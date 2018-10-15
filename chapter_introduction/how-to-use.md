@@ -4,7 +4,7 @@ This book will provide a comprehensive introduction to all aspects of deep learn
 
 ## Target reader
 
-本书面向希望了解深度学习，特别是对实际使用深度学习感兴趣的大学生、工程师和研究人员。本书并不要求你有任何深度学习或者机器学习的背景知识，我们将从头开始解释每一个概念。虽然深度学习技术与应用的阐述涉及了数学和编程，但你只需了解基础的数学和编程，例如基础的线性代数、微分和概率，以及基础的Python编程。在附录中我们提供了本书所涉及的主要数学知识供你参考。如果你之前没有接触过Python，可以参考中文教程 http://www.runoob.com/python/python-tutorial.html 或英文教程 http://learnpython.org/ 。当然，如果你只对本书中的数学部分感兴趣，你可以忽略掉编程部分，反之亦然。
+This book is for college students, engineers, and researchers who wish to learn deep learning, especially for those who are interested in applying deep learning into practice. This book does not require that you have any background in deep learning or machine learning. We will explain every concept from scratch. Although illustrations of deep learning techniques and applications involve mathematics and programming, you only need to know their basics, such as basic linear algebra, calculus, and probability, and basic Python programming. In appendix we provide most of the mathematics covered in this book for your reference. If you have not used Python before, you may refer to the tutorial http://learnpython.org/ . Of course, if you are only interested in the mathematical part, you can ignore the programming part, and vice versa.
 
 
 ## Content and structure
