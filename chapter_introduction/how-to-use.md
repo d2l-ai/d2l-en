@@ -33,7 +33,8 @@ This book can serve as an MXNet primer. The main purpose of our codes is to prov
 
 ## Forum
 
-本书的学习社区地址是 https://discuss.gluon.ai/ 。当你对书中某节内容有疑惑时，请扫一扫该节末尾的二维码参与该节内容的讨论。值得一提的是，在有关Kaggle比赛章节的讨论区中，众多社区成员提供了丰富的高水平方法。我们强烈推荐大家积极参与学习社区中的讨论，并相信你一定会有所收获。本书作者和MXNet开发人员也时常参与社区中的讨论。
+The discussion forum of this book is https://discuss.mxnet.io/ . When you have questions on any section of the book, please scan the QR code at the end of the section to participate in its discussions. The authors of this book and MXNet developers often participate in the discussions on the forum.
+
 
 ## Summary
 
@@ -41,9 +42,9 @@ This book can serve as an MXNet primer. The main purpose of our codes is to prov
 * This book seeks to create a multi-faceted interactive learning experience with deep learning.
 
 
-## exercise
+## Exercise
 
-* 在本书的学习社区 https://discuss.gluon.ai/ 上注册一个账号。搜索关键字Kaggle，浏览其中回复量最大的几个帖子。
+* Register an account at the discussion forum of this book https://discuss.mxnet.io/ .
 
 
 ## Scan the QR code to get to the [forum](https://discuss.gluon.ai/t/topic/6915)
