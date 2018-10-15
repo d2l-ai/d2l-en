@@ -1,4 +1,4 @@
-# How to use this book
+# How to Use This Book
 
 This book will provide a comprehensive introduction to all aspects of deep learning from model construction to model training, as well as their applications in computer vision and natural language processing. We will not only explain the principles of the algorithm, but also demonstrate their implementation and operation based on Apache MXNet. Each section of the book is a Jupyter notebook,  which combines texts, formulas, images, codes, and running results. Not only can you read them directly, but you can run them to get an interactive learning experience.
 
@@ -47,6 +47,6 @@ The discussion forum of this book is https://discuss.mxnet.io/ . When you have q
 * Register an account at the discussion forum of this book https://discuss.mxnet.io/ .
 
 
-## Scan the QR code to get to the [forum](https://discuss.gluon.ai/t/topic/6915)
+## Scan the QR code to get to the [forum](https://discuss.mxnet.io/t/how-to-use-this-book-discussions/2011)
 
 ![](../img/qr_how-to-use.svg)

@@ -129,7 +129,7 @@ Lastly, the Deep Learning community prides itself of sharing tools across academ
 * Where else can you apply the end-to-end training approach? Physics? Engineering? Econometrics?
 * Why would you want to build a Deep Network that is structured like a human brain? What would the advantage be? Why would you not want to do that (what are some key differences between microprocessors and neurons)?
 
-## Scan the QR code to get to the [forum](https://discuss.gluon.ai/t/topic/746)
+## Scan the QR code to get to the [forum](https://discuss.mxnet.io/t/introduction-discussions/2010)
 
 ![](../img/qr_deep-learning-intro.svg)
 
