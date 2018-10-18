@@ -5,7 +5,7 @@ body {
 }
 
 body {
-    font-family: sans-serif;
+    font-family: 'Lato', sans-serif;
 
 }
 
@@ -177,7 +177,7 @@ section.community .content p {
   color: black;
   border: 1px solid;
   letter-spacing: 2px;
-  font-size: 14px;
+  font-size: 12px;
   padding: 10px 30px;
   margin: 0px 10px;
 }
@@ -194,7 +194,7 @@ section.community .content p {
       padding-top: 50px;
   }
   header.masthead .btn {
-      width: 150px;
+      width: 180px;
       margin: 10px 100px;
   }
 
