@@ -28,7 +28,7 @@ Compared with the multilayer perceptron, we added one more $\boldsymbol{H}_{t-1}
 
 There are many different RNN construction methods.  RNNs with a hidden state defined by the equation above are very common. Unless otherwise stated, all the RNNs in this chapter are based on the recurrent computation of the hidden state in the equation above. For time step $t$, the output of the output layer is similar to the computation in the multilayer perceptron:
 
-$\boldsymbol{O}_t = \boldsymbol{H}_t \boldsymbol{W_}{hq} + \boldsymbol{b}_q.$
+$\boldsymbol{O}_t = \boldsymbol{H}_t \boldsymbol{W}_{hq} + \boldsymbol{b}_q.$
 
 RNN parameters include the weight $\boldsymbol{W}_{xh} \in \mathbb{R}^{d \times h}, \boldsymbol{W}_{hh} \in \mathbb{R}^{h \times h}$ of the hidden layer with the bias $\boldsymbol{b}_h \in \mathbb{R}^{1 \times h}$, and the weight $\boldsymbol{W}_{hq} \in \mathbb{R}^{h \times q}$ of the output layer with the bias $\boldsymbol{b}_q \in \mathbb{R}^{1 \times q}$. It is worth mentioning that RNNs always use these model parameters, even for different time steps. Therefore, the number of RNN model parameters does not grow as the number of time steps increases.
 
@@ -66,7 +66,7 @@ Compared with the multilayer perceptron, we added one more $\boldsymbol{H}_{t-1}
 
 There are many different RNN construction methods.  RNNs with a hidden state defined by the equation above are very common. Unless otherwise stated, all the RNNs in this chapter are based on the recurrent computation of the hidden state in the equation above. For time step $t$, the output of the output layer is similar to the computation in the multilayer perceptron:
 
-$\boldsymbol{O}_t = \boldsymbol{H}_t \boldsymbol{W_}{hq} + \boldsymbol{b}_q.$
+$\boldsymbol{O}_t = \boldsymbol{H}_t \boldsymbol{W}_{hq} + \boldsymbol{b}_q.$
 
 RNN parameters include the weight $\boldsymbol{W}_{xh} \in \mathbb{R}^{d \times h}, \boldsymbol{W}_{hh} \in \mathbb{R}^{h \times h}$ of the hidden layer with the bias $\boldsymbol{b}_h \in \mathbb{R}^{1 \times h}$, and the weight $\boldsymbol{W}_{hq} \in \mathbb{R}^{h \times q}$ of the output layer with the bias $\boldsymbol{b}_q \in \mathbb{R}^{1 \times q}$. It is worth mentioning that RNNs always use these model parameters, even for different time steps. Therefore, the number of RNN model parameters does not grow as the number of time steps increases.
 
