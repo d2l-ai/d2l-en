@@ -8,4 +8,4 @@ pip list
 
 rm -rf build/_build/
 
-make html EVAL=0
+make html
