@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Dive into Deep Learning</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
+
+    <link href="_static/index.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+    <header class="masthead">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-4 my-auto mx-auto text-center">
+            <img src="_images/frontpage/front.jpg" class="img-fluid" alt="">
+          </div>
+          <div class="col-lg-7 my-auto mx-auto">
+            <div class="header-content my-auto mx-auto">
+              <h1 class="mb-5">Dive into Deep Learning</h1>
+              <p>A interactive deep learning for students, engineers and
+              reseachers. </p>
+              <a href="toc.html" class="btn btn-outline btn-xl">READ ONLINE</a>
+              <!-- <a href="gluon_tutorials_zh.pdf" class="btn btn-outline btn-xl"><i class="fas fa-download"></i> PDF</a> -->
+              <a href="https://github.com/diveintodeeplearning/d2l-en" class="btn btn-outline btn-xl"><i class="fab
+              fa-github"></i> GITHUB</a>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="authors" id="authors">
+      <div class="container ">
+        <div class="row ">
+          <div class="col-lg-3 ">
+            <div class="author-item mx-auto my-auto">
+              <img src="./_images/frontpage/aston.jpg" class="rounded-circle"/>
+              <h3><a href="https://astonzhang.github.io/">Aston Zhang </a></h3>
+              <p>Amazon applied scientist. UIUC PhD.</p>
+            </div>
+          </div>
+
+          <div class="col-lg-3">
+            <div class="author-item mx-auto my-auto">
+              <img src="./_images/frontpage/zack.jpg" class="rounded-circle"/>
+              <h3><a href="http://zacklipton.com/">Zack C. Lipton</a></h3>
+              <p> CMU assistant professor. Amazon applied scientst. UCSD PhD.</p>
+            </div>
+          </div>
+
+          <div class="col-lg-3">
+            <div class="author-item mx-auto my-auto">
+              <img src="./_images/frontpage/mu.jpg" class="rounded-circle"/>
+              <h3><a href="http://www.cs.cmu.edu/~muli/">Mu Li</a></h3>
+              <p>Amazon principal scientist, CMU PhD.</p>
+            </div>
+          </div>
+
+
+          <div class="col-lg-3">
+            <div class="author-item mx-auto my-auto">
+              <img src="./_images/frontpage/alex.jpg" class="rounded-circle"/>
+              <h3><a href="https://alex.smola.org/">Alex J. Smola</a></h3>
+              <p>Amazon director. </p>
+            </div>
+          </div>
+        </div>
+        <h3 class="text-center"> Thanks to community contributors </h3>
+      </div>
+    </section>
+
+    <section class="toc" id="toc">
+      <div class="container">
+        <div class="toc-content mx-auto">
+        <h2> <a href="toc.html">Combining algorithms and practices </a></h2>
+        <p>We will explain the concepts of deep learning and machine learning from the beginning, you don't need to have this background knowledge. Our goal is to allow you to conceptually understand deep learning not only after completing your studies, but also to apply it to practical projects and research</p>
+        </div>
+        <div class="row">
+          <div class="col-lg-4">
+            <h3 class="text-center"> <a href="chapter_introduction/index.html">引言</a> · <a href="chapter_prerequisite/index.html">预备知识</a></h3>
+            <p>&#9657; 深度学习简介 &#9657; 如何使用本书 &#9657; 获取和运行本书代码
+&#9657; 数据操作 &#9657; 自动求梯度 &#9657; 查阅 MXNet 文档</p>
+          </div>
+          <div class="col-lg-4">
+            <h3 class="text-center"><a href="chapter_deep-learning-basics/index.html">深度学习基础</a></h3>
+            <p>&#9657; 线性回归 &#9657; Softmax 回归 &#9657; 多层感知机 &#9657;
+              模型选择 &#9657; 权重衰减 &#9657; 丢弃法 &#9657; 正向、反向传播 &#9657;
+              模型初始化 &#9657; Kaggle 实战 ：房价预测</p>
+          </div>
+          <div class="col-lg-4">
+            <h3 class="text-center"> <a href="chapter_deep-learning-computation/index.html">深度学习计算</a></h3>
+            <p>&#9657; 模型构造 &#9657; 模型参数的访问、初始化和共享 &#9657;
+              模型参数的延后初始化 &#9657; 自定义层 &#9657; 读取和存储 &#9657; GPU 计算</p>
+          </div>
+          <div class="col-lg-4">
+            <h3 class="text-center"> <a href="chapter_convolutional-neural-networks/index.html">卷积神经网络</a></h3>
+            <p> &#9657; 二维卷积层 &#9657; 填充和步幅 &#9657; 多输入通道和多输出通道
+              &#9657; 池化层&#9657; LeNet &#9657; AlexNet &#9657; VGG &#9657;
+              NiN &#9657; GoogLeNet &#9657; 批量归一化 &#9657; ResNet &#9657;
+              DenseNet</p>
+          </div>
+          <div class="col-lg-4">
+            <h3 class="text-center"> <a href="chapter_recurrent-neural-networks/index.html">循环神经网络</a></h3>
+            <p> &#9657; 语言模型 &#9657; 循环神经网络 &#9657; 通过时间反向传播
+    &#9657; GRU &#9657; LSTM &#9657; 深度循环神经网络 &#9657; 双向循环神经网络</p>
+          </div>
+          <div class="col-lg-4">
+            <h3 class="text-center"> <a href="chapter_optimization/index.html">优化算法</a></h3>
+            <p> &#9657; 优化与深度学习 &#9657; 梯度下降和随机梯度下降 &#9657;
+              小批量随机梯度下降 &#9657; 动量法 &#9657; Adagrad &#9657; RMSProp &#9657;
+     Adadelta &#9657; Adam</p>
+          </div>
+          <div class="col-lg-4">
+            <h3 class="text-center"> <a href="chapter_computational-performance/index.html">计算性能</a></h3>
+            <p> &#9657; 命令式和符号式混合编程 &#9657; 异步计算 &#9657;
+              自动并行计算 &#9657; 多 GPU 计算</p>
+          </div>
+          <div class="col-lg-4">
+            <h3 class="text-center"> <a href="chapter_computer-vision/index.html">计算机视觉</a></h3>
+            <p> &#9657; 图像增广 &#9657; 微调 &#9657; 物体检测和边界框 &#9657;
+              锚框 &#9657; SSD &#9657; R-CNN 系列
+              &#9657; FCN &#9657; 样式 迁移 &#9657; Kaggle 实战：CIFAR-10
+              &#9657; Kaggle 实战：ImageNet Dogs
+            </p>
+          </div>
+          <div class="col-lg-4 mx-auto">
+            <h3 class="text-center"> <a href="chapter_natural-language-processing/index.html">自然语言处理</a></h3>
+            <p> &#9657; word2vec &#9657; fastText &#9657; GloVe &#9657;
+              求近义词和类比词 &#9657; 文本情感分类 &#9657; seq2seq &#9657;
+              束搜索 &#9657; 注意力机制 &#9657; 机器翻译</p>
+          </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="features" id="features">
+      <div class="container">
+        <div class="features-content mx-auto">
+          <h2>Equations + Figures + Codes</h2>
+          <p> Not only do we combine text, formulas, and diagrams to clarify the models and algorithms that are commonly used in deep learning, but we also provide code to demonstrate how to implement them from scratch and use real data to provide an interactive learning experience.
+ </p>
+          </div>
+        <div class="row">
+          <div class="feature-item mx-auto my-auto">
+          <div class="col-lg-4">
+             <img src="_images/frontpage/eq.jpg"/>
+          </div>
+          </div>
+          <div class="feature-item mx-auto my-auto">
+          <div class="col-lg-4">
+             <img src="_images/frontpage/figure.jpg"/>
+          </div>
+          </div>
+          <div class="feature-item mx-auto my-auto">
+          <div class="col-lg-4">
+             <img src="_images/frontpage/code.jpg"/>
+          </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="notebook" id="notebook">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-5 mx-auto my-auto">
+            <div class="content">
+            <h2>Each section is an runable <a href="chapter_prerequisite/install.html">Jupyter notebook</a></h2>
+            <p>You can freely modify the code and hyperparameters to get timely feedback to accumulate practical experience in deep learning. </a>
+            </div>
+          </div>
+            <div class="my-auto mx-auto">
+          <div class="col-lg-7 ">
+            <img src="_images/frontpage/notebook.jpg">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="community" id="community">
+      <div class="container">
+        <div class="row">
+            <div class="my-auto mx-auto">
+          <div class="col-lg-7 my-auto">
+            <img src="_images/frontpage/forum.jpg">
+          </div>
+          </div>
+          <div class="col-lg-4 mx-auto my-auto">
+            <div class="content">
+              <h2>Active <a href="https://discuss.gluon.ai/">community</a> support</h2>
+              <p>You can discuss and learn with thousands of small partners in the community through the last link in each chapter. </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <script type="text/javascript" src="_static/google_analytics.js"></script>
+  </body>
+
+
+
+</html>

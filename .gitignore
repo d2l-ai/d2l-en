@@ -10,4 +10,7 @@ data/
 /chapter_gluon-basics/mydict
 *egg-info*
 dist*
-utils.py
+build/chapter*
+build/_build
+build/img
+build/data
