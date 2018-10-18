@@ -74,7 +74,7 @@ Figure 6.1 shows the computational logic of an RNN at three adjacent time steps.
 
 ![An RNN with a hidden state. ](../img/rnn.svg)
 
-, and `H` by `W_hh`, then add the results from the multiplication to obtain a matrix with the shape (3,4). 
+, and `H` by `W_hh`, then add the results from the multiplication to obtain a matrix with the shape (3,4).
 
 ```{.python .input  n=1}
 from mxnet import nd
@@ -84,7 +84,7 @@ H, W_hh = nd.random.normal(shape=(3, 2)), nd.random.normal(shape=(2, 4))
 nd.dot(X, W_xh) + nd.dot(H, W_hh)
 ```
 
-Concatenate matrices `X` and `H` vertically (dimension 1). The shape of the concatenated matrix is (3,3). It can be seen that the length of the concatenated matrix on dimension 1 is the sum of lengths ($1+2$) from the matrices `X` and `H` on dimension 1.  Then, concatenate matrixes `W_xh` and `W_hh` horizontally (dimension 0). The resulting matrix shape will be (3,4). Lastly, multiply the two concatenated matrices to obtain a matrix that has the same shape (3, 4) as the above code output. 
+Concatenate matrices `X` and `H` vertically (dimension 1). The shape of the concatenated matrix is (3,3). It can be seen that the length of the concatenated matrix on dimension 1 is the sum of lengths ($1+2$) from the matrices `X` and `H` on dimension 1.  Then, concatenate matrixes `W_xh` and `W_hh` horizontally (dimension 0). The resulting matrix shape will be (3,4). Lastly, multiply the two concatenated matrices to obtain a matrix that has the same shape (3, 4) as the above code output.
 
 ```{.python .input  n=2}
 nd.dot(nd.concat(X, H, dim=1), nd.concat(W_xh, W_hh, dim=0))
@@ -102,7 +102,7 @@ Since each word entered is a character, this model is called a "character-level 
 ## Summary
 
 * A network that uses recurrent computation is called a recurrent neural network (RNN).
-* The hidden state of the RNN can capture historical information of the sequence up to the current time step. 
+* The hidden state of the RNN can capture historical information of the sequence up to the current time step.
 * The number of RNN model parameters does not grow as the number of time steps increases.
 * We can create language models using a character-level RNN.
 
