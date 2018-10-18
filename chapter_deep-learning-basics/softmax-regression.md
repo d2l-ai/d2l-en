@@ -90,7 +90,7 @@ $$
 \boldsymbol{o}^{(i)} &= \boldsymbol{x}^{(i)} \boldsymbol{W} + \boldsymbol{b},\\
 \boldsymbol{\hat{y}}^{(i)} &= \text{softmax}(\boldsymbol{o}^{(i)}).
 \end{aligned}
-$
+$$
 
 ## Vector Calculation Expression for Mini-batch Example Classification
 
