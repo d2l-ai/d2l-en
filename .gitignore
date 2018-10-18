@@ -1,7 +1,6 @@
 **/.ipynb_checkpoints
 **/__pycache__
 data/
-build/
 *.json
 *.params
 *.DS_Store
