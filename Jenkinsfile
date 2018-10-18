@@ -8,14 +8,14 @@ stage("Sanity Check") {
 }
 
 
-stage("Build HTML") {
-  node {
-    ws('workspace/d2l-en') {
-      checkout scm
-      sh "build/build_html.sh"
-    }
-  }
-}
+// stage("Build HTML") {
+//   node {
+//     ws('workspace/d2l-en') {
+//       checkout scm
+//       sh "build/build_html.sh"
+//     }
+//   }
+// }
 
 stage("Build PDF") {
   node {
