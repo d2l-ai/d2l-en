@@ -61,8 +61,6 @@ The main symbols used in this book are listed below.
 |:--|:-:|
 |$\mathbb{P}(\cdot)$ | Probability distribution |
 |$\cdot \sim \mathbb{P}$ | The probability distribution of the random variable $\cdot$ is $\mathbb{P}$ |
-| $\mathbb{P}(\cdot \mid \cdot)$ | Conditional probability distribution |
-| $\mathbb{E}_\cdot\left(f(\cdot)\right)$ | The mathematical expectation of the function $f(\cdot)$ for $\cdot$ |
 
 
 ## Complexity
