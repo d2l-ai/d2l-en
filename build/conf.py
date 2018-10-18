@@ -284,13 +284,13 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'gluon_tutorials_zh.tex', '动手学深度学习',
+    (master_doc, 'd2l-en.tex', 'Dive into Deep Learning',
      author, 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
-latex_logo = '_static/gluon.png'
+# latex_logo = '_static/gluon.png'
 
 # latex_engine  = 'xelatex'
 # For "manual" documents, if this is true, then toplevel headings are parts,

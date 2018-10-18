@@ -28,11 +28,11 @@ Compared with the multilayer perceptron, we added one more $\boldsymbol{H}_{t-1}
 
 There are many different RNN construction methods.  RNNs with a hidden state defined by the equation above are very common. Unless otherwise stated, all the RNNs in this chapter are based on the recurrent computation of the hidden state in the equation above. For time step $t$, the output of the output layer is similar to the computation in the multilayer perceptron:
 
-$\boldsymbol{O}_t = \boldsymbol{H}_t \boldsymbol{W_}{hq} + \boldsymbol{b}_q.$
+$\boldsymbol{O}_t = \boldsymbol{H}_t \boldsymbol{W}_{hq} + \boldsymbol{b}_q.$
 
 RNN parameters include the weight $\boldsymbol{W}_{xh} \in \mathbb{R}^{d \times h}, \boldsymbol{W}_{hh} \in \mathbb{R}^{h \times h}$ of the hidden layer with the bias $\boldsymbol{b}_h \in \mathbb{R}^{1 \times h}$, and the weight $\boldsymbol{W}_{hq} \in \mathbb{R}^{h \times q}$ of the output layer with the bias $\boldsymbol{b}_q \in \mathbb{R}^{1 \times q}$. It is worth mentioning that RNNs always use these model parameters, even for different time steps. Therefore, the number of RNN model parameters does not grow as the number of time steps increases.
 
-Figure 6.1 shows the computational logic of an RNN at three adjacent time steps. In time step $t$, the computation of the hidden state can be treated as an entry of a fully connected layer with the activation function $\phi$ after concatenating the input $\boldsymbol{X}_t$ with the hidden state $\boldsymbol{H}_{t-1}$ of the previous time step.  The output of the fully connected layer is the hidden state of the current time step $\boldsymbol{H}__t$. Its model parameter is the concatenation of $\boldsymbol{W}_{xh}$ and $\boldsymbol{W}_{hh}$, with a bias of $\boldsymbol{b}_h$. The hidden state of the current time step $t$ $\boldsymbol{H}_t$ will participate in computing the hidden state $\boldsymbol{H}_{t+1}$ of the next time step $t+1$, the result of which will become the input for the fully connected output layer of the current time step.
+Figure 6.1 shows the computational logic of an RNN at three adjacent time steps. In time step $t$, the computation of the hidden state can be treated as an entry of a fully connected layer with the activation function $\phi$ after concatenating the input $\boldsymbol{X}_t$ with the hidden state $\boldsymbol{H}_{t-1}$ of the previous time step.  The output of the fully connected layer is the hidden state of the current time step $\boldsymbol{H}_t$. Its model parameter is the concatenation of $\boldsymbol{W}_{xh}$ and $\boldsymbol{W}_{hh}$, with a bias of $\boldsymbol{b}_h$. The hidden state of the current time step $t$ $\boldsymbol{H}_t$ will participate in computing the hidden state $\boldsymbol{H}_{t+1}$ of the next time step $t+1$, the result of which will become the input for the fully connected output layer of the current time step.
 
 ![An RNN with a hidden state. ](../img/rnn.svg)
 
@@ -66,15 +66,15 @@ Compared with the multilayer perceptron, we added one more $\boldsymbol{H}_{t-1}
 
 There are many different RNN construction methods.  RNNs with a hidden state defined by the equation above are very common. Unless otherwise stated, all the RNNs in this chapter are based on the recurrent computation of the hidden state in the equation above. For time step $t$, the output of the output layer is similar to the computation in the multilayer perceptron:
 
-$\boldsymbol{O}_t = \boldsymbol{H}_t \boldsymbol{W_}{hq} + \boldsymbol{b}_q.$
+$\boldsymbol{O}_t = \boldsymbol{H}_t \boldsymbol{W}_{hq} + \boldsymbol{b}_q.$
 
 RNN parameters include the weight $\boldsymbol{W}_{xh} \in \mathbb{R}^{d \times h}, \boldsymbol{W}_{hh} \in \mathbb{R}^{h \times h}$ of the hidden layer with the bias $\boldsymbol{b}_h \in \mathbb{R}^{1 \times h}$, and the weight $\boldsymbol{W}_{hq} \in \mathbb{R}^{h \times q}$ of the output layer with the bias $\boldsymbol{b}_q \in \mathbb{R}^{1 \times q}$. It is worth mentioning that RNNs always use these model parameters, even for different time steps. Therefore, the number of RNN model parameters does not grow as the number of time steps increases.
 
-Figure 6.1 shows the computational logic of an RNN at three adjacent time steps. In time step $t$, the computation of the hidden state can be treated as an entry of a fully connected layer with the activation function $\phi$ after concatenating the input $\boldsymbol{X}_t$ with the hidden state $\boldsymbol{H}_{t-1}$ of the previous time step.  The output of the fully connected layer is the hidden state of the current time step $\boldsymbol{H}__t$. Its model parameter is the concatenation of $\boldsymbol{W}_{xh}$ and $\boldsymbol{W}_{hh}$, with a bias of $\boldsymbol{b}_h$. The hidden state of the current time step $t$ $\boldsymbol{H}_t$ will participate in computing the hidden state $\boldsymbol{H}_{t+1}$ of the next time step $t+1$, the result of which will become the input for the fully connected output layer of the current time step.
+Figure 6.1 shows the computational logic of an RNN at three adjacent time steps. In time step $t$, the computation of the hidden state can be treated as an entry of a fully connected layer with the activation function $\phi$ after concatenating the input $\boldsymbol{X}_t$ with the hidden state $\boldsymbol{H}_{t-1}$ of the previous time step.  The output of the fully connected layer is the hidden state of the current time step $\boldsymbol{H}_t$. Its model parameter is the concatenation of $\boldsymbol{W}_{xh}$ and $\boldsymbol{W}_{hh}$, with a bias of $\boldsymbol{b}_h$. The hidden state of the current time step $t$ $\boldsymbol{H}_t$ will participate in computing the hidden state $\boldsymbol{H}_{t+1}$ of the next time step $t+1$, the result of which will become the input for the fully connected output layer of the current time step.
 
 ![An RNN with a hidden state. ](../img/rnn.svg)
 
-, and `H` by `W_hh`, then add the results from the multiplication to obtain a matrix with the shape (3,4). 
+, and `H` by `W_hh`, then add the results from the multiplication to obtain a matrix with the shape (3,4).
 
 ```{.python .input  n=1}
 from mxnet import nd
@@ -84,7 +84,7 @@ H, W_hh = nd.random.normal(shape=(3, 2)), nd.random.normal(shape=(2, 4))
 nd.dot(X, W_xh) + nd.dot(H, W_hh)
 ```
 
-Concatenate matrices `X` and `H` vertically (dimension 1). The shape of the concatenated matrix is (3,3). It can be seen that the length of the concatenated matrix on dimension 1 is the sum of lengths ($1+2$) from the matrices `X` and `H` on dimension 1.  Then, concatenate matrixes `W_xh` and `W_hh` horizontally (dimension 0). The resulting matrix shape will be (3,4). Lastly, multiply the two concatenated matrices to obtain a matrix that has the same shape (3, 4) as the above code output. 
+Concatenate matrices `X` and `H` vertically (dimension 1). The shape of the concatenated matrix is (3,3). It can be seen that the length of the concatenated matrix on dimension 1 is the sum of lengths ($1+2$) from the matrices `X` and `H` on dimension 1.  Then, concatenate matrixes `W_xh` and `W_hh` horizontally (dimension 0). The resulting matrix shape will be (3,4). Lastly, multiply the two concatenated matrices to obtain a matrix that has the same shape (3, 4) as the above code output.
 
 ```{.python .input  n=2}
 nd.dot(nd.concat(X, H, dim=1), nd.concat(W_xh, W_hh, dim=0))
@@ -102,7 +102,7 @@ Since each word entered is a character, this model is called a "character-level 
 ## Summary
 
 * A network that uses recurrent computation is called a recurrent neural network (RNN).
-* The hidden state of the RNN can capture historical information of the sequence up to the current time step. 
+* The hidden state of the RNN can capture historical information of the sequence up to the current time step.
 * The number of RNN model parameters does not grow as the number of time steps increases.
 * We can create language models using a character-level RNN.
 

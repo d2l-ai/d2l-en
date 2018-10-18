@@ -21,6 +21,7 @@ stage("Build PDF") {
   node {
     ws('workspace/d2l-en') {
       checkout scm
+      sh "build/build_pdf.sh"
     }
   }
 }

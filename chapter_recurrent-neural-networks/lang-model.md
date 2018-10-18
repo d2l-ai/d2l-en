@@ -37,7 +37,7 @@ $$
 \mathbb{P}(w_1, w_2, w_3, w_4) &=  \mathbb{P}(w_1) \mathbb{P}(w_2 \mid w_1) \mathbb{P}(w_3 \mid w_2) \mathbb{P}(w_4 \mid w_3) ,\\
 \mathbb{P}(w_1, w_2, w_3, w_4) &=  \mathbb{P}(w_1) \mathbb{P}(w_2 \mid w_1) \mathbb{P}(w_3 \mid w_1, w_2) \mathbb{P}(w_4 \mid w_2, w_3) .
 \end{aligned}
-$
+$$
 
 When $n$ is small, the $n$-grams is often inaccurate. For example, in unigram, the probability of the three-word sentences "you go first" and "you first go" is the same. However, when $n$ is large, the $n$-grams needs to calculate and store a large number of word frequencies and multi-word adjacent frequencies.
 
