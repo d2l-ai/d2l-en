@@ -2,6 +2,7 @@ stage("Sanity Check") {
   node {
     ws('workspace/d2l-en') {
       checkout scm
+      sh build/sanity_check.sh
     }
   }
 }
