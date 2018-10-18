@@ -1,1 +1,1 @@
-Dive into Deep Learning (D2L)
+Dive into Deep Learning
