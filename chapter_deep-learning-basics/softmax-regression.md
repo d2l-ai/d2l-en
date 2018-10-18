@@ -19,7 +19,7 @@ o_1 &= x_1 w_{11} + x_2 w_{21} + x_3 w_{31} + x_4 w_{41} + b_1,\\
 o_2 &= x_1 w_{12} + x_2 w_{22} + x_3 w_{32} + x_4 w_{42} + b_2,\\
 o_3 &= x_1 w_{13} + x_2 w_{23} + x_3 w_{33} + x_4 w_{43} + b_3.
 \end{aligned}
-$
+$$
 
 
 Figure 3.2 uses a neural network diagram to depict the calculation above.  Like linear regression, softmax regression is also a single-layer neural network.  Since the calculation of each output, $o_1, o_2, and o_3$, depends on all inputs, $x_1, x_2, x_3, and x_4$, the output layer of the softmax regression is also a fully connected layer.
@@ -55,14 +55,14 @@ So, the softmax operation does not change the prediction category output.
 In order to improve the computational efficiency, we can use vector calculation to express the classification for a single example.  In the image classification problem above, it is assumed that the weight and bias parameters of the softmax regression are
 
 $$
-\boldsymbol{W} = 
+\boldsymbol{W} =
 \begin{bmatrix}
     w_{11} & w_{12} & w_{13} \\
     w_{21} & w_{22} & w_{23} \\
     w_{31} & w_{32} & w_{33} \\
     w_{41} & w_{42} & w_{43}
 \end{bmatrix},\quad
-\boldsymbol{b} = 
+\boldsymbol{b} =
 \begin{bmatrix}
     b_1 & b_2 & b_3
 \end{bmatrix},
@@ -129,11 +129,11 @@ Here, $\boldsymbol{\Theta}$ represents the model parameters.  Similarly, if ther
 
 ## Model Prediction and Evaluation
 
-After training the softmax regression model, given any example features, we can predict the probability of each output category. Normally, we use the category with the highest predicted probability as the output category. The prediction is correct if it is consistent with the actual category (label).  In the next part of the experiment, we will use accuracy to evaluate the model’s performance. This is equal to the ratio between the number of correct predictions and the total number of predictions. 
+After training the softmax regression model, given any example features, we can predict the probability of each output category. Normally, we use the category with the highest predicted probability as the output category. The prediction is correct if it is consistent with the actual category (label).  In the next part of the experiment, we will use accuracy to evaluate the model’s performance. This is equal to the ratio between the number of correct predictions and the total number of predictions.
 
 ## Summary
 
-* Softmax regression applies to classification problems. It uses the probability distribution of the output category in the softmax operation. 
+* Softmax regression applies to classification problems. It uses the probability distribution of the output category in the softmax operation.
 * Softmax regression is a single-layer neural network, and the number of outputs is equal to the number of categories in the classification problem.
 * Cross entropy is a good measure of the difference between two probability distributions.
 

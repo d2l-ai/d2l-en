@@ -22,7 +22,7 @@ $$
 w_1 &\leftarrow \left(1- \frac{\eta\lambda}{|\mathcal{B}|} \right)w_1 -   \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}}x_1^{(i)} \left(x_1^{(i)} w_1 + x_2^{(i)} w_2 + b - y^{(i)}\right),\\
 w_2 &\leftarrow \left(1- \frac{\eta\lambda}{|\mathcal{B}|} \right)w_2 -   \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}}x_2^{(i)} \left(x_1^{(i)} w_1 + x_2^{(i)} w_2 + b - y^{(i)}\right).
 \end{aligned}
-$
+$$
 
 We can see that $L_2$ norm regularization multiplies the weights $w_1$ and $w_2$ by a number less than one and then subtracts the gradient without the penalty term. Therefore, $L_2$ norm regularization is also called weight decay. Weight decay adds a limit to the model that needs to be learned using a penalty for the model parameter with a larger absolute value. This can be an effective solution for overfitting. In real-world use, we sometimes add the sum of the squares of the bias elements to the penalty term.
 

@@ -23,7 +23,13 @@ for FNAME in `find . -type f -name "*.md"`; do
         if [[ "$LINE" =~ ^\`\`\`.* ]]; then
             IN_CODE=$(($IN_CODE ^ 1))
         fi
+
+        if [[ "$LINE" =~ ^\$\$.* ]] && ! [[ "$LINE" =~ .+\$\$$ ]]; then
+            IN_CODE=$(($IN_CODE ^ 1))
+        fi
+
         if [[ "$LINE" =~ ^\ \ \ .* ]] && [[ "$IN_CODE" == "0" ]]; then
+            echo $FNAME $LINE
             OUTPUT=$(printf "$OUTPUT\nL$L: $LINE")
         fi
         L=$((L+1))

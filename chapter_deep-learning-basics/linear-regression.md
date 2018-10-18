@@ -61,7 +61,7 @@ w_1 &\leftarrow w_1 -   \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \fra
 w_2 &\leftarrow w_2 -   \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \frac{ \partial \ell^{(i)}(w_1, w_2, b)  }{\partial w_2} = w_2 -   \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}}x_2^{(i)} \left(x_1^{(i)} w_1 + x_2^{(i)} w_2 + b - y^{(i)}\right),\\
 b &\leftarrow b -   \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \frac{ \partial \ell^{(i)}(w_1, w_2, b)  }{\partial b} = b -   \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}}\left(x_1^{(i)} w_1 + x_2^{(i)} w_2 + b - y^{(i)}\right).
 \end{aligned}
-$
+$$
 
 In the above formula, $|\mathcal{B}|$ represents the number of samples (batch size) in each mini-batch, $\eta$ is referred to as ‘learning rate’ and takes a positive number. It should be emphasized that the values of the batch size and learning rate are artificially set and are not learned through model training. Therefore, they are referred to as ‘hyper-parameters’. What we usually call "tuning hyper-parameters" refers to the adjustment of the hyper-parameters. This can be performed through repeated trial and error until the appropriate hyper-parameters are found. In a few cases, hyper-parameters can also be learned through model training. However, this book does not discuss such cases.
 
@@ -125,24 +125,24 @@ $$
 \hat{y}^{(2)} &= x_1^{(2)} w_1 + x_2^{(2)} w_2 + b,\\
 \hat{y}^{(3)} &= x_1^{(3)} w_1 + x_2^{(3)} w_2 + b.
 \end{aligned}
-$
+$$
 
 Now, we convert the above three equations into vector calculations. Set
 
-$
-\boldsymbol{\hat{y}} = 
+$$
+\boldsymbol{\hat{y}} =
 \begin{bmatrix}
     \hat{y}^{(1)} \\
     \hat{y}^{(2)} \\
     \hat{y}^{(3)}
 \end{bmatrix},\quad
-\boldsymbol{X} = 
+\boldsymbol{X} =
 \begin{bmatrix}
     x_1^{(1)} & x_2^{(1)} \\
     x_1^{(2)} & x_2^{(2)} \\
     x_1^{(3)} & x_2^{(3)}
 \end{bmatrix},\quad
-\boldsymbol{w} = 
+\boldsymbol{w} =
 \begin{bmatrix}
     w_1 \\
     w_2
@@ -171,7 +171,8 @@ The iteration steps of mini-batch stochastic gradient descent will be rewritten 
 $\boldsymbol{\theta}\leftarrow \boldsymbol{\theta} -   \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}}   \nabla_{\boldsymbol{\theta}} \ell^{(i)}(\boldsymbol{\theta}),$
 
 其中梯度是损失有关三个为标量的模型参数的偏导数组成的向量：
-$
+
+$$
 \nabla_{\boldsymbol{\theta}} \ell^{(i)}(\boldsymbol{\theta})=
 \begin{bmatrix}
     \frac{ \partial \ell^{(i)}(w_1, w_2, b)  }{\partial w_1} \\

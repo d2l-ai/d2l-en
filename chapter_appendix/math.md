@@ -12,12 +12,12 @@ Below we summarize the concepts of vectors, matrices, operations, norms, feature
 Vectors in this book refer to column vectors. An expression for an $n$ dimension vector $\boldsymbol{x}$ can be written as
 
 $$
-\boldsymbol{x} = 
+\boldsymbol{x} =
 \begin{bmatrix}
     x_{1}  \\
     x_{2}  \\
     \vdots  \\
-    x_{n} 
+    x_{n}
 \end{bmatrix},
 $$
 
@@ -29,7 +29,7 @@ Here, $x_1, \ldots, x_n$ are elements of the vector. We denote the $n$ dimension
 An expression for a matrix with $m$ rows and $n$ columns can be written as
 
 $$
-\boldsymbol{X} = 
+\boldsymbol{X} =
 \begin{bmatrix}
     x_{11} & x_{12}  & \dots  & x_{1n} \\
     x_{21} & x_{22}  & \dots  & x_{2n} \\
@@ -50,26 +50,26 @@ $\boldsymbol{a} \cdot \boldsymbol{b} = a_1 b_1 + \ldots + a_n b_n.$
 
 Assume two matrices with $m$ rows and $n$ columns:
 
-$
-\boldsymbol{A} = 
+$$
+\boldsymbol{A} =
 \begin{bmatrix}
     a_{11} & a_{12} & \dots  & a_{1n} \\
     a_{21} & a_{22} & \dots  & a_{2n} \\
     \vdots & \vdots & \ddots & \vdots \\
     a_{m1} & a_{m2} & \dots  & a_{mn}
 \end{bmatrix},\quad
-\boldsymbol{B} = 
+\boldsymbol{B} =
 \begin{bmatrix}
     b_{11} & b_{12} & \dots  & b_{1n} \\
     b_{21} & b_{22} & \dots  & b_{2n} \\
     \vdots & \vdots & \ddots & \vdots \\
     b_{m1} & b_{m2} & \dots  & b_{mn}
 \end{bmatrix}.
-$
+$$
 
 矩阵$\boldsymbol{A}$的转置是一个$n$行$m$列矩阵，它的每一行其实是原矩阵的每一列：
 $$
-\boldsymbol{A}^\top = 
+\boldsymbol{A}^\top =
 \begin{bmatrix}
     a_{11} & a_{21} & \dots  & a_{m1} \\
     a_{12} & a_{22} & \dots  & a_{m2} \\
@@ -81,8 +81,8 @@ $$
 
 To add two matrices of the same shape we add the two matrices by element:
 
-$
-\boldsymbol{A} + \boldsymbol{B} = 
+$$
+\boldsymbol{A} + \boldsymbol{B} =
 \begin{bmatrix}
     a_{11} + b_{11} & a_{12} + b_{12} & \dots  & a_{1n} + b_{1n} \\
     a_{21} + b_{21} & a_{22} + b_{22} & \dots  & a_{2n} + b_{2n} \\
@@ -93,8 +93,8 @@ $$
 
 We use the symbol $\odot$ to indicate the multiplication by element of two matrices:
 
-$
-\boldsymbol{A} \odot \boldsymbol{B} = 
+$$
+\boldsymbol{A} \odot \boldsymbol{B} =
 \begin{bmatrix}
     a_{11}  b_{11} & a_{12}  b_{12} & \dots  & a_{1n}  b_{1n} \\
     a_{21}  b_{21} & a_{22}  b_{22} & \dots  & a_{2n}  b_{2n} \\
@@ -106,8 +106,8 @@ $$
 Define a scalar $k$. Multiplication of scalars and matrices is also a multiplication by element operation:
 
 
-$
-k\boldsymbol{A} = 
+$$
+k\boldsymbol{A} =
 \begin{bmatrix}
     ka_{11} & ka_{21} & \dots  & ka_{m1} \\
     ka_{12} & ka_{22} & \dots  & ka_{m2} \\
@@ -121,7 +121,7 @@ Other operations such as scalar and matrix addition and division by element, are
 Matrix multiplication is different from multiplication by element. Assume $\boldsymbol{A}$ is a matrix with $m$ rows and $p$ columns and $\boldsymbol{B}$ is a matrix with $p$ rows and $n$ columns. Result of multiplication of two matrices:
 
 $$
-\boldsymbol{A} \boldsymbol{B} = 
+\boldsymbol{A} \boldsymbol{B} =
 \begin{bmatrix}
     a_{11} & a_{12} & \dots  & a_{1p} \\
     a_{21} & a_{22} & \dots  & a_{2p} \\
@@ -199,11 +199,11 @@ If functions $f$ and $g$ are both derivable and we assume $C$ is a constant, the
 $$
 \begin{aligned}
 \frac{\text{d}}{\text{d}x} [Cf(x)] &= C \frac{\text{d}}{\text{d}x} f(x),\\
-\frac{\text{d}}{\text{d}x} [f(x) + g(x)] &= \frac{\text{d}}{\text{d}x} f(x) + \frac{\text{d}}{\text{d}x} g(x),\\ 
+\frac{\text{d}}{\text{d}x} [f(x) + g(x)] &= \frac{\text{d}}{\text{d}x} f(x) + \frac{\text{d}}{\text{d}x} g(x),\\
 \frac{\text{d}}{\text{d}x} [f(x)g(x)] &= f(x) \frac{\text{d}}{\text{d}x} [g(x)] + g(x) \frac{\text{d}}{\text{d}x} [f(x)],\\
 \frac{\text{d}}{\text{d}x} \left[\frac{f(x)}{g(x)}\right] &= \frac{g(x) \frac{\text{d}}{\text{d}x} [f(x)] - f(x) \frac{\text{d}}{\text{d}x} [g(x)]}{[g(x)]^2}.
 \end{aligned}
-$
+$$
 
 
 If functions $y=f(u)$ and $u=g(x)$ are both derivable, according to the chain rule,
@@ -261,7 +261,7 @@ $$
 \nabla_{\boldsymbol{x}} \boldsymbol{x}^\top \boldsymbol{A} \boldsymbol{x}  &= (\boldsymbol{A} + \boldsymbol{A}^\top)\boldsymbol{x},\\
 \nabla_{\boldsymbol{x}} \|\boldsymbol{x} \|^2 &= \nabla_{\boldsymbol{x}} \boldsymbol{x}^\top \boldsymbol{x} = 2\boldsymbol{x}.
 \end{aligned}
-$
+$$
 
 类似地，假设$\boldsymbol{X}$是一个矩阵，那么
 $$\nabla_{\boldsymbol{X}} \|\boldsymbol{X} \|_F^2 = 2\boldsymbol{X}.$$
@@ -274,12 +274,12 @@ $$\nabla_{\boldsymbol{X}} \|\boldsymbol{X} \|_F^2 = 2\boldsymbol{X}.$$
 Assume the input of function $f: \mathbb{R}^n \rightarrow \mathbb{R}$ is an $n$ dimension vector $\boldsymbol{x} = [x_1, x_2, \ldots, x_n]^\top$ and the output is a scalar. Assuming that all second-order partial derivatives of function $f$ exist, then the Hessian matrix $\boldsymbol{H}$ of $f$ is a matrix with $n$ rows and $n$ columns:
 
 $$
-\boldsymbol{H} = 
+\boldsymbol{H} =
 \begin{bmatrix}
-    \frac{\partial^2 f}{\partial x_1^2} & \frac{\partial^2 f}{\partial x_1 \partial x_2} & \dots  & \frac{\partial^2 f}{\partial x_1 \partial x_n} \\
-    \frac{\partial^2 f}{\partial x_2 \partial x_1} & \frac{\partial^2 f}{\partial x_2^2} & \dots  & \frac{\partial^2 f}{\partial x_2 \partial x_n} \\
-    \vdots & \vdots & \ddots & \vdots \\
-    \frac{\partial^2 f}{\partial x_n \partial x_1} & \frac{\partial^2 f}{\partial x_n \partial x_2} & \dots  & \frac{\partial^2 f}{\partial x_n^2}
+\frac{\partial^2 f}{\partial x_1^2} & \frac{\partial^2 f}{\partial x_1 \partial x_2} & \dots  & \frac{\partial^2 f}{\partial x_1 \partial x_n} \\
+\frac{\partial^2 f}{\partial x_2 \partial x_1} & \frac{\partial^2 f}{\partial x_2^2} & \dots  & \frac{\partial^2 f}{\partial x_2 \partial x_n} \\
+\vdots & \vdots & \ddots & \vdots \\
+\frac{\partial^2 f}{\partial x_n \partial x_1} & \frac{\partial^2 f}{\partial x_n \partial x_2} & \dots  & \frac{\partial^2 f}{\partial x_n^2}
 \end{bmatrix},
 $$
 
@@ -303,7 +303,7 @@ That is,
 
 $\mathbb{P}(A \cap B) = \mathbb{P}(B) \mathbb{P}(A \mid B) = \mathbb{P}(A) \mathbb{P}(B \mid A).$
 
-When satisfying 
+When satisfying
 
 $\mathbb{P}(A \cap B) = \mathbb{P}(A) \mathbb{P}(B)$,
 
