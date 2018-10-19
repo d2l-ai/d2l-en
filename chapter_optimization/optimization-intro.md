@@ -32,7 +32,7 @@ For the objective function $f(x)$, if the value of $f(x)$ at $x$ is smaller than
 
 For example, given the function
 
-$f(x) = x \cdot \text{cos}(\pi x), \qquad -1.0 \leq x \leq 2.0,$
+$$f(x) = x \cdot \text{cos}(\pi x), \qquad -1.0 \leq x \leq 2.0,$$
 
 we can approximate the local minimum and global minimum of this function. Please note that the arrows in the figure only indicate the approximate positions.
 
@@ -57,7 +57,7 @@ The objective function of the deep learning model may have several local optimum
 
 As we just mentioned, one possible explanation for a gradient that approaches or becomes zero is that the current solution is close to a local optimum. In fact, there is another possibility. The current solution could be near a saddle point. For example, given the function
 
-$f(x) = x^3,$
+$$f(x) = x^3,$$
 
 we can find the position of the saddle point of this function.
 
@@ -72,7 +72,7 @@ gb.plt.ylabel('f(x)');
 
 Now, we will use another example of a two-dimensional function, defined as follows:
 
-$f(x, y) = x^2 - y^2.$
+$$f(x, y) = x^2 - y^2.$$
 
 We can find the position of the saddle point of this function. Perhaps you have noticed that the function looks just like a saddle, and the saddle point happens to be the center point of the seat.
 

@@ -6,13 +6,13 @@ In the experiment in the ["Adagrad"](adagrad.md) section, the learning rate of e
 
 We introduced EWMA (exponentially weighted moving average) in the ["Momentum"](momentum.md) section. Unlike in Adagrad, the state variable $\boldsymbol{s}_t$ is the sum of the square by element all the mini-batch stochastic gradients $\boldsymbol{g}_t$ up to the time step $t$, RMSProp uses the EWMA on the square by element results of these gradients. Specifically, given the hyperparameter $0 \leq \gamma < 1$, RMSProp is computed at time step $t>0$.
 
-$\boldsymbol{s}_t \leftarrow \gamma \boldsymbol{s}_{t-1} + (1 - \gamma) \boldsymbol{g}_t \odot \boldsymbol{g}_t. $
+$$\boldsymbol{s}_t \leftarrow \gamma \boldsymbol{s}_{t-1} + (1 - \gamma) \boldsymbol{g}_t \odot \boldsymbol{g}_t. $$
 
 Like Adagrad, RMSProp re-adjusts the learning rate of each element in the independent variable of the objective function with element operations and then updates the independent variable.
 
-$\boldsymbol{x}_t \leftarrow \boldsymbol{x}_{t-1} - \frac{\eta}{\sqrt{\boldsymbol{s}_t + \epsilon}} \odot \boldsymbol{g}_t, $
+$$\boldsymbol{x}_t \leftarrow \boldsymbol{x}_{t-1} - \frac{\eta}{\sqrt{\boldsymbol{s}_t + \epsilon}} \odot \boldsymbol{g}_t, $$
 
-Here, eta$ is the learning rate while $\epsilon$ is a constant added to maintain numerical stability, such as $10^{-6}$. Because the state variable of RMSProp is an EWMA of the squared term $\boldsymbol{g}_t \odot \boldsymbol{g}_t$, it can be seen as the weighted average of the mini-batch stochastic gradient's squared terms from the last $1/(1-\gamma)$ time steps. Therefore, the learning rate of each element in the independent variable will not always decline (or remain unchanged) during iteration.
+Here, $eta$ is the learning rate while $\epsilon$ is a constant added to maintain numerical stability, such as $10^{-6}$. Because the state variable of RMSProp is an EWMA of the squared term $\boldsymbol{g}_t \odot \boldsymbol{g}_t$, it can be seen as the weighted average of the mini-batch stochastic gradient's squared terms from the last $1/(1-\gamma)$ time steps. Therefore, the learning rate of each element in the independent variable will not always decline (or remain unchanged) during iteration.
 
 By convention, we will use the objective function $f(\boldsymbol{x})=0.1x_1^2+2x_2^2$ to observe the iterative trajectory of the independent variable in RMSProp. Recall that in the ["Adagrad"](adagrad.md) section, when we used Adagrad with a learning rate of 0.4, the independent variable moved less in later stages of iteration. However, at the same learning rate, RMSProp can approach the optimal solution faster.
 

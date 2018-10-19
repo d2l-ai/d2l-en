@@ -5,7 +5,7 @@ In the ["Gradient Descent and Stochastic Gradient Descent"](./gd-sgd.md) section
 
 ## Problems with Gradient Descent
 
-Now, we will consider an objective function $f(\boldsymbol{x})=0.1x_1^2+2x_2^2$, whose input and output are a two-dimensional vector $\boldsymbol{x} = [x_1, x_2] and a scalar, respectively. In contrast to the ["Gradient Descent and Stochastic Gradient Descent"](./gd-sgd.md) section, here, the coefficient $x_1^2$ is reduced from $1$ to $0.1$. We are going to implement gradient descent based on this objective function, and demonstrate the iterative trajectory of the independent variable using the learning rate $0.4.
+Now, we will consider an objective function $f(\boldsymbol{x})=0.1x_1^2+2x_2^2$, whose input and output are a two-dimensional vector $\boldsymbol{x} = [x_1, x_2]$ and a scalar, respectively. In contrast to the ["Gradient Descent and Stochastic Gradient Descent"](./gd-sgd.md) section, here, the coefficient $x_1^2$ is reduced from $1$ to $0.1$. We are going to implement gradient descent based on this objective function, and demonstrate the iterative trajectory of the independent variable using the learning rate $0.4.
 
 ```{.python .input  n=3}
 %matplotlib inline
@@ -69,7 +69,7 @@ gb.show_trace_2d(f_2d, gb.train_2d(momentum_2d))
 
 In order to understand the momentum method mathematically, we must first explain the exponentially weighted moving average(EWMA). Given hyperparameter $0 \leq \gamma < 1$, the variable $y_t$ of the current time step $t$ is the linear combination of variable $y_{t-1}$ from the previous time step $t-1$ and another variable $x_t$ of the current step.
 
-$y_t = \gamma y_{t-1} + (1-\gamma) x_t.$
+$$y_t = \gamma y_{t-1} + (1-\gamma) x_t.$$
 
 We can expand $y_t$:
 
@@ -84,11 +84,11 @@ $$
 
 Let $n = 1/(1-\gamma)$, so $\left(1-1/n\right)^n = \gamma^{1/(1-\gamma)}$. Because
 
-$ \lim_{n \rightarrow \infty}  \left(1-\frac{1}{n}\right)^n = \exp(-1) \approx 0.3679,$
+$$ \lim_{n \rightarrow \infty}  \left(1-\frac{1}{n}\right)^n = \exp(-1) \approx 0.3679,$$
 
 when $\gamma \rightarrow 1$, $\gamma^{1/(1-\gamma)}=\exp(-1)$. For example, $0.95^{20} \approx \exp(-1)$. If we treat $\exp(-1)$ as a relatively small number, we can ignore all the terms that have $\gamma^{1/(1-\gamma)}$ or coefficients of higher order than $\gamma^{1/(1-\gamma)}$ in them. For example, when $\gamma=0.95$,
 
-$y_t \approx 0.05 \sum_{i=0}^{19} 0.95^i x_{t-i}.$
+$$y_t \approx 0.05 \sum_{i=0}^{19} 0.95^i x_{t-i}.$$
 
 Therefore, in practice, we often treat $y_t$ as the weighted average of the $x_t$ values from the last $1/(1-\gamma)$ time steps. For example, when $\gamma = 0.95$, $y_t$ can be treated as the weighted average of the $x_t$ values from the last 20 time steps; when $\gamma = 0.9$, $y_t$ can be treated as the weighted average of the $x_t$ values from the last 10 time steps. Additionally, the closer the $x_t$ value is to the current time step $t$, the greater the value's weight (closer to 1).
 
@@ -97,7 +97,7 @@ Therefore, in practice, we often treat $y_t$ as the weighted average of the $x_t
 
 Now, we are going to deform the velocity variable of momentum:
 
-$\boldsymbol{v}_t \leftarrow \gamma \boldsymbol{v}_{t-1} + (1 - \gamma) \left(\frac{\eta_t}{1 - \gamma} \boldsymbol{g}_t\right). $
+$$\boldsymbol{v}_t \leftarrow \gamma \boldsymbol{v}_{t-1} + (1 - \gamma) \left(\frac{\eta_t}{1 - \gamma} \boldsymbol{g}_t\right). $$
 
 由指数加权移动平均的形式可得，速度变量$\boldsymbol{v}_t$实际上对序列$\{\eta_{t-i}\boldsymbol{g}_{t-i} /(1-\gamma):i=0,\ldots,1/(1-\gamma)-1\}$做了指数加权移动平均。换句话说，相比于小批量随机梯度下降，动量法在每个时间步的自变量更新量近似于将前者对应的最近$1/(1-\gamma)$个时间步的更新量做了指数加权移动平均后再除以$1-\gamma$。所以动量法中，自变量在各个方向上的移动幅度不仅取决当前梯度，还取决于过去的各个梯度在各个方向上是否一致。在本节之前示例的优化问题中，所有梯度在水平方向上为正（向右）、而在竖直方向上时正（向上）时负（向下）。这样，我们就可以使用较大的学习率，从而使自变量向最优解更快移动。
 

@@ -6,21 +6,21 @@ In this section, we are going to introduce the basic principles of gradient desc
 
 Here, we will use a simple gradient descent in one-dimensional space as an example to explain why the gradient descent algorithm may reduce the value of the objective function. We assume that the input and output of the continuously differentiable function $f: \mathbb{R} \rightarrow \mathbb{R}$ are both scalars. Given $\epsilon$ with a small enough absolute value, according to the Taylor's expansion formula from the ["Mathematical basics"](../chapter_appendix/math.md) section, we get the following approximation:
 
-$f(x + \epsilon) \approx f(x) + \epsilon f'(x) .$
+$$f(x + \epsilon) \approx f(x) + \epsilon f'(x) .$$
 
 Here, $f'(x)$ is the gradient of function $f$ at $x$. The gradient of a one-dimensional function is a scalar, also known as a derivative.
 
 Next, find a constant $\eta > 0$, to make $\left|\eta f'(x)\right|$ sufficiently small so that we can replace $\epsilon$ with $-\eta f'(x) $ and get
 
-$f(x - \eta f'(x)) \approx f(x) -  \eta f'(x)^2.$
+$$f(x - \eta f'(x)) \approx f(x) -  \eta f'(x)^2.$$
 
 If the derivative $f'(x) \neq 0$, then $\eta f'(x)^2>0$, so
 
-$f(x - \eta f'(x)) \lesssim f(x).$
+$$f(x - \eta f'(x)) \lesssim f(x).$$
 
 This means that, if we use
 
-$x \leftarrow x - \eta f'(x)$
+$$x \leftarrow x - \eta f'(x)$$
 
 to iterate $x$, the value of function $f(x)$ might decline. Therefore, in the gradient descent, we first choose an initial value $x$ and a constant $\eta > 0$ and then use them to continuously iterate $x$ until the stop condition is reached, for example, when the value of $f'(x)^2$ is small enough or the number of iterations has reached a certain value.
 
@@ -82,18 +82,18 @@ show_trace(gd(1.1))
 
 Now that we understand gradient descent in one-dimensional space, let us consider a more general case: the input of the objective function is a vector and the output is a scalar. We assume that the input of the target function $f: \mathbb{R}^d \rightarrow \mathbb{R}$ is the $d$-dimensional vector $\boldsymbol{x} = [x_1, x_2, \ldots, x_d]^\top$. The gradient of the objective function $f(\boldsymbol{x})$ with respect to $\boldsymbol{x}$ is a vector consisting of $d$ partial derivatives:
 
-$\nabla_{\boldsymbol{x}} f(\boldsymbol{x}) = \bigg[\frac{\partial f(\boldsymbol{x})}{\partial x_1}, \frac{\partial f(\boldsymbol{x})}{\partial x_2}, \ldots, \frac{\partial f(\boldsymbol{x})}{\partial x_d}\bigg]^\top.$
+$$\nabla_{\boldsymbol{x}} f(\boldsymbol{x}) = \bigg[\frac{\partial f(\boldsymbol{x})}{\partial x_1}, \frac{\partial f(\boldsymbol{x})}{\partial x_2}, \ldots, \frac{\partial f(\boldsymbol{x})}{\partial x_d}\bigg]^\top.$$
 
 
 为表示简洁，我们用$\nabla f(\boldsymbol{x})$代替$\nabla_{\boldsymbol{x}} f(\boldsymbol{x})$。梯度中每个偏导数元素$\partial f(\boldsymbol{x})/\partial x_i$代表着$f$在$\boldsymbol{x}$有关输入$x_i$的变化率。为了测量$f$沿着单位向量$\boldsymbol{u}$（即$\|\boldsymbol{u}\|=1$）方向上的变化率，在多元微积分中，我们定义$f$在$\boldsymbol{x}$上沿着$\boldsymbol{u}$方向的方向导数为
 
-$\text{D}_{\boldsymbol{u}} f(\boldsymbol{x}) = \lim_{h \rightarrow 0}  \frac{f(\boldsymbol{x} + h \boldsymbol{u}) - f(\boldsymbol{x})}{h}.$
+$$\text{D}_{\boldsymbol{u}} f(\boldsymbol{x}) = \lim_{h \rightarrow 0}  \frac{f(\boldsymbol{x} + h \boldsymbol{u}) - f(\boldsymbol{x})}{h}.$$
 
-依据方向导数性质 \[1，14.6节定理三\]，以上的方向导数可以改写为
+依据方向导数性质 \[1，Chapter 14.6 Theorem 3\]，以上的方向导数可以改写为
 
-$\text{D}_{\boldsymbol{u}} f(\boldsymbol{x}) = \nabla f(\boldsymbol{x}) \cdot \boldsymbol{u}.$
+$$\text{D}_{\boldsymbol{u}} f(\boldsymbol{x}) = \nabla f(\boldsymbol{x}) \cdot \boldsymbol{u}.$$
 
-The directional derivative $\text{D}_{\boldsymbol{u}} f(\boldsymbol{x}) gives all the possible rates of change for $f$ along $\boldsymbol{x}$. In order to minimize $f$, we hope to find the direction the will allow us to reduce $f$ in the fastest way. Therefore, we can use the unit vector $\boldsymbol{u}$ to minimize the directional derivative $\text{D}_{\boldsymbol{u}} f(\boldsymbol{x})$.
+The directional derivative $\text{D}_{\boldsymbol{u}} f(\boldsymbol{x})$ gives all the possible rates of change for $f$ along $\boldsymbol{x}$. In order to minimize $f$, we hope to find the direction the will allow us to reduce $f$ in the fastest way. Therefore, we can use the unit vector $\boldsymbol{u}$ to minimize the directional derivative $\text{D}_{\boldsymbol{u}} f(\boldsymbol{x})$.
 
 For $\text{D}_{\boldsymbol{u}} f(\boldsymbol{x}) = \|\nabla f(\boldsymbol{x})\| \cdot \|\boldsymbol{u}\|  \cdot \text{cos} (\theta) = \|\nabla f(\boldsymbol{x})\|  \cdot \text{cos} (\theta)$,
 Here, $\theta$ is the angle between the gradient $\nabla f(\boldsymbol{x})$ and the unit vector $\boldsymbol{u}$. When $\theta = \pi$, $\text{cos }(\theta)$ gives us the minimum value $-1$. So when $\boldsymbol{u}$ is in a direction that is opposite to the gradient direction $\nabla f(\boldsymbol{x})$, the direction derivative $\text{D}_{\boldsymbol{u}} f(\boldsymbol{x})$ is minimized. Therefore, we may continue to reduce the value of objective function $f$ by the gradient descent algorithm:
@@ -140,21 +140,21 @@ show_trace_2d(f_2d, train_2d(gd_2d))
 
 In deep learning, the objective function is usually the average of the loss functions for each example in the training data set. We assume that $f_i(\boldsymbol{x})$ is the loss function of the training data instance with $n$ examples, an index of $i$, and parameter vector of $\boldsymbol{x}$, then we have the objective function
 
-$f(\boldsymbol{x}) = \frac{1}{n} \sum_{i = 1}^n f_i(\boldsymbol{x}).$
+$$f(\boldsymbol{x}) = \frac{1}{n} \sum_{i = 1}^n f_i(\boldsymbol{x}).$$
 
 The gradient of the objective function at $\boldsymbol{x}$ is computed as
 
-$\nabla f(\boldsymbol{x}) = \frac{1}{n} \sum_{i = 1}^n \nabla f_i(\boldsymbol{x}).$
+$$\nabla f(\boldsymbol{x}) = \frac{1}{n} \sum_{i = 1}^n \nabla f_i(\boldsymbol{x}).$$
 
 If gradient descent is used, the computing cost for each independent variable iteration is $\mathcal{O}(n)$, which grows linearly with $n$. Therefore, when the model training data instance is large, the cost of gradient descent for each iteration will be very high.
 
 随机梯度下降（stochastic gradient descent，简称SGD）减少了每次迭代的计算开销。在随机梯度下降的每次迭代中，我们随机均匀采样的一个样本索引$i\in\{1,\ldots,n\}$，并计算梯度$\nabla f_i(\boldsymbol{x})$来迭代$\boldsymbol{x}$：
 
-$\boldsymbol{x} \leftarrow \boldsymbol{x} - \eta \nabla f_i(\boldsymbol{x}).$
+$$\boldsymbol{x} \leftarrow \boldsymbol{x} - \eta \nabla f_i(\boldsymbol{x}).$$
 
 Here, $\eta$ is the learning rate. We can see that the computing cost for each iteration drops from $\mathcal{O}(n)$ of the gradient descent to the constant $\mathcal{O}(1)$. We should mention that the stochastic gradient $\nabla f_i(\boldsymbol{x})$ is the unbiased estimate of gradient $\nabla f(\boldsymbol{x})$.
 
-$\mathbb{E}_i \nabla f_i(\boldsymbol{x}) = \frac{1}{n} \sum_{i = 1}^n \nabla f_i(\boldsymbol{x}) = \nabla f(\boldsymbol{x}).$
+$$\mathbb{E}_i \nabla f_i(\boldsymbol{x}) = \frac{1}{n} \sum_{i = 1}^n \nabla f_i(\boldsymbol{x}) = \nabla f(\boldsymbol{x}).$$
 
 This means that, on average, the stochastic gradient is a good estimate of the gradient.
 

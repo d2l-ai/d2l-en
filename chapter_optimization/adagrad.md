@@ -1,11 +1,11 @@
 # Adagrad
 
-In the optimization algorithms we introduced previously, each element of the objective function's independent variables uses the same learning rate at the same time step for self-iteration. For example, if we assume that the objective function is $f$ and the independent variable is a two-dimensional vector [x_1, x_2]^\top$, each element in the vector uses the same learning rate when iterating. For example, in gradient descent with the learning rate $\eta$, element $x_1$ and $x_2$ both use the same learning rate $\eta$ for iteration:
+In the optimization algorithms we introduced previously, each element of the objective function's independent variables uses the same learning rate at the same time step for self-iteration. For example, if we assume that the objective function is $f$ and the independent variable is a two-dimensional vector $[x_1, x_2]^\top$, each element in the vector uses the same learning rate when iterating. For example, in gradient descent with the learning rate $\eta$, element $x_1$ and $x_2$ both use the same learning rate $\eta$ for iteration:
 
-$
+$$
 x_1 \leftarrow x_1 - \eta \frac{\partial{f}}{\partial{x_1}}, \quad
 x_2 \leftarrow x_2 - \eta \frac{\partial{f}}{\partial{x_2}}.
-$
+$$
 
 In the [Momentum](./momentum.md) section, we can see that, when there is a big difference between the gradient values $x_1$ and $x_2$, a sufficiently small learning rate needs to be selected so that the independent variable will not diverge in the dimension of larger gradient values. However, this will cause the independent variables to iterate too slowly in the dimension with smaller gradient values. The momentum method relies on the exponentially weighted moving average (EWMA) to make the direction of the independent variable more consistent, thus reducing the possibility of divergence. In this section, we are going to introduce Adagrad, an algorithm that adjusts the learning rate according to the gradient value of the independent variable in each dimension to eliminate problems caused when a unified learning rate has to adapt to all dimensions.
 
@@ -14,13 +14,13 @@ In the [Momentum](./momentum.md) section, we can see that, when there is a big d
 
 The Adadelta algorithm uses the cumulative variable $\boldsymbol{s}_t$ obtained from a square by element operation on the mini-batch stochastic gradient $\boldsymbol{g}_t$. At time step 0, Adagrad initializes each element in $\boldsymbol{s}_0$ to 0. At time step $t$, we first sum the results of the square by element operation for the mini-batch gradient $\boldsymbol{g}_t$ to get the variable $\boldsymbol{s}_t$:
 
-$\boldsymbol{s}_t \leftarrow \boldsymbol{s}_{t-1} + \boldsymbol{g}_t \odot \boldsymbol{g}_t,$
+$$\boldsymbol{s}_t \leftarrow \boldsymbol{s}_{t-1} + \boldsymbol{g}_t \odot \boldsymbol{g}_t,$$
 
 Here, $\odot$ is the symbol for multiplication by element. Next, we re-adjust the learning rate of each element in the independent variable of the objective function using element operations:
 
-$\boldsymbol{x}_t \leftarrow \boldsymbol{x}_{t-1} - \frac{\eta}{\sqrt{\boldsymbol{s}_t + \epsilon}} \odot \boldsymbol{g}_t,$
+$$\boldsymbol{x}_t \leftarrow \boldsymbol{x}_{t-1} - \frac{\eta}{\sqrt{\boldsymbol{s}_t + \epsilon}} \odot \boldsymbol{g}_t,$$
 
-Here, eta$ is the learning rate while $\epsilon$ is a constant added to maintain numerical stability, such as $10^{-6}$. Here, the square root, division, and multiplication operations are all element operations. Each element in the independent variable of the objective function will have its own learning rate after the operations by elements.
+Here, $eta$ is the learning rate while $\epsilon$ is a constant added to maintain numerical stability, such as $10^{-6}$. Here, the square root, division, and multiplication operations are all element operations. Each element in the independent variable of the objective function will have its own learning rate after the operations by elements.
 
 ## Features
 
