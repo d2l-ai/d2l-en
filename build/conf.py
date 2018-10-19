@@ -355,7 +355,6 @@ nbsphinx_execute = 'never'
 html_sourcelink_suffix = ''
 
 def image_caption(app, docname, source):
-    print(docname)
     for i, src in enumerate(source):
         out = ''
         for l in src.split('\n'):

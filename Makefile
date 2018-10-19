@@ -38,21 +38,19 @@ html: $(DEPS) $(OBJ)
 
 TEX=build/_build/latex/d2l-en.tex
 
-build/_build/latex/%.pdf: img/%.svg
-	@mkdir -p $(@D)
-	rsvg-convert -f pdf -z 0.80 -o $@ $<
+#build/_build/latex/%.pdf: img/%.svg
+#	@mkdir -p $(@D)
+#	rsvg-convert -f pdf -z 0.80 -o $@ $<
 
-SVG=$(wildcard img/*.svg)
+#SVG=$(wildcard img/*.svg)
 
-PDFIMG = $(patsubst img/%.svg, build/_build/latex/%.pdf, $(SVG))
+#PDFIMG = $(patsubst img/%.svg, build/_build/latex/%.pdf, $(SVG))
 
-pdf: $(DEPS) $(OBJ) $(PDFIMG)
-	@echo $(PDFIMG)
+pdf: $(DEPS) $(OBJ)
 	make -C build latex
 	sed -i s/\\.svg/.pdf/g ${TEX}
 	sed -i s/\}\\.gif/\_00\}.pdf/g $(TEX)
 	sed -i s/{tocdepth}{0}/{tocdepth}{1}/g $(TEX)
-	sed -i s/{\\\\releasename}{发布}/{\\\\releasename}{}/g $(TEX)
 	sed -i s/{OriginalVerbatim}\\\[commandchars=\\\\\\\\\\\\{\\\\}\\\]/{OriginalVerbatim}\\\[commandchars=\\\\\\\\\\\\{\\\\},formatcom=\\\\footnotesize\\\]/g $(TEX)
 	sed -i s/\\\\usepackage{geometry}/\\\\usepackage[paperwidth=187mm,paperheight=235mm,left=20mm,right=20mm,top=20mm,bottom=15mm,includefoot]{geometry}/g $(TEX)
 	# Remove un-translated long table descriptions
@@ -60,6 +58,7 @@ pdf: $(DEPS) $(OBJ) $(PDFIMG)
 	sed -i /\\\\sphinxtablecontinued{Continued\ on\ next\ page}/d $(TEX)
 	sed -i /{\\\\tablename\\\\\ \\\\thetable{}\ --\ continued\ from\ previous\ page}/d $(TEX)
 	cd build/_build/latex && \
+	bash ../../convert_output_svg.sh && \
 	buf_size=10000000 xelatex d2l-en.tex && \
 	buf_size=10000000 xelatex d2l-en.tex
 
