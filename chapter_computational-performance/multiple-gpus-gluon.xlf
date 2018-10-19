@@ -1,0 +1,96 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="chapter_computational-performance/multiple-gpus-gluon.md" source-language="zh-CN" target-language="en-US" datatype="markdown">
+    <header>
+      <skl>
+        <external-file href="chapter_computational-performance/multiple-gpus-gluon.skl.md"/>
+      </skl>
+    </header>
+    <body>
+      <trans-unit id="1">
+        <source xml:lang="zh-CN">多GPU计算的Gluon实现</source>
+        <target xml:lang="en-US">Gluon Implementation for Multi-GPU Computation</target>
+      </trans-unit>
+      <trans-unit id="2">
+        <source xml:lang="zh-CN">在Gluon中，我们可以很方便地使用数据并行进行多GPU计算。例如，我们并不需要自己实现<bpt id="l2">[</bpt>“多GPU计算”<ept id="l2">]</ept><bpt id="l3">(</bpt>multiple-gpus.md<ept id="l3">)</ept>一节里介绍的多GPU之间同步数据的辅助函数。</source>
+        <target xml:lang="en-US">In Gluon, we can conveniently use data parallelism to perform multi-GPU computation. For example, we do not need to implement the helper function to synchronize data among multiple GPUs, as described in the<bpt id="l2">[</bpt>“Multi-GPU Computation”<ept id="l2">]</ept><bpt id="l3">(</bpt>multiple-gpus.md<ept id="l3">)</ept> section, ourselves.</target>
+      </trans-unit>
+      <trans-unit id="3">
+        <source xml:lang="zh-CN">首先导入本节实验所需的包或模块。运行本节中的程序需要至少两块GPU。</source>
+        <target xml:lang="en-US">First, import the required packages or modules for the experiment in this section. Running the programs in this section requires at least two GPUs.</target>
+      </trans-unit>
+      <trans-unit id="4">
+        <source xml:lang="zh-CN">多GPU上初始化模型参数</source>
+        <target xml:lang="en-US">Initialize Model Parameters on Multiple GPUs</target>
+      </trans-unit>
+      <trans-unit id="5">
+        <source xml:lang="zh-CN">我们使用ResNet-18来作为本节的样例模型。由于本节的输入图像使用原尺寸（未放大），这里的模型构造与<bpt id="l2">[</bpt>“残差网络（ResNet）”<ept id="l2">]</ept><bpt id="l3">(</bpt>../chapter_convolutional-neural-networks/resnet.md<ept id="l3">)</ept>一节中的ResNet-18构造稍有不同。这里的模型在一开始使用了较小的卷积核、步幅和填充，并去掉了最大池化层。</source>
+        <target xml:lang="en-US">In this section, we use ResNet-18 as a sample model. Since the input images in this section are original size (not enlarged), the model construction here is different from the ResNet-18 structure described in the <bpt id="l2">[</bpt>“ResNet”<ept id="l2">]</ept><bpt id="l3">(</bpt>../chapter_convolutional-neural-networks/resnet.md<ept id="l3">)</ept> section. This model uses a smaller convolution kernel, stride, and padding at the beginning and removes the maximum pooling layer.</target>
+      </trans-unit>
+      <trans-unit id="6">
+        <source xml:lang="zh-CN">本函数已保存在 gluonbook 包中方便以后使用。</source>
+        <target xml:lang="en-US">This function is saved in the gluonbook package for future use.</target>
+      </trans-unit>
+      <trans-unit id="7">
+        <source xml:lang="zh-CN">这里使用了较小的卷积核、步幅和填充，并去掉了最大池化层。</source>
+        <target xml:lang="en-US">This model uses a smaller convolution kernel, stride, and padding and removes the maximum pooling layer.</target>
+      </trans-unit>
+      <trans-unit id="8">
+        <source xml:lang="zh-CN">之前我们介绍了如何使用<bpt id="2">`</bpt>initialize<ept id="2">`</ept>函数的<bpt id="4">`</bpt>ctx<ept id="4">`</ept>参数在CPU或单个GPU上初始化模型参数。事实上，<bpt id="6">`</bpt>ctx<ept id="6">`</ept>可以接受一系列的CPU和GPU，从而使初始化好的模型参数复制到<bpt id="8">`</bpt>ctx<ept id="8">`</ept>里所有的CPU和GPU上。</source>
+        <target xml:lang="en-US">Previously, we discussed how to use the <bpt id="2">`</bpt>initialize<ept id="2">`</ept> function's <bpt id="4">`</bpt>ctx<ept id="4">`</ept> parameter to initialize model parameters on a CPU or a single GPU. In fact, <bpt id="6">`</bpt>ctx<ept id="6">`</ept> can accept a range of CPUs and GPUs so as to copy initialized model parameters to all CPUs and GPUs in <bpt id="8">`</bpt>ctx<ept id="8">`</ept>.</target>
+      </trans-unit>
+      <trans-unit id="9">
+        <source xml:lang="zh-CN">Gluon提供了上一节中实现的<bpt id="2">`</bpt>split_and_load<ept id="2">`</ept>函数。它可以划分一个小批量的数据样本并复制到各个CPU或GPU上。之后，根据输入数据所在的CPU或GPU，模型计算会发生在相同的CPU或GPU上。</source>
+        <target xml:lang="en-US">Gluon provides the <bpt id="2">`</bpt>split_and_load<ept id="2">`</ept> function implemented in the previous section. It can divide a mini-batch of data instances and copy them to each CPU or GPU. Then, the model computation for the data input to each CPU or GPU occurs on that same CPU or GPU.</target>
+      </trans-unit>
+      <trans-unit id="10">
+        <source xml:lang="zh-CN">现在，我们可以通过<bpt id="2">`</bpt>data<ept id="2">`</ept>访问已初始化好的模型参数值。需要注意的是，默认下<bpt id="4">`</bpt>weight.data()<ept id="4">`</ept>会返回CPU上的参数值。由于我们指定了2个GPU来初始化模型参数，我们需要指定GPU来访问参数值。我们看到，相同参数在不同的GPU上的值一样。</source>
+        <target xml:lang="en-US">Now we can access the initialized model parameter values through <bpt id="2">`</bpt>data<ept id="2">`</ept>. It should be noted that <bpt id="4">`</bpt>weight.data()<ept id="4">`</ept> will return the parameter values on the CPU by default. Since we specified 2 GPUs to initialize the model parameters, we need to specify the GPU to access parameter values. As we can see, the same parameters have the same values on different GPUs.</target>
+      </trans-unit>
+      <trans-unit id="11">
+        <source xml:lang="zh-CN">多GPU训练模型</source>
+        <target xml:lang="en-US">Multi-GPU Model Training</target>
+      </trans-unit>
+      <trans-unit id="12">
+        <source xml:lang="zh-CN">当我们使用多个GPU来训练模型时，<bpt id="2">`</bpt>Trainer<ept id="2">`</ept>实例会自动做数据并行，例如划分小批量数据样本并复制到各个GPU上，以及对各个GPU上的梯度求和再广播到所有GPU上。这样，我们就可以很方便地实现训练函数了。</source>
+        <target xml:lang="en-US">When we use multiple GPUs to train the model, the <bpt id="2">`</bpt>Trainer<ept id="2">`</ept> instance will automatically perform data parallelism, such as dividing mini-batches of data instances and copying them to individual GPUs and summing the gradients of each GPU and broadcasting the result to all GPUs. In this way, we can easily implement the training function.</target>
+      </trans-unit>
+      <trans-unit id="13">
+        <source xml:lang="zh-CN">首先在单GPU上训练。</source>
+        <target xml:lang="en-US">First, use a single GPU for training.</target>
+      </trans-unit>
+      <trans-unit id="14">
+        <source xml:lang="zh-CN">然后尝试在2个GPU上训练。与上一节使用的LeNet相比，ResNet-18的计算更加复杂，通讯时间与计算时间相比更短，因此ResNet-18的并行计算所获得的性能提升更佳。</source>
+        <target xml:lang="en-US">Then we try to use 2 GPUs for training. Compared with the LeNet used in the previous section, ResNet-18 computing is more complicated and the communication time is shorter compared to the calculation time, so parallel computing in ResNet-18 better improves performance.</target>
+      </trans-unit>
+      <trans-unit id="15">
+        <source xml:lang="zh-CN">小结</source>
+        <target xml:lang="en-US">Summary</target>
+      </trans-unit>
+      <trans-unit id="16">
+        <source xml:lang="zh-CN">在Gluon中，我们可以很方便地进行多GPU计算，例如在多GPU上初始化模型参数和训练模型。</source>
+        <target xml:lang="en-US">In Gluon, we can conveniently perform multi-GPU computations, such as initializing model parameters and training models on multiple GPUs.</target>
+      </trans-unit>
+      <trans-unit id="17">
+        <source xml:lang="zh-CN">练习</source>
+        <target xml:lang="en-US">exercise</target>
+      </trans-unit>
+      <trans-unit id="18">
+        <source xml:lang="zh-CN">本节使用了ResNet-18。试试不同的迭代周期、批量大小和学习率。如果条件允许，使用更多GPU计算。</source>
+        <target xml:lang="en-US">This section uses ResNet-18. Try different epochs, batch sizes, and learning rates. Use more GPUs for computation if conditions permit.</target>
+      </trans-unit>
+      <trans-unit id="19">
+        <source xml:lang="zh-CN">有时候，不同设备的计算能力不一样，例如同时使用CPU和GPU，或者不同GPU之间型号不一样。这时候应该如何划分小批量到不同的CPU或GPU？</source>
+        <target xml:lang="en-US">Sometimes, different devices provide different computing power. Some can use CPUs and GPUs at the same time, or GPUs of different models. How should we divide mini-batches among different CPUs or GPUs?</target>
+      </trans-unit>
+      <trans-unit id="20">
+        <source xml:lang="zh-CN">扫码直达<bpt id="l2">[</bpt>讨论区<ept id="l2">]</ept><bpt id="l3">(</bpt>https://discuss.gluon.ai/t/topic/1885<ept id="l3">)</ept></source>
+        <target xml:lang="en-US">Scan the QR Code to Access <bpt id="l2">[</bpt>Discussions<ept id="l2">]</ept><bpt id="l3">(</bpt>https://discuss.gluon.ai/t/topic/1885<ept id="l3">)</ept></target>
+      </trans-unit>
+      <trans-unit id="21">
+        <source xml:lang="zh-CN"><bpt id="1">![</bpt>../img/qr_multiple-gpus-gluon.svg<ept id="1">]</ept></source>
+        <target xml:lang="en-US"><bpt id="1">![</bpt>../img/qr_multiple-gpus-gluon.svg<ept id="1">]</ept></target>
+      </trans-unit>
+    </body>
+ </file>
+</xliff>

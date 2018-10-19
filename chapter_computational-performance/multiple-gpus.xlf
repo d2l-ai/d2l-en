@@ -1,0 +1,196 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="chapter_computational-performance/multiple-gpus.md" source-language="zh-CN" target-language="en-US" datatype="markdown">
+    <header>
+      <skl>
+        <external-file href="chapter_computational-performance/multiple-gpus.skl.md"/>
+      </skl>
+    </header>
+    <body>
+      <trans-unit id="1">
+        <source xml:lang="zh-CN">多GPU计算</source>
+        <target xml:lang="en-US">Multi-GPU Computation</target>
+      </trans-unit>
+      <trans-unit id="2">
+        <source xml:lang="zh-CN">本节中我们将展示如何使用多个GPU计算，例如使用多个GPU训练同一个模型。正如你期望的那样，运行本节中的程序需要至少两块GPU。事实上，一台机器上安装多块GPU很常见，这是因为主板上通常会有多个PCIe插槽。如果正确安装了Nvidia驱动，我们可以通过<bpt id="2">`</bpt>nvidia-smi<ept id="2">`</ept>命令来查看当前计算机上的全部GPU。</source>
+        <target xml:lang="en-US">In this section, we will show how to use multiple GPU for computation. For example, we can train the same model using multiple GPUs. As you might expect, running the programs in this section requires at least two GPUs. In fact, installing multiple GPUs on a single machine is common because there are usually multiple PCIe slots on the motherboard. If the Nvidia driver is properly installed, we can use the <bpt id="2">`</bpt>nvidia-smi<ept id="2">`</ept> command to view all GPUs on the current computer.</target>
+      </trans-unit>
+      <trans-unit id="3">
+        <source xml:lang="zh-CN"><bpt id="l1">[</bpt>“自动并行计算”<ept id="l1">]</ept><bpt id="l2">(</bpt>auto-parallelism.md<ept id="l2">)</ept>一节介绍过，大部分的运算可以使用所有的CPU的全部计算资源，或者单个GPU的全部计算资源。但如果使用多个GPU训练模型，我们仍然需要实现相应的算法。这些算法中最常用的叫做数据并行。</source>
+        <target xml:lang="en-US">As we discussed in the <bpt id="l1">[</bpt>“Automatic Parallel Computation”<ept id="l1">]</ept><bpt id="l2">(</bpt>auto-parallelism.md<ept id="l2">)</ept> section, most operations can use all the computational resources of all CPUs, or all computational resources of a single GPU. However, if we use multiple GPUs for model training, we still need to implement the corresponding algorithms. Of these, the most commonly used algorithm is called data parallelism.</target>
+      </trans-unit>
+      <trans-unit id="4">
+        <source xml:lang="zh-CN">数据并行</source>
+        <target xml:lang="en-US">Data Parallelism</target>
+      </trans-unit>
+      <trans-unit id="5">
+        <source xml:lang="zh-CN">数据并行目前是深度学习里使用最广泛的将模型训练任务划分到多个GPU的办法。回忆一下我们在<bpt id="l2">[</bpt>“小批量随机梯度下降”<ept id="l2">]</ept><bpt id="l3">(</bpt>../chapter_optimization/minibatch-sgd.md<ept id="l3">)</ept>一节中介绍的使用优化算法训练模型的过程。下面我们就以小批量随机梯度下降为例来介绍数据并行是如何工作的。</source>
+        <target xml:lang="en-US">In the deep learning field, Data Parallelism is currently the most widely used method for dividing model training tasks among multiple GPUs. Recall the process for training models using optimization algorithms described in the <bpt id="l2">[</bpt>“Mini-batch Stochastic Gradient Descent”<ept id="l2">]</ept><bpt id="l3">(</bpt>../chapter_optimization/minibatch-sgd.md<ept id="l3">)</ept> section. Now, we will demonstrate how data parallelism works using mini-batch stochastic gradient descent as an example.</target>
+      </trans-unit>
+      <trans-unit id="6">
+        <source xml:lang="zh-CN">假设一台机器上有$k$个GPU。给定需要训练的模型，每个GPU将分别独立维护一份完整的模型参数。在模型训练的任意一次迭代中，给定一个随机小批量，我们将该批量中的样本划分成$k$份并分给每个GPU一份。然后，每个GPU将根据自己所分到的小批量子集和自己所维护的模型参数分别计算模型参数的本地梯度。接下来，我们把$k$个GPU上的本地梯度相加，便得到当前的小批量随机梯度。之后，每个GPU都使用这个小批量随机梯度分别更新自己所维护的那一份完整的模型参数。图8.1描绘了使用两个GPU的数据并行下的小批量随机梯度的计算。</source>
+        <target xml:lang="en-US">Assume there are $k$ GPUs on a machine. Given the model to be trained, each GPU will maintain a complete set of model parameters independently. In any iteration of model training, given a random mini-batch, we divide the examples in the batch into $k$ portions and distribute one to each GPU. Then, each GPU will calculate the local gradient of the model parameters based on the mini-batch subset it was assigned and the model parameters it maintains. Next, we add together the local gradients on the $k$ GPUs to get the current mini-batch stochastic gradient. After that, each GPU uses this mini-batch stochastic gradient to update the complete set of model parameters that it maintains. Figure 8.1 depicts the mini-batch stochastic gradient calculation using data parallelism and two GPUs.</target>
+      </trans-unit>
+      <trans-unit id="7">
+        <source xml:lang="zh-CN"><bpt id="l1">![</bpt>使用两个GPU的数据并行下的小批量随机梯度的计算。<ept id="l1">]</ept><bpt id="l2">(</bpt>../img/data-parallel.svg<ept id="l2">)</ept></source>
+        <target xml:lang="en-US"><bpt id="l1">![</bpt>Calculation of mini-batch stochastic gradient using data parallelism and two GPUs. <ept id="l1">]</ept><bpt id="l2">(</bpt>../img/data-parallel.svg<ept id="l2">)</ept></target>
+      </trans-unit>
+      <trans-unit id="8">
+        <source xml:lang="zh-CN">为了从零开始实现多GPU训练中的数据并行，让我们先导入需要的包或模块。</source>
+        <target xml:lang="en-US">In order to implement data parallelism in a multi-GPU training scenario from scratch, we first import the required packages or modules.</target>
+      </trans-unit>
+      <trans-unit id="9">
+        <source xml:lang="zh-CN">定义模型</source>
+        <target xml:lang="en-US">Define the Model</target>
+      </trans-unit>
+      <trans-unit id="10">
+        <source xml:lang="zh-CN">我们使用<bpt id="l2">[</bpt>“卷积神经网络（LeNet）”<ept id="l2">]</ept><bpt id="l3">(</bpt>../chapter_convolutional-neural-networks/lenet.md<ept id="l3">)</ept>一节里介绍的LeNet来作为本节的样例模型。这里的模型实现部分只用到了NDArray。</source>
+        <target xml:lang="en-US">We use LeNet, introduced in the <bpt id="l2">[</bpt>“Convolutional Neural Networks (LeNet)”<ept id="l2">]</ept><bpt id="l3">(</bpt>../chapter_convolutional-neural-networks/lenet.md<ept id="l3">)</ept> section, as the sample model for this section. Here, the model implementation only uses NDArray.</target>
+      </trans-unit>
+      <trans-unit id="11">
+        <source xml:lang="zh-CN">初始化模型参数。</source>
+        <target xml:lang="en-US">Initialize model parameters.</target>
+      </trans-unit>
+      <trans-unit id="12">
+        <source xml:lang="zh-CN">定义模型。</source>
+        <target xml:lang="en-US">Define the model.</target>
+      </trans-unit>
+      <trans-unit id="13">
+        <source xml:lang="zh-CN">交叉熵损失函数。</source>
+        <target xml:lang="en-US">Cross-entropy loss function.</target>
+      </trans-unit>
+      <trans-unit id="14">
+        <source xml:lang="zh-CN">多GPU之间同步数据</source>
+        <target xml:lang="en-US">Synchronize Data Among Multiple GPUs</target>
+      </trans-unit>
+      <trans-unit id="15">
+        <source xml:lang="zh-CN">我们需要实现一些多GPU之间同步数据的辅助函数。下面的<bpt id="2">`</bpt>get_params<ept id="2">`</ept>函数将模型参数复制到某个特定GPU并初始化梯度。</source>
+        <target xml:lang="en-US">We need to implement some auxiliary functions to synchronize data among the multiple GPUs. The following <bpt id="2">`</bpt>get_params<ept id="2">`</ept> function copies the model parameters to a specific GPU and initializes the gradient.</target>
+      </trans-unit>
+      <trans-unit id="16">
+        <source xml:lang="zh-CN">尝试把模型参数<bpt id="2">`</bpt>params<ept id="2">`</ept>复制到<bpt id="4">`</bpt>gpu(0)<ept id="4">`</ept>上。</source>
+        <target xml:lang="en-US">Try to copy the model parameter <bpt id="2">`</bpt>params<ept id="2">`</ept> to <bpt id="4">`</bpt>gpu(0)<ept id="4">`</ept>.</target>
+      </trans-unit>
+      <trans-unit id="17">
+        <source xml:lang="zh-CN">给定分布在多个GPU之间的数据。以下的<bpt id="2">`</bpt>allreduce<ept id="2">`</ept>函数可以把各个GPU上的数据加起来，然后再广播到所有的GPU上。</source>
+        <target xml:lang="en-US">Here, the data is distributed among multiple GPUs. The following <bpt id="2">`</bpt>allreduce<ept id="2">`</ept> function adds up the data on each GPU and then broadcasts it to all the GPUs.</target>
+      </trans-unit>
+      <trans-unit id="18">
+        <source xml:lang="zh-CN">简单测试一下<bpt id="2">`</bpt>allreduce<ept id="2">`</ept>函数。</source>
+        <target xml:lang="en-US">Perform a simple test of the <bpt id="2">`</bpt>allreduce<ept id="2">`</ept> function.</target>
+      </trans-unit>
+      <trans-unit id="19">
+        <source xml:lang="zh-CN">给定一个批量的数据样本，以下的<bpt id="2">`</bpt>split_and_load<ept id="2">`</ept>函数可以划分它们并复制到各个GPU上。</source>
+        <target xml:lang="en-US">Given a batch of data instances, the following <bpt id="2">`</bpt>split_and_load<ept id="2">`</ept> function can split the sample and copy it to each GPU.</target>
+      </trans-unit>
+      <trans-unit id="20">
+        <source xml:lang="zh-CN">为了简单起见假设整除。</source>
+        <target xml:lang="en-US">For simplicity, we assume the data is divisible.</target>
+      </trans-unit>
+      <trans-unit id="21">
+        <source xml:lang="zh-CN">examples is not divided by # devices.'</source>
+        <target xml:lang="en-US">examples is not divided by # devices.'</target>
+      </trans-unit>
+      <trans-unit id="22">
+        <source xml:lang="zh-CN">让我们试着用<bpt id="2">`</bpt>split_and_load<ept id="2">`</ept>函数将6个数据样本平均分给2个GPU。</source>
+        <target xml:lang="en-US">Now, we try to divide the 6 data instances equally between 2 GPUs using the <bpt id="2">`</bpt>split_and_load<ept id="2">`</ept> function.</target>
+      </trans-unit>
+      <trans-unit id="23">
+        <source xml:lang="zh-CN">单个小批量上的多GPU训练</source>
+        <target xml:lang="en-US">Multi-GPU Training on a Single Mini-batch</target>
+      </trans-unit>
+      <trans-unit id="24">
+        <source xml:lang="zh-CN">现在我们可以实现单个小批量上的多GPU训练了。它的实现主要依据本节介绍的数据并行方法。我们将使用刚刚定义的多GPU之间同步数据的辅助函数：<bpt id="2">`</bpt>allreduce<ept id="2">`</ept>和<bpt id="4">`</bpt>split_and_load<ept id="4">`</ept>。</source>
+        <target xml:lang="en-US">Now we can implement multi-GPU training on a single mini-batch. Its implementation is primarily based on the data parallelism approach described in this section. We will use the auxiliary functions we just discussed, <bpt id="2">`</bpt>allreduce<ept id="2">`</ept> and <bpt id="4">`</bpt>split_and_load<ept id="4">`</ept>, to synchronize the data among multiple GPUs.</target>
+      </trans-unit>
+      <trans-unit id="25">
+        <source xml:lang="zh-CN">当 ctx 包含多个 GPU 时，划分小批量数据样本并复制到各个 GPU 上。</source>
+        <target xml:lang="en-US">When ctx contains multiple GPUs, mini-batches of data instances are divided and copied to each GPU.</target>
+      </trans-unit>
+      <trans-unit id="26">
+        <source xml:lang="zh-CN">在各个 GPU 上分别计算损失。</source>
+        <target xml:lang="en-US">Loss is calculated separately on each GPU.</target>
+      </trans-unit>
+      <trans-unit id="27">
+        <source xml:lang="zh-CN">在各个 GPU 上分别反向传播。</source>
+        <target xml:lang="en-US">Back Propagation is performed separately on each GPU.</target>
+      </trans-unit>
+      <trans-unit id="28">
+        <source xml:lang="zh-CN">把各个 GPU 上的梯度加起来，然后再广播到所有 GPU 上。</source>
+        <target xml:lang="en-US">Add up all the gradients from each GPU and then broadcast them to all the GPUs.</target>
+      </trans-unit>
+      <trans-unit id="29">
+        <source xml:lang="zh-CN">在各个 GPU 上分别更新模型参数。</source>
+        <target xml:lang="en-US">The model parameters are updated separately on each GPU.</target>
+      </trans-unit>
+      <trans-unit id="30">
+        <source xml:lang="zh-CN">这里使用了完整批量大小。</source>
+        <target xml:lang="en-US">Here, we use a full-size batch.</target>
+      </trans-unit>
+      <trans-unit id="31">
+        <source xml:lang="zh-CN">训练函数</source>
+        <target xml:lang="en-US">Training Functions</target>
+      </trans-unit>
+      <trans-unit id="32">
+        <source xml:lang="zh-CN">现在我们可以定义训练函数。这里的训练函数和之前章节里的训练函数稍有不同。例如，在这里我们需要依据数据并行将完整的模型参数复制到多个GPU上，并在每次迭代时对单个小批量上进行多GPU训练。</source>
+        <target xml:lang="en-US">Now, we can define the training function. Here the training function is slightly different from the one used in the previous chapter. For example, here, we need to copy all the model parameters to multiple GPUs based on data parallelism and perform multi-GPU training on a single mini-batch for each iteration.</target>
+      </trans-unit>
+      <trans-unit id="33">
+        <source xml:lang="zh-CN">将模型参数复制到 num_gpus 个 GPU 上。</source>
+        <target xml:lang="en-US">Copy model parameters to num_gpus GPUs.</target>
+      </trans-unit>
+      <trans-unit id="34">
+        <source xml:lang="zh-CN">对单个小批量进行多 GPU 训练。</source>
+        <target xml:lang="en-US">Perform multi-GPU training for a single mini-batch.</target>
+      </trans-unit>
+      <trans-unit id="35">
+        <source xml:lang="zh-CN">在 GPU 0 上验证模型。</source>
+        <target xml:lang="en-US">Verify the model on GPU 0.</target>
+      </trans-unit>
+      <trans-unit id="36">
+        <source xml:lang="zh-CN">多GPU训练实验</source>
+        <target xml:lang="en-US">Multi-GPU Training Experiment</target>
+      </trans-unit>
+      <trans-unit id="37">
+        <source xml:lang="zh-CN">让我们先从单GPU训练开始。设批量大小为256，学习率为0.2。</source>
+        <target xml:lang="en-US">We will start by training with a single GPU. Assume the batch size is 256 and the learning rate is 0.2.</target>
+      </trans-unit>
+      <trans-unit id="38">
+        <source xml:lang="zh-CN">保持批量大小和学习率不变，将使用的GPU数改为2，可以看到测试精度的提升同上一个实验中的结果大体相当。由于额外的通讯开销，我们并没有看到训练时间的显著降低。</source>
+        <target xml:lang="en-US">By keeping the batch size and learning rate unchanged and changing the number of GPUs to 2, we can see that the improvement in test accuracy is roughly the same as in the results from the previous experiment. Because of the extra communication overhead, we did not observe a significant reduction in the training time.</target>
+      </trans-unit>
+      <trans-unit id="39">
+        <source xml:lang="zh-CN">小结</source>
+        <target xml:lang="en-US">Summary</target>
+      </trans-unit>
+      <trans-unit id="40">
+        <source xml:lang="zh-CN">我们可以使用数据并行更充分地利用多个GPU的计算资源，实现多GPU训练模型。</source>
+        <target xml:lang="en-US">We can use data parallelism to more fully utilize the computational resources of multiple GPUs to implement multi-GPU model training.</target>
+      </trans-unit>
+      <trans-unit id="41">
+        <source xml:lang="zh-CN">给定超参数的情况下，改变GPU个数时模型的训练精度大体相当。</source>
+        <target xml:lang="en-US">With the same hyper-parameters, the training accuracy of the model is roughly equivalent when we change the number of GPUs.</target>
+      </trans-unit>
+      <trans-unit id="42">
+        <source xml:lang="zh-CN">练习</source>
+        <target xml:lang="en-US">exercise</target>
+      </trans-unit>
+      <trans-unit id="43">
+        <source xml:lang="zh-CN">在多GPU训练实验中，使用2个GPU训练并将<bpt id="2">`</bpt>batch_size<ept id="2">`</ept>翻倍至512，训练时间有何变化？如果希望测试精度与单GPU训练中的结果相当，学习率应如何调节？</source>
+        <target xml:lang="en-US">In a multi-GPU training experiment, use 2 GPUs for training and double the <bpt id="2">`</bpt>batch_size<ept id="2">`</ept> to 512. How does the training time change? If we want a test accuracy comparable with the results of single-GPU training, how should the learning rate be adjusted?</target>
+      </trans-unit>
+      <trans-unit id="44">
+        <source xml:lang="zh-CN">将实验的模型预测部分改为用多GPU预测。</source>
+        <target xml:lang="en-US">Change the model prediction part of the experiment to multi-GPU prediction.</target>
+      </trans-unit>
+      <trans-unit id="45">
+        <source xml:lang="zh-CN">扫码直达<bpt id="l2">[</bpt>讨论区<ept id="l2">]</ept><bpt id="l3">(</bpt>https://discuss.gluon.ai/t/topic/1884<ept id="l3">)</ept></source>
+        <target xml:lang="en-US">Scan the QR Code to Access <bpt id="l2">[</bpt>Discussions<ept id="l2">]</ept><bpt id="l3">(</bpt>https://discuss.gluon.ai/t/topic/1884<ept id="l3">)</ept></target>
+      </trans-unit>
+      <trans-unit id="46">
+        <source xml:lang="zh-CN"><bpt id="1">![</bpt>../img/qr_multiple-gpus.svg<ept id="1">]</ept></source>
+        <target xml:lang="en-US"><bpt id="1">![</bpt>../img/qr_multiple-gpus.svg<ept id="1">]</ept></target>
+      </trans-unit>
+    </body>
+ </file>
+</xliff>

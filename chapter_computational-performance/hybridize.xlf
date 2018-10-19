@@ -1,0 +1,208 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="chapter_computational-performance/hybridize.md" source-language="zh-CN" target-language="en-US" datatype="markdown">
+    <header>
+      <skl>
+        <external-file href="chapter_computational-performance/hybridize.skl.md"/>
+      </skl>
+    </header>
+    <body>
+      <trans-unit id="1">
+        <source xml:lang="zh-CN">命令式和符号式混合编程</source>
+        <target xml:lang="en-US">A Hybrid of Imperative and Symbolic Programming</target>
+      </trans-unit>
+      <trans-unit id="2">
+        <source xml:lang="zh-CN">本书到目前为止一直都在使用命令式编程，它使用编程语句改变程序状态。考虑下面这段简单的命令式编程代码。</source>
+        <target xml:lang="en-US">So far, this book has focused on imperative programming, which makes use of programming statements to change a program’s state. Consider the following example of simple imperative programming code.</target>
+      </trans-unit>
+      <trans-unit id="3">
+        <source xml:lang="zh-CN">和我们预期的一样，在运行语句<bpt id="2">`</bpt>e = add(a, b)<ept id="2">`</ept>时，Python会做加法运算并将结果存储在变量<bpt id="4">`</bpt>e<ept id="4">`</ept>，从而令程序的状态发生了改变。类似地，后面的两个语句<bpt id="6">`</bpt>f = add(c, d)<ept id="6">`</ept>和<bpt id="8">`</bpt>g = add(e, f)<ept id="8">`</ept>会依次做加法运算并存储变量。</source>
+        <target xml:lang="en-US">As expected, Python will perform an addition when running the statement <bpt id="2">`</bpt>e = add(a, b)<ept id="2">`</ept>, and will store the result as the variable <bpt id="4">`</bpt>e<ept id="4">`</ept>, thereby changing the program’s state. The next two statements <bpt id="6">`</bpt>f = add(c, d)<ept id="6">`</ept> and <bpt id="8">`</bpt>g = add(e, f)<ept id="8">`</ept> will similarly perform additions and store the results as variables.</target>
+      </trans-unit>
+      <trans-unit id="4">
+        <source xml:lang="zh-CN">虽然使用命令式编程很方便，但它的运行可能会慢。一方面，即使<bpt id="2">`</bpt>fancy_func<ept id="2">`</ept>函数中的<bpt id="4">`</bpt>add<ept id="4">`</ept>是被重复调用的函数，Python也会逐一执行这三个函数调用语句。另一方面，我们需要保存变量<bpt id="6">`</bpt>e<ept id="6">`</ept>和<bpt id="8">`</bpt>f<ept id="8">`</ept>的值直到<bpt id="10">`</bpt>fancy_func<ept id="10">`</ept>中所有语句执行结束。这是因为在执行<bpt id="12">`</bpt>e = add(a, b)<ept id="12">`</ept>和<bpt id="14">`</bpt>f = add(c, d)<ept id="14">`</ept>这两个语句之后我们并不知道变量<bpt id="16">`</bpt>e<ept id="16">`</ept>和<bpt id="18">`</bpt>f<ept id="18">`</ept>是否会被程序的其他部分使用。</source>
+        <target xml:lang="en-US">Although imperative programming is convenient, it may be inefficient. On the one hand, even if the <bpt id="4">`</bpt>add<ept id="4">`</ept> function is repeatedly called throughout the <bpt id="2">`</bpt>fancy_func<ept id="2">`</ept> function, Python will execute the three function calling statements individually, one after the other. On the other hand, we need to save the variable values of <bpt id="6">`</bpt>e<ept id="6">`</ept> and <bpt id="8">`</bpt>f<ept id="8">`</ept> until all the statements in <bpt id="10">`</bpt>fancy_func<ept id="10">`</ept> have been executed. This is because we do not know whether the variables <bpt id="16">`</bpt>e<ept id="16">`</ept> and <bpt id="18">`</bpt>f<ept id="18">`</ept> will be used by other parts of the program after the statements <bpt id="12">`</bpt>e = add(a, b)<ept id="12">`</ept> and <bpt id="14">`</bpt>f = add(c, d)<ept id="14">`</ept> have been executed.</target>
+      </trans-unit>
+      <trans-unit id="5">
+        <source xml:lang="zh-CN">与命令式编程不同，符号式编程通常在计算流程完全定义好后才被执行。多个深度学习框架，例如Theano和TensorFlow，都使用了符号式编程。通常，符号式编程的程序需要下面三个步骤：</source>
+        <target xml:lang="en-US">Contrary to imperative programming, symbolic programming is usually performed after the computational process has been fully defined. Symbolic programming is used by multiple deep learning frameworks, including Theano and TensorFlow. The process of symbolic programming generally requires the following three steps:</target>
+      </trans-unit>
+      <trans-unit id="6">
+        <source xml:lang="zh-CN">定义计算流程；</source>
+        <target xml:lang="en-US">Define the computation process.</target>
+      </trans-unit>
+      <trans-unit id="7">
+        <source xml:lang="zh-CN">把计算流程编译成可执行的程序；</source>
+        <target xml:lang="en-US">Compile the computation process into an executable program.</target>
+      </trans-unit>
+      <trans-unit id="8">
+        <source xml:lang="zh-CN">给定输入，调用编译好的程序执行。</source>
+        <target xml:lang="en-US">Provide the required inputs and call on the compiled program for execution.</target>
+      </trans-unit>
+      <trans-unit id="9">
+        <source xml:lang="zh-CN">下面我们用符号式编程重新实现本节开头给出的命令式编程代码。</source>
+        <target xml:lang="en-US">In the example below, we utilize symbolic programming to re-implement the imperative programming code provided at the beginning of this section.</target>
+      </trans-unit>
+      <trans-unit id="10">
+        <source xml:lang="zh-CN">以上定义的三个函数都仅以字符串的形式返回计算流程。最后，我们通过<bpt id="2">`</bpt>compile<ept id="2">`</ept>函数编译完整的计算流程并运行。由于在编译时系统能够完整地看到整个程序，因此有更多空间优化计算。例如，编译的时候可以将程序改写成<bpt id="4">`</bpt>print((1 + 2) + (3 + 4))<ept id="4">`</ept>，甚至直接改写成<bpt id="6">`</bpt>print(10)<ept id="6">`</ept>。这样不仅减少了函数调用，还节省了内存。</source>
+        <target xml:lang="en-US">The three functions defined above will only return the results of the computation process as a string. Finally, the complete computation process is compiled and run using the <bpt id="2">`</bpt>compile<ept id="2">`</ept> function. This leaves more room to optimize computation, since the system is able to view the entire program during its compilation. For example, during compilation, the program can be rewritten as <bpt id="4">`</bpt>print((1 + 2) + (3 + 4))<ept id="4">`</ept> or even directly rewritten as <bpt id="6">`</bpt>print(10)<ept id="6">`</ept>. Apart from reducing the amount of function calls, this process also saves memory.</target>
+      </trans-unit>
+      <trans-unit id="11">
+        <source xml:lang="zh-CN">对比这两种编程方式，我们可以看到</source>
+        <target xml:lang="en-US">A comparison of these two programming methods shows that</target>
+      </trans-unit>
+      <trans-unit id="12">
+        <source xml:lang="zh-CN">命令式编程更方便。当我们在Python里使用命令式编程时，大部分代码编写起来都很直观。同时，命令式编程更容易排错。这是因为我们可以很方便地获取并打印所有的中间变量值，或者使用Python的排错工具。</source>
+        <target xml:lang="en-US">imperative programming is easier. When imperative programming is used in Python, the majority of the code is straightforward and easy to write. At the same time, it is easier to debug imperative programming code. This is because it is easier to obtain and print all relevant intermediate variable values, or make use of Python’s built-in debugging tools.</target>
+      </trans-unit>
+      <trans-unit id="13">
+        <source xml:lang="zh-CN">符号式编程更高效并更容易移植。一方面，在编译的时候系统容易做更多优化；另一方面，符号式编程可以将程序变成一个与Python无关的格式，从而可以使程序在非Python环境下运行，以避开Python解释器的性能问题。</source>
+        <target xml:lang="en-US">Symbolic programming is more efficient and easier to port. Symbolic programming makes it easier to better optimize the system during compilation, while also having the ability to port the program into a format independent of Python. This allows the program to be run in a non-Python environment, thus avoiding any potential performance issues related to the Python interpreter.</target>
+      </trans-unit>
+      <trans-unit id="14">
+        <source xml:lang="zh-CN">混合式编程取两者之长</source>
+        <target xml:lang="en-US">Hybrid programming provides the best of both worlds.</target>
+      </trans-unit>
+      <trans-unit id="15">
+        <source xml:lang="zh-CN">大部分的深度学习框架在命令式编程和符号式编程之间二选一。例如Theano和受其启发的后来者TensorFlow使用了符号式编程；Chainer和它的追随者PyTorch使用了命令式编程。开发人员在设计Gluon时思考了这个问题：有没有可能既得到命令式编程的好处，又享受符号式编程的优势？开发者们认为，用户应该用纯命令式编程进行开发和调试；当需要产品级别的计算性能和部署时，用户可以将大部分程序转换成符号式来运行。Gluon通过提供混合式编程做到了这一点。</source>
+        <target xml:lang="en-US">Most deep learning frameworks choose either imperative or symbolic programming. For example, both Theano and TensorFlow (inspired by the latter) make use of symbolic programming, while Chainer and its predecessor PyTorch utilize imperative programming. When designing Gluon, developers considered whether it was possible to harness the benefits of both imperative and symbolic programming. The developers believed that users should be able to develop and debug using pure imperative programming, while having the ability to convert most programs into symbolic programming to be run when product-level computing performance and deployment are required This was achieved by Gluon through the introduction of hybrid programming.</target>
+      </trans-unit>
+      <trans-unit id="16">
+        <source xml:lang="zh-CN">在混合式编程中，我们可以通过使用HybridBlock类或者HybridSequential类构建模型。默认情况下，它们和Block或者Sequential类一样依据命令式编程的方式执行。当我们调用<bpt id="2">`</bpt>hybridize<ept id="2">`</ept>函数后，Gluon会转换成依据符号式编程的方式执行。事实上，绝大多数模型都可以享受这样的混合式编程的执行方式。</source>
+        <target xml:lang="en-US">In hybrid programming, we can build models using either the HybridBlock or the HybridSequential classes. By default, they are executed in the same way Block or Sequential classes are executed in imperative programming. When the <bpt id="2">`</bpt>hybridize<ept id="2">`</ept> function is called, Gluon will convert the program’s execution into the style used in symbolic programming. In fact, most models can make use of hybrid programming’s execution style.</target>
+      </trans-unit>
+      <trans-unit id="17">
+        <source xml:lang="zh-CN">本节将通过实验展示混合式编程的魅力。</source>
+        <target xml:lang="en-US">Through the use of experiments, this section will demonstrate the benefits of hybrid programming.</target>
+      </trans-unit>
+      <trans-unit id="18">
+        <source xml:lang="zh-CN">使用HybridSequential类构造模型</source>
+        <target xml:lang="en-US">Constructing Models Using the HybridSequential Class</target>
+      </trans-unit>
+      <trans-unit id="19">
+        <source xml:lang="zh-CN">我们之前学习了如何使用Sequential类来串联多个层。为了使用混合式编程，下面我们将Sequential类替换成HybridSequential类。</source>
+        <target xml:lang="en-US">Previously, we learned how to use the Sequential class to concatenate multiple layers. Next, we will replace the Sequential class with the HybridSequential class in order to make use of hybrid programming.</target>
+      </trans-unit>
+      <trans-unit id="20">
+        <source xml:lang="zh-CN">这里使用 HybridSequential 类。</source>
+        <target xml:lang="en-US">Here we use the class HybridSequential.</target>
+      </trans-unit>
+      <trans-unit id="21">
+        <source xml:lang="zh-CN">我们可以通过调用<bpt id="2">`</bpt>hybridize<ept id="2">`</ept>函数来编译和优化HybridSequential实例中串联层的计算。模型的计算结果不变。</source>
+        <target xml:lang="en-US">By calling the <bpt id="2">`</bpt>hybridize<ept id="2">`</ept> function, we are able to compile and optimize the computation of the concatenation layer in the HybridSequential instance. The model’s computation result remains unchanged.</target>
+      </trans-unit>
+      <trans-unit id="22">
+        <source xml:lang="zh-CN">需要注意的是，只有继承HybridBlock类的层才会被优化计算。例如，HybridSequential类和Gluon提供的<bpt id="2">`</bpt>Dense<ept id="2">`</ept>类都是HybridBlock类的子类，它们都会被优化计算。如果一个层只是继承自Block类而不是HybridBlock类，那么它将不会被优化。</source>
+        <target xml:lang="en-US">It should be noted that only the layers inheriting the HybridBlock class will be optimized during computation. For example, the HybridSequential and <bpt id="2">`</bpt>Dense<ept id="2">`</ept> classes provided by Gluon are all subclasses of HybridBlock class, meaning they will both be optimized during computation. A layer will not be optimized if it inherits from the Block class rather than the HybridBlock class.</target>
+      </trans-unit>
+      <trans-unit id="23">
+        <source xml:lang="zh-CN">计算性能</source>
+        <target xml:lang="en-US">Computing Performance</target>
+      </trans-unit>
+      <trans-unit id="24">
+        <source xml:lang="zh-CN">我们比较调用<bpt id="2">`</bpt>hybridize<ept id="2">`</ept>函数前后的计算时间来展示符号式编程的性能提升。这里我们计时1000次<bpt id="4">`</bpt>net<ept id="4">`</ept>模型计算。在<bpt id="6">`</bpt>net<ept id="6">`</ept>调用<bpt id="8">`</bpt>hybridize<ept id="8">`</ept>函数前后，它分别依据命令式编程和符号式编程做模型计算。</source>
+        <target xml:lang="en-US">To demonstrate the performance improvement gained by the use of symbolic programming, we will compare the computation time before and after calling the <bpt id="2">`</bpt>hybridize<ept id="2">`</ept> function. Here we time 1000 <bpt id="4">`</bpt>net<ept id="4">`</ept> model computations. The model computations are based on imperative and symbolic programming, respectively, before and after <bpt id="6">`</bpt>net<ept id="6">`</ept> has called the <bpt id="8">`</bpt>hybridize<ept id="8">`</ept> function.</target>
+      </trans-unit>
+      <trans-unit id="25">
+        <source xml:lang="zh-CN">等待所有计算完成方便计时。</source>
+        <target xml:lang="en-US">To facilitate timing, we wait for all computations to be completed.</target>
+      </trans-unit>
+      <trans-unit id="26">
+        <source xml:lang="zh-CN">由上面结果可见，在一个HybridSequential实例调用<bpt id="2">`</bpt>hybridize<ept id="2">`</ept>函数后，它可以通过符号式编程提升计算性能。</source>
+        <target xml:lang="en-US">As is observed in the above results, after a HybridSequential instance calls the <bpt id="2">`</bpt>hybridize<ept id="2">`</ept> function, computing performance is improved through the use of symbolic programming.</target>
+      </trans-unit>
+      <trans-unit id="27">
+        <source xml:lang="zh-CN">获取符号式程序</source>
+        <target xml:lang="en-US">Achieving Symbolic Programming</target>
+      </trans-unit>
+      <trans-unit id="28">
+        <source xml:lang="zh-CN">在模型<bpt id="2">`</bpt>net<ept id="2">`</ept>根据输入计算模型输出后，例如<bpt id="4">`</bpt>benchmark<ept id="4">`</ept>函数中的<bpt id="6">`</bpt>net(x)<ept id="6">`</ept>，我们就可以通过<bpt id="8">`</bpt>export<ept id="8">`</ept>函数来保存符号式程序和模型参数到硬盘。</source>
+        <target xml:lang="en-US">We can save the symbolic program and model parameters to the hard disk through the use of the <bpt id="8">`</bpt>export<ept id="8">`</ept> function after the <bpt id="2">`</bpt>net<ept id="2">`</ept> model has finished computing the output based on the input, such as in the case of <bpt id="6">`</bpt>net(x)<ept id="6">`</ept> in the <bpt id="4">`</bpt>benchmark<ept id="4">`</ept> function.</target>
+      </trans-unit>
+      <trans-unit id="29">
+        <source xml:lang="zh-CN">此时生成的.json和.params文件分别为符号式程序和模型参数。它们可以被Python或MXNet支持的其他前端语言读取，例如C++、R、Scala、Perl和其它语言。这样，我们就可以很方便地使用其他前端语言或在其他设备上部署训练好的模型。同时，由于部署时使用的是基于符号式编程的程序，计算性能往往比基于命令式编程时更好。</source>
+        <target xml:lang="en-US">The .json and .params files generated during this process are a symbolic program and a model parameter, respectively. They can be read by other front-end languages supported by Python or MXNet, such as C++, R, Scala, and Perl. This allows us to deploy trained models to other devices and easily use other front-end programming languages. At the same time, because symbolic programming was used during deployment, the computing performance is often superior to that based on imperative programming.</target>
+      </trans-unit>
+      <trans-unit id="30">
+        <source xml:lang="zh-CN">在MXNet中，符号式程序指的是Symbol类型的程序。我们知道，当给<bpt id="2">`</bpt>net<ept id="2">`</ept>提供NDArray类型的输入<bpt id="4">`</bpt>x<ept id="4">`</ept>后，<bpt id="6">`</bpt>net(x)<ept id="6">`</ept>会根据<bpt id="8">`</bpt>x<ept id="8">`</ept>直接计算模型输出并返回结果。对于调用过<bpt id="10">`</bpt>hybridize<ept id="10">`</ept>函数后的模型，我们还可以给它输入一个Symbol类型的变量，<bpt id="12">`</bpt>net(x)<ept id="12">`</ept>会返回Symbol类型的结果。</source>
+        <target xml:lang="en-US">In MXNet, a symbolic program refers to a program that makes use of the Symbol type. We know that, when the NDArray input <bpt id="4">`</bpt>x<ept id="4">`</ept> is provided to <bpt id="2">`</bpt>net<ept id="2">`</ept>, <bpt id="6">`</bpt>net(x)<ept id="6">`</ept> will directly calculate the model output and return a result based on <bpt id="8">`</bpt>x<ept id="8">`</ept>. For models that have called the <bpt id="10">`</bpt>hybridize<ept id="10">`</ept> function, we can also provide a Symbol-type input variable, and <bpt id="12">`</bpt>net(x)<ept id="12">`</ept> will return Symbol type results.</target>
+      </trans-unit>
+      <trans-unit id="31">
+        <source xml:lang="zh-CN">使用HybridBlock类构造模型</source>
+        <target xml:lang="en-US">Constructing Models Using the HybridBlock Class</target>
+      </trans-unit>
+      <trans-unit id="32">
+        <source xml:lang="zh-CN">和Sequential类与Block类之间的关系一样，HybridSequential类是HybridBlock类的子类。跟Block实例需要实现<bpt id="2">`</bpt>forward<ept id="2">`</ept>函数不太一样的是，对于HybridBlock实例我们需要实现<bpt id="4">`</bpt>hybrid_forward<ept id="4">`</ept>函数。</source>
+        <target xml:lang="en-US">Similar to the correlation between the Sequential Block classes, the HybridSequential class is a HybridBlock subclass. Contrary to the Block instance, which needs to use the <bpt id="2">`</bpt>forward<ept id="2">`</ept> function, for a HybridBlock instance we need to use the <bpt id="4">`</bpt>hybrid_forward<ept id="4">`</ept> function.</target>
+      </trans-unit>
+      <trans-unit id="33">
+        <source xml:lang="zh-CN">前面我们展示了调用<bpt id="2">`</bpt>hybridize<ept id="2">`</ept>函数后的模型可以获得更好的计算性能和可移植性。另一方面，调用<bpt id="4">`</bpt>hybridize<ept id="4">`</ept>函数后的模型会影响灵活性。为了解释这一点，我们先使用HybridBlock类构造模型。</source>
+        <target xml:lang="en-US">Earlier, we demonstrated that, after calling the <bpt id="2">`</bpt>hybridize<ept id="2">`</ept> function, the model is able to achieve superior computing performance and portability. In addition, model flexibility can be affected after calling the <bpt id="4">`</bpt>hybridize<ept id="4">`</ept> function. We will demonstrate this by constructing a model using the HybridBlock class.</target>
+      </trans-unit>
+      <trans-unit id="34">
+        <source xml:lang="zh-CN">在继承HybridBlock类时，我们需要在<bpt id="2">`</bpt>hybrid_forward<ept id="2">`</ept>函数中添加额外的输入<bpt id="4">`</bpt>F<ept id="4">`</ept>。我们知道，MXNet既有基于命令式编程的NDArray类，又有基于符号式编程的Symbol类。由于这两个类的函数基本一致，MXNet会根据输入来决定<bpt id="6">`</bpt>F<ept id="6">`</ept>使用NDArray或Symbol。</source>
+        <target xml:lang="en-US">We need to add the additional input <bpt id="2">`</bpt>F<ept id="2">`</ept> to the <bpt id="4">`</bpt>hybrid_forward<ept id="4">`</ept> function when inheriting the HybridBlock class. We already know that MXNet uses both an NDArray class and a Symbol class, which are based on imperative programming and symbolic programming, respectively. Since these two classes perform very similar functions, MXNet will determine whether <bpt id="6">`</bpt>F<ept id="6">`</ept> will call NDArray or Symbol based on the input provided.</target>
+      </trans-unit>
+      <trans-unit id="35">
+        <source xml:lang="zh-CN">下面创建了一个HybridBlock实例。可以看到默认下<bpt id="2">`</bpt>F<ept id="2">`</ept>使用NDArray。而且，我们打印出了输入<bpt id="4">`</bpt>x<ept id="4">`</ept>和使用ReLU激活函数的隐藏层的输出。</source>
+        <target xml:lang="en-US">The following creates a HybridBlock instance. As we can see, by default, <bpt id="2">`</bpt>F<ept id="2">`</ept> uses NDArray. We also printed out the <bpt id="4">`</bpt>x<ept id="4">`</ept> input as well as the hidden layer’s output using the ReLU activation function.</target>
+      </trans-unit>
+      <trans-unit id="36">
+        <source xml:lang="zh-CN">再运行一次前向计算会得到同样的结果。</source>
+        <target xml:lang="en-US">Repeating the forward computation will achieve the same results.</target>
+      </trans-unit>
+      <trans-unit id="37">
+        <source xml:lang="zh-CN">接下来看看调用<bpt id="2">`</bpt>hybridize<ept id="2">`</ept>函数后会发生什么。</source>
+        <target xml:lang="en-US">Next, we will see what happens after we call the <bpt id="2">`</bpt>hybridize<ept id="2">`</ept> function.</target>
+      </trans-unit>
+      <trans-unit id="38">
+        <source xml:lang="zh-CN">可以看到，<bpt id="2">`</bpt>F<ept id="2">`</ept>变成了Symbol。而且，虽然输入数据还是NDArray，但<bpt id="4">`</bpt>hybrid_forward<ept id="4">`</ept>函数里，相同输入和中间输出全部变成了Symbol类型。</source>
+        <target xml:lang="en-US">We can see that <bpt id="2">`</bpt>F<ept id="2">`</ept> turns into a Symbol. Moreover, even though the input data is still NDArray, the same input and intermediate output will all be converted to Symbol type in the <bpt id="4">`</bpt>hybrid_forward<ept id="4">`</ept> function.</target>
+      </trans-unit>
+      <trans-unit id="39">
+        <source xml:lang="zh-CN">再运行一次前向计算看看。</source>
+        <target xml:lang="en-US">Now, we repeat the forward computation.</target>
+      </trans-unit>
+      <trans-unit id="40">
+        <source xml:lang="zh-CN">可以看到<bpt id="2">`</bpt>hybrid_forward<ept id="2">`</ept>函数里定义的三行打印语句都没有打印任何东西。这是因为上一次在调用<bpt id="4">`</bpt>hybridize<ept id="4">`</ept>函数后运行<bpt id="6">`</bpt>net(x)<ept id="6">`</ept>的时候，符号式程序已经得到。之后再运行<bpt id="8">`</bpt>net(x)<ept id="8">`</ept>的时候MXNet将不再访问Python代码，而是直接在C++后端执行符号式程序。这也是调用<bpt id="10">`</bpt>hybridize<ept id="10">`</ept>后模型计算性能会提升的一个原因。但它可能的问题在于我们损失了写程序的灵活性。在上面这个例子中，如果我们希望使用那三行打印语句调试代码，执行符号式程序时会跳过它们无法打印。此外，对于少数像<bpt id="12">`</bpt>asnumpy<ept id="12">`</ept>这样的Symbol所不支持的函数，以及像<bpt id="14">`</bpt>a += b<ept id="14">`</ept>和<bpt id="16">`</bpt>a[:] = a + b<ept id="16">`</ept>（需改写为<bpt id="18">`</bpt>a = a + b<ept id="18">`</ept>）这样的原地（in-place）操作，我们无法在<bpt id="20">`</bpt>hybrid_forward<ept id="20">`</ept>函数中使用并在调用<bpt id="22">`</bpt>hybridize<ept id="22">`</ept>函数后进行前向计算。</source>
+        <target xml:lang="en-US">We can see that the three lines of print statements defined in the <bpt id="2">`</bpt>hybrid_forward<ept id="2">`</ept> function will not print anything. This is because a symbolic program has been produced since the last time <bpt id="6">`</bpt>net(x)<ept id="6">`</ept> was run by calling the <bpt id="4">`</bpt>hybridize<ept id="4">`</ept> function. Afterwards, when we run <bpt id="8">`</bpt>net(x)<ept id="8">`</ept> again, MXNet will no longer need to access Python code, but can directly perform symbolic programming at the C++ backend. This is another reason why model computing performance will be improve after the <bpt id="10">`</bpt>hybridize<ept id="10">`</ept> function is called. However, there is always the potential that any programs we write will suffer a loss in flexibility. If we want to use the three lines of print statements to debug the code in the above example, they will be skipped over and we would not be able to print when the symbolic program is executed. Additionally, in the case of a few functions not supported by Symbol (like <bpt id="12">`</bpt>asnumpy<ept id="12">`</ept>), and operations in-place like <bpt id="14">`</bpt>a += b<ept id="14">`</ept> and <bpt id="16">`</bpt>a[:] = a + b<ept id="16">`</ept> (must be rewritten as <bpt id="18">`</bpt>a = a + b<ept id="18">`</ept>). Therefore, we will not be able to use the <bpt id="20">`</bpt>hybrid_forward<ept id="20">`</ept> function or perform forward computation after the <bpt id="22">`</bpt>hybridize<ept id="22">`</ept> function has been called.</target>
+      </trans-unit>
+      <trans-unit id="41">
+        <source xml:lang="zh-CN">小结</source>
+        <target xml:lang="en-US">Summary</target>
+      </trans-unit>
+      <trans-unit id="42">
+        <source xml:lang="zh-CN">命令式编程和符号式编程各有优劣。MXNet通过混合式编程取二者之长。</source>
+        <target xml:lang="en-US">Both imperative and symbolic programming have their advantages as well as their disadvantages. Through hybrid programming, MXNet is able to combine the advantages of both.</target>
+      </trans-unit>
+      <trans-unit id="43">
+        <source xml:lang="zh-CN">通过HybridSequential类和HybridBlock类构建的模型可以调用<bpt id="2">`</bpt>hybridize<ept id="2">`</ept>函数将命令式程序转成符号式程序。我们建议大家使用这种方法获得计算性能的提升。</source>
+        <target xml:lang="en-US">Models constructed by the HybridSequential and HybridBlock classes are able to convert imperative program into symbolic program by calling the <bpt id="2">`</bpt>hybridize<ept id="2">`</ept> function. We recommend using this method to improve computing performance.</target>
+      </trans-unit>
+      <trans-unit id="44">
+        <source xml:lang="zh-CN">练习</source>
+        <target xml:lang="en-US">exercise</target>
+      </trans-unit>
+      <trans-unit id="45">
+        <source xml:lang="zh-CN">在本节HybridNet类的<bpt id="2">`</bpt>hybrid_forward<ept id="2">`</ept>函数中第一行添加<bpt id="4">`</bpt>x.asnumpy()<ept id="4">`</ept>，运行本节全部代码，观察报错的位置和错误类型。</source>
+        <target xml:lang="en-US">Add <bpt id="4">`</bpt>x.asnumpy()<ept id="4">`</ept> to the first line of the <bpt id="2">`</bpt>hybrid_forward<ept id="2">`</ept> function of the HybridNet class in this section, run all the code in this section, and observe any error types and locations</target>
+      </trans-unit>
+      <trans-unit id="46">
+        <source xml:lang="zh-CN">如果在<bpt id="2">`</bpt>hybrid_forward<ept id="2">`</ept>函数中加入Python的<bpt id="4">`</bpt>if<ept id="4">`</ept>和<bpt id="6">`</bpt>for<ept id="6">`</ept>语句会怎么样？</source>
+        <target xml:lang="en-US">What happens if we add the Python statements <bpt id="4">`</bpt>if<ept id="4">`</ept> and <bpt id="6">`</bpt>for<ept id="6">`</ept> in the <bpt id="2">`</bpt>hybrid_forward<ept id="2">`</ept> function?</target>
+      </trans-unit>
+      <trans-unit id="47">
+        <source xml:lang="zh-CN">回顾前面几章中你感兴趣的模型，改用HybridBlock类或HybridSequential类实现。</source>
+        <target xml:lang="en-US">Review the models that interest you in the previous chapters and use the HybridBlock class or HybridSequential class to implement them.</target>
+      </trans-unit>
+      <trans-unit id="48">
+        <source xml:lang="zh-CN">扫码直达<bpt id="l2">[</bpt>讨论区<ept id="l2">]</ept><bpt id="l3">(</bpt>https://discuss.gluon.ai/t/topic/1665<ept id="l3">)</ept></source>
+        <target xml:lang="en-US">Scan the QR Code to Access <bpt id="l2">[</bpt>Discussions<ept id="l2">]</ept><bpt id="l3">(</bpt>https://discuss.gluon.ai/t/topic/1665<ept id="l3">)</ept></target>
+      </trans-unit>
+      <trans-unit id="49">
+        <source xml:lang="zh-CN"><bpt id="1">![</bpt>../img/qr_hybridize.svg<ept id="1">]</ept></source>
+        <target xml:lang="en-US"><bpt id="1">![</bpt>../img/qr_hybridize.svg<ept id="1">]</ept></target>
+      </trans-unit>
+    </body>
+ </file>
+</xliff>

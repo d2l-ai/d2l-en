@@ -1,0 +1,160 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="chapter_optimization/adam.md" source-language="zh-CN" target-language="en-US" datatype="markdown">
+    <header>
+      <skl>
+        <external-file href="chapter_optimization/adam.skl.md"/>
+      </skl>
+    </header>
+    <body>
+      <trans-unit id="1">
+        <source xml:lang="zh-CN">Adam</source>
+        <target xml:lang="en-US">Adam</target>
+      </trans-unit>
+      <trans-unit id="2">
+        <source xml:lang="zh-CN">Adam在RMSProp基础上对小批量随机梯度也做了指数加权移动平均 <bpt id="2">[</bpt>1<ept id="2">]</ept>。下面我们来介绍这个算法。</source>
+        <target xml:lang="en-US">Created on the basis of RMSProp, Adam also uses EWMA on the mini-batch stochastic gradient<bpt id="2">[</bpt>1<ept id="2">]</ept>. Here, we are going to introduce this algorithm.</target>
+      </trans-unit>
+      <trans-unit id="3">
+        <source xml:lang="zh-CN">算法</source>
+        <target xml:lang="en-US">The Algorithm</target>
+      </trans-unit>
+      <trans-unit id="4">
+        <source xml:lang="zh-CN">Adam使用了动量变量$\boldsymbol{v}_t$和RMSProp中小批量随机梯度按元素平方的指数加权移动平均变量$\boldsymbol{s}_t$，并在时间步0将它们中每个元素初始化为0。给定超参数$0 \leq \beta_1 %%%less-than%%% 1$（算法作者建议设为0.9），时间步$t$的动量变量$\boldsymbol{v}_t$即小批量随机梯度$\boldsymbol{g}_t$的指数加权移动平均：</source>
+        <target xml:lang="en-US">Adam uses the momentum variable $\boldsymbol{v}_t$ and variable $\boldsymbol{s}_t$, which is an EWMA on the squares of elements in the mini-batch stochastic gradient from RMSProp, and initializes each element of the variables to 0 at time step 0. Given the hyperparameter $0 \leq \beta_1 %%%less-than%%% 1$ (the author of the algorithm suggests a value of 0.9), the momentum variable $\boldsymbol{v}_t$ at time step $t$ is the EWMA of the mini-batch stochastic gradient $\boldsymbol{g}_t$:</target>
+      </trans-unit>
+      <trans-unit id="5">
+        <source xml:lang="zh-CN">$$\boldsymbol{v}_t \leftarrow \beta_1 \boldsymbol{v}_{t-1} + (1 - \beta_1) \boldsymbol{g}_t.</source>
+        <target xml:lang="en-US">$$\boldsymbol{v}_t \leftarrow \beta_1 \boldsymbol{v}_{t-1} + (1 - \beta_1) \boldsymbol{g}_t.</target>
+      </trans-unit>
+      <trans-unit id="6">
+        <source xml:lang="zh-CN">$$</source>
+        <target xml:lang="en-US">$$</target>
+      </trans-unit>
+      <trans-unit id="7">
+        <source xml:lang="zh-CN">和RMSProp中一样，给定超参数$0 \leq \beta_2 %%%less-than%%% 1$（算法作者建议设为0.999），
+将小批量随机梯度按元素平方后的项$\boldsymbol{g}_t \odot \boldsymbol{g}_t$做指数加权移动平均得到$\boldsymbol{s}_t$：</source>
+        <target xml:lang="en-US">Just as in RMSProp, given the hyperparameter $0 \leq \beta_2 %%%less-than%%% 1$ (the author of the algorithm suggests a value of 0.999),
+After taken the squares of elements in the mini-batch stochastic gradient, find $\boldsymbol{g}_t \odot \boldsymbol{g}_t$ and perform EWMA on it to obtain $\boldsymbol{s}_t$:</target>
+      </trans-unit>
+      <trans-unit id="8">
+        <source xml:lang="zh-CN">$$\boldsymbol{s}_t \leftarrow \beta_2 \boldsymbol{s}_{t-1} + (1 - \beta_2) \boldsymbol{g}_t \odot \boldsymbol{g}_t.</source>
+        <target xml:lang="en-US">$$\boldsymbol{s}_t \leftarrow \beta_2 \boldsymbol{s}_{t-1} + (1 - \beta_2) \boldsymbol{g}_t \odot \boldsymbol{g}_t.</target>
+      </trans-unit>
+      <trans-unit id="9">
+        <source xml:lang="zh-CN">$$</source>
+        <target xml:lang="en-US">$$</target>
+      </trans-unit>
+      <trans-unit id="10">
+        <source xml:lang="zh-CN">由于我们将$\boldsymbol{v}_0$和$\boldsymbol{s}_0$中的元素都初始化为0，
+在时间步$t$我们得到$\boldsymbol{v}_t =  (1-\beta_1) \sum_{i=1}^t \beta_1^{t-i} \boldsymbol{g}_i$。将过去各时间步小批量随机梯度的权值相加，得到 $(1-\beta_1) \sum_{i=1}^t \beta_1^{t-i} = 1 - \beta_1^t$。需要注意的是，当$t$较小时，过去各时间步小批量随机梯度权值之和会较小。例如当$\beta_1 = 0.9$时，$\boldsymbol{v}_1 = 0.1\boldsymbol{g}_1$。为了消除这样的影响，对于任意时间步$t$，我们可以将$\boldsymbol{v}_t$再除以$1 - \beta_1^t$，从而使得过去各时间步小批量随机梯度权值之和为1。这也叫做偏差修正。在Adam算法中，我们对变量$\boldsymbol{v}_t$和$\boldsymbol{s}_t$均作偏差修正：</source>
+        <target xml:lang="en-US">Since we initialized elements in $\boldsymbol{v}_0$ and $\boldsymbol{s}_0$ to 0,
+we get $\boldsymbol{v}_t =  (1-\beta_1) \sum_{i=1}^t \beta_1^{t-i} \boldsymbol{g}_i$ at time step $t$. Sum the mini-batch stochastic gradient weights from each previous time step to get $(1-\beta_1) \sum_{i=1}^t \beta_1^{t-i} = 1 - \beta_1^t$. Notice that when $t$ is small, the sum of the mini-batch stochastic gradient weights from each previous time step will be small. For example, when $\beta_1 = 0.9$, $\boldsymbol{v}_1 = 0.1\boldsymbol{g}_1$. To eliminate this effect, for any time step $t$, we can divide $\boldsymbol{v}_t$ by $1 - \beta_1^t$, so that the sum of the mini-batch stochastic gradient weights from each previous time step is 1. This is also called bias correction. In the Adam algorithm, we perform bias corrections for variables $\boldsymbol{v}_t$ and $\boldsymbol{s}_t$:</target>
+      </trans-unit>
+      <trans-unit id="11">
+        <source xml:lang="zh-CN">$$\hat{\boldsymbol{v}}_t \leftarrow \frac{\boldsymbol{v}_t}{1 - \beta_1^t}, $$</source>
+        <target xml:lang="en-US">$$\hat{\boldsymbol{v}}_t \leftarrow \frac{\boldsymbol{v}_t}{1 - \beta_1^t}, $$</target>
+      </trans-unit>
+      <trans-unit id="12">
+        <source xml:lang="zh-CN">$$\hat{\boldsymbol{s}}_t \leftarrow \frac{\boldsymbol{s}_t}{1 - \beta_2^t}.</source>
+        <target xml:lang="en-US">$$\hat{\boldsymbol{s}}_t \leftarrow \frac{\boldsymbol{s}_t}{1 - \beta_2^t}.</target>
+      </trans-unit>
+      <trans-unit id="13">
+        <source xml:lang="zh-CN">$$</source>
+        <target xml:lang="en-US">$$</target>
+      </trans-unit>
+      <trans-unit id="14">
+        <source xml:lang="zh-CN">接下来，Adam算法使用以上偏差修正后的变量$\hat{\boldsymbol{v}}_t$和$\hat{\boldsymbol{s}}_t$，将模型参数中每个元素的学习率通过按元素运算重新调整：</source>
+        <target xml:lang="en-US">Next, the Adam algorithm will use the bias-corrected variables $\hat{\boldsymbol{v}}_t$ and $\hat{\boldsymbol{s}}_t$ from above to re-adjust the learning rate of each element in the model parameters using element operations.</target>
+      </trans-unit>
+      <trans-unit id="15">
+        <source xml:lang="zh-CN">$$\boldsymbol{g}_t' \leftarrow \frac{\eta \hat{\boldsymbol{v}}_t}{\sqrt{\hat{\boldsymbol{s}}_t + \epsilon}},$$</source>
+        <target xml:lang="en-US">$$\boldsymbol{g}_t' \leftarrow \frac{\eta \hat{\boldsymbol{v}}_t}{\sqrt{\hat{\boldsymbol{s}}_t + \epsilon}},$$</target>
+      </trans-unit>
+      <trans-unit id="16">
+        <source xml:lang="zh-CN">其中$\eta$是学习率，$\epsilon$是为了维持数值稳定性而添加的常数，例如$10^{-8}$。和Adagrad、RMSProp以及Adadelta一样，目标函数自变量中每个元素都分别拥有自己的学习率。最后，使用$\boldsymbol{g}_t'$迭代自变量：</source>
+        <target xml:lang="en-US">Here, eta$ is the learning rate while $\epsilon$ is a constant added to maintain numerical stability, such as $10^{-8}$. Just as for Adagrad, RMSProp, and Adadelta, each element in the independent variable of the objective function has its own learning rate. Finally, use $\boldsymbol{g}_t'$ to iterate the independent variable:</target>
+      </trans-unit>
+      <trans-unit id="17">
+        <source xml:lang="zh-CN">$$\boldsymbol{x}<bpt id="3">_</bpt>t \leftarrow \boldsymbol{x}<ept id="3">_</ept>{t-1} - \boldsymbol{g}_t'.</source>
+        <target xml:lang="en-US">$$\boldsymbol{x}<bpt id="3">_</bpt>t \leftarrow \boldsymbol{x}<ept id="3">_</ept>{t-1} - \boldsymbol{g}_t'.</target>
+      </trans-unit>
+      <trans-unit id="18">
+        <source xml:lang="zh-CN">$$</source>
+        <target xml:lang="en-US">$$</target>
+      </trans-unit>
+      <trans-unit id="19">
+        <source xml:lang="zh-CN">从零开始实现</source>
+        <target xml:lang="en-US">Implementation from Scratch</target>
+      </trans-unit>
+      <trans-unit id="20">
+        <source xml:lang="zh-CN">我们按照算法中的公式实现Adam。其中时间步$t$通过<bpt id="2">`</bpt>hyperparams<ept id="2">`</ept>参数传入<bpt id="4">`</bpt>adam<ept id="4">`</ept>函数。</source>
+        <target xml:lang="en-US">We use the formula from the algorithm to implement Adam. Here, time step $t$ uses <bpt id="2">`</bpt>hyperparams<ept id="2">`</ept> to input parameters to the <bpt id="4">`</bpt>adam<ept id="4">`</ept> function.</target>
+      </trans-unit>
+      <trans-unit id="21">
+        <source xml:lang="zh-CN">使用学习率$0.01$的Adam来训练模型。</source>
+        <target xml:lang="en-US">Use Adam to train the model with a learning rate of $0.01$.</target>
+      </trans-unit>
+      <trans-unit id="22">
+        <source xml:lang="zh-CN">Gluon实现</source>
+        <target xml:lang="en-US">Implementation with Gluon</target>
+      </trans-unit>
+      <trans-unit id="23">
+        <source xml:lang="zh-CN">通过算法名称为“adam”的<bpt id="2">`</bpt>Trainer<ept id="2">`</ept>实例，我们便可在Gluon中使用Adam算法。</source>
+        <target xml:lang="en-US">From the <bpt id="2">`</bpt>Trainer<ept id="2">`</ept> instance of the algorithm named "adam", we can implement Adam with Gluon.</target>
+      </trans-unit>
+      <trans-unit id="24">
+        <source xml:lang="zh-CN">小结</source>
+        <target xml:lang="en-US">Summary</target>
+      </trans-unit>
+      <trans-unit id="25">
+        <source xml:lang="zh-CN">Adam在RMSProp基础上对小批量随机梯度也做了指数加权移动平均。</source>
+        <target xml:lang="en-US">Created on the basis of RMSProp, Adam also uses EWMA on the mini-batch stochastic gradient</target>
+      </trans-unit>
+      <trans-unit id="26">
+        <source xml:lang="zh-CN">Adam使用了偏差修正。</source>
+        <target xml:lang="en-US">Adam uses bias correction.</target>
+      </trans-unit>
+      <trans-unit id="27">
+        <source xml:lang="zh-CN">练习</source>
+        <target xml:lang="en-US">exercise</target>
+      </trans-unit>
+      <trans-unit id="28">
+        <source xml:lang="zh-CN">调节学习率，观察并分析实验结果。</source>
+        <target xml:lang="en-US">Adjust the learning rate and observe and analyze the experimental results.</target>
+      </trans-unit>
+      <trans-unit id="29">
+        <source xml:lang="zh-CN">有人说Adam是RMSProp与动量法的结合。想一想，这是为什么？</source>
+        <target xml:lang="en-US">Some people say that Adam is a combination of RMSProp and momentum. Why do you think they say this?</target>
+      </trans-unit>
+      <trans-unit id="30">
+        <source xml:lang="zh-CN">扫码直达<bpt id="l2">[</bpt>讨论区<ept id="l2">]</ept><bpt id="l3">(</bpt>https://discuss.gluon.ai/t/topic/2279<ept id="l3">)</ept></source>
+        <target xml:lang="en-US">Scan the QR Code to Access <bpt id="l2">[</bpt>Discussions<ept id="l2">]</ept><bpt id="l3">(</bpt>https://discuss.gluon.ai/t/topic/2279<ept id="l3">)</ept></target>
+      </trans-unit>
+      <trans-unit id="31">
+        <source xml:lang="zh-CN"><bpt id="1">![</bpt>../img/qr_adam.svg<ept id="1">]</ept></source>
+        <target xml:lang="en-US"><bpt id="1">![</bpt>../img/qr_adam.svg<ept id="1">]</ept></target>
+      </trans-unit>
+      <trans-unit id="32">
+        <source xml:lang="zh-CN">参考文献</source>
+        <target xml:lang="en-US">Reference</target>
+      </trans-unit>
+      <trans-unit id="33">
+        <source xml:lang="zh-CN"><bpt id="1">[</bpt>1<ept id="1">]</ept> Kingma, D.</source>
+        <target xml:lang="en-US"><bpt id="1">[</bpt>1<ept id="1">]</ept> Kingma, D.</target>
+      </trans-unit>
+      <trans-unit id="34">
+        <source xml:lang="zh-CN">P., %%%ampersand%%% Ba, J.</source>
+        <target xml:lang="en-US">P., %%%ampersand%%% Ba, J.</target>
+      </trans-unit>
+      <trans-unit id="35">
+        <source xml:lang="zh-CN">(2014).</source>
+        <target xml:lang="en-US">(2014).</target>
+      </trans-unit>
+      <trans-unit id="36">
+        <source xml:lang="zh-CN">Adam: A method for stochastic optimization. arXiv preprint arXiv:1412.6980.</source>
+        <target xml:lang="en-US">Adam: A method for stochastic optimization. arXiv preprint arXiv:1412.6980.</target>
+      </trans-unit>
+    </body>
+ </file>
+</xliff>

@@ -1,0 +1,176 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file original="chapter_computational-performance/async-computation.md" source-language="zh-CN" target-language="en-US" datatype="markdown">
+    <header>
+      <skl>
+        <external-file href="chapter_computational-performance/async-computation.skl.md"/>
+      </skl>
+    </header>
+    <body>
+      <trans-unit id="1">
+        <source xml:lang="zh-CN">异步计算</source>
+        <target xml:lang="en-US">Asynchronous Programming</target>
+      </trans-unit>
+      <trans-unit id="2">
+        <source xml:lang="zh-CN">MXNet使用异步计算来提升计算性能。理解它的工作原理既有助于开发更高效的程序，又有助于在内存资源有限的情况下主动降低计算性能从而减小内存开销。我们先导入本节中实验需要的包或模块。</source>
+        <target xml:lang="en-US">MXNet utilizes asynchronous programming to improve computing performance. Understanding how asynchronous programming works helps us to develop more efficient programs, by proactively reducing computational requirements and thereby minimizing the memory overhead required in the case of limited memory resources. First, we will import the package or module needed for this section’s experiment.</target>
+      </trans-unit>
+      <trans-unit id="3">
+        <source xml:lang="zh-CN">MXNet中的异步计算</source>
+        <target xml:lang="en-US">Asynchronous Programming in MXNet</target>
+      </trans-unit>
+      <trans-unit id="4">
+        <source xml:lang="zh-CN">广义上，MXNet包括用户直接用来交互的前端和系统用来执行计算的后端。例如，用户可以使用不同的前端语言编写MXNet程序，像Python、R、Scala和C++。无论使用何种前端编程语言，MXNet程序的执行主要都发生在C++实现的后端。换句话说，用户写好的前端MXNet程序会传给后端执行计算。后端有自己的线程在队列中不断收集任务并执行它们。</source>
+        <target xml:lang="en-US">Broadly speaking, MXNet includes the front-end directly used by users for interaction, as well as the back-end used by the system to perform the computation. For example, users can write MXNet programs in various front-end languages, such as Python, R, Scala and C++. Regardless of the front-end programming language used, the execution of MXNet programs occurs primarily in the back-end of C++ implementations. In other words, front-end MXNet programs written by users are passed on to the back-end to be computed. The back-end possesses its own threads that continuously collect and execute queued tasks.</target>
+      </trans-unit>
+      <trans-unit id="5">
+        <source xml:lang="zh-CN">MXNet通过前端线程和后端线程的交互实现异步计算。异步计算指，前端线程无需等待当前指令从后端线程返回结果就继续执行后面的指令。为了便于解释，假设Python前端线程调用以下四条指令。</source>
+        <target xml:lang="en-US">Through the interaction between front-end and back-end threads, MXNet is able to implement asynchronous programming. Asynchronous programming means that the front-end threads continue to execute subsequent instructions without having to wait for the back-end threads to return the results from the current instruction. For simplicity’s sake, assume that the Python front-end thread calls the following four instructions.</target>
+      </trans-unit>
+      <trans-unit id="6">
+        <source xml:lang="zh-CN">在异步计算中，Python前端线程执行前三条语句的时候，仅仅是把任务放进后端的队列里就返回了。当最后一条语句需要打印计算结果时，Python前端线程会等待C++后端线程把变量<bpt id="2">`</bpt>c<ept id="2">`</ept>的结果计算完。此设计的一个好处是，这里的Python前端线程不需要做实际计算。因此，无论Python的性能如何，它对整个程序性能的影响很小。只要C++后端足够高效，那么不管前端语言性能如何，MXNet都可以提供一致的高性能。</source>
+        <target xml:lang="en-US">In Asynchronous Computing, whenever the Python front-end thread executes one of the first three statements, it simply returns the task to the back-end queue. When the last statement’s results need to be printed, the Python front-end thread will wait for the C++ back-end thread to finish computing result of the variable <bpt id="2">`</bpt>c<ept id="2">`</ept>. One benefit of such as design is that the Python front-end thread in this example does not need to perform actual computations. Thus, there is little impact on the program’s overall performance, regardless of Python’s performance. MXNet will deliver consistently high performance, regardless of the front-end language’s performance, provided the C++ back-end can meet the efficiency requirements.</target>
+      </trans-unit>
+      <trans-unit id="7">
+        <source xml:lang="zh-CN">为了演示异步计算的性能，我们先实现一个简单的计时类。</source>
+        <target xml:lang="en-US">To further demonstrate the asynchronous computation’s performance, we will implement a simple timing class.</target>
+      </trans-unit>
+      <trans-unit id="8">
+        <source xml:lang="zh-CN">本类已保存在 gluonbook 包中方便以后使用。</source>
+        <target xml:lang="en-US">This class is saved in the Gluonbook module for future reference.</target>
+      </trans-unit>
+      <trans-unit id="9">
+        <source xml:lang="zh-CN">下面的例子通过计时来展示异步计算的效果。可以看到，当<bpt id="2">`</bpt>y = nd.dot(x, x).sum()<ept id="2">`</ept>返回的时候并没有等待变量<bpt id="4">`</bpt>y<ept id="4">`</ept>真正被计算完。只有当<bpt id="6">`</bpt>print<ept id="6">`</ept>函数需要打印变量<bpt id="8">`</bpt>y<ept id="8">`</ept>时才必须等待它计算完。</source>
+        <target xml:lang="en-US">The following example uses timing to demonstrate the effect of asynchronous programming. As we can see, when <bpt id="2">`</bpt>y = nd.dot(x, x).sum()<ept id="2">`</ept> is returned, it does not actually wait for the variable <bpt id="4">`</bpt>y<ept id="4">`</ept> to be calculated. Only when the <bpt id="6">`</bpt>print<ept id="6">`</ept> function needs to print the variable <bpt id="8">`</bpt>y<ept id="8">`</ept> must the function wait for it to be calculated.</target>
+      </trans-unit>
+      <trans-unit id="10">
+        <source xml:lang="zh-CN">的确，除非我们需要打印或者保存计算结果，我们基本无需关心目前结果在内存中是否已经计算好了。只要数据是保存在NDArray里并使用MXNet提供的运算符，MXNet将默认使用异步计算来获取高计算性能。</source>
+        <target xml:lang="en-US">In truth, whether or not the current result is already calculated in the memory is irrelevant, unless we need to print or save the computation results. So long as the data is stored in NDArray and the operators provided by MXNet are used, MXNet will utilize asynchronous programming by default to attain superior computing performance.</target>
+      </trans-unit>
+      <trans-unit id="11">
+        <source xml:lang="zh-CN">用同步函数让前端等待计算结果</source>
+        <target xml:lang="en-US">Use of the Synchronization Function to Allow the Front-End to Wait for the Computation Results</target>
+      </trans-unit>
+      <trans-unit id="12">
+        <source xml:lang="zh-CN">除了刚刚介绍的<bpt id="2">`</bpt>print<ept id="2">`</ept>函数外，我们还有其他方法让前端线程等待后端的计算结果完成。我们可以使用<bpt id="4">`</bpt>wait_to_read<ept id="4">`</ept>函数让前端等待某个的NDArray的计算结果完成，再执行前端中后面的语句。或者，我们可以用<bpt id="6">`</bpt>waitall<ept id="6">`</ept>函数令前端等待前面所有计算结果完成。后者是性能测试中常用的方法。</source>
+        <target xml:lang="en-US">In addition to the <bpt id="2">`</bpt>print<ept id="2">`</ept> function we just introduced, there are other ways to make the front-end thread wait for the completion of the back-end computations. The <bpt id="4">`</bpt>wait_to_read<ept id="4">`</ept> function can be used to make the front-end wait for the complete computation of the NDArray results, and then execute following statement. Alternatively, we can use the <bpt id="6">`</bpt>waitall<ept id="6">`</ept> function to make the front-end wait for the completion of all previous computations. The latter is a common method used in performance testing.</target>
+      </trans-unit>
+      <trans-unit id="13">
+        <source xml:lang="zh-CN">下面是使用<bpt id="2">`</bpt>wait_to_read<ept id="2">`</ept>函数的例子。输出用时包含了<bpt id="4">`</bpt>y<ept id="4">`</ept>的计算时间。</source>
+        <target xml:lang="en-US">Below, we use the <bpt id="2">`</bpt>wait_to_read<ept id="2">`</ept> function as an example. The time output includes the calculation time of <bpt id="4">`</bpt>y<ept id="4">`</ept>.</target>
+      </trans-unit>
+      <trans-unit id="14">
+        <source xml:lang="zh-CN">下面是使用<bpt id="2">`</bpt>waitall<ept id="2">`</ept>的例子。输出用时包含了<bpt id="4">`</bpt>y<ept id="4">`</ept>和<bpt id="6">`</bpt>z<ept id="6">`</ept>的计算时间。</source>
+        <target xml:lang="en-US">Below, we use <bpt id="2">`</bpt>waitall<ept id="2">`</ept> as an example. The time output includes the calculation time of <bpt id="4">`</bpt>y<ept id="4">`</ept> and <bpt id="6">`</bpt>z<ept id="6">`</ept> respectively.</target>
+      </trans-unit>
+      <trans-unit id="15">
+        <source xml:lang="zh-CN">此外，任何将NDArray转换成其他不支持异步计算的数据结构的操作都会让前端等待计算结果。例如当我们调用<bpt id="2">`</bpt>asnumpy<ept id="2">`</ept>和 <bpt id="4">`</bpt>asscalar<ept id="4">`</ept>函数时：</source>
+        <target xml:lang="en-US">Additionally, any operation that does not support asynchronous programming but converts the NDArray into another data structure will cause the front-end to have to wait for computation results. For example, calling the <bpt id="2">`</bpt>asnumpy<ept id="2">`</ept> and <bpt id="4">`</bpt>asscalar<ept id="4">`</ept> functions:</target>
+      </trans-unit>
+      <trans-unit id="16">
+        <source xml:lang="zh-CN">上面介绍的<bpt id="2">`</bpt>wait_to_read<ept id="2">`</ept>、<bpt id="4">`</bpt>waitall<ept id="4">`</ept>、<bpt id="6">`</bpt>asnumpy<ept id="6">`</ept>、<bpt id="8">`</bpt>asscalar<ept id="8">`</ept>和<bpt id="10">`</bpt>print<ept id="10">`</ept>函数会触发让前端等待后端计算结果的行为。这类函数通常称为同步函数。</source>
+        <target xml:lang="en-US">The <bpt id="2">`</bpt>wait_to_read<ept id="2">`</ept>, <bpt id="4">`</bpt>waitall<ept id="4">`</ept>, <bpt id="6">`</bpt>asnumpy<ept id="6">`</ept>, <bpt id="8">`</bpt>asscalar<ept id="8">`</ept> and the<bpt id="10">`</bpt>print<ept id="10">`</ept> functions described above will cause the front-end to wait for the back-end computation results. Such functions are often referred to as synchronization functions.</target>
+      </trans-unit>
+      <trans-unit id="17">
+        <source xml:lang="zh-CN">使用异步计算提升计算性能</source>
+        <target xml:lang="en-US">Using Asynchronous Programming to Improve Computing Performance</target>
+      </trans-unit>
+      <trans-unit id="18">
+        <source xml:lang="zh-CN">在下面例子中，我们用for循环不断对变量<bpt id="2">`</bpt>y<ept id="2">`</ept>赋值。当for循环内使用同步函数<bpt id="4">`</bpt>wait_to_read<ept id="4">`</ept>时，每次赋值不使用异步计算；当for循环外使用同步函数<bpt id="6">`</bpt>waitall<ept id="6">`</ept>时，则使用异步计算。</source>
+        <target xml:lang="en-US">In the following example, we will use the “for” loop to continuously assign values to the variable <bpt id="2">`</bpt>y<ept id="2">`</ept>. Asynchronous programming is not used in tasks when the synchronization function <bpt id="4">`</bpt>wait_to_read<ept id="4">`</ept> is used in the “for” loop. However, when the synchronization function <bpt id="6">`</bpt>waitall<ept id="6">`</ept> is used outside of the “for” loop, asynchronous programming is used.</target>
+      </trans-unit>
+      <trans-unit id="19">
+        <source xml:lang="zh-CN">我们观察到，使用异步计算能提升一定的计算性能。为了解释这个现象，让我们对Python前端线程和C++后端线程的交互稍作简化。在每一次循环中，前端和后端的交互大约可以分为三个阶段：</source>
+        <target xml:lang="en-US">We have observed that certain aspects of computing performance can be improved by making use of asynchronous programming. To explain this, we will slightly simplify the interaction between the Python front-end thread and the C++ back-end thread. In each loop, the interaction between front and back-ends can be largely divided into three stages:</target>
+      </trans-unit>
+      <trans-unit id="20">
+        <source xml:lang="zh-CN">前端令后端将计算任务<bpt id="2">`</bpt>y = x + 1<ept id="2">`</ept>放进队列；</source>
+        <target xml:lang="en-US">The front-end orders the back-end to insert the calculation task <bpt id="2">`</bpt>y = x + 1<ept id="2">`</ept> into the queue.</target>
+      </trans-unit>
+      <trans-unit id="21">
+        <source xml:lang="zh-CN">后端从队列中获取计算任务并执行真正的计算；</source>
+        <target xml:lang="en-US">The back-end then receives the computation tasks from the queue and performs the actual computations.</target>
+      </trans-unit>
+      <trans-unit id="22">
+        <source xml:lang="zh-CN">后端将计算结果返回给前端。</source>
+        <target xml:lang="en-US">The back-end then returns the computation results to the front-end.</target>
+      </trans-unit>
+      <trans-unit id="23">
+        <source xml:lang="zh-CN">我们将这三个阶段的耗时分别设为$t_1, t_2, t_3$。如果不使用异步计算，执行1000次计算的总耗时大约为$1000 (t_1+ t_2 + t_3)$；如果使用异步计算，由于每次循环中前端都无需等待后端返回计算结果，执行1000次计算的总耗时可以降为$t_1 + 1000 t_2 + t_3$（假设$1000t_2 &gt; 999t_1$）。</source>
+        <target xml:lang="en-US">Assume that the durations of these three stages are $t_1, t_2, t_3$, respectively. If we do not use asynchronous programming, the total time taken to perform 1000 computations is approximately $1000 (t_1+ t_2 + t_3)$. If asynchronous programming is used, the total time taken to perform 1000 computations can be reduced to $t_1 + 1000 t_2 + t_3$ (assuming $1000t_2 &gt; 999t_1$), since the front-end does not have to wait for the back-end to return computation results for each loop.</target>
+      </trans-unit>
+      <trans-unit id="24">
+        <source xml:lang="zh-CN">异步计算对内存的影响</source>
+        <target xml:lang="en-US">The Impact of Asynchronous Programming on Memory</target>
+      </trans-unit>
+      <trans-unit id="25">
+        <source xml:lang="zh-CN">为了解释异步计算对内存使用的影响，让我们先回忆一下前面章节的内容。在前面章节中实现的模型训练过程中，我们通常会在每个小批量上评测一下模型，例如模型的损失或者精度。细心的你也许发现了，这类评测常用到同步函数，例如<bpt id="2">`</bpt>asscalar<ept id="2">`</ept>或者<bpt id="4">`</bpt>asnumpy<ept id="4">`</ept>。如果去掉这些同步函数，前端会将大量的小批量计算任务在极短的时间内丢给后端，从而可能导致占用更多内存。当我们在每个小批量上都使用同步函数时，前端在每次迭代时仅会将一个小批量的任务丢给后端执行计算，并通常会减小内存占用。</source>
+        <target xml:lang="en-US">In order to explain the impact of asynchronous programming on memory usage, recall what we learned in the previous chapters. Throughout the model training process implemented in the previous chapters, we usually evaluated things like the loss or accuracy of the model in each mini-batch. Detail-oriented readers may have discovered that such evaluations often make use of synchronization functions, such as <bpt id="2">`</bpt>asscalar<ept id="2">`</ept> or <bpt id="4">`</bpt>asnumpy<ept id="4">`</ept>. If these synchronization functions are removed, the front-end will pass a large number of mini-batch computing tasks to the back-end in a very short time, which might cause a spike in memory usage. When the mini-batches makes use of synchronization functions, on each iteration, the front-end will only pass one mini-batch task to the back-end to be computed, which will typically reduce memory use.</target>
+      </trans-unit>
+      <trans-unit id="26">
+        <source xml:lang="zh-CN">由于深度学习模型通常比较大，而内存资源通常有限，我们建议大家在训练模型时对每个小批量都使用同步函数，例如用<bpt id="2">`</bpt>asscalar<ept id="2">`</ept>或者<bpt id="4">`</bpt>asnumpy<ept id="4">`</ept>函数评价模型的表现。类似地，在使用模型预测时，为了减小内存的占用，我们也建议大家对每个小批量预测时都使用同步函数，例如直接打印出当前小批量的预测结果。</source>
+        <target xml:lang="en-US">Because the deep learning model is usually large and memory resources are usually limited, we recommend the use of synchronization functions for each mini-batch throughout model training, for example by using the <bpt id="2">`</bpt>asscalar<ept id="2">`</ept> or <bpt id="4">`</bpt>asnumpy<ept id="4">`</ept> functions to evaluate model performance. Similarly, we also recommend utilizing synchronization functions for each mini-batch prediction (such as directly printing out the current batch’s prediction results), in order to reduce memory usage during model prediction.</target>
+      </trans-unit>
+      <trans-unit id="27">
+        <source xml:lang="zh-CN">下面我们来演示异步计算对内存的影响。我们先定义一个数据获取函数<bpt id="2">`</bpt>data_iter<ept id="2">`</ept>，它会从被调用时开始计时，并定期打印到目前为止获取数据批量的总耗时。</source>
+        <target xml:lang="en-US">Next, we will demonstrate asynchronous programming’s impact on memory. We will first define a data retrieval function <bpt id="2">`</bpt>data_iter<ept id="2">`</ept>, which upon being called, will start timing and regularly print out the time taken to retrieve data batches.</target>
+      </trans-unit>
+      <trans-unit id="28">
+        <source xml:lang="zh-CN">以下定义多层感知机、优化算法和损失函数。</source>
+        <target xml:lang="en-US">The multilayer perceptron, optimization algorithm, and loss function are defined below.</target>
+      </trans-unit>
+      <trans-unit id="29">
+        <source xml:lang="zh-CN">这里定义辅助函数来监测内存的使用。需要注意的是，这个函数只能在Linux或MacOS运行。</source>
+        <target xml:lang="en-US">A helper function to monitor memory use is defined here. It should be noted that this function can only be run on Linux or MacOS operating systems.</target>
+      </trans-unit>
+      <trans-unit id="30">
+        <source xml:lang="zh-CN">现在我们可以做测试了。我们先试运行一次让系统把<bpt id="2">`</bpt>net<ept id="2">`</ept>的参数初始化。有关初始化的讨论可参见<bpt id="l4">[</bpt>“模型参数的延后初始化”<ept id="l4">]</ept><bpt id="l5">(</bpt>../chapter_deep-learning-computation/deferred-init.md<ept id="l5">)</ept>一节。</source>
+        <target xml:lang="en-US">Now we can begin testing. To initialize the <bpt id="2">`</bpt>net<ept id="2">`</ept> parameters we will try running the system once. See the section <bpt id="l4">[</bpt>“Deferred Initialization of Model Parameters”<ept id="l4">]</ept><bpt id="l5">(</bpt>../chapter_deep-learning-computation/deferred-init.md<ept id="l5">)</ept> for further discussions related to initialization.</target>
+      </trans-unit>
+      <trans-unit id="31">
+        <source xml:lang="zh-CN">对于训练模型<bpt id="2">`</bpt>net<ept id="2">`</ept>来说，我们可以自然地使用同步函数<bpt id="4">`</bpt>asscalar<ept id="4">`</ept>将每个小批量的损失从NDArray格式中取出，并打印每个迭代周期后的模型损失。此时，每个小批量的生成间隔较长，不过内存开销较小。</source>
+        <target xml:lang="en-US">For the <bpt id="2">`</bpt>net<ept id="2">`</ept> training model, the synchronization function <bpt id="4">`</bpt>asscalar<ept id="4">`</ept> can naturally be used to record the loss of each mini-batch output by the NDArray format and to print out the model loss after each iteration. At this point, the generation interval of each mini-batch increases, but with a small memory overhead.</target>
+      </trans-unit>
+      <trans-unit id="32">
+        <source xml:lang="zh-CN">使用同步函数 asscalar。</source>
+        <target xml:lang="en-US">Use of the Asscalar synchronization function.</target>
+      </trans-unit>
+      <trans-unit id="33">
+        <source xml:lang="zh-CN">如果去掉同步函数，虽然每个小批量的生成间隔较短，但训练过程中可能会导致内存占用较高。这是因为在默认异步计算下，前端会将所有小批量计算在短时间内全部丢给后端。这可能在内存积压大量中间结果无法释放。实验中我们看到，不到一秒所有数据（<bpt id="2">`</bpt>X<ept id="2">`</ept>和<bpt id="4">`</bpt>y<ept id="4">`</ept>）就都已经产生。但因为训练速度没有跟上，所以这些数据只能放在内存里不能及时清除，从而占用额外内存。</source>
+        <target xml:lang="en-US">Even though each mini-batch’s generation interval is shorter, the memory usage may still be high during training if the synchronization function is removed. This is because, in default asynchronous programming, the front-end will pass on all mini-batch computations to the back-end in a short amount of time. As a result of this, a large amount of intermediate results cannot be released and may end up piled up in memory. In this experiment, we can see that all data (<bpt id="2">`</bpt>X<ept id="2">`</ept> and <bpt id="4">`</bpt>y<ept id="4">`</ept>) is generated in under a second. However, because of an insufficient training speed, this data can only be stored in the memory and cannot be cleared in time, resulting in extra memory usage.</target>
+      </trans-unit>
+      <trans-unit id="34">
+        <source xml:lang="zh-CN">小结</source>
+        <target xml:lang="en-US">Summary</target>
+      </trans-unit>
+      <trans-unit id="35">
+        <source xml:lang="zh-CN">MXNet包括用户直接用来交互的前端和系统用来执行计算的后端。</source>
+        <target xml:lang="en-US">MXNet includes the front-end used directly by users for interaction and the back-end used by the system to perform the computation.</target>
+      </trans-unit>
+      <trans-unit id="36">
+        <source xml:lang="zh-CN">MXNet能够通过异步计算提升计算性能。</source>
+        <target xml:lang="en-US">MXNet can improve computing performance through the use of asynchronous programming.</target>
+      </trans-unit>
+      <trans-unit id="37">
+        <source xml:lang="zh-CN">我们建议使用每个小批量训练或预测时至少使用一个同步函数，从而避免在短时间内将过多计算任务丢给后端。</source>
+        <target xml:lang="en-US">We recommend using at least one synchronization function for each mini-batch training or prediction to avoid passing on too many computation tasks to the back-end in a short period of time.</target>
+      </trans-unit>
+      <trans-unit id="38">
+        <source xml:lang="zh-CN">练习</source>
+        <target xml:lang="en-US">exercise</target>
+      </trans-unit>
+      <trans-unit id="39">
+        <source xml:lang="zh-CN">在“使用异步计算提升计算性能”一节中，我们提到使用异步计算可以使执行1000次计算的总耗时可以降为$t_1 + 1000 t_2 + t_3$。这里为什么要假设$1000t_2 &gt; 999t_1$？</source>
+        <target xml:lang="en-US">In the section "Use of Asynchronous Programming to Improve Computing Performance", we mentioned that using asynchronous computation can reduce the total amount of time needed to perform 1000 computations to $t_1 + 1000 t_2 + t_3$. Why do we have to assume $1000t_2 &gt; 999t_1$ here?</target>
+      </trans-unit>
+      <trans-unit id="40">
+        <source xml:lang="zh-CN">扫码直达<bpt id="l2">[</bpt>讨论区<ept id="l2">]</ept><bpt id="l3">(</bpt>https://discuss.gluon.ai/t/topic/1881<ept id="l3">)</ept></source>
+        <target xml:lang="en-US">Scan the QR Code to Access <bpt id="l2">[</bpt>Discussions<ept id="l2">]</ept><bpt id="l3">(</bpt>https://discuss.gluon.ai/t/topic/1881<ept id="l3">)</ept></target>
+      </trans-unit>
+      <trans-unit id="41">
+        <source xml:lang="zh-CN"><bpt id="1">![</bpt>../img/qr_async-computation.svg<ept id="1">]</ept></source>
+        <target xml:lang="en-US"><bpt id="1">![</bpt>../img/qr_async-computation.svg<ept id="1">]</ept></target>
+      </trans-unit>
+    </body>
+ </file>
+</xliff>
