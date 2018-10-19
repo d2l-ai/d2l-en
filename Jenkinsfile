@@ -29,10 +29,11 @@ stage("Build PDF") {
 stage("Publish") {
   node {
     ws('workspace/d2l-en') {
-      checkout scm
       sh """#!/bin/bash
       set -ex
-      aws s3 sync --delete build/_build/html/ s3://diveintodeeplearning.org/ --acl public-read
+      if [[ ${env.BRANCH_NAME} == master ]]; then
+          aws s3 sync --delete build/_build/html/ s3://diveintodeeplearning.org/ --acl public-read
+      fi
       """
     }
   }
