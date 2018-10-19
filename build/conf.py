@@ -354,9 +354,20 @@ nbsphinx_execute = 'never'
 # let the source file format to be xxx.ipynb instead of xxx.ipynb.txt
 html_sourcelink_suffix = ''
 
+def image_caption(app, docname, source):
+    for i, src in enumerate(source):
+        out = ''
+        for l in src.split('\n'):
+            l = l.strip()
+            if '![' in l and 'img' in l:
+                l = l.replace(' ', '.')
+            out += l + '\n'
+        source[i] = out
+
 def setup(app):
     app.add_transform(AutoStructify)
     app.add_config_value('recommonmark_config', {
     }, True)
     app.add_javascript('google_analytics.js')
     app.add_stylesheet('d2l.css')
+    app.connect('source-read', image_caption)

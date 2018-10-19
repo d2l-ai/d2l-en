@@ -5,6 +5,8 @@ data/
 *.params
 *.DS_Store
 *.csv
+build/README.md
+build/environment.yml
 /chapter_gluon-basics/x
 /chapter_gluon-basics/xy
 /chapter_gluon-basics/mydict
