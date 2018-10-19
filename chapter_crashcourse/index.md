@@ -1,15 +1,24 @@
-# Prerequisites
+# A Taste of Deep Learning
 
-Before hands on learning, we need to acquire the codes in the book, and install the software program or programs needed to run them.  For hands-on deep learning of the basics, we need to also understand how to manipulate memory data and how to calculate a function gradient.  Finally, we should develop the habit of looking for documents to supplement our code knowledge. 
+If you are in a hurry, this chapter has all the details you need to
+get a taste of deep learning. If you like to take the scenic route, we
+still recommend that you read it, since it will explain how to set up
+the software, how to use automatic differentiation and how to
+manipulate data and memory. We also provide quick primers on linear
+algebra and statistics, designed to help readers to get up to speed on
+the basics. 
 
 ```eval_rst
 
 .. toctree::
    :maxdepth: 2
 
+   introduction
    install
+   linear-algebra
    ndarray
    autograd
+   probability
    lookup-api
 
 ```
