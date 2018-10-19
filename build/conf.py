@@ -358,9 +358,8 @@ def image_caption(app, docname, source):
     for i, src in enumerate(source):
         out = ''
         for l in src.split('\n'):
-            l = l.strip()
             if '![' in l and 'img' in l:
-                l = l.replace(' ', '.')
+                l = l.strip().replace(' ', '.')
             out += l + '\n'
         source[i] = out
 
