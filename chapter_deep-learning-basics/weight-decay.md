@@ -9,7 +9,7 @@ Weight decay is equivalent to $L_2$ norm regularization. Regularization is a com
 
 $L_2$ norm regularization adds a $L_2$ norm penalty to the original loss function of the model to obtain the minimum function required for training. The $L_2$ norm penalty term refers to the product of the sum of the squares of each element of the model weight parameter and a positive constant. Here, we use the linear regression loss function in the [“Linear Regression”](linear-regression.md) section
 
-$\ell(w_1, w_2, b) = \frac{1}{n}\sum_{i=1}^n \frac{1}{2}\left(x_1^{(i)} w_1 + x_2^{(i)} w_2 + b - y^{(i)}\right)^2$
+$$\ell(w_1, w_2, b) = \frac{1}{n}\sum_{i=1}^n \frac{1}{2}\left(x_1^{(i)} w_1 + x_2^{(i)} w_2 + b - y^{(i)}\right)^2$$
 
 as an example. Here, $w_1, w_2$ are the weight parameters, $b$ is the bias parameter, and the input of example $i$ is $x_1^{(i)}, x_2^{(i)}$. The label is $y^{(i)}$, and the example size is $n$. The weight parameter is represented by the vector $\boldsymbol{w}= [w_1, w_2]$, the new loss function with the $L_2$ norm penalty term is
 
@@ -30,7 +30,7 @@ We can see that $L_2$ norm regularization multiplies the weights $w_1$ and $w_2$
 
 Below, we will look at an overfitting problem using high-dimensional linear regression as an example, and try to cope with overfitting using weight decay. We assume the dimension of the data example feature is $p$. For any example with features $x_1, x_2, \ldots, and x_p$ in the training data set and test data set, we use the following linear function to generate the label for the example:
 
-$y = 0.05 + \sum_{i = 1}^p 0.01x_i +  \epsilon,$
+$$y = 0.05 + \sum_{i = 1}^p 0.01x_i +  \epsilon,$$
 
 The noise term $\epsilon$ obeys a normal distribution with a mean of 0 and a standard deviation of 0.01. In order to observe overfitting more easily, we consider a high-dimensional linear regression problem, such as setting the dimension $p=200$. At the same time, we deliberately set a low number of examples in the training data, for example, 20.
 

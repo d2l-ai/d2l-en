@@ -2,7 +2,7 @@
 
 After getting to know the background of linear regression, we are now ready for a hands-on implementation.  While a powerful deep learning framework minimizes repetitive work, relying on it too much to make things easy can make it hard to properly understand how deep learning works.    Because of this, this section will describe how to implement linear regression training using only NDArray and `autograd`.
 
-Before we begin, let’s import the package or module required for this section’s experiment; where the matplotlib package will be used for plotting and will be set to embed in the GUI. 
+Before we begin, let’s import the package or module required for this section’s experiment; where the matplotlib package will be used for plotting and will be set to embed in the GUI.
 
 ```{.python .input  n=1}
 %matplotlib inline
@@ -16,9 +16,9 @@ import random
 
 By constructing a simple artificial training data set, we can visually compare the differences between the parameters we have learned and the actual model parameters.  Set the number of examples in the training data set as 1000 and the number of inputs (feature number) as 2.  Using the randomly generated batch example feature $\boldsymbol{X}\in \mathbb{R}^{1000 \times 2}$, we use the actual weight $\boldsymbol{w} = [2, -3.4]^\top$ and bias $b = 4.2$ of the linear regression model, as well as a random noise item $\epsilon$ to generate the tag
 
-$\boldsymbol{y}= \boldsymbol{X}\boldsymbol{w} + b + \epsilon,$,
+$$\boldsymbol{y}= \boldsymbol{X}\boldsymbol{w} + b + \epsilon,$$
 
-The noise term $\epsilon$ obeys a normal distribution with a mean of 0 and a standard deviation of 0.01. Next, we’ll generate the data set. 
+The noise term $\epsilon$ obeys a normal distribution with a mean of 0 and a standard deviation of 0.01. Next, we’ll generate the data set.
 
 ```{.python .input  n=2}
 num_inputs = 2
@@ -52,7 +52,7 @@ set_figsize()
 plt.scatter(features[:, 1].asnumpy(), labels.asnumpy(), 1);
 ```
 
-The plotting function `plt` as well as the `use_svg_display` and `set_figsize` functions are defined in the `gluonbook` package. We will call `gluonbook.plt` directly for future plotting. To print the vector diagram and set its size, we only need to call  `gluonbook.set_figsize( `  >  before plotting, because `plt` is a global variable in the `gluonbook` package.
+The plotting function `plt` as well as the `use_svg_display` and `set_figsize` functions are defined in the `gluonbook` package. We will call `gluonbook.plt` directly for future plotting. To print the vector diagram and set its size, we only need to call  `gluonbook.set_figsize()`  before plotting, because `plt` is a global variable in the `gluonbook` package.
 
 
 ## Reading Data
@@ -70,7 +70,7 @@ def data_iter(batch_size, features, labels):
         yield features.take(j), labels.take(j)  # The “take” function will then return the corresponding element based on the indices. 
 ```
 
-Let's read and print out the first small batch of data examples. Each batch’s feature shape, (10, 2), corresponds to the batch size and the number of inputs, with the label shape also representing the batch size. 
+Let's read and print out the first small batch of data examples. Each batch’s feature shape, (10, 2), corresponds to the batch size and the number of inputs, with the label shape also representing the batch size.
 
 ```{.python .input  n=6}
 batch_size = 10
@@ -89,7 +89,7 @@ w = nd.random.normal(scale=0.01, shape=(num_inputs, 1))
 b = nd.zeros(shape=(1,))
 ```
 
-In the subsequent model training, we need to create the gradients for the parameters in order for them to iterate their values. 
+In the subsequent model training, we need to create the gradients for the parameters in order for them to iterate their values.
 
 ```{.python .input  n=8}
 w.attach_grad()
@@ -128,7 +128,7 @@ def sgd(params, lr, batch_size):  # This function has been saved in the gluonboo
 
 In training, we will iterate the model parameters. In each iteration, the mini-batch stochastic gradient is calculated by first calling the inverse function `backward` depending on the currently read mini-batch data examples (feature `X` and label `y`), and then calling the optimization algorithm `sgd` to iterate the model parameters. Since we previously set the batch size `batch_size` to 10, the loss shape `l` for each small batch is (10, 1). Refer to the section ["Automatic Gradient"](../chapter_prerequisite/autograd.md). Since `l` is not a scalar variable, running `l.backward()` will add together the elements in `l` to obtain the new variable, and then calculate the variable model parameters’ gradient.
 
-In an iterative cycle (epoch), we will iterate through the `data_iter` function once and use it for all the examples in the training data set (assuming the number of examples is divisible by the batch size). In this case, the number of epoch iterations `num_epochs` and the learning rate `lr` are both hyper-parameters and are set to 3 and 0.03, respectively. In practice, the majority of the hyper-parameters require constant adjustment through trial and error.  Although the model may become more efficient, the training time may be longer when the number of epoch iterations is raised.  The impact of the learning rate on the model will be covered in further detail later on in the “Optimization Algorithms” chapter. 
+In an iterative cycle (epoch), we will iterate through the `data_iter` function once and use it for all the examples in the training data set (assuming the number of examples is divisible by the batch size). In this case, the number of epoch iterations `num_epochs` and the learning rate `lr` are both hyper-parameters and are set to 3 and 0.03, respectively. In practice, the majority of the hyper-parameters require constant adjustment through trial and error.  Although the model may become more efficient, the training time may be longer when the number of epoch iterations is raised.  The impact of the learning rate on the model will be covered in further detail later on in the “Optimization Algorithms” chapter.
 
 ```{.python .input  n=12}
 lr = 0.03

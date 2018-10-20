@@ -6,16 +6,16 @@ In addition to the weight decay described in the previous section, deep learning
 
 Recall that Figure 3.3 of the section [“Multilayer Perceptron”](mlp.md) described a multilayer perceptron with a single hidden layer. The number of inputs was 4, the number of hidden units was 5, and the calculation expression of the hidden unit $h_i$($i=1, \ldots, 5$) was
 
-$h_i = \phi\left(x_1 w_{1i}+ x_2 w_{2i} + x_3 w_{3i} + x_4 w_{4i} + b_i\right),$
+$$h_i = \phi\left(x_1 w_{1i}+ x_2 w_{2i} + x_3 w_{3i} + x_4 w_{4i} + b_i\right),$$
 
 Here, $\phi$ was the activation function, $x_1, \ldots, x_4$ were inputs, and the weight parameters of the hidden unit $i$ were $w_{1i}, \ldots, w_{4i}$, and the bias parameter was $b_i$. When we use dropout for this hidden layer, the hidden units of this layer will be dropped out with a certain probability. If the probability of dropout is $p$,
 then the probability that $h_i$ will be cleared is $p$ and the probability that $h_i$ will be divided by $1-p$ for stretching is $1-p$. The dropout probability is a hyper-parameter of dropout. Specifically, let the probability that the random variable $\xi_i$ is 0 and 1 be $p$ and $1-p$, respectively. When using dropout, we calculate the new hidden unit $h_i'$
 
-$h_i' = \frac{\xi_i}{1-p}h_i.$
+$$h_i' = \frac{\xi_i}{1-p}h_i.$$
 
 As $\mathbb{E}(\xi_i) = 1-p$, therefore
 
-$\mathbb{E}(h_i') = \frac{\mathbb{E}(\xi_i)}{1-p}h_i = h_i.$
+$$\mathbb{E}(h_i') = \frac{\mathbb{E}(\xi_i)}{1-p}h_i = h_i.$$
 
 That is, dropout does not change the expected value of its input. We use dropout for the hidden layer in Figure 3.3. One possible result is shown in Figure 3.5, where $h_2$ and $h_5$ are cleared. Now, the calculation of the output value is no longer dependent on $h_2$ and $h_5$. In back propagation, the gradients of the weights associated with the two hidden units are both 0. Since the dropout of the hidden layer neurons during training is random, $h_1, \ldots, h_5$ may all be cleared. In this way, the calculation of the output layer cannot be overly dependent on any one element of $h_1, \ldots, h_5$ and, therefore, it can be used as a regularization when training the model, and can be used to cope with overfitting. When testing the model, we generally do not use dropout to get more conclusive results.
 

@@ -46,7 +46,7 @@ trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': 0.1})
 
 ## To train a model
 
-Next, we use the training functions defined in the last section to train a model. 
+Next, we use the training functions defined in the last section to train a model.
 
 ```{.python .input  n=6}
 num_epochs = 5

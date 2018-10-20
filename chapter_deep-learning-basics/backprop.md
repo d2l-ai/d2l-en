@@ -6,19 +6,19 @@ In the previous sections we used a mini-batch stochastic gradient descent optimi
 
 Forward propagation refers to the calculation and storage of intermediate variables (including outputs) for the neural network within the models in the order from input layer to output layer. For the sake of simplicity, let’s assume that the input example is $\boldsymbol{x}\in \mathbb{R}^d$ and the bias term is not considered, and that the intermediate variable is
 
-$\boldsymbol{z}= \boldsymbol{W}^{(1)} \boldsymbol{x},$
+$$\boldsymbol{z}= \boldsymbol{W}^{(1)} \boldsymbol{x},$$
 
 where $\boldsymbol{W}^{(1)} \in \mathbb{R}^{h \times d}$ is the weight parameter of the hidden layer. After entering the intermediate variable $\boldsymbol{z}\in \mathbb{R}^h$ into the activation function $\phi$ operated by the basic elements, we will obtain a hidden layer variable with the vector length of $h$,
 
-$\boldsymbol{h}= \phi (\boldsymbol{z}).$
+$$\boldsymbol{h}= \phi (\boldsymbol{z}).$$
 
 The hidden variable $\boldsymbol{h}$ is also an intermediate variable. Assuming the parameters of the output layer only possess a weight of $\boldsymbol{W}^{(2)} \in \mathbb{R}^{q \times h}$, we can obtain an output layer variable with a vector length of $q$,
 
-$\boldsymbol{o}= \boldsymbol{W}^{(2)} \boldsymbol{h}.$
+$$\boldsymbol{o}= \boldsymbol{W}^{(2)} \boldsymbol{h}.$$
 
 Assuming the loss function is $\ell$ and the example label is $y$, we can then calculate the loss term for a single data example,
 
-$L = \ell(\boldsymbol{o}, y).$
+$$L = \ell(\boldsymbol{o}, y).$$
 
 According to the definition of $L_2$ norm regularization, given the hyper-parameter $\lambda$, the regularization term is
 
@@ -26,7 +26,7 @@ $$s = \frac{\lambda}{2} \left(\|\boldsymbol{W}^{(1)}\|_F^2 + \|\boldsymbol{W}^{(
 
 where the Frobenius norm of the matrix is equivalent to the calculation of the $L_2$ norm after flattening the matrix to a vector. Finally, the model's regularized loss on a given data example is
 
-$J = L + s.$
+$$J = L + s.$$
 
 We refer to $J$ as the objective function of a given data example and refer to it as the ‘objective function’ in the following discussion.
 
@@ -42,61 +42,61 @@ We usually plot computational graphs to help us visualize the dependencies of op
 
 Back propagation refers to the method of calculating the gradient of neural network parameters. In general, back propagation calculates and stores the intermediate variables of an objective function related to each layer of the neural network and the gradient of the parameters in the order of the output layer to the input layer according to the ‘chain rule’ in calculus. For functions $\mathsf{Y}=f(\mathsf{X})$ and $\mathsf{Z}=g(\mathsf{Y})$, in which the input and the output $\mathsf{X}, \mathsf{Y}, \mathsf{Z}$ are tensors of arbitrary shapes, through the chain rule, we then have
 
-$\frac{\partial \mathsf{Z}}{\partial \mathsf{X}} = \text{prod}\left(\frac{\partial \mathsf{Z}}{\partial \mathsf{Y}}, \frac{\partial \mathsf{Y}}{\partial \mathsf{X}}\right),$
+$$\frac{\partial \mathsf{Z}}{\partial \mathsf{X}} = \text{prod}\left(\frac{\partial \mathsf{Z}}{\partial \mathsf{Y}}, \frac{\partial \mathsf{Y}}{\partial \mathsf{X}}\right),$$
 
 where the $\text{prod}$ operator will multiply the two inputs after the necessary operations (such as transposition and swapping input positions) based on their shape.
 
 In reviewing the sample model in this section, it's parameters are $\boldsymbol{W}^{(1)}$ and $\boldsymbol{W}^{(2)}$, therefore the objective of back propagation is to calculate $\partial J/\partial \boldsymbol{W}^{(1)}$ and $\partial J/\partial \boldsymbol{W}^{(2)}$. We will then, in turn, apply the chain rule to calculate the gradient of each intermediate variable and parameter. Here, the order of calculations are opposite to that of the corresponding intermediate variables performed during forward propagation. First, calculate the gradients of the objective function $J=L+s$ with respect to the loss term $L$ and the regularization term $s$,
 
-$\frac{\partial J}{\partial L} = 1, \quad \frac{\partial J}{\partial s} = 1.$, respectively
+$$\frac{\partial J}{\partial L} = 1, \quad \frac{\partial J}{\partial s} = 1.$$, respectively
 
 Second, calculate the gradient of the objective function with respect to the output layer variable according to the chain rule, $\partial J/\partial \boldsymbol{o}\in \mathbb{R}^q$:
 
-$
+$$
 \frac{\partial J}{\partial \boldsymbol{o}}
 = \text{prod}\left(\frac{\partial J}{\partial L}, \frac{\partial L}{\partial \boldsymbol{o}}\right)
 = \frac{\partial L}{\partial \boldsymbol{o}}.
-$
+$$
 
 
 Next, calculate the gradients of the regularization term with respect to two parameters:
 
-$\frac{\partial s}{\partial \boldsymbol{W}^{(1)}} = \lambda \boldsymbol{W}^{(1)},\quad\frac{\partial s}{\partial \boldsymbol{W}^{(2)}} = \lambda \boldsymbol{W}^{(2)}.$
+$$\frac{\partial s}{\partial \boldsymbol{W}^{(1)}} = \lambda \boldsymbol{W}^{(1)},\quad\frac{\partial s}{\partial \boldsymbol{W}^{(2)}} = \lambda \boldsymbol{W}^{(2)}.$$
 
 
 Now we are able calculate the gradient $\partial J/\partial \boldsymbol{W}^{(2)} \in \mathbb{R}^{q \times h}$ of the model parameters closest to the output layer. According to the chain rule, we then get
 
-$
+$$
 \frac{\partial J}{\partial \boldsymbol{W}^{(2)}}
 = \text{prod}\left(\frac{\partial J}{\partial \boldsymbol{o}}, \frac{\partial \boldsymbol{o}}{\partial \boldsymbol{W}^{(2)}}\right) + \text{prod}\left(\frac{\partial J}{\partial s}, \frac{\partial s}{\partial \boldsymbol{W}^{(2)}}\right)
 = \frac{\partial J}{\partial \boldsymbol{o}} \boldsymbol{h}^\top + \lambda \boldsymbol{W}^{(2)}.
-$
+$$
 
 
 Continue back propagation along the output layer to the hidden layer. The gradient $\partial J/\partial \boldsymbol{h}\in \mathbb{R}^h$ of the hidden layer variable can be calculated as follows:
 
-$
+$$
 \frac{\partial J}{\partial \boldsymbol{h}}
 = \text{prod}\left(\frac{\partial J}{\partial \boldsymbol{o}}, \frac{\partial \boldsymbol{o}}{\partial \boldsymbol{h}}\right)
 = {\boldsymbol{W}^{(2)}}^\top \frac{\partial J}{\partial \boldsymbol{o}}.
-$
+$$
 
 
 Because the activation function $\phi$ is operated by basic elements, calculating the gradient $\partial J/\partial \boldsymbol{z}\in \mathbb{R}^h$ of the intermediate variable $\boldsymbol{z}$ requires the use of the multiplication operator via element $\odot$:
 
-$
+$$
 \frac{\partial J}{\partial \boldsymbol{z}}
 = \text{prod}\left(\frac{\partial J}{\partial \boldsymbol{h}}, \frac{\partial \boldsymbol{h}}{\partial \boldsymbol{z}}\right)
 = \frac{\partial J}{\partial \boldsymbol{h}} \odot \phi'\left(\boldsymbol{z}\right).
-$
+$$
 
 Finally, we can obtain the gradient $\partial J/\partial \boldsymbol{W}^{(1)} \in \mathbb{R}^{h \times d}$ of the model parameters closest to the input layer. According to the chain rule, we get
 
-$
+$$
 \frac{\partial J}{\partial \boldsymbol{W}^{(1)}}
 = \text{prod}\left(\frac{\partial J}{\partial \boldsymbol{z}}, \frac{\partial \boldsymbol{z}}{\partial \boldsymbol{W}^{(1)}}\right) + \text{prod}\left(\frac{\partial J}{\partial s}, \frac{\partial s}{\partial \boldsymbol{W}^{(1)}}\right)
 = \frac{\partial J}{\partial \boldsymbol{z}} \boldsymbol{x}^\top + \lambda \boldsymbol{W}^{(1)}.
-$
+$$
 
 ## Training Deep Learning Model
 
