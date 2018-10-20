@@ -1,554 +1,234 @@
+# Manipulating Data with `ndarray`
 
-# Manipulate data the MXNet way with `ndarray`
+It's impossible to get anything done if we can't manipulate data.
+Generally, there are two important things we need to do with:
+(i) acquire it and (ii) process it once it's inside the computer.
+There's no point in trying to acquire data if we don't even know how to store it, so let's get our hands dirty first by playing with synthetic data.
 
-It's impossible to get anything done if we can't manipulate data. 
-Generally, there are two important things we need to do with: 
-(i) acquire it! and (ii) process it once it's inside the computer.
-There's no point in trying to acquire data if we don't even know how to store it,
-so let's get our hands dirty first by playing with synthetic data.
+We'll start by introducing NDArrays, MXNet's primary tool for storing and transforming data. If you've worked with NumPy before, you'll notice that NDArrays are, by design, similar to NumPy's multi-dimensional array. However, they confer a few key advantages. First, NDArrays support asynchronous computation on CPU, GPU, and distributed cloud architectures. Second, they provide support for automatic differentiation. These properties make NDArray an ideal ingredient for machine learning.
 
-We'll start by introducing NDArrays, MXNet's primary tool for storing and transforming data. If you've worked with NumPy before, you'll notice that NDArrays are, by design, similar to NumPy's multi-dimensional array. However, they confer a few key advantages. First, NDArrays support asynchronous computation on CPU, GPU, and distributed cloud architectures. Second, they provide support for automatic differentiation. These properties make NDArray an ideal library for machine learning, both for researchers and engineers launching production systems.
+## Getting Started
 
+In this chapter, we'll get you going with the basic functionality. Don't worry if you don't understand any of the basic math, like element-wise operations or normal distributions. In the next two chapters we'll take another pass at NDArray, teaching you both the math you'll need and how to realize it in code. For even more math, see the ["Math"](../chapter_appendix/math.md) section in the appendix.
 
-## Getting started
+We begin by importing MXNet and the `ndarray` module from MXNet. Here, `nd` is short for `ndarray`.
 
-In this chapter, we'll get you going with the basic functionality. Don't worry if you don't understand any of the basic math, like element-wise operations or normal distributions. In the next two chapters we'll take another pass at NDArray, teaching you both the math you'll need and how to realize it in code.
-
-To get started, let's import `mxnet`. We'll also import `ndarray` from `mxnet` for convenience. We’ll make a habit of setting a random seed so that you always get the same results that we do.
-
-
-```python
+```{.python .input  n=1}
 import mxnet as mx
 from mxnet import nd
-mx.random.seed(1)
 ```
 
-Next, let's see how to create an NDArray, without any values initialized. Specifically, we'll create a 2D array (also called a *matrix*) with 3 rows and 4 columns.
+The simplest object we can create is a vector. `arange` creates a row vector of 12 consecutive integers.
 
-
-```python
-x = nd.empty((3, 4))
-print(x)
-```
-
-    
-    [[  0.00000000e+00   0.00000000e+00   2.26995938e-20   4.57734143e-41]
-     [  1.38654559e-38   0.00000000e+00   1.07958838e-15   4.57720130e-41]
-     [  6.48255647e-37   0.00000000e+00   4.70016266e-18   4.57734143e-41]]
-    <NDArray 3x4 @cpu(0)>
-
-
-The `empty` method just grabs some memory and hands us back a matrix without setting the values of any of its entries. This means that the entries can have any form of values, including very big ones! But typically, we'll want our matrices initialized. Commonly, we want a matrix of all zeros. 
-
-
-```python
-x = nd.zeros((3, 5))
+```{.python .input  n=2}
+x = nd.arange(12)
 x
 ```
 
+From the property `<NDArray 12 @cpu(0)>` shown when printing `x` we can see that it is a one-dimensional array of length 12 and that it resides in CPU main memory. The 0 in `@cpu(0)`` has no special meaning and does not represent a specific core.
 
+We can get the NDArray instance shape through the `shape` property.
 
+```{.python .input  n=8}
+x.shape
+```
 
-    
-    [[ 0.  0.  0.  0.  0.]
-     [ 0.  0.  0.  0.  0.]
-     [ 0.  0.  0.  0.  0.]]
-    <NDArray 3x5 @cpu(0)>
+We can also get the total number of elements in the NDArray instance through the `size` property. Since we are dealing with a vector, both are identical.
 
+```{.python .input  n=9}
+x.size
+```
 
+In the following, we use the `reshape` function to change the shape of the line vector `x` to (3, 4), which is a matrix of 3 rows and 4 columns. Except for the shape change, the elements in `x` (and also its size) remain unchanged.
 
-Similarly, `ndarray` has a function to create a matrix of all ones. 
-
-
-```python
-x = nd.ones((3, 4))
+```{.python .input  n=3}
+x = x.reshape((3, 4))
 x
 ```
 
+It can be awkward to reshape a matrix in the way described above. After all, if we want a matrix with 3 rows we also need to know that it should have 4 columns in order to make up 12 elements. Or we might want to request NDArray to figure out automatically how to give us a matrix with 4 columns and whatever number of rows that are needed to take care of all elements. This is precisely what the entry `-1` does in any one of the fields. That is, in our case
+`x.reshape((3, 4))` is equivalent to `x.reshape((-1, 4))` and `x.reshape((3, -1))`.
 
+```{.python .input}
+nd.empty((3, 4))
+```
 
+The `empty` method just grabs some memory and hands us back a matrix without setting the values of any of its entries. This is very efficient but it means that the entries can have any form of values, including very big ones! But typically, we'll want our matrices initialized.
 
-    
-    [[ 1.  1.  1.  1.]
-     [ 1.  1.  1.  1.]
-     [ 1.  1.  1.  1.]]
-    <NDArray 3x4 @cpu(0)>
+Commonly, we want one of all zeros. For objects with more than two dimensions mathematicians don't have special names - they simply call them tensors. To create one with all elements set to 0 a shape of (2, 3, 4) we use
 
+```{.python .input  n=4}
+nd.zeros((2, 3, 4))
+```
 
+Just like in numpy, creating tensors with each element being 1 works via
 
-Often, we'll want to create arrays whose values are sampled randomly. This is especially common when we intend to use the array as a parameter in a neural network. In this snippet, we initialize with values drawn from a standard normal distribution with zero mean and unit variance.
+```{.python .input  n=5}
+nd.ones((2, 3, 4))
+```
 
+We can also specify the value of each element in the NDArray that needs to be created through a Python list.
 
-```python
-y = nd.random_normal(0, 1, shape=(3, 4))
+```{.python .input  n=6}
+y = nd.array([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 y
 ```
 
+In some cases, we need to randomly generate the value of each element in the NDArray. This is especially common when we intend to use the array as a parameter in a neural network. The following  creates an NDArray with a shape of (3,4). Each of its elements is randomly sampled in a normal distribution with zero mean and unit variance.
 
-
-
-    
-    [[ 0.11287736 -1.30644417 -0.10713575 -2.63099265]
-     [-0.05735848  0.31348416 -0.57651091 -1.11059952]
-     [ 0.57960719 -0.22899596  1.04484284  0.81243682]]
-    <NDArray 3x4 @cpu(0)>
-
-
-
-As in NumPy, the dimensions of each NDArray are accessible via the `.shape` attribute.
-
-
-```python
-y.shape
+```{.python .input  n=7}
+nd.random.normal(0, 1, shape=(3, 4))
 ```
-
-
-
-
-    (3, 4)
-
-
-
-We can also query its size, which is equal to the product of the components of the shape. Together with the precision of the stored values, this tells us how much memory the array occupies.
-
-
-```python
-y.size
-```
-
-
-
-
-    12
-
-
 
 ## Operations
 
-NDArray supports a large number of standard mathematical operations. Such as element-wise addition:
+NDArray supports a large number of operators. For example, we can carry out addition by element on two previously created NDArrays with a shape of (3, 4). The shape of the result does not change.
 
-
-```python
+```{.python .input  n=10}
 x + y
 ```
 
+Likewise we can multiply and divide two NDArrays element by element.
 
-
-
-    
-    [[ 1.11287737 -0.30644417  0.89286423 -1.63099265]
-     [ 0.9426415   1.31348419  0.42348909 -0.11059952]
-     [ 1.57960725  0.77100402  2.04484272  1.81243682]]
-    <NDArray 3x4 @cpu(0)>
-
-
-
-Multiplication:
-
-
-```python
+```{.python .input  n=11}
 x * y
+x / y
 ```
 
+Many more operations can be applied element-wise, such as exponentiation:
 
-
-
-    
-    [[ 0.11287736 -1.30644417 -0.10713575 -2.63099265]
-     [-0.05735848  0.31348416 -0.57651091 -1.11059952]
-     [ 0.57960719 -0.22899596  1.04484284  0.81243682]]
-    <NDArray 3x4 @cpu(0)>
-
-
-
-And exponentiation:
-
-
-```python
-nd.exp(y)
+```{.python .input  n=12}
+y.exp()
 ```
 
+In addition to computations by element, we can also use the `dot` function for matrix operations. Next, we will perform matrix multiplication to transpose `x` and `y`. Since `x` is a matrix of 3 rows and 4 columns, `y` is transposed into a matrix of 4 rows and 3 columns. The two matrices are multiplied to obtain a matrix of 3 rows and 3 columns (if you're confused about what this means, don't worry - we will explain matrix operations in much more detail in the chapter on [linear algebra](linear_algebra.md)).
 
-
-
-    
-    [[ 1.11949468  0.27078119  0.8984037   0.07200695]
-     [ 0.94425553  1.36818385  0.56185532  0.32936144]
-     [ 1.78533697  0.79533172  2.84295177  2.25339246]]
-    <NDArray 3x4 @cpu(0)>
-
-
-
-We can also grab a matrix's transpose to compute a proper matrix-matrix product.
-
-
-```python
+```{.python .input  n=13}
 nd.dot(x, y.T)
 ```
 
+We can also merge multiple NDArrays. For that we need to tell the system along with dimension to merge. The example below merges two matrices along dimension 0 (along rows) and dimension 1 (along columns) respectively.
 
-
-
-    
-    [[-3.93169522 -1.43098474  2.20789099]
-     [-3.93169522 -1.43098474  2.20789099]
-     [-3.93169522 -1.43098474  2.20789099]]
-    <NDArray 3x3 @cpu(0)>
-
-
-
-We'll explain these operations and present even more operators in the [linear algebra](P01-C03-linear-algebra.ipynb) chapter. But for now, we'll stick with the mechanics of working with NDArrays.
-
-## In-place operations
-
-In the previous example, every time we ran an operation, we allocated new memory to host its results. For example, if we write `y = x + y`, we will dereference the matrix that `y` used to point to and instead point it at the newly allocated memory. In the following example we demonstrate this with Python's `id()` function, which gives us the exact address of the referenced object in memory. After running `y = y + x`, we'll find that `id(y)` points to a different location. That's because Python first evaluates `y + x`, allocating new memory for the result and then subsequently redirects `y` to point at this new location in memory.
-
-
-```python
-print('id(y):', id(y))
-y = y + x
-print('id(y):', id(y))
+```{.python .input}
+nd.concat(x, y, dim=0)
+nd.concat(x, y, dim=1)
 ```
 
-    id(y): 140291459787296
-    id(y): 140295515324600
+Just like in Numpy, we can construct binary NDarrays by a logical statement. Take `x == y` as an example. If `x` and `y` are equal for some entry, the new NDArray has a value of 1 at the same position; otherwise, it is 0.
 
-
-This might be undesirable for two reasons. First, we don't want to run around allocating memory unnecessarily all the time. In machine learning, we might have hundreds of megabytes of paramaters and update all of them multiple times per second. Typically, we'll want to perform these updates in place. Second, we might point at the same parameters from multiple variables. If we don't update in place, this could cause a memory leak, and could cause us to inadvertently reference stale parameters. 
-
-Fortunately, performing in-place operations in MXNet is easy. We can assign the result of an operation to a previously allocated array with slice notation, e.g., `y[:] = <expression>`.
-
-
-```python
-print('id(y):', id(y))
-y[:] = x + y
-print('id(y):', id(y))
+```{.python .input}
+x == y
 ```
 
-    id(y): 140295515324600
-    id(y): 140295515324600
+Summing all the elements in the NDArray yields an NDArray with only one element.
 
-
-While this syntacically nice, `x+y` here will still allocate a temporary buffer to store the result before copying it to `y[:]`. To make even better use of memory, we can directly invoke the underlying `ndarray` operation, in this case `elemwise_add`, avoiding temporary buffers. We do this by specifying the `out` keyword argument, which every `ndarray` operator supports:
-
-
-```python
-nd.elemwise_add(x, y, out=y)
+```{.python .input}
+x.sum()
 ```
 
+We can transform the result into a scalar in Python using the `asscalar` function. In the following example, the $L_2$ norm of `x` yields a single element NDArray. The final result is transformed into a scalar.
 
-
-
-    
-    [[ 3.11287737  1.69355583  2.89286423  0.36900735]
-     [ 2.9426415   3.31348419  2.42348909  1.88940048]
-     [ 3.57960725  2.77100396  4.04484272  3.81243682]]
-    <NDArray 3x4 @cpu(0)>
-
-
-
-If we're not planning to re-use ``x``, then we can assign the result to ``x`` itself. There are two ways to do this in MXNet. 
-1. By using slice notation x[:] = x op y
-2. By using the op-equals operators like `+=`
-
-
-```python
-print('id(x):', id(x))
-x += y
-x
-print('id(x):', id(x))
+```{.python .input}
+x.norm().asscalar()
 ```
 
-    id(x): 140291459564992
-    id(x): 140291459564992
+For stylistic convenience, we can write `y.exp()`, `x.sum()`, `x.norm()`, etc. also as `nd.exp(y)`, `nd.sum(x)`, `nd.norm(x)`.
 
+## Broadcast Mechanism
 
-## Slicing
-MXNet NDArrays support slicing in all the ridiculous ways you might imagine accessing your data. Here's an example of reading the second and third rows from `x`.
+In the above section, we saw how to perform operations on two NDArrays of the same shape. When their shapes differ, a broadcasting mechanism may be triggered analogous to NumPy: first, copy the elements appropriately so that the two NDArrays have the same shape, and then carry out operations by element.
 
+```{.python .input  n=14}
+a = nd.arange(3).reshape((3, 1))
+b = nd.arange(2).reshape((1, 2))
+a, b
+```
 
-```python
+Since `a` and `b` are (3x1) and (1x2) matrices respectively, their shapes do not match up if we want to add them. NDArray addresses this by 'broadcasting' the entries of both matrices into a larger (3x2) matrix as follows: for matrix `a` it replicates the columns, for matrix `b` it replicates the rows before adding up both element-wise.
+
+```{.python .input}
+a + b
+```
+
+## Indexing and Slicing
+
+Just like in any other Python array, elements in an NDArray can be accessed by its index. In good Python tradition the first element has index 0 and ranges are specified to include the first but not the last. By this logic `1:3` selects the second and third element. Let's try this out by selecting the respective rows in a matrix.
+
+```{.python .input  n=19}
 x[1:3]
 ```
 
+Beyond reading we can also write elements of a matrix.
 
-
-
-    
-    [[ 3.9426415   4.31348419  3.42348909  2.88940048]
-     [ 4.57960701  3.77100396  5.04484272  4.81243706]]
-    <NDArray 2x4 @cpu(0)>
-
-
-
-Now let's try writing to a specific element.
-
-
-```python
-x[1,2] = 9.0
+```{.python .input  n=20}
+x[1, 2] = 9
 x
 ```
 
+If we want to assign multiple elements the same value, we simply index all of them and then assign them the value. For instance, `[0:2, :]` accesses the first and second rows. While we discussed indexing for matrices, this obviously also works for vectors and for tensors of more than 2 dimensions.
 
-
-
-    
-    [[ 4.11287737  2.69355583  3.89286423  1.36900735]
-     [ 3.9426415   4.31348419  9.          2.88940048]
-     [ 4.57960701  3.77100396  5.04484272  4.81243706]]
-    <NDArray 3x4 @cpu(0)>
-
-
-
-Multi-dimensional slicing is also supported.
-
-
-```python
-x[1:2,1:3]
-```
-
-
-
-
-    
-    [[ 4.31348419  9.        ]]
-    <NDArray 1x2 @cpu(0)>
-
-
-
-
-```python
-x[1:2,1:3] = 5.0
+```{.python .input  n=21}
+x[0:2, :] = 12
 x
 ```
 
+## Saving Memory
 
+In the previous example, every time we ran an operation, we allocated new memory to host its results. For example, if we write `y = x + y`, we will dereference the matrix that `y` used to point to and instead point it at the newly allocated memory. In the following example we demonstrate this with Python's `id()` function, which gives us the exact address of the referenced object in memory. After running `y = y + x`, we'll find that `id(y)` points to a different location. That's because Python first evaluates `y + x`, allocating new memory for the result and then subsequently redirects `y` to point at this new location in memory.
 
-
-    
-    [[ 4.11287737  2.69355583  3.89286423  1.36900735]
-     [ 3.9426415   5.          5.          2.88940048]
-     [ 4.57960701  3.77100396  5.04484272  4.81243706]]
-    <NDArray 3x4 @cpu(0)>
-
-
-
-## Broadcasting
-
-You might wonder, what happens if you add a vector `y` to a matrix `X`? These operations, where we compose a low dimensional array `y` with a high-dimensional array `X` invoke a functionality called broadcasting. Here, the low-dimensional array is duplicated along any axis with dimension $1$ to match the shape of the high dimensional array. Consider the following example.
-
-
-```python
-x = nd.ones(shape=(3,3))
-print('x = ', x)
-y = nd.arange(3)
-print('y = ', y)
-print('x + y = ', x + y)
+```{.python .input  n=15}
+before = id(y)
+y = y + x
+id(y) == before
 ```
 
-    x =  
-    [[ 1.  1.  1.]
-     [ 1.  1.  1.]
-     [ 1.  1.  1.]]
-    <NDArray 3x3 @cpu(0)>
-    y =  
-    [ 0.  1.  2.]
-    <NDArray 3 @cpu(0)>
-    x + y =  
-    [[ 1.  2.  3.]
-     [ 1.  2.  3.]
-     [ 1.  2.  3.]]
-    <NDArray 3x3 @cpu(0)>
+This might be undesirable for two reasons. First, we don't want to run around allocating memory unnecessarily all the time. In machine learning, we might have hundreds of megabytes of paramaters and update all of them multiple times per second. Typically, we'll want to perform these updates *in place*. Second, we might point at the same parameters from multiple variables. If we don't update in place, this could cause a memory leak, and could cause us to inadvertently reference stale parameters.
 
+Fortunately, performing in-place operations in MXNet is easy. We can assign the result of an operation to a previously allocated array with slice notation, e.g., `y[:] = <expression>`. To illustrate the behavior, we first clone the shape of a matrix using `zeros_like` to allocate a block of 0 entries.
 
-While `y` is initially of shape (3), 
-MXNet infers its shape to be (1,3), 
-and then broadcasts along the rows to form a (3,3) matrix). 
-You might wonder, why did MXNet choose to interpret `y` as a (1,3) matrix and not (3,1). 
-That's because broadcasting prefers to duplicate along the left most axis. 
-We can alter this behavior by explicitly giving `y` a 2D shape.
-
-
-```python
-y = y.reshape((3,1))
-print('y = ', y)
-print('x + y = ', x+y)
-```
-
-    y =  
-    [[ 0.]
-     [ 1.]
-     [ 2.]]
-    <NDArray 3x1 @cpu(0)>
-    x + y =  
-    [[ 1.  1.  1.]
-     [ 2.  2.  2.]
-     [ 3.  3.  3.]]
-    <NDArray 3x3 @cpu(0)>
-
-
-## Converting from MXNet NDArray to NumPy
-Converting MXNet NDArrays to and from NumPy is easy. The converted arrays do not share memory.
-
-
-```python
-a = x.asnumpy()
-type(a)
-```
-
-
-
-
-    numpy.ndarray
-
-
-
-
-```python
-y = nd.array(a) 
-y
-```
-
-
-
-
-    
-    [[ 1.  1.  1.]
-     [ 1.  1.  1.]
-     [ 1.  1.  1.]]
-    <NDArray 3x3 @cpu(0)>
-
-
-
-## Managing context
-You might have noticed that MXNet NDArray looks almost identical to NumPy. 
-But there are a few crucial differences.
-One of the key features that differentiates MXNet from NumPy is its support for diverse hardware devices.
-
-In MXNet, every array has a context. 
-One context could be the CPU. 
-Other contexts might be various GPUs. 
-Things can get even hairier when we deploy jobs across multiple servers. 
-By assigning arrays to contexts intelligently, 
-we can minimize the time spent transferring data between devices. 
-For example, when training neural networks on a server with a GPU, 
-we typically prefer for the model's parameters to live on the GPU. 
-To start, let's try initializing an array on the first GPU.
-
-
-```python
-z = nd.ones(shape=(3,3), ctx=mx.gpu(0))
-z
-```
-
-
-
-
-    
-    [[ 1.  1.  1.]
-     [ 1.  1.  1.]
-     [ 1.  1.  1.]]
-    <NDArray 3x3 @gpu(0)>
-
-
-
-Given an NDArray on a given context, we can copy it to another context by using the copyto() method.
-
-
-```python
-x_gpu = x.copyto(mx.gpu(0))
-print(x_gpu)
-```
-
-    
-    [[ 1.  1.  1.]
-     [ 1.  1.  1.]
-     [ 1.  1.  1.]]
-    <NDArray 3x3 @gpu(0)>
-
-
-The result of an operator will have the same context as the inputs.
-
-
-```python
-x_gpu + z
-```
-
-
-
-
-    
-    [[ 2.  2.  2.]
-     [ 2.  2.  2.]
-     [ 2.  2.  2.]]
-    <NDArray 3x3 @gpu(0)>
-
-
-
-If we ever want to check the context of an NDArray programmaticaly, 
-we can just call its `.context` attribute.
-
-
-```python
-print(x_gpu.context)
-print(z.context)
-```
-
-    gpu(0)
-    gpu(0)
-
-
-In order to perform an operation on two ndarrays `x1` and `x2`,
-we need them both to live on the same context. 
-And if they don't already, 
-we may need to explicitly copy data from one context to another.
-You might think that's annoying. 
-After all, we just demonstrated that MXNet knows where each NDArray lives. 
-So why can't MXNet just automatically copy `x1` to `x2.context` and then add them?
-
-In short, people use MXNet to do machine learning
-because they expect it to be fast. 
-But transferring variables between different contexts is slow. 
-So we want you to be 100% certain that you want to do something slow 
-before we let you do it. 
-If MXNet just did the copy automatically without crashing
-then you might not realize that you had written some slow code.
-We don't want you to spend your entire life on StackOverflow,
-so we make some mistakes impossible. 
-
-![](../img/operator-context.png)
-
-## Watch out!
-
-Imagine that your variable z already lives on your second GPU (`gpu(0)`). What happens if we call `z.copyto(gpu(0))`? It will make a copy and allocate new memory, even though that variable already lives on the desired device!
-
-There are times where depending on the environment our code is running in,
-two variables may already live on the same device.
-So we only want to make a copy if the variables currently lives on different contexts. 
-In these cases, we can call `as_in_context()`. 
-If the variable is already the specified context then this is a no-op.
-
-
-```python
+```{.python .input  n=16}
+z = y.zeros_like()
 print('id(z):', id(z))
-z = z.copyto(mx.gpu(0))
+z[:] = x + y
 print('id(z):', id(z))
-z = z.as_in_context(mx.gpu(0))
-print('id(z):', id(z))
-print(z)
 ```
 
-    id(z): 140291459785224
-    id(z): 140291460485072
-    id(z): 140291460485072
-    
-    [[ 1.  1.  1.]
-     [ 1.  1.  1.]
-     [ 1.  1.  1.]]
-    <NDArray 3x3 @gpu(0)>
+While this looks pretty, `x+y` here will still allocate a temporary buffer to store the result of `x+y` before copying it to `y[:]`. To make even better use of memory, we can directly invoke the underlying `ndarray` operation, in this case `elemwise_add`, avoiding temporary buffers. We do this by specifying the `out` keyword argument, which every `ndarray` operator supports:
+
+```{.python .input  n=17}
+nd.elemwise_add(x, y, out=z)
+id(z) == before
+```
+
+If the value of `x ` is not reused in subsequent programs, we can also use `x[:] = x + y` or `x += y` to reduce the memory overhead of the operation.
+
+```{.python .input  n=18}
+before = id(x)
+x += y
+id(x) == before
+```
+
+## Mutual Transformation of NDArray and NumPy
+
+Converting MXNet NDArrays to and from NumPy is easy. The converted arrays do *not* share memory. This minor inconvenience is actually quite important: when you perform operations on the CPU or one of the GPUs, you don't want MXNet having to wait whether NumPy might want to be doing something else with the same chunk of memory. The  `array` and `asnumpy` functions do the trick.
+
+```{.python .input  n=22}
+import numpy as np
+
+a = np.ones((2, 3))
+b = nd.array(a)
+type(d)
+c = b.asnumpy()
+type(c)
+```
+
+## Exercises
+
+* Run the code in this section. Change the conditional statement `x == y` in this section to `x < y` or `x > y`, and then see what kind of NDArray you can get.
+* Replace the two NDArrays that operate by element in the broadcast mechanism with other shapes, e.g. three dimensional tensors. Is the result the same as expected?
+* Assume that we have three matrices `a`, `b` and `c`. Rewrite `c = nd.dot(a, b.T) + c` in the most memory efficient manner. 
 
 
-## Next
-[Linear algebra](../chapter01_crashcourse/linear-algebra.ipynb)
+## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/745)
 
-For whinges or inquiries, [open an issue on  GitHub.](https://github.com/zackchase/mxnet-the-straight-dope)
+![](../img/qr_ndarray.svg)

@@ -4,7 +4,7 @@ This section discusses how to download the codes in this book and to install the
 
 For simplicity we recommend [Conda](https://conda.io), a popular Python package manager to install all libraries.
 
-### Windows
+## Windows
 
 1. Download and install [Miniconda](https://conda.io/miniconda.html), based on your operating system. Make sure to add Anaconda to your PATH environment variable.
 1. Download the tarball containing the notebooks from this book. This can be found at en.gluon.ai/gluon_tutorials_en-latest.zip. Alternatively feel free to clone the latest version from GitHub.
@@ -19,100 +19,88 @@ activate gluon
 jupyter notebook
 ```
 
-这时在浏览器打开 http://localhost:8888 （通常会自动打开）就可以查看和运行本书中每一节的代码了。
+Alternatively, you can open `jupyter-lab` instead of `jupyter notebook`. This will give you a more powerful Jupyter environment.
+If your browser integration is working properly, starting Jupyter will open a new window in your browser. If this doesn't happen, go to http://localhost:8888 to open it manually.
 
-In some chapters of this book, codes will automatically download the data set and pre-training model; use the US sites to download them by default. We can use domestic sites to download data and models by specifying that MXNet do so prior to running Jupyter.
+Some notebooks will automatically download the data set and pre-training model. You can adjust the location of the repository by overriding the `MXNET_GLUON_REPO` variable.
 
-```
-set MXNET_GLUON_REPO=https://apache-mxnet.s3.cn-north-1.amazonaws.com.cn/ jupyter notebook
-```
+## Linux and macOS
 
-### Linux/macOS users
-
-第一步：根据操作系统下载Miniconda（网址：https://conda.io/miniconda.html ），它是一个sh文件。打开Terminal应用进入命令行来执行这个sh文件，例如
+Installation for both is very similar. We give a description of the workflow for Linux. Begin by installing Miniconda (and accepting the liense terms), as available at https://conda.io/miniconda.html via  
 
 ```
 sh Miniconda3-latest-Linux-x86_64.sh
 ```
 
-the terms of use will be displayed during installation, press "↓" to continue reading, or press "Q" to exit reading. After that, you will be required to answer the following questions:
+Next you need to update your shell for Conda to take effect. Linux users will need to run `source ~/.bashrc` or restart the command line application; macOS users will need to run `source ~/.bash_profile` or restart the command line application.
+
+Download the tarball containing all the codes provided in the book and unpack it.
 
 ```
-Do you accept the license terms? [yes|no]
-[no] >>> yes
-Do you wish the installer to prepend the Miniconda3 install location
-to PATH in your /home/your_name/.conda ? [yes|no]
-[no] >>> yes
+mkdir gluon_tutorials
+cd gluon_tutorials
+curl https://en.gluon.ai/gluon_tutorials_en-latest.tar.gz -o tutorials.tar.gz
+tar -xzvf tutorials.tar.gz
+rm tutorials.tar.gz
 ```
 
-After the installation is complete, you need to make Conda take effect. Linux users will need to run `source ~/.bashrc` or restart the command line application; macOS users will need to run `source ~/.bash_profile` or restart the command line application.
-
-Step 2: Download the tarball containing all the codes provided in the book. After unzipping it, run the following commands. Run the following commands.
+Next (in analogy to Windows) create the appropriate Conda environment and start Jupyter.
 
 ```
-mkdir gluon_tutorials_zh-1.0 && cd gluon_tutorials_zh-1.0
-curl https://zh.gluon.ai/gluon_tutorials_zh-1.0.tar.gz -o tutorials.tar.gz
-tar -xzvf tutorials.tar.gz && rm tutorials.tar.gz
-```
-
-For Steps 3-5, please refer to the installation steps as defined for Windows users.  However, for Step 4, the command should be replaced with
-
-```
+conda env create -f environment.yml
 source activate gluon
+jupyter notebook
 ```
 
 ## Updating Codes and Runtime Environment
 
-To stay updated on the rapid development of deep learning and MXNet, the open source content in this book will be regularly updated and released. We suggest that you update the open source content (such as codes) and the corresponding runtime environment (such as new versions of MXNet) on a regular basis.  The specific steps for the update are as follows.
+We recommend that you download the latest version of the library regularly to keep track of the progress. The code can always be found at `https://en.gluon.ai/gluon_tutorials_en-latest.tar.gz`.
 
-Step 1: Re-download the latest tarball containing all the codes provided in this book.  You can download the tarball from one of the following addresses.
-
-* https://zh.gluon.ai/gluon_tutorials_zh.zip
-* https://zh.gluon.ai/gluon_tutorials_zh.tar.gz
-
-After unzipping it, visit the folder "gluon_tutorials_zh".
-
-Step 2: Use the following command to update the runtime environment.
+To update the conda environment use the following steps:
 
 ```
 conda env update -f environment.yml
+source activate gluon
 ```
-
-The subsequent steps for activating environment and running Jupyter are the same as those described in the section above.
-
-
-## Using GPU-enabled version of MXNet
-
-The MXNet to be installed by following the steps described above supports CPU computation only.  Some chapters in this book, however, require or recommend running MXNet via a GPU.   If you have a Nvidia graphics card on your computer and have CUDA installed already, it is recommended that you use the GPU-enabled version of MXNet.
-
-Step 1: Uninstall the CPU-enabled version of MXNet.  If there is no virtual environment installed, you may skip this step.  If you have installed a virtual environment, the runtime environment must be activated prior to uninstallation:
+On Windows you need to replace this as follows:
 
 ```
+conda env update -f environment.yml
+activate gluon
+```
+
+## Using the GPU-enabled version of MXNet
+
+The version of MXNet described above supports CPU only. Some chapters in this book require GPUs for efficient experiments (running the code on CPUs would simply take too long). If you have na NVIDIA graphics card on your computer and have CUDA installed already, it is recommended that you use the GPU-enabled version instead.
+
+Uninstall the CPU version of MXNet. Note that if you have a virtual environment installed, you must activate this prior to uninstalling MXNet. On Windows use
+
+```
+activate gluon
 pip uninstall mxnet
+deactivate
 ```
 
-Then, exit the virtual environment by using the command `deactivate` for Windows users, and the command `source deactivate` for Linux/macOS users.
+On Linux and macOS use
+```
+source activate gluon
+pip uninstall mxnet
+source deactivate
+```
 
-Step 2: Update the environment to the GPU-dependent MXNet. Open the file `environment.yml` in the root directory where the codes in this book are contained, and with a text editor, replace "mxnet" located within the file with the corresponding GPU-version. For example, if the 8.0 version of CUDA is installed on the computer, change the string "mxnet" located within the file to "mxnet-cu80".  If other versions of CUDA (such as versions 7.5, 9.0, 9.2, etc.) are installed, complete the appropriate changes to the string "mxnet" located within the file (for example, change the line to "mxnet-cu75", "mxnet-cu90" or "mxnet-cu92", etc.). Save and exit the file.
+Next update the environment description in `environment.yml` by replacing `mxnet` by `mxnet-cu92`. If you have an oder version of cuda installed, e.g. 8.0 or 9.0, you need to replace this with mxnet-cu80 and mxnet-cu90 respectively.
 
-Step 3: Update the virtual environment and execute the command.
+Finally, update the virtual environment and execute the command.
 
 ```
 conda env update -f environment.yml
 ```
 
-Afterward, we only need to activate the installation environment to use the GPU-enabled version of MXNet to run the codes provided in the book. One thing to keep in mind: if new codes are downloaded later, you will need to repeat these three steps to use the GPU-enabled version of MXNet.
+Finally, you only need to activate the environment via `source activate gluon` or `activate gluon` for Linux/macOS and Windows respectively. If you download new code or update your version of CUDA, you obviously need to update the entries in `environment.yml` accordingly.
 
+## Exercise
 
-## Summary
-
-* To get a hands-on learning experience with deep learning, we need to acquire the codes provided in this book and install the appropriate runtime environment.
-* We recommend that you update the codes and runtime environment.
-
-
-## exercise
-
-* Acquire the codes in this book and install the runtime environment. If you encounter any problem during installation, please scan the QR code in this section. On the forum, you can see our FAQ or ask your own questions.
+Download the code for the book and install the runtime environment. If you encounter any problems during installation, please scan the QR code to take you to the FAQ section of the discussion forum for further help.
 
 ## Scan the QR code to get to the [forum](https://discuss.gluon.ai/t/topic/249)
 
