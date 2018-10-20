@@ -21,7 +21,7 @@ $$
 \end{bmatrix},
 $$
 
-Here, $x_1, \ldots, x_n$ are elements of the vector. We denote the $n$ dimension vector $\boldsymbol{x}$ whose elements are all real numbers as $\boldsymbol{x} \in \mathbb{R}^{n}$ or $\boldsymbol{x} \in \ Mathbb{R}^{n \times 1}$.
+Here, $x_1, \ldots, x_n$ are elements of the vector. We denote the $n$ dimension vector $\boldsymbol{x}$ whose elements are all real numbers as $\boldsymbol{x} \in \mathbb{R}^{n}$ or $\boldsymbol{x} \in \mathbb{R}^{n \times 1}$.
 
 
 ### Matrices
@@ -171,7 +171,7 @@ Here, $x_{ij}$ is the element of matrix $\boldsymbol{X}$ in row $i$ and column $
 
 For a matrix $\boldsymbol{A}$ with $n$ rows and $n$ columns, suppose there is a scalar $\lambda$ and a non-zero $n$ dimension vector $\boldsymbol{v}$ such that
 
-$\boldsymbol{A} \boldsymbol{v} = \lambda \boldsymbol{v},$
+$$\boldsymbol{A} \boldsymbol{v} = \lambda \boldsymbol{v},$$
 
 In this case, $\boldsymbol{v}$ is a feature vector of matrix $\boldsymbol{A}$, and the scalar $\lambda$ is the eigenvalue corresponding to $\boldsymbol{v}$.
 
@@ -186,11 +186,11 @@ Here we briefly introduce some basic concepts and calculations for differentials
 
 Assume the input and output of function $f: \mathbb{R} \rightarrow \mathbb{R}$ are both scalars. The derivative of function $f$ is:
 
-$f'(x) = \lim_{h \rightarrow 0} \frac{f(x+h) - f(x)}{h},$
+$$f'(x) = \lim_{h \rightarrow 0} \frac{f(x+h) - f(x)}{h},$$
 
 and we assume that the limit exists. Given $y = f(x)$, where $x$ and $y$ are the arguments and dependent variables of function $f$, respectively, the following derivative and differential expressions are equivalent:
 
-$f'(x) = y' = \frac{\text{d}y}{\text{d}x} = \frac{\text{d}f}{\text{d}x} = \frac{\text{d}}{\text{d}x} f(x) = \text{D}f(x) = \text{D}_x f(x),$
+$$f'(x) = y' = \frac{\text{d}y}{\text{d}x} = \frac{\text{d}f}{\text{d}x} = \frac{\text{d}}{\text{d}x} f(x) = \text{D}f(x) = \text{D}_x f(x),$$
 
 Here, the symbols $\text{D}$ and $\text{d}/\text{d}x$ are also called differential operators. Common differential calculations are $\text{D}C = 0$ ($C$ is a constant), $\text{D}x^n = nx^{n-1}$ ($n$ is a constant), and $ \text{D}e^x = e^x$, $\text{D}\ln(x) = 1/x$.
 
@@ -208,22 +208,22 @@ $$
 
 If functions $y=f(u)$ and $u=g(x)$ are both derivable, according to the chain rule,
 
-$\frac{\text{d}y}{\text{d}x} = \frac{\text{d}y}{\text{d}u} \frac{\text{d}u}{\text{d}x}.$
+$$\frac{\text{d}y}{\text{d}x} = \frac{\text{d}y}{\text{d}u} \frac{\text{d}u}{\text{d}x}.$$
 
 
 ### Taylor Expansion
 
 The Taylor expansion of function $f$ is
 
-$f(x) = \sum_{n=0}^\infty \frac{f^{(n)}(a)}{n!} (x-a)^n,$
+$$f(x) = \sum_{n=0}^\infty \frac{f^{(n)}(a)}{n!} (x-a)^n,$$
 
 Here, $f^{(n)}$ is the $n$th derivative of function $f$ (find the $n$ derivative), and $n!$ is the factorial of $n$. Assuming $\epsilon$ is a sufficiently small number, if we replace $x$ and $a$ with $x+\epsilon$ and $x$ respectively, we can get
 
-$f(x + \epsilon) \approx f(x) + f'(x) \epsilon + \mathcal{O}(\epsilon^2).$
+$$f(x + \epsilon) \approx f(x) + f'(x) \epsilon + \mathcal{O}(\epsilon^2).$$
 
 Because $\epsilon$ is sufficiently small, the above formula can be simplified to
 
-$f(x + \epsilon) \approx f(x) + f'(x) \epsilon.$
+$$f(x + \epsilon) \approx f(x) + f'(x) \epsilon.$$
 
 
 
@@ -231,12 +231,12 @@ $f(x + \epsilon) \approx f(x) + f'(x) \epsilon.$
 
 Assume $u$ is a function with $n$ arguments, $u = f(x_1, x_2, \ldots, x_n)$, while its partial derivative with respect to the $i$th variable $x_i$ is
 
-$ \frac{\partial u}{\partial x_i} = \lim_{h \rightarrow 0} \frac{f(x_1, \ldots, x_{i-1}, x_i+h, x_{i+1}, \ldots, x_n) - f(x_1, \ldots, x_i, \ldots, x_n)}{h}.$
+$$ \frac{\partial u}{\partial x_i} = \lim_{h \rightarrow 0} \frac{f(x_1, \ldots, x_{i-1}, x_i+h, x_{i+1}, \ldots, x_n) - f(x_1, \ldots, x_i, \ldots, x_n)}{h}.$$
 
 
 The following partial derivative expressions are equivalent:
 
-$\frac{\partial u}{\partial x_i} = \frac{\partial f}{\partial x_i} = f_{x_i} = f_i = D_i f = D_{x_i} f.$
+$$\frac{\partial u}{\partial x_i} = \frac{\partial f}{\partial x_i} = f_{x_i} = f_i = D_i f = D_{x_i} f.$$
 
 To calculate $\partial u/\partial x_i$, we simply treat $x_1, \ldots, x_{i-1}, x_{i+1}, \ldots, x_n$ as constants and calculate the derivative of $u$ with respect to $x_i$.
 
@@ -247,7 +247,7 @@ To calculate $\partial u/\partial x_i$, we simply treat $x_1, \ldots, x_{i-1}, x
 
 Assume the input of function $f: \mathbb{R}^n \rightarrow \mathbb{R}$ is an $n$ dimension vector $\boldsymbol{x} = [x_1, x_2, \ldots, x_n]^\top$ and the output is a scalar. The gradient of function $f(\boldsymbol{x})$ with respect to $\boldsymbol{x}$ is a vector of $n$ partial derivatives:
 
-$\nabla_{\boldsymbol{x}} f(\boldsymbol{x}) = \bigg[\frac{\partial f(\boldsymbol{x})}{\partial x_1}, \frac{\partial f(\boldsymbol{x})}{\partial x_2}, \ldots, \frac{\partial f(\boldsymbol{x})}{\partial x_n}\bigg]^\top.$
+$$\nabla_{\boldsymbol{x}} f(\boldsymbol{x}) = \bigg[\frac{\partial f(\boldsymbol{x})}{\partial x_1}, \frac{\partial f(\boldsymbol{x})}{\partial x_2}, \ldots, \frac{\partial f(\boldsymbol{x})}{\partial x_n}\bigg]^\top.$$
 
 
 To be concise, we sometimes use $\nabla f(\boldsymbol{x})$ to replace $\nabla_{\boldsymbol{x}} f(\boldsymbol{x})$.
@@ -285,7 +285,7 @@ $$
 
 Here, second-order partial derivative
 
-$\frac{\partial^2 f}{\partial x_i \partial x_j} = \frac{\partial }{\partial x_j} \left(\frac{\partial f}{ \partial x_i}\right).$
+$$\frac{\partial^2 f}{\partial x_i \partial x_j} = \frac{\partial }{\partial x_j} \left(\frac{\partial f}{ \partial x_i}\right).$$
 
 
 
@@ -297,15 +297,15 @@ Finally, we will briefly introduce conditional probability, expectation, and uni
 
 Assume the probability of event $A$ and event $B$ are $\mathbb{P}(A)$ and $\mathbb{P}(B)$, respectively. The probability of the simultaneous occurrence of the two events is denoted as $\mathbb{P }(A \cap B)$ or $\mathbb{P}(A, B)$. Given event $B$, the conditional probability of event $A$
 
-$\mathbb{P}(A \mid B) = \frac{\mathbb{P}(A \cap B)}{\mathbb{P}(B)}.$
+$$\mathbb{P}(A \mid B) = \frac{\mathbb{P}(A \cap B)}{\mathbb{P}(B)}.$$
 
 That is,
 
-$\mathbb{P}(A \cap B) = \mathbb{P}(B) \mathbb{P}(A \mid B) = \mathbb{P}(A) \mathbb{P}(B \mid A).$
+$$\mathbb{P}(A \cap B) = \mathbb{P}(B) \mathbb{P}(A \mid B) = \mathbb{P}(A) \mathbb{P}(B \mid A).$$
 
 When satisfying
 
-$\mathbb{P}(A \cap B) = \mathbb{P}(A) \mathbb{P}(B)$,
+$$\mathbb{P}(A \cap B) = \mathbb{P}(A) \mathbb{P}(B),$$
 
 event $A$ and event $B$ are independent of each other.
 
@@ -314,7 +314,7 @@ event $A$ and event $B$ are independent of each other.
 
 Th expectation (or average) of random variable $X$ is denoted as
 
-$\mathbb{E}(X) = \sum_{x} x \mathbb{P}(X = x).$
+$$\mathbb{E}(X) = \sum_{x} x \mathbb{P}(X = x).$$
 
 
 

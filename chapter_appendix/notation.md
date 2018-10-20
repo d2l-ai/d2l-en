@@ -68,4 +68,4 @@ The main symbols used in this book are listed below.
 |||
 |:--|:-:|
 |$\mathcal{O}$|Big O notation|
-c
+
