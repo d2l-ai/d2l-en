@@ -38,7 +38,7 @@ Next, LSTM needs to compute the candidate memory cell $\tilde{\boldsymbol{C}}_t$
 
 For time step $t$, the candidate memory cell $\tilde{\boldsymbol{C}}_t \in \mathbb{R}^{n \times h}$ is calculated by the following formula:
 
-$\tilde{\boldsymbol{C}}_t = \text{tanh}(\boldsymbol{X}_t \boldsymbol{W}_{xc} + \boldsymbol{H}_{t-1} \boldsymbol{W}_{hc} + \boldsymbol{b}_c),$
+$$\tilde{\boldsymbol{C}}_t = \text{tanh}(\boldsymbol{X}_t \boldsymbol{W}_{xc} + \boldsymbol{H}_{t-1} \boldsymbol{W}_{hc} + \boldsymbol{b}_c),$$
 
 Here, $\boldsymbol{W}_{xc} \in \mathbb{R}^{d \times h}$ and $\boldsymbol{W}_{hc} \in \mathbb{R}^{h \times h}$ are weight parameters and $\boldsymbol{b}_c \in \mathbb{R}^{1 \times h}$ is a bias parameter.
 
@@ -47,7 +47,7 @@ Here, $\boldsymbol{W}_{xc} \in \mathbb{R}^{d \times h}$ and $\boldsymbol{W}_{hc}
 
 We can control flow of information in the hidden state use input, forget, and output gates with an element value range between $[0, 1]$. This is also generally achieved by using multiplication by element (symbol $\odot$). The computation of the current time step memory cell $\boldsymbol{C}_t \in \mathbb{R}^{n \times h}$ combines the information of the previous time step memory cells and the current time step candidate memory cells, and controls the flow of information through forget gate and input gate:
 
-$\boldsymbol{C}_t = \boldsymbol{F}_t \odot \boldsymbol{C}_{t-1} + \boldsymbol{I}_t \odot \tilde{\boldsymbol{C}}_t.$
+$$\boldsymbol{C}_t = \boldsymbol{F}_t \odot \boldsymbol{C}_{t-1} + \boldsymbol{I}_t \odot \tilde{\boldsymbol{C}}_t.$$
 
 
 As shown in Figure 6.9, the forget gate controls whether the information in the memory cell $\boldsymbol{C}_{t-1}$ of the last time step is passed to the current time step, and the input gate can control how the input of the current time step $\boldsymbol{X}_t$ flows into the memory cells of the current time step through the candidate memory cell $\tilde{\boldsymbol{C}}_t$. If the forget gate is always approximately 1 and the input gate is always approximately 0, the past memory cells will be saved over time and passed to the current time step. This design can cope with the vanishing gradient problem in recurrent neural networks and better capture dependencies for time series with large time step distances.
@@ -59,7 +59,7 @@ As shown in Figure 6.9, the forget gate controls whether the information in the 
 
 With memory cells, we can also control the flow of information from memory cells to the hidden state $\boldsymbol{H}_t \in \mathbb{R}^{n \times h}$ through the output gate:
 
-$\boldsymbol{H}_t = \boldsymbol{O}_t \odot \text{tanh}(\boldsymbol{C}_t).$
+$$\boldsymbol{H}_t = \boldsymbol{O}_t \odot \text{tanh}(\boldsymbol{C}_t).$$
 
 The tanh function here ensures that the hidden state element value is between -1 and 1. It should be noted that when the output gate is approximately 1, the memory cell information will be passed to the hidden state for use by the output layer; and when the output gate is approximately 0, the memory cell information is only retained by itself. Figure 6.10 shows the computation of the hidden state in LSTM.
 

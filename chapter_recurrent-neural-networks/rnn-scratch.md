@@ -95,7 +95,7 @@ len(outputs), outputs[0].shape, state_new[0].shape
 
 ## Define the Prediction Function
 
-The following function predicts the next `num_chars` characters based on the `prefix` (a string containing several characters). This function is a bit more complicated. In it, we set the recurrent neural unit `rnn` as a function parameter, so that this function can be reused in the other recurrent neural networks described in following sections. 
+The following function predicts the next `num_chars` characters based on the `prefix` (a string containing several characters). This function is a bit more complicated. In it, we set the recurrent neural unit `rnn` as a function parameter, so that this function can be reused in the other recurrent neural networks described in following sections.
 
 ```{.python .input  n=8}
 # This function is saved in the gluonbook package for future use.
