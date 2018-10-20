@@ -15,28 +15,28 @@ The batch normalization methods for fully connected layers and convolutional lay
 
 First, we will consider batch normalization for fully connected layers. Usually, we will put the batch normalization layer between the affine transformation and the activation function in the fully connected layer. The input of the fully connected layer is set to $\boldsymbol{u}$, the weight parameter and the bias parameter are respectively set to $\boldsymbol{W}$ and $\boldsymbol{b}$, and the activation function is set to $\phi$. The operator for batch normalization is set to $\text{BN}$. Therefore, the output of the fully connected layer using batch normalization is
 
-$\phi(\text{BN}(\boldsymbol{x})),$
+$$\phi(\text{BN}(\boldsymbol{x})),$$
 
 Here, the batch normalization input $\boldsymbol{x}$ is obtained from the affine transformation
 
-$\boldsymbol{x}= \boldsymbol{W\boldsymbol{u} + \boldsymbol{b}}$
+$$\boldsymbol{x}= \boldsymbol{W\boldsymbol{u} + \boldsymbol{b}}$$
 
 得到。考虑一个由$m$个样本组成的小批量，仿射变换的输出为一个新的小批量$\mathcal{B} = \{\boldsymbol{x}^{(1)}, \ldots, \boldsymbol{x}^{(m)} \}$。它们正是批量归一化层的输入。对于小批量$\mathcal{B}$中任意样本$\boldsymbol{x}^{(i)} \in \mathbb{R}^d, 1 \leq  i \leq m$，批量归一化层的输出同样是$d$维向量
 
-$\boldsymbol{y}^{(i)} = \text{BN}(\boldsymbol{x}^{(i)}),$
+$$\boldsymbol{y}^{(i)} = \text{BN}(\boldsymbol{x}^{(i)}),$$
 
 and it is obtained by the following steps. First, calculate the mean and the variance of the mini-batch $\mathcal{B}$:
 
-$\boldsymbol{\mu}_\mathcal{B} \leftarrow \frac{1}{m}\sum_{i = 1}^{m} \boldsymbol{x}^{(i)},$
-$\boldsymbol{\sigma}_\mathcal{B}^2 \leftarrow \frac{1}{m} \sum_{i=1}^{m}(\boldsymbol{x}^{(i)} - \boldsymbol{\mu}_\mathcal{B})^2,$
+$$\boldsymbol{\mu}_\mathcal{B} \leftarrow \frac{1}{m}\sum_{i = 1}^{m} \boldsymbol{x}^{(i)},$$
+$$\boldsymbol{\sigma}_\mathcal{B}^2 \leftarrow \frac{1}{m} \sum_{i=1}^{m}(\boldsymbol{x}^{(i)} - \boldsymbol{\mu}_\mathcal{B})^2,$$
 
 Here, square computation is carried out by squaring by element. Next, we use squaring by element and division by element to standardize $\boldsymbol{x}^{(i)}$:
 
-$\hat{\boldsymbol{x}}^{(i)} \leftarrow \frac{\boldsymbol{x}^{(i)} - \boldsymbol{\mu}_\mathcal{B}}{\sqrt{\boldsymbol{\sigma}_\mathcal{B}^2 + \epsilon}},$
+$$\hat{\boldsymbol{x}}^{(i)} \leftarrow \frac{\boldsymbol{x}^{(i)} - \boldsymbol{\mu}_\mathcal{B}}{\sqrt{\boldsymbol{\sigma}_\mathcal{B}^2 + \epsilon}},$$
 
 Here, $\epsilon > 0$ is a very small constant, and the denominator is guaranteed to be greater than 0. Based on the above standardization, the batch normalization layer introduces two model parameters that can be learned: the scale parameter $\boldsymbol{\gamma}$ and the shift parameter $\boldsymbol{\beta}$. These two parameters have the same shape as $\boldsymbol{x}^{(i)}$, and both are $d$-dimensional vectors. They are calculated respectively with $\boldsymbol{x}^{(i)}$ by multiplication by element (symbol $\odot$) and addition by element:
 
-${\boldsymbol{y}}^{(i)} \leftarrow \boldsymbol{\gamma} \odot \hat{\boldsymbol{x}}^{(i)} + \boldsymbol{\beta}.$
+$${\boldsymbol{y}}^{(i)} \leftarrow \boldsymbol{\gamma} \odot \hat{\boldsymbol{x}}^{(i)} + \boldsymbol{\beta}.$$
 
 At this point, we have obtained the batch normalization output for $\boldsymbol{x}^{(i)}$: $\boldsymbol{y}^{(i)}$.
 It is worth noting that the learnable scale and shift parameters still may not be able to perform batch normalization on $\hat{\boldsymbol{x}}^{(i)}$. In this case, it is necessary to learn $\boldsymbol{\gamma} = \sqrt{\boldsymbol{\sigma}_\mathcal{B}^2 + \epsilon}$ and $\boldsymbol{\beta} = \boldsymbol{\mu}_\mathcal{B}$. We can understand it like this: If the batch normalization is not beneficial, theoretically, the learned model does not have to use batch normalization.
