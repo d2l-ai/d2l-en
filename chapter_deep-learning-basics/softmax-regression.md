@@ -22,31 +22,31 @@ o_3 &= x_1 w_{13} + x_2 w_{23} + x_3 w_{33} + x_4 w_{43} + b_3.
 $$
 
 
-Figure 3.2 uses a neural network diagram to depict the calculation above.  Like linear regression, softmax regression is also a single-layer neural network.  Since the calculation of each output, $o_1, o_2, and o_3$, depends on all inputs, $x_1, x_2, x_3, and x_4$, the output layer of the softmax regression is also a fully connected layer.
+Figure 3.2 uses a neural network diagram to depict the calculation above.  Like linear regression, softmax regression is also a single-layer neural network.  Since the calculation of each output, $o_1, o_2, and o_3$, depends on all inputs, $x_1$, $x_2$, $x_3$, and $x_4$, the output layer of the softmax regression is also a fully connected layer.
 
 ![Softmax regression is a single-layer neural network.  ](../img/softmaxreg.svg)
 
 ### Softmax Operation
 
-Since the classification problem requires discrete prediction output, we can use a simple approach to treat the output value $o_i$ as the confidence level of the prediction category $i$. We can choose the class with the largest output value as the predicted output, which is output $\ Operatorname*{argmax}_i o_i$. For example, if $o_1, o_2, and o_3$ are $0.1, 10, and 0.1$, respectively, then the prediction category is 2, which represents "cat".
+Since the classification problem requires discrete prediction output, we can use a simple approach to treat the output value $o_i$ as the confidence level of the prediction category $i$. We can choose the class with the largest output value as the predicted output, which is output $\operatorname*{argmax}_i o_i$. For example, if $o_1$, $o_2$, and $o_3$ are 0.1, 10, and 0.1, respectively, then the prediction category is 2, which represents "cat".
 
 However, there are two problems with using the output from the output layer directly. On the one hand, because the range of output values from the output layer is uncertain, it is difficult for us to visually judge the meaning of these values. For instance, the output value 10 from the previous example indicates a level of "very confident" that the image category is "cat". That is because its output value is 100 times that of the other two categories.  However, if $o_1=o_3=10^3$, then an output value of 10 means that the chance for the image category to be cat is very low.  On the other hand, since the actual label has discrete values, the error between these discrete values and the output values from an uncertain range is difficult to measure.
 
 The softmax operator solves the two problems above. It transforms the output value into a probability distribution that has a positive value with a sum of 1:
 
-$\hat{y}_1, \hat{y}_2, \hat{y}_3 = \text{softmax}(o_1, o_2, o_3),$
+$$\hat{y}_1, \hat{y}_2, \hat{y}_3 = \text{softmax}(o_1, o_2, o_3),$$
 
 where
 
-$
+$$
 \hat{y}_1 = \frac{ \exp(o_1)}{\sum_{i=1}^3 \exp(o_i)},\quad
 \hat{y}_2 = \frac{ \exp(o_2)}{\sum_{i=1}^3 \exp(o_i)},\quad
 \hat{y}_3 = \frac{ \exp(o_3)}{\sum_{i=1}^3 \exp(o_i)}.
-$
+$$
 
 It is easy to see $\hat{y}_1 + \hat{y}_2 + \hat{y}_3 = 1$ with $0 \leq \hat{y}_1, \hat{y}_2, and \hat{y}_3 \leq 1$. Thus, $\hat{y}_1, \hat{y}_2, and \hat{y}_3$ is a legal probability distribution.  Now, if $\hat{y}_2=0.8$, regardless of the value of $\hat{y}_1$ and $\hat{y}_3$, we will know that the probability of the image category being cat is 80%. In addition, we noticed
 
-$\operatorname*{argmax}_i o_i = \operatorname*{argmax}_i \hat y_i,$
+$$\operatorname*{argmax}_i o_i = \operatorname*{argmax}_i \hat y_i,$$
 
 So, the softmax operation does not change the prediction category output.
 
@@ -72,15 +72,15 @@ $$
 
 Set the features of the example image $i$ with a height and width of 2 pixels to be
 
-$\boldsymbol{x}^{(i)} = \begin{bmatrix}x_1^{(i)} & x_2^{(i)} & x_3^{(i)} & x_4^{(i)}\end{bmatrix},$
+$$\boldsymbol{x}^{(i)} = \begin{bmatrix}x_1^{(i)} & x_2^{(i)} & x_3^{(i)} & x_4^{(i)}\end{bmatrix},$$
 
 The output from the output layer is
 
-$\boldsymbol{o}^{(i)} = \begin{bmatrix}o_1^{(i)} & o_2^{(i)} & o_3^{(i)}\end{bmatrix},$
+$$\boldsymbol{o}^{(i)} = \begin{bmatrix}o_1^{(i)} & o_2^{(i)} & o_3^{(i)}\end{bmatrix},$$
 
 The probability distribution for the prediction to be dog, cat or chicken is
 
-$\boldsymbol{\hat{y}}^{(i)} = \begin{bmatrix}\hat{y}_1^{(i)} & \hat{y}_2^{(i)} & \hat{y}_3^{(i)}\end{bmatrix}.$
+$$\boldsymbol{\hat{y}}^{(i)} = \begin{bmatrix}\hat{y}_1^{(i)} & \hat{y}_2^{(i)} & \hat{y}_3^{(i)}\end{bmatrix}.$$
 
 
 The vector calculation expression of softmax regression for the example $i$ classification is
@@ -104,24 +104,25 @@ $$
 \end{aligned}
 $$
 
-In this case, the additional operation uses a broadcast mechanism $\boldsymbol{O}, \boldsymbol{\hat{Y}} \in \mathbb{R}^{n \times q}$, while row $i$ of the two matrices are the output $\boldsymbol{o}^{(i)} and probability distribution $\boldsymbol{\hat{y}}^{(i)}$ of example $i$, respectively.
+In this case, the additional operation uses a broadcast mechanism $\boldsymbol{O}, \boldsymbol{\hat{Y}} \in \mathbb{R}^{n \times q}$, while row $i$ of the two matrices are the output $\boldsymbol{o}^{(i)}$ and probability distribution $\boldsymbol{\hat{y}}^{(i)}$ of example $i$, respectively.
 
 
 ## Cross-entropy Loss Function
 
-As mentioned earlier, using softmax operations makes it easier to calculate errors with discrete labels. We already know that the softmax operation transforms the output into a legal class prediction distribution. As a matter of fact, actual labels can be expressed by classification distribution: for example $i$, we construct vector $\boldsymbol{y}^{(i)}\in \mathbb{R}^{q}$ to make its $y^{(i)}$th element (the discrete value of example $i$) equal to 1, and the rest equal to 0.  This way, our training goal can be set to make the predicted probability distribution $\boldsymbol{\hat y}^{(i)} stay as close as possible to the probability distribution $\boldsymbol{y}^{(i)}$ of the actual label.
+As mentioned earlier, using softmax operations makes it easier to calculate errors with discrete labels. We already know that the softmax operation transforms the output into a legal class prediction distribution. As a matter of fact, actual labels can be expressed by classification distribution: for example $i$, we construct vector $\boldsymbol{y}^{(i)}\in \mathbb{R}^{q}$ to make its $y^{(i)}$th element (the discrete value of example $i$) equal to 1, and the rest equal to 0.  This way, our training goal can be set to make the predicted probability distribution $\boldsymbol{\hat y}^{(i)}$ stay as close as possible to the probability distribution $\boldsymbol{y}^{(i)}$ of the actual label.
 
 我们可以像线性回归那样使用平方损失函数$\|\boldsymbol{\hat y}^{(i)}-\boldsymbol{y}^{(i)}\|^2/2$。然而，想要预测分类结果正确，我们其实并不需要预测概率完全等于标签概率。例如在图像分类的例子里，如果$y^{(i)}=3$，那么我们只需要$\hat{y}^{(i)}_3$比其他两个预测值$\hat{y}^{(i)}_1$和$\hat{y}^{(i)}_2$大就行了。即使$\hat{y}^{(i)}_3$值为0.6，不管其他两个预测值为多少，类别预测均正确。而平方损失则过于严格，例如$\hat y^{(i)}_1=\hat y^{(i)}_2=0.2$比$\hat y^{(i)}_1=0, \hat y^{(i)}_2=0.4$的损失要小很多，虽然两者都有同样正确的分类预测结果。
 
 One way to address this issue is to use a measurement function that is more suitable for measuring the difference between two probability distributions. For cases like this, cross entropy is a commonly used measurement method:
 
-$H\left(\boldsymbol y^{(i)}, \boldsymbol {\hat y}^{(i)}\right ) = -\sum_{j=1}^q y_j^{(i)} \log \hat y_j^{(i)},$
+$$H\left(\boldsymbol y^{(i)}, \boldsymbol {\hat y}^{(i)}\right ) = -\sum_{j=1}^q y_j^{(i)} \log \hat y_j^{(i)},$$
 
 The subscripted $y_j^{(i)}$ is an element of the vector $\boldsymbol y^{(i)}$ that is either 0 or 1. You need to pay attention to its difference from the category discrete value of example $i$, which is $y^{(i)}$ without subscript. From the formula above, we know that only the $y^{(i)}$th element $y^{(i)}_{y^{(i)}}$, from the vector $\boldsymbol y^{(i)}$, is 1, and all the rest are 0. Hence, $H(\boldsymbol y^{(i)}, \boldsymbol {\hat y}^ {(i)}) = -\log \hat y_{y^{(i)}}^{(i)}$. That is to say, cross entropy only concerns the prediction probability of the correct category. As long as its value is large enough, we can ensure that the classification result is correct. Of course, when an example has multiple labels, as when there is more than one object in the image, we cannot use this simplification method. Even in this case, the cross entropy is only concerned with the prediction probability of the class of objects appearing in the image.
 
 
 Let us assume that the number of examples in the training data set is $n$, and the cross-entropy loss function is defined as
-$\ell(\boldsymbol{\Theta}= \frac{1}{n}  \sum_{i=1}^n H\left(\boldsymbol y^{(i)}, \boldsymbol {\hat y}^{(i)}\right ),$
+
+$$\ell(\boldsymbol{\Theta}= \frac{1}{n}  \sum_{i=1}^n H\left(\boldsymbol y^{(i)}, \boldsymbol {\hat y}^{(i)}\right ),$$
 
 Here, $\boldsymbol{\Theta}$ represents the model parameters.  Similarly, if there is only one label per example, the cross-entropy loss can be abbreviated as $\ell(\boldsymbol{\Theta}= -(1/n) \sum_{i=1}^n \log \hat y_{y^{(i)}}^{(i)}$. From another perspective, we know that the minimization of $\ell(\boldsymbol{\Theta})$ is equal to the maximization of $\exp(-n\ell(\boldsymbol{\Theta}))=\prod_{i=1}^n \hat y_{y^{(i)}}^{(i)}$. In other words, minimizing the cross-entropy loss function is equivalent to maximizing the joint prediction probability of all label categories of the training data set.
 

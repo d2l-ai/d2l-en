@@ -21,7 +21,7 @@ net.initialize(init.Normal(sigma=0.01))
 
 ## Reading Data and Training Model
 
-We use almost the same steps for softmax regression training as we do for reading and training the model.  
+We use almost the same steps for softmax regression training as we do for reading and training the model.
 
 ```{.python .input  n=6}
 batch_size = 256
@@ -43,6 +43,6 @@ gb.train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size,
 * Try adding a few more hidden layers to compare the implementation that started from scratch in the previous section.  
 * Use other activation functions to see resulting effects. 
 
-## Scan the QR code to get to the  https://discuss.gluon.ai/t/topic/738) forum
+## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/738)
 
 ![](../img/qr_mlp-gluon.svg)

@@ -7,21 +7,21 @@ Up to now, we have only discussed recurrent neural networks with a single unidir
 
 In time step $t$, we assume the mini-batch input is given as $\boldsymbol{X}_t \in \mathbb{R}^{n \times d}$ (number of examples: $n$, number of inputs: $d$). The hidden state of hidden layer $\ell$ ($\ell=1,\ldots,T$) is $\boldsymbol{H}_t^{(\ell)}  \in \mathbb{R}^{n \times h}$ (number of hidden units: $h$), the output layer variable is $\boldsymbol{O}_t \in \mathbb{R}^{n \times q}$ (number of outputs: $q$), and the hidden layer activation function is $\phi$. The hidden state of hidden layer 1 is calculated in the same way as before:
 
-$\boldsymbol{H}_t^{(1)} = \phi(\boldsymbol{X}_t \boldsymbol{W}_{xh}^{(1)} + \boldsymbol{H}_{t-1}^{(1)} \boldsymbol{W}_{hh}^{(1)}  + \boldsymbol{b}_h^{(1)}),$
+$$\boldsymbol{H}_t^{(1)} = \phi(\boldsymbol{X}_t \boldsymbol{W}_{xh}^{(1)} + \boldsymbol{H}_{t-1}^{(1)} \boldsymbol{W}_{hh}^{(1)}  + \boldsymbol{b}_h^{(1)}),$$
 
 
 Here, the weight parameters $\boldsymbol{W}_{xh}^{(1)} \in \mathbb{R}^{d \times h} and \boldsymbol{W}_{hh}^{(1)} \in \mathbb{R}^{h \times h}$ and bias parameter $\boldsymbol{b}_h^{(1)} \in \mathbb{R}^{1 \times h}$ are the model parameters of hidden layer 1.
 
 When $1 < \ell \leq L$, the hidden state of hidden layer $\ell$ is expressed as follows:
 
-$\boldsymbol{H}_t^{(\ell)} = \phi(\boldsymbol{H}_t^{(\ell-1)} \boldsymbol{W}_{xh}^{(\ell)} + \boldsymbol{H}_{t-1}^{(\ell)} \boldsymbol{W}_{hh}^{(\ell)}  + \boldsymbol{b}_h^{(\ell)}),$
+$$\boldsymbol{H}_t^{(\ell)} = \phi(\boldsymbol{H}_t^{(\ell-1)} \boldsymbol{W}_{xh}^{(\ell)} + \boldsymbol{H}_{t-1}^{(\ell)} \boldsymbol{W}_{hh}^{(\ell)}  + \boldsymbol{b}_h^{(\ell)}),$$
 
 
 Here, the weight parameters $\boldsymbol{W}_{xh}^{(\ell)} \in \mathbb{R}^{h \times h} and \boldsymbol{W}_{hh}^{(\ell)} \in \mathbb{R}^{h \times h}$ and bias parameter $\boldsymbol{b}_h^{(\ell)} \in \mathbb{R}^{1 \times h}$ are the model parameters of hidden layer $\ell$.
 
 Finally, the output of the output layer is only based on the hidden state of hidden layer $L$:
 
-$\boldsymbol{O}_t = \boldsymbol{H}_t^{(L)} \boldsymbol{W}_{hq} + \boldsymbol{b}_q,$
+$$\boldsymbol{O}_t = \boldsymbol{H}_t^{(L)} \boldsymbol{W}_{hq} + \boldsymbol{b}_q,$$
 
 Here, the weight parameter $\boldsymbol{W}_{hq} \in \mathbb{R}^{h \times q}$ and bias parameter $\boldsymbol{b}_q \in \mathbb{R}^{1 \times q}$ are the model parameters of the output layer.
 

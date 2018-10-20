@@ -26,7 +26,7 @@ There are many ways to randomly initialize model parameters. In the [“Gluon Im
 
 There is also a more commonly used random initialization method called the Xavier random initialization[1]. Suppose that the number of inputs of a fully connected layer is $a$ and the number of outputs is $b$. Xavier random initialization will cause each element of the weight parameter in the layer to be randomly sampled in an even distribution.
 
-$U\left(-\sqrt{\frac{6}{a+b}}, \sqrt{\frac{6}{a+b}}\right).$
+$$U\left(-\sqrt{\frac{6}{a+b}}, \sqrt{\frac{6}{a+b}}\right).$$
 
 Its design mainly considers the fact that after the model parameters are initialized, the variance of each layer's output should not be affected by the number of inputs of the layer. The variance of each layer's gradient should also not be affected by the number of outputs of the layer.
 

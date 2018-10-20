@@ -13,7 +13,7 @@ We can use a simple prediction of housing prices as an example to help better ex
 
 Suppose the house has an area of $x_1$, the age is $x_2$, and the selling price is $y$. We need to build an expression that calculates the output $y$ based on the input $x_1$ and $x_2$. This information constitutes the model. As the name suggests, linear regression assumes a linear relationship between the output and each input:
 
-$\hat{y}= x_1 w_1 + x_2 w_2 + b,$
+$$\hat{y}= x_1 w_1 + x_2 w_2 + b,$$
 
 Both the weight, $w_1, w_2$ and the bias, $b$ are scalar. They are the parameters of the linear regression model. The model output $\hat{y}$ is the prediction or estimate of the linear regression for the actual price $y$. We usually allow for some error between them.
 
@@ -28,23 +28,23 @@ We usually collect a set real data, such as the actual selling price of multiple
 
 Suppose the number of samples we collect is $n$, and the sample (indexed as $i$) is featured by $x_1^{(i)}, x_2^{(i)}$, and the label is $y^{(i)}$. For houses with an index of $i$, the house price prediction expression for the linear regression model is as follows:
 
-$\hat{y}^{(i)} = x_1^{(i)} w_1 + x_2^{(i)} w_2 + b.$
+$$\hat{y}^{(i)} = x_1^{(i)} w_1 + x_2^{(i)} w_2 + b.$$
 
 #### Loss Function
 
 In model training, we need to measure the error between the predicted value and the real value of the price. Usually, we will choose a non-negative number as the error. The smaller the value, the smaller the error. A common choice is the square function. The expression for evaluating the error of a sample with an index of $i$ is as follows:
 
-$\ell^{(i)}(w_1, w_2, b) = \frac{1}{2} \left(\hat{y}^{(i)} - y^{(i)}\right)^2,$
+$$\ell^{(i)}(w_1, w_2, b) = \frac{1}{2} \left(\hat{y}^{(i)} - y^{(i)}\right)^2,$$
 
 The constant $1/2$ ensures that the constant coefficient, after deriving the quadratic term, is 1, which is slightly simpler in form. Obviously, the smaller the error, the closer the predicted price is to the actual price, and when the two are equal, the error will be zero. Given the training data set, this error is only related to the model parameters, so we record it as a function with the model parameters as parameters. In machine learning, we call the function that measures the error the ‘loss function’. The squared error function used here is also referred to as ‘square loss’.
 
 In general, we measure the quality of model predictions by using the average of all sample errors in the training data set. For example:
 
-$\ell(w_1, w_2, b) =\frac{1}{n}\sum_{i=1}^n \ell^{(i)}(w_1, w_2, b) =\frac{1}{n} \sum_{i=1}^n \frac{1}{2}\left(x_1^{(i)} w_1 + x_2^{(i)} w_2 + b - y^{(i)}\right)^2.$
+$$\ell(w_1, w_2, b) =\frac{1}{n}\sum_{i=1}^n \ell^{(i)}(w_1, w_2, b) =\frac{1}{n} \sum_{i=1}^n \frac{1}{2}\left(x_1^{(i)} w_1 + x_2^{(i)} w_2 + b - y^{(i)}\right)^2.$$
 
 In model training, we want to find a set of model parameters, represented by $w_1^*, w_2^*, b^*$, that can minimize the average loss of training samples:
 
-$w_1^*, w_2^*, b^* = \operatorname*{argmin}_{w_1, w_2, b}\  \ell(w_1, w_2, b).$
+$$w_1^*, w_2^*, b^* = \operatorname*{argmin}_{w_1, w_2, b}\  \ell(w_1, w_2, b).$$
 
 
 #### Optimization Algorithm
@@ -159,16 +159,16 @@ a + b
 
 Generally, when the number of data examples is $n$ and the feature number is $d$, the vector calculation expression for linear regression is
 
-$\boldsymbol{\hat{y}} = \boldsymbol{X} \boldsymbol{w} + b,$
+$$\boldsymbol{\hat{y}} = \boldsymbol{X} \boldsymbol{w} + b,$$
 
 Model output is $\boldsymbol{\hat{y}} \in \mathbb{R}^{n \times 1}$, batch data example feature is $\boldsymbol{X} \in \mathbb{R}^{n \times d}$, weight is $\boldsymbol{w} \in \mathbb{R}^{d \times 1}$, bias is $b \in \mathbb{R}$. Correspondingly, batch data example label is $\boldsymbol{y}\in \mathbb{R}^{n \times 1}$. Set the model parameter to $\boldsymbol{\theta}= [w_1, w_2, b]^\top$, we can rewrite the loss function to
 
 
-$\ell(\boldsymbol{w})=\frac{1}{2n}(\boldsymbol{\hat{y}}-\boldsymbol{y})^\top(\boldsymbol{\hat{y}}-\boldsymbol{y}).$
+$$\ell(\boldsymbol{w})=\frac{1}{2n}(\boldsymbol{\hat{y}}-\boldsymbol{y})^\top(\boldsymbol{\hat{y}}-\boldsymbol{y}).$$
 
 The iteration steps of mini-batch stochastic gradient descent will be rewritten accordingly to
 
-$\boldsymbol{\theta}\leftarrow \boldsymbol{\theta} -   \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}}   \nabla_{\boldsymbol{\theta}} \ell^{(i)}(\boldsymbol{\theta}),$
+$$\boldsymbol{\theta}\leftarrow \boldsymbol{\theta} -   \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}}   \nabla_{\boldsymbol{\theta}} \ell^{(i)}(\boldsymbol{\theta}),$$
 
 其中梯度是损失有关三个为标量的模型参数的偏导数组成的向量：
 
