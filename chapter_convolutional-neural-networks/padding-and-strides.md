@@ -2,7 +2,7 @@
 
 In the example in the previous section, we used an input with a height and width of 3 and a convolution kernel with a height and width of 2 to get an output with a height and a width of 2. In general, assuming the input shape is $n_h\times n_w$ and the convolution kernel window shape is $k_h\times k_w$, then the output shape will be
 
-$(n_h-k_h+1) \times (n_w-k_w+1).$
+$$(n_h-k_h+1) \times (n_w-k_w+1).$$
 
 Therefore, the output shape of the convolutional layer is determined by the shape of the input and the shape of the convolution kernel window. In this section, we will introduce the two hyper-parameters of the convolutional layer, padding and stride. They can change the output shape for an input and convolution kernel of a given shape.
 
@@ -14,7 +14,7 @@ Padding refers to padding elements (usually 0 elements) added on both sides of t
 
 In general, if a total of $p_h$ rows are padded on both sides of the height and a total of $p_w$ columns are padded on both sides of width, the output shape will be
 
-$(n_h-k_h+p_h+1)\times(n_w-k_w+p_w+1),$
+$$(n_h-k_h+p_h+1)\times(n_w-k_w+p_w+1),$$
 
 This means that the height and width of the output will increase by $p_h$ and $p_w$ respectively.
 
@@ -60,7 +60,7 @@ In the current example, the stride is 1 in both the height and width directions.
 
 In general, when the stride on the height is $s_h$ and the stride on the width is $s_w$, the output shape is
 
-$\lfloor(n_h-k_h+p_h+s_h)/s_h\rfloor \times \lfloor(n_w-k_w+p_w+s_w)/s_w\rfloor.$
+$$\lfloor(n_h-k_h+p_h+s_h)/s_h\rfloor \times \lfloor(n_w-k_w+p_w+s_w)/s_w\rfloor.$$
 
 If we set $p_h=k_h-1$ and $p_w=k_w-1$, then the output shape will be simplified to $\lfloor(n_h+s_h-1)/s_h\rfloor \times \lfloor(n_w+s_w-1)/s_w\rfloor$. Going a step further, if the input height and width are divisible by the strides on the height and width, then the output shape will be $(n_h/s_h) \times (n_w/s_w)$.
 

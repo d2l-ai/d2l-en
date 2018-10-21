@@ -24,9 +24,9 @@ $$
 
 This is to say, the output of the hidden layer is used directly as the input of the output layer. If we combine the above two formulas, we can get
 
-$
+$$
 \boldsymbol{O}= (\boldsymbol{X} \boldsymbol{W}_h + \boldsymbol{b}_h)\boldsymbol{W}_o + \boldsymbol{b}_o = \boldsymbol{X} \boldsymbol{W}_h\boldsymbol{W}_o + \boldsymbol{b}_h \boldsymbol{W}_o + \boldsymbol{b}_o.
-$
+$$
 
 It can be seen from the formula after combination, although the neural network introduces the hidden layer, it is still equivalent to a single-layer neural network: the weight parameter of output layer is $\boldsymbol{W}_h\boldsymbol{W}_o$, the bias parameter is $\boldsymbol{b}_h \boldsymbol{W}_o + \boldsymbol{b}_o$. It is not difficult to find, even if more hidden layers are added, as the above formula is only able to obtain a single-layer neural network when using the output layer alone.
 
@@ -39,7 +39,7 @@ The root of the problem discussed above lies in the fully connected layer only p
 
 The ReLU (rectified linear unit) function provides a very simple nonlinear transformation. Given the element $x$, the function is defined as
 
-$\text{ReLU}(x) = \max(x, 0).$
+$$\text{ReLU}(x) = \max(x, 0).$$
 
 It can be understood that the ReLU function retains only positive elements and dissipates negative elements. To observe this nonlinear transformation visually, we must first define a plotting function `xyplot`.
 
@@ -76,7 +76,7 @@ xyplot(x, x.grad, 'grad of relu')
 
 The Sigmoid function can transform the value of an element between 0 and 1:
 
-$\text{sigmoid}(x) = \frac{1}{1 + \exp(-x)}.$
+$$\text{sigmoid}(x) = \frac{1}{1 + \exp(-x)}.$$
 
 The Sigmoid function is commonly used in early neural networks, but is currently being replaced by a simpler ReLU function. In the "Recurrent Neural Network" chapter, we will describe how to utilize the function’s ability to control the flow of information in the neural network thanks to its capacity to transform the value range between 0 and 1. The derivative of Sigmoid function is plotted below. When the input is close to 0, the Sigmoid function approaches linear transformation.
 
@@ -88,7 +88,7 @@ xyplot(x, y, 'sigmoid')
 
 According to the chain rule, the derivative of Sigmoid function is as follows:
 
-$\text{sigmoid}'(x) = \text{sigmoid}(x)\left(1-\text{sigmoid}(x)\right).$
+$$\text{sigmoid}'(x) = \text{sigmoid}(x)\left(1-\text{sigmoid}(x)\right).$$
 
 
 The derivative of Sigmoid function is plotted below. When the input is 0, the derivative of the Sigmoid function reaches a maximum of 0.25; as the input deviates further from 0, the derivative of Sigmoid function approaches 0.
@@ -102,7 +102,7 @@ xyplot(x, x.grad, 'grad of sigmoid')
 
 The Tanh (Hyperbolic Tangent) function transforms the value of an element between -1 and 1:
 
-$\text{tanh}(x) = \frac{1 - \exp(-2x)}{1 + \exp(-2x)}.$
+$$\text{tanh}(x) = \frac{1 - \exp(-2x)}{1 + \exp(-2x)}.$$
 
 We can then plot the Tanh function. As the input nears 0, the Tanh function approaches linear transformation. Although the shape of the function is similar to that of the Sigmoid function, the Tanh function is symmetric at the origin of the coordinate system.
 
@@ -114,7 +114,7 @@ xyplot(x, y, 'tanh')
 
 According to the chain rule, the derivative of Tanh function is:
 
-$\text{tanh}'(x) = 1 - \text{tanh}^2(x).$
+$$\text{tanh}'(x) = 1 - \text{tanh}^2(x).$$
 
 The derivative of Tanh function is plotted below. As the input nears 0, the derivative of the Tanh function approaches a maximum of 1; as the input deviates away from 0, the derivative of the Tanh function approaches 0.
 

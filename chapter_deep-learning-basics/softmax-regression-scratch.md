@@ -73,7 +73,7 @@ def net(X):
 
 ## Define the Loss Function
 
-In the last section, we introduced the cross-entropy loss function used by softmax regression. In order to get the label's predicted probability, we can use the `pick` function. In the example below, the variable `y_hat` is the predicted probability of 2 examples in 3 different categories, and variable `y` is the label category of those 2 examples.  Through the `pick` function, we get the label's predicted probability of 2 examples. In the ["Softmax regression"](softmax-regression.md) section, the label category's discrete value increases by 1 from 1. This mathematical expression is different in the code, where the increment of label category's discrete value starts from 0. 
+In the last section, we introduced the cross-entropy loss function used by softmax regression. In order to get the label's predicted probability, we can use the `pick` function. In the example below, the variable `y_hat` is the predicted probability of 2 examples in 3 different categories, and variable `y` is the label category of those 2 examples.  Through the `pick` function, we get the label's predicted probability of 2 examples. In the ["Softmax regression"](softmax-regression.md) section, the label category's discrete value increases by 1 from 1. This mathematical expression is different in the code, where the increment of label category's discrete value starts from 0.
 
 ```{.python .input  n=15}
 y_hat = nd.array([[0.1, 0.3, 0.6], [0.3, 0.2, 0.5]])
@@ -100,7 +100,7 @@ def accuracy(y_hat, y):
     return (y_hat.argmax(axis=1) == y.astype('float32')).mean().asscalar()
 ```
 
-We will continue to use the variables `y_hat` and `y` defined in the `pick` function, as the predicted probability distribution and label, respectively. We can see that the first example's prediction category is 2 (the largest element of the row is 0.6 with an index of 2), which is inconsistent with the actual label, 0. The second example's prediction category is 2 (the largest element of the row is 0.5 with an index of 2), which is consistent with the actual label, 2. Therefore, the classification accuracy rate for these two examples is 0.5. 
+We will continue to use the variables `y_hat` and `y` defined in the `pick` function, as the predicted probability distribution and label, respectively. We can see that the first example's prediction category is 2 (the largest element of the row is 0.6 with an index of 2), which is inconsistent with the actual label, 0. The second example's prediction category is 2 (the largest element of the row is 0.5 with an index of 2), which is consistent with the actual label, 2. Therefore, the classification accuracy rate for these two examples is 0.5.
 
 ```{.python .input  n=18}
 accuracy(y_hat, y)
@@ -118,7 +118,7 @@ def evaluate_accuracy(data_iter, net):
     return acc / len(data_iter)
 ```
 
-Because we randomly initialized the `net` model, the accuracy rate of this stochastic model should be close to 0.1, the reciprocal of 10, which is the number of categories. 
+Because we randomly initialized the `net` model, the accuracy rate of this stochastic model should be close to 0.1, the reciprocal of 10, which is the number of categories.
 
 ```{.python .input  n=20}
 evaluate_accuracy(test_iter, net)

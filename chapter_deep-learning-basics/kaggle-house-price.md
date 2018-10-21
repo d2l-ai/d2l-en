@@ -48,19 +48,19 @@ The training data set includes 1,460 examples, 80 features, and 1 label.
 train_data.shape
 ```
 
-The testing data set includes 1,459 examples and 80 features. In the testing data set, we need to predict the label for each example. 
+The testing data set includes 1,459 examples and 80 features. In the testing data set, we need to predict the label for each example.
 
 ```{.python .input  n=5}
 test_data.shape
 ```
 
-Let’s take a look at the first 4 and last 2 features as well as the label (SalePrice) from the first 4 examples: 
+Let’s take a look at the first 4 and last 2 features as well as the label (SalePrice) from the first 4 examples:
 
 ```{.python .input  n=28}
 train_data.iloc[0:4, [0, 1, 2, 3, -3, -2, -1]]
 ```
 
-We can see that in each example, the first feature is ID. This helps the model identify each training example, however it’s difficult to implement this in the testing example, so we don’t make use of it during training.  All 79 features of both the training and the testing data are linked by example. 
+We can see that in each example, the first feature is ID. This helps the model identify each training example, however it’s difficult to implement this in the testing example, so we don’t make use of it during training.  All 79 features of both the training and the testing data are linked by example.
 
 ```{.python .input  n=30}
 all_features = pd.concat((train_data.iloc[:, 1:-1], test_data.iloc[:, 1:]))
@@ -68,7 +68,7 @@ all_features = pd.concat((train_data.iloc[:, 1:-1], test_data.iloc[:, 1:]))
 
 ## Data Preprocessing
 
-To standardize the features of continuous values we need to set the feature with a mean of $\mu$ and a standard deviation of $\sigma$ throughout the entire data set. Next, we can subtract each of the feature’s values by $\mu$ and divide them by $\sigma$ to obtain each normalized eigenvalues. Missing eigenvalues are replaced with the feature mean. 
+To standardize the features of continuous values we need to set the feature with a mean of $\mu$ and a standard deviation of $\sigma$ throughout the entire data set. Next, we can subtract each of the feature’s values by $\mu$ and divide them by $\sigma$ to obtain each normalized eigenvalues. Missing eigenvalues are replaced with the feature mean.
 
 ```{.python .input  n=6}
 numeric_features = all_features.dtypes[all_features.dtypes != 'object'].index
@@ -98,7 +98,7 @@ train_labels = nd.array(train_data.SalePrice.values).reshape((-1, 1))
 
 ## To train a model
 
-To train the model, we use a basic linear regression model as well as a quadratic loss function. 
+To train the model, we use a basic linear regression model as well as a quadratic loss function.
 
 ```{.python .input  n=13}
 loss = gloss.L2Loss()
@@ -112,7 +112,7 @@ def get_net():
 
 Next, the root mean squared logarithmic error used by the competition is determined to evaluate the model.  The predicted values are preset to $\hat y_1, \ldots, \hat y_n$ and the corresponding real labels to $y_1,\ldots, y_n$, and are then defined as
 
-$\sqrt{\frac{1}{n}\sum_{i=1}^n\left(\log(y_i)-\log(\hat y_i)\right)^2}.$
+$$\sqrt{\frac{1}{n}\sum_{i=1}^n\left(\log(y_i)-\log(\hat y_i)\right)^2}.$$
 
 ```{.python .input  n=11}
 def log_rmse(net, train_features, train_labels):
@@ -167,7 +167,7 @@ def get_k_fold_data(k, i, X, y):
     return X_train, y_train, X_valid, y_valid
 ```
 
-The training and verification error averages are returned when we train $K$ times in the $K$-fold cross-validation. 
+The training and verification error averages are returned when we train $K$ times in the $K$-fold cross-validation.
 
 ```{.python .input  n=15}
 def k_fold(k, X_train, y_train, num_epochs,
@@ -191,7 +191,7 @@ def k_fold(k, X_train, y_train, num_epochs,
 
 ## Model Selection
 
-To calculate the amount of cross-validation errors, a set of un-tuned hyper parameters are used.  These hyper-parameters can be changed to minimize the testing error average. 
+To calculate the amount of cross-validation errors, a set of un-tuned hyper parameters are used.  These hyper-parameters can be changed to minimize the testing error average.
 
 ```{.python .input  n=16}
 k, num_epochs, lr, weight_decay, batch_size = 5, 100, 5, 0, 64
@@ -206,7 +206,7 @@ You will notice that sometimes the number of training errors for a set of hyper-
 
 ##  Determine your predictions and submit them on Kaggle. 
 
-The prediction function is as defined below. The completed training data set will be used to retrain the model before prediction and the results will be saved in the format required for submission. 
+The prediction function is as defined below. The completed training data set will be used to retrain the model before prediction and the results will be saved in the format required for submission.
 
 ```{.python .input  n=18}
 def train_and_pred(train_features, test_feature, train_labels, test_data,
@@ -222,7 +222,7 @@ def train_and_pred(train_features, test_feature, train_labels, test_data,
     submission.to_csv('submission.csv', index=False)
 ```
 
-After the model has been designed and the hyper-parameters have been adjusted, the next step is to predict the prices of the sample houses provided in the testing data set.  If the amount of training errors are similar to those of the cross-validation, then the predictions are potentially ideal and can be submitted on Kaggle. 
+After the model has been designed and the hyper-parameters have been adjusted, the next step is to predict the prices of the sample houses provided in the testing data set.  If the amount of training errors are similar to those of the cross-validation, then the predictions are potentially ideal and can be submitted on Kaggle.
 
 ```{.python .input  n=19}
 train_and_pred(train_features, test_features, train_labels, test_data,

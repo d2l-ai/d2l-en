@@ -11,7 +11,7 @@ from mxnet.gluon import loss as gloss
 
 ## Retrieve and read the data
 
-We continue to use the Fashion-MNIST data set. We will use the Multilayer Perceptron for image classification 
+We continue to use the Fashion-MNIST data set. We will use the Multilayer Perceptron for image classification
 
 ```{.python .input  n=2}
 batch_size = 256
@@ -37,7 +37,7 @@ for param in params:
 
 ## Defining Activation Function
 
-Here, we use the underlying `maximum` function to implement the ReLU process, instead of instructing `ReLU` to directly function. 
+Here, we use the underlying `maximum` function to implement the ReLU process, instead of instructing `ReLU` to directly function.
 
 ```{.python .input  n=4}
 def relu(X):
@@ -46,7 +46,7 @@ def relu(X):
 
 ## Define the model
 
-As softmax regression, with a`reshape` function, we changed each original image to a length vector of  `num_inputs`. We then implemented a Multilayer Perceptron calculation expression in the previous section. 
+As softmax regression, with a`reshape` function, we changed each original image to a length vector of  `num_inputs`. We then implemented a Multilayer Perceptron calculation expression in the previous section.
 
 ```{.python .input  n=5}
 def net(X):
@@ -57,7 +57,7 @@ def net(X):
 
 ## Define loss function
 
-For better numerical stability, we use Gluon's functions, including softmax calculation and cross-entropy loss calculation. 
+For better numerical stability, we use Gluon's functions, including softmax calculation and cross-entropy loss calculation.
 
 ```{.python .input  n=6}
 loss = gloss.SoftmaxCrossEntropyLoss()
