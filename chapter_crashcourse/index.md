@@ -6,7 +6,7 @@ still recommend that you read it, since it will explain how to set up
 the software, how to use automatic differentiation and how to
 manipulate data and memory. We also provide quick primers on linear
 algebra and statistics, designed to help readers to get up to speed on
-the basics. 
+the basics.
 
 ```eval_rst
 
@@ -15,8 +15,8 @@ the basics.
 
    introduction
    install
-   linear-algebra
    ndarray
+   linear-algebra 
    autograd
    probability
    lookup-api
