@@ -2,7 +2,7 @@
 set -e
 
 # check no ipynb files
-IPYNB=`find . -type f -name "*.ipynb"`
+IPYNB=`find chapter* -type f -name "*.ipynb"`
 if [[ ! -z "$IPYNB" ]]; then
     echo "ERROR: Find the following .ipynb files. "
     echo "$IPYNB"
