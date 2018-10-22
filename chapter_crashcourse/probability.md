@@ -474,18 +474,6 @@ for i in range(10):
     print(random.random())
 ```
 
-    0.970844720223
-    0.11442244666
-    0.476145849846
-    0.154138063676
-    0.925771401913
-    0.347466944833
-    0.288795056587
-    0.855051122608
-    0.32666729925
-    0.932922304219
-
-
 ### Uniform Distribution
 
 These are some pretty random numbers. As we can see, their range is between 0 and 1, and they are evenly distributed. That is, there is (actually, should be, since this is not a *real* random number generator) no interval in which numbers are more likely than in any other. In other words, the chances of any of these numbers to fall into the interval, say $[0.2,0.3)$ are as high as in the interval $[.593264, .693264)$. The way they are generated internally is to produce a random integer first, and then divide it by its maximum range. If we want to have integers directly, try the following instead. It generates random numbers between 0 and 100.
@@ -495,17 +483,6 @@ These are some pretty random numbers. As we can see, their range is between 0 an
 for i in range(10):
     print(random.randint(1, 100))
 ```
-
-    75
-    23
-    34
-    85
-    99
-    66
-    13
-    42
-    19
-    14
 
 
 What if we wanted to check that ``randint`` is actually really uniform. Intuitively the best strategy would be to run it, say 1 million times, count how many times it generates each one of the values and to ensure that the result is uniform.

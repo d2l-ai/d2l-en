@@ -381,17 +381,6 @@ B = nd.ones(shape=(4, 5))
 nd.dot(A, B)
 ```
 
-
-
-
-
-    [[ 4.  4.  4.  4.  4.]
-     [ 4.  4.  4.  4.  4.]
-     [ 4.  4.  4.  4.  4.]]
-    <NDArray 3x5 @cpu(0)>
-
-
-
 ## Norms
 
 Before we can start implementing models,
