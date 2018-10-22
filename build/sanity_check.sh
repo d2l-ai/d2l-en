@@ -14,7 +14,7 @@ fi
 
 # check no output
 HAS_OUTPUT=0
-for FNAME in `find . -type f -name "*.md"`; do
+for FNAME in `find chapter* -type f -name "*.md"`; do
     OUTPUT=""
     IN_CODE=0
     IFS=''
