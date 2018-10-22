@@ -142,6 +142,7 @@
 * https://www.the-qrcode-generator.com/
     * 75pixel, SVG
 
+
 ## References
 
 * Append references at the end of each section
