@@ -1,4 +1,3 @@
-
 # Probability and statistics
 
 
@@ -83,7 +82,6 @@ Before going into the details of what's going here, let's try it out.
 
 To start, let's import the necessary packages:
 
-
 ```{.python .input}
 import mxnet as mx
 from mxnet import nd
@@ -99,7 +97,6 @@ In MXNet, we can sample from the multinomial distribution via the aptly named `n
 The function can be called in many ways, but we'll focus on the simplest.
 To draw a single sample, we simply give pass in a vector of probabilities.
 
-
 ```{.python .input}
 probabilities = nd.ones(6) / 6
 nd.random.multinomial(probabilities)
@@ -112,7 +109,6 @@ we often want to generate many samples from the same distribution.
 It would be really slow to do this with a Python `for` loop,
 so `random.multinomial` supports drawing multiple samples at once,
 returning an array of independent samples in any shape we might desire.
-
 
 ```{.python .input}
 print(nd.random.multinomial(probabilities, shape=(10)))
@@ -154,13 +150,11 @@ So we can normalize each $j$-th column of the counts vector by the number of tos
 to give the `current` estimated probabilities at that time.
 The counts object looks like this:
 
-
 ```{.python .input}
 counts
 ```
 
 Normalizing by the number of tosses, we get:
-
 
 ```{.python .input}
 x = nd.arange(1000).reshape((1,1000)) + 1
@@ -173,18 +167,17 @@ print(estimates[:,100])
 As you can see, after the first toss of the die, we get the extreme estimate that one of the numbers will be rolled with probability $1.0$ and that the others have probability $0$. After $100$ rolls, things already look a bit more reasonable.
 We can visualize this convergence by using the plotting package `matplotlib`. If you don't have it installed, now would be a good time to [install it](https://matplotlib.org/).
 
-
-
 ```{.python .input}
 %matplotlib inline
 from matplotlib import pyplot as plt
 
+plt.figure(figsize=(15, 8))
 for i in range(6):
-  plt.plot(estimates[0, :].asnumpy(), label=("P(die=" + str(i) +")"))
+    plt.plot(estimates[i, :].asnumpy(), label=("P(die=" + str(i) +")"))
 
 plt.axhline(y=0.16666, color='black', linestyle='dashed')
 plt.legend()
-plt.show()
+plt.show()   
 ```
 
 Each solid curve corresponds to one of the six values of the die
@@ -364,7 +357,6 @@ After all that math, it's time for some code to show how to use a Naive Bayes cl
 
 The problem is that we don't actually know $p(y)$ and $p(x_i|y)$. So we need to *estimate* it given some training data first. This is what is called *training* the model. In the case of 10 possible classes we simply compute $n_y$, i.e. the number of occurrences of class $y$ and then divide it by the total number of occurrences. E.g. if we have a total of 60,000 pictures of digits and digit 4 occurs 5800 times, we estimate its probability as $\frac{5800}{60000}$. Likewise, to get an idea of $p(x_i|y)$ we count how many times pixel $i$ is set for digit $y$ and then divide it by the number of occurrences of digit $y$. This is the probability that that very pixel will be switched on.
 
-
 ```{.python .input}
 import numpy as np
 
@@ -399,7 +391,6 @@ py = ycount / nd.sum(ycount)
 
 Now that we computed per-pixel counts of occurrence for all pixels, it's time to see how our model behaves. Time to plot it. We show the estimated probabilities of observing a switched-on pixel. These are some mean looking digits.
 
-
 ```{.python .input}
 import matplotlib.pyplot as plt
 fig, figarr = plt.subplots(1, 10, figsize=(15, 15))
@@ -420,7 +411,6 @@ l_y :=& \sum_i \log p(x_i|y) \\
  \end{eqnarray}$$
 
 To avoid recomputing logarithms all the time, we precompute them for all pixels.
-
 
 ```{.python .input}
 logxcount = nd.log(xcount)
@@ -467,7 +457,6 @@ As we can see, this classifier is both incompetent and overly confident of its i
 
 Random numbers are just one form of random variables, and since computers are particularly good with numbers, pretty much everything else in code ultimately gets converted to numbers anyway. One of the basic tools needed to generate random numbers is to sample from a distribution. Let's start with what happens when we use a random number generator.
 
-
 ```{.python .input}
 import random
 for i in range(10):
@@ -478,15 +467,12 @@ for i in range(10):
 
 These are some pretty random numbers. As we can see, their range is between 0 and 1, and they are evenly distributed. That is, there is (actually, should be, since this is not a *real* random number generator) no interval in which numbers are more likely than in any other. In other words, the chances of any of these numbers to fall into the interval, say $[0.2,0.3)$ are as high as in the interval $[.593264, .693264)$. The way they are generated internally is to produce a random integer first, and then divide it by its maximum range. If we want to have integers directly, try the following instead. It generates random numbers between 0 and 100.
 
-
 ```{.python .input}
 for i in range(10):
     print(random.randint(1, 100))
 ```
 
-
 What if we wanted to check that ``randint`` is actually really uniform. Intuitively the best strategy would be to run it, say 1 million times, count how many times it generates each one of the values and to ensure that the result is uniform.
-
 
 ```{.python .input}
 import math
@@ -504,13 +490,11 @@ for i in range(1, 1000001):
 plt.show()
 ```
 
-
 What we can see from the above figures is that the initial number of counts looks *very* uneven. If we sample fewer than 100 draws from a distribution over 100 outcomes this is pretty much expected. But even for 1000 samples there is a significant variability between the draws. What we are really aiming for is a situation where the probability of drawing a number $x$ is given by $p(x)$.
 
 ### The categorical distribution
 
 Quite obviously, drawing from a uniform distribution over a set of 100 outcomes is quite simple. But what if we have nonuniform probabilities? Let's start with a simple case, a biased coin which comes up heads with probability 0.35 and tails with probability 0.65. A simple way to sample from that is to generate a uniform random variable over $[0,1]$ and if the number is less than $0.35$, we output heads and otherwise we generate tails. Let's try this out.
-
 
 ```{.python .input}
 # number of samples
@@ -527,8 +511,6 @@ plt.semilogx(x, p1)
 plt.show()
 ```
 
-
-
 As we can see, on average this sampler will generate 35% zeros and 65% ones. Now what if we have more than two possible outcomes? We can simply generalize this idea as follows. Given any probability distribution, e.g.
 $p = [0.1, 0.2, 0.05, 0.3, 0.25, 0.1]$ we can compute its cumulative distribution (python's ``cumsum`` will do this for you) $F = [0.1, 0.3, 0.35, 0.65, 0.9, 1]$. Once we have this we draw a random variable $x$ from the uniform distribution $U[0,1]$ and then find the interval where $F[i-1] \leq x < F[i]$. We then return $i$ as the sample. By construction, the chances of hitting interval $[F[i-1], F[i])$ has probability $p(i)$.
 
@@ -537,7 +519,6 @@ Note that there are many more efficient algorithms for sampling than the one abo
 ### The Normal distribution
 
 The Normal distribution (aka the Gaussian distribution) is given by $p(x) = \frac{1}{\sqrt{2 \pi}} \exp\left(-\frac{1}{2} x^2\right)$. Let's plot it to get a feel for it.
-
 
 ```{.python .input}
 x = np.arange(-10, 10, 0.01)
@@ -564,7 +545,6 @@ $\sigma^2 = \mathbb{E}_{x \sim p(x)}[x^2] - \mathbb{E}^2_{x \sim p(x)}[x]$.
 The above allows us to change both mean and variance of random variables. Quite obviously for some random variable $x$ with mean $\mu$, the random variable $x + c$ has mean $\mu + c$. Moreover, $\gamma x$ has the variance $\gamma^2 \sigma^2$. Applying this to the normal distribution we see that one with mean $\mu$ and variance $\sigma^2$ has the form $p(x) = \frac{1}{\sqrt{2 \sigma^2 \pi}} \exp\left(-\frac{1}{2 \sigma^2} (x-\mu)^2\right)$. Note the scaling factor $\frac{1}{\sigma}$ - it arises from the fact that if we stretch the distribution by $\sigma$, we need to lower it by $\frac{1}{\sigma}$ to retain the same probability mass (i.e. the weight under the distribution always needs to integrate out to 1).
 
 Now we are ready to state one of the most fundamental theorems in statistics, the [Central Limit Theorem](https://en.wikipedia.org/wiki/Central_limit_theorem). It states that for sufficiently well-behaved random variables, in particular random variables with well-defined mean and variance, the sum tends toward a normal distribution. To get some idea, let's repeat the experiment described in the beginning, but now using random variables with integer values of $\{0, 1, 2\}$.
-
 
 ```{.python .input}
 # generate 10 random sequences of 10,000 random normal variables N(0,1)

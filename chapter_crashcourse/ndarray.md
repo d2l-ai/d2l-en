@@ -80,7 +80,6 @@ In some cases, we need to randomly generate the value of each element in the NDA
 nd.random.normal(0, 1, shape=(3, 4))
 ```
 
-
 ## Operations
 
 Oftentimes, we want to apply functions to arrays.
@@ -94,28 +93,29 @@ by setting $c_i \gets f(u_i, v_i)$ for all $i$.
 Here, we produced the vector-valued $F: \mathcal{R}^d \rightarrow \mathcal{R}^d$
 by *lifting* the scalar function to an element-wise vector operation.
 In MXNet, the common standard arithmetic operators (+,-,/,\*,\*\*)
-have all been *lifted* to element-wise operations for identically-shaped tensors of arbitrary shape. We can call element-wise operations on any two tensors of the same shape, including matrices. 
+have all been *lifted* to element-wise operations for identically-shaped tensors of arbitrary shape. We can call element-wise operations on any two tensors of the same shape, including matrices.
 
-
-```python
-u = nd.array([1, 2, 4, 8])
-v = nd.ones_like(u) * 2
-print('v =', v)
-print('u + v', u + v)
-print('u - v', u - v)
-print('u * v', u * v)
-print('u / v', u / v)
+```{.python .input}
+x = nd.array([1, 2, 4, 8])
+y = nd.ones_like(x) * 2
+print('x =', x)
+print('x + y', x + x)
+print('x - y', x - x)
+print('x * y', x * x)
+print('x / y', x / x)
 ```
 
 Many more operations can be applied element-wise, such as exponentiation:
 
 ```{.python .input  n=12}
-u.exp()
+x.exp()
 ```
 
-In addition to computations by element, we can also use the `dot` function for matrix operations. Next, we will perform matrix multiplication to transpose `x` and `y`. Since `x` is a matrix of 3 rows and 4 columns, `y` is transposed into a matrix of 4 rows and 3 columns. The two matrices are multiplied to obtain a matrix of 3 rows and 3 columns (if you're confused about what this means, don't worry - we will explain matrix operations in much more detail in the chapter on [linear algebra](linear_algebra.md)).
+In addition to computations by element, we can also use the `dot` function for matrix operations. Next, we will perform matrix multiplication to transpose `x` and `y`. We define `x` as a matrix of 3 rows and 4 columns, and `y` is transposed into a matrix of 4 rows and 3 columns. The two matrices are multiplied to obtain a matrix of 3 rows and 3 columns (if you're confused about what this means, don't worry - we will explain matrix operations in much more detail in the chapter on [linear algebra](linear_algebra.md)).
 
 ```{.python .input  n=13}
+x = nd.arange(12).reshape((3,4))
+y = nd.array([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 nd.dot(x, y.T)
 ```
 
@@ -208,6 +208,7 @@ print('id(z):', id(z))
 While this looks pretty, `x+y` here will still allocate a temporary buffer to store the result of `x+y` before copying it to `y[:]`. To make even better use of memory, we can directly invoke the underlying `ndarray` operation, in this case `elemwise_add`, avoiding temporary buffers. We do this by specifying the `out` keyword argument, which every `ndarray` operator supports:
 
 ```{.python .input  n=17}
+before = id(z)
 nd.elemwise_add(x, y, out=z)
 id(z) == before
 ```
@@ -227,11 +228,10 @@ Converting MXNet NDArrays to and from NumPy is easy. The converted arrays do *no
 ```{.python .input  n=22}
 import numpy as np
 
-a = np.ones((2, 3))
+a = x.asnumpy()
+print(type(a))
 b = nd.array(a)
-type(d)
-c = b.asnumpy()
-type(c)
+print(type(b))
 ```
 
 ## Exercises
