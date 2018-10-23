@@ -14,24 +14,37 @@ fi
 
 # check no output
 HAS_OUTPUT=0
-for FNAME in `find chapter* -type f -name "*.md"`; do
+#for FNAME in `find chapter* -type f -name "*.md"`; do
+for FNAME in `find chapter* -type f -name "adadelta.md"`; do
     OUTPUT=""
     IN_CODE=0
+	IN_JSON_OUTPUT=0
     IFS=''
-    L=1
+    L=1 
     while read LINE; do
-        if [[ "$LINE" =~ ^\`\`\`.* ]]; then
-            IN_CODE=$(($IN_CODE ^ 1))
+        if [[ "$LINE" =~ ^\`\`\`\{\.json\ \.output ]]; then
+			IN_JSON_OUTPUT=1
+        elif [[ "$LINE" =~ ^\`\`\`.* ]]; then
+			if [[ "$IN_JSON_OUTPUT" == "1" ]]; then
+				IN_JSON_OUTPUT=0
+			else
+				IN_CODE=$(($IN_CODE ^ 1))
+			fi
         fi
 
-        if [[ "$LINE" =~ ^\$\$.* ]] && ! [[ "$LINE" =~ .+\$\$$ ]]; then
-            IN_CODE=$(($IN_CODE ^ 1))
-        fi
+        # Skip one-line math. 
+        if ! [[ "$LINE" =~ ^\$\$.+ ]] || ! [[ "$LINE" =~ .+\$\$$ ]]; then
+        # Math also allows multiple space at the beginning of a line.
+            if [[ "$LINE" =~ ^\$\$.* ]] || [[ "$LINE" =~ .*\$\$$ ]]; then
+                IN_CODE=$(($IN_CODE ^ 1))
+            fi  
+        fi                                                                                                                   
 
-        if [[ "$LINE" =~ ^\ \ \ .* ]] && [[ "$IN_CODE" == "0" ]]; then
+
+        if [[ "$LINE" =~ ^\ \ \ .* ]] && [[ "$IN_CODE" == "0" ]] || [[ "$IN_JSON_OUTPUT" == "1" ]]; then
             echo $FNAME $LINE
             OUTPUT=$(printf "$OUTPUT\nL$L: $LINE")
-        fi
+        fi  
         L=$((L+1))
     done <"$FNAME"
 
@@ -39,7 +52,7 @@ for FNAME in `find chapter* -type f -name "*.md"`; do
         echo "ERROR: $FNAME contains the following cell outputs:"
         echo $OUTPUT
         HAS_OUTPUT=1
-    fi
+    fi  
 done
 
 if [[ "$HAS_OUTPUT" == "1" ]]; then
