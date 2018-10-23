@@ -17,18 +17,18 @@ HAS_OUTPUT=0
 for FNAME in `find chapter* -type f -name "*.md"`; do
     OUTPUT=""
     IN_CODE=0
-	IN_JSON_OUTPUT=0
+    IN_JSON_OUTPUT=0
     IFS=''
     L=1
     while read LINE; do
         if [[ "$LINE" =~ ^\`\`\`\{\.json\ \.output ]]; then
-			IN_JSON_OUTPUT=1
+            IN_JSON_OUTPUT=1
         elif [[ "$LINE" =~ ^\`\`\`.* ]]; then
-			if [[ "$IN_JSON_OUTPUT" == "1" ]]; then
-				IN_JSON_OUTPUT=0
-			else
-				IN_CODE=$(($IN_CODE ^ 1))
-			fi
+            if [[ "$IN_JSON_OUTPUT" == "1" ]]; then
+                IN_JSON_OUTPUT=0
+            else
+                IN_CODE=$(($IN_CODE ^ 1))
+            fi
         fi
 
         # Skip one-line math.
