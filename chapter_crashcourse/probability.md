@@ -84,7 +84,7 @@ Before going into the details of what's going here, let's try it out.
 To start, let's import the necessary packages:
 
 
-```python
+```{.python .input}
 import mxnet as mx
 from mxnet import nd
 ```
@@ -100,7 +100,7 @@ The function can be called in many ways, but we'll focus on the simplest.
 To draw a single sample, we simply give pass in a vector of probabilities.
 
 
-```python
+```{.python .input}
 probabilities = nd.ones(6) / 6
 nd.random.multinomial(probabilities)
 ```
@@ -114,7 +114,7 @@ so `random.multinomial` supports drawing multiple samples at once,
 returning an array of independent samples in any shape we might desire.
 
 
-```python
+```{.python .input}
 print(nd.random.multinomial(probabilities, shape=(10)))
 print(nd.random.multinomial(probabilities, shape=(5,10)))
 ```
@@ -123,7 +123,7 @@ Now that we know how to sample rolls of a die,
 we can simulate 1000 rolls. We can then go through and count, after each of the 1000 rolls,
 how many times each number was rolled.
 
-```python
+```{.python .input}
 rolls = nd.random.multinomial(probabilities, shape=(1000))
 counts = nd.zeros((6,1000))
 totals = nd.zeros(6)
@@ -134,7 +134,7 @@ for i, roll in enumerate(rolls):
 
 To start, we can inspect the final tally at the end of $1000$ rolls.
 
-```python
+```{.python .input}
 totals / 1000
 ```
 
@@ -155,14 +155,14 @@ to give the `current` estimated probabilities at that time.
 The counts object looks like this:
 
 
-```python
+```{.python .input}
 counts
 ```
 
 Normalizing by the number of tosses, we get:
 
 
-```python
+```{.python .input}
 x = nd.arange(1000).reshape((1,1000)) + 1
 estimates = counts / x
 print(estimates[:,0])
@@ -175,7 +175,7 @@ We can visualize this convergence by using the plotting package `matplotlib`. If
 
 
 
-```python
+```{.python .input}
 %matplotlib inline
 from matplotlib import pyplot as plt
 
@@ -365,7 +365,7 @@ After all that math, it's time for some code to show how to use a Naive Bayes cl
 The problem is that we don't actually know $p(y)$ and $p(x_i|y)$. So we need to *estimate* it given some training data first. This is what is called *training* the model. In the case of 10 possible classes we simply compute $n_y$, i.e. the number of occurrences of class $y$ and then divide it by the total number of occurrences. E.g. if we have a total of 60,000 pictures of digits and digit 4 occurs 5800 times, we estimate its probability as $\frac{5800}{60000}$. Likewise, to get an idea of $p(x_i|y)$ we count how many times pixel $i$ is set for digit $y$ and then divide it by the number of occurrences of digit $y$. This is the probability that that very pixel will be switched on.
 
 
-```python
+```{.python .input}
 import numpy as np
 
 # we go over one observation at a time (speed doesn't matter here)
@@ -400,7 +400,7 @@ py = ycount / nd.sum(ycount)
 Now that we computed per-pixel counts of occurrence for all pixels, it's time to see how our model behaves. Time to plot it. We show the estimated probabilities of observing a switched-on pixel. These are some mean looking digits.
 
 
-```python
+```{.python .input}
 import matplotlib.pyplot as plt
 fig, figarr = plt.subplots(1, 10, figsize=(15, 15))
 for i in range(10):
@@ -422,7 +422,7 @@ l_y :=& \sum_i \log p(x_i|y) \\
 To avoid recomputing logarithms all the time, we precompute them for all pixels.
 
 
-```python
+```{.python .input}
 logxcount = nd.log(xcount)
 logxcountneg = nd.log(1-xcount)
 logpy = nd.log(py)
@@ -468,7 +468,7 @@ As we can see, this classifier is both incompetent and overly confident of its i
 Random numbers are just one form of random variables, and since computers are particularly good with numbers, pretty much everything else in code ultimately gets converted to numbers anyway. One of the basic tools needed to generate random numbers is to sample from a distribution. Let's start with what happens when we use a random number generator.
 
 
-```python
+```{.python .input}
 import random
 for i in range(10):
     print(random.random())
@@ -479,7 +479,7 @@ for i in range(10):
 These are some pretty random numbers. As we can see, their range is between 0 and 1, and they are evenly distributed. That is, there is (actually, should be, since this is not a *real* random number generator) no interval in which numbers are more likely than in any other. In other words, the chances of any of these numbers to fall into the interval, say $[0.2,0.3)$ are as high as in the interval $[.593264, .693264)$. The way they are generated internally is to produce a random integer first, and then divide it by its maximum range. If we want to have integers directly, try the following instead. It generates random numbers between 0 and 100.
 
 
-```python
+```{.python .input}
 for i in range(10):
     print(random.randint(1, 100))
 ```
@@ -488,7 +488,7 @@ for i in range(10):
 What if we wanted to check that ``randint`` is actually really uniform. Intuitively the best strategy would be to run it, say 1 million times, count how many times it generates each one of the values and to ensure that the result is uniform.
 
 
-```python
+```{.python .input}
 import math
 
 counts = np.zeros(100)
@@ -512,7 +512,7 @@ What we can see from the above figures is that the initial number of counts look
 Quite obviously, drawing from a uniform distribution over a set of 100 outcomes is quite simple. But what if we have nonuniform probabilities? Let's start with a simple case, a biased coin which comes up heads with probability 0.35 and tails with probability 0.65. A simple way to sample from that is to generate a uniform random variable over $[0,1]$ and if the number is less than $0.35$, we output heads and otherwise we generate tails. Let's try this out.
 
 
-```python
+```{.python .input}
 # number of samples
 n = 1000000
 y = np.random.uniform(0, 1, n)
@@ -539,7 +539,7 @@ Note that there are many more efficient algorithms for sampling than the one abo
 The Normal distribution (aka the Gaussian distribution) is given by $p(x) = \frac{1}{\sqrt{2 \pi}} \exp\left(-\frac{1}{2} x^2\right)$. Let's plot it to get a feel for it.
 
 
-```python
+```{.python .input}
 x = np.arange(-10, 10, 0.01)
 p = (1/math.sqrt(2 * math.pi)) * np.exp(-0.5 * x**2)
 plt.figure(figsize=(10, 5))
@@ -566,7 +566,7 @@ The above allows us to change both mean and variance of random variables. Quite 
 Now we are ready to state one of the most fundamental theorems in statistics, the [Central Limit Theorem](https://en.wikipedia.org/wiki/Central_limit_theorem). It states that for sufficiently well-behaved random variables, in particular random variables with well-defined mean and variance, the sum tends toward a normal distribution. To get some idea, let's repeat the experiment described in the beginning, but now using random variables with integer values of $\{0, 1, 2\}$.
 
 
-```python
+```{.python .input}
 # generate 10 random sequences of 10,000 random normal variables N(0,1)
 tmp = np.random.uniform(size=(10000,10))
 x = 1.0 * (tmp > 0.3) + 1.0 * (tmp > 0.8)

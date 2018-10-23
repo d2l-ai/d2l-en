@@ -11,7 +11,7 @@ If you're already confident in your basic linear algebra,
 feel free to skim or skip this chapter.
 
 
-```python
+```{.python .input}
 from mxnet import nd
 ```
 
@@ -39,7 +39,7 @@ In MXNet, we work with scalars by creating NDArrays with just one element.
 In this snippet, we instantiate two scalars and perform some familiar arithmetic operations with them, such as addition, multiplication, division and exponentiation.
 
 
-```python
+```{.python .input}
 x = nd.array([3.0])
 y = nd.array([2.0])
 
@@ -51,7 +51,7 @@ print('x ** y = ', nd.power(x,y))
 
 We can convert any NDArray to a Python float by calling its `asscalar` method. Note that this is typically a bad idea. While you are doing this, NDArray has to stop doing anything else in order to hand the result and the process control back to Python. And unfortunately isn't very good at doing things in parallel. So avoid sprinkling this operation liberally throughout your code or your networks will take a long time to train.
 
-```python
+```{.python .input}
 x.asscalar()
 ```
 
@@ -73,7 +73,7 @@ In math notation, we'll usually denote vectors as bold-faced,
 lower-cased letters ($\mathbf{u}$, $\mathbf{v}$, $\mathbf{w})$.
 In MXNet, we work with vectors via 1D NDArrays with an arbitrary number of components.
 
-```python
+```{.python .input}
 u = nd.arange(4)
 print('u = ', u)
 ```
@@ -85,7 +85,7 @@ so we don't bold-face the font when referring to it.
 In code, we access any element $i$ by indexing into the ``NDArray``.
 
 
-```python
+```{.python .input}
 u[3]
 ```
 
@@ -104,7 +104,7 @@ The shape is a tuple that lists the dimensionality of the NDArray along each of 
 Because a vector can only be indexed along one axis, its shape has just one element.
 
 
-```python
+```{.python .input}
 u.shape
 ```
 
@@ -116,7 +116,7 @@ In this sense, a scalar *would have* $0$ dimensions and a vector *would have* $1
 **To avoid confusion, when we say *2D* array or *3D* array, we mean an array with 2 or 3 axes repespectively. But if we say *$n$-dimensional* vector, we mean a vector of length $n$.**
 
 
-```python
+```{.python .input}
 a = 2
 x = nd.array([1,2,3])
 y = nd.array([10,20,30])
@@ -147,7 +147,7 @@ when calling any of our favorite functions for instantiating an `ndarray`
 such as `ones`, or `zeros`.
 
 
-```python
+```{.python .input}
 A = nd.zeros((5,4))
 A
 ```
@@ -159,7 +159,7 @@ We can access the scalar elements $a_{ij}$ of a matrix $A$ by specifying the ind
 We can transpose the matrix through `T`. That is, if $B = A^T$, then $b_{ij} = a_{ji}$ for any $i$ and $j$.
 
 
-```python
+```{.python .input}
 A.T
 ```
 
@@ -170,7 +170,7 @@ Just as vectors generalize scalars, and matrices generalize vectors, we can actu
 Using tensors will become more important when we start working with images, which arrive as 3D data structures, with axes corresponding to the height, width, and the three (RGB) color channels. But in this chapter, we're going to skip past and make sure you know the basics.
 
 
-```python
+```{.python .input}
 X = nd.arange(24).reshape((2, 3, 4))
 print('X.shape =', X.shape)
 print('X =', X)
@@ -189,7 +189,7 @@ $\alpha X + Y$ has the same shape
 (numerical mathematicians call this the AXPY operation).
 
 
-```python
+```{.python .input}
 a = 2
 x = nd.ones(3)
 y = nd.zeros(3)
@@ -210,14 +210,14 @@ To express the sum of the elements in a vector $\mathbf{u}$ of length $d$,
 we can write $\sum_{i=1}^d u_i$. In code, we can just call ``nd.sum()``.
 
 
-```python
+```{.python .input}
 nd.sum(u)
 ```
 
 We can similarly express sums over the elements of tensors of arbitrary shape. For example, the sum of the elements of an $m \times n$ matrix $A$ could be written $\sum_{i=1}^{m} \sum_{j=1}^{n} a_{ij}$.
 
 
-```python
+```{.python .input}
 nd.sum(A)
 ```
 
@@ -229,7 +229,7 @@ and the average over a matrix $A$ as  $\frac{1}{n \cdot m} \sum_{i=1}^{m} \sum_{
 In code, we could just call ``nd.mean()`` on tensors of arbitrary shape:
 
 
-```python
+```{.python .input}
 print(nd.mean(A))
 print(nd.sum(A) / A.size)
 ```
@@ -239,13 +239,13 @@ print(nd.sum(A) / A.size)
 So far, we've only performed element-wise operations, sums and averages. And if this was we could do, linear algebra probably wouldn't deserve it's own chapter. However, one of the most fundamental operations is the dot product. Given two vectors $\mathbf{u}$ and $\mathbf{v}$, the dot product $\mathbf{u}^T \mathbf{v}$ is a sum over the products of the corresponding elements: $\mathbf{u}^T \mathbf{v} = \sum_{i=1}^{d} u_i \cdot v_i$.
 
 
-```python
+```{.python .input}
 nd.dot(u, v)
 ```
 
 Note that we can express the dot product of two vectors ``nd.dot(u, v)`` equivalently by performing an element-wise multiplication and then a sum:
 
-```python
+```{.python .input}
 nd.sum(u * v)
 ```
 
@@ -310,7 +310,7 @@ These transformations turn out to be quite useful. For example, we can represent
 Expressing matrix-vector products in code with ``ndarray``, we use the same ``nd.dot()`` function as for dot products. When we call ``nd.dot(A, x)`` with a matrix ``A`` and a vector ``x``, ``MXNet`` knows to perform a matrix-vector product. Note that the column dimension of ``A`` must be the same as the dimension of ``x``.
 
 
-```python
+```{.python .input}
 nd.dot(A, u)
 ```
 
@@ -375,7 +375,7 @@ $$
 You can think of the matrix-matrix multiplication $AB$ as simply performing $m$ matrix-vector products and stitching the results together to form an $n \times m$ matrix. Just as with ordinary dot products and matrix-vector products, we can compute matrix-matrix products in ``MXNet`` by using ``nd.dot()``.
 
 
-```python
+```{.python .input}
 A = nd.ones(shape=(3, 4))
 B = nd.ones(shape=(4, 5))
 nd.dot(A, B)
@@ -428,14 +428,14 @@ It has the convenient property of placing less emphasis on outliers.
 To calculate the $\ell_2$ norm, we can just call ``nd.norm()``.  
 
 
-```python
+```{.python .input}
 nd.norm(u)
 ```
 
 To calculate the L1-norm we can simply perform the absolute value and then sum over the elements.
 
 
-```python
+```{.python .input}
 nd.sum(nd.abs(u))
 ```
 
