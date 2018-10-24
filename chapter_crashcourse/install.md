@@ -23,7 +23,7 @@ Next update the environment description in `environment.yml`. Replace `mxnet` by
 1. Activate the environment.
 1. Open Jupyter notebooks to start experimenting.
 
-```{.python .input}
+```
 conda env create -f environment.yml
 activate gluon
 jupyter notebook
@@ -44,7 +44,7 @@ Installation for both is very similar. We give a description of the workflow for
 1. Create the Conda environment
 1. Activate it and start Jupyter
 
-```{.python .input}
+```
 sh Miniconda3-latest-Linux-x86_64.sh
 
 mkdir gluon_tutorials
@@ -60,7 +60,7 @@ jupyter notebook
 
 The main difference between Windows and other installations is that for the former you use `activate gluon` whereas for Linux and macOS you use `source activate gluon`.
 
-```{.python .input}
+```
 conda env update -f environment.yml
 activate gluon
 ```
@@ -69,7 +69,7 @@ activate gluon
 
 In case you want to update the repository, if you installed a new version of CUDA and (or) MXNet, you can simply use the Conda commands to do this. As before, make sure you update the packages accordingly.
 
-```{.python .input}
+```
 conda env update -f environment.yml
 ```
 
