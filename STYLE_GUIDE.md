@@ -18,12 +18,12 @@
 * Symbol Descriptions
     * time step t（not t time step）
 * Tools, Class, and Functions
-    * Gluon, MXNet, NumPy, spaCy, NDArray, Symbol, Block, HybridBlock, ResNet-18, Fashion-MNIST
-        * Consider these as words without accents (``) 
+    * Gluon, MXNet, NumPy, spaCy, NDArray, Symbol, Block, HybridBlock, ResNet-18, Fashion-MNIST, matplotlib
+        * Consider these as words without accents (``)
     * Sequential class/instance, HybridSequential class/instance
         * Without accents (``)
     * `backward`function
-        * not `backward()` function 
+        * not `backward()` function
     * for loop
 * Terminologies
     * Consistently use
@@ -53,9 +53,9 @@
 ## Figure
 
 * Software
-    * Use OmniGraffle to make figures. 
+    * Use OmniGraffle to make figures.
       * Export pdf (infinite canvas) in 100%, then use pdf2svg to convert to svg
-        * `ls | while read f; do pdf2svg $f ${f%.pdf}.svg; done`	
+        * `ls | while read f; do pdf2svg $f ${f%.pdf}.svg; done`
       * Do not export svg directly from Omnigraffle (font size may slightly change)
 * Style
     * Size：
@@ -120,7 +120,7 @@
 * Print variables
     * if possible use `x, y` instead of `print('x:', x, 'y:', y)` at the end of the code block
 * String
-    * Use single quotes	
+    * Use single quotes
 * Other items
     * `nd.f(x)` → `x.nd`
     * `random_normal` → `random.normal`
