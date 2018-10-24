@@ -19,6 +19,8 @@ the basics.
    linear-algebra 
    autograd
    probability
+   naive-bayes
+   sampling
    lookup-api
 
 ```
