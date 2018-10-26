@@ -186,7 +186,6 @@ as assessed after each of the 1000 turns.
 The dashed black line gives the true underlying probability.
 As we get more data, the solid curves converge towards the true answer.
 
-<!-- What we can see is that the red curves pretty well capture the behavior of the 10 random traces of averages. This is the case since we are averaging numbers and their aggregate behavior is like that of a number with a lot less uncertainty. Looking at the red curves, they are given by $f(x) = \pm 1/\sqrt{x}$. (The reader might cry foul by noting that we just added Gaussian random variables which, quite obviously, lead to yet another Gaussian random variable. That said, the curves for sums of other random variables, such as $\{0, 1\}$ valued objects look identical in the limit.) -->
 
 
 In our example of casting a die, we introduced the notion of a **random variable**.
