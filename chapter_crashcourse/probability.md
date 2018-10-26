@@ -287,7 +287,7 @@ it never fails to detect HIV if the patient actually has it.
 We use $D$ to indicate the diagnosis and $H$ to denote the HIV status.
 Written as a table the outcome $\Pr(D|H)$ looks as follows:
 
-|             | HIV positive | HIV negative |
+|      outcome| HIV positive | HIV negative |
 |:------------|-------------:|-------------:|
 |Test positive|            1 |         0.01 |
 |Test negative|            0 |         0.99 |
@@ -323,10 +323,10 @@ What should a patient do upon receiving such terrifying news?
 Likely, he/she would ask the physician to administer another test to get clarity.
 The second test has different characteristics (it isn't as good as the first one).
 
-|             |  HIV positive |  HIV negative |
-|:------------|------------------------:|------------------------:|
-|Test positive| 0.98 | 0.03 |
-|Test negative| 0.02 | 0.97 |
+|     outcome |  HIV positive |  HIV negative |
+|:------------|--------------:|--------------:|
+|Test positive|          0.98 |          0.03 |
+|Test negative|          0.02 |          0.97 |
 
 Unfortunately, the second test comes back positive, too.
 Let us work out the requisite probabilities to invoke Bayes' Theorem.
