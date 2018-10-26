@@ -177,7 +177,7 @@ for i in range(6):
 
 plt.axhline(y=0.16666, color='black', linestyle='dashed')
 plt.legend()
-plt.show()   
+plt.show()
 ```
 
 Each solid curve corresponds to one of the six values of the die
@@ -299,7 +299,8 @@ Obviously this is going to depend on how common the disease is, since it affects
 Assume that the population is quite healthy, e.g. $\Pr(\text{HIV positive}) = 0.0015$.
 To apply Bayes Theorem we need to determine
 
-$$\begin{align}
+$$
+\begin{align}
 \Pr(\text{Test positive}) =& \Pr(D=1|H=0) \Pr(H=0) + \Pr(D=1|H=1) \Pr(H=1) \\
 =& 0.01 \cdot 0.9985 + 1 \cdot 0.0015 \\
 =& 0.011485
@@ -308,7 +309,8 @@ $$
 
 Hence we get
 
-$$\begin{align}
+$$
+\begin{align}
 \Pr(H = 1|D = 1) =& \frac{\Pr(D=1|H=1) \Pr(H=1)}{\Pr(D=1)} \\
 =& \frac{1 \cdot 0.0015}{0.011485} \\
 =& 0.131
