@@ -109,7 +109,7 @@ def linreg(X, w, b):  # This function has been saved in the gluonbook package fo
     return nd.dot(X, w) + b
 ```
 
-## Defining the Loss Function
+## Define the Loss Function
 
 We will use the squared loss function described in the previous section to define the linear regression loss. In the implementation, we need to transform the true value `y` into the predicted value’s shape `y_hat`.  The result returned by the following function will also be the same as the `y_hat` shape.
 
@@ -118,7 +118,7 @@ def squared_loss(y_hat, y):  # This function has been saved in the gluonbook pac
     return (y_hat - y.reshape(y_hat.shape)) ** 2 / 2
 ```
 
-## Defining the Optimization Algorithm
+## Define the Optimization Algorithm
 
 Linear regression actually has a closed-form solution. However, most interesting models that we'll care about cannot be solved analytically. So we'll solve this problem by stochastic gradient descent `sgd`. At each step, we'll estimate the gradient of the loss with respect to our weights, using one batch randomly drawn from our dataset. Then, we'll update our parameters a small amount in the direction that reduces the loss. Here, the gradient calculated by the automatic differentiation module is the gradient sum of a batch of examples.   We divide it by the batch size to obtain the average. The size of the step is determined by the learning rate `lr`. 
 
