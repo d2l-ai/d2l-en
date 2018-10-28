@@ -40,16 +40,20 @@ for FNAME in `find chapter* -type f -name "*.md"`; do
         fi
 
 
-        if [[ "$LINE" =~ ^\ \ \ .* ]] && [[ "$IN_CODE" == "0" ]] || [[ "$IN_JSON_OUTPUT" == "1" ]]; then
-            echo $FNAME $LINE
-            OUTPUT=$(printf "$OUTPUT\nL$L: $LINE")
+        if [[ "$LINE" =~ ^\ \ \ .* ]] && \
+               [[ ! "$LINE" =~ ^\ *- ]] && \
+               [[ ! "$LINE" =~ ^\ *\* ]] && \
+               [[ "$IN_CODE" == "0" ]]  || \
+               [[ "$IN_JSON_OUTPUT" == "1" ]]; then
+            OUTPUT=$(printf "$OUTPUT\n$FNAME L$L: $LINE")
         fi
         L=$((L+1))
     done <"$FNAME"
 
     if [[ ! -z $OUTPUT ]]; then
         echo "ERROR: $FNAME contains the following cell outputs:"
-        echo $OUTPUT
+        echo "$OUTPUT"
+        echo ""
         HAS_OUTPUT=1
     fi
 done
