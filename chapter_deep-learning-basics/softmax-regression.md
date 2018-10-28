@@ -57,12 +57,16 @@ However, there are two problems with using the output from the output layer dire
 
 We could try forcing the outputs to correspond to probabilities, but there's no guarantee that on new (unseen) data the probabilities would be nonnegative, let alone sum up to 1. For this kind of discrete value prediction problem, statisticians have invented classification models such as (softmax) logistic regression. Unlike linear regression, the output of softmax regression is subjected to a nonlinearity which ensures that the sum over all outcomes always adds up to 1 and that none of the terms is ever negative. The nonlinear transformation works as follows:
 
-$$\hat{y} = \mathrm{softmax}(o) \text{ where }
-\hat{y}_i = \frac{\exp(o_i)}{\sum_j \exp(o_j)}$$
+$$
+\hat{y} = \mathrm{softmax}(o) \text{ where }
+\hat{y}_i = \frac{\exp(o_i)}{\sum_j \exp(o_j)}
+$$
 
 It is easy to see $\hat{y}_1 + \hat{y}_2 + \hat{y}_3 = 1$ with $0 \leq \hat{y}_i \leq 1$ for all $i$. Thus, $\hat{y}$ is a proper probability distribution and the values of $o$ now assume an easily quantifiable meaning. Note that we can still find the most likely class by 
 
-$$\hat{i}(o) = \operatorname*{argmax}_i o_i = \operatorname*{argmax}_i \hat y_i,$$
+$$
+\hat{i}(o) = \operatorname*{argmax}_i o_i = \operatorname*{argmax}_i \hat y_i
+$$
 
 So, the softmax operation does not change the prediction category output but rather it gives the outputs $o$ proper meaning. Summarizing it all in vector notation we get ${o}^{(i)} = W {x}^{(i)} + {b}$ where ${\hat{y}}^{(i)} = \mathrm{softmax}({o}^{(i)})$.
 
@@ -88,13 +92,17 @@ Now that we have some mechanism for outputting probabilities, we need to transfo
 
 The softmax function maps $o$ into a vector of probabilities corresponding to various outcomes, such as $p(y=\mathrm{cat}|x)$. This allows us to compare the estimates with reality, simply by checking how well it predicted what we observe. 
 
-$$p(Y|X) = \prod_{i=1}^n p(y^{(i)}|x^{(i)})
+$$
+p(Y|X) = \prod_{i=1}^n p(y^{(i)}|x^{(i)})
 \text{ and thus }
--\log p(Y|X) = \sum_{i=1}^n -\log p(y^{(i)}|x^{(i)})$$
+-\log p(Y|X) = \sum_{i=1}^n -\log p(y^{(i)}|x^{(i)})
+$$
 
 Minimizing $-\log p(Y|X)$ corresponds to predicting things well. This yields the loss function (we dropped the superscript $(i)$ to avoid notation clutter):
 
-$$l = -\log p(y|x) = - \sum_j y_j \log \hat{y}_j$$
+$$
+l = -\log p(y|x) = - \sum_j y_j \log \hat{y}_j
+$$
 
 Here we used that by construction $\hat{y} = \mathrm{softmax}(o)$ and moreover, that the vector $y$ consists of all zeroes but for the correct label, such as $(1, 0, 0)$. Hence the the sum over all coordinates $j$ vanishes for all but one term. Since all $\hat{y}_j$ are probabilities, their logarithm is never larger $0$. Consequently, the loss function is minimized if we correctly predict $y$ with *certainty*, i.e. if $p(y|x) = 1$ for the correct label. 
 
@@ -102,12 +110,16 @@ Here we used that by construction $\hat{y} = \mathrm{softmax}(o)$ and moreover, 
 
 Since the Softmax and the corresponding loss are so common, it is worth while understanding a bit better how it is computed. Plugging $o$ into the definition of the loss $l$ and using the definition of the softmax we obtain:
 
-$$l = -\sum_j y_j \log \hat{y}_j = \sum_j y_j \log \sum_k \exp(o_k) - \sum_j y_j o_j 
-= \log \sum_k \exp(o_k) - \sum_j y_j o_j$$
+$$
+l = -\sum_j y_j \log \hat{y}_j = \sum_j y_j \log \sum_k \exp(o_k) - \sum_j y_j o_j 
+= \log \sum_k \exp(o_k) - \sum_j y_j o_j
+$$
 
 To understand a bit better what is going on, consider the derivative with respect to $o$. We get
 
-$$\partial_{o_j} l = \frac{\exp(o_j)}{\sum_k \exp(o_k)} - y_j = \mathrm{softmax}(o)_j - y_j = \Pr(y = j|x) - y_j$$
+$$
+\partial_{o_j} l = \frac{\exp(o_j)}{\sum_k \exp(o_k)} - y_j = \mathrm{softmax}(o)_j - y_j = \Pr(y = j|x) - y_j
+$$
 
 In other words, the gradient is the difference between what the model thinks should happen, as expressed by the probability $p(y|x)$, and what acutally happened, as expressed by $h$. In this sense, it is very similar to what we saw in regression, where the gradient was the difference between the observation $y$ and estimate $\hat{y}$. This seems too much of a coincidence, and indeed, it isn't. In any [exponential family](https://en.wikipedia.org/wiki/Exponential_family) model the gradients of the log-likelihood are given by precisely this term. This fact makes computing gradients a lot easier in practice. 
 
@@ -115,7 +127,9 @@ In other words, the gradient is the difference between what the model thinks sho
 
 Now consider the case where we don't just observe a single outcome but maybe, an entire distribution over outcomes. We can use the same representation as before for $y$. The only difference is that rather than a vector containing only binary entries, say $(0, 0, 1)$, we now have a generic probability vector, say $(0.1, 0.2, 0.7)$. The math that we used previously to define the loss $l$ still works out fine, just that the interpretation is slightyly more general. It is the expected value of the loss for a distribution over labels. 
 
-$$l(y, \hat{y}) = - \sum_j y_j \log \hat{y}_j$$
+$$
+l(y, \hat{y}) = - \sum_j y_j \log \hat{y}_j
+$$
 
 This loss is called the cross-entropy loss. It is one of the most commonly used ones for multiclass classification. To demystify its name we need some information theory. The following section can be skipped if needed. 
 
@@ -127,7 +141,9 @@ Information theory deals with the problem of encoding, decoding, transmitting an
 
 A key concept is how many bits of information (or randomness) are contained in data. It can be measured as the [entropy](https://en.wikipedia.org/wiki/Entropy) of a distribution $p$ via
 
-$$H[p] = \sum_j - p(j) \log p(j)$$
+$$
+H[p] = \sum_j - p(j) \log p(j)
+$$
 
 One of the fundamental theorems of information theory states that in order to encode data drawn randomly from the distribution $p$ we need at least $H[p]$ 'nats' to encode it. If you wonder what a 'nat' is, it is the equivalent of bit but when using a code with base $e$ rather than one with base 2. One nat is $\frac{1}{\log(2)} \approx 1.44$ bit. $H[p] / 2$ is often also called the binary entropy.  
 
@@ -137,7 +153,9 @@ To make this all a bit more theoretical consider the following: $p(1) = \frac{1}
 
 One way of measuring the difference between two distributions arises directly from the entropy. Since $H[p]$ is the minimum number of bits that we need to encode data drawn from $p$, we could ask how well it it is encoded if we pick the 'wrong' distribution $q$. The amount of extra bits that we need to encode $q$ gives us some idea of how different these two distributions are. Let us compute this directly - recall that to encode $j$ using an optimal code for $q$ would cost $-\log q(j)$ nats, and we need to use this in $p(j)$ of all cases. Hence we have
 
-$$D(p\|q) = -\sum_j p(j) \log q(j) - H[p] = \sum_j p(j) \log \frac{p(j)}{q(j)}$$
+$$
+D(p\|q) = -\sum_j p(j) \log q(j) - H[p] = \sum_j p(j) \log \frac{p(j)}{q(j)}
+$$
 
 Note that minimizing $D(p\|q)$ with respect to $q$ is equivalent to minimizing the cross-entropy loss. This can be seen directly by dropping $H[p]$ which doesn't depend on $q$. We thus showed that softmax regression tries the minimize the surprise (and thus the number of bits) we experience when seeing the true label $y$ rather than our prediction $\hat{y}$. 
 
