@@ -170,8 +170,10 @@ We can visualize this convergence by using the plotting package `matplotlib`. If
 ```{.python .input}
 %matplotlib inline
 from matplotlib import pyplot as plt
+from IPython import display
+display.set_matplotlib_formats('svg')
 
-plt.figure(figsize=(15, 8))
+plt.figure(figsize=(8, 6))
 for i in range(6):
     plt.plot(estimates[i, :].asnumpy(), label=("P(die=" + str(i) +")"))
 

@@ -58,7 +58,7 @@ The plotting function `plt` as well as the `use_svg_display` and `set_figsize` f
 
 ## Reading Data
 
-We need iterate over the entire data set and continuously examine mini-batches of data examples when training the model. Here we define a function. Its purpose is to return the features and tags of random `batch_size` (batch size) examples every time it’s called. One might wonder why we are not reading one observation at a time but rather construct an iterator which returns a few observations at a time. This has mostly to do with efficiency when optimizing. Recall that when we processed one dimension at a time the algorithm was quite slow. The same thing happens when processing single observations vs. an entire 'batch' of them, which can be represented as a matrix rather than just a vector. In particular, GPUs are much faster when it comes to dealing with matrices, up to an order of magnitude. This is one of the reasons why deep learning usually operates on mini-batches rather than singletons. 
+We need iterate over the entire data set and continuously examine mini-batches of data examples when training the model. Here we define a function. Its purpose is to return the features and tags of random `batch_size` (batch size) examples every time it’s called. One might wonder why we are not reading one observation at a time but rather construct an iterator which returns a few observations at a time. This has mostly to do with efficiency when optimizing. Recall that when we processed one dimension at a time the algorithm was quite slow. The same thing happens when processing single observations vs. an entire 'batch' of them, which can be represented as a matrix rather than just a vector. In particular, GPUs are much faster when it comes to dealing with matrices, up to an order of magnitude. This is one of the reasons why deep learning usually operates on mini-batches rather than singletons.
 
 ```{.python .input  n=5}
 # This function has been saved in the gluonbook package for future use.
@@ -72,7 +72,7 @@ def data_iter(batch_size, features, labels):
         # The “take” function will then return the corresponding element based on the indices. 
 ```
 
-Let's read and print the first small batch of data examples. The shape of the features in each batch corresponds to the batch size and the number of input dimensions. Likewise, we obtain as many labels as requested by the batch size. 
+Let's read and print the first small batch of data examples. The shape of the features in each batch corresponds to the batch size and the number of input dimensions. Likewise, we obtain as many labels as requested by the batch size.
 
 ```{.python .input  n=6}
 batch_size = 10
@@ -86,14 +86,14 @@ Clearly, if we run the iterator again, we obtain a different minibatch until all
 
 ## Initialize Model Parameters
 
-Weights are initialized to normal random numbers using a mean of 0 and a standard deviation of 0.01, with the bias $b$ set to zero. 
+Weights are initialized to normal random numbers using a mean of 0 and a standard deviation of 0.01, with the bias $b$ set to zero.
 
 ```{.python .input  n=7}
 w = nd.random.normal(scale=0.01, shape=(num_inputs, 1))
 b = nd.zeros(shape=(1,))
 ```
 
-In the succeeding cells, we're going to update these parameters to better fit our data. This will involve taking the gradient (a multi-dimensional derivative) of some loss function with respect to the parameters. We'll update each parameter in the direction that reduces the loss. In order for `autograd` to know that it needs to set up the appropriate data structures, track changes, etc., we need to attach gradients explicitly. 
+In the succeeding cells, we're going to update these parameters to better fit our data. This will involve taking the gradient (a multi-dimensional derivative) of some loss function with respect to the parameters. We'll update each parameter in the direction that reduces the loss. In order for `autograd` to know that it needs to set up the appropriate data structures, track changes, etc., we need to attach gradients explicitly.
 
 ```{.python .input  n=8}
 w.attach_grad()
@@ -120,7 +120,7 @@ def squared_loss(y_hat, y):  # This function has been saved in the gluonbook pac
 
 ## Define the Optimization Algorithm
 
-Linear regression actually has a closed-form solution. However, most interesting models that we'll care about cannot be solved analytically. So we'll solve this problem by stochastic gradient descent `sgd`. At each step, we'll estimate the gradient of the loss with respect to our weights, using one batch randomly drawn from our dataset. Then, we'll update our parameters a small amount in the direction that reduces the loss. Here, the gradient calculated by the automatic differentiation module is the gradient sum of a batch of examples.   We divide it by the batch size to obtain the average. The size of the step is determined by the learning rate `lr`. 
+Linear regression actually has a closed-form solution. However, most interesting models that we'll care about cannot be solved analytically. So we'll solve this problem by stochastic gradient descent `sgd`. At each step, we'll estimate the gradient of the loss with respect to our weights, using one batch randomly drawn from our dataset. Then, we'll update our parameters a small amount in the direction that reduces the loss. Here, the gradient calculated by the automatic differentiation module is the gradient sum of a batch of examples.   We divide it by the batch size to obtain the average. The size of the step is determined by the learning rate `lr`.
 
 ```{.python .input  n=11}
 def sgd(params, lr, batch_size):  # This function has been saved in the gluonbook package for future use.
