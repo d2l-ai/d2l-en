@@ -1,49 +1,86 @@
 # Multilayer Perceptron
 
-We have now introduced single-layer neural networks, including linear regression and Softmax regression. However, deep learning primarily focuses on multilayer models. In this section, using multilayer perceptron (MLP) as an example, we will introduce the concept of multilayer neural networks.
+In the previous chapters we showed how you could implement multiclass logistic regression (also called softmax regression) for classifiying images of clothing into the 10 possible categories. This is where things start to get fun. We understand how to wrangle data, coerce our outputs into a valid probability distribution (via `softmax`), how to apply an appropriate loss function, and how to optimize over our parameters. Now that we’ve covered these preliminaries, we can extend our toolbox to include deep neural networks.
 
-## Hidden Layer
+## Hidden Layers
 
-Multilayer perceptrons import one or more hidden layers using the single-layer neural network. This hidden layer is located between the input and output layers. Figure 3.3 shows a neural network diagram of the multilayer perceptron.
+Recall that before, we mapped our inputs directly onto our outputs through a single linear transformation via 
+
+$$
+\hat{o} = \mathrm{softmax}(W x + b)
+$$
+
+![Single layer perceptron with 5 output units.](../img/singlelayer.svg)
+
+If our labels really were related to our input data by an approximately linear function, then this approach might be adequate. But linearity is a *strong assumption*. Linearity means that given an output of interest, for each input, increasing the value of the input should either drive the value of the output up or drive it down, irrespective of the value of the other inputs.
+
+### From one to many
+
+Imagine the case of classifying cats and dogs based on black and white images. That’s like saying that for each pixel, increasing its value either increases the probability that it depicts a dog or decreases it. That’s not reasonable. After all, the world contains both black dogs and black cats, and both white dogs and white cats.
+
+Teasing out what is depicted in an image generally requires allowing more complex relationships between our inputs and outputs, considering the possibility that our pattern might be characterized by interactions among the many features. In these cases, linear models will have low accuracy. We can model a more general class of functions by incorporating one or more hidden layers. The easiest way to do this is to stack a bunch of layers of neurons on top of each other. Each layer feeds into the layer above it, until we generate an output. This architecture is commonly called a “multilayer perceptron”. With an MLP, we stack a bunch of layers on top of each other. Here's an example:
 
 ![Multilayer perceptron with hidden layers. This example contains a hidden layer with 5 hidden units in it. ](../img/mlp.svg)
 
-In the multilayer perceptron of Figure 3.3, the number of inputs and outputs is 4 and 3 respectively, and the hidden layer in the middle contains 5 hidden units. Since the input layer does not involve any calculations, there are a total of 2 layers of the multilayer perceptron in Figure 3.3. As shown in Figure 3.3, the neurons in the hidden layer are fully connected to the inputs within the input layer. The neurons in the output layer and the neurons in the hidden layer are also fully connected. Therefore, both the hidden layer and the output layer in the multilayer perceptron are fully connected layers.
+In the multilayer perceptron above, the number of inputs and outputs is 4 and 3 respectively, and the hidden layer in the middle contains 5 hidden units. Since the input layer does not involve any calculations, there are a total of 2 layers in the multilayer perceptron. The neurons in the hidden layer are fully connected to the inputs within the input layer. The neurons in the output layer and the neurons in the hidden layer are also fully connected. Therefore, both the hidden layer and the output layer in the multilayer perceptron are fully connected layers.
+
+### From linear to nonlinear
 
 
-More specifically, when given a mini-batch of samples $\boldsymbol{X}\in \mathbb{R}^{n \times d}$, the batch size is $n$, and the number of inputs is $d$. Assume that the multilayer perceptron has only one hidden layer, and the total number of hidden units is $h$. Record the output of the hidden layer (also known as ‘hidden layer variables’ or ‘hidden variables’) as $\boldsymbol{H}$, we have $\boldsymbol{H} \in \mathbb{R}^{n \times h}$. Because both the hidden layer and output layer are wholly connected layers, we can set the weight and bias parameters of the hidden layer to $\boldsymbol{W}_h \in \mathbb{R}^{d \times h}$ and $\boldsymbol{b}_h \in \mathbb{R}^{1 \times h}$, the weight and bias parameters of the output layer are $\boldsymbol{W}_o \in \mathbb{R}^{h \times q}$ and $\boldsymbol{b}_o \in \mathbb{R}^{1 \times q}$, respectively.
-
-First, let’s take a look at the design of a multilayer perceptron with a single hidden layer. The output $\boldsymbol{O}\in \mathbb{R}^{n \times q}$ is calculated as
-
+Let us write out what is happening mathematically in the picture above, e.g. for multiclass classification.
 $$
-\begin{aligned}
-\boldsymbol{H} &= \boldsymbol{X} \boldsymbol{W}_h + \boldsymbol{b}_h,\\
-\boldsymbol{O} &= \boldsymbol{H} \boldsymbol{W}_o + \boldsymbol{b}_o,
-\end{aligned}      
-$$
-
-This is to say, the output of the hidden layer is used directly as the input of the output layer. If we combine the above two formulas, we can get
-
-$$
-\boldsymbol{O}= (\boldsymbol{X} \boldsymbol{W}_h + \boldsymbol{b}_h)\boldsymbol{W}_o + \boldsymbol{b}_o = \boldsymbol{X} \boldsymbol{W}_h\boldsymbol{W}_o + \boldsymbol{b}_h \boldsymbol{W}_o + \boldsymbol{b}_o.
+\begin{align}
+    h & = W_1 x + b_1 \\
+    o & = W_2 h + b_2 \\
+    \hat{y} & = \mathrm{softmax}(o)
+\end{align}
 $$
 
-It can be seen from the formula after combination, although the neural network introduces the hidden layer, it is still equivalent to a single-layer neural network: the weight parameter of output layer is $\boldsymbol{W}_h\boldsymbol{W}_o$, the bias parameter is $\boldsymbol{b}_h \boldsymbol{W}_o + \boldsymbol{b}_o$. It is not difficult to find, even if more hidden layers are added, as the above formula is only able to obtain a single-layer neural network when using the output layer alone.
+The problem with the approach above is that we have gained nothing over a simple single layer perceptron since we can collapse out the hidden layer by an equivalently parametrized single layer perceptron using $W = W_2 W_1$ and $b = W_2 b_1 + b_2$.
 
+$$o = W_2 h + b_2 = W_2 (W_1 x + b_1) + b_2 = (W_2 W_1) x + (W_2 b_1 + b_2) = W x + b$$
 
-## Activation Function
+To fix this we need another key ingredient - a nonlinearity $\sigma$ such as $\mathrm{max}(x,0)$ after each layer. Once we do this, it becomes impossible to merge layers. This yields
 
-The root of the problem discussed above lies in the fully connected layer only performing affine transformation on the data, while the superposition of multiple affine transformations remain affine transformations. One way to solve this problem is to introduce nonlinear transformation. This can be done by transforming a hidden variable using a nonlinear function that operates by element, then continuing to have the nonlinear function act as the input to the next fully connected layer. This nonlinear function is referred to as an ‘activation function’. In the following section, we will introduce several commonly used activation functions.
+$$
+\begin{align}
+    h & = \sigma(W_1 x + b_1) \\
+    o & = W_2 h + b_2 \\
+    \hat{y} & = \mathrm{softmax}(o)
+\end{align}
+$$
+
+Clearly we could continue stacking such hidden layers, e.g. $h_1 = \sigma(W_1 x + b_1)$ and $h_2 = \sigma(W_2 h_1 + b_2)$ on top of each other to obtain a true multilayer perceptron. 
+
+Multilayer perceptrons can account for complex interactions in the inputs because the hidden neurons depend on the values of each of the inputs. It’s easy to design a hidden node that that does arbitrary computation, such as, for instance, logical operations on its inputs. And it’s even widely known that multilayer perceptrons are universal approximators. That means that even for a single-hidden-layer neural network, with enough nodes, and the right set of weights, it could model any function at all! Actually learning that function is the hard part. And it turns out that we can approximate functions much more compactly if we use deeper (vs wider) neural networks. We’ll get more into the math in a subsequent chapter, but for now let’s actually build an MLP. In this example, we’ll implement a multilayer perceptron with two hidden layers and one output layer.
+
+### Vectorization and mini-batch
+
+When given a mini-batch of samples we can use vectorization to gain better efficiency in implementation. In a nutshell, we replace vectors by matrices. As before, denote by $X$ the matrix of inputs from a minibatch. Then an MLP with two hidden layers can be expressed as 
+
+$$
+\begin{align}
+    H_1 & = \sigma(W_1 X + b_1) \\
+    H_2 & = \sigma(W_2 H_1 + b_2) \\
+    O & = \mathrm{softmax}(W_3 H_2 + b_3)
+\end{align}
+$$
+
+This is easy to implement and easy to optimize. With some abuse of notation we define the nonlinearity $\sigma$ to apply to its inputs on a row-wise fashion, i.e. one observation at a time, often one coordinate at a time. This is true for most activation functions (the [batch normalization](../chapter_convolutional-neural-networks/batch-norm.md) is a notable exception from that rule).  
+
+## Activation Functions
+
+Let us look a bit more at examples of activation functions. After all, it is this alternation between linear and nonlinear terms that makes deep networks work. A rather popular choice, due to its simplicity of implementation and its efficacy is the ReLu function. 
 
 ### ReLU Function
 
 The ReLU (rectified linear unit) function provides a very simple nonlinear transformation. Given the element $x$, the function is defined as
 
-$$\text{ReLU}(x) = \max(x, 0).$$
+$$\mathrm{ReLU}(x) = \max(x, 0).$$
 
-It can be understood that the ReLU function retains only positive elements and dissipates negative elements. To observe this nonlinear transformation visually, we must first define a plotting function `xyplot`.
+It can be understood that the ReLU function retains only positive elements and discards negative elements. To get a better idea of what it looks like it helps to plot it. For convenience we define a plotting function `xyplot` to take care of the gruntwork.
 
-```{.python .input  n=6}
+```{.python .input  n=1}
 %matplotlib inline
 import gluonbook as gb
 from mxnet import autograd, nd
@@ -57,7 +94,7 @@ def xyplot(x_vals, y_vals, name):
 
 Then, we can plot the ReLU function using the `relu` function provided by NDArray. As you can see, the activation function is a two-stage linear function.
 
-```{.python .input  n=7}
+```{.python .input  n=2}
 x = nd.arange(-8.0, 8.0, 0.1)
 x.attach_grad()
 with autograd.record():
@@ -65,79 +102,71 @@ with autograd.record():
 xyplot(x, y, 'relu')
 ```
 
-Obviously, when the input is negative, the derivative of ReLU function is 0; when the input is positive, the derivative of ReLU function is 1. Although the ReLU function is not derivable when the input is 0, we can set the derivative here to 0. The derivative of ReLU function is plotted below.
+Obviously, when the input is negative, the derivative of ReLU function is 0; when the input is positive, the derivative of ReLU function is 1. Note that the ReLU function is not differentiable when the input is 0. Instead, we pick its left-hand-side (LHS) derivative 0 at location 0. The derivative of the ReLU function is plotted below.
 
-```{.python .input}
+```{.python .input  n=3}
 y.backward()
 xyplot(x, x.grad, 'grad of relu')
 ```
 
+Note that there are many variants to the ReLU function, such as the parameterized ReLU (pReLU). Effectively it adds a linear term to the ReLU, so some information still gets through, even when the argument is negative. 
+
+$$\mathrm{pReLU}(x) = \max(0, x) - \alpha x$$
+
+The reason for using the ReLU is that its derivatives are particularly well behaved - either they vanish or they just let the argument through. This makes optimization better behaved and it reduces the issue of the vanishing gradient problem (more on this later).
+
 ### Sigmoid Function
 
-The Sigmoid function can transform the value of an element between 0 and 1:
+The Sigmoid function can transform the value of an element in $\mathbb{R}$ to the interval $(0,1)$.
 
-$$\text{sigmoid}(x) = \frac{1}{1 + \exp(-x)}.$$
+$$\mathrm{sigmoid}(x) = \frac{1}{1 + \exp(-x)}.$$
 
-The Sigmoid function is commonly used in early neural networks, but is currently being replaced by a simpler ReLU function. In the "Recurrent Neural Network" chapter, we will describe how to utilize the function’s ability to control the flow of information in the neural network thanks to its capacity to transform the value range between 0 and 1. The derivative of Sigmoid function is plotted below. When the input is close to 0, the Sigmoid function approaches linear transformation.
+The Sigmoid function was commonly used in early neural networks, but is currently being replaced by the simpler ReLU function. In the "Recurrent Neural Network" chapter, we will describe how to utilize the function’s ability to control the flow of information in a neural network thanks to its capacity to transform the value range between 0 and 1. The derivative of the Sigmoid function is plotted below. When the input is close to 0, the Sigmoid function approaches a linear transformation.
 
-```{.python .input  n=8}
+```{.python .input  n=4}
 with autograd.record():
     y = x.sigmoid()
 xyplot(x, y, 'sigmoid')
 ```
 
-According to the chain rule, the derivative of Sigmoid function is as follows:
+The derivative of Sigmoid function is as follows:
 
-$$\text{sigmoid}'(x) = \text{sigmoid}(x)\left(1-\text{sigmoid}(x)\right).$$
+$$\frac{d}{dx} \mathrm{sigmoid}(x) = \frac{-\exp(x)}{(1 + \exp(-x))^2} = \mathrm{sigmoid}(x)\left(1-\mathrm{sigmoid}(x)\right).$$
 
 
 The derivative of Sigmoid function is plotted below. When the input is 0, the derivative of the Sigmoid function reaches a maximum of 0.25; as the input deviates further from 0, the derivative of Sigmoid function approaches 0.
 
-```{.python .input}
+```{.python .input  n=5}
 y.backward()
 xyplot(x, x.grad, 'grad of sigmoid')
 ```
 
 ### Tanh Function
 
-The Tanh (Hyperbolic Tangent) function transforms the value of an element between -1 and 1:
+The Tanh (Hyperbolic Tangent) function transforms the value of an element to the interval between -1 and 1:
 
 $$\text{tanh}(x) = \frac{1 - \exp(-2x)}{1 + \exp(-2x)}.$$
 
 We can then plot the Tanh function. As the input nears 0, the Tanh function approaches linear transformation. Although the shape of the function is similar to that of the Sigmoid function, the Tanh function is symmetric at the origin of the coordinate system.
 
-```{.python .input  n=9}
+```{.python .input  n=6}
 with autograd.record():
     y = x.tanh()
 xyplot(x, y, 'tanh')
 ```
 
-According to the chain rule, the derivative of Tanh function is:
+The derivative of the Tanh function is:
 
-$$\text{tanh}'(x) = 1 - \text{tanh}^2(x).$$
+$$\frac{d}{dx} \mathrm{tanh}(x) = 1 - \mathrm{tanh}^2(x).$$
 
 The derivative of Tanh function is plotted below. As the input nears 0, the derivative of the Tanh function approaches a maximum of 1; as the input deviates away from 0, the derivative of the Tanh function approaches 0.
 
-```{.python .input}
+```{.python .input  n=7}
 y.backward()
 xyplot(x, x.grad, 'grad of tanh')
 ```
 
-## Multilayer Perceptron
-
-The multilayer perceptron is the neural network composed of fully connected layers containing at least one hidden layer. Here, the output of each hidden layer is transformed by an activation function. The number of layers to the multilayer perceptron and the number of hidden units within each hidden layer are considered hyper-parameters. Taking a single hidden layer as an example and by following the key points previously defined in this section, the multilayer perceptron calculates the output as follows:
-
-$$
-\begin{aligned}
-\boldsymbol{H} &= \phi(\boldsymbol{X} \boldsymbol{W}_h + \boldsymbol{b}_h),\\
-\boldsymbol{O} &= \boldsymbol{H} \boldsymbol{W}_o + \boldsymbol{b}_o,
-\end{aligned}
-$$
- 
-$\phi$ represents the activation function. In the classification problem, we can perform a Softmax operation on the output $\boldsymbol{O}$, and use the cross-entropy loss function in Softmax regression.
-In the regression problem, we set the number of outputs within the output layer to 1, and set the output directly $\boldsymbol{O}$ to the squared loss function we used in linear regression.  
-
-
+In summary, we have a range of nonlinearities and now know how to layer them to build quite powerful network architectures. As a side note, we have now pretty much reached the state of the art in deep learning, anno 1990. The main difference is that we have a powerful deep learning framework which lets us build models in a few lines of code where previously thousands of lines of C and Fortran would have been needed. 
 
 ## Summary
 
@@ -145,10 +174,13 @@ In the regression problem, we set the number of outputs within the output layer 
 * Commonly used activation functions include the ReLU function, the Sigmoid function, and the Tanh function.
 
 
-## exercise
+## Problems
 
-* Applying the chain rule, derive the mathematical expression of the derivative of Sigmoid function and Tanh function.
-* Check out the information below to learn about other activation functions.
+1. Compute the derivative of the Tanh and the pReLU activation function.
+1. Show that a multilayer perceptron using only ReLU (or pReLU) constructs a continuous piecewise linear function. 
+1. Show that $\mathrm{tanh}(x) + 1 = 2 \mathrm{sigmoid}(2x)$.
+1. Assume we have a multilayer perceptron *without* nonlinearities between the layers. In particular, assume that we have $d$ input dimensions, $d$ output dimensions and that one of the layers had only $d/2$ dimensions. Show that this network is less expressive (powerful) than a single layer perceptron. 
+1. Assume that we have a nonlinearity that applies to one minibatch at a time. What kinds of problems to you expect this to cause? 
 
 
 ## Scan the QR code to get to the [forum](https://discuss.gluon.ai/t/topic/6447)

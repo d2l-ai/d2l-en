@@ -163,7 +163,7 @@ train_ch3(net, train_iter, test_iter, cross_entropy, num_epochs,
           batch_size, [W, b], lr)
 ```
 
-## PREDICTION
+## Prediction
 
 Now that training is complete, we can show how to classify the image. Given a series of images, we will compare their actual labels (first line of text output) and the model predictions (second line of text output).
 

@@ -28,7 +28,30 @@ net.initialize(init.Normal(sigma=0.01))
 
 ## The Softmax
 
-As the problem set from the last section illustrates, computing softmax and loss function separately can cause all sorts of numerical instabilities, mostly due to numerical overflow (e.g. $\exp(50)$) and underflow (e.g. $\exp(-50)$). To address this Gluon provides a function that includes softmax operations and cross-entropy loss calculations. This results in better numerical stability and better computational efficiency.
+In the previous example, we calculated our model's output and then ran this output through the cross-entropy loss function: 
+
+``
+def cross_entropy(y_hat, y):
+    return - nd.pick(y_hat, y).log()
+``
+
+Mathematically, that's a perfectly reasonable thing to do. However, computationally, things can get hairy, as we've already alluded to a few times (e.g. in the context of [Naive Bayes](../chapter_crashcourse/naive-bayes.md) and in the problem set of the previous chapter). Recall that the softmax function calculates $\hat y_j = \frac{e^{z_j}}{\sum_{i=1}^{n} e^{z_i}}$, where $\hat y_j$ is the j-th element of ``yhat`` and $z_j$ is the j-th element of the input ``y_linear`` variable, as computed by the softmax.
+
+If some of the $z_i$ are very large (i.e. very positive), $e^{z_i}$ might be larger than the largest number we can have for certain types of ``float`` (i.e. overflow). This would make the denominator (and/or numerator) ``inf`` and we get zero, or ``inf``, or ``nan`` for $\hat y_j$. In any case, we won't get a well-defined return value for ``cross_entropy``. This is the reason we subtract $\text{max}(z_i)$ from all $z_i$ first in ``softmax`` function. You can verify that this shifting in $z_i$ will not change the return value of ``softmax``.
+
+After the above subtraction/ normalization step, it is possible that $z_j$ is very negative. Thus, $e^{z_j}$ will be very close to zero and might be rounded to zero due to finite precision (i.e underflow), which makes $\hat y_j$ zero and we get ``-inf`` for $\text{log}(\hat y_j)$. A few steps down the road in backpropagation, we start to get horrific not-a-number (``nan``) results printed to screen.
+
+Our salvation is that even though we're computing these exponential functions, we ultimately plan to take their log in the cross-entropy functions. It turns out that by combining these two operators ``softmax`` and ``cross_entropy`` together, we can elude the numerical stability issues that might otherwise plague us during backpropagation. As shown in the equation below, we avoided calculating $e^{z_j}$ but directly used $z_j$ due to $log(exp(\cdot))$.
+
+$$
+\begin{align}
+\log{(\hat y_j)} & = \log\left( \frac{e^{z_j}}{\sum_{i=1}^{n} e^{z_i}}\right) \\
+& = \log{(e^{z_j})}-\text{log}{\left( \sum_{i=1}^{n} e^{z_i} \right)} \\
+& = z_j -\log{\left( \sum_{i=1}^{n} e^{z_i} \right)}
+\end{align}
+$$
+
+We'll want to keep the conventional softmax function handy in case we ever want to evaluate the probabilities output by our model. But instead of passing softmax probabilities into our new loss function, we'll just pass $\hat{y}$ and compute the softmax and its log all at once inside the softmax_cross_entropy loss function, which does smart things like the log-sum-exp trick ([see on Wikipedia](https://en.wikipedia.org/wiki/LogSumExp)).
 
 ```{.python .input  n=4}
 loss = gloss.SoftmaxCrossEntropyLoss()
@@ -63,7 +86,3 @@ Just as before, this algorithm converges to a fairly decent accuracy of 83.7%, a
 ## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/740)
 
 ![](../img/qr_softmax-regression-gluon.svg)
-
-```{.python .input}
-
-```
