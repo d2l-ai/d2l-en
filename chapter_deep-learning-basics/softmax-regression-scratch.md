@@ -17,7 +17,7 @@ train_iter, test_iter = gb.load_data_fashion_mnist(batch_size)
 
 ## Initialize Model Parameters
 
-Just as in linear regression, we use vectors to represent examples. Since each example is an image with $28 \times 28$ pixels we can store it as a $784$ dimensional vector. Moreover, since we have 10 categories, the single layer network has an output dimension of 10. Consequently, the weight and bias parameters of the softmax regression are matrics of size $784 \times 10$ and $1 \times 10$ respectively. We initialize $W$ with Gaussian noise. 
+Just as in linear regression, we use vectors to represent examples. Since each example is an image with $28 \times 28$ pixels we can store it as a $784$ dimensional vector. Moreover, since we have 10 categories, the single layer network has an output dimension of 10. Consequently, the weight and bias parameters of the softmax regression are matrics of size $784 \times 10$ and $1 \times 10$ respectively. We initialize $W$ with Gaussian noise.
 
 ```{.python .input  n=9}
 num_inputs = 784
@@ -36,7 +36,7 @@ b.attach_grad()
 
 ## The Softmax
 
-Before defining softmax regression let us briefly review how operators such as `sum` work along specific dimensions in an NDArray. Given a matrix `X` we can sum over all elements (default) or only over elements in the same column (`axis=0`) or the same row (`axis=1`). Moreover, we can retain the same dimensionality rather than collapsing out the dimension that we summed over, if required (`keepdims=True`). 
+Before defining softmax regression let us briefly review how operators such as `sum` work along specific dimensions in an NDArray. Given a matrix `X` we can sum over all elements (default) or only over elements in the same column (`axis=0`) or the same row (`axis=1`). Moreover, we can retain the same dimensionality rather than collapsing out the dimension that we summed over, if required (`keepdims=True`).
 
 ```{.python .input  n=11}
 X = nd.array([[1, 2, 3], [4, 5, 6]])
@@ -79,7 +79,7 @@ def net(X):
 
 In the [last section](softmax-regression.md), we introduced the cross-entropy loss function used by softmax regression. It may be the most common loss function you’ll find in all of deep learning. That’s because at the moment, classification problems tend to be far more abundant than regression problems.
 
-Recall that it picks the label's predicted probability and takes its logarithm $-\log p(y|x)$. Rather than having to do this using a Python `for` loop (which tends to be inefficient) we have a `pick` function which allows us to select the appropriate terms from the matrix of softmax entries easily. We illustrate this in the case of 3 categories and 2 examples. 
+Recall that it picks the label's predicted probability and takes its logarithm $-\log p(y|x)$. Rather than having to do this using a Python `for` loop (which tends to be inefficient) we have a `pick` function which allows us to select the appropriate terms from the matrix of softmax entries easily. We illustrate this in the case of 3 categories and 2 examples.
 
 ```{.python .input  n=15}
 y_hat = nd.array([[0.1, 0.3, 0.6], [0.3, 0.2, 0.5]])
