@@ -28,14 +28,7 @@ net.initialize(init.Normal(sigma=0.01))
 
 ## The Softmax
 
-In the previous example, we calculated our model's output and then ran this output through the cross-entropy loss function: 
-
-``
-def cross_entropy(y_hat, y):
-    return - nd.pick(y_hat, y).log()
-``
-
-Mathematically, that's a perfectly reasonable thing to do. However, computationally, things can get hairy, as we've already alluded to a few times (e.g. in the context of [Naive Bayes](../chapter_crashcourse/naive-bayes.md) and in the problem set of the previous chapter). Recall that the softmax function calculates $\hat y_j = \frac{e^{z_j}}{\sum_{i=1}^{n} e^{z_i}}$, where $\hat y_j$ is the j-th element of ``yhat`` and $z_j$ is the j-th element of the input ``y_linear`` variable, as computed by the softmax.
+In the previous example, we calculated our model's output and then ran this output through the cross-entropy loss. At its heart it uses `-nd.pick(y_hat, y).log()`. Mathematically, that's a perfectly reasonable thing to do. However, computationally, things can get hairy, as we've already alluded to a few times (e.g. in the context of [Naive Bayes](../chapter_crashcourse/naive-bayes.md) and in the problem set of the previous chapter). Recall that the softmax function calculates $\hat y_j = \frac{e^{z_j}}{\sum_{i=1}^{n} e^{z_i}}$, where $\hat y_j$ is the j-th element of ``yhat`` and $z_j$ is the j-th element of the input ``y_linear`` variable, as computed by the softmax.
 
 If some of the $z_i$ are very large (i.e. very positive), $e^{z_i}$ might be larger than the largest number we can have for certain types of ``float`` (i.e. overflow). This would make the denominator (and/or numerator) ``inf`` and we get zero, or ``inf``, or ``nan`` for $\hat y_j$. In any case, we won't get a well-defined return value for ``cross_entropy``. This is the reason we subtract $\text{max}(z_i)$ from all $z_i$ first in ``softmax`` function. You can verify that this shifting in $z_i$ will not change the return value of ``softmax``.
 
