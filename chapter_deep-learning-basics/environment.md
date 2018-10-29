@@ -1,4 +1,3 @@
-
 # Environment
 
 So far we did not worry very much about where the data came from and how the models that we build get deployed. Not caring about it can be problematic. Many failed machine learning deployments can be traced back to this situation. This chapter is meant to help with detecting such situations early and points out how to mitigate them. Depending on the case this might be rather simple (ask for the 'right' data) or really difficult (implement a reinforcement learning system). 
@@ -7,15 +6,15 @@ So far we did not worry very much about where the data came from and how the mod
 
 At its heart is a problem that is easy to understand but also equally easy to miss. Consider being given the challenge of distinguishing cats and dogs. Our training data consists of images of the following kind:
 
-|![](../img/cat1.jpg)|![](../img/cat2.jpg)|![](../img/dog1.jpg)|![](../img/dog2.jpg)|
-|:---------------:|:---------------:|:---------------:|:---------------:|
 |cat|cat|dog|dog|
+|:---------------:|:---------------:|:---------------:|:---------------:|
+|![](../img/cat1.jpg)|![](../img/cat2.jpg)|![](../img/dog1.jpg)|![](../img/dog2.jpg)|
 
 At test time we are asked to classify the following images:
 
-|![](../img/cat-cartoon1.png)|![](../img/cat-cartoon2.png)|![](../img/dog-cartoon1.png)|![](../img/dog-cartoon2.jpg)|
-|:---------------:|:---------------:|:---------------:|:---------------:|
 |cat|cat|dog|dog|
+|:---------------:|:---------------:|:---------------:|:---------------:|
+|![](../img/cat-cartoon1.png)|![](../img/cat-cartoon2.png)|![](../img/dog-cartoon1.png)|![](../img/dog-cartoon2.png)|
 
 Obviously this is unlikely to work well. The training set consists of photos, while the test set contains only cartoons. The colors aren't even accurate. Training on a dataset that looks substantially different from the test set without some plan for how to adapt to the new domain is a bad idea. Unfortunately, this is a very common pitfall. Statisticians call this **Covariate Shift**, i.e. the situation where the distribution over the covariates (aka training data) is shifted on test data relative to the training case. Mathematically speaking, we are referring the case where $p(x)$ changes but $p(y|x)$ remains unchanged.
 
@@ -23,7 +22,7 @@ Obviously this is unlikely to work well. The training set consists of photos, wh
 
 A related problem is that of concept shift. This is the situation where the the labels change. This sounds weird - after all, a cat is a cat is a cat. Well, cats maybe but not soft drinks. There is considerable concept shift throughout the USA, even for such a simple term:
 
-![](../img/sodapopcoke.png)
+![](../img/popvssoda.png)
 
 If we were to build a machine translation system, the distribution $p(y|x)$ would be different, e.g. depending on our location. This problem can be quite tricky to spot. A saving grace is that quite often the $p(y|x)$ only shifts gradually (e.g. the click-through rate for NOKIA phone ads). Before we go into further details, let us discuss a number of situations where covariate and concept shift are not quite as blatantly obvious.
 
@@ -60,13 +59,22 @@ In short, there are many cases where training and test distribution $p(x)$ are d
 
 ## Covariate Shift Correction
 
-Assume that we want to estimate some dependency $p(y|x)$ for which we have labeled data $(x_i,y_i)$. Alas, the observations $x_i$ are drawn from some distribution $q(x)$ rather than the ‘proper’ distribution $p(x)$. To make progress, we need to reflect about what exactly is happening during training: we iterate over training data and associated labels $\{(x_1, y_1), \ldots (y_m, y_m)\}$ and update the weight vectors of the model after every minibatch. Depending on the situation we also apply some penalty to the parameters, e.g. $L_2$ regularization. In other words, we want to solve
+Assume that we want to estimate some dependency $p(y|x)$ for which we have labeled data $(x_i,y_i)$. Alas, the observations $x_i$ are drawn from some distribution $q(x)$ rather than the ‘proper’ distribution $p(x)$. To make progress, we need to reflect about what exactly is happening during training: we iterate over training data and associated labels $\{(x_1, y_1), \ldots (y_n, y_n)\}$ and update the weight vectors of the model after every minibatch.
 
-$$\mathop{\mathrm{minimize}}_w \frac{1}{m} \sum_{i=1}^m l(x_i, y_i, f(x_i)) + \frac{\lambda}{2} \|w\|_2^2$$
+Depending on the situation we also apply some penalty to the parameters, such as weight decay, dropout, zoneout, or anything similar. This means that we largely minimize the loss on the training.  
+
+$$
+\mathop{\mathrm{minimize}}_w \frac{1}{n} \sum_{i=1}^n l(x_i, y_i, f(x_i)) + \mathrm{some~penalty}(w)
+$$
 
 Statisticians call the first term an *empirical average*, that is an average computed over the data drawn from $p(x) p(y|x)$. If the data is drawn from the 'wrong' distribution $q$, we can correct for that by using the following simple identity:
 
-$$\mathbf{E}_{x \sim p(x)} [f(x)] = \int f(x) p(x) dx = \int f(x) \frac{p(x)}{q(x)} q(x) dx = \mathbf{E}_{x \sim q(x)} \left[f(x) \frac{p(x)}{q(x)}\right]$$
+$$
+\begin{align}
+\int p(x) f(x) dx & = \int p(x) f(x) \frac{q(x)}{q(x)} dx \\
+& = \int q(x) f(x) \frac{p(x)}{q(x)} dx 
+\end{align}
+$$
 
 In other words, we need to re-weight each instance by the ratio of probabilities that it would have been drawn from the correct distribution $\beta(x) := p(x)/q(x)$. Alas, we do not know that ratio, so before we can do anything useful we need to estimate it. Many methods are available, e.g. some rather fancy operator theoretic ones which try to recalibrate the expectation operator directly using a minimum-norm or a maximum entropy principle. Note that for any such approach, we need samples drawn from both distributions - the 'true' $p$, e.g. by access to training data, and the one used for generating the training set $q$ (the latter is trivially available). 
 
@@ -74,19 +82,24 @@ In this case there exists a very effective approach that will give almost as goo
 
 $$p(z=1|x) = \frac{p(x)}{p(x)+q(x)} \text{ and hence } \frac{p(z=1|x)}{p(z=-1|x)} = \frac{p(x)}{q(x)}$$
 
-Hence, if we use a logistic regression approach where $p(z=1|x)=\frac{1}{1+\exp(−f(x)}$ it follows (after some simple algebra) that $\beta(x) = \exp(f(x))$. In summary, we need to solve two problems: first one to distinguish between data drawn from both distributions, and then a reweighted minimization problem where we weigh terms by $\beta$, e.g. via the head gradients. Here's a prototypical algorithm for that purpose:
+Hence, if we use a logistic regression approach where $p(z=1|x)=\frac{1}{1+\exp(−f(x)}$ it follows that
 
-```
+$$
+\beta(x) = \frac{1/(1 + \exp(-f(x)))}{\exp(-f(x)/(1 + \exp(-f(x)))} = \exp(f(x))
+$$
+
+As a result, we need to solve two problems: first one to distinguish between data drawn from both distributions, and then a reweighted minimization problem where we weigh terms by $\beta$, e.g. via the head gradients. Here's a prototypical algorithm for that purpose:
+
+``
 CovariateShiftCorrector(X, Z)
     X: Training dataset (without labels)
     Z: Test dataset (without labels)
-    
-    generate training set with {(x_i, -1) ... (z_j, 1)}
+        generate training set with {(x_i, -1) ... (z_j, 1)}
     train binary classifier using logistic regression to get function f
     weigh data using beta_i = exp(f(x_i)) or 
                      beta_i = min(exp(f(x_i)), c)
     use weights beta_i for training on X with labels Y
-``` 
+`` 
 
 **Generative Adversarial Networks** use the very idea described above to engineer a *data generator* such that it cannot be distinguished from a reference dataset. For this, we use one network, say $f$ to distinguish real and fake data and a second network $g$ that tries to fool the discriminator $f$ into accepting fake data as real. We will discuss this in much more detail later. 
 
@@ -123,4 +136,6 @@ $$
 One key distinction between the different situations above is that the same strategy that might have worked throughout in the case of a stationary environment, might not work throughout when the environment can adapt. For instance, an arbitrage opportunity discovered by a trader is likely to disappear once he starts exploiting it. The speed and manner at which the environment changes determines to a large extent the type of algorithms that we can bring to bear. For instance, if we *know* that things may only change slowly, we can force any estimate to change only slowly, too. If we know that the environment might change instantaneously, but only very infrequently, we can make allowances for that. These types of knowledge are crucial for the aspiring data scientist to deal with concept shift, i.e. when the problem that he is trying to solve changes over time.
 
 
-For whinges or inquiries, [open an issue on  GitHub.](https://github.com/zackchase/mxnet-the-straight-dope)
+```{.python .input}
+
+```
