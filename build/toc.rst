@@ -5,7 +5,7 @@ Table of Contents
    :maxdepth: 2
 
    chapter_introduction/index
-   chapter_prerequisite/index
+   chapter_crashcourse/index
    chapter_deep-learning-basics/index
    chapter_deep-learning-computation/index
    chapter_convolutional-neural-networks/index
