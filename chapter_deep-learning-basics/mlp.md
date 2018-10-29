@@ -29,11 +29,11 @@ In the multilayer perceptron above, the number of inputs and outputs is 4 and 3 
 
 Let us write out what is happening mathematically in the picture above, e.g. for multiclass classification.
 $$
-\begin{align}
+\begin{aligned}
     h & = W_1 x + b_1 \\
     o & = W_2 h + b_2 \\
     \hat{y} & = \mathrm{softmax}(o)
-\end{align}
+\end{aligned}
 $$
 
 The problem with the approach above is that we have gained nothing over a simple single layer perceptron since we can collapse out the hidden layer by an equivalently parametrized single layer perceptron using $W = W_2 W_1$ and $b = W_2 b_1 + b_2$.
@@ -43,11 +43,11 @@ $$o = W_2 h + b_2 = W_2 (W_1 x + b_1) + b_2 = (W_2 W_1) x + (W_2 b_1 + b_2) = W 
 To fix this we need another key ingredient - a nonlinearity $\sigma$ such as $\mathrm{max}(x,0)$ after each layer. Once we do this, it becomes impossible to merge layers. This yields
 
 $$
-\begin{align}
+\begin{aligned}
     h & = \sigma(W_1 x + b_1) \\
     o & = W_2 h + b_2 \\
     \hat{y} & = \mathrm{softmax}(o)
-\end{align}
+\end{aligned}
 $$
 
 Clearly we could continue stacking such hidden layers, e.g. $h_1 = \sigma(W_1 x + b_1)$ and $h_2 = \sigma(W_2 h_1 + b_2)$ on top of each other to obtain a true multilayer perceptron. 
@@ -59,11 +59,11 @@ Multilayer perceptrons can account for complex interactions in the inputs becaus
 When given a mini-batch of samples we can use vectorization to gain better efficiency in implementation. In a nutshell, we replace vectors by matrices. As before, denote by $X$ the matrix of inputs from a minibatch. Then an MLP with two hidden layers can be expressed as 
 
 $$
-\begin{align}
+\begin{aligned}
     H_1 & = \sigma(W_1 X + b_1) \\
     H_2 & = \sigma(W_2 H_1 + b_2) \\
     O & = \mathrm{softmax}(W_3 H_2 + b_3)
-\end{align}
+\end{aligned}
 $$
 
 This is easy to implement and easy to optimize. With some abuse of notation we define the nonlinearity $\sigma$ to apply to its inputs on a row-wise fashion, i.e. one observation at a time, often one coordinate at a time. This is true for most activation functions (the [batch normalization](../chapter_convolutional-neural-networks/batch-norm.md) is a notable exception from that rule).  

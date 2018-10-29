@@ -68,12 +68,12 @@ $$(w,b) \leftarrow (w,b) - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \
 For quadratic losses and linear functions we can write this out explicitly as followsn Note that $w$ and $x$ are vectors. Here the more elegant vector notation makes the math much more readable than expressing things in terms of coefficients, say $w_1, w_2, \ldots w_d$. 
 
 $$
-\begin{align}
+\begin{aligned}
 w &\leftarrow w -   \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_w l^{(i)}(w, b) && =
 w - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} x^{(i)} \left(w^\top x^{(i)} + b - y^{(i)}\right),\\
 b &\leftarrow b -  \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_b l^{(i)}(w, b)  && =
 b - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \left(w^\top x^{(i)} - y^{(i)}\right).
-\end{align}
+\end{aligned}
 $$
 
 In the above equation $|\mathcal{B}|$ represents the number of samples (batch size) in each mini-batch, $\eta$ is referred to as ‘learning rate’ and takes a positive number. It should be emphasized that the values of the batch size and learning rate are set somewhat manually and are typically not learned through model training. Therefore, they are referred to as *hyper-parameters*. What we usually call *tuning hyper-parameters* refers to the adjustment of these terms. In the worst case this is performed through repeated trial and error until the appropriate hyper-parameters are found. A better approach is to learn these as parts of model training. This is an advanced topic and we do not cover them here for the sake of simplicity. 

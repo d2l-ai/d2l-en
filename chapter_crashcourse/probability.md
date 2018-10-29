@@ -188,9 +188,6 @@ as assessed after each of the 1000 turns.
 The dashed black line gives the true underlying probability.
 As we get more data, the solid curves converge towards the true answer.
 
-<!-- What we can see is that the red curves pretty well capture the behavior of the 10 random traces of averages. This is the case since we are averaging numbers and their aggregate behavior is like that of a number with a lot less uncertainty. Looking at the red curves, they are given by $f(x) = \pm 1/\sqrt{x}$. (The reader might cry foul by noting that we just added Gaussian random variables which, quite obviously, lead to yet another Gaussian random variable. That said, the curves for sums of other random variables, such as $\{0, 1\}$ valued objects look identical in the limit.) -->
-
-
 In our example of casting a die, we introduced the notion of a **random variable**.
 A random variable, which we denote here as $X$ can be pretty much any quantity and is not determistic.
 Random variables could take one value among a set of possibilites.
@@ -221,7 +218,7 @@ There are a few important axioms of probability that you'll want to remember:
 
 * For any event $z$, the probability is never negative, i.e. $\Pr(Z=z) \geq 0$.
 * For any two events $Z=z$ and $X=x$ the union is no more likely than the sum of the individual events, i.e. $\Pr(Z=z \cup X=x) \leq \Pr(Z=z) + \Pr(X=x)$.
-* For any random variable, the probabilities of all the values it can take must sum to 1 $\sum_{i=1}^n P(Z=z_i) = 1$.
+* For any random variable, the probabilities of all the values it can take must sum to 1, i.e. $\sum_{i=1}^n P(Z=z_i) = 1$.
 * For any two mutually exclusive events $Z=z$ and $X=x$, the probability that either happens is equal to the sum of their individual probabilities that $\Pr(Z=z \cup X=x) = \Pr(Z=z) + \Pr(X=z)$.
 
 ## Dealing with multiple random variables
@@ -301,20 +298,20 @@ Obviously this is going to depend on how common the disease is, since it affects
 Assume that the population is quite healthy, e.g. $\Pr(\text{HIV positive}) = 0.0015$.
 To apply Bayes Theorem we need to determine
 
-$$\begin{align}
+$$\begin{aligned}
 \Pr(\text{Test positive}) =& \Pr(D=1|H=0) \Pr(H=0) + \Pr(D=1|H=1) \Pr(H=1) \\
 =& 0.01 \cdot 0.9985 + 1 \cdot 0.0015 \\
 =& 0.011485
-\end{align}
+\end{aligned}
 $$
 
 Hence we get
 
-$$\begin{align}
+$$\begin{aligned}
 \Pr(H = 1|D = 1) =& \frac{\Pr(D=1|H=1) \Pr(H=1)}{\Pr(D=1)} \\
 =& \frac{1 \cdot 0.0015}{0.011485} \\
 =& 0.131
-\end{align}
+\end{aligned}
 $$
 
 In other words, there's only a 13.1% chance that the patient actually has AIDS, despite using a test that is 99% accurate! As we can see, statistics can be quite counterintuitive.
@@ -348,3 +345,7 @@ The reason is that we needed a second test that confirmed *independently* of the
 ## Summary
 
 So far we covered probabilities, independence, conditional independence, and how to use this to draw some basic conclusions. This is already quite powerful. In the next section we will see how this can be used to perform some basic estimation using a Naive Bayes classifier.
+
+```{.python .input}
+
+```

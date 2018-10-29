@@ -70,10 +70,10 @@ $$
 Statisticians call the first term an *empirical average*, that is an average computed over the data drawn from $p(x) p(y|x)$. If the data is drawn from the 'wrong' distribution $q$, we can correct for that by using the following simple identity:
 
 $$
-\begin{align}
+\begin{aligned}
 \int p(x) f(x) dx & = \int p(x) f(x) \frac{q(x)}{q(x)} dx \\
 & = \int q(x) f(x) \frac{p(x)}{q(x)} dx 
-\end{align}
+\end{aligned}
 $$
 
 In other words, we need to re-weight each instance by the ratio of probabilities that it would have been drawn from the correct distribution $\beta(x) := p(x)/q(x)$. Alas, we do not know that ratio, so before we can do anything useful we need to estimate it. Many methods are available, e.g. some rather fancy operator theoretic ones which try to recalibrate the expectation operator directly using a minimum-norm or a maximum entropy principle. Note that for any such approach, we need samples drawn from both distributions - the 'true' $p$, e.g. by access to training data, and the one used for generating the training set $q$ (the latter is trivially available). 
