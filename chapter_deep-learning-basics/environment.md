@@ -88,18 +88,12 @@ $$
 \beta(x) = \frac{1/(1 + \exp(-f(x)))}{\exp(-f(x)/(1 + \exp(-f(x)))} = \exp(f(x))
 $$
 
-As a result, we need to solve two problems: first one to distinguish between data drawn from both distributions, and then a reweighted minimization problem where we weigh terms by $\beta$, e.g. via the head gradients. Here's a prototypical algorithm for that purpose:
+As a result, we need to solve two problems: first one to distinguish between data drawn from both distributions, and then a reweighted minimization problem where we weigh terms by $\beta$, e.g. via the head gradients. Here's a prototypical algorithm for that purpose which uses an unlabeled training set $X$ and test set $Z$:
 
-``
-CovariateShiftCorrector(X, Z)
-    X: Training dataset (without labels)
-    Z: Test dataset (without labels)
-        generate training set with {(x_i, -1) ... (z_j, 1)}
-    train binary classifier using logistic regression to get function f
-    weigh data using beta_i = exp(f(x_i)) or 
-                     beta_i = min(exp(f(x_i)), c)
-    use weights beta_i for training on X with labels Y
-`` 
+1. Generate training set with $\{(x_i, -1) ... (z_j, 1)\}$
+1. Train binary classifier using logistic regression to get function $f$
+1. Weigh training data using $\beta_i = \exp(f(x_i))$ or better $\beta_i = \min(\exp(f(x_i)), c)$
+1. Use weights $\beta_i$ for training on $X$ with labels $Y$
 
 **Generative Adversarial Networks** use the very idea described above to engineer a *data generator* such that it cannot be distinguished from a reference dataset. For this, we use one network, say $f$ to distinguish real and fake data and a second network $g$ that tries to fool the discriminator $f$ into accepting fake data as real. We will discuss this in much more detail later. 
 
