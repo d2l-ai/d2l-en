@@ -1,6 +1,6 @@
-# Implementation of the Multilayer Perceptron starting from scratch
+# Implementing a Multilayer Perceptron from Scratch
 
-We have already learned the multilayer perceptron principle from the previous section.  Let’s work through the following together in order to implement a multilayer perceptron.  First, import the required packages or modules.
+Now that we learned how multilayer perceptrons (MLPs) work in theory, let's implement them. First, import the required packages or modules.
 
 ```{.python .input  n=9}
 %matplotlib inline
@@ -9,8 +9,6 @@ from mxnet import nd
 from mxnet.gluon import loss as gloss
 ```
 
-## Retrieve and read the data
-
 We continue to use the Fashion-MNIST data set. We will use the Multilayer Perceptron for image classification
 
 ```{.python .input  n=2}
@@ -18,9 +16,9 @@ batch_size = 256
 train_iter, test_iter = gb.load_data_fashion_mnist(batch_size)
 ```
 
-## Defining Model Parameters
+## Initialize Model Parameters
 
-In the section titled “Implementation of Softmax Regression Starting From Scratch”, we have already stated the image shape in the  []()Fashion-MNIST data set is $28 \times 28$, and the number of categories is 10. In this section, we still use a vector length of $28 \times 28 = 784$ to represent each image. Therefore, the number of inputs is 784 and the number of outputs is 10. In this experiment, we set the number of hyper-parameter hidden units at 256. 256
+We know that the dataset contains 10 classes and that the images are of $28 \times 28 = 784$ pixel resolution. Thus the number of inputs is 784 and the number of outputs is 10. Moreover, we use an MLP with one hidden layer and we set the number of hidden units to 256, but we could have picked some other value for this *hyperparameter*, too. Typically one uses powers of 2 since things align more nicely in memory.
 
 ```{.python .input  n=3}
 num_inputs, num_outputs, num_hiddens = 784, 10, 256
@@ -35,18 +33,18 @@ for param in params:
     param.attach_grad()
 ```
 
-## Defining Activation Function
+## Activation Function
 
-Here, we use the underlying `maximum` function to implement the ReLU process, instead of instructing `ReLU` to directly function.
+Here, we use the underlying `maximum` function to implement the ReLU, instead of invoking `ReLU` directly. 
 
 ```{.python .input  n=4}
 def relu(X):
     return nd.maximum(X, 0)
 ```
 
-## Define the model
+## The model
 
-As softmax regression, with a`reshape` function, we changed each original image to a length vector of  `num_inputs`. We then implemented a Multilayer Perceptron calculation expression in the previous section.
+As in softmax regression, using `reshape` we change each original image to a length vector of  `num_inputs`. We then implement implement the MLP just as discussed previously.
 
 ```{.python .input  n=5}
 def net(X):
@@ -55,33 +53,49 @@ def net(X):
     return nd.dot(H, W2) + b2
 ```
 
-## Define loss function
+## The Loss Function
 
-For better numerical stability, we use Gluon's functions, including softmax calculation and cross-entropy loss calculation.
+For better numerical stability, we use Gluon's functions, including softmax calculation and cross-entropy loss calculation. We discussed the intricacies of that in the [previous section](mlp.md). This is simply to avoid lots of fairly detailed and specific code (the interested reader is welcome to look at the source code for more details, something that is useful for implementing other related functions).
 
 ```{.python .input  n=6}
 loss = gloss.SoftmaxCrossEntropyLoss()
 ```
 
-## To train a model
+## Training
 
-Steps for training the Multilayer Perceptron are no different from Softmax Regression training steps.  In the `gluonbook` package, we directly call the `train_ch3` function, whose implementation was introduced in [ "Implementation of Softmax Regression Starting from Scratch" ](softmax-regression-scratch.md) section.  Here we set the number of hyper-parameter epochs to 5 and the learning rate to 0.5.
+Steps for training the Multilayer Perceptron are no different from Softmax Regression training steps.  In the `gluonbook` package, we directly call the `train_ch3` function, whose implementation was introduced [here](softmax-regression-scratch.md). We set the number of epochs to 10 and the learning rate to 0.5.
 
 ```{.python .input  n=7}
-num_epochs, lr = 5, 0.5
+num_epochs, lr = 10, 0.5
 gb.train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size,
              params, lr)
 ```
 
+To see how well we did, let's apply the model to some test data. If you're interested, compare the result to corresponding [linear model](softmax-regression-scratch.md). 
+
+```{.python .input}
+for X, y in test_iter:
+    break
+
+true_labels = gb.get_fashion_mnist_labels(y.asnumpy())
+pred_labels = gb.get_fashion_mnist_labels(net(X).argmax(axis=1).asnumpy())
+titles = [truelabel + '\n' + predlabel for truelabel, predlabel in zip(true_labels, pred_labels)]
+
+gb.show_fashion_mnist(X[0:9], titles[0:9])
+```
+
+This looks slightly better than before, a clear sign that we're on to something good here.
+
 ## Summary
 
-* We can implement a simple multilayer perceptron by manually defining the model and its parameters. 
-* When there is a large number of layers in the Multilayer Perceptron, the implementation of this section will be more complicated, such as the ability to define model parameters.  
+We saw that implementing a simple MLP is quite easy, when done manually. That said, for a large number of layers this can get quite complicated (e.g. naming the model parameters, etc). 
 
-## exercise
+## Problems
 
-* Change the value of the hyper-parameter `num_hiddens` in order to see the result effects. 
-* Try adding a new hidden layer to see how it affects the results.  
+1. Change the value of the hyper-parameter `num_hiddens` in order to see the result effects. 
+1. Try adding a new hidden layer to see how it affects the results.  
+1. How does changing the learning rate change the result. 
+1. What is the best result you can get by optimizing over all the parameters (learning rate, iterations, number of hidden layers, number of hidden units per layer)?
 
 ## Scan the QR code to access the  [  ](> forum. 
 

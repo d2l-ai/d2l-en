@@ -15,11 +15,13 @@ To illustrate this a bit, consider classifying emails into spam and ham. It's fa
 
 Since images are much easier to deal with, we will illustrate the workings of a Naive Bayes classifier for distinguishing digits on the MNIST dataset. The problem is that we don't actually know $p(y)$ and $p(x_i|y)$. So we need to *estimate* it given some training data first. This is what is called *training* the model. Estimating $p(y)$ is not too hard. Since we are only dealing with 10 classes, this is pretty easy - simply count the number of occurrences $n_y$ for each of the digits and divide it by the total amount of data $n$. For instance, if digit 8 occurs $n_8 = 5,800$ times and we have a total of $n = 60,000$ images, the probability estimate is $p(y=8) = 0.0967$. 
 
-Now on to slightly more difficult things - $p(x_i|y)$. Since we picked black and white images, $p(x_i|y)$ denotes the probability that pixel $i$ is switched on for class $y$. Just like before we can go and count the number of times $n_{iy}$ that such an event occurs and divide it by the total number of occurrences of y, i.e. $n_y$. But there's something slightly troubling. It might be that certain pixels are never black (e.g. for very well cropped images the corner pixels might always be white). A convenient way for statisticians to deal with this problem is to add pseudo counts to all occurrences. Hence, rather than $n_{iy}$ we use $n_{iy}+1$ and instead of $n_y$ we use $n_{y} + 1$. This is also called [Laplace Smoothing](https://en.wikipedia.org/wiki/Additive_smoothing). 
+Now on to slightly more difficult things - $p(x_i|y)$. Since we picked black and white images, $p(x_i|y)$ denotes the probability that pixel $i$ is switched on for class $y$. Just like before we can go and count the number of times $n_{iy}$ that such an event occurs and divide it by the total number of occurrences of y, i.e. $n_y$. But there's something slightly troubling. It might be that certain pixels are never black (e.g. for very well cropped images the corner pixels might always be white). A convenient way for statisticians to deal with this problem is to add pseudo counts to all occurrences. Hence, rather than $n_{iy}$ we use $n_{iy}+1$ and instead of $n_y$ we use $n_{y} + 1$. This is also called [Laplace Smoothing](https://en.wikipedia.org/wiki/Additive_smoothing).
 
-```{.python .input}
+```{.python .input  n=1}
 %matplotlib inline
 from matplotlib import pyplot as plt
+from IPython import display
+display.set_matplotlib_formats('svg')
 import mxnet as mx
 from mxnet import nd
 import numpy as np
@@ -46,9 +48,9 @@ px = (xcount / ycount.reshape(1,10))
 
 Now that we computed per-pixel counts of occurrence for all pixels, it's time to see how our model behaves. Time to plot it. This is where it is so much more convenient to work with images. Visualizing 28x28x10 probabilities (for each pixel for each class) would typically be an exercise in futility. However, by plotting them as images we get a quick overview. The astute reader probably noticed by now that these are some mean looking digits ...
 
-```{.python .input}
+```{.python .input  n=2}
 import matplotlib.pyplot as plt
-fig, figarr = plt.subplots(1, 10, figsize=(15, 15))
+fig, figarr = plt.subplots(1, 10, figsize=(10, 10))
 for i in range(10):
     figarr[i].imshow(xcount[:, i].reshape((28, 28)).asnumpy(), cmap='hot')
     figarr[i].axes.get_xaxis().set_visible(False)
@@ -68,7 +70,7 @@ $$p(y|x) = \frac{p(x|y)}{\sum_{y'} p(x|y')}$$
 
 Let's try this ...
 
-```{.python .input}
+```{.python .input  n=3}
 # get the first test item
 data, label = mnist_test[0]
 data = data.reshape((784,1))
@@ -89,9 +91,9 @@ To fix this we use the fact that $\log a b = \log a + \log b$, i.e. we switch to
 
 $$\frac{\exp(a)}{\exp(a) + \exp(b)} = \frac{\exp(a + c)}{\exp(a + c) + \exp(b + c)}$$
 
-In particular, we can pick $c = -\max(a,b)$, which ensures that at least one of the terms in the denominator is $1$. 
+In particular, we can pick $c = -\max(a,b)$, which ensures that at least one of the terms in the denominator is $1$.
 
-```{.python .input}
+```{.python .input  n=4}
 logpx = nd.log(px)
 logpxneg = nd.log(1-px)
 logpy = nd.log(py)
@@ -109,7 +111,7 @@ def bayespost(data):
     post /= np.sum(post)
     return post
 
-fig, figarr = plt.subplots(2, 10, figsize=(15, 3))
+fig, figarr = plt.subplots(2, 10, figsize=(10, 3))
 
 # show 10 images
 ctr = 0
@@ -133,9 +135,9 @@ for data, label in mnist_test:
 plt.show()
 ```
 
-As we can see, this classifier works pretty well in many cases. However, the second last digit shows that it can be both incompetent and overly confident of its incorrect estimates. That is, even if it is horribly wrong, it generates probabilities close to 1 or 0. Not a classifier we should use very much nowadays any longer. To see how well it performs overall, let's compute the overall acuracy of the classifier. 
+As we can see, this classifier works pretty well in many cases. However, the second last digit shows that it can be both incompetent and overly confident of its incorrect estimates. That is, even if it is horribly wrong, it generates probabilities close to 1 or 0. Not a classifier we should use very much nowadays any longer. To see how well it performs overall, let's compute the overall acuracy of the classifier.
 
-```{.python .input}
+```{.python .input  n=5}
 # initialize counter
 ctr = 0
 err = 0

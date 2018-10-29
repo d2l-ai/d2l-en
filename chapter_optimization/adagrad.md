@@ -28,7 +28,7 @@ We should emphasize that the cumulative variable $\boldsymbol{s}_t$ produced by 
 
 Below we will continue to use the objective function $f(\boldsymbol{x})=0.1x_1^2+2x_2^2$ as an example to observe the iterative trajectory of the independent variable in Adagrad. We are going to implement Adagrad using the same learning rate as the experiment in last section, 0.4. As we can see, the iterative trajectory of the independent variable is smoother. However, due to the cumulative effect of $\boldsymbol{s}_t$, the learning rate continuously decays, so the independent variable does not move as much during later stages of iteration.
 
-```{.python .input  n=2}
+```{.python .input  n=1}
 %matplotlib inline
 import gluonbook as gb
 import math
@@ -51,7 +51,7 @@ gb.show_trace_2d(f_2d, gb.train_2d(adagrad_2d))
 
 Now, we are going to increase the learning rate to $2$. As we can see, the independent variable approaches the optimal solution more quickly.
 
-```{.python .input  n=3}
+```{.python .input  n=2}
 eta = 2
 gb.show_trace_2d(f_2d, gb.train_2d(adagrad_2d))
 ```
@@ -60,7 +60,7 @@ gb.show_trace_2d(f_2d, gb.train_2d(adagrad_2d))
 
 Like the momentum method, Adagrad needs to maintain a state variable of the same shape for each independent variable. We use the formula from the algorithm to implement Adagrad.
 
-```{.python .input  n=4}
+```{.python .input  n=3}
 features, labels = gb.get_data_ch7()
 
 def init_adagrad_states():
@@ -77,7 +77,7 @@ def adagrad(params, states, hyperparams):
 
 Compared with the experiment in the ["Mini-Batch Stochastic Gradient Descent"](minibatch-sgd.md) section, here, we use a larger learning rate to train the model.
 
-```{.python .input  n=5}
+```{.python .input  n=4}
 gb.train_ch7(adagrad, init_adagrad_states(), {'lr': 0.1}, features, labels)
 ```
 
@@ -85,7 +85,7 @@ gb.train_ch7(adagrad, init_adagrad_states(), {'lr': 0.1}, features, labels)
 
 Using the `Trainer` instance of the algorithm named “adagrad”, we can implement the Adagrad algorithm with Gluon to train models.
 
-```{.python .input  n=6}
+```{.python .input  n=5}
 gb.train_gluon_ch7('adagrad', {'learning_rate': 0.1}, features, labels)
 ```
 
