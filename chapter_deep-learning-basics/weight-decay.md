@@ -80,7 +80,7 @@ def l2_penalty(w):
 
 ### Define Training and Testing
 
-The following defines how to train and test the model separately on the training data set and the test data set. Unlike the previous sections, here, the $\ell_2$ norm penalty term is added when calculating the final loss function. The linear network and the squared loss are as before and thus imported via `gb.linreg` and `gb.squared_loss` respectively. 
+The following defines how to train and test the model separately on the training data set and the test data set. Unlike the previous sections, here, the $\ell_2$ norm penalty term is added when calculating the final loss function. The linear network and the squared loss are as before and thus imported via `gb.linreg` and `gb.squared_loss` respectively.
 
 ```{.python .input  n=7}
 batch_size, num_epochs, lr = 1, 100, 0.003
@@ -117,7 +117,7 @@ fit_and_plot(lambd=0)
 
 ### Using Weight Decay
 
-The example below shows that even though the training error increased, the error on the test set decreased. This is precisely the improvement that we expect from using weight decay. While not perfect, overfitting has been mitigated to some extent. In addition, the $\ell_2$ norm of the weight $\mathbf{w}$ is smaller than without using weight decay. 
+The example below shows that even though the training error increased, the error on the test set decreased. This is precisely the improvement that we expect from using weight decay. While not perfect, overfitting has been mitigated to some extent. In addition, the $\ell_2$ norm of the weight $\mathbf{w}$ is smaller than without using weight decay.
 
 ```{.python .input  n=9}
 fit_and_plot(lambd=3)
@@ -158,7 +158,7 @@ def fit_and_plot_gluon(wd):
     print('L2 norm of w:', net[0].weight.data().norm().asscalar())
 ```
 
-The plots look just the same as when we implemented weight decay from scratch (but they run a bit faster and are a bit easier to implement, in particular for large problems). 
+The plots look just the same as when we implemented weight decay from scratch (but they run a bit faster and are a bit easier to implement, in particular for large problems).
 
 ```{.python .input}
 fit_and_plot_gluon(0)

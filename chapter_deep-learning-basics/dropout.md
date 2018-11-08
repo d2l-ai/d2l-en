@@ -52,7 +52,7 @@ When we apply dropout to the hidden layer, it amounts to removing hidden units w
 To implement the dropout function we have to draw as many random variables as the input has dimensions from the uniform distribution $U[0,1]$. 
 According to the definition of dropout, we can implement it easily. The following `dropout` function will drop out the elements in the NDArray input `X` with the probability of `drop_prob`.
 
-```{.python .input  n=1}
+```{.python .input}
 import gluonbook as gb
 from mxnet import autograd, gluon, init, nd
 from mxnet.gluon import loss as gloss, nn
@@ -68,28 +68,18 @@ def dropout(X, drop_prob):
 
 Let us test how it works in a few examples. The dropout probability is 0, 0.5, and 1, respectively.
 
-```{.python .input  n=2}
+```{.python .input}
 X = nd.arange(16).reshape((2, 8))
 print(dropout(X, 0))
 print(dropout(X, 0.5))
 print(dropout(X, 1))
 ```
 
-```{.json .output n=2}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "\n[[ 0.  1.  2.  3.  4.  5.  6.  7.]\n [ 8.  9. 10. 11. 12. 13. 14. 15.]]\n<NDArray 2x8 @cpu(0)>\n\n[[ 0.  0.  0.  0.  8. 10. 12.  0.]\n [16.  0. 20. 22.  0.  0.  0. 30.]]\n<NDArray 2x8 @cpu(0)>\n\n[[0. 0. 0. 0. 0. 0. 0. 0.]\n [0. 0. 0. 0. 0. 0. 0. 0.]]\n<NDArray 2x8 @cpu(0)>\n"
- }
-]
-```
-
 ### Defining Model Parameters
 
 Let's use the same dataset as used previously, namely Fashion-MNIST, described in the section ["Softmax Regression - Starting From Scratch"](softmax-regression-scratch.md). We will define a multilayer perceptron with two hidden layers. The two hidden layers both have 256 outputs.
 
-```{.python .input  n=3}
+```{.python .input}
 num_inputs, num_outputs, num_hiddens1, num_hiddens2 = 784, 10, 256, 256
 
 W1 = nd.random.normal(scale=0.01, shape=(num_inputs, num_hiddens1))
@@ -108,7 +98,7 @@ for param in params:
 
 The model defined below concatenates the fully connected layer and the activation function ReLU, using dropout for the output of each activation function. We can set the dropout probability of each layer separately. It is generally recommended to set a lower dropout probability closer to the input layer. Below we set it to 0.2 and 0.5 for the first and second hidden layer respectively. By using the `is_training` function described in the ["Autograd"](../chapter_prerequisite/autograd.md) section we can ensure that dropout is only active during training.
 
-```{.python .input  n=4}
+```{.python .input}
 drop_prob1, drop_prob2 = 0.2, 0.5
 
 def net(X):
@@ -126,7 +116,7 @@ def net(X):
 
 This is similar to the training and testing of multilayer perceptrons described previously.
 
-```{.python .input  n=5}
+```{.python .input}
 num_epochs, lr, batch_size = 10, 0.5, 256
 loss = gloss.SoftmaxCrossEntropyLoss()
 train_iter, test_iter = gb.load_data_fashion_mnist(batch_size)
@@ -134,21 +124,11 @@ gb.train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size, params,
              lr)
 ```
 
-```{.json .output n=5}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "epoch 1, loss 1.1273, train acc 0.563, test acc 0.786\nepoch 2, loss 0.5755, train acc 0.787, test acc 0.800\nepoch 3, loss 0.4902, train acc 0.822, test acc 0.846\nepoch 4, loss 0.4432, train acc 0.838, test acc 0.863\nepoch 5, loss 0.4174, train acc 0.848, test acc 0.869\nepoch 6, loss 0.3978, train acc 0.855, test acc 0.868\nepoch 7, loss 0.3803, train acc 0.861, test acc 0.876\nepoch 8, loss 0.3667, train acc 0.866, test acc 0.874\nepoch 9, loss 0.3534, train acc 0.869, test acc 0.875\nepoch 10, loss 0.3444, train acc 0.874, test acc 0.876\n"
- }
-]
-```
-
 ## Dropout in Gluon
 
 In Gluon, we only need to add the `Dropout` layer after the fully connected layer and specify the dropout probability. When training the model, the `Dropout` layer will randomly drop out the output elements of the previous layer at the specified dropout probability; the `Dropout` layer simply passes the data through during testin.
 
-```{.python .input  n=6}
+```{.python .input}
 net = nn.Sequential()
 net.add(nn.Dense(256, activation="relu"),
         nn.Dropout(drop_prob1),  # Add a dropout layer after the first fully connected layer.
@@ -160,20 +140,10 @@ net.initialize(init.Normal(sigma=0.01))
 
 Next, we will train and test the model.
 
-```{.python .input  n=7}
+```{.python .input}
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
 gb.train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size,
              None, None, trainer)
-```
-
-```{.json .output n=7}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "epoch 1, loss 1.1635, train acc 0.542, test acc 0.798\nepoch 2, loss 0.5835, train acc 0.782, test acc 0.830\nepoch 3, loss 0.4953, train acc 0.817, test acc 0.846\nepoch 4, loss 0.4497, train acc 0.837, test acc 0.840\nepoch 5, loss 0.4203, train acc 0.847, test acc 0.865\nepoch 6, loss 0.3964, train acc 0.856, test acc 0.875\nepoch 7, loss 0.3838, train acc 0.860, test acc 0.870\nepoch 8, loss 0.3717, train acc 0.863, test acc 0.870\nepoch 9, loss 0.3625, train acc 0.868, test acc 0.874\nepoch 10, loss 0.3502, train acc 0.872, test acc 0.879\n"
- }
-]
 ```
 
 ## Summary
@@ -192,7 +162,7 @@ gb.train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size,
 1. If changes are made to the model to make it more complex, such as adding hidden layer units, will the effect of using dropout to cope with overfitting be more obvious?
 1. Using the model in this section as an example, compare the effects of using dropout and weight decay. What if dropout and weight decay are used at the same time?
 1. What happens if we apply dropout to the individual weights of the weight matrix rather than the activations? 
-1. Replace the dropout activation with a random variable that takes on valu
+1. Replace the dropout activation with a random variable that takes on values of $[0, \gamma/2, \gamma]$. Can you design something that works better than the binary dropout function? Why might you want to use it? Why not?
 
 
 ## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/1278)
