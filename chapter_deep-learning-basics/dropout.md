@@ -19,6 +19,7 @@ In fact, this notion was formalized by Bishop in 1995, when he proved that [Trai
 
 A key challenge in this context is how to add noise without introducing undue bias. In terms of inputs $\mathbf{x}$, this is relatively easy to accomplish: simply add some noise $\epsilon \sim \mathcal{N}(0,\sigma^2)$ to it and use this data during training via $\mathbf{x}' = \mathbf{x} + \epsilon$. A key property is that in expectation $\mathbf{E}[\mathbf{x}'] = \mathbf{x}$. For intermediate layers, though, this might not be quite so desirable since the scale of the noise might not be appropriate. The alternative is to perturb coordinates as follows:
 
+$$
 \begin{aligned}
 h' = 
 \begin{cases} 
@@ -26,6 +27,7 @@ h' =
     \frac{h}{1-p} & \text{ otherwise}
 \end{cases}
 \end{aligned}
+$$
 
 By design, the expectation remains unchanged, i.e. $\mathbf{E}[h'] = h$. This idea is at the heart of dropout where intermediate activations $h$ are replaced by a random variable $h'$ with matching expectation. The name 'dropout' arises from the notion that some neurons 'drop out' of the computation for the purpose of computing the final result. During training we replace intermediate activations with random variables
 
