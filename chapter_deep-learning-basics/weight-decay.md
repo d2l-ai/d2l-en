@@ -1,38 +1,38 @@
 # Weight Decay
 
-In the previous section, we observed the overfitting issue, which occurs when the training error of the model is much smaller than the error on the test set. While increasing the training data set may mitigate overfitting, obtaining additional training data is often costly. This section describes a common method for dealing with overfitting problems: weight decay.
+In the previous section, we encountered overfitting and the need for capacity control. While increasing the training data set may mitigate overfitting, obtaining additional training data is often costly, hence it is preferable to control the complexity of the functions we use. In particular, we saw that we could control the complexity of a polynomial by adjusting its degree. While this might be a fine strategy for problems on one-dimensional data, this quickly becomes difficult to manage and too coarse. For instance, for vectors of dimensionality $D$ the number of monomials of a given degree $d$ is ${D -1 + d} \choose {D-1}$. Hence, instead of controlling for the number of functions we need a more fine-grained tool for adjusting function complexity. 
 
+## Squared Norm Regularization
 
-## Technique
+One of the most commonly used techniques is weight decay. It relies on the notion that among all functions $f$ the function $f = 0$ is the simplest of all. Hence we can measure functions by their proximity to zero. There are many ways of doing this. In fact there exist entire branches of mathematics, e.g. in functional analysis and the theory of Banach spaces which are devoted to answering this issue. 
 
-Weight decay is equivalent to $L_2$ norm regularization. Regularization is a common method of dealing with overfitting by adding a penalty term to the model loss function to reduce the size of the learned model parameter values. We will first describe $L_2$ norm regularization and then explain why it is also called weight decay.
+For our purpose something much simpler will suffice: 
+A linear function $f(\mathbf{x}) = \mathbf{w}^\top \mathbf{x}$ can be considered simple if its weight vector is small. We can measure this via $\|\mathbf{w}\|^2$. One way of keeping the weight vector small is to add its value as a penalty to the problem of minimizing the loss. This way if the weight vector becomes too large, the learning algorithm will prioritize minimizing $\mathbf{w}$ over minimizing the training error. That's exactly what we want. To illustrate things in code, consider the previous section on [“Linear Regression”](linear-regression.md). There the loss is given by 
 
-$L_2$ norm regularization adds a $L_2$ norm penalty to the original loss function of the model to obtain the minimum function required for training. The $L_2$ norm penalty term refers to the product of the sum of the squares of each element of the model weight parameter and a positive constant. Here, we use the linear regression loss function in the [“Linear Regression”](linear-regression.md) section
+$$l(\mathbf{w}, b) = \frac{1}{n}\sum_{i=1}^n \frac{1}{2}\left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right)^2.$$
 
-$$\ell(w_1, w_2, b) = \frac{1}{n}\sum_{i=1}^n \frac{1}{2}\left(x_1^{(i)} w_1 + x_2^{(i)} w_2 + b - y^{(i)}\right)^2$$
+Recall that $\mathbf{x}^{(i)}$ are the observations, $y^{(i)}$ are labels, and $(\mathbf{w}, b)$ are the weight and bias parameters respectively. To arrive at the new loss function which penalizes the size of the weight vector we need to add $\|\mathbf{w}\|^2$, but how much should we add? This is where the regularization constant (hyperparameter) $\lambda$ comes in: 
 
-as an example. Here, $w_1, w_2$ are the weight parameters, $b$ is the bias parameter, and the input of example $i$ is $x_1^{(i)}, x_2^{(i)}$. The label is $y^{(i)}$, and the example size is $n$. The weight parameter is represented by the vector $\boldsymbol{w}= [w_1, w_2]$, the new loss function with the $L_2$ norm penalty term is
+$$l(\mathbf{w}, b) + \frac{\lambda}{2} \|\boldsymbol{w}\|^2$$
 
-$$\ell(w_1, w_2, b) + \frac{\lambda}{2n} \|\boldsymbol{w}\|^2,$$
-
-其中超参数$\lambda > 0$。当权重参数均为0时，惩罚项最小。当$\lambda$较大时，惩罚项在损失函数中的比重较大，这通常会使学到的权重参数的元素较接近0。当$\lambda$设为0时，惩罚项完全不起作用。上式中$L_2$范数平方$\|\boldsymbol{w}\|^2$展开后得到$w_1^2 + w_2^2$。有了$L_2$范数惩罚项后，在小批量随机梯度下降中，我们将[“线性回归”](linear-regression.md)一节中权重$w_1$和$w_2$的迭代方式更改为
+$\lambda \geq 0$ governs the amount of regularization. For $\lambda = 0$ we recover the previous loss function, whereas for $\lambda > 0$ we ensure that $\mathbf{w}$ cannot grow too large. The astute reader might wonder why we are squaring the weight vector. This is done both for computational convenience since it leads to easy to compute derivatives, and for statistical performance, as it penalizes large weight vectors a lot more than small ones. The stochastic gradient descent updates look as follows: 
 
 $$
 \begin{aligned}
-w_1 &\leftarrow \left(1- \frac{\eta\lambda}{|\mathcal{B}|} \right)w_1 -   \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}}x_1^{(i)} \left(x_1^{(i)} w_1 + x_2^{(i)} w_2 + b - y^{(i)}\right),\\
-w_2 &\leftarrow \left(1- \frac{\eta\lambda}{|\mathcal{B}|} \right)w_2 -   \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}}x_2^{(i)} \left(x_1^{(i)} w_1 + x_2^{(i)} w_2 + b - y^{(i)}\right).
+w & \leftarrow \left(1- \frac{\eta\lambda}{|\mathcal{B}|} \right) \mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \mathbf{x}^{(i)} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right),
 \end{aligned}
 $$
 
-We can see that $L_2$ norm regularization multiplies the weights $w_1$ and $w_2$ by a number less than one and then subtracts the gradient without the penalty term. Therefore, $L_2$ norm regularization is also called weight decay. Weight decay adds a limit to the model that needs to be learned using a penalty for the model parameter with a larger absolute value. This can be an effective solution for overfitting. In real-world use, we sometimes add the sum of the squares of the bias elements to the penalty term.
+As before, we update $\mathbf{w}$ in accordance to the amount to which our estimate differs from the observation. However, we also shrink the size of $\mathbf{w}$ towards $0$, i.e. the weight 'decays'. This is much more convenient than having to pick the number of parameters as we did for polynomials. In particular, we now have a continuous mechanism for adjusting the complexity of $f$. Small values of $\lambda$ correspond to fairly unconstrained $\mathbf{w}$ whereas large values of $\lambda$ constrain $\mathbf{w}$ considerably. Since we don't want to have large bias terms either, we often add $b^2$ as penalty, too. 
 
-## High-dimensional Linear Regression Experiment
+## High-dimensional Linear Regression 
 
-Below, we will look at an overfitting problem using high-dimensional linear regression as an example, and try to cope with overfitting using weight decay. We assume the dimension of the data example feature is $p$. For any example with features $x_1, x_2, \ldots, and x_p$ in the training data set and test data set, we use the following linear function to generate the label for the example:
+For high-dimensional regression it is difficult to pick the 'right' dimensions to omit. Weight-decay regularization is a much more convenient alternative. We will illustrate this below. But first we need to generate some data via
 
-$$y = 0.05 + \sum_{i = 1}^p 0.01x_i +  \epsilon,$$
+$$y = 0.05 + \sum_{i = 1}^d 0.01 x_i + \epsilon \text{ where } 
+\epsilon \sim \mathcal{N}(0, 0.01)$$
 
-The noise term $\epsilon$ obeys a normal distribution with a mean of 0 and a standard deviation of 0.01. In order to observe overfitting more easily, we consider a high-dimensional linear regression problem, such as setting the dimension $p=200$. At the same time, we deliberately set a low number of examples in the training data, for example, 20.
+That is, we have additive Gaussian noise with zero mean and variance 0.01. In order to observe overfitting more easily we pick a high-dimensional problem with $d = 200$ and a deliberatly low number of training examples, e.g. 20. As before we begin with our import ritual (and data generation).
 
 ```{.python .input  n=2}
 %matplotlib inline
@@ -50,9 +50,11 @@ train_features, test_features = features[:n_train, :], features[n_train:, :]
 train_labels, test_labels = labels[:n_train], labels[n_train:]
 ```
 
-## Weight Decay Implementation from Scratch
+## Weight Decay from Scratch
 
-Next, we will show how to implement weight decay from scratch. We achieve weight decay by adding an $L_2$ norm penalty term after the target function.
+Next, we will show how to implement weight decay from scratch. For this we simply add the $\ell_2$ penalty as an additional loss term after the target function. The squared norm penalty derives its name from the fact that we are adding the second power $\sum_i x_i^2$. There are many other related penalties. In particular, the $\ell_p$ norm is defined as 
+
+$$\|\mathbf{x}\|_p^p := \sum_{i=1}^d |x_i|^p$$
 
 ### Initialize Model Parameters
 
@@ -67,9 +69,9 @@ def init_params():
     return [w, b]
 ```
 
-### Define $L_2$ Norm Penalty Term
+### Define $\ell_2$ Norm Penalty
 
-The $L_2$ norm penalty term is defined below. Here, only the weight parameters of the model are used for the penalty.
+A convenient way of defining this penalty is by squaring all terms in place and summing them up. We divide by $2$ to keep the math looking nice and simple.
 
 ```{.python .input  n=6}
 def l2_penalty(w):
@@ -78,7 +80,7 @@ def l2_penalty(w):
 
 ### Define Training and Testing
 
-The following defines how to train and test the model separately on the training data set and the test data set. Unlike the previous sections, here, the $L_2$ norm penalty term is added when calculating the final loss function.
+The following defines how to train and test the model separately on the training data set and the test data set. Unlike the previous sections, here, the $\ell_2$ norm penalty term is added when calculating the final loss function. The linear network and the squared loss are as before and thus imported via `gb.linreg` and `gb.squared_loss` respectively.
 
 ```{.python .input  n=7}
 batch_size, num_epochs, lr = 1, 100, 0.003
@@ -102,28 +104,30 @@ def fit_and_plot(lambd):
                             test_labels).mean().asscalar())
     gb.semilogy(range(1, num_epochs + 1), train_ls, 'epochs', 'loss',
                 range(1, num_epochs + 1), test_ls, ['train', 'test'])
-    print('L2 norm of w:', w.norm().asscalar())
+    print('l2 norm of w:', w.norm().asscalar())
 ```
 
-### Observe Overfitting
+### Training without Regularization
 
-Next, we will train and test the high-dimensional linear regression model. When `lambd` is set to 0, we do not use weight decay. As a result, the training error is much smaller than the error on the test set. This is a typical case of overfitting.
+Next, let's train and test the high-dimensional linear regression model. When `lambd = 0` we do not use weight decay. As a result, while the training error decreases, the test error does not. This is a perfect example of overfitting.
 
 ```{.python .input  n=8}
 fit_and_plot(lambd=0)
 ```
 
-### Use Weight Decay
+### Using Weight Decay
 
-Next, we use weight decay. As we can see, even though the training error has increased, the error on the test set has decreased. The overfitting issue has been mitigated to some extent. In addition, the $L_2$ norm of the weight parameter is smaller than when weight decay is not used: the weight parameter at this time is closer to zero.
+The example below shows that even though the training error increased, the error on the test set decreased. This is precisely the improvement that we expect from using weight decay. While not perfect, overfitting has been mitigated to some extent. In addition, the $\ell_2$ norm of the weight $\mathbf{w}$ is smaller than without using weight decay.
 
 ```{.python .input  n=9}
 fit_and_plot(lambd=3)
 ```
 
-## Weight Decay Gluon Implementation
+## Weight Decay in Gluon 
 
-Here, we directly specify the weight decay hyper-parameter through the `wd` parameter when constructing the `Trainer` instance. By default, Gluon decays weight and bias simultaneously. We can construct `Trainer` instances for weight and bias respectively to only decay the weight.
+Weight decay in Gluon is quite convenient (and also a bit special) insofar as it is typically integrated with the optimization algorithm itself. The reason for this is that it is much faster (in terms of runtime) for the optimizer to take care of weight decay and related things right inside the optimization algorithm itself, since the optimizer itself needs to touch all parameters anyway. 
+
+Here, we directly specify the weight decay hyper-parameter through the `wd` parameter when constructing the `Trainer` instance. By default, Gluon decays weight and bias simultaneously. Note that we can have *different* optimizers for different sets of parameters. For instance, we can have a `Trainer` with weight decay and one without to take care of $\mathbf{w}$ and $b$ respectively.
 
 ```{.python .input}
 def fit_and_plot_gluon(wd):
@@ -154,7 +158,7 @@ def fit_and_plot_gluon(wd):
     print('L2 norm of w:', net[0].weight.data().norm().asscalar())
 ```
 
-Similar to the experimental phenomena in the "Weight Decay Starting from Scratch" section, the use of weight decay can mitigate the overfitting problem to some extent.
+The plots look just the same as when we implemented weight decay from scratch (but they run a bit faster and are a bit easier to implement, in particular for large problems).
 
 ```{.python .input}
 fit_and_plot_gluon(0)
@@ -164,18 +168,26 @@ fit_and_plot_gluon(0)
 fit_and_plot_gluon(3)
 ```
 
+So far we only touched upon what constitutes a simple *linear* function. For nonlinear functions answering this question is way more complex. For instance, there exist [Reproducing Kernel Hilbert Spaces](https://en.wikipedia.org/wiki/Reproducing_kernel_Hilbert_space) which allow one to use many of the tools introduced for linear functions in a nonlinear context. Unfortunately, algorithms using them do not always scale well to very large amounts of data. For all intents and purposes of this book we limit ourselves to simply summing over the weights for different layers, e.g. via $\sum_l \|\mathbf{w_l}\|^2$, which is equivalent to weight decay applied to all layers. 
+
+
 ## Summary
 
-* Regularization is a common method for dealing with overfitting. It adds a penalty term to the model loss function to reduce the size of the learned model parameter values.
-* Weight decay is equivalent to $L_2$ norm regularization, which usually makes the elements of the learned weight parameter closer to zero.
-* Weight decay can be specified by Gluon's `wd` hyper-parameter.
-* We can define multiple `Trainer` instances to use different iteration methods for different model parameters.
+* Regularization is a common method for dealing with overfitting. It adds a penalty term to the loss function on the training set to reduce the complexity of the learned model. 
+* One particular choice for keeping the model simple is weight decay using an $\ell_2$ penalty. This leads to weight decay in the update steps of the learning algorithm.
+* Gluon provides automatic weight decay functionality in the optimizer by setting the hyperparameter `wd`. 
+* You can have different optimizers within the same training loop, e.g. for different sets of parameters. 
 
-## exercise
 
-* Review the relationship between training error and generalization error. In addition to weight decay, increased training, and the use of a model of suitable complexity, what other ways can you think of to deal with overfitting?
-* If you understand Bayesian statistics, which important concept in Bayesian statistics do you think weight decay corresponds to?
-* Adjust the weight decay hyper-parameter in the experiment and observe and analyze the experimental results.
+## Problems
+
+1. Experiment with the value of $\lambda$ in the estimation problem in this page. Plot training and test accuracy as a function of $\lambda$. What do you observe?
+1. Use a validation set to find the optimal value of $\lambda$. Is it really the optimal value? Does this matter?
+1. What would the update equations look like if instead of $\|\mathbf{w}\|^2$ we used $\sum_i |w_i|$ as our penalty of choice (this is called $\ell_1$ regularization). 
+1. We know that $\|\mathbf{w}\|^2 = \mathbf{w}^\top \mathbf{w}$. Can you find a similar equation for matrices (mathematicians call this the [Frobenius norm](https://en.wikipedia.org/wiki/Matrix_norm#Frobenius_norm))?
+1. Review the relationship between training error and generalization error. In addition to weight decay, increased training, and the use of a model of suitable complexity, what other ways can you think of to deal with overfitting?
+1. In Bayesian statistics we use the product of prior and likelihood to arrive at a posterior via $p(w|x) \propto p(x|w) p(w)$. How can you identify $p(w)$ with regularization?
+
 
 ## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/984)
 
