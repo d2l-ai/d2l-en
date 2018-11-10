@@ -86,11 +86,11 @@ Oftentimes, we want to apply functions to arrays.
 Some of the simplest and most useful functions are the element-wise functions.
 These operate by performing a single scalar operation on the corresponding elements of two arrays.
 We can create an element-wise function from any function that maps from the scalars to the scalars.
-In math notations we would denote such a function as $f: \mathcal{R} \rightarrow \mathcal{R}$.
+In math notations we would denote such a function as $f: \mathbb{R} \rightarrow \mathbb{R}$.
 Given any two vectors $\mathbf{u}$ and $\mathbf{v}$ *of the same shape*, and the function f,
 we can produce a vector $\mathbf{c} = F(\mathbf{u},\mathbf{v})$
 by setting $c_i \gets f(u_i, v_i)$ for all $i$.
-Here, we produced the vector-valued $F: \mathcal{R}^d \rightarrow \mathcal{R}^d$
+Here, we produced the vector-valued $F: \mathbb{R}^d \rightarrow \mathbb{R}^d$
 by *lifting* the scalar function to an element-wise vector operation.
 In MXNet, the common standard arithmetic operators (+,-,/,\*,\*\*)
 have all been *lifted* to element-wise operations for identically-shaped tensors of arbitrary shape. We can call element-wise operations on any two tensors of the same shape, including matrices.
