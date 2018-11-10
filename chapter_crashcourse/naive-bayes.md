@@ -3,19 +3,19 @@
 Conditional independence is useful when dealing with data, since it simplifies a lot of equations. A popular (and very simple) algorithm is the Naive Bayes Classifier.
 The key assumption in it is that the attributes are all independent of each other, given the labels. In other words, we have:
 
-$$p(x|y) = \prod_i p(x_i|y)$$
+$$p(\mathbf{x} \mid y) = \prod_i p(x_i \mid y)$$
 
-Using Bayes Theorem this leads to the classifier $p(y|x) = \frac{\prod_i p(x_i|y) p(y)}{p(x)}$. Unfortunately, this is still intractable, since we don't know $p(x)$. Fortunately, we don't need it, since we know that $\sum_y p(y|x) = 1$, hence we can always recover the normalization from
+Using Bayes Theorem this leads to the classifier $p(y \mid \mathbf{x}) = \frac{\prod_i p(x_i \mid y) p(y)}{p(\mathbf{x})}$. Unfortunately, this is still intractable, since we don't know $p(x)$. Fortunately, we don't need it, since we know that $\sum_y p(y \mid \mathbf{x}) = 1$, hence we can always recover the normalization from
 
-$$p(y|x) \propto \prod_i p(x_i|y) p(y).$$
+$$p(y \mid \mathbf{x}) \propto \prod_i p(x_i \mid y) p(y).$$
 
 To illustrate this a bit, consider classifying emails into spam and ham. It's fair to say that the occurrence of the words `Nigeria`, `prince`, `money`, `rich` are all likely indicators that the e-mail might be spam, whereas `theorem`, `network`, `Bayes` or `statistics` are pretty good indicators that there's substance the message. We could thus model the probability of occurrence for each of these words, given the respective class and then use it to score the likelihood of a text. In fact, for a long time this *is* what many so-called [Bayesian spam filters](https://en.wikipedia.org/wiki/Naive_Bayes_spam_filtering) used. 
 
 ## Optical Character Recognition
 
-Since images are much easier to deal with, we will illustrate the workings of a Naive Bayes classifier for distinguishing digits on the MNIST dataset. The problem is that we don't actually know $p(y)$ and $p(x_i|y)$. So we need to *estimate* it given some training data first. This is what is called *training* the model. Estimating $p(y)$ is not too hard. Since we are only dealing with 10 classes, this is pretty easy - simply count the number of occurrences $n_y$ for each of the digits and divide it by the total amount of data $n$. For instance, if digit 8 occurs $n_8 = 5,800$ times and we have a total of $n = 60,000$ images, the probability estimate is $p(y=8) = 0.0967$. 
+Since images are much easier to deal with, we will illustrate the workings of a Naive Bayes classifier for distinguishing digits on the MNIST dataset. The problem is that we don't actually know $p(y)$ and $p(x_i \mid y)$. So we need to *estimate* it given some training data first. This is what is called *training* the model. Estimating $p(y)$ is not too hard. Since we are only dealing with 10 classes, this is pretty easy - simply count the number of occurrences $n_y$ for each of the digits and divide it by the total amount of data $n$. For instance, if digit 8 occurs $n_8 = 5,800$ times and we have a total of $n = 60,000$ images, the probability estimate is $p(y=8) = 0.0967$. 
 
-Now on to slightly more difficult things - $p(x_i|y)$. Since we picked black and white images, $p(x_i|y)$ denotes the probability that pixel $i$ is switched on for class $y$. Just like before we can go and count the number of times $n_{iy}$ that such an event occurs and divide it by the total number of occurrences of y, i.e. $n_y$. But there's something slightly troubling. It might be that certain pixels are never black (e.g. for very well cropped images the corner pixels might always be white). A convenient way for statisticians to deal with this problem is to add pseudo counts to all occurrences. Hence, rather than $n_{iy}$ we use $n_{iy}+1$ and instead of $n_y$ we use $n_{y} + 1$. This is also called [Laplace Smoothing](https://en.wikipedia.org/wiki/Additive_smoothing).
+Now on to slightly more difficult things - $p(x_i \mid y)$. Since we picked black and white images, $p(x_i \mid y)$ denotes the probability that pixel $i$ is switched on for class $y$. Just like before we can go and count the number of times $n_{iy}$ that such an event occurs and divide it by the total number of occurrences of y, i.e. $n_y$. But there's something slightly troubling. It might be that certain pixels are never black (e.g. for very well cropped images the corner pixels might always be white). A convenient way for statisticians to deal with this problem is to add pseudo counts to all occurrences. Hence, rather than $n_{iy}$ we use $n_{iy}+1$ and instead of $n_y$ we use $n_{y} + 1$. This is also called [Laplace Smoothing](https://en.wikipedia.org/wiki/Additive_smoothing).
 
 ```{.python .input  n=1}
 %matplotlib inline
@@ -60,13 +60,13 @@ plt.show()
 print('Class probabilities', py)
 ```
 
-Now we can compute the likelihoods of an image, given the model. This is statistican speak for $p(x|y)$, i.e. how likely it is to see a particular image under certain conditions (such as the label). Our Naive Bayes model which assumed that all pixesl are independent tells us that 
+Now we can compute the likelihoods of an image, given the model. This is statistican speak for $p(x \mid y)$, i.e. how likely it is to see a particular image under certain conditions (such as the label). Our Naive Bayes model which assumed that all pixesl are independent tells us that 
 
-$$p(x|y) = \prod_{i} p(x_i|y)$$
+$$p(\mathbf{x} \mid y) = \prod_{i} p(x_i \mid y)$$
 
-Using Bayes' rule, we can thus compute $p(y|x)$ via
+Using Bayes' rule, we can thus compute $p(y \mid \mathbf{x})$ via
 
-$$p(y|x) = \frac{p(x|y)}{\sum_{y'} p(x|y')}$$
+$$p(y \mid \mathbf{x}) = \frac{p(\mathbf{x} \mid y)}{\sum_{y'} p(\mathbf{x} \mid y')}$$
 
 Let's try this ...
 
@@ -155,3 +155,24 @@ print('Naive Bayes has an error rate of', err/ctr)
 ```
 
 Modern deep networks achieve error rates of less than 0.01. While Naive Bayes classifiers used to be popular in the 80s and 90s, e.g. for spam filtering, their heydays are over. The poor performance is due to the incorrect statistical assumptions that we made in our model: we assumed that each and every pixel are *independently* generated, depending only on the label. This is clearly not how humans write digits, and this wrong assumption led to the downfall of our overly naive (Bayes) classifier. Time to start building Deep Networks.
+
+## Summary
+
+* Naive Bayes is an easy to use classifier that uses the assumption
+  $p(\mathbf{x} \mid y) = \prod_i p(x_i \mid y)$.
+* The classifier is easy to train but its estimates can be very wrong.
+* To address overly confident and nonsensical estimates, the
+  probabilities $p(x_i|y)$ are smoothed, e.g. by Laplace
+  smoothing. That is, we add a constant to all counts.
+* Naive Bayes classifiers don't exploit any correlations between
+  observations. 
+
+## Problems
+
+1. Design a Naive Bayes regression estimator where $p(x_i \mid
+   y)$ is a normal distribution.
+1. Under which situations does Naive Bayes work?
+1. An eyewitness is sure that he could recognize the perpetrator with 90%
+   accuracy, if he were to encounter him again.
+   * Is this a useful statement if there are only 5 suspects?
+   * Is it still useful if there are 50? 

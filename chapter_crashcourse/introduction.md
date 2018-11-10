@@ -2,22 +2,22 @@
 
 Before we could begin writing, the authors of this book, like much of
 the work force, had to become caffeinated.  We hopped in the car and
-started driving.  Using an iPhone, Alex called out "Hey Siri",
+started driving.  Using an iPhone, Alex called out 'Hey Siri',
 awakening the phone's voice recognition system.  Then Mu commanded
-"directions to Blue Bottle coffee shop".  The phone quickly displayed
+'directions to Blue Bottle coffee shop'.  The phone quickly displayed
 the transcription of his command.  It also recognized that we were
 asking for directions and launched the Maps application to fulfill our request.  Once launched, the Maps app identified a number of routes. Next to each route, the phone displayed a predicted transit time. While we fabricated this story for pedagogical convenience, it demonstrates that in the span of just a few seconds, our everyday interactions with a smartphone can engage several machine learning
 models.
 
 If you've never worked with machine learning before, you might be
-wondering what we're talking about.  You might ask, "isn't that just
-programming?" or "what does *machine learning* even mean?"  First, to
+wondering what we're talking about.  You might ask, 'isn't that just
+programming?' or 'what does *machine learning* even mean?'  First, to
 be clear, we implement all machine learning algorithms by writing
 computer programs.  Indeed, we use the same languages and hardware as
 other fields of computer science, but not all computer programs
 involve machine learning.  In response to the second question,
 precisely defining a field of study as vast as machine learning is
-hard.  It's a bit like answering, "what is math?".  But we'll try to
+hard.  It's a bit like answering, 'what is math?'.  But we'll try to
 give you enough intuition to get started.
 
 
@@ -38,7 +38,7 @@ Fortunately (for the community of ML scientists)
 for many problems, solutions aren't so easy.
 Returning to our fake story about going to get coffee,
 imagine just writing a program to respond to a *wake word*
-like "Alexa", "Okay, Google" or "Siri".
+like 'Alexa', 'Okay, Google' or 'Siri'.
 Try coding it up in a room by yourself
 with nothing but a computer and a code editor.
 How would you write such a program from first principles?
@@ -51,14 +51,14 @@ If you're stuck, don't worry.
 We don't know how to write such a program from scratch either.
 That's why we use machine learning.
 
-![](../img/wake-word.png)
+![](../img/wake-word.svg)
 
 Here's the trick.
 Often, even when we don't know how to tell a computer
 explicitly how to map from inputs to outputs,
 we are nonetheless capable of performing the cognitive feat ourselves.
-In other words, even if you don't know *how to program a computer* to recognize the word "Alexa",
-you yourself *are able* to recognize the word "Alexa".
+In other words, even if you don't know *how to program a computer* to recognize the word 'Alexa',
+you yourself *are able* to recognize the word 'Alexa'.
 Armed with this ability,
 we can collect a huge *data set* containing examples of audio
 and label those that *do* and that *do not* contain the wake word.
@@ -74,17 +74,17 @@ which we hope reflects whether (or not) the snippet contains the wake word.
 
 If we choose the right kind of model,
 then there should exist one setting of the knobs
-such that the model fires ``yes`` every time it hears the word "Alexa".
+such that the model fires ``yes`` every time it hears the word 'Alexa'.
 There should also be another setting of the knobs that might fire ``yes``
-on the word "Apricot".
-We expect that the same model should apply to "Alexa" recognition and "Apricot" recognition
+on the word 'Apricot'.
+We expect that the same model should apply to 'Alexa' recognition and 'Apricot' recognition
 because these are similar tasks.
 However, we might need a different model to deal with fundamentally different inputs or outputs.
 For example, we might choose a different sort of machine to map from images to captions,
 or from English sentences to Chinese sentences.
 
 As you might guess, if we just set the knobs randomly,
-the model will probably recognize neither "Alexa", "Apricot",
+the model will probably recognize neither 'Alexa', 'Apricot',
 nor any other English word.
 Generally, in deep learning, the *learning*
 refers precisely
@@ -98,7 +98,7 @@ The training process usually looks like this:
 1. Tweak the knobs so the model sucks less with respect to those examples
 1. Repeat until the model is awesome.
 
-![](../img/ml-loop.png)
+![](../img/ml-loop.svg)
 
 To summarize, rather than code up a wake word recognizer,
 we code up a program that can *learn* to recognize wake words,
@@ -251,7 +251,7 @@ can be described crisply as estimating the probability of some unknown given som
 * Predict the correct translation in French, given a sentence in English.
 * Predict the price of a stock next month based on this month's financial reporting data.
 
-Even with the simple description "predict targets from inputs"
+Even with the simple description 'predict targets from inputs'
 supervised learning can take a great many forms and require a great many modeling decisions,
 depending on the type, size, and the number of inputs and outputs.
 For example, we use different models to process sequences (like strings of text or time series data)
@@ -269,7 +269,7 @@ and outputs another function, *the learned model*.
 Then, given a learned model,
 we can take a new previously unseen input, and predict the corresponding label.
 
-![](../img/supervised-learning.png)
+![](../img/supervised-learning.svg)
 
 
 
@@ -316,10 +316,10 @@ and if you designed a great algorithm to accomplish this feat in 2009,
 you might have won the [$1 million Netflix prize](https://en.wikipedia.org/wiki/Netflix_Prize).
 Predicting the length of stay for patients in the hospital is also a regression problem.
 A good rule of thumb is that any *How much?* or *How many?* problem should suggest regression.
-* "How many hours will this surgery take?" - *regression*
-* "How many dogs are in this photo?" - *regression*.
+* 'How many hours will this surgery take?' - *regression*
+* 'How many dogs are in this photo?' - *regression*.
 
-However, if you can easily pose your problem as "Is this a _ ?",
+However, if you can easily pose your problem as 'Is this a _ ?',
 then it's likely, classification, a different fundamental problem type that we'll cover next.
 Even if you've never worked with machine learning before,
 you've probably worked through a regression problem informally.
@@ -340,10 +340,19 @@ If you followed that much then you already understand the high-level idea behind
 In this case, we could produce the parameters that exactly matched the contractor's prices.
 Sometimes that's not possible, e.g., if some of the variance owes to some factors besides your two features.
 In these cases, we'll try to learn models that minimize the distance between our predictions and the observed values.
-In most of our chapters, we'll focus on one of two very common losses, the [L1 loss](http://mxnet.incubator.apache.org/api/python/gluon/loss.html#mxnet.gluon.loss.L1Loss) where
+In most of our chapters, we'll focus on one of two very common losses,
+the
+[L1 loss](http://mxnet.incubator.apache.org/api/python/gluon/loss.html#mxnet.gluon.loss.L1Loss)
+where
+
 $$l(y,y') = \sum_i |y_i-y_i'|$$
-and the least mean squares loss, aka [L2 loss](http://mxnet.incubator.apache.org/api/python/gluon/loss.html#mxnet.gluon.loss.L2Loss) where
+
+and the least mean squares loss, aka
+[L2 loss](http://mxnet.incubator.apache.org/api/python/gluon/loss.html#mxnet.gluon.loss.L2Loss)
+where
+
 $$l(y,y') = \sum_i (y_i - y_i')^2.$$
+
 As we will see later, the $L_2$ loss corresponds to the assumption that our data was corrupted by Gaussian noise, whereas the $L_1$ loss corresponds to an assumption of noise from a Laplace distribution.
 
 ### Classification
@@ -450,12 +459,12 @@ is called multi-label classification.
 Auto-tagging problems are typically best described
 as multi-label classification problems.
 Think of the tags people might apply to posts on a tech blog,
-e.g., "machine learning", "technology", "gadgets",
-"programming languages", "linux", "cloud computing", "AWS".
+e.g., 'machine learning', 'technology', 'gadgets',
+'programming languages', 'linux', 'cloud computing', 'AWS'.
 A typical article might have 5-10 tags applied
 because these concepts are correlated.
-Posts about "cloud computing" are likely to mention "AWS"
-and posts about "machine learning" could also deal with "programming languages".
+Posts about 'cloud computing' are likely to mention 'AWS'
+and posts about 'machine learning' could also deal with 'programming languages'.
 
 We also have to deal with this kind of problem when dealing with the biomedical literature,
 where correctly tagging articles is important
@@ -624,7 +633,7 @@ Because all of the learning takes place after the algorithm is disconnected from
 this is called *offline learning*.
 For supervised learning, the process looks like this:
 
-![](../img/data-collection.png)
+![](../img/data-collection.svg)
 
 
 This simplicity of offline learning has its charms.
@@ -677,7 +686,7 @@ The behavior of an RL agent is governed by a *policy*.
 In short, a *policy* is just a function that maps from observations (of the environment) to actions.
 The goal of reinforcement learning is to produce a good policy.
 
-![](../img/rl-environment.png)
+![](../img/rl-environment.svg)
 
 It's hard to overstate the generality of the RL framework.
 For example, we can cast any supervised learning problem as an RL problem.
@@ -735,4 +744,8 @@ this problem is the classic *multi-armed bandit problem*.
 
 ## Conclusion
 
-Machine Learning is vast. We cannot possibly cover it all. On the other hand, neural networks are simple and only require elementary mathematics. So let's get started (but first, let's install MxNet).
+Machine Learning is vast. We cannot possibly cover it all. On the other hand, neural networks are simple and only require elementary mathematics. So let's get started (but first, let's install MXNet).
+
+```{.python .input}
+
+```
