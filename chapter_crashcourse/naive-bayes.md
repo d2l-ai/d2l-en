@@ -169,8 +169,7 @@ Modern deep networks achieve error rates of less than 0.01. While Naive Bayes cl
 
 ## Problems
 
-1. Design a Naive Bayes regression estimator where $p(x_i \mid
-   y)$ is a normal distribution.
+1. Design a Naive Bayes regression estimator where $p(x_i \mid y)$ is a normal distribution.
 1. Under which situations does Naive Bayes work?
 1. An eyewitness is sure that he could recognize the perpetrator with 90%
    accuracy, if he were to encounter him again.
