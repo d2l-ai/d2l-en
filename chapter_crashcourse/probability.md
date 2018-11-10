@@ -249,15 +249,17 @@ This has to be the case, since for $A$ and $B$ to happen,
 $A$ has to happen *and* $B$ also has to happen (and vice versa).
 Thus $A,B$ cannot be more likely than $A$ or $B$ individually.
 This brings us to an interesting ratio: $0 \leq \frac{\Pr(A,B)}{\Pr(A)} \leq 1$.
-We call this a **conditional probability** and denote it by $\Pr(B|A)$,
+We call this a **conditional probability** and denote it by $\Pr(B
+ \mid A)$,
 the probability that $B$ happens, provided that $A$ has happened.
 
 Using the definition of conditional probabilities,
 we can derive one of the most useful and celebrated equations in statistics - Bayes' theorem.
-It goes as follows: By construction, we have that $\Pr(A, B) = \Pr(B|A) \Pr(A)$.
-By symmetry, this also holds for $\Pr(A,B) = \Pr(A|B) \Pr(B)$.
+It goes as follows: By construction, we have that $\Pr(A, B) = \Pr(B
+ \mid A) \Pr(A)$.
+By symmetry, this also holds for $\Pr(A,B) = \Pr(A \mid B) \Pr(B)$.
 Solving for one of the conditional variables we get:
-$$\Pr(A|B) = \frac{\Pr(B|A) \Pr(A)}{\Pr(B)}$$
+$$\Pr(A \mid B) = \frac{\Pr(B \mid A) \Pr(A)}{\Pr(B)}$$
 
 This is very useful if we want to infer one thing from another,
 say cause and effect but we only know the properties in the reverse direction.
@@ -270,8 +272,8 @@ $$\Pr(A) = \sum_{B'} \Pr(A,B') \text{ and } \Pr(B) = \sum_{A'} \Pr(A',B)$$
 
 A really useful property to check is for **dependence** and **independence**.
 Independence is when the occurrence of one event does not influence the occurrence of the other.
-In this case $\Pr(B|A) = \Pr(B)$. Statisticians typically use $A \perp\!\!\!\perp B$ to express this.
-From Bayes Theorem it follows immediately that also $\Pr(A|B) = \Pr(A)$.
+In this case $\Pr(B \mid A) = \Pr(B)$. Statisticians typically use $A \perp\!\!\!\perp B$ to express this.
+From Bayes Theorem it follows immediately that also $\Pr(A \mid B) = \Pr(A)$.
 In all other cases we call $A$ and $B$ dependent.
 For instance, two successive rolls of a dice are independent.
 On the other hand, the position of a light switch and the brightness in the room are not
@@ -284,7 +286,7 @@ This test is fairly accurate and it fails only with 1% probability
 if the patient is healthy by reporting him as diseased. Moreover,
 it never fails to detect HIV if the patient actually has it.
 We use $D$ to indicate the diagnosis and $H$ to denote the HIV status.
-Written as a table the outcome $\Pr(D|H)$ looks as follows:
+Written as a table the outcome $\Pr(D \mid H)$ looks as follows:
 
 |      outcome| HIV positive | HIV negative |
 |:------------|-------------:|-------------:|
@@ -299,7 +301,7 @@ Assume that the population is quite healthy, e.g. $\Pr(\text{HIV positive}) = 0.
 To apply Bayes Theorem we need to determine
 
 $$\begin{aligned}
-\Pr(\text{Test positive}) =& \Pr(D=1|H=0) \Pr(H=0) + \Pr(D=1|H=1) \Pr(H=1) \\
+\Pr(\text{Test positive}) =& \Pr(D=1 \mid H=0) \Pr(H=0) + \Pr(D=1 \mid H=1) \Pr(H=1) \\
 =& 0.01 \cdot 0.9985 + 1 \cdot 0.0015 \\
 =& 0.011485
 \end{aligned}
@@ -308,7 +310,7 @@ $$
 Hence we get
 
 $$\begin{aligned}
-\Pr(H = 1|D = 1) =& \frac{\Pr(D=1|H=1) \Pr(H=1)}{\Pr(D=1)} \\
+\Pr(H = 1 \mid D = 1) =& \frac{\Pr(D=1 \mid H=1) \Pr(H=1)}{\Pr(D=1)} \\
 =& \frac{1 \cdot 0.0015}{0.011485} \\
 =& 0.131
 \end{aligned}
@@ -330,22 +332,23 @@ The second test has different characteristics (it isn't as good as the first one
 Unfortunately, the second test comes back positive, too.
 Let us work out the requisite probabilities to invoke Bayes' Theorem.
 
-* $\Pr(D_1 = 1 \text{ and } D_2 = 1|H = 0) = 0.01 \cdot 0.03 = 0.0003$
-* $\Pr(D_1 = 1 \text{ and } D_2 = 1|H = 1) = 1 \cdot 0.98 = 0.98$
+* $\Pr(D_1 = 1 \text{ and } D_2 = 1 \mid H = 0) = 0.01 \cdot 0.03 = 0.0003$
+* $\Pr(D_1 = 1 \text{ and } D_2 = 1 \mid H = 1) = 1 \cdot 0.98 = 0.98$
 * $\Pr(D_1 = 1 \text{ and } D_2 = 1) = 0.0001 \cdot 0.9985 + 0.98 \cdot 0.0015 = 0.00176955$
-* $\Pr(H = 1|D_1 = 1 \text{ and } D_2 = 1) = \frac{0.98 \cdot 0.0015}{0.00176955} = 0.831$
+* $\Pr(H = 1 \mid D_1 = 1 \text{ and } D_2 = 1) = \frac{0.98 \cdot 0.0015}{0.00176955} = 0.831$
 
 That is, the second test allowed us to gain much higher confidence that not all is well.
 Despite the second test being considerably less accurate than the first one,
 it still improved our estimate quite a bit.
 *Why couldn't we just run the first test a second time?*
 After all, the first test was more accurate.
-The reason is that we needed a second test that confirmed *independently* of the first test that things were dire, indeed. In other words, we made the tacit assumption that $\Pr(D_1, D_2|H) = \Pr(D_1|H) \Pr(D_2|H)$. Statisticians call such random variables **conditionally independent**. This is expressed as $D_1 \perp\!\!\!\perp D_2 | H$.
+The reason is that we needed a second test that confirmed *independently* of the first test that things were dire, indeed. In other words, we made the tacit assumption that $\Pr(D_1, D_2 \mid H) = \Pr(D_1 \mid H) \Pr(D_2 \mid H)$. Statisticians call such random variables **conditionally independent**. This is expressed as $D_1 \perp\!\!\!\perp D_2  \mid H$.
 
 ## Summary
 
 So far we covered probabilities, independence, conditional independence, and how to use this to draw some basic conclusions. This is already quite powerful. In the next section we will see how this can be used to perform some basic estimation using a Naive Bayes classifier.
 
-```{.python .input}
+## Problems
 
-```
+1. Given two events with probability $\Pr(A)$ and $\Pr(B)$, compute upper and lower bounds on $\Pr(A \cup B)$ and $\Pr(A \cap B)$. Hint - display the situation using a [Venn Diagram](https://en.wikipedia.org/wiki/Venn_diagram). 
+1. Assume that we have a sequence of events, say $A$, $B$ and $C$, where $B$ only depends on $A$ and $C$ only on $B$, can you simplify the joint probability? Hint - this is a [Markov Chain](https://en.wikipedia.org/wiki/Markov_chain).

@@ -10,7 +10,7 @@ from mxnet import autograd, nd
 
 ## A Simple Example
 
-As a toy example, let's say that we are interested in differentiating the mapping $y = 2\boldsymbol{x}^{\top}\boldsymbol{x}$ with respect to the column vector $\boldsymbol{x}$. Firstly, we create the variable `x` and assign an initial value.
+As a toy example, let's say that we are interested in differentiating the mapping $y = 2\mathbf{x}^{\top}\mathbf{x}$ with respect to the column vector $\mathbf{x}$. Firstly, we create the variable `x` and assign an initial value.
 
 ```{.python .input  n=2}
 x = nd.arange(4).reshape((4, 1))
@@ -39,7 +39,7 @@ Since the shape of `x` is (4, 1), `y` is a scalar. Next, we can automatically fi
 y.backward()
 ```
 
-The gradient of the function $y = 2\boldsymbol{x}^{\top}\boldsymbol{x}$ with respect to $\boldsymbol{x}$ should be $4\boldsymbol{x}$. Now let's verify that the gradient produced is correct.
+The gradient of the function $y = 2\mathbf{x}^{\top}\mathbf{x}$ with respect to $\mathbf{x}$ should be $4\mathbf{x}$. Now let's verify that the gradient produced is correct.
 
 ```{.python .input  n=6}
 print((x.grad - 4 * x).norm().asscalar() == 0)
@@ -94,8 +94,16 @@ print(a.grad == (d / a))
 
 *Caution: This part is tricky and not necessary to understanding subsequent sections. That said, it is needed if you want to build new layers from scratch. You can skip this on a first read.*
 
-Sometimes when we call the backward method, e.g. `y.backward()`, where `y` is a function of `x` we are just interested in the derivative of `y` with respect to `x`. Mathematicians write this as $\frac{dy(x)}{dx}$. At other times, we may be interested in the gradient of `z` with respect to `x`, where `z` is a function of `y`, which in turn, is a function of `x`. That is, we are interested in $\frac{d}{dx} z(y(x))$. Recall that by the chain rule
+Sometimes when we call the backward method, e.g. `y.backward()`, where
+`y` is a function of `x` we are just interested in the derivative of
+`y` with respect to `x`. Mathematicians write this as
+$\frac{dy(x)}{dx}$. At other times, we may be interested in the
+gradient of `z` with respect to `x`, where `z` is a function of `y`,
+which in turn, is a function of `x`. That is, we are interested in
+$\frac{d}{dx} z(y(x))$. Recall that by the chain rule
+
 $$\frac{d}{dx} z(y(x)) = \frac{dz(y)}{dy} \frac{dy(x)}{dx}.$$
+
 So, when ``y`` is part of a larger function ``z``, and we want ``x.grad`` to store $\frac{dz}{dx}$, we can pass in the *head gradient* $\frac{dz}{dy}$ as an input to ``backward()``. The default argument is ``nd.ones_like(y)``. See [Wikipedia](https://en.wikipedia.org/wiki/Chain_rule) for more details.
 
 ```{.python .input  n=11}
@@ -114,14 +122,14 @@ print(x.grad)
 * MXNet's `autograd` package can be used to derive general imperative programs.
 * The running modes of MXNet include the training mode and the prediction mode. We can determine the running mode by `autograd.is_training()`.
 
-## Exercises
+## Problems
 
-* In the example, finding the gradient of the control flow shown in this section, the variable `a` is changed to a random vector or matrix. At this point, the result of the calculation `c` is no longer a scalar. What happens to the result. How do we analyze this?
-* Redesign an example of finding the gradient of the control flow. Run and analyze the result.
-* In a second price auction (such as in eBay or in computational advertising) the winning bidder pays the second highest price. Compute the gradient of the winning bidder with regard to his bid using `autograd`. Why do you get a pathological result? What does this tell us about the mechanism? For more details read the paper by [Edelman, Ostrovski and Schwartz, 2005](https://www.benedelman.org/publications/gsp-060801.pdf).
-* Why is the second derivative much more expensive to compute than the first derivative?
-* Derive the head gradient relationship for the chain rule. If you get stuck, use the  [Wikipedia Chain Rule](https://en.wikipedia.org/wiki/Chain_rule) entry.
-* Assume $f(x) = \sin(x)$. Plot $f(x)$ and $\frac{df(x)}{dx}$ on a graph, where you computed the latter without any symbolic calculations, i.e. without exploiting that $f'(x) = \cos(x)$.
+1. In the example, finding the gradient of the control flow shown in this section, the variable `a` is changed to a random vector or matrix. At this point, the result of the calculation `c` is no longer a scalar. What happens to the result. How do we analyze this?
+1. Redesign an example of finding the gradient of the control flow. Run and analyze the result.
+1. In a second price auction (such as in eBay or in computational advertising) the winning bidder pays the second highest price. Compute the gradient of the winning bidder with regard to his bid using `autograd`. Why do you get a pathological result? What does this tell us about the mechanism? For more details read the paper by [Edelman, Ostrovski and Schwartz, 2005](https://www.benedelman.org/publications/gsp-060801.pdf).
+1. Why is the second derivative much more expensive to compute than the first derivative?
+1. Derive the head gradient relationship for the chain rule. If you get stuck, use the  [Wikipedia Chain Rule](https://en.wikipedia.org/wiki/Chain_rule) entry.
+1. Assume $f(x) = \sin(x)$. Plot $f(x)$ and $\frac{df(x)}{dx}$ on a graph, where you computed the latter without any symbolic calculations, i.e. without exploiting that $f'(x) = \cos(x)$.
 
 ## Scan the QR code to get to the [forum](https://discuss.gluon.ai/t/topic/744)
 

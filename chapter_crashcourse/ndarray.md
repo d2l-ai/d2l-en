@@ -86,11 +86,11 @@ Oftentimes, we want to apply functions to arrays.
 Some of the simplest and most useful functions are the element-wise functions.
 These operate by performing a single scalar operation on the corresponding elements of two arrays.
 We can create an element-wise function from any function that maps from the scalars to the scalars.
-In math notations we would denote such a function as $f: \mathcal{R} \rightarrow \mathcal{R}$.
+In math notations we would denote such a function as $f: \mathbb{R} \rightarrow \mathbb{R}$.
 Given any two vectors $\mathbf{u}$ and $\mathbf{v}$ *of the same shape*, and the function f,
 we can produce a vector $\mathbf{c} = F(\mathbf{u},\mathbf{v})$
 by setting $c_i \gets f(u_i, v_i)$ for all $i$.
-Here, we produced the vector-valued $F: \mathcal{R}^d \rightarrow \mathcal{R}^d$
+Here, we produced the vector-valued $F: \mathbb{R}^d \rightarrow \mathbb{R}^d$
 by *lifting* the scalar function to an element-wise vector operation.
 In MXNet, the common standard arithmetic operators (+,-,/,\*,\*\*)
 have all been *lifted* to element-wise operations for identically-shaped tensors of arbitrary shape. We can call element-wise operations on any two tensors of the same shape, including matrices.
@@ -138,7 +138,7 @@ Summing all the elements in the NDArray yields an NDArray with only one element.
 x.sum()
 ```
 
-We can transform the result into a scalar in Python using the `asscalar` function. In the following example, the $L_2$ norm of `x` yields a single element NDArray. The final result is transformed into a scalar.
+We can transform the result into a scalar in Python using the `asscalar` function. In the following example, the $\ell_2$ norm of `x` yields a single element NDArray. The final result is transformed into a scalar.
 
 ```{.python .input}
 x.norm().asscalar()
@@ -234,11 +234,11 @@ b = nd.array(a)
 print(type(b))
 ```
 
-## Exercises
+## Problems
 
-* Run the code in this section. Change the conditional statement `x == y` in this section to `x < y` or `x > y`, and then see what kind of NDArray you can get.
-* Replace the two NDArrays that operate by element in the broadcast mechanism with other shapes, e.g. three dimensional tensors. Is the result the same as expected?
-* Assume that we have three matrices `a`, `b` and `c`. Rewrite `c = nd.dot(a, b.T) + c` in the most memory efficient manner.
+1. Run the code in this section. Change the conditional statement `x == y` in this section to `x < y` or `x > y`, and then see what kind of NDArray you can get.
+1. Replace the two NDArrays that operate by element in the broadcast mechanism with other shapes, e.g. three dimensional tensors. Is the result the same as expected?
+1. Assume that we have three matrices `a`, `b` and `c`. Rewrite `c = nd.dot(a, b.T) + c` in the most memory efficient manner.
 
 
 ## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/745)
