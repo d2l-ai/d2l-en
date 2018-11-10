@@ -350,8 +350,5 @@ So far we covered probabilities, independence, conditional independence, and how
 
 ## Problems
 
-1. Given two events with probability $\Pr(A)$ and $\Pr(B)$, compute
-   upper and lower bounds on $\Pr(A \cup B)$ and $\Pr(A \cap B)$. Hint - display the situation using a [Venn Diagram](https://en.wikipedia.org/wiki/Venn_diagram). 
-1. Assume that we have a sequence of events, say $A$, $B$ and $C$,
-   where $B$ only depends on $A$ and $C$ only on $B$, can you simplify
-   the joint probability? Hint - this is a [Markov Chain](https://en.wikipedia.org/wiki/Markov_chain).
+1. Given two events with probability $\Pr(A)$ and $\Pr(B)$, compute upper and lower bounds on $\Pr(A \cup B)$ and $\Pr(A \cap B)$. Hint - display the situation using a [Venn Diagram](https://en.wikipedia.org/wiki/Venn_diagram). 
+1. Assume that we have a sequence of events, say $A$, $B$ and $C$, where $B$ only depends on $A$ and $C$ only on $B$, can you simplify the joint probability? Hint - this is a [Markov Chain](https://en.wikipedia.org/wiki/Markov_chain).
