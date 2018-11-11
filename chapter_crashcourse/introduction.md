@@ -388,7 +388,7 @@ This is easy to see for binary classification.
 If there's a 0.6 (60%) probability that an unfair coin comes up heads,
 then there's a 0.4 (40%) probability that it comes up tails.
 Returning to our animal classification example, a classifier might see an image
-and output the probability that the image is a cat $\Pr(y=\mathrm{cat}\mid x) = 0.9$.
+and output the probability that the image is a cat $\Pr(y=\mathrm{cat}| x) = 0.9$.
 We can interpret this number by saying that the classifier is 90% sure that the image depicts a cat.
 The magnitude of the probability for the predicted class is one notion of confidence.
 It's not the only notion of confidence and we'll discuss different notions of uncertainty in more advanced chapters.
@@ -407,16 +407,16 @@ Note that the most likely class is not necessarily the one that you're going to 
 
 Now, assume that you built a classifier and trained it
 to predict if a mushroom is poisonous based on a photograph.
-Say our poison-detection classifier outputs $\Pr(y=\mathrm{death cap}\mid\mathrm{image}) = 0.2$.
+Say our poison-detection classifier outputs $\Pr(y=\mathrm{death cap}|\mathrm{image}) = 0.2$.
 In other words, the classifier is 80% confident that our mushroom *is not* a death cap.
 Still, you'd have to be a fool to eat it.
 That's because the certain benefit of a delicious dinner isn't worth a 20% risk of dying from it.
 In other words, the effect of the *uncertain risk* by far outweighs the benefit.
 Let's look at this in math. Basically, we need to compute the expected risk that we incur, i.e. we need to multiply the probability of the outcome with the benefit (or harm) associated with it:
 
-$$L(\mathrm{action}\mid x) = \mathbf{E}_{y \sim p(y\mid x)}[\mathrm{loss}(\mathrm{action},y)]$$
+$$L(\mathrm{action}| x) = \mathbf{E}_{y \sim p(y| x)}[\mathrm{loss}(\mathrm{action},y)]$$
 
-Hence, the loss $L$ incurred by eating the mushroom is $L(a=\mathrm{eat}\mid x) = 0.2 * \infty + 0.8 * 0 = \infty$, whereas the cost of discarding it is $L(a=\mathrm{discard}\mid x) = 0.2 * 0 + 0.8 * 1 = 0.8$.
+Hence, the loss $L$ incurred by eating the mushroom is $L(a=\mathrm{eat}| x) = 0.2 * \infty + 0.8 * 0 = \infty$, whereas the cost of discarding it is $L(a=\mathrm{discard}| x) = 0.2 * 0 + 0.8 * 1 = 0.8$.
 
 Our caution was justified: as any mycologist would tell us, the above actually *is* a death cap.
 Classification can get much more complicated than just binary, multiclass, of even multi-label classification.
