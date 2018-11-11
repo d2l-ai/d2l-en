@@ -1,7 +1,7 @@
 # Image Classification Data (Fashion-MNIST)
 
 Before introducing the implementation for softmax regression, we need a suitable datset. To make things more visually compelling we pick one on classification. 
-It will be used multiple times in later chapters to allow us to observe the difference between model accuracy and computational efficiency between comparison algorithms. The most commonly used image classification data set is the handwritten digit recognition data set MNIST [1]. However, most models have a classification accuracy of over 95% on MNIST, hence it is hard to spot the difference between different models. In order to get a better intuition about the difference between algorithms we use a more complex data set - Fashion-MNIST [2].
+It will be used multiple times in later chapters to allow us to observe the difference between model accuracy and computational efficiency between comparison algorithms. The most commonly used image classification data set is the [MNIST](http://yann.lecun.com/exdb/mnist/) handwritten digit recognition data set. It was proposed by LeCun, Cortes and Burges in the 1990s. However, most models have a classification accuracy of over 95% on MNIST, hence it is hard to spot the difference between different models. In order to get a better intuition about the difference between algorithms we use a more complex data set. [Fashion-MNIST](https://github.com/zalandoresearch/fashion-mnist) was proposed by [Xiao, Rasul and Vollgraf](https://arxiv.org/abs/1708.07747) in 2017. 
 
 ## Getting the Data
 
@@ -131,9 +131,3 @@ for X, y in train_iter:
 
 ![](../img/qr_fashion-mnist.svg)
 
-
-## References
-
-[1] LeCun, Y., Cortes, C., & Burges, C. http://yann.lecun.com/exdb/mnist/
-
-[2] Xiao, H., Rasul, K., & Vollgraf, R. (2017). Fashion-mnist: a novel image dataset for benchmarking machine learning algorithms. arXiv preprint arXiv:1708.07747.

@@ -48,7 +48,6 @@ To define a linear model, first import the module `nn`. `nn` is an abbreviation 
 
 ```{.python .input  n=5}
 from mxnet.gluon import nn
-
 net = nn.Sequential()
 ```
 
@@ -103,7 +102,7 @@ To refresh your memory. For some number of epochs, we'll make a complete pass ov
 * Calculate gradients by making a backwards pass through the network via `l.backward()`.
 * Update the model parameters by invoking our SGD optimizer (note that we need not tell trainer.step about which parameters but rather just the amount of data, since we already performed that in the initialization of trainer).
 
-For good measure we compute the loss on the features after each epoch and print it to monitor progress. 
+For good measure we compute the loss on the features after each epoch and print it to monitor progress.
 
 ```{.python .input  n=10}
 num_epochs = 3

@@ -46,7 +46,7 @@ X.sum(axis=0, keepdims=True), X.sum(axis=1, keepdims=True)
 We can now define the softmax function. For that we first exponentiate each term using `exp` and then sum each row to get the normalization constant. Last we divide each row by its normalization constant and return the result. Before looking at the code, let's look at this in equation form:
 
 $$
-\mathrm{softmax}(X)_{ij} = \frac{\exp(X_{ij})}{\sum_k \exp(X_{ik})}
+\mathrm{softmax}(\mathbf{X})_{ij} = \frac{\exp(X_{ij})}{\sum_k \exp(X_{ik})}
 $$
 
 The denominator is sometimes called the partition function (and its logarithm the log-partition function). The origins of that name are in [statistical physics](https://en.wikipedia.org/wiki/Partition_function_(statistical_mechanics)) where a related equation models the distribution over an ensemble of particles). Also note that in the definition below we are somewhat sloppy as we do not take any precautions against numerical overflow or underflow due to large (or very small) elements of the matrix, as we did in [Naive Bayes](../chapter_crashcourse/naive-bayes.md).

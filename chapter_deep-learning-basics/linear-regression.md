@@ -20,13 +20,13 @@ While this is quite illustrative, it becomes extremely tedious when dealing with
 
 $$\hat{y} = w_1 \cdot x_1 + ... + w_d \cdot x_d + b$$
 
-Given a collection of data points $X$, and corresponding target values $\boldsymbol{y}$, 
+Given a collection of data points $X$, and corresponding target values $\mathbf{y}$, 
 we'll try to find the *weight* vector $w$ and bias term $b$ 
 (also called an *offset* or *intercept*)
 that approximately associate data points $x_i$ with their corresponding labels $y_i$.
-Using slightly more advanced math notation, we can express the long sum as $\hat{y} = w^\top x + b$. Finally, for a collection of data points $X$ the predictions $\hat{y}$ can be expressed via the matrix-vector product:
+Using slightly more advanced math notation, we can express the long sum as $\hat{y} = \mathbf{w}^\top \mathbf{x} + b$. Finally, for a collection of data points $\mathbf{X}$ the predictions $\hat{\mathbf{y}}$ can be expressed via the matrix-vector product:
 
-$${\hat{y}} = X \boldsymbol{w} + b$$
+$${\hat{\mathbf{y}}} = \mathbf{X} \mathbf{w} + b$$
 
 It's quite reasonable to assume that the relationship between $x$ and $y$ is only approximately linear. There might be some error in measuring things. Likewise, while the price of a house typically decreases, this is probably less the case with very old historical mansions which are likely to be prized specifically for their age. To find the parameters $w$ we need two more things: some way to measure the quality of the current model and secondly, some way to manipulate the model to improve its quality. 
 
@@ -40,7 +40,7 @@ Typically we denote by $n$ the number of samples that we collect. Each sample (i
 
 In model training, we need to measure the error between the predicted value and the real value of the price. Usually, we will choose a non-negative number as the error. The smaller the value, the smaller the error. A common choice is the square function. The expression for evaluating the error of a sample with an index of $i$ is as follows:
 
-$$l^{(i)}(w, b) = \frac{1}{2} \left(\hat{y}^{(i)} - y^{(i)}\right)^2,$$
+$$l^{(i)}(\mathbf{w}, b) = \frac{1}{2} \left(\hat{y}^{(i)} - y^{(i)}\right)^2,$$
 
 The constant $1/2$ ensures that the constant coefficient, after deriving the quadratic term, is 1, which is slightly simpler in form. Obviously, the smaller the error, the closer the predicted price is to the actual price, and when the two are equal, the error will be zero. Given the training data set, this error is only related to the model parameters, so we record it as a function with the model parameters as parameters. In machine learning, we call the function that measures the error the ‘loss function’. The squared error function used here is also referred to as ‘square loss’.
 
@@ -50,11 +50,11 @@ To make things a bit more concrete, consider the example below where we plot suc
 
 As you can see, large differences between estimates $\hat{y}^{(i)}$ and observations $y^{(i)}$ lead to even larger contributions in terms of the loss, due to the quadratic dependence. To measure the quality of a model on the entire dataset, we can simply average the losses on the training set. 
 
-$$L(w, b) =\frac{1}{n}\sum_{i=1}^n l^{(i)}(w, b) =\frac{1}{n} \sum_{i=1}^n \frac{1}{2}\left(w^\top x^{(i)} + b - y^{(i)}\right)^2.$$
+$$L(\mathbf{w}, b) =\frac{1}{n}\sum_{i=1}^n l^{(i)}(\mathbf{w}, b) =\frac{1}{n} \sum_{i=1}^n \frac{1}{2}\left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right)^2.$$
 
-In model training, we want to find a set of model parameters, represented by $w^*, b^*$, that can minimize the average loss of training samples:
+In model training, we want to find a set of model parameters, represented by $\mathbf{w}^*, b^*$, that can minimize the average loss of training samples:
 
-$$w^*, b^* = \operatorname*{argmin}_{w, b}\  L(w, b).$$
+$$\mathbf{w}^*, b^* = \operatorname*{argmin}_{\mathbf{w}, b}\  L(\mathbf{w}, b).$$
 
 
 ### Optimization Algorithm
@@ -63,16 +63,16 @@ When the model and loss function are in a relatively simple format, the solution
 
 The mini-batch stochastic gradient descent is widely used for deep learning to find numerical solutions. Its algorithm is simple: first, we initialize the values of the model parameters, typically at random; then we iterate over the data multiple times, so that each iteration may reduce the value of the loss function. In each iteration, we first randomly and uniformly sample a mini-batch $\mathcal{B}$ consisting of a fixed number of training data examples; we then compute the derivative (gradient) of the average loss on the mini batch the with regard to the model parameters. Finally, the product of this result and a predetermined step size $\eta > 0$ is used to change the parameters in the direction of the minimum of the loss. In math we have
 
-$$(w,b) \leftarrow (w,b) - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_{(w,b)} l^{(i)}(w,b)$$
+$$(\mathbf{w},b) \leftarrow (\mathbf{w},b) - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_{(\mathbf{w},b)} l^{(i)}(\mathbf{w},b)$$
 
-For quadratic losses and linear functions we can write this out explicitly as followsn Note that $w$ and $x$ are vectors. Here the more elegant vector notation makes the math much more readable than expressing things in terms of coefficients, say $w_1, w_2, \ldots w_d$. 
+For quadratic losses and linear functions we can write this out explicitly as followsn Note that $\mathbf{w}$ and $\mathbf{x}$ are vectors. Here the more elegant vector notation makes the math much more readable than expressing things in terms of coefficients, say $w_1, w_2, \ldots w_d$. 
 
 $$
 \begin{aligned}
-w &\leftarrow w -   \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_w l^{(i)}(w, b) && =
-w - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} x^{(i)} \left(w^\top x^{(i)} + b - y^{(i)}\right),\\
-b &\leftarrow b -  \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_b l^{(i)}(w, b)  && =
-b - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \left(w^\top x^{(i)} - y^{(i)}\right).
+\mathbf{w} &\leftarrow \mathbf{w} -   \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_{\mathbf{w}} l^{(i)}(\mathbf{w}, b) && =
+w - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \mathbf{x}^{(i)} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right),\\
+b &\leftarrow b -  \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_b l^{(i)}(\mathbf{w}, b)  && =
+b - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \left(\mathbf{w}^\top \mathbf{x}^{(i)} - y^{(i)}\right).
 \end{aligned}
 $$
 
@@ -80,7 +80,7 @@ In the above equation $|\mathcal{B}|$ represents the number of samples (batch si
 
 ### Model Prediction
 
-After model training has been completed, we then record the values of the model parameters $w, b$ as $\hat{w}, \hat{b}$. Note that we do not necessarily obtain the optimal solution of the loss function minimizer, $w^*, b^*$ (or the true parameters), but instead we gain an approximation of the optimal solution. We can then use the learned linear regression model $\hat{w}^\top x + \hat{b}$ to estimate the price of any house outside the training data set with area (square feet) as $x_1$ and house age (year) as $x_2$. Here, estimation also referred to as ‘model prediction’ or ‘model inference’. 
+After model training has been completed, we then record the values of the model parameters $\mathbf{w}, b$ as $\hat{\mathbf{w}}, \hat{b}$. Note that we do not necessarily obtain the optimal solution of the loss function minimizer, $\mathbf{w}^*, b^*$ (or the true parameters), but instead we gain an approximation of the optimal solution. We can then use the learned linear regression model $\hat{\mathbf{w}}^\top x + \hat{b}$ to estimate the price of any house outside the training data set with area (square feet) as $x_1$ and house age (year) as $x_2$. Here, estimation also referred to as ‘model prediction’ or ‘model inference’. 
 
 Note that calling this step 'inference' is actually quite a misnomer, albeit one that has become the default in deep learning. In statistics 'inference' means estimating parameters and outcomes based on other data. This misuse of terminology in deep learning can be a source of confusion when talking to statisticians. We adopt the incorrect, but by now common, terminology of using 'inference' when a (trained) model is applied to new data (and express our sincere apologies to centuries of statisticians). 
 
@@ -99,13 +99,13 @@ In the neural network shown above, the inputs are $x_1, x_2, \ldots x_d$. Someti
 
 ### A Detour to Biology
 
-Neural networks quite clearly derive their name from Neuroscience. To understand a bit better how many network architectures were invented, it is worth while considering the basic structure of a neuron. For the purpose of the analogy it is sufficient to consider the *dendrites* (input terminals), the *nucleus* (CPU), the *axon* (output wire), and the *axon terminals* (output terminals) which connect to other neurons via *synapses*.  
+Neural networks quite clearly derive their name from Neuroscience. To understand a bit better how many network architectures were invented, it is worth while considering the basic structure of a neuron. For the purpose of the analogy it is sufficient to consider the *dendrites* (input terminals), the *nucleus* (CPU), the *axon* (output wire), and the *axon terminals* (output terminals) which connect to other neurons via *synapses*.
 
 ![The real neuron](../img/Neuron.svg)
 
 Information $x_i$ arriving from other neurons (or environmental sensors such as the retina) is received in the dendrites. In particular, that information is weighted by *synaptic weights* $w_i$ which determine how to respond to the inputs (e.g. activation or inhibition via $x_i w_i$). All this is aggregated in the nucleus $y = \sum_i x_i w_i + b$, and this information is then sent for further processing in the axon $y$, typically after some nonlinear processing via $\sigma(y)$. From there it either reaches its destination (e.g. a muscle) or is fed into another neuron via its dendrites. 
 
-Brain *structures* can be quite varied. Some look rather arbitrary whereas others have a very regular structure. E.g. the visual system of many insects is quite regular. The analysis of such structures has often inspired neuroscientists to propose new architectures, and in some cases, this has been successful. Note, though, that it would be a fallacy to require a direct correspondence - just like airplanes are *inspired* by birds, they have many distinctions. An equal source of inspiration have been mathematics and compute science. 
+Brain *structures* can be quite varied. Some look rather arbitrary whereas others have a very regular structure. E.g. the visual system of many insects is quite regular. The analysis of such structures has often inspired neuroscientists to propose new architectures, and in some cases, this has been successful. Note, though, that it would be a fallacy to require a direct correspondence - just like airplanes are *inspired* by birds, they have many distinctions. Equal sources of inspiration were mathematics and computer science. 
 
 ### Vectorzation for Speed
 
@@ -171,23 +171,21 @@ plt.show()
 
 As can be seen in the figure above, changing the mean shifts the function, increasing the variance makes it more spread-out with a lower peak. The key assumption in linear regression with least mean squares loss is that the observations actually arise from noisy observations, where noise is added to the data, e.g. as part of the observations process. 
 
-$$y = w^\top x + b + \epsilon \text{ where } \epsilon \sim \mathcal{N}(0, \sigma^2)$$
+$$y = \mathbf{w}^\top \mathbf{x} + b + \epsilon \text{ where } \epsilon \sim \mathcal{N}(0, \sigma^2)$$
 
-This allows us to write out the *likelihood* of seeing a particular $y$ for a given $x$ via
+This allows us to write out the *likelihood* of seeing a particular $y$ for a given $\mathbf{x}$ via
 
-$$p(y|x) = \frac{1}{\sqrt{2 \pi \sigma^2}} \exp\left(-\frac{1}{2 \sigma^2} (y - w^\top x - b)^2\right)$$
+$$p(y|\mathbf{x}) = \frac{1}{\sqrt{2 \pi \sigma^2}} \exp\left(-\frac{1}{2 \sigma^2} (y - \mathbf{w}^\top \mathbf{x} - b)^2\right)$$
 
-A good way of finding the most likely values of $b$ and $w$ is to maximize the *likelihood* of the entire dataset 
+A good way of finding the most likely values of $b$ and $\mathbf{w}$ is to maximize the *likelihood* of the entire dataset 
 
-$$p(Y|X) = \prod_{i=1}^{n} p(y^{(i)}|x^{(i)})$$
+$$p(Y|X) = \prod_{i=1}^{n} p(y^{(i)}|\mathbf{x}^{(i)})$$
 
 The notion of maximizing the likelihood of the data subject to the parameters is well known as the *Maximum Likelihood Principle* and its estimators are usually called *Maximum Likelihood Estimators* (MLE). Unfortunately, maximizing the product of many exponential functions is pretty awkward, both in terms of implementation and in terms of writing it out on paper. Instead, a much better way is to minimize the *Negative Log-Likelihood* $-\log P(Y|X)$. In the above case this works out to be 
 
-$$-\log P(Y|X) = \sum_{i=1}^n \frac{1}{2} \log(2 \pi \sigma^2) + \frac{1}{2 \sigma^2} \left(y^{(i)} - w^\top x^{(i)} - b\right)^2$$
+$$-\log P(Y|X) = \sum_{i=1}^n \frac{1}{2} \log(2 \pi \sigma^2) + \frac{1}{2 \sigma^2} \left(y^{(i)} - \mathbf{w}^\top \mathbf{x}^{(i)} - b\right)^2$$
 
-A closer inspection reveals that for the purpose of minimizing $-\log P(Y|X)$ we can skip the first term since it doesn't depend on $w, b$ or even the data. The second term is identical to the objective we initially introduced, but for the multiplicative constant $\frac{1}{\sigma^2}$. Again, this can be skipped if we just want to get the most likely solution. It follows that maximum likelihood in a linear model with additive Gaussian noise is  
-
-
+A closer inspection reveals that for the purpose of minimizing $-\log P(Y|X)$ we can skip the first term since it doesn't depend on $\mathbf{w}, b$ or even the data. The second term is identical to the objective we initially introduced, but for the multiplicative constant $\frac{1}{\sigma^2}$. Again, this can be skipped if we just want to get the most likely solution. It follows that maximum likelihood in a linear model with additive Gaussian noise is equivalent to linear regression with squared loss. 
 
 ## Summary
 

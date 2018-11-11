@@ -97,6 +97,6 @@ We saw that implementing a simple MLP is quite easy, when done manually. That sa
 1. How does changing the learning rate change the result. 
 1. What is the best result you can get by optimizing over all the parameters (learning rate, iterations, number of hidden layers, number of hidden units per layer)?
 
-## Scan the QR code to access the  [  ](> forum. 
+## Scan the QR code to access the forum. 
 
 ![](../img/qr_mlp-scratch.svg)

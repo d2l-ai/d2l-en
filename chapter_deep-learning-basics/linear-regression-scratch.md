@@ -14,11 +14,11 @@ import random
 
 ## Generating Data Sets
 
-By constructing a simple artificial training data set, we can visually compare the differences between the parameters we have learned and the actual model parameters.  Set the number of examples in the training data set as 1000 and the number of inputs (feature number) as 2.  Using the randomly generated batch example feature ${X}\in \mathbb{R}^{1000 \times 2}$, we use the actual weight ${w} = [2, -3.4]^\top$ and bias $b = 4.2$ of the linear regression model, as well as a random noise item $\epsilon$ to generate the tag
+By constructing a simple artificial training data set, we can visually compare the differences between the parameters we have learned and the actual model parameters.  Set the number of examples in the training data set as 1000 and the number of inputs (feature number) as 2.  Using the randomly generated batch example feature $\mathbf{X}\in \mathbb{R}^{1000 \times 2}$, we use the actual weight $\mathbf{w} = [2, -3.4]^\top$ and bias $b = 4.2$ of the linear regression model, as well as a random noise item $\epsilon$ to generate the tag
 
-$${y}= {X}{w} + b + \epsilon$$
+$$\mathbf{y}= \mathbf{X} \mathbf{w} + b + \mathbf\epsilon$$
 
-The noise term $\epsilon$ obeys a normal distribution with a mean of 0 and a standard deviation of 0.01. To get a better idea, let us generate the dataset.
+The noise term $\epsilon$ (or rather each coordinate of it) obeys a normal distribution with a mean of 0 and a standard deviation of 0.01. To get a better idea, let us generate the dataset.
 
 ```{.python .input  n=2}
 num_inputs = 2
@@ -132,10 +132,10 @@ def sgd(params, lr, batch_size):  # This function has been saved in the gluonboo
 
 In training, we will iterate over the data to improve the model parameters. In each iteration, the mini-batch stochastic gradient is calculated by first calling the inverse function `backward` depending on the currently read mini-batch data examples (feature `X` and label `y`), and then calling the optimization algorithm `sgd` to iterate the model parameters. Since we previously set the batch size `batch_size` to 10, the loss shape `l` for each small batch is (10, 1).
 
-* Initialize parameters $(w, b)$
+* Initialize parameters $(\mathbf{w}, b)$
 * Repeat until done
-    * Compute gradient $g \leftarrow \partial_{(w,b)} \frac{1}{\mathcal{B}} \sum_{i \in \mathcal{B}} l(x^i, y^i, w, b)$
-    * Update parameters $(w, b) \leftarrow (w, b) - \eta g$
+    * Compute gradient $\mathbf{g} \leftarrow \partial_{(\mathbf{w},b)} \frac{1}{\mathcal{B}} \sum_{i \in \mathcal{B}} l(\mathbf{x}^i, y^i, \mathbf{w}, b)$
+    * Update parameters $(\mathbf{w}, b) \leftarrow (\mathbf{w}, b) - \eta \mathbf{g}$
 
 Since nobody wants to compute gradients explicitly (this is tedious and error prone) we use automatic differentiation to compute $g$. See section ["Automatic Gradient"](../chapter_prerequisite/autograd.md) for more details. Since the loss `l` is not a scalar variable, running `l.backward()` will add together the elements in `l` to obtain the new variable, and then calculate the variable model parameters’ gradient.
  
@@ -176,7 +176,7 @@ We saw how a deep network can be implemented and optimized from scratch, using j
 
 ## Problems
 
-1. What would happen if we were to initialize the weights $w = 0$. Would the algorithm still work?
+1. What would happen if we were to initialize the weights $\mathbf{w} = 0$. Would the algorithm still work? 
 1. Assume that you're [Georg Simon Ohm](https://en.wikipedia.org/wiki/Georg_Ohm) trying to come up with a model between voltage and current. Can you use `autograd` to learn the parameters of your model.
 1. Can you use [Planck's Law](https://en.wikipedia.org/wiki/Planck%27s_law) to determine the temperature of an object using spectral energy density. 
 1. What are the problems you might encounter if you wanted to extend `autograd` to second derivatives? How would you fix them?
