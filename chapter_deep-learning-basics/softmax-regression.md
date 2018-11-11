@@ -51,38 +51,38 @@ The neural network diagram below depicts the calculation above.  Like linear reg
 
 ### Softmax Operation
 
-The chosen notation is somewhat verbose. In vector form we arrive at $o = W x + b$, which is much more compact to write and code. Since the classification problem requires discrete prediction output, we can use a simple approach to treat the output value $o_i$ as the confidence level of the prediction category $i$. We can choose the class with the largest output value as the predicted output, which is output $\operatorname*{argmax}_i o_i$. For example, if $o_1$, $o_2$, and $o_3$ are 0.1, 10, and 0.1, respectively, then the prediction category is 2, which represents "chicken".
+The chosen notation is somewhat verbose. In vector form we arrive at $\mathbf{o} = \mathbf{W} \mathbf{x} + \mathbf{b}$, which is much more compact to write and code. Since the classification problem requires discrete prediction output, we can use a simple approach to treat the output value $o_i$ as the confidence level of the prediction category $i$. We can choose the class with the largest output value as the predicted output, which is output $\operatorname*{argmax}_i o_i$. For example, if $o_1$, $o_2$, and $o_3$ are 0.1, 10, and 0.1, respectively, then the prediction category is 2, which represents "chicken".
 
 However, there are two problems with using the output from the output layer directly. On the one hand, because the range of output values from the output layer is uncertain, it is difficult for us to visually judge the meaning of these values. For instance, the output value 10 from the previous example indicates a level of "very confident" that the image category is "chicken". That is because its output value is 100 times that of the other two categories.  However, if $o_1=o_3=10^3$, then an output value of 10 means that the chance for the image category to be chicken is very low.  On the other hand, since the actual label has discrete values, the error between these discrete values and the output values from an uncertain range is difficult to measure.
 
 We could try forcing the outputs to correspond to probabilities, but there's no guarantee that on new (unseen) data the probabilities would be nonnegative, let alone sum up to 1. For this kind of discrete value prediction problem, statisticians have invented classification models such as (softmax) logistic regression. Unlike linear regression, the output of softmax regression is subjected to a nonlinearity which ensures that the sum over all outcomes always adds up to 1 and that none of the terms is ever negative. The nonlinear transformation works as follows:
 
 $$
-\hat{y} = \mathrm{softmax}(o) \text{ where }
+\hat{\mathbf{y}} = \mathrm{softmax}(\mathbf{o}) \text{ where }
 \hat{y}_i = \frac{\exp(o_i)}{\sum_j \exp(o_j)}
 $$
 
 It is easy to see $\hat{y}_1 + \hat{y}_2 + \hat{y}_3 = 1$ with $0 \leq \hat{y}_i \leq 1$ for all $i$. Thus, $\hat{y}$ is a proper probability distribution and the values of $o$ now assume an easily quantifiable meaning. Note that we can still find the most likely class by 
 
 $$
-\hat{i}(o) = \operatorname*{argmax}_i o_i = \operatorname*{argmax}_i \hat y_i
+\hat{\imath}(\mathbf{o}) = \operatorname*{argmax}_i o_i = \operatorname*{argmax}_i \hat y_i
 $$
 
-So, the softmax operation does not change the prediction category output but rather it gives the outputs $o$ proper meaning. Summarizing it all in vector notation we get ${o}^{(i)} = W {x}^{(i)} + {b}$ where ${\hat{y}}^{(i)} = \mathrm{softmax}({o}^{(i)})$.
+So, the softmax operation does not change the prediction category output but rather it gives the outputs $\mathbf{o}$ proper meaning. Summarizing it all in vector notation we get ${\mathbf{o}}^{(i)} = \mathbf{W} {\mathbf{x}}^{(i)} + {\mathbf{b}}$ where ${\hat{\mathbf{y}}}^{(i)} = \mathrm{softmax}({\mathbf{o}}^{(i)})$.
 
 
 ### Vectorization for Minibatches
 
-To improve computational efficiency further, we usually carry out vector calculations for mini-batches of data. Assume that we are given a mini-batch $X$ of examples with dimensionality $d$ and batch size $n$. Moreover, assume that we have $q$ categories (outputs). Then the minibatch features $X$ are in $\mathbb{R}^{n \times d}$, weights $W \in \mathbb{R}^{d \times q}$ and the bias satisfies $b \in \mathbb{R}^q$. 
+To improve computational efficiency further, we usually carry out vector calculations for mini-batches of data. Assume that we are given a mini-batch $\mathbf{X}$ of examples with dimensionality $d$ and batch size $n$. Moreover, assume that we have $q$ categories (outputs). Then the minibatch features $\mathbf{X}$ are in $\mathbb{R}^{n \times d}$, weights $\mathbf{W} \in \mathbb{R}^{d \times q}$ and the bias satisfies $\mathbf{b} \in \mathbb{R}^q$. 
 
 $$
 \begin{aligned}
-{O} &= W X + b \\
-\hat{Y} & = \mathrm{softmax}(O)
+\mathbf{O} &= \mathbf{W} \mathbf{X} + \mathbf{b} \\
+\hat{\mathbf{Y}} & = \mathrm{softmax}(\mathbf{O})
 \end{aligned}
 $$
 
-This accelerates the dominant operation: $W X$ from a matrix-vector to a matrix-matrix product. The softmax itself can be computed by exponentiating all entries in $O$ and then normalizing them by the sum appropriately. 
+This accelerates the dominant operation: $\mathbf{W} \mathbf{X}$ from a matrix-vector to a matrix-matrix product. The softmax itself can be computed by exponentiating all entries in $\mathbf{O}$ and then normalizing them by the sum appropriately. 
 
 ## Loss Function
 
@@ -90,7 +90,7 @@ Now that we have some mechanism for outputting probabilities, we need to transfo
 
 ### Log-Likelihood
 
-The softmax function maps $o$ into a vector of probabilities corresponding to various outcomes, such as $p(y=\mathrm{cat}|x)$. This allows us to compare the estimates with reality, simply by checking how well it predicted what we observe. 
+The softmax function maps $\mathbf{o}$ into a vector of probabilities corresponding to various outcomes, such as $p(y=\mathrm{cat}|\mathbf{x})$. This allows us to compare the estimates with reality, simply by checking how well it predicted what we observe. 
 
 $$
 p(Y|X) = \prod_{i=1}^n p(y^{(i)}|x^{(i)})
@@ -104,7 +104,7 @@ $$
 l = -\log p(y|x) = - \sum_j y_j \log \hat{y}_j
 $$
 
-Here we used that by construction $\hat{y} = \mathrm{softmax}(o)$ and moreover, that the vector $y$ consists of all zeroes but for the correct label, such as $(1, 0, 0)$. Hence the the sum over all coordinates $j$ vanishes for all but one term. Since all $\hat{y}_j$ are probabilities, their logarithm is never larger $0$. Consequently, the loss function is minimized if we correctly predict $y$ with *certainty*, i.e. if $p(y|x) = 1$ for the correct label. 
+Here we used that by construction $\hat{y} = \mathrm{softmax}(\mathbf{o})$ and moreover, that the vector $\mathbf{y}$ consists of all zeroes but for the correct label, such as $(1, 0, 0)$. Hence the the sum over all coordinates $j$ vanishes for all but one term. Since all $\hat{y}_j$ are probabilities, their logarithm is never larger $0$. Consequently, the loss function is minimized if we correctly predict $y$ with *certainty*, i.e. if $p(y|x) = 1$ for the correct label. 
 
 ### Softmax and Derivatives
 
@@ -118,7 +118,7 @@ $$
 To understand a bit better what is going on, consider the derivative with respect to $o$. We get
 
 $$
-\partial_{o_j} l = \frac{\exp(o_j)}{\sum_k \exp(o_k)} - y_j = \mathrm{softmax}(o)_j - y_j = \Pr(y = j|x) - y_j
+\partial_{o_j} l = \frac{\exp(o_j)}{\sum_k \exp(o_k)} - y_j = \mathrm{softmax}(\mathbf{o})_j - y_j = \Pr(y = j|x) - y_j
 $$
 
 In other words, the gradient is the difference between what the model thinks should happen, as expressed by the probability $p(y|x)$, and what acutally happened, as expressed by $h$. In this sense, it is very similar to what we saw in regression, where the gradient was the difference between the observation $y$ and estimate $\hat{y}$. This seems too much of a coincidence, and indeed, it isn't. In any [exponential family](https://en.wikipedia.org/wiki/Exponential_family) model the gradients of the log-likelihood are given by precisely this term. This fact makes computing gradients a lot easier in practice. 
@@ -128,7 +128,7 @@ In other words, the gradient is the difference between what the model thinks sho
 Now consider the case where we don't just observe a single outcome but maybe, an entire distribution over outcomes. We can use the same representation as before for $y$. The only difference is that rather than a vector containing only binary entries, say $(0, 0, 1)$, we now have a generic probability vector, say $(0.1, 0.2, 0.7)$. The math that we used previously to define the loss $l$ still works out fine, just that the interpretation is slightyly more general. It is the expected value of the loss for a distribution over labels. 
 
 $$
-l(y, \hat{y}) = - \sum_j y_j \log \hat{y}_j
+l(\mathbf{y}, \hat{\mathbf{y}}) = - \sum_j y_j \log \hat{y}_j
 $$
 
 This loss is called the cross-entropy loss. It is one of the most commonly used ones for multiclass classification. To demystify its name we need some information theory. The following section can be skipped if needed. 

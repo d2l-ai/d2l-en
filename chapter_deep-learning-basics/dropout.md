@@ -45,9 +45,7 @@ $$
 
 When we apply dropout to the hidden layer, it amounts to removing hidden units with probability $p$ since their output is set to $0$ with that probability. A possible result is the network shown below. Here $h_2$ and $h_5$ are removed. Consequently the calculation of $y$ no longer depends on $h_2$ and $h_5$ and their respective gradient also vanishes when performing backprop. In this way, the calculation of the output layer cannot be overly dependent on any one element of $h_1, \ldots, h_5$. This is exactly what we want for regularization purposes to cope with overfitting. At test time we typically do not use dropout to obtain more conclusive results. 
 
-|Original Network           | Network with Dropout      |
-|:-------------------------|:-------------------------|
-|![](../img/mlp.svg)| ![](../img/dropout.svg)|
+![MLP before and after dropout](../img/dropout2.svg)
 
 ## Dropout from Scratch
 

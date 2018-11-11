@@ -18,7 +18,7 @@ The hidden variable $\mathbf{h}$ is also an intermediate variable. Assuming the 
 
 $$\mathbf{o}= \mathbf{W}^{(2)} \mathbf{h}.$$
 
-Assuming the loss function is $\ell$ and the example label is $y$, we can then calculate the loss term for a single data example,
+Assuming the loss function is $l$ and the example label is $y$, we can then calculate the loss term for a single data example,
 
 $$L = l(\mathbf{o}, y).$$
 

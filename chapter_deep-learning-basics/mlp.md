@@ -7,7 +7,7 @@ In the previous chapters we showed how you could implement multiclass logistic r
 Recall that before, we mapped our inputs directly onto our outputs through a single linear transformation via 
 
 $$
-\hat{o} = \mathrm{softmax}(W x + b)
+\hat{\mathbf{o}} = \mathrm{softmax}(\mathbf{W} \mathbf{x} + \mathbf{b})
 $$
 
 ![Single layer perceptron with 5 output units.](../img/singlelayer.svg)
@@ -30,43 +30,43 @@ In the multilayer perceptron above, the number of inputs and outputs is 4 and 3 
 Let us write out what is happening mathematically in the picture above, e.g. for multiclass classification.
 $$
 \begin{aligned}
-    h & = W_1 x + b_1 \\
-    o & = W_2 h + b_2 \\
-    \hat{y} & = \mathrm{softmax}(o)
+    \mathbf{h} & = \mathbf{W}_1 \mathbf{x} + \mathbf{b}_1 \\
+    \mathbf{o} & = \mathbf{W}_2 \mathbf{h} + \mathbf{b}_2 \\
+    \hat{\mathbf{y}} & = \mathrm{softmax}(\mathbf{o})
 \end{aligned}
 $$
 
-The problem with the approach above is that we have gained nothing over a simple single layer perceptron since we can collapse out the hidden layer by an equivalently parametrized single layer perceptron using $W = W_2 W_1$ and $b = W_2 b_1 + b_2$.
+The problem with the approach above is that we have gained nothing over a simple single layer perceptron since we can collapse out the hidden layer by an equivalently parametrized single layer perceptron using $\mathbf{W} = \mathbf{W}_2 \mathbf{W}_1$ and $\mathbf{b} = \mathbf{W}_2 \mathbf{b}_1 + \mathbf{b}_2$.
 
-$$o = W_2 h + b_2 = W_2 (W_1 x + b_1) + b_2 = (W_2 W_1) x + (W_2 b_1 + b_2) = W x + b$$
+$$\mathbf{o} = \mathbf{W}_2 \mathbf{h} + \mathbf{b}_2 = \mathbf{W}_2 (\mathbf{W}_1 \mathbf{x} + \mathbf{b}_1) + \mathbf{b}_2 = (\mathbf{W}_2 \mathbf{W}_1) \mathbf{x} + (\mathbf{W}_2 \mathbf{b}_1 + \mathbf{b}_2) = \mathbf{W} \mathbf{x} + \mathbf{b}$$
 
 To fix this we need another key ingredient - a nonlinearity $\sigma$ such as $\mathrm{max}(x,0)$ after each layer. Once we do this, it becomes impossible to merge layers. This yields
 
 $$
 \begin{aligned}
-    h & = \sigma(W_1 x + b_1) \\
-    o & = W_2 h + b_2 \\
-    \hat{y} & = \mathrm{softmax}(o)
+    \mathbf{h} & = \sigma(\mathbf{W}_1 \mathbf{x} + \mathbf{b}_1) \\
+    \mathbf{o} & = \mathbf{W}_2 \mathbf{h} + \mathbf{b}_2 \\
+    \hat{\mathbf{y}} & = \mathrm{softmax}(\mathbf{o})
 \end{aligned}
 $$
 
-Clearly we could continue stacking such hidden layers, e.g. $h_1 = \sigma(W_1 x + b_1)$ and $h_2 = \sigma(W_2 h_1 + b_2)$ on top of each other to obtain a true multilayer perceptron. 
+Clearly we could continue stacking such hidden layers, e.g. $\mathbf{h}_1 = \sigma(\mathbf{W}_1 \mathbf{x} + \mathbf{b}_1)$ and $\mathbf{h}_2 = \sigma(\mathbf{W}_2 \mathbf{h}_1 + \mathbf{b}_2)$ on top of each other to obtain a true multilayer perceptron. 
 
 Multilayer perceptrons can account for complex interactions in the inputs because the hidden neurons depend on the values of each of the inputs. It’s easy to design a hidden node that that does arbitrary computation, such as, for instance, logical operations on its inputs. And it’s even widely known that multilayer perceptrons are universal approximators. That means that even for a single-hidden-layer neural network, with enough nodes, and the right set of weights, it could model any function at all! Actually learning that function is the hard part. And it turns out that we can approximate functions much more compactly if we use deeper (vs wider) neural networks. We’ll get more into the math in a subsequent chapter, but for now let’s actually build an MLP. In this example, we’ll implement a multilayer perceptron with two hidden layers and one output layer.
 
 ### Vectorization and mini-batch
 
-When given a mini-batch of samples we can use vectorization to gain better efficiency in implementation. In a nutshell, we replace vectors by matrices. As before, denote by $X$ the matrix of inputs from a minibatch. Then an MLP with two hidden layers can be expressed as 
+When given a mini-batch of samples we can use vectorization to gain better efficiency in implementation. In a nutshell, we replace vectors by matrices. As before, denote by $\mathbf{X}$ the matrix of inputs from a minibatch. Then an MLP with two hidden layers can be expressed as 
 
 $$
 \begin{aligned}
-    H_1 & = \sigma(W_1 X + b_1) \\
-    H_2 & = \sigma(W_2 H_1 + b_2) \\
-    O & = \mathrm{softmax}(W_3 H_2 + b_3)
+    \mathbf{H}_1 & = \sigma(\mathbf{W}_1 \mathbf{X} + \mathbf{b}_1) \\
+    \mathbf{H}_2 & = \sigma(\mathbf{W}_2 \mathbf{H}_1 + \mathbf{b}_2) \\
+    \mathbf{O} & = \mathrm{softmax}(\mathbf{W}_3 \mathbf{H}_2 + \mathbf{b}_3)
 \end{aligned}
 $$
 
-This is easy to implement and easy to optimize. With some abuse of notation we define the nonlinearity $\sigma$ to apply to its inputs on a row-wise fashion, i.e. one observation at a time, often one coordinate at a time. This is true for most activation functions (the [batch normalization](../chapter_convolutional-neural-networks/batch-norm.md) is a notable exception from that rule).  
+This is easy to implement and easy to optimize. With some abuse of notation we define the nonlinearity $\sigma$ to apply to its inputs on a row-wise fashion, i.e. one observation at a time, often one coordinate at a time. This is true for most activation functions (the [batch normalization](../chapter_convolutional-neural-networks/batch-norm.md) is a notable exception from that rule).
 
 ## Activation Functions
 
@@ -109,7 +109,7 @@ y.backward()
 xyplot(x, x.grad, 'grad of relu')
 ```
 
-Note that there are many variants to the ReLU function, such as the parameterized ReLU (pReLU). Effectively it adds a linear term to the ReLU, so some information still gets through, even when the argument is negative. 
+Note that there are many variants to the ReLU function, such as the parameterized ReLU (pReLU) of [He et al., 2015](https://arxiv.org/abs/1502.01852). Effectively it adds a linear term to the ReLU, so some information still gets through, even when the argument is negative. 
 
 $$\mathrm{pReLU}(x) = \max(0, x) - \alpha x$$
 
