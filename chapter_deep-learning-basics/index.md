@@ -23,5 +23,6 @@ This chapter introduces the basics of deep learning. This includes network archi
    backprop
    numerical-stability-and-init
    kaggle-house-price
+   environment
 
 ```
