@@ -129,7 +129,15 @@ $$
 
 One key distinction between the different situations above is that the same strategy that might have worked throughout in the case of a stationary environment, might not work throughout when the environment can adapt. For instance, an arbitrage opportunity discovered by a trader is likely to disappear once he starts exploiting it. The speed and manner at which the environment changes determines to a large extent the type of algorithms that we can bring to bear. For instance, if we *know* that things may only change slowly, we can force any estimate to change only slowly, too. If we know that the environment might change instantaneously, but only very infrequently, we can make allowances for that. These types of knowledge are crucial for the aspiring data scientist to deal with concept shift, i.e. when the problem that he is trying to solve changes over time.
 
+## Summary
 
-```{.python .input}
+* In many cases training and test set do not come from the same distribution. This is called covariate shift. 
+* Covariate shift can be detected and corrected if the shift isn't too severe. Failure to do so leads to nasty surprises at test time.
+* In some cases the environment *remembers* what we did and will respond in unexpected ways. We need to account for that when building models.
 
-```
+## Problems
+
+1. What could happen when we change the behavior of a search engine? What might the users do? What about the advertisers?
+1. Implement a covariate shift detector. Hint - build a classifier.
+1. Implement a covariate shift corrector.
+1. What could go wrong if training and test set are very different? What would happen to the sample weights?
