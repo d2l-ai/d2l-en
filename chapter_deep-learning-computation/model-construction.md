@@ -1,6 +1,23 @@
-# Model Construction
+# Layers and Blocks
 
-Before we begin, we should review the implementation method of multilayer perceptron with a single hidden layer in the [“Gluon Implementation of the Multilayer Perceptron”](../chapter_deep-learning-basics/mlp-gluon.md) section. First, we construct a Sequential instance, and then add two fully connected layers, one at a time. The output size of the first layer is 256, so the number of hidden layer units is 256. The output size of the second layer is 10, so the number of output layer units is 10. We also used the Sequential class construction model in the other sections of the previous chapter. Here, we introduce another model construction method based on the Block class, makes model construction more flexible.
+One of the key components that helped propel deep learning is powerful software. In an analogous manner to semiconductor design where engineers went from specifying transistors to logical circuits to writing code we now witness similar progress in the design of deep networks. The previous chapters have seen us move from designing single neurons to entire layers of neurons. However, even network design by layers can be tedious when we have 152 layers, as is the case in ResNet-152, which was proposed by [He et al.](https://www.cv-foundation.org/openaccess/content_cvpr_2016/papers/He_Deep_Residual_Learning_CVPR_2016_paper.pdf) in 2016 for computer vision problems. 
+Such networks have a fair degree of regularity and they consist of *blocks* of repeated (or at least similarly designed) layers. These blocks then form the basis of more complex network designs. In short, blocks are combinations of one or more layers. This design is aided by code that generates such blocks on demand, just like a Lego factory generates blocks which can be combined to produce terrific artifacts. 
+
+To get started we design a very simple block, namely the block for a multilayer perceptron, such as the one we encountered [previously](../chapter_deep-learning-basics/mlp-gluon.md). A common strategy would be to design a two-layer network as follows:
+
+```{.python .input  n=1}
+from mxnet import nd
+from mxnet.gluon import nn
+
+net = nn.Sequential()
+net.add(nn.Dense(256, activation='relu'))
+net.add(nn.Dense(10))
+```
+
+This generates a network with a hidden layer of 256 units, followed by a ReLu activation and another 10 units governing the output. In particular, we used the `nn.Sequential` constructor to generate an empty network into which we then inserted both layers. 
+
+
+section. First, we construct a Sequential instance, and then add two fully connected layers, one at a time. The output size of the first layer is 256, so the number of hidden layer units is 256. The output size of the second layer is 10, so the number of output layer units is 10. We also used the Sequential class construction model in the other sections of the previous chapter. Here, we introduce another model construction method based on the Block class, makes model construction more flexible.
 
 
 ## Inherit the Block Class to Construct the Model
