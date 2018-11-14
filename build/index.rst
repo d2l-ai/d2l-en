@@ -1,11 +1,14 @@
-Table of Contents
-=======================
+《动手学深度学习》
+====================
+
+.. raw:: html
+   :file: frontpage.html
 
 .. toctree::
    :maxdepth: 2
 
    chapter_introduction/index
-   chapter_crashcourse/index
+   chapter_prerequisite/index
    chapter_deep-learning-basics/index
    chapter_deep-learning-computation/index
    chapter_convolutional-neural-networks/index
