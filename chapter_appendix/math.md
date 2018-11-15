@@ -140,7 +140,7 @@ $$
 
 is a matrix with $m$ rows and $n$ columns, while the element in row $i$ and column $j$ ($1 \leq i \leq m, 1 \leq j \leq n$) is
 
-$a_{i1}b_{1j}  + a_{i2}b_{2j} + \ldots + a_{ip}b_{pj} = \sum_{k=1}^p a_{ik}b_{kj}. $
+$$a_{i1}b_{1j}  + a_{i2}b_{2j} + \ldots + a_{ip}b_{pj} = \sum_{k=1}^p a_{ik}b_{kj}.$$
 
 
 ### Norms
