@@ -33,7 +33,6 @@ build/%: %
 
 html: $(DEPS) $(OBJ)
 	make -C build html
-	cp build/index.html build/_build/html/
 	cp -r img/frontpage/ build/_build/html/_images/
 
 TEX=build/_build/latex/d2l-en.tex
