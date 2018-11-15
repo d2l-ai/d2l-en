@@ -13,7 +13,9 @@ Here, $f'(x)$ is the gradient of function $f$ at $x$. The gradient of a one-dime
 Next, find a constant 
 $\eta>0$, 
 to make $\left|\eta f'(x)\right|$ sufficiently small 
-so that we can replace $\epsilon$ with $-\eta f'(x) $ and get
+so that we can replace $\epsilon$ with 
+$-\eta f'(x) $ 
+and get
 
 $$f(x - \eta f'(x)) \approx f(x) -  \eta f'(x)^2.$$
 
