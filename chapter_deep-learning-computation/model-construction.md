@@ -87,7 +87,7 @@ class MySequential(nn.Block):
         return x
 ```
 
-At its core is the `add` method. It adds any block to the ordered dictionary of children. These are then executed in sequence when forward propagation is invoked. Let's see what the MLP looks like now. 
+At its core is the `add` method. It adds any block to the ordered dictionary of children. These are then executed in sequence when forward propagation is invoked. Let's see what the MLP looks like now.
 
 ```{.python .input  n=4}
 net = MySequential()
@@ -110,7 +110,7 @@ In this case 3 is a constant parameter. We could change 3 to something else, say
 
 $$f(\mathbf{x},\mathbf{w}) = c \cdot \mathbf{w}^\top \mathbf{x}.$$
 
-Nothing has really changed, except that we can adjust the value of $c$. It is still a constant as far as $\mathbf{w}$ and $\mathbf{x}$ are concerned. However, since Gluon doesn't know about this beforehand, it's worth while to give it a hand (this makes the code go faster, too, since we're not sending the Gluon engine on a wild goose chase after a parameter that doesn't change). `get_constant` is the method that can be used to accomplish this. Let's see what this looks like in practice. 
+Nothing has really changed, except that we can adjust the value of $c$. It is still a constant as far as $\mathbf{w}$ and $\mathbf{x}$ are concerned. However, since Gluon doesn't know about this beforehand, it's worth while to give it a hand (this makes the code go faster, too, since we're not sending the Gluon engine on a wild goose chase after a parameter that doesn't change). `get_constant` is the method that can be used to accomplish this. Let's see what this looks like in practice.
 
 ```{.python .input  n=5}
 class FancyMLP(nn.Block):
@@ -193,7 +193,3 @@ Gluon does this by allowing for [Hybridization](../chapter_computational-perform
 
 
 ![](../img/qr_model-construction.svg)
-
-```{.python .input}
-
-```
