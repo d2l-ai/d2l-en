@@ -10,7 +10,7 @@ $$f(x + \epsilon) \approx f(x) + \epsilon f'(x) .$$
 
 Here, $f'(x)$ is the gradient of function $f$ at $x$. The gradient of a one-dimensional function is a scalar, also known as a derivative.
 
-Next, find a constant $\eta > 0$, to make $\left|\eta f'(x)\right|$ sufficiently small so that we can replace $\epsilon$ with $-\eta f'(x) $ and get
+Next, find a constant $\eta>0$, to make $\left|\eta f'(x)\right|$ sufficiently small so that we can replace $\epsilon$ with $-\eta f'(x) $ and get
 
 $$f(x - \eta f'(x)) \approx f(x) -  \eta f'(x)^2.$$
 
