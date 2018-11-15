@@ -1,29 +1,66 @@
-# Deferred Initialization of Model Parameters
+# Deferred Initialization
 
+In the previous examples we played fast and loose with setting up our networks. In particular we did the following things that *shouldn't* work:
 
+* We defined the network architecture with no regard to the input dimensionality.
+* We added layers without regard to the output dimension of the previous layer.
+* We even 'initialized' these parameters without knowing how many parameters were were to initialize. 
 
-If you have done the exercise in the previous section, you will have found that the model `net` had 0 in the shape of the weight parameter after calling the initialization function `initialize` , and before doing the forward calculation of `net(x)`. Although intuitively, `initialize` completes all parameter initialization processes. This, is not necessarily true for Gluon. We will discuss this topic in detail in this section.
+All of those things sound impossible and indeed, they are. After all, there's no way MXNet (or any other framework for that matter) could predict what the input dimensionality of a network would be. Later on, when working with convolutional networks and images this problem will become even more pertinent, since the input dimensionality (i.e. the resolution of an image) will affect the dimensionality of subsequent layers at a long range. Hence, the ability to set parameters without the need to know at the time of writing the code what the dimensionality is can greatly simplify statistical modeling. In what follows, we will discuss how this works using initialization as an example. After all, we cannot initialize variables that we don't know exist.
 
+## Instantiating a Network
 
-## Deferred Initialization
+Let's see what happens when we instantiate a network. We start with our trusty MLP as before.
 
-You may have noticed that the fully connected layers created in the previous Gluon did not specify the number of inputs. For example, in the multilayer perceptron `net` used in the previous section, the hidden layer we created only specified an output size of 256. When the `initialize` function is called, since the number of hidden layer inputs is still unknown, the system cannot identify the shape of the layer weight parameter. Only when we pass the input `x` of shape `(2, 20)` into the network for forward calculation `net(x)`, will the system conclude that the weight parameter shape of the layer is `(256, 20)`. Now we can really start to initialize the parameters.
-
-Let's demonstrate this process using the `MyInit` class defined in the previous section. We create a multilayer perceptron and use the `MyInit` instance to initialize the model parameters.
-
-```{.python .input  n=22}
+```{.python .input}
 from mxnet import init, nd
 from mxnet.gluon import nn
- 
+
+def getnet():
+    net = nn.Sequential()
+    net.add(nn.Dense(256, activation='relu'))
+    net.add(nn.Dense(10))
+    return net
+
+net = getnet()
+```
+
+At this point the network doesn't really know yet what the dimensionalities of the various parameters should be. All one could tell at this point is that each layer needs weights and bias, albeit of unspecified dimensionality. If we try accessing the parameters, that's exactly what happens.
+
+```{.python .input}
+print(net.collect_params)
+print(net.collect_params())
+```
+
+In particular, trying to access `net[0].weight.data()` at this point would trigger a runtime error stating that the network needs initializing before it can do anything. Let's see whether anything changes after we initialize the parameters:
+
+```{.python .input}
+net.initialize()
+net.collect_params()
+```
+
+As we can see, nothing really changed. Only once we provide the network with some data do we see a difference. Let's try it out. 
+
+```{.python .input}
+x = nd.random.uniform(shape=(2, 20))
+net(x)            # Forward computation.
+
+net.collect_params()
+```
+
+The main difference to before is that as soon as we knew the input dimensionality, $\mathbf{x} \in \mathbb{R}^{20}$ it was possible to define the weight matrix for the first layer, i.e. $\mathbf{W}_1 \in \mathbb{R}^{256 \times 20}$. With that out of the way, we can progress to the second layer, define its dimensionality to be $10 \times 256$ and so on through the computational graph and bind all the dimensions as they become available. Once this is known, we can proceed by initializing parameters. This is the solution to the three problems outlined above. 
+
+## Deferred Initialization in Practice
+
+Now that we know how it works in theory, let's see when the initialization is actually triggered. In order to do so, we mock up an initializer which does nothing but report a debug message stating when it was invoked and with which paramers. 
+
+```{.python .input  n=22}
 class MyInit(init.Initializer):
     def _init_weight(self, name, data):
         print('Init', name, data.shape)
         # The actual initialization logic is omitted here.
 
-net = nn.Sequential()
-net.add(nn.Dense(256, activation='relu'),
-        nn.Dense(10))
-
+net = getnet()
 net.initialize(init=MyInit())
 ```
 
@@ -42,21 +79,22 @@ Of course, this initialization will only be called when completing the initial f
 y = net(x)
 ```
 
-The act of delaying the actual parameter initialization until it gets enough information is referred to as deferred initialization. It makes the creation of the model simpler: we only need to define the output size of each layer, without manually estimating the number of inputs. This is especially convenient for networks of up containing tens or even hundreds of layers, which we introduced later.
+As mentioned at the beginning of this section, deferred initialization can also cause confusion. Before the first forward calculation, we were unable to directly manipulate the model parameters, for example, we could not use the `data` and `set_data` functions to get and modify the parameters. Therefore, we often force initialization by sending a sample observation through the network. 
 
-However, everything has two sides. As mentioned at the beginning of this section, deferred initialization can also cause confusion. Before the first forward calculation, we were unable to directly manipulate the model parameters, for example, we could not use the `data` and `set_data` functions to get and modify the parameters. Therefore, we often do an extra forward calculation to force the parameters to be truly initialized.
+## Forced Initialization
 
-## Avoid Deferred Initialization
+Deferred initialization does not occur if the system knows the shape of all parameters when calling the `initialize` function. This can occur in two cases:
 
-Deferred initialization does not occur if the system knows the shape of all parameters when calling the `initialize` function. We introduce two such situations here.
+* We've already seen some data and we just want to reset the parameters.
+* We specificed all input and output dimensions of the network when defining it. 
 
-The first case is when we want to reinitialize the initialized model. Because the shape of the parameter does not change, the system can be reinitialized immediately.
+The first case works just fine, as illustrated below.
 
 ```{.python .input}
 net.initialize(init=MyInit(), force_reinit=True)
 ```
 
-The second case is that we specify the number of inputs when we create the layer, so that the system does not need additional information to speculate the shape of the parameters. In the following example, we specify the number of inputs for each fully connected layer by `in units`, so that initialization can occur immediately when the `initialize` function is called.
+The second case requires us to specify the remaining set of parameters when creating the layer. For instance, for dense layers we also need to specify the `in_units` so that initialization can occur immediately once `initialize` is called. 
 
 ```{.python .input}
 net = nn.Sequential()
@@ -68,15 +106,21 @@ net.initialize(init=MyInit())
 
 ## Summary
 
-* The system’s behavior of delaying the actual parameter initialization until information is obtained is referred to as deferred initialization.
-* The main benefit of deferred initialization is that it makes the model construction easier. For example, we don't need to manually guess the number of inputs per layer.
-* We can also avoid deferred initialization.
+* Deferred initialization is a good thing. It allows Gluon to set many things automagically and it removes a great source of errors from defining novel network architectures. 
+* We can override this by specifying all implicitly defined variables.
+* Initialization can be repeated (or forced) by setting the `force_reinit=True` flag.
 
 
-## exercise
+## Problems
 
-* What happens if the shape of the input `x` is changed before the next forward calculation of `net(x)`, including the batch size and the number of inputs?
+1. What happens if you specify only parts of the input dimensions. Do you still get immediate initialization?
+1. What happens if you specify mismatching dimensions?
+1. What would you need to do if you have input of varying dimensionality? Hint - look at parameter tying. 
 
 ## Scan the QR code to get to the [forum](https://discuss.gluon.ai/t/topic/6320)
 
 ![](../img/qr_deferred-init.svg)
+
+```{.python .input}
+
+```

@@ -223,7 +223,3 @@ The above exampe shows that the parameters of the second and third layer are tie
 ## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/987)
 
 ![](../img/qr_parameters.svg)
-
-```{.python .input}
-
-```
