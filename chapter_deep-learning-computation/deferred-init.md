@@ -1,5 +1,7 @@
 # Deferred Initialization of Model Parameters
 
+
+
 If you have done the exercise in the previous section, you will have found that the model `net` had 0 in the shape of the weight parameter after calling the initialization function `initialize` , and before doing the forward calculation of `net(x)`. Although intuitively, `initialize` completes all parameter initialization processes. This, is not necessarily true for Gluon. We will discuss this topic in detail in this section.
 
 
@@ -12,7 +14,7 @@ Let's demonstrate this process using the `MyInit` class defined in the previous 
 ```{.python .input  n=22}
 from mxnet import init, nd
 from mxnet.gluon import nn
-
+ 
 class MyInit(init.Initializer):
     def _init_weight(self, name, data):
         print('Init', name, data.shape)
