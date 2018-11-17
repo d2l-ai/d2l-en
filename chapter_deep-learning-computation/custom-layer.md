@@ -1,11 +1,10 @@
 # Custom Layers
 
-One of the charms of deep learning lies in the various layers of the neural network.  Examples include the fully connected layer, the convolutional, pooling, and looping layers, all of which will be introduced in later chapters.   Although Gluon provides a number of commonly used layers, sometimes a custom layer is needed.  This section describes how to use NDArray to customize a Gluon layer, so that it can be repeatedly called. 
+One of the reasons for the success of deep learning can be found in the wide range of layers that can be used in a deep network. This allows for a tremendous degree of customization and adaptation. For instance, scientists have invented layers for images, text, pooling, loops, dynamic programming, even for computer programs. Sooner or later you will encounter a layer that doesn't exist yet in Gluon, or even better, you will eventually invent a new layer that works well for your problem at hand. This is when it's time to build a custom layer. This section shows you how. 
 
+## Layers without Parameters
 
-## Custom Layer without Model Parameters
-
-We will first show the reader how to define a custom layer that does not contain any model parameters.   In fact, this is similar to using the Block class construction model described in Model Construction section. [ "](model-construction.md). The following `CenteredLayer` class customizes a layer that subtracts the mean from the input before outputting by inheriting the Block class. It defines the calculation of the layer in the `forward` function. There are no model parameters in this layer.
+Since this is slightly intricate, we start with a custom layer (aka Block) that doesn't have any inherent parameters. Our first step is very similar to when we [introduced blocks](model-construction.md) previously. The following `CenteredLayer` class constructs a layer that subtracts the mean from the input. We build it by inheriting from the Block class and implementing the `forward` method.
 
 ```{.python .input  n=1}
 from mxnet import gluon, nd
@@ -19,7 +18,7 @@ class CenteredLayer(nn.Block):
         return x - x.mean()
 ```
 
-We can provide an example for this layer, then do forward calculations. 
+To see how it works let's feed some data into the layer.
 
 ```{.python .input  n=2}
 layer = CenteredLayer()
@@ -30,23 +29,22 @@ We can also use it to construct more complex models.
 
 ```{.python .input  n=3}
 net = nn.Sequential()
-net.add(nn.Dense(128),
-        CenteredLayer())
+net.add(nn.Dense(128), CenteredLayer())
+net.initialize()
 ```
 
-Next, we print the individual output means of the custom layer. Since the mean is a floating-point number, its value is a number very close to zero.
+Let's see whether the centering layer did its job. For that we send random data through the network and check whether the mean vanishes. Note that since we're dealing with floating point numbers, we're going to see a very small albeit typically nonzero number.
 
 ```{.python .input  n=4}
-net.initialize()
 y = net(nd.random.uniform(shape=(4, 8)))
 y.mean().asscalar()
 ```
 
-## Custom Layer with Model Parameters
+## Layers with Parameters
 
-We can also customize the custom layer with model parameters. The model parameters can be taught through training.  
+Now that we know how to define layers in principle, let's define layers with parameters. These can be adjusted through training. In order to simplify things for an avid deep learning researcher the `Parameter` class and the `ParameterDict` dictionary provide some basic housekeeping functionality. In particular, they govern access, initialization, sharing, saving and loading model parameters. For instance, this way we don't need to write custom serialization routines for each new custom layer. 
 
-The `Parameter` class and the `ParameterDict` class are introduced in the Access, Initialization, and Sharing of Model Parameters< section [" ](parameters.md). When customizing the layer containing model parameters, we can use the member variable `params` of the `ParameterDict` type that comes with the Block class. It is a dictionary that maps string type parameter names to model parameters in the Parameter type.  We can create a `Parameter` instance from `ParameterDict` via the `get` function.
+For instance, we can use the member variable `params` of the `ParameterDict` type that comes with the Block class. It is a dictionary that maps string type parameter names to model parameters in the `Parameter` type.  We can create a `Parameter` instance from `ParameterDict` via the `get` function.
 
 ```{.python .input  n=7}
 params = gluon.ParameterDict()
@@ -54,7 +52,7 @@ params.get('param2', shape=(2, 3))
 params
 ```
 
-Next, we try to implement a fully connected layer with both weight and bias parameters.  It uses ReLU as an activation function, where `in_units` and `units` are the number of inputs and the number of outputs, respectively.
+Let's use this to implement our own version of the dense layer. It has two parameters - bias and weight. To make it a bit nonstandard, we bake in the ReLu activation as default. Next, we implement a fully connected layer with both weight and bias parameters.  It uses ReLU as an activation function, where `in_units` and `units` are the number of inputs and the number of outputs, respectively.
 
 ```{.python .input  n=19}
 class MyDense(nn.Block):
@@ -69,21 +67,21 @@ class MyDense(nn.Block):
         return nd.relu(linear)
 ```
 
-Next, we instantiate the `MyDense` class and access its model parameters.
+Naming the parameters allows us to access them by name through dictionary lookup later. It's a good idea to give them instructive names. Next, we instantiate the `MyDense` class and access its model parameters.
 
 ```{.python .input}
 dense = MyDense(units=3, in_units=5)
 dense.params
 ```
 
-We can directly carry out forward calculations using custom layers. 
+We can directly carry out forward calculations using custom layers.
 
 ```{.python .input  n=20}
 dense.initialize()
 dense(nd.random.uniform(shape=(2, 5)))
 ```
 
-We can also construct models using custom layers. It is similar in use to other layers of Gluon.
+We can also construct models using custom layers. Once we have that we can use it just like the built-in dense layer. The only exception is that in our case size inference is not automagic. Please consult the [MXNet documentation](http://www.mxnet.io) for details on how to do this.
 
 ```{.python .input  n=19}
 net = nn.Sequential()
@@ -95,12 +93,15 @@ net(nd.random.uniform(shape=(2, 64)))
 
 ## Summary
 
-* We can customize the layers in the neural network through the Block class so that they can be repeatedly called. 
+* We can design custom layers via the Block class. This is more powerful than defining a block factory, since it can be invoked in many contexts. 
+* Blocks can have local parameters. 
 
 
-## exercise
+## Problems
 
-* Customize a layer and use it to do a forward calculation.
+1. Design a layer that learns an affine transform of the data, i.e. it removes the mean and learns an additive parameter instead. 
+1. Design a layer that takes an input and computes a tensor reduction, i.e. it returns $y_k = \sum_{i,j} W_{ijk} x_i x_j$. 
+1. Design a layer that returns the leading half of the Fourier coefficients of the data. Hint - look up the `fft` function in MXNet. 
 
 
 ## Scan the QR code to get to the [ ](https://discuss.gluon.ai/t/topic/1256) forum
