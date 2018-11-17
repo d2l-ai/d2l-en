@@ -88,6 +88,8 @@ yclone == y
 ## Problems
 
 1. Even if there is no need to deploy trained models to a different device, what are the practical benefits of storing model parameters?
+1. Assume that we want to reuse only parts of a network to be incorporated into a network of a *different* architecture. How would you go about using, say the first two layers from a previous network in a new network. 
+1. How would you go about saving network architecture and parameters? What restrictions would you impose on the architecture?
 
 ## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/1255)
 
