@@ -46,7 +46,7 @@ x = nd.array([1, 2, 3])
 x
 ```
 
-We can use the `context` property of NDArray to view the device where the NDArray is located. It is important to note that whenever we want to operate on multiple terms they need to be in the same context. For instance, if we sum two variables, we need to make sure that both arguments are on the same device - otherwise MXNet would not know where to store the result or even how to decide where to perform the computation. 
+We can use the `context` property of NDArray to view the device where the NDArray is located. It is important to note that whenever we want to operate on multiple terms they need to be in the same context. For instance, if we sum two variables, we need to make sure that both arguments are on the same device - otherwise MXNet would not know where to store the result or even how to decide where to perform the computation.
 
 ```{.python .input}
 x.context
@@ -68,34 +68,38 @@ y = nd.random.uniform(shape=(2, 3), ctx=mx.gpu(1))
 y
 ```
 
-If we want to compute $\mathbf{x} + \mathbf{y}$ we need to decide where to perform this operation. For instance, we can transfer $\mathbf{x}$ to `gpu(1)` and perform the operation there. 
+### Copying
+
+If we want to compute $\mathbf{x} + \mathbf{y}$ we need to decide where to perform this operation. For instance, we can transfer $\mathbf{x}$ to `gpu(1)` and perform the operation there. **Do not** simply add `x + y` since this will result in an exception. The runtime engine wouldn't know what to do, it cannot find data on the same device and it fails. 
 
 ![](../img/copyto.svg)
 
-`copyto` copies the data to another device such that we can add them. 
-
-In addition to that specified at the time of creation, we can also transfer data between devices through the `copyto` and `as_in_context` functions. Next, we copy the NDArray variable `x` on the CPU to `gpu(0)`.
+`copyto` copies the data to another device such that we can add them. Since $\mathbf{y}$ lives on the second GPU we need to move $\mathbf{x}$ there before we can add the two.
 
 ```{.python .input  n=7}
 z = x.copyto(mx.gpu(1))
-y + z
 print(x)
 print(z)
 ```
 
-Imagine that your variable z already lives on your second GPU (gpu(0)). What happens if we call z.copyto(gpu(0))? It will make a copy and allocate new memory, even though that variable already lives on the desired device!
-
-There are times where depending on the environment our code is running in, two variables may already live on the same device. So we only want to make a copy if the variables currently lives on different contexts. In these cases, we can call as_in_context(). If the variable is already the specified context then this is a no-op.
+Now that the data is on the same GPU (both $\mathbf{z}$ and $\mathbf{y}$ are), we can add them up. In such cases MXNet places the result on the same device as its constituents. In our case that is `@gpu(1)`.
 
 ```{.python .input}
-z = x.as_in_context(mx.gpu())
+y + z
+```
+
+Imagine that your variable z already lives on your second GPU (gpu(0)). What happens if we call z.copyto(gpu(0))? It will make a copy and allocate new memory, even though that variable already lives on the desired device!
+There are times where depending on the environment our code is running in, two variables may already live on the same device. So we only want to make a copy if the variables currently lives on different contexts. In these cases, we can call `as_in_context()`. If the variable is already the specified context then this is a no-op. In fact, unless you specifically want to make a copy, `as_in_context()` is the method of choice.
+
+```{.python .input}
+z = x.as_in_context(mx.gpu(1))
 z
 ```
 
 It is important to note that, if the `context` of the source variable and the target variable are consistent, then the `as_in_context` function causes the target variable and the source variable to share the memory of the source variable.
 
 ```{.python .input  n=8}
-y.as_in_context(mx.gpu()) is y
+y.as_in_context(mx.gpu(1)) is y
 ```
 
 The `copyto` function always creates new memory for the target variable.
@@ -104,19 +108,18 @@ The `copyto` function always creates new memory for the target variable.
 y.copyto(mx.gpu()) is y
 ```
 
-### Computing on the GPU
+### Watch Out
 
-MXNet calculations are performed on the device specified by the data `context`. In order to use GPU computing, we only need to store the data on the GPU in advance. The results of the calculation are automatically saved on the same GPU.
+People use GPUs to do machine learning because they expect them to be fast. But transferring variables between contexts is slow. So we want you to be 100% certain that you want to do something slow before we let you do it. If MXNet just did the copy automatically without crashing then you might not realize that you had written some slow code. 
 
-```{.python .input  n=9}
-(z + 2).exp() * y
-```
+Also, transferring data between devices (CPU, GPUs, other machines) is something that is *much slower* than computation. It also makes parallelization a lot more difficult, since we have to wait for data to be sent (or rather to be received) before we can proceed with more operations. This is why copy operations should be taken with great care. As a rule of thumb, many small operations are much worse than one big operation. Moreover, several operations at a time are much better than many single operations interspersed in the code (unless you know what you're doing). This is the case since such operations can block if one device has to wait for the other before it can do something else. It's a bit like ordering your coffee in a queue rather than pre-ordering it by phone and finding out that it's ready when you are. 
 
-Note that MXNet requires all input data for calculation to be on the CPU or the same GPU. It is designed this way because data interaction between the CPU and different GPUs is usually time consuming. Therefore, MXNet expects the user to specify that the input data for calculation is on the CPU or the same GPU. For example, if you use the NDArray variable `x` on the CPU and the NDArray variable `y` for operation, then an error message will appear. When we print NDArray or convert NDArray to NumPy format, if the data is not in main memory, MXNet will copy it to the main memory first, resulting in additional transmission overhead.
+Lastly, when we print NDArray data or convert NDArrays to NumPy format, if the data is not in main memory, MXNet will copy it to the main memory first, resulting in additional transmission overhead. Even worse, it is now subject to the dreaded Global Interpreter Lock which makes everything wait for Python to complete. 
 
-## Gluon's GPU computing
 
-Similar to NDArray, Gluon's model can specify devices through the `ctx` parameter during initialization. The following code initializes the model parameters on the GPU.
+## Gluon and GPUs
+
+Similar to NDArray, Gluon's model can specify devices through the `ctx` parameter during initialization. The following code initializes the model parameters on the GPU (we will see many more examples of how to run models on GPUs in the following, simply since they will become somewhat more compute intensive).
 
 ```{.python .input  n=12}
 net = nn.Sequential()
@@ -127,24 +130,29 @@ net.initialize(ctx=mx.gpu())
 When the input is an NDArray on the GPU, Gluon will calculate the result on the same GPU.
 
 ```{.python .input  n=13}
-net(y)
+net(x)
 ```
 
-Next, let we confirm that the model parameters are stored on the same GPU.
+Let us confirm that the model parameters are stored on the same GPU.
 
 ```{.python .input  n=14}
 net[0].weight.data()
 ```
 
+In short, as long as all data and parameters are on the same device, we can learn models efficiently. In the following we will see several such examples. 
+
 ## Summary
 
 * MXNet can specify devices for storage and calculation, such as CPU or GPU. By default, MXNet creates data in the main memory and then uses the CPU to calculate it.
-* MXNet requires all input data for calculation to be on the CPU or the same GPU.
+* MXNet requires all input data for calculation to be **on the same device**, be it CPU or the same GPU.
+* You can lose significant performance by moving data without care. A typical mistake is as follows: computing the loss for every minibatch on the GPU and reporting it back to the user on the commandline (or logging it in a NumPy array) will trigger a global interpreter lock which stalls all GPUs. It is much better to allocate memory for logging inside the GPU and only move larger logs. 
 
-## exercise
+## Problems
 
-* Try a larger computation task, such as the multiplication of large matrices, and see the difference in speed between the CPU and GPU. What about a task with a small amount of calculations?
-* How should we read and write model parameters on the GPU?
+1. Try a larger computation task, such as the multiplication of large matrices, and see the difference in speed between the CPU and GPU. What about a task with a small amount of calculations?
+1. How should we read and write model parameters on the GPU?
+1. Measure the time it takes to compute 1000 matrix-matrix multiplications of $100 \times 100$ matrices and log the matrix norm $\mathrm{tr} M M^\top$ one result at a time vs. keeping a log on the GPU and transferring only the final result. 
+1. Measure how much time it takes to perform two matrix-matrix multiplications on two GPUs at the same time vs. in sequence on one GPU (hint - you should see almost linear scaling). 
 
 ## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/988)
 
