@@ -8,7 +8,7 @@ The avid reader might object to the rather absurd implications of this argument 
 
 ## Invariances
 
-Imagine that you want to detect an object in an image. It is only reasonable to assume that the location of the object shouldn't matter too much to determine whether the object is there. We should assume that we would recognize an object wherever it is in an image. This is true within reason - pigs usually don't fly and planes usually don't swim. Nonetheless, we would still recognize a flying pig, albeit possibly after a double-take. This fact manifests itself e.g. in the form of the children's game 'Where is Waldo'. In it, the goal is to find a boy with red and white striped clothes, a striped hat and black glasses within a panoply of activity in an image. The image below makes the problem particularly easy since it contains many Waldo lookalikes. 
+Imagine that you want to detect an object in an image. It is only reasonable to assume that the location of the object shouldn't matter too much to determine whether the object is there. We should assume that we would recognize an object wherever it is in an image. This is true within reason - pigs usually don't fly and planes usually don't swim. Nonetheless, we would still recognize a flying pig, albeit possibly after a double-take. This fact manifests itself e.g. in the form of the children's game 'Where is Waldo'. In it, the goal is to find a boy with red and white striped clothes, a striped hat and black glasses within a panoply of activity in an image. Despite the rather characteristic outfit this tends to be quite difficult, due to the large amount of confounders. The image below, on the other hand, makes the problem particularly easy. 
 
 ![](../img/waldo.jpg)
 
@@ -27,165 +27,47 @@ In the following we will treat images and hidden layers as two-dimensional array
 $$h[i,j] = \sum_{k,l} W[i,j,k,l] x[k,l] = 
 \sum_{a, b} V[i,j,a,b] \cdot x[i+a,j+b]$$
 
-The switch from $W$ to $V$ is entirely cosmetic (for now) since there is a one to one correspondence between coefficients in both tensors. The indices $a, b$ run over both positive and negative offsets, covering the entire image. For any given location $(i,j)$ in the hidden layer $h[i,j]$ we compute its value by summing over pixels in $x$, centered around $(i,j)$ and weighted by $V[i,j,a,b]$. 
+The switch from $W$ to $V$ is entirely cosmetic (for now) since there is a one to one correspondence between coefficients in both tensors. We simply re-index the subscripts $(k,l)$ such that $k = i+a$ and $l = j+b$. In other words we set $V[i,j,a,b] = W[i,j,i+a, j+b]$. The indices $a, b$ run over both positive and negative offsets, covering the entire image. For any given location $(i,j)$ in the hidden layer $h[i,j]$ we compute its value by summing over pixels in $x$, centered around $(i,j)$ and weighted by $V[i,j,a,b]$. 
 
-Now let's invoke the first principle we established above - translation invariance. This implies that a shift in the inputs $x$ should simply lead to a shift in the activations $h$. This is only possible if $V$ doesn't actually depend on $(i,j)$, that is, we have $V[i,j,a,b] = V[a,b]$. As a result we can simplify the definition for $h$.
+Now let's invoke the first principle we established above - *translation invariance*. This implies that a shift in the inputs $x$ should simply lead to a shift in the activations $h$. This is only possible if $V$ doesn't actually depend on $(i,j)$, that is, we have $V[i,j,a,b] = V[a,b]$. As a result we can simplify the definition for $h$.
 
 $$h[i,j] = \sum_{a, b} V[a,b] \cdot x[i+a,j+b]$$
 
-This is a convolution! Note that $V[a,b]$ is *much* simpler than $V[i,j,a,b]$. For a 1 megapixel image it has 1 million fewer parameters since it no longer depends on the location within the image. We have made significant progress! Now let's invoke the second principle - locality. 
+This is a convolution! We are effectively weighting pixels $(i+a, j+b)$ in the vicinity of $(i,j)$ with coefficients $V[a,b]$ to obtain the value $h[i,j]$. Note that $V[a,b]$ needs a lot fewer coefficients than $V[i,j,a,b]$. For a 1 megapixel image it has at most 1 million coefficients. This is 1 million fewer parameters since it no longer depends on the location within the image. We have made significant progress! 
 
+Now let's invoke the second principle - *locality*. In the problem of detecting Waldo we shouldn't have to look very far away from $(i,j)$ in order to glean relevant information to assess what is going on at $h[i,j]$. This means that outside some range $|a|, |b| > \Delta$ we should set $V[a,b] = 0$. Equivalently we can simply rewrite $h[i,j]$ as
 
+$$h[i,j] = \sum_{a = -\Delta}^{\Delta} \sum_{b = -\Delta}^{\Delta} V[a,b] \cdot x[i+a,j+b]$$
 
+This, in a nutshell is the convolutional layer. The difference to the fully connected network is dramatic. While previously we might have needed $10^8$ or more coefficients, we now only need $O(\Delta^2)$ terms. The price that we pay for this drastic simplification is that our network will be translation invariant and that we are only able to take local information into account. 
 
+## Waldo Revisited
 
+Let's see what this looks like if we want to build an improved Waldo detector. The convolutional layer picks windows of a given size and weighs intensities according to the mask $V$. We expect that wherever the 'waldoness' is highest, we will also find a peak in the hidden layer activations.  
 
+![](../img/waldo-mask.svg)
 
+There's just a problem with this approach: so far we blissfully ignored that images consist of 3 channels - red, green and blue. In reality images are thus not two-dimensional objects but three-dimensional tensors, e.g. of $1024 \times 1024 \times 3$ pixels. We thus index $\mathbf{x}$ as $x[i,j,k]$. The convolutional mask has to adapt accordingly. Instead of $V[a,b]$ we now have $V[a,b,c]$. 
 
-A convolutional neural network is a neural network that contains convolutional layers. The convolutional neural networks used in this chapter use two-dimensional convolutional layers, the most common type. Such a layer has two spatial dimensions (height and width) and are commonly used to process image data. In this section, we will show how the simple form of the two-dimensional convolutional layer works.
+The last flaw in our reasoning is that this approach generates only one set of activations. This might not be great if we want to detect Waldo in several steps. We might need edge detectors, detectors for different colors, etc.; In short, we want to retain some information about edges, color gradients, combinations of colors, and a great many other things. An easy way to address this is to allow for *output channels*. We can take care of this by adding a fourth coordinate to $V$ via $V[a,b,c,d]$. Putting all together we have:
 
+$$h[i,j,k] = \sum_{a = -\Delta}^{\Delta} \sum_{b = -\Delta}^{\Delta} \sum_c V[a,b,c,k] \cdot x[i+a,j+b,c]$$
 
-## Two-dimensional Cross-correlation Operations
-
-Although the convolutional layer is named after the convolution operation, we usually use a more intuitive cross-correlation operation in the convolutional layer. In a two-dimensional convolutional layer, a two-dimensional input array and a two-dimensional kernel array output a two-dimensional array through a cross-correlation operation.
-Here, we use a specific example to explain the meaning of two-dimensional cross-correlation operations. As shown in Figure 5.1, the input is a two-dimensional array with a height of 3 and width of 3. We mark the shape of the array as $3 \times 3$ or (3, 3). The height and width of the kernel array are both 2. This array is also called a kernel or filter in convolution computations. The shape of the kernel window (also known as the convolution window) depends on the height and width of the kernel, which is $2 \times 2$.
-
-![Two-dimensional cross-correlation operation. The shaded portions are the first output element and the input and kernel array elements used in its computation: $0\times0+1\times1+3\times2+4\times3=19$. ](../img/correlation.svg)
-
-In the two-dimensional cross-correlation operation, the convolution window starts from the top-left of the input array, and slides in the input array from left to right and top to bottom. When the convolution window slides to a certain position, the input subarray in the window and kernel array are multiplied and summed by element to get the element at the corresponding location in the output array. The output array in Figure 5.1 has a height of 2 and width of 2, and the four elements are derived from a two-dimensional cross-correlation operation:
-
-$$
-0\times0+1\times1+3\times2+4\times3=19,\\
-1\times0+2\times1+4\times2+5\times3=25,\\
-3\times0+4\times1+6\times2+7\times3=37,\\
-4\times0+5\times1+7\times2+8\times3=43.\\
-$$
-
-Next, we implement the above process in the `corr2d` function. It accepts the input array `X` with the kernel array `K` and outputs the array `Y`.
-
-```{.python .input}
-from mxnet import autograd, nd
-from mxnet.gluon import nn
-
-def corr2d(X, K):  # This function has been saved in the gluonbook package for future use.
-    h, w = K.shape
-    Y = nd.zeros((X.shape[0] - h + 1, X.shape[1] - w + 1))
-    for i in range(Y.shape[0]):
-        for j in range(Y.shape[1]):
-            Y[i, j] = (X[i: i + h, j: j + w] * K).sum()
-    return Y
-```
-
-We can construct the input array `X` and the kernel array `K` in Figure 5.1 to validate the output of the two-dimensional cross-correlation operation.
-
-```{.python .input}
-X = nd.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]])
-K = nd.array([[0, 1], [2, 3]])
-corr2d(X, K)
-```
-
-## Two-dimensional Convolutional Layers
-
-The two-dimensional convolutional layer cross-correlates the input and kernels and adds a scalar bias to get the output. The model parameters of the convolutional layer include the kernel and scalar bias. When training the model, we usually randomly initialize the kernel and then continuously iterate the kernel and bias.
-
-Next, we implement a custom two-dimensional convolutional layer based on the `corr2d` function. In the `__init__` constructor function, we declare `weight` and `bias` are two model parameters. The forward computation function `forward` directly calls the `corr2d` function and adds the bias.
-
-```{.python .input  n=70}
-class Conv2D(nn.Block):
-    def __init__(self, kernel_size, **kwargs):
-        super(Conv2D, self).__init__(**kwargs)
-        self.weight = self.params.get('weight', shape=kernel_size)
-        self.bias = self.params.get('bias', shape=(1,))
-
-    def forward(self, x):
-        return corr2d(x, self.weight.data()) + self.bias.data()
-```
-
-The convolutional layer with a convolution window shape of $p \times q$ is called the $p \times q$ convolutional layer. Similarly, the $p \times q$ convolution or $p \times q$ kernel states that the height and width of the kernel are $p$ and $q$, respectively.
-
-
-## Object Edge Detection in Images
-
-Now, we will look at a simple application of a convolutional layer: detecting the edge of an object in an image, that is, finding the location of the pixel change. First, we construct an image of $6\times 8$ (image with height and width of 6 and 8 pixels respectively). The middle four columns are black (0), and the rest are white (1).
-
-```{.python .input  n=66}
-X = nd.ones((6, 8))
-X[:, 2:6] = 0
-X
-```
-
-Then, we construct a kernel `K` with a height and width of 1 and 2. When this performs the cross-correlation operation with the input, if the horizontally adjacent elements are the same, the output is 0. Otherwise, the output is non-zero.
-
-```{.python .input  n=67}
-K = nd.array([[1, -1]])
-```
-
-Enter `X` and our designed kernel `K` to perform the cross-correlation operations. As you can see, we will detect 1 for the edge from white to black and -1 for the edge from black to white. The rest of the outputs are 0.
-
-```{.python .input  n=69}
-Y = corr2d(X, K)
-Y
-```
-
-From this, we can see that the convolutional layer can effectively characterize the local space by reusing the kernel.
-
-
-## Learning a Kernel Array Through Data
-
-Finally, we will look at an example that uses input data `X` and output data `Y` in object edge detection to learn the kernel array `K` we constructed. We first construct a convolutional layer and initialize its kernel into a random array. Next, in each iteration, we use the square error to compare `Y` and the output of the convolutional layer, then calculate the gradient to update the weight. For the sake of simplicity, the convolutional layer here ignores the bias.
-
-We have previously constructed the `Conv2D` class. However, because `corr2d` performs assignment to a single element (`[i, j]=`), it fails to automatically find the gradient. Below, we use the `Conv2D` class provided by Gluon to implement this example.
-
-```{.python .input  n=83}
-# Construct a convolutional layer with 1 output channel (channels will be introduced in the following section) and a kernel array shape of (1, 2).
-conv2d = nn.Conv2D(1, kernel_size=(1, 2))
-conv2d.initialize()
-
-# The two-dimensional convolutional layer uses four-dimensional input and output in the format of (example channel, height, width), where the batch size (number of examples in the batch) and 
-# the number of channels are both 1.
-X = X.reshape((1, 1, 6, 8))
-Y = Y.reshape((1, 1, 6, 7))
-
-for i in range(10):
-    with autograd.record():
-        Y_hat = conv2d(X)
-        l = (Y_hat - Y) ** 2
-    l.backward()
-    # For the sake of simplicity, we ignore the bias here.
-    conv2d.weight.data()[:] -= 3e-2 * conv2d.weight.grad()
-    if (i + 1) % 2 == 0:
-        print('batch %d, loss %.3f' % (i + 1, l.sum().asscalar()))
-```
-
-As you can see, the error has dropped to a relatively small value after 10 iterations. Now we will take a look at the kernel array we learned.
-
-```{.python .input}
-conv2d.weight.data().reshape((1, 2))
-```
-
-We find that the kernel array we learned is similar to the kernel array `K` we defined earlier.
-
-## Cross-correlation and Convolution Operations
-
-In fact, the convolution operation is similar to the cross-correlation operation. In order to get the output of the convolution operation, we simply need to flip the kernel array left to right and upside-down, and then perform the cross-correlation operation with the input array. As you can see, the convolution operation and cross-correlation operation are similar, but if they use the same kernel array, the output is often different with the same input.
-
-So, you might wonder why convolutional layers can use the cross-correlation operation instead of the convolution operation. In fact, kernel arrays are learned in deep learning: the convolutional layer does not affect the output of model prediction, whether it uses a cross-correlation operation or convolution operation. To explain this, assume that the convolutional layer uses the cross-correlation operation to learn the kernel array in Figure 5.1. If other conditions are not changed, the kernel array learned by the convolution operation, that is, the kernel array in Figure 5.1, is flipped upside down, left to right. That is to say, when we perform the convolution operation once again on the input in Figure 5.1 and the learned flipped kernel array, the output in Figure 5.1 is still obtained. In accordance with the standard terminology in deep learning literature, the convolution operations mentioned in this book refer to cross-correlation operations, unless otherwise stated.
-
+This is the definition of a convolutional neural network layer. There are still many operations that we need to address. For instance, we need to figure out how to combine all the activations to a single output (e.g. whether there's a Waldo in the image). We also need to decide how to compute things efficiently, how to combine multiple layers, and whether it is a good idea to have many narrow or a few wide layers. All of this will be addressed in the remainder of the chaper. For now we can bask in the glory having understood why convolutions exist in principle. 
 
 ## Summary
 
-* The core computation of a two-dimensional convolutional layer is a two-dimensional cross-correlation operation. In its simplest form, this performs a cross-correlation operation on the two-dimensional input data and the kernel, and then adds a bias.
-* We can design a kernel to detect edges in images.
-* We can learn the kernel through data.
+* Translation invariance in images implies that all patches of an image will be treated in the same manner.
+* Locality means that only a small neighborhood of pixels will be used for computation.
+* Channels on input and output allows for meaningful feature analysis.
+
+## Problems
+
+* Assume that the size of the convolution mask is $\Delta = 0$. Show that in this case the convolutional mask implements an MLP independently for each set of channels. 
+* Why might translation invariance not be a good idea after all? Does it make sense for pigs to fly?
+* What happens at the boundary of an image?
+* Derive an analogous convolutional layer for audio.
+* What goes wrong when you apply the above reasoning to text? Hint - what is the structure of language?
 
 
-## exercise
 
-* Construct an input image `X` which has horizontal edges. How do you design a kernel `K` to detect horizontal edges in an image? What if the edges are diagonal?
-* When you try to automatically find the gradient for the `Conv2D` class we created, what kind of error message do you see? In the `forward` function of this class, the `corr2d` function is replaced with the `nd.Convolution` class, which makes it possible to automatically find the gradient.
-* How do you represent a cross-correlation operation as a matrix multiplication by changing the input and kernel arrays?
-* How do you construct a fully connected layer for object edge detection?
-
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/6314)
-
-![](../img/qr_conv-layer.svg)
