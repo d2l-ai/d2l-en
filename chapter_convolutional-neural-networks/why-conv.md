@@ -45,7 +45,7 @@ This, in a nutshell is the convolutional layer. The difference to the fully conn
 
 Let's see what this looks like if we want to build an improved Waldo detector. The convolutional layer picks windows of a given size and weighs intensities according to the mask $V$. We expect that wherever the 'waldoness' is highest, we will also find a peak in the hidden layer activations.  
 
-![](../img/waldo-mask.svg)
+![](../img/waldo-mask.jpg)
 
 There's just a problem with this approach: so far we blissfully ignored that images consist of 3 channels - red, green and blue. In reality images are thus not two-dimensional objects but three-dimensional tensors, e.g. of $1024 \times 1024 \times 3$ pixels. We thus index $\mathbf{x}$ as $x[i,j,k]$. The convolutional mask has to adapt accordingly. Instead of $V[a,b]$ we now have $V[a,b,c]$. 
 
