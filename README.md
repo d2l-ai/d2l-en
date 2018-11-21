@@ -6,10 +6,6 @@ Website:
 
 http://diveintodeeplearning.org.s3-website-us-west-2.amazonaws.com/
 
-Built HTML:
-
-http://diveintodeeplearning.org.s3-website-us-west-2.amazonaws.com/toc.html
-
 Built PDF:
 
 http://diveintodeeplearning.org.s3-website-us-west-2.amazonaws.com/d2l-en.pdf
