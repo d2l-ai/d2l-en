@@ -276,7 +276,7 @@ BLEU (Bilingual Evaluation Understudy) is often used to evaluate machine transla
 
 Specifically, the precision of the subsequence with $n$ words is $p_n$. It is the ratio of the number of subsequences with $n$ matched words for the prediction sequence and label sequence to the number of subsequences with $n$ words in the prediction sequence. For example, assume the label sequence is $A$, $B$, $C$, $D$, $E$, $F$, and the prediction sequence is $A$, $B$, $B$, $C$, $D$. Then $p_1 = 4/5, \ p_2 = 3/4, \ p_3 = 1/3, and \ p_4 = 0$. Assume $len_{\text{label}}$ and $len_{\text{pred}}$ are the numbers of words in the label sequence and the prediction sequence. Then, BLEU is defined as
 
-$ \exp\left(\min\left(0, 1 - \frac{len_{\text{label}}}{len_{\text{pred}}}\right)\right) \prod_{n=1}^k p_n^{1/2^n},$
+$$ \exp\left(\min\left(0, 1 - \frac{len_{\text{label}}}{len_{\text{pred}}}\right)\right) \prod_{n=1}^k p_n^{1/2^n},$$
 
 Here, $k$ is the maximum number of words in the subsequence we wish to match. It can be seen that the BLEU is 1 when the prediction sequence and the label sequence are identical.
 
