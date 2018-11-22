@@ -1,5 +1,6 @@
 # Implementation of Word2vec
 
+
 This section is a practice exercise for the two previous sections. We use the skip-gram model from the ["Word Embedding (word2vec)”](word2vec.md) section and negative sampling from the ["Approximate Training" ](approx-training.md) section as examples to introduce the implementation of word embedding model training on a corpus. We will also introduce some implementation tricks, such as subsampling and mask variables.
 
 First, import the packages and modules required for the experiment.
