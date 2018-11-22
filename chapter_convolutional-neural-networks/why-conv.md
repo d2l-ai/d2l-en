@@ -1,4 +1,4 @@
-# From MLPs to Convnets
+# From Dense Layers to Convolutions
 
 So far we learned the basics of designing Deep Networks. Indeed, for someone dealing only with generic data, the previous sections are probably sufficient to train and deploy such a network sufficiently. There is one caveat, though - just like most problems in statistics, networks with many parameters either require a lot of data or a lot of regularization. As a result we cannot hope to design sophisticated models in most cases. 
 
@@ -24,7 +24,7 @@ Let's see how this translates into mathematics.
 
 In the following we will treat images and hidden layers as two-dimensional arrays. I.e. $x[i,j]$ and $h[i,j]$ denote the position $(i,j)$ in an image. Consequently we switch from weight matrices to four-dimensional weight tensors. In this case a dense layer can be written as follows:
 
-$$h[i,j] = \sum_{k,l} W[i,j,k,l] x[k,l] = 
+$$h[i,j] = \sum_{k,l} W[i,j,k,l] \cdot x[k,l] = 
 \sum_{a, b} V[i,j,a,b] \cdot x[i+a,j+b]$$
 
 The switch from $W$ to $V$ is entirely cosmetic (for now) since there is a one to one correspondence between coefficients in both tensors. We simply re-index the subscripts $(k,l)$ such that $k = i+a$ and $l = j+b$. In other words we set $V[i,j,a,b] = W[i,j,i+a, j+b]$. The indices $a, b$ run over both positive and negative offsets, covering the entire image. For any given location $(i,j)$ in the hidden layer $h[i,j]$ we compute its value by summing over pixels in $x$, centered around $(i,j)$ and weighted by $V[i,j,a,b]$. 
@@ -40,6 +40,19 @@ Now let's invoke the second principle - *locality*. In the problem of detecting 
 $$h[i,j] = \sum_{a = -\Delta}^{\Delta} \sum_{b = -\Delta}^{\Delta} V[a,b] \cdot x[i+a,j+b]$$
 
 This, in a nutshell is the convolutional layer. The difference to the fully connected network is dramatic. While previously we might have needed $10^8$ or more coefficients, we now only need $O(\Delta^2)$ terms. The price that we pay for this drastic simplification is that our network will be translation invariant and that we are only able to take local information into account. 
+
+## Convolutions
+
+Let's briefly review why the above operation is called a convolution. In math the convolution between two functions, say $f, g: \mathbb{R}^d \to R$ is defined as
+
+$$[f \circledast g](x) = \int_{\mathbb{R}^d} f(z) g(x-z) dz$$
+
+That is, we measure the overlap beween $f$ and $g$ when both functions are shifted by $x$ and 'flipped'. Whenever we have discrete objects the integral turns into a sum. For instance, for vectors defined on $\ell_2$, i.e. the set of square summable infinite dimensional vectors with index running over $\mathbb{Z}$ we obtain the following definition. 
+
+$$[f \circledast g](i) = \sum_a f(a) g(i-a)$$
+
+For two-dimensional arrays we have a corresponding sum with indices $(i,j)$ for $f$ and $(i-a, j-b)$ for $g$ respectively. This looks almost the same in the definition above, with one major difference. Rather than using $(i+a, j+b)$ we are using the difference instead. Note, though, that this distinction is mostly cosmetic since we can always match the notation by using $\tilde{V}[a,b] = V[-a, -b]$ to obtain $h = x \circledast \tilde{V}$. Note that the original definition is actually a *cross correlation*. We will come back to this in the following section. 
+
 
 ## Waldo Revisited
 
@@ -63,11 +76,9 @@ This is the definition of a convolutional neural network layer. There are still 
 
 ## Problems
 
-* Assume that the size of the convolution mask is $\Delta = 0$. Show that in this case the convolutional mask implements an MLP independently for each set of channels. 
-* Why might translation invariance not be a good idea after all? Does it make sense for pigs to fly?
-* What happens at the boundary of an image?
-* Derive an analogous convolutional layer for audio.
-* What goes wrong when you apply the above reasoning to text? Hint - what is the structure of language?
-
-
-
+1. Assume that the size of the convolution mask is $\Delta = 0$. Show that in this case the convolutional mask implements an MLP independently for each set of channels. 
+1. Why might translation invariance not be a good idea after all? Does it make sense for pigs to fly?
+1. What happens at the boundary of an image?
+1. Derive an analogous convolutional layer for audio.
+1. What goes wrong when you apply the above reasoning to text? Hint - what is the structure of language?
+1. Prove that $f \circledast g = g \circledast f$.

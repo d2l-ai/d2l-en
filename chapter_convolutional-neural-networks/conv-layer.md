@@ -1,25 +1,23 @@
-# Two-dimensional Convolutional Layers
+# Convolutions for Images
 
-A convolutional neural network is a neural network that contains convolutional layers. The convolutional neural networks used in this chapter use two-dimensional convolutional layers, the most common type. Such a layer has two spatial dimensions (height and width) and are commonly used to process image data. In this section, we will show how the simple form of the two-dimensional convolutional layer works.
+Now that we understand how to design convolutional networks in theory, let's see how this works in practice. For the next chapters we will stick to dealing with images, since they constitute one of the most common use cases for convolutional networks. That is, we will discuss the two-dimensional case (image height and width). We begin with the cross-correlation operator that we introduced in the previous section. Strictly speaking, convolutional networks are a slight misnomer (but for notation only), since the operations are typically expressed as cross correlations. 
 
+## The Cross-Correlation Operator
 
-## Two-dimensional Cross-correlation Operations
-
-Although the convolutional layer is named after the convolution operation, we usually use a more intuitive cross-correlation operation in the convolutional layer. In a two-dimensional convolutional layer, a two-dimensional input array and a two-dimensional kernel array output a two-dimensional array through a cross-correlation operation.
-Here, we use a specific example to explain the meaning of two-dimensional cross-correlation operations. As shown in Figure 5.1, the input is a two-dimensional array with a height of 3 and width of 3. We mark the shape of the array as $3 \times 3$ or (3, 3). The height and width of the kernel array are both 2. This array is also called a kernel or filter in convolution computations. The shape of the kernel window (also known as the convolution window) depends on the height and width of the kernel, which is $2 \times 2$.
+In a convolutional layer, an input array and a correlation kernel array output an array through a cross-correlation operation. Let's see how this works for two dimensions. As shown below, the input is a two-dimensional array with a height of 3 and width of 3. We mark the shape of the array as $3 \times 3$ or (3, 3). The height and width of the kernel array are both 2. This array is also called a kernel or filter in convolution computations. The shape of the kernel window (also known as the convolution window) depends on the height and width of the kernel, which is $2 \times 2$.
 
 ![Two-dimensional cross-correlation operation. The shaded portions are the first output element and the input and kernel array elements used in its computation: $0\times0+1\times1+3\times2+4\times3=19$. ](../img/correlation.svg)
 
-In the two-dimensional cross-correlation operation, the convolution window starts from the top-left of the input array, and slides in the input array from left to right and top to bottom. When the convolution window slides to a certain position, the input subarray in the window and kernel array are multiplied and summed by element to get the element at the corresponding location in the output array. The output array in Figure 5.1 has a height of 2 and width of 2, and the four elements are derived from a two-dimensional cross-correlation operation:
+In the two-dimensional cross-correlation operation, the convolution window starts from the top-left of the input array, and slides in the input array from left to right and top to bottom. When the convolution window slides to a certain position, the input subarray in the window and kernel array are multiplied and summed by element to get the element at the corresponding location in the output array. The output array has a height of 2 and width of 2, and the four elements are derived from a two-dimensional cross-correlation operation:
 
 $$
 0\times0+1\times1+3\times2+4\times3=19,\\
 1\times0+2\times1+4\times2+5\times3=25,\\
 3\times0+4\times1+6\times2+7\times3=37,\\
-4\times0+5\times1+7\times2+8\times3=43.\\
+4\times0+5\times1+7\times2+8\times3=43.
 $$
 
-Next, we implement the above process in the `corr2d` function. It accepts the input array `X` with the kernel array `K` and outputs the array `Y`.
+Note that the output size is *smaller* than the input. In particular, the output size is given by the input size $H \times W$ minus the size of the convolutional kernel $h \times w$ via $(H-h+1) \times (W-w+1)$. This is the case since we need enough space to 'shift' the convolutional kernel across the image (later we will see how to keep the size unchanged by padding the image with zeros around its boundary such that there's enough space to shift the kernel). Next, we implement the above process in the `corr2d` function. It accepts the input array `X` with the kernel array `K` and outputs the array `Y`.
 
 ```{.python .input}
 from mxnet import autograd, nd
@@ -34,7 +32,7 @@ def corr2d(X, K):  # This function has been saved in the gluonbook package for f
     return Y
 ```
 
-We can construct the input array `X` and the kernel array `K` in Figure 5.1 to validate the output of the two-dimensional cross-correlation operation.
+We can construct the input array `X` and the kernel array `K` of the figure above to validate the output of the two-dimensional cross-correlation operation.
 
 ```{.python .input}
 X = nd.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]])
@@ -42,11 +40,11 @@ K = nd.array([[0, 1], [2, 3]])
 corr2d(X, K)
 ```
 
-## Two-dimensional Convolutional Layers
+## Convolutional Layers
 
-The two-dimensional convolutional layer cross-correlates the input and kernels and adds a scalar bias to get the output. The model parameters of the convolutional layer include the kernel and scalar bias. When training the model, we usually randomly initialize the kernel and then continuously iterate the kernel and bias.
+The convolutional layer cross-correlates the input and kernels and adds a scalar bias to get the output. The model parameters of the convolutional layer include the kernel and scalar bias. When training the model, we usually randomly initialize the kernel and then continuously iterate the kernel and bias.
 
-Next, we implement a custom two-dimensional convolutional layer based on the `corr2d` function. In the `__init__` constructor function, we declare `weight` and `bias` are two model parameters. The forward computation function `forward` directly calls the `corr2d` function and adds the bias.
+Next, we implement a custom two-dimensional convolutional layer based on the `corr2d` function. In the `__init__` constructor function, we declare `weight` and `bias` as the two model parameters. The forward computation function `forward` directly calls the `corr2d` function and adds the bias. Just like the $h \times w$ cross-correlation we  also refer to convolutional layers as $h \times w$ dimensional convolutions.
 
 ```{.python .input  n=70}
 class Conv2D(nn.Block):
@@ -59,12 +57,9 @@ class Conv2D(nn.Block):
         return corr2d(x, self.weight.data()) + self.bias.data()
 ```
 
-The convolutional layer with a convolution window shape of $p \times q$ is called the $p \times q$ convolutional layer. Similarly, the $p \times q$ convolution or $p \times q$ kernel states that the height and width of the kernel are $p$ and $q$, respectively.
-
-
 ## Object Edge Detection in Images
 
-Now, we will look at a simple application of a convolutional layer: detecting the edge of an object in an image, that is, finding the location of the pixel change. First, we construct an image of $6\times 8$ (image with height and width of 6 and 8 pixels respectively). The middle four columns are black (0), and the rest are white (1).
+Let's look at a simple application of a convolutional layer: detecting the edge of an object in an image by finding the location of the pixel change. First, we construct an 'image' of $6\times 8$ pixels. The middle four columns are black (0), and the rest are white (1).
 
 ```{.python .input  n=66}
 X = nd.ones((6, 8))
@@ -72,7 +67,7 @@ X[:, 2:6] = 0
 X
 ```
 
-Then, we construct a kernel `K` with a height and width of 1 and 2. When this performs the cross-correlation operation with the input, if the horizontally adjacent elements are the same, the output is 0. Otherwise, the output is non-zero.
+Next we construct a kernel `K` with a height and width of 1 and 2. When this performs the cross-correlation operation with the input, if the horizontally adjacent elements are the same, the output is 0. Otherwise, the output is non-zero.
 
 ```{.python .input  n=67}
 K = nd.array([[1, -1]])
@@ -85,14 +80,17 @@ Y = corr2d(X, K)
 Y
 ```
 
-From this, we can see that the convolutional layer can effectively characterize the local space by reusing the kernel.
+Let's apply the kernel to the transposed 'image'. As expected, it vanishes. The kernel `K` only detects vertical edges.
 
+```{.python .input}
+corr2d(X.T, K)
+```
 
-## Learning a Kernel Array Through Data
+## Learning a Kernel
 
-Finally, we will look at an example that uses input data `X` and output data `Y` in object edge detection to learn the kernel array `K` we constructed. We first construct a convolutional layer and initialize its kernel into a random array. Next, in each iteration, we use the square error to compare `Y` and the output of the convolutional layer, then calculate the gradient to update the weight. For the sake of simplicity, the convolutional layer here ignores the bias.
+Designing an edge detector by finite differences `[1, -1]` is neat if we know what we are looking for. However, as we look at larger kernels, or possibly multiple layers, it is next to impossible to specify such filters manually. Let's see whether we can learn the kernel that generated `Y` from `X` by looking at the (input, output) pairs only. We first construct a convolutional layer and initialize its kernel into a random array. Next, in each iteration, we use the squared error to compare `Y` and the output of the convolutional layer, then calculate the gradient to update the weight. For the sake of simplicity, the convolutional layer here ignores the bias.
 
-We have previously constructed the `Conv2D` class. However, because `corr2d` performs assignment to a single element (`[i, j]=`), it fails to automatically find the gradient. Below, we use the `Conv2D` class provided by Gluon to implement this example.
+We previously constructed the `Conv2D` class. However, since we used single-element assignments, Gluon has some trouble finding the gradient. Instead, we use the built-in `Conv2D` class provided by Gluon below. 
 
 ```{.python .input  n=83}
 # Construct a convolutional layer with 1 output channel (channels will be introduced in the following section) and a kernel array shape of (1, 2).
@@ -121,14 +119,11 @@ As you can see, the error has dropped to a relatively small value after 10 itera
 conv2d.weight.data().reshape((1, 2))
 ```
 
-We find that the kernel array we learned is similar to the kernel array `K` we defined earlier.
+We find that the kernel array we learned is very close to the kernel array `K` we defined earlier.
 
-## Cross-correlation and Convolution Operations
+## Cross-correlation and Convolution 
 
-In fact, the convolution operation is similar to the cross-correlation operation. In order to get the output of the convolution operation, we simply need to flip the kernel array left to right and upside-down, and then perform the cross-correlation operation with the input array. As you can see, the convolution operation and cross-correlation operation are similar, but if they use the same kernel array, the output is often different with the same input.
-
-So, you might wonder why convolutional layers can use the cross-correlation operation instead of the convolution operation. In fact, kernel arrays are learned in deep learning: the convolutional layer does not affect the output of model prediction, whether it uses a cross-correlation operation or convolution operation. To explain this, assume that the convolutional layer uses the cross-correlation operation to learn the kernel array in Figure 5.1. If other conditions are not changed, the kernel array learned by the convolution operation, that is, the kernel array in Figure 5.1, is flipped upside down, left to right. That is to say, when we perform the convolution operation once again on the input in Figure 5.1 and the learned flipped kernel array, the output in Figure 5.1 is still obtained. In accordance with the standard terminology in deep learning literature, the convolution operations mentioned in this book refer to cross-correlation operations, unless otherwise stated.
-
+Recall the observation from the previous section that cross-correlation and convolution are equivalent. In the figure above it is easy to see this correspondence. Simply flip the kernel from the bottom left to the top right. In this case the indexing in the sum is reverted, yet the same result can be obtained. In keeping with standard terminology with deep learning literature we will continue to refer to the cross-correlation operation as a convolution even though it is stricly speaking something slightly different. 
 
 ## Summary
 
@@ -136,13 +131,20 @@ So, you might wonder why convolutional layers can use the cross-correlation oper
 * We can design a kernel to detect edges in images.
 * We can learn the kernel through data.
 
+## Problems
 
-## exercise
+1. Construct an image `X` with diagonal edges. 
+    * What happens if you apply the kernel `K` to it? 
+    * What happens if you transpose `X`? 
+    * What happens if you transpose `K`?
+1. When you try to automatically find the gradient for the `Conv2D` class we created, what kind of error message do you see? 
+1. How do you represent a cross-correlation operation as a matrix multiplication by changing the input and kernel arrays?
+1. Design some kernels manually.
+    * What is the form of a kernel for the second derivative?
+    * What is the kernel for the Laplace operator?
+    * What is the kernel for an integral?
+    * What is the minimum size of a kernel to obtain a derivative of degree $d$?
 
-* Construct an input image `X` which has horizontal edges. How do you design a kernel `K` to detect horizontal edges in an image? What if the edges are diagonal?
-* When you try to automatically find the gradient for the `Conv2D` class we created, what kind of error message do you see? In the `forward` function of this class, the `corr2d` function is replaced with the `nd.Convolution` class, which makes it possible to automatically find the gradient.
-* How do you represent a cross-correlation operation as a matrix multiplication by changing the input and kernel arrays?
-* How do you construct a fully connected layer for object edge detection?
 
 ## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/6314)
 
