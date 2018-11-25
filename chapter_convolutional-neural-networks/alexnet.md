@@ -14,48 +14,64 @@ If you spoke to machine learning researchers, they believed that machine learnin
 
 ## Learning Feature Representation
 
-Another way to cast the state of affairs is that the most important part of the pipeline was the representation. And up until 2012, this part was done mechanically, based on some hard-fought intuition. In fact, engineering a new set of feature functions, improving results, and writing up the method was a prominent genre of paper.
+Another way to cast the state of affairs is that the most important part of the pipeline was the representation. And up until 2012, this part was done mechanically, based on some hard-fought intuition. In fact, engineering a new set of feature functions, improving results, and writing up the method was a prominent genre of paper. 
+[SIFT](https://en.wikipedia.org/wiki/Scale-invariant_feature_transform), 
+[SURF](https://en.wikipedia.org/wiki/Speeded_up_robust_features), 
+[HOG](https://en.wikipedia.org/wiki/Histogram_of_oriented_gradients), 
+[Bags of visual words](https://en.wikipedia.org/wiki/Bag-of-words_model_in_computer_vision)
+and similar feature extractors ruled the roost. 
+
+Another group of researchers had different plans. They believed that features themselves ought to be learned. Moreover they believed that to be reasonably complex, the features ought to be hierarchically composed. These researchers, including Yann LeCun, Geoff Hinton, Yoshua Bengio, Andrew Ng, Shun-ichi Amari, and Juergen Schmidhuber believed that by jointly training many layers of a neural network, they might come to learn hierarchical representations of data. 
+In the case of an image, the lowest layers might come to detect edges, colors, and textures. Indeed, [Krizhevski, Sutskever and Hinton, 2012](https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks) designed a new variant of a convolutional neural network which achieved excellent performance in the ImageNet challenge. Indeed, it learned good feature extractors in the lower layers. The figure below is reproduced from this paper and it describes lower level image descriptors. 
+
+![](../img/filters.png)
+
+Higher layers might build upon these representations to represent larger structures, like eyes, noses, blades of grass, and features. Yet higher layers might represent whole objects like people, airplanes, dogs, or frisbees. 
+And ultimately, before the classification layer, the final hidden state might represent a compact representation of the image that summarized the contents in a space where data belonging to different categories would be linearly separable. It should be emphasized that the hierarchical representation of the input is determined by the parameters in the multilayer model, and these parameters are all obtained from learning.
+
+Indeed, the visual processing system of animals (and humans) works a bit like that. At its lowest level it contains mostly edge detectors, followed by more structured features. Although researchers dedicated themselves to this idea and attempted to study the hierarchical representation of visual data, their ambitions went unrewarded until 2012. This was due to two key factors.
+
+### Missing Ingredient - Data
+
+A deep model with many layers requires a large amount of data to achieve better results than convex models, such as kernel methods. However, given the limited storage capacity of computers, the fact that sensors were expensive and the comparatively tighter research budgets in the 1990s, most research relied on tiny datasets. For example, many  research papers relied on the UCI corpus of datasets, many of which contained hundreds or a few thousand images of low resolution, which were taken in unnatural settings. This situation was improved by the advent of big data around 2010. In particular, the ImageNet data set, which was released in 2009, contains 1,000 categories of objects, each with thousands of different images. This scale was unprecedented. It pushed both computer vision and machine learning research towards deep nonconvex models. 
 
 
+### Missing Ingredient - Hardware
 
-Because the features are so important, how should they be represented?
+Deep Learning has a voracious appetite for computation. This is one of the main reasons why in the 90s and early 2000s algorithms based on convex optimization were the preferred way of solving problems. After all, convex algorithms have fast rates of convergence, global minima, and efficient algorithms can be found. 
 
-As we already mentioned, for a long time, features were extracted from data based on a variety of hand-designed functions. In fact, many researchers continued to improve image classification results by proposing new feature extraction functions. Their efforts made important contributions to the development of computer vision.
+The game changer was the availability of GPUs. They had long been tuned for graphics processing in computer games. In particular, they were optimized for high throughput 4x4 matrix-vector products, since these are needed for many computer graphics tasks. Fortunately, the math required for that is very similar to convolutional layers in deep networks. Furthermore, around that time, NVIDIA and ATI had begun optimizing GPUs for general compute operations, going as far as renaming them GPGPU (General Purpose GPUs). 
 
-However, other researchers disagreed with this approach. They believed that the features themselves should also be obtained from learning. In addition, they held that the features themselves should be represented hierarchically in order to characterize sufficiently complex inputs. Researchers who supported this idea believed that multilayer neural networks may be able to learn multilevel representations of data and represent increasingly abstract concepts or patterns step-by-step. Let us use image classification as an example. Recall the object edge detection example in the ["Two-dimensional Convolutional Layer"](conv-layer.md) section. In multilayer neural networks, the first level representation of an image can be whether or not an edge appears at a particular location and angle. The second level representation may be able to combine these edges into interesting patterns, such as decorative patterns. In the third-level representation, perhaps the decorative pattern of the previous level could be further combined into the pattern of a specific part of the corresponding object. This process is repeated step by step, and finally, the model can easily complete the classification task based on the representation of the last level. It should be emphasized that the hierarchical representation of the input is determined by the parameters in the multilayer model, and these parameters are all obtained from learning.
+To provide some intuition, consider the cores of a modern microprocessor. Each of the cores is quite powerful, running at a high clock frequency, it has quite advanced and large caches (up to several MB of L3). Each core is very good at executing a very wide range of code, with branch predictors, a deep pipeline and lots of other things that make it great at executing regular programs. This apparent strength, however, is also its Achilles heel: general purpose cores are very expensive to build. They require lots of chip area, a sophisticated support structure (memory interfaces, caching logic between cores, high speed interconnects, etc.), and they're comparatively bad at any single task. Modern laptops have up to 4 cores, and even high end servers rarely exceed 64 cores, simply because it is not cost effective. 
 
-Although a group of dedicated researchers dedicated themselves to this idea and attempted to study the hierarchical representation of visual data, their ambitions went unrewarded for a long time. It is worthwhile for us to analysis these factors one by one. 
+Compare that with GPUs. They consist of 100-1000 small processing elements (the details differ somewhat betwen NVIDIA, ATI, ARM and other chip vendors), often grouped into larger groups (NVIDIA calls them warps). While each core is relatively weak, sometimes even running at sub-1GHz clock frequency, it is the total number of such cores that makes GPUs orders of magnitude faster than CPUs. For instance, NVIDIA's latest Volta generation offers up to 120 TFlops per chip for specialized instructions (and up to 24 TFlops for more general purpose ones), while floating point performance of CPUs has not exceeded 1 TFlop to date. The reason for why this is possible is actually quite simple: firstly, power consumption tends to grow *quadratically* with clock frequency. Hence, for the power budget of a CPU core that runs 4x faster (a typical number) you can use 16 GPU cores at 1/4 the speed, which yields 16 x 1/4 = 4x the performance. Furthermore GPU cores are much simpler (in fact, for a long time they weren't even *able* to execute general purpose code), which makes them more energy efficient. Lastly, many operations in deep learning require high memory bandwidth. Again, GPUs shine here with buses that are at least 10x as wide as many CPUs. 
 
-
-### The First Missing Element: Data
-
-A deep model with many features requires a large amount of labeled data to achieve better results than other typical methods. Constrained by the limited storage of early computers and the limited research budgets of the 1990s, most of the research was based only on small public data sets. For example, many research papers were based on a few public data sets provided by UCI. Many of these data sets had only a few hundred to several thousand images. This situation was improved by the advent of big data around 2010. In particular, the ImageNet data set, which was released in 2009, contains 1,000 categories of objects, each with thousands of different images. This scale was unattainable by the other public data sets at that time. The ImageNet data set has pushed both computer vision and machine learning research into a new phase, so the traditional methods of the past were no longer advantageous.
-
-
-### The Second Missing Element: Hardware
-
-Deep learning demands massive amounts of computing resources. The computing power of early hardware was limited, making it difficult to train more complex neural networks. However, the release of general-purpose GPUs changed all that. GPUs have long been designed for image processing and computer games, especially for high-throughput matrixes and vector multiplication used for basic graphics conversion. Fortunately, the mathematical expressions used in these application are similar to the expressions of convolutional layers in deep networks. The concept of general-purpose GPUs emerged in 2001, and programming frameworks, such as OpenCL and CUDA, were born. The machine learning community began to use GPUs around 2010.
-
+Back to 2012. A major breakthrough came when Alex Krizhevsky and Ilya Sutskever 
+implemented a deep convolutional neural network that could run on GPU hardware. They realized that 
+the computational bottlenecks in CNNs (convolutions and matrix multiplications) are all operations that could be parallelized in hardware. Using two NIVIDA GTX 580s with 3GB of memory they implemented fast convolutions. The code [cuda-convnet](https://code.google.com/archive/p/cuda-convnet/) was good enough that for several years it was the industry standard and powered the first couple years of the deep learning boom.  
 
 ## AlexNet
 
- In 2012, AlexNet came into the world. This model was named after Alex Krizhevsky, the first author of the paper proposing the network[1]. AlexNet used an 8-layer convolutional neural network and won the ImageNet Large Scale Visual Recognition Challenge 2012 with a big advantage. This network proved, for the first time, that the features obtained by learning can transcend manually-design features, thus overturning the previous paradigm of computer vision research.
+AlexNet was introduced in 2012, named after Alex Krizhevsky, the first author of the eponymous [paper](https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks). AlexNet uses an 8-layer convolutional neural network and won the ImageNet Large Scale Visual Recognition Challenge 2012 with a large margin. This network proved, for the first time, that the features obtained by learning can transcend manually-design features, breaking the previous paradigm in computer vision. The architectures of AlexNet and LeNet are *very similar*, as the diagram below illustrates. Note that we provide a slightly streamlined version of AlexNet which removes the quirks that were needed in 2012 to make the model fit on two small GPUs. 
+
+![LeNet (left) and AlexNet (right)](../img/alexnet-all.svg)
 
 The design philosophies of AlextNet and LeNet are very similar, but there are also significant differences.
+First, AlexNet is much deeper than the comparatively small LeNet5. AlexNet consists of eight layers, five convolutional layers, two fully connected hidden layers, and one fully connected output layer. Second, AlexNet used the ReLu instead of the sigmoid as its activation function. This improved convergence during training significantly. Let's delve into the details below. 
 
-First, compared with the relatively small LeNet, AlexNet consists of eight layers, five convolutional layers, two fully connected hidden layers, and one fully connected output layer. Below, we will describe the design of these layers in detail.
+### Architecture
 
 In AlexNet's first layer, the convolution window shape is $11\times11$. Since most images in ImageNet are more than ten times higher and wider than the MNIST images, objects in ImageNet images take up more pixels. Consequently, a larger convolution window is needed to capture the object. The convolution window shape in the second layer is reduced to $5\times5$, followed by $3\times3$. In addition, after the first, second, and fifth convolutional layers, the network adds maximum pooling layers with a window shape of $3\times3$ and a stride of 2. Moreover, AlexNet has ten times more convolution channels than LeNet.
 
-After the last convolutional layer are two fully connected layers with 4096 outputs. These two huge fully connected layers produce model parameters of nearly 1 GB. Due to the limited video memory in early GPUs, the original AlexNet used a dual data stream design, so that one GPU only needs to process half of the model. Fortunately, GPU memory has developed tremendously over the past few years, so we usually do not need this special design anymore.
+After the last convolutional layer are two fully connected layers with 4096 outputs. These two huge fully connected layers produce model parameters of nearly 1 GB. Due to the limited memory in early GPUs, the original AlexNet used a dual data stream design, so that one GPU only needs to process half of the model. Fortunately, GPU memory has developed tremendously over the past few years, so we usually do not need this special design anymore (our model deviates from the original paper in this aspect).
+
+### Activation Functions
 
 Second, AlextNet changed the sigmoid activation function to a simpler ReLU activation function. On the one hand, the computation of the ReLU activation function is simpler. For example, it does not have the exponentiation operation found in the sigmoid activation function. On the other hand, the ReLU activation function makes model training easier when using different parameter initialization methods. This is because, when the output of the sigmoid activation function is very close to 0 or 1, the gradient of these regions is almost 0, so that back propagation cannot continue to update some of the model parameters. In contrast, the gradient of the ReLU activation function in the positive interval is always 1. Therefore, if the model parameters are not properly initialized, the sigmoid function may obtain a gradient of almost 0 in the positive interval, so that the model cannot be effectively trained.
 
-Third, AlextNet controls the model complexity of the fully connected layer by dropout (see the ["Dropout" ](../chapter_deep-learning-basics/dropout.md) section), while LeNet does not use dropout.
+### Capacity Control and Preprocessing
 
-Fourth, AlextNet introduces a great deal of image augmentation, such as flipping, clipping, and color changes, in order to further expand the data set to mitigate overfitting. We will cover this method in detail later in the ["Image Augmentation" ](chapter_computer-vision/image-augmentation.md) section.
-
-Next, we will implement a slightly simplified AlexNet.
+AlextNet controls the model complexity of the fully connected layer by [dropout](../chapter_deep-learning-basics/dropout.md) section), while LeNet only uses weight decay. To augment the data even further, the training loop of AlexNet added a great deal of image augmentation, such as flipping, clipping, and color changes. This makes the model more robust and the larger sample size effectively reduces overfitting. We will discuss preprocessing in detail in a [subsequent section](chapter_computer-vision/image-augmentation.md).
 
 ```{.python .input  n=1}
 import gluonbook as gb
@@ -85,7 +101,7 @@ net.add(nn.Conv2D(96, kernel_size=11, strides=4, activation='relu'),
         nn.Dense(10))
 ```
 
-We construct a single-channel data instance with both height and width of 224 to observe the output shape of each layer
+We construct a single-channel data instance with both height and width of 224 to observe the output shape of each layer. It matches our diagram above. 
 
 ```{.python .input  n=2}
 X = nd.random.uniform(shape=(1, 1, 224, 224))
@@ -97,7 +113,7 @@ for layer in net:
 
 ## Reading Data
 
-Although AlexNet uses ImageNet data in the paper, in this example, we again use the Fashion-MNIST data set to demonstrate AlexNet. This is because training with ImageNet data would take too long. When reading the data, we introduced an extra step to expand the image height and width to 224 as used by AlexNet. This can be done with the `Resize` class. That is to say, before using the `ToTensor` class, we use the `Resize` class, and then use the `Compose` class to concatenate these two changes for easy invocation.
+Although AlexNet uses ImageNet in the paper, we use Fashion-MNIST. This is simply since training on ImageNet would take hours even on modern GPUs. One of the problems with applying AlexNet directly is that the images are simply too low resolution at $28 \times 28$ pixels. To make things work we upsample them to $244 \times 244$ (this is generally not very smart but we do so to illustrate network performance). This can be done with the `Resize` class. We insert it into the processing pipeline before using the `ToTensor` class. The `Compose` class to concatenates these two changes for easy invocation.
 
 ```{.python .input  n=3}
 # This function has been saved in the gluonbook package for future use.
@@ -126,7 +142,7 @@ train_iter, test_iter = load_data_fashion_mnist(batch_size, resize=224)
 
 ## Training
 
-Now, we can start training AlexNet. Compared with LeNet in the previous section, the main change here is the use of a smaller learning rate.
+Now, we can start training AlexNet. Compared to LeNet in the previous section, the main change here is the use of a smaller learning rate and much slower training due to the deeper and wider network, the higher image resolution and the more costly convolutions. 
 
 ```{.python .input  n=5}
 lr, num_epochs, ctx = 0.01, 5, gb.try_gpu()
@@ -137,21 +153,29 @@ gb.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
 
 ## Summary
 
-* AlexNet has a similar structure to that of LeNet, but uses more convolutional layers and a larger parameter space to fit the large-scale data set ImageNet. AlexNet sits at the boundary between shallow neural networks and deep neural networks.
+* AlexNet has a similar structure to that of LeNet, but uses more convolutional layers and a larger parameter space to fit the large-scale data set ImageNet. 
+* Today AlexNet has been surpassed by much more effective architectures but it is a key step from shallow to deep networks that are used nowadays.
+* Although it seems that there are only a few more lines in AlexNet's implementation than in LeNet, it took the academic community many years to embrace this conceptual change and take advantage of its excellent experimental results. This was also due to the lack of efficient computational tools.
+* Dropout, ReLu and preprocessing were the other key steps in achieving excellent performance in computer vision tasks.
 
-* Although it seems that there are only a few more lines in AlexNet's implementation than in LeNet, it took the academic community many years to embrace this conceptual change and take advantage of its excellent experimental results.
+## Problems
 
-## exercise
-
-* Try increasing the epochs. Compared with LeNet, how are the results different? Why? 
-* AlexNet may be too complex for the Fashion-MNIST data set. Try to simplify the model to make the training faster, while ensuring that the accuracy does not drop significantly.
-* Modify the batch size, and observe the changes in accuracy and GPU memory.
+1. Try increasing the number of epochs. Compared with LeNet, how are the results different? Why? 
+1. AlexNet may be too complex for the Fashion-MNIST data set. 
+    * Try to simplify the model to make the training faster, while ensuring that the accuracy does not drop significantly. 
+    * Can you design a better model that works directly on $28 \times 28$ images.
+1. Modify the batch size, and observe the changes in accuracy and GPU memory.
+1. Rooflines
+    * What is the dominant part for the memory footprint of AlexNet?
+    * What is the dominant part for computation in AlexNet?
+    * How about memory bandwidth when computing the results?
+1. Apply dropout and ReLu to LeNet5. Does it improve? How about preprocessing?
 
 
 ## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/1258)
 
 ![](../img/qr_alexnet.svg)
 
-## References
+```{.python .input}
 
-[1] Krizhevsky, A., Sutskever, I., & Hinton, G. E. (2012). Imagenet classification with deep convolutional neural networks. In Advances in neural information processing systems (pp. 1097-1105).
+```
