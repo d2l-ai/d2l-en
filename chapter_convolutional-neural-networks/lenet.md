@@ -13,7 +13,7 @@ A convolutional neural network is a network with convolutional layers. In this s
 
 LeNet is divided into two parts: a block of convolutional layers and one of fully connected ones. Below, we will introduce these two modules separately. Before going into details, let's briefly review the model in pictures. To illustrate the issue of channels and the specific layers we will use a rather description (later we will see how to convey the same information more concisely).
 
-![](../img/lenet.svg)
+![Data flow in LeNet 5. The input is a handwritten digit, the output a probabilitiy over 10 possible outcomes.](../img/lenet.svg)
 
 The basic units in the convolutional block are a convolutional layer and a subsequent average pooling layer (note that max-pooling works better, but it had not been invented in the 90s yet). The convolutional layer is used to recognize the spatial patterns in the image, such as lines and the parts of objects, and the subsequent average pooling layer is used to reduce the dimensionality. The convolutional layer block is composed of repeated stacks of these two basic units. In the convolutional layer block, each convolutional layer uses a $5\times 5$ window and a sigmoid activation function for the output (note that ReLu works better, but it had not been invented in the 90s yet). The number of output channels for the first convolutional layer is 6, and the number of output channels for the second convolutional layer is increased to 16. This is because the height and width of the input of the second convolutional layer is smaller than that of the first convolutional layer. Therefore, increasing the number of output channels makes the parameter sizes of the two convolutional layers similar. The window shape for the two average pooling layers of the convolutional layer block is $2\times 2$ and the stride is 2. Because the pooling window has the same shape as the stride, the areas covered by the pooling window sliding on each input do not overlap. In other words, the pooling layer performs downsampling.
 
@@ -52,12 +52,12 @@ for layer in net:
 
 We can see that the height and width of the input in the convolutional layer block is reduced, layer by layer. The convolutional layer uses a kernel with a height and width of 5 to reduce the height and width by 4, while the pooling layer halves the height and width, but the number of channels increases from 1 to 16. The fully connected layer reduces the number of outputs layer by layer, until the number of image classes becomes 10. 
 
-![](../img/lenet-vert.svg)
+![Compressed notation for LeNet5](../img/lenet-vert.svg)
 
 
 ## Data Acquisition and Training
 
-Now, we will experiment with the LeNet model. We still use Fashion-MNIST as the training data set since the problem is rather more difficult than OCR (even in the 1990s the error rates were in the 1% range). 
+Now, we will experiment with the LeNet model. We still use Fashion-MNIST as the training data set since the problem is rather more difficult than OCR (even in the 1990s the error rates were in the 1% range).
 
 ```{.python .input}
 batch_size = 256
@@ -79,7 +79,7 @@ ctx = try_gpu4()
 ctx
 ```
 
-Accordingly, we slightly modify the `evaluate_accuracy` function described when [impleenting the SoftMax from scratch](../chapter_deep-learning-basics/softmax-regression-scratch.md).  Since the data arrives in the CPU when loading we need to copy it to the GPU before any computation can occur. This is accomplished via the `as_in_context` function described in the [GPU Computing](../chapter_deep-learning-computation/use-gpu.md) section. Note that we accumulate the errors on the same device as where the data eventually lives (in `acc`). This avoids intermediate copy operations that would destroy performance. 
+Accordingly, we slightly modify the `evaluate_accuracy` function described when [impleenting the SoftMax from scratch](../chapter_deep-learning-basics/softmax-regression-scratch.md).  Since the data arrives in the CPU when loading we need to copy it to the GPU before any computation can occur. This is accomplished via the `as_in_context` function described in the [GPU Computing](../chapter_deep-learning-computation/use-gpu.md) section. Note that we accumulate the errors on the same device as where the data eventually lives (in `acc`). This avoids intermediate copy operations that would destroy performance.
 
 ```{.python .input}
 # This function has been saved in the gluonbook package for future use. The function will be gradually improved. 
@@ -93,7 +93,7 @@ def evaluate_accuracy(data_iter, net, ctx):
     return acc.asscalar() / len(data_iter)
 ```
 
-Just like the data loader we need to update the training function to deal with GPUs. Unlike [`train_ch3`](../chapter_deep-learning-basics/softmax-regression-scratch.md) we now move data prior to computation. 
+Just like the data loader we need to update the training function to deal with GPUs. Unlike [`train_ch3`](../chapter_deep-learning-basics/softmax-regression-scratch.md) we now move data prior to computation.
 
 ```{.python .input}
 # This function has been saved in the gluonbook package for future use.
