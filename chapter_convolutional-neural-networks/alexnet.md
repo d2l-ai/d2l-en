@@ -24,7 +24,7 @@ and similar feature extractors ruled the roost.
 Another group of researchers had different plans. They believed that features themselves ought to be learned. Moreover they believed that to be reasonably complex, the features ought to be hierarchically composed. These researchers, including Yann LeCun, Geoff Hinton, Yoshua Bengio, Andrew Ng, Shun-ichi Amari, and Juergen Schmidhuber believed that by jointly training many layers of a neural network, they might come to learn hierarchical representations of data. 
 In the case of an image, the lowest layers might come to detect edges, colors, and textures. Indeed, [Krizhevski, Sutskever and Hinton, 2012](https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks) designed a new variant of a convolutional neural network which achieved excellent performance in the ImageNet challenge. Indeed, it learned good feature extractors in the lower layers. The figure below is reproduced from this paper and it describes lower level image descriptors. 
 
-![](../img/filters.png)
+![Image filters learned by the first layer of AlexNet](../img/filters.png)
 
 Higher layers might build upon these representations to represent larger structures, like eyes, noses, blades of grass, and features. Yet higher layers might represent whole objects like people, airplanes, dogs, or frisbees. 
 And ultimately, before the classification layer, the final hidden state might represent a compact representation of the image that summarized the contents in a space where data belonging to different categories would be linearly separable. It should be emphasized that the hierarchical representation of the input is determined by the parameters in the multilayer model, and these parameters are all obtained from learning.
@@ -101,7 +101,7 @@ net.add(nn.Conv2D(96, kernel_size=11, strides=4, activation='relu'),
         nn.Dense(10))
 ```
 
-We construct a single-channel data instance with both height and width of 224 to observe the output shape of each layer. It matches our diagram above. 
+We construct a single-channel data instance with both height and width of 224 to observe the output shape of each layer. It matches our diagram above.
 
 ```{.python .input  n=2}
 X = nd.random.uniform(shape=(1, 1, 224, 224))
@@ -142,7 +142,7 @@ train_iter, test_iter = load_data_fashion_mnist(batch_size, resize=224)
 
 ## Training
 
-Now, we can start training AlexNet. Compared to LeNet in the previous section, the main change here is the use of a smaller learning rate and much slower training due to the deeper and wider network, the higher image resolution and the more costly convolutions. 
+Now, we can start training AlexNet. Compared to LeNet in the previous section, the main change here is the use of a smaller learning rate and much slower training due to the deeper and wider network, the higher image resolution and the more costly convolutions.
 
 ```{.python .input  n=5}
 lr, num_epochs, ctx = 0.01, 5, gb.try_gpu()
@@ -175,7 +175,3 @@ gb.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
 ## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/1258)
 
 ![](../img/qr_alexnet.svg)
-
-```{.python .input}
-
-```
