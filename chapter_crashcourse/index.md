@@ -16,12 +16,11 @@ the basics.
    introduction
    install
    ndarray
-   linear-algebra 
+   linear-algebra
    autograd
    probability
    naive-bayes
    sampling
-   linear-algebra
    lookup-api
 
 ```
