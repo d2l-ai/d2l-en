@@ -16,7 +16,7 @@ the basics.
    introduction
    install
    ndarray
-   linear-algebra 
+   linear-algebra
    autograd
    probability
    naive-bayes

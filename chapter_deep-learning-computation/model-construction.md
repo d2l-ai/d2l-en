@@ -20,7 +20,7 @@ net(x)
 
 This generates a network with a hidden layer of 256 units, followed by a ReLu activation and another 10 units governing the output. In particular, we used the `nn.Sequential` constructor to generate an empty network into which we then inserted both layers. What exactly happens inside `nn.Sequential` has remained rather mysterious so far. In the following we will see that this really just constructs a block. These blocks can be combined into larger artifacts, often recursively. The diagram below shows how:
 
-![](../img/blocks.svg)
+![Multiple layers are combined into blocks](../img/blocks.svg)
 
 In the following we will explain the various steps needed to go from defining layers to defining blocks (of one or more layers). To get started we need a bit of reasoning about software. For most intents and purposes a block behaves very much like a fancy layer. That is, it provides the following functionality:
 
