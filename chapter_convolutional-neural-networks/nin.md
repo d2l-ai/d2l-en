@@ -1,6 +1,6 @@
 # Network in Network (NiN)
 
-LeNet, AlexNet, and VGG introduced in the previous sections all act as follows: They first extract the spatial features through modules consisting of convolutional layers, and then output the classification results through modules consisting of fully connected layers. The improvements upon LeNet by AlexNet and VGG mainly lie in how these later networks widen and deepen these two modules. In this section, we will introduce network in network (NiN)[1]. This network introduces another concept, that is, constructing a deep network by concatenating small networks made up of multiple convolutional layers and fully connected layers.
+LeNet, AlexNet, and VGG all share a common design pattern: extract the spatial features through a sequence of convolutions and pooling layers and then post-process the representations via fully connected layers. The improvements upon LeNet by AlexNet and VGG mainly lie in how these later networks widen and deepen these two modules. An alternative is to use fully connected layers much earlier in the process. However, a careless use of a dense layer would destroy the spatial structure of the data entirely.  In this section, we will introduce network in network (NiN)[1]. This network introduces another concept, that is, constructing a deep network by concatenating small networks made up of multiple convolutional layers and fully connected layers.
 
 
 ## NiN Block

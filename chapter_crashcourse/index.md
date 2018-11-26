@@ -21,6 +21,7 @@ the basics.
    probability
    naive-bayes
    sampling
+   linear-algebra
    lookup-api
 
 ```
