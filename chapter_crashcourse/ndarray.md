@@ -111,7 +111,7 @@ Many more operations can be applied element-wise, such as exponentiation:
 x.exp()
 ```
 
-In addition to computations by element, we can also use the `dot` function for matrix operations. Next, we will perform matrix multiplication to transpose `x` and `y`. We define `x` as a matrix of 3 rows and 4 columns, and `y` is transposed into a matrix of 4 rows and 3 columns. The two matrices are multiplied to obtain a matrix of 3 rows and 3 columns (if you're confused about what this means, don't worry - we will explain matrix operations in much more detail in the chapter on [linear algebra](linear_algebra.md)).
+In addition to computations by element, we can also use the `dot` function for matrix operations. Next, we will perform matrix multiplication to transpose `x` and `y`. We define `x` as a matrix of 3 rows and 4 columns, and `y` is transposed into a matrix of 4 rows and 3 columns. The two matrices are multiplied to obtain a matrix of 3 rows and 3 columns (if you're confused about what this means, don't worry - we will explain matrix operations in much more detail in the chapter on [linear algebra](linear-algebra.md)).
 
 ```{.python .input  n=13}
 x = nd.arange(12).reshape((3,4))
