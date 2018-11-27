@@ -214,7 +214,7 @@ so we'll want to keep track of two quantities.
  * **Test Error:** This is the error incurred on an unseen test set. This can deviate quite a bit from the training error. This condition, when a model fails to generalize to unseen data, is called *overfitting*. In real-life terms, this is the equivalent of screwing up the real exam despite doing well on the practice exams.
 
 
-### Optimization algorithms     
+### Optimization algorithms
 
 Finally, to minimize the loss, we'll need some way of taking the model and its loss functions,
 and searching for a set of parameters that minimizes the loss.
@@ -304,7 +304,7 @@ and the set of all targets $\mathbf{y}$ (corresponding to all examples X).
 When our targets take on arbitrary real values in some range,
 we call this a regression problem.
 The goal of our model is to produce predictions (guesses of the price, in our example)
-that closely approximate the actual target values.  
+that closely approximate the actual target values.
 We denote these predictions $\hat{y}_i$
 and if the notation seems unfamiliar, then just ignore it for now.
 We'll unpack it more thoroughly in the subsequent chapters.
@@ -746,6 +746,6 @@ this problem is the classic *multi-armed bandit problem*.
 
 Machine Learning is vast. We cannot possibly cover it all. On the other hand, neural networks are simple and only require elementary mathematics. So let's get started (but first, let's install MXNet).
 
-```{.python .input}
+## Discuss on our Forum
 
-```
+<div id="discuss" topic_id="2314"></div>

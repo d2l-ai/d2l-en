@@ -4,7 +4,7 @@ This section discusses how to download the codes in this book and to install the
 
 ## Conda
 
-For simplicity we recommend [Conda](https://conda.io), a popular Python package manager to install all libraries. 
+For simplicity we recommend [Conda](https://conda.io), a popular Python package manager to install all libraries.
 
 1. Download and install [Miniconda](https://conda.io/miniconda.html), based on your operating system. Make sure to add Anaconda to your PATH environment variable.
 1. Download the tarball containing the notebooks from this book. This can be found at en.gluon.ai/gluon_tutorials_en-latest.zip. Alternatively feel free to clone the latest version from GitHub.
@@ -12,9 +12,9 @@ For simplicity we recommend [Conda](https://conda.io), a popular Python package 
 
 ### GPU Support
 
-By default MXNet is installed without GPU support to ensure that it will run on any computer (including most laptops). If you should be so lucky to have a GPU enabled computer, you should modify the Conda environment to download the CUDA enabled build. Obviously you need to have the appropriate drivers installed, such as [CUDA](https://developer.nvidia.com/cuda-downloads), [CUDNN](https://developer.nvidia.com/cudnn) and [TensorRT](https://developer.nvidia.com/tensorrt), if appropriate. 
+By default MXNet is installed without GPU support to ensure that it will run on any computer (including most laptops). If you should be so lucky to have a GPU enabled computer, you should modify the Conda environment to download the CUDA enabled build. Obviously you need to have the appropriate drivers installed, such as [CUDA](https://developer.nvidia.com/cuda-downloads), [CUDNN](https://developer.nvidia.com/cudnn) and [TensorRT](https://developer.nvidia.com/tensorrt), if appropriate.
 
-Next update the environment description in `environment.yml`. Replace `mxnet` by `mxnet-cu92` or whatever version of CUDA that you've got installed. For instance, if you're on CUDA 8.0, you need to replace `mxnet-cu92` with `mxnet-cu80`. You should do this *before* creating the Conda environment. Otherwise you will need to rebuild it later. 
+Next update the environment description in `environment.yml`. Replace `mxnet` by `mxnet-cu92` or whatever version of CUDA that you've got installed. For instance, if you're on CUDA 8.0, you need to replace `mxnet-cu92` with `mxnet-cu80`. You should do this *before* creating the Conda environment. Otherwise you will need to rebuild it later.
 
 
 ### Windows
@@ -36,11 +36,11 @@ Some notebooks will automatically download the data set and pre-training model. 
 
 ### Linux and macOS
 
-Installation for both is very similar. We give a description of the workflow for Linux. 
+Installation for both is very similar. We give a description of the workflow for Linux.
 
 1. Install Miniconda (and accepting the license terms), as available at https://conda.io/miniconda.html
-1. Update your shell by `source ~/.bashrc` (Linux) or `source ~/.bash_profile` (macOS) or open a new terminal. 
-1. Download the tar file with all code and unpack it. 
+1. Update your shell by `source ~/.bashrc` (Linux) or `source ~/.bash_profile` (macOS) or open a new terminal.
+1. Download the tar file with all code and unpack it.
 1. Create the Conda environment
 1. Activate it and start Jupyter
 
@@ -77,6 +77,6 @@ conda env update -f environment.yml
 
 Download the code for the book and install the runtime environment. If you encounter any problems during installation, please scan the QR code to take you to the FAQ section of the discussion forum for further help.
 
-## Scan the QR code to get to the [forum](https://discuss.gluon.ai/t/topic/249)
+## Discuss on our Forum
 
-![](../img/qr_install.svg)
+<div id="discuss" topic_id="2315"></div>

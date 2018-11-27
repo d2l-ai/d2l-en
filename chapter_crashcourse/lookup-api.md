@@ -29,7 +29,7 @@ y = x.ones_like()
 y
 ```
 
-In the Jupyter notebook, we can use `?` to display the document in another window. For example, `nd.ones_like?` will create content that is almost identical to `help(nd.ones_like)`, but will be displayed in an extra window. In addition, if we use two `nd.ones_like??`, the function implementation code will also be displayed.  
+In the Jupyter notebook, we can use `?` to display the document in another window. For example, `nd.ones_like?` will create content that is almost identical to `help(nd.ones_like)`, but will be displayed in an extra window. In addition, if we use two `nd.ones_like??`, the function implementation code will also be displayed.
 
 ## API Documentation
 
@@ -38,3 +38,7 @@ For further details on the API details check the MXNet website at  [http://mxnet
 ## Exercise
 
 Check out the documentation for `ones_like` and for `autograd`.
+
+## Discuss on our Forum
+
+<div id="discuss" topic_id="2322"></div>
