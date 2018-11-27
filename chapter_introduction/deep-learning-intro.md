@@ -177,4 +177,6 @@ Lastly, the Deep Learning community prides itself of sharing tools across academ
 
 [23] Tesauro, G. (1995), Transactions of the ACM, (38) 3, 58-68
 
+## Discuss on our Forum
+
 <div id="discuss" topic_id="2310"></div>

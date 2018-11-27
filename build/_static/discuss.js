@@ -1,7 +1,7 @@
 $(document).ready(function () {
     var discuss = $("#discuss")
     var topic_id = discuss.attr("topic_id");
-    discuss.html('<h2>Discuss on our Forum</h2><div id="discourse-comments"></div>');
+    discuss.html('<div id="discourse-comments"></div>');
     DiscourseEmbed = { discourseUrl: 'https://discuss.mxnet.io/', topicId: topic_id };
     (function() {
         var d = document.createElement('script'); d.type = 'text/javascript';
