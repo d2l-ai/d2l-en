@@ -19,7 +19,7 @@ net.add(nn.Dense(10))
 net.initialize(init.Normal(sigma=0.01))
 ```
 
-One minor detail is of note when invoking `net.add()`. It adds one or more layers to the network. That is, an equivalent to the above lines would be `net.add(nn.Dense(256, activation='relu'), nn.Dense(10))`. Also note that Gluon automagically infers the missing parameteters, such as the fact that the second layer needs a matrix of size $256 \times 10$. This happens the first time the network is invoked. 
+One minor detail is of note when invoking `net.add()`. It adds one or more layers to the network. That is, an equivalent to the above lines would be `net.add(nn.Dense(256, activation='relu'), nn.Dense(10))`. Also note that Gluon automagically infers the missing parameteters, such as the fact that the second layer needs a matrix of size $256 \times 10$. This happens the first time the network is invoked.
 
 We use almost the same steps for softmax regression training as we do for reading and training the model.
 
@@ -40,7 +40,6 @@ gb.train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size,
 1. Try out different activation functions. Which ones work best?
 1. Try out different initializations of the weights.
 
+## Discuss on our Forum
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/738)
-
-![](../img/qr_mlp-gluon.svg)
+<div id="discuss" topic_id="2340"></div>

@@ -1,10 +1,10 @@
 # Predicting House Prices on Kaggle
 
-The previous chapters introduced a number of basic tools to build deep networks and to perform capacity control using dimensionality, weight decay and dropout. It's time to put our knowledge to good use by participating in a Kaggle competition. [Predicting house prices](https://www.kaggle.com/c/house-prices-advanced-regression-techniques) is the perfect start, since its data is fairly generic and doesn't have much regular structure in the way text of images do.  Note that the dataset is *not* the [Boston housing dataset](https://archive.ics.uci.edu/ml/machine-learning-databases/housing/housing.names) of Harrison and Rubinfeld, 1978. Instead, it consists of the larger and more fully-featured dataset of house prices in Ames, IA covering 2006-2010. It was collected by [Bart de Cock](http://jse.amstat.org/v19n3/decock.pdf) in 2011. Due to its larger size it presents a slightly more interesting estimation problem. 
+The previous chapters introduced a number of basic tools to build deep networks and to perform capacity control using dimensionality, weight decay and dropout. It's time to put our knowledge to good use by participating in a Kaggle competition. [Predicting house prices](https://www.kaggle.com/c/house-prices-advanced-regression-techniques) is the perfect start, since its data is fairly generic and doesn't have much regular structure in the way text of images do.  Note that the dataset is *not* the [Boston housing dataset](https://archive.ics.uci.edu/ml/machine-learning-databases/housing/housing.names) of Harrison and Rubinfeld, 1978. Instead, it consists of the larger and more fully-featured dataset of house prices in Ames, IA covering 2006-2010. It was collected by [Bart de Cock](http://jse.amstat.org/v19n3/decock.pdf) in 2011. Due to its larger size it presents a slightly more interesting estimation problem.
 
-In this chapter we will apply what we've learned so far. In particular, we will walk you through details of data preprocessing, model design, hyperparameter selection and tuning. We hope that through a hands-on approach you will be able to observe the effects of capacity control, feature extraction, etc. in practice. Such experience is vital if you want to become an experienced data scientist. 
+In this chapter we will apply what we've learned so far. In particular, we will walk you through details of data preprocessing, model design, hyperparameter selection and tuning. We hope that through a hands-on approach you will be able to observe the effects of capacity control, feature extraction, etc. in practice. Such experience is vital if you want to become an experienced data scientist.
 
-## Kaggle 
+## Kaggle
 
 [Kaggle](https://www.kaggle.com) is a popular platform for machine learning competitions. It combines data, code and users in a way to allow for both collaboration and competition. For instance, you can see the code that (some) competitors submitted and you can see how well you're doing relative to everyone else. If you want to participate in one of the competitions, you need to register for an account. So it's best to do this now.
 
@@ -18,9 +18,9 @@ On the House Prices Prediction page you can find the data set (under the data ta
 
 ## Accessing and Reading Data Sets
 
-The competition data is separated into traiing and test set. Each record includes the property values of the house and attributes such as street type, year of construction, roof type, basement condition. The data includes multiple datatypes, including integers (year of construction), discrete labels (roof type), floating point numbers, etc.; Some data is missing and is thus labeled 'na'. The price of each house, namely the label, is only included in the training data set (it's a competition after all). The 'Data' tab on the competition tab has links to download the data. 
+The competition data is separated into traiing and test set. Each record includes the property values of the house and attributes such as street type, year of construction, roof type, basement condition. The data includes multiple datatypes, including integers (year of construction), discrete labels (roof type), floating point numbers, etc.; Some data is missing and is thus labeled 'na'. The price of each house, namely the label, is only included in the training data set (it's a competition after all). The 'Data' tab on the competition tab has links to download the data.
 
-We will read and process the data using `pandas`, an [efficient data analysis toolkit](http://pandas.pydata.org/pandas-docs/stable/). Make sure you have `pandas` installed for the experiments in this section. 
+We will read and process the data using `pandas`, an [efficient data analysis toolkit](http://pandas.pydata.org/pandas-docs/stable/). Make sure you have `pandas` installed for the experiments in this section.
 
 ```{.python .input  n=3}
 # If pandas is not installed, please uncomment the following line:
@@ -34,14 +34,14 @@ import numpy as np
 import pandas as pd
 ```
 
-For convenience we already downloaded the data and stored it in the `../data` directory. To load the two CSV (Comma Separated Values) files containing training and test data respectively we use Pandas. 
+For convenience we already downloaded the data and stored it in the `../data` directory. To load the two CSV (Comma Separated Values) files containing training and test data respectively we use Pandas.
 
 ```{.python .input  n=14}
 train_data = pd.read_csv('../data/kaggle_house_pred_train.csv')
 test_data = pd.read_csv('../data/kaggle_house_pred_test.csv')
 ```
 
-The training data set includes 1,460 examples, 80 features, and 1 label., the test data contains 1,459 examples and 80 features. 
+The training data set includes 1,460 examples, 80 features, and 1 label., the test data contains 1,459 examples and 80 features.
 
 ```{.python .input  n=11}
 print(train_data.shape)
@@ -54,7 +54,7 @@ Let’s take a look at the first 4 and last 2 features as well as the label (Sal
 train_data.iloc[0:4, [0, 1, 2, 3, -3, -2, -1]]
 ```
 
-We can see that in each example, the first feature is the ID. This helps the model identify each training example. While this is convenient, it doesn't carry any information for prediction purposes. Hence we remove it from the dataset before feeding the data into the network. 
+We can see that in each example, the first feature is the ID. This helps the model identify each training example. While this is convenient, it doesn't carry any information for prediction purposes. Hence we remove it from the dataset before feeding the data into the network.
 
 ```{.python .input  n=30}
 all_features = pd.concat((train_data.iloc[:, 1:-1], test_data.iloc[:, 1:]))
@@ -66,7 +66,7 @@ As stated above, we have a wide variety of datatypes. Before we feed it into a d
 
 $$x \leftarrow \frac{x - \mu}{\sigma}$$
 
-To check that this transforms $x$ to data with zero mean and unit variance simply calculate $\mathbf{E}[(x-\mu)/\sigma] = (\mu - \mu)/\sigma = 0$. To check the variance we use $\mathbf{E}[(x-\mu)^2] = \sigma^2$ and thus the transformed variable has unit variance. The reason for 'normalizing' the data is that it brings all features to the same order of magnitude. After all, we do not know *a priori* which features are likely to be relevant. Hence it makes sense to treat them equally. 
+To check that this transforms $x$ to data with zero mean and unit variance simply calculate $\mathbf{E}[(x-\mu)/\sigma] = (\mu - \mu)/\sigma = 0$. To check the variance we use $\mathbf{E}[(x-\mu)^2] = \sigma^2$ and thus the transformed variable has unit variance. The reason for 'normalizing' the data is that it brings all features to the same order of magnitude. After all, we do not know *a priori* which features are likely to be relevant. Hence it makes sense to treat them equally.
 
 ```{.python .input  n=6}
 numeric_features = all_features.dtypes[all_features.dtypes != 'object'].index
@@ -79,12 +79,12 @@ all_features = all_features.fillna(0)
 Next we deal with discrete values. This includes variables such as 'MSZoning'. We replace them by a one-hot encoding in the same manner as how we transformed multiclass classification data into a vector of $0$ and $1$. For instace, 'MSZoning' assumes the values 'RL' and 'RM'. They map into vectors $(1,0)$ and $(0,1)$ respectively. Pandas does this automatically for us.
 
 ```{.python .input  n=7}
-# Dummy_na=True refers to a missing value being a legal eigenvalue, and creates an indicative feature for it. 
+# Dummy_na=True refers to a missing value being a legal eigenvalue, and creates an indicative feature for it.
 all_features = pd.get_dummies(all_features, dummy_na=True)
 all_features.shape
 ```
 
-You can see that this conversion increases the number of features from 79 to 331. Finally, via the `values` attribute we can extract the NumPy format from the Pandas dataframe and convert it into MXNet's native representation - NDArray for training. 
+You can see that this conversion increases the number of features from 79 to 331. Finally, via the `values` attribute we can extract the NumPy format from the Pandas dataframe and convert it into MXNet's native representation - NDArray for training.
 
 ```{.python .input  n=9}
 n_train = train_data.shape[0]
@@ -95,7 +95,7 @@ train_labels = nd.array(train_data.SalePrice.values).reshape((-1, 1))
 
 ## Training
 
-To get started we train a linear model with squared loss. This will obviously not lead to a competition winning submission but it provides a sanity check to see whether there's meaningful information in the data. It also amounts to a minimum baseline of how well we should expect any 'fancy' model to work. 
+To get started we train a linear model with squared loss. This will obviously not lead to a competition winning submission but it provides a sanity check to see whether there's meaningful information in the data. It also amounts to a minimum baseline of how well we should expect any 'fancy' model to work.
 
 ```{.python .input  n=13}
 loss = gloss.L2Loss()
@@ -115,7 +115,7 @@ $$L = \sqrt{\frac{1}{n}\sum_{i=1}^n\left(\log y_i -\log \hat{y}_i\right)^2}$$
 
 ```{.python .input  n=11}
 def log_rmse(net, train_features, train_labels):
-    # To further stabilize the value when the logarithm is taken, set the value less than 1 as 1. 
+    # To further stabilize the value when the logarithm is taken, set the value less than 1 as 1.
     clipped_preds = nd.clip(net(train_features), 1, float('inf'))
     rmse = nd.sqrt(2 * loss(clipped_preds.log(), train_labels.log()).mean())
     return rmse.asscalar()
@@ -190,7 +190,7 @@ def k_fold(k, X_train, y_train, num_epochs,
 
 ## Model Selection
 
-We pick a rather un-tuned set of hyperparameters and leave it up to the reader to improve the model considerably. Finding a good choice can take quite some time, depending on how many things one wants to optimize over. Within reason the k-fold crossvalidation approach is resilient against multiple testing. However, if we were to try out an unreasonably large number of options it might fail since we might just get lucky on the validation split with a particular set of hyperparameters. 
+We pick a rather un-tuned set of hyperparameters and leave it up to the reader to improve the model considerably. Finding a good choice can take quite some time, depending on how many things one wants to optimize over. Within reason the k-fold crossvalidation approach is resilient against multiple testing. However, if we were to try out an unreasonably large number of options it might fail since we might just get lucky on the validation split with a particular set of hyperparameters.
 
 ```{.python .input  n=16}
 k, num_epochs, lr, weight_decay, batch_size = 5, 100, 5, 0, 64
@@ -201,11 +201,11 @@ print('%d-fold validation: avg train rmse: %f, avg valid rmse: %f'
       % (k, train_l, valid_l))
 ```
 
-You will notice that sometimes the number of training errors for a set of hyper-parameters can be very low, while the number of errors for the $K$-fold cross validation may be higher. This is most likely a consequence of overfitting. Therefore, when we reduce the amount of training errors, we need to check whether the amount of errors in the k-fold cross-validation have also been reduced accordingly. 
+You will notice that sometimes the number of training errors for a set of hyper-parameters can be very low, while the number of errors for the $K$-fold cross validation may be higher. This is most likely a consequence of overfitting. Therefore, when we reduce the amount of training errors, we need to check whether the amount of errors in the k-fold cross-validation have also been reduced accordingly.
 
 ##  Predict and Submit
 
-Now that we know what a good choice of hyperparameters should be, we might as well use all the data to train on it (rather than just $1-1/k$ of the data that is used in the crossvalidation slices). The model that we obtain in this way can then be applied to the test set. Saving the estimates in a CSV file will simplify uploading the results to Kaggle. 
+Now that we know what a good choice of hyperparameters should be, we might as well use all the data to train on it (rather than just $1-1/k$ of the data that is used in the crossvalidation slices). The model that we obtain in this way can then be applied to the test set. Saving the estimates in a CSV file will simplify uploading the results to Kaggle.
 
 ```{.python .input  n=18}
 def train_and_pred(train_features, test_feature, train_labels, test_data,
@@ -232,19 +232,19 @@ train_and_pred(train_features, test_features, train_labels, test_data,
 
 A file, `submission.csv` will be generated by the code above (CSV is one of the file formats accepted by Kaggle).  Next, we can submit our predictions on Kaggle and compare them to the actual house price (label) on the testing data set, checking for errors. The steps are quite simple:
 
-* Log in to the Kaggle website and visit the House Price Prediction Competition page. 
-* Click the “Submit Predictions” or “Late Submission” button on the right.  
-* Click the “Upload Submission File” button in the dashed box at the bottom of the page and select the prediction file you wish to upload.  
-* Click the “Make Submission” button at the bottom of the page to view your results.  
+* Log in to the Kaggle website and visit the House Price Prediction Competition page.
+* Click the “Submit Predictions” or “Late Submission” button on the right.
+* Click the “Upload Submission File” button in the dashed box at the bottom of the page and select the prediction file you wish to upload.
+* Click the “Make Submission” button at the bottom of the page to view your results.
 
 ![Submitting data to Kaggle](../img/kaggle_submit2.png)
 
 
 ## Summary
 
-* Real data often contains a mix of different datatypes and needs to be preprocessed. 
-* Rescaling real-valued data to zero mean and unit variance is a good default. So is replacing missing values with their mean. 
-* Transforming categorical variables into indicator variables allows us to treat them like vectors. 
+* Real data often contains a mix of different datatypes and needs to be preprocessed.
+* Rescaling real-valued data to zero mean and unit variance is a good default. So is replacing missing values with their mean.
+* Transforming categorical variables into indicator variables allows us to treat them like vectors.
 * We can use k-fold cross validation to select the model and adjust the hyper-parameters.
 * Logarithms are useful for relative loss.
 
@@ -256,11 +256,9 @@ A file, `submission.csv` will be generated by the code above (CSV is one of the 
 1. Is it always a good idea to replace missing values by their mean? Hint - can you construct a situation where the values are not missing at random?
 1. Find a better representation to deal with missing values. Hint - What happens if you add an indicator variable?
 1. Improve the score on Kaggle by tuning the hyperparameters through k-fold crossvalidation.
-1. Improve the score by improving the model (layers, regularization, dropout). 
+1. Improve the score by improving the model (layers, regularization, dropout).
 1. What happens if we do not standardize the continuous numerical features like we have done in this section?
 
-The forum has more ideas about how to improve the models. Scan the QR code for more details. 
+## Discuss on our Forum
 
-## Scan the QR code to access the [forum](https://discuss.gluon.ai/t/topic/1039)
-
-![](../img/qr_kaggle-house-price.svg)
+<div id="discuss" topic_id="2346"></div>

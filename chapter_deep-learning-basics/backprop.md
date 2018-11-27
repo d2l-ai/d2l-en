@@ -1,12 +1,12 @@
 # Forward Propagation, Back Propagation and Computational Graphs
 
-In the previous sections we used a mini-batch stochastic gradient descent optimization algorithm to train the model. During the implementation of the algorithm, we only calculated the forward propagation of the model, which is to say, we calculated the model output for the input, then called the auto-generated `backward` function to then finally calculate the gradient through the `autograd` module. The automatic gradient calculation, when based on back-propagation, significantly simplifies the implementation of the deep learning model training algorithm. In this section we will use both mathematical and computational graphs to describe forward and back propagation. More specifically, we will explain forward and back propagation through a sample model with a single hidden layer perceptron with $\ell_2$ norm regularization. This section will help understand a bit better what goes on behind the scenes when we invoke a deep network. 
+In the previous sections we used a mini-batch stochastic gradient descent optimization algorithm to train the model. During the implementation of the algorithm, we only calculated the forward propagation of the model, which is to say, we calculated the model output for the input, then called the auto-generated `backward` function to then finally calculate the gradient through the `autograd` module. The automatic gradient calculation, when based on back-propagation, significantly simplifies the implementation of the deep learning model training algorithm. In this section we will use both mathematical and computational graphs to describe forward and back propagation. More specifically, we will explain forward and back propagation through a sample model with a single hidden layer perceptron with $\ell_2$ norm regularization. This section will help understand a bit better what goes on behind the scenes when we invoke a deep network.
 
 ## Forward Propagation
 
-Forward propagation refers to the calculation and storage of intermediate variables (including outputs) for the neural network within the models in the order from input layer to output layer. In the following we work in detail through the example of a deep network with one hidden layer step by step. This is a bit tedious but it will serve us well when discussing what really goes on when we call `backward`. 
+Forward propagation refers to the calculation and storage of intermediate variables (including outputs) for the neural network within the models in the order from input layer to output layer. In the following we work in detail through the example of a deep network with one hidden layer step by step. This is a bit tedious but it will serve us well when discussing what really goes on when we call `backward`.
 
-For the sake of simplicity, let’s assume that the input example is $\mathbf{x}\in \mathbb{R}^d$ and there is no bias term. Here the intermediate variable is: 
+For the sake of simplicity, let’s assume that the input example is $\mathbf{x}\in \mathbb{R}^d$ and there is no bias term. Here the intermediate variable is:
 
 $$\mathbf{z}= \mathbf{W}^{(1)} \mathbf{x}$$
 
@@ -42,29 +42,29 @@ Plotting computational graphs helps us visualize the dependencies of operators a
 
 ## Back Propagation
 
-Back propagation refers to the method of calculating the gradient of neural network parameters. In general, back propagation calculates and stores the intermediate variables of an objective function related to each layer of the neural network and the gradient of the parameters in the order of the output layer to the input layer according to the ‘chain rule’ in calculus. Assume that we have functions $\mathsf{Y}=f(\mathsf{X})$ and $\mathsf{Z}=g(\mathsf{Y}) = g \circ f(\mathsf{X})$, in which the input and the output $\mathsf{X}, \mathsf{Y}, \mathsf{Z}$ are tensors of arbitrary shapes. By using the chain rule we can compute the derivative of $\mathsf{Z}$ wrt. $\mathsf{X}$ via 
+Back propagation refers to the method of calculating the gradient of neural network parameters. In general, back propagation calculates and stores the intermediate variables of an objective function related to each layer of the neural network and the gradient of the parameters in the order of the output layer to the input layer according to the ‘chain rule’ in calculus. Assume that we have functions $\mathsf{Y}=f(\mathsf{X})$ and $\mathsf{Z}=g(\mathsf{Y}) = g \circ f(\mathsf{X})$, in which the input and the output $\mathsf{X}, \mathsf{Y}, \mathsf{Z}$ are tensors of arbitrary shapes. By using the chain rule we can compute the derivative of $\mathsf{Z}$ wrt. $\mathsf{X}$ via
 
 $$\frac{\partial \mathsf{Z}}{\partial \mathsf{X}} = \text{prod}\left(\frac{\partial \mathsf{Z}}{\partial \mathsf{Y}}, \frac{\partial \mathsf{Y}}{\partial \mathsf{X}}\right).$$
 
-Here we use the $\text{prod}$ operator to multiply its arguments after the necessary operations, such as transposition and swapping input positions have been carried out. For vectors this is straightforward: it is simply matrix-matrix multiplication and for higher dimensional tensors we use the appropriate counterpart. The operator $\text{prod}$ hides all the notation overhead. 
+Here we use the $\text{prod}$ operator to multiply its arguments after the necessary operations, such as transposition and swapping input positions have been carried out. For vectors this is straightforward: it is simply matrix-matrix multiplication and for higher dimensional tensors we use the appropriate counterpart. The operator $\text{prod}$ hides all the notation overhead.
 
 The parameters of the simple network with one hidden layer are $\mathbf{W}^{(1)}$ and $\mathbf{W}^{(2)}$. The objective of back propagation is to calculate the gradients $\partial J/\partial \mathbf{W}^{(1)}$ and $\partial J/\partial \mathbf{W}^{(2)}$. To accompish this we will apply the chain rule and calculate in turn the gradient of each intermediate variable and parameter. The order of calculations are reversed relative to those performed in forward propagation, since we need to start with the outcome of the compute graph and work our way towards the parameters. The first step is to calculate the gradients of the objective function $J=L+s$ with respect to the loss term $L$ and the regularization term $s$.
 
-$$\frac{\partial J}{\partial L} = 1 \text{ and } \frac{\partial J}{\partial s} = 1$$ 
+$$\frac{\partial J}{\partial L} = 1 \text{ and } \frac{\partial J}{\partial s} = 1$$
 
-Next we compute the gradient of the objective function with respect to variable of the output layer $\mathbf{o}$ according to the chain rule. 
+Next we compute the gradient of the objective function with respect to variable of the output layer $\mathbf{o}$ according to the chain rule.
 
 $$
 \frac{\partial J}{\partial \mathbf{o}}
 = \text{prod}\left(\frac{\partial J}{\partial L}, \frac{\partial L}{\partial \mathbf{o}}\right)
-= \frac{\partial L}{\partial \mathbf{o}} 
+= \frac{\partial L}{\partial \mathbf{o}}
 \in \mathbb{R}^q
 $$
 
 Next we calculate the gradients of the regularization term with respect to both parameters.
 
-$$\frac{\partial s}{\partial \mathbf{W}^{(1)}} = \lambda \mathbf{W}^{(1)} 
-\text{ and } 
+$$\frac{\partial s}{\partial \mathbf{W}^{(1)}} = \lambda \mathbf{W}^{(1)}
+\text{ and }
 \frac{\partial s}{\partial \mathbf{W}^{(2)}} = \lambda \mathbf{W}^{(2)}$$
 
 Now we are able calculate the gradient $\partial J/\partial \mathbf{W}^{(2)} \in \mathbb{R}^{q \times h}$ of the model parameters closest to the output layer. Using the chain rule yields:
@@ -101,29 +101,28 @@ $$
 
 ## Training a Model
 
-When training networks, forward and backward propagation depend on each other. In particular, for forward propagation we traverse the compute graph in the direction of dependencies and compute all the variables on its path. These are then used for backpropagation where the compute order on the graph is reversed. One of the consequences is that we need to retain the intermediate values until backpropagation is complete. This is also one of the reasons why backpropagation requires significantly more memory than plain 'inference' - we end up computing tensors as gradients and need to retain all the intermediate variables to invoke the chain rule. Another reason is that we typically train with minibatches containing more than one variable, thus more intermediate activations need to be stored. 
+When training networks, forward and backward propagation depend on each other. In particular, for forward propagation we traverse the compute graph in the direction of dependencies and compute all the variables on its path. These are then used for backpropagation where the compute order on the graph is reversed. One of the consequences is that we need to retain the intermediate values until backpropagation is complete. This is also one of the reasons why backpropagation requires significantly more memory than plain 'inference' - we end up computing tensors as gradients and need to retain all the intermediate variables to invoke the chain rule. Another reason is that we typically train with minibatches containing more than one variable, thus more intermediate activations need to be stored.
 
 ## Summary
 
 * Forward propagation sequentially calculates and stores intermediate variables within the compute graph defined by the neural network. It proceeds from input to output layer.
 * Back propagation sequentially calculates and stores the gradients of intermediate variables and parameters within the neural network in the reversed order.
 * When training deep learning models, forward propagation and back propagation are interdependent.
-* Training requires significantly more memory and storage. 
+* Training requires significantly more memory and storage.
 
 
 ## Problems
 
 1. Assume that the inputs $\mathbf{x}$ are matrices. What is the dimensionality of the gradients?
-1. Add a bias to the hidden layer of the model described in this chapter. 
+1. Add a bias to the hidden layer of the model described in this chapter.
     * Draw the corresponding compute graph.
-    * Derive the forward and backward propagation equations. 
-1. Compute the memory footprint for training and inference in model described in the current chapter. 
+    * Derive the forward and backward propagation equations.
+1. Compute the memory footprint for training and inference in model described in the current chapter.
 1. Assume that you want to compute *second* derivatives. What happens to the compute graph? Is this a good idea?
-1. Assume that the compute graph is too large for your GPU. 
+1. Assume that the compute graph is too large for your GPU.
     * Can you partition it over more than one GPU?
     * What are the advantages and disadvantages over training on a smaller minibatch?
 
+## Discuss on our Forum
 
-## Scan the QR code to get to the [forum](https://discuss.gluon.ai/t/topic/3710)
-
-![](../img/qr_backprop.svg)
+<div id="discuss" topic_id="2344"></div>

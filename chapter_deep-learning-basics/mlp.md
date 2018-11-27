@@ -4,7 +4,7 @@ In the previous chapters we showed how you could implement multiclass logistic r
 
 ## Hidden Layers
 
-Recall that before, we mapped our inputs directly onto our outputs through a single linear transformation via 
+Recall that before, we mapped our inputs directly onto our outputs through a single linear transformation via
 
 $$
 \hat{\mathbf{o}} = \mathrm{softmax}(\mathbf{W} \mathbf{x} + \mathbf{b})
@@ -50,13 +50,13 @@ $$
 \end{aligned}
 $$
 
-Clearly we could continue stacking such hidden layers, e.g. $\mathbf{h}_1 = \sigma(\mathbf{W}_1 \mathbf{x} + \mathbf{b}_1)$ and $\mathbf{h}_2 = \sigma(\mathbf{W}_2 \mathbf{h}_1 + \mathbf{b}_2)$ on top of each other to obtain a true multilayer perceptron. 
+Clearly we could continue stacking such hidden layers, e.g. $\mathbf{h}_1 = \sigma(\mathbf{W}_1 \mathbf{x} + \mathbf{b}_1)$ and $\mathbf{h}_2 = \sigma(\mathbf{W}_2 \mathbf{h}_1 + \mathbf{b}_2)$ on top of each other to obtain a true multilayer perceptron.
 
 Multilayer perceptrons can account for complex interactions in the inputs because the hidden neurons depend on the values of each of the inputs. It’s easy to design a hidden node that that does arbitrary computation, such as, for instance, logical operations on its inputs. And it’s even widely known that multilayer perceptrons are universal approximators. That means that even for a single-hidden-layer neural network, with enough nodes, and the right set of weights, it could model any function at all! Actually learning that function is the hard part. And it turns out that we can approximate functions much more compactly if we use deeper (vs wider) neural networks. We’ll get more into the math in a subsequent chapter, but for now let’s actually build an MLP. In this example, we’ll implement a multilayer perceptron with two hidden layers and one output layer.
 
 ### Vectorization and mini-batch
 
-When given a mini-batch of samples we can use vectorization to gain better efficiency in implementation. In a nutshell, we replace vectors by matrices. As before, denote by $\mathbf{X}$ the matrix of inputs from a minibatch. Then an MLP with two hidden layers can be expressed as 
+When given a mini-batch of samples we can use vectorization to gain better efficiency in implementation. In a nutshell, we replace vectors by matrices. As before, denote by $\mathbf{X}$ the matrix of inputs from a minibatch. Then an MLP with two hidden layers can be expressed as
 
 $$
 \begin{aligned}
@@ -70,7 +70,7 @@ This is easy to implement and easy to optimize. With some abuse of notation we d
 
 ## Activation Functions
 
-Let us look a bit more at examples of activation functions. After all, it is this alternation between linear and nonlinear terms that makes deep networks work. A rather popular choice, due to its simplicity of implementation and its efficacy is the ReLu function. 
+Let us look a bit more at examples of activation functions. After all, it is this alternation between linear and nonlinear terms that makes deep networks work. A rather popular choice, due to its simplicity of implementation and its efficacy is the ReLu function.
 
 ### ReLU Function
 
@@ -109,7 +109,7 @@ y.backward()
 xyplot(x, x.grad, 'grad of relu')
 ```
 
-Note that there are many variants to the ReLU function, such as the parameterized ReLU (pReLU) of [He et al., 2015](https://arxiv.org/abs/1502.01852). Effectively it adds a linear term to the ReLU, so some information still gets through, even when the argument is negative. 
+Note that there are many variants to the ReLU function, such as the parameterized ReLU (pReLU) of [He et al., 2015](https://arxiv.org/abs/1502.01852). Effectively it adds a linear term to the ReLU, so some information still gets through, even when the argument is negative.
 
 $$\mathrm{pReLU}(x) = \max(0, x) - \alpha x$$
 
@@ -166,7 +166,7 @@ y.backward()
 xyplot(x, x.grad, 'grad of tanh')
 ```
 
-In summary, we have a range of nonlinearities and now know how to layer them to build quite powerful network architectures. As a side note, we have now pretty much reached the state of the art in deep learning, anno 1990. The main difference is that we have a powerful deep learning framework which lets us build models in a few lines of code where previously thousands of lines of C and Fortran would have been needed. 
+In summary, we have a range of nonlinearities and now know how to layer them to build quite powerful network architectures. As a side note, we have now pretty much reached the state of the art in deep learning, anno 1990. The main difference is that we have a powerful deep learning framework which lets us build models in a few lines of code where previously thousands of lines of C and Fortran would have been needed.
 
 ## Summary
 
@@ -177,12 +177,11 @@ In summary, we have a range of nonlinearities and now know how to layer them to 
 ## Problems
 
 1. Compute the derivative of the Tanh and the pReLU activation function.
-1. Show that a multilayer perceptron using only ReLU (or pReLU) constructs a continuous piecewise linear function. 
+1. Show that a multilayer perceptron using only ReLU (or pReLU) constructs a continuous piecewise linear function.
 1. Show that $\mathrm{tanh}(x) + 1 = 2 \mathrm{sigmoid}(2x)$.
-1. Assume we have a multilayer perceptron *without* nonlinearities between the layers. In particular, assume that we have $d$ input dimensions, $d$ output dimensions and that one of the layers had only $d/2$ dimensions. Show that this network is less expressive (powerful) than a single layer perceptron. 
-1. Assume that we have a nonlinearity that applies to one minibatch at a time. What kinds of problems to you expect this to cause? 
+1. Assume we have a multilayer perceptron *without* nonlinearities between the layers. In particular, assume that we have $d$ input dimensions, $d$ output dimensions and that one of the layers had only $d/2$ dimensions. Show that this network is less expressive (powerful) than a single layer perceptron.
+1. Assume that we have a nonlinearity that applies to one minibatch at a time. What kinds of problems to you expect this to cause?
 
+## Discuss on our Forum
 
-## Scan the QR code to get to the [forum](https://discuss.gluon.ai/t/topic/6447)
-
-![](../img/qr_mlp.svg)
+<div id="discuss" topic_id="2338"></div>

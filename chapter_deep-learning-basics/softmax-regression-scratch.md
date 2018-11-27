@@ -96,12 +96,12 @@ def cross_entropy(y_hat, y):
 
 ## Classification Accuracy
 
-Given a class of predicted probability distributions `y_hat`, we use the one with the highest predicted probability as the output category. If it is consistent with the actual category `y`, then this prediction is correct.  The classification accuracy is the ratio between the number of correct predictions and the total number of predictions made. 
+Given a class of predicted probability distributions `y_hat`, we use the one with the highest predicted probability as the output category. If it is consistent with the actual category `y`, then this prediction is correct.  The classification accuracy is the ratio between the number of correct predictions and the total number of predictions made.
 
 The function `accuracy` is defined as follows: `y_hat.argmax(axis=1)` returns the largest element index to matrix `y_hat`, the result has the same shape as variable `y`. Now all we need to do is check whether both match. Since the equality operator `==` is datatype-sensitive (e.g. an `int` and a `float32` are never equal), we also need to convert both to the same type (we pick `float32`). The result is an NDArray containing entries of 0 (false) and 1 (true). Taking the mean yields the desired result.
 
 ```{.python .input  n=17}
-# 
+#
 def accuracy(y_hat, y):
     return (y_hat.argmax(axis=1) == y.astype('float32')).mean().asscalar()
 ```
@@ -137,7 +137,7 @@ The implementation for training softmax regression is very similar to the implem
 ```{.python .input  n=21}
 num_epochs, lr = 5, 0.1
 
-# 
+#
 def train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size,
               params=None, lr=None, trainer=None):
     for epoch in range(num_epochs):
@@ -179,7 +179,7 @@ gb.show_fashion_mnist(X[0:9], titles[0:9])
 ```
 
 ## Summary
- 
+
 We can use softmax regression to carry out multi-category classification. Training is very similar to that of linear regression: retrieve and read data, define models and loss functions, then train models using optimization algorithms. In fact, most common deep learning models have a similar training procedure.
 
 ## Problems
@@ -187,10 +187,9 @@ We can use softmax regression to carry out multi-category classification. Traini
 1. In this section, we directly implemented the softmax function based on the mathematical definition of the softmax operation. What problems might this cause (hint - try to calculate the size of $\exp(50)$)?
 1. The function `cross_entropy` in this section is implemented according to the definition of the cross-entropy loss function.  What could be the problem with this implementation (hint - consider the domain of the logarithm)?
 1. What solutions you can think of to fix the two problems above?
-1. Is it always a good idea to return the most likely label. E.g. would you do this for medical diagnosis? 
+1. Is it always a good idea to return the most likely label. E.g. would you do this for medical diagnosis?
 1. Assume that we want to use softmax regression to predict the next word based on some features. What are some problems that might arise from a large vocabulary?
 
+## Discuss on our Forum
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/741)
-
-![](../img/qr_softmax-regression-scratch.svg)
+<div id="discuss" topic_id="2336"></div>
