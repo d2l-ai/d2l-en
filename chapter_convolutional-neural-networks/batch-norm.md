@@ -73,7 +73,7 @@ def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
             mean = X.mean(axis=0)
             var = ((X - mean) ** 2).mean(axis=0)
         else:
-            # When using a two-dimensional convolutional layer, calculate the mean and variance on the channel dimension (axis=1). Here we need to 
+            # When using a two-dimensional convolutional layer, calculate the mean and variance on the channel dimension (axis=1). Here we need to
             # maintain the shape of X, so that the broadcast operation can be carried out later.
             mean = X.mean(axis=(0, 2, 3), keepdims=True)
             var = ((X - mean) ** 2).mean(axis=(0, 2, 3), keepdims=True)
@@ -201,10 +201,10 @@ gb.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
 * To learn about more application methods, such as how to use the mean and variance of the global average during training, view the documentation for the `BatchNorm` class.
 
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/1253)
-
-![](../img/qr_batch-norm.svg)
-
 ## References
 
 [1] Ioffe, S., & Szegedy, C. (2015). Batch normalization: Accelerating deep network training by reducing internal covariate shift. arXiv preprint arXiv:1502.03167.
+
+## Discuss on our Forum
+
+<div id="discuss" topic_id="2358"></div>

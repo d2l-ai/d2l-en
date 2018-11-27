@@ -128,18 +128,19 @@ gb.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
 * ResNet has had a major influence on the design of subsequent deep neural networks.
 
 
-## exercise
+## Problems
 
 * Refer to Table 1 in the ResNet thesis to implement different versions of ResNet[1].
 * For deeper networks, the ResNet thesis introduces a "bottleneck" architecture to reduce model complexity. Try to implement it [1].
 * In subsequent versions of ResNet, the author changed the "convolution, batch normalization, and activation" architecture to the "batch normalization, activation, and convolution" architecture. Make this improvement yourself([2], Figure 1).
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/1663)
-
-![](../img/qr_resnet.svg)
 
 ## References
 
 [1] He, K., Zhang, X., Ren, S., & Sun, J. (2016). Deep residual learning for image recognition. In Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 770-778).
 
 [2] He, K., Zhang, X., Ren, S., & Sun, J. (2016, October). Identity mappings in deep residual networks. In European Conference on Computer Vision (pp. 630-645). Springer, Cham.
+
+## Discuss on our Forum
+
+<div id="discuss" topic_id="2359"></div>

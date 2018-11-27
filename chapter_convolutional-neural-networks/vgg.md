@@ -86,8 +86,8 @@ gb.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
 ## Summary
 
 * VGG-11 constructs a network using reusable convolutional blocks. Different VGG models can be defined by the differences in the number of convolutional layers and output channels in each block.
-* The use of blocks leads to very compact representations of the network definition. It allows for efficient design of complex networks. 
-* In their work Simonyan and Ziserman experimented with various architetures. In particular, they found that several layers of deep and narrow convolutions (i.e. $3 \times 3$) were more effective than fewer layers of wider convolutions. 
+* The use of blocks leads to very compact representations of the network definition. It allows for efficient design of complex networks.
+* In their work Simonyan and Ziserman experimented with various architetures. In particular, they found that several layers of deep and narrow convolutions (i.e. $3 \times 3$) were more effective than fewer layers of wider convolutions.
 
 ## Problems
 
@@ -96,6 +96,6 @@ gb.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
 1. Try to change the height and width of the images in Fashion-MNIST from 224 to 96. What influence does this have on the experiments?
 1. Refer to Table 1 in the original [VGG Paper](https://arxiv.org/abs/1409.1556) to construct other common models, such as VGG-16 or VGG-19.
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/1277)
+## Discuss on our Forum
 
-![](../img/qr_vgg.svg)
+<div id="discuss" topic_id="2355"></div>

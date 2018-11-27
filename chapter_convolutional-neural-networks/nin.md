@@ -1,6 +1,6 @@
 # Network in Network (NiN)
 
-LeNet, AlexNet, and VGG all share a common design pattern: extract the spatial features through a sequence of convolutions and pooling layers and then post-process the representations via fully connected layers. The improvements upon LeNet by AlexNet and VGG mainly lie in how these later networks widen and deepen these two modules. An alternative is to use fully connected layers much earlier in the process. However, a careless use of a dense layer would destroy the spatial structure of the data entirely, since fully connected layers mangle all inputs. Network in Network (NiN) blocks offer an alternative. They were proposed by [Lin, Chen and Yan, 2013](https://arxiv.org/pdf/1312.4400.pdf) based on a very simple insight - to use an MLP on the channels for each pixel separately. 
+LeNet, AlexNet, and VGG all share a common design pattern: extract the spatial features through a sequence of convolutions and pooling layers and then post-process the representations via fully connected layers. The improvements upon LeNet by AlexNet and VGG mainly lie in how these later networks widen and deepen these two modules. An alternative is to use fully connected layers much earlier in the process. However, a careless use of a dense layer would destroy the spatial structure of the data entirely, since fully connected layers mangle all inputs. Network in Network (NiN) blocks offer an alternative. They were proposed by [Lin, Chen and Yan, 2013](https://arxiv.org/pdf/1312.4400.pdf) based on a very simple insight - to use an MLP on the channels for each pixel separately.
 
 ## NiN Blocks
 
@@ -8,7 +8,7 @@ We know that the inputs and outputs of convolutional layers are usually four-dim
 
 ![The figure on the left shows the network structure of AlexNet and VGG, and the figure on the right shows the network structure of NiN. ](../img/nin-compare.svg)
 
-The NiN block is the basic block in NiN. It concatenates a convolutional layer and two $1\times 1$ convolutional layers that act as fully connected layers (with ReLu in between). The convolution width of the first layer is typically set by the user. The subsequent widths are fixed to $1 \times 1$. 
+The NiN block is the basic block in NiN. It concatenates a convolutional layer and two $1\times 1$ convolutional layers that act as fully connected layers (with ReLu in between). The convolution width of the first layer is typically set by the user. The subsequent widths are fixed to $1 \times 1$.
 
 ```{.python .input  n=2}
 import gluonbook as gb
@@ -36,7 +36,7 @@ net.add(nin_block(96, kernel_size=11, strides=4, padding=0),
         nin_block(256, kernel_size=5, strides=1, padding=2),
         nn.MaxPool2D(pool_size=3, strides=2),
         nin_block(384, kernel_size=3, strides=1, padding=1),
-        nn.MaxPool2D(pool_size=3, strides=2), 
+        nn.MaxPool2D(pool_size=3, strides=2),
         nn.Dropout(0.5),
         # There are 10 label classes.
         nin_block(10, kernel_size=3, strides=1, padding=1),
@@ -72,7 +72,7 @@ gb.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
 
 * NiN uses blocks consisting of a convolutional layer and multiple $1\times 1$ convolutional layer. This can be used within the convolutional stack to allow for more per-pixel nonlinearity.
 * NiN removes the fully connected layers and replaces them with global average pooling (i.e. summing over all locations) after reducing the number of channels to the desired number of outputs (e.g. 10 for Fashion-MNIST).
-* Removing the dense layers reduces overfitting. NiN has dramatically fewer parameters. 
+* Removing the dense layers reduces overfitting. NiN has dramatically fewer parameters.
 * The NiN design influenced many subsequent convolutional neural networks designs.
 
 ## Problems
@@ -81,17 +81,11 @@ gb.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
 1. Why are there two $1\times 1$ convolutional layers in the NiN block? Remove one of them, and then observe and analyze the experimental phenomena.
 1. Calculate the resource usage for NiN
     * What is the number of parameters?
-    * What is the amount of computation? 
+    * What is the amount of computation?
     * What is the amount of memory needed during training?
     * What is the amount of memory needed during inference?
 1. What are possible problems with reducing the $384 \times 5 \times 5$ representation to a $10 \times 5 \times 5$ representation in one step?
 
+## Discuss on our Forum
 
-## Scan the QR Code to access [Discussions](https://discuss.gluon.ai/t/topic/1661)
-
-![](../img/qr_nin.svg)
-
-
-```{.python .input}
-
-```
+<div id="discuss" topic_id="2356"></div>
