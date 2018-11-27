@@ -129,10 +129,6 @@ Lastly, the Deep Learning community prides itself of sharing tools across academ
 1. Where else can you apply the end-to-end training approach? Physics? Engineering? Econometrics?
 1. Why would you want to build a Deep Network that is structured like a human brain? What would the advantage be? Why would you not want to do that (what are some key differences between microprocessors and neurons)?
 
-## Scan the QR code to get to the [forum](https://discuss.gluon.ai/t/topic/746)
-
-![](../img/qr_deep-learning-intro.svg)
-
 ## References
 
 [1] Machinery, C. (1950). Computing machinery and intelligence-AM Turing. Mind, 59(236), 433.
@@ -180,3 +176,5 @@ Lastly, the Deep Learning community prides itself of sharing tools across academ
 [22] Salton, G., & McGill, M. J. (1986). Introduction to modern information retrieval.
 
 [23] Tesauro, G. (1995), Transactions of the ACM, (38) 3, 58-68
+
+## Discuss on [our forum](https://discuss.mxnet.io/t/introduction-to-deep-learning/2310)
