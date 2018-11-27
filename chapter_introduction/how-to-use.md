@@ -37,8 +37,6 @@ The discussion forum of this book is [discuss.mxnet.io](https://discuss.mxnet.io
 ## Problems
 
 1. Register an account on the discussion forum of this book [discuss.mxnet.io](https://discuss.mxnet.io/).
-1. Install Python on your computer. 
+1. Install Python on your computer.
 
-## Scan the QR code to get to the [forum](https://discuss.mxnet.io/t/how-to-use-this-book-discussions/2011)
-
-![](../img/qr_how-to-use.svg)
+<div id="discuss" topic_id="2311"></div>
