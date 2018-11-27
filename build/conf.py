@@ -262,9 +262,11 @@ latex_elements = {
 \setCJKsansfont[BoldFont=Source Han Sans SC Medium]{Source Han Sans SC Normal}
 \setCJKmonofont{Source Han Sans SC Normal}
 
+\usepackage{setspace}
+\singlespacing
 
 \addto\captionsenglish{\renewcommand{\chaptername}{}}
-\addto\captionsenglish{\renewcommand{\contentsname}{目录}}
+\addto\captionsenglish{\renewcommand{\contentsname}{Contents}}
 
 \usepackage[draft]{minted}
 \fvset{breaklines=true, breakanywhere=true}
