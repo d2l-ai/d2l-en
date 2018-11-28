@@ -143,7 +143,7 @@ html_theme_options = {
     'primary_color': 'blue',
     'accent_color': 'deep_orange',
     'header_links' : [
-        ('PDF', './d2l-en.pdf', True, 'fas fa-file-pdf'),
+        ('PDF', 'https://en.diveintodeeplearning.org/d2l-en.pdf', True, 'fas fa-file-pdf'),
        # ('Jupyter Notebooks', './d2l-en.zip', True, 'fas fa-download'),
        # ('参与讨论', 'https://discuss.gluon.ai/c/lecture?order=views', True, 'fab fa-discourse'),
         ('Github', 'https://github.com/diveintodeeplearning/d2l-en', True, 'fab fa-github'),
