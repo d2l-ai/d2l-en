@@ -111,7 +111,6 @@ jupyter nbextension enable execute_time/ExecuteTime
 
 * Try to edit and run the code in this book locally.
 
+## Discuss on our Forum
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/6965)
-
-![](../img/qr_jupyter.svg)
+<div id="discuss" topic_id="2398"></div>

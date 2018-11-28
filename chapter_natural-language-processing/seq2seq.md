@@ -9,7 +9,7 @@ We have processed and analyzed variable-length input sequences in the previous c
 When the input and output are both variable-length sequences, we can use the encoder-decoder[1] or the seq2seq model[2]. Both models use two recurrent neural networks (RNNs) named encoders and decoders. The encoder is used to analyze the input sequence and the decoder is used to generate the output sequence.
 
 Figure 10.8 depicts a method for translating the English sentences above into French sentences using an encoder-decoder. In the training data set, we can attach a special symbol "&;eos&gt;" (end of sequence) after each sentence to indicate the termination of the sequence. For each time step, the encoder generates inputs following the order of words, punctuation, and special symbols "&lt;eos&gt;" in the English sentence. Figure 10.8 uses the hidden state of the encoder at the final time step as the encoding information for the input sentence. The decoder uses the encoding information of the input sentence, the output of the last time step, and the hidden state as inputs for each time step.
-We hope that the decoder can correctly output the translated French words, punctuation, and special symbols "&lt;eos&gt;" at each time step. 
+We hope that the decoder can correctly output the translated French words, punctuation, and special symbols "&lt;eos&gt;" at each time step.
 It should be noted that the input of the decoder at the initial time step uses a special symbol "&;eos&gt;" to indicate the beginning of the sequence.
 
 ![Use an encoder-decoder to translate this sentence from English to French.  The encoder and decoder are each recurrent neural networks. ](../img/seq2seq.svg)
@@ -37,7 +37,7 @@ The encoder discussed above is a unidirectional RNN, and the hidden state of eac
 
 As we just mentioned, the context variable $\boldsymbol{c}$ of the encoder's output encodes the entire input sequence $x_1, \ldots, x_T$. Given the output sequence $y_1, y_2, \ldots, y_{T'}$ in the training example, for each time step $t'$ (the symbol differs from the input sequence and the encoder's time step $t$), the conditional probability of decoder output $y_{t'}$ will be based on the previous output sequence $y_1, \ldots, y_{t'-1}$ and context variable $\boldsymbol{c}$, i.e. $\mathbb{P }(y_{t'} \mid y_1, \ldots, y_{t'-1}, \boldsymbol{c})$.
 
-Therefore, we can use another RNN as a decoder. 
+Therefore, we can use another RNN as a decoder.
 At time step $t^\prime$ of the output sequence, the decoder uses the output $y_{t^\prime-1}$ from the previous time step and context variable $\boldsymbol{c}$ as its input and transforms their hidden state $\boldsymbol{s}_{t^\prime-1}$ from the previous time step into hidden state $\boldsymbol{s}_{t^\prime}$ of the current time step.  Therefore, we can use function $f$ to express the transformation of the decoder's hidden layer:
 
 $$\boldsymbol{s}_{t^\prime} = g(y_{t^\prime-1}, \boldsymbol{c}, \boldsymbol{s}_{t^\prime-1}).$$
@@ -67,8 +67,8 @@ In model training, the mean of losses for all the output sequences is usually us
 ## Summary
 
 * The encoder-decoder (seq2seq) model can input and output a sequence of variable length.
-* The encoder-decoder uses two RNNs. 
-* In encoder-decoder training, we can use teacher forcing. 
+* The encoder-decoder uses two RNNs.
+* In encoder-decoder training, we can use teacher forcing.
 
 
 ## exercise
@@ -77,12 +77,14 @@ In model training, the mean of losses for all the output sequences is usually us
 * What methods can be used to design the output layer of the decoder?
 
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/4523)
 
-![](../img/qr_seq2seq.svg)
 
 ## Reference
 
 [1] Cho, K., Van Merriënboer, B., Gulcehre, C., Bahdanau, D., Bougares, F., Schwenk, H., & Bengio, Y. (2014). Learning phrase representations using RNN encoder-decoder for statistical machine translation. arXiv preprint arXiv:1406.1078.
 
 [2] Sutskever, I., Vinyals, O., & Le, Q. V. (2014). Sequence to sequence learning with neural networks. In Advances in neural information processing systems (pp. 3104-3112).
+
+## Discuss on our Forum
+
+<div id="discuss" topic_id="2393"></div>

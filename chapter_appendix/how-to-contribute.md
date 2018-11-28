@@ -79,10 +79,6 @@ After submitting the request, you will see the page shown in Figure 11.25, which
 * If you feel that some parts of the book can be improved, try submitting a pull request.
 
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/7570)
-
-![](../img/qr_how-to-contribute.svg)
-
 
 ## References
 
@@ -93,3 +89,7 @@ After submitting the request, you will see the page shown in Figure 11.25, which
 [3] Install Git. https://git-scm.com/book/zh/v2
 
 [4] URL of GitHub. https://github.com/
+
+## Discuss on our Forum
+
+<div id="discuss" topic_id="2401"></div>

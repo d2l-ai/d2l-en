@@ -81,10 +81,12 @@ gb.train_gluon_ch7('adam', {'learning_rate': 0.01}, features, labels)
 * Some people say that Adam is a combination of RMSProp and momentum. Why do you think they say this?
 
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/2279)
 
-![](../img/qr_adam.svg)
 
 ## Reference
 
 [1] Kingma, D. P., & Ba, J. (2014). Adam: A method for stochastic optimization. arXiv preprint arXiv:1412.6980.
+
+## Discuss on our Forum
+
+<div id="discuss" topic_id="2378"></div>

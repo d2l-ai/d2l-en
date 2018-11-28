@@ -54,7 +54,6 @@ So, is there a way to better balance these two features in the language model? W
 * Suppose there are 100,000 words in the training data set. How many word frequencies and multi-word adjacent frequencies does a four-gram need to store?
 * What other applications of language models can you think of?
 
+## Discuss on our Forum
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/6650)
-
-![](../img/qr_lang-model.svg)
+<div id="discuss" topic_id="23"></div>

@@ -128,9 +128,7 @@ get_analogy('do', 'did', 'go', glove_6b50d)
 * If the dictionary is extremely large, how can we improve the synonym and analogy search speed?
 
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/4373)
 
-![](../img/qr_similarity-analogy.svg)
 
 ## Reference
 
@@ -139,3 +137,7 @@ get_analogy('do', 'did', 'go', glove_6b50d)
 [2] GloVe project website. https://nlp.stanford.edu/projects/glove/
 
 [3] fastText project website. https://fasttext.cc/
+
+## Discuss on our Forum
+
+<div id="discuss" topic_id="2390"></div>

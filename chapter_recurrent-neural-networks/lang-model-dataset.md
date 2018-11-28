@@ -124,7 +124,6 @@ for X, Y in data_iter_consecutive(my_seq, batch_size=2, num_steps=6):
 * What other mini-batch data sampling methods can you think of?
 * If we want a sequence example to be a complete sentence, what kinds of problems does this introduce in mini-batch sampling?
 
+## Discuss on our Forum
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/7876)
-
-![](../img/qr_lang-model-dataset.svg)
+<div id="discuss" topic_id="23"></div>

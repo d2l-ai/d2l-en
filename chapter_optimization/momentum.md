@@ -159,7 +159,6 @@ gb.train_gluon_ch7('sgd', {'learning_rate': 0.004, 'momentum': 0.9}, features,
 
 * Use other combinations of momentum hyperparameters and learning rates and observe and analyze the different experimental results.
 
+## Discuss on our Forum
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/1879)
-
-![](../img/qr_momentum.svg)
+<div id="discuss" topic_id="2374"></div>

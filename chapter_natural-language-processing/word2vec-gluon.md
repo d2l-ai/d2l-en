@@ -346,9 +346,7 @@ get_similar_tokens('chip', 3, net[0])
 * When the data set is large, we usually sample the context words and the noise words for the central target word in the current mini-batch only when updating the model parameters. In other words, the same central target word may have different context words or noise words in different epochs. What are the benefits of this sort of training? Try to implement this training method.
 
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/7761)
 
-![](../img/qr_word2vec-gluon.svg)
 
 
 ## Reference
@@ -356,3 +354,7 @@ get_similar_tokens('chip', 3, net[0])
 [1] Penn Tree Bank. https://catalog.ldc.upenn.edu/ldc99t42
 
 [2] Mikolov, T., Sutskever, I., Chen, K., Corrado, G. S., & Dean, J. (2013). Distributed representations of words and phrases and their compositionality. In Advances in neural information processing systems (pp. 3111-3119).
+
+## Discuss on our Forum
+
+<div id="discuss" topic_id="2387"></div>

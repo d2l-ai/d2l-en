@@ -26,7 +26,7 @@ To address this, GloVe, a word embedding model that came after word2vec, adopts 
 
 1. Here, we use the non-probability distribution variables $p'_{ij}=x_{ij}$ and $q'_{ij}=\exp(\mathbf{u}_j^\top \mathbf{v}_i)$ and take their logs. Therefore, we get the square loss $\left(\log\,p'_{ij} - \log\,q'_{ij}\right)^2 = \left(\mathbf{u}_j^\top \mathbf{v}_i - \log\,x_{ij}\right)^2$.
 2. We add two scalar model parameters for each word $w_i$: the bias terms $b_i$ (for central target words) and $c_i$( for context words).
-3. Replace the weight of each loss with the function $h(x_{ij})$. The weight function $h(x)$ is a monotone increasing function with the range $[0,1]. 
+3. Replace the weight of each loss with the function $h(x_{ij})$. The weight function $h(x)$ is a monotone increasing function with the range $[0,1].
 
 Therefore, the goal of GloVe is to minimize the loss function.
 
@@ -78,12 +78,13 @@ By taking the square error and weighting the left and right sides of the formula
 ## exercise
 
 * If a word appears in the context window of another word, how can we use the distance between them in the text sequence to redesign the method for computing the conditional probability $p_{ij}$? Hint: See section 4.2 from the paper GloVe[1].
-* For any word, will its central target word bias term and context word bias term be equivalent to each other in GloVe? Why? 
+* For any word, will its central target word bias term and context word bias term be equivalent to each other in GloVe? Why?
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/4372)
-
-![](../img/qr_glove.svg)
 
 ## Reference
 
 [1] Pennington, J., Socher, R., & Manning, C. (2014). Glove: Global vectors for word representation. In Proceedings of the 2014 conference on empirical methods in natural language processing (EMNLP) (pp. 1532-1543).
+
+## Discuss on our Forum
+
+<div id="discuss" topic_id="2389"></div>

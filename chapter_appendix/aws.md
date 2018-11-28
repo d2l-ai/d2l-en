@@ -1,6 +1,6 @@
 # Using AWS to Run Code
 
-If your local machine has limited computing resources, you can use cloud computing services to obtain more powerful computing resources and use them to run the deep learning code in this document. In this section, we will show you how to apply for instances and use Jupyter Notebook to run code on AWS (Amazon's cloud computing service). The example here includes two steps:  
+If your local machine has limited computing resources, you can use cloud computing services to obtain more powerful computing resources and use them to run the deep learning code in this document. In this section, we will show you how to apply for instances and use Jupyter Notebook to run code on AWS (Amazon's cloud computing service). The example here includes two steps:
 
 1. Apply for a K80 GPU "p2.xlarge" instance.
 2. Install CUDA and the corresponding MXNet GPU version.
@@ -185,7 +185,6 @@ If you do not plan to use the instance again for a long time, right-click on the
 
 * The cloud offers convenience, but it does not come cheap. Research the prices of cloud services and find ways to reduce overhead.
 
+## Discuss on our Forum
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/6154)
-
-![](../img/qr_aws.svg)
+<div id="discuss" topic_id="2399"></div>

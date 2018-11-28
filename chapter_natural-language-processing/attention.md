@@ -11,7 +11,7 @@ In the ["Encoder-Decoder(seq2seq)"](seq2seq.md) section, we were able to disting
 
 $$\boldsymbol{s}_{t'} = g(\boldsymbol{y}_{t'-1}, \boldsymbol{c}_{t'}, \boldsymbol{s}_{t'-1}).$$
 
-The key here is to figure out how to compute the context variable $\boldsymbol{c}_{t'}$ and use it to update the hidden state $\boldsymbol{s}_{t'}$. Below, we will introduce these two key points separately. 
+The key here is to figure out how to compute the context variable $\boldsymbol{c}_{t'}$ and use it to update the hidden state $\boldsymbol{s}_{t'}$. Below, we will introduce these two key points separately.
 
 
 ## Compute the Context Variable
@@ -45,7 +45,7 @@ Here, $\boldsymbol{v}$, $\boldsymbol{W}_s$, and $\boldsymbol{W}_h$ are all model
 We can also use vectorization to compute more efficiently within the attention mechanism. Generally speaking, the input of the attention model consists of query entries, key entries, and value entries. There is also a one-to-one correspondence between the key entries and value entries. Here, the value entry is a set of entries that requires a weighted average. In the weighted average, the weight of the value entry is obtained by computing the query entry and the key entry corresponding to the value entry.
 
 In the example above, the query entry is the hidden state of the decoder, and the key entry and value entry are hidden states of the encoder.
-Now, we will look at a common simple case where the encoder and decoder have $h$ hidden units and we have the function $a(\boldsymbol{s}, \boldsymbol{h})=\boldsymbol{s}^ \top \boldsymbol{h}$. Assume that we want to compute the context vector $\boldsymbol{c}_{t'}\in \mathbb{R}^{h}$ based on the single hidden state of the decoder $\boldsymbol{s}_{t' - 1} \in \mathbb{R}^{h}$ and all the hidden states of the encoder $\boldsymbol{h}_t \in \mathbb{R}^{h}, t = 1,\ldots,T$. 
+Now, we will look at a common simple case where the encoder and decoder have $h$ hidden units and we have the function $a(\boldsymbol{s}, \boldsymbol{h})=\boldsymbol{s}^ \top \boldsymbol{h}$. Assume that we want to compute the context vector $\boldsymbol{c}_{t'}\in \mathbb{R}^{h}$ based on the single hidden state of the decoder $\boldsymbol{s}_{t' - 1} \in \mathbb{R}^{h}$ and all the hidden states of the encoder $\boldsymbol{h}_t \in \mathbb{R}^{h}, t = 1,\ldots,T$.
 We can let the query entry matrix $\boldsymbol{Q} \in \mathbb{R}^{1 \times h}$ be $\boldsymbol{s}_{t' - 1}^\top$ and the key entry matrix $\boldsymbol{K} \in \mathbb{R}^{T \times h}$ have the same value as the entry matrix $\boldsymbol{V} \in \mathbb{R}^{T \times h}$, with all the values in row $t$ set to $\boldsymbol{h}_t^\top$. Now, we only need to use vectorization
 
 $$\text{softmax}(\boldsymbol{Q}\boldsymbol{K}^\top)\boldsymbol{V}$$
@@ -77,7 +77,7 @@ Here, $\boldsymbol{W}$ and $\boldsymbol{b}$ with subscripts are the weight param
 
 * We can use different context variables at each time step of the decoder and assign different attentions to the information encoded in different time steps of the input sequence.
 * Generally speaking, the input of the attention model consists of query entries, key entries, and value entries. There is also a one-to-one correspondence between the key entries and value entries.
-* With the attention mechanism, we can adopt vectorization for higher efficiency. 
+* With the attention mechanism, we can adopt vectorization for higher efficiency.
 
 
 ## exercise
@@ -88,11 +88,10 @@ Here, $\boldsymbol{W}$ and $\boldsymbol{b}$ with subscripts are the weight param
 
 * In addition to natural language processing, where else can the attention mechanism be applied?
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/6759)
-
-![](../img/qr_attention.svg)
-
-
 ## Reference
 
 [1] Bahdanau, D., Cho, K., & Bengio, Y. (2014). Neural machine translation by jointly learning to align and translate. arXiv preprint arXiv:1409.0473.
+
+## Discuss on our Forum
+
+<div id="discuss" topic_id="2395"></div>
