@@ -5,11 +5,11 @@ This section summarizes the basic knowledge of linear algebra, differentiation, 
 
 ## Linear Algebra
 
-Below we summarize the concepts of vectors, matrices, operations, norms, feature vectors, and eigenvalues.
+Below we summarize the concepts of vectors, matrices, operations, norms, eigenvectors, and eigenvalues.
 
 ### Vectors
 
-Vectors in this book refer to column vectors. An expression for an $n$ dimension vector $\boldsymbol{x}$ can be written as
+Vectors in this book refer to column vectors. An $n$-dimensional vector $\boldsymbol{x}$ can be written as
 
 $$
 \boldsymbol{x} =
@@ -21,7 +21,7 @@ $$
 \end{bmatrix},
 $$
 
-Here, $x_1, \ldots, x_n$ are elements of the vector. We denote the $n$ dimension vector $\boldsymbol{x}$ whose elements are all real numbers as $\boldsymbol{x} \in \mathbb{R}^{n}$ or $\boldsymbol{x} \in \mathbb{R}^{n \times 1}$.
+where $x_1, \ldots, x_n$ are elements of the vector. To express that $\boldsymbol{x}$ is an $n$-dimensional vector with elements from the set of real numbers, we write $\boldsymbol{x} \in \mathbb{R}^{n}$ or $\boldsymbol{x} \in \mathbb{R}^{n \times 1}$.
 
 
 ### Matrices
@@ -38,14 +38,16 @@ $$
 \end{bmatrix},
 $$
 
-Here, $x_{ij}$ is the element in row $i$ and column $j$ in the matrix $\boldsymbol{X}$ ($1 \leq i \leq m, 1 \leq j \leq n$). We denote the matrix $\boldsymbol{X}$ with $m$ rows and $n$ columns, whose elements are all real numbers as $\boldsymbol{X} \in \mathbb{R}^{m \times n}$. It is not difficult to see that vectors are special matrices.
+Here, $x_{ij}$ is the element in row $i$ and column $j$ in the matrix $\boldsymbol{X}$ ($1 \leq i \leq m, 1 \leq j \leq n$). To express that $\boldsymbol{X}$ is a matrix with $m$ rows and $n$ columns consisting of elements from the set of real numbers, we write $\boldsymbol{X} \in \mathbb{R}^{m \times n}$. It is not difficult to see that vectors are a special class of matrices.
 
 
-### Operation
+### Operations
 
-Assume the elements in the $n$ dimension vector $\boldsymbol{a}$ are $a_1, \ldots, a_n$, and the elements in the $n$ dimension vector $\boldsymbol{b}$ are $b_1, \ldots, b_n$. The dot product (internal product) of vectors $\boldsymbol{a}$ and $\boldsymbol{b}$ is a scalar:
+Assume the elements in the $n$-dimensional vector $\boldsymbol{a}$ are $a_1, \ldots, a_n$, and the elements in the $n$-dimensional vector $\boldsymbol{b}$ are $b_1, \ldots, b_n$. The dot product (internal product) of vectors $\boldsymbol{a}$ and $\boldsymbol{b}$ is a scalar:
 
-$\boldsymbol{a} \cdot \boldsymbol{b} = a_1 b_1 + \ldots + a_n b_n.$
+$$
+\boldsymbol{a} \cdot \boldsymbol{b} = a_1 b_1 + \ldots + a_n b_n.
+$$
 
 
 Assume two matrices with $m$ rows and $n$ columns:
@@ -67,7 +69,8 @@ $$
 \end{bmatrix}.
 $$
 
-矩阵$\boldsymbol{A}$的转置是一个$n$行$m$列矩阵，它的每一行其实是原矩阵的每一列：
+The transpose of a matrix $\boldsymbol{A}$ with $m$ rows and $n$ columns is a matrix with $n$ rows and $m$ columns whose rows are formed from the columns of the original matrix:
+
 $$
 \boldsymbol{A}^\top =
 \begin{bmatrix}
@@ -79,7 +82,7 @@ $$
 $$
 
 
-To add two matrices of the same shape we add the two matrices by element:
+To add two matrices of the same shape, we add them element-wise:
 
 $$
 \boldsymbol{A} + \boldsymbol{B} =
@@ -91,7 +94,7 @@ $$
 \end{bmatrix}.
 $$
 
-We use the symbol $\odot$ to indicate the multiplication by element of two matrices:
+We use the symbol $\odot$ to indicate the element-wise multiplication of two matrices:
 
 $$
 \boldsymbol{A} \odot \boldsymbol{B} =
@@ -103,7 +106,7 @@ $$
 \end{bmatrix}.
 $$
 
-Define a scalar $k$. Multiplication of scalars and matrices is also a multiplication by element operation:
+Define a scalar $k$. Multiplication of scalars and matrices is also an element-wise multiplication:
 
 
 $$
@@ -116,9 +119,9 @@ k\boldsymbol{A} =
 \end{bmatrix}.
 $$
 
-Other operations such as scalar and matrix addition and division by element, are similar to the multiplication operation in the above equation. Calculating square root and taking logarithm of a matrix by element are performed calculating square root or taking logarithm for each element of the matrix and obtaining a matrix with the same shape as the original matrix.
+Other operations such as scalar and matrix addition, and division by an element are similar to the multiplication operation in the above equation. Calculating the square root or taking logarithms of a matrix are performed by calculating the square root or logarithm, respectively, of each element of the matrix to obtain a matrix with the same shape as the original matrix.
 
-Matrix multiplication is different from multiplication by element. Assume $\boldsymbol{A}$ is a matrix with $m$ rows and $p$ columns and $\boldsymbol{B}$ is a matrix with $p$ rows and $n$ columns. Result of multiplication of two matrices:
+Matrix multiplication is different from element-wise matrix multiplication. Assume $\boldsymbol{A}$ is a matrix with $m$ rows and $p$ columns and $\boldsymbol{B}$ is a matrix with $p$ rows and $n$ columns. The product (matrix multiplication) of these two matricies is denoted
 
 $$
 \boldsymbol{A} \boldsymbol{B} =
@@ -135,17 +138,17 @@ $$
     b_{21} & b_{22} & \dots  & b_{2j} & \dots  & b_{2n} \\
     \vdots & \vdots & \ddots & \vdots & \ddots & \vdots \\
     b_{p1} & b_{p2} & \dots  & b_{pj} & \dots  & b_{pn}
-\end{bmatrix}
+\end{bmatrix},
 $$
 
-is a matrix with $m$ rows and $n$ columns, while the element in row $i$ and column $j$ ($1 \leq i \leq m, 1 \leq j \leq n$) is
+is a matrix with $m$ rows and $n$ columns, with the element in row $i$ and column $j$ ($1 \leq i \leq m, 1 \leq j \leq n$) equal to
 
 $$a_{i1}b_{1j}  + a_{i2}b_{2j} + \ldots + a_{ip}b_{pj} = \sum_{k=1}^p a_{ik}b_{kj}.$$
 
 
 ### Norms
 
-Assume the elements in the $n$ dimension vector $\boldsymbol{x}$ are $x_1, \ldots, x_n$. The $L_p$ norm of the vector $\boldsymbol{x}$ is
+Assume the elements in the $n$-dimensional vector $\boldsymbol{x}$ are $x_1, \ldots, x_n$. The $L_p$ norm of the vector $\boldsymbol{x}$ is
 
 $$\|\boldsymbol{x}\|_p = \left(\sum_{i=1}^n \left|x_i \right|^p \right)^{1/p}.$$
 
@@ -157,7 +160,7 @@ While the $L_2$ norm of $\boldsymbol{x}$ is the square root of the sum of the sq
 
 $$\|\boldsymbol{x}\|_2 = \sqrt{\sum_{i=1}^n x_i^2}.$$
 
-我们通常用$\|\boldsymbol{x}\|$指代$\|\boldsymbol{x}\|_2$。
+We usually use $\|\boldsymbol{x}\|$ to refer to the $L_2$ norm of $\boldsymbol{x}$.
 
 Assume $\boldsymbol{X}$ is a matrix with $m$ rows and $n$ columns. The Frobenius norm of matrix $\boldsymbol{X}$ is the square root of the sum of the squares of the matrix elements:
 
@@ -166,14 +169,14 @@ $$\|\boldsymbol{X}\|_F = \sqrt{\sum_{i=1}^m \sum_{j=1}^n x_{ij}^2},$$
 Here, $x_{ij}$ is the element of matrix $\boldsymbol{X}$ in row $i$ and column $j$.
 
 
-### Feature Vectors and Eigenvalues
+### Eigenvectors and Eigenvalues
 
 
-For a matrix $\boldsymbol{A}$ with $n$ rows and $n$ columns, suppose there is a scalar $\lambda$ and a non-zero $n$ dimension vector $\boldsymbol{v}$ such that
+Let $\boldsymbol{A}$ be a matrix with $m$ rows and $n$ columns. If $\lambda$ is a scalar and $\boldsymbol{v}$ is a non-zero $n$-dimensional vector with
 
 $$\boldsymbol{A} \boldsymbol{v} = \lambda \boldsymbol{v},$$
 
-In this case, $\boldsymbol{v}$ is a feature vector of matrix $\boldsymbol{A}$, and the scalar $\lambda$ is the eigenvalue corresponding to $\boldsymbol{v}$.
+then $\boldsymbol{v}$ is an called eigenvector vector of matrix $\boldsymbol{A}$, and $\lambda$ is called an eigenvalue of $\boldsymbol{A}$ corresponding to $\boldsymbol{v}$.
 
 
 
@@ -184,17 +187,17 @@ Here we briefly introduce some basic concepts and calculations for differentials
 
 ### Derivatives and Differentials
 
-Assume the input and output of function $f: \mathbb{R} \rightarrow \mathbb{R}$ are both scalars. The derivative of function $f$ is:
+Assume the input and output of function $f: \mathbb{R} \rightarrow \mathbb{R}$ are both scalars. The derivative $f$ is defined as
 
 $$f'(x) = \lim_{h \rightarrow 0} \frac{f(x+h) - f(x)}{h},$$
 
-and we assume that the limit exists. Given $y = f(x)$, where $x$ and $y$ are the arguments and dependent variables of function $f$, respectively, the following derivative and differential expressions are equivalent:
+when the limit exists (and $f$ is said to be \textit{differentiable}). Given $y = f(x)$, where $x$ and $y$ are the arguments and dependent variables of function $f$, respectively, the following derivative and differential expressions are equivalent:
 
 $$f'(x) = y' = \frac{\text{d}y}{\text{d}x} = \frac{\text{d}f}{\text{d}x} = \frac{\text{d}}{\text{d}x} f(x) = \text{D}f(x) = \text{D}_x f(x),$$
 
-Here, the symbols $\text{D}$ and $\text{d}/\text{d}x$ are also called differential operators. Common differential calculations are $\text{D}C = 0$ ($C$ is a constant), $\text{D}x^n = nx^{n-1}$ ($n$ is a constant), and $ \text{D}e^x = e^x$, $\text{D}\ln(x) = 1/x$.
+Here, the symbols $\text{D}$ and $\text{d}/\text{d}x$ are also called differential operators. Common differential calculations are $\text{D}C = 0$ ($C$ is a constant), $\text{D}x^n = nx^{n-1}$ ($n$ is a constant), and $\text{D}e^x = e^x$, $\text{D}\ln(x) = 1/x$.
 
-If functions $f$ and $g$ are both derivable and we assume $C$ is a constant, then
+If functions $f$ and $g$ are both differentiable and $C$ is a constant, then
 
 $$
 \begin{aligned}
@@ -206,18 +209,18 @@ $$
 $$
 
 
-If functions $y=f(u)$ and $u=g(x)$ are both derivable, according to the chain rule,
+If functions $y=f(u)$ and $u=g(x)$ are both differentiable, then the Chain Rule states that
 
 $$\frac{\text{d}y}{\text{d}x} = \frac{\text{d}y}{\text{d}u} \frac{\text{d}u}{\text{d}x}.$$
 
 
 ### Taylor Expansion
 
-The Taylor expansion of function $f$ is
+The Taylor expansion of function $f$ is given by the infinite sum
 
 $$f(x) = \sum_{n=0}^\infty \frac{f^{(n)}(a)}{n!} (x-a)^n,$$
 
-Here, $f^{(n)}$ is the $n$th derivative of function $f$ (find the $n$ derivative), and $n!$ is the factorial of $n$. Assuming $\epsilon$ is a sufficiently small number, if we replace $x$ and $a$ with $x+\epsilon$ and $x$ respectively, we can get
+when it exists. Here, $f^{(n)}$ is the $n$-th derivative of $f$, and $n!$ is the factorial of $n$. For a sufficiently small number $\epsilon$, we can replace $x$ and $a$ with $x+\epsilon$ and $x$ respectively to obtain
 
 $$f(x + \epsilon) \approx f(x) + f'(x) \epsilon + \mathcal{O}(\epsilon^2).$$
 
@@ -229,7 +232,7 @@ $$f(x + \epsilon) \approx f(x) + f'(x) \epsilon.$$
 
 ### Partial Derivatives
 
-Assume $u$ is a function with $n$ arguments, $u = f(x_1, x_2, \ldots, x_n)$, while its partial derivative with respect to the $i$th variable $x_i$ is
+Let $u = f(x_1, x_2, \ldots, x_n)$ be a function with $n$ arguments. The partial derivative of $u$ with respect to its $i$-th  parameter $x_i$ is
 
 $$ \frac{\partial u}{\partial x_i} = \lim_{h \rightarrow 0} \frac{f(x_1, \ldots, x_{i-1}, x_i+h, x_{i+1}, \ldots, x_n) - f(x_1, \ldots, x_i, \ldots, x_n)}{h}.$$
 
@@ -245,25 +248,25 @@ To calculate $\partial u/\partial x_i$, we simply treat $x_1, \ldots, x_{i-1}, x
 ### Gradients
 
 
-Assume the input of function $f: \mathbb{R}^n \rightarrow \mathbb{R}$ is an $n$ dimension vector $\boldsymbol{x} = [x_1, x_2, \ldots, x_n]^\top$ and the output is a scalar. The gradient of function $f(\boldsymbol{x})$ with respect to $\boldsymbol{x}$ is a vector of $n$ partial derivatives:
+Assume the input of function $f: \mathbb{R}^n \rightarrow \mathbb{R}$ is an $n$-dimensional vector $\boldsymbol{x} = [x_1, x_2, \ldots, x_n]^\top$ and the output is a scalar. The gradient of function $f(\boldsymbol{x})$ with respect to $\boldsymbol{x}$ is a vector of $n$ partial derivatives:
 
 $$\nabla_{\boldsymbol{x}} f(\boldsymbol{x}) = \bigg[\frac{\partial f(\boldsymbol{x})}{\partial x_1}, \frac{\partial f(\boldsymbol{x})}{\partial x_2}, \ldots, \frac{\partial f(\boldsymbol{x})}{\partial x_n}\bigg]^\top.$$
 
 
 To be concise, we sometimes use $\nabla f(\boldsymbol{x})$ to replace $\nabla_{\boldsymbol{x}} f(\boldsymbol{x})$.
 
-Assuming $\boldsymbol{x}$ is a vector, common gradient calculations include
+If $\boldsymbol{A}$ is a matrix with $m$ rows and $n$ columns, and $\boldsymbol{x}$ is an $n$-dimensional vector, the following identities hold:
 
 $$
 \begin{aligned}
-\nabla_{\boldsymbol{x}} \boldsymbol{A}^\top \boldsymbol{x} &= \boldsymbol{A}, \\
+\nabla_{\boldsymbol{x}} \boldsymbol{A} \boldsymbol{x} &= \boldsymbol{A}^\top, \\
 \nabla_{\boldsymbol{x}} \boldsymbol{x}^\top \boldsymbol{A}  &= \boldsymbol{A}, \\
 \nabla_{\boldsymbol{x}} \boldsymbol{x}^\top \boldsymbol{A} \boldsymbol{x}  &= (\boldsymbol{A} + \boldsymbol{A}^\top)\boldsymbol{x},\\
 \nabla_{\boldsymbol{x}} \|\boldsymbol{x} \|^2 &= \nabla_{\boldsymbol{x}} \boldsymbol{x}^\top \boldsymbol{x} = 2\boldsymbol{x}.
 \end{aligned}
 $$
 
-类似地，假设$\boldsymbol{X}$是一个矩阵，那么
+Similarly if $\boldsymbol{X}$ is a matrix, the
 $$\nabla_{\boldsymbol{X}} \|\boldsymbol{X} \|_F^2 = 2\boldsymbol{X}.$$
 
 
@@ -271,7 +274,7 @@ $$\nabla_{\boldsymbol{X}} \|\boldsymbol{X} \|_F^2 = 2\boldsymbol{X}.$$
 
 ### Hessian Matrices
 
-Assume the input of function $f: \mathbb{R}^n \rightarrow \mathbb{R}$ is an $n$ dimension vector $\boldsymbol{x} = [x_1, x_2, \ldots, x_n]^\top$ and the output is a scalar. Assuming that all second-order partial derivatives of function $f$ exist, then the Hessian matrix $\boldsymbol{H}$ of $f$ is a matrix with $n$ rows and $n$ columns:
+Assume the input of function $f: \mathbb{R}^n \rightarrow \mathbb{R}$ is an $n$-dimensional vector $\boldsymbol{x} = [x_1, x_2, \ldots, x_n]^\top$ and the output is a scalar. If all second-order partial derivatives of function $f$ exist and are continuous, then the Hessian matrix $\boldsymbol{H}$ of $f$ is a matrix with $m$ rows and $n$ columns given by
 
 $$
 \boldsymbol{H} =
@@ -283,9 +286,9 @@ $$
 \end{bmatrix},
 $$
 
-Here, second-order partial derivative
+Here, the second-order partial derivative is evaluated
 
-$$\frac{\partial^2 f}{\partial x_i \partial x_j} = \frac{\partial }{\partial x_j} \left(\frac{\partial f}{ \partial x_i}\right).$$
+$$\frac{\partial^2 f}{\partial x_i \partial x_j} = \frac{\partial }{\partial x_i} \left(\frac{\partial f}{ \partial x_j}\right).$$
 
 
 
@@ -295,27 +298,26 @@ Finally, we will briefly introduce conditional probability, expectation, and uni
 
 ### Conditional Probability
 
-Assume the probability of event $A$ and event $B$ are $\mathbb{P}(A)$ and $\mathbb{P}(B)$, respectively. The probability of the simultaneous occurrence of the two events is denoted as $\mathbb{P }(A \cap B)$ or $\mathbb{P}(A, B)$. Given event $B$, the conditional probability of event $A$
+Denote the probability of event $A$ and event $B$ as $\mathbb{P}(A)$ and $\mathbb{P}(B)$, respectively. The probability of the simultaneous occurrence of the two events is denoted as $\mathbb{P}(A \cap B)$ or $\mathbb{P}(A, B)$. If $B$ has non-zero probability, the conditional probability of event $A$ given that $B$ has occurred is
 
-$$\mathbb{P}(A \mid B) = \frac{\mathbb{P}(A \cap B)}{\mathbb{P}(B)}.$$
+$$\mathbb{P}(A \mid B) = \frac{\mathbb{P}(A \cap B)}{\mathbb{P}(B)},$$
 
 That is,
 
 $$\mathbb{P}(A \cap B) = \mathbb{P}(B) \mathbb{P}(A \mid B) = \mathbb{P}(A) \mathbb{P}(B \mid A).$$
 
-When satisfying
+If
 
 $$\mathbb{P}(A \cap B) = \mathbb{P}(A) \mathbb{P}(B),$$
 
-event $A$ and event $B$ are independent of each other.
+then $A$ and $B$ are said to be independent of each other.
 
 
 ### Expectation
 
-Th expectation (or average) of random variable $X$ is denoted as
+A random variable takes values that represent possible outcomes of an experiment. The expectation (or average) of the random variable $X$ is denoted as
 
 $$\mathbb{E}(X) = \sum_{x} x \mathbb{P}(X = x).$$
-
 
 
 ### Uniform Distribution
@@ -323,14 +325,12 @@ $$\mathbb{E}(X) = \sum_{x} x \mathbb{P}(X = x).$$
 Assume random variable $X$ obeys a uniform distribution over $[a, b]$, i.e. $X \sim U( a, b)$. In this case, random variable $X$ has the same probability of being any number between $a$ and $b$.
 
 
-
-
 ## Summary
 
 * This section summarizes the basic knowledge of linear algebra, differentiation, and probability required to understand the contents in this book.
 
 
-## exercise
+## Exercises
 
 * Find the gradient of function $f(\boldsymbol{x}) = 3x_1^2 + 5e^{x_2}$.
 
