@@ -10,4 +10,4 @@ http://diveintodeeplearning.org.s3-website-us-west-2.amazonaws.com/
 
 ## Contribute
 
-Feel free to submit a pull request. We will include acknowledgement of all the contributors in the book.
+Feel free to submit a pull request. We will acknowledge all the contributors in the book.
