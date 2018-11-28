@@ -1,6 +1,6 @@
 Dive into Deep Learning (D2L)
 
-[![Build Status](http://ci.mxnet.io/job/d2l-en/job/master/badge/icon)](http://ci.diveintodeeplearning.org/job/en/job/master/)
+[![Build Status](http://ci.diveintodeeplearning.org/job/en/job/master/badge/icon)](http://ci.diveintodeeplearning.org/job/en/job/master/)
 
 Website:
 
