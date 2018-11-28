@@ -2,11 +2,6 @@
 
 [![Build Status](http://ci.diveintodeeplearning.org/job/en/job/master/badge/icon)](http://ci.diveintodeeplearning.org/job/en/job/master/)
 
-## Website
-
-http://diveintodeeplearning.org.s3-website-us-west-2.amazonaws.com/
-
-
 ## Contribute
 
 The contents of the book are under revision. We expect that the quality will be constantly improved.
