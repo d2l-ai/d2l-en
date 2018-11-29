@@ -6,9 +6,11 @@
 
 The contents of the book are under revision. We expect that the quality will be constantly improved.
 
-Feel free to submit a pull request. We will acknowledge all the contributors in the book. 
+Feel free to contribute to this book ([learn how to contribute](http://en.diveintodeeplearning.org/chapter_appendix/how-to-contribute.html)). All the contributors (Github ID and name, if any) will be acknowledged in the book. We will also negotiate with the press to see if each contributor can receive a free book when published. When you become a contributor, please email your Github ID, name, and mailing address to 
+
+> d2lbook.en@gmail.com
 
 
-## Chinese repo 《动手学深度学习》
+## Chinese version 《动手学深度学习》
 
 [https://github.com/diveintodeeplearning/d2l-zh](https://github.com/diveintodeeplearning/d2l-zh)
