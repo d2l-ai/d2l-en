@@ -2,7 +2,7 @@
 
 [![Build Status](http://ci.diveintodeeplearning.org/job/en/job/master/badge/icon)](http://ci.diveintodeeplearning.org/job/en/job/master/)
 
-## Contribute
+## Contributors Will Be Acknowledged in the Book
 
 The contents of the book are under revision. We expect that the quality will be constantly improved.
 
