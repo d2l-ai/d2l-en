@@ -172,7 +172,7 @@ Here, $x_{ij}$ is the element of matrix $\boldsymbol{X}$ in row $i$ and column $
 ### Eigenvectors and Eigenvalues
 
 
-Let $\boldsymbol{A}$ be a matrix with $m$ rows and $n$ columns. If $\lambda$ is a scalar and $\boldsymbol{v}$ is a non-zero $n$-dimensional vector with
+Let $\boldsymbol{A}$ be a matrix with $n$ rows and $n$ columns. If $\lambda$ is a scalar and $\boldsymbol{v}$ is a non-zero $n$-dimensional vector with
 
 $$\boldsymbol{A} \boldsymbol{v} = \lambda \boldsymbol{v},$$
 
@@ -191,7 +191,7 @@ Assume the input and output of function $f: \mathbb{R} \rightarrow \mathbb{R}$ a
 
 $$f'(x) = \lim_{h \rightarrow 0} \frac{f(x+h) - f(x)}{h},$$
 
-when the limit exists (and $f$ is said to be \textit{differentiable}). Given $y = f(x)$, where $x$ and $y$ are the arguments and dependent variables of function $f$, respectively, the following derivative and differential expressions are equivalent:
+when the limit exists (and $f$ is said to be differentiable). Given $y = f(x)$, where $x$ and $y$ are the arguments and dependent variables of function $f$, respectively, the following derivative and differential expressions are equivalent:
 
 $$f'(x) = y' = \frac{\text{d}y}{\text{d}x} = \frac{\text{d}f}{\text{d}x} = \frac{\text{d}}{\text{d}x} f(x) = \text{D}f(x) = \text{D}_x f(x),$$
 
@@ -220,7 +220,7 @@ The Taylor expansion of function $f$ is given by the infinite sum
 
 $$f(x) = \sum_{n=0}^\infty \frac{f^{(n)}(a)}{n!} (x-a)^n,$$
 
-when it exists. Here, $f^{(n)}$ is the $n$-th derivative of $f$, and $n!$ is the factorial of $n$. For a sufficiently small number $\epsilon$, we can replace $x$ and $a$ with $x+\epsilon$ and $x$ respectively to obtain
+when it exists. Here, $f^{(n)}$ is the $n$th derivative of $f$, and $n!$ is the factorial of $n$. For a sufficiently small number $\epsilon$, we can replace $x$ and $a$ with $x+\epsilon$ and $x$ respectively to obtain
 
 $$f(x + \epsilon) \approx f(x) + f'(x) \epsilon + \mathcal{O}(\epsilon^2).$$
 
@@ -232,7 +232,7 @@ $$f(x + \epsilon) \approx f(x) + f'(x) \epsilon.$$
 
 ### Partial Derivatives
 
-Let $u = f(x_1, x_2, \ldots, x_n)$ be a function with $n$ arguments. The partial derivative of $u$ with respect to its $i$-th  parameter $x_i$ is
+Let $u = f(x_1, x_2, \ldots, x_n)$ be a function with $n$ arguments. The partial derivative of $u$ with respect to its $i$th  parameter $x_i$ is
 
 $$ \frac{\partial u}{\partial x_i} = \lim_{h \rightarrow 0} \frac{f(x_1, \ldots, x_{i-1}, x_i+h, x_{i+1}, \ldots, x_n) - f(x_1, \ldots, x_i, \ldots, x_n)}{h}.$$
 
