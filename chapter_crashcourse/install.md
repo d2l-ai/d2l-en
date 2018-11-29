@@ -7,7 +7,7 @@ This section discusses how to download the codes in this book and to install the
 For simplicity we recommend [Conda](https://conda.io), a popular Python package manager to install all libraries.
 
 1. Download and install [Miniconda](https://conda.io/miniconda.html), based on your operating system. Make sure to add Anaconda to your PATH environment variable.
-1. Download the tarball containing the notebooks from this book. This can be found at en.gluon.ai/gluon_tutorials_en-latest.zip. Alternatively feel free to clone the latest version from GitHub.
+1. Download the tarball containing the notebooks from this book. This can be found at https://www.diveintodeeplearning.org/d2l-en-1.0.zip. Alternatively feel free to clone the latest version from GitHub.
 1. Unzip the the tarball and move its contents to a folder for the tutorials.
 
 ### GPU Support
@@ -47,11 +47,9 @@ Installation for both is very similar. We give a description of the workflow for
 ```
 sh Miniconda3-latest-Linux-x86_64.sh
 
-mkdir gluon_tutorials
-cd gluon_tutorials
-curl https://en.gluon.ai/gluon_tutorials_en-latest.tar.gz -o tutorials.tar.gz
-tar -xzvf tutorials.tar.gz
-rm tutorials.tar.gz
+mkdir d2l-en && cd d2l-en
+curl https://www.diveintodeeplearning.org/d2l-en-1.0.zip -o d2l-en.zip
+unzip d2l-en.zip && rm d2l-en.zip
 
 conda env create -f environment.yml
 source activate gluon
