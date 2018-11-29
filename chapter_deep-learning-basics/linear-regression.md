@@ -6,7 +6,7 @@ Regression problems are extremely common in practice. For example, they are used
 
 ## Basic Elements of Linear Regression
 
-In linear regression, the simplest and still perhaps the most useful approach,
+On linear regression, the simplest and still perhaps the most useful approach,
 we assume that prediction can be expressed as a *linear* combination of the input features
 (thus giving the name *linear* regression).
 
