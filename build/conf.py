@@ -138,7 +138,7 @@ todo_include_todos = True
 # a list of builtin themes.
 
 html_theme_path = ['mx-theme']
-html_theme = 'sphinx_materialdesign_theme'
+html_theme = 'mxtheme'
 html_theme_options = {
     'primary_color': 'blue',
     'accent_color': 'deep_orange',
