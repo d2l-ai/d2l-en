@@ -26,6 +26,15 @@ stage("Build PDF") {
   }
 }
 
+stage("Build PKG") {
+  node {
+    ws('workspace/d2l-en') {
+	  checkout scm
+      sh "build/build_pkg.sh"
+    }
+  }
+}
+
 stage("Publish") {
   node {
     ws('workspace/d2l-en') {

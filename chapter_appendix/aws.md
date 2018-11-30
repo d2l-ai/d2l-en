@@ -10,7 +10,7 @@ The process to apply for other instance types and install other MXNet versions i
 
 ## Apply for an Account and Log In
 
-首先，我们需要在 https://aws.amazon.com/ 网站上创建账号。这通常需要一张信用卡。需要注意的是，AWS中国需要公司实体才能注册。如果你是个人用户，请注册AWS全球账号。
+First, we need to register an account at https://aws.amazon.com/. It usually requires a credit card.
 
 After logging into your AWS account, click "EC2" (marked by the red box in Figure 11.8) to go to the EC2 panel.
 
@@ -28,7 +28,7 @@ The row at the top of Figure 11.10 shows the seven steps in the instance configu
 
 ![ Choose an operating system. ](../img/os.png)
 
-EC2 provides many different instance configurations to choose from. As shown in Figure 11.11, Chosse Instance Type”中，选择有一个K80 GPU的“p2.xlarge”实例。我们也可以选择像“p2.16xlarge”这样有多个GPU的实例。如果你想比较不同实例的机器配置和收费，可参考 https://www.ec2instances.info/ 。
+EC2 provides many different instance configurations to choose from. As shown in Figure 11.11, In "Step 2: Chosse an Instance Type”，choose a "p2.xlarge" instance with K80 GPU. We can also choose instances with multiple GPUs such as "p2.16xlarge". If you want to compare machine configurations and fees of different instances, you may refer to https://www.ec2instances.info/.
 
 ![ Choose an instance. ](../img/p2x.png)
 
@@ -68,7 +68,7 @@ If you log into a GPU instance, you need to download and install CUDA. First, up
 sudo apt-get update && sudo apt-get install -y build-essential git libgfortran3
 ```
 
-Nvidia一般每年会更新一次CUDA大版本。这里我们下载作者写本书时的最新版本CUDA 9.1。访问Nvidia官网（https://developer.nvidia.com/cuda-91-download-archive ）获取正确 版本的CUDA 9.1的下载地址，如图11.17所示。
+Nvidia releases a major version of CUDA every year. Here we download the latest CUDA 9.1 when the book is written. Visit the official website of Nvidia(https://developer.nvidia.com/cuda-91-download-archive) to obtain the download link of CUDA 9.1, as shown in Figure 11.17.
 
 ![Find the CUDA 9.1 download address. ](../img/cuda.png)
 
@@ -114,7 +114,7 @@ echo "export LD_LIBRARY_PATH=\${LD_LIBRARY_PATH}:/usr/local/cuda-9.1/lib64" >> .
 
 ## Acquire the Code for this Book and Install MXNet GPU Version
 
-我们已在[“获取和运行本书代码”](../chapter_prerequisite/install.md)一节中介绍了Linux用户获取本书代码并安装运行环境的方法。首先，安装Linux版的Miniconda（网址：https://conda.io/miniconda.html ），例如
+We have introduced the way to obtaining code of the book and setting up the running environment in Section ["Getting started with Gluon"](../chapter_prerequisite/install.md). First, install Miniconda of the Linux version (website: https://conda.io/miniconda.html), such as
 
 ```
 wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
@@ -134,9 +134,9 @@ to PATH in your /home/ubuntu/.bashrc ? [yes|no]
 After installation, run `source ~/.bashrc` once to activate CUDA and Conda. Next, download the code for this book and install and activate the Conda environment.
 
 ```
-mkdir gluon_tutorials_zh && cd gluon_tutorials_zh
-curl https://zh.gluon.ai/gluon_tutorials_zh.tar.gz -o tutorials.tar.gz
-tar -xzvf tutorials.tar.gz && rm tutorials.tar.gz
+mkdir d2l-en && cd d2l-en
+curl https://www.diveintodeeplearning.org/d2l-en-1.0.zip -o d2l-en.zip
+unzip d2l-en.zip && rm d2l-en.zip
 conda env create -f environment.yml
 source activate gluon
 ```
@@ -181,7 +181,7 @@ If you do not plan to use the instance again for a long time, right-click on the
 
 * You can use cloud computing services to obtain more powerful computing resources and use them to run the deep learning code in this document.
 
-## exercise
+## Problem
 
 * The cloud offers convenience, but it does not come cheap. Research the prices of cloud services and find ways to reduce overhead.
 
