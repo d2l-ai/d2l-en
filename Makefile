@@ -14,18 +14,18 @@ NOTEBOOK = $(filter-out $(MARKDOWN), $(wildcard chapter*/*.md))
 OBJ = $(patsubst %.md, build/%.md, $(MARKDOWN)) \
 	$(patsubst %.md, build/%.ipynb, $(NOTEBOOK))
 
-ORIGN_DEPS = $(wildcard img/* data/* ) environment.yml README.md
+FRONTPAGE = $(wildcard img/frontpage/*)
+IMG_NOTEBOOK = $(filter-out $(FRONTPAGE), $(wildcard img/*))
+
+ORIGN_DEPS = $(IMG_NOTEBOOK) $(wildcard data/*) environment.yml README.md
 DEPS = $(patsubst %, build/%, $(ORIGN_DEPS))
 
-PKG = build/_build/html/d2l-en.tar.gz build/_build/html/d2l-en.zip
+PKG = build/_build/html/d2l-en.zip
 
 pkg: $(PKG)
 
 build/_build/html/d2l-en.zip: $(OBJ) $(DEPS)
 	cd build; zip -r $(patsubst build/%, %, $@ $(DEPS)) chapter*
-
-build/_build/html/d2l-en.tar.gz: $(OBJ) $(DEPS)
-	cd build; tar -zcvf $(patsubst build/%, %, $@ $(DEPS)) chapter*
 
 build/%: %
 	@mkdir -p $(@D)
