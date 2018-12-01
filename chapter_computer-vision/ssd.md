@@ -373,4 +373,4 @@ gb.plt.legend();
 
 ## Discuss on our Forum
 
-<div id="discuss" topic_id="">2453</div>
+<div id="discuss" topic_id="2453"></div>

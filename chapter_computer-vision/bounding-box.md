@@ -59,4 +59,4 @@ fig.axes.add_patch(bbox_to_rect(cat_bbox, 'red'));
 
 ## Discuss on our Forum
 
-<div id="discuss" topic_id="">2444</div>
+<div id="discuss" topic_id="2444"></div>

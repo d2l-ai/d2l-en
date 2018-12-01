@@ -260,4 +260,4 @@ As you can see, even adding a simple random flip may have a certain impact on th
 
 ## Discuss on our Forum
 
-<div id="discuss" topic_id="">2442</div>
+<div id="discuss" topic_id="2442"></div>

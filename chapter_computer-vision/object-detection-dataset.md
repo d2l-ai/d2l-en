@@ -85,4 +85,4 @@ for ax, label in zip(axes, batch.label[0][0:10]):
 
 ## Discuss on our Forum
 
-<div id="discuss" topic_id="">2452</div>
+<div id="discuss" topic_id="2452"></div>

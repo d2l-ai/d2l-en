@@ -341,4 +341,4 @@ After executing the above code, we will get a "submission.csv" file. The format 
 
 ## Discuss on our Forum
 
-<div id="discuss" topic_id="">2450</div>
+<div id="discuss" topic_id="2450"></div>

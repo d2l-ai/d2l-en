@@ -77,4 +77,4 @@ We will implement a multiscale object detection model in the following section.
 
 ## Discuss on our Forum
 
-<div id="discuss" topic_id="">2446</div>
+<div id="discuss" topic_id="2446"></div>

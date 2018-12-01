@@ -232,4 +232,4 @@ In practice, we can remove prediction bounding boxes with lower confidence level
 
 ## Discuss on our Forum
 
-<div id="discuss" topic_id="">2445</div>
+<div id="discuss" topic_id="2445"></div>

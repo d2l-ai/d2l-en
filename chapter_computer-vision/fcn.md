@@ -242,4 +242,4 @@ gb.show_images(imgs[::3] + imgs[1::3] + imgs[2::3], 3, n);
 
 ## Discuss on our Forum
 
-<div id="discuss" topic_id="">2454</div>
+<div id="discuss" topic_id="2454"></div>

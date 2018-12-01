@@ -278,4 +278,4 @@ As you can see, each epoch takes more time due to the larger image size. As show
 
 ## Discuss on our Forum
 
-<div id="discuss" topic_id="">2449</div>
+<div id="discuss" topic_id="2449"></div>

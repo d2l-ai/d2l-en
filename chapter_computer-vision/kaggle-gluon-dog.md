@@ -302,4 +302,4 @@ After executing the above code, we will generate a "submission.csv" file. The fo
 
 ## Discuss on our Forum
 
-<div id="discuss" topic_id="">2451</div>
+<div id="discuss" topic_id="2451"></div>

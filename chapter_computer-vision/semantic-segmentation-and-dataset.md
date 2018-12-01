@@ -209,4 +209,4 @@ for X, Y in train_iter:
 
 ## Discuss on our Forum
 
-<div id="discuss" topic_id="">2448</div>
+<div id="discuss" topic_id="2448"></div>

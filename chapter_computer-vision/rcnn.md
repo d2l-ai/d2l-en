@@ -118,4 +118,4 @@ As shown in 9.9, Mask R-CNN is a modification to the Faster R-CNN model. Mask R-
 
 ## Discuss on our Forum
 
-<div id="discuss" topic_id="">2447</div>
+<div id="discuss" topic_id="2447"></div>
