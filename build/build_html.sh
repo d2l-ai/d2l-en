@@ -10,6 +10,4 @@ pip list
 
 rm -rf build/_build/
 
-rm build/d2l-en.zip
-
 make html
