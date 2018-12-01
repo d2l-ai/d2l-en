@@ -61,6 +61,8 @@ The main symbols used in this book are listed below.
 |:--|:-:|
 |$\mathbb{P}(\cdot)$ | Probability distribution |
 |$\cdot \sim \mathbb{P}$ | Random variable $\cdot$ obeys the probability distribution $\mathbb{P}$ |
+|$\mathbb{P}(\cdot \mid\cdot)$|Conditional probability|
+|$\mathbb{E}_{\cdot}\left(f(\cdot)\right)$|Expectation of $f(\cdot)$ with respect to $\cdot$|
 
 
 ## Complexity
@@ -68,4 +70,3 @@ The main symbols used in this book are listed below.
 |||
 |:--|:-:|
 |$\mathcal{O}$|Big O notation|
-
