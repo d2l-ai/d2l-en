@@ -365,13 +365,12 @@ gb.plt.legend();
 * Assign hyper-parameters with different weights to the anchor box category loss and positive anchor box offset loss in the loss function.
 * Refer to the SSD paper. What methods can be used to evaluate the precision of object detection models[1]?
 
-
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/2511)
-
-![](../img/qr_ssd.svg)
-
 ## References
 
 [1] Liu, W., Anguelov, D., Erhan, D., Szegedy, C., Reed, S., Fu, C. Y., & Berg, A. C. (2016, October). Ssd: Single shot multibox detector. In European conference on computer vision (pp. 21-37). Springer, Cham.
 
 [2] Lin, T. Y., Goyal, P., Girshick, R., He, K., & Dollár, P. (2018). Focal loss for dense object detection. IEEE transactions on pattern analysis and machine intelligence.
+
+## Discuss on our Forum
+
+<div id="discuss" topic_id="">2453</div>

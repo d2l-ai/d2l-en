@@ -1,7 +1,7 @@
 # Get Started with Kaggle Competition: Dog Breed Identification (ImageNet Dogs)
 
 
-In this section, we will tackle the dog breed identification challenge in the Kaggle Competition. The competition’s web address is 
+In this section, we will tackle the dog breed identification challenge in the Kaggle Competition. The competition’s web address is
 
 > https://www.kaggle.com/c/dog-breed-identification
 
@@ -296,10 +296,10 @@ After executing the above code, we will generate a "submission.csv" file. The fo
 * Do you get better results if you use a deeper pre-trained model?
 * Scan the QR code to access the relevant discussions and exchange ideas about the methods used and the results obtained with the community. Can you come up with any better techniques?
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/2399)
-
-![](../img/qr_kaggle-gluon-dog.svg)
-
 ## Reference
 
 [1] Kaggle ImageNet Dog Breed Identification website. https://www.kaggle.com/c/dog-breed-identification
+
+## Discuss on our Forum
+
+<div id="discuss" topic_id="">2451</div>

@@ -1,6 +1,6 @@
 # Multiscale Object Detection
 
-In the ["Anchor Box"](anchor.md) section, we generated multiple anchor boxes centered on each pixel of the input image.  These anchor boxes are used to sample different regions of the input image. However, if anchor boxes are generated centered on each pixel of the image, soon there will be too many anchor boxes for us to compute. For example, we assume that the input image has a height and a width of 561 and 728 pixels respectively. If five different shapes of anchor boxes are generated centered on each pixel, over two million anchor boxes ($561 \times 728 \times 5$) need to be predicted and labeled on the image. 
+In the ["Anchor Box"](anchor.md) section, we generated multiple anchor boxes centered on each pixel of the input image.  These anchor boxes are used to sample different regions of the input image. However, if anchor boxes are generated centered on each pixel of the image, soon there will be too many anchor boxes for us to compute. For example, we assume that the input image has a height and a width of 561 and 728 pixels respectively. If five different shapes of anchor boxes are generated centered on each pixel, over two million anchor boxes ($561 \times 728 \times 5$) need to be predicted and labeled on the image.
 
 It is not difficult to reduce the number of anchor boxes.  An easy way is to apply uniform sampling on a small portion of pixels from the input image and generate anchor boxes centered on the sampled pixels. In addition, we can generate anchor boxes of varied numbers and sizes on multiple scales. Notice that smaller objects are more likely to be positioned on the image than larger ones.  Here, we will use a simple example: Objects with shapes of $1 \times 1$, $1 \times 2$, and $2 \times 2$ may have 4, 2, and 1 possible position(s) on an image with the shape $2 \times 2$. Therefore, when using smaller anchor boxes to detect smaller objects, we can sample more regions; when using larger anchor boxes to detect larger objects, we can sample fewer regions.
 
@@ -75,7 +75,6 @@ We will implement a multiscale object detection model in the following section.
 
 * Given an input image, assume $1 \times c_i \times h \times w$ to be the shape of the feature map while $c_i, h, w$ are the number, height, and width of the feature map. What methods can you think of to convert this variable into the anchor box's category and offset? What is the shape of the output?
 
+## Discuss on our Forum
 
-## Scan the QR code to Access [Discussions](https://discuss.gluon.ai/t/topic/8859)
-
-![](../img/qr_multiscale-object-detection.svg)
+<div id="discuss" topic_id="">2446</div>

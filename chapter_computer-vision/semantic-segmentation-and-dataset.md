@@ -203,10 +203,10 @@ for X, Y in train_iter:
 
 * Recall the content we covered in the ["Image Augmentation"](image-augmentation.md) section. Which of the image augmentation methods used in image classification would be hard to use in semantic segmentation?
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/7218)
-
-![](../img/qr_semantic-segmentation-and-dataset.svg)
-
 ##  Reference
 
 [1] Pascal VOC2012 data set. http://host.robots.ox.ac.uk/pascal/VOC/voc2012/
+
+## Discuss on our Forum
+
+<div id="discuss" topic_id="">2448</div>

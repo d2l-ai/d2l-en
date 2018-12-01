@@ -101,11 +101,6 @@ As shown in 9.9, Mask R-CNN is a modification to the Faster R-CNN model. Mask R-
 
 * Study the implementation of each model in the GluonCV toolkit related to this section[6].
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/7219)
-
-![](../img/qr_rcnn.svg)
-
-
 
 ## References
 
@@ -120,3 +115,7 @@ As shown in 9.9, Mask R-CNN is a modification to the Faster R-CNN model. Mask R-
 [5] He, K., Gkioxari, G., Dollár, P., & Girshick, R. (2017, October). Mask r-cnn. In Computer Vision (ICCV), 2017 IEEE International Conference on (pp. 2980-2988). IEEE.
 
 [6] GluonCV Toolkit. https://gluon-cv.mxnet.io/
+
+## Discuss on our Forum
+
+<div id="discuss" topic_id="">2447</div>

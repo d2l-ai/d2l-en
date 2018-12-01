@@ -228,19 +228,18 @@ gb.show_images(imgs[::3] + imgs[1::3] + imgs[2::3], 3, n);
 
 ## Problems
 
-* Is it efficient to use matrix multiplication to implement convolution operations? Why? 
+* Is it efficient to use matrix multiplication to implement convolution operations? Why?
 * If we use Xavier to randomly initialize the transposed convolution layer, what will happen to the result?
 * Can you further improve the accuracy of the model by tuning the hyper-parameters?
 * Predict the categories of all pixels in the test image.
 * The outputs of some intermediate layers of the convolutional neural network are also used in the paper on fully convolutional networks[1]. Try to implement this idea.
-
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/3041)
-
-![](../img/qr_fcn.svg)
-
 
 ## References
 
 [1] Long, J., Shelhamer, E., & Darrell, T. (2015). Fully convolutional networks for semantic segmentation. In Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 3431-3440).
 
 [2] Dumoulin, V., & Visin, F. (2016). A guide to convolution arithmetic for deep learning. arXiv preprint arXiv:1603.07285.
+
+## Discuss on our Forum
+
+<div id="discuss" topic_id="">2454</div>

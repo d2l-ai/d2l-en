@@ -77,13 +77,12 @@ for ax, label in zip(axes, batch.label[0][0:10]):
 
 * Referring to the MXNet documentation, what are the parameters for the constructors of the `image.ImageDetIter` and `image.CreateDetAugmenter` classes? What is their significance?
 
-
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/7022)
-
-![](../img/qr_object-detection-dataset.svg)
-
 ## References
 
 [1] im2rec Tool. https://github.com/apache/incubator-mxnet/blob/master/tools/im2rec.py
 
 [2] GluonCV Toolkit. https://gluon-cv.mxnet.io/
+
+## Discuss on our Forum
+
+<div id="discuss" topic_id="">2452</div>

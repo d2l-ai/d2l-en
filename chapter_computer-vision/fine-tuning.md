@@ -173,10 +173,10 @@ hotdog_w = nd.split(weight.data(), 1000, axis=0)[713]
 hotdog_w.shape
 ```
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/2272)
-
-![](../img/qr_fine-tuning.svg)
-
 ## Reference
 
 [1] GluonCV Toolkit. https://gluon-cv.mxnet.io/
+
+## Discuss on our Forum
+
+<div id="discuss" topic_id="">2443</div>

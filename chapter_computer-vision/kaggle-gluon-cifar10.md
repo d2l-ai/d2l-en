@@ -2,7 +2,7 @@
 
 So far, we have been using Gluon's `data` package to directly obtain image data sets in NDArray format. In practice, however, image data sets often exist in the format of image files. In this section, we will start with the original image files and organize, read, and convert the files to NDArray format step by step.
 
-We performed an experiment on the CIFAR-10 data set in the ["Image Augmentation"](image-augmentation.md) section. This is an important data set in the computer vision field. Now, we will apply the knowledge we learned in the previous sections in order to participate in the Kaggle competition, which addresses CIFAR-10 image classification problems. The competition’s web address is 
+We performed an experiment on the CIFAR-10 data set in the ["Image Augmentation"](image-augmentation.md) section. This is an important data set in the computer vision field. Now, we will apply the knowledge we learned in the previous sections in order to participate in the Kaggle competition, which addresses CIFAR-10 image classification problems. The competition’s web address is
 
 > https://www.kaggle.com/c/cifar-10
 
@@ -126,7 +126,7 @@ We use only 100 training example and one test example here. The folder names for
 
 ```{.python .input  n=8}
 if demo:
-    # Note: Here, we use small training sets and small testing sets and the batch size should be set smaller. When using the complete data set for the Kaggle competition, 
+    # Note: Here, we use small training sets and small testing sets and the batch size should be set smaller. When using the complete data set for the Kaggle competition,
     # the batch size can be set to a large integer.
     train_dir, test_dir, batch_size = 'train_tiny', 'test_tiny', 1
 else:
@@ -339,6 +339,6 @@ After executing the above code, we will get a "submission.csv" file. The format 
 * What accuracy can you achieve when not using image augmentation?
 * Scan the QR code to access the relevant discussions and exchange ideas about the methods used and the results obtained with the community. Can you come up with any better techniques?
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/1545/)
+## Discuss on our Forum
 
-![](../img/qr_kaggle-gluon-cifar10.svg)
+<div id="discuss" topic_id="">2450</div>

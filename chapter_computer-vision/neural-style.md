@@ -272,10 +272,10 @@ As you can see, each epoch takes more time due to the larger image size. As show
 * Further increase the size of the composite image. Does this increase the detail of the output?
 * Use different content and style images. Can you create more interesting composite images?
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/3273)
-
-![](../img/qr_neural-style.svg)
-
 ## Reference
 
 [1] Gatys, L. A., Ecker, A. S., & Bethge, M. (2016). Image style transfer using convolutional neural networks. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (pp. 2414-2423).
+
+## Discuss on our Forum
+
+<div id="discuss" topic_id="">2449</div>

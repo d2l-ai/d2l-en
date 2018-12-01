@@ -258,6 +258,6 @@ As you can see, even adding a simple random flip may have a certain impact on th
 * Add different image augmentation methods in model training based on the CIFAR-10 data set. Observe the implementation results.
 * With reference to the MXNet documentation, what other image augmentation methods are provided in Gluon's `transforms` module?
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/1666)
+## Discuss on our Forum
 
-![](../img/qr_image-augmentation.svg)
+<div id="discuss" topic_id="">2442</div>
