@@ -8,8 +8,6 @@ conda activate d2l-en-build
 
 pip list
 
-make clean
-
 rm -rf build/_build/
 
 make html
