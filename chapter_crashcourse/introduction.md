@@ -443,7 +443,7 @@ Given the current state of computer vision,
 we can do this easily, with off-the-shelf tools.
 Nonetheless, no matter how accurate our model gets, we might find ourselves in trouble when the classifier encounters an image of the Bremen Town Musicians.
 
-![](../img/catdog.jpg)
+![](../img/stackedanimals.jpg)
 
 
 As you can see, there's a cat in the picture, and a rooster, a dog and a donkey, with some trees in the background.
