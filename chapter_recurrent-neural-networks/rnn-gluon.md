@@ -160,4 +160,4 @@ train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
 
 ## Discuss on our Forum
 
-<div id="discuss" topic_id="23"></div>
+<div id="discuss" topic_id="2365"></div>

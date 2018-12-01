@@ -108,4 +108,4 @@ To give an example, the calculation of the parameter gradient $\partial L/\parti
 
 ## Discuss on our Forum
 
-<div id="discuss" topic_id="23"></div>
+<div id="discuss" topic_id="2366"></div>

@@ -36,4 +36,4 @@ Here, the weight parameter $\boldsymbol{W}_{hq} \in \mathbb{R}^{2h \times q}$ an
 
 ## Discuss on our Forum
 
-<div id="discuss" topic_id="23"></div>
+<div id="discuss" topic_id="2370"></div>

@@ -126,4 +126,4 @@ for X, Y in data_iter_consecutive(my_seq, batch_size=2, num_steps=6):
 
 ## Discuss on our Forum
 
-<div id="discuss" topic_id="23"></div>
+<div id="discuss" topic_id="2363"></div>

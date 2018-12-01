@@ -75,4 +75,4 @@ Since each word entered is a character, this model is called a "character-level 
 
 ## Discuss on our Forum
 
-<div id="discuss" topic_id="23"></div>
+<div id="discuss" topic_id="2362"></div>

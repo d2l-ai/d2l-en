@@ -38,4 +38,4 @@ Just as with multilayer perceptrons, the number of hidden layers $L$ and number 
 
 ## Discuss on our Forum
 
-<div id="discuss" topic_id="23"></div>
+<div id="discuss" topic_id="2369"></div>
