@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-# avoid to put the downloaed data into the notebook package
+# avoid putting data downloaded by scripts into the notebook package
 mv build/data build/data-bak
 make pkg
 # backup build/data to avoid download the dataset each time and put the
