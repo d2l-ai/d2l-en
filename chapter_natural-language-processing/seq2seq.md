@@ -61,14 +61,14 @@ to get the loss of the output sequence
 
 $$- \log\mathbb{P}(y_1, \ldots, y_{T'} \mid x_1, \ldots, x_T) = -\sum_{t'=1}^{T'} \log \mathbb{P}(y_{t'} \mid y_1, \ldots, y_{t'-1}, \boldsymbol{c}),$$
 
-In model training, the mean of losses for all the output sequences is usually used as a loss function that needs to be minimized. In the model prediction discussed in Figure 10.8, we need to use the output of the decoder from the previous time step as the input to the current time step. In contrast, in training, we can also use the label of the label sequence from the previous time step as the input of the decoder for the current time step. This is called teacher forcing.
+In model training, the mean of losses for all the output sequences is usually used as a loss function that needs to be minimized. In the model prediction discussed in Figure 10.8, we need to use the output of the decoder from the previous time step as the input to the current time step. In contrast, in training, we can also use the label of the label sequence from the previous time step as the input of the decoder for the current time step. This is called teacher forcing. Teacher forcing, however, introduces a mismatch between training and inference behavior. This can be alleviated using scheduled sampling, which samples from the probability distribution (i.e. softmax output) of the previous prediction[3]. 
 
 
 ## Summary
 
 * The encoder-decoder (seq2seq) model can input and output a sequence of variable length.
 * The encoder-decoder uses two RNNs.
-* In encoder-decoder training, we can use teacher forcing.
+* In encoder-decoder training, we can use teacher forcing and scheduled sampling.
 
 
 ## exercise
@@ -84,6 +84,8 @@ In model training, the mean of losses for all the output sequences is usually us
 [1] Cho, K., Van Merriënboer, B., Gulcehre, C., Bahdanau, D., Bougares, F., Schwenk, H., & Bengio, Y. (2014). Learning phrase representations using RNN encoder-decoder for statistical machine translation. arXiv preprint arXiv:1406.1078.
 
 [2] Sutskever, I., Vinyals, O., & Le, Q. V. (2014). Sequence to sequence learning with neural networks. In Advances in neural information processing systems (pp. 3104-3112).
+
+[3] S. Bengio, O. Vinyals, N. Jaitly, and N. Shazeer, “Scheduled Sampling for Sequence Prediction with Recurrent Neural Net- works,” in Proc. NIPS, 2015, pp. 1171–1179.
 
 ## Discuss on our Forum
 
