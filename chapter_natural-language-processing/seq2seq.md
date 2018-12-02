@@ -85,7 +85,7 @@ In model training, the mean of losses for all the output sequences is usually us
 
 [2] Sutskever, I., Vinyals, O., & Le, Q. V. (2014). Sequence to sequence learning with neural networks. In Advances in neural information processing systems (pp. 3104-3112).
 
-[3] S. Bengio, O. Vinyals, N. Jaitly, and N. Shazeer, “Scheduled Sampling for Sequence Prediction with Recurrent Neural Net- works,” in Proc. NIPS, 2015, pp. 1171–1179.
+[3] Bengio, S., Vinyals, O., Jaitly, N., & Shazeer, N. (2015). Scheduled Sampling for Sequence Prediction with Recurrent Neural Networks. In Advances in neural information processing systems (pp. 1171–1179).
 
 ## Discuss on our Forum
 
