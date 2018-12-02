@@ -1,45 +1,63 @@
 # Batch Normalization
 
-In this section, we will introduce the batch normalization layer, which makes it easier to train deeper neural networks[1]. In the ["Get Started with Kaggle Competition: Predicting House Prices"](../chapter_deep-learning-basics/kaggle-house-price.md) section, we showed how to standardize input data. After the standardization, the mean of any feature on all examples in the data set is 0, and the standard deviation is 1. Standardizing input data makes the distribution of features similar, which generally makes it easier to train effective models.
+Training very deep models is difficult and it can be tricky to get the models to converge or to ensure that they do not overfit. This is one of the reasons why it took a long time for very deep networks with over 100 layers to become popular. 
 
-Generally speaking, data standardization preprocessing is effective enough for shallow models. As the model training progresses, the output near the output layer is less likely to change drastically as the parameters in each layer are updated. However, for deep neural networks, even if the input data has been standardized, updates to the model parameters during training is still very likely to cause drastic changes in the output near the output layer. This instability in the computed values often makes it difficult for us to train effective deep models.
+## Training deep networks
 
-Batch normalization is implemented to cope with the challenges of deep model training. During model training, batch normalization continuously adjusts the intermediate output of the neural network by utilizing the mean and standard deviation of the mini-batch, so that the values of the intermediate output in each layer throughout the neural network are more stable. Batch normalization and the residual networks introduced in the next section introduce two important concepts in the training and design the deep models.
+1. Data preprocessing is a key aspect of effective statistical modeling. Recall our discussion when we applied deep networks to [Predicting House Prices](../chapter_deep-learning-basics/kaggle-house-price.md). Here we standardized input data to zero mean and unit variance. Standardizing input data makes the distribution of features similar, which generally makes it easier to train effective models. 
+1. As we train the model, the activations in intermediate layers of the network will assume rather different orders of magnitude. This can lead to issues with the convergence of the network due to scale of activations - if one layer has activation values that are 100x that of another layer, we need to adjust learning rates adaptively per layer (or even per parameter group per layer). 
+1. Deeper networks are fairly complex and they are more prone to overfitting. This means that regularization becomes more critical. That said dropout is nontrivial to use in convolutional layers and does not perform as well, hence we need a more appropriate type of regularization. 
+1. When training deep networks the last layers will converge first, at which point the layers below start converging. Unfortunately, once this happens, the weights for the last layers are no longer optimal and they need to converge again. As training progresses, this gets worse. 
 
+All of this requires fixing in order for deep network training to become feasible. Batch Normalization, as proposed by [Ioffe and Szegedy, 2015](https://arxiv.org/abs/1502.03167) is an effective technique to alleviate these problems. The ingenious thing is that it does all of this with one very simple trick. Let's discuss this first before going into details as to why it is a good idea after all. In a nutshell, the idea is to transform the activation at a given layer from $\mathbf{x}$ to 
+
+$$\bar{\mathbf{x}} = \alpha \frac{\mathbf{x} - \mathbf{\hat\mu}}{\hat\sigma} + \mathbf{\beta}$$
+
+Here $\mathbf{\hat\mu}$ is the estimate of the mean and $\mathbf{\hat\sigma}$ is the estimate of the variance. The result is that the activations are approximately rescaled to zero mean and unit variance. Since this may not be quite what we want, we allow for a scaling coefficient $\alpha$ and an offset $\beta$. Consequently the activations for intermediate layers cannot diverge any longer, thus solving problem 1: we are actively rescaling it back to a given order of magnitude via $\mathbf{\mu}$ and $\sigma$. Consequently we can be more aggressive in picking large learning rates on the data. To address the fact that in some cases the activations actually *need* to differ from standardized data, we need to introduce scaling coefficients $\alpha$ and an offset $\mathbf{\beta}$. 
+
+So far we didn't discuss how we actually obtain the estimates for mean and variance. The canonical way is to estimate them from data. Unfortunately, the statistics change as we train our model. Hence one option is to use the current minibatch also for estimating $\mathbf{\hat\mu}$ and $\hat\sigma$. This is fairly straightforward. All we need to do is aggregate over a small set of activations, such as a minibatch of data. Hence the name *Batch Normalization*. To indicate which minibatch $\mathcal{B}$ we draw this from, we denote the quantities with $\mathbf{\hat\mu}_\mathcal{B}$ and $\hat\sigma_\mathcal{B}$. 
+
+$$\mathbf{\hat\mu}_\mathcal{B} \leftarrow \frac{1}{|\mathcal{B}|} \sum_{\mathbf{x} \in \mathcal{B}} \mathbf{x} 
+\text{ and }
+\mathbf{\hat\sigma}_\mathcal{B}^2 \leftarrow \frac{1}{|\mathcal{B}|} \sum_{\mathbf{x} \in \mathcal{B}} (\mathbf{x} - \mathbf{\mu}_{\mathcal{B}})^2$$
+
+This estimate counteracts the scaling issue by using unbiased but potentially very noisy estimates of mean and variance. Normally we would consider this a problem. After all, each minibatch has different data, different labels and with it, different activations, predictions and errors. As it turns out, this is actually beneficial. This natural variation acts as *regularization* which prevents models from overfitting too badly. There is some preliminary work by [Teye, Azizpour and Smith, 2018](https://arxiv.org/pdf/1802.06455.pdf) and by [Luo et al, 2018](https://arxiv.org/pdf/1809.00846.pdf) which relate the properties of Batch Normalization (BN) to Bayesian Priors and penalties respectively. In particular, this resolves the puzzle why BN works best for moderate sizes of minibatches, i.e. of size 50-100. 
+
+Lastly, let us briefly review the original motivation of BN, namely covariate shift correction due to training. Obviously, rescaling activations to zero mean and unit variance does not entirely remove covariate shift. In fact, if it did, it would render deep networks entirely useless. After all, we want the activations become more meaningful for solving estimation problems. However, at least, it prevents mean and variance from diverging and thus decouples one of the more problematic aspects from training and inference. 
+
+After a lot of theory, let's look at how BN works in practice. Empirically it appears to stabilize the gradient (less exploding or vanishing values) and batch-normalized models appear to overfit less. In fact, batch-normalized models seldom even use dropout. 
 
 ## Batch Normalization Layers
 
-The batch normalization methods for fully connected layers and convolutional layers are slightly different. Below, we will introduce the batch normalization for both types of layers.
+The batch normalization methods for fully connected layers and convolutional layers are slightly different. This is due to the dimensionality of the data generated by convolutional layers. We discuss both cases below. Note that one of the key differences between BN and other layers is that BN operates on a a full minibatch at a time (otherwise it cannot compute the mean and variance parameters per batch).
 
-### Batch Normalization for Fully Connected Layers
+### Fully Connected Layers
 
-First, we will consider batch normalization for fully connected layers. Usually, we will put the batch normalization layer between the affine transformation and the activation function in the fully connected layer. The input of the fully connected layer is set to $\boldsymbol{u}$, the weight parameter and the bias parameter are respectively set to $\boldsymbol{W}$ and $\boldsymbol{b}$, and the activation function is set to $\phi$. The operator for batch normalization is set to $\text{BN}$. Therefore, the output of the fully connected layer using batch normalization is
+Usually we apply the batch normalization layer between the affine transformation and the activation function in the fully connected layer. Denote the input of the fully connected layer by $\mathbf{u}$, let the weight parameter and the bias parameter be $\mathbf{W}$ and $\mathbf{b}$ respectively, and let the activation function by $\phi$. In this case we have by definition
 
-$$\phi(\text{BN}(\boldsymbol{x})),$$
+$$\mathbf{y} = \phi(\mathrm{BN}(\mathbf{x})) = \phi(\mathrm{BN}(\mathbf{W}\mathbf{u} + \mathbf{b}))$$
 
-Here, the batch normalization input $\boldsymbol{x}$ is obtained from the affine transformation
 
-$$\boldsymbol{x}= \boldsymbol{W\boldsymbol{u} + \boldsymbol{b}}$$
 
-得到。考虑一个由$m$个样本组成的小批量，仿射变换的输出为一个新的小批量$\mathcal{B} = \{\boldsymbol{x}^{(1)}, \ldots, \boldsymbol{x}^{(m)} \}$。它们正是批量归一化层的输入。对于小批量$\mathcal{B}$中任意样本$\boldsymbol{x}^{(i)} \in \mathbb{R}^d, 1 \leq  i \leq m$，批量归一化层的输出同样是$d$维向量
+得到。考虑一个由$m$个样本组成的小批量，仿射变换的输出为一个新的小批量$\mathcal{B} = \{\mathbf{x}^{(1)}, \ldots, \mathbf{x}^{(m)} \}$。它们正是批量归一化层的输入。对于小批量$\mathcal{B}$中任意样本$\mathbf{x}^{(i)} \in \mathbb{R}^d, 1 \leq  i \leq m$，批量归一化层的输出同样是$d$维向量
 
-$$\boldsymbol{y}^{(i)} = \text{BN}(\boldsymbol{x}^{(i)}),$$
+$$\mathbf{y}^{(i)} = \text{BN}(\mathbf{x}^{(i)}),$$
 
 and it is obtained by the following steps. First, calculate the mean and the variance of the mini-batch $\mathcal{B}$:
 
-$$\boldsymbol{\mu}_\mathcal{B} \leftarrow \frac{1}{m}\sum_{i = 1}^{m} \boldsymbol{x}^{(i)},$$
-$$\boldsymbol{\sigma}_\mathcal{B}^2 \leftarrow \frac{1}{m} \sum_{i=1}^{m}(\boldsymbol{x}^{(i)} - \boldsymbol{\mu}_\mathcal{B})^2,$$
+$$\mathbf{\mu}_\mathcal{B} \leftarrow \frac{1}{m}\sum_{i = 1}^{m} \mathbf{x}^{(i)},$$
+$$\mathbf{\sigma}_\mathcal{B}^2 \leftarrow \frac{1}{m} \sum_{i=1}^{m}(\mathbf{x}^{(i)} - \mathbf{\mu}_\mathcal{B})^2,$$
 
-Here, square computation is carried out by squaring by element. Next, we use squaring by element and division by element to standardize $\boldsymbol{x}^{(i)}$:
+Here, square computation is carried out by squaring by element. Next, we use squaring by element and division by element to standardize $\mathbf{x}^{(i)}$:
 
-$$\hat{\boldsymbol{x}}^{(i)} \leftarrow \frac{\boldsymbol{x}^{(i)} - \boldsymbol{\mu}_\mathcal{B}}{\sqrt{\boldsymbol{\sigma}_\mathcal{B}^2 + \epsilon}},$$
+$$\hat{\mathbf{x}}^{(i)} \leftarrow \frac{\mathbf{x}^{(i)} - \mathbf{\mu}_\mathcal{B}}{\sqrt{\mathbf{\sigma}_\mathcal{B}^2 + \epsilon}},$$
 
-Here, $\epsilon > 0$ is a very small constant, and the denominator is guaranteed to be greater than 0. Based on the above standardization, the batch normalization layer introduces two model parameters that can be learned: the scale parameter $\boldsymbol{\gamma}$ and the shift parameter $\boldsymbol{\beta}$. These two parameters have the same shape as $\boldsymbol{x}^{(i)}$, and both are $d$-dimensional vectors. They are calculated respectively with $\boldsymbol{x}^{(i)}$ by multiplication by element (symbol $\odot$) and addition by element:
+Here, $\epsilon > 0$ is a very small constant, and the denominator is guaranteed to be greater than 0. Based on the above standardization, the batch normalization layer introduces two model parameters that can be learned: the scale parameter $\mathbf{\gamma}$ and the shift parameter $\mathbf{\beta}$. These two parameters have the same shape as $\mathbf{x}^{(i)}$, and both are $d$-dimensional vectors. They are calculated respectively with $\mathbf{x}^{(i)}$ by multiplication by element (symbol $\odot$) and addition by element:
 
-$${\boldsymbol{y}}^{(i)} \leftarrow \boldsymbol{\gamma} \odot \hat{\boldsymbol{x}}^{(i)} + \boldsymbol{\beta}.$$
+$${\mathbf{y}}^{(i)} \leftarrow \mathbf{\gamma} \odot \hat{\mathbf{x}}^{(i)} + \mathbf{\beta}.$$
 
-At this point, we have obtained the batch normalization output for $\boldsymbol{x}^{(i)}$: $\boldsymbol{y}^{(i)}$.
-It is worth noting that the learnable scale and shift parameters still may not be able to perform batch normalization on $\hat{\boldsymbol{x}}^{(i)}$. In this case, it is necessary to learn $\boldsymbol{\gamma} = \sqrt{\boldsymbol{\sigma}_\mathcal{B}^2 + \epsilon}$ and $\boldsymbol{\beta} = \boldsymbol{\mu}_\mathcal{B}$. We can understand it like this: If the batch normalization is not beneficial, theoretically, the learned model does not have to use batch normalization.
+At this point, we have obtained the batch normalization output for $\mathbf{x}^{(i)}$: $\mathbf{y}^{(i)}$.
+It is worth noting that the learnable scale and shift parameters still may not be able to perform batch normalization on $\hat{\mathbf{x}}^{(i)}$. In this case, it is necessary to learn $\mathbf{\gamma} = \sqrt{\mathbf{\sigma}_\mathcal{B}^2 + \epsilon}$ and $\mathbf{\beta} = \mathbf{\mu}_\mathcal{B}$. We can understand it like this: If the batch normalization is not beneficial, theoretically, the learned model does not have to use batch normalization.
 
 
 ### Batch Normalization for Convolutional Layers
