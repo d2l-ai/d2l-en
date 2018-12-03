@@ -67,7 +67,7 @@ Here, "/path/to/key.pem" is the path of the locally-stored key used to access th
 With the given address, we can log into our instance:
 
 
-![](img/login_screen.png)
+![ Login Screen. ](../img/login_screen.png)
 
 The login screen will show a long list of available conda environments for the different Deep Learning frameworks, CUDA driver and Python versions. With ```conda activate``` you can easily switch into the different environments.
 
