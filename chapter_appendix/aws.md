@@ -24,14 +24,13 @@ Figure 11.9 shows the EC2 panel. In the area marked by the red box in Figure 11.
 ![ EC2 panel. ](../img/ec2.png)
 
 
-The row at the top of Figure 11.10 shows the seven steps in the instance configuration process. In the first step "1. Choose AMI", choose Ubuntu 16.04 for the operating system.
-
-![ Choose an operating system. ](../img/os.png)
 AWS offers [Deep Learning AMIs](https://docs.aws.amazon.com/dlami/latest/devguide/options.html)
 that come with the latest versions of Deep Learning frameworks. The Deep Learning AMIs provide
 all necessary packages and drivers and allow you to directly start implementing
 and training your models. Deep Learning AMIs use optimized binaries, which accelerate model training and inference.
 AWS also offers DL Base AMIs that are useful for users that need their own custom Deep Learning environment. In this tutorial we use Deep Learning AMI (Ubuntu) Version 19.0:
+
+![ Choose an operating system. ](../img/os.png)
 
 In "Step 2: Chosse an Instance Type”，choose a "p2.xlarge" instance with K80 GPU. We can also choose instances with multiple GPUs such as "p2.16xlarge". If you want to compare machine configurations and fees of different instances, you may refer to https://www.ec2instances.info/.
 
@@ -74,10 +73,7 @@ The login screen will show a long list of available conda environments for the d
 
 ## Acquire the Code for this Book and activate MXNet GPU environment
 
-
-We have introduced the way to obtaining code of the book and setting up the running environment in Section ["Getting started with Gluon"](../chapter_prerequisite/install.md). First, install Miniconda of the Linux version (website: https://conda.io/miniconda.html), such as
-
-After installation, run `source ~/.bashrc` once to activate CUDA and Conda. Next, download the code for this book and install and activate the Conda environment.
+Next, download the code for this book and install and activate the Conda environment.
 
 ```
 mkdir d2l-en && cd d2l-en
@@ -113,7 +109,7 @@ As cloud services are billed by use duration, you will generally want to close i
 
 If you plan on restarting the instance after a short time, right-click on the example shown in Figure 11.16 and select "Instance State" $\rightarrow$ "Stop" to stop the instance. When you want to use it again, select "Instance State" $\rightarrow$ "Start" to restart the instance. In this situation, the restarted instance will retain the information stored on its hard disk before it was stopped (for example, you do not have to reinstall CUDA and other runtime environments). However, stopped instances will still be billed a small amount for the hard disk space retained.
 
-If you do not plan to use the instance again for a long time, right-click on the example in Figure 11.16 and select "Image" $\rightarrow$ "Create" to create an image of the instance. Then, select "Instance State" $\rightarrow$ "Terminate" to terminate the instance (it will no longer be billed for hard disk space). The next time you want to use this instance, you can follow the steps for creating and running an EC2 instance described in this section to create an instance based on the saved image. The only difference is that, in "1. Choose AMI" shown in Figure 11.10, you must use the "My AMIs" option on the left to select your saved image. The created instance will retain the information stored on the image hard disk. For example, you will not have to reinstall CUDA and other runtime environments.
+If you do not plan to use the instance again for a long time, right-click on the example in Figure 11.16 and select "Image" $\rightarrow$ "Create" to create an image of the instance. Then, select "Instance State" $\rightarrow$ "Terminate" to terminate the instance (it will no longer be billed for hard disk space). The next time you want to use this instance, you can follow the steps for creating and running an EC2 instance described in this section to create an instance based on the saved image. The only difference is that, in "1. Choose AMI" shown in Figure 11.10, you must use the "My AMIs" option on the left to select your saved image. The created instance will retain the information stored on the image hard disk. 
 
 ## Summary
 
