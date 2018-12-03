@@ -8,9 +8,9 @@ We have processed and analyzed variable-length input sequences in the previous c
 
 When the input and output are both variable-length sequences, we can use the encoder-decoder[1] or the seq2seq model[2]. Both models use two recurrent neural networks (RNNs) named encoders and decoders. The encoder is used to analyze the input sequence and the decoder is used to generate the output sequence.
 
-Figure 10.8 depicts a method for translating the English sentences above into French sentences using an encoder-decoder. In the training data set, we can attach a special symbol "&;eos&gt;" (end of sequence) after each sentence to indicate the termination of the sequence. For each time step, the encoder generates inputs following the order of words, punctuation, and special symbols "&lt;eos&gt;" in the English sentence. Figure 10.8 uses the hidden state of the encoder at the final time step as the encoding information for the input sentence. The decoder uses the encoding information of the input sentence, the output of the last time step, and the hidden state as inputs for each time step.
+Figure 10.8 depicts a method for translating the English sentences above into French sentences using an encoder-decoder. In the training data set, we can attach a special symbol "&lt;eos&gt;" (end of sequence) after each sentence to indicate the termination of the sequence. For each time step, the encoder generates inputs following the order of words, punctuation, and special symbols "&lt;eos&gt;" in the English sentence. Figure 10.8 uses the hidden state of the encoder at the final time step as the encoding information for the input sentence. The decoder uses the encoding information of the input sentence, the output of the last time step, and the hidden state as inputs for each time step.
 We hope that the decoder can correctly output the translated French words, punctuation, and special symbols "&lt;eos&gt;" at each time step.
-It should be noted that the input of the decoder at the initial time step uses a special symbol "&;eos&gt;" to indicate the beginning of the sequence.
+It should be noted that the input of the decoder at the initial time step uses a special symbol "&lt;bos&gt;" to indicate the beginning of the sequence.
 
 ![Use an encoder-decoder to translate this sentence from English to French.  The encoder and decoder are each recurrent neural networks. ](../img/seq2seq.svg)
 
@@ -61,8 +61,7 @@ to get the loss of the output sequence
 
 $$- \log\mathbb{P}(y_1, \ldots, y_{T'} \mid x_1, \ldots, x_T) = -\sum_{t'=1}^{T'} \log \mathbb{P}(y_{t'} \mid y_1, \ldots, y_{t'-1}, \boldsymbol{c}),$$
 
-In model training, the mean of losses for all the output sequences is usually used as a loss function that needs to be minimized. In the model prediction discussed in Figure 10.8, we need to use the output of the decoder from the previous time step as the input to the current time step. In contrast, in training, we can also use the label of the label sequence from the previous time step as the input of the decoder for the current time step. This is called teacher forcing.
-
+In model training, the mean of losses for all the output sequences is usually used as a loss function that needs to be minimized. In the model prediction discussed in Figure 10.8, we need to use the output of the decoder from the previous time step as the input to the current time step. In contrast, in training, we can also use the label of the label sequence from the previous time step as the input of the decoder for the current time step. This is called teacher forcing. 
 
 ## Summary
 
