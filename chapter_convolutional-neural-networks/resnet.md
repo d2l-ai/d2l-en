@@ -1,32 +1,43 @@
 # Residual Networks (ResNet)
 
-Let us start with a question: Can we add a new layer to the neural network so that the fully trained model can reduce training errors more effectively? In theory, the space of the original model solution is only the subspace of the space of the new model solution. This means that if we can train the newly-added layer into an identity mapping $f(x) = x$, the new model will be as effective as the original model. As the new model may get a better solution to fit the training data set, the added layer might make it easier to reduce training errors. In practice, however, with the addition of too many layers, training errors increase rather than decrease. Even if the numerical stability brought about by batch normalization makes it easier to train a deep model, this problem still exists. In response to this problem, He Kaiming and his colleagues proposed the ResNet[1]. It won the ImageNet Visual Recognition Challenge in 2015 and had a profound influence on the design of subsequent deep neural networks.
+As we design increasingly deeper networks it becomes imperative to understand how adding layers can increase the complexity and expressiveness of the network. Even more important is the ability to design networks where adding layers makes networks strictly more expressive rather than just different. To make some progress we need a bit of theory. 
+
+## Function Classes
+
+Consider $\mathcal{F}$, the class of functions that a specific network architecture (together with learning rates and other hyperparameter settings) can reach. That is, for all $f \in \mathcal{F}$ there exists some set of parameters $W$ that can be obtained through training on a suitable dataset. Let's assume that $f^*$ is the function that we really would like to find. If it's in $\mathcal{F}$, we're in good shape but typically we won't be quite so lucky. Instead, we will try to find some $f^*_\mathcal{F}$ which is our best bet within $\mathcal{F}$. For instance, we might try finding it by solving the following optimization problem:
+
+$$f^*_\mathcal{F} := \mathop{\mathrm{argmin}}_f L(X, Y, f) \text{ subject to } f \in \mathcal{F}$$ 
+
+It is only reasonable to assume that if we design a different and more powerful architecture $\mathcal{F}'$ we should arrive at a better outcome. In other words, we would expect that $f^*_{\mathcal{F}'}$ is 'better' than $f^*_{\mathcal{F}}$. However, if $\mathcal{F} \not\subseteq \mathcal{F}'$ there is no guarantee that this should even happen. In fact, $f^*_{\mathcal{F}'}$ might well be worse. This is a situation that we often encounter in practice - adding layers doesn't only make the network more expressive, it also changes it in sometimes not quite so predictable ways. The picture below illustrates this in slightly abstract terms. 
+
+![Left: non-nested function classes. The distance may in fact increase as the complexity increases. Right: with nested function classes this does not happen.](../img/functionclasses.svg)
+
+Only if larger function classes contain the smaller ones are we guaranteed that increasing them strictly increases the expressive power of the network. This is the question that He et al, 2016 considered when working on very deep computer vision models. At the heart of ResNet is the idea that every additional layer should contain the identity function as one of its elements. This means that if we can train the newly-added layer into an identity mapping $f(\mathbf{x}) = \mathbf{x}$, the new model will be as effective as the original model. As the new model may get a better solution to fit the training data set, the added layer might make it easier to reduce training errors. Even better, the identity function rather than the null $f(\mathbf{x}) = 0$ should be the the simplest function within a layer. 
+
+These considerations are rather profound but they led to a surprisingly simple solution, a residual block. With it, He et al, 2016 won the ImageNet Visual Recognition Challenge in 2015. The design had a profound influence on how to build deep neural networks.
 
 
 ## Residual Blocks
 
-Let us focus on the local neural network. As shown in Figure 5.9, set the input as $\boldsymbol{x}$. We assume the ideal mapping we want to obtain by learning is $f(\boldsymbol{x})$, to be used as the input to the activation function in Figure 5.9 above. The portion within the dotted-line box in the left image must directly fit the mapping $f(\boldsymbol{x})$. The portion within the dotted-line box in the right image must fit the residual mapping $f(\boldsymbol{x})-\boldsymbol{x}$. In practice, the residual mapping is often easier to optimize. Use the identity mapping mentioned at the beginning of this section as the ideal mapping $f(\boldsymbol{x})$ that we want to obtain by learning, and use ReLU as the activation function. We only need to zero the weight and the bias parameter of the weighting operation (such as affine) at the top of the right image in Figure 5.9, so the output of ReLU above is identical to the input $\boldsymbol{x}$. The right image in Figure 5.9 is also the basic block of ResNet, that is, the residual block. In the residual block, the input can travel forward faster through cross-layer data paths.
+Let us focus on a local neural network, as depicted below. Denote the input by $\mathbf{x}$. We assume that the ideal mapping we want to obtain by learning is $f(\mathbf{x})$, to be used as the input to the activation function. The portion within the dotted-line box in the left image must directly fit the mapping $f(\mathbf{x})$. This can be tricky if we don't need that particular layer and we would much rather retain the input $\mathbf{x}$. The portion within the dotted-line box in the right image now only needs to parametrize the *deviation* from the identity, since we return $\mathbf{x} + f(\mathbf{x})$. In practice, the residual mapping is often easier to optimize. We only need to set $f(\mathbf{x}) = 0$. The right image in the figure below illustrates the basic Residual Block of ResNet. Similar architectures were later proposed for sequence models which we will study later. 
 
-![Set the input as $\boldsymbol{x}$. We assumer that the ideal mapping of ReLU at the top of the figure is $f(\boldsymbol{x})$. The portion within the dotted-line box in the left image must directly fit the mapping $f(\boldsymbol{x})$. The portion within the dotted-line box in the right image must fit the residual mapping $f(\boldsymbol{x})-\boldsymbol{x}$. ](../img/residual-block.svg)
+![The difference between a regular block (left) and a residual block (right). In the latter case, we can short-circuit the convolutions.](../img/residual-block.svg)
 
-ResNet follows VGG's full $3\times 3$ convolutional layer design. The residual block has two $3\times 3$ convolutional layers with the same number of output channels. Each convolutional layer is followed by a batch normalization layer and a ReLU activation function. Then, we skip these two convolution operations and add the input directly before the final ReLU activation function. This kind of design requires that the output of the two convolutional layers be of the same shape as the input, so that they can be added together. If you want to change the number of channels, you need to introduce an additional $1\times 1$ convolutional layer to transform the input into the desired shape for the addition operation.
-
-The residual block is implemented as follows. It can be used to set the number of output channels, whether to use an additional $1\times 1$ convolutional layer to change the number of channels, as well as the stride of convolutional layers.
+ResNet follows VGG's full $3\times 3$ convolutional layer design. The residual block has two $3\times 3$ convolutional layers with the same number of output channels. Each convolutional layer is followed by a batch normalization layer and a ReLU activation function. Then, we skip these two convolution operations and add the input directly before the final ReLU activation function. This kind of design requires that the output of the two convolutional layers be of the same shape as the input, so that they can be added together. If we want to change the number of channels or the the stride, we need to introduce an additional $1\times 1$ convolutional layer to transform the input into the desired shape for the addition operation. Let's have a look at the code below. 
 
 ```{.python .input  n=1}
 import gluonbook as gb
 from mxnet import gluon, init, nd
 from mxnet.gluon import nn
 
-class Residual(nn.Block):  # This category has been saved in the gluonbook package for future use.
+# This class has been saved in the gluonbook package for future use.
+class Residual(nn.Block):  
     def __init__(self, num_channels, use_1x1conv=False, strides=1, **kwargs):
         super(Residual, self).__init__(**kwargs)
-        self.conv1 = nn.Conv2D(num_channels, kernel_size=3, padding=1,
-                               strides=strides)
+        self.conv1 = nn.Conv2D(num_channels, kernel_size=3, padding=1, strides=strides)
         self.conv2 = nn.Conv2D(num_channels, kernel_size=3, padding=1)
         if use_1x1conv:
-            self.conv3 = nn.Conv2D(num_channels, kernel_size=1,
-                                   strides=strides)
+            self.conv3 = nn.Conv2D(num_channels, kernel_size=1, strides=strides)
         else:
             self.conv3 = None
         self.bn1 = nn.BatchNorm()
