@@ -14,7 +14,7 @@ It is only reasonable to assume that if we design a different and more powerful 
 
 Only if larger function classes contain the smaller ones are we guaranteed that increasing them strictly increases the expressive power of the network. This is the question that He et al, 2016 considered when working on very deep computer vision models. At the heart of ResNet is the idea that every additional layer should contain the identity function as one of its elements. This means that if we can train the newly-added layer into an identity mapping $f(\mathbf{x}) = \mathbf{x}$, the new model will be as effective as the original model. As the new model may get a better solution to fit the training data set, the added layer might make it easier to reduce training errors. Even better, the identity function rather than the null $f(\mathbf{x}) = 0$ should be the the simplest function within a layer. 
 
-These considerations are rather profound but they led to a surprisingly simple solution, a residual block. With it, He et al, 2016 won the ImageNet Visual Recognition Challenge in 2015. The design had a profound influence on how to build deep neural networks.
+These considerations are rather profound but they led to a surprisingly simple solution, a residual block. With it, [He et al, 2015](https://arxiv.org/abs/1512.03385) won the ImageNet Visual Recognition Challenge in 2015. The design had a profound influence on how to build deep neural networks.
 
 
 ## Residual Blocks
@@ -23,7 +23,7 @@ Let us focus on a local neural network, as depicted below. Denote the input by $
 
 ![The difference between a regular block (left) and a residual block (right). In the latter case, we can short-circuit the convolutions.](../img/residual-block.svg)
 
-ResNet follows VGG's full $3\times 3$ convolutional layer design. The residual block has two $3\times 3$ convolutional layers with the same number of output channels. Each convolutional layer is followed by a batch normalization layer and a ReLU activation function. Then, we skip these two convolution operations and add the input directly before the final ReLU activation function. This kind of design requires that the output of the two convolutional layers be of the same shape as the input, so that they can be added together. If we want to change the number of channels or the the stride, we need to introduce an additional $1\times 1$ convolutional layer to transform the input into the desired shape for the addition operation. Let's have a look at the code below. 
+ResNet follows VGG's full $3\times 3$ convolutional layer design. The residual block has two $3\times 3$ convolutional layers with the same number of output channels. Each convolutional layer is followed by a batch normalization layer and a ReLU activation function. Then, we skip these two convolution operations and add the input directly before the final ReLU activation function. This kind of design requires that the output of the two convolutional layers be of the same shape as the input, so that they can be added together. If we want to change the number of channels or the the stride, we need to introduce an additional $1\times 1$ convolutional layer to transform the input into the desired shape for the addition operation. Let's have a look at the code below.
 
 ```{.python .input  n=1}
 import gluonbook as gb
@@ -49,6 +49,10 @@ class Residual(nn.Block): # This class is part of the gluonbook package
             X = self.conv3(X)
         return nd.relu(Y + X)
 ```
+
+This code generates two types of networks: one where we add the input to the output before applying the ReLu nonlinearity, and whenever `use_1x1conv=True`, one where we adjust channels and resolution by means of a $1 \times 1$ convolution before adding. The diagram below illustrates this:
+
+![Left: regular ResNet block; Right: ResNet block with 1x1 convolution](../img/ResNetBlock.svg) 
 
 Now let us look at a situation where the input and output are of the same shape.
 
@@ -108,9 +112,11 @@ Finally, just like GoogLeNet, we add a global average pooling layer, followed by
 net.add(nn.GlobalAvgPool2D(), nn.Dense(10))
 ```
 
-There are 4 convolutional layers in each module (excluding the $1\times 1$ convolutional layer). Together with the first convolutional layer and the final fully connected layer, there are 18 layers in total. Therefore, this model is commonly known as ResNet-18. By configuring different numbers of channels and residual blocks in the module, we can create different ResNet models, such as the deeper 152-layer ResNet-152. Although the main architecture of ResNet is similar to that of GoogLeNet, ResNet's structure is simpler and easier to modify. All these factors have resulted in the rapid and widespread use of ResNet.
+There are 4 convolutional layers in each module (excluding the $1\times 1$ convolutional layer). Together with the first convolutional layer and the final fully connected layer, there are 18 layers in total. Therefore, this model is commonly known as ResNet-18. By configuring different numbers of channels and residual blocks in the module, we can create different ResNet models, such as the deeper 152-layer ResNet-152. Although the main architecture of ResNet is similar to that of GoogLeNet, ResNet's structure is simpler and easier to modify. All these factors have resulted in the rapid and widespread use of ResNet. Below is a diagram of the full ResNet-18.
 
-Before training ResNet, let us observe how the input shape changes between different modules in ResNet.
+![ResNet 18](../img/ResNetFull.svg)
+
+Before training ResNet, let us observe how the input shape changes between different modules in ResNet. As in all previous architectures, the resolution decreases while the number of channels increases up until the point where a global average pooling layer aggregates all features.
 
 ```{.python .input  n=6}
 X = nd.random.uniform(shape=(1, 1, 224, 224))
@@ -122,7 +128,7 @@ for layer in net:
 
 ## Data Acquisition and Training
 
-Now we train ResNet on the Fashion-MNIST data set.
+We train ResNet on the Fashion-MNIST data set, just like before. The only thing that has changed is the learning rate that decreased again, due to the more complex architecture.
 
 ```{.python .input}
 lr, num_epochs, batch_size, ctx = 0.05, 5, 256, gb.try_gpu()
@@ -134,15 +140,19 @@ gb.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
 
 ## Summary
 
+* Residual blocks allow for a parametrization relative to the identity function $f(\mathbf{x}) = \mathbf{x}$.
+* Adding residual blocks increases the function complexity in a well-defined manner.
 * We can train an effective deep neural network by having residual blocks pass through cross-layer data channels.
-* ResNet has had a major influence on the design of subsequent deep neural networks.
+* ResNet had a major influence on the design of subsequent deep neural networks, both for convolutional and sequential nature.
 
 
 ## Problems
 
-* Refer to Table 1 in the ResNet thesis to implement different versions of ResNet[1].
-* For deeper networks, the ResNet thesis introduces a "bottleneck" architecture to reduce model complexity. Try to implement it [1].
-* In subsequent versions of ResNet, the author changed the "convolution, batch normalization, and activation" architecture to the "batch normalization, activation, and convolution" architecture. Make this improvement yourself([2], Figure 1).
+1. Refer to Table 1 in the [ResNet paper](https://arxiv.org/abs/1512.03385) to implement different variants.
+1. For deeper networks, ResNet introduces a "bottleneck" architecture to reduce model complexity. Try to implement it.
+1. In subsequent versions of ResNet, the author changed the "convolution, batch normalization, and activation" architecture to the "batch normalization, activation, and convolution" architecture. Make this improvement yourself. See Figure 1 in [He et al., 2016](https://arxiv.org/abs/1603.05027) for details.
+1. Prove that if $\mathbf{x}$ is generated by a ReLu, the ResNet block does indeed include the identity function.
+1. Why can't we just increase the complexity of functions without bound, even if the function classes are nested?
 
 
 ## References
