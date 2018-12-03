@@ -27,8 +27,13 @@ Figure 11.9 shows the EC2 panel. In the area marked by the red box in Figure 11.
 The row at the top of Figure 11.10 shows the seven steps in the instance configuration process. In the first step "1. Choose AMI", choose Ubuntu 16.04 for the operating system.
 
 ![ Choose an operating system. ](../img/os.png)
+AWS offers [Deep Learning AMIs](https://docs.aws.amazon.com/dlami/latest/devguide/options.html)
+that come with the latest versions of Deep Learning frameworks. The Deep Learning AMIs provide
+all necessary packages and drivers and allow you to directly start implementing
+and training your models. Deep Learning AMIs use optimized binaries, which accelerate model training and inference.
+AWS also offers DL Base AMIs that are useful for users that need their own custom Deep Learning environment. In this tutorial we use Deep Learning AMI (Ubuntu) Version 19.0:
 
-EC2 provides many different instance configurations to choose from. As shown in Figure 11.11, In "Step 2: Chosse an Instance Type”，choose a "p2.xlarge" instance with K80 GPU. We can also choose instances with multiple GPUs such as "p2.16xlarge". If you want to compare machine configurations and fees of different instances, you may refer to https://www.ec2instances.info/.
+In "Step 2: Chosse an Instance Type”，choose a "p2.xlarge" instance with K80 GPU. We can also choose instances with multiple GPUs such as "p2.16xlarge". If you want to compare machine configurations and fees of different instances, you may refer to https://www.ec2instances.info/.
 
 ![ Choose an instance. ](../img/p2x.png)
 
@@ -57,79 +62,20 @@ ssh -i "/path/to/key.pem" ubuntu@ec2-xx-xxx-xxx-xxx.y.compute.amazonaws.com
 
 Here, "/path/to/key.pem" is the path of the locally-stored key used to access the instance. When the command line prompts "Are you sure you want to continue connecting (yes/no)", enter "yes" and press Enter to log into the instance.
 
+
 ![ View instance access and startup method. ](../img/connect.png)
 
-
-## Install CUDA
-
-If you log into a GPU instance, you need to download and install CUDA. First, update and install the package needed for compilation.
-
-```
-sudo apt-get update && sudo apt-get install -y build-essential git libgfortran3
-```
-
-Nvidia releases a major version of CUDA every year. Here we download the latest CUDA 9.1 when the book is written. Visit the official website of Nvidia(https://developer.nvidia.com/cuda-91-download-archive) to obtain the download link of CUDA 9.1, as shown in Figure 11.17.
-
-![Find the CUDA 9.1 download address. ](../img/cuda.png)
+With the given address, we can log into our instance:
 
 
-After finding the download address, download and install CUDA 9.1. For example:
+![](img/login_screen.png)
 
-```
-wget https://developer.download.nvidia.com/compute/cuda/9.1/secure/Prod/local_installers/cuda_9.1.85_387.26_linux.run
-sudo sh cuda_9.1.85_387.26_linux.run
-```
+The login screen will show a long list of available conda environments for the different Deep Learning frameworks, CUDA driver and Python versions. With ```conda activate``` you can easily switch into the different environments.
 
-Press "Ctrl+C" to jump out of the document and answer the following questions.
+## Acquire the Code for this Book and activate MXNet GPU environment
 
-```
-accept/decline/quit: accept
-Install NVIDIA Accelerated Graphics Driver for Linux-x86_64 387.26?
-(y)es/(n)o/(q)uit: y
-Do you want to install the OpenGL libraries?
-(y)es/(n)o/(q)uit [ default is yes ]: y
-Do you want to run nvidia-xconfig?
-(y)es/(n)o/(q)uit [ default is no ]: n
-Install the CUDA 9.1 Toolkit?
-(y)es/(n)o/(q)uit: y
-Enter Toolkit Location
- [ default is /usr/local/cuda-9.1 ]:
-Do you want to install a symbolic link at /usr/local/cuda?
-(y)es/(n)o/(q)uit: y
-Install the CUDA 9.1 Samples?
-(y)es/(n)o/(q)uit: n
-```
-
-After installing the program, run the following command to view the instance GPU.
-
-```
-nvidia-smi
-```
-
-Finally, add CUDA to the library path to help other libraries find it.
-
-```
-echo "export LD_LIBRARY_PATH=\${LD_LIBRARY_PATH}:/usr/local/cuda-9.1/lib64" >> .bashrc
-```
-
-## Acquire the Code for this Book and Install MXNet GPU Version
 
 We have introduced the way to obtaining code of the book and setting up the running environment in Section ["Getting started with Gluon"](../chapter_prerequisite/install.md). First, install Miniconda of the Linux version (website: https://conda.io/miniconda.html), such as
-
-```
-wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
-bash Miniconda3-latest-Linux-x86_64.sh
-```
-
-Now, you need to answer the following questions:
-
-```
-Do you accept the license terms? [yes|no]
-[no] >>> yes
-Do you wish the installer to prepend the Miniconda3 install location
-to PATH in your /home/ubuntu/.bashrc ? [yes|no]
-[no] >>> yes
-```
 
 After installation, run `source ~/.bashrc` once to activate CUDA and Conda. Next, download the code for this book and install and activate the Conda environment.
 
@@ -137,15 +83,7 @@ After installation, run `source ~/.bashrc` once to activate CUDA and Conda. Next
 mkdir d2l-en && cd d2l-en
 curl https://www.diveintodeeplearning.org/d2l-en-1.0.zip -o d2l-en.zip
 unzip d2l-en.zip && rm d2l-en.zip
-conda env create -f environment.yml
-source activate gluon
-```
-
-The MXNet CPU version is installed in the environment by default. Now, you must replace it with the MXNet GPU version. As the CUDA version is 9.1, install `mxnet-cu91`. Generally speaking, if your CUDA version is x.y, the corresponding MXNET version is `mxnet-cuxy`.
-
-```
-pip uninstall mxnet
-pip install mxnet-cu91
+source activate mxnet_p36 
 ```
 
 ## Run Jupyter Notebook
