@@ -50,6 +50,6 @@ Generally, GPUs are primarily used for deep learning training. Therefore, you do
 
 * You can browse the discussions about machine configurations in the forum for this section.
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/1177)
+## Discuss on our Forum
 
-![](../img/qr_buy-gpu.svg)
+<div id="discuss" topic_id="2400"></div>

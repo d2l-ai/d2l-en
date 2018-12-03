@@ -65,11 +65,11 @@ We need iterate over the entire data set and continuously examine mini-batches o
 def data_iter(batch_size, features, labels):
     num_examples = len(features)
     indices = list(range(num_examples))
-    random.shuffle(indices)  # The examples are read at random, in no particular order. 
+    random.shuffle(indices)  # The examples are read at random, in no particular order.
     for i in range(0, num_examples, batch_size):
         j = nd.array(indices[i: min(i + batch_size, num_examples)])
-        yield features.take(j), labels.take(j)  
-        # The “take” function will then return the corresponding element based on the indices. 
+        yield features.take(j), labels.take(j)
+        # The “take” function will then return the corresponding element based on the indices.
 ```
 
 Let's read and print the first small batch of data examples. The shape of the features in each batch corresponds to the batch size and the number of input dimensions. Likewise, we obtain as many labels as requested by the batch size.
@@ -82,7 +82,7 @@ for X, y in data_iter(batch_size, features, labels):
     break
 ```
 
-Clearly, if we run the iterator again, we obtain a different minibatch until all the data has been exhausted (try this). Note that the iterator described above is a bit inefficient (it requires that we load all data in memory and that we perform a lot of random memory access). The built-in iterators are more efficient and they can deal with data stored on file (or being fed via a data stream). 
+Clearly, if we run the iterator again, we obtain a different minibatch until all the data has been exhausted (try this). Note that the iterator described above is a bit inefficient (it requires that we load all data in memory and that we perform a lot of random memory access). The built-in iterators are more efficient and they can deal with data stored on file (or being fed via a data stream).
 
 ## Initialize Model Parameters
 
@@ -138,22 +138,22 @@ In training, we will iterate over the data to improve the model parameters. In e
     * Update parameters $(\mathbf{w}, b) \leftarrow (\mathbf{w}, b) - \eta \mathbf{g}$
 
 Since nobody wants to compute gradients explicitly (this is tedious and error prone) we use automatic differentiation to compute $g$. See section ["Automatic Gradient"](../chapter_prerequisite/autograd.md) for more details. Since the loss `l` is not a scalar variable, running `l.backward()` will add together the elements in `l` to obtain the new variable, and then calculate the variable model parameters’ gradient.
- 
+
 In an epoch (a pass through the data), we will iterate through the `data_iter` function once and use it for all the examples in the training data set (assuming the number of examples is divisible by the batch size). The number of epochs `num_epochs` and the learning rate `lr` are both hyper-parameters and are set to 3 and 0.03, respectively. Unfortunately in practice, the majority of the hyper-parameters will require some adjustment by trial and error. For instance, the model might actually become more accurate by training longer (but this increases computational cost). Likewise, we might want to change the learning rate on the fly. We will discuss this later in the chapter on  ["Optimization Algorithms"](../chapter_optimization/index.md).
 
 ```{.python .input  n=12}
 lr = 0.03               # learning rate
-num_epochs = 3          # number of iterations 
+num_epochs = 3          # number of iterations
 net = linreg            # our fancy linear model
 loss = squared_loss     # 0.5 (y-y')^2
 
-for epoch in range(num_epochs):  
-    # Assuming the number of examples can be divided by the batch size, all the examples in 
-    # the training data set are used once in one epoch iteration. 
-    # The features and tags of mini-batch examples are given by X and Y respectively.  
+for epoch in range(num_epochs):
+    # Assuming the number of examples can be divided by the batch size, all the examples in
+    # the training data set are used once in one epoch iteration.
+    # The features and tags of mini-batch examples are given by X and Y respectively.
     for X, y in data_iter(batch_size, features, labels):
         with autograd.record():
-            l = loss(net(X, w, b), y)  # minibatch loss in X and Y 
+            l = loss(net(X, w, b), y)  # minibatch loss in X and Y
         l.backward()                   # compute gradient on l with respect to [w,b]
         sgd([w, b], lr, batch_size)    # update parameters [w,b] using their gradient
     train_l = loss(net(features, w, b), labels)
@@ -167,7 +167,7 @@ print('Error in estimating w', true_w - w.reshape(true_w.shape))
 print('Error in estimating b', true_b - b)
 ```
 
-Note that we should not take it for granted that we are able to reover the parameters accurately. This only happens for a special category problems: strongly convex optimization problems with 'enough' data to ensure that the noisy samples allow us to recover the underlying dependency correctly. In most cases this is *not* the case. In fact, the parameters of a deep network are rarely the same (or even close) between two different runs, unless everything is kept identically, including the order in which the data is traversed. Nonetheless this can lead to very good solutions, mostly due to the fact that quite often there are many sets of parameters that work well. 
+Note that we should not take it for granted that we are able to reover the parameters accurately. This only happens for a special category problems: strongly convex optimization problems with 'enough' data to ensure that the noisy samples allow us to recover the underlying dependency correctly. In most cases this is *not* the case. In fact, the parameters of a deep network are rarely the same (or even close) between two different runs, unless everything is kept identically, including the order in which the data is traversed. Nonetheless this can lead to very good solutions, mostly due to the fact that quite often there are many sets of parameters that work well.
 
 ## Summary
 
@@ -176,15 +176,14 @@ We saw how a deep network can be implemented and optimized from scratch, using j
 
 ## Problems
 
-1. What would happen if we were to initialize the weights $\mathbf{w} = 0$. Would the algorithm still work? 
+1. What would happen if we were to initialize the weights $\mathbf{w} = 0$. Would the algorithm still work?
 1. Assume that you're [Georg Simon Ohm](https://en.wikipedia.org/wiki/Georg_Ohm) trying to come up with a model between voltage and current. Can you use `autograd` to learn the parameters of your model.
-1. Can you use [Planck's Law](https://en.wikipedia.org/wiki/Planck%27s_law) to determine the temperature of an object using spectral energy density. 
+1. Can you use [Planck's Law](https://en.wikipedia.org/wiki/Planck%27s_law) to determine the temperature of an object using spectral energy density.
 1. What are the problems you might encounter if you wanted to extend `autograd` to second derivatives? How would you fix them?
 1.  Why is the `reshape` function needed in the `squared_loss` function?
-1. Experiment using different learning rates to find out how fast the loss function value drops. 
+1. Experiment using different learning rates to find out how fast the loss function value drops.
 1. If the number of examples cannot be divided by the batch size, what happens to the `data_iter` function’s behavior?
 
+## Discuss on our Forum
 
-## Scan the QR code to access the [forum](https://discuss.gluon.ai/t/topic/743)
-
-![](../img/qr_linear-regression-scratch.svg)
+<div id="discuss" topic_id="2332"></div>

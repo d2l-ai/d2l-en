@@ -41,8 +41,8 @@ $$\frac{\partial L}{\partial \boldsymbol{o}_t} =  \frac{\partial \ell (\boldsymb
 Now, we can calculate the gradient for the objective function model parameter $\boldsymbol{W}_{qh}$: $\partial L/\partial \boldsymbol{W}_{qh} \in \mathbb{R}^{q \times h}$. Based on Figure 6.3, $L$ depends on $\boldsymbol{W}_{qh}$ through $\boldsymbol{o}_1, \ldots, \boldsymbol{o}_T$. Applying the chain rule,
 
 $$
-\frac{\partial L}{\partial \boldsymbol{W}_{qh}} 
-= \sum_{t=1}^T \text{prod}\left(\frac{\partial L}{\partial \boldsymbol{o}_t}, \frac{\partial \boldsymbol{o}_t}{\partial \boldsymbol{W}_{qh}}\right) 
+\frac{\partial L}{\partial \boldsymbol{W}_{qh}}
+= \sum_{t=1}^T \text{prod}\left(\frac{\partial L}{\partial \boldsymbol{o}_t}, \frac{\partial \boldsymbol{o}_t}{\partial \boldsymbol{W}_{qh}}\right)
 = \sum_{t=1}^T \frac{\partial L}{\partial \boldsymbol{o}_t} \boldsymbol{h}_t^\top.
 $$
 
@@ -62,16 +62,16 @@ the objective function gradient with respect to the hidden states of the time st
 
 
 $$
-\frac{\partial L}{\partial \boldsymbol{h}_t} 
-= \text{prod}\left(\frac{\partial L}{\partial \boldsymbol{h}_{t+1}}, \frac{\partial \boldsymbol{h}_{t+1}}{\partial \boldsymbol{h}_t} \right) 
-+ \text{prod}\left(\frac{\partial L}{\partial \boldsymbol{o}_t}, \frac{\partial \boldsymbol{o}_t}{\partial \boldsymbol{h}_t} \right) 
+\frac{\partial L}{\partial \boldsymbol{h}_t}
+= \text{prod}\left(\frac{\partial L}{\partial \boldsymbol{h}_{t+1}}, \frac{\partial \boldsymbol{h}_{t+1}}{\partial \boldsymbol{h}_t} \right)
++ \text{prod}\left(\frac{\partial L}{\partial \boldsymbol{o}_t}, \frac{\partial \boldsymbol{o}_t}{\partial \boldsymbol{h}_t} \right)
 = \boldsymbol{W}_{hh}^\top \frac{\partial L}{\partial \boldsymbol{h}_{t+1}} + \boldsymbol{W}_{qh}^\top \frac{\partial L}{\partial \boldsymbol{o}_t}.
 $$
 
 Expanding the recursive formula above, we can find a general formula for the objective function hidden state gradient for any time step $1 \leq t \leq T$.
 
 $$
-\frac{\partial L}{\partial \boldsymbol{h}_t} 
+\frac{\partial L}{\partial \boldsymbol{h}_t}
 = \sum_{i=t}^T {\left(\boldsymbol{W}_{hh}^\top\right)}^{T-i} \boldsymbol{W}_{qh}^\top \frac{\partial L}{\partial \boldsymbol{o}_{T+t-i}}.
 $$
 
@@ -81,11 +81,11 @@ According to the chain rule, we get
 
 $$
 \begin{aligned}
-\frac{\partial L}{\partial \boldsymbol{W}_{hx}} 
-&= \sum_{t=1}^T \text{prod}\left(\frac{\partial L}{\partial \boldsymbol{h}_t}, \frac{\partial \boldsymbol{h}_t}{\partial \boldsymbol{W}_{hx}}\right) 
+\frac{\partial L}{\partial \boldsymbol{W}_{hx}}
+&= \sum_{t=1}^T \text{prod}\left(\frac{\partial L}{\partial \boldsymbol{h}_t}, \frac{\partial \boldsymbol{h}_t}{\partial \boldsymbol{W}_{hx}}\right)
 = \sum_{t=1}^T \frac{\partial L}{\partial \boldsymbol{h}_t} \boldsymbol{x}_t^\top,\\
-\frac{\partial L}{\partial \boldsymbol{W}_{hh}} 
-&= \sum_{t=1}^T \text{prod}\left(\frac{\partial L}{\partial \boldsymbol{h}_t}, \frac{\partial \boldsymbol{h}_t}{\partial \boldsymbol{W}_{hh}}\right) 
+\frac{\partial L}{\partial \boldsymbol{W}_{hh}}
+&= \sum_{t=1}^T \text{prod}\left(\frac{\partial L}{\partial \boldsymbol{h}_t}, \frac{\partial \boldsymbol{h}_t}{\partial \boldsymbol{W}_{hh}}\right)
 = \sum_{t=1}^T \frac{\partial L}{\partial \boldsymbol{h}_t} \boldsymbol{h}_{t-1}^\top.
 \end{aligned}
 $$
@@ -106,6 +106,6 @@ To give an example, the calculation of the parameter gradient $\partial L/\parti
 
 * Besides gradient clipping, can you think of any other methods to cope with gradient explosion in recurrent neural networks?
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/3711)
+## Discuss on our Forum
 
-![](../img/qr_bptt.svg)
+<div id="discuss" topic_id="2366"></div>

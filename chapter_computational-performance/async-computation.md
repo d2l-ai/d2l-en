@@ -203,7 +203,6 @@ print('increased memory: %f MB' % (get_mem() - mem))
 
 * In the section "Use of Asynchronous Programming to Improve Computing Performance", we mentioned that using asynchronous computation can reduce the total amount of time needed to perform 1000 computations to $t_1 + 1000 t_2 + t_3$. Why do we have to assume $1000t_2 > 999t_1$ here?
 
+## Discuss on our Forum
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/1881)
-
-![](../img/qr_async-computation.svg)
+<div id="discuss" topic_id="2381"></div>

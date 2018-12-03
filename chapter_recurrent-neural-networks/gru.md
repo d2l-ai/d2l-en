@@ -176,14 +176,12 @@ gb.train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
 * Adjust the hyper-parameters and observe and analyze the impact on running time, perplexity, and the written lyrics.
 * Compare the running times of a GRU and ungated recurrent neural network under the same conditions.
 
-
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/4042)
-
-![](../img/qr_gru.svg)
-
-
 ## References
 
 [1] Cho, K., Van Merriënboer, B., Bahdanau, D., & Bengio, Y. (2014). On the properties of neural machine translation: Encoder-decoder approaches. arXiv preprint arXiv:1409.1259.
 
 [2] Chung, J., Gulcehre, C., Cho, K., & Bengio, Y. (2014). Empirical evaluation of gated recurrent neural networks on sequence modeling. arXiv preprint arXiv:1412.3555.
+
+## Discuss on our Forum
+
+<div id="discuss" topic_id="2367"></div>

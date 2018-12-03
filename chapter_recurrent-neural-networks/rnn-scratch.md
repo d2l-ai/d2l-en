@@ -194,7 +194,7 @@ def train_and_predict_rnn(rnn, get_params, init_rnn_state, num_hiddens,
                 (outputs, state) = rnn(inputs, state, params)
                 # The shape after stitching is (num_steps * batch_size, vocab_size).
                 outputs = nd.concat(*outputs, dim=0)
-                # The shape of Y is (batch_size, num_steps), and then becomes a vector with a length of 
+                # The shape of Y is (batch_size, num_steps), and then becomes a vector with a length of
                 # batch * num_steps after transposition. This gives it a one-to-one correspondence with output rows.
                 y = Y.T.reshape((-1,))
                 # The average classification error is calculated using cross entropy loss.
@@ -258,7 +258,6 @@ train_and_predict_rnn(rnn, get_params, init_rnn_state, num_hiddens,
 * Change adjacent sampling so that it does not separate hidden states from the computational graph. Does the running time change?
 * Replace the activation function used in this section with ReLU and repeat the experiments in this section.
 
+## Discuss on our Forum
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/989)
-
-![](../img/qr_rnn-scratch.svg)
+<div id="discuss" topic_id="23"></div>

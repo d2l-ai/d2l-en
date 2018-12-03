@@ -18,7 +18,7 @@ import gluonbook as gb
 from mxnet import nd
 
 def corr2d_multi_in(X, K):
-    # First, traverse along the 0th dimension (channel dimension) of X and K. Then, add them together by using * to turn 
+    # First, traverse along the 0th dimension (channel dimension) of X and K. Then, add them together by using * to turn
     # the result list into a positional argument of the add_n function.
     return nd.add_n(*[gb.corr2d(x, k) for x, k in zip(X, K)])
 ```
@@ -60,7 +60,7 @@ corr2d_multi_in_out(X, K)
 
 ## $1\times 1$ Convolutional Layer
 
-At first a $1 \times 1$ convolution, i.e. $k_h = k_w = 1$, doesn't seem to make much sense. After all, a convolution correlates adjacent pixels. A $1 \times 1$ convolution obviously doesn't. Nonetheless, it is a popular choice when designing complex and deep networks. Let's see in some detail what it actually does. 
+At first a $1 \times 1$ convolution, i.e. $k_h = k_w = 1$, doesn't seem to make much sense. After all, a convolution correlates adjacent pixels. A $1 \times 1$ convolution obviously doesn't. Nonetheless, it is a popular choice when designing complex and deep networks. Let's see in some detail what it actually does.
 
 Because the minimum window is used, the $1\times 1$ convolution loses the ability of the convolutional layer to recognize patterns composed of adjacent elements in the height and width dimensions. The main computation of the $1\times 1$ convolution occurs on the channel dimension. The figure below shows the cross-correlation computation using the $1\times 1$ convolution kernel with 3 input channels and 2 output channels. It is worth noting that the inputs and outputs have the same height and width. Each element in the output is derived from a linear combination of elements in the same position in the height and width of the input between different channels. Assuming that the channel dimension is considered a feature dimension and that the elements in the height and width dimensions are considered data examples, then the $1\times 1$ convolutional layer is equivalent to the fully connected layer.
 
@@ -78,7 +78,7 @@ def corr2d_multi_in_out_1x1(X, K):
     return Y.reshape((c_o, h, w))
 ```
 
-When performing $1\times 1$ convolution, the above function is equivalent to the previously implemented cross-correlation function `corr2d_multi_in_out`. Let's check this with some reference data. 
+When performing $1\times 1$ convolution, the above function is equivalent to the previously implemented cross-correlation function `corr2d_multi_in_out`. Let's check this with some reference data.
 
 ```{.python .input  n=7}
 X = nd.random.uniform(shape=(3, 3, 3))
@@ -99,12 +99,12 @@ Y2 = corr2d_multi_in_out(X, K)
 
 ## Problems
 
-1. Assume that we have two convolutional kernels of size $k_1$ and $k_2$ respectively (with no nonlinearity in between). 
+1. Assume that we have two convolutional kernels of size $k_1$ and $k_2$ respectively (with no nonlinearity in between).
     * Prove that the result of the operation can be expressed by a single convolution.
     * What is the dimensionality of the equivalent single convolution?
     * Is the converse true?
 1. Assume an input shape of $c_i\times h\times w$ and a convolution kernel with the shape $c_o\times c_i\times k_h\times k_w$, padding of $(p_h, p_w)$, and stride of $(s_h, s_w)$.
-    * What is the computational cost (multiplications and additions) for the forward computation?  
+    * What is the computational cost (multiplications and additions) for the forward computation?
     * What is the memory footprint?
     * What is the memory footprint for the backward computation?
     * What is the computational cost for the backward computation?
@@ -113,7 +113,6 @@ Y2 = corr2d_multi_in_out(X, K)
 1. Are the variables `Y1` and `Y2` in the last example of this section exactly the same? Why?
 1. How would you implement convolutions using matrix multiplication when the convolution window is not $1\times 1$?
 
+## Discuss on our Forum
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/6405)
-
-![](../img/qr_channels.svg)
+<div id="discuss" topic_id="2351"></div>

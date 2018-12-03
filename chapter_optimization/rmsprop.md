@@ -82,11 +82,13 @@ gb.train_gluon_ch7('rmsprop', {'learning_rate': 0.01, 'gamma1': 0.9},
 * What happens to the experimental results if we set the value of $\gamma$ to 1? Why?
 * Try using other combinations of initial learning rates and $\gamma$ hyperparameters and observe and analyze the experimental results.
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/2275)
 
 
-![](../img/qr_rmsprop.svg)
 
 ## Reference
 
 [1] Tieleman, T., & Hinton, G. (2012). Lecture 6.5-rmsprop: Divide the gradient by a running average of its recent magnitude. COURSERA: Neural networks for machine learning, 4(2), 26-31.
+
+## Discuss on our Forum
+
+<div id="discuss" topic_id="2376"></div>

@@ -68,14 +68,14 @@ gb.train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size, None,
              None, trainer)
 ```
 
-Just as before, this algorithm converges to a fairly decent accuracy of 83.7%, albeit this time with a lot fewer lines of code than before. Note that in many cases Gluon takes specific precautions beyond what one would naively do to ensure numerical stability. This takes care of many common pitfalls when coding a model from scratch. 
+Just as before, this algorithm converges to a fairly decent accuracy of 83.7%, albeit this time with a lot fewer lines of code than before. Note that in many cases Gluon takes specific precautions beyond what one would naively do to ensure numerical stability. This takes care of many common pitfalls when coding a model from scratch.
 
 
 ## Problems
 
 1. Try adjusting the hyper-parameters, such as batch size, epoch, and learning rate, to see what the results are.
-1. Why might the test accuracy decrease again after a while? How could we fix this? 
+1. Why might the test accuracy decrease again after a while? How could we fix this?
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/740)
+## Discuss on our Forum
 
-![](../img/qr_softmax-regression-gluon.svg)
+<div id="discuss" topic_id="2337"></div>

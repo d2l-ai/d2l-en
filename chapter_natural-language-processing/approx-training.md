@@ -10,7 +10,7 @@ $$-\log \mathbb{P}(w_o \mid w_c) =
 -\boldsymbol{u}_o^\top \boldsymbol{v}_c + \log\left(\sum_{i \in \mathcal{V}} \text{exp}(\boldsymbol{u}_i^\top \boldsymbol{v}_c)\right).$$
 
 
-Because the softmax operation has considered that the context word could be any word in the dictionary $\mathcal{V}$, the loss mentioned above actually includes the sum of the number of items in the dictionary size. From the last section, we know that for both the skip-gram model and CBOW model, because they both get the conditional probability using a softmax operation, the gradient computation for each step contains the sum of the number of items in the dictionary size. For larger dictionaries with hundreds of thousands or even millions of words, the overhead for computing each gradient may be too high.  In order to reduce such computational complexity, we will introduce two approximate training methods in this section: negative sampling and hierarchical softmax. Since there is no major difference between the skip-gram model and the CBOW model, we will only use the skip-gram model as an example to introduce these two training methods in this section. 
+Because the softmax operation has considered that the context word could be any word in the dictionary $\mathcal{V}$, the loss mentioned above actually includes the sum of the number of items in the dictionary size. From the last section, we know that for both the skip-gram model and CBOW model, because they both get the conditional probability using a softmax operation, the gradient computation for each step contains the sum of the number of items in the dictionary size. For larger dictionaries with hundreds of thousands or even millions of words, the overhead for computing each gradient may be too high.  In order to reduce such computational complexity, we will introduce two approximate training methods in this section: negative sampling and hierarchical softmax. Since there is no major difference between the skip-gram model and the CBOW model, we will only use the skip-gram model as an example to introduce these two training methods in this section.
 
 
 
@@ -85,6 +85,6 @@ In addition, because the order of magnitude for $L(w_o)-1$ is $\mathcal{O}(\text
 * What makes the last formula in this section hold?
 * How can we apply negative sampling and hierarchical softmax in the skip-gram model?
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/8135)
+## Discuss on our Forum
 
-![](../img/qr_word2vec-approx-train.svg)
+<div id="discuss" topic_id="2386"></div>

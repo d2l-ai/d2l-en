@@ -164,10 +164,11 @@ train_gluon_ch7('sgd', {'learning_rate': 0.05}, features, labels, 10)
 * Read the MXNet documentation and use the `Trainer` class `set_learning_rate` function to reduce the learning rate of the mini-batch SGD to 1/10 of its previous value after each epoch.
 
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/1877)
-
-![](../img/qr_minibatch-sgd.svg)
 
 ## Reference
 
 [1] Aircraft wing noise data set. https://archive.ics.uci.edu/ml/datasets/Airfoil+Self-Noise
+
+## Discuss on our Forum
+
+<div id="discuss" topic_id="2373"></div>

@@ -3,11 +3,11 @@
 In our first encounter with image data we applied a [Multilayer Perceptron](../chapter_deep-learning-basics/mlp-scratch.md) to pictures of clothing in the Fashion-MNIST data set. Both the height and width of each image were 28 pixels. We expanded the pixels in the image line by line to get a vector of length 784, and then used them as inputs to the fully connected layer. However, this classification method has certain limitations:
 
 1. The adjacent pixels in the same column of an image may be far apart in this vector. The patterns they create may be difficult for the model to recognize. In fact, the vectorial representation ignores position entirely - we could have permuted all $28 \times 28$ pixels at random and obtained the same results.
-2. For large input images, using a fully connected layer can easily cause the model to become too large, as we discussed previously. 
+2. For large input images, using a fully connected layer can easily cause the model to become too large, as we discussed previously.
 
 As discussed in the previous sections, the convolutional layer attempts to solve both problems. On the one hand, the convolutional layer retains the input shape, so that the correlation of image pixels in the directions of both height and width can be recognized effectively. On the other hand, the convolutional layer repeatedly calculates the same kernel and the input of different positions through the sliding window, thereby avoiding excessively large parameter sizes.
 
-A convolutional neural network is a network with convolutional layers. In this section, we will introduce an early convolutional neural network used to recognize handwritten digits in images - [LeNet5](http://yann.lecun.com/exdb/lenet/). Convolutional networks were invented by Yann LeCun and coworkers at AT&T Bell Labs in the early 90s. LeNet showed that it was possible to use gradient descent to train the convolutional neural network for handwritten digit recognition. It achieved outstanding results at the time (only matched by Support Vector Machines at the time). 
+A convolutional neural network is a network with convolutional layers. In this section, we will introduce an early convolutional neural network used to recognize handwritten digits in images - [LeNet5](http://yann.lecun.com/exdb/lenet/). Convolutional networks were invented by Yann LeCun and coworkers at AT&T Bell Labs in the early 90s. LeNet showed that it was possible to use gradient descent to train the convolutional neural network for handwritten digit recognition. It achieved outstanding results at the time (only matched by Support Vector Machines at the time).
 
 ## LeNet
 
@@ -50,7 +50,7 @@ for layer in net:
     print(layer.name, 'output shape:\t', X.shape)
 ```
 
-We can see that the height and width of the input in the convolutional layer block is reduced, layer by layer. The convolutional layer uses a kernel with a height and width of 5 to reduce the height and width by 4, while the pooling layer halves the height and width, but the number of channels increases from 1 to 16. The fully connected layer reduces the number of outputs layer by layer, until the number of image classes becomes 10. 
+We can see that the height and width of the input in the convolutional layer block is reduced, layer by layer. The convolutional layer uses a kernel with a height and width of 5 to reduce the height and width by 4, while the pooling layer halves the height and width, but the number of channels increases from 1 to 16. The fully connected layer reduces the number of outputs layer by layer, until the number of image classes becomes 10.
 
 ![Compressed notation for LeNet5](../img/lenet-vert.svg)
 
@@ -82,7 +82,7 @@ ctx
 Accordingly, we slightly modify the `evaluate_accuracy` function described when [impleenting the SoftMax from scratch](../chapter_deep-learning-basics/softmax-regression-scratch.md).  Since the data arrives in the CPU when loading we need to copy it to the GPU before any computation can occur. This is accomplished via the `as_in_context` function described in the [GPU Computing](../chapter_deep-learning-computation/use-gpu.md) section. Note that we accumulate the errors on the same device as where the data eventually lives (in `acc`). This avoids intermediate copy operations that would destroy performance.
 
 ```{.python .input}
-# This function has been saved in the gluonbook package for future use. The function will be gradually improved. 
+# This function has been saved in the gluonbook package for future use. The function will be gradually improved.
 # Its complete implementation will be discussed in the "Image Augmentation" section.
 def evaluate_accuracy(data_iter, net, ctx):
     acc = nd.array([0], ctx=ctx)
@@ -132,27 +132,27 @@ train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
 
 * A convolutional neural network (in short, ConvNet) is a network using convolutional layers.
 * In a ConvNet we alternate between convolutions, nonlinearities and often also pooling operations.
-* Ultimately the resolution is reduced prior to emitting an output via one (or more) dense layers. 
+* Ultimately the resolution is reduced prior to emitting an output via one (or more) dense layers.
 * LeNet was the first successful deployment of such a network.
 
 ## Problems
 
 1. Replace the average pooling with max pooling. What happens?
-1. Try to construct a more complex network based on LeNet to improve its accuracy. 
+1. Try to construct a more complex network based on LeNet to improve its accuracy.
     * Adjust the convolution window size.
     * Adjust the number of output channels.
     * Adjust the activation function (ReLu?).
     * Adjust the number of convolution layers.
     * Adjust the number of fully connected layers.
     * Adjust the learning rates and other training details (initialization, epochs, etc.)
-1. Try out the improved network on the original MNIST dataset. 
+1. Try out the improved network on the original MNIST dataset.
 1. Display the activations of the first and second layer of LeNet for different inputs (e.g. sweaters, coats).
 
-
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/737)
-
-![](../img/qr_lenet.svg)
 
 ## References
 
 [1] LeCun, Y., Bottou, L., Bengio, Y., & Haffner, P. (1998). Gradient-based learning applied to document recognition. Proceedings of the IEEE, 86(11), 2278-2324.
+
+## Discuss on our Forum
+
+<div id="discuss" topic_id="2353"></div>

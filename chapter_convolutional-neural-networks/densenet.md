@@ -131,10 +131,11 @@ gb.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
 * One problem for which DenseNet has been criticized is its high memory consumption. Is this really the case? Try to change the input shape to $224\times 224$ to see the actual (GPU) memory consumption.
 * Implement the various DenseNet versions presented in Table 1 of the DenseNet paper[1].
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/1664)
-
-![](../img/qr_densenet.svg)
 
 ## References
 
 [1] Huang, G., Liu, Z., Weinberger, K. Q., & van der Maaten, L. (2017). Densely connected convolutional networks. In Proceedings of the IEEE conference on computer vision and pattern recognition (Vol. 1, No. 2).
+
+## Discuss on our Forum
+
+<div id="discuss" topic_id="2360"></div>

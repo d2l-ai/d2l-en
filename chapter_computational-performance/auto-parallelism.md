@@ -95,7 +95,6 @@ As we can see, the total time required to perform computation and communication 
 * Designing computation tasks that include more complex data dependencies, and run experiments to see if MXNet can obtain the correct results and improve computing performance.
 * When the computational load of an operator is small enough, parallel computation on only the CPU or a single GPU may also improve the computing performance. Design an experiment to verify this.
 
+## Discuss on our Forum
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/1883)
-
-![](../img/qr_auto-parallelism.svg)
+<div id="discuss" topic_id="2382"></div>

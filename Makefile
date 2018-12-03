@@ -1,6 +1,6 @@
 all: html
 
-build/%.ipynb: %.md build/env.yml build/md2ipynb.py
+build/%.ipynb: %.md build/env.yml build/md2ipynb.py $(wildcard gluonbook/*)
 	@mkdir -p $(@D)
 	cd $(@D); python ../md2ipynb.py ../../$< ../../$@
 
@@ -14,24 +14,27 @@ NOTEBOOK = $(filter-out $(MARKDOWN), $(wildcard chapter*/*.md))
 OBJ = $(patsubst %.md, build/%.md, $(MARKDOWN)) \
 	$(patsubst %.md, build/%.ipynb, $(NOTEBOOK))
 
-ORIGN_DEPS = $(wildcard img/* data/* ) environment.yml README.md
-DEPS = $(patsubst %, build/%, $(ORIGN_DEPS))
+FRONTPAGE_DIR = img/frontpage
+FRONTPAGE = $(wildcard $(FRONTPAGE_DIR)/*)
+FRONTPAGE_DEP = $(patsubst %, build/%, $(FRONTPAGE))
 
-PKG = build/_build/html/d2l-en.tar.gz build/_build/html/d2l-en.zip
+IMG_NOTEBOOK = $(filter-out $(FRONTPAGE_DIR), $(wildcard img/*))
+ORIGIN_DEPS = $(IMG_NOTEBOOK) $(wildcard data/*) environment.yml README.md
+DEPS = $(patsubst %, build/%, $(ORIGIN_DEPS))
+
+PKG = build/_build/html/d2l-en.zip
 
 pkg: $(PKG)
 
 build/_build/html/d2l-en.zip: $(OBJ) $(DEPS)
 	cd build; zip -r $(patsubst build/%, %, $@ $(DEPS)) chapter*
 
-build/_build/html/d2l-en.tar.gz: $(OBJ) $(DEPS)
-	cd build; tar -zcvf $(patsubst build/%, %, $@ $(DEPS)) chapter*
-
+# Copy everything to build/.
 build/%: %
 	@mkdir -p $(@D)
 	@cp -r $< $@
 
-html: $(DEPS) $(OBJ)
+html: $(DEPS) $(FRONTPAGE_DEP) $(OBJ)
 	make -C build html
 	cp -r img/frontpage/ build/_build/html/_images/
 
@@ -62,4 +65,5 @@ pdf: $(DEPS) $(OBJ)
 	buf_size=10000000 xelatex d2l-en.tex
 
 clean:
-	rm -rf build/chapter* build/_build $(DEPS) $(PKG)
+	rm -rf build/chapter* build/_build build/img build/data build/environment.yml build/README.md $(PKG)
+

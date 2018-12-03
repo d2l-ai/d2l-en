@@ -36,7 +36,6 @@ Just as with multilayer perceptrons, the number of hidden layers $L$ and number 
 
 * Alter the model in the ["Implementation of a Recurrent Neural Network from Scratch"](rnn-scratch.md) section to create a recurrent neural network with two hidden layers. Observe and analyze the experimental phenomena.
 
+## Discuss on our Forum
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/6730)
-
-![](../img/qr_deep-rnn.svg)
+<div id="discuss" topic_id="2369"></div>

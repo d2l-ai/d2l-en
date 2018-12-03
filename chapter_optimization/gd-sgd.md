@@ -10,11 +10,11 @@ $$f(x + \epsilon) \approx f(x) + \epsilon f'(x) .$$
 
 Here, $f'(x)$ is the gradient of function $f$ at $x$. The gradient of a one-dimensional function is a scalar, also known as a derivative.
 
-Next, find a constant 
-$\eta>0$, 
-to make $\left|\eta f'(x)\right|$ sufficiently small 
-so that we can replace $\epsilon$ with 
-$-\eta f'(x)$ 
+Next, find a constant
+$\eta>0$,
+to make $\left|\eta f'(x)\right|$ sufficiently small
+so that we can replace $\epsilon$ with
+$-\eta f'(x)$
 and get
 
 $$f(x - \eta f'(x)) \approx f(x) -  \eta f'(x)^2.$$
@@ -188,7 +188,6 @@ As we can see, the iterative trajectory of the independent variable in the SGD i
 * Using a different objective function, observe the iterative trajectory of the independent variable in gradient descent and the SGD.
 * In the experiment for gradient descent in two-dimensional space, try to use different learning rates to observe and analyze the experimental phenomena.
 
+## Discuss on our Forum
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/1877)
-
-![](../img/qr_gd-sgd.svg)
+<div id="discuss" topic_id="2372"></div>

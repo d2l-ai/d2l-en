@@ -1,6 +1,6 @@
 # Convolutions for Images
 
-Now that we understand how to design convolutional networks in theory, let's see how this works in practice. For the next chapters we will stick to dealing with images, since they constitute one of the most common use cases for convolutional networks. That is, we will discuss the two-dimensional case (image height and width). We begin with the cross-correlation operator that we introduced in the previous section. Strictly speaking, convolutional networks are a slight misnomer (but for notation only), since the operations are typically expressed as cross correlations. 
+Now that we understand how to design convolutional networks in theory, let's see how this works in practice. For the next chapters we will stick to dealing with images, since they constitute one of the most common use cases for convolutional networks. That is, we will discuss the two-dimensional case (image height and width). We begin with the cross-correlation operator that we introduced in the previous section. Strictly speaking, convolutional networks are a slight misnomer (but for notation only), since the operations are typically expressed as cross correlations.
 
 ## The Cross-Correlation Operator
 
@@ -90,14 +90,14 @@ corr2d(X.T, K)
 
 Designing an edge detector by finite differences `[1, -1]` is neat if we know what we are looking for. However, as we look at larger kernels, or possibly multiple layers, it is next to impossible to specify such filters manually. Let's see whether we can learn the kernel that generated `Y` from `X` by looking at the (input, output) pairs only. We first construct a convolutional layer and initialize its kernel into a random array. Next, in each iteration, we use the squared error to compare `Y` and the output of the convolutional layer, then calculate the gradient to update the weight. For the sake of simplicity, the convolutional layer here ignores the bias.
 
-We previously constructed the `Conv2D` class. However, since we used single-element assignments, Gluon has some trouble finding the gradient. Instead, we use the built-in `Conv2D` class provided by Gluon below. 
+We previously constructed the `Conv2D` class. However, since we used single-element assignments, Gluon has some trouble finding the gradient. Instead, we use the built-in `Conv2D` class provided by Gluon below.
 
 ```{.python .input  n=83}
 # Construct a convolutional layer with 1 output channel (channels will be introduced in the following section) and a kernel array shape of (1, 2).
 conv2d = nn.Conv2D(1, kernel_size=(1, 2))
 conv2d.initialize()
 
-# The two-dimensional convolutional layer uses four-dimensional input and output in the format of (example channel, height, width), where the batch size (number of examples in the batch) and 
+# The two-dimensional convolutional layer uses four-dimensional input and output in the format of (example channel, height, width), where the batch size (number of examples in the batch) and
 # the number of channels are both 1.
 X = X.reshape((1, 1, 6, 8))
 Y = Y.reshape((1, 1, 6, 7))
@@ -121,9 +121,9 @@ conv2d.weight.data().reshape((1, 2))
 
 We find that the kernel array we learned is very close to the kernel array `K` we defined earlier.
 
-## Cross-correlation and Convolution 
+## Cross-correlation and Convolution
 
-Recall the observation from the previous section that cross-correlation and convolution are equivalent. In the figure above it is easy to see this correspondence. Simply flip the kernel from the bottom left to the top right. In this case the indexing in the sum is reverted, yet the same result can be obtained. In keeping with standard terminology with deep learning literature we will continue to refer to the cross-correlation operation as a convolution even though it is stricly speaking something slightly different. 
+Recall the observation from the previous section that cross-correlation and convolution are equivalent. In the figure above it is easy to see this correspondence. Simply flip the kernel from the bottom left to the top right. In this case the indexing in the sum is reverted, yet the same result can be obtained. In keeping with standard terminology with deep learning literature we will continue to refer to the cross-correlation operation as a convolution even though it is stricly speaking something slightly different.
 
 ## Summary
 
@@ -133,11 +133,11 @@ Recall the observation from the previous section that cross-correlation and conv
 
 ## Problems
 
-1. Construct an image `X` with diagonal edges. 
-    * What happens if you apply the kernel `K` to it? 
-    * What happens if you transpose `X`? 
+1. Construct an image `X` with diagonal edges.
+    * What happens if you apply the kernel `K` to it?
+    * What happens if you transpose `X`?
     * What happens if you transpose `K`?
-1. When you try to automatically find the gradient for the `Conv2D` class we created, what kind of error message do you see? 
+1. When you try to automatically find the gradient for the `Conv2D` class we created, what kind of error message do you see?
 1. How do you represent a cross-correlation operation as a matrix multiplication by changing the input and kernel arrays?
 1. Design some kernels manually.
     * What is the form of a kernel for the second derivative?
@@ -145,7 +145,6 @@ Recall the observation from the previous section that cross-correlation and conv
     * What is the kernel for an integral?
     * What is the minimum size of a kernel to obtain a derivative of degree $d$?
 
+## Discuss on our Forum
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/6314)
-
-![](../img/qr_conv-layer.svg)
+<div id="discuss" topic_id="2349"></div>

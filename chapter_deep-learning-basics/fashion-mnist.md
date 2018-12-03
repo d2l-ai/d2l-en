@@ -1,7 +1,7 @@
 # Image Classification Data (Fashion-MNIST)
 
-Before introducing the implementation for softmax regression, we need a suitable datset. To make things more visually compelling we pick one on classification. 
-It will be used multiple times in later chapters to allow us to observe the difference between model accuracy and computational efficiency between comparison algorithms. The most commonly used image classification data set is the [MNIST](http://yann.lecun.com/exdb/mnist/) handwritten digit recognition data set. It was proposed by LeCun, Cortes and Burges in the 1990s. However, most models have a classification accuracy of over 95% on MNIST, hence it is hard to spot the difference between different models. In order to get a better intuition about the difference between algorithms we use a more complex data set. [Fashion-MNIST](https://github.com/zalandoresearch/fashion-mnist) was proposed by [Xiao, Rasul and Vollgraf](https://arxiv.org/abs/1708.07747) in 2017. 
+Before introducing the implementation for softmax regression, we need a suitable datset. To make things more visually compelling we pick one on classification.
+It will be used multiple times in later chapters to allow us to observe the difference between model accuracy and computational efficiency between comparison algorithms. The most commonly used image classification data set is the [MNIST](http://yann.lecun.com/exdb/mnist/) handwritten digit recognition data set. It was proposed by LeCun, Cortes and Burges in the 1990s. However, most models have a classification accuracy of over 95% on MNIST, hence it is hard to spot the difference between different models. In order to get a better intuition about the difference between algorithms we use a more complex data set. [Fashion-MNIST](https://github.com/zalandoresearch/fashion-mnist) was proposed by [Xiao, Rasul and Vollgraf](https://arxiv.org/abs/1708.07747) in 2017.
 
 ## Getting the Data
 
@@ -80,7 +80,7 @@ show_fashion_mnist(X, get_fashion_mnist_labels(y))
 
 ## Reading a Minibatch
 
-To make our life easier when reading from the training and test sets we use a `DataLoader` rather than creating one from scratch, as we did in the section on ["Linear Regression Implementation Starting from Scratch"](linear-regression-scratch.md). The data loader reads a mini-batch of data with an example number of `batch_size` each time. 
+To make our life easier when reading from the training and test sets we use a `DataLoader` rather than creating one from scratch, as we did in the section on ["Linear Regression Implementation Starting from Scratch"](linear-regression-scratch.md). The data loader reads a mini-batch of data with an example number of `batch_size` each time.
 
 In practice, data reading is often a performance bottleneck for training, especially when the model is simple or when the computer is fast. A handy feature of Gluon's `DataLoader` is the ability to use multiple processes to speed up data reading (not currently supported on Windows). For instance, we can set aside 4 processes to read the data (via `num_workers`).
 
@@ -116,7 +116,7 @@ for X, y in train_iter:
 ## Summary
 
 * Fashion-MNIST is an apparel classification data set containing 10 categories, which we will use to test the performance of different algorithms in later chapters.
-* We store the shape of image using height and width of $h$ and $w$ pixels, respectively, as $h \times w$ or `(h, w)`. 
+* We store the shape of image using height and width of $h$ and $w$ pixels, respectively, as $h \times w$ or `(h, w)`.
 * Data iterators are a key component for efficient performance. Use existing ones if available.
 
 ## Problems
@@ -126,8 +126,6 @@ for X, y in train_iter:
 1. Use the MXNet documentation to see which other datasets are available in `mxnet.gluon.data.vision`.
 1. Use the MXNet documentation to see which other transformations are available in `mxnet.gluon.data.vision.transforms`.
 
+## Discuss on our Forum
 
-## Scan the QR code to get to the [forum](https://discuss.gluon.ai/t/topic/7760)
-
-![](../img/qr_fashion-mnist.svg)
-
+<div id="discuss" topic_id="2335"></div>

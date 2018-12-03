@@ -1,6 +1,6 @@
 # Networks with Parallel Concatenations (GoogLeNet)
 
-During the ImageNet Challenge in 2014, a new architeture emerged that outperformed the rest. [Szegedy et al., 2014](https://arxiv.org/abs/1409.4842) proposed a structure that combined the strenghts of the NiN and repeated blocks paradigms. At its heart was the rather pragmatic answer to the question as to which size of convolution is ideal for processing. After all, we have a smorgasbord of choices, $1 \times 1$ or $3 \times 3$, $5 \times 5$ or even larger. And it isn't always clear which one is the best. As it turns out, the answer is that a combination of all the above works best. Over the next few years, researchers made several improvements to GoogLeNet. In this section, we will introduce the first version of this model series in a slightly simplified form - we omit the pecularities that were added to stabilize training, due to the availability of better training algorithms. 
+During the ImageNet Challenge in 2014, a new architeture emerged that outperformed the rest. [Szegedy et al., 2014](https://arxiv.org/abs/1409.4842) proposed a structure that combined the strenghts of the NiN and repeated blocks paradigms. At its heart was the rather pragmatic answer to the question as to which size of convolution is ideal for processing. After all, we have a smorgasbord of choices, $1 \times 1$ or $3 \times 3$, $5 \times 5$ or even larger. And it isn't always clear which one is the best. As it turns out, the answer is that a combination of all the above works best. Over the next few years, researchers made several improvements to GoogLeNet. In this section, we will introduce the first version of this model series in a slightly simplified form - we omit the pecularities that were added to stabilize training, due to the availability of better training algorithms.
 
 ## Inception Blocks
 
@@ -39,11 +39,11 @@ class Inception(nn.Block):
         return nd.concat(p1, p2, p3, p4, dim=1)  # Concatenate the outputs on the channel dimension.
 ```
 
-To understand why this works as well as it does, consider the combination of the filters. They explore the image in varying ranges. This means that details at different extents can be recognized efficiently by different filters. At the same time, we can allocate different amounts of parameters for different ranges (e.g. more for short range but not ignore the long range entirely). 
+To understand why this works as well as it does, consider the combination of the filters. They explore the image in varying ranges. This means that details at different extents can be recognized efficiently by different filters. At the same time, we can allocate different amounts of parameters for different ranges (e.g. more for short range but not ignore the long range entirely).
 
 ## GoogLeNet Model
 
-GoogLeNet uses an initial long range feature convolution, a stack of a total of 9 inception blocks and global average pooling to generate its estimates. Maximum pooling between inception blocks reduced the dimensionality. The first part is identical to AlexNet and LeNet, the stack of blocks is inherited from VGG and the global average pooling that avoids a stack of fully connected layers at the end. The architecture is depicted below. 
+GoogLeNet uses an initial long range feature convolution, a stack of a total of 9 inception blocks and global average pooling to generate its estimates. Maximum pooling between inception blocks reduced the dimensionality. The first part is identical to AlexNet and LeNet, the stack of blocks is inherited from VGG and the global average pooling that avoids a stack of fully connected layers at the end. The architecture is depicted below.
 
 ![Full GoogLeNet Model](../img/inception-full.svg)
 
@@ -109,7 +109,7 @@ for layer in net:
 
 ## Data Acquisition and Training
 
-As before, we train our model using the Fashion-MNIST dataset. We transform it to $96 \times 96$ pixel resolution before invoking the training procedure. 
+As before, we train our model using the Fashion-MNIST dataset. We transform it to $96 \times 96$ pixel resolution before invoking the training procedure.
 
 ```{.python .input  n=8}
 lr, num_epochs, batch_size, ctx = 0.1, 5, 128, gb.try_gpu()
@@ -136,9 +136,6 @@ gb.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
 1. Why do we need a large range convolution initially?
 
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/1662)
-
-![](../img/qr_googlenet.svg)
 
 ## References
 
@@ -150,6 +147,7 @@ gb.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
 
 [4] Szegedy, C., Ioffe, S., Vanhoucke, V., & Alemi, A. A. (2017, February). Inception-v4, inception-resnet and the impact of residual connections on learning. In Proceedings of the AAAI Conference on Artificial Intelligence (Vol. 4, p. 12).
 
-```{.python .input}
+## Discuss on our Forum
 
-```
+<div id="discuss" topic_id="2357"></div>
+

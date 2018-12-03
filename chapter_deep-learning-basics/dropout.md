@@ -4,8 +4,8 @@ In the previous chapter, we introduced one classical approach to regularize stat
 
 ## Overfitting Revisited
 
-With great flexibility comes overfitting liability. 
-Given many more features than examples, linear models can overfit. But when there are many more examples than features, linear models can usually be counted on not to overfit. Unfortunately this propensity to generalize well comes at a cost. For every feature, a linear model has to assign it either positive or negative weight. Linear models can’t take into account nuanced interactions between features. In more formal texts, you’ll see this phenomena discussed as the bias-variance tradeoff. Linear models have high bias, (they can only represent a small class of functions), but low variance (they give similar results across different random samples of the data). 
+With great flexibility comes overfitting liability.
+Given many more features than examples, linear models can overfit. But when there are many more examples than features, linear models can usually be counted on not to overfit. Unfortunately this propensity to generalize well comes at a cost. For every feature, a linear model has to assign it either positive or negative weight. Linear models can’t take into account nuanced interactions between features. In more formal texts, you’ll see this phenomena discussed as the bias-variance tradeoff. Linear models have high bias, (they can only represent a small class of functions), but low variance (they give similar results across different random samples of the data).
 
 Deep neural networks, however, occupy the opposite end of the bias-variance spectrum. Neural networks are so flexible because they aren’t confined to looking at each feature individually. Instead, they can learn complex interactions among groups of features. For example, they might infer that “Nigeria” and “Western Union” appearing together in an email indicates spam but that “Nigeria” without “Western Union” does not connote spam.
 
@@ -13,16 +13,16 @@ Even for a small number of features, deep neural networks are capable of overfit
 
 ## Robustness through Perturbations
 
-Let's think briefly about what we expect from a good statistical model. Obviously we want it to do well on unseen test data. One way we can accomplish this is by asking for what amounts to a 'simple' model. Simplicity can come in the form of a small number of dimensions, which is what we did when discussing fitting a function with monomial basis functions. Simplicity can also come in the form of a small norm for the basis funtions. This is what led to weight decay and $\ell_2$ regularization. Yet a third way to impose some notion of simplicity is that the function should be robust under modest changes in the input. For instance, when we classify images, we would expect that alterations of a few pixels are mostly harmless. 
+Let's think briefly about what we expect from a good statistical model. Obviously we want it to do well on unseen test data. One way we can accomplish this is by asking for what amounts to a 'simple' model. Simplicity can come in the form of a small number of dimensions, which is what we did when discussing fitting a function with monomial basis functions. Simplicity can also come in the form of a small norm for the basis funtions. This is what led to weight decay and $\ell_2$ regularization. Yet a third way to impose some notion of simplicity is that the function should be robust under modest changes in the input. For instance, when we classify images, we would expect that alterations of a few pixels are mostly harmless.
 
-In fact, this notion was formalized by Bishop in 1995, when he proved that [Training with Input Noise is Equivalent to Tikhonov Regularization](https://www.mitpressjournals.org/doi/10.1162/neco.1995.7.1.108). That is, he connected the notion of having a smooth (and thus simple) function with one that is resilient to perturbations in the input. Fast forward to 2014. Given the complexity of deep networks with many layers, enforcing smoothness just on the input misses out on what is happening in subsequent layers. The ingenious idea of [Srivastava et al., 2014](http://jmlr.org/papers/volume15/srivastava14a.old/srivastava14a.pdf) was to apply Bishop's idea to the *internal* layers of the network, too, namely to inject noise into the computational path of the network while it's training. 
+In fact, this notion was formalized by Bishop in 1995, when he proved that [Training with Input Noise is Equivalent to Tikhonov Regularization](https://www.mitpressjournals.org/doi/10.1162/neco.1995.7.1.108). That is, he connected the notion of having a smooth (and thus simple) function with one that is resilient to perturbations in the input. Fast forward to 2014. Given the complexity of deep networks with many layers, enforcing smoothness just on the input misses out on what is happening in subsequent layers. The ingenious idea of [Srivastava et al., 2014](http://jmlr.org/papers/volume15/srivastava14a.old/srivastava14a.pdf) was to apply Bishop's idea to the *internal* layers of the network, too, namely to inject noise into the computational path of the network while it's training.
 
 A key challenge in this context is how to add noise without introducing undue bias. In terms of inputs $\mathbf{x}$, this is relatively easy to accomplish: simply add some noise $\epsilon \sim \mathcal{N}(0,\sigma^2)$ to it and use this data during training via $\mathbf{x}' = \mathbf{x} + \epsilon$. A key property is that in expectation $\mathbf{E}[\mathbf{x}'] = \mathbf{x}$. For intermediate layers, though, this might not be quite so desirable since the scale of the noise might not be appropriate. The alternative is to perturb coordinates as follows:
 
 $$
 \begin{aligned}
-h' = 
-\begin{cases} 
+h' =
+\begin{cases}
     0 & \text{ with probability } p \\
     \frac{h}{1-p} & \text{ otherwise}
 \end{cases}
@@ -33,7 +33,7 @@ By design, the expectation remains unchanged, i.e. $\mathbf{E}[h'] = h$. This id
 
 ## Dropout in Practice
 
-Recall the [multilayer perceptron](mlp.md) with a hidden layer and 5 hidden units. Its architecture is given by 
+Recall the [multilayer perceptron](mlp.md) with a hidden layer and 5 hidden units. Its architecture is given by
 
 $$
 \begin{aligned}
@@ -43,13 +43,13 @@ $$
 \end{aligned}
 $$
 
-When we apply dropout to the hidden layer, it amounts to removing hidden units with probability $p$ since their output is set to $0$ with that probability. A possible result is the network shown below. Here $h_2$ and $h_5$ are removed. Consequently the calculation of $y$ no longer depends on $h_2$ and $h_5$ and their respective gradient also vanishes when performing backprop. In this way, the calculation of the output layer cannot be overly dependent on any one element of $h_1, \ldots, h_5$. This is exactly what we want for regularization purposes to cope with overfitting. At test time we typically do not use dropout to obtain more conclusive results. 
+When we apply dropout to the hidden layer, it amounts to removing hidden units with probability $p$ since their output is set to $0$ with that probability. A possible result is the network shown below. Here $h_2$ and $h_5$ are removed. Consequently the calculation of $y$ no longer depends on $h_2$ and $h_5$ and their respective gradient also vanishes when performing backprop. In this way, the calculation of the output layer cannot be overly dependent on any one element of $h_1, \ldots, h_5$. This is exactly what we want for regularization purposes to cope with overfitting. At test time we typically do not use dropout to obtain more conclusive results.
 
 ![MLP before and after dropout](../img/dropout2.svg)
 
 ## Dropout from Scratch
 
-To implement the dropout function we have to draw as many random variables as the input has dimensions from the uniform distribution $U[0,1]$. 
+To implement the dropout function we have to draw as many random variables as the input has dimensions from the uniform distribution $U[0,1]$.
 According to the definition of dropout, we can implement it easily. The following `dropout` function will drop out the elements in the NDArray input `X` with the probability of `drop_prob`.
 
 ```{.python .input}
@@ -150,7 +150,7 @@ gb.train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size,
 
 * Beyond controlling the number of dimensions and the size of the weight vector, dropout is yet another tool to avoid overfitting. Often all three are used jointly.
 * Dropout replaces an activation $h$ with a random variable $h'$ with expected value $h$ and with variance given by the dropout probability $p$.
-* Dropout is only used during training. 
+* Dropout is only used during training.
 
 
 ## Problems
@@ -161,14 +161,13 @@ gb.train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size,
 1. Why should you typically not using dropout?
 1. If changes are made to the model to make it more complex, such as adding hidden layer units, will the effect of using dropout to cope with overfitting be more obvious?
 1. Using the model in this section as an example, compare the effects of using dropout and weight decay. What if dropout and weight decay are used at the same time?
-1. What happens if we apply dropout to the individual weights of the weight matrix rather than the activations? 
+1. What happens if we apply dropout to the individual weights of the weight matrix rather than the activations?
 1. Replace the dropout activation with a random variable that takes on values of $[0, \gamma/2, \gamma]$. Can you design something that works better than the binary dropout function? Why might you want to use it? Why not?
-
-
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/1278)
-
-![](../img/qr_dropout.svg)
 
 ## References
 
 [1] Srivastava, N., Hinton, G., Krizhevsky, A., Sutskever, I., & Salakhutdinov, R. (2014).  JMLR
+
+## Discuss on our Forum
+
+<div id="discuss" topic_id="2343"></div>

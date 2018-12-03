@@ -122,7 +122,7 @@ print(a * x + y)
 Just as vectors generalize scalars from order $0$ to order $1$,
 matrices generalize vectors from $1D$ to $2D$.
 Matrices, which we'll typically denote with capital letters ($A$, $B$, $C$),
-are represented in code as arrays with 2 axes.  
+are represented in code as arrays with 2 axes.
 Visually, we can draw a matrix as a table,
 where each entry $a_{ij}$ belongs to the $i$-th row and $j$-th column.
 
@@ -429,7 +429,7 @@ While we don't want to get too far ahead of ourselves, we do want you to anticip
 In machine learning we're often trying to solve optimization problems: *Maximize* the probability assigned to observed data. *Minimize* the distance between predictions and the ground-truth observations. Assign vector representations to items (like words, products, or news articles) such that the distance between similar items is minimized, and the distance between dissimilar items is maximized. Oftentimes, these objectives, perhaps the most important component of a machine learning algorithm (besides the data itself), are expressed as norms.
 
 
-# Intermediate linear algebra
+## Intermediate linear algebra
 
 If you've made it this far, and understand everything that we've covered,
 then honestly, you *are* ready to begin modeling.
@@ -445,7 +445,7 @@ In the rest of this chapter, we introduce some useful, more advanced concepts.
 
 
 
-## Basic vector properties
+### Basic vector properties
 
 Vectors are useful beyond being data structures to carry numbers.
 In addition to reading and writing values to the components of a vector,
@@ -462,7 +462,7 @@ Here are the conditions that make a vector space:
 * **Distributive axioms** (we assume that x and y are vectors and a, b are scalars):
   $a(x+y) = ax + ay$ and $(a+b)x = ax +bx$.
 
-## Special matrices
+### Special matrices
 
 There are a number of special matrices that we will use throughout this tutorial. Let's look at them in a bit of detail:
 
@@ -478,3 +478,7 @@ In just a few pages (or one Jupyter notebook) we've taught you all the linear al
 If you're eager to learn more about linear algebra, here are some of our favorite resources on the topic
 * For a solid primer on basics, check out Gilbert Strang's book [Introduction to Linear Algebra](http://math.mit.edu/~gs/linearalgebra/)
 * Zico Kolter's [Linear Algebra Reivew and Reference](http://www.cs.cmu.edu/~zkolter/course/15-884/linalg-review.pdf)
+
+## Discuss on our Forum
+
+<div id="discuss" topic_id="2317"></div>

@@ -63,7 +63,7 @@ in_vocab, out_vocab, dataset = read_data(max_seq_len)
 dataset[0]
 ```
 
-## Encoder-Decoder with Attention Mechanism 
+## Encoder-Decoder with Attention Mechanism
 
 We will use an encoder-decoder with an attention mechanism to translate a short French paragraph into English. Next, we will show how to implement the model.
 
@@ -331,9 +331,6 @@ score('ils sont canadiens .', 'they are canadian .', k=2)
 * Try to train the model with larger translation data sets, such as WMT[2] and Tatoeba Project[3].
 
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/4689)
-
-![](../img/qr_machine-translation.svg)
 
 ## Reference
 
@@ -342,3 +339,7 @@ score('ils sont canadiens .', 'they are canadian .', k=2)
 [2] WMT. http://www.statmt.org/wmt14/translation-task.html
 
 [3] Tatoeba Project. http://www.manythings.org/anki/
+
+## Discuss on our Forum
+
+<div id="discuss" topic_id="2396"></div>

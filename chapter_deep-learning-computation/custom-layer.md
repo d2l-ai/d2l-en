@@ -1,6 +1,6 @@
 # Custom Layers
 
-One of the reasons for the success of deep learning can be found in the wide range of layers that can be used in a deep network. This allows for a tremendous degree of customization and adaptation. For instance, scientists have invented layers for images, text, pooling, loops, dynamic programming, even for computer programs. Sooner or later you will encounter a layer that doesn't exist yet in Gluon, or even better, you will eventually invent a new layer that works well for your problem at hand. This is when it's time to build a custom layer. This section shows you how. 
+One of the reasons for the success of deep learning can be found in the wide range of layers that can be used in a deep network. This allows for a tremendous degree of customization and adaptation. For instance, scientists have invented layers for images, text, pooling, loops, dynamic programming, even for computer programs. Sooner or later you will encounter a layer that doesn't exist yet in Gluon, or even better, you will eventually invent a new layer that works well for your problem at hand. This is when it's time to build a custom layer. This section shows you how.
 
 ## Layers without Parameters
 
@@ -42,7 +42,7 @@ y.mean().asscalar()
 
 ## Layers with Parameters
 
-Now that we know how to define layers in principle, let's define layers with parameters. These can be adjusted through training. In order to simplify things for an avid deep learning researcher the `Parameter` class and the `ParameterDict` dictionary provide some basic housekeeping functionality. In particular, they govern access, initialization, sharing, saving and loading model parameters. For instance, this way we don't need to write custom serialization routines for each new custom layer. 
+Now that we know how to define layers in principle, let's define layers with parameters. These can be adjusted through training. In order to simplify things for an avid deep learning researcher the `Parameter` class and the `ParameterDict` dictionary provide some basic housekeeping functionality. In particular, they govern access, initialization, sharing, saving and loading model parameters. For instance, this way we don't need to write custom serialization routines for each new custom layer.
 
 For instance, we can use the member variable `params` of the `ParameterDict` type that comes with the Block class. It is a dictionary that maps string type parameter names to model parameters in the `Parameter` type.  We can create a `Parameter` instance from `ParameterDict` via the `get` function.
 
@@ -93,17 +93,16 @@ net(nd.random.uniform(shape=(2, 64)))
 
 ## Summary
 
-* We can design custom layers via the Block class. This is more powerful than defining a block factory, since it can be invoked in many contexts. 
-* Blocks can have local parameters. 
+* We can design custom layers via the Block class. This is more powerful than defining a block factory, since it can be invoked in many contexts.
+* Blocks can have local parameters.
 
 
 ## Problems
 
-1. Design a layer that learns an affine transform of the data, i.e. it removes the mean and learns an additive parameter instead. 
-1. Design a layer that takes an input and computes a tensor reduction, i.e. it returns $y_k = \sum_{i,j} W_{ijk} x_i x_j$. 
-1. Design a layer that returns the leading half of the Fourier coefficients of the data. Hint - look up the `fft` function in MXNet. 
+1. Design a layer that learns an affine transform of the data, i.e. it removes the mean and learns an additive parameter instead.
+1. Design a layer that takes an input and computes a tensor reduction, i.e. it returns $y_k = \sum_{i,j} W_{ijk} x_i x_j$.
+1. Design a layer that returns the leading half of the Fourier coefficients of the data. Hint - look up the `fft` function in MXNet.
 
+## Discuss on our Forum
 
-## Scan the QR code to get to the [ ](https://discuss.gluon.ai/t/topic/1256) forum
-
-![](../img/qr_custom-layer.svg)
+<div id="discuss" topic_id="2328"></div>

@@ -5,18 +5,18 @@ This section describes how to edit and run the code in this book using Jupyter N
 
 ## Edit and Run the Code in This Book Locally
 
-下面我们介绍如何在本地使用Jupyter笔记本来编辑和运行本书代码。假设本书代码所在的本地路径为“xx/yy/gluon_tutorials_zh-1.0/”。在命令行模式下进入该路径（`cd xx/yy/gluon_tutorials_zh-1.0`），然后运行命令`jupyter notebook`。这时在浏览器打开 http://localhost:8888 （通常会自动打开）就可以看到Jupyter笔记本的界面和本书代码所在的各个文件夹，如图11.1所示。
+Now we describe how to use Jupyter Notebook to edit and run code of the book locally. Suppose that the local path of code of the book is "xx/yy/d2l-en-1.0/". Change directory to this path in command mode (`cd xx/yy/d2l-en-1.0`), then run command `jupyter notebook`. Now open http://localhost:8888 (usually automatically opened) in the browser, and you will see the interface of Jupyter Notebook and all the folders containing code of the book, as shown in Figure 11.1.
 
 ![The folders containing the code in this book. ](../img/jupyter00.png)
 
 
 You can access the notebook files by clicking on the folder displayed on the webpage. They usually have the suffix "ipynb".
-For the sake of brevity, we create a temporary "test.ipynb" file, and the content displayed after you click it is as shown in Figure 11.2. This notebook includes a markdown cell and code cell. The content in the markdown cell includes "This is a title" and "This is text".   The code cell contains two lines of Python code.
+For the sake of brevity, we create a temporary "test.ipynb" file, and the content displayed after you click it is as shown in Figure 11.2. This notebook includes a markdown cell and code cell. The content in the markdown cell includes "This is A Title" and "This is text".   The code cell contains two lines of Python code.
 
 ![Markdown and code cells in the "text.ipynb" file. ](../img/jupyter01.png)
 
 
-Double click on the markdown cell, to enter edit mode. Add a new text string "Hello World." at the end of the cell, as shown in Figure 11.3.
+Double click on the markdown cell, to enter edit mode. Add a new text string "Hello world." at the end of the cell, as shown in Figure 11.3.
 
 ![Edit the markdown cell. ](../img/jupyter02.png)
 
@@ -53,8 +53,8 @@ Below are some advanced options for using Jupyter Notebook. You can use this sec
 If you wish to contribute to the content of this book, you need to modify the source file (.md file, not .ipynb file) in the markdown format on GitHub. With the notedown plugin, we can use Jupyter Notebook to modify and run the source code in markdown format. Linux/MacOS users can execute the following commands to obtain the GitHub source files and activate the runtime environment.
 
 ```
-git clone https://github.com/mli/gluon-tutorials-zh
-cd gluon-tutorials-zh
+git clone https://github.com/diveintodeeplearning/d2l-en.git
+cd d2l-en
 conda env create -f environment.yml
 source activate gluon # Windows users run "activate gluon"
 ```
@@ -91,7 +91,7 @@ Sometimes, you may want to run Jupyter Notebook on a remote server and access it
 ssh myserver -L 8888:localhost:8888
 ```
 
-以上`myserver`是远端服务器地址。然后我们可以使用 http://localhost:8888 打开运行Jupyter笔记本的远端服务器`myserver`。我们将在下一节详细介绍如何在AWS实例上运行Jupyter笔记本。
+The above is the address of the remote server `myserver`. Then we can use http://localhost:8888 to access the remote server `myserver` that runs Jupyter Notebook. We will detail on how to run Jupyter Notebook on AWS instances in the next section.
 
 ### Operation Timing
 
@@ -107,11 +107,10 @@ jupyter nbextension enable execute_time/ExecuteTime
 
 * You can edit and run the code in this book using Jupyter Notebook.
 
-## exercise
+## Problem
 
 * Try to edit and run the code in this book locally.
 
+## Discuss on our Forum
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/6965)
-
-![](../img/qr_jupyter.svg)
+<div id="discuss" topic_id="2398"></div>

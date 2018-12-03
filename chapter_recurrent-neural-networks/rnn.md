@@ -73,7 +73,6 @@ Since each word entered is a character, this model is called a "character-level 
 * If we use an RNN to predict the next word in a text sequence, how many outputs should be set?
 * How can an RNN be used to express the word of a time step based on the conditional probability of all the previous words in the text sequence?
 
+## Discuss on our Forum
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/6669)
-
-![](../img/qr_rnn.svg)
+<div id="discuss" topic_id="2362"></div>

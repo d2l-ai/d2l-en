@@ -121,6 +121,6 @@ train(num_gpus=2, batch_size=512, lr=0.2)
 * This section uses ResNet-18. Try different epochs, batch sizes, and learning rates. Use more GPUs for computation if conditions permit.
 * Sometimes, different devices provide different computing power. Some can use CPUs and GPUs at the same time, or GPUs of different models. How should we divide mini-batches among different CPUs or GPUs?
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/1885)
+## Discuss on our Forum
 
-![](../img/qr_multiple-gpus-gluon.svg)
+<div id="discuss" topic_id="2384"></div>

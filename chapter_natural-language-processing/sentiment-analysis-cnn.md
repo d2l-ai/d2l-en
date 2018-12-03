@@ -41,7 +41,7 @@ Now, we reproduce the results of the one-dimensional cross-correlation operation
 
 ```{.python .input  n=5}
 def corr1d_multi_in(X, K):
-    # First, we traverse along the 0th dimension (channel dimension) of X and K. Then, we add them together by using * to turn 
+    # First, we traverse along the 0th dimension (channel dimension) of X and K. Then, we add them together by using * to turn
     # the result list into a positional argument of the add_n function.
     return nd.add_n(*[corr1d(x, k) for x, k in zip(X, K)])
 
@@ -117,7 +117,7 @@ class TextCNN(nn.Block):
             self.embedding(inputs), self.constant_embedding(inputs), dim=2)
         # According to the input format required by Conv1D, the word vector dimension, that is, the channel dimension of the one-dimensional convolutional layer, is transformed into the previous dimension.
         embeddings = embeddings.transpose((0, 2, 1))
-        # For each one-dimensional convolutional layer, after max-over-time pooling, an NDArray with the shape of (batch size, channel size, 1) 
+        # For each one-dimensional convolutional layer, after max-over-time pooling, an NDArray with the shape of (batch size, channel size, 1)
         # can be obtained. Use the flatten function to remove the last dimension and then concatenate on the channel dimension.
         encoding = nd.concat(*[nd.flatten(
             self.pool(conv(embeddings))) for conv in self.convs], dim=1)
@@ -183,11 +183,13 @@ gb.predict_sentiment(net, vocab, ['this', 'movie', 'is', 'so', 'bad'])
 * What other natural language processing tasks can you use textCNN for?
 
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/7762)
 
-![](../img/qr_sentiment-analysis-cnn.svg)
 
 
 ## Reference
 
 [1] Kim, Y. (2014). Convolutional neural networks for sentence classification. arXiv preprint arXiv:1408.5882.
+
+## Discuss on our Forum
+
+<div id="discuss" topic_id="2392"></div>

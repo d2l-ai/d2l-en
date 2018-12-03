@@ -179,7 +179,7 @@ for i in range(6):
 
 plt.axhline(y=0.16666, color='black', linestyle='dashed')
 plt.legend()
-plt.show()   
+plt.show()
 ```
 
 Each solid curve corresponds to one of the six values of the die
@@ -350,5 +350,9 @@ So far we covered probabilities, independence, conditional independence, and how
 
 ## Problems
 
-1. Given two events with probability $\Pr(A)$ and $\Pr(B)$, compute upper and lower bounds on $\Pr(A \cup B)$ and $\Pr(A \cap B)$. Hint - display the situation using a [Venn Diagram](https://en.wikipedia.org/wiki/Venn_diagram). 
+1. Given two events with probability $\Pr(A)$ and $\Pr(B)$, compute upper and lower bounds on $\Pr(A \cup B)$ and $\Pr(A \cap B)$. Hint - display the situation using a [Venn Diagram](https://en.wikipedia.org/wiki/Venn_diagram).
 1. Assume that we have a sequence of events, say $A$, $B$ and $C$, where $B$ only depends on $A$ and $C$ only on $B$, can you simplify the joint probability? Hint - this is a [Markov Chain](https://en.wikipedia.org/wiki/Markov_chain).
+
+## Discuss on our Forum
+
+<div id="discuss" topic_id="2319"></div>

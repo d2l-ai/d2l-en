@@ -138,14 +138,14 @@ todo_include_todos = True
 # a list of builtin themes.
 
 html_theme_path = ['mx-theme']
-html_theme = 'sphinx_materialdesign_theme'
+html_theme = 'mxtheme'
 html_theme_options = {
     'primary_color': 'blue',
     'accent_color': 'deep_orange',
     'header_links' : [
-        ('PDF', './d2l-en.pdf', True, 'fas fa-file-pdf'),
-       # ('Jupyter Notebooks', './d2l-en.zip', True, 'fas fa-download'),
-       # ('参与讨论', 'https://discuss.gluon.ai/c/lecture?order=views', True, 'fab fa-discourse'),
+        ('PDF', 'https://en.diveintodeeplearning.org/d2l-en.pdf', True, 'fas fa-file-pdf'),
+        ('Jupyter Notebooks', './d2l-en.zip', True, 'fas fa-download'),
+        ('Forum', 'https://discuss.mxnet.io', True, 'fab fa-discourse'),
         ('Github', 'https://github.com/diveintodeeplearning/d2l-en', True, 'fab fa-github'),
         ('中文版本', 'https://zh.diveintodeeplearning.org', True, 'fas fa-external-link-alt'),
     ],
@@ -384,4 +384,5 @@ def setup(app):
     app.add_config_value('recommonmark_config', {
     }, True)
     app.add_javascript('google_analytics.js')
+    app.add_javascript('discuss.js')
     app.connect('source-read', image_caption)

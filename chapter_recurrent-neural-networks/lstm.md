@@ -191,11 +191,10 @@ gb.train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
 * Since the candidate memory cells ensure that the value range is between -1 and 1 using the tanh function, why does the hidden state need to use the tanh function again to ensure that the output value range is between -1 and 1?
 
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/4049)
-
-![](../img/qr_lstm.svg)
-
-
 ## References
 
 [1] Hochreiter, S., & Schmidhuber, J. (1997). Long short-term memory. Neural computation, 9(8), 1735-1780.
+
+## Discuss on our Forum
+
+<div id="discuss" topic_id="2368"></div>
