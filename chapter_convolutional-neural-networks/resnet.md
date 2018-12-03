@@ -30,8 +30,7 @@ import gluonbook as gb
 from mxnet import gluon, init, nd
 from mxnet.gluon import nn
 
-# This class has been saved in the gluonbook package for future use.
-class Residual(nn.Block):  
+class Residual(nn.Block): # This class is part of the gluonbook package
     def __init__(self, num_channels, use_1x1conv=False, strides=1, **kwargs):
         super(Residual, self).__init__(**kwargs)
         self.conv1 = nn.Conv2D(num_channels, kernel_size=3, padding=1, strides=strides)
