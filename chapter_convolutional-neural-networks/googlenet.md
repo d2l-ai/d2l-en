@@ -150,3 +150,4 @@ gb.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
 ## Discuss on our Forum
 
 <div id="discuss" topic_id="2357"></div>
+
