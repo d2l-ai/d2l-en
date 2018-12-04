@@ -89,12 +89,11 @@ Now that we understand gradient descent in one-dimensional space, let us conside
 
 $$\nabla_{\boldsymbol{x}} f(\boldsymbol{x}) = \bigg[\frac{\partial f(\boldsymbol{x})}{\partial x_1}, \frac{\partial f(\boldsymbol{x})}{\partial x_2}, \ldots, \frac{\partial f(\boldsymbol{x})}{\partial x_d}\bigg]^\top.$$
 
-
-为表示简洁，我们用$\nabla f(\boldsymbol{x})$代替$\nabla_{\boldsymbol{x}} f(\boldsymbol{x})$。梯度中每个偏导数元素$\partial f(\boldsymbol{x})/\partial x_i$代表着$f$在$\boldsymbol{x}$有关输入$x_i$的变化率。为了测量$f$沿着单位向量$\boldsymbol{u}$（即$\|\boldsymbol{u}\|=1$）方向上的变化率，在多元微积分中，我们定义$f$在$\boldsymbol{x}$上沿着$\boldsymbol{u}$方向的方向导数为
+For brevity, we use $\nabla f(\boldsymbol{x})$ instead of $\nabla_{\boldsymbol{x}} f(\boldsymbol{x})$. Each partial derivative element $\partial f(\boldsymbol{x})/\partial x_i$ in the gradient indicates the rate of change of $f$ at $\boldsymbol{x}$ with respect to the input $x_i$. To measure the rate of change of $f$ in the direction of the unit vector $\boldsymbol{u}$ ($\|\boldsymbol{u}\|=1$), in multivariate calculus, the directional derivative of $f$ at $\boldsymbol{x}$ in the direction of $\boldsymbol{u}$ is defined as
 
 $$\text{D}_{\boldsymbol{u}} f(\boldsymbol{x}) = \lim_{h \rightarrow 0}  \frac{f(\boldsymbol{x} + h \boldsymbol{u}) - f(\boldsymbol{x})}{h}.$$
 
-依据方向导数性质 \[1，Chapter 14.6 Theorem 3\]，以上的方向导数可以改写为
+According to the property of directional derivatives \[1，Chapter 14.6 Theorem 3\], the aforementioned directional derivative can be rewritten as
 
 $$\text{D}_{\boldsymbol{u}} f(\boldsymbol{x}) = \nabla f(\boldsymbol{x}) \cdot \boldsymbol{u}.$$
 
@@ -153,7 +152,7 @@ $$\nabla f(\boldsymbol{x}) = \frac{1}{n} \sum_{i = 1}^n \nabla f_i(\boldsymbol{x
 
 If gradient descent is used, the computing cost for each independent variable iteration is $\mathcal{O}(n)$, which grows linearly with $n$. Therefore, when the model training data instance is large, the cost of gradient descent for each iteration will be very high.
 
-随机梯度下降（stochastic gradient descent，简称SGD）减少了每次迭代的计算开销。在随机梯度下降的每次迭代中，我们随机均匀采样的一个样本索引$i\in\{1,\ldots,n\}$，并计算梯度$\nabla f_i(\boldsymbol{x})$来迭代$\boldsymbol{x}$：
+Stochastic gradient descent (SGD) reduces computational cost at each iteration. At each iteration of stochastic gradient descent, we uniformly sample an index $i\in\{1,\ldots,n\}$ for data instances at random, and compute the gradient $\nabla f_i(\boldsymbol{x})$ to update $\boldsymbol{x}$:
 
 $$\boldsymbol{x} \leftarrow \boldsymbol{x} - \eta \nabla f_i(\boldsymbol{x}).$$
 
@@ -183,7 +182,7 @@ As we can see, the iterative trajectory of the independent variable in the SGD i
 * When there are more examples in the training data set, it costs more to compute each iteration for gradient descent, so SGD is preferred in these cases.
 
 
-## exercise
+## Problems
 
 * Using a different objective function, observe the iterative trajectory of the independent variable in gradient descent and the SGD.
 * In the experiment for gradient descent in two-dimensional space, try to use different learning rates to observe and analyze the experimental phenomena.
