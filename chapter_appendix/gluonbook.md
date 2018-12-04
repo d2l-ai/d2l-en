@@ -14,14 +14,14 @@
 | `download_voc_pascal`|[Semantic Segmentation and Data Sets](../chapter_computer-vision/semantic-segmentation-and-dataset.md)|
 | `evaluate_accuracy`|[Image Augmentation](../chapter_computer-vision/image-augmentation.md)|
 | `get_data_ch7`|[Mini-batch Stochastic Gradient Descent](../chapter_optimization/minibatch-sgd.md)|
-| `get_fashion_mnist_labels`|[Image Classification Data Set (Fashion-MNIST)](../chapter_deep-learning-basics/fashion-mnist.md)|
+|`get_fashion_mnist_labels`|[Image Classification Data Set(Fashion-MNIST)](../chapter_deep-learning-basics/fashion-mnist.md)|
 | `get_tokenized_imdb`|[Sentiment Classification: Using Recurrent Neural Networks](../chapter_natural-language-processing/sentiment-analysis-rnn.md)|
 | `get_vocab_imdb`|[Sentiment Classification: Using Recurrent Neural Networks](../chapter_natural-language-processing/sentiment-analysis-rnn.md)|
 | `grad_clipping`|[Implementation of the Recurrent Neural Network from Scratch](../chapter_recurrent-neural-networks/rnn-scratch.md)|
 | `linreg`|[Implementation of Linear Regression Starting from Scratch](../chapter_deep-learning-basics/linear-regression-scratch.md)|
 | `load_data_fashion_mnist`|[Deep Convolutional Neural Networks (AlexNet)](../chapter_convolutional-neural-networks/alexnet.md)|
 |`load_data_jay_lyrics`|[Language Model Data Set (Jay Chou album lyrics)](../chapter_recurrent-neural-networks/lang-model-dataset.md)|
-| `load_data_pikachu`|[Object Detection Data Set (Pikachu)](../chapter_computer-vision/object-detection-dataset.md)|
+|`load_data_pikachu`|[Object Detection Data Set(Pikachu)](../chapter_computer-vision/object-detection-dataset.md)|
 | `plt`|[Implementation of Linear Regression Starting from Scratch](../chapter_deep-learning-basics/linear-regression-scratch.md)|
 | `predict_rnn`|[Implementation of the Recurrent Neural Network from Scratch](../chapter_recurrent-neural-networks/rnn-scratch.md)|
 | `predict_rnn_gluon`|[Gluon Implementation for Recurrent Neural Networks](../chapter_recurrent-neural-networks/rnn-gluon.md)|
@@ -32,11 +32,11 @@
 | `Residual`|[Residual Networks (ResNet)](../chapter_convolutional-neural-networks/resnet.md)|
 | `resnet18`|[Gluon Implementation for Multi-GPU Computing](../chapter_computational-performance/multiple-gpus-gluon.md)|
 | `RNNModel`|[Gluon Implementation for Recurrent Neural Networks](../chapter_recurrent-neural-networks/rnn-gluon.md)|
-| `semilogy`|[Model Selection, Underfitting, and Overfitting](../chapter_deep-learning-basics/underfit-overfit.md)|
+|`semilogy`|[Model Selection, Underfitting, and Overfitting](../chapter_deep-learning-basics/underfit-overfit.md)|
 | `set_figsize`|[Implementation of Linear Regression Starting from Scratch](../chapter_deep-learning-basics/linear-regression-scratch.md)|
 | `sgd`|[Implementation of Linear Regression Starting from Scratch](../chapter_deep-learning-basics/linear-regression-scratch.md)|
 | `show_bboxes`|[Anchor Boxes](../chapter_computer-vision/anchor.md)|
-| `show_fashion_mnist`|[Image Classification Data Set (Fashion-MNIST)](../chapter_deep-learning-basics/fashion-mnist.md)|
+|`show_fashion_mnist`|[Image Classification Data Set(Fashion-MNIST)](../chapter_deep-learning-basics/fashion-mnist.md)|
 | `show_images`|[Image Augmentation](../chapter_computer-vision/image-augmentation.md)|
 | `show_trace_2d`|[Gradient Descent and Stochastic Gradient Descent](../chapter_optimization/gd-sgd.md)|
 | `squared_loss`|[Implementation of Linear Regression Starting from Scratch](../chapter_deep-learning-basics/linear-regression-scratch.md)|

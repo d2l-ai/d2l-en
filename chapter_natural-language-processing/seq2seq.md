@@ -20,7 +20,7 @@ Next, we are going to introduce the definitions of the encoder and decoder indiv
 
 The role of the encoder is to transform an input sequence of variable length into a fixed-length context variable $\boldsymbol{c}$, and encode the input sequence information in that context variable. The most commonly used encoder is an RNN.
 
-We will consider a time-series data instance with a batch size of 1. We assume that the input sequence is $x_1, \ldots, x_T$, such that $x_i$ is the $i$th word in the input sentence. At time step $t$, the RNN will enter feature vector $xbtsymbol{x}_t$ for $x_t$ and hidden state $\boldsymbol{h} _{t-1}$ from the previous time step will be transformed into the current hidden state $\boldsymbol{h}_t$. We can use function $f$ to express the transformation of the RNN's hidden layer:
+We will consider a time-series data instance with a batch size of 1. We assume that the input sequence is $x_1, \ldots, x_T$, such that $x_i$ is the $i$th word in the input sentence. At time step $t$, the RNN will enter feature vector $\boldsymbol{x}_t$ for $x_t$ and hidden state $\boldsymbol{h} _{t-1}$ from the previous time step will be transformed into the current hidden state $\boldsymbol{h}_t$. We can use function $f$ to express the transformation of the RNN's hidden layer:
 
 $$\boldsymbol{h}_t = f(\boldsymbol{x}_t, \boldsymbol{h}_{t-1}). $$
 
