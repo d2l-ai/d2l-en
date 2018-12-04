@@ -15,7 +15,7 @@ import time
 
 ## One-hot Vector
 
-One-hot vectors provide an easy way to express words as vectors in order to input them in the neural network. Assume the number of different characters in the dictionary is $N$ (the `vocab_size`) and each character has a one-to-one correspondence with a single value in the index of successive integers from 0 to $N-1$. If the index of a character is the integer $i$, then we create a vector of all 0s with a length of $N$ and set the element at position $i$ to 1. This vector is the one-hot vector of the original character. The one-hot vectors with indices 0 and 2 are shown below, and the length of the vector is equal to the dictionary size.
+One-hot vectors provide an easy way to express words as vectors in order to input them in the neural network. Assume the number of different characters in the dictionary is $N$  (the `vocab_size`) and each character has a one-to-one correspondence with a single value in the index of successive integers from 0 to $N-1$. If the index of a character is the integer $i$, then we create a vector of all 0s with a length of $N$ and set the element at position $i$ to 1. This vector is the one-hot vector of the original character. The one-hot vectors with indices 0 and 2 are shown below, and the length of the vector is equal to the dictionary size.
 
 ```{.python .input  n=2}
 nd.one_hot(nd.array([0, 2]), vocab_size)
