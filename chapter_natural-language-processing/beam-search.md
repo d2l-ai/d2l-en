@@ -39,9 +39,7 @@ Beam search is an improved algorithm based on greedy search. It has a hyper-para
 
 ![The beam search process. The beam size is 2 and the maximum length of the output sequence is 3. The candidate output sequences are $A$, $C$, $AB$, $CE$, $ABD$, and $CED$. ](../img/beam_search.svg)
 
-图10.11通过一个例子演示了束搜索的过程。假设输出序列的词典中只包含五个元素：$\mathcal{Y} = \{A, B, C, D, E\}$，且其中一个为特殊符号“&lt;eos&gt;”。设束搜索的束宽等于2，输出序列最大长度为3。在输出序列的时间步1，假设条件概率$\mathbb{P}(y_1 \mid \boldsymbol{c})$最大的两个词为$A$和$C$。我们在时间步2时将对所有的$y_2 \in \mathcal{Y}$都分别计算$\mathbb{P}(y_2 \mid A, \boldsymbol{c})$和$\mathbb{P}(y_2 \mid C, \boldsymbol{c})$，并从计算出的10个条件概率中取最大的两个：假设为$\mathbb{P}(B \mid A, \boldsymbol{c})$和$\mathbb{P}(E \mid C, \boldsymbol{c})$。那么，我们在时间步3时将对所有的$y_3 \in \mathcal{Y}$都分别计算$\mathbb{P}(y_3 \mid A, B, \boldsymbol{c})$和$\mathbb{P}(y_3 \mid C, E, \boldsymbol{c})$，并从计算出的10个条件概率中取最大的两个：假设为$\mathbb{P}(D \mid A, B, \boldsymbol{c})$和$\mathbb{P}(D \mid C, E, \boldsymbol{c})$。如此一来，我们得到6个候选输出序列：（1）$A$；（2）$C$；（3）$A$、$B$；（4）$C$、$E$；（5）$A$、$B$、$D$和（6）$C$、$E$、$D$。接下来，我们将根据这6个序列得出最终候选输出序列的集合。
-
-
+Figure 10.11 demonstrates the process of beam search with an example. Suppose that the vocabulary of the output sequence only contains five elements: $\mathcal{Y} = \{A, B, C, D, E\}$ where one of them is a special symbol “&lt;eos&gt;”. Set beam size to 2, the maximum length of the output sequence to 3. At time step 1 of the output sequence, suppose the words with the highest conditional probability $\mathbb{P}(y_1 \mid \boldsymbol{c})$ are $A$ and $C$. At time step 2, we compute $\mathbb{P}(y_2 \mid A, \boldsymbol{c})$ and $\mathbb{P}(y_2 \mid C, \boldsymbol{c})$ for all $y_2 \in \mathcal{Y}$, and pick the largest two among these 10 values: say $\mathbb{P}(B \mid A, \boldsymbol{c})$ and $\mathbb{P}(E \mid C, \boldsymbol{c})$. Then at time step 3, we compute $\mathbb{P}(y_3 \mid A, B, \boldsymbol{c})$ and $\mathbb{P}(y_3 \mid C, E, \boldsymbol{c})$ for all $y_3 \in \mathcal{Y}$, and pick the largest two among these 10 values: say $\mathbb{P}(D \mid A, B, \boldsymbol{c})$ and $\mathbb{P}(D \mid C, E, \boldsymbol{c})$. As a result, we obtain 6 candidates output sequences: (1) $A$; (2)$C$; (3) $A$, $B$; (4)$C$, $E$; (5)$A$, $B$, $D$; and (6)$C$, $E$, $D$. In the end, we will get the set of final candidate output sequences based on these 6 sequences.
 
 In the set of final candidate output sequences, we will take the sequence with the highest score as the output sequence from those below:
 
@@ -56,7 +54,7 @@ Here, $L$ is the length of the final candidate sequence and the selection for $\
 * Beam search strikes a balance between computational overhead and search quality using a flexible beam size.
 
 
-## exercise
+## Problems
 
 * Can we treat an exhaustive search as a beam search with a special beam size? Why?
 * We used language models to create lyrics in the ["Implementation of the Recurrent Neural Network from Scratch"](../chapter_recurrent-neural-networks/rnn-scratch.md) section. Which kind of search does this output use? Can you improve it?

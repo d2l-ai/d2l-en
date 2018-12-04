@@ -199,7 +199,7 @@ print('increased memory: %f MB' % (get_mem() - mem))
 * We recommend using at least one synchronization function for each mini-batch training or prediction to avoid passing on too many computation tasks to the back-end in a short period of time.
 
 
-## exercise
+## Problems
 
 * In the section "Use of Asynchronous Programming to Improve Computing Performance", we mentioned that using asynchronous computation can reduce the total amount of time needed to perform 1000 computations to $t_1 + 1000 t_2 + t_3$. Why do we have to assume $1000t_2 > 999t_1$ here?
 

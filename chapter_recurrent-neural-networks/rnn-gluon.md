@@ -154,7 +154,7 @@ train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
 * Gluon's `rnn` module provides an implementation at the recurrent neural network layer.
 * Gluon's `nn.RNN` instance returns the output and hidden state after forward computation. This forward computation does not involve output layer computation.
 
-## exercise
+## Problems
 
 * Compare the implementation with the previous section. Does Gluon's implementation run faster? If you observe a significant difference, try to find the reason.
 

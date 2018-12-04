@@ -77,7 +77,7 @@ gb.train_gluon_ch7('rmsprop', {'learning_rate': 0.01, 'gamma1': 0.9},
 
 * The difference between RMSProp and Adagrad is that RMSProp uses an EWMA on the squares of elements in the mini-batch stochastic gradient to adjust the learning rate.
 
-## exercise
+## Problems
 
 * What happens to the experimental results if we set the value of $\gamma$ to 1? Why?
 * Try using other combinations of initial learning rates and $\gamma$ hyperparameters and observe and analyze the experimental results.

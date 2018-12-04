@@ -324,7 +324,7 @@ score('ils sont canadiens .', 'they are canadian .', k=2)
 * We can apply encoder-decoder and attention mechanisms to machine translation.
 * BLEU can be used to evaluate translation results.
 
-## exercise
+## Problems
 
 * If the encoder and decoder have different numbers of hidden units or layers, how can we improve the decoder's hidden state initialization method?
 * During training, replace teacher forcing with the output of the decoder at the previous time step as the input of the decoder at the current time step. Has the result changed?

@@ -116,7 +116,7 @@ train(num_gpus=2, batch_size=512, lr=0.2)
 
 * In Gluon, we can conveniently perform multi-GPU computations, such as initializing model parameters and training models on multiple GPUs.
 
-## exercise
+## Problems
 
 * This section uses ResNet-18. Try different epochs, batch sizes, and learning rates. Use more GPUs for computation if conditions permit.
 * Sometimes, different devices provide different computing power. Some can use CPUs and GPUs at the same time, or GPUs of different models. How should we divide mini-batches among different CPUs or GPUs?

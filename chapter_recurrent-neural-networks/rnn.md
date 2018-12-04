@@ -68,7 +68,7 @@ Since each word entered is a character, this model is called a "character-level 
 * The number of RNN model parameters does not grow as the number of time steps increases.
 * We can create language models using a character-level RNN.
 
-## exercise
+## Problems
 
 * If we use an RNN to predict the next word in a text sequence, how many outputs should be set?
 * How can an RNN be used to express the word of a time step based on the conditional probability of all the previous words in the text sequence?

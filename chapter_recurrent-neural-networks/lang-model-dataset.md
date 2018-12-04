@@ -119,7 +119,7 @@ for X, Y in data_iter_consecutive(my_seq, batch_size=2, num_steps=6):
 
 * Timing data sampling methods include random sampling and adjacent sampling. These two methods are implemented slightly differently in recurrent neural network model training.
 
-## exercise
+## Problems
 
 * What other mini-batch data sampling methods can you think of?
 * If we want a sequence example to be a complete sentence, what kinds of problems does this introduce in mini-batch sampling?

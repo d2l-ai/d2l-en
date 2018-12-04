@@ -49,7 +49,7 @@ So, is there a way to better balance these two features in the language model? W
 * $N$-grams provide a probabilistic language model based on the Markov chain of $n-1$ order, where $n$ balances computational complexity and model accuracy.
 
 
-## exercise
+## Problems
 
 * Suppose there are 100,000 words in the training data set. How many word frequencies and multi-word adjacent frequencies does a four-gram need to store?
 * What other applications of language models can you think of?

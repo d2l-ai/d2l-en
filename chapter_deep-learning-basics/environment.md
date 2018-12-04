@@ -8,7 +8,7 @@ At its heart is a problem that is easy to understand but also equally easy to mi
 
 |cat|cat|dog|dog|
 |:---------------:|:---------------:|:---------------:|:---------------:|
-|![](../img/cat1.jpg)|![](../img/cat2.jpg)|![](../img/dog1.jpg)|![](../img/dog2.jpg)|
+|![](../img/cat3.jpg)|![](../img/cat2.jpg)|![](../img/dog1.jpg)|![](../img/dog2.jpg)|
 
 At test time we are asked to classify the following images:
 
