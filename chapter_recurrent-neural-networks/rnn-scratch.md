@@ -250,7 +250,7 @@ train_and_predict_rnn(rnn, get_params, init_rnn_state, num_hiddens,
 
 
 
-## exercise
+## Problems
 
 * Adjust the hyper-parameters and observe and analyze the impact on running time, perplexity, and the written lyrics.
 * Run the code in this section without clipping the gradient. What happens?

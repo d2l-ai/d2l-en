@@ -338,7 +338,7 @@ get_similar_tokens('chip', 3, net[0])
 * We can pad examples of different lengths to create mini-batches with examples of all the same length and use mask variables to distinguish between padding and non-padding elements, so that only non-padding elements participate in the calculation of the loss function.
 
 
-## exercise
+## Problems
 
 * We use the `batchify` function to specify the mini-batch reading method in the `DataLoader` instance and print the shape of each variable in the first batch read. How should these shapes be calculated?
 * Try to find synonyms for other words.

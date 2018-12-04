@@ -78,8 +78,7 @@ In addition, because the order of magnitude for $L(w_o)-1$ is $\mathcal{O}(\text
 * Negative sampling constructs the loss function by considering independent events that contain both positive and negative examples. The gradient computational overhead for each step in the training process is linearly related to the number of noise words we sample.
 * Hierarchical softmax uses a binary tree and constructs the loss function based on the path from the root node to the leaf node. The gradient computational overhead for each step in the training process is related to the logarithm of the dictionary size.
 
-## exercise
-
+## Problems
 
 * Before reading the next section, think about how we should sample noise words in negative sampling.
 * What makes the last formula in this section hold?

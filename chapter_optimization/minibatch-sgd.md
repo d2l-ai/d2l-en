@@ -158,7 +158,7 @@ train_gluon_ch7('sgd', {'learning_rate': 0.05}, features, labels, 10)
 * In practice, learning rates of the (mini-batch) SGD can self-decay during iteration.
 * In general, the time consumption per epoch for mini-batch stochastic gradient is between what takes for gradient descent and SGD to complete the same epoch.
 
-## exercise
+## Problems
 
 * Modify the batch size and learning rate and observe the rate of decline for the value of the objective function and the time consumed in each epoch.
 * Read the MXNet documentation and use the `Trainer` class `set_learning_rate` function to reduce the learning rate of the mini-batch SGD to 1/10 of its previous value after each epoch.

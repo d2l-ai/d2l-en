@@ -176,7 +176,7 @@ gb.predict_sentiment(net, vocab, ['this', 'movie', 'is', 'so', 'bad'])
 * TextCNN mainly uses a one-dimensional convolutional layer and max-over-time pooling layer.
 
 
-## exercise
+## Problems
 
 * Tune the hyper-parameters and compare the two sentiment analysis methods, using recurrent neural networks and using convolutional neural networks, as regards accuracy and operational efficiency.
 * Can you further improve the accuracy of the model on the test set by using the three methods introduced in the previous section: tuning hyper-parameters, using larger pre-trained word vectors, and using the spaCy word tokenization tool?

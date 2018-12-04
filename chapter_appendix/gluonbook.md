@@ -32,7 +32,7 @@
 | `Residual`|[Residual Networks (ResNet)](../chapter_convolutional-neural-networks/resnet.md)|
 | `resnet18`|[Gluon Implementation for Multi-GPU Computing](../chapter_computational-performance/multiple-gpus-gluon.md)|
 | `RNNModel`|[Gluon Implementation for Recurrent Neural Networks](../chapter_recurrent-neural-networks/rnn-gluon.md)|
-|`semilogy`|[Model Selection,Underfitting,and Overfitting](../chapter_deep-learning-basics/underfit-overfit.md)|
+|`semilogy` |[Model Selection, Underfitting, and Overfitting](../chapter_deep-learning-basics/underfit-overfit.md)|
 | `set_figsize`|[Implementation of Linear Regression Starting from Scratch](../chapter_deep-learning-basics/linear-regression-scratch.md)|
 | `sgd`|[Implementation of Linear Regression Starting from Scratch](../chapter_deep-learning-basics/linear-regression-scratch.md)|
 | `show_bboxes`|[Anchor Boxes](../chapter_computer-vision/anchor.md)|

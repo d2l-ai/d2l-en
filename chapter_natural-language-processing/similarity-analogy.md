@@ -122,7 +122,7 @@ get_analogy('do', 'did', 'go', glove_6b50d)
 * We can use pre-trained word vectors to seek synonyms and analogies.
 
 
-## exercise
+## Problems
 
 * Test the fastText results. It is worth mentioning that fastText has a pre-trained Chinese word vector (pretrained_file_name='wiki.zh.vec').
 * If the dictionary is extremely large, how can we improve the synonym and analogy search speed?
