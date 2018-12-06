@@ -38,7 +38,7 @@ git status
 
 At this point Git will prompt that the "chapter_deep-learning-basics/linear-regression.md" file has been modified, as shown in Figure 11.22.
 
-![contrib03.png](../img/contrib03.png "Figure 11.22. Git prompts that the 'chapter_deep-learning-basics/linear-regression.md file has been modified.")
+![contrib03.png](../img/contrib03.png "Figure 11.22. Git prompts that the 'chapter_deep-learning-basics/linear-regression.md' file has been modified.")
 
 After confirming the file submitting the change, execute the following command:
 
