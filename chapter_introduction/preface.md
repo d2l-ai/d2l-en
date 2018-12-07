@@ -68,7 +68,7 @@ to bring would-be practitioners up to speed.
 
 
 
-We started this book project in June 2017
+We started this book project in July 2017
 when we needed to explain MXNet's (then new) Gluon interface to our users.
 At the time, there were no resources that were simultaneously
 (1) up to date, (2) covered the full breadth of modern machine learning
@@ -115,7 +115,7 @@ We settled on Github to share the source and to allow for edits,
 Jupyter notebooks for mixing code, equations and text,
 Sphinx as a rendering engine to generate multiple outputs,
 and Discourse for the forum.
-While our system it not yet perfect, these choices provide a good compromise
+While our system is not yet perfect, these choices provide a good compromise
 among the competing concerns.
 We believe that this might be the first book published using such an integrated workflow.
 
