@@ -65,7 +65,7 @@ The mini-batch stochastic gradient descent is widely used for deep learning to f
 
 $$(\mathbf{w},b) \leftarrow (\mathbf{w},b) - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_{(\mathbf{w},b)} l^{(i)}(\mathbf{w},b)$$
 
-For quadratic losses and linear functions we can write this out explicitly as followsn Note that $\mathbf{w}$ and $\mathbf{x}$ are vectors. Here the more elegant vector notation makes the math much more readable than expressing things in terms of coefficients, say $w_1, w_2, \ldots w_d$.
+For quadratic losses and linear functions we can write this out explicitly as follows. Note that $\mathbf{w}$ and $\mathbf{x}$ are vectors. Here the more elegant vector notation makes the math much more readable than expressing things in terms of coefficients, say $w_1, w_2, \ldots w_d$.
 
 $$
 \begin{aligned}
@@ -107,7 +107,7 @@ Information $x_i$ arriving from other neurons (or environmental sensors such as 
 
 Brain *structures* can be quite varied. Some look rather arbitrary whereas others have a very regular structure. E.g. the visual system of many insects is quite regular. The analysis of such structures has often inspired neuroscientists to propose new architectures, and in some cases, this has been successful. Note, though, that it would be a fallacy to require a direct correspondence - just like airplanes are *inspired* by birds, they have many distinctions. Equal sources of inspiration were mathematics and computer science.
 
-### Vectorzation for Speed
+### Vectorization for Speed
 
 In model training or prediction, we often use vector calculations and process multiple observations at the same time. To illustrate why this matters, consideer two methods of adding vectors. We begin by creating two 1000 dimensional ones first.
 
