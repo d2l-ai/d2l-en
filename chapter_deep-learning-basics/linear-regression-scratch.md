@@ -2,7 +2,7 @@
 
 After getting some background on linear regression, we are now ready for a hands-on implementation. While a powerful deep learning framework minimizes repetitive work, relying on it too much to make things easy can make it hard to properly understand how deep learning works. This matters in particular if we want to change things later, e.g. define our own layers, loss functions, etc. Because of this, we start by describing how to implement linear regression training using only NDArray and `autograd`.
 
-Before we begin, let’s import the package or module required for this section’s experiment; `matplotlib` will be used for plotting and will be set to embed in the GUI.
+Before we begin, let's import the package or module required for this section's experiment; `matplotlib` will be used for plotting and will be set to embed in the GUI.
 
 ```{.python .input  n=1}
 %matplotlib inline
@@ -14,7 +14,7 @@ import random
 
 ## Generating Data Sets
 
-By constructing a simple artificial training data set, we can visually compare the differences between the parameters we have learned and the actual model parameters.  Set the number of examples in the training data set as 1000 and the number of inputs (feature number) as 2.  Using the randomly generated batch example feature $\mathbf{X}\in \mathbb{R}^{1000 \times 2}$, we use the actual weight $\mathbf{w} = [2, -3.4]^\top$ and bias $b = 4.2$ of the linear regression model, as well as a random noise item $\epsilon$ to generate the tag
+By constructing a simple artificial training data set, we can visually compare the differences between the parameters we have learned and the actual model parameters. Set the number of examples in the training data set as 1000 and the number of inputs (feature number) as 2. Using the randomly generated batch example feature $\mathbf{X}\in \mathbb{R}^{1000 \times 2}$, we use the actual weight $\mathbf{w} = [2, -3.4]^\top$ and bias $b = 4.2$ of the linear regression model, as well as a random noise item $\epsilon$ to generate the tag
 
 $$\mathbf{y}= \mathbf{X} \mathbf{w} + b + \mathbf\epsilon$$
 
@@ -53,12 +53,12 @@ plt.figure(figsize=(10, 6))
 plt.scatter(features[:, 1].asnumpy(), labels.asnumpy(), 1);
 ```
 
-The plotting function `plt` as well as the `use_svg_display` and `set_figsize` functions are defined in the `gluonbook` package. We will call `gluonbook.plt` directly for future plotting. To print the vector diagram and set its size, we only need to call  `gluonbook.set_figsize()`  before plotting, because `plt` is a global variable in the `gluonbook` package.
+The plotting function `plt` as well as the `use_svg_display` and `set_figsize` functions are defined in the `gluonbook` package. We will call `gluonbook.plt` directly for future plotting. To print the vector diagram and set its size, we only need to call `gluonbook.set_figsize()` before plotting, because `plt` is a global variable in the `gluonbook` package.
 
 
 ## Reading Data
 
-We need iterate over the entire data set and continuously examine mini-batches of data examples when training the model. Here we define a function. Its purpose is to return the features and tags of random `batch_size` (batch size) examples every time it’s called. One might wonder why we are not reading one observation at a time but rather construct an iterator which returns a few observations at a time. This has mostly to do with efficiency when optimizing. Recall that when we processed one dimension at a time the algorithm was quite slow. The same thing happens when processing single observations vs. an entire 'batch' of them, which can be represented as a matrix rather than just a vector. In particular, GPUs are much faster when it comes to dealing with matrices, up to an order of magnitude. This is one of the reasons why deep learning usually operates on mini-batches rather than singletons.
+We need to iterate over the entire data set and continuously examine mini-batches of data examples when training the model. Here we define a function. Its purpose is to return the features and tags of random `batch_size` (batch size) examples every time it's called. One might wonder why we are not reading one observation at a time but rather construct an iterator which returns a few observations at a time. This has mostly to do with efficiency when optimizing. Recall that when we processed one dimension at a time the algorithm was quite slow. The same thing happens when processing single observations vs. an entire 'batch' of them, which can be represented as a matrix rather than just a vector. In particular, GPUs are much faster when it comes to dealing with matrices, up to an order of magnitude. This is one of the reasons why deep learning usually operates on mini-batches rather than singletons.
 
 ```{.python .input  n=5}
 # This function has been saved in the gluonbook package for future use.
@@ -111,7 +111,7 @@ def linreg(X, w, b):  # This function has been saved in the gluonbook package fo
 
 ## Define the Loss Function
 
-We will use the squared loss function described in the previous section to define the linear regression loss. In the implementation, we need to transform the true value `y` into the predicted value’s shape `y_hat`.  The result returned by the following function will also be the same as the `y_hat` shape.
+We will use the squared loss function described in the previous section to define the linear regression loss. In the implementation, we need to transform the true value `y` into the predicted value's shape `y_hat`. The result returned by the following function will also be the same as the `y_hat` shape.
 
 ```{.python .input  n=10}
 def squared_loss(y_hat, y):  # This function has been saved in the gluonbook package for future use.
@@ -120,7 +120,7 @@ def squared_loss(y_hat, y):  # This function has been saved in the gluonbook pac
 
 ## Define the Optimization Algorithm
 
-Linear regression actually has a closed-form solution. However, most interesting models that we'll care about cannot be solved analytically. So we'll solve this problem by stochastic gradient descent `sgd`. At each step, we'll estimate the gradient of the loss with respect to our weights, using one batch randomly drawn from our dataset. Then, we'll update our parameters a small amount in the direction that reduces the loss. Here, the gradient calculated by the automatic differentiation module is the gradient sum of a batch of examples.   We divide it by the batch size to obtain the average. The size of the step is determined by the learning rate `lr`.
+Linear regression actually has a closed-form solution. However, most interesting models that we'll care about cannot be solved analytically. So we'll solve this problem by stochastic gradient descent `sgd`. At each step, we'll estimate the gradient of the loss with respect to our weights, using one batch randomly drawn from our dataset. Then, we'll update our parameters a small amount in the direction that reduces the loss. Here, the gradient calculated by the automatic differentiation module is the gradient sum of a batch of examples. We divide it by the batch size to obtain the average. The size of the step is determined by the learning rate `lr`.
 
 ```{.python .input  n=11}
 def sgd(params, lr, batch_size):  # This function has been saved in the gluonbook package for future use.
@@ -137,9 +137,9 @@ In training, we will iterate over the data to improve the model parameters. In e
     * Compute gradient $\mathbf{g} \leftarrow \partial_{(\mathbf{w},b)} \frac{1}{\mathcal{B}} \sum_{i \in \mathcal{B}} l(\mathbf{x}^i, y^i, \mathbf{w}, b)$
     * Update parameters $(\mathbf{w}, b) \leftarrow (\mathbf{w}, b) - \eta \mathbf{g}$
 
-Since nobody wants to compute gradients explicitly (this is tedious and error prone) we use automatic differentiation to compute $g$. See section ["Automatic Gradient"](../chapter_prerequisite/autograd.md) for more details. Since the loss `l` is not a scalar variable, running `l.backward()` will add together the elements in `l` to obtain the new variable, and then calculate the variable model parameters’ gradient.
+Since nobody wants to compute gradients explicitly (this is tedious and error prone) we use automatic differentiation to compute $g$. See section ["Automatic Gradient"](../chapter_prerequisite/autograd.md) for more details. Since the loss `l` is not a scalar variable, running `l.backward()` will add together the elements in `l` to obtain the new variable, and then calculate the variable model parameters' gradient.
 
-In an epoch (a pass through the data), we will iterate through the `data_iter` function once and use it for all the examples in the training data set (assuming the number of examples is divisible by the batch size). The number of epochs `num_epochs` and the learning rate `lr` are both hyper-parameters and are set to 3 and 0.03, respectively. Unfortunately in practice, the majority of the hyper-parameters will require some adjustment by trial and error. For instance, the model might actually become more accurate by training longer (but this increases computational cost). Likewise, we might want to change the learning rate on the fly. We will discuss this later in the chapter on  ["Optimization Algorithms"](../chapter_optimization/index.md).
+In an epoch (a pass through the data), we will iterate through the `data_iter` function once and use it for all the examples in the training data set (assuming the number of examples is divisible by the batch size). The number of epochs `num_epochs` and the learning rate `lr` are both hyper-parameters and are set to 3 and 0.03, respectively. Unfortunately in practice, the majority of the hyper-parameters will require some adjustment by trial and error. For instance, the model might actually become more accurate by training longer (but this increases computational cost). Likewise, we might want to change the learning rate on the fly. We will discuss this later in the chapter on ["Optimization Algorithms"](../chapter_optimization/index.md).
 
 ```{.python .input  n=12}
 lr = 0.03               # learning rate
@@ -150,17 +150,17 @@ loss = squared_loss     # 0.5 (y-y')^2
 for epoch in range(num_epochs):
     # Assuming the number of examples can be divided by the batch size, all the examples in
     # the training data set are used once in one epoch iteration.
-    # The features and tags of mini-batch examples are given by X and Y respectively.
+    # The features and tags of mini-batch examples are given by X and y respectively.
     for X, y in data_iter(batch_size, features, labels):
         with autograd.record():
-            l = loss(net(X, w, b), y)  # minibatch loss in X and Y
+            l = loss(net(X, w, b), y)  # minibatch loss in X and y
         l.backward()                   # compute gradient on l with respect to [w,b]
         sgd([w, b], lr, batch_size)    # update parameters [w,b] using their gradient
     train_l = loss(net(features, w, b), labels)
     print('epoch %d, loss %f' % (epoch + 1, train_l.mean().asnumpy()))
 ```
 
-To generate the training set, we can compare the actual parameters used with the parameters we have learned after the training has been completed.  They are very close to each other.
+To evaluate the trained model, we can compare the actual parameters used with the parameters we have learned after the training has been completed. They are very close to each other.
 
 ```{.python .input  n=13}
 print('Error in estimating w', true_w - w.reshape(true_w.shape))
@@ -182,7 +182,7 @@ We saw how a deep network can be implemented and optimized from scratch, using j
 1. What are the problems you might encounter if you wanted to extend `autograd` to second derivatives? How would you fix them?
 1.  Why is the `reshape` function needed in the `squared_loss` function?
 1. Experiment using different learning rates to find out how fast the loss function value drops.
-1. If the number of examples cannot be divided by the batch size, what happens to the `data_iter` function’s behavior?
+1. If the number of examples cannot be divided by the batch size, what happens to the `data_iter` function's behavior?
 
 ## Discuss on our Forum
 
