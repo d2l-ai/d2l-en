@@ -1,4 +1,4 @@
-# Asynchronous Programming
+# Asynchronous Computing
 
 MXNet utilizes asynchronous programming to improve computing performance. Understanding how asynchronous programming works helps us to develop more efficient programs, by proactively reducing computational requirements and thereby minimizing the memory overhead required in the case of limited memory resources. First, we will import the package or module needed for this section’s experiment.
 

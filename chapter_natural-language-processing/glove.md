@@ -1,4 +1,4 @@
-# Word Embedding For Global Vectors (GloVe)
+# Word Embedding with Global Vectors (GloVe)
 
 First, we should review the skip-gram model in word2vec.  The conditional probability $\mathbb{P}(w_j\mid w_i)$ expressed in the skip-gram model using the softmax operation will be recorded as $q_{ij}$, that is:
 

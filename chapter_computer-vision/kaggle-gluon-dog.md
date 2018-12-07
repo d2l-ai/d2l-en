@@ -1,4 +1,4 @@
-# Get Started with Kaggle Competition: Dog Breed Identification (ImageNet Dogs)
+# Dog Breed Identification (ImageNet Dogs) on Kaggle
 
 
 In this section, we will tackle the dog breed identification challenge in the Kaggle Competition. The competition’s web address is
