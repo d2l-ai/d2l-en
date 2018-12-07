@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+[ -e build/data-bak ] && rm -rf build/data-bak
+
 # Clean build/chapter*/*ipynb and build/chapter*/*md that are no longer needed.
 cd build
 for ch in chapter*; do
