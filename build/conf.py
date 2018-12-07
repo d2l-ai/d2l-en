@@ -144,7 +144,7 @@ html_theme_options = {
     'accent_color': 'deep_orange',
     'header_links' : [
         ('PDF', 'https://en.diveintodeeplearning.org/d2l-en.pdf', True, 'fas fa-file-pdf'),
-        ('Jupyter Notebooks', './d2l-en.zip', True, 'fas fa-download'),
+        ('Jupyter Notebooks', 'http://en.diveintodeeplearning.org/d2l-en.zip', True, 'fas fa-download'),
         ('Forum', 'https://discuss.mxnet.io', True, 'fab fa-discourse'),
         ('Github', 'https://github.com/diveintodeeplearning/d2l-en', True, 'fab fa-github'),
         ('中文版本', 'https://zh.diveintodeeplearning.org', True, 'fas fa-external-link-alt'),
