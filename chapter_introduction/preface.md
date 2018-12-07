@@ -36,7 +36,7 @@ teaching you both the *concepts*, the *context*, and the *code*.
 
 For any computing technology to reach its full impact,
 it must well-understood, well-documented, and supported by
-supported by mature, well-maintained tools.
+mature, well-maintained tools.
 The key ideas should be clearly distilled,
 minimizing the onboarding time needing to bring new practitioners up to date.
 Mature libraries should automate common tasks,
@@ -51,7 +51,7 @@ owing to the development of powerful, well-documented frameworks.
 
 
 
-Realizing deep learning's presents unique challenge because
+Realizing deep learning presents unique challenges because
 any single application brings together various disciplines.
 Applying deep learning requires simultaneously understanding
 (i) the motivations for casting a problem in a particular way,
@@ -68,7 +68,7 @@ to bring would-be practitioners up to speed.
 
 
 
-We started this book project in June 2017
+We started this book project in July 2017
 when we needed to explain MXNet's (then new) Gluon interface to our users.
 At the time, there were no resources that were simultaneously
 (1) up to date, (2) covered the full breadth of modern machine learning
@@ -115,7 +115,7 @@ We settled on Github to share the source and to allow for edits,
 Jupyter notebooks for mixing code, equations and text,
 Sphinx as a rendering engine to generate multiple outputs,
 and Discourse for the forum.
-While our system it not yet perfect, these choices provide a good compromise
+While our system is not yet perfect, these choices provide a good compromise
 among the competing concerns.
 We believe that this might be the first book published using such an integrated workflow.
 
@@ -163,7 +163,7 @@ For example, Chris Bishop's excellent textbook,
 teaches each topic so thoroughly, that getting to the chapter
 on linear regression requires a non-trivial amount of work.
 While experts love this book precisely for its thoroughness,
-for beginners, this property's limit it's usefulness as an introductory text,
+for beginners, this property limits its usefulness as an introductory text.
 
 In this book, we'll teach most concepts *just in time*.
 In other words, you'll learn concepts at the very moment
