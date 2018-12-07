@@ -2,7 +2,7 @@
 
 In the "Acknowledgments" section of this book, we thank all the contributors to this book and list their GitHub IDs or names.
 
-You can view the list of contributors [1] in the GitHub code repository for this book. If you want to be one of the contributors to this book, you need to install Git and submit a pull request[2] for the GitHub code repository of this book. When your pull request is merged into the code repository by the author of this book, you will become a contributor.
+You can view the list of contributors [1] in the GitHub code repository for this book. If you want to be one of the contributors to this book, you need to install Git and submit a pull request [2] for the GitHub code repository of this book. When your pull request is merged into the code repository by the author of this book, you will become a contributor.
 
 This section describes the basic Git procedure for contributing to this book. If you are familiar with Git operations, you can skip this section.
 
@@ -12,15 +12,15 @@ Step 1: Install Git. The Git open source book details how to install Git [3]. If
 
 Step 2: Log in to GitHub. Enter the address of code repository of this book in your browser [2]. Click on the "Fork" button in the red box at the top-right of Figure 11.20 to get a copy of code repository of this book.
 
-![The code repository page. ](../img/contrib01.png)
+![The code repository page.](../img/contrib01.png)
 
 
 Now, the code repository of this book will be copied to your username, such as "Your GitHub ID/d2l-en" shown at the top-left of Figure 11.21.
 
-![Copy the code repository. ](../img/contrib02.png)
+![Copy the code repository.](../img/contrib02.png)
 
 
-Step 3: Click the green "Clone or download" button on the right side of Figure 11.21 and click the button in the red box to copy the code repository address under your username. Follow the method described in the ["Acquiring and Running Codes in This Book"](../chapter_prerequisite/install.md) section to enter command line mode. Here, we assume you want to save the code repository under the local "~/repo" path. Go to this path, type `git clone `, and paste the code repository address under your username. Execute the command:
+Step 3: Click the green "Clone or download" button on the right side of Figure 11.21 and click the button in the red box to copy the code repository address under your username. Follow the method described in the ["Acquiring and Running Codes in This Book"](../chapter_prerequisite/install.md) section to enter command line mode. Here, we assume you want to save the code repository under the local "~/repo" path. Go to this path, type `git clone`, and paste the code repository address under your username. Execute the command:
 
 ```
 # Replace your_Github_ID with your GitHub username.
@@ -38,7 +38,7 @@ git status
 
 At this point Git will prompt that the "chapter_deep-learning-basics/linear-regression.md" file has been modified, as shown in Figure 11.22.
 
-![Git prompts that the "chapter_deep-learning-basics/linear-regression.md" file has been modified. ](../img/contrib03.png)
+![Git prompts that the chapter_deep-learning-basics/linear-regression.md file has been modified.](../img/contrib03.png)
 
 After confirming the file submitting the change, execute the following command:
 
@@ -50,23 +50,19 @@ git push
 
 Here, `'fix typo in linear-regression.md'` is the description of the submitted change. You can replace this with other meaningful descriptive information.
 
+Step 5: Enter the code repository address of this book [2] in your browser again. Click the "New pull request" button in the red box on the bottom-left of Figure 11.20. On the page that appears, click the "compare across forks" link in the red box on the right side of Figure 11.23. Then, click the "head fork: diveintodeeplearning/d2l-en" button in the red box below. Enter your GitHub ID in the pop-up text box and select "Your GitHub-ID/d2l-en" from the drop-down menu, as shown in Figure 11.23.
 
-Step 5: Enter the code repository address of this book[2] in your browser again. Click the "New pull request" button in the red box on the left of Figure 11.20. On the page that appears, click the "compare across forks" link in the red box on the right side of Figure 11.23. Then, click the "head fork: diveintodeeplearning/d2l-en" button in the red box below. Enter your GitHub ID in the pop-up text box and select "Your GitHub-ID/d2l-en" from the drop-down menu, as shown in Figure 11.23.
-
-
-![Select the code repository where the source of the change is located. ](../img/contrib04.png)
+![Select the code repository where the source of the change is located.](../img/contrib04.png)
 
 
 Step 6: As shown in Figure 11.24, describe the pull request you want to submit in the title and body text boxes. Click the green "Create pull request" button in the red box to submit the pull request.
 
-![Describe and submit a pull request. ](../img/contrib05.png)
+![Describe and submit a pull request.](../img/contrib05.png)
 
 
 After submitting the request, you will see the page shown in Figure 11.25, which indicates that the pull request has been submitted.
 
-![The pull request has been submitted. ](../img/contrib06.png)
-
-
+![The pull request has been submitted.](../img/contrib06.png)
 
 
 ## Summary
