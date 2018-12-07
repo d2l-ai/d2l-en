@@ -157,7 +157,7 @@ for epoch in range(num_epochs):
         l.backward()                   # compute gradient on l with respect to [w,b]
         sgd([w, b], lr, batch_size)    # update parameters [w,b] using their gradient
     train_l = loss(net(features, w, b), labels)
-    print('epoch %d, loss %f' % (epoch + 1, train_l.mean().asnumpy()))
+    print('epoch %d, loss %f' % (epoch + 1, train_l.sum().asnumpy()))
 ```
 
 To generate the training set, we can compare the actual parameters used with the parameters we have learned after the training has been completed.  They are very close to each other.
