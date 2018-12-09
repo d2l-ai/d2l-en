@@ -155,7 +155,7 @@ In other words, very quickly will we have to use our own predictions to make fut
 predictions = nd.zeros_like(estimates)
 predictions[:(ntrain-embedding)] = estimates[:(ntrain-embedding)]
 for i in range(ntrain-embedding, T-embedding):
-    predictions[i] = net(predictions[i-embedding:i].reshape(1,-1))
+    predictions[i] = net(predictions[i-embedding:i].reshape(1,embedding))
     
 plt.plot(time.asnumpy(), x.asnumpy(), label='data');
 plt.plot(time[embedding:].asnumpy(), estimates.asnumpy(), label='estimate');
