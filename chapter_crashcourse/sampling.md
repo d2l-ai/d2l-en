@@ -100,7 +100,7 @@ The above allows us to change both mean and variance of random variables. Quite 
 Now we are ready to state one of the most fundamental theorems in statistics, the [Central Limit Theorem](https://en.wikipedia.org/wiki/Central_limit_theorem). It states that for sufficiently well-behaved random variables, in particular random variables with well-defined mean and variance, the sum tends toward a normal distribution. To get some idea, let's repeat the experiment described in the beginning, but now using random variables with integer values of $\{0, 1, 2\}$.
 
 ```{.python .input}
-# generate 10 random sequences of 10,000 random normal variables N(0,1)
+# generate 10 random sequences of 10,000 uniformly distributed random variables
 tmp = np.random.uniform(size=(10000,10))
 x = 1.0 * (tmp > 0.3) + 1.0 * (tmp > 0.8)
 mean = 1 * 0.5 + 2 * 0.2
