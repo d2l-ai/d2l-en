@@ -75,12 +75,12 @@ from matplotlib import pyplot as plt
 embedding = 4 # embedding dimension for autoregressive model
 T = 1000      # generate a total of 1000 points 
 time = nd.arange(0,T)
-x = nd.sin(0.01 * time) + 0.2 * nd.random.randn(T)
+x = nd.sin(0.01 * time) + 0.2 * nd.random.normal(shape=(T))
 
 plt.plot(time.asnumpy(), x.asnumpy());
 ```
 
-Next we need to turn this 'time series' into data the network can train on. Based on the embedding dimension $\tau$ we map the data into pairs $y_t = x_t$ and $\mathbf{z}_t = (x_{t-1}, \ldots x_{t-\tau})$. The astute reader might have noticed that this gives us $\tau$ fewer datapoints, since we don't have sufficient history for the first $\tau$ of them. A simple fix, in particular if the time series is long is to discard those few terms. Alternatively we could pad the time series with zeros. The code below is essentially identical to the training code in previous sections. 
+Next we need to turn this 'time series' into data the network can train on. Based on the embedding dimension $\tau$ we map the data into pairs $y_t = x_t$ and $\mathbf{z}_t = (x_{t-1}, \ldots x_{t-\tau})$. The astute reader might have noticed that this gives us $\tau$ fewer datapoints, since we don't have sufficient history for the first $\tau$ of them. A simple fix, in particular if the time series is long is to discard those few terms. Alternatively we could pad the time series with zeros. The code below is essentially identical to the training code in previous sections.
 
 ```{.python .input}
 features = nd.zeros((T-embedding, embedding))
@@ -105,7 +105,7 @@ def get_net():
 loss = gluon.loss.L2Loss()
 ```
 
-We kept the architecture fairly simple. A few layers of a fully connected network, ReLu activation and $\ell_2$ loss. Now we are ready to train. 
+We kept the architecture fairly simple. A few layers of a fully connected network, ReLu activation and $\ell_2$ loss. Now we are ready to train.
 
 ```{.python .input}
 # simple optimizer using adam, random shuffle and minibatch size 16
@@ -130,7 +130,7 @@ l = loss(net(test_data[:][0]), nd.array(test_data[:][1]))
 print('test loss: %f' % l.mean().asnumpy())
 ```
 
-The both training and test loss are small and we would expect our model to work well. Let's see what this means in practice. The first thing to check is how well the model is able to predict what happens in the next timestep. 
+The both training and test loss are small and we would expect our model to work well. Let's see what this means in practice. The first thing to check is how well the model is able to predict what happens in the next timestep.
 
 ```{.python .input}
 estimates = net(features)
@@ -165,7 +165,7 @@ plt.legend();
 
 As the above example shows, this is a spectacular failure. The estimates decay to 0 pretty quickly after a few prediction steps. Why did the algorithm work so poorly? This is ultimately due to the fact that errors build up. Let's say that after step 1 we have some error $\epsilon_1 = \bar\epsilon$. Now the *input* for step 2 is perturbed by $\epsilon_1$, hence we suffer some error in the order of $\epsilon_2 = \bar\epsilon + L \epsilon_1$, and so on. The error can diverge rather rapidly from the true observations. This is a common phenomenon - for instance weather forecasts for the next 24 hours tend to be pretty accurate but beyond that their accuracy declines rapidly. We will discuss methods for improvig this throughout this chapter and beyond. 
 
-Let's verify this observation by computing the $k$-step predictions on the entire sequence. 
+Let's verify this observation by computing the $k$-step predictions on the entire sequence.
 
 ```{.python .input}
 k = 33 # look up to k - embedding steps ahead
@@ -204,7 +204,3 @@ This clearly illustrates how the quality of the estimates changes as we try to p
 1. Give an example for when a latent variable autoregressive model might be needed to capture the dynamic of the data. 
 
 ## Discuss on our Forum
-
-```{.python .input}
-
-```
