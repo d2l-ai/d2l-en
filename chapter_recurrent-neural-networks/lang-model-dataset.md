@@ -6,7 +6,7 @@ This section describes how to preprocess a language model data set and convert i
 
 First, read this data set and see what the first 40 characters look like.
 
-```{.python .input  n=20}
+```{.python .input  n=1}
 from mxnet import nd
 import random
 import zipfile
@@ -17,9 +17,22 @@ with zipfile.ZipFile('../data/jaychou_lyrics.txt.zip') as zin:
 corpus_chars[:40]
 ```
 
+```{.json .output n=1}
+[
+ {
+  "data": {
+   "text/plain": "'\u60f3\u8981\u6709\u76f4\u5347\u673a\\n\u60f3\u8981\u548c\u4f60\u98de\u5230\u5b87\u5b99\u53bb\\n\u60f3\u8981\u548c\u4f60\u878d\u5316\u5728\u4e00\u8d77\\n\u878d\u5316\u5728\u5b87\u5b99\u91cc\\n\u6211\u6bcf\u5929\u6bcf\u5929\u6bcf'"
+  },
+  "execution_count": 1,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
+```
+
 This data set has more than 50,000 characters. For ease of printing, we replaced line breaks with spaces and then used only the first 10,000 characters to train the model.
 
-```{.python .input  n=14}
+```{.python .input  n=2}
 corpus_chars = corpus_chars.replace('\n', ' ').replace('\r', ' ')
 corpus_chars = corpus_chars[0:10000]
 ```
@@ -28,20 +41,43 @@ corpus_chars = corpus_chars[0:10000]
 
 We map each character to continuous integers starting from 0, also known as an index, to facilitate subsequent data processing. To get the index, we extract all the different characters in the data set and then map them to the index one by one to construct the dictionary. Then, print `vocab_size`, which is the number of different characters in the dictionary, i.e. the dictionary size.
 
-```{.python .input  n=9}
+```{.python .input  n=3}
 idx_to_char = list(set(corpus_chars))
 char_to_idx = dict([(char, i) for i, char in enumerate(idx_to_char)])
 vocab_size = len(char_to_idx)
 vocab_size
 ```
 
+```{.json .output n=3}
+[
+ {
+  "data": {
+   "text/plain": "1027"
+  },
+  "execution_count": 3,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
+```
+
 After that, each character in the training data set is converted into an index, and the first 20 characters and their corresponding indexes are printed.
 
-```{.python .input  n=18}
+```{.python .input  n=4}
 corpus_indices = [char_to_idx[char] for char in corpus_chars]
 sample = corpus_indices[:20]
 print('chars:', ''.join([idx_to_char[idx] for idx in sample]))
 print('indices:', sample)
+```
+
+```{.json .output n=4}
+[
+ {
+  "name": "stdout",
+  "output_type": "stream",
+  "text": "chars: \u60f3\u8981\u6709\u76f4\u5347\u673a \u60f3\u8981\u548c\u4f60\u98de\u5230\u5b87\u5b99\u53bb \u60f3\u8981\u548c\nindices: [273, 252, 756, 607, 791, 927, 900, 273, 252, 489, 844, 412, 361, 648, 454, 441, 900, 273, 252, 489]\n"
+ }
+]
 ```
 
 We packaged the above code in the `load_data_jay_lyrics` function of the `gluonbook` package for to facilitate calling in later chapters. After calling this function, we will get four variables in turn, `corpus_indices`, `char_to_idx`, `idx_to_char`, and `vocab_size`.
@@ -55,7 +91,7 @@ During training, we need to randomly read mini-batches of examples and labels ea
 The following code randomly samples a mini--batch from the data each time. Here, the batch size `batch_size` indicates to the number of examples in each mini-batch and `num_steps` is the number of time steps included in each example.
 In random sampling, each example is a sequence arbitrarily captured on the original sequence. The positions of two adjacent random mini-batches on the original sequence are not necessarily adjacent. Therefore, we cannot initialize the hidden state of the next mini-batch with the hidden state of final time step of the previous mini-batch. When training the model, the hidden state needs to be reinitialized before each random sampling.
 
-```{.python .input  n=25}
+```{.python .input  n=5}
 # This function is saved in the gluonbook package for future use.
 def data_iter_random(corpus_indices, batch_size, num_steps, ctx=None):
     # We subtract one because the index of the output is the index of the corresponding input plus one.
@@ -79,10 +115,20 @@ def data_iter_random(corpus_indices, batch_size, num_steps, ctx=None):
 
 Let us input an artificial sequence from 0 to 29. We assume the batch size and numbers of time steps are 2 and 6 respectively. Then we print input `X` and label `Y` for each mini-batch of examples read by random sampling. As we can see, the positions of two adjacent random mini-batches on the original sequence are not necessarily adjacent.
 
-```{.python .input  n=31}
+```{.python .input  n=6}
 my_seq = list(range(30))
 for X, Y in data_iter_random(my_seq, batch_size=2, num_steps=6):
     print('X: ', X, '\nY:', Y, '\n')
+```
+
+```{.json .output n=6}
+[
+ {
+  "name": "stdout",
+  "output_type": "stream",
+  "text": "X:  \n[[12. 13. 14. 15. 16. 17.]\n [ 0.  1.  2.  3.  4.  5.]]\n<NDArray 2x6 @cpu(0)> \nY: \n[[13. 14. 15. 16. 17. 18.]\n [ 1.  2.  3.  4.  5.  6.]]\n<NDArray 2x6 @cpu(0)> \n\nX:  \n[[18. 19. 20. 21. 22. 23.]\n [ 6.  7.  8.  9. 10. 11.]]\n<NDArray 2x6 @cpu(0)> \nY: \n[[19. 20. 21. 22. 23. 24.]\n [ 7.  8.  9. 10. 11. 12.]]\n<NDArray 2x6 @cpu(0)> \n\n"
+ }
+]
 ```
 
 ### Adjacent sampling
@@ -92,7 +138,7 @@ when training the model, we only need to initialize the hidden state at the begi
 On the other hand, when multiple adjacent mini-batches are concatenated by passing hidden states, the gradient calculation of the model parameters will depend on all the mini-batch sequences that are concatenated. In the same epoch as the number of iterations increases, the costs of gradient calculation rise.
 So that the model parameter gradient calculations only depend on the mini-batch sequence read by one iteration, we can separate the hidden state from the computational graph before reading the mini-batch. We will gain a deeper understand this approach in the following sections.
 
-```{.python .input  n=32}
+```{.python .input  n=7}
 # This function is saved in the gluonbook package for future use.
 def data_iter_consecutive(corpus_indices, batch_size, num_steps, ctx=None):
     corpus_indices = nd.array(corpus_indices, ctx=ctx)
@@ -110,9 +156,19 @@ def data_iter_consecutive(corpus_indices, batch_size, num_steps, ctx=None):
 
 Using the same settings, print input `X` and label `Y` for each mini-batch of examples read by random sampling. The positions of two adjacent random mini-batches on the original sequence are adjacent.
 
-```{.python .input  n=33}
+```{.python .input  n=8}
 for X, Y in data_iter_consecutive(my_seq, batch_size=2, num_steps=6):
     print('X: ', X, '\nY:', Y, '\n')
+```
+
+```{.json .output n=8}
+[
+ {
+  "name": "stdout",
+  "output_type": "stream",
+  "text": "X:  \n[[ 0.  1.  2.  3.  4.  5.]\n [15. 16. 17. 18. 19. 20.]]\n<NDArray 2x6 @cpu(0)> \nY: \n[[ 1.  2.  3.  4.  5.  6.]\n [16. 17. 18. 19. 20. 21.]]\n<NDArray 2x6 @cpu(0)> \n\nX:  \n[[ 6.  7.  8.  9. 10. 11.]\n [21. 22. 23. 24. 25. 26.]]\n<NDArray 2x6 @cpu(0)> \nY: \n[[ 7.  8.  9. 10. 11. 12.]\n [22. 23. 24. 25. 26. 27.]]\n<NDArray 2x6 @cpu(0)> \n\n"
+ }
+]
 ```
 
 ## Summary
