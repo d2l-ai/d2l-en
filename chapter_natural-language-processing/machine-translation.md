@@ -31,8 +31,8 @@ def process_one_seq(seq_tokens, all_tokens, all_seqs, max_seq_len):
 def build_data(all_tokens, all_seqs):
     vocab = text.vocab.Vocabulary(collections.Counter(all_tokens),
                                   reserved_tokens=[PAD, BOS, EOS])
-    indicies = [vocab.to_indices(seq) for seq in all_seqs]
-    return vocab, nd.array(indicies)
+    indices = [vocab.to_indices(seq) for seq in all_seqs]
+    return vocab, nd.array(indices)
 ```
 
 For simplicity, we use a very small French-English data set here. In this data set, each line is a French sentence and its corresponding English sentence, separated by `'\t'`. When reading data, we attach the “&lt;eos&gt;” symbol at the end of the sentence, and if necessary, make the length of each sequence `max_seq_len` by adding the “&lt;pad&gt;” symbol. We create separate dictionaries for French and English words. The index of French words and the index of the English words are independent of each other.
@@ -99,7 +99,7 @@ output.shape, state[0].shape
 
 ### Attention Mechanism
 
-Before we introduce how to implement vectorization calculation for the attention mechanism, we will take a look at the `flatten` option for a `Dense` instance. When the input dimension is greater than 2, by default, the `Dense` instance will treat all dimensions other than the first dimension (example dimension) as feature dimensions that require affine transformation, and will automatically convert the input into a two-dimensional matrix with rows of behavioral examples and columns of features. After calculation, the shape of output the matrix is (number of examples, number of outputs). If we want the fully connected layer to only perform affine transformation on the last dimension of the input while keeping the shapes of the other dimensions unchanged, we need to set the `flatten` option of the `Dense` instance to `False`. In the following example, the fully connected layer only performs affine transformation on the last dimension of the input, therefore, only the last dimension of the output shape becomes the number of outputs of the fully connected layer, i.e. 2.
+Before we introduce how to implement vectorization calculation for the attention mechanism, we will take a look at the `flatten` option for a `Dense` instance. When the input dimension is greater than 2, by default, the `Dense` instance will treat all dimensions other than the first dimension (example dimension) as feature dimensions that require affine transformation, and will automatically convert the input into a two-dimensional matrix with rows of behavioral examples and columns of features. After calculation, the shape of the output matrix is (number of examples, number of outputs). If we want the fully connected layer to only perform affine transformation on the last dimension of the input while keeping the shapes of the other dimensions unchanged, we need to set the `flatten` option of the `Dense` instance to `False`. In the following example, the fully connected layer only performs affine transformation on the last dimension of the input, therefore, only the last dimension of the output shape becomes the number of outputs of the fully connected layer, i.e. 2.
 
 ```{.python .input}
 dense = nn.Dense(2, flatten=False)
@@ -107,7 +107,7 @@ dense.initialize()
 dense(nd.zeros((3, 5, 7))).shape
 ```
 
-We will implement the function $a$ defined in the ["Attention Mechanism"](./attention.md) section to transform the concatenated input through a multilayer perceptron with a single hidden layer. The input of the hidden layer is a one-to-one concatenation between the hidden state of the decoder and the hidden state of the encoder on all time steps, which uses tanh as the activation function. The number of outputs of the output layer is 1. Neither `Dense` instance use a bias and they set `flatten=False`. Here, the length of the vector $\boldsymbol{v}$ in the $a$ function definition is a hyper-parameter, i.e. `attention_size`.
+We will implement the function $a$ defined in the ["Attention Mechanism"](./attention.md) section to transform the concatenated input through a multilayer perceptron with a single hidden layer. The input of the hidden layer is a one-to-one concatenation between the hidden state of the decoder and the hidden state of the encoder on all time steps, which uses tanh as the activation function. The number of outputs of the output layer is 1. Neither of the 2 `Dense` instances use a bias or flatten. Here, the length of the vector $\boldsymbol{v}$ in the $a$ function definition is a hyper-parameter, i.e. `attention_size`.
 
 ```{.python .input  n=167}
 def attention_model(attention_size):
@@ -326,8 +326,8 @@ score('ils sont canadiens .', 'they are canadian .', k=2)
 
 ## Problems
 
-* If the encoder and decoder have different numbers of hidden units or layers, how can we improve the decoder's hidden state initialization method?
-* During training, replace teacher forcing with the output of the decoder at the previous time step as the input of the decoder at the current time step. Has the result changed?
+* If the encoder and decoder have different number of hidden units or layers, how can we improve the decoder's hidden state initialization method?
+* During training, we experiment by replacing "teacher forcing" with the output of the decoder at the previous time step as the input of the decoder at the current time step. Has the result changed?
 * Try to train the model with larger translation data sets, such as WMT[2] and Tatoeba Project[3].
 
 
