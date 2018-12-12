@@ -17,19 +17,6 @@ with zipfile.ZipFile('../data/jaychou_lyrics.txt.zip') as zin:
 corpus_chars[:40]
 ```
 
-```{.json .output n=1}
-[
- {
-  "data": {
-   "text/plain": "'\u60f3\u8981\u6709\u76f4\u5347\u673a\\n\u60f3\u8981\u548c\u4f60\u98de\u5230\u5b87\u5b99\u53bb\\n\u60f3\u8981\u548c\u4f60\u878d\u5316\u5728\u4e00\u8d77\\n\u878d\u5316\u5728\u5b87\u5b99\u91cc\\n\u6211\u6bcf\u5929\u6bcf\u5929\u6bcf'"
-  },
-  "execution_count": 1,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 This data set has more than 50,000 characters. For ease of printing, we replaced line breaks with spaces and then used only the first 10,000 characters to train the model.
 
 ```{.python .input  n=2}
@@ -48,19 +35,6 @@ vocab_size = len(char_to_idx)
 vocab_size
 ```
 
-```{.json .output n=3}
-[
- {
-  "data": {
-   "text/plain": "1027"
-  },
-  "execution_count": 3,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 After that, each character in the training data set is converted into an index, and the first 20 characters and their corresponding indexes are printed.
 
 ```{.python .input  n=4}
@@ -68,16 +42,6 @@ corpus_indices = [char_to_idx[char] for char in corpus_chars]
 sample = corpus_indices[:20]
 print('chars:', ''.join([idx_to_char[idx] for idx in sample]))
 print('indices:', sample)
-```
-
-```{.json .output n=4}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "chars: \u60f3\u8981\u6709\u76f4\u5347\u673a \u60f3\u8981\u548c\u4f60\u98de\u5230\u5b87\u5b99\u53bb \u60f3\u8981\u548c\nindices: [273, 252, 756, 607, 791, 927, 900, 273, 252, 489, 844, 412, 361, 648, 454, 441, 900, 273, 252, 489]\n"
- }
-]
 ```
 
 We packaged the above code in the `load_data_jay_lyrics` function of the `gluonbook` package for to facilitate calling in later chapters. After calling this function, we will get four variables in turn, `corpus_indices`, `char_to_idx`, `idx_to_char`, and `vocab_size`.
@@ -121,16 +85,6 @@ for X, Y in data_iter_random(my_seq, batch_size=2, num_steps=6):
     print('X: ', X, '\nY:', Y, '\n')
 ```
 
-```{.json .output n=6}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "X:  \n[[12. 13. 14. 15. 16. 17.]\n [ 0.  1.  2.  3.  4.  5.]]\n<NDArray 2x6 @cpu(0)> \nY: \n[[13. 14. 15. 16. 17. 18.]\n [ 1.  2.  3.  4.  5.  6.]]\n<NDArray 2x6 @cpu(0)> \n\nX:  \n[[18. 19. 20. 21. 22. 23.]\n [ 6.  7.  8.  9. 10. 11.]]\n<NDArray 2x6 @cpu(0)> \nY: \n[[19. 20. 21. 22. 23. 24.]\n [ 7.  8.  9. 10. 11. 12.]]\n<NDArray 2x6 @cpu(0)> \n\n"
- }
-]
-```
-
 ### Adjacent sampling
 
 In addition to random sampling of the original sequence, we can also make the positions of two adjacent random mini-batches adjacent on the original sequence. Now, we can use a hidden state of the last time step of a mini-batch to initialize the hidden state of the next mini-batch, so that the output of the next mini-batch is also dependent on the input of the mini-batch, with this pattern continuing in subsequent mini-batches. This has two effects on the implementation of recurrent neural network. On the one hand,
@@ -159,16 +113,6 @@ Using the same settings, print input `X` and label `Y` for each mini-batch of ex
 ```{.python .input  n=8}
 for X, Y in data_iter_consecutive(my_seq, batch_size=2, num_steps=6):
     print('X: ', X, '\nY:', Y, '\n')
-```
-
-```{.json .output n=8}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "X:  \n[[ 0.  1.  2.  3.  4.  5.]\n [15. 16. 17. 18. 19. 20.]]\n<NDArray 2x6 @cpu(0)> \nY: \n[[ 1.  2.  3.  4.  5.  6.]\n [16. 17. 18. 19. 20. 21.]]\n<NDArray 2x6 @cpu(0)> \n\nX:  \n[[ 6.  7.  8.  9. 10. 11.]\n [21. 22. 23. 24. 25. 26.]]\n<NDArray 2x6 @cpu(0)> \nY: \n[[ 7.  8.  9. 10. 11. 12.]\n [22. 23. 24. 25. 26. 27.]]\n<NDArray 2x6 @cpu(0)> \n\n"
- }
-]
 ```
 
 ## Summary

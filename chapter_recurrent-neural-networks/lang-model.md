@@ -82,18 +82,92 @@ $$
 
 Since they involve one, two or three terms, these are typically referred to as unigram, bigram and trigram models. In the following we will learn how to design better models. 
 
+## Natural Language Statistics
+
+Let's see how this works on real data. To get started we load text from H.G. Wells' [Time Machine](http://www.gutenberg.org/ebooks/35). This is a fairly small corpus of just over 30,000 words but for the purpose of what we want to illustrate this is just fine. More realistic document collections contain many billions of words. To begin, we split the document up into words and ignore punctuation and capitalization. While this discards some relevant information, it is useful for computing count statistics in general. Let's see what the first few lines look like.
+
+```{.python .input}
+import collections
+import re
+with open('../data/timemachine.txt', 'r') as f:
+    lines = f.readlines()
+    raw_dataset = [re.sub('[^A-Za-z]+', ' ', st).lower().split() for st in lines]
+
+# Let's read the first 10 lines of the text    
+for st in raw_dataset[8:10]:
+    print('# tokens:', len(st), st)        
+```
+
+Now we need to insert this into a word counter. This is where the `collections` datastructure comes in handy. It takes care of all the accounting for us.
+
+```{.python .input}
+counter = collections.Counter([tk for st in raw_dataset for tk in st])
+print("frequency of 'traveller':", counter['traveller'])
+# Print the 10 most frequent words with word frequency count
+print(counter.most_common(10))
+```
+
+As we can see, the most popular words are actually quite boring to look at. In traditional NLP they're often referred to as [stopwords](https://en.wikipedia.org/wiki/Stop_words) and thus filtered out. That said, they still carry meaning and we will use them nonetheless. However, one thing that is quite clear is that the word frequency decays rather rapidly. The 10th word is less than $\frac{1}{5}$ as common as the most popular one. To get a better idea we plot the graph of word frequencies.
+
+```{.python .input}
+%matplotlib inline
+from matplotlib import pyplot as plt
+from math import log10
+
+wordcounts = [count for _,count in counter.most_common()]
+plt.loglog(wordcounts);
+```
+
+We're on to something quite fundamental here - the word frequencies decay rapidly in a well defined way. After dealing with the first four words as exceptions ('the', 'i', 'and', 'of'), all remaining words follow a straight line on a log-log plot. This means that words satisfy [Zipf's law](https://en.wikipedia.org/wiki/Zipf%27s_law) which states that the item frequency is given by
+
+$$n(x) \propto (x + c)^{-\alpha} \text{ and hence }
+\log n(x) = \alpha \log (x+c) + \mathrm{const.}$$
+
+This should already give us pause if we want to model words by count statistics and smoothing. After all, we will significantly overestimate the frequency of the tail, aka the infrequent words. But what about word pairs (and trigrams and beyond)? Let's see.
+
+```{.python .input}
+wseq = [tk for st in raw_dataset for tk in st]
+word_pairs = [pair for pair in zip(wseq[:-1], wseq[1:])]
+print('Beginning of the book\n', word_pairs[:10])
+counter_pairs = collections.Counter(word_pairs)
+print('Most common word pairs\n', counter_pairs.most_common(10))
+```
+
+Two things are notable. Out of the 10 most frequent word pairs, 9 are composed of stop words and only one is relevant to the actual book - 'the time'. Let's see whether the bigram frequencies behave in the same manner as the unigram frequencies. 
+
+```{.python .input}
+word_triples = [triple for triple in zip(wseq[:-2], wseq[1:-1], wseq[2:])]
+counter_triples = collections.Counter(word_triples)
+
+bigramcounts = [count for _,count in counter_pairs.most_common()]
+triplecounts = [count for _,count in counter_triples.most_common()]
+plt.loglog(wordcounts, label='word counts');
+plt.loglog(bigramcounts, label='bigram counts');
+plt.loglog(triplecounts, label='triple counts');
+plt.legend();
+```
+
+The graph is quite exciting for a number of reasons. Firstly, beyond words, also sequences of words appear to be following Zipf's law, albeit with a lower exponent, depending on sequence length. Secondly, the number of distinct n-grams is not that large. This gives us hope that there is quite a lot of structure in language. Third, *many* n-grams occur very rarely, which makes Laplace smoothing rather unsuitable for language modeling. Instead, we will use deep learning based models. 
+
 ## Summary
 
 * Language models are an important technology for natural language processing.
 * $n$-grams provide a convenient model for dealing with long sequences by truncating the dependence. 
 * Long sequences suffer from the problem that they occur very rarely or never. This requires smoothing, e.g. via Bayesian Nonparametrics or alternatively via deep learning.
+* Zipf's law governs the word distribution for both unigrams and n-grams. 
+* There's a lot of structure but not enough frequency to deal with infrequent word combinations efficiently via smoothing. 
 
 ## Problems
 
 1. Suppose there are 100,000 words in the training data set. How many word frequencies and multi-word adjacent frequencies does a four-gram need to store?
 1. Review the smoothed probability estimates. Why are they not accurate? Hint - we are dealing with a contiguous sequence rather than singletons.
 1. How would you model a dialogue?
+1. Estimate the exponent of Zipf's law for unigrams, bigrams and trigrams. 
 
 ## Discuss on our Forum
 
 <div id="discuss" topic_id="2361"></div>
+
+```{.python .input}
+
+```
