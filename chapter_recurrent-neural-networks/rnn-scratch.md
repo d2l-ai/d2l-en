@@ -1,5 +1,7 @@
 # Implementation of a Recurrent Neural Network from Scratch
 
+@TODO(smolix/astonzhang): the data set was just changed from lyrics to time machine, so descriptions/hyperparameters have to change.
+
 In this section, we will implement a language model based on a character-level recurrent neural network from scratch and train the model on the Jay Chou album lyrics data set to teach it to write lyrics. First, we read the Jay Chou album lyrics data set.
 
 ```{.python .input  n=1}

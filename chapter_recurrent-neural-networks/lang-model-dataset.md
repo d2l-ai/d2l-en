@@ -1,6 +1,6 @@
 # Language Model Data Sets (Time Machine)
 
-@TODO: the data set was just changed from lyrics to time machine (descriptions/hyperparameters have to change).
+@TODO(smolix/astonzhang): the data set was just changed from lyrics to time machine, so descriptions/hyperparameters have to change.
 
 This section describes how to preprocess a language model data set and convert it to the input format required for a character-level recurrent neural network. To this end, we collected Jay Chou's lyrics from his first album "Jay" to his tenth album "The Era". In subsequent chapters, we will a recurrent neural network to train a language model on this data set. Once the model is trained, we can use it to write lyrics.
 

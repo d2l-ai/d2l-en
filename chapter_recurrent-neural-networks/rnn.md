@@ -1,5 +1,7 @@
 # Recurrent Neural Networks
 
+@TODO(smolix/astonzhang): the data set was just changed from lyrics to time machine, so descriptions/hyperparameters have to change.
+
 In the last section, we introduced the $n$-gram, in which the conditional probability of word $w_t$ for time step $t$ based on all previous words only takes $n-1$ number of words from the last time step into account.  If we want to check the possible effect of words earlier than $t-(n-1)$ on $w_t$, we need to increase $n$. However, the number of model parameters would also increase exponentially with it (see the exercises in the last section).
 
 In this section, we will discuss recurrent neural networks (RNNs).  Instead of rigidly remembering all fixed-length sequences, RNNs use hidden states to store information from previous time steps. First, recall the multilayer perceptron introduced earlier, and then discuss how to add a hidden state to turn it into an RNN.

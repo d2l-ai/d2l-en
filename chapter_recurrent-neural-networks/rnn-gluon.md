@@ -1,5 +1,7 @@
 # Gluon Implementation in Recurrent Neural Networks
 
+@TODO(smolix/astonzhang): the data set was just changed from lyrics to time machine, so descriptions/hyperparameters have to change.
+
 This section will use Gluon to implement a language model based on a recurrent neural network. First, we read the Jay Chou album lyrics data set.
 
 ```{.python .input  n=1}
