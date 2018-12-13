@@ -1,6 +1,8 @@
 #!/bin/bash
 
 # Prerequisite: pip install nblint
+# Run 'bash build/lint.sh'
+# Check results in outlint
 
 OUT=outlint
 
