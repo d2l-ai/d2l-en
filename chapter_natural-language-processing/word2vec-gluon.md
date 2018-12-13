@@ -312,7 +312,7 @@ def train(net, lr, num_epochs):
 Now, we can train a skip-gram model using negative sampling.
 
 ```{.python .input  n=22}
-train(net, 0.005, 8)
+train(net, 0.001, 8)
 ```
 
 ## Applying the Word Embedding Model
