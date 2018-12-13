@@ -176,7 +176,7 @@ before worrying about more exotic probability distributions.
 If you're ready to get started, head over to [the introduction](../chapter_introduction/index.rst).
 For everything else [open an issue on Github](https://github.com/diveintodeeplearning/d2l-en).
 
-## Thanks
+## Acknowledgments
 
 We are indebted to the hundreds of contributors for both
 the English draft and subsequently the Chinese version.
