@@ -21,7 +21,7 @@ corpus_chars[:40]
 This data set has more than 50,000 characters. For ease of printing, we replaced line breaks with spaces and then used only the first 10,000 characters to train the model.
 
 ```{.python .input  n=2}
-corpus_chars = corpus_chars.replace('\n', ' ').replace('\r', ' ')
+corpus_chars = corpus_chars.replace('\n', ' ').replace('\r', ' ').lower()
 corpus_chars = corpus_chars[0:10000]
 ```
 

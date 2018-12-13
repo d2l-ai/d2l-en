@@ -285,7 +285,7 @@ def load_data_time_machine():
     """Load the time machine data set."""
     with open('../data/timemachine.txt') as f:
         corpus_chars = f.read()
-    corpus_chars = corpus_chars.replace('\n', ' ').replace('\r', ' ')
+    corpus_chars = corpus_chars.replace('\n', ' ').replace('\r', ' ').lower()
     corpus_chars = corpus_chars[0:10000]
     idx_to_char = list(set(corpus_chars))
     char_to_idx = dict([(char, i) for i, char in enumerate(idx_to_char)])

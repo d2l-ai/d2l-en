@@ -155,7 +155,7 @@ As in the previous section, during model training, we only use adjacent sampling
 
 ```{.python .input  n=5}
 num_epochs, num_steps, batch_size, lr, clipping_theta = 160, 35, 32, 1e2, 1e-2
-pred_period, pred_len, prefixes = 40, 50, ['Traveller', 'Time Traveller']
+pred_period, pred_len, prefixes = 40, 50, ['traveller', 'time traveller']
 ```
 
 We create a string of lyrics based on the currently trained model every 40 epochs.

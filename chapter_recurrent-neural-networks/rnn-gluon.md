@@ -96,7 +96,7 @@ Let us make one predication using a model with weights that are random values.
 ctx = gb.try_gpu()
 model = RNNModel(rnn_layer, vocab_size)
 model.initialize(force_reinit=True, ctx=ctx)
-predict_rnn_gluon('Traveller', 10, model, vocab_size, ctx, idx_to_char,
+predict_rnn_gluon('traveller', 10, model, vocab_size, ctx, idx_to_char,
                   char_to_idx)
 ```
 
@@ -145,7 +145,7 @@ Train the model using the same hyper-parameters as in the previous experiments.
 
 ```{.python .input  n=19}
 num_epochs, batch_size, lr, clipping_theta = 200, 32, 1e2, 1e-2
-pred_period, pred_len, prefixes = 50, 50, ['Traveller', 'Time Traveller']
+pred_period, pred_len, prefixes = 50, 50, ['traveller', 'time traveller']
 train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
                             corpus_indices, idx_to_char, char_to_idx,
                             num_epochs, num_steps, lr, clipping_theta,

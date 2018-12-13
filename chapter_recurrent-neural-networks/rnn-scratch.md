@@ -124,7 +124,7 @@ def predict_rnn(prefix, num_chars, rnn, params, init_rnn_state,
 We test the `predict_rnn` function first. We will create a lyric with a length of 10 characters (regardless of the prefix length) based on the prefix "separate". Because the model parameters are random values, the prediction results are also random.
 
 ```{.python .input  n=9}
-predict_rnn('Traveller', 10, rnn, params, init_rnn_state, num_hiddens, vocab_size,
+predict_rnn('traveller', 10, rnn, params, init_rnn_state, num_hiddens, vocab_size,
             ctx, idx_to_char, char_to_idx)
 ```
 
@@ -224,7 +224,7 @@ Now we can train the model. First, set the model hyper-parameter. We will create
 
 ```{.python .input  n=12}
 num_epochs, num_steps, batch_size, lr, clipping_theta = 200, 35, 32, 1e2, 1e-2
-pred_period, pred_len, prefixes = 50, 50, ['Traveller', 'Time Traveller']
+pred_period, pred_len, prefixes = 50, 50, ['traveller', 'time traveller']
 ```
 
 Next, we use random sampling to train the model and write lyrics.
