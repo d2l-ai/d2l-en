@@ -87,6 +87,9 @@ Since they involve one, two or three terms, these are typically referred to as u
 Let's see how this works on real data. To get started we load text from H.G. Wells' [Time Machine](http://www.gutenberg.org/ebooks/35). This is a fairly small corpus of just over 30,000 words but for the purpose of what we want to illustrate this is just fine. More realistic document collections contain many billions of words. To begin, we split the document up into words and ignore punctuation and capitalization. While this discards some relevant information, it is useful for computing count statistics in general. Let's see what the first few lines look like.
 
 ```{.python .input}
+import sys
+sys.path.insert(0, '..')
+
 import collections
 import re
 with open('../data/timemachine.txt', 'r') as f:
@@ -133,7 +136,7 @@ counter_pairs = collections.Counter(word_pairs)
 print('Most common word pairs\n', counter_pairs.most_common(10))
 ```
 
-Two things are notable. Out of the 10 most frequent word pairs, 9 are composed of stop words and only one is relevant to the actual book - 'the time'. Let's see whether the bigram frequencies behave in the same manner as the unigram frequencies. 
+Two things are notable. Out of the 10 most frequent word pairs, 9 are composed of stop words and only one is relevant to the actual book - 'the time'. Let's see whether the bigram frequencies behave in the same manner as the unigram frequencies.
 
 ```{.python .input}
 word_triples = [triple for triple in zip(wseq[:-2], wseq[1:-1], wseq[2:])]
@@ -167,7 +170,3 @@ The graph is quite exciting for a number of reasons. Firstly, beyond words, also
 ## Discuss on our Forum
 
 <div id="discuss" topic_id="2361"></div>
-
-```{.python .input}
-
-```

@@ -1,4 +1,6 @@
-# Language Model Data Sets (Jay Chou Album Lyrics)
+# Language Model Data Sets (Time Machine)
+
+@TODO: the data set was just changed from lyrics to time machine (descriptions/hyperparameters have to change).
 
 This section describes how to preprocess a language model data set and convert it to the input format required for a character-level recurrent neural network. To this end, we collected Jay Chou's lyrics from his first album "Jay" to his tenth album "The Era". In subsequent chapters, we will a recurrent neural network to train a language model on this data set. Once the model is trained, we can use it to write lyrics.
 
@@ -11,9 +13,8 @@ from mxnet import nd
 import random
 import zipfile
 
-with zipfile.ZipFile('../data/jaychou_lyrics.txt.zip') as zin:
-    with zin.open('jaychou_lyrics.txt') as f:
-        corpus_chars = f.read().decode('utf-8')
+with open('../data/timemachine.txt') as f:
+    corpus_chars = f.read()
 corpus_chars[:40]
 ```
 

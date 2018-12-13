@@ -62,12 +62,15 @@ We can summarize the design of GRUs as follows:
 To implement and display a GRU, we will again use the Jay Chou lyrics data set to train the model to compose song lyrics. The implementation, except for the GRU, has already been described in the ["Recurrent Neural Network"](rnn.md) section. The code for reading the data set is given below:
 
 ```{.python .input  n=1}
+import sys
+sys.path.insert(0, '..')
+
 import gluonbook as gb
 from mxnet import nd
 from mxnet.gluon import rnn
 
 (corpus_indices, char_to_idx, idx_to_char,
- vocab_size) = gb.load_data_jay_lyrics()
+ vocab_size) = gb.load_data_time_machine()
 ```
 
 ## Implementation from Scratch
@@ -136,7 +139,7 @@ During model training, we only use adjacent examples. After setting the hyper-pa
 
 ```{.python .input  n=5}
 num_epochs, num_steps, batch_size, lr, clipping_theta = 160, 35, 32, 1e2, 1e-2
-pred_period, pred_len, prefixes = 40, 50, ['分开', '不分开']
+pred_period, pred_len, prefixes = 40, 50, ['Traveller', 'Time Traveller']
 ```
 
 We create a string of lyrics based on the currently trained model every 40 epochs.
