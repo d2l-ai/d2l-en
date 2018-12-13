@@ -69,7 +69,6 @@ from mxnet import autograd, nd, gluon, init
 import gluonbook as gb
 # display routines
 %matplotlib inline
-from IPython import display
 from matplotlib import pyplot as plt
 
 embedding = 4 # embedding dimension for autoregressive model

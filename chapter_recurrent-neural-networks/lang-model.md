@@ -112,7 +112,6 @@ As we can see, the most popular words are actually quite boring to look at. In t
 ```{.python .input}
 %matplotlib inline
 from matplotlib import pyplot as plt
-from math import log10
 
 wordcounts = [count for _,count in counter.most_common()]
 plt.loglog(wordcounts);
@@ -121,7 +120,7 @@ plt.loglog(wordcounts);
 We're on to something quite fundamental here - the word frequencies decay rapidly in a well defined way. After dealing with the first four words as exceptions ('the', 'i', 'and', 'of'), all remaining words follow a straight line on a log-log plot. This means that words satisfy [Zipf's law](https://en.wikipedia.org/wiki/Zipf%27s_law) which states that the item frequency is given by
 
 $$n(x) \propto (x + c)^{-\alpha} \text{ and hence }
-\log n(x) = \alpha \log (x+c) + \mathrm{const.}$$
+\log n(x) = -\alpha \log (x+c) + \mathrm{const.}$$
 
 This should already give us pause if we want to model words by count statistics and smoothing. After all, we will significantly overestimate the frequency of the tail, aka the infrequent words. But what about word pairs (and trigrams and beyond)? Let's see.
 
@@ -133,7 +132,7 @@ counter_pairs = collections.Counter(word_pairs)
 print('Most common word pairs\n', counter_pairs.most_common(10))
 ```
 
-Two things are notable. Out of the 10 most frequent word pairs, 9 are composed of stop words and only one is relevant to the actual book - 'the time'. Let's see whether the bigram frequencies behave in the same manner as the unigram frequencies. 
+Two things are notable. Out of the 10 most frequent word pairs, 9 are composed of stop words and only one is relevant to the actual book - 'the time'. Let's see whether the bigram frequencies behave in the same manner as the unigram frequencies.
 
 ```{.python .input}
 word_triples = [triple for triple in zip(wseq[:-2], wseq[1:-1], wseq[2:])]
@@ -167,7 +166,3 @@ The graph is quite exciting for a number of reasons. Firstly, beyond words, also
 ## Discuss on our Forum
 
 <div id="discuss" topic_id="2361"></div>
-
-```{.python .input}
-
-```
