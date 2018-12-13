@@ -87,6 +87,9 @@ Since they involve one, two or three terms, these are typically referred to as u
 Let's see how this works on real data. To get started we load text from H.G. Wells' [Time Machine](http://www.gutenberg.org/ebooks/35). This is a fairly small corpus of just over 30,000 words but for the purpose of what we want to illustrate this is just fine. More realistic document collections contain many billions of words. To begin, we split the document up into words and ignore punctuation and capitalization. While this discards some relevant information, it is useful for computing count statistics in general. Let's see what the first few lines look like.
 
 ```{.python .input}
+import sys
+sys.path.insert(0, '..')
+
 import collections
 import re
 with open('../data/timemachine.txt', 'r') as f:

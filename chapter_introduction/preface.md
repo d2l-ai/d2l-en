@@ -181,6 +181,8 @@ For everything else [open an issue on Github](https://github.com/diveintodeeplea
 We are indebted to the hundreds of contributors for both
 the English draft and subsequently the Chinese version.
 They helped improve the content and offered valuable feedback.
+Their Github IDs and names (if provided) are: bowen0701, ChaiBapchya (Chaitanya Prakash Bapat), kirk86
+, MLWhiz (Rahul Agarwal), muelleme, sundeepteki, vishaalkapoor, YaYaB.
 Moreover, we thank Amazon Web Services for its generous support in writing this book.
 Without the available time, resources, discussions with colleagues,
 and continuous encouragement this book would not have happened.

@@ -1,8 +1,13 @@
 # Implementation of a Recurrent Neural Network from Scratch
 
+@TODO(smolix/astonzhang): the data set was just changed from lyrics to time machine, so descriptions/hyperparameters have to change.
+
 In this section, we will implement a language model based on a character-level recurrent neural network from scratch and train the model on the Jay Chou album lyrics data set to teach it to write lyrics. First, we read the Jay Chou album lyrics data set.
 
 ```{.python .input  n=1}
+import sys
+sys.path.insert(0, '..')
+
 import gluonbook as gb
 import math
 from mxnet import autograd, nd
@@ -10,7 +15,7 @@ from mxnet.gluon import loss as gloss
 import time
 
 (corpus_indices, char_to_idx, idx_to_char,
- vocab_size) = gb.load_data_jay_lyrics()
+ vocab_size) = gb.load_data_time_machine()
 ```
 
 ## One-hot Vector
@@ -119,7 +124,7 @@ def predict_rnn(prefix, num_chars, rnn, params, init_rnn_state,
 We test the `predict_rnn` function first. We will create a lyric with a length of 10 characters (regardless of the prefix length) based on the prefix "separate". Because the model parameters are random values, the prediction results are also random.
 
 ```{.python .input  n=9}
-predict_rnn('分开', 10, rnn, params, init_rnn_state, num_hiddens, vocab_size,
+predict_rnn('traveller', 10, rnn, params, init_rnn_state, num_hiddens, vocab_size,
             ctx, idx_to_char, char_to_idx)
 ```
 
@@ -219,7 +224,7 @@ Now we can train the model. First, set the model hyper-parameter. We will create
 
 ```{.python .input  n=12}
 num_epochs, num_steps, batch_size, lr, clipping_theta = 200, 35, 32, 1e2, 1e-2
-pred_period, pred_len, prefixes = 50, 50, ['分开', '不分开']
+pred_period, pred_len, prefixes = 50, 50, ['traveller', 'time traveller']
 ```
 
 Next, we use random sampling to train the model and write lyrics.
