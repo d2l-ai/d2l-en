@@ -11,7 +11,7 @@ stage("Sanity Check") {
 stage("Build and Publish") {
   node {
     ws('workspace/d2l-en') {
-      tik=\\\`date +%s\\\`
+      tik=\\`date +%s\\`
 
 	  checkout scm
       sh "build/build_html.sh"
@@ -24,7 +24,7 @@ stage("Build and Publish") {
       fi
       """
 
-	  tok=\\\`date +%s\\\`
+	  tok=\\`date +%s\\`
 	  runtime=$((end-start))
       convertsecs() {
 		((h=${1}/3600))
