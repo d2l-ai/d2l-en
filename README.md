@@ -2,6 +2,9 @@
 
 [![Build Status](http://ci.diveintodeeplearning.org/job/en/job/master/badge/icon)](http://ci.diveintodeeplearning.org/job/en/job/master/)
 
+## [Why this book](http://blog.smola.org/post/180838682891/dive-into-deep-learning)
+
+
 ## Become a D2L contributor, and you will be acknowledged in the book
 
 The contents of the book are under revision. We expect that the quality will be constantly improved.
