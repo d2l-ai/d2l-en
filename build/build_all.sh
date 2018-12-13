@@ -38,25 +38,15 @@ conda env update -f build/env.yml
 conda activate d2l-en-build
 
 pip list
-
 rm -rf build/_build/
 
 make html
-
-
-# Build pdf
-
-export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/cuda/lib64
-conda activate d2l-en-build
 
 make pdf
 cp build/_build/latex/d2l-en.pdf build/_build/html/
 
 [ -e build/_build/latex/d2l-en.aux ] && rm build/_build/latex/d2l-en.aux
 [ -e build/_build/latex/d2l-en.idx ] && rm build/_build/latex/d2l-en.idx
-
-
-# Build pkg
 
 # avoid putting data downloaded by scripts into the notebook package
 mv build/data build/data-bak
@@ -68,11 +58,9 @@ mv build/data-bak build/data
 # For 1.0
 cp build/_build/html/d2l-en.zip build/_build/html/d2l-en-1.0.zip
 
-
 # Time it
-
 tok=$(date +%s)
-runtime=$((end-start))
+runtime=$((tok-tik))
 convertsecs() {
 	((h=${1}/3600))
 	((m=(${1}%3600)/60))

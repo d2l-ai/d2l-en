@@ -1,6 +1,5 @@
 #!/bin/bash
 set -e
-set -x
 
 conda activate d2l-en-build
 
@@ -29,5 +28,7 @@ aws s3 sync --exclude '*.*' --include '*.woff' --include '*.woff2' \
 #      $DIR $BUCKET
 
 aws s3 sync --delete $DIR $BUCKET --acl 'public-read'
+
+echo 's3 uploaded'
 
 # TODO: add cache control
