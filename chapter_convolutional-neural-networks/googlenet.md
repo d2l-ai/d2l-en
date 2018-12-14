@@ -1,6 +1,6 @@
 # Networks with Parallel Concatenations (GoogLeNet)
 
-During the ImageNet Challenge in 2014, a new architecture emerged that outperformed the rest. [Szegedy et al., 2014](https://arxiv.org/abs/1409.4842) proposed a structure that combined the strengths of the NiN and repeated blocks paradigms. At its heart was the rather pragmatic answer to the question as to which size of convolution is ideal for processing. After all, we have a smorgasbord of choices, $1 \times 1$ or $3 \times 3$, $5 \times 5$ or even larger. And it isn't always clear which one is the best. As it turns out, the answer is that a combination of all the above works best. Over the next few years, researchers made several improvements to GoogLeNet. In this section, we will introduce the first version of this model series in a slightly simplified form - we omit the peculiarities that were added to stabilize training, due to the availability of better training algorithms. Notable, the original architecture included several "auxiliary classification" heads which addressed the diminution of gradients in very deep networks; this slightly cumbersome technique has become less popular over time [3].
+During the ImageNet Challenge in 2014, a new architecture emerged that outperformed the rest. [Szegedy et al., 2014](https://arxiv.org/abs/1409.4842) proposed a structure that combined the strengths of the NiN and repeated blocks paradigms. At its heart was the rather pragmatic answer to the question as to which size of convolution is ideal for processing. After all, we have a smorgasbord of choices, $1 \times 1$ or $3 \times 3$, $5 \times 5$ or even larger. And it isn't always clear which one is the best. As it turns out, the answer is that a combination of all the above works best. Over the next few years, researchers made several improvements to GoogLeNet. In this section, we will introduce the first version of this model series in a slightly simplified form - we omit the peculiarities that were added to stabilize training, due to the availability of better training algorithms. 
 
 ## Inception Blocks
 
@@ -131,7 +131,7 @@ gb.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
 1. There are several iterations of GoogLeNet. Try to implement and run them. Some of them include the following:
     * Add a batch normalization layer, as described later in this chapter [2].
     * Make adjustments to the Inception block [3].
-    * Use "Label Smoothing" to prevent the net from becoming overconfident in it's predictions [3].
+    * Use "label smoothing" for model regularization [3].
     * Include it in the residual connection, as described later in this chapter [4].
 1. What is the minimum image size for GoogLeNet to work?
 1. Compare the model parameter sizes of AlexNet, VGG, and NiN with GoogLeNet. How do the latter two network architectures significantly reduce the model parameter size?
