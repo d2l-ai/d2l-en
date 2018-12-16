@@ -69,8 +69,9 @@ from mxnet import autograd, nd, gluon, init
 import gluonbook as gb
 # display routines
 %matplotlib inline
-from IPython import display
 from matplotlib import pyplot as plt
+from IPython import display
+display.set_matplotlib_formats('svg')
 
 embedding = 4 # embedding dimension for autoregressive model
 T = 1000      # generate a total of 1000 points 

@@ -115,7 +115,8 @@ As we can see, the most popular words are actually quite boring to look at. In t
 ```{.python .input}
 %matplotlib inline
 from matplotlib import pyplot as plt
-from math import log10
+from IPython import display
+display.set_matplotlib_formats('svg')
 
 wordcounts = [count for _,count in counter.most_common()]
 plt.loglog(wordcounts);
@@ -124,7 +125,7 @@ plt.loglog(wordcounts);
 We're on to something quite fundamental here - the word frequencies decay rapidly in a well defined way. After dealing with the first four words as exceptions ('the', 'i', 'and', 'of'), all remaining words follow a straight line on a log-log plot. This means that words satisfy [Zipf's law](https://en.wikipedia.org/wiki/Zipf%27s_law) which states that the item frequency is given by
 
 $$n(x) \propto (x + c)^{-\alpha} \text{ and hence }
-\log n(x) = \alpha \log (x+c) + \mathrm{const.}$$
+\log n(x) = -\alpha \log (x+c) + \mathrm{const.}$$
 
 This should already give us pause if we want to model words by count statistics and smoothing. After all, we will significantly overestimate the frequency of the tail, aka the infrequent words. But what about word pairs (and trigrams and beyond)? Let's see.
 
