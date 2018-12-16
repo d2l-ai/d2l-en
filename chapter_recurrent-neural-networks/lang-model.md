@@ -115,6 +115,8 @@ As we can see, the most popular words are actually quite boring to look at. In t
 ```{.python .input}
 %matplotlib inline
 from matplotlib import pyplot as plt
+from IPython import display
+display.set_matplotlib_formats('svg')
 
 wordcounts = [count for _,count in counter.most_common()]
 plt.loglog(wordcounts);
