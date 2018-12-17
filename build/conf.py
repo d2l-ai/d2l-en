@@ -74,7 +74,7 @@ master_doc = 'index'
 # General information about the project.
 project = 'Dive into Deep Learning'
 copyright = '2017--2018, Contributors'
-author = "MXNet Community"
+author = "Aston Zhang, Zachary C. Lipton, Mu Li, and Alexander J. Smola"
 
 
 # The version info for the project you're documenting, acts as replacement for
