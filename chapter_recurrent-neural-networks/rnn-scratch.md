@@ -12,7 +12,7 @@ from mxnet import autograd, nd
 from mxnet.gluon import loss as gloss
 import time
 
-(corpus_indices, char_to_idx, idx_to_char, vocab_size) = 
+(corpus_indices, char_to_idx, idx_to_char, vocab_size) = \
     gb.load_data_time_machine()
 ```
 
