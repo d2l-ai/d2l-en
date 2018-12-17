@@ -1,8 +1,6 @@
-# Implementation of a Recurrent Neural Network from Scratch
+# Building a Recurrent Neural Network from Scratch
 
-@TODO(smolix/astonzhang): the data set was just changed from lyrics to time machine, so descriptions/hyperparameters have to change.
-
-In this section, we will implement a language model based on a character-level recurrent neural network from scratch and train the model on the Jay Chou album lyrics data set to teach it to write lyrics. First, we read the Jay Chou album lyrics data set.
+In this section, we will implement a language model from scratch. It is based on a character-level recurrent neural network that is trained on H. G. Wells' 'The Time Machine'. As before, we start by reading the dataset first. 
 
 ```{.python .input  n=1}
 import sys
@@ -14,8 +12,8 @@ from mxnet import autograd, nd
 from mxnet.gluon import loss as gloss
 import time
 
-(corpus_indices, char_to_idx, idx_to_char,
- vocab_size) = gb.load_data_time_machine()
+(corpus_indices, char_to_idx, idx_to_char, vocab_size) = 
+    gb.load_data_time_machine()
 ```
 
 ## One-hot Vector
@@ -223,7 +221,7 @@ def train_and_predict_rnn(rnn, get_params, init_rnn_state, num_hiddens,
 Now we can train the model. First, set the model hyper-parameter. We will create a lyrics segment with a length of 50 characters (regardless of the prefix length) respectively based on the prefixes "separate" and "not separated". We create a lyrics segment based on the currently trained model every 50 epochs.
 
 ```{.python .input  n=12}
-num_epochs, num_steps, batch_size, lr, clipping_theta = 200, 35, 32, 1e2, 1e-2
+num_epochs, num_steps, batch_size, lr, clipping_theta = 500, 35, 32, 1e2, 1e-2
 pred_period, pred_len, prefixes = 50, 50, ['traveller', 'time traveller']
 ```
 
