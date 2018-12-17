@@ -8,7 +8,6 @@ First, import the packages and modules required for the experiment.
 ```{.python .input  n=1}
 import collections
 import math
-import mxnet as mx
 from mxnet import autograd, gluon, nd
 from mxnet.gluon import data as gdata, loss as gloss, nn
 import random
