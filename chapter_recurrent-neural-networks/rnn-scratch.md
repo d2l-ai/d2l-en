@@ -16,18 +16,32 @@ import time
     gb.load_data_time_machine()
 ```
 
-## One-hot Vector
+## One-hot Encoding
 
-One-hot vectors provide an easy way to express words as vectors in order to input them in the neural network. Assume the number of different characters in the dictionary is $N$  (the `vocab_size`) and each character has a one-to-one correspondence with a single value in the index of successive integers from 0 to $N-1$. If the index of a character is the integer $i$, then we create a vector of all 0s with a length of $N$ and set the element at position $i$ to 1. This vector is the one-hot vector of the original character. The one-hot vectors with indices 0 and 2 are shown below, and the length of the vector is equal to the dictionary size.
+One-hot encoding vectors provide an easy way to express words as vectors in order to process them in a deep network. In a nutshell, we map each word to a different unit vector: assume that the number of different characters in the dictionary is $N$ (the `vocab_size`) and each character has a one-to-one correspondence with a single value in the index of successive integers from 0 to $N-1$. If the index of a character is the integer $i$, then we create a vector $\mathbf{e}_i$ of all 0s with a length of $N$ and set the element at position $i$ to 1. This vector is the one-hot vector of the original character. The one-hot vectors with indices 0 and 2 are shown below (the length of the vector is equal to the dictionary size).
 
 ```{.python .input  n=2}
 nd.one_hot(nd.array([0, 2]), vocab_size)
 ```
 
+```{.json .output n=2}
+[
+ {
+  "data": {
+   "text/plain": "\n[[1. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.\n  0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]\n [0. 0. 1. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.\n  0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]]\n<NDArray 2x43 @cpu(0)>"
+  },
+  "execution_count": 2,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
+```
+
 The shape of the mini-batch we sample each time is (batch size, time step). The following function transforms such mini-batches into a number of matrices with the shape of (batch size, dictionary size) that can be entered into the network. The total number of vectors is equal to the number of time steps. That is, the input of time step $t$ is $\boldsymbol{X}_t \in \mathbb{R}^{n \times d}$, where $n$ is the batch size and $d$ is the number of inputs. That is the one-hot vector length (the dictionary size).
 
 ```{.python .input  n=3}
-def to_onehot(X, size):  # This function is saved in the gluonbook package for future use.
+# This function is saved in the gluonbook package for future use.
+def to_onehot(X, size):  
     return [nd.one_hot(x, size) for x in X.T]
 
 X = nd.arange(10).reshape((2, 5))
@@ -35,15 +49,31 @@ inputs = to_onehot(X, vocab_size)
 len(inputs), inputs[0].shape
 ```
 
-## Initialize Model Parameters
+```{.json .output n=3}
+[
+ {
+  "data": {
+   "text/plain": "(5, (2, 43))"
+  },
+  "execution_count": 3,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
+```
 
-Next, we initialize the model parameters. The number of hidden units `num_hiddens` is a hyper-parameter.
+The code above generates 5 minibatches containing 2 vectors each. Since we have a total of 43 distinct symbols in "The Time Machine" we get 43-dimensional vectors.
+
+## Initializing the Model Parameters
+
+Next, we initialize the model parameters. The number of hidden units `num_hiddens` is a tunable parameter.
 
 ```{.python .input  n=4}
 num_inputs, num_hiddens, num_outputs = vocab_size, 256, vocab_size
 ctx = gb.try_gpu()
-print('will use', ctx)
+print('Using', ctx)
 
+# Create the parameters of the model, initialize them and attach gradients
 def get_params():
     def _one(shape):
         return nd.random.normal(scale=0.01, shape=shape, ctx=ctx)
@@ -62,9 +92,19 @@ def get_params():
     return params
 ```
 
-## Define the Model
+```{.json .output n=4}
+[
+ {
+  "name": "stdout",
+  "output_type": "stream",
+  "text": "will use cpu(0)\n"
+ }
+]
+```
 
-We implement this model based on the computational expressions of the recurrent neural network. First, we define the `init_rnn_state` function to return the hidden state at initialization. It returns a tuple consisting of an NDArray with a value of 0 and a shape of (batch size, number of hidden units). Using tuples makes it easier to handle situations where the hidden state contains multiple NDArrays.
+## Model Definition
+
+We implement this model based on the definition of an RNN. First, we need an `init_rnn_state` function to return the hidden state at initialization. It returns a tuple consisting of an NDArray with a value of 0 and a shape of (batch size, number of hidden units). Using tuples makes it easier to handle situations where the hidden state contains multiple NDArrays (e.g. when combining multiple layers in an RNN).
 
 ```{.python .input  n=5}
 def init_rnn_state(batch_size, num_hiddens, ctx):
@@ -75,7 +115,8 @@ The following `rnn` function defines how to compute the hidden state and output 
 
 ```{.python .input  n=6}
 def rnn(inputs, state, params):
-    # Both inputs and outputs are composed of num_steps matrices of the shape (batch_size, vocab_size).
+    # Both inputs and outputs are composed of num_steps matrices 
+    # of the shape (batch_size, vocab_size).
     W_xh, W_hh, b_h, W_hq, b_q = params
     H, = state
     outputs = []
@@ -86,14 +127,27 @@ def rnn(inputs, state, params):
     return outputs, (H,)
 ```
 
-Do a simple test to observe the number of output results (number of time steps), as well as the output layer output shape and hidden state shape of the first time step.
+Let's run a simple test to check whether inputs and outputs are accurate. In particular, we check output dimensions, the number of outputs and ensure that the hidden state hasn't changed.
 
-```{.python .input  n=7}
+```{.python .input  n=8}
 state = init_rnn_state(X.shape[0], num_hiddens, ctx)
 inputs = to_onehot(X.as_in_context(ctx), vocab_size)
 params = get_params()
 outputs, state_new = rnn(inputs, state, params)
 len(outputs), outputs[0].shape, state_new[0].shape
+```
+
+```{.json .output n=8}
+[
+ {
+  "data": {
+   "text/plain": "(5, (2, 43), (2, 256))"
+  },
+  "execution_count": 8,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
 ```
 
 ## Define the Prediction Function
@@ -254,6 +308,8 @@ train_and_predict_rnn(rnn, get_params, init_rnn_state, num_hiddens,
 
 
 ## Problems
+
+1. Show that one-hot encoding is equivalent to picking a different embedding for each object.
 
 * Adjust the hyper-parameters and observe and analyze the impact on running time, perplexity, and the written lyrics.
 * Run the code in this section without clipping the gradient. What happens?

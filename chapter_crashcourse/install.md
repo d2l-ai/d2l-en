@@ -17,9 +17,9 @@ For simplicity we recommend [Conda](https://conda.io), a popular Python package 
 1. Download the tarball containing the notebooks from this book. This can be found at (www.diveintodeeplearning.org/d2l-en-1.0.zip)[https://www.diveintodeeplearning.org/d2l-en-1.0.zip]. Alternatively feel free to clone the latest version from GitHub.
 1. Uncompress the ZIP file and move its contents to a folder for the tutorials.
 
-On Linux this can be accomplished as follows from the command line; For MacOS replace Linux by MacOSX in the first line, for Windows follow the links provided above. 
+On Linux this can be accomplished as follows from the command line; For MacOS replace Linux by MacOSX in the first line, for Windows follow the links provided above.
 
-```
+```{.python .input}
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 sh Miniconda3-latest-Linux-x86_64.sh
 mkdir d2l-en
@@ -42,7 +42,7 @@ The installation process is somewhat lengthy and you will need to agree to a num
 
 Next update the environment description in `environment.yml`. Replace `mxnet` by `mxnet-cu92` or whatever version of CUDA that you've got installed. For instance, if you're on CUDA 8.0, you need to replace `mxnet-cu92` with `mxnet-cu80`. You should do this *before* creating the Conda environment. Otherwise you will need to rebuild it later. On Linux this looks as follows (on Windows you can use e.g. Notepad to edit `environment.yml` directly).
 
-```
+```{.python .input}
 cd d2l
 emacs environment.yml
 ```
@@ -57,9 +57,9 @@ In a nutshell, Conda provides a mechanism for setting up a set of Python librari
 
 ### Windows
 
-As before, open the command line terminal. 
+As before, open the command line terminal.
 
-```
+```{.python .input}
 conda env create -f environment.yml
 cd d2l-en
 activate gluon
@@ -72,9 +72,9 @@ If your browser integration is working properly, starting Jupyter will open a ne
 
 ### Linux and MacOSX
 
-The steps for Linux are quite similar, just that anaconda uses slightly different command line options. 
+The steps for Linux are quite similar, just that anaconda uses slightly different command line options.
 
-```
+```{.python .input}
 conda env create -f environment.yml
 cd d2l-en
 source activate gluon
@@ -87,7 +87,7 @@ The main difference between Windows and other installations is that for the form
 
 In case you want to update the repository, if you installed a new version of CUDA and (or) MXNet, you can simply use the Conda commands to do this. As before, make sure you update the packages accordingly.
 
-```
+```{.python .input}
 cd d2l-en
 conda env update -f environment.yml
 ```
