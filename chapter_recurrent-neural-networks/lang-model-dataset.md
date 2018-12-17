@@ -87,7 +87,7 @@ def data_iter_random(corpus_indices, batch_size, num_steps, ctx=None):
 
 Let us generate an artificial sequence from 0 to 30. We assume that
 the batch size and numbers of time steps are 2 and 5
-respectively. This means that depending on the offset we can generate between 4 and 5 $(x,y)$ pairs. With a minibatch size of 2 we only get 2 minibatches. 
+respectively. This means that depending on the offset we can generate between 4 and 5 $(x,y)$ pairs. With a minibatch size of 2 we only get 2 minibatches.
 
 ```{.python .input  n=6}
 my_seq = list(range(30))
