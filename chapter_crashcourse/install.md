@@ -2,15 +2,15 @@
 
 To get started we need to download and install the code needed to run the notebooks. Although skipping this section will not affect your theoretical understanding of sections to come, we strongly recommend that you get some hands-on experience. We believe that modifying and writing code and seeing the results thereof greatly enhances the benefit you can gain from the book. In a nutshell, to get started you need to do the following steps:
 
-1. Install Conda
+1. Install conda
 1. Download the code that goes with the book
 1. Install GPU drivers if you have a GPU and haven't used it before
-1. Build the Conda environment to run MXNet and the examples of the book
+1. Build the conda environment to run MXNet and the examples of the book
 
 
 ## Conda
 
-For simplicity we recommend [Conda](https://conda.io), a popular Python package manager to install all libraries.
+For simplicity we recommend [conda](https://conda.io), a popular Python package manager to install all libraries.
 
 1. Download and install [Miniconda](https://conda.io/miniconda.html) at [conda.io/miniconda.html](https://conda.io/miniconda.html) based on your operating system. 
 1. Update your shell by `source ~/.bashrc` (Linux) or `source ~/.bash_profile` (macOS). Make sure to add Anaconda to your PATH environment variable.
@@ -31,7 +31,7 @@ rm d2l-en-1.0.zip
 
 ## GPU Support
 
-By default MXNet is installed without GPU support to ensure that it will run on any computer (including most laptops). If you should be so lucky to have a GPU enabled computer, you should modify the Conda environment to download the CUDA enabled build. Obviously you need to have the appropriate drivers installed. In particular you need the following:
+By default MXNet is installed without GPU support to ensure that it will run on any computer (including most laptops). If you should be so lucky to have a GPU enabled computer, you should modify the conda environment to download the CUDA enabled build. Obviously you need to have the appropriate drivers installed. In particular you need the following:
 
 1. Ensure that you install the [NVIDIA Drivers](https://www.nvidia.com/drivers) for your specific GPU. 
 1. Install [CUDA](https://developer.nvidia.com/cuda-downloads), the programming language for GPUs.
@@ -40,7 +40,7 @@ By default MXNet is installed without GPU support to ensure that it will run on 
 
 The installation process is somewhat lengthy and you will need to agree to a number of different licenses and use different installation scripts for it. Details will depend strongly on your choice of operating system and hardware. 
 
-Next update the environment description in `environment.yml`. Replace `mxnet` by `mxnet-cu92` or whatever version of CUDA that you've got installed. For instance, if you're on CUDA 8.0, you need to replace `mxnet-cu92` with `mxnet-cu80`. You should do this *before* creating the Conda environment. Otherwise you will need to rebuild it later. On Linux this looks as follows (on Windows you can use e.g. Notepad to edit `environment.yml` directly).
+Next update the environment description in `environment.yml`. Replace `mxnet` by `mxnet-cu92` or whatever version of CUDA that you've got installed. For instance, if you're on CUDA 8.0, you need to replace `mxnet-cu92` with `mxnet-cu80`. You should do this *before* creating the conda environment. Otherwise you will need to rebuild it later. On Linux this looks as follows (on Windows you can use e.g. Notepad to edit `environment.yml` directly).
 
 ```{.python .input}
 cd d2l
@@ -49,9 +49,9 @@ emacs environment.yml
 
 ## Conda Environment
 
-In a nutshell, Conda provides a mechanism for setting up a set of Python libraries in a reproducible and reliable manner, ensuring that all software dependencies are satisfied. Here's what is needed to get started.
+In a nutshell, conda provides a mechanism for setting up a set of Python libraries in a reproducible and reliable manner, ensuring that all software dependencies are satisfied. Here's what is needed to get started.
 
-1. Create and activate the environment using Conda. For convenience we created an `environment.yml` file to hold all configuration.
+1. Create and activate the environment using conda. For convenience we created an `environment.yml` file to hold all configuration.
 1. Activate the environment.
 1. Open Jupyter notebooks to start experimenting.
 
@@ -85,7 +85,7 @@ The main difference between Windows and other installations is that for the form
 
 ## Updating Gluon
 
-In case you want to update the repository, if you installed a new version of CUDA and (or) MXNet, you can simply use the Conda commands to do this. As before, make sure you update the packages accordingly.
+In case you want to update the repository, if you installed a new version of CUDA and (or) MXNet, you can simply use the conda commands to do this. As before, make sure you update the packages accordingly.
 
 ```{.python .input}
 cd d2l-en
