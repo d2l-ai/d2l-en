@@ -24,19 +24,6 @@ One-hot encoding vectors provide an easy way to express words as vectors in orde
 nd.one_hot(nd.array([0, 2]), vocab_size)
 ```
 
-```{.json .output n=2}
-[
- {
-  "data": {
-   "text/plain": "\n[[1. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.\n  0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]\n [0. 0. 1. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.\n  0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]]\n<NDArray 2x43 @cpu(0)>"
-  },
-  "execution_count": 2,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 The shape of the mini-batch we sample each time is (batch size, time step). The following function transforms such mini-batches into a number of matrices with the shape of (batch size, dictionary size) that can be entered into the network. The total number of vectors is equal to the number of time steps. That is, the input of time step $t$ is $\boldsymbol{X}_t \in \mathbb{R}^{n \times d}$, where $n$ is the batch size and $d$ is the number of inputs. That is the one-hot vector length (the dictionary size).
 
 ```{.python .input  n=3}
@@ -49,19 +36,6 @@ inputs = to_onehot(X, vocab_size)
 len(inputs), inputs[0].shape
 ```
 
-```{.json .output n=3}
-[
- {
-  "data": {
-   "text/plain": "(5, (2, 43))"
-  },
-  "execution_count": 3,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 The code above generates 5 minibatches containing 2 vectors each. Since we have a total of 43 distinct symbols in "The Time Machine" we get 43-dimensional vectors.
 
 ## Initializing the Model Parameters
@@ -69,7 +43,7 @@ The code above generates 5 minibatches containing 2 vectors each. Since we have 
 Next, we initialize the model parameters. The number of hidden units `num_hiddens` is a tunable parameter.
 
 ```{.python .input  n=4}
-num_inputs, num_hiddens, num_outputs = vocab_size, 256, vocab_size
+num_inputs, num_hiddens, num_outputs = vocab_size, 512, vocab_size
 ctx = gb.try_gpu()
 print('Using', ctx)
 
@@ -92,17 +66,9 @@ def get_params():
     return params
 ```
 
-```{.json .output n=4}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "will use cpu(0)\n"
- }
-]
-```
+## Sequence Modeling
 
-## Model Definition
+### RNN Model
 
 We implement this model based on the definition of an RNN. First, we need an `init_rnn_state` function to return the hidden state at initialization. It returns a tuple consisting of an NDArray with a value of 0 and a shape of (batch size, number of hidden units). Using tuples makes it easier to handle situations where the hidden state contains multiple NDArrays (e.g. when combining multiple layers in an RNN).
 
@@ -129,7 +95,7 @@ def rnn(inputs, state, params):
 
 Let's run a simple test to check whether inputs and outputs are accurate. In particular, we check output dimensions, the number of outputs and ensure that the hidden state hasn't changed.
 
-```{.python .input  n=8}
+```{.python .input  n=7}
 state = init_rnn_state(X.shape[0], num_hiddens, ctx)
 inputs = to_onehot(X.as_in_context(ctx), vocab_size)
 params = get_params()
@@ -137,20 +103,7 @@ outputs, state_new = rnn(inputs, state, params)
 len(outputs), outputs[0].shape, state_new[0].shape
 ```
 
-```{.json .output n=8}
-[
- {
-  "data": {
-   "text/plain": "(5, (2, 43), (2, 256))"
-  },
-  "execution_count": 8,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
-## Define the Prediction Function
+### Prediction Function
 
 The following function predicts the next `num_chars` characters based on the `prefix` (a string containing several characters). This function is a bit more complicated. In it, we set the recurrent neural unit `rnn` as a function parameter, so that this function can be reused in the other recurrent neural networks described in following sections.
 
@@ -161,14 +114,17 @@ def predict_rnn(prefix, num_chars, rnn, params, init_rnn_state,
     state = init_rnn_state(1, num_hiddens, ctx)
     output = [char_to_idx[prefix[0]]]
     for t in range(num_chars + len(prefix) - 1):
-        # The output of the previous time step is taken as the input of the current time step.
+        # The output of the previous time step is taken 
+        # as the input of the current time step.
         X = to_onehot(nd.array([output[-1]], ctx=ctx), vocab_size)
         # Calculate the output and update the hidden state.
         (Y, state) = rnn(X, state, params)
-        # The input to the next time step is the character in the prefix or the current best predicted character.
+        # The input to the next time step is the character in 
+        # the prefix or the current best predicted character.
         if t < len(prefix) - 1:
             output.append(char_to_idx[prefix[t + 1]])
         else:
+            # This is maximum likelihood decoding, not sampling
             output.append(int(Y[0].argmax(axis=1).asscalar()))
     return ''.join([idx_to_char[i] for i in output])
 ```
@@ -176,17 +132,23 @@ def predict_rnn(prefix, num_chars, rnn, params, init_rnn_state,
 We test the `predict_rnn` function first. We will create a lyric with a length of 10 characters (regardless of the prefix length) based on the prefix "separate". Because the model parameters are random values, the prediction results are also random.
 
 ```{.python .input  n=9}
-predict_rnn('traveller', 10, rnn, params, init_rnn_state, num_hiddens, vocab_size,
-            ctx, idx_to_char, char_to_idx)
+predict_rnn('traveller', 10, rnn, params, init_rnn_state, num_hiddens, 
+            vocab_size, ctx, idx_to_char, char_to_idx)
 ```
 
-## Clip Gradients
+## Gradient Clipping
 
-Gradient vanishing or explosion is more likely to occur in recurrent neural networks. We will explain the reason in subsequent sections of this chapter. In order to deal with gradient explosion, we can clip the gradient. Assume we concatenate the elements of all model parameter gradients into a vector $\boldsymbol{g}$ and set the clipping threshold to $\theta$. In the clipped gradient:
+When solving an optimization problem we take update steps for the weights $\mathbf{w}$ in the general direction of the negative gradient $\mathbf{g}_t$ on a minibatch, say $\mathbf{w} - \eta \cdot \mathbf{g}_t$. Let's further assume that the objective is well behaved, i.e. it is Lipschitz continuous with constant $L$, i.e. 
 
-$$ \min\left(\frac{\theta}{\|\boldsymbol{g}\|}, 1\right)\boldsymbol{g}$$
+$$|l(\mathbf{w}) - l(\mathbf{w}')| \leq L \|\mathbf{w} - \mathbf{w}'\|.$$
 
-the $L_2$ norm does not exceed $\theta$.
+In this case we can safely assume that if we update the weight vector by $\eta \cdot \mathbf{g}_t$ we will not observe a change by more than $L \eta \|\mathbf{g}_t\|$. This is both a curse and a blessing. A curse since it limits the speed with which we can make progress, a blessing since it limits the extent to which things can go wrong if we move in the wrong direction. 
+
+Sometimes the gradients can be quite large and the optimization algorithm may fail to converge. We could address this by reducing the learning rate $\eta$ or by some other higher order trick. But what if we only rarely get large gradients? In this case such an approach may appear entirely unwarranted. One alternative is to clip the gradients by projecting them back to a ball of a given radius, say $\theta$ via 
+
+$$\mathbf{g} \leftarrow \min\left(1, \frac{\theta}{\|\mathbf{g}\|}\right) \mathbf{g}.$$
+
+By doing so we know that the gradient norm never exceeds $\theta$ and that the updated gradient is entirely aligned with the original direction $\mathbf{g}$. Back to the case at hand - optimization in RNNs. One of the issues is that the gradients in an RNN may either explode or vanish. Consider the chain of matrix-products involved in backpropagation. If the largest eigenvalue of the matrices is typically larger than $1$, then the product of many such matrices can be much larger than $1$. As a result, the aggregate gradient might explode. Gradient clipping provides a quick fix. While it doesn't entire solve the problem, it is one of the many techniques to alleviate it. 
 
 ```{.python .input  n=10}
 # This function is saved in the gluonbook package for future use.
@@ -202,23 +164,41 @@ def grad_clipping(params, theta, ctx):
 
 ## Perplexity
 
-We generally use perplexity to evaluate the quality of a language model. Recall the definition of the cross entropy loss function in the [“Softmax Regression”](../chapter_deep-learning-basics/softmax-regression.md) section. Perplexity is the value obtained by exponentially computing the cross entropy loss function. In particular:
+One way of measuring how well a sequence model works is to check how surprising the text is. A good language model is able to predict with high accuracy what we will see next. Consider the following continuations of the phrase `It is raining`, as proposed by different language models:
 
-* In the best case scenario, the model always predicts the probability of the label category as 1. In this situation, the perplexity is 1.
-* In the worst case scenario, the model always predicts the probability of the label category as 0. In this situation, the perplexity is positive infinity.
-* At the baseline, the model always predicts the same probability for all categories. In this situation, the perplexity is the number of categories.
+1. `It is raining outside`
+1. `It is raining banana tree`
+1. `It is raining piouw;kcj pwepoiut`
 
-Obviously, the perplexity of any valid model must be less than the number of categories. In this case, the perplexity must be less than the dictionary size `vocab_size`.
+In terms of quality, example 1 is clearly the best. The words are sensible and logically coherent. While it might not quite so accurately reflect which word follows (`in San Francisco` and `in winter` would have been perfectly reasonable extensions), the model is able to capture which kind of word follows. Example 2 is considerably worse by producing a nonsensical and borderline dysgrammatical extension. Nonetheless, at least the model has learned how to spell words and some degree of correlation between words. Lastly, example 3 indicates a poorly trained model that doesn't fit data. 
 
-## Define Model Training Functions
+One way of measuring the quality of the model is to compute $p(w)$, i.e. the likelihood of the sequence. Unfortunately this is a number that is hard to understand and difficult to compare. After all, shorter sequences are *much* more likely than long ones, hence evaluating the model on Tolstoy's magnum opus ['War and Peace'](https://www.gutenberg.org/files/2600/2600-h/2600-h.htm) will inevitably produce a much smaller likelihood than, say, on Saint-Exupery's novella ['The Little Prince'](https://en.wikipedia.org/wiki/The_Little_Prince). What is missing is the equivalent of an average. 
 
-Compared with the model training functions of the previous chapters, the model training functions here are different in the following ways:
+Information Theory comes handy here. If we want to compress text we can ask about estimating the next symbol given the current set of symbols. A lower bound on the number of bits is given by $-\log_2 p(w_t|w_{t-1}, \ldots w_1)$. A good language model should allow us to predict the next word quite accurately and thus it should allow us to spend very few bits on compressing the sequence. One way of measuring it is by the average number of bits that we need to spend.
 
-1. We use perplexity to evaluate the model.
-2. We clip the gradient before updating the model parameters.
-3. Different sampling methods for timing data will result in differences in the initialization of hidden states. For a discussion of these issues, please refer to the ["Language Model Data Set (Jay Chou Album Lyrics)"](lang-model-dataset.md) section.
+$$\frac{1}{n} \sum_{t=1}^n -\log p(w_t|w_{t-1}, \ldots w_1) = \frac{1}{|w|} -\log p(w)$$
 
-In addition, considering the other recurrent neural networks that will be described later, the function implementations here are longer, so as to be more general.
+This makes the performance on documents of different lengths comparable. For historical reasons scientists in natural language processing prefer to use a quantity called perplexity rather than bitrate. In a nutshell it is the exponential of the above:
+
+$$\mathrm{PPL} := \exp\left(-\frac{1}{n} \sum_{t=1}^n \log p(w_t|w_{t-1}, \ldots w_1)\right)$$
+
+It can be best understood as the harmonic mean of the number of real choices that we have when deciding which word to pick next. Note that Perplexity naturally generalizes the notion of the cross entropy loss defined when we introduced [Softmax Regression](../chapter_deep-learning-basics/softmax-regression.md). That is, for a single symbol both definitions are identical bar the fact that one is the exponential of the other. Let's look at a number of cases:
+
+* In the best case scenario, the model always estimates the probability of the next symbol as $1$. In this case the perplexity of the model is $1$.
+* In the worst case scenario, the model always predicts the probability of the label category as 0. In this situation, the perplexity is infinite.
+* At the baseline, the model predicts a uniform distribution over all tokens. In this case the perplexity equals the size of the dictionary `vocab_size`. In fact, if we were to store the sequence without any compression this would be the best we could do to encode it. Hence this provides a nontrivial upper bound that any model must satisfy. 
+
+## Training the Model
+
+Training a sequence model proceeds quite different from previous codes. In particular we need to take care of the following changes due to the fact that the tokens appear in order:
+
+1. We use perplexity to evaluate the model. This ensures that different tests are comparable. 
+1. We clip the gradient before updating the model parameters. This ensures that the model doesn't diverge even when gradients blow up at some point during the training process (effectively it reduces the stepsize automatically).
+3. Different sampling methods for sequential data (independent sampling and sequential partitioning) will result in differences in the initialization of hidden states. We discussed these issues in detail when we covered [data processing](lang-model-dataset.md).
+
+### Optimization Loop
+
+To allow for more flexibility the call signture and the code are slightly longer. This will allow us to replace the various pieces by a Gluon implementation subsequently without the need to change the training logic. 
 
 ```{.python .input  n=11}
 # This function is saved in the gluonbook package for future use.
@@ -235,30 +215,40 @@ def train_and_predict_rnn(rnn, get_params, init_rnn_state, num_hiddens,
     loss = gloss.SoftmaxCrossEntropyLoss()
 
     for epoch in range(num_epochs):
-        if not is_random_iter:  # If adjacent sampling is used, the hidden state is initialized at the beginning of the epoch.
+        if not is_random_iter:  
+            # If adjacent sampling is used, the hidden state is initialized 
+            # at the beginning of the epoch.
             state = init_rnn_state(batch_size, num_hiddens, ctx)
         loss_sum, start = 0.0, time.time()
         data_iter = data_iter_fn(corpus_indices, batch_size, num_steps, ctx)
         for t, (X, Y) in enumerate(data_iter):
-            if is_random_iter:  # If random sampling is used, the hidden state is initialized before each mini-batch update.
+            if is_random_iter:  
+                # If random sampling is used, the hidden state is initialized 
+                # before each mini-batch update.
                 state = init_rnn_state(batch_size, num_hiddens, ctx)
-            else:  # Otherwise, the detach function needs to be used to separate the hidden state from the computational graph.
+            else:  
+                # Otherwise, the detach function needs to be used to separate 
+                # the hidden state from the computational graph to avoid 
+                # backpropagation beyond the current sample.
                 for s in state:
                     s.detach()
             with autograd.record():
                 inputs = to_onehot(X, vocab_size)
-                # outputs has num_steps matrices of the shape (batch_size, vocab_size).
+                # outputs is num_steps terms of shape (batch_size, vocab_size)
                 (outputs, state) = rnn(inputs, state, params)
-                # The shape after stitching is (num_steps * batch_size, vocab_size).
+                # after stitching it is (num_steps * batch_size, vocab_size).
                 outputs = nd.concat(*outputs, dim=0)
-                # The shape of Y is (batch_size, num_steps), and then becomes a vector with a length of
-                # batch * num_steps after transposition. This gives it a one-to-one correspondence with output rows.
+                # The shape of Y is (batch_size, num_steps), and then becomes 
+                # a vector with a length of batch * num_steps after 
+                # transposition. This gives it a one-to-one correspondence 
+                # with output rows.
                 y = Y.T.reshape((-1,))
-                # The average classification error is calculated using cross entropy loss.
+                # Average classification error via cross entropy loss.
                 l = loss(outputs, y).mean()
             l.backward()
             grad_clipping(params, clipping_theta, ctx)  # Clip the gradient.
-            gb.sgd(params, lr, 1)  # Since the error has already taken the mean, the gradient does not need to be averaged.
+            gb.sgd(params, lr, 1)  
+            # Since the error is the mean, no need to average gradients here
             loss_sum += l.asscalar()
 
         if (epoch + 1) % pred_period == 0:
@@ -270,16 +260,16 @@ def train_and_predict_rnn(rnn, get_params, init_rnn_state, num_hiddens,
                     num_hiddens, vocab_size, ctx, idx_to_char, char_to_idx))
 ```
 
-## Train the Model and Write Lyrics
+### Experiments with a Sequence Model
 
-Now we can train the model. First, set the model hyper-parameter. We will create a lyrics segment with a length of 50 characters (regardless of the prefix length) respectively based on the prefixes "separate" and "not separated". We create a lyrics segment based on the currently trained model every 50 epochs.
+Now we can train the model. First, we need to set the model hyper-parameters. To allow for some meaningful amount of context we set the sequence length to 64. To get some intuition of how well the model works, we will have it generate 50 characters every 50 epochs of the training phase. In particular, we will see how training using the 'separate' and 'sequential' term generation will affect the performance of the model. 
 
 ```{.python .input  n=12}
-num_epochs, num_steps, batch_size, lr, clipping_theta = 500, 35, 32, 1e2, 1e-2
+num_epochs, num_steps, batch_size, lr, clipping_theta = 500, 64, 32, 1e2, 1e-2
 pred_period, pred_len, prefixes = 50, 50, ['traveller', 'time traveller']
 ```
 
-Next, we use random sampling to train the model and write lyrics.
+Let's use random sampling to train the model and produce some text.
 
 ```{.python .input  n=13}
 train_and_predict_rnn(rnn, get_params, init_rnn_state, num_hiddens,
@@ -289,7 +279,7 @@ train_and_predict_rnn(rnn, get_params, init_rnn_state, num_hiddens,
                       prefixes)
 ```
 
-Then, we use adjacent sampling to train the model and write lyrics.
+Even though our model was rather primitive, it is nonetheless able to produce text that resembles language. In particular it learns some notion of quotations, punctuation and a basic sense of grammar, at least for frequent words. Now let's compare this with sequential partitioning.
 
 ```{.python .input  n=19}
 train_and_predict_rnn(rnn, get_params, init_rnn_state, num_hiddens,
@@ -299,24 +289,33 @@ train_and_predict_rnn(rnn, get_params, init_rnn_state, num_hiddens,
                       prefixes)
 ```
 
+The perplexity is quite a bit lower. In fact, both models are pretty close to $1$. This means that if we were to compress the text using this simple character-based language model we would needs less than 1 bit per character to encode a symbol. In the following we will see how to improve significantly on the current model and how to make it faster and easier to implement. 
+
 ## Summary
 
-* We can apply a language model based on a character-level recurrent neural network to generate sequences, such as writing lyrics.
-* When training a recurrent neural network, we can clip the gradient to cope with gradient explosion.
-* Perplexity is the value obtained by exponentially computing the cross entropy loss function.
-
-
+* Sequence models need state initialization for training.
+* Between sequential models you need to ensure to detach the gradient, to ensure that the automatic differentiation does not propagate effects beyond the current sample.
+* A simple RNN language model consists of an encoder, an RNN model and a decoder. 
+* Gradient clipping prevents gradient explosion (but it cannot fix vanishing gradients).
+* Perplexity calibrates model performance across variable sequence length. It is the exponentiated average of the cross-entropy loss.
+* Sequential partitioning typically leads to better models. 
 
 ## Problems
 
 1. Show that one-hot encoding is equivalent to picking a different embedding for each object.
-
-* Adjust the hyper-parameters and observe and analyze the impact on running time, perplexity, and the written lyrics.
-* Run the code in this section without clipping the gradient. What happens?
-* Set the `pred_period` variable to 1 to observe how the under-trained model (high perplexity) writes lyrics. What can you learn from this?
-* Change adjacent sampling so that it does not separate hidden states from the computational graph. Does the running time change?
-* Replace the activation function used in this section with ReLU and repeat the experiments in this section.
+1. Adjust the hyperparameters to improve the perplexity. 
+    * How low can you go? Adjust embeddings, hidden units, learning rate, etc.
+    * How well will it work on other books by H. G. Wells, e.g. [The War of the Worlds](http://www.gutenberg.org/ebooks/36).
+1. Run the code in this section without clipping the gradient. What happens?
+1. Set the `pred_period` variable to 1 to observe how the under-trained model (high perplexity) writes lyrics. What can you learn from this?
+1. Change adjacent sampling so that it does not separate hidden states from the computational graph. Does the running time change? How about the accuracy?
+1. Replace the activation function used in this section with ReLU and repeat the experiments in this section.
+1. Prove that the perplexity is the inverse of the harmonic mean of the conditional word probabilities. 
 
 ## Discuss on our Forum
 
 <div id="discuss" topic_id="23"></div>
+
+```{.python .input}
+
+```
