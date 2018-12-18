@@ -17,7 +17,7 @@ For simplicity we recommend [conda](https://conda.io), a popular Python package 
 1. Download the tarball containing the notebooks from this book. This can be found at (www.diveintodeeplearning.org/d2l-en-1.0.zip)[https://www.diveintodeeplearning.org/d2l-en-1.0.zip]. Alternatively feel free to clone the latest version from GitHub.
 1. Uncompress the ZIP file and move its contents to a folder for the tutorials.
 
-On Linux this can be accomplished as follows from the command line; For MacOS replace Linux by MacOSX in the first line, for Windows follow the links provided above. 
+On Linux this can be accomplished as follows from the command line; For MacOS replace Linux by MacOSX in the first line, for Windows follow the links provided above.
 
 ```
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
@@ -57,7 +57,7 @@ In a nutshell, conda provides a mechanism for setting up a set of Python librari
 
 ### Windows
 
-As before, open the command line terminal. 
+As before, open the command line terminal.
 
 ```
 conda env create -f environment.yml
@@ -72,7 +72,7 @@ If your browser integration is working properly, starting Jupyter will open a ne
 
 ### Linux and MacOSX
 
-The steps for Linux are quite similar, just that anaconda uses slightly different command line options. 
+The steps for Linux are quite similar, just that anaconda uses slightly different command line options.
 
 ```
 conda env create -f environment.yml
