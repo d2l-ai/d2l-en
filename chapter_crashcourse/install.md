@@ -19,7 +19,7 @@ For simplicity we recommend [conda](https://conda.io), a popular Python package 
 
 On Linux this can be accomplished as follows from the command line; For MacOS replace Linux by MacOSX in the first line, for Windows follow the links provided above.
 
-```{.python .input}
+```
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 sh Miniconda3-latest-Linux-x86_64.sh
 mkdir d2l-en
@@ -42,7 +42,7 @@ The installation process is somewhat lengthy and you will need to agree to a num
 
 Next update the environment description in `environment.yml`. Replace `mxnet` by `mxnet-cu92` or whatever version of CUDA that you've got installed. For instance, if you're on CUDA 8.0, you need to replace `mxnet-cu92` with `mxnet-cu80`. You should do this *before* creating the conda environment. Otherwise you will need to rebuild it later. On Linux this looks as follows (on Windows you can use e.g. Notepad to edit `environment.yml` directly).
 
-```{.python .input}
+```
 cd d2l
 emacs environment.yml
 ```
@@ -59,7 +59,7 @@ In a nutshell, conda provides a mechanism for setting up a set of Python librari
 
 As before, open the command line terminal.
 
-```{.python .input}
+```
 conda env create -f environment.yml
 cd d2l-en
 activate gluon
@@ -74,7 +74,7 @@ If your browser integration is working properly, starting Jupyter will open a ne
 
 The steps for Linux are quite similar, just that anaconda uses slightly different command line options.
 
-```{.python .input}
+```
 conda env create -f environment.yml
 cd d2l-en
 source activate gluon
@@ -87,7 +87,7 @@ The main difference between Windows and other installations is that for the form
 
 In case you want to update the repository, if you installed a new version of CUDA and (or) MXNet, you can simply use the conda commands to do this. As before, make sure you update the packages accordingly.
 
-```{.python .input}
+```
 cd d2l-en
 conda env update -f environment.yml
 ```
