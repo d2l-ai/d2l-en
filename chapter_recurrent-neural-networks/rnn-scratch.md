@@ -1,6 +1,6 @@
 # Building a Recurrent Neural Network from Scratch
 
-In this section, we will implement a language model from scratch. It is based on a character-level recurrent neural network that is trained on H. G. Wells' 'The Time Machine'. As before, we start by reading the dataset first. 
+In this section, we will implement a language model from scratch. It is based on a character-level recurrent neural network that is trained on H. G. Wells' 'The Time Machine'. As before, we start by reading the dataset first.
 
 ```{.python .input  n=1}
 import sys
@@ -148,7 +148,7 @@ Sometimes the gradients can be quite large and the optimization algorithm may fa
 
 $$\mathbf{g} \leftarrow \min\left(1, \frac{\theta}{\|\mathbf{g}\|}\right) \mathbf{g}.$$
 
-By doing so we know that the gradient norm never exceeds $\theta$ and that the updated gradient is entirely aligned with the original direction $\mathbf{g}$. Back to the case at hand - optimization in RNNs. One of the issues is that the gradients in an RNN may either explode or vanish. Consider the chain of matrix-products involved in backpropagation. If the largest eigenvalue of the matrices is typically larger than $1$, then the product of many such matrices can be much larger than $1$. As a result, the aggregate gradient might explode. Gradient clipping provides a quick fix. While it doesn't entire solve the problem, it is one of the many techniques to alleviate it. 
+By doing so we know that the gradient norm never exceeds $\theta$ and that the updated gradient is entirely aligned with the original direction $\mathbf{g}$. Back to the case at hand - optimization in RNNs. One of the issues is that the gradients in an RNN may either explode or vanish. Consider the chain of matrix-products involved in backpropagation. If the largest eigenvalue of the matrices is typically larger than $1$, then the product of many such matrices can be much larger than $1$. As a result, the aggregate gradient might explode. Gradient clipping provides a quick fix. While it doesn't entire solve the problem, it is one of the many techniques to alleviate it.
 
 ```{.python .input  n=10}
 # This function is saved in the gluonbook package for future use.
@@ -198,7 +198,7 @@ Training a sequence model proceeds quite different from previous codes. In parti
 
 ### Optimization Loop
 
-To allow for more flexibility the call signture and the code are slightly longer. This will allow us to replace the various pieces by a Gluon implementation subsequently without the need to change the training logic. 
+To allow for more flexibility the call signture and the code are slightly longer. This will allow us to replace the various pieces by a Gluon implementation subsequently without the need to change the training logic.
 
 ```{.python .input  n=11}
 # This function is saved in the gluonbook package for future use.
@@ -262,7 +262,7 @@ def train_and_predict_rnn(rnn, get_params, init_rnn_state, num_hiddens,
 
 ### Experiments with a Sequence Model
 
-Now we can train the model. First, we need to set the model hyper-parameters. To allow for some meaningful amount of context we set the sequence length to 64. To get some intuition of how well the model works, we will have it generate 50 characters every 50 epochs of the training phase. In particular, we will see how training using the 'separate' and 'sequential' term generation will affect the performance of the model. 
+Now we can train the model. First, we need to set the model hyper-parameters. To allow for some meaningful amount of context we set the sequence length to 64. To get some intuition of how well the model works, we will have it generate 50 characters every 50 epochs of the training phase. In particular, we will see how training using the 'separate' and 'sequential' term generation will affect the performance of the model.
 
 ```{.python .input  n=12}
 num_epochs, num_steps, batch_size, lr, clipping_theta = 500, 64, 32, 1e2, 1e-2
@@ -315,7 +315,3 @@ The perplexity is quite a bit lower. In fact, both models are pretty close to $1
 ## Discuss on our Forum
 
 <div id="discuss" topic_id="23"></div>
-
-```{.python .input}
-
-```
