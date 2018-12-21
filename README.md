@@ -4,7 +4,7 @@
 
 ## [About this book](http://blog.smola.org/post/180838682891/dive-into-deep-learning)
 
-## Contribute to *Dive into Deep Learning* ([learn how](http://en.diveintodeeplearning.org/chapter_appendix/how-to-contribute.html))
+## Contribute ([learn how](http://en.diveintodeeplearning.org/chapter_appendix/how-to-contribute.html))
 
 *Dive into Deep Learning* has benefited from pedagogical suggestions, typo corrections, and other improvements from our contributors. Your help is valuable for making the book better for everyone. We will [acknowledge](http://en.diveintodeeplearning.org/chapter_introduction/preface.html#Acknowledgments) each contributor in the book and send a free book (hard copy) to each contributor when it is published. 
 
