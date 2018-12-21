@@ -2,7 +2,7 @@
 
 [![Build Status](http://ci.diveintodeeplearning.org/job/en/job/master/badge/icon)](http://ci.diveintodeeplearning.org/job/en/job/master/)
 
-[[Book website](http://en.diveintodeeplearning.org/)]  [[Teaching at UC Berkeley in Spring 2019](http://blog.smola.org/post/180838682891/dive-into-deep-learning)]
+[[Book website](http://en.diveintodeeplearning.org/)]  [[Teaching *Deep Learning* at UC Berkeley, Spring 2019](http://blog.smola.org/post/180838682891/dive-into-deep-learning)]
 
 
 ## Contribute ([learn how](http://en.diveintodeeplearning.org/chapter_appendix/how-to-contribute.html))
