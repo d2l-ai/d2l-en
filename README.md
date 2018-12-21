@@ -8,7 +8,7 @@
 
 *Dive into Deep Learning* has benefited from pedagogical suggestions, typo corrections, and other improvements from our contributors. Your help is valuable for making the book better for everyone. We will [acknowledge](http://en.diveintodeeplearning.org/chapter_introduction/preface.html#Acknowledgments) each contributor in the book and send a free book (hard copy) to each contributor when it is published. 
 
-Once you become a [D2L contributor](https://github.com/diveintodeeplearning/d2l-en/graphs/contributors), please email your Github ID and name to 
+Once you become a [contributor](https://github.com/diveintodeeplearning/d2l-en/graphs/contributors), please email your Github ID and name to 
 
 > d2lbook.en@gmail.com
 
