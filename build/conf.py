@@ -146,8 +146,7 @@ html_theme_options = {
         ('Berkeley Course 2019', 'http://courses.diveintodeeplearning.org/berkeley-stat-157/', True, 'fas fa-user-graduate'),
         ('PDF', 'https://en.diveintodeeplearning.org/d2l-en.pdf', True, 'fas fa-file-pdf'),
         ('Jupyter Notebooks', 'http://en.diveintodeeplearning.org/d2l-en.zip', True, 'fas fa-download'),
-        ('Forum', 'https://discuss.mxnet.io', True, 'fab fa-discourse'),
-        ('GitHub', 'https://github.com/diveintodeeplearning/d2l-en', True, 'fab fa-github'),
+        ('Discuss', 'https://discuss.mxnet.io', True, 'fab fa-discourse'),
         ('中文版', 'https://zh.diveintodeeplearning.org', True, 'fas fa-external-link-alt'),
     ],
     'show_footer': True
