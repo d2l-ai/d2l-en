@@ -11,6 +11,6 @@ This open source book has benefited from pedagogical suggestions, typo correctio
 Contributors, please email your GitHub ID and name to d2lbook.en@gmail.com. Thanks.
 
 
-## Chinese version (Stars: 5.5k, Forks: 1.5k, Contributors: 110)
+## Chinese version 
 
-[https://github.com/diveintodeeplearning/d2l-zh](https://github.com/diveintodeeplearning/d2l-zh)
+[https://github.com/diveintodeeplearning/d2l-zh](https://github.com/diveintodeeplearning/d2l-zh) (*Stars: 5.5k, Forks: 1.5k, Contributors: 110*)
