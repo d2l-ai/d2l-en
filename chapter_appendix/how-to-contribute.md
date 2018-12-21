@@ -1,8 +1,6 @@
 # How to Contribute to This Book
 
-In the "Acknowledgments" section of this book, we thank all the contributors to this book and list their GitHub IDs or names.
-
-You can view the list of contributors [1] in the GitHub code repository for this book. If you want to be one of the contributors to this book, you need to install Git and submit a pull request [2] for the GitHub code repository of this book. When your pull request is merged into the code repository by the author of this book, you will become a contributor.
+You can view the list of contributors [1] for this open-sourced book. If you want to contribute to this book, you need to install Git and submit a pull request [2] for the GitHub code repository of this book. When your pull request is merged into the code repository by the author of this book, you will become a contributor.
 
 This section describes the basic Git procedure for contributing to this book. If you are familiar with Git operations, you can skip this section.
 
