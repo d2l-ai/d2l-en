@@ -2,7 +2,7 @@
 
 [![Build Status](http://ci.diveintodeeplearning.org/job/en/job/master/badge/icon)](http://ci.diveintodeeplearning.org/job/en/job/master/)
 
-[[Book website](http://en.diveintodeeplearning.org/)]  [[STAT 157 *Introduction to Deep Learning* at UC Berkeley, Spring 2019](http://courses.diveintodeeplearning.org/berkeley-stat-157/)]
+[[Book website](http://en.diveintodeeplearning.org/)]  [[STAT 157 Course at UC Berkeley, Spring 2019](http://courses.diveintodeeplearning.org/berkeley-stat-157/)]
 
 
 ## Contribute ([learn how](http://en.diveintodeeplearning.org/chapter_appendix/how-to-contribute.html))
