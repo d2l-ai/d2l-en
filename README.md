@@ -17,4 +17,4 @@ Dear contributors, please email your GitHub ID and name to d2lbook.en@gmail.com.
 
 ## More Examples
 
-[[Computer Vision with GluonCV](https://gluon-cv.mxnet.io/)]  [[Natural Language Processing with GluonNLP](https://gluon-nlp.mxnet.io/)]
+[[Computer Vision with GluonCV](https://gluon-cv.mxnet.io/)]  [[Natural Language Processing with GluonNLP](https://gluon-nlp.mxnet.io/)] [[Deep Graphs with DGL](https://www.dgl.ai/)]
