@@ -12,4 +12,4 @@ This open source book has benefited from pedagogical suggestions, typo correctio
 Dear contributors, please email your GitHub ID and name to d2lbook.en@gmail.com. Thanks.
 
 
-[[Chinese version and more](https://github.com/diveintodeeplearning)] [[Discuss and report issues](https://discuss.mxnet.io/)]
+[[Chinese version and more](https://github.com/diveintodeeplearning)] [[Discuss and report issues](https://discuss.mxnet.io/)] [[Computer Vision with GluonCV](https://gluon-cv.mxnet.io/)] [[Natural Language Processing with GluonNLP](https://gluon-nlp.mxnet.io/)]
