@@ -15,6 +15,3 @@ Dear contributors, please email your GitHub ID and name to d2lbook.en@gmail.com.
 [[Chinese version](https://github.com/diveintodeeplearning)] [[Discuss and report issues](https://discuss.mxnet.io/)] 
 
 
-## Frontiers in Deep Learning
-
-[[Computer Vision: GluonCV](https://gluon-cv.mxnet.io/)]  [[Natural Language Processing: GluonNLP](https://gluon-nlp.mxnet.io/)] [[Graph Neural Networks: DGL](https://www.dgl.ai/)] [[Deep Learning Compiler: TVM](https://tvm.ai/)]
