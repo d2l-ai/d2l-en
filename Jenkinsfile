@@ -10,15 +10,10 @@ stage("Sanity Check") {
 stage("Build and Publish") {
   node {
     ws('workspace/d2l-en') {
-	  checkout scm
-      sh """#!/bin/bash
-      set -e
-      git submodule update --init
-      conda activate d2l-en-build
-      if [[ ${env.BRANCH_NAME} == master ]]; then
-         build/utils/upload_notebooks_no_output_github.sh . https://github.com/d2l-ai/notebooks
-      fi
-      """
+      withCredentials([usernamePassword(credentialsId: '13cb1009-3cda-49ef-9aaa-8a705fdaaeb7',
+                       passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+        sh "build/test.sh"
+      }
 	}
   }
 }
