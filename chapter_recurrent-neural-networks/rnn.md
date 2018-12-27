@@ -1,64 +1,83 @@
 # Recurrent Neural Networks
 
-In the last section, we introduced the $n$-gram, in which the conditional probability of word $w_t$ for time step $t$ based on all previous words only takes $n-1$ number of words from the last time step into account.  If we want to check the possible effect of words earlier than $t-(n-1)$ on $w_t$, we need to increase $n$. However, the number of model parameters would also increase exponentially with it (see the exercises in the last section).
+In the previous section we introduced $n$-gram models, where the conditional probability of word $w_t$ at position $t$ only depends on the $n-1$ previous words. If we want to check the possible effect of words earlier than $t-(n-1)$ on $w_t$, we need to increase $n$. However, the number of model parameters would also increase exponentially with it, as we need to store $|V|^n$ numbers for a vocabulary $V$. Hence, rather than modeling $p(w_t|w_{t-1}, \ldots w_{t-n+1})$ it is preferable to use a latent variable model in which we have 
 
-In this section, we will discuss recurrent neural networks (RNNs).  Instead of rigidly remembering all fixed-length sequences, RNNs use hidden states to store information from previous time steps. First, recall the multilayer perceptron introduced earlier, and then discuss how to add a hidden state to turn it into an RNN.
+$$p(w_t|w_{t-1}, \ldots w_1) \approx p(w_t|h_t(w_{t-1}, h_{t-1}).$$
 
+In theory, for a sufficiently powerful function $h_t$ this is not an approximation. After all, it could simply store all the data it observed so far. We discussed this previously in the [introduction](sequence.md) to the current chapter. Let's see why building such models is a bit more tricky than simple autoregressive models where 
 
-## Neural Networks Without Hidden States
+$$p(w_t|w_{t-1}, \ldots w_1) \approx p(w_t|f(w_{t-1}, \ldots w_{t-n+1}).$$
 
-Let us take a look at a multilayer perceptron with a single hidden layer.  Given a mini-batch data instance $\boldsymbol{X} \in \mathbb{R}^{n \times d}$ with sample size $n$ and $d$ inputs (features or feature vector dimensions). Let the hidden layer's activation function be $\phi$, so the hidden layer's output $\boldsymbol{H} \in \mathbb{R}^{n \times h}$ is calculated as
+As a warmup we will review the latter for discrete outputs and $n=2$, i.e. for Markov model of first order. To simplify things further we use a single layer in the design of the RNN. Later on we will see how to add more expressivity efficiently across items. 
 
-$$\boldsymbol{H} = \phi(\boldsymbol{X} \boldsymbol{W}_{xh} + \boldsymbol{b}_h),$$
+## Recurrent Networks Without Hidden States
 
-Here, we have the weight parameter $\boldsymbol{W}_{xh} \in \mathbb{R}^{d \times h}$, bias parameter $\boldsymbol{b}_h \in \mathbb{R}^{1 \times h}$, and the number of hidden units $h$, for the hidden layer. The two equations above have different shapes, so they will be added through the broadcasting mechanism (see section["Data Operation"](../chapter_prerequisite/ndarray.md)). The hidden variable $\boldsymbol{H}$ is used as the input of the output layer. We assume the output number is $q$ (like the number of categories in the classification problem), and the output of the output layer is
+Let us take a look at a multilayer perceptron with a single hidden layer. Given a mini-batch of instances $\mathbf{X} \in \mathbb{R}^{n \times d}$ with sample size $n$ and $d$ inputs (features or feature vector dimensions). Let the hidden layer's activation function be $\phi$. Hence the hidden layer's output $\mathbf{H} \in \mathbb{R}^{n \times h}$ is calculated as
 
-$$\boldsymbol{O} = \boldsymbol{H} \boldsymbol{W}_{hq} + \boldsymbol{b}_q,$$
+$$\mathbf{H} = \phi(\mathbf{X} \mathbf{W}_{xh} + \mathbf{b}_h),$$
 
-Here, $\boldsymbol{O} \in \mathbb{R}^{n \times q}$ is the output variable, $\boldsymbol{W}_{hq} \in \mathbb{R}^{h \times q}$ is the weight parameter, and $\boldsymbol{b}_q \in \mathbb{R}^{1 \times q}$ is the bias parameter of the output layer.  If it is a classification problem, we can use $\text{softmax}(\boldsymbol{O})$ to compute the probability distribution of the output category.
+Here, we have the weight parameter $\mathbf{W}_{xh} \in \mathbb{R}^{d \times h}$, bias parameter $\mathbf{b}_h \in \mathbb{R}^{1 \times h}$, and the number of hidden units $h$, for the hidden layer. Recall that $\mathbf{b}_h$ is just a vector - its values are replicated using the [broadcasting mechanism](../chapter_prerequisite/ndarray.md)) to match those of the matrix-matrix product. 
 
+Also note that hidden *state* and hidden *layer* refer to two very different concepts. Hidden layers are, as explained, layers that are hidden from view on the path from input to output. Hidden states are technically speaking *inputs* to whatever we do at a given step. Instead, they can only be computed by looking at data at previous iterations. In this sense they have much in common with latent variable models in statistics, such as clustering or topic models where e.g. the cluster ID affects the output but cannot be directly observed. 
 
-## RNNs with Hidden States
+The hidden variable $\mathbf{H}$ is used as the input of the output layer. For cluassification purposes, such as predicting the next character, the output dimensionality $q$ might e.g. match the number of categories in the classification problem. Lastly the the output layer is given by 
 
-Now we move on to the case where the input data has temporal correlation. Assume that $\boldsymbol{X}_t \in \mathbb{R}^{n \times d}$ is the mini-batch input and $\boldsymbol{H}_t  \in \mathbb{R}^{n \times h}$ is the hidden layer variable of time step $t$ from the sequence.  Unlike the multilayer perceptron, here we save the hidden variable $\boldsymbol{H}_{t-1}$ from the previous time step and introduce a new weight parameter $\boldsymbol{W}_{hh} \in \mathbb{R}^{h \times h}$, to describe how to use the hidden variable of the previous time step in the current time step. Specifically, the calculation of the hidden variable of the current time step is determined by the input of the current time step together with the hidden variable of the previous time step:
+$$\mathbf{O} = \mathbf{H} \mathbf{W}_{hq} + \mathbf{b}_q.$$
 
-$$\boldsymbol{H}_t = \phi(\boldsymbol{X}_t \boldsymbol{W}_{xh} + \boldsymbol{H}_{t-1} \boldsymbol{W}_{hh}  + \boldsymbol{b}_h).$$
+Here, $\mathbf{O} \in \mathbb{R}^{n \times q}$ is the output variable, $\mathbf{W}_{hq} \in \mathbb{R}^{h \times q}$ is the weight parameter, and $\mathbf{b}_q \in \mathbb{R}^{1 \times q}$ is the bias parameter of the output layer.  If it is a classification problem, we can use $\text{softmax}(\mathbf{O})$ to compute the probability distribution of the output category. This is entirely analogous to the regression problem we solved [previously](sequence.md), hence we omit details. Suffice it to say that we can pick $(w_t, w_{t-1})$ pairs at random and estimate the parameters $\mathbf{W}$ and $\mathbf{b}$ of our network via autograd and stochastic gradient descent.
 
-Compared with the multilayer perceptron, we added one more $\boldsymbol{H}_{t-1} \boldsymbol{W}_{hh}$ here. From the relationship between hidden variables $\boldsymbol{H}_t$ and $\boldsymbol{H}_{t-1}$ of adjacent time steps, we know that those variables captured and retained the sequence's historical information up to the current time step, just like the state or memory of the neural network's current time step. Therefore, such a hidden variable is also called a hidden state. Since the hidden state uses the same definition of the previous time step in the current time step, the computation of the equation above is recurrent.  A network that uses such recurrent computation is called a recurrent neural network (RNN).
+## Recurrent Networks with Hidden States
 
-There are many different RNN construction methods.  RNNs with a hidden state defined by the equation above are very common. Unless otherwise stated, all the RNNs in this chapter are based on the recurrent computation of the hidden state in the equation above. For time step $t$, the output of the output layer is similar to the computation in the multilayer perceptron:
+Matters are entirely different when we have hidden states. Let's look at the structure in some more detail. Assume that $\mathbf{X}_t \in \mathbb{R}^{n \times d}$ is the mini-batch input and $\mathbf{H}_t  \in \mathbb{R}^{n \times h}$ is the hidden layer variable of time step $t$ from the sequence.  Unlike the multilayer perceptron, here we save the hidden variable $\mathbf{H}_{t-1}$ from the previous time step and introduce a new weight parameter $\mathbf{W}_{hh} \in \mathbb{R}^{h \times h}$, to describe how to use the hidden variable of the previous time step in the current time step. Specifically, the calculation of the hidden variable of the current time step is determined by the input of the current time step together with the hidden variable of the previous time step:
 
-$$\boldsymbol{O}_t = \boldsymbol{H}_t \boldsymbol{W}_{hq} + \boldsymbol{b}_q.$$
+$$\mathbf{H}_t = \phi(\mathbf{X}_t \mathbf{W}_{xh} + \mathbf{H}_{t-1} \mathbf{W}_{hh}  + \mathbf{b}_h).$$
 
-RNN parameters include the weight $\boldsymbol{W}_{xh} \in \mathbb{R}^{d \times h}, \boldsymbol{W}_{hh} \in \mathbb{R}^{h \times h}$ of the hidden layer with the bias $\boldsymbol{b}_h \in \mathbb{R}^{1 \times h}$, and the weight $\boldsymbol{W}_{hq} \in \mathbb{R}^{h \times q}$ of the output layer with the bias $\boldsymbol{b}_q \in \mathbb{R}^{1 \times q}$. It is worth mentioning that RNNs always use these model parameters, even for different time steps. Therefore, the number of RNN model parameters does not grow as the number of time steps increases.
+Compared with the multilayer perceptron, we added one more $\mathbf{H}_{t-1} \mathbf{W}_{hh}$ here. From the relationship between hidden variables $\mathbf{H}_t$ and $\mathbf{H}_{t-1}$ of adjacent time steps, we know that those variables captured and retained the sequence's historical information up to the current time step, just like the state or memory of the neural network's current time step. Therefore, such a hidden variable is also called a hidden state. Since the hidden state uses the same definition of the previous time step in the current time step, the computation of the equation above is recurrent, hence the name recurrent neural network (RNN).
 
-Figure 6.1 shows the computational logic of an RNN at three adjacent time steps. In time step $t$, the computation of the hidden state can be treated as an entry of a fully connected layer with the activation function $\phi$ after concatenating the input $\boldsymbol{X}_t$ with the hidden state $\boldsymbol{H}_{t-1}$ of the previous time step.  The output of the fully connected layer is the hidden state of the current time step $\boldsymbol{H}_t$. Its model parameter is the concatenation of $\boldsymbol{W}_{xh}$ and $\boldsymbol{W}_{hh}$, with a bias of $\boldsymbol{b}_h$. The hidden state of the current time step $t$ $\boldsymbol{H}_t$ will participate in computing the hidden state $\boldsymbol{H}_{t+1}$ of the next time step $t+1$, the result of which will become the input for the fully connected output layer of the current time step.
+There are many different RNN construction methods.  RNNs with a hidden state defined by the equation above are very common. For time step $t$, the output of the output layer is similar to the computation in the multilayer perceptron:
+
+$$\mathbf{O}_t = \mathbf{H}_t \mathbf{W}_{hq} + \mathbf{b}_q$$
+
+RNN parameters include the weight $\mathbf{W}_{xh} \in \mathbb{R}^{d \times h}, \mathbf{W}_{hh} \in \mathbb{R}^{h \times h}$ of the hidden layer with the bias $\mathbf{b}_h \in \mathbb{R}^{1 \times h}$, and the weight $\mathbf{W}_{hq} \in \mathbb{R}^{h \times q}$ of the output layer with the bias $\mathbf{b}_q \in \mathbb{R}^{1 \times q}$. It is worth mentioning that RNNs always use these model parameters, even for different time steps. Therefore, the number of RNN model parameters does not grow as the number of time steps increases.
+
+The figure below shows the computational logic of an RNN at three adjacent time steps. In time step $t$, the computation of the hidden state can be treated as an entry of a fully connected layer with the activation function $\phi$ after concatenating the input $\mathbf{X}_t$ with the hidden state $\mathbf{H}_{t-1}$ of the previous time step.  The output of the fully connected layer is the hidden state of the current time step $\mathbf{H}_t$. Its model parameter is the concatenation of $\mathbf{W}_{xh}$ and $\mathbf{W}_{hh}$, with a bias of $\mathbf{b}_h$. The hidden state of the current time step $t$ $\mathbf{H}_t$ will participate in computing the hidden state $\mathbf{H}_{t+1}$ of the next time step $t+1$, the result of which will become the input for the fully connected output layer of the current time step.
 
 ![An RNN with a hidden state. ](../img/rnn.svg)
 
-As we just mentioned, the computation in hidden state $\boldsymbol{X}_t \boldsymbol{W}_{xh} + \boldsymbol{H}_{t-1} \boldsymbol{W}_{hh}$ equals the result from the concatenated matrix of $\boldsymbol{X}_t$ and $\boldsymbol{H}_{t-1}$ multiplied by the concatenated matrix of $\boldsymbol{W}_{xh}$ and $\boldsymbol{W}_{hh}$.  Next, we will use an example to verify this. First of all, we construct the matrixes `X`, `W_xh`, `H`, and `W_hh`, with the shapes (3,1), (1,4), (3,2), and (2,4), respectively. Multiply `X` by `W_xh`, and `H` by `W_hh`, then add the results from the multiplication to obtain a matrix with the shape (3,4).
+As discussed, the computation in the hidden state uses $\mathbf{H}_t = \mathbf{X}_t \mathbf{W}_{xh} + \mathbf{H}_{t-1} \mathbf{W}_{hh}$ to generate an object matching $\mathbf{H}_{t-1}$ in dimensionality. Moreover, we use $\mathbf{H}_t$ to generate the output $\mathbf{O}_t = \mathbf{H}_t \mathbf{W}_{hq}$. 
 
 ```{.python .input  n=1}
 from mxnet import nd
 
-X, W_xh = nd.random.normal(shape=(3, 1)), nd.random.normal(shape=(1, 4))
-H, W_hh = nd.random.normal(shape=(3, 2)), nd.random.normal(shape=(2, 4))
-nd.dot(X, W_xh) + nd.dot(H, W_hh)
+# Data X and hidden state H
+X = nd.random.normal(shape=(3, 1))
+H = nd.random.normal(shape=(3, 2))
+
+# Weights
+W_xh = nd.random.normal(shape=(1, 2))
+W_hh = nd.random.normal(shape=(2, 2))
+W_hq = nd.random.normal(shape=(2, 3))
+
+def net(X, H):
+    H = nd.relu(nd.dot(X, W_xh) + nd.dot(H, W_hh))
+    O = nd.relu(nd.dot(H, W_hq))
+    return H, O
 ```
 
-Concatenate matrices `X` and `H` vertically (dimension 1). The shape of the concatenated matrix is (3,3). It can be seen that the length of the concatenated matrix on dimension 1 is the sum of lengths ($1+2$) from the matrices `X` and `H` on dimension 1.  Then, concatenate matrixes `W_xh` and `W_hh` horizontally (dimension 0). The resulting matrix shape will be (3,4). Lastly, multiply the two concatenated matrices to obtain a matrix that has the same shape (3, 4) as the above code output.
+The recurrent network defined above takes observations `X` and a hidden state `H` as arguments and uses them to update the hidden state and emit an output `O`. Since this chain could go on for a very long time, training the model with backprop is out of the question (at least without some approximation). After all, this leads to a very long chain of dependencies that would be prohibitive to solve exactly: books typically have more than 100,000 characters and it is unreasonable to assume that the later text relies indiscriminately on all occurrences that happened, say, 10,000 characters in the past. Truncation methods such as [BPTT](bptt.md) and [Long Short Term Memory](lstm.md) are useful to address this in a more principled manner. For now, let's see how a state update works. 
 
-```{.python .input  n=2}
-nd.dot(nd.concat(X, H, dim=1), nd.concat(W_xh, W_hh, dim=0))
+```{.python .input}
+(H, O) = net(X,H)
+print(H, O)
 ```
 
-## Application: Character-level RNN Language Model
+## Steps in a Language Model
 
-In the last step, we are going to explain how to use RNN to build a language model. Let the number of mini-batch examples be 1, and the sequence of the text be "想", "要", "有", "直", "升", "机". Figure 6.2 demonstrates how we can use RNN to predict the next character based on the present and previous characters. During the training process, we run a softmax operation on the output from the output layer for each time step, and then use the cross-entropy loss function to compute the error between the result and the label. In Figure 6.2, due to the recurrent computation of the hidden state in the hidden layer, the output of time step 3 $\boldsymbol{O}_3$ is determined by the text sequence "想", "要", "有".  Since the next word of the sequence in the training data is "直", the loss of time step 3 will depend on the probability distribution of the next word generated based on the sequence "想", "要", "有" and the label "直" of this time step.
+We conclude this section by illustrating how RNNs can be used to build a language model. For simplicity of illustration we use words rather than characters, since the former are easier to comprehend. Let the number of mini-batch examples be 1, and the sequence of the text be the beginning of our dataset, i.e. "the time machine by h. g. wells". The figure below illustrates how to estimate the next character based on the present and previous characters. During the training process, we run a softmax operation on the output from the output layer for each time step, and then use the cross-entropy loss function to compute the error between the result and the label. Due to the recurrent computation of the hidden state in the hidden layer, the output of time step 3 $\mathbf{O}_3$ is determined by the text sequence "the", "time", "machine".  Since the next word of the sequence in the training data is "by", the loss of time step 3 will depend on the probability distribution of the next word generated based on the sequence "the", "time", "machine" and the label "by" of this time step.
 
-![Character-level RNN language model. The input and label sequences are "想", "要", "有", "直", "升" and "要", "有", "直", "升", "机", respectively. ](../img/rnn-train.svg)
+![Word-level RNN language model. The input and label sequences are `The Time Machine by H.` and `Time Machine by H. G.` respectively. ](../img/rnn-train.svg)
 
-Since each word entered is a character, this model is called a "character-level recurrent neural network". Since the number of different characters is much smaller than the number of different words (especially for English), the computation of character-level RNNs is usually much simpler. In the next few sections, we will introduce its implementation.
+The number of words is huge compared to the number of characters. This is why quite often (such as in the subsequent sections) we will use a character-level RNN instead. In the next few sections, we will introduce its implementation.
 
 
 ## Summary
@@ -70,9 +89,15 @@ Since each word entered is a character, this model is called a "character-level 
 
 ## Problems
 
-* If we use an RNN to predict the next word in a text sequence, how many outputs should be set?
-* How can an RNN be used to express the word of a time step based on the conditional probability of all the previous words in the text sequence?
+1. If we use an RNN to predict the next character in a text sequence, how many output dimensions do we need?
+1. Can you design a mapping for which an RNN with hidden states is exact? Hint - what about a finite number of words? 
+1. What happens to the gradient if you backpropagate through a long sequence?
+1. What are some of the problems associated with the simple sequence model described above?
 
 ## Discuss on our Forum
 
 <div id="discuss" topic_id="2362"></div>
+
+```{.python .input}
+
+```

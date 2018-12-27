@@ -7,15 +7,16 @@ stage("Sanity Check") {
   }
 }
 
-stage("Publish") {
+stage("Build and Publish") {
   node {
     ws('workspace/d2l-en') {
+	  checkout scm
       sh """#!/bin/bash
-      set -ex
+      set -e
       if [[ ${env.BRANCH_NAME} == master ]]; then
          build/utils/upload_notebooks_no_output_github.sh . https://github.com/d2l-ai/notebooks
       fi
       """
-    }
+	}
   }
 }

@@ -131,7 +131,7 @@ xyplot(x, y, 'sigmoid')
 
 The derivative of Sigmoid function is as follows:
 
-$$\frac{d}{dx} \mathrm{sigmoid}(x) = \frac{-\exp(x)}{(1 + \exp(-x))^2} = \mathrm{sigmoid}(x)\left(1-\mathrm{sigmoid}(x)\right).$$
+$$\frac{d}{dx} \mathrm{sigmoid}(x) = \frac{\exp(-x)}{(1 + \exp(-x))^2} = \mathrm{sigmoid}(x)\left(1-\mathrm{sigmoid}(x)\right).$$
 
 
 The derivative of Sigmoid function is plotted below. When the input is 0, the derivative of the Sigmoid function reaches a maximum of 0.25; as the input deviates further from 0, the derivative of Sigmoid function approaches 0.

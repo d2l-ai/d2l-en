@@ -1,5 +1,7 @@
 # Gluon Implementation in Recurrent Neural Networks
 
+@TODO(smolix/astonzhang): the data set was just changed from lyrics to time machine, so descriptions/hyperparameters have to change.
+
 This section will use Gluon to implement a language model based on a recurrent neural network. First, we read the Jay Chou album lyrics data set.
 
 ```{.python .input  n=1}
@@ -13,7 +15,7 @@ from mxnet.gluon import loss as gloss, nn, rnn
 import time
 
 (corpus_indices, char_to_idx, idx_to_char,
- vocab_size) = gb.load_data_jay_lyrics()
+ vocab_size) = gb.load_data_time_machine()
 ```
 
 ## Define the Model
@@ -94,7 +96,8 @@ Let us make one predication using a model with weights that are random values.
 ctx = gb.try_gpu()
 model = RNNModel(rnn_layer, vocab_size)
 model.initialize(force_reinit=True, ctx=ctx)
-predict_rnn_gluon('分开', 10, model, vocab_size, ctx, idx_to_char, char_to_idx)
+predict_rnn_gluon('traveller', 10, model, vocab_size, ctx, idx_to_char,
+                  char_to_idx)
 ```
 
 Next, implement the training function. Its algorithm is the same as in the previous section, but only random sampling is used here to read the data.
@@ -142,7 +145,7 @@ Train the model using the same hyper-parameters as in the previous experiments.
 
 ```{.python .input  n=19}
 num_epochs, batch_size, lr, clipping_theta = 200, 32, 1e2, 1e-2
-pred_period, pred_len, prefixes = 50, 50, ['分开', '不分开']
+pred_period, pred_len, prefixes = 50, 50, ['traveller', 'time traveller']
 train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
                             corpus_indices, idx_to_char, char_to_idx,
                             num_epochs, num_steps, lr, clipping_theta,

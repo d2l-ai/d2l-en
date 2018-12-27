@@ -7,7 +7,6 @@ First, import the packages and modules required for the experiment.
 
 ```{.python .input  n=1}
 import collections
-import gluonbook as gb
 import math
 from mxnet import autograd, gluon, nd
 from mxnet.gluon import data as gdata, loss as gloss, nn
@@ -287,15 +286,13 @@ The training function is defined below. Because of the existence of padding, the
 
 ```{.python .input  n=21}
 def train(net, lr, num_epochs):
-    ctx = gb.try_gpu()
-    net.initialize(ctx=ctx, force_reinit=True)
+    net.initialize(force_reinit=True)
     trainer = gluon.Trainer(net.collect_params(), 'adam',
                             {'learning_rate': lr})
     for epoch in range(num_epochs):
         start_time, train_l_sum = time.time(), 0
         for batch in data_iter:
-            center, context_negative, mask, label = [
-                data.as_in_context(ctx) for data in batch]
+            center, context_negative, mask, label = batch
             with autograd.record():
                 pred = skip_gram(center, context_negative, net[0], net[1])
                 # Use the mask variable to avoid the effect of padding on loss function calculations.
@@ -312,7 +309,7 @@ def train(net, lr, num_epochs):
 Now, we can train a skip-gram model using negative sampling.
 
 ```{.python .input  n=22}
-train(net, 0.005, 8)
+train(net, 0.005, 3)
 ```
 
 ## Applying the Word Embedding Model

@@ -316,6 +316,7 @@ and if you designed a great algorithm to accomplish this feat in 2009,
 you might have won the [$1 million Netflix prize](https://en.wikipedia.org/wiki/Netflix_Prize).
 Predicting the length of stay for patients in the hospital is also a regression problem.
 A good rule of thumb is that any *How much?* or *How many?* problem should suggest regression.
+
 * 'How many hours will this surgery take?' - *regression*
 * 'How many dogs are in this photo?' - *regression*.
 
@@ -324,7 +325,7 @@ then it's likely, classification, a different fundamental problem type that we'l
 Even if you've never worked with machine learning before,
 you've probably worked through a regression problem informally.
 Imagine, for example, that you had your drains repaired
-and that your contractor, spent $x_1=3$ hours removing gunk from your sewage pipes.
+and that your contractor spent $x_1=3$ hours removing gunk from your sewage pipes.
 Then she sent you a bill of $y_1 = \$350$.
 Now imagine that your friend hired the same contractor for $x_2 = 2$ hours
 and that she received a bill of $y_2 = \$250$.
@@ -493,7 +494,7 @@ Recommender systems are another problem setting that is related to search and ra
 
 Such problems occur, e.g. for movie, product or music recommendation. In some cases, customers will provide explicit details about how much they liked the product (e.g. Amazon product reviews). In some other cases, they might simply provide feedback if they are dissatisfied with the result (skipping titles on a playlist). Generally, such systems strive to estimate some score $y_{ij}$, such as an estimated rating or probability of purchase, given a user $u_i$ and product $p_j$.
 
-Given such a model, then for any given user, we could retrieve the set of objects  with the largest scores $y_{ij}$ are then used as a recommendation. Production systems are considerably more advanced and take detailed user activity and item characteristics into account when computing such scores. The following image is an example of deep learning books recommended by Amazon based on personalization algorithms tuned to the author's preferences.
+Given such a model, then for any given user, we could retrieve the set of objects with the largest scores $y_{ij}$, which are then used as a recommendation. Production systems are considerably more advanced and take detailed user activity and item characteristics into account when computing such scores. The following image is an example of deep learning books recommended by Amazon based on personalization algorithms tuned to the author's preferences.
 
 ![](../img/deeplearning_amazon.png)
 
@@ -650,7 +651,7 @@ we must account for the way its actions might
 impact the future observations of the agent.
 
 
-Considering the interaction with an environment that opens a whole set of new modeling questions. Does the environment:
+Considering the interaction with an environment opens a whole set of new modeling questions. Does the environment:
 
 * remember what we did previously?
 * want to help us, e.g. a user reading text into a speech recognizer?
@@ -715,7 +716,7 @@ Reinforcement learners may also have to deal with the problem of partial observa
 That is, the current observation might not tell you everything about your current state.
 Say a cleaning robot found itself trapped in one of many identical closets in a house.
 Inferring the precise location (and thus state) of the robot
-might require considering its previous observerations before entering the closet.
+might require considering its previous observations before entering the closet.
 
 Finally, at any given point, reinforcement learners might know of one good policy,
 but there might be many other better policies that the agent has never tried.

@@ -1,4 +1,4 @@
-# MXNet documentation
+# Documentation
 
 Due to the length of this book, it is impossible for us to introduce all  MXNet functions and classes. The API documentation and additional tutorials and examples provide plenty of documentation beyond the book.
 
@@ -29,7 +29,7 @@ y = x.ones_like()
 y
 ```
 
-In the Jupyter notebook, we can use `?` to display the document in another window. For example, `nd.ones_like?` will create content that is almost identical to `help(nd.ones_like)`, but will be displayed in an extra window. In addition, if we use two `nd.ones_like??`, the function implementation code will also be displayed.
+In the Jupyter notebook, we can use `?` to display the document in another window. For example, `nd.random.uniform?` will create content that is almost identical to `help(nd.random.uniform)`, but will be displayed in an extra window. In addition, if we use two `nd.random.uniform??`, the function implementation code will also be displayed.
 
 ## API Documentation
 

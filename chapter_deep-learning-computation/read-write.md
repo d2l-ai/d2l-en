@@ -62,14 +62,16 @@ y = net(x)
 Next, we store the parameters of the model as a file with the name 'mlp.params'.
 
 ```{.python .input}
-net.save_parameters('mlp.params')
+# Use save_parameters in MXNet of later versions, such as 1.2.1.
+net.save_params('mlp.params')
 ```
 
 To check whether we are able to recover the model we instantiate a clone of the original MLP model. Unlike the random initialization of model parameters, here we read the parameters stored in the file directly.
 
 ```{.python .input  n=8}
 clone = MLP()
-clone.load_parameters('mlp.params')
+# Use load_parameters in MXNet of later versions, such as 1.2.1.
+clone.load_params('mlp.params')
 ```
 
 Since both instances have the same model parameters, the computation result of the same input `x` should be the same. Let's verify this.
@@ -82,7 +84,7 @@ yclone == y
 ## Summary
 
 * The `save` and `load` functions can be used to perform File I/O for NDArray objects.
-* The `load_parameters` and `save_parameters` functions allow us to save entire sets of parameters for a network in Gluon.
+* The `load_params` and `save_params` functions allow us to save entire sets of parameters for a network in Gluon.
 * Saving the architecture has to be done in code rather than in parameters.
 
 ## Problems

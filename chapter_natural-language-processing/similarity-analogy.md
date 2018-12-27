@@ -1,4 +1,4 @@
-# Seeking Synonyms and Analogies
+# Finding Synonyms and Analogies
 
 In the ["Implementation of Word2vec"](./word2vec-gluon.md) section, we trained a word2vec word embedding model on a small-scale data set and searched for synonyms using the cosine similarity of word vectors. In practice, word vectors pre-trained on a large-scale corpus can often be applied to downstream natural language processing tasks. This section will demonstrate how to use these pre-trained word vectors to find synonyms and analogies. We will continue to apply pre-trained word vectors in later chapters.
 

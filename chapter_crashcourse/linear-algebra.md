@@ -379,10 +379,11 @@ For example, we would represent the norm of a vector $\mathbf{x}$
 or matrix $A$ as $\|\mathbf{x}\|$ or $\|A\|$, respectively.
 
 All norms must satisfy a handful of properties:
+
 1. $\|\alpha A\| = |\alpha| \|A\|$
-2. $\|A + B\| \leq \|A\| + \|B\|$
-3. $\|A\| \geq 0$
-4. If $\forall {i,j}, a_{ij} = 0$, then $\|A\|=0$
+1. $\|A + B\| \leq \|A\| + \|B\|$
+1. $\|A\| \geq 0$
+1. If $\forall {i,j}, a_{ij} = 0$, then $\|A\|=0$
 
 To put it in words, the first rule says
 that if we scale all the components of a matrix or vector

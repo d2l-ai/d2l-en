@@ -1,4 +1,4 @@
-# Get Started with Kaggle Competition: Image Classification (CIFAR-10)
+# Image Classification (CIFAR-10) on Kaggle
 
 So far, we have been using Gluon's `data` package to directly obtain image data sets in NDArray format. In practice, however, image data sets often exist in the format of image files. In this section, we will start with the original image files and organize, read, and convert the files to NDArray format step by step.
 

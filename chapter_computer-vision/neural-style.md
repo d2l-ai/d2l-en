@@ -1,4 +1,4 @@
-# Style Transfer
+# Neural Style Transfer
 
 If you happen to be an amateur photographer, you might know something about filters. Filters can alter the color styles of photos to make the background sharper or people's faces whiter. However, a filter generally can only change one aspect of a photo. To create the ideal photo, you often need to try many different filter combinations. This process is as complex as tuning the hyper-parameters of a model.
 

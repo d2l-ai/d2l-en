@@ -1,13 +1,15 @@
 #!/bin/bash
 set -e
-set -x
 
 conda activate d2l-en-build
 
-BUCKET=s3://diveintodeeplearning.org
+#BUCKET=s3://diveintodeeplearning.org
 # BUCKET=s3://diveintodeeplearning-staging
 
 DIR=build/_build/html/
+
+aws s3 sync --delete $DIR s3://diveintodeeplearning.org --acl 'public-read' --quiet
+aws s3 sync --delete $DIR s3://en.d2l.ai --acl 'public-read' --quiet
 
 #find $DIR \( -iname '*.css' -o -iname '*.js' \) -exec gzip -9 -n {} \; -exec mv {}.gz {} \;
 
@@ -17,10 +19,10 @@ DIR=build/_build/html/
 #      --acl 'public-read' \
 #      $DIR $BUCKET
 
-aws s3 sync --exclude '*.*' --include '*.woff' --include '*.woff2' \
-      --expires "$(date -d '+24 months' --utc +'%Y-%m-%dT%H:%M:%SZ')" \
-      --acl 'public-read' \
-      $DIR $BUCKET
+#aws s3 sync --exclude '*.*' --include '*.woff' --include '*.woff2' \
+#      --expires "$(date -d '+24 months' --utc +'%Y-%m-%dT%H:%M:%SZ')" \
+#      --acl 'public-read' --quiet \
+#      $DIR $BUCKET
 
 #aws s3 sync --exclude '*.*' --include '*.js' \
 #      --content-type 'application/javascript' \
@@ -28,6 +30,8 @@ aws s3 sync --exclude '*.*' --include '*.woff' --include '*.woff2' \
 #      --acl 'public-read' \
 #      $DIR $BUCKET
 
-aws s3 sync --delete $DIR $BUCKET --acl 'public-read'
+#aws s3 sync --delete $DIR $BUCKET --acl 'public-read' --quiet
+
+echo 's3 uploaded'
 
 # TODO: add cache control
