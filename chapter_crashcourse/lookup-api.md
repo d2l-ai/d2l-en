@@ -1,4 +1,4 @@
-# MXNet documentation
+# Documentation
 
 Due to the length of this book, it is impossible for us to introduce all  MXNet functions and classes. The API documentation and additional tutorials and examples provide plenty of documentation beyond the book.
 
