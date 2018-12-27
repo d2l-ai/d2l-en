@@ -14,6 +14,7 @@ stage("Build and Publish") {
       sh """#!/bin/bash
       set -e
       git submodule update --init
+      conda activate d2l-en-build
       if [[ ${env.BRANCH_NAME} == master ]]; then
          build/utils/upload_notebooks_no_output_github.sh . https://github.com/d2l-ai/notebooks
       fi
