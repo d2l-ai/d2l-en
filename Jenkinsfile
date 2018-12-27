@@ -12,7 +12,7 @@ stage("Build and Publish") {
     ws('workspace/d2l-en') {
       withCredentials([usernamePassword(credentialsId: '13cb1009-3cda-49ef-9aaa-8a705fdaaeb7',
                        passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-        sh "build/test.sh"
+        sh "build/publish_notebook.sh"
       }
 	}
   }
