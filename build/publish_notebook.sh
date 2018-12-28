@@ -1,5 +1,5 @@
 #!/bin/bash
-set -x
+set -ex
 
 conda activate d2l-en-build
 
@@ -9,4 +9,5 @@ rm -f ${DIR}/*.ipynb
 cp environment.yml ${DIR}/
 rm -rf ${DIR}/img/qr_* ${DIR}/img/frontpage
 
-build/utils/upload_github.sh ${DIR} d2l-ai/notebooks
+# will return -1 if nothing to commit.
+build/utils/upload_github.sh ${DIR} d2l-ai/notebooks || exit 0
