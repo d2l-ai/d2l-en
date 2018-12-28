@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ex
+set -x
 
 conda activate d2l-en-build
 
