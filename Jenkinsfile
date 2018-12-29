@@ -2,8 +2,8 @@ stage("Build and Publish") {
   node {
     ws('workspace/d2l-en') {
       checkout scm
-      sh "build/sanity_check.sh"
-      sh "build/clean_build.sh"
+      sh "build/utils/sanity_check.sh"
+      sh "build/utils/clean_build.sh"
       sh "build/update_env.sh"
       sh "build/build_html.sh"
       sh "build/build_pdf.sh"
