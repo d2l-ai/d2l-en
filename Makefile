@@ -1,8 +1,8 @@
 all: html
 
-build/%.ipynb: %.md build/env.yml build/md2ipynb.py $(wildcard gluonbook/*)
+build/%.ipynb: %.md build/env.yml $(wildcard gluonbook/*)
 	mkdir -p $(@D)
-	cd $(@D); python ../md2ipynb.py ../../$< ../../$@
+	cd $(@D); python ../utils/md2ipynb.py ../../$< ../../$@
 
 build/%.md: %.md
 	@mkdir -p $(@D)
@@ -66,4 +66,3 @@ pdf: $(DEPS) $(OBJ)
 
 clean:
 	rm -rf build/chapter* build/_build build/img build/data build/environment.yml build/README.md $(PKG)
-
