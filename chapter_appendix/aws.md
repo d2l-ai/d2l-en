@@ -28,7 +28,7 @@ The row at the top of Figure 11.10 shows the seven steps in the instance configu
 
 ![ Choose an operating system. ](../img/os.png)
 
-EC2 provides many different instance configurations to choose from. As shown in Figure 11.11, In "Step 2: Chosse an Instance Type”，choose a "p2.xlarge" instance with K80 GPU. We can also choose instances with multiple GPUs such as "p2.16xlarge". If you want to compare machine configurations and fees of different instances, you may refer to https://www.ec2instances.info/.
+EC2 provides many different instance configurations to choose from. As shown in Figure 11.11, In "Step 2: Choose an Instance Type”，choose a "p2.xlarge" instance with K80 GPU. We can also choose instances with multiple GPUs such as "p2.16xlarge". If you want to compare machine configurations and fees of different instances, you may refer to https://www.ec2instances.info/.
 
 ![ Choose an instance. ](../img/p2x.png)
 
