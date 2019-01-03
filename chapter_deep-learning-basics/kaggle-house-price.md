@@ -114,10 +114,10 @@ One way to address this problem is to measure the discrepancy in the logarithm o
 $$L = \sqrt{\frac{1}{n}\sum_{i=1}^n\left(\log y_i -\log \hat{y}_i\right)^2}$$
 
 ```{.python .input  n=11}
-def log_rmse(net, train_features, train_labels):
+def log_rmse(net, features, labels):
     # To further stabilize the value when the logarithm is taken, set the value less than 1 as 1.
-    clipped_preds = nd.clip(net(train_features), 1, float('inf'))
-    rmse = nd.sqrt(2 * loss(clipped_preds.log(), train_labels.log()).mean())
+    clipped_preds = nd.clip(net(features), 1, float('inf'))
+    rmse = nd.sqrt(2 * loss(clipped_preds.log(), labels.log()).mean())
     return rmse.asscalar()
 ```
 
@@ -176,7 +176,7 @@ def k_fold(k, X_train, y_train, num_epochs,
         data = get_k_fold_data(k, i, X_train, y_train)
         net = get_net()
         train_ls, valid_ls = train(net, *data, num_epochs, learning_rate,
-                                  weight_decay, batch_size)
+                                   weight_decay, batch_size)
         train_l_sum += train_ls[-1]
         valid_l_sum += valid_ls[-1]
         if i == 0:
@@ -194,9 +194,8 @@ We pick a rather un-tuned set of hyperparameters and leave it up to the reader t
 
 ```{.python .input  n=16}
 k, num_epochs, lr, weight_decay, batch_size = 5, 100, 5, 0, 64
-verbose_epoch = num_epochs - 2
 train_l, valid_l = k_fold(k, train_features, train_labels, num_epochs, lr,
-                         weight_decay, batch_size)
+                          weight_decay, batch_size)
 print('%d-fold validation: avg train rmse: %f, avg valid rmse: %f'
       % (k, train_l, valid_l))
 ```

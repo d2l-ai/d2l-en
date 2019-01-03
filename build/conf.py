@@ -143,11 +143,12 @@ html_theme_options = {
     'primary_color': 'blue',
     'accent_color': 'deep_orange',
     'header_links' : [
-        ('PDF', 'https://en.diveintodeeplearning.org/d2l-en.pdf', True, 'fas fa-file-pdf'),
-        ('Jupyter Notebooks', 'http://en.diveintodeeplearning.org/d2l-en.zip', True, 'fas fa-download'),
-        ('Forum', 'https://discuss.mxnet.io', True, 'fab fa-discourse'),
-        ('Github', 'https://github.com/diveintodeeplearning/d2l-en', True, 'fab fa-github'),
-        ('中文版本', 'https://zh.diveintodeeplearning.org', True, 'fas fa-external-link-alt'),
+        ('Berkeley Course 2019', 'https://courses.d2l.ai/berkeley-stat-157/index.html', True, 'fas fa-user-graduate'),
+        ('PDF', 'https://en.d2l.ai/d2l-en.pdf', True, 'fas fa-file-pdf'),
+        ('Jupyter Notebooks', 'https://en.d2l.ai/d2l-en.zip', True, 'fas fa-download'),
+        ('Discuss', 'https://discuss.mxnet.io', True, 'fab fa-discourse'),
+		('GitHub', 'https://github.com/d2l-ai/d2l-en', True, 'fab fa-github'),
+        ('中文版', 'https://zh.d2l.ai', True, 'fas fa-external-link-alt'),
     ],
     'show_footer': True
 }

@@ -82,7 +82,7 @@ import sys
 
 net = nn.Sequential()
 # Here, we use a larger 11 x 11 window to capture objects. At the same time, we use a stride of 4 to greatly reduce the height and width of the output.
-# Here, the number of input channels is much larger than that in LeNet.
+# Here, the number of output channels is much larger than that in LeNet.
 net.add(nn.Conv2D(96, kernel_size=11, strides=4, activation='relu'),
         nn.MaxPool2D(pool_size=3, strides=2),
         # Make the convolution window smaller, set padding to 2 for consistent height and width across the input and output, and increase the number of output channels
