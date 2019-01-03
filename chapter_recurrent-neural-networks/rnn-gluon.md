@@ -177,11 +177,10 @@ As we can see, the model achieves comparable perplexity, albeit within a shorter
     * What happens?
     * Bias the model towards more likely outputs, e.g. by sampling from $q(w_t|w_{t-1}, \ldots w_1) \propto p^\alpha(w_t|w_{t-1}, \ldots w_1)$ for $\alpha > 1$.
 1. What happens if you increase the number of hidden layers in the RNN model? Can you make the model work?
+1. How well can you compress the text using this model?
+    * How many bits do you need?
+    * Why doesn't everyone use this model for text compression? Hint - what about the compressor?
 
 ## Discuss on our Forum
 
 <div id="discuss" topic_id="2365"></div>
-
-```{.python .input}
-
-```
