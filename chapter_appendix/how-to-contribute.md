@@ -48,7 +48,7 @@ git push
 
 Here, `'fix typo in linear-regression.md'` is the description of the submitted change. You can replace this with other meaningful descriptive information.
 
-Step 5: Enter the code repository address of this book [2] in your browser again. Click the "New pull request" button in the red box on the bottom-left of Figure 11.20. On the page that appears, click the "compare across forks" link in the red box on the right side of Figure 11.23. Then, click the "head fork: diveintodeeplearning/d2l-en" button in the red box below. Enter your GitHub ID in the pop-up text box and select "Your GitHub-ID/d2l-en" from the drop-down menu, as shown in Figure 11.23.
+Step 5: Enter the code repository address of this book [2] in your browser again. Click the "New pull request" button in the red box on the bottom-left of Figure 11.20. On the page that appears, click the "compare across forks" link in the red box on the right side of Figure 11.23. Then, click the "head fork: d2l-ai/d2l-en" button in the red box below. Enter your GitHub ID in the pop-up text box and select "Your GitHub-ID/d2l-en" from the drop-down menu, as shown in Figure 11.23.
 
 ![Select the code repository where the source of the change is located.](../img/contrib04.png)
 
@@ -75,9 +75,9 @@ After submitting the request, you will see the page shown in Figure 11.25, which
 
 ## References
 
-[1] List of contributors to this book. https://github.com/diveintodeeplearning/d2l-en/graphs/contributors
+[1] List of contributors to this book. https://github.com/d2l-ai/d2l-en/graphs/contributors
 
-[2] Address of the code repository of this book. https://github.com/diveintodeeplearning/d2l-en
+[2] Address of the code repository of this book. https://github.com/d2l-ai/d2l-en
 
 [3] Install Git. https://git-scm.com/book/zh/v2
 

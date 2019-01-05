@@ -173,8 +173,6 @@ fundamental preliminaries, like linear algebra and probability.
 we want you to taste the satisfaction of training your first model
 before worrying about more exotic probability distributions.
 
-If you're ready to get started, head over to [the introduction](../chapter_introduction/index.rst).
-For everything else [open an issue on Github](https://github.com/diveintodeeplearning/d2l-en).
 
 ## Acknowledgments
  
