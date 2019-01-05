@@ -182,8 +182,8 @@ We are indebted to the hundreds of contributors for both
 the English and the Chinese drafts.
 They helped improve the content and offered valuable feedback.
 Specifically, we thank every contributor of this English draft for making it better for everyone.
-Their Github IDs and names (if provided) are: bowen0701, ChaiBapchya (Chaitanya Prakash Bapat), kirk86
-, liangpu597 (Liang Pu), MLWhiz (Rahul Agarwal), mstewart141, muelleme (Mike Müller), prakhar1989, sfermigier, sundeepteki, vishaalkapoor, vishwesh5, YaYaB.
+Their Github IDs and names (if provided) are: bowen0701, Chaitanya Prakash Bapat, kirk86
+, Liang Pu, Rahul Agarwal, mstewart141, Mike Müller, prakhar1989, sfermigier, sundeepteki, vishaalkapoor, vishwesh5, YaYaB.
 Moreover, we thank Amazon Web Services, especially Swami Sivasubramanian, Raju Gulabani, Charlie Bell, and Andrew Jassy for their generous support in writing this book.
 Without the available time, resources, discussions with colleagues,
 and continuous encouragement this book would not have happened.
