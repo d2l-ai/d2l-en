@@ -11,6 +11,7 @@ feel free to skim or skip this chapter.
 
 ```{.python .input}
 from mxnet import nd
+import numpy as np
 ```
 
 ## Scalars
