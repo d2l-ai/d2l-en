@@ -474,6 +474,7 @@ There are a number of special matrices that we will use throughout this tutorial
 
 ### Basic matrix properties
 
+```math
 \begin{align}
 \label{eqn:1}
 (\mathbf{A}\mathbf{B})^{-1} &= \mathbf{B}^{-1}\mathbf{A}^{-1} \\
@@ -496,6 +497,7 @@ There are a number of special matrices that we will use throughout this tutorial
 \label{eqn:10}
 (\mathbf{ABC\ldots})^{H} &= \ldots\mathbf{C}^{H}\mathbf{B}^{H}\mathbf{A}^{H} \\
 \end{align}
+```
 
 ```{.python .input}
 # lets play with the above equations and equatities to see for ouselves
