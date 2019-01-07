@@ -121,7 +121,7 @@ $$
 \partial_{o_j} l = \frac{\exp(o_j)}{\sum_k \exp(o_k)} - y_j = \mathrm{softmax}(\mathbf{o})_j - y_j = \Pr(y = j|x) - y_j
 $$
 
-In other words, the gradient is the difference between what the model thinks should happen, as expressed by the probability $p(y|x)$, and what acutally happened, as expressed by $h$. In this sense, it is very similar to what we saw in regression, where the gradient was the difference between the observation $y$ and estimate $\hat{y}$. This seems too much of a coincidence, and indeed, it isn't. In any [exponential family](https://en.wikipedia.org/wiki/Exponential_family) model the gradients of the log-likelihood are given by precisely this term. This fact makes computing gradients a lot easier in practice.
+In other words, the gradient is the difference between what the model thinks should happen, as expressed by the probability $p(y|x)$, and what acutally happened, as expressed by $y$. In this sense, it is very similar to what we saw in regression, where the gradient was the difference between the observation $y$ and estimate $\hat{y}$. This seems too much of a coincidence, and indeed, it isn't. In any [exponential family](https://en.wikipedia.org/wiki/Exponential_family) model the gradients of the log-likelihood are given by precisely this term. This fact makes computing gradients a lot easier in practice.
 
 ### Cross-Entropy Loss
 
