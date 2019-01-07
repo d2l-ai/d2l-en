@@ -10,7 +10,7 @@ User who only need compute instances rather than a fully managed Machine Learnin
 ## Run on Amazon SageMaker
 This chapter will give a high level overview about Amazon SageMaker, in-depth tutorials can be found on the [Sagemaker website](https://docs.aws.amazon.com/sagemaker/latest/dg/whatis.html).
 
-<img src="img/sagemaker.png" width="700"/>
+<img src="../img/sagemaker.png" width="700"/>
 
 SageMaker offers Jupyter notebooks and supports MXNet out-of-the box. You can run your notebooks on CPU instances and as such profit from  the free tier. However, more powerful CPU instances or GPU instances are charged by time.
 Within this notebook you can [fetch, explore and prepare training data](https://docs.aws.amazon.com/sagemaker/latest/dg/how-it-works-notebooks-instances.html). 
