@@ -214,7 +214,7 @@ so we'll want to keep track of two quantities.
  * **Test Error:** This is the error incurred on an unseen test set. This can deviate quite a bit from the training error. This condition, when a model fails to generalize to unseen data, is called *overfitting*. In real-life terms, this is the equivalent of screwing up the real exam despite doing well on the practice exams.
 
 
-### Optimization algorithms     
+### Optimization algorithms
 
 Finally, to minimize the loss, we'll need some way of taking the model and its loss functions,
 and searching for a set of parameters that minimizes the loss.
@@ -304,7 +304,7 @@ and the set of all targets $\mathbf{y}$ (corresponding to all examples X).
 When our targets take on arbitrary real values in some range,
 we call this a regression problem.
 The goal of our model is to produce predictions (guesses of the price, in our example)
-that closely approximate the actual target values.  
+that closely approximate the actual target values.
 We denote these predictions $\hat{y}_i$
 and if the notation seems unfamiliar, then just ignore it for now.
 We'll unpack it more thoroughly in the subsequent chapters.
@@ -316,6 +316,7 @@ and if you designed a great algorithm to accomplish this feat in 2009,
 you might have won the [$1 million Netflix prize](https://en.wikipedia.org/wiki/Netflix_Prize).
 Predicting the length of stay for patients in the hospital is also a regression problem.
 A good rule of thumb is that any *How much?* or *How many?* problem should suggest regression.
+
 * 'How many hours will this surgery take?' - *regression*
 * 'How many dogs are in this photo?' - *regression*.
 
@@ -324,7 +325,7 @@ then it's likely, classification, a different fundamental problem type that we'l
 Even if you've never worked with machine learning before,
 you've probably worked through a regression problem informally.
 Imagine, for example, that you had your drains repaired
-and that your contractor, spent $x_1=3$ hours removing gunk from your sewage pipes.
+and that your contractor spent $x_1=3$ hours removing gunk from your sewage pipes.
 Then she sent you a bill of $y_1 = \$350$.
 Now imagine that your friend hired the same contractor for $x_2 = 2$ hours
 and that she received a bill of $y_2 = \$250$.
@@ -443,7 +444,7 @@ Given the current state of computer vision,
 we can do this easily, with off-the-shelf tools.
 Nonetheless, no matter how accurate our model gets, we might find ourselves in trouble when the classifier encounters an image of the Bremen Town Musicians.
 
-![](../img/catdog.jpg)
+![](../img/stackedanimals.jpg)
 
 
 As you can see, there's a cat in the picture, and a rooster, a dog and a donkey, with some trees in the background.
@@ -493,7 +494,7 @@ Recommender systems are another problem setting that is related to search and ra
 
 Such problems occur, e.g. for movie, product or music recommendation. In some cases, customers will provide explicit details about how much they liked the product (e.g. Amazon product reviews). In some other cases, they might simply provide feedback if they are dissatisfied with the result (skipping titles on a playlist). Generally, such systems strive to estimate some score $y_{ij}$, such as an estimated rating or probability of purchase, given a user $u_i$ and product $p_j$.
 
-Given such a model, then for any given user, we could retrieve the set of objects  with the largest scores $y_{ij}$ are then used as a recommendation. Production systems are considerably more advanced and take detailed user activity and item characteristics into account when computing such scores. The following image is an example of deep learning books recommended by Amazon based on personalization algorithms tuned to the author's preferences.
+Given such a model, then for any given user, we could retrieve the set of objects with the largest scores $y_{ij}$, which are then used as a recommendation. Production systems are considerably more advanced and take detailed user activity and item characteristics into account when computing such scores. The following image is an example of deep learning books recommended by Amazon based on personalization algorithms tuned to the author's preferences.
 
 ![](../img/deeplearning_amazon.png)
 
@@ -650,7 +651,7 @@ we must account for the way its actions might
 impact the future observations of the agent.
 
 
-Considering the interaction with an environment that opens a whole set of new modeling questions. Does the environment:
+Considering the interaction with an environment opens a whole set of new modeling questions. Does the environment:
 
 * remember what we did previously?
 * want to help us, e.g. a user reading text into a speech recognizer?
@@ -715,7 +716,7 @@ Reinforcement learners may also have to deal with the problem of partial observa
 That is, the current observation might not tell you everything about your current state.
 Say a cleaning robot found itself trapped in one of many identical closets in a house.
 Inferring the precise location (and thus state) of the robot
-might require considering its previous observerations before entering the closet.
+might require considering its previous observations before entering the closet.
 
 Finally, at any given point, reinforcement learners might know of one good policy,
 but there might be many other better policies that the agent has never tried.
@@ -746,6 +747,6 @@ this problem is the classic *multi-armed bandit problem*.
 
 Machine Learning is vast. We cannot possibly cover it all. On the other hand, neural networks are simple and only require elementary mathematics. So let's get started (but first, let's install MXNet).
 
-```{.python .input}
+## Discuss on our Forum
 
-```
+<div id="discuss" topic_id="2314"></div>

@@ -26,7 +26,7 @@ Figure 11.19 compares the 32-bit floating-point compute power and price of the v
 
 From Figure 11.19, we can see two things:
 
-1. Within each series, price and performance are roughly proportional. However, the newer models offer better cost effectiveness, as can be seen by comparing the 980 TI and 1080 TI.
+1. Within each series, price and performance are roughly proportional. However, the newer models offer better cost effectiveness, as can be seen by comparing the 980 Ti and 1080 Ti.
 2. The performance to cost ratio of the GTX 1000 series is about two times greater than the 900 series.
 
 If we look at the earlier GTX series, we will observe a similar pattern. Therefore, we recommend you buy the latest GPU model in your budget.
@@ -50,6 +50,6 @@ Generally, GPUs are primarily used for deep learning training. Therefore, you do
 
 * You can browse the discussions about machine configurations in the forum for this section.
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/1177)
+## Discuss on our Forum
 
-![](../img/qr_buy-gpu.svg)
+<div id="discuss" topic_id="2400"></div>

@@ -94,17 +94,17 @@ gb.train_gluon_ch7('adagrad', {'learning_rate': 0.1}, features, labels)
 * Adagrad constantly adjusts the learning rate during iteration to give each element in the independent variable of the objective function its own learning rate.
 * When using Adagrad, the learning rate of each element in the independent variable decreases (or remains unchanged) during iteration.
 
-## exercise
+## Problems
 
 * When introducing the features of Adagrad, we mentioned a potential problem. What solutions can you think of to fix this problem?
 * Try to use other initial learning rates in the experiment. How does this change the results?
 
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/2273)
-
-![](../img/qr_adagrad.svg)
-
 
 ## Reference
 
 [1] Duchi, J., Hazan, E., & Singer, Y. (2011). Adaptive subgradient methods for online learning and stochastic optimization. Journal of Machine Learning Research, 12(Jul), 2121-2159.
+
+## Discuss on our Forum
+
+<div id="discuss" topic_id="2375"></div>

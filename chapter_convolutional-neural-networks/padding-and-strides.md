@@ -6,15 +6,15 @@ $$(n_h-k_h+1) \times (n_w-k_w+1).$$
 
 Therefore, the output shape of the convolutional layer is determined by the shape of the input and the shape of the convolution kernel window. In several cases we might want to change the dimensionality of the output:
 
-* Multiple layers of convolutions reduce the information available at the boundary, often by much more than what we would want. If we start with a 240x240 pixel image, 10 layers of 5x5 convolutions reduce the image to 200x200 pixels, effectively slicing off 30% of the image and with it obliterating anything interesting on the boundaries. Padding mitigates this problem. 
-* In some cases we want to reduce the resolution drastically, e.g. halving it if we think that such a high input dimensionality is not required. In this case we might want to subsample the output. Strides address this. 
-* In some cases we want to increase the resolution, e.g. for image superresolution or for audio generation. Again, strides come to our rescue. 
-* In some cases we want to increase the length gently to a given size (mostly for sentences of variable length or for filling in patches). Padding addreses this. 
+* Multiple layers of convolutions reduce the information available at the boundary, often by much more than what we would want. If we start with a 240x240 pixel image, 10 layers of 5x5 convolutions reduce the image to 200x200 pixels, effectively slicing off 30% of the image and with it obliterating anything interesting on the boundaries. Padding mitigates this problem.
+* In some cases we want to reduce the resolution drastically, e.g. halving it if we think that such a high input dimensionality is not required. In this case we might want to subsample the output. Strides address this.
+* In some cases we want to increase the resolution, e.g. for image superresolution or for audio generation. Again, strides come to our rescue.
+* In some cases we want to increase the length gently to a given size (mostly for sentences of variable length or for filling in patches). Padding addreses this.
 
 
 ## Padding
 
-As we saw so far, convolutions are quite useful. Alas, on the boundaries we encounter the problem that we keep on losing pixels. For any given convolution it's only a few pixels but this adds up as we discussed above. If the image was larger things would be easier - we could simply record one that's larger. Unfortunately, that's not what we get in reality. One solution to this problem is to add extra pixels around the boundary of the image, thus increasing the effective size of the image (the extra pixels typically assume the value 0). In the figure below we pad the $3 \times 5$ to increase to $5 \times 7$. The corresponding output then increases to a $4 \times 6$ matrix. 
+As we saw so far, convolutions are quite useful. Alas, on the boundaries we encounter the problem that we keep on losing pixels. For any given convolution it's only a few pixels but this adds up as we discussed above. If the image was larger things would be easier - we could simply record one that's larger. Unfortunately, that's not what we get in reality. One solution to this problem is to add extra pixels around the boundary of the image, thus increasing the effective size of the image (the extra pixels typically assume the value 0). In the figure below we pad the $3 \times 5$ to increase to $5 \times 7$. The corresponding output then increases to a $4 \times 6$ matrix.
 
 ![Two-dimensional cross-correlation with padding. The shaded portions are the input and kernel array elements used by the first output element: $0\times0+0\times1+0\times2+0\times3=0$. ](../img/conv_pad.svg)
 
@@ -34,8 +34,8 @@ In the following example we create a two-dimensional convolutional layer with a 
 from mxnet import nd
 from mxnet.gluon import nn
 
-# We define a convenience function to calculate the convolutional layer. This function initializes 
-# the convolutional layer weights and performs corresponding dimensionality elevations and reductions 
+# We define a convenience function to calculate the convolutional layer. This function initializes
+# the convolutional layer weights and performs corresponding dimensionality elevations and reductions
 # on the input and output.
 def comp_conv2d(conv2d, X):
     conv2d.initialize()
@@ -53,7 +53,7 @@ comp_conv2d(conv2d, X).shape
 When the height and width of the convolution kernel are different, we can make the output and input have the same height and width by setting different padding numbers for height and width.
 
 ```{.python .input  n=2}
-# Here, we use a convolution kernel with a height of 5 and a width of 3. The padding numbers on 
+# Here, we use a convolution kernel with a height of 5 and a width of 3. The padding numbers on
 # both sides of the height and width are 2 and 1, respectively.
 conv2d = nn.Conv2D(1, kernel_size=(5, 3), padding=(2, 1))
 comp_conv2d(conv2d, X).shape
@@ -87,7 +87,7 @@ conv2d = nn.Conv2D(1, kernel_size=(3, 5), padding=(0, 1), strides=(3, 4))
 comp_conv2d(conv2d, X).shape
 ```
 
-For the sake of brevity, when the padding number on both sides of the input height and width are $p_h$ and $p_w$ respectively, we call the padding $(p_h, p_w)$. Specifically, when $p_h = p_w = p$, the padding is $p$. When the strides on the height and width are $s_h$ and $s_w$, respectively, we call the stride $(s_h, s_w)$. Specifically, when $s_h = s_w = s$, the stride is $s$. By default, the padding is 0 and the stride is 1. In practice we rarely use inhomogeneous strides or padding, i.e. we usually have $p_h = p_w$ and $s_h = s_w$. 
+For the sake of brevity, when the padding number on both sides of the input height and width are $p_h$ and $p_w$ respectively, we call the padding $(p_h, p_w)$. Specifically, when $p_h = p_w = p$, the padding is $p$. When the strides on the height and width are $s_h$ and $s_w$, respectively, we call the stride $(s_h, s_w)$. Specifically, when $s_h = s_w = s$, the stride is $s$. By default, the padding is 0 and the stride is 1. In practice we rarely use inhomogeneous strides or padding, i.e. we usually have $p_h = p_w$ and $s_h = s_w$.
 
 ## Summary
 
@@ -102,7 +102,6 @@ For the sake of brevity, when the padding number on both sides of the input heig
 1. For audio signals, what does a stride of $2$ correspond to?
 1. What are the computational benefits of a stride larger than $1$.
 
+## Discuss on our Forum
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/6404)
-
-![](../img/qr_padding-and-strides.svg)
+<div id="discuss" topic_id="2350"></div>

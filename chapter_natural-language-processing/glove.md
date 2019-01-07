@@ -1,12 +1,12 @@
-# Word Embedding For Global Vectors (GloVe)
+# Word Embedding with Global Vectors (GloVe)
 
 First, we should review the skip-gram model in word2vec.  The conditional probability $\mathbb{P}(w_j\mid w_i)$ expressed in the skip-gram model using the softmax operation will be recorded as $q_{ij}$, that is:
 
 $$q_{ij}=\frac{\exp(\mathbf{u}_j^\top \mathbf{v}_i)}{ \sum_{k \in \mathcal{V}} \text{exp}(\mathbf{u}_k^\top \mathbf{v}_i)},$$
 
-其中$\mathbf{v}_i$和$\mathbf{u}_i$分别是索引为$i$的词$w_i$作为中心词和背景词时的向量表示，$\mathcal{V} = \{0, 1, \ldots, |\mathcal{V}|-1\}$为词典索引集。
+where $\mathbf{v}_i$ and $\mathbf{u}_i$ are the vector representations of word $w_i$ of index $i$ as the center word and context word respectively, and $\mathcal{V} = \{0, 1, \ldots, |\mathcal{V}|-1\}$ is the vocabulary index set.
 
-对于词$w_i$，它在数据集中可能多次出现。我们将每一次以它作为中心词的所有背景词全部汇总并保留重复元素，记作多重集（multiset）$\mathcal{C}_i$。一个元素在多重集中的个数称为该元素的重数（multiplicity）。举例来说，假设词$w_i$在数据集中出现2次：文本序列中以这2个$w_i$作为中心词的背景窗口分别包含背景词索引$2,1,5,2$和$2,3,2,1$。那么多重集$\mathcal{C}_i = \{1,1,2,2,2,2,3,5\}$，其中元素1的重数为2，元素2的重数为4，元素3和5的重数均为1。将多重集$\mathcal{C}_i$中元素$j$的重数记作$x_{ij}$：它表示了整个数据集中所有以$w_i$为中心词的背景窗口中词$w_j$的个数。那么，跳字模型的损失函数还可以用另一种方式表达：
+For word $w_i$, it may appear in the data set for multiple times. We collect all the context words every time when $w_i$ is a center word and keep duplicates, denoted as multiset $\mathcal{C}_i$. The number of an element in a multiset is called the multiplicity of the element. For instance, suppose that word $w_i$ appears twice in the data set: the context windows when these two $w_i$ become center words in the text sequence contain context word indices $2,1,5,2$ and $2,3,2,1$. Then, multiset $\mathcal{C}_i = \{1,1,2,2,2,2,3,5\}$, where multiplicity of element 1 is 2, multiplicity of element 2 is 4, and multiplicities of elements 3 and 5 are both 1. Denote multiplicity of element $j$ in multiset $\mathcal{C}_i$ as $x_{ij}$: it is the number of word $w_j$ in all the context windows for center word $w_i$ in the entire data set. As a result, the loss function of the skip-gram model can be expressed in a different way:
 
 $$-\sum_{i\in\mathcal{V}}\sum_{j\in\mathcal{V}} x_{ij} \log\,q_{ij}.$$
 
@@ -26,7 +26,7 @@ To address this, GloVe, a word embedding model that came after word2vec, adopts 
 
 1. Here, we use the non-probability distribution variables $p'_{ij}=x_{ij}$ and $q'_{ij}=\exp(\mathbf{u}_j^\top \mathbf{v}_i)$ and take their logs. Therefore, we get the square loss $\left(\log\,p'_{ij} - \log\,q'_{ij}\right)^2 = \left(\mathbf{u}_j^\top \mathbf{v}_i - \log\,x_{ij}\right)^2$.
 2. We add two scalar model parameters for each word $w_i$: the bias terms $b_i$ (for central target words) and $c_i$( for context words).
-3. Replace the weight of each loss with the function $h(x_{ij})$. The weight function $h(x)$ is a monotone increasing function with the range $[0,1]. 
+3. Replace the weight of each loss with the function $h(x_{ij})$. The weight function $h(x)$ is a monotone increasing function with the range $[0,1].
 
 Therefore, the goal of GloVe is to minimize the loss function.
 
@@ -43,8 +43,8 @@ We can also try to understand GloVe word embedding from another perspective. We 
 
 |$w_k$=|“solid”|“gas”|“water”|“fashion”|
 |--:|:-:|:-:|:-:|
-|$p_1=\mathbb{P}(w_k\mid\text{"ice"})$|0.00019|0.000066|0.003|0.000017|
-|$p_2=\mathbb{P}(w_k\mid\text{"steam"})$|0.000022|0.00078|0.0022|0.000018|
+|$p_1=\mathbb{P}(w_k\mid$ "ice" $)$|0.00019|0.000066|0.003|0.000017|
+|$p_2=\mathbb{P}(w_k\mid$ "steam" $)$|0.000022|0.00078|0.0022|0.000018|
 |$p_1/p_2$|8.9|0.085|1.36|0.96|
 
 We will be able to observe phenomena such as:
@@ -75,15 +75,16 @@ By taking the square error and weighting the left and right sides of the formula
 * The central target word vector and context word vector of any word are equivalent in GloVe.
 
 
-## exercise
+## Problems
 
 * If a word appears in the context window of another word, how can we use the distance between them in the text sequence to redesign the method for computing the conditional probability $p_{ij}$? Hint: See section 4.2 from the paper GloVe[1].
-* For any word, will its central target word bias term and context word bias term be equivalent to each other in GloVe? Why? 
+* For any word, will its central target word bias term and context word bias term be equivalent to each other in GloVe? Why?
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/4372)
-
-![](../img/qr_glove.svg)
 
 ## Reference
 
 [1] Pennington, J., Socher, R., & Manning, C. (2014). Glove: Global vectors for word representation. In Proceedings of the 2014 conference on empirical methods in natural language processing (EMNLP) (pp. 1532-1543).
+
+## Discuss on our Forum
+
+<div id="discuss" topic_id="2389"></div>

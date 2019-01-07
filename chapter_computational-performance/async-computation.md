@@ -1,4 +1,4 @@
-# Asynchronous Programming
+# Asynchronous Computing
 
 MXNet utilizes asynchronous programming to improve computing performance. Understanding how asynchronous programming works helps us to develop more efficient programs, by proactively reducing computational requirements and thereby minimizing the memory overhead required in the case of limited memory resources. First, we will import the package or module needed for this section’s experiment.
 
@@ -199,11 +199,10 @@ print('increased memory: %f MB' % (get_mem() - mem))
 * We recommend using at least one synchronization function for each mini-batch training or prediction to avoid passing on too many computation tasks to the back-end in a short period of time.
 
 
-## exercise
+## Problems
 
 * In the section "Use of Asynchronous Programming to Improve Computing Performance", we mentioned that using asynchronous computation can reduce the total amount of time needed to perform 1000 computations to $t_1 + 1000 t_2 + t_3$. Why do we have to assume $1000t_2 > 999t_1$ here?
 
+## Discuss on our Forum
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/1881)
-
-![](../img/qr_async-computation.svg)
+<div id="discuss" topic_id="2381"></div>

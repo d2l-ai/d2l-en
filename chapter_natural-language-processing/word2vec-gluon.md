@@ -7,7 +7,6 @@ First, import the packages and modules required for the experiment.
 
 ```{.python .input  n=1}
 import collections
-import gluonbook as gb
 import math
 from mxnet import autograd, gluon, nd
 from mxnet.gluon import data as gdata, loss as gloss, nn
@@ -287,15 +286,13 @@ The training function is defined below. Because of the existence of padding, the
 
 ```{.python .input  n=21}
 def train(net, lr, num_epochs):
-    ctx = gb.try_gpu()
-    net.initialize(ctx=ctx, force_reinit=True)
+    net.initialize(force_reinit=True)
     trainer = gluon.Trainer(net.collect_params(), 'adam',
                             {'learning_rate': lr})
     for epoch in range(num_epochs):
         start_time, train_l_sum = time.time(), 0
         for batch in data_iter:
-            center, context_negative, mask, label = [
-                data.as_in_context(ctx) for data in batch]
+            center, context_negative, mask, label = batch
             with autograd.record():
                 pred = skip_gram(center, context_negative, net[0], net[1])
                 # Use the mask variable to avoid the effect of padding on loss function calculations.
@@ -312,7 +309,7 @@ def train(net, lr, num_epochs):
 Now, we can train a skip-gram model using negative sampling.
 
 ```{.python .input  n=22}
-train(net, 0.005, 8)
+train(net, 0.005, 3)
 ```
 
 ## Applying the Word Embedding Model
@@ -338,7 +335,7 @@ get_similar_tokens('chip', 3, net[0])
 * We can pad examples of different lengths to create mini-batches with examples of all the same length and use mask variables to distinguish between padding and non-padding elements, so that only non-padding elements participate in the calculation of the loss function.
 
 
-## exercise
+## Problems
 
 * We use the `batchify` function to specify the mini-batch reading method in the `DataLoader` instance and print the shape of each variable in the first batch read. How should these shapes be calculated?
 * Try to find synonyms for other words.
@@ -346,9 +343,7 @@ get_similar_tokens('chip', 3, net[0])
 * When the data set is large, we usually sample the context words and the noise words for the central target word in the current mini-batch only when updating the model parameters. In other words, the same central target word may have different context words or noise words in different epochs. What are the benefits of this sort of training? Try to implement this training method.
 
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/7761)
 
-![](../img/qr_word2vec-gluon.svg)
 
 
 ## Reference
@@ -356,3 +351,7 @@ get_similar_tokens('chip', 3, net[0])
 [1] Penn Tree Bank. https://catalog.ldc.upenn.edu/ldc99t42
 
 [2] Mikolov, T., Sutskever, I., Chen, K., Corrado, G. S., & Dean, J. (2013). Distributed representations of words and phrases and their compositionality. In Advances in neural information processing systems (pp. 3111-3119).
+
+## Discuss on our Forum
+
+<div id="discuss" topic_id="2387"></div>

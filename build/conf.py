@@ -74,7 +74,7 @@ master_doc = 'index'
 # General information about the project.
 project = 'Dive into Deep Learning'
 copyright = '2017--2018, Contributors'
-author = "MXNet Community"
+author = "A. Zhang, Z. C. Lipton, M. Li, and A. J. Smola"
 
 
 # The version info for the project you're documenting, acts as replacement for
@@ -138,16 +138,17 @@ todo_include_todos = True
 # a list of builtin themes.
 
 html_theme_path = ['mx-theme']
-html_theme = 'sphinx_materialdesign_theme'
+html_theme = 'mxtheme'
 html_theme_options = {
     'primary_color': 'blue',
     'accent_color': 'deep_orange',
     'header_links' : [
-        ('PDF', './d2l-en.pdf', True, 'fas fa-file-pdf'),
-       # ('Jupyter Notebooks', './d2l-en.zip', True, 'fas fa-download'),
-       # ('参与讨论', 'https://discuss.gluon.ai/c/lecture?order=views', True, 'fab fa-discourse'),
-        ('Github', 'https://github.com/diveintodeeplearning/d2l-en', True, 'fab fa-github'),
-        ('中文版本', 'https://zh.diveintodeeplearning.org', True, 'fas fa-external-link-alt'),
+        ('Berkeley Course 2019', 'https://courses.d2l.ai/berkeley-stat-157/index.html', True, 'fas fa-user-graduate'),
+        ('PDF', 'https://en.d2l.ai/d2l-en.pdf', True, 'fas fa-file-pdf'),
+        ('Jupyter Notebooks', 'https://en.d2l.ai/d2l-en.zip', True, 'fas fa-download'),
+        ('Discuss', 'https://discuss.mxnet.io', True, 'fab fa-discourse'),
+		('GitHub', 'https://github.com/d2l-ai/d2l-en', True, 'fab fa-github'),
+        ('中文版', 'https://zh.d2l.ai', True, 'fas fa-external-link-alt'),
     ],
     'show_footer': True
 }
@@ -384,4 +385,5 @@ def setup(app):
     app.add_config_value('recommonmark_config', {
     }, True)
     app.add_javascript('google_analytics.js')
+    app.add_javascript('discuss.js')
     app.connect('source-read', image_caption)

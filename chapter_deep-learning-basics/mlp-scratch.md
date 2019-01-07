@@ -35,7 +35,7 @@ for param in params:
 
 ## Activation Function
 
-Here, we use the underlying `maximum` function to implement the ReLU, instead of invoking `ReLU` directly. 
+Here, we use the underlying `maximum` function to implement the ReLU, instead of invoking `ReLU` directly.
 
 ```{.python .input  n=4}
 def relu(X):
@@ -71,7 +71,7 @@ gb.train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size,
              params, lr)
 ```
 
-To see how well we did, let's apply the model to some test data. If you're interested, compare the result to corresponding [linear model](softmax-regression-scratch.md). 
+To see how well we did, let's apply the model to some test data. If you're interested, compare the result to corresponding [linear model](softmax-regression-scratch.md).
 
 ```{.python .input}
 for X, y in test_iter:
@@ -88,15 +88,15 @@ This looks slightly better than before, a clear sign that we're on to something 
 
 ## Summary
 
-We saw that implementing a simple MLP is quite easy, when done manually. That said, for a large number of layers this can get quite complicated (e.g. naming the model parameters, etc). 
+We saw that implementing a simple MLP is quite easy, when done manually. That said, for a large number of layers this can get quite complicated (e.g. naming the model parameters, etc).
 
 ## Problems
 
-1. Change the value of the hyper-parameter `num_hiddens` in order to see the result effects. 
-1. Try adding a new hidden layer to see how it affects the results.  
-1. How does changing the learning rate change the result. 
+1. Change the value of the hyper-parameter `num_hiddens` in order to see the result effects.
+1. Try adding a new hidden layer to see how it affects the results.
+1. How does changing the learning rate change the result.
 1. What is the best result you can get by optimizing over all the parameters (learning rate, iterations, number of hidden layers, number of hidden units per layer)?
 
-## Scan the QR code to access the forum. 
+## Discuss on our Forum
 
-![](../img/qr_mlp-scratch.svg)
+<div id="discuss" topic_id="2339"></div>

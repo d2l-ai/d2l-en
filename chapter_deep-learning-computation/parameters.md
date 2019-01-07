@@ -2,9 +2,9 @@
 
 The ultimate goal of training deep networks is to find good parameter values for a given architecture. When everything is standard, the `nn.Sequential` class is a perfectly good tool for it. However, very few models are entirely standard and most scientists want to build things that are novel. This section shows how to manipulate parameters. In particular we will cover the following aspects:
 
-* Accessing parameters for debugging, diagnostics, to visualize them or to save them is the first step to understanding how to work with custom models. 
+* Accessing parameters for debugging, diagnostics, to visualize them or to save them is the first step to understanding how to work with custom models.
 * Secondly, we want to set them in specific ways, e.g. for initialization purposes. We discuss the structure of parameter initializers.
-* Lastly, we show how this knowledge can be put to good use by building networks that share some parameters. 
+* Lastly, we show how this knowledge can be put to good use by building networks that share some parameters.
 
 As always, we start from our trusty Multilayer Perceptron with a hidden layer. This will serve as our choice for demonstrating the various features.
 
@@ -30,7 +30,7 @@ print(net[0].params)
 print(net[1].params)
 ```
 
-The output tells us a number of things. Firstly, the layer consists of two sets of parameters: `dense0_weight` and `dense0_bias`, as we would expect. They are both single precision and they have the necessary shapes that we would expect from the first layer, given that the input dimension is 20 and the output dimension 256. In particular the names of the parameters are very useful since they allow us to identify parameters *uniquely* even in a network of hundreds of layers and with nontrivial structure. The second layer is structured accordingly. 
+The output tells us a number of things. Firstly, the layer consists of two sets of parameters: `dense0_weight` and `dense0_bias`, as we would expect. They are both single precision and they have the necessary shapes that we would expect from the first layer, given that the input dimension is 20 and the output dimension 256. In particular the names of the parameters are very useful since they allow us to identify parameters *uniquely* even in a network of hundreds of layers and with nontrivial structure. The second layer is structured accordingly.
 
 ### Targeted Parameters
 
@@ -117,14 +117,14 @@ rgnet[0][1][0].bias.data()
 
 ## Parameter Initialization
 
-Now that we know how to access the parameters, let's look at how to initialize them properly. We discussed the need for [Initialization](../chapter_deep-learning-basics/numerical-stability-and-init.md) in the previous chapter. By default, MXNet initializes the weight matrices uniformly by drawing from $U[-0.07, 0.07]$ and the bias parameters are all set to $0$. However, we often need to use other methods to initialize the weights. MXNet's `init` module provides a variety of preset initialization methods, but if we want something out of the ordinary, we need a bit of extra work. 
+Now that we know how to access the parameters, let's look at how to initialize them properly. We discussed the need for [Initialization](../chapter_deep-learning-basics/numerical-stability-and-init.md) in the previous chapter. By default, MXNet initializes the weight matrices uniformly by drawing from $U[-0.07, 0.07]$ and the bias parameters are all set to $0$. However, we often need to use other methods to initialize the weights. MXNet's `init` module provides a variety of preset initialization methods, but if we want something out of the ordinary, we need a bit of extra work.
 
 ### Built-in Initialization
 
 Let's begin with the built-in initializers. The code below initializes all parameters with Gaussian random variables.
 
 ```{.python .input  n=9}
-# force_reinit ensures that the variables are initialized again, regardless of whether they were 
+# force_reinit ensures that the variables are initialized again, regardless of whether they were
 # already initialized previously.
 net.initialize(init=init.Normal(sigma=0.01), force_reinit=True)
 net[0].weight.data()[0]
@@ -214,12 +214,12 @@ The above exampe shows that the parameters of the second and third layer are tie
 
 ## Problems
 
-1. Use the FancyMLP definition of the [previous section](model-construction.md) and access the parameters of the various layers. 
-1. Look at the [MXNet documentation](http://beta.mxnet.io/api/gluon-related/mxnet.initializer.html) and explore different initializers. 
+1. Use the FancyMLP definition of the [previous section](model-construction.md) and access the parameters of the various layers.
+1. Look at the [MXNet documentation](http://beta.mxnet.io/api/gluon-related/mxnet.initializer.html) and explore different initializers.
 1. Try accessing the model parameters after `net.initialize()` and before `net(x)` to observe the shape of the model parameters. What changes? Why?
 1. Construct a multilayer perceptron containing a shared parameter layer and train it. During the training process, observe the model parameters and gradients of each layer.
 1. Why is sharing parameters a good idea?
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/987)
+## Discuss on our Forum
 
-![](../img/qr_parameters.svg)
+<div id="discuss" topic_id="2326"></div>

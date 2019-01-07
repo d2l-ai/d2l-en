@@ -203,13 +203,12 @@ We can see that the three lines of print statements defined in the `hybrid_forwa
 * Models constructed by the HybridSequential and HybridBlock classes are able to convert imperative program into symbolic program by calling the `hybridize` function. We recommend using this method to improve computing performance.
 
 
-## exercise
+## Problems
 
 * Add `x.asnumpy()` to the first line of the `hybrid_forward` function of the HybridNet class in this section, run all the code in this section, and observe any error types and locations
 * What happens if we add the Python statements `if` and `for` in the `hybrid_forward` function?
 * Review the models that interest you in the previous chapters and use the HybridBlock class or HybridSequential class to implement them.
 
+## Discuss on our Forum
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/1665)
-
-![](../img/qr_hybridize.svg)
+<div id="discuss" topic_id="2380"></div>

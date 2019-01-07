@@ -67,14 +67,14 @@ gb.train_gluon_ch7('adadelta', {'rho': 0.9}, features, labels)
 
 * Adadelta has no learning rate hyperparameter, it uses an EWMA on the squares of elements in the variation of the independent variable to replace the learning rate.
 
-## exercise
+## Problems
 
 * Adjust the value of $\rho$ and observe the experimental results.
-
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/2277)
-
-![](../img/qr_adadelta.svg)
 
 ## Reference
 
 [1] Zeiler, M. D. (2012). ADADELTA: an adaptive learning rate method. arXiv preprint arXiv:1212.5701.
+
+## Discuss on our Forum
+
+<div id="discuss" topic_id="2377"></div>

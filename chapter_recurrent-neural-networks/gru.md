@@ -1,5 +1,7 @@
 # Gated Recurrent Unit (GRU)
 
+@TODO(smolix/astonzhang): the data set was just changed from lyrics to time machine, so descriptions/hyperparameters have to change.
+
 In the previous section, we discussed gradient calculation methods in recurrent neural networks. We found that, when the number of time steps is large or the time step is small, the gradients in recurrent neural networks are prone to vanishing or explosion. Although gradient clipping can cope with gradient explosion, it cannot solve the vanishing gradient problem. Therefore, it is generally quite difficult to capture dependencies for time series with large time step distances during the actual use of recurrent neural networks.
 
 Gated recurrent neural networks were proposed as a way to better capture dependencies for time series with large time step distances. Such a network uses learnable gates to control the flow of information. One common type of gated recurrent neural network is a gated recurrent unit (GRU) [1, 2]. Another common type of gated recurrent neural network is discussed in the next section.
@@ -62,12 +64,15 @@ We can summarize the design of GRUs as follows:
 To implement and display a GRU, we will again use the Jay Chou lyrics data set to train the model to compose song lyrics. The implementation, except for the GRU, has already been described in the ["Recurrent Neural Network"](rnn.md) section. The code for reading the data set is given below:
 
 ```{.python .input  n=1}
+import sys
+sys.path.insert(0, '..')
+
 import gluonbook as gb
 from mxnet import nd
 from mxnet.gluon import rnn
 
 (corpus_indices, char_to_idx, idx_to_char,
- vocab_size) = gb.load_data_jay_lyrics()
+ vocab_size) = gb.load_data_time_machine()
 ```
 
 ## Implementation from Scratch
@@ -136,7 +141,7 @@ During model training, we only use adjacent examples. After setting the hyper-pa
 
 ```{.python .input  n=5}
 num_epochs, num_steps, batch_size, lr, clipping_theta = 160, 35, 32, 1e2, 1e-2
-pred_period, pred_len, prefixes = 40, 50, ['分开', '不分开']
+pred_period, pred_len, prefixes = 40, 50, ['traveller', 'time traveller']
 ```
 
 We create a string of lyrics based on the currently trained model every 40 epochs.
@@ -170,20 +175,18 @@ gb.train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
 * Update gates help capture long-term dependencies in time series.
 
 
-## exercise
+## Problems
 
 * Assume that time step $t' < t$. If we only want to use the input for time step $t'$ to predict the output at time step $t$, what are the best values for the reset and update gates for each time step?
 * Adjust the hyper-parameters and observe and analyze the impact on running time, perplexity, and the written lyrics.
 * Compare the running times of a GRU and ungated recurrent neural network under the same conditions.
-
-
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/4042)
-
-![](../img/qr_gru.svg)
-
 
 ## References
 
 [1] Cho, K., Van Merriënboer, B., Bahdanau, D., & Bengio, Y. (2014). On the properties of neural machine translation: Encoder-decoder approaches. arXiv preprint arXiv:1409.1259.
 
 [2] Chung, J., Gulcehre, C., Cho, K., & Bengio, Y. (2014). Empirical evaluation of gated recurrent neural networks on sequence modeling. arXiv preprint arXiv:1412.3555.
+
+## Discuss on our Forum
+
+<div id="discuss" topic_id="2367"></div>

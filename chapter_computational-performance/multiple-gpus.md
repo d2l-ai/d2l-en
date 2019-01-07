@@ -133,7 +133,7 @@ Now we can implement multi-GPU training on a single mini-batch. Its implementati
 ```{.python .input  n=10}
 def train_batch(X, y, gpu_params, ctx, lr):
     # When ctx contains multiple GPUs, mini-batches of data instances are divided and copied to each GPU.
-    gpu_Xs, gpu_ys = split_and_load(X, ctx), split_and_load(y, ctx) 
+    gpu_Xs, gpu_ys = split_and_load(X, ctx), split_and_load(y, ctx)
     with autograd.record():  # Loss is calculated separately on each GPU.
         ls = [loss(lenet(gpu_X, gpu_W), gpu_y)
               for gpu_X, gpu_y, gpu_W in zip(gpu_Xs, gpu_ys, gpu_params)]
@@ -192,12 +192,11 @@ train(num_gpus=2, batch_size=256, lr=0.2)
 * We can use data parallelism to more fully utilize the computational resources of multiple GPUs to implement multi-GPU model training.
 * With the same hyper-parameters, the training accuracy of the model is roughly equivalent when we change the number of GPUs.
 
-## exercise
+## Problems
 
 * In a multi-GPU training experiment, use 2 GPUs for training and double the `batch_size` to 512. How does the training time change? If we want a test accuracy comparable with the results of single-GPU training, how should the learning rate be adjusted?
 * Change the model prediction part of the experiment to multi-GPU prediction.
 
+## Discuss on our Forum
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/1884)
-
-![](../img/qr_multiple-gpus.svg)
+<div id="discuss" topic_id="2383"></div>

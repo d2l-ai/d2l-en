@@ -1,5 +1,6 @@
 # Long Short-term Memory (LSTM)
 
+@TODO(smolix/astonzhang): the data set was just changed from lyrics to time machine, so descriptions/hyperparameters have to change.
 
 This section describes another commonly used gated recurrent neural network: long short-term memory (LSTM) [1]. Its structure is slightly more complicated than that of a gated recurrent unit.
 
@@ -71,12 +72,15 @@ The tanh function here ensures that the hidden state element value is between -1
 Below we begin to implement and display LSTM. As with the experiments in the previous sections, we still use the lyrics of the Jay Chou data set to train the model to write lyrics.
 
 ```{.python .input  n=1}
+import sys
+sys.path.insert(0, '..')
+
 import gluonbook as gb
 from mxnet import nd
 from mxnet.gluon import rnn
 
 (corpus_indices, char_to_idx, idx_to_char,
- vocab_size) = gb.load_data_jay_lyrics()
+ vocab_size) = gb.load_data_time_machine()
 ```
 
 ## Implementation from Scratch
@@ -151,7 +155,7 @@ As in the previous section, during model training, we only use adjacent sampling
 
 ```{.python .input  n=5}
 num_epochs, num_steps, batch_size, lr, clipping_theta = 160, 35, 32, 1e2, 1e-2
-pred_period, pred_len, prefixes = 40, 50, ['分开', '不分开']
+pred_period, pred_len, prefixes = 40, 50, ['traveller', 'time traveller']
 ```
 
 We create a string of lyrics based on the currently trained model every 40 epochs.
@@ -184,18 +188,17 @@ gb.train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
 * LSTM can cope with the gradient attenuation problem in the recurrent neural networks and better capture dependencies for time series with large time step distances.
 
 
-## exercise
+## Problems
 
 * Adjust the hyper-parameters and observe and analyze the impact on running time, perplexity, and the written lyrics.
 * Under the same conditions, compare the running time of an LSTM, GRU and recurrent neural network without gates.
 * Since the candidate memory cells ensure that the value range is between -1 and 1 using the tanh function, why does the hidden state need to use the tanh function again to ensure that the output value range is between -1 and 1?
 
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/4049)
-
-![](../img/qr_lstm.svg)
-
-
 ## References
 
 [1] Hochreiter, S., & Schmidhuber, J. (1997). Long short-term memory. Neural computation, 9(8), 1735-1780.
+
+## Discuss on our Forum
+
+<div id="discuss" topic_id="2368"></div>

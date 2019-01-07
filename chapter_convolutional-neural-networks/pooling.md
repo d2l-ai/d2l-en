@@ -1,8 +1,8 @@
 # Pooling
 
-As we process images (or other data sources) we will eventually want to reduce the resolution of the images. After all, we typically want to output an estimate that does not depend on the dimensionality of the original image. Secondly, when detecting lower-level features, such as edge detection (we covered this in the section on [convolutional layers](conv-layer.md)), we often want to have some degree of invariance to translation. For instance, if we take the image `X` with a sharp delineation between black and white and if we shift it by one pixel to the right, i.e. `Z[i,j] = X[i,j+1]`, then the output for for the new image `Z` will be vastly different. The edge will have shifted by one pixel and with it all the activations. In reality objects hardly ever occur exactly at the same place. In fact, even with a tripod and a stationary object, vibration of the camera due to the movement of the shutter might shift things by a pixel or so (this is why high end cameras have a special option to fix this). Given that, we need a mathematical device to address the problem. 
+As we process images (or other data sources) we will eventually want to reduce the resolution of the images. After all, we typically want to output an estimate that does not depend on the dimensionality of the original image. Secondly, when detecting lower-level features, such as edge detection (we covered this in the section on [convolutional layers](conv-layer.md)), we often want to have some degree of invariance to translation. For instance, if we take the image `X` with a sharp delineation between black and white and if we shift it by one pixel to the right, i.e. `Z[i,j] = X[i,j+1]`, then the output for for the new image `Z` will be vastly different. The edge will have shifted by one pixel and with it all the activations. In reality objects hardly ever occur exactly at the same place. In fact, even with a tripod and a stationary object, vibration of the camera due to the movement of the shutter might shift things by a pixel or so (this is why high end cameras have a special option to fix this). Given that, we need a mathematical device to address the problem.
 
-This section introduces pooling layers, which were proposed to alleviate the excessive sensitivity of the convolutional layer to location and to reduce the resolution of images through the processing pipeline. 
+This section introduces pooling layers, which were proposed to alleviate the excessive sensitivity of the convolutional layer to location and to reduce the resolution of images through the processing pipeline.
 
 ## Maximum Pooling and Average Pooling
 
@@ -19,7 +19,7 @@ $$
 \max(4,5,7,8)=8.\\
 $$
 
-Average pooling works like maximum pooling, only with the maximum operator replaced by the average operator. The pooling layer with a pooling window shape of $p \times q$ is called the $p \times q$ pooling layer. The pooling operation is called $p \times q$ pooling. 
+Average pooling works like maximum pooling, only with the maximum operator replaced by the average operator. The pooling layer with a pooling window shape of $p \times q$ is called the $p \times q$ pooling layer. The pooling operation is called $p \times q$ pooling.
 
 Let us return to the object edge detection example mentioned at the beginning of this section. Now we will use the output of the convolutional layer as the input for $2\times 2$ maximum pooling. Set the convolutional layer input as `X` and the pooling layer output as `Y`. Whether or not the values of `X[i, j]` and `X[i, j+1]` are different, or `X[i, j+1]` and `X[i, j+2]` are different, the pooling layer outputs all include `Y[i, j]=1`. That is to say, using the $2\times 2$ maximum pooling layer, we can still detect if the pattern recognized by the convolutional layer moves no more than one element in height and width.
 
@@ -37,7 +37,7 @@ def pool2d(X, pool_size, mode='max'):
             if mode == 'max':
                 Y[i, j] = X[i: i + p_h, j: j + p_w].max()
             elif mode == 'avg':
-                Y[i, j] = X[i: i + p_h, j: j + p_w].mean()       
+                Y[i, j] = X[i: i + p_h, j: j + p_w].mean()
     return Y
 ```
 
@@ -105,7 +105,7 @@ pool2d(X)
 * Taking the input elements in the pooling window, the maximum pooling operation assigns the maximum value as the output and the average pooling operation assigns the average value as the output.
 * One of the major functions of a pooling layer is to alleviate the excessive sensitivity of the convolutional layer to location.
 * We can specify the padding and stride for the pooling layer.
-* Maximum pooling, combined with a stride larger than 1 can be used to reduce the resolution. 
+* Maximum pooling, combined with a stride larger than 1 can be used to reduce the resolution.
 * The pooling layer's number of output channels is the same as the number of input channels.
 
 
@@ -117,7 +117,6 @@ pool2d(X)
 1. Do we need a separate minimum pooling layer? Can you replace it with another operation?
 1. Is there another operation between average and maximum pooling that you could consider (hint - recall the softmax)? Why might it not be so popular?
 
+## Discuss on our Forum
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/6406)
-
-![](../img/qr_pooling.svg)
+<div id="discuss" topic_id="2352"></div>

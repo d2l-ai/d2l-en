@@ -199,7 +199,7 @@ predict_sentiment(net, vocab, ['this', 'movie', 'is', 'so', 'bad'])
 * We can apply pre-trained word vectors and recurrent neural networks to classify the emotions in a text.
 
 
-## exercise
+## Problems
 
 * Increase the number of epochs. What accuracy rate can you achieve on the training and testing data sets? What about trying to re-tune other hyper-parameters?
 
@@ -208,12 +208,13 @@ predict_sentiment(net, vocab, ['this', 'movie', 'is', 'so', 'bad'])
 * Can we improve the classification accuracy by using the spaCy word tokenization tool? You need to install spaCy: `pip install spacy` and install the English package: `python -m spacy download en`. In the code, first import spacy: `import spacy`. Then, load the spacy English package: `spacy_en = spacy.load('en')`. Finally, define the function `def tokenizer(text): return [tok.text for tok in spacy_en.tokenizer(text)]` and replace the original `tokenizer` function. It should be noted that GloVe's word vector uses "-" to connect each word when storing noun phrases. For example, the phrase "new york" is represented as "new-york" in GloVe. After using spaCy tokenization, "new york" may be stored as "new york".
 
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/6155)
 
-
-![](../img/qr_sentiment-analysis.svg)
 
 
 ## Reference
 
 [1] Maas, A. L., Daly, R. E., Pham, P. T., Huang, D., Ng, A. Y., & Potts, C. (2011, June). Learning word vectors for sentiment analysis. In Proceedings of the 49th annual meeting of the association for computational linguistics: Human language technologies-volume 1 (pp. 142-150). Association for Computational Linguistics.
+
+## Discuss on our Forum
+
+<div id="discuss" topic_id="2391"></div>

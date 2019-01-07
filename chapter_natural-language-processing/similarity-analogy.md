@@ -1,10 +1,10 @@
-# Seeking Synonyms and Analogies
+# Finding Synonyms and Analogies
 
-In the ["Implementation of Word2vec"](./word2vec-gluon.md) section, we trained a word2vec word embedding model on a small-scale data set and searched for synonyms using the cosine similarity of word vectors. In practice, word vectors pre-trained on a large-scale corpus can often be applied to downstream natural language processing tasks. This section will demonstrate how to use these pre-trained word vectors to find synonyms and analogies. We will continue to apply pre-trained word vectors in later chapters.
+In the ["Implementation of Word2vec"](./word2vec-gluon.md) section, we trained a word2vec word embedding model on a small-scale data set and searched for synonyms using the cosine similarity of word vectors. In practice, word vectors pre-trained on a large-scale corpus can often be applied to downstream natural language processing tasks. This section will demonstrate how to use these pre-trained word vectors to find synonyms and analogies. We will continue to apply pre-trained word vectors in subsequent sections.
 
 ## Using Pre-trained Word Vectors
 
-MXNet's `contrib.text` package provides functions and classes related to natural language processing (see the GluonNLP tool package[1] for more details). Next, we will look at the name of the pre-trained word embeddings it currently provides.
+MXNet's `contrib.text` package provides functions and classes related to natural language processing (see the GluonNLP tool package[1] for more details). Next, let us check out names of the provided pre-trained word embeddings.
 
 ```{.python .input}
 from mxnet import nd
@@ -42,7 +42,7 @@ glove_6b50d.token_to_idx['beautiful'], glove_6b50d.idx_to_token[3367]
 
 Below, we demonstrate the application of pre-trained word vectors, using GloVe as an example.
 
-### Seeking Synonyms
+### Finding Synonyms
 
 Here, we re-implement the algorithm used to search for synonyms by cosine similarity introduced in the ["Implementation of Word2vec"](./word2vec-gluon.md) section. In order to reuse the logic for seeking the $k$ nearest neighbors when seeking analogies, we encapsulate this part of the logic separately in the `knn` ($k$-nearest neighbors) function.
 
@@ -80,7 +80,7 @@ get_similar_tokens('baby', 3, glove_6b50d)
 get_similar_tokens('beautiful', 3, glove_6b50d)
 ```
 
-### Seeking Analogies
+### Finding Analogies
 
 In addition to seeking synonyms, we can also use the pre-trained word vector to seek the analogies between words. For example, “man”:“woman”::“son”:“daughter” is an example of analogy, “man” is to “woman” as “son” is to “daughter”. The problem of seeking analogies can be defined as follows: for four words in the analogical relationship $a : b :: c : d$, given the first three words, $a$, $b$ and $c$, we want to find $d$. Assume the word vector for the word $w$ is $\text{vec}(w)$. To solve the analogy problem, we need to find the word vector that is most similar to the result vector of $\text{vec}(c)+\text{vec}(b)-\text{vec}(a)$.
 
@@ -104,7 +104,7 @@ get_analogy('man', 'woman', 'son', glove_6b50d)
 get_analogy('beijing', 'china', 'tokyo', glove_6b50d)
 ```
 
-"Adjective-superlative adjective" analogy: "bad" is to "worst" and "big" is to what? The answer should be "biggest".
+"Adjective-superlative adjective" analogy: "bad" is to "worst" as "big" is to what? The answer should be "biggest".
 
 ```{.python .input  n=20}
 get_analogy('bad', 'worst', 'big', glove_6b50d)
@@ -122,15 +122,13 @@ get_analogy('do', 'did', 'go', glove_6b50d)
 * We can use pre-trained word vectors to seek synonyms and analogies.
 
 
-## exercise
+## Problems
 
-* Test the fastText results. It is worth mentioning that fastText has a pre-trained Chinese word vector (pretrained_file_name='wiki.zh.vec').
-* If the dictionary is extremely large, how can we improve the synonym and analogy search speed?
+* Test the fastText results.
+* If the dictionary is extremely large, how can we accelerate finding synonyms and analogies?
 
 
-## Scan the QR Code to Access [Discussions](https://discuss.gluon.ai/t/topic/4373)
 
-![](../img/qr_similarity-analogy.svg)
 
 ## Reference
 
@@ -139,3 +137,7 @@ get_analogy('do', 'did', 'go', glove_6b50d)
 [2] GloVe project website. https://nlp.stanford.edu/projects/glove/
 
 [3] fastText project website. https://fasttext.cc/
+
+## Discuss on our Forum
+
+<div id="discuss" topic_id="2390"></div>
