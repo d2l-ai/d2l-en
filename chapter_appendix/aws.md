@@ -1,64 +1,46 @@
 # Using AWS to Run Code
 
-If your local machine has limited computing resources, you can use cloud computing services to obtain more powerful computing resources and use them to run the deep learning code in this document. In this section, we will show you how to apply for instances and use Jupyter Notebook to run code on AWS (Amazon's cloud computing service). The example here includes two steps:
+This tutorial will guide you through Amazon SageMaker: a service that allows you to be up and running with MXNet in 5 minutes and to do Machine Learning at large scale in the quickest and easiest way possible.
 
-1. Apply for a K80 GPU "p2.xlarge" instance.
-2. Install CUDA and the corresponding MXNet GPU version.
+Deep Learning projects usually consist of a set of problem tasks: for instance you may have to create training datasets, train and evaluate your model, tune its hyperparameters and finally deploy the model to a production ready cluster. This workflow can be quite cumbersome and time consuming. For this reason AWS provides Amazon SageMaker a fully managed machine learning service that accelerates the overall Deep Learning workflow.
 
-The process to apply for other instance types and install other MXNet versions is basically the same as that described here.
-
-
-## Apply for an Account and Log In
-
-First, we need to register an account at https://aws.amazon.com/. It usually requires a credit card.
-
-After logging into your AWS account, click "EC2" (marked by the red box in Figure 11.8) to go to the EC2 panel.
-
-![ Log into your AWS account. ](../img/aws.png)
+User who only need compute instances rather than a fully managed Machine Learning service should follow chapter [Run on an EC2 instance](use_ec2.md#run-on-an-ec2-instance). EC2 provides specialized Deep Learning images so developers can start training their models right away without the hassle of installing driver and software frameworks.
 
 
-## Create and Run an EC2 Instance
+## Run on Amazon SageMaker
+This chapter will give a high level overview about Amazon SageMaker, in-depth tutorials can be found on the [Sagemaker website](https://docs.aws.amazon.com/sagemaker/latest/dg/whatis.html).
 
-Figure 11.9 shows the EC2 panel. In the area marked by the red box in Figure 11.9, select a nearby data center to reduce latency. If you are located in China you can select a nearby Asia Pacific region, such as Asia Pacific (Seoul). Please note that some data centers may not have GPU instances. Click the "Launch Instance" button marked by the red box in Figure 11.8 to launch your instance.
+<img src="img/sagemaker.png" width="700"/>
 
-![ EC2 panel. ](../img/ec2.png)
-
-
-AWS offers [Deep Learning AMIs](https://docs.aws.amazon.com/dlami/latest/devguide/options.html)
-that come with the latest versions of Deep Learning frameworks. The Deep Learning AMIs provide
-all necessary packages and drivers and allow you to directly start implementing
-and training your models. Deep Learning AMIs use optimized binaries, which accelerate model training and inference.
-AWS also offers DL Base AMIs that are useful for users that need their own custom Deep Learning environment. In this tutorial we use Deep Learning AMI (Ubuntu) Version 19.0:
-
-![ Choose an operating system. ](../img/os.png)
-
-In "Step 2: Chosse an Instance Type”，choose a "p2.xlarge" instance with K80 GPU. We can also choose instances with multiple GPUs such as "p2.16xlarge". If you want to compare machine configurations and fees of different instances, you may refer to https://www.ec2instances.info/.
-
-![ Choose an instance. ](../img/p2x.png)
-
-Before choosing an instance, we suggest you check if there are quantity restrictions by clicking the "Limits" label in the bar on the, as left shown in Figure 11.9. As shown in Figure 11.12, this account can only open one "p2.xlarge" instance per region. If you need to open more instances, click on the "Request limit increase" link to apply for a higher instance quota. Generally, it takes one business day to process an application.
-
-![ Instance quantity restrictions. ](../img/limits.png)
-
-In this example, we keep the default configurations for the steps "3. Configure Instance", "5. Add Tags", and "6. Configure Security Group". Tap on "4. Add Storage" and increase the default hard disk size to 40 GB. Note that you will need about 4 GB to install CUDA.
-
-![ Modify instance hard disk size. ](../img/disk.png)
-
-
-Finally, go to "7. Review" and click "Launch" to launch the configured instance. The system will now prompt you to select the key pair used to access the instance. If you do not have a key pair, select "Create a new key pair" in the first drop-down menu in Figure 11.14 to generate a key pair. Subsequently, you can select "Choose an existing key pair" for this menu and then select the previously generated key pair. Click "Launch Instances" to launch the created instance.
-
-![ Select a key pair. ](../img/keypair.png)
-
-Click the instance ID shown in Figure 11.15 to view the status of this instance.
-
-![C lick the instance ID. ](../img/launching.png)
-
-As shown in Figure 11.16, after the instance state turns green, right-click the instance and select "Connect" to view the instance access method. For example, enter the following in the command line:
-
+SageMaker offers Jupyter notebooks and supports MXNet out-of-the box. You can run your notebooks on CPU instances and as such profit from  the free tier. However, more powerful CPU instances or GPU instances are charged by time.
+Within this notebook you can [fetch, explore and prepare training data](https://docs.aws.amazon.com/sagemaker/latest/dg/how-it-works-notebooks-instances.html). 
 ```
-ssh -i "/path/to/key.pem" ubuntu@ec2-xx-xxx-xxx-xxx.y.compute.amazonaws.com
+import mxnet as mx
+import sagemaker
+mx.test_utils.get_cifar10() # Downloads Cifar-10 dataset to ./data
+sagemaker_session = sagemaker.Session()
+inputs = sagemaker_session.upload_data(path='data/cifar',
+                                       key_prefix='data/cifar10')
+```
+Once the data is ready, you can easily launch training via the SageMaker SDK. So there is no need to manually configure and log into EC2 instances. You can either bring your own model or use SageMaker's [built-in algorithms](https://docs.aws.amazon.com/sagemaker/latest/dg/algos.html) that are tailored to specific use cases such as computer vision, NLP etc. SageMaker encapsulates the process of training into the class ```Estimator``` and we can now start the training on the local notebook instance:
+```
+from sagemaker.mxnet import MXNet as MXNetEstimator
+estimator = MXNetEstimator(entry_point='train.py', 
+                           role=sagemaker.get_execution_role(),
+                           train_instance_count=1, 
+                           train_instance_type='local',
+                           hyperparameters={'batch_size': 1024, 
+                                            'epochs': 30})
+estimator.fit(inputs)
+```
+If you require a more powerful platform for training, then you only need to change the ```train_instance_type```. Once you call ```fit```, SageMaker will automatically create the required EC2 instances, train your model within a Docker container and then immediately shutdown these instances. ```Fit()``` requires an entry point (here ```train.py```) that describes the model and training loop. This script needs to provide certain functions, that will be automatically executed by SageMaker. More information about the entry point script can be found [here](https://docs.aws.amazon.com/sagemaker/latest/dg/mxnet-training-inference-code-template.html).
+When the model is ready for deployment you can use [SageMaker's hosting services](https://docs.aws.amazon.com/sagemaker/latest/dg/how-it-works-hosting.html) that create an HTTPS endpoint where model inference is provided.
+```
+predictor = estimator.deploy(initial_instance_count=1,
+                             instance_type='ml.m4.xlarge')
 ```
 
+<<<<<<< Updated upstream
 Here, "/path/to/key.pem" is the path of the locally-stored key used to access the instance. When the command line prompts "Are you sure you want to continue connecting (yes/no)", enter "yes" and press Enter to log into the instance.
 
 
@@ -71,6 +53,13 @@ With the given address, we can log into our instance:
 
 The login screen will show a long list of available conda environments for the different Deep Learning frameworks, CUDA driver and Python versions. With ```conda activate``` you can easily switch into the different environments.
 
+The following links show more advanced uses cases in SageMaker:
+  - [Distributed training on multiple machines](https://medium.com/apache-mxnet/94-accuracy-on-cifar-10-in-10-minutes-with-amazon-sagemaker-754e441d01d7) 
+  - [Hyperparameter Tuning Jobs](https://docs.aws.amazon.com/sagemaker/latest/dg/automatic-model-tuning-ex.html)
+  - [Optimize a model with SageMaker Neo](https://docs.aws.amazon.com/sagemaker/latest/dg/neo.html)
+  - [Build Groundtruth Datasets](https://docs.aws.amazon.com/sagemaker/latest/dg/sms-getting-started.html)
+  - [Getting started with SageMaker](https://medium.com/apache-mxnet/getting-started-with-sagemaker-ebe1277484c9)
+  
 ## Acquire the Code for this Book and activate MXNet GPU environment
 
 Next, download the code for this book and install and activate the Conda environment.
