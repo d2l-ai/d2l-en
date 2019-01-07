@@ -554,7 +554,8 @@ $Tr(\mathbf{A}) = \sum_{i}\lambda_{i}, \;\;\lambda_{i} = eig(\mathbf{A})$ (Eqn: 
 $Tr(\mathbf{A}) = Tr(\mathbf{A}^{T})$ (Eqn: 13)
 $Tr(\mathbf{AB}) = Tr(\mathbf{BA})$ (Eqn: 14)
 $Tr(\mathbf{A}+\mathbf{B}) = Tr(\mathbf{A}) + Tr(\mathbf{B})$ (Eqn: 15)
-$Tr(\mathbf{ABC}) = Tr(\mathbf{BCA}) = Tr(\mathbf{CAB})\mathbf{a}^{T}\mathbf{a} = Tr(\mathbf{a}\mathbf{a}^{T})$ (Eqn: 16)
+$Tr(\mathbf{ABC}) = Tr(\mathbf{BCA}) = Tr(\mathbf{CAB})$ (Eqn: 16)
+$Tr(\mathbf{a}^{T}\mathbf{a}) = Tr(\mathbf{a}\mathbf{a}^{T})$ (Eqn: 17)
 
 ```{.python .input}
 # equation 11:
