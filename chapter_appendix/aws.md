@@ -10,7 +10,7 @@ User who only need compute instances rather than a fully managed Machine Learnin
 ## Run on Amazon SageMaker
 This chapter will give a high level overview about Amazon SageMaker, in-depth tutorials can be found on the [Sagemaker website](https://docs.aws.amazon.com/sagemaker/latest/dg/whatis.html).
 
-<img src="https://github.com/NRauschmayr/d2l-en/blob/aws_updated/img/sagemaker.png" width="700"/>
+<img src="https://raw.githubusercontent.com/NRauschmayr/d2l-en/aws_updated/img/sagemaker.png" width="700"/>
 
 SageMaker offers Jupyter notebooks and supports MXNet out-of-the box. You can run your notebooks on CPU instances and as such profit from  the free tier. However, more powerful CPU instances or GPU instances are charged by time.
 Within this notebook you can [fetch, explore and prepare training data](https://docs.aws.amazon.com/sagemaker/latest/dg/how-it-works-notebooks-instances.html). 
@@ -46,7 +46,20 @@ The following links show more advanced uses cases in SageMaker:
   - [Optimize a model with SageMaker Neo](https://docs.aws.amazon.com/sagemaker/latest/dg/neo.html)
   - [Build Groundtruth Datasets](https://docs.aws.amazon.com/sagemaker/latest/dg/sms-getting-started.html)
   - [Getting started with SageMaker](https://medium.com/apache-mxnet/getting-started-with-sagemaker-ebe1277484c9)
-  
+
+## Acquire the Code for this Book and activate MXNet GPU environment
+
+Next, download the code for this book and and unzip it. Go to you notebook instance and create a new cell with the following content:
+
+```%%bash
+%%bash
+wget https://www.diveintodeeplearning.org/d2l-en-1.0.zip 
+unzip d2l-en-1.0.zip 
+```
+
+When you open Jupyter, you will find the downloaded and unzipped chapters. Now you can pick any available notebook. 
+
+<img src="https://raw.githubusercontent.com/NRauschmayr/d2l-en/aws_updated/img/jupyter_sagemaker.png" width="700"/>
 
 ## Summary
 
