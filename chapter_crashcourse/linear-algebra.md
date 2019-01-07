@@ -472,6 +472,154 @@ There are a number of special matrices that we will use throughout this tutorial
 * **Diagonally Dominant Matrix** These are matrices where the off-diagonal elements are small relative to the main diagonal elements. In particular we have that $M_{ii} \geq \sum_{j \neq i} M_{ij}$ and $M_{ii} \geq \sum_{j \neq i} M_{ji}$. If a matrix has this property, we can often approximate $M$ by its diagonal. This is often expressed as $\mathrm{diag}(M)$.
 * **Positive Definite Matrix** These are matrices that have the nice property where $x^\top M x > 0$ whenever $x \neq 0$. Intuitively, they are a generalization of the squared norm of a vector $\|x\|^2 = x^\top x$. It is easy to check that whenever $M = A^\top A$, this holds since there $x^\top M x = x^\top A^\top A x = \|A x\|^2$. There is a somewhat more profound theorem which states that all positive definite matrices can be written in this form.
 
+### Basic matrix properties
+
+\begin{align}
+\label{eqn:1}
+(\mathbf{A}\mathbf{B})^{-1} &= \mathbf{B}^{-1}\mathbf{A}^{-1} \\
+\label{eqn:2}
+(\mathbf{ABC\ldots})^{-1} &= \ldots\mathbf{C}^{-1}\mathbf{B}^{-1}\mathbf{A}^{-1} \\
+\label{eqn:3}
+(\mathbf{A}^{T})^{-1} &= (\mathbf{A}^{-1})^{T} \\
+\label{eqn:4}
+(\mathbf{A} + \mathbf{B})^{T} &= \mathbf{A}^{T} + \mathbf{B}^{T} \\
+\label{eqn:5}
+(\mathbf{AB})^{T} &= \mathbf{B}^{T}\mathbf{A}^{T} \\
+\label{eqn:6}
+(\mathbf{ABC\ldots})^{T} &= \ldots\mathbf{C}^{T}\mathbf{B}^{T}\mathbf{A}^{T} \\
+\label{eqn:7}
+(\mathbf{A}^{H})^{-1} &= (\mathbf{A}^{-1})^{H} \\
+\label{eqn:8}
+(\mathbf{A} + \mathbf{B})^{H} &= \mathbf{B}^{H} + \mathbf{A}^{H} \\
+\label{eqn:9}
+(\mathbf{AB})^{H} &= \mathbf{B}^{H}\mathbf{A}^{H} \\
+\label{eqn:10}
+(\mathbf{ABC\ldots})^{H} &= \ldots\mathbf{C}^{H}\mathbf{B}^{H}\mathbf{A}^{H} \\
+\end{align}
+
+```{.python .input}
+# lets play with the above equations and equatities to see for ouselves
+# caution the above probably work only for square matrices
+width = 3
+height = 3
+A = np.random.random([width, height])
+B = np.random.random([width, height])
+C = np.random.random([width, height])
+
+
+# validate if results are equal of right and left hand side operations
+def validate(left, right, eqn):
+    print("results equation {}: {} \n".format(eqn, left.all() == right.all()))
+
+# equation 1:
+lft_hand = np.linalg.inv(A.dot(B))
+rgt_hand = np.dot(np.linalg.inv(B), np.linalg.inv(A))
+print("lft_hand = \n {} \n".format(lft_hand))
+print("rgt_hand = \n {} \n".format(rgt_hand))
+#check if results are identical
+validate(lft_hand, rgt_hand, 1)
+
+# equation 2:
+lft_hand = np.linalg.inv(A.dot(B).dot(C))
+rgt_hand = np.dot(np.linalg.inv(C), np.linalg.inv(B)).dot(np.linalg.inv(A))
+print("lft_hand = \n {} \n".format(lft_hand))
+print("rgt_hand = \n {} \n".format(rgt_hand))
+# check results
+validate(lft_hand, rgt_hand, 2)
+
+# equation 3:
+lft_hand = np.linalg.inv(A.T)
+rgt_hand = np.transpose(np.linalg.inv(A))
+print("lft_hand = \n {} \n".format(lft_hand))
+print("rgt_hand = \n {} \n".format(rgt_hand))
+# check results
+validate(lft_hand, rgt_hand, 3)
+
+# equation 4:
+lft_hand = (A+B).T
+rgt_hand = A.T+B.T
+print("lft_hand = \n {} \n".format(lft_hand))
+print("rgt_hand = \n {} \n".format(rgt_hand))
+# check results
+validate(lft_hand, rgt_hand, 4)
+
+# equation 5:
+lft_hand = A.dot(B).T
+rgt_hand = B.T.dot(A.T)
+print("lft_hand = \n {} \n".format(lft_hand))
+print("rgt_hand = \n {} \n".format(rgt_hand))
+# check results
+validate(lft_hand, rgt_hand, 5)
+
+# equation 7:
+lft_hand = np.linalg.inv(np.conjugate(A))
+rgt_hand = np.conjugate(np.linalg.inv(A))
+print("lft_hand = \n {} \n".format(lft_hand))
+print("rgt_hand = \n {} \n".format(rgt_hand))
+# check results
+validate(lft_hand, rgt_hand, 6)
+```
+
+\begin{align}
+Tr(\mathbf{A}) &= \sum_{i} A_{ii} \\
+Tr(\mathbf{A}) &= \sum_{i}\lambda_{i}, \;\;\lambda_{i} = eig(\mathbf{A}) \\
+Tr(\mathbf{A}) &= Tr(\mathbf{A}^{T}) \\
+Tr(\mathbf{AB}) &= Tr(\mathbf{BA}) \\
+Tr(\mathbf{A}+\mathbf{B}) &= Tr(\mathbf{A}) + Tr(\mathbf{B}) \\
+Tr(\mathbf{ABC}) &= Tr(\mathbf{BCA}) = Tr(\mathbf{CAB}) \\
+\vec{a}^{T}\vec{a} &= Tr(\vec{a}\vec{a}^{T})
+\end{align}
+
+```{.python .input}
+# equation 11:
+lft_hand = np.trace(A)
+rgt_hand = np.sum(np.diag(A))
+print("lft_hand = \n {} \n".format(lft_hand))
+print("rgt_hand = \n {} \n".format(rgt_hand))
+# check results
+validate(lft_hand, rgt_hand, 11)
+
+# equation 12:
+lft_hand = np.trace(A)
+rgt_hand = np.sum(np.linalg.eigvals(A))
+print("lft_hand = \n {} \n".format(lft_hand))
+print("rgt_hand = \n {} \n".format(rgt_hand))
+# check results
+validate(lft_hand, rgt_hand, 12)
+
+# equation 13:
+lft_hand = np.trace(A)
+rgt_hand = np.trace(A.T)
+print("lft_hand = \n {} \n".format(lft_hand))
+print("rgt_hand = \n {} \n".format(rgt_hand))
+# check results
+validate(lft_hand, rgt_hand, 13)
+
+# equation 14:
+lft_hand = np.trace(A.dot(B))
+rgt_hand = np.trace(B.dot(A))
+print("lft_hand = \n {} \n".format(lft_hand))
+print("rgt_hand = \n {} \n".format(rgt_hand))
+# check results
+validate(lft_hand, rgt_hand, 14)
+
+# equation 15:
+lft_hand = np.trace(A+B)
+rgt_hand = np.trace(A) + np.trace(B)
+print("lft_hand = \n {} \n".format(lft_hand))
+print("rgt_hand = \n {} \n".format(rgt_hand))
+# check results
+validate(lft_hand, rgt_hand, 15)
+
+# equation 16:
+lft_hand = np.trace(np.dot(A.dot(B), C))
+rgt_hand = np.trace(np.dot(B.dot(C), A))
+print("lft_hand = \n {} \n".format(lft_hand))
+print("rgt_hand = \n {} \n".format(rgt_hand))
+# check results
+validate(lft_hand, rgt_hand, 16)
+```
+
 ## Conclusions
 
 In just a few pages (or one Jupyter notebook) we've taught you all the linear algebra you'll need to understand a good chunk of neural networks. Of course there's a *lot* more to linear algebra. And a lot of that math *is* useful for machine learning. For example, matrices can be decomposed into factors, and these decompositions can reveal low-dimensional structure in real-world datasets. There are entire subfields of machine learning that focus on using matrix decompositions and their generalizations to high-order tensors to discover structure in datasets and solve prediction problems. But this book focuses on deep learning. And we believe you'll be much more inclined to learn more mathematics once you've gotten your hands dirty deploying useful machine learning models on real datasets. So while we reserve the right to introduce more math much later on, we'll wrap up this chapter here.
