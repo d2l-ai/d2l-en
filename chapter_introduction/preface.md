@@ -23,10 +23,10 @@ With these advances in hand, we can now build cars that drive themselves
 (with increasing autonomy), smart reply systems that anticipate mundane replies,
 helping people dig out from mountains of email,
 and software agents that dominate the world's best humans at board games like Go,
-a featonce deemed to be decades away.
+a feat once deemed to be decades away.
 Already, these tools are exerting a widening impact,
 changing the way movies are made, diseases are diagnosed,
-and playing a growing role in basic sciences, from astrophysics to biology.
+and playing a growing role in basic sciences -- from astrophysics to biology.
 This book represents our attempt to make deep learning approachable,
 teaching you both the *concepts*, the *context*, and the *code*.
 
@@ -73,7 +73,7 @@ when we needed to explain MXNet's (then new) Gluon interface to our users.
 At the time, there were no resources that were simultaneously
 (1) up to date, (2) covered the full breadth of modern machine learning
 with anything resembling of technical depth,
-and (3) interleaved the exposition one expects from an egaging textbook
+and (3) interleaved the exposition one expects from an engaging textbook
 with the clean runnable code one seeks in hands-on tutorials.
 We found plenty of code examples for how to use a given deep learning
 framework (e.g. how to do basic numerical computing with matrices in TensorFlow)
@@ -124,13 +124,13 @@ We believe that this might be the first book published using such an integrated 
 Aside from a few preliminary notebooks that provide a crash course
 in the basic mathematical background, each subsequent notebook introduces
 both a reasonable number of new concepts and provides a single
-self-contained working example, using a real dataset.
+self-contained working example -- using a real dataset.
 This presents an organizational challenge. Some models might logically
 be grouped together in a single notebook.  And some ideas might be
 best taught by executing several models in succession.  On the other
 hand, there's a big advantage to adhering to a policy of *1 working
 example, 1 notebook*: This makes it as easy as possible for you to
-start your own research projects by plagiarising our code. Just copy a
+start your own research projects by leveraging our code. Just copy a
 single notebook and start modifying it.
 
 We will interleave the runnable code with background material as needed.
@@ -170,7 +170,7 @@ In other words, you'll learn concepts at the very moment
 that they are needed to accomplish some practical end.
 While we take some time at the outset to teach
 fundamental preliminaries, like linear algebra and probability.
-we want you to taste the satisfaction of training your first model
+We want you to taste the satisfaction of training your first model
 before worrying about more exotic probability distributions.
 
 
