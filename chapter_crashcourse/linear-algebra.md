@@ -474,30 +474,17 @@ There are a number of special matrices that we will use throughout this tutorial
 
 ### Basic matrix properties
 
-```math
-\begin{align}
-\label{eqn:1}
-(\mathbf{A}\mathbf{B})^{-1} &= \mathbf{B}^{-1}\mathbf{A}^{-1} \\
-\label{eqn:2}
-(\mathbf{ABC\ldots})^{-1} &= \ldots\mathbf{C}^{-1}\mathbf{B}^{-1}\mathbf{A}^{-1} \\
-\label{eqn:3}
-(\mathbf{A}^{T})^{-1} &= (\mathbf{A}^{-1})^{T} \\
-\label{eqn:4}
-(\mathbf{A} + \mathbf{B})^{T} &= \mathbf{A}^{T} + \mathbf{B}^{T} \\
-\label{eqn:5}
-(\mathbf{AB})^{T} &= \mathbf{B}^{T}\mathbf{A}^{T} \\
-\label{eqn:6}
-(\mathbf{ABC\ldots})^{T} &= \ldots\mathbf{C}^{T}\mathbf{B}^{T}\mathbf{A}^{T} \\
-\label{eqn:7}
-(\mathbf{A}^{H})^{-1} &= (\mathbf{A}^{-1})^{H} \\
-\label{eqn:8}
-(\mathbf{A} + \mathbf{B})^{H} &= \mathbf{B}^{H} + \mathbf{A}^{H} \\
-\label{eqn:9}
-(\mathbf{AB})^{H} &= \mathbf{B}^{H}\mathbf{A}^{H} \\
-\label{eqn:10}
-(\mathbf{ABC\ldots})^{H} &= \ldots\mathbf{C}^{H}\mathbf{B}^{H}\mathbf{A}^{H} \\
-\end{align}
-```
+$(\mathbf{A}\mathbf{B})^{-1} = \mathbf{B}^{-1}\mathbf{A}^{-1}$ (Eqn: 1)
+$(\mathbf{ABC\ldots})^{-1} = \ldots\mathbf{C}^{-1}\mathbf{B}^{-1}\mathbf{A}^{-1}$  (Eqn: 2)
+$(\mathbf{A}^{T})^{-1} = (\mathbf{A}^{-1})^{T}$ (Eqn: 3)
+$(\mathbf{A} + \mathbf{B})^{T} = \mathbf{A}^{T} + \mathbf{B}^{T}$ (Eqn: 4)
+$(\mathbf{AB})^{T} = \mathbf{B}^{T}\mathbf{A}^{T}$ (Eqn: 5)
+$(\mathbf{ABC\ldots})^{T} = \ldots\mathbf{C}^{T}\mathbf{B}^{T}\mathbf{A}^{T}$ (Eqn: 6)
+$(\mathbf{A}^{H})^{-1} = (\mathbf{A}^{-1})^{H}$ (Eqn: 7)
+$(\mathbf{A} + \mathbf{B})^{H} = \mathbf{B}^{H} + \mathbf{A}^{H}$ (Eqn: 8)
+$(\mathbf{AB})^{H} = \mathbf{B}^{H}\mathbf{A}^{H}$ (Eqn: 9)
+$(\mathbf{ABC\ldots})^{H} = \ldots\mathbf{C}^{H}\mathbf{B}^{H}\mathbf{A}^{H}$ (Eqn: 10)
+
 
 ```{.python .input}
 # lets play with the above equations and equatities to see for ouselves
@@ -507,7 +494,6 @@ height = 3
 A = np.random.random([width, height])
 B = np.random.random([width, height])
 C = np.random.random([width, height])
-
 
 # validate if results are equal of right and left hand side operations
 def validate(left, right, eqn):
@@ -562,15 +548,12 @@ print("rgt_hand = \n {} \n".format(rgt_hand))
 validate(lft_hand, rgt_hand, 6)
 ```
 
-\begin{align}
-Tr(\mathbf{A}) &= \sum_{i} A_{ii} \\
-Tr(\mathbf{A}) &= \sum_{i}\lambda_{i}, \;\;\lambda_{i} = eig(\mathbf{A}) \\
-Tr(\mathbf{A}) &= Tr(\mathbf{A}^{T}) \\
-Tr(\mathbf{AB}) &= Tr(\mathbf{BA}) \\
-Tr(\mathbf{A}+\mathbf{B}) &= Tr(\mathbf{A}) + Tr(\mathbf{B}) \\
-Tr(\mathbf{ABC}) &= Tr(\mathbf{BCA}) = Tr(\mathbf{CAB}) \\
-\vec{a}^{T}\vec{a} &= Tr(\vec{a}\vec{a}^{T})
-\end{align}
+$Tr(\mathbf{A}) = \sum_{i} A_{ii}$ (Eqn: 11)
+$Tr(\mathbf{A}) = \sum_{i}\lambda_{i}, \;\;\lambda_{i} = eig(\mathbf{A})$ (Eqn: 12)
+$Tr(\mathbf{A}) = Tr(\mathbf{A}^{T})$ (Eqn: 13)
+$Tr(\mathbf{AB}) = Tr(\mathbf{BA})$ (Eqn: 14)
+$Tr(\mathbf{A}+\mathbf{B}) = Tr(\mathbf{A}) + Tr(\mathbf{B})$ (Eqn: 15)
+$Tr(\mathbf{ABC}) = Tr(\mathbf{BCA}) = Tr(\mathbf{CAB})\mathbf{a}^{T}\mathbf{a} = Tr(\mathbf{a}\mathbf{a}^{T})$ (Eqn: 16)
 
 ```{.python .input}
 # equation 11:
