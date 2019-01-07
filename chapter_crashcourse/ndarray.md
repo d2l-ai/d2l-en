@@ -99,10 +99,10 @@ have all been *lifted* to element-wise operations for identically-shaped tensors
 x = nd.array([1, 2, 4, 8])
 y = nd.ones_like(x) * 2
 print('x =', x)
-print('x + y', x + x)
-print('x - y', x - x)
-print('x * y', x * x)
-print('x / y', x / x)
+print('x + y', x + y)
+print('x - y', x - y)
+print('x * y', x * y)
+print('x / y', x / y)
 ```
 
 Many more operations can be applied element-wise, such as exponentiation:
