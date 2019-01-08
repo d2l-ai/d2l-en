@@ -209,8 +209,8 @@ As we get more data, the solid curves converge towards the true answer.
 
 
 In our example of casting a die, we introduced the notion of a **random variable**. 
-A random variable, which we denote here as $X$ can be pretty much any quantity and is not determistic. 
-Random variables could take one value among a set of possibilites. 
+A random variable, which we denote here as $X$ can be pretty much any quantity and is not deterministic. 
+Random variables could take one value among a set of possibilities. 
 We denote sets with brackets, e.g., $\{\mathrm{cat}, \mathrm{dog}, \mathrm{rabbit}\}$.
 The items contained in the set are called *elements*,
 and we can say that an element $x$ is *in* the set S, by writing $x \in S$.
@@ -262,7 +262,7 @@ there are several quantities of interest.
 The first is called the joint distribution $\Pr(A, B)$. 
 Given any elements $a$ and $b$,
 the joint distribution lets us answer,
-what is the probability that $A=a$ and $B=b$ simulataneously?
+what is the probability that $A=a$ and $B=b$ simultaneously?
 It might be clear that for any values $a$ and $b$, $\Pr(A,B) \leq \Pr(A=a)$. 
 
 This has to be the case, since for $A$ and $B$ to happen, 
@@ -409,7 +409,7 @@ plt.show()
 print(py)
 ```
 
-Now we can compute the likelihoods of an image, given the model. This is statistican speak for $p(x|y)$, i.e. how likely it is to see a particular image under certain conditions (such as the label). Since this is computationally awkward (we might have to multiply many small numbers if many pixels have a small probability of occurring), we are better off computing its logarithm instead. That is, instead of $p(x|y) = \prod_{i} p(x_i|y)$ we compute $\log p(x|y) = \sum_i \log p(x_i|y)$. 
+Now we can compute the likelihoods of an image, given the model. This is statistician speak for $p(x|y)$, i.e. how likely it is to see a particular image under certain conditions (such as the label). Since this is computationally awkward (we might have to multiply many small numbers if many pixels have a small probability of occurring), we are better off computing its logarithm instead. That is, instead of $p(x|y) = \prod_{i} p(x_i|y)$ we compute $\log p(x|y) = \sum_i \log p(x_i|y)$. 
 
 $$l_y := \sum_i \log p(x_i|y) = \sum_i x_i \log p(x_i = 1|y) + (1-x_i) \log \left(1-p(x_i=1|y)\right)$$
 

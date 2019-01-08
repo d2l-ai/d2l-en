@@ -65,7 +65,7 @@ Next, we will look into two common problems that occur during model training.  O
 
 ### Model Complexity
 
-We use polyomials as a way to illustrate the issue. Given training data consisting of the scalar data feature $x$ and the corresponding scalar label $y$, we try to find a polynomial of degree $d$
+We use polynomials as a way to illustrate the issue. Given training data consisting of the scalar data feature $x$ and the corresponding scalar label $y$, we try to find a polynomial of degree $d$
 
 $$\hat{y}= \sum_{i=0}^d x^i w_i$$
 
@@ -79,7 +79,7 @@ A higher order polynomial function is more complex than a lower order polynomial
 
 ### Data Set Size
 
-Another influence is the amount of training data. Typically, if there are not enough samples in the training data set, especially if the number of samples is less than the number of model parameters (count by element), overfitting is more likely to occur. Additionally, as we increase the amount of training data, the generalization error tpically decreases. This means that more data never hurts. Moreover, it also means that we should typically only use complex models (e.g. many layers) if we have sufficient data.
+Another influence is the amount of training data. Typically, if there are not enough samples in the training data set, especially if the number of samples is less than the number of model parameters (count by element), overfitting is more likely to occur. Additionally, as we increase the amount of training data, the generalization error typically decreases. This means that more data never hurts. Moreover, it also means that we should typically only use complex models (e.g. many layers) if we have sufficient data.
 
 
 ## Polynomial Regression
