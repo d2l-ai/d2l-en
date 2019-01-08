@@ -198,7 +198,7 @@ Training a sequence model proceeds quite different from previous codes. In parti
 
 ### Optimization Loop
 
-To allow for more flexibility the call signture and the code are slightly longer. This will allow us to replace the various pieces by a Gluon implementation subsequently without the need to change the training logic. 
+To allow for more flexibility the call signature and the code are slightly longer. This will allow us to replace the various pieces by a Gluon implementation subsequently without the need to change the training logic. 
 
 ```{.python .input  n=11}
 # This function is saved in the gluonbook package for future use.

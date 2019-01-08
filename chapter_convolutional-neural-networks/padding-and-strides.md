@@ -9,7 +9,7 @@ Therefore, the output shape of the convolutional layer is determined by the shap
 * Multiple layers of convolutions reduce the information available at the boundary, often by much more than what we would want. If we start with a 240x240 pixel image, 10 layers of 5x5 convolutions reduce the image to 200x200 pixels, effectively slicing off 30% of the image and with it obliterating anything interesting on the boundaries. Padding mitigates this problem.
 * In some cases we want to reduce the resolution drastically, e.g. halving it if we think that such a high input dimensionality is not required. In this case we might want to subsample the output. Strides address this.
 * In some cases we want to increase the resolution, e.g. for image superresolution or for audio generation. Again, strides come to our rescue.
-* In some cases we want to increase the length gently to a given size (mostly for sentences of variable length or for filling in patches). Padding addreses this.
+* In some cases we want to increase the length gently to a given size (mostly for sentences of variable length or for filling in patches). Padding addresses this.
 
 
 ## Padding

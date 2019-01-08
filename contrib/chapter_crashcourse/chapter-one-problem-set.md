@@ -40,7 +40,7 @@ Problem 4: What is the sum of the vector you created? What is the mean?
 # Problem 4 Work Area
 ```
 
-Problem 5: Create a vector [0,1], and another vector [1,0], and use mxnet to calculate the angle between them. Remember that the dot product of two vectors is equal to the cossine of the angle between the vectors, and that the arccos function is the inverse of cosine.
+Problem 5: Create a vector [0,1], and another vector [1,0], and use mxnet to calculate the angle between them. Remember that the dot product of two vectors is equal to the cosine of the angle between the vectors, and that the arccos function is the inverse of cosine.
 
 
 ```python

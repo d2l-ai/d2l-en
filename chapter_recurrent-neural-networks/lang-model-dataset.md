@@ -140,7 +140,7 @@ Sequential partitioning decomposes the sequence into `batch_size` many strips of
 
 ## Problems
 
-1. Which other oher mini-batch data sampling methods can you think of?
+1. Which other other mini-batch data sampling methods can you think of?
 1. Why is it a good idea to have a random offset? 
     * Does it really lead to a perfectly uniform distribution over the sequences on the document?
     * What would you have to do to make things even more uniform?

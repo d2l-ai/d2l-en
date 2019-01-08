@@ -189,8 +189,8 @@ The dashed black line gives the true underlying probability.
 As we get more data, the solid curves converge towards the true answer.
 
 In our example of casting a die, we introduced the notion of a **random variable**.
-A random variable, which we denote here as $X$ can be pretty much any quantity and is not determistic.
-Random variables could take one value among a set of possibilites.
+A random variable, which we denote here as $X$ can be pretty much any quantity and is not deterministic.
+Random variables could take one value among a set of possibilities.
 We denote sets with brackets, e.g., $\{\mathrm{cat}, \mathrm{dog}, \mathrm{rabbit}\}$.
 The items contained in the set are called *elements*,
 and we can say that an element $x$ is *in* the set S, by writing $x \in S$.
@@ -242,7 +242,7 @@ there are several quantities of interest.
 The first is called the joint distribution $\Pr(A, B)$.
 Given any elements $a$ and $b$,
 the joint distribution lets us answer,
-what is the probability that $A=a$ and $B=b$ simulataneously?
+what is the probability that $A=a$ and $B=b$ simultaneously?
 It might be clear that for any values $a$ and $b$, $\Pr(A,B) \leq \Pr(A=a)$.
 
 This has to be the case, since for $A$ and $B$ to happen,

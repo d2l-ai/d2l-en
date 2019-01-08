@@ -135,7 +135,7 @@ Note that the word dimension is overloaded and this tends to confuse people.
 Some use the *dimensionality* of a vector to refer to its length (the number of components). 
 However some use the word *dimensionality* to refer to the number of axes that an array has.
 In this sense, a scalar *would have* $0$ dimensions and a vector *would have* $1$ dimension.
-**To avoid confusion, when we say *2D* array or *3D* array, we mean an array with 2 or 3 axes repespectively. But if we say *$n$-dimensional* vector, we mean a vector of length $n$.**
+**To avoid confusion, when we say *2D* array or *3D* array, we mean an array with 2 or 3 axes respectively. But if we say *$n$-dimensional* vector, we mean a vector of length $n$.**
 
 
 ```python
@@ -576,7 +576,7 @@ In just a few pages (or one Jupyter notebook) we've taught you all the linear al
 
 If you're eager to learn more about linear algebra, here are some of our favorite resources on the topic
 * For a solid primer on basics, check out Gilbert Strang's book [Introduction to Linear Algebra](http://math.mit.edu/~gs/linearalgebra/)
-* Zico Kolter's [Linear Algebra Reivew and Reference](http://www.cs.cmu.edu/~zkolter/course/15-884/linalg-review.pdf)
+* Zico Kolter's [Linear Algebra Review and Reference](http://www.cs.cmu.edu/~zkolter/course/15-884/linalg-review.pdf)
 
 ## Next
 [Probability and statistics](../chapter01_crashcourse/probability.ipynb)

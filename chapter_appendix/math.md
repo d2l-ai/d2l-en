@@ -121,7 +121,7 @@ $$
 
 Other operations such as scalar and matrix addition, and division by an element are similar to the multiplication operation in the above equation. Calculating the square root or taking logarithms of a matrix are performed by calculating the square root or logarithm, respectively, of each element of the matrix to obtain a matrix with the same shape as the original matrix.
 
-Matrix multiplication is different from element-wise matrix multiplication. Assume $\boldsymbol{A}$ is a matrix with $m$ rows and $p$ columns and $\boldsymbol{B}$ is a matrix with $p$ rows and $n$ columns. The product (matrix multiplication) of these two matricies is denoted
+Matrix multiplication is different from element-wise matrix multiplication. Assume $\boldsymbol{A}$ is a matrix with $m$ rows and $p$ columns and $\boldsymbol{B}$ is a matrix with $p$ rows and $n$ columns. The product (matrix multiplication) of these two matrices is denoted
 
 $$
 \boldsymbol{A} \boldsymbol{B} =

@@ -60,7 +60,7 @@ plt.show()
 print('Class probabilities', py)
 ```
 
-Now we can compute the likelihoods of an image, given the model. This is statistican speak for $p(x | y)$, i.e. how likely it is to see a particular image under certain conditions (such as the label). Our Naive Bayes model which assumed that all pixesl are independent tells us that
+Now we can compute the likelihoods of an image, given the model. This is statistician speak for $p(x | y)$, i.e. how likely it is to see a particular image under certain conditions (such as the label). Our Naive Bayes model which assumed that all pixels are independent tells us that
 
 $$p(\mathbf{x} | y) = \prod_{i} p(x_i | y)$$
 
@@ -135,7 +135,7 @@ for data, label in mnist_test:
 plt.show()
 ```
 
-As we can see, this classifier works pretty well in many cases. However, the second last digit shows that it can be both incompetent and overly confident of its incorrect estimates. That is, even if it is horribly wrong, it generates probabilities close to 1 or 0. Not a classifier we should use very much nowadays any longer. To see how well it performs overall, let's compute the overall acuracy of the classifier.
+As we can see, this classifier works pretty well in many cases. However, the second last digit shows that it can be both incompetent and overly confident of its incorrect estimates. That is, even if it is horribly wrong, it generates probabilities close to 1 or 0. Not a classifier we should use very much nowadays any longer. To see how well it performs overall, let's compute the overall accuracy of the classifier.
 
 ```{.python .input  n=5}
 # initialize counter
