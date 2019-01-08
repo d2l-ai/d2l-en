@@ -682,7 +682,7 @@ in which an agent interacts with an environment over a series of *time steps*.
 At each time step $t$, the agent receives some observation $o_t$ from the environment,
 and must choose an action $a_t$ which is then transmitted back to the environment.
 Finally, the agent receives a reward $r_t$ from the environment.
-The agent then receives a subseqeunt observation, and chooses a subsequent action, and so on.
+The agent then receives a subsequent observation, and chooses a subsequent action, and so on.
 The behavior of an RL agent is governed by a *policy*.
 In short, a *policy* is just a function that maps from observations (of the environment) to actions.
 The goal of reinforcement learning is to produce a good policy.

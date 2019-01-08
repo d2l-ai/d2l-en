@@ -17,7 +17,7 @@ train_iter, test_iter = gb.load_data_fashion_mnist(batch_size)
 
 ## Initialize Model Parameters
 
-Just as in linear regression, we use vectors to represent examples. Since each example is an image with $28 \times 28$ pixels we can store it as a $784$ dimensional vector. Moreover, since we have 10 categories, the single layer network has an output dimension of 10. Consequently, the weight and bias parameters of the softmax regression are matrics of size $784 \times 10$ and $1 \times 10$ respectively. We initialize $W$ with Gaussian noise.
+Just as in linear regression, we use vectors to represent examples. Since each example is an image with $28 \times 28$ pixels we can store it as a $784$ dimensional vector. Moreover, since we have 10 categories, the single layer network has an output dimension of 10. Consequently, the weight and bias parameters of the softmax regression are matrices of size $784 \times 10$ and $1 \times 10$ respectively. We initialize $W$ with Gaussian noise.
 
 ```{.python .input  n=9}
 num_inputs = 784

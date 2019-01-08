@@ -112,7 +112,7 @@ y = y + x
 print('id(y):', id(y))
 ```
 
-This might be undesirable for two reasons. First, we don't want to run around allocating memory unnecessarily all the time. In machine learning, we might have hundreds of megabytes of paramaters and update all of them multiple times per second. Typically, we'll want to perform these updates in place. Second, we might point at the same parameters from multiple variables. If we don't update in place, this could cause a memory leak, and could cause us to inadvertently reference stale parameters. 
+This might be undesirable for two reasons. First, we don't want to run around allocating memory unnecessarily all the time. In machine learning, we might have hundreds of megabytes of parameters and update all of them multiple times per second. Typically, we'll want to perform these updates in place. Second, we might point at the same parameters from multiple variables. If we don't update in place, this could cause a memory leak, and could cause us to inadvertently reference stale parameters. 
 
 Fortunately, performing in-place operations in MXNet is easy. We can assign the result of an operation to a previously allocated array with slice notation, e.g., `y[:] = <expression>`.
 
@@ -123,7 +123,7 @@ y[:] = x + y
 print('id(y):', id(y))
 ```
 
-While this syntacically nice, `x+y` here will still allocate a temporary buffer to store the result before copying it to `y[:]`. To make even better use of memory, we can directly invoke the underlying `ndarray` operation, in this case `elemwise_add`, avoiding temporary buffers. We do this by specifying the `out` keyword argument, which every `ndarray` operator supports:
+While this syntactically nice, `x+y` here will still allocate a temporary buffer to store the result before copying it to `y[:]`. To make even better use of memory, we can directly invoke the underlying `ndarray` operation, in this case `elemwise_add`, avoiding temporary buffers. We do this by specifying the `out` keyword argument, which every `ndarray` operator supports:
 
 
 ```python

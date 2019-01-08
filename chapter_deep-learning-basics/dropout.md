@@ -126,7 +126,7 @@ gb.train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size, params,
 
 ## Dropout in Gluon
 
-In Gluon, we only need to add the `Dropout` layer after the fully connected layer and specify the dropout probability. When training the model, the `Dropout` layer will randomly drop out the output elements of the previous layer at the specified dropout probability; the `Dropout` layer simply passes the data through during testin.
+In Gluon, we only need to add the `Dropout` layer after the fully connected layer and specify the dropout probability. When training the model, the `Dropout` layer will randomly drop out the output elements of the previous layer at the specified dropout probability; the `Dropout` layer simply passes the data through during testing.
 
 ```{.python .input}
 net = nn.Sequential()

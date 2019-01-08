@@ -52,7 +52,7 @@ The main difference to before is that as soon as we knew the input dimensionalit
 
 ## Deferred Initialization in Practice
 
-Now that we know how it works in theory, let's see when the initialization is actually triggered. In order to do so, we mock up an initializer which does nothing but report a debug message stating when it was invoked and with which paramers.
+Now that we know how it works in theory, let's see when the initialization is actually triggered. In order to do so, we mock up an initializer which does nothing but report a debug message stating when it was invoked and with which parameters.
 
 ```{.python .input  n=22}
 class MyInit(init.Initializer):
@@ -86,7 +86,7 @@ As mentioned at the beginning of this section, deferred initialization can also 
 Deferred initialization does not occur if the system knows the shape of all parameters when calling the `initialize` function. This can occur in two cases:
 
 * We've already seen some data and we just want to reset the parameters.
-* We specificed all input and output dimensions of the network when defining it.
+* We specified all input and output dimensions of the network when defining it.
 
 The first case works just fine, as illustrated below.
 

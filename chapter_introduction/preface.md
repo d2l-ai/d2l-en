@@ -61,7 +61,7 @@ Applying deep learning requires simultaneously understanding
 navigating the pitfalls of numerical computing and getting the most
 out of available hardware.
 Teaching both the critical thinking skills required to formulate problems,
-the mathmematics to solve them, and the software tools to implement those
+the mathematics to solve them, and the software tools to implement those
 solutions all in one place presents formidable challenges.
 Our goal in this book is to present a unified resource
 to bring would-be practitioners up to speed.
@@ -82,7 +82,7 @@ in the form of blog posts or on GitHub.
 However, these examples typically focused on
 *how* to implement a given approach,
 but left out the discussion of *why* certain algorithmic decisions are made.
-While sporadic topics have been convered in blog posts,
+While sporadic topics have been covered in blog posts,
 e.g. on the website [Distill](http://distill.pub) or personal blogs,
 they only covered selected topics in deep learning, and often lacked associated code.
 On the other hand, while several textbooks have emerged,
@@ -99,7 +99,7 @@ to actually becoming an applied machine learning scientist,
 (3) include runnable code, showing readers *how* to solve problems in practice,
 and (4) that allowed for rapid updates, both by us, and also by the community at large,
 and (5) be complemented by a [forum](http://discuss.mxnet.io)
-for interative discussion of technical details and to answer questions.
+for interactive discussion of technical details and to answer questions.
 
 These goals were often in conflict.
 Equations, theorems, and citations are best managed and laid out in LaTeX.
