@@ -60,7 +60,7 @@ plt.show()
 print('Class probabilities', py)
 ```
 
-Now we can compute the likelihoods of an image, given the model. This is statistican speak for $p(x | y)$, i.e. how likely it is to see a particular image under certain conditions (such as the label). Our Naive Bayes model which assumed that all pixesl are independent tells us that
+Now we can compute the likelihoods of an image, given the model. This is statistician speak for $p(x | y)$, i.e. how likely it is to see a particular image under certain conditions (such as the label). Our Naive Bayes model which assumed that all pixels are independent tells us that
 
 $$p(\mathbf{x} | y) = \prod_{i} p(x_i | y)$$
 
