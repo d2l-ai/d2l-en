@@ -85,7 +85,7 @@ but left out the discussion of *why* certain algorithmic decisions are made.
 While sporadic topics have been convered in blog posts,
 e.g. on the website [Distill](http://distill.pub) or personal blogs,
 they only covered selected topics in deep learning, and often lacked associated code.
-One the other hand, while several textbooks have emerged,
+On the other hand, while several textbooks have emerged,
 most notably [Goodfellow, Bengio and Courville, 2016](https://www.deeplearningbook.org/),
 which offers an excellent survey of the concepts behind deep learning,
 these resources don't marry the descriptions to realizations of the concepts in code,
