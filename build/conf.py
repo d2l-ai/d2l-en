@@ -282,6 +282,8 @@ latex_elements = {
         \fancyhead[LE,RO]{{\py@HeaderFamily }}
      }
 \makeatother
+
+\CJKsetecglue{}
 ''',
 # The paper size ('letterpaper' or 'a4paper').
 #'papersize': 'letterpaper',
