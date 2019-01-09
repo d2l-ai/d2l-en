@@ -35,13 +35,13 @@ large number of instance, refer to
 [ec2instances.info](http://www.ec2instances.info/) for detailed configurations
 and fees.
 
-<img src="https://raw.githubusercontent.com//d2l-ai/d2l-en/master/img/p2x.png" width="400"/>
+<img src="https://raw.githubusercontent.com/d2l-ai/d2l-en/master/img/p2x.png" width="400"/>
 
 Note that we need to check the instance limits to guarantee that we can request
 the resource. If running out of limits, we can request more capacity by clicking
 the right link, which often takes about a single workday to process.
 
-<img src="https://raw.githubusercontent.com//d2l-ai/d2l-en/master/img/limits.png" width="500"/>
+<img src="https://raw.githubusercontent.com/d2l-ai/d2l-en/master/img/limits.png" width="500"/>
 
 On the next step we increased the disk from 8 GB to 40 GB so we have enough
 space store a reasonable size dataset. For large-scale
@@ -55,16 +55,16 @@ Then we launched with other options as the default values. The last step before
 launching is choosing the ssh key, you may need to generate and store a key if
 you don't have one before.
 
-<img src="https://raw.githubusercontent.com//d2l-ai/d2l-en/master/img/keypair.png" width="400"/>
+<img src="https://raw.githubusercontent.com/d2l-ai/d2l-en/master/img/keypair.png" width="400"/>
 
 After clicked "launch instances", we can check the status by clicking the
 instance ID link.
 
-<img src="https://raw.githubusercontent.com//d2l-ai/d2l-en/master/img/launching.png" width="500"/>
+<img src="https://raw.githubusercontent.com/d2l-ai/d2l-en/master/img/launching.png" width="500"/>
 
 Once the status is green, we can right-click and select "connect" to get the access instruction.
 
-<img src="https://raw.githubusercontent.com//d2l-ai/d2l-en/master/img/connect.png" width="500"/>
+<img src="https://raw.githubusercontent.com/d2l-ai/d2l-en/master/img/connect.png" width="500"/>
 
 With the given address, we can log into our instance:
 
