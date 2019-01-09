@@ -8,7 +8,7 @@ User who only need compute instances rather than a fully managed Machine Learnin
 
 This chapter will give a high level overview about Amazon SageMaker, in-depth tutorials can be found on the [Sagemaker website](https://docs.aws.amazon.com/sagemaker/latest/dg/whatis.html).
 
-<img src="https://raw.githubusercontent.com/NRauschmayr/d2l-en/aws_updated/img/sagemaker.png" width="700"/>
+<img src="https://raw.githubusercontent.com/d2l-ai/d2l-en/master/img/sagemaker.png" width="700"/>
 
 SageMaker offers Jupyter notebooks and supports MXNet out-of-the box. You can run your notebooks on CPU instances and as such profit from  the free tier. However, more powerful CPU instances or GPU instances are charged by time.
 Within this notebook you can [fetch, explore and prepare training data](https://docs.aws.amazon.com/sagemaker/latest/dg/how-it-works-notebooks-instances.html). 
@@ -57,7 +57,7 @@ unzip d2l-en-1.0.zip
 
 When you open Jupyter, you will find the downloaded and unzipped chapters. Now you can pick any available notebook. 
 
-<img src="https://raw.githubusercontent.com/NRauschmayr/d2l-en/aws_updated/img/jupyter_sagemaker.png" width="700"/>
+<img src="https://raw.githubusercontent.com/d2l-ai/d2l-en/master/img/jupyter_sagemaker.png" width="700"/>
 
 ## Summary
 
