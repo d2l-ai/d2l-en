@@ -7,84 +7,145 @@ If your local machine has limited computing resources, you can use cloud computi
 
 The process to apply for other instance types and install other MXNet versions is basically the same as that described here.
 
+
 ## Apply for an Account and Log In
 
-This chapter shows, how to allocate a CPU/GPU instance in AWS and how to setup the Deep Learning environment.
+First, we need to register an account at https://aws.amazon.com/. It usually requires a credit card.
 
-We first need [an AWS account](https://aws.amazon.com/), and then go the EC2 console
-after login in.
+After logging into your AWS account, click "EC2" (marked by the red box in Figure 11.8) to go to the EC2 panel.
 
-<img src="https://raw.githubusercontent.com/d2l-ai/d2l-en/master/img/aws.png" width="400"/>
-
-Then click "launch instance" to select the operation system and instance type.
-
-<img src="https://raw.githubusercontent.com/d2l-ai/d2l-en/master/img/ec2.png" width="500"/>
-
-AWS offers [Deep Learning AMIs](https://docs.aws.amazon.com/dlami/latest/devguide/options.html) 
-that come with the latest versions of Deep Learning frameworks. The Deep Learning AMIs provide 
-all necessary packages and drivers and allow you to directly start implementing 
-and training your models. Deep Learning AMIs use use binaries that are optimized to run on AWS instances to accelerate model training and inference.
-In this tutorial we use Deep Learning AMI (Ubuntu) Version 19.0:
+![ Log into your AWS account. ](../img/aws.png)
 
 
-<img src="https://raw.githubusercontent.com/NRauschmayr/d2l-en/aws_updated/img/os.png" width="600"/>
+## Create and Run an EC2 Instance
+
+Figure 11.9 shows the EC2 panel. In the area marked by the red box in Figure 11.9, select a nearby data center to reduce latency. If you are located in China you can select a nearby Asia Pacific region, such as Asia Pacific (Seoul). Please note that some data centers may not have GPU instances. Click the "Launch Instance" button marked by the red box in Figure 11.8 to launch your instance.
+
+![ EC2 panel. ](../img/ec2.png)
 
 
-We choose "p2.xlarge", which contains a single Nvidia K80 GPU. Note that there is a
-large number of instance, refer to
-[ec2instances.info](http://www.ec2instances.info/) for detailed configurations
-and fees.
+The row at the top of Figure 11.10 shows the seven steps in the instance configuration process. In the first step "1. Choose AMI", choose Ubuntu 16.04 for the operating system.
 
-<img src="https://raw.githubusercontent.com/d2l-ai/d2l-en/master/img/p2x.png" width="400"/>
+![ Choose an operating system. ](../img/os.png)
 
-Note that we need to check the instance limits to guarantee that we can request
-the resource. If running out of limits, we can request more capacity by clicking
-the right link, which often takes about a single workday to process.
+EC2 provides many different instance configurations to choose from. As shown in Figure 11.11, In "Step 2: Chosse an Instance Type”，choose a "p2.xlarge" instance with K80 GPU. We can also choose instances with multiple GPUs such as "p2.16xlarge". If you want to compare machine configurations and fees of different instances, you may refer to https://www.ec2instances.info/.
 
-<img src="https://raw.githubusercontent.com/d2l-ai/d2l-en/master/img/limits.png" width="500"/>
+![ Choose an instance. ](../img/p2x.png)
 
-On the next step we increased the disk from 8 GB to 40 GB so we have enough
-space store a reasonable size dataset. For large-scale
-datasets, we can "add new volume". Also you selected a very powerful GPU
-instance such as "p3.8xlarge", make sure you selected "Provisioned IOPS" in the
-volume type for better I/O performance.
+Before choosing an instance, we suggest you check if there are quantity restrictions by clicking the "Limits" label in the bar on the, as left shown in Figure 11.9. As shown in Figure 11.12, this account can only open one "p2.xlarge" instance per region. If you need to open more instances, click on the "Request limit increase" link to apply for a higher instance quota. Generally, it takes one business day to process an application.
 
-<img src="https://raw.githubusercontent.com/d2l-ai/d2l-en/master/img/disk.png" width="500"/>
+![ Instance quantity restrictions. ](../img/limits.png)
 
-Then we launched with other options as the default values. The last step before
-launching is choosing the ssh key, you may need to generate and store a key if
-you don't have one before.
+In this example, we keep the default configurations for the steps "3. Configure Instance", "5. Add Tags", and "6. Configure Security Group". Tap on "4. Add Storage" and increase the default hard disk size to 40 GB. Note that you will need about 4 GB to install CUDA.
 
-<img src="https://raw.githubusercontent.com/d2l-ai/d2l-en/master/img/keypair.png" width="400"/>
+![ Modify instance hard disk size. ](../img/disk.png)
 
-After clicked "launch instances", we can check the status by clicking the
-instance ID link.
 
-<img src="https://raw.githubusercontent.com/d2l-ai/d2l-en/master/img/launching.png" width="500"/>
+Finally, go to "7. Review" and click "Launch" to launch the configured instance. The system will now prompt you to select the key pair used to access the instance. If you do not have a key pair, select "Create a new key pair" in the first drop-down menu in Figure 11.14 to generate a key pair. Subsequently, you can select "Choose an existing key pair" for this menu and then select the previously generated key pair. Click "Launch Instances" to launch the created instance.
 
-Once the status is green, we can right-click and select "connect" to get the access instruction.
+![ Select a key pair. ](../img/keypair.png)
 
-<img src="https://raw.githubusercontent.com/d2l-ai/d2l-en/master/img/connect.png" width="500"/>
+Click the instance ID shown in Figure 11.15 to view the status of this instance.
 
-With the given address, we can log into our instance:
+![C lick the instance ID. ](../img/launching.png)
 
-<img src="https://raw.githubusercontent.com/NRauschmayr/d2l-en/aws_updated/img/login_screen.png" width="700"/>
+As shown in Figure 11.16, after the instance state turns green, right-click the instance and select "Connect" to view the instance access method. For example, enter the following in the command line:
 
-The login screen will show a long list of available conda environments for the different Deep Learning frameworks, CUDA driver and Python versions. With ```conda activate``` you can easily switch into the different environments. In the following example we switch to the MXNet Python 3.6 environment:
+```
+ssh -i "/path/to/key.pem" ubuntu@ec2-xx-xxx-xxx-xxx.y.compute.amazonaws.com
+```
 
-<img src="https://raw.githubusercontent.com/NRauschmayr/d2l-en/aws_updated/img/mxnet.png" width="400"/> 
+Here, "/path/to/key.pem" is the path of the locally-stored key used to access the instance. When the command line prompts "Are you sure you want to continue connecting (yes/no)", enter "yes" and press Enter to log into the instance.
 
-Now you are ready to start developing and training MXNet models. Once you start training, you can check the GPU status with ```nividia-smi```.
+![ View instance access and startup method. ](../img/connect.png)
 
-## Acquire the Code for this Book and activate MXNet GPU environment
 
-Next, download the code for this book and install and activate the Conda environment.
+## Install CUDA
+
+If you log into a GPU instance, you need to download and install CUDA. First, update and install the package needed for compilation.
+
+```
+sudo apt-get update && sudo apt-get install -y build-essential git libgfortran3
+```
+
+Nvidia releases a major version of CUDA every year. Here we download the latest CUDA 9.1 when the book is written. Visit the official website of Nvidia(https://developer.nvidia.com/cuda-91-download-archive) to obtain the download link of CUDA 9.1, as shown in Figure 11.17.
+
+![Find the CUDA 9.1 download address. ](../img/cuda.png)
+
+
+After finding the download address, download and install CUDA 9.1. For example:
+
+```
+wget https://developer.download.nvidia.com/compute/cuda/9.1/secure/Prod/local_installers/cuda_9.1.85_387.26_linux.run
+sudo sh cuda_9.1.85_387.26_linux.run
+```
+
+Press "Ctrl+C" to jump out of the document and answer the following questions.
+
+```
+accept/decline/quit: accept
+Install NVIDIA Accelerated Graphics Driver for Linux-x86_64 387.26?
+(y)es/(n)o/(q)uit: y
+Do you want to install the OpenGL libraries?
+(y)es/(n)o/(q)uit [ default is yes ]: y
+Do you want to run nvidia-xconfig?
+(y)es/(n)o/(q)uit [ default is no ]: n
+Install the CUDA 9.1 Toolkit?
+(y)es/(n)o/(q)uit: y
+Enter Toolkit Location
+ [ default is /usr/local/cuda-9.1 ]:
+Do you want to install a symbolic link at /usr/local/cuda?
+(y)es/(n)o/(q)uit: y
+Install the CUDA 9.1 Samples?
+(y)es/(n)o/(q)uit: n
+```
+
+After installing the program, run the following command to view the instance GPU.
+
+```
+nvidia-smi
+```
+
+Finally, add CUDA to the library path to help other libraries find it.
+
+```
+echo "export LD_LIBRARY_PATH=\${LD_LIBRARY_PATH}:/usr/local/cuda-9.1/lib64" >> .bashrc
+```
+
+## Acquire the Code for this Book and Install MXNet GPU Version
+
+We have introduced the way to obtaining code of the book and setting up the running environment in Section ["Getting started with Gluon"](../chapter_prerequisite/install.md). First, install Miniconda of the Linux version (website: https://conda.io/miniconda.html), such as
+
+```
+wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash Miniconda3-latest-Linux-x86_64.sh
+```
+
+Now, you need to answer the following questions:
+
+```
+Do you accept the license terms? [yes|no]
+[no] >>> yes
+Do you wish the installer to prepend the Miniconda3 install location
+to PATH in your /home/ubuntu/.bashrc ? [yes|no]
+[no] >>> yes
+```
+
+After installation, run `source ~/.bashrc` once to activate CUDA and Conda. Next, download the code for this book and install and activate the Conda environment.
 
 ```
 mkdir d2l-en && cd d2l-en
 curl https://www.diveintodeeplearning.org/d2l-en-1.0.zip -o d2l-en.zip
 unzip d2l-en.zip && rm d2l-en.zip
-source activate mxnet_p36 
+conda env create -f environment.yml
+source activate gluon
+```
+
+The MXNet CPU version is installed in the environment by default. Now, you must replace it with the MXNet GPU version. As the CUDA version is 9.1, install `mxnet-cu91`. Generally speaking, if your CUDA version is x.y, the corresponding MXNET version is `mxnet-cuxy`.
+
+```
+pip uninstall mxnet
+pip install mxnet-cu91
 ```
 
 ## Run Jupyter Notebook
@@ -100,7 +161,7 @@ Figure 11.18 shows the possible output after you run Jupyter Notebook. The last 
 ![ Output after running Jupyter Notebook. The last row is the URL for port 8888. ](../img/jupyter.png)
 
 Because the instance you created does not expose port 8888, you can launch SSH in the local command line and map the instance to the local port 8889.
- 
+
 ```
 # This command must be run in the local command line.
 ssh -i "/path/to/key.pem" ubuntu@ec2-xx-xxx-xxx-xxx.y.compute.amazonaws.com -L 8889:localhost:8888
@@ -114,7 +175,7 @@ As cloud services are billed by use duration, you will generally want to close i
 
 If you plan on restarting the instance after a short time, right-click on the example shown in Figure 11.16 and select "Instance State" $\rightarrow$ "Stop" to stop the instance. When you want to use it again, select "Instance State" $\rightarrow$ "Start" to restart the instance. In this situation, the restarted instance will retain the information stored on its hard disk before it was stopped (for example, you do not have to reinstall CUDA and other runtime environments). However, stopped instances will still be billed a small amount for the hard disk space retained.
 
-If you do not plan to use the instance again for a long time, right-click on the example in Figure 11.16 and select "Image" $\rightarrow$ "Create" to create an image of the instance. Then, select "Instance State" $\rightarrow$ "Terminate" to terminate the instance (it will no longer be billed for hard disk space). The next time you want to use this instance, you can follow the steps for creating and running an EC2 instance described in this section to create an instance based on the saved image. The only difference is that, in "1. Choose AMI" shown in Figure 11.10, you must use the "My AMIs" option on the left to select your saved image. The created instance will retain the information stored on the image hard disk. 
+If you do not plan to use the instance again for a long time, right-click on the example in Figure 11.16 and select "Image" $\rightarrow$ "Create" to create an image of the instance. Then, select "Instance State" $\rightarrow$ "Terminate" to terminate the instance (it will no longer be billed for hard disk space). The next time you want to use this instance, you can follow the steps for creating and running an EC2 instance described in this section to create an instance based on the saved image. The only difference is that, in "1. Choose AMI" shown in Figure 11.10, you must use the "My AMIs" option on the left to select your saved image. The created instance will retain the information stored on the image hard disk. For example, you will not have to reinstall CUDA and other runtime environments.
 
 ## Summary
 
