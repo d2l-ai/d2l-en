@@ -1,4 +1,4 @@
-# Using AWS to Run Code
+# Run on Amazon SageMaker
 
 This tutorial will guide you through Amazon SageMaker: a service that allows you to be up and running with MXNet in 5 minutes and to do Machine Learning at large scale in the quickest and easiest way possible.
 
@@ -6,8 +6,6 @@ Deep Learning projects usually consist of a set of problem tasks: for instance y
 
 User who only need compute instances rather than a fully managed Machine Learning service should follow chapter [Run on an EC2 instance](use_ec2.md#run-on-an-ec2-instance). EC2 provides specialized Deep Learning images so developers can start training their models right away without the hassle of installing driver and software frameworks.
 
-
-## Run on Amazon SageMaker
 This chapter will give a high level overview about Amazon SageMaker, in-depth tutorials can be found on the [Sagemaker website](https://docs.aws.amazon.com/sagemaker/latest/dg/whatis.html).
 
 <img src="https://raw.githubusercontent.com/NRauschmayr/d2l-en/aws_updated/img/sagemaker.png" width="700"/>
