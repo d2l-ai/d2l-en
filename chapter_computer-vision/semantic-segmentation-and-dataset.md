@@ -9,7 +9,7 @@ In our discussion of object detection issues in the previous sections, we only u
 
 In the computer vision field, there are two important methods related to semantic segmentation: image segmentation and instance segmentation. Here, we will distinguish these concepts from semantic segmentation as follows:
 
-* Image segmentation divides an image into several constituent regions. This method is generally uses the correlations between pixels in an image. During training, labels are not needed for the image pixels. However, during prediction, this method cannot ensure that the segmented regions have the semantics we want. If we input the image in 9.10, image segmentation might divide the dog into two regions, one covering the dog's mouth and eyes where black is the prominent color and the other covering the rest of the dog where yellow is the prominent color.
+* Image segmentation divides an image into several constituent regions. This method generally uses the correlations between pixels in an image. During training, labels are not needed for image pixels. However, during prediction, this method cannot ensure that the segmented regions have the semantics we want. If we input the image in 9.10, image segmentation might divide the dog into two regions, one covering the dog's mouth and eyes where black is the prominent color and the other covering the rest of the dog where yellow is the prominent color.
 * Instance segmentation is also called simultaneous detection and segmentation. This method attempts to identify the pixel-level regions of each object instance in an image. In contrast to semantic segmentation, instance segmentation not only distinguishes semantics, but also different object instances. If an image contains two dogs, instance segmentation will distinguish which pixels belong to which dog.
 
 
@@ -112,7 +112,7 @@ y[105:115, 130:140], VOC_CLASSES[1]
 
 ### Data Preprocessing
 
-In the preceding chapters, we scaled images to make them fit the input shape of the model. In semantic segmentation, this method would require us to re-map the predicted pixel categories back to the original-size input image. It would be very difficult to do this precisely, especially in segmented regions with different semantics. To avoid this problem, we crop the images to set dimensions and do not scale them. Specially, we use the random cropping method used in image augmentation to crop the same region from input images and their labels.
+In the preceding chapters, we scaled images to make them fit the input shape of the model. In semantic segmentation, this method would require us to re-map the predicted pixel categories back to the original-size input image. It would be very difficult to do this precisely, especially in segmented regions with different semantics. To avoid this problem, we crop the images to set dimensions and do not scale them. Specifically, we use the random cropping method used in image augmentation to crop the same region from input images and their labels.
 
 ```{.python .input  n=8}
 # This function is saved in the gluonbook package for future use.
@@ -165,7 +165,7 @@ class VOCSegDataset(gdata.Dataset):
 
 ### Read the Data Set
 
-Using the custom `VOCSegDataset` class, we create the training set and testing set instances. We assume the random cropping operation outputs images in the shape $320\times 480$. Below, we can see the number of examples retained in the training and testing sets.
+Using the custom `VOCSegDataset` class, we create the training set and testing set instances. We assume the random cropping operation output images in the shape $320\times 480$. Below, we can see the number of examples retained in the training and testing sets.
 
 ```{.python .input  n=10}
 crop_size = (320, 480)
@@ -197,7 +197,7 @@ for X, Y in train_iter:
 
 * Semantic segmentation looks at how images can be segmented into regions with different semantic categories.
 * In the semantic segmentation field, one important data set is Pascal VOC2012.
-* Because the input images and labels in semantic segmentation have a one-to-one correspondence at the pixel level, we randomly crop them to a fixed size, rather then scaling them.
+* Because the input images and labels in semantic segmentation have a one-to-one correspondence at the pixel level, we randomly crop them to a fixed size, rather than scaling them.
 
 ## Problems
 
