@@ -66,7 +66,7 @@ $$p(\mathbf{x} | y) = \prod_{i} p(x_i | y)$$
 
 Using Bayes' rule, we can thus compute $p(y | \mathbf{x})$ via
 
-$$p(y | \mathbf{x}) = \frac{p(\mathbf{x} | y)}{\sum_{y'} p(\mathbf{x} | y')}$$
+$$p(y | \mathbf{x}) = \frac{p(\mathbf{x} | y) p(y)}{\sum_{y'} p(\mathbf{x} | y')}$$
 
 Let's try this ...
 
