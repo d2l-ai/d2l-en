@@ -571,7 +571,7 @@ this isn't quite so trivial for computers.
 
 #### Machine Translation
 
-Unlike the case of speech of recognition, where corresponding inputs and outputs occur in the same order (after alignment),
+Unlike the case of speech recognition, where corresponding inputs and outputs occur in the same order (after alignment),
 in machine translation, order inversion can be vital.
 In other words, while we are still converting one sequence into another,
 neither the number of inputs and outputs
