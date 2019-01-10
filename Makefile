@@ -56,6 +56,7 @@ pdf: $(DEPS) $(OBJ)
 	sed -i s/{OriginalVerbatim}\\\[commandchars=\\\\\\\\\\\\{\\\\}\\\]/{OriginalVerbatim}\\\[commandchars=\\\\\\\\\\\\{\\\\},formatcom=\\\\footnotesize\\\]/g $(TEX)
 	sed -i s/\\\\usepackage{geometry}/\\\\usepackage[paperwidth=187mm,paperheight=235mm,left=20mm,right=20mm,top=20mm,bottom=15mm,includefoot]{geometry}/g $(TEX)
 	sed -i s/\\\\maketitle/\\\\maketitle\ \\\\pagebreak\\\\hspace{0pt}\\\\vfill\\\\begin{center}This\ draft\ is\ a\ testing\ version\ \(draft\ date:\ \\\\today\).\\\\\\\\\ Visit\ \\\\url{https:\\/\\/d2l.ai}\ to\ obtain\ a\ later\ or\ release\ version.\\\\end{center}\\\\vfill\\\\hspace{0pt}\\\\pagebreak/g $(TEX)
+	# Hack to not number chapter_preface.
 	sed -i s/\\\\chapter{Preface}/\\\\chapter*{Preface}/g $(TEX)
 	sed -i s/\\\\section{One\ Medium\ Combining\ Code,\ Math,\ and\ HTML}/\\\\section*{One\ Medium\ Combining\ Code,\ Math,\ and\ HTML}/g $(TEX)
 	sed -i s/\\\\section{Organization}/\\\\section*{Organization}/g $(TEX)
