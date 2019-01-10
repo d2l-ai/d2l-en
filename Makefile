@@ -56,10 +56,16 @@ pdf: $(DEPS) $(OBJ)
 	sed -i s/{OriginalVerbatim}\\\[commandchars=\\\\\\\\\\\\{\\\\}\\\]/{OriginalVerbatim}\\\[commandchars=\\\\\\\\\\\\{\\\\},formatcom=\\\\footnotesize\\\]/g $(TEX)
 	sed -i s/\\\\usepackage{geometry}/\\\\usepackage[paperwidth=187mm,paperheight=235mm,left=20mm,right=20mm,top=20mm,bottom=15mm,includefoot]{geometry}/g $(TEX)
 	sed -i s/\\\\maketitle/\\\\maketitle\ \\\\pagebreak\\\\hspace{0pt}\\\\vfill\\\\begin{center}This\ draft\ is\ a\ testing\ version\ \(draft\ date:\ \\\\today\).\\\\\\\\\ Visit\ \\\\url{https:\\/\\/d2l.ai}\ to\ obtain\ a\ later\ or\ release\ version.\\\\end{center}\\\\vfill\\\\hspace{0pt}\\\\pagebreak/g $(TEX)
+	sed -i s/\\\\chapter{Preface}/\\\\chapter*{Preface}/g $(TEX)
+	sed -i s/\\\\section{One\ Medium\ Combining\ Code,\ Math,\ and\ HTML}/\\\\section*{One\ Medium\ Combining\ Code,\ Math,\ and\ HTML}/g $(TEX)
+	sed -i s/\\\\section{Organization}/\\\\section*{Organization}/g $(TEX)
+	sed -i s/\\\\section{Learning\ by\ Doing}/\\\\section*{Learning\ by\ Doing}/g $(TEX)
+	sed -i s/\\\\section{Acknowledgments}/\\\\section*{Acknowledgments}/g $(TEX)
 	# Remove un-translated long table descriptions
 	sed -i /\\\\multicolumn{2}{c}\%/d $(TEX)
 	sed -i /\\\\sphinxtablecontinued{Continued\ on\ next\ page}/d $(TEX)
 	sed -i /{\\\\tablename\\\\\ \\\\thetable{}\ --\ continued\ from\ previous\ page}/d $(TEX)
+
 	cd build/_build/latex && \
 	bash ../../utils/convert_output_svg.sh && \
 	buf_size=10000000 xelatex d2l-en.tex && \
