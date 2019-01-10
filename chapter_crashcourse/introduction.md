@@ -227,7 +227,7 @@ In the following sections, we will discuss a few types of machine learning in so
 ## Supervised learning
 
 Supervised learning addresses the task of predicting *targets* given input data.
-The targets, also commonly called *labels* are generally denoted *y*.
+The targets, also commonly called *labels*, are generally denoted *y*.
 The input data points, also commonly called *examples* or *instances*, are typically denoted $\boldsymbol{x}$.
 The goal is to produce a model $f_\theta$ that maps an input $\boldsymbol{x}$ to a prediction $f_{\theta}(\boldsymbol{x})$
 
