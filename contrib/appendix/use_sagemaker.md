@@ -6,7 +6,7 @@ Deep Learning projects usually consist of a set of problem tasks: for instance y
 
 This chapter will give a high level overview about Amazon SageMaker, in-depth tutorials can be found on the [Sagemaker website](https://docs.aws.amazon.com/sagemaker/latest/dg/whatis.html).
 
-![Sagemaker](img/sagemaker.png)
+![Sagemaker](../img/sagemaker.png)
 
 SageMaker offers Jupyter notebooks and supports MXNet out-of-the box. You can run your notebooks on CPU instances and as such profit from  the free tier. However, more powerful CPU instances or GPU instances are charged by time.
 Within this notebook you can [fetch, explore and prepare training data](https://docs.aws.amazon.com/sagemaker/latest/dg/how-it-works-notebooks-instances.html). 
@@ -54,7 +54,7 @@ unzip d2l-en-1.0.zip
 ```
 
 When you open Jupyter, you will find the downloaded and unzipped chapters. Now you can pick any available notebook. 
-![Sagemaker Notebook](img/jupyter_sagemaker.png)
+![Sagemaker Notebook](../img/jupyter_sagemaker.png)
 
 ## Summary
 
