@@ -53,6 +53,7 @@ pdf: $(DEPS) $(OBJ)
 	sed -i s/\\.svg/.pdf/g ${TEX}
 	sed -i s/\}\\.gif/\_00\}.pdf/g $(TEX)
 	sed -i s/{tocdepth}{0}/{tocdepth}{1}/g $(TEX)
+	sed -i s/{\\\\releasename}{Release}/{\\\\releasename}{}/g $(TEX)
 	sed -i s/{OriginalVerbatim}\\\[commandchars=\\\\\\\\\\\\{\\\\}\\\]/{OriginalVerbatim}\\\[commandchars=\\\\\\\\\\\\{\\\\},formatcom=\\\\footnotesize\\\]/g $(TEX)
 	sed -i s/\\\\usepackage{geometry}/\\\\usepackage[paperwidth=187mm,paperheight=235mm,left=20mm,right=20mm,top=20mm,bottom=15mm,includefoot]{geometry}/g $(TEX)
 	sed -i s/\\\\maketitle/\\\\maketitle\ \\\\pagebreak\\\\hspace{0pt}\\\\vfill\\\\begin{center}This\ draft\ is\ a\ testing\ version\ \(draft\ date:\ \\\\today\).\\\\\\\\\ Visit\ \\\\url{https:\\/\\/d2l.ai}\ to\ obtain\ a\ later\ or\ release\ version.\\\\end{center}\\\\vfill\\\\hspace{0pt}\\\\pagebreak/g $(TEX)
