@@ -119,7 +119,7 @@ y = nd.array([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 nd.dot(x, y.T)
 ```
 
-We can also merge multiple NDArrays. For that we need to tell the system along with dimension to merge. The example below merges two matrices along dimension 0 (along rows) and dimension 1 (along columns) respectively.
+We can also merge multiple NDArrays. For that, we need to tell the system along which dimension to merge. The example below merges two matrices along dimension 0 (along rows) and dimension 1 (along columns) respectively.
 
 ```{.python .input}
 nd.concat(x, y, dim=0)
