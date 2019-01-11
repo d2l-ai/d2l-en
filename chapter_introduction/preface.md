@@ -8,7 +8,7 @@ Our parents had no idea what machine learning was,
 let alone why we might prefer it to a career in medicine or law.
 Machine learning was a forward-looking academic discipline
 with a narrow set of real-world applications.
-And those applications, e.g. speech recognition and computer vision,
+And those applications, e.g., speech recognition and computer vision,
 required so much domain knowledge that they were often regarded
 as separate areas entirely for which machine learning was one small component.
 Neural networks, the antecedents of the deep learning models

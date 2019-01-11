@@ -255,13 +255,6 @@ latex_elements = {
     'inputenc'  : '',
     'babel'     : r'''\usepackage[english]{babel}''',
     'preamble' : r'''
-\usepackage{ctex}
-\setmainfont{Source Serif Pro}
-\setsansfont{Source Sans Pro}
-\setmonofont{Source Code Pro}
-\setCJKmainfont[BoldFont=Source Han Serif SC SemiBold]{Source Han Serif SC}
-\setCJKsansfont[BoldFont=Source Han Sans SC Medium]{Source Han Sans SC Normal}
-\setCJKmonofont{Source Han Sans SC Normal}
 
 \usepackage{setspace}
 \singlespacing
@@ -283,7 +276,6 @@ latex_elements = {
      }
 \makeatother
 
-\CJKsetecglue{}
 ''',
 # The paper size ('letterpaper' or 'a4paper').
 #'papersize': 'letterpaper',
