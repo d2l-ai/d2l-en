@@ -6,8 +6,8 @@ Dive into Deep Learning
 
 .. toctree::
    :maxdepth: 2
+   :numbered:
 
-   chapter_preface/index
    chapter_introduction/index
    chapter_crashcourse/index
    chapter_deep-learning-basics/index
