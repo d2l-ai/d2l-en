@@ -1,7 +1,7 @@
 # Manipulating Data with `ndarray`
 
 It's impossible to get anything done if we can't manipulate data.
-Generally, there are two important things we need to do with:
+Generally, there are two important things we need to do with data:
 (i) acquire it and (ii) process it once it's inside the computer.
 There's no point in trying to acquire data if we don't even know how to store it, so let's get our hands dirty first by playing with synthetic data.
 
