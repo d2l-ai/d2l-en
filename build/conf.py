@@ -389,7 +389,7 @@ def image_caption(app, docname, source):
             if '![' in l and 'img' in l:
 			    # Sphinx does not allow very long caption with space, replace space
 			    # with a special space
-                l = l.strip().replace(' ', '.')
+                l = l.strip().replace(' ', 'Ⓐ')
             out += l + '\n'
         source[i] = out
 
