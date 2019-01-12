@@ -266,6 +266,7 @@ latex_elements = {
 \setCJKmonofont{Source Han Sans SC Normal}
 
 
+
 \usepackage{setspace}
 \singlespacing
 
@@ -386,6 +387,8 @@ def image_caption(app, docname, source):
         out = ''
         for l in src.split('\n'):
             if '![' in l and 'img' in l:
+			    # Sphinx does not allow very long caption with space, replace space
+			    # with non-breaking space
                 l = l.strip().replace(' ', ' ')
             out += l + '\n'
         source[i] = out
