@@ -150,7 +150,7 @@ html_theme_options = {
 		('GitHub', 'https://github.com/d2l-ai/d2l-en', True, 'fab fa-github'),
         ('中文版', 'https://zh.d2l.ai', True, 'fas fa-external-link-alt'),
     ],
-    'show_footer': True
+    'show_footer': False
 }
 
 # Theme options are theme-specific and customize the look and feel of a theme

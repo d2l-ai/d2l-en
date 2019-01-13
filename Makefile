@@ -52,6 +52,7 @@ TEX=build/_build/latex/d2l-en.tex
 pdf: $(DEPS) $(OBJ)
 	make -C build latex
 	sed -i s/\\.svg/.pdf/g ${TEX}
+	sed -i s/\\\\chapter{Preface}/\\\\chapter*{Preface}\\\\addcontentsline{toc}{chapter}{Preface}/ ${TEX}
 	sed -i s/\}\\.gif/\_00\}.pdf/g $(TEX)
 	sed -i s/{tocdepth}{0}/{tocdepth}{1}/g $(TEX)
 	sed -i s/{\\\\releasename}{Release}/{\\\\releasename}{}/g $(TEX)

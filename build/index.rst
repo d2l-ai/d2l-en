@@ -5,6 +5,11 @@ Dive into Deep Learning
    :file: frontpage.html
 
 .. toctree::
+   :maxdepth: 1
+
+   chapter_preface/preface
+
+.. toctree::
    :maxdepth: 2
    :numbered:
 
