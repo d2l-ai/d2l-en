@@ -102,7 +102,7 @@ def bayespost(data):
     # we need to incorporate the prior probability p(y) since p(y|x) is
     # proportional to p(x|y) p(y)
     logpost = logpy.copy()
-    logpost += (logpx * x + logpxneg * (1-x)).sum(0)
+    logpost += (logpx * data + logpxneg * (1-data)).sum(0)
     # normalize to prevent overflow or underflow by subtracting the largest
     # value
     logpost -= nd.max(logpost)
