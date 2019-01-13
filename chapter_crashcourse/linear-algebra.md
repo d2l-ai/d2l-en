@@ -391,7 +391,7 @@ by a constant factor $\alpha$,
 its norm also scales by the *absolute value*
 of the same constant factor.
 The second rule is the familiar triangle inequality.
-The third rule simple says that the norm must be non-negative.
+The third rule simply says that the norm must be non-negative.
 That makes sense, in most contexts the smallest *size* for anything is 0.
 The final rule basically says that the smallest norm is achieved by a matrix or vector consisting of all zeros.
 It's possible to define a norm that gives zero norm to nonzero matrices,
