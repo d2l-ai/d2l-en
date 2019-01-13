@@ -36,7 +36,7 @@ build/%: %
 
 html: $(DEPS) $(FRONTPAGE_DEP) $(OBJ)
 	make -C build html
-	bash build/post_html.sh
+	bash build/utils/post_html.sh
 	cp -r img/frontpage/ build/_build/html/_images/
 
 TEX=build/_build/latex/d2l-en.tex
