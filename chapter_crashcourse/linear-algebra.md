@@ -224,7 +224,7 @@ print(nd.sum(A) / A.size)
 
 ## Dot products
 
-So far, we've only performed element-wise operations, sums and averages. And if this was we could do, linear algebra probably wouldn't deserve its own chapter. However, one of the most fundamental operations is the dot product. Given two vectors $\mathbf{u}$ and $\mathbf{v}$, the dot product $\mathbf{u}^T \mathbf{v}$ is a sum over the products of the corresponding elements: $\mathbf{u}^T \mathbf{v} = \sum_{i=1}^{d} u_i \cdot v_i$.
+So far, we've only performed element-wise operations, sums and averages. And if this was all we could do, linear algebra probably wouldn't deserve its own chapter. However, one of the most fundamental operations is the dot product. Given two vectors $\mathbf{u}$ and $\mathbf{v}$, the dot product $\mathbf{u}^T \mathbf{v}$ is a sum over the products of the corresponding elements: $\mathbf{u}^T \mathbf{v} = \sum_{i=1}^{d} u_i \cdot v_i$.
 
 ```{.python .input}
 x = nd.arange(4)
