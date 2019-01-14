@@ -223,7 +223,7 @@ There are a few important axioms of probability that you'll want to remember:
 
 ## Dealing with multiple random variables
 
-Very often, we'll want consider more than one random variable at a time.
+Very often, we'll want to consider more than one random variable at a time.
 For instance, we may want to model the relationship between diseases and symptoms.
 Given a disease and symptom, say 'flu' and 'cough',
 either may or may not occur in a patient with some probability.
