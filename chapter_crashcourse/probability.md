@@ -223,7 +223,7 @@ There are a few important axioms of probability that you'll want to remember:
 
 ## Dealing with multiple random variables
 
-Very often, we'll want consider more than one random variable at a time.
+Very often, we'll want to consider more than one random variable at a time.
 For instance, we may want to model the relationship between diseases and symptoms.
 Given a disease and symptom, say 'flu' and 'cough',
 either may or may not occur in a patient with some probability.
@@ -263,7 +263,7 @@ $$\Pr(A | B) = \frac{\Pr(B | A) \Pr(A)}{\Pr(B)}$$
 
 This is very useful if we want to infer one thing from another,
 say cause and effect but we only know the properties in the reverse direction.
-One important operation that we need to make this work is **marginalization**, i.e.,
+One important operation that we need, to make this work, is **marginalization**, i.e.,
 the operation of determining $\Pr(A)$ and $\Pr(B)$ from $\Pr(A,B)$.
 We can see that the probability of seeing $A$ amounts to accounting
 for all possible choices of $B$ and aggregating the joint probabilities over all of them, i.e.
