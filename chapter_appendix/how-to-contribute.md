@@ -1,14 +1,14 @@
 # How to Contribute to This Book
 
-You can view the list of contributors [1] for this open-sourced book. If you want to contribute to this book, you need to install Git and submit a pull request [2] for the GitHub code repository of this book. When your pull request is merged into the code repository by the author of this book, you will become a contributor.
+You can view the list of contributors [1] for this open-source book. If you want to contribute, you need to install Git and submit a pull request [2] to the book's GitHub code repository. When your pull request is merged into the code repository by the author, you will become a contributor.
 
 This section describes the basic Git procedure for contributing to this book. If you are familiar with Git operations, you can skip this section.
 
 In the procedure below, we assume that the contributor's GitHub ID is "astonzhang".
 
-Step 1: Install Git. The Git open source book details how to install Git [3]. If you do note have a GitHub account, you need to sign up for an account [4].
+Step 1: Install Git. The Git open source book details how to install Git [3]. If you do note have a GitHub account, you need to sign up for one[4].
 
-Step 2: Log in to GitHub. Enter the address of code repository of this book in your browser [2]. Click on the "Fork" button in the red box at the top-right of Figure 11.20 to get a copy of code repository of this book.
+Step 2: Log in to GitHub. Enter the address of the book's code repository in your browser [2]. Click on the "Fork" button in the red box at the top-right of Figure 11.20 to clone (get a copy of) the code repository of this book.
 
 ![The code repository page.](../img/contrib01.png)
 
