@@ -8,7 +8,7 @@ In the procedure below, we assume that the contributor's GitHub ID is "astonzhan
 
 Step 1: Install Git. The Git open source book details how to install Git [3]. If you do note have a GitHub account, you need to sign up for one[4].
 
-Step 2: Log in to GitHub. Enter the address of book's code repository in your browser [2]. Click on the "Fork" button in the red box at the top-right of Figure 11.20 to clone (get a copy of) the code repository of this book.
+Step 2: Log in to GitHub. Enter the address of the book's code repository in your browser [2]. Click on the "Fork" button in the red box at the top-right of Figure 11.20 to clone (get a copy of) the code repository of this book.
 
 ![The code repository page.](../img/contrib01.png)
 
