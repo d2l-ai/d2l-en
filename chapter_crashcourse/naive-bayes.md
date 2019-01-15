@@ -1,7 +1,7 @@
 # Naive Bayes Classification
 
 Conditional independence is useful when dealing with data, since it simplifies a lot of equations. A popular (and very simple) algorithm is the Naive Bayes Classifier.
-The key assumption in it is that the attributes are all independent of each other, given the labels. In other words, we have:
+Its key assumption is that the attributes are all independent of each other, given the labels. In other words, we have:
 
 $$p(\mathbf{x} | y) = \prod_i p(x_i | y)$$
 
@@ -9,7 +9,7 @@ Using Bayes Theorem this leads to the classifier $p(y | \mathbf{x}) = \frac{\pro
 
 $$p(y | \mathbf{x}) \propto \prod_i p(x_i | y) p(y).$$
 
-To illustrate this a bit, consider classifying emails into spam and ham. It's fair to say that the occurrence of the words `Nigeria`, `prince`, `money`, `rich` are all likely indicators that the e-mail might be spam, whereas `theorem`, `network`, `Bayes` or `statistics` are pretty good indicators that there's substance the message. We could thus model the probability of occurrence for each of these words, given the respective class and then use it to score the likelihood of a text. In fact, for a long time this *is* what many so-called [Bayesian spam filters](https://en.wikipedia.org/wiki/Naive_Bayes_spam_filtering) used.
+To illustrate this a bit, consider classifying emails into spam and ham. It's fair to say that the occurrence of the words `Nigeria`, `prince`, `money`, `rich` are all likely indicators that the e-mail might be spam, whereas `theorem`, `network`, `Bayes` or `statistics` are pretty good indicators that there's substance in the message. Thus, we could model the probability of occurrence for each of these words, given the respective class and then use it to score the likelihood of a text. In fact, for a long time this *is* what many so-called [Bayesian spam filters](https://en.wikipedia.org/wiki/Naive_Bayes_spam_filtering) used.
 
 ## Optical Character Recognition
 
