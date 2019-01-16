@@ -4,13 +4,13 @@ Deep learning training generally requires large volumes of computing resources. 
 
 ## Selecting a GPU
 
-At present, AMD and Nvidia are the two main manufacturers of dedicated GPUs. Nvidia was the first to enter the deep learning field and provides better support for deep learning frameworks. Therefore, most buyers choose Nvidia GPUs.
+At present, AMD and NVIDIA are the two main manufacturers of dedicated GPUs. NVIDIA was the first to enter the deep learning field and provides better support for deep learning frameworks. Therefore, most buyers choose NVIDIA GPUs.
 
-Nvidia provides two types of GPUs, targeting individual uses (such as the GTX series) and enterprise users (such as the Tesla series). The two types of GPUs provide comparable compute power. However, the enterprise user GPUs generally use passive heat dissipation and add a memory check function. Therefore, these GPUs are more suitable for data centers and usually cost ten times more than individual user GPUs.
+NVIDIA provides two types of GPUs, targeting individual uses (such as the GTX series) and enterprise users (such as the Tesla series). The two types of GPUs provide comparable compute power. However, the enterprise user GPUs generally use passive heat dissipation and add a memory check function. Therefore, these GPUs are more suitable for data centers and usually cost ten times more than individual user GPUs.
 
-If you are a large company with 100 or more servers, you should consider the Nvidia Tesla series for enterprise users. If you are a lab or small to mid-size company with 10 to 100 servers, you should consider the Nvidia DGX series if your budget is sufficient. Otherwise, you can consider more cost-effective servers, such as Supermicro, and then purchase and install GTX series GPUs.
+If you are a large company with 100 or more servers, you should consider the NVIDIA Tesla series for enterprise users. If you are a lab or small to mid-size company with 10 to 100 servers, you should consider the NVIDIA DGX series if your budget is sufficient. Otherwise, you can consider more cost-effective servers, such as Supermicro, and then purchase and install GTX series GPUs.
 
-Nvidia generally releases a new GPU version every one or two years, such as the GTX 1000 series released in 2017. Each series offers several different models that provide different performance levels.
+NVIDIA generally releases a new GPU version every one or two years, such as the GTX 1000 series released in 2017. Each series offers several different models that provide different performance levels.
 
 GPU performance is primarily a combination of the following three parameters:
 
