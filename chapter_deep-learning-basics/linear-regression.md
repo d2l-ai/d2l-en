@@ -4,7 +4,7 @@ To get our feet wet, we'll start off by looking at the problem of regression.
 This is the task of predicting a *real valued target* $y$ given a data point $x$.
 Regression problems are extremely common in practice. For example, they are used for predicting continuous values, such as house prices, temperatures, sales, and so on. This is quite different from classification problems (which we study later), where the outputs are discrete (such as apple, banana, orange, etc. in image classification).
 
-## Basic Elements of Linear Regression
+## Basic Elementx of Linear Regression
 
 In linear regression, the simplest and still perhaps the most useful approach,
 we assume that prediction can be expressed as a *linear* combination of the input features
