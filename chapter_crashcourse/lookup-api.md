@@ -15,7 +15,7 @@ Generally speaking, we can ignore functions that start and end with `__` (specia
 
 ## Finding the usage of specific functions and classes
 
-For specific function or class usage, we can use the  `help` function. Let's take a look at the usage of the `ones_like,  such as the NDArray function as an example. `
+For specific function or class usage, we can use the  `help` function. Let's take a look at the usage of the `ones_like` function of an NDArray as an example.
 
 ```{.python .input}
 help(nd.ones_like)
