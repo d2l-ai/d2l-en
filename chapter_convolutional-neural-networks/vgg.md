@@ -9,7 +9,7 @@ Progress in this field mirrors that in chip design where engineers went from pla
 The basic building block of a ConvNet is the combination of a convolutional layer (with padding to keep the resolution unchanged), followed by a nonlinearity such as a ReLu. A VGG block is given by a sequence of such layers, followed by maximum pooling. Throughout their design [Simonyan and Ziserman, 2014](https://arxiv.org/abs/1409.1556) used convolution windows of size 3 and maximum poolin with stride and window width 2, effectively halving the resolution after each block. We use the `vgg_block` function to implement this basic VGG block. This function takes the number of convolutional layers `num_convs` and the number of output channels `num_channels` as input.
 
 ```{.python .input  n=1}
-import gluonbook as gb
+import d2l
 from mxnet import gluon, init, nd
 from mxnet.gluon import nn
 
@@ -76,11 +76,11 @@ net = vgg(small_conv_arch)
 Apart from using a slightly larger learning rate, the model training process is similar to that of AlexNet in the last section.
 
 ```{.python .input}
-lr, num_epochs, batch_size, ctx = 0.05, 5, 128, gb.try_gpu()
+lr, num_epochs, batch_size, ctx = 0.05, 5, 128, d2l.try_gpu()
 net.initialize(ctx=ctx, init=init.Xavier())
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
-train_iter, test_iter = gb.load_data_fashion_mnist(batch_size, resize=224)
-gb.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
+train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)
+d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
 ```
 
 ## Summary

@@ -22,13 +22,13 @@ In this chapter, we will use a data set developed by NASA to test the wing noise
 
 ```{.python .input  n=1}
 %matplotlib inline
-import gluonbook as gb
+import d2l
 from mxnet import autograd, gluon, init, nd
 from mxnet.gluon import nn, data as gdata, loss as gloss
 import numpy as np
 import time
 
-def get_data_ch7():  # This function is saved in the gluonbook package for future use.
+def get_data_ch7():  # This function is saved in the d2l package for future use.
     data = np.genfromtxt('../data/airfoil_self_noise.dat', delimiter='\t')
     data = (data - data.mean(axis=0)) / data.std(axis=0)
     return nd.array(data[:1500, :-1]), nd.array(data[:1500, -1])
@@ -50,11 +50,11 @@ def sgd(params, states, hyperparams):
 Next, we are going to implement a generic training function to facilitate the use of the other optimization algorithms introduced later in this chapter. It initializes a linear regression model and can then be used to train the model with the mini-batch SGD and other algorithms introduced in subsequent sections.
 
 ```{.python .input  n=4}
-# This function is saved in the gluonbook package for future use.
+# This function is saved in the d2l package for future use.
 def train_ch7(trainer_fn, states, hyperparams, features, labels,
               batch_size=10, num_epochs=2):
     # Initialize model parameters.
-    net, loss = gb.linreg, gb.squared_loss
+    net, loss = d2l.linreg, d2l.squared_loss
     w = nd.random.normal(scale=0.01, shape=(features.shape[1], 1))
     b = nd.zeros(1)
     w.attach_grad()
@@ -77,10 +77,10 @@ def train_ch7(trainer_fn, states, hyperparams, features, labels,
                 ls.append(eval_loss())  # Record the current training error for every 100 examples.
     # Print and plot the results.
     print('loss: %f, %f sec per epoch' % (ls[-1], time.time() - start))
-    gb.set_figsize()
-    gb.plt.plot(np.linspace(0, num_epochs, len(ls)), ls)
-    gb.plt.xlabel('epoch')
-    gb.plt.ylabel('loss')
+    d2l.set_figsize()
+    d2l.plt.plot(np.linspace(0, num_epochs, len(ls)), ls)
+    d2l.plt.xlabel('epoch')
+    d2l.plt.ylabel('loss')
 ```
 
 When the batch size equals 1500 (the total number of examples), we use gradient descent for optimization. The model parameters will be iterated only once for each epoch of the gradient descent. As we can see, the downward trend of the value of the objective function (training loss) flattened out after 6 iterations.
@@ -111,7 +111,7 @@ train_sgd(0.05, 10)
 In Gluon, we can use the `Trainer` class to call optimization algorithms. Next, we are going to implement a generic training function that uses the optimization name `trainer name` and hyperparameter `trainer_hyperparameter` to create the instance `Trainer`.
 
 ```{.python .input  n=8}
-# This function is saved in the gluonbook package for future use.
+# This function is saved in the d2l package for future use.
 def train_gluon_ch7(trainer_name, trainer_hyperparams, features, labels,
                     batch_size=10, num_epochs=2):
     # Initialize model parameters.
@@ -140,10 +140,10 @@ def train_gluon_ch7(trainer_name, trainer_hyperparams, features, labels,
                 ls.append(eval_loss())
     # Print and plot the results.
     print('loss: %f, %f sec per epoch' % (ls[-1], time.time() - start))
-    gb.set_figsize()
-    gb.plt.plot(np.linspace(0, num_epochs, len(ls)), ls)
-    gb.plt.xlabel('epoch')
-    gb.plt.ylabel('loss')
+    d2l.set_figsize()
+    d2l.plt.plot(np.linspace(0, num_epochs, len(ls)), ls)
+    d2l.plt.xlabel('epoch')
+    d2l.plt.ylabel('loss')
 ```
 
 Use Gluon to repeat the last experiment.

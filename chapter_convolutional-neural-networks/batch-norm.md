@@ -56,7 +56,7 @@ At prediction time we might not have the luxury of computing offsets per batch -
 Next, we will implement the batch normalization layer via the NDArray from scratch.
 
 ```{.python .input  n=72}
-import gluonbook as gb
+import d2l
 from mxnet import autograd, gluon, init, nd
 from mxnet.gluon import nn
 
@@ -145,11 +145,11 @@ net.add(nn.Conv2D(6, kernel_size=5),
 Next we train the modified model, again on Fashion-MNIST. The code is virtually identical to that in previous steps. The main difference is the considerably larger learning rate.
 
 ```{.python .input  n=77}
-lr, num_epochs, batch_size, ctx = 1.0, 5, 256, gb.try_gpu()
+lr, num_epochs, batch_size, ctx = 1.0, 5, 256, d2l.try_gpu()
 net.initialize(ctx=ctx, init=init.Xavier())
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
-train_iter, test_iter = gb.load_data_fashion_mnist(batch_size)
-gb.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
+train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
+d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
 ```
 
 Let's have a look at the scale parameter `gamma` and the shift parameter `beta` learned from the first batch normalization layer.
@@ -186,7 +186,7 @@ Use the same hyper-parameter to carry out the training. Note that as always the 
 ```{.python .input}
 net.initialize(ctx=ctx, init=init.Xavier())
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
-gb.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
+d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
 ```
 
 ## Summary

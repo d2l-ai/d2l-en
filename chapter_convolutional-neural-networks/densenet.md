@@ -27,7 +27,7 @@ In the end, all these functions are combined in an MLP to reduce the number of f
 DenseNet uses the modified "batch normalization, activation, and convolution" architecture of ResNet (see the exercise in the [previous section](resnet.md)). First, we implement this architecture in the `conv_block` function.
 
 ```{.python .input  n=1}
-import gluonbook as gb
+import d2l
 from mxnet import gluon, init, nd
 from mxnet.gluon import nn
 
@@ -129,11 +129,11 @@ net.add(nn.BatchNorm(),
 Since we are using a deeper network here, in this section, we will reduce the input height and width from 224 to 96 to simplify the computation.
 
 ```{.python .input}
-lr, num_epochs, batch_size, ctx = 0.1, 5, 256, gb.try_gpu()
+lr, num_epochs, batch_size, ctx = 0.1, 5, 256, d2l.try_gpu()
 net.initialize(ctx=ctx, init=init.Xavier())
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
-train_iter, test_iter = gb.load_data_fashion_mnist(batch_size, resize=96)
-gb.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
+train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)
+d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
 ```
 
 ## Summary

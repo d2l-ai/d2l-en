@@ -4,7 +4,7 @@ We already saw that it is much more convenient to use Gluon in the context of [l
 
 ```{.python .input  n=1}
 %matplotlib inline
-import gluonbook as gb
+import d2l
 from mxnet import gluon, init
 from mxnet.gluon import loss as gloss, nn
 ```
@@ -13,7 +13,7 @@ We still use the Fashion-MNIST data set and the batch size set from the last sec
 
 ```{.python .input  n=2}
 batch_size = 256
-train_iter, test_iter = gb.load_data_fashion_mnist(batch_size)
+train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 ```
 
 ## Initialize Model Parameters
@@ -64,7 +64,7 @@ Next, we use the training functions defined in the last section to train a model
 
 ```{.python .input  n=6}
 num_epochs = 5
-gb.train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size, None,
+d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size, None,
              None, trainer)
 ```
 

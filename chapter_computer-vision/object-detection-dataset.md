@@ -9,7 +9,7 @@ The Pikachu data set in RecordIO format can be downloaded directly from the Inte
 
 ```{.python .input  n=1}
 %matplotlib inline
-import gluonbook as gb
+import d2l
 from mxnet import gluon, image
 from mxnet.gluon import utils as gutils
 import os
@@ -29,7 +29,7 @@ def _download_pikachu(data_dir):
 We are going to read the object detection data set by creating the instance `ImageDetIter`. The "Det" in the name refers to Detection. We will read the training data set in random order. Since the format of the data set is RecordIO, we need the image index file `'train.idx'` to read random mini-batches. In addition, for each image of the training set, we will use random cropping and require the cropped image to cover at least 95% of each object. Since the cropping is random, this requirement is not always satisfied. We preset the maximum number of random cropping attempts to 200. If none of them meets the requirement, the image will not be cropped. To ensure the certainty of the output, we will not randomly crop the images in the test data set. We also do not need to read the test data set in random order.
 
 ```{.python .input  n=2}
-# This function is saved in the gluonbook package for future use.
+# This function is saved in the d2l package for future use.
 def load_data_pikachu(batch_size, edge_size=256):  # Edge_size: the width and height of the output image.
     data_dir = '../data/pikachu'
     _download_pikachu(data_dir)
@@ -62,9 +62,9 @@ We have ten images with bounding boxes on them. We can see that the angle, size,
 
 ```{.python .input  n=4}
 imgs = (batch.data[0][0:10].transpose((0, 2, 3, 1))) / 255
-axes = gb.show_images(imgs, 2, 5).flatten()
+axes = d2l.show_images(imgs, 2, 5).flatten()
 for ax, label in zip(axes, batch.label[0][0:10]):
-    gb.show_bboxes(ax, [label[0][1:5] * edge_size], colors=['w'])
+    d2l.show_bboxes(ax, [label[0][1:5] * edge_size], colors=['w'])
 ```
 
 ## Summary

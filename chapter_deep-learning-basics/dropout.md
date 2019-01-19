@@ -53,7 +53,7 @@ To implement the dropout function we have to draw as many random variables as th
 According to the definition of dropout, we can implement it easily. The following `dropout` function will drop out the elements in the NDArray input `X` with the probability of `drop_prob`.
 
 ```{.python .input}
-import gluonbook as gb
+import d2l
 from mxnet import autograd, gluon, init, nd
 from mxnet.gluon import loss as gloss, nn
 
@@ -119,8 +119,8 @@ This is similar to the training and testing of multilayer perceptrons described 
 ```{.python .input}
 num_epochs, lr, batch_size = 10, 0.5, 256
 loss = gloss.SoftmaxCrossEntropyLoss()
-train_iter, test_iter = gb.load_data_fashion_mnist(batch_size)
-gb.train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size, params,
+train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
+d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size, params,
              lr)
 ```
 
@@ -142,7 +142,7 @@ Next, we will train and test the model.
 
 ```{.python .input}
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
-gb.train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size,
+d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size,
              None, None, trainer)
 ```
 

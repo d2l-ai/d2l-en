@@ -75,12 +75,12 @@ Below we begin to implement and display LSTM. As with the experiments in the pre
 import sys
 sys.path.insert(0, '..')
 
-import gluonbook as gb
+import d2l
 from mxnet import nd
 from mxnet.gluon import rnn
 
 (corpus_indices, char_to_idx, idx_to_char,
- vocab_size) = gb.load_data_time_machine()
+ vocab_size) = d2l.load_data_time_machine()
 ```
 
 ## Implementation from Scratch
@@ -93,7 +93,7 @@ The code below initializes the model parameters. The hyper-parameter `num_hidden
 
 ```{.python .input  n=2}
 num_inputs, num_hiddens, num_outputs = vocab_size, 256, vocab_size
-ctx = gb.try_gpu()
+ctx = d2l.try_gpu()
 
 def get_params():
     def _one(shape):
@@ -161,7 +161,7 @@ pred_period, pred_len, prefixes = 40, 50, ['traveller', 'time traveller']
 We create a string of lyrics based on the currently trained model every 40 epochs.
 
 ```{.python .input}
-gb.train_and_predict_rnn(lstm, get_params, init_lstm_state, num_hiddens,
+d2l.train_and_predict_rnn(lstm, get_params, init_lstm_state, num_hiddens,
                          vocab_size, ctx, corpus_indices, idx_to_char,
                          char_to_idx, False, num_epochs, num_steps, lr,
                          clipping_theta, batch_size, pred_period, pred_len,
@@ -174,8 +174,8 @@ In Gluon, we can directly call the `LSTM` class in the `rnn` module.
 
 ```{.python .input  n=6}
 lstm_layer = rnn.LSTM(num_hiddens)
-model = gb.RNNModel(lstm_layer, vocab_size)
-gb.train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
+model = d2l.RNNModel(lstm_layer, vocab_size)
+d2l.train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
                                corpus_indices, idx_to_char, char_to_idx,
                                num_epochs, num_steps, lr, clipping_theta,
                                batch_size, pred_period, pred_len, prefixes)

@@ -8,14 +8,14 @@ This section will use Gluon to implement a language model based on a recurrent n
 import sys
 sys.path.insert(0, '..')
 
-import gluonbook as gb
+import d2l
 import math
 from mxnet import autograd, gluon, init, nd
 from mxnet.gluon import loss as gloss, nn, rnn
 import time
 
 (corpus_indices, char_to_idx, idx_to_char,
- vocab_size) = gb.load_data_time_machine()
+ vocab_size) = d2l.load_data_time_machine()
 ```
 
 ## Define the Model
@@ -48,7 +48,7 @@ Y.shape, len(state_new), state_new[0].shape
 Next, we inherit the Block class to define a complete recurrent neural network. It first uses one-hot vector to represent input data and enter it into the `rnn_layer`. This, it uses the fully connected output layer to obtain the output. The number of outputs is equal to the dictionary size `vocab_size`.
 
 ```{.python .input  n=39}
-# This class has been saved in the gluonbook package for future use.
+# This class has been saved in the d2l package for future use.
 class RNNModel(nn.Block):
     def __init__(self, rnn_layer, vocab_size, **kwargs):
         super(RNNModel, self).__init__(**kwargs)
@@ -74,7 +74,7 @@ class RNNModel(nn.Block):
 As in the previous section, a prediction function is defined below. The implementation here differs from the previous one in the function interfaces for forward computation and hidden state initialization.
 
 ```{.python .input  n=41}
-# This function is saved in the gluonbook package for future use.
+# This function is saved in the d2l package for future use.
 def predict_rnn_gluon(prefix, num_chars, model, vocab_size, ctx, idx_to_char,
                       char_to_idx):
     # Use model's member function to initialize the hidden state.
@@ -93,7 +93,7 @@ def predict_rnn_gluon(prefix, num_chars, model, vocab_size, ctx, idx_to_char,
 Let us make one predication using a model with weights that are random values.
 
 ```{.python .input  n=42}
-ctx = gb.try_gpu()
+ctx = d2l.try_gpu()
 model = RNNModel(rnn_layer, vocab_size)
 model.initialize(force_reinit=True, ctx=ctx)
 predict_rnn_gluon('traveller', 10, model, vocab_size, ctx, idx_to_char,
@@ -103,7 +103,7 @@ predict_rnn_gluon('traveller', 10, model, vocab_size, ctx, idx_to_char,
 Next, implement the training function. Its algorithm is the same as in the previous section, but only random sampling is used here to read the data.
 
 ```{.python .input  n=18}
-# This function is saved in the gluonbook package for future use.
+# This function is saved in the d2l package for future use.
 def train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
                                 corpus_indices, idx_to_char, char_to_idx,
                                 num_epochs, num_steps, lr, clipping_theta,
@@ -114,11 +114,11 @@ def train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
                             {'learning_rate': lr, 'momentum': 0, 'wd': 0})
 
     for epoch in range(num_epochs):
-        loss_sum, start = 0.0, time.time()
-        data_iter = gb.data_iter_consecutive(
+        l_sum, n, start = 0.0, 0, time.time()
+        data_iter = d2l.data_iter_consecutive(
             corpus_indices, batch_size, num_steps, ctx)
         state = model.begin_state(batch_size=batch_size, ctx=ctx)
-        for t, (X, Y) in enumerate(data_iter):
+        for X, Y in data_iter:
             for s in state:
                 s.detach()
             with autograd.record():
@@ -128,17 +128,20 @@ def train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
             l.backward()
             # Clip the gradient.
             params = [p.data() for p in model.collect_params().values()]
-            gb.grad_clipping(params, clipping_theta, ctx)
-            trainer.step(1)  # Since the error has already taken the mean, the gradient does not need to be averaged.
-            loss_sum += l.asscalar()
+            d2l.grad_clipping(params, clipping_theta, ctx)
+            # Since the error has already taken the mean, the gradient does
+            # not need to be averaged.
+            trainer.step(1)
+            l_sum += l.asscalar() * y.size
+            n += y.size
 
         if (epoch + 1) % pred_period == 0:
             print('epoch %d, perplexity %f, time %.2f sec' % (
-                epoch + 1, math.exp(loss_sum / (t + 1)), time.time() - start))
+                epoch + 1, math.exp(l_sum / n), time.time() - start))
             for prefix in prefixes:
                 print(' -', predict_rnn_gluon(
-                    prefix, pred_len, model, vocab_size,
-                    ctx, idx_to_char, char_to_idx))
+                    prefix, pred_len, model, vocab_size, ctx, idx_to_char,
+                    char_to_idx))
 ```
 
 Train the model using the same hyper-parameters as in the previous experiments.

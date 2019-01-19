@@ -45,7 +45,7 @@ print('chars:', ''.join([idx_to_char[idx] for idx in sample]))
 print('indices:', sample)
 ```
 
-We packaged the above code in the `(corpus_indices, char_to_idx, idx_to_char, vocab_size) = load_data_timemachine()` function of the `gluonbook` package to make it easier to call it in later chapters. 
+We packaged the above code in the `(corpus_indices, char_to_idx, idx_to_char, vocab_size) = load_data_timemachine()` function of the `d2l` package to make it easier to call it in later chapters. 
 
 ## Training Data Preparation
 
@@ -58,10 +58,10 @@ In fact, any one of these offsets is fine. Hence, which one should we pick? In f
 ### Random sampling
 
 The following code randomly generates a minibatch from the data each time. Here, the batch size `batch_size` indicates to the number of examples in each mini-batch and `num_steps` is the length of the sequence (or time steps if we have a time series) included in each example.
-In random sampling, each example is a sequence arbitrarily captured on the original sequence. The positions of two adjacent random mini-batches on the original sequence are not necessarily adjacent. The target is to predict the next character based on what we've seen so far, hence the labels are the original sequence, shifted by one character. Note that this is not recommended for latent variable models, since we do not have access to the hidden state *prior* to seeing the sequence. We packaged the above code in the `load_data_timemachine` function of the `gluonbook` package to make it easier to call it in later chapters. It returns four variables: `corpus_indices`, `char_to_idx`, `idx_to_char`, and `vocab_size`.
+In random sampling, each example is a sequence arbitrarily captured on the original sequence. The positions of two adjacent random mini-batches on the original sequence are not necessarily adjacent. The target is to predict the next character based on what we've seen so far, hence the labels are the original sequence, shifted by one character. Note that this is not recommended for latent variable models, since we do not have access to the hidden state *prior* to seeing the sequence. We packaged the above code in the `load_data_timemachine` function of the `d2l` package to make it easier to call it in later chapters. It returns four variables: `corpus_indices`, `char_to_idx`, `idx_to_char`, and `vocab_size`.
 
 ```{.python .input  n=5}
-# This function is saved in the gluonbook package for future use.
+# This function is saved in the d2l package for future use.
 def data_iter_random(corpus_indices, batch_size, num_steps, ctx=None):
     # offset for the iterator over the data for uniform starts
     offset = int(random.uniform(0,num_steps))
@@ -103,7 +103,7 @@ On the other hand, when multiple adjacent mini-batches are concatenated by passi
 So that the model parameter gradient calculations only depend on the mini-batch sequence read by one iteration, we can separate the hidden state from the computational graph before reading the mini-batch (this can be done by detaching the graph). We will gain a deeper understand this approach in the following sections.
 
 ```{.python .input  n=7}
-# This function is saved in the gluonbook package for future use.
+# This function is saved in the d2l package for future use.
 def data_iter_consecutive(corpus_indices, batch_size, num_steps, ctx=None):
     # offset for the iterator over the data for uniform starts
     offset = int(random.uniform(0,num_steps))

@@ -20,19 +20,19 @@ First, we read the content and style images. By printing out the image coordinat
 
 ```{.python .input  n=1}
 %matplotlib inline
-import gluonbook as gb
+import d2l
 from mxnet import autograd, gluon, image, init, nd
 from mxnet.gluon import model_zoo, nn
 import time
 
-gb.set_figsize()
+d2l.set_figsize()
 content_img = image.imread('../img/rainier.jpg')
-gb.plt.imshow(content_img.asnumpy());
+d2l.plt.imshow(content_img.asnumpy());
 ```
 
 ```{.python .input  n=2}
 style_img = image.imread('../img/autumn_oak.jpg')
-gb.plt.imshow(style_img.asnumpy());
+d2l.plt.imshow(style_img.asnumpy());
 ```
 
 ## Preprocessing and Postprocessing
@@ -224,10 +224,10 @@ def train(X, contents_Y, styles_Y, ctx, lr, max_epochs, lr_decay_epoch):
     return X
 ```
 
-Next, we start to train the model. First, we set the height and width of the content and style images to 200 by 300 pixels. We use the content image to initialize the composite image.
+Next, we start to train the model. First, we set the height and width of the content and style images to 150 by 225 pixels. We use the content image to initialize the composite image.
 
 ```{.python .input  n=17}
-ctx, image_shape = gb.try_gpu(), (300, 200)
+ctx, image_shape = d2l.try_gpu(), (225, 150)
 net.collect_params().reset_ctx(ctx)
 content_X, contents_Y = get_contents(image_shape, ctx)
 style_X, styles_Y = get_styles(image_shape, ctx)
@@ -237,25 +237,25 @@ output = train(content_X, contents_Y, styles_Y, ctx, 0.01, 500, 200)
 Next, we save the trained composite image. As you can see, the composite image in Figure 9.14 retains the scenery and objects of the content image, while introducing the color of the style image. Because the image is relatively small, the details are a bit fuzzy.
 
 ```{.python .input  n=18}
-gb.plt.imsave('../img/neural-style-1.png', postprocess(output).asnumpy())
+d2l.plt.imsave('../img/neural-style-1.png', postprocess(output).asnumpy())
 ```
 
-![$200 \times 300$ composite image. ](../img/neural-style-1.png)
+![$150 \times 225$ composite image. ](../img/neural-style-1.png)
 
-To obtain a clearer composite image, we train the model using a larger image size: $800 \times 1200$. We increase the height and width of the image in Figure 9.14 by a factor of four and initialize a larger composite image.
+To obtain a clearer composite image, we train the model using a larger image size: $300 \times 450$. We increase the height and width of the image in Figure 9.14 by a factor of two and initialize a larger composite image.
 
 ```{.python .input  n=19}
-image_shape = (1200, 800)
+image_shape = (450, 300)
 content_X, content_Y = get_contents(image_shape, ctx)
 style_X, style_Y = get_styles(image_shape, ctx)
 X = preprocess(postprocess(output) * 255, image_shape)
 output = train(X, content_Y, style_Y, ctx, 0.01, 300, 100)
-gb.plt.imsave('../img/neural-style-2.png', postprocess(output).asnumpy())
+d2l.plt.imsave('../img/neural-style-2.png', postprocess(output).asnumpy())
 ```
 
 As you can see, each epoch takes more time due to the larger image size. As shown in Figure 9.15, the composite image produced retains more detail due to its larger size. The composite image not only has large blocks of color like the style image, but these blocks even have the subtle texture of brush strokes.
 
-![$1200 \times 800$ composite image. ](../img/neural-style-2.png)
+![$300 \times 450$ composite image. ](../img/neural-style-2.png)
 
 
 ## Summary
@@ -269,7 +269,6 @@ As you can see, each epoch takes more time due to the larger image size. As show
 
 * How does the output change when you select different content and style layers?
 * Adjust the weight hyper-parameters in the loss function. Does the output retain more content or have less noise?
-* Further increase the size of the composite image. Does this increase the detail of the output?
 * Use different content and style images. Can you create more interesting composite images?
 
 ## Reference

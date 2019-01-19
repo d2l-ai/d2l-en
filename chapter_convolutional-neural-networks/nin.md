@@ -11,7 +11,7 @@ We know that the inputs and outputs of convolutional layers are usually four-dim
 The NiN block is the basic block in NiN. It concatenates a convolutional layer and two $1\times 1$ convolutional layers that act as fully connected layers (with ReLu in between). The convolution width of the first layer is typically set by the user. The subsequent widths are fixed to $1 \times 1$.
 
 ```{.python .input  n=2}
-import gluonbook as gb
+import d2l
 from mxnet import gluon, init, nd
 from mxnet.gluon import nn
 
@@ -61,11 +61,11 @@ for layer in net:
 As before we use Fashion-MNIST to train the model. NiN's training is similar to that for AlexNet and VGG, but it often uses a larger learning rate.
 
 ```{.python .input}
-lr, num_epochs, batch_size, ctx = 0.1, 5, 128, gb.try_gpu()
+lr, num_epochs, batch_size, ctx = 0.1, 5, 128, d2l.try_gpu()
 net.initialize(force_reinit=True, ctx=ctx, init=init.Xavier())
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
-train_iter, test_iter = gb.load_data_fashion_mnist(batch_size, resize=224)
-gb.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
+train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)
+d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
 ```
 
 ## Summary

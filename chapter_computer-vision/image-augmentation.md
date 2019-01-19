@@ -6,12 +6,12 @@ First, import the packages or modules required for the experiment in this sectio
 
 ```{.python .input  n=21}
 %matplotlib inline
-import gluonbook as gb
+import d2l
 import mxnet as mx
 from mxnet import autograd, gluon, image, init, nd
 from mxnet.gluon import data as gdata, loss as gloss, utils as gutils
 import sys
-from time import time
+import time
 ```
 
 ## Common Image Augmentation Method
@@ -19,18 +19,18 @@ from time import time
 In this experiment, we will use an image with a shape of $400\times 500$ as an example.
 
 ```{.python .input  n=22}
-gb.set_figsize()
+d2l.set_figsize()
 img = image.imread('../img/cat1.jpg')
-gb.plt.imshow(img.asnumpy())
+d2l.plt.imshow(img.asnumpy())
 ```
 
 The drawing function `show_images` is defined below.
 
 ```{.python .input  n=23}
-# This function is saved in the gluonbook package for future use.
+# This function is saved in the d2l package for future use.
 def show_images(imgs, num_rows, num_cols, scale=2):
     figsize = (num_cols * scale, num_rows * scale)
-    _, axes = gb.plt.subplots(num_rows, num_cols, figsize=figsize)
+    _, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize)
     for i in range(num_rows):
         for j in range(num_cols):
             axes[i][j].imshow(imgs[i * num_cols + j].asnumpy())
@@ -139,7 +139,7 @@ We train the ResNet-18 model described in ["ResNet"](../chapter_convolutional-ne
 First, we define the `try_all_gpus` function to get all available GPUs.
 
 ```{.python .input  n=35}
-def try_all_gpus():  # This function is saved in the gluonbook package for future use.
+def try_all_gpus():  # This function is saved in the d2l package for future use.
     ctxes = []
     try:
         for i in range(16):  # Here, we assume the number of GPUs on a machine does not exceed 16.
@@ -162,40 +162,37 @@ def _get_batch(batch, ctx):
         labels = labels.astype(features.dtype)
     # When ctx contains multiple GPUs, mini-batch data instances are divided and copied to each GPU.
     return (gutils.split_and_load(features, ctx),
-            gutils.split_and_load(labels, ctx),
-            features.shape[0])
+            gutils.split_and_load(labels, ctx), features.shape[0])
 ```
 
 Then, we define the `evaluate_accuracy` function to evaluate the classification accuracy of the model. Different from `evaluate_accuracy`, the function described in the ["Softmax Regression Starting from Scratch"](../chapter_deep-learning-basics/softmax-regression-scratch.md) and ["Convolutional Neural Network (LeNet)"](../chapter_convolutional-neural-networks/lenet.md) sections, the function defined here are more general. It evaluates the model using all GPUs contained in the `ctx` variable by using the auxiliary function `_get_batch`.
 
 ```{.python .input  n=36}
-# This function is saved in the gluonbook package for future use.
+# This function is saved in the d2l package for future use.
 def evaluate_accuracy(data_iter, net, ctx=[mx.cpu()]):
     if isinstance(ctx, mx.Context):
         ctx = [ctx]
-    acc = nd.array([0])
-    n = 0
+    acc_sum, n = nd.array([0]), 0
     for batch in data_iter:
         features, labels, _ = _get_batch(batch, ctx)
         for X, y in zip(features, labels):
             y = y.astype('float32')
-            acc += (net(X).argmax(axis=1) == y).sum().copyto(mx.cpu())
+            acc_sum += (net(X).argmax(axis=1) == y).sum().copyto(mx.cpu())
             n += y.size
-        acc.wait_to_read()
-    return acc.asscalar() / n
+        acc_sum.wait_to_read()
+    return acc_sum.asscalar() / n
 ```
 
 Next, we define the `train` function to train and evaluate the model using multiple GPUs.
 
 ```{.python .input  n=37}
-# This function is saved in the gluonbook package for future use.
+# This function is saved in the d2l package for future use.
 def train(train_iter, test_iter, net, loss, trainer, ctx, num_epochs):
     print('training on', ctx)
     if isinstance(ctx, mx.Context):
         ctx = [ctx]
     for epoch in range(num_epochs):
-        train_l_sum, train_acc_sum, n, m = 0.0, 0.0, 0.0, 0.0
-        start = time()
+        train_l_sum, train_acc_sum, n, m, start = 0.0, 0.0, 0, 0, time.time()
         for i, batch in enumerate(train_iter):
             Xs, ys, batch_size = _get_batch(batch, ctx)
             ls = []
@@ -204,31 +201,31 @@ def train(train_iter, test_iter, net, loss, trainer, ctx, num_epochs):
                 ls = [loss(y_hat, y) for y_hat, y in zip(y_hats, ys)]
             for l in ls:
                 l.backward()
+            trainer.step(batch_size)
+            train_l_sum += sum([l.sum().asscalar() for l in ls])
+            n += sum([l.size for l in ls])
             train_acc_sum += sum([(y_hat.argmax(axis=1) == y).sum().asscalar()
                                  for y_hat, y in zip(y_hats, ys)])
-            train_l_sum += sum([l.sum().asscalar() for l in ls])
-            trainer.step(batch_size)
-            n += batch_size
             m += sum([y.size for y in ys])
         test_acc = evaluate_accuracy(test_iter, net, ctx)
         print('epoch %d, loss %.4f, train acc %.3f, test acc %.3f, '
               'time %.1f sec'
               % (epoch + 1, train_l_sum / n, train_acc_sum / m, test_acc,
-                 time() - start))
+                 time.time() - start))
 ```
 
 Now, we can define the `train_with_data_aug` function to use image augmentation to train the model. This function obtains all available GPUs and uses Adam as the optimization algorithm for training. It then applies image augmentation to the training data set, and finally calls the `train` function just defined to train and evaluate the model.
 
 ```{.python .input  n=38}
 def train_with_data_aug(train_augs, test_augs, lr=0.001):
-    batch_size, ctx, net = 256, try_all_gpus(), gb.resnet18(10)
+    batch_size, ctx, net = 256, try_all_gpus(), d2l.resnet18(10)
     net.initialize(ctx=ctx, init=init.Xavier())
     trainer = gluon.Trainer(net.collect_params(), 'adam',
                             {'learning_rate': lr})
     loss = gloss.SoftmaxCrossEntropyLoss()
     train_iter = load_cifar10(True, train_augs, batch_size)
     test_iter = load_cifar10(False, test_augs, batch_size)
-    train(train_iter, test_iter, net, loss, trainer, ctx, num_epochs=10)
+    train(train_iter, test_iter, net, loss, trainer, ctx, num_epochs=8)
 ```
 
 ### Comparative Image Augmentation Experiment

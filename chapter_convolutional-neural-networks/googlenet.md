@@ -11,7 +11,7 @@ The basic convolutional block in GoogLeNet is called an Inception block, named a
 As can be seen in the figure above, there are four parallel paths in the Inception block. The first three paths use convolutional layers with window sizes of $1\times 1$, $3\times 3$, and $5\times 5$ to extract information from different spatial sizes. The middle two paths will perform a $1\times 1$ convolution on the input to reduce the number of input channels, so as to reduce the model's complexity. The fourth path uses the $3\times 3$ maximum pooling layer, followed by the $1\times 1$ convolutional layer, to change the number of channels. The four paths all use appropriate padding to give the input and output the same height and width. Finally, we concatenate the output of each path on the channel dimension and input it to the next layer. The customizable parameters of the Inception block are the number of output channels per layer, which can be used to control the model complexity.
 
 ```{.python .input  n=1}
-import gluonbook as gb
+import d2l
 from mxnet import gluon, init, nd
 from mxnet.gluon import nn
 
@@ -113,11 +113,11 @@ for layer in net:
 As before, we train our model using the Fashion-MNIST dataset. We transform it to $96 \times 96$ pixel resolution before invoking the training procedure.
 
 ```{.python .input  n=8}
-lr, num_epochs, batch_size, ctx = 0.1, 5, 128, gb.try_gpu()
+lr, num_epochs, batch_size, ctx = 0.1, 5, 128, d2l.try_gpu()
 net.initialize(force_reinit=True, ctx=ctx, init=init.Xavier())
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
-train_iter, test_iter = gb.load_data_fashion_mnist(batch_size, resize=96)
-gb.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
+train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)
+d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
 ```
 
 ## Summary

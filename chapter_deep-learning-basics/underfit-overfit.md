@@ -88,7 +88,7 @@ Let us try how this works in practice by fitting polynomials to data. As before 
 
 ```{.python .input  n=1}
 %matplotlib inline
-import gluonbook as gb
+import d2l
 from mxnet import autograd, gluon, nd
 from mxnet.gluon import data as gdata, loss as gloss, nn
 ```
@@ -129,16 +129,16 @@ features[:2], poly_features[:2], labels[:2]
 We first define the plotting function`semilogy`, where the $y$ axis makes use of the logarithmic scale.
 
 ```{.python .input  n=4}
-# This function has been saved in the gluonbook package for future use.
+# This function has been saved in the d2l package for future use.
 def semilogy(x_vals, y_vals, x_label, y_label, x2_vals=None, y2_vals=None,
              legend=None, figsize=(3.5, 2.5)):
-    gb.set_figsize(figsize)
-    gb.plt.xlabel(x_label)
-    gb.plt.ylabel(y_label)
-    gb.plt.semilogy(x_vals, y_vals)
+    d2l.set_figsize(figsize)
+    d2l.plt.xlabel(x_label)
+    d2l.plt.ylabel(y_label)
+    d2l.plt.semilogy(x_vals, y_vals)
     if x2_vals and y2_vals:
-        gb.plt.semilogy(x2_vals, y2_vals, linestyle=':')
-        gb.plt.legend(legend)
+        d2l.plt.semilogy(x2_vals, y2_vals, linestyle=':')
+        d2l.plt.legend(legend)
 ```
 
 Similar to linear regression, polynomial function fitting also makes use of a squared loss function.  Since we will be attempting to fit the generated data set using models of varying complexity, we insert the model definition into the `fit_and_plot` function. The training and testing steps involved in polynomial function fitting are similar to those previously described in softmax regression.

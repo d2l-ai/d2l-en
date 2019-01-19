@@ -66,7 +66,7 @@ After so much theory, let's try this out in practice. Since much of the modeling
 
 ```{.python .input}
 from mxnet import autograd, nd, gluon, init
-import gluonbook as gb
+import d2l
 # display routines
 %matplotlib inline
 from matplotlib import pyplot as plt

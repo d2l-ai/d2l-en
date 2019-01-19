@@ -53,7 +53,7 @@ plt.figure(figsize=(10, 6))
 plt.scatter(features[:, 1].asnumpy(), labels.asnumpy(), 1);
 ```
 
-The plotting function `plt` as well as the `use_svg_display` and `set_figsize` functions are defined in the `gluonbook` package. We will call `gluonbook.plt` directly for future plotting. To print the vector diagram and set its size, we only need to call `gluonbook.set_figsize()` before plotting, because `plt` is a global variable in the `gluonbook` package.
+The plotting function `plt` as well as the `use_svg_display` and `set_figsize` functions are defined in the `d2l` package. We will call `d2l.plt` directly for future plotting. To print the vector diagram and set its size, we only need to call `d2l.set_figsize()` before plotting, because `plt` is a global variable in the `d2l` package.
 
 
 ## Reading Data
@@ -61,7 +61,7 @@ The plotting function `plt` as well as the `use_svg_display` and `set_figsize` f
 We need to iterate over the entire data set and continuously examine mini-batches of data examples when training the model. Here we define a function. Its purpose is to return the features and tags of random `batch_size` (batch size) examples every time it's called. One might wonder why we are not reading one observation at a time but rather construct an iterator which returns a few observations at a time. This has mostly to do with efficiency when optimizing. Recall that when we processed one dimension at a time the algorithm was quite slow. The same thing happens when processing single observations vs. an entire 'batch' of them, which can be represented as a matrix rather than just a vector. In particular, GPUs are much faster when it comes to dealing with matrices, up to an order of magnitude. This is one of the reasons why deep learning usually operates on mini-batches rather than singletons.
 
 ```{.python .input  n=5}
-# This function has been saved in the gluonbook package for future use.
+# This function has been saved in the d2l package for future use.
 def data_iter(batch_size, features, labels):
     num_examples = len(features)
     indices = list(range(num_examples))
@@ -105,7 +105,7 @@ b.attach_grad()
 Next we'll want to define our model. In this case, we'll be working with linear models, the simplest possible useful neural network. To calculate the output of the linear model, we simply multiply a given input with the model's weights $w$, and add the offset $b$.
 
 ```{.python .input  n=9}
-def linreg(X, w, b):  # This function has been saved in the gluonbook package for future use.
+def linreg(X, w, b):  # This function has been saved in the d2l package for future use.
     return nd.dot(X, w) + b
 ```
 
@@ -114,7 +114,7 @@ def linreg(X, w, b):  # This function has been saved in the gluonbook package fo
 We will use the squared loss function described in the previous section to define the linear regression loss. In the implementation, we need to transform the true value `y` into the predicted value's shape `y_hat`. The result returned by the following function will also be the same as the `y_hat` shape.
 
 ```{.python .input  n=10}
-def squared_loss(y_hat, y):  # This function has been saved in the gluonbook package for future use.
+def squared_loss(y_hat, y):  # This function has been saved in the d2l package for future use.
     return (y_hat - y.reshape(y_hat.shape)) ** 2 / 2
 ```
 
@@ -123,7 +123,7 @@ def squared_loss(y_hat, y):  # This function has been saved in the gluonbook pac
 Linear regression actually has a closed-form solution. However, most interesting models that we'll care about cannot be solved analytically. So we'll solve this problem by stochastic gradient descent `sgd`. At each step, we'll estimate the gradient of the loss with respect to our weights, using one batch randomly drawn from our dataset. Then, we'll update our parameters a small amount in the direction that reduces the loss. Here, the gradient calculated by the automatic differentiation module is the gradient sum of a batch of examples. We divide it by the batch size to obtain the average. The size of the step is determined by the learning rate `lr`.
 
 ```{.python .input  n=11}
-def sgd(params, lr, batch_size):  # This function has been saved in the gluonbook package for future use.
+def sgd(params, lr, batch_size):  # This function has been saved in the d2l package for future use.
     for param in params:
         param[:] = param - lr * param.grad / batch_size
 ```

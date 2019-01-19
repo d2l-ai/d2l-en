@@ -13,7 +13,7 @@ Figure 9.16 shows the information on the competition's webpage. In order to subm
 First, import the packages or modules required for the competition.
 
 ```{.python .input  n=1}
-import gluonbook as gb
+import d2l
 from mxnet import autograd, gluon, init
 from mxnet.gluon import data as gdata, loss as gloss, nn
 import os
@@ -72,7 +72,7 @@ def read_label_file(data_dir, label_file, train_dir, valid_ratio):
 Below we define a helper function to create a path only if the path does not already exist.
 
 ```{.python .input  n=4}
-def mkdir_if_not_exist(path):  # This function is saved in the gluonbook package for future use.
+def mkdir_if_not_exist(path):  # This function is saved in the d2l package for future use.
     if not os.path.exists(os.path.join(*path)):
         os.makedirs(os.path.join(*path))
 ```
@@ -184,13 +184,13 @@ test_ds = gdata.vision.ImageFolderDataset(
 We specify the defined image augmentation operation in `DataLoader`. During training, we only use the validation set to evaluate the model, so we need to ensure the certainty of the output. During prediction, we will train the model on the combined training set and validation set to make full use of all labelled data.
 
 ```{.python .input}
-train_data = gdata.DataLoader(train_ds.transform_first(transform_train),
+train_iter = gdata.DataLoader(train_ds.transform_first(transform_train),
                               batch_size, shuffle=True, last_batch='keep')
-valid_data = gdata.DataLoader(valid_ds.transform_first(transform_test),
+valid_iter = gdata.DataLoader(valid_ds.transform_first(transform_test),
                               batch_size, shuffle=True, last_batch='keep')
-train_valid_data = gdata.DataLoader(train_valid_ds.transform_first(
+train_valid_iter = gdata.DataLoader(train_valid_ds.transform_first(
     transform_train), batch_size, shuffle=True, last_batch='keep')
-test_data = gdata.DataLoader(test_ds.transform_first(transform_test),
+test_iter = gdata.DataLoader(test_ds.transform_first(transform_test),
                              batch_size, shuffle=False, last_batch='keep')
 ```
 
@@ -263,33 +263,33 @@ loss = gloss.SoftmaxCrossEntropyLoss()
 We will select the model and tune hyper-parameters according to the model's performance on the validation set. Next, we define the model training function `train`. We record the training time of each epoch, which helps us compare the time costs of different models.
 
 ```{.python .input  n=12}
-def train(net, train_data, valid_data, num_epochs, lr, wd, ctx, lr_period,
+def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
           lr_decay):
     trainer = gluon.Trainer(net.collect_params(), 'sgd',
                             {'learning_rate': lr, 'momentum': 0.9, 'wd': wd})
     for epoch in range(num_epochs):
-        train_l, train_acc, start = 0.0, 0.0, time.time()
+        train_l_sum, train_acc_sum, n, start = 0.0, 0.0, 0, time.time()
         if epoch > 0 and epoch % lr_period == 0:
             trainer.set_learning_rate(trainer.learning_rate * lr_decay)
-        for X, y in train_data:
+        for X, y in train_iter:
             y = y.astype('float32').as_in_context(ctx)
             with autograd.record():
                 y_hat = net(X.as_in_context(ctx))
-                l = loss(y_hat, y)
+                l = loss(y_hat, y).sum()
             l.backward()
             trainer.step(batch_size)
-            train_l += l.mean().asscalar()
-            train_acc += gb.accuracy(y_hat, y)
+            train_l_sum += l.asscalar()
+            train_acc_sum += (y_hat.argmax(axis=1) == y).sum().asscalar()
+            n += y.size
         time_s = "time %.2f sec" % (time.time() - start)
-        if valid_data is not None:
-            valid_acc = gb.evaluate_accuracy(valid_data, net, ctx)
+        if valid_iter is not None:
+            valid_acc = d2l.evaluate_accuracy(valid_iter, net, ctx)
             epoch_s = ("epoch %d, loss %f, train acc %f, valid acc %f, "
-                       % (epoch + 1, train_l / len(train_data),
-                          train_acc / len(train_data), valid_acc))
+                       % (epoch + 1, train_l_sum / n, train_acc_sum / n,
+                       valid_acc))
         else:
             epoch_s = ("epoch %d, loss %f, train acc %f, " %
-                       (epoch + 1, train_l / len(train_data),
-                        train_acc / len(train_data)))
+                       (epoch + 1, train_l_sum / n, train_acc_sum / n))
         print(epoch_s + time_s + ', lr ' + str(trainer.learning_rate))
 ```
 
@@ -298,10 +298,10 @@ def train(net, train_data, valid_data, num_epochs, lr, wd, ctx, lr_period,
 Now, we can train and validate the model. The following hyper-parameters can be tuned. For example, we can increase the number of epochs. Because `lr_period` and `lr_decay` are set to 80 and 0.1 respectively, the learning rate of the optimization algorithm will be multiplied by 0.1 after every 80 epochs. For simplicity, we only train one epoch here.
 
 ```{.python .input  n=13}
-ctx, num_epochs, lr, wd = gb.try_gpu(), 1, 0.1, 5e-4
+ctx, num_epochs, lr, wd = d2l.try_gpu(), 1, 0.1, 5e-4
 lr_period, lr_decay, net = 80, 0.1, get_net(ctx)
 net.hybridize()
-train(net, train_data, valid_data, num_epochs, lr, wd, ctx, lr_period,
+train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
       lr_decay)
 ```
 
@@ -312,10 +312,10 @@ After obtaining a satisfactory model design and hyper-parameters, we use all tra
 ```{.python .input  n=14}
 net, preds = get_net(ctx), []
 net.hybridize()
-train(net, train_valid_data, None, num_epochs, lr, wd, ctx, lr_period,
+train(net, train_valid_iter, None, num_epochs, lr, wd, ctx, lr_period,
       lr_decay)
 
-for X, _ in test_data:
+for X, _ in test_iter:
     y_hat = net(X.as_in_context(ctx))
     preds.extend(y_hat.argmax(axis=1).astype(int).asnumpy())
 sorted_ids = list(range(1, len(test_ds) + 1))

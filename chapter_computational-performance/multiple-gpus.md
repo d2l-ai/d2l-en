@@ -20,7 +20,7 @@ Assume there are $k$ GPUs on a machine. Given the model to be trained, each GPU 
 In order to implement data parallelism in a multi-GPU training scenario from scratch, we first import the required packages or modules.
 
 ```{.python .input  n=2}
-import gluonbook as gb
+import d2l
 import mxnet as mx
 from mxnet import autograd, nd
 from mxnet.gluon import loss as gloss
@@ -143,7 +143,7 @@ def train_batch(X, y, gpu_params, ctx, lr):
     for i in range(len(gpu_params[0])):
         allreduce([gpu_params[c][i].grad for c in range(len(ctx))])
     for param in gpu_params:  # The model parameters are updated separately on each GPU.
-        gb.sgd(param, lr, X.shape[0])  # Here, we use a full-size batch.
+        d2l.sgd(param, lr, X.shape[0])  # Here, we use a full-size batch.
 ```
 
 ## Training Functions
@@ -152,7 +152,7 @@ Now, we can define the training function. Here the training function is slightly
 
 ```{.python .input  n=11}
 def train(num_gpus, batch_size, lr):
-    train_iter, test_iter = gb.load_data_fashion_mnist(batch_size)
+    train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
     ctx = [mx.gpu(i) for i in range(num_gpus)]
     print('running on:', ctx)
     # Copy model parameters to num_gpus GPUs.
@@ -168,7 +168,7 @@ def train(num_gpus, batch_size, lr):
         def net(x):  # Verify the model on GPU 0.
             return lenet(x, gpu_params[0])
 
-        test_acc = gb.evaluate_accuracy(test_iter, net, ctx[0])
+        test_acc = d2l.evaluate_accuracy(test_iter, net, ctx[0])
         print('epoch %d, time: %.1f sec, test acc: %.2f'
               % (epoch + 1, train_time, test_acc))
 ```

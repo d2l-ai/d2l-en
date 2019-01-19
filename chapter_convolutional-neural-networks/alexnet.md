@@ -74,7 +74,7 @@ Second, AlexNet changed the sigmoid activation function to a simpler ReLU activa
 AlexNet controls the model complexity of the fully connected layer by [dropout](../chapter_deep-learning-basics/dropout.md) section), while LeNet only uses weight decay. To augment the data even further, the training loop of AlexNet added a great deal of image augmentation, such as flipping, clipping, and color changes. This makes the model more robust and the larger sample size effectively reduces overfitting. We will discuss preprocessing in detail in a [subsequent section](../chapter_computer-vision/image-augmentation.md).
 
 ```{.python .input  n=1}
-import gluonbook as gb
+import d2l
 from mxnet import gluon, init, nd
 from mxnet.gluon import data as gdata, nn
 import os
@@ -116,7 +116,7 @@ for layer in net:
 Although AlexNet uses ImageNet in the paper, we use Fashion-MNIST. This is simply since training on ImageNet would take hours even on modern GPUs. One of the problems with applying AlexNet directly is that the images are simply too low resolution at $28 \times 28$ pixels. To make things work we upsample them to $244 \times 244$ (this is generally not very smart but we do so to illustrate network performance). This can be done with the `Resize` class. We insert it into the processing pipeline before using the `ToTensor` class. The `Compose` class to concatenates these two changes for easy invocation.
 
 ```{.python .input  n=3}
-# This function has been saved in the gluonbook package for future use.
+# This function has been saved in the d2l package for future use.
 def load_data_fashion_mnist(batch_size, resize=None, root=os.path.join(
         '~', '.mxnet', 'datasets', 'fashion-mnist')):
     root = os.path.expanduser(root)  # Expand the user path '~'.
@@ -145,10 +145,10 @@ train_iter, test_iter = load_data_fashion_mnist(batch_size, resize=224)
 Now, we can start training AlexNet. Compared to LeNet in the previous section, the main change here is the use of a smaller learning rate and much slower training due to the deeper and wider network, the higher image resolution and the more costly convolutions.
 
 ```{.python .input  n=5}
-lr, num_epochs, ctx = 0.01, 5, gb.try_gpu()
+lr, num_epochs, ctx = 0.01, 5, d2l.try_gpu()
 net.initialize(force_reinit=True, ctx=ctx, init=init.Xavier())
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
-gb.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
+d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
 ```
 
 ## Summary
