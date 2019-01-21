@@ -1,6 +1,6 @@
 # Batch Normalization
 
-Training very deep models is difficult and it can be tricky to get the models to converge (or converge within a reasonable amount of time) when training. It can be eqally challenging to ensure that they do not overfit. This is one of the reasons why it took a long time for very deep networks with over 100 layers to gain popularity.
+Training very deep models is difficult and it can be tricky to get the models to converge (or converge within a reasonable amount of time) when training. It can be equally challenging to ensure that they do not overfit. This is one of the reasons why it took a long time for very deep networks with over 100 layers to gain popularity.
 
 ## Training Deep Networks
 
@@ -11,7 +11,7 @@ Let's review some of the practical challenges when training deep networks.
 1. Deeper networks are fairly complex and they are more prone to overfitting. This means that regularization becomes more critical. That said dropout is nontrivial to use in convolutional layers and does not perform as well, hence we need a more appropriate type of regularization.
 1. When training deep networks the last layers will converge first, at which point the layers below start converging. Unfortunately, once this happens, the weights for the last layers are no longer optimal and they need to converge again. As training progresses, this gets worse.
 
-Batch normalization (BN), as proposed by [Ioffe and Szegedy, 2015](https://arxiv.org/abs/1502.03167), can be used to cope with the challenges of deep model training. During training, BN continuously adjusts the intermediate output of the neural network by utilizing the mean and standard deviation of the mini-batch. In effect that causes the optimization landscape of the model to be smoother, hence allowing the model to reach a local minimum and to be trained faster. That being said, one has to be careful in oder to avoid the already troubling trends in machine learning ([Lipton et al, 2018](https://arxiv.org/abs/1807.03341)). Batch normalization has been shown ([Santukar et al., 2018](https://arxiv.org/abs/1805.11604)) to have no relation at all with internal covariate shift, as a matter in fact it has been shown that it actually causes the opposite result from what it was originally intented, pointed by [Lipton et al., 2018](https://arxiv.org/abs/1807.03341) as well. In a nutshell, the idea in Batch Normalization is to transform the activation at a given layer from $\mathbf{x}$ to
+Batch normalization (BN), as proposed by [Ioffe and Szegedy, 2015](https://arxiv.org/abs/1502.03167), can be used to cope with the challenges of deep model training. During training, BN continuously adjusts the intermediate output of the neural network by utilizing the mean and standard deviation of the mini-batch. In effect that causes the optimization landscape of the model to be smoother, hence allowing the model to reach a local minimum and to be trained faster. That being said, one has to be careful in oder to avoid the already troubling trends in machine learning ([Lipton et al, 2018](https://arxiv.org/abs/1807.03341)). Batch normalization has been shown ([Santukar et al., 2018](https://arxiv.org/abs/1805.11604)) to have no relation at all with internal covariate shift, as a matter in fact it has been shown that it actually causes the opposite result from what it was originally intended, pointed by [Lipton et al., 2018](https://arxiv.org/abs/1807.03341) as well. In a nutshell, the idea in Batch Normalization is to transform the activation at a given layer from $\mathbf{x}$ to
 
 $$\mathrm{BN}(\mathbf{x}) = \mathbf{\gamma} \odot \frac{\mathbf{x} - \hat{\mathbf{\mu}}}{\hat\sigma} + \mathbf{\beta}$$
 
@@ -56,7 +56,7 @@ At prediction time we might not have the luxury of computing offsets per batch -
 Next, we will implement the batch normalization layer via the NDArray from scratch.
 
 ```{.python .input  n=72}
-import gluonbook as gb
+import d2l
 from mxnet import autograd, gluon, init, nd
 from mxnet.gluon import nn
 
@@ -145,11 +145,11 @@ net.add(nn.Conv2D(6, kernel_size=5),
 Next we train the modified model, again on Fashion-MNIST. The code is virtually identical to that in previous steps. The main difference is the considerably larger learning rate.
 
 ```{.python .input  n=77}
-lr, num_epochs, batch_size, ctx = 1.0, 5, 256, gb.try_gpu()
+lr, num_epochs, batch_size, ctx = 1.0, 5, 256, d2l.try_gpu()
 net.initialize(ctx=ctx, init=init.Xavier())
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
-train_iter, test_iter = gb.load_data_fashion_mnist(batch_size)
-gb.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
+train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
+d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
 ```
 
 Let's have a look at the scale parameter `gamma` and the shift parameter `beta` learned from the first batch normalization layer.
@@ -186,7 +186,7 @@ Use the same hyper-parameter to carry out the training. Note that as always the 
 ```{.python .input}
 net.initialize(ctx=ctx, init=init.Xavier())
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
-gb.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
+d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
 ```
 
 ## Summary

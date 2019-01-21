@@ -8,7 +8,7 @@ To demonstrate how to generate anchor boxes on multiple scales, let us read an i
 
 ```{.python .input  n=1}
 %matplotlib inline
-import gluonbook as gb
+import d2l
 from mxnet import contrib, image, nd
 
 img = image.imread('../img/catdog.jpg')
@@ -22,13 +22,13 @@ We can determine the midpoints of anchor boxes uniformly sampled on any image by
 The function `display_anchors` is defined below.  We are going to generate anchor boxes `anchors` centered on each unit (pixel) on the feature map `fmap`.  Since the coordinates of axes $x$ and $y$ in anchor boxes `anchors` have been divided by the width and height of the feature map `fmap`, values between 0 and 1 can be used to represent relative positions of anchor boxes in the feature map.  Since the midpoints of anchor boxes `anchors` overlap with all the units on feature map `fmap`, the relative spatial positions of the midpoints of the `anchors` on any image must have a uniform distribution.  Specifically, when the width and height of the feature map are set to `fmap_w` and `fmap_h` respectively, the function will conduct uniform sampling for `fmap_h` rows and `fmap_w` columns of pixels and use them as midpoints to generate anchor boxes with size `s` (we assume that the length of list `s` is 1) and different aspect ratios (`ratios`).
 
 ```{.python .input  n=2}
-gb.set_figsize()
+d2l.set_figsize()
 
 def display_anchors(fmap_w, fmap_h, s):
     fmap = nd.zeros((1, 10, fmap_w, fmap_h))  # The values from the first two dimensions will not affect the output.
     anchors = contrib.nd.MultiBoxPrior(fmap, sizes=s, ratios=[1, 2, 0.5])
     bbox_scale = nd.array((w, h, w, h))
-    gb.show_bboxes(gb.plt.imshow(img.asnumpy()).axes, anchors[0] * bbox_scale)
+    d2l.show_bboxes(d2l.plt.imshow(img.asnumpy()).axes, anchors[0] * bbox_scale)
 ```
 
 We will first focus on the detection of small objects. In order to make it easier to distinguish upon display, the anchor boxes with different midpoints here do not overlap. We assume that the size of the anchor boxes is 0.15 and the height and width of the feature map are 4. We can see that the midpoints of anchor boxes from the 4 rows and 4 columns on the image are uniformly distributed.

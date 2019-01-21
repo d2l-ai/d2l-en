@@ -15,7 +15,7 @@ First, import the packages or modules required for the competition.
 
 ```{.python .input}
 import collections
-import gluonbook as gb
+import d2l
 import math
 from mxnet import autograd, gluon, init, nd
 from mxnet.gluon import data as gdata, loss as gloss, model_zoo, nn
@@ -68,16 +68,16 @@ def reorg_train_valid(data_dir, train_dir, input_dir, valid_ratio, idx_label):
     for train_file in os.listdir(os.path.join(data_dir, train_dir)):
         idx = train_file.split('.')[0]
         label = idx_label[idx]
-        gb.mkdir_if_not_exist([data_dir, input_dir, 'train_valid', label])
+        d2l.mkdir_if_not_exist([data_dir, input_dir, 'train_valid', label])
         shutil.copy(os.path.join(data_dir, train_dir, train_file),
                     os.path.join(data_dir, input_dir, 'train_valid', label))
         if label not in label_count or label_count[label] < n_valid_per_label:
-            gb.mkdir_if_not_exist([data_dir, input_dir, 'valid', label])
+            d2l.mkdir_if_not_exist([data_dir, input_dir, 'valid', label])
             shutil.copy(os.path.join(data_dir, train_dir, train_file),
                         os.path.join(data_dir, input_dir, 'valid', label))
             label_count[label] = label_count.get(label, 0) + 1
         else:
-            gb.mkdir_if_not_exist([data_dir, input_dir, 'train', label])
+            d2l.mkdir_if_not_exist([data_dir, input_dir, 'train', label])
             shutil.copy(os.path.join(data_dir, train_dir, train_file),
                         os.path.join(data_dir, input_dir, 'train', label))
 ```
@@ -95,7 +95,7 @@ def reorg_dog_data(data_dir, label_file, train_dir, test_dir, input_dir,
         idx_label = dict(((idx, label) for idx, label in tokens))
     reorg_train_valid(data_dir, train_dir, input_dir, valid_ratio, idx_label)
     # Organize the training set.
-    gb.mkdir_if_not_exist([data_dir, input_dir, 'test', 'unknown'])
+    d2l.mkdir_if_not_exist([data_dir, input_dir, 'test', 'unknown'])
     for test_file in os.listdir(os.path.join(data_dir, test_dir)):
         shutil.copy(os.path.join(data_dir, test_dir, test_file),
                     os.path.join(data_dir, input_dir, 'test', 'unknown'))
@@ -167,13 +167,13 @@ test_ds = gdata.vision.ImageFolderDataset(
 Here, we create a `DataLoader` instance, just like in the previous section.
 
 ```{.python .input}
-train_data = gdata.DataLoader(train_ds.transform_first(transform_train),
+train_iter = gdata.DataLoader(train_ds.transform_first(transform_train),
                               batch_size, shuffle=True, last_batch='keep')
-valid_data = gdata.DataLoader(valid_ds.transform_first(transform_test),
+valid_iter = gdata.DataLoader(valid_ds.transform_first(transform_test),
                               batch_size, shuffle=True, last_batch='keep')
-train_valid_data = gdata.DataLoader(train_valid_ds.transform_first(
+train_valid_iter = gdata.DataLoader(train_valid_ds.transform_first(
     transform_train), batch_size, shuffle=True, last_batch='keep')
-test_data = gdata.DataLoader(test_ds.transform_first(transform_test),
+test_iter = gdata.DataLoader(test_ds.transform_first(transform_test),
                              batch_size, shuffle=False, last_batch='keep')
 ```
 
@@ -203,14 +203,15 @@ When calculating the loss, we first use the member variable `features` to obtain
 ```{.python .input}
 loss = gloss.SoftmaxCrossEntropyLoss()
 
-def get_loss(data, net, ctx):
-    l = 0.0
-    for X, y in data:
+def evaluate_loss(data_iter, net, ctx):
+    l_sum, n = 0.0, 0
+    for X, y in data_iter:
         y = y.as_in_context(ctx)
         output_features = net.features(X.as_in_context(ctx))
         outputs = net.output_new(output_features)
-        l += loss(outputs, y).mean().asscalar()
-    return l / len(data)
+        l_sum += loss(outputs, y).sum().asscalar()
+        n += y.size
+    return l_sum / n
 ```
 
 ## Define the Training Functions
@@ -218,32 +219,33 @@ def get_loss(data, net, ctx):
 We will select the model and tune hyper-parameters according to the model's performance on the validation set. The model training function `train` only trains the small custom output network.
 
 ```{.python .input  n=7}
-def train(net, train_data, valid_data, num_epochs, lr, wd, ctx, lr_period,
+def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
           lr_decay):
     # Only train the small custom output network.
     trainer = gluon.Trainer(net.output_new.collect_params(), 'sgd',
                             {'learning_rate': lr, 'momentum': 0.9, 'wd': wd})
     for epoch in range(num_epochs):
-        train_l, start = 0.0, time.time()
+        train_l_sum, n, start = 0.0, 0, time.time()
         if epoch > 0 and epoch % lr_period == 0:
             trainer.set_learning_rate(trainer.learning_rate * lr_decay)
-        for X, y in train_data:
-            y = y.astype('float32').as_in_context(ctx)
+        for X, y in train_iter:
+            y = y.as_in_context(ctx)
             output_features = net.features(X.as_in_context(ctx))
             with autograd.record():
                 outputs = net.output_new(output_features)
-                l = loss(outputs, y)
+                l = loss(outputs, y).sum()
             l.backward()
             trainer.step(batch_size)
-            train_l += l.mean().asscalar()
+            train_l_sum += l.asscalar()
+            n += y.size
         time_s = "time %.2f sec" % (time.time() - start)
-        if valid_data is not None:
-            valid_loss = get_loss(valid_data, net, ctx)
+        if valid_iter is not None:
+            valid_loss = evaluate_loss(valid_iter, net, ctx)
             epoch_s = ("epoch %d, train loss %f, valid loss %f, "
-                       % (epoch + 1, train_l / len(train_data), valid_loss))
+                       % (epoch + 1, train_l_sum / n, valid_loss))
         else:
             epoch_s = ("epoch %d, train loss %f, "
-                       % (epoch + 1, train_l / len(train_data)))
+                       % (epoch + 1, train_l_sum / n))
         print(epoch_s + time_s + ', lr ' + str(trainer.learning_rate))
 ```
 
@@ -252,10 +254,10 @@ def train(net, train_data, valid_data, num_epochs, lr, wd, ctx, lr_period,
 Now, we can train and validate the model. The following hyper-parameters can be tuned. For example, we can increase the number of epochs. Because `lr_period` and `lr_decay` are set to 10 and 0.1 respectively, the learning rate of the optimization algorithm will be multiplied by 0.1 after every 10 epochs.
 
 ```{.python .input  n=9}
-ctx, num_epochs, lr, wd = gb.try_gpu(), 1, 0.01, 1e-4
+ctx, num_epochs, lr, wd = d2l.try_gpu(), 1, 0.01, 1e-4
 lr_period, lr_decay, net = 10, 0.1, get_net(ctx)
 net.hybridize()
-train(net, train_data, valid_data, num_epochs, lr, wd, ctx, lr_period,
+train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
       lr_decay)
 ```
 
@@ -266,11 +268,11 @@ After obtaining a satisfactory model design and hyper-parameters, we use all tra
 ```{.python .input  n=8}
 net = get_net(ctx)
 net.hybridize()
-train(net, train_valid_data, None, num_epochs, lr, wd, ctx, lr_period,
+train(net, train_valid_iter, None, num_epochs, lr, wd, ctx, lr_period,
       lr_decay)
 
 preds = []
-for data, label in test_data:
+for data, label in test_iter:
     output_features = net.features(data.as_in_context(ctx))
     output = nd.softmax(net.output_new(output_features))
     preds.extend(output.asnumpy())

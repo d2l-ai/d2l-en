@@ -135,7 +135,7 @@ After installation, run `source ~/.bashrc` once to activate CUDA and Conda. Next
 
 ```
 mkdir d2l-en && cd d2l-en
-curl https://www.diveintodeeplearning.org/d2l-en-1.0.zip -o d2l-en.zip
+curl https://www.d2l.ai/d2l-en-1.0.zip -o d2l-en.zip
 unzip d2l-en.zip && rm d2l-en.zip
 conda env create -f environment.yml
 source activate gluon

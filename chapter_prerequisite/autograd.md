@@ -8,7 +8,7 @@ from mxnet import autograd, nd
 
 ## Simple Examples
 
-Let's look at a simple example: find the gradient of the function $y = 2\boldsymbol{x}^{\top}\boldsymbol{x}$ with respect to the column vector $\boldsymbol{x}$. Firstly, we create the variable `x` and assign an initial value.
+Let's look at a simple example: find the gradient of the function $y = 2\boldsymbol{x}^{\top}\boldsymbol{x}$ with respect to the column vector $\boldsymbol{x}$. First, we create the variable `x` and assign an initial value.
 
 ```{.python .input}
 x = nd.arange(4).reshape((4, 1))
@@ -21,7 +21,7 @@ To find the gradient of the variable `x`, we need to call the `attach_grad` func
 x.attach_grad()
 ```
 
-Next, we define the function with respect to the variable `x`. To reduce computational and memory usage, MXNet does not record calculations for gradients by default. We need to call the `record` function to ask the MXNet to record the calculations related to the gradient.
+Next, we define the function with respect to the variable `x`. To reduce computational and memory usage, MXNet does not record calculations for gradients by default. We need to call the `record` function to ask MXNet to record the calculations related to the gradient.
 
 ```{.python .input}
 with autograd.record():
@@ -43,7 +43,7 @@ x.grad
 
 ## Training Mode and Prediction Mode
 
-As you can see from the above, after calling the `record` function, MXNet will record and calculate the gradient. In addition, `autograd` will also change the running mode from the prediction mode to the training mode by default. This can be viewed by calling the `is_training` function.
+As you can see from above, after calling the `record` function, MXNet will record and calculate the gradient. In addition, `autograd` will also change the running mode from the prediction mode to the training mode by default. This can be viewed by calling the `is_training` function.
 
 ```{.python .input}
 print(autograd.is_training())
@@ -92,11 +92,11 @@ a.grad == c / a
 
 * MXNet provides an `autograd` package to automate the derivation process.
 * MXNet's `autograd` package can be used to derive general imperative programs.
-* The running modes of MXNet include the training mode and the prediction mode. We can determine the running mode by `autograd.is_training()`.
+* The running modes of MXNet includes the training mode and the prediction mode. We can determine the running mode by `autograd.is_training()`.
 
 ## exercise
 
-* In the example, finding the gradient of the control flow shown in this section, the variable `a` is changed to a random vector or matrix. At this point, the result of the calculation `c` is no longer a scalar. So, what will happen to the running result? How do we analyze the result?
+* In the example finding the gradient of the control flow shown in this section, the variable `a` is changed to a random vector or matrix. At this point, the result of the calculation `c` is no longer a scalar. So, what will happen to the running result? How do we analyze the result?
 * Redesign an example of finding the gradient of the control flow. Run and analyze the result.
 
 

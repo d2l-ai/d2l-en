@@ -65,7 +65,7 @@ Next, we will look into two common problems that occur during model training.  O
 
 ### Model Complexity
 
-We use polyomials as a way to illustrate the issue. Given training data consisting of the scalar data feature $x$ and the corresponding scalar label $y$, we try to find a polynomial of degree $d$
+We use polynomials as a way to illustrate the issue. Given training data consisting of the scalar data feature $x$ and the corresponding scalar label $y$, we try to find a polynomial of degree $d$
 
 $$\hat{y}= \sum_{i=0}^d x^i w_i$$
 
@@ -79,7 +79,7 @@ A higher order polynomial function is more complex than a lower order polynomial
 
 ### Data Set Size
 
-Another influence is the amount of training data. Typically, if there are not enough samples in the training data set, especially if the number of samples is less than the number of model parameters (count by element), overfitting is more likely to occur. Additionally, as we increase the amount of training data, the generalization error tpically decreases. This means that more data never hurts. Moreover, it also means that we should typically only use complex models (e.g. many layers) if we have sufficient data.
+Another influence is the amount of training data. Typically, if there are not enough samples in the training data set, especially if the number of samples is less than the number of model parameters (count by element), overfitting is more likely to occur. Additionally, as we increase the amount of training data, the generalization error typically decreases. This means that more data never hurts. Moreover, it also means that we should typically only use complex models (e.g. many layers) if we have sufficient data.
 
 
 ## Polynomial Regression
@@ -88,7 +88,7 @@ Let us try how this works in practice by fitting polynomials to data. As before 
 
 ```{.python .input  n=1}
 %matplotlib inline
-import gluonbook as gb
+import d2l
 from mxnet import autograd, gluon, nd
 from mxnet.gluon import data as gdata, loss as gloss, nn
 ```
@@ -129,16 +129,16 @@ features[:2], poly_features[:2], labels[:2]
 We first define the plotting function`semilogy`, where the $y$ axis makes use of the logarithmic scale.
 
 ```{.python .input  n=4}
-# This function has been saved in the gluonbook package for future use.
+# This function has been saved in the d2l package for future use.
 def semilogy(x_vals, y_vals, x_label, y_label, x2_vals=None, y2_vals=None,
              legend=None, figsize=(3.5, 2.5)):
-    gb.set_figsize(figsize)
-    gb.plt.xlabel(x_label)
-    gb.plt.ylabel(y_label)
-    gb.plt.semilogy(x_vals, y_vals)
+    d2l.set_figsize(figsize)
+    d2l.plt.xlabel(x_label)
+    d2l.plt.ylabel(y_label)
+    d2l.plt.semilogy(x_vals, y_vals)
     if x2_vals and y2_vals:
-        gb.plt.semilogy(x2_vals, y2_vals, linestyle=':')
-        gb.plt.legend(legend)
+        d2l.plt.semilogy(x2_vals, y2_vals, linestyle=':')
+        d2l.plt.legend(legend)
 ```
 
 Similar to linear regression, polynomial function fitting also makes use of a squared loss function.  Since we will be attempting to fit the generated data set using models of varying complexity, we insert the model definition into the `fit_and_plot` function. The training and testing steps involved in polynomial function fitting are similar to those previously described in softmax regression.

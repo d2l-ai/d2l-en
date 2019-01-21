@@ -227,7 +227,7 @@ In the following sections, we will discuss a few types of machine learning in so
 ## Supervised learning
 
 Supervised learning addresses the task of predicting *targets* given input data.
-The targets, also commonly called *labels* are generally denoted *y*.
+The targets, also commonly called *labels*, are generally denoted *y*.
 The input data points, also commonly called *examples* or *instances*, are typically denoted $\boldsymbol{x}$.
 The goal is to produce a model $f_\theta$ that maps an input $\boldsymbol{x}$ to a prediction $f_{\theta}(\boldsymbol{x})$
 
@@ -238,7 +238,7 @@ This observation, *heart attack* or *no heart attack*,
 would be our label $y$.
 The input data $\boldsymbol{x}$ might be vital signs such as heart rate, diastolic and systolic blood pressure, etc.
 
-The supervision comes into play because for choosing the parameters $\theta$, we (the supervisors) provide the model with a collection of *labeled examples* ($\boldsymbol{x}_i, y_i$), where each example $\boldsymbol{x}_i$ is matched up against it's correct label.
+The supervision comes into play because for choosing the parameters $\theta$, we (the supervisors) provide the model with a collection of *labeled examples* ($\boldsymbol{x}_i, y_i$), where each example $\boldsymbol{x}_i$ is matched up against its correct label.
 
 In probabilistic terms, we typically are interested estimating
 the conditional probability $P(y|x)$.
@@ -571,7 +571,7 @@ this isn't quite so trivial for computers.
 
 #### Machine Translation
 
-Unlike the case of speech of recognition, where corresponding inputs and outputs occur in the same order (after alignment),
+Unlike the case of speech recognition, where corresponding inputs and outputs occur in the same order (after alignment),
 in machine translation, order inversion can be vital.
 In other words, while we are still converting one sequence into another,
 neither the number of inputs and outputs
@@ -682,7 +682,7 @@ in which an agent interacts with an environment over a series of *time steps*.
 At each time step $t$, the agent receives some observation $o_t$ from the environment,
 and must choose an action $a_t$ which is then transmitted back to the environment.
 Finally, the agent receives a reward $r_t$ from the environment.
-The agent then receives a subseqeunt observation, and chooses a subsequent action, and so on.
+The agent then receives a subsequent observation, and chooses a subsequent action, and so on.
 The behavior of an RL agent is governed by a *policy*.
 In short, a *policy* is just a function that maps from observations (of the environment) to actions.
 The goal of reinforcement learning is to produce a good policy.

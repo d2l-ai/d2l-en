@@ -1,7 +1,7 @@
 # Naive Bayes Classification
 
 Conditional independence is useful when dealing with data, since it simplifies a lot of equations. A popular (and very simple) algorithm is the Naive Bayes Classifier.
-The key assumption in it is that the attributes are all independent of each other, given the labels. In other words, we have:
+Its key assumption is that the attributes are all independent of each other, given the labels. In other words, we have:
 
 $$p(\mathbf{x} | y) = \prod_i p(x_i | y)$$
 
@@ -9,13 +9,13 @@ Using Bayes Theorem this leads to the classifier $p(y | \mathbf{x}) = \frac{\pro
 
 $$p(y | \mathbf{x}) \propto \prod_i p(x_i | y) p(y).$$
 
-To illustrate this a bit, consider classifying emails into spam and ham. It's fair to say that the occurrence of the words `Nigeria`, `prince`, `money`, `rich` are all likely indicators that the e-mail might be spam, whereas `theorem`, `network`, `Bayes` or `statistics` are pretty good indicators that there's substance the message. We could thus model the probability of occurrence for each of these words, given the respective class and then use it to score the likelihood of a text. In fact, for a long time this *is* what many so-called [Bayesian spam filters](https://en.wikipedia.org/wiki/Naive_Bayes_spam_filtering) used.
+To illustrate this a bit, consider classifying emails into spam and ham. It's fair to say that the occurrence of the words `Nigeria`, `prince`, `money`, `rich` are all likely indicators that the e-mail might be spam, whereas `theorem`, `network`, `Bayes` or `statistics` are pretty good indicators that there's substance in the message. Thus, we could model the probability of occurrence for each of these words, given the respective class and then use it to score the likelihood of a text. In fact, for a long time this *is* what many so-called [Bayesian spam filters](https://en.wikipedia.org/wiki/Naive_Bayes_spam_filtering) used.
 
 ## Optical Character Recognition
 
 Since images are much easier to deal with, we will illustrate the workings of a Naive Bayes classifier for distinguishing digits on the MNIST dataset. The problem is that we don't actually know $p(y)$ and $p(x_i | y)$. So we need to *estimate* it given some training data first. This is what is called *training* the model. Estimating $p(y)$ is not too hard. Since we are only dealing with 10 classes, this is pretty easy - simply count the number of occurrences $n_y$ for each of the digits and divide it by the total amount of data $n$. For instance, if digit 8 occurs $n_8 = 5,800$ times and we have a total of $n = 60,000$ images, the probability estimate is $p(y=8) = 0.0967$.
 
-Now on to slightly more difficult things - $p(x_i | y)$. Since we picked black and white images, $p(x_i | y)$ denotes the probability that pixel $i$ is switched on for class $y$. Just like before we can go and count the number of times $n_{iy}$ that such an event occurs and divide it by the total number of occurrences of y, i.e. $n_y$. But there's something slightly troubling. It might be that certain pixels are never black (e.g. for very well cropped images the corner pixels might always be white). A convenient way for statisticians to deal with this problem is to add pseudo counts to all occurrences. Hence, rather than $n_{iy}$ we use $n_{iy}+1$ and instead of $n_y$ we use $n_{y} + 1$. This is also called [Laplace Smoothing](https://en.wikipedia.org/wiki/Additive_smoothing).
+Now on to slightly more difficult things - $p(x_i | y)$. Since we picked black and white images, $p(x_i | y)$ denotes the probability that pixel $i$ is switched on for class $y$. Just like before we can go and count the number of times $n_{iy}$ such that an event occurs and divide it by the total number of occurrences of y, i.e. $n_y$. But there's something slightly troubling: certain pixels may never be black (e.g. for very well cropped images the corner pixels might always be white). A convenient way for statisticians to deal with this problem is to add pseudo counts to all occurrences. Hence, rather than $n_{iy}$ we use $n_{iy}+1$ and instead of $n_y$ we use $n_{y} + 1$. This is also called [Laplace Smoothing](https://en.wikipedia.org/wiki/Additive_smoothing).
 
 ```{.python .input  n=1}
 %matplotlib inline
@@ -60,13 +60,13 @@ plt.show()
 print('Class probabilities', py)
 ```
 
-Now we can compute the likelihoods of an image, given the model. This is statistican speak for $p(x | y)$, i.e. how likely it is to see a particular image under certain conditions (such as the label). Our Naive Bayes model which assumed that all pixesl are independent tells us that
+Now we can compute the likelihoods of an image, given the model. This is statistician speak for $p(x | y)$, i.e. how likely it is to see a particular image under certain conditions (such as the label). Our Naive Bayes model which assumed that all pixels are independent tells us that
 
 $$p(\mathbf{x} | y) = \prod_{i} p(x_i | y)$$
 
 Using Bayes' rule, we can thus compute $p(y | \mathbf{x})$ via
 
-$$p(y | \mathbf{x}) = \frac{p(\mathbf{x} | y)}{\sum_{y'} p(\mathbf{x} | y')}$$
+$$p(y | \mathbf{x}) = \frac{p(\mathbf{x} | y) p(y)}{\sum_{y'} p(\mathbf{x} | y')}$$
 
 Let's try this ...
 
@@ -102,7 +102,7 @@ def bayespost(data):
     # we need to incorporate the prior probability p(y) since p(y|x) is
     # proportional to p(x|y) p(y)
     logpost = logpy.copy()
-    logpost += (logpx * x + logpxneg * (1-x)).sum(0)
+    logpost += (logpx * data + logpxneg * (1-data)).sum(0)
     # normalize to prevent overflow or underflow by subtracting the largest
     # value
     logpost -= nd.max(logpost)
@@ -135,7 +135,7 @@ for data, label in mnist_test:
 plt.show()
 ```
 
-As we can see, this classifier works pretty well in many cases. However, the second last digit shows that it can be both incompetent and overly confident of its incorrect estimates. That is, even if it is horribly wrong, it generates probabilities close to 1 or 0. Not a classifier we should use very much nowadays any longer. To see how well it performs overall, let's compute the overall acuracy of the classifier.
+As we can see, this classifier works pretty well in many cases. However, the second last digit shows that it can be both incompetent and overly confident of its incorrect estimates. That is, even if it is horribly wrong, it generates probabilities close to 1 or 0. Not a classifier we should use very much nowadays any longer. To see how well it performs overall, let's compute the overall accuracy of the classifier.
 
 ```{.python .input  n=5}
 # initialize counter

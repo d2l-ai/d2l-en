@@ -9,7 +9,7 @@ Now, we will consider an objective function $f(\boldsymbol{x})=0.1x_1^2+2x_2^2$,
 
 ```{.python .input  n=3}
 %matplotlib inline
-import gluonbook as gb
+import d2l
 from mxnet import nd
 
 eta = 0.4
@@ -20,7 +20,7 @@ def f_2d(x1, x2):
 def gd_2d(x1, x2, s1, s2):
     return (x1 - eta * 0.2 * x1, x2 - eta * 4 * x2, 0, 0)
 
-gb.show_trace_2d(f_2d, gb.train_2d(gd_2d))
+d2l.show_trace_2d(f_2d, d2l.train_2d(gd_2d))
 ```
 
 As we can see, at the same position, the slope of the objective function has a larger absolute value in the vertical direction ($x_2$ axis direction) than in the horizontal direction ($x_1$ axis direction). Therefore, given the learning rate, using gradient descent for interaction will cause the independent variable to move more in the vertical direction than in the horizontal one. So we need a small learning rate to prevent the independent variable from overshooting the optimal solution for the objective function in the vertical direction. However, it will cause the independent variable to move slower toward the optimal solution in the horizontal direction.
@@ -29,7 +29,7 @@ Now, we try to make the learning rate slightly larger, so the independent variab
 
 ```{.python .input  n=4}
 eta = 0.6
-gb.show_trace_2d(f_2d, gb.train_2d(gd_2d))
+d2l.show_trace_2d(f_2d, d2l.train_2d(gd_2d))
 ```
 
 ## The Momentum Method
@@ -55,14 +55,14 @@ def momentum_2d(x1, x2, v1, v2):
     return x1 - v1, x2 - v2, v1, v2
 
 eta, gamma = 0.4, 0.5
-gb.show_trace_2d(f_2d, gb.train_2d(momentum_2d))
+d2l.show_trace_2d(f_2d, d2l.train_2d(momentum_2d))
 ```
 
 As we can see, when using a smaller learning rate ($\eta=0.4$) and momentum hyperparameter ($\gamma=0.5$), momentum moves more smoothly in the vertical direction and approaches the optimal solution faster in the horizontal direction. Now, when we use a larger learning rate ($\eta=0.6$), the independent variable will no longer diverge.
 
 ```{.python .input  n=11}
 eta = 0.6
-gb.show_trace_2d(f_2d, gb.train_2d(momentum_2d))
+d2l.show_trace_2d(f_2d, d2l.train_2d(momentum_2d))
 ```
 
 ### Exponentially Weighted Moving Average (EWMA)
@@ -106,7 +106,7 @@ By the form of EWMA, velocity variable $\boldsymbol{v}_t$ is actually an EWMA of
 Compared with mini-batch SGD, the momentum method needs to maintain a velocity variable of the same shape for each independent variable and a momentum hyperparameter is added to the hyperparameter category. In the implementation, we use the state variable `states` to represent the velocity variable in a more general sense.
 
 ```{.python .input  n=13}
-features, labels = gb.get_data_ch7()
+features, labels = d2l.get_data_ch7()
 
 def init_momentum_states():
     v_w = nd.zeros((features.shape[1], 1))
@@ -122,21 +122,21 @@ def sgd_momentum(params, states, hyperparams):
 When we set the momentum hyperparameter `momentum` to 0.5, it can be treated as a mini-batch SGD: the mini-batch gradient here is the weighted average of twice the mini-batch gradient of the last two time steps.
 
 ```{.python .input  n=15}
-gb.train_ch7(sgd_momentum, init_momentum_states(),
+d2l.train_ch7(sgd_momentum, init_momentum_states(),
              {'lr': 0.02, 'momentum': 0.5}, features, labels)
 ```
 
 When we increase the momentum hyperparameter `momentum` to 0.9, it can still be treated as a mini-batch SGD: the mini-batch gradient here will be the weighted average of ten times the mini-batch gradient of the last 10 time steps. Now we keep the learning rate at 0.02.
 
 ```{.python .input  n=8}
-gb.train_ch7(sgd_momentum, init_momentum_states(),
+d2l.train_ch7(sgd_momentum, init_momentum_states(),
              {'lr': 0.02, 'momentum': 0.9}, features, labels)
 ```
 
 We can see that the value change of the objective function is not smooth enough at later stages of iteration. Intuitively, ten times the mini-batch gradient is five times larger than two times the mini-batch gradient, so we can try to reduce the learning rate to 1/5 of its original value. Now, the value change of the objective function becomes smoother after its period of decline.
 
 ```{.python .input}
-gb.train_ch7(sgd_momentum, init_momentum_states(),
+d2l.train_ch7(sgd_momentum, init_momentum_states(),
              {'lr': 0.004, 'momentum': 0.9}, features, labels)
 ```
 
@@ -145,7 +145,7 @@ gb.train_ch7(sgd_momentum, init_momentum_states(),
 In Gluon, we only need to use `momentum` to define the momentum hyperparameter in the `Trainer` instance to implement momentum.
 
 ```{.python .input  n=9}
-gb.train_gluon_ch7('sgd', {'learning_rate': 0.004, 'momentum': 0.9}, features,
+d2l.train_gluon_ch7('sgd', {'learning_rate': 0.004, 'momentum': 0.9}, features,
                    labels)
 ```
 

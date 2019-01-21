@@ -1,7 +1,7 @@
 # Manipulating Data with `ndarray`
 
 It's impossible to get anything done if we can't manipulate data.
-Generally, there are two important things we need to do with:
+Generally, there are two important things we need to do with data:
 (i) acquire it and (ii) process it once it's inside the computer.
 There's no point in trying to acquire data if we don't even know how to store it, so let's get our hands dirty first by playing with synthetic data.
 
@@ -99,10 +99,10 @@ have all been *lifted* to element-wise operations for identically-shaped tensors
 x = nd.array([1, 2, 4, 8])
 y = nd.ones_like(x) * 2
 print('x =', x)
-print('x + y', x + x)
-print('x - y', x - x)
-print('x * y', x * x)
-print('x / y', x / x)
+print('x + y', x + y)
+print('x - y', x - y)
+print('x * y', x * y)
+print('x / y', x / y)
 ```
 
 Many more operations can be applied element-wise, such as exponentiation:
@@ -119,7 +119,7 @@ y = nd.array([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 nd.dot(x, y.T)
 ```
 
-We can also merge multiple NDArrays. For that we need to tell the system along with dimension to merge. The example below merges two matrices along dimension 0 (along rows) and dimension 1 (along columns) respectively.
+We can also merge multiple NDArrays. For that, we need to tell the system along which dimension to merge. The example below merges two matrices along dimension 0 (along rows) and dimension 1 (along columns) respectively.
 
 ```{.python .input}
 nd.concat(x, y, dim=0)
@@ -194,7 +194,7 @@ y = y + x
 id(y) == before
 ```
 
-This might be undesirable for two reasons. First, we don't want to run around allocating memory unnecessarily all the time. In machine learning, we might have hundreds of megabytes of paramaters and update all of them multiple times per second. Typically, we'll want to perform these updates *in place*. Second, we might point at the same parameters from multiple variables. If we don't update in place, this could cause a memory leak, and could cause us to inadvertently reference stale parameters.
+This might be undesirable for two reasons. First, we don't want to run around allocating memory unnecessarily all the time. In machine learning, we might have hundreds of megabytes of parameters and update all of them multiple times per second. Typically, we'll want to perform these updates *in place*. Second, we might point at the same parameters from multiple variables. If we don't update in place, this could cause a memory leak, and could cause us to inadvertently reference stale parameters.
 
 Fortunately, performing in-place operations in MXNet is easy. We can assign the result of an operation to a previously allocated array with slice notation, e.g., `y[:] = <expression>`. To illustrate the behavior, we first clone the shape of a matrix using `zeros_like` to allocate a block of 0 entries.
 

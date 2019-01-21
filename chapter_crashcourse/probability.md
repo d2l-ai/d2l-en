@@ -189,8 +189,8 @@ The dashed black line gives the true underlying probability.
 As we get more data, the solid curves converge towards the true answer.
 
 In our example of casting a die, we introduced the notion of a **random variable**.
-A random variable, which we denote here as $X$ can be pretty much any quantity and is not determistic.
-Random variables could take one value among a set of possibilites.
+A random variable, which we denote here as $X$ can be pretty much any quantity and is not deterministic.
+Random variables could take one value among a set of possibilities.
 We denote sets with brackets, e.g., $\{\mathrm{cat}, \mathrm{dog}, \mathrm{rabbit}\}$.
 The items contained in the set are called *elements*,
 and we can say that an element $x$ is *in* the set S, by writing $x \in S$.
@@ -223,7 +223,7 @@ There are a few important axioms of probability that you'll want to remember:
 
 ## Dealing with multiple random variables
 
-Very often, we'll want consider more than one random variable at a time.
+Very often, we'll want to consider more than one random variable at a time.
 For instance, we may want to model the relationship between diseases and symptoms.
 Given a disease and symptom, say 'flu' and 'cough',
 either may or may not occur in a patient with some probability.
@@ -242,7 +242,7 @@ there are several quantities of interest.
 The first is called the joint distribution $\Pr(A, B)$.
 Given any elements $a$ and $b$,
 the joint distribution lets us answer,
-what is the probability that $A=a$ and $B=b$ simulataneously?
+what is the probability that $A=a$ and $B=b$ simultaneously?
 It might be clear that for any values $a$ and $b$, $\Pr(A,B) \leq \Pr(A=a)$.
 
 This has to be the case, since for $A$ and $B$ to happen,
@@ -263,7 +263,7 @@ $$\Pr(A | B) = \frac{\Pr(B | A) \Pr(A)}{\Pr(B)}$$
 
 This is very useful if we want to infer one thing from another,
 say cause and effect but we only know the properties in the reverse direction.
-One important operation that we need to make this work is **marginalization**, i.e.,
+One important operation that we need, to make this work, is **marginalization**, i.e.,
 the operation of determining $\Pr(A)$ and $\Pr(B)$ from $\Pr(A,B)$.
 We can see that the probability of seeing $A$ amounts to accounting
 for all possible choices of $B$ and aggregating the joint probabilities over all of them, i.e.
@@ -334,7 +334,7 @@ Let us work out the requisite probabilities to invoke Bayes' Theorem.
 
 * $\Pr(D_1 = 1 \text{ and } D_2 = 1 | H = 0) = 0.01 \cdot 0.03 = 0.0003$
 * $\Pr(D_1 = 1 \text{ and } D_2 = 1 | H = 1) = 1 \cdot 0.98 = 0.98$
-* $\Pr(D_1 = 1 \text{ and } D_2 = 1) = 0.0001 \cdot 0.9985 + 0.98 \cdot 0.0015 = 0.00176955$
+* $\Pr(D_1 = 1 \text{ and } D_2 = 1) = 0.0003 \cdot 0.9985 + 0.98 \cdot 0.0015 = 0.00176955$
 * $\Pr(H = 1 | D_1 = 1 \text{ and } D_2 = 1) = \frac{0.98 \cdot 0.0015}{0.00176955} = 0.831$
 
 That is, the second test allowed us to gain much higher confidence that not all is well.

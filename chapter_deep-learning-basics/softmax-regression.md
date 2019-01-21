@@ -14,7 +14,7 @@ then you're probably looking for a regression model.
 In reality, we're more often interested in making categorical assignments.
 
 * Does this email belong in the spam folder or the inbox*?
-* How likely is this custromer to sign up for subscription service?*
+* How likely is this customer to sign up for subscription service?*
 * What is the object in the image (donkey, dog, cat, rooster, etc.)?
 * Which object is a customer most likely to purchase?
 
@@ -86,7 +86,7 @@ This accelerates the dominant operation: $\mathbf{W} \mathbf{X}$ from a matrix-v
 
 ## Loss Function
 
-Now that we have some mechanism for outputting probabilities, we need to transform this into a measure of how accurate things are, i.e. we need a *loss function*. For this we use the same concept that we already encountered in linear regression, mamely likelihood maximization.
+Now that we have some mechanism for outputting probabilities, we need to transform this into a measure of how accurate things are, i.e. we need a *loss function*. For this we use the same concept that we already encountered in linear regression, namely likelihood maximization.
 
 ### Log-Likelihood
 
@@ -121,11 +121,11 @@ $$
 \partial_{o_j} l = \frac{\exp(o_j)}{\sum_k \exp(o_k)} - y_j = \mathrm{softmax}(\mathbf{o})_j - y_j = \Pr(y = j|x) - y_j
 $$
 
-In other words, the gradient is the difference between what the model thinks should happen, as expressed by the probability $p(y|x)$, and what acutally happened, as expressed by $h$. In this sense, it is very similar to what we saw in regression, where the gradient was the difference between the observation $y$ and estimate $\hat{y}$. This seems too much of a coincidence, and indeed, it isn't. In any [exponential family](https://en.wikipedia.org/wiki/Exponential_family) model the gradients of the log-likelihood are given by precisely this term. This fact makes computing gradients a lot easier in practice.
+In other words, the gradient is the difference between what the model thinks should happen, as expressed by the probability $p(y|x)$, and what actually happened, as expressed by $y$. In this sense, it is very similar to what we saw in regression, where the gradient was the difference between the observation $y$ and estimate $\hat{y}$. This seems too much of a coincidence, and indeed, it isn't. In any [exponential family](https://en.wikipedia.org/wiki/Exponential_family) model the gradients of the log-likelihood are given by precisely this term. This fact makes computing gradients a lot easier in practice.
 
 ### Cross-Entropy Loss
 
-Now consider the case where we don't just observe a single outcome but maybe, an entire distribution over outcomes. We can use the same representation as before for $y$. The only difference is that rather than a vector containing only binary entries, say $(0, 0, 1)$, we now have a generic probability vector, say $(0.1, 0.2, 0.7)$. The math that we used previously to define the loss $l$ still works out fine, just that the interpretation is slightyly more general. It is the expected value of the loss for a distribution over labels.
+Now consider the case where we don't just observe a single outcome but maybe, an entire distribution over outcomes. We can use the same representation as before for $y$. The only difference is that rather than a vector containing only binary entries, say $(0, 0, 1)$, we now have a generic probability vector, say $(0.1, 0.2, 0.7)$. The math that we used previously to define the loss $l$ still works out fine, just that the interpretation is slightly more general. It is the expected value of the loss for a distribution over labels.
 
 $$
 l(\mathbf{y}, \hat{\mathbf{y}}) = - \sum_j y_j \log \hat{y}_j
@@ -151,7 +151,7 @@ To make this all a bit more theoretical consider the following: $p(1) = \frac{1}
 
 ### Kullback Leibler Divergence
 
-One way of measuring the difference between two distributions arises directly from the entropy. Since $H[p]$ is the minimum number of bits that we need to encode data drawn from $p$, we could ask how well it it is encoded if we pick the 'wrong' distribution $q$. The amount of extra bits that we need to encode $q$ gives us some idea of how different these two distributions are. Let us compute this directly - recall that to encode $j$ using an optimal code for $q$ would cost $-\log q(j)$ nats, and we need to use this in $p(j)$ of all cases. Hence we have
+One way of measuring the difference between two distributions arises directly from the entropy. Since $H[p]$ is the minimum number of bits that we need to encode data drawn from $p$, we could ask how well it is encoded if we pick the 'wrong' distribution $q$. The amount of extra bits that we need to encode $q$ gives us some idea of how different these two distributions are. Let us compute this directly - recall that to encode $j$ using an optimal code for $q$ would cost $-\log q(j)$ nats, and we need to use this in $p(j)$ of all cases. Hence we have
 
 $$
 D(p\|q) = -\sum_j p(j) \log q(j) - H[p] = \sum_j p(j) \log \frac{p(j)}{q(j)}

@@ -6,7 +6,7 @@ Similar to search synonyms and analogies, text classification is also a downstre
 
 ```{.python .input  n=2}
 import collections
-import gluonbook as gb
+import d2l
 from mxnet import gluon, init, nd
 from mxnet.contrib import text
 from mxnet.gluon import data as gdata, loss as gloss, nn, rnn, utils as gutils
@@ -24,7 +24,7 @@ We use Stanford's Large Movie Review Dataset as the data set for text sentiment 
 We first download this data set to the "../data" path and extract it to "../data/aclImdb".
 
 ```{.python .input  n=3}
-# This function is saved in the gluonbook package for future use.
+# This function is saved in the d2l package for future use.
 def download_imdb(data_dir='../data'):
     url = ('http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz')
     sha1 = '01ada507287d82875905620988597833ad4e0903'
@@ -38,7 +38,7 @@ download_imdb()
 Next, read the training and test data sets. Each example is a review and its corresponding label: 1 indicates "positive" and 0 indicates "negative".
 
 ```{.python .input  n=13}
-def read_imdb(folder='train'):  # This function is saved in the gluonbook package for future use.
+def read_imdb(folder='train'):  # This function is saved in the d2l package for future use.
     data = []
     for label in ['pos', 'neg']:
         folder_name = os.path.join('../data/aclImdb/', folder, label)
@@ -57,7 +57,7 @@ train_data, test_data = read_imdb('train'), read_imdb('test')
 We need to segment each review to get a review with segmented words. The `get_tokenized_imdb` function defined here uses the easiest method: word tokenization based on spaces.
 
 ```{.python .input  n=14}
-def get_tokenized_imdb(data):  # This function is saved in the gluonbook package for future use.
+def get_tokenized_imdb(data):  # This function is saved in the d2l package for future use.
     def tokenizer(text):
         return [tok.lower() for tok in text.split(' ')]
     return [tokenizer(review) for review, _ in data]
@@ -66,7 +66,7 @@ def get_tokenized_imdb(data):  # This function is saved in the gluonbook package
 Now, we can create a dictionary based on the training data set with the words segmented. Here, we have filtered out words that appear less than 5 times.
 
 ```{.python .input  n=28}
-def get_vocab_imdb(data):  # This function is saved in the gluonbook package for future use.
+def get_vocab_imdb(data):  # This function is saved in the d2l package for future use.
     tokenized_data = get_tokenized_imdb(data)
     counter = collections.Counter([tk for st in tokenized_data for tk in st])
     return text.vocab.Vocabulary(counter, min_freq=5)
@@ -78,7 +78,7 @@ vocab = get_vocab_imdb(train_data)
 Because the reviews have different lengths, so they cannot be directly combined into mini-batches, we define the `preprocess_imdb` function to segment each comment, convert it into a word index through a dictionary, and then fix the length of each comment to 500 by truncating or adding 0s.
 
 ```{.python .input  n=44}
-def preprocess_imdb(data, vocab):  # This function is saved in the gluonbook package for future use.
+def preprocess_imdb(data, vocab):  # This function is saved in the d2l package for future use.
     max_l = 500  # Make the length of each comment 500 by truncating or adding 0s.
 
     def pad(x):
@@ -141,7 +141,7 @@ class BiRNN(nn.Block):
 Create a bidirectional recurrent neural network with two hidden layers.
 
 ```{.python .input}
-embed_size, num_hiddens, num_layers, ctx = 100, 100, 2, gb.try_all_gpus()
+embed_size, num_hiddens, num_layers, ctx = 100, 100, 2, d2l.try_all_gpus()
 net = BiRNN(vocab, embed_size, num_hiddens, num_layers)
 net.initialize(init.Xavier(), ctx=ctx)
 ```
@@ -170,15 +170,15 @@ Now, we can start training.
 lr, num_epochs = 0.01, 5
 trainer = gluon.Trainer(net.collect_params(), 'adam', {'learning_rate': lr})
 loss = gloss.SoftmaxCrossEntropyLoss()
-gb.train(train_iter, test_iter, net, loss, trainer, ctx, num_epochs)
+d2l.train(train_iter, test_iter, net, loss, trainer, ctx, num_epochs)
 ```
 
 Finally, define the prediction function.
 
 ```{.python .input  n=49}
-# This function is saved in the gluonbook package for future use.
+# This function is saved in the d2l package for future use.
 def predict_sentiment(net, vocab, sentence):
-    sentence = nd.array(vocab.to_indices(sentence), ctx=gb.try_gpu())
+    sentence = nd.array(vocab.to_indices(sentence), ctx=d2l.try_gpu())
     label = nd.argmax(net(sentence.reshape((1, -1))), axis=1)
     return 'positive' if label.asscalar() == 1 else 'negative'
 ```

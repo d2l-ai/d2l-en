@@ -2,7 +2,6 @@
 
 |Name of Function or Class|Relevant Chapter|
 |:--|:-:|
-| `accuracy`|[Implementation of Softmax Regression Starting from Scratch](../chapter_deep-learning-basics/softmax-regression-scratch.md)|
 | `bbox_to_rect`|[Object Detection and Bounding Boxes](../chapter_computer-vision/bounding-box.md)|
 | `Benchmark`|[Asynchronous Computation](../chapter_computational-performance/async-computation.md)|
 | `corr2d`|[Two-dimensional Convolutional Layer](../chapter_convolutional-neural-networks/conv-layer.md)|

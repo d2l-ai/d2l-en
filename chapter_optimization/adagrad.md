@@ -30,7 +30,7 @@ Below we will continue to use the objective function $f(\boldsymbol{x})=0.1x_1^2
 
 ```{.python .input  n=1}
 %matplotlib inline
-import gluonbook as gb
+import d2l
 import math
 from mxnet import nd
 
@@ -46,14 +46,14 @@ def f_2d(x1, x2):
     return 0.1 * x1 ** 2 + 2 * x2 ** 2
 
 eta = 0.4
-gb.show_trace_2d(f_2d, gb.train_2d(adagrad_2d))
+d2l.show_trace_2d(f_2d, d2l.train_2d(adagrad_2d))
 ```
 
 Now, we are going to increase the learning rate to $2$. As we can see, the independent variable approaches the optimal solution more quickly.
 
 ```{.python .input  n=2}
 eta = 2
-gb.show_trace_2d(f_2d, gb.train_2d(adagrad_2d))
+d2l.show_trace_2d(f_2d, d2l.train_2d(adagrad_2d))
 ```
 
 ## Implementation from Scratch
@@ -61,7 +61,7 @@ gb.show_trace_2d(f_2d, gb.train_2d(adagrad_2d))
 Like the momentum method, Adagrad needs to maintain a state variable of the same shape for each independent variable. We use the formula from the algorithm to implement Adagrad.
 
 ```{.python .input  n=3}
-features, labels = gb.get_data_ch7()
+features, labels = d2l.get_data_ch7()
 
 def init_adagrad_states():
     s_w = nd.zeros((features.shape[1], 1))
@@ -78,7 +78,7 @@ def adagrad(params, states, hyperparams):
 Compared with the experiment in the ["Mini-Batch Stochastic Gradient Descent"](minibatch-sgd.md) section, here, we use a larger learning rate to train the model.
 
 ```{.python .input  n=4}
-gb.train_ch7(adagrad, init_adagrad_states(), {'lr': 0.1}, features, labels)
+d2l.train_ch7(adagrad, init_adagrad_states(), {'lr': 0.1}, features, labels)
 ```
 
 ## Implementation with Gluon
@@ -86,7 +86,7 @@ gb.train_ch7(adagrad, init_adagrad_states(), {'lr': 0.1}, features, labels)
 Using the `Trainer` instance of the algorithm named “adagrad”, we can implement the Adagrad algorithm with Gluon to train models.
 
 ```{.python .input  n=5}
-gb.train_gluon_ch7('adagrad', {'learning_rate': 0.1}, features, labels)
+d2l.train_gluon_ch7('adagrad', {'learning_rate': 0.1}, features, labels)
 ```
 
 ## Summary

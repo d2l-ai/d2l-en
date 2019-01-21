@@ -36,7 +36,7 @@ That is, we have additive Gaussian noise with zero mean and variance 0.01. In or
 
 ```{.python .input  n=2}
 %matplotlib inline
-import gluonbook as gb
+import d2l
 from mxnet import autograd, gluon, init, nd
 from mxnet.gluon import data as gdata, loss as gloss, nn
 
@@ -80,11 +80,11 @@ def l2_penalty(w):
 
 ### Define Training and Testing
 
-The following defines how to train and test the model separately on the training data set and the test data set. Unlike the previous sections, here, the $\ell_2$ norm penalty term is added when calculating the final loss function. The linear network and the squared loss are as before and thus imported via `gb.linreg` and `gb.squared_loss` respectively.
+The following defines how to train and test the model separately on the training data set and the test data set. Unlike the previous sections, here, the $\ell_2$ norm penalty term is added when calculating the final loss function. The linear network and the squared loss are as before and thus imported via `d2l.linreg` and `d2l.squared_loss` respectively.
 
 ```{.python .input  n=7}
 batch_size, num_epochs, lr = 1, 100, 0.003
-net, loss = gb.linreg, gb.squared_loss
+net, loss = d2l.linreg, d2l.squared_loss
 train_iter = gdata.DataLoader(gdata.ArrayDataset(
     train_features, train_labels), batch_size, shuffle=True)
 
@@ -97,12 +97,12 @@ def fit_and_plot(lambd):
                 # The L2 norm penalty term has been added.
                 l = loss(net(X, w, b), y) + lambd * l2_penalty(w)
             l.backward()
-            gb.sgd([w, b], lr, batch_size)
+            d2l.sgd([w, b], lr, batch_size)
         train_ls.append(loss(net(train_features, w, b),
                              train_labels).mean().asscalar())
         test_ls.append(loss(net(test_features, w, b),
                             test_labels).mean().asscalar())
-    gb.semilogy(range(1, num_epochs + 1), train_ls, 'epochs', 'loss',
+    d2l.semilogy(range(1, num_epochs + 1), train_ls, 'epochs', 'loss',
                 range(1, num_epochs + 1), test_ls, ['train', 'test'])
     print('l2 norm of w:', w.norm().asscalar())
 ```
@@ -153,7 +153,7 @@ def fit_and_plot_gluon(wd):
                              train_labels).mean().asscalar())
         test_ls.append(loss(net(test_features),
                             test_labels).mean().asscalar())
-    gb.semilogy(range(1, num_epochs + 1), train_ls, 'epochs', 'loss',
+    d2l.semilogy(range(1, num_epochs + 1), train_ls, 'epochs', 'loss',
                 range(1, num_epochs + 1), test_ls, ['train', 'test'])
     print('L2 norm of w:', net[0].weight.data().norm().asscalar())
 ```

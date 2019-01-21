@@ -8,16 +8,16 @@ In the next few sections, we will introduce multiple deep learning models used f
 
 ```{.python .input}
 %matplotlib inline
-import gluonbook as gb
+import d2l
 from mxnet import image
 ```
 
 Next, we will load the sample images that will be used in this section. We can see there is a dog on the left side of the image and a cat on the right. They are the two main targets in this image.
 
 ```{.python .input}
-gb.set_figsize()
+d2l.set_figsize()
 img = image.imread('../img/catdog.jpg').asnumpy()
-gb.plt.imshow(img);  # Add a semicolon to only display the image.
+d2l.plt.imshow(img);  # Add a semicolon to only display the image.
 ```
 
 ## Bounding Box
@@ -32,10 +32,10 @@ dog_bbox, cat_bbox = [60, 45, 378, 516], [400, 112, 655, 493]
 We can draw the bounding box in the image to check if it is accurate. Before drawing the box, we will define a helper function `bbox_to_rect`. It represents the bounding box in the bounding box format of matplotlib.
 
 ```{.python .input  n=3}
-def bbox_to_rect(bbox, color):  # This function is saved in the gluonbook package for future use.
+def bbox_to_rect(bbox, color):  # This function is saved in the d2l package for future use.
     # Convert the bounding box (top-left x, top-left y, bottom-right x, bottom-right y) format to matplotlib format:
     # ((upper-left x, upper-left y), width, height).
-    return gb.plt.Rectangle(
+    return d2l.plt.Rectangle(
         xy=(bbox[0], bbox[1]), width=bbox[2]-bbox[0], height=bbox[3]-bbox[1],
         fill=False, edgecolor=color, linewidth=2)
 ```
@@ -43,7 +43,7 @@ def bbox_to_rect(bbox, color):  # This function is saved in the gluonbook packag
 After loading the bounding box on the image, we can see that the main outline of the target is basically inside the box.
 
 ```{.python .input}
-fig = gb.plt.imshow(img)
+fig = d2l.plt.imshow(img)
 fig.axes.add_patch(bbox_to_rect(dog_bbox, 'blue'))
 fig.axes.add_patch(bbox_to_rect(cat_bbox, 'red'));
 ```

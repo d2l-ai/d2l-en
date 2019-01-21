@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# The Straight Dope documentation build configuration file, created by
+# The D2L documentation build configuration file, created by
 # sphinx-quickstart on Tue Jul 18 10:40:45 2017.
 #
 # This file is execfile()d with the current directory set to its
@@ -73,7 +73,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Dive into Deep Learning'
-copyright = '2017--2018, Contributors'
+copyright = '2017--2019'
 author = "A. Zhang, Z. C. Lipton, M. Li, and A. J. Smola"
 
 
@@ -150,7 +150,7 @@ html_theme_options = {
 		('GitHub', 'https://github.com/d2l-ai/d2l-en', True, 'fab fa-github'),
         ('中文版', 'https://zh.d2l.ai', True, 'fas fa-external-link-alt'),
     ],
-    'show_footer': True
+    'show_footer': False
 }
 
 # Theme options are theme-specific and customize the look and feel of a theme
@@ -163,7 +163,7 @@ html_theme_options = {
 
 # The name for this set of Sphinx documents.
 # "<project> v<release> documentation" by default.
-#html_title = 'The Straight Dope v0.1'
+#html_title = 'Dive into Deep Learning v0.1'
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
 #html_short_title = None
@@ -255,6 +255,8 @@ latex_elements = {
     'inputenc'  : '',
     'babel'     : r'''\usepackage[english]{babel}''',
     'preamble' : r'''
+
+
 \usepackage{ctex}
 \setmainfont{Source Serif Pro}
 \setsansfont{Source Sans Pro}
@@ -262,6 +264,8 @@ latex_elements = {
 \setCJKmainfont[BoldFont=Source Han Serif SC SemiBold]{Source Han Serif SC}
 \setCJKsansfont[BoldFont=Source Han Sans SC Medium]{Source Han Sans SC Normal}
 \setCJKmonofont{Source Han Sans SC Normal}
+
+
 
 \usepackage{setspace}
 \singlespacing
@@ -282,6 +286,8 @@ latex_elements = {
         \fancyhead[LE,RO]{{\py@HeaderFamily }}
      }
 \makeatother
+
+\CJKsetecglue{}
 ''',
 # The paper size ('letterpaper' or 'a4paper').
 #'papersize': 'letterpaper',
@@ -307,7 +313,7 @@ latex_documents = [
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
-# latex_logo = '_static/gluon.png'
+# latex_logo = '_static/d2l-ai.png'
 
 # latex_engine  = 'xelatex'
 # For "manual" documents, if this is true, then toplevel headings are parts,
@@ -358,6 +364,11 @@ latex_domain_indices = False
 # Example configuration for intersphinx: refer to the Python standard library.
 # intersphinx_mapping = {'https://docs.python.org/': None}
 
+
+# Figure X.y (1 level)
+numfig = True
+numfig_secnum_depth = 1
+
 intersphinx_mapping = {
     # 'python': 'https://docs.python.org/3.5',
     # 'matplotlib': 'https://matplotlib.org',
@@ -376,7 +387,9 @@ def image_caption(app, docname, source):
         out = ''
         for l in src.split('\n'):
             if '![' in l and 'img' in l:
-                l = l.strip().replace(' ', '.')
+                # Sphinx does not allow very long caption with space, replace space
+                # with a special token
+                l = l.strip().replace(' ', 'Ⓐ')
             out += l + '\n'
         source[i] = out
 

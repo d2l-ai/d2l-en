@@ -6,14 +6,14 @@ In this section, we will implement a language model from scratch. It is based on
 import sys
 sys.path.insert(0, '..')
 
-import gluonbook as gb
+import d2l
 import math
 from mxnet import autograd, nd
 from mxnet.gluon import loss as gloss
 import time
 
 (corpus_indices, char_to_idx, idx_to_char, vocab_size) = \
-    gb.load_data_time_machine()
+    d2l.load_data_time_machine()
 ```
 
 ## One-hot Encoding
@@ -27,7 +27,7 @@ nd.one_hot(nd.array([0, 2]), vocab_size)
 The shape of the mini-batch we sample each time is (batch size, time step). The following function transforms such mini-batches into a number of matrices with the shape of (batch size, dictionary size) that can be entered into the network. The total number of vectors is equal to the number of time steps. That is, the input of time step $t$ is $\boldsymbol{X}_t \in \mathbb{R}^{n \times d}$, where $n$ is the batch size and $d$ is the number of inputs. That is the one-hot vector length (the dictionary size).
 
 ```{.python .input  n=3}
-# This function is saved in the gluonbook package for future use.
+# This function is saved in the d2l package for future use.
 def to_onehot(X, size):  
     return [nd.one_hot(x, size) for x in X.T]
 
@@ -44,7 +44,7 @@ Next, we initialize the model parameters. The number of hidden units `num_hidden
 
 ```{.python .input  n=4}
 num_inputs, num_hiddens, num_outputs = vocab_size, 512, vocab_size
-ctx = gb.try_gpu()
+ctx = d2l.try_gpu()
 print('Using', ctx)
 
 # Create the parameters of the model, initialize them and attach gradients
@@ -108,7 +108,7 @@ len(outputs), outputs[0].shape, state_new[0].shape
 The following function predicts the next `num_chars` characters based on the `prefix` (a string containing several characters). This function is a bit more complicated. In it, we set the recurrent neural unit `rnn` as a function parameter, so that this function can be reused in the other recurrent neural networks described in following sections.
 
 ```{.python .input  n=8}
-# This function is saved in the gluonbook package for future use.
+# This function is saved in the d2l package for future use.
 def predict_rnn(prefix, num_chars, rnn, params, init_rnn_state,
                 num_hiddens, vocab_size, ctx, idx_to_char, char_to_idx):
     state = init_rnn_state(1, num_hiddens, ctx)
@@ -151,9 +151,9 @@ $$\mathbf{g} \leftarrow \min\left(1, \frac{\theta}{\|\mathbf{g}\|}\right) \mathb
 By doing so we know that the gradient norm never exceeds $\theta$ and that the updated gradient is entirely aligned with the original direction $\mathbf{g}$. Back to the case at hand - optimization in RNNs. One of the issues is that the gradients in an RNN may either explode or vanish. Consider the chain of matrix-products involved in backpropagation. If the largest eigenvalue of the matrices is typically larger than $1$, then the product of many such matrices can be much larger than $1$. As a result, the aggregate gradient might explode. Gradient clipping provides a quick fix. While it doesn't entire solve the problem, it is one of the many techniques to alleviate it.
 
 ```{.python .input  n=10}
-# This function is saved in the gluonbook package for future use.
+# This function is saved in the d2l package for future use.
 def grad_clipping(params, theta, ctx):
-    norm = nd.array([0.0], ctx)
+    norm = nd.array([0], ctx)
     for param in params:
         norm += (param.grad ** 2).sum()
     norm = norm.sqrt().asscalar()
@@ -198,19 +198,19 @@ Training a sequence model proceeds quite different from previous codes. In parti
 
 ### Optimization Loop
 
-To allow for more flexibility the call signture and the code are slightly longer. This will allow us to replace the various pieces by a Gluon implementation subsequently without the need to change the training logic.
+To allow for more flexibility the call signature and the code are slightly longer. This will allow us to replace the various pieces by a Gluon implementation subsequently without the need to change the training logic.
 
 ```{.python .input  n=11}
-# This function is saved in the gluonbook package for future use.
+# This function is saved in the d2l package for future use.
 def train_and_predict_rnn(rnn, get_params, init_rnn_state, num_hiddens,
                           vocab_size, ctx, corpus_indices, idx_to_char,
                           char_to_idx, is_random_iter, num_epochs, num_steps,
                           lr, clipping_theta, batch_size, pred_period,
                           pred_len, prefixes):
     if is_random_iter:
-        data_iter_fn = gb.data_iter_random
+        data_iter_fn = d2l.data_iter_random
     else:
-        data_iter_fn = gb.data_iter_consecutive
+        data_iter_fn = d2l.data_iter_consecutive
     params = get_params()
     loss = gloss.SoftmaxCrossEntropyLoss()
 
@@ -219,9 +219,9 @@ def train_and_predict_rnn(rnn, get_params, init_rnn_state, num_hiddens,
             # If adjacent sampling is used, the hidden state is initialized 
             # at the beginning of the epoch.
             state = init_rnn_state(batch_size, num_hiddens, ctx)
-        loss_sum, start = 0.0, time.time()
+        l_sum, n, start = 0.0, 0, time.time()
         data_iter = data_iter_fn(corpus_indices, batch_size, num_steps, ctx)
-        for t, (X, Y) in enumerate(data_iter):
+        for X, Y in data_iter:
             if is_random_iter:  
                 # If random sampling is used, the hidden state is initialized 
                 # before each mini-batch update.
@@ -247,13 +247,14 @@ def train_and_predict_rnn(rnn, get_params, init_rnn_state, num_hiddens,
                 l = loss(outputs, y).mean()
             l.backward()
             grad_clipping(params, clipping_theta, ctx)  # Clip the gradient.
-            gb.sgd(params, lr, 1)  
-            # Since the error is the mean, no need to average gradients here
-            loss_sum += l.asscalar()
+            d2l.sgd(params, lr, 1)  
+            # Since the error is the mean, no need to average gradients here.
+            l_sum += l.asscalar() * y.size
+            n += y.size
 
         if (epoch + 1) % pred_period == 0:
             print('epoch %d, perplexity %f, time %.2f sec' % (
-                epoch + 1, math.exp(loss_sum / (t + 1)), time.time() - start))
+                epoch + 1, math.exp(l_sum / n), time.time() - start))
             for prefix in prefixes:
                 print(' -', predict_rnn(
                     prefix, pred_len, rnn, params, init_rnn_state,

@@ -8,7 +8,7 @@ Our parents had no idea what machine learning was,
 let alone why we might prefer it to a career in medicine or law.
 Machine learning was a forward-looking academic discipline
 with a narrow set of real-world applications.
-And those applications, e.g. speech recognition and computer vision,
+And those applications, e.g., speech recognition and computer vision,
 required so much domain knowledge that they were often regarded
 as separate areas entirely for which machine learning was one small component.
 Neural networks, the antecedents of the deep learning models
@@ -23,10 +23,10 @@ With these advances in hand, we can now build cars that drive themselves
 (with increasing autonomy), smart reply systems that anticipate mundane replies,
 helping people dig out from mountains of email,
 and software agents that dominate the world's best humans at board games like Go,
-a featonce deemed to be decades away.
+a feat once deemed to be decades away.
 Already, these tools are exerting a widening impact,
 changing the way movies are made, diseases are diagnosed,
-and playing a growing role in basic sciences, from astrophysics to biology.
+and playing a growing role in basic sciences -- from astrophysics to biology.
 This book represents our attempt to make deep learning approachable,
 teaching you both the *concepts*, the *context*, and the *code*.
 
@@ -61,7 +61,7 @@ Applying deep learning requires simultaneously understanding
 navigating the pitfalls of numerical computing and getting the most
 out of available hardware.
 Teaching both the critical thinking skills required to formulate problems,
-the mathmematics to solve them, and the software tools to implement those
+the mathematics to solve them, and the software tools to implement those
 solutions all in one place presents formidable challenges.
 Our goal in this book is to present a unified resource
 to bring would-be practitioners up to speed.
@@ -73,7 +73,7 @@ when we needed to explain MXNet's (then new) Gluon interface to our users.
 At the time, there were no resources that were simultaneously
 (1) up to date, (2) covered the full breadth of modern machine learning
 with anything resembling of technical depth,
-and (3) interleaved the exposition one expects from an egaging textbook
+and (3) interleaved the exposition one expects from an engaging textbook
 with the clean runnable code one seeks in hands-on tutorials.
 We found plenty of code examples for how to use a given deep learning
 framework (e.g. how to do basic numerical computing with matrices in TensorFlow)
@@ -82,10 +82,10 @@ in the form of blog posts or on GitHub.
 However, these examples typically focused on
 *how* to implement a given approach,
 but left out the discussion of *why* certain algorithmic decisions are made.
-While sporadic topics have been convered in blog posts,
+While sporadic topics have been covered in blog posts,
 e.g. on the website [Distill](http://distill.pub) or personal blogs,
 they only covered selected topics in deep learning, and often lacked associated code.
-One the other hand, while several textbooks have emerged,
+On the other hand, while several textbooks have emerged,
 most notably [Goodfellow, Bengio and Courville, 2016](https://www.deeplearningbook.org/),
 which offers an excellent survey of the concepts behind deep learning,
 these resources don't marry the descriptions to realizations of the concepts in code,
@@ -99,7 +99,7 @@ to actually becoming an applied machine learning scientist,
 (3) include runnable code, showing readers *how* to solve problems in practice,
 and (4) that allowed for rapid updates, both by us, and also by the community at large,
 and (5) be complemented by a [forum](http://discuss.mxnet.io)
-for interative discussion of technical details and to answer questions.
+for interactive discussion of technical details and to answer questions.
 
 These goals were often in conflict.
 Equations, theorems, and citations are best managed and laid out in LaTeX.
@@ -124,13 +124,13 @@ We believe that this might be the first book published using such an integrated 
 Aside from a few preliminary notebooks that provide a crash course
 in the basic mathematical background, each subsequent notebook introduces
 both a reasonable number of new concepts and provides a single
-self-contained working example, using a real dataset.
+self-contained working example -- using a real dataset.
 This presents an organizational challenge. Some models might logically
 be grouped together in a single notebook.  And some ideas might be
 best taught by executing several models in succession.  On the other
 hand, there's a big advantage to adhering to a policy of *1 working
 example, 1 notebook*: This makes it as easy as possible for you to
-start your own research projects by plagiarising our code. Just copy a
+start your own research projects by leveraging our code. Just copy a
 single notebook and start modifying it.
 
 We will interleave the runnable code with background material as needed.
@@ -170,11 +170,12 @@ In other words, you'll learn concepts at the very moment
 that they are needed to accomplish some practical end.
 While we take some time at the outset to teach
 fundamental preliminaries, like linear algebra and probability.
-we want you to taste the satisfaction of training your first model
+We want you to taste the satisfaction of training your first model
 before worrying about more exotic probability distributions.
 
-If you're ready to get started, head over to [the introduction](../chapter_introduction/index.rst).
-For everything else [open an issue on Github](https://github.com/diveintodeeplearning/d2l-en).
+ 
+
+
 
 ## Acknowledgments
 
@@ -182,8 +183,7 @@ We are indebted to the hundreds of contributors for both
 the English and the Chinese drafts.
 They helped improve the content and offered valuable feedback.
 Specifically, we thank every contributor of this English draft for making it better for everyone.
-Their Github IDs and names (if provided) are: bowen0701, ChaiBapchya (Chaitanya Prakash Bapat), kirk86
-, liangpu597 (Liang Pu), MLWhiz (Rahul Agarwal), mstewart141, muelleme (Mike Müller), prakhar1989, sfermigier, sundeepteki, vishaalkapoor, YaYaB.
+Their GitHub IDs or names are (in no particular order): alxnorden, avinashingit, bowen0701, brettkoonce, Chaitanya Prakash Bapat, cryptonaut, edgarroman, gkutiel, John Mitro, Liang Pu, Rahul Agarwal, mohamed-ali, mstewart141, Mike Müller, NRauschmayr, prakhar1989, sad-, sfermigier, sundeepteki, topecongiro, tpdi, vermicelli, vishaalkapoor, vishwesh5, YaYaB.
 Moreover, we thank Amazon Web Services, especially Swami Sivasubramanian, Raju Gulabani, Charlie Bell, and Andrew Jassy for their generous support in writing this book.
 Without the available time, resources, discussions with colleagues,
 and continuous encouragement this book would not have happened.

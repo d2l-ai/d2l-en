@@ -1,6 +1,6 @@
 # Multilayer Perceptron
 
-In the previous chapters we showed how you could implement multiclass logistic regression (also called softmax regression) for classifiying images of clothing into the 10 possible categories. This is where things start to get fun. We understand how to wrangle data, coerce our outputs into a valid probability distribution (via `softmax`), how to apply an appropriate loss function, and how to optimize over our parameters. Now that we’ve covered these preliminaries, we can extend our toolbox to include deep neural networks.
+In the previous chapters we showed how you could implement multiclass logistic regression (also called softmax regression) for classifying images of clothing into the 10 possible categories. This is where things start to get fun. We understand how to wrangle data, coerce our outputs into a valid probability distribution (via `softmax`), how to apply an appropriate loss function, and how to optimize over our parameters. Now that we’ve covered these preliminaries, we can extend our toolbox to include deep neural networks.
 
 ## Hidden Layers
 
@@ -82,14 +82,14 @@ It can be understood that the ReLU function retains only positive elements and d
 
 ```{.python .input  n=1}
 %matplotlib inline
-import gluonbook as gb
+import d2l
 from mxnet import autograd, nd
 
 def xyplot(x_vals, y_vals, name):
-    gb.set_figsize(figsize=(5, 2.5))
-    gb.plt.plot(x_vals.asnumpy(), y_vals.asnumpy())
-    gb.plt.xlabel('x')
-    gb.plt.ylabel(name + '(x)')
+    d2l.set_figsize(figsize=(5, 2.5))
+    d2l.plt.plot(x_vals.asnumpy(), y_vals.asnumpy())
+    d2l.plt.xlabel('x')
+    d2l.plt.ylabel(name + '(x)')
 ```
 
 Then, we can plot the ReLU function using the `relu` function provided by NDArray. As you can see, the activation function is a two-stage linear function.

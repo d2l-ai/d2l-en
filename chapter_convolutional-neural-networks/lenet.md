@@ -22,7 +22,7 @@ The output shape of the convolutional layer block is (batch size, channel, heigh
 Next, we implement the LeNet model through the Sequential class.
 
 ```{.python .input}
-import gluonbook as gb
+import d2l
 import mxnet as mx
 from mxnet import autograd, gluon, init, nd
 from mxnet.gluon import loss as gloss, nn
@@ -61,13 +61,13 @@ Now, we will experiment with the LeNet model. We still use Fashion-MNIST as the 
 
 ```{.python .input}
 batch_size = 256
-train_iter, test_iter = gb.load_data_fashion_mnist(batch_size=batch_size)
+train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)
 ```
 
 Since convolutional networks are significantly more expensive to compute than multilayer perceptrons we recommend using GPUs to speed up training. Time to introduce a convenience function that allows us to detect whether we have a GPU: it works by trying to allocate an NDArray on `gpu(0)`, and use `gpu(0)` if this is successful. Otherwise, we catch the resulting exception and we stick with the CPU.
 
 ```{.python .input}
-def try_gpu4():  # This function has been saved in the gluonbook package for future use.
+def try_gpu():  # This function has been saved in the d2l package for future use.
     try:
         ctx = mx.gpu()
         _ = nd.zeros((1,), ctx=ctx)
@@ -75,48 +75,51 @@ def try_gpu4():  # This function has been saved in the gluonbook package for fut
         ctx = mx.cpu()
     return ctx
 
-ctx = try_gpu4()
+ctx = try_gpu()
 ctx
 ```
 
-Accordingly, we slightly modify the `evaluate_accuracy` function described when [impleenting the SoftMax from scratch](../chapter_deep-learning-basics/softmax-regression-scratch.md).  Since the data arrives in the CPU when loading we need to copy it to the GPU before any computation can occur. This is accomplished via the `as_in_context` function described in the [GPU Computing](../chapter_deep-learning-computation/use-gpu.md) section. Note that we accumulate the errors on the same device as where the data eventually lives (in `acc`). This avoids intermediate copy operations that would destroy performance.
+Accordingly, we slightly modify the `evaluate_accuracy` function described when [implementing the SoftMax from scratch](../chapter_deep-learning-basics/softmax-regression-scratch.md).  Since the data arrives in the CPU when loading we need to copy it to the GPU before any computation can occur. This is accomplished via the `as_in_context` function described in the [GPU Computing](../chapter_deep-learning-computation/use-gpu.md) section. Note that we accumulate the errors on the same device as where the data eventually lives (in `acc`). This avoids intermediate copy operations that would destroy performance.
 
 ```{.python .input}
-# This function has been saved in the gluonbook package for future use. The function will be gradually improved.
+# This function has been saved in the d2l package for future use. The function will be gradually improved.
 # Its complete implementation will be discussed in the "Image Augmentation" section.
 def evaluate_accuracy(data_iter, net, ctx):
-    acc = nd.array([0], ctx=ctx)
+    acc_sum, n = nd.array([0], ctx=ctx), 0
     for X, y in data_iter:
         # If ctx is the GPU, copy the data to the GPU.
-        X, y = X.as_in_context(ctx), y.as_in_context(ctx)
-        acc += gb.accuracy(net(X), y)
-    return acc.asscalar() / len(data_iter)
+        X, y = X.as_in_context(ctx), y.as_in_context(ctx).astype('float32')
+        acc_sum += (net(X).argmax(axis=1) == y).sum()
+        n += y.size
+    return acc_sum.asscalar() / n
 ```
 
 Just like the data loader we need to update the training function to deal with GPUs. Unlike [`train_ch3`](../chapter_deep-learning-basics/softmax-regression-scratch.md) we now move data prior to computation.
 
 ```{.python .input}
-# This function has been saved in the gluonbook package for future use.
+# This function has been saved in the d2l package for future use.
 def train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,
               num_epochs):
     print('training on', ctx)
     loss = gloss.SoftmaxCrossEntropyLoss()
     for epoch in range(num_epochs):
-        train_l_sum, train_acc_sum, start = 0, 0, time.time()
+        train_l_sum, train_acc_sum, n, start = 0.0, 0.0, 0, time.time()
         for X, y in train_iter:
             X, y = X.as_in_context(ctx), y.as_in_context(ctx)
             with autograd.record():
                 y_hat = net(X)
-                l = loss(y_hat, y)
+                l = loss(y_hat, y).sum()
             l.backward()
             trainer.step(batch_size)
-            train_l_sum += l.mean().asscalar()
-            train_acc_sum += gb.accuracy(y_hat, y)
+            y = y.astype('float32')
+            train_l_sum += l.asscalar()
+            train_acc_sum += (y_hat.argmax(axis=1) == y).sum().asscalar()
+            n += y.size
         test_acc = evaluate_accuracy(test_iter, net, ctx)
         print('epoch %d, loss %.4f, train acc %.3f, test acc %.3f, '
-              'time %.1f sec' % (epoch + 1, train_l_sum / len(train_iter),
-                                 train_acc_sum / len(train_iter),
-                                 test_acc, time.time() - start))
+              'time %.1f sec'
+              % (epoch + 1, train_l_sum / n, train_acc_sum / n, test_acc,
+                 time.time() - start))
 ```
 
 We initialize the model parameters on the device indicated by `ctx`, this time using Xavier. The loss function and the training algorithm still use the cross-entropy loss function and mini-batch stochastic gradient descent.

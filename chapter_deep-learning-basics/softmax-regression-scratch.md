@@ -4,7 +4,7 @@ Just like we learned how to implement linear regression from scratch, it is very
 
 ```{.python .input}
 %matplotlib inline
-import gluonbook as gb
+import d2l
 from mxnet import autograd, nd
 ```
 
@@ -12,12 +12,12 @@ We use the Fashion-MNIST data set with batch size 256.
 
 ```{.python .input}
 batch_size = 256
-train_iter, test_iter = gb.load_data_fashion_mnist(batch_size)
+train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 ```
 
 ## Initialize Model Parameters
 
-Just as in linear regression, we use vectors to represent examples. Since each example is an image with $28 \times 28$ pixels we can store it as a $784$ dimensional vector. Moreover, since we have 10 categories, the single layer network has an output dimension of 10. Consequently, the weight and bias parameters of the softmax regression are matrics of size $784 \times 10$ and $1 \times 10$ respectively. We initialize $W$ with Gaussian noise.
+Just as in linear regression, we use vectors to represent examples. Since each example is an image with $28 \times 28$ pixels we can store it as a $784$ dimensional vector. Moreover, since we have 10 categories, the single layer network has an output dimension of 10. Consequently, the weight and bias parameters of the softmax regression are matrices of size $784 \times 10$ and $1 \times 10$ respectively. We initialize $W$ with Gaussian noise.
 
 ```{.python .input  n=9}
 num_inputs = 784
@@ -83,7 +83,7 @@ Recall that it picks the label's predicted probability and takes its logarithm $
 
 ```{.python .input  n=15}
 y_hat = nd.array([[0.1, 0.3, 0.6], [0.3, 0.2, 0.5]])
-y = nd.array([0, 2])
+y = nd.array([0, 2], dtype='int32')
 nd.pick(y_hat, y)
 ```
 
@@ -98,10 +98,9 @@ def cross_entropy(y_hat, y):
 
 Given a class of predicted probability distributions `y_hat`, we use the one with the highest predicted probability as the output category. If it is consistent with the actual category `y`, then this prediction is correct.  The classification accuracy is the ratio between the number of correct predictions and the total number of predictions made.
 
-The function `accuracy` is defined as follows: `y_hat.argmax(axis=1)` returns the largest element index to matrix `y_hat`, the result has the same shape as variable `y`. Now all we need to do is check whether both match. Since the equality operator `==` is datatype-sensitive (e.g. an `int` and a `float32` are never equal), we also need to convert both to the same type (we pick `float32`). The result is an NDArray containing entries of 0 (false) and 1 (true). Taking the mean yields the desired result.
+To demostrate how to compute accuracy, the function `accuracy` is defined as follows: `y_hat.argmax(axis=1)` returns the largest element index to matrix `y_hat`, the result has the same shape as variable `y`. Now all we need to do is check whether both match. Since the equality operator `==` is datatype-sensitive (e.g. an `int` and a `float32` are never equal), we also need to convert both to the same type (we pick `float32`). The result is an NDArray containing entries of 0 (false) and 1 (true). Taking the mean yields the desired result.
 
 ```{.python .input  n=17}
-#
 def accuracy(y_hat, y):
     return (y_hat.argmax(axis=1) == y.astype('float32')).mean().asscalar()
 ```
@@ -118,10 +117,12 @@ Similarly, we can evaluate the accuracy for model `net` on the data set `data_it
 #  The function will be gradually improved: the complete implementation will be
 # discussed in the "Image Augmentation" section.
 def evaluate_accuracy(data_iter, net):
-    acc = 0
+    acc_sum, n = 0.0, 0
     for X, y in data_iter:
-        acc += accuracy(net(X), y)
-    return acc / len(data_iter)
+        y = y.astype('float32')
+        acc_sum += (net(X).argmax(axis=1) == y).sum().asscalar()
+        n += y.size
+    return acc_sum / n
 ```
 
 Because we initialized the `net` model with random weights, the accuracy of this model should be close to random guessing, i.e. 0.1 for 10 classes.
@@ -137,27 +138,27 @@ The implementation for training softmax regression is very similar to the implem
 ```{.python .input  n=21}
 num_epochs, lr = 5, 0.1
 
-#
+# This function has been saved in the d2l package for future use.
 def train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size,
               params=None, lr=None, trainer=None):
     for epoch in range(num_epochs):
-        train_l_sum = 0
-        train_acc_sum = 0
+        train_l_sum, train_acc_sum, n = 0.0, 0.0, 0
         for X, y in train_iter:
             with autograd.record():
                 y_hat = net(X)
-                l = loss(y_hat, y)
+                l = loss(y_hat, y).sum()
             l.backward()
             if trainer is None:
-                gb.sgd(params, lr, batch_size)
+                d2l.sgd(params, lr, batch_size)
             else:
                 trainer.step(batch_size)  # This will be illustrated in the next section.
-            train_l_sum += l.mean().asscalar()
-            train_acc_sum += accuracy(y_hat, y)
+            y = y.astype('float32')
+            train_l_sum += l.asscalar()
+            train_acc_sum += (y_hat.argmax(axis=1) == y).sum().asscalar()
+            n += y.size
         test_acc = evaluate_accuracy(test_iter, net)
         print('epoch %d, loss %.4f, train acc %.3f, test acc %.3f'
-              % (epoch + 1, train_l_sum / len(train_iter),
-                 train_acc_sum / len(train_iter), test_acc))
+              % (epoch + 1, train_l_sum / n, train_acc_sum / n, test_acc))
 
 train_ch3(net, train_iter, test_iter, cross_entropy, num_epochs,
           batch_size, [W, b], lr)
@@ -171,11 +172,11 @@ Now that training is complete, we can show how to classify the image. Given a se
 for X, y in test_iter:
     break
 
-true_labels = gb.get_fashion_mnist_labels(y.asnumpy())
-pred_labels = gb.get_fashion_mnist_labels(net(X).argmax(axis=1).asnumpy())
+true_labels = d2l.get_fashion_mnist_labels(y.asnumpy())
+pred_labels = d2l.get_fashion_mnist_labels(net(X).argmax(axis=1).asnumpy())
 titles = [truelabel + '\n' + predlabel for truelabel, predlabel in zip(true_labels, pred_labels)]
 
-gb.show_fashion_mnist(X[0:9], titles[0:9])
+d2l.show_fashion_mnist(X[0:9], titles[0:9])
 ```
 
 ## Summary

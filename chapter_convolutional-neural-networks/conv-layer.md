@@ -23,7 +23,7 @@ Note that the output size is *smaller* than the input. In particular, the output
 from mxnet import autograd, nd
 from mxnet.gluon import nn
 
-def corr2d(X, K):  # This function has been saved in the gluonbook package for future use.
+def corr2d(X, K):  # This function has been saved in the d2l package for future use.
     h, w = K.shape
     Y = nd.zeros((X.shape[0] - h + 1, X.shape[1] - w + 1))
     for i in range(Y.shape[0]):
@@ -123,7 +123,7 @@ We find that the kernel array we learned is very close to the kernel array `K` w
 
 ## Cross-correlation and Convolution
 
-Recall the observation from the previous section that cross-correlation and convolution are equivalent. In the figure above it is easy to see this correspondence. Simply flip the kernel from the bottom left to the top right. In this case the indexing in the sum is reverted, yet the same result can be obtained. In keeping with standard terminology with deep learning literature we will continue to refer to the cross-correlation operation as a convolution even though it is stricly speaking something slightly different.
+Recall the observation from the previous section that cross-correlation and convolution are equivalent. In the figure above it is easy to see this correspondence. Simply flip the kernel from the bottom left to the top right. In this case the indexing in the sum is reverted, yet the same result can be obtained. In keeping with standard terminology with deep learning literature we will continue to refer to the cross-correlation operation as a convolution even though it is strictly speaking something slightly different.
 
 ## Summary
 

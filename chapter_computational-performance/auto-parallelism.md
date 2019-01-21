@@ -7,7 +7,10 @@ Typically, a single operator will use all the computational resources on all CPU
 First, import the required packages or modules for experiment in this section. Note that we need at least one GPU to run the experiment in this section.
 
 ```{.python .input}
-import gluonbook as gb
+import sys
+sys.path.insert(0, '..')
+
+import d2l
 import mxnet as mx
 from mxnet import nd
 ```
@@ -35,11 +38,11 @@ run(x_cpu)  # Warm-up begins.
 run(x_gpu)
 nd.waitall()  # Warm-up ends.
 
-with gb.Benchmark('Run on CPU.'):
+with d2l.Benchmark('Run on CPU.'):
     run(x_cpu)
     nd.waitall()
 
-with gb.Benchmark('Then run on GPU.'):
+with d2l.Benchmark('Then run on GPU.'):
     run(x_gpu)
     nd.waitall()
 ```
@@ -47,7 +50,7 @@ with gb.Benchmark('Then run on GPU.'):
 We remove `nd.waitall()` between the two computing tasks `run(x_cpu)` and `run(x_gpu)` and hope the system can automatically parallel these two tasks.
 
 ```{.python .input}
-with gb.Benchmark('Run on both CPU and GPU in parallel.'):
+with d2l.Benchmark('Run on both CPU and GPU in parallel.'):
     run(x_cpu)
     run(x_gpu)
     nd.waitall()
@@ -64,11 +67,11 @@ In computations that use both the CPU and GPU, we often need to copy data betwee
 def copy_to_cpu(x):
     return [y.copyto(mx.cpu()) for y in x]
 
-with gb.Benchmark('Run on GPU.'):
+with d2l.Benchmark('Run on GPU.'):
     y = run(x_gpu)
     nd.waitall()
 
-with gb.Benchmark('Then copy to CPU.'):
+with d2l.Benchmark('Then copy to CPU.'):
     copy_to_cpu(y)
     nd.waitall()
 ```
@@ -76,7 +79,7 @@ with gb.Benchmark('Then copy to CPU.'):
 We remove the `waitall` function between computation and communication and print the total time need to complete both tasks.
 
 ```{.python .input}
-with gb.Benchmark('Run and copy in parallel.'):
+with d2l.Benchmark('Run and copy in parallel.'):
     y = run(x_gpu)
     copy_to_cpu(y)
     nd.waitall()

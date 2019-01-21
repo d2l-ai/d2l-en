@@ -7,6 +7,7 @@ First, import the packages and modules required for the experiment.
 
 ```{.python .input  n=1}
 import collections
+import d2l
 import math
 from mxnet import autograd, gluon, nd
 from mxnet.gluon import data as gdata, loss as gloss, nn
@@ -286,13 +287,15 @@ The training function is defined below. Because of the existence of padding, the
 
 ```{.python .input  n=21}
 def train(net, lr, num_epochs):
-    net.initialize(force_reinit=True)
+    ctx = d2l.try_gpu()
+    net.initialize(ctx=ctx, force_reinit=True)
     trainer = gluon.Trainer(net.collect_params(), 'adam',
                             {'learning_rate': lr})
     for epoch in range(num_epochs):
-        start_time, train_l_sum = time.time(), 0
+        start, l_sum, n = time.time(), 0.0, 0
         for batch in data_iter:
-            center, context_negative, mask, label = batch
+            center, context_negative, mask, label = [
+                data.as_in_context(ctx) for data in batch]
             with autograd.record():
                 pred = skip_gram(center, context_negative, net[0], net[1])
                 # Use the mask variable to avoid the effect of padding on loss function calculations.
@@ -300,10 +303,10 @@ def train(net, lr, num_epochs):
                      mask.shape[1] / mask.sum(axis=1))
             l.backward()
             trainer.step(batch_size)
-            train_l_sum += l.mean().asscalar()
-        print('epoch %d, train loss %.2f, time %.2fs'
-              % (epoch + 1, train_l_sum / len(data_iter),
-                 time.time() - start_time))
+            l_sum += l.sum().asscalar()
+            n += l.size
+        print('epoch %d, loss %.2f, time %.2fs'
+              % (epoch + 1, l_sum / n, time.time() - start))
 ```
 
 Now, we can train a skip-gram model using negative sampling.
@@ -320,7 +323,8 @@ After training the word embedding model, we can represent similarity in meaning 
 def get_similar_tokens(query_token, k, embed):
     W = embed.weight.data()
     x = W[token_to_idx[query_token]]
-    cos = nd.dot(W, x) / nd.sum(W * W, axis=1).sqrt() / nd.sum(x * x).sqrt()
+    # The added 1e-9 is for numerical stability.
+    cos = nd.dot(W, x) / (nd.sum(W * W, axis=1) * nd.sum(x * x) + 1e-9).sqrt()
     topk = nd.topk(cos, k=k+1, ret_typ='indices').asnumpy().astype('int32')
     for i in topk[1:]:  # Remove the input words.
         print('cosine sim=%.3f: %s' % (cos[i].asscalar(), (idx_to_token[i])))
@@ -337,6 +341,7 @@ get_similar_tokens('chip', 3, net[0])
 
 ## Problems
 
+* Set `sparse_grad=True` when creating an instance of `nn.Embedding`. Does it accelerate training? Look up MXNet documentation to learn the meaning of this argument.
 * We use the `batchify` function to specify the mini-batch reading method in the `DataLoader` instance and print the shape of each variable in the first batch read. How should these shapes be calculated?
 * Try to find synonyms for other words.
 * Tune the hyper-parameters and observe and analyze the experimental results.

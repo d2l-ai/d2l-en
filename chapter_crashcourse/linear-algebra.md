@@ -107,7 +107,7 @@ Some use the *dimensionality* of a vector to refer to its length (the number of 
 However some use the word *dimensionality* to refer to the number of axes that an array has.
 In this sense, a scalar *would have* $0$ dimensions and a vector *would have* $1$ dimension.
 
-**To avoid confusion, when we say *2D* array or *3D* array, we mean an array with 2 or 3 axes repespectively. But if we say *$n$-dimensional* vector, we mean a vector of length $n$.**
+**To avoid confusion, when we say *2D* array or *3D* array, we mean an array with 2 or 3 axes respectively. But if we say *$n$-dimensional* vector, we mean a vector of length $n$.**
 
 ```{.python .input}
 a = 2
@@ -224,7 +224,7 @@ print(nd.sum(A) / A.size)
 
 ## Dot products
 
-So far, we've only performed element-wise operations, sums and averages. And if this was we could do, linear algebra probably wouldn't deserve it's own chapter. However, one of the most fundamental operations is the dot product. Given two vectors $\mathbf{u}$ and $\mathbf{v}$, the dot product $\mathbf{u}^T \mathbf{v}$ is a sum over the products of the corresponding elements: $\mathbf{u}^T \mathbf{v} = \sum_{i=1}^{d} u_i \cdot v_i$.
+So far, we've only performed element-wise operations, sums and averages. And if this was all we could do, linear algebra probably wouldn't deserve its own chapter. However, one of the most fundamental operations is the dot product. Given two vectors $\mathbf{u}$ and $\mathbf{v}$, the dot product $\mathbf{u}^T \mathbf{v}$ is a sum over the products of the corresponding elements: $\mathbf{u}^T \mathbf{v} = \sum_{i=1}^{d} u_i \cdot v_i$.
 
 ```{.python .input}
 x = nd.arange(4)
@@ -391,7 +391,7 @@ by a constant factor $\alpha$,
 its norm also scales by the *absolute value*
 of the same constant factor.
 The second rule is the familiar triangle inequality.
-The third rule simple says that the norm must be non-negative.
+The third rule simply says that the norm must be non-negative.
 That makes sense, in most contexts the smallest *size* for anything is 0.
 The final rule basically says that the smallest norm is achieved by a matrix or vector consisting of all zeros.
 It's possible to define a norm that gives zero norm to nonzero matrices,
@@ -472,13 +472,14 @@ There are a number of special matrices that we will use throughout this tutorial
 * **Diagonally Dominant Matrix** These are matrices where the off-diagonal elements are small relative to the main diagonal elements. In particular we have that $M_{ii} \geq \sum_{j \neq i} M_{ij}$ and $M_{ii} \geq \sum_{j \neq i} M_{ji}$. If a matrix has this property, we can often approximate $M$ by its diagonal. This is often expressed as $\mathrm{diag}(M)$.
 * **Positive Definite Matrix** These are matrices that have the nice property where $x^\top M x > 0$ whenever $x \neq 0$. Intuitively, they are a generalization of the squared norm of a vector $\|x\|^2 = x^\top x$. It is easy to check that whenever $M = A^\top A$, this holds since there $x^\top M x = x^\top A^\top A x = \|A x\|^2$. There is a somewhat more profound theorem which states that all positive definite matrices can be written in this form.
 
+
 ## Conclusions
 
 In just a few pages (or one Jupyter notebook) we've taught you all the linear algebra you'll need to understand a good chunk of neural networks. Of course there's a *lot* more to linear algebra. And a lot of that math *is* useful for machine learning. For example, matrices can be decomposed into factors, and these decompositions can reveal low-dimensional structure in real-world datasets. There are entire subfields of machine learning that focus on using matrix decompositions and their generalizations to high-order tensors to discover structure in datasets and solve prediction problems. But this book focuses on deep learning. And we believe you'll be much more inclined to learn more mathematics once you've gotten your hands dirty deploying useful machine learning models on real datasets. So while we reserve the right to introduce more math much later on, we'll wrap up this chapter here.
 
 If you're eager to learn more about linear algebra, here are some of our favorite resources on the topic
 * For a solid primer on basics, check out Gilbert Strang's book [Introduction to Linear Algebra](http://math.mit.edu/~gs/linearalgebra/)
-* Zico Kolter's [Linear Algebra Reivew and Reference](http://www.cs.cmu.edu/~zkolter/course/15-884/linalg-review.pdf)
+* Zico Kolter's [Linear Algebra Review and Reference](http://www.cs.cmu.edu/~zkolter/course/15-884/linalg-review.pdf)
 
 ## Discuss on our Forum
 

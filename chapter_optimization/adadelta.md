@@ -30,10 +30,10 @@ Adadelta needs to maintain two state variables for each independent variable, $\
 
 ```{.python .input  n=11}
 %matplotlib inline
-import gluonbook as gb
+import d2l
 from mxnet import nd
 
-features, labels = gb.get_data_ch7()
+features, labels = d2l.get_data_ch7()
 
 def init_adadelta_states():
     s_w, s_b = nd.zeros((features.shape[1], 1)), nd.zeros(1)
@@ -52,7 +52,7 @@ def adadelta(params, states, hyperparams):
 Then, we train the model with the hyperparameter $\rho=0.9$.
 
 ```{.python .input  n=12}
-gb.train_ch7(adadelta, init_adadelta_states(), {'rho': 0.9}, features, labels)
+d2l.train_ch7(adadelta, init_adadelta_states(), {'rho': 0.9}, features, labels)
 ```
 
 ## Implementation with Gluon
@@ -60,7 +60,7 @@ gb.train_ch7(adadelta, init_adadelta_states(), {'rho': 0.9}, features, labels)
 From the `Trainer` instance for the algorithm named "adadelta", we can implement Adadelta in Gluon. Its hyperparameters can be specified by `rho`.
 
 ```{.python .input  n=9}
-gb.train_gluon_ch7('adadelta', {'rho': 0.9}, features, labels)
+d2l.train_gluon_ch7('adadelta', {'rho': 0.9}, features, labels)
 ```
 
 ## Summary

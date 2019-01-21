@@ -1,6 +1,6 @@
 # Image Classification Data (Fashion-MNIST)
 
-Before introducing the implementation for softmax regression, we need a suitable datset. To make things more visually compelling we pick one on classification.
+Before introducing the implementation for softmax regression, we need a suitable dataset. To make things more visually compelling we pick one on classification.
 It will be used multiple times in later chapters to allow us to observe the difference between model accuracy and computational efficiency between comparison algorithms. The most commonly used image classification data set is the [MNIST](http://yann.lecun.com/exdb/mnist/) handwritten digit recognition data set. It was proposed by LeCun, Cortes and Burges in the 1990s. However, most models have a classification accuracy of over 95% on MNIST, hence it is hard to spot the difference between different models. In order to get a better intuition about the difference between algorithms we use a more complex data set. [Fashion-MNIST](https://github.com/zalandoresearch/fashion-mnist) was proposed by [Xiao, Rasul and Vollgraf](https://arxiv.org/abs/1708.07747) in 2017.
 
 ## Getting the Data
@@ -9,7 +9,7 @@ First, import the packages or modules required in this section.
 
 ```{.python .input}
 %matplotlib inline
-import gluonbook as gb
+import d2l
 from mxnet.gluon import data as gdata
 import sys
 import time
@@ -49,7 +49,7 @@ label, type(label), label.dtype
 There are 10 categories in Fashion-MNIST: t-shirt, trousers, pullover, dress, coat, sandal, shirt, sneaker, bag and ankle boot. The following function can convert a numeric label into a corresponding text label.
 
 ```{.python .input  n=25}
-# This function has been saved in the gluonbook package for future use.
+# This function has been saved in the d2l package for future use.
 def get_fashion_mnist_labels(labels):
     text_labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
                    'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
@@ -59,11 +59,11 @@ def get_fashion_mnist_labels(labels):
 The following defines a function that can draw multiple images and corresponding labels in a single line.
 
 ```{.python .input}
-# This function has been saved in the gluonbook package for future use.
+# This function has been saved in the d2l package for future use.
 def show_fashion_mnist(images, labels):
-    gb.use_svg_display()
+    d2l.use_svg_display()
     # Here _ means that we ignore (not use) variables.
-    _, figs = gb.plt.subplots(1, len(images), figsize=(12, 12))
+    _, figs = d2l.plt.subplots(1, len(images), figsize=(12, 12))
     for f, img, lbl in zip(figs, images, labels):
         f.imshow(img.reshape((28, 28)).asnumpy())
         f.set_title(lbl)
@@ -102,7 +102,7 @@ test_iter = gdata.DataLoader(mnist_test.transform_first(transformer),
                              num_workers=num_workers)
 ```
 
-The logic that we will use to obtain and read the Fashion-MNIST data set is encapsulated in the `gluonbook.load_data_fashion_mnist` function, which we will use in later chapters. This function will return two variables, `train_iter` and `test_iter`. As the content of this book continues to deepen, we will further improve this function. Its full implementation will be described in the section ["Deep Convolutional Neural Networks (AlexNet)"](../chapter_convolutional-neural-networks/alexnet.md).
+The logic that we will use to obtain and read the Fashion-MNIST data set is encapsulated in the `d2l.load_data_fashion_mnist` function, which we will use in later chapters. This function will return two variables, `train_iter` and `test_iter`. As the content of this book continues to deepen, we will further improve this function. Its full implementation will be described in the section ["Deep Convolutional Neural Networks (AlexNet)"](../chapter_convolutional-neural-networks/alexnet.md).
 
 Let's look at the time it takes to read the training data.
 

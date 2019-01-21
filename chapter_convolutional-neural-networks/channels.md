@@ -14,13 +14,13 @@ The figure below shows an example of a two-dimensional cross-correlation computa
 Let's implement cross-correlation operations with multiple input channels. We simply need to perform a cross-correlation operation for each channel, and then add them up using the `add_n` function.
 
 ```{.python .input  n=1}
-import gluonbook as gb
+import d2l
 from mxnet import nd
 
 def corr2d_multi_in(X, K):
     # First, traverse along the 0th dimension (channel dimension) of X and K. Then, add them together by using * to turn
     # the result list into a positional argument of the add_n function.
-    return nd.add_n(*[gb.corr2d(x, k) for x, k in zip(X, K)])
+    return nd.add_n(*[d2l.corr2d(x, k) for x, k in zip(X, K)])
 ```
 
 We can construct the input array `X` and the kernel array `K` of the above diagram to validate the output of the cross-correlation operation.

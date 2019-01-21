@@ -35,10 +35,10 @@ We use the formula from the algorithm to implement Adam. Here, time step $t$ use
 
 ```{.python .input  n=2}
 %matplotlib inline
-import gluonbook as gb
+import d2l
 from mxnet import nd
 
-features, labels = gb.get_data_ch7()
+features, labels = d2l.get_data_ch7()
 
 def init_adam_states():
     v_w, v_b = nd.zeros((features.shape[1], 1)), nd.zeros(1)
@@ -59,7 +59,7 @@ def adam(params, states, hyperparams):
 Use Adam to train the model with a learning rate of $0.01$.
 
 ```{.python .input  n=5}
-gb.train_ch7(adam, init_adam_states(), {'lr': 0.01, 't': 1}, features, labels)
+d2l.train_ch7(adam, init_adam_states(), {'lr': 0.01, 't': 1}, features, labels)
 ```
 
 ## Implementation with Gluon
@@ -67,7 +67,7 @@ gb.train_ch7(adam, init_adam_states(), {'lr': 0.01, 't': 1}, features, labels)
 From the `Trainer` instance of the algorithm named "adam", we can implement Adam with Gluon.
 
 ```{.python .input  n=11}
-gb.train_gluon_ch7('adam', {'learning_rate': 0.01}, features, labels)
+d2l.train_gluon_ch7('adam', {'learning_rate': 0.01}, features, labels)
 ```
 
 ## Summary

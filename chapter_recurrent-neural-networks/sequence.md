@@ -31,7 +31,7 @@ $$x_t \sim p(x_t|x_{t-1}, \ldots x_1).$$
 In order to achieve this, our trader could use a regressor such as the one we trained in the [section on regression](../chapter_deep-learning-basics/linear-regression-gluon.md). There's just a major problem - the number of inputs, $x_{t-1}, \ldots x_1$ varies, depending on $t$. That is, the number increases with the amount of data that we encounter, and we will need an approximation to make this computationally tractable. Much of what follows in this chapter will revolve around how to estimate $p(x_t|x_{t-1}, \ldots x_1)$ efficiently. In a nutshell it boils down to two strategies:
 
 1. Assume that the potentially rather long sequence $x_{t-1}, \ldots x_1$ isn't really necessary. In this case we might content ourselves with some timespan $\tau$ and only use $x_{t-1}, \ldots x_{t-\tau}$ observations. The immediate benefit is that now the number of arguments is always the same, at least for $t > \tau$. This allows us to train a deep network as indicated above. Such models will be called *autoregressive* models, as they quite literally perform regression on themselves.
-1. Another strategy is to try and keep some summary $h_t$ of the past observations around and update that in addition to the actual prediction. This leads to models that estimate $x_t|x_{t-1}, h_{t-1}$ and moreover updates of the form  $h_t = g(h_t, x_t)$. Since $h_t$ is never observed, these models are also called *latent autoregressive models*. LSTMs and GRUs are exampes of this.
+1. Another strategy is to try and keep some summary $h_t$ of the past observations around and update that in addition to the actual prediction. This leads to models that estimate $x_t|x_{t-1}, h_{t-1}$ and moreover updates of the form  $h_t = g(h_t, x_t)$. Since $h_t$ is never observed, these models are also called *latent autoregressive models*. LSTMs and GRUs are examples of this.
 
 Both cases raise the obvious question how to generate training data. One typically uses historical observations to predict the next observation given the ones up to right now. Obviously we do not expect time to stand still. However, a common assumption is that while the specific values of $x_t$ might change, at least the dynamics of the time series itself won't. This is reasonable, since novel dynamics are just that, novel and thus not predictable using data we have so far. Statisticians call dynamics that don't change *stationary*. Regardless of what we do, we will thus get an estimate of the entire time series via
 
@@ -66,7 +66,7 @@ After so much theory, let's try this out in practice. Since much of the modeling
 
 ```{.python .input}
 from mxnet import autograd, nd, gluon, init
-import gluonbook as gb
+import d2l
 # display routines
 %matplotlib inline
 from matplotlib import pyplot as plt
