@@ -12,7 +12,7 @@ we assume that prediction can be expressed as a *linear* combination of the inpu
 
 ### Linear Model
 
-For the sake of simplicity we will use the problem of estimating the price of a house based (e.g. in dollars) on area (e.g. in square feet) and age (e.g. in years) as our running example. In this case we could model
+For the sake of simplicity we will use the problem of estimating the price of a house (e.g. in dollars) based on area (e.g. in square feet) and age (e.g. in years) as our running example. In this case we could model
 
 $$\mathrm{price} = w_{\mathrm{area}} \cdot \mathrm{area} + w_{\mathrm{age}} \cdot \mathrm{age} + b$$
 
