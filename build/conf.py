@@ -73,7 +73,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Dive into Deep Learning'
-copyright = '2017--2018, Contributors'
+copyright = '2017--2019'
 author = "A. Zhang, Z. C. Lipton, M. Li, and A. J. Smola"
 
 
