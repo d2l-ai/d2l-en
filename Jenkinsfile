@@ -3,7 +3,6 @@ stage("Build and Publish") {
     ws('workspace/d2l-en') {
       checkout scm
       sh "git submodule update --init"
-      sh "build/hi.sh"
       sh "build/utils/sanity_check.sh"
       sh "build/utils/clean_build.sh"
       sh "conda env update -f build/env.yml"
