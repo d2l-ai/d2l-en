@@ -112,7 +112,7 @@ When the batch size equals 10, we use mini-batch SGD for optimization. The time 
 train_sgd(0.05, 10)
 ```
 
-## Implementation with Gluon
+## Concise Implementation
 
 In Gluon, we can use the `Trainer` class to call optimization algorithms. Next, we are going to implement a generic training function that uses the optimization name `trainer name` and hyperparameter `trainer_hyperparameter` to create the instance `Trainer`.
 

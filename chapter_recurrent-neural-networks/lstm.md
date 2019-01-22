@@ -168,7 +168,7 @@ d2l.train_and_predict_rnn(lstm, get_params, init_lstm_state, num_hiddens,
                           prefixes)
 ```
 
-## Gluon Implementation
+## Concise Implementation
 
 In Gluon, we can directly call the `LSTM` class in the `rnn` module.
 

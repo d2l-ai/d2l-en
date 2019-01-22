@@ -66,7 +66,7 @@ One way of addressing, or at least mitigating the issues raised above is through
 
 ### Default Initialization
 
-In the previous sections, e.g. in [“Gluon Implementation of Linear Regression”](linear-regression-gluon.md), we used `net.initialize(init.Normal(sigma=0.01))` as a way to pick normally distributed random numbers as initial values for the weights. If the initialization method is not specified, such as `net.initialize()`, MXNet will use the default random initialization method: each element of the weight parameter is randomly sampled with an uniform distribution $U[-0.07, 0.07]$ and the bias parameters are all set to $0$. Both choices tend to work quite well in practice for moderate problem sizes.
+In the previous sections, e.g. in [“Concise Implementation of Linear Regression”](linear-regression-gluon.md), we used `net.initialize(init.Normal(sigma=0.01))` as a way to pick normally distributed random numbers as initial values for the weights. If the initialization method is not specified, such as `net.initialize()`, MXNet will use the default random initialization method: each element of the weight parameter is randomly sampled with an uniform distribution $U[-0.07, 0.07]$ and the bias parameters are all set to $0$. Both choices tend to work quite well in practice for moderate problem sizes.
 
 ### Xavier Initialization
 

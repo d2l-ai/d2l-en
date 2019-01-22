@@ -85,7 +85,7 @@ Compared with the experiment in the ["Mini-Batch Stochastic Gradient Descent"](m
 d2l.train_ch7(adagrad, init_adagrad_states(), {'lr': 0.1}, features, labels)
 ```
 
-## Implementation with Gluon
+## Concise Implementation
 
 Using the `Trainer` instance of the algorithm named “adagrad”, we can implement the Adagrad algorithm with Gluon to train models.
 

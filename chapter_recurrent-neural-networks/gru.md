@@ -154,7 +154,7 @@ d2l.train_and_predict_rnn(gru, get_params, init_gru_state, num_hiddens,
                           prefixes)
 ```
 
-## Gluon Implementation
+## Concise Implementation
 
 In Gluon, we can directly call the `GRU` class in the `rnn` module.
 

@@ -168,7 +168,7 @@ Let's have a look at the scale parameter `gamma` and the shift parameter `beta` 
 net[1].gamma.data().reshape((-1,)), net[1].beta.data().reshape((-1,))
 ```
 
-## Gluon Implementation for Batch Normalization
+## Concise Implementation
 
 Compared with the `BatchNorm` class, which we just defined ourselves, the `BatchNorm` class defined by the `nn` model in Gluon is easier to use. In Gluon, we do not have to define the `num_features` and `num_dims` parameter values required in the `BatchNorm` class. Instead, these parameter values will be obtained automatically by delayed initialization. The code looks virtually identical (save for the lack of an explicit specification of the dimensionality of the features for the Batch Normalization layers).
 

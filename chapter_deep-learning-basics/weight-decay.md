@@ -53,7 +53,7 @@ train_features, test_features = features[:n_train, :], features[n_train:, :]
 train_labels, test_labels = labels[:n_train], labels[n_train:]
 ```
 
-## Weight Decay from Scratch
+## Implementation from Scratch
 
 Next, we will show how to implement weight decay from scratch. For this we simply add the $\ell_2$ penalty as an additional loss term after the target function. The squared norm penalty derives its name from the fact that we are adding the second power $\sum_i x_i^2$. There are many other related penalties. In particular, the $\ell_p$ norm is defined as
 
@@ -126,7 +126,7 @@ The example below shows that even though the training error increased, the error
 fit_and_plot(lambd=3)
 ```
 
-## Weight Decay in Gluon
+## Concise Implementation
 
 Weight decay in Gluon is quite convenient (and also a bit special) insofar as it is typically integrated with the optimization algorithm itself. The reason for this is that it is much faster (in terms of runtime) for the optimizer to take care of weight decay and related things right inside the optimization algorithm itself, since the optimizer itself needs to touch all parameters anyway.
 

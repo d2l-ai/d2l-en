@@ -1,4 +1,4 @@
-# Gluon Implementation of Linear Regression
+# Concise Implementation of Linear Regression
 
 With the development of deep learning frameworks, it has become increasingly easy to develop deep learning applications. In practice, we can usually implement the same model, but much more concisely how we introduce it in the previous section. In this section, we will introduce how to use the Gluon interface provided by MXNet.
 

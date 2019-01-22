@@ -104,7 +104,7 @@ net.initialize()
 net(x)
 ```
 
-Indeed, it is no different than It can observed here that the use of the `MySequential` class is no different from the use of the Sequential class described in the [“Gluon implementation of multilayer perceptron”](../chapter_deep-learning-basics/mlp-gluon.md) section.
+Indeed, it is no different than It can observed here that the use of the `MySequential` class is no different from the use of the Sequential class described in the [“Concise Implementation of Multilayer Perceptron”](../chapter_deep-learning-basics/mlp-gluon.md) section.
 
 
 ## Blocks with Code

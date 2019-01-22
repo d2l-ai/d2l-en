@@ -1,4 +1,4 @@
-# Implementing a Multilayer Perceptron from Scratch
+# Implementation of Multilayer Perceptron from Scratch
 
 Now that we learned how multilayer perceptrons (MLPs) work in theory, let's implement them. First, import the required packages or modules.
 

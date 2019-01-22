@@ -1,4 +1,4 @@
-# Multilayer Perceptron in Gluon
+# Concise Implementation of Multilayer Perceptron
 
 Now that we learned how multilayer perceptrons (MLPs) work in theory, let's implement them. We begin, as always, by importing modules.
 

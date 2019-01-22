@@ -74,7 +74,7 @@ We will use an encoder-decoder with an attention mechanism to translate a short 
 
 ### Encoder
 
-In the encoder, we use the word embedding layer to obtain a feature index from the word index of the input language and then input it into a multi-level gated recurrent unit. As we mentioned in the ["Gluon implementation of the recurrent neural network"](../chapter_recurrent-neural-networks/rnn-gluon.md) section, Gluon's `rnn.GRU` instance also returns the multi-layer hidden states of the output and final time steps after forward calculation. Here, the output refers to the hidden state of the hidden layer of the last layer at each time step, and it does not involve output layer calculation. The attention mechanism uses these output as key items and value items.
+In the encoder, we use the word embedding layer to obtain a feature index from the word index of the input language and then input it into a multi-level gated recurrent unit. As we mentioned in the ["Concise Implementation of Recurrent Neural Networks"](../chapter_recurrent-neural-networks/rnn-gluon.md) section, Gluon's `rnn.GRU` instance also returns the multi-layer hidden states of the output and final time steps after forward calculation. Here, the output refers to the hidden state of the hidden layer of the last layer at each time step, and it does not involve output layer calculation. The attention mechanism uses these output as key items and value items.
 
 ```{.python .input  n=165}
 class Encoder(nn.Block):

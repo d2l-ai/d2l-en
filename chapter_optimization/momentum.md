@@ -143,7 +143,7 @@ d2l.train_ch7(sgd_momentum, init_momentum_states(),
               {'lr': 0.004, 'momentum': 0.9}, features, labels)
 ```
 
-## Implementation with Gluon
+## Concse Implementation
 
 In Gluon, we only need to use `momentum` to define the momentum hyperparameter in the `Trainer` instance to implement momentum.
 

@@ -1,4 +1,4 @@
-# Multi-GPU Computation
+# Multi-GPU Computation Implementation from Scratch
 
 In this section, we will show how to use multiple GPU for computation. For example, we can train the same model using multiple GPUs. As you might expect, running the programs in this section requires at least two GPUs. In fact, installing multiple GPUs on a single machine is common because there are usually multiple PCIe slots on the motherboard. If the Nvidia driver is properly installed, we can use the `nvidia-smi` command to view all GPUs on the current computer.
 

@@ -47,7 +47,7 @@ When we apply dropout to the hidden layer, it amounts to removing hidden units w
 
 ![MLP before and after dropout](../img/dropout2.svg)
 
-## Dropout from Scratch
+## Implementation from Scratch
 
 To implement the dropout function we have to draw as many random variables as the input has dimensions from the uniform distribution $U[0,1]$.
 According to the definition of dropout, we can implement it easily. The following `dropout` function will drop out the elements in the NDArray input `X` with the probability of `drop_prob`.
@@ -130,7 +130,7 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size,
               params, lr)
 ```
 
-## Dropout in Gluon
+## Concise Implementation
 
 In Gluon, we only need to add the `Dropout` layer after the fully connected layer and specify the dropout probability. When training the model, the `Dropout` layer will randomly drop out the output elements of the previous layer at the specified dropout probability; the `Dropout` layer simply passes the data through during testing.
 

@@ -67,7 +67,7 @@ d2l.train_ch7(rmsprop, init_rmsprop_states(), {'lr': 0.01, 'gamma': 0.9},
               features, labels)
 ```
 
-## Implementation with Gluon
+## Concise Implementation
 
 From the `Trainer` instance of the algorithm named "rmsprop", we can implement the RMSProp algorithm with Gluon to train models. Note that the hyperparameter $\gamma$ is assigned by `gamma1`.
 

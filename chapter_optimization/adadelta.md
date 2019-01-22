@@ -59,7 +59,7 @@ d2l.train_ch7(adadelta, init_adadelta_states(), {'rho': 0.9}, features,
               labels)
 ```
 
-## Implementation with Gluon
+## Concise Implementation
 
 From the `Trainer` instance for the algorithm named "adadelta", we can implement Adadelta in Gluon. Its hyperparameters can be specified by `rho`.
 

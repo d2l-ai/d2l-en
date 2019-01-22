@@ -1,4 +1,4 @@
-# Softmax Regression from Scratch
+# Implementation of Softmax Regression from Scratch
 
 Just like we learned how to implement linear regression from scratch, it is very instructive to do the same for softmax regression. After that we'll repeat the same procedure using Gluon for comparison. We begin with our regular import ritual.
 

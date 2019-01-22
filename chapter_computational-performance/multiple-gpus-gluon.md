@@ -1,4 +1,4 @@
-# Gluon Implementation for Multi-GPU Computation
+# Concise Implementation of Multi-GPU Computation
 
 In Gluon, we can conveniently use data parallelism to perform multi-GPU computation. For example, we do not need to implement the helper function to synchronize data among multiple GPUs, as described in the[“Multi-GPU Computation”](multiple-gpus.md) section, ourselves.
 

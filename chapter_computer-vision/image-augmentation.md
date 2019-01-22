@@ -138,7 +138,7 @@ def load_cifar10(is_train, augs, batch_size):
 
 ### Using a Multi-GPU Training Model
 
-We train the ResNet-18 model described in ["ResNet"](../chapter_convolutional-neural-networks/resnet.md) section on the CIFAR-10 data set. We will also apply the methods described in the ["Gluon Implementation in Multi-GPU Computation"](../chapter_computational-performance/multiple-gpus-gluon.md) section, and use a multi-GPU training model.
+We train the ResNet-18 model described in ["ResNet"](../chapter_convolutional-neural-networks/resnet.md) section on the CIFAR-10 data set. We will also apply the methods described in the ["Concise Implementation of Multi-GPU Computation"](../chapter_computational-performance/multiple-gpus-gluon.md) section, and use a multi-GPU training model.
 
 First, we define the `try_all_gpus` function to get all available GPUs.
 

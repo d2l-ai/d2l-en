@@ -1,4 +1,4 @@
-# Building a Recurrent Neural Network from Scratch
+# Implementation of Recurrent Neural Networks from Scratch
 
 In this section, we will implement a language model from scratch. It is based on a character-level recurrent neural network that is trained on H. G. Wells' 'The Time Machine'. As before, we start by reading the dataset first.
 

@@ -66,7 +66,7 @@ d2l.train_ch7(adam, init_adam_states(), {'lr': 0.01, 't': 1}, features,
               labels)
 ```
 
-## Implementation with Gluon
+## Concise Implementation
 
 From the `Trainer` instance of the algorithm named "adam", we can implement Adam with Gluon.
 
