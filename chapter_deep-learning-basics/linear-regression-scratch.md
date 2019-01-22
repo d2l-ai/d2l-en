@@ -40,7 +40,7 @@ By generating a scatter plot using the second `features[:, 1]` and `labels`, we 
 
 ```{.python .input  n=4}
 def use_svg_display():
-    # Displayed in vector graphics
+    # Display in vector graphics
     display.set_matplotlib_formats('svg')
 
 def set_figsize(figsize=(3.5, 2.5)):
@@ -147,9 +147,9 @@ Since nobody wants to compute gradients explicitly (this is tedious and error pr
 In an epoch (a pass through the data), we will iterate through the `data_iter` function once and use it for all the examples in the training data set (assuming the number of examples is divisible by the batch size). The number of epochs `num_epochs` and the learning rate `lr` are both hyper-parameters and are set to 3 and 0.03, respectively. Unfortunately in practice, the majority of the hyper-parameters will require some adjustment by trial and error. For instance, the model might actually become more accurate by training longer (but this increases computational cost). Likewise, we might want to change the learning rate on the fly. We will discuss this later in the chapter on ["Optimization Algorithms"](../chapter_optimization/index.md).
 
 ```{.python .input  n=12}
-lr = 0.03  # learning rate
-num_epochs = 3  # number of iterations
-net = linreg  # our fancy linear model
+lr = 0.03  # Learning rate
+num_epochs = 3  # Number of iterations
+net = linreg  # Our fancy linear model
 loss = squared_loss  # 0.5 (y-y')^2
 
 for epoch in range(num_epochs):
@@ -159,9 +159,9 @@ for epoch in range(num_epochs):
     # and y respectively
     for X, y in data_iter(batch_size, features, labels):
         with autograd.record():
-            l = loss(net(X, w, b), y)  # minibatch loss in X and y
-        l.backward()  # compute gradient on l with respect to [w,b]
-        sgd([w, b], lr, batch_size)  # update parameters using their gradient
+            l = loss(net(X, w, b), y)  # Minibatch loss in X and y
+        l.backward()  # Compute gradient on l with respect to [w,b]
+        sgd([w, b], lr, batch_size)  # Update parameters using their gradient
     train_l = loss(net(features, w, b), labels)
     print('epoch %d, loss %f' % (epoch + 1, train_l.mean().asnumpy()))
 ```
