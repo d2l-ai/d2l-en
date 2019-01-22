@@ -176,7 +176,7 @@ before worrying about more exotic probability distributions.
 
 
 
-	
+
 ## Acknowledgments
 
 We are indebted to the hundreds of contributors for both
