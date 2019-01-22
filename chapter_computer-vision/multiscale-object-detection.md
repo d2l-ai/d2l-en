@@ -7,6 +7,9 @@ It is not difficult to reduce the number of anchor boxes.  An easy way is to app
 To demonstrate how to generate anchor boxes on multiple scales, let us read an image first.  It has a height and width of 561 * 728 pixels.
 
 ```{.python .input  n=1}
+import sys
+sys.path.insert(0, '..')
+
 %matplotlib inline
 import d2l
 from mxnet import contrib, image, nd
