@@ -59,8 +59,8 @@ Much of this changed with the ready availability of large amounts of data, due t
 |1980|1 K (House prices in Boston)|100 KB|1 MF (Intel 80186)|
 |1990|10 K (optical character recognition)|10 MB|10 MF (Intel 80486)|
 |2000|10 M (web pages)|100 MB|1 GF (Intel Core)|
-|2010|10 G (advertising)|1 GB|1 TF (Nvidia C2050)|
-|2020|1 T (social network)|100 GB|1 PF (Nvidia DGX-2)|
+|2010|10 G (advertising)|1 GB|1 TF (NVIDIA C2050)|
+|2020|1 T (social network)|100 GB|1 PF (NVIDIA DGX-2)|
 
 It is quite evident that RAM has not kept pace with the growth in data. At the same time, the increase in computational power has outpaced that of the data available. This means that statistical models needed to become more memory efficient (this is typically achieved by adding nonlinearities) while simultaneously being able to spend more time on optimizing these parameters, due to an increased compute budget. Consequently the sweet spot in machine learning and statistics moved from (generalized) linear models and kernel methods to deep networks. This is also one of the reasons why many of the mainstays of deep learning, such as Multilayer Perceptrons (e.g. McCulloch & Pitts, 1943), Convolutional Neural Networks (Le Cun, 1992), Long Short Term Memory (Hochreiter & Schmidhuber, 1997), Q-Learning (Watkins, 1989), were essentially 'rediscovered' in the past decade, after laying dormant for considerable time.
 

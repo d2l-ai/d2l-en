@@ -68,7 +68,7 @@ If you log into a GPU instance, you need to download and install CUDA. First, up
 sudo apt-get update && sudo apt-get install -y build-essential git libgfortran3
 ```
 
-Nvidia releases a major version of CUDA every year. Here we download the latest CUDA 9.1 when the book is written. Visit the official website of Nvidia(https://developer.nvidia.com/cuda-91-download-archive) to obtain the download link of CUDA 9.1, as shown in Figure 11.17.
+NVIDIA releases a major version of CUDA every year. Here we download the latest CUDA 9.1 when the book is written. Visit the official website of NVIDIA(https://developer.nvidia.com/cuda-91-download-archive) to obtain the download link of CUDA 9.1, as shown in Figure 11.17.
 
 ![Find the CUDA 9.1 download address. ](../img/cuda.png)
 
