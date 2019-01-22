@@ -59,7 +59,7 @@ Next, we will implement the batch normalization layer via the NDArray from scrat
 import sys
 sys.path.insert(0, '..')
 
-mport d2l
+import d2l
 from mxnet import autograd, gluon, init, nd
 from mxnet.gluon import nn
 
