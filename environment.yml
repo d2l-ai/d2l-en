@@ -5,5 +5,5 @@ dependencies:
 - matplotlib=2.2.2
 - pandas=0.23.4
 - pip:
-  - requests==2.18.4
+  - requests==2.20.0
   - mxnet==1.5.0b20181215
