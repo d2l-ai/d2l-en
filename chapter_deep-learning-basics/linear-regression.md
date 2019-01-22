@@ -155,10 +155,10 @@ from mxnet import nd
 import math
 
 x = nd.arange(-7, 7, 0.01)
-# mean and variance pairs
+# Mean and variance pairs
 parameters = [(0,1), (0,2), (3,1)]
 
-# display SVG rather than JPG
+# Display SVG rather than JPG
 display.set_matplotlib_formats('svg')
 plt.figure(figsize=(10, 6))
 for (mu, sigma) in parameters:

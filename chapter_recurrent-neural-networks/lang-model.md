@@ -94,7 +94,8 @@ import collections
 import re
 with open('../data/timemachine.txt', 'r') as f:
     lines = f.readlines()
-    raw_dataset = [re.sub('[^A-Za-z]+', ' ', st).lower().split() for st in lines]
+    raw_dataset = [re.sub('[^A-Za-z]+', ' ', st).lower().split()
+                   for st in lines]
 
 # Let's read the first 10 lines of the text    
 for st in raw_dataset[8:10]:

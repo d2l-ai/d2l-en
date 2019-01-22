@@ -56,7 +56,8 @@ Let's use this to implement our own version of the dense layer. It has two param
 
 ```{.python .input  n=19}
 class MyDense(nn.Block):
-    # Units: the number of outputs in this layer; in_units: the number of inputs in this layer.
+    # units: the number of outputs in this layer; in_units: the number of
+    # inputs in this layer
     def __init__(self, units, in_units, **kwargs):
         super(MyDense, self).__init__(**kwargs)
         self.weight = self.params.get('weight', shape=(in_units, units))

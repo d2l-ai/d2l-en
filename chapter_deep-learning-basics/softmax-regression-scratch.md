@@ -3,6 +3,9 @@
 Just like we learned how to implement linear regression from scratch, it is very instructive to do the same for softmax regression. After that we'll repeat the same procedure using Gluon for comparison. We begin with our regular import ritual.
 
 ```{.python .input}
+import sys
+sys.path.insert(0, '..')
+
 %matplotlib inline
 import d2l
 from mxnet import autograd, nd
@@ -55,7 +58,7 @@ The denominator is sometimes called the partition function (and its logarithm th
 def softmax(X):
     X_exp = X.exp()
     partition = X_exp.sum(axis=1, keepdims=True)
-    return X_exp / partition  # The broadcast mechanism is applied here.
+    return X_exp / partition  # The broadcast mechanism is applied here
 ```
 
 As you can see, for any random input, we turn each element into a non-negative number. Moreover, each row sums up to 1, as is required for a probability.
@@ -114,8 +117,8 @@ accuracy(y_hat, y)
 Similarly, we can evaluate the accuracy for model `net` on the data set `data_iter`.
 
 ```{.python .input  n=19}
-#  The function will be gradually improved: the complete implementation will be
-# discussed in the "Image Augmentation" section.
+# The function will be gradually improved: the complete implementation will be
+# discussed in the "Image Augmentation" section
 def evaluate_accuracy(data_iter, net):
     acc_sum, n = 0.0, 0
     for X, y in data_iter:
@@ -138,7 +141,7 @@ The implementation for training softmax regression is very similar to the implem
 ```{.python .input  n=21}
 num_epochs, lr = 5, 0.1
 
-# This function has been saved in the d2l package for future use.
+# This function has been saved in the d2l package for future use
 def train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size,
               params=None, lr=None, trainer=None):
     for epoch in range(num_epochs):
@@ -151,7 +154,8 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size,
             if trainer is None:
                 d2l.sgd(params, lr, batch_size)
             else:
-                trainer.step(batch_size)  # This will be illustrated in the next section.
+                # This will be illustrated in the next section
+                trainer.step(batch_size)
             y = y.astype('float32')
             train_l_sum += l.asscalar()
             train_acc_sum += (y_hat.argmax(axis=1) == y).sum().asscalar()
@@ -174,7 +178,8 @@ for X, y in test_iter:
 
 true_labels = d2l.get_fashion_mnist_labels(y.asnumpy())
 pred_labels = d2l.get_fashion_mnist_labels(net(X).argmax(axis=1).asnumpy())
-titles = [truelabel + '\n' + predlabel for truelabel, predlabel in zip(true_labels, pred_labels)]
+titles = [truelabel + '\n' + predlabel
+          for truelabel, predlabel in zip(true_labels, pred_labels)]
 
 d2l.show_fashion_mnist(X[0:9], titles[0:9])
 ```

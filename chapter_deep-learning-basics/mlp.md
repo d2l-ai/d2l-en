@@ -81,6 +81,9 @@ $$\mathrm{ReLU}(x) = \max(x, 0).$$
 It can be understood that the ReLU function retains only positive elements and discards negative elements. To get a better idea of what it looks like it helps to plot it. For convenience we define a plotting function `xyplot` to take care of the gruntwork.
 
 ```{.python .input  n=1}
+import sys
+sys.path.insert(0, '..')
+
 %matplotlib inline
 import d2l
 from mxnet import autograd, nd

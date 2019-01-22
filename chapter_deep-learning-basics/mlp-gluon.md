@@ -3,6 +3,9 @@
 Now that we learned how multilayer perceptrons (MLPs) work in theory, let's implement them. We begin, as always, by importing modules.
 
 ```{.python .input}
+import sys
+sys.path.insert(0, '..')
+
 import d2l
 from mxnet import gluon, init
 from mxnet.gluon import loss as gloss, nn
@@ -30,8 +33,8 @@ train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 loss = gloss.SoftmaxCrossEntropyLoss()
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': 0.5})
 num_epochs = 10
-d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size,
-             None, None, trainer)
+d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size, None,
+              None, trainer)
 ```
 
 ## Problems

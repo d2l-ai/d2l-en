@@ -20,14 +20,17 @@ PAD, BOS, EOS = '<pad>', '<bos>', '<eos>'
 Then, we define two auxiliary functions to preprocess the data to be read later.
 
 ```{.python .input}
-# For a sequence, we record all the words in all_tokens in order to subsequently construct the dictionary, then we add PAD after the sequence, until
-# the length becomes max_seq_len. Then, we record the sequence in all_seqs.
+# For a sequence, we record all the words in all_tokens in order to
+# subsequently construct the dictionary, then we add PAD after the sequence,
+# until the length becomes max_seq_len. Then, we record the sequence in
+# all_seqs
 def process_one_seq(seq_tokens, all_tokens, all_seqs, max_seq_len):
     all_tokens.extend(seq_tokens)
     seq_tokens += [EOS] + [PAD] * (max_seq_len - len(seq_tokens) - 1)
     all_seqs.append(seq_tokens)
 
-# Use all the words to construct a dictionary. Construct an NDArray instance after transforming the words in all sequences into a word index.
+# Use all the words to construct a dictionary. Construct an NDArray instance
+# after transforming the words in all sequences into a word index
 def build_data(all_tokens, all_seqs):
     vocab = text.vocab.Vocabulary(collections.Counter(all_tokens),
                                   reserved_tokens=[PAD, BOS, EOS])
@@ -39,15 +42,17 @@ For simplicity, we use a very small French-English data set here. In this data s
 
 ```{.python .input  n=31}
 def read_data(max_seq_len):
-    # In and out are the abbreviations of input and output, respectively.
+    # In and out are the abbreviations of input and output, respectively
     in_tokens, out_tokens, in_seqs, out_seqs = [], [], [], []
     with io.open('../data/fr-en-small.txt') as f:
         lines = f.readlines()
     for line in lines:
         in_seq, out_seq = line.rstrip().split('\t')
         in_seq_tokens, out_seq_tokens = in_seq.split(' '), out_seq.split(' ')
+        # If a sequence is longer than the max_seq_len after adding EOS, this
+        # example will be ignored
         if max(len(in_seq_tokens), len(out_seq_tokens)) > max_seq_len - 1:
-            continue  # If a sequence is longer than the max_seq_len after adding EOS, this example will be ignored.
+            continue
         process_one_seq(in_seq_tokens, in_tokens, in_seqs, max_seq_len)
         process_one_seq(out_seq_tokens, out_tokens, out_seqs, max_seq_len)
     in_vocab, in_data = build_data(in_tokens, in_seqs)
@@ -80,7 +85,8 @@ class Encoder(nn.Block):
         self.rnn = rnn.GRU(num_hiddens, num_layers, dropout=drop_prob)
 
     def forward(self, inputs, state):
-        # The input shape is (batch size, number of time steps). Change the example dimension and time step dimension of the output.
+        # The input shape is (batch size, number of time steps). Change the
+        # example dimension and time step dimension of the output
         embedding = self.embedding(inputs).swapaxes(0, 1)
         return self.rnn(embedding, state)
 
@@ -122,13 +128,17 @@ The inputs of the attention model include query items, key items, and value item
 
 ```{.python .input  n=168}
 def attention_forward(model, enc_states, dec_state):
-    # Broadcast the decoder hidden state to the same shape as the encoder hidden state and then perform concatenation.
+    # Broadcast the decoder hidden state to the same shape as the encoder
+    # hidden state and then perform concatenation
     dec_states = nd.broadcast_axis(
         dec_state.expand_dims(0), axis=0, size=enc_states.shape[0])
     enc_and_dec_states = nd.concat(enc_states, dec_states, dim=2)
-    e = model(enc_and_dec_states)  # The shape is (number of time steps, batch size, 1).
-    alpha = nd.softmax(e, axis=0)  # Perform the softmax operation on the time step dimension.
-    return (alpha * enc_states).sum(axis=0)  # This returns the context variable.
+    # The shape is (number of time steps, batch size, 1)
+    e = model(enc_and_dec_states)
+    # Perform the softmax operation on the time step dimension
+    alpha = nd.softmax(e, axis=0)
+    # This returns the context variable
+    return (alpha * enc_states).sum(axis=0)
 ```
 
 In the example below, the encoder has 10 time steps and a batch size of 4. Both the encoder and the decoder have 8 hidden units. The attention model returns a mini-batch of context vectors, and the length of each context vector is equal to the number of hidden units of the encoder. Therefore, the output shape is (4, 8).
@@ -159,18 +169,22 @@ class Decoder(nn.Block):
         self.out = nn.Dense(vocab_size, flatten=False)
 
     def forward(self, cur_input, state, enc_states):
-        # Use the attention mechanism to calculate the context vector.
+        # Use the attention mechanism to calculate the context vector
         c = attention_forward(self.attention, enc_states, state[0][-1])
-        # The embedded input and the context vector are concatenated in the feature dimension.
+        # The embedded input and the context vector are concatenated in the
+        # feature dimension
         input_and_c = nd.concat(self.embedding(cur_input), c, dim=1)
-        # Add a time step dimension, with 1 time step, for the concatenation of the input and the context vector.
+        # Add a time step dimension, with 1 time step, for the concatenation
+        # of the input and the context vector
         output, state = self.rnn(input_and_c.expand_dims(0), state)
-        # Remove the time step dimension, so the output shape is (batch size, output dictionary size).
+        # Remove the time step dimension, so the output shape is (batch size,
+        # output dictionary size)
         output = self.out(output).squeeze(axis=0)
         return output, state
 
     def begin_state(self, enc_state):
-        # Directly use the hidden state of the final time step of the encoder as the initial hidden state of the decoder.
+        # Directly use the hidden state of the final time step of the encoder
+        # as the initial hidden state of the decoder.
         return enc_state
 ```
 
@@ -183,19 +197,20 @@ def batch_loss(encoder, decoder, X, Y, loss):
     batch_size = X.shape[0]
     enc_state = encoder.begin_state(batch_size=batch_size)
     enc_outputs, enc_state = encoder(X, enc_state)
-    # Initialize the hidden state of the decoder.
+    # Initialize the hidden state of the decoder
     dec_state = decoder.begin_state(enc_state)
-    # The input of decoder at the initial time step is BOS.
+    # The input of decoder at the initial time step is BOS
     dec_input = nd.array([out_vocab.token_to_idx[BOS]] * batch_size)
-    # We will use the mask variable to ignore the loss when the label is PAD.
+    # We will use the mask variable to ignore the loss when the label is PAD
     mask, num_not_pad_tokens = nd.ones(shape=(batch_size,)), 0
     l = nd.array([0])
     for y in Y.T:
         dec_output, dec_state = decoder(dec_input, dec_state, enc_outputs)
         l = l + (mask * loss(dec_output, y)).sum()
-        dec_input = y  # Use teacher forcing.
+        dec_input = y  # Use teacher forcing
         num_not_pad_tokens += mask.sum().asscalar()
-        # When we encounter EOS, words after the sequence will all be PAD and the mask for the corresponding position is set to 0.
+        # When we encounter EOS, words after the sequence will all be PAD and
+        # the mask for the corresponding position is set to 0
         mask = mask * (y != out_vocab.token_to_idx[EOS])
     return l / num_not_pad_tokens
 ```
@@ -255,7 +270,9 @@ def translate(encoder, decoder, input_seq, max_seq_len):
         dec_output, dec_state = decoder(dec_input, dec_state, enc_output)
         pred = dec_output.argmax(axis=1)
         pred_token = out_vocab.idx_to_token[int(pred.asscalar())]
-        if pred_token == EOS:  # When an EOS symbol is found at any time step, the output sequence is complete.
+        # When an EOS symbol is found at any time step, the output sequence is
+        # complete
+        if pred_token == EOS:
             break
         else:
             output_tokens.append(pred_token)

@@ -48,7 +48,7 @@ Here, we re-implement the algorithm used to search for synonyms by cosine simila
 
 ```{.python .input}
 def knn(W, x, k):
-    # The added 1e-9 is for numerical stability.
+    # The added 1e-9 is for numerical stability
     cos = nd.dot(W, x.reshape((-1,))) / (
         (nd.sum(W * W, axis=1) + 1e-9).sqrt() * nd.sum(x * x).sqrt())
     topk = nd.topk(cos, k=k, ret_typ='indices').asnumpy().astype('int32')
@@ -61,7 +61,7 @@ Then, we search for synonyms by pre-training the word vector instance `embed`.
 def get_similar_tokens(query_token, k, embed):
     topk, cos = knn(embed.idx_to_vec,
                     embed.get_vecs_by_tokens([query_token]), k+1)
-    for i, c in zip(topk[1:], cos[1:]):  # Remove input words.
+    for i, c in zip(topk[1:], cos[1:]):  # Remove input words
         print('cosine sim=%.3f: %s' % (c, (embed.idx_to_token[i])))
 ```
 
@@ -90,7 +90,7 @@ def get_analogy(token_a, token_b, token_c, embed):
     vecs = embed.get_vecs_by_tokens([token_a, token_b, token_c])
     x = vecs[1] - vecs[0] + vecs[2]
     topk, cos = knn(embed.idx_to_vec, x, 1)
-    return embed.idx_to_token[topk[0]]  # Remove unknown words.
+    return embed.idx_to_token[topk[0]]  # Remove unknown words
 ```
 
 Verify the "male-female" analogy.

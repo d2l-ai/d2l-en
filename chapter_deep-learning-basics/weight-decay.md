@@ -35,6 +35,9 @@ $$y = 0.05 + \sum_{i = 1}^d 0.01 x_i + \epsilon \text{ where }
 That is, we have additive Gaussian noise with zero mean and variance 0.01. In order to observe overfitting more easily we pick a high-dimensional problem with $d = 200$ and a deliberatly low number of training examples, e.g. 20. As before we begin with our import ritual (and data generation).
 
 ```{.python .input  n=2}
+import sys
+sys.path.insert(0, '..')
+
 %matplotlib inline
 import d2l
 from mxnet import autograd, gluon, init, nd
@@ -94,7 +97,7 @@ def fit_and_plot(lambd):
     for _ in range(num_epochs):
         for X, y in train_iter:
             with autograd.record():
-                # The L2 norm penalty term has been added.
+                # The L2 norm penalty term has been added
                 l = loss(net(X, w, b), y) + lambd * l2_penalty(w)
             l.backward()
             d2l.sgd([w, b], lr, batch_size)
@@ -103,7 +106,7 @@ def fit_and_plot(lambd):
         test_ls.append(loss(net(test_features, w, b),
                             test_labels).mean().asscalar())
     d2l.semilogy(range(1, num_epochs + 1), train_ls, 'epochs', 'loss',
-                range(1, num_epochs + 1), test_ls, ['train', 'test'])
+                 range(1, num_epochs + 1), test_ls, ['train', 'test'])
     print('l2 norm of w:', w.norm().asscalar())
 ```
 
@@ -134,10 +137,11 @@ def fit_and_plot_gluon(wd):
     net = nn.Sequential()
     net.add(nn.Dense(1))
     net.initialize(init.Normal(sigma=1))
-    # The weight parameter has been decayed. Weight names generally end with "weight".
+    # The weight parameter has been decayed. Weight names generally end with
+    # "weight".
     trainer_w = gluon.Trainer(net.collect_params('.*weight'), 'sgd',
                               {'learning_rate': lr, 'wd': wd})
-    # The bias parameter has not decayed. Bias names generally end with "bias".
+    # The bias parameter has not decayed. Bias names generally end with "bias"
     trainer_b = gluon.Trainer(net.collect_params('.*bias'), 'sgd',
                               {'learning_rate': lr})
     train_ls, test_ls = [], []
@@ -146,7 +150,8 @@ def fit_and_plot_gluon(wd):
             with autograd.record():
                 l = loss(net(X), y)
             l.backward()
-            # Call the step function on each of the two Trainer instances to update the weight and bias separately.
+            # Call the step function on each of the two Trainer instances to
+            # update the weight and bias separately
             trainer_w.step(batch_size)
             trainer_b.step(batch_size)
         train_ls.append(loss(net(train_features),
@@ -154,7 +159,7 @@ def fit_and_plot_gluon(wd):
         test_ls.append(loss(net(test_features),
                             test_labels).mean().asscalar())
     d2l.semilogy(range(1, num_epochs + 1), train_ls, 'epochs', 'loss',
-                range(1, num_epochs + 1), test_ls, ['train', 'test'])
+                 range(1, num_epochs + 1), test_ls, ['train', 'test'])
     print('L2 norm of w:', net[0].weight.data().norm().asscalar())
 ```
 

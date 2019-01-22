@@ -29,13 +29,17 @@ We should emphasize that the cumulative variable $\boldsymbol{s}_t$ produced by 
 Below we will continue to use the objective function $f(\boldsymbol{x})=0.1x_1^2+2x_2^2$ as an example to observe the iterative trajectory of the independent variable in Adagrad. We are going to implement Adagrad using the same learning rate as the experiment in last section, 0.4. As we can see, the iterative trajectory of the independent variable is smoother. However, due to the cumulative effect of $\boldsymbol{s}_t$, the learning rate continuously decays, so the independent variable does not move as much during later stages of iteration.
 
 ```{.python .input  n=1}
+import sys
+sys.path.insert(0, '..')
+
 %matplotlib inline
 import d2l
 import math
 from mxnet import nd
 
 def adagrad_2d(x1, x2, s1, s2):
-    g1, g2, eps = 0.2 * x1, 4 * x2, 1e-6  # The first two terms are the independent variable gradients.
+    # The first two terms are the independent variable gradients
+    g1, g2, eps = 0.2 * x1, 4 * x2, 1e-6
     s1 += g1 ** 2
     s2 += g2 ** 2
     x1 -= eta / math.sqrt(s1 + eps) * g1

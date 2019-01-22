@@ -6,6 +6,9 @@ We mentioned that large-scale data sets are prerequisites for the successful app
 First, import the packages or modules required for the experiment in this section.
 
 ```{.python .input  n=21}
+import sys
+sys.path.insert(0, '..')
+
 %matplotlib inline
 import d2l
 import mxnet as mx
@@ -28,7 +31,7 @@ d2l.plt.imshow(img.asnumpy())
 The drawing function `show_images` is defined below.
 
 ```{.python .input  n=23}
-# This function is saved in the d2l package for future use.
+# This function is saved in the d2l package for future use
 def show_images(imgs, num_rows, num_cols, scale=2):
     figsize = (num_cols * scale, num_rows * scale)
     _, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize)
@@ -140,10 +143,12 @@ We train the ResNet-18 model described in ["ResNet"](../chapter_convolutional-ne
 First, we define the `try_all_gpus` function to get all available GPUs.
 
 ```{.python .input  n=35}
-def try_all_gpus():  # This function is saved in the d2l package for future use.
+# This function has been saved in the d2l package for future use
+def try_all_gpus():
     ctxes = []
     try:
-        for i in range(16):  # Here, we assume the number of GPUs on a machine does not exceed 16.
+        # Assume that the number of GPUs on a machine does not exceed 16
+        for i in range(16):
             ctx = mx.gpu(i)
             _ = nd.array([0], ctx=ctx)
             ctxes.append(ctx)
@@ -161,7 +166,8 @@ def _get_batch(batch, ctx):
     features, labels = batch
     if labels.dtype != features.dtype:
         labels = labels.astype(features.dtype)
-    # When ctx contains multiple GPUs, mini-batch data instances are divided and copied to each GPU.
+    # When ctx contains multiple GPUs, mini-batch data instances are divided
+    # and copied to each GPU.
     return (gutils.split_and_load(features, ctx),
             gutils.split_and_load(labels, ctx), features.shape[0])
 ```
@@ -169,7 +175,7 @@ def _get_batch(batch, ctx):
 Then, we define the `evaluate_accuracy` function to evaluate the classification accuracy of the model. Different from `evaluate_accuracy`, the function described in the ["Softmax Regression Starting from Scratch"](../chapter_deep-learning-basics/softmax-regression-scratch.md) and ["Convolutional Neural Network (LeNet)"](../chapter_convolutional-neural-networks/lenet.md) sections, the function defined here are more general. It evaluates the model using all GPUs contained in the `ctx` variable by using the auxiliary function `_get_batch`.
 
 ```{.python .input  n=36}
-# This function is saved in the d2l package for future use.
+# This function has been saved in the d2l package for future use
 def evaluate_accuracy(data_iter, net, ctx=[mx.cpu()]):
     if isinstance(ctx, mx.Context):
         ctx = [ctx]
@@ -187,7 +193,7 @@ def evaluate_accuracy(data_iter, net, ctx=[mx.cpu()]):
 Next, we define the `train` function to train and evaluate the model using multiple GPUs.
 
 ```{.python .input  n=37}
-# This function is saved in the d2l package for future use.
+# This function has been saved in the d2l package for future use
 def train(train_iter, test_iter, net, loss, trainer, ctx, num_epochs):
     print('training on', ctx)
     if isinstance(ctx, mx.Context):

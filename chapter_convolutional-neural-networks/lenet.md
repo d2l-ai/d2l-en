@@ -22,6 +22,9 @@ The output shape of the convolutional layer block is (batch size, channel, heigh
 Next, we implement the LeNet model through the Sequential class.
 
 ```{.python .input}
+import sys
+sys.path.insert(0, '..')
+
 import d2l
 import mxnet as mx
 from mxnet import autograd, gluon, init, nd
@@ -33,8 +36,9 @@ net.add(nn.Conv2D(channels=6, kernel_size=5, padding=2, activation='sigmoid'),
         nn.AvgPool2D(pool_size=2, strides=2),
         nn.Conv2D(channels=16, kernel_size=5, activation='sigmoid'),
         nn.AvgPool2D(pool_size=2, strides=2),
-        # Dense will transform the input of the shape (batch size, channel, height, width) into
-        # the input of the shape (batch size, channel *height * width) automatically by default.
+        # Dense will transform the input of the shape (batch size, channel,
+        # height, width) into the input of the shape (batch size,
+        # channel * height * width) automatically by default
         nn.Dense(120, activation='sigmoid'),
         nn.Dense(84, activation='sigmoid'),
         nn.Dense(10))
@@ -67,7 +71,8 @@ train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)
 Since convolutional networks are significantly more expensive to compute than multilayer perceptrons we recommend using GPUs to speed up training. Time to introduce a convenience function that allows us to detect whether we have a GPU: it works by trying to allocate an NDArray on `gpu(0)`, and use `gpu(0)` if this is successful. Otherwise, we catch the resulting exception and we stick with the CPU.
 
 ```{.python .input}
-def try_gpu():  # This function has been saved in the d2l package for future use.
+# This function has been saved in the d2l package for future use
+def try_gpu():
     try:
         ctx = mx.gpu()
         _ = nd.zeros((1,), ctx=ctx)
@@ -82,8 +87,9 @@ ctx
 Accordingly, we slightly modify the `evaluate_accuracy` function described when [implementing the SoftMax from scratch](../chapter_deep-learning-basics/softmax-regression-scratch.md).  Since the data arrives in the CPU when loading we need to copy it to the GPU before any computation can occur. This is accomplished via the `as_in_context` function described in the [GPU Computing](../chapter_deep-learning-computation/use-gpu.md) section. Note that we accumulate the errors on the same device as where the data eventually lives (in `acc`). This avoids intermediate copy operations that would destroy performance.
 
 ```{.python .input}
-# This function has been saved in the d2l package for future use. The function will be gradually improved.
-# Its complete implementation will be discussed in the "Image Augmentation" section.
+# This function has been saved in the d2l package for future use. The function
+# will be gradually improved. Its complete implementation will be discussed in
+# the "Image Augmentation" section
 def evaluate_accuracy(data_iter, net, ctx):
     acc_sum, n = nd.array([0], ctx=ctx), 0
     for X, y in data_iter:
@@ -97,7 +103,7 @@ def evaluate_accuracy(data_iter, net, ctx):
 Just like the data loader we need to update the training function to deal with GPUs. Unlike [`train_ch3`](../chapter_deep-learning-basics/softmax-regression-scratch.md) we now move data prior to computation.
 
 ```{.python .input}
-# This function has been saved in the d2l package for future use.
+# This function has been saved in the d2l package for future use
 def train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,
               num_epochs):
     print('training on', ctx)

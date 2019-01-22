@@ -8,6 +8,9 @@ In the ["Gradient Descent and Stochastic Gradient Descent"](./gd-sgd.md) section
 Now, we will consider an objective function $f(\boldsymbol{x})=0.1x_1^2+2x_2^2$, whose input and output are a two-dimensional vector $\boldsymbol{x} = [x_1, x_2]$ and a scalar, respectively. In contrast to the ["Gradient Descent and Stochastic Gradient Descent"](./gd-sgd.md) section, here, the coefficient $x_1^2$ is reduced from $1$ to $0.1$. We are going to implement gradient descent based on this objective function, and demonstrate the iterative trajectory of the independent variable using the learning rate $0.4.
 
 ```{.python .input  n=3}
+import sys
+sys.path.insert(0, '..')
+
 %matplotlib inline
 import d2l
 from mxnet import nd
@@ -130,14 +133,14 @@ When we increase the momentum hyperparameter `momentum` to 0.9, it can still be 
 
 ```{.python .input  n=8}
 d2l.train_ch7(sgd_momentum, init_momentum_states(),
-             {'lr': 0.02, 'momentum': 0.9}, features, labels)
+              {'lr': 0.02, 'momentum': 0.9}, features, labels)
 ```
 
 We can see that the value change of the objective function is not smooth enough at later stages of iteration. Intuitively, ten times the mini-batch gradient is five times larger than two times the mini-batch gradient, so we can try to reduce the learning rate to 1/5 of its original value. Now, the value change of the objective function becomes smoother after its period of decline.
 
 ```{.python .input}
 d2l.train_ch7(sgd_momentum, init_momentum_states(),
-             {'lr': 0.004, 'momentum': 0.9}, features, labels)
+              {'lr': 0.004, 'momentum': 0.9}, features, labels)
 ```
 
 ## Implementation with Gluon
@@ -145,8 +148,8 @@ d2l.train_ch7(sgd_momentum, init_momentum_states(),
 In Gluon, we only need to use `momentum` to define the momentum hyperparameter in the `Trainer` instance to implement momentum.
 
 ```{.python .input  n=9}
-d2l.train_gluon_ch7('sgd', {'learning_rate': 0.004, 'momentum': 0.9}, features,
-                   labels)
+d2l.train_gluon_ch7('sgd', {'learning_rate': 0.004, 'momentum': 0.9},
+                    features, labels)
 ```
 
 ## Summary

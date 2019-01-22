@@ -80,14 +80,16 @@ def data_iter(batch_size, features, labels):
         j = nd.array(indices[i: min(i + batch_size, num_examples)])
         yield features.take(j), labels.take(j)
 
+
 def data_iter_consecutive(corpus_indices, batch_size, num_steps, ctx=None):
-    # offset for the iterator over the data for uniform starts
+    """Sample mini-batches in a consecutive order from sequential data."""
+    # Offset for the iterator over the data for uniform starts
     offset = int(random.uniform(0,num_steps))
-    # slice out data - ignore num_steps and just wrap around
+    # Slice out data - ignore num_steps and just wrap around
     num_indices = ((len(corpus_indices) - offset) // batch_size) * batch_size
     indices = nd.array(corpus_indices[offset:(offset + num_indices)], ctx=ctx)
     indices = indices.reshape((batch_size,-1))
-    # need to leave one last token since targets are shifted by 1
+    # Need to leave one last token since targets are shifted by 1
     num_epochs = ((num_indices // batch_size) - 1) // num_steps
 
     for i in range(0, num_epochs * num_steps, num_steps):
@@ -96,11 +98,12 @@ def data_iter_consecutive(corpus_indices, batch_size, num_steps, ctx=None):
         yield X, Y
 
 def data_iter_random(corpus_indices, batch_size, num_steps, ctx=None):
-    # offset for the iterator over the data
+    """Sample mini-batches in a random order from sequential data."""
+    # Offset for the iterator over the data
     offset = int(random.uniform(0,num_steps))
-    # subtract 1 extra since we need to account for the sequence length
+    # Subtract 1 extra since we need to account for the sequence length
     num_examples = ((len(corpus_indices) - offset - 1) // num_steps) - 1
-    # discard half empty batches
+    # Discard half empty batches
     num_batches = num_examples // batch_size
     example_indices = list(range(offset, offset + num_examples * num_steps, num_steps))
     random.shuffle(example_indices)
@@ -493,6 +496,7 @@ def show_bboxes(axes, bboxes, labels=None, colors=None):
 
 
 def show_fashion_mnist(images, labels):
+    """Plot Fashion-MNIST images with labels."""
     use_svg_display()
     _, figs = plt.subplots(1, len(images), figsize=(12, 12))
     for f, img, lbl in zip(figs, images, labels):
@@ -515,6 +519,7 @@ def show_images(imgs, num_rows, num_cols, scale=2):
 
 
 def show_trace_2d(f, res):
+    """Show the trace of 2d variables during optimization."""
     x1, x2 = zip(*res)
     set_figsize()
     plt.plot(x1, x2, '-o', color='#ff7f0e')
@@ -565,7 +570,7 @@ def train(train_iter, test_iter, net, loss, trainer, ctx, num_epochs):
 
 
 def train_2d(trainer):
-    """Train a 2d object function with a customized trainer"""
+    """Optimize the objective function of 2d variables with a customized trainer."""
     x1, x2 = -5, -2
     s_x1, s_x2 = 0, 0
     res = [(x1, x2)]
@@ -800,7 +805,7 @@ def use_svg_display():
 
 
 def voc_label_indices(colormap, colormap2label):
-    """Assig label indices for Pascal VOC2012 Dataset."""
+    """Assign label indices for Pascal VOC2012 Dataset."""
     colormap = colormap.astype('int32')
     idx = ((colormap[:, :, 0] * 256 + colormap[:, :, 1]) * 256
            + colormap[:, :, 2])

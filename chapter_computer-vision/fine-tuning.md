@@ -25,6 +25,9 @@ Next, we will use a specific example for practice: hot dog recognition. We will 
 First, import the packages and modules required for the experiment.  Gluon's `model_zoo` package provides a common pre-trained model. If you want to get more pre-trained models for computer vision, you can use the GluonCV Toolkit[1].
 
 ```{.python .input  n=1}
+import sys
+sys.path.insert(0, '..')
+
 %matplotlib inline
 import d2l
 from mxnet import gluon, init, nd
@@ -107,7 +110,8 @@ We then build a new neural network to use as the target model. It is defined in 
 finetune_net = model_zoo.vision.resnet18_v2(classes=2)
 finetune_net.features = pretrained_net.features
 finetune_net.output.initialize(init.Xavier())
-# The model parameters in output will be updated using a learning rate ten times greater.
+# The model parameters in output will be updated using a learning rate ten
+# times greater
 finetune_net.output.collect_params().setattr('lr_mult', 10)
 ```
 

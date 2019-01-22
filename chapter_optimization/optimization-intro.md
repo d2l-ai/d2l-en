@@ -20,6 +20,9 @@ In the [Linear Regression](../chapter_deep-learning-basics/linear-regression.md)
 There are many challenges in deep learning optimization. Two such challenges are discussed below: local minimums and saddle points. To better describe the problem, we first import the packages or modules required for the experiments in this section.
 
 ```{.python .input  n=1}
+import sys
+sys.path.insert(0, '..')
+
 %matplotlib inline
 import d2l
 from mpl_toolkits import mplot3d

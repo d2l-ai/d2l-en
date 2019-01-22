@@ -74,6 +74,9 @@ Second, AlexNet changed the sigmoid activation function to a simpler ReLU activa
 AlexNet controls the model complexity of the fully connected layer by [dropout](../chapter_deep-learning-basics/dropout.md) section), while LeNet only uses weight decay. To augment the data even further, the training loop of AlexNet added a great deal of image augmentation, such as flipping, clipping, and color changes. This makes the model more robust and the larger sample size effectively reduces overfitting. We will discuss preprocessing in detail in a [subsequent section](../chapter_computer-vision/image-augmentation.md).
 
 ```{.python .input  n=1}
+import sys
+sys.path.insert(0, '..')
+
 import d2l
 from mxnet import gluon, init, nd
 from mxnet.gluon import data as gdata, nn
@@ -81,23 +84,32 @@ import os
 import sys
 
 net = nn.Sequential()
-# Here, we use a larger 11 x 11 window to capture objects. At the same time, we use a stride of 4 to greatly reduce the height and width of the output.
-# Here, the number of output channels is much larger than that in LeNet.
+# Here, we use a larger 11 x 11 window to capture objects. At the same time,
+# we use a stride of 4 to greatly reduce the height and width of the output.
+# Here, the number of output channels is much larger than that in LeNet
 net.add(nn.Conv2D(96, kernel_size=11, strides=4, activation='relu'),
         nn.MaxPool2D(pool_size=3, strides=2),
-        # Make the convolution window smaller, set padding to 2 for consistent height and width across the input and output, and increase the number of output channels
+        # Make the convolution window smaller, set padding to 2 for consistent
+        # height and width across the input and output, and increase the
+        # number of output channels
         nn.Conv2D(256, kernel_size=5, padding=2, activation='relu'),
         nn.MaxPool2D(pool_size=3, strides=2),
-        # Use three successive convolutional layers and a smaller convolution window. Except for the final convolutional layer, the number of output channels is further increased.
-        # Pooling layers are not used to reduce the height and width of input after the first two convolutional layers.
+        # Use three successive convolutional layers and a smaller convolution
+        # window. Except for the final convolutional layer, the number of
+        # output channels is further increased. Pooling layers are not used to
+        # reduce the height and width of input after the first two
+        # convolutional layers
         nn.Conv2D(384, kernel_size=3, padding=1, activation='relu'),
         nn.Conv2D(384, kernel_size=3, padding=1, activation='relu'),
         nn.Conv2D(256, kernel_size=3, padding=1, activation='relu'),
         nn.MaxPool2D(pool_size=3, strides=2),
-        # Here, the number of outputs of the fully connected layer is several times larger than that in LeNet. Use the dropout layer to mitigate overfitting.
+        # Here, the number of outputs of the fully connected layer is several
+        # times larger than that in LeNet. Use the dropout layer to mitigate
+        # overfitting
         nn.Dense(4096, activation="relu"), nn.Dropout(0.5),
         nn.Dense(4096, activation="relu"), nn.Dropout(0.5),
-        # Output layer. Since we are using Fashion-MNIST, the number of classes is 10, instead of 1000 as in the paper.
+        # Output layer. Since we are using Fashion-MNIST, the number of
+        # classes is 10, instead of 1000 as in the paper
         nn.Dense(10))
 ```
 
@@ -116,7 +128,7 @@ for layer in net:
 Although AlexNet uses ImageNet in the paper, we use Fashion-MNIST. This is simply since training on ImageNet would take hours even on modern GPUs. One of the problems with applying AlexNet directly is that the images are simply too low resolution at $28 \times 28$ pixels. To make things work we upsample them to $244 \times 244$ (this is generally not very smart but we do so to illustrate network performance). This can be done with the `Resize` class. We insert it into the processing pipeline before using the `ToTensor` class. The `Compose` class to concatenates these two changes for easy invocation.
 
 ```{.python .input  n=3}
-# This function has been saved in the d2l package for future use.
+# This function has been saved in the d2l package for future use
 def load_data_fashion_mnist(batch_size, resize=None, root=os.path.join(
         '~', '.mxnet', 'datasets', 'fashion-mnist')):
     root = os.path.expanduser(root)  # Expand the user path '~'.
@@ -148,7 +160,8 @@ Now, we can start training AlexNet. Compared to LeNet in the previous section, t
 lr, num_epochs, ctx = 0.01, 5, d2l.try_gpu()
 net.initialize(force_reinit=True, ctx=ctx, init=init.Xavier())
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
-d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
+d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,
+              num_epochs)
 ```
 
 ## Summary

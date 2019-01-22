@@ -1,4 +1,4 @@
-# `Gluonbook` Package Index
+# `d2l` Package Index
 
 |Name of Function or Class|Relevant Chapter|
 |:--|:-:|

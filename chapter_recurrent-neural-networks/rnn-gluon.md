@@ -48,7 +48,7 @@ Y.shape, len(state_new), state_new[0].shape
 Next, we inherit the Block class to define a complete recurrent neural network. It first uses one-hot vector to represent input data and enter it into the `rnn_layer`. This, it uses the fully connected output layer to obtain the output. The number of outputs is equal to the dictionary size `vocab_size`.
 
 ```{.python .input  n=39}
-# This class has been saved in the d2l package for future use.
+# This class has been saved in the d2l package for future use
 class RNNModel(nn.Block):
     def __init__(self, rnn_layer, vocab_size, **kwargs):
         super(RNNModel, self).__init__(**kwargs)
@@ -57,11 +57,13 @@ class RNNModel(nn.Block):
         self.dense = nn.Dense(vocab_size)
 
     def forward(self, inputs, state):
-        # Get the one-hot vector representation by transposing the input to (num_steps, batch_size).
+        # Get the one-hot vector representation by transposing the input to
+        # (num_steps, batch_size)
         X = nd.one_hot(inputs.T, self.vocab_size)
         Y, state = self.rnn(X, state)
-        # The fully connected layer will first change the shape of Y to (num_steps * batch_size, num_hiddens).
-        # Its output shape is (num_steps * batch_size, vocab_size).
+        # The fully connected layer will first change the shape of Y to
+        # (num_steps * batch_size, num_hiddens)
+        # Its output shape is (num_steps * batch_size, vocab_size)
         output = self.dense(Y.reshape((-1, Y.shape[-1])))
         return output, state
 
@@ -74,15 +76,16 @@ class RNNModel(nn.Block):
 As in the previous section, a prediction function is defined below. The implementation here differs from the previous one in the function interfaces for forward computation and hidden state initialization.
 
 ```{.python .input  n=41}
-# This function is saved in the d2l package for future use.
+# This function is saved in the d2l package for future use
 def predict_rnn_gluon(prefix, num_chars, model, vocab_size, ctx, idx_to_char,
                       char_to_idx):
-    # Use model's member function to initialize the hidden state.
+    # Use model's member function to initialize the hidden state
     state = model.begin_state(batch_size=1, ctx=ctx)
     output = [char_to_idx[prefix[0]]]
     for t in range(num_chars + len(prefix) - 1):
         X = nd.array([output[-1]], ctx=ctx).reshape((1, 1))
-        (Y, state) = model(X, state)  # Forward computation does not require incoming model parameters.
+        # Forward computation does not require incoming model parameters
+        (Y, state) = model(X, state)
         if t < len(prefix) - 1:
             output.append(char_to_idx[prefix[t + 1]])
         else:
@@ -103,7 +106,7 @@ predict_rnn_gluon('traveller', 10, model, vocab_size, ctx, idx_to_char,
 Next, implement the training function. Its algorithm is the same as in the previous section, but only random sampling is used here to read the data.
 
 ```{.python .input  n=18}
-# This function is saved in the d2l package for future use.
+# This function is saved in the d2l package for future use
 def train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
                                 corpus_indices, idx_to_char, char_to_idx,
                                 num_epochs, num_steps, lr, clipping_theta,
@@ -126,11 +129,11 @@ def train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
                 y = Y.T.reshape((-1,))
                 l = loss(output, y).mean()
             l.backward()
-            # Clip the gradient.
+            # Clip the gradient
             params = [p.data() for p in model.collect_params().values()]
             d2l.grad_clipping(params, clipping_theta, ctx)
             # Since the error has already taken the mean, the gradient does
-            # not need to be averaged.
+            # not need to be averaged
             trainer.step(1)
             l_sum += l.asscalar() * y.size
             n += y.size

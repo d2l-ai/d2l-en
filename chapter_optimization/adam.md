@@ -34,6 +34,9 @@ $$\boldsymbol{x}_t \leftarrow \boldsymbol{x}_{t-1} - \boldsymbol{g}_t'. $$
 We use the formula from the algorithm to implement Adam. Here, time step $t$ uses `hyperparams` to input parameters to the `adam` function.
 
 ```{.python .input  n=2}
+import sys
+sys.path.insert(0, '..')
+
 %matplotlib inline
 import d2l
 from mxnet import nd
@@ -59,7 +62,8 @@ def adam(params, states, hyperparams):
 Use Adam to train the model with a learning rate of $0.01$.
 
 ```{.python .input  n=5}
-d2l.train_ch7(adam, init_adam_states(), {'lr': 0.01, 't': 1}, features, labels)
+d2l.train_ch7(adam, init_adam_states(), {'lr': 0.01, 't': 1}, features,
+              labels)
 ```
 
 ## Implementation with Gluon

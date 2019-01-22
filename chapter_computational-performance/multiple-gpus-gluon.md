@@ -5,6 +5,9 @@ In Gluon, we can conveniently use data parallelism to perform multi-GPU computat
 First, import the required packages or modules for the experiment in this section. Running the programs in this section requires at least two GPUs.
 
 ```{.python .input  n=1}
+import sys
+sys.path.insert(0, '..')
+
 import d2l
 import mxnet as mx
 from mxnet import autograd, gluon, init, nd
@@ -17,7 +20,8 @@ import time
 In this section, we use ResNet-18 as a sample model. Since the input images in this section are original size (not enlarged), the model construction here is different from the ResNet-18 structure described in the [“ResNet”](../chapter_convolutional-neural-networks/resnet.md) section. This model uses a smaller convolution kernel, stride, and padding at the beginning and removes the maximum pooling layer.
 
 ```{.python .input  n=2}
-def resnet18(num_classes):  # This function is saved in the d2l package for future use.
+# This function is saved in the d2l package for future use
+def resnet18(num_classes):
     def resnet_block(num_channels, num_residuals, first_block=False):
         blk = nn.Sequential()
         for i in range(num_residuals):
@@ -29,7 +33,8 @@ def resnet18(num_classes):  # This function is saved in the d2l package for futu
         return blk
 
     net = nn.Sequential()
-    # This model uses a smaller convolution kernel, stride, and padding and removes the maximum pooling layer.
+    # This model uses a smaller convolution kernel, stride, and padding and
+    # removes the maximum pooling layer
     net.add(nn.Conv2D(64, kernel_size=3, strides=1, padding=1),
             nn.BatchNorm(), nn.Activation('relu'))
     net.add(resnet_block(64, 2, first_block=True),

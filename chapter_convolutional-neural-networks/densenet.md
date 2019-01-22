@@ -27,6 +27,9 @@ In the end, all these functions are combined in an MLP to reduce the number of f
 DenseNet uses the modified "batch normalization, activation, and convolution" architecture of ResNet (see the exercise in the [previous section](resnet.md)). First, we implement this architecture in the `conv_block` function.
 
 ```{.python .input  n=1}
+import sys
+sys.path.insert(0, '..')
+
 import d2l
 from mxnet import gluon, init, nd
 from mxnet.gluon import nn
@@ -52,7 +55,9 @@ class DenseBlock(nn.Block):
     def forward(self, X):
         for blk in self.net:
             Y = blk(X)
-            X = nd.concat(X, Y, dim=1)  # Concatenate the input and output of each block on the channel dimension.
+            # Concatenate the input and output of each block on the channel
+            # dimension
+            X = nd.concat(X, Y, dim=1)
         return X
 ```
 
@@ -103,14 +108,16 @@ Then, similar to the four residual blocks that ResNet uses, DenseNet uses four d
 In ResNet, the height and width are reduced between each module by a residual block with a stride of 2. Here, we use the transition layer to halve the height and width and halve the number of channels.
 
 ```{.python .input  n=5}
-num_channels, growth_rate = 64, 32  # Num_channels: the current number of channels.
+# Num_channels: the current number of channels
+num_channels, growth_rate = 64, 32
 num_convs_in_dense_blocks = [4, 4, 4, 4]
 
 for i, num_convs in enumerate(num_convs_in_dense_blocks):
     net.add(DenseBlock(num_convs, growth_rate))
-    # This is the number of output channels in the previous dense block.
+    # This is the number of output channels in the previous dense block
     num_channels += num_convs * growth_rate
-    # A transition layer that haves the number of channels is added between the dense blocks.
+    # A transition layer that haves the number of channels is added between
+    # the dense blocks
     if i != len(num_convs_in_dense_blocks) - 1:
         net.add(transition_block(num_channels // 2))
 ```
@@ -133,7 +140,8 @@ lr, num_epochs, batch_size, ctx = 0.1, 5, 256, d2l.try_gpu()
 net.initialize(ctx=ctx, init=init.Xavier())
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)
-d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
+d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,
+              num_epochs)
 ```
 
 ## Summary
@@ -161,7 +169,3 @@ d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
 ## Discuss on our Forum
 
 <div id="discuss" topic_id="2360"></div>
-
-```{.python .input}
-
-```

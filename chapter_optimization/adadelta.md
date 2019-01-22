@@ -29,6 +29,9 @@ As we can see, if the impact of $\epsilon$ is not considered here, Adadelta diff
 Adadelta needs to maintain two state variables for each independent variable, $\boldsymbol{s}_t$ and $\Delta\boldsymbol{x}_t$. We use the formula from the algorithm to implement Adadelta.
 
 ```{.python .input  n=11}
+import sys
+sys.path.insert(0, '..')
+
 %matplotlib inline
 import d2l
 from mxnet import nd
@@ -52,7 +55,8 @@ def adadelta(params, states, hyperparams):
 Then, we train the model with the hyperparameter $\rho=0.9$.
 
 ```{.python .input  n=12}
-d2l.train_ch7(adadelta, init_adadelta_states(), {'rho': 0.9}, features, labels)
+d2l.train_ch7(adadelta, init_adadelta_states(), {'rho': 0.9}, features,
+              labels)
 ```
 
 ## Implementation with Gluon

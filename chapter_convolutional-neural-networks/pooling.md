@@ -67,7 +67,9 @@ By default, the stride in the `MaxPool2D` class has the same shape as the poolin
 
 ```{.python .input  n=16}
 pool2d = nn.MaxPool2D(3)
-pool2d(X)  # Because there are no model parameters in the pooling layer, we do not need to call the parameter initialization function.
+# Because there are no model parameters in the pooling layer, we do not need
+# to call the parameter initialization function
+pool2d(X)
 ```
 
 The stride and padding can be manually specified.

@@ -13,6 +13,9 @@ Figure 9.16 shows the information on the competition's webpage. In order to subm
 First, import the packages or modules required for the competition.
 
 ```{.python .input  n=1}
+import sys
+sys.path.insert(0, '..')
+
 import d2l
 from mxnet import autograd, gluon, init
 from mxnet.gluon import data as gdata, loss as gloss, nn
@@ -42,7 +45,8 @@ The training data set "train.7z" and the test data set "test.7z" need to be unzi
 To make it easier to get started, we provide a small-scale sample of the data set mentioned above. "train_tiny.zip" contains 100 training examples, while "test_tiny.zip" contains only one test example. Their unzipped folder names are "train_tiny" and "test_tiny", respectively. In addition, unzip the zip file of the training data set labels to obtain the file "trainlabels.csv". If you are going to use the full data set of the Kaggle competition, you will also need to change the following `demo` variable to `False`.
 
 ```{.python .input  n=2}
-# If you use the full data set downloaded for the Kaggle competition, change the demo variable to False.
+# If you use the full data set downloaded for the Kaggle competition, change
+# the demo variable to False
 demo = True
 if demo:
     import zipfile
@@ -58,7 +62,7 @@ We need to organize data sets to facilitate model training and testing. The foll
 ```{.python .input  n=3}
 def read_label_file(data_dir, label_file, train_dir, valid_ratio):
     with open(os.path.join(data_dir, label_file), 'r') as f:
-        # Skip the file header line (column name).
+        # Skip the file header line (column name)
         lines = f.readlines()[1:]
         tokens = [l.rstrip().split(',') for l in lines]
         idx_label = dict(((int(idx), label) for idx, label in tokens))
@@ -72,7 +76,8 @@ def read_label_file(data_dir, label_file, train_dir, valid_ratio):
 Below we define a helper function to create a path only if the path does not already exist.
 
 ```{.python .input  n=4}
-def mkdir_if_not_exist(path):  # This function is saved in the d2l package for future use.
+ # This function has been saved in the d2l package for future use
+def mkdir_if_not_exist(path):
     if not os.path.exists(os.path.join(*path)):
         os.makedirs(os.path.join(*path))
 ```
@@ -126,8 +131,9 @@ We use only 100 training example and one test example here. The folder names for
 
 ```{.python .input  n=8}
 if demo:
-    # Note: Here, we use small training sets and small testing sets and the batch size should be set smaller. When using the complete data set for the Kaggle competition,
-    # the batch size can be set to a large integer.
+    # Note: Here, we use small training sets and small testing sets and the
+    # batch size should be set smaller. When using the complete data set for
+    # the Kaggle competition, the batch size can be set to a large integer
     train_dir, test_dir, batch_size = 'train_tiny', 'test_tiny', 1
 else:
     train_dir, test_dir, batch_size = 'train', 'test', 128
@@ -143,15 +149,17 @@ To cope with overfitting, we use image augmentation. For example, by adding `tra
 
 ```{.python .input  n=9}
 transform_train = gdata.vision.transforms.Compose([
-    # Magnify the image to a square of 40 pixels in both height and width.
+    # Magnify the image to a square of 40 pixels in both height and width
     gdata.vision.transforms.Resize(40),
-    # Randomly crop a square image of 40 pixels in both height and width to produce a small square of 0.64 to 1 times the area of the original image,
-    # and then shrink it to a square of 32 pixels in both height and width.
+    # Randomly crop a square image of 40 pixels in both height and width to
+    # produce a small square of 0.64 to 1 times the area of the original
+    # image, and then shrink it to a square of 32 pixels in both height and
+    # width
     gdata.vision.transforms.RandomResizedCrop(32, scale=(0.64, 1.0),
                                               ratio=(1.0, 1.0)),
     gdata.vision.transforms.RandomFlipLeftRight(),
     gdata.vision.transforms.ToTensor(),
-    # Normalize each channel of the image.
+    # Normalize each channel of the image
     gdata.vision.transforms.Normalize([0.4914, 0.4822, 0.4465],
                                       [0.2023, 0.1994, 0.2010])])
 ```
@@ -170,7 +178,8 @@ transform_test = gdata.vision.transforms.Compose([
 Next, we can create the `ImageFolderDataset` instance to read the organized data set containing the original image files, where each data instance includes the image and label.
 
 ```{.python .input  n=10}
-# Read the original image file. Flag=1 indicates that the input image has three channels (color).
+# Read the original image file. Flag=1 indicates that the input image has
+# three channels (color)
 train_ds = gdata.vision.ImageFolderDataset(
     os.path.join(data_dir, input_dir, 'train'), flag=1)
 valid_ds = gdata.vision.ImageFolderDataset(

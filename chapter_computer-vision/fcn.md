@@ -5,6 +5,9 @@ We previously discussed semantic segmentation using each pixel in an image for c
 We will first import the package or module needed for the experiment and then explain the transposed convolution layer.
 
 ```{.python .input  n=2}
+import sys
+sys.path.insert(0, '..')
+
 %matplotlib inline
 import d2l
 from mxnet import gluon, image, init, nd

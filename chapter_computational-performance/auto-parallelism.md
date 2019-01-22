@@ -34,9 +34,9 @@ x_gpu = nd.random.uniform(shape=(6000, 6000), ctx=mx.gpu(0))
 Then, use the two NDArrays to run the `run` function on both the CPU and GPU and print the time required.
 
 ```{.python .input}
-run(x_cpu)  # Warm-up begins.
+run(x_cpu)  # Warm-up begins
 run(x_gpu)
-nd.waitall()  # Warm-up ends.
+nd.waitall()  # Warm-up ends
 
 with d2l.Benchmark('Run on CPU.'):
     run(x_cpu)

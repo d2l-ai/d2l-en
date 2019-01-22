@@ -163,7 +163,7 @@ Figure 11.18 shows the possible output after you run Jupyter Notebook. The last 
 Because the instance you created does not expose port 8888, you can launch SSH in the local command line and map the instance to the local port 8889.
 
 ```
-# This command must be run in the local command line.
+# This command must be run in the local command line
 ssh -i "/path/to/key.pem" ubuntu@ec2-xx-xxx-xxx-xxx.y.compute.amazonaws.com -L 8889:localhost:8888
 ```
 

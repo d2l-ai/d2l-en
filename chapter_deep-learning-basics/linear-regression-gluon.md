@@ -26,9 +26,9 @@ Gluon provides the `data` module to read data. Since `data` is often used as a v
 from mxnet.gluon import data as gdata
 
 batch_size = 10
-# Combining the features and labels of the training data.
+# Combine the features and labels of the training data
 dataset = gdata.ArrayDataset(features, labels)
-# Randomly reading mini-batches.
+# Randomly reading mini-batches
 data_iter = gdata.DataLoader(dataset, batch_size, shuffle=True)
 ```
 
@@ -80,7 +80,7 @@ In Gluon, the module `loss` defines various loss functions. We will replace the 
 
 ```{.python .input  n=8}
 from mxnet.gluon import loss as gloss
-loss = gloss.L2Loss()  # The squared loss is also known as the L2 norm loss.
+loss = gloss.L2Loss()  # The squared loss is also known as the L2 norm loss
 ```
 
 ## Define the Optimization Algorithm

@@ -87,6 +87,9 @@ Another influence is the amount of training data. Typically, if there are not en
 Let us try how this works in practice by fitting polynomials to data. As before we start by importing some modules.
 
 ```{.python .input  n=1}
+import sys
+sys.path.insert(0, '..')
+
 %matplotlib inline
 import d2l
 from mxnet import autograd, gluon, nd
@@ -103,15 +106,16 @@ $$y = 5 + 1.2x - 3.4\frac{x^2}{2!} + 5.6 \frac{x^3}{3!} + \epsilon \text{ where 
 The noise term $\epsilon$ obeys a normal distribution with a mean of 0 and a standard deviation of 0.1.  The number of samples for both the training and the testing data sets  is set to 100.
 
 ```{.python .input  n=2}
-maxdegree = 20                     # maximum degree of the polynomial
-n_train, n_test = 100, 1000         # training and test data set sizes
-true_w = nd.zeros(maxdegree)       # allocate lots of empty space
+maxdegree = 20  # Maximum degree of the polynomial
+n_train, n_test = 100, 1000  # Training and test data set sizes
+true_w = nd.zeros(maxdegree)  # Allocate lots of empty space
 true_w[0:4] = nd.array([5, 1.2, -3.4, 5.6])
 
 features = nd.random.normal(shape=(n_train + n_test, 1))
 features = nd.random.shuffle(features)
-poly_features = nd.power(features, nd.arange(maxdegree).reshape((1,-1)))
-poly_features = poly_features / (nd.gamma(nd.arange(maxdegree)+1).reshape((1,-1)))
+poly_features = nd.power(features, nd.arange(maxdegree).reshape((1, -1)))
+poly_features = poly_features / (
+    nd.gamma(nd.arange(maxdegree) + 1).reshape((1, -1)))
 labels = nd.dot(poly_features, true_w)
 labels += nd.random.normal(scale=0.1, shape=labels.shape)
 ```
@@ -129,7 +133,7 @@ features[:2], poly_features[:2], labels[:2]
 We first define the plotting function`semilogy`, where the $y$ axis makes use of the logarithmic scale.
 
 ```{.python .input  n=4}
-# This function has been saved in the d2l package for future use.
+# This function has been saved in the d2l package for future use
 def semilogy(x_vals, y_vals, x_label, y_label, x2_vals=None, y2_vals=None,
              legend=None, figsize=(3.5, 2.5)):
     d2l.set_figsize(figsize)
@@ -148,7 +152,8 @@ num_epochs, loss = 200, gloss.L2Loss()
 
 def fit_and_plot(train_features, test_features, train_labels, test_labels):
     net = nn.Sequential()
-    # Switch off the bias since we already catered for it in the polynomial features
+    # Switch off the bias since we already catered for it in the polynomial
+    # features
     net.add(nn.Dense(1, use_bias=False))
     net.initialize()
     batch_size = min(10, train_labels.shape[0])
@@ -179,7 +184,8 @@ We will begin by first using a third-order polynomial function with the same ord
 
 ```{.python .input  n=6}
 num_epochs = 1000
-# Pick the first four dimensions, i.e. 1, x, x^2, x^3 from the polynomial features
+# Pick the first four dimensions, i.e. 1, x, x^2, x^3 from the polynomial
+# features
 fit_and_plot(poly_features[:n_train, 0:4], poly_features[n_train:, 0:4],
              labels[:n_train], labels[n_train:])
 ```
@@ -203,10 +209,11 @@ Try out different model complexities (`n_degree`) and training set sizes (`n_sub
 
 ```{.python .input  n=8}
 num_epochs = 1000
-n_subset = 100  # subset of data to train on
-n_degree = 20   # degree of polynomials
-fit_and_plot(poly_features[1:n_subset, 0:n_degree], poly_features[n_train:, 0:n_degree],
-             labels[1:n_subset], labels[n_train:])
+n_subset = 100  # Subset of data to train on
+n_degree = 20   # Degree of polynomials
+fit_and_plot(poly_features[1:n_subset, 0:n_degree],
+             poly_features[n_train:, 0:n_degree], labels[1:n_subset],
+             labels[n_train:])
 ```
 
 Further along in later chapters, we will continue discussing overfitting problems and methods for dealing with them, such as weight decay and dropout.
