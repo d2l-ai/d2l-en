@@ -17,7 +17,7 @@ Let's implement cross-correlation operations with multiple input channels. We si
 import sys
 sys.path.insert(0, '..')
 
-mport d2l
+import d2l
 from mxnet import nd
 
 def corr2d_multi_in(X, K):
