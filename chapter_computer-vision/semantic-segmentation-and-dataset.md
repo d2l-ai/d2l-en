@@ -18,10 +18,10 @@ In the computer vision field, there are two important methods related to semanti
 In the semantic segmentation field, one important data set is Pascal VOC2012[1]. To better understand this data set, we must first import the package or module needed for the experiment.
 
 ```{.python .input  n=1}
-%import sys
+import sys
 sys.path.insert(0, '..')
 
-matplotlib inline
+%matplotlib inline
 import d2l
 from mxnet import gluon, image, nd
 from mxnet.gluon import data as gdata, utils as gutils
