@@ -1,4 +1,4 @@
-# Manipulating Data with `ndarray`
+# Data Manipulation
 
 It's impossible to get anything done if we can't manipulate data.
 Generally, there are two important things we need to do with data:
