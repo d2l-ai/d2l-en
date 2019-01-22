@@ -1,5 +1,6 @@
 # Image Augmentation
 
+
 We mentioned that large-scale data sets are prerequisites for the successful application of deep neural networks in the ["Deep Convolutional Neural Networks (AlexNet)"](../chapter_convolutional-neural-networks/alexnet.md) section. Image augmentation technology expands the scale of training data sets by making a series of random changes to the training images to produce similar, but different, training examples. Another way to explain image augmentation is that randomly changing training examples can reduce a model's dependence on certain properties, thereby improving its capability for generalization. For example, we can crop the images in different ways, so that the objects of interest appear in different positions, reducing the model's dependence on the position where objects appear. We can also adjust the brightness, color, and other factors to reduce model's sensitivity to color. It can be said that image augmentation technology contributed greatly to the success of AlexNet. In this section we will discuss this technology, which is widely used in computer vision.
 
 First, import the packages or modules required for the experiment in this section.
@@ -225,24 +226,14 @@ def train_with_data_aug(train_augs, test_augs, lr=0.001):
     loss = gloss.SoftmaxCrossEntropyLoss()
     train_iter = load_cifar10(True, train_augs, batch_size)
     test_iter = load_cifar10(False, test_augs, batch_size)
-    train(train_iter, test_iter, net, loss, trainer, ctx, num_epochs=8)
+    train(train_iter, test_iter, net, loss, trainer, ctx, num_epochs=10)
 ```
 
-### Comparative Image Augmentation Experiment
-
-We first observe the results of using image augmentation.
+Now we train the model using image augmentation of random flipping left and right.
 
 ```{.python .input  n=39}
 train_with_data_aug(train_augs, test_augs)
 ```
-
-For comparison, we will try not to use image augmentation below.
-
-```{.python .input  n=40}
-train_with_data_aug(test_augs, test_augs)
-```
-
-As you can see, even adding a simple random flip may have a certain impact on the training. Image augmentation usually results in lower training accuracy, but it can improve testing accuracy. It can be used to cope with overfitting.
 
 ## Summary
 
@@ -252,6 +243,7 @@ As you can see, even adding a simple random flip may have a certain impact on th
 
 ## Problems
 
+* Train the model without using image augmentation: `train_with_data_aug(no_aug, no_aug)`. Compare training and testing accuracy when using and not using image augmentation. Can this comparative experiment support the argument that image augmentation can mitigate overfitting? Why?
 * Add different image augmentation methods in model training based on the CIFAR-10 data set. Observe the implementation results.
 * With reference to the MXNet documentation, what other image augmentation methods are provided in Gluon's `transforms` module?
 
