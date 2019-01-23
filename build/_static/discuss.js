@@ -4,12 +4,13 @@ $(document).ready(function () {
             var url = $(this).find('a').attr('href');
             var tokens = url.split('/');
             var topic_id = tokens[tokens.length-1];
-            $(this).html('<h2>Discuss</h2>');
+            var discuss_str = 'Discuss'
+            $(this).html('<h2>'.concat(discuss_str).concat('</h2>'));
             $(this).parent().append('<div id="discourse-comments"></div>');
 
             $('a').each(function(){
                 if ($(this).text().indexOf("Scan the QR Code to Discuss") != -1) {
-                    $(this).text('Discuss');
+                    $(this).text(discuss_str);
                 }
             });
 
@@ -30,6 +31,6 @@ $(document).ready(function () {
         }
     });
 
-	var replaced = $('body').html().replace(/Scan-the-QR-Code-to-Discuss/g, 'Discuss');
-	$('body').html(replaced);
+    var replaced = $('body').html().replace(/Scan-the-QR-Code-to-Discuss/g, discuss_str);
+    $('body').html(replaced);
 });
