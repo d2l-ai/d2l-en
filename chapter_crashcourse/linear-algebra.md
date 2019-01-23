@@ -260,10 +260,10 @@ We can visualize the matrix in terms of its row vectors
 
 $$A=
 \begin{pmatrix}
-\cdots & \mathbf{a}^T_{1} &...  \\
-\cdots & \mathbf{a}^T_{2} & \cdots \\
- & \vdots &  \\
- \cdots &\mathbf{a}^T_n & \cdots \\
+\mathbf{a}^T_{1} \\
+\mathbf{a}^T_{2} \\
+\vdots \\
+\mathbf{a}^T_n \\
 \end{pmatrix},$$
 
 where each $\mathbf{a}^T_{i} \in \mathbb{R}^{m}$
@@ -273,10 +273,10 @@ Then the matrix vector product $\mathbf{y} = A\mathbf{x}$ is simply a column vec
 
 $$A\mathbf{x}=
 \begin{pmatrix}
-\cdots & \mathbf{a}^T_{1} &...  \\
-\cdots & \mathbf{a}^T_{2} & \cdots \\
- & \vdots &  \\
- \cdots &\mathbf{a}^T_n & \cdots \\
+\mathbf{a}^T_{1}  \\
+\mathbf{a}^T_{2}  \\
+ \vdots  \\
+\mathbf{a}^T_n \\
 \end{pmatrix}
 \begin{pmatrix}
  x_{1}  \\
@@ -325,15 +325,13 @@ To produce the matrix product $C = AB$, it's easiest to think of $A$ in terms of
 
 $$A=
 \begin{pmatrix}
-\cdots & \mathbf{a}^T_{1} &...  \\
-\cdots & \mathbf{a}^T_{2} & \cdots \\
- & \vdots &  \\
- \cdots &\mathbf{a}^T_n & \cdots \\
+\mathbf{a}^T_{1} \\
+\mathbf{a}^T_{2} \\
+\vdots \\
+\mathbf{a}^T_n \\
 \end{pmatrix},
 \quad B=\begin{pmatrix}
-\vdots & \vdots &  & \vdots \\
  \mathbf{b}_{1} & \mathbf{b}_{2} & \cdots & \mathbf{b}_{m} \\
- \vdots & \vdots &  &\vdots\\
 \end{pmatrix}.
 $$
 
@@ -342,15 +340,13 @@ Note here that each row vector $\mathbf{a}^T_{i}$ lies in $\mathbb{R}^k$ and tha
 Then to produce the matrix product $C \in \mathbb{R}^{n \times m}$ we simply compute each entry $c_{ij}$ as the dot product $\mathbf{a}^T_i \mathbf{b}_j$.
 
 $$C = AB = \begin{pmatrix}
-\cdots & \mathbf{a}^T_{1} &...  \\
-\cdots & \mathbf{a}^T_{2} & \cdots \\
- & \vdots &  \\
- \cdots &\mathbf{a}^T_n & \cdots \\
+\mathbf{a}^T_{1} \\
+\mathbf{a}^T_{2} \\
+\vdots \\
+\mathbf{a}^T_n \\
 \end{pmatrix}
 \begin{pmatrix}
-\vdots & \vdots &  & \vdots \\
  \mathbf{b}_{1} & \mathbf{b}_{2} & \cdots & \mathbf{b}_{m} \\
- \vdots & \vdots &  &\vdots\\
 \end{pmatrix}
 = \begin{pmatrix}
 \mathbf{a}^T_{1} \mathbf{b}_1 & \mathbf{a}^T_{1}\mathbf{b}_2& \cdots & \mathbf{a}^T_{1} \mathbf{b}_m \\
