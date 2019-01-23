@@ -29,4 +29,7 @@ $(document).ready(function () {
             })();
         }
     });
+
+	var replaced = $('body').html().replace(/Scan-the-QR-Code-to-Discuss/g, 'Discuss');
+	$('body').html(replaced);
 });
