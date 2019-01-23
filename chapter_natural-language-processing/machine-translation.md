@@ -252,7 +252,7 @@ decoder = Decoder(len(out_vocab), embed_size, num_hiddens, num_layers,
 train(encoder, decoder, dataset, lr, batch_size, num_epochs)
 ```
 
-## PREDICTION
+## Prediction
 
 We introduced three methods to generate the output of the decoder at each time step in the ["Beam Search"](beam-search.md) section. Here we implement the simplest method, greedy search.
 
