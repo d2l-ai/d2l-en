@@ -91,7 +91,7 @@ ntrain = 600
 train_data = gluon.data.ArrayDataset(features[:ntrain,:], labels[:ntrain])
 test_data  = gluon.data.ArrayDataset(features[ntrain:,:], labels[ntrain:])
 
-# vanilla MLP architecture
+# Vanilla MLP architecture
 def get_net():
     net = gluon.nn.Sequential()
     net.add(gluon.nn.Dense(10, activation='relu'))
@@ -100,7 +100,7 @@ def get_net():
     net.initialize(init.Xavier())
     return net
 
-# least mean squares loss
+# Least mean squares loss
 loss = gluon.loss.L2Loss()
 ```
 
@@ -110,7 +110,8 @@ We kept the architecture fairly simple. A few layers of a fully connected networ
 # Simple optimizer using adam, random shuffle and minibatch size 16
 def train_net(net, data, loss, epochs, learningrate):
     batch_size = 16
-    trainer = gluon.Trainer(net.collect_params(), 'adam', {'learning_rate': learningrate})
+    trainer = gluon.Trainer(net.collect_params(), 'adam',
+                            {'learning_rate': learningrate})
     data_iter = gluon.data.DataLoader(data, batch_size, shuffle=True)
     for epoch in range(1, epochs + 1):
         for X, y in data_iter:

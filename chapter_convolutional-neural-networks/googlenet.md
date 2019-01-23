@@ -27,11 +27,13 @@ class Inception(nn.Block):
         # Path 2 is a 1 x 1 convolutional layer followed by a 3 x 3
         # convolutional layer
         self.p2_1 = nn.Conv2D(c2[0], kernel_size=1, activation='relu')
-        self.p2_2 = nn.Conv2D(c2[1], kernel_size=3, padding=1, activation='relu')
+        self.p2_2 = nn.Conv2D(c2[1], kernel_size=3, padding=1,
+                              activation='relu')
         # Path 3 is a 1 x 1 convolutional layer followed by a 5 x 5
         # convolutional layer
         self.p3_1 = nn.Conv2D(c3[0], kernel_size=1, activation='relu')
-        self.p3_2 = nn.Conv2D(c3[1], kernel_size=5, padding=2, activation='relu')
+        self.p3_2 = nn.Conv2D(c3[1], kernel_size=5, padding=2,
+                              activation='relu')
         # Path 4 is a 3 x 3 maximum pooling layer followed by a 1 x 1
         # convolutional layer
         self.p4_1 = nn.MaxPool2D(pool_size=3, strides=1, padding=1)
