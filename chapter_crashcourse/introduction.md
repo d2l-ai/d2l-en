@@ -747,6 +747,6 @@ this problem is the classic *multi-armed bandit problem*.
 
 Machine Learning is vast. We cannot possibly cover it all. On the other hand, neural networks are simple and only require elementary mathematics. So let's get started (but first, let's install MXNet).
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2314)
 
-<div id="discuss" topic_id="2314"></div>
+![](../img/qr_introduction.svg)
