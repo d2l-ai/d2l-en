@@ -79,6 +79,6 @@ d2l.train_gluon_ch7('adadelta', {'rho': 0.9}, features, labels)
 
 [1] Zeiler, M. D. (2012). ADADELTA: an adaptive learning rate method. arXiv preprint arXiv:1212.5701.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2377)
 
-<div id="discuss" topic_id="2377"></div>
+![](../img/qr_adadelta.svg)

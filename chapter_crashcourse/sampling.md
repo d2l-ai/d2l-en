@@ -137,6 +137,6 @@ Many more useful distributions exist. We recommend consulting a statistics book 
 * **Beta, Dirichlet, Gamma, and Wishart Distributions** They are what statisticians call *conjugate* to the Binomial, Multinomial, Poisson and Gaussian respectively. Without going into detail, these distributions are often used as priors for coefficients of the latter set of distributions, e.g. a Beta distribution as a prior for modeling the probability for binomial outcomes.
 
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2321)
 
-<div id="discuss" topic_id="2321"></div>
+![](../img/qr_sampling.svg)

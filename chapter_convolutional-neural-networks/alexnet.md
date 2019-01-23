@@ -184,6 +184,6 @@ d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,
     * How about memory bandwidth when computing the results?
 1. Apply dropout and ReLu to LeNet5. Does it improve? How about preprocessing?
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2354)
 
-<div id="discuss" topic_id="2354"></div>
+![](../img/qr_alexnet.svg)

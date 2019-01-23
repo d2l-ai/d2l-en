@@ -190,6 +190,6 @@ We saw how a deep network can be implemented and optimized from scratch, using j
 1. Experiment using different learning rates to find out how fast the loss function value drops.
 1. If the number of examples cannot be divided by the batch size, what happens to the `data_iter` function's behavior?
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2332)
 
-<div id="discuss" topic_id="2332"></div>
+![](../img/qr_linear-regression-scratch.svg)

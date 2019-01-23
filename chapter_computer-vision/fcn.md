@@ -243,6 +243,6 @@ d2l.show_images(imgs[::3] + imgs[1::3] + imgs[2::3], 3, n);
 
 [2] Dumoulin, V., & Visin, F. (2016). A guide to convolution arithmetic for deep learning. arXiv preprint arXiv:1603.07285.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2454)
 
-<div id="discuss" topic_id="2454"></div>
+![](../img/qr_fcn.svg)

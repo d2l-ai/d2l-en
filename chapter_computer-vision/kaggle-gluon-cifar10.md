@@ -348,6 +348,6 @@ After executing the above code, we will get a "submission.csv" file. The format 
 * What accuracy can you achieve when not using image augmentation?
 * Scan the QR code to access the relevant discussions and exchange ideas about the methods used and the results obtained with the community. Can you come up with any better techniques?
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2450)
 
-<div id="discuss" topic_id="2450"></div>
+![](../img/qr_kaggle-gluon-cifar10.svg)

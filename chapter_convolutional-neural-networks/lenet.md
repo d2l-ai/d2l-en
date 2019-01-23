@@ -162,6 +162,6 @@ train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
 
 [1] LeCun, Y., Bottou, L., Bengio, Y., & Haffner, P. (1998). Gradient-based learning applied to document recognition. Proceedings of the IEEE, 86(11), 2278-2324.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2353)
 
-<div id="discuss" topic_id="2353"></div>
+![](../img/qr_lenet.svg)

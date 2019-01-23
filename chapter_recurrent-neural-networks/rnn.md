@@ -44,7 +44,7 @@ The figure below shows the computational logic of an RNN at three adjacent time 
 
 ![An RNN with a hidden state. ](../img/rnn.svg)
 
-As discussed, the computation in the hidden state uses $\mathbf{H}_t = \mathbf{X}_t \mathbf{W}_{xh} + \mathbf{H}_{t-1} \mathbf{W}_{hh}$ to generate an object matching $\mathbf{H}_{t-1}$ in dimensionality. Moreover, we use $\mathbf{H}_t$ to generate the output $\mathbf{O}_t = \mathbf{H}_t \mathbf{W}_{hq}$. 
+As discussed, the computation in the hidden state uses $\mathbf{H}_t = \mathbf{X}_t \mathbf{W}_{xh} + \mathbf{H}_{t-1} \mathbf{W}_{hh}$ to generate an object matching $\mathbf{H}_{t-1}$ in dimensionality. Moreover, we use $\mathbf{H}_t$ to generate the output $\mathbf{O}_t = \mathbf{H}_t \mathbf{W}_{hq}$.
 
 ```{.python .input  n=1}
 from mxnet import nd
@@ -64,7 +64,7 @@ def net(X, H):
     return H, O
 ```
 
-The recurrent network defined above takes observations `X` and a hidden state `H` as arguments and uses them to update the hidden state and emit an output `O`. Since this chain could go on for a very long time, training the model with backprop is out of the question (at least without some approximation). After all, this leads to a very long chain of dependencies that would be prohibitive to solve exactly: books typically have more than 100,000 characters and it is unreasonable to assume that the later text relies indiscriminately on all occurrences that happened, say, 10,000 characters in the past. Truncation methods such as [BPTT](bptt.md) and [Long Short Term Memory](lstm.md) are useful to address this in a more principled manner. For now, let's see how a state update works. 
+The recurrent network defined above takes observations `X` and a hidden state `H` as arguments and uses them to update the hidden state and emit an output `O`. Since this chain could go on for a very long time, training the model with backprop is out of the question (at least without some approximation). After all, this leads to a very long chain of dependencies that would be prohibitive to solve exactly: books typically have more than 100,000 characters and it is unreasonable to assume that the later text relies indiscriminately on all occurrences that happened, say, 10,000 characters in the past. Truncation methods such as [BPTT](bptt.md) and [Long Short Term Memory](lstm.md) are useful to address this in a more principled manner. For now, let's see how a state update works.
 
 ```{.python .input}
 (H, O) = net(X,H)
@@ -94,10 +94,6 @@ The number of words is huge compared to the number of characters. This is why qu
 1. What happens to the gradient if you backpropagate through a long sequence?
 1. What are some of the problems associated with the simple sequence model described above?
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2362)
 
-<div id="discuss" topic_id="2362"></div>
-
-```{.python .input}
-
-```
+![](../img/qr_rnn.svg)

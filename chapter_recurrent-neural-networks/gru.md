@@ -187,6 +187,6 @@ d2l.train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
 
 [2] Chung, J., Gulcehre, C., Cho, K., & Bengio, Y. (2014). Empirical evaluation of gated recurrent neural networks on sequence modeling. arXiv preprint arXiv:1412.3555.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2367)
 
-<div id="discuss" topic_id="2367"></div>
+![](../img/qr_gru.svg)

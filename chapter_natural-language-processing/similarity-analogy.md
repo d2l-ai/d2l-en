@@ -139,6 +139,6 @@ get_analogy('do', 'did', 'go', glove_6b50d)
 
 [3] fastText project website. https://fasttext.cc/
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2390)
 
-<div id="discuss" topic_id="2390"></div>
+![](../img/qr_similarity-analogy.svg)

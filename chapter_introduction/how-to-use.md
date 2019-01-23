@@ -39,6 +39,8 @@ The discussion forum of this book is [discuss.mxnet.io](https://discuss.mxnet.io
 1. Register an account on the discussion forum of this book [discuss.mxnet.io](https://discuss.mxnet.io/).
 1. Install Python on your computer.
 
-## Discuss on our Forum
 
-<div id="discuss" topic_id="2311"></div>
+
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2311)
+
+![](../img/qr_how-to-use.svg)

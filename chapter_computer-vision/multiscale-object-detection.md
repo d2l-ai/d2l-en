@@ -80,6 +80,6 @@ We will implement a multiscale object detection model in the following section.
 
 * Given an input image, assume $1 \times c_i \times h \times w$ to be the shape of the feature map while $c_i, h, w$ are the number, height, and width of the feature map. What methods can you think of to convert this variable into the anchor box's category and offset? What is the shape of the output?
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2446)
 
-<div id="discuss" topic_id="2446"></div>
+![](../img/qr_multiscale-object-detection.svg)

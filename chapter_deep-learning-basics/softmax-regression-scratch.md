@@ -196,6 +196,6 @@ We can use softmax regression to carry out multi-category classification. Traini
 1. Is it always a good idea to return the most likely label. E.g. would you do this for medical diagnosis?
 1. Assume that we want to use softmax regression to predict the next word based on some features. What are some problems that might arise from a large vocabulary?
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2336)
 
-<div id="discuss" topic_id="2336"></div>
+![](../img/qr_softmax-regression-scratch.svg)

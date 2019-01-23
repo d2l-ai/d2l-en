@@ -100,6 +100,6 @@ d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,
 1. Try to change the height and width of the images in Fashion-MNIST from 224 to 96. What influence does this have on the experiments?
 1. Refer to Table 1 in the original [VGG Paper](https://arxiv.org/abs/1409.1556) to construct other common models, such as VGG-16 or VGG-19.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2355)
 
-<div id="discuss" topic_id="2355"></div>
+![](../img/qr_vgg.svg)

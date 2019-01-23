@@ -117,6 +117,6 @@ The reasoning above barely scratches the surface. In fact, MXNet has an entire `
 1. Look up analytic bounds on the eigenvalues of the product of two matrices. What does this tell you about ensuring that gradients are well conditioned?
 1. If we know that some terms diverge, can we fix this after the fact? Look at the paper on LARS by [You, Gitman and Ginsburg, 2017](https://arxiv.org/pdf/1708.03888.pdf) for inspiration.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2345)
 
-<div id="discuss" topic_id="2345"></div>
+![](../img/qr_numerical-stability-and-init.svg)

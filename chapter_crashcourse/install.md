@@ -98,12 +98,12 @@ conda env update -f environment.yml
 * `environment.yml` has the full configuration for the book. All notebooks are available for download or on GitHub.
 * Install GPU drivers and update the configuration if you have GPUs. This will shorten the time to train significantly.
 
-## Exercise
+## Problems
 
 1. Download the code for the book and install the runtime environment.
 1. Follow the links at the bottom of the section to the forum in case you have questions and need further help.
 1. Create an account on the forum and introduce yourself.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2315)
 
-<div id="discuss" topic_id="2315"></div>
+![](../img/qr_install.svg)

@@ -202,6 +202,6 @@ d2l.predict_sentiment(net, vocab, ['this', 'movie', 'is', 'so', 'bad'])
 
 [1] Kim, Y. (2014). Convolutional neural networks for sentence classification. arXiv preprint arXiv:1408.5882.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2392)
 
-<div id="discuss" topic_id="2392"></div>
+![](../img/qr_sentiment-analysis-cnn.svg)

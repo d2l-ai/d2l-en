@@ -92,6 +92,6 @@ Here, $\boldsymbol{W}$ and $\boldsymbol{b}$ with subscripts are the weight param
 
 [1] Bahdanau, D., Cho, K., & Bengio, Y. (2014). Neural machine translation by jointly learning to align and translate. arXiv preprint arXiv:1409.0473.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2395)
 
-<div id="discuss" topic_id="2395"></div>
+![](../img/qr_attention.svg)

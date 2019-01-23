@@ -119,6 +119,6 @@ Y2 = corr2d_multi_in_out(X, K)
 1. Are the variables `Y1` and `Y2` in the last example of this section exactly the same? Why?
 1. How would you implement convolutions using matrix multiplication when the convolution window is not $1\times 1$?
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2351)
 
-<div id="discuss" topic_id="2351"></div>
+![](../img/qr_channels.svg)

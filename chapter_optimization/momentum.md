@@ -161,6 +161,6 @@ d2l.train_gluon_ch7('sgd', {'learning_rate': 0.004, 'momentum': 0.9},
 
 * Use other combinations of momentum hyperparameters and learning rates and observe and analyze the different experimental results.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2374)
 
-<div id="discuss" topic_id="2374"></div>
+![](../img/qr_momentum.svg)

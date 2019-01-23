@@ -62,6 +62,6 @@ fig.axes.add_patch(bbox_to_rect(cat_bbox, 'red'));
 * Find some images and try to label a bounding box that contains the target. Compare the difference between the time it takes to label the bounding box and label the category.
 
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2444)
 
-<div id="discuss" topic_id="2444"></div>
+![](../img/qr_bounding-box.svg)

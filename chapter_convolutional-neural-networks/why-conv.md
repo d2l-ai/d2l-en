@@ -83,6 +83,6 @@ This is the definition of a convolutional neural network layer. There are still 
 1. What goes wrong when you apply the above reasoning to text? Hint - what is the structure of language?
 1. Prove that $f \circledast g = g \circledast f$.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2348)
 
-<div id="discuss" topic_id="2348"></div>
+![](../img/qr_why-conv.svg)

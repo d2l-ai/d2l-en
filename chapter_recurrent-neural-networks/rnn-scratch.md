@@ -313,6 +313,6 @@ The perplexity is quite a bit lower. In fact, both models are pretty close to $1
 1. Replace the activation function used in this section with ReLU and repeat the experiments in this section.
 1. Prove that the perplexity is the inverse of the harmonic mean of the conditional word probabilities. 
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2364)
 
-<div id="discuss" topic_id="23"></div>
+![](../img/qr_rnn-scratch.svg)

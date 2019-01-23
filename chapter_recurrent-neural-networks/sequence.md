@@ -205,4 +205,6 @@ This clearly illustrates how the quality of the estimates changes as we try to p
 1. Does causality also apply to text? To which extent?
 1. Give an example for when a latent variable autoregressive model might be needed to capture the dynamic of the data. 
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2860)
+
+![](../img/qr_sequence.svg)

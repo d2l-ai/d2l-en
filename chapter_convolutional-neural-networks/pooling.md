@@ -119,6 +119,6 @@ pool2d(X)
 1. Do we need a separate minimum pooling layer? Can you replace it with another operation?
 1. Is there another operation between average and maximum pooling that you could consider (hint - recall the softmax)? Why might it not be so popular?
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2352)
 
-<div id="discuss" topic_id="2352"></div>
+![](../img/qr_pooling.svg)

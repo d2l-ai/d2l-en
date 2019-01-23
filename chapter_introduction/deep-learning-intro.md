@@ -2,7 +2,9 @@
 
 In 2016 Joel Grus, a well-known data scientist went for a [job interview](http://joelgrus.com/2016/05/23/fizz-buzz-in-tensorflow/) at a major internet company. As is common, one of the interviewers had the task to assess his programming skills. The goal was to implement a simple children's game - FizzBuzz. In it, the player counts up from 1, replacing numbers divisible by 3 by 'fizz' and those divisible by 5 by 'buzz'. Numbers divisible by 15 result in 'FizzBuzz'. That is, the player generates the sequence
 
-```1 2 fizz 4 buzz fizz 7 8 fizz buzz 11 ...```
+```
+1 2 fizz 4 buzz fizz 7 8 fizz buzz 11 ...
+```
 
 What happened was quite unexpected. Rather than solving the problem with a few lines of Python code *algorithmically*, he decided to solve it by programming with data. He used pairs of the form (3, fizz), (5, buzz), (7, 7), (2, 2), (15, fizzbuzz) as examples to train a classifier for what to do. Then he designed a small neural network and trained it using this data, achieving pretty high accuracy (the interviewer was nonplussed and he did not get the job).
 
@@ -179,6 +181,6 @@ Lastly, the Deep Learning community prides itself of sharing tools across academ
 
 [23] Tesauro, G. (1995), Transactions of the ACM, (38) 3, 58-68
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2310)
 
-<div id="discuss" topic_id="2310"></div>
+![](../img/qr_deep-learning-intro.svg)

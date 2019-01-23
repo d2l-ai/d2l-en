@@ -87,6 +87,6 @@ for ax, label in zip(axes, batch.label[0][0:10]):
 
 [2] GluonCV Toolkit. https://gluon-cv.mxnet.io/
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2452)
 
-<div id="discuss" topic_id="2452"></div>
+![](../img/qr_object-detection-dataset.svg)

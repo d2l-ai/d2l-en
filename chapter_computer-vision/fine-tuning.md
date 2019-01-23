@@ -181,6 +181,6 @@ hotdog_w.shape
 
 [1] GluonCV Toolkit. https://gluon-cv.mxnet.io/
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2443)
 
-<div id="discuss" topic_id="2443"></div>
+![](../img/qr_fine-tuning.svg)

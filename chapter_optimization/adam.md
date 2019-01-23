@@ -91,6 +91,6 @@ d2l.train_gluon_ch7('adam', {'learning_rate': 0.01}, features, labels)
 
 [1] Kingma, D. P., & Ba, J. (2014). Adam: A method for stochastic optimization. arXiv preprint arXiv:1412.6980.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2378)
 
-<div id="discuss" topic_id="2378"></div>
+![](../img/qr_adam.svg)

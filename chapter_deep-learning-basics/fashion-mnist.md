@@ -131,6 +131,6 @@ for X, y in train_iter:
 1. Use the MXNet documentation to see which other datasets are available in `mxnet.gluon.data.vision`.
 1. Use the MXNet documentation to see which other transformations are available in `mxnet.gluon.data.vision.transforms`.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2335)
 
-<div id="discuss" topic_id="2335"></div>
+![](../img/qr_fashion-mnist.svg)

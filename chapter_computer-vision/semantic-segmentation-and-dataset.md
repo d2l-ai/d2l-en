@@ -210,6 +210,6 @@ for X, Y in train_iter:
 
 [1] Pascal VOC2012 data set. http://host.robots.ox.ac.uk/pascal/VOC/voc2012/
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2448)
 
-<div id="discuss" topic_id="2448"></div>
+![](../img/qr_semantic-segmentation-and-dataset.svg)

@@ -238,6 +238,6 @@ Further along in later chapters, we will continue discussing overfitting problem
 1. What degree of polynomial do you need to reduce the training error to 0?
 1. Can you ever expect to see 0 generalization error?
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2341)
 
-<div id="discuss" topic_id="2341"></div>
+![](../img/qr_underfit-overfit.svg)

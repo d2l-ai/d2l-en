@@ -142,6 +142,6 @@ One key distinction between the different situations above is that the same stra
 1. Implement a covariate shift corrector.
 1. What could go wrong if training and test set are very different? What would happen to the sample weights?
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2347)
 
-<div id="discuss" topic_id="2347"></div>
+![](../img/qr_environment.svg)

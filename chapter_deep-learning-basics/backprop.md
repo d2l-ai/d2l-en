@@ -1,4 +1,4 @@
-# Forward Propagation, Back Propagation and Computational Graphs
+# Forward Propagation, Back Propagation, and Computational Graphs
 
 In the previous sections we used a mini-batch stochastic gradient descent optimization algorithm to train the model. During the implementation of the algorithm, we only calculated the forward propagation of the model, which is to say, we calculated the model output for the input, then called the auto-generated `backward` function to then finally calculate the gradient through the `autograd` module. The automatic gradient calculation, when based on back-propagation, significantly simplifies the implementation of the deep learning model training algorithm. In this section we will use both mathematical and computational graphs to describe forward and back propagation. More specifically, we will explain forward and back propagation through a sample model with a single hidden layer perceptron with $\ell_2$ norm regularization. This section will help understand a bit better what goes on behind the scenes when we invoke a deep network.
 
@@ -123,6 +123,6 @@ When training networks, forward and backward propagation depend on each other. I
     * Can you partition it over more than one GPU?
     * What are the advantages and disadvantages over training on a smaller minibatch?
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2344)
 
-<div id="discuss" topic_id="2344"></div>
+![](../img/qr_backprop.svg)

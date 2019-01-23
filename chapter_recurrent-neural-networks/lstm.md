@@ -199,6 +199,6 @@ d2l.train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
 
 [1] Hochreiter, S., & Schmidhuber, J. (1997). Long short-term memory. Neural computation, 9(8), 1735-1780.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2368)
 
-<div id="discuss" topic_id="2368"></div>
+![](../img/qr_lstm.svg)

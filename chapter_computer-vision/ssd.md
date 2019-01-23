@@ -379,6 +379,6 @@ d2l.plt.legend();
 
 [2] Lin, T. Y., Goyal, P., Girshick, R., He, K., & Dollár, P. (2018). Focal loss for dense object detection. IEEE transactions on pattern analysis and machine intelligence.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2453)
 
-<div id="discuss" topic_id="2453"></div>
+![](../img/qr_ssd.svg)

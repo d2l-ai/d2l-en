@@ -146,6 +146,6 @@ Sequential partitioning decomposes the sequence into `batch_size` many strips of
     * What would you have to do to make things even more uniform?
 1. If we want a sequence example to be a complete sentence, what kinds of problems does this introduce in mini-batch sampling? Why would we want to do this anyway?
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2363)
 
-<div id="discuss" topic_id="2363"></div>
+![](../img/qr_lang-model-dataset.svg)

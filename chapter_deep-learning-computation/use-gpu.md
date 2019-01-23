@@ -158,6 +158,6 @@ In short, as long as all data and parameters are on the same device, we can lear
 
 [1] CUDA download address. https://developer.nvidia.com/cuda-downloads
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2330)
 
-<div id="discuss" topic_id="2330"></div>
+![](../img/qr_use-gpu.svg)

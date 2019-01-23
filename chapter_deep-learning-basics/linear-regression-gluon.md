@@ -139,6 +139,6 @@ print('Error in estimating b', true_b - b)
 1. Review the MXNet documentation to see what loss functions and initialization methods are provided in the modules `gluon.loss` and `init`. Replace the loss by Huber's loss.
 1. How do you access the gradient of `dense.weight`?
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2333)
 
-<div id="discuss" topic_id="2333"></div>
+![](../img/qr_linear-regression-gluon.svg)

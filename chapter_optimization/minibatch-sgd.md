@@ -1,4 +1,4 @@
-# Mini-Batch Stochastic Gradient Descent
+# Mini-batch Stochastic Gradient Descent
 
 In each iteration, the gradient descent uses the entire training data set to compute the gradient, so it is sometimes referred to as batch gradient descent. Stochastic gradient descent (SGD) only randomly select one example in each iteration to compute the gradient. Just like in the previous chapters, we can perform random uniform sampling for each iteration to form a mini-batch and then use this mini-batch to compute the gradient. Now, we are going to discuss mini-batch stochastic gradient descent.
 
@@ -176,6 +176,6 @@ train_gluon_ch7('sgd', {'learning_rate': 0.05}, features, labels, 10)
 
 [1] Aircraft wing noise data set. https://archive.ics.uci.edu/ml/datasets/Airfoil+Self-Noise
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2373)
 
-<div id="discuss" topic_id="2373"></div>
+![](../img/qr_minibatch-sgd.svg)

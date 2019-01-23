@@ -222,6 +222,6 @@ The above example shows that the parameters of the second and third layer are ti
 1. Construct a multilayer perceptron containing a shared parameter layer and train it. During the training process, observe the model parameters and gradients of each layer.
 1. Why is sharing parameters a good idea?
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2326)
 
-<div id="discuss" topic_id="2326"></div>
+![](../img/qr_parameters.svg)

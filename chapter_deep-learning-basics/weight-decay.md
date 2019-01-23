@@ -193,6 +193,6 @@ So far we only touched upon what constitutes a simple *linear* function. For non
 1. Review the relationship between training error and generalization error. In addition to weight decay, increased training, and the use of a model of suitable complexity, what other ways can you think of to deal with overfitting?
 1. In Bayesian statistics we use the product of prior and likelihood to arrive at a posterior via $p(w|x) \propto p(x|w) p(w)$. How can you identify $p(w)$ with regularization?
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2342)
 
-<div id="discuss" topic_id="2342"></div>
+![](../img/qr_weight-decay.svg)

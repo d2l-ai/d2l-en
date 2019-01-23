@@ -66,8 +66,6 @@ pdf: $(DEPS) $(OBJ)
 	sed -i s/ /\ /g ${TEX}
 	# Allow figure captions to include space and autowrap
 	sed -i s/Ⓐ/\ /g ${TEX}
-	# Remove Discuss on our Forum
-	sed -i '/\\subsection{Discuss\ on\ our\ Forum}/,+1d' ${TEX}
 	# Remove un-translated long table descriptions
 	sed -i /\\\\multicolumn{2}{c}\%/d $(TEX)
 	sed -i /\\\\sphinxtablecontinued{Continued\ on\ next\ page}/d $(TEX)

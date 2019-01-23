@@ -85,6 +85,6 @@ By taking the square error and weighting the left and right sides of the formula
 
 [1] Pennington, J., Socher, R., & Manning, C. (2014). Glove: Global vectors for word representation. In Proceedings of the 2014 conference on empirical methods in natural language processing (EMNLP) (pp. 1532-1543).
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2389)
 
-<div id="discuss" topic_id="2389"></div>
+![](../img/qr_glove.svg)

@@ -199,6 +199,6 @@ Gluon does this by allowing for [Hybridization](../chapter_computational-perform
 1. Implement a block that takes two blocks as an argument, say `net1` and `net2` and returns the concatenated output of both networks in the forward pass (this is also called a parallel block).
 1. Assume that you want to concatenate multiple instances of the same network. Implement a factory function that generates multiple instances of the same block and build a larger network from it.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2325)
 
-<div id="discuss" topic_id="2325"></div>
+![](../img/qr_model-construction.svg)

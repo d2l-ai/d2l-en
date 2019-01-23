@@ -228,6 +228,6 @@ predict_sentiment(net, vocab, ['this', 'movie', 'is', 'so', 'bad'])
 
 [1] Maas, A. L., Daly, R. E., Pham, P. T., Huang, D., Ng, A. Y., & Potts, C. (2011, June). Learning word vectors for sentiment analysis. In Proceedings of the 49th annual meeting of the association for computational linguistics: Human language technologies-volume 1 (pp. 142-150). Association for Computational Linguistics.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2391)
 
-<div id="discuss" topic_id="2391"></div>
+![](../img/qr_sentiment-analysis-rnn.svg)

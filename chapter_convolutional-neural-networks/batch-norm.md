@@ -226,6 +226,6 @@ d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,
 
 [1] Ioffe, S., & Szegedy, C. (2015). Batch normalization: Accelerating deep network training by reducing internal covariate shift. arXiv preprint arXiv:1502.03167.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2358)
 
-<div id="discuss" topic_id="2358"></div>
+![](../img/qr_batch-norm.svg)

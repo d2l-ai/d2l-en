@@ -278,6 +278,6 @@ As you can see, each epoch takes more time due to the larger image size. As show
 
 [1] Gatys, L. A., Ecker, A. S., & Bethge, M. (2016). Image style transfer using convolutional neural networks. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (pp. 2414-2423).
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2449)
 
-<div id="discuss" topic_id="2449"></div>
+![](../img/qr_neural-style.svg)

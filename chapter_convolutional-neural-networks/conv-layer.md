@@ -148,6 +148,6 @@ Recall the observation from the previous section that cross-correlation and conv
     * What is the kernel for an integral?
     * What is the minimum size of a kernel to obtain a derivative of degree $d$?
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2349)
 
-<div id="discuss" topic_id="2349"></div>
+![](../img/qr_conv-layer.svg)

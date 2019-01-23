@@ -310,6 +310,6 @@ After executing the above code, we will generate a "submission.csv" file. The fo
 
 [1] Kaggle ImageNet Dog Breed Identification website. https://www.kaggle.com/c/dog-breed-identification
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2451)
 
-<div id="discuss" topic_id="2451"></div>
+![](../img/qr_kaggle-gluon-dog.svg)

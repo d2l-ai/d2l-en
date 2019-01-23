@@ -240,6 +240,6 @@ print(type(b))
 1. Replace the two NDArrays that operate by element in the broadcast mechanism with other shapes, e.g. three dimensional tensors. Is the result the same as expected?
 1. Assume that we have three matrices `a`, `b` and `c`. Rewrite `c = nd.dot(a, b.T) + c` in the most memory efficient manner.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2316)
 
-<div id="discuss" topic_id="2316"></div>
+![](../img/qr_ndarray.svg)

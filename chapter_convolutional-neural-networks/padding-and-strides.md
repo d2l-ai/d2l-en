@@ -108,6 +108,6 @@ For the sake of brevity, when the padding number on both sides of the input heig
 1. For audio signals, what does a stride of $2$ correspond to?
 1. What are the computational benefits of a stride larger than $1$.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2350)
 
-<div id="discuss" topic_id="2350"></div>
+![](../img/qr_padding-and-strides.svg)

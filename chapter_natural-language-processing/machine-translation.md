@@ -357,6 +357,6 @@ score('ils sont canadiens .', 'they are canadian .', k=2)
 
 [3] Tatoeba Project. http://www.manythings.org/anki/
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2396)
 
-<div id="discuss" topic_id="2396"></div>
+![](../img/qr_machine-translation.svg)

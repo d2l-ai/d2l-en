@@ -176,6 +176,6 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size, None,
 
 [1] Srivastava, N., Hinton, G., Krizhevsky, A., Sutskever, I., & Salakhutdinov, R. (2014).  JMLR
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2343)
 
-<div id="discuss" topic_id="2343"></div>
+![](../img/qr_dropout.svg)

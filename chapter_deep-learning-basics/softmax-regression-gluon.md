@@ -79,6 +79,6 @@ Just as before, this algorithm converges to a fairly decent accuracy of 83.7%, a
 1. Try adjusting the hyper-parameters, such as batch size, epoch, and learning rate, to see what the results are.
 1. Why might the test accuracy decrease again after a while? How could we fix this?
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2337)
 
-<div id="discuss" topic_id="2337"></div>
+![](../img/qr_softmax-regression-gluon.svg)

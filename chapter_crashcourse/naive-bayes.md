@@ -175,6 +175,6 @@ Modern deep networks achieve error rates of less than 0.01. While Naive Bayes cl
    * Is this a useful statement if there are only 5 suspects?
    * Is it still useful if there are 50?
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2320)
 
-<div id="discuss" topic_id="2320"></div>
+![](../img/qr_naive-bayes.svg)

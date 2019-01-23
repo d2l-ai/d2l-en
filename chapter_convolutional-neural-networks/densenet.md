@@ -166,6 +166,6 @@ d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,
 
 [1] Huang, G., Liu, Z., Weinberger, K. Q., & van der Maaten, L. (2017). Densely connected convolutional networks. In Proceedings of the IEEE conference on computer vision and pattern recognition (Vol. 1, No. 2).
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2360)
 
-<div id="discuss" topic_id="2360"></div>
+![](../img/qr_densenet.svg)

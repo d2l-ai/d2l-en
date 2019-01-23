@@ -118,12 +118,10 @@ In deep learning, it is difficult, but also not necessary, to find the global op
 * What other challenges involved in deep learning optimization can you think of?
 
 
-
-
 ## Reference
 
 [1] Wigner, E. P. (1958). On the distribution of the roots of certain symmetric matrices. Annals of Mathematics, 325-327.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2371)
 
-<div id="discuss" topic_id="2371"></div>
+![](../img/qr_optimization-intro.svg)

@@ -158,6 +158,6 @@ d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,
 
 [4] Szegedy, C., Ioffe, S., Vanhoucke, V., & Alemi, A. A. (2017, February). Inception-v4, inception-resnet and the impact of residual connections on learning. In Proceedings of the AAAI Conference on Artificial Intelligence (Vol. 4, p. 12).
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2357)
 
-<div id="discuss" topic_id="2357"></div>
+![](../img/qr_googlenet.svg)

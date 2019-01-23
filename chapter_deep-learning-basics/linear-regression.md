@@ -210,6 +210,6 @@ A closer inspection reveals that for the purpose of minimizing $-\log P(Y|X)$ we
     * Suggest a stochastic gradient descent algorithm to solve this problem. What could possibly go wrong (hint - what happens near the stationary point as we keep on updating the parameters). Can you fix this?
 1. Compare the runtime of the two methods of adding two vectors using other packages (such as NumPy) or other programming languages (such as MATLAB).
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2331)
 
-<div id="discuss" topic_id="2331"></div>
+![](../img/qr_linear-regression.svg)

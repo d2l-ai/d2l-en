@@ -194,6 +194,6 @@ As we can see, the iterative trajectory of the independent variable in the SGD i
 * Using a different objective function, observe the iterative trajectory of the independent variable in gradient descent and the SGD.
 * In the experiment for gradient descent in two-dimensional space, try to use different learning rates to observe and analyze the experimental phenomena.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2372)
 
-<div id="discuss" topic_id="2372"></div>
+![](../img/qr_gd-sgd.svg)

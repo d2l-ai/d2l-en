@@ -185,6 +185,6 @@ If you do not plan to use the instance again for a long time, right-click on the
 
 * The cloud offers convenience, but it does not come cheap. Research the prices of cloud services and find ways to reduce overhead.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2399)
 
-<div id="discuss" topic_id="2399"></div>
+![](../img/qr_aws.svg)

@@ -167,6 +167,6 @@ train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
 
 * Compare the implementation with the previous section. Does Gluon's implementation run faster? If you observe a significant difference, try to find the reason.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2365)
 
-<div id="discuss" topic_id="2365"></div>
+![](../img/qr_rnn-gluon.svg)

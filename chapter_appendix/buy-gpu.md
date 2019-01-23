@@ -50,6 +50,6 @@ Generally, GPUs are primarily used for deep learning training. Therefore, you do
 
 * You can browse the discussions about machine configurations in the forum for this section.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2400)
 
-<div id="discuss" topic_id="2400"></div>
+![](../img/qr_buy-gpu.svg)

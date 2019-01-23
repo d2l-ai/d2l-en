@@ -83,6 +83,6 @@ After submitting the request, you will see the page shown in Figure 11.25, which
 
 [4] URL of GitHub. https://github.com/
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2401)
 
-<div id="discuss" topic_id="2401"></div>
+![](../img/qr_how-to-contribute.svg)

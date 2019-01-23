@@ -168,6 +168,6 @@ d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,
 
 [2] He, K., Zhang, X., Ren, S., & Sun, J. (2016, October). Identity mappings in deep residual networks. In European Conference on Computer Vision (pp. 630-645). Springer, Cham.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2359)
 
-<div id="discuss" topic_id="2359"></div>
+![](../img/qr_resnet.svg)

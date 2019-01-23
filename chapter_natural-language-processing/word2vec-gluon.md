@@ -366,6 +366,6 @@ get_similar_tokens('chip', 3, net[0])
 
 [2] Mikolov, T., Sutskever, I., Chen, K., Corrado, G. S., & Dean, J. (2013). Distributed representations of words and phrases and their compositionality. In Advances in neural information processing systems (pp. 3111-3119).
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2387)
 
-<div id="discuss" topic_id="2387"></div>
+![](../img/qr_word2vec-gluon.svg)

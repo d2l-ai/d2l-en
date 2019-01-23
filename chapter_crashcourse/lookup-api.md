@@ -39,6 +39,6 @@ For further details on the API details check the MXNet website at  [http://mxnet
 
 Look up `ones_like` and `autograd` in the API documentation.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2322)
 
-<div id="discuss" topic_id="2322"></div>
+![](../img/qr_lookup-api.svg)

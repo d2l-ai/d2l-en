@@ -186,6 +186,6 @@ After training the softmax regression model, given any example features, we can 
     * What does the soft-min look like?
     * Extend this to more than two numbers.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2334)
 
-<div id="discuss" topic_id="2334"></div>
+![](../img/qr_softmax-regression.svg)
