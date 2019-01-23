@@ -1,10 +1,10 @@
 $(document).ready(function () {
+    var discuss_str = 'Discuss'
     $('h2').each(function(){
         if ($(this).text().indexOf("Scan the QR Code") != -1) {
             var url = $(this).find('a').attr('href');
             var tokens = url.split('/');
             var topic_id = tokens[tokens.length-1];
-            var discuss_str = 'Discuss'
             $(this).html('<h2>'.concat(discuss_str).concat('</h2>'));
             $(this).parent().append('<div id="discourse-comments"></div>');
 
