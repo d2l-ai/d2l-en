@@ -55,13 +55,13 @@ nd.empty((3, 4))
 
 The `empty` method just grabs some memory and hands us back a matrix without setting the values of any of its entries. This is very efficient but it means that the entries can have any form of values, including very big ones! But typically, we'll want our matrices initialized.
 
-Commonly, we want one of all zeros. For objects with more than two dimensions mathematicians don't have special names - they simply call them tensors. To create one with all elements set to 0 a shape of (2, 3, 4) we use
+Commonly, we want one of all zeros. For objects with more than two dimensions mathematicians don't have special names - they simply call them tensors. To create one with all elements set to 0 and a shape of (2, 3, 4) we use
 
 ```{.python .input  n=4}
 nd.zeros((2, 3, 4))
 ```
 
-Just like in numpy, creating tensors with each element being 1 works via
+Just like in NumPy, creating tensors with each element being 1 works via
 
 ```{.python .input  n=5}
 nd.ones((2, 3, 4))
@@ -111,7 +111,7 @@ Many more operations can be applied element-wise, such as exponentiation:
 x.exp()
 ```
 
-In addition to computations by element, we can also use the `dot` function for matrix operations. Next, we will perform matrix multiplication to transpose `x` and `y`. We define `x` as a matrix of 3 rows and 4 columns, and `y` is transposed into a matrix of 4 rows and 3 columns. The two matrices are multiplied to obtain a matrix of 3 rows and 3 columns (if you're confused about what this means, don't worry - we will explain matrix operations in much more detail in the chapter on [linear algebra](linear-algebra.md)).
+In addition to computations by element, we can also perform matrix operations, like matrix multiplication using the `dot` function. Next, we will perform matrix multiplication of `x` and the transpose of `y`. We define `x` as a matrix of 3 rows and 4 columns, and `y` is transposed into a matrix of 4 rows and 3 columns. The two matrices are multiplied to obtain a matrix of 3 rows and 3 columns (if you're confused about what this means, don't worry - we will explain matrix operations in much more detail in the chapter on [linear algebra](linear-algebra.md)).
 
 ```{.python .input  n=13}
 x = nd.arange(12).reshape((3,4))
@@ -126,7 +126,7 @@ nd.concat(x, y, dim=0)
 nd.concat(x, y, dim=1)
 ```
 
-Just like in Numpy, we can construct binary NDarrays by a logical statement. Take `x == y` as an example. If `x` and `y` are equal for some entry, the new NDArray has a value of 1 at the same position; otherwise, it is 0.
+Just like in NumPy, we can construct binary NDArrays by a logical statement. Take `x == y` as an example. If `x` and `y` are equal for some entry, the new NDArray has a value of 1 at the same position; otherwise, it is 0.
 
 ```{.python .input}
 x == y

@@ -46,7 +46,7 @@ print('x / y = ', x / y)
 print('x ** y = ', nd.power(x,y))
 ```
 
-We can convert any NDArray to a Python float by calling its `asscalar` method. Note that this is typically a bad idea. While you are doing this, NDArray has to stop doing anything else in order to hand the result and the process control back to Python. And unfortunately isn't very good at doing things in parallel. So avoid sprinkling this operation liberally throughout your code or your networks will take a long time to train.
+We can convert any NDArray to a Python float by calling its `asscalar` method. Note that this is typically a bad idea. While you are doing this, NDArray has to stop doing anything else in order to hand the result and the process control back to Python. And unfortunately Python isn't very good at doing things in parallel. So avoid sprinkling this operation liberally throughout your code or your networks will take a long time to train.
 
 ```{.python .input}
 x.asscalar()
@@ -88,7 +88,7 @@ x[3]
 ## Length, dimensionality and shape
 
 Let's revisit some concepts from the previous section. A vector is just an array of numbers. And just as every array has a length, so does every vector.
-In math notation, if we want to say that a vector $x$ consists of $n$ real-valued scalars,
+In math notation, if we want to say that a vector $\mathbf{x}$ consists of $n$ real-valued scalars,
 we can express this as $\mathbf{x} \in \mathcal{R}^n$.
 The length of a vector is commonly called its $dimension$.
 As with an ordinary Python array, we can access the length of an NDArray
@@ -232,7 +232,7 @@ y = nd.ones(4)
 print(x, y, nd.dot(x, y))
 ```
 
-Note that we can express the dot product of two vectors ``nd.dot(u, v)`` equivalently by performing an element-wise multiplication and then a sum:
+Note that we can express the dot product of two vectors ``nd.dot(x, y)`` equivalently by performing an element-wise multiplication and then a sum:
 
 ```{.python .input}
 nd.sum(x * y)
@@ -292,11 +292,11 @@ $$A\mathbf{x}=
 \end{pmatrix}
 $$
 
-So you can think of multiplication by a matrix $A\in \mathbb{R}^{m \times n}$ as a transformation that projects vectors from $\mathbb{R}^{m}$ to $\mathbb{R}^{n}$.
+So you can think of multiplication by a matrix $A\in \mathbb{R}^{n \times m}$ as a transformation that projects vectors from $\mathbb{R}^{m}$ to $\mathbb{R}^{n}$.
 
 These transformations turn out to be quite useful. For example, we can represent rotations as multiplications by a square matrix. As we'll see in subsequent chapters, we can also use matrix-vector products to describe the calculations of each layer in a neural network.
 
-Expressing matrix-vector products in code with ``ndarray``, we use the same ``nd.dot()`` function as for dot products. When we call ``nd.dot(A, x)`` with a matrix ``A`` and a vector ``x``, ``MXNet`` knows to perform a matrix-vector product. Note that the column dimension of ``A`` must be the same as the dimension of ``x``.
+Expressing matrix-vector products in code with ``ndarray``, we use the same ``nd.dot()`` function as for dot products. When we call ``nd.dot(A, x)`` with a matrix ``A`` and a vector ``x``, MXNet knows to perform a matrix-vector product. Note that the column dimension of ``A`` must be the same as the dimension of ``x``.
 
 ```{.python .input}
 nd.dot(A, x)
@@ -360,7 +360,7 @@ $$C = AB = \begin{pmatrix}
 \end{pmatrix}
 $$
 
-You can think of the matrix-matrix multiplication $AB$ as simply performing $m$ matrix-vector products and stitching the results together to form an $n \times m$ matrix. Just as with ordinary dot products and matrix-vector products, we can compute matrix-matrix products in ``MXNet`` by using ``nd.dot()``.
+You can think of the matrix-matrix multiplication $AB$ as simply performing $m$ matrix-vector products and stitching the results together to form an $n \times m$ matrix. Just as with ordinary dot products and matrix-vector products, we can compute matrix-matrix products in MXNet by using ``nd.dot()``.
 
 ```{.python .input}
 B = nd.ones(shape=(4, 3))
@@ -478,6 +478,7 @@ There are a number of special matrices that we will use throughout this tutorial
 In just a few pages (or one Jupyter notebook) we've taught you all the linear algebra you'll need to understand a good chunk of neural networks. Of course there's a *lot* more to linear algebra. And a lot of that math *is* useful for machine learning. For example, matrices can be decomposed into factors, and these decompositions can reveal low-dimensional structure in real-world datasets. There are entire subfields of machine learning that focus on using matrix decompositions and their generalizations to high-order tensors to discover structure in datasets and solve prediction problems. But this book focuses on deep learning. And we believe you'll be much more inclined to learn more mathematics once you've gotten your hands dirty deploying useful machine learning models on real datasets. So while we reserve the right to introduce more math much later on, we'll wrap up this chapter here.
 
 If you're eager to learn more about linear algebra, here are some of our favorite resources on the topic
+
 * For a solid primer on basics, check out Gilbert Strang's book [Introduction to Linear Algebra](http://math.mit.edu/~gs/linearalgebra/)
 * Zico Kolter's [Linear Algebra Review and Reference](http://www.cs.cmu.edu/~zkolter/course/15-884/linalg-review.pdf)
 
