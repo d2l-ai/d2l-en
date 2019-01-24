@@ -17,10 +17,16 @@ Dive into Deep Learning
 
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :numbered:
 
    chapter_introduction/deep-learning-intro
+
+
+.. toctree::
+   :maxdepth: 2
+   :numbered:
+
    chapter_crashcourse/index
    chapter_deep-learning-basics/index
    chapter_deep-learning-computation/index
