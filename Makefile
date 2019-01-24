@@ -54,7 +54,6 @@ TEX=build/_build/latex/d2l-en.tex
 pdf: $(DEPS) $(OBJ)
 	make -C build latex
 	sed -i s/\\.svg/.pdf/g ${TEX}
-	sed -i s/\\\\chapter{Preface}/\\\\chapter*{Preface}\\\\addcontentsline{toc}{chapter}{Preface}/ ${TEX}
 	sed -i s/\}\\.gif/\_00\}.pdf/g $(TEX)
 	sed -i s/{tocdepth}{0}/{tocdepth}{1}/g $(TEX)
 	sed -i s/{\\\\releasename}{Release}/{\\\\releasename}{}/g $(TEX)
@@ -70,6 +69,8 @@ pdf: $(DEPS) $(OBJ)
 	sed -i /\\\\multicolumn{2}{c}\%/d $(TEX)
 	sed -i /\\\\sphinxtablecontinued{Continued\ on\ next\ page}/d $(TEX)
 	sed -i /{\\\\tablename\\\\\ \\\\thetable{}\ --\ continued\ from\ previous\ page}/d $(TEX)
+
+	python build/utils/post_latex_en.py
 
 	cd build/_build/latex && \
 	bash ../../utils/convert_output_svg.sh && \
