@@ -20,7 +20,7 @@ Obviously this is unlikely to work well. The training set consists of photos, wh
 
 ## Concept Shift
 
-A related problem is that of concept shift. This is the situation where the the labels change. This sounds weird - after all, a cat is a cat is a cat. Well, cats maybe but not soft drinks. There is considerable concept shift throughout the USA, even for such a simple term:
+A related problem is that of concept shift. This is the situation where the labels change. This sounds weird - after all, a cat is a cat. Well, cats maybe but not soft drinks. There is considerable concept shift throughout the USA, even for such a simple term:
 
 ![](../img/popvssoda.png)
 
@@ -71,7 +71,7 @@ Statisticians call the first term an *empirical average*, that is an average com
 
 $$
 \begin{aligned}
-\int p(x) f(x) dx & = \int p(x) f(x) \frac{q(x)}{q(x)} dx \\
+\int p(x) f(x) dx & = \int p(x) f(x) \frac{q(x)}{p(x)} dx \\
 & = \int q(x) f(x) \frac{p(x)}{q(x)} dx
 \end{aligned}
 $$
@@ -82,7 +82,7 @@ In this case there exists a very effective approach that will give almost as goo
 
 $$p(z=1|x) = \frac{p(x)}{p(x)+q(x)} \text{ and hence } \frac{p(z=1|x)}{p(z=-1|x)} = \frac{p(x)}{q(x)}$$
 
-Hence, if we use a logistic regression approach where $p(z=1|x)=\frac{1}{1+\exp(−f(x)}$ it follows that
+Hence, if we use a logistic regression approach where $p(z=1|x)=\frac{1}{1+\exp(−f(x))}$ it follows that
 
 $$
 \beta(x) = \frac{1/(1 + \exp(-f(x)))}{\exp(-f(x)/(1 + \exp(-f(x)))} = \exp(f(x))
