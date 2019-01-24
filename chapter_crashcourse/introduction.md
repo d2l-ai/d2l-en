@@ -743,7 +743,7 @@ we call the problem a *contextual bandit problem*.
 When there is no state, just a set of available actions with initially unknown rewards,
 this problem is the classic *multi-armed bandit problem*.
 
-## Conclusion
+## Summary
 
 Machine Learning is vast. We cannot possibly cover it all. On the other hand, neural networks are simple and only require elementary mathematics. So let's get started (but first, let's install MXNet).
 
