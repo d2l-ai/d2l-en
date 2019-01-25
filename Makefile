@@ -70,7 +70,7 @@ pdf: $(DEPS) $(OBJ)
 	sed -i /\\\\sphinxtablecontinued{Continued\ on\ next\ page}/d $(TEX)
 	sed -i /{\\\\tablename\\\\\ \\\\thetable{}\ --\ continued\ from\ previous\ page}/d $(TEX)
 
-	python build/utils/post_tex.py en
+	python build/utils/post_latex.py en
 
 	cd build/_build/latex && \
 	bash ../../utils/convert_output_svg.sh && \
