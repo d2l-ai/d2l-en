@@ -12,7 +12,7 @@ To get started we need to download and install the code needed to run the notebo
 
 For simplicity we recommend [conda](https://conda.io), a popular Python package manager to install all libraries.
 
-1. Download and install [Miniconda](https://conda.io/en/latest/miniconda.html) at [conda.io/en/latest/miniconda.html](https://conda.io/en/latest/miniconda.html) based on your operating system.
+1. Download and install Miniconda at [https://conda.io/en/master/miniconda.html](https://conda.io/en/master/miniconda.html) based on your operating system.
 1. Update your shell by `source ~/.bashrc` (Linux) or `source ~/.bash_profile` (macOS). Make sure to add Anaconda to your PATH environment variable.
 1. Download the tarball containing the notebooks from this book. This can be found at [www.d2l.ai/d2l-en-1.0.zip](https://www.d2l.ai/d2l-en-1.0.zip). Alternatively feel free to clone the latest version from GitHub.
 1. Uncompress the ZIP file and move its contents to a folder for the tutorials.
