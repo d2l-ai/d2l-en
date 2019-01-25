@@ -1,6 +1,6 @@
 all: html
 
-build/%.ipynb: %.md build/env.yml $(wildcard d2l/*)
+build/%.ipynb: %.md $(wildcard d2l/*)
 	mkdir -p $(@D)
 	cd $(@D); python ../utils/md2ipynb.py ../../$< ../../$@
 
