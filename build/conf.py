@@ -74,8 +74,7 @@ master_doc = 'index'
 # General information about the project.
 project = 'Dive into Deep Learning'
 copyright = '2017--2019'
-author = "A. Zhang, Z. C. Lipton, M. Li, and A. J. Smola"
-
+author = "Aston Zhang\\\\Zachary C. Lipton\\\\Mu Li\\\\Alexander J. Smola"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
