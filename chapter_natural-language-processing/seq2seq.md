@@ -70,7 +70,7 @@ In model training, the mean of losses for all the output sequences is usually us
 * In encoder-decoder training, we can use teacher forcing.
 
 
-## exercise
+## Problems
 
 * In addition to machine translation, what other applications can you think of for encoder-decoder?
 * What methods can be used to design the output layer of the decoder?
@@ -84,6 +84,6 @@ In model training, the mean of losses for all the output sequences is usually us
 
 [2] Sutskever, I., Vinyals, O., & Le, Q. V. (2014). Sequence to sequence learning with neural networks. In Advances in neural information processing systems (pp. 3104-3112).
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2393)
 
-<div id="discuss" topic_id="2393"></div>
+![](../img/qr_seq2seq.svg)

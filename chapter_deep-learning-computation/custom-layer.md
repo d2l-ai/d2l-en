@@ -56,7 +56,8 @@ Let's use this to implement our own version of the dense layer. It has two param
 
 ```{.python .input  n=19}
 class MyDense(nn.Block):
-    # Units: the number of outputs in this layer; in_units: the number of inputs in this layer.
+    # units: the number of outputs in this layer; in_units: the number of
+    # inputs in this layer
     def __init__(self, units, in_units, **kwargs):
         super(MyDense, self).__init__(**kwargs)
         self.weight = self.params.get('weight', shape=(in_units, units))
@@ -103,6 +104,6 @@ net(nd.random.uniform(shape=(2, 64)))
 1. Design a layer that takes an input and computes a tensor reduction, i.e. it returns $y_k = \sum_{i,j} W_{ijk} x_i x_j$.
 1. Design a layer that returns the leading half of the Fourier coefficients of the data. Hint - look up the `fft` function in MXNet.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2328)
 
-<div id="discuss" topic_id="2328"></div>
+![](../img/qr_custom-layer.svg)

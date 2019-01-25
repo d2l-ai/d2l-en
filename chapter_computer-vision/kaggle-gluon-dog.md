@@ -14,6 +14,9 @@ Figure 9.17 shows the information on the competition's webpage. In order to subm
 First, import the packages or modules required for the competition.
 
 ```{.python .input}
+import sys
+sys.path.insert(0, '..')
+
 import collections
 import d2l
 import math
@@ -41,7 +44,8 @@ After logging in to Kaggle, we can click on the "Data" tab on the dog breed iden
 To make it easier to get started, we provide a small-scale sample of the data set mentioned above, "train_valid_test_tiny.zip". If you are going to use the full data set for the Kaggle competition, you will also need to change the `demo` variable below to `False`.
 
 ```{.python .input  n=1}
-# If you use the full data set downloaded for the Kaggle competition, change the variable below to False.
+# If you use the full data set downloaded for the Kaggle competition, change
+# the variable below to False
 demo = True
 data_dir = '../data/kaggle_dog'
 if demo:
@@ -59,10 +63,11 @@ Next, we define the `reorg_train_valid` function to segment the validation set f
 
 ```{.python .input}
 def reorg_train_valid(data_dir, train_dir, input_dir, valid_ratio, idx_label):
-    # The number of examples of the least represented breed in the training set.
+    # The number of examples of the least represented breed in the training
+    # set
     min_n_train_per_label = (
         collections.Counter(idx_label.values()).most_common()[:-2:-1][0][1])
-    # The number of examples of each breed in the validation set.
+    # The number of examples of each breed in the validation set
     n_valid_per_label = math.floor(min_n_train_per_label * valid_ratio)
     label_count = {}
     for train_file in os.listdir(os.path.join(data_dir, train_dir)):
@@ -87,14 +92,14 @@ The `reorg_dog_data` function below is used to read the training data labels, se
 ```{.python .input  n=2}
 def reorg_dog_data(data_dir, label_file, train_dir, test_dir, input_dir,
                    valid_ratio):
-    # Read the training data labels.
+    # Read the training data labels
     with open(os.path.join(data_dir, label_file), 'r') as f:
-        # Skip the file header line (column name).
+        # Skip the file header line (column name)
         lines = f.readlines()[1:]
         tokens = [l.rstrip().split(',') for l in lines]
         idx_label = dict(((idx, label) for idx, label in tokens))
     reorg_train_valid(data_dir, train_dir, input_dir, valid_ratio, idx_label)
-    # Organize the training set.
+    # Organize the training set
     d2l.mkdir_if_not_exist([data_dir, input_dir, 'test', 'unknown'])
     for test_file in os.listdir(os.path.join(data_dir, test_dir)):
         shutil.copy(os.path.join(data_dir, test_dir, test_file),
@@ -105,8 +110,9 @@ Because we are using a small data set, we set the batch size to 1. During actual
 
 ```{.python .input  n=3}
 if demo:
-    # Note: Here, we use a small data set and the batch size should be set smaller. When using the complete data set for the Kaggle competition, we can set the batch size
-    # to a larger integer.
+    # Note: Here, we use a small data set and the batch size should be set
+    # smaller. When using the complete data set for the Kaggle competition, we
+    # can set the batch size to a larger integer
     input_dir, batch_size = 'train_valid_test_tiny', 1
 else:
     label_file, train_dir, test_dir = 'labels.csv', 'train', 'test'
@@ -121,18 +127,20 @@ The size of the images in this section are larger than the images in the previou
 
 ```{.python .input  n=4}
 transform_train = gdata.vision.transforms.Compose([
-    # Randomly crop the image to obtain an image with an area of 0.08 to 1 of the original area and height to width ratio between 3/4 and 4/3.
-    # Then, scale the image to create a new image with a height and width of 224 pixels each.
+    # Randomly crop the image to obtain an image with an area of 0.08 to 1 of
+    # the original area and height to width ratio between 3/4 and 4/3. Then,
+    # scale the image to create a new image with a height and width of 224
+    # pixels each
     gdata.vision.transforms.RandomResizedCrop(224, scale=(0.08, 1.0),
                                               ratio=(3.0/4.0, 4.0/3.0)),
     gdata.vision.transforms.RandomFlipLeftRight(),
-    # Randomly change the brightness, contrast, and saturation.
+    # Randomly change the brightness, contrast, and saturation
     gdata.vision.transforms.RandomColorJitter(brightness=0.4, contrast=0.4,
                                               saturation=0.4),
-    # Add random noise.
+    # Add random noise
     gdata.vision.transforms.RandomLighting(0.1),
     gdata.vision.transforms.ToTensor(),
-    # Standardize each channel of the image.
+    # Standardize each channel of the image
     gdata.vision.transforms.Normalize([0.485, 0.456, 0.406],
                                       [0.229, 0.224, 0.225])])
 ```
@@ -142,7 +150,7 @@ During testing, we only use definite image preprocessing operations.
 ```{.python .input}
 transform_test = gdata.vision.transforms.Compose([
     gdata.vision.transforms.Resize(256),
-    # Crop a square of 224 by 224 from the center of the image.
+    # Crop a square of 224 by 224 from the center of the image
     gdata.vision.transforms.CenterCrop(224),
     gdata.vision.transforms.ToTensor(),
     gdata.vision.transforms.Normalize([0.485, 0.456, 0.406],
@@ -186,14 +194,14 @@ You must note that, during image augmentation, we use the mean values and standa
 ```{.python .input  n=6}
 def get_net(ctx):
     finetune_net = model_zoo.vision.resnet34_v2(pretrained=True)
-    # Define a new output network.
+    # Define a new output network
     finetune_net.output_new = nn.HybridSequential(prefix='')
     finetune_net.output_new.add(nn.Dense(256, activation='relu'))
-    # There are 120 output categories.
+    # There are 120 output categories
     finetune_net.output_new.add(nn.Dense(120))
-    # Initialize the output network.
+    # Initialize the output network
     finetune_net.output_new.initialize(init.Xavier(), ctx=ctx)
-    # Distribute the model parameters to the CPUs or GPUs used for computation.
+    # Distribute the model parameters to the CPUs or GPUs used for computation
     finetune_net.collect_params().reset_ctx(ctx)
     return finetune_net
 ```
@@ -221,7 +229,7 @@ We will select the model and tune hyper-parameters according to the model's perf
 ```{.python .input  n=7}
 def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
           lr_decay):
-    # Only train the small custom output network.
+    # Only train the small custom output network
     trainer = gluon.Trainer(net.output_new.collect_params(), 'sgd',
                             {'learning_rate': lr, 'momentum': 0.9, 'wd': wd})
     for epoch in range(num_epochs):
@@ -302,6 +310,6 @@ After executing the above code, we will generate a "submission.csv" file. The fo
 
 [1] Kaggle ImageNet Dog Breed Identification website. https://www.kaggle.com/c/dog-breed-identification
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2451)
 
-<div id="discuss" topic_id="2451"></div>
+![](../img/qr_kaggle-gluon-dog.svg)

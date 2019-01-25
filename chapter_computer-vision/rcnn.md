@@ -116,6 +116,6 @@ As shown in 9.9, Mask R-CNN is a modification to the Faster R-CNN model. Mask R-
 
 [6] GluonCV Toolkit. https://gluon-cv.mxnet.io/
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2447)
 
-<div id="discuss" topic_id="2447"></div>
+![](../img/qr_rcnn.svg)

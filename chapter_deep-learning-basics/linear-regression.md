@@ -12,7 +12,7 @@ we assume that prediction can be expressed as a *linear* combination of the inpu
 
 ### Linear Model
 
-For the sake of simplicity we will use the problem of estimating the price of a house based (e.g. in dollars) on area (e.g. in square feet) and age (e.g. in years) as our running example. In this case we could model
+For the sake of simplicity we will use the problem of estimating the price of a house (e.g. in dollars) based on area (e.g. in square feet) and age (e.g. in years) as our running example. In this case we could model
 
 $$\mathrm{price} = w_{\mathrm{area}} \cdot \mathrm{area} + w_{\mathrm{age}} \cdot \mathrm{age} + b$$
 
@@ -155,10 +155,10 @@ from mxnet import nd
 import math
 
 x = nd.arange(-7, 7, 0.01)
-# mean and variance pairs
+# Mean and variance pairs
 parameters = [(0,1), (0,2), (3,1)]
 
-# display SVG rather than JPG
+# Display SVG rather than JPG
 display.set_matplotlib_formats('svg')
 plt.figure(figsize=(10, 6))
 for (mu, sigma) in parameters:
@@ -194,7 +194,7 @@ A closer inspection reveals that for the purpose of minimizing $-\log P(Y|X)$ we
 * Minimizing an objective function and performing maximum likelihood can mean the same thing.
 * Linear models are neural networks, too.
 
-## Exercises
+## Problems
 
 1. Assume that we have some data $x_1, \ldots x_n \in \mathbb{R}$. Our goal is to find a constant $b$ such that $\sum_i (x_i - b)^2$ is minimized.
     * Find the optimal closed form solution.
@@ -210,6 +210,6 @@ A closer inspection reveals that for the purpose of minimizing $-\log P(Y|X)$ we
     * Suggest a stochastic gradient descent algorithm to solve this problem. What could possibly go wrong (hint - what happens near the stationary point as we keep on updating the parameters). Can you fix this?
 1. Compare the runtime of the two methods of adding two vectors using other packages (such as NumPy) or other programming languages (such as MATLAB).
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2331)
 
-<div id="discuss" topic_id="2331"></div>
+![](../img/qr_linear-regression.svg)

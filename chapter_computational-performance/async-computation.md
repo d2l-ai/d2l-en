@@ -28,7 +28,8 @@ In Asynchronous Computing, whenever the Python front-end thread executes one of 
 To further demonstrate the asynchronous computation’s performance, we will implement a simple timing class.
 
 ```{.python .input}
-class Benchmark():  # This class is saved in the Gluonbook module for future reference.
+# This class has been saved in the Gluonbook module for future use
+class Benchmark():
     def __init__(self, prefix=None):
         self.prefix = prefix + ' ' if prefix else ''
 
@@ -170,7 +171,8 @@ l_sum, mem = 0, get_mem()
 for X, y in data_iter():
     with autograd.record():
         l = loss(y, net(X))
-    l_sum += l.mean().asscalar()  # Use of the Asscalar synchronization function.
+    # Use of the Asscalar synchronization function
+    l_sum += l.mean().asscalar()
     l.backward()
     trainer.step(X.shape[0])
 nd.waitall()
@@ -203,6 +205,6 @@ print('increased memory: %f MB' % (get_mem() - mem))
 
 * In the section "Use of Asynchronous Programming to Improve Computing Performance", we mentioned that using asynchronous computation can reduce the total amount of time needed to perform 1000 computations to $t_1 + 1000 t_2 + t_3$. Why do we have to assume $1000t_2 > 999t_1$ here?
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2381)
 
-<div id="discuss" topic_id="2381"></div>
+![](../img/qr_async-computation.svg)

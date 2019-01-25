@@ -20,6 +20,9 @@ In the [Linear Regression](../chapter_deep-learning-basics/linear-regression.md)
 There are many challenges in deep learning optimization. Two such challenges are discussed below: local minimums and saddle points. To better describe the problem, we first import the packages or modules required for the experiments in this section.
 
 ```{.python .input  n=1}
+import sys
+sys.path.insert(0, '..')
+
 %matplotlib inline
 import d2l
 from mpl_toolkits import mplot3d
@@ -115,12 +118,10 @@ In deep learning, it is difficult, but also not necessary, to find the global op
 * What other challenges involved in deep learning optimization can you think of?
 
 
-
-
 ## Reference
 
 [1] Wigner, E. P. (1958). On the distribution of the roots of certain symmetric matrices. Annals of Mathematics, 325-327.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2371)
 
-<div id="discuss" topic_id="2371"></div>
+![](../img/qr_optimization-intro.svg)

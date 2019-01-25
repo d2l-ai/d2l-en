@@ -17,6 +17,9 @@ Here, $eta$ is the learning rate while $\epsilon$ is a constant added to maintai
 By convention, we will use the objective function $f(\boldsymbol{x})=0.1x_1^2+2x_2^2$ to observe the iterative trajectory of the independent variable in RMSProp. Recall that in the ["Adagrad"](adagrad.md) section, when we used Adagrad with a learning rate of 0.4, the independent variable moved less in later stages of iteration. However, at the same learning rate, RMSProp can approach the optimal solution faster.
 
 ```{.python .input  n=3}
+import sys
+sys.path.insert(0, '..')
+
 %matplotlib inline
 import d2l
 import math
@@ -61,16 +64,16 @@ We set the initial learning rate to 0.01 and the hyperparameter $\gamma$ to 0.9.
 ```{.python .input  n=24}
 features, labels = d2l.get_data_ch7()
 d2l.train_ch7(rmsprop, init_rmsprop_states(), {'lr': 0.01, 'gamma': 0.9},
-             features, labels)
+              features, labels)
 ```
 
-## Implementation with Gluon
+## Concise Implementation
 
 From the `Trainer` instance of the algorithm named "rmsprop", we can implement the RMSProp algorithm with Gluon to train models. Note that the hyperparameter $\gamma$ is assigned by `gamma1`.
 
 ```{.python .input  n=29}
 d2l.train_gluon_ch7('rmsprop', {'learning_rate': 0.01, 'gamma1': 0.9},
-                   features, labels)
+                    features, labels)
 ```
 
 ## Summary
@@ -89,6 +92,6 @@ d2l.train_gluon_ch7('rmsprop', {'learning_rate': 0.01, 'gamma1': 0.9},
 
 [1] Tieleman, T., & Hinton, G. (2012). Lecture 6.5-rmsprop: Divide the gradient by a running average of its recent magnitude. COURSERA: Neural networks for machine learning, 4(2), 26-31.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2376)
 
-<div id="discuss" topic_id="2376"></div>
+![](../img/qr_rmsprop.svg)

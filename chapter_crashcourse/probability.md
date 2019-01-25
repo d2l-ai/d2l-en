@@ -1,4 +1,4 @@
-# Probability and statistics
+# Probability and Statistics
 
 
 In some form or another, machine learning is all about making predictions.
@@ -95,7 +95,7 @@ We'll give a more formal definition of *distribution* later,
 but at a high level, think of it as just an assignment of probabilities to events.
 In MXNet, we can sample from the multinomial distribution via the aptly named `nd.random.multinomial` function.
 The function can be called in many ways, but we'll focus on the simplest.
-To draw a single sample, we simply give pass in a vector of probabilities.
+To draw a single sample, we simply pass in a vector of probabilities.
 
 ```{.python .input}
 probabilities = nd.ones(6) / 6
@@ -145,7 +145,7 @@ towards reasonable estimates.
 To start let's take a look at the `counts`
 array which has shape `(6, 1000)`.
 For each time step (out of 1000),
-counts, says how many times each of the numbers has shown up.
+`counts` says how many times each of the numbers has shown up.
 So we can normalize each $j$-th column of the counts vector by the number of tosses
 to give the `current` estimated probabilities at that time.
 The counts object looks like this:
@@ -218,8 +218,8 @@ There are a few important axioms of probability that you'll want to remember:
 
 * For any event $z$, the probability is never negative, i.e. $\Pr(Z=z) \geq 0$.
 * For any two events $Z=z$ and $X=x$ the union is no more likely than the sum of the individual events, i.e. $\Pr(Z=z \cup X=x) \leq \Pr(Z=z) + \Pr(X=x)$.
-* For any random variable, the probabilities of all the values it can take must sum to 1, i.e. $\sum_{i=1}^n P(Z=z_i) = 1$.
-* For any two mutually exclusive events $Z=z$ and $X=x$, the probability that either happens is equal to the sum of their individual probabilities that $\Pr(Z=z \cup X=x) = \Pr(Z=z) + \Pr(X=z)$.
+* For any random variable, the probabilities of all the values it can take must sum to 1, i.e. $\sum_{i=1}^n \Pr(Z=z_i) = 1$.
+* For any two mutually exclusive events $Z=z$ and $X=x$, the probability that either happens is equal to the sum of their individual probabilities, that is $\Pr(Z=z \cup X=x) = \Pr(Z=z) + \Pr(X=x)$.
 
 ## Dealing with multiple random variables
 
@@ -273,9 +273,9 @@ $$\Pr(A) = \sum_{B'} \Pr(A,B') \text{ and } \Pr(B) = \sum_{A'} \Pr(A',B)$$
 A really useful property to check is for **dependence** and **independence**.
 Independence is when the occurrence of one event does not influence the occurrence of the other.
 In this case $\Pr(B | A) = \Pr(B)$. Statisticians typically use $A \perp\!\!\!\perp B$ to express this.
-From Bayes Theorem it follows immediately that also $\Pr(A | B) = \Pr(A)$.
+From Bayes' Theorem it follows immediately that also $\Pr(A | B) = \Pr(A)$.
 In all other cases we call $A$ and $B$ dependent.
-For instance, two successive rolls of a dice are independent.
+For instance, two successive rolls of a die are independent.
 On the other hand, the position of a light switch and the brightness in the room are not
 (they are not perfectly deterministic, though,
 since we could always have a broken lightbulb, power failure, or a broken switch).
@@ -298,7 +298,7 @@ since the conditional probability needs to sum up to $1$, just like the probabil
 Let us work out the probability of the patient having AIDS if the test comes back positive.
 Obviously this is going to depend on how common the disease is, since it affects the number of false alarms.
 Assume that the population is quite healthy, e.g. $\Pr(\text{HIV positive}) = 0.0015$.
-To apply Bayes Theorem we need to determine
+To apply Bayes' Theorem we need to determine
 
 $$\begin{aligned}
 \Pr(\text{Test positive}) =& \Pr(D=1 | H=0) \Pr(H=0) + \Pr(D=1 | H=1) \Pr(H=1) \\
@@ -353,6 +353,6 @@ So far we covered probabilities, independence, conditional independence, and how
 1. Given two events with probability $\Pr(A)$ and $\Pr(B)$, compute upper and lower bounds on $\Pr(A \cup B)$ and $\Pr(A \cap B)$. Hint - display the situation using a [Venn Diagram](https://en.wikipedia.org/wiki/Venn_diagram).
 1. Assume that we have a sequence of events, say $A$, $B$ and $C$, where $B$ only depends on $A$ and $C$ only on $B$, can you simplify the joint probability? Hint - this is a [Markov Chain](https://en.wikipedia.org/wiki/Markov_chain).
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2319)
 
-<div id="discuss" topic_id="2319"></div>
+![](../img/qr_probability.svg)

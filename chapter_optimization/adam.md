@@ -34,6 +34,9 @@ $$\boldsymbol{x}_t \leftarrow \boldsymbol{x}_{t-1} - \boldsymbol{g}_t'. $$
 We use the formula from the algorithm to implement Adam. Here, time step $t$ uses `hyperparams` to input parameters to the `adam` function.
 
 ```{.python .input  n=2}
+import sys
+sys.path.insert(0, '..')
+
 %matplotlib inline
 import d2l
 from mxnet import nd
@@ -59,10 +62,11 @@ def adam(params, states, hyperparams):
 Use Adam to train the model with a learning rate of $0.01$.
 
 ```{.python .input  n=5}
-d2l.train_ch7(adam, init_adam_states(), {'lr': 0.01, 't': 1}, features, labels)
+d2l.train_ch7(adam, init_adam_states(), {'lr': 0.01, 't': 1}, features,
+              labels)
 ```
 
-## Implementation with Gluon
+## Concise Implementation
 
 From the `Trainer` instance of the algorithm named "adam", we can implement Adam with Gluon.
 
@@ -87,6 +91,6 @@ d2l.train_gluon_ch7('adam', {'learning_rate': 0.01}, features, labels)
 
 [1] Kingma, D. P., & Ba, J. (2014). Adam: A method for stochastic optimization. arXiv preprint arXiv:1412.6980.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2378)
 
-<div id="discuss" topic_id="2378"></div>
+![](../img/qr_adam.svg)

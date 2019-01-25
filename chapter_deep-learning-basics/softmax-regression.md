@@ -77,7 +77,7 @@ To improve computational efficiency further, we usually carry out vector calcula
 
 $$
 \begin{aligned}
-\mathbf{O} &= \mathbf{W} \mathbf{X} + \mathbf{b} \\
+\mathbf{O} &= \mathbf{X} \mathbf{W} + \mathbf{b} \\
 \hat{\mathbf{Y}} & = \mathrm{softmax}(\mathbf{O})
 \end{aligned}
 $$
@@ -104,7 +104,7 @@ $$
 l = -\log p(y|x) = - \sum_j y_j \log \hat{y}_j
 $$
 
-Here we used that by construction $\hat{y} = \mathrm{softmax}(\mathbf{o})$ and moreover, that the vector $\mathbf{y}$ consists of all zeroes but for the correct label, such as $(1, 0, 0)$. Hence the the sum over all coordinates $j$ vanishes for all but one term. Since all $\hat{y}_j$ are probabilities, their logarithm is never larger $0$. Consequently, the loss function is minimized if we correctly predict $y$ with *certainty*, i.e. if $p(y|x) = 1$ for the correct label.
+Here we used that by construction $\hat{y} = \mathrm{softmax}(\mathbf{o})$ and moreover, that the vector $\mathbf{y}$ consists of all zeroes but for the correct label, such as $(1, 0, 0)$. Hence the the sum over all coordinates $j$ vanishes for all but one term. Since all $\hat{y}_j$ are probabilities, their logarithm is never larger than $0$. Consequently, the loss function is minimized if we correctly predict $y$ with *certainty*, i.e. if $p(y|x) = 1$ for the correct label.
 
 ### Softmax and Derivatives
 
@@ -186,6 +186,6 @@ After training the softmax regression model, given any example features, we can 
     * What does the soft-min look like?
     * Extend this to more than two numbers.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2334)
 
-<div id="discuss" topic_id="2334"></div>
+![](../img/qr_softmax-regression.svg)

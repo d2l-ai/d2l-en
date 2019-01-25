@@ -330,10 +330,10 @@ Assume random variable $X$ obeys a uniform distribution over $[a, b]$, i.e. $X \
 * This section summarizes the basic knowledge of linear algebra, differentiation, and probability required to understand the contents in this book.
 
 
-## Exercises
+## Problem
 
 * Find the gradient of function $f(\boldsymbol{x}) = 3x_1^2 + 5e^{x_2}$.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2397)
 
-<div id="discuss" topic_id="2397"></div>
+![](../img/qr_math.svg)

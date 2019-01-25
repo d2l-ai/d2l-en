@@ -94,7 +94,8 @@ import collections
 import re
 with open('../data/timemachine.txt', 'r') as f:
     lines = f.readlines()
-    raw_dataset = [re.sub('[^A-Za-z]+', ' ', st).lower().split() for st in lines]
+    raw_dataset = [re.sub('[^A-Za-z]+', ' ', st).lower().split()
+                   for st in lines]
 
 # Let's read the first 10 lines of the text    
 for st in raw_dataset[8:10]:
@@ -168,6 +169,6 @@ The graph is quite exciting for a number of reasons. Firstly, beyond words, also
 1. How would you model a dialogue?
 1. Estimate the exponent of Zipf's law for unigrams, bigrams and trigrams. 
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2361)
 
-<div id="discuss" topic_id="2361"></div>
+![](../img/qr_lang-model.svg)

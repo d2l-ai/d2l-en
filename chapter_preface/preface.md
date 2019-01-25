@@ -76,14 +76,14 @@ with anything resembling of technical depth,
 and (3) interleaved the exposition one expects from an engaging textbook
 with the clean runnable code one seeks in hands-on tutorials.
 We found plenty of code examples for how to use a given deep learning
-framework (e.g. how to do basic numerical computing with matrices in TensorFlow)
-or for implementing particular techniques (e.g. code snippets for LeNet, AlexNet, ResNets, etc)
+framework (e.g., how to do basic numerical computing with matrices in TensorFlow)
+or for implementing particular techniques (e.g., code snippets for LeNet, AlexNet, ResNets, etc)
 in the form of blog posts or on GitHub.
 However, these examples typically focused on
 *how* to implement a given approach,
 but left out the discussion of *why* certain algorithmic decisions are made.
 While sporadic topics have been covered in blog posts,
-e.g. on the website [Distill](http://distill.pub) or personal blogs,
+e.g., on the website [Distill](http://distill.pub) or personal blogs,
 they only covered selected topics in deep learning, and often lacked associated code.
 On the other hand, while several textbooks have emerged,
 most notably [Goodfellow, Bengio and Courville, 2016](https://www.deeplearningbook.org/),
@@ -173,7 +173,7 @@ fundamental preliminaries, like linear algebra and probability.
 We want you to taste the satisfaction of training your first model
 before worrying about more exotic probability distributions.
 
- 
+
 
 
 
@@ -183,7 +183,7 @@ We are indebted to the hundreds of contributors for both
 the English and the Chinese drafts.
 They helped improve the content and offered valuable feedback.
 Specifically, we thank every contributor of this English draft for making it better for everyone.
-Their GitHub IDs or names are (in no particular order): alxnorden, avinashingit, bowen0701, brettkoonce, Chaitanya Prakash Bapat, cryptonaut, edgarroman, gkutiel, John Mitro, Liang Pu, Rahul Agarwal, mohamed-ali, mstewart141, Mike Müller, NRauschmayr, prakhar1989, sad-, sfermigier, sundeepteki, topecongiro, tpdi, vermicelli, vishaalkapoor, vishwesh5, YaYaB.
+Their GitHub IDs or names are (in no particular order): alxnorden, avinashingit, bowen0701, brettkoonce, Chaitanya Prakash Bapat, cryptonaut, Davide Fiocco, edgarroman, gkutiel, John Mitro, Liang Pu, Rahul Agarwal, mohamed-ali, mstewart141, Mike Müller, NRauschmayr, Prakhar Srivastav, sad-, sfermigier, Sheng Zha, sundeepteki, topecongiro, tpdi, vermicelli, Vishaal Kapoor, vishwesh5, YaYaB.
 Moreover, we thank Amazon Web Services, especially Swami Sivasubramanian, Raju Gulabani, Charlie Bell, and Andrew Jassy for their generous support in writing this book.
 Without the available time, resources, discussions with colleagues,
 and continuous encouragement this book would not have happened.

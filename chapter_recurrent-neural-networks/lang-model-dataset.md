@@ -61,24 +61,24 @@ The following code randomly generates a minibatch from the data each time. Here,
 In random sampling, each example is a sequence arbitrarily captured on the original sequence. The positions of two adjacent random mini-batches on the original sequence are not necessarily adjacent. The target is to predict the next character based on what we've seen so far, hence the labels are the original sequence, shifted by one character. Note that this is not recommended for latent variable models, since we do not have access to the hidden state *prior* to seeing the sequence. We packaged the above code in the `load_data_timemachine` function of the `d2l` package to make it easier to call it in later chapters. It returns four variables: `corpus_indices`, `char_to_idx`, `idx_to_char`, and `vocab_size`.
 
 ```{.python .input  n=5}
-# This function is saved in the d2l package for future use.
+# This function is saved in the d2l package for future use
 def data_iter_random(corpus_indices, batch_size, num_steps, ctx=None):
-    # offset for the iterator over the data for uniform starts
+    # Offset for the iterator over the data for uniform starts
     offset = int(random.uniform(0,num_steps))
     corpus_indices = corpus_indices[offset:]
-    # subtract 1 extra since we need to account for the sequence length
+    # Subtract 1 extra since we need to account for the sequence length
     num_examples = ((len(corpus_indices) - 1) // num_steps) - 1
-    # discard half empty batches
+    # Discard half empty batches
     num_batches = num_examples // batch_size
     example_indices = list(range(0, num_examples * num_steps, num_steps))
     random.shuffle(example_indices)
     
-    # This returns a sequence of the length num_steps starting from pos.
+    # This returns a sequence of the length num_steps starting from pos
     def _data(pos):
         return corpus_indices[pos: pos + num_steps]
 
     for i in range(0, batch_size * num_batches, batch_size):
-        # batch_size indicates the random examples read each time.
+        # Batch_size indicates the random examples read each time
         batch_indices = example_indices[i:(i+batch_size)]
         X = [_data(j) for j in batch_indices]
         Y = [_data(j + 1) for j in batch_indices]       
@@ -103,15 +103,15 @@ On the other hand, when multiple adjacent mini-batches are concatenated by passi
 So that the model parameter gradient calculations only depend on the mini-batch sequence read by one iteration, we can separate the hidden state from the computational graph before reading the mini-batch (this can be done by detaching the graph). We will gain a deeper understand this approach in the following sections.
 
 ```{.python .input  n=7}
-# This function is saved in the d2l package for future use.
+# This function is saved in the d2l package for future use
 def data_iter_consecutive(corpus_indices, batch_size, num_steps, ctx=None):
-    # offset for the iterator over the data for uniform starts
+    # Offset for the iterator over the data for uniform starts
     offset = int(random.uniform(0,num_steps))
-    # slice out data - ignore num_steps and just wrap around
+    # Slice out data - ignore num_steps and just wrap around
     num_indices = ((len(corpus_indices) - offset) // batch_size) * batch_size
     indices = nd.array(corpus_indices[offset:(offset + num_indices)], ctx=ctx)
     indices = indices.reshape((batch_size,-1))
-    # need to leave one last token since targets are shifted by 1
+    # Need to leave one last token since targets are shifted by 1
     num_epochs = ((num_indices // batch_size) - 1) // num_steps
 
     for i in range(0, num_epochs * num_steps, num_steps):
@@ -146,6 +146,6 @@ Sequential partitioning decomposes the sequence into `batch_size` many strips of
     * What would you have to do to make things even more uniform?
 1. If we want a sequence example to be a complete sentence, what kinds of problems does this introduce in mini-batch sampling? Why would we want to do this anyway?
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2363)
 
-<div id="discuss" topic_id="2363"></div>
+![](../img/qr_lang-model-dataset.svg)

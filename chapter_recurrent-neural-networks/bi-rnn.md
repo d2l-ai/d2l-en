@@ -34,6 +34,6 @@ Here, the weight parameter $\boldsymbol{W}_{hq} \in \mathbb{R}^{2h \times q}$ an
 * If the different directions use a different number of hidden units, how will the shape of $\boldsymbol{H}_t$ change?
 * Referring to figures 6.11 and 6.12, design a bidirectional recurrent neural network with multiple hidden layers.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2370)
 
-<div id="discuss" topic_id="2370"></div>
+![](../img/qr_bi-rnn.svg)

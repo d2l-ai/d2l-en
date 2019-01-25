@@ -34,17 +34,22 @@ In the following example we create a two-dimensional convolutional layer with a 
 from mxnet import nd
 from mxnet.gluon import nn
 
-# We define a convenience function to calculate the convolutional layer. This function initializes
-# the convolutional layer weights and performs corresponding dimensionality elevations and reductions
-# on the input and output.
+# We define a convenience function to calculate the convolutional layer. This
+# function initializes the convolutional layer weights and performs
+# corresponding dimensionality elevations and reductions on the input and
+# output
 def comp_conv2d(conv2d, X):
     conv2d.initialize()
-    # (1,1) indicates that the batch size and the number of channels (described in later chapters) are both 1.
+    # (1,1) indicates that the batch size and the number of channels
+    # (described in later chapters) are both 1
     X = X.reshape((1, 1) + X.shape)
     Y = conv2d(X)
-    return Y.reshape(Y.shape[2:])  # Exclude the first two dimensions that do not interest us: batch and channel.
+    # Exclude the first two dimensions that do not interest us: batch and
+    # channel
+    return Y.reshape(Y.shape[2:])
 
-# Note that here 1 row or column is padded on either side, so a total of 2 rows or columns are added.
+# Note that here 1 row or column is padded on either side, so a total of 2
+# rows or columns are added
 conv2d = nn.Conv2D(1, kernel_size=3, padding=1)
 X = nd.random.uniform(shape=(8, 8))
 comp_conv2d(conv2d, X).shape
@@ -53,8 +58,9 @@ comp_conv2d(conv2d, X).shape
 When the height and width of the convolution kernel are different, we can make the output and input have the same height and width by setting different padding numbers for height and width.
 
 ```{.python .input  n=2}
-# Here, we use a convolution kernel with a height of 5 and a width of 3. The padding numbers on
-# both sides of the height and width are 2 and 1, respectively.
+# Here, we use a convolution kernel with a height of 5 and a width of 3. The
+# padding numbers on both sides of the height and width are 2 and 1,
+# respectively
 conv2d = nn.Conv2D(1, kernel_size=(5, 3), padding=(2, 1))
 comp_conv2d(conv2d, X).shape
 ```
@@ -102,6 +108,6 @@ For the sake of brevity, when the padding number on both sides of the input heig
 1. For audio signals, what does a stride of $2$ correspond to?
 1. What are the computational benefits of a stride larger than $1$.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2350)
 
-<div id="discuss" topic_id="2350"></div>
+![](../img/qr_padding-and-strides.svg)

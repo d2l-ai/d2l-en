@@ -34,9 +34,9 @@ x_gpu = nd.random.uniform(shape=(6000, 6000), ctx=mx.gpu(0))
 Then, use the two NDArrays to run the `run` function on both the CPU and GPU and print the time required.
 
 ```{.python .input}
-run(x_cpu)  # Warm-up begins.
+run(x_cpu)  # Warm-up begins
 run(x_gpu)
-nd.waitall()  # Warm-up ends.
+nd.waitall()  # Warm-up ends
 
 with d2l.Benchmark('Run on CPU.'):
     run(x_cpu)
@@ -98,6 +98,6 @@ As we can see, the total time required to perform computation and communication 
 * Designing computation tasks that include more complex data dependencies, and run experiments to see if MXNet can obtain the correct results and improve computing performance.
 * When the computational load of an operator is small enough, parallel computation on only the CPU or a single GPU may also improve the computing performance. Design an experiment to verify this.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2382)
 
-<div id="discuss" topic_id="2382"></div>
+![](../img/qr_auto-parallelism.svg)

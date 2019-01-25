@@ -26,13 +26,13 @@ import mxnet as mx
 from mxnet import nd
 import numpy as np
 
-# we go over one observation at a time (speed doesn't matter here)
+# We go over one observation at a time (speed doesn't matter here)
 def transform(data, label):
     return (nd.floor(data/128)).astype(np.float32), label.astype(np.float32)
 mnist_train = mx.gluon.data.vision.MNIST(train=True, transform=transform)
 mnist_test  = mx.gluon.data.vision.MNIST(train=False, transform=transform)
 
-# initialize the counters
+# Initialize the counters
 xcount = nd.ones((784,10))
 ycount = nd.ones((10))
 
@@ -71,16 +71,16 @@ $$p(y | \mathbf{x}) = \frac{p(\mathbf{x} | y) p(y)}{\sum_{y'} p(\mathbf{x} | y')
 Let's try this ...
 
 ```{.python .input  n=3}
-# get the first test item
+# Get the first test item
 data, label = mnist_test[0]
 data = data.reshape((784,1))
 
-# compute the per pixel conditional probabilities
+# Compute the per pixel conditional probabilities
 xprob = (px * data + (1-px) * (1-data))
-# take the product
+# Take the product
 xprob = xprob.prod(0) * py
 print('Unnormalized Probabilities', xprob)
-# and normalize
+# Normalize
 xprob = xprob / xprob.sum()
 print('Normalized Probabilities', xprob)
 ```
@@ -99,21 +99,21 @@ logpxneg = nd.log(1-px)
 logpy = nd.log(py)
 
 def bayespost(data):
-    # we need to incorporate the prior probability p(y) since p(y|x) is
+    # We need to incorporate the prior probability p(y) since p(y|x) is
     # proportional to p(x|y) p(y)
     logpost = logpy.copy()
     logpost += (logpx * data + logpxneg * (1-data)).sum(0)
-    # normalize to prevent overflow or underflow by subtracting the largest
+    # Normalize to prevent overflow or underflow by subtracting the largest
     # value
     logpost -= nd.max(logpost)
-    # and compute the softmax using logpx
+    # Compute the softmax using logpx
     post = nd.exp(logpost).asnumpy()
     post /= np.sum(post)
     return post
 
 fig, figarr = plt.subplots(2, 10, figsize=(10, 3))
 
-# show 10 images
+# Show 10 images
 ctr = 0
 for data, label in mnist_test:
     x = data.reshape((784,1))
@@ -121,7 +121,7 @@ for data, label in mnist_test:
 
     post = bayespost(x)
 
-    # bar chart and image of digit
+    # Bar chart and image of digit
     figarr[1, ctr].bar(range(10), post)
     figarr[1, ctr].axes.get_yaxis().set_visible(False)
     figarr[0, ctr].imshow(x.reshape((28, 28)).asnumpy(), cmap='hot')
@@ -138,7 +138,7 @@ plt.show()
 As we can see, this classifier works pretty well in many cases. However, the second last digit shows that it can be both incompetent and overly confident of its incorrect estimates. That is, even if it is horribly wrong, it generates probabilities close to 1 or 0. Not a classifier we should use very much nowadays any longer. To see how well it performs overall, let's compute the overall accuracy of the classifier.
 
 ```{.python .input  n=5}
-# initialize counter
+# Initialize counter
 ctr = 0
 err = 0
 
@@ -175,6 +175,6 @@ Modern deep networks achieve error rates of less than 0.01. While Naive Bayes cl
    * Is this a useful statement if there are only 5 suspects?
    * Is it still useful if there are 50?
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2320)
 
-<div id="discuss" topic_id="2320"></div>
+![](../img/qr_naive-bayes.svg)

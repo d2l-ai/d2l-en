@@ -43,7 +43,7 @@ As we can see, nothing really changed. Only once we provide the network with som
 
 ```{.python .input}
 x = nd.random.uniform(shape=(2, 20))
-net(x)            # Forward computation.
+net(x)  # Forward computation
 
 net.collect_params()
 ```
@@ -58,7 +58,7 @@ Now that we know how it works in theory, let's see when the initialization is ac
 class MyInit(init.Initializer):
     def _init_weight(self, name, data):
         print('Init', name, data.shape)
-        # The actual initialization logic is omitted here.
+        # The actual initialization logic is omitted here
 
 net = getnet()
 net.initialize(init=MyInit())
@@ -117,6 +117,6 @@ net.initialize(init=MyInit())
 1. What happens if you specify mismatching dimensions?
 1. What would you need to do if you have input of varying dimensionality? Hint - look at parameter tying.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2327)
 
-<div id="discuss" topic_id="2327"></div>
+![](../img/qr_deferred-init.svg)

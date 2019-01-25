@@ -19,6 +19,9 @@ Next, we will perform an experiment to help us better understand the technical d
 First, we read the content and style images. By printing out the image coordinate axes, we can see that they have different dimensions.
 
 ```{.python .input  n=1}
+import sys
+sys.path.insert(0, '..')
+
 %matplotlib inline
 import d2l
 from mxnet import autograd, gluon, image, init, nd
@@ -158,13 +161,13 @@ style_channels = [net[l].weight.shape[0] for l in style_layers]
 content_weight, style_weight, tv_weight = 1, 1e3, 10
 
 def compute_loss(X, contents_Y_hat, styles_Y_hat, contents_Y, styles_Y_gram):
-    # Calculate the content, style, and total variance losses individually.
+    # Calculate the content, style, and total variance losses individually
     contents_l = [content_loss(Y_hat, Y) * content_weight for Y_hat, Y in zip(
         contents_Y_hat, contents_Y)]
     styles_l = [style_loss(Y_hat, Y) * style_weight for Y_hat, Y in zip(
         styles_Y_hat, styles_Y_gram)]
     tv_l = tv_loss(X) * tv_weight
-    # Add up all the losses.
+    # Add up all the losses
     l = nd.add_n(*styles_l) + nd.add_n(*contents_l) + tv_l
     return contents_l, styles_l, tv_l, l
 ```
@@ -275,6 +278,6 @@ As you can see, each epoch takes more time due to the larger image size. As show
 
 [1] Gatys, L. A., Ecker, A. S., & Bethge, M. (2016). Image style transfer using convolutional neural networks. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (pp. 2414-2423).
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2449)
 
-<div id="discuss" topic_id="2449"></div>
+![](../img/qr_neural-style.svg)

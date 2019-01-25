@@ -8,6 +8,9 @@ It will be used multiple times in later chapters to allow us to observe the diff
 First, import the packages or modules required in this section.
 
 ```{.python .input}
+import sys
+sys.path.insert(0, '..')
+
 %matplotlib inline
 import d2l
 from mxnet.gluon import data as gdata
@@ -49,7 +52,7 @@ label, type(label), label.dtype
 There are 10 categories in Fashion-MNIST: t-shirt, trousers, pullover, dress, coat, sandal, shirt, sneaker, bag and ankle boot. The following function can convert a numeric label into a corresponding text label.
 
 ```{.python .input  n=25}
-# This function has been saved in the d2l package for future use.
+# This function has been saved in the d2l package for future use
 def get_fashion_mnist_labels(labels):
     text_labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
                    'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
@@ -59,10 +62,10 @@ def get_fashion_mnist_labels(labels):
 The following defines a function that can draw multiple images and corresponding labels in a single line.
 
 ```{.python .input}
-# This function has been saved in the d2l package for future use.
+# This function has been saved in the d2l package for future use
 def show_fashion_mnist(images, labels):
     d2l.use_svg_display()
-    # Here _ means that we ignore (not use) variables.
+    # Here _ means that we ignore (not use) variables
     _, figs = d2l.plt.subplots(1, len(images), figsize=(12, 12))
     for f, img, lbl in zip(figs, images, labels):
         f.imshow(img.reshape((28, 28)).asnumpy())
@@ -90,7 +93,9 @@ In addition, we convert the image data from uint8 to 32-bit floating point numbe
 batch_size = 256
 transformer = gdata.vision.transforms.ToTensor()
 if sys.platform.startswith('win'):
-    num_workers = 0  # 0 means no additional processes are needed to speed up the reading of data.
+    # 0 means no additional processes are needed to speed up the reading of
+    # data
+    num_workers = 0
 else:
     num_workers = 4
 
@@ -126,6 +131,6 @@ for X, y in train_iter:
 1. Use the MXNet documentation to see which other datasets are available in `mxnet.gluon.data.vision`.
 1. Use the MXNet documentation to see which other transformations are available in `mxnet.gluon.data.vision.transforms`.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2335)
 
-<div id="discuss" topic_id="2335"></div>
+![](../img/qr_fashion-mnist.svg)

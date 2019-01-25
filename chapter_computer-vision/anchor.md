@@ -5,6 +5,9 @@ Object detection algorithms usually sample a large number of regions in the inpu
 First, import the packages or modules required for this section. Here, we have introduced the `contrib` package, and modified the printing accuracy of NumPy. Because printing NDArray actually calls the print function of NumPy, the floating-point numbers in NDArray printed in this section are more concise.
 
 ```{.python .input  n=1}
+import sys
+sys.path.insert(0, '..')
+
 %matplotlib inline
 import d2l
 from mxnet import contrib, gluon, image, nd
@@ -29,7 +32,7 @@ img = image.imread('../img/catdog.jpg').asnumpy()
 h, w = img.shape[0:2]
 
 print(h, w)
-X = nd.random.uniform(shape=(1, 3, h, w))  # Construct input data.
+X = nd.random.uniform(shape=(1, 3, h, w))  # Construct input data
 Y = contrib.nd.MultiBoxPrior(X, sizes=[0.75, 0.5, 0.25], ratios=[1, 2, 0.5])
 Y.shape
 ```
@@ -44,7 +47,7 @@ boxes[250, 250, 0, :]
 In order to describe all anchor boxes centered on one pixel in the image, we first define the `show_bboxes` function to draw multiple bounding boxes on the image.
 
 ```{.python .input  n=4}
-# This function is saved in the d2l package for future use.
+# This function is saved in the d2l package for future use
 def show_bboxes(axes, bboxes, labels=None, colors=None):
     def _make_list(obj, default_values=None):
         if obj is None:
@@ -230,6 +233,6 @@ In practice, we can remove prediction bounding boxes with lower confidence level
 * Modify the variable `anchors` in the "Labeling Training Set Anchor Boxes" and "Output Bounding Boxes for Prediction" sections. How do the results change?
 
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2445)
 
-<div id="discuss" topic_id="2445"></div>
+![](../img/qr_anchor.svg)

@@ -68,7 +68,7 @@ If you log into a GPU instance, you need to download and install CUDA. First, up
 sudo apt-get update && sudo apt-get install -y build-essential git libgfortran3
 ```
 
-Nvidia releases a major version of CUDA every year. Here we download the latest CUDA 9.1 when the book is written. Visit the official website of Nvidia(https://developer.nvidia.com/cuda-91-download-archive) to obtain the download link of CUDA 9.1, as shown in Figure 11.17.
+NVIDIA releases a major version of CUDA every year. Here we download the latest CUDA 9.1 when the book is written. Visit the official website of NVIDIA(https://developer.nvidia.com/cuda-91-download-archive) to obtain the download link of CUDA 9.1, as shown in Figure 11.17.
 
 ![Find the CUDA 9.1 download address. ](../img/cuda.png)
 
@@ -163,7 +163,7 @@ Figure 11.18 shows the possible output after you run Jupyter Notebook. The last 
 Because the instance you created does not expose port 8888, you can launch SSH in the local command line and map the instance to the local port 8889.
 
 ```
-# This command must be run in the local command line.
+# This command must be run in the local command line
 ssh -i "/path/to/key.pem" ubuntu@ec2-xx-xxx-xxx-xxx.y.compute.amazonaws.com -L 8889:localhost:8888
 ```
 
@@ -185,6 +185,6 @@ If you do not plan to use the instance again for a long time, right-click on the
 
 * The cloud offers convenience, but it does not come cheap. Research the prices of cloud services and find ways to reduce overhead.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2399)
 
-<div id="discuss" topic_id="2399"></div>
+![](../img/qr_aws.svg)

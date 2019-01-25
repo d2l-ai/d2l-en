@@ -7,6 +7,9 @@ It is not difficult to reduce the number of anchor boxes.  An easy way is to app
 To demonstrate how to generate anchor boxes on multiple scales, let us read an image first.  It has a height and width of 561 * 728 pixels.
 
 ```{.python .input  n=1}
+import sys
+sys.path.insert(0, '..')
+
 %matplotlib inline
 import d2l
 from mxnet import contrib, image, nd
@@ -25,10 +28,12 @@ The function `display_anchors` is defined below.  We are going to generate ancho
 d2l.set_figsize()
 
 def display_anchors(fmap_w, fmap_h, s):
-    fmap = nd.zeros((1, 10, fmap_w, fmap_h))  # The values from the first two dimensions will not affect the output.
+    # The values from the first two dimensions will not affect the output
+    fmap = nd.zeros((1, 10, fmap_w, fmap_h))
     anchors = contrib.nd.MultiBoxPrior(fmap, sizes=s, ratios=[1, 2, 0.5])
     bbox_scale = nd.array((w, h, w, h))
-    d2l.show_bboxes(d2l.plt.imshow(img.asnumpy()).axes, anchors[0] * bbox_scale)
+    d2l.show_bboxes(d2l.plt.imshow(img.asnumpy()).axes,
+                    anchors[0] * bbox_scale)
 ```
 
 We will first focus on the detection of small objects. In order to make it easier to distinguish upon display, the anchor boxes with different midpoints here do not overlap. We assume that the size of the anchor boxes is 0.15 and the height and width of the feature map are 4. We can see that the midpoints of anchor boxes from the 4 rows and 4 columns on the image are uniformly distributed.
@@ -75,6 +80,6 @@ We will implement a multiscale object detection model in the following section.
 
 * Given an input image, assume $1 \times c_i \times h \times w$ to be the shape of the feature map while $c_i, h, w$ are the number, height, and width of the feature map. What methods can you think of to convert this variable into the anchor box's category and offset? What is the shape of the output?
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2446)
 
-<div id="discuss" topic_id="2446"></div>
+![](../img/qr_multiscale-object-detection.svg)

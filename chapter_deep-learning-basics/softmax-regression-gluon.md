@@ -1,8 +1,11 @@
-# Softmax Regression in Gluon
+# Concise Implementation of Softmax Regression
 
 We already saw that it is much more convenient to use Gluon in the context of [linear regression](linear-regression-gluon.md). Now we will see how this applies to classification, too. We being with our import ritual.
 
 ```{.python .input  n=1}
+import sys
+sys.path.insert(0, '..')
+
 %matplotlib inline
 import d2l
 from mxnet import gluon, init
@@ -65,7 +68,7 @@ Next, we use the training functions defined in the last section to train a model
 ```{.python .input  n=6}
 num_epochs = 5
 d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size, None,
-             None, trainer)
+              None, trainer)
 ```
 
 Just as before, this algorithm converges to a fairly decent accuracy of 83.7%, albeit this time with a lot fewer lines of code than before. Note that in many cases Gluon takes specific precautions beyond what one would naively do to ensure numerical stability. This takes care of many common pitfalls when coding a model from scratch.
@@ -76,6 +79,6 @@ Just as before, this algorithm converges to a fairly decent accuracy of 83.7%, a
 1. Try adjusting the hyper-parameters, such as batch size, epoch, and learning rate, to see what the results are.
 1. Why might the test accuracy decrease again after a while? How could we fix this?
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2337)
 
-<div id="discuss" topic_id="2337"></div>
+![](../img/qr_softmax-regression-gluon.svg)

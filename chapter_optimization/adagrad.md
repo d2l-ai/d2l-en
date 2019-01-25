@@ -29,13 +29,17 @@ We should emphasize that the cumulative variable $\boldsymbol{s}_t$ produced by 
 Below we will continue to use the objective function $f(\boldsymbol{x})=0.1x_1^2+2x_2^2$ as an example to observe the iterative trajectory of the independent variable in Adagrad. We are going to implement Adagrad using the same learning rate as the experiment in last section, 0.4. As we can see, the iterative trajectory of the independent variable is smoother. However, due to the cumulative effect of $\boldsymbol{s}_t$, the learning rate continuously decays, so the independent variable does not move as much during later stages of iteration.
 
 ```{.python .input  n=1}
+import sys
+sys.path.insert(0, '..')
+
 %matplotlib inline
 import d2l
 import math
 from mxnet import nd
 
 def adagrad_2d(x1, x2, s1, s2):
-    g1, g2, eps = 0.2 * x1, 4 * x2, 1e-6  # The first two terms are the independent variable gradients.
+    # The first two terms are the independent variable gradients
+    g1, g2, eps = 0.2 * x1, 4 * x2, 1e-6
     s1 += g1 ** 2
     s2 += g2 ** 2
     x1 -= eta / math.sqrt(s1 + eps) * g1
@@ -81,7 +85,7 @@ Compared with the experiment in the ["Mini-Batch Stochastic Gradient Descent"](m
 d2l.train_ch7(adagrad, init_adagrad_states(), {'lr': 0.1}, features, labels)
 ```
 
-## Implementation with Gluon
+## Concise Implementation
 
 Using the `Trainer` instance of the algorithm named “adagrad”, we can implement the Adagrad algorithm with Gluon to train models.
 
@@ -105,6 +109,6 @@ d2l.train_gluon_ch7('adagrad', {'learning_rate': 0.1}, features, labels)
 
 [1] Duchi, J., Hazan, E., & Singer, Y. (2011). Adaptive subgradient methods for online learning and stochastic optimization. Journal of Machine Learning Research, 12(Jul), 2121-2159.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2375)
 
-<div id="discuss" topic_id="2375"></div>
+![](../img/qr_adagrad.svg)

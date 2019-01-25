@@ -59,6 +59,6 @@ Here, $L$ is the length of the final candidate sequence and the selection for $\
 * Can we treat an exhaustive search as a beam search with a special beam size? Why?
 * We used language models to create lyrics in the ["Implementation of the Recurrent Neural Network from Scratch"](../chapter_recurrent-neural-networks/rnn-scratch.md) section. Which kind of search does this output use? Can you improve it?
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2394)
 
-<div id="discuss" topic_id="2394"></div>
+![](../img/qr_beam-search.svg)

@@ -1,8 +1,11 @@
-# Implementing a Multilayer Perceptron from Scratch
+# Implementation of Multilayer Perceptron from Scratch
 
 Now that we learned how multilayer perceptrons (MLPs) work in theory, let's implement them. First, import the required packages or modules.
 
 ```{.python .input  n=9}
+import sys
+sys.path.insert(0, '..')
+
 %matplotlib inline
 import d2l
 from mxnet import nd
@@ -68,7 +71,7 @@ Steps for training the Multilayer Perceptron are no different from Softmax Regre
 ```{.python .input  n=7}
 num_epochs, lr = 10, 0.5
 d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size,
-             params, lr)
+              params, lr)
 ```
 
 To see how well we did, let's apply the model to some test data. If you're interested, compare the result to corresponding [linear model](softmax-regression-scratch.md).
@@ -79,7 +82,8 @@ for X, y in test_iter:
 
 true_labels = d2l.get_fashion_mnist_labels(y.asnumpy())
 pred_labels = d2l.get_fashion_mnist_labels(net(X).argmax(axis=1).asnumpy())
-titles = [truelabel + '\n' + predlabel for truelabel, predlabel in zip(true_labels, pred_labels)]
+titles = [truelabel + '\n' + predlabel
+          for truelabel, predlabel in zip(true_labels, pred_labels)]
 
 d2l.show_fashion_mnist(X[0:9], titles[0:9])
 ```
@@ -97,6 +101,6 @@ We saw that implementing a simple MLP is quite easy, when done manually. That sa
 1. How does changing the learning rate change the result.
 1. What is the best result you can get by optimizing over all the parameters (learning rate, iterations, number of hidden layers, number of hidden units per layer)?
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2339)
 
-<div id="discuss" topic_id="2339"></div>
+![](../img/qr_mlp-scratch.svg)

@@ -35,10 +35,10 @@ In the Jupyter notebook, we can use `?` to display the document in another windo
 
 For further details on the API details check the MXNet website at  [http://mxnet.apache.org/](http://mxnet.apache.org/). You can find the details under the appropriate headings (also for programming languages other than Python).
 
-## Exercise
+## Problem
 
-Check out the documentation for `ones_like` and for `autograd`.
+Look up `ones_like` and `autograd` in the API documentation.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2322)
 
-<div id="discuss" topic_id="2322"></div>
+![](../img/qr_lookup-api.svg)

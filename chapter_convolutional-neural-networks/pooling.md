@@ -67,7 +67,9 @@ By default, the stride in the `MaxPool2D` class has the same shape as the poolin
 
 ```{.python .input  n=16}
 pool2d = nn.MaxPool2D(3)
-pool2d(X)  # Because there are no model parameters in the pooling layer, we do not need to call the parameter initialization function.
+# Because there are no model parameters in the pooling layer, we do not need
+# to call the parameter initialization function
+pool2d(X)
 ```
 
 The stride and padding can be manually specified.
@@ -117,6 +119,6 @@ pool2d(X)
 1. Do we need a separate minimum pooling layer? Can you replace it with another operation?
 1. Is there another operation between average and maximum pooling that you could consider (hint - recall the softmax)? Why might it not be so popular?
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2352)
 
-<div id="discuss" topic_id="2352"></div>
+![](../img/qr_pooling.svg)

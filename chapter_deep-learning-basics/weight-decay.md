@@ -35,6 +35,9 @@ $$y = 0.05 + \sum_{i = 1}^d 0.01 x_i + \epsilon \text{ where }
 That is, we have additive Gaussian noise with zero mean and variance 0.01. In order to observe overfitting more easily we pick a high-dimensional problem with $d = 200$ and a deliberatly low number of training examples, e.g. 20. As before we begin with our import ritual (and data generation).
 
 ```{.python .input  n=2}
+import sys
+sys.path.insert(0, '..')
+
 %matplotlib inline
 import d2l
 from mxnet import autograd, gluon, init, nd
@@ -50,7 +53,7 @@ train_features, test_features = features[:n_train, :], features[n_train:, :]
 train_labels, test_labels = labels[:n_train], labels[n_train:]
 ```
 
-## Weight Decay from Scratch
+## Implementation from Scratch
 
 Next, we will show how to implement weight decay from scratch. For this we simply add the $\ell_2$ penalty as an additional loss term after the target function. The squared norm penalty derives its name from the fact that we are adding the second power $\sum_i x_i^2$. There are many other related penalties. In particular, the $\ell_p$ norm is defined as
 
@@ -94,7 +97,7 @@ def fit_and_plot(lambd):
     for _ in range(num_epochs):
         for X, y in train_iter:
             with autograd.record():
-                # The L2 norm penalty term has been added.
+                # The L2 norm penalty term has been added
                 l = loss(net(X, w, b), y) + lambd * l2_penalty(w)
             l.backward()
             d2l.sgd([w, b], lr, batch_size)
@@ -103,7 +106,7 @@ def fit_and_plot(lambd):
         test_ls.append(loss(net(test_features, w, b),
                             test_labels).mean().asscalar())
     d2l.semilogy(range(1, num_epochs + 1), train_ls, 'epochs', 'loss',
-                range(1, num_epochs + 1), test_ls, ['train', 'test'])
+                 range(1, num_epochs + 1), test_ls, ['train', 'test'])
     print('l2 norm of w:', w.norm().asscalar())
 ```
 
@@ -123,7 +126,7 @@ The example below shows that even though the training error increased, the error
 fit_and_plot(lambd=3)
 ```
 
-## Weight Decay in Gluon
+## Concise Implementation
 
 Weight decay in Gluon is quite convenient (and also a bit special) insofar as it is typically integrated with the optimization algorithm itself. The reason for this is that it is much faster (in terms of runtime) for the optimizer to take care of weight decay and related things right inside the optimization algorithm itself, since the optimizer itself needs to touch all parameters anyway.
 
@@ -134,10 +137,11 @@ def fit_and_plot_gluon(wd):
     net = nn.Sequential()
     net.add(nn.Dense(1))
     net.initialize(init.Normal(sigma=1))
-    # The weight parameter has been decayed. Weight names generally end with "weight".
+    # The weight parameter has been decayed. Weight names generally end with
+    # "weight".
     trainer_w = gluon.Trainer(net.collect_params('.*weight'), 'sgd',
                               {'learning_rate': lr, 'wd': wd})
-    # The bias parameter has not decayed. Bias names generally end with "bias".
+    # The bias parameter has not decayed. Bias names generally end with "bias"
     trainer_b = gluon.Trainer(net.collect_params('.*bias'), 'sgd',
                               {'learning_rate': lr})
     train_ls, test_ls = [], []
@@ -146,7 +150,8 @@ def fit_and_plot_gluon(wd):
             with autograd.record():
                 l = loss(net(X), y)
             l.backward()
-            # Call the step function on each of the two Trainer instances to update the weight and bias separately.
+            # Call the step function on each of the two Trainer instances to
+            # update the weight and bias separately
             trainer_w.step(batch_size)
             trainer_b.step(batch_size)
         train_ls.append(loss(net(train_features),
@@ -154,7 +159,7 @@ def fit_and_plot_gluon(wd):
         test_ls.append(loss(net(test_features),
                             test_labels).mean().asscalar())
     d2l.semilogy(range(1, num_epochs + 1), train_ls, 'epochs', 'loss',
-                range(1, num_epochs + 1), test_ls, ['train', 'test'])
+                 range(1, num_epochs + 1), test_ls, ['train', 'test'])
     print('L2 norm of w:', net[0].weight.data().norm().asscalar())
 ```
 
@@ -188,6 +193,6 @@ So far we only touched upon what constitutes a simple *linear* function. For non
 1. Review the relationship between training error and generalization error. In addition to weight decay, increased training, and the use of a model of suitable complexity, what other ways can you think of to deal with overfitting?
 1. In Bayesian statistics we use the product of prior and likelihood to arrive at a posterior via $p(w|x) \propto p(x|w) p(w)$. How can you identify $p(w)$ with regularization?
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2342)
 
-<div id="discuss" topic_id="2342"></div>
+![](../img/qr_weight-decay.svg)

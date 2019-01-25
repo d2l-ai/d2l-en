@@ -1,4 +1,4 @@
-# Mini-Batch Stochastic Gradient Descent
+# Mini-batch Stochastic Gradient Descent
 
 In each iteration, the gradient descent uses the entire training data set to compute the gradient, so it is sometimes referred to as batch gradient descent. Stochastic gradient descent (SGD) only randomly select one example in each iteration to compute the gradient. Just like in the previous chapters, we can perform random uniform sampling for each iteration to form a mini-batch and then use this mini-batch to compute the gradient. Now, we are going to discuss mini-batch stochastic gradient descent.
 
@@ -21,6 +21,9 @@ The cost for computing each iteration is $\mathcal{O}(|\mathcal{B}|)$. When the 
 In this chapter, we will use a data set developed by NASA to test the wing noise from different aircraft to compare these optimization algorithms[1]. We will use the first 1500 examples of the data set, 5 features, and a normalization method to preprocess the data.
 
 ```{.python .input  n=1}
+import sys
+sys.path.insert(0, '..')
+
 %matplotlib inline
 import d2l
 from mxnet import autograd, gluon, init, nd
@@ -28,7 +31,8 @@ from mxnet.gluon import nn, data as gdata, loss as gloss
 import numpy as np
 import time
 
-def get_data_ch7():  # This function is saved in the d2l package for future use.
+# This function is saved in the d2l package for future use
+def get_data_ch7():
     data = np.genfromtxt('../data/airfoil_self_noise.dat', delimiter='\t')
     data = (data - data.mean(axis=0)) / data.std(axis=0)
     return nd.array(data[:1500, :-1]), nd.array(data[:1500, -1])
@@ -50,10 +54,10 @@ def sgd(params, states, hyperparams):
 Next, we are going to implement a generic training function to facilitate the use of the other optimization algorithms introduced later in this chapter. It initializes a linear regression model and can then be used to train the model with the mini-batch SGD and other algorithms introduced in subsequent sections.
 
 ```{.python .input  n=4}
-# This function is saved in the d2l package for future use.
+# This function is saved in the d2l package for future use
 def train_ch7(trainer_fn, states, hyperparams, features, labels,
               batch_size=10, num_epochs=2):
-    # Initialize model parameters.
+    # Initialize model parameters
     net, loss = d2l.linreg, d2l.squared_loss
     w = nd.random.normal(scale=0.01, shape=(features.shape[1], 1))
     b = nd.zeros(1)
@@ -70,11 +74,13 @@ def train_ch7(trainer_fn, states, hyperparams, features, labels,
         start = time.time()
         for batch_i, (X, y) in enumerate(data_iter):
             with autograd.record():
-                l = loss(net(X, w, b), y).mean()  # Average the loss.
+                l = loss(net(X, w, b), y).mean()  # Average the loss
             l.backward()
-            trainer_fn([w, b], states, hyperparams)  # Update model parameter(s).
+            # Update model parameters
+            trainer_fn([w, b], states, hyperparams)
             if (batch_i + 1) * batch_size % 100 == 0:
-                ls.append(eval_loss())  # Record the current training error for every 100 examples.
+                # Record the current training error for every 100 examples
+                ls.append(eval_loss())
     # Print and plot the results.
     print('loss: %f, %f sec per epoch' % (ls[-1], time.time() - start))
     d2l.set_figsize()
@@ -106,15 +112,15 @@ When the batch size equals 10, we use mini-batch SGD for optimization. The time 
 train_sgd(0.05, 10)
 ```
 
-## Implementation with Gluon
+## Concise Implementation
 
 In Gluon, we can use the `Trainer` class to call optimization algorithms. Next, we are going to implement a generic training function that uses the optimization name `trainer name` and hyperparameter `trainer_hyperparameter` to create the instance `Trainer`.
 
 ```{.python .input  n=8}
-# This function is saved in the d2l package for future use.
+# This function is saved in the d2l package for future use
 def train_gluon_ch7(trainer_name, trainer_hyperparams, features, labels,
                     batch_size=10, num_epochs=2):
-    # Initialize model parameters.
+    # Initialize model parameters
     net = nn.Sequential()
     net.add(nn.Dense(1))
     net.initialize(init.Normal(sigma=0.01))
@@ -126,7 +132,7 @@ def train_gluon_ch7(trainer_name, trainer_hyperparams, features, labels,
     ls = [eval_loss()]
     data_iter = gdata.DataLoader(
         gdata.ArrayDataset(features, labels), batch_size, shuffle=True)
-    # Create the instance "Trainer" to update model parameter(s).
+    # Create the instance "Trainer" to update model parameter(s)
     trainer = gluon.Trainer(
         net.collect_params(), trainer_name, trainer_hyperparams)
     for _ in range(num_epochs):
@@ -135,10 +141,11 @@ def train_gluon_ch7(trainer_name, trainer_hyperparams, features, labels,
             with autograd.record():
                 l = loss(net(X), y)
             l.backward()
-            trainer.step(batch_size)  # Average the gradient in the "Trainer" instance.
+            # Average the gradient in the "Trainer" instance
+            trainer.step(batch_size)
             if (batch_i + 1) * batch_size % 100 == 0:
                 ls.append(eval_loss())
-    # Print and plot the results.
+    # Print and plot the results
     print('loss: %f, %f sec per epoch' % (ls[-1], time.time() - start))
     d2l.set_figsize()
     d2l.plt.plot(np.linspace(0, num_epochs, len(ls)), ls)
@@ -169,6 +176,6 @@ train_gluon_ch7('sgd', {'learning_rate': 0.05}, features, labels, 10)
 
 [1] Aircraft wing noise data set. https://archive.ics.uci.edu/ml/datasets/Airfoil+Self-Noise
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2373)
 
-<div id="discuss" topic_id="2373"></div>
+![](../img/qr_minibatch-sgd.svg)

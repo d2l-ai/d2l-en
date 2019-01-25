@@ -148,13 +148,13 @@ We create a string of lyrics based on the currently trained model every 40 epoch
 
 ```{.python .input}
 d2l.train_and_predict_rnn(gru, get_params, init_gru_state, num_hiddens,
-                         vocab_size, ctx, corpus_indices, idx_to_char,
-                         char_to_idx, False, num_epochs, num_steps, lr,
-                         clipping_theta, batch_size, pred_period, pred_len,
-                         prefixes)
+                          vocab_size, ctx, corpus_indices, idx_to_char,
+                          char_to_idx, False, num_epochs, num_steps, lr,
+                          clipping_theta, batch_size, pred_period, pred_len,
+                          prefixes)
 ```
 
-## Gluon Implementation
+## Concise Implementation
 
 In Gluon, we can directly call the `GRU` class in the `rnn` module.
 
@@ -162,9 +162,9 @@ In Gluon, we can directly call the `GRU` class in the `rnn` module.
 gru_layer = rnn.GRU(num_hiddens)
 model = d2l.RNNModel(gru_layer, vocab_size)
 d2l.train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
-                               corpus_indices, idx_to_char, char_to_idx,
-                               num_epochs, num_steps, lr, clipping_theta,
-                               batch_size, pred_period, pred_len, prefixes)
+                                corpus_indices, idx_to_char, char_to_idx,
+                                num_epochs, num_steps, lr, clipping_theta,
+                                batch_size, pred_period, pred_len, prefixes)
 ```
 
 ## Summary
@@ -187,6 +187,6 @@ d2l.train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
 
 [2] Chung, J., Gulcehre, C., Cho, K., & Bengio, Y. (2014). Empirical evaluation of gated recurrent neural networks on sequence modeling. arXiv preprint arXiv:1412.3555.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2367)
 
-<div id="discuss" topic_id="2367"></div>
+![](../img/qr_gru.svg)

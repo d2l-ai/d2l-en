@@ -1,4 +1,4 @@
-# Building a Recurrent Neural Network from Scratch
+# Implementation of Recurrent Neural Networks from Scratch
 
 In this section, we will implement a language model from scratch. It is based on a character-level recurrent neural network that is trained on H. G. Wells' 'The Time Machine'. As before, we start by reading the dataset first.
 
@@ -27,7 +27,7 @@ nd.one_hot(nd.array([0, 2]), vocab_size)
 The shape of the mini-batch we sample each time is (batch size, time step). The following function transforms such mini-batches into a number of matrices with the shape of (batch size, dictionary size) that can be entered into the network. The total number of vectors is equal to the number of time steps. That is, the input of time step $t$ is $\boldsymbol{X}_t \in \mathbb{R}^{n \times d}$, where $n$ is the batch size and $d$ is the number of inputs. That is the one-hot vector length (the dictionary size).
 
 ```{.python .input  n=3}
-# This function is saved in the d2l package for future use.
+# This function is saved in the d2l package for future use
 def to_onehot(X, size):  
     return [nd.one_hot(x, size) for x in X.T]
 
@@ -81,8 +81,8 @@ The following `rnn` function defines how to compute the hidden state and output 
 
 ```{.python .input  n=6}
 def rnn(inputs, state, params):
-    # Both inputs and outputs are composed of num_steps matrices 
-    # of the shape (batch_size, vocab_size).
+    # Both inputs and outputs are composed of num_steps matrices of the shape
+    # (batch_size, vocab_size)
     W_xh, W_hh, b_h, W_hq, b_q = params
     H, = state
     outputs = []
@@ -108,19 +108,19 @@ len(outputs), outputs[0].shape, state_new[0].shape
 The following function predicts the next `num_chars` characters based on the `prefix` (a string containing several characters). This function is a bit more complicated. In it, we set the recurrent neural unit `rnn` as a function parameter, so that this function can be reused in the other recurrent neural networks described in following sections.
 
 ```{.python .input  n=8}
-# This function is saved in the d2l package for future use.
+# This function is saved in the d2l package for future use
 def predict_rnn(prefix, num_chars, rnn, params, init_rnn_state,
                 num_hiddens, vocab_size, ctx, idx_to_char, char_to_idx):
     state = init_rnn_state(1, num_hiddens, ctx)
     output = [char_to_idx[prefix[0]]]
     for t in range(num_chars + len(prefix) - 1):
-        # The output of the previous time step is taken 
-        # as the input of the current time step.
+        # The output of the previous time step is taken as the input of the
+        # current time step.
         X = to_onehot(nd.array([output[-1]], ctx=ctx), vocab_size)
-        # Calculate the output and update the hidden state.
+        # Calculate the output and update the hidden state
         (Y, state) = rnn(X, state, params)
-        # The input to the next time step is the character in 
-        # the prefix or the current best predicted character.
+        # The input to the next time step is the character in the prefix or
+        # the current best predicted character
         if t < len(prefix) - 1:
             output.append(char_to_idx[prefix[t + 1]])
         else:
@@ -151,7 +151,7 @@ $$\mathbf{g} \leftarrow \min\left(1, \frac{\theta}{\|\mathbf{g}\|}\right) \mathb
 By doing so we know that the gradient norm never exceeds $\theta$ and that the updated gradient is entirely aligned with the original direction $\mathbf{g}$. Back to the case at hand - optimization in RNNs. One of the issues is that the gradients in an RNN may either explode or vanish. Consider the chain of matrix-products involved in backpropagation. If the largest eigenvalue of the matrices is typically larger than $1$, then the product of many such matrices can be much larger than $1$. As a result, the aggregate gradient might explode. Gradient clipping provides a quick fix. While it doesn't entire solve the problem, it is one of the many techniques to alleviate it.
 
 ```{.python .input  n=10}
-# This function is saved in the d2l package for future use.
+# This function is saved in the d2l package for future use
 def grad_clipping(params, theta, ctx):
     norm = nd.array([0], ctx)
     for param in params:
@@ -201,7 +201,7 @@ Training a sequence model proceeds quite different from previous codes. In parti
 To allow for more flexibility the call signature and the code are slightly longer. This will allow us to replace the various pieces by a Gluon implementation subsequently without the need to change the training logic.
 
 ```{.python .input  n=11}
-# This function is saved in the d2l package for future use.
+# This function is saved in the d2l package for future use
 def train_and_predict_rnn(rnn, get_params, init_rnn_state, num_hiddens,
                           vocab_size, ctx, corpus_indices, idx_to_char,
                           char_to_idx, is_random_iter, num_epochs, num_steps,
@@ -217,38 +217,38 @@ def train_and_predict_rnn(rnn, get_params, init_rnn_state, num_hiddens,
     for epoch in range(num_epochs):
         if not is_random_iter:  
             # If adjacent sampling is used, the hidden state is initialized 
-            # at the beginning of the epoch.
+            # at the beginning of the epoch
             state = init_rnn_state(batch_size, num_hiddens, ctx)
         l_sum, n, start = 0.0, 0, time.time()
         data_iter = data_iter_fn(corpus_indices, batch_size, num_steps, ctx)
         for X, Y in data_iter:
             if is_random_iter:  
                 # If random sampling is used, the hidden state is initialized 
-                # before each mini-batch update.
+                # before each mini-batch update
                 state = init_rnn_state(batch_size, num_hiddens, ctx)
             else:  
                 # Otherwise, the detach function needs to be used to separate 
                 # the hidden state from the computational graph to avoid 
-                # backpropagation beyond the current sample.
+                # backpropagation beyond the current sample
                 for s in state:
                     s.detach()
             with autograd.record():
                 inputs = to_onehot(X, vocab_size)
                 # outputs is num_steps terms of shape (batch_size, vocab_size)
                 (outputs, state) = rnn(inputs, state, params)
-                # after stitching it is (num_steps * batch_size, vocab_size).
+                # After stitching it is (num_steps * batch_size, vocab_size)
                 outputs = nd.concat(*outputs, dim=0)
                 # The shape of Y is (batch_size, num_steps), and then becomes 
                 # a vector with a length of batch * num_steps after 
                 # transposition. This gives it a one-to-one correspondence 
-                # with output rows.
+                # with output rows
                 y = Y.T.reshape((-1,))
-                # Average classification error via cross entropy loss.
+                # Average classification error via cross entropy loss
                 l = loss(outputs, y).mean()
             l.backward()
-            grad_clipping(params, clipping_theta, ctx)  # Clip the gradient.
+            grad_clipping(params, clipping_theta, ctx)  # Clip the gradient
             d2l.sgd(params, lr, 1)  
-            # Since the error is the mean, no need to average gradients here.
+            # Since the error is the mean, no need to average gradients here
             l_sum += l.asscalar() * y.size
             n += y.size
 
@@ -313,6 +313,6 @@ The perplexity is quite a bit lower. In fact, both models are pretty close to $1
 1. Replace the activation function used in this section with ReLU and repeat the experiments in this section.
 1. Prove that the perplexity is the inverse of the harmonic mean of the conditional word probabilities. 
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2364)
 
-<div id="discuss" topic_id="23"></div>
+![](../img/qr_rnn-scratch.svg)

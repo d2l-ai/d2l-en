@@ -56,35 +56,41 @@ At prediction time we might not have the luxury of computing offsets per batch -
 Next, we will implement the batch normalization layer via the NDArray from scratch.
 
 ```{.python .input  n=72}
+import sys
+sys.path.insert(0, '..')
+
 import d2l
 from mxnet import autograd, gluon, init, nd
 from mxnet.gluon import nn
 
 def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
-    # Use autograd to determine whether the current mode is training mode or prediction mode.
+    # Use autograd to determine whether the current mode is training mode or
+    # prediction mode
     if not autograd.is_training():
-        # If it is the prediction mode, directly use the mean and variance obtained
-        # from the incoming moving average.
+        # If it is the prediction mode, directly use the mean and variance
+        # obtained from the incoming moving average
         X_hat = (X - moving_mean) / nd.sqrt(moving_var + eps)
     else:
         assert len(X.shape) in (2, 4)
         if len(X.shape) == 2:
-            # When using a fully connected layer, calculate the mean and variance
-            # on the feature dimension.
+            # When using a fully connected layer, calculate the mean and
+            # variance on the feature dimension
             mean = X.mean(axis=0)
             var = ((X - mean) ** 2).mean(axis=0)
         else:
-            # When using a two-dimensional convolutional layer, calculate the mean
-            # and variance on the channel dimension (axis=1). Here we need to maintain
-            # the shape of X, so that the broadcast operation can be carried out later.
+            # When using a two-dimensional convolutional layer, calculate the
+            # mean and variance on the channel dimension (axis=1). Here we
+            # need to maintain the shape of X, so that the broadcast operation
+            # can be carried out later
             mean = X.mean(axis=(0, 2, 3), keepdims=True)
             var = ((X - mean) ** 2).mean(axis=(0, 2, 3), keepdims=True)
-        # In training mode, the current mean and variance are used for the standardization.
+        # In training mode, the current mean and variance are used for the
+        # standardization
         X_hat = (X - mean) / nd.sqrt(var + eps)
-        # Update the mean and variance of the moving average.
+        # Update the mean and variance of the moving average
         moving_mean = momentum * moving_mean + (1.0 - momentum) * mean
         moving_var = momentum * moving_var + (1.0 - momentum) * var
-    Y = gamma * X_hat + beta  # Scale and shift.
+    Y = gamma * X_hat + beta  # Scale and shift
     return Y, moving_mean, moving_var
 ```
 
@@ -100,19 +106,22 @@ class BatchNorm(nn.Block):
             shape = (1, num_features)
         else:
             shape = (1, num_features, 1, 1)
-        # The scale parameter and the shift parameter involved in gradient finding and iteration are initialized to 0 and 1 respectively.
+        # The scale parameter and the shift parameter involved in gradient
+        # finding and iteration are initialized to 0 and 1 respectively
         self.gamma = self.params.get('gamma', shape=shape, init=init.One())
         self.beta = self.params.get('beta', shape=shape, init=init.Zero())
-        # All the variables not involved in gradient finding and iteration are initialized to 0 on the CPU.
+        # All the variables not involved in gradient finding and iteration are
+        # initialized to 0 on the CPU
         self.moving_mean = nd.zeros(shape)
         self.moving_var = nd.zeros(shape)
 
     def forward(self, X):
-        # If X is not on the CPU, copy moving_mean and moving_var to the device where X is located.
+        # If X is not on the CPU, copy moving_mean and moving_var to the
+        # device where X is located
         if self.moving_mean.context != X.context:
             self.moving_mean = self.moving_mean.copyto(X.context)
             self.moving_var = self.moving_var.copyto(X.context)
-        # Save the updated moving_mean and moving_var.
+        # Save the updated moving_mean and moving_var
         Y, self.moving_mean, self.moving_var = batch_norm(
             X, self.gamma.data(), self.beta.data(), self.moving_mean,
             self.moving_var, eps=1e-5, momentum=0.9)
@@ -149,7 +158,8 @@ lr, num_epochs, batch_size, ctx = 1.0, 5, 256, d2l.try_gpu()
 net.initialize(ctx=ctx, init=init.Xavier())
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
-d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
+d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,
+              num_epochs)
 ```
 
 Let's have a look at the scale parameter `gamma` and the shift parameter `beta` learned from the first batch normalization layer.
@@ -158,7 +168,7 @@ Let's have a look at the scale parameter `gamma` and the shift parameter `beta` 
 net[1].gamma.data().reshape((-1,)), net[1].beta.data().reshape((-1,))
 ```
 
-## Gluon Implementation for Batch Normalization
+## Concise Implementation
 
 Compared with the `BatchNorm` class, which we just defined ourselves, the `BatchNorm` class defined by the `nn` model in Gluon is easier to use. In Gluon, we do not have to define the `num_features` and `num_dims` parameter values required in the `BatchNorm` class. Instead, these parameter values will be obtained automatically by delayed initialization. The code looks virtually identical (save for the lack of an explicit specification of the dimensionality of the features for the Batch Normalization layers).
 
@@ -186,7 +196,8 @@ Use the same hyper-parameter to carry out the training. Note that as always the 
 ```{.python .input}
 net.initialize(ctx=ctx, init=init.Xavier())
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
-d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
+d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,
+              num_epochs)
 ```
 
 ## Summary
@@ -215,6 +226,6 @@ d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
 
 [1] Ioffe, S., & Szegedy, C. (2015). Batch normalization: Accelerating deep network training by reducing internal covariate shift. arXiv preprint arXiv:1502.03167.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2358)
 
-<div id="discuss" topic_id="2358"></div>
+![](../img/qr_batch-norm.svg)

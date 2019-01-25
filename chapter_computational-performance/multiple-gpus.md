@@ -1,6 +1,6 @@
-# Multi-GPU Computation
+# Multi-GPU Computation Implementation from Scratch
 
-In this section, we will show how to use multiple GPU for computation. For example, we can train the same model using multiple GPUs. As you might expect, running the programs in this section requires at least two GPUs. In fact, installing multiple GPUs on a single machine is common because there are usually multiple PCIe slots on the motherboard. If the Nvidia driver is properly installed, we can use the `nvidia-smi` command to view all GPUs on the current computer.
+In this section, we will show how to use multiple GPU for computation. For example, we can train the same model using multiple GPUs. As you might expect, running the programs in this section requires at least two GPUs. In fact, installing multiple GPUs on a single machine is common because there are usually multiple PCIe slots on the motherboard. If the NVIDIA driver is properly installed, we can use the `nvidia-smi` command to view all GPUs on the current computer.
 
 ```{.python .input  n=1}
 !nvidia-smi
@@ -20,6 +20,9 @@ Assume there are $k$ GPUs on a machine. Given the model to be trained, each GPU 
 In order to implement data parallelism in a multi-GPU training scenario from scratch, we first import the required packages or modules.
 
 ```{.python .input  n=2}
+import sys
+sys.path.insert(0, '..')
+
 import d2l
 import mxnet as mx
 from mxnet import autograd, nd
@@ -32,7 +35,7 @@ import time
 We use LeNet, introduced in the [“Convolutional Neural Networks (LeNet)”](../chapter_convolutional-neural-networks/lenet.md) section, as the sample model for this section. Here, the model implementation only uses NDArray.
 
 ```{.python .input  n=3}
-# Initialize model parameters.
+# Initialize model parameters
 scale = 0.01
 W1 = nd.random.normal(scale=scale, shape=(20, 1, 3, 3))
 b1 = nd.zeros(shape=20)
@@ -44,7 +47,7 @@ W4 = nd.random.normal(scale=scale, shape=(128, 10))
 b4 = nd.zeros(shape=10)
 params = [W1, b1, W2, b2, W3, b3, W4, b4]
 
-# Define the model.
+# Define the model
 def lenet(X, params):
     h1_conv = nd.Convolution(data=X, weight=params[0], bias=params[1],
                              kernel=(3, 3), num_filter=20)
@@ -62,7 +65,7 @@ def lenet(X, params):
     y_hat = nd.dot(h3, params[6]) + params[7]
     return y_hat
 
-# Cross-entropy loss function.
+# Cross-entropy loss function
 loss = gloss.SoftmaxCrossEntropyLoss()
 ```
 
@@ -110,7 +113,7 @@ Given a batch of data instances, the following `split_and_load` function can spl
 ```{.python .input  n=8}
 def split_and_load(data, ctx):
     n, k = data.shape[0], len(ctx)
-    m = n // k  # For simplicity, we assume the data is divisible.
+    m = n // k  # For simplicity, we assume the data is divisible
     assert m * k == n, '# examples is not divided by # devices.'
     return [data[i * m: (i + 1) * m].as_in_context(ctx[i]) for i in range(k)]
 ```
@@ -132,18 +135,21 @@ Now we can implement multi-GPU training on a single mini-batch. Its implementati
 
 ```{.python .input  n=10}
 def train_batch(X, y, gpu_params, ctx, lr):
-    # When ctx contains multiple GPUs, mini-batches of data instances are divided and copied to each GPU.
+    # When ctx contains multiple GPUs, mini-batches of data instances are
+    # divided and copied to each GPU
     gpu_Xs, gpu_ys = split_and_load(X, ctx), split_and_load(y, ctx)
-    with autograd.record():  # Loss is calculated separately on each GPU.
+    with autograd.record():  # Loss is calculated separately on each GPU
         ls = [loss(lenet(gpu_X, gpu_W), gpu_y)
               for gpu_X, gpu_y, gpu_W in zip(gpu_Xs, gpu_ys, gpu_params)]
-    for l in ls:  # Back Propagation is performed separately on each GPU.
+    for l in ls:  # Back Propagation is performed separately on each GPU
         l.backward()
-    # Add up all the gradients from each GPU and then broadcast them to all the GPUs.
+    # Add up all the gradients from each GPU and then broadcast them to all
+    # the GPUs
     for i in range(len(gpu_params[0])):
         allreduce([gpu_params[c][i].grad for c in range(len(ctx))])
-    for param in gpu_params:  # The model parameters are updated separately on each GPU.
-        d2l.sgd(param, lr, X.shape[0])  # Here, we use a full-size batch.
+    # The model parameters are updated separately on each GPU
+    for param in gpu_params:
+        d2l.sgd(param, lr, X.shape[0])  # Here, we use a full-size batch
 ```
 
 ## Training Functions
@@ -155,17 +161,17 @@ def train(num_gpus, batch_size, lr):
     train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
     ctx = [mx.gpu(i) for i in range(num_gpus)]
     print('running on:', ctx)
-    # Copy model parameters to num_gpus GPUs.
+    # Copy model parameters to num_gpus GPUs
     gpu_params = [get_params(params, c) for c in ctx]
     for epoch in range(4):
         start = time.time()
         for X, y in train_iter:
-            # Perform multi-GPU training for a single mini-batch.
+            # Perform multi-GPU training for a single mini-batch
             train_batch(X, y, gpu_params, ctx, lr)
             nd.waitall()
         train_time = time.time() - start
 
-        def net(x):  # Verify the model on GPU 0.
+        def net(x):  # Verify the model on GPU 0
             return lenet(x, gpu_params[0])
 
         test_acc = d2l.evaluate_accuracy(test_iter, net, ctx[0])
@@ -197,6 +203,6 @@ train(num_gpus=2, batch_size=256, lr=0.2)
 * In a multi-GPU training experiment, use 2 GPUs for training and double the `batch_size` to 512. How does the training time change? If we want a test accuracy comparable with the results of single-GPU training, how should the learning rate be adjusted?
 * Change the model prediction part of the experiment to multi-GPU prediction.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2383)
 
-<div id="discuss" topic_id="2383"></div>
+![](../img/qr_multiple-gpus.svg)

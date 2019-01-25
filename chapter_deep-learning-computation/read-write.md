@@ -91,6 +91,6 @@ yclone == y
 1. Assume that we want to reuse only parts of a network to be incorporated into a network of a *different* architecture. How would you go about using, say the first two layers from a previous network in a new network.
 1. How would you go about saving network architecture and parameters? What restrictions would you impose on the architecture?
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2329)
 
-<div id="discuss" topic_id="2329"></div>
+![](../img/qr_read-write.svg)

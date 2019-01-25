@@ -7,6 +7,9 @@ Object detection is widely used in many fields. For example, in self-driving tec
 In the next few sections, we will introduce multiple deep learning models used for object detection. Before that, we should discuss the concept of target location. First, import the packages and modules required for the experiment.
 
 ```{.python .input}
+import sys
+sys.path.insert(0, '..')
+
 %matplotlib inline
 import d2l
 from mxnet import image
@@ -17,7 +20,7 @@ Next, we will load the sample images that will be used in this section. We can s
 ```{.python .input}
 d2l.set_figsize()
 img = image.imread('../img/catdog.jpg').asnumpy()
-d2l.plt.imshow(img);  # Add a semicolon to only display the image.
+d2l.plt.imshow(img);  # Add a semicolon to only display the image
 ```
 
 ## Bounding Box
@@ -25,16 +28,18 @@ d2l.plt.imshow(img);  # Add a semicolon to only display the image.
 In object detection, we usually use a bounding box to describe the target location. The bounding box is a rectangular box that can be determined by the $x$ and $y$ axis coordinates in the upper-left corner and the $x$ and $y$ axis coordinates in the lower-right corner of the rectangle. We will define the bounding boxes of the dog and the cat in the image based on the coordinate information in the above image. The origin of the coordinates in the above image is the upper left corner of the image, and to the right and down are the positive directions of the $x$ axis and the $y$ axis, respectively.
 
 ```{.python .input  n=2}
-# bbox is the abbreviation for bounding box.
+# bbox is the abbreviation for bounding box
 dog_bbox, cat_bbox = [60, 45, 378, 516], [400, 112, 655, 493]
 ```
 
 We can draw the bounding box in the image to check if it is accurate. Before drawing the box, we will define a helper function `bbox_to_rect`. It represents the bounding box in the bounding box format of matplotlib.
 
 ```{.python .input  n=3}
-def bbox_to_rect(bbox, color):  # This function is saved in the d2l package for future use.
-    # Convert the bounding box (top-left x, top-left y, bottom-right x, bottom-right y) format to matplotlib format:
-    # ((upper-left x, upper-left y), width, height).
+# This function has been saved in the d2l package for future use
+def bbox_to_rect(bbox, color):
+    # Convert the bounding box (top-left x, top-left y, bottom-right x,
+    # bottom-right y) format to matplotlib format: ((upper-left x,
+    # upper-left y), width, height)
     return d2l.plt.Rectangle(
         xy=(bbox[0], bbox[1]), width=bbox[2]-bbox[0], height=bbox[3]-bbox[1],
         fill=False, edgecolor=color, linewidth=2)
@@ -57,6 +62,6 @@ fig.axes.add_patch(bbox_to_rect(cat_bbox, 'red'));
 * Find some images and try to label a bounding box that contains the target. Compare the difference between the time it takes to label the bounding box and label the category.
 
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2444)
 
-<div id="discuss" topic_id="2444"></div>
+![](../img/qr_bounding-box.svg)

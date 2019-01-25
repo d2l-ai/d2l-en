@@ -74,8 +74,7 @@ master_doc = 'index'
 # General information about the project.
 project = 'Dive into Deep Learning'
 copyright = '2017--2019'
-author = "A. Zhang, Z. C. Lipton, M. Li, and A. J. Smola"
-
+author = "Aston Zhang\\\\Zachary C. Lipton\\\\Mu Li\\\\Alexander J. Smola"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -256,17 +255,6 @@ latex_elements = {
     'babel'     : r'''\usepackage[english]{babel}''',
     'preamble' : r'''
 
-
-\usepackage{ctex}
-\setmainfont{Source Serif Pro}
-\setsansfont{Source Sans Pro}
-\setmonofont{Source Code Pro}
-\setCJKmainfont[BoldFont=Source Han Serif SC SemiBold]{Source Han Serif SC}
-\setCJKsansfont[BoldFont=Source Han Sans SC Medium]{Source Han Sans SC Normal}
-\setCJKmonofont{Source Han Sans SC Normal}
-
-
-
 \usepackage{setspace}
 \singlespacing
 
@@ -286,8 +274,6 @@ latex_elements = {
         \fancyhead[LE,RO]{{\py@HeaderFamily }}
      }
 \makeatother
-
-\CJKsetecglue{}
 ''',
 # The paper size ('letterpaper' or 'a4paper').
 #'papersize': 'letterpaper',

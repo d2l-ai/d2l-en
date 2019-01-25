@@ -1,4 +1,4 @@
-# Gluon Implementation of Linear Regression
+# Concise Implementation of Linear Regression
 
 With the development of deep learning frameworks, it has become increasingly easy to develop deep learning applications. In practice, we can usually implement the same model, but much more concisely how we introduce it in the previous section. In this section, we will introduce how to use the Gluon interface provided by MXNet.
 
@@ -26,9 +26,9 @@ Gluon provides the `data` module to read data. Since `data` is often used as a v
 from mxnet.gluon import data as gdata
 
 batch_size = 10
-# Combining the features and labels of the training data.
+# Combine the features and labels of the training data
 dataset = gdata.ArrayDataset(features, labels)
-# Randomly reading mini-batches.
+# Randomly reading mini-batches
 data_iter = gdata.DataLoader(dataset, batch_size, shuffle=True)
 ```
 
@@ -80,7 +80,7 @@ In Gluon, the module `loss` defines various loss functions. We will replace the 
 
 ```{.python .input  n=8}
 from mxnet.gluon import loss as gloss
-loss = gloss.L2Loss()  # The squared loss is also known as the L2 norm loss.
+loss = gloss.L2Loss()  # The squared loss is also known as the L2 norm loss
 ```
 
 ## Define the Optimization Algorithm
@@ -139,6 +139,6 @@ print('Error in estimating b', true_b - b)
 1. Review the MXNet documentation to see what loss functions and initialization methods are provided in the modules `gluon.loss` and `init`. Replace the loss by Huber's loss.
 1. How do you access the gradient of `dense.weight`?
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2333)
 
-<div id="discuss" topic_id="2333"></div>
+![](../img/qr_linear-regression-gluon.svg)

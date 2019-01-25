@@ -8,6 +8,9 @@ There are no small data sets, like MNIST or Fashion-MNIST, in the object detecti
 The Pikachu data set in RecordIO format can be downloaded directly from the Internet. The operation for downloading the data set is defined in the function `_download_pikachu`.
 
 ```{.python .input  n=1}
+import sys
+sys.path.insert(0, '..')
+
 %matplotlib inline
 import d2l
 from mxnet import gluon, image
@@ -29,17 +32,18 @@ def _download_pikachu(data_dir):
 We are going to read the object detection data set by creating the instance `ImageDetIter`. The "Det" in the name refers to Detection. We will read the training data set in random order. Since the format of the data set is RecordIO, we need the image index file `'train.idx'` to read random mini-batches. In addition, for each image of the training set, we will use random cropping and require the cropped image to cover at least 95% of each object. Since the cropping is random, this requirement is not always satisfied. We preset the maximum number of random cropping attempts to 200. If none of them meets the requirement, the image will not be cropped. To ensure the certainty of the output, we will not randomly crop the images in the test data set. We also do not need to read the test data set in random order.
 
 ```{.python .input  n=2}
-# This function is saved in the d2l package for future use.
-def load_data_pikachu(batch_size, edge_size=256):  # Edge_size: the width and height of the output image.
+# This function has been saved in the d2l package for future use
+# Edge_size: the width and height of the output image
+def load_data_pikachu(batch_size, edge_size=256):
     data_dir = '../data/pikachu'
     _download_pikachu(data_dir)
     train_iter = image.ImageDetIter(
         path_imgrec=os.path.join(data_dir, 'train.rec'),
         path_imgidx=os.path.join(data_dir, 'train.idx'),
         batch_size=batch_size,
-        data_shape=(3, edge_size, edge_size),  # The shape of the output image.
-        shuffle=True,  # Read the data set in random order.
-        rand_crop=1,  # The probability of random cropping is 1.
+        data_shape=(3, edge_size, edge_size),  # The shape of the output image
+        shuffle=True,  # Read the data set in random order
+        rand_crop=1,  # The probability of random cropping is 1
         min_object_covered=0.95, max_attempts=200)
     val_iter = image.ImageDetIter(
         path_imgrec=os.path.join(data_dir, 'val.rec'), batch_size=batch_size,
@@ -83,6 +87,6 @@ for ax, label in zip(axes, batch.label[0][0:10]):
 
 [2] GluonCV Toolkit. https://gluon-cv.mxnet.io/
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2452)
 
-<div id="discuss" topic_id="2452"></div>
+![](../img/qr_object-detection-dataset.svg)

@@ -3,6 +3,9 @@
 In the "Convolutional Neural Networks" chapter, we explored how to process two-dimensional image data with two-dimensional convolutional neural networks. In the previous language models and text classification tasks, we treated text data as a time series with only one dimension, and naturally, we used recurrent neural networks to process such data. In fact, we can also treat text as a one-dimensional image, so that we can use one-dimensional convolutional neural networks to capture associations between adjacent words. This section describes a groundbreaking approach to applying convolutional neural networks to text analysis: textCNN[1]. First, import the packages and modules required for the experiment.
 
 ```{.python .input  n=2}
+import sys
+sys.path.insert(0, '..')
+
 import d2l
 from mxnet import gluon, init, nd
 from mxnet.contrib import text
@@ -41,8 +44,9 @@ Now, we reproduce the results of the one-dimensional cross-correlation operation
 
 ```{.python .input  n=5}
 def corr1d_multi_in(X, K):
-    # First, we traverse along the 0th dimension (channel dimension) of X and K. Then, we add them together by using * to turn
-    # the result list into a positional argument of the add_n function.
+    # First, we traverse along the 0th dimension (channel dimension) of X and
+    # K. Then, we add them together by using * to turn the result list into a
+    # positional argument of the add_n function
     return nd.add_n(*[corr1d(x, k) for x, k in zip(X, K)])
 
 X = nd.array([[0, 1, 2, 3, 4, 5, 6],
@@ -101,27 +105,35 @@ class TextCNN(nn.Block):
                  **kwargs):
         super(TextCNN, self).__init__(**kwargs)
         self.embedding = nn.Embedding(len(vocab), embed_size)
-        # The embedding layer does not participate in training.
+        # The embedding layer does not participate in training
         self.constant_embedding = nn.Embedding(len(vocab), embed_size)
         self.dropout = nn.Dropout(0.5)
         self.decoder = nn.Dense(2)
-        # The max-over-time pooling layer has no weight, so it can share an instance.
+        # The max-over-time pooling layer has no weight, so it can share an
+        # instance
         self.pool = nn.GlobalMaxPool1D()
-        self.convs = nn.Sequential()  # Create multiple one-dimensional convolutional layers.
+        # Create multiple one-dimensional convolutional layers
+        self.convs = nn.Sequential()
         for c, k in zip(num_channels, kernel_sizes):
             self.convs.add(nn.Conv1D(c, k, activation='relu'))
 
     def forward(self, inputs):
-        # Concatenate the output of two embedding layers with shape of (batch size, number of words, word vector dimension) by word vector.
+        # Concatenate the output of two embedding layers with shape of
+        # (batch size, number of words, word vector dimension) by word vector
         embeddings = nd.concat(
             self.embedding(inputs), self.constant_embedding(inputs), dim=2)
-        # According to the input format required by Conv1D, the word vector dimension, that is, the channel dimension of the one-dimensional convolutional layer, is transformed into the previous dimension.
+        # According to the input format required by Conv1D, the word vector
+        # dimension, that is, the channel dimension of the one-dimensional
+        # convolutional layer, is transformed into the previous dimension
         embeddings = embeddings.transpose((0, 2, 1))
-        # For each one-dimensional convolutional layer, after max-over-time pooling, an NDArray with the shape of (batch size, channel size, 1)
-        # can be obtained. Use the flatten function to remove the last dimension and then concatenate on the channel dimension.
+        # For each one-dimensional convolutional layer, after max-over-time
+        # pooling, an NDArray with the shape of (batch size, channel size, 1)
+        # can be obtained. Use the flatten function to remove the last
+        # dimension and then concatenate on the channel dimension
         encoding = nd.concat(*[nd.flatten(
             self.pool(conv(embeddings))) for conv in self.convs], dim=1)
-        # After applying the dropout method, use a fully connected layer to obtain the output.
+        # After applying the dropout method, use a fully connected layer to
+        # obtain the output
         outputs = self.decoder(self.dropout(encoding))
         return outputs
 ```
@@ -190,6 +202,6 @@ d2l.predict_sentiment(net, vocab, ['this', 'movie', 'is', 'so', 'bad'])
 
 [1] Kim, Y. (2014). Convolutional neural networks for sentence classification. arXiv preprint arXiv:1408.5882.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2392)
 
-<div id="discuss" topic_id="2392"></div>
+![](../img/qr_sentiment-analysis-cnn.svg)

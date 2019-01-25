@@ -8,14 +8,14 @@ In the introduction to this book we discussed the rapid growth of computation ov
 |1980|1 K (House prices in Boston)|100 KB|1 MF (Intel 80186)|
 |1990|10 K (optical character recognition)|10 MB|10 MF (Intel 80486)|
 |2000|10 M (web pages)|100 MB|1 GF (Intel Core)|
-|2010|10 G (advertising)|1 GB|1 TF (Nvidia C2050)|
-|2020|1 T (social network)|100 GB|1 PF (Nvidia DGX-2)|
+|2010|10 G (advertising)|1 GB|1 TF (NVIDIA C2050)|
+|2020|1 T (social network)|100 GB|1 PF (NVIDIA DGX-2)|
 
 In this section we begin to discuss how to harness this compute performance for your research. First by using single GPUs and at a later point, how to use multiple GPUs and multiple servers (with multiple GPUs). You might have noticed that MXNet NDArray looks almost identical to NumPy. But there are a few crucial differences. One of the key features that differentiates MXNet from NumPy is its support for diverse hardware devices.
 
 In MXNet, every array has a context. In fact, whenever we displayed an NDArray so far, it added a cryptic `@cpu(0)` notice to the output which remained unexplained so far. As we will discover, this just indicates that the computation is being executed on the CPU. Other contexts might be various GPUs. Things can get even hairier when we deploy jobs across multiple servers. By assigning arrays to contexts intelligently, we can minimize the time spent transferring data between devices. For example, when training neural networks on a server with a GPU, we typically prefer for the model’s parameters to live on the GPU.
 
-In short, for complex neural networks and large-scale data, using only CPUs for computation may be inefficient. In this section, we will discuss how to use a single Nvidia GPU for calculations. First, make sure you have at least one Nvidia GPU installed. Then, [download CUDA](https://developer.nvidia.com/cuda-downloads) and follow the prompts to set the appropriate path. Once these preparations are complete, the `nvidia-smi` command can be used to view the graphics card information.
+In short, for complex neural networks and large-scale data, using only CPUs for computation may be inefficient. In this section, we will discuss how to use a single NVIDIA GPU for calculations. First, make sure you have at least one NVIDIA GPU installed. Then, [download CUDA](https://developer.nvidia.com/cuda-downloads) and follow the prompts to set the appropriate path. Once these preparations are complete, the `nvidia-smi` command can be used to view the graphics card information.
 
 ```{.python .input  n=1}
 !nvidia-smi
@@ -158,6 +158,6 @@ In short, as long as all data and parameters are on the same device, we can lear
 
 [1] CUDA download address. https://developer.nvidia.com/cuda-downloads
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2330)
 
-<div id="discuss" topic_id="2330"></div>
+![](../img/qr_use-gpu.svg)

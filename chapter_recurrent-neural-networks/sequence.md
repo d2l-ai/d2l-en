@@ -65,16 +65,14 @@ In many cases, however, there exists a natural direction for the data, namely go
 After so much theory, let's try this out in practice. Since much of the modeling is identical to when we built regression estimators in Gluon, we will not delve into much detail regarding the choice of architecture besides the fact that we will use several layers of a fully connected network. Let's begin by generating some data. To keep things simple we generate our 'time series' by using a sine function with some additive noise.
 
 ```{.python .input}
-from mxnet import autograd, nd, gluon, init
-import d2l
-# display routines
 %matplotlib inline
-from matplotlib import pyplot as plt
 from IPython import display
+from matplotlib import pyplot as plt
+from mxnet import autograd, nd, gluon, init
 display.set_matplotlib_formats('svg')
 
-embedding = 4 # embedding dimension for autoregressive model
-T = 1000      # generate a total of 1000 points 
+embedding = 4  # Embedding dimension for autoregressive model
+T = 1000  # Generate a total of 1000 points 
 time = nd.arange(0,T)
 x = nd.sin(0.01 * time) + 0.2 * nd.random.normal(shape=(T))
 
@@ -93,7 +91,7 @@ ntrain = 600
 train_data = gluon.data.ArrayDataset(features[:ntrain,:], labels[:ntrain])
 test_data  = gluon.data.ArrayDataset(features[ntrain:,:], labels[ntrain:])
 
-# vanilla MLP architecture
+# Vanilla MLP architecture
 def get_net():
     net = gluon.nn.Sequential()
     net.add(gluon.nn.Dense(10, activation='relu'))
@@ -102,17 +100,18 @@ def get_net():
     net.initialize(init.Xavier())
     return net
 
-# least mean squares loss
+# Least mean squares loss
 loss = gluon.loss.L2Loss()
 ```
 
 We kept the architecture fairly simple. A few layers of a fully connected network, ReLu activation and $\ell_2$ loss. Now we are ready to train.
 
 ```{.python .input}
-# simple optimizer using adam, random shuffle and minibatch size 16
+# Simple optimizer using adam, random shuffle and minibatch size 16
 def train_net(net, data, loss, epochs, learningrate):
     batch_size = 16
-    trainer = gluon.Trainer(net.collect_params(), 'adam', {'learning_rate': learningrate})
+    trainer = gluon.Trainer(net.collect_params(), 'adam',
+                            {'learning_rate': learningrate})
     data_iter = gluon.data.DataLoader(data, batch_size, shuffle=True)
     for epoch in range(1, epochs + 1):
         for X, y in data_iter:
@@ -156,11 +155,13 @@ In other words, very quickly will we have to use our own predictions to make fut
 predictions = nd.zeros_like(estimates)
 predictions[:(ntrain-embedding)] = estimates[:(ntrain-embedding)]
 for i in range(ntrain-embedding, T-embedding):
-    predictions[i] = net(predictions[(i-embedding):i].reshape(1,-1)).reshape(1)
+    predictions[i] = net(
+        predictions[(i-embedding):i].reshape(1,-1)).reshape(1)
     
 plt.plot(time.asnumpy(), x.asnumpy(), label='data');
 plt.plot(time[embedding:].asnumpy(), estimates.asnumpy(), label='estimate');
-plt.plot(time[embedding:].asnumpy(), predictions.asnumpy(), label='multistep');
+plt.plot(time[embedding:].asnumpy(), predictions.asnumpy(),
+         label='multistep');
 plt.legend();
 ```
 
@@ -169,7 +170,7 @@ As the above example shows, this is a spectacular failure. The estimates decay t
 Let's verify this observation by computing the $k$-step predictions on the entire sequence.
 
 ```{.python .input}
-k = 33 # look up to k - embedding steps ahead
+k = 33  # Look up to k - embedding steps ahead
 
 features = nd.zeros((T-k, k))
 for i in range(embedding):
@@ -179,9 +180,9 @@ for i in range(embedding, k):
     features[:,i] = net(features[:,(i-embedding):i]).reshape((-1))
     
 for i in (4, 8, 16, 32):   
-    plt.plot(time[i:T-k+i].asnumpy(), features[:,i].asnumpy(), label=('step ' + str(i)))
+    plt.plot(time[i:T-k+i].asnumpy(), features[:,i].asnumpy(),
+             label=('step ' + str(i)))
 plt.legend();
-
 ```
 
 This clearly illustrates how the quality of the estimates changes as we try to predict further into the future. While the 8-step predictions are still pretty good, anything beyond that is pretty useless. 
@@ -204,4 +205,6 @@ This clearly illustrates how the quality of the estimates changes as we try to p
 1. Does causality also apply to text? To which extent?
 1. Give an example for when a latent variable autoregressive model might be needed to capture the dynamic of the data. 
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2860)
+
+![](../img/qr_sequence.svg)

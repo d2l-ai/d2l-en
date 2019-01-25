@@ -33,7 +33,7 @@ import math
 counts = np.zeros(100)
 fig, axes = plt.subplots(2, 3, figsize=(15, 8), sharex=True)
 axes = axes.reshape(6)
-# mangle subplots such that we can index them in a linear fashion rather than
+# Mangle subplots such that we can index them in a linear fashion rather than
 # a 2d grid
 
 for i in range(1, 1000001):
@@ -50,11 +50,11 @@ What we can see from the above figures is that the initial number of counts look
 Quite obviously, drawing from a uniform distribution over a set of 100 outcomes is quite simple. But what if we have nonuniform probabilities? Let's start with a simple case, a biased coin which comes up heads with probability 0.35 and tails with probability 0.65. A simple way to sample from that is to generate a uniform random variable over $[0,1]$ and if the number is less than $0.35$, we output heads and otherwise we generate tails. Let's try this out.
 
 ```{.python .input}
-# number of samples
+# Number of samples
 n = 1000000
 y = np.random.uniform(0, 1, n)
 x = np.arange(1, n+1)
-# count number of occurrences and divide by the number of total draws
+# Count number of occurrences and divide by the number of total draws
 p0 = np.cumsum(y < 0.35) / x
 p1 = np.cumsum(y >= 0.35) / x
 
@@ -100,13 +100,14 @@ The above allows us to change both mean and variance of random variables. Quite 
 Now we are ready to state one of the most fundamental theorems in statistics, the [Central Limit Theorem](https://en.wikipedia.org/wiki/Central_limit_theorem). It states that for sufficiently well-behaved random variables, in particular random variables with well-defined mean and variance, the sum tends toward a normal distribution. To get some idea, let's repeat the experiment described in the beginning, but now using random variables with integer values of $\{0, 1, 2\}$.
 
 ```{.python .input}
-# generate 10 random sequences of 10,000 uniformly distributed random variables
+# Generate 10 random sequences of 10,000 uniformly distributed random variables
 tmp = np.random.uniform(size=(10000,10))
 x = 1.0 * (tmp > 0.3) + 1.0 * (tmp > 0.8)
 mean = 1 * 0.5 + 2 * 0.2
 variance = 1 * 0.5 + 4 * 0.2 - mean**2
 print('mean {}, variance {}'.format(mean, variance))
-# cumulative sum and normalization
+
+# Cumulative sum and normalization
 y = np.arange(1,10001).reshape(10000,1)
 z = np.cumsum(x,axis=0) / y
 
@@ -136,6 +137,6 @@ Many more useful distributions exist. We recommend consulting a statistics book 
 * **Beta, Dirichlet, Gamma, and Wishart Distributions** They are what statisticians call *conjugate* to the Binomial, Multinomial, Poisson and Gaussian respectively. Without going into detail, these distributions are often used as priors for coefficients of the latter set of distributions, e.g. a Beta distribution as a prior for modeling the probability for binomial outcomes.
 
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2321)
 
-<div id="discuss" topic_id="2321"></div>
+![](../img/qr_sampling.svg)

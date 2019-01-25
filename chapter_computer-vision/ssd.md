@@ -21,6 +21,9 @@ Specifically, the category prediction layer uses a convolutional layer that main
 Now, we will define a category prediction layer of this type. After we specify the parameters $a$ and $q$, it uses a $3\times3$ convolutional layer with a padding of 1. The heights and widths of the input and output of this convolutional layer remain unchanged.
 
 ```{.python .input  n=1}
+import sys
+sys.path.insert(0, '..')
+
 %matplotlib inline
 import d2l
 from mxnet import autograd, contrib, gluon, image, init, nd
@@ -151,7 +154,7 @@ class TinySSD(nn.Block):
         super(TinySSD, self).__init__(**kwargs)
         self.num_classes = num_classes
         for i in range(5):
-            # The assignment statement is self.blk_i = get_blk(i).
+            # The assignment statement is self.blk_i = get_blk(i)
             setattr(self, 'blk_%d' % i, get_blk(i))
             setattr(self, 'cls_%d' % i, cls_predictor(num_anchors,
                                                       num_classes))
@@ -160,11 +163,12 @@ class TinySSD(nn.Block):
     def forward(self, X):
         anchors, cls_preds, bbox_preds = [None] * 5, [None] * 5, [None] * 5
         for i in range(5):
-            # getattr(self, 'blk_%d' % i) accesses self.blk_i.
+            # getattr(self, 'blk_%d' % i) accesses self.blk_i
             X, anchors[i], cls_preds[i], bbox_preds[i] = blk_forward(
                 X, getattr(self, 'blk_%d' % i), sizes[i], ratios[i],
                 getattr(self, 'cls_%d' % i), getattr(self, 'bbox_%d' % i))
-        # In the reshape function, 0 indicates that the batch size remains unchanged.
+        # In the reshape function, 0 indicates that the batch size remains
+        # unchanged
         return (nd.concat(*anchors, dim=1),
                 concat_preds(cls_preds).reshape(
                     (0, -1, self.num_classes + 1)), concat_preds(bbox_preds))
@@ -223,7 +227,8 @@ We can use the accuracy rate to evaluate the classification results. As we use t
 
 ```{.python .input  n=18}
 def cls_eval(cls_preds, cls_labels):
-    # Because the category prediction results are placed in the final dimension, argmax must specify this dimension.
+    # Because the category prediction results are placed in the final
+    # dimension, argmax must specify this dimension
     return (cls_preds.argmax(axis=-1) == cls_labels).sum().asscalar()
 
 def bbox_eval(bbox_preds, bbox_labels, bbox_masks):
@@ -243,12 +248,14 @@ for epoch in range(20):
         X = batch.data[0].as_in_context(ctx)
         Y = batch.label[0].as_in_context(ctx)
         with autograd.record():
-            # Generate multiscale anchor boxes and predict the category and offset of each.
+            # Generate multiscale anchor boxes and predict the category and
+            # offset of each
             anchors, cls_preds, bbox_preds = net(X)
-            # Label the category and offset of each anchor box.
+            # Label the category and offset of each anchor box
             bbox_labels, bbox_masks, cls_labels = contrib.nd.MultiBoxTarget(
                 anchors, Y, cls_preds.transpose((0, 2, 1)))
-            # Calculate the loss function using the predicted and labeled category and offset values.
+            # Calculate the loss function using the predicted and labeled
+            # category and offset values
             l = calc_loss(cls_preds, cls_labels, bbox_preds, bbox_labels,
                           bbox_masks)
         l.backward()
@@ -355,7 +362,7 @@ def focal_loss(gamma, x):
 x = nd.arange(0.01, 1, 0.01)
 for l, gamma in zip(lines, [0, 1, 5]):
     y = d2l.plt.plot(x.asnumpy(), focal_loss(gamma, x).asnumpy(), l,
-                    label='gamma=%.1f' % gamma)
+                     label='gamma=%.1f' % gamma)
 d2l.plt.legend();
 ```
 
@@ -372,6 +379,6 @@ d2l.plt.legend();
 
 [2] Lin, T. Y., Goyal, P., Girshick, R., He, K., & Dollár, P. (2018). Focal loss for dense object detection. IEEE transactions on pattern analysis and machine intelligence.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2453)
 
-<div id="discuss" topic_id="2453"></div>
+![](../img/qr_ssd.svg)
