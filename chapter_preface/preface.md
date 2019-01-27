@@ -441,12 +441,8 @@ by engaging the authors and broader community.
 
 ## Discuss on our Forum
 
-<div id="discuss" topic_id="2311"></div>
 
-<!-- LEFT OVER FROM THE INSTALL SECTION BEFORE IT WAS ABSORBED INTO PREFACE
-## Discuss on our Forum
-
-<div id="discuss" topic_id="2315"></div> -->
+<div id="discuss" topic_id="2315"></div>
 
 
 ## Acknowledgments
