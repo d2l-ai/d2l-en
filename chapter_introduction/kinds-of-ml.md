@@ -1,230 +1,8 @@
-# Introduction
-
-Before we could begin writing, the authors of this book, like much of
-the work force, had to become caffeinated.  We hopped in the car and
-started driving.  Using an iPhone, Alex called out 'Hey Siri',
-awakening the phone's voice recognition system.  Then Mu commanded
-'directions to Blue Bottle coffee shop'.  The phone quickly displayed
-the transcription of his command.  It also recognized that we were
-asking for directions and launched the Maps application to fulfill our request.  Once launched, the Maps app identified a number of routes. Next to each route, the phone displayed a predicted transit time. While we fabricated this story for pedagogical convenience, it demonstrates that in the span of just a few seconds, our everyday interactions with a smartphone can engage several machine learning
-models.
-
-If you've never worked with machine learning before, you might be
-wondering what we're talking about.  You might ask, 'isn't that just
-programming?' or 'what does *machine learning* even mean?'  First, to
-be clear, we implement all machine learning algorithms by writing
-computer programs.  Indeed, we use the same languages and hardware as
-other fields of computer science, but not all computer programs
-involve machine learning.  In response to the second question,
-precisely defining a field of study as vast as machine learning is
-hard.  It's a bit like answering, 'what is math?'.  But we'll try to
-give you enough intuition to get started.
-
-
-## A motivating example
-
-Most of the computer programs we interact with every day
-can be coded up from first principles.
-When you add an item to your shopping cart,
-you trigger an e-commerce application to store an entry
-in a *shopping cart* database table,
-associating your user ID with the product's ID.
-We can write such a program from first principles,
-launch without ever having seen a real customer.
-When it's this easy to write an application
-*you should not be using machine learning*.
-
-Fortunately (for the community of ML scientists)
-for many problems, solutions aren't so easy.
-Returning to our fake story about going to get coffee,
-imagine just writing a program to respond to a *wake word*
-like 'Alexa', 'Okay, Google' or 'Siri'.
-Try coding it up in a room by yourself
-with nothing but a computer and a code editor.
-How would you write such a program from first principles?
-Think about it... the problem is hard.
-Every second, the microphone will collect roughly 44,000 samples.
-What rule could map reliably from a snippet of raw audio
-to confident predictions ``{yes, no}``
-on whether the snippet contains the wake word?
-If you're stuck, don't worry.
-We don't know how to write such a program from scratch either.
-That's why we use machine learning.
-
-![](../img/wake-word.svg)
-
-Here's the trick.
-Often, even when we don't know how to tell a computer
-explicitly how to map from inputs to outputs,
-we are nonetheless capable of performing the cognitive feat ourselves.
-In other words, even if you don't know *how to program a computer* to recognize the word 'Alexa',
-you yourself *are able* to recognize the word 'Alexa'.
-Armed with this ability,
-we can collect a huge *data set* containing examples of audio
-and label those that *do* and that *do not* contain the wake word.
-In the machine learning approach, we do not design a system *explicitly* to recognize
-wake words right away.
-Instead, we define a flexible program with a number of *parameters*.
-These are knobs that we can tune to change the behavior of the program.
-We call this program a model.
-Generally, our model is just a machine that transforms its input into some output.
-In this case, the model receives as *input* a snippet of audio,
-and it generates as output an answer ``{yes, no}``,
-which we hope reflects whether (or not) the snippet contains the wake word.
-
-If we choose the right kind of model,
-then there should exist one setting of the knobs
-such that the model fires ``yes`` every time it hears the word 'Alexa'.
-There should also be another setting of the knobs that might fire ``yes``
-on the word 'Apricot'.
-We expect that the same model should apply to 'Alexa' recognition and 'Apricot' recognition
-because these are similar tasks.
-However, we might need a different model to deal with fundamentally different inputs or outputs.
-For example, we might choose a different sort of machine to map from images to captions,
-or from English sentences to Chinese sentences.
-
-As you might guess, if we just set the knobs randomly,
-the model will probably recognize neither 'Alexa', 'Apricot',
-nor any other English word.
-Generally, in deep learning, the *learning*
-refers precisely
-to updating the model's behavior (by twisting the knobs)
-over the course of a *training period*.
-
-The training process usually looks like this:
-
-1. Start off with a randomly initialized model that can't do anything useful.
-1. Grab some of your labeled data (e.g. audio snippets and corresponding ``{yes,no}`` labels)
-1. Tweak the knobs so the model sucks less with respect to those examples
-1. Repeat until the model is awesome.
-
-![](../img/ml-loop.svg)
-
-To summarize, rather than code up a wake word recognizer,
-we code up a program that can *learn* to recognize wake words,
-*if we present it with a large labeled dataset*.
-You can think of this act
-of determining a program's behavior by presenting it with a dataset
-as *programming with data*.
-
-We can 'program' a cat detector by providing our machine learning system with many examples of cats and dogs, such as the images below:
-
-|![](../img/cat1.png)|![](../img/cat2.jpg)|![](../img/dog1.jpg)|![](../img/dog2.jpg)|
-|:---------------:|:---------------:|:---------------:|:---------------:|
-|cat|cat|dog|dog|
-
-This way the detector will eventually learn to emit a very large positive number if it's a cat, a very large negative number if it's a dog, and something closer to zero if it isn't sure, but this is just barely scratching the surface of what machine learning can do.
-
-
-## The dizzying versatility of machine learning
-
-This is the core idea behind machine learning:
-Rather than code programs with fixed behavior,
-we design programs with the ability to improve
-as they acquire more experience.
-This basic idea can take many forms.
-Machine learning can address many different application domains,
-involve many different types of models,
-and update them according to many different learning algorithms.
-In this particular case, we described an instance of *supervised learning*
-applied to a problem in automated speech recognition.
-
-Machine Learning is a versatile set of tools that lets you work with data in many different situations where simple rule-based systems would fail or might be very difficult to build. Due to its versatility, machine learning can be quite confusing to newcomers.
-For example, machine learning techniques are already widely used
-in applications as diverse as search engines, self driving cars,
-machine translation, medical diagnosis, spam filtering,
-game playing (*chess*, *go*), face recognition,
-data matching, calculating insurance premiums, and adding filters to photos.
-
-Despite the superficial differences between these problems many of them share a common structure
-and are addressable with deep learning tools.
-They're mostly similar because they are problems where we wouldn't be able to program their behavior directly in code,
-but we can *program them with data*.
-Often times the most direct language for communicating these kinds of programs is *math*.
-In this book, we'll introduce a minimal amount of mathematical notation,
-but unlike other books on machine learning and neural networks,
-we'll always keep the conversation grounded in real examples and real code.
-
-
-
-## Basics of machine learning
-When we considered the task of recognizing wake-words,
-we put together a dataset consisting of snippets and labels.
-We then described (albeit abstractly)
-how you might train a machine learning model
-to predict the label given a snippet.
-This set-up, predicting labels from examples, is just one flavor of ML
-and it's called *supervised learning*.
-Even within deep learning, there are many other approaches,
-and we'll discuss each in subsequent sections.
-To get going with machine learning, we need four things:
-
-1. Data
-2. A model of how to transform the data
-3. A loss function to measure how well we're doing
-4. An algorithm to tweak the model parameters such that the loss function is minimized
-
-### Data
-
-Generally, the more data we have, the easier our job becomes.
-When we have more data, we can train more powerful models. Data is at the heart of the resurgence of deep learning and many of most exciting models in deep learning don't work without large data sets. Here are some examples of the kinds of data machine learning practitioners often engage with:
-
-* **Images:** Pictures taken by smartphones or harvested from the web, satellite images, photographs of medical conditions, ultrasounds, and radiologic images like CT scans and MRIs, etc.
-* **Text:** Emails, high school essays, tweets, news articles, doctor's notes, books, and corpora of translated sentences, etc.
-* **Audio:** Voice commands sent to smart devices like Amazon Echo, or iPhone or Android phones, audio books, phone calls, music recordings, etc.
-* **Video:** Television programs and movies, YouTube videos, cell phone footage, home surveillance, multi-camera tracking, etc.
-* **Structured data:** Webpages, electronic medical records, car rental records, electricity bills, etc.
-
-### Models
-
-Usually the data looks quite different from what we want to accomplish with it.
-For example, we might have photos of people and want to know whether they appear to be happy.
-We might desire a model capable of ingesting a high-resolution image and outputting a happiness score.
-While some simple problems might be addressable with simple models, we're asking a lot in this case.
-To do its job, our happiness detector needs to transform hundreds of thousands of low-level features (pixel values)
-into something quite abstract on the other end (happiness scores).
-Choosing the right model is hard, and different models are better suited to different datasets.
-In this book, we'll be focusing mostly on deep neural networks.
-These models consist of many successive transformations of the data that are chained together top to bottom,
-thus the name *deep learning*.
-On our way to discussing deep nets, we'll also discuss some simpler, shallower models.
-
-
-###  Loss functions
-
-To assess how well we're doing we need to compare the output from the model with the truth.
-Loss functions give us a way of measuring how *bad* our output is.
-For example, say we trained a model to infer a patient's heart rate from images.
-If the model predicted that a patient's heart rate was 100bpm,
-when the ground truth was actually 60bpm,
-we need a way to communicate to the model that it's doing a lousy job.
-
-
-Similarly if the model was assigning scores to emails indicating the probability that they are spam,
-we'd need a way of telling the model when its predictions are bad.
-Typically the *learning* part of machine learning consists of minimizing this loss function.
-Usually, models have many parameters.
-The best values of these parameters is what we need to 'learn', typically by minimizing the loss incurred on a *training data*
-of observed data.
-Unfortunately, doing well on the training data
-doesn't guarantee that we will do well on (unseen) test data,
-so we'll want to keep track of two quantities.
-
- * **Training Error:** This is the error on the dataset used to train our model by minimizing the loss on the training set. This is equivalent to doing well on all the practice exams that a student might use to prepare for the real exam. The results are encouraging, but by no means guarantee success on the final exam.
- * **Test Error:** This is the error incurred on an unseen test set. This can deviate quite a bit from the training error. This condition, when a model fails to generalize to unseen data, is called *overfitting*. In real-life terms, this is the equivalent of screwing up the real exam despite doing well on the practice exams.
-
-
-### Optimization algorithms
-
-Finally, to minimize the loss, we'll need some way of taking the model and its loss functions,
-and searching for a set of parameters that minimizes the loss.
-The most popular optimization algorithms for work on neural networks
-follow an approach called gradient descent.
-In short, they look to see, for each parameter which way the training set loss would move if you jiggled the parameter a little bit. They then update the parameter in the direction that reduces the loss.
+## Kinds of Machine Learning
 
 In the following sections, we will discuss a few types of machine learning in some more detail. We begin with a list of *objectives*, i.e. a list of things that machine learning can do. Note that the objectives are complemented with a set of techniques of *how* to accomplish them, i.e. training, types of data, etc. The list below is really only sufficient to whet the readers' appetite and to give us a common language when we talk about problems. We will introduce a larger number of such problems as we go along.
 
-## Supervised learning
+### Supervised learning
 
 Supervised learning addresses the task of predicting *targets* given input data.
 The targets, also commonly called *labels*, are generally denoted *y*.
@@ -273,7 +51,7 @@ we can take a new previously unseen input, and predict the corresponding label.
 
 
 
-### Regression
+#### Regression
 
 Perhaps the simplest supervised learning task to wrap your head around is Regression.
 Consider, for example a set of data harvested
@@ -356,7 +134,7 @@ $$l(y,y') = \sum_i (y_i - y_i')^2.$$
 
 As we will see later, the $L_2$ loss corresponds to the assumption that our data was corrupted by Gaussian noise, whereas the $L_1$ loss corresponds to an assumption of noise from a Laplace distribution.
 
-### Classification
+#### Classification
 
 While regression models are great for addressing *how many?* questions,
 lots of problems don't bend comfortably to this template. For example,
@@ -436,7 +214,7 @@ What hierarchy is relevant might depend on how you plan to use the model.
 For example, rattle snakes and garter snakes might be close on the phylogenetic tree,
 but mistaking a rattler for a garter could be deadly.
 
-### Tagging
+#### Tagging
 
 Some classification problems don't fit neatly into the binary or multiclass classification setups.
 For example, we could train a normal binary classifier to distinguish cats from dogs.
@@ -480,7 +258,7 @@ Indeed, for several years, the BioASQ organization has [hosted a competition](ht
 to do precisely this.
 
 
-### Search and ranking
+#### Search and ranking
 
 Sometimes we don't just want to assign each example to a bucket or to a real value. In the field of information retrieval, we want to impose a ranking on a set of items. Take web search for example, the goal is less to determine whether a particular page is relevant for a query, but rather, which one of the plethora of search results should be displayed for the user. We really care about the ordering of the relevant search results and our learning algorithm needs to produce ordered subsets of elements from a larger set. In other words, if we are asked to produce the first 5 letters from the alphabet, there is a difference between returning ``A B C D E`` and ``C A B E D``. Even if the result set is the same, the ordering within the set matters nonetheless.
 
@@ -499,7 +277,7 @@ Given such a model, then for any given user, we could retrieve the set of object
 ![](../img/deeplearning_amazon.png)
 
 
-### Sequence Learning
+#### Sequence Learning
 
 So far we've looked at problems where we have some fixed number of inputs
 and produce a fixed number of outputs.
@@ -622,7 +400,7 @@ We will address a number of unsupervised learning techniques in later chapters. 
 * An important and exciting recent development is **generative adversarial networks**. They are basically a procedural way of synthesizing data. The underlying statistical mechanisms are tests to check whether real and fake data are the same. We will devote a few notebooks to them.
 
 
-## Interacting with an environment
+## Interacting with an Environment
 
 So far, we haven't discussed where data actually comes from,
 or what actually *happens* when a machine learning model generates an output.
@@ -667,7 +445,7 @@ We'll briefly describe reinforcement learning, and adversarial learning,
 two settings that explicitly consider interaction with an environment.
 
 
-### Reinforcement learning
+## Reinforcement learning
 
 If you're interested in using machine learning to develop an agent that interacts with an environment and takes actions, then you're probably going to wind up focusing on *reinforcement learning* (RL).
 This might include applications to robotics, to dialogue systems,
@@ -742,11 +520,3 @@ When the state does not depend on the previous actions,
 we call the problem a *contextual bandit problem*.
 When there is no state, just a set of available actions with initially unknown rewards,
 this problem is the classic *multi-armed bandit problem*.
-
-## Summary
-
-Machine Learning is vast. We cannot possibly cover it all. On the other hand, neural networks are simple and only require elementary mathematics. So let's get started (but first, let's install MXNet).
-
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2314)
-
-![](../img/qr_introduction.svg)
