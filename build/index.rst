@@ -14,7 +14,7 @@ Dive into Deep Learning
    :maxdepth: 2
    :numbered:
 
-   chapter_introduction/deep-learning-intro
+   chapter_introduction/index
    chapter_crashcourse/index
    chapter_deep-learning-basics/index
    chapter_deep-learning-computation/index
