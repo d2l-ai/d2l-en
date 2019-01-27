@@ -11,12 +11,6 @@ Dive into Deep Learning
 
 
 .. toctree::
-   :maxdepth: 1
-
-   chapter_how-to-use/how-to-use
-
-
-.. toctree::
    :maxdepth: 2
    :numbered:
 
