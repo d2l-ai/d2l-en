@@ -49,8 +49,8 @@ and a trailing window of past weather.
   that they are likely to enjoy but unlikely,
   in the natural course of browsing, to encounter.
 
-In each of these cases, even the best minds
-are incapable of tackling the problems from scratch.
+In each of these cases, even elite programmers
+are incapable of coding up solutions from scratch.
 The reasons for this can vary.
 Sometimes the program that we are looking for
 follows a pattern that changes over time,

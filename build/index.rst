@@ -8,7 +8,7 @@ Dive into Deep Learning
    :maxdepth: 1
 
    chapter_preface/preface
-
+   chapter_preface/install
 
 .. toctree::
    :maxdepth: 2
