@@ -38,19 +38,26 @@ problems in automation don't bend so easily to human ingenuity.
 Imagine huddling around the whiteboard with the smartest minds you know,
 but this time you are tackling any of the following problems:
  * Write a program that predicts tomorrow's weather
-given geographic information, sattelite images,
+given geographic information, satellite images,
 and a trailing window of past weather.
- * Write a program that takes in a question, expressed in free-form text,
- and answers it correctly.
- * Write a program that analyzed images, identifying all the people,
-  drawing outlines around each of them.
-  * Write a progam that presents users with items that they are likely to enjoy, but otherwise unlikely to encounter.
+ * Write a program that takes in a question,
+ expressed in free-form text, and answers it correctly.
+ * Write a program that given an image
+ can identify all the people it contains,
+ drawing outlines around each.
+  * Write a progam that presents users with products
+  that they are likely to enjoy but unlikely,
+  in the natural course of browsing, to encounter.
 
-In each of these cases, even the best minds are incapable of tackling the problems from scratch.
+In each of these cases, even the best minds
+are incapable of tackling the problems from scratch.
 The reasons for this can vary.
-Sometimes the program that we are looking for follows a pattern that is changin over time, and we need our programs to adapt.
-In other cases, the relationship (say between pixels, and abstract categories)
-may just be to complicated, requiring thousands or millions of computations
+Sometimes the program that we are looking for
+follows a pattern that changes over time,
+and we need our programs to adapt.
+In other cases, the relationship
+(say between pixels, and abstract categories)
+may be too complicated, requiring thousands or millions of computations
 that are beyond our conscious understanding
 (even if our eyes manage the task effortlessly).
 Machine learning (ML) is the study of powerful techniques

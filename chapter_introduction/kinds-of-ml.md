@@ -266,7 +266,7 @@ One possible solution to this problem is to score every element in the set of po
 
 <!-- Add / clean up-->
 
-### Recommender systems
+#### Recommender systems
 
 Recommender systems are another problem setting that is related to search and ranking. The problems are  similar insofar as the goal is to display a set of relevant items to the user. The main difference is the emphasis on *personalization* to specific users in the context of recommender systems. For instance, for movie recommendations, the results page for a SciFi fan and the results page for a connoisseur of Woody Allen comedies might differ significantly.
 
@@ -372,7 +372,7 @@ we need to take world-knowledge and prior state into account.
 This is an active area of research.
 
 
-## Unsupervised learning
+### Unsupervised learning
 
 All the examples so far were related to *Supervised Learning*,
 i.e. situations where we feed the model
@@ -400,7 +400,7 @@ We will address a number of unsupervised learning techniques in later chapters. 
 * An important and exciting recent development is **generative adversarial networks**. They are basically a procedural way of synthesizing data. The underlying statistical mechanisms are tests to check whether real and fake data are the same. We will devote a few notebooks to them.
 
 
-## Interacting with an Environment
+### Interacting with an Environment
 
 So far, we haven't discussed where data actually comes from,
 or what actually *happens* when a machine learning model generates an output.
@@ -445,7 +445,7 @@ We'll briefly describe reinforcement learning, and adversarial learning,
 two settings that explicitly consider interaction with an environment.
 
 
-## Reinforcement learning
+### Reinforcement learning
 
 If you're interested in using machine learning to develop an agent that interacts with an environment and takes actions, then you're probably going to wind up focusing on *reinforcement learning* (RL).
 This might include applications to robotics, to dialogue systems,
@@ -504,7 +504,7 @@ or to *explore* the space of strategies,
 potentially giving up some short-run reward in exchange for knowledge.
 
 
-### MDPs, bandits, and friends
+#### MDPs, bandits, and friends
 
 The general reinforcement learning problem
 is a very general setting.
@@ -515,7 +515,8 @@ Accounting for all this complexity at once may ask too much of researchers.
 Moreover not every practical problem exhibits all this complexity.
 As a result, researchers have studied a number of *special cases* of reinforcement learning problems.
 
-When the environment is fully observed, we call the RL problem a *Markov Decision Process* (MDP).
+When the environment is fully observed,
+we call the RL problem a *Markov Decision Process* (MDP).
 When the state does not depend on the previous actions,
 we call the problem a *contextual bandit problem*.
 When there is no state, just a set of available actions with initially unknown rewards,
