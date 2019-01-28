@@ -1,4 +1,4 @@
-# Installing MXNet and Gluon
+# Installation
 
 To get you up and running with hands-on experience
 we'll need you to set up with a Python environment,
