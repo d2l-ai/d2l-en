@@ -16,25 +16,6 @@ it demonstrates that in the span of just a few seconds,
 our everyday interactions with a smartphone
 can engage several machine learning models.
 
-<!-- If you've never worked with machine learning before, you might be
-wondering what we're talking about.  You might ask, 'isn't that just
-programming?' or 'what does *machine learning* even mean?'  First, to
-be clear, we implement all machine learning algorithms by writing
-computer programs.  Indeed, we use the same languages and hardware as
-other fields of computer science, but not all computer programs
-involve machine learning.  In response to the second question,
-precisely defining a field of study as vast as machine learning is
-hard.  It's a bit like answering, 'what is math?'.  But we'll try to
-give you enough intuition to get started. -->
-
-<!--
-Consider the growing ecosystem of voice assistants
-powering most smartphones and home speakers like
-Amazon's Echo, Google's Home, and Apple's HomePod.
-The first step in any interaction with these devices typically
-involves triggering them with a "wake
-word" like “Alexa”, “Okay, Google” or “Siri”. -->
-
 Imagine just writing a program to respond to a *wake word*
 like 'Alexa', 'Okay, Google' or 'Siri'.
 Try coding it up in a room by yourself
@@ -129,8 +110,8 @@ we code up a program that can *learn* to recognize wake words,
 You can think of this act
 of determining a program's behavior by presenting it with a dataset
 as *programming with data*.
-
-We can 'program' a cat detector by providing our machine learning system with many examples of cats and dogs, such as the images below:
+We can 'program' a cat detector by providing our machine learning system
+with many examples of cats and dogs, such as the images below:
 
 |![](../img/cat1.png)|![](../img/cat2.jpg)|![](../img/dog1.jpg)|![](../img/dog2.jpg)|
 |:---------------:|:---------------:|:---------------:|:---------------:|
@@ -143,7 +124,7 @@ and something closer to zero if it isn't sure,
 and this barely scratches the surface of what ML can do.
 
 Deep learning is just one among many
-popular frameworks for building such model families.
+popular frameworks for solving machine learning problems.
 While thus far, we've only talked about machine learning broadly
 and not deep learning, there's a couple points worth sneaking in here:
 First, the problems that we've discussed thus far:
@@ -159,11 +140,13 @@ in a way that previous tools could not.
 In bygone days, the crucial part of applying ML to these problems
 consisted of coming up with manually engineered ways of transforming
 the data into some form amenable to *shallow* models.
-One key advantage of deep learning is that it replaces not only the *shallow* models that lived at the end of traditional learning pipelines,
+One key advantage of deep learning is that it replaces not only the *shallow* models
+at the end of traditional learning pipelines,
 but also the labor-intensive feature engineering.
 Secondly, by replacing by eliminating much of the *domain-specific preprocessing*,
 deep learning has eliminated many of the boundaries
-that previously separated computer vision, speech recognition, natural language processing, medical informatics, and other application areas,
+that previously separated computer vision, speech recognition,
+natural language processing, medical informatics, and other application areas,
 offering a unified set of tools for tackling diverse problems.
 
 
