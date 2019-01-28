@@ -68,7 +68,7 @@ After submitting the request, you will see the page shown in Figure 11.25, which
 * You can use GitHub to contribute to this book.
 
 
-## Problem
+## Exercise
 
 * If you feel that some parts of the book can be improved, try submitting a pull request.
 

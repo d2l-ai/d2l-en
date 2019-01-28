@@ -186,7 +186,7 @@ If you do not plan to use the instance again for a long time, right-click on the
 
 * You can use cloud computing services to obtain more powerful computing resources and use them to run the deep learning code in this document.
 
-## Problem
+## Exercise
 
 * The cloud offers convenience, but it does not come cheap. Research the prices of cloud services and find ways to reduce overhead.
 
