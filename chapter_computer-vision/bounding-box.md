@@ -57,7 +57,7 @@ fig.axes.add_patch(bbox_to_rect(cat_bbox, 'red'));
 
 * In object detection, we not only need to identify all the objects of interest in the image, but also their positions. The positions are generally represented by a rectangular bounding box.
 
-## Problems
+## Exercises
 
 * Find some images and try to label a bounding box that contains the target. Compare the difference between the time it takes to label the bounding box and label the category.
 

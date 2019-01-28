@@ -175,7 +175,7 @@ d2l.train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
 * Update gates help capture long-term dependencies in time series.
 
 
-## Problems
+## Exercises
 
 * Assume that time step $t' < t$. If we only want to use the input for time step $t'$ to predict the output at time step $t$, what are the best values for the reset and update gates for each time step?
 * Adjust the hyper-parameters and observe and analyze the impact on running time, perplexity, and the written lyrics.

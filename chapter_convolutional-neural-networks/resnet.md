@@ -153,7 +153,7 @@ d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,
 * ResNet had a major influence on the design of subsequent deep neural networks, both for convolutional and sequential nature.
 
 
-## Problems
+## Exercises
 
 1. Refer to Table 1 in the [ResNet paper](https://arxiv.org/abs/1512.03385) to implement different variants.
 1. For deeper networks, ResNet introduces a "bottleneck" architecture to reduce model complexity. Try to implement it.

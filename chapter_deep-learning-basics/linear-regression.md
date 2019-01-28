@@ -194,7 +194,7 @@ A closer inspection reveals that for the purpose of minimizing $-\log P(Y|X)$ we
 * Minimizing an objective function and performing maximum likelihood can mean the same thing.
 * Linear models are neural networks, too.
 
-## Problems
+## Exercises
 
 1. Assume that we have some data $x_1, \ldots x_n \in \mathbb{R}$. Our goal is to find a constant $b$ such that $\sum_i (x_i - b)^2$ is minimized.
     * Find the optimal closed form solution.

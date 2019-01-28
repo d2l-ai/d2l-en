@@ -214,7 +214,7 @@ The above example shows that the parameters of the second and third layer are ti
 * Gluon has a sophisticated mechanism for accessing parameters in a unique and hierarchical manner.
 
 
-## Problems
+## Exercises
 
 1. Use the FancyMLP definition of the [previous section](model-construction.md) and access the parameters of the various layers.
 1. Look at the [MXNet documentation](http://beta.mxnet.io/api/gluon-related/mxnet.initializer.html) and explore different initializers.

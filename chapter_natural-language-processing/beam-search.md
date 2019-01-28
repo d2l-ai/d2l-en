@@ -54,7 +54,7 @@ Here, $L$ is the length of the final candidate sequence and the selection for $\
 * Beam search strikes a balance between computational overhead and search quality using a flexible beam size.
 
 
-## Problems
+## Exercises
 
 * Can we treat an exhaustive search as a beam search with a special beam size? Why?
 * We used language models to create lyrics in the ["Implementation of the Recurrent Neural Network from Scratch"](../chapter_recurrent-neural-networks/rnn-scratch.md) section. Which kind of search does this output use? Can you improve it?

@@ -144,7 +144,7 @@ train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
 * Ultimately the resolution is reduced prior to emitting an output via one (or more) dense layers.
 * LeNet was the first successful deployment of such a network.
 
-## Problems
+## Exercises
 
 1. Replace the average pooling with max pooling. What happens?
 1. Try to construct a more complex network based on LeNet to improve its accuracy.

@@ -111,7 +111,7 @@ When training networks, forward and backward propagation depend on each other. I
 * Training requires significantly more memory and storage.
 
 
-## Problems
+## Exercises
 
 1. Assume that the inputs $\mathbf{x}$ are matrices. What is the dimensionality of the gradients?
 1. Add a bias to the hidden layer of the model described in this chapter.

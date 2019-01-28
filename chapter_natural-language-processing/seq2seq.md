@@ -70,7 +70,7 @@ In model training, the mean of losses for all the output sequences is usually us
 * In encoder-decoder training, we can use teacher forcing.
 
 
-## Problems
+## Exercises
 
 * In addition to machine translation, what other applications can you think of for encoder-decoder?
 * What methods can be used to design the output layer of the decoder?

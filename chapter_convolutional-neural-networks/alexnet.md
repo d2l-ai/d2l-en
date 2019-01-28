@@ -171,7 +171,7 @@ d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,
 * Although it seems that there are only a few more lines in AlexNet's implementation than in LeNet, it took the academic community many years to embrace this conceptual change and take advantage of its excellent experimental results. This was also due to the lack of efficient computational tools.
 * Dropout, ReLu and preprocessing were the other key steps in achieving excellent performance in computer vision tasks.
 
-## Problems
+## Exercises
 
 1. Try increasing the number of epochs. Compared with LeNet, how are the results different? Why?
 1. AlexNet may be too complex for the Fashion-MNIST data set.

@@ -98,7 +98,7 @@ d2l.train_gluon_ch7('adagrad', {'learning_rate': 0.1}, features, labels)
 * Adagrad constantly adjusts the learning rate during iteration to give each element in the independent variable of the objective function its own learning rate.
 * When using Adagrad, the learning rate of each element in the independent variable decreases (or remains unchanged) during iteration.
 
-## Problems
+## Exercises
 
 * When introducing the features of Adagrad, we mentioned a potential problem. What solutions can you think of to fix this problem?
 * Try to use other initial learning rates in the experiment. How does this change the results?

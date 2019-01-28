@@ -29,7 +29,7 @@ Here, the weight parameter $\boldsymbol{W}_{hq} \in \mathbb{R}^{2h \times q}$ an
 * In bidirectional recurrent neural networks, the hidden state for each time step is simultaneously determined by the subseries before and after this time step (including the input for the current time step).
 
 
-## Problems
+## Exercises
 
 * If the different directions use a different number of hidden units, how will the shape of $\boldsymbol{H}_t$ change?
 * Referring to figures 6.11 and 6.12, design a bidirectional recurrent neural network with multiple hidden layers.

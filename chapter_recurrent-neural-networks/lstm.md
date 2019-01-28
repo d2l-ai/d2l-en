@@ -188,7 +188,7 @@ d2l.train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
 * LSTM can cope with the gradient attenuation problem in the recurrent neural networks and better capture dependencies for time series with large time step distances.
 
 
-## Problems
+## Exercises
 
 * Adjust the hyper-parameters and observe and analyze the impact on running time, perplexity, and the written lyrics.
 * Under the same conditions, compare the running time of an LSTM, GRU and recurrent neural network without gates.

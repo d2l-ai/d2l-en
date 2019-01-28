@@ -3,7 +3,7 @@
 In the ["Gradient Descent and Stochastic Gradient Descent"](./gd-sgd.md) section, we mentioned that the gradient of the objective function's independent variable represents the direction of the objective function's fastest descend at the current position of the independent variable. Therefore, gradient descent is also called steepest descent. In each iteration, the gradient descends according to the current position of the independent variable while updating the latter along the current position of the gradient. However, this can lead to problems if the iterative direction of the independent variable relies exclusively on the current position of the independent variable.
 
 
-## Problems with Gradient Descent
+## Exercises with Gradient Descent
 
 Now, we will consider an objective function $f(\boldsymbol{x})=0.1x_1^2+2x_2^2$, whose input and output are a two-dimensional vector $\boldsymbol{x} = [x_1, x_2]$ and a scalar, respectively. In contrast to the ["Gradient Descent and Stochastic Gradient Descent"](./gd-sgd.md) section, here, the coefficient $x_1^2$ is reduced from $1$ to $0.1$. We are going to implement gradient descent based on this objective function, and demonstrate the iterative trajectory of the independent variable using the learning rate $0.4.
 
@@ -157,7 +157,7 @@ d2l.train_gluon_ch7('sgd', {'learning_rate': 0.004, 'momentum': 0.9},
 * The momentum method uses the EWMA concept. It takes the weighted average of past time steps, with weights that decay exponentially by the time step.
 * Momentum makes independent variable updates for adjacent time steps more consistent in direction.
 
-## Problems
+## Exercises
 
 * Use other combinations of momentum hyperparameters and learning rates and observe and analyze the different experimental results.
 

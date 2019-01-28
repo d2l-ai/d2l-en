@@ -111,7 +111,7 @@ We then use the same method to obtain the gradients for other word vectors. Unli
 * Word2vec includes both the continuous bag of words (CBOW) and skip-gram models. The skip-gram model assumes that context words are generated based on the central target word. The CBOW model assumes that the central target word is generated based on the context words.
 
 
-## Problems
+## Exercises
 
 * What is the computational complexity of each gradient? If the dictionary contains a large volume of words, what problems will this cause?
 * There are some fixed phrases in the English language which consist of multiple words, such as "new york". How can you train their word vectors? Hint: See section 4 in the Word2vec paper[2].

@@ -135,7 +135,7 @@ d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,
 * GoogLeNet connects multiple well-designed Inception blocks with other layers in series. The ratio of the number of channels assigned in the Inception block is obtained through a large number of experiments on the ImageNet data set.
 * GoogLeNet, as well as its succeeding versions, was one of the most efficient models on ImageNet, providing similar test accuracy with lower computational complexity.
 
-## Problems
+## Exercises
 
 1. There are several iterations of GoogLeNet. Try to implement and run them. Some of them include the following:
     * Add a batch normalization layer, as described later in this chapter [2].

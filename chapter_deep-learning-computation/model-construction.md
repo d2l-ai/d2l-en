@@ -191,7 +191,7 @@ Gluon does this by allowing for [Hybridization](../chapter_computational-perform
 * Blocks take are of a lot of housekeeping, such as parameter initialization, backprop and related issues.
 * Sequential concatenations of layers and blocks are handled by the eponymous `Sequential` block.
 
-## Problems
+## Exercises
 
 1. What kind of error message will you get when calling an `__init__` method whose parent class not in the `__init__` function of the parent class?
 1. What kinds of problems will occur if you remove the `asscalar` function in the `FancyMLP` class?

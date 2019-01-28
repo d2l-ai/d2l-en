@@ -87,7 +87,7 @@ The number of words is huge compared to the number of characters. This is why qu
 * The number of RNN model parameters does not grow as the number of time steps increases.
 * We can create language models using a character-level RNN.
 
-## Problems
+## Exercises
 
 1. If we use an RNN to predict the next character in a text sequence, how many output dimensions do we need?
 1. Can you design a mapping for which an RNN with hidden states is exact? Hint - what about a finite number of words? 

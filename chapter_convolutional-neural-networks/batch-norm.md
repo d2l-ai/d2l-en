@@ -207,7 +207,7 @@ d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,
 * Like a dropout layer, batch normalization layers have different computation results in training mode and prediction mode.
 * Batch Normalization has many beneficial side effects, primarily that of regularization. On the other hand, the original motivation of reducing covariate shift seems not to be a valid explanation.
 
-## Problems
+## Exercises
 
 1. Can we remove the fully connected affine transformation before the batch normalization or the bias parameter in convolution computation?
     * Find an equivalent transformation that applies prior to the fully connected layer.

@@ -76,7 +76,7 @@ We will implement a multiscale object detection model in the following section.
 * We use the information for the input image from a certain receptive field to predict the category and offset of the anchor boxes close to that field on the image.
 
 
-## Problems
+## Exercises
 
 * Given an input image, assume $1 \times c_i \times h \times w$ to be the shape of the feature map while $c_i, h, w$ are the number, height, and width of the feature map. What methods can you think of to convert this variable into the anchor box's category and offset? What is the shape of the output?
 

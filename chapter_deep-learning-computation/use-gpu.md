@@ -147,7 +147,7 @@ In short, as long as all data and parameters are on the same device, we can lear
 * MXNet requires all input data for calculation to be **on the same device**, be it CPU or the same GPU.
 * You can lose significant performance by moving data without care. A typical mistake is as follows: computing the loss for every minibatch on the GPU and reporting it back to the user on the commandline (or logging it in a NumPy array) will trigger a global interpreter lock which stalls all GPUs. It is much better to allocate memory for logging inside the GPU and only move larger logs.
 
-## Problems
+## Exercises
 
 1. Try a larger computation task, such as the multiplication of large matrices, and see the difference in speed between the CPU and GPU. What about a task with a small amount of calculations?
 1. How should we read and write model parameters on the GPU?

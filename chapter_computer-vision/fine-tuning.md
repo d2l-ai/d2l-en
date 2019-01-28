@@ -159,7 +159,7 @@ As you can see, the fine-tuned model tends to achieve higher precision in the sa
 * Generally, fine tuning parameters use a smaller learning rate, while training the output layer from scratch can use a larger learning rate.
 
 
-## Problems
+## Exercises
 
 * Keep increasing the learning rate of `finetune_net`. How does the precision of the model change?
 * Further tune the hyper-parameters of `finetune_net` and `scratch_net` in the comparative experiment. Do they still have different precisions?

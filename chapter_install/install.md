@@ -118,7 +118,6 @@ source activate gluon
 jupyter notebook
 ```
 
-
 ## Updating Gluon
 
 In case you want to update the repository,
@@ -132,11 +131,10 @@ conda env update -f environment.yml
 ```
 
 ## Exercises
+
 1. Download the code for the book and install the runtime environment.
 
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2315)
 
-
-<div id="discuss" topic_id="2315"></div>
-
+![](../img/qr_install.svg)

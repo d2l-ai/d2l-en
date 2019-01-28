@@ -111,7 +111,7 @@ pool2d(X)
 * The pooling layer's number of output channels is the same as the number of input channels.
 
 
-## Problems
+## Exercises
 
 1. Implement average pooling as a convolution.
 1. What is the computational cost of the pooling layer? Assume that the input to the pooling layer is of size $c\times h\times w$, the pooling window has a shape of $p_h\times p_w$ with a padding of $(p_h, p_w)$ and a stride of $(s_h, s_w)$.

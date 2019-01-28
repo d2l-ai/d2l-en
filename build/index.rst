@@ -8,13 +8,13 @@ Dive into Deep Learning
    :maxdepth: 1
 
    chapter_preface/preface
-   chapter_preface/install
+   chapter_install/install
 
 .. toctree::
    :maxdepth: 2
    :numbered:
 
-   chapter_introduction/index
+   chapter_introduction/intro
    chapter_crashcourse/index
    chapter_deep-learning-basics/index
    chapter_deep-learning-computation/index

@@ -225,7 +225,7 @@ In practice, we can remove prediction bounding boxes with lower confidence level
 * In the training set, we mark two types of labels for each anchor box: one is the category of the target contained in the anchor box and the other is the offset of the ground-truth bounding box relative to the anchor box.
 * When predicting, we can use non-maximum suppression (NMS) to remove similar prediction bounding boxes, thereby simplifying the results.
 
-## Problems
+## Exercises
 
 * Change the `sizes` and `ratios` values in `contrib.nd.MultiBoxPrior` and observe the changes to the generated anchor boxes.
 * Construct two bounding boxes with and IoU of 0.5, and observe their coincidence.

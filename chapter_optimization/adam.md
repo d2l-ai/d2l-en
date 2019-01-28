@@ -79,7 +79,7 @@ d2l.train_gluon_ch7('adam', {'learning_rate': 0.01}, features, labels)
 * Created on the basis of RMSProp, Adam also uses EWMA on the mini-batch stochastic gradient
 * Adam uses bias correction.
 
-## Problems
+## Exercises
 
 * Adjust the learning rate and observe and analyze the experimental results.
 * Some people say that Adam is a combination of RMSProp and momentum. Why do you think they say this?

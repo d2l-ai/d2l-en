@@ -177,7 +177,7 @@ In summary, we have a range of nonlinearities and now know how to layer them to 
 * Commonly used activation functions include the ReLU function, the Sigmoid function, and the Tanh function.
 
 
-## Problems
+## Exercises
 
 1. Compute the derivative of the Tanh and the pReLU activation function.
 1. Show that a multilayer perceptron using only ReLU (or pReLU) constructs a continuous piecewise linear function.

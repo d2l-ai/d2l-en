@@ -135,7 +135,7 @@ One key distinction between the different situations above is that the same stra
 * Covariate shift can be detected and corrected if the shift isn't too severe. Failure to do so leads to nasty surprises at test time.
 * In some cases the environment *remembers* what we did and will respond in unexpected ways. We need to account for that when building models.
 
-## Problems
+## Exercises
 
 1. What could happen when we change the behavior of a search engine? What might the users do? What about the advertisers?
 1. Implement a covariate shift detector. Hint - build a classifier.

@@ -93,7 +93,7 @@ d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,
 * The use of blocks leads to very compact representations of the network definition. It allows for efficient design of complex networks.
 * In their work Simonyan and Ziserman experimented with various architectures. In particular, they found that several layers of deep and narrow convolutions (i.e. $3 \times 3$) were more effective than fewer layers of wider convolutions.
 
-## Problems
+## Exercises
 
 1. When printing out the dimensions of the layers we only saw 8 results rather than 11. Where did the remaining 3 layer informations go?
 1. Compared with AlexNet, VGG is much slower in terms of computation, and it also needs more GPU memory. Try to analyze the reasons for this.

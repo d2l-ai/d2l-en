@@ -74,7 +74,7 @@ This is the definition of a convolutional neural network layer. There are still 
 * Locality means that only a small neighborhood of pixels will be used for computation.
 * Channels on input and output allows for meaningful feature analysis.
 
-## Problems
+## Exercises
 
 1. Assume that the size of the convolution mask is $\Delta = 0$. Show that in this case the convolutional mask implements an MLP independently for each set of channels.
 1. Why might translation invariance not be a good idea after all? Does it make sense for pigs to fly?
