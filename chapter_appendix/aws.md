@@ -68,35 +68,37 @@ If you log into a GPU instance, you need to download and install CUDA. First, up
 sudo apt-get update && sudo apt-get install -y build-essential git libgfortran3
 ```
 
-NVIDIA releases a major version of CUDA every year. Here we download the latest CUDA 9.1 when the book is written. Visit the official website of NVIDIA(https://developer.nvidia.com/cuda-91-download-archive) to obtain the download link of CUDA 9.1, as shown in Figure 11.17.
+NVIDIA releases a major version of CUDA every year. Here we download the latest CUDA 9.0 when the book is written. Visit the official website of NVIDIA (https://developer.nvidia.com/cuda-90-download-archive) to obtain the download link of CUDA 9.0, as shown in Figure 11.17.
 
-![Find the CUDA 9.1 download address. ](../img/cuda.png)
+![Find the CUDA 9.0 download address. ](../img/cuda.png)
 
 
-After finding the download address, download and install CUDA 9.1. For example:
+After finding the download address, download and install CUDA 9.0. For example:
 
 ```
-wget https://developer.download.nvidia.com/compute/cuda/9.1/secure/Prod/local_installers/cuda_9.1.85_387.26_linux.run
-sudo sh cuda_9.1.85_387.26_linux.run
+wget https://developer.nvidia.com/compute/cuda/9.0/Prod/local_installers/cuda_9.0.176_384.81_linux-run
+sudo sh cuda_9.0.176_384.81_linux-run
 ```
 
 Press "Ctrl+C" to jump out of the document and answer the following questions.
 
 ```
+Do you accept the previously read EULA?
 accept/decline/quit: accept
-Install NVIDIA Accelerated Graphics Driver for Linux-x86_64 387.26?
+Install NVIDIA Accelerated Graphics Driver for Linux-x86_64 384.81?
 (y)es/(n)o/(q)uit: y
 Do you want to install the OpenGL libraries?
 (y)es/(n)o/(q)uit [ default is yes ]: y
 Do you want to run nvidia-xconfig?
+This will ... vendors.
 (y)es/(n)o/(q)uit [ default is no ]: n
-Install the CUDA 9.1 Toolkit?
+Install the CUDA 9.0 Toolkit?
 (y)es/(n)o/(q)uit: y
 Enter Toolkit Location
- [ default is /usr/local/cuda-9.1 ]:
+ [ default is /usr/local/cuda-9.0 ]:
 Do you want to install a symbolic link at /usr/local/cuda?
 (y)es/(n)o/(q)uit: y
-Install the CUDA 9.1 Samples?
+Install the CUDA 9.0 Samples?
 (y)es/(n)o/(q)uit: n
 ```
 
@@ -109,7 +111,7 @@ nvidia-smi
 Finally, add CUDA to the library path to help other libraries find it.
 
 ```
-echo "export LD_LIBRARY_PATH=\${LD_LIBRARY_PATH}:/usr/local/cuda-9.1/lib64" >> .bashrc
+echo "export LD_LIBRARY_PATH=\${LD_LIBRARY_PATH}:/usr/local/cuda-9.0/lib64" >> ~/.bashrc
 ```
 
 ## Acquire the Code for this Book and Install MXNet GPU Version
@@ -117,7 +119,9 @@ echo "export LD_LIBRARY_PATH=\${LD_LIBRARY_PATH}:/usr/local/cuda-9.1/lib64" >> .
 We have introduced the way to obtaining code of the book and setting up the running environment in Section ["Getting started with Gluon"](../chapter_prerequisite/install.md). First, install Miniconda of the Linux version (website: https://conda.io/miniconda.html), such as
 
 ```
-wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
+# The download link and file name are subject to change, so always use those
+# from the Miniconda website
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 bash Miniconda3-latest-Linux-x86_64.sh
 ```
 
@@ -141,11 +145,12 @@ conda env create -f environment.yml
 source activate gluon
 ```
 
-The MXNet CPU version is installed in the environment by default. Now, you must replace it with the MXNet GPU version. As the CUDA version is 9.1, install `mxnet-cu91`. Generally speaking, if your CUDA version is x.y, the corresponding MXNET version is `mxnet-cuxy`.
+The MXNet CPU version is installed in the environment by default. Now, you must replace it with the MXNet GPU version. As the CUDA version is 9.0, install `mxnet-cu90`. Generally speaking, if your CUDA version is x.y, the corresponding MXNET version is `mxnet-cuxy`.
 
 ```
 pip uninstall mxnet
-pip install mxnet-cu91
+# X.Y.Z should be replaced with the version number depended on by the book
+pip install mxnet-cu90==X.Y.Z
 ```
 
 ## Run Jupyter Notebook
