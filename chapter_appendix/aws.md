@@ -76,6 +76,8 @@ NVIDIA releases a major version of CUDA every year. Here we download the latest 
 After finding the download address, download and install CUDA 9.0. For example:
 
 ```
+# The download link and file name are subject to change, so always use those
+# from the NVIDIA website
 wget https://developer.nvidia.com/compute/cuda/9.0/Prod/local_installers/cuda_9.0.176_384.81_linux-run
 sudo sh cuda_9.0.176_384.81_linux-run
 ```
@@ -122,7 +124,7 @@ We have introduced the way to obtaining code of the book and setting up the runn
 # The download link and file name are subject to change, so always use those
 # from the Miniconda website
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-bash Miniconda3-latest-Linux-x86_64.sh
+sudo sh Miniconda3-latest-Linux-x86_64.sh
 ```
 
 Now, you need to answer the following questions:
