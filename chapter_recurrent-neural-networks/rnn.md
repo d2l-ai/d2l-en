@@ -1,14 +1,14 @@
 # Recurrent Neural Networks
 
-In the previous section we introduced $n$-gram models, where the conditional probability of word $w_t$ at position $t$ only depends on the $n-1$ previous words. If we want to check the possible effect of words earlier than $t-(n-1)$ on $w_t$, we need to increase $n$. However, the number of model parameters would also increase exponentially with it, as we need to store $|V|^n$ numbers for a vocabulary $V$. Hence, rather than modeling $p(w_t|w_{t-1}, \ldots w_{t-n+1})$ it is preferable to use a latent variable model in which we have 
+In the previous section we introduced $n$-gram models, where the conditional probability of word $w_t$ at position $t$ only depends on the $n-1$ previous words. If we want to check the possible effect of words earlier than $t-(n-1)$ on $w_t$, we need to increase $n$. However, the number of model parameters would also increase exponentially with it, as we need to store $|V|^n$ numbers for a vocabulary $V$. Hence, rather than modeling $p(w_t|w_{t-1}, \ldots w_{t-n+1})$ it is preferable to use a latent variable model in which we have
 
-$$p(w_t|w_{t-1}, \ldots w_1) \approx p(w_t|h_t(w_{t-1}, h_{t-1}).$$
+$$p(w_t|w_{t-1}, \ldots w_1) \approx p(w_t|h_t(w_{t-1}, h_{t-1})).$$
 
-In theory, for a sufficiently powerful function $h_t$ this is not an approximation. After all, it could simply store all the data it observed so far. We discussed this previously in the [introduction](sequence.md) to the current chapter. Let's see why building such models is a bit more tricky than simple autoregressive models where 
+In theory, for a sufficiently powerful function $h_t$ this is not an approximation. After all, it could simply store all the data it observed so far. We discussed this previously in the [introduction](sequence.md) to the current chapter. Let's see why building such models is a bit more tricky than simple autoregressive models where
 
-$$p(w_t|w_{t-1}, \ldots w_1) \approx p(w_t|f(w_{t-1}, \ldots w_{t-n+1}).$$
+$$p(w_t|w_{t-1}, \ldots w_1) \approx p(w_t|f(w_{t-1}, \ldots w_{t-n+1})).$$
 
-As a warmup we will review the latter for discrete outputs and $n=2$, i.e. for Markov model of first order. To simplify things further we use a single layer in the design of the RNN. Later on we will see how to add more expressivity efficiently across items. 
+As a warmup we will review the latter for discrete outputs and $n=2$, i.e. for Markov model of first order. To simplify things further we use a single layer in the design of the RNN. Later on we will see how to add more expressivity efficiently across items.
 
 ## Recurrent Networks Without Hidden States
 
@@ -16,11 +16,11 @@ Let us take a look at a multilayer perceptron with a single hidden layer. Given 
 
 $$\mathbf{H} = \phi(\mathbf{X} \mathbf{W}_{xh} + \mathbf{b}_h),$$
 
-Here, we have the weight parameter $\mathbf{W}_{xh} \in \mathbb{R}^{d \times h}$, bias parameter $\mathbf{b}_h \in \mathbb{R}^{1 \times h}$, and the number of hidden units $h$, for the hidden layer. Recall that $\mathbf{b}_h$ is just a vector - its values are replicated using the [broadcasting mechanism](../chapter_prerequisite/ndarray.md)) to match those of the matrix-matrix product. 
+Here, we have the weight parameter $\mathbf{W}_{xh} \in \mathbb{R}^{d \times h}$, bias parameter $\mathbf{b}_h \in \mathbb{R}^{1 \times h}$, and the number of hidden units $h$, for the hidden layer. Recall that $\mathbf{b}_h$ is just a vector - its values are replicated using the [broadcasting mechanism](../chapter_prerequisite/ndarray.md)) to match those of the matrix-matrix product.
 
-Also note that hidden *state* and hidden *layer* refer to two very different concepts. Hidden layers are, as explained, layers that are hidden from view on the path from input to output. Hidden states are technically speaking *inputs* to whatever we do at a given step. Instead, they can only be computed by looking at data at previous iterations. In this sense they have much in common with latent variable models in statistics, such as clustering or topic models where e.g. the cluster ID affects the output but cannot be directly observed. 
+Also note that hidden *state* and hidden *layer* refer to two very different concepts. Hidden layers are, as explained, layers that are hidden from view on the path from input to output. Hidden states are technically speaking *inputs* to whatever we do at a given step. Instead, they can only be computed by looking at data at previous iterations. In this sense they have much in common with latent variable models in statistics, such as clustering or topic models where e.g. the cluster ID affects the output but cannot be directly observed.
 
-The hidden variable $\mathbf{H}$ is used as the input of the output layer. For classification purposes, such as predicting the next character, the output dimensionality $q$ might e.g. match the number of categories in the classification problem. Lastly the the output layer is given by 
+The hidden variable $\mathbf{H}$ is used as the input of the output layer. For classification purposes, such as predicting the next character, the output dimensionality $q$ might e.g. match the number of categories in the classification problem. Lastly the the output layer is given by
 
 $$\mathbf{O} = \mathbf{H} \mathbf{W}_{hq} + \mathbf{b}_q.$$
 
@@ -90,7 +90,7 @@ The number of words is huge compared to the number of characters. This is why qu
 ## Exercises
 
 1. If we use an RNN to predict the next character in a text sequence, how many output dimensions do we need?
-1. Can you design a mapping for which an RNN with hidden states is exact? Hint - what about a finite number of words? 
+1. Can you design a mapping for which an RNN with hidden states is exact? Hint - what about a finite number of words?
 1. What happens to the gradient if you backpropagate through a long sequence?
 1. What are some of the problems associated with the simple sequence model described above?
 
