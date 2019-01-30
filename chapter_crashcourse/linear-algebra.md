@@ -1,4 +1,4 @@
-# Linear algebra
+# Linear Algebra
 
 Now that you can store and manipulate data,
 let's briefly review the subset of basic linear algebra
