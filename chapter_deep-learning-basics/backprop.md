@@ -37,7 +37,7 @@ We refer to $J$ as the objective function of a given data example and refer to i
 
 Plotting computational graphs helps us visualize the dependencies of operators and variables within the calculation. The figure below contains the graph associated with the simple network described above. The lower left corner signifies the input and the upper right corner the output. Notice that the direction of the arrows (which illustrate data flow) are primarily rightward and upward.
 
-![Compute Graph](../img/forward.svg)
+![Computational Graph](../img/forward.svg)
 
 
 ## Back Propagation
