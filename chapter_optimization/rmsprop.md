@@ -45,8 +45,6 @@ d2l.show_trace_2d(f_2d, d2l.train_2d(rmsprop_2d))
 Next, we implement RMSProp with the formula in the algorithm.
 
 ```{.python .input  n=22}
-features, labels = d2l.get_data_ch7()
-
 def init_rmsprop_states():
     s_w = nd.zeros((features.shape[1], 1))
     s_b = nd.zeros(1)
