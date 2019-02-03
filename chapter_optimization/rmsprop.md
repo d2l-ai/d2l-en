@@ -45,8 +45,8 @@ d2l.show_trace_2d(f_2d, d2l.train_2d(rmsprop_2d))
 Next, we implement RMSProp with the formula in the algorithm.
 
 ```{.python .input  n=22}
-features, labels = d2l.get_data_ch7()
 
+features, labels = d2l.get_data_ch7()
 def init_rmsprop_states():
     s_w = nd.zeros((features.shape[1], 1))
     s_b = nd.zeros(1)
@@ -62,7 +62,6 @@ def rmsprop(params, states, hyperparams):
 We set the initial learning rate to 0.01 and the hyperparameter $\gamma$ to 0.9. Now, the variable $\boldsymbol{s}_t$ can be treated as the weighted average of the square term $\boldsymbol{g}_t \odot \boldsymbol{g}_t$ from the last $1/(1-0.9) = 10$ time steps.
 
 ```{.python .input  n=24}
-features, labels = d2l.get_data_ch7()
 d2l.train_ch7(rmsprop, init_rmsprop_states(), {'lr': 0.01, 'gamma': 0.9},
               features, labels)
 ```
