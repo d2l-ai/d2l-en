@@ -23,7 +23,7 @@ $$\hat{\boldsymbol{s}}_t \leftarrow \frac{\boldsymbol{s}_t}{1 - \beta_2^t}. $$
 
 Next, the Adam algorithm will use the bias-corrected variables $\hat{\boldsymbol{v}}_t$ and $\hat{\boldsymbol{s}}_t$ from above to re-adjust the learning rate of each element in the model parameters using element operations.
 
-$$\boldsymbol{g}_t' \leftarrow \frac{\eta \hat{\boldsymbol{v}}_t}{\sqrt{\hat{\boldsymbol{s}}_t + \epsilon}},$$
+$$\boldsymbol{g}_t' \leftarrow \frac{\eta \hat{\boldsymbol{v}}_t}{\sqrt{\hat{\boldsymbol{s}}_t} + \epsilon},$$
 
 Here, $eta$ is the learning rate while $\epsilon$ is a constant added to maintain numerical stability, such as $10^{-8}$. Just as for Adagrad, RMSProp, and Adadelta, each element in the independent variable of the objective function has its own learning rate. Finally, use $\boldsymbol{g}_t'$ to iterate the independent variable:
 
