@@ -409,9 +409,6 @@ which way the training set loss would move
 if you perturbed that parameter just a small amount. 
 They then update the parameter in the direction that reduces the loss.
 
-<!-- In the following sections, we will discuss a few types of machine learning in some more detail. We begin with a list of *objectives*, i.e. a list of things that machine learning can do. Note that the objectives are complemented with a set of techniques of *how* to accomplish them, i.e. training, types of data, etc. The list below is really only sufficient to whet the readers' appetite and to give us a common language when we talk about problems. We will introduce a larger number of such problems as we go along.
- -->
-
 
 ## Kinds of Machine Learning
 
