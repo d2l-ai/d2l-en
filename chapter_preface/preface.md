@@ -37,7 +37,7 @@ teaching you both the *concepts*, the *context*, and the *code*.
 ### One Medium Combining Code, Math, and HTML
 
 For any computing technology to reach its full impact,
-it must well-understood, well-documented, and supported by
+it must be well-understood, well-documented, and supported by
 mature, well-maintained tools.
 The key ideas should be clearly distilled,
 minimizing the onboarding time needing to bring new practitioners up to date.
