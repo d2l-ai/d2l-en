@@ -398,14 +398,19 @@ reporting the following two quantities:
 
 ### Optimization algorithms
 
-Finally, to minimize the loss, we'll need some way of taking the model and its loss functions,
-and searching for a set of parameters that minimizes the loss.
-The most popular optimization algorithms for work on neural networks
+Once we've got some data source and representation,
+a model, and a well-defined objective function,
+we need an algorithm capable of searching 
+for the best possible parameters for minimizing the loss function.
+The most popular optimization algorithms for neural networks
 follow an approach called gradient descent.
-In short, they look to see, for each parameter which way the training set loss would move if you jiggled the parameter a little bit. They then update the parameter in the direction that reduces the loss.
+In short, at each step, they check to see, for each parameter,
+which way the training set loss would move 
+if you perturbed that parameter just a small amount. 
+They then update the parameter in the direction that reduces the loss.
 
-In the following sections, we will discuss a few types of machine learning in some more detail. We begin with a list of *objectives*, i.e. a list of things that machine learning can do. Note that the objectives are complemented with a set of techniques of *how* to accomplish them, i.e. training, types of data, etc. The list below is really only sufficient to whet the readers' appetite and to give us a common language when we talk about problems. We will introduce a larger number of such problems as we go along.
-
+<!-- In the following sections, we will discuss a few types of machine learning in some more detail. We begin with a list of *objectives*, i.e. a list of things that machine learning can do. Note that the objectives are complemented with a set of techniques of *how* to accomplish them, i.e. training, types of data, etc. The list below is really only sufficient to whet the readers' appetite and to give us a common language when we talk about problems. We will introduce a larger number of such problems as we go along.
+ -->
 
 
 ## Kinds of Machine Learning
