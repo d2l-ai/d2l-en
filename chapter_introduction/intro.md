@@ -16,7 +16,6 @@ of all historical transactions
 would map out in methodical details the appropriate action to take
 in every conceivable circumstance.
 
-
 To build the *brains* of our application,
 we'd have to step through every possible corner case
 that we anticipate encountering, devising appropriate rules.
@@ -130,7 +129,6 @@ the best possible set of parameters,
 those that improve the performance of our program
 with respect to some measure of performance on the task of interest.
 
-
 You can think of the parameters as knobs that we can turn,
 manipulating the behavior of the program.
 Fixing a the parameters, we call the program a *model*.
@@ -139,7 +137,6 @@ that we can produce just by manipulating the parameters
 is called a *family* of models.
 And the *meta-program* that uses our dataset
 to choose the parameters is called a *learning algorithm*.
-
 
 Before we an go ahead and engage the learning algorithm,
 we have to define the problem precisely,
@@ -163,13 +160,12 @@ if we want to deal with fundamentally different inputs or outputs,
 say if we wanted to map from images to captions,
 or from English sentences to Chinese sentences.
 
-
-As you might guess, if we just set the knobs randomly,
-the model will probably recognize neither 'Alexa', 'Apricot',
-nor any other English word.
-Generally, in deep learning, the *learning*
-refers to updating the model's behavior (by tuning the knobs)
-over the course of a *training period*.
+As you might guess, if we just set all of the knobs randomly,
+it's not likely that our model will recognize 'Alexa', 'Apricot',
+or any other English word.
+In deep learning, the *learning* is the process
+by which we discover the right setting of the knobs
+coercing the desired behaviour from our model.
 
 The training process usually looks like this:
 
@@ -228,33 +224,96 @@ natural language processing, medical informatics, and other application areas,
 offering a unified set of tools for tackling diverse problems.
 
 
-## Basics of Machine Learning
-When we considered the task of recognizing wake-words,
-we put together a dataset consisting of snippets and labels.
-We then described (albeit abstractly)
-how you might train a machine learning model
-to predict the label given a snippet.
-This set-up, predicting labels from examples, is just one flavor of ML
-and it's called *supervised learning*.
-Even within deep learning, there are many other approaches,
-and we'll discuss each in subsequent sections.
-To get going with machine learning, we need four things:
+## The Key Components: Data, Models, and Algorithms
 
-1. Data
-2. A model of how to transform the data
-3. A loss function to measure how well we're doing
-4. An algorithm to tweak the model parameters such that the loss function is minimized
+In our *wake-word* example, we described a dataset 
+consisting of audio snippets and binary labels
+gave a hand-wavy sense of how we might *train*
+a model to approximate a mapping from snippets to classifications.
+This sort of problem, where we try to predict a designated unknown *label*
+given known *inputs* (also called *features* or *covariates*),
+given examples of both is called *supervised learning*,
+and it's just one among many *kinds* of machine learning problems.
+In the next section, we'll take a deep dive into the different ML ploblems.
+First, we'd like to shed more light on some core components 
+that will follow us around, no matter what kind of ML problem we take on:
+
+1. The **data** that we can learn from
+2. A **model** of how to transform the data
+3. A **loss** function that quantifies the *badness* of our model
+4. An **algorithm** to ajust the model's parameters to minimize the loss
+
 
 ### Data
 
-Generally, the more data we have, the easier our job becomes.
-When we have more data, we can train more powerful models. Data is at the heart of the resurgence of deep learning and many of most exciting models in deep learning don't work without large data sets. Here are some examples of the kinds of data machine learning practitioners often engage with:
+It might go without saying that you cannot do data science without data.
+We could lose hundreds of pages pondering the precise nature of data
+but for now we'll err on the practical side and focus on the key properties
+to be concerned with. 
+Generally we are concerned with a collection of *examples* 
+(also called *data points*, *samples*, or *instances*).
+In order to work with data usefully, we typically 
+need to come up with a suitable numerical representation.
+Each *example* typically consists of a collection 
+of numerical attributes called *features* or *covariates*.
 
-* **Images:** Pictures taken by smartphones or harvested from the web, satellite images, photographs of medical conditions, ultrasounds, and radiologic images like CT scans and MRIs, etc.
-* **Text:** Emails, high school essays, tweets, news articles, doctor's notes, books, and corpora of translated sentences, etc.
-* **Audio:** Voice commands sent to smart devices like Amazon Echo, or iPhone or Android phones, audio books, phone calls, music recordings, etc.
-* **Video:** Television programs and movies, YouTube videos, cell phone footage, home surveillance, multi-camera tracking, etc.
-* **Structured data:** Webpages, electronic medical records, car rental records, electricity bills, etc.
+If we were working with image data,
+each individual photograph might constitute an *example*,
+each represented by an ordered list of numerical values
+corresponding to the brightness of each pixel.
+A $200\times200$ color photograph would consist of $200\times200\times3=120000$
+numerical values, corresponding to the brightness 
+of the red, green, and blue channels corresponding to each spatial location.
+In a more traditional task, we might try to predict 
+whether or not a patient will survive, 
+given a standard set of features such as age, vital signs, diagnoses, etc.
+
+When every example is characterized by the same number of numerical values,
+we say that the data consists of *fixed-length* vectors
+and we describe the (consant) length of the vectors 
+as the *dimensionality* of the data.
+As you might imagine, fixed length can be a convenient property.
+If we wanted to train a model to recognize cancer in microscopy images,
+fixed-length inputs means we have one less thing to worry about.
+
+However, not all data can easily be represented as fixed length vectors. 
+While we might expect microscrope images to come from standard equipment,
+we can't expect images mined from the internet to all show up in the same size.
+While we might imagine cropping images to a standard size,
+text data resists fixed-length representations even more stubbornly.
+Consider the product reviews left on e-commerce sites like Amazon or TripAdvisor. Some are short: "it stinks!". Others ramble for pages.
+One major advantage of deep learning over traditional methods
+is the comparative grace with which modern models 
+can handle *varying-length* data.
+
+Generally, the more data we have, the easier our job becomes.
+When we have more data, we can train more powerful models,
+and rely less heavily on pre-conceived assumptions.
+The regime change from (comparatively small) to big data 
+is a major contributor to the success of modern deep learning.
+To bring the point home, many of the most exciting models in deep learning either don't work without large data sets.
+Some others work in the low-data regime, 
+but no better than traditional approaches.
+
+Finally it's not enough to have lots of data and to process it cleverly. 
+We need the *right* data. 
+If the data is full of mistakes, or if the chosen features are not predictive of the target quantity of interest, learning is going to fail.
+The situation is well captured by the cliché: *garbage in, garbage out*.
+Moreover, poor predictive performance isn't the only potential consequence.
+In sensitive applications of machine learning, 
+like predictive policing, resumé screening, and risk models used for lending,
+we must be especially alert to the consequences of garbage data.
+One common failure mode occurs in datasets where some groups of people
+are unrepresented in the training data.
+Imagine applying a skin cancer recognition system in the wild 
+that had never seen black skin before. 
+Failure can also occur when the data doesn't merely under-represent some groups,
+but reflects societal prejudices. 
+For example if past hiring decisions are used to train a predictive model 
+that will be used to screen resumes, then machine learning models could inadvertantly capture and automate historical injustices.
+Note that this can all happen without the data scientist being complicit, 
+or even aware.
+
 
 ### Models
 
@@ -273,7 +332,8 @@ On our way to discussing deep nets, we'll also discuss some simpler, shallower m
 
 ###  Loss functions
 
-To assess how well we're doing we need to compare the output from the model with the truth.
+To assess how well we're doing we need to compare 
+the output from the model with the truth.
 Loss functions give us a way of measuring how *bad* our output is.
 For example, say we trained a model to infer a patient's heart rate from images.
 If the model predicted that a patient's heart rate was 100bpm,
@@ -304,6 +364,8 @@ follow an approach called gradient descent.
 In short, they look to see, for each parameter which way the training set loss would move if you jiggled the parameter a little bit. They then update the parameter in the direction that reduces the loss.
 
 In the following sections, we will discuss a few types of machine learning in some more detail. We begin with a list of *objectives*, i.e. a list of things that machine learning can do. Note that the objectives are complemented with a set of techniques of *how* to accomplish them, i.e. training, types of data, etc. The list below is really only sufficient to whet the readers' appetite and to give us a common language when we talk about problems. We will introduce a larger number of such problems as we go along.
+
+
 
 ## Kinds of Machine Learning
 
