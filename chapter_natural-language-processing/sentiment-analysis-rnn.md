@@ -212,7 +212,7 @@ predict_sentiment(net, vocab, ['this', 'movie', 'is', 'so', 'bad'])
 * We can apply pre-trained word vectors and recurrent neural networks to classify the emotions in a text.
 
 
-## Problems
+## Exercises
 
 * Increase the number of epochs. What accuracy rate can you achieve on the training and testing data sets? What about trying to re-tune other hyper-parameters?
 

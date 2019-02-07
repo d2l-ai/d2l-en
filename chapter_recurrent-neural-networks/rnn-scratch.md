@@ -301,7 +301,7 @@ The perplexity is quite a bit lower. In fact, both models are pretty close to $1
 * Perplexity calibrates model performance across variable sequence length. It is the exponentiated average of the cross-entropy loss.
 * Sequential partitioning typically leads to better models. 
 
-## Problems
+## Exercises
 
 1. Show that one-hot encoding is equivalent to picking a different embedding for each object.
 1. Adjust the hyperparameters to improve the perplexity. 

@@ -318,7 +318,7 @@ display(img, output, threshold=0.3)
 
 
 
-## Problems
+## Exercises
 
 * Due to space limitations, we have ignored some of the implementation details of SSD models in this experiment. Can you further improve the model in the following areas?
 

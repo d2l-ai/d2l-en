@@ -122,7 +122,7 @@ print(x.grad)
 * MXNet's `autograd` package can be used to derive general imperative programs.
 * The running modes of MXNet include the training mode and the prediction mode. We can determine the running mode by `autograd.is_training()`.
 
-## Problems
+## Exercises
 
 1. In the example, finding the gradient of the control flow shown in this section, the variable `a` is changed to a random vector or matrix. At this point, the result of the calculation `c` is no longer a scalar. What happens to the result. How do we analyze this?
 1. Redesign an example of finding the gradient of the control flow. Run and analyze the result.

@@ -247,7 +247,7 @@ train_with_data_aug(train_augs, test_augs)
 * In order to obtain a definitive results during prediction, we usually only apply image augmentation to the training example, and do not use image augmentation with random operations during prediction.
 * We can obtain classes related to image augmentation from Gluon's `transforms` module.
 
-## Problems
+## Exercises
 
 * Train the model without using image augmentation: `train_with_data_aug(no_aug, no_aug)`. Compare training and testing accuracy when using and not using image augmentation. Can this comparative experiment support the argument that image augmentation can mitigate overfitting? Why?
 * Add different image augmentation methods in model training based on the CIFAR-10 data set. Observe the implementation results.

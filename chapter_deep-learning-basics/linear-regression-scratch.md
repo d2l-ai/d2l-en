@@ -180,7 +180,7 @@ Note that we should not take it for granted that we are able to reover the param
 We saw how a deep network can be implemented and optimized from scratch, using just NDArray and `autograd` without any need for defining layers, fancy optimizers, etc. This only scratches the surface of what is possible. In the following sections, we will describe additional deep learning models based on what we have just learned and you will learn how to implement them using more concisely.
 
 
-## Problems
+## Exercises
 
 1. What would happen if we were to initialize the weights $\mathbf{w} = 0$. Would the algorithm still work?
 1. Assume that you're [Georg Simon Ohm](https://en.wikipedia.org/wiki/Georg_Ohm) trying to come up with a model between voltage and current. Can you use `autograd` to learn the parameters of your model.

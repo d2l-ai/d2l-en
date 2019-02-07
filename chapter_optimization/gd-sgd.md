@@ -189,7 +189,7 @@ As we can see, the iterative trajectory of the independent variable in the SGD i
 * When there are more examples in the training data set, it costs more to compute each iteration for gradient descent, so SGD is preferred in these cases.
 
 
-## Problems
+## Exercises
 
 * Using a different objective function, observe the iterative trajectory of the independent variable in gradient descent and the SGD.
 * In the experiment for gradient descent in two-dimensional space, try to use different learning rates to observe and analyze the experimental phenomena.

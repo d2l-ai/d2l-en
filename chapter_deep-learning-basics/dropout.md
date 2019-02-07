@@ -161,7 +161,7 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size, None,
 * Dropout is only used during training.
 
 
-## Problems
+## Exercises
 
 1. Try out what happens if you change the dropout probabilities for layers 1 and 2. In particular, what happens if you switch the ones for both layers?
 1. Increase the number of epochs and compare the results obtained when using dropout with those when not using it.

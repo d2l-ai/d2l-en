@@ -198,7 +198,7 @@ train(num_gpus=2, batch_size=256, lr=0.2)
 * We can use data parallelism to more fully utilize the computational resources of multiple GPUs to implement multi-GPU model training.
 * With the same hyper-parameters, the training accuracy of the model is roughly equivalent when we change the number of GPUs.
 
-## Problems
+## Exercises
 
 * In a multi-GPU training experiment, use 2 GPUs for training and double the `batch_size` to 512. How does the training time change? If we want a test accuracy comparable with the results of single-GPU training, how should the learning rate be adjusted?
 * Change the model prediction part of the experiment to multi-GPU prediction.

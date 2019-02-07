@@ -150,7 +150,7 @@ d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,
 * The main units that compose DenseNet are dense blocks and transition layers.
 * We need to keep the dimensionality under control when composing the network by adding transition layers that shrink the number of channels again. 
 
-## Problems
+## Exercises
 
 1. Why do we use average pooling rather than max-pooling in the transition layer? 
 1. One of the advantages mentioned in the DenseNet paper is that its model parameters are smaller than those of ResNet. Why is this the case?

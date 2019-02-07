@@ -113,7 +113,7 @@ In deep learning, it is difficult, but also not necessary, to find the global op
 * Since, generally, the parameters of deep learning models are high-dimensional, saddle points in the objective function are more commonly seen than local minimums.
 
 
-## Problems
+## Exercises
 
 * What other challenges involved in deep learning optimization can you think of?
 

@@ -44,7 +44,7 @@ $$l^{(i)}(\mathbf{w}, b) = \frac{1}{2} \left(\hat{y}^{(i)} - y^{(i)}\right)^2,$$
 
 The constant $1/2$ ensures that the constant coefficient, after deriving the quadratic term, is 1, which is slightly simpler in form. Obviously, the smaller the error, the closer the predicted price is to the actual price, and when the two are equal, the error will be zero. Given the training data set, this error is only related to the model parameters, so we record it as a function with the model parameters as parameters. In machine learning, we call the function that measures the error the ‘loss function’. The squared error function used here is also referred to as ‘square loss’.
 
-To make things a bit more concrete, consider the example below where we plot such a regression problem for a one-dimensional case, e.g. for a model where house prices depend only on area.
+To make things a bit more concrete, consider the example below where we plot a regression problem for a one-dimensional case, e.g. for a model where house prices depend only on area.
 
 ![Linear regression is a single-layer neural network. ](../img/linearregression.svg)
 
@@ -194,7 +194,7 @@ A closer inspection reveals that for the purpose of minimizing $-\log P(Y|X)$ we
 * Minimizing an objective function and performing maximum likelihood can mean the same thing.
 * Linear models are neural networks, too.
 
-## Problems
+## Exercises
 
 1. Assume that we have some data $x_1, \ldots x_n \in \mathbb{R}$. Our goal is to find a constant $b$ such that $\sum_i (x_i - b)^2$ is minimized.
     * Find the optimal closed form solution.

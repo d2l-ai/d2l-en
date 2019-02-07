@@ -133,7 +133,7 @@ print('Error in estimating b', true_b - b)
 * Dimensionality and storage are automagically inferred (but caution if you want to access parameters before they've been initialized).
 
 
-## Problems
+## Exercises
 
 1. If we replace `l = loss(output, y)` with `l = loss(output, y).mean()`, we need to change `trainer.step(batch_size)` to `trainer.step(1)` accordingly. Why?
 1. Review the MXNet documentation to see what loss functions and initialization methods are provided in the modules `gluon.loss` and `init`. Replace the loss by Huber's loss.

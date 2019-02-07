@@ -342,7 +342,7 @@ After executing the above code, we will get a "submission.csv" file. The format 
 * We can use convolutional neural networks, image augmentation, and hybrid programming to take part in an image classification competition.
 
 
-## Problems
+## Exercises
 
 * Use the complete CIFAF-10 data set for the Kaggle competition. Change the `batch_size` and number of epochs `num_epochs` to 128 and 100, respectively.  See what accuracy and ranking you can achieve in this competition.
 * What accuracy can you achieve when not using image augmentation?

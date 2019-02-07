@@ -46,7 +46,7 @@ Generally, GPUs are primarily used for deep learning training. Therefore, you do
 * You should purchase the latest GPU model that you can afford.
 * When deciding on machine configurations, you must consider GPU power consumption, heat dissipation, and size.
 
-## Problem
+## Exercise
 
 * You can browse the discussions about machine configurations in the forum for this section.
 

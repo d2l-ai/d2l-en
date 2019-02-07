@@ -167,7 +167,7 @@ As we can see, the model achieves comparable perplexity, albeit within a shorter
 * Gluon's `nn.RNN` instance returns the output and hidden state after forward computation. This forward computation does not involve output layer computation.
 * As before, the compute graph needs to be detached from previous steps for reasons of efficiency.
 
-## Problems
+## Exercises
 
 1. Compare the implementation with the previous section. 
     * Why does Gluon's implementation run faster? 

@@ -111,7 +111,7 @@ net.initialize(init=MyInit())
 * Initialization can be repeated (or forced) by setting the `force_reinit=True` flag.
 
 
-## Problems
+## Exercises
 
 1. What happens if you specify only parts of the input dimensions. Do you still get immediate initialization?
 1. What happens if you specify mismatching dimensions?

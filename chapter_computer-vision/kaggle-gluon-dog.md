@@ -300,7 +300,7 @@ After executing the above code, we will generate a "submission.csv" file. The fo
 * We can use a model pre-trained on the ImageNet data set to extract features and only train a small custom output network. This will allow us to classify a subset of the ImageNet data set with lower computing and storage overhead.
 
 
-## Problems
+## Exercises
 
 * When using the entire Kaggle data set, what kind of results do you get when you increase the `batch_size` (batch size) and `num_epochs` (number of epochs)?
 * Do you get better results if you use a deeper pre-trained model?

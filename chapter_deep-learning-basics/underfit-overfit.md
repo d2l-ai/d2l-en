@@ -227,7 +227,7 @@ Further along in later chapters, we will continue discussing overfitting problem
 * We should choose an appropriately complex model and avoid using insufficient training samples.
 
 
-## Problems
+## Exercises
 
 1. Can you solve the polynomial regression problem exactly? Hint - use linear algebra.
 1. Model selection for polynomials

@@ -105,7 +105,7 @@ We know that, in the object detection training set, each image is labelled with 
 
 
 Assume the anchor boxes in the image are $A_1, A_2, \ldots, A_{n_a}$ and the ground-truth bounding boxes are $B_1, B_2, \ldots, B_{n_b}$ and $n_a \geq n_b$. Define matrix $\boldsymbol{X} \in \mathbb{R}^{n_a \times n_b}$, where element $x_{ij}$ in the $i$th row and $j$th column is the IoU of the anchor box $A_i$ to the ground-truth bounding box $B_j$.
-First, we find the largest element in the matrix $boldsymbol{x}$ and record the row index and column index of the element as $i_1,j_1$. We assign the ground-truth bounding box $B_{j_1}$ to the anchor box $A_{i_1}$. Obviously, anchor box $A_{i_1}$ and ground-truth bounding box $B_{j_1}$ have the highest similarity among all the "anchor box - ground-truth bounding box" pairings. Next, discard all elements in the $i_1$th row and the $j_1$th column in the matrix $\boldsymbol{X}$. Find the largest remaining element in the matrix $\boldsymbol{X}$ and record the row index and column index of the element as $i_2,j_2$. We assign ground-truth bounding box $B_{j_2}$ to anchor box $A_{i_2}$ and then discard all elements in the $i_2$th row and the $j_2$th column in the matrix $\boldsymbol{X}$. At this point, elements in two rows and two columns in the matrix $\boldsymbol{X}$ have been discarded.
+First, we find the largest element in the matrix $\boldsymbol{X}$ and record the row index and column index of the element as $i_1,j_1$. We assign the ground-truth bounding box $B_{j_1}$ to the anchor box $A_{i_1}$. Obviously, anchor box $A_{i_1}$ and ground-truth bounding box $B_{j_1}$ have the highest similarity among all the "anchor box - ground-truth bounding box" pairings. Next, discard all elements in the $i_1$th row and the $j_1$th column in the matrix $\boldsymbol{X}$. Find the largest remaining element in the matrix $\boldsymbol{X}$ and record the row index and column index of the element as $i_2,j_2$. We assign ground-truth bounding box $B_{j_2}$ to anchor box $A_{i_2}$ and then discard all elements in the $i_2$th row and the $j_2$th column in the matrix $\boldsymbol{X}$. At this point, elements in two rows and two columns in the matrix $\boldsymbol{X}$ have been discarded.
 We proceed until all elements in the $n_b$ column in the matrix $\boldsymbol{X}$ are discarded. At this time, we have assigned a ground-truth bounding box to each of the $n_b$ anchor boxes.
 Next, we only traverse the remaining $n_a - n_b$ anchor boxes. Given anchor box $A_i$, find the bounding box $B_j$ with the largest IoU with $A_i$ according to the $i$th row of the matrix $\boldsymbol{X}$, and only assign ground-truth bounding box $B_j$ to anchor box $A_i$ when the IoU is greater than the predetermined threshold.
 
@@ -225,7 +225,7 @@ In practice, we can remove prediction bounding boxes with lower confidence level
 * In the training set, we mark two types of labels for each anchor box: one is the category of the target contained in the anchor box and the other is the offset of the ground-truth bounding box relative to the anchor box.
 * When predicting, we can use non-maximum suppression (NMS) to remove similar prediction bounding boxes, thereby simplifying the results.
 
-## Problems
+## Exercises
 
 * Change the `sizes` and `ratios` values in `contrib.nd.MultiBoxPrior` and observe the changes to the generated anchor boxes.
 * Construct two bounding boxes with and IoU of 0.5, and observe their coincidence.

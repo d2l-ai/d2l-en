@@ -101,7 +101,7 @@ For the sake of brevity, when the padding number on both sides of the input heig
 * The stride can reduce the resolution of the output, for example reducing the height and width of the output to only $1/n$ of the height and width of the input ($n$ is an integer greater than 1).
 * Padding and stride can be used to adjust the dimensionality of the data effectively.
 
-## Problems
+## Exercises
 
 1. For the last example in this section, use the shape calculation formula to calculate the output shape to see if it is consistent with the experimental results.
 1. Try other padding and stride combinations on the experiments in this section.

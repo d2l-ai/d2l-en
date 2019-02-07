@@ -202,7 +202,7 @@ for X, Y in train_iter:
 * In the semantic segmentation field, one important data set is Pascal VOC2012.
 * Because the input images and labels in semantic segmentation have a one-to-one correspondence at the pixel level, we randomly crop them to a fixed size, rather than scaling them.
 
-## Problems
+## Exercises
 
 * Recall the content we covered in the ["Image Augmentation"](image-augmentation.md) section. Which of the image augmentation methods used in image classification would be hard to use in semantic segmentation?
 

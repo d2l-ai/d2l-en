@@ -97,7 +97,7 @@ As shown in 9.9, Mask R-CNN is a modification to the Faster R-CNN model. Mask R-
 * Mask R-CNN uses the same basic structure as Faster R-CNN, but adds a fully convolution layer to help locate objects at the pixel level and further improve the precision of object detection.
 
 
-## Problems
+## Exercises
 
 * Study the implementation of each model in the GluonCV toolkit related to this section[6].
 

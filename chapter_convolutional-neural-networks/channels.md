@@ -103,7 +103,7 @@ Y2 = corr2d_multi_in_out(X, K)
 * The $1\times 1$ convolutional layer is typically used to adjust the number of channels between network layers and to control model complexity.
 
 
-## Problems
+## Exercises
 
 1. Assume that we have two convolutional kernels of size $k_1$ and $k_2$ respectively (with no nonlinearity in between).
     * Prove that the result of the operation can be expressed by a single convolution.

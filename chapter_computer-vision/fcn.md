@@ -229,7 +229,7 @@ d2l.show_images(imgs[::3] + imgs[1::3] + imgs[2::3], 3, n);
 * In a fully convolutional network, we initialize the transposed convolution layer for upsampled bilinear interpolation.
 
 
-## Problems
+## Exercises
 
 * Is it efficient to use matrix multiplication to implement convolution operations? Why?
 * If we use Xavier to randomly initialize the transposed convolution layer, what will happen to the result?

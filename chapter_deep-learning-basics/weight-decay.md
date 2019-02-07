@@ -184,7 +184,7 @@ So far we only touched upon what constitutes a simple *linear* function. For non
 * You can have different optimizers within the same training loop, e.g. for different sets of parameters.
 
 
-## Problems
+## Exercises
 
 1. Experiment with the value of $\lambda$ in the estimation problem in this page. Plot training and test accuracy as a function of $\lambda$. What do you observe?
 1. Use a validation set to find the optimal value of $\lambda$. Is it really the optimal value? Does this matter?

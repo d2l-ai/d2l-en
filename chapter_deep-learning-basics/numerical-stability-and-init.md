@@ -110,7 +110,7 @@ The reasoning above barely scratches the surface. In fact, MXNet has an entire `
 * The ReLu addresses one of the vanishing gradient problems, namely that gradients vanish for very large inputs. This can accelerate convergence significantly.
 * Random initialization is key to ensure that symmetry is broken before optimization.
 
-## Problems
+## Exercises
 
 1. Can you design other cases of symmetry breaking besides the permutation symmetry?
 1. Can we initialize all weight parameters in linear regression or in softmax regression to the same value?

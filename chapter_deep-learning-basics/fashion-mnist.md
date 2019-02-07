@@ -124,7 +124,7 @@ for X, y in train_iter:
 * We store the shape of image using height and width of $h$ and $w$ pixels, respectively, as $h \times w$ or `(h, w)`.
 * Data iterators are a key component for efficient performance. Use existing ones if available.
 
-## Problems
+## Exercises
 
 1. Does reducing `batch_size` (for instance, to 1) affect read performance?
 1. For non-Windows users, try modifying `num_workers` to see how it affects read performance.

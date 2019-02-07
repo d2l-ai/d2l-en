@@ -107,7 +107,7 @@ jupyter nbextension enable execute_time/ExecuteTime
 
 * You can edit and run the code in this book using Jupyter Notebook.
 
-## Problem
+## Exercise
 
 * Try to edit and run the code in this book locally.
 

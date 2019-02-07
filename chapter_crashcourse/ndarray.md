@@ -234,7 +234,7 @@ b = nd.array(a)
 print(type(b))
 ```
 
-## Problems
+## Exercises
 
 1. Run the code in this section. Change the conditional statement `x == y` in this section to `x < y` or `x > y`, and then see what kind of NDArray you can get.
 1. Replace the two NDArrays that operate by element in the broadcast mechanism with other shapes, e.g. three dimensional tensors. Is the result the same as expected?

@@ -167,7 +167,7 @@ Modern deep networks achieve error rates of less than 0.01. While Naive Bayes cl
 * Naive Bayes classifiers don't exploit any correlations between
   observations.
 
-## Problems
+## Exercises
 
 1. Design a Naive Bayes regression estimator where $p(x_i | y)$ is a normal distribution.
 1. Under which situations does Naive Bayes work?

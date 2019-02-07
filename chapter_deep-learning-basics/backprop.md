@@ -37,7 +37,7 @@ We refer to $J$ as the objective function of a given data example and refer to i
 
 Plotting computational graphs helps us visualize the dependencies of operators and variables within the calculation. The figure below contains the graph associated with the simple network described above. The lower left corner signifies the input and the upper right corner the output. Notice that the direction of the arrows (which illustrate data flow) are primarily rightward and upward.
 
-![Compute Graph](../img/forward.svg)
+![Computational Graph](../img/forward.svg)
 
 
 ## Back Propagation
@@ -111,7 +111,7 @@ When training networks, forward and backward propagation depend on each other. I
 * Training requires significantly more memory and storage.
 
 
-## Problems
+## Exercises
 
 1. Assume that the inputs $\mathbf{x}$ are matrices. What is the dimensionality of the gradients?
 1. Add a bias to the hidden layer of the model described in this chapter.

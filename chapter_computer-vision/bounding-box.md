@@ -1,4 +1,4 @@
-# Object Detection and Bounding Box
+# Object Detection and Bounding Boxes
 
 In the previous section, we introduced many models for image classification. In image classification tasks, we assume that there is only one main target in the image and we only focus on how to identify the target category. However, in many situations, there are multiple targets in the image that we are interested in. We not only want to classify them, but also want to obtain their specific positions in the image. In computer vision, we refer to such tasks as object detection (or object detection).
 
@@ -57,7 +57,7 @@ fig.axes.add_patch(bbox_to_rect(cat_bbox, 'red'));
 
 * In object detection, we not only need to identify all the objects of interest in the image, but also their positions. The positions are generally represented by a rectangular bounding box.
 
-## Problems
+## Exercises
 
 * Find some images and try to label a bounding box that contains the target. Compare the difference between the time it takes to label the bounding box and label the category.
 

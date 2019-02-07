@@ -194,7 +194,7 @@ This clearly illustrates how the quality of the estimates changes as we try to p
 * There's quite a difference in difficulty between filling in the blanks in a sequence (smoothing) and forecasting. Consequently, if you have a time series, always respect the temporal order of the data when training, i.e. never train on future data.
 * For causal models (e.g. time going forward), estimating the forward direction is typically a lot easier than the reverse direction, i.e. we can get by with simpler networks. 
 
-## Problems
+## Exercises
 
 1. Improve the above model.
     * Incorporate more than the past 4 observations? How many do you really need?

@@ -71,7 +71,7 @@ d2l.train_gluon_ch7('adadelta', {'rho': 0.9}, features, labels)
 
 * Adadelta has no learning rate hyperparameter, it uses an EWMA on the squares of elements in the variation of the independent variable to replace the learning rate.
 
-## Problems
+## Exercises
 
 * Adjust the value of $\rho$ and observe the experimental results.
 

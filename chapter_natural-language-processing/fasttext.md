@@ -23,7 +23,7 @@ The rest of the fastText process is consistent with the skip-gram model, so it i
 * Subword embedding utilizes the principles of morphology, which usually improves the quality of representations of uncommon words.
 
 
-## Problems
+## Exercises
 
 * When there are too many subwords (for example, 6 words in English result in about $3\times 10^8$ combinations), what problems arise? Can you think of any methods to solve them? Hint: Refer to the end of section 3.2 of the fastText paper[1].
 * How can you design a subword embedding model based on the continuous bag-of-words model?

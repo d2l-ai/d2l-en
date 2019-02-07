@@ -134,7 +134,7 @@ Recall the observation from the previous section that cross-correlation and conv
 * We can design a kernel to detect edges in images.
 * We can learn the kernel through data.
 
-## Problems
+## Exercises
 
 1. Construct an image `X` with diagonal edges.
     * What happens if you apply the kernel `K` to it?

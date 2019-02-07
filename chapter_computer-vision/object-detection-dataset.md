@@ -77,7 +77,7 @@ for ax, label in zip(axes, batch.label[0][0:10]):
 * The data reading for object detection is similar to that for image classification. However, after we introduce bounding boxes, the label shape and image augmentation (e.g., random cropping) are changed.
 
 
-## Problems
+## Exercises
 
 * Referring to the MXNet documentation, what are the parameters for the constructors of the `image.ImageDetIter` and `image.CreateDetAugmenter` classes? What is their significance?
 

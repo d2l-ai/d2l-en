@@ -138,7 +138,7 @@ Sequential partitioning decomposes the sequence into `batch_size` many strips of
 * The main choices for sequence partitioning are whether we pick consecutive or random sequences. In particular for recurrent networks the former is critical. 
 * Given the overall document length, it is usually acceptable to be slightly wasteful with the documents and discard half-empty minibatches. 
 
-## Problems
+## Exercises
 
 1. Which other other mini-batch data sampling methods can you think of?
 1. Why is it a good idea to have a random offset? 

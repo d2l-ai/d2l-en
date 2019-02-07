@@ -94,7 +94,7 @@ This looks slightly better than before, a clear sign that we're on to something 
 
 We saw that implementing a simple MLP is quite easy, when done manually. That said, for a large number of layers this can get quite complicated (e.g. naming the model parameters, etc).
 
-## Problems
+## Exercises
 
 1. Change the value of the hyper-parameter `num_hiddens` in order to see the result effects.
 1. Try adding a new hidden layer to see how it affects the results.

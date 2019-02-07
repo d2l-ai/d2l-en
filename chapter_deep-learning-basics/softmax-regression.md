@@ -169,7 +169,7 @@ After training the softmax regression model, given any example features, we can 
 * Softmax regression applies to classification problems. It uses the probability distribution of the output category in the softmax operation.
 * Cross entropy is a good measure of the difference between two probability distributions. It measures the number of bits needed to encode the data given our model.
 
-## Problems
+## Exercises
 
 1. Show that the Kullback-Leibler divergence $D(p\|q)$ is nonnegative for all distributions $p$ and $q$. Hint - use Jensen's inequality, i.e. use the fact that $-\log x$ is a convex function.
 1. Show that $\log \sum_j \exp(o_j)$ is a convex function in $o$.

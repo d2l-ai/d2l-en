@@ -268,7 +268,7 @@ As you can see, each epoch takes more time due to the larger image size. As show
 * We use a Gram matrix to represent the style output by the style layers.
 
 
-## Problems
+## Exercises
 
 * How does the output change when you select different content and style layers?
 * Adjust the weight hyper-parameters in the loss function. Does the output retain more content or have less noise?

@@ -37,7 +37,7 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size, None,
               None, trainer)
 ```
 
-## Problems
+## Exercises
 
 1. Try adding a few more hidden layers to see how the result changes.
 1. Try out different activation functions. Which ones work best?
