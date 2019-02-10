@@ -27,7 +27,7 @@ VERSION = find_version('d2l', '__init__.py')
 requirements = [
     'numpy',
     'matplotlib',
-	'jupyter'
+    'jupyter'
 ]
 
 setup(

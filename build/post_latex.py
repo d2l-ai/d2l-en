@@ -19,7 +19,8 @@ def unnumber_sections(source_file):
                 if l.startswith('\subsection'):
                     target_f.write(l.replace('\\subsection', '\subsection*'))
                 if l.startswith('\subsubsection'):
-                    target_f.write(l.replace('\\subsubsection', '\subsubsection*'))
+                    target_f.write(
+                        l.replace('\\subsubsection', '\subsubsection*'))
             else:
                 target_f.write(l)
     remove(source_file)

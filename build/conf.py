@@ -22,10 +22,12 @@ from recommonmark.transform import AutoStructify
 from sphinx.highlighting import PygmentsBridge
 from pygments.formatters.latex import LatexFormatter
 
+
 class CustomLatexFormatter(LatexFormatter):
     def __init__(self, **options):
         super(CustomLatexFormatter, self).__init__(**options)
         self.verboptions = r"formatcom=\footnotesize"
+
 
 PygmentsBridge.latex_formatter = CustomLatexFormatter
 
@@ -101,7 +103,8 @@ language = 'en'
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', 'mx-theme', '**.ipynb_checkpoints']
+exclude_patterns = ['_build', 'Thumbs.db',
+                    '.DS_Store', 'mx-theme', '**.ipynb_checkpoints']
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
@@ -141,12 +144,13 @@ html_theme = 'mxtheme'
 html_theme_options = {
     'primary_color': 'blue',
     'accent_color': 'deep_orange',
-    'header_links' : [
-        ('Berkeley Course 2019', 'https://courses.d2l.ai/berkeley-stat-157/index.html', True, 'fas fa-user-graduate'),
+    'header_links': [
+        ('Berkeley Course 2019', 'https://courses.d2l.ai/berkeley-stat-157/index.html',
+         True, 'fas fa-user-graduate'),
         ('PDF', 'https://en.d2l.ai/d2l-en.pdf', True, 'fas fa-file-pdf'),
         ('Jupyter Notebooks', 'https://en.d2l.ai/d2l-en.zip', True, 'fas fa-download'),
         ('Discuss', 'https://discuss.mxnet.io', True, 'fab fa-discourse'),
-		('GitHub', 'https://github.com/d2l-ai/d2l-en', True, 'fab fa-github'),
+        ('GitHub', 'https://github.com/d2l-ai/d2l-en', True, 'fab fa-github'),
         ('中文版', 'https://zh.d2l.ai', True, 'fas fa-external-link-alt'),
     ],
     'show_footer': False
@@ -250,10 +254,10 @@ htmlhelp_basename = 'DiveIntoDeepLearning'
 
 latex_elements = {
     # 'papersize' : 'a4paper',
-    'utf8extra' : '',
-    'inputenc'  : '',
-    'babel'     : r'''\usepackage[english]{babel}''',
-    'preamble' : r'''
+    'utf8extra': '',
+    'inputenc': '',
+    'babel': r'''\usepackage[english]{babel}''',
+    'preamble': r'''
 
 \usepackage{setspace}
 \singlespacing
@@ -275,18 +279,18 @@ latex_elements = {
      }
 \makeatother
 ''',
-# The paper size ('letterpaper' or 'a4paper').
-#'papersize': 'letterpaper',
+    # The paper size ('letterpaper' or 'a4paper').
+    # 'papersize': 'letterpaper',
 
-# The font size ('10pt', '11pt' or '12pt').
-'pointsize': '10pt',
+    # The font size ('10pt', '11pt' or '12pt').
+    'pointsize': '10pt',
 
-# Additional stuff for the LaTeX preamble.
-#'preamble': '',
+    # Additional stuff for the LaTeX preamble.
+    # 'preamble': '',
 
-# Latex figure (float) alignment
-#'figure_align': 'htbp',
-'figure_align': 'H',
+    # Latex figure (float) alignment
+    # 'figure_align': 'htbp',
+    'figure_align': 'H',
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
@@ -368,6 +372,7 @@ nbsphinx_execute = 'never'
 # let the source file format to be xxx.ipynb instead of xxx.ipynb.txt
 html_sourcelink_suffix = ''
 
+
 def image_caption(app, docname, source):
     for i, src in enumerate(source):
         out = ''
@@ -378,6 +383,7 @@ def image_caption(app, docname, source):
                 l = l.strip().replace(' ', 'Ⓐ')
             out += l + '\n'
         source[i] = out
+
 
 def setup(app):
     app.add_transform(AutoStructify)
