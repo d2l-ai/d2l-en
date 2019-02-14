@@ -52,7 +52,7 @@ The main difference to before is that as soon as we knew the input dimensionalit
 
 ## Deferred Initialization in Practice
 
-Now that we know how it works in theory, let's see when the initialization is actually triggered. In order to do so, we mock up an initializer which does nothing but report a debug message stating when it was invoked and with which paramers.
+Now that we know how it works in theory, let's see when the initialization is actually triggered. In order to do so, we mock up an initializer which does nothing but report a debug message stating when it was invoked and with which parameters.
 
 ```{.python .input  n=22}
 class MyInit(init.Initializer):

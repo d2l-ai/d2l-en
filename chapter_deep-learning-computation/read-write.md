@@ -4,7 +4,7 @@ So far we discussed how to process data, how to build, train and test deep learn
 
 ## NDArray
 
-In its siplest form, we can directly use the `save` and `load` functions to store and read NDArrays separately. This works just as expected.
+In its simplest form, we can directly use the `save` and `load` functions to store and read NDArrays separately. This works just as expected.
 
 ```{.python .input}
 from mxnet import nd
