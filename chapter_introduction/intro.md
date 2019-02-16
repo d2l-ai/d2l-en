@@ -44,7 +44,7 @@ and a trailing window of past weather.
  * Write a program that given an image
  can identify all the people it contains,
  drawing outlines around each.
-  * Write a progam that presents users with products
+  * Write a program that presents users with products
   that they are likely to enjoy but unlikely,
   in the natural course of browsing, to encounter.
 
