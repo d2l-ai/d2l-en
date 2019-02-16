@@ -1,7 +1,7 @@
 # Introduction
 
 Until recently, nearly all of the computer programs
-thay we interacted with every day were coded
+that we interacted with every day were coded
 by software developers from first principles.
 Say that we wanted to write an application to manage an e-commerce platform.
 After huddling around a whiteboard for a few hours to ponder the problem,
