@@ -131,7 +131,7 @@ with respect to some measure of performance on the task of interest.
 
 You can think of the parameters as knobs that we can turn,
 manipulating the behavior of the program.
-Fixing a the parameters, we call the program a *model*.
+Fixing the parameters, we call the program a *model*.
 The set of all distinct programs (input-output mappings)
 that we can produce just by manipulating the parameters
 is called a *family* of models.
