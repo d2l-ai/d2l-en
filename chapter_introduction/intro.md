@@ -270,7 +270,7 @@ given a standard set of features such as age, vital signs, diagnoses, etc.
 
 When every example is characterized by the same number of numerical values,
 we say that the data consists of *fixed-length* vectors
-and we describe the (consant) length of the vectors 
+and we describe the (constant) length of the vectors 
 as the *dimensionality* of the data.
 As you might imagine, fixed length can be a convenient property.
 If we wanted to train a model to recognize cancer in microscopy images,
