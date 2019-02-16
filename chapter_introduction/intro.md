@@ -376,7 +376,7 @@ by minimizing the loss incurred on a *training set*
 consisting of some number of *examples* collected for training.
 However, doing well on the training data
 doesn't guarantee that we will do well on (unseen) test data.
-So we'll typically want to split the available into two partitions:
+So we'll typically want to split the available data into two partitions:
 the training data (for fitting model parameters) 
 and the test data (which is held out for evaluation),
 reporting the following two quantities:
