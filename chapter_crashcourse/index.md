@@ -1,4 +1,4 @@
-#  The Basics
+#  Crashcourse in the Preliminaries
 
 If you are in a hurry, this chapter has all the details you need to
 get a taste of deep learning. If you like to take the scenic route, we
