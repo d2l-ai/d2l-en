@@ -1,7 +1,7 @@
 # Introduction
 
 Until recently, nearly all of the computer programs
-thay we interacted with every day were coded
+that we interacted with every day were coded
 by software developers from first principles.
 Say that we wanted to write an application to manage an e-commerce platform.
 After huddling around a whiteboard for a few hours to ponder the problem,
@@ -44,7 +44,7 @@ and a trailing window of past weather.
  * Write a program that given an image
  can identify all the people it contains,
  drawing outlines around each.
-  * Write a progam that presents users with products
+  * Write a program that presents users with products
   that they are likely to enjoy but unlikely,
   in the natural course of browsing, to encounter.
 
@@ -131,7 +131,7 @@ with respect to some measure of performance on the task of interest.
 
 You can think of the parameters as knobs that we can turn,
 manipulating the behavior of the program.
-Fixing a the parameters, we call the program a *model*.
+Fixing the parameters, we call the program a *model*.
 The set of all distinct programs (input-output mappings)
 that we can produce just by manipulating the parameters
 is called a *family* of models.
@@ -270,7 +270,7 @@ given a standard set of features such as age, vital signs, diagnoses, etc.
 
 When every example is characterized by the same number of numerical values,
 we say that the data consists of *fixed-length* vectors
-and we describe the (consant) length of the vectors 
+and we describe the (constant) length of the vectors 
 as the *dimensionality* of the data.
 As you might imagine, fixed length can be a convenient property.
 If we wanted to train a model to recognize cancer in microscopy images,
@@ -376,7 +376,7 @@ by minimizing the loss incurred on a *training set*
 consisting of some number of *examples* collected for training.
 However, doing well on the training data
 doesn't guarantee that we will do well on (unseen) test data.
-So we'll typically want to split the available into two partitions:
+So we'll typically want to split the available data into two partitions:
 the training data (for fitting model parameters) 
 and the test data (which is held out for evaluation),
 reporting the following two quantities:

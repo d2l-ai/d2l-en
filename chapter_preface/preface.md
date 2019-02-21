@@ -294,7 +294,7 @@ Their GitHub IDs or names are (in no particular order):
 alxnorden, avinashingit, bowen0701, brettkoonce, Chaitanya Prakash Bapat,
 cryptonaut, edgarroman, gkutiel, John Mitro, Liang Pu, Rahul Agarwal, mohamed-ali,
 mstewart141, Mike Müller, NRauschmayr, prakhar1989, sad-, sfermigier, sundeepteki,
-topecongiro, vishaalkapoor, vishwesh5, YaYaB, Yuhong Chen, Evgeniy Smirnov, lgov, Simon Corston-Oliver.
+topecongiro, vishaalkapoor, vishwesh5, YaYaB, Yuhong Chen, Evgeniy Smirnov, lgov, Simon Corston-Oliver, IgorDzreyev, trungha-ngx.
 Moreover, we thank Amazon Web Services, especially Swami Sivasubramanian,
 Raju Gulabani, Charlie Bell, and Andrew Jassy for their generous support in writing this book.
 Without the available time, resources, discussions with colleagues,
@@ -308,7 +308,7 @@ and continuous encouragement this book would not have happened.
 * To successfully apply deep learning, you must understand how to cast a problem, the mathematics of modeling, the algorithms for fitting your models to data, and the engineering techniques to implement it all.
 * This book presents a comprehensive resource, including prose, figures, mathematics, and code, all in one place.
 * To answer questions related to this book, visit our forum at https://discuss.mxnet.io/.
-* Apache MXNet is a powerful library for coding up deep learning models and unning them in parallel across GPU cores.
+* Apache MXNet is a powerful library for coding up deep learning models and running them in parallel across GPU cores.
 * Gluon is a high level library that makes it easy to code up deep learning models using Apache MXNet.
 * Conda is a Python package manager that ensures that all software dependencies are met.
 * All notebooks are available for download on GitHub and  the conda configurations needed to run this book's code are expressed in the `environment.yml` file.
