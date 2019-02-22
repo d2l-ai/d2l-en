@@ -71,7 +71,7 @@ Note that there are many more efficient algorithms for sampling than the one abo
 
 ## The Normal distribution
 
-The Normal distribution (aka the Gaussian distribution) is given by $p(x) = \frac{1}{\sqrt{2 \pi}} \exp\left(-\frac{1}{2} x^2\right)$. Let's plot it to get a feel for it.
+The **standard** Normal distribution (aka the standard Gaussian distribution) is given by $p(x) = \frac{1}{\sqrt{2 \pi}} \exp\left(-\frac{1}{2} x^2\right)$. Let's plot it to get a feel for it.
 
 ```{.python .input}
 x = np.arange(-10, 10, 0.01)
