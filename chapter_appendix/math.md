@@ -255,7 +255,7 @@ $$\nabla_{\boldsymbol{x}} f(\boldsymbol{x}) = \bigg[\frac{\partial f(\boldsymbol
 
 To be concise, we sometimes use $\nabla f(\boldsymbol{x})$ to replace $\nabla_{\boldsymbol{x}} f(\boldsymbol{x})$.
 
-If $\boldsymbol{A}$ is a square matrix of order $n$, and $\boldsymbol{x}$ is an $n$-dimensional vector, the following identities hold:
+If $\boldsymbol{A}$ is a matrix with $m$ rows and $n$ columns, and $\boldsymbol{x}$ is an $n$-dimensional vector, the following identities hold:
 
 $$
 \begin{aligned}
