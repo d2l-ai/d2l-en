@@ -157,11 +157,10 @@ def tv_loss(Y_hat):
 The loss function for style transfer is the weighted sum of the content loss, style loss, and total variance loss. By adjusting these weight hyper-parameters, we can balance the retained content, transferred style, and noise reduction in the composite image according to their relative importance.
 
 ```{.python .input  n=13}
-style_channels = [net[l].weight.shape[0] for l in style_layers]
 content_weight, style_weight, tv_weight = 1, 1e3, 10
 
 def compute_loss(X, contents_Y_hat, styles_Y_hat, contents_Y, styles_Y_gram):
-    # Calculate the content, style, and total variance losses individually
+    # Calculate the content, style, and total variance losses respectively
     contents_l = [content_loss(Y_hat, Y) * content_weight for Y_hat, Y in zip(
         contents_Y_hat, contents_Y)]
     styles_l = [style_loss(Y_hat, Y) * style_weight for Y_hat, Y in zip(
@@ -233,7 +232,7 @@ Next, we start to train the model. First, we set the height and width of the con
 ctx, image_shape = d2l.try_gpu(), (225, 150)
 net.collect_params().reset_ctx(ctx)
 content_X, contents_Y = get_contents(image_shape, ctx)
-style_X, styles_Y = get_styles(image_shape, ctx)
+_, styles_Y = get_styles(image_shape, ctx)
 output = train(content_X, contents_Y, styles_Y, ctx, 0.01, 500, 200)
 ```
 
@@ -249,8 +248,8 @@ To obtain a clearer composite image, we train the model using a larger image siz
 
 ```{.python .input  n=19}
 image_shape = (450, 300)
-content_X, content_Y = get_contents(image_shape, ctx)
-style_X, style_Y = get_styles(image_shape, ctx)
+_, content_Y = get_contents(image_shape, ctx)
+_, style_Y = get_styles(image_shape, ctx)
 X = preprocess(postprocess(output) * 255, image_shape)
 output = train(X, content_Y, style_Y, ctx, 0.01, 300, 100)
 d2l.plt.imsave('../img/neural-style-2.png', postprocess(output).asnumpy())

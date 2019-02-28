@@ -39,6 +39,7 @@ def bbox_to_rect(bbox, color):
 
 class Benchmark():
     """Benchmark programs."""
+
     def __init__(self, prefix=None):
         self.prefix = prefix + ' ' if prefix else ''
 
@@ -84,28 +85,30 @@ def data_iter(batch_size, features, labels):
 def data_iter_consecutive(corpus_indices, batch_size, num_steps, ctx=None):
     """Sample mini-batches in a consecutive order from sequential data."""
     # Offset for the iterator over the data for uniform starts
-    offset = int(random.uniform(0,num_steps))
+    offset = int(random.uniform(0, num_steps))
     # Slice out data - ignore num_steps and just wrap around
     num_indices = ((len(corpus_indices) - offset) // batch_size) * batch_size
     indices = nd.array(corpus_indices[offset:(offset + num_indices)], ctx=ctx)
-    indices = indices.reshape((batch_size,-1))
+    indices = indices.reshape((batch_size, -1))
     # Need to leave one last token since targets are shifted by 1
     num_epochs = ((num_indices // batch_size) - 1) // num_steps
 
     for i in range(0, num_epochs * num_steps, num_steps):
-        X = indices[:,i:(i+num_steps)]
-        Y = indices[:,(i+1):(i+1+num_steps)]
+        X = indices[:, i:(i+num_steps)]
+        Y = indices[:, (i+1):(i+1+num_steps)]
         yield X, Y
+
 
 def data_iter_random(corpus_indices, batch_size, num_steps, ctx=None):
     """Sample mini-batches in a random order from sequential data."""
     # Offset for the iterator over the data
-    offset = int(random.uniform(0,num_steps))
+    offset = int(random.uniform(0, num_steps))
     # Subtract 1 extra since we need to account for the sequence length
     num_examples = ((len(corpus_indices) - offset - 1) // num_steps) - 1
     # Discard half empty batches
     num_batches = num_examples // batch_size
-    example_indices = list(range(offset, offset + num_examples * num_steps, num_steps))
+    example_indices = list(
+        range(offset, offset + num_examples * num_steps, num_steps))
     random.shuffle(example_indices)
 
     # This returns a sequence of the length num_steps starting from pos.
@@ -256,6 +259,7 @@ def load_data_jay_lyrics():
     corpus_indices = [char_to_idx[char] for char in corpus_chars]
     return corpus_indices, char_to_idx, idx_to_char, vocab_size
 
+
 def load_data_timemachine():
     with open('../data/timemachine.txt', 'r') as f:
         lines = f.readlines()
@@ -265,6 +269,7 @@ def load_data_timemachine():
     vocab_size = len(char_to_idx)
     corpus_indices = [char_to_idx[char] for char in raw_dataset]
     return corpus_indices, char_to_idx, idx_to_char, vocab_size
+
 
 def load_data_pikachu(batch_size, edge_size=256):
     """Download the pikachu dataest and then load into memory."""
@@ -393,6 +398,7 @@ def read_voc_images(root='../data/VOCdevkit/VOC2012', is_train=True):
 
 class Residual(nn.Block):
     """The residual block."""
+
     def __init__(self, num_channels, use_1x1conv=False, strides=1, **kwargs):
         super(Residual, self).__init__(**kwargs)
         self.conv1 = nn.Conv2D(num_channels, kernel_size=3, padding=1,
@@ -439,6 +445,7 @@ def resnet18(num_classes):
 
 class RNNModel(nn.Block):
     """RNN model."""
+
     def __init__(self, rnn_layer, vocab_size, **kwargs):
         super(RNNModel, self).__init__(**kwargs)
         self.rnn = rnn_layer
@@ -560,7 +567,7 @@ def train(train_iter, test_iter, net, loss, trainer, ctx, num_epochs):
             train_l_sum += sum([l.sum().asscalar() for l in ls])
             n += sum([l.size for l in ls])
             train_acc_sum += sum([(y_hat.argmax(axis=1) == y).sum().asscalar()
-                                 for y_hat, y in zip(y_hats, ys)])
+                                  for y_hat, y in zip(y_hats, ys)])
             m += sum([y.size for y in ys])
         test_acc = evaluate_accuracy(test_iter, net, ctx)
         print('epoch %d, loss %.4f, train acc %.3f, test acc %.3f, '
@@ -716,7 +723,8 @@ def train_ch7(trainer_fn, states, hyperparams, features, labels, batch_size=10,
               num_epochs=2):
     """Train a linear regression model."""
     net, loss = linreg, squared_loss
-    w, b = nd.random.normal(scale=0.01, shape=(features.shape[1], 1)), nd.zeros(1)
+    w, b = nd.random.normal(scale=0.01, shape=(
+        features.shape[1], 1)), nd.zeros(1)
     w.attach_grad()
     b.attach_grad()
 
@@ -821,6 +829,7 @@ def voc_rand_crop(feature, label, height, width):
 
 class VOCSegDataset(gdata.Dataset):
     """The Pascal VOC2012 Dataset."""
+
     def __init__(self, is_train, crop_size, voc_dir, colormap2label):
         self.rgb_mean = nd.array([0.485, 0.456, 0.406])
         self.rgb_std = nd.array([0.229, 0.224, 0.225])
@@ -847,4 +856,3 @@ class VOCSegDataset(gdata.Dataset):
 
     def __len__(self):
         return len(self.data)
-
