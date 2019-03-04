@@ -1,7 +1,6 @@
 # Concise Implementation of Recurrent Neural Networks
 
-
-This section will implement a language model based on a recurrent neural network more concisely. First, we read the time machine data set.
+While the previous section was instructive to see how recurrent neural networks are implemented, this isn't convenient or fast. The current section will show how to implement the same language model more efficiently using functions provided by the deep learning framework. We begin as before by reading the 'Time Machine' corpus. 
 
 ```{.python .input  n=1}
 import sys
@@ -17,9 +16,9 @@ import time
  vocab_size) = d2l.load_data_time_machine()
 ```
 
-## Define the Model
+## Defining the Model
 
-Gluon's `rnn` module provides a recurrent neural network implementation (beyond many other sequence models). Next, we construct the recurrent neural network layer `rnn_layer` with a single hidden layer and 256 hidden units, and initialize the weights.
+Gluon's `rnn` module provides a recurrent neural network implementation (beyond many other sequence models). We construct the recurrent neural network layer `rnn_layer` with a single hidden layer and 256 hidden units, and initialize the weights.
 
 ```{.python .input  n=26}
 num_hiddens = 256
@@ -27,7 +26,7 @@ rnn_layer = rnn.RNN(num_hiddens)
 rnn_layer.initialize()
 ```
 
-Initializing the state is straightforward. We invoke the member function `rnn_layer.begin_state(batch_size)`, which will return an initial state for each element in the minibatch. That is, it returns an object that is of size (hidden layers, batch size, number of hidden units). The number of hidden layers defaults to 1 (in fact, we haven't even discussed yet what it means to have multiple layers - this will happen [later](deep-rnn.md)). 
+Initializing the state is straightforward. We invoke the member function `rnn_layer.begin_state(batch_size)`. This returns an initial state for each element in the minibatch. That is, it returns an object that is of size (hidden layers, batch size, number of hidden units). The number of hidden layers defaults to 1. In fact, we haven't even discussed yet what it means to have multiple layers - this will happen [later](deep-rnn.md). For now, suffice it to say that multiple layers simply amount to the output of one RNN being used as the input for the next RNN. 
 
 ```{.python .input  n=37}
 batch_size = 2
@@ -35,9 +34,9 @@ state = rnn_layer.begin_state(batch_size=batch_size)
 state[0].shape
 ```
 
-Unlike the recurrent neural network implemented in the previous section, the input shape of `rnn_layer` is given by (time step, batch size, number of inputs). More specifically, the number of inputs is the one-hot vector length (the dictionary size). In addition, as an `rnn.RNN` instance in Gluon, `rnn_layer` returns the output and hidden state after forward computation. The output refers to the sequence of hidden states that the RNN computes over various time steps. They are used as input for subsequent output layers. We should emphasize that the "output" itself does not involve the computation of the output layer (e.g. conversion to characters). Hence its its shape is given by (time step, batch size, number of hidden units). 
+Unlike the recurrent neural network implemented in the previous section, the input shape of `rnn_layer` is given by (time step, batch size, number of inputs). In the case of a language model the number of inputs would be the one-hot vector length (the dictionary size). In addition, as an `rnn.RNN` instance in Gluon, `rnn_layer` returns the output and hidden state after forward computation. The output refers to the sequence of hidden states that the RNN computes over various time steps. They are used as input for subsequent output layers. Note that the output does not involve any conversion to characters or any other post-processing. This is so, since the RNN itself has no concept of what to do with the vectors that it generates. In short, its shape is given by (time step, batch size, number of hidden units). 
 
-The hidden state returned by the `rnn.RNN` instance in the forward computation is the state of the hidden layer available at the last time step. This can be used to initialize the next time step: when there are multiple layers in the hidden layer, the hidden state of each layer is recorded in this variable. For recurrent neural networks such as [Long Short Term Memory](lstm.md) (LSTM) networks, the variables also contains other state information. We will introduce LSTM and deep RNNs later in this chapter. 
+The hidden state returned by the `rnn.RNN` instance in the forward computation is the state of the hidden layer available at the last time step. This can be used to initialize the next time step: when there are multiple layers in the hidden layer, the hidden state of each layer is recorded in this variable. For recurrent neural networks such as [Long Short Term Memory](lstm.md) (LSTM) networks, the variables also contains other state information. We will introduce LSTM and deep RNNs later in this chapter.
 
 ```{.python .input  n=38}
 num_steps = 35
@@ -74,7 +73,7 @@ class RNNModel(nn.Block):
 
 ## Model Training
 
-As before we need a prediction function. The implementation here differs from the previous one in the function interfaces for forward computation and hidden state initialization.
+As before we need a prediction function. The implementation here differs from the previous one in the function interfaces for forward computation and hidden state initialization. The main difference is that the decoding into characters is now clearly separated from the hidden variable model.
 
 ```{.python .input  n=41}
 # This function is saved in the d2l package for future use
@@ -94,7 +93,7 @@ def predict_rnn_gluon(prefix, num_chars, model, vocab_size, ctx, idx_to_char,
     return ''.join([idx_to_char[i] for i in output])
 ```
 
-Let's make a prediction with the a model that has random weights. 
+Let's make a prediction with the a model that has random weights.
 
 ```{.python .input  n=42}
 ctx = d2l.try_gpu()
@@ -104,7 +103,7 @@ predict_rnn_gluon('traveller', 10, model, vocab_size, ctx, idx_to_char,
                   char_to_idx)
 ```
 
-As is quite obvious, this model doesn't work at all (just yet). Next, we implement the training function. Its algorithm is the same as in the previous section, but only random sampling is used here to read the data.
+As is quite obvious, this model doesn't work at all (just yet). Next, we implement the training function. Its algorithm is the same as in the previous section. That said, since we observed that random sampling works considerably better for training sequence models, we only use the latter below.
 
 ```{.python .input  n=18}
 # This function is saved in the d2l package for future use
@@ -183,7 +182,7 @@ As we can see, the model achieves comparable perplexity, albeit within a shorter
 1. What happens if you increase the number of hidden layers in the RNN model? Can you make the model work?
 1. How well can you compress the text using this model?
     * How many bits do you need?
-    * Why doesn't everyone use this model for text compression? Hint - what about the compressor?
+    * Why doesn't everyone use this model for text compression? Hint - what about the compressor itself?
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2365)
 
