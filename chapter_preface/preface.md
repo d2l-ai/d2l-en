@@ -201,7 +201,7 @@ and lays the groundwork for the later implementation of more complex models.
 Next we explain [Convolutional Neural Networks](../chapter_convolutional-neural-networks/index.md),
 powerful tools that form the backbone of most modern computer vision systems in recent years.
 Subsequently, we introduce [Recurrent Neural Networks](../chapter_recurrent-neural-networks/index.md),
-models that exloit temporal or sequential structure in data,
+models that exploit temporal or sequential structure in data,
 and are commonly used for natural language processing and time series prediction.
 These sections will get you up to speed on the basic tools behind most modern deep learning.
 
