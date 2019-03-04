@@ -44,7 +44,7 @@ o_3 &= x_1 w_{13} + x_2 w_{23} + x_3 w_{33} + x_4 w_{43} + b_3.
 \end{aligned}
 $$
 
-The neural network diagram below depicts the calculation above.  Like linear regression, softmax regression is also a single-layer neural network.  Since the calculation of each output, $o_1, o_2, and o_3$, depends on all inputs, $x_1$, $x_2$, $x_3$, and $x_4$, the output layer of the softmax regression is also a fully connected layer.
+The neural network diagram below depicts the calculation above.  Like linear regression, softmax regression is also a single-layer neural network.  Since the calculation of each output, $o_1, o_2$, and $o_3$, depends on all inputs, $x_1$, $x_2$, $x_3$, and $x_4$, the output layer of the softmax regression is also a fully connected layer.
 
 ![Softmax regression is a single-layer neural network.  ](../img/softmaxreg.svg)
 
