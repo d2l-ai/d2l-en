@@ -1,8 +1,9 @@
 # Backpropagation Through Time
 
 So far we repeatedly alluded to things like *exploding gradients*,
-*vanishing gradients*, truncating backprop, and the need for
-*detaching the computational graph*. None of this was really fully
+*vanishing gradients*, *truncating backprop*, and the need for
+*detaching the computational graph*. For instance, in the previous 
+section we invoked `s.detach()` on the sequence. None of this was really fully
 explained, in the interest of being able to build a model quickly and
 to see how it works. In this section we will delve a bit more deeply
 into the details of backpropagation for sequence models and why (and
@@ -24,11 +25,10 @@ another time.
 Forward propagation in a recurrent neural network is relatively
 straightforward. Back-propagation through time is actually a specific
 application of back propagation in recurrent neural networks. It
-requires us to expand the recurrent neural network by time step to
+requires us to expand the recurrent neural network one time step at a time to
 obtain the dependencies between model variables and parameters. Then,
 based on the chain rule, we apply back propagation to compute and
 store gradients.
-
 
 ## Recurrent Model
 
