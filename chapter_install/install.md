@@ -68,23 +68,6 @@ unzip d2l-en.zip && rm d2l-en.zip
 
 For Step 3 to Step 5, refer to the such steps for Windows users as described earlier. If the conda version is lower than 4.4, replace the command in Step 4 with `source activate gluon` and exit the virtual environment using the command `source deactivate`.
 
-### Docker Users
-Step 1 is to follow the instructions to install [Docker CE](https://docs.docker.com/install/)
-
-Step 2 is to build Docker image using source files from [this directory](../docker/) and running
-
-```
-docker build . -t dl2-en/jupyter
-```
-
-To start the environment run
-
-```
-docker run -p 127.0.0.1:8888:8888 -it --rm --name dl2-en dl2-en/jupyter
-```
-
-and then open [this link](http://127.0.0.1:8888/?token=d2l) in your browser. The environment will run with default token ("d2l"), and available only from the local machine.
-
 
 ## Updating Code and Running Environment
 
