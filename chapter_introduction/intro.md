@@ -138,7 +138,7 @@ is called a *family* of models.
 And the *meta-program* that uses our dataset
 to choose the parameters is called a *learning algorithm*.
 
-Before we an go ahead and engage the learning algorithm,
+Before we can go ahead and engage the learning algorithm,
 we have to define the problem precisely,
 pinning down the exact nature of the inputs and outputs,
 and choosing an appropriate model family.
@@ -217,7 +217,7 @@ the data into some form amenable to *shallow* models.
 One key advantage of deep learning is that it replaces not only the *shallow* models
 at the end of traditional learning pipelines,
 but also the labor-intensive feature engineering.
-Secondly, by replacing by eliminating much of the *domain-specific preprocessing*,
+Secondly, by replacing much of the *domain-specific preprocessing*,
 deep learning has eliminated many of the boundaries
 that previously separated computer vision, speech recognition,
 natural language processing, medical informatics, and other application areas,
@@ -226,16 +226,16 @@ offering a unified set of tools for tackling diverse problems.
 
 ## The Key Components: Data, Models, and Algorithms
 
-In our *wake-word* example, we described a dataset 
+In our *wake-word* example, we described a dataset
 consisting of audio snippets and binary labels
 gave a hand-wavy sense of how we might *train*
 a model to approximate a mapping from snippets to classifications.
 This sort of problem, where we try to predict a designated unknown *label*
 given known *inputs* (also called *features* or *covariates*),
-given examples of both is called *supervised learning*,
+and examples of both is called *supervised learning*,
 and it's just one among many *kinds* of machine learning problems.
 In the next section, we'll take a deep dive into the different ML ploblems.
-First, we'd like to shed more light on some core components 
+First, we'd like to shed more light on some core components
 that will follow us around, no matter what kind of ML problem we take on:
 
 1. The **data** that we can learn from
@@ -249,12 +249,12 @@ that will follow us around, no matter what kind of ML problem we take on:
 It might go without saying that you cannot do data science without data.
 We could lose hundreds of pages pondering the precise nature of data
 but for now we'll err on the practical side and focus on the key properties
-to be concerned with. 
-Generally we are concerned with a collection of *examples* 
+to be concerned with.
+Generally we are concerned with a collection of *examples*
 (also called *data points*, *samples*, or *instances*).
-In order to work with data usefully, we typically 
+In order to work with data usefully, we typically
 need to come up with a suitable numerical representation.
-Each *example* typically consists of a collection 
+Each *example* typically consists of a collection
 of numerical attributes called *features* or *covariates*.
 
 If we were working with image data,
@@ -262,56 +262,56 @@ each individual photograph might constitute an *example*,
 each represented by an ordered list of numerical values
 corresponding to the brightness of each pixel.
 A $200\times200$ color photograph would consist of $200\times200\times3=120000$
-numerical values, corresponding to the brightness 
+numerical values, corresponding to the brightness
 of the red, green, and blue channels corresponding to each spatial location.
-In a more traditional task, we might try to predict 
-whether or not a patient will survive, 
+In a more traditional task, we might try to predict
+whether or not a patient will survive,
 given a standard set of features such as age, vital signs, diagnoses, etc.
 
 When every example is characterized by the same number of numerical values,
 we say that the data consists of *fixed-length* vectors
-and we describe the (constant) length of the vectors 
+and we describe the (constant) length of the vectors
 as the *dimensionality* of the data.
 As you might imagine, fixed length can be a convenient property.
 If we wanted to train a model to recognize cancer in microscopy images,
 fixed-length inputs means we have one less thing to worry about.
 
-However, not all data can easily be represented as fixed length vectors. 
+However, not all data can easily be represented as fixed length vectors.
 While we might expect microscrope images to come from standard equipment,
 we can't expect images mined from the internet to all show up in the same size.
 While we might imagine cropping images to a standard size,
 text data resists fixed-length representations even more stubbornly.
 Consider the product reviews left on e-commerce sites like Amazon or TripAdvisor. Some are short: "it stinks!". Others ramble for pages.
 One major advantage of deep learning over traditional methods
-is the comparative grace with which modern models 
+is the comparative grace with which modern models
 can handle *varying-length* data.
 
 Generally, the more data we have, the easier our job becomes.
 When we have more data, we can train more powerful models,
 and rely less heavily on pre-conceived assumptions.
-The regime change from (comparatively small) to big data 
+The regime change from (comparatively small) to big data
 is a major contributor to the success of modern deep learning.
-To bring the point home, many of the most exciting models in deep learning either don't work without large data sets.
-Some others work in the low-data regime, 
+To drive the point home, many of the most exciting models in deep learning either don't work without large data sets.
+Some others work in the low-data regime,
 but no better than traditional approaches.
 
-Finally it's not enough to have lots of data and to process it cleverly. 
-We need the *right* data. 
+Finally it's not enough to have lots of data and to process it cleverly.
+We need the *right* data.
 If the data is full of mistakes, or if the chosen features are not predictive of the target quantity of interest, learning is going to fail.
 The situation is well captured by the cliché: *garbage in, garbage out*.
 Moreover, poor predictive performance isn't the only potential consequence.
-In sensitive applications of machine learning, 
+In sensitive applications of machine learning,
 like predictive policing, resumé screening, and risk models used for lending,
 we must be especially alert to the consequences of garbage data.
 One common failure mode occurs in datasets where some groups of people
 are unrepresented in the training data.
-Imagine applying a skin cancer recognition system in the wild 
-that had never seen black skin before. 
+Imagine applying a skin cancer recognition system in the wild
+that had never seen black skin before.
 Failure can also occur when the data doesn't merely under-represent some groups,
-but reflects societal prejudices. 
-For example if past hiring decisions are used to train a predictive model 
+but reflects societal prejudices.
+For example if past hiring decisions are used to train a predictive model
 that will be used to screen resumes, then machine learning models could inadvertantly capture and automate historical injustices.
-Note that this can all happen without the data scientist being complicit, 
+Note that this can all happen without the data scientist being complicit,
 or even aware.
 
 
@@ -320,26 +320,26 @@ or even aware.
 
 Most machine learning involves *transforming* the data in some sense.
 We might want to build a system that ingests photos and predicts *smiley-ness*.
-Alternatively, we might want to ingest a set of sensor readings 
-and predict how *normal* vs *anomalous* the readings are. 
-By *model*, we denote the computational machinery for ingesting data 
+Alternatively, we might want to ingest a set of sensor readings
+and predict how *normal* vs *anomalous* the readings are.
+By *model*, we denote the computational machinery for ingesting data
 of one type, and spitting out predictions of a possibly different type.
 In particular, we are interested in statistical models
 that can be estimated from data.
-While simple models are perfectly capable of addressing 
-appropriately simple problems the problems 
+While simple models are perfectly capable of addressing
+appropriately simple problems the problems
 that we focus on in this book stretch the limits of classical methods.
-Deep learning is differentiated from classical approaches 
+Deep learning is differentiated from classical approaches
 principally by the set of powerful models that it focuses on.
-These models consist of many successive transformations of the data 
+These models consist of many successive transformations of the data
 that are chained together top to bottom, thus the name *deep learning*.
-On our way to discussing deep nets, we'll discuss some more traditional methods.
+On our way to discussing deep neural networks, we'll discuss some more traditional methods.
 
 
 ###  Objective functions
 
 Earlier, we introduced machine learning as "learning behavior from experience".
-By *learning* here, we mean *improving* at some task over time. 
+By *learning* here, we mean *improving* at some task over time.
 But who is to say what constitutes an improvement?
 You might imagine that we could propose to update our model,
 and some people might disagree on whether the proposed update
@@ -349,50 +349,50 @@ In order to develop a formal mathematical system of learning machines,
 we need to have formal measures of how good (or bad) our models are.
 In machine learning, and optimization more generally,
 we call these objective functions.
-By convention, we usually define objective funcitons 
-so that *lower* is *better*. 
+By convention, we usually define objective funcitons
+so that *lower* is *better*.
 This is merely a convention. You can take any function $f$
 for which higher is better, and turn it into a new function $f'$
 that is qualitatively identical but for which lower is better
 by setting $f' = -f$.
-Because lower is better, these functions are sometimes called 
+Because lower is better, these functions are sometimes called
 *loss functions* or *cost functions*.
 
-When trying to predict numerical values, 
+When trying to predict numerical values,
 the most common objective function is squared error $(y-\hat{y})^2$.
 For classification, the most common objective is to minimize error rate,
-i.e., the fraction of instances on which 
+i.e., the fraction of instances on which
 our predictions disagree with the ground truth.
 Some objectives (like squared error) are easy to optimize.
 Others (like error rate) are difficult to optimize directly,
 owing to non-differentiability or other complications.
 In these cases, it's common to optimize a surrogate objective.
 
-Typically, the loss function is defined 
+Typically, the loss function is defined
 with respect to the models parameters
-and depends upon the dataset. 
+and depends upon the dataset.
 The best values of our model's parameters are learned
 by minimizing the loss incurred on a *training set*
 consisting of some number of *examples* collected for training.
 However, doing well on the training data
 doesn't guarantee that we will do well on (unseen) test data.
 So we'll typically want to split the available data into two partitions:
-the training data (for fitting model parameters) 
+the training data (for fitting model parameters)
 and the test data (which is held out for evaluation),
 reporting the following two quantities:
 
- * **Training Error:** 
- The error on that data on which the model was trained. 
- You could think of this as being like 
- a student's scores on practice exams 
- used to prepare for some real exam. 
- Even if the results are encouraging, 
+ * **Training Error:**
+ The error on that data on which the model was trained.
+ You could think of this as being like
+ a student's scores on practice exams
+ used to prepare for some real exam.
+ Even if the results are encouraging,
  that does not guarantee success on the final exam.
- * **Test Error:** This is the error incurred on an unseen test set. 
- This can deviate significantly from the training error. 
- When a model fails to generalize to unseen data, 
- we say that it is *overfitting*. 
- In real-life terms, this is like flunking the real exam 
+ * **Test Error:** This is the error incurred on an unseen test set.
+ This can deviate significantly from the training error.
+ When a model fails to generalize to unseen data,
+ we say that it is *overfitting*.
+ In real-life terms, this is like flunking the real exam
  despite doing well on practice exams.
 
 
@@ -400,13 +400,13 @@ reporting the following two quantities:
 
 Once we've got some data source and representation,
 a model, and a well-defined objective function,
-we need an algorithm capable of searching 
+we need an algorithm capable of searching
 for the best possible parameters for minimizing the loss function.
 The most popular optimization algorithms for neural networks
 follow an approach called gradient descent.
 In short, at each step, they check to see, for each parameter,
-which way the training set loss would move 
-if you perturbed that parameter just a small amount. 
+which way the training set loss would move
+if you perturbed that parameter just a small amount.
 They then update the parameter in the direction that reduces the loss.
 
 
@@ -430,7 +430,7 @@ The input data $\boldsymbol{x}$ might be vital signs such as heart rate, diastol
 
 The supervision comes into play because for choosing the parameters $\theta$, we (the supervisors) provide the model with a collection of *labeled examples* ($\boldsymbol{x}_i, y_i$), where each example $\boldsymbol{x}_i$ is matched up against its correct label.
 
-In probabilistic terms, we typically are interested estimating
+In probabilistic terms, we typically are interested in estimating
 the conditional probability $P(y|x)$.
 While it's just one among several approaches to machine learning,
 supervised learning accounts for the majority of machine learning in practice.
@@ -484,7 +484,7 @@ Feature vectors like this are essential for all the classic machine learning pro
 We'll typically denote the feature vector for any one example $\mathbf{x_i}$
 and the set of feature vectors for all our examples $X$.
 
-What makes a problem *regression* is actually the outputs.
+What makes a problem a *regression* is actually the outputs.
 Say that you're in the market for a new home,
 you might want to estimate the fair market value of a house,
 given some features like these.
@@ -523,7 +523,7 @@ If someone then asked you how much to expect on their upcoming gunk-removal invo
 you might make some reasonable assumptions,
 such as more hours worked costs more dollars.
 You might also assume that there's some base charge and that the contractor then charges per hour.
-If these assumptions held, then given these two data points,
+If these assumptions held true, then given these two data points,
 you could already identify the contractor's pricing structure:
 \$100 per hour plus \$50 to show up at your house.
 If you followed that much then you already understand the high-level idea behind linear regression (and you just implicitly designed a linear model with bias).
@@ -567,7 +567,7 @@ The simplest form of classification is when there are only two classes,
 a problem which we call binary classification.
 For example, our dataset $X$ could consist of images of animals
 and our *labels* $Y$ might be the classes $\mathrm{\{cat, dog\}}$.
-While in regression, we sought a regressor to output a real value $\hat{y}$,
+While in regression, we sought a *regressor* to output a real value $\hat{y}$,
 in classification, we seek a *classifier*, whose output $\hat{y}$ is the predicted class assignment.
 
 For reasons that we'll get into as the book gets more technical, it's pretty hard to optimize a model that can only output a hard categorical assignment, e.g. either *cat* or *dog*.
@@ -609,7 +609,7 @@ $$L(\mathrm{action}| x) = \mathbf{E}_{y \sim p(y| x)}[\mathrm{loss}(\mathrm{acti
 
 Hence, the loss $L$ incurred by eating the mushroom is $L(a=\mathrm{eat}| x) = 0.2 * \infty + 0.8 * 0 = \infty$, whereas the cost of discarding it is $L(a=\mathrm{discard}| x) = 0.2 * 0 + 0.8 * 1 = 0.8$.
 
-Our caution was justified: as any mycologist would tell us, the above actually *is* a death cap.
+Our caution was justified: as any mycologist would tell us, the above mushroom actually *is* a death cap.
 Classification can get much more complicated than just binary, multiclass, of even multi-label classification.
 For instance, there are some variants of classification for addressing hierarchies.
 Hierarchies assume that there exist some relationships among the many classes.
@@ -622,7 +622,7 @@ who organized the animals in a hierarchy.
 
 In the case of animal classification, it might not be so bad to mistake a poodle for a schnauzer,
 but our model would pay a huge penalty if it confused a poodle for a dinosaur.
-What hierarchy is relevant might depend on how you plan to use the model.
+Which hierarchy is relevant might depend on how you plan to use the model.
 For example, rattle snakes and garter snakes might be close on the phylogenetic tree,
 but mistaking a rattler for a garter could be deadly.
 
@@ -632,7 +632,7 @@ Some classification problems don't fit neatly into the binary or multiclass clas
 For example, we could train a normal binary classifier to distinguish cats from dogs.
 Given the current state of computer vision,
 we can do this easily, with off-the-shelf tools.
-Nonetheless, no matter how accurate our model gets, we might find ourselves in trouble when the classifier encounters an image of the Bremen Town Musicians.
+Nonetheless, no matter how accurate our model gets, we might find ourselves in trouble when the classifier encounters an image of the Town Musicians of Bremen.
 
 ![](../img/stackedanimals.jpg)
 
@@ -662,7 +662,7 @@ where correctly tagging articles is important
 because it allows researchers to do exhaustive reviews of the literature.
 At the National Library of Medicine, a number of professional annotators
 go over each article that gets indexed in PubMed
-to associate each with the relevant terms from MeSH,
+to associate it with the relevant terms from MeSH,
 a collection of roughly 28k tags.
 This is a time-consuming process and the annotators typically have a one year lag between archiving and tagging. Machine learning can be used here to provide provisional tags
 until each article can have a proper manual review.
@@ -744,7 +744,7 @@ With speech recognition, the input sequence $x$ is the sound of a speaker,
 and the output $y$ is the textual transcript of what the speaker said.
 The challenge is that there are many more audio frames (sound is typically sampled at 8kHz or 16kHz) than text, i.e. there is no 1:1 correspondence between audio and text,
 since thousands of samples correspond to a single spoken word.
-These are seq2seq problems where the output is much shorter than the input.
+These are ``seq2seq`` problems where the output is much shorter than the input.
 
 |`-D-e-e-p- L-ea-r-ni-ng-`|
 |:--------------:|
@@ -752,7 +752,7 @@ These are seq2seq problems where the output is much shorter than the input.
 
 #### Text to Speech
 
-Text to Speech (TTS) is the inverse of speech recognition.
+Text-to-Speech (TTS) is the inverse of speech recognition.
 In other words, the input $x$ is text
 and the output $y$ is an audio file.
 In this case, the output is *much longer* than the input.
@@ -797,7 +797,7 @@ On the other hand, it's easy to please this boss. You just recognize the pattern
 In a completely opposite way,
 it could be frustrating to work for a boss
 who has no idea what they want you to do.
-However, if you plan to be a data scientist, you had better get used to it.
+However, if you plan to be a data scientist, you'd better get used to it.
 The boss might just hand you a giant dump of data and tell you to *do some data science with it!*
 This sounds vague because it is.
 We call this class of problems *unsupervised learning*,
@@ -847,13 +847,13 @@ Considering the interaction with an environment opens a whole set of new modelin
 * want to help us, e.g. a user reading text into a speech recognizer?
 * want to beat us, i.e. an adversarial setting like spam filtering (against spammers) or playing a game (vs an opponent)?
 * not  care (as in most cases)?
-* have shifting dynamics (steady vs shifting over time)?
+* have shifting dynamics (steady vs. shifting over time)?
 
 This last question raises the problem of *covariate shift*,
 (when training and test data are different).
 It's a problem that most of us have experienced when taking exams written by a lecturer,
 while the homeworks were composed by his TAs.
-We'll briefly describe reinforcement learning, and adversarial learning,
+We'll briefly describe reinforcement learning and adversarial learning,
 two settings that explicitly consider interaction with an environment.
 
 
