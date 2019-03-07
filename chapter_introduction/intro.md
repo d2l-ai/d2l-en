@@ -234,14 +234,14 @@ This sort of problem, where we try to predict a designated unknown *label*
 given known *inputs* (also called *features* or *covariates*),
 and examples of both is called *supervised learning*,
 and it's just one among many *kinds* of machine learning problems.
-In the next section, we'll take a deep dive into the different ML ploblems.
+In the next section, we'll take a deep dive into the different ML problems.
 First, we'd like to shed more light on some core components
 that will follow us around, no matter what kind of ML problem we take on:
 
 1. The **data** that we can learn from
 2. A **model** of how to transform the data
 3. A **loss** function that quantifies the *badness* of our model
-4. An **algorithm** to ajust the model's parameters to minimize the loss
+4. An **algorithm** to adjust the model's parameters to minimize the loss
 
 
 ### Data
