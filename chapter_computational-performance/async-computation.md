@@ -156,7 +156,7 @@ def get_mem():
     return int(str(res).split()[15]) / 1e3
 ```
 
-Now we can begin testing. To initialize the `net` parameters we will try running the system once. See the section [“Deferred Initialization of Model Parameters”](../chapter_deep-learning-computation/deferred-init.md) for further discussions related to initialization.
+Now we can begin testing. To initialize the `net` parameters we will try running the system once. See the section [“Deferred Initialization of Model Parameters”](../chapter_gluon-fundamentals/deferred-init.md) for further discussions related to initialization.
 
 ```{.python .input  n=14}
 for X, y in data_iter():

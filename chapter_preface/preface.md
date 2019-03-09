@@ -195,7 +195,7 @@ such as multi-layer perceptrons and regularization.
 about the most basic concepts and techniques of deep learning,
 it is sufficient to read the first section only.-->
 * The next three chapters focus on modern deep learning techniques.
-[Deep Learning Computation](../chapter_deep-learning-computation/index.md)
+[Deep Learning Computation](../chapter_gluon-fundamentals/index.md)
 describes the various key components of deep learning calculations
 and lays the groundwork for the later implementation of more complex models.
 Next we explain [Convolutional Neural Networks](../chapter_convolutional-neural-networks/index.md),

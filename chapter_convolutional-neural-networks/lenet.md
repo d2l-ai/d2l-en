@@ -84,7 +84,7 @@ ctx = try_gpu()
 ctx
 ```
 
-Accordingly, we slightly modify the `evaluate_accuracy` function described when [implementing the SoftMax from scratch](../chapter_deep-learning-basics/softmax-regression-scratch.md).  Since the data arrives in the CPU when loading we need to copy it to the GPU before any computation can occur. This is accomplished via the `as_in_context` function described in the [GPU Computing](../chapter_deep-learning-computation/use-gpu.md) section. Note that we accumulate the errors on the same device as where the data eventually lives (in `acc`). This avoids intermediate copy operations that would destroy performance.
+Accordingly, we slightly modify the `evaluate_accuracy` function described when [implementing the SoftMax from scratch](../chapter_deep-learning-basics/softmax-regression-scratch.md).  Since the data arrives in the CPU when loading we need to copy it to the GPU before any computation can occur. This is accomplished via the `as_in_context` function described in the [GPU Computing](../chapter_gluon-fundamentals/use-gpu.md) section. Note that we accumulate the errors on the same device as where the data eventually lives (in `acc`). This avoids intermediate copy operations that would destroy performance.
 
 ```{.python .input}
 # This function has been saved in the d2l package for future use. The function
