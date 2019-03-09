@@ -201,7 +201,7 @@ and lays the groundwork for the later implementation of more complex models.
 Next we explain [Convolutional Neural Networks](../chapter_convolutional-neural-networks/index.md),
 powerful tools that form the backbone of most modern computer vision systems in recent years.
 Subsequently, we introduce [Recurrent Neural Networks](../chapter_recurrent-neural-networks/index.md),
-models that exloit temporal or sequential structure in data,
+models that exploit temporal or sequential structure in data,
 and are commonly used for natural language processing and time series prediction.
 These sections will get you up to speed on the basic tools behind most modern deep learning.
 
@@ -294,7 +294,7 @@ Their GitHub IDs or names are (in no particular order):
 alxnorden, avinashingit, bowen0701, brettkoonce, Chaitanya Prakash Bapat,
 cryptonaut, Davide Fiocco, edgarroman, gkutiel, John Mitro, Liang Pu, Rahul Agarwal, mohamed-ali,
 mstewart141, Mike Müller, NRauschmayr, Prakhar Srivastav, sad-, sfermigier, Sheng Zha, sundeepteki,
-topecongiro, tpdi, vermicelli, Vishaal Kapoor, vishwesh5, YaYaB, Yuhong Chen, Evgeniy Smirnov, lgov, Simon Corston-Oliver, IgorDzreyev, trungha-ngx.
+topecongiro, tpdi, vermicelli, Vishaal Kapoor, vishwesh5, YaYaB, Yuhong Chen, Evgeniy Smirnov, lgov, Simon Corston-Oliver, IgorDzreyev, trungha-ngx, pmuens, alukovenko, senorcinco.
 Moreover, we thank Amazon Web Services, especially Swami Sivasubramanian,
 Raju Gulabani, Charlie Bell, and Andrew Jassy for their generous support in writing this book.
 Without the available time, resources, discussions with colleagues,
