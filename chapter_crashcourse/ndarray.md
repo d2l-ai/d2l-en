@@ -1,31 +1,32 @@
 # Data Manipulation
 
-It's impossible to get anything done if we can't manipulate data.
-Generally, there are two important things we need to do with data:
-(i) acquire it and (ii) process it once it's inside the computer.
-There's no point in trying to acquire data if we don't even know how to store it, so let's get our hands dirty first by playing with synthetic data.
-
-We'll start by introducing NDArrays, MXNet's primary tool for storing and transforming data. If you've worked with NumPy before, you'll notice that NDArrays are, by design, similar to NumPy's multi-dimensional array. However, they confer a few key advantages. First, NDArrays support asynchronous computation on CPU, GPU, and distributed cloud architectures. Second, they provide support for automatic differentiation. These properties make NDArray an ideal ingredient for machine learning.
+It's impossible to get anything done if we can't manipulate data. Generally, there are two important things we need to do with data: (i) acquire it and (ii) process it once it's inside the computer. There's no point in acquiring data if we don't even know how to store it, so let's get our hands dirty first by playing with synthetic data. We'll start by introducing the NDArray, 
+MXNet's primary tool for storing and transforming data. If you've worked with NumPy before, you'll notice that NDArrays are, by design, similar to NumPy's multi-dimensional array. However, they confer a few key advantages. First, NDArrays support asynchronous computation on CPU, GPU, and distributed cloud architectures. Second, they provide support for automatic differentiation. These properties make NDArray indispensable for deep learning.
 
 ## Getting Started
 
-In this chapter, we'll get you going with the basic functionality. Don't worry if you don't understand any of the basic math, like element-wise operations or normal distributions. In the next two chapters we'll take another pass at NDArray, teaching you both the math you'll need and how to realize it in code. For even more math, see the ["Math"](../chapter_appendix/math.md) section in the appendix.
+Throughout this chapter, we're aiming to get you up and running with the basic functionality. Don't worry if you don't understand all of the basic math, 
+like element-wise operations or normal distributions. In the next two chapters we'll take another pass at the same material, teaching the material in the context of practica examples. On the other hand, if you want to go deeper into the mathematical content, see the ["Math"](../chapter_appendix/math.md) section in the appendix.
 
-We begin by importing MXNet and the `ndarray` module from MXNet. Here, `nd` is short for `ndarray`.
+We begin by importing MXNet and the `ndarray` module from MXNet. 
+Here, `nd` is short for `ndarray`.
 
 ```{.python .input  n=1}
 import mxnet as mx
 from mxnet import nd
 ```
 
-The simplest object we can create is a vector. `arange` creates a row vector of 12 consecutive integers.
+
+NDArrays represent (possibly multi-dimensional) arrays of numerical values. NDArrays with one axis correspond (in math-speak) to *vectors*. NDArrays with two axes correspond to *matrices*. For arrays with more than two axes, mathematicians don't have special names---they simply call them *tensors*.
+
+The simplest object we can create is a vector. To start, we can use `arange` to create a row vector with 12 consecutive integers.
 
 ```{.python .input  n=2}
 x = nd.arange(12)
 x
 ```
 
-From the property `<NDArray 12 @cpu(0)>` shown when printing `x` we can see that it is a one-dimensional array of length 12 and that it resides in CPU main memory. The 0 in `@cpu(0)`` has no special meaning and does not represent a specific core.
+When we print `x`, we can observe the property `<NDArray 12 @cpu(0)>` listed, which indicates that `x` is a one-dimensional array of length 12 and that it resides in CPU main memory. The 0 in `@cpu(0)`` has no special meaning and does not represent a specific core.
 
 We can get the NDArray instance shape through the `shape` property.
 
@@ -33,48 +34,49 @@ We can get the NDArray instance shape through the `shape` property.
 x.shape
 ```
 
-We can also get the total number of elements in the NDArray instance through the `size` property. Since we are dealing with a vector, both are identical.
+We can also get the total number of elements in the NDArray instance through the `size` property. This is the product of the elements of the shape. Since we are dealing with a vector here, both are identical.
 
 ```{.python .input  n=9}
 x.size
 ```
 
-In the following, we use the `reshape` function to change the shape of the line vector `x` to (3, 4), which is a matrix of 3 rows and 4 columns. Except for the shape change, the elements in `x` (and also its size) remain unchanged.
+We use the `reshape` function to change the shape of one (possibly multi-dimensional) array, to another that contains the same number of elements.
+For example, we can transform the shape of our line vector `x` to (3, 4), which contains the same values but interprets them as a matrix containing 3 rows and 4 columns. Note that although the shape has changed, the elements in `x` have not. Moreover, the `size` remains the same.
 
 ```{.python .input  n=3}
 x = x.reshape((3, 4))
 x
 ```
 
-It can be awkward to reshape a matrix in the way described above. After all, if we want a matrix with 3 rows we also need to know that it should have 4 columns in order to make up 12 elements. Or we might want to request NDArray to figure out automatically how to give us a matrix with 4 columns and whatever number of rows that are needed to take care of all elements. This is precisely what the entry `-1` does in any one of the fields. That is, in our case
-`x.reshape((3, 4))` is equivalent to `x.reshape((-1, 4))` and `x.reshape((3, -1))`.
+Reshaping by manually specifying each of the dimensions can get annoying. Once we know one of the dimensions, why should we have to perform the division our selves to determine the other? For example, above, to get a matrix with 3 rows, we had to specify that it should have 4 columns (to account for the 12 elements). Fortunately, NDArray can automatically work out one dimension given the other. We can invoke this capability by placing `-1` for the dimension that we would like NDArray to automatically infer. In our case, instead of
+`x.reshape((3, 4))`, we could have equivalently used `x.reshape((-1, 4))` or `x.reshape((3, -1))`.
 
 ```{.python .input}
 nd.empty((3, 4))
 ```
 
-The `empty` method just grabs some memory and hands us back a matrix without setting the values of any of its entries. This is very efficient but it means that the entries can have any form of values, including very big ones! But typically, we'll want our matrices initialized.
+The `empty` method just grabs some memory and hands us back a matrix without setting the values of any of its entries. This is very efficient but it means that the entries might take any arbitrary values, including very big ones! Typically, we'll want our matrices initialized either with ones, zeros, some known constant or numbers randomly sampled from a known distribution.
 
-Commonly, we want one of all zeros. For objects with more than two dimensions mathematicians don't have special names - they simply call them tensors. To create one with all elements set to 0 and a shape of (2, 3, 4) we use
+Perhaps most often, we want an array of all zeros. To create an NDArray representing a tensor with all elements set to 0 and a shape of (2, 3, 4) we can invoke:
 
 ```{.python .input  n=4}
 nd.zeros((2, 3, 4))
 ```
 
-Just like in NumPy, creating tensors with each element being 1 works via
+We can create tensors with each element set to 1 works via
 
 ```{.python .input  n=5}
 nd.ones((2, 3, 4))
 ```
 
-We can also specify the value of each element in the NDArray that needs to be created through a Python list.
+We can also specify the value of each element in the desired NDArray by supplying a Python list containing the numerical values.
 
 ```{.python .input  n=6}
 y = nd.array([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 y
 ```
 
-In some cases, we need to randomly generate the value of each element in the NDArray. This is especially common when we intend to use the array as a parameter in a neural network. The following  creates an NDArray with a shape of (3,4). Each of its elements is randomly sampled in a normal distribution with zero mean and unit variance.
+In some cases, we will want to randomly sample the values of each element in the NDArray according to some known probability distribution. This is especially common when we intend to use the array as a parameter in a neural network. The following snippet creates an NDArray with a shape of (3,4). Each of its elements is randomly sampled in a normal distribution with zero mean and unit variance.
 
 ```{.python .input  n=7}
 nd.random.normal(0, 1, shape=(3, 4))
@@ -82,18 +84,8 @@ nd.random.normal(0, 1, shape=(3, 4))
 
 ## Operations
 
-Oftentimes, we want to apply functions to arrays.
-Some of the simplest and most useful functions are the element-wise functions.
-These operate by performing a single scalar operation on the corresponding elements of two arrays.
-We can create an element-wise function from any function that maps from the scalars to the scalars.
-In math notations we would denote such a function as $f: \mathbb{R} \rightarrow \mathbb{R}$.
-Given any two vectors $\mathbf{u}$ and $\mathbf{v}$ *of the same shape*, and the function f,
-we can produce a vector $\mathbf{c} = F(\mathbf{u},\mathbf{v})$
-by setting $c_i \gets f(u_i, v_i)$ for all $i$.
-Here, we produced the vector-valued $F: \mathbb{R}^d \rightarrow \mathbb{R}^d$
-by *lifting* the scalar function to an element-wise vector operation.
-In MXNet, the common standard arithmetic operators (+,-,/,\*,\*\*)
-have all been *lifted* to element-wise operations for identically-shaped tensors of arbitrary shape. We can call element-wise operations on any two tensors of the same shape, including matrices.
+Oftentimes, we want to apply functions to arrays. Some of the simplest and most useful functions are the element-wise functions. These operate by performing a single scalar operation on the corresponding elements of two arrays. We can create an element-wise function from any function that maps from the scalars to the scalars. In math notations we would denote such a function as $f: \mathbb{R} \rightarrow \mathbb{R}$. Given any two vectors $\mathbf{u}$ and $\mathbf{v}$ *of the same shape*, and the function f,
+we can produce a vector $\mathbf{c} = F(\mathbf{u},\mathbf{v})$ by setting $c_i \gets f(u_i, v_i)$ for all $i$. Here, we produced the vector-valued $F: \mathbb{R}^d \rightarrow \mathbb{R}^d$ by *lifting* the scalar function to an element-wise vector operation. In MXNet, the common standard arithmetic operators (+,-,/,\*,\*\*) have all been *lifted* to element-wise operations for identically-shaped tensors of arbitrary shape. We can call element-wise operations on any two tensors of the same shape, including matrices.
 
 ```{.python .input}
 x = nd.array([1, 2, 4, 8])
@@ -126,7 +118,7 @@ nd.concat(x, y, dim=0)
 nd.concat(x, y, dim=1)
 ```
 
-Just like in NumPy, we can construct binary NDArrays by a logical statement. Take `x == y` as an example. If `x` and `y` are equal for some entry, the new NDArray has a value of 1 at the same position; otherwise, it is 0.
+Sometimes, we may want to construct binary NDArrays via logical statements. Take `x == y` as an example. If `x` and `y` are equal for some entry, the new NDArray has a value of 1 at the same position; otherwise, it is 0.
 
 ```{.python .input}
 x == y
@@ -170,7 +162,7 @@ Just like in any other Python array, elements in an NDArray can be accessed by i
 x[1:3]
 ```
 
-Beyond reading we can also write elements of a matrix.
+Beyond reading, we can also write elements of a matrix.
 
 ```{.python .input  n=20}
 x[1, 2] = 9
