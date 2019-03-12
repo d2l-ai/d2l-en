@@ -376,14 +376,10 @@ Unfortunately, the
 second test comes back positive, too. Let us work out the requisite
 probabilities to invoke Bayes' Theorem.
 
-* $\Pr(D_1 = 1 \text{ and } D_2 = 1 | H
-= 0) = 0.01 \cdot 0.03 = 0.0003$
-* $\Pr(D_1 = 1 \text{ and } D_2 = 1 | H = 1) =
-1 \cdot 0.98 = 0.98$
-* $\Pr(D_1 = 1 \text{ and } D_2 = 1) = 0.0003 \cdot 0.9985
-+ 0.98 \cdot 0.0015 = 0.00176955$
-* $\Pr(H = 1 | D_1 = 1 \text{ and } D_2 = 1) =
-\frac{0.98 \cdot 0.0015}{0.00176955} = 0.831$
+* $\Pr(D_1 = 1 \text{ and } D_2 = 1 | H = 0) = 0.01 \cdot 0.03 = 0.0003$
+* $\Pr(D_1 = 1 \text{ and } D_2 = 1 | H = 1) = 1 \cdot 0.98 = 0.98$
+* $\Pr(D_1 = 1 \text{ and } D_2 = 1) = 0.0003 \cdot 0.9985 + 0.98 \cdot 0.0015 = 0.00176955$
+* $\Pr(H = 1 | D_1 = 1 \text{ and } D_2 = 1) = \frac{0.98 \cdot 0.0015}{0.00176955} = 0.831$
 
 That is, the second test allowed
 us to gain much higher confidence that not all is well. Despite the second test
@@ -391,12 +387,9 @@ being considerably less accurate than the first one, it still improved our
 estimate quite a bit. You might ask, *why couldn't we just run the first test a
 second time?* After all, the first test was more accurate. The reason is that we
 needed a second test whose result is *independent* of the first test (given the
-true diagnosis). In other words, we made the tacit assumption that $\Pr(D_1, D_2
-| H) = \Pr(D_1 | H) \Pr(D_2 | H)$. Statisticians call such random variables
+true diagnosis). In other words, we made the tacit assumption that $\Pr(D_1, D_2 | H) = \Pr(D_1 | H) \Pr(D_2 | H)$. Statisticians call such random variables
 **conditionally independent**. This is expressed as $D_1 \perp\!\!\!\perp D_2  |
 H$.
-
-
 
 ## Sampling
 
@@ -454,8 +447,7 @@ We can see from these figures that the initial number of counts looks
 significant variability between the draws. What we are really aiming for is a
 situation where the probability of drawing a number $x$ is given by $p(x)$.
 
-###
-The categorical distribution
+### The categorical distribution
 
 Drawing from a uniform distribution over a set of
 100 outcomes is simple. But what if we have nonuniform probabilities? Let's
