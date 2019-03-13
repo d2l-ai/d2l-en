@@ -1,14 +1,14 @@
 # Data Manipulation
 
-It's impossible to get anything done if we can't manipulate data. Generally, there are two important things we need to do with data: (i) acquire it and (ii) process it once it's inside the computer. There's no point in acquiring data if we don't even know how to store it, so let's get our hands dirty first by playing with synthetic data. We'll start by introducing the NDArray, 
+It's impossible to get anything done if we can't manipulate data. Generally, there are two important things we need to do with data: (i) acquire it and (ii) process it once it's inside the computer. There's no point in acquiring data if we don't even know how to store it, so let's get our hands dirty first by playing with synthetic data. We'll start by introducing the NDArray,
 MXNet's primary tool for storing and transforming data. If you've worked with NumPy before, you'll notice that NDArrays are, by design, similar to NumPy's multi-dimensional array. However, they confer a few key advantages. First, NDArrays support asynchronous computation on CPU, GPU, and distributed cloud architectures. Second, they provide support for automatic differentiation. These properties make NDArray indispensable for deep learning.
 
 ## Getting Started
 
-Throughout this chapter, we're aiming to get you up and running with the basic functionality. Don't worry if you don't understand all of the basic math, 
+Throughout this chapter, we're aiming to get you up and running with the basic functionality. Don't worry if you don't understand all of the basic math,
 like element-wise operations or normal distributions. In the next two chapters we'll take another pass at the same material, teaching the material in the context of practica examples. On the other hand, if you want to go deeper into the mathematical content, see the ["Math"](../chapter_appendix/math.md) section in the appendix.
 
-We begin by importing MXNet and the `ndarray` module from MXNet. 
+We begin by importing MXNet and the `ndarray` module from MXNet.
 Here, `nd` is short for `ndarray`.
 
 ```{.python .input  n=1}
@@ -26,7 +26,7 @@ x = nd.arange(12)
 x
 ```
 
-When we print `x`, we can observe the property `<NDArray 12 @cpu(0)>` listed, which indicates that `x` is a one-dimensional array of length 12 and that it resides in CPU main memory. The 0 in `@cpu(0)`` has no special meaning and does not represent a specific core.
+When we print `x`, we can observe the property `<NDArray 12 @cpu(0)>` listed, which indicates that `x` is a one-dimensional array of length 12 and that it resides in CPU main memory. The 0 in `@cpu(0)` has no special meaning and does not represent a specific core.
 
 We can get the NDArray instance shape through the `shape` property.
 
@@ -118,7 +118,7 @@ nd.concat(x, y, dim=0)
 nd.concat(x, y, dim=1)
 ```
 
-Sometimes, we may want to construct binary NDArrays via logical statements. Take `x == y` as an example. If `x` and `y` are equal for some entry, the new NDArray has a value of 1 at the same position; otherwise, it is 0.
+Sometimes, we may want to construct binary NDArrays via logical statements. Take `x == y` as an example. If `x` and `y` are equal for some entry, the new NDArray has a value of 1 at the same position; otherwise it is 0.
 
 ```{.python .input}
 x == y
@@ -156,7 +156,7 @@ a + b
 
 ## Indexing and Slicing
 
-Just like in any other Python array, elements in an NDArray can be accessed by its index. In good Python tradition the first element has index 0 and ranges are specified to include the first but not the last. By this logic `1:3` selects the second and third element. Let's try this out by selecting the respective rows in a matrix.
+Just like in any other Python array, elements in an NDArray can be accessed by its index. In good Python tradition the first element has index 0 and ranges are specified to include the first but not the last element. By this logic `1:3` selects the second and third element. Let's try this out by selecting the respective rows in a matrix.
 
 ```{.python .input  n=19}
 x[1:3]
@@ -186,7 +186,7 @@ y = y + x
 id(y) == before
 ```
 
-This might be undesirable for two reasons. First, we don't want to run around allocating memory unnecessarily all the time. In machine learning, we might have hundreds of megabytes of parameters and update all of them multiple times per second. Typically, we'll want to perform these updates *in place*. Second, we might point at the same parameters from multiple variables. If we don't update in place, this could cause a memory leak, and could cause us to inadvertently reference stale parameters.
+This might be undesirable for two reasons. First, we don't want to run around allocating memory unnecessarily all the time. In machine learning, we might have hundreds of megabytes of parameters and update all of them multiple times per second. Typically, we'll want to perform these updates *in place*. Second, we might point at the same parameters from multiple variables. If we don't update in place, this could cause a memory leak, making it possible for us to inadvertently reference stale parameters.
 
 Fortunately, performing in-place operations in MXNet is easy. We can assign the result of an operation to a previously allocated array with slice notation, e.g., `y[:] = <expression>`. To illustrate the behavior, we first clone the shape of a matrix using `zeros_like` to allocate a block of 0 entries.
 
@@ -205,7 +205,7 @@ nd.elemwise_add(x, y, out=z)
 id(z) == before
 ```
 
-If the value of `x ` is not reused in subsequent programs, we can also use `x[:] = x + y` or `x += y` to reduce the memory overhead of the operation.
+If the value of `x ` is not reused in subsequent computations, we can also use `x[:] = x + y` or `x += y` to reduce the memory overhead of the operation.
 
 ```{.python .input  n=18}
 before = id(x)
