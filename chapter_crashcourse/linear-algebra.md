@@ -7,7 +7,7 @@ We'll introduce all the basic concepts,
 the corresponding mathematical notation,
 and their realization in code all in one place.
 If you're already confident in your basic linear algebra,
-feel free to skim or skip this chapter.
+feel free to skim through or skip this chapter.
 
 ```{.python .input}
 from mxnet import nd
@@ -24,7 +24,7 @@ If you wanted to convert this value to Celsius (using metric system's more sensi
 you'd evaluate the expression $c = (f - 32) * 5/9$ setting $f$ to $52$.
 In this equation, each of the terms $32$, $5$, and $9$ is a scalar value.
 The placeholders $c$ and $f$ that we use are called variables
-and they stand in for unknown scalar values.
+and they represent unknown scalar values.
 
 In mathematical notation, we represent scalars with ordinary lower cased letters ($x$, $y$, $z$).
 We also denote the space of all scalars as $\mathcal{R}$.
@@ -62,7 +62,7 @@ For example, if we're studying the risk that loans default,
 we might associate each applicant with a vector
 whose components correspond to their income,
 length of employment, number of previous defaults, etc.
-If we were studying the risk of heart attack in hospital patients,
+If we were studying the risk of heart attacks hospital patients potentially face,
 we might represent each patient with a vector
 whose components capture their most recent vital signs,
 cholesterol levels, minutes of exercise per day, etc.
@@ -158,7 +158,7 @@ print(A.T)
 
 Just as vectors generalize scalars, and matrices generalize vectors, we can actually build data structures with even more axes. Tensors give us a generic way of discussing arrays with an arbitrary number of axes. Vectors, for example, are first-order tensors, and matrices are second-order tensors.
 
-Using tensors will become more important when we start working with images, which arrive as 3D data structures, with axes corresponding to the height, width, and the three (RGB) color channels. But in this chapter, we're going to skip past and make sure you know the basics.
+Using tensors will become more important when we start working with images, which arrive as 3D data structures, with axes corresponding to the height, width, and the three (RGB) color channels. But in this chapter, we're going to skip this part and make sure you know the basics.
 
 ```{.python .input}
 X = nd.arange(24).reshape((2, 3, 4))
@@ -436,8 +436,8 @@ to implement a number of many practically useful models
 and you can always circle back when you want to learn more.
 
 But there's a lot more to linear algebra, even as concerns machine learning.
-At some point, if you plan to make a career of machine learning,
-you'll need to know more than we've covered so far.
+At some point, if you plan to make a career in machine learning,
+you'll need to know more than what we've covered so far.
 In the rest of this chapter, we introduce some useful, more advanced concepts.
 
 
