@@ -56,7 +56,7 @@ with autograd.record():
     print(autograd.is_training())
 ```
 
-In some cases, the same model behaves differently in the training and prediction modes (e.g. when using neural techniques such as dropout and batch normalization). In other cases, some models may store more auxiliary variables to make computing gradients easier. We will cover these differences in detail in later chapters. For now, you do not need to worry about these details.
+In some cases, the same model behaves differently in the training and prediction modes (e.g. when using neural techniques such as dropout and batch normalization). In other cases, some models may store more auxiliary variables to make computing gradients easier. We will cover these differences in detail in later chapters. For now, you don't need to worry about them.
 
 ## Computing the Gradient of Python Control Flow
 
@@ -128,7 +128,7 @@ print(x.grad)
 1. Redesign an example of finding the gradient of the control flow. Run and analyze the result.
 1. In a second price auction (such as in eBay or in computational advertising) the winning bidder pays the second highest price. Compute the gradient of the winning bidder with regard to his bid using `autograd`. Why do you get a pathological result? What does this tell us about the mechanism? For more details read the paper by [Edelman, Ostrovski and Schwartz, 2005](https://www.benedelman.org/publications/gsp-060801.pdf).
 1. Why is the second derivative much more expensive to compute than the first derivative?
-1. Derive the head gradient relationship for the chain rule. If you get stuck, use the  [Wikipedia Chain Rule](https://en.wikipedia.org/wiki/Chain_rule) entry.
+1. Derive the head gradient relationship for the chain rule. If you get stuck, use the ["Chain Rule" article on Wikipedia](https://en.wikipedia.org/wiki/Chain_rule).
 1. Assume $f(x) = \sin(x)$. Plot $f(x)$ and $\frac{df(x)}{dx}$ on a graph, where you computed the latter without any symbolic calculations, i.e. without exploiting that $f'(x) = \cos(x)$.
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2318)
