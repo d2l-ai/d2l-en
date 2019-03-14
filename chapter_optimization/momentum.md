@@ -5,7 +5,7 @@ In the ["Gradient Descent and Stochastic Gradient Descent"](./gd-sgd.md) section
 
 ## Exercises with Gradient Descent
 
-Now, we will consider an objective function $f(\boldsymbol{x})=0.1x_1^2+2x_2^2$, whose input and output are a two-dimensional vector $\boldsymbol{x} = [x_1, x_2]$ and a scalar, respectively. In contrast to the ["Gradient Descent and Stochastic Gradient Descent"](./gd-sgd.md) section, here, the coefficient $x_1^2$ is reduced from $1$ to $0.1$. We are going to implement gradient descent based on this objective function, and demonstrate the iterative trajectory of the independent variable using the learning rate $0.4.
+Now, we will consider an objective function $f(\boldsymbol{x})=0.1x_1^2+2x_2^2$, whose input and output are a two-dimensional vector $\boldsymbol{x} = [x_1, x_2]$ and a scalar, respectively. In contrast to the ["Gradient Descent and Stochastic Gradient Descent"](./gd-sgd.md) section, here, the coefficient $x_1^2$ is reduced from $1$ to $0.1$. We are going to implement gradient descent based on this objective function, and demonstrate the iterative trajectory of the independent variable using the learning rate $0.4$.
 
 ```{.python .input  n=3}
 import sys
@@ -143,7 +143,7 @@ d2l.train_ch7(sgd_momentum, init_momentum_states(),
               {'lr': 0.004, 'momentum': 0.9}, features, labels)
 ```
 
-## Concse Implementation
+## Concise Implementation
 
 In Gluon, we only need to use `momentum` to define the momentum hyperparameter in the `Trainer` instance to implement momentum.
 
