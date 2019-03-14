@@ -169,7 +169,7 @@ $$\mathbb{E}_i \nabla f_i(\boldsymbol{x}) = \frac{1}{n} \sum_{i = 1}^n \nabla f_
 
 This means that, on average, the stochastic gradient is a good estimate of the gradient.
 
-Now, we will compare it to gradient descent by adding random noise with a mean of 0 to the gradient to simulate ab SGD.
+Now, we will compare it to gradient descent by adding random noise with a mean of 0 to the gradient to simulate a SGD.
 
 ```{.python .input  n=17}
 def sgd_2d(x1, x2, s1, s2):
