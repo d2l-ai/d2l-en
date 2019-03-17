@@ -6,7 +6,7 @@ MXNet's primary tool for storing and transforming data. If you've worked with Nu
 ## Getting Started
 
 Throughout this chapter, we're aiming to get you up and running with the basic functionality. Don't worry if you don't understand all of the basic math,
-like element-wise operations or normal distributions. In the next two chapters we'll take another pass at the same material, teaching the material in the context of practica examples. On the other hand, if you want to go deeper into the mathematical content, see the ["Math"](../chapter_appendix/math.md) section in the appendix.
+like element-wise operations or normal distributions. In the next two chapters we'll take another pass at the same material, teaching the material in the context of practical examples. On the other hand, if you want to go deeper into the mathematical content, see the ["Math"](../chapter_appendix/math.md) section in the appendix.
 
 We begin by importing MXNet and the `ndarray` module from MXNet.
 Here, `nd` is short for `ndarray`.
