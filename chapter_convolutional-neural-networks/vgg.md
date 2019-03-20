@@ -9,7 +9,10 @@ Progress in this field mirrors that in chip design where engineers went from pla
 The basic building block of a ConvNet is the combination of a convolutional layer (with padding to keep the resolution unchanged), followed by a nonlinearity such as a ReLu. A VGG block is given by a sequence of such layers, followed by maximum pooling. Throughout their design [Simonyan and Ziserman, 2014](https://arxiv.org/abs/1409.1556) used convolution windows of size 3 and maximum poolin with stride and window width 2, effectively halving the resolution after each block. We use the `vgg_block` function to implement this basic VGG block. This function takes the number of convolutional layers `num_convs` and the number of output channels `num_channels` as input.
 
 ```{.python .input  n=1}
-import gluonbook as gb
+import sys
+sys.path.insert(0, '..')
+
+import d2l
 from mxnet import gluon, init, nd
 from mxnet.gluon import nn
 
@@ -39,10 +42,10 @@ Now, we will implement VGG-11. This is a simple matter of executing a for loop o
 ```{.python .input  n=3}
 def vgg(conv_arch):
     net = nn.Sequential()
-    # The convolutional layer part.
+    # The convolutional layer part
     for (num_convs, num_channels) in conv_arch:
         net.add(vgg_block(num_convs, num_channels))
-    # The fully connected layer part.
+    # The fully connected layer part
     net.add(nn.Dense(4096, activation='relu'), nn.Dropout(0.5),
             nn.Dense(4096, activation='relu'), nn.Dropout(0.5),
             nn.Dense(10))
@@ -76,26 +79,27 @@ net = vgg(small_conv_arch)
 Apart from using a slightly larger learning rate, the model training process is similar to that of AlexNet in the last section.
 
 ```{.python .input}
-lr, num_epochs, batch_size, ctx = 0.05, 5, 128, gb.try_gpu()
+lr, num_epochs, batch_size, ctx = 0.05, 5, 128, d2l.try_gpu()
 net.initialize(ctx=ctx, init=init.Xavier())
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
-train_iter, test_iter = gb.load_data_fashion_mnist(batch_size, resize=224)
-gb.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
+train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)
+d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,
+              num_epochs)
 ```
 
 ## Summary
 
 * VGG-11 constructs a network using reusable convolutional blocks. Different VGG models can be defined by the differences in the number of convolutional layers and output channels in each block.
 * The use of blocks leads to very compact representations of the network definition. It allows for efficient design of complex networks.
-* In their work Simonyan and Ziserman experimented with various architetures. In particular, they found that several layers of deep and narrow convolutions (i.e. $3 \times 3$) were more effective than fewer layers of wider convolutions.
+* In their work Simonyan and Ziserman experimented with various architectures. In particular, they found that several layers of deep and narrow convolutions (i.e. $3 \times 3$) were more effective than fewer layers of wider convolutions.
 
-## Problems
+## Exercises
 
 1. When printing out the dimensions of the layers we only saw 8 results rather than 11. Where did the remaining 3 layer informations go?
 1. Compared with AlexNet, VGG is much slower in terms of computation, and it also needs more GPU memory. Try to analyze the reasons for this.
 1. Try to change the height and width of the images in Fashion-MNIST from 224 to 96. What influence does this have on the experiments?
 1. Refer to Table 1 in the original [VGG Paper](https://arxiv.org/abs/1409.1556) to construct other common models, such as VGG-16 or VGG-19.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2355)
 
-<div id="discuss" topic_id="2355"></div>
+![](../img/qr_vgg.svg)

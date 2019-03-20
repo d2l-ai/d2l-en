@@ -5,8 +5,11 @@ We previously discussed semantic segmentation using each pixel in an image for c
 We will first import the package or module needed for the experiment and then explain the transposed convolution layer.
 
 ```{.python .input  n=2}
+import sys
+sys.path.insert(0, '..')
+
 %matplotlib inline
-import gluonbook as gb
+import d2l
 from mxnet import gluon, image, init, nd
 from mxnet.gluon import data as gdata, loss as gloss, model_zoo, nn
 import numpy as np
@@ -136,11 +139,11 @@ out_img = Y[0].transpose((1, 2, 0))
 As you can see, the transposed convolution layer magnifies both the height and width of the image by a factor of 2. It is worth mentioning that, besides to the difference in coordinate scale, the image magnified by bilinear interpolation and original image printed in the ["Object Detection and Bounding Box"](bounding-box.md) section look the same.
 
 ```{.python .input}
-gb.set_figsize()
+d2l.set_figsize()
 print('input image shape:', img.shape)
-gb.plt.imshow(img.asnumpy());
+d2l.plt.imshow(img.asnumpy());
 print('output image shape:', out_img.shape)
-gb.plt.imshow(out_img.asnumpy());
+d2l.plt.imshow(out_img.asnumpy());
 ```
 
 In a fully convolutional network, we initialize the transposed convolution layer for upsampled bilinear interpolation. For a $1\times 1$ convolution layer, we use Xavier for randomly initialization.
@@ -157,16 +160,16 @@ We read the data set using the method described in the previous section. Here, w
 
 ```{.python .input  n=13}
 crop_size, batch_size, colormap2label = (320, 480), 32, nd.zeros(256**3)
-for i, cm in enumerate(gb.VOC_COLORMAP):
+for i, cm in enumerate(d2l.VOC_COLORMAP):
     colormap2label[(cm[0] * 256 + cm[1]) * 256 + cm[2]] = i
-voc_dir = gb.download_voc_pascal(data_dir='../data')
+voc_dir = d2l.download_voc_pascal(data_dir='../data')
 
 num_workers = 0 if sys.platform.startswith('win32') else 4
 train_iter = gdata.DataLoader(
-    gb.VOCSegDataset(True, crop_size, voc_dir, colormap2label), batch_size,
+    d2l.VOCSegDataset(True, crop_size, voc_dir, colormap2label), batch_size,
     shuffle=True, last_batch='discard', num_workers=num_workers)
 test_iter = gdata.DataLoader(
-    gb.VOCSegDataset(False, crop_size, voc_dir, colormap2label), batch_size,
+    d2l.VOCSegDataset(False, crop_size, voc_dir, colormap2label), batch_size,
     last_batch='discard', num_workers=num_workers)
 ```
 
@@ -175,12 +178,12 @@ test_iter = gdata.DataLoader(
 Now we can start training the model. The loss function and accuracy calculation here are not substantially different from those used in image classification. Because we use the channel of the transposed convolution layer to predict pixel categories, the `axis=1` (channel dimension) option is specified in `SoftmaxCrossEntropyLoss`. In addition, the model calculates the accuracy based on whether the prediction category of each pixel is correct.
 
 ```{.python .input  n=12}
-ctx = gb.try_all_gpus()
+ctx = d2l.try_all_gpus()
 loss = gloss.SoftmaxCrossEntropyLoss(axis=1)
 net.collect_params().reset_ctx(ctx)
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': 0.1,
                                                       'wd': 1e-3})
-gb.train(train_iter, test_iter, net, loss, trainer, ctx, num_epochs=5)
+d2l.train(train_iter, test_iter, net, loss, trainer, ctx, num_epochs=5)
 ```
 
 ## Prediction
@@ -199,7 +202,7 @@ To visualize the predicted categories for each pixel, we map the predicted categ
 
 ```{.python .input  n=14}
 def label2image(pred):
-    colormap = nd.array(gb.VOC_COLORMAP, ctx=ctx[0], dtype='uint8')
+    colormap = nd.array(d2l.VOC_COLORMAP, ctx=ctx[0], dtype='uint8')
     X = pred.astype('int32')
     return colormap[X, :]
 ```
@@ -209,14 +212,14 @@ The size and shape of the images in the test data set vary. Because the model us
 For the sake of simplicity, we only read a few large test images and crop an area with a shape of $320\times480$ from the top-left corner of the image. Only this area is used for prediction. For the input image, we print the cropped area first, then print the predicted result, and finally print the labeled category.
 
 ```{.python .input  n=15}
-test_images, test_labels = gb.read_voc_images(is_train=False)
+test_images, test_labels = d2l.read_voc_images(is_train=False)
 n, imgs = 4, []
 for i in range(n):
     crop_rect = (0, 0, 480, 320)
     X = image.fixed_crop(test_images[i], *crop_rect)
     pred = label2image(predict(X))
     imgs += [X, pred, image.fixed_crop(test_labels[i], *crop_rect)]
-gb.show_images(imgs[::3] + imgs[1::3] + imgs[2::3], 3, n);
+d2l.show_images(imgs[::3] + imgs[1::3] + imgs[2::3], 3, n);
 ```
 
 ## Summary
@@ -226,7 +229,7 @@ gb.show_images(imgs[::3] + imgs[1::3] + imgs[2::3], 3, n);
 * In a fully convolutional network, we initialize the transposed convolution layer for upsampled bilinear interpolation.
 
 
-## Problems
+## Exercises
 
 * Is it efficient to use matrix multiplication to implement convolution operations? Why?
 * If we use Xavier to randomly initialize the transposed convolution layer, what will happen to the result?
@@ -240,6 +243,6 @@ gb.show_images(imgs[::3] + imgs[1::3] + imgs[2::3], 3, n);
 
 [2] Dumoulin, V., & Visin, F. (2016). A guide to convolution arithmetic for deep learning. arXiv preprint arXiv:1603.07285.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2454)
 
-<div id="discuss" topic_id="2454"></div>
+![](../img/qr_fcn.svg)

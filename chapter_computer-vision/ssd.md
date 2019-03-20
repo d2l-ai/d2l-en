@@ -3,7 +3,7 @@
 In the previous few sections, we have introduced bounding boxes, anchor boxes, multiscale object detection, and data sets. Now, we will use this background knowledge to construct an object detection model: single shot multibox detection (SSD)[1]. This quick and easy model is already widely used. Some of the design concepts and implementation details of this model are also applicable to other object detection models.
 
 
-## model
+## Model
 
 Figure 9.4 shows the design of an SSD model. The model's main components are a base network block and several multiscale feature blocks connected in a series. Here, the base network block is used to extract features of original images, and it generally takes the form of a deep convolutional neural network. The paper on SSDs chooses to place a truncated VGG before the classification layer[1], but this is now commonly replaced by ResNet. We can design the base network so that it outputs larger heights and widths. In this way, more anchor boxes are generated based on this feature map, allowing us to detect smaller objects. Next, each multiscale feature block reduces the height and width of the feature map provided by the previous layer (for example, it may reduce the sizes by half). The blocks then use each element in the feature map to expand the receptive field on the input image. In this way, the closer a multiscale feature block is to the top of Figure 9.4 the smaller its output feature map, and the fewer the anchor boxes that are generated based on the feature map. In addition, the closer a feature block is to the top, the larger the receptive field of each element in the feature map and the better suited it is to detect larger objects. As the SSD generates different numbers of anchor boxes of different sizes based on the base network block and each multiscale feature block and then predicts the categories and offsets (i.e., predicted bounding boxes) of the anchor boxes in order to detect objects of different sizes, SSD is a multiscale object detection model.
 
@@ -21,8 +21,11 @@ Specifically, the category prediction layer uses a convolutional layer that main
 Now, we will define a category prediction layer of this type. After we specify the parameters $a$ and $q$, it uses a $3\times3$ convolutional layer with a padding of 1. The heights and widths of the input and output of this convolutional layer remain unchanged.
 
 ```{.python .input  n=1}
+import sys
+sys.path.insert(0, '..')
+
 %matplotlib inline
-import gluonbook as gb
+import d2l
 from mxnet import autograd, contrib, gluon, image, init, nd
 from mxnet.gluon import loss as gloss, nn
 import time
@@ -151,7 +154,7 @@ class TinySSD(nn.Block):
         super(TinySSD, self).__init__(**kwargs)
         self.num_classes = num_classes
         for i in range(5):
-            # The assignment statement is self.blk_i = get_blk(i).
+            # The assignment statement is self.blk_i = get_blk(i)
             setattr(self, 'blk_%d' % i, get_blk(i))
             setattr(self, 'cls_%d' % i, cls_predictor(num_anchors,
                                                       num_classes))
@@ -160,11 +163,12 @@ class TinySSD(nn.Block):
     def forward(self, X):
         anchors, cls_preds, bbox_preds = [None] * 5, [None] * 5, [None] * 5
         for i in range(5):
-            # getattr(self, 'blk_%d' % i) accesses self.blk_i.
+            # getattr(self, 'blk_%d' % i) accesses self.blk_i
             X, anchors[i], cls_preds[i], bbox_preds[i] = blk_forward(
                 X, getattr(self, 'blk_%d' % i), sizes[i], ratios[i],
                 getattr(self, 'cls_%d' % i), getattr(self, 'bbox_%d' % i))
-        # In the reshape function, 0 indicates that the batch size remains unchanged.
+        # In the reshape function, 0 indicates that the batch size remains
+        # unchanged
         return (nd.concat(*anchors, dim=1),
                 concat_preds(cls_preds).reshape(
                     (0, -1, self.num_classes + 1)), concat_preds(bbox_preds))
@@ -193,15 +197,13 @@ We read the Pikachu data set we created in the previous section.
 
 ```{.python .input  n=14}
 batch_size = 32
-train_data, test_data = gb.load_data_pikachu(batch_size)
-# To ensure efficient GPU computation, we pad each training image with two bounding boxes labeled -1.
-train_data.reshape(label_shape=(3, 5))
+train_iter, _ = d2l.load_data_pikachu(batch_size)
 ```
 
 There is 1 category in the Pikachu data set. After defining the module, we need to initialize the model parameters and define the optimization algorithm.
 
 ```{.python .input  n=15}
-ctx, net = gb.try_gpu(), TinySSD(num_classes=1)
+ctx, net = d2l.try_gpu(), TinySSD(num_classes=1)
 net.initialize(init=init.Xavier(), ctx=ctx)
 trainer = gluon.Trainer(net.collect_params(), 'sgd',
                         {'learning_rate': 0.2, 'wd': 5e-4})
@@ -225,11 +227,12 @@ We can use the accuracy rate to evaluate the classification results. As we use t
 
 ```{.python .input  n=18}
 def cls_eval(cls_preds, cls_labels):
-    # Because the category prediction results are placed in the final dimension, argmax must specify this dimension.
-    return (cls_preds.argmax(axis=-1) == cls_labels).mean().asscalar()
+    # Because the category prediction results are placed in the final
+    # dimension, argmax must specify this dimension
+    return (cls_preds.argmax(axis=-1) == cls_labels).sum().asscalar()
 
 def bbox_eval(bbox_preds, bbox_labels, bbox_masks):
-    return ((bbox_labels - bbox_preds) * bbox_masks).abs().mean().asscalar()
+    return ((bbox_labels - bbox_preds) * bbox_masks).abs().sum().asscalar()
 ```
 
 ### Train the Model
@@ -238,28 +241,33 @@ During model training, we must generate multiscale anchor boxes (`anchors`) in t
 
 ```{.python .input  n=19}
 for epoch in range(20):
-    acc, mae = 0, 0
-    train_data.reset()  # Read data from the start.
+    acc_sum, mae_sum, n, m = 0.0, 0.0, 0, 0
+    train_iter.reset()  # Read data from the start.
     start = time.time()
-    for i, batch in enumerate(train_data):
+    for batch in train_iter:
         X = batch.data[0].as_in_context(ctx)
         Y = batch.label[0].as_in_context(ctx)
         with autograd.record():
-            # Generate multiscale anchor boxes and predict the category and offset of each.
+            # Generate multiscale anchor boxes and predict the category and
+            # offset of each
             anchors, cls_preds, bbox_preds = net(X)
-            # Label the category and offset of each anchor box.
+            # Label the category and offset of each anchor box
             bbox_labels, bbox_masks, cls_labels = contrib.nd.MultiBoxTarget(
                 anchors, Y, cls_preds.transpose((0, 2, 1)))
-            # Calculate the loss function using the predicted and labeled category and offset values.
+            # Calculate the loss function using the predicted and labeled
+            # category and offset values
             l = calc_loss(cls_preds, cls_labels, bbox_preds, bbox_labels,
                           bbox_masks)
         l.backward()
         trainer.step(batch_size)
-        acc += cls_eval(cls_preds, cls_labels)
-        mae += bbox_eval(bbox_preds, bbox_labels, bbox_masks)
+        acc_sum += cls_eval(cls_preds, cls_labels)
+        n += cls_labels.size
+        mae_sum += bbox_eval(bbox_preds, bbox_labels, bbox_masks)
+        m += bbox_labels.size
+
     if (epoch + 1) % 5 == 0:
         print('epoch %2d, class err %.2e, bbox mae %.2e, time %.1f sec' % (
-            epoch + 1, 1 - acc / (i + 1), mae / (i + 1), time.time() - start))
+            epoch + 1, 1 - acc_sum / n, mae_sum / m, time.time() - start))
 ```
 
 ## Prediction
@@ -288,17 +296,17 @@ output = predict(X)
 Finally, we take all the bounding boxes with a confidence level of at least 0.3 and display them as the final output.
 
 ```{.python .input  n=22}
-gb.set_figsize((5, 5))
+d2l.set_figsize((5, 5))
 
 def display(img, output, threshold):
-    fig = gb.plt.imshow(img.asnumpy())
+    fig = d2l.plt.imshow(img.asnumpy())
     for row in output:
         score = row[1].asscalar()
         if score < threshold:
             continue
         h, w = img.shape[0:2]
         bbox = [row[2:6] * nd.array((w, h, w, h), ctx=row.context)]
-        gb.show_bboxes(fig.axes, bbox, '%.2f' % score, 'w')
+        d2l.show_bboxes(fig.axes, bbox, '%.2f' % score, 'w')
 
 display(img, output, threshold=0.3)
 ```
@@ -310,7 +318,7 @@ display(img, output, threshold=0.3)
 
 
 
-## Problems
+## Exercises
 
 * Due to space limitations, we have ignored some of the implementation details of SSD models in this experiment. Can you further improve the model in the following areas?
 
@@ -333,12 +341,12 @@ When $\sigma$ is large, this loss is similar to the $L_1$ norm loss. When the va
 sigmas = [10, 1, 0.5]
 lines = ['-', '--', '-.']
 x = nd.arange(-2, 2, 0.1)
-gb.set_figsize()
+d2l.set_figsize()
 
 for l, s in zip(lines, sigmas):
     y = nd.smooth_l1(x, scalar=s)
-    gb.plt.plot(x.asnumpy(), y.asnumpy(), l, label='sigma=%.1f' % s)
-gb.plt.legend();
+    d2l.plt.plot(x.asnumpy(), y.asnumpy(), l, label='sigma=%.1f' % s)
+d2l.plt.legend();
 ```
 
 In the experiment, we used cross-entropy loss for category prediction. Now, assume that the prediction probability of the actual category $j$ is $p_j$ and the cross-entropy loss is $-\log p_j$. We can also use the focal loss[2]. Given the positive hyper-parameters $\gamma$ and $\alpha$, this loss is defined as:
@@ -353,9 +361,9 @@ def focal_loss(gamma, x):
 
 x = nd.arange(0.01, 1, 0.01)
 for l, gamma in zip(lines, [0, 1, 5]):
-    y = gb.plt.plot(x.asnumpy(), focal_loss(gamma, x).asnumpy(), l,
-                    label='gamma=%.1f' % gamma)
-gb.plt.legend();
+    y = d2l.plt.plot(x.asnumpy(), focal_loss(gamma, x).asnumpy(), l,
+                     label='gamma=%.1f' % gamma)
+d2l.plt.legend();
 ```
 
 ### Training and Prediction
@@ -371,6 +379,6 @@ gb.plt.legend();
 
 [2] Lin, T. Y., Goyal, P., Girshick, R., He, K., & Dollár, P. (2018). Focal loss for dense object detection. IEEE transactions on pattern analysis and machine intelligence.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2453)
 
-<div id="discuss" topic_id="2453"></div>
+![](../img/qr_ssd.svg)

@@ -53,7 +53,7 @@ Below are some advanced options for using Jupyter Notebook. You can use this sec
 If you wish to contribute to the content of this book, you need to modify the source file (.md file, not .ipynb file) in the markdown format on GitHub. With the notedown plugin, we can use Jupyter Notebook to modify and run the source code in markdown format. Linux/MacOS users can execute the following commands to obtain the GitHub source files and activate the runtime environment.
 
 ```
-git clone https://github.com/diveintodeeplearning/d2l-en.git
+git clone https://github.com/d2l-ai/d2l-en.git
 cd d2l-en
 conda env create -f environment.yml
 source activate gluon # Windows users run "activate gluon"
@@ -107,10 +107,10 @@ jupyter nbextension enable execute_time/ExecuteTime
 
 * You can edit and run the code in this book using Jupyter Notebook.
 
-## Problem
+## Exercise
 
 * Try to edit and run the code in this book locally.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2398)
 
-<div id="discuss" topic_id="2398"></div>
+![](../img/qr_jupyter.svg)

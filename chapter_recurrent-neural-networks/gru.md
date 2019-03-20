@@ -67,12 +67,12 @@ To implement and display a GRU, we will again use the Jay Chou lyrics data set t
 import sys
 sys.path.insert(0, '..')
 
-import gluonbook as gb
+import d2l
 from mxnet import nd
 from mxnet.gluon import rnn
 
 (corpus_indices, char_to_idx, idx_to_char,
- vocab_size) = gb.load_data_time_machine()
+ vocab_size) = d2l.load_data_time_machine()
 ```
 
 ## Implementation from Scratch
@@ -85,7 +85,7 @@ The code below initializes the model parameters. The hyper-parameter `num_hidden
 
 ```{.python .input  n=2}
 num_inputs, num_hiddens, num_outputs = vocab_size, 256, vocab_size
-ctx = gb.try_gpu()
+ctx = d2l.try_gpu()
 
 def get_params():
     def _one(shape):
@@ -128,7 +128,7 @@ def gru(inputs, state, params):
     for X in inputs:
         Z = nd.sigmoid(nd.dot(X, W_xz) + nd.dot(H, W_hz) + b_z)
         R = nd.sigmoid(nd.dot(X, W_xr) + nd.dot(H, W_hr) + b_r)
-        H_tilda = nd.tanh(nd.dot(X, W_xh) + R * nd.dot(H, W_hh) + b_h)
+        H_tilda = nd.tanh(nd.dot(X, W_xh) + nd.dot(R * H, W_hh) + b_h)
         H = Z * H + (1 - Z) * H_tilda
         Y = nd.dot(H, W_hq) + b_q
         outputs.append(Y)
@@ -147,24 +147,24 @@ pred_period, pred_len, prefixes = 40, 50, ['traveller', 'time traveller']
 We create a string of lyrics based on the currently trained model every 40 epochs.
 
 ```{.python .input}
-gb.train_and_predict_rnn(gru, get_params, init_gru_state, num_hiddens,
-                         vocab_size, ctx, corpus_indices, idx_to_char,
-                         char_to_idx, False, num_epochs, num_steps, lr,
-                         clipping_theta, batch_size, pred_period, pred_len,
-                         prefixes)
+d2l.train_and_predict_rnn(gru, get_params, init_gru_state, num_hiddens,
+                          vocab_size, ctx, corpus_indices, idx_to_char,
+                          char_to_idx, False, num_epochs, num_steps, lr,
+                          clipping_theta, batch_size, pred_period, pred_len,
+                          prefixes)
 ```
 
-## Gluon Implementation
+## Concise Implementation
 
 In Gluon, we can directly call the `GRU` class in the `rnn` module.
 
 ```{.python .input  n=6}
 gru_layer = rnn.GRU(num_hiddens)
-model = gb.RNNModel(gru_layer, vocab_size)
-gb.train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
-                               corpus_indices, idx_to_char, char_to_idx,
-                               num_epochs, num_steps, lr, clipping_theta,
-                               batch_size, pred_period, pred_len, prefixes)
+model = d2l.RNNModel(gru_layer, vocab_size)
+d2l.train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
+                                corpus_indices, idx_to_char, char_to_idx,
+                                num_epochs, num_steps, lr, clipping_theta,
+                                batch_size, pred_period, pred_len, prefixes)
 ```
 
 ## Summary
@@ -175,7 +175,7 @@ gb.train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
 * Update gates help capture long-term dependencies in time series.
 
 
-## Problems
+## Exercises
 
 * Assume that time step $t' < t$. If we only want to use the input for time step $t'$ to predict the output at time step $t$, what are the best values for the reset and update gates for each time step?
 * Adjust the hyper-parameters and observe and analyze the impact on running time, perplexity, and the written lyrics.
@@ -187,6 +187,6 @@ gb.train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
 
 [2] Chung, J., Gulcehre, C., Cho, K., & Bengio, Y. (2014). Empirical evaluation of gated recurrent neural networks on sequence modeling. arXiv preprint arXiv:1412.3555.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2367)
 
-<div id="discuss" topic_id="2367"></div>
+![](../img/qr_gru.svg)

@@ -25,8 +25,11 @@ Next, we will use a specific example for practice: hot dog recognition. We will 
 First, import the packages and modules required for the experiment.  Gluon's `model_zoo` package provides a common pre-trained model. If you want to get more pre-trained models for computer vision, you can use the GluonCV Toolkit[1].
 
 ```{.python .input  n=1}
+import sys
+sys.path.insert(0, '..')
+
 %matplotlib inline
-import gluonbook as gb
+import d2l
 from mxnet import gluon, init, nd
 from mxnet.gluon import data as gdata, loss as gloss, model_zoo
 from mxnet.gluon import utils as gutils
@@ -64,7 +67,7 @@ The first 8 positive examples and the last 8 negative images are shown below. As
 ```{.python .input  n=4}
 hotdogs = [train_imgs[i][0] for i in range(8)]
 not_hotdogs = [train_imgs[-i - 1][0] for i in range(8)]
-gb.show_images(hotdogs + not_hotdogs, 2, 8, scale=1.4);
+d2l.show_images(hotdogs + not_hotdogs, 2, 8, scale=1.4);
 ```
 
 During training, we first crop a random area with random size and random aspect ratio from the image and then scale the area to an input with a height and width of 224 pixels. During testing, we scale the height and width of images to 256 pixels, and then crop the center area with height and width of 224 pixels to use as the input. In addition, we normalize the values of the three RGB (red, green, and blue) color channels. The average of all values of the channel is subtracted from each value and then the result is divided by the standard deviation of all values of the channel to produce the output.
@@ -107,7 +110,8 @@ We then build a new neural network to use as the target model. It is defined in 
 finetune_net = model_zoo.vision.resnet18_v2(classes=2)
 finetune_net.features = pretrained_net.features
 finetune_net.output.initialize(init.Xavier())
-# The model parameters in output will be updated using a learning rate ten times greater.
+# The model parameters in output will be updated using a learning rate ten
+# times greater
 finetune_net.output.collect_params().setattr('lr_mult', 10)
 ```
 
@@ -121,13 +125,13 @@ def train_fine_tuning(net, learning_rate, batch_size=128, num_epochs=5):
         train_imgs.transform_first(train_augs), batch_size, shuffle=True)
     test_iter = gdata.DataLoader(
         test_imgs.transform_first(test_augs), batch_size)
-    ctx = gb.try_all_gpus()
+    ctx = d2l.try_all_gpus()
     net.collect_params().reset_ctx(ctx)
     net.hybridize()
     loss = gloss.SoftmaxCrossEntropyLoss()
     trainer = gluon.Trainer(net.collect_params(), 'sgd', {
         'learning_rate': learning_rate, 'wd': 0.001})
-    gb.train(train_iter, test_iter, net, loss, trainer, ctx, num_epochs)
+    d2l.train(train_iter, test_iter, net, loss, trainer, ctx, num_epochs)
 ```
 
 We set the learning rate in the `Trainer` instance to a smaller value, such as 0.01, in order to fine tune the model parameters obtained in pre-training. Based on the previous settings, we will train the output layer parameters of the target model from scratch using a learning rate ten times greater.
@@ -155,7 +159,7 @@ As you can see, the fine-tuned model tends to achieve higher precision in the sa
 * Generally, fine tuning parameters use a smaller learning rate, while training the output layer from scratch can use a larger learning rate.
 
 
-## Problems
+## Exercises
 
 * Keep increasing the learning rate of `finetune_net`. How does the precision of the model change?
 * Further tune the hyper-parameters of `finetune_net` and `scratch_net` in the comparative experiment. Do they still have different precisions?
@@ -177,6 +181,6 @@ hotdog_w.shape
 
 [1] GluonCV Toolkit. https://gluon-cv.mxnet.io/
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2443)
 
-<div id="discuss" topic_id="2443"></div>
+![](../img/qr_fine-tuning.svg)

@@ -9,7 +9,7 @@ Therefore, the output shape of the convolutional layer is determined by the shap
 * Multiple layers of convolutions reduce the information available at the boundary, often by much more than what we would want. If we start with a 240x240 pixel image, 10 layers of 5x5 convolutions reduce the image to 200x200 pixels, effectively slicing off 30% of the image and with it obliterating anything interesting on the boundaries. Padding mitigates this problem.
 * In some cases we want to reduce the resolution drastically, e.g. halving it if we think that such a high input dimensionality is not required. In this case we might want to subsample the output. Strides address this.
 * In some cases we want to increase the resolution, e.g. for image superresolution or for audio generation. Again, strides come to our rescue.
-* In some cases we want to increase the length gently to a given size (mostly for sentences of variable length or for filling in patches). Padding addreses this.
+* In some cases we want to increase the length gently to a given size (mostly for sentences of variable length or for filling in patches). Padding addresses this.
 
 
 ## Padding
@@ -34,17 +34,22 @@ In the following example we create a two-dimensional convolutional layer with a 
 from mxnet import nd
 from mxnet.gluon import nn
 
-# We define a convenience function to calculate the convolutional layer. This function initializes
-# the convolutional layer weights and performs corresponding dimensionality elevations and reductions
-# on the input and output.
+# We define a convenience function to calculate the convolutional layer. This
+# function initializes the convolutional layer weights and performs
+# corresponding dimensionality elevations and reductions on the input and
+# output
 def comp_conv2d(conv2d, X):
     conv2d.initialize()
-    # (1,1) indicates that the batch size and the number of channels (described in later chapters) are both 1.
+    # (1,1) indicates that the batch size and the number of channels
+    # (described in later chapters) are both 1
     X = X.reshape((1, 1) + X.shape)
     Y = conv2d(X)
-    return Y.reshape(Y.shape[2:])  # Exclude the first two dimensions that do not interest us: batch and channel.
+    # Exclude the first two dimensions that do not interest us: batch and
+    # channel
+    return Y.reshape(Y.shape[2:])
 
-# Note that here 1 row or column is padded on either side, so a total of 2 rows or columns are added.
+# Note that here 1 row or column is padded on either side, so a total of 2
+# rows or columns are added
 conv2d = nn.Conv2D(1, kernel_size=3, padding=1)
 X = nd.random.uniform(shape=(8, 8))
 comp_conv2d(conv2d, X).shape
@@ -53,8 +58,9 @@ comp_conv2d(conv2d, X).shape
 When the height and width of the convolution kernel are different, we can make the output and input have the same height and width by setting different padding numbers for height and width.
 
 ```{.python .input  n=2}
-# Here, we use a convolution kernel with a height of 5 and a width of 3. The padding numbers on
-# both sides of the height and width are 2 and 1, respectively.
+# Here, we use a convolution kernel with a height of 5 and a width of 3. The
+# padding numbers on both sides of the height and width are 2 and 1,
+# respectively
 conv2d = nn.Conv2D(1, kernel_size=(5, 3), padding=(2, 1))
 comp_conv2d(conv2d, X).shape
 ```
@@ -95,13 +101,13 @@ For the sake of brevity, when the padding number on both sides of the input heig
 * The stride can reduce the resolution of the output, for example reducing the height and width of the output to only $1/n$ of the height and width of the input ($n$ is an integer greater than 1).
 * Padding and stride can be used to adjust the dimensionality of the data effectively.
 
-## Problems
+## Exercises
 
 1. For the last example in this section, use the shape calculation formula to calculate the output shape to see if it is consistent with the experimental results.
 1. Try other padding and stride combinations on the experiments in this section.
 1. For audio signals, what does a stride of $2$ correspond to?
 1. What are the computational benefits of a stride larger than $1$.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2350)
 
-<div id="discuss" topic_id="2350"></div>
+![](../img/qr_padding-and-strides.svg)

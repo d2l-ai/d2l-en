@@ -65,7 +65,7 @@ A comparison of these two programming methods shows that
 
 ## Hybrid programming provides the best of both worlds.
 
-Most deep learning frameworks choose either imperative or symbolic programming. For example, both Theano and TensorFlow (inspired by the latter) make use of symbolic programming, while Chainer and its predecessor PyTorch utilize imperative programming. When designing Gluon, developers considered whether it was possible to harness the benefits of both imperative and symbolic programming. The developers believed that users should be able to develop and debug using pure imperative programming, while having the ability to convert most programs into symbolic programming to be run when product-level computing performance and deployment are required This was achieved by Gluon through the introduction of hybrid programming.
+Most deep learning frameworks choose either imperative or symbolic programming. For example, both Theano and TensorFlow (inspired by the latter) make use of symbolic programming, while Chainer and PyTorch utilize imperative programming. When designing Gluon, developers considered whether it was possible to harness the benefits of both imperative and symbolic programming. The developers believed that users should be able to develop and debug using pure imperative programming, while having the ability to convert most programs into symbolic programming to be run when product-level computing performance and deployment are required This was achieved by Gluon through the introduction of hybrid programming.
 
 In hybrid programming, we can build models using either the HybridBlock or the HybridSequential classes. By default, they are executed in the same way Block or Sequential classes are executed in imperative programming. When the `hybridize` function is called, Gluon will convert the program’s execution into the style used in symbolic programming. In fact, most models can make use of hybrid programming’s execution style.
 
@@ -81,7 +81,7 @@ from mxnet.gluon import nn
 import time
 
 def get_net():
-    net = nn.HybridSequential()  # Here we use the class HybridSequential.
+    net = nn.HybridSequential()  # Here we use the class HybridSequential
     net.add(nn.Dense(256, activation='relu'),
             nn.Dense(128, activation='relu'),
             nn.Dense(2))
@@ -112,7 +112,8 @@ def benchmark(net, x):
     start = time.time()
     for i in range(1000):
         _ = net(x)
-    nd.waitall()  # To facilitate timing, we wait for all computations to be completed.
+    # To facilitate timing, we wait for all computations to be completed
+    nd.waitall()
     return time.time() - start
 
 net = get_net()
@@ -203,12 +204,12 @@ We can see that the three lines of print statements defined in the `hybrid_forwa
 * Models constructed by the HybridSequential and HybridBlock classes are able to convert imperative program into symbolic program by calling the `hybridize` function. We recommend using this method to improve computing performance.
 
 
-## Problems
+## Exercises
 
 * Add `x.asnumpy()` to the first line of the `hybrid_forward` function of the HybridNet class in this section, run all the code in this section, and observe any error types and locations
 * What happens if we add the Python statements `if` and `for` in the `hybrid_forward` function?
 * Review the models that interest you in the previous chapters and use the HybridBlock class or HybridSequential class to implement them.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2380)
 
-<div id="discuss" topic_id="2380"></div>
+![](../img/qr_hybridize.svg)

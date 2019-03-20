@@ -80,7 +80,7 @@ Here, $\boldsymbol{W}$ and $\boldsymbol{b}$ with subscripts are the weight param
 * With the attention mechanism, we can adopt vectorization for higher efficiency.
 
 
-## Problems
+## Exercises
 
 * Based on the model design in this section, why can't we concatenate hidden state $\boldsymbol{s}_{t' - 1}^\top \in \mathbb{R}^{1 \times h}, t' \in 1, \ldots, T'$ from different time steps of the decoder to create the query entry matrix $\boldsymbol{Q} \in \mathbb{R}^{T' \times h}$ to compute context variable $\boldsymbol{c}_{t'}^\top, t' \in 1, \ldots, T'$ of the attention mechanism at different time steps simultaneously?
 
@@ -92,6 +92,6 @@ Here, $\boldsymbol{W}$ and $\boldsymbol{b}$ with subscripts are the weight param
 
 [1] Bahdanau, D., Cho, K., & Bengio, Y. (2014). Neural machine translation by jointly learning to align and translate. arXiv preprint arXiv:1409.0473.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2395)
 
-<div id="discuss" topic_id="2395"></div>
+![](../img/qr_attention.svg)

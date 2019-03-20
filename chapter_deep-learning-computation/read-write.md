@@ -4,7 +4,7 @@ So far we discussed how to process data, how to build, train and test deep learn
 
 ## NDArray
 
-In its siplest form, we can directly use the `save` and `load` functions to store and read NDArrays separately. This works just as expected.
+In its simplest form, we can directly use the `save` and `load` functions to store and read NDArrays separately. This works just as expected.
 
 ```{.python .input}
 from mxnet import nd
@@ -62,16 +62,14 @@ y = net(x)
 Next, we store the parameters of the model as a file with the name 'mlp.params'.
 
 ```{.python .input}
-# Use save_parameters in MXNet of later versions, such as 1.2.1.
-net.save_params('mlp.params')
+net.save_parameters('mlp.params')
 ```
 
 To check whether we are able to recover the model we instantiate a clone of the original MLP model. Unlike the random initialization of model parameters, here we read the parameters stored in the file directly.
 
 ```{.python .input  n=8}
 clone = MLP()
-# Use load_parameters in MXNet of later versions, such as 1.2.1.
-clone.load_params('mlp.params')
+clone.load_parameters('mlp.params')
 ```
 
 Since both instances have the same model parameters, the computation result of the same input `x` should be the same. Let's verify this.
@@ -84,15 +82,15 @@ yclone == y
 ## Summary
 
 * The `save` and `load` functions can be used to perform File I/O for NDArray objects.
-* The `load_params` and `save_params` functions allow us to save entire sets of parameters for a network in Gluon.
+* The `load_parameters` and `save_parameters` functions allow us to save entire sets of parameters for a network in Gluon.
 * Saving the architecture has to be done in code rather than in parameters.
 
-## Problems
+## Exercises
 
 1. Even if there is no need to deploy trained models to a different device, what are the practical benefits of storing model parameters?
 1. Assume that we want to reuse only parts of a network to be incorporated into a network of a *different* architecture. How would you go about using, say the first two layers from a previous network in a new network.
 1. How would you go about saving network architecture and parameters? What restrictions would you impose on the architecture?
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2329)
 
-<div id="discuss" topic_id="2329"></div>
+![](../img/qr_read-write.svg)

@@ -20,8 +20,11 @@ In the [Linear Regression](../chapter_deep-learning-basics/linear-regression.md)
 There are many challenges in deep learning optimization. Two such challenges are discussed below: local minimums and saddle points. To better describe the problem, we first import the packages or modules required for the experiments in this section.
 
 ```{.python .input  n=1}
+import sys
+sys.path.insert(0, '..')
+
 %matplotlib inline
-import gluonbook as gb
+import d2l
 from mpl_toolkits import mplot3d
 import numpy as np
 ```
@@ -40,15 +43,15 @@ we can approximate the local minimum and global minimum of this function. Please
 def f(x):
     return x * np.cos(np.pi * x)
 
-gb.set_figsize((4.5, 2.5))
+d2l.set_figsize((4.5, 2.5))
 x = np.arange(-1.0, 2.0, 0.1)
-fig,  = gb.plt.plot(x, f(x))
+fig,  = d2l.plt.plot(x, f(x))
 fig.axes.annotate('local minimum', xy=(-0.3, -0.25), xytext=(-0.77, -1.0),
                   arrowprops=dict(arrowstyle='->'))
 fig.axes.annotate('global minimum', xy=(1.1, -0.95), xytext=(0.6, 0.8),
                   arrowprops=dict(arrowstyle='->'))
-gb.plt.xlabel('x')
-gb.plt.ylabel('f(x)');
+d2l.plt.xlabel('x')
+d2l.plt.ylabel('f(x)');
 ```
 
 The objective function of the deep learning model may have several local optimums. When the numerical solution of an optimization problem is near the local optimum, the numerical solution obtained by the final iteration may only minimize the objective function locally, rather than globally, as the gradient of the objective function's solutions approaches or becomes zero.
@@ -63,11 +66,11 @@ we can find the position of the saddle point of this function.
 
 ```{.python .input  n=3}
 x = np.arange(-2.0, 2.0, 0.1)
-fig, = gb.plt.plot(x, x**3)
+fig, = d2l.plt.plot(x, x**3)
 fig.axes.annotate('saddle point', xy=(0, -0.2), xytext=(-0.52, -5.0),
                   arrowprops=dict(arrowstyle='->'))
-gb.plt.xlabel('x')
-gb.plt.ylabel('f(x)');
+d2l.plt.xlabel('x')
+d2l.plt.ylabel('f(x)');
 ```
 
 Now, we will use another example of a two-dimensional function, defined as follows:
@@ -80,15 +83,15 @@ We can find the position of the saddle point of this function. Perhaps you have 
 x, y = np.mgrid[-1: 1: 31j, -1: 1: 31j]
 z = x**2 - y**2
 
-ax = gb.plt.figure().add_subplot(111, projection='3d')
+ax = d2l.plt.figure().add_subplot(111, projection='3d')
 ax.plot_wireframe(x, y, z, **{'rstride': 2, 'cstride': 2})
 ax.plot([0], [0], [0], 'rx')
 ticks = [-1,  0, 1]
-gb.plt.xticks(ticks)
-gb.plt.yticks(ticks)
+d2l.plt.xticks(ticks)
+d2l.plt.yticks(ticks)
 ax.set_zticks(ticks)
-gb.plt.xlabel('x')
-gb.plt.ylabel('y');
+d2l.plt.xlabel('x')
+d2l.plt.ylabel('y');
 ```
 
 In the figure above, the objective function's local minimum and local maximum can be found on the $x$ axis and $y$ axis respectively at the position of the saddle point.
@@ -110,17 +113,15 @@ In deep learning, it is difficult, but also not necessary, to find the global op
 * Since, generally, the parameters of deep learning models are high-dimensional, saddle points in the objective function are more commonly seen than local minimums.
 
 
-## Problems
+## Exercises
 
 * What other challenges involved in deep learning optimization can you think of?
-
-
 
 
 ## Reference
 
 [1] Wigner, E. P. (1958). On the distribution of the roots of certain symmetric matrices. Annals of Mathematics, 325-327.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2371)
 
-<div id="discuss" topic_id="2371"></div>
+![](../img/qr_optimization-intro.svg)

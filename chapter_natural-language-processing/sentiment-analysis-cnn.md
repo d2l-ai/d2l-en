@@ -3,7 +3,10 @@
 In the "Convolutional Neural Networks" chapter, we explored how to process two-dimensional image data with two-dimensional convolutional neural networks. In the previous language models and text classification tasks, we treated text data as a time series with only one dimension, and naturally, we used recurrent neural networks to process such data. In fact, we can also treat text as a one-dimensional image, so that we can use one-dimensional convolutional neural networks to capture associations between adjacent words. This section describes a groundbreaking approach to applying convolutional neural networks to text analysis: textCNN[1]. First, import the packages and modules required for the experiment.
 
 ```{.python .input  n=2}
-import gluonbook as gb
+import sys
+sys.path.insert(0, '..')
+
+import d2l
 from mxnet import gluon, init, nd
 from mxnet.contrib import text
 from mxnet.gluon import data as gdata, loss as gloss, nn
@@ -41,8 +44,9 @@ Now, we reproduce the results of the one-dimensional cross-correlation operation
 
 ```{.python .input  n=5}
 def corr1d_multi_in(X, K):
-    # First, we traverse along the 0th dimension (channel dimension) of X and K. Then, we add them together by using * to turn
-    # the result list into a positional argument of the add_n function.
+    # First, we traverse along the 0th dimension (channel dimension) of X and
+    # K. Then, we add them together by using * to turn the result list into a
+    # positional argument of the add_n function
     return nd.add_n(*[corr1d(x, k) for x, k in zip(X, K)])
 
 X = nd.array([[0, 1, 2, 3, 4, 5, 6],
@@ -72,13 +76,13 @@ We still use the same IMDb data set as n the previous section for sentiment anal
 
 ```{.python .input  n=2}
 batch_size = 64
-gb.download_imdb()
-train_data, test_data = gb.read_imdb('train'), gb.read_imdb('test')
-vocab = gb.get_vocab_imdb(train_data)
+d2l.download_imdb()
+train_data, test_data = d2l.read_imdb('train'), d2l.read_imdb('test')
+vocab = d2l.get_vocab_imdb(train_data)
 train_iter = gdata.DataLoader(gdata.ArrayDataset(
-    *gb.preprocess_imdb(train_data, vocab)), batch_size, shuffle=True)
+    *d2l.preprocess_imdb(train_data, vocab)), batch_size, shuffle=True)
 test_iter = gdata.DataLoader(gdata.ArrayDataset(
-    *gb.preprocess_imdb(test_data, vocab)), batch_size)
+    *d2l.preprocess_imdb(test_data, vocab)), batch_size)
 ```
 
 ## The TextCNN Model
@@ -101,27 +105,35 @@ class TextCNN(nn.Block):
                  **kwargs):
         super(TextCNN, self).__init__(**kwargs)
         self.embedding = nn.Embedding(len(vocab), embed_size)
-        # The embedding layer does not participate in training.
+        # The embedding layer does not participate in training
         self.constant_embedding = nn.Embedding(len(vocab), embed_size)
         self.dropout = nn.Dropout(0.5)
         self.decoder = nn.Dense(2)
-        # The max-over-time pooling layer has no weight, so it can share an instance.
+        # The max-over-time pooling layer has no weight, so it can share an
+        # instance
         self.pool = nn.GlobalMaxPool1D()
-        self.convs = nn.Sequential()  # Create multiple one-dimensional convolutional layers.
+        # Create multiple one-dimensional convolutional layers
+        self.convs = nn.Sequential()
         for c, k in zip(num_channels, kernel_sizes):
             self.convs.add(nn.Conv1D(c, k, activation='relu'))
 
     def forward(self, inputs):
-        # Concatenate the output of two embedding layers with shape of (batch size, number of words, word vector dimension) by word vector.
+        # Concatenate the output of two embedding layers with shape of
+        # (batch size, number of words, word vector dimension) by word vector
         embeddings = nd.concat(
             self.embedding(inputs), self.constant_embedding(inputs), dim=2)
-        # According to the input format required by Conv1D, the word vector dimension, that is, the channel dimension of the one-dimensional convolutional layer, is transformed into the previous dimension.
+        # According to the input format required by Conv1D, the word vector
+        # dimension, that is, the channel dimension of the one-dimensional
+        # convolutional layer, is transformed into the previous dimension
         embeddings = embeddings.transpose((0, 2, 1))
-        # For each one-dimensional convolutional layer, after max-over-time pooling, an NDArray with the shape of (batch size, channel size, 1)
-        # can be obtained. Use the flatten function to remove the last dimension and then concatenate on the channel dimension.
+        # For each one-dimensional convolutional layer, after max-over-time
+        # pooling, an NDArray with the shape of (batch size, channel size, 1)
+        # can be obtained. Use the flatten function to remove the last
+        # dimension and then concatenate on the channel dimension
         encoding = nd.concat(*[nd.flatten(
             self.pool(conv(embeddings))) for conv in self.convs], dim=1)
-        # After applying the dropout method, use a fully connected layer to obtain the output.
+        # After applying the dropout method, use a fully connected layer to
+        # obtain the output
         outputs = self.decoder(self.dropout(encoding))
         return outputs
 ```
@@ -130,7 +142,7 @@ Create a TextCNN instance. It has 3 convolutional layers with kernel widths of 3
 
 ```{.python .input}
 embed_size, kernel_sizes, nums_channels = 100, [3, 4, 5], [100, 100, 100]
-ctx = gb.try_all_gpus()
+ctx = d2l.try_all_gpus()
 net = TextCNN(vocab, embed_size, kernel_sizes, nums_channels)
 net.initialize(init.Xavier(), ctx=ctx)
 ```
@@ -155,17 +167,17 @@ Now we can train the model.
 lr, num_epochs = 0.001, 5
 trainer = gluon.Trainer(net.collect_params(), 'adam', {'learning_rate': lr})
 loss = gloss.SoftmaxCrossEntropyLoss()
-gb.train(train_iter, test_iter, net, loss, trainer, ctx, num_epochs)
+d2l.train(train_iter, test_iter, net, loss, trainer, ctx, num_epochs)
 ```
 
 Below, we use the trained model to the classify sentiments of two simple sentences.
 
 ```{.python .input}
-gb.predict_sentiment(net, vocab, ['this', 'movie', 'is', 'so', 'great'])
+d2l.predict_sentiment(net, vocab, ['this', 'movie', 'is', 'so', 'great'])
 ```
 
 ```{.python .input}
-gb.predict_sentiment(net, vocab, ['this', 'movie', 'is', 'so', 'bad'])
+d2l.predict_sentiment(net, vocab, ['this', 'movie', 'is', 'so', 'bad'])
 ```
 
 ## Summary
@@ -176,7 +188,7 @@ gb.predict_sentiment(net, vocab, ['this', 'movie', 'is', 'so', 'bad'])
 * TextCNN mainly uses a one-dimensional convolutional layer and max-over-time pooling layer.
 
 
-## Problems
+## Exercises
 
 * Tune the hyper-parameters and compare the two sentiment analysis methods, using recurrent neural networks and using convolutional neural networks, as regards accuracy and operational efficiency.
 * Can you further improve the accuracy of the model on the test set by using the three methods introduced in the previous section: tuning hyper-parameters, using larger pre-trained word vectors, and using the spaCy word tokenization tool?
@@ -190,6 +202,6 @@ gb.predict_sentiment(net, vocab, ['this', 'movie', 'is', 'so', 'bad'])
 
 [1] Kim, Y. (2014). Convolutional neural networks for sentence classification. arXiv preprint arXiv:1408.5882.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2392)
 
-<div id="discuss" topic_id="2392"></div>
+![](../img/qr_sentiment-analysis-cnn.svg)

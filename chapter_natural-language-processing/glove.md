@@ -42,7 +42,7 @@ Notice that if word $w_i$ appears in the context window of word $w_j$, then word
 We can also try to understand GloVe word embedding from another perspective. We will continue the use of symbols from earlier in this section, $\mathbb{P}(w_j \mid w_i)$ represents the conditional probability of generating context word $w_j$ with central target word $w_i$ in the data set, and it will be recorded as $p_{ij}$. From a real example from a large corpus, here we have the following two sets of conditional probabilities with "ice" and "steam" as the central target words and the ratio between them[1]:
 
 |$w_k$=|“solid”|“gas”|“water”|“fashion”|
-|--:|:-:|:-:|:-:|
+|--:|:-:|:-:|:-:|:-:|
 |$p_1=\mathbb{P}(w_k\mid$ "ice" $)$|0.00019|0.000066|0.003|0.000017|
 |$p_2=\mathbb{P}(w_k\mid$ "steam" $)$|0.000022|0.00078|0.0022|0.000018|
 |$p_1/p_2$|8.9|0.085|1.36|0.96|
@@ -75,7 +75,7 @@ By taking the square error and weighting the left and right sides of the formula
 * The central target word vector and context word vector of any word are equivalent in GloVe.
 
 
-## Problems
+## Exercises
 
 * If a word appears in the context window of another word, how can we use the distance between them in the text sequence to redesign the method for computing the conditional probability $p_{ij}$? Hint: See section 4.2 from the paper GloVe[1].
 * For any word, will its central target word bias term and context word bias term be equivalent to each other in GloVe? Why?
@@ -85,6 +85,6 @@ By taking the square error and weighting the left and right sides of the formula
 
 [1] Pennington, J., Socher, R., & Manning, C. (2014). Glove: Global vectors for word representation. In Proceedings of the 2014 conference on empirical methods in natural language processing (EMNLP) (pp. 1532-1543).
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2389)
 
-<div id="discuss" topic_id="2389"></div>
+![](../img/qr_glove.svg)

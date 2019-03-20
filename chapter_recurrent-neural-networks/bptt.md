@@ -102,10 +102,10 @@ To give an example, the calculation of the parameter gradient $\partial L/\parti
 * When the number of time steps is large or the time step is small, the gradients in recurrent neural networks are prone to vanishing or explosion.
 
 
-## Problems
+## Exercises
 
 * Besides gradient clipping, can you think of any other methods to cope with gradient explosion in recurrent neural networks?
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2366)
 
-<div id="discuss" topic_id="2366"></div>
+![](../img/qr_bptt.svg)
