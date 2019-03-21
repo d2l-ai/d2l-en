@@ -32,7 +32,7 @@ For high-dimensional regression it is difficult to pick the 'right' dimensions t
 $$y = 0.05 + \sum_{i = 1}^d 0.01 x_i + \epsilon \text{ where }
 \epsilon \sim \mathcal{N}(0, 0.01)$$
 
-That is, we have additive Gaussian noise with zero mean and variance 0.01. In order to observe overfitting more easily we pick a high-dimensional problem with $d = 200$ and a deliberatly low number of training examples, e.g. 20. As before we begin with our import ritual (and data generation).
+That is, we have additive Gaussian noise with zero mean and variance 0.01. In order to observe overfitting more easily we pick a high-dimensional problem with $d = 200$ and a deliberately low number of training examples, e.g. 20. As before we begin with our import ritual (and data generation).
 
 ```{.python .input  n=2}
 import sys
