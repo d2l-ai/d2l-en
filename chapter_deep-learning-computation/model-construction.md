@@ -39,22 +39,26 @@ from mxnet import nd
 from mxnet.gluon import nn
 
 class MLP(nn.Block):
-    # Declare a layer with model parameters. Here, we declare two fully connected layers.
+    # Declare a layer with model parameters. Here, we declare two fully
+    # connected layers
     def __init__(self, **kwargs):
-        # Call the constructor of the MLP parent class Block to perform the necessary initialization. In this way,
-        # other function parameters can also be specified when constructing an instance, such as the model parameter, params, described in the following sections.
+        # Call the constructor of the MLP parent class Block to perform the
+        # necessary initialization. In this way, other function parameters can
+        # also be specified when constructing an instance, such as the model
+        # parameter, params, described in the following sections
         super(MLP, self).__init__(**kwargs)
-        self.hidden = nn.Dense(256, activation='relu')  # Hidden layer.
-        self.output = nn.Dense(10)  # Output layer.
+        self.hidden = nn.Dense(256, activation='relu')  # Hidden layer
+        self.output = nn.Dense(10)  # Output layer
 
-    # Define the forward computation of the model, that is, how to return the required model output based on the input x.
+    # Define the forward computation of the model, that is, how to return the
+    # required model output based on the input x
     def forward(self, x):
         return self.output(self.hidden(x))
 ```
 
 Let's look at it a bit more closely. The `forward` method invokes a network simply by evaluating the hidden layer `self.hidden(x)` and subsequently by evaluating the output layer `self.output( ... )`. This is what we expect in the forward pass of this block.
 
-In order for the block to know what it needs to evaluate, we first need to define the layers. This is what the `__init__` method does. It first initializes all of the Block-related parameters and then constructs the requisite layers. This attached the coresponding layers and the required parameters to the class. Note that there is no need to define a backpropagation method in the class. The system automatically generates the `backward` method needed for back propagation by automatically finding the gradient. The same applies to the `initialize` method, which is generated automatically. Let's try this out:
+In order for the block to know what it needs to evaluate, we first need to define the layers. This is what the `__init__` method does. It first initializes all of the Block-related parameters and then constructs the requisite layers. This attached the corresponding layers and the required parameters to the class. Note that there is no need to define a backpropagation method in the class. The system automatically generates the `backward` method needed for back propagation by automatically finding the gradient. The same applies to the `initialize` method, which is generated automatically. Let's try this out:
 
 ```{.python .input  n=2}
 net = MLP()
@@ -75,13 +79,16 @@ class MySequential(nn.Block):
         super(MySequential, self).__init__(**kwargs)
 
     def add(self, block):
-        # Here, block is an instance of a Block subclass, and we assume it has a unique name. We save it in the
-        # member variable _children of the Block class, and its type is OrderedDict. When the MySequential instance
-        # calls the initialize function, the system automatically initializes all members of _children.
+        # Here, block is an instance of a Block subclass, and we assume it has
+        # a unique name. We save it in the member variable _children of the
+        # Block class, and its type is OrderedDict. When the MySequential
+        # instance calls the initialize function, the system automatically
+        # initializes all members of _children
         self._children[block.name] = block
 
     def forward(self, x):
-        # OrderedDict guarantees that members will be traversed in the order they were added.
+        # OrderedDict guarantees that members will be traversed in the order
+        # they were added
         for block in self._children.values():
             x = block(x)
         return x
@@ -97,7 +104,7 @@ net.initialize()
 net(x)
 ```
 
-Indeed, it is no different than It can observed here that the use of the `MySequential` class is no different from the use of the Sequential class described in the [“Gluon implementation of multilayer perceptron”](../chapter_deep-learning-basics/mlp-gluon.md) section.
+Indeed, it is no different than It can observed here that the use of the `MySequential` class is no different from the use of the Sequential class described in the [“Concise Implementation of Multilayer Perceptron”](../chapter_deep-learning-basics/mlp-gluon.md) section.
 
 
 ## Blocks with Code
@@ -116,18 +123,22 @@ Nothing has really changed, except that we can adjust the value of $c$. It is st
 class FancyMLP(nn.Block):
     def __init__(self, **kwargs):
         super(FancyMLP, self).__init__(**kwargs)
-        # Random weight parameters created with the get_constant are not iterated during training (i.e. constant parameters).
+        # Random weight parameters created with the get_constant are not
+        # iterated during training (i.e. constant parameters)
         self.rand_weight = self.params.get_constant(
             'rand_weight', nd.random.uniform(shape=(20, 20)))
         self.dense = nn.Dense(20, activation='relu')
 
     def forward(self, x):
         x = self.dense(x)
-        # Use the constant parameters created, as well as the relu and dot functions of NDArray.
+        # Use the constant parameters created, as well as the relu and dot
+        # functions of NDArray
         x = nd.relu(nd.dot(x, self.rand_weight.data()) + 1)
-        # Reuse the fully connected layer. This is equivalent to sharing parameters with two fully connected layers.
+        # Reuse the fully connected layer. This is equivalent to sharing
+        # parameters with two fully connected layers
         x = self.dense(x)
-        # Here in Control flow, we need to call asscalar to return the scalar for comparison.
+        # Here in Control flow, we need to call asscalar to return the scalar
+        # for comparison
         while x.norm().asscalar() > 1:
             x /= 2
         if x.norm().asscalar() < 0.8:
@@ -180,7 +191,7 @@ Gluon does this by allowing for [Hybridization](../chapter_computational-perform
 * Blocks take are of a lot of housekeeping, such as parameter initialization, backprop and related issues.
 * Sequential concatenations of layers and blocks are handled by the eponymous `Sequential` block.
 
-## Problems
+## Exercises
 
 1. What kind of error message will you get when calling an `__init__` method whose parent class not in the `__init__` function of the parent class?
 1. What kinds of problems will occur if you remove the `asscalar` function in the `FancyMLP` class?
@@ -188,6 +199,6 @@ Gluon does this by allowing for [Hybridization](../chapter_computational-perform
 1. Implement a block that takes two blocks as an argument, say `net1` and `net2` and returns the concatenated output of both networks in the forward pass (this is also called a parallel block).
 1. Assume that you want to concatenate multiple instances of the same network. Implement a factory function that generates multiple instances of the same block and build a larger network from it.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2325)
 
-<div id="discuss" topic_id="2325"></div>
+![](../img/qr_model-construction.svg)

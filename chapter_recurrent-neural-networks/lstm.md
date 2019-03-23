@@ -1,5 +1,6 @@
 # Long Short-term Memory (LSTM)
 
+@TODO(smolix/astonzhang): the data set was just changed from lyrics to time machine, so descriptions/hyperparameters have to change.
 
 This section describes another commonly used gated recurrent neural network: long short-term memory (LSTM) [1]. Its structure is slightly more complicated than that of a gated recurrent unit.
 
@@ -71,12 +72,15 @@ The tanh function here ensures that the hidden state element value is between -1
 Below we begin to implement and display LSTM. As with the experiments in the previous sections, we still use the lyrics of the Jay Chou data set to train the model to write lyrics.
 
 ```{.python .input  n=1}
-import gluonbook as gb
+import sys
+sys.path.insert(0, '..')
+
+import d2l
 from mxnet import nd
 from mxnet.gluon import rnn
 
 (corpus_indices, char_to_idx, idx_to_char,
- vocab_size) = gb.load_data_jay_lyrics()
+ vocab_size) = d2l.load_data_time_machine()
 ```
 
 ## Implementation from Scratch
@@ -89,7 +93,7 @@ The code below initializes the model parameters. The hyper-parameter `num_hidden
 
 ```{.python .input  n=2}
 num_inputs, num_hiddens, num_outputs = vocab_size, 256, vocab_size
-ctx = gb.try_gpu()
+ctx = d2l.try_gpu()
 
 def get_params():
     def _one(shape):
@@ -151,30 +155,30 @@ As in the previous section, during model training, we only use adjacent sampling
 
 ```{.python .input  n=5}
 num_epochs, num_steps, batch_size, lr, clipping_theta = 160, 35, 32, 1e2, 1e-2
-pred_period, pred_len, prefixes = 40, 50, ['分开', '不分开']
+pred_period, pred_len, prefixes = 40, 50, ['traveller', 'time traveller']
 ```
 
 We create a string of lyrics based on the currently trained model every 40 epochs.
 
 ```{.python .input}
-gb.train_and_predict_rnn(lstm, get_params, init_lstm_state, num_hiddens,
-                         vocab_size, ctx, corpus_indices, idx_to_char,
-                         char_to_idx, False, num_epochs, num_steps, lr,
-                         clipping_theta, batch_size, pred_period, pred_len,
-                         prefixes)
+d2l.train_and_predict_rnn(lstm, get_params, init_lstm_state, num_hiddens,
+                          vocab_size, ctx, corpus_indices, idx_to_char,
+                          char_to_idx, False, num_epochs, num_steps, lr,
+                          clipping_theta, batch_size, pred_period, pred_len,
+                          prefixes)
 ```
 
-## Gluon Implementation
+## Concise Implementation
 
 In Gluon, we can directly call the `LSTM` class in the `rnn` module.
 
 ```{.python .input  n=6}
 lstm_layer = rnn.LSTM(num_hiddens)
-model = gb.RNNModel(lstm_layer, vocab_size)
-gb.train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
-                               corpus_indices, idx_to_char, char_to_idx,
-                               num_epochs, num_steps, lr, clipping_theta,
-                               batch_size, pred_period, pred_len, prefixes)
+model = d2l.RNNModel(lstm_layer, vocab_size)
+d2l.train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
+                                corpus_indices, idx_to_char, char_to_idx,
+                                num_epochs, num_steps, lr, clipping_theta,
+                                batch_size, pred_period, pred_len, prefixes)
 ```
 
 ## Summary
@@ -184,7 +188,7 @@ gb.train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
 * LSTM can cope with the gradient attenuation problem in the recurrent neural networks and better capture dependencies for time series with large time step distances.
 
 
-## Problems
+## Exercises
 
 * Adjust the hyper-parameters and observe and analyze the impact on running time, perplexity, and the written lyrics.
 * Under the same conditions, compare the running time of an LSTM, GRU and recurrent neural network without gates.
@@ -195,6 +199,6 @@ gb.train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
 
 [1] Hochreiter, S., & Schmidhuber, J. (1997). Long short-term memory. Neural computation, 9(8), 1735-1780.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2368)
 
-<div id="discuss" topic_id="2368"></div>
+![](../img/qr_lstm.svg)

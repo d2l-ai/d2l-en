@@ -12,13 +12,16 @@ Like Adagrad, RMSProp re-adjusts the learning rate of each element in the indepe
 
 $$\boldsymbol{x}_t \leftarrow \boldsymbol{x}_{t-1} - \frac{\eta}{\sqrt{\boldsymbol{s}_t + \epsilon}} \odot \boldsymbol{g}_t, $$
 
-Here, $eta$ is the learning rate while $\epsilon$ is a constant added to maintain numerical stability, such as $10^{-6}$. Because the state variable of RMSProp is an EWMA of the squared term $\boldsymbol{g}_t \odot \boldsymbol{g}_t$, it can be seen as the weighted average of the mini-batch stochastic gradient's squared terms from the last $1/(1-\gamma)$ time steps. Therefore, the learning rate of each element in the independent variable will not always decline (or remain unchanged) during iteration.
+Here, $\eta$ is the learning rate while $\epsilon$ is a constant added to maintain numerical stability, such as $10^{-6}$. Because the state variable of RMSProp is an EWMA of the squared term $\boldsymbol{g}_t \odot \boldsymbol{g}_t$, it can be seen as the weighted average of the mini-batch stochastic gradient's squared terms from the last $1/(1-\gamma)$ time steps. Therefore, the learning rate of each element in the independent variable will not always decline (or remain unchanged) during iteration.
 
 By convention, we will use the objective function $f(\boldsymbol{x})=0.1x_1^2+2x_2^2$ to observe the iterative trajectory of the independent variable in RMSProp. Recall that in the ["Adagrad"](adagrad.md) section, when we used Adagrad with a learning rate of 0.4, the independent variable moved less in later stages of iteration. However, at the same learning rate, RMSProp can approach the optimal solution faster.
 
 ```{.python .input  n=3}
+import sys
+sys.path.insert(0, '..')
+
 %matplotlib inline
-import gluonbook as gb
+import d2l
 import math
 from mxnet import nd
 
@@ -34,7 +37,7 @@ def f_2d(x1, x2):
     return 0.1 * x1 ** 2 + 2 * x2 ** 2
 
 eta, gamma = 0.4, 0.9
-gb.show_trace_2d(f_2d, gb.train_2d(rmsprop_2d))
+d2l.show_trace_2d(f_2d, d2l.train_2d(rmsprop_2d))
 ```
 
 ## Implementation from Scratch
@@ -42,8 +45,8 @@ gb.show_trace_2d(f_2d, gb.train_2d(rmsprop_2d))
 Next, we implement RMSProp with the formula in the algorithm.
 
 ```{.python .input  n=22}
-features, labels = gb.get_data_ch7()
 
+features, labels = d2l.get_data_ch7()
 def init_rmsprop_states():
     s_w = nd.zeros((features.shape[1], 1))
     s_b = nd.zeros(1)
@@ -59,25 +62,24 @@ def rmsprop(params, states, hyperparams):
 We set the initial learning rate to 0.01 and the hyperparameter $\gamma$ to 0.9. Now, the variable $\boldsymbol{s}_t$ can be treated as the weighted average of the square term $\boldsymbol{g}_t \odot \boldsymbol{g}_t$ from the last $1/(1-0.9) = 10$ time steps.
 
 ```{.python .input  n=24}
-features, labels = gb.get_data_ch7()
-gb.train_ch7(rmsprop, init_rmsprop_states(), {'lr': 0.01, 'gamma': 0.9},
-             features, labels)
+d2l.train_ch7(rmsprop, init_rmsprop_states(), {'lr': 0.01, 'gamma': 0.9},
+              features, labels)
 ```
 
-## Implementation with Gluon
+## Concise Implementation
 
 From the `Trainer` instance of the algorithm named "rmsprop", we can implement the RMSProp algorithm with Gluon to train models. Note that the hyperparameter $\gamma$ is assigned by `gamma1`.
 
 ```{.python .input  n=29}
-gb.train_gluon_ch7('rmsprop', {'learning_rate': 0.01, 'gamma1': 0.9},
-                   features, labels)
+d2l.train_gluon_ch7('rmsprop', {'learning_rate': 0.01, 'gamma1': 0.9},
+                    features, labels)
 ```
 
 ## Summary
 
 * The difference between RMSProp and Adagrad is that RMSProp uses an EWMA on the squares of elements in the mini-batch stochastic gradient to adjust the learning rate.
 
-## Problems
+## Exercises
 
 * What happens to the experimental results if we set the value of $\gamma$ to 1? Why?
 * Try using other combinations of initial learning rates and $\gamma$ hyperparameters and observe and analyze the experimental results.
@@ -89,6 +91,6 @@ gb.train_gluon_ch7('rmsprop', {'learning_rate': 0.01, 'gamma1': 0.9},
 
 [1] Tieleman, T., & Hinton, G. (2012). Lecture 6.5-rmsprop: Divide the gradient by a running average of its recent magnitude. COURSERA: Neural networks for machine learning, 4(2), 26-31.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2376)
 
-<div id="discuss" topic_id="2376"></div>
+![](../img/qr_rmsprop.svg)

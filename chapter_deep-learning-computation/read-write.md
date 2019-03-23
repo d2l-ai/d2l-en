@@ -4,7 +4,7 @@ So far we discussed how to process data, how to build, train and test deep learn
 
 ## NDArray
 
-In its siplest form, we can directly use the `save` and `load` functions to store and read NDArrays separately. This works just as expected.
+In its simplest form, we can directly use the `save` and `load` functions to store and read NDArrays separately. This works just as expected.
 
 ```{.python .input}
 from mxnet import nd
@@ -85,12 +85,12 @@ yclone == y
 * The `load_parameters` and `save_parameters` functions allow us to save entire sets of parameters for a network in Gluon.
 * Saving the architecture has to be done in code rather than in parameters.
 
-## Problems
+## Exercises
 
 1. Even if there is no need to deploy trained models to a different device, what are the practical benefits of storing model parameters?
 1. Assume that we want to reuse only parts of a network to be incorporated into a network of a *different* architecture. How would you go about using, say the first two layers from a previous network in a new network.
 1. How would you go about saving network architecture and parameters? What restrictions would you impose on the architecture?
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2329)
 
-<div id="discuss" topic_id="2329"></div>
+![](../img/qr_read-write.svg)

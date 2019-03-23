@@ -32,8 +32,11 @@ to iterate $x$, the value of function $f(x)$ might decline. Therefore, in the gr
 Now we will use the objective function $f(x)=x^2$ as an example to see how gradient descent is implemented. Although we know that $x=0$ is the solution to minimize $f(x)$, here we still use this simple function to observe how $x$ is iterated. First, import the packages or modules required for the experiment in this section.
 
 ```{.python .input  n=3}
+import sys
+sys.path.insert(0, '..')
+
 %matplotlib inline
-import gluonbook as gb
+import d2l
 import math
 from mxnet import nd
 import numpy as np
@@ -46,7 +49,7 @@ def gd(eta):
     x = 10
     results = [x]
     for i in range(10):
-        x -= eta * 2 * x  # f(x) = x* the derivative of x is f'(x) = 2* x.
+        x -= eta * 2 * x  # f(x) = x* the derivative of x is f'(x) = 2 * x
         results.append(x)
     print('epoch 10, x:', x)
     return results
@@ -60,11 +63,11 @@ The iterative trajectory of the independent variable $x$ is plotted as follows.
 def show_trace(res):
     n = max(abs(min(res)), abs(max(res)), 10)
     f_line = np.arange(-n, n, 0.1)
-    gb.set_figsize()
-    gb.plt.plot(f_line, [x * x for x in f_line])
-    gb.plt.plot(res, [x * x for x in res], '-o')
-    gb.plt.xlabel('x')
-    gb.plt.ylabel('f(x)')
+    d2l.set_figsize()
+    d2l.plt.plot(f_line, [x * x for x in f_line])
+    d2l.plt.plot(res, [x * x for x in res], '-o')
+    d2l.plt.xlabel('x')
+    d2l.plt.ylabel('f(x)')
 
 show_trace(res)
 ```
@@ -106,11 +109,14 @@ $\boldsymbol{x} \leftarrow \boldsymbol{x} - \eta \nabla f(\boldsymbol{x}).$
 
 Similarly, $\eta$ (positive) is called the learning rate.
 
-Now we are going to construct an objective function $f(\boldsymbol{x})=x_1^2+2x_2^2$ with a two-dimensional vector $\boldsymbol{x} = [x_1, x_2]^\top$ as input and a scalar as the output. So we have the gradient $\nabla f(\boldsymbol{x}) = [2x_1, 4x_2]^\top$. We will observe the iterative trajectory of independent variable $\boldsymbol{x}$ by gradient descent from the initial position $[5,2]$. First, we are going to define two helper functions. The first helper uses the given independent variable update function to iterate independent variable $\boldsymbol{x}$ a total of 20 times from the initial position $[5,2]$. The second helper will visualize the iterative trajectory of independent variable $\boldsymbol{x}$.
+Now we are going to construct an objective function $f(\boldsymbol{x})=x_1^2+2x_2^2$ with a two-dimensional vector $\boldsymbol{x} = [x_1, x_2]^\top$ as input and a scalar as the output. So we have the gradient $\nabla f(\boldsymbol{x}) = [2x_1, 4x_2]^\top$. We will observe the iterative trajectory of independent variable $\boldsymbol{x}$ by gradient descent from the initial position $[-5,-2]$. First, we are going to define two helper functions. The first helper uses the given independent variable update function to iterate independent variable $\boldsymbol{x}$ a total of 20 times from the initial position $[-5,-2]$. The second helper will visualize the iterative trajectory of independent variable $\boldsymbol{x}$.
 
 ```{.python .input  n=10}
-def train_2d(trainer):  # This function is saved in the gluonbook package for future use.
-    x1, x2, s1, s2 = -5, -2, 0, 0  # s1 and s2 are states of the independent variable and will be used later in the chapter.
+# This function is saved in the d2l package for future use
+def train_2d(trainer):
+    # s1 and s2 are states of the independent variable and will be used later
+    # in the chapter
+    x1, x2, s1, s2 = -5, -2, 0, 0
     results = [(x1, x2)]
     for i in range(20):
         x1, x2, s1, s2 = trainer(x1, x2, s1, s2)
@@ -118,12 +124,13 @@ def train_2d(trainer):  # This function is saved in the gluonbook package for fu
     print('epoch %d, x1 %f, x2 %f' % (i + 1, x1, x2))
     return results
 
-def show_trace_2d(f, results):  # This function is saved in the gluonbook package for future use.
-    gb.plt.plot(*zip(*results), '-o', color='#ff7f0e')
+# This function is saved in the d2l package for future use
+def show_trace_2d(f, results):
+    d2l.plt.plot(*zip(*results), '-o', color='#ff7f0e')
     x1, x2 = np.meshgrid(np.arange(-5.5, 1.0, 0.1), np.arange(-3.0, 1.0, 0.1))
-    gb.plt.contour(x1, x2, f(x1, x2), colors='#1f77b4')
-    gb.plt.xlabel('x1')
-    gb.plt.ylabel('x2')
+    d2l.plt.contour(x1, x2, f(x1, x2), colors='#1f77b4')
+    d2l.plt.xlabel('x1')
+    d2l.plt.ylabel('x2')
 ```
 
 Next, we observe the iterative trajectory of the independent variable at learning rate $0.1$. After iterating the independent variable $\boldsymbol{x}$ 20 times using gradient descent, we can see that. eventually, the value of $\boldsymbol{x}$ approaches the optimal solution $[0, 0]$.
@@ -131,7 +138,7 @@ Next, we observe the iterative trajectory of the independent variable at learnin
 ```{.python .input  n=15}
 eta = 0.1
 
-def f_2d(x1, x2):  # Objective function.
+def f_2d(x1, x2):  # Objective function
     return x1 ** 2 + 2 * x2 ** 2
 
 def gd_2d(x1, x2, s1, s2):
@@ -162,7 +169,7 @@ $$\mathbb{E}_i \nabla f_i(\boldsymbol{x}) = \frac{1}{n} \sum_{i = 1}^n \nabla f_
 
 This means that, on average, the stochastic gradient is a good estimate of the gradient.
 
-Now, we will compare it to gradient descent by adding random noise with a mean of 0 to the gradient to simulate ab SGD.
+Now, we will compare it to gradient descent by adding random noise with a mean of 0 to the gradient to simulate a SGD.
 
 ```{.python .input  n=17}
 def sgd_2d(x1, x2, s1, s2):
@@ -182,11 +189,11 @@ As we can see, the iterative trajectory of the independent variable in the SGD i
 * When there are more examples in the training data set, it costs more to compute each iteration for gradient descent, so SGD is preferred in these cases.
 
 
-## Problems
+## Exercises
 
 * Using a different objective function, observe the iterative trajectory of the independent variable in gradient descent and the SGD.
 * In the experiment for gradient descent in two-dimensional space, try to use different learning rates to observe and analyze the experimental phenomena.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2372)
 
-<div id="discuss" topic_id="2372"></div>
+![](../img/qr_gd-sgd.svg)

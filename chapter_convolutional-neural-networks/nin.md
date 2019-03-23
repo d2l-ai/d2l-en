@@ -11,7 +11,10 @@ We know that the inputs and outputs of convolutional layers are usually four-dim
 The NiN block is the basic block in NiN. It concatenates a convolutional layer and two $1\times 1$ convolutional layers that act as fully connected layers (with ReLu in between). The convolution width of the first layer is typically set by the user. The subsequent widths are fixed to $1 \times 1$.
 
 ```{.python .input  n=2}
-import gluonbook as gb
+import sys
+sys.path.insert(0, '..')
+
+import d2l
 from mxnet import gluon, init, nd
 from mxnet.gluon import nn
 
@@ -38,11 +41,13 @@ net.add(nin_block(96, kernel_size=11, strides=4, padding=0),
         nin_block(384, kernel_size=3, strides=1, padding=1),
         nn.MaxPool2D(pool_size=3, strides=2),
         nn.Dropout(0.5),
-        # There are 10 label classes.
+        # There are 10 label classes
         nin_block(10, kernel_size=3, strides=1, padding=1),
-        # The global average pooling layer automatically sets the window shape to the height and width of the input.
+        # The global average pooling layer automatically sets the window shape
+        # to the height and width of the input
         nn.GlobalAvgPool2D(),
-        # Transform the four-dimensional output into two-dimensional output with a shape of (batch size, 10).
+        # Transform the four-dimensional output into two-dimensional output
+        # with a shape of (batch size, 10)
         nn.Flatten())
 ```
 
@@ -61,11 +66,12 @@ for layer in net:
 As before we use Fashion-MNIST to train the model. NiN's training is similar to that for AlexNet and VGG, but it often uses a larger learning rate.
 
 ```{.python .input}
-lr, num_epochs, batch_size, ctx = 0.1, 5, 128, gb.try_gpu()
+lr, num_epochs, batch_size, ctx = 0.1, 5, 128, d2l.try_gpu()
 net.initialize(force_reinit=True, ctx=ctx, init=init.Xavier())
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
-train_iter, test_iter = gb.load_data_fashion_mnist(batch_size, resize=224)
-gb.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
+train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)
+d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,
+              num_epochs)
 ```
 
 ## Summary
@@ -75,7 +81,7 @@ gb.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
 * Removing the dense layers reduces overfitting. NiN has dramatically fewer parameters.
 * The NiN design influenced many subsequent convolutional neural networks designs.
 
-## Problems
+## Exercises
 
 1. Tune the hyper-parameters to improve the classification accuracy.
 1. Why are there two $1\times 1$ convolutional layers in the NiN block? Remove one of them, and then observe and analyze the experimental phenomena.
@@ -86,6 +92,6 @@ gb.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
     * What is the amount of memory needed during inference?
 1. What are possible problems with reducing the $384 \times 5 \times 5$ representation to a $10 \times 5 \times 5$ representation in one step?
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2356)
 
-<div id="discuss" topic_id="2356"></div>
+![](../img/qr_nin.svg)

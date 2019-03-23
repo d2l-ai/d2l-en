@@ -1,6 +1,6 @@
 # Networks with Parallel Concatenations (GoogLeNet)
 
-During the ImageNet Challenge in 2014, a new architeture emerged that outperformed the rest. [Szegedy et al., 2014](https://arxiv.org/abs/1409.4842) proposed a structure that combined the strenghts of the NiN and repeated blocks paradigms. At its heart was the rather pragmatic answer to the question as to which size of convolution is ideal for processing. After all, we have a smorgasbord of choices, $1 \times 1$ or $3 \times 3$, $5 \times 5$ or even larger. And it isn't always clear which one is the best. As it turns out, the answer is that a combination of all the above works best. Over the next few years, researchers made several improvements to GoogLeNet. In this section, we will introduce the first version of this model series in a slightly simplified form - we omit the pecularities that were added to stabilize training, due to the availability of better training algorithms.
+During the ImageNet Challenge in 2014, a new architecture emerged that outperformed the rest. [Szegedy et al., 2014](https://arxiv.org/abs/1409.4842) proposed a structure that combined the strengths of the NiN and repeated blocks paradigms. At its heart was the rather pragmatic answer to the question as to which size of convolution is ideal for processing. After all, we have a smorgasbord of choices, $1 \times 1$ or $3 \times 3$, $5 \times 5$ or even larger. And it isn't always clear which one is the best. As it turns out, the answer is that a combination of all the above works best. Over the next few years, researchers made several improvements to GoogLeNet. In this section, we will introduce the first version of this model series in a slightly simplified form - we omit the peculiarities that were added to stabilize training, due to the availability of better training algorithms. 
 
 ## Inception Blocks
 
@@ -11,23 +11,31 @@ The basic convolutional block in GoogLeNet is called an Inception block, named a
 As can be seen in the figure above, there are four parallel paths in the Inception block. The first three paths use convolutional layers with window sizes of $1\times 1$, $3\times 3$, and $5\times 5$ to extract information from different spatial sizes. The middle two paths will perform a $1\times 1$ convolution on the input to reduce the number of input channels, so as to reduce the model's complexity. The fourth path uses the $3\times 3$ maximum pooling layer, followed by the $1\times 1$ convolutional layer, to change the number of channels. The four paths all use appropriate padding to give the input and output the same height and width. Finally, we concatenate the output of each path on the channel dimension and input it to the next layer. The customizable parameters of the Inception block are the number of output channels per layer, which can be used to control the model complexity.
 
 ```{.python .input  n=1}
-import gluonbook as gb
+import sys
+sys.path.insert(0, '..')
+
+import d2l
 from mxnet import gluon, init, nd
 from mxnet.gluon import nn
 
 class Inception(nn.Block):
-    # c1 - c4 are the number of output channels for each layer in the path.
+    # c1 - c4 are the number of output channels for each layer in the path
     def __init__(self, c1, c2, c3, c4, **kwargs):
         super(Inception, self).__init__(**kwargs)
-        # Path 1 is a single 1 x 1 convolutional layer.
+        # Path 1 is a single 1 x 1 convolutional layer
         self.p1_1 = nn.Conv2D(c1, kernel_size=1, activation='relu')
-        # Path 2 is a 1 x 1 convolutional layer followed by a 3 x 3 convolutional layer.
+        # Path 2 is a 1 x 1 convolutional layer followed by a 3 x 3
+        # convolutional layer
         self.p2_1 = nn.Conv2D(c2[0], kernel_size=1, activation='relu')
-        self.p2_2 = nn.Conv2D(c2[1], kernel_size=3, padding=1, activation='relu')
-        # Path 3 is a 1 x 1 convolutional layer followed by a 5 x 5 convolutional layer.
+        self.p2_2 = nn.Conv2D(c2[1], kernel_size=3, padding=1,
+                              activation='relu')
+        # Path 3 is a 1 x 1 convolutional layer followed by a 5 x 5
+        # convolutional layer
         self.p3_1 = nn.Conv2D(c3[0], kernel_size=1, activation='relu')
-        self.p3_2 = nn.Conv2D(c3[1], kernel_size=5, padding=2, activation='relu')
-        # Path 4 is a 3 x 3 maximum pooling layer followed by a 1 x 1 convolutional layer.
+        self.p3_2 = nn.Conv2D(c3[1], kernel_size=5, padding=2,
+                              activation='relu')
+        # Path 4 is a 3 x 3 maximum pooling layer followed by a 1 x 1
+        # convolutional layer
         self.p4_1 = nn.MaxPool2D(pool_size=3, strides=1, padding=1)
         self.p4_2 = nn.Conv2D(c4, kernel_size=1, activation='relu')
 
@@ -36,7 +44,8 @@ class Inception(nn.Block):
         p2 = self.p2_2(self.p2_1(x))
         p3 = self.p3_2(self.p3_1(x))
         p4 = self.p4_2(self.p4_1(x))
-        return nd.concat(p1, p2, p3, p4, dim=1)  # Concatenate the outputs on the channel dimension.
+        # Concatenate the outputs on the channel dimension
+        return nd.concat(p1, p2, p3, p4, dim=1)
 ```
 
 To understand why this works as well as it does, consider the combination of the filters. They explore the image in varying ranges. This means that details at different extents can be recognized efficiently by different filters. At the same time, we can allocate different amounts of parameters for different ranges (e.g. more for short range but not ignore the long range entirely).
@@ -112,11 +121,12 @@ for layer in net:
 As before, we train our model using the Fashion-MNIST dataset. We transform it to $96 \times 96$ pixel resolution before invoking the training procedure.
 
 ```{.python .input  n=8}
-lr, num_epochs, batch_size, ctx = 0.1, 5, 128, gb.try_gpu()
+lr, num_epochs, batch_size, ctx = 0.1, 5, 128, d2l.try_gpu()
 net.initialize(force_reinit=True, ctx=ctx, init=init.Xavier())
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
-train_iter, test_iter = gb.load_data_fashion_mnist(batch_size, resize=96)
-gb.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
+train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)
+d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,
+              num_epochs)
 ```
 
 ## Summary
@@ -125,11 +135,12 @@ gb.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
 * GoogLeNet connects multiple well-designed Inception blocks with other layers in series. The ratio of the number of channels assigned in the Inception block is obtained through a large number of experiments on the ImageNet data set.
 * GoogLeNet, as well as its succeeding versions, was one of the most efficient models on ImageNet, providing similar test accuracy with lower computational complexity.
 
-## Problems
+## Exercises
 
 1. There are several iterations of GoogLeNet. Try to implement and run them. Some of them include the following:
     * Add a batch normalization layer, as described later in this chapter [2].
     * Make adjustments to the Inception block [3].
+    * Use "label smoothing" for model regularization [3].
     * Include it in the residual connection, as described later in this chapter [4].
 1. What is the minimum image size for GoogLeNet to work?
 1. Compare the model parameter sizes of AlexNet, VGG, and NiN with GoogLeNet. How do the latter two network architectures significantly reduce the model parameter size?
@@ -147,7 +158,6 @@ gb.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
 
 [4] Szegedy, C., Ioffe, S., Vanhoucke, V., & Alemi, A. A. (2017, February). Inception-v4, inception-resnet and the impact of residual connections on learning. In Proceedings of the AAAI Conference on Artificial Intelligence (Vol. 4, p. 12).
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2357)
 
-<div id="discuss" topic_id="2357"></div>
-
+![](../img/qr_googlenet.svg)

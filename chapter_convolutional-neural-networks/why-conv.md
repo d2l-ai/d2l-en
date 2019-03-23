@@ -66,7 +66,7 @@ The last flaw in our reasoning is that this approach generates only one set of a
 
 $$h[i,j,k] = \sum_{a = -\Delta}^{\Delta} \sum_{b = -\Delta}^{\Delta} \sum_c V[a,b,c,k] \cdot x[i+a,j+b,c]$$
 
-This is the definition of a convolutional neural network layer. There are still many operations that we need to address. For instance, we need to figure out how to combine all the activations to a single output (e.g. whether there's a Waldo in the image). We also need to decide how to compute things efficiently, how to combine multiple layers, and whether it is a good idea to have many narrow or a few wide layers. All of this will be addressed in the remainder of the chaper. For now we can bask in the glory having understood why convolutions exist in principle.
+This is the definition of a convolutional neural network layer. There are still many operations that we need to address. For instance, we need to figure out how to combine all the activations to a single output (e.g. whether there's a Waldo in the image). We also need to decide how to compute things efficiently, how to combine multiple layers, and whether it is a good idea to have many narrow or a few wide layers. All of this will be addressed in the remainder of the chapter. For now we can bask in the glory having understood why convolutions exist in principle.
 
 ## Summary
 
@@ -74,7 +74,7 @@ This is the definition of a convolutional neural network layer. There are still 
 * Locality means that only a small neighborhood of pixels will be used for computation.
 * Channels on input and output allows for meaningful feature analysis.
 
-## Problems
+## Exercises
 
 1. Assume that the size of the convolution mask is $\Delta = 0$. Show that in this case the convolutional mask implements an MLP independently for each set of channels.
 1. Why might translation invariance not be a good idea after all? Does it make sense for pigs to fly?
@@ -83,6 +83,6 @@ This is the definition of a convolutional neural network layer. There are still 
 1. What goes wrong when you apply the above reasoning to text? Hint - what is the structure of language?
 1. Prove that $f \circledast g = g \circledast f$.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2348)
 
-<div id="discuss" topic_id="2348"></div>
+![](../img/qr_why-conv.svg)

@@ -9,7 +9,7 @@ In our discussion of object detection issues in the previous sections, we only u
 
 In the computer vision field, there are two important methods related to semantic segmentation: image segmentation and instance segmentation. Here, we will distinguish these concepts from semantic segmentation as follows:
 
-* Image segmentation divides an image into several constituent regions. This method is generally uses the correlations between pixels in an image. During training, labels are not needed for the image pixels. However, during prediction, this method cannot ensure that the segmented regions have the semantics we want. If we input the image in 9.10, image segmentation might divide the dog into two regions, one covering the dog's mouth and eyes where black is the prominent color and the other covering the rest of the dog where yellow is the prominent color.
+* Image segmentation divides an image into several constituent regions. This method generally uses the correlations between pixels in an image. During training, labels are not needed for image pixels. However, during prediction, this method cannot ensure that the segmented regions have the semantics we want. If we input the image in 9.10, image segmentation might divide the dog into two regions, one covering the dog's mouth and eyes where black is the prominent color and the other covering the rest of the dog where yellow is the prominent color.
 * Instance segmentation is also called simultaneous detection and segmentation. This method attempts to identify the pixel-level regions of each object instance in an image. In contrast to semantic segmentation, instance segmentation not only distinguishes semantics, but also different object instances. If an image contains two dogs, instance segmentation will distinguish which pixels belong to which dog.
 
 
@@ -18,8 +18,11 @@ In the computer vision field, there are two important methods related to semanti
 In the semantic segmentation field, one important data set is Pascal VOC2012[1]. To better understand this data set, we must first import the package or module needed for the experiment.
 
 ```{.python .input  n=1}
+import sys
+sys.path.insert(0, '..')
+
 %matplotlib inline
-import gluonbook as gb
+import d2l
 from mxnet import gluon, image, nd
 from mxnet.gluon import data as gdata, utils as gutils
 import os
@@ -30,7 +33,7 @@ import tarfile
 We download the archive containing this data set to the `../data` path. The archive is about 2GB, so it will take some time to download. After you decompress the archive, the data set is located in the `../data/VOCdevkit/VOC2012` path.
 
 ```{.python .input  n=2}
-# This function is saved in the gluonbook package for future use.
+# This function has been saved in the d2l package for future use
 def download_voc_pascal(data_dir='../data'):
     voc_dir = os.path.join(data_dir, 'VOCdevkit/VOC2012')
     url = ('http://host.robots.ox.ac.uk/pascal/VOC/voc2012'
@@ -47,7 +50,7 @@ voc_dir = download_voc_pascal()
 Go to `../data/VOCdevkit/VOC2012` to see the different parts of the data set. The `ImageSets/Segmentation` path contains text files that specify the training and testing examples. The `JPEGImages` and `SegmentationClass` paths contain the example input images and labels, respectively. These labels are also in image format, with the same dimensions as the input images to which they correspond. In the labels, pixels with the same color belong to the same semantic category. The `read_voc_images` function defined below reads all input images and labels to the memory.
 
 ```{.python .input  n=3}
-# This function is saved in the gluonbook package for future use.
+# This function has been saved in the d2l package for future use
 def read_voc_images(root=voc_dir, is_train=True):
     txt_fname = '%s/ImageSets/Segmentation/%s' % (
         root, 'train.txt' if is_train else 'val.txt')
@@ -68,20 +71,20 @@ We draw the first five input images and their labels. In the label images, white
 ```{.python .input  n=4}
 n = 5
 imgs = train_features[0:n] + train_labels[0:n]
-gb.show_images(imgs, 2, n);
+d2l.show_images(imgs, 2, n);
 ```
 
 Next, we list each RGB color value in the labels and the categories they label.
 
 ```{.python .input  n=5}
-# This constant has been saved in the gluonbook package for future use.
+# This constant has been saved in the d2l package for future use
 VOC_COLORMAP = [[0, 0, 0], [128, 0, 0], [0, 128, 0], [128, 128, 0],
                 [0, 0, 128], [128, 0, 128], [0, 128, 128], [128, 128, 128],
                 [64, 0, 0], [192, 0, 0], [64, 128, 0], [192, 128, 0],
                 [64, 0, 128], [192, 0, 128], [64, 128, 128], [192, 128, 128],
                 [0, 64, 0], [128, 64, 0], [0, 192, 0], [128, 192, 0],
                 [0, 64, 128]]
-# This constant has been saved in the gluonbook package for future use.
+# This constant has been saved in the d2l package for future use
 VOC_CLASSES = ['background', 'aeroplane', 'bicycle', 'bird', 'boat',
                'bottle', 'bus', 'car', 'cat', 'chair', 'cow',
                'diningtable', 'dog', 'horse', 'motorbike', 'person',
@@ -95,7 +98,7 @@ colormap2label = nd.zeros(256 ** 3)
 for i, colormap in enumerate(VOC_COLORMAP):
     colormap2label[(colormap[0] * 256 + colormap[1]) * 256 + colormap[2]] = i
 
-# This function is saved in the gluonbook package for future use.
+# This function has been saved in the d2l package for future use
 def voc_label_indices(colormap, colormap2label):
     colormap = colormap.astype('int32')
     idx = ((colormap[:, :, 0] * 256 + colormap[:, :, 1]) * 256
@@ -112,10 +115,10 @@ y[105:115, 130:140], VOC_CLASSES[1]
 
 ### Data Preprocessing
 
-In the preceding chapters, we scaled images to make them fit the input shape of the model. In semantic segmentation, this method would require us to re-map the predicted pixel categories back to the original-size input image. It would be very difficult to do this precisely, especially in segmented regions with different semantics. To avoid this problem, we crop the images to set dimensions and do not scale them. Specially, we use the random cropping method used in image augmentation to crop the same region from input images and their labels.
+In the preceding chapters, we scaled images to make them fit the input shape of the model. In semantic segmentation, this method would require us to re-map the predicted pixel categories back to the original-size input image. It would be very difficult to do this precisely, especially in segmented regions with different semantics. To avoid this problem, we crop the images to set dimensions and do not scale them. Specifically, we use the random cropping method used in image augmentation to crop the same region from input images and their labels.
 
 ```{.python .input  n=8}
-# This function is saved in the gluonbook package for future use.
+# This function has been saved in the d2l package for future use
 def voc_rand_crop(feature, label, height, width):
     feature, rect = image.random_crop(feature, (width, height))
     label = image.fixed_crop(label, *rect)
@@ -124,7 +127,7 @@ def voc_rand_crop(feature, label, height, width):
 imgs = []
 for _ in range(n):
     imgs += voc_rand_crop(train_features[0], train_labels[0], 200, 300)
-gb.show_images(imgs[::2] + imgs[1::2], 2, n);
+d2l.show_images(imgs[::2] + imgs[1::2], 2, n);
 ```
 
 ### Data Set Classes for Custom Semantic Segmentation
@@ -132,7 +135,7 @@ gb.show_images(imgs[::2] + imgs[1::2], 2, n);
 We use the inherited `Dataset` class provided by Gluon to customize the semantic segmentation data set class `VOCSegDataset`. By implementing the `__getitem__` function, we can arbitrarily access the input image with the index `idx` and the category indexes for each of its pixels from the data set. As some images in the data set may be smaller than the output dimensions specified for random cropping, we must remove these example by using a custom `filter` function. In addition, we define the `normalize_image` function to normalize each of the three RGB channels of the input images.
 
 ```{.python .input  n=9}
-# This class has been saved in the gluonbook package for future use.
+# This class has been saved in the d2l package for future use
 class VOCSegDataset(gdata.Dataset):
     def __init__(self, is_train, crop_size, voc_dir, colormap2label):
         self.rgb_mean = nd.array([0.485, 0.456, 0.406])
@@ -165,7 +168,7 @@ class VOCSegDataset(gdata.Dataset):
 
 ### Read the Data Set
 
-Using the custom `VOCSegDataset` class, we create the training set and testing set instances. We assume the random cropping operation outputs images in the shape $320\times 480$. Below, we can see the number of examples retained in the training and testing sets.
+Using the custom `VOCSegDataset` class, we create the training set and testing set instances. We assume the random cropping operation output images in the shape $320\times 480$. Below, we can see the number of examples retained in the training and testing sets.
 
 ```{.python .input  n=10}
 crop_size = (320, 480)
@@ -197,9 +200,9 @@ for X, Y in train_iter:
 
 * Semantic segmentation looks at how images can be segmented into regions with different semantic categories.
 * In the semantic segmentation field, one important data set is Pascal VOC2012.
-* Because the input images and labels in semantic segmentation have a one-to-one correspondence at the pixel level, we randomly crop them to a fixed size, rather then scaling them.
+* Because the input images and labels in semantic segmentation have a one-to-one correspondence at the pixel level, we randomly crop them to a fixed size, rather than scaling them.
 
-## Problems
+## Exercises
 
 * Recall the content we covered in the ["Image Augmentation"](image-augmentation.md) section. Which of the image augmentation methods used in image classification would be hard to use in semantic segmentation?
 
@@ -207,6 +210,6 @@ for X, Y in train_iter:
 
 [1] Pascal VOC2012 data set. http://host.robots.ox.ac.uk/pascal/VOC/voc2012/
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2448)
 
-<div id="discuss" topic_id="2448"></div>
+![](../img/qr_semantic-segmentation-and-dataset.svg)

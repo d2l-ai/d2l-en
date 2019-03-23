@@ -20,7 +20,7 @@ Here, $\odot$ is the symbol for multiplication by element. Next, we re-adjust th
 
 $$\boldsymbol{x}_t \leftarrow \boldsymbol{x}_{t-1} - \frac{\eta}{\sqrt{\boldsymbol{s}_t + \epsilon}} \odot \boldsymbol{g}_t,$$
 
-Here, $eta$ is the learning rate while $\epsilon$ is a constant added to maintain numerical stability, such as $10^{-6}$. Here, the square root, division, and multiplication operations are all element operations. Each element in the independent variable of the objective function will have its own learning rate after the operations by elements.
+Here, $\eta$ is the learning rate while $\epsilon$ is a constant added to maintain numerical stability, such as $10^{-6}$. Here, the square root, division, and multiplication operations are all element operations. Each element in the independent variable of the objective function will have its own learning rate after the operations by elements.
 
 ## Features
 
@@ -29,13 +29,17 @@ We should emphasize that the cumulative variable $\boldsymbol{s}_t$ produced by 
 Below we will continue to use the objective function $f(\boldsymbol{x})=0.1x_1^2+2x_2^2$ as an example to observe the iterative trajectory of the independent variable in Adagrad. We are going to implement Adagrad using the same learning rate as the experiment in last section, 0.4. As we can see, the iterative trajectory of the independent variable is smoother. However, due to the cumulative effect of $\boldsymbol{s}_t$, the learning rate continuously decays, so the independent variable does not move as much during later stages of iteration.
 
 ```{.python .input  n=1}
+import sys
+sys.path.insert(0, '..')
+
 %matplotlib inline
-import gluonbook as gb
+import d2l
 import math
 from mxnet import nd
 
 def adagrad_2d(x1, x2, s1, s2):
-    g1, g2, eps = 0.2 * x1, 4 * x2, 1e-6  # The first two terms are the independent variable gradients.
+    # The first two terms are the independent variable gradients
+    g1, g2, eps = 0.2 * x1, 4 * x2, 1e-6
     s1 += g1 ** 2
     s2 += g2 ** 2
     x1 -= eta / math.sqrt(s1 + eps) * g1
@@ -46,14 +50,14 @@ def f_2d(x1, x2):
     return 0.1 * x1 ** 2 + 2 * x2 ** 2
 
 eta = 0.4
-gb.show_trace_2d(f_2d, gb.train_2d(adagrad_2d))
+d2l.show_trace_2d(f_2d, d2l.train_2d(adagrad_2d))
 ```
 
 Now, we are going to increase the learning rate to $2$. As we can see, the independent variable approaches the optimal solution more quickly.
 
 ```{.python .input  n=2}
 eta = 2
-gb.show_trace_2d(f_2d, gb.train_2d(adagrad_2d))
+d2l.show_trace_2d(f_2d, d2l.train_2d(adagrad_2d))
 ```
 
 ## Implementation from Scratch
@@ -61,7 +65,7 @@ gb.show_trace_2d(f_2d, gb.train_2d(adagrad_2d))
 Like the momentum method, Adagrad needs to maintain a state variable of the same shape for each independent variable. We use the formula from the algorithm to implement Adagrad.
 
 ```{.python .input  n=3}
-features, labels = gb.get_data_ch7()
+features, labels = d2l.get_data_ch7()
 
 def init_adagrad_states():
     s_w = nd.zeros((features.shape[1], 1))
@@ -78,15 +82,15 @@ def adagrad(params, states, hyperparams):
 Compared with the experiment in the ["Mini-Batch Stochastic Gradient Descent"](minibatch-sgd.md) section, here, we use a larger learning rate to train the model.
 
 ```{.python .input  n=4}
-gb.train_ch7(adagrad, init_adagrad_states(), {'lr': 0.1}, features, labels)
+d2l.train_ch7(adagrad, init_adagrad_states(), {'lr': 0.1}, features, labels)
 ```
 
-## Implementation with Gluon
+## Concise Implementation
 
 Using the `Trainer` instance of the algorithm named “adagrad”, we can implement the Adagrad algorithm with Gluon to train models.
 
 ```{.python .input  n=5}
-gb.train_gluon_ch7('adagrad', {'learning_rate': 0.1}, features, labels)
+d2l.train_gluon_ch7('adagrad', {'learning_rate': 0.1}, features, labels)
 ```
 
 ## Summary
@@ -94,7 +98,7 @@ gb.train_gluon_ch7('adagrad', {'learning_rate': 0.1}, features, labels)
 * Adagrad constantly adjusts the learning rate during iteration to give each element in the independent variable of the objective function its own learning rate.
 * When using Adagrad, the learning rate of each element in the independent variable decreases (or remains unchanged) during iteration.
 
-## Problems
+## Exercises
 
 * When introducing the features of Adagrad, we mentioned a potential problem. What solutions can you think of to fix this problem?
 * Try to use other initial learning rates in the experiment. How does this change the results?
@@ -105,6 +109,6 @@ gb.train_gluon_ch7('adagrad', {'learning_rate': 0.1}, features, labels)
 
 [1] Duchi, J., Hazan, E., & Singer, Y. (2011). Adaptive subgradient methods for online learning and stochastic optimization. Journal of Machine Learning Research, 12(Jul), 2121-2159.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2375)
 
-<div id="discuss" topic_id="2375"></div>
+![](../img/qr_adagrad.svg)

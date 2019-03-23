@@ -6,8 +6,11 @@ This section is a practice exercise for the two previous sections. We use the sk
 First, import the packages and modules required for the experiment.
 
 ```{.python .input  n=1}
+import sys
+sys.path.insert(0, '..')
+
 import collections
-import gluonbook as gb
+import d2l
 import math
 from mxnet import autograd, gluon, nd
 from mxnet.gluon import data as gdata, loss as gloss, nn
@@ -27,7 +30,7 @@ with zipfile.ZipFile('../data/ptb.zip', 'r') as zin:
 
 with open('../data/ptb/ptb.train.txt', 'r') as f:
     lines = f.readlines()
-    # St is the abbreviation of "sentence" in the loop.
+    # st is the abbreviation of "sentence" in the loop
     raw_dataset = [st.split() for st in lines]
 
 '# sentences: %d' % len(raw_dataset)
@@ -45,7 +48,7 @@ for st in raw_dataset[:3]:
 For the sake of simplicity, we only keep words that appear at least 5 times in the data set.
 
 ```{.python .input  n=4}
-# Tk is an abbreviation for "token" in the loop.
+# tk is an abbreviation for "token" in the loop
 counter = collections.Counter([tk for st in raw_dataset for tk in st])
 counter = dict(filter(lambda x: x[1] >= 5, counter.items()))
 ```
@@ -103,14 +106,17 @@ We use words with a distance from the central target word not exceeding the cont
 def get_centers_and_contexts(dataset, max_window_size):
     centers, contexts = [], []
     for st in dataset:
-        if len(st) < 2:  # Each sentence needs at least 2 words to form a "central target word - context word" pair.
+        # Each sentence needs at least 2 words to form a
+        # "central target word - context word" pair
+        if len(st) < 2:
             continue
         centers += st
         for center_i in range(len(st)):
             window_size = random.randint(1, max_window_size)
             indices = list(range(max(0, center_i - window_size),
                                  min(len(st), center_i + 1 + window_size)))
-            indices.remove(center_i)  # Exclude the central target word from the context words.
+            # Exclude the central target word from the context words
+            indices.remove(center_i)
             contexts.append([st[idx] for idx in indices])
     return centers, contexts
 ```
@@ -142,12 +148,13 @@ def get_negatives(all_contexts, sampling_weights, K):
         negatives = []
         while len(negatives) < len(contexts) * K:
             if i == len(neg_candidates):
-                # An index of k words is randomly generated as noise words based on the weight of each word (sampling_weights)
-                # . For efficient calculations, k can be set slightly larger.
+                # An index of k words is randomly generated as noise words
+                # based on the weight of each word (sampling_weights). For
+                # efficient calculation, k can be set slightly larger
                 i, neg_candidates = 0, random.choices(
                     population, sampling_weights, k=int(1e5))
             neg, i = neg_candidates[i], i + 1
-            # Noise words cannot be context words.
+            # Noise words cannot be context words
             if neg not in set(contexts):
                 negatives.append(neg)
         all_negatives.append(negatives)
@@ -254,9 +261,10 @@ It is worth mentioning that we can use the mask variable to specify the partial 
 
 ```{.python .input}
 pred = nd.array([[1.5, 0.3, -1, 2], [1.1, -0.6, 2.2, 0.4]])
-# 1 and 0 in the label variables label represent context words and the noise words, respectively.
+# 1 and 0 in the label variables label represent context words and the noise
+# words, respectively
 label = nd.array([[1, 0, 0, 0], [1, 1, 0, 0]])
-mask = nd.array([[1, 1, 1, 1], [1, 1, 1, 0]])  # Mask variable.
+mask = nd.array([[1, 1, 1, 1], [1, 1, 1, 0]])  # Mask variable
 loss(pred, label, mask) * mask.shape[1] / mask.sum(axis=1)
 ```
 
@@ -287,32 +295,33 @@ The training function is defined below. Because of the existence of padding, the
 
 ```{.python .input  n=21}
 def train(net, lr, num_epochs):
-    ctx = gb.try_gpu()
+    ctx = d2l.try_gpu()
     net.initialize(ctx=ctx, force_reinit=True)
     trainer = gluon.Trainer(net.collect_params(), 'adam',
                             {'learning_rate': lr})
     for epoch in range(num_epochs):
-        start_time, train_l_sum = time.time(), 0
+        start, l_sum, n = time.time(), 0.0, 0
         for batch in data_iter:
             center, context_negative, mask, label = [
                 data.as_in_context(ctx) for data in batch]
             with autograd.record():
                 pred = skip_gram(center, context_negative, net[0], net[1])
-                # Use the mask variable to avoid the effect of padding on loss function calculations.
+                # Use the mask variable to avoid the effect of padding on loss
+                # function calculations
                 l = (loss(pred.reshape(label.shape), label, mask) *
                      mask.shape[1] / mask.sum(axis=1))
             l.backward()
             trainer.step(batch_size)
-            train_l_sum += l.mean().asscalar()
-        print('epoch %d, train loss %.2f, time %.2fs'
-              % (epoch + 1, train_l_sum / len(data_iter),
-                 time.time() - start_time))
+            l_sum += l.sum().asscalar()
+            n += l.size
+        print('epoch %d, loss %.2f, time %.2fs'
+              % (epoch + 1, l_sum / n, time.time() - start))
 ```
 
 Now, we can train a skip-gram model using negative sampling.
 
 ```{.python .input  n=22}
-train(net, 0.005, 8)
+train(net, 0.005, 3)
 ```
 
 ## Applying the Word Embedding Model
@@ -323,9 +332,10 @@ After training the word embedding model, we can represent similarity in meaning 
 def get_similar_tokens(query_token, k, embed):
     W = embed.weight.data()
     x = W[token_to_idx[query_token]]
-    cos = nd.dot(W, x) / nd.sum(W * W, axis=1).sqrt() / nd.sum(x * x).sqrt()
+    # The added 1e-9 is for numerical stability
+    cos = nd.dot(W, x) / (nd.sum(W * W, axis=1) * nd.sum(x * x) + 1e-9).sqrt()
     topk = nd.topk(cos, k=k+1, ret_typ='indices').asnumpy().astype('int32')
-    for i in topk[1:]:  # Remove the input words.
+    for i in topk[1:]:  # Remove the input words
         print('cosine sim=%.3f: %s' % (cos[i].asscalar(), (idx_to_token[i])))
 
 get_similar_tokens('chip', 3, net[0])
@@ -338,8 +348,9 @@ get_similar_tokens('chip', 3, net[0])
 * We can pad examples of different lengths to create mini-batches with examples of all the same length and use mask variables to distinguish between padding and non-padding elements, so that only non-padding elements participate in the calculation of the loss function.
 
 
-## Problems
+## Exercises
 
+* Set `sparse_grad=True` when creating an instance of `nn.Embedding`. Does it accelerate training? Look up MXNet documentation to learn the meaning of this argument.
 * We use the `batchify` function to specify the mini-batch reading method in the `DataLoader` instance and print the shape of each variable in the first batch read. How should these shapes be calculated?
 * Try to find synonyms for other words.
 * Tune the hyper-parameters and observe and analyze the experimental results.
@@ -351,10 +362,10 @@ get_similar_tokens('chip', 3, net[0])
 
 ## Reference
 
-[1] Penn Tree Bank. https://catalog.ldc.upenn.edu/ldc99t42
+[1] Penn Tree Bank. https://catalog.ldc.upenn.edu/LDC99T42
 
 [2] Mikolov, T., Sutskever, I., Chen, K., Corrado, G. S., & Dean, J. (2013). Distributed representations of words and phrases and their compositionality. In Advances in neural information processing systems (pp. 3111-3119).
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2387)
 
-<div id="discuss" topic_id="2387"></div>
+![](../img/qr_word2vec-gluon.svg)

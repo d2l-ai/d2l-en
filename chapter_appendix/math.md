@@ -112,16 +112,16 @@ Define a scalar $k$. Multiplication of scalars and matrices is also an element-w
 $$
 k\boldsymbol{A} =
 \begin{bmatrix}
-    ka_{11} & ka_{21} & \dots  & ka_{m1} \\
-    ka_{12} & ka_{22} & \dots  & ka_{m2} \\
+    ka_{11} & ka_{12} & \dots  & ka_{1n} \\
+    ka_{21} & ka_{22} & \dots  & ka_{2n} \\
     \vdots & \vdots   & \ddots & \vdots \\
-    ka_{1n} & ka_{2n} & \dots  & ka_{mn}
+    ka_{m1} & ka_{m2} & \dots  & ka_{mn}
 \end{bmatrix}.
 $$
 
 Other operations such as scalar and matrix addition, and division by an element are similar to the multiplication operation in the above equation. Calculating the square root or taking logarithms of a matrix are performed by calculating the square root or logarithm, respectively, of each element of the matrix to obtain a matrix with the same shape as the original matrix.
 
-Matrix multiplication is different from element-wise matrix multiplication. Assume $\boldsymbol{A}$ is a matrix with $m$ rows and $p$ columns and $\boldsymbol{B}$ is a matrix with $p$ rows and $n$ columns. The product (matrix multiplication) of these two matricies is denoted
+Matrix multiplication is different from element-wise matrix multiplication. Assume $\boldsymbol{A}$ is a matrix with $m$ rows and $p$ columns and $\boldsymbol{B}$ is a matrix with $p$ rows and $n$ columns. The product (matrix multiplication) of these two matrices is denoted
 
 $$
 \boldsymbol{A} \boldsymbol{B} =
@@ -330,10 +330,10 @@ Assume random variable $X$ obeys a uniform distribution over $[a, b]$, i.e. $X \
 * This section summarizes the basic knowledge of linear algebra, differentiation, and probability required to understand the contents in this book.
 
 
-## Exercises
+## Exercise
 
 * Find the gradient of function $f(\boldsymbol{x}) = 3x_1^2 + 5e^{x_2}$.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2397)
 
-<div id="discuss" topic_id="2397"></div>
+![](../img/qr_math.svg)

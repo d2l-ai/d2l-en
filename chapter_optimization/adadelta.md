@@ -29,11 +29,14 @@ As we can see, if the impact of $\epsilon$ is not considered here, Adadelta diff
 Adadelta needs to maintain two state variables for each independent variable, $\boldsymbol{s}_t$ and $\Delta\boldsymbol{x}_t$. We use the formula from the algorithm to implement Adadelta.
 
 ```{.python .input  n=11}
+import sys
+sys.path.insert(0, '..')
+
 %matplotlib inline
-import gluonbook as gb
+import d2l
 from mxnet import nd
 
-features, labels = gb.get_data_ch7()
+features, labels = d2l.get_data_ch7()
 
 def init_adadelta_states():
     s_w, s_b = nd.zeros((features.shape[1], 1)), nd.zeros(1)
@@ -52,22 +55,23 @@ def adadelta(params, states, hyperparams):
 Then, we train the model with the hyperparameter $\rho=0.9$.
 
 ```{.python .input  n=12}
-gb.train_ch7(adadelta, init_adadelta_states(), {'rho': 0.9}, features, labels)
+d2l.train_ch7(adadelta, init_adadelta_states(), {'rho': 0.9}, features,
+              labels)
 ```
 
-## Implementation with Gluon
+## Concise Implementation
 
 From the `Trainer` instance for the algorithm named "adadelta", we can implement Adadelta in Gluon. Its hyperparameters can be specified by `rho`.
 
 ```{.python .input  n=9}
-gb.train_gluon_ch7('adadelta', {'rho': 0.9}, features, labels)
+d2l.train_gluon_ch7('adadelta', {'rho': 0.9}, features, labels)
 ```
 
 ## Summary
 
 * Adadelta has no learning rate hyperparameter, it uses an EWMA on the squares of elements in the variation of the independent variable to replace the learning rate.
 
-## Problems
+## Exercises
 
 * Adjust the value of $\rho$ and observe the experimental results.
 
@@ -75,6 +79,6 @@ gb.train_gluon_ch7('adadelta', {'rho': 0.9}, features, labels)
 
 [1] Zeiler, M. D. (2012). ADADELTA: an adaptive learning rate method. arXiv preprint arXiv:1212.5701.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2377)
 
-<div id="discuss" topic_id="2377"></div>
+![](../img/qr_adadelta.svg)

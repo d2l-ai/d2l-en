@@ -5,8 +5,11 @@ Object detection algorithms usually sample a large number of regions in the inpu
 First, import the packages or modules required for this section. Here, we have introduced the `contrib` package, and modified the printing accuracy of NumPy. Because printing NDArray actually calls the print function of NumPy, the floating-point numbers in NDArray printed in this section are more concise.
 
 ```{.python .input  n=1}
+import sys
+sys.path.insert(0, '..')
+
 %matplotlib inline
-import gluonbook as gb
+import d2l
 from mxnet import contrib, gluon, image, nd
 import numpy as np
 np.set_printoptions(2)
@@ -29,7 +32,7 @@ img = image.imread('../img/catdog.jpg').asnumpy()
 h, w = img.shape[0:2]
 
 print(h, w)
-X = nd.random.uniform(shape=(1, 3, h, w))  # Construct input data.
+X = nd.random.uniform(shape=(1, 3, h, w))  # Construct input data
 Y = contrib.nd.MultiBoxPrior(X, sizes=[0.75, 0.5, 0.25], ratios=[1, 2, 0.5])
 Y.shape
 ```
@@ -44,7 +47,7 @@ boxes[250, 250, 0, :]
 In order to describe all anchor boxes centered on one pixel in the image, we first define the `show_bboxes` function to draw multiple bounding boxes on the image.
 
 ```{.python .input  n=4}
-# This function is saved in the gluonbook package for future use.
+# This function is saved in the d2l package for future use
 def show_bboxes(axes, bboxes, labels=None, colors=None):
     def _make_list(obj, default_values=None):
         if obj is None:
@@ -57,7 +60,7 @@ def show_bboxes(axes, bboxes, labels=None, colors=None):
     colors = _make_list(colors, ['b', 'g', 'r', 'm', 'c'])
     for i, bbox in enumerate(bboxes):
         color = colors[i % len(colors)]
-        rect = gb.bbox_to_rect(bbox.asnumpy(), color)
+        rect = d2l.bbox_to_rect(bbox.asnumpy(), color)
         axes.add_patch(rect)
         if labels and len(labels) > i:
             text_color = 'k' if color == 'w' else 'w'
@@ -69,9 +72,9 @@ def show_bboxes(axes, bboxes, labels=None, colors=None):
 As we just saw, the coordinate values of the $x$ and $y$ axis in the variable `boxes` have been divided by the width and height of the image, respectively. When drawing images, we need to restore the original coordinate values of the anchor boxes and therefore define the variable `bbox_scale`. Now, we can draw all the anchor boxes centered on (250, 250) in the image. As you can see, the blue anchor box with a size of 0.75 and an aspect ratio of 1 covers the dog in the image well.
 
 ```{.python .input  n=5}
-gb.set_figsize()
+d2l.set_figsize()
 bbox_scale = nd.array((w, h, w, h))
-fig = gb.plt.imshow(img)
+fig = d2l.plt.imshow(img)
 show_bboxes(fig.axes, boxes[250, 250, :, :] * bbox_scale,
             ['s=0.75, r=1', 's=0.5, r=1', 's=0.25, r=1', 's=0.75, r=2',
              's=0.75, r=0.5'])
@@ -84,7 +87,7 @@ We just mentioned that the anchor box covers the dog in the image well. If the g
 $$J(\mathcal{A},\mathcal{B}) = \frac{\left|\mathcal{A} \cap \mathcal{B}\right|}{\left| \mathcal{A} \cup \mathcal{B}\right|}.$$
 
 
-In fact, we can consider the pixel area of a bounding box as a collection of pixels. In this way, we can measure the similarity of the two bounding boxes by the Jaccard index of their pixel sets. When we measure the similarity of two bounding boxes, we usually refer the Jaccard index as Intersection over Union (IoU), which is the ratio of the intersecting area to the union area of the two bounding boxes, as shown in Figure 9.2. The value range of IoU is between 0 and 1: 0 means that there are no overlapping pixels between the two bounding boxes, while 1 indicates that the two bounding boxes are equal.
+In fact, we can consider the pixel area of a bounding box as a collection of pixels. In this way, we can measure the similarity of the two bounding boxes by the Jaccard index of their pixel sets. When we measure the similarity of two bounding boxes, we usually refer the Jaccard index as intersection over union (IoU), which is the ratio of the intersecting area to the union area of the two bounding boxes, as shown in Figure 9.2. The value range of IoU is between 0 and 1: 0 means that there are no overlapping pixels between the two bounding boxes, while 1 indicates that the two bounding boxes are equal.
 
 ![IoU is the ratio of the intersecting area to the union area of two bounding boxes.  ](../img/iou.svg)
 
@@ -102,7 +105,7 @@ We know that, in the object detection training set, each image is labelled with 
 
 
 Assume the anchor boxes in the image are $A_1, A_2, \ldots, A_{n_a}$ and the ground-truth bounding boxes are $B_1, B_2, \ldots, B_{n_b}$ and $n_a \geq n_b$. Define matrix $\boldsymbol{X} \in \mathbb{R}^{n_a \times n_b}$, where element $x_{ij}$ in the $i$th row and $j$th column is the IoU of the anchor box $A_i$ to the ground-truth bounding box $B_j$.
-First, we find the largest element in the matrix $boldsymbol{x}$ and record the row index and column index of the element as $i_1,j_1$. We assign the ground-truth bounding box $B_{j_1}$ to the anchor box $A_{i_1}$. Obviously, anchor box $A_{i_1}$ and ground-truth bounding box $B_{j_1}$ have the highest similarity among all the "anchor box - ground-truth bounding box" pairings. Next, discard all elements in the $i_1$th row and the $j_1$th column in the matrix $\boldsymbol{X}$. Find the largest remaining element in the matrix $\boldsymbol{X}$ and record the row index and column index of the element as $i_2,j_2$. We assign ground-truth bounding box $B_{j_2}$ to anchor box $A_{i_2}$ and then discard all elements in the $i_2$th row and the $j_2$th column in the matrix $\boldsymbol{X}$. At this point, elements in two rows and two columns in the matrix $\boldsymbol{X}$ have been discarded.
+First, we find the largest element in the matrix $\boldsymbol{X}$ and record the row index and column index of the element as $i_1,j_1$. We assign the ground-truth bounding box $B_{j_1}$ to the anchor box $A_{i_1}$. Obviously, anchor box $A_{i_1}$ and ground-truth bounding box $B_{j_1}$ have the highest similarity among all the "anchor box - ground-truth bounding box" pairings. Next, discard all elements in the $i_1$th row and the $j_1$th column in the matrix $\boldsymbol{X}$. Find the largest remaining element in the matrix $\boldsymbol{X}$ and record the row index and column index of the element as $i_2,j_2$. We assign ground-truth bounding box $B_{j_2}$ to anchor box $A_{i_2}$ and then discard all elements in the $i_2$th row and the $j_2$th column in the matrix $\boldsymbol{X}$. At this point, elements in two rows and two columns in the matrix $\boldsymbol{X}$ have been discarded.
 We proceed until all elements in the $n_b$ column in the matrix $\boldsymbol{X}$ are discarded. At this time, we have assigned a ground-truth bounding box to each of the $n_b$ anchor boxes.
 Next, we only traverse the remaining $n_a - n_b$ anchor boxes. Given anchor box $A_i$, find the bounding box $B_j$ with the largest IoU with $A_i$ according to the $i$th row of the matrix $\boldsymbol{X}$, and only assign ground-truth bounding box $B_j$ to anchor box $A_i$ when the IoU is greater than the predetermined threshold.
 
@@ -131,7 +134,7 @@ anchors = nd.array([[0, 0.1, 0.2, 0.3], [0.15, 0.2, 0.4, 0.4],
                     [0.63, 0.05, 0.88, 0.98], [0.66, 0.45, 0.8, 0.8],
                     [0.57, 0.3, 0.92, 0.9]])
 
-fig = gb.plt.imshow(img)
+fig = d2l.plt.imshow(img)
 show_bboxes(fig.axes, ground_truth[:, 1:] * bbox_scale, ['dog', 'cat'], 'k')
 show_bboxes(fig.axes, anchors * bbox_scale, ['0', '1', '2', '3', '4']);
 ```
@@ -187,7 +190,7 @@ cls_probs = nd.array([[0] * 4,  # Predicted probability for background
 Print prediction bounding boxes and their confidence levels on the image.
 
 ```{.python .input  n=12}
-fig = gb.plt.imshow(img)
+fig = d2l.plt.imshow(img)
 show_bboxes(fig.axes, anchors * bbox_scale,
             ['dog=0.9', 'dog=0.8', 'dog=0.7', 'cat=0.9'])
 ```
@@ -204,7 +207,7 @@ output
 We remove the prediction bounding boxes of category -1 and visualize the results retained by NMS.
 
 ```{.python .input  n=14}
-fig = gb.plt.imshow(img)
+fig = d2l.plt.imshow(img)
 for i in output[0].asnumpy():
     if i[0] == -1:
         continue
@@ -222,7 +225,7 @@ In practice, we can remove prediction bounding boxes with lower confidence level
 * In the training set, we mark two types of labels for each anchor box: one is the category of the target contained in the anchor box and the other is the offset of the ground-truth bounding box relative to the anchor box.
 * When predicting, we can use non-maximum suppression (NMS) to remove similar prediction bounding boxes, thereby simplifying the results.
 
-## Problems
+## Exercises
 
 * Change the `sizes` and `ratios` values in `contrib.nd.MultiBoxPrior` and observe the changes to the generated anchor boxes.
 * Construct two bounding boxes with and IoU of 0.5, and observe their coincidence.
@@ -230,6 +233,6 @@ In practice, we can remove prediction bounding boxes with lower confidence level
 * Modify the variable `anchors` in the "Labeling Training Set Anchor Boxes" and "Output Bounding Boxes for Prediction" sections. How do the results change?
 
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2445)
 
-<div id="discuss" topic_id="2445"></div>
+![](../img/qr_anchor.svg)

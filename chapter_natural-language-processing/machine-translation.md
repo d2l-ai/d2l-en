@@ -20,34 +20,39 @@ PAD, BOS, EOS = '<pad>', '<bos>', '<eos>'
 Then, we define two auxiliary functions to preprocess the data to be read later.
 
 ```{.python .input}
-# For a sequence, we record all the words in all_tokens in order to subsequently construct the dictionary, then we add PAD after the sequence, until
-# the length becomes max_seq_len. Then, we record the sequence in all_seqs.
+# For a sequence, we record all the words in all_tokens in order to
+# subsequently construct the dictionary, then we add PAD after the sequence,
+# until the length becomes max_seq_len. Then, we record the sequence in
+# all_seqs
 def process_one_seq(seq_tokens, all_tokens, all_seqs, max_seq_len):
     all_tokens.extend(seq_tokens)
     seq_tokens += [EOS] + [PAD] * (max_seq_len - len(seq_tokens) - 1)
     all_seqs.append(seq_tokens)
 
-# Use all the words to construct a dictionary. Construct an NDArray instance after transforming the words in all sequences into a word index.
+# Use all the words to construct a dictionary. Construct an NDArray instance
+# after transforming the words in all sequences into a word index
 def build_data(all_tokens, all_seqs):
     vocab = text.vocab.Vocabulary(collections.Counter(all_tokens),
                                   reserved_tokens=[PAD, BOS, EOS])
-    indicies = [vocab.to_indices(seq) for seq in all_seqs]
-    return vocab, nd.array(indicies)
+    indices = [vocab.to_indices(seq) for seq in all_seqs]
+    return vocab, nd.array(indices)
 ```
 
 For simplicity, we use a very small French-English data set here. In this data set, each line is a French sentence and its corresponding English sentence, separated by `'\t'`. When reading data, we attach the “&lt;eos&gt;” symbol at the end of the sentence, and if necessary, make the length of each sequence `max_seq_len` by adding the “&lt;pad&gt;” symbol. We create separate dictionaries for French and English words. The index of French words and the index of the English words are independent of each other.
 
 ```{.python .input  n=31}
 def read_data(max_seq_len):
-    # In and out are the abbreviations of input and output, respectively.
+    # In and out are the abbreviations of input and output, respectively
     in_tokens, out_tokens, in_seqs, out_seqs = [], [], [], []
     with io.open('../data/fr-en-small.txt') as f:
         lines = f.readlines()
     for line in lines:
         in_seq, out_seq = line.rstrip().split('\t')
         in_seq_tokens, out_seq_tokens = in_seq.split(' '), out_seq.split(' ')
+        # If a sequence is longer than the max_seq_len after adding EOS, this
+        # example will be ignored
         if max(len(in_seq_tokens), len(out_seq_tokens)) > max_seq_len - 1:
-            continue  # If a sequence is longer than the max_seq_len after adding EOS, this example will be ignored.
+            continue
         process_one_seq(in_seq_tokens, in_tokens, in_seqs, max_seq_len)
         process_one_seq(out_seq_tokens, out_tokens, out_seqs, max_seq_len)
     in_vocab, in_data = build_data(in_tokens, in_seqs)
@@ -69,7 +74,7 @@ We will use an encoder-decoder with an attention mechanism to translate a short 
 
 ### Encoder
 
-In the encoder, we use the word embedding layer to obtain a feature index from the word index of the input language and then input it into a multi-level gated recurrent unit. As we mentioned in the ["Gluon implementation of the recurrent neural network"](../chapter_recurrent-neural-networks/rnn-gluon.md) section, Gluon's `rnn.GRU` instance also returns the multi-layer hidden states of the output and final time steps after forward calculation. Here, the output refers to the hidden state of the hidden layer of the last layer at each time step, and it does not involve output layer calculation. The attention mechanism uses these output as key items and value items.
+In the encoder, we use the word embedding layer to obtain a feature index from the word index of the input language and then input it into a multi-level gated recurrent unit. As we mentioned in the ["Concise Implementation of Recurrent Neural Networks"](../chapter_recurrent-neural-networks/rnn-gluon.md) section, Gluon's `rnn.GRU` instance also returns the multi-layer hidden states of the output and final time steps after forward calculation. Here, the output refers to the hidden state of the hidden layer of the last layer at each time step, and it does not involve output layer calculation. The attention mechanism uses these output as key items and value items.
 
 ```{.python .input  n=165}
 class Encoder(nn.Block):
@@ -80,7 +85,8 @@ class Encoder(nn.Block):
         self.rnn = rnn.GRU(num_hiddens, num_layers, dropout=drop_prob)
 
     def forward(self, inputs, state):
-        # The input shape is (batch size, number of time steps). Change the example dimension and time step dimension of the output.
+        # The input shape is (batch size, number of time steps). Change the
+        # example dimension and time step dimension of the output
         embedding = self.embedding(inputs).swapaxes(0, 1)
         return self.rnn(embedding, state)
 
@@ -99,7 +105,7 @@ output.shape, state[0].shape
 
 ### Attention Mechanism
 
-Before we introduce how to implement vectorization calculation for the attention mechanism, we will take a look at the `flatten` option for a `Dense` instance. When the input dimension is greater than 2, by default, the `Dense` instance will treat all dimensions other than the first dimension (example dimension) as feature dimensions that require affine transformation, and will automatically convert the input into a two-dimensional matrix with rows of behavioral examples and columns of features. After calculation, the shape of output the matrix is (number of examples, number of outputs). If we want the fully connected layer to only perform affine transformation on the last dimension of the input while keeping the shapes of the other dimensions unchanged, we need to set the `flatten` option of the `Dense` instance to `False`. In the following example, the fully connected layer only performs affine transformation on the last dimension of the input, therefore, only the last dimension of the output shape becomes the number of outputs of the fully connected layer, i.e. 2.
+Before we introduce how to implement vectorization calculation for the attention mechanism, we will take a look at the `flatten` option for a `Dense` instance. When the input dimension is greater than 2, by default, the `Dense` instance will treat all dimensions other than the first dimension (example dimension) as feature dimensions that require affine transformation, and will automatically convert the input into a two-dimensional matrix with rows of behavioral examples and columns of features. After calculation, the shape of the output matrix is (number of examples, number of outputs). If we want the fully connected layer to only perform affine transformation on the last dimension of the input while keeping the shapes of the other dimensions unchanged, we need to set the `flatten` option of the `Dense` instance to `False`. In the following example, the fully connected layer only performs affine transformation on the last dimension of the input, therefore, only the last dimension of the output shape becomes the number of outputs of the fully connected layer, i.e. 2.
 
 ```{.python .input}
 dense = nn.Dense(2, flatten=False)
@@ -107,7 +113,7 @@ dense.initialize()
 dense(nd.zeros((3, 5, 7))).shape
 ```
 
-We will implement the function $a$ defined in the ["Attention Mechanism"](./attention.md) section to transform the concatenated input through a multilayer perceptron with a single hidden layer. The input of the hidden layer is a one-to-one concatenation between the hidden state of the decoder and the hidden state of the encoder on all time steps, which uses tanh as the activation function. The number of outputs of the output layer is 1. Neither `Dense` instance use a bias and they set `flatten=False`. Here, the length of the vector $\boldsymbol{v}$ in the $a$ function definition is a hyper-parameter, i.e. `attention_size`.
+We will implement the function $a$ defined in the ["Attention Mechanism"](./attention.md) section to transform the concatenated input through a multilayer perceptron with a single hidden layer. The input of the hidden layer is a one-to-one concatenation between the hidden state of the decoder and the hidden state of the encoder on all time steps, which uses tanh as the activation function. The number of outputs of the output layer is 1. Neither of the 2 `Dense` instances use a bias or flatten. Here, the length of the vector $\boldsymbol{v}$ in the $a$ function definition is a hyper-parameter, i.e. `attention_size`.
 
 ```{.python .input  n=167}
 def attention_model(attention_size):
@@ -122,13 +128,17 @@ The inputs of the attention model include query items, key items, and value item
 
 ```{.python .input  n=168}
 def attention_forward(model, enc_states, dec_state):
-    # Broadcast the decoder hidden state to the same shape as the encoder hidden state and then perform concatenation.
+    # Broadcast the decoder hidden state to the same shape as the encoder
+    # hidden state and then perform concatenation
     dec_states = nd.broadcast_axis(
         dec_state.expand_dims(0), axis=0, size=enc_states.shape[0])
     enc_and_dec_states = nd.concat(enc_states, dec_states, dim=2)
-    e = model(enc_and_dec_states)  # The shape is (number of time steps, batch size, 1).
-    alpha = nd.softmax(e, axis=0)  # Perform the softmax operation on the time step dimension.
-    return (alpha * enc_states).sum(axis=0)  # This returns the context variable.
+    # The shape is (number of time steps, batch size, 1)
+    e = model(enc_and_dec_states)
+    # Perform the softmax operation on the time step dimension
+    alpha = nd.softmax(e, axis=0)
+    # This returns the context variable
+    return (alpha * enc_states).sum(axis=0)
 ```
 
 In the example below, the encoder has 10 time steps and a batch size of 4. Both the encoder and the decoder have 8 hidden units. The attention model returns a mini-batch of context vectors, and the length of each context vector is equal to the number of hidden units of the encoder. Therefore, the output shape is (4, 8).
@@ -159,18 +169,22 @@ class Decoder(nn.Block):
         self.out = nn.Dense(vocab_size, flatten=False)
 
     def forward(self, cur_input, state, enc_states):
-        # Use the attention mechanism to calculate the context vector.
+        # Use the attention mechanism to calculate the context vector
         c = attention_forward(self.attention, enc_states, state[0][-1])
-        # The embedded input and the context vector are concatenated in the feature dimension.
+        # The embedded input and the context vector are concatenated in the
+        # feature dimension
         input_and_c = nd.concat(self.embedding(cur_input), c, dim=1)
-        # Add a time step dimension, with 1 time step, for the concatenation of the input and the context vector.
+        # Add a time step dimension, with 1 time step, for the concatenation
+        # of the input and the context vector
         output, state = self.rnn(input_and_c.expand_dims(0), state)
-        # Remove the time step dimension, so the output shape is (batch size, output dictionary size).
+        # Remove the time step dimension, so the output shape is (batch size,
+        # output dictionary size)
         output = self.out(output).squeeze(axis=0)
         return output, state
 
     def begin_state(self, enc_state):
-        # Directly use the hidden state of the final time step of the encoder as the initial hidden state of the decoder.
+        # Directly use the hidden state of the final time step of the encoder
+        # as the initial hidden state of the decoder.
         return enc_state
 ```
 
@@ -183,19 +197,20 @@ def batch_loss(encoder, decoder, X, Y, loss):
     batch_size = X.shape[0]
     enc_state = encoder.begin_state(batch_size=batch_size)
     enc_outputs, enc_state = encoder(X, enc_state)
-    # Initialize the hidden state of the decoder.
+    # Initialize the hidden state of the decoder
     dec_state = decoder.begin_state(enc_state)
-    # The input of decoder at the initial time step is BOS.
+    # The input of decoder at the initial time step is BOS
     dec_input = nd.array([out_vocab.token_to_idx[BOS]] * batch_size)
-    # We will use the mask variable to ignore the loss when the label is PAD.
+    # We will use the mask variable to ignore the loss when the label is PAD
     mask, num_not_pad_tokens = nd.ones(shape=(batch_size,)), 0
     l = nd.array([0])
     for y in Y.T:
         dec_output, dec_state = decoder(dec_input, dec_state, enc_outputs)
         l = l + (mask * loss(dec_output, y)).sum()
-        dec_input = y  # Use teacher forcing.
+        dec_input = y  # Use teacher forcing
         num_not_pad_tokens += mask.sum().asscalar()
-        # When we encounter EOS, words after the sequence will all be PAD and the mask for the corresponding position is set to 0.
+        # When we encounter EOS, words after the sequence will all be PAD and
+        # the mask for the corresponding position is set to 0
         mask = mask * (y != out_vocab.token_to_idx[EOS])
     return l / num_not_pad_tokens
 ```
@@ -213,7 +228,7 @@ def train(encoder, decoder, dataset, lr, batch_size, num_epochs):
     loss = gloss.SoftmaxCrossEntropyLoss()
     data_iter = gdata.DataLoader(dataset, batch_size, shuffle=True)
     for epoch in range(num_epochs):
-        l_sum = 0
+        l_sum = 0.0
         for X, Y in data_iter:
             with autograd.record():
                 l = batch_loss(encoder, decoder, X, Y, loss)
@@ -237,7 +252,7 @@ decoder = Decoder(len(out_vocab), embed_size, num_hiddens, num_layers,
 train(encoder, decoder, dataset, lr, batch_size, num_epochs)
 ```
 
-## PREDICTION
+## Prediction
 
 We introduced three methods to generate the output of the decoder at each time step in the ["Beam Search"](beam-search.md) section. Here we implement the simplest method, greedy search.
 
@@ -255,7 +270,9 @@ def translate(encoder, decoder, input_seq, max_seq_len):
         dec_output, dec_state = decoder(dec_input, dec_state, enc_output)
         pred = dec_output.argmax(axis=1)
         pred_token = out_vocab.idx_to_token[int(pred.asscalar())]
-        if pred_token == EOS:  # When an EOS symbol is found at any time step, the output sequence is complete.
+        # When an EOS symbol is found at any time step, the output sequence is
+        # complete
+        if pred_token == EOS:
             break
         else:
             output_tokens.append(pred_token)
@@ -324,10 +341,10 @@ score('ils sont canadiens .', 'they are canadian .', k=2)
 * We can apply encoder-decoder and attention mechanisms to machine translation.
 * BLEU can be used to evaluate translation results.
 
-## Problems
+## Exercises
 
-* If the encoder and decoder have different numbers of hidden units or layers, how can we improve the decoder's hidden state initialization method?
-* During training, replace teacher forcing with the output of the decoder at the previous time step as the input of the decoder at the current time step. Has the result changed?
+* If the encoder and decoder have different number of hidden units or layers, how can we improve the decoder's hidden state initialization method?
+* During training, we experiment by replacing "teacher forcing" with the output of the decoder at the previous time step as the input of the decoder at the current time step. Has the result changed?
 * Try to train the model with larger translation data sets, such as WMT[2] and Tatoeba Project[3].
 
 
@@ -340,6 +357,6 @@ score('ils sont canadiens .', 'they are canadian .', k=2)
 
 [3] Tatoeba Project. http://www.manythings.org/anki/
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2396)
 
-<div id="discuss" topic_id="2396"></div>
+![](../img/qr_machine-translation.svg)
