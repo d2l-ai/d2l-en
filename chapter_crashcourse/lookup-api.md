@@ -1,4 +1,4 @@
-# MXNet documentation
+# Documentation
 
 Due to the length of this book, it is impossible for us to introduce all  MXNet functions and classes. The API documentation and additional tutorials and examples provide plenty of documentation beyond the book.
 
@@ -15,7 +15,7 @@ Generally speaking, we can ignore functions that start and end with `__` (specia
 
 ## Finding the usage of specific functions and classes
 
-For specific function or class usage, we can use the  `help` function. Let's take a look at the usage of the `ones_like,  such as the NDArray function as an example. `
+For specific function or class usage, we can use the  `help` function. Let's take a look at the usage of the `ones_like` function of an NDArray as an example.
 
 ```{.python .input}
 help(nd.ones_like)
@@ -29,7 +29,7 @@ y = x.ones_like()
 y
 ```
 
-In the Jupyter notebook, we can use `?` to display the document in another window. For example, `nd.ones_like?` will create content that is almost identical to `help(nd.ones_like)`, but will be displayed in an extra window. In addition, if we use two `nd.ones_like??`, the function implementation code will also be displayed.
+In the Jupyter notebook, we can use `?` to display the document in another window. For example, `nd.random.uniform?` will create content that is almost identical to `help(nd.random.uniform)`, but will be displayed in an extra window. In addition, if we use two `nd.random.uniform??`, the function implementation code will also be displayed.
 
 ## API Documentation
 
@@ -37,8 +37,8 @@ For further details on the API details check the MXNet website at  [http://mxnet
 
 ## Exercise
 
-Check out the documentation for `ones_like` and for `autograd`.
+Look up `ones_like` and `autograd` in the API documentation.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2322)
 
-<div id="discuss" topic_id="2322"></div>
+![](../img/qr_lookup-api.svg)

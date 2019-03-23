@@ -14,8 +14,11 @@ Figure 9.17 shows the information on the competition's webpage. In order to subm
 First, import the packages or modules required for the competition.
 
 ```{.python .input}
+import sys
+sys.path.insert(0, '..')
+
 import collections
-import gluonbook as gb
+import d2l
 import math
 from mxnet import autograd, gluon, init, nd
 from mxnet.gluon import data as gdata, loss as gloss, model_zoo, nn
@@ -41,7 +44,8 @@ After logging in to Kaggle, we can click on the "Data" tab on the dog breed iden
 To make it easier to get started, we provide a small-scale sample of the data set mentioned above, "train_valid_test_tiny.zip". If you are going to use the full data set for the Kaggle competition, you will also need to change the `demo` variable below to `False`.
 
 ```{.python .input  n=1}
-# If you use the full data set downloaded for the Kaggle competition, change the variable below to False.
+# If you use the full data set downloaded for the Kaggle competition, change
+# the variable below to False
 demo = True
 data_dir = '../data/kaggle_dog'
 if demo:
@@ -59,25 +63,26 @@ Next, we define the `reorg_train_valid` function to segment the validation set f
 
 ```{.python .input}
 def reorg_train_valid(data_dir, train_dir, input_dir, valid_ratio, idx_label):
-    # The number of examples of the least represented breed in the training set.
+    # The number of examples of the least represented breed in the training
+    # set
     min_n_train_per_label = (
         collections.Counter(idx_label.values()).most_common()[:-2:-1][0][1])
-    # The number of examples of each breed in the validation set.
+    # The number of examples of each breed in the validation set
     n_valid_per_label = math.floor(min_n_train_per_label * valid_ratio)
     label_count = {}
     for train_file in os.listdir(os.path.join(data_dir, train_dir)):
         idx = train_file.split('.')[0]
         label = idx_label[idx]
-        gb.mkdir_if_not_exist([data_dir, input_dir, 'train_valid', label])
+        d2l.mkdir_if_not_exist([data_dir, input_dir, 'train_valid', label])
         shutil.copy(os.path.join(data_dir, train_dir, train_file),
                     os.path.join(data_dir, input_dir, 'train_valid', label))
         if label not in label_count or label_count[label] < n_valid_per_label:
-            gb.mkdir_if_not_exist([data_dir, input_dir, 'valid', label])
+            d2l.mkdir_if_not_exist([data_dir, input_dir, 'valid', label])
             shutil.copy(os.path.join(data_dir, train_dir, train_file),
                         os.path.join(data_dir, input_dir, 'valid', label))
             label_count[label] = label_count.get(label, 0) + 1
         else:
-            gb.mkdir_if_not_exist([data_dir, input_dir, 'train', label])
+            d2l.mkdir_if_not_exist([data_dir, input_dir, 'train', label])
             shutil.copy(os.path.join(data_dir, train_dir, train_file),
                         os.path.join(data_dir, input_dir, 'train', label))
 ```
@@ -87,15 +92,15 @@ The `reorg_dog_data` function below is used to read the training data labels, se
 ```{.python .input  n=2}
 def reorg_dog_data(data_dir, label_file, train_dir, test_dir, input_dir,
                    valid_ratio):
-    # Read the training data labels.
+    # Read the training data labels
     with open(os.path.join(data_dir, label_file), 'r') as f:
-        # Skip the file header line (column name).
+        # Skip the file header line (column name)
         lines = f.readlines()[1:]
         tokens = [l.rstrip().split(',') for l in lines]
         idx_label = dict(((idx, label) for idx, label in tokens))
     reorg_train_valid(data_dir, train_dir, input_dir, valid_ratio, idx_label)
-    # Organize the training set.
-    gb.mkdir_if_not_exist([data_dir, input_dir, 'test', 'unknown'])
+    # Organize the training set
+    d2l.mkdir_if_not_exist([data_dir, input_dir, 'test', 'unknown'])
     for test_file in os.listdir(os.path.join(data_dir, test_dir)):
         shutil.copy(os.path.join(data_dir, test_dir, test_file),
                     os.path.join(data_dir, input_dir, 'test', 'unknown'))
@@ -105,8 +110,9 @@ Because we are using a small data set, we set the batch size to 1. During actual
 
 ```{.python .input  n=3}
 if demo:
-    # Note: Here, we use a small data set and the batch size should be set smaller. When using the complete data set for the Kaggle competition, we can set the batch size
-    # to a larger integer.
+    # Note: Here, we use a small data set and the batch size should be set
+    # smaller. When using the complete data set for the Kaggle competition, we
+    # can set the batch size to a larger integer
     input_dir, batch_size = 'train_valid_test_tiny', 1
 else:
     label_file, train_dir, test_dir = 'labels.csv', 'train', 'test'
@@ -121,18 +127,20 @@ The size of the images in this section are larger than the images in the previou
 
 ```{.python .input  n=4}
 transform_train = gdata.vision.transforms.Compose([
-    # Randomly crop the image to obtain an image with an area of 0.08 to 1 of the original area and height to width ratio between 3/4 and 4/3.
-    # Then, scale the image to create a new image with a height and width of 224 pixels each.
+    # Randomly crop the image to obtain an image with an area of 0.08 to 1 of
+    # the original area and height to width ratio between 3/4 and 4/3. Then,
+    # scale the image to create a new image with a height and width of 224
+    # pixels each
     gdata.vision.transforms.RandomResizedCrop(224, scale=(0.08, 1.0),
                                               ratio=(3.0/4.0, 4.0/3.0)),
     gdata.vision.transforms.RandomFlipLeftRight(),
-    # Randomly change the brightness, contrast, and saturation.
+    # Randomly change the brightness, contrast, and saturation
     gdata.vision.transforms.RandomColorJitter(brightness=0.4, contrast=0.4,
                                               saturation=0.4),
-    # Add random noise.
+    # Add random noise
     gdata.vision.transforms.RandomLighting(0.1),
     gdata.vision.transforms.ToTensor(),
-    # Standardize each channel of the image.
+    # Standardize each channel of the image
     gdata.vision.transforms.Normalize([0.485, 0.456, 0.406],
                                       [0.229, 0.224, 0.225])])
 ```
@@ -142,7 +150,7 @@ During testing, we only use definite image preprocessing operations.
 ```{.python .input}
 transform_test = gdata.vision.transforms.Compose([
     gdata.vision.transforms.Resize(256),
-    # Crop a square of 224 by 224 from the center of the image.
+    # Crop a square of 224 by 224 from the center of the image
     gdata.vision.transforms.CenterCrop(224),
     gdata.vision.transforms.ToTensor(),
     gdata.vision.transforms.Normalize([0.485, 0.456, 0.406],
@@ -167,13 +175,13 @@ test_ds = gdata.vision.ImageFolderDataset(
 Here, we create a `DataLoader` instance, just like in the previous section.
 
 ```{.python .input}
-train_data = gdata.DataLoader(train_ds.transform_first(transform_train),
+train_iter = gdata.DataLoader(train_ds.transform_first(transform_train),
                               batch_size, shuffle=True, last_batch='keep')
-valid_data = gdata.DataLoader(valid_ds.transform_first(transform_test),
+valid_iter = gdata.DataLoader(valid_ds.transform_first(transform_test),
                               batch_size, shuffle=True, last_batch='keep')
-train_valid_data = gdata.DataLoader(train_valid_ds.transform_first(
+train_valid_iter = gdata.DataLoader(train_valid_ds.transform_first(
     transform_train), batch_size, shuffle=True, last_batch='keep')
-test_data = gdata.DataLoader(test_ds.transform_first(transform_test),
+test_iter = gdata.DataLoader(test_ds.transform_first(transform_test),
                              batch_size, shuffle=False, last_batch='keep')
 ```
 
@@ -186,14 +194,14 @@ You must note that, during image augmentation, we use the mean values and standa
 ```{.python .input  n=6}
 def get_net(ctx):
     finetune_net = model_zoo.vision.resnet34_v2(pretrained=True)
-    # Define a new output network.
+    # Define a new output network
     finetune_net.output_new = nn.HybridSequential(prefix='')
     finetune_net.output_new.add(nn.Dense(256, activation='relu'))
-    # There are 120 output categories.
+    # There are 120 output categories
     finetune_net.output_new.add(nn.Dense(120))
-    # Initialize the output network.
+    # Initialize the output network
     finetune_net.output_new.initialize(init.Xavier(), ctx=ctx)
-    # Distribute the model parameters to the CPUs or GPUs used for computation.
+    # Distribute the model parameters to the CPUs or GPUs used for computation
     finetune_net.collect_params().reset_ctx(ctx)
     return finetune_net
 ```
@@ -203,14 +211,15 @@ When calculating the loss, we first use the member variable `features` to obtain
 ```{.python .input}
 loss = gloss.SoftmaxCrossEntropyLoss()
 
-def get_loss(data, net, ctx):
-    l = 0.0
-    for X, y in data:
+def evaluate_loss(data_iter, net, ctx):
+    l_sum, n = 0.0, 0
+    for X, y in data_iter:
         y = y.as_in_context(ctx)
         output_features = net.features(X.as_in_context(ctx))
         outputs = net.output_new(output_features)
-        l += loss(outputs, y).mean().asscalar()
-    return l / len(data)
+        l_sum += loss(outputs, y).sum().asscalar()
+        n += y.size
+    return l_sum / n
 ```
 
 ## Define the Training Functions
@@ -218,32 +227,33 @@ def get_loss(data, net, ctx):
 We will select the model and tune hyper-parameters according to the model's performance on the validation set. The model training function `train` only trains the small custom output network.
 
 ```{.python .input  n=7}
-def train(net, train_data, valid_data, num_epochs, lr, wd, ctx, lr_period,
+def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
           lr_decay):
-    # Only train the small custom output network.
+    # Only train the small custom output network
     trainer = gluon.Trainer(net.output_new.collect_params(), 'sgd',
                             {'learning_rate': lr, 'momentum': 0.9, 'wd': wd})
     for epoch in range(num_epochs):
-        train_l, start = 0.0, time.time()
+        train_l_sum, n, start = 0.0, 0, time.time()
         if epoch > 0 and epoch % lr_period == 0:
             trainer.set_learning_rate(trainer.learning_rate * lr_decay)
-        for X, y in train_data:
-            y = y.astype('float32').as_in_context(ctx)
+        for X, y in train_iter:
+            y = y.as_in_context(ctx)
             output_features = net.features(X.as_in_context(ctx))
             with autograd.record():
                 outputs = net.output_new(output_features)
-                l = loss(outputs, y)
+                l = loss(outputs, y).sum()
             l.backward()
             trainer.step(batch_size)
-            train_l += l.mean().asscalar()
+            train_l_sum += l.asscalar()
+            n += y.size
         time_s = "time %.2f sec" % (time.time() - start)
-        if valid_data is not None:
-            valid_loss = get_loss(valid_data, net, ctx)
+        if valid_iter is not None:
+            valid_loss = evaluate_loss(valid_iter, net, ctx)
             epoch_s = ("epoch %d, train loss %f, valid loss %f, "
-                       % (epoch + 1, train_l / len(train_data), valid_loss))
+                       % (epoch + 1, train_l_sum / n, valid_loss))
         else:
             epoch_s = ("epoch %d, train loss %f, "
-                       % (epoch + 1, train_l / len(train_data)))
+                       % (epoch + 1, train_l_sum / n))
         print(epoch_s + time_s + ', lr ' + str(trainer.learning_rate))
 ```
 
@@ -252,10 +262,10 @@ def train(net, train_data, valid_data, num_epochs, lr, wd, ctx, lr_period,
 Now, we can train and validate the model. The following hyper-parameters can be tuned. For example, we can increase the number of epochs. Because `lr_period` and `lr_decay` are set to 10 and 0.1 respectively, the learning rate of the optimization algorithm will be multiplied by 0.1 after every 10 epochs.
 
 ```{.python .input  n=9}
-ctx, num_epochs, lr, wd = gb.try_gpu(), 1, 0.01, 1e-4
+ctx, num_epochs, lr, wd = d2l.try_gpu(), 1, 0.01, 1e-4
 lr_period, lr_decay, net = 10, 0.1, get_net(ctx)
 net.hybridize()
-train(net, train_data, valid_data, num_epochs, lr, wd, ctx, lr_period,
+train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
       lr_decay)
 ```
 
@@ -266,11 +276,11 @@ After obtaining a satisfactory model design and hyper-parameters, we use all tra
 ```{.python .input  n=8}
 net = get_net(ctx)
 net.hybridize()
-train(net, train_valid_data, None, num_epochs, lr, wd, ctx, lr_period,
+train(net, train_valid_iter, None, num_epochs, lr, wd, ctx, lr_period,
       lr_decay)
 
 preds = []
-for data, label in test_data:
+for data, label in test_iter:
     output_features = net.features(data.as_in_context(ctx))
     output = nd.softmax(net.output_new(output_features))
     preds.extend(output.asnumpy())
@@ -290,7 +300,7 @@ After executing the above code, we will generate a "submission.csv" file. The fo
 * We can use a model pre-trained on the ImageNet data set to extract features and only train a small custom output network. This will allow us to classify a subset of the ImageNet data set with lower computing and storage overhead.
 
 
-## Problems
+## Exercises
 
 * When using the entire Kaggle data set, what kind of results do you get when you increase the `batch_size` (batch size) and `num_epochs` (number of epochs)?
 * Do you get better results if you use a deeper pre-trained model?
@@ -300,6 +310,6 @@ After executing the above code, we will generate a "submission.csv" file. The fo
 
 [1] Kaggle ImageNet Dog Breed Identification website. https://www.kaggle.com/c/dog-breed-identification
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2451)
 
-<div id="discuss" topic_id="2451"></div>
+![](../img/qr_kaggle-gluon-dog.svg)

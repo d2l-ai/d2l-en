@@ -1,4 +1,4 @@
-# Subword embedding (fastText)
+# Subword Embedding (fastText)
 
 English words usually have internal structures and formation methods. For example, we can deduce the relationship between "dog", "dogs", and "dogcatcher" by their spelling. All these words have the same root, "dog", but they use different suffixes to change the meaning of the word. Moreover, this association can be extended to other words. For example, the relationship between "dog" and "dogs" is just like the relationship between "cat" and "cats". The relationship between "boy" and "boyfriend" is just like the relationship between "girl" and "girlfriend". This characteristic is not unique to English. In French and Spanish, a lot of verbs can have more than 40 different forms depending on the context. In Finnish, a noun may have more than 15 forms. In fact, morphology, which is an important branch of linguistics, studies the internal structure and formation of words.
 
@@ -23,7 +23,7 @@ The rest of the fastText process is consistent with the skip-gram model, so it i
 * Subword embedding utilizes the principles of morphology, which usually improves the quality of representations of uncommon words.
 
 
-## Problems
+## Exercises
 
 * When there are too many subwords (for example, 6 words in English result in about $3\times 10^8$ combinations), what problems arise? Can you think of any methods to solve them? Hint: Refer to the end of section 3.2 of the fastText paper[1].
 * How can you design a subword embedding model based on the continuous bag-of-words model?
@@ -35,6 +35,6 @@ The rest of the fastText process is consistent with the skip-gram model, so it i
 
 [1] Bojanowski, P., Grave, E., Joulin, A., & Mikolov, T. (2016). Enriching word vectors with subword information. arXiv preprint arXiv:1607.04606.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2388)
 
-<div id="discuss" topic_id="2388"></div>
+![](../img/qr_fasttext.svg)

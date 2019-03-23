@@ -43,7 +43,7 @@ As we can see, nothing really changed. Only once we provide the network with som
 
 ```{.python .input}
 x = nd.random.uniform(shape=(2, 20))
-net(x)            # Forward computation.
+net(x)  # Forward computation
 
 net.collect_params()
 ```
@@ -52,13 +52,13 @@ The main difference to before is that as soon as we knew the input dimensionalit
 
 ## Deferred Initialization in Practice
 
-Now that we know how it works in theory, let's see when the initialization is actually triggered. In order to do so, we mock up an initializer which does nothing but report a debug message stating when it was invoked and with which paramers.
+Now that we know how it works in theory, let's see when the initialization is actually triggered. In order to do so, we mock up an initializer which does nothing but report a debug message stating when it was invoked and with which parameters.
 
 ```{.python .input  n=22}
 class MyInit(init.Initializer):
     def _init_weight(self, name, data):
         print('Init', name, data.shape)
-        # The actual initialization logic is omitted here.
+        # The actual initialization logic is omitted here
 
 net = getnet()
 net.initialize(init=MyInit())
@@ -86,7 +86,7 @@ As mentioned at the beginning of this section, deferred initialization can also 
 Deferred initialization does not occur if the system knows the shape of all parameters when calling the `initialize` function. This can occur in two cases:
 
 * We've already seen some data and we just want to reset the parameters.
-* We specificed all input and output dimensions of the network when defining it.
+* We specified all input and output dimensions of the network when defining it.
 
 The first case works just fine, as illustrated below.
 
@@ -111,12 +111,12 @@ net.initialize(init=MyInit())
 * Initialization can be repeated (or forced) by setting the `force_reinit=True` flag.
 
 
-## Problems
+## Exercises
 
 1. What happens if you specify only parts of the input dimensions. Do you still get immediate initialization?
 1. What happens if you specify mismatching dimensions?
 1. What would you need to do if you have input of varying dimensionality? Hint - look at parameter tying.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2327)
 
-<div id="discuss" topic_id="2327"></div>
+![](../img/qr_deferred-init.svg)

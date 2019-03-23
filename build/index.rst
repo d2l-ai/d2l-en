@@ -5,11 +5,19 @@ Dive into Deep Learning
    :file: frontpage.html
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
-   chapter_introduction/index
+   chapter_preface/preface
+   chapter_install/install
+
+.. toctree::
+   :maxdepth: 2
+   :numbered:
+
+   chapter_introduction/intro
    chapter_crashcourse/index
-   chapter_deep-learning-basics/index
+   chapter_linear-networks/index
+   chapter_multilayer-perceptrons/index
    chapter_deep-learning-computation/index
    chapter_convolutional-neural-networks/index
    chapter_recurrent-neural-networks/index

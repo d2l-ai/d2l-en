@@ -1,4 +1,4 @@
-# Linear algebra
+# Linear Algebra
 
 Now that you can store and manipulate data,
 let's briefly review the subset of basic linear algebra
@@ -7,7 +7,7 @@ We'll introduce all the basic concepts,
 the corresponding mathematical notation,
 and their realization in code all in one place.
 If you're already confident in your basic linear algebra,
-feel free to skim or skip this chapter.
+feel free to skim through or skip this chapter.
 
 ```{.python .input}
 from mxnet import nd
@@ -24,7 +24,7 @@ If you wanted to convert this value to Celsius (using metric system's more sensi
 you'd evaluate the expression $c = (f - 32) * 5/9$ setting $f$ to $52$.
 In this equation, each of the terms $32$, $5$, and $9$ is a scalar value.
 The placeholders $c$ and $f$ that we use are called variables
-and they stand in for unknown scalar values.
+and they represent unknown scalar values.
 
 In mathematical notation, we represent scalars with ordinary lower cased letters ($x$, $y$, $z$).
 We also denote the space of all scalars as $\mathcal{R}$.
@@ -46,7 +46,7 @@ print('x / y = ', x / y)
 print('x ** y = ', nd.power(x,y))
 ```
 
-We can convert any NDArray to a Python float by calling its `asscalar` method. Note that this is typically a bad idea. While you are doing this, NDArray has to stop doing anything else in order to hand the result and the process control back to Python. And unfortunately isn't very good at doing things in parallel. So avoid sprinkling this operation liberally throughout your code or your networks will take a long time to train.
+We can convert any NDArray to a Python float by calling its `asscalar` method. Note that this is typically a bad idea. While you are doing this, NDArray has to stop doing anything else in order to hand the result and the process control back to Python. And unfortunately Python isn't very good at doing things in parallel. So avoid sprinkling this operation liberally throughout your code or your networks will take a long time to train.
 
 ```{.python .input}
 x.asscalar()
@@ -62,7 +62,7 @@ For example, if we're studying the risk that loans default,
 we might associate each applicant with a vector
 whose components correspond to their income,
 length of employment, number of previous defaults, etc.
-If we were studying the risk of heart attack in hospital patients,
+If we were studying the risk of heart attacks hospital patients potentially face,
 we might represent each patient with a vector
 whose components capture their most recent vital signs,
 cholesterol levels, minutes of exercise per day, etc.
@@ -88,7 +88,7 @@ x[3]
 ## Length, dimensionality and shape
 
 Let's revisit some concepts from the previous section. A vector is just an array of numbers. And just as every array has a length, so does every vector.
-In math notation, if we want to say that a vector $x$ consists of $n$ real-valued scalars,
+In math notation, if we want to say that a vector $\mathbf{x}$ consists of $n$ real-valued scalars,
 we can express this as $\mathbf{x} \in \mathcal{R}^n$.
 The length of a vector is commonly called its $dimension$.
 As with an ordinary Python array, we can access the length of an NDArray
@@ -107,7 +107,7 @@ Some use the *dimensionality* of a vector to refer to its length (the number of 
 However some use the word *dimensionality* to refer to the number of axes that an array has.
 In this sense, a scalar *would have* $0$ dimensions and a vector *would have* $1$ dimension.
 
-**To avoid confusion, when we say *2D* array or *3D* array, we mean an array with 2 or 3 axes repespectively. But if we say *$n$-dimensional* vector, we mean a vector of length $n$.**
+**To avoid confusion, when we say *2D* array or *3D* array, we mean an array with 2 or 3 axes respectively. But if we say *$n$-dimensional* vector, we mean a vector of length $n$.**
 
 ```{.python .input}
 a = 2
@@ -158,7 +158,7 @@ print(A.T)
 
 Just as vectors generalize scalars, and matrices generalize vectors, we can actually build data structures with even more axes. Tensors give us a generic way of discussing arrays with an arbitrary number of axes. Vectors, for example, are first-order tensors, and matrices are second-order tensors.
 
-Using tensors will become more important when we start working with images, which arrive as 3D data structures, with axes corresponding to the height, width, and the three (RGB) color channels. But in this chapter, we're going to skip past and make sure you know the basics.
+Using tensors will become more important when we start working with images, which arrive as 3D data structures, with axes corresponding to the height, width, and the three (RGB) color channels. But in this chapter, we're going to skip this part and make sure you know the basics.
 
 ```{.python .input}
 X = nd.arange(24).reshape((2, 3, 4))
@@ -224,7 +224,7 @@ print(nd.sum(A) / A.size)
 
 ## Dot products
 
-So far, we've only performed element-wise operations, sums and averages. And if this was we could do, linear algebra probably wouldn't deserve it's own chapter. However, one of the most fundamental operations is the dot product. Given two vectors $\mathbf{u}$ and $\mathbf{v}$, the dot product $\mathbf{u}^T \mathbf{v}$ is a sum over the products of the corresponding elements: $\mathbf{u}^T \mathbf{v} = \sum_{i=1}^{d} u_i \cdot v_i$.
+So far, we've only performed element-wise operations, sums and averages. And if this was all we could do, linear algebra probably wouldn't deserve its own chapter. However, one of the most fundamental operations is the dot product. Given two vectors $\mathbf{u}$ and $\mathbf{v}$, the dot product $\mathbf{u}^T \mathbf{v}$ is a sum over the products of the corresponding elements: $\mathbf{u}^T \mathbf{v} = \sum_{i=1}^{d} u_i \cdot v_i$.
 
 ```{.python .input}
 x = nd.arange(4)
@@ -232,7 +232,7 @@ y = nd.ones(4)
 print(x, y, nd.dot(x, y))
 ```
 
-Note that we can express the dot product of two vectors ``nd.dot(u, v)`` equivalently by performing an element-wise multiplication and then a sum:
+Note that we can express the dot product of two vectors ``nd.dot(x, y)`` equivalently by performing an element-wise multiplication and then a sum:
 
 ```{.python .input}
 nd.sum(x * y)
@@ -260,10 +260,10 @@ We can visualize the matrix in terms of its row vectors
 
 $$A=
 \begin{pmatrix}
-\cdots & \mathbf{a}^T_{1} &...  \\
-\cdots & \mathbf{a}^T_{2} & \cdots \\
- & \vdots &  \\
- \cdots &\mathbf{a}^T_n & \cdots \\
+\mathbf{a}^T_{1} \\
+\mathbf{a}^T_{2} \\
+\vdots \\
+\mathbf{a}^T_n \\
 \end{pmatrix},$$
 
 where each $\mathbf{a}^T_{i} \in \mathbb{R}^{m}$
@@ -273,10 +273,10 @@ Then the matrix vector product $\mathbf{y} = A\mathbf{x}$ is simply a column vec
 
 $$A\mathbf{x}=
 \begin{pmatrix}
-\cdots & \mathbf{a}^T_{1} &...  \\
-\cdots & \mathbf{a}^T_{2} & \cdots \\
- & \vdots &  \\
- \cdots &\mathbf{a}^T_n & \cdots \\
+\mathbf{a}^T_{1}  \\
+\mathbf{a}^T_{2}  \\
+ \vdots  \\
+\mathbf{a}^T_n \\
 \end{pmatrix}
 \begin{pmatrix}
  x_{1}  \\
@@ -292,11 +292,11 @@ $$A\mathbf{x}=
 \end{pmatrix}
 $$
 
-So you can think of multiplication by a matrix $A\in \mathbb{R}^{m \times n}$ as a transformation that projects vectors from $\mathbb{R}^{m}$ to $\mathbb{R}^{n}$.
+So you can think of multiplication by a matrix $A\in \mathbb{R}^{n \times m}$ as a transformation that projects vectors from $\mathbb{R}^{m}$ to $\mathbb{R}^{n}$.
 
 These transformations turn out to be quite useful. For example, we can represent rotations as multiplications by a square matrix. As we'll see in subsequent chapters, we can also use matrix-vector products to describe the calculations of each layer in a neural network.
 
-Expressing matrix-vector products in code with ``ndarray``, we use the same ``nd.dot()`` function as for dot products. When we call ``nd.dot(A, x)`` with a matrix ``A`` and a vector ``x``, ``MXNet`` knows to perform a matrix-vector product. Note that the column dimension of ``A`` must be the same as the dimension of ``x``.
+Expressing matrix-vector products in code with ``ndarray``, we use the same ``nd.dot()`` function as for dot products. When we call ``nd.dot(A, x)`` with a matrix ``A`` and a vector ``x``, MXNet knows to perform a matrix-vector product. Note that the column dimension of ``A`` must be the same as the dimension of ``x``.
 
 ```{.python .input}
 nd.dot(A, x)
@@ -325,15 +325,13 @@ To produce the matrix product $C = AB$, it's easiest to think of $A$ in terms of
 
 $$A=
 \begin{pmatrix}
-\cdots & \mathbf{a}^T_{1} &...  \\
-\cdots & \mathbf{a}^T_{2} & \cdots \\
- & \vdots &  \\
- \cdots &\mathbf{a}^T_n & \cdots \\
+\mathbf{a}^T_{1} \\
+\mathbf{a}^T_{2} \\
+\vdots \\
+\mathbf{a}^T_n \\
 \end{pmatrix},
 \quad B=\begin{pmatrix}
-\vdots & \vdots &  & \vdots \\
  \mathbf{b}_{1} & \mathbf{b}_{2} & \cdots & \mathbf{b}_{m} \\
- \vdots & \vdots &  &\vdots\\
 \end{pmatrix}.
 $$
 
@@ -342,15 +340,13 @@ Note here that each row vector $\mathbf{a}^T_{i}$ lies in $\mathbb{R}^k$ and tha
 Then to produce the matrix product $C \in \mathbb{R}^{n \times m}$ we simply compute each entry $c_{ij}$ as the dot product $\mathbf{a}^T_i \mathbf{b}_j$.
 
 $$C = AB = \begin{pmatrix}
-\cdots & \mathbf{a}^T_{1} &...  \\
-\cdots & \mathbf{a}^T_{2} & \cdots \\
- & \vdots &  \\
- \cdots &\mathbf{a}^T_n & \cdots \\
+\mathbf{a}^T_{1} \\
+\mathbf{a}^T_{2} \\
+\vdots \\
+\mathbf{a}^T_n \\
 \end{pmatrix}
 \begin{pmatrix}
-\vdots & \vdots &  & \vdots \\
  \mathbf{b}_{1} & \mathbf{b}_{2} & \cdots & \mathbf{b}_{m} \\
- \vdots & \vdots &  &\vdots\\
 \end{pmatrix}
 = \begin{pmatrix}
 \mathbf{a}^T_{1} \mathbf{b}_1 & \mathbf{a}^T_{1}\mathbf{b}_2& \cdots & \mathbf{a}^T_{1} \mathbf{b}_m \\
@@ -360,7 +356,7 @@ $$C = AB = \begin{pmatrix}
 \end{pmatrix}
 $$
 
-You can think of the matrix-matrix multiplication $AB$ as simply performing $m$ matrix-vector products and stitching the results together to form an $n \times m$ matrix. Just as with ordinary dot products and matrix-vector products, we can compute matrix-matrix products in ``MXNet`` by using ``nd.dot()``.
+You can think of the matrix-matrix multiplication $AB$ as simply performing $m$ matrix-vector products and stitching the results together to form an $n \times m$ matrix. Just as with ordinary dot products and matrix-vector products, we can compute matrix-matrix products in MXNet by using ``nd.dot()``.
 
 ```{.python .input}
 B = nd.ones(shape=(4, 3))
@@ -379,10 +375,11 @@ For example, we would represent the norm of a vector $\mathbf{x}$
 or matrix $A$ as $\|\mathbf{x}\|$ or $\|A\|$, respectively.
 
 All norms must satisfy a handful of properties:
+
 1. $\|\alpha A\| = |\alpha| \|A\|$
-2. $\|A + B\| \leq \|A\| + \|B\|$
-3. $\|A\| \geq 0$
-4. If $\forall {i,j}, a_{ij} = 0$, then $\|A\|=0$
+1. $\|A + B\| \leq \|A\| + \|B\|$
+1. $\|A\| \geq 0$
+1. If $\forall {i,j}, a_{ij} = 0$, then $\|A\|=0$
 
 To put it in words, the first rule says
 that if we scale all the components of a matrix or vector
@@ -390,7 +387,7 @@ by a constant factor $\alpha$,
 its norm also scales by the *absolute value*
 of the same constant factor.
 The second rule is the familiar triangle inequality.
-The third rule simple says that the norm must be non-negative.
+The third rule simply says that the norm must be non-negative.
 That makes sense, in most contexts the smallest *size* for anything is 0.
 The final rule basically says that the smallest norm is achieved by a matrix or vector consisting of all zeros.
 It's possible to define a norm that gives zero norm to nonzero matrices,
@@ -439,8 +436,8 @@ to implement a number of many practically useful models
 and you can always circle back when you want to learn more.
 
 But there's a lot more to linear algebra, even as concerns machine learning.
-At some point, if you plan to make a career of machine learning,
-you'll need to know more than we've covered so far.
+At some point, if you plan to make a career in machine learning,
+you'll need to know more than what we've covered so far.
 In the rest of this chapter, we introduce some useful, more advanced concepts.
 
 
@@ -467,18 +464,20 @@ Here are the conditions that make a vector space:
 There are a number of special matrices that we will use throughout this tutorial. Let's look at them in a bit of detail:
 
 * **Symmetric Matrix** These are matrices where the entries below and above the diagonal are the same. In other words, we have that $M^\top = M$. An example of such matrices are those that describe pairwise distances, i.e. $M_{ij} = \|x_i - x_j\|$. Likewise, the Facebook friendship graph can be written as a symmetric matrix where $M_{ij} = 1$ if $i$ and $j$ are friends and $M_{ij} = 0$ if they are not. Note that the *Twitter* graph is asymmetric - $M_{ij} = 1$, i.e. $i$ following $j$ does not imply that $M_{ji} = 1$, i.e. $j$ following $i$.
-* **Antisymmetric Matrix** These matrices satisfy $M^\top = -M$. Note that any arbitrary matrix can always be decomposed into a symmetric and into an antisymmetric matrix by using $M = \frac{1}{2}(M + M^\top) + \frac{1}{2}(M - M^\top)$.
+* **Antisymmetric Matrix** These matrices satisfy $M^\top = -M$. Note that any square matrix can always be decomposed into a symmetric and into an antisymmetric matrix by using $M = \frac{1}{2}(M + M^\top) + \frac{1}{2}(M - M^\top)$.
 * **Diagonally Dominant Matrix** These are matrices where the off-diagonal elements are small relative to the main diagonal elements. In particular we have that $M_{ii} \geq \sum_{j \neq i} M_{ij}$ and $M_{ii} \geq \sum_{j \neq i} M_{ji}$. If a matrix has this property, we can often approximate $M$ by its diagonal. This is often expressed as $\mathrm{diag}(M)$.
 * **Positive Definite Matrix** These are matrices that have the nice property where $x^\top M x > 0$ whenever $x \neq 0$. Intuitively, they are a generalization of the squared norm of a vector $\|x\|^2 = x^\top x$. It is easy to check that whenever $M = A^\top A$, this holds since there $x^\top M x = x^\top A^\top A x = \|A x\|^2$. There is a somewhat more profound theorem which states that all positive definite matrices can be written in this form.
 
-## Conclusions
+
+## Summary
 
 In just a few pages (or one Jupyter notebook) we've taught you all the linear algebra you'll need to understand a good chunk of neural networks. Of course there's a *lot* more to linear algebra. And a lot of that math *is* useful for machine learning. For example, matrices can be decomposed into factors, and these decompositions can reveal low-dimensional structure in real-world datasets. There are entire subfields of machine learning that focus on using matrix decompositions and their generalizations to high-order tensors to discover structure in datasets and solve prediction problems. But this book focuses on deep learning. And we believe you'll be much more inclined to learn more mathematics once you've gotten your hands dirty deploying useful machine learning models on real datasets. So while we reserve the right to introduce more math much later on, we'll wrap up this chapter here.
 
 If you're eager to learn more about linear algebra, here are some of our favorite resources on the topic
+
 * For a solid primer on basics, check out Gilbert Strang's book [Introduction to Linear Algebra](http://math.mit.edu/~gs/linearalgebra/)
-* Zico Kolter's [Linear Algebra Reivew and Reference](http://www.cs.cmu.edu/~zkolter/course/15-884/linalg-review.pdf)
+* Zico Kolter's [Linear Algebra Review and Reference](http://www.cs.cmu.edu/~zkolter/course/15-884/linalg-review.pdf)
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2317)
 
-<div id="discuss" topic_id="2317"></div>
+![](../img/qr_linear-algebra.svg)

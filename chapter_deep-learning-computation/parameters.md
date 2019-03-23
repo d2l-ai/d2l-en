@@ -15,10 +15,10 @@ from mxnet.gluon import nn
 net = nn.Sequential()
 net.add(nn.Dense(256, activation='relu'))
 net.add(nn.Dense(10))
-net.initialize()  # Use the default initialization method.
+net.initialize()  # Use the default initialization method
 
 x = nd.random.uniform(shape=(2, 20))
-net(x)            # Forward computation.
+net(x)  # Forward computation
 ```
 
 ## Parameter Access
@@ -41,7 +41,7 @@ print(net[1].bias)
 print(net[1].bias.data())
 ```
 
-The first returns the bias of the second layer. Sine this is an object containing data, gradients, and additional information, we need to request the data explicitly. Note that the bias is all 0 since we initialized the bias to contain all zeros. Note that we can also access the parameters by name, such as `dense0_weight`. This is possible since each layer comes with its own parameter dictionary that can be accessed directly. Both methods are entirely equivalent but the first method leads to much more readable code.
+The first returns the bias of the second layer. Since this is an object containing data, gradients, and additional information, we need to request the data explicitly. Note that the bias is all 0 since we initialized the bias to contain all zeros. Note that we can also access the parameters by name, such as `dense0_weight`. This is possible since each layer comes with its own parameter dictionary that can be accessed directly. Both methods are entirely equivalent but the first method leads to much more readable code.
 
 ```{.python .input  n=4}
 print(net[0].params['dense0_weight'])
@@ -124,8 +124,8 @@ Now that we know how to access the parameters, let's look at how to initialize t
 Let's begin with the built-in initializers. The code below initializes all parameters with Gaussian random variables.
 
 ```{.python .input  n=9}
-# force_reinit ensures that the variables are initialized again, regardless of whether they were
-# already initialized previously.
+# force_reinit ensures that the variables are initialized again, regardless of
+# whether they were already initialized previously
 net.initialize(init=init.Normal(sigma=0.01), force_reinit=True)
 net[0].weight.data()[0]
 ```
@@ -185,7 +185,8 @@ In some cases, we want to share model parameters across multiple layers. For ins
 
 ```{.python .input  n=14}
 net = nn.Sequential()
-# we need to give the shared layer a name such that we can reference its parameters
+# We need to give the shared layer a name such that we can reference its
+# parameters
 shared = nn.Dense(8, activation='relu')
 net.add(nn.Dense(8, activation='relu'),
         shared,
@@ -199,11 +200,12 @@ net(x)
 # Check whether the parameters are the same
 print(net[1].weight.data()[0] == net[2].weight.data()[0])
 net[1].weight.data()[0,0] = 100
-# And make sure that they're actually the same object rather than just having the same value.
+# Make sure that they're actually the same object rather than just having the
+# same value
 print(net[1].weight.data()[0] == net[2].weight.data()[0])
 ```
 
-The above exampe shows that the parameters of the second and third layer are tied. They are identical rather than just being equal. That is, by changing one of the parameters the other one changes, too. What happens to the gradients is quite ingenious. Since the model parameters contain gradients, the gradients of the second hidden layer and the third hidden layer are accumulated in the `shared.params.grad( )` during backpropagation.
+The above example shows that the parameters of the second and third layer are tied. They are identical rather than just being equal. That is, by changing one of the parameters the other one changes, too. What happens to the gradients is quite ingenious. Since the model parameters contain gradients, the gradients of the second hidden layer and the third hidden layer are accumulated in the `shared.params.grad( )` during backpropagation.
 
 ## Summary
 
@@ -212,7 +214,7 @@ The above exampe shows that the parameters of the second and third layer are tie
 * Gluon has a sophisticated mechanism for accessing parameters in a unique and hierarchical manner.
 
 
-## Problems
+## Exercises
 
 1. Use the FancyMLP definition of the [previous section](model-construction.md) and access the parameters of the various layers.
 1. Look at the [MXNet documentation](http://beta.mxnet.io/api/gluon-related/mxnet.initializer.html) and explore different initializers.
@@ -220,6 +222,6 @@ The above exampe shows that the parameters of the second and third layer are tie
 1. Construct a multilayer perceptron containing a shared parameter layer and train it. During the training process, observe the model parameters and gradients of each layer.
 1. Why is sharing parameters a good idea?
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2326)
 
-<div id="discuss" topic_id="2326"></div>
+![](../img/qr_parameters.svg)

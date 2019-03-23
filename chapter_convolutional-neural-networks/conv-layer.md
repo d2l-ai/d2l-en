@@ -23,7 +23,8 @@ Note that the output size is *smaller* than the input. In particular, the output
 from mxnet import autograd, nd
 from mxnet.gluon import nn
 
-def corr2d(X, K):  # This function has been saved in the gluonbook package for future use.
+# This function has been saved in the d2l package for future use
+def corr2d(X, K):
     h, w = K.shape
     Y = nd.zeros((X.shape[0] - h + 1, X.shape[1] - w + 1))
     for i in range(Y.shape[0]):
@@ -93,12 +94,14 @@ Designing an edge detector by finite differences `[1, -1]` is neat if we know wh
 We previously constructed the `Conv2D` class. However, since we used single-element assignments, Gluon has some trouble finding the gradient. Instead, we use the built-in `Conv2D` class provided by Gluon below.
 
 ```{.python .input  n=83}
-# Construct a convolutional layer with 1 output channel (channels will be introduced in the following section) and a kernel array shape of (1, 2).
+# Construct a convolutional layer with 1 output channel (channels will be
+# introduced in the following section) and a kernel array shape of (1, 2)
 conv2d = nn.Conv2D(1, kernel_size=(1, 2))
 conv2d.initialize()
 
-# The two-dimensional convolutional layer uses four-dimensional input and output in the format of (example channel, height, width), where the batch size (number of examples in the batch) and
-# the number of channels are both 1.
+# The two-dimensional convolutional layer uses four-dimensional input and
+# output in the format of (example channel, height, width), where the batch
+# size (number of examples in the batch) and the number of channels are both 1
 X = X.reshape((1, 1, 6, 8))
 Y = Y.reshape((1, 1, 6, 7))
 
@@ -107,7 +110,7 @@ for i in range(10):
         Y_hat = conv2d(X)
         l = (Y_hat - Y) ** 2
     l.backward()
-    # For the sake of simplicity, we ignore the bias here.
+    # For the sake of simplicity, we ignore the bias here
     conv2d.weight.data()[:] -= 3e-2 * conv2d.weight.grad()
     if (i + 1) % 2 == 0:
         print('batch %d, loss %.3f' % (i + 1, l.sum().asscalar()))
@@ -123,7 +126,7 @@ We find that the kernel array we learned is very close to the kernel array `K` w
 
 ## Cross-correlation and Convolution
 
-Recall the observation from the previous section that cross-correlation and convolution are equivalent. In the figure above it is easy to see this correspondence. Simply flip the kernel from the bottom left to the top right. In this case the indexing in the sum is reverted, yet the same result can be obtained. In keeping with standard terminology with deep learning literature we will continue to refer to the cross-correlation operation as a convolution even though it is stricly speaking something slightly different.
+Recall the observation from the previous section that cross-correlation and convolution are equivalent. In the figure above it is easy to see this correspondence. Simply flip the kernel from the bottom left to the top right. In this case the indexing in the sum is reverted, yet the same result can be obtained. In keeping with standard terminology with deep learning literature we will continue to refer to the cross-correlation operation as a convolution even though it is strictly speaking something slightly different.
 
 ## Summary
 
@@ -131,7 +134,7 @@ Recall the observation from the previous section that cross-correlation and conv
 * We can design a kernel to detect edges in images.
 * We can learn the kernel through data.
 
-## Problems
+## Exercises
 
 1. Construct an image `X` with diagonal edges.
     * What happens if you apply the kernel `K` to it?
@@ -145,6 +148,6 @@ Recall the observation from the previous section that cross-correlation and conv
     * What is the kernel for an integral?
     * What is the minimum size of a kernel to obtain a derivative of degree $d$?
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2349)
 
-<div id="discuss" topic_id="2349"></div>
+![](../img/qr_conv-layer.svg)

@@ -4,7 +4,7 @@ In this chapter we introduce convolutional neural networks. They are
 the first nontrivial *architecture* beyond the humble multilayer
 perceptron. In their design scientists used inspiration from biology,
 group theory, and lots of experimentation to achieve stunning results
-in object reognition, segmentation, image synthesis and related
+in object recognition, segmentation, image synthesis and related
 computer vision tasks. 'Convnets', as they are often called, have
 become a cornerstone for deep learning research. Their applications
 reach beyond images to audio, text, video, time series analysis,
@@ -26,7 +26,7 @@ Over time the networks have increased in depth significantly,
 exceeding hundreds of layers. To train on them efficiently tools for
 capacity control, reparametrization and training acceleration are
 needed. Batch normalization and residual networks are both used to
-address these probems. We will describe them in this chapter.
+address these problems. We will describe them in this chapter.
 
 ```eval_rst
 

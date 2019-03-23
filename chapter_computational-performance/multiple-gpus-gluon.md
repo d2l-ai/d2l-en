@@ -1,11 +1,14 @@
-# Gluon Implementation for Multi-GPU Computation
+# Concise Implementation of Multi-GPU Computation
 
 In Gluon, we can conveniently use data parallelism to perform multi-GPU computation. For example, we do not need to implement the helper function to synchronize data among multiple GPUs, as described in the[“Multi-GPU Computation”](multiple-gpus.md) section, ourselves.
 
 First, import the required packages or modules for the experiment in this section. Running the programs in this section requires at least two GPUs.
 
 ```{.python .input  n=1}
-import gluonbook as gb
+import sys
+sys.path.insert(0, '..')
+
+import d2l
 import mxnet as mx
 from mxnet import autograd, gluon, init, nd
 from mxnet.gluon import loss as gloss, nn, utils as gutils
@@ -17,19 +20,21 @@ import time
 In this section, we use ResNet-18 as a sample model. Since the input images in this section are original size (not enlarged), the model construction here is different from the ResNet-18 structure described in the [“ResNet”](../chapter_convolutional-neural-networks/resnet.md) section. This model uses a smaller convolution kernel, stride, and padding at the beginning and removes the maximum pooling layer.
 
 ```{.python .input  n=2}
-def resnet18(num_classes):  # This function is saved in the gluonbook package for future use.
+# This function is saved in the d2l package for future use
+def resnet18(num_classes):
     def resnet_block(num_channels, num_residuals, first_block=False):
         blk = nn.Sequential()
         for i in range(num_residuals):
             if i == 0 and not first_block:
-                blk.add(gb.Residual(
+                blk.add(d2l.Residual(
                     num_channels, use_1x1conv=True, strides=2))
             else:
-                blk.add(gb.Residual(num_channels))
+                blk.add(d2l.Residual(num_channels))
         return blk
 
     net = nn.Sequential()
-    # This model uses a smaller convolution kernel, stride, and padding and removes the maximum pooling layer.
+    # This model uses a smaller convolution kernel, stride, and padding and
+    # removes the maximum pooling layer
     net.add(nn.Conv2D(64, kernel_size=3, strides=1, padding=1),
             nn.BatchNorm(), nn.Activation('relu'))
     net.add(resnet_block(64, 2, first_block=True),
@@ -75,7 +80,7 @@ When we use multiple GPUs to train the model, the `Trainer` instance will automa
 
 ```{.python .input  n=7}
 def train(num_gpus, batch_size, lr):
-    train_iter, test_iter = gb.load_data_fashion_mnist(batch_size)
+    train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
     ctx = [mx.gpu(i) for i in range(num_gpus)]
     print('running on:', ctx)
     net.initialize(init=init.Normal(sigma=0.01), ctx=ctx, force_reinit=True)
@@ -95,8 +100,8 @@ def train(num_gpus, batch_size, lr):
             trainer.step(batch_size)
         nd.waitall()
         train_time = time.time() - start
-        test_acc = gb.evaluate_accuracy(test_iter, net, ctx[0])
-        print('epoch %d, training time: %.1f sec, test_acc %.2f' % (
+        test_acc = d2l.evaluate_accuracy(test_iter, net, ctx[0])
+        print('epoch %d, time: %.1f sec, test acc %.2f' % (
             epoch + 1, train_time, test_acc))
 ```
 
@@ -116,11 +121,11 @@ train(num_gpus=2, batch_size=512, lr=0.2)
 
 * In Gluon, we can conveniently perform multi-GPU computations, such as initializing model parameters and training models on multiple GPUs.
 
-## Problems
+## Exercises
 
 * This section uses ResNet-18. Try different epochs, batch sizes, and learning rates. Use more GPUs for computation if conditions permit.
 * Sometimes, different devices provide different computing power. Some can use CPUs and GPUs at the same time, or GPUs of different models. How should we divide mini-batches among different CPUs or GPUs?
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2384)
 
-<div id="discuss" topic_id="2384"></div>
+![](../img/qr_multiple-gpus-gluon.svg)

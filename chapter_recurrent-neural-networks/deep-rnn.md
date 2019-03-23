@@ -32,10 +32,10 @@ Just as with multilayer perceptrons, the number of hidden layers $L$ and number 
 * In deep recurrent neural networks, hidden state information is continuously passed to the next time step of the current layer and the next layer of the current time step.
 
 
-## Problems
+## Exercises
 
 * Alter the model in the ["Implementation of a Recurrent Neural Network from Scratch"](rnn-scratch.md) section to create a recurrent neural network with two hidden layers. Observe and analyze the experimental phenomena.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2369)
 
-<div id="discuss" topic_id="2369"></div>
+![](../img/qr_deep-rnn.svg)

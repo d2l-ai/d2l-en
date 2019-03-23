@@ -13,7 +13,10 @@ Figure 9.16 shows the information on the competition's webpage. In order to subm
 First, import the packages or modules required for the competition.
 
 ```{.python .input  n=1}
-import gluonbook as gb
+import sys
+sys.path.insert(0, '..')
+
+import d2l
 from mxnet import autograd, gluon, init
 from mxnet.gluon import data as gdata, loss as gloss, nn
 import os
@@ -42,7 +45,8 @@ The training data set "train.7z" and the test data set "test.7z" need to be unzi
 To make it easier to get started, we provide a small-scale sample of the data set mentioned above. "train_tiny.zip" contains 100 training examples, while "test_tiny.zip" contains only one test example. Their unzipped folder names are "train_tiny" and "test_tiny", respectively. In addition, unzip the zip file of the training data set labels to obtain the file "trainlabels.csv". If you are going to use the full data set of the Kaggle competition, you will also need to change the following `demo` variable to `False`.
 
 ```{.python .input  n=2}
-# If you use the full data set downloaded for the Kaggle competition, change the demo variable to False.
+# If you use the full data set downloaded for the Kaggle competition, change
+# the demo variable to False
 demo = True
 if demo:
     import zipfile
@@ -58,7 +62,7 @@ We need to organize data sets to facilitate model training and testing. The foll
 ```{.python .input  n=3}
 def read_label_file(data_dir, label_file, train_dir, valid_ratio):
     with open(os.path.join(data_dir, label_file), 'r') as f:
-        # Skip the file header line (column name).
+        # Skip the file header line (column name)
         lines = f.readlines()[1:]
         tokens = [l.rstrip().split(',') for l in lines]
         idx_label = dict(((int(idx), label) for idx, label in tokens))
@@ -72,7 +76,8 @@ def read_label_file(data_dir, label_file, train_dir, valid_ratio):
 Below we define a helper function to create a path only if the path does not already exist.
 
 ```{.python .input  n=4}
-def mkdir_if_not_exist(path):  # This function is saved in the gluonbook package for future use.
+ # This function has been saved in the d2l package for future use
+def mkdir_if_not_exist(path):
     if not os.path.exists(os.path.join(*path)):
         os.makedirs(os.path.join(*path))
 ```
@@ -126,8 +131,9 @@ We use only 100 training example and one test example here. The folder names for
 
 ```{.python .input  n=8}
 if demo:
-    # Note: Here, we use small training sets and small testing sets and the batch size should be set smaller. When using the complete data set for the Kaggle competition,
-    # the batch size can be set to a large integer.
+    # Note: Here, we use small training sets and small testing sets and the
+    # batch size should be set smaller. When using the complete data set for
+    # the Kaggle competition, the batch size can be set to a large integer
     train_dir, test_dir, batch_size = 'train_tiny', 'test_tiny', 1
 else:
     train_dir, test_dir, batch_size = 'train', 'test', 128
@@ -143,15 +149,17 @@ To cope with overfitting, we use image augmentation. For example, by adding `tra
 
 ```{.python .input  n=9}
 transform_train = gdata.vision.transforms.Compose([
-    # Magnify the image to a square of 40 pixels in both height and width.
+    # Magnify the image to a square of 40 pixels in both height and width
     gdata.vision.transforms.Resize(40),
-    # Randomly crop a square image of 40 pixels in both height and width to produce a small square of 0.64 to 1 times the area of the original image,
-    # and then shrink it to a square of 32 pixels in both height and width.
+    # Randomly crop a square image of 40 pixels in both height and width to
+    # produce a small square of 0.64 to 1 times the area of the original
+    # image, and then shrink it to a square of 32 pixels in both height and
+    # width
     gdata.vision.transforms.RandomResizedCrop(32, scale=(0.64, 1.0),
                                               ratio=(1.0, 1.0)),
     gdata.vision.transforms.RandomFlipLeftRight(),
     gdata.vision.transforms.ToTensor(),
-    # Normalize each channel of the image.
+    # Normalize each channel of the image
     gdata.vision.transforms.Normalize([0.4914, 0.4822, 0.4465],
                                       [0.2023, 0.1994, 0.2010])])
 ```
@@ -170,7 +178,8 @@ transform_test = gdata.vision.transforms.Compose([
 Next, we can create the `ImageFolderDataset` instance to read the organized data set containing the original image files, where each data instance includes the image and label.
 
 ```{.python .input  n=10}
-# Read the original image file. Flag=1 indicates that the input image has three channels (color).
+# Read the original image file. Flag=1 indicates that the input image has
+# three channels (color)
 train_ds = gdata.vision.ImageFolderDataset(
     os.path.join(data_dir, input_dir, 'train'), flag=1)
 valid_ds = gdata.vision.ImageFolderDataset(
@@ -184,13 +193,13 @@ test_ds = gdata.vision.ImageFolderDataset(
 We specify the defined image augmentation operation in `DataLoader`. During training, we only use the validation set to evaluate the model, so we need to ensure the certainty of the output. During prediction, we will train the model on the combined training set and validation set to make full use of all labelled data.
 
 ```{.python .input}
-train_data = gdata.DataLoader(train_ds.transform_first(transform_train),
+train_iter = gdata.DataLoader(train_ds.transform_first(transform_train),
                               batch_size, shuffle=True, last_batch='keep')
-valid_data = gdata.DataLoader(valid_ds.transform_first(transform_test),
+valid_iter = gdata.DataLoader(valid_ds.transform_first(transform_test),
                               batch_size, shuffle=True, last_batch='keep')
-train_valid_data = gdata.DataLoader(train_valid_ds.transform_first(
+train_valid_iter = gdata.DataLoader(train_valid_ds.transform_first(
     transform_train), batch_size, shuffle=True, last_batch='keep')
-test_data = gdata.DataLoader(test_ds.transform_first(transform_test),
+test_iter = gdata.DataLoader(test_ds.transform_first(transform_test),
                              batch_size, shuffle=False, last_batch='keep')
 ```
 
@@ -263,33 +272,33 @@ loss = gloss.SoftmaxCrossEntropyLoss()
 We will select the model and tune hyper-parameters according to the model's performance on the validation set. Next, we define the model training function `train`. We record the training time of each epoch, which helps us compare the time costs of different models.
 
 ```{.python .input  n=12}
-def train(net, train_data, valid_data, num_epochs, lr, wd, ctx, lr_period,
+def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
           lr_decay):
     trainer = gluon.Trainer(net.collect_params(), 'sgd',
                             {'learning_rate': lr, 'momentum': 0.9, 'wd': wd})
     for epoch in range(num_epochs):
-        train_l, train_acc, start = 0.0, 0.0, time.time()
+        train_l_sum, train_acc_sum, n, start = 0.0, 0.0, 0, time.time()
         if epoch > 0 and epoch % lr_period == 0:
             trainer.set_learning_rate(trainer.learning_rate * lr_decay)
-        for X, y in train_data:
+        for X, y in train_iter:
             y = y.astype('float32').as_in_context(ctx)
             with autograd.record():
                 y_hat = net(X.as_in_context(ctx))
-                l = loss(y_hat, y)
+                l = loss(y_hat, y).sum()
             l.backward()
             trainer.step(batch_size)
-            train_l += l.mean().asscalar()
-            train_acc += gb.accuracy(y_hat, y)
+            train_l_sum += l.asscalar()
+            train_acc_sum += (y_hat.argmax(axis=1) == y).sum().asscalar()
+            n += y.size
         time_s = "time %.2f sec" % (time.time() - start)
-        if valid_data is not None:
-            valid_acc = gb.evaluate_accuracy(valid_data, net, ctx)
+        if valid_iter is not None:
+            valid_acc = d2l.evaluate_accuracy(valid_iter, net, ctx)
             epoch_s = ("epoch %d, loss %f, train acc %f, valid acc %f, "
-                       % (epoch + 1, train_l / len(train_data),
-                          train_acc / len(train_data), valid_acc))
+                       % (epoch + 1, train_l_sum / n, train_acc_sum / n,
+                       valid_acc))
         else:
             epoch_s = ("epoch %d, loss %f, train acc %f, " %
-                       (epoch + 1, train_l / len(train_data),
-                        train_acc / len(train_data)))
+                       (epoch + 1, train_l_sum / n, train_acc_sum / n))
         print(epoch_s + time_s + ', lr ' + str(trainer.learning_rate))
 ```
 
@@ -298,10 +307,10 @@ def train(net, train_data, valid_data, num_epochs, lr, wd, ctx, lr_period,
 Now, we can train and validate the model. The following hyper-parameters can be tuned. For example, we can increase the number of epochs. Because `lr_period` and `lr_decay` are set to 80 and 0.1 respectively, the learning rate of the optimization algorithm will be multiplied by 0.1 after every 80 epochs. For simplicity, we only train one epoch here.
 
 ```{.python .input  n=13}
-ctx, num_epochs, lr, wd = gb.try_gpu(), 1, 0.1, 5e-4
+ctx, num_epochs, lr, wd = d2l.try_gpu(), 1, 0.1, 5e-4
 lr_period, lr_decay, net = 80, 0.1, get_net(ctx)
 net.hybridize()
-train(net, train_data, valid_data, num_epochs, lr, wd, ctx, lr_period,
+train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
       lr_decay)
 ```
 
@@ -312,10 +321,10 @@ After obtaining a satisfactory model design and hyper-parameters, we use all tra
 ```{.python .input  n=14}
 net, preds = get_net(ctx), []
 net.hybridize()
-train(net, train_valid_data, None, num_epochs, lr, wd, ctx, lr_period,
+train(net, train_valid_iter, None, num_epochs, lr, wd, ctx, lr_period,
       lr_decay)
 
-for X, _ in test_data:
+for X, _ in test_iter:
     y_hat = net(X.as_in_context(ctx))
     preds.extend(y_hat.argmax(axis=1).astype(int).asnumpy())
 sorted_ids = list(range(1, len(test_ds) + 1))
@@ -333,12 +342,12 @@ After executing the above code, we will get a "submission.csv" file. The format 
 * We can use convolutional neural networks, image augmentation, and hybrid programming to take part in an image classification competition.
 
 
-## Problems
+## Exercises
 
 * Use the complete CIFAF-10 data set for the Kaggle competition. Change the `batch_size` and number of epochs `num_epochs` to 128 and 100, respectively.  See what accuracy and ranking you can achieve in this competition.
 * What accuracy can you achieve when not using image augmentation?
 * Scan the QR code to access the relevant discussions and exchange ideas about the methods used and the results obtained with the community. Can you come up with any better techniques?
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2450)
 
-<div id="discuss" topic_id="2450"></div>
+![](../img/qr_kaggle-gluon-cifar10.svg)

@@ -14,13 +14,17 @@ The figure below shows an example of a two-dimensional cross-correlation computa
 Let's implement cross-correlation operations with multiple input channels. We simply need to perform a cross-correlation operation for each channel, and then add them up using the `add_n` function.
 
 ```{.python .input  n=1}
-import gluonbook as gb
+import sys
+sys.path.insert(0, '..')
+
+import d2l
 from mxnet import nd
 
 def corr2d_multi_in(X, K):
-    # First, traverse along the 0th dimension (channel dimension) of X and K. Then, add them together by using * to turn
-    # the result list into a positional argument of the add_n function.
-    return nd.add_n(*[gb.corr2d(x, k) for x, k in zip(X, K)])
+    # First, traverse along the 0th dimension (channel dimension) of X and K.
+    # Then, add them together by using * to turn the result list into a
+    # positional argument of the add_n function
+    return nd.add_n(*[d2l.corr2d(x, k) for x, k in zip(X, K)])
 ```
 
 We can construct the input array `X` and the kernel array `K` of the above diagram to validate the output of the cross-correlation operation.
@@ -41,7 +45,9 @@ We implement a cross-correlation function to calculate the output of multiple ch
 
 ```{.python .input  n=3}
 def corr2d_multi_in_out(X, K):
-    # Traverse along the 0th dimension of K, and each time, perform cross-correlation operations with input X. All of the results are merged together using the stack function.
+    # Traverse along the 0th dimension of K, and each time, perform
+    # cross-correlation operations with input X. All of the results are merged
+    # together using the stack function
     return nd.stack(*[corr2d_multi_in(X, k) for k in K])
 ```
 
@@ -74,7 +80,7 @@ def corr2d_multi_in_out_1x1(X, K):
     c_o = K.shape[0]
     X = X.reshape((c_i, h * w))
     K = K.reshape((c_o, c_i))
-    Y = nd.dot(K, X)  # Matrix multiplication in the fully connected layer.
+    Y = nd.dot(K, X)  # Matrix multiplication in the fully connected layer
     return Y.reshape((c_o, h, w))
 ```
 
@@ -97,7 +103,7 @@ Y2 = corr2d_multi_in_out(X, K)
 * The $1\times 1$ convolutional layer is typically used to adjust the number of channels between network layers and to control model complexity.
 
 
-## Problems
+## Exercises
 
 1. Assume that we have two convolutional kernels of size $k_1$ and $k_2$ respectively (with no nonlinearity in between).
     * Prove that the result of the operation can be expressed by a single convolution.
@@ -113,6 +119,6 @@ Y2 = corr2d_multi_in_out(X, K)
 1. Are the variables `Y1` and `Y2` in the last example of this section exactly the same? Why?
 1. How would you implement convolutions using matrix multiplication when the convolution window is not $1\times 1$?
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2351)
 
-<div id="discuss" topic_id="2351"></div>
+![](../img/qr_channels.svg)

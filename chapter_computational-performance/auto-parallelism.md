@@ -7,7 +7,10 @@ Typically, a single operator will use all the computational resources on all CPU
 First, import the required packages or modules for experiment in this section. Note that we need at least one GPU to run the experiment in this section.
 
 ```{.python .input}
-import gluonbook as gb
+import sys
+sys.path.insert(0, '..')
+
+import d2l
 import mxnet as mx
 from mxnet import nd
 ```
@@ -31,15 +34,15 @@ x_gpu = nd.random.uniform(shape=(6000, 6000), ctx=mx.gpu(0))
 Then, use the two NDArrays to run the `run` function on both the CPU and GPU and print the time required.
 
 ```{.python .input}
-run(x_cpu)  # Warm-up begins.
+run(x_cpu)  # Warm-up begins
 run(x_gpu)
-nd.waitall()  # Warm-up ends.
+nd.waitall()  # Warm-up ends
 
-with gb.Benchmark('Run on CPU.'):
+with d2l.Benchmark('Run on CPU.'):
     run(x_cpu)
     nd.waitall()
 
-with gb.Benchmark('Then run on GPU.'):
+with d2l.Benchmark('Then run on GPU.'):
     run(x_gpu)
     nd.waitall()
 ```
@@ -47,7 +50,7 @@ with gb.Benchmark('Then run on GPU.'):
 We remove `nd.waitall()` between the two computing tasks `run(x_cpu)` and `run(x_gpu)` and hope the system can automatically parallel these two tasks.
 
 ```{.python .input}
-with gb.Benchmark('Run on both CPU and GPU in parallel.'):
+with d2l.Benchmark('Run on both CPU and GPU in parallel.'):
     run(x_cpu)
     run(x_gpu)
     nd.waitall()
@@ -64,11 +67,11 @@ In computations that use both the CPU and GPU, we often need to copy data betwee
 def copy_to_cpu(x):
     return [y.copyto(mx.cpu()) for y in x]
 
-with gb.Benchmark('Run on GPU.'):
+with d2l.Benchmark('Run on GPU.'):
     y = run(x_gpu)
     nd.waitall()
 
-with gb.Benchmark('Then copy to CPU.'):
+with d2l.Benchmark('Then copy to CPU.'):
     copy_to_cpu(y)
     nd.waitall()
 ```
@@ -76,7 +79,7 @@ with gb.Benchmark('Then copy to CPU.'):
 We remove the `waitall` function between computation and communication and print the total time need to complete both tasks.
 
 ```{.python .input}
-with gb.Benchmark('Run and copy in parallel.'):
+with d2l.Benchmark('Run and copy in parallel.'):
     y = run(x_gpu)
     copy_to_cpu(y)
     nd.waitall()
@@ -89,12 +92,12 @@ As we can see, the total time required to perform computation and communication 
 * MXNet can improve computing performance through automatic parallel computation, such as parallel computation using the CPU and GPU and the parallelization of computation and communication.
 
 
-## Problems
+## Exercises
 
 * 10 operations were performed in the `run` function defined in this section. There are no dependencies between them. Design an experiment to see if MXNet will automatically execute them in parallel.
 * Designing computation tasks that include more complex data dependencies, and run experiments to see if MXNet can obtain the correct results and improve computing performance.
 * When the computational load of an operator is small enough, parallel computation on only the CPU or a single GPU may also improve the computing performance. Design an experiment to verify this.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2382)
 
-<div id="discuss" topic_id="2382"></div>
+![](../img/qr_auto-parallelism.svg)

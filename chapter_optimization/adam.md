@@ -23,9 +23,9 @@ $$\hat{\boldsymbol{s}}_t \leftarrow \frac{\boldsymbol{s}_t}{1 - \beta_2^t}. $$
 
 Next, the Adam algorithm will use the bias-corrected variables $\hat{\boldsymbol{v}}_t$ and $\hat{\boldsymbol{s}}_t$ from above to re-adjust the learning rate of each element in the model parameters using element operations.
 
-$$\boldsymbol{g}_t' \leftarrow \frac{\eta \hat{\boldsymbol{v}}_t}{\sqrt{\hat{\boldsymbol{s}}_t + \epsilon}},$$
+$$\boldsymbol{g}_t' \leftarrow \frac{\eta \hat{\boldsymbol{v}}_t}{\sqrt{\hat{\boldsymbol{s}}_t} + \epsilon},$$
 
-Here, $eta$ is the learning rate while $\epsilon$ is a constant added to maintain numerical stability, such as $10^{-8}$. Just as for Adagrad, RMSProp, and Adadelta, each element in the independent variable of the objective function has its own learning rate. Finally, use $\boldsymbol{g}_t'$ to iterate the independent variable:
+Here, $\eta$ is the learning rate while $\epsilon$ is a constant added to maintain numerical stability, such as $10^{-8}$. Just as for Adagrad, RMSProp, and Adadelta, each element in the independent variable of the objective function has its own learning rate. Finally, use $\boldsymbol{g}_t'$ to iterate the independent variable:
 
 $$\boldsymbol{x}_t \leftarrow \boldsymbol{x}_{t-1} - \boldsymbol{g}_t'. $$
 
@@ -34,11 +34,14 @@ $$\boldsymbol{x}_t \leftarrow \boldsymbol{x}_{t-1} - \boldsymbol{g}_t'. $$
 We use the formula from the algorithm to implement Adam. Here, time step $t$ uses `hyperparams` to input parameters to the `adam` function.
 
 ```{.python .input  n=2}
+import sys
+sys.path.insert(0, '..')
+
 %matplotlib inline
-import gluonbook as gb
+import d2l
 from mxnet import nd
 
-features, labels = gb.get_data_ch7()
+features, labels = d2l.get_data_ch7()
 
 def init_adam_states():
     v_w, v_b = nd.zeros((features.shape[1], 1)), nd.zeros(1)
@@ -59,15 +62,16 @@ def adam(params, states, hyperparams):
 Use Adam to train the model with a learning rate of $0.01$.
 
 ```{.python .input  n=5}
-gb.train_ch7(adam, init_adam_states(), {'lr': 0.01, 't': 1}, features, labels)
+d2l.train_ch7(adam, init_adam_states(), {'lr': 0.01, 't': 1}, features,
+              labels)
 ```
 
-## Implementation with Gluon
+## Concise Implementation
 
 From the `Trainer` instance of the algorithm named "adam", we can implement Adam with Gluon.
 
 ```{.python .input  n=11}
-gb.train_gluon_ch7('adam', {'learning_rate': 0.01}, features, labels)
+d2l.train_gluon_ch7('adam', {'learning_rate': 0.01}, features, labels)
 ```
 
 ## Summary
@@ -75,7 +79,7 @@ gb.train_gluon_ch7('adam', {'learning_rate': 0.01}, features, labels)
 * Created on the basis of RMSProp, Adam also uses EWMA on the mini-batch stochastic gradient
 * Adam uses bias correction.
 
-## Problems
+## Exercises
 
 * Adjust the learning rate and observe and analyze the experimental results.
 * Some people say that Adam is a combination of RMSProp and momentum. Why do you think they say this?
@@ -87,6 +91,6 @@ gb.train_gluon_ch7('adam', {'learning_rate': 0.01}, features, labels)
 
 [1] Kingma, D. P., & Ba, J. (2014). Adam: A method for stochastic optimization. arXiv preprint arXiv:1412.6980.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2378)
 
-<div id="discuss" topic_id="2378"></div>
+![](../img/qr_adam.svg)

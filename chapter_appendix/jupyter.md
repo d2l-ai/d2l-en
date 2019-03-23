@@ -5,38 +5,38 @@ This section describes how to edit and run the code in this book using Jupyter N
 
 ## Edit and Run the Code in This Book Locally
 
-Now we describe how to use Jupyter Notebook to edit and run code of the book locally. Suppose that the local path of code of the book is "xx/yy/d2l-en-1.0/". Change directory to this path in command mode (`cd xx/yy/d2l-en-1.0`), then run command `jupyter notebook`. Now open http://localhost:8888 (usually automatically opened) in the browser, and you will see the interface of Jupyter Notebook and all the folders containing code of the book, as shown in Figure 11.1.
+Now we describe how to use Jupyter Notebook to edit and run code of the book locally. Suppose that the local path of code of the book is "xx/yy/d2l-en-1.0/". Change directory to this path in command mode (`cd xx/yy/d2l-en-1.0`), then run command `jupyter notebook`. Now open http://localhost:8888 (usually automatically opened) in the browser, and you will see the interface of Jupyter Notebook and all the folders containing code of the book, as shown in Figure 12.1.
 
 ![The folders containing the code in this book. ](../img/jupyter00.png)
 
 
 You can access the notebook files by clicking on the folder displayed on the webpage. They usually have the suffix "ipynb".
-For the sake of brevity, we create a temporary "test.ipynb" file, and the content displayed after you click it is as shown in Figure 11.2. This notebook includes a markdown cell and code cell. The content in the markdown cell includes "This is A Title" and "This is text".   The code cell contains two lines of Python code.
+For the sake of brevity, we create a temporary "test.ipynb" file, and the content displayed after you click it is as shown in Figure 12.2. This notebook includes a markdown cell and code cell. The content in the markdown cell includes "This is A Title" and "This is text".   The code cell contains two lines of Python code.
 
 ![Markdown and code cells in the "text.ipynb" file. ](../img/jupyter01.png)
 
 
-Double click on the markdown cell, to enter edit mode. Add a new text string "Hello world." at the end of the cell, as shown in Figure 11.3.
+Double click on the markdown cell, to enter edit mode. Add a new text string "Hello world." at the end of the cell, as shown in Figure 12.3.
 
 ![Edit the markdown cell. ](../img/jupyter02.png)
 
 
-As shown in Figure 11.4, click "Cell" $\rightarrow$ "Run Cells" in the menu bar to run the edited cell.
+As shown in Figure 12.4, click "Cell" $\rightarrow$ "Run Cells" in the menu bar to run the edited cell.
 
 ![Run the cell. ](../img/jupyter03.png)
 
 
-After running, the markdown cell is as shown in Figure 11.5.
+After running, the markdown cell is as shown in Figure 12.5.
 
 ![The markdown cell after editing. ](../img/jupyter04.png)
 
 
-Next, click on the code cell. Add the multiply by 2 operation `* 2` after the last line of code, as shown in Figure 11.6.
+Next, click on the code cell. Add the multiply by 2 operation `* 2` after the last line of code, as shown in Figure 12.6.
 
 ![Edit the code cell. ](../img/jupyter05.png)
 
 
-You can also run the cell with a shortcut ("Ctrl + Enter" by default) and obtain the output result from Figure 11.7.
+You can also run the cell with a shortcut ("Ctrl + Enter" by default) and obtain the output result from Figure 12.7.
 
 ![Run the code cell to obtain the output. ](../img/jupyter06.png)
 
@@ -53,7 +53,7 @@ Below are some advanced options for using Jupyter Notebook. You can use this sec
 If you wish to contribute to the content of this book, you need to modify the source file (.md file, not .ipynb file) in the markdown format on GitHub. With the notedown plugin, we can use Jupyter Notebook to modify and run the source code in markdown format. Linux/MacOS users can execute the following commands to obtain the GitHub source files and activate the runtime environment.
 
 ```
-git clone https://github.com/diveintodeeplearning/d2l-en.git
+git clone https://github.com/d2l-ai/d2l-en.git
 cd d2l-en
 conda env create -f environment.yml
 source activate gluon # Windows users run "activate gluon"
@@ -107,10 +107,10 @@ jupyter nbextension enable execute_time/ExecuteTime
 
 * You can edit and run the code in this book using Jupyter Notebook.
 
-## Problem
+## Exercise
 
 * Try to edit and run the code in this book locally.
 
-## Discuss on our Forum
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2398)
 
-<div id="discuss" topic_id="2398"></div>
+![](../img/qr_jupyter.svg)
