@@ -1,7 +1,3 @@
-```{.python .input}
-print("yo")
-```
-
 # Naive Bayes Classification
 
 Before we worry about complex optimization algorithms or GPUs, we can already deploy your first classifier, relying only on simple statistical estimators and our understanding of conditional independence. Learning is all about making assumptions. If we want to classify a new data point that we've never seen before we have to make some assumptions about which data points are *similar* to each other. 
