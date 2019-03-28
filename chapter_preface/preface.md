@@ -236,7 +236,7 @@ future editions of this book will be able to provide insights in places the pres
 
 Most of the code in this book is based on Apache MXNet.
 MXNet is an open-source framework for deep learning
-and the preferred choice of AWS (Amazon Cloud Services),
+and the preferred choice of AWS (Amazon Web Services),
 as well as many colleges and companies.
 All of the code in this book has passed tests under MXNet 1.2.0.
 However, due to the rapid development of deep learning,
