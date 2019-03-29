@@ -104,7 +104,7 @@ def get_net():
 loss = gluon.loss.L2Loss()
 ```
 
-We kept the architecture fairly simple. A few layers of a fully connected network, ReLu activation and $\ell_2$ loss. Now we are ready to train.
+We kept the architecture fairly simple. A few layers of a fully connected network, ReLU activation and $\ell_2$ loss. Now we are ready to train.
 
 ```{.python .input}
 # Simple optimizer using adam, random shuffle and minibatch size 16
