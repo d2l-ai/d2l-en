@@ -2,11 +2,11 @@
 
 Now that you can store and manipulate data,
 let's briefly review the subset of basic linear algebra
-that you'll need to understand most of the models.
-We'll introduce all the basic concepts,
+that you will need to understand most of the models.
+We will introduce all the basic concepts,
 the corresponding mathematical notation,
 and their realization in code all in one place.
-If you're already confident in your basic linear algebra,
+If you are already confident in your basic linear algebra,
 feel free to skim through or skip this chapter.
 
 ```{.python .input}
@@ -16,19 +16,19 @@ from mxnet import nd
 ## Scalars
 
 If you never studied linear algebra or machine learning,
-you're probably used to working with one number at a time.
+you are probably used to working with one number at a time.
 And know how to do basic things like add them together or multiply them.
 For example, in Palo Alto, the temperature is $52$ degrees Fahrenheit.
 Formally, we call these values $scalars$.
 If you wanted to convert this value to Celsius (using metric system's more sensible unit of temperature measurement),
-you'd evaluate the expression $c = (f - 32) * 5/9$ setting $f$ to $52$.
+you would evaluate the expression $c = (f - 32) * 5/9$ setting $f$ to $52$.
 In this equation, each of the terms $32$, $5$, and $9$ is a scalar value.
 The placeholders $c$ and $f$ that we use are called variables
 and they represent unknown scalar values.
 
-In mathematical notation, we represent scalars with ordinary lower cased letters ($x$, $y$, $z$).
+In mathematical notation, we represent scalars with ordinary lower-cased letters ($x$, $y$, $z$).
 We also denote the space of all scalars as $\mathcal{R}$.
-For expedience, we're going to punt a bit on what precisely a space is,
+For expedience, we are going to punt a bit on what precisely a space is,
 but for now, remember that if you want to say that $x$ is a scalar,
 you can simply say $x \in \mathcal{R}$.
 The symbol $\in$ can be pronounced "in" and just denotes membership in a set.
@@ -46,7 +46,7 @@ print('x / y = ', x / y)
 print('x ** y = ', nd.power(x,y))
 ```
 
-We can convert any NDArray to a Python float by calling its `asscalar` method. Note that this is typically a bad idea. While you are doing this, NDArray has to stop doing anything else in order to hand the result and the process control back to Python. And unfortunately Python isn't very good at doing things in parallel. So avoid sprinkling this operation liberally throughout your code or your networks will take a long time to train.
+We can convert any NDArray to a Python float by calling its `asscalar` method. Note that this is typically a bad idea. While you are doing this, NDArray has to stop doing anything else in order to hand the result and the process control back to Python. And unfortunately Python is not very good at doing things in parallel. So avoid sprinkling this operation liberally throughout your code or your networks will take a long time to train.
 
 ```{.python .input}
 x.asscalar()
@@ -57,8 +57,8 @@ x.asscalar()
 You can think of a vector as simply a list of numbers, for example ``[1.0,3.0,4.0,2.0]``.
 Each of the numbers in the vector consists of a single scalar value.
 We call these values the *entries* or *components* of the vector.
-Often, we're interested in vectors whose values hold some real-world significance.
-For example, if we're studying the risk that loans default,
+Often, we are interested in vectors whose values hold some real-world significance.
+For example, if we are studying the risk that loans default,
 we might associate each applicant with a vector
 whose components correspond to their income,
 length of employment, number of previous defaults, etc.
@@ -66,7 +66,7 @@ If we were studying the risk of heart attacks hospital patients potentially face
 we might represent each patient with a vector
 whose components capture their most recent vital signs,
 cholesterol levels, minutes of exercise per day, etc.
-In math notation, we'll usually denote vectors as bold-faced,
+In math notation, we will usually denote vectors as bold-faced,
 lower-cased letters ($\mathbf{u}$, $\mathbf{v}$, $\mathbf{w})$.
 In MXNet, we work with vectors via 1D NDArrays with an arbitrary number of components.
 
@@ -78,7 +78,7 @@ print('x = ', x)
 We can refer to any element of a vector by using a subscript.
 For example, we can refer to the $4$th element of $\mathbf{u}$ by $u_4$.
 Note that the element $u_4$ is a scalar,
-so we don't bold-face the font when referring to it.
+so we do not bold-face the font when referring to it.
 In code, we access any element $i$ by indexing into the ``NDArray``.
 
 ```{.python .input}
@@ -168,7 +168,7 @@ print('X =', X)
 
 ## Basic properties of tensor arithmetic
 
-Scalars, vectors, matrices, and tensors of any order have some nice properties that we'll often rely on.
+Scalars, vectors, matrices, and tensors of any order have some nice properties that we will often rely on.
 For example, as you might have noticed from the definition of an element-wise operation,
 given operands with the same shape,
 the result of any element-wise operation is a tensor of that same shape.
@@ -188,7 +188,7 @@ print((a * x).shape)
 print((a * x + y).shape)
 ```
 
-Shape is not the the only property preserved under addition and multiplication by a scalar. These operations also preserve membership in a vector space. But we'll postpone this discussion for the second half of this chapter because it's not critical to getting your first models up and running.
+Shape is not the the only property preserved under addition and multiplication by a scalar. These operations also preserve membership in a vector space. But we will postpone this discussion for the second half of this chapter because it is not critical to getting your first models up and running.
 
 ## Sums and means
 
@@ -224,7 +224,7 @@ print(nd.sum(A) / A.size)
 
 ## Dot products
 
-So far, we've only performed element-wise operations, sums and averages. And if this was all we could do, linear algebra probably wouldn't deserve its own chapter. However, one of the most fundamental operations is the dot product. Given two vectors $\mathbf{u}$ and $\mathbf{v}$, the dot product $\mathbf{u}^T \mathbf{v}$ is a sum over the products of the corresponding elements: $\mathbf{u}^T \mathbf{v} = \sum_{i=1}^{d} u_i \cdot v_i$.
+So far, we have only performed element-wise operations, sums and averages. And if this was all we could do, linear algebra probably would not deserve its own chapter. However, one of the most fundamental operations is the dot product. Given two vectors $\mathbf{u}$ and $\mathbf{v}$, the dot product $\mathbf{u}^T \mathbf{v}$ is a sum over the products of the corresponding elements: $\mathbf{u}^T \mathbf{v} = \sum_{i=1}^{d} u_i \cdot v_i$.
 
 ```{.python .input}
 x = nd.arange(4)
@@ -238,7 +238,7 @@ Note that we can express the dot product of two vectors ``nd.dot(x, y)`` equival
 nd.sum(x * y)
 ```
 
-Dot products are useful in a wide range of contexts. For example, given a set of weights $\mathbf{w}$, the weighted sum of some values ${u}$ could be expressed as the dot product $\mathbf{u}^T \mathbf{w}$. When the weights are non-negative and sum to one $\left(\sum_{i=1}^{d} {w_i} = 1\right)$, the dot product expresses a *weighted average*. When two vectors each have length one (we'll discuss what *length* means below in the section on norms), dot products can also capture the cosine of the angle between them.
+Dot products are useful in a wide range of contexts. For example, given a set of weights $\mathbf{w}$, the weighted sum of some values ${u}$ could be expressed as the dot product $\mathbf{u}^T \mathbf{w}$. When the weights are non-negative and sum to one $\left(\sum_{i=1}^{d} {w_i} = 1\right)$, the dot product expresses a *weighted average*. When two vectors each have length one (we will discuss what *length* means below in the section on norms), dot products can also capture the cosine of the angle between them.
 
 ## Matrix-vector products
 
@@ -294,7 +294,7 @@ $$
 
 So you can think of multiplication by a matrix $A\in \mathbb{R}^{n \times m}$ as a transformation that projects vectors from $\mathbb{R}^{m}$ to $\mathbb{R}^{n}$.
 
-These transformations turn out to be quite useful. For example, we can represent rotations as multiplications by a square matrix. As we'll see in subsequent chapters, we can also use matrix-vector products to describe the calculations of each layer in a neural network.
+These transformations turn out to be remarkably useful. For example, we can represent rotations as multiplications by a square matrix. As we will see in subsequent chapters, we can also use matrix-vector products to describe the calculations of each layer in a neural network.
 
 Expressing matrix-vector products in code with ``ndarray``, we use the same ``nd.dot()`` function as for dot products. When we call ``nd.dot(A, x)`` with a matrix ``A`` and a vector ``x``, MXNet knows to perform a matrix-vector product. Note that the column dimension of ``A`` must be the same as the dimension of ``x``.
 
@@ -304,7 +304,7 @@ nd.dot(A, x)
 
 ## Matrix-matrix multiplication
 
-If you've gotten the hang of dot products and matrix-vector multiplication, then matrix-matrix multiplications should be pretty straightforward.
+If you have gotten the hang of dot products and matrix-vector multiplication, then matrix-matrix multiplications should be pretty straightforward.
 
 Say we have two matrices, $A \in \mathbb{R}^{n \times k}$ and $B \in \mathbb{R}^{k \times m}$:
 
@@ -366,7 +366,7 @@ nd.dot(A, B)
 ## Norms
 
 Before we can start implementing models,
-there's one last concept we're going to introduce.
+there is one last concept we are going to introduce.
 Some of the most useful operators in linear algebra are norms.
 Informally, they tell us how big a vector or matrix is.
 We represent norms with the notation $\|\cdot\|$.
@@ -390,16 +390,16 @@ The second rule is the familiar triangle inequality.
 The third rule simply says that the norm must be non-negative.
 That makes sense, in most contexts the smallest *size* for anything is 0.
 The final rule basically says that the smallest norm is achieved by a matrix or vector consisting of all zeros.
-It's possible to define a norm that gives zero norm to nonzero matrices,
-but you can't give nonzero norm to zero matrices.
-That's a mouthful, but if you digest it then you probably have grepped the important concepts here.
+It is possible to define a norm that gives zero norm to nonzero matrices,
+but you cannot give nonzero norm to zero matrices.
+That may seem like a mouthful, but if you digest it then you probably have grepped the important concepts here.
 
 If you remember Euclidean distances (think Pythagoras' theorem) from grade school,
 then non-negativity and the triangle inequality might ring a bell.
 You might notice that norms sound a lot like measures of distance.
 
 In fact, the Euclidean distance $\sqrt{x_1^2 + \cdots + x_n^2}$ is a norm.
-Specifically it's the $\ell_2$-norm.
+Specifically it is the $\ell_2$-norm.
 An analogous computation,
 performed over the entries of a matrix, e.g. $\sqrt{\sum_{i,j} a_{ij}^2}$,
 is called the Frobenius norm.
@@ -422,22 +422,22 @@ nd.sum(nd.abs(x))
 
 ## Norms and objectives
 
-While we don't want to get too far ahead of ourselves, we do want you to anticipate why these concepts are useful.
-In machine learning we're often trying to solve optimization problems: *Maximize* the probability assigned to observed data. *Minimize* the distance between predictions and the ground-truth observations. Assign vector representations to items (like words, products, or news articles) such that the distance between similar items is minimized, and the distance between dissimilar items is maximized. Oftentimes, these objectives, perhaps the most important component of a machine learning algorithm (besides the data itself), are expressed as norms.
+While we do not want to get too far ahead of ourselves, we do want you to anticipate why these concepts are useful.
+In machine learning we are often trying to solve optimization problems: *Maximize* the probability assigned to observed data. *Minimize* the distance between predictions and the ground-truth observations. Assign vector representations to items (like words, products, or news articles) such that the distance between similar items is minimized, and the distance between dissimilar items is maximized. Oftentimes, these objectives, perhaps the most important component of a machine learning algorithm (besides the data itself), are expressed as norms.
 
 
 ## Intermediate linear algebra
 
-If you've made it this far, and understand everything that we've covered,
+If you have made it this far, and understand everything that we have covered,
 then honestly, you *are* ready to begin modeling.
-If you're feeling antsy, this is a perfectly reasonable place to move on.
+If you are feeling antsy, this is a perfectly reasonable place to move on.
 You already know nearly all of the linear algebra required
 to implement a number of many practically useful models
 and you can always circle back when you want to learn more.
 
-But there's a lot more to linear algebra, even as concerns machine learning.
+But there is a lot more to linear algebra, even as concerns machine learning.
 At some point, if you plan to make a career in machine learning,
-you'll need to know more than what we've covered so far.
+you will need to know more than what we have covered so far.
 In the rest of this chapter, we introduce some useful, more advanced concepts.
 
 
@@ -471,9 +471,9 @@ There are a number of special matrices that we will use throughout this tutorial
 
 ## Summary
 
-In just a few pages (or one Jupyter notebook) we've taught you all the linear algebra you'll need to understand a good chunk of neural networks. Of course there's a *lot* more to linear algebra. And a lot of that math *is* useful for machine learning. For example, matrices can be decomposed into factors, and these decompositions can reveal low-dimensional structure in real-world datasets. There are entire subfields of machine learning that focus on using matrix decompositions and their generalizations to high-order tensors to discover structure in datasets and solve prediction problems. But this book focuses on deep learning. And we believe you'll be much more inclined to learn more mathematics once you've gotten your hands dirty deploying useful machine learning models on real datasets. So while we reserve the right to introduce more math much later on, we'll wrap up this chapter here.
+In just a few pages (or one Jupyter notebook) we have taught you all the linear algebra you will need to understand a good chunk of neural networks. Of course there is a *lot* more to linear algebra. And a lot of that math *is* useful for machine learning. For example, matrices can be decomposed into factors, and these decompositions can reveal low-dimensional structure in real-world datasets. There are entire subfields of machine learning that focus on using matrix decompositions and their generalizations to high-order tensors to discover structure in datasets and solve prediction problems. But this book focuses on deep learning. And we believe you will be much more inclined to learn more mathematics once you have gotten your hands dirty deploying useful machine learning models on real datasets. So while we reserve the right to introduce more math much later on, we will wrap up this chapter here.
 
-If you're eager to learn more about linear algebra, here are some of our favorite resources on the topic
+If you are eager to learn more about linear algebra, here are some of our favorite resources on the topic
 
 * For a solid primer on basics, check out Gilbert Strang's book [Introduction to Linear Algebra](http://math.mit.edu/~gs/linearalgebra/)
 * Zico Kolter's [Linear Algebra Review and Reference](http://www.cs.cmu.edu/~zkolter/course/15-884/linalg-review.pdf)
