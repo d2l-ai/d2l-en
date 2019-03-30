@@ -1,12 +1,11 @@
 # Data Manipulation
 
-It's impossible to get anything done if we can't manipulate data. Generally, there are two important things we need to do with data: (i) acquire it and (ii) process it once it's inside the computer. There's no point in acquiring data if we don't even know how to store it, so let's get our hands dirty first by playing with synthetic data. We'll start by introducing the NDArray,
-MXNet's primary tool for storing and transforming data. If you've worked with NumPy before, you'll notice that NDArrays are, by design, similar to NumPy's multi-dimensional array. However, they confer a few key advantages. First, NDArrays support asynchronous computation on CPU, GPU, and distributed cloud architectures. Second, they provide support for automatic differentiation. These properties make NDArray indispensable for deep learning.
+It is impossible to get anything done if we cannot manipulate data. Generally, there are two important things we need to do with data: (i) acquire it and (ii) process it once it is inside the computer. There is no point in acquiring data if we do not even know how to store it, so let's get our hands dirty first by playing with synthetic data. We will start by introducing the NDArray,
+MXNet's primary tool for storing and transforming data. If you have worked with NumPy before, you will notice that NDArrays are, by design, similar to NumPy's multi-dimensional array. However, they confer a few key advantages. First, NDArrays support asynchronous computation on CPU, GPU, and distributed cloud architectures. Second, they provide support for automatic differentiation. These properties make NDArray indispensable for deep learning.
 
 ## Getting Started
 
-Throughout this chapter, we're aiming to get you up and running with the basic functionality. Don't worry if you don't understand all of the basic math,
-like element-wise operations or normal distributions. In the next two chapters we'll take another pass at the same material, teaching the material in the context of practical examples. On the other hand, if you want to go deeper into the mathematical content, see the ["Math"](../chapter_appendix/math.md) section in the appendix.
+Throughout this chapter, we are aiming to get you up and running with the basic functionality. Do not worry if you do not understand all of the basic math, like element-wise operations or normal distributions. In the next two chapters we will take another pass at the same material, teaching the material in the context of practical examples. On the other hand, if you want to go deeper into the mathematical content, see the ["Math"](../chapter_appendix/math.md) section in the appendix.
 
 We begin by importing MXNet and the `ndarray` module from MXNet.
 Here, `nd` is short for `ndarray`.
@@ -17,7 +16,7 @@ from mxnet import nd
 ```
 
 
-NDArrays represent (possibly multi-dimensional) arrays of numerical values. NDArrays with one axis correspond (in math-speak) to *vectors*. NDArrays with two axes correspond to *matrices*. For arrays with more than two axes, mathematicians don't have special names---they simply call them *tensors*.
+NDArrays represent (possibly multi-dimensional) arrays of numerical values. NDArrays with one axis correspond (in math-speak) to *vectors*. NDArrays with two axes correspond to *matrices*. For arrays with more than two axes, mathematicians do not have special names---they simply call them *tensors*.
 
 The simplest object we can create is a vector. To start, we can use `arange` to create a row vector with 12 consecutive integers.
 
@@ -103,7 +102,7 @@ Many more operations can be applied element-wise, such as exponentiation:
 x.exp()
 ```
 
-In addition to computations by element, we can also perform matrix operations, like matrix multiplication using the `dot` function. Next, we will perform matrix multiplication of `x` and the transpose of `y`. We define `x` as a matrix of 3 rows and 4 columns, and `y` is transposed into a matrix of 4 rows and 3 columns. The two matrices are multiplied to obtain a matrix of 3 rows and 3 columns (if you're confused about what this means, don't worry - we will explain matrix operations in much more detail in the chapter on [linear algebra](linear-algebra.md)).
+In addition to computations by element, we can also perform matrix operations, like matrix multiplication using the `dot` function. Next, we will perform matrix multiplication of `x` and the transpose of `y`. We define `x` as a matrix of 3 rows and 4 columns, and `y` is transposed into a matrix of 4 rows and 3 columns. The two matrices are multiplied to obtain a matrix of 3 rows and 3 columns (if you are confused about what this means, do not worry - we will explain matrix operations in much more detail in the chapter on [linear algebra](linear-algebra.md)).
 
 ```{.python .input  n=13}
 x = nd.arange(12).reshape((3,4))
@@ -178,7 +177,7 @@ x
 
 ## Saving Memory
 
-In the previous example, every time we ran an operation, we allocated new memory to host its results. For example, if we write `y = x + y`, we will dereference the matrix that `y` used to point to and instead point it at the newly allocated memory. In the following example we demonstrate this with Python's `id()` function, which gives us the exact address of the referenced object in memory. After running `y = y + x`, we'll find that `id(y)` points to a different location. That's because Python first evaluates `y + x`, allocating new memory for the result and then subsequently redirects `y` to point at this new location in memory.
+In the previous example, every time we ran an operation, we allocated new memory to host its results. For example, if we write `y = x + y`, we will dereference the matrix that `y` used to point to and instead point it at the newly allocated memory. In the following example we demonstrate this with Python's `id()` function, which gives us the exact address of the referenced object in memory. After running `y = y + x`, we will find that `id(y)` points to a different location. That is because Python first evaluates `y + x`, allocating new memory for the result and then subsequently redirects `y` to point at this new location in memory.
 
 ```{.python .input  n=15}
 before = id(y)
@@ -186,7 +185,7 @@ y = y + x
 id(y) == before
 ```
 
-This might be undesirable for two reasons. First, we don't want to run around allocating memory unnecessarily all the time. In machine learning, we might have hundreds of megabytes of parameters and update all of them multiple times per second. Typically, we'll want to perform these updates *in place*. Second, we might point at the same parameters from multiple variables. If we don't update in place, this could cause a memory leak, making it possible for us to inadvertently reference stale parameters.
+This might be undesirable for two reasons. First, we do not want to run around allocating memory unnecessarily all the time. In machine learning, we might have hundreds of megabytes of parameters and update all of them multiple times per second. Typically, we will want to perform these updates *in place*. Second, we might point at the same parameters from multiple variables. If we do not update in place, this could cause a memory leak, making it possible for us to inadvertently reference stale parameters.
 
 Fortunately, performing in-place operations in MXNet is easy. We can assign the result of an operation to a previously allocated array with slice notation, e.g., `y[:] = <expression>`. To illustrate the behavior, we first clone the shape of a matrix using `zeros_like` to allocate a block of 0 entries.
 
@@ -215,7 +214,7 @@ id(x) == before
 
 ## Mutual Transformation of NDArray and NumPy
 
-Converting MXNet NDArrays to and from NumPy is easy. The converted arrays do *not* share memory. This minor inconvenience is actually quite important: when you perform operations on the CPU or one of the GPUs, you don't want MXNet having to wait whether NumPy might want to be doing something else with the same chunk of memory. The  `array` and `asnumpy` functions do the trick.
+Converting MXNet NDArrays to and from NumPy is easy. The converted arrays do *not* share memory. This minor inconvenience is actually quite important: when you perform operations on the CPU or one of the GPUs, you do not want MXNet having to wait whether NumPy might want to be doing something else with the same chunk of memory. The  `array` and `asnumpy` functions do the trick.
 
 ```{.python .input  n=22}
 import numpy as np
