@@ -146,7 +146,7 @@ pred_period, pred_len, prefixes = 40, 50, ['traveller', 'time traveller']
 
 We create a string of lyrics based on the currently trained model every 40 epochs.
 
-```{.python .input  n=6}
+```{.python .input}
 d2l.train_and_predict_rnn(gru, get_params, init_gru_state, num_hiddens,
                           vocab_size, ctx, corpus_indices, idx_to_char,
                           char_to_idx, False, num_epochs, num_steps, lr,
@@ -154,37 +154,17 @@ d2l.train_and_predict_rnn(gru, get_params, init_gru_state, num_hiddens,
                           prefixes)
 ```
 
-```{.json .output n=6}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "epoch 40, perplexity 7.663786, time 0.71 sec\n - traveller the time tre ce the time tre ce the time tre ce t\n - time traveller the time tre ce the time tre ce the time tre ce t\nepoch 80, perplexity 3.337684, time 0.72 sec\n - traveller.  'but you graced the precholess. 'ou cour i so a\n - time traveller.  'but you gractless of the travel to tome st as \nepoch 120, perplexity 1.402557, time 0.73 sec\n - traveller. 'f really that is just where whe have gree a mat\n - time traveller.  'it's against reason,' said filby.  'what reaso\nepoch 160, perplexity 1.114200, time 0.72 sec\n - traveller. 'f reyy celtrovel soll of ho ganklall redight an\n - time traveller. 'furty'  ' then there is the future,' said the t\n"
- }
-]
-```
-
 ## Concise Implementation
 
 In Gluon, we can directly call the `GRU` class in the `rnn` module.
 
-```{.python .input  n=7}
+```{.python .input  n=6}
 gru_layer = rnn.GRU(num_hiddens)
 model = d2l.RNNModel(gru_layer, vocab_size)
 d2l.train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
                                 corpus_indices, idx_to_char, char_to_idx,
                                 num_epochs, num_steps, lr, clipping_theta,
                                 batch_size, pred_period, pred_len, prefixes)
-```
-
-```{.json .output n=7}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "epoch 40, perplexity 7.809901, time 0.40 sec\n - traveller and the and the and the and the and the and the a\n - time traveller and the and the and the and the and the and the a\nepoch 80, perplexity 3.650538, time 0.42 sec\n - traveller conca it the time traveller conccine we have expe\n - time traveller conccine we have expesing to vey concuptercectime\nepoch 120, perplexity 1.553798, time 0.42 sec\n - traveller care passimant of the bermar exist he parsemutte \n - time traveller came passigriok beich he vege of space, his his o\nepoch 160, perplexity 1.146737, time 0.41 sec\n - traveller, with a slight accession of cheerfulness. 'really\n - time traveller held in his hand was a glittering metallic framew\n"
- }
-]
 ```
 
 ## Summary
