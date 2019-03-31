@@ -1,6 +1,9 @@
 # Gated Recurrent Units (GRU)
 
-In the previous section we discussed how gradients are calculated in a recurrent neural network. In particular we found that long products of 
+In the previous section we discussed how gradients are calculated in a recurrent neural network. In particular we found that long products of matrices can lead to vanishing or divergent gradients. Let's briefly think about what such gradient anomalies mean in practice:
+
+* **Divergent Gradient**
+* **Vanishing Gradient**
 
 In the previous section, we discussed gradient calculation methods in recurrent neural networks. We found that, when the number of time steps is large or the time step is small, the gradients in recurrent neural networks are prone to vanishing or explosion. Although gradient clipping can cope with gradient explosion, it cannot solve the vanishing gradient problem. Therefore, it is generally quite difficult to capture dependencies for time series with large time step distances during the actual use of recurrent neural networks.
 
