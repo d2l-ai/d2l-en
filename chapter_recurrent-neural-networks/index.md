@@ -44,10 +44,6 @@ LSTMs and GRUs, described later in this chapter.
 
 rnn-gluon
 bptt
-gru
-lstm
-deep-rnn
-bi-rnn
 
 ```eval_rst
 
@@ -59,4 +55,8 @@ bi-rnn
    rnn
    lang-model-dataset
    rnn-scratch
+   gru
+   lstm
+   deep-rnn
+   bi-rnn
 ```
