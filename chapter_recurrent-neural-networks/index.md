@@ -40,9 +40,9 @@ design of recurrent neural networks. Next, we describe the gradient
 calculation method in recurrent neural networks to explore problems
 that may be encountered in recurrent neural network training. For some
 of these problems, we can use gated recurrent neural networks, such as
-LSTMs and GRUs, described later in this chapter. 
+LSTMs and GRUs, described later in this chapter.
 
-```eval_rst
+```{.python .input .eval_rst}
 
 .. toctree::
    :maxdepth: 2
