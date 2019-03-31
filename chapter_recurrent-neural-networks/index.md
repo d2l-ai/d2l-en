@@ -42,6 +42,15 @@ that may be encountered in recurrent neural network training. For some
 of these problems, we can use gated recurrent neural networks, such as
 LSTMs and GRUs, described later in this chapter.
 
+   rnn-scratch
+   rnn-gluon
+   bptt
+   gru
+   lstm
+   deep-rnn
+   bi-rnn
+
+
 ```eval_rst
 
 .. toctree::
@@ -53,11 +62,3 @@ LSTMs and GRUs, described later in this chapter.
    lang-model-dataset
 ```
    
-   rnn-scratch
-   rnn-gluon
-   bptt
-   gru
-   lstm
-   deep-rnn
-   bi-rnn
-
