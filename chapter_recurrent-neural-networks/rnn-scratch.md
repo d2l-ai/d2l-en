@@ -1,6 +1,6 @@
 # Implementation of Recurrent Neural Networks from Scratch
 
-In this section, we will implement a language model from scratch. It is based on a character-level recurrent neural network that is trained on H. G. Wells' 'The Time Machine'. As before, we start by reading the dataset first.
+In this section we implement a language model from scratch. It is based on a character-level recurrent neural network trained on H. G. Wells' 'The Time Machine'. As before, we start by reading the dataset first.
 
 ```{.python .input  n=1}
 import sys
@@ -12,8 +12,8 @@ from mxnet import autograd, nd
 from mxnet.gluon import loss as gloss
 import time
 
-(corpus_indices, char_to_idx, idx_to_char, vocab_size) = \
-    d2l.load_data_time_machine()
+(corpus_indices, char_to_idx, idx_to_char,
+ vocab_size) = d2l.load_data_time_machine()
 ```
 
 ## One-hot Encoding
@@ -23,6 +23,8 @@ One-hot encoding vectors provide an easy way to express words as vectors in orde
 ```{.python .input  n=2}
 nd.one_hot(nd.array([0, 2]), vocab_size)
 ```
+
+Note that one-hot encodings are just a convenient way of separating the encoding (e.g. mapping the character `a` to $(1,0,0, \ldots) vector)$ from the embedding (i.e. multiplying the encoded vectors by some weight matrix $\mathbf{W}). This simplifies the code greatly relative to storing an embedding matrix that the user needs to maintain. 
 
 The shape of the mini-batch we sample each time is (batch size, time step). The following function transforms such mini-batches into a number of matrices with the shape of (batch size, dictionary size) that can be entered into the network. The total number of vectors is equal to the number of time steps. That is, the input of time step $t$ is $\boldsymbol{X}_t \in \mathbb{R}^{n \times d}$, where $n$ is the batch size and $d$ is the number of inputs. That is the one-hot vector length (the dictionary size).
 
@@ -70,14 +72,14 @@ def get_params():
 
 ### RNN Model
 
-We implement this model based on the definition of an RNN. First, we need an `init_rnn_state` function to return the hidden state at initialization. It returns a tuple consisting of an NDArray with a value of 0 and a shape of (batch size, number of hidden units). Using tuples makes it easier to handle situations where the hidden state contains multiple NDArrays (e.g. when combining multiple layers in an RNN).
+We implement this model based on the definition of an RNN. First, we need an `init_rnn_state` function to return the hidden state at initialization. It returns a tuple consisting of an NDArray with a value of 0 and a shape of (batch size, number of hidden units). Using tuples makes it easier to handle situations where the hidden state contains multiple NDArrays (e.g. when combining multiple layers in an RNN where each layers requires initializing).
 
 ```{.python .input  n=5}
 def init_rnn_state(batch_size, num_hiddens, ctx):
     return (nd.zeros(shape=(batch_size, num_hiddens), ctx=ctx), )
 ```
 
-The following `rnn` function defines how to compute the hidden state and output in a time step. The activation function here uses the tanh function. As described in the ["Multilayer Perceptron"](../chapter_deep-learning-basics/mlp.md) section, the mean value of tanh function values is 0 when the elements are evenly distributed over the real number field.
+The following `rnn` function defines how to compute the hidden state and output in a time step. The activation function here uses the tanh function. As described in the ["Multilayer Perceptron"](../chapter_deep-learning-basics/mlp.md) section, the mean value of the $\tanh$ function values is 0 when the elements are evenly distributed over the real numbers.
 
 ```{.python .input  n=6}
 def rnn(inputs, state, params):
@@ -93,7 +95,7 @@ def rnn(inputs, state, params):
     return outputs, (H,)
 ```
 
-Let's run a simple test to check whether inputs and outputs are accurate. In particular, we check output dimensions, the number of outputs and ensure that the hidden state hasn't changed.
+Let's run a simple test to check whether the model makes any sense at all. In particular, let's check whether inputs and outputs have the correct dimensions, e.g. to ensure that the dimensionality of the hidden state hasn't changed.
 
 ```{.python .input  n=7}
 state = init_rnn_state(X.shape[0], num_hiddens, ctx)
@@ -105,7 +107,7 @@ len(outputs), outputs[0].shape, state_new[0].shape
 
 ### Prediction Function
 
-The following function predicts the next `num_chars` characters based on the `prefix` (a string containing several characters). This function is a bit more complicated. In it, we set the recurrent neural unit `rnn` as a function parameter, so that this function can be reused in the other recurrent neural networks described in following sections.
+The following function predicts the next `num_chars` characters based on the `prefix` (a string containing several characters). This function is a bit more complicated. Whenever the actual sequence is known, i.e. for the beginning of the sequence, we only update the hidden state. After that we begin generating new characters and emitting them. For convenience we use the recurrent neural unit `rnn` as a function parameter, so that this function can be reused in the other recurrent neural networks described in following sections.
 
 ```{.python .input  n=8}
 # This function is saved in the d2l package for future use
@@ -122,17 +124,19 @@ def predict_rnn(prefix, num_chars, rnn, params, init_rnn_state,
         # The input to the next time step is the character in the prefix or
         # the current best predicted character
         if t < len(prefix) - 1:
+            # Read off from the given sequence of characters
             output.append(char_to_idx[prefix[t + 1]])
         else:
-            # This is maximum likelihood decoding, not sampling
+            # This is maximum likelihood decoding. Modify this if you want
+            # use sampling, beam search or beam sampling for better sequences.
             output.append(int(Y[0].argmax(axis=1).asscalar()))
     return ''.join([idx_to_char[i] for i in output])
 ```
 
-We test the `predict_rnn` function first. We will create a lyric with a length of 10 characters (regardless of the prefix length) based on the prefix "separate". Because the model parameters are random values, the prediction results are also random.
+We test the `predict_rnn` function first. Given that we didn't train the network it will generate nonsensical predictions. We initialize it with the sequence `traveller ` and have it generate 10 additional characters.
 
 ```{.python .input  n=9}
-predict_rnn('traveller', 10, rnn, params, init_rnn_state, num_hiddens, 
+predict_rnn('traveller ', 10, rnn, params, init_rnn_state, num_hiddens, 
             vocab_size, ctx, idx_to_char, char_to_idx)
 ```
 
@@ -148,7 +152,7 @@ Sometimes the gradients can be quite large and the optimization algorithm may fa
 
 $$\mathbf{g} \leftarrow \min\left(1, \frac{\theta}{\|\mathbf{g}\|}\right) \mathbf{g}.$$
 
-By doing so we know that the gradient norm never exceeds $\theta$ and that the updated gradient is entirely aligned with the original direction $\mathbf{g}$. Back to the case at hand - optimization in RNNs. One of the issues is that the gradients in an RNN may either explode or vanish. Consider the chain of matrix-products involved in backpropagation. If the largest eigenvalue of the matrices is typically larger than $1$, then the product of many such matrices can be much larger than $1$. As a result, the aggregate gradient might explode. Gradient clipping provides a quick fix. While it doesn't entire solve the problem, it is one of the many techniques to alleviate it.
+By doing so we know that the gradient norm never exceeds $\theta$ and that the updated gradient is entirely aligned with the original direction $\mathbf{g}$. It also has the desirable side-effect of limiting the influence any given minibatch (and within it any given sample) can exert on the weight vectors. This bestows a certain degree of robustness to the model. Back to the case at hand - optimization in RNNs. One of the issues is that the gradients in an RNN may either explode or vanish. Consider the chain of matrix-products involved in backpropagation. If the largest eigenvalue of the matrices is typically larger than $1$, then the product of many such matrices can be much larger than $1$. As a result, the aggregate gradient might explode. Gradient clipping provides a quick fix. While it doesn't entire solve the problem, it is one of the many techniques to alleviate it.
 
 ```{.python .input  n=10}
 # This function is saved in the d2l package for future use

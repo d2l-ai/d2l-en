@@ -6,7 +6,8 @@ Progress in this field mirrors that in chip design where engineers went from pla
 
 ## VGG Blocks
 
-The basic building block of a ConvNet is the combination of a convolutional layer (with padding to keep the resolution unchanged), followed by a nonlinearity such as a ReLu. A VGG block is given by a sequence of such layers, followed by maximum pooling. Throughout their design [Simonyan and Ziserman, 2014](https://arxiv.org/abs/1409.1556) used convolution windows of size 3 and maximum poolin with stride and window width 2, effectively halving the resolution after each block. We use the `vgg_block` function to implement this basic VGG block. This function takes the number of convolutional layers `num_convs` and the number of output channels `num_channels` as input.
+The basic building block of a ConvNet is the combination of a convolutional layer (with padding to keep the resolution unchanged), followed by a nonlinearity such as a ReLu. A VGG block is given by a sequence of such layers, followed by maximum pooling. Throughout their design [Simonyan and Ziserman, 2014](https://arxiv.org/abs/1409.1556) used convolution windows of size 3 and maximum pooling with stride and window width 2, effectively halving the resolution after each block. We use the `vgg_block` function to implement this basic VGG block. This function takes the number of convolutional layers `num_convs` and the number of output channels `num_channels` as input.
+
 
 ```{.python .input  n=1}
 import sys
