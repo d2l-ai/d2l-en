@@ -1,6 +1,6 @@
 # Concise Implementation of Recurrent Neural Networks
 
-While the previous section was instructive to see how recurrent neural networks are implemented, this isn't convenient or fast. The current section will show how to implement the same language model more efficiently using functions provided by the deep learning framework. We begin as before by reading the 'Time Machine' corpus. 
+While the previous section was instructive to see how recurrent neural networks are implemented, this isn't convenient or fast. The current section will show how to implement the same language model more efficiently using functions provided by the deep learning framework. We begin as before by reading the 'Time Machine' corpus.
 
 ```{.python .input  n=1}
 import sys
@@ -26,7 +26,7 @@ rnn_layer = rnn.RNN(num_hiddens)
 rnn_layer.initialize()
 ```
 
-Initializing the state is straightforward. We invoke the member function `rnn_layer.begin_state(batch_size)`. This returns an initial state for each element in the minibatch. That is, it returns an object that is of size (hidden layers, batch size, number of hidden units). The number of hidden layers defaults to 1. In fact, we haven't even discussed yet what it means to have multiple layers - this will happen [later](deep-rnn.md). For now, suffice it to say that multiple layers simply amount to the output of one RNN being used as the input for the next RNN. 
+Initializing the state is straightforward. We invoke the member function `rnn_layer.begin_state(batch_size)`. This returns an initial state for each element in the minibatch. That is, it returns an object that is of size (hidden layers, batch size, number of hidden units). The number of hidden layers defaults to 1. In fact, we haven't even discussed yet what it means to have multiple layers - this will happen [later](deep-rnn.md). For now, suffice it to say that multiple layers simply amount to the output of one RNN being used as the input for the next RNN.
 
 ```{.python .input  n=37}
 batch_size = 2
@@ -158,7 +158,7 @@ train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
                             batch_size, pred_period, pred_len, prefixes)
 ```
 
-As we can see, the model achieves comparable perplexity, albeit within a shorter period of time, due to the code being more optimized. 
+The model achieves comparable perplexity, albeit within a shorter period of time, due to the code being more optimized. 
 
 ## Summary
 
