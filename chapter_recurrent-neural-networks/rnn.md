@@ -4,7 +4,7 @@ In the previous section we introduced $n$-gram models, where the conditional pro
 
 $$p(w_t|w_{t-1}, \ldots w_1) \approx p(w_t|h_t(w_{t-1}, h_{t-1})).$$
 
-In theory, for a sufficiently powerful function $h_t$ this is not an approximation. After all, it could simply store all the data it observed so far. We discussed this previously in the [introduction](sequence.md) to the current chapter. Let's see why building such models is a bit more tricky than simple autoregressive models where
+For a sufficiently powerful function $h_t$ this is not an approximation. After all, $h_t$ could simply store all the data it observed so far. We discussed this in the [introduction](sequence.md) to the current chapter. Let's see why building such models is a bit more tricky than simple autoregressive models where
 
 $$p(w_t|w_{t-1}, \ldots w_1) \approx p(w_t|f(w_{t-1}, \ldots w_{t-n+1})).$$
 

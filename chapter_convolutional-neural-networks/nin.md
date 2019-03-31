@@ -8,7 +8,7 @@ We know that the inputs and outputs of convolutional layers are usually four-dim
 
 ![The figure on the left shows the network structure of AlexNet and VGG, and the figure on the right shows the network structure of NiN. ](../img/nin-compare.svg)
 
-The NiN block is the basic block in NiN. It concatenates a convolutional layer and two $1\times 1$ convolutional layers that act as fully connected layers (with ReLu in between). The convolution width of the first layer is typically set by the user. The subsequent widths are fixed to $1 \times 1$.
+The NiN block is the basic block in NiN. It concatenates a convolutional layer and two $1\times 1$ convolutional layers that act as fully connected layers (with ReLU in between). The convolution width of the first layer is typically set by the user. The subsequent widths are fixed to $1 \times 1$.
 
 ```{.python .input  n=2}
 import sys

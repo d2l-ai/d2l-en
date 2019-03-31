@@ -57,7 +57,7 @@ AlexNet was introduced in 2012, named after Alex Krizhevsky, the first author of
 ![LeNet (left) and AlexNet (right)](../img/alexnet-all.svg)
 
 The design philosophies of AlexNet and LeNet are very similar, but there are also significant differences.
-First, AlexNet is much deeper than the comparatively small LeNet5. AlexNet consists of eight layers, five convolutional layers, two fully connected hidden layers, and one fully connected output layer. Second, AlexNet used the ReLu instead of the sigmoid as its activation function. This improved convergence during training significantly. Let's delve into the details below.
+First, AlexNet is much deeper than the comparatively small LeNet5. AlexNet consists of eight layers, five convolutional layers, two fully connected hidden layers, and one fully connected output layer. Second, AlexNet used the ReLU instead of the sigmoid as its activation function. This improved convergence during training significantly. Let's delve into the details below.
 
 ### Architecture
 
@@ -169,7 +169,7 @@ d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,
 * AlexNet has a similar structure to that of LeNet, but uses more convolutional layers and a larger parameter space to fit the large-scale data set ImageNet.
 * Today AlexNet has been surpassed by much more effective architectures but it is a key step from shallow to deep networks that are used nowadays.
 * Although it seems that there are only a few more lines in AlexNet's implementation than in LeNet, it took the academic community many years to embrace this conceptual change and take advantage of its excellent experimental results. This was also due to the lack of efficient computational tools.
-* Dropout, ReLu and preprocessing were the other key steps in achieving excellent performance in computer vision tasks.
+* Dropout, ReLU and preprocessing were the other key steps in achieving excellent performance in computer vision tasks.
 
 ## Exercises
 
@@ -182,7 +182,7 @@ d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,
     * What is the dominant part for the memory footprint of AlexNet?
     * What is the dominant part for computation in AlexNet?
     * How about memory bandwidth when computing the results?
-1. Apply dropout and ReLu to LeNet5. Does it improve? How about preprocessing?
+1. Apply dropout and ReLU to LeNet5. Does it improve? How about preprocessing?
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2354)
 

@@ -70,7 +70,7 @@ This is easy to implement and easy to optimize. With some abuse of notation we d
 
 ## Activation Functions
 
-Let us look a bit more at examples of activation functions. After all, it is this alternation between linear and nonlinear terms that makes deep networks work. A rather popular choice, due to its simplicity of implementation and its efficacy is the ReLu function.
+Let us look a bit more at examples of activation functions. After all, it is this alternation between linear and nonlinear terms that makes deep networks work. A rather popular choice, due to its simplicity of implementation and its efficacy is the ReLU function.
 
 ### ReLU Function
 
@@ -114,7 +114,7 @@ xyplot(x, x.grad, 'grad of relu')
 
 Note that there are many variants to the ReLU function, such as the parameterized ReLU (pReLU) of [He et al., 2015](https://arxiv.org/abs/1502.01852). Effectively it adds a linear term to the ReLU, so some information still gets through, even when the argument is negative.
 
-$$\mathrm{pReLU}(x) = \max(0, x) - \alpha x$$
+$$\mathrm{pReLU}(x) = \max(0, x) + \alpha \min(0, x)$$
 
 The reason for using the ReLU is that its derivatives are particularly well behaved - either they vanish or they just let the argument through. This makes optimization better behaved and it reduces the issue of the vanishing gradient problem (more on this later).
 

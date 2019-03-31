@@ -1,8 +1,9 @@
 # Automatic Differentiation
 
-In machine learning, we *train* models to get better and better as a function of experience. Usually, *getting better* means minimizing a *loss function*, i.e. a score that answers "how *bad* is our model?" With neural networks, we typically choose loss functions that are differentiable with respect to our parameters. Put simply, this means that for each of the model's parameters, we can determine how much *increasing* or *decreasing* it might affect the loss. While the calculations are straightforward, for complex models, working it out by hand can be a pain (and often error-prone).
+In machine learning, we *train* models, updating them successively so that they get better and better as they see more and more data. Usually, *getting better* means minimizing a *loss function*, a score that answers the question "how *bad* is our model?" With neural networks, we typically choose loss functions that are differentiable with respect to our parameters. 
+Put simply, this means that for each of the model's parameters, we can determine how much *increasing* or *decreasing* it might affect the loss. While the calculations for taking these derivatives are straightforward, requiring only some basic calculus, for complex models, working out the updates by hand can be a pain (and often error-prone).
 
-The autograd package expedites this work by automatically calculating derivatives. And while most other libraries require that we compile a symbolic graph to take automatic derivatives, `autograd` allows you to take derivatives while writing  ordinary imperative code. Every time you make pass through your model, `autograd` builds a graph on the fly, through which it can immediately backpropagate gradients. If you are unfamiliar with some of the math, e.g. gradients, please refer to the [“Mathematical Basics”](../chapter_appendix/math.md) section in the appendix.
+The autograd package expedites this work by automatically calculating derivatives. And while many other libraries require that we compile a symbolic graph to take automatic derivatives, `autograd` allows us to take derivatives while writing  ordinary imperative code. Every time we pass data through our model, `autograd` builds a graph on the fly, tracking which data combined through which operations to produce the output. This graph enables `autograd` to subsequently backpropagate gradients on command. Here *backpropagate* simply means to trace through the compute graph, filling in the partial derivatives with respect to each parameter. If you are unfamiliar with some of the math, e.g. gradients, please refer to the [“Mathematical Basics”](../chapter_appendix/math.md) section in the appendix.
 
 ```{.python .input  n=1}
 from mxnet import autograd, nd
@@ -10,20 +11,20 @@ from mxnet import autograd, nd
 
 ## A Simple Example
 
-As a toy example, let's say that we are interested in differentiating the mapping $y = 2\mathbf{x}^{\top}\mathbf{x}$ with respect to the column vector $\mathbf{x}$. First, we can create the variable `x` and assign an initial value.
+As a toy example, say that we are interested in differentiating the mapping $y = 2\mathbf{x}^{\top}\mathbf{x}$ with respect to the column vector $\mathbf{x}$. To start, let's create the variable `x` and assign it an initial value.
 
 ```{.python .input  n=2}
 x = nd.arange(4).reshape((4, 1))
 print(x)
 ```
 
-Once we compute the gradient of ``y`` with respect to ``x``, we'll need a place to store it. We can tell an NDArray that we plan to store a gradient by invoking its ``attach_grad()`` method.
+Once we compute the gradient of ``y`` with respect to ``x``, we will need a place to store it. We can tell an NDArray that we plan to store a gradient by invoking its ``attach_grad()`` method.
 
 ```{.python .input  n=3}
 x.attach_grad()
 ```
 
-Now we're going to compute ``y`` and MXNet will generate a computation graph on the fly. It's as if MXNet turned on a recording device and captured the exact path by which each variable was generated.
+Now we are going to compute ``y`` and MXNet will generate a computation graph on the fly. It is as if MXNet turned on a recording device and captured the exact path by which each variable was generated.
 
 Note that building the computation graph requires a nontrivial amount of computation. So MXNet will *only* build the graph when explicitly told to do so. This happens by placing code inside a ``with autograd.record():`` block.
 
@@ -56,7 +57,7 @@ with autograd.record():
     print(autograd.is_training())
 ```
 
-In some cases, the same model behaves differently in the training and prediction modes (e.g. when using neural techniques such as dropout and batch normalization). In other cases, some models may store more auxiliary variables to make computing gradients easier. We will cover these differences in detail in later chapters. For now, you don't need to worry about them.
+In some cases, the same model behaves differently in the training and prediction modes (e.g. when using neural techniques such as dropout and batch normalization). In other cases, some models may store more auxiliary variables to make computing gradients easier. We will cover these differences in detail in later chapters. For now, you do not need to worry about them.
 
 ## Computing the Gradient of Python Control Flow
 
@@ -74,7 +75,7 @@ def f(a):
     return c
 ```
 
-Note that the number of iterations of the while loop and the execution of the conditional statement (if then else) depend on the value of `a`. To compute gradients, we need to `record` the calculation, and call the `backward` function to find the gradient.
+Note that the number of iterations of the while loop and the execution of the conditional statement (if then else) depend on the value of `a`. To compute gradients, we need to `record` the calculation, and then call the `backward` function to calculate the gradient.
 
 ```{.python .input  n=9}
 a = nd.random.normal(shape=1)
@@ -104,7 +105,7 @@ $\frac{d}{dx} z(y(x))$. Recall that by the chain rule
 
 $$\frac{d}{dx} z(y(x)) = \frac{dz(y)}{dy} \frac{dy(x)}{dx}.$$
 
-So, when ``y`` is part of a larger function ``z``, and we want ``x.grad`` to store $\frac{dz}{dx}$, we can pass in the *head gradient* $\frac{dz}{dy}$ as an input to ``backward()``. The default argument is ``nd.ones_like(y)``. See [Wikipedia](https://en.wikipedia.org/wiki/Chain_rule) for more details.
+So, when ``y`` is part of a larger function ``z`` and we want ``x.grad`` to store $\frac{dz}{dx}$, we can pass in the *head gradient* $\frac{dz}{dy}$ as an input to ``backward()``. The default argument is ``nd.ones_like(y)``. See [Wikipedia](https://en.wikipedia.org/wiki/Chain_rule) for more details.
 
 ```{.python .input  n=11}
 with autograd.record():
@@ -124,9 +125,9 @@ print(x.grad)
 
 ## Exercises
 
-1. In the example, finding the gradient of the control flow shown in this section, the variable `a` is changed to a random vector or matrix. At this point, the result of the calculation `c` is no longer a scalar. What happens to the result. How do we analyze this?
+1. In the control flow example where we calculate the derivative of `d` with respect to `a`, what would happen if we changed the variable `a` to a random vector or matrix. At this point, the result of the calculation `f(a)` is no longer a scalar. What happens to the result? How do we analyze this?
 1. Redesign an example of finding the gradient of the control flow. Run and analyze the result.
-1. In a second price auction (such as in eBay or in computational advertising) the winning bidder pays the second highest price. Compute the gradient of the winning bidder with regard to his bid using `autograd`. Why do you get a pathological result? What does this tell us about the mechanism? For more details read the paper by [Edelman, Ostrovski and Schwartz, 2005](https://www.benedelman.org/publications/gsp-060801.pdf).
+1. In a second-price auction (such as in eBay or in computational advertising), the winning bidder pays the second-highest price. Compute the gradient of the final price with respect to the winning bidder's bid using `autograd`. What does the result tell you about the mechanism? If you are curious to learn more about second-price auctions, check out this paper by [Edelman, Ostrovski and Schwartz, 2005](https://www.benedelman.org/publications/gsp-060801.pdf).
 1. Why is the second derivative much more expensive to compute than the first derivative?
 1. Derive the head gradient relationship for the chain rule. If you get stuck, use the ["Chain Rule" article on Wikipedia](https://en.wikipedia.org/wiki/Chain_rule).
 1. Assume $f(x) = \sin(x)$. Plot $f(x)$ and $\frac{df(x)}{dx}$ on a graph, where you computed the latter without any symbolic calculations, i.e. without exploiting that $f'(x) = \cos(x)$.
