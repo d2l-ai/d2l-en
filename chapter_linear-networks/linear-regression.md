@@ -131,13 +131,68 @@ When training the model, we want to find parameters ($\mathbf{w}^*, b^*$) that m
 $$\mathbf{w}^*, b^* = \operatorname*{argmin}_{\mathbf{w}, b}\  L(\mathbf{w}, b).$$
 
 
-### Optimization Algorithm
+### Analytic Solution
 
-When the model and loss function are in a relatively simple format, the solution to the aforementioned loss minimization problem can be expressed analytically in a closed form solution, involving matrix inversion. This is very elegant, it allows for a lot of nice mathematical analysis, *but* it is also very restrictive insofar as this approach only works for a small number of cases (e.g. multilayer perceptrons and nonlinear layers are no go). Most deep learning models do not possess such analytical solutions. The value of the loss function can only be reduced by a finite update of model parameters via an incremental optimization algorithm.
+Linear regression happens to be an unusually simple optimiaztion problem.
+Unlike nearly every other model that we will encounter in this book,
+linear regression can be solved easily with a simple formula,
+yielding a global optimum. 
+To start we can subsume the bias $b$ into the parameter $\mathbf{w}$
+by appending a column to the design matrix consisting of all $1s$.
+Then our prediction problem is to minimize $||\mathbf{y} - X\mathbf{w}||$. 
+Because this expression has a quadratic form it is clearly convex,
+and so long as the problem is not degenerate
+(our features are linearly indpendent), it is strictly convex.
 
-The mini-batch stochastic gradient descent is widely used for deep learning to find numerical solutions. Its algorithm is simple: first, we initialize the values of the model parameters, typically at random; then we iterate over the data multiple times, so that each iteration may reduce the value of the loss function. In each iteration, we first randomly and uniformly sample a mini-batch $\mathcal{B}$ consisting of a fixed number of training data examples; we then compute the derivative (gradient) of the average loss on the mini batch with regard to the model parameters. Finally, the product of this result and a predetermined step size $\eta > 0$ is used to change the parameters in the direction of the minimum of the loss. In math we have ($\partial$ denotes the partial derivative):
+Thus there is just one global critical point on the loss surface 
+corresponding to the global minimum.
+Taking the derivative of the loss with respect to $\mathbf{w}$ 
+and setting it equal to 0 gives the analytic solution:
+
+$$\mathbf{w}^* = (X^T X)^{-1}X^T y$$
+
+While simple problems like linear regression may admit analytic solutions,
+you should not get used to such good fortune. 
+Although analytic solutions allow for nice mathematical analysis,
+the requirement of an analytic solution confines one to 
+an restrictive set of models that would exclude all of deep learning.
+
+### Gradient descent
+
+Even in cases where we cannot solve the models analytically,
+and even when the loss surfaces are high-dimensional and nonconvex,
+it turns out that we can still make progress.
+Moreover, when those difficult-to-optimize models are sufficiently superior for the task at hand, figuring out how to train them is well worth the trouble.
+
+The key trick behind nearly all of deep learning 
+and that we will repeatedly throughout this book
+is to reduce the error gradually by iteratively updating the parameters,
+each step moving the parameters in the direction 
+that incrementally lowers the loss function.
+This algorithm is called gradient descent.
+On convex loss surfaces it will eventually converge to a global minimum,
+and while the same can't be said for nonconvex surfaces, 
+it will at least lead towards a (hopefully good) local minimum.
+
+The most naive application of gradient descent consists of taking the derivative of the true loss, which is an average of the losses computed on every single example in the dataset. In practice, this can be extremely slow. We must pass over the entire dataset before making a single update. 
+Thus, we'll often settle for sampling a random mini-batch
+of examples every time we need to computer the update, 
+a variant called *stochastic gradient descent*.
+
+In each iteration, we first randomly and uniformly sample a mini-batch $\mathcal{B}$ consisting of a fixed number of training data examples. 
+We then compute the derivative (gradient) of the average loss on the mini batch with regard to the model parameters. 
+Finally, the product of this result and a predetermined step size $\eta > 0$ are used to update the parameters in the direction that lowers the loss. 
+
+We can express the update mathematically as follows ($\partial$ denotes the partial derivative):
 
 $$(\mathbf{w},b) \leftarrow (\mathbf{w},b) - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_{(\mathbf{w},b)} l^{(i)}(\mathbf{w},b)$$
+
+
+To summarize, steps of the algorithm are the following: 
+(i) we initialize the values of the model parameters, typically at random;
+(ii) we iterate over the data many times, 
+updating the paramters in each by moving the parameters in the direction of the negative gradient, as calculted on a random minibatch of data. 
+
 
 For quadratic losses and linear functions we can write this out explicitly as follows. Note that $\mathbf{w}$ and $\mathbf{x}$ are vectors. Here the more elegant vector notation makes the math much more readable than expressing things in terms of coefficients, say $w_1, w_2, \ldots w_d$.
 
@@ -154,32 +209,57 @@ In the above equation $|\mathcal{B}|$ represents the number of samples (batch si
 
 ### Model Prediction
 
-After model training has been completed, we then record the values of the model parameters $\mathbf{w}, b$ as $\hat{\mathbf{w}}, \hat{b}$. Note that we do not necessarily obtain the optimal solution of the loss function minimizer, $\mathbf{w}^*, b^*$ (or the true parameters), but instead we gain an approximation of the optimal solution. We can then use the learned linear regression model $\hat{\mathbf{w}}^\top x + \hat{b}$ to estimate the price of any house outside the training data set with area (square feet) as $x_1$ and house age (year) as $x_2$. Here, estimation also referred to as ‘model prediction’ or ‘model inference’.
+After completing the training process, we record the estimated model parameters, denoted $\hat{\mathbf{w}}, \hat{b}$ 
+(in general the "hat" symbol denotes estimates).
+Note that the parameters that we learn via gradient descent 
+are not exactly equal to the true minimizers of the loss on the training set,
+that's be cause gradient descent converges slowly to a local minimum but does not achieve it exactly. 
+Moreover if the problem has multiple local minimum, we may not necessarily achieve the lowest minimum. 
+Fortunately, for deep neural networks, finding parameters that minimize the loss *on training data* is seldom a significant problem. The more formidable task is to find parameters that will achieve low loss on data that we have not seen before, a challenge called *generalization*. We return to these topics throughout the book.
 
-Note that calling this step 'inference' is actually quite a misnomer, albeit one that has become the default in deep learning. In statistics 'inference' means estimating parameters and outcomes based on other data. This misuse of terminology in deep learning can be a source of confusion when talking to statisticians. We adopt the incorrect, but by now common, terminology of using 'inference' when a (trained) model is applied to new data (and express our sincere apologies to centuries of statisticians).
+Given the learned learned linear regression model $\hat{\mathbf{w}}^\top x + \hat{b}$, we can now estimate the price of any house outside the training data set with area (square feet) as $x_1$ and house age (year) as $x_2$. Here, estimation also referred to as ‘model prediction’ or ‘model inference’.
+
+Note that calling this step 'inference' is a misnomer, 
+but has become standard jargon in deep learning. 
+In statistics, 'inference' means estimating parameters 
+and outcomes based on other data. 
+This misuse of terminology in deep learning 
+can be a source of confusion when talking to statisticians. 
 
 
 ## From Linear Regression to Deep Networks
 
-So far we only talked about linear functions. Neural Networks cover a lot more than that. That said, linear functions are an important building block. Let's start by rewriting things in a 'layer' notation.
+So far we only talked about linear functions. While neural networks cover a much richer family of models, we can begin thinking of the linear model as a neural network by expressing it the language of neural networks. To begin, let's start by rewriting things in a 'layer' notation.
 
 ### Neural Network Diagram
 
-While in deep learning, we can represent model structures visually using neural network diagrams. To more clearly demonstrate the linear regression as the structure of neural network, Figure 3.1 uses a neural network diagram to represent the linear regression model presented in this section. The neural network diagram hides the weight and bias of the model parameter.
+Commonly, deep learning practitioners represent models visually using neural network diagrams. In Figure 3.1, we represent linear regression with a neural network diagram. The diagram shows the connectivity among the inputs and output, but does not depict the weights or biases (which are given implicitly).
 
 ![Linear regression is a single-layer neural network. ](../img/singleneuron.svg)
 
-In the neural network shown above, the inputs are $x_1, x_2, \ldots x_d$. Sometimes the number of inputs is also referred to as feature dimension. In the above cases the number of inputs is $d$ and the number of outputs is $1$. It should be noted that we use the output directly as the output of linear regression.  Since the input layer does not involve any other nonlinearities or any further calculations, the number of layers is 1. Sometimes this setting is also referred to as a single neuron. Since all inputs are connected to all outputs (in this case it's just one), the layer is also referred to as a 'fully connected layer' or 'dense layer'.
+In the above network, the inputs are $x_1, x_2, \ldots x_d$. 
+Sometimes the number of inputs are referred to as the feature dimension. 
+For linear regression models, we act upon $d$ inputs and output $1$ value. 
+Because there is just a single computed neuron (node) in the graph,
+we can think of linear models as neural networks consisting of just a single neuron. Since all inputs are connected to all outputs (in this case it's just one), this layer can also be regarded as an instance of a *fully-connected layer*, also commonly called a *dense layer*.
 
-### A Detour to Biology
+### Biology
 
-Neural networks quite clearly derive their name from Neuroscience. To understand a bit better how many network architectures were invented, it is worth while considering the basic structure of a neuron. For the purpose of the analogy it is sufficient to consider the *dendrites* (input terminals), the *nucleus* (CPU), the *axon* (output wire), and the *axon terminals* (output terminals) which connect to other neurons via *synapses*.
+Neural networks derive their name from their inspirations in neuroscience. 
+Although linear regression predates computation neuroscience,
+many of the models we subsequently discuss truly owe to neural inspiration.
+To understand the neural inspiration for artificial neural networks 
+it is worth while considering the basic structure of a neuron. 
+For the purpose of the analogy it is sufficient to consider the *dendrites* 
+(input terminals), the *nucleus* (CPU), the *axon* (output wire), 
+and the *axon terminals* (output terminals) 
+which connect to other neurons via *synapses*.
 
 ![The real neuron](../img/Neuron.svg)
 
 Information $x_i$ arriving from other neurons (or environmental sensors such as the retina) is received in the dendrites. In particular, that information is weighted by *synaptic weights* $w_i$ which determine how to respond to the inputs (e.g. activation or inhibition via $x_i w_i$). All this is aggregated in the nucleus $y = \sum_i x_i w_i + b$, and this information is then sent for further processing in the axon $y$, typically after some nonlinear processing via $\sigma(y)$. From there it either reaches its destination (e.g. a muscle) or is fed into another neuron via its dendrites.
 
-Brain *structures* can be quite varied. Some look rather arbitrary whereas others have a very regular structure. E.g. the visual system of many insects is quite regular. The analysis of such structures has often inspired neuroscientists to propose new architectures, and in some cases, this has been successful. Note, though, that it would be a fallacy to require a direct correspondence - just like airplanes are *inspired* by birds, they have many distinctions. Equal sources of inspiration were mathematics and computer science.
+Brain *structures* vary significantly. Some look (to us) rather arbitrary whereas others have a regular structure. For example, the visual system of many insects is consistent across members of a species. The analysis of such structures has often inspired neuroscientists to propose new architectures, and in some cases, this has been successful. However, much research in artificial neural networks has little to do with any direct inspiration in neuroscience, just as although airplanes are *inspired* by birds, the study of orninthology hasn't been the primary driver of aeronautics innovaton in the last century. Equal amounts of inspiration these days comes from mathematics, statistics, and computer science.
 
 ### Vectorization for Speed
 
