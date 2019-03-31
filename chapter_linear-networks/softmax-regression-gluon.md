@@ -1,6 +1,6 @@
 # Concise Implementation of Softmax Regression
 
-We already saw that it is much more convenient to use Gluon in the context of [linear regression](linear-regression-gluon.md). Now we will see how this applies to classification, too. We being with our import ritual.
+We already saw that it is much more convenient to use Gluon in the context of [linear regression](linear-regression-gluon.md). Now we will see how this applies to classification, too. We begin with our import ritual.
 
 ```{.python .input  n=1}
 import sys

@@ -4,7 +4,7 @@ In the previous sections we used a mini-batch stochastic gradient descent optimi
 
 ## Forward Propagation
 
-Forward propagation refers to the calculation and storage of intermediate variables (including outputs) for the neural network within the models in the order from input layer to output layer. In the following we work in detail through the example of a deep network with one hidden layer step by step. This is a bit tedious but it will serve us well when discussing what really goes on when we call `backward`.
+Forward propagation refers to the calculation and storage of intermediate variables (including outputs) for the neural network within the models in the order from input layer to output layer. In the following, we work in detail through the example of a deep network with one hidden layer step by step. This is a bit tedious but it will serve us well when discussing what really goes on when we call `backward`.
 
 For the sake of simplicity, let’s assume that the input example is $\mathbf{x}\in \mathbb{R}^d$ and there is no bias term. Here the intermediate variable is:
 

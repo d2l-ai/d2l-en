@@ -20,11 +20,11 @@ GPU performance is primarily a combination of the following three parameters:
 
 For most users, it is enough to look at compute power. The GPU memory should be no less than 4 GB. However, if the GPU must simultaneously display graphical interfaces, we recommend a memory size of at least 6 GB. There is generally not much variation in memory bandwidth, with few options to choose from.
 
-Figure 11.19 compares the 32-bit floating-point compute power and price of the various GTX 900 and 1000 series models. The prices are the suggested prices found on Wikipedia.
+Figure 12.19 compares the 32-bit floating-point compute power and price of the various GTX 900 and 1000 series models. The prices are the suggested prices found on Wikipedia.
 
 ![Floating-point compute power and price comparison. ](../img/gtx.png)
 
-From Figure 11.19, we can see two things:
+From Figure 12.19, we can see two things:
 
 1. Within each series, price and performance are roughly proportional. However, the newer models offer better cost effectiveness, as can be seen by comparing the 980 Ti and 1080 Ti.
 2. The performance to cost ratio of the GTX 1000 series is about two times greater than the 900 series.
