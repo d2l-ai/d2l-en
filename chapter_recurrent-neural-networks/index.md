@@ -51,6 +51,8 @@ LSTMs and GRUs, described later in this chapter.
    lang-model
    rnn
    lang-model-dataset
+```
+   
    rnn-scratch
    rnn-gluon
    bptt
@@ -58,4 +60,4 @@ LSTMs and GRUs, described later in this chapter.
    lstm
    deep-rnn
    bi-rnn
-```
+
