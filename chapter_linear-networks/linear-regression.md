@@ -1,48 +1,122 @@
 # Linear Regression
 
-To get our feet wet, we'll start off by looking at the problem of regression.
-This is the task of predicting a *real valued target* $y$ given a data point $x$.
-Regression problems are extremely common in practice. For example, they are used for predicting continuous values, such as house prices, temperatures, sales, and so on. This is quite different from classification problems (which we study later), where the outputs are discrete (such as apple, banana, orange, etc. in image classification).
+To start off, we will introduce the problem of regression.
+This is the task of predicting a *real valued target* $y$
+given a data point $\mathbf{x}$.
+Regression problems are common in practice, arising
+whenever we want to predict a continuous numerical value. 
+Some exmaples of regression problems include
+predicting house prices, stock prices, 
+length of stay (for patients in the hospital),
+tomorrow's temperature, demand forecasting (for retail sales), and many more. 
+Note that not every prediciton problem is a regression problem.
+In subsequent sections we will discuss classification problems,
+where our predictions are discrete categories.
 
 ## Basic Elements of Linear Regression
 
-In linear regression, the simplest and still perhaps the most useful approach,
-we assume that prediction can be expressed as a *linear* combination of the input features
-(thus giving the name *linear* regression).
+Linear regresion, which dates to Gauss and Legendre, 
+is perhaps the simplest, and by far the most popular approach
+to solving regression problems. 
+What makes linear regression *linear* is that 
+we assume that the output truly can be expressed 
+as a *linear* combination of the input features.
+
 
 ### Linear Model
 
-For the sake of simplicity we will use the problem of estimating the price of a house (e.g. in dollars) based on area (e.g. in square feet) and age (e.g. in years) as our running example. In this case we could model
+To keep things simple, we will start with running example
+in which we consider the problem 
+of estimating the price of a house (e.g. in dollars) 
+based on area (e.g. in square feet) and age (e.g. in years). 
+More formally, the assumption of linearity suggests 
+that our model can be expressed in the following form:
 
 $$\mathrm{price} = w_{\mathrm{area}} \cdot \mathrm{area} + w_{\mathrm{age}} \cdot \mathrm{age} + b$$
 
-While this is quite illustrative, it becomes extremely tedious when dealing with more than two variables (even just naming them becomes a pain). This is what mathematicians have invented vectors for. In the case of $d$ variables we get
+In economics papers, it is common for authors to write out linear models in this format with a gigantic equation that spans multiple lines containing terms for every single feature. 
+For the high-dimensional data that we often address in machine learning,
+writing out the entire model can be tedious. 
+In these cases, we will find it more convenient to use linear algebra notation.
+In the case of $d$ variables, we could express our prediction $\hat{y}$ as follows:
 
 $$\hat{y} = w_1 \cdot x_1 + ... + w_d \cdot x_d + b$$
 
-Given a collection of data points $X$, and corresponding target values $\mathbf{y}$,
-we'll try to find the *weight* vector $w$ and bias term $b$
+or alternatively, collecting all features into a single vector $\mathbf{x}$ and all parameters into a vector $\mathbf{w}$, we can express our linear model as $\hat{y} = \mathbf{w}^T \mathbf{x} + b$.
+
+Above, the vector $\mathbf{x}$ corresponds to a single data point.
+Commonly, we will want notation to refer to 
+the entire dataset of all input data points.
+This matrix, often denoted using a capital letter $X$,
+is called the *design matrix* and contrains one row for every example,
+and one column for every feature.
+
+Given a collection of data points $X$ and a vector
+containing the corresponding target values $\mathbf{y}$,
+the goal of linear regression is to find 
+the *weight* vector $w$ and bias term $b$
 (also called an *offset* or *intercept*)
-that approximately associate data points $x_i$ with their corresponding labels $y_i$.
-Using slightly more advanced math notation, we can express the long sum as $\hat{y} = \mathbf{w}^\top \mathbf{x} + b$. Finally, for a collection of data points $\mathbf{X}$ the predictions $\hat{\mathbf{y}}$ can be expressed via the matrix-vector product:
+that associates each data point $\mathbf{x}_i$ 
+with an approximation $\hat{y}_i$ of its corresponding label $y_i$.
 
-$${\hat{\mathbf{y}}} = \mathbf{X} \mathbf{w} + b$$
+Expressed in terms of a single data point, 
+this gives us the expression (same as above) 
+$\hat{y} = \mathbf{w}^\top \mathbf{x} + b$. 
 
-It's quite reasonable to assume that the relationship between $x$ and $y$ is only approximately linear. There might be some error in measuring things. Likewise, while the price of a house typically decreases, this is probably less the case with very old historical mansions which are likely to be prized specifically for their age. To find the parameters $w$ we need two more things: some way to measure the quality of the current model and secondly, some way to manipulate the model to improve its quality.
+Finally, for a collection of data points $\mathbf{X}$, 
+the predictions $\hat{\mathbf{y}}$ can be expressed via the matrix-vector product:
+
+$${\hat{\mathbf{y}}} = X \mathbf{w} + b$$
+
+Even if we believe that the best model 
+to relate $\mathbf{x}$ and $y$ is linear,
+it's unlikely that we'd find data where $y$ 
+lines up exactly as a linear function of $\mathbf{x}$.
+For example, both the target values $y$ and the features $X$
+might be subject to some amount of measurement error.
+Thus even when we believe that the linearity assumption holds,
+we will typically incorporate a noise term to account for such errors.
+
+Before we can go about solving for the best setting of the parameters $w$ and $b$, we will need two more things: 
+(i) some way to measure the quality of the current model 
+and (ii) some way to manipulate the model to improve its quality.
 
 ### Training Data
 
-The first thing that we need is data, such as the actual selling price of multiple houses as well as their corresponding area and age. We hope to find model parameters on this data to minimize the error between the predicted price and the real price of the model. In the terminology of machine learning, the data set is called a ‘training data’ or ‘training set’, a house (often a house and its price) is called a ‘sample’, and its actual selling price is called a ‘label’. The two factors used to predict the label are called ‘features’ or 'covariates'. Features are used to describe the characteristics of the sample.
+The first thing that we need is training data. 
+Sticking with our running example, we'll need some collection of examples 
+for which we know both the actual selling price of each house 
+as well as their corresponding area and age. 
+Our goal is to identify model parameters 
+that minimize the error between the predicted price and the real price. 
+In the terminology of machine learning, the data set is called a ‘training data’ or ‘training set’, a house (often a house and its price) here comprises one ‘sample’, and its actual selling price is called a ‘label’. 
+The two factors used to predict the label 
+are called ‘features’ or 'covariates'. 
 
-Typically we denote by $n$ the number of samples that we collect. Each sample (indexed as $i$) is described by $x^{(i)} = [x_1^{(i)}, x_2^{(i)}]$, and the label is $y^{(i)}$.
+Typically, we will use $n$ to denote the number of samples in our dataset. 
+We index the samples by $i$, denoting each input data point as $x^{(i)} = [x_1^{(i)}, x_2^{(i)}]$ and the corresponding label as $y^{(i)}$.
 
 ### Loss Function
 
-In model training, we need to measure the error between the predicted value and the real value of the price. Usually, we will choose a non-negative number as the error. The smaller the value, the smaller the error. A common choice is the square function. The expression for evaluating the error of a sample with an index of $i$ is as follows:
+In model training, we need to measure the error 
+between the predicted value and the real value of the price. 
+Usually, we will choose a non-negative number as the error. 
+The smaller the value, the smaller the error. 
+A common choice is the square function. 
+For given parameters $\mathbf{w}$ and $b$,
+we can express the error of our prediction on a given a sample as follows:
 
 $$l^{(i)}(\mathbf{w}, b) = \frac{1}{2} \left(\hat{y}^{(i)} - y^{(i)}\right)^2,$$
 
-The constant $1/2$ ensures that the constant coefficient, after deriving the quadratic term, is 1, which is slightly simpler in form. Obviously, the smaller the error, the closer the predicted price is to the actual price, and when the two are equal, the error will be zero. Given the training data set, this error is only related to the model parameters, so we record it as a function with the model parameters as parameters. In machine learning, we call the function that measures the error the ‘loss function’. The squared error function used here is also referred to as ‘square loss’.
+The constant $1/2$ is just for mathematical convenience,
+ensuring that after we take the derivative of the loss,
+the constant coefficient will be $1$. 
+The smaller the error, the closer the predicted price is to the actual price, and when the two are equal, the error will be zero. 
+
+Since the training dataset is given to us, and thus out of our control,
+the error is only a function of the model parameters. 
+In machine learning, we call the function that measures the error the ‘loss function’. 
+The squared error function used here is commonly referred to as ‘square loss’.
 
 To make things a bit more concrete, consider the example below where we plot a regression problem for a one-dimensional case, e.g. for a model where house prices depend only on area.
 
@@ -52,7 +126,7 @@ As you can see, large differences between estimates $\hat{y}^{(i)}$ and observat
 
 $$L(\mathbf{w}, b) =\frac{1}{n}\sum_{i=1}^n l^{(i)}(\mathbf{w}, b) =\frac{1}{n} \sum_{i=1}^n \frac{1}{2}\left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right)^2.$$
 
-In model training, we want to find a set of model parameters, represented by $\mathbf{w}^*, b^*$, that can minimize the average loss of training samples:
+When training the model, we want to find parameters ($\mathbf{w}^*, b^*$) that minimize the average loss across all training samples:
 
 $$\mathbf{w}^*, b^* = \operatorname*{argmin}_{\mathbf{w}, b}\  L(\mathbf{w}, b).$$
 

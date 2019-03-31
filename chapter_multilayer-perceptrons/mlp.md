@@ -70,7 +70,7 @@ This is easy to implement and easy to optimize. With some abuse of notation we d
 
 ## Activation Functions
 
-Let us look a bit more at examples of activation functions. After all, it is this alternation between linear and nonlinear terms that makes deep networks work. A rather popular choice, due to its simplicity of implementation and its efficacy is the ReLu function.
+Let us look a bit more at examples of activation functions. After all, it is this alternation between linear and nonlinear terms that makes deep networks work. A rather popular choice, due to its simplicity of implementation and its efficacy is the ReLU function.
 
 ### ReLU Function
 

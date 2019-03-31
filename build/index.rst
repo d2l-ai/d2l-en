@@ -18,7 +18,7 @@ Dive into Deep Learning
    chapter_crashcourse/index
    chapter_linear-networks/index
    chapter_multilayer-perceptrons/index
-   chapter_gluon-fundamentals/index
+   chapter_deep-learning-computation/index
    chapter_convolutional-neural-networks/index
    chapter_recurrent-neural-networks/index
    chapter_optimization/index

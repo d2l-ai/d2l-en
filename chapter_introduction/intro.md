@@ -310,7 +310,7 @@ that had never seen black skin before.
 Failure can also occur when the data doesn't merely under-represent some groups,
 but reflects societal prejudices.
 For example if past hiring decisions are used to train a predictive model
-that will be used to screen resumes, then machine learning models could inadvertantly capture and automate historical injustices.
+that will be used to screen resumes, then machine learning models could inadvertently capture and automate historical injustices.
 Note that this can all happen without the data scientist being complicit,
 or even aware.
 
