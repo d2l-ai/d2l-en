@@ -43,7 +43,6 @@ of these problems, we can use gated recurrent neural networks, such as
 LSTMs and GRUs, described later in this chapter.
 
 rnn-gluon
-bptt
 
 ```eval_rst
 
@@ -55,6 +54,7 @@ bptt
    rnn
    lang-model-dataset
    rnn-scratch
+   bptt
    gru
    lstm
    deep-rnn
