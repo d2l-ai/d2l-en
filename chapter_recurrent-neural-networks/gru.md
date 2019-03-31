@@ -1,6 +1,6 @@
-# Gated Recurrent Unit (GRU)
+# Gated Recurrent Units (GRU)
 
-@TODO(smolix/astonzhang): the data set was just changed from lyrics to time machine, so descriptions/hyperparameters have to change.
+In the previous section we discussed how gradients are calculated in a recurrent neural network. In particular we found that long products of 
 
 In the previous section, we discussed gradient calculation methods in recurrent neural networks. We found that, when the number of time steps is large or the time step is small, the gradients in recurrent neural networks are prone to vanishing or explosion. Although gradient clipping can cope with gradient explosion, it cannot solve the vanishing gradient problem. Therefore, it is generally quite difficult to capture dependencies for time series with large time step distances during the actual use of recurrent neural networks.
 

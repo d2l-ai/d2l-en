@@ -47,6 +47,7 @@ gru
 lstm
 deep-rnn
 bi-rnn
+rnn-gluon
 
 ```eval_rst
 
@@ -58,5 +59,4 @@ bi-rnn
    rnn
    lang-model-dataset
    rnn-scratch
-   rnn-gluon
 ```
