@@ -9,61 +9,65 @@ In the previous section we discussed how gradients are calculated in a recurrent
 A number of methods have been proposed to address this. One of the earliest is the Long Short Term Memory (LSTM) of [Hochreiter and Schmidhuber, 1997](http://papers.nips.cc/paper/1215-lstm-can-solve-hard-long-time-lag-problems.pdf) which we will discuss in a [later section](../chapter_recurrent-neural-networks/lstm.md). The Gated Recurrent Unit (GRU) of [Cho et al., 2014](https://arxiv.org/abs/1409.1259) is a slightly more streamlined variant that often offers comparable performance and is significantly faster to compute. See also [Chung et al., 2014](https://arxiv.org/abs/1412.3555) for more details. Due to its simplicity we start with the GRU. 
 
 
-## Gating in Recurrent Units
+## Gating the Hidden State
 
 The key distinction between regular RNNs and GRUs is that the latter support gating of the hidden state. This means that we have dedicated mechanisms for when the hidden state should be updated and also when it should be reset. These mechanisms are learned and they address the concerns listed above. For instance, if the first symbol is of great importance we will learn not to update the hidden state after the first observation. Likewise, we will learn to skip irrelevant temporary observations. Lastly, we will learn to reset the latent state whenever needed. We discuss this in detail below. 
 
 ### Reset Gates and Update Gates
 
-As shown in Figure 6.4, the inputs for both reset gates and update gates in GRU are the current time step input $\boldsymbol{X}_t$ and the hidden state of the previous time step $\boldsymbol{H}_{t-1}$. The output is computed by the fully connected layer with a sigmoid function as its activation function.
+The first thing we need to introduce are reset and update gates. We engineer them to be vectors with entries in $(0,1)$ such that we can perform convex combinations, e.g.\ of a hidden state and an alternative. For instance, a reset variable would allow us to control how much of the previous state we might still want to remember. Likewise, an update variable would allow us to control how much of the new state is just a copy of the old state. 
 
+We begin by engineering gates to generate these variables. The figure below illustrates the inputs for both reset and update gates in a GRU, given the current time step input $\mathbf{X}_t$ and the hidden state of the previous time step $\mathbf{H}_{t-1}$. The output is given by a fully connected layer with a sigmoid as its activation function.  
 
-![ Reset and update gate computation in a GRU. ](../img/gru_1.svg)
+![ Reset and update gate in a GRU. ](../img/gru_1.svg)
 
-
-Here, we assume there are $h$ hidden units and, for a given time step $t$, the mini-batch input is $\boldsymbol{X}_t \in \mathbb{R}^{n \times d}$ (number of examples: $n$, number of inputs: $d$）and the hidden state of the last time step is $\boldsymbol{H}_{t-1} \in \mathbb{R}^{n \times h}$. Then, the reset gate $\boldsymbol{R}_t \in \mathbb{R}^{n \times h}$ and update gate $\boldsymbol{Z}_t \in \mathbb{R}^{n \times h}$ computation is as follows:
+Here, we assume there are $h$ hidden units and, for a given time step $t$, the mini-batch input is $\mathbf{X}_t \in \mathbb{R}^{n \times d}$ (number of examples: $n$, number of inputs: $d$）and the hidden state of the last time step is $\mathbf{H}_{t-1} \in \mathbb{R}^{n \times h}$. Then, the reset gate $\mathbf{R}_t \in \mathbb{R}^{n \times h}$ and update gate $\mathbf{Z}_t \in \mathbb{R}^{n \times h}$ are computed as follows:
 
 $$
 \begin{aligned}
-\boldsymbol{R}_t = \sigma(\boldsymbol{X}_t \boldsymbol{W}_{xr} + \boldsymbol{H}_{t-1} \boldsymbol{W}_{hr} + \boldsymbol{b}_r),\\
-\boldsymbol{Z}_t = \sigma(\boldsymbol{X}_t \boldsymbol{W}_{xz} + \boldsymbol{H}_{t-1} \boldsymbol{W}_{hz} + \boldsymbol{b}_z),
+\mathbf{R}_t = \sigma(\mathbf{X}_t \mathbf{W}_{xr} + \mathbf{H}_{t-1} \mathbf{W}_{hr} + \mathbf{b}_r)\\
+\mathbf{Z}_t = \sigma(\mathbf{X}_t \mathbf{W}_{xz} + \mathbf{H}_{t-1} \mathbf{W}_{hz} + \mathbf{b}_z)
 \end{aligned}
 $$
 
-Here, $\boldsymbol{W}_{xr}, \boldsymbol{W}_{xz} \in \mathbb{R}^{d \times h}$ and $\boldsymbol{W}_{hr}, \boldsymbol{W}_{hz} \in \mathbb{R}^{h \times h}$ are weight parameters and $\boldsymbol{b}_r, \boldsymbol{b}_z \in \mathbb{R}^{1 \times h}$ is a bias parameter. As described in the ["Multilayer Perceptron"](../chapter_deep-learning-basics/mlp.md) section, a sigmoid function can transform element values between 0 and 1. Therefore, the range of each element in the reset gate $\boldsymbol{R}_t$ and update gate $\boldsymbol{Z}_t$ is $[0, 1]$.
+Here, $\mathbf{W}_{xr}, \mathbf{W}_{xz} \in \mathbb{R}^{d \times h}$ and $\mathbf{W}_{hr}, \mathbf{W}_{hz} \in \mathbb{R}^{h \times h}$ are weight parameters and $\mathbf{b}_r, \mathbf{b}_z \in \mathbb{R}^{1 \times h}$ are biases. We use a sigmoid function (see e.g. the [MLP](../chapter_deep-learning-basics/mlp.md) section for a description) to transform values to the interval $(0,1)$. 
 
-### Candidate Hidden States
+### Reset Gate in Action
 
-Next, the GRU computes candidate hidden states to facilitate subsequent hidden state computation. As shown in Figure 6.5, we perform multiplication by element between the current time step reset gate output and previous time step hidden state (symbol: $\odot$). If the element value in the reset gate approaches 0, this means that it resets the value of the corresponding hidden state element to 0, discarding the hidden state from the previous time step. If the element value approaches 1, this indicates that the hidden state from the previous time step is retained. Then, the result of multiplication by element is concatenated with the current time step input to compute candidate hidden states in a fully connected layer with a tanh activation function. The range of all element values is $[-1, 1]$.
+We begin by integrating the reset gate with a regular latent state updating mechanism. In a conventional deep RNN we would have an update of the form
 
-![ Candidate hidden state computation in a GRU. Here, the multiplication sign indicates multiplication by element. ](../img/gru_2.svg)
+$$\mathbf{H}_t = \tanh(\mathbf{X}_t \mathbf{W}_{xh} + \mathbf{H}_{t-1}\mathbf{W}_{hh} + \mathbf{b}_h).$$
 
-For time step $t$, the candidate hidden state $\tilde{\boldsymbol{H}}_t \in \mathbb{R}^{n \times h}$ is computed by the following formula:
+This is essentially identical to the discussion of the previous section, albeit with a nonlinearity in the form of $\tanh$ to ensure that the values of the hidden state remain in the interval $(-1, 1)$.
+If we want to be able to reduce the influence of previous states we can multiply $\mathbf{H}_{t-1}$ with $\mathbf{R}_t$ elementwise. Whenever the entries in $\mathbf{R}_t$ are close to $1$ we recover a conventional deep RNN. For all entries of $\mathbf{R}_t$ that are close to $0$ the hidden state is the result of an MLP with $\mathbf{X}_t$ as input. Any pre-existing hidden state is thus 'reset' to defaults. This leads to the following candidate for a new hidden state (it is a *candidate* since we still need to incorporate the action of the update gate).
 
-$$\tilde{\boldsymbol{H}}_t = \text{tanh}(\boldsymbol{X}_t \boldsymbol{W}_{xh} + \left(\boldsymbol{R}_t \odot \boldsymbol{H}_{t-1}\right) \boldsymbol{W}_{hh} + \boldsymbol{b}_h),$$
+$$\tilde{\mathbf{H}}_t = \tanh(\mathbf{X}_t \mathbf{W}_{xh} + \left(\mathbf{R}_t \odot \mathbf{H}_{t-1}\right) \mathbf{W}_{hh} + \mathbf{b}_h)$$
 
-Here, $\boldsymbol{W}_{xh} \in \mathbb{R}^{d \times h}$ and $\boldsymbol{W}_{hh} \in \mathbb{R}^{h \times h}$ are weight parameters and $\boldsymbol{b}_h \in \mathbb{R}^{1 \times h}$ is a bias parameter. From the formula above, we can see that the reset gate controls how the hidden state of the previous time step enters into the candidate hidden state of the current time step. In addition, the hidden state of the previous time step may contain all historical information of the time series up to the previous time step. Thus, the reset gate can be used to discard historical information that has no bearing on predictions.
+The figure below illustrates the computational flow after applying the reset gate. The symbol $\odot$ indicates pointwise multiplication between tensors.  
 
-### Hidden States
+![ Candidate hidden state computation in a GRU. The multiplication is carried out elementwise. ](../img/gru_2.svg)
 
-Finally, the computation of the hidden state $\boldsymbol{H}_t \in \mathbb{R}^{n \times h}$ for time step $t$ uses the current time step's update gate $\boldsymbol{Z}_t$ to combine the previous time step hidden state $\boldsymbol{H}_{t-1}$ and current time step candidate hidden state $\tilde{\boldsymbol{H}}_t$:
+### Update Gate in Action
 
-$$\boldsymbol{H}_t = \boldsymbol{Z}_t \odot \boldsymbol{H}_{t-1}  + (1 - \boldsymbol{Z}_t) \odot \tilde{\boldsymbol{H}}_t.$$
+Next we need to incorporate the effect of the update gate. This determines the extent to which the new state $\mathbf{H}_t$ is just the old state $\mathbf{H}_{t-1}$ and by how much the new candidate state $\tilde{\mathbf{H}}_t$ is used. The gating variable $\mathbf{Z}_t$ can be used for this purpose, simply by taking elementwise convex combinations between both candidates. This leads to the final update equation for the GRU. 
+
+$$\mathbf{H}_t = \mathbf{Z}_t \odot \mathbf{H}_{t-1}  + (1 - \mathbf{Z}_t) \odot \tilde{\mathbf{H}}_t.$$
 
 
-![ Hidden state computation in a GRU. Here, the multiplication sign indicates multiplication by element. ](../img/gru_3.svg)
+![ Hidden state computation in a GRU. As before, the multiplication is carried out elementwise. ](../img/gru_3.svg)
 
-
-It should be noted that update gates can control how hidden states should be updated by candidate hidden states containing current time step information, as shown in Figure 6.6. Here, we assume that the update gate is always approximately 1 between the time steps $t'$ and $t$ ($t' < t$). Therefore, the input information between the time steps $t'$ and $t$ almost never enters the hidden state $\boldsymbol{H}_t$ for time step $t$. In fact, we can think of it like this: The hidden state of an earlier time $\boldsymbol{H}_{t'-1}$ is saved over time and passed to the current time step $t$. This design can cope with the vanishing gradient problem in recurrent neural networks and better capture dependencies for time series with large time step distances.
-
-We can summarize the design of GRUs as follows:
+Whenever the update gate is close to $1$ we simply retain the old state. In this case the information from $\mathbf{X}_t$ is essentially ignored, effectively skipping time step $t$ in the dependency chain. Whenever it is close to $1$ the new latent state $\mathbf{H}_t$ approaches the candidate latent state $\tilde{\mathbf{H}}_t$. These designs can help cope with the vanishing gradient problem in RNNs and better capture dependencies for time series with large time step distances. In summary GRUs have the following two distinguishing features:
 
 * Reset gates help capture short-term dependencies in time series.
 * Update gates help capture long-term dependencies in time series.
 
-## Read the Data Set
+## Implementation from Scratch
 
-To implement and display a GRU, we will again use the Jay Chou lyrics data set to train the model to compose song lyrics. The implementation, except for the GRU, has already been described in the ["Recurrent Neural Network"](rnn.md) section. The code for reading the data set is given below:
+To gain a better understanding of the model let us implement a GRU from scratch. 
+
+### Reading the Data Set
+
+We begin by reading *The Time Machine* corpus that we used in the previous section discussing [Recurrent Neural Networks](rnn.md). The code for reading the data set is given below:
 
 ```{.python .input  n=1}
 import sys
@@ -73,17 +77,12 @@ import d2l
 from mxnet import nd
 from mxnet.gluon import rnn
 
-(corpus_indices, char_to_idx, idx_to_char,
- vocab_size) = d2l.load_data_time_machine()
+(corpus_indices, char_to_idx, idx_to_char, vocab_size) = d2l.load_data_time_machine()
 ```
-
-## Implementation from Scratch
-
-We will start by showing how to implement a GRU from scratch.
 
 ### Initialize Model Parameters
 
-The code below initializes the model parameters. The hyper-parameter `num_hiddens` defines the number of hidden units.
+The next step is to initialize the model parameters. We draw the weights from a Gaussian with variance $0.01$ and set the bias to $0$. The hyper-parameter `num_hiddens` defines the number of hidden units. We instantiate all terms relating to update and reset gate and the candidate hidden state itself. Subsequently we attach gradients to all parameters. 
 
 ```{.python .input  n=2}
 num_inputs, num_hiddens, num_outputs = vocab_size, 256, vocab_size
@@ -113,14 +112,14 @@ def get_params():
 
 ### Define the Model
 
-Now we will define the hidden state initialization function `init_gru_state`. Just like the `init_rnn_state` function defined in the ["Implementation of the Recurrent Neural Network from Scratch"](rnn-scratch.md) section, this function returns a tuple composed of an NDArray with a shape (batch size, number of hidden units) value of 0.
+Now we will define the hidden state initialization function `init_gru_state`. Just like the `init_rnn_state` function defined in the ["Implementation of the Recurrent Neural Network from Scratch"](rnn-scratch.md) section, this function returns a tuple composed of an NDArray with a shape (batch size, number of hidden units) and with all values set to 0.
 
 ```{.python .input  n=3}
 def init_gru_state(batch_size, num_hiddens, ctx):
     return (nd.zeros(shape=(batch_size, num_hiddens), ctx=ctx), )
 ```
 
-Below, we define the model based on GRU computing expressions.
+Now we are ready to define the actual model. Its structure is the same as the basic RNN cell, just that the update equations are more complex.
 
 ```{.python .input  n=4}
 def gru(inputs, state, params):
@@ -137,16 +136,16 @@ def gru(inputs, state, params):
     return outputs, (H,)
 ```
 
-### Train the Model and Write Lyrics
+### Training and Prediction
 
-During model training, we only use adjacent examples. After setting the hyper-parameters, we train and model and create a 50 character string of lyrics based on the prefixes "separate" and "not separated".
+Training and prediction work in exactly the same manner as before. That is, we need to define a number of epochs, a number of steps for truncation, the minibatch size, a learning rate and how aggressively we should be clipping the gradients. Lastly we create a string of 50 characters based on the prefixes *traveller* and *time traveller*. 
 
 ```{.python .input  n=5}
-num_epochs, num_steps, batch_size, lr, clipping_theta = 160, 35, 32, 1e2, 1e-2
-pred_period, pred_len, prefixes = 40, 50, ['traveller', 'time traveller']
+num_epochs, num_steps, batch_size, lr, clipping_theta = 250, 35, 32, 1e2, 1e-2
+pred_period, pred_len, prefixes = 50, 50, ['traveller', 'time traveller']
 ```
 
-We create a string of lyrics based on the currently trained model every 40 epochs.
+We generate a string of lyrics based on the currently trained model every 50 epochs.
 
 ```{.python .input}
 d2l.train_and_predict_rnn(gru, get_params, init_gru_state, num_hiddens,
@@ -158,7 +157,7 @@ d2l.train_and_predict_rnn(gru, get_params, init_gru_state, num_hiddens,
 
 ## Concise Implementation
 
-In Gluon, we can directly call the `GRU` class in the `rnn` module.
+In Gluon, we can directly call the `GRU` class in the `rnn` module. This encapsulates all the configuration details that we made explicit above. The code is significantly faster as it uses compiled operators rather than Python for many details that we spelled out in detail before. 
 
 ```{.python .input  n=6}
 gru_layer = rnn.GRU(num_hiddens)
@@ -171,17 +170,18 @@ d2l.train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
 
 ## Summary
 
-* Gated recurrent neural networks can better capture dependencies for time series with large time step distances.
-* GRUs introduce the reset gate and update gate concepts to change the method used to calculate hidden states in recurrent neural networks. They include reset gates, update gates, candidate hidden states, and hidden states.
+* Gated recurrent neural networks are better at capturing dependencies for time series with large time step distances.
 * Reset gates help capture short-term dependencies in time series.
 * Update gates help capture long-term dependencies in time series.
+* GRUs contain basic RNNs as their extreme case whenever the reset gate is switched on. They can ignore sequences as needed. 
 
 
 ## Exercises
 
-* Assume that time step $t' < t$. If we only want to use the input for time step $t'$ to predict the output at time step $t$, what are the best values for the reset and update gates for each time step?
-* Adjust the hyper-parameters and observe and analyze the impact on running time, perplexity, and the written lyrics.
-* Compare the running times of a GRU and ungated recurrent neural network under the same conditions.
+1. Compare runtimes, perplexity and the extracted strings for 'rnn.RNN' and 'rnn.GRU' implementations with each other. 
+1. Assume that we only want to use the input for time step $t'$ to predict the output at time step $t > t'$. What are the best values for reset and update gates for each time step?
+1. Adjust the hyper-parameters and observe and analyze the impact on running time, perplexity, and the written lyrics.
+1. What happens if you implement only parts of a GRU? That is, implement a recurrent cell that only has a reset gate. Likewise, implement a recurrent cell only with an update gate. 
 
 ## References
 
