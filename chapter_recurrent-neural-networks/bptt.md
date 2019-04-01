@@ -86,3 +86,66 @@ It follows from the definition of $\xi_t$ that $\mathbf{E}[z_t] = \partial_w h_t
 
 The picture above illustrates the three cases when analyzing the first few words of *The Time Machine*: randomized truncation partitions the text into segments of varying length. Regular truncated BPTT breaks it into sequences of the same length, and full BPTT leads to a computationally infeasible expression.
 
+## The Computational Graph
+
+In order to visualize the dependencies between model variables and parameters during computation in a recurrent neural network, we can draw a computational graph for the model, as shown below. For example, the computation of the hidden states of time step 3 $\mathbf{h}_3$ depends on the model parameters $\mathbf{W}_{hx}$ and $\mathbf{W}_{hh}$, the hidden state of the last time step $\mathbf{h}_2$, and the input of the current time step $\mathbf{x}_3$.
+
+![ Computational dependencies for a recurrent neural network model with three time steps. Boxes represent variables (not shaded) or parameters (shaded) and circles represent operators. ](../img/rnn-bptt.svg)
+
+## BPTT in Detail
+
+Now that we discussed the general principle let's discuss BPTT in detail, distinguishing between different sets of weight matrices ($\mathbf{W}_{hx}, \mathbf{W}_{hh}$ and $\mathbf{W}_{oh}$) in a simple linear latent variable model:
+
+$$\mathbf{h}_t = \mathbf{W}_{hx} \mathbf{x}_t + \mathbf{W}_{hh} \mathbf{h}_{t-1} \text{ and }
+\mathbf{o}_t = \mathbf{W}_{oh} \mathbf{h}_t$$
+
+Following the discussion of the section on ["backprop"](../chapter_deep-learning-basics/backprop.md) we compute gradients $\partial L/\partial \mathbf{W}_{hx}$, $\partial L/\partial \mathbf{W}_{hh}$, and $\partial L/\partial \mathbf{W}_{oh}$ for 
+$L(\mathbf{x}, \mathbf{y}, \mathbf{W}) = \sum_{t=1}^T l(\mathbf{o}_t, y_t)$.
+Taking the derivatives with respect to $W_{oh}$ is fairly straightforward and we obtain
+
+$$\partial_{\mathbf{W}_{oh}} L = \sum_{t=1}^T \mathrm{prod}
+\left(\partial_{\mathbf{o}_t} l(\mathbf{o}_t, y_t), \mathbf{h}_t\right)$$
+
+The dependency on $\mathbf{W}_{hx}$ and $\mathbf{W}_{hh}$ is a bit more tricky since it involves a chain of derivatives. We begin with 
+
+$$\begin{aligned}
+\partial_{\mathbf{W}_{hh}} L & = \sum_{t=1}^T \mathrm{prod}
+\left(\partial_{\mathbf{o}_t} l(\mathbf{o}_t, y_t), \mathbf{W}_{oh}, \partial_{\mathbf{W}_{hh}} \mathbf{h}_t\right) \\
+\partial_{\mathbf{W}_{hx}} L & = \sum_{t=1}^T \mathrm{prod}
+\left(\partial_{\mathbf{o}_t} l(\mathbf{o}_t, y_t), \mathbf{W}_{oh}, \partial_{\mathbf{W}_{hx}} \mathbf{h}_t\right)
+\end{aligned}$$
+
+After all, hidden states depend on each other and on past inputs. The key quantity is how past hidden states affect future hidden states. 
+
+$$\partial_{\mathbf{h}_t} \mathbf{h}_{t+1} = \mathbf{W}_{hh}^\top
+\text{ and thus }
+\partial_{\mathbf{h}_t} \mathbf{h}_T = \left(\mathbf{W}_{hh}^\top\right)^{T-t}$$
+
+Chaining terms together yields
+
+$$\begin{aligned}
+\partial_{\mathbf{W}_{hh}} \mathbf{h}_t & = \sum_{j=1}^t \left(\mathbf{W}_{hh}^\top\right)^{t-j} \mathbf{h}_j \\
+\partial_{\mathbf{W}_{hx}} \mathbf{h}_t & = \sum_{j=1}^t \left(\mathbf{W}_{hh}^\top\right)^{t-j} \mathbf{x}_j.
+\end{aligned}$$
+
+A number of things follow from this potentially very intimidating expression. Firstly, it pays to store intermediate results, i.e. powers of $\mathbf{W}_{hh}$ as we work our way through the terms of the loss function $L$. Secondly, this simple *linear* example already exhibits some key problems of long sequence models: it involves potentially very large powers $\mathbf{W}_{hh}^j$. In it, eigenvalues smaller than $1$ vanish for large $j$ and eigenvalues larger than $1$ diverge. This is numerically unstable and gives undue importance to potentially irrelvant past detail. One way to address this is to truncate the sum at a computationally convenient size. Later on in this chapter we will see how more sophisticated sequence models such as LSTMs can alleviate this further. In code, this truncation is effected by *detaching* the gradient after a given number of steps. 
+
+## Summary
+
+* Back-propagation through time is merely an application of backprop to sequence models with a hidden state.
+* Truncation is needed for computational convencient and numerical stability.
+* High powers of matrices can lead top divergent and vanishing eigenvalues. This manifests itself in the form of exploding or vanishing gradients.
+* For efficient computation intermediate values are cached. 
+
+## Exercises
+
+1. Assume that we have a symmetric matrix $\mathbf{M} \in \mathbb{R}^{n \times n}$ with eigenvalues $\lambda_i$. Without loss of generality assume that they are ordered in ascending order $\lambda_i \leq \lambda_{i+1}$. Show that $\mathbf{M}^k$ has eigenvalues $\lambda_i^k$.
+1. Prove that for a random vector $\mathbf{x} \in \mathbb{R}^n$ with high probability $\mathbf{M}^k \mathbf{x}$ will by very much aligned with the largest eigenvector $\mathbf{v}_n$ of $\mathbf{M}$. Formalize this statement. 
+1. What does the above result mean for gradients in a recurrent neural network?
+1. Besides gradient clipping, can you think of any other methods to cope with gradient explosion in recurrent neural networks?
+
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2366)
+
+![](../img/qr_bptt.svg)
+
+
