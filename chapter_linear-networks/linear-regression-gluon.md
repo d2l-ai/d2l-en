@@ -34,7 +34,7 @@ labels += nd.random.normal(scale=0.01, shape=labels.shape)
 
 ## Reading Data
 
-Rather than rolling our own diterator, 
+Rather than rolling our own iterator, 
 we can call upon Gluon's `data` module to read data. 
 Since `data` is often used as a variable name, 
 we will replace it with the pseudonym `gdata` 
