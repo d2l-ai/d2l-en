@@ -1,40 +1,44 @@
 # Softmax Regression
 
-Over the last two sections we worked through how to implement a linear regression model,
-both [*from scratch*](linear-regression-scratch.ipynb)
-and [using Gluon](linear-regression-gluon.ipynb) to automate most of the repetitive work
-like allocating and initializing parameters, defining loss functions, and implementing optimizers.
+In the last two sections, we worked through implementations
+linear regression, building everything [*from scratch*](linear-regression-scratch.ipynb) and again [using Gluon](linear-regression-gluon.ipynb) to automate the most repetitive work.
 
-Regression is the hammer we reach for when we want to answer *how much?* or *how many?* questions.
-If you want to predict the number of dollars (the *price*) at which a house will be sold,
+Regression is the hammer we reach for 
+when we want to answer *how much?* or *how many?* questions.
+If you want to predict the number of dollars (the *price*) 
+at which a house will be sold,
 or the number of wins a baseball team might have,
-or the number of days that a patient will remain hospitalized before being discharged,
+or the number of days that a patient 
+will remain hospitalized before being discharged,
 then you're probably looking for a regression model.
 
-In reality, we're more often interested in making categorical assignments.
+In practice, we're more often interested in classification:
+asking not *how much* but *which one*.
 
 * Does this email belong in the spam folder or the inbox*?
-* How likely is this customer to sign up for subscription service?*
-* What is the object in the image (donkey, dog, cat, rooster, etc.)?
-* Which object is a customer most likely to purchase?
+* Is this customer more likley *to sign up* or *not to sign up* for a subscription service?*
+* Does this image depict a donkey, a dog, a cat, or a rooster?
+* Which movie is user most likely to watch next?
 
-When we're interested in either assigning datapoints to categories
-or assessing the *probability* that a category applies,
-we call this task *classification*. The issue with the models that we studied so far is that they cannot be applied to problems of probability estimation.
+Colloquially, we use the word *classification* to describe two subtly different problems: (i) those where we are interested only in *hard* assignments of examples to categories, and (ii) those where we wish to make *soft assignments*, i.e., to assess the *probability* that each category applies. One reason why the distinction between these tasks gets blurred is because most often, even when we only care about hard assignments, we still use models that make soft assignments.
+
 
 ## Classification Problems
 
-Let's start with an admittedly somewhat contrived image problem where the input image has a height and width of 2 pixels and the color is grayscale. Thus, each pixel value can be represented by a scalar. We record the four pixels in the image as $x_1, x_2, x_3, x_4$. We assume that the actual labels of the images in the training data set are "cat", "chicken" or "dog" (assuming that the three animals can be represented by 4 pixels).
+To get our feet wet, let's start off with a somewhat contrived image classification problem. Here, each input will be a grayscale 2-by-2 image. We can represent each pixel location as a single scalar, representing each image with four features $x_1, x_2, x_3, x_4$. Further, let's assume that each image belongs to one among the categories "cat", "chicken" and "dog".
 
-To represent these labels we have two choices. Either we set $y \in \{1, 2, 3\}$, where the integers represent {dog, cat, chicken} respectively. This is a great way of *storing* such information on a computer. It would also lend itself rather neatly to regression, but the ordering of outcomes imposes some quite unnatural ordering. In our toy case, this would presume that cats are more similar to chickens than to dogs, at least mathematically. It doesn't work so well in practice either, which is why statisticians invented an alternative approach: one hot encoding via
+First, we have to choose how to represent the labels. We have two obvious choices. Perhaps the most natural impulse would be to choose $y \in \{1, 2, 3\}$, where the integers represent {dog, cat, chicken} respectively. This is a great way of *storing* such information on a computer. 
+If the categories had some natural ordering among them, say if we were trying to predict {baby, child, adolescent, adult}, then it might even make sense to cast this problem as a regression and keep the labels in this format. 
+
+But general classification problems do not come with natural orderings among the classes. To deal with problems like this, statisticians invented an alternative way to represent categorical data: the one hot encoding. Here we have a vector with one component for every possible category. For a given instance, we set the component correponding to *its category* to 1, and set all other components to 0.
 
 $$y \in \{(1, 0, 0), (0, 1, 0), (0, 0, 1)\}$$
 
-That is, $y$ is viewed as a three-dimensional vector, where $(1,0,0)$ corresponds to "cat", $(0,1,0)$ to "chicken" and $(0,0,1)$ to "dog".
+In our case, $y$ would be a three-dimensional vector, with $(1,0,0)$ corresponding to "cat", $(0,1,0)$ to "chicken" and $(0,0,1)$ to "dog".
 
 ### Network Architecture
 
-If we want to estimate multiple classes, we need multiple outputs, matching the number of categories. This is one of the main differences to regression. Because there are 4 features and 3 output animal categories, the weight contains 12 scalars ($w$ with subscripts) and the bias contains 3 scalars ($b$ with subscripts). We compute these three outputs, $o_1, o_2$, and $o_3$, for each input:
+In order to estimate multiple classes, we need a model with multiple outputs, one per category. This is one of the main differences beween classification and regression models. To address classification with linear models, we will need as many linear functions as we have outputs. Each output will correpsond to its own linear function. In our case, since we have 4 features and 3 possible output categories, we will need 12 scalars to represent the weights,  ($w$ with subscripts) and 3 scalars to represent the biases ($b$ with subscripts). We compute these three outputs, $o_1, o_2$, and $o_3$, for each input:
 
 $$
 \begin{aligned}
@@ -44,18 +48,30 @@ o_3 &= x_1 w_{13} + x_2 w_{23} + x_3 w_{33} + x_4 w_{43} + b_3.
 \end{aligned}
 $$
 
-The neural network diagram below depicts the calculation above.  Like linear regression, softmax regression is also a single-layer neural network.  Since the calculation of each output, $o_1, o_2$, and $o_3$, depends on all inputs, $x_1$, $x_2$, $x_3$, and $x_4$, the output layer of the softmax regression is also a fully connected layer.
+We can depict this calculation with the neural network diagram below. Just as in linear regression, softmax regression is also a single-layer neural network. And since the calculation of each output, $o_1, o_2$, and $o_3$, depends on all inputs, $x_1$, $x_2$, $x_3$, and $x_4$, the output layer of softmax regression can also be described as fully connected layer.
 
 ![Softmax regression is a single-layer neural network.  ](../img/softmaxreg.svg)
 
 
 ### Softmax Operation
 
-The chosen notation is somewhat verbose. In vector form we arrive at $\mathbf{o} = \mathbf{W} \mathbf{x} + \mathbf{b}$, which is much more compact to write and code. Since the classification problem requires discrete prediction output, we can use a simple approach to treat the output value $o_i$ as the confidence level of the prediction category $i$. We can choose the class with the largest output value as the predicted output, which is output $\operatorname*{argmax}_i o_i$. For example, if $o_1$, $o_2$, and $o_3$ are 0.1, 10, and 0.1, respectively, then the prediction category is 2, which represents "chicken".
+To express the model more compactly, we can use linear algebra notation. In vector form, we arrive at $\mathbf{o} = \mathbf{W} \mathbf{x} + \mathbf{b}$, a form better suited both for mathematics, and for writing code. Note that we have gathered all of our weights into a $3\times4$ matrix and that for a given example $\mathbf{x}$ our outputs are given by a matrix vector product of our weights by our inputs plus our biases $\mathbf{b}$.
 
-However, there are two problems with using the output from the output layer directly. On the one hand, because the range of output values from the output layer is uncertain, it is difficult for us to visually judge the meaning of these values. For instance, the output value 10 from the previous example indicates a level of "very confident" that the image category is "chicken". That is because its output value is 100 times that of the other two categories.  However, if $o_1=o_3=10^3$, then an output value of 10 means that the chance for the image category to be chicken is very low.  On the other hand, since the actual label has discrete values, the error between these discrete values and the output values from an uncertain range is difficult to measure.
 
-We could try forcing the outputs to correspond to probabilities, but there's no guarantee that on new (unseen) data the probabilities would be nonnegative, let alone sum up to 1. For this kind of discrete value prediction problem, statisticians have invented classification models such as (softmax) logistic regression. Unlike linear regression, the output of softmax regression is subjected to a nonlinearity which ensures that the sum over all outcomes always adds up to 1 and that none of the terms is ever negative. The nonlinear transformation works as follows:
+If we are inerested in hard classifications, we need to convert these outputs into a discrete prediction. One straightforward way to do this is to treat the output values $o_i$ as the relative confidence levels that the item belongs to each category $i$. Then we can choose the class with the largest output value as our prediction $\operatorname*{argmax}_i o_i$. For example, if $o_1$, $o_2$, and $o_3$ are 0.1, 10, and 0.1, respectively, then we predict category 2, which represents "chicken".
+
+However, there are a few problems with using the output from the output layer directly. First, because the range of output values from the output layer is uncertain, it is difficult to judge the meaning of these values. For instance, the output value 10 from the previous example appears to indicate that we are *very confident* that the image category is *chicken*. But just how confident? Is it 100 times more likely to be a chicken than a dog or are we less confident?
+
+Moreover how do we train this model. If the argmax matches the label, then we have no error at all! And if if the argmax is not equal to the label, then no infinitesimal change in our weights will decrease our error. That takes gradient-based learning off the table.
+
+We might like for our outputs to correspond to probabilities, but then we would need a way to guarantee that on new (unseen) data the probabilities would be nonnegative and sum up to 1. Moreover, we would need a training objective that encouraged the model to actually estimate *probabilities*.
+Fortunately, statisticians have conveniently invented a model 
+called softmax logistic regression that does precisely this.
+
+In order to ensure that our outputs are nonnegative and sum to 1,
+while requiring that our model remains differentiable, 
+we subject the outputs of the linear portion of our model 
+to a nonlinear *softmax* function:
 
 $$
 \hat{\mathbf{y}} = \mathrm{softmax}(\mathbf{o}) \text{ where }
@@ -68,12 +84,12 @@ $$
 \hat{\imath}(\mathbf{o}) = \operatorname*{argmax}_i o_i = \operatorname*{argmax}_i \hat y_i
 $$
 
-So, the softmax operation does not change the prediction category output but rather it gives the outputs $\mathbf{o}$ proper meaning. Summarizing it all in vector notation we get ${\mathbf{o}}^{(i)} = \mathbf{W} {\mathbf{x}}^{(i)} + {\mathbf{b}}$ where ${\hat{\mathbf{y}}}^{(i)} = \mathrm{softmax}({\mathbf{o}}^{(i)})$.
+In short, the softmax operation perserves the orderings of its inputs, and thus does not alter the predicted category vs our simpler *argmax* model. However, it gives the outputs $\mathbf{o}$ proper meaning: they are the pre-softmax values determining the probabilities assigned to each category. Summarizing it all in vector notation we get ${\mathbf{o}}^{(i)} = \mathbf{W} {\mathbf{x}}^{(i)} + {\mathbf{b}}$ where ${\hat{\mathbf{y}}}^{(i)} = \mathrm{softmax}({\mathbf{o}}^{(i)})$.
 
 
 ### Vectorization for Minibatches
 
-To improve computational efficiency further, we usually carry out vector calculations for mini-batches of data. Assume that we are given a mini-batch $\mathbf{X}$ of examples with dimensionality $d$ and batch size $n$. Moreover, assume that we have $q$ categories (outputs). Then the minibatch features $\mathbf{X}$ are in $\mathbb{R}^{n \times d}$, weights $\mathbf{W} \in \mathbb{R}^{d \times q}$ and the bias satisfies $\mathbf{b} \in \mathbb{R}^q$.
+Again, to improve computational efficiency and take advantage of GPUs, we will typicaly carry out vector calculations for mini-batches of data. Assume that we are given a mini-batch $\mathbf{X}$ of examples with dimensionality $d$ and batch size $n$. Moreover, assume that we have $q$ categories (outputs). Then the minibatch features $\mathbf{X}$ are in $\mathbb{R}^{n \times d}$, weights $\mathbf{W} \in \mathbb{R}^{d \times q}$ and the bias satisfies $\mathbf{b} \in \mathbb{R}^q$.
 
 $$
 \begin{aligned}
@@ -82,11 +98,11 @@ $$
 \end{aligned}
 $$
 
-This accelerates the dominant operation: $\mathbf{W} \mathbf{X}$ from a matrix-vector to a matrix-matrix product. The softmax itself can be computed by exponentiating all entries in $\mathbf{O}$ and then normalizing them by the sum appropriately.
+This accelerates the dominant operation into a matrix-matrix product $\mathbf{W} \mathbf{X}$ vs the matrix-vector products we would be exectuting if we processed one example at a time. The softmax itself can be computed by exponentiating all entries in $\mathbf{O}$ and then normalizing them by the sum appropriately.
 
 ## Loss Function
 
-Now that we have some mechanism for outputting probabilities, we need to transform this into a measure of how accurate things are, i.e. we need a *loss function*. For this we use the same concept that we already encountered in linear regression, namely likelihood maximization.
+Now that we have some mechanism for outputting probabilities, we need to transform this into a measure of how accurate things are, i.e. we need a *loss function*. For this, we use the same concept that we already encountered in linear regression, namely likelihood maximization.
 
 ### Log-Likelihood
 
@@ -98,7 +114,9 @@ p(Y|X) = \prod_{i=1}^n p(y^{(i)}|x^{(i)})
 -\log p(Y|X) = \sum_{i=1}^n -\log p(y^{(i)}|x^{(i)})
 $$
 
-Minimizing $-\log p(Y|X)$ corresponds to predicting things well. This yields the loss function (we dropped the superscript $(i)$ to avoid notation clutter):
+Maximizing $p(Y|X)$ (and thus equivalently $-\log p(Y|X)$) 
+corresponds to predicting the label well. 
+This yields the loss function (we dropped the superscript $(i)$ to avoid notation clutter):
 
 $$
 l = -\log p(y|x) = - \sum_j y_j \log \hat{y}_j
@@ -121,7 +139,7 @@ $$
 \partial_{o_j} l = \frac{\exp(o_j)}{\sum_k \exp(o_k)} - y_j = \mathrm{softmax}(\mathbf{o})_j - y_j = \Pr(y = j|x) - y_j
 $$
 
-In other words, the gradient is the difference between what the model thinks should happen, as expressed by the probability $p(y|x)$, and what actually happened, as expressed by $y$. In this sense, it is very similar to what we saw in regression, where the gradient was the difference between the observation $y$ and estimate $\hat{y}$. This seems too much of a coincidence, and indeed, it isn't. In any [exponential family](https://en.wikipedia.org/wiki/Exponential_family) model the gradients of the log-likelihood are given by precisely this term. This fact makes computing gradients a lot easier in practice.
+In other words, the gradient is the difference between the probability assigned to the true class by our model, as expressed by the probability $p(y|x)$, and what actually happened, as expressed by $y$. In this sense, it is very similar to what we saw in regression, where the gradient was the difference between the observation $y$ and estimate $\hat{y}$. This is not coincidence. In any [exponential family](https://en.wikipedia.org/wiki/Exponential_family) model, the gradients of the log-likelihood are given by precisely this term. This fact makes computing gradients easy in practice.
 
 ### Cross-Entropy Loss
 
@@ -131,7 +149,7 @@ $$
 l(\mathbf{y}, \hat{\mathbf{y}}) = - \sum_j y_j \log \hat{y}_j
 $$
 
-This loss is called the cross-entropy loss. It is one of the most commonly used ones for multiclass classification. To demystify its name we need some information theory. The following section can be skipped if needed.
+This loss is called the cross-entropy loss and it is one of the most commonly used losses for multiclass classification. To demystify its name we need some information theory. The following section can be skipped if needed.
 
 ## Information Theory Basics
 
