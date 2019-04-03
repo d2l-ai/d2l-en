@@ -50,8 +50,6 @@ and specify a Boolean value `shuffle` indicating whether or not
 we want the DataLoader to shuffle the data 
 on each epoch (pass through the dataset).
 
-<!-- In each iteration, we will randomly read a mini-batch containing 10 data instances.
- -->
 ```{.python .input  n=3}
 from mxnet.gluon import data as gdata
 
