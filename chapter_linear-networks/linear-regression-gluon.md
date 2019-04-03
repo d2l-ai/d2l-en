@@ -47,7 +47,7 @@ Here, we pass in `features` and `labels` as arguments.
 Next, we will use the ArrayDataset to instantiate a DataLoader,
 which also requires that we specify a `batch_size` 
 and specify a Boolean value `shuffle` indicating whether or not 
-we want the DataLoader to shuffle the data 
+we want the `DataLoader` to shuffle the data 
 on each epoch (pass through the dataset).
 
 ```{.python .input  n=3}
