@@ -5,7 +5,7 @@ This is the task of predicting a *real valued target* $y$
 given a data point $\mathbf{x}$.
 Regression problems are common in practice, arising
 whenever we want to predict a continuous numerical value. 
-Some exmaples of regression problems include
+Some examples of regression problems include
 predicting house prices, stock prices, 
 length of stay (for patients in the hospital),
 tomorrow's temperature, demand forecasting (for retail sales), and many more. 
