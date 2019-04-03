@@ -1,7 +1,6 @@
 # Image Classification Data (Fashion-MNIST)
 
-Before introducing the implementation for softmax regression, we need a suitable dataset. To make things more visually compelling we pick one on classification.
-It will be used multiple times in later chapters to allow us to observe the difference between model accuracy and computational efficiency between comparison algorithms. The most commonly used image classification data set is the [MNIST](http://yann.lecun.com/exdb/mnist/) handwritten digit recognition data set. It was proposed by LeCun, Cortes and Burges in the 1990s. However, most models have a classification accuracy of over 95% on MNIST, hence it is hard to spot the difference between different models. In order to get a better intuition about the difference between algorithms we use a more complex data set. [Fashion-MNIST](https://github.com/zalandoresearch/fashion-mnist) was proposed by [Xiao, Rasul and Vollgraf](https://arxiv.org/abs/1708.07747) in 2017.
+Before we implement softmax regression ourselves, let's pick a real dataset to work with. To make things visually compelling, we will pick an image classification dataset. The most commonly used image classification data set is the [MNIST](http://yann.lecun.com/exdb/mnist/) handwritten digit recognition data set, proposed by LeCun, Cortes and Burges in the 1990s. However, even simple models achieve classification accuracy over 95% on MNIST, so it is hard to spot the differences between better models and weaker ones. In order to get a better intuition, we will use the qualitatively similar, but comparatively complex [Fashion-MNIST](https://github.com/zalandoresearch/fashion-mnist) dataset, proposed by [Xiao, Rasul and Vollgraf](https://arxiv.org/abs/1708.07747) in 2017.
 
 ## Getting the Data
 
@@ -18,26 +17,35 @@ import sys
 import time
 ```
 
-Next, we will download this data set through Gluon's `data` package. The data is automatically retrieved from the Internet the first time it is called. We specify the acquisition of a training data set, or a testing data set by the parameter `train`. The test data set, also called the testing set, is only used to evaluate the performance of the model and is not used to train the model.
+Conveniently, Gluon's `data` package provides easy access 
+to a number of benchmark datasets for testing our models. 
+The first time we invoke `data.vision.FashionMNIST(train=True)` 
+to collect the training data, 
+Gluon will automatically retrieve the dataset via our Internet connection.
+Subsequently, Gluon will use the already-downloaded local copy.
+We specify whether we are requesting the training set or the test set 
+by setting the value of the parameter `train` to `True` or `False`, respectively. 
+Recall that we will only be using the training data for training,
+holding out the test set for a final evaluation of our model.
 
 ```{.python .input  n=23}
 mnist_train = gdata.vision.FashionMNIST(train=True)
 mnist_test = gdata.vision.FashionMNIST(train=False)
 ```
 
-The number of images for each category in the training set and the testing set is 6,000 and 1,000, respectively. Since there are 10 categories, the number of examples for the training set and the testing set is 60,000 and 10,000, respectively.
+The number of images for each category in the training set and the testing set is 6,000 and 1,000, respectively. Since there are 10 categories, the numbers of examples in the training set and the test set are 60,000 and 10,000, respectively.
 
 ```{.python .input}
 len(mnist_train), len(mnist_test)
 ```
 
-We can access any example by square brackets `[]`, and next, we will get the image and label of the first example.
+We can access any example by indexing into the dataset using square brackets `[]`. In the following code, we access the image and label corresponding to the first example.
 
 ```{.python .input  n=24}
 feature, label = mnist_train[0]
 ```
 
-The variable `feature` corresponds to an image with a height and width of 28 pixels. Each pixel is an 8-bit unsigned integer (uint8) with values between 0 and 255. It is stored in a 3D NDArray. Its last dimension is the number of channels. Since the data set is a grayscale image, the number of channels is 1. For the sake of simplicity, we will record the shape of the image with the height and width of $h$ and $w$ pixels, respectively, as $h \times w$ or `(h, w)`.
+Our example, stored here in the variable `feature` corresponds to an image with a height and width of 28 pixels. Each pixel is an 8-bit unsigned integer (uint8) with values between 0 and 255. It is stored in a 3D NDArray. Its last dimension is the number of channels. Since the data set is a grayscale image, the number of channels is 1. When we encounter color, images, we'll have 3 channels for red, green, and blue. To keep things simple, we will record the shape of the image with the height and width of $h$ and $w$ pixels, respectively, as $h \times w$ or `(h, w)`.
 
 ```{.python .input}
 feature.shape, feature.dtype
@@ -83,9 +91,9 @@ show_fashion_mnist(X, get_fashion_mnist_labels(y))
 
 ## Reading a Minibatch
 
-To make our life easier when reading from the training and test sets we use a `DataLoader` rather than creating one from scratch, as we did in the section on ["Linear Regression Implementation Starting from Scratch"](linear-regression-scratch.md). The data loader reads a mini-batch of data with an example number of `batch_size` each time.
+To make our life easier when reading from the training and test sets we use a `DataLoader` rather than creating one from scratch, as we did in the section on ["Linear Regression Implementation Starting from Scratch"](linear-regression-scratch.md). Recall that a data loader reads a mini-batch of data with an example number of `batch_size` each time.
 
-In practice, data reading is often a performance bottleneck for training, especially when the model is simple or when the computer is fast. A handy feature of Gluon's `DataLoader` is the ability to use multiple processes to speed up data reading (not currently supported on Windows). For instance, we can set aside 4 processes to read the data (via `num_workers`).
+In practice, reading data can often be a significant performance bottleneck for training, especially when the model is simple or when the computer is fast. A handy feature of Gluon's `DataLoader` is the ability to use multiple processes to speed up data reading (not currently supported on Windows). For instance, we can set aside 4 processes to read the data (via `num_workers`).
 
 In addition, we convert the image data from uint8 to 32-bit floating point numbers using the `ToTensor` class. Beyond that we divide all numbers by 255 so that all pixels have values between 0 and 1. The `ToTensor` class also moves the image channel from the last dimension to the first dimension to facilitate the convolutional neural network calculations introduced later. Through the `transform_first` function of the data set, we apply the transformation of `ToTensor` to the first element of each data example (image and label), i.e., the image.
 
