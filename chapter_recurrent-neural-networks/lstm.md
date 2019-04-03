@@ -40,7 +40,7 @@ Here $\mathbf{W}_{xc} \in \mathbb{R}^{d \times h}$ and $\mathbf{W}_{hc} \in \mat
 
 ### Memory Cell
 
-In GRUs we had a single mechanism to govern input and forgetting. Here we have two parameters, $\mathbf{I}_t$ which governs how much we take new data into account via $\tilde{\mathbf{C}}_t$ and the forget parameter $\mathbf{F}_t$ which addresses how much we of the old memory cell content $\mathbf{C}_{t-1} \in \mathbbb{R}^{n \times h}$ we retain. Using the same pointwise multiplication trick as before we arrive at the following update equation. 
+In GRUs we had a single mechanism to govern input and forgetting. Here we have two parameters, $\mathbf{I}_t$ which governs how much we take new data into account via $\tilde{\mathbf{C}}_t$ and the forget parameter $\mathbf{F}_t$ which addresses how much we of the old memory cell content $\mathbf{C}_{t-1} \in \mathbb{R}^{n \times h}$ we retain. Using the same pointwise multiplication trick as before we arrive at the following update equation. 
 
 $$\mathbf{C}_t = \mathbf{F}_t \odot \mathbf{C}_{t-1} + \mathbf{I}_t \odot \tilde{\mathbf{C}}_t.$$
 
@@ -62,14 +62,14 @@ $$\mathbf{H}_t = \mathbf{O}_t \odot \tanh(\mathbf{C}_t).$$
 
 ## Implementation from Scratch
 
-Now it's time to implement an LSTM. We begin with a model built from scratch. As with the experiments in the previous sections we first need to load the data. We use *The Time Machine* for this. 
+Now it's time to implement an LSTM. We begin with a model built from scratch. As with the experiments in the previous sections we first need to load the data. We use *The Time Machine* for this.
 
 ```{.python .input  n=1}
 import sys
 sys.path.insert(0, '..')
 
 import d2l
-from mxnet import nd
+from mxnet import nd, init
 from mxnet.gluon import rnn
 
 (corpus_indices, char_to_idx, idx_to_char,
@@ -118,7 +118,7 @@ def init_lstm_state(batch_size, num_hiddens, ctx):
             nd.zeros(shape=(batch_size, num_hiddens), ctx=ctx))
 ```
 
-The actual model is defined just like we discussed it before with three gates and an auxiliary memory cell. Note that only the hidden state is passed on to the output layer. The memory cells do not participate in the computation directly. 
+The actual model is defined just like we discussed it before with three gates and an auxiliary memory cell. Note that only the hidden state is passed on to the output layer. The memory cells do not participate in the computation directly.
 
 ```{.python .input  n=4}
 def lstm(inputs, state, params):
@@ -147,9 +147,9 @@ num_epochs, num_steps, batch_size, lr, clipping_theta = 300, 35, 32, 1e2, 1e-2
 pred_period, pred_len, prefixes = 50, 50, ['traveller', 'time traveller']
 ```
 
-We create a string of lyrics based on the currently trained model every 50 epochs. The training code is identical to all previous sequence models. 
+We create a string of lyrics based on the currently trained model every 50 epochs. The training code is identical to all previous sequence models.
 
-```{.python .input}
+```{.python .input  n=6}
 d2l.train_and_predict_rnn(lstm, get_params, init_lstm_state, num_hiddens,
                           vocab_size, ctx, corpus_indices, idx_to_char,
                           char_to_idx, False, num_epochs, num_steps, lr,
@@ -161,9 +161,10 @@ d2l.train_and_predict_rnn(lstm, get_params, init_lstm_state, num_hiddens,
 
 In Gluon, we can call the `LSTM` class in the `rnn` module directly to instantiate the model.
 
-```{.python .input  n=6}
+```{.python .input  n=7}
 lstm_layer = rnn.LSTM(num_hiddens)
 model = d2l.RNNModel(lstm_layer, vocab_size)
+model.initialize(init.Xavier(), ctx=ctx)
 d2l.train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
                                 corpus_indices, idx_to_char, char_to_idx,
                                 num_epochs, num_steps, lr, clipping_theta,

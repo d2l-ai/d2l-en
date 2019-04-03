@@ -74,7 +74,7 @@ import sys
 sys.path.insert(0, '..')
 
 import d2l
-from mxnet import nd
+from mxnet import nd, init
 from mxnet.gluon import rnn
 
 (corpus_indices, char_to_idx, idx_to_char, vocab_size) = d2l.load_data_time_machine()
@@ -162,6 +162,7 @@ In Gluon, we can directly call the `GRU` class in the `rnn` module. This encapsu
 ```{.python .input  n=6}
 gru_layer = rnn.GRU(num_hiddens)
 model = d2l.RNNModel(gru_layer, vocab_size)
+model.initialize(init.Xavier(), ctx=ctx)
 d2l.train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
                                 corpus_indices, idx_to_char, char_to_idx,
                                 num_epochs, num_steps, lr, clipping_theta,
