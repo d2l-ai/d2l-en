@@ -15,7 +15,7 @@ where our predictions are discrete categories.
 
 ## Basic Elements of Linear Regression
 
-Linear regresion, which dates to Gauss and Legendre, 
+Linear regression, which dates to Gauss and Legendre, 
 is perhaps the simplest, and by far the most popular approach
 to solving regression problems. 
 What makes linear regression *linear* is that 
