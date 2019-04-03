@@ -9,7 +9,7 @@ Some examples of regression problems include
 predicting house prices, stock prices, 
 length of stay (for patients in the hospital),
 tomorrow's temperature, demand forecasting (for retail sales), and many more. 
-Note that not every prediciton problem is a regression problem.
+Note that not every prediction problem is a regression problem.
 In subsequent sections we will discuss classification problems,
 where our predictions are discrete categories.
 
