@@ -729,7 +729,7 @@ Transcribing text from spoken speech is also a ``seq2seq`` problem.
 While it is impossible to consider all types of sequence transformations,
 a number of special cases are worth mentioning:
 
-#### Tagging and Parsing
+##### Tagging and Parsing
 
 This involves annotating a text sequence with attributes. In other words, the number of inputs and outputs is essentially the same. For instance, we might want to know where the verbs and subjects are. Alternatively, we might want to know which words are the named entities. In general, the goal is to decompose and annotate text based on structural and grammatical assumptions to get some annotation. This sounds more complex than it actually is. Below is a very simple example of annotating a sentence with tags indicating which words refer to named entities.
 
@@ -738,7 +738,7 @@ This involves annotating a text sequence with attributes. In other words, the nu
 |Ent | - | - | - | Ent | - | Ent|
 
 
-#### Automatic Speech Recognition
+##### Automatic Speech Recognition
 
 With speech recognition, the input sequence $x$ is the sound of a speaker,
 and the output $y$ is the textual transcript of what the speaker said.
@@ -750,7 +750,7 @@ These are ``seq2seq`` problems where the output is much shorter than the input.
 |:--------------:|
 |![Deep Learning](../img/speech.png)|
 
-#### Text to Speech
+##### Text to Speech
 
 Text-to-Speech (TTS) is the inverse of speech recognition.
 In other words, the input $x$ is text
@@ -759,7 +759,7 @@ In this case, the output is *much longer* than the input.
 While it is easy for *humans* to recognize a bad audio file,
 this isn't quite so trivial for computers.
 
-#### Machine Translation
+##### Machine Translation
 
 Unlike the case of speech recognition, where corresponding inputs and outputs occur in the same order (after alignment),
 in machine translation, order inversion can be vital.

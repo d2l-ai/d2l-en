@@ -88,10 +88,9 @@ The picture above illustrates the three cases when analyzing the first few words
 
 ## The Computational Graph
 
-In order to visualize the dependencies between model variables and parameters during computation in a recurrent neural network, we can draw a computational graph for the model, as shown below. For example, the computation of the hidden states of time step 3 $\mathbf{h}_3$ depends on the model parameters $\mathbf{W}_{hx} and \mathbf{W}_{hh}$, the hidden state of the last time step $\mathbf{h}_2$, and the input of the current time step $\mathbf{x}_3$.
+In order to visualize the dependencies between model variables and parameters during computation in a recurrent neural network, we can draw a computational graph for the model, as shown below. For example, the computation of the hidden states of time step 3 $\mathbf{h}_3$ depends on the model parameters $\mathbf{W}_{hx}$ and $\mathbf{W}_{hh}$, the hidden state of the last time step $\mathbf{h}_2$, and the input of the current time step $\mathbf{x}_3$.
 
 ![ Computational dependencies for a recurrent neural network model with three time steps. Boxes represent variables (not shaded) or parameters (shaded) and circles represent operators. ](../img/rnn-bptt.svg)
-
 
 ## BPTT in Detail
 
@@ -109,12 +108,12 @@ $$\partial_{\mathbf{W}_{oh}} L = \sum_{t=1}^T \mathrm{prod}
 
 The dependency on $\mathbf{W}_{hx}$ and $\mathbf{W}_{hh}$ is a bit more tricky since it involves a chain of derivatives. We begin with 
 
-$$\begin{align}
+$$\begin{aligned}
 \partial_{\mathbf{W}_{hh}} L & = \sum_{t=1}^T \mathrm{prod}
 \left(\partial_{\mathbf{o}_t} l(\mathbf{o}_t, y_t), \mathbf{W}_{oh}, \partial_{\mathbf{W}_{hh}} \mathbf{h}_t\right) \\
 \partial_{\mathbf{W}_{hx}} L & = \sum_{t=1}^T \mathrm{prod}
 \left(\partial_{\mathbf{o}_t} l(\mathbf{o}_t, y_t), \mathbf{W}_{oh}, \partial_{\mathbf{W}_{hx}} \mathbf{h}_t\right)
-\end{align}$$
+\end{aligned}$$
 
 After all, hidden states depend on each other and on past inputs. The key quantity is how past hidden states affect future hidden states. 
 
@@ -124,10 +123,10 @@ $$\partial_{\mathbf{h}_t} \mathbf{h}_{t+1} = \mathbf{W}_{hh}^\top
 
 Chaining terms together yields
 
-$$\begin{align}
+$$\begin{aligned}
 \partial_{\mathbf{W}_{hh}} \mathbf{h}_t & = \sum_{j=1}^t \left(\mathbf{W}_{hh}^\top\right)^{t-j} \mathbf{h}_j \\
 \partial_{\mathbf{W}_{hx}} \mathbf{h}_t & = \sum_{j=1}^t \left(\mathbf{W}_{hh}^\top\right)^{t-j} \mathbf{x}_j.
-\end{align}$$
+\end{aligned}$$
 
 A number of things follow from this potentially very intimidating expression. Firstly, it pays to store intermediate results, i.e. powers of $\mathbf{W}_{hh}$ as we work our way through the terms of the loss function $L$. Secondly, this simple *linear* example already exhibits some key problems of long sequence models: it involves potentially very large powers $\mathbf{W}_{hh}^j$. In it, eigenvalues smaller than $1$ vanish for large $j$ and eigenvalues larger than $1$ diverge. This is numerically unstable and gives undue importance to potentially irrelvant past detail. One way to address this is to truncate the sum at a computationally convenient size. Later on in this chapter we will see how more sophisticated sequence models such as LSTMs can alleviate this further. In code, this truncation is effected by *detaching* the gradient after a given number of steps. 
 
@@ -148,3 +147,5 @@ A number of things follow from this potentially very intimidating expression. Fi
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2366)
 
 ![](../img/qr_bptt.svg)
+
+
