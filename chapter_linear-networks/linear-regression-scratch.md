@@ -334,7 +334,6 @@ In the following sections, we will describe additional models
 based on the concepts that we have just introduced 
 and learn how to implement them more concisely.
 
-
 ## Exercises
 
 1. What would happen if we were to initialize the weights $\mathbf{w} = 0$. Would the algorithm still work?
