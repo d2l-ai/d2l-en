@@ -77,7 +77,7 @@ all_features[numeric_features] = all_features[numeric_features].apply(
     lambda x: (x - x.mean()) / (x.std()))
 # After standardizing the data all means vanish, hence we can set missing
 # values to 0
-all_features = all_features.fillna(0)
+all_features[numeric_features] = all_features[numeric_features].fillna(0)
 ```
 
 Next we deal with discrete values. This includes variables such as 'MSZoning'. We replace them by a one-hot encoding in the same manner as how we transformed multiclass classification data into a vector of $0$ and $1$. For instance, 'MSZoning' assumes the values 'RL' and 'RM'. They map into vectors $(1,0)$ and $(0,1)$ respectively. Pandas does this automatically for us.
