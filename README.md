@@ -12,3 +12,17 @@ This open source book has benefited from pedagogical suggestions, typo correctio
 **Dear contributors, please email your GitHub ID, name, and mailing address to d2lbook.en@gmail.com. Thanks.**
 
 [Chinese version](https://github.com/d2l-ai/d2l-zh) | [Discuss and report issues](https://discuss.mxnet.io/)
+
+
+## Citing this book
+
+Please use the following bibtex entry to cite this book:
+
+```
+@book{zhang2019dive,
+    title={Dive into Deep Learning},
+    author={Aston Zhang and Zachary C. Lipton and Mu Li and Alexander J. Smola},
+    note={\url{http://www.d2l.ai}},
+    year={2019}
+}
+```
