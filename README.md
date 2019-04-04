@@ -19,7 +19,7 @@ This open source book has benefited from pedagogical suggestions, typo correctio
 Please use the following bibtex entry to cite this book:
 
 ```
-@book{zhang-et-al-2019,
+@book{zhang2019dive,
     title={Dive into Deep Learning},
     author={Aston Zhang and Zachary C. Lipton and Mu Li and Alexander J. Smola},
     note={\url{http://www.d2l.ai}},
