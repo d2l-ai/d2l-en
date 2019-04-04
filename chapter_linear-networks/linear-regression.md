@@ -133,7 +133,7 @@ $$\mathbf{w}^*, b^* = \operatorname*{argmin}_{\mathbf{w}, b}\  L(\mathbf{w}, b).
 
 ### Analytic Solution
 
-Linear regression happens to be an unusually simple optimiaztion problem.
+Linear regression happens to be an unusually simple optimization problem.
 Unlike nearly every other model that we will encounter in this book,
 linear regression can be solved easily with a simple formula,
 yielding a global optimum. 
