@@ -5,17 +5,17 @@ This is the task of predicting a *real valued target* $y$
 given a data point $\mathbf{x}$.
 Regression problems are common in practice, arising
 whenever we want to predict a continuous numerical value. 
-Some exmaples of regression problems include
+Some examples of regression problems include
 predicting house prices, stock prices, 
 length of stay (for patients in the hospital),
 tomorrow's temperature, demand forecasting (for retail sales), and many more. 
-Note that not every prediciton problem is a regression problem.
+Note that not every prediction problem is a regression problem.
 In subsequent sections we will discuss classification problems,
 where our predictions are discrete categories.
 
 ## Basic Elements of Linear Regression
 
-Linear regresion, which dates to Gauss and Legendre, 
+Linear regression, which dates to Gauss and Legendre, 
 is perhaps the simplest, and by far the most popular approach
 to solving regression problems. 
 What makes linear regression *linear* is that 
