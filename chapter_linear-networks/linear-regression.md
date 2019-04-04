@@ -191,7 +191,7 @@ $$(\mathbf{w},b) \leftarrow (\mathbf{w},b) - \frac{\eta}{|\mathcal{B}|} \sum_{i 
 To summarize, steps of the algorithm are the following: 
 (i) we initialize the values of the model parameters, typically at random;
 (ii) we iterate over the data many times, 
-updating the paramters in each by moving the parameters in the direction of the negative gradient, as calculted on a random minibatch of data. 
+updating the parameters in each by moving the parameters in the direction of the negative gradient, as calculated on a random minibatch of data. 
 
 
 For quadratic losses and linear functions we can write this out explicitly as follows. Note that $\mathbf{w}$ and $\mathbf{x}$ are vectors. Here the more elegant vector notation makes the math much more readable than expressing things in terms of coefficients, say $w_1, w_2, \ldots w_d$.
