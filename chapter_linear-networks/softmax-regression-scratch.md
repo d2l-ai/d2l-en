@@ -71,7 +71,7 @@ X_prob, X_prob.sum(axis=1)
 
 ## The Model
 
-With the softmax operation, we can define the softmax regression model discussed in the last section. We change each original image into a vector with length `num inputs` through the `reshape` function.
+With the softmax operation, we can define the softmax regression model discussed in the last section. We change each original image into a vector with length `num_inputs` through the `reshape` function.
 
 ```{.python .input  n=14}
 def net(X):
