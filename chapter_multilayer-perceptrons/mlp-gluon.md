@@ -13,7 +13,10 @@ from mxnet.gluon import loss as gloss, nn
 
 ## The Model
 
-The only difference from the softmax regression is the addition of a fully connected layer as a hidden layer.  It has 256 hidden units and uses ReLU as the activation function.
+The only difference from our softmax regression implementation
+is that we add two `Dense` (fully-connected) layers instead of one.  
+The first is our hidden layer, which has *256* hidden units 
+and uses the ReLU activation function.
 
 ```{.python .input  n=5}
 net = nn.Sequential()
@@ -22,9 +25,15 @@ net.add(nn.Dense(10))
 net.initialize(init.Normal(sigma=0.01))
 ```
 
-One minor detail is of note when invoking `net.add()`. It adds one or more layers to the network. That is, an equivalent to the above lines would be `net.add(nn.Dense(256, activation='relu'), nn.Dense(10))`. Also note that Gluon automagically infers the missing parameteters, such as the fact that the second layer needs a matrix of size $256 \times 10$. This happens the first time the network is invoked.
+Note that as above we can invoke `net.add()` multiple times in succession,
+but we can also invoke it a single time, passing in 
+multiple layers to be added the network. 
+Thus, we could have equivalently written 
+`net.add(nn.Dense(256, activation='relu'), nn.Dense(10))`. 
+Again, note that as always, Gluon automatically 
+infers the missing input dimensions to each layer. 
 
-We use almost the same steps for softmax regression training as we do for reading and training the model.
+Training the model follows the exact same steps as in our softmax regression implementation.
 
 ```{.python .input  n=6}
 batch_size = 256
