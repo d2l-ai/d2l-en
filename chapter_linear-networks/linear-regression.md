@@ -5,17 +5,17 @@ This is the task of predicting a *real valued target* $y$
 given a data point $\mathbf{x}$.
 Regression problems are common in practice, arising
 whenever we want to predict a continuous numerical value. 
-Some exmaples of regression problems include
+Some examples of regression problems include
 predicting house prices, stock prices, 
 length of stay (for patients in the hospital),
 tomorrow's temperature, demand forecasting (for retail sales), and many more. 
-Note that not every prediciton problem is a regression problem.
+Note that not every prediction problem is a regression problem.
 In subsequent sections we will discuss classification problems,
 where our predictions are discrete categories.
 
 ## Basic Elements of Linear Regression
 
-Linear regresion, which dates to Gauss and Legendre, 
+Linear regression, which dates to Gauss and Legendre, 
 is perhaps the simplest, and by far the most popular approach
 to solving regression problems. 
 What makes linear regression *linear* is that 
@@ -133,7 +133,7 @@ $$\mathbf{w}^*, b^* = \operatorname*{argmin}_{\mathbf{w}, b}\  L(\mathbf{w}, b).
 
 ### Analytic Solution
 
-Linear regression happens to be an unusually simple optimiaztion problem.
+Linear regression happens to be an unusually simple optimization problem.
 Unlike nearly every other model that we will encounter in this book,
 linear regression can be solved easily with a simple formula,
 yielding a global optimum. 
@@ -142,7 +142,7 @@ by appending a column to the design matrix consisting of all $1s$.
 Then our prediction problem is to minimize $||\mathbf{y} - X\mathbf{w}||$. 
 Because this expression has a quadratic form it is clearly convex,
 and so long as the problem is not degenerate
-(our features are linearly indpendent), it is strictly convex.
+(our features are linearly independent), it is strictly convex.
 
 Thus there is just one global critical point on the loss surface 
 corresponding to the global minimum.
@@ -191,7 +191,7 @@ $$(\mathbf{w},b) \leftarrow (\mathbf{w},b) - \frac{\eta}{|\mathcal{B}|} \sum_{i 
 To summarize, steps of the algorithm are the following: 
 (i) we initialize the values of the model parameters, typically at random;
 (ii) we iterate over the data many times, 
-updating the paramters in each by moving the parameters in the direction of the negative gradient, as calculted on a random minibatch of data. 
+updating the parameters in each by moving the parameters in the direction of the negative gradient, as calculated on a random minibatch of data. 
 
 
 For quadratic losses and linear functions we can write this out explicitly as follows. Note that $\mathbf{w}$ and $\mathbf{x}$ are vectors. Here the more elegant vector notation makes the math much more readable than expressing things in terms of coefficients, say $w_1, w_2, \ldots w_d$.
