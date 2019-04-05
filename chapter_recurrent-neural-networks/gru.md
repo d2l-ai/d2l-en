@@ -74,7 +74,7 @@ import sys
 sys.path.insert(0, '..')
 
 import d2l
-from mxnet import nd
+from mxnet import nd, init
 from mxnet.gluon import rnn
 
 (corpus_indices, char_to_idx, idx_to_char, vocab_size) = d2l.load_data_time_machine()
@@ -82,7 +82,7 @@ from mxnet.gluon import rnn
 
 ### Initialize Model Parameters
 
-The next step is to initialize the model parameters. We draw the weights from a Gaussian with variance $0.01$ and set the bias to $0$. The hyper-parameter `num_hiddens` defines the number of hidden units. We instantiate all terms relating to update and reset gate and the candidate hidden state itself. Subsequently we attach gradients to all parameters. 
+The next step is to initialize the model parameters. We draw the weights from a Gaussian with variance $0.01$ and set the bias to $0$. The hyper-parameter `num_hiddens` defines the number of hidden units. We instantiate all terms relating to update and reset gate and the candidate hidden state itself. Subsequently we attach gradients to all parameters.
 
 ```{.python .input  n=2}
 num_inputs, num_hiddens, num_outputs = vocab_size, 256, vocab_size
@@ -138,7 +138,7 @@ def gru(inputs, state, params):
 
 ### Training and Prediction
 
-Training and prediction work in exactly the same manner as before. That is, we need to define a number of epochs, a number of steps for truncation, the minibatch size, a learning rate and how aggressively we should be clipping the gradients. Lastly we create a string of 50 characters based on the prefixes *traveller* and *time traveller*. 
+Training and prediction work in exactly the same manner as before. That is, we need to define a number of epochs, a number of steps for truncation, the minibatch size, a learning rate and how aggressively we should be clipping the gradients. Lastly we create a string of 50 characters based on the prefixes *traveller* and *time traveller*.
 
 ```{.python .input  n=5}
 num_epochs, num_steps, batch_size, lr, clipping_theta = 250, 35, 32, 1e2, 1e-2
@@ -157,11 +157,12 @@ d2l.train_and_predict_rnn(gru, get_params, init_gru_state, num_hiddens,
 
 ## Concise Implementation
 
-In Gluon, we can directly call the `GRU` class in the `rnn` module. This encapsulates all the configuration details that we made explicit above. The code is significantly faster as it uses compiled operators rather than Python for many details that we spelled out in detail before. 
+In Gluon, we can directly call the `GRU` class in the `rnn` module. This encapsulates all the configuration details that we made explicit above. The code is significantly faster as it uses compiled operators rather than Python for many details that we spelled out in detail before.
 
 ```{.python .input  n=6}
 gru_layer = rnn.GRU(num_hiddens)
 model = d2l.RNNModel(gru_layer, vocab_size)
+model.initialize(init.Xavier(), ctx=ctx)
 d2l.train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
                                 corpus_indices, idx_to_char, char_to_idx,
                                 num_epochs, num_steps, lr, clipping_theta,
@@ -178,7 +179,7 @@ d2l.train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
 
 ## Exercises
 
-1. Compare runtimes, perplexity and the extracted strings for 'rnn.RNN' and 'rnn.GRU' implementations with each other. 
+1. Compare runtimes, perplexity and the extracted strings for `rnn.RNN` and `rnn.GRU` implementations with each other. 
 1. Assume that we only want to use the input for time step $t'$ to predict the output at time step $t > t'$. What are the best values for reset and update gates for each time step?
 1. Adjust the hyper-parameters and observe and analyze the impact on running time, perplexity, and the written lyrics.
 1. What happens if you implement only parts of a GRU? That is, implement a recurrent cell that only has a reset gate. Likewise, implement a recurrent cell only with an update gate. 
