@@ -26,7 +26,7 @@ Just as with multilayer perceptrons, the number of hidden layers $L$ and number 
 
 ## Concise Implementation
 
-Fortunately much of the logistics required to implement multiple layers of an RNN are readily available in Gluon. To keep things simple we only illustrate the implementation using such built-in functionality. The code is very similar to the one we used previously for LSTMs. In fact, the only difference is that we specify the number of layers explicitly. Let's begin by importing the appropriate modules and data.
+Fortunately many of the logistical details required to implement multiple layers of an RNN are readily available in Gluon. To keep things simple we only illustrate the implementation using such built-in functionality. The code is very similar to the one we used previously for LSTMs. In fact, the only difference is that we specify the number of layers explicitly rather than picking the default of a single layer. Let's begin by importing the appropriate modules and data.
 
 ```{.python .input  n=17}
 import sys
@@ -39,16 +39,18 @@ from mxnet.gluon import rnn
 (corpus_indices, char_to_idx, idx_to_char, vocab_size) = d2l.load_data_time_machine()
 ```
 
-The architectural decisions (parameters, etc.) are very similar to those of previous sections. The only difference is that we now select a nontrivial number of layers `num_layers = 2`. Since the model is somewhat slower to train we use 2000 iterations. 
+The architectural decisions (parameters, etc.) are very similar to those of previous sections. We pick the same number of inputs and outputs as we have distinct tokens, i.e. `vocab_size`. The number of hidden units is still 256 and we retain a learning rate of 100. The only difference is that we now select a nontrivial number of layers `num_layers = 2`. Since the model is somewhat slower to train we use 3000 iterations.
 
 ```{.python .input  n=22}
 num_inputs, num_hiddens, num_layers, num_outputs = vocab_size, 256, 2, vocab_size
 ctx = d2l.try_gpu()
-num_epochs, num_steps, batch_size, lr, clipping_theta = 2000, 35, 32, 100, 1e-2
-pred_period, pred_len, prefixes = 200, 50, ['traveller', 'time traveller']
+num_epochs, num_steps, batch_size, lr, clipping_theta = 3000, 35, 32, 100, 1e-2
+pred_period, pred_len, prefixes = 500, 50, ['traveller', 'time traveller']
 ```
 
-The actual invocation logic is identical to before. The only difference is that we now instantiate two layers with LSTMs. This rather more complex architecture slows down training considerably. 
+## Training
+
+The actual invocation logic is identical to before and we re-use `train_and_predict_rnn_gluon`. The only difference is that we now instantiate two layers with LSTMs. This rather more complex architecture and the large number of epochs slow down training considerably.
 
 ```{.python .input  n=8}
 lstm_layer = rnn.LSTM(hidden_size = num_hiddens, num_layers=num_layers)
@@ -61,8 +63,8 @@ d2l.train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
 
 ## Summary
 
-* In deep recurrent neural networks, hidden state information is continuously passed to the next time step of the current layer and the next layer of the current time step.
-* There exist multiple flavors of deep RNNs, such as LSTMs, GRUs or regular RNNs. Conveniently these models are all available as parts of the `rnn` module in Gluon. 
+* In deep recurrent neural networks, hidden state information is passed to the next time step of the current layer and the next layer of the current time step.
+* There exist many different flavors of deep RNNs, such as LSTMs, GRUs or regular RNNs. Conveniently these models are all available as parts of the `rnn` module in Gluon. 
 * Initialization of the models requires care. Overall, deep RNNs require considerable amount of work (learning rate, clipping, etc) to ensure proper convergence. 
 
 ## Exercises
@@ -70,7 +72,7 @@ d2l.train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
 1. Try to implement a two-layer RNN from scratch using the ["single layer implementation"](rnn-scratch.md) we discussed in an earlier section. 
 2. Replace the LSTM by a GRU and compare the accuracy.
 3. Increase the training data to include multiple books. How low can you go on the perplexity scale?
-4. Would you want to combine sources of different authors? Explain why.
+4. Would you want to combine sources of different authors when modeling text? Why is this a good idea? What could go wrong?
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2369)
 
