@@ -1,95 +1,84 @@
-# Long Short-term Memory (LSTM)
+# Long Short Term Memory (LSTM)
 
-@TODO(smolix/astonzhang): the data set was just changed from lyrics to time machine, so descriptions/hyperparameters have to change.
+The challenge to address long-term information preservation and short-term input skipping in latent variable models has existed for a long time. One of the earliest approaches to address this was the LSTM by [Hochreiter and Schmidhuber, 1997](http://papers.nips.cc/paper/1215-lstm-can-solve-hard-long-time-lag-problems.pdf). It shares many of the properties of the Gated Recurrent Unit (GRU) and predates it by almost two decades. Its design is slightly more complex. 
 
-This section describes another commonly used gated recurrent neural network: long short-term memory (LSTM) [1]. Its structure is slightly more complicated than that of a gated recurrent unit.
+Arguably it is inspired by logic gates of a computer. To control a memory cell we need a number of gates. One gate is needed to read out the entries from the cell (as opposed to reading any other cell). We will refer to this as the *output* gate. A second gate is needed to decide when to read data into the cell. We refer to this as the *input* gate. Lastly, we need a mechanism to reset the contents of the cell, governed by a *forget* gate. The motivation for such a design is the same as before, namely to be able to decide when to remember and when to ignore inputs into the latent state via a dedicated mechanism. Let's see how this works in practice.
 
+## Gated Memory Cells
 
-## Long Short-term Memory
+Three gates are introduced in LSTMs: the input gate, the forget gate, and the output gate. In addition to that we introduce memory cells that take the same shape as the hidden state. Strictly speaking this is just a fancy version of a hidden state, custom engineered to record additional information. 
 
-Three gates are introduced in LSTM: the input gate, the forget gate, and the output gate, as well as memory cells in the same shape as the hidden state (some literature treats memory cells as a special kind of hidden state) used to record additional information.
+### Input Gates, Forget Gates and Output Gates
 
+Just like with GRUs, the data feeding into the LSTM gates is the input at the current time step $\mathbf{X}_t$ and the hidden state of the previous time step $\mathbf{H}_{t-1}$. These inputs are processed by a fully connected layer and a sigmoid activation function to compute the values of input, forget and output gates. As a result, the three gate elements all have a value range of $[0,1]$.
 
-### Input Gates, Forget Gates, and Output Gates
+![Calculation of input, forget, and output gates in an LSTM. ](../img/lstm_0.svg)
 
-Like the reset gate and the update gate in the gated recurrent unit, as shown in Figure 6.7, the input of LSTM gates is the current time step input $\boldsymbol{X}_t$ and the hidden state of the previous time step $\boldsymbol{H}_{t-1}$. The output is computed by the fully connected layer with a sigmoid function as its activation function. As a result, the three gate elements all have a value range of $[0,1]$.
-
-![Calculation of input, forget, and output gates in LSTM. ](../img/lstm_0.svg)
-
-Here, we assume there are $h$ hidden units and, for a given time step $t$, the mini-batch input is $\boldsymbol{X}_t \in \mathbb{R}^{n \times d}$ (number of examples: $n$, number of inputs: $d$）and the hidden state of the last time step is $\boldsymbol{H}_{t-1} \in \mathbb{R}^{n \times h}$.
-For time step $t$, the input gate $\boldsymbol{I}_t \in \mathbb{R}^{n \times h}$, forget gate $\boldsymbol{F}_t \in \mathbb{R}^{n \times h}$, and output gate $\boldsymbol{O}_t \in \mathbb{R}^{n \times h}$ are calculated as follows:
+We assume there are $h$ hidden units and that the minibatch is of size $n$. Thus the input is $\mathbf{X}_t \in \mathbb{R}^{n \times d}$ (number of examples: $n$, number of inputs: $d$）and the hidden state of the last time step is $\mathbf{H}_{t-1} \in \mathbb{R}^{n \times h}$. Correspondingly the gates are defined as follows: the input gate is $\mathbf{I}_t \in \mathbb{R}^{n \times h}$, the forget gate is $\mathbf{F}_t \in \mathbb{R}^{n \times h}$, and the output gate is $\mathbf{O}_t \in \mathbb{R}^{n \times h}$. They are calculated as follows:
 
 $$
 \begin{aligned}
-\boldsymbol{I}_t &= \sigma(\boldsymbol{X}_t \boldsymbol{W}_{xi} + \boldsymbol{H}_{t-1} \boldsymbol{W}_{hi} + \boldsymbol{b}_i),\\
-\boldsymbol{F}_t &= \sigma(\boldsymbol{X}_t \boldsymbol{W}_{xf} + \boldsymbol{H}_{t-1} \boldsymbol{W}_{hf} + \boldsymbol{b}_f),\\
-\boldsymbol{O}_t &= \sigma(\boldsymbol{X}_t \boldsymbol{W}_{xo} + \boldsymbol{H}_{t-1} \boldsymbol{W}_{ho} + \boldsymbol{b}_o),
+\mathbf{I}_t &= \sigma(\mathbf{X}_t \mathbf{W}_{xi} + \mathbf{H}_{t-1} \mathbf{W}_{hi} + \mathbf{b}_i),\\
+\mathbf{F}_t &= \sigma(\mathbf{X}_t \mathbf{W}_{xf} + \mathbf{H}_{t-1} \mathbf{W}_{hf} + \mathbf{b}_f),\\
+\mathbf{O}_t &= \sigma(\mathbf{X}_t \mathbf{W}_{xo} + \mathbf{H}_{t-1} \mathbf{W}_{ho} + \mathbf{b}_o),
 \end{aligned}
 $$
 
-Here, $\boldsymbol{W}_{xi}, \boldsymbol{W}_{xf}, \boldsymbol{W}_{xo} \in \mathbb{R}^{d \times h}$ and $\boldsymbol{W}_{hi}, \boldsymbol{W}_{hf}, \boldsymbol{W}_{ho} \in \mathbb{R}^{h \times h}$ are weight parameters and $\boldsymbol{b}_i, \boldsymbol{b}_f, \boldsymbol{b}_o \in \mathbb{R}^{1 \times h}$ is a bias parameter.
+$\mathbf{W}_{xi}, \mathbf{W}_{xf}, \mathbf{W}_{xo} \in \mathbb{R}^{d \times h}$ and $\mathbf{W}_{hi}, \mathbf{W}_{hf}, \mathbf{W}_{ho} \in \mathbb{R}^{h \times h}$ are weight parameters and $\mathbf{b}_i, \mathbf{b}_f, \mathbf{b}_o \in \mathbb{R}^{1 \times h}$ are bias parameters.
 
 
-### Candidate Memory Cells
+### Candidate Memory Cell
 
-Next, LSTM needs to compute the candidate memory cell $\tilde{\boldsymbol{C}}_t$. Its computation is similar to the three gates described above, but using a tanh function with a value range for $[-1, 1] as activation function, as shown in Figure 6.8.
+Next we design a memory cell. Since we haven't specified the action of the various gates yet, we first introduce a *candidate* memory cell $\tilde{\mathbf{C}}_t \in \mathbb{R}^{n \times h}$. Its computation is similar to the three gates described above, but using a $\tanh$ function with a value range for $[-1, 1]$ as activation function. This leads to the following equation at time step $t$.
+
+$$\tilde{\mathbf{C}}_t = \text{tanh}(\mathbf{X}_t \mathbf{W}_{xc} + \mathbf{H}_{t-1} \mathbf{W}_{hc} + \mathbf{b}_c)$$
+
+Here $\mathbf{W}_{xc} \in \mathbb{R}^{d \times h}$ and $\mathbf{W}_{hc} \in \mathbb{R}^{h \times h}$ are weights and $\mathbf{b}_c \in \mathbb{R}^{1 \times h}$ is a bias.
 
 ![Computation of candidate memory cells in LSTM. ](../img/lstm_1.svg)
 
 
-For time step $t$, the candidate memory cell $\tilde{\boldsymbol{C}}_t \in \mathbb{R}^{n \times h}$ is calculated by the following formula:
+### Memory Cell
 
-$$\tilde{\boldsymbol{C}}_t = \text{tanh}(\boldsymbol{X}_t \boldsymbol{W}_{xc} + \boldsymbol{H}_{t-1} \boldsymbol{W}_{hc} + \boldsymbol{b}_c),$$
+In GRUs we had a single mechanism to govern input and forgetting. Here we have two parameters, $\mathbf{I}_t$ which governs how much we take new data into account via $\tilde{\mathbf{C}}_t$ and the forget parameter $\mathbf{F}_t$ which addresses how much we of the old memory cell content $\mathbf{C}_{t-1} \in \mathbb{R}^{n \times h}$ we retain. Using the same pointwise multiplication trick as before we arrive at the following update equation. 
 
-Here, $\boldsymbol{W}_{xc} \in \mathbb{R}^{d \times h}$ and $\boldsymbol{W}_{hc} \in \mathbb{R}^{h \times h}$ are weight parameters and $\boldsymbol{b}_c \in \mathbb{R}^{1 \times h}$ is a bias parameter.
+$$\mathbf{C}_t = \mathbf{F}_t \odot \mathbf{C}_{t-1} + \mathbf{I}_t \odot \tilde{\mathbf{C}}_t.$$
 
+If the forget gate is always approximately 1 and the input gate is always approximately 0, the past memory cells will be saved over time and passed to the current time step. This design was introduced to alleviate the vanishing gradient problem and to better capture dependencies for time series with long range dependencies. We thus arrive at the following flow diagram.
 
-### Memory Cells
-
-We can control flow of information in the hidden state use input, forget, and output gates with an element value range between $[0, 1]$. This is also generally achieved by using multiplication by element (symbol $\odot$). The computation of the current time step memory cell $\boldsymbol{C}_t \in \mathbb{R}^{n \times h}$ combines the information of the previous time step memory cells and the current time step candidate memory cells, and controls the flow of information through forget gate and input gate:
-
-$$\boldsymbol{C}_t = \boldsymbol{F}_t \odot \boldsymbol{C}_{t-1} + \boldsymbol{I}_t \odot \tilde{\boldsymbol{C}}_t.$$
-
-
-As shown in Figure 6.9, the forget gate controls whether the information in the memory cell $\boldsymbol{C}_{t-1}$ of the last time step is passed to the current time step, and the input gate can control how the input of the current time step $\boldsymbol{X}_t$ flows into the memory cells of the current time step through the candidate memory cell $\tilde{\boldsymbol{C}}_t$. If the forget gate is always approximately 1 and the input gate is always approximately 0, the past memory cells will be saved over time and passed to the current time step. This design can cope with the vanishing gradient problem in recurrent neural networks and better capture dependencies for time series with large time step distances.
-
-![Computation of memory cells in LSTM. Here, the multiplication sign indicates multiplication by element. ](../img/lstm_2.svg)
+![Computation of memory cells in an LSTM. Here, the multiplication is carried out element-wise. ](../img/lstm_2.svg)
 
 
 ### Hidden States
 
-With memory cells, we can also control the flow of information from memory cells to the hidden state $\boldsymbol{H}_t \in \mathbb{R}^{n \times h}$ through the output gate:
+Lastly we need to define how to compute the hidden state $\mathbf{H}_t \in \mathbb{R}^{n \times h}$. This is where the output gate comes into play. In the LSTM it is simply a gated version of the $\tanh$ of the memory cell. This ensures that the values of $\mathbf{H}_t$ are always in the interval $[-1, 1]$. Whenever the output gate is $1$ we effectively pass all memory information through to the predictor whereas for output $0$ we retain all information only within the memory cell and perform no further processing. The figure below has a graphical illustration of the data flow.
 
-$$\boldsymbol{H}_t = \boldsymbol{O}_t \odot \text{tanh}(\boldsymbol{C}_t).$$
+$$\mathbf{H}_t = \mathbf{O}_t \odot \tanh(\mathbf{C}_t).$$
 
-The tanh function here ensures that the hidden state element value is between -1 and 1. It should be noted that when the output gate is approximately 1, the memory cell information will be passed to the hidden state for use by the output layer; and when the output gate is approximately 0, the memory cell information is only retained by itself. Figure 6.10 shows the computation of the hidden state in LSTM.
-
-![Computation of hidden state in LSTM. Here, the multiplication sign indicates multiplication by element. ](../img/lstm_3.svg)
+![Computation of the hidden state. Multiplication is element-wise. ](../img/lstm_3.svg)
 
 
-## Read the Data Set
 
-Below we begin to implement and display LSTM. As with the experiments in the previous sections, we still use the lyrics of the Jay Chou data set to train the model to write lyrics.
+
+## Implementation from Scratch
+
+Now it's time to implement an LSTM. We begin with a model built from scratch. As with the experiments in the previous sections we first need to load the data. We use *The Time Machine* for this.
 
 ```{.python .input  n=1}
 import sys
 sys.path.insert(0, '..')
 
 import d2l
-from mxnet import nd
+from mxnet import nd, init
 from mxnet.gluon import rnn
 
 (corpus_indices, char_to_idx, idx_to_char,
  vocab_size) = d2l.load_data_time_machine()
 ```
 
-## Implementation from Scratch
-
-First, we will discuss how to implement LSTM from scratch.
-
 ### Initialize Model Parameters
 
-The code below initializes the model parameters. The hyper-parameter `num_hiddens` defines the number of hidden units.
+Next we need to define and initialize the model parameters. As previously, the hyperparameter `num_hiddens` defines the number of hidden units. We initialize weights with a Gaussian with $0.01$ variance and we set the biases to $0$.
 
 ```{.python .input  n=2}
 num_inputs, num_hiddens, num_outputs = vocab_size, 256, vocab_size
@@ -121,7 +110,7 @@ def get_params():
 
 ## Define the Model
 
-In the initialization function, the hidden state of the LSTM needs to return an additional memory cell with a value of 0 and a shape of (batch size, number of hidden units).
+In the initialization function, the hidden state of the LSTM needs to return an additional memory cell with a value of $0$ and a shape of (batch size, number of hidden units). Hence we get the following state initialization.
 
 ```{.python .input  n=3}
 def init_lstm_state(batch_size, num_hiddens, ctx):
@@ -129,7 +118,7 @@ def init_lstm_state(batch_size, num_hiddens, ctx):
             nd.zeros(shape=(batch_size, num_hiddens), ctx=ctx))
 ```
 
-Below, we defined the model based on LSTM computing expressions. It should be noted that only the hidden state will be passed into the output layer, and the memory cells do not participate in the computation of the output layer.
+The actual model is defined just like we discussed it before with three gates and an auxiliary memory cell. Note that only the hidden state is passed on to the output layer. The memory cells do not participate in the computation directly.
 
 ```{.python .input  n=4}
 def lstm(inputs, state, params):
@@ -149,18 +138,18 @@ def lstm(inputs, state, params):
     return outputs, (H, C)
 ```
 
-### Train the Model and Write Lyrics
+### Training and Prediction
 
-As in the previous section, during model training, we only use adjacent sampling. After setting the hyper-parameters, we train and model and create a 50 character string of lyrics based on the prefixes "separate" and "not separated".
+As in the previous section, during model training, we only use adjacent sampling. After setting the hyper-parameters, we train and model and create a 50 character string of text based on the prefixes "traveller" and "time traveller".
 
 ```{.python .input  n=5}
-num_epochs, num_steps, batch_size, lr, clipping_theta = 160, 35, 32, 1e2, 1e-2
-pred_period, pred_len, prefixes = 40, 50, ['traveller', 'time traveller']
+num_epochs, num_steps, batch_size, lr, clipping_theta = 300, 35, 32, 1e2, 1e-2
+pred_period, pred_len, prefixes = 50, 50, ['traveller', 'time traveller']
 ```
 
-We create a string of lyrics based on the currently trained model every 40 epochs.
+We create a string of lyrics based on the currently trained model every 50 epochs. The training code is identical to all previous sequence models.
 
-```{.python .input}
+```{.python .input  n=6}
 d2l.train_and_predict_rnn(lstm, get_params, init_lstm_state, num_hiddens,
                           vocab_size, ctx, corpus_indices, idx_to_char,
                           char_to_idx, False, num_epochs, num_steps, lr,
@@ -170,11 +159,12 @@ d2l.train_and_predict_rnn(lstm, get_params, init_lstm_state, num_hiddens,
 
 ## Concise Implementation
 
-In Gluon, we can directly call the `LSTM` class in the `rnn` module.
+In Gluon, we can call the `LSTM` class in the `rnn` module directly to instantiate the model.
 
-```{.python .input  n=6}
+```{.python .input  n=7}
 lstm_layer = rnn.LSTM(num_hiddens)
 model = d2l.RNNModel(lstm_layer, vocab_size)
+model.initialize(init.Xavier(), ctx=ctx)
 d2l.train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
                                 corpus_indices, idx_to_char, char_to_idx,
                                 num_epochs, num_steps, lr, clipping_theta,
@@ -183,16 +173,20 @@ d2l.train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
 
 ## Summary
 
-* The hidden layer output of LSTM includes hidden states and memory cells. Only hidden states are passed into the output layer.
-* The input, forget, and output gates in LSTM can control the flow of information.
-* LSTM can cope with the gradient attenuation problem in the recurrent neural networks and better capture dependencies for time series with large time step distances.
-
+* LSTMs have three types of gates: input, forget and output gates which control the flow of information. 
+* The hidden layer output of LSTM includes hidden states and memory cells. Only hidden states are passed into the output layer. Memory cells are entirely internal.
+* LSTMs can help cope with vanishing and exploding gradients due to long range dependencies and short-range irrelevant data. 
+* In many cases LSTMs perform slightly better than GRUs but they are more costly to train and execute due to the larger latent state size. 
+* LSTMs are the prototypical latent variable autoregressive model with nontrivial state control. Many variants thereof have been proposed over the years, e.g. multiple layers, residual connections, different types of regularization.
+* Training LSTMs and other sequence models is quite costly due to the long dependency of the sequence. Later we will encounter alternative models such as transformers that can be used in some cases.
 
 ## Exercises
 
-* Adjust the hyper-parameters and observe and analyze the impact on running time, perplexity, and the written lyrics.
-* Under the same conditions, compare the running time of an LSTM, GRU and recurrent neural network without gates.
-* Since the candidate memory cells ensure that the value range is between -1 and 1 using the tanh function, why does the hidden state need to use the tanh function again to ensure that the output value range is between -1 and 1?
+1. Adjust the hyperparameters. Observe and analyze the impact on runtime, perplexity, and the generted output. 
+1. How would you need to change the model to generate proper words as opposed to sequences of characters?
+1. Compare the computational cost for GRUs, LSTMs and regular RNNs for a given hidden dimension. Pay special attention to training and inference cost
+1. Since the candidate memory cells ensure that the value range is between -1 and 1 using the tanh function, why does the hidden state need to use the tanh function again to ensure that the output value range is between -1 and 1?
+1. Implement an LSTM for time series prediction rather than character sequences. 
 
 
 ## References
