@@ -140,7 +140,7 @@ The objective of backpropagation is to
 calculate the gradients $\partial J/\partial \mathbf{W}^{(1)}$ 
 and $\partial J/\partial \mathbf{W}^{(2)}$. 
 To accompish this, we will apply the chain rule 
-and calculate in turn the gradient of 
+and calculate, in turn, the gradient of 
 each intermediate variable and parameter. 
 The order of calculations are reversed 
 relative to those performed in forward propagation, 
@@ -183,10 +183,11 @@ $$
 $$
 
 To obtain the gradient with respect to $\mathbf{W}^{(1)}$ 
-we need to continue back propagation 
+we need to continue backpropagation 
 along the output layer to the hidden layer. 
-The gradient $\partial J/\partial \mathbf{h}\in \mathbb{R}^h$ 
-of the hidden layer variable is
+The gradient with respect to the hidden layer's outputs
+$\partial J/\partial \mathbf{h} \in \mathbb{R}^h$ is given by
+
 
 $$
 \frac{\partial J}{\partial \mathbf{h}}
@@ -195,10 +196,10 @@ $$
 $$
 
 Since the activation function $\phi$ applies element-wise, 
-calculating the gradient $\partial J/\partial \mathbf{z}\in \mathbb{R}^h$ 
+calculating the gradient $\partial J/\partial \mathbf{z} \in \mathbb{R}^h$ 
 of the intermediate variable $\mathbf{z}$ 
-requires the use of the element-wise multiplication operator. 
-We denote it by $\odot$.
+requires that we use the element-wise multiplication operator,
+which we denote by $\odot$.
 
 $$
 \frac{\partial J}{\partial \mathbf{z}}
