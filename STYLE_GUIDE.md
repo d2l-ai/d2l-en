@@ -55,7 +55,7 @@
 * Software
     * Use OmniGraffle to make figures.
       * Export pdf (infinite canvas) in 100%, then use pdf2svg to convert to svg
-        * `ls | while read f; do pdf2svg $f ${f%.pdf}.svg; done`
+        * `ls *.pdf| while read f; do pdf2svg $f ${f%.pdf}.svg; done`
       * Do not export svg directly from Omnigraffle (font size may slightly change)
 * Style
     * Size：
