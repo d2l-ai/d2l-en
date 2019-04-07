@@ -48,7 +48,7 @@ $$\begin{aligned}
 
 We can thus write the *backward* recursion as
 
-$$\rho_{t-1}(h_{t-1}) = \sum_{h_{t}} p(h_{t)|h_{t-1}) p(x_{t}|h_{t})$$
+$$\rho_{t-1}(h_{t-1})= \sum_{h_{t}} p(h_{t}|h_{t-1}) p(x_{t}|h_{t})$$
 
 with initialization $\rho_T(h_T) = 1$. These two recursions allow us to sum over $T$ variables in $O(kT)$ (linear) time over all values of $(h_1, \ldots h_T)$ rather than in exponential time. This is one of the great benefits of probabilistic inference with graphical models. It is a very special instance of the [Generalized Distributive Law](https://authors.library.caltech.edu/1541/1/AJIieeetit00.pdf) proposed in 2000 by Aji and McEliece. Combining both forward and backward pass we are able to compute
 
