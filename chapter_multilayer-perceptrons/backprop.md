@@ -1,4 +1,4 @@
-# Forward Propagation, Back Propagation, and Computational Graphs
+# Forward Propagation, Backward Propagation, and Computational Graphs
 
 In the previous sections, we used mini-batch 
 stochastic gradient descent to train our models. 
