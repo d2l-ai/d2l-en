@@ -78,6 +78,12 @@ to see why picking it might be problematic
 vis-a-vis vanishing gradients.
 
 ```{.python .input}
+%matplotlib inline
+import mxnet as mx
+from mxnet import nd, autograd
+from matplotlib import pyplot as plt
+
+from mxnet import nd, autograd
 x = nd.arange(-8.0, 8.0, 0.1)
 x.attach_grad()
 with autograd.record():
@@ -121,11 +127,6 @@ we would have no realistic chance of getting
 a gradient descent optimizer to converge.
 
 ```{.python .input  n=5}
-%matplotlib inline
-import mxnet as mx
-from mxnet import nd, autograd
-from matplotlib import pyplot as plt
-
 M = nd.random.normal(shape=(4,4))
 print('A single matrix', M)
 for i in range(100):
@@ -266,7 +267,7 @@ at what is offered as part of this module,
 and investigate the recent research on parameter initialization.
 Perhaps you may come across a recent clever idea 
 and contribute its implementation to MXNet, 
-or you may even invent your own scheme! 
+or you may even invent your own scheme!     
 
 
 ## Summary
