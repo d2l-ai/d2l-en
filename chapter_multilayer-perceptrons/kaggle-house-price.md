@@ -387,7 +387,7 @@ def train_and_pred(train_features, test_feature, train_labels, test_data,
     submission.to_csv('submission.csv', index=False)
 ```
 
-Let's invoke our model. 
+We can now invoke our model. 
 One nice sanity check is to see 
 whether the predictions on the test set 
 resemble those of the k-fold cross-validation process. 
