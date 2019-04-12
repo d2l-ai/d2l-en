@@ -40,7 +40,7 @@ The one-dimensional cross-correlation operation for multiple input channels is a
 
 ![One-dimensional cross-correlation operation with three input channels. The shaded parts are the first output element as well as the input and kernel array elements used in its calculation: $0\times1+1\times2+1\times3+2\times4+2\times(-1)+3\times(-3)=2$. ](../img/conv1d-channel.svg)
 
-Now, we reproduce the results of the one-dimensional cross-correlation operation with multi-input channel in Figure 10.5.
+Now, we reproduce the results of the one-dimensional cross-correlation operation with multi-input channel in Figure 11.5.
 
 ```{.python .input  n=5}
 def corr1d_multi_in(X, K):

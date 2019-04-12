@@ -26,7 +26,7 @@ The main performance bottleneck of an R-CNN model is the need to independently e
 
 ![Fast R-CNN model. ](../img/fast-rcnn.svg)
 
-Figure 9.6 shows a Fast R-CNN model. It's primary computation steps are described below:
+Figure 10.6 shows a Fast R-CNN model. It's primary computation steps are described below:
 
 1. Compared to an R-CNN model, a Fast R-CNN model uses the entire image as the CNN input for feature extraction, rather than each proposed region. Moreover, this network is generally trained to update the model parameters. As the input is an entire image, the CNN output shape is $1 \times c \times h_1 \times w_1$.
 1. Assuming selective search generates $n$ proposed regions, their different shapes indicate regions of interests (RoIs) of different shapes on the CNN output. Features of the same shapes must be extracted from these RoIs (here we assume that the height is $h_2$ and the width is $w_2$). Fast R-CNN introduces RoI pooling, which uses the CNN output and RoIs as input to output a concatenation of the features extracted from each proposed region with the shape $n \times c \times h_2 \times w_2$.

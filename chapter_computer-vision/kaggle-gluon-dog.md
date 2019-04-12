@@ -7,7 +7,7 @@ In this section, we will tackle the dog breed identification challenge in the Ka
 
 In this competition, we attempt to identify 120 different breeds of dogs. The data set used in this competition is actually a subset of the famous ImageNet data set. Different from the images in the CIFAR-10 data set used in the previous section, the images in the ImageNet data set are higher and wider and their dimensions are inconsistent.
 
-Figure 9.17 shows the information on the competition's webpage. In order to submit the results, please register an account on the Kaggle website first.
+Figure 10.17 shows the information on the competition's webpage. In order to submit the results, please register an account on the Kaggle website first.
 
 ![Dog breed identification competition website. The data set for the competition can be accessed by clicking the "Data" tab. (Source: www.](../img/kaggle-dog.png)
 
