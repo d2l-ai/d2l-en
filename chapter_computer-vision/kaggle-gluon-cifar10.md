@@ -6,7 +6,7 @@ We performed an experiment on the CIFAR-10 data set in the ["Image Augmentation"
 
 > https://www.kaggle.com/c/cifar-10
 
-Figure 9.16 shows the information on the competition's webpage. In order to submit the results, please register an account on the Kaggle website first.
+Figure 10.16 shows the information on the competition's webpage. In order to submit the results, please register an account on the Kaggle website first.
 
 ![CIFAR-10 image classification competition webpage information. The data set for the competition can be accessed by clicking the "Data" tab. (Source: www.](../img/kaggle_cifar10.png)
 
