@@ -20,11 +20,11 @@ Word2vec is a tool that we came up with to solve the problem above[1].  It repre
 
 The skip-gram model assumes that a word can be used to generate the words that surround it in a text sequence. For example, we assume that the text sequence is "the", "man", "loves", "his", and "son". We use "loves" as the central target word and set the context window size to 2. As shown in Figure 11.1, given the central target word "loves", the skip-gram model is concerned with the conditional probability for generating the context words, "the", "man", "his" and "son", that are within a distance of no more than 2 words, which is
 
-$$\mathbb{P}(\textrm{"the"},\textrm{"man"},\textrm{"his"},\textrm{"son"}\mid\textrm{"loves"}).$$
+$$\mathbb{P}(\textrm{``the''},\textrm{``man''},\textrm{``his''},\textrm{``son''}\mid\textrm{``loves''}).$$
 
 We assume that, given the central target word, the context words are generated independently of each other. In this case, the formula above can be rewritten as
 
-$$\mathbb{P}(\textrm{"the"}\mid\textrm{"loves"})\cdot\mathbb{P}(\textrm{"man"}\mid\textrm{"loves"})\cdot\mathbb{P}(\textrm{"his"}\mid\textrm{"loves"})\cdot\mathbb{P}(\textrm{"son"}\mid\textrm{"loves"}).$$
+$$\mathbb{P}(\textrm{``the''}\mid\textrm{``loves''})\cdot\mathbb{P}(\textrm{``man''}\mid\textrm{``loves''})\cdot\mathbb{P}(\textrm{``his''}\mid\textrm{``loves''})\cdot\mathbb{P}(\textrm{``son''}\mid\textrm{``loves''}).$$
 
 ![The skip-gram model cares about the conditional probability of generating context words for a given central target word. ](../img/skip-gram.svg)
 
