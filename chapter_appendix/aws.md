@@ -59,6 +59,8 @@ Here, "/path/to/key.pem" is the path of the locally-stored key used to access th
 
 ![ View instance access and startup method. ](../img/connect.png)
 
+To use MXNet with GPU, we still need to install CUDA on our created instance (see "Install CUDA" subsection). In fact, we can also directly create an instance installed with CUDA. For example, in the first step "1. Choose AMI", choose "Deep Learning Base AMI (Ubuntu) Version XX.X", and keep the following steps the same. After logging into the instance, run command `cat README` to view versions of the installed CUDA on this instance (suppose that 9.0 is included). If we wish to set the default CUDA version to 9.0, run commands `sudo rm /usr/local/cuda` and `sudo ln -s /usr/local/cuda-9.0 /usr/local/cuda`. Then, we can skip CUDA installation in the following subsection.
+
 
 ## Install CUDA
 
