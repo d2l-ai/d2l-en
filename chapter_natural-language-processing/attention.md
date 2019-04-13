@@ -16,7 +16,7 @@ The key here is to figure out how to compute the context variable $\boldsymbol{c
 
 ## Compute the Context Variable
 
-Figure 10.12 depicts how the attention mechanism computes the context variable for the decoder at time step 2. First, function $a$ will compute the input of the softmax operation based on the hidden state of the decoder at time step 1 and the hidden states of the encoder at each time step. The Softmax operation outputs a probability distribution and weights the hidden state of each time step of the encoder to obtain a context variable.
+Figure 11.12 depicts how the attention mechanism computes the context variable for the decoder at time step 2. First, function $a$ will compute the input of the softmax operation based on the hidden state of the decoder at time step 1 and the hidden states of the encoder at each time step. The Softmax operation outputs a probability distribution and weights the hidden state of each time step of the encoder to obtain a context variable.
 
 ![Attention mechanism based on the encoder-decoder. ](../img/attention.svg)
 
