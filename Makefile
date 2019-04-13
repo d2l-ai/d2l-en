@@ -1,6 +1,6 @@
 all: html
 
-build/%.ipynb: %.md build/env.yml $(wildcard d2l/*)
+build/%.ipynb: %.md build/env.yml # $(wildcard d2l/*)
 	mkdir -p $(@D)
 	cd $(@D); python ../utils/md2ipynb.py ../../$< ../../$@
 
@@ -8,7 +8,7 @@ build/%.md: %.md
 	@mkdir -p $(@D)
 	@cp $< $@
 
-MARKDOWN = $(wildcard */index.md)
+MARKDOWN = $(wildcard */index.md chapter_appendix/d2l.md)
 NOTEBOOK = $(filter-out $(MARKDOWN), $(wildcard chapter*/*.md))
 
 OBJ = $(patsubst %.md, build/%.md, $(MARKDOWN)) \
@@ -19,7 +19,7 @@ FRONTPAGE = $(wildcard $(FRONTPAGE_DIR)/*)
 FRONTPAGE_DEP = $(patsubst %, build/%, $(FRONTPAGE))
 
 IMG_NOTEBOOK = $(filter-out $(FRONTPAGE_DIR), $(wildcard img/*))
-ORIGIN_DEPS = $(IMG_NOTEBOOK) $(wildcard data/* d2l/*) environment.yml README.md
+ORIGIN_DEPS = $(IMG_NOTEBOOK) $(wildcard data/* d2l/* d2l/*/*) environment.yml README.md
 DEPS = $(patsubst %, build/%, $(ORIGIN_DEPS))
 
 PKG = build/_build/html/d2l-en.zip
