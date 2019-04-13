@@ -13,7 +13,8 @@ from .model import linreg
 
 __all__ = ['evaluate_accuracy', 'squared_loss', 'grad_clipping', 'sgd', 'train',
            'train_2d', 'train_and_predict_rnn', 'train_and_predict_rnn_gluon',
-           'train_ch3', 'train_ch5', 'train_ch7', 'train_gluon_ch7', 'predict_sentiment']
+           'train_ch3', 'train_ch5', 'train_ch9', 'train_gluon_ch9',
+           'predict_sentiment', 'train_ch7', 'translate_ch7']
 
 def _get_batch(batch, ctx):
     """Return features and labels on ctx."""
@@ -43,14 +44,15 @@ def squared_loss(y_hat, y):
 
 def grad_clipping(params, theta, ctx):
     """Clip the gradient."""
-    if theta is not None:
-        norm = nd.array([0], ctx)
+    if isinstance(params, nn.Block):
+        params = [p.data(ctx) for p in params.collect_params().values()]
+    norm = nd.array([0], ctx)
+    for param in params:
+        norm += (param.grad ** 2).sum()
+    norm = norm.sqrt().asscalar()
+    if norm > theta:
         for param in params:
-            norm += (param.grad ** 2).sum()
-        norm = norm.sqrt().asscalar()
-        if norm > theta:
-            for param in params:
-                param.grad[:] *= theta / norm
+            param.grad[:] *= theta / norm
 
 def sgd(params, lr, batch_size):
     """Mini-batch stochastic gradient descent."""
@@ -229,7 +231,7 @@ def train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,
                  time.time() - start))
 
 
-def train_ch7(trainer_fn, states, hyperparams, features, labels, batch_size=10,
+def train_ch9(trainer_fn, states, hyperparams, features, labels, batch_size=10,
               num_epochs=2):
     """Train a linear regression model."""
     net, loss = linreg, squared_loss
@@ -260,7 +262,7 @@ def train_ch7(trainer_fn, states, hyperparams, features, labels, batch_size=10,
     plt.ylabel('loss')
 
 
-def train_gluon_ch7(trainer_name, trainer_hyperparams, features, labels,
+def train_gluon_ch9(trainer_name, trainer_hyperparams, features, labels,
                     batch_size=10, num_epochs=2):
     """Train a linear regression model with a given Gluon trainer."""
     net = nn.Sequential()
@@ -326,3 +328,56 @@ def predict_sentiment(net, vocab, sentence):
     sentence = nd.array(vocab.to_indices(sentence), ctx=try_gpu())
     label = nd.argmax(net(sentence.reshape((1, -1))), axis=1)
     return 'positive' if label.asscalar() == 1 else 'negative'
+
+def train_ch7(model, data_iter, lr, num_epochs, ctx):
+    """Train an encoder-encoder model"""
+    model.initialize(init.Xavier(), force_reinit=True, ctx=ctx)
+    trainer = gluon.Trainer(model.collect_params(),
+                            'adam', {'learning_rate': lr})
+    loss = MaskedSoftmaxCELoss()
+    tic = time.time()
+    for epoch in range(1, num_epochs+1):
+        l_sum, num_tokens_sum = 0.0, 0.0
+        for batch in data_iter:
+            X, X_vlen, Y, Y_vlen = [x.as_in_context(ctx) for x in batch]
+            Y_input, Y_label, Y_vlen = Y[:,:-1], Y[:,1:], Y_vlen-1
+            with autograd.record():
+                Y_hat, _ = model(X, Y_input, X_vlen, Y_vlen)
+                l = loss(Y_hat, Y_label, Y_vlen)
+            l.backward()
+            grad_clipping(model, 5, ctx)
+            num_tokens = Y_vlen.sum().asscalar()
+            trainer.step(num_tokens)
+            l_sum += l.sum().asscalar()
+            num_tokens_sum += num_tokens
+        if epoch % (num_epochs // 4) == 0:
+            print("epoch %d, loss %.3f, time %.1f sec" % (
+                epoch, l_sum/num_tokens_sum, time.time()-tic))
+            tic = time.time()
+
+def translate_ch7(model, src_sentence, src_vocab, tgt_vocab, max_len, ctx):
+    """Translate based on an encode-decoder model with greedy search"""
+    src_tokens = src_vocab[src_sentence.lower().split(' ')]
+    src_len = len(src_tokens)
+    if src_len < max_len:
+        src_tokens += [src_vocab.pad] * (max_len - src_len)
+    enc_X = nd.array(src_tokens, ctx=ctx)
+    enc_valid_length = nd.array([src_len], ctx=ctx)
+    enc_outputs = model.encoder(enc_X.expand_dims(axis=0), enc_valid_length)
+    dec_state = model.decoder.init_state(enc_outputs, enc_valid_length)
+    dec_X = nd.array([tgt_vocab.bos], ctx=ctx).expand_dims(axis=0)
+    predict_tokens = []
+    for _ in range(max_len):
+        Y, dec_state = model.decoder(dec_X, dec_state)
+        dec_X = Y.argmax(axis=2)
+        py = dec_X.squeeze(axis=0).astype('int32').asscalar()
+        if py == tgt_vocab.eos:
+            break
+        predict_tokens.append(py)
+    return ' '.join(tgt_vocab.to_tokens(predict_tokens))
+
+class MaskedSoftmaxCELoss(gloss.SoftmaxCELoss):
+    def forward(self, pred, label, valid_length):
+        weights = nd.ones_like(label).expand_dims(axis=-1)
+        weights = nd.SequenceMask(weights, valid_length, True, axis=1)
+        return super(MaskedSoftmaxCELoss, self).forward(pred, label, weights)

@@ -55,7 +55,7 @@ def adadelta(params, states, hyperparams):
 Then, we train the model with the hyperparameter $\rho=0.9$.
 
 ```{.python .input  n=12}
-d2l.train_ch7(adadelta, init_adadelta_states(), {'rho': 0.9}, features,
+d2l.train_ch9(adadelta, init_adadelta_states(), {'rho': 0.9}, features,
               labels)
 ```
 
@@ -64,7 +64,7 @@ d2l.train_ch7(adadelta, init_adadelta_states(), {'rho': 0.9}, features,
 From the `Trainer` instance for the algorithm named "adadelta", we can implement Adadelta in Gluon. Its hyperparameters can be specified by `rho`.
 
 ```{.python .input  n=9}
-d2l.train_gluon_ch7('adadelta', {'rho': 0.9}, features, labels)
+d2l.train_gluon_ch9('adadelta', {'rho': 0.9}, features, labels)
 ```
 
 ## Summary
