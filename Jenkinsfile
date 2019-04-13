@@ -11,7 +11,7 @@ stage("Build and Publish") {
       sh "build/utils/build_pkg.sh en"
       if (env.BRANCH_NAME == 'master') {
         sh "build/utils/publish_website.sh en"
-        withCredentials([usernamePassword(credentialsId: '13cb1009-3cda-49ef-9aaa-8a705fdaaeb7',
+        withCredentials([usernamePassword(credentialsId: 'ea9ac23b-cc0d-4d2c-a080-67d829e1415a',
                          passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
           sh "build/publish_notebook.sh"
         }
