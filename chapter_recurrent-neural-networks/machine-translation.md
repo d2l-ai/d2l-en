@@ -5,6 +5,9 @@ from one language to another. Solving this problem with neural networks is often
 called neural machine translation (NMT). Compared to the language model we discussed before, a major difference for MT is that the output is a sequence of words instead of a single words. The length of the output sequence could be different to the source sequence length. In the rest of this section, we will demonstrate how to pre-process a MT dataset and transform it into a set of data batches.
 
 ```{.python .input  n=1}
+import sys
+sys.path.insert(0, '..')
+
 import collections
 import d2l
 import zipfile
@@ -54,7 +57,7 @@ for i, line in enumerate(text.split('\n')):
     if len(parts) == 2:
         source.append(parts[0].split(' '))
         target.append(parts[1].split(' '))
-        
+
 source[0:3], target[0:3]
 ```
 
@@ -72,7 +75,7 @@ d2l.plt.legend(loc='upper right');
 A vocabulary is used to map tokens into numerical indices. Given a list of tokens, often called corpus, a vocabulary counts the frequency of each token in this corpus, and then assigns an numerical index to each token according to its frequency. Rarely appeared tokens are often removed to reduce the complexity. In addition, we add four special tokens: “&lt;pad&gt;” a token for padding, “&lt;bos&gt;” to present the beginning for a sentence, “&lt;eos&gt;” for the ending of a sentence, and “&lt;unk&gt;” for any token that is not mapped into an index by this vocabulary, e.g. the rare tokens filtered before.
 
 ```{.python .input  n=6}
-class Vocab(object):  # This class is saved in d2l. 
+class Vocab(object):  # This class is saved in d2l.
     def __init__(self, tokens, min_freq):
         # sort by frequency and token
         counter = collections.Counter(tokens)
@@ -151,7 +154,7 @@ Now we can convert a list of sentences into an `(num_example, max_len)` index ar
 ```{.python .input  n=12}
 def build_array(lines, vocab, max_len, is_source):
     lines = [vocab[line] for line in lines]
-    if not is_source: 
+    if not is_source:
         lines = [[vocab.bos] + line + [vocab.eos] for line in lines]
     array = nd.array([pad(line, max_len, vocab.pad) for line in lines])
     valid_len = (array != vocab.pad).sum(axis=1)
@@ -176,7 +179,7 @@ Let's read the first batch.
 ```{.python .input  n=14}
 src_vocab, tgt_vocab, train_iter = load_data_nmt(batch_size=2, max_len=8)
 for X, X_valid_len, Y, Y_valid_len, in train_iter:
-    print('X =', X.astype('int32'), '\nValid lengths for X =', X_valid_len, 
+    print('X =', X.astype('int32'), '\nValid lengths for X =', X_valid_len,
           '\nY =', Y.astype('int32'), '\nValid lengths for Y =', Y_valid_len)
     break
 ```
