@@ -5,38 +5,38 @@ This section describes how to edit and run the code in this book using Jupyter N
 
 ## Edit and Run the Code in This Book Locally
 
-Now we describe how to use Jupyter Notebook to edit and run code of the book locally. Suppose that the local path of code of the book is "xx/yy/d2l-en-1.0/". Change directory to this path in command mode (`cd xx/yy/d2l-en-1.0`), then run command `jupyter notebook`. Now open http://localhost:8888 (usually automatically opened) in the browser, and you will see the interface of Jupyter Notebook and all the folders containing code of the book, as shown in Figure 12.1.
+Now we describe how to use Jupyter Notebook to edit and run code of the book locally. Suppose that the local path of code of the book is "xx/yy/d2l-en-1.0/". Change directory to this path in command mode (`cd xx/yy/d2l-en-1.0`), then run command `jupyter notebook`. Now open http://localhost:8888 (usually automatically opened) in the browser, and you will see the interface of Jupyter Notebook and all the folders containing code of the book, as shown in Figure 13.1.
 
 ![The folders containing the code in this book. ](../img/jupyter00.png)
 
 
 You can access the notebook files by clicking on the folder displayed on the webpage. They usually have the suffix "ipynb".
-For the sake of brevity, we create a temporary "test.ipynb" file, and the content displayed after you click it is as shown in Figure 12.2. This notebook includes a markdown cell and code cell. The content in the markdown cell includes "This is A Title" and "This is text".   The code cell contains two lines of Python code.
+For the sake of brevity, we create a temporary "test.ipynb" file, and the content displayed after you click it is as shown in Figure 13.2. This notebook includes a markdown cell and code cell. The content in the markdown cell includes "This is A Title" and "This is text".   The code cell contains two lines of Python code.
 
 ![Markdown and code cells in the "text.ipynb" file. ](../img/jupyter01.png)
 
 
-Double click on the markdown cell, to enter edit mode. Add a new text string "Hello world." at the end of the cell, as shown in Figure 12.3.
+Double click on the markdown cell, to enter edit mode. Add a new text string "Hello world." at the end of the cell, as shown in Figure 13.3.
 
 ![Edit the markdown cell. ](../img/jupyter02.png)
 
 
-As shown in Figure 12.4, click "Cell" $\rightarrow$ "Run Cells" in the menu bar to run the edited cell.
+As shown in Figure 13.4, click "Cell" $\rightarrow$ "Run Cells" in the menu bar to run the edited cell.
 
 ![Run the cell. ](../img/jupyter03.png)
 
 
-After running, the markdown cell is as shown in Figure 12.5.
+After running, the markdown cell is as shown in Figure 13.5.
 
 ![The markdown cell after editing. ](../img/jupyter04.png)
 
 
-Next, click on the code cell. Add the multiply by 2 operation `* 2` after the last line of code, as shown in Figure 12.6.
+Next, click on the code cell. Add the multiply by 2 operation `* 2` after the last line of code, as shown in Figure 13.6.
 
 ![Edit the code cell. ](../img/jupyter05.png)
 
 
-You can also run the cell with a shortcut ("Ctrl + Enter" by default) and obtain the output result from Figure 12.7.
+You can also run the cell with a shortcut ("Ctrl + Enter" by default) and obtain the output result from Figure 13.7.
 
 ![Run the code cell to obtain the output. ](../img/jupyter06.png)
 

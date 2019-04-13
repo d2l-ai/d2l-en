@@ -65,7 +65,7 @@ In the literature, transposed convolution is also sometimes referred to as fract
 
 ## Construct a Model
 
-Here, we demonstrate the most basic design of a fully convolutional network model. As shown in Figure 10.11, the fully convolutional network first uses the convolutional neural network to extract image features, then transforms the number of channels into the number of categories through the $1\times 1$ convolution layer, and finally transforms the height and width of the feature map to the size of the input image by using the transposed convolution layer. The model output has the same height and width as the input image and has a one-to-one correspondence in spatial positions. The final output channel contains the category prediction of the pixel of the corresponding spatial position.
+Here, we demonstrate the most basic design of a fully convolutional network model. As shown in Figure 11.11, the fully convolutional network first uses the convolutional neural network to extract image features, then transforms the number of channels into the number of categories through the $1\times 1$ convolution layer, and finally transforms the height and width of the feature map to the size of the input image by using the transposed convolution layer. The model output has the same height and width as the input image and has a one-to-one correspondence in spatial positions. The final output channel contains the category prediction of the pixel of the corresponding spatial position.
 
 ![Fully convolutional network. ](../img/fcn.svg)
 
