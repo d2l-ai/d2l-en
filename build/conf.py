@@ -18,6 +18,9 @@ import os
 from recommonmark.parser import CommonMarkParser
 from recommonmark.transform import AutoStructify
 
+sys.path.insert(0, '..')
+sys.path.insert(0, '.')
+
 # Use footnote size for code block.
 from sphinx.highlighting import PygmentsBridge
 from pygments.formatters.latex import LatexFormatter
