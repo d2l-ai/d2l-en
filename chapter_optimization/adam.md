@@ -62,7 +62,7 @@ def adam(params, states, hyperparams):
 Use Adam to train the model with a learning rate of $0.01$.
 
 ```{.python .input  n=5}
-d2l.train_ch7(adam, init_adam_states(), {'lr': 0.01, 't': 1}, features,
+d2l.train_ch9(adam, init_adam_states(), {'lr': 0.01, 't': 1}, features,
               labels)
 ```
 
@@ -71,7 +71,7 @@ d2l.train_ch7(adam, init_adam_states(), {'lr': 0.01, 't': 1}, features,
 From the `Trainer` instance of the algorithm named "adam", we can implement Adam with Gluon.
 
 ```{.python .input  n=11}
-d2l.train_gluon_ch7('adam', {'learning_rate': 0.01}, features, labels)
+d2l.train_gluon_ch9('adam', {'learning_rate': 0.01}, features, labels)
 ```
 
 ## Summary
