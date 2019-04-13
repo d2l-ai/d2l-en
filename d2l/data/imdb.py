@@ -5,7 +5,7 @@ from mxnet import nd
 from mxnet.contrib import text
 from mxnet.gluon import utils as gutils
 
-__all__ = ['read_imdb', 'preprocess_imdb', 'download_imdb']
+__all__ = ['read_imdb', 'preprocess_imdb', 'download_imdb', 'get_vocab_imdb']
 
 def get_tokenized_imdb(data):
     """Get the tokenized IMDB data set for sentiment analysis."""
