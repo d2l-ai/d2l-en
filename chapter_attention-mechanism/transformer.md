@@ -2,7 +2,7 @@
 
 The Transformer model is also based on the encoder-decoder architecture. It, however, differs to the seq2seq model that the transformer replaces the recurrent layers in seq2seq with attention layers. To deal with sequential inputs, each item in the sequential is copied as the query, the key and the value as illustrated in the following figure. It therefore outputs a same length sequential output. We call such an attention layer as a self-attention layer. 
 
-![](./self-attention.svg)
+![](../img/self-attention.svg)
  
 
 <!-- Compared to a recurrent layer, output items of a self-attention layer can be computed in parallel and, therefore, it is easy to obtain a high-efficient implementation. -->
@@ -10,7 +10,7 @@ The Transformer model is also based on the encoder-decoder architecture. It, how
 The transformer architecture, with a comparison to the seq2seq model with attention, is shown in the following figure. These two models are similar to each other in overall: the source sequence embeddings are fed into $n$ repeated blocks. The outputs of the last block are then used as attention memory for the decoder. 
 The target sequence embeddings is similarly fed into $n$ repeated blocks in the decoder, and the final outputs are obtained by applying a dense layer with vocabulary size to the last block's outputs. 
 
-![](./transformer.svg)
+![](../img/transformer.svg)
 
 It can also be seen that the transformer differs to the seq2seq with attention model in three major places:
 
