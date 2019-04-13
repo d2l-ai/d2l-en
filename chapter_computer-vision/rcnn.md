@@ -6,7 +6,7 @@ Region-based convolutional neural networks or regions with CNN features (R-CNNs)
 
 ## R-CNNs
 
-R-CNN models first select several proposed regions from an image (for example, anchor boxes are one type of selection method) and then label their categories and bounding boxes (e.g., offsets). Then, they use a CNN to perform forward computation to extract features from each proposed area. Afterwards, we use the features of each proposed region to predict their categories and bounding boxes. Figure 9.5 shows an R-CNN model.
+R-CNN models first select several proposed regions from an image (for example, anchor boxes are one type of selection method) and then label their categories and bounding boxes (e.g., offsets). Then, they use a CNN to perform forward computation to extract features from each proposed area. Afterwards, we use the features of each proposed region to predict their categories and bounding boxes. Figure 10.5 shows an R-CNN model.
 
 ![R-CNN model. ](../img/r-cnn.svg)
 
@@ -35,7 +35,7 @@ Figure 10.6 shows a Fast R-CNN model. It's primary computation steps are describ
 
 The RoI pooling layer in Fast R-CNN is somewhat different from the pooling layers we have discussed before. In a normal pooling layer, we set the pooling window, padding, and stride to control the output shape. In an RoI pooling layer, we can directly specify the output shape of each region, such as specifying the height and width of each region as $h_2,w_2$. Assuming that the height and width of the RoI window are $h$ and $w$, this window is divided into a grid of sub-windows with the shape $h_2 \times w_2$. The size of each sub-window is about $(h/h_2) \times (w/w_2)$. The sub-window height and width must always be integers and the largest element is used as the output for a given sub-window. This allows the RoI pooling layer to extract features of the same shape from RoIs of different shapes.
 
-In Figure 9.7, we select an $3\times 3$ region as an RoI of the $4 \times 4$ input. For this RoI, we use a $2\times 2$ RoI pooling layer to obtain a single $2\times 2$ output. When we divide the region into four sub-windows, they respectively contain the elements 0, 1, 4, and 5 (5 is the largest); 2 and 6 (6 is the largest); 8 and 9 (9 is the largest); and 10.
+In Figure 10.7, we select an $3\times 3$ region as an RoI of the $4 \times 4$ input. For this RoI, we use a $2\times 2$ RoI pooling layer to obtain a single $2\times 2$ output. When we divide the region into four sub-windows, they respectively contain the elements 0, 1, 4, and 5 (5 is the largest); 2 and 6 (6 is the largest); 8 and 9 (9 is the largest); and 10.
 
 ![$2\times 2$ RoI pooling layer. ](../img/roi.svg)
 
@@ -68,7 +68,7 @@ In order to obtain precise object detection results, Fast R-CNN generally requir
 ![Faster R-CNN model. ](../img/faster-rcnn.svg)
 
 
-Figure 9.8 shows a Faster R-CNN model. Compared to Fast R-CNN, Faster R-CNN only changes the method for generating proposed regions from selective search to region proposal network. The other parts of the model remain unchanged. The detailed region proposal network computation process is described below:
+Figure 10.8 shows a Faster R-CNN model. Compared to Fast R-CNN, Faster R-CNN only changes the method for generating proposed regions from selective search to region proposal network. The other parts of the model remain unchanged. The detailed region proposal network computation process is described below:
 
 1. We use a $3\times 3$ convolutional layer with a padding of 1 to transform the CNN output and set the number of output channels to $c$. This way, each element in the feature map the CNN extracts from the image is a new feature with a length of $c$.
 1. We use each element in the feature map as a center to generate multiple anchor boxes of different sizes and aspect ratios and then label them.

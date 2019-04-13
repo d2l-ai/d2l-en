@@ -34,7 +34,7 @@ The competition data is divided into a training set and testing set. The trainin
 
 ### Download the Data Set
 
-After logging in to Kaggle, we can click on the "Data" tab on the dog breed identification competition webpage shown in Figure 9.17 and download the training data set "train.zip", the testing data set "test.zip", and the training data set labels "label.csv.zip". After downloading the files, place them in the three paths below:
+After logging in to Kaggle, we can click on the "Data" tab on the dog breed identification competition webpage shown in Figure 10.17 and download the training data set "train.zip", the testing data set "test.zip", and the training data set labels "label.csv.zip". After downloading the files, place them in the three paths below:
 
 * ../data/kaggle_dog/train.zip
 * ../data/kaggle_dog/test.zip
