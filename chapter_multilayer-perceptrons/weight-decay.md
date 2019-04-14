@@ -11,7 +11,7 @@ typically making it impossible in the short run.
 For now, let's assume that we have already obtained 
 as much high-quality data as our resources permit
 and focus on techniques aimed at limiting the capacity 
-of the fuction classes under consideration. 
+of the function classes under consideration. 
 
 In our toy example, 
 we saw that we could control the complexity of a polynomial 
