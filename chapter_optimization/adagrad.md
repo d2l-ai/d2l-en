@@ -82,7 +82,7 @@ def adagrad(params, states, hyperparams):
 Compared with the experiment in the ["Mini-Batch Stochastic Gradient Descent"](minibatch-sgd.md) section, here, we use a larger learning rate to train the model.
 
 ```{.python .input  n=4}
-d2l.train_ch7(adagrad, init_adagrad_states(), {'lr': 0.1}, features, labels)
+d2l.train_ch9(adagrad, init_adagrad_states(), {'lr': 0.1}, features, labels)
 ```
 
 ## Concise Implementation
@@ -90,7 +90,7 @@ d2l.train_ch7(adagrad, init_adagrad_states(), {'lr': 0.1}, features, labels)
 Using the `Trainer` instance of the algorithm named “adagrad”, we can implement the Adagrad algorithm with Gluon to train models.
 
 ```{.python .input  n=5}
-d2l.train_gluon_ch7('adagrad', {'learning_rate': 0.1}, features, labels)
+d2l.train_gluon_ch9('adagrad', {'learning_rate': 0.1}, features, labels)
 ```
 
 ## Summary

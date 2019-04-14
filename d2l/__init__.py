@@ -1,3 +1,7 @@
-from .utils import *
+from .base import *
+from .figure import *
+from .data import *
+from .model import *
+from .train import *
 
-__version__ = '0.8.7'
+__version__ = '0.9'
