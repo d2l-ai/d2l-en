@@ -8,7 +8,7 @@ In order to deal with the above problems, an obvious solution is to collect more
 
 Another solution is to apply transfer learning to migrate the knowledge learned from the source data set to the target data set. For example, although the images in ImageNet are mostly unrelated to chairs, models trained on this data set can extract more general image features that can help identify edges, textures, shapes, and object composition. These similar features may be equally effective for recognizing a chair.
 
-In this section, we introduce a common technique in transfer learning: fine tuning. As shown in Figure 10.1, fine tuning consists of the following four steps:
+In this section, we introduce a common technique in transfer learning: fine tuning. As shown in Figure 11.1, fine tuning consists of the following four steps:
 
 1. Pre-train a neural network model, i.e. the source model, on a source data set (e.g., the ImageNet data set).
 2. Create a new neural network model, i.e. the target model. This replicates all model designs and their parameters on the source model, except the output layer. We assume that these model parameters contain the knowledge learned from the source data set and that this knowledge will be equally applicable to the target data set. We also assume that the output layer of the source model is closely related to the labels of the source data set and is therefore not used in the target model.

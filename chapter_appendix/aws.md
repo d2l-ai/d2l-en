@@ -12,27 +12,27 @@ The process to apply for other instance types and install other MXNet versions i
 
 First, we need to register an account at https://aws.amazon.com/. It usually requires a credit card.
 
-After logging into your AWS account, click "EC2" (marked by the red box in Figure 12.8) to go to the EC2 panel.
+After logging into your AWS account, click "EC2" (marked by the red box in Figure 13.8) to go to the EC2 panel.
 
 ![ Log into your AWS account. ](../img/aws.png)
 
 
 ## Create and Run an EC2 Instance
 
-Figure 12.9 shows the EC2 panel. In the area marked by the red box in Figure 12.9, select a nearby data center to reduce latency. If you are located in China you can select a nearby Asia Pacific region, such as Asia Pacific (Seoul). Please note that some data centers may not have GPU instances. Click the "Launch Instance" button marked by the red box in Figure 12.8 to launch your instance.
+Figure 13.9 shows the EC2 panel. In the area marked by the red box in Figure 13.9, select a nearby data center to reduce latency. If you are located in China you can select a nearby Asia Pacific region, such as Asia Pacific (Seoul). Please note that some data centers may not have GPU instances. Click the "Launch Instance" button marked by the red box in Figure 13.8 to launch your instance.
 
 ![ EC2 panel. ](../img/ec2.png)
 
 
-The row at the top of Figure 12.10 shows the seven steps in the instance configuration process. In the first step "1. Choose AMI", choose Ubuntu 16.04 for the operating system.
+The row at the top of Figure 13.10 shows the seven steps in the instance configuration process. In the first step "1. Choose AMI", choose Ubuntu 16.04 for the operating system.
 
 ![ Choose an operating system. ](../img/os.png)
 
-EC2 provides many different instance configurations to choose from. As shown in Figure 12.11, In "Step 2: Choose an Instance Type”，choose a "p2.xlarge" instance with K80 GPU. We can also choose instances with multiple GPUs such as "p2.16xlarge". If you want to compare machine configurations and fees of different instances, you may refer to https://www.ec2instances.info/.
+EC2 provides many different instance configurations to choose from. As shown in Figure 13.11, In "Step 2: Choose an Instance Type”，choose a "p2.xlarge" instance with K80 GPU. We can also choose instances with multiple GPUs such as "p2.16xlarge". If you want to compare machine configurations and fees of different instances, you may refer to https://www.ec2instances.info/.
 
 ![ Choose an instance. ](../img/p2x.png)
 
-Before choosing an instance, we suggest you check if there are quantity restrictions by clicking the "Limits" label in the bar on the, as left shown in Figure 12.9. As shown in Figure 12.12, this account can only open one "p2.xlarge" instance per region. If you need to open more instances, click on the "Request limit increase" link to apply for a higher instance quota. Generally, it takes one business day to process an application.
+Before choosing an instance, we suggest you check if there are quantity restrictions by clicking the "Limits" label in the bar on the, as left shown in Figure 13.9. As shown in Figure 13.12, this account can only open one "p2.xlarge" instance per region. If you need to open more instances, click on the "Request limit increase" link to apply for a higher instance quota. Generally, it takes one business day to process an application.
 
 ![ Instance quantity restrictions. ](../img/limits.png)
 
@@ -41,15 +41,15 @@ In this example, we keep the default configurations for the steps "3. Configure 
 ![ Modify instance hard disk size. ](../img/disk.png)
 
 
-Finally, go to "7. Review" and click "Launch" to launch the configured instance. The system will now prompt you to select the key pair used to access the instance. If you do not have a key pair, select "Create a new key pair" in the first drop-down menu in Figure 12.14 to generate a key pair. Subsequently, you can select "Choose an existing key pair" for this menu and then select the previously generated key pair. Click "Launch Instances" to launch the created instance.
+Finally, go to "7. Review" and click "Launch" to launch the configured instance. The system will now prompt you to select the key pair used to access the instance. If you do not have a key pair, select "Create a new key pair" in the first drop-down menu in Figure 13.14 to generate a key pair. Subsequently, you can select "Choose an existing key pair" for this menu and then select the previously generated key pair. Click "Launch Instances" to launch the created instance.
 
 ![ Select a key pair. ](../img/keypair.png)
 
-Click the instance ID shown in Figure 12.15 to view the status of this instance.
+Click the instance ID shown in Figure 13.15 to view the status of this instance.
 
 ![C lick the instance ID. ](../img/launching.png)
 
-As shown in Figure 12.16, after the instance state turns green, right-click the instance and select "Connect" to view the instance access method. For example, enter the following in the command line:
+As shown in Figure 13.16, after the instance state turns green, right-click the instance and select "Connect" to view the instance access method. For example, enter the following in the command line:
 
 ```
 ssh -i "/path/to/key.pem" ubuntu@ec2-xx-xxx-xxx-xxx.y.compute.amazonaws.com
@@ -70,7 +70,7 @@ If you log into a GPU instance, you need to download and install CUDA. First, up
 sudo apt-get update && sudo apt-get install -y build-essential git libgfortran3
 ```
 
-NVIDIA releases a major version of CUDA every year. Here we download the latest CUDA 9.0 when the book is written. Visit the official website of NVIDIA (https://developer.nvidia.com/cuda-90-download-archive) to obtain the download link of CUDA 9.0, as shown in Figure 12.17.
+NVIDIA releases a major version of CUDA every year. Here we download the latest CUDA 9.0 when the book is written. Visit the official website of NVIDIA (https://developer.nvidia.com/cuda-90-download-archive) to obtain the download link of CUDA 9.0, as shown in Figure 13.17.
 
 ![Find the CUDA 9.0 download address. ](../img/cuda.png)
 
@@ -165,7 +165,7 @@ Now, you can run Jupyter Notebook:
 jupyter notebook
 ```
 
-Figure 12.18 shows the possible output after you run Jupyter Notebook. The last row is the URL for port 8888.
+Figure 13.18 shows the possible output after you run Jupyter Notebook. The last row is the URL for port 8888.
 
 ![ Output after running Jupyter Notebook. The last row is the URL for port 8888. ](../img/jupyter.png)
 
@@ -176,15 +176,15 @@ Because the instance you created does not expose port 8888, you can launch SSH i
 ssh -i "/path/to/key.pem" ubuntu@ec2-xx-xxx-xxx-xxx.y.compute.amazonaws.com -L 8889:localhost:8888
 ```
 
-Finally, copy the URL shown in the last line of the Jupyter Notebook output in Figure 12.18 to your local browser and change 8888 to 8889. Press Enter to use Jupyter Notebook to run the instance code from your local browser.
+Finally, copy the URL shown in the last line of the Jupyter Notebook output in Figure 13.18 to your local browser and change 8888 to 8889. Press Enter to use Jupyter Notebook to run the instance code from your local browser.
 
 ## Close Unused Instances
 
 As cloud services are billed by use duration, you will generally want to close instances you no longer use.
 
-If you plan on restarting the instance after a short time, right-click on the example shown in Figure 12.16 and select "Instance State" $\rightarrow$ "Stop" to stop the instance. When you want to use it again, select "Instance State" $\rightarrow$ "Start" to restart the instance. In this situation, the restarted instance will retain the information stored on its hard disk before it was stopped (for example, you do not have to reinstall CUDA and other runtime environments). However, stopped instances will still be billed a small amount for the hard disk space retained.
+If you plan on restarting the instance after a short time, right-click on the example shown in Figure 13.16 and select "Instance State" $\rightarrow$ "Stop" to stop the instance. When you want to use it again, select "Instance State" $\rightarrow$ "Start" to restart the instance. In this situation, the restarted instance will retain the information stored on its hard disk before it was stopped (for example, you do not have to reinstall CUDA and other runtime environments). However, stopped instances will still be billed a small amount for the hard disk space retained.
 
-If you do not plan to use the instance again for a long time, right-click on the example in Figure 12.16 and select "Image" $\rightarrow$ "Create" to create an image of the instance. Then, select "Instance State" $\rightarrow$ "Terminate" to terminate the instance (it will no longer be billed for hard disk space). The next time you want to use this instance, you can follow the steps for creating and running an EC2 instance described in this section to create an instance based on the saved image. The only difference is that, in "1. Choose AMI" shown in Figure 12.10, you must use the "My AMIs" option on the left to select your saved image. The created instance will retain the information stored on the image hard disk. For example, you will not have to reinstall CUDA and other runtime environments.
+If you do not plan to use the instance again for a long time, right-click on the example in Figure 13.16 and select "Image" $\rightarrow$ "Create" to create an image of the instance. Then, select "Instance State" $\rightarrow$ "Terminate" to terminate the instance (it will no longer be billed for hard disk space). The next time you want to use this instance, you can follow the steps for creating and running an EC2 instance described in this section to create an instance based on the saved image. The only difference is that, in "1. Choose AMI" shown in Figure 13.10, you must use the "My AMIs" option on the left to select your saved image. The created instance will retain the information stored on the image hard disk. For example, you will not have to reinstall CUDA and other runtime environments.
 
 ## Summary
 
