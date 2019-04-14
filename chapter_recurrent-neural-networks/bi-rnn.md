@@ -2,7 +2,7 @@
 
 So far we assumed that our goal is to model the next word given what we've seen so far, e.g. in the context of a time series or in the context of a language model. While this is a typical scenario, it is not the only one we might encounter. To illustrate the issue, consider the following three tasks of filling in the blanks in a text:
 
-```
+```{.python .input}
 I am _____ 
 I am _____ very hungry,
 I am _____ very hungry, I could eat half a pig.
