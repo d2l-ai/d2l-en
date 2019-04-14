@@ -3,9 +3,9 @@
 So far we assumed that our goal is to model the next word given what we've seen so far, e.g. in the context of a time series or in the context of a language model. While this is a typical scenario, it is not the only one we might encounter. To illustrate the issue, consider the following three tasks of filling in the blanks in a text:
 
 ```{.python .input}
-# I am _____
-# I am _____ very hungry.
-# I am _____ very hungry, I could eat half a pig.
+I am _____ 
+I am _____ very hungry,
+I am _____ very hungry, I could eat half a pig.
 ```
 
 Depending on the amount of information available we might fill the blanks with very different words such as *'happy'*, *'not'*, and *'very'*. Clearly the end of the phrase (if available) conveys significant information about which word to pick. A sequence model that is incapable of taking advantage of this will perform poorly on related tasks. For instance, to do well in named entity recognition (e.g. to recognize whether *Green* refers to *Mr. Green* or to the color) longer-range context is equally vital. To get some inspiration for addressing the problem let's take a detour to graphical models. 
@@ -106,19 +106,20 @@ import d2l
 from mxnet import nd
 from mxnet.gluon import rnn
 
-corpus_indices, vocab = d2l.load_data_time_machine()
+(corpus_indices, char_to_idx, idx_to_char, vocab_size) = d2l.load_data_time_machine()
 
-num_inputs, num_hiddens, num_layers, num_outputs = len(vocab), 256, 2, len(vocab)
+num_inputs, num_hiddens, num_layers, num_outputs = vocab_size, 256, 2, vocab_size
 ctx = d2l.try_gpu()
-num_epochs, num_steps, batch_size, lr, clipping_theta = 500, 35, 32, 1, 1
-prefixes = ['traveller', 'time traveller']
+num_epochs, num_steps, batch_size, lr, clipping_theta = 1000, 35, 32, 100, 1e-2
+pred_period, pred_len, prefixes = 200, 50, ['traveller', 'time traveller']
 
 lstm_layer = rnn.LSTM(hidden_size = num_hiddens, num_layers=num_layers,
                       bidirectional = True)
-model = d2l.RNNModel(lstm_layer, len(vocab))
-d2l.train_and_predict_rnn_gluon(model, num_hiddens, corpus_indices, vocab, 
-                                ctx, num_epochs, num_steps, lr, 
-                                clipping_theta, batch_size, prefixes)
+model = d2l.RNNModel(lstm_layer, vocab_size)
+d2l.train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
+                                corpus_indices, idx_to_char, char_to_idx,
+                                num_epochs, num_steps, lr, clipping_theta,
+                                batch_size, pred_period, pred_len, prefixes)
 ```
 
 The output is clearly unsatisfactory for the reasons described above. For a discussion of more effective uses of bidirectional models see e.g. the later section on [Sentiment Classification](../chapter_natural-language-processing/sentiment-analysis-rnn.md). 
