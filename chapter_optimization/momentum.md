@@ -125,21 +125,21 @@ def sgd_momentum(params, states, hyperparams):
 When we set the momentum hyperparameter `momentum` to 0.5, it can be treated as a mini-batch SGD: the mini-batch gradient here is the weighted average of twice the mini-batch gradient of the last two time steps.
 
 ```{.python .input  n=15}
-d2l.train_ch7(sgd_momentum, init_momentum_states(),
+d2l.train_ch9(sgd_momentum, init_momentum_states(),
              {'lr': 0.02, 'momentum': 0.5}, features, labels)
 ```
 
 When we increase the momentum hyperparameter `momentum` to 0.9, it can still be treated as a mini-batch SGD: the mini-batch gradient here will be the weighted average of ten times the mini-batch gradient of the last 10 time steps. Now we keep the learning rate at 0.02.
 
 ```{.python .input  n=8}
-d2l.train_ch7(sgd_momentum, init_momentum_states(),
+d2l.train_ch9(sgd_momentum, init_momentum_states(),
               {'lr': 0.02, 'momentum': 0.9}, features, labels)
 ```
 
 We can see that the value change of the objective function is not smooth enough at later stages of iteration. Intuitively, ten times the mini-batch gradient is five times larger than two times the mini-batch gradient, so we can try to reduce the learning rate to 1/5 of its original value. Now, the value change of the objective function becomes smoother after its period of decline.
 
 ```{.python .input}
-d2l.train_ch7(sgd_momentum, init_momentum_states(),
+d2l.train_ch9(sgd_momentum, init_momentum_states(),
               {'lr': 0.004, 'momentum': 0.9}, features, labels)
 ```
 
@@ -148,7 +148,7 @@ d2l.train_ch7(sgd_momentum, init_momentum_states(),
 In Gluon, we only need to use `momentum` to define the momentum hyperparameter in the `Trainer` instance to implement momentum.
 
 ```{.python .input  n=9}
-d2l.train_gluon_ch7('sgd', {'learning_rate': 0.004, 'momentum': 0.9},
+d2l.train_gluon_ch9('sgd', {'learning_rate': 0.004, 'momentum': 0.9},
                     features, labels)
 ```
 

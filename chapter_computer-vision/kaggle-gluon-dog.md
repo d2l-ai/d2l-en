@@ -7,7 +7,7 @@ In this section, we will tackle the dog breed identification challenge in the Ka
 
 In this competition, we attempt to identify 120 different breeds of dogs. The data set used in this competition is actually a subset of the famous ImageNet data set. Different from the images in the CIFAR-10 data set used in the previous section, the images in the ImageNet data set are higher and wider and their dimensions are inconsistent.
 
-Figure 9.17 shows the information on the competition's webpage. In order to submit the results, please register an account on the Kaggle website first.
+Figure 11.17 shows the information on the competition's webpage. In order to submit the results, please register an account on the Kaggle website first.
 
 ![Dog breed identification competition website. The data set for the competition can be accessed by clicking the "Data" tab. (Source: www.](../img/kaggle-dog.png)
 
@@ -34,7 +34,7 @@ The competition data is divided into a training set and testing set. The trainin
 
 ### Download the Data Set
 
-After logging in to Kaggle, we can click on the "Data" tab on the dog breed identification competition webpage shown in Figure 9.17 and download the training data set "train.zip", the testing data set "test.zip", and the training data set labels "label.csv.zip". After downloading the files, place them in the three paths below:
+After logging in to Kaggle, we can click on the "Data" tab on the dog breed identification competition webpage shown in Figure 11.17 and download the training data set "train.zip", the testing data set "test.zip", and the training data set labels "label.csv.zip". After downloading the files, place them in the three paths below:
 
 * ../data/kaggle_dog/train.zip
 * ../data/kaggle_dog/test.zip

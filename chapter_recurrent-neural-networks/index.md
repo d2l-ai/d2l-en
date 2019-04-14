@@ -58,4 +58,7 @@ LSTMs and GRUs, described later in this chapter.
    lstm
    deep-rnn
    bi-rnn
+   machine-translation
+   encoder-decoder
+   seq2seq
 ```
