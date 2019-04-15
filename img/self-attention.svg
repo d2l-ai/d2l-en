@@ -86,8 +86,6 @@
 </g>
 </defs>
 <g id="surface1">
-<rect x="0" y="0" width="175" height="111" style="fill:rgb(100%,100%,100%);fill-opacity:1;stroke:none;"/>
-<rect x="0" y="0" width="175" height="111" style="fill:rgb(100%,100%,100%);fill-opacity:1;stroke:none;"/>
 <path style="fill-rule:nonzero;fill:rgb(100%,100%,100%);fill-opacity:1;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 401 466.898438 L 417 466.898438 L 417 486.898438 L 401 486.898438 Z M 401 466.898438 " transform="matrix(1,0,0,1,-333,-397)"/>
 <path style="fill:none;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 409 466.898438 L 409 457.398438 " transform="matrix(1,0,0,1,-333,-397)"/>
 <path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 409 453.398438 L 409 457.398438 M 407.5 457.398438 L 409 453.398438 L 410.5 457.398438 " transform="matrix(1,0,0,1,-333,-397)"/>
@@ -114,7 +112,7 @@
   <use xlink:href="#glyph0-4" x="159.0654" y="102.6"/>
   <use xlink:href="#glyph0-3" x="164.3214" y="102.6"/>
 </g>
-<path style="fill-rule:nonzero;fill:rgb(48.58551%,74.183655%,97.653198%);fill-opacity:1;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 401 429.398438 L 504.496094 429.398438 L 504.496094 450.398438 L 401 450.398438 Z M 401 429.398438 " transform="matrix(1,0,0,1,-333,-397)"/>
+<path style="fill-rule:nonzero;fill:rgb(39.99939%,74.902344%,100%);fill-opacity:1;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 401 429.398438 L 504.496094 429.398438 L 504.496094 450.398438 L 401 450.398438 Z M 401 429.398438 " transform="matrix(1,0,0,1,-333,-397)"/>
 <g style="fill:rgb(0%,0%,0%);fill-opacity:1;">
   <use xlink:href="#glyph1-1" x="93.2307" y="45.4"/>
   <use xlink:href="#glyph1-2" x="99.2337" y="45.4"/>
