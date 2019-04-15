@@ -60,6 +60,7 @@ Despite his characteristic outfit, this can be surprisingly difficult,
 due to the large number  of confounders. 
 
 ![](../img/where-wally-walker-books.jpg)
+(Image via Walker Books)
 
 Back to images, the intuitions we have been discussion could be made more concrete yielding a few key principles for building neural networks for computer vision:
 
