@@ -74,11 +74,27 @@ $$
 \max(4,5,7,8)=8.\\
 $$
 
-Average pooling works like maximum pooling, only with the maximum operator replaced by the average operator. The pooling layer with a pooling window shape of $p \times q$ is called the $p \times q$ pooling layer. The pooling operation is called $p \times q$ pooling.
+A pooling layer with a pooling window shape of $p \times q$ 
+is called a $p \times q$ pooling layer. 
+The pooling operation is called $p \times q$ pooling.
 
-Let us return to the object edge detection example mentioned at the beginning of this section. Now we will use the output of the convolutional layer as the input for $2\times 2$ maximum pooling. Set the convolutional layer input as `X` and the pooling layer output as `Y`. Whether or not the values of `X[i, j]` and `X[i, j+1]` are different, or `X[i, j+1]` and `X[i, j+2]` are different, the pooling layer outputs all include `Y[i, j]=1`. That is to say, using the $2\times 2$ maximum pooling layer, we can still detect if the pattern recognized by the convolutional layer moves no more than one element in height and width.
+Let us return to the object edge detection example 
+mentioned at the beginning of this section.
+Now we will use the output of the convolutional layer 
+as the input for $2\times 2$ maximum pooling. 
+Set the convolutional layer input as `X` and the pooling layer output as `Y`. Whether or not the values of `X[i, j]` and `X[i, j+1]` are different, 
+or `X[i, j+1]` and `X[i, j+2]` are different, 
+the pooling layer outputs all include `Y[i, j]=1`. 
+That is to say, using the $2\times 2$ maximum pooling layer, 
+we can still detect if the pattern recognized by the convolutional layer 
+moves no more than one element in height and width.
 
-As shown below, we implement the forward computation of the pooling layer in the `pool2d` function. This function is very similar to the `corr2d` function in the section on [convolutions](conv-layer.md). The only difference lies in the computation of the output `Y`.
+In the code below, we implement the forward computation 
+of the pooling layer in the `pool2d` function. 
+This function is similar to the `corr2d` function 
+in the section on [convolutions](conv-layer.md). 
+However, here we have no kernel, computing the output 
+as either the max or the average of each region in the input..
 
 ```{.python .input  n=11}
 from mxnet import nd
@@ -111,14 +127,25 @@ pool2d(X, (2, 2), 'avg')
 
 ## Padding and Stride
 
-Like the convolutional layer, the pooling layer can also change the output shape by padding the two sides of the input height and width and adjusting the window stride. The pooling layer works in the same way as the convolutional layer in terms of padding and strides. We will demonstrate the use of padding and stride in the pooling layer through the two-dimensional maximum pooling layer MaxPool2D in the `nn` module. We first construct an input data of shape `(1, 1, 4, 4)`, where the first two dimensions are batch and channel.
+As with convolutional layers, pooling layers 
+can also change the output shape.
+And as before, we can alter the operation to achieve a desired output shape 
+by padding the input and adjusting the stride. 
+We can demonstrate the use of padding and strides 
+in pooling layers via the two-dimensional maximum pooling layer MaxPool2D 
+shipped in MXNet Gluon's `nn` module. 
+We first construct an input data of shape `(1, 1, 4, 4)`, 
+where the first two dimensions are batch and channel.
 
 ```{.python .input  n=15}
 X = nd.arange(16).reshape((1, 1, 4, 4))
 X
 ```
 
-By default, the stride in the `MaxPool2D` class has the same shape as the pooling window. Below, we use a pooling window of shape `(3, 3)`, so we get a stride shape of `(3, 3)` by default.
+By default, the stride in the `MaxPool2D` class 
+has the same shape as the pooling window. 
+Below, we use a pooling window of shape `(3, 3)`, 
+so we get a stride shape of `(3, 3)` by default.
 
 ```{.python .input  n=16}
 pool2d = nn.MaxPool2D(3)
@@ -134,7 +161,8 @@ pool2d = nn.MaxPool2D(3, padding=1, strides=2)
 pool2d(X)
 ```
 
-Of course, we can specify an arbitrary rectangular pooling window and specify the padding and stride for height and width, respectively.
+Of course, we can specify an arbitrary rectangular pooling window 
+and specify the padding and stride for height and width, respectively.
 
 ```{.python .input  n=8}
 pool2d = nn.MaxPool2D((2, 3), padding=(1, 2), strides=(2, 3))
@@ -143,7 +171,14 @@ pool2d(X)
 
 ## Multiple Channels
 
-When processing multi-channel input data, the pooling layer pools each input channel separately, rather than adding the inputs of each channel by channel as in a convolutional layer. This means that the number of output channels for the pooling layer is the same as the number of input channels. Below, we will concatenate arrays `X` and `X+1` on the channel dimension to construct an input with 2 channels.
+When processing multi-channel input data, 
+the pooling layer pools each input channel separately, 
+rather than adding the inputs of each channel by channel 
+as in a convolutional layer. 
+This means that the number of output channels for the pooling layer 
+is the same as the number of input channels. 
+Below, we will concatenate arrays `X` and `X+1` 
+on the channel dimension to construct an input with 2 channels.
 
 ```{.python .input  n=9}
 X = nd.concat(X, X + 1, dim=1)
@@ -168,7 +203,8 @@ pool2d(X)
 
 ## Exercises
 
-1. Implement average pooling as a convolution.
+1. Can you implement average pooling as a special case of a convolution layer? If so, do it.
+1. Can you implement max pooling as a special case of a convolution layer? If so, do it.
 1. What is the computational cost of the pooling layer? Assume that the input to the pooling layer is of size $c\times h\times w$, the pooling window has a shape of $p_h\times p_w$ with a padding of $(p_h, p_w)$ and a stride of $(s_h, s_w)$.
 1. Why do you expect maximum pooling and average pooling to work differently?
 1. Do we need a separate minimum pooling layer? Can you replace it with another operation?
