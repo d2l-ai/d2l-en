@@ -10,7 +10,7 @@ Not surprisingly, today's deep learning frameworks
 can automate nearly all of this work, 
 but if you never learn to implement things from scratch,
 then you may never truly understand how the model works.
-Moreover, when the time comes to customize models,
+Moreover, when it comes time to customize models,
 defining our own layers, loss functions, etc.,
 knowing how things work under the hood will come in handy.
 Thus, we start off describing how to implement linear regression
