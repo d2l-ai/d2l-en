@@ -59,8 +59,8 @@ The reader's goal is to locate him.
 Despite his characteristic outfit, this can be surprisingly difficult, 
 due to the large number  of confounders. 
 
-![](../img/where-wally-walker-books.jpg)
-(Image via Walker Books)
+![(Image via Walker Books)](../img/where-wally-walker-books.jpg)
+
 
 Back to images, the intuitions we have been discussion could be made more concrete yielding a few key principles for building neural networks for computer vision:
 
@@ -200,13 +200,19 @@ We thus index $\mathbf{x}$ as $x[i,j,k]$.
 The convolutional mask has to adapt accordingly. 
 Instead of $V[a,b]$ we now have $V[a,b,c]$.
 
-The last flaw in our reasoning is that this approach 
-generates only one set of activations. 
-This might not be great if we want to detect Waldo in several steps. 
-We might need edge detectors, detectors for different colors, etc..
-In short, we want to retain some information about edges, color gradients, combinations of colors, and a great many other things. 
-An easy way to address this is to allow for *output channels*. 
-We can take care of this by adding a fourth coordinate to $V$ via $V[a,b,c,d]$. Putting all together we have:
+Moreover, just as our input consists of a 3rd order tensor
+it turns out to be a good idea to similarly formulate 
+our hidden representations as 3rd order tensors.
+In other words, rather than just having a 1D representation
+corresponding to each spatial location,
+we want to have a multidimensional hidden representations 
+corresponding to each spatial location.
+We could think of the hidden representation as comprising a number of 2D grids stacked on top of each other.
+These are sometimes called *channels* or *feature maps*.
+Intuitively you might imaginee that at lower layers,
+some channels specialize to recognizing edges, 
+We can take care of this by adding a fourth coordinate to $V$ 
+via $V[a,b,c,d]$. Putting all together we have:
 
 $$h[i,j,k] = \sum_{a = -\Delta}^{\Delta} \sum_{b = -\Delta}^{\Delta} \sum_c V[a,b,c,k] \cdot x[i+a,j+b,c]$$
 
