@@ -177,7 +177,7 @@ $$\Pr(A) = \sum_{B'} \Pr(A,B') \text{ and
 } \Pr(B) = \sum_{A'} \Pr(A',B)$$
 
 Another useful property to check for is **dependence** vs. **independence**.
-Independence is when the occurrence of one event does not reveal any information about the occurrence of the other. In this case $\Pr(B | A) = \Pr(B)$. Statisticians typically exress this as $A \perp\!\!\!\perp B$. From Bayes' Theorem, it follows immediately that also $\Pr(A | B) = \Pr(A)$. In all other cases we call $A$ and $B$ dependent. For instance, two successive rolls of a die are independent. On the other hand, the position of a light switch and the brightness in the room are not (they are not perfectly deterministic, though, since we could always have a broken lightbulb, power failure, or a broken switch).
+Independence is when the occurrence of one event does not reveal any information about the occurrence of the other. In this case $\Pr(B | A) = \Pr(B)$. Statisticians typically express this as $A \perp\!\!\!\perp B$. From Bayes' Theorem, it follows immediately that also $\Pr(A | B) = \Pr(A)$. In all other cases we call $A$ and $B$ dependent. For instance, two successive rolls of a die are independent. On the other hand, the position of a light switch and the brightness in the room are not (they are not perfectly deterministic, though, since we could always have a broken lightbulb, power failure, or a broken switch).
 
 Let's put our skills to the test. Assume that a doctor administers an AIDS test to a patient. This test is fairly accurate and it fails only with 1% probability if the patient is healthy by reporting him as diseased. Moreover,
 it never fails to detect HIV if the patient actually has it. We use $D$ to indicate the diagnosis and $H$ to denote the HIV status. Written as a table the outcome $\Pr(D | H)$ looks as follows:
@@ -185,8 +185,7 @@ it never fails to detect HIV if the patient actually has it. We use $D$ to indic
 |
 outcome| HIV positive | HIV negative |
 |:------------|-------------:|-------------:|
-|Test positive|            1 |
-0.01 |
+|Test positive|            1 |         0.01 |
 |Test negative|            0 |         0.99 |
 
 Note that the column sums are all one (but the row sums aren't), since the conditional probability needs to sum up to $1$, just like the probability. Let us work out the probability of the patient having AIDS if the test comes back positive. Obviously this is going to depend on how common the disease is, since it affects the number of false alarms. Assume that the population is quite healthy, e.g. $\Pr(\text{HIV positive}) = 0.0015$. To apply Bayes' Theorem, we need to determine
@@ -212,8 +211,7 @@ test has different characteristics (it isn't as good as the first one).
 |
 outcome |  HIV positive |  HIV negative |
 |:------------|--------------:|--------------:|
-|Test positive|          0.98 |
-0.03 |
+|Test positive|          0.98 |          0.03 |
 |Test negative|          0.02 |          0.97 |
 
 Unfortunately, the second test comes back positive, too. Let us work out the requisite probabilities to invoke Bayes' Theorem.
