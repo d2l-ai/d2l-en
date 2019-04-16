@@ -14,7 +14,7 @@ Moreover, when it comes time to customize models,
 defining our own layers, loss functions, etc.,
 knowing how things work under the hood will come in handy.
 Thus, we start off describing how to implement linear regression
-relyin only on the primitives in the NDArray and `autograd` packages.
+relying only on the primitives in the NDArray and `autograd` packages.
 In the section immediately following, we will present the compact implementation, using all of Gluon's bells and whistles,
 but this is where we dive into the details.
 
@@ -113,9 +113,9 @@ def data_iter(batch_size, features, labels):
         # on the indices
 ```
 
-In general, note that we want to use reasonably sized minibatches to take advantage of the GPU hardware, which excel at parallelizing operations. Because each example can be fed through our models in parallel and the gradient of the loss function for each example can also be taken in parallel, GPUs allow us to process hundreds of examples in scarcely more time than it might take to process just a single example. 
+In general, note that we want to use reasonably sized minibatches to take advantage of the GPU hardware, which excels at parallelizing operations. Because each example can be fed through our models in parallel and the gradient of the loss function for each example can also be taken in parallel, GPUs allow us to process hundreds of examples in scarcely more time than it might take to process just a single example. 
 
-To build some intuition, let's read and print the first small batch of data examples. The shape of the features in each mini-batch tells us both the mini-batch size and the number of input features. Likewise, our mini-batch of labels will have a shape given by `bach_size`.
+To build some intuition, let's read and print the first small batch of data examples. The shape of the features in each mini-batch tells us both the mini-batch size and the number of input features. Likewise, our mini-batch of labels will have a shape given by `batch_size`.
 
 ```{.python .input  n=6}
 batch_size = 10
@@ -309,7 +309,7 @@ print('Error in estimating b', true_b - b)
 ```
 
 Note that we should not take it for granted 
-that we are able to reover the parameters accurately. 
+that we are able to recover the parameters accurately. 
 This only happens for a special category problems: 
 strongly convex optimization problems with 'enough' data to ensure 
 that the noisy samples allow us to recover the underlying dependency. 
