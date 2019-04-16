@@ -1,16 +1,71 @@
 # Pooling
 
-As we process images (or other data sources) we will eventually want to reduce the resolution of the images. After all, we typically want to output an estimate that does not depend on the dimensionality of the original image. Secondly, when detecting lower-level features, such as edge detection (we covered this in the section on [convolutional layers](conv-layer.md)), we often want to have some degree of invariance to translation. For instance, if we take the image `X` with a sharp delineation between black and white and if we shift it by one pixel to the right, i.e. `Z[i,j] = X[i,j+1]`, then the output for for the new image `Z` will be vastly different. The edge will have shifted by one pixel and with it all the activations. In reality objects hardly ever occur exactly at the same place. In fact, even with a tripod and a stationary object, vibration of the camera due to the movement of the shutter might shift things by a pixel or so (this is why high end cameras have a special option to fix this). Given that, we need a mathematical device to address the problem.
+Often, as we process images, we want to gradually
+reduce the spatial resolution of our hidden representations,
+aggregating information so that
+the higher up we go in the network,
+the larger the receptive field (in the input)
+to which each hidden node is sensitive.
 
-This section introduces pooling layers, which were proposed to alleviate the excessive sensitivity of the convolutional layer to location and to reduce the resolution of images through the processing pipeline.
+Often our ultimate task asks some global question about the image,
+e.g., *does it contain a cat?*
+So typically the nodes of our final layer should be sensitive
+to the entire input. 
+By gradually aggregating information, yielding coarser and coarser maps,
+we accomplish this goal of ultimately learning a global representation,
+while keeping all of the advantages of convolutional layers at the intermediate layers of processing.
+
+
+Moreover, when detecting lower-level features, such as edges 
+(as discussed in our section on [convolutional layers](conv-layer.md)), 
+we often want our representations to be somewhat invariant to translation. 
+For instance, if we take the image `X` 
+with a sharp delineation between black and white 
+and shift the whole image by one pixel to the right, 
+i.e. `Z[i,j] = X[i,j+1]`, 
+then the output for for the new image `Z` might be vastly different. 
+The edge will have shifted by one pixel and with it all the activations. 
+In reality, objects hardly ever occur exactly at the same place. 
+In fact, even with a tripod and a stationary object, 
+vibration of the camera due to the movement of the shutter 
+might shift everything by a pixel or so 
+(high-end cameras are loaded with special features to address this problem). 
+
+This section introduces pooling layers, 
+which serve the dual purposes of 
+mitigating the sensitivity of convolutional layers to location 
+and of spatially downsampling representations.
 
 ## Maximum Pooling and Average Pooling
 
-Like convolutions, pooling computes the output for each element in a fixed-shape window (also known as a pooling window) of input data. Different from the cross-correlation computation of the inputs and kernels in the convolutional layer, the pooling layer directly calculates the maximum or average value of the elements in the pooling window. These operations are called maximum pooling or average pooling respectively. In maximum pooling, the pooling window starts from the top left of the input array, and slides in the input array from left to right and top to bottom. When the pooling window slides to a certain position, the maximum value of the input subarray in the window is the element at the corresponding location in the output array.
+Like convolutional layers, pooling operators
+consist of a fixed-shape window that is slid over 
+all regions in the input according to its stride,
+computing a single output for each location traversed 
+by the fixed-shape window (sometimes known as the *pooling window*). 
+However, unlike the cross-correlation computation 
+of the inputs and kernels in the convolutional layer, 
+the pooling layer contains no parameters (there is no *filter*).
+Instead, pooling operators are deterministic, 
+typically calculating either the maximum or the average value 
+of the elements in the pooling window. 
+These operations are called *maximum pooling* (*max pooling* for short) 
+and *average pooling*, respectively. 
+
+In both cases, as with the cross-correlation operator,
+we can think of the pooling window 
+as starting from the top left of the input array
+and sliding across the input array from left to right and top to bottom. 
+At each location that the pooling window hits, 
+it computes the maximum or average 
+value of the input subarray in the window
+(depending on whether *max* or *average* pooling is employed).
+
 
 ![Maximum pooling with a pooling window shape of $2\times 2$. The shaded portions represent the first output element and the input element used for its computation: $\max(0,1,3,4)=4$](../img/pooling.svg)
 
-The output array in the figure above has a height of 2 and a width of 2. The four elements are derived from the maximum value of $\text{max}$:
+The output array in the figure above has a height of 2 and a width of 2. 
+The four elements are derived from the maximum value of $\text{max}$:
 
 $$
 \max(0,1,3,4)=4,\\
