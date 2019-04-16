@@ -1,4 +1,4 @@
-# Mathematical Basis
+# Mathematical Basics
 
 This section summarizes the basic knowledge of linear algebra, differentiation, and probability required to understand the contents in this book. To avoid long discussions of mathematical knowledge not required to understand this book, a few definitions in this section are slightly simplified.
 
