@@ -10,42 +10,85 @@ For the sake of simplicity we will limit ourselves to pure character sequences. 
 
 We begin, as before, by loading the data and by mapping it into a sequence of whitespaces, punctuation signs and regular characters. Preprocessing is minimal and we limit ourselves to removing multiple whitespaces.
 
-```{.python .input  n=10}
+```{.python .input  n=42}
 import sys
 sys.path.insert(0, '..')
 
 from mxnet import nd
 import random
+import collections
 
 with open('../data/timemachine.txt', 'r') as f:
-    lines = f.readlines()
-    raw_dataset = ' '.join(' '.join(lines).lower().split())
-
-print('number of characters: ', len(raw_dataset))
-print(raw_dataset[0:70])
+    raw_text = f.read()
+print(raw_text[0:110])
 ```
 
-## Character Index
+## Tokenization
 
-This data set has more than 178,000 characters. Next we need to identify all the characters occurring in the document. That is, we want to map each character to continuous integers starting from 0, also known as an index, to facilitate subsequent data processing. To get the index, we extract all the different characters in the data set and then map them to the index one by one to construct the dictionary. Then, print `vocab_size`, which is the number of different characters in the dictionary, i.e. the dictionary size.
+Next we need to split the dataset, a string, into tokens. A token is a data point the model will train and predict. We common use a word or a character as a token. In addition, we remove all line breaks and change chars to lower cases. 
 
-```{.python .input  n=13}
-idx_to_char = list(set(raw_dataset))
-char_to_idx = dict([(char, i) for i, char in enumerate(idx_to_char)])
-vocab_size = len(char_to_idx)
-print(char_to_idx)
+```{.python .input}
+text = raw_text.replace('\n', ' ').replace('\r', ' ').lower()
+# Add space between chars and then split
+text = ' '.join(text).split()
+print('# of chars:', len(text))
+print(text[0:30])
+```
+
+## Vocabulary
+
+Then we need to map tokens into numerical indices. We often call it a vocabulary. Its input is a list of tokens,  called a corpus. Then it counts the frequency of each token in this corpus, and then assigns an numerical index to each token according to its frequency. Rarely appeared tokens are often removed to reduce the complexity. In addition, we add four special tokens: “&lt;pad&gt;” a token for padding, “&lt;bos&gt;” to present the beginning for a sentence, “&lt;eos&gt;” for the ending of a sentence, and “&lt;unk&gt;” for any token that is not mapped into an index by this vocabulary, e.g. the rare tokens filtered before. sadf
+
+```{.python .input  n=9}
+class Vocab(object):  # This class is saved in d2l.
+    def __init__(self, tokens, min_freq=3):
+        # sort by frequency and token
+        counter = collections.Counter(tokens)
+        token_freqs = sorted(counter.items(), key=lambda x: x[0])
+        token_freqs.sort(key=lambda x: x[1], reverse=True)
+        # padding, begin of sentence, end of sentence, unkown
+        self.pad, self.bos, self.eos, self.unk = (0, 1, 2, 3)
+        tokens = ['<pad>', '<bos>', '<eos>', '<unk>'] + [
+            token for token, freq in token_freqs if freq >= min_freq]
+        self.idx_to_token = []
+        self.token_to_idx = dict()
+        for token in tokens:
+            self.idx_to_token.append(token)
+            self.token_to_idx[token] = len(self.idx_to_token) - 1
+
+    def __len__(self):
+        return len(self.idx_to_token)
+
+    def __getitem__(self, tokens):
+        if not isinstance(tokens, (list, tuple)):
+            return self.token_to_idx.get(tokens, self.unk)
+        else:
+            return [self.__getitem__(token) for token in tokens]
+
+    def to_tokens(self, indices):
+        if not isinstance(indices, (list, tuple)):
+            return self.idx_to_token[indices]
+        else:
+            return [self.idx_to_token[index] for index in indices]
+```
+
+We construct a vocabulary with the time machine dataset as the corpus, and then print the map between tokens to indices.
+
+```{.python .input  n=23}
+vocab = Vocab(text)
+print(vocab.token_to_idx)
 ```
 
 After that, each character in the training data set is converted into an index ID. To illustrate things we print the first 20 characters and their corresponding indices.
 
-```{.python .input  n=15}
-corpus_indices = [char_to_idx[char] for char in raw_dataset]
-sample = corpus_indices[:20]
-print('chars:', ''.join([idx_to_char[idx] for idx in sample]))
+```{.python .input  n=25}
+corpus_indices = [vocab[char] for char in text]
+sample = corpus_indices[:15]
+print('chars:', [vocab.idx_to_token[idx] for idx in sample])
 print('indices:', sample)
 ```
 
-We packaged the above code in the `(corpus_indices, char_to_idx, idx_to_char, vocab_size) = load_data_timemachine()` function of the `d2l` package to make it easier to call it in later chapters. 
+We packaged the above code in the `(corpus_indices, vocab) = load_data_timemachine()` function of the `d2l` package to make it easier to call it in later chapters. 
 
 ## Training Data Preparation
 

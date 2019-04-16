@@ -51,17 +51,14 @@ def get_data_ch7():
     data = (data - data.mean(axis=0)) / data.std(axis=0)
     return nd.array(data[:, :-1]), nd.array(data[:, -1])
 
-def load_data_time_machine():
+def load_data_time_machine(num_examples=10000):
     """Load the time machine data set (available in the English book)."""
     with open('../data/timemachine.txt') as f:
-        corpus_chars = f.read()
-    corpus_chars = corpus_chars.replace('\n', ' ').replace('\r', ' ').lower()
-    corpus_chars = corpus_chars[0:10000]
-    idx_to_char = list(set(corpus_chars))
-    char_to_idx = dict([(char, i) for i, char in enumerate(idx_to_char)])
-    vocab_size = len(char_to_idx)
-    corpus_indices = [char_to_idx[char] for char in corpus_chars]
-    return corpus_indices, char_to_idx, idx_to_char, vocab_size
+        raw_text = f.read()
+    text = raw_text.replace('\n', ' ').replace('\r', ' ').lower()
+    text = ' '.join(text).split()
+    vocab = Vocab(text[:num_examples])
+    corpus_indices = [vocab[char] for char in text]
 
 def mkdir_if_not_exist(path):
     """Make a directory if it does not exist."""
