@@ -20,6 +20,7 @@ Dive into Deep Learning
    chapter_multilayer-perceptrons/index
    chapter_deep-learning-computation/index
    chapter_convolutional-neural-networks/index
+   chapter_convolutional-modern/index
    chapter_recurrent-neural-networks/index
    chapter_attention-mechanism/index
    chapter_optimization/index

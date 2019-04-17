@@ -73,11 +73,4 @@ concatenations (GoogLeNet); residual networks (ResNet) which are currently the m
    channels
    pooling
    lenet
-   alexnet
-   vgg
-   nin
-   googlenet
-   batch-norm
-   resnet
-   densenet
 ```
