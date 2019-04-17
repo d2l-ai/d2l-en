@@ -25,31 +25,34 @@ print(raw_text[0:110])
 
 ## Tokenization
 
-Next we need to split the dataset, a string, into tokens. A token is a data point the model will train and predict. We common use a word or a character as a token. In addition, we remove all line breaks and change chars to lower cases. 
+Next we need to split the dataset, a string, into tokens. A token is a data point the model will train and predict. We common use a word or a character as a token. 
 
 ```{.python .input}
-text = raw_text.replace('\n', ' ').replace('\r', ' ').lower()
-# Add space between chars and then split
-text = ' '.join(text).split()
+lines = raw_text.split('\n')
+text = ' '.join(' '.join(lines).lower().split())
 print('# of chars:', len(text))
-print(text[0:30])
+print(text[0:70])
 ```
 
 ## Vocabulary
 
-Then we need to map tokens into numerical indices. We often call it a vocabulary. Its input is a list of tokens,  called a corpus. Then it counts the frequency of each token in this corpus, and then assigns an numerical index to each token according to its frequency. Rarely appeared tokens are often removed to reduce the complexity. In addition, we add four special tokens: “&lt;pad&gt;” a token for padding, “&lt;bos&gt;” to present the beginning for a sentence, “&lt;eos&gt;” for the ending of a sentence, and “&lt;unk&gt;” for any token that is not mapped into an index by this vocabulary, e.g. the rare tokens filtered before. sadf
+Then we need to map tokens into numerical indices. We often call it a vocabulary. Its input is a list of tokens,  called a corpus. Then it counts the frequency of each token in this corpus, and then assigns an numerical index to each token according to its frequency. Rarely appeared tokens are often removed to reduce the complexity. A token doesn't exist in corpus or has been removed is mapped into a special unknown (“&lt;unk&gt;”) token. We optionally add another three special tokens: “&lt;pad&gt;” a token for padding, “&lt;bos&gt;” to present the beginning for a sentence, and “&lt;eos&gt;” for the ending of a sentence.
 
 ```{.python .input  n=9}
 class Vocab(object):  # This class is saved in d2l.
-    def __init__(self, tokens, min_freq=3):
+    def __init__(self, tokens, min_freq=0, use_special_tokens=False):
         # sort by frequency and token
         counter = collections.Counter(tokens)
         token_freqs = sorted(counter.items(), key=lambda x: x[0])
         token_freqs.sort(key=lambda x: x[1], reverse=True)
-        # padding, begin of sentence, end of sentence, unkown
-        self.pad, self.bos, self.eos, self.unk = (0, 1, 2, 3)
-        tokens = ['<pad>', '<bos>', '<eos>', '<unk>'] + [
-            token for token, freq in token_freqs if freq >= min_freq]
+        if use_special_tokens:
+            # padding, begin of sentence, end of sentence, unknown
+            self.pad, self.bos, self.eos, self.unk = (0, 1, 2, 3)
+            tokens = ['<pad>', '<bos>', '<eos>', '<unk>']
+        else:
+            self.unk = 0
+            tokens = ['<unk>']
+        tokens +=  [token for token, freq in token_freqs if freq >= min_freq]
         self.idx_to_token = []
         self.token_to_idx = dict()
         for token in tokens:
