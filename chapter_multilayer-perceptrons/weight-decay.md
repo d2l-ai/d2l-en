@@ -303,6 +303,7 @@ def fit_and_plot_gluon(wd):
     net = nn.Sequential()
     net.add(nn.Dense(1))
     net.initialize(init.Normal(sigma=1))
+    loss = gloss.L2Loss()
     # The weight parameter has been decayed. Weight names generally end with
     # "weight".
     trainer_w = gluon.Trainer(net.collect_params('.*weight'), 'sgd',
