@@ -1,3 +1,6 @@
+// Add
+
+// Replace the QR code with an embeded discussion thread
 $(document).ready(function () {
     var discuss_str = 'Discuss'
     $('h2').each(function(){
