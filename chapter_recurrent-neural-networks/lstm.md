@@ -72,8 +72,7 @@ import d2l
 from mxnet import nd, init
 from mxnet.gluon import rnn
 
-(corpus_indices, char_to_idx, idx_to_char,
- vocab_size) = d2l.load_data_time_machine()
+corpus_indices, vocab = d2l.load_data_time_machine()
 ```
 
 ### Initialize Model Parameters
@@ -81,7 +80,7 @@ from mxnet.gluon import rnn
 Next we need to define and initialize the model parameters. As previously, the hyperparameter `num_hiddens` defines the number of hidden units. We initialize weights with a Gaussian with $0.01$ variance and we set the biases to $0$.
 
 ```{.python .input  n=2}
-num_inputs, num_hiddens, num_outputs = vocab_size, 256, vocab_size
+num_inputs, num_hiddens, num_outputs = len(vocab), 256, len(vocab)
 ctx = d2l.try_gpu()
 
 def get_params():
@@ -142,33 +141,25 @@ def lstm(inputs, state, params):
 
 As in the previous section, during model training, we only use adjacent sampling. After setting the hyper-parameters, we train and model and create a 50 character string of text based on the prefixes "traveller" and "time traveller".
 
-```{.python .input  n=5}
-num_epochs, num_steps, batch_size, lr, clipping_theta = 300, 35, 32, 1e2, 1e-2
-pred_period, pred_len, prefixes = 50, 50, ['traveller', 'time traveller']
-```
+```{.python .input  n=9}
+num_epochs, num_steps, batch_size, lr, clipping_theta = 100, 35, 32, 3, 1
+prefixes = ['traveller', 'time traveller']
 
-We create a string of lyrics based on the currently trained model every 50 epochs. The training code is identical to all previous sequence models.
-
-```{.python .input  n=6}
 d2l.train_and_predict_rnn(lstm, get_params, init_lstm_state, num_hiddens,
-                          vocab_size, ctx, corpus_indices, idx_to_char,
-                          char_to_idx, False, num_epochs, num_steps, lr,
-                          clipping_theta, batch_size, pred_period, pred_len,
-                          prefixes)
+                          corpus_indices, vocab, ctx, False, num_epochs, 
+                          num_steps, lr, clipping_theta, batch_size, prefixes)
 ```
 
 ## Concise Implementation
 
 In Gluon, we can call the `LSTM` class in the `rnn` module directly to instantiate the model.
 
-```{.python .input  n=7}
+```{.python .input  n=10}
 lstm_layer = rnn.LSTM(num_hiddens)
-model = d2l.RNNModel(lstm_layer, vocab_size)
-model.initialize(init.Xavier(), ctx=ctx)
-d2l.train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
-                                corpus_indices, idx_to_char, char_to_idx,
-                                num_epochs, num_steps, lr, clipping_theta,
-                                batch_size, pred_period, pred_len, prefixes)
+model = d2l.RNNModel(lstm_layer, len(vocab))
+d2l.train_and_predict_rnn_gluon(model, num_hiddens, corpus_indices, vocab, 
+                                ctx, num_epochs*5, num_steps, lr, 
+                                clipping_theta, batch_size, prefixes)
 ```
 
 ## Summary

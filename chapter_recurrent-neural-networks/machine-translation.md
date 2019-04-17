@@ -72,65 +72,12 @@ d2l.plt.legend(loc='upper right');
 
 ## Vocabulary
 
-A vocabulary is used to map tokens into numerical indices. Given a list of tokens, often called corpus, a vocabulary counts the frequency of each token in this corpus, and then assigns an numerical index to each token according to its frequency. Rarely appeared tokens are often removed to reduce the complexity. In addition, we add four special tokens: “&lt;pad&gt;” a token for padding, “&lt;bos&gt;” to present the beginning for a sentence, “&lt;eos&gt;” for the ending of a sentence, and “&lt;unk&gt;” for any token that is not mapped into an index by this vocabulary, e.g. the rare tokens filtered before.
-
-```{.python .input  n=6}
-class Vocab(object):  # This class is saved in d2l.
-    def __init__(self, tokens, min_freq):
-        # sort by frequency and token
-        counter = collections.Counter(tokens)
-        token_freqs = sorted(counter.items(), key=lambda x: x[0])
-        token_freqs.sort(key=lambda x: x[1], reverse=True)
-        # padding, begin of sentence, end of sentence, unkown
-        self.pad, self.bos, self.eos, self.unk = (0, 1, 2, 3)
-        tokens = ['<pad>', '<bos>', '<eos>', '<unk>'] + [
-            token for token, freq in token_freqs if freq >= min_freq]
-        self.idx_to_token = []
-        self.token_to_idx = dict()
-        for token in tokens:
-            self.idx_to_token.append(token)
-            self.token_to_idx[token] = len(self.idx_to_token) - 1
-
-    def __len__(self):
-        return len(self.idx_to_token)
-
-    def __getitem__(self, tokens):
-        if not isinstance(tokens, (list, tuple)):
-            return self.token_to_idx.get(tokens, self.unk)
-        else:
-            return [self.__getitem__(token) for token in tokens]
-
-    def to_tokens(self, indices):
-        if not isinstance(indices, (list, tuple)):
-            return self.idx_to_token[indices]
-        else:
-            return [self.idx_to_token[index] for index in indices]
-```
-
-We construct a sample corpus and build a vocabulary with all tokens appeared only once removed.
-
-```{.python .input  n=7}
-corpus = 'This is A , this is B , and it is also A'
-vocab = Vocab(corpus.lower().split(), min_freq=2)
-vocab.token_to_idx
-```
-
-Then we can map a list of tokens into indices, and also map indices back into tokens.
-
-```{.python .input  n=8}
-vocab[['this', 'is', 'b']]
-```
-
-```{.python .input  n=9}
-vocab.to_tokens([3,5,7])
-```
-
 Now build a vocabulary for the source sentences and print its vocabulary sizes.
 
 ```{.python .input  n=10}
 def build_vocab(tokens):
     tokens = [token for line in tokens for token in line]
-    return Vocab(tokens, min_freq=3)
+    return d2l.Vocab(tokens, min_freq=3, use_special_tokens=True)
 
 src_vocab = build_vocab(source)
 len(src_vocab)
