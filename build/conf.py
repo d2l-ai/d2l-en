@@ -393,5 +393,5 @@ def setup(app):
     app.add_config_value('recommonmark_config', {
     }, True)
     app.add_javascript('google_analytics.js')
-    app.add_javascript('discuss.js')
+    app.add_javascript('d2l.js')
     app.connect('source-read', image_caption)
