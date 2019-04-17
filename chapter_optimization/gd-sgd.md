@@ -100,7 +100,7 @@ According to the property of directional derivatives \[1，Chapter 14.6 Theorem 
 
 $$\text{D}_{\boldsymbol{u}} f(\boldsymbol{x}) = \nabla f(\boldsymbol{x}) \cdot \boldsymbol{u}.$$
 
-The directional derivative $\text{D}_{\boldsymbol{u}} f(\boldsymbol{x})$ gives all the possible rates of change for $f$ along $\boldsymbol{x}$. In order to minimize $f$, we hope to find the direction the will allow us to reduce $f$ in the fastest way. Therefore, we can use the unit vector $\boldsymbol{u}$ to minimize the directional derivative $\text{D}_{\boldsymbol{u}} f(\boldsymbol{x})$.
+The directional derivative $\text{D}_{\boldsymbol{u}} f(\boldsymbol{x})$ gives all the possible rates of change for $f$ along $\boldsymbol{x}$. In order to minimize $f$, we hope to find the direction that will allow us to reduce $f$ in the fastest way. Therefore, we can use the unit vector $\boldsymbol{u}$ to minimize the directional derivative $\text{D}_{\boldsymbol{u}} f(\boldsymbol{x})$.
 
 For $\text{D}_{\boldsymbol{u}} f(\boldsymbol{x}) = \|\nabla f(\boldsymbol{x})\| \cdot \|\boldsymbol{u}\|  \cdot \text{cos} (\theta) = \|\nabla f(\boldsymbol{x})\|  \cdot \text{cos} (\theta)$,
 Here, $\theta$ is the angle between the gradient $\nabla f(\boldsymbol{x})$ and the unit vector $\boldsymbol{u}$. When $\theta = \pi$, $\text{cos }(\theta)$ gives us the minimum value $-1$. So when $\boldsymbol{u}$ is in a direction that is opposite to the gradient direction $\nabla f(\boldsymbol{x})$, the direction derivative $\text{D}_{\boldsymbol{u}} f(\boldsymbol{x})$ is minimized. Therefore, we may continue to reduce the value of objective function $f$ by the gradient descent algorithm:
@@ -185,7 +185,7 @@ As we can see, the iterative trajectory of the independent variable in the SGD i
 ## Summary
 
 * If we use a more suitable learning rate and update the independent variable in the opposite direction of the gradient, the value of the objective function might be reduced. Gradient descent repeats this update process until a solution that meets the requirements is obtained.
-* Problems occur when the learning rate is tool small or too large. A suitable learning rate is usually found only after multiple experiments.
+* Problems occur when the learning rate is too small or too large. A suitable learning rate is usually found only after multiple experiments.
 * When there are more examples in the training data set, it costs more to compute each iteration for gradient descent, so SGD is preferred in these cases.
 
 
