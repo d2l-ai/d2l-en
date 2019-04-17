@@ -36,16 +36,16 @@ import d2l
 from mxnet import nd
 from mxnet.gluon import rnn
 
-(corpus_indices, char_to_idx, idx_to_char, vocab_size) = d2l.load_data_time_machine()
+corpus_indices, vocab = d2l.load_data_time_machine()
 ```
 
 The architectural decisions (parameters, etc.) are very similar to those of previous sections. We pick the same number of inputs and outputs as we have distinct tokens, i.e. `vocab_size`. The number of hidden units is still 256 and we retain a learning rate of 100. The only difference is that we now select a nontrivial number of layers `num_layers = 2`. Since the model is somewhat slower to train we use 3000 iterations.
 
 ```{.python .input  n=22}
-num_inputs, num_hiddens, num_layers, num_outputs = vocab_size, 256, 2, vocab_size
+num_inputs, num_hiddens, num_layers, num_outputs = len(vocab), 256, 2, len(vocab)
 ctx = d2l.try_gpu()
-num_epochs, num_steps, batch_size, lr, clipping_theta = 3000, 35, 32, 100, 1e-2
-pred_period, pred_len, prefixes = 500, 50, ['traveller', 'time traveller']
+num_epochs, num_steps, batch_size, lr, clipping_theta = 500, 35, 32, 5, 1
+prefixes = ['traveller', 'time traveller']
 ```
 
 ## Training
@@ -54,11 +54,11 @@ The actual invocation logic is identical to before and we re-use `train_and_pred
 
 ```{.python .input  n=8}
 lstm_layer = rnn.LSTM(hidden_size = num_hiddens, num_layers=num_layers)
-model = d2l.RNNModel(lstm_layer, vocab_size)
-d2l.train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
-                                corpus_indices, idx_to_char, char_to_idx,
-                                num_epochs, num_steps, lr, clipping_theta,
-                                batch_size, pred_period, pred_len, prefixes)
+model = d2l.RNNModel(lstm_layer, len(vocab))
+d2l.train_and_predict_rnn_gluon(model, num_hiddens, corpus_indices, vocab, 
+                                ctx, num_epochs, num_steps, lr, 
+                                clipping_theta, batch_size, prefixes)
+
 ```
 
 ## Summary

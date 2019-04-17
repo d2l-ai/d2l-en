@@ -11,7 +11,7 @@ from .base import try_gpu
 from .figure import set_figsize, plt
 from .model import linreg
 
-__all__ = ['evaluate_accuracy', 'squared_loss', 'grad_clipping', 'sgd', 'train',
+__all__ = ['evaluate_accuracy', 'squared_loss', 'grad_clipping', 'grad_clipping_gluon', 'sgd', 'train',
            'train_2d', 'train_and_predict_rnn', 'train_and_predict_rnn_gluon',
            'train_ch3', 'train_ch5', 'train_ch9', 'train_gluon_ch9',
            'predict_sentiment', 'train_ch7', 'translate_ch7']
@@ -44,8 +44,6 @@ def squared_loss(y_hat, y):
 
 def grad_clipping(params, theta, ctx):
     """Clip the gradient."""
-    if isinstance(params, nn.Block):
-        params = [p.data(ctx) for p in params.collect_params().values()]
     norm = nd.array([0], ctx)
     for param in params:
         norm += (param.grad ** 2).sum()
@@ -53,6 +51,11 @@ def grad_clipping(params, theta, ctx):
     if norm > theta:
         for param in params:
             param.grad[:] *= theta / norm
+            
+def grad_clipping_gluon(model, theta, ctx):
+    """Clip the gradient for a Gluon model."""
+    params = [p.data(ctx) for p in model.collect_params().values()]
+    grad_clipping(params, theta, ctx)
 
 def sgd(params, lr, batch_size):
     """Mini-batch stochastic gradient descent."""
@@ -98,13 +101,10 @@ def train_2d(trainer):
     print('epoch %d, x1 %f, x2 %f' % (i+1, x1, x2))
     return res
 
-
-
 def train_and_predict_rnn(rnn, get_params, init_rnn_state, num_hiddens,
-                          vocab_size, ctx, corpus_indices, idx_to_char,
-                          char_to_idx, is_random_iter, num_epochs, num_steps,
-                          lr, clipping_theta, batch_size, pred_period,
-                          pred_len, prefixes):
+                          corpus_indices, vocab, ctx, is_random_iter,  
+                          num_epochs, num_steps, lr, clipping_theta, 
+                          batch_size, prefixes):
     """Train an RNN model and predict the next item in the sequence."""
     if is_random_iter:
         data_iter_fn = data_iter_random
@@ -112,51 +112,66 @@ def train_and_predict_rnn(rnn, get_params, init_rnn_state, num_hiddens,
         data_iter_fn = data_iter_consecutive
     params = get_params()
     loss = gloss.SoftmaxCrossEntropyLoss()
-
-    for epoch in range(num_epochs):
-        if not is_random_iter:
+    start = time.time()
+    for epoch in range(1, num_epochs+1):
+        if not is_random_iter:  
+            # If adjacent sampling is used, the hidden state is initialized 
+            # at the beginning of the epoch
             state = init_rnn_state(batch_size, num_hiddens, ctx)
-        l_sum, n, start = 0.0, 0, time.time()
+        l_sum, n = 0.0, 0
         data_iter = data_iter_fn(corpus_indices, batch_size, num_steps, ctx)
         for X, Y in data_iter:
-            if is_random_iter:
+            if is_random_iter:  
+                # If random sampling is used, the hidden state is initialized 
+                # before each mini-batch update
                 state = init_rnn_state(batch_size, num_hiddens, ctx)
-            else:
+            else:  
+                # Otherwise, the detach function needs to be used to separate 
+                # the hidden state from the computational graph to avoid 
+                # backpropagation beyond the current sample
                 for s in state:
                     s.detach()
             with autograd.record():
-                inputs = [nd.one_hot(x, vocab_size) for x in X.T]
+                inputs = to_onehot(X, len(vocab))
+                # outputs is num_steps terms of shape (batch_size, len(vocab))
                 (outputs, state) = rnn(inputs, state, params)
+                # After stitching it is (num_steps * batch_size, len(vocab))
                 outputs = nd.concat(*outputs, dim=0)
+                # The shape of Y is (batch_size, num_steps), and then becomes 
+                # a vector with a length of batch * num_steps after 
+                # transposition. This gives it a one-to-one correspondence 
+                # with output rows
                 y = Y.T.reshape((-1,))
+                # Average classification error via cross entropy loss
                 l = loss(outputs, y).mean()
             l.backward()
-            grad_clipping(params, clipping_theta, ctx)
-            sgd(params, lr, 1)
+            grad_clipping(params, clipping_theta, ctx)  # Clip the gradient
+            sgd(params, lr, 1)  
+            # Since the error is the mean, no need to average gradients here
             l_sum += l.asscalar() * y.size
             n += y.size
-
-        if (epoch + 1) % pred_period == 0:
+        if epoch % (num_epochs // 4) == 0:
             print('epoch %d, perplexity %f, time %.2f sec' % (
-                epoch + 1, math.exp(l_sum / n), time.time() - start))
+                epoch, math.exp(l_sum / n), time.time() - start))
+            start = time.time()
+        if epoch % (num_epochs // 2) == 0:
             for prefix in prefixes:
-                print(' -', predict_rnn(
-                    prefix, pred_len, rnn, params, init_rnn_state,
-                    num_hiddens, vocab_size, ctx, idx_to_char, char_to_idx))
+                print(' -',  predict_rnn(prefix, 50, rnn, params, 
+                                         init_rnn_state, num_hiddens,
+                                         vocab, ctx))
+                
 
-
-def train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
-                                corpus_indices, idx_to_char, char_to_idx,
-                                num_epochs, num_steps, lr, clipping_theta,
-                                batch_size, pred_period, pred_len, prefixes):
+def train_and_predict_rnn_gluon(model, num_hiddens, corpus_indices, vocab, 
+                                ctx, num_epochs, num_steps, lr, 
+                                clipping_theta, batch_size, prefixes):
     """Train an Gluon RNN model and predict the next item in the sequence."""
     loss = gloss.SoftmaxCrossEntropyLoss()
     model.initialize(ctx=ctx, force_reinit=True, init=init.Normal(0.01))
     trainer = gluon.Trainer(model.collect_params(), 'sgd',
                             {'learning_rate': lr, 'momentum': 0, 'wd': 0})
-
-    for epoch in range(num_epochs):
-        l_sum, n, start = 0.0, 0, time.time()
+    start = time.time()
+    for epoch in range(1, num_epochs+1):
+        l_sum, n = 0.0, 0
         data_iter = data_iter_consecutive(
             corpus_indices, batch_size, num_steps, ctx)
         state = model.begin_state(batch_size=batch_size, ctx=ctx)
@@ -168,20 +183,22 @@ def train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
                 y = Y.T.reshape((-1,))
                 l = loss(output, y).mean()
             l.backward()
-            params = [p.data() for p in model.collect_params().values()]
-            grad_clipping(params, clipping_theta, ctx)
+            # Clip the gradient
+            grad_clipping_gluon(model, clipping_theta, ctx)
+            # Since the error has already taken the mean, the gradient does
+            # not need to be averaged
             trainer.step(1)
             l_sum += l.asscalar() * y.size
             n += y.size
 
-        if (epoch + 1) % pred_period == 0:
+        if epoch % (num_epochs // 4) == 0:
             print('epoch %d, perplexity %f, time %.2f sec' % (
-                epoch + 1, math.exp(l_sum / n), time.time() - start))
+                epoch, math.exp(l_sum / n), time.time() - start))
+            start = time.time()
+        if epoch % (num_epochs // 2) == 0:
             for prefix in prefixes:
-                print(' -', predict_rnn_gluon(
-                    prefix, pred_len, model, vocab_size, ctx, idx_to_char,
-                    char_to_idx))
-
+                print(' -', predict_rnn_gluon(prefix, 50, model, vocab, ctx))
+                
 
 def train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size,
               params=None, lr=None, trainer=None):
@@ -292,36 +309,47 @@ def train_gluon_ch9(trainer_name, trainer_hyperparams, features, labels,
     plt.plot(np.linspace(0, num_epochs, len(ls)), ls)
     plt.xlabel('epoch')
     plt.ylabel('loss')
+    
+def to_onehot(X, size):  
+    return [nd.one_hot(x, size) for x in X.T]
 
 def predict_rnn(prefix, num_chars, rnn, params, init_rnn_state,
-                num_hiddens, vocab_size, ctx, idx_to_char, char_to_idx):
+                num_hiddens, vocab, ctx):
     """Predict next chars with a RNN model"""
     state = init_rnn_state(1, num_hiddens, ctx)
-    output = [char_to_idx[prefix[0]]]
+    output = [vocab[prefix[0]]]
     for t in range(num_chars + len(prefix) - 1):
-        X = [nd.one_hot(x, vocab_size) for x in nd.array([output[-1]], ctx=ctx).T]
+        # The output of the previous time step is taken as the input of the
+        # current time step.
+        X = to_onehot(nd.array([output[-1]], ctx=ctx), len(vocab))
+        # Calculate the output and update the hidden state
         (Y, state) = rnn(X, state, params)
+        # The input to the next time step is the character in the prefix or
+        # the current best predicted character
         if t < len(prefix) - 1:
-            output.append(char_to_idx[prefix[t + 1]])
+            # Read off from the given sequence of characters
+            output.append(vocab[prefix[t + 1]])
         else:
+            # This is maximum likelihood decoding. Modify this if you want
+            # use sampling, beam search or beam sampling for better sequences.
             output.append(int(Y[0].argmax(axis=1).asscalar()))
-    return ''.join([idx_to_char[i] for i in output])
-
-
-def predict_rnn_gluon(prefix, num_chars, model, vocab_size, ctx, idx_to_char,
-                      char_to_idx):
+    return ''.join([vocab.idx_to_token[i] for i in output])
+    
+    
+def predict_rnn_gluon(prefix, num_chars, model, vocab, ctx):
     """Precit next chars with a Gluon RNN model"""
+    # Use the model's member function to initialize the hidden state.
     state = model.begin_state(batch_size=1, ctx=ctx)
-    output = [char_to_idx[prefix[0]]]
+    output = [vocab[prefix[0]]]
     for t in range(num_chars + len(prefix) - 1):
         X = nd.array([output[-1]], ctx=ctx).reshape((1, 1))
+        # Forward computation does not require incoming model parameters
         (Y, state) = model(X, state)
         if t < len(prefix) - 1:
-            output.append(char_to_idx[prefix[t + 1]])
+            output.append(vocab[prefix[t + 1]])
         else:
             output.append(int(Y.argmax(axis=1).asscalar()))
-    return ''.join([idx_to_char[i] for i in output])
-
+    return ''.join([vocab.idx_to_token[i] for i in output])
 
 def predict_sentiment(net, vocab, sentence):
     """Predict the sentiment of a given sentence."""
@@ -345,7 +373,7 @@ def train_ch7(model, data_iter, lr, num_epochs, ctx):
                 Y_hat, _ = model(X, Y_input, X_vlen, Y_vlen)
                 l = loss(Y_hat, Y_label, Y_vlen)
             l.backward()
-            grad_clipping(model, 5, ctx)
+            grad_clipping_gluon(model, 5, ctx)
             num_tokens = Y_vlen.sum().asscalar()
             trainer.step(num_tokens)
             l_sum += l.sum().asscalar()
