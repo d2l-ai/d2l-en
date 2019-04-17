@@ -15,53 +15,34 @@ import math
 from mxnet import autograd, gluon, nd
 from mxnet.gluon import data as gdata, loss as gloss, nn
 import random
-import sys
 import time
 import zipfile
 ```
 
-## Process the Data Set
+## Pre-process the Data Set
 
-Penn Tree Bank (PTB) is a small commonly-used corpus[1]. It takes samples from Wall Street Journal articles and includes training sets, validation sets, and test sets. We will train the word embedding model on the PTB training set. Each line of the data set acts as a sentence. All the words in a sentence are separated by spaces.
+### Load and Tokenize
+
+Penn Tree Bank (PTB) is a small commonly-used corpus[1]. It takes samples from Wall Street Journal articles and includes training sets, validation sets, and test sets. We will train the word embedding model on the PTB training set. Each line of the data set acts as a sentence. All the words in a sentence are separated by spaces. In this task, each word is a token.
 
 ```{.python .input  n=2}
-with zipfile.ZipFile('../data/ptb.zip', 'r') as zin:
-    zin.extractall('../data/')
-
-with open('../data/ptb/ptb.train.txt', 'r') as f:
-    lines = f.readlines()
-    # st is the abbreviation of "sentence" in the loop
-    raw_dataset = [st.split() for st in lines]
-
-'# sentences: %d' % len(raw_dataset)
+with zipfile.ZipFile('../data/ptb.zip', 'r') as f:
+    raw_text = f.read('ptb/ptb.train.txt').decode("utf-8").lower()
+sentences = [line.split() for line in raw_text.split('\n')]    
+'# sentences: %d' % len(sentences)
 ```
 
-For the first three sentences of the data set, print the number of words and the first five words of each sentence. The end character of this data set is "&lt;eos&gt;", uncommon words are all represented by "&lt;unk&gt;", and numbers are replaced with "N".
+### Build the Vocabulary
 
-```{.python .input  n=3}
-for st in raw_dataset[:3]:
-    print('# tokens:', len(st), st[:5])
-```
+Next we build a vocabulary with words appeared not greater than 5 times mapped into a "&lt;unk&gt;" token.
 
-### Create Word Index
+```{.python .input  n=15}
+def expand(sentences):
+    """Expand a list of token lists into a list of tokens"""
+    return [tk for line in sentences for tk in line]
 
-For the sake of simplicity, we only keep words that appear at least 5 times in the data set.
-
-```{.python .input  n=4}
-# tk is an abbreviation for "token" in the loop
-counter = collections.Counter([tk for st in raw_dataset for tk in st])
-counter = dict(filter(lambda x: x[1] >= 5, counter.items()))
-```
-
-Then, map the words to the integer indexes.
-
-```{.python .input  n=5}
-idx_to_token = [tk for tk, _ in counter.items()]
-token_to_idx = {tk: idx for idx, tk in enumerate(idx_to_token)}
-dataset = [[token_to_idx[tk] for tk in st if tk in token_to_idx]
-           for st in raw_dataset]
-num_tokens = sum([len(st) for st in dataset])
-'# tokens: %d' % num_tokens
+vocab = d2l.Vocab(expand(sentences), min_freq=10)
+'vocab size: %d' % len(vocab)
 ```
 
 ### Subsampling
@@ -72,58 +53,88 @@ $$ \mathbb{P}(w_i) = \max\left(1 - \sqrt{\frac{t}{f(w_i)}}, 0\right),$$
 
 Here, $f(w_i)$ is the ratio of the instances of word $w_i$ to the total number of words in the data set, and the constant $t$ is a hyper-parameter (set to $10^{-4}$ in this experiment). As we can see, it is only possible to drop out the word $w_i$ in subsampling when $f(w_i) > t$. The higher the word's frequency, the higher its dropout probability.
 
-```{.python .input  n=6}
-def discard(idx):
-    return random.uniform(0, 1) < 1 - math.sqrt(
-        1e-4 / counter[idx_to_token[idx]] * num_tokens)
+```{.python .input  n=16}
+# Map low frequency words into <unk>
+sentences = [[vocab.idx_to_token[vocab[tk]] for tk in line] 
+             for line in sentences]
+# Count the frequency for each word
+tokens = expand(sentences)
+counter = collections.Counter(tokens)
 
-subsampled_dataset = [[tk for tk in st if not discard(tk)] for st in dataset]
-'# tokens: %d' % sum([len(st) for st in subsampled_dataset])
+def discard(token):
+    p = 1 - math.sqrt(1e-4 / counter[token] * len(tokens))
+    return random.uniform(0, 1) < p
+
+subsampled = [[tk for tk in line if not discard(tk)] for line in sentences]
 ```
 
-As we can see, we have removed about half of the words after the second sampling. The following compares the number of times a word appears in the data set before and after subsampling. The sampling rate of the high-frequency word "the" is less than 1/20.
+Compare the sequence lengths before and after sampling, we can see subsampling significantly reduced the sequence length.
 
-```{.python .input  n=7}
+```{.python .input  n=17}
+d2l.set_figsize()
+d2l.plt.hist([[len(line) for line in sentences],
+              [len(line) for line in subsampled]] )
+d2l.plt.xlabel('# tokens per sentence')
+d2l.plt.ylabel('count')
+d2l.plt.legend(['origin', 'subsampled']);
+```
+
+For individual tokens, the sampling rate of the high-frequency word "the" is less than 1/20.
+
+```{.python .input  n=18}
 def compare_counts(token):
-    return '# %s: before=%d, after=%d' % (token, sum(
-        [st.count(token_to_idx[token]) for st in dataset]), sum(
-        [st.count(token_to_idx[token]) for st in subsampled_dataset]))
+    return '# of "%s": before=%d, after=%d' % (token, sum(
+        [line.count(token) for line in sentences]), sum(
+        [line.count(token) for line in subsampled]))
 
 compare_counts('the')
 ```
 
 But the low-frequency word "join" is completely preserved.
 
-```{.python .input  n=8}
+```{.python .input  n=19}
 compare_counts('join')
 ```
+
+### Map Tokens into Indices
+
+Lastly, we map each token into an index to construct the corpus.
+
+```{.python .input  n=20}
+corpus = [vocab[line] for line in subsampled]
+corpus[0:3]
+```
+
+## Read the Data Set
+
+Next we read the corpus with token indicies into data batches for training. 
 
 ### Extract Central Target Words and Context Words
 
 We use words with a distance from the central target word not exceeding the context window size as the context words of the given center target word. The following definition function extracts all the central target words and their context words. It uniformly and randomly samples an integer to be used as the context window size between integer 1 and the `max_window_size` (maximum context window).
 
-```{.python .input  n=9}
-def get_centers_and_contexts(dataset, max_window_size):
+```{.python .input  n=21}
+def get_centers_and_contexts(corpus, max_window_size):
     centers, contexts = [], []
-    for st in dataset:
+    for line in corpus:
         # Each sentence needs at least 2 words to form a
         # "central target word - context word" pair
-        if len(st) < 2:
+        if len(line) < 2:
             continue
-        centers += st
-        for center_i in range(len(st)):
+        centers += line
+        for i in range(len(line)):  # Context window centered at i
             window_size = random.randint(1, max_window_size)
-            indices = list(range(max(0, center_i - window_size),
-                                 min(len(st), center_i + 1 + window_size)))
+            indices = list(range(max(0, i - window_size),
+                                 min(len(line), i + 1 + window_size)))
             # Exclude the central target word from the context words
-            indices.remove(center_i)
-            contexts.append([st[idx] for idx in indices])
+            indices.remove(i)
+            contexts.append([line[idx] for idx in indices])
     return centers, contexts
 ```
 
 Next, we create an artificial data set containing two sentences of 7 and 3 words, respectively. Assume the maximum context window is 2 and print all the central target words and their context words.
 
-```{.python .input  n=10}
+```{.python .input  n=22}
 tiny_dataset = [list(range(7)), list(range(7, 10))]
 print('dataset', tiny_dataset)
 for center, context in zip(*get_centers_and_contexts(tiny_dataset, 2)):
@@ -132,39 +143,59 @@ for center, context in zip(*get_centers_and_contexts(tiny_dataset, 2)):
 
 In the experiment, we set the maximum context window size to 5. The following extracts all the central target words and their context words in the data set.
 
-```{.python .input  n=11}
-all_centers, all_contexts = get_centers_and_contexts(subsampled_dataset, 5)
+```{.python .input  n=23}
+all_centers, all_contexts = get_centers_and_contexts(corpus, 5)
+'# center-context pairs: %d' % len(all_centers)
 ```
 
-## Negative Sampling
+### Negative Sampling
 
-We use negative sampling for approximate training. For a central and context word pair, we randomly sample $K$ noise words ($K=5$ in the experiment). According to the suggestion in the Word2vec paper, the noise word sampling probability $\mathbb{P}(w)$ is the ratio of the word frequency of $w$ to the total word frequency raised to the power of 0.75[2].
+We use negative sampling for approximate training. For a central and context word pair, we randomly sample $K$ noise words ($K=5$ in the experiment). According to the suggestion in the Word2vec paper, the noise word sampling probability $\mathbb{P}(w)$ is the ratio of the word frequency of $w$ to the total word frequency raised to the power of 0.75 [2].
+
+We first define a class to draw a candidate according to the sampling weights. It caches a 10000 size random number bank instead of calling `random.choices` every time. 
+
+```{.python .input}
+class RandomGenerator(object):
+    """Draw a random int in [0, n] according to n sampling weights"""
+    def __init__(self, sampling_weights):
+        self.population = list(range(len(sampling_weights)))
+        self.sampling_weights = sampling_weights
+        self.candidates = []
+        self.i = 0
+        
+    def draw(self):
+        if self.i == len(self.candidates):
+            self.candidates = random.choices(
+                self.population, self.sampling_weights, k=10000)
+            self.i = 0
+        self.i += 1
+        return self.candidates[self.i-1]
+    
+generator = RandomGenerator([2,3,4])
+[generator.draw() for _ in range(10)]
+```
 
 ```{.python .input  n=12}
+counter = collections.Counter(expand(corpus))
+sampling_weights = [counter[i]**0.75 for i in range(len(counter))]
+
 def get_negatives(all_contexts, sampling_weights, K):
-    all_negatives, neg_candidates, i = [], [], 0
-    population = list(range(len(sampling_weights)))
+    all_negatives = []
+    generator = RandomGenerator(sampling_weights)
     for contexts in all_contexts:
         negatives = []
         while len(negatives) < len(contexts) * K:
-            if i == len(neg_candidates):
-                # An index of k words is randomly generated as noise words
-                # based on the weight of each word (sampling_weights). For
-                # efficient calculation, k can be set slightly larger
-                i, neg_candidates = 0, random.choices(
-                    population, sampling_weights, k=int(1e5))
-            neg, i = neg_candidates[i], i + 1
+            neg = generator.draw()
             # Noise words cannot be context words
-            if neg not in set(contexts):
+            if neg not in contexts:
                 negatives.append(neg)
         all_negatives.append(negatives)
     return all_negatives
 
-sampling_weights = [counter[w]**0.75 for w in idx_to_token]
 all_negatives = get_negatives(all_contexts, sampling_weights, 5)
 ```
 
-## Reading Data
+### Read into Batches
 
 We extract all central target words `all_centers`, and the context words `all_contexts` and noise words `all_negatives` of each central target word from the data set. We will read them in random mini-batches.
 
@@ -186,17 +217,27 @@ def batchify(data):
             nd.array(masks), nd.array(labels))
 ```
 
+Construct two simple examples:
+
+```{.python .input}
+x_1 = (1, [2,2], [3,3,3,3])
+x_2 = (1, [2,2,2], [3,3])
+batch = batchify((x_1, x_2))
+
+names = ['centers', 'contexts_negatives', 'masks', 'labels']
+for name, data in zip(names, batch):
+    print(name, '=', data)
+```
+
 We use the `batchify` function just defined to specify the mini-batch reading method in the `DataLoader` instance. Then, we print the shape of each variable in the first batch read.
 
 ```{.python .input  n=14}
 batch_size = 512
-num_workers = 0 if sys.platform.startswith('win32') else 4
 dataset = gdata.ArrayDataset(all_centers, all_contexts, all_negatives)
 data_iter = gdata.DataLoader(dataset, batch_size, shuffle=True,
-                             batchify_fn=batchify, num_workers=num_workers)
+                             batchify_fn=batchify)
 for batch in data_iter:
-    for name, data in zip(['centers', 'contexts_negatives', 'masks',
-                           'labels'], batch):
+    for name, data in zip(names, batch):
         print(name, 'shape:', data.shape)
     break
 ```
@@ -244,10 +285,15 @@ def skip_gram(center, contexts_and_negatives, embed_v, embed_u):
     return pred
 ```
 
-## To train a model
+Verify that the output shape should be (batch size, 1, `max_len`).
+
+```{.python .input}
+skip_gram(nd.ones((2,1)), nd.ones((2,4)), embed, embed).shape
+```
+
+## Training
 
 Before training the word embedding model, we need to define the loss function of the model.
-
 
 ### Binary Cross Entropy Loss Function
 
@@ -259,23 +305,19 @@ loss = gloss.SigmoidBinaryCrossEntropyLoss()
 
 It is worth mentioning that we can use the mask variable to specify the partial predicted value and label that participate in loss function calculation in the mini-batch: when the mask is 1, the predicted value and label of the corresponding position will participate in the calculation of the loss function; When the mask is 0, the predicted value and label of the corresponding position do not participate in the calculation of the loss function. As we mentioned earlier, mask variables can be used to avoid the effect of padding on loss function calculations.
 
+Given two identical examples, different masks lead to different loss values.
+
 ```{.python .input}
-pred = nd.array([[1.5, 0.3, -1, 2], [1.1, -0.6, 2.2, 0.4]])
-# 1 and 0 in the label variables label represent context words and the noise
-# words, respectively
-label = nd.array([[1, 0, 0, 0], [1, 1, 0, 0]])
-mask = nd.array([[1, 1, 1, 1], [1, 1, 1, 0]])  # Mask variable
-loss(pred, label, mask) * mask.shape[1] / mask.sum(axis=1)
+pred = nd.array([[.5]*4]*2)
+label = nd.array([[1,0,1,0]]*2)
+mask = nd.array([[1, 1, 1, 1], [1, 1, 0, 0]])
+loss(pred, label, mask)
 ```
 
-Next, as a comparison, we will implement binary cross-entropy loss function calculation from scratch and calculate the predicted value with a mask of 1 and the loss of the label based on the mask variable `mask`.
+We can normalize the loss in each example due to various lengths in each example. 
 
 ```{.python .input}
-def sigmd(x):
-    return -math.log(1 / (1 + math.exp(-x)))
-
-print('%.7f' % ((sigmd(1.5) + sigmd(-0.3) + sigmd(1) + sigmd(-2)) / 4))
-print('%.7f' % ((sigmd(1.1) + sigmd(-0.6) + sigmd(-2.2)) / 3))
+loss(pred, label, mask) / mask.sum(axis=1) * mask.shape[1]
 ```
 
 ### Initialize Model Parameters
@@ -283,10 +325,10 @@ print('%.7f' % ((sigmd(1.1) + sigmd(-0.6) + sigmd(-2.2)) / 3))
 We construct the embedding layers of the central and context words, respectively, and set the hyper-parameter word vector dimension `embed_size` to 100.
 
 ```{.python .input  n=20}
-embed_size = 100
+embed_size = 50
 net = nn.Sequential()
-net.add(nn.Embedding(input_dim=len(idx_to_token), output_dim=embed_size),
-        nn.Embedding(input_dim=len(idx_to_token), output_dim=embed_size))
+net.add(nn.Embedding(input_dim=len(vocab), output_dim=embed_size),
+        nn.Embedding(input_dim=len(vocab), output_dim=embed_size))
 ```
 
 ### Training
@@ -299,29 +341,28 @@ def train(net, lr, num_epochs):
     net.initialize(ctx=ctx, force_reinit=True)
     trainer = gluon.Trainer(net.collect_params(), 'adam',
                             {'learning_rate': lr})
-    for epoch in range(num_epochs):
+    for epoch in range(1, num_epochs+1):
         start, l_sum, n = time.time(), 0.0, 0
         for batch in data_iter:
             center, context_negative, mask, label = [
                 data.as_in_context(ctx) for data in batch]
             with autograd.record():
                 pred = skip_gram(center, context_negative, net[0], net[1])
-                # Use the mask variable to avoid the effect of padding on loss
-                # function calculations
-                l = (loss(pred.reshape(label.shape), label, mask) *
-                     mask.shape[1] / mask.sum(axis=1))
+
+                l = (loss(pred.reshape(label.shape), label, mask)
+                     / mask.sum(axis=1) * mask.shape[1])
             l.backward()
             trainer.step(batch_size)
             l_sum += l.sum().asscalar()
             n += l.size
         print('epoch %d, loss %.2f, time %.2fs'
-              % (epoch + 1, l_sum / n, time.time() - start))
+              % (epoch, l_sum/n, time.time() - start))
 ```
 
 Now, we can train a skip-gram model using negative sampling.
 
 ```{.python .input  n=22}
-train(net, 0.005, 3)
+train(net, 0.005, 5)
 ```
 
 ## Applying the Word Embedding Model
@@ -331,12 +372,12 @@ After training the word embedding model, we can represent similarity in meaning 
 ```{.python .input  n=23}
 def get_similar_tokens(query_token, k, embed):
     W = embed.weight.data()
-    x = W[token_to_idx[query_token]]
-    # The added 1e-9 is for numerical stability
+    x = W[vocab[query_token]]
+    # Compute the cosine similarity. Add 1e-9 for numerical stability.
     cos = nd.dot(W, x) / (nd.sum(W * W, axis=1) * nd.sum(x * x) + 1e-9).sqrt()
     topk = nd.topk(cos, k=k+1, ret_typ='indices').asnumpy().astype('int32')
     for i in topk[1:]:  # Remove the input words
-        print('cosine sim=%.3f: %s' % (cos[i].asscalar(), (idx_to_token[i])))
+        print('cosine sim=%.3f: %s' % (cos[i].asscalar(), (vocab.idx_to_token[i])))
 
 get_similar_tokens('chip', 3, net[0])
 ```
