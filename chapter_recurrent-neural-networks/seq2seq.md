@@ -155,7 +155,7 @@ def train_ch7(model, data_iter, lr, num_epochs, ctx):  # Saved in d2l
                 Y_hat, _ = model(X, Y_input, X_vlen, Y_vlen)
                 l = loss(Y_hat, Y_label, Y_vlen)
             l.backward()
-            d2l.grad_clipping(model, 5, ctx)
+            d2l.grad_clipping_gluon(model, 5, ctx)
             num_tokens = Y_vlen.sum().asscalar()
             trainer.step(num_tokens)
             l_sum += l.sum().asscalar()
