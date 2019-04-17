@@ -135,13 +135,20 @@ for layer in net:
     print(layer.name, 'output shape:\t', X.shape)
 ```
 
-Note that the height and width of the input 
-in the convolutional layer block is reduced, layer-by-layer. 
+Note that the height and width of the representation 
+at each layer throughout the convolutional block is reduced
+(compared to the previous layer). 
 The convolutional layer uses a kernel 
-with a height and width of 5 to reduce the height and width by 4, 
-while the pooling layer halves the height and width. 
-However, the number of channels increases layer-over-layer from 1 to 16. 
-The fully-connected layer reduces dimensionality layer by layer, 
+with a height and width of 5, 
+which with only $2$ pixels of padding in the first convolutional layer
+and none in the second convolutional layer
+leads to reductions in both height and width by 2 and 4 pixels, respectively.
+Moreover each pooling layer halves the height and width. 
+However, as we go up the stack of layers,
+the number of channels increases layer-over-layer 
+from 1 in the input to 6 after the first convolutional layer
+and 16 after the second layer. 
+Then, the fully-connected layer reduces dimensionality layer by layer, 
 until emitting an output that matches the number of image classes.
 
 ![Compressed notation for LeNet5](../img/lenet-vert.svg)
@@ -149,17 +156,34 @@ until emitting an output that matches the number of image classes.
 
 ## Data Acquisition and Training
 
-Now, we will experiment with the LeNet model. 
-We still use Fashion-MNIST as the training data set 
-since the problem is rather more difficult than OCR 
-(even in the 1990s the error rates were in the 1% range).
+Now that we've implemented the model,
+we might as well run some experiments
+to see what we can accomplish with the LeNet model. 
+While it might serve nostalgia
+to train LeNet on the original MNIST OCR dataset,
+that dataset has become too easy,
+with MLPs getting over 98% accuracy,
+so it would be hard to see the benefits of convolutional networks. 
+Thus we will stick with Fashion-MNIST as our dataset 
+because while it has the same shape ($28\times28$ images),
+this dataset is notably more challenging.
+
 
 ```{.python .input}
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)
 ```
 
-Since convolutional networks are significantly more expensive to compute than multilayer perceptrons we recommend using GPUs to speed up training. Time to introduce a convenience function that allows us to detect whether we have a GPU: it works by trying to allocate an NDArray on `gpu(0)`, and use `gpu(0)` if this is successful. Otherwise, we catch the resulting exception and we stick with the CPU.
+While convolutional networks may have few parameters,
+they can still be significantly more expensive 
+to compute than a similarly deep multilayer perceptron
+so if you have access to a GPU, this might be a good time 
+to put it into action to speed up training. 
+
+Here's a simple function that we can use to detect whether we have a GPU.
+In it, we try to allocate an NDArray on `gpu(0)`, 
+and use `gpu(0)` as our context if the operation proves successful. 
+Otherwise, we catch the resulting exception and we stick with the CPU.
 
 ```{.python .input}
 # This function has been saved in the d2l package for future use
@@ -175,7 +199,16 @@ ctx = try_gpu()
 ctx
 ```
 
-Accordingly, we slightly modify the `evaluate_accuracy` function described when [implementing the SoftMax from scratch](../chapter_deep-learning-basics/softmax-regression-scratch.md).  Since the data arrives in the CPU when loading we need to copy it to the GPU before any computation can occur. This is accomplished via the `as_in_context` function described in the [GPU Computing](../chapter_deep-learning-computation/use-gpu.md) section. Note that we accumulate the errors on the same device as where the data eventually lives (in `acc`). This avoids intermediate copy operations that would destroy performance.
+For evaluation, we need to make a slight modification 
+to the `evaluate_accuracy` function that we described 
+when [implementing the SoftMax from scratch](../chapter_deep-learning-basics/softmax-regression-scratch.md).  
+Since the full dataset lives on the CPU,
+we need to copy it to the GPU before we can compute our models. 
+This is accomplished via the `as_in_context` function 
+described in the [GPU Computing](../chapter_deep-learning-computation/use-gpu.md) section. 
+Note that we accumulate the errors on the device 
+where the data eventually lives (in `acc`). 
+This avoids intermediate copy operations that might harm performance.
 
 ```{.python .input}
 # This function has been saved in the d2l package for future use. The function
@@ -191,7 +224,10 @@ def evaluate_accuracy(data_iter, net, ctx):
     return acc_sum.asscalar() / n
 ```
 
-Just like the data loader we need to update the training function to deal with GPUs. Unlike [`train_ch3`](../chapter_deep-learning-basics/softmax-regression-scratch.md) we now move data prior to computation.
+We also need to update our training function to deal with GPUs. 
+Unlike [`train_ch3`](../chapter_deep-learning-basics/softmax-regression-scratch.md), we now need to move each batch of data
+to our designated context (hopefully, the GPU) 
+prior to making the forward and backward passes.
 
 ```{.python .input}
 # This function has been saved in the d2l package for future use
@@ -219,7 +255,11 @@ def train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,
                  time.time() - start))
 ```
 
-We initialize the model parameters on the device indicated by `ctx`, this time using Xavier. The loss function and the training algorithm still use the cross-entropy loss function and mini-batch stochastic gradient descent.
+We initialize the model parameters on the device indicated by `ctx`, 
+this time using the Xavier initializer. 
+The loss function and the training algorithm
+still use the cross-entropy loss function 
+and mini-batch stochastic gradient descent.
 
 ```{.python .input}
 lr, num_epochs = 0.9, 5
