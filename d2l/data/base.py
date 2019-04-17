@@ -73,14 +73,15 @@ class Vocab(object):
         token_freqs.sort(key=lambda x: x[1], reverse=True)
         if use_special_tokens:
             self.pad, self.bos, self.eos, self.unk = (0, 1, 2, 3)
-            tokens = ['<pad>', '<bos>', '<eos>', '<unk>']
+            special_tokens = ['<pad>', '<bos>', '<eos>', '<unk>']
         else:
             self.unk = 0
-            tokens = ['<unk>']
-        tokens +=  [token for token, freq in token_freqs if freq >= min_freq]
+            special_tokens = ['<unk>']
+        tokens = [token for token, freq in token_freqs 
+                  if freq >= min_freq and token not in special_tokens]
         self.idx_to_token = []
         self.token_to_idx = dict()
-        for token in tokens:
+        for token in special_tokens + tokens:
             self.idx_to_token.append(token)
             self.token_to_idx[token] = len(self.idx_to_token) - 1
 
