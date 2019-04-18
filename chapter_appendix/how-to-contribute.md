@@ -6,7 +6,7 @@ This section describes the basic Git procedure for contributing to this book. If
 
 In the procedure below, we assume that the contributor's GitHub ID is "astonzhang".
 
-Step 1: Install Git. The Git open source book details how to install Git [3]. If you do note have a GitHub account, you need to sign up for one[4].
+Step 1: Install Git. The Git open source book [3] details how to install Git. If you do not have a GitHub account, you need to sign up for one [4].
 
 Step 2: Log in to GitHub. Enter the address of the book's code repository in your browser [2]. Click on the "Fork" button in the red box at the top-right of Figure 13.20 to clone (get a copy of) the code repository of this book.
 
@@ -18,7 +18,7 @@ Now, the code repository of this book will be copied to your username, such as "
 ![Copy the code repository.](../img/contrib02.png)
 
 
-Step 3: Click the green "Clone or download" button on the right side of Figure 13.21 and click the button in the red box to copy the code repository address under your username. Follow the method described in the ["Acquiring and Running Codes in This Book"](../chapter_prerequisite/install.md) section to enter command line mode. Here, we assume you want to save the code repository under the local "~/repo" path. Go to this path, type `git clone`, and paste the code repository address under your username. Execute the command:
+Step 3: Click the green "Clone or download" button on the right side of Figure 13.21 and click the button in the red box to copy the code repository address under your username. Follow the method described in the ["Acquiring and Running Codes in This Book"](../chapter_prerequisite/install.md) section to enter command line mode. Here, we assume you want to save the code repository under the local "~/repo" path. Go to this path, type `git clone`, and paste the code repository address under your username. Execute the following command:
 
 ```
 # Replace your_Github_ID with your GitHub username
