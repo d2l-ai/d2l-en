@@ -9,7 +9,7 @@ sys.path.insert(0, '..')
 import d2l
 from mxnet import gluon, init, nd
 from mxnet.contrib import text
-from mxnet.gluon import data as gdata, loss as gloss, nn
+from mxnet.gluon import loss as gloss, nn
 ```
 
 ## One-dimensional Convolutional Layer

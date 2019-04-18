@@ -8,13 +8,11 @@ Similar to search synonyms and analogies, text classification is also a downstre
 import sys
 sys.path.insert(0, '..')
 
-import collections
 import d2l
 from mxnet import gluon, init, nd
-from mxnet.contrib import text
 from mxnet.gluon import data as gdata, loss as gloss, nn, rnn, utils as gutils
+from mxnet.contrib import text
 import os
-import random
 import tarfile
 ```
 
@@ -67,7 +65,7 @@ test_tokens = tokenize(test_data[0])
 ```
 
 Then we can create a dictionary based on the training data set with the words segmented. 
-Here, we have filtered out words that appear less than 5 times. 
+Here, we have filtered out words that appear less than 5 times.
 
 ```{.python .input}
 vocab = d2l.Vocab([tk for line in train_tokens for tk in line], min_freq=5)
@@ -119,9 +117,9 @@ In this model, each word first obtains a feature vector from the embedding layer
 
 ```{.python .input  n=46}
 class BiRNN(nn.Block):
-    def __init__(self, vocab, embed_size, num_hiddens, num_layers, **kwargs):
+    def __init__(self, vocab_size, embed_size, num_hiddens, num_layers, **kwargs):
         super(BiRNN, self).__init__(**kwargs)
-        self.embedding = nn.Embedding(len(vocab), embed_size)
+        self.embedding = nn.Embedding(vocab_size, embed_size)
         # Set Bidirectional to True to get a bidirectional recurrent neural
         # network
         self.encoder = rnn.LSTM(num_hiddens, num_layers=num_layers,
@@ -149,7 +147,7 @@ Create a bidirectional recurrent neural network with two hidden layers.
 
 ```{.python .input}
 embed_size, num_hiddens, num_layers, ctx = 100, 100, 2, d2l.try_all_gpus()
-net = BiRNN(vocab, embed_size, num_hiddens, num_layers)
+net = BiRNN(len(vocab), embed_size, num_hiddens, num_layers)
 net.initialize(init.Xavier(), ctx=ctx)
 ```
 
@@ -162,7 +160,7 @@ glove_embedding = text.embedding.create(
     'glove', pretrained_file_name='glove.6B.100d.txt')
 ```
 
-Query the word vectors that in our vocabulary. 
+Query the word vectors that in our vocabulary.
 
 ```{.python .input}
 embeds = glove_embedding.get_vecs_by_tokens(vocab.idx_to_token)
