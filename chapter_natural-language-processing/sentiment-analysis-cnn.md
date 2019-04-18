@@ -75,14 +75,7 @@ To improve computing performance, we often combine timing examples of different 
 We still use the same IMDb data set as n the previous section for sentiment analysis. The following steps for reading and preprocessing the data set are the same as in the previous section.
 
 ```{.python .input  n=2}
-batch_size = 64
-d2l.download_imdb()
-train_data, test_data = d2l.read_imdb('train'), d2l.read_imdb('test')
-vocab = d2l.get_vocab_imdb(train_data)
-train_iter = gdata.DataLoader(gdata.ArrayDataset(
-    *d2l.preprocess_imdb(train_data, vocab)), batch_size, shuffle=True)
-test_iter = gdata.DataLoader(gdata.ArrayDataset(
-    *d2l.preprocess_imdb(test_data, vocab)), batch_size)
+vocab, train_iter, test_iter = d2l.load_data_imdb(batch_size=64)
 ```
 
 ## The TextCNN Model
@@ -101,12 +94,12 @@ Next, we will implement a textCNN model. Compared with the previous section, in 
 
 ```{.python .input  n=10}
 class TextCNN(nn.Block):
-    def __init__(self, vocab, embed_size, kernel_sizes, num_channels,
+    def __init__(self, vocab_size, embed_size, kernel_sizes, num_channels,
                  **kwargs):
         super(TextCNN, self).__init__(**kwargs)
-        self.embedding = nn.Embedding(len(vocab), embed_size)
+        self.embedding = nn.Embedding(vocab_size, embed_size)
         # The embedding layer does not participate in training
-        self.constant_embedding = nn.Embedding(len(vocab), embed_size)
+        self.constant_embedding = nn.Embedding(vocab_size, embed_size)
         self.dropout = nn.Dropout(0.5)
         self.decoder = nn.Dense(2)
         # The max-over-time pooling layer has no weight, so it can share an
@@ -143,7 +136,7 @@ Create a TextCNN instance. It has 3 convolutional layers with kernel widths of 3
 ```{.python .input}
 embed_size, kernel_sizes, nums_channels = 100, [3, 4, 5], [100, 100, 100]
 ctx = d2l.try_all_gpus()
-net = TextCNN(vocab, embed_size, kernel_sizes, nums_channels)
+net = TextCNN(len(vocab), embed_size, kernel_sizes, nums_channels)
 net.initialize(init.Xavier(), ctx=ctx)
 ```
 
@@ -151,12 +144,12 @@ net.initialize(init.Xavier(), ctx=ctx)
 
 As in the previous section, load pre-trained 100-dimensional GloVe word vectors and initialize the embedding layers `embedding` and `constant_embedding`. Here, the former participates in training while the latter has a fixed weight.
 
-```{.python .input  n=7}
+```{.python .input}
 glove_embedding = text.embedding.create(
-    'glove', pretrained_file_name='glove.6B.100d.txt', vocabulary=vocab)
-net.embedding.weight.set_data(glove_embedding.idx_to_vec)
-net.constant_embedding.weight.set_data(glove_embedding.idx_to_vec)
-net.constant_embedding.collect_params().setattr('grad_req', 'null')
+    'glove', pretrained_file_name='glove.6B.100d.txt')
+embeds = glove_embedding.get_vecs_by_tokens(vocab.idx_to_token)
+net.embedding.weight.set_data(embeds)
+net.embedding.collect_params().setattr('grad_req', 'null')
 ```
 
 ### Train and Evaluate the Model
@@ -173,11 +166,11 @@ d2l.train(train_iter, test_iter, net, loss, trainer, ctx, num_epochs)
 Below, we use the trained model to the classify sentiments of two simple sentences.
 
 ```{.python .input}
-d2l.predict_sentiment(net, vocab, ['this', 'movie', 'is', 'so', 'great'])
+d2l.predict_sentiment(net, vocab, 'this movie is so great')
 ```
 
 ```{.python .input}
-d2l.predict_sentiment(net, vocab, ['this', 'movie', 'is', 'so', 'bad'])
+d2l.predict_sentiment(net, vocab, 'this movie is so bad')
 ```
 
 ## Summary

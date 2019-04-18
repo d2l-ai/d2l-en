@@ -1,55 +1,50 @@
 import tarfile
 import os
-import random
-import collections
 from mxnet import nd
-from mxnet.contrib import text
-from mxnet.gluon import utils as gutils
+from mxnet.gluon import utils as gutils, data as gdata
+from .base import Vocab
 
-__all__ = ['read_imdb', 'get_vocab_imdb', 'preprocess_imdb', 'download_imdb']
+__all__ = ['load_data_imdb']
 
-def get_tokenized_imdb(data):
-    """Get the tokenized IMDB data set for sentiment analysis."""
-    def tokenizer(text):
-        return [tok.lower() for tok in text.split(' ')]
-    return [tokenizer(review) for review, _ in data]
+def load_data_imdb(batch_size, max_len=500):
+    """Download a IMDB dataset, return the vocabulary and iterators"""
 
-
-def get_vocab_imdb(data):
-    """Get the vocab for the IMDB data set for sentiment analysis."""
-    tokenized_data = get_tokenized_imdb(data)
-    counter = collections.Counter([tk for st in tokenized_data for tk in st])
-    return text.vocab.Vocabulary(counter, min_freq=5)
-
-def download_imdb(data_dir='../data'):
-    """Download the IMDB data set for sentiment analysis."""
-    url = ('http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz')
-    sha1 = '01ada507287d82875905620988597833ad4e0903'
-    fname = gutils.download(url, data_dir, sha1_hash=sha1)
+    data_dir = '../data'
+    url = 'http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz'
+    fname = gutils.download(url, data_dir)
     with tarfile.open(fname, 'r') as f:
         f.extractall(data_dir)
 
-def preprocess_imdb(data, vocab):
-    """Preprocess the IMDB data set for sentiment analysis."""
-    max_l = 500
+    def read_imdb(folder='train'):
+        data, labels = [], []
+        for label in ['pos', 'neg']:
+            folder_name = os.path.join(data_dir, 'aclImdb', folder, label)
+            for file in os.listdir(folder_name):
+                with open(os.path.join(folder_name, file), 'rb') as f:
+                    review = f.read().decode('utf-8').replace('\n', '')
+                    data.append(review)
+                    labels.append(1 if label == 'pos' else 0)
+        return data, labels
+
+    train_data, test_data = read_imdb('train'), read_imdb('test')
+
+    def tokenize(sentences):
+        return [line.split(' ') for line in sentences]
+
+    train_tokens = tokenize(train_data[0])
+    test_tokens = tokenize(test_data[0])
+
+    vocab = Vocab([tk for line in train_tokens for tk in line], min_freq=5)
 
     def pad(x):
-        return x[:max_l] if len(x) > max_l else x + [0] * (max_l - len(x))
+        return x[:max_len] if len(x) > max_len else x + [vocab.unk] * (max_len - len(x))
 
-    tokenized_data = get_tokenized_imdb(data)
-    features = nd.array([pad(vocab.to_indices(x)) for x in tokenized_data])
-    labels = nd.array([score for _, score in data])
-    return features, labels
+    train_features = nd.array([pad(vocab[line]) for line in train_tokens])
+    test_features = nd.array([pad(vocab[line]) for line in test_tokens])
 
+    train_set = gdata.ArrayDataset(train_features, train_data[1])
+    test_set = gdata.ArrayDataset(test_features, test_data[1])
+    train_iter = gdata.DataLoader(train_set, batch_size, shuffle=True)
+    test_iter = gdata.DataLoader(test_set, batch_size)
 
-def read_imdb(folder='train'):
-    """Read the IMDB data set for sentiment analysis."""
-    data = []
-    for label in ['pos', 'neg']:
-        folder_name = os.path.join('../data/aclImdb/', folder, label)
-        for file in os.listdir(folder_name):
-            with open(os.path.join(folder_name, file), 'rb') as f:
-                review = f.read().decode('utf-8').replace('\n', '').lower()
-                data.append([review, 1 if label == 'pos' else 0])
-    random.shuffle(data)
-    return data
+    return vocab, train_iter, test_iter
