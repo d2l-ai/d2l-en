@@ -20,3 +20,4 @@ build/d2l
 /chapter_attention-mechanism/fra-eng.zip
 /chapter_recurrent-neural-networks/fra-eng.zip
 img/*.pdf
+aclImdb*
