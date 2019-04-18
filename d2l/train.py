@@ -51,7 +51,7 @@ def grad_clipping(params, theta, ctx):
     if norm > theta:
         for param in params:
             param.grad[:] *= theta / norm
-            
+
 def grad_clipping_gluon(model, theta, ctx):
     """Clip the gradient for a Gluon model."""
     params = [p.data(ctx) for p in model.collect_params().values()]
@@ -102,8 +102,8 @@ def train_2d(trainer):
     return res
 
 def train_and_predict_rnn(rnn, get_params, init_rnn_state, num_hiddens,
-                          corpus_indices, vocab, ctx, is_random_iter,  
-                          num_epochs, num_steps, lr, clipping_theta, 
+                          corpus_indices, vocab, ctx, is_random_iter,
+                          num_epochs, num_steps, lr, clipping_theta,
                           batch_size, prefixes):
     """Train an RNN model and predict the next item in the sequence."""
     if is_random_iter:
@@ -114,20 +114,20 @@ def train_and_predict_rnn(rnn, get_params, init_rnn_state, num_hiddens,
     loss = gloss.SoftmaxCrossEntropyLoss()
     start = time.time()
     for epoch in range(1, num_epochs+1):
-        if not is_random_iter:  
-            # If adjacent sampling is used, the hidden state is initialized 
+        if not is_random_iter:
+            # If adjacent sampling is used, the hidden state is initialized
             # at the beginning of the epoch
             state = init_rnn_state(batch_size, num_hiddens, ctx)
         l_sum, n = 0.0, 0
         data_iter = data_iter_fn(corpus_indices, batch_size, num_steps, ctx)
         for X, Y in data_iter:
-            if is_random_iter:  
-                # If random sampling is used, the hidden state is initialized 
+            if is_random_iter:
+                # If random sampling is used, the hidden state is initialized
                 # before each mini-batch update
                 state = init_rnn_state(batch_size, num_hiddens, ctx)
-            else:  
-                # Otherwise, the detach function needs to be used to separate 
-                # the hidden state from the computational graph to avoid 
+            else:
+                # Otherwise, the detach function needs to be used to separate
+                # the hidden state from the computational graph to avoid
                 # backpropagation beyond the current sample
                 for s in state:
                     s.detach()
@@ -137,16 +137,16 @@ def train_and_predict_rnn(rnn, get_params, init_rnn_state, num_hiddens,
                 (outputs, state) = rnn(inputs, state, params)
                 # After stitching it is (num_steps * batch_size, len(vocab))
                 outputs = nd.concat(*outputs, dim=0)
-                # The shape of Y is (batch_size, num_steps), and then becomes 
-                # a vector with a length of batch * num_steps after 
-                # transposition. This gives it a one-to-one correspondence 
+                # The shape of Y is (batch_size, num_steps), and then becomes
+                # a vector with a length of batch * num_steps after
+                # transposition. This gives it a one-to-one correspondence
                 # with output rows
                 y = Y.T.reshape((-1,))
                 # Average classification error via cross entropy loss
                 l = loss(outputs, y).mean()
             l.backward()
             grad_clipping(params, clipping_theta, ctx)  # Clip the gradient
-            sgd(params, lr, 1)  
+            sgd(params, lr, 1)
             # Since the error is the mean, no need to average gradients here
             l_sum += l.asscalar() * y.size
             n += y.size
@@ -156,13 +156,13 @@ def train_and_predict_rnn(rnn, get_params, init_rnn_state, num_hiddens,
             start = time.time()
         if epoch % (num_epochs // 2) == 0:
             for prefix in prefixes:
-                print(' -',  predict_rnn(prefix, 50, rnn, params, 
+                print(' -',  predict_rnn(prefix, 50, rnn, params,
                                          init_rnn_state, num_hiddens,
                                          vocab, ctx))
-                
 
-def train_and_predict_rnn_gluon(model, num_hiddens, corpus_indices, vocab, 
-                                ctx, num_epochs, num_steps, lr, 
+
+def train_and_predict_rnn_gluon(model, num_hiddens, corpus_indices, vocab,
+                                ctx, num_epochs, num_steps, lr,
                                 clipping_theta, batch_size, prefixes):
     """Train an Gluon RNN model and predict the next item in the sequence."""
     loss = gloss.SoftmaxCrossEntropyLoss()
@@ -198,7 +198,7 @@ def train_and_predict_rnn_gluon(model, num_hiddens, corpus_indices, vocab,
         if epoch % (num_epochs // 2) == 0:
             for prefix in prefixes:
                 print(' -', predict_rnn_gluon(prefix, 50, model, vocab, ctx))
-                
+
 
 def train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size,
               params=None, lr=None, trainer=None):
@@ -309,8 +309,8 @@ def train_gluon_ch9(trainer_name, trainer_hyperparams, features, labels,
     plt.plot(np.linspace(0, num_epochs, len(ls)), ls)
     plt.xlabel('epoch')
     plt.ylabel('loss')
-    
-def to_onehot(X, size):  
+
+def to_onehot(X, size):
     return [nd.one_hot(x, size) for x in X.T]
 
 def predict_rnn(prefix, num_chars, rnn, params, init_rnn_state,
@@ -334,8 +334,8 @@ def predict_rnn(prefix, num_chars, rnn, params, init_rnn_state,
             # use sampling, beam search or beam sampling for better sequences.
             output.append(int(Y[0].argmax(axis=1).asscalar()))
     return ''.join([vocab.idx_to_token[i] for i in output])
-    
-    
+
+
 def predict_rnn_gluon(prefix, num_chars, model, vocab, ctx):
     """Precit next chars with a Gluon RNN model"""
     # Use the model's member function to initialize the hidden state.
@@ -353,7 +353,7 @@ def predict_rnn_gluon(prefix, num_chars, model, vocab, ctx):
 
 def predict_sentiment(net, vocab, sentence):
     """Predict the sentiment of a given sentence."""
-    sentence = nd.array(vocab.to_indices(sentence), ctx=try_gpu())
+    sentence = nd.array(vocab[sentence.split()], ctx=try_gpu())
     label = nd.argmax(net(sentence.reshape((1, -1))), axis=1)
     return 'positive' if label.asscalar() == 1 else 'negative'
 
