@@ -132,15 +132,17 @@ class BiRNN(nn.Block):
         # transformed and the word feature is then extracted. The output shape
         # is (number of words, batch size, word vector dimension).
         embeddings = self.embedding(inputs.T)
-        # The shape of states is (number of words, batch size, 2 * number of
-        # hidden units).
-        states = self.encoder(embeddings)
+        # Since the input (embeddings) is the only argument passed into
+        # rnn.LSTM, it only returns the hidden states of the last hidden layer
+        # at different time step (outputs). The shape of outputs is
+        # (number of words, batch size, 2 * number of hidden units).
+        outputs = self.encoder(embeddings)
         # Concatenate the hidden states of the initial time step and final
         # time step to use as the input of the fully connected layer. Its
         # shape is (batch size, 4 * number of hidden units)
-        encoding = nd.concat(states[0], states[-1])
-        outputs = self.decoder(encoding)
-        return outputs
+        encoding = nd.concat(outputs[0], outputs[-1])
+        outs = self.decoder(encoding)
+        return outs
 ```
 
 Create a bidirectional recurrent neural network with two hidden layers.
