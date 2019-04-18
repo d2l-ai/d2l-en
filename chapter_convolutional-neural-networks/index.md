@@ -54,12 +54,13 @@ the pooling layers used to aggregate information
 across adjacent spatial regions, 
 the use of multiple *channels* (also called *filters*) at each layer,
 and a careful discussion of the structure of modern architectures.
-We will explore the design concepts of several representative deep
-convolutional neural networks, each of which was briefly a dominant architecture at some point since 2012. 
-These models include LeNet, the first convolutional network successfully deployed, long before the rise of deep learning;
-AlexNet, the first large-scale network deployed to beat conventional computer vision methods on a large-scale vision challenge; 
-the VGG network, which makes use of a number of repeating blocks of elements; the network in network (NiN) which convolves whole neural networks patch-wise over inputs; the GoogLeNet, which makes use of networks with parallel
-concatenations (GoogLeNet); residual networks (ResNet) which are currently the most popular go-to architecture today, and densely connected networks (DenseNet), which are expensive to compute but have set some recent benchmarks. Many of these networks were at one point winners or runners-up in the famous ImageNet competition which served as a barometer of progress on supervised learning tasks in computer vision since 2010.
+We will conclude the chapter with a full working example of LeNet, 
+the first convolutional network successfully deployed, 
+long before the rise of modern deep learning.
+In the next chapter we'll dive into full implementations
+of some of the recent popular neural networks 
+whose designs are representative of most of the techniques
+commonly used to design modern convolutional neural networks.
 
 
 ```eval_rst
@@ -73,11 +74,4 @@ concatenations (GoogLeNet); residual networks (ResNet) which are currently the m
    channels
    pooling
    lenet
-   alexnet
-   vgg
-   nin
-   googlenet
-   batch-norm
-   resnet
-   densenet
 ```
