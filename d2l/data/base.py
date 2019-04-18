@@ -51,17 +51,15 @@ def get_data_ch7():
     data = (data - data.mean(axis=0)) / data.std(axis=0)
     return nd.array(data[:, :-1]), nd.array(data[:, -1])
 
-def load_data_time_machine():
+def load_data_time_machine(num_examples=10000):
     """Load the time machine data set (available in the English book)."""
     with open('../data/timemachine.txt') as f:
-        corpus_chars = f.read()
-    corpus_chars = corpus_chars.replace('\n', ' ').replace('\r', ' ').lower()
-    corpus_chars = corpus_chars[0:10000]
-    idx_to_char = list(set(corpus_chars))
-    char_to_idx = dict([(char, i) for i, char in enumerate(idx_to_char)])
-    vocab_size = len(char_to_idx)
-    corpus_indices = [char_to_idx[char] for char in corpus_chars]
-    return corpus_indices, char_to_idx, idx_to_char, vocab_size
+        raw_text = f.read()
+    lines = raw_text.split('\n')
+    text = ' '.join(' '.join(lines).lower().split())[:num_examples]
+    vocab = Vocab(text)
+    corpus_indices = [vocab[char] for char in text]
+    return corpus_indices, vocab
 
 def mkdir_if_not_exist(path):
     """Make a directory if it does not exist."""
@@ -69,16 +67,21 @@ def mkdir_if_not_exist(path):
         os.makedirs(os.path.join(*path))
 
 class Vocab(object):
-    def __init__(self, tokens, min_freq):
+    def __init__(self, tokens, min_freq=0, use_special_tokens=False):
         counter = collections.Counter(tokens)
         token_freqs = sorted(counter.items(), key=lambda x: x[0])
         token_freqs.sort(key=lambda x: x[1], reverse=True)
-        self.pad, self.bos, self.eos, self.unk = (0, 1, 2, 3)
-        tokens = ['<pad>', '<bos>', '<eos>', '<unk>'] + [
-            token for token, freq in token_freqs if freq >= min_freq]
+        if use_special_tokens:
+            self.pad, self.bos, self.eos, self.unk = (0, 1, 2, 3)
+            special_tokens = ['<pad>', '<bos>', '<eos>', '<unk>']
+        else:
+            self.unk = 0
+            special_tokens = ['<unk>']
+        tokens = [token for token, freq in token_freqs 
+                  if freq >= min_freq and token not in special_tokens]
         self.idx_to_token = []
         self.token_to_idx = dict()
-        for token in tokens:
+        for token in special_tokens + tokens:
             self.idx_to_token.append(token)
             self.token_to_idx[token] = len(self.idx_to_token) - 1
 
@@ -125,7 +128,7 @@ def load_data_nmt(batch_size, max_len, num_examples=1000):
     # build vocab
     def build_vocab(tokens):
         tokens = [token for line in tokens for token in line]
-        return Vocab(tokens, min_freq=2)
+        return Vocab(tokens, min_freq=3, use_special_tokens=True)
     src_vocab, tgt_vocab = build_vocab(source), build_vocab(target)
 
     # convert to index arrays

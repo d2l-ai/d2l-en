@@ -77,7 +77,7 @@ import d2l
 from mxnet import nd, init
 from mxnet.gluon import rnn
 
-(corpus_indices, char_to_idx, idx_to_char, vocab_size) = d2l.load_data_time_machine()
+corpus_indices, vocab = d2l.load_data_time_machine()
 ```
 
 ### Initialize Model Parameters
@@ -85,7 +85,7 @@ from mxnet.gluon import rnn
 The next step is to initialize the model parameters. We draw the weights from a Gaussian with variance $0.01$ and set the bias to $0$. The hyper-parameter `num_hiddens` defines the number of hidden units. We instantiate all terms relating to update and reset gate and the candidate hidden state itself. Subsequently we attach gradients to all parameters.
 
 ```{.python .input  n=2}
-num_inputs, num_hiddens, num_outputs = vocab_size, 256, vocab_size
+num_inputs, num_hiddens, num_outputs = len(vocab), 256, len(vocab)
 ctx = d2l.try_gpu()
 
 def get_params():
@@ -141,18 +141,12 @@ def gru(inputs, state, params):
 Training and prediction work in exactly the same manner as before. That is, we need to define a number of epochs, a number of steps for truncation, the minibatch size, a learning rate and how aggressively we should be clipping the gradients. Lastly we create a string of 50 characters based on the prefixes *traveller* and *time traveller*.
 
 ```{.python .input  n=5}
-num_epochs, num_steps, batch_size, lr, clipping_theta = 250, 35, 32, 1e2, 1e-2
-pred_period, pred_len, prefixes = 50, 50, ['traveller', 'time traveller']
-```
+num_epochs, num_steps, batch_size, lr, clipping_theta = 100, 35, 32, 1, 1
+prefixes = ['traveller', 'time traveller']
 
-We generate a string of lyrics based on the currently trained model every 50 epochs.
-
-```{.python .input}
 d2l.train_and_predict_rnn(gru, get_params, init_gru_state, num_hiddens,
-                          vocab_size, ctx, corpus_indices, idx_to_char,
-                          char_to_idx, False, num_epochs, num_steps, lr,
-                          clipping_theta, batch_size, pred_period, pred_len,
-                          prefixes)
+                          corpus_indices, vocab, ctx, False, num_epochs, 
+                          num_steps, lr, clipping_theta, batch_size, prefixes)
 ```
 
 ## Concise Implementation
@@ -161,12 +155,10 @@ In Gluon, we can directly call the `GRU` class in the `rnn` module. This encapsu
 
 ```{.python .input  n=6}
 gru_layer = rnn.GRU(num_hiddens)
-model = d2l.RNNModel(gru_layer, vocab_size)
-model.initialize(init.Xavier(), ctx=ctx)
-d2l.train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
-                                corpus_indices, idx_to_char, char_to_idx,
-                                num_epochs, num_steps, lr, clipping_theta,
-                                batch_size, pred_period, pred_len, prefixes)
+model = d2l.RNNModel(gru_layer, len(vocab))
+d2l.train_and_predict_rnn_gluon(model, num_hiddens, corpus_indices, vocab, 
+                                ctx, num_epochs*5, num_steps, lr, 
+                                clipping_theta, batch_size, prefixes)
 ```
 
 ## Summary
