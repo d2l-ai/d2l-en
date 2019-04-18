@@ -9,7 +9,7 @@ __all__ = ['load_data_imdb']
 def load_data_imdb(batch_size, max_len=500):
     """Download a IMDB dataset, return the vocabulary and iterators"""
 
-    data_dir = '../data'
+    data_dir = './'
     url = 'http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz'
     fname = gutils.download(url, data_dir)
     with tarfile.open(fname, 'r') as f:

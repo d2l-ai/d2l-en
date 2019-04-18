@@ -25,7 +25,7 @@ We use Stanford's Large Movie Review Dataset as the data set for text sentiment 
 We first download this data set to the "../data" path and extract it to "../data/aclImdb".
 
 ```{.python .input  n=23}
-data_dir = '../data'
+data_dir = './'
 url = 'http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz'
 fname = gutils.download(url, data_dir)
 with tarfile.open(fname, 'r') as f:
