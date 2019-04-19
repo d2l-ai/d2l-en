@@ -3,6 +3,18 @@ $(document).ready(function () {
     $('h2').each(function(){
         $(this).html($(this).html().replace(/^\d+.\d+./, ''))
     });
+    $('h3').each(function(){
+        $(this).html($(this).html().replace(/^\d+.\d+./, ''))
+    });
+    $('h4').each(function(){
+        $(this).html($(this).html().replace(/^\d+.\d+./, ''))
+    });
+    $('h5').each(function(){
+        $(this).html($(this).html().replace(/^\d+.\d+./, ''))
+    });
+    $('h6').each(function(){
+        $(this).html($(this).html().replace(/^\d+.\d+./, ''))
+    });
     $('.localtoc').each(function(){
         $(this).find('a').each(function(){
             $(this).html($(this).html().replace(/^\d+\.\d+\./, ''))
