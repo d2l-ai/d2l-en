@@ -51,17 +51,15 @@ def get_data_ch7():
     data = (data - data.mean(axis=0)) / data.std(axis=0)
     return nd.array(data[:, :-1]), nd.array(data[:, -1])
 
-def load_data_time_machine():
+def load_data_time_machine(num_examples=10000):
     """Load the time machine data set (available in the English book)."""
     with open('../data/timemachine.txt') as f:
-        corpus_chars = f.read()
-    corpus_chars = corpus_chars.replace('\n', ' ').replace('\r', ' ').lower()
-    corpus_chars = corpus_chars[0:10000]
-    idx_to_char = list(set(corpus_chars))
-    char_to_idx = dict([(char, i) for i, char in enumerate(idx_to_char)])
-    vocab_size = len(char_to_idx)
-    corpus_indices = [char_to_idx[char] for char in corpus_chars]
-    return corpus_indices, char_to_idx, idx_to_char, vocab_size
+        raw_text = f.read()
+    lines = raw_text.split('\n')
+    text = ' '.join(' '.join(lines).lower().split())[:num_examples]
+    vocab = Vocab(text)
+    corpus_indices = [vocab[char] for char in text]
+    return corpus_indices, vocab
 
 def mkdir_if_not_exist(path):
     """Make a directory if it does not exist."""
@@ -69,16 +67,21 @@ def mkdir_if_not_exist(path):
         os.makedirs(os.path.join(*path))
 
 class Vocab(object):
-    def __init__(self, tokens, min_freq):
+    def __init__(self, tokens, min_freq=0, use_special_tokens=False):
         counter = collections.Counter(tokens)
         token_freqs = sorted(counter.items(), key=lambda x: x[0])
         token_freqs.sort(key=lambda x: x[1], reverse=True)
-        self.pad, self.bos, self.eos, self.unk = (0, 1, 2, 3)
-        tokens = ['<pad>', '<bos>', '<eos>', '<unk>'] + [
-            token for token, freq in token_freqs if freq >= min_freq]
+        if use_special_tokens:
+            self.pad, self.bos, self.eos, self.unk = (0, 1, 2, 3)
+            special_tokens = ['<pad>', '<bos>', '<eos>', '<unk>']
+        else:
+            self.unk = 0
+            special_tokens = ['<unk>']
+        tokens = [token for token, freq in token_freqs
+                  if freq >= min_freq and token not in special_tokens]
         self.idx_to_token = []
         self.token_to_idx = dict()
-        for token in tokens:
+        for token in special_tokens + tokens:
             self.idx_to_token.append(token)
             self.token_to_idx[token] = len(self.idx_to_token) - 1
 
@@ -96,57 +99,3 @@ class Vocab(object):
             return self.idx_to_token[indices]
         else:
             return [self.idx_to_token[index] for index in indices]
-
-def load_data_nmt(batch_size, max_len, num_examples=1000):
-    # download and preprocess
-    def preprocess_raw(text):
-        text = text.replace('\u202f', ' ').replace('\xa0', ' ')
-        out = ''
-        for i, char in enumerate(text.lower()):
-            if char in (',', '!', '.') and text[i-1] != ' ':
-                out += ' '
-            out += char
-        return out
-    fname = gutils.download('http://www.manythings.org/anki/fra-eng.zip')
-    with zipfile.ZipFile(fname, 'r') as f:
-        raw_text = f.read('fra.txt').decode("utf-8")
-    text = preprocess_raw(raw_text)
-
-    # tokenize
-    source, target = [], []
-    for i, line in enumerate(text.split('\n')):
-        if i >= num_examples:
-            break
-        parts = line.split('\t')
-        if len(parts) == 2:
-            source.append(parts[0].split(' '))
-            target.append(parts[1].split(' '))
-
-    # build vocab
-    def build_vocab(tokens):
-        tokens = [token for line in tokens for token in line]
-        return Vocab(tokens, min_freq=2)
-    src_vocab, tgt_vocab = build_vocab(source), build_vocab(target)
-
-    # convert to index arrays
-    def pad(line, max_len, padding_token):
-        if len(line) > max_len:
-            return line[:max_len]
-        return line + [padding_token] * (max_len - len(line))
-
-    def build_array(lines, vocab, max_len, is_source):
-        lines = [vocab[line] for line in lines]
-        if not is_source:
-            lines = [[vocab.bos] + line + [vocab.eos] for line in lines]
-        array = nd.array([pad(line, max_len, vocab.pad) for line in lines])
-        valid_len = (array != vocab.pad).sum(axis=1)
-        return array, valid_len
-
-    src_array, src_valid_len = build_array(source, src_vocab, max_len, True)
-    tgt_array, tgt_valid_len = build_array(target, tgt_vocab, max_len, False)
-
-    # construct data iterator
-    train_set = gdata.ArrayDataset(src_array, src_valid_len, tgt_array, tgt_valid_len)
-    train_iter = gdata.DataLoader(train_set, batch_size, shuffle=True)
-
-    return src_vocab, tgt_vocab, train_iter

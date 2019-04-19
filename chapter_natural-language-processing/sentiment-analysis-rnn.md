@@ -8,13 +8,11 @@ Similar to search synonyms and analogies, text classification is also a downstre
 import sys
 sys.path.insert(0, '..')
 
-import collections
 import d2l
 from mxnet import gluon, init, nd
-from mxnet.contrib import text
 from mxnet.gluon import data as gdata, loss as gloss, nn, rnn, utils as gutils
+from mxnet.contrib import text
 import os
-import random
 import tarfile
 ```
 
@@ -26,76 +24,68 @@ We use Stanford's Large Movie Review Dataset as the data set for text sentiment 
 
 We first download this data set to the "../data" path and extract it to "../data/aclImdb".
 
-```{.python .input  n=3}
-# This function has been saved in the d2l package for future use
-def download_imdb(data_dir='../data'):
-    url = ('http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz')
-    sha1 = '01ada507287d82875905620988597833ad4e0903'
-    fname = gutils.download(url, data_dir, sha1_hash=sha1)
-    with tarfile.open(fname, 'r') as f:
-        f.extractall(data_dir)
-
-download_imdb()
+```{.python .input  n=23}
+data_dir = './'
+url = 'http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz'
+fname = gutils.download(url, data_dir)
+with tarfile.open(fname, 'r') as f:
+    f.extractall(data_dir)
 ```
 
 Next, read the training and test data sets. Each example is a review and its corresponding label: 1 indicates "positive" and 0 indicates "negative".
 
-```{.python .input  n=13}
-# This function has been saved in the d2l package for future use
+```{.python .input  n=24}
 def read_imdb(folder='train'):
-    data = []
+    data, labels = [], []
     for label in ['pos', 'neg']:
-        folder_name = os.path.join('../data/aclImdb/', folder, label)
+        folder_name = os.path.join(data_dir, 'aclImdb', folder, label)
         for file in os.listdir(folder_name):
             with open(os.path.join(folder_name, file), 'rb') as f:
-                review = f.read().decode('utf-8').replace('\n', '').lower()
-                data.append([review, 1 if label == 'pos' else 0])
-    random.shuffle(data)
-    return data
+                review = f.read().decode('utf-8').replace('\n', '')
+                data.append(review)
+                labels.append(1 if label == 'pos' else 0)
+    return data, labels
 
 train_data, test_data = read_imdb('train'), read_imdb('test')
+print('# trainings:', len(train_data[0]), '\n# tests:', len(test_data[0]))
+for x, y in zip(train_data[0][:3], train_data[1][:3]):
+    print('label:', y, 'review:', x[0:60])
 ```
 
-### Data Preprocessing
+### Tokenization and Vocabulary 
 
-We need to segment each review to get a review with segmented words. The `get_tokenized_imdb` function defined here uses the easiest method: word tokenization based on spaces.
-
-```{.python .input  n=14}
-# This function has been saved in the d2l package for future use
-def get_tokenized_imdb(data):
-    def tokenizer(text):
-        return [tok.lower() for tok in text.split(' ')]
-    return [tokenizer(review) for review, _ in data]
-```
-
-Now, we can create a dictionary based on the training data set with the words segmented. Here, we have filtered out words that appear less than 5 times.
+We use a word as a token, which can be split based on spaces.
 
 ```{.python .input  n=28}
-# This function has been saved in the d2l package for future use
-def get_vocab_imdb(data):
-    tokenized_data = get_tokenized_imdb(data)
-    counter = collections.Counter([tk for st in tokenized_data for tk in st])
-    return text.vocab.Vocabulary(counter, min_freq=5)
+def tokenize(sentences):
+    return [line.split(' ') for line in sentences]
 
-vocab = get_vocab_imdb(train_data)
-'# Words in vocab:', len(vocab)
+train_tokens = tokenize(train_data[0])
+test_tokens = tokenize(test_data[0])
 ```
 
-Because the reviews have different lengths, so they cannot be directly combined into mini-batches, we define the `preprocess_imdb` function to segment each comment, convert it into a word index through a dictionary, and then fix the length of each comment to 500 by truncating or adding 0s.
+Then we can create a dictionary based on the training data set with the words segmented. 
+Here, we have filtered out words that appear less than 5 times.
+
+```{.python .input}
+vocab = d2l.Vocab([tk for line in train_tokens for tk in line], min_freq=5)
+```
+
+### Padding to the Same Length
+
+Because the reviews have different lengths, so they cannot be directly combined into mini-batches. Here we fix the length of each comment to 500 by truncating or adding "&lt;unk&gt;" indices.
 
 ```{.python .input  n=44}
-# This function has been saved in the d2l package for future use
-def preprocess_imdb(data, vocab):
-    # Make the length of each comment 500 by truncating or adding 0s
-    max_l = 500
+max_len = 500
 
-    def pad(x):
-        return x[:max_l] if len(x) > max_l else x + [0] * (max_l - len(x))
-
-    tokenized_data = get_tokenized_imdb(data)
-    features = nd.array([pad(vocab.to_indices(x)) for x in tokenized_data])
-    labels = nd.array([score for _, score in data])
-    return features, labels
+def pad(x):
+    if len(x) > max_len:        
+        return x[:max_len]
+    else:
+        return x + [vocab.unk] * (max_len - len(x))
+    
+train_features = nd.array([pad(vocab[line]) for line in train_tokens])
+test_features = nd.array([pad(vocab[line]) for line in test_tokens])
 ```
 
 ### Create Data Iterator
@@ -104,8 +94,8 @@ Now, we will create a data iterator. Each iteration will return a mini-batch of 
 
 ```{.python .input}
 batch_size = 64
-train_set = gdata.ArrayDataset(*preprocess_imdb(train_data, vocab))
-test_set = gdata.ArrayDataset(*preprocess_imdb(test_data, vocab))
+train_set = gdata.ArrayDataset(train_features, train_data[1])
+test_set = gdata.ArrayDataset(test_features, test_data[1])
 train_iter = gdata.DataLoader(train_set, batch_size, shuffle=True)
 test_iter = gdata.DataLoader(test_set, batch_size)
 ```
@@ -116,8 +106,10 @@ Print the shape of the first mini-batch of data and the number of mini-batches i
 for X, y in train_iter:
     print('X', X.shape, 'y', y.shape)
     break
-'#batches:', len(train_iter)
+'# batches:', len(train_iter)
 ```
+
+Lastly, we will save a function `get_data_imdb` into `d2l`, which returns the vocabulary and data iterators. 
 
 ## Use a Recurrent Neural Network Model
 
@@ -125,9 +117,9 @@ In this model, each word first obtains a feature vector from the embedding layer
 
 ```{.python .input  n=46}
 class BiRNN(nn.Block):
-    def __init__(self, vocab, embed_size, num_hiddens, num_layers, **kwargs):
+    def __init__(self, vocab_size, embed_size, num_hiddens, num_layers, **kwargs):
         super(BiRNN, self).__init__(**kwargs)
-        self.embedding = nn.Embedding(len(vocab), embed_size)
+        self.embedding = nn.Embedding(vocab_size, embed_size)
         # Set Bidirectional to True to get a bidirectional recurrent neural
         # network
         self.encoder = rnn.LSTM(num_hiddens, num_layers=num_layers,
@@ -140,22 +132,24 @@ class BiRNN(nn.Block):
         # transformed and the word feature is then extracted. The output shape
         # is (number of words, batch size, word vector dimension).
         embeddings = self.embedding(inputs.T)
-        # The shape of states is (number of words, batch size, 2 * number of
-        # hidden units).
-        states = self.encoder(embeddings)
+        # Since the input (embeddings) is the only argument passed into
+        # rnn.LSTM, it only returns the hidden states of the last hidden layer
+        # at different time step (outputs). The shape of outputs is
+        # (number of words, batch size, 2 * number of hidden units).
+        outputs = self.encoder(embeddings)
         # Concatenate the hidden states of the initial time step and final
         # time step to use as the input of the fully connected layer. Its
         # shape is (batch size, 4 * number of hidden units)
-        encoding = nd.concat(states[0], states[-1])
-        outputs = self.decoder(encoding)
-        return outputs
+        encoding = nd.concat(outputs[0], outputs[-1])
+        outs = self.decoder(encoding)
+        return outs
 ```
 
 Create a bidirectional recurrent neural network with two hidden layers.
 
 ```{.python .input}
 embed_size, num_hiddens, num_layers, ctx = 100, 100, 2, d2l.try_all_gpus()
-net = BiRNN(vocab, embed_size, num_hiddens, num_layers)
+net = BiRNN(len(vocab), embed_size, num_hiddens, num_layers)
 net.initialize(init.Xavier(), ctx=ctx)
 ```
 
@@ -163,15 +157,22 @@ net.initialize(init.Xavier(), ctx=ctx)
 
 Because the training data set for sentiment classification is not very large, in order to deal with overfitting, we will directly use word vectors pre-trained on a larger corpus as the feature vectors of all words. Here, we load a 100-dimensional GloVe word vector for each word in the dictionary `vocab`.
 
-```{.python .input  n=45}
+```{.python .input}
 glove_embedding = text.embedding.create(
-    'glove', pretrained_file_name='glove.6B.100d.txt', vocabulary=vocab)
+    'glove', pretrained_file_name='glove.6B.100d.txt')
+```
+
+Query the word vectors that in our vocabulary.
+
+```{.python .input}
+embeds = glove_embedding.get_vecs_by_tokens(vocab.idx_to_token)
+embeds.shape
 ```
 
 Then, we will use these word vectors as feature vectors for each word in the reviews. Note that the dimensions of the pre-trained word vectors need to be consistent with the embedding layer output size `embed_size` in the created model. In addition, we no longer update these word vectors during training.
 
 ```{.python .input  n=47}
-net.embedding.weight.set_data(glove_embedding.idx_to_vec)
+net.embedding.weight.set_data(embeds)
 net.embedding.collect_params().setattr('grad_req', 'null')
 ```
 
@@ -189,9 +190,8 @@ d2l.train(train_iter, test_iter, net, loss, trainer, ctx, num_epochs)
 Finally, define the prediction function.
 
 ```{.python .input  n=49}
-# This function has been saved in the d2l package for future use
 def predict_sentiment(net, vocab, sentence):
-    sentence = nd.array(vocab.to_indices(sentence), ctx=d2l.try_gpu())
+    sentence = nd.array(vocab[sentence.split()], ctx=d2l.try_gpu())
     label = nd.argmax(net(sentence.reshape((1, -1))), axis=1)
     return 'positive' if label.asscalar() == 1 else 'negative'
 ```
@@ -199,11 +199,11 @@ def predict_sentiment(net, vocab, sentence):
 Then, use the trained model to classify the sentiments of two simple sentences.
 
 ```{.python .input  n=50}
-predict_sentiment(net, vocab, ['this', 'movie', 'is', 'so', 'great'])
+predict_sentiment(net, vocab, 'this movie is so great')
 ```
 
 ```{.python .input}
-predict_sentiment(net, vocab, ['this', 'movie', 'is', 'so', 'bad'])
+predict_sentiment(net, vocab, 'this movie is so bad')
 ```
 
 ## Summary

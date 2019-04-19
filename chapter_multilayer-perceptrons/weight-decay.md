@@ -11,7 +11,7 @@ typically making it impossible in the short run.
 For now, let's assume that we have already obtained 
 as much high-quality data as our resources permit
 and focus on techniques aimed at limiting the capacity 
-of the fuction classes under consideration. 
+of the function classes under consideration. 
 
 In our toy example, 
 we saw that we could control the complexity of a polynomial 
@@ -303,6 +303,7 @@ def fit_and_plot_gluon(wd):
     net = nn.Sequential()
     net.add(nn.Dense(1))
     net.initialize(init.Normal(sigma=1))
+    loss = gloss.L2Loss()
     # The weight parameter has been decayed. Weight names generally end with
     # "weight".
     trainer_w = gluon.Trainer(net.collect_params('.*weight'), 'sgd',

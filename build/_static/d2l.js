@@ -1,3 +1,35 @@
+// Shorten the local section number, e.g. 4.3.2.1 -> 2.1
+$(document).ready(function () {
+    $('h2').each(function(){
+        $(this).html($(this).html().replace(/^\d+.\d+./, ''))
+    });
+    $('h3').each(function(){
+        $(this).html($(this).html().replace(/^\d+.\d+./, ''))
+    });
+    $('h4').each(function(){
+        $(this).html($(this).html().replace(/^\d+.\d+./, ''))
+    });
+    $('h5').each(function(){
+        $(this).html($(this).html().replace(/^\d+.\d+./, ''))
+    });
+    $('h6').each(function(){
+        $(this).html($(this).html().replace(/^\d+.\d+./, ''))
+    });
+    $('.localtoc').each(function(){
+        $(this).find('a').each(function(){
+            $(this).html($(this).html().replace(/^\d+\.\d+\./, ''))
+        });
+    });
+    $('.toctree-wrapper').each(function(){
+        $(this).find('a').each(function(){
+            if ($(this).text().match(/^\d+\.\d+.\d+\./) != null) {
+                $(this).html($(this).html().replace(/^\d+\.\d+\./, ''))
+            }
+        });
+    });
+});
+
+// Replace the QR code with an embeded discussion thread
 $(document).ready(function () {
     var discuss_str = 'Discuss'
     $('h2').each(function(){
