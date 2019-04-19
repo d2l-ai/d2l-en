@@ -290,7 +290,7 @@ the English and the Chinese drafts.
 They helped improve the content and offered valuable feedback.
 Specifically, we thank every contributor of this English draft
 for making it better for everyone.
-Their GitHub IDs or names are (in no particular order):
+Their GitHub usernames or names are (in no particular order):
 alxnorden, avinashingit, bowen0701, brettkoonce, Chaitanya Prakash Bapat,
 cryptonaut, Davide Fiocco, edgarroman, gkutiel, John Mitro, Liang Pu, Rahul Agarwal, mohamed-ali,
 mstewart141, Mike Müller, NRauschmayr, Prakhar Srivastav, sad-, sfermigier, Sheng Zha, sundeepteki,
