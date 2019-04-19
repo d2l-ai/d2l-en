@@ -369,7 +369,7 @@ owing to non-differentiability or other complications.
 In these cases, it's common to optimize a surrogate objective.
 
 Typically, the loss function is defined
-with respect to the models parameters
+with respect to the model's parameters
 and depends upon the dataset.
 The best values of our model's parameters are learned
 by minimizing the loss incurred on a *training set*
