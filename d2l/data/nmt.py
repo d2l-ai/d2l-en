@@ -6,8 +6,8 @@ from .base import Vocab
 __all__  = ['load_data_nmt']
 
 def load_data_nmt(batch_size, max_len, num_examples=1000):
-    """Download a NMT dataset, return its vocabulary and data iterator"""
-    # download and preprocess
+    """Download an NMT dataset, return its vocabulary and data iterator."""
+    # Download and preprocess
     def preprocess_raw(text):
         text = text.replace('\u202f', ' ').replace('\xa0', ' ')
         out = ''
@@ -21,7 +21,7 @@ def load_data_nmt(batch_size, max_len, num_examples=1000):
         raw_text = f.read('fra.txt').decode("utf-8")
     text = preprocess_raw(raw_text)
 
-    # tokenize
+    # Tokenize
     source, target = [], []
     for i, line in enumerate(text.split('\n')):
         if i >= num_examples:
@@ -31,13 +31,13 @@ def load_data_nmt(batch_size, max_len, num_examples=1000):
             source.append(parts[0].split(' '))
             target.append(parts[1].split(' '))
 
-    # build vocab
+    # Build vocab
     def build_vocab(tokens):
         tokens = [token for line in tokens for token in line]
         return Vocab(tokens, min_freq=3, use_special_tokens=True)
     src_vocab, tgt_vocab = build_vocab(source), build_vocab(target)
 
-    # convert to index arrays
+    # Convert to index arrays
     def pad(line, max_len, padding_token):
         if len(line) > max_len:
             return line[:max_len]
@@ -54,7 +54,7 @@ def load_data_nmt(batch_size, max_len, num_examples=1000):
     src_array, src_valid_len = build_array(source, src_vocab, max_len, True)
     tgt_array, tgt_valid_len = build_array(target, tgt_vocab, max_len, False)
 
-    # construct data iterator
+    # Construct data iterator
     train_set = gdata.ArrayDataset(src_array, src_valid_len, tgt_array, tgt_valid_len)
     train_iter = gdata.DataLoader(train_set, batch_size, shuffle=True)
 
