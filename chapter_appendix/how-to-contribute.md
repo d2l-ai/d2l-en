@@ -1,89 +1,96 @@
 # How to Contribute to This Book
 
-Contributions by readers [1] help us make this a better book. If you find a typo, an outdated link, something where you think we missed a citation, or where the code doesn't look elegant or where an explanation is unclear, please contribute back and help us help our readers. While in regular books the delay between print runs (and thus between typo corrections) can be measured in years, it typically takes hours to days to incorporate an improvement in this book. This is all possible due to version control and continuous integration testing. To do so you need to install Git and submit a pull request [2] to the GitHub repository. When your pull request is merged into the code repository by the author, you will become a contributor. In a nutshell the process works as described in the diagram below. 
+Contributions by readers [1] help us improve this book. If you find a typo, an outdated link, something where you think we missed a citation, where the code doesn't look elegant or where an explanation is unclear, please contribute back and help us help our readers. While in regular books the delay between print runs (and thus between typo corrections) can be measured in years, it typically takes hours to days to incorporate an improvement in this book. This is all possible due to version control and continuous integration testing. To do so you need to install Git and submit a pull request [2] to the GitHub repository. When your pull request is merged into the code repository by the author, you will become a contributor. In a nutshell the process works as described in the diagram below. 
 
 ![Contributing to the book.](../img/contribute.svg)
 
 ## From Reader to Contributor in 6 Steps
 
-We will walk you through the steps in detail. If you are already familiar with Git you can skip this section. To make matters concrete we assume that the contributor's user name is `astonzhang`. 
+We will walk you through the steps in detail. If you are already familiar with Git you can skip this section. For concreteness we assume that the contributor's user name is `smolix`. 
 
 ### Install Git
 
-The Git open source book [3] details how to install Git. This typically works via `apt-get install git` on Ubuntu Linux, by installing the Xcode developer tools on macOS, or a GUI client such as [Git Fork](https://git-fork.com/). If you don't have a GitHub account, you need to sign up for one [4].
+The Git open source book [3] describes how to install Git. This typically works via `apt-get install git` on Ubuntu Linux, by installing the Xcode developer tools on macOS, or by using GitHub's [desktop client](https://desktop.github.com). If you don't have a GitHub account, you need to sign up for one [4].
 
-### Log in to GitHub.
+### Log in to GitHub
 
-Enter the address of the book's code repository in your browser [2]. Click on the "Fork" button in the red box at the top-right of Figure 13.20 to clone (get a copy of) the code repository of this book.
+Enter the address of the book's code repository in your browser [2]. Click on the `Fork` button in the red box at the top-right the figure below to make a copy of the repository of this book. This is now *your copy* and you can change it any way you want. 
 
-![The code repository page.](../img/contrib01.png)
+![The code repository page.](../img/git-fork.png)
 
+Now, the code repository of this book will be copied to your username, such as `smolix/d2l-en` shown at the top-left of the screenshot below.
 
-Now, the code repository of this book will be copied to your username, such as "your_github_username/d2l-en" shown at the top-left of Figure 13.21.
-
-![Copy the code repository.](../img/contrib02.png)
+![Copy the code repository.](../img/git-forked.png)
 
 ### Clone the Repository
 
-Click the green "Clone or download" button on the right side of Figure 13.21 and click the button in the red box to copy the code repository address under your username. Follow the method described in the ["Acquiring and Running Codes in This Book"](../chapter_prerequisite/install.md) section to enter command line mode. Here, we assume you want to save the code repository under the local "~/repo" path. Go to this path, type `git clone`, and paste the code repository address under your username. Execute the following command:
+To clone the repository (i.e. to make a local copy) we need to get its repository address. The green button on the picture below displays this. Make sure that your local copy is up to date with the main repository if you decide to keep this fork around for longer. For now simply follow the instructions in the [Installation](../chapter_prerequisite/install.md) section to get started. The main difference is that you're now downloading *your own fork* of the repository. 
 
-```{.python .input}
+![Git clone](../img/git-clone.png)
+
+```
 # Replace your_github_username with your GitHub username
 git clone https://github.com/your_github_username/d2l-en.git
 ```
 
-Now, all the files in the code repository of this book will be saved in the local "~/repo/d2l-en" path.
-
+On Unix the above command copies all the code from GitHub to the directory d2l-en. 
 
 ### Edit the Book and Push
 
-Edit the code repository of this book under the local path. Assume we have modified a typo in the file `~/repo/d2l-en/chapter_deep-learning-basics/linear-regression.md`. In command line mode, enter the path `~/repo/d2l-en` and execute the command:
+Now it's time to edit the book. It's best to edit the notebooks in Jupyter following the [instructions](../chapter_appendix/jupyter.md) in the appendix. Make the changes and check that they're OK. Assume we have modified a typo in the file `~/d2l-en/chapter_appendix/how-to-contribute.md`. Git will tell you all the things that have changed:
 
-```{.python .input}
+```
 git status
 ```
 
-At this point Git will prompt that the "chapter_deep-learning-basics/linear-regression.md" file has been modified, as shown in Figure 13.22.
+At this point Git will prompt that the "chapter_deep-learning-basics/linear-regression.md" file has been modified.
 
-![Git prompts that the chapter_deep-learning-basics/linear-regression.md file has been modified.](../img/contrib03.png)
+```
+mylaptop:d2l-en smola$ git status
+On branch master
+Your branch is up-to-date with 'origin/master'.
 
-After confirming the file submitting the change, execute the following command:
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
 
-```{.python .input}
-git add chapter_deep-learning-basics/linear-regression.md
-git commit -m 'fix typo in linear-regression.md'
+	modified:   chapter_appendix/how-to-contribute.md
+```
+
+After confirming that this is what you want, execute the following command:
+
+```
+git add chapter_appendix/how-to-contribute.md
+git commit -m 'fix typo in git documentation'
 git push
 ```
 
-Here, `'fix typo in linear-regression.md'` is the description of the submitted change. You can replace this with other meaningful descriptive information.
-
 ### Pull Request
 
-Enter the code repository address of this book [2] in your browser again. Click the "New pull request" button in the red box on the bottom-left of Figure 13.20. On the page that appears, click the "compare across forks" link in the red box on the right side of Figure 13.23. Then, click the "head fork: d2l-ai/d2l-en" button in the red box below. Enter your GitHub username in the pop-up text box and select "your_github_username/d2l-en" from the drop-down menu, as shown in Figure 13.23.
+Go to your fork of the repository on GitHub and select "New pull request". This will open up a screen that shows you the changes between your edits and what is current in the main repository of the book. 
 
-![Select the code repository where the source of the change is located.](../img/contrib04.png)
+![Pull Request](../img/git-newpr.png)
 
 
 ### Submit Pull Request
 
-As shown in Figure 13.24, describe the pull request you want to submit in the title and body text boxes. Click the green "Create pull request" button in the red box to submit the pull request.
+Finally, submit a pull request. Make sure to describe in the pull request what you changed. This will make it easier for the authors to review it and to merge it with the book. Depending on the changes this might get accepted right away, rejected, or more likely, you'll get some feedback on the changes. Once you've incorporated them, you're good to go. 
 
-![Describe and submit a pull request.](../img/contrib05.png)
+![Create Pull Request](../img/git-createpr.png)
 
-
-After submitting the request, you will see the page shown in Figure 13.25, which indicates that the pull request has been submitted.
-
-![The pull request has been submitted.](../img/contrib06.png)
-
+Your pull request will appear among the list of requests in the main repository. We will make every effort to process it quickly. 
 
 ## Summary
 
 * You can use GitHub to contribute to this book.
+* Forking a repositoy is the first step to contributing, since it allows you to edit things locally and only contribute back once you're ready.
+* Pull requests are how contributions are being bundled up. Try not to submit huge pull requests since this makes them hard to understand and incorporate. Better send several smaller ones. 
 
+## Exercises
 
-## Exercise
-
-* If you feel that some parts of the book can be improved, try submitting a pull request.
+1. Star and fork the `d2l-en` repository. 
+1. Find some code that needs improvement and submit a pull request.
+1. Find a reference that we missed and submit a pull request. 
 
 
 ## References
