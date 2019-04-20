@@ -91,7 +91,7 @@ def train(train_iter, test_iter, net, loss, trainer, ctx, num_epochs):
 
 
 def train_2d(trainer):
-    """Optimize the objective function of 2d variables with a customized trainer."""
+    """Optimize the objective function of 2D variables with a customized trainer."""
     x1, x2 = -5, -2
     s_x1, s_x2 = 0, 0
     res = [(x1, x2)]
