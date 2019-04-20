@@ -11,8 +11,8 @@ This process applies to other instances (and other clouds), too, albeit with som
 
 ## Register Account and Log In
 
-First, we need to register an account at https://aws.amazon.com/. We strongly encourage you to use two-factor authentication for added security. Furthermore, it is a good idea to set up detailed billing and spending alerts to avoid any unexpected surprises if you forget to suspend your computers. Note that you will need a credit card. 
-After logging into your AWS account, click "EC2" (marked by the red box in the figure above) to go to the EC2 panel.
+First, we need to register an account at https://aws.amazon.com/. We strongly encourage you to use two-factor authentication for additional security. Furthermore, it is a good idea to set up detailed billing and spending alerts to avoid any unexpected surprises if you forget to suspend your computers. Note that you will need a credit card. 
+After logging into your AWS account, click "EC2" (marked by the red box in the figure below) to go to the EC2 panel.
 
 ![ Open the EC2 console. ](../img/aws.png)
 
