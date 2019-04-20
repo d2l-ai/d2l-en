@@ -43,14 +43,6 @@ The main symbols used in this book are listed below.
 |$\exp(\cdot)$|Exponential function        |
 
 
-## Derivatives and Gradients
-
-|Symbol                           |Type                                         |
-|---------------------------------|---------------------------------------------|
-| $\frac{dy}{dx}$                 |Derivative of $y$ with respect to $x$        |
-| $\partial_x y$                  |Partial derivative of $y$ with respect to $x$|
-| $\nabla_{\mathbf{x}} y$              |Gradient of $y$ with respect to $\mathbf{x}$      |
-
 ## Probability and Statistics
 
 |Symbol                                   |Type                                                              |
