@@ -101,7 +101,7 @@ sudo apt-get install -y build-essential git libgfortran3
 
 NVIDIA frequently releases updates to CUDA (typically one major version per year). Here we download CUDA 10.0. Visit NVIDIA's official repository at (https://developer.nvidia.com/cuda-toolkit-archive) to find the download link of CUDA 10.0 as shown below.
 
-![Find the CUDA 9.0 download address. ](../img/cuda.png)
+![Find the CUDA 10.0 download address. ](../img/cuda.png)
 
 After copying the download address in the browser, download and install CUDA 10.0. Presently the following link is up to date:
 
