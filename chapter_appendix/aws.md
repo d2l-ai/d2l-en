@@ -1,9 +1,9 @@
 # Using AWS Instances
 
-If your local machine has limited computing resources or lacks a GPU you can use cloud computing services. This gives you access to more powerful computers to run the GPU intensive deep learning code in this book. In this section, we will show you how to set up an instance and use Jupyter Notebooks to run code on AWS (Amazon Web Services). The walkthrough includes a number of steps:
+Many deep learning applications require significant amounts of computation. Your local machine might be too slow to solve these problems in a reasonable amount of time. Cloud computing services can give you access to more powerful computers to run the GPU intensive portions of this book. In this section, we will show you how to set up an instance. We will use Jupyter Notebooks to run code on AWS (Amazon Web Services). The walkthrough includes a number of steps:
 
 1. Request for a GPU instance. 
-1. Optionally - install CUDA (or use an AMI with CUDA preinstalled). 
+1. Optionally: install CUDA or use an AMI with CUDA preinstalled. 
 1. Set up the corresponding MXNet GPU version.
 
 This process applies to other instances (and other clouds), too, albeit with some minor modifications. 
@@ -11,21 +11,21 @@ This process applies to other instances (and other clouds), too, albeit with som
 
 ## Register Account and Log In
 
-First, we need to register an account at https://aws.amazon.com/. We strongly encourage you to use two-factor authentication for added security. Furthermore, it is a good idea to set up detailed billing and spending alerts to avoid any unexpected surprises if you forget to suspend your computers. Note that you will need a credit card. 
-After logging into your AWS account, click "EC2" (marked by the red box in the figure above) to go to the EC2 panel.
+First, we need to register an account at https://aws.amazon.com/. We strongly encourage you to use two-factor authentication for additional security. Furthermore, it is a good idea to set up detailed billing and spending alerts to avoid any unexpected surprises if you forget to suspend your computers. Note that you will need a credit card. 
+After logging into your AWS account, click "EC2" (marked by the red box in the figure below) to go to the EC2 panel.
 
 ![ Open the EC2 console. ](../img/aws.png)
 
 
 ## Create and Run an EC2 Instance
 
-Figure 13.9 shows the EC2 panel with sensitive account information greyed out. Select a nearby data center to reduce latency, e.g. Oregon. If you are located in China you can select a nearby Asia Pacific region, such as Seoul or Tokyo. Please note that some data centers may not have GPU instances. Click the "Launch Instance" button marked by the red box in Figure 13.8 to launch your instance.
+Figure 14.9 shows the EC2 panel with sensitive account information greyed out. Select a nearby data center to reduce latency, e.g. Oregon. If you are located in China you can select a nearby Asia Pacific region, such as Seoul or Tokyo. Please note that some data centers may not have GPU instances. Click the "Launch Instance" button marked by the red box in Figure 14.8 to launch your instance.
 
 ![ EC2 panel. ](../img/ec2.png)
 
 We begin by selecting a suitable AMI (AWS Machine Image). If you want to install everything including the CUDA drivers from scratch, choose Ubuntu. Instead we recommend that you use the Deep Learning AMI that comes with all the drivers preconfigured. 
 
-The row at the top of Figure 13.10 shows the steps required to configure the instance. Search for *Deep Learning Base* and select the Ubuntu flavor.
+The row at the top of Figure 14.10 shows the steps required to configure the instance. Search for *Deep Learning Base* and select the Ubuntu flavor.
 
 ![ Choose an operating system. ](../img/os.png)
 
@@ -45,7 +45,7 @@ All the above servers come in multiple flavors indicating the number of GPUs use
 
 ![ Choose an instance. ](../img/p2x.png)
 
-Before choosing an instance, we suggest you check if there are quantity restrictions by clicking the "Limits" label in the bar on the, as left shown in Figure 13.9. As shown in Figure 13.12, this account can only open one "p2.xlarge" instance per region. If you need to open more instances, click on the "Request limit increase" link to apply for a higher instance quota. Generally, it takes one business day to process an application.
+Before choosing an instance, we suggest you check if there are quantity restrictions by clicking the "Limits" label in the bar on the, as left shown in Figure 14.9. As shown in Figure 14.12, this account can only open one "p2.xlarge" instance per region. If you need to open more instances, click on the "Request limit increase" link to apply for a higher instance quota. Generally, it takes one business day to process an application.
 
 ![ Instance quantity restrictions. ](../img/limits.png)
 
@@ -53,15 +53,15 @@ In this example, we keep the default configurations for the steps "3. Configure 
 
 ![ Modify instance hard disk size. ](../img/disk.png)
 
-Finally, go to "7. Review" and click "Launch" to launch the configured instance. The system will now prompt you to select the key pair used to access the instance. If you do not have a key pair, select "Create a new key pair" in the first drop-down menu in Figure 13.14 to generate a key pair. Subsequently, you can select "Choose an existing key pair" for this menu and then select the previously generated key pair. Click "Launch Instances" to launch the created instance.
+Finally, go to "7. Review" and click "Launch" to launch the configured instance. The system will now prompt you to select the key pair used to access the instance. If you do not have a key pair, select "Create a new key pair" in the first drop-down menu in Figure 14.14 to generate a key pair. Subsequently, you can select "Choose an existing key pair" for this menu and then select the previously generated key pair. Click "Launch Instances" to launch the created instance.
 
 ![ Select a key pair. ](../img/keypair.png)
 
-Make sure that you download the keypair and store it in a safe location if you generated a new one. This is your only way to SSH into the server. Click the instance ID shown in Figure 13.15 to view the status of this instance.
+Make sure that you download the keypair and store it in a safe location if you generated a new one. This is your only way to SSH into the server. Click the instance ID shown in Figure 14.15 to view the status of this instance.
 
 ![ Click the instance ID. ](../img/launching.png)
 
-As shown in Figure 13.16, after the instance state turns green, right-click the instance and select "Connect" to view the instance access method. For example, enter the following in the command line:
+As shown in Figure 14.16, after the instance state turns green, right-click the instance and select "Connect" to view the instance access method. For example, enter the following in the command line:
 
 ```
 ssh -i "/path/to/key.pem" ubuntu@ec2-xx-xxx-xxx-xxx.y.compute.amazonaws.com
@@ -212,7 +212,7 @@ conda activate gluon
 jupyter notebook
 ```
 
-Figure 13.18 shows the possible output after you run Jupyter Notebook. The last row is the URL for port 8888.
+Figure 14.18 shows the possible output after you run Jupyter Notebook. The last row is the URL for port 8888.
 
 ![ Output after running Jupyter Notebook. The last row is the URL for port 8888. ](../img/jupyter.png)
 
@@ -222,7 +222,7 @@ Since you used port forwarding to port 8889 you will need to replace the port nu
 
 As cloud services are billed by the time of use, you should close instances that are not being used. Note that there are alternatives: *Stopping* an instance means that you will be able to start it again. This is akin to switching off the power for your regular server. However, stopped instances will still be billed a small amount for the hard disk space retained. *Terminate* deletes all data associated with it. This includes the disk, hence you cannot start it again. Only do this if you know that you won't need it in the future.
 
-If you want to use the instance as a template for many more instances, right-click on the example in Figure 13.16 and select "Image" $\rightarrow$ "Create" to create an image of the instance. Once this is complete select "Instance State" $\rightarrow$ "Terminate" to terminate the instance. The next time you want to use this instance, you can follow the steps for creating and running an EC2 instance described in this section to create an instance based on the saved image. The only difference is that, in "1. Choose AMI" shown in Figure 13.10, you must use the "My AMIs" option on the left to select your saved image. The created instance will retain the information stored on the image hard disk. For example, you will not have to reinstall CUDA and other runtime environments.
+If you want to use the instance as a template for many more instances, right-click on the example in Figure 14.16 and select "Image" $\rightarrow$ "Create" to create an image of the instance. Once this is complete select "Instance State" $\rightarrow$ "Terminate" to terminate the instance. The next time you want to use this instance, you can follow the steps for creating and running an EC2 instance described in this section to create an instance based on the saved image. The only difference is that, in "1. Choose AMI" shown in Figure 14.10, you must use the "My AMIs" option on the left to select your saved image. The created instance will retain the information stored on the image hard disk. For example, you will not have to reinstall CUDA and other runtime environments.
 
 ## Summary
 
