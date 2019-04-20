@@ -36,19 +36,19 @@ GPU vendors typically release a new generation every 1-2 years, such as the GTX 
 
 For most users, it is enough to look at compute power. Note that many GPUs offer different types of acceleration. E.g. NVIDIA's TensorCores accelerate a subset of operators by 5x. Ensure that your libraries support this. The GPU memory should be no less than 4 GB (8GB is much better). Try to avoid using the GPU also for displaying a GUI (use the built-in graphics instead). If you cannot avoid it, add an extra 2GB of RAM for safety. 
 
-The figure below compares the 32-bit floating-point compute power and price of the various GTX 900 and 1000 series models. The prices are the suggested prices found on Wikipedia.
+The figure below compares the 32-bit floating-point compute power and price of the various GTX 900, GTX 1000 and RTX 2000 series models. The prices are the suggested prices found on Wikipedia.
 
-![Floating-point compute power and price comparison. ](../img/gtx.png)
+![Floating-point compute power and price comparison. ](../img/flopsvsprice.svg)
 
 We can see a number of things:
 
-1. Within each series, price and performance are roughly proportional. However, the newer models offer better cost effectiveness, as can be seen by comparing the 980 Ti and 1080 Ti.
-2. The performance to cost ratio of the GTX 1000 series is about two times greater than the 900 series.  
+1. Within each series, price and performance are roughly proportional. Titan models command a significant premium for the benefit of larger amounts of GPU memory. However, the newer models offer better cost effectiveness, as can be seen by comparing the 980 Ti and 1080 Ti. The price does not appear to improve much for the RTX 2000 series. However, this is due to the fact that they offer far superior low precision performance (FP16, INT8 and INT4). 
+2. The performance to cost ratio of the GTX 1000 series is about two times greater than the 900 series. 
+3. For the RTX 2000 series the price is an *affine* function of the price. 
 
-If we look at the earlier GTX series, we will observe a similar
-pattern. Therefore, we recommend you buy the latest GPU model in your
-budget. If given the choice, buy fewer and faster GPUs rather than
-many slower ones. 
+![Floating-point compute power and energy consumption. ](../img/wattvsprice.svg)
+
+The second curve shows how energy consumption scales mostly linearly with the amount of computation. Secondly, later generations are more efficient. This seems to be contradicted by the graph corresponding to the RTX 2000 series. However, this is a consequence of the TensorCores which draw disproportionally much energy. 
 
 ## Summary
 
@@ -56,6 +56,7 @@ many slower ones.
 * You should purchase the latest GPU generation if possible.
 * Use the cloud for large deployments.
 * High density servers may not be compatible with all GPUs. Check the mechanical and cooling specifications before you buy.
+* Use FP16 or lower precision for high efficiency. 
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2400)
 
