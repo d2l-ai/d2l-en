@@ -1,6 +1,6 @@
 # Using AWS Instances
 
-Many deep learning applications require computational expensive operations. The resources of your local machine might not be sufficient to perform the required computations in a reasonable amount of time. Cloud computing services can give you access to more powerful computers to run the GPU intensive deep learning code of this book. In this section, we will show you how to set up an instance and we will use Jupyter Notebooks to run code on AWS (Amazon Web Services). The walkthrough includes a number of steps:
+Many deep learning applications require computational expensive operations. The resources of your local machine might not be sufficient to perform these computations in a reasonable amount of time. Cloud computing services can give you access to more powerful computers to run the GPU intensive deep learning code of this book. In this section, we will show you how to set up an instance and we will use Jupyter Notebooks to run code on AWS (Amazon Web Services). The walkthrough includes a number of steps:
 
 1. Request for a GPU instance. 
 1. Optionally: install CUDA (or use an AMI with CUDA preinstalled). 
