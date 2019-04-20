@@ -11,7 +11,7 @@
     * Be consistent in the structure of each section
         * Summary
         * Exercises
-        * Scan the QR Code to Access Discussions
+        * Scan the QR Code to access discussions
         * References (if any)
 * Quotes
     * Use double quotes
@@ -46,8 +46,8 @@
     * the equation above/below (Equation numbering is to be consolidated by the Press)
     * the N equations above/below
 * Place punctuations within equations if necessary
-    * e.g., comma and period
-* Assignment sumbol
+    * e.g. comma and period
+* Assignment symbol
     * \leftarrow
 
 ## Figure
@@ -110,7 +110,7 @@
         * labels：`labels`
         * DataLoader instance：`train_iter`, `test_iter`, `data_iter`
 * Comments
-    * Add period at the end of comments.
+    * Add period at the end of comments
 * imports
     * import alphabetically
     * `from mxnet.gluon import data as gdata, loss as gloss, nn, utils as gutils`
@@ -118,7 +118,7 @@
     * `epoch, lr, loss, train acc, time`
     * Around 5 lines
 * Print variables
-    * if possible use `x, y` instead of `print('x:', x, 'y:', y)` at the end of the code block
+    * If possible use `x, y` instead of `print('x:', x, 'y:', y)` at the end of the code block
 * String
     * Use single quotes
 * Other items
