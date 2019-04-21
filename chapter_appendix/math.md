@@ -348,7 +348,8 @@ The Normal Distribution, also called Gaussian is given by $p(x) = \frac{1}{2 \pi
 1. A square matrix is called antisymmetric if $\mathbf{A} = -\mathbf{A}^\top$. Show that you can decompose any square matrix into a symmetric and an antisymmetric matrix.
 1. Write out a permutation in matrix form. 
 1. Find the gradient of the function $f(\mathbf{x}) = 3x_1^2 + 5e^{x_2}$.
-1. 
+1. What is the gradient of the function $f(\mathbf{x}) = \|\mathbf{x}\|_2$?
+1. Prove that $\Pr(A \cup B) \leq \Pr(A) + \Pr(B)$. When do you have an equality?
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2397)
 
