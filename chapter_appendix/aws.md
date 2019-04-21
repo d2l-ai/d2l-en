@@ -45,11 +45,11 @@ All the above servers come in multiple flavors indicating the number of GPUs use
 
 ![ Choose an instance. ](../img/p2x.png)
 
-Before choosing an instance, we suggest you check if there are quantity restrictions by clicking the "Limits" label in the bar on the, as left shown in Figure 14.9. As shown in Figure 14.12, this account can only open one "p2.xlarge" instance per region. If you need to open more instances, click on the "Request limit increase" link to apply for a higher instance quota. Generally, it takes one business day to process an application.
+Before choosing an instance, we suggest you check if there are quantity restrictions by clicking the "Limits" label in the bar on the left as shown in Figure 14.9. Figure 14.12 shows an example of such a limitation. The account can only open one "p2.xlarge" instance per region. If you need to open more instances, click on the "Request limit increase" link to apply for a higher instance quota. Generally, it takes one business day to process an application.
 
 ![ Instance quantity restrictions. ](../img/limits.png)
 
-In this example, we keep the default configurations for the steps "3. Configure Instance", "5. Add Tags", and "6. Configure Security Group". Tap on "4. Add Storage" and increase the default hard disk size to 64 GB. Note that CUDA by itself already takes up 4GB.
+So far, we have finished the first two of seven steps for launching an EC2 instance, as shown on the top of Fig 14.13. In this example, we keep the default configurations for the steps "3. Configure Instance", "5. Add Tags", and "6. Configure Security Group". Tap on "4. Add Storage" and increase the default hard disk size to 64 GB. Note that CUDA by itself already takes up 4GB.
 
 ![ Modify instance hard disk size. ](../img/disk.png)
 
