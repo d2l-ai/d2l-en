@@ -4,8 +4,6 @@ Natural language processing is concerned with interactions between computers and
 
 In this chapter, we will discuss how to use vectors to represent words and train the word vectors on a corpus. We will also use word vectors pre-trained on a larger corpus to find synonyms and analogies. Then, in the text classification task, we will use word vectors to analyze the emotion of a text and explain the important ideas of timing data classification based on RNNs and the convolutional neural networks. In addition, many of the outputs of natural language processing tasks are not fixed, such as sentences of arbitrary length. We will introduce the encoder-decoder model, beam search, and attention mechanisms to address problems of this type and apply them to machine translation.
 
-## Derivatives and Gradients
-
 ```eval_rst
 
 .. toctree::
@@ -17,4 +15,6 @@ In this chapter, we will discuss how to use vectors to represent words and train
    fasttext
    glove
    similarity-analogy
+   sentiment-analysis-rnn
+   sentiment-analysis-cnn
 ```
