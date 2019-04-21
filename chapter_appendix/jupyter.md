@@ -109,7 +109,7 @@ jupyter nbextension enable execute_time/ExecuteTime
 
 1. Try to edit and run the code in this book locally.
 1. Try to edit and run the code in this book *remotely* via port forwarding.
-1. Measure $\mathbf{A}^\top \mathbf{B}$ vs. $\mathbf{A} \mathbf{B}$ for two square matrices on $10
+1. Measure $\mathbf{A}^\top \mathbf{B}$ vs. $\mathbf{A} \mathbf{B}$ for two square matrices in $\mathbb{R}^{1024 \times 1024}. Which one is faster?
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2398)
 
