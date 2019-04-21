@@ -42,4 +42,20 @@ The main symbols used in this book are listed below.
 |$\log(\cdot)$|Natural logarithm|
 |$\exp(\cdot)$|Exponential function        |
 
+## Probability and Statistics
+
+|Symbol                                   |Type                                                              |
+|-----------------------------------------|------------------------------------------------------------------|
+|$\Pr(\cdot)$                             | Probability distribution                                         |
+|$z \sim \Pr$                         | Random variable $z$ obeys the probability distribution $\Pr$ |
+|$\Pr(x|y)$                   | Conditional probability of $x|y$                                         |
+|$\mathbf{E}_{x}\left(f(x)\right)$| Expectation of $f$ with respect to $x$                |
+
+
+## Complexity
+
+|Symbol       |Type          |
+|-------------|--------------|
+|$\mathcal{O}$|Big O notation|
+|$\mathcal{o}$|Little o notation (grows much more slowly than)|
 
