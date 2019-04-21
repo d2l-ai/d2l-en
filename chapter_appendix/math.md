@@ -1,15 +1,14 @@
 # Mathematical Basics
 
-This section summarizes the basic knowledge of linear algebra, differentiation, and probability required to understand the contents in this book. To avoid long discussions of mathematical knowledge not required to understand this book, a few definitions in this section are slightly simplified.
-
+This section summarizes basic tools from linear algebra, differentiation, and probability required to understand the contents in this book. We avoid details beyond the bare minimum to keep things streamlined and easily accessible. In some cases we simplify things to keep them easily accessible. For more background see e.g. the excellent [Data Science 100](http://ds100.org) course at UC Berkeley. 
 
 ## Linear Algebra
 
-Below we summarize the concepts of vectors, matrices, operations, norms, eigenvectors, and eigenvalues.
+This is a brief summary of vectors, matrices, operators, norms, eigenvectors, and eigenvalues. They're needed since a significant part of deep learning revolves around manipulating matrices and vectors. For a much more in-depth introduction to linear algebra in Python see e.g. the [Jupyter notebooks] of Gilbert Strang's MIT course on [Linear Algebra](https://www.amazon.com/exec/obidos/ASIN/0980232716/).
 
 ### Vectors
 
-Vectors in this book refer to column vectors. An $n$-dimensional vector $\mathbf{x}$ can be written as
+By default we refer to column vectors in this book. An $n$-dimensional vector $\mathbf{x}$ can be written as
 
 $$
 \mathbf{x} =
@@ -18,15 +17,18 @@ $$
     x_{2}  \\
     \vdots  \\
     x_{n}
-\end{bmatrix},
+\end{bmatrix}.
 $$
 
-where $x_1, \ldots, x_n$ are elements of the vector. To express that $\mathbf{x}$ is an $n$-dimensional vector with elements from the set of real numbers, we write $\mathbf{x} \in \mathbb{R}^{n}$ or $\mathbf{x} \in \mathbb{R}^{n \times 1}$.
+Here $x_1, \ldots, x_n$ are elements of the vector. To express that $\mathbf{x}$ is an $n$-dimensional vector with elements from the set of real numbers, we write $\mathbf{x} \in \mathbb{R}^{n}$ or $\mathbf{x} \in \mathbb{R}^{n \times 1}$. Vectors satisfy the basic operations of a *vector space*, namely that you can add them together and multiply them with scalars (in our case element-wise) and you still get a vector back: assuming that $\mathbf{a}, \mathbf{b} \in \mathbb{R}^n$ and $\alpha \in \mathbb{R}$ we have that 
+$\mathbf{a} + \mathbf{b} \in \mathbb{R}^n$ and $\alpha \cdot \mathbf{a} \in \mathbb{R}^n$. Furthermore they satisfy the distributive law
+
+$$\alpha \cdot (\mathbf{a} + \mathbf{b}) = \alpha \cdot \mathbf{a} + \alpha \cdot \mathbf{b}.$$
 
 
 ### Matrices
 
-An expression for a matrix with $m$ rows and $n$ columns can be written as
+A matrix with $m$ rows and $n$ columns can be written as
 
 $$
 \mathbf{X} =
@@ -38,19 +40,18 @@ $$
 \end{bmatrix}.
 $$
 
-Here, $x_{ij}$ is the element in row $i$ and column $j$ in the matrix $\mathbf{X}$ ($1 \leq i \leq m, 1 \leq j \leq n$). To express that $\mathbf{X}$ is a matrix with $m$ rows and $n$ columns consisting of elements from the set of real numbers, we write $\mathbf{X} \in \mathbb{R}^{m \times n}$. It is not difficult to see that vectors are a special class of matrices.
+Here, $x_{ij}$ is the element in row $i \in \{1, \ldots m\}$ and column $j \in \{1, \ldots n\}$ in the matrix $\mathbf{X}$. Extending the vector notation we use $\mathbf{X} \in \mathbb{R}^{m \times n}$ to indicate that $\mathbf{X}$ is an $m \times n$ matrix. Given the above we could interpret vectors as $m \times 1$ dimensional matrices. Furthermore, matrices also form a vector space, i.e. we can multiply and add them just fine, as long as their dimensions match.
 
 
 ### Operations
 
-Assume the elements in the $n$-dimensional vector $\mathbf{a}$ are $a_1, \ldots, a_n$, and the elements in the $n$-dimensional vector $\mathbf{b}$ are $b_1, \ldots, b_n$. The dot product (internal product) of vectors $\mathbf{a}$ and $\mathbf{b}$ is a scalar:
+Assume that the elements in the $\mathbf{a}, \mathbf{b} \in \mathbb{R}^n$ are $a_1, \ldots, a_n$ and $b_1, \ldots, b_n$ respectively. The dot product (internal product) of vectors $\mathbf{a}$ and $\mathbf{b}$ is a scalar:
 
 $$
 \mathbf{a} \cdot \mathbf{b} = a_1 b_1 + \ldots + a_n b_n.
 $$
 
-
-Assume two matrices with $m$ rows and $n$ columns:
+Assume that we have two matrices with $m$ rows and $n$ columns $\mathbf{A}, \mathbf{B} \in \mathbb{R}^{m \times n}$:
 
 $$
 \mathbf{A} =
@@ -69,7 +70,7 @@ $$
 \end{bmatrix}.
 $$
 
-The transpose of a matrix $\mathbf{A}$ with $m$ rows and $n$ columns is a matrix with $n$ rows and $m$ columns whose rows are formed from the columns of the original matrix:
+The transpose of a matrix $\mathbf{A}^\top \in \mathbb{R}^{n \times m}$ is a matrix with $n$ rows and $m$ columns which are formed by 'flipping' over the original matrix as follows:
 
 $$
 \mathbf{A}^\top =
@@ -78,9 +79,8 @@ $$
     a_{12} & a_{22} & \dots  & a_{m2} \\
     \vdots & \vdots & \ddots & \vdots \\
     a_{1n} & a_{2n} & \dots  & a_{mn}
-\end{bmatrix}.
+\end{bmatrix}
 $$
-
 
 To add two matrices of the same shape, we add them element-wise:
 
@@ -91,10 +91,10 @@ $$
     a_{21} + b_{21} & a_{22} + b_{22} & \dots  & a_{2n} + b_{2n} \\
     \vdots & \vdots & \ddots & \vdots \\
     a_{m1} + b_{m1} & a_{m2} + b_{m2} & \dots  & a_{mn} + b_{mn}
-\end{bmatrix}.
+\end{bmatrix}
 $$
 
-We use the symbol $\odot$ to indicate the element-wise multiplication of two matrices:
+We use the symbol $\odot$ to indicate the element-wise multiplication of two matrices (in Matlab notation this is `.*`):
 
 $$
 \mathbf{A} \odot \mathbf{B} =
@@ -103,14 +103,13 @@ $$
     a_{21}  b_{21} & a_{22}  b_{22} & \dots  & a_{2n}  b_{2n} \\
     \vdots & \vdots & \ddots & \vdots \\
     a_{m1}  b_{m1} & a_{m2}  b_{m2} & \dots  & a_{mn}  b_{mn}
-\end{bmatrix}.
+\end{bmatrix}
 $$
 
 Define a scalar $k$. Multiplication of scalars and matrices is also an element-wise multiplication:
 
-
 $$
-k\mathbf{A} =
+k \cdot \mathbf{A} =
 \begin{bmatrix}
     ka_{11} & ka_{12} & \dots  & ka_{1n} \\
     ka_{21} & ka_{22} & \dots  & ka_{2n} \\
@@ -141,49 +140,49 @@ $$
 \end{bmatrix}.
 $$
 
-The product is a matrix with $m$ rows and $n$ columns, with the element in row $i$ and column $j$ ($1 \leq i \leq m, 1 \leq j \leq n$) equal to
+The product is a matrix with $m$ rows and $n$ columns, with the element in row $i \in \{1, \ldots m\}$ and column $j \in \{1, \ldots n\}$ equal to
 
-$$a_{i1}b_{1j}  + a_{i2}b_{2j} + \ldots + a_{ip}b_{pj} = \sum_{k=1}^p a_{ik}b_{kj}.$$
+$$\left[\mathbf{A} \mathbf{B}\right]_{ij} = a_{i1}b_{1j}  + a_{i2}b_{2j} + \ldots + a_{ip}b_{pj} = \sum_{k=1}^p a_{ik}b_{kj}.$$
 
 
 ### Norms
 
-Assume the elements in the $n$-dimensional vector $\mathbf{x}$ are $x_1, \ldots, x_n$. The $L_p$ norm of the vector $\mathbf{x}$ is
+Assume that the elements in the $n$-dimensional vector $\mathbf{x}$ are $x_1, \ldots, x_n$. The $\ell_p$ norm of $\mathbf{x}$ is
 
 $$\|\mathbf{x}\|_p = \left(\sum_{i=1}^n \left|x_i \right|^p \right)^{1/p}.$$
 
-For example, the $L_1$ norm of $\mathbf{x}$ is the sum of the absolute values ​​of the vector elements:
+For example, the $\ell_1$ norm of $\mathbf{x}$ is the sum of the absolute values of the vector elements:
 
-$$\|\mathbf{x}\|_1 = \sum_{i=1}^n \left|x_i \right|.$$
+$$\|\mathbf{x}\|_1 = \sum_{i=1}^n \left|x_i \right|$$
 
-While the $L_2$ norm of $\mathbf{x}$ is the square root of the sum of the squares of the vector elements:
+The $\ell_2$ norm of $\mathbf{x}$ is the square root of the sum of the squares of the vector elements:
 
-$$\|\mathbf{x}\|_2 = \sqrt{\sum_{i=1}^n x_i^2}.$$
+$$\|\mathbf{x}\|_2 = \sqrt{\sum_{i=1}^n x_i^2}$$
 
-We usually use $\|\mathbf{x}\|$ to refer to the $L_2$ norm of $\mathbf{x}$.
+We usually use $\|\mathbf{x}\|$ to refer to the $\ell_2$ norm of $\mathbf{x}$. Lastly, the $\ell_\infty$ norm of a vector is the limit of the above definition. This works out to
+
+$$\|\mathbf{x}\|_\infty = \mathop{\mathrm{max}}_i |x_i|.$$
 
 Assume $\mathbf{X}$ is a matrix with $m$ rows and $n$ columns. The Frobenius norm of matrix $\mathbf{X}$ is the square root of the sum of the squares of the matrix elements:
 
-$$\|\mathbf{X}\|_F = \sqrt{\sum_{i=1}^m \sum_{j=1}^n x_{ij}^2},$$
+$$\|\mathbf{X}\|_F = \sqrt{\sum_{i=1}^m \sum_{j=1}^n x_{ij}^2}$$
 
-Here, $x_{ij}$ is the element of matrix $\mathbf{X}$ in row $i$ and column $j$.
+Here, $x_{ij}$ is the element of matrix $\mathbf{X}$ in row $i$ and column $j$. In other words, the Frobenius norm behaves as if it were an $\ell_2$ norm of a matrix-shaped vector. 
+
+**Note:** sometimes the norms on vectors are also (erroneously) referred to as $L_p$ norms. However, the latter are norms on functions with similar structure. For instance, the $L_2$ norm of a function $f$ is given by $\|f\|_2^2 = \int |f(x)|^2 dx$.
 
 
 ### Eigenvectors and Eigenvalues
-
 
 Let $\mathbf{A}$ be a matrix with $n$ rows and $n$ columns. If $\lambda$ is a scalar and $\mathbf{v}$ is a non-zero $n$-dimensional vector with
 
 $$\mathbf{A} \mathbf{v} = \lambda \mathbf{v},$$
 
-then $\mathbf{v}$ is called an eigenvector of matrix $\mathbf{A}$, and $\lambda$ is called an eigenvalue of $\mathbf{A}$ corresponding to $\mathbf{v}$.
-
-
+then $\mathbf{v}$ is called an eigenvector of matrix $\mathbf{A}$ and $\lambda$ is called an eigenvalue of $\mathbf{A}$ corresponding to $\mathbf{v}$. For symmetric matrices $\mathbf{A} = \mathbf{A}^\top$ there are exactly $n$ (linearly independent) eigenvector and eigenvalue pairs. 
 
 ## Differentials
 
-Here we briefly introduce some basic concepts and calculations for differentials.
-
+This is a very brief primer on multivariate differential calculus. 
 
 ### Derivatives and Differentials
 
@@ -294,45 +293,62 @@ $$\frac{\partial^2 f}{\partial x_i \partial x_j} = \frac{\partial }{\partial x_i
 
 ## Probability
 
-Finally, we will briefly introduce conditional probability, expectation, and uniform distribution.
+Finally, we will briefly introduce conditional probability, expectation and variance. 
 
 ### Conditional Probability
 
-We will denote the probability of event $A$ and event $B$ as $\mathbb{P}(A)$ and $\mathbb{P}(B)$, respectively. The probability of the simultaneous occurrence of the two events is denoted as $\mathbb{P}(A \cap B)$ or $\mathbb{P}(A, B)$. If $B$ has non-zero probability, the conditional probability of event $A$ given that $B$ has occurred is
+![Intersection between $A$ and $B$](../img/intersect.svg)
 
-$$\mathbb{P}(A \mid B) = \frac{\mathbb{P}(A \cap B)}{\mathbb{P}(B)}.$$
+We will denote the probability of event $A$ and event $B$ as $\Pr(A)$ and $\Pr(B)$, respectively. The probability of the simultaneous occurrence of the two events is denoted as $\Pr(A \cap B)$ or $\Pr(A, B)$. In the figure above it is the shaded area. If $B$ has non-zero probability, the conditional probability of event $A$ given that $B$ has occurred is
+
+$$\Pr(A | B) = \frac{\Pr(A \cap B)}{\Pr(B)}.$$
 
 That is,
 
-$$\mathbb{P}(A \cap B) = \mathbb{P}(B) \mathbb{P}(A \mid B) = \mathbb{P}(A) \mathbb{P}(B \mid A).$$
+$$\Pr(A \cap B) = \Pr(B) \Pr(A | B) = \Pr(A) \Pr(B | A).$$
 
 If
 
-$$\mathbb{P}(A \cap B) = \mathbb{P}(A) \mathbb{P}(B),$$
+$$\Pr(A \cap B) = \Pr(A) \Pr(B),$$
 
 then $A$ and $B$ are said to be independent of each other.
 
 
-### Expectation
+### Expectation and Variance
 
 A random variable takes values that represent possible outcomes of an experiment. The expectation (or average) of the random variable $X$ is denoted as
 
-$$\mathbb{E}(X) = \sum_{x} x \mathbb{P}(X = x).$$
+$$\mathbf{E}[X] = \sum_{x} x \Pr(X = x).$$
+
+In many cases we want to measure by how much the random variable $x$ deviates from its expectation. This can be quantified by the variance
+
+$$\mathop{\mathrm{Var}}[X] = \mathbf{E}\left[(X - \mathbf{E}[X])^2\right] = 
+\mathbf{E}[X^2] - \mathbf{E}^2[X].$$
+
+Here the last equality follows from the linearity of expectation. 
 
 
 ### Uniform Distribution
 
 Assume random variable $X$ obeys a uniform distribution over $[a, b]$, i.e. $X \sim U( a, b)$. In this case, random variable $X$ has the same probability of being any number between $a$ and $b$.
 
+### Normal Distribution
+
+The Normal Distribution, also called Gaussian is given by $p(x) = \frac{1}{2 \pi \sigma^2} \exp\left(-\frac{1}{2 \sigma^2} (x-\mu)^2\right)$. Its expectation is $\mu$ and its variance is $\sigma^2$. For more details on probability and statistics see the [introduction](../chapter_crashcourse/probability.md).
 
 ## Summary
 
-* This section summarizes the basic knowledge of linear algebra, differentiation, and probability required to understand the contents in this book.
+* Vectors and matrics can be added and multiplied with rules similar to those of scalars. 
+* There are specialized norms for vectors and matrices, quite different from the (Euclidean) $\ell_2$ norm.  
+* Derivatives yield vectors and matrices when computing higher order terms. 
 
+## Exercises
 
-## Exercise
-
-* Find the gradient of function $f(\mathbf{x}) = 3x_1^2 + 5e^{x_2}$.
+1. When traveling between two points in Manhattan, what is the distance that you need to cover in terms of the coordinates, i.e. in terms of avenues and streets? Can you travel diagonally?
+1. A square matrix is called antisymmetric if $\mathbf{A} = -\mathbf{A}^\top$. Show that you can decompose any square matrix into a symmetric and an antisymmetric matrix.
+1. Write out a permutation in matrix form. 
+1. Find the gradient of the function $f(\mathbf{x}) = 3x_1^2 + 5e^{x_2}$.
+1. 
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2397)
 
