@@ -49,7 +49,7 @@ Beyond local editing there are two things that are quite important: editing the 
 
 If you wish to contribute to the content of this book, you need to modify the source file (.md file, not .ipynb file)  on GitHub. Using the notedown plugin we can modify notebooks in .md format directly in Jupyter. Linux/MacOS users can execute the following commands to obtain the GitHub source files and activate the runtime environment. If you haven't done so already, install the environment needed for MXNet Gluon. 
 
-```{.python .input}
+```
 git clone https://github.com/d2l-ai/d2l-en.git
 cd d2l-en 
 sed -i 's/mxnet/mxnet-cu100/g' environment.yml  # Only use this if you have a GPU
@@ -59,7 +59,7 @@ source activate gluon # Windows users run "activate gluon"
 
 Next, install the notedown plugin, run Jupyter Notebook, and load the plugin:
 
-```{.python .input}
+```
 pip install https://github.com/mli/notedown/tarball/master
 jupyter notebook --NotebookApp.contents_manager_class='notedown.NotedownContentsManager'
 ```
@@ -67,13 +67,13 @@ jupyter notebook --NotebookApp.contents_manager_class='notedown.NotedownContents
 To turn on the notedown plugin by default whenever you run Jupyter Notebook do the following: 
 First, generate a Jupyter Notebook configuration file (if it has already been generated, you can skip this step).
 
-```{.python .input}
+```
 jupyter notebook --generate-config
 ```
 
 Then, add the following line to the end of the Jupyter Notebook configuration file (for Linux/macOS, usually in the path `~/.jupyter/jupyter_notebook_config.py`):
 
-```{.python .input}
+```
 c.NotebookApp.contents_manager_class = 'notedown.NotedownContentsManager'
 ```
 
@@ -84,7 +84,7 @@ After that, you only need to run the `jupyter notebook` command to turn on the n
 
 Sometimes, you may want to run Jupyter Notebook on a remote server and access it through a browser on your local computer. If Linux or MacOS is installed on you local machine (Windows can also support this function through third-party software such as PuTTY), you can use port forwarding:
 
-```{.python .input}
+```
 ssh myserver -L 8888:localhost:8888
 ```
 
@@ -94,7 +94,7 @@ The above is the address of the remote server `myserver`. Then we can use http:/
 
 We can use the `ExecuteTime` plugin to time the execution of each code cell in a Jupyter notebook. Use the following commands to install the plugin:
 
-```{.python .input}
+```
 pip install jupyter_contrib_nbextensions
 jupyter contrib nbextension install --user
 jupyter nbextension enable execute_time/ExecuteTime
