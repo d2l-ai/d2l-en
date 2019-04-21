@@ -228,7 +228,7 @@ tweaking the code in small ways and observing the results.
 Ideally, an elegant mathematical theory might tell us
 precisely how to tweak our code to achieve a desired result.
 Unfortunately, at present such elegant theories elude us.
-Despite our best attempts, our explanations for of various techniques might be lacking,
+Despite our best attempts, our explanations of various techniques might be lacking,
 sometimes on account of our shortcomings,
 and equally often on account of the nascent state of the science of deep learning.
 We are hopeful that as the theory of deep learning progresses,
