@@ -9,10 +9,10 @@ Below we summarize the concepts of vectors, matrices, operations, norms, eigenve
 
 ### Vectors
 
-Vectors in this book refer to column vectors. An $n$-dimensional vector $\boldsymbol{x}$ can be written as
+Vectors in this book refer to column vectors. An $n$-dimensional vector $\mathbf{x}$ can be written as
 
 $$
-\boldsymbol{x} =
+\mathbf{x} =
 \begin{bmatrix}
     x_{1}  \\
     x_{2}  \\
@@ -21,7 +21,7 @@ $$
 \end{bmatrix},
 $$
 
-where $x_1, \ldots, x_n$ are elements of the vector. To express that $\boldsymbol{x}$ is an $n$-dimensional vector with elements from the set of real numbers, we write $\boldsymbol{x} \in \mathbb{R}^{n}$ or $\boldsymbol{x} \in \mathbb{R}^{n \times 1}$.
+where $x_1, \ldots, x_n$ are elements of the vector. To express that $\mathbf{x}$ is an $n$-dimensional vector with elements from the set of real numbers, we write $\mathbf{x} \in \mathbb{R}^{n}$ or $\mathbf{x} \in \mathbb{R}^{n \times 1}$.
 
 
 ### Matrices
@@ -29,7 +29,7 @@ where $x_1, \ldots, x_n$ are elements of the vector. To express that $\boldsymbo
 An expression for a matrix with $m$ rows and $n$ columns can be written as
 
 $$
-\boldsymbol{X} =
+\mathbf{X} =
 \begin{bmatrix}
     x_{11} & x_{12}  & \dots  & x_{1n} \\
     x_{21} & x_{22}  & \dots  & x_{2n} \\
@@ -38,29 +38,29 @@ $$
 \end{bmatrix}.
 $$
 
-Here, $x_{ij}$ is the element in row $i$ and column $j$ in the matrix $\boldsymbol{X}$ ($1 \leq i \leq m, 1 \leq j \leq n$). To express that $\boldsymbol{X}$ is a matrix with $m$ rows and $n$ columns consisting of elements from the set of real numbers, we write $\boldsymbol{X} \in \mathbb{R}^{m \times n}$. It is not difficult to see that vectors are a special class of matrices.
+Here, $x_{ij}$ is the element in row $i$ and column $j$ in the matrix $\mathbf{X}$ ($1 \leq i \leq m, 1 \leq j \leq n$). To express that $\mathbf{X}$ is a matrix with $m$ rows and $n$ columns consisting of elements from the set of real numbers, we write $\mathbf{X} \in \mathbb{R}^{m \times n}$. It is not difficult to see that vectors are a special class of matrices.
 
 
 ### Operations
 
-Assume the elements in the $n$-dimensional vector $\boldsymbol{a}$ are $a_1, \ldots, a_n$, and the elements in the $n$-dimensional vector $\boldsymbol{b}$ are $b_1, \ldots, b_n$. The dot product (internal product) of vectors $\boldsymbol{a}$ and $\boldsymbol{b}$ is a scalar:
+Assume the elements in the $n$-dimensional vector $\mathbf{a}$ are $a_1, \ldots, a_n$, and the elements in the $n$-dimensional vector $\mathbf{b}$ are $b_1, \ldots, b_n$. The dot product (internal product) of vectors $\mathbf{a}$ and $\mathbf{b}$ is a scalar:
 
 $$
-\boldsymbol{a} \cdot \boldsymbol{b} = a_1 b_1 + \ldots + a_n b_n.
+\mathbf{a} \cdot \mathbf{b} = a_1 b_1 + \ldots + a_n b_n.
 $$
 
 
 Assume two matrices with $m$ rows and $n$ columns:
 
 $$
-\boldsymbol{A} =
+\mathbf{A} =
 \begin{bmatrix}
     a_{11} & a_{12} & \dots  & a_{1n} \\
     a_{21} & a_{22} & \dots  & a_{2n} \\
     \vdots & \vdots & \ddots & \vdots \\
     a_{m1} & a_{m2} & \dots  & a_{mn}
 \end{bmatrix},\quad
-\boldsymbol{B} =
+\mathbf{B} =
 \begin{bmatrix}
     b_{11} & b_{12} & \dots  & b_{1n} \\
     b_{21} & b_{22} & \dots  & b_{2n} \\
@@ -69,10 +69,10 @@ $$
 \end{bmatrix}.
 $$
 
-The transpose of a matrix $\boldsymbol{A}$ with $m$ rows and $n$ columns is a matrix with $n$ rows and $m$ columns whose rows are formed from the columns of the original matrix:
+The transpose of a matrix $\mathbf{A}$ with $m$ rows and $n$ columns is a matrix with $n$ rows and $m$ columns whose rows are formed from the columns of the original matrix:
 
 $$
-\boldsymbol{A}^\top =
+\mathbf{A}^\top =
 \begin{bmatrix}
     a_{11} & a_{21} & \dots  & a_{m1} \\
     a_{12} & a_{22} & \dots  & a_{m2} \\
@@ -85,7 +85,7 @@ $$
 To add two matrices of the same shape, we add them element-wise:
 
 $$
-\boldsymbol{A} + \boldsymbol{B} =
+\mathbf{A} + \mathbf{B} =
 \begin{bmatrix}
     a_{11} + b_{11} & a_{12} + b_{12} & \dots  & a_{1n} + b_{1n} \\
     a_{21} + b_{21} & a_{22} + b_{22} & \dots  & a_{2n} + b_{2n} \\
@@ -97,7 +97,7 @@ $$
 We use the symbol $\odot$ to indicate the element-wise multiplication of two matrices:
 
 $$
-\boldsymbol{A} \odot \boldsymbol{B} =
+\mathbf{A} \odot \mathbf{B} =
 \begin{bmatrix}
     a_{11}  b_{11} & a_{12}  b_{12} & \dots  & a_{1n}  b_{1n} \\
     a_{21}  b_{21} & a_{22}  b_{22} & \dots  & a_{2n}  b_{2n} \\
@@ -110,7 +110,7 @@ Define a scalar $k$. Multiplication of scalars and matrices is also an element-w
 
 
 $$
-k\boldsymbol{A} =
+k\mathbf{A} =
 \begin{bmatrix}
     ka_{11} & ka_{12} & \dots  & ka_{1n} \\
     ka_{21} & ka_{22} & \dots  & ka_{2n} \\
@@ -121,10 +121,10 @@ $$
 
 Other operations such as scalar and matrix addition, and division by an element are similar to the multiplication operation in the above equation. Calculating the square root or taking logarithms of a matrix are performed by calculating the square root or logarithm, respectively, of each element of the matrix to obtain a matrix with the same shape as the original matrix.
 
-Matrix multiplication is different from element-wise matrix multiplication. Assume $\boldsymbol{A}$ is a matrix with $m$ rows and $p$ columns and $\boldsymbol{B}$ is a matrix with $p$ rows and $n$ columns. The product (matrix multiplication) of these two matrices is denoted as
+Matrix multiplication is different from element-wise matrix multiplication. Assume $\mathbf{A}$ is a matrix with $m$ rows and $p$ columns and $\mathbf{B}$ is a matrix with $p$ rows and $n$ columns. The product (matrix multiplication) of these two matrices is denoted as
 
 $$
-\boldsymbol{A} \boldsymbol{B} =
+\mathbf{A} \mathbf{B} =
 \begin{bmatrix}
     a_{11} & a_{12} & \dots  & a_{1p} \\
     a_{21} & a_{22} & \dots  & a_{2p} \\
@@ -148,35 +148,35 @@ $$a_{i1}b_{1j}  + a_{i2}b_{2j} + \ldots + a_{ip}b_{pj} = \sum_{k=1}^p a_{ik}b_{k
 
 ### Norms
 
-Assume the elements in the $n$-dimensional vector $\boldsymbol{x}$ are $x_1, \ldots, x_n$. The $L_p$ norm of the vector $\boldsymbol{x}$ is
+Assume the elements in the $n$-dimensional vector $\mathbf{x}$ are $x_1, \ldots, x_n$. The $L_p$ norm of the vector $\mathbf{x}$ is
 
-$$\|\boldsymbol{x}\|_p = \left(\sum_{i=1}^n \left|x_i \right|^p \right)^{1/p}.$$
+$$\|\mathbf{x}\|_p = \left(\sum_{i=1}^n \left|x_i \right|^p \right)^{1/p}.$$
 
-For example, the $L_1$ norm of $\boldsymbol{x}$ is the sum of the absolute values ​​of the vector elements:
+For example, the $L_1$ norm of $\mathbf{x}$ is the sum of the absolute values ​​of the vector elements:
 
-$$\|\boldsymbol{x}\|_1 = \sum_{i=1}^n \left|x_i \right|.$$
+$$\|\mathbf{x}\|_1 = \sum_{i=1}^n \left|x_i \right|.$$
 
-While the $L_2$ norm of $\boldsymbol{x}$ is the square root of the sum of the squares of the vector elements:
+While the $L_2$ norm of $\mathbf{x}$ is the square root of the sum of the squares of the vector elements:
 
-$$\|\boldsymbol{x}\|_2 = \sqrt{\sum_{i=1}^n x_i^2}.$$
+$$\|\mathbf{x}\|_2 = \sqrt{\sum_{i=1}^n x_i^2}.$$
 
-We usually use $\|\boldsymbol{x}\|$ to refer to the $L_2$ norm of $\boldsymbol{x}$.
+We usually use $\|\mathbf{x}\|$ to refer to the $L_2$ norm of $\mathbf{x}$.
 
-Assume $\boldsymbol{X}$ is a matrix with $m$ rows and $n$ columns. The Frobenius norm of matrix $\boldsymbol{X}$ is the square root of the sum of the squares of the matrix elements:
+Assume $\mathbf{X}$ is a matrix with $m$ rows and $n$ columns. The Frobenius norm of matrix $\mathbf{X}$ is the square root of the sum of the squares of the matrix elements:
 
-$$\|\boldsymbol{X}\|_F = \sqrt{\sum_{i=1}^m \sum_{j=1}^n x_{ij}^2},$$
+$$\|\mathbf{X}\|_F = \sqrt{\sum_{i=1}^m \sum_{j=1}^n x_{ij}^2},$$
 
-Here, $x_{ij}$ is the element of matrix $\boldsymbol{X}$ in row $i$ and column $j$.
+Here, $x_{ij}$ is the element of matrix $\mathbf{X}$ in row $i$ and column $j$.
 
 
 ### Eigenvectors and Eigenvalues
 
 
-Let $\boldsymbol{A}$ be a matrix with $n$ rows and $n$ columns. If $\lambda$ is a scalar and $\boldsymbol{v}$ is a non-zero $n$-dimensional vector with
+Let $\mathbf{A}$ be a matrix with $n$ rows and $n$ columns. If $\lambda$ is a scalar and $\mathbf{v}$ is a non-zero $n$-dimensional vector with
 
-$$\boldsymbol{A} \boldsymbol{v} = \lambda \boldsymbol{v},$$
+$$\mathbf{A} \mathbf{v} = \lambda \mathbf{v},$$
 
-then $\boldsymbol{v}$ is called an eigenvector of matrix $\boldsymbol{A}$, and $\lambda$ is called an eigenvalue of $\boldsymbol{A}$ corresponding to $\boldsymbol{v}$.
+then $\mathbf{v}$ is called an eigenvector of matrix $\mathbf{A}$, and $\lambda$ is called an eigenvalue of $\mathbf{A}$ corresponding to $\mathbf{v}$.
 
 
 
@@ -248,36 +248,36 @@ To calculate $\partial u/\partial x_i$, we simply treat $x_1, \ldots, x_{i-1}, x
 ### Gradients
 
 
-Assume the input of function $f: \mathbb{R}^n \rightarrow \mathbb{R}$ is an $n$-dimensional vector $\boldsymbol{x} = [x_1, x_2, \ldots, x_n]^\top$ and the output is a scalar. The gradient of function $f(\boldsymbol{x})$ with respect to $\boldsymbol{x}$ is a vector of $n$ partial derivatives:
+Assume the input of function $f: \mathbb{R}^n \rightarrow \mathbb{R}$ is an $n$-dimensional vector $\mathbf{x} = [x_1, x_2, \ldots, x_n]^\top$ and the output is a scalar. The gradient of function $f(\mathbf{x})$ with respect to $\mathbf{x}$ is a vector of $n$ partial derivatives:
 
-$$\nabla_{\boldsymbol{x}} f(\boldsymbol{x}) = \bigg[\frac{\partial f(\boldsymbol{x})}{\partial x_1}, \frac{\partial f(\boldsymbol{x})}{\partial x_2}, \ldots, \frac{\partial f(\boldsymbol{x})}{\partial x_n}\bigg]^\top.$$
+$$\nabla_{\mathbf{x}} f(\mathbf{x}) = \bigg[\frac{\partial f(\mathbf{x})}{\partial x_1}, \frac{\partial f(\mathbf{x})}{\partial x_2}, \ldots, \frac{\partial f(\mathbf{x})}{\partial x_n}\bigg]^\top.$$
 
 
-To be concise, we sometimes use $\nabla f(\boldsymbol{x})$ to replace $\nabla_{\boldsymbol{x}} f(\boldsymbol{x})$.
+To be concise, we sometimes use $\nabla f(\mathbf{x})$ to replace $\nabla_{\mathbf{x}} f(\mathbf{x})$.
 
-If $\boldsymbol{A}$ is a matrix with $m$ rows and $n$ columns, and $\boldsymbol{x}$ is an $n$-dimensional vector, the following identities hold:
+If $\mathbf{A}$ is a matrix with $m$ rows and $n$ columns, and $\mathbf{x}$ is an $n$-dimensional vector, the following identities hold:
 
 $$
 \begin{aligned}
-\nabla_{\boldsymbol{x}} \boldsymbol{A} \boldsymbol{x} &= \boldsymbol{A}^\top, \\
-\nabla_{\boldsymbol{x}} \boldsymbol{x}^\top \boldsymbol{A}  &= \boldsymbol{A}, \\
-\nabla_{\boldsymbol{x}} \boldsymbol{x}^\top \boldsymbol{A} \boldsymbol{x}  &= (\boldsymbol{A} + \boldsymbol{A}^\top)\boldsymbol{x},\\
-\nabla_{\boldsymbol{x}} \|\boldsymbol{x} \|^2 &= \nabla_{\boldsymbol{x}} \boldsymbol{x}^\top \boldsymbol{x} = 2\boldsymbol{x}.
+\nabla_{\mathbf{x}} \mathbf{A} \mathbf{x} &= \mathbf{A}^\top, \\
+\nabla_{\mathbf{x}} \mathbf{x}^\top \mathbf{A}  &= \mathbf{A}, \\
+\nabla_{\mathbf{x}} \mathbf{x}^\top \mathbf{A} \mathbf{x}  &= (\mathbf{A} + \mathbf{A}^\top)\mathbf{x},\\
+\nabla_{\mathbf{x}} \|\mathbf{x} \|^2 &= \nabla_{\mathbf{x}} \mathbf{x}^\top \mathbf{x} = 2\mathbf{x}.
 \end{aligned}
 $$
 
-Similarly if $\boldsymbol{X}$ is a matrix, then
-$$\nabla_{\boldsymbol{X}} \|\boldsymbol{X} \|_F^2 = 2\boldsymbol{X}.$$
+Similarly if $\mathbf{X}$ is a matrix, then
+$$\nabla_{\mathbf{X}} \|\mathbf{X} \|_F^2 = 2\mathbf{X}.$$
 
 
 
 
 ### Hessian Matrices
 
-Assume the input of function $f: \mathbb{R}^n \rightarrow \mathbb{R}$ is an $n$-dimensional vector $\boldsymbol{x} = [x_1, x_2, \ldots, x_n]^\top$ and the output is a scalar. If all second-order partial derivatives of function $f$ exist and are continuous, then the Hessian matrix $\boldsymbol{H}$ of $f$ is a matrix with $m$ rows and $n$ columns given by
+Assume the input of function $f: \mathbb{R}^n \rightarrow \mathbb{R}$ is an $n$-dimensional vector $\mathbf{x} = [x_1, x_2, \ldots, x_n]^\top$ and the output is a scalar. If all second-order partial derivatives of function $f$ exist and are continuous, then the Hessian matrix $\mathbf{H}$ of $f$ is a matrix with $m$ rows and $n$ columns given by
 
 $$
-\boldsymbol{H} =
+\mathbf{H} =
 \begin{bmatrix}
 \frac{\partial^2 f}{\partial x_1^2} & \frac{\partial^2 f}{\partial x_1 \partial x_2} & \dots  & \frac{\partial^2 f}{\partial x_1 \partial x_n} \\
 \frac{\partial^2 f}{\partial x_2 \partial x_1} & \frac{\partial^2 f}{\partial x_2^2} & \dots  & \frac{\partial^2 f}{\partial x_2 \partial x_n} \\
@@ -332,7 +332,7 @@ Assume random variable $X$ obeys a uniform distribution over $[a, b]$, i.e. $X \
 
 ## Exercise
 
-* Find the gradient of function $f(\boldsymbol{x}) = 3x_1^2 + 5e^{x_2}$.
+* Find the gradient of function $f(\mathbf{x}) = 3x_1^2 + 5e^{x_2}$.
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2397)
 
