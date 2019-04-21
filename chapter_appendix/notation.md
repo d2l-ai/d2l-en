@@ -42,6 +42,14 @@ The main symbols used in this book are listed below.
 |$\log(\cdot)$|Natural logarithm|
 |$\exp(\cdot)$|Exponential function        |
 
+## Derivatives and Gradients
+
+|Symbol                           |Type                                         |
+|---------------------------------|---------------------------------------------|
+| $\frac{dy}{dx}$                 |Derivative of $y$ with respect to $x$        |
+| $\partial_{x} {y}$              |Partial derivative of $y$ with respect to $x$|
+| $\nabla_{\mathbf{x}} y$         |Gradient of $y$ with respect to $\mathbf{x}$      |
+
 ## Probability and Statistics
 
 |Symbol                                   |Type                                                     |
@@ -51,3 +59,9 @@ The main symbols used in this book are listed below.
 |$\Pr(x|y)$                   | Conditional probability of $x|y$                                 |
 |${\mathbf{E}}_{x} [f(x)]$| Expectation of $f$ with respect to $x$                |
 
+## Complexity
+
+|Symbol       |Type          |
+|-------------|--------------|
+|$\mathcal{O}$|Big O notation|
+|$\mathcal{o}$|Little o notation (grows much more slowly than)|
