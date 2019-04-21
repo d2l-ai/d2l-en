@@ -44,8 +44,10 @@ The main symbols used in this book are listed below.
 
 ## Probability and Statistics
 
-|Symbol                                   |Type                                                              |
-|-----------------------------------------|------------------------------------------------------------------|
-|$\Pr(\cdot)$                             | Probability distribution                                         |
+|Symbol                                   |Type                                                     |
+|-----------------------------------------|---------------------------------------------------------|
+|$\Pr(\cdot)$                             | Probability distribution                                |
+|$z \sim \Pr$                         | Random variable $z$ obeys the probability distribution $\Pr$ |
+|$\Pr(x|y)$                   | Conditional probability of $x|y$                                 |
 
 
