@@ -47,7 +47,7 @@ Beyond local editing there are two things that are quite important: editing the 
 
 ### Markdown Files in Jupyter 
 
-If you wish to contribute to the content of this book, you need to modify the source file (.md file, not .ipynb file)  on GitHub. Using the notedown plugin we can modify notebooks in .md format directly in Jupyter. Linux/MacOS users can execute the following commands to obtain the GitHub source files and activate the runtime environment. If you haven't done so already, install the environment needed for MXNet Gluon. 
+If you wish to contribute to the content of this book, you need to modify the source file (.md file, not .ipynb file)  on GitHub. Using the notedown plugin we can modify notebooks in .md format directly in Jupyter. Linux/MacOS users can execute the following commands to obtain the GitHub source files and activate the runtime environment. If you haven't done so already, install the environment needed for MXNet Gluon.
 
 ```
 git clone https://github.com/d2l-ai/d2l-en.git
@@ -109,7 +109,7 @@ jupyter nbextension enable execute_time/ExecuteTime
 
 1. Try to edit and run the code in this book locally.
 1. Try to edit and run the code in this book *remotely* via port forwarding.
-1. Measure $\mathbf{A}^\top \mathbf{B}$ vs. $\mathbf{A} \mathbf{B}$ for two square matrices in $\mathbb{R}^{1024 \times 1024}. Which one is faster?
+1. Measure $\mathbf{A}^\top \mathbf{B}$ vs. $\mathbf{A} \mathbf{B}$ for two square matrices in $\mathbb{R}^{1024 \times 1024}$. Which one is faster?
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2398)
 
