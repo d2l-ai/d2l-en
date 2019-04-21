@@ -1,6 +1,7 @@
 # Appendix
 
-   notation
+notation
+
 ```eval_rst
 
 .. toctree::
