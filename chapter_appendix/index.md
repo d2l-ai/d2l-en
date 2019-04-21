@@ -1,11 +1,11 @@
 # Appendix
 
+   notation
 ```eval_rst
 
 .. toctree::
    :maxdepth: 2
 
-   notation
    math
    jupyter
    aws
