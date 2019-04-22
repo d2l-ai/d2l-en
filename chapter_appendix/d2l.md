@@ -54,7 +54,7 @@
 
 ```
 
-## Prediciting
+## Predicting
 
 ```eval_rst
 
