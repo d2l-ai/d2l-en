@@ -46,7 +46,7 @@ are conventionally used.
 Some clever adaptations of CNNs have also brought them to bear 
 on graph-structured data and in recommender systems.
 
-First, we will walk through the basic operationgs
+First, we will walk through the basic operations
 that comprise the backbone of all modern convolutional networks.
 These include the convolutional layers themselves,
 nitty-gritty details including padding and stride,
