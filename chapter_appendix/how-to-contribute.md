@@ -10,11 +10,11 @@ We will walk you through the steps in detail. If you are already familiar with G
 
 ### Install Git
 
-The Git open source book [3] describes how to install Git. This typically works via `apt-get install git` on Ubuntu Linux, by installing the Xcode developer tools on macOS, or by using GitHub's [desktop client](https://desktop.github.com). If you don't have a GitHub account, you need to sign up for one [4].
+The Git open source book [3] describes how to install Git. This typically works via `sudo apt install git` on Ubuntu Linux, by installing the Xcode developer tools on macOS, or by using GitHub's [desktop client](https://desktop.github.com). If you don't have a GitHub account, you need to sign up for one [4].
 
 ### Log in to GitHub
 
-Enter the address of the book's code repository in your browser [2]. Click on the `Fork` button in the red box at the top-right the figure below to make a copy of the repository of this book. This is now *your copy* and you can change it any way you want. 
+Enter the address of the book's code repository in your browser [2]. Click on the `Fork` button in the red box at the top-right of the figure below, to make a copy of the repository of this book. This is now *your copy* and you can change it any way you want. 
 
 ![The code repository page.](../img/git-fork.png)
 
@@ -26,24 +26,25 @@ Now, the code repository of this book will be copied to your username, such as `
 
 To clone the repository (i.e. to make a local copy) we need to get its repository address. The green button on the picture below displays this. Make sure that your local copy is up to date with the main repository if you decide to keep this fork around for longer. For now simply follow the instructions in the [Installation](../chapter_prerequisite/install.md) section to get started. The main difference is that you're now downloading *your own fork* of the repository. 
 
-![Git clone](../img/git-clone.png)
+![Git clone.](../img/git-clone.png)
 
 ```
 # Replace your_github_username with your GitHub username
 git clone https://github.com/your_github_username/d2l-en.git
 ```
 
-On Unix the above command copies all the code from GitHub to the directory d2l-en. 
+On Unix, the above command copies all the code from GitHub to the directory `d2l-en`. 
 
 ### Edit the Book and Push
 
-Now it's time to edit the book. It's best to edit the notebooks in Jupyter following the [instructions](../chapter_appendix/jupyter.md) in the appendix. Make the changes and check that they're OK. Assume we have modified a typo in the file `~/d2l-en/chapter_appendix/how-to-contribute.md`. Git will tell you all the things that have changed:
+Now it's time to edit the book. It's best to edit the notebooks in Jupyter following the [instructions](../chapter_appendix/jupyter.md) in the appendix. Make the changes and check that they're OK. Assume we have modified a typo in the file `~/d2l-en/chapter_appendix/how-to-contribute.md`. 
+You can then check which files you have changed:
 
 ```
 git status
 ```
 
-At this point Git will prompt that the "chapter_deep-learning-basics/linear-regression.md" file has been modified.
+At this point Git will prompt that the `chapter_appendix/how-to-contribute.md` file has been modified.
 
 ```
 mylaptop:d2l-en smola$ git status
@@ -65,18 +66,20 @@ git commit -m 'fix typo in git documentation'
 git push
 ```
 
+The changed code will then be in your personal fork of the repository. To request the addition of your change, you have to create a pull request for the official repository of the book.
+
 ### Pull Request
 
 Go to your fork of the repository on GitHub and select "New pull request". This will open up a screen that shows you the changes between your edits and what is current in the main repository of the book. 
 
-![Pull Request](../img/git-newpr.png)
+![Pull Request.](../img/git-newpr.png)
 
 
 ### Submit Pull Request
 
-Finally, submit a pull request. Make sure to describe in the pull request what you changed. This will make it easier for the authors to review it and to merge it with the book. Depending on the changes this might get accepted right away, rejected, or more likely, you'll get some feedback on the changes. Once you've incorporated them, you're good to go. 
+Finally, submit a pull request. Make sure to describe the changes you have made in the pull request. This will make it easier for the authors to review it and to merge it with the book. Depending on the changes, this might get accepted right away, rejected, or more likely, you'll get some feedback on the changes. Once you've incorporated them, you're good to go. 
 
-![Create Pull Request](../img/git-createpr.png)
+![Create Pull Request.](../img/git-createpr.png)
 
 Your pull request will appear among the list of requests in the main repository. We will make every effort to process it quickly. 
 
