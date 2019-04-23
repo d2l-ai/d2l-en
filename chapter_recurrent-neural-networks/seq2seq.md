@@ -24,11 +24,6 @@ import d2l
 
 In the encoder, we use the word embedding layer to obtain a feature index from the word index of the input language and then input it into a multi-level LSTM recurrent unit. The input for the encoder is a batch of sequences, which is 2-D tensor with shape (batch size, sequence length). It outputs both the LSTM outputs, e.g the hidden state, for each time step and the hidden state and memory cell of the last time step.
 
-```{.python .input  n=2}
-X = nd.array([[1,2,3],[4,5,6]])
-nd.SequenceMask(X, nd.array([1,2]), True, axis=1)
-```
-
 ```{.python .input  n=3}
 class Seq2SeqEncoder(d2l.Encoder):
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
