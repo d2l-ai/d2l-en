@@ -85,7 +85,7 @@ Your server is ready now.
 If you used the Deep Learning AMI you can skip the steps below since it already comes with a range of CUDA versions pre-installed. Instead, all you need to do is select the CUDA version of your choice as follows:
 
 ```
-sudo rm -r /usr/local/cuda
+sudo rm /usr/local/cuda
 sudo ln -s /usr/local/cuda-10.0 /usr/local/cuda
 ```
 
