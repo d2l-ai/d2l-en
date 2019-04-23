@@ -369,7 +369,7 @@ owing to non-differentiability or other complications.
 In these cases, it's common to optimize a surrogate objective.
 
 Typically, the loss function is defined
-with respect to the models parameters
+with respect to the model's parameters
 and depends upon the dataset.
 The best values of our model's parameters are learned
 by minimizing the loss incurred on a *training set*
@@ -610,7 +610,7 @@ $$L(\mathrm{action}| x) = \mathbf{E}_{y \sim p(y| x)}[\mathrm{loss}(\mathrm{acti
 Hence, the loss $L$ incurred by eating the mushroom is $L(a=\mathrm{eat}| x) = 0.2 * \infty + 0.8 * 0 = \infty$, whereas the cost of discarding it is $L(a=\mathrm{discard}| x) = 0.2 * 0 + 0.8 * 1 = 0.8$.
 
 Our caution was justified: as any mycologist would tell us, the above mushroom actually *is* a death cap.
-Classification can get much more complicated than just binary, multiclass, of even multi-label classification.
+Classification can get much more complicated than just binary, multiclass, or even multi-label classification.
 For instance, there are some variants of classification for addressing hierarchies.
 Hierarchies assume that there exist some relationships among the many classes.
 So not all errors are equal - we prefer to misclassify to a related class than to a distant class.

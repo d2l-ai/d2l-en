@@ -359,11 +359,9 @@ class TransformerDecoder(d2l.Decoder):
 We use similar hyper-parameters as for the seq2seq with attention model: two transformer blocks with both the embedding size and the block output size to be 32. The additional hyper-parameters are chosen as 4 heads with the hidden size to be 2 times larger than output size.
 
 ```{.python .input  n=31}
-import mxnet as mx
-
 embed_size, units, num_layers, dropout = 32, 32, 2, 0.0 
 batch_size, num_examples, max_len = 64, 1024, 10
-lr, num_epochs, ctx = 0.005, 100, mx.gpu(0)
+lr, num_epochs, ctx = 0.005, 100, d2l.try_gpu()
 num_hiddens, num_heads = 64, 4
 
 src_vocab, tgt_vocab, train_iter = d2l.load_data_nmt(

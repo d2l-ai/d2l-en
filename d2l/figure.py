@@ -63,7 +63,7 @@ def show_images(imgs, num_rows, num_cols, scale=2):
     return axes
 
 def show_trace_2d(f, res):
-    """Show the trace of 2d variables during optimization."""
+    """Show the trace of 2D variables during optimization."""
     x1, x2 = zip(*res)
     set_figsize()
     plt.plot(x1, x2, '-o', color='#ff7f0e')
@@ -75,5 +75,5 @@ def show_trace_2d(f, res):
     plt.ylabel('x2')
 
 def use_svg_display():
-    """Use svg format to display plot in jupyter"""
+    """Use svg format to display plot in jupyter."""
     display.set_matplotlib_formats('svg')

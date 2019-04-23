@@ -14,7 +14,7 @@ def _download_pikachu(data_dir):
         gutils.download(root_url + k, os.path.join(data_dir, k), sha1_hash=v)
 
 def load_data_pikachu(batch_size, edge_size=256):
-    """Download the pikachu dataest and then load into memory."""
+    """Download the pikachu dataset and load it into memory."""
     data_dir = '../data/pikachu'
     _download_pikachu(data_dir)
     train_iter = image.ImageDetIter(
