@@ -1,40 +1,40 @@
 # Using Jupyter
 
-This section describes how to edit and run the code in the chapters of this book using Jupyter Notebooks. Make sure you have Jupyter installed and downloaded the code as described in the [Installation](../chapter_prerequisite/install.md) section. If you want to know more about Jupyter see the excellent tutorial in the [Documentation](https://jupyter.readthedocs.io/en/latest/). 
+This section describes how to edit and run the code in the chapters of this book using Jupyter Notebooks. Make sure you have Jupyter installed and downloaded the code as described in the [Installation](../chapter_install/install.md) section. If you want to know more about Jupyter see the excellent tutorial in the [Documentation](https://jupyter.readthedocs.io/en/latest/). 
 
 
 ## Edit and Run the Code Locally
 
-Now we describe how to use Jupyter to edit and run code in the book locally. Suppose that the local path of code of the book is "xx/yy/d2l-en/". Change directory in the shell to this path (`cd xx/yy/d2l-en`) and run the command `jupyter notebook`. If your browser doesn't do this automatically, open http://localhost:8888 and you will see the interface of Jupyter and all the folders containing code of the book, as shown in Figure 13.1.
+Suppose that the local path of code of the book is "xx/yy/d2l-en/". Change directory in the shell to this path (`cd xx/yy/d2l-en`) and run the command `jupyter notebook`. If your browser doesn't do this automatically, open http://localhost:8888 and you will see the interface of Jupyter and all the folders containing code of the book, as shown in Figure 14.1.
 
 ![The folders containing the code in this book. ](../img/jupyter00.png)
 
 You can access the notebook files by clicking on the folder displayed on the webpage. They usually have the suffix `.ipynb`.
-For the sake of brevity, we create a temporary `test.ipynb` file, and the content displayed after you click it is as shown in Figure 13.2. This notebook includes a markdown cell and code cell. The content in the markdown cell includes "This is A Title" and "This is text".   The code cell contains two lines of Python code.
+For the sake of brevity, we create a temporary `test.ipynb` file, and the content displayed after you click it is as shown in Figure 14.2. This notebook includes a markdown cell and code cell. The content in the markdown cell includes "This is A Title" and "This is text".   The code cell contains two lines of Python code.
 
 ![Markdown and code cells in the "text.ipynb" file. ](../img/jupyter01.png)
 
 
-Double click on the markdown cell, to enter edit mode. Add a new text string "Hello world." at the end of the cell, as shown in Figure 13.3.
+Double click on the markdown cell, to enter edit mode. Add a new text string "Hello world." at the end of the cell, as shown in Figure 14.3.
 
 ![Edit the markdown cell. ](../img/jupyter02.png)
 
 
-As shown in Figure 13.4, click "Cell" $\rightarrow$ "Run Cells" in the menu bar to run the edited cell.
+As shown in Figure 14.4, click "Cell" $\rightarrow$ "Run Cells" in the menu bar to run the edited cell.
 
 ![Run the cell. ](../img/jupyter03.png)
 
 
-After running, the markdown cell is as shown in Figure 13.5.
+After running, the markdown cell is as shown in Figure 14.5.
 
 ![The markdown cell after editing. ](../img/jupyter04.png)
 
 
-Next, click on the code cell. Multiply the elements by 2 after the last line of code, as shown in Figure 13.6.
+Next, click on the code cell. Multiply the elements by 2 after the last line of code, as shown in Figure 14.6.
 
 ![Edit the code cell. ](../img/jupyter05.png)
 
-You can also run the cell with a shortcut ("Ctrl + Enter" by default) and obtain the output result from Figure 13.7.
+You can also run the cell with a shortcut ("Ctrl + Enter" by default) and obtain the output result from Figure 14.7.
 
 ![Run the code cell to obtain the output. ](../img/jupyter06.png)
 
