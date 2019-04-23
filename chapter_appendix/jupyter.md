@@ -5,17 +5,17 @@ This section describes how to edit and run the code in the chapters of this book
 
 ## Edit and Run the Code Locally
 
-Suppose that the local path of code of the book is "xx/yy/d2l-en/". Change directory in the shell to this path (`cd xx/yy/d2l-en`) and run the command `jupyter notebook`. If your browser doesn't do this automatically, open http://localhost:8888 and you will see the interface of Jupyter and all the folders containing code of the book, as shown in Figure 14.1.
+Suppose that the local path of code of the book is "xx/yy/d2l-en/". Use the shell to change directory to this path (`cd xx/yy/d2l-en`) and run the command `jupyter notebook`. If your browser doesn't do this automatically, open http://localhost:8888 and you will see the interface of Jupyter and all the folders containing the code of the book, as shown in Figure 14.1.
 
 ![The folders containing the code in this book. ](../img/jupyter00.png)
 
 You can access the notebook files by clicking on the folder displayed on the webpage. They usually have the suffix `.ipynb`.
-For the sake of brevity, we create a temporary `test.ipynb` file, and the content displayed after you click it is as shown in Figure 14.2. This notebook includes a markdown cell and code cell. The content in the markdown cell includes "This is A Title" and "This is text".   The code cell contains two lines of Python code.
+For the sake of brevity, we create a temporary `test.ipynb` file. The content displayed after you click it is as shown in Figure 14.2. This notebook includes a markdown cell and a code cell. The content in the markdown cell includes "This is A Title" and "This is text". The code cell contains two lines of Python code.
 
 ![Markdown and code cells in the "text.ipynb" file. ](../img/jupyter01.png)
 
 
-Double click on the markdown cell, to enter edit mode. Add a new text string "Hello world." at the end of the cell, as shown in Figure 14.3.
+Double click on the markdown cell to enter edit mode. Add a new text string "Hello world." at the end of the cell, as shown in Figure 14.3.
 
 ![Edit the markdown cell. ](../img/jupyter02.png)
 
@@ -47,7 +47,7 @@ Beyond local editing there are two things that are quite important: editing the 
 
 ### Markdown Files in Jupyter 
 
-If you wish to contribute to the content of this book, you need to modify the source file (.md file, not .ipynb file)  on GitHub. Using the notedown plugin we can modify notebooks in .md format directly in Jupyter. Linux/MacOS users can execute the following commands to obtain the GitHub source files and activate the runtime environment. If you haven't done so already, install the environment needed for MXNet Gluon.
+If you wish to contribute to the content of this book, you need to modify the source file (.md file, not .ipynb file) on GitHub. Using the notedown plugin we can modify notebooks in .md format directly in Jupyter. Linux/MacOS users can execute the following commands to obtain the GitHub source files and activate the runtime environment. If you haven't done so already, install the environment needed for MXNet Gluon.
 
 ```
 git clone https://github.com/d2l-ai/d2l-en.git
@@ -82,7 +82,7 @@ After that, you only need to run the `jupyter notebook` command to turn on the n
 
 ### Run Jupyter Notebook on a Remote Server
 
-Sometimes, you may want to run Jupyter Notebook on a remote server and access it through a browser on your local computer. If Linux or MacOS is installed on you local machine (Windows can also support this function through third-party software such as PuTTY), you can use port forwarding:
+Sometimes, you may want to run Jupyter Notebook on a remote server and access it through a browser on your local computer. If Linux or MacOS is installed on your local machine (Windows can also support this function through third-party software such as PuTTY), you can use port forwarding:
 
 ```
 ssh myserver -L 8888:localhost:8888
@@ -92,7 +92,7 @@ The above is the address of the remote server `myserver`. Then we can use http:/
 
 ### Timing
 
-We can use the `ExecuteTime` plugin to time the execution of each code cell in a Jupyter notebook. Use the following commands to install the plugin:
+We can use the `ExecuteTime` plugin to time the execution of each code cell in a Jupyter Notebook. Use the following commands to install the plugin:
 
 ```
 pip install jupyter_contrib_nbextensions
