@@ -10,7 +10,7 @@ We will walk you through the steps in detail. If you are already familiar with G
 
 ### Install Git
 
-The Git open source book [3] describes how to install Git. This typically works via `sudo apt install git` on Ubuntu Linux, by installing the Xcode developer tools on macOS, or by using GitHub's [desktop client](https://desktop.github.com). If you don't have a GitHub account, you need to sign up for one [4].
+The Git open source book [3] describes how to install Git. This typically works via `apt install git` on Ubuntu Linux, by installing the Xcode developer tools on macOS, or by using GitHub's [desktop client](https://desktop.github.com). If you don't have a GitHub account, you need to sign up for one [4].
 
 ### Log in to GitHub
 
