@@ -33,7 +33,7 @@ To clone the repository (i.e. to make a local copy) we need to get its repositor
 git clone https://github.com/your_github_username/d2l-en.git
 ```
 
-On Unix, the above command copies all the code from GitHub to the directory `d2l-en`. 
+On Unix the above command copies all the code from GitHub to the directory `d2l-en`. 
 
 ### Edit the Book and Push
 
