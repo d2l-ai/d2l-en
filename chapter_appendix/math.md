@@ -4,7 +4,7 @@ This section summarizes basic tools from linear algebra, differentiation, and pr
 
 ## Linear Algebra
 
-This is a brief summary of vectors, matrices, operators, norms, eigenvectors, and eigenvalues. They're needed since a significant part of deep learning revolves around manipulating matrices and vectors. For a much more in-depth introduction to linear algebra in Python see e.g. the [Jupyter notebooks] of Gilbert Strang's MIT course on [Linear Algebra](https://www.amazon.com/exec/obidos/ASIN/0980232716/).
+This is a brief summary of vectors, matrices, operators, norms, eigenvectors, and eigenvalues. They're needed since a significant part of deep learning revolves around manipulating matrices and vectors. For a much more in-depth introduction to linear algebra in Python see e.g. the [Jupyter notebooks](https://github.com/juanklopper/MIT_OCW_Linear_Algebra_18_06) of Gilbert Strang's MIT course on [Linear Algebra](https://www.amazon.com/exec/obidos/ASIN/0980232716/).
 
 ### Vectors
 
