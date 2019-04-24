@@ -1,6 +1,6 @@
 # Sequence to Sequence with Attention Mechanism
 
-In this section, we add the attention mechanism to the sequence to sequence model introduced in the ["Sequence to Sequence"](seq2seq.md) section to explicitly select state. The following figure shows the model architecture for a decoding time step. As can be seen, the memory of the attention layer consists of the encoder outputs of each time step. During decoding, the decoder output from the previous time step is used as the query, the attention output is then fed into the decoder with the input to provide attentional context information. 
+In this section, we add the attention mechanism to the sequence to sequence model introduced in the ["Sequence to Sequence"](../chapter_recurrent-neural-networks/seq2seq.md) section to explicitly select state. The following figure shows the model architecture for a decoding time step. As can be seen, the memory of the attention layer consists of the encoder outputs of each time step. During decoding, the decoder output from the previous time step is used as the query, the attention output is then fed into the decoder with the input to provide attentional context information. 
 
 ![The second time step in decoding for the sequence to sequence model with attention mechanism.](../img/seq2seq_attention.svg)
 
@@ -61,7 +61,7 @@ class Seq2SeqAttentionDecoder(d2l.Decoder):
                                         enc_valid_len]
 ```
 
-Use the same hyper-parameters to create an encoder and decoder as the ["Sequence to Sequence"](seq2seq.md) section, we get the same decoder output shape, but the state structure is changed.
+Use the same hyper-parameters to create an encoder and decoder as the ["Sequence to Sequence"](../chapter_recurrent-neural-networks/seq2seq.md) section, we get the same decoder output shape, but the state structure is changed.
 
 ```{.python .input  n=3}
 encoder = d2l.Seq2SeqEncoder(vocab_size=10, embed_size=8,
@@ -78,7 +78,7 @@ out.shape, len(state), state[0].shape, len(state[1]), state[1][0].shape
 
 ## Training
 
-Again, we use the same training hyper-parameters as the ["Sequence to Sequence"](seq2seq.md) section. The training loss is similar to the seq2seq model, because the sequences in the training dataset are relative short. The additional attention layer doesn't lead to a significant different. But due to both attention layer computational overhead and we unroll the time steps in the decoder, this model is much slower than the seq2seq model.
+Again, we use the same training hyper-parameters as the ["Sequence to Sequence"](../chapter_recurrent-neural-networks/seq2seq.md) section. The training loss is similar to the seq2seq model, because the sequences in the training dataset are relative short. The additional attention layer doesn't lead to a significant different. But due to both attention layer computational overhead and we unroll the time steps in the decoder, this model is much slower than the seq2seq model.
 
 ```{.python .input  n=5}
 embed_size, num_hiddens, num_layers, dropout = 32, 32, 2, 0.0
