@@ -66,7 +66,8 @@
         * 1pt
         * arrow head size: 50%
     * Font：
-        * Arial, 9pt（subscripts：7pt）
+        * STIXGeneral, 9pt（subscripts/superscripts：6pt）
+        * Do not italize numbers or parentheses in subscripts or superscripts
     * Color：
         * Blue as background (text is black)
             * Dark：66BFFF

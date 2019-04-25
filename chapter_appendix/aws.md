@@ -45,11 +45,11 @@ All the above servers come in multiple flavors indicating the number of GPUs use
 
 ![ Choose an instance. ](../img/p2x.png)
 
-Before choosing an instance, we suggest you check if there are quantity restrictions by clicking the "Limits" label in the bar on the, as left shown in Figure 14.9. As shown in Figure 14.12, this account can only open one "p2.xlarge" instance per region. If you need to open more instances, click on the "Request limit increase" link to apply for a higher instance quota. Generally, it takes one business day to process an application.
+Before choosing an instance, we suggest you check if there are quantity restrictions by clicking the "Limits" label in the bar on the left as shown in Figure 14.9. Figure 14.12 shows an example of such a limitation. The account can only open one "p2.xlarge" instance per region. If you need to open more instances, click on the "Request limit increase" link to apply for a higher instance quota. Generally, it takes one business day to process an application.
 
 ![ Instance quantity restrictions. ](../img/limits.png)
 
-In this example, we keep the default configurations for the steps "3. Configure Instance", "5. Add Tags", and "6. Configure Security Group". Tap on "4. Add Storage" and increase the default hard disk size to 64 GB. Note that CUDA by itself already takes up 4GB.
+So far, we have finished the first two of seven steps for launching an EC2 instance, as shown on the top of Fig 14.13. In this example, we keep the default configurations for the steps "3. Configure Instance", "5. Add Tags", and "6. Configure Security Group". Tap on "4. Add Storage" and increase the default hard disk size to 64 GB. Note that CUDA by itself already takes up 4GB.
 
 ![ Modify instance hard disk size. ](../img/disk.png)
 
@@ -74,8 +74,8 @@ Here, "/path/to/key.pem" is the path of the locally-stored key used to access th
 It is a good idea to update the instance with the latest drivers.
 
 ```
-sudo apt-get update
-sudo apt-get dist-upgrade
+sudo apt update
+sudo apt dist-upgrade
 ```
 
 Your server is ready now.
@@ -94,9 +94,9 @@ This selects CUDA 10.0 as the default.
 If you prefer to take the scenic route, please follow the path below. First, update and install the package needed for compilation.
 
 ```
-sudo apt-get update 
-sudo apt-get dist-upgrade
-sudo apt-get install -y build-essential git libgfortran3
+sudo apt update 
+sudo apt dist-upgrade
+sudo apt install -y build-essential git libgfortran3
 ```
 
 NVIDIA frequently releases updates to CUDA (typically one major version per year). Here we download CUDA 10.0. Visit NVIDIA's official repository at (https://developer.nvidia.com/cuda-toolkit-archive) to find the download link of CUDA 10.0 as shown below.
@@ -203,7 +203,7 @@ $ python
 
 ## Running Jupyter
 
-To run Jupyter remotely you need to use SSH port forwarding. After all, the server in the cloud doesn't have a monitor or keyboard. For this log into your server from your desktop (or laptop) as follows.
+To run Jupyter remotely you need to use SSH port forwarding. After all, the server in the cloud doesn't have a monitor or keyboard. For this, log into your server from your desktop (or laptop) as follows.
 
 ```
 # This command must be run in the local command line
@@ -222,7 +222,7 @@ Since you used port forwarding to port 8889 you will need to replace the port nu
 
 As cloud services are billed by the time of use, you should close instances that are not being used. Note that there are alternatives: *Stopping* an instance means that you will be able to start it again. This is akin to switching off the power for your regular server. However, stopped instances will still be billed a small amount for the hard disk space retained. *Terminate* deletes all data associated with it. This includes the disk, hence you cannot start it again. Only do this if you know that you won't need it in the future.
 
-If you want to use the instance as a template for many more instances, right-click on the example in Figure 14.16 and select "Image" $\rightarrow$ "Create" to create an image of the instance. Once this is complete select "Instance State" $\rightarrow$ "Terminate" to terminate the instance. The next time you want to use this instance, you can follow the steps for creating and running an EC2 instance described in this section to create an instance based on the saved image. The only difference is that, in "1. Choose AMI" shown in Figure 14.10, you must use the "My AMIs" option on the left to select your saved image. The created instance will retain the information stored on the image hard disk. For example, you will not have to reinstall CUDA and other runtime environments.
+If you want to use the instance as a template for many more instances, right-click on the example in Figure 14.16 and select "Image" $\rightarrow$ "Create" to create an image of the instance. Once this is complete, select "Instance State" $\rightarrow$ "Terminate" to terminate the instance. The next time you want to use this instance, you can follow the steps for creating and running an EC2 instance described in this section to create an instance based on the saved image. The only difference is that, in "1. Choose AMI" shown in Figure 14.10, you must use the "My AMIs" option on the left to select your saved image. The created instance will retain the information stored on the image hard disk. For example, you will not have to reinstall CUDA and other runtime environments.
 
 ## Summary
 
