@@ -22,3 +22,5 @@ build/d2l
 img/*.pdf
 aclImdb*
 /_build/
+graffle/*/*.svg
+graffle/*/*.pdf

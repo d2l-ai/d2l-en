@@ -30,24 +30,22 @@ and confidently launch it *before ever seeing a real customer*.
 Our ability to design automated systems from first principles
 that drive functioning products and systems,
 often in novel situations, is a remarkable cognitive feat.
-And when you're able to devise solutions that work $100\%$ of the time.
+And when you're able to devise solutions that work $100\%$ of the time,
 *you should not be using machine learning*.
 
 Fortunately—for the growing community of ML scientists—many
 problems in automation don't bend so easily to human ingenuity.
 Imagine huddling around the whiteboard with the smartest minds you know,
 but this time you are tackling any of the following problems:
- * Write a program that predicts tomorrow's weather
-given geographic information, satellite images,
-and a trailing window of past weather.
- * Write a program that takes in a question,
- expressed in free-form text, and answers it correctly.
- * Write a program that given an image
- can identify all the people it contains,
+
+* Write a program that predicts tomorrow's weather given geographic
+information, satellite images, and a trailing window of past weather.
+* Write a program that takes in a question, expressed in free-form text, and
+ answers it correctly.
+* Write a program that given an image can identify all the people it contains,
  drawing outlines around each.
-  * Write a program that presents users with products
-  that they are likely to enjoy but unlikely,
-  in the natural course of browsing, to encounter.
+* Write a program that presents users with products that they are likely to
+  enjoy but unlikely, in the natural course of browsing, to encounter.
 
 In each of these cases, even elite programmers
 are incapable of coding up solutions from scratch.
@@ -175,9 +173,7 @@ The training process usually looks like this:
 1. Tweak the knobs so the model sucks less with respect to those examples
 1. Repeat until the model is awesome.
 
-![](../img/ml-loop.svg)
-
-
+![A typical training process. ](../img/ml-loop.svg)
 
 To summarize, rather than code up a wake word recognizer,
 we code up a program that can *learn* to recognize wake words,
@@ -185,10 +181,10 @@ we code up a program that can *learn* to recognize wake words,
 You can think of this act
 of determining a program's behavior by presenting it with a dataset
 as *programming with data*.
-We can 'program' a cat detector by providing our machine learning system
+We can "program" a cat detector by providing our machine learning system
 with many examples of cats and dogs, such as the images below:
 
-|![](../img/cat1.png)|![](../img/cat2.jpg)|![](../img/dog1.jpg)|![](../img/dog2.jpg)|
+| ![cat1](../img/cat1.png) | ![cat2](../img/cat2.jpg) | ![dog1](../img/dog1.jpg) |![dog2](../img/dog2.jpg) |
 |:---------------:|:---------------:|:---------------:|:---------------:|
 |cat|cat|dog|dog|
 
@@ -460,7 +456,7 @@ and outputs another function, *the learned model*.
 Then, given a learned model,
 we can take a new previously unseen input, and predict the corresponding label.
 
-![](../img/supervised-learning.svg)
+![Supervised learning.](../img/supervised-learning.svg)
 
 
 
@@ -827,7 +823,7 @@ Because all of the learning takes place after the algorithm is disconnected from
 this is called *offline learning*.
 For supervised learning, the process looks like this:
 
-![](../img/data-collection.svg)
+![Collect data for supervised learning from an environment.](../img/data-collection.svg)
 
 
 This simplicity of offline learning has its charms.
@@ -880,7 +876,7 @@ The behavior of an RL agent is governed by a *policy*.
 In short, a *policy* is just a function that maps from observations (of the environment) to actions.
 The goal of reinforcement learning is to produce a good policy.
 
-![](../img/rl-environment.svg)
+![The interaction between reinforcement learning and an environment.](../img/rl-environment.svg)
 
 It's hard to overstate the generality of the RL framework.
 For example, we can cast any supervised learning problem as an RL problem.
