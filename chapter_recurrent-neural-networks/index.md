@@ -1,4 +1,5 @@
 # Recurrent Neural Networks
+:label:`chapter_rnn`
 
 So far we encountered two types of data: generic vectors and
 images. For the latter we designed specialized layers to take

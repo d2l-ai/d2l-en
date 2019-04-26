@@ -1,4 +1,5 @@
 # Attention Mechanism
+:label:`chapter_attention`
 
 ```eval_rst
 

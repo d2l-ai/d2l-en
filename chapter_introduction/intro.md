@@ -1,4 +1,5 @@
 # Introduction
+:label:chapter.introduction:
 
 Until recently, nearly all of the computer programs
 that we interacted with every day were coded

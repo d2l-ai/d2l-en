@@ -1,4 +1,5 @@
 # Natural Language Processing
+:label:`chapter_nlp`
 
 Natural language processing is concerned with interactions between computers and humans that use natural language. In practice, it is very common for us to use this technique to process and analyze large amounts of natural language data, like the language models from the "Recurrent Neural Networks" section.
 
