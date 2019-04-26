@@ -17,10 +17,10 @@ chapter_install/install
 :numbered:
 
 chapter_appendix/index
+chapter_introduction/intro
 ```
 
 
-chapter_introduction/intro
 chapter_crashcourse/index
 chapter_linear-networks/index
 chapter_multilayer-perceptrons/index

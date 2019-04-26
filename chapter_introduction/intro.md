@@ -1,5 +1,5 @@
 # Introduction
-:label:chapter.introduction:
+:label:`chapter_introduction`
 
 Until recently, nearly all of the computer programs
 that we interacted with every day were coded
@@ -108,7 +108,7 @@ If you're stuck, don't worry.
 We don't know how to write such a program from scratch either.
 That's why we use ML.
 
-![](../img/wake-word.svg)
+![Identify an awake word.](../img/wake-word.svg)
 
 
 Here's the trick.
@@ -593,9 +593,8 @@ In MXNet Gluon, the corresponding loss function can be found [here](https://mxne
 
 Note that the most likely class is not necessarily the one that you're going to use for your decision. Assume that you find this beautiful mushroom in your backyard:
 
-|![](../img/death_cap.jpg)|
-|:-------:|
-|Death cap - do not eat!|
+![Death cap - do not eat!](../img/death_cap.jpg)
+:width:`400px`
 
 Now, assume that you built a classifier and trained it
 to predict if a mushroom is poisonous based on a photograph.
@@ -619,7 +618,8 @@ Usually, this is referred to as *hierarchical classification*.
 One early example is due to [Linnaeus](https://en.wikipedia.org/wiki/Carl_Linnaeus),
 who organized the animals in a hierarchy.
 
-![](../img/sharks.png)
+![Classify sharks](../img/sharks.png)
+:width:`500px`
 
 In the case of animal classification, it might not be so bad to mistake a poodle for a schnauzer,
 but our model would pay a huge penalty if it confused a poodle for a dinosaur.
@@ -635,7 +635,8 @@ Given the current state of computer vision,
 we can do this easily, with off-the-shelf tools.
 Nonetheless, no matter how accurate our model gets, we might find ourselves in trouble when the classifier encounters an image of the Town Musicians of Bremen.
 
-![](../img/stackedanimals.jpg)
+![A cat, a roster, a dog and a donkey](../img/stackedanimals.jpg)
+:width:`500px`
 
 
 As you can see, there's a cat in the picture, and a rooster, a dog and a donkey, with some trees in the background.
@@ -687,7 +688,7 @@ Such problems occur, e.g. for movie, product or music recommendation. In some ca
 
 Given such a model, then for any given user, we could retrieve the set of objects with the largest scores $y_{ij}$, which are then used as a recommendation. Production systems are considerably more advanced and take detailed user activity and item characteristics into account when computing such scores. The following image is an example of deep learning books recommended by Amazon based on personalization algorithms tuned to the author's preferences.
 
-![](../img/deeplearning_amazon.png)
+![Deep learning books recommended by Amazon.](../img/deeplearning_amazon.png)
 
 
 #### Sequence Learning
@@ -734,9 +735,10 @@ a number of special cases are worth mentioning:
 
 This involves annotating a text sequence with attributes. In other words, the number of inputs and outputs is essentially the same. For instance, we might want to know where the verbs and subjects are. Alternatively, we might want to know which words are the named entities. In general, the goal is to decompose and annotate text based on structural and grammatical assumptions to get some annotation. This sounds more complex than it actually is. Below is a very simple example of annotating a sentence with tags indicating which words refer to named entities.
 
-|Tom | has | dinner | in | Washington | with | Sally.|
-|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
-|Ent | - | - | - | Ent | - | Ent|
+```text
+Tom has dinner in Washington with Sally.
+Ent  -    -    -     Ent      -    Ent
+```
 
 
 ##### Automatic Speech Recognition
@@ -747,9 +749,8 @@ The challenge is that there are many more audio frames (sound is typically sampl
 since thousands of samples correspond to a single spoken word.
 These are ``seq2seq`` problems where the output is much shorter than the input.
 
-|`-D-e-e-p- L-ea-r-ni-ng-`|
-|:--------------:|
-|![Deep Learning](../img/speech.png)|
+![`-D-e-e-p- L-ea-r-ni-ng-`](../img/speech.png)
+:width:`700px`
 
 ##### Text to Speech
 
@@ -769,13 +770,14 @@ neither the number of inputs and outputs
 nor the order of corresponding data points
 are assumed to be the same.
 Consider the following illustrative example of the obnoxious tendency of Germans
-(*Alex writing here*)
+<!-- Alex writing here -->
 to place the verbs at the end of sentences.
 
-|German |Haben Sie sich schon dieses grossartige Lehrwerk angeschaut?|
-|:------|:---------|
-|English|Did you already check out this excellent tutorial?|
-|Wrong alignment |Did you yourself already this excellent tutorial looked-at?|
+```text
+German:           Haben Sie sich schon dieses grossartige Lehrwerk angeschaut?
+English:          Did you already check out this excellent tutorial?
+Wrong alignment:  Did you yourself already this excellent tutorial looked-at?
+```
 
 A number of related problems exist.
 For instance, determining the order in which a user reads a webpage
@@ -944,6 +946,7 @@ Although deep learning is a recent invention, humans have held the desire to ana
 Even in the middle ages mathematicians had a keen intuition of estimates. For instance, the geometry book of [Jacob Köbel (1460-1533)](https://www.maa.org/press/periodicals/convergence/mathematical-treasures-jacob-kobels-geometry) illustrates averaging the length of 16 adult men's feet to obtain the average foot length.
 
 ![Estimating the length of a foot](../img/koebel.jpg)
+:width:`500px`
 
 Figure 1.1 illustrates how this estimator works. 16 adult men were asked to line up in a row, when leaving church. Their aggregate length was then divided by 16 to obtain an estimate for what now amounts to 1 foot. This 'algorithm' was later improved to deal with misshapen feet - the 2 men with the shortest and longest feet respectively were sent away, averaging only over the remainder. This is one of the earliest examples of the trimmed mean estimate.
 
@@ -966,7 +969,9 @@ Given the scarcity of data and computation, strong statistical tools such as Ker
 
 ## The Road to Deep Learning
 
-Much of this changed with the ready availability of large amounts of data, due to the World Wide Web, the advent of companies serving hundreds of millions of users online, a dissemination of cheap, high quality sensors, cheap data storage (Kryder's law), and cheap computation (Moore's law), in particular in the form of GPUs, originally engineered for computer gaming. Suddenly algorithms and models that seemed computationally infeasible became relevant (and vice versa). This is best illustrated in the table below:
+Much of this changed with the ready availability of large amounts of data, due to the World Wide Web, the advent of companies serving hundreds of millions of users online, a dissemination of cheap, high quality sensors, cheap data storage (Kryder's law), and cheap computation (Moore's law), in particular in the form of GPUs, originally engineered for computer gaming. Suddenly algorithms and models that seemed computationally infeasible became relevant (and vice versa). This is best illustrated in :numref:`tab_intro_decade`.
+
+:Dataset versus computer memory and computational power
 
 |Decade|Dataset|Memory|Floating Point Calculations per Second|
 |:--|:-|:-|:-|
@@ -976,6 +981,7 @@ Much of this changed with the ready availability of large amounts of data, due t
 |2000|10 M (web pages)|100 MB|1 GF (Intel Core)|
 |2010|10 G (advertising)|1 GB|1 TF (Nvidia C2050)|
 |2020|1 T (social network)|100 GB|1 PF (Nvidia DGX-2)|
+:label:`tab_intro_decade`
 
 It is quite evident that RAM has not kept pace with the growth in data. At the same time, the increase in computational power has outpaced that of the data available. This means that statistical models needed to become more memory efficient (this is typically achieved by adding nonlinearities) while simultaneously being able to spend more time on optimizing these parameters, due to an increased compute budget. Consequently the sweet spot in machine learning and statistics moved from (generalized) linear models and kernel methods to deep networks. This is also one of the reasons why many of the mainstays of deep learning, such as Multilayer Perceptrons (e.g. McCulloch & Pitts, 1943), Convolutional Neural Networks (Le Cun, 1992), Long Short Term Memory (Hochreiter & Schmidhuber, 1997), Q-Learning (Watkins, 1989), were essentially 'rediscovered' in the past decade, after laying dormant for considerable time.
 
