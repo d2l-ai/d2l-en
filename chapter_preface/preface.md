@@ -86,7 +86,7 @@ While sporadic topics have been covered in blog posts,
 e.g. on the website [Distill](http://distill.pub) or personal blogs,
 they only covered selected topics in deep learning, and often lacked associated code.
 On the other hand, while several textbooks have emerged,
-most notably [Goodfellow, Bengio and Courville, 2016](https://www.deeplearningbook.org/),
+most notably :cite:Goodfellow-et-al-2016:,
 which offers an excellent survey of the concepts behind deep learning,
 these resources don't marry the descriptions to realizations of the concepts in code,
 sometimes leaving readers clueless as to how to implement them.
