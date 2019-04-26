@@ -11,5 +11,5 @@ aws
 buy-gpu
 how-to-contribute
 d2l
-references
+zreferences
 ```
