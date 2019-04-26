@@ -188,21 +188,24 @@ The first chapter offers an [Introduction to Deep Learning](../chapter_introduct
 In [Crashcourse](../chapter_crashcourse/index.md),
 we'll quickly bring you up to speed on the prerequisites required for hands-on deep learning,
 such as how to acquire and run the codes covered in the book.
-[Deep Learning Basics](../chapter_deep-learning-basics/index.md)
-covers the most basic concepts and techniques of deep learning,
+[Linear Neural Networks](../chapter_linear-networks/index.md) and [Multilayer Perceptrons](../chapter_multilayer-perceptrons/index.md)
+cover the most basic concepts and techniques of deep learning,
 such as multi-layer perceptrons and regularization.
 <!--If you are short on time or you only want to learn only
 about the most basic concepts and techniques of deep learning,
 it is sufficient to read the first section only.-->
-* The next three chapters focus on modern deep learning techniques.
+* The next five chapters focus on modern deep learning techniques.
 [Deep Learning Computation](../chapter_deep-learning-computation/index.md)
 describes the various key components of deep learning calculations
 and lays the groundwork for the later implementation of more complex models.
-Next we explain [Convolutional Neural Networks](../chapter_convolutional-neural-networks/index.md),
+Next we explain [Convolutional Neural Networks](../chapter_convolutional-neural-networks/index.md)
+and [Modern Convolutional Networks](../chapter_convolutional-modern/index.md),
 powerful tools that form the backbone of most modern computer vision systems in recent years.
 Subsequently, we introduce [Recurrent Neural Networks](../chapter_recurrent-neural-networks/index.md),
 models that exploit temporal or sequential structure in data,
 and are commonly used for natural language processing and time series prediction.
+Then we introduce the [Attention Mechanism](../chapter_attention-mechanism/index.md),
+which becomes a key component in the recent state-of-the-art deep learning models.
 These sections will get you up to speed on the basic tools behind most modern deep learning.
 
 * Part three discusses scalability, efficiency and applications.
