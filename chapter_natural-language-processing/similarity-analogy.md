@@ -52,12 +52,7 @@ Below, we demonstrate the application of pre-trained word vectors, using GloVe a
 ### Finding Synonyms
 
 Here, we re-implement the algorithm used to search for synonyms by cosine
-similarity introduced in
-
-:numref:`chapter_`
-
-the ["Implementation of Word2vec"](./word2vec-gluon.md)
-section.
+similarity introduced in :numref:`chapter_word2vec`
 
 In order to reuse the logic for seeking the $k$ nearest neighbors when
 seeking analogies, we encapsulate this part of the logic separately in the `knn`

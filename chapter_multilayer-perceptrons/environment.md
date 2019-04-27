@@ -308,15 +308,14 @@ to come from either one of the two distributions.
 On the other hand, any instances that can be well discriminated
 should be significantly over/underweighted accordingly.
 For simplicity’s sake assume that we have an equal number of instances
-from both distributions, denoted by $\mathbf{x}_i \sim p(\mathbf{x})$
-and $\mathbf{x}_i′ \sim q(\mathbf{x})$ respectively.
+from both distributions, denoted by $\mathbf{x}_i \sim p(\mathbf{x})$ and $\mathbf{x}_i' \sim q(\mathbf{x})$ respectively.
 Now denote by $z_i$ labels which are 1
 for data drawn from $p$ and -1 for data drawn from $q$.
 Then the probability in a mixed dataset is given by
 
 $$p(z=1|\mathbf{x}) = \frac{p(\mathbf{x})}{p(\mathbf{x})+q(\mathbf{x})} \text{ and hence } \frac{p(z=1|\mathbf{x})}{p(z=-1|\mathbf{x})} = \frac{p(\mathbf{x})}{q(\mathbf{x})}$$
 
-Hence, if we use a logistic regression approach where $p(z=1|\mathbf{x})=\frac{1}{1+\exp(−f(\mathbf{x}))}$ it follows that
+Hence, if we use a logistic regression approach where $p(z=1|\mathbf{x})=\frac{1}{1+\exp(-f(\mathbf{x}))}$ it follows that
 
 $$
 \beta(\mathbf{x}) = \frac{1/(1 + \exp(-f(\mathbf{x})))}{\exp(-f(\mathbf{x})/(1 + \exp(-f(\mathbf{x})))} = \exp(f(\mathbf{x}))

@@ -103,7 +103,7 @@ For brevity, we use $\nabla f(\boldsymbol{x})$ instead of $\nabla_{\boldsymbol{x
 
 $$\text{D}_{\boldsymbol{u}} f(\boldsymbol{x}) = \lim_{h \rightarrow 0}  \frac{f(\boldsymbol{x} + h \boldsymbol{u}) - f(\boldsymbol{x})}{h}.$$
 
-According to the property of directional derivatives \[1，Chapter 14.6 Theorem 3\], the aforementioned directional derivative can be rewritten as
+According to the property of directional derivatives, the aforementioned directional derivative can be rewritten as
 
 $$\text{D}_{\boldsymbol{u}} f(\boldsymbol{x}) = \nabla f(\boldsymbol{x}) \cdot \boldsymbol{u}.$$
 

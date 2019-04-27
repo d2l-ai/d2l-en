@@ -15,7 +15,9 @@ Just like with GRUs, the data feeding into the LSTM gates is the input at the cu
 
 ![Calculation of input, forget, and output gates in an LSTM. ](../img/lstm_0.svg)
 
-We assume there are $h$ hidden units and that the minibatch is of size $n$. Thus the input is $\mathbf{X}_t \in \mathbb{R}^{n \times d}$ (number of examples: $n$, number of inputs: $d$）and the hidden state of the last time step is $\mathbf{H}_{t-1} \in \mathbb{R}^{n \times h}$. Correspondingly the gates are defined as follows: the input gate is $\mathbf{I}_t \in \mathbb{R}^{n \times h}$, the forget gate is $\mathbf{F}_t \in \mathbb{R}^{n \times h}$, and the output gate is $\mathbf{O}_t \in \mathbb{R}^{n \times h}$. They are calculated as follows:
+We assume there are $h$ hidden units and that the minibatch is of size $n$. Thus
+the input is $\mathbf{X}_t \in \mathbb{R}^{n \times d}$ (number of examples:
+$n$, number of inputs: $d$) and the hidden state of the last time step is $\mathbf{H}_{t-1} \in \mathbb{R}^{n \times h}$. Correspondingly the gates are defined as follows: the input gate is $\mathbf{I}_t \in \mathbb{R}^{n \times h}$, the forget gate is $\mathbf{F}_t \in \mathbb{R}^{n \times h}$, and the output gate is $\mathbf{O}_t \in \mathbb{R}^{n \times h}$. They are calculated as follows:
 
 $$
 \begin{aligned}
