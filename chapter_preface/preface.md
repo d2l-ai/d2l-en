@@ -110,7 +110,7 @@ accessible both as executable code, as a physical book,
 as a downloadable PDF, and on the internet as a website.
 At present there exist no tools and no workflow
 perfectly suited to these demands, so we had to assemble our own.
-We describe our approach in detail in :ref:`chapter_contribute`.
+We describe our approach in detail in :numref:`chapter_contribute`.
 We settled on Github to share the source and to allow for edits,
 Jupyter notebooks for mixing code, equations and text,
 Sphinx as a rendering engine to generate multiple outputs,
@@ -184,34 +184,34 @@ we can just use the ``Gluon`` version in subsequent tutorials.
 The book can be roughly divided into three sections:
 
 * The first part covers prerequisites and basics.
-The first chapter offers an introduction to deep learning in :ref:`chapter_introduction`.
-In :ref:`chapter_crashcourse`,
+The first chapter offers an introduction to deep learning in :numref:`chapter_introduction`.
+In :numref:`chapter_crashcourse`,
 we'll quickly bring you up to speed on the prerequisites required for hands-on deep learning,
 such as how to acquire and run the codes covered in the book.
-:ref:`chapter_linear` and :ref:`chapter_mlp`
+:numref:`chapter_linear` and :numref:`chapter_mlp`
 cover the most basic concepts and techniques of deep learning,
 such as linear regression, multi-layer perceptrons and regularization.
 <!--If you are short on time or you only want to learn only
 about the most basic concepts and techniques of deep learning,
 it is sufficient to read the first section only.-->
 * The next four chapters focus on modern deep learning techniques.
-:ref:`chapter_computation`
+:numref:`chapter_computation`
 describes the various key components of deep learning calculations
 and lays the groundwork for the later implementation of more complex models.
-Next we explain in :ref:`chapter_cnn` and :ref:`chapter_mordern_cnn`,
+Next we explain in :numref:`chapter_cnn` and :numref:`chapter_mordern_cnn`,
 powerful tools that form the backbone of most modern computer vision systems in recent years.
-Subsequently, we introduce :ref:`chapter_rnn`
+Subsequently, we introduce :numref:`chapter_rnn`
 models that exploit temporal or sequential structure in data,
 and are commonly used for natural language processing and time series
-prediction. :ref:`chapter_attention` introduces recent models exploring the attention mechanism.
+prediction. :numref:`chapter_attention` introduces recent models exploring the attention mechanism.
 These sections will get you up to speed on the basic tools behind most modern deep learning.
 
 * Part three discusses scalability, efficiency and applications.
-First we discuss several common :ref:`chapter_optimization`
+First we discuss several common :numref:`chapter_optimization`
 used to train deep learning models.
-The next chapter, :ref:`chapter_performance`
+The next chapter, :numref:`chapter_performance`
 examines several important factors that affect the computational performance of your deep learning code.
-:ref:`chapter_cv` and :ref:`chapter_nlp`
+:numref:`chapter_cv` and :numref:`chapter_nlp`
 illustrate major applications of deep learning
 in computer vision and natural language processing, respectively.
 
@@ -249,7 +249,7 @@ to update the code and runtime environment.
 At times, to avoid unnecessary repetition,
 we encapsulate the frequently-imported and referred-to functions, classes, etc.
 in this book in the `d2l` package.
-We give a detailed overview of these functions and classes in :ref:`chapter_d2l`.
+We give a detailed overview of these functions and classes in :numref:`chapter_d2l`.
 
 
 ### Target Audience

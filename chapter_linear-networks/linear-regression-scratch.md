@@ -161,7 +161,7 @@ in the direction that reduces the loss.
 Since nobody wants to compute gradients explicitly
 (this is tedious and error prone),
 we use automatic differentiation to compute the gradient.
-See :ref:`chapter_autograd`
+See :numref:`chapter_autograd`
 for more details.
 Recall from the autograd chapter
 that in order for `autograd` to know
@@ -279,8 +279,8 @@ passing through every examples in the training dataset
 The number of epochs `num_epochs` and the learning rate `lr` are both hyper-parameters, which we set here to $3$ and $0.03$, respectively. Unfortunately, setting hyper-parameters is tricky
 and requires some adjustment by trial and error.
 We elide these details for now but revise them
-later in the chapter on
-:ref:`chapter_optimization`.
+later in
+:numref:`chapter_optimization`.
 
 ```{.python .input  n=12}
 lr = 0.03  # Learning rate

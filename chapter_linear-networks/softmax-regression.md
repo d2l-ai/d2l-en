@@ -3,7 +3,7 @@
 
 In the last two chapters, we worked through implementations
 linear regression, building everything from scratch
-(:ref:`chapter_linear_scratch` and again using Gluon (:ref:`chapter_linear_gluon`) to automate the most repetitive work.
+(:numref:`chapter_linear_scratch`) and again using Gluon (:numref:`chapter_linear_gluon`) to automate the most repetitive work.
 
 Regression is the hammer we reach for
 when we want to answer *how much?* or *how many?* questions.

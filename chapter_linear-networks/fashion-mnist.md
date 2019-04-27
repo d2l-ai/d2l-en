@@ -92,7 +92,7 @@ show_fashion_mnist(X, get_fashion_mnist_labels(y))
 
 ## Reading a Minibatch
 
-To make our life easier when reading from the training and test sets we use a `DataLoader` rather than creating one from scratch, as we did in :ref:`chapter_linear_scratch`. Recall that a data loader reads a mini-batch of data with an example number of `batch_size` each time.
+To make our life easier when reading from the training and test sets we use a `DataLoader` rather than creating one from scratch, as we did in :numref:`chapter_linear_scratch`. Recall that a data loader reads a mini-batch of data with an example number of `batch_size` each time.
 
 In practice, reading data can often be a significant performance bottleneck for training, especially when the model is simple or when the computer is fast. A handy feature of Gluon's `DataLoader` is the ability to use multiple processes to speed up data reading (not currently supported on Windows). For instance, we can set aside 4 processes to read the data (via `num_workers`).
 
@@ -120,7 +120,7 @@ The logic that we will use to obtain and read the Fashion-MNIST data set is
 encapsulated in the `d2l.load_data_fashion_mnist` function, which we will use in
 later chapters. This function will return two variables, `train_iter` and
 `test_iter`. As the content of this book continues to deepen, we will further
-improve this function. Its full implementation will be described in :ref:`chapter_alexnet`.
+improve this function. Its full implementation will be described in :numref:`chapter_alexnet`.
 
 Let's look at the time it takes to read the training data.
 

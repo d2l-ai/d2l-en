@@ -117,7 +117,7 @@ we were a bit sloppy in our implementation
 because failed to take precautions against numerical overflow or underflow
 due to large (or very small) elements of the matrix,
 as we did in
-:ref:`chapter_naive_bayes`.
+:numref:`chapter_naive_bayes`.
 
 
 ```{.python .input  n=13}

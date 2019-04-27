@@ -1,7 +1,9 @@
 # Concise Implementation of Softmax Regression
 
-Just as Gluon made it much easier to implement linear regression in :ref:`chapter_linear_gluon`, we'll find it similarly (or possibly more) convenient for implementing classification models.
-Again, we begin with our import ritual.
+Just as Gluon made it much easier to implement linear regression in
+:numref:`chapter_linear_gluon`, we'll find it similarly (or possibly more)
+convenient for implementing classification models.  Again, we begin with our
+import ritual.
 
 ```{.python .input  n=1}
 import sys
@@ -37,7 +39,7 @@ output through the cross-entropy loss. At its heart it uses `-nd.pick(y_hat,
 y).log()`. Mathematically, that's a perfectly reasonable thing to do. However,
 computationally, things can get hairy when dealing with exponentiation due to
 numerical stability issues, a matter we've already discussed a few times
-(e.g. in when covering :ref:`chapter_naive_bayes`) and
+(e.g. in :numref:`chapter_naive_bayes`) and
 in the problem set of the previous chapter). Recall that the softmax function
 calculates $\hat y_j = \frac{e^{z_j}}{\sum_{i=1}^{n} e^{z_i}}$, where $\hat y_j$
 is the j-th element of ``yhat`` and $z_j$ is the j-th element of the input
