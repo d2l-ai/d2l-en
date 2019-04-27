@@ -1,4 +1,5 @@
 # Numerical Stability and Initialization
+:label:`chapter_numerical_stability`.
 
 In the past few sections, each model that we implemented
 required initializing our parameters according to some specified distribution.

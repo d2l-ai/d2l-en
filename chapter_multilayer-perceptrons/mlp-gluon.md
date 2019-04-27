@@ -1,4 +1,5 @@
 # Concise Implementation of Multilayer Perceptron
+:label:`chapter_mlp_gluon`
 
 Now that we learned how multilayer perceptrons (MLPs) work in theory, let's implement them. We begin, as always, by importing modules.
 
@@ -14,8 +15,8 @@ from mxnet.gluon import loss as gloss, nn
 ## The Model
 
 The only difference from our softmax regression implementation
-is that we add two `Dense` (fully-connected) layers instead of one.  
-The first is our hidden layer, which has *256* hidden units 
+is that we add two `Dense` (fully-connected) layers instead of one.
+The first is our hidden layer, which has *256* hidden units
 and uses the ReLU activation function.
 
 ```{.python .input  n=5}
@@ -26,12 +27,12 @@ net.initialize(init.Normal(sigma=0.01))
 ```
 
 Note that as above we can invoke `net.add()` multiple times in succession,
-but we can also invoke it a single time, passing in 
-multiple layers to be added the network. 
-Thus, we could have equivalently written 
-`net.add(nn.Dense(256, activation='relu'), nn.Dense(10))`. 
-Again, note that as always, Gluon automatically 
-infers the missing input dimensions to each layer. 
+but we can also invoke it a single time, passing in
+multiple layers to be added the network.
+Thus, we could have equivalently written
+`net.add(nn.Dense(256, activation='relu'), nn.Dense(10))`.
+Again, note that as always, Gluon automatically
+infers the missing input dimensions to each layer.
 
 Training the model follows the exact same steps as in our softmax regression implementation.
 
