@@ -1,4 +1,4 @@
-"""Some basic functions/classes for d2l"""
+"""The base module contains some basic functions/classes for d2l"""
 
 import time
 import mxnet as mx

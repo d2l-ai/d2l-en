@@ -7,7 +7,7 @@ from .base import Vocab
 __all__ = ['load_data_imdb']
 
 def load_data_imdb(batch_size, max_len=500):
-    """Download a IMDB dataset, return the vocabulary and iterators"""
+    """Download an IMDB dataset, return the vocabulary and iterators."""
 
     data_dir = './'
     url = 'http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz'

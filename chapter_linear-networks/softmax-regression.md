@@ -114,7 +114,7 @@ p(Y|X) = \prod_{i=1}^n p(y^{(i)}|x^{(i)})
 -\log p(Y|X) = \sum_{i=1}^n -\log p(y^{(i)}|x^{(i)})
 $$
 
-Maximizing $p(Y|X)$ (and thus equivalently $-\log p(Y|X)$) 
+Maximizing $p(Y|X)$ (and thus equivalently minimizing $-\log p(Y|X)$) 
 corresponds to predicting the label well. 
 This yields the loss function (we dropped the superscript $(i)$ to avoid notation clutter):
 

@@ -86,7 +86,7 @@ class RNNModel(nn.Block):
         return self.rnn.begin_state(*args, **kwargs)
 
 class Encoder(nn.Block):
-    """The base encoder interface for the encoder-decoder architecture"""
+    """The base encoder interface for the encoder-decoder architecture."""
     def __init__(self, **kwargs):
         super(Encoder, self).__init__(**kwargs)
 
@@ -94,7 +94,7 @@ class Encoder(nn.Block):
         raise NotImplementedError
 
 class Decoder(nn.Block):
-    """The base decoder interface for the encoder-decoder archtecture"""
+    """The base decoder interface for the encoder-decoder archtecture."""
     def __init__(self, **kwargs):
         super(Decoder, self).__init__(**kwargs)
 
@@ -105,7 +105,7 @@ class Decoder(nn.Block):
         raise NotImplementedError
 
 class EncoderDecoder(nn.Block):
-    """The base class for the encoder-decoder architecture"""
+    """The base class for the encoder-decoder architecture."""
     def __init__(self, encoder, decoder, **kwargs):
         super(EncoderDecoder, self).__init__(**kwargs)
         self.encoder = encoder
