@@ -18,16 +18,19 @@ The Git open source book [3] describes how to install Git. This typically works 
 Enter the address of the book's code repository in your browser [2]. Click on the `Fork` button in the red box at the top-right of the figure below, to make a copy of the repository of this book. This is now *your copy* and you can change it any way you want.
 
 ![The code repository page.](../img/git-fork.png)
+:width:`700px`
 
 Now, the code repository of this book will be copied to your username, such as `smolix/d2l-en` shown at the top-left of the screenshot below.
 
 ![Copy the code repository.](../img/git-forked.png)
+:width:`700px`
 
 ### Clone the Repository
 
 To clone the repository (i.e. to make a local copy) we need to get its repository address. The green button on the picture below displays this. Make sure that your local copy is up to date with the main repository if you decide to keep this fork around for longer. For now simply follow the instructions in the [Installation](../chapter_prerequisite/install.md) section to get started. The main difference is that you're now downloading *your own fork* of the repository.
 
 ![Git clone.](../img/git-clone.png)
+:width:`700px`
 
 ```
 # Replace your_github_username with your GitHub username
@@ -74,6 +77,7 @@ The changed code will then be in your personal fork of the repository. To reques
 Go to your fork of the repository on GitHub and select "New pull request". This will open up a screen that shows you the changes between your edits and what is current in the main repository of the book.
 
 ![Pull Request.](../img/git-newpr.png)
+:width:`700px`
 
 
 ### Submit Pull Request
@@ -81,6 +85,7 @@ Go to your fork of the repository on GitHub and select "New pull request". This 
 Finally, submit a pull request. Make sure to describe the changes you have made in the pull request. This will make it easier for the authors to review it and to merge it with the book. Depending on the changes, this might get accepted right away, rejected, or more likely, you'll get some feedback on the changes. Once you've incorporated them, you're good to go.
 
 ![Create Pull Request.](../img/git-createpr.png)
+:width:`700px`
 
 Your pull request will appear among the list of requests in the main repository. We will make every effort to process it quickly.
 

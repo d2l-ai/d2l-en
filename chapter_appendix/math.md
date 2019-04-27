@@ -335,7 +335,11 @@ Assume random variable $X$ obeys a uniform distribution over $[a, b]$, i.e. $X \
 
 ### Normal Distribution
 
-The Normal Distribution, also called Gaussian is given by $p(x) = \frac{1}{2 \pi \sigma^2} \exp\left(-\frac{1}{2 \sigma^2} (x-\mu)^2\right)$. Its expectation is $\mu$ and its variance is $\sigma^2$. For more details on probability and statistics see the [introduction](../chapter_crashcourse/probability.md).
+The Normal Distribution, also called Gaussian is given by $p(x) = \frac{1}{2 \pi
+\sigma^2} \exp\left(-\frac{1}{2 \sigma^2} (x-\mu)^2\right)$. Its expectation is
+$\mu$ and its variance is $\sigma^2$. For more details on probability and
+statistics see
+:numref:`chapter_prob`.
 
 ## Summary
 

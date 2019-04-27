@@ -1,6 +1,11 @@
 # Using Jupyter
 
-This section describes how to edit and run the code in the chapters of this book using Jupyter Notebooks. Make sure you have Jupyter installed and downloaded the code as described in the [Installation](../chapter_install/install.md) section. If you want to know more about Jupyter see the excellent tutorial in the [Documentation](https://jupyter.readthedocs.io/en/latest/). 
+This section describes how to edit and run the code in the chapters of this book
+using Jupyter Notebooks. Make sure you have Jupyter installed and downloaded the
+code as described in
+:numref:`chapter_installation`.
+ If you want to know more about Jupyter see the excellent tutorial in
+the [Documentation](https://jupyter.readthedocs.io/en/latest/).
 
 
 ## Edit and Run the Code Locally
@@ -8,50 +13,57 @@ This section describes how to edit and run the code in the chapters of this book
 Suppose that the local path of code of the book is "xx/yy/d2l-en/". Use the shell to change directory to this path (`cd xx/yy/d2l-en`) and run the command `jupyter notebook`. If your browser doesn't do this automatically, open http://localhost:8888 and you will see the interface of Jupyter and all the folders containing the code of the book, as shown in Figure 14.1.
 
 ![The folders containing the code in this book. ](../img/jupyter00.png)
+:width:`600px`
 
 You can access the notebook files by clicking on the folder displayed on the webpage. They usually have the suffix `.ipynb`.
 For the sake of brevity, we create a temporary `test.ipynb` file. The content displayed after you click it is as shown in Figure 14.2. This notebook includes a markdown cell and a code cell. The content in the markdown cell includes "This is A Title" and "This is text". The code cell contains two lines of Python code.
 
 ![Markdown and code cells in the "text.ipynb" file. ](../img/jupyter01.png)
+:width:`600px`
 
 
 Double click on the markdown cell to enter edit mode. Add a new text string "Hello world." at the end of the cell, as shown in Figure 14.3.
 
 ![Edit the markdown cell. ](../img/jupyter02.png)
+:width:`600px`
 
 
 As shown in Figure 14.4, click "Cell" $\rightarrow$ "Run Cells" in the menu bar to run the edited cell.
 
 ![Run the cell. ](../img/jupyter03.png)
+:width:`600px`
 
 
 After running, the markdown cell is as shown in Figure 14.5.
 
 ![The markdown cell after editing. ](../img/jupyter04.png)
+:width:`600px`
 
 
 Next, click on the code cell. Multiply the elements by 2 after the last line of code, as shown in Figure 14.6.
 
 ![Edit the code cell. ](../img/jupyter05.png)
+:width:`600px`
 
 You can also run the cell with a shortcut ("Ctrl + Enter" by default) and obtain the output result from Figure 14.7.
 
 ![Run the code cell to obtain the output. ](../img/jupyter06.png)
+:width:`600px`
 
 When a notebook contains more cells, we can click "Kernel" $\rightarrow$ "Restart & Run All" in the menu bar to run all the cells in the entire notebook. By clicking "Help" $\rightarrow$ "Edit Keyboard Shortcuts" in the menu bar, you can edit the shortcuts according to your preferences.
 
 
 ## Advanced Options
 
-Beyond local editing there are two things that are quite important: editing the notebooks in markdown format and running Jupyter remotely. The latter matters when we want to run the code on a faster server. The former matters since Jupyter's native .ipnyb format stores a lot of auxiliary data that isn't really specific to what is in the notebooks, mostly related to how and where the code is run. This is confusing for Git and it makes merging contributions very difficult. Fortunately there's an alternative - native editing in Markdown. 
+Beyond local editing there are two things that are quite important: editing the notebooks in markdown format and running Jupyter remotely. The latter matters when we want to run the code on a faster server. The former matters since Jupyter's native .ipnyb format stores a lot of auxiliary data that isn't really specific to what is in the notebooks, mostly related to how and where the code is run. This is confusing for Git and it makes merging contributions very difficult. Fortunately there's an alternative - native editing in Markdown.
 
-### Markdown Files in Jupyter 
+### Markdown Files in Jupyter
 
 If you wish to contribute to the content of this book, you need to modify the source file (.md file, not .ipynb file) on GitHub. Using the notedown plugin we can modify notebooks in .md format directly in Jupyter. Linux/MacOS users can execute the following commands to obtain the GitHub source files and activate the runtime environment. If you haven't done so already, install the environment needed for MXNet Gluon.
 
 ```
 git clone https://github.com/d2l-ai/d2l-en.git
-cd d2l-en 
+cd d2l-en
 sed -i 's/mxnet/mxnet-cu100/g' environment.yml  # Only use this if you have a GPU
 conda env create -f environment.yml
 source activate gluon # Windows users run "activate gluon"
@@ -64,7 +76,7 @@ pip install https://github.com/mli/notedown/tarball/master
 jupyter notebook --NotebookApp.contents_manager_class='notedown.NotedownContentsManager'
 ```
 
-To turn on the notedown plugin by default whenever you run Jupyter Notebook do the following: 
+To turn on the notedown plugin by default whenever you run Jupyter Notebook do the following:
 First, generate a Jupyter Notebook configuration file (if it has already been generated, you can skip this step).
 
 ```
