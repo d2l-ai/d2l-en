@@ -637,12 +637,12 @@ Nonetheless, no matter how accurate our model gets, we might find ourselves in t
 ![](../img/stackedanimals.jpg)
 
 
-As you can see, there's a cat in the picture, and a rooster, a dog and a donkey, with some trees in the background.
+As you can see, there's a cat in the picture, and a rooster, a dog, a donkey and a bird, with some trees in the background.
 Depending on what we want to do with our model ultimately,
 treating this as a binary classification problem
 might not make a lot of sense.
 Instead, we might want to give the model the option
-of saying the image depicts a cat *and* a dog *and* a donkey *and* a rooster.
+of saying the image depicts a cat *and* a dog *and* a donkey *and* a rooster *and* a bird.
 
 The problem of learning to predict classes
 that are *not mutually exclusive*
@@ -719,7 +719,7 @@ if their risk of death in the next 24 hours exceeds some threshold.
 We definitely wouldn't want this model to throw away everything it knows about the patient history each hour,
 and just make its predictions based on the most recent measurements.
 
-These problems are among the more exciting applications of machine learning
+These problems are among the most exciting applications of machine learning
 and they are instances of *sequence learning*.
 They require a model to either ingest sequences of inputs
 or to emit sequences of outputs (or both!).
