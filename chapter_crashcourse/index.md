@@ -33,16 +33,13 @@ your first basic classifier, *Naive Bayes*.
 
 
 
-```eval_rst
+```toc
+:maxdepth: 2
 
-.. toctree::
-   :maxdepth: 2
-
-   ndarray
-   linear-algebra
-   autograd
-   probability
-   naive-bayes
-   lookup-api
-
+ndarray
+linear-algebra
+autograd
+probability
+naive-bayes
+lookup-api
 ```

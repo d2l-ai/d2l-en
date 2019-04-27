@@ -1,6 +1,7 @@
 # Mathematical Basics
+:label:`chapter_math`
 
-This section summarizes basic tools from linear algebra, differentiation, and probability required to understand the contents in this book. We avoid details beyond the bare minimum to keep things streamlined and easily accessible. In some cases we simplify things to keep them easily accessible. For more background see e.g. the excellent [Data Science 100](http://ds100.org) course at UC Berkeley. 
+This section summarizes basic tools from linear algebra, differentiation, and probability required to understand the contents in this book. We avoid details beyond the bare minimum to keep things streamlined and easily accessible. In some cases we simplify things to keep them easily accessible. For more background see e.g. the excellent [Data Science 100](http://ds100.org) course at UC Berkeley.
 
 ## Linear Algebra
 
@@ -20,7 +21,7 @@ $$
 \end{bmatrix}.
 $$
 
-Here $x_1, \ldots, x_n$ are elements of the vector. To express that $\mathbf{x}$ is an $n$-dimensional vector with elements from the set of real numbers, we write $\mathbf{x} \in \mathbb{R}^{n}$ or $\mathbf{x} \in \mathbb{R}^{n \times 1}$. Vectors satisfy the basic operations of a *vector space*, namely that you can add them together and multiply them with scalars (in our case element-wise) and you still get a vector back: assuming that $\mathbf{a}, \mathbf{b} \in \mathbb{R}^n$ and $\alpha \in \mathbb{R}$ we have that 
+Here $x_1, \ldots, x_n$ are elements of the vector. To express that $\mathbf{x}$ is an $n$-dimensional vector with elements from the set of real numbers, we write $\mathbf{x} \in \mathbb{R}^{n}$ or $\mathbf{x} \in \mathbb{R}^{n \times 1}$. Vectors satisfy the basic operations of a *vector space*, namely that you can add them together and multiply them with scalars (in our case element-wise) and you still get a vector back: assuming that $\mathbf{a}, \mathbf{b} \in \mathbb{R}^n$ and $\alpha \in \mathbb{R}$ we have that
 $\mathbf{a} + \mathbf{b} \in \mathbb{R}^n$ and $\alpha \cdot \mathbf{a} \in \mathbb{R}^n$. Furthermore they satisfy the distributive law
 
 $$\alpha \cdot (\mathbf{a} + \mathbf{b}) = \alpha \cdot \mathbf{a} + \alpha \cdot \mathbf{b}.$$
@@ -167,7 +168,7 @@ Assume $\mathbf{X}$ is a matrix with $m$ rows and $n$ columns. The Frobenius nor
 
 $$\|\mathbf{X}\|_F = \sqrt{\sum_{i=1}^m \sum_{j=1}^n x_{ij}^2}.$$
 
-Here, $x_{ij}$ is the element of matrix $\mathbf{X}$ in row $i$ and column $j$. In other words, the Frobenius norm behaves as if it were an $\ell_2$ norm of a matrix-shaped vector. 
+Here, $x_{ij}$ is the element of matrix $\mathbf{X}$ in row $i$ and column $j$. In other words, the Frobenius norm behaves as if it were an $\ell_2$ norm of a matrix-shaped vector.
 
 **Note:** sometimes the norms on vectors are also (erroneously) referred to as $L_p$ norms. However, the latter are norms on functions with similar structure. For instance, the $L_2$ norm of a function $f$ is given by $\|f\|_2^2 = \int |f(x)|^2 dx$.
 
@@ -178,11 +179,11 @@ Let $\mathbf{A}$ be a matrix with $n$ rows and $n$ columns. If $\lambda$ is a sc
 
 $$\mathbf{A} \mathbf{v} = \lambda \mathbf{v},$$
 
-then $\mathbf{v}$ is called an eigenvector of matrix $\mathbf{A}$ and $\lambda$ is called an eigenvalue of $\mathbf{A}$ corresponding to $\mathbf{v}$. For symmetric matrices $\mathbf{A} = \mathbf{A}^\top$ there are exactly $n$ (linearly independent) eigenvector and eigenvalue pairs. 
+then $\mathbf{v}$ is called an eigenvector of matrix $\mathbf{A}$ and $\lambda$ is called an eigenvalue of $\mathbf{A}$ corresponding to $\mathbf{v}$. For symmetric matrices $\mathbf{A} = \mathbf{A}^\top$ there are exactly $n$ (linearly independent) eigenvector and eigenvalue pairs.
 
 ## Differentials
 
-This is a very brief primer on multivariate differential calculus. 
+This is a very brief primer on multivariate differential calculus.
 
 ### Derivatives and Differentials
 
@@ -293,7 +294,7 @@ $$\frac{\partial^2 f}{\partial x_i \partial x_j} = \frac{\partial }{\partial x_i
 
 ## Probability
 
-Finally, we will briefly introduce conditional probability, expectation and variance. 
+Finally, we will briefly introduce conditional probability, expectation and variance.
 
 ### Conditional Probability
 
@@ -322,10 +323,10 @@ $$\mathbf{E}[X] = \sum_{x} x \Pr(X = x).$$
 
 In many cases we want to measure by how much the random variable $x$ deviates from its expectation. This can be quantified by the variance
 
-$$\mathop{\mathrm{Var}}[X] = \mathbf{E}\left[(X - \mathbf{E}[X])^2\right] = 
+$$\mathop{\mathrm{Var}}[X] = \mathbf{E}\left[(X - \mathbf{E}[X])^2\right] =
 \mathbf{E}[X^2] - \mathbf{E}^2[X].$$
 
-Here the last equality follows from the linearity of expectation. 
+Here the last equality follows from the linearity of expectation.
 
 
 ### Uniform Distribution
@@ -338,15 +339,15 @@ The Normal Distribution, also called Gaussian is given by $p(x) = \frac{1}{2 \pi
 
 ## Summary
 
-* Vectors and matrics can be added and multiplied with rules similar to those of scalars. 
-* There are specialized norms for vectors and matrices, quite different from the (Euclidean) $\ell_2$ norm.  
-* Derivatives yield vectors and matrices when computing higher order terms. 
+* Vectors and matrics can be added and multiplied with rules similar to those of scalars.
+* There are specialized norms for vectors and matrices, quite different from the (Euclidean) $\ell_2$ norm.
+* Derivatives yield vectors and matrices when computing higher order terms.
 
 ## Exercises
 
 1. When traveling between two points in Manhattan, what is the distance that you need to cover in terms of the coordinates, i.e. in terms of avenues and streets? Can you travel diagonally?
 1. A square matrix is called antisymmetric if $\mathbf{A} = -\mathbf{A}^\top$. Show that you can decompose any square matrix into a symmetric and an antisymmetric matrix.
-1. Write out a permutation in matrix form. 
+1. Write out a permutation in matrix form.
 1. Find the gradient of the function $f(\mathbf{x}) = 3x_1^2 + 5e^{x_2}$.
 1. What is the gradient of the function $f(\mathbf{x}) = \|\mathbf{x}\|_2$?
 1. Prove that $\Pr(A \cup B) \leq \Pr(A) + \Pr(B)$. When do you have an equality?

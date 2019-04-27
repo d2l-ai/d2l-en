@@ -16,11 +16,7 @@ chapter_install/install
 :maxdepth: 2
 :numbered:
 
-chapter_appendix/index
 chapter_introduction/intro
-```
-
-
 chapter_crashcourse/index
 chapter_linear-networks/index
 chapter_multilayer-perceptrons/index
@@ -33,3 +29,5 @@ chapter_optimization/index
 chapter_computational-performance/index
 chapter_computer-vision/index
 chapter_natural-language-processing/index
+chapter_appendix/index
+```

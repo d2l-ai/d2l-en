@@ -5,7 +5,7 @@ MXNet's primary tool for storing and transforming data. If you have worked with 
 
 ## Getting Started
 
-Throughout this chapter, we are aiming to get you up and running with the basic functionality. Do not worry if you do not understand all of the basic math, like element-wise operations or normal distributions. In the next two chapters we will take another pass at the same material, teaching the material in the context of practical examples. On the other hand, if you want to go deeper into the mathematical content, see the ["Math"](../chapter_appendix/math.md) section in the appendix.
+Throughout this chapter, we are aiming to get you up and running with the basic functionality. Do not worry if you do not understand all of the basic math, like element-wise operations or normal distributions. In the next two chapters we will take another pass at the same material, teaching the material in the context of practical examples. On the other hand, if you want to go deeper into the mathematical content, see :ref:`chapter_math` in the appendix.
 
 We begin by importing MXNet and the `ndarray` module from MXNet.
 Here, `nd` is short for `ndarray`.
@@ -102,7 +102,7 @@ Many more operations can be applied element-wise, such as exponentiation:
 x.exp()
 ```
 
-In addition to computations by element, we can also perform matrix operations, like matrix multiplication using the `dot` function. Next, we will perform matrix multiplication of `x` and the transpose of `y`. We define `x` as a matrix of 3 rows and 4 columns, and `y` is transposed into a matrix of 4 rows and 3 columns. The two matrices are multiplied to obtain a matrix of 3 rows and 3 columns (if you are confused about what this means, do not worry - we will explain matrix operations in much more detail in the chapter on [linear algebra](linear-algebra.md)).
+In addition to computations by element, we can also perform matrix operations, like matrix multiplication using the `dot` function. Next, we will perform matrix multiplication of `x` and the transpose of `y`. We define `x` as a matrix of 3 rows and 4 columns, and `y` is transposed into a matrix of 4 rows and 3 columns. The two matrices are multiplied to obtain a matrix of 3 rows and 3 columns (if you are confused about what this means, do not worry - we will explain matrix operations in much more detail in the chapter on :ref:`chapter_linear_algebra`).
 
 ```{.python .input  n=13}
 x = nd.arange(12).reshape((3,4))
