@@ -1,6 +1,6 @@
 # Implementation of Multilayer Perceptron from Scratch
 
-Now that we know how multilayer perceptrons (MLPs) work in theory, 
+Now that we know how multilayer perceptrons (MLPs) work in theory,
 let's implement them. First, we import the required packages.
 
 ```{.python .input  n=9}
@@ -13,9 +13,9 @@ from mxnet import nd
 from mxnet.gluon import loss as gloss
 ```
 
-To compare against the results 
-we previously achieved with vanilla softmax regression, 
-we continue to use the Fashion-MNIST image classification dataset. 
+To compare against the results
+we previously achieved with vanilla softmax regression,
+we continue to use the Fashion-MNIST image classification dataset.
 
 ```{.python .input  n=2}
 batch_size = 256
@@ -24,16 +24,16 @@ train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 
 ## Initialize Model Parameters
 
-Recall that this dataset contains 10 classes and that 
-each image consists of a $28 \times 28 = 784$ grid of pixel values. 
+Recall that this dataset contains 10 classes and that
+each image consists of a $28 \times 28 = 784$ grid of pixel values.
 Since we'll be discarding the spatial strucutre (for now),
-we can just think of this as a classifiation dataset 
-with $784$ input features and $10$ classes. 
-In particular we will implement our MLP 
+we can just think of this as a classifiation dataset
+with $784$ input features and $10$ classes.
+In particular we will implement our MLP
 with one hidden layer and $256$ hidden units.
 Note that we can regard both of these choices as *hyperparameters*
-that could be set based on performance on validation data. 
-Typically, we'll choose layer widths as powers of $2$ 
+that could be set based on performance on validation data.
+Typically, we'll choose layer widths as powers of $2$
 to make everything align nicely in memory.
 
 Again, we will allocate several NDArrays to represent our parameters.
@@ -55,7 +55,7 @@ for param in params:
 
 ## Activation Function
 
-To make sure we know how everything works, 
+To make sure we know how everything works,
 we will use the `maximum` function to implement ReLU ourselves,
 instead of invoking `nd.relu` directly.
 
@@ -66,8 +66,8 @@ def relu(X):
 
 ## The model
 
-As in softmax regression, we will `reshape` each 2D image 
-into a flat vector of length  `num_inputs`. 
+As in softmax regression, we will `reshape` each 2D image
+into a flat vector of length  `num_inputs`.
 Finally, we cam implement our model with just a few lines of code.
 
 ```{.python .input  n=5}
@@ -79,14 +79,14 @@ def net(X):
 
 ## The Loss Function
 
-For better numerical stability and because we already know 
-how to implement [softmax regression completely from scratch](../chapter_linear-networks/softmax-regression-scratch), 
-we will use Gluon's integrated function 
-for calculating the softmax and cross-entropy loss. 
-Recall that we discussed some of these intricacies 
-in the [previous section](mlp.md). 
+For better numerical stability and because we already know
+how to implement softmax regression completely from scratch in :numref:`chapter_softmax_scratch`,
+we will use Gluon's integrated function
+for calculating the softmax and cross-entropy loss.
+Recall that we discussed some of these intricacies
+in :numref:`chapter_mlp`.
 We encourage the interested reader to examing the source code
-for `mxnet.gluon.loss.nnSoftmaxCrossEntropyLoss` for more details.
+for `mxnet.gluon.loss.SoftmaxCrossEntropyLoss` for more details.
 
 ```{.python .input  n=6}
 loss = gloss.SoftmaxCrossEntropyLoss()
@@ -94,8 +94,8 @@ loss = gloss.SoftmaxCrossEntropyLoss()
 
 ## Training
 
-Steps for training the MLP are no different than for softmax regression. 
-In the `d2l` package, we directly call the `train_ch3` function, whose implementation was introduced [here](softmax-regression-scratch.md). 
+Steps for training the MLP are no different than for softmax regression.
+In the `d2l` package, we directly call the `train_ch3` function, whose implementation was introduced [here](softmax-regression-scratch.md).
 We set the number of epochs to $10$ and the learning rate to $0.5$.
 
 ```{.python .input  n=7}
@@ -104,8 +104,8 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size,
               params, lr)
 ```
 
-To see how well we did, let's apply the model to some test data. 
-If you're interested, compare the result to corresponding [linear model](softmax-regression-scratch.md).
+To see how well we did, let's apply the model to some test data.
+If you're interested, compare the result to corresponding linear model in :numref:`chapter_softmax_scratch`.
 
 ```{.python .input}
 for X, y in test_iter:
@@ -123,8 +123,8 @@ This looks a bit better than our previous result, a good sign that we're on the 
 
 ## Summary
 
-We saw that implementing a simple MLP is easy, even when done manually. 
-That said, with a large number of layers, this can get messy 
+We saw that implementing a simple MLP is easy, even when done manually.
+That said, with a large number of layers, this can get messy
 (e.g. naming and keeping track of the model parameters, etc).
 
 ## Exercises

@@ -1,4 +1,5 @@
 # Implementation of Softmax Regression from Scratch
+:label:`chapter_softmax_scratch`
 
 Just as we implemented linear regression from scratch,
 we believe that multiclass logistic (softmax) regression
