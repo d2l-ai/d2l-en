@@ -1,12 +1,13 @@
 # Long Short Term Memory (LSTM)
+:label:`chapter_lstm`
 
-The challenge to address long-term information preservation and short-term input skipping in latent variable models has existed for a long time. One of the earliest approaches to address this was the LSTM by [Hochreiter and Schmidhuber, 1997](http://papers.nips.cc/paper/1215-lstm-can-solve-hard-long-time-lag-problems.pdf). It shares many of the properties of the Gated Recurrent Unit (GRU) and predates it by almost two decades. Its design is slightly more complex. 
+The challenge to address long-term information preservation and short-term input skipping in latent variable models has existed for a long time. One of the earliest approaches to address this was the LSTM by [Hochreiter and Schmidhuber, 1997](http://papers.nips.cc/paper/1215-lstm-can-solve-hard-long-time-lag-problems.pdf). It shares many of the properties of the Gated Recurrent Unit (GRU) and predates it by almost two decades. Its design is slightly more complex.
 
 Arguably it is inspired by logic gates of a computer. To control a memory cell we need a number of gates. One gate is needed to read out the entries from the cell (as opposed to reading any other cell). We will refer to this as the *output* gate. A second gate is needed to decide when to read data into the cell. We refer to this as the *input* gate. Lastly, we need a mechanism to reset the contents of the cell, governed by a *forget* gate. The motivation for such a design is the same as before, namely to be able to decide when to remember and when to ignore inputs into the latent state via a dedicated mechanism. Let's see how this works in practice.
 
 ## Gated Memory Cells
 
-Three gates are introduced in LSTMs: the input gate, the forget gate, and the output gate. In addition to that we introduce memory cells that take the same shape as the hidden state. Strictly speaking this is just a fancy version of a hidden state, custom engineered to record additional information. 
+Three gates are introduced in LSTMs: the input gate, the forget gate, and the output gate. In addition to that we introduce memory cells that take the same shape as the hidden state. Strictly speaking this is just a fancy version of a hidden state, custom engineered to record additional information.
 
 ### Input Gates, Forget Gates and Output Gates
 
@@ -40,7 +41,7 @@ Here $\mathbf{W}_{xc} \in \mathbb{R}^{d \times h}$ and $\mathbf{W}_{hc} \in \mat
 
 ### Memory Cell
 
-In GRUs we had a single mechanism to govern input and forgetting. Here we have two parameters, $\mathbf{I}_t$ which governs how much we take new data into account via $\tilde{\mathbf{C}}_t$ and the forget parameter $\mathbf{F}_t$ which addresses how much we of the old memory cell content $\mathbf{C}_{t-1} \in \mathbb{R}^{n \times h}$ we retain. Using the same pointwise multiplication trick as before we arrive at the following update equation. 
+In GRUs we had a single mechanism to govern input and forgetting. Here we have two parameters, $\mathbf{I}_t$ which governs how much we take new data into account via $\tilde{\mathbf{C}}_t$ and the forget parameter $\mathbf{F}_t$ which addresses how much we of the old memory cell content $\mathbf{C}_{t-1} \in \mathbb{R}^{n \times h}$ we retain. Using the same pointwise multiplication trick as before we arrive at the following update equation.
 
 $$\mathbf{C}_t = \mathbf{F}_t \odot \mathbf{C}_{t-1} + \mathbf{I}_t \odot \tilde{\mathbf{C}}_t.$$
 
@@ -146,7 +147,7 @@ num_epochs, num_steps, batch_size, lr, clipping_theta = 100, 35, 32, 3, 1
 prefixes = ['traveller', 'time traveller']
 
 d2l.train_and_predict_rnn(lstm, get_params, init_lstm_state, num_hiddens,
-                          corpus_indices, vocab, ctx, False, num_epochs, 
+                          corpus_indices, vocab, ctx, False, num_epochs,
                           num_steps, lr, clipping_theta, batch_size, prefixes)
 ```
 
@@ -157,27 +158,27 @@ In Gluon, we can call the `LSTM` class in the `rnn` module directly to instantia
 ```{.python .input  n=10}
 lstm_layer = rnn.LSTM(num_hiddens)
 model = d2l.RNNModel(lstm_layer, len(vocab))
-d2l.train_and_predict_rnn_gluon(model, num_hiddens, corpus_indices, vocab, 
-                                ctx, num_epochs*5, num_steps, lr, 
+d2l.train_and_predict_rnn_gluon(model, num_hiddens, corpus_indices, vocab,
+                                ctx, num_epochs*5, num_steps, lr,
                                 clipping_theta, batch_size, prefixes)
 ```
 
 ## Summary
 
-* LSTMs have three types of gates: input, forget and output gates which control the flow of information. 
+* LSTMs have three types of gates: input, forget and output gates which control the flow of information.
 * The hidden layer output of LSTM includes hidden states and memory cells. Only hidden states are passed into the output layer. Memory cells are entirely internal.
-* LSTMs can help cope with vanishing and exploding gradients due to long range dependencies and short-range irrelevant data. 
-* In many cases LSTMs perform slightly better than GRUs but they are more costly to train and execute due to the larger latent state size. 
+* LSTMs can help cope with vanishing and exploding gradients due to long range dependencies and short-range irrelevant data.
+* In many cases LSTMs perform slightly better than GRUs but they are more costly to train and execute due to the larger latent state size.
 * LSTMs are the prototypical latent variable autoregressive model with nontrivial state control. Many variants thereof have been proposed over the years, e.g. multiple layers, residual connections, different types of regularization.
 * Training LSTMs and other sequence models is quite costly due to the long dependency of the sequence. Later we will encounter alternative models such as transformers that can be used in some cases.
 
 ## Exercises
 
-1. Adjust the hyperparameters. Observe and analyze the impact on runtime, perplexity, and the generted output. 
+1. Adjust the hyperparameters. Observe and analyze the impact on runtime, perplexity, and the generted output.
 1. How would you need to change the model to generate proper words as opposed to sequences of characters?
 1. Compare the computational cost for GRUs, LSTMs and regular RNNs for a given hidden dimension. Pay special attention to training and inference cost
 1. Since the candidate memory cells ensure that the value range is between -1 and 1 using the tanh function, why does the hidden state need to use the tanh function again to ensure that the output value range is between -1 and 1?
-1. Implement an LSTM for time series prediction rather than character sequences. 
+1. Implement an LSTM for time series prediction rather than character sequences.
 
 
 ## References
