@@ -19,19 +19,17 @@ but also of the practice of using deep networks.
 We punt matters relating to the computational performance,
 scalability and efficiency of our models to subsequent chapters.
 
-```eval_rst
+```toc
+:maxdepth: 2
 
-.. toctree::
-   :maxdepth: 2
-
-   mlp
-   mlp-scratch
-   mlp-gluon
-   underfit-overfit
-   weight-decay
-   dropout
-   backprop
-   numerical-stability-and-init
-   environment
-   kaggle-house-price
+mlp
+mlp-scratch
+mlp-gluon
+underfit-overfit
+weight-decay
+dropout
+backprop
+numerical-stability-and-init
+environment
+kaggle-house-price
 ```
