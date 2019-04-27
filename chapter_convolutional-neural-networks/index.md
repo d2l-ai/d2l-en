@@ -64,15 +64,13 @@ whose designs are representative of most of the techniques
 commonly used to design modern convolutional neural networks.
 
 
-```eval_rst
+```toc
+:maxdepth: 2
 
-.. toctree::
-   :maxdepth: 2
-
-   why-conv
-   conv-layer
-   padding-and-strides
-   channels
-   pooling
-   lenet
+why-conv
+conv-layer
+padding-and-strides
+channels
+pooling
+lenet
 ```

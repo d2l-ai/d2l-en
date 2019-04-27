@@ -10,61 +10,61 @@ to which each hidden node is sensitive.
 Often our ultimate task asks some global question about the image,
 e.g., *does it contain a cat?*
 So typically the nodes of our final layer should be sensitive
-to the entire input. 
+to the entire input.
 By gradually aggregating information, yielding coarser and coarser maps,
 we accomplish this goal of ultimately learning a global representation,
 while keeping all of the advantages of convolutional layers at the intermediate layers of processing.
 
 
-Moreover, when detecting lower-level features, such as edges 
-(as discussed in our section on [convolutional layers](conv-layer.md)), 
-we often want our representations to be somewhat invariant to translation. 
-For instance, if we take the image `X` 
-with a sharp delineation between black and white 
-and shift the whole image by one pixel to the right, 
-i.e. `Z[i,j] = X[i,j+1]`, 
-then the output for for the new image `Z` might be vastly different. 
-The edge will have shifted by one pixel and with it all the activations. 
-In reality, objects hardly ever occur exactly at the same place. 
-In fact, even with a tripod and a stationary object, 
-vibration of the camera due to the movement of the shutter 
-might shift everything by a pixel or so 
-(high-end cameras are loaded with special features to address this problem). 
+Moreover, when detecting lower-level features, such as edges
+(as discussed in :numref:`chapter_conv_layer`),
+we often want our representations to be somewhat invariant to translation.
+For instance, if we take the image `X`
+with a sharp delineation between black and white
+and shift the whole image by one pixel to the right,
+i.e. `Z[i,j] = X[i,j+1]`,
+then the output for for the new image `Z` might be vastly different.
+The edge will have shifted by one pixel and with it all the activations.
+In reality, objects hardly ever occur exactly at the same place.
+In fact, even with a tripod and a stationary object,
+vibration of the camera due to the movement of the shutter
+might shift everything by a pixel or so
+(high-end cameras are loaded with special features to address this problem).
 
-This section introduces pooling layers, 
-which serve the dual purposes of 
-mitigating the sensitivity of convolutional layers to location 
+This section introduces pooling layers,
+which serve the dual purposes of
+mitigating the sensitivity of convolutional layers to location
 and of spatially downsampling representations.
 
 ## Maximum Pooling and Average Pooling
 
 Like convolutional layers, pooling operators
-consist of a fixed-shape window that is slid over 
+consist of a fixed-shape window that is slid over
 all regions in the input according to its stride,
-computing a single output for each location traversed 
-by the fixed-shape window (sometimes known as the *pooling window*). 
-However, unlike the cross-correlation computation 
-of the inputs and kernels in the convolutional layer, 
+computing a single output for each location traversed
+by the fixed-shape window (sometimes known as the *pooling window*).
+However, unlike the cross-correlation computation
+of the inputs and kernels in the convolutional layer,
 the pooling layer contains no parameters (there is no *filter*).
-Instead, pooling operators are deterministic, 
-typically calculating either the maximum or the average value 
-of the elements in the pooling window. 
-These operations are called *maximum pooling* (*max pooling* for short) 
-and *average pooling*, respectively. 
+Instead, pooling operators are deterministic,
+typically calculating either the maximum or the average value
+of the elements in the pooling window.
+These operations are called *maximum pooling* (*max pooling* for short)
+and *average pooling*, respectively.
 
 In both cases, as with the cross-correlation operator,
-we can think of the pooling window 
+we can think of the pooling window
 as starting from the top left of the input array
-and sliding across the input array from left to right and top to bottom. 
-At each location that the pooling window hits, 
-it computes the maximum or average 
+and sliding across the input array from left to right and top to bottom.
+At each location that the pooling window hits,
+it computes the maximum or average
 value of the input subarray in the window
 (depending on whether *max* or *average* pooling is employed).
 
 
 ![Maximum pooling with a pooling window shape of $2\times 2$. The shaded portions represent the first output element and the input element used for its computation: $\max(0,1,3,4)=4$](../img/pooling.svg)
 
-The output array in the figure above has a height of 2 and a width of 2. 
+The output array in the figure above has a height of 2 and a width of 2.
 The four elements are derived from the maximum value of $\text{max}$:
 
 $$
@@ -74,26 +74,26 @@ $$
 \max(4,5,7,8)=8.\\
 $$
 
-A pooling layer with a pooling window shape of $p \times q$ 
-is called a $p \times q$ pooling layer. 
+A pooling layer with a pooling window shape of $p \times q$
+is called a $p \times q$ pooling layer.
 The pooling operation is called $p \times q$ pooling.
 
-Let us return to the object edge detection example 
+Let us return to the object edge detection example
 mentioned at the beginning of this section.
-Now we will use the output of the convolutional layer 
-as the input for $2\times 2$ maximum pooling. 
-Set the convolutional layer input as `X` and the pooling layer output as `Y`. Whether or not the values of `X[i, j]` and `X[i, j+1]` are different, 
-or `X[i, j+1]` and `X[i, j+2]` are different, 
-the pooling layer outputs all include `Y[i, j]=1`. 
-That is to say, using the $2\times 2$ maximum pooling layer, 
-we can still detect if the pattern recognized by the convolutional layer 
+Now we will use the output of the convolutional layer
+as the input for $2\times 2$ maximum pooling.
+Set the convolutional layer input as `X` and the pooling layer output as `Y`. Whether or not the values of `X[i, j]` and `X[i, j+1]` are different,
+or `X[i, j+1]` and `X[i, j+2]` are different,
+the pooling layer outputs all include `Y[i, j]=1`.
+That is to say, using the $2\times 2$ maximum pooling layer,
+we can still detect if the pattern recognized by the convolutional layer
 moves no more than one element in height and width.
 
-In the code below, we implement the forward computation 
-of the pooling layer in the `pool2d` function. 
-This function is similar to the `corr2d` function 
-in the section on [convolutions](conv-layer.md). 
-However, here we have no kernel, computing the output 
+In the code below, we implement the forward computation
+of the pooling layer in the `pool2d` function.
+This function is similar to the `corr2d` function
+in :numref:`chapter_conv_layer`.
+However, here we have no kernel, computing the output
 as either the max or the average of each region in the input..
 
 ```{.python .input  n=11}
@@ -127,14 +127,14 @@ pool2d(X, (2, 2), 'avg')
 
 ## Padding and Stride
 
-As with convolutional layers, pooling layers 
+As with convolutional layers, pooling layers
 can also change the output shape.
-And as before, we can alter the operation to achieve a desired output shape 
-by padding the input and adjusting the stride. 
-We can demonstrate the use of padding and strides 
-in pooling layers via the two-dimensional maximum pooling layer MaxPool2D 
-shipped in MXNet Gluon's `nn` module. 
-We first construct an input data of shape `(1, 1, 4, 4)`, 
+And as before, we can alter the operation to achieve a desired output shape
+by padding the input and adjusting the stride.
+We can demonstrate the use of padding and strides
+in pooling layers via the two-dimensional maximum pooling layer MaxPool2D
+shipped in MXNet Gluon's `nn` module.
+We first construct an input data of shape `(1, 1, 4, 4)`,
 where the first two dimensions are batch and channel.
 
 ```{.python .input  n=15}
@@ -142,9 +142,9 @@ X = nd.arange(16).reshape((1, 1, 4, 4))
 X
 ```
 
-By default, the stride in the `MaxPool2D` class 
-has the same shape as the pooling window. 
-Below, we use a pooling window of shape `(3, 3)`, 
+By default, the stride in the `MaxPool2D` class
+has the same shape as the pooling window.
+Below, we use a pooling window of shape `(3, 3)`,
 so we get a stride shape of `(3, 3)` by default.
 
 ```{.python .input  n=16}
@@ -161,7 +161,7 @@ pool2d = nn.MaxPool2D(3, padding=1, strides=2)
 pool2d(X)
 ```
 
-Of course, we can specify an arbitrary rectangular pooling window 
+Of course, we can specify an arbitrary rectangular pooling window
 and specify the padding and stride for height and width, respectively.
 
 ```{.python .input  n=8}
@@ -171,13 +171,13 @@ pool2d(X)
 
 ## Multiple Channels
 
-When processing multi-channel input data, 
-the pooling layer pools each input channel separately, 
-rather than adding the inputs of each channel by channel 
-as in a convolutional layer. 
-This means that the number of output channels for the pooling layer 
-is the same as the number of input channels. 
-Below, we will concatenate arrays `X` and `X+1` 
+When processing multi-channel input data,
+the pooling layer pools each input channel separately,
+rather than adding the inputs of each channel by channel
+as in a convolutional layer.
+This means that the number of output channels for the pooling layer
+is the same as the number of input channels.
+Below, we will concatenate arrays `X` and `X+1`
 on the channel dimension to construct an input with 2 channels.
 
 ```{.python .input  n=9}
