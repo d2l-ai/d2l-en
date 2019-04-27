@@ -131,7 +131,7 @@ class BatchNorm(nn.Block):
 
 ## Use a Batch Normalization LeNet
 
-Next, we will modify the [LeNet model](lenet.md) in order to apply the batch normalization layer. We add the batch normalization layer after all the convolutional layers and after all fully connected layers. As discussed, we add it  before the activation layer.
+Next, we will modify the LeNet model (:numref:`chapter_lenet`) in order to apply the batch normalization layer. We add the batch normalization layer after all the convolutional layers and after all fully connected layers. As discussed, we add it  before the activation layer.
 
 ```{.python .input  n=74}
 net = nn.Sequential()

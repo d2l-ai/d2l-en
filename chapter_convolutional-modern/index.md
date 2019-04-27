@@ -13,16 +13,14 @@ These models include AlexNet, the first large-scale network deployed to beat con
 the VGG network, which makes use of a number of repeating blocks of elements; the network in network (NiN) which convolves whole neural networks patch-wise over inputs; the GoogLeNet, which makes use of networks with parallel
 concatenations (GoogLeNet); residual networks (ResNet) which are currently the most popular go-to architecture today, and densely connected networks (DenseNet), which are expensive to compute but have set some recent benchmarks.
 
-```eval_rst
+```toc
+:maxdepth: 2
 
-.. toctree::
-   :maxdepth: 2
-
-   alexnet
-   vgg
-   nin
-   googlenet
-   batch-norm
-   resnet
-   densenet
+alexnet
+vgg
+nin
+googlenet
+batch-norm
+resnet
+densenet
 ```

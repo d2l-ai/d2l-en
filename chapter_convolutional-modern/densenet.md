@@ -6,11 +6,11 @@ $$f(x) = f(0) + f'(x) x + \frac{1}{2} f''(x) x^2 + \frac{1}{6} f'''(x) x^3 + o(x
 
 ## Function Decomposition
 
-The key point is that it decomposes the function into increasingly higher order terms. In a similar vein, ResNet decomposes functions into 
+The key point is that it decomposes the function into increasingly higher order terms. In a similar vein, ResNet decomposes functions into
 
 $$f(\mathbf{x}) = \mathbf{x} + g(\mathbf{x})$$
 
-That is, ResNet decomposes $f$ into a simple linear term and a more complex nonlinear one. What if we want to go beyond two terms? A solution was proposed by [Huang et al, 2016](https://arxiv.org/abs/1608.06993) in the form of DenseNet, an architecture that reported record performance on the ImageNet dataset. 
+That is, ResNet decomposes $f$ into a simple linear term and a more complex nonlinear one. What if we want to go beyond two terms? A solution was proposed by [Huang et al, 2016](https://arxiv.org/abs/1608.06993) in the form of DenseNet, an architecture that reported record performance on the ImageNet dataset.
 
 ![The main difference between ResNet (left) and DenseNet (right) in cross-layer connections: use of addition and use of concatenation. ](../img/densenet.svg)
 
@@ -24,7 +24,10 @@ In the end, all these functions are combined in an MLP to reduce the number of f
 
 ## Dense Blocks
 
-DenseNet uses the modified "batch normalization, activation, and convolution" architecture of ResNet (see the exercise in the [previous section](resnet.md)). First, we implement this architecture in the `conv_block` function.
+DenseNet uses the modified "batch normalization, activation, and convolution"
+architecture of ResNet (see the exercise in :numref:`chapter_resnet`).
+First, we implement this architecture in the
+`conv_block` function.
 
 ```{.python .input  n=1}
 import sys
@@ -36,7 +39,7 @@ from mxnet.gluon import nn
 
 def conv_block(num_channels):
     blk = nn.Sequential()
-    blk.add(nn.BatchNorm(), 
+    blk.add(nn.BatchNorm(),
             nn.Activation('relu'),
             nn.Conv2D(num_channels, kernel_size=3, padding=1))
     return blk
@@ -125,8 +128,8 @@ for i, num_convs in enumerate(num_convs_in_dense_blocks):
 Similar to ResNet, a global pooling layer and fully connected layer are connected at the end to produce the output.
 
 ```{.python .input}
-net.add(nn.BatchNorm(), 
-        nn.Activation('relu'), 
+net.add(nn.BatchNorm(),
+        nn.Activation('relu'),
         nn.GlobalAvgPool2D(),
         nn.Dense(10))
 ```
@@ -148,18 +151,18 @@ d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,
 
 * In terms of cross-layer connections, unlike ResNet, where inputs and outputs are added together, DenseNet concatenates inputs and outputs on the channel dimension.
 * The main units that compose DenseNet are dense blocks and transition layers.
-* We need to keep the dimensionality under control when composing the network by adding transition layers that shrink the number of channels again. 
+* We need to keep the dimensionality under control when composing the network by adding transition layers that shrink the number of channels again.
 
 ## Exercises
 
-1. Why do we use average pooling rather than max-pooling in the transition layer? 
+1. Why do we use average pooling rather than max-pooling in the transition layer?
 1. One of the advantages mentioned in the DenseNet paper is that its model parameters are smaller than those of ResNet. Why is this the case?
-1. One problem for which DenseNet has been criticized is its high memory consumption. 
+1. One problem for which DenseNet has been criticized is its high memory consumption.
     * Is this really the case? Try to change the input shape to $224\times 224$ to see the actual (GPU) memory consumption.
     * Can you think of an alternative means of reducing the memory consumption? How would you need to change the framework?
 1. Implement the various DenseNet versions presented in Table 1 of the [DenseNet paper](https://arxiv.org/abs/1608.06993).
 1. Why do we not need to concatenate terms if we are just interested in $\mathbf{x}$ and $f(\mathbf{x})$ for ResNet? Why do we need this for more than two layers in DenseNet?
-1. Design a DenseNet for fully connected networks and apply it to the Housing Price prediction task. 
+1. Design a DenseNet for fully connected networks and apply it to the Housing Price prediction task.
 
 
 ## References

@@ -1,4 +1,5 @@
 # Dropout
+:label:`chapter_dropout`
 
 Just now, we introduced the classical approach
 of regularizing statistical models by penalyzing
