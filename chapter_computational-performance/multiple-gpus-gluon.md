@@ -1,6 +1,9 @@
 # Concise Implementation of Multi-GPU Computation
 
-In Gluon, we can conveniently use data parallelism to perform multi-GPU computation. For example, we do not need to implement the helper function to synchronize data among multiple GPUs, as described in the[“Multi-GPU Computation”](multiple-gpus.md) section, ourselves.
+In Gluon, we can conveniently use data parallelism to perform multi-GPU
+computation. For example, we do not need to implement the helper function to
+synchronize data among multiple GPUs, as described in
+:numref:`chapter_multi_gpu`, ourselves.
 
 First, import the required packages or modules for the experiment in this section. Running the programs in this section requires at least two GPUs.
 
@@ -17,7 +20,11 @@ import time
 
 ## Initialize Model Parameters on Multiple GPUs
 
-In this section, we use ResNet-18 as a sample model. Since the input images in this section are original size (not enlarged), the model construction here is different from the ResNet-18 structure described in the [“ResNet”](../chapter_convolutional-neural-networks/resnet.md) section. This model uses a smaller convolution kernel, stride, and padding at the beginning and removes the maximum pooling layer.
+In this section, we use ResNet-18 as a sample model. Since the input images in
+this section are original size (not enlarged), the model construction here is
+different from the ResNet-18 structure described in :numref:`chapter_resnet`. This
+model uses a smaller convolution kernel, stride, and padding at the beginning
+and removes the maximum pooling layer.
 
 ```{.python .input  n=2}
 # This function is saved in the d2l package for future use
