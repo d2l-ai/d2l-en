@@ -252,7 +252,7 @@ counts = np.zeros(100)
 fig, axes = plt.subplots(2, 3, figsize=(15, 8), sharex=True)
 axes = axes.reshape(6)
 # Mangle subplots such that we can index them in a linear fashion rather than
-# a 2d grid
+# a 2D grid
 for i in range(1, 1000001):
     counts[random.randint(0, 99)] += 1
     if i in [10, 100, 1000, 10000, 100000, 1000000]:

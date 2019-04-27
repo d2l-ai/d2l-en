@@ -6,7 +6,7 @@ from ..figure import plt, use_svg_display
 
 def load_data_fashion_mnist(batch_size, resize=None, root=os.path.join(
         '~', '.mxnet', 'datasets', 'fashion-mnist')):
-    """Download the fashion mnist dataset and then load into memory."""
+    """Download the Fashion-MNIST dataset and then load into memory."""
     root = os.path.expanduser(root)
     transformer = []
     if resize:
@@ -27,7 +27,7 @@ def load_data_fashion_mnist(batch_size, resize=None, root=os.path.join(
     return train_iter, test_iter
 
 def get_fashion_mnist_labels(labels):
-    """Get text label for fashion mnist."""
+    """Get text labels for Fashion-MNIST."""
     text_labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
                    'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
     return [text_labels[int(i)] for i in labels]
