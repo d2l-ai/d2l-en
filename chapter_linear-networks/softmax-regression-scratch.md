@@ -142,7 +142,7 @@ def net(X):
 ## The Loss Function
 
 Next, we need to implement the cross entropy loss function,
-introduced in the [last section](softmax-regression.md).
+introduced in :numref:`chapter_softmax`.
 This may be the most common loss function
 in all of deep learning because, at the moment,
 classification problems far outnumber regression problems.

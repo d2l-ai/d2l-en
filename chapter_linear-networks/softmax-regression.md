@@ -1,4 +1,5 @@
 # Softmax Regression
+:label:`chapter_softmax`
 
 In the last two chapters, we worked through implementations
 linear regression, building everything from scratch
@@ -102,6 +103,7 @@ $$
 This accelerates the dominant operation into a matrix-matrix product $\mathbf{W} \mathbf{X}$ vs the matrix-vector products we would be exectuting if we processed one example at a time. The softmax itself can be computed by exponentiating all entries in $\mathbf{O}$ and then normalizing them by the sum appropriately.
 
 ## Loss Function
+:label:`section_cross_entropy`
 
 Now that we have some mechanism for outputting probabilities, we need to transform this into a measure of how accurate things are, i.e. we need a *loss function*. For this, we use the same concept that we already encountered in linear regression, namely likelihood maximization.
 
