@@ -1,3 +1,3 @@
 # References
 
-:bibliography:../d2l.bib:
+:bibliography:`../d2l.bib`
