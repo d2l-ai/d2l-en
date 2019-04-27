@@ -1,4 +1,5 @@
 # Mini-batch Stochastic Gradient Descent
+:label:`chapter_minibatch_sgd`
 
 In each iteration, the gradient descent uses the entire training data set to compute the gradient, so it is sometimes referred to as batch gradient descent. Stochastic gradient descent (SGD) only randomly select one example in each iteration to compute the gradient. Just like in the previous chapters, we can perform random uniform sampling for each iteration to form a mini-batch and then use this mini-batch to compute the gradient. Now, we are going to discuss mini-batch stochastic gradient descent.
 
@@ -47,7 +48,14 @@ features.shape
 
 ## Implementation from Scratch
 
-We have already implemented the mini-batch SGD algorithm in the [Linear Regression Implemented From Scratch](../chapter_deep-learning-basics/linear-regression-scratch.md) section. We have made its input parameters more generic here, so that we can conveniently use the same input for the other optimization algorithms introduced later in this chapter. Specifically, we add the status input `states` and place the hyper-parameter in dictionary `hyperparams`. In addition, we will average the loss of each mini-batch example in the training function, so the gradient in the optimization algorithm does not need to be divided by the batch size.
+We have already implemented the mini-batch SGD algorithm in the
+:numref:`chapter_linear_scratch`. We have made its input parameters more generic
+here, so that we can conveniently use the same input for the other optimization
+algorithms introduced later in this chapter. Specifically, we add the status
+input `states` and place the hyper-parameter in dictionary `hyperparams`. In
+addition, we will average the loss of each mini-batch example in the training
+function, so the gradient in the optimization algorithm does not need to be
+divided by the batch size.
 
 ```{.python .input  n=2}
 def sgd(params, states, hyperparams):
@@ -87,7 +95,7 @@ def train_ch7(trainer_fn, states, hyperparams, features, labels,
                 ts.append(time.time() - start + ts[-1])
                 ls.append(eval_loss())
                 start = time.time()
-                
+
     # Print and plot the results.
     print('loss: %f, %f sec per epoch' % (ls[-1], ts[-1]/num_epochs))
     d2l.set_figsize()
