@@ -1,4 +1,5 @@
 # Predicting House Prices on Kaggle
+:label:`chapter_kaggle_house`
 
 In the previous sections, we introduced
 the basic tools for building deep networks
@@ -48,6 +49,7 @@ The URL is right here:
 > https://www.kaggle.com/c/house-prices-advanced-regression-techniques
 
 ![House Price Prediction](../img/house_pricing.png)
+:width:`600px`
 
 ## Accessing and Reading Data Sets
 

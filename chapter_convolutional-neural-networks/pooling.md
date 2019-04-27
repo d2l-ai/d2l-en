@@ -1,4 +1,6 @@
 # Pooling
+:label:`chapter_pooling`
+
 
 Often, as we process images, we want to gradually
 reduce the spatial resolution of our hidden representations,

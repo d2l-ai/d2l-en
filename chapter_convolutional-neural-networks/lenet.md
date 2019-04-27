@@ -1,4 +1,5 @@
 # Convolutional Neural Networks (LeNet)
+:label:`chapter_lenet`
 
 We are now ready to put all of the tools together
 to deploy your first fully-functional convolutional neural network.

@@ -2,7 +2,20 @@
 :label:`chapter_image_augmentation`
 
 
-We mentioned that large-scale data sets are prerequisites for the successful application of deep neural networks in the ["Deep Convolutional Neural Networks (AlexNet)"](../chapter_convolutional-neural-networks/alexnet.md) section. Image augmentation technology expands the scale of training data sets by making a series of random changes to the training images to produce similar, but different, training examples. Another way to explain image augmentation is that randomly changing training examples can reduce a model's dependence on certain properties, thereby improving its capability for generalization. For example, we can crop the images in different ways, so that the objects of interest appear in different positions, reducing the model's dependence on the position where objects appear. We can also adjust the brightness, color, and other factors to reduce model's sensitivity to color. It can be said that image augmentation technology contributed greatly to the success of AlexNet. In this section we will discuss this technology, which is widely used in computer vision.
+We mentioned that large-scale data sets are prerequisites for the successful
+application of deep neural networks in
+:numref:`chapter_alexnet`. Image augmentation technology expands the scale of training data sets
+by making a series of random changes to the training images to produce similar,
+but different, training examples. Another way to explain image augmentation is
+that randomly changing training examples can reduce a model's dependence on
+certain properties, thereby improving its capability for generalization. For
+example, we can crop the images in different ways, so that the objects of
+interest appear in different positions, reducing the model's dependence on the
+position where objects appear. We can also adjust the brightness, color, and
+other factors to reduce model's sensitivity to color. It can be said that image
+augmentation technology contributed greatly to the success of AlexNet. In this
+section we will discuss this technology, which is widely used in computer
+vision.
 
 First, import the packages or modules required for the experiment in this section.
 
@@ -66,7 +79,14 @@ Flipping up and down is not as commonly used as flipping left and right. However
 apply(img, gdata.vision.transforms.RandomFlipTopBottom())
 ```
 
-In the example image we used, the cat is in the middle of the image, but this may not be the case for all images. In the [“Pooling Layer”](../chapter_convolutional-neural-networks/pooling.md) section, we explained that the pooling layer can reduce the sensitivity of the convolutional layer to the target location. In addition, we can make objects appear at different positions in the image in different proportions by randomly cropping the image. This can also reduce the sensitivity of the model to the target position.
+In the example image we used, the cat is in the middle of the image, but this
+may not be the case for all images. In
+:numref:`chapter_pooling`,
+we explained that the pooling layer can reduce the sensitivity of the
+convolutional layer to the target location. In addition, we can make objects
+appear at different positions in the image in different proportions by randomly
+cropping the image. This can also reduce the sensitivity of the model to the
+target position.
 
 In the following code, we randomly crop a region with an area of 10% to 100% of the original area, and the ratio of width to height of the region is randomly selected from between 0.5 and 2. Then, the width and height of the region are both scaled to 200 pixels. Unless otherwise stated, the random number between $a$ and $b$ in this section refers to a continuous value obtained by uniform sampling in the interval $[a,b]$.
 
@@ -127,7 +147,11 @@ test_augs = gdata.vision.transforms.Compose([
     gdata.vision.transforms.ToTensor()])
 ```
 
-Next, we define an auxiliary function to make it easier to read the image and apply image augmentation. The `transform_first` function provided by Gluon's data set applies image augmentation to the first element of each training example (image and label), i.e., the element at the top of the image. For detailed description of `DataLoader`, refer to the previous ["Image Classification Data Set (Fashion-MNIST)"](fashion-mnist.md) section.
+Next, we define an auxiliary function to make it easier to read the image and
+apply image augmentation. The `transform_first` function provided by Gluon's
+data set applies image augmentation to the first element of each training
+example (image and label), i.e., the element at the top of the image. For
+detailed description of `DataLoader`, refer to :numref:`chapter_fashion_mnist`.
 
 ```{.python .input  n=34}
 num_workers = 0 if sys.platform.startswith('win32') else 4
@@ -139,7 +163,9 @@ def load_cifar10(is_train, augs, batch_size):
 
 ### Using a Multi-GPU Training Model
 
-We train the ResNet-18 model described in ["ResNet"](../chapter_convolutional-neural-networks/resnet.md) section on the CIFAR-10 data set. We will also apply the methods described in the ["Concise Implementation of Multi-GPU Computation"](../chapter_computational-performance/multiple-gpus-gluon.md) section, and use a multi-GPU training model.
+We train the ResNet-18 model described in :numref:`chapter_resnet` on the
+CIFAR-10 data set. We will also apply the methods described in
+:numref:`chapter_multi_gpu_gluon` and use a multi-GPU training model.
 
 First, we define the `try_all_gpus` function to get all available GPUs.
 
@@ -173,7 +199,11 @@ def _get_batch(batch, ctx):
             gutils.split_and_load(labels, ctx), features.shape[0])
 ```
 
-Then, we define the `evaluate_accuracy` function to evaluate the classification accuracy of the model. Different from `evaluate_accuracy`, the function described in the ["Softmax Regression Starting from Scratch"](../chapter_deep-learning-basics/softmax-regression-scratch.md) and ["Convolutional Neural Network (LeNet)"](../chapter_convolutional-neural-networks/lenet.md) sections, the function defined here are more general. It evaluates the model using all GPUs contained in the `ctx` variable by using the auxiliary function `_get_batch`.
+Then, we define the `evaluate_accuracy` function to evaluate the classification
+accuracy of the model. Different from `evaluate_accuracy`, the function
+described in :numref:`chapter_softmax_scratch` and :numref:`chapter_lenet`, the
+function defined here are more general. It evaluates the model using all GPUs
+contained in the `ctx` variable by using the auxiliary function `_get_batch`.
 
 ```{.python .input  n=36}
 # This function has been saved in the d2l package for future use

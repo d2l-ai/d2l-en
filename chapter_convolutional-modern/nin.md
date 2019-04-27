@@ -1,4 +1,5 @@
 # Network in Network (NiN)
+:label:`chapter_nin`
 
 LeNet, AlexNet, and VGG all share a common design pattern:
 extract features exploiting *spatial* structure
