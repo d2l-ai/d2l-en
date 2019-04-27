@@ -1,8 +1,9 @@
 Dive into Deep Learning
 ========================
 
-```rst_html
-:file: frontpage.html
+```eval_rst
+.. raw:: html
+   :file: frontpage.html
 ```
 
 ```toc
