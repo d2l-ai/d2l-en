@@ -8,11 +8,11 @@ learning models, and to give you enough of a flavor for the subject that you can
 
 We've already invoked probabilities in previous sections without articulating what precisely they are or giving a concrete example. Let's get more serious now by considering the problem of distinguishing cats and dogs based on photographs. This might sound simple but it's actually a formidable challenge. To start with, the difficulty of the problem may depend on the resolution of the image.
 
-| 10px | 20px | 40px
-| 80px | 160px |
+| 10px | 20px | 40px | 80px | 160px |
 |:----:|:----:|:----:|:----:|:-----:|
 |![](../img/whitecat10.jpg)|![](../img/whitecat20.jpg)|![](../img/whitecat40.jpg)|![](../img/whitecat80.jpg)|![](../img/whitecat160.jpg)|
 |![](../img/whitedog10.jpg)|![](../img/whitedog20.jpg)|![](../img/whitedog40.jpg)|![](../img/whitedog80.jpg)|![](../img/whitedog160.jpg)|
+
 While it's easy for humans to recognize cats and dogs at 320 pixel resolution,
 it becomes challenging at 40 pixels and next to impossible at 10 pixels. In
 other words, our ability to tell cats and dogs apart at a large distance (and thus low resolution) might approach uninformed guessing. Probability gives us a
@@ -182,8 +182,7 @@ Independence is when the occurrence of one event does not reveal any information
 Let's put our skills to the test. Assume that a doctor administers an AIDS test to a patient. This test is fairly accurate and it fails only with 1% probability if the patient is healthy by reporting him as diseased. Moreover,
 it never fails to detect HIV if the patient actually has it. We use $D$ to indicate the diagnosis and $H$ to denote the HIV status. Written as a table the outcome $\Pr(D | H)$ looks as follows:
 
-|
-outcome| HIV positive | HIV negative |
+|outcome| HIV positive | HIV negative |
 |:------------|-------------:|-------------:|
 |Test positive|            1 |         0.01 |
 |Test negative|            0 |         0.99 |
