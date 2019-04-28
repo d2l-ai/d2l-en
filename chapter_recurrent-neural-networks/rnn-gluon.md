@@ -1,4 +1,5 @@
 # Concise Implementation of Recurrent Neural Networks
+:label:`chapter_rnn_gluon`
 
 While the previous section was instructive to see how recurrent neural networks are implemented, this isn't convenient or fast. The current section will show how to implement the same language model more efficiently using functions provided by the deep learning framework. We begin as before by reading the 'Time Machine' corpus.
 
@@ -33,9 +34,15 @@ state = rnn_layer.begin_state(batch_size=batch_size)
 state[0].shape
 ```
 
-Unlike the recurrent neural network implemented in the previous section, the input shape of `rnn_layer` is given by (time step, batch size, number of inputs). In the case of a language model the number of inputs would be the one-hot vector length (the dictionary size). In addition, as an `rnn.RNN` instance in Gluon, `rnn_layer` returns the output and hidden state after forward computation. The output refers to the sequence of hidden states that the RNN computes over various time steps. They are used as input for subsequent output layers. Note that the output does not involve any conversion to characters or any other post-processing. This is so, since the RNN itself has no concept of what to do with the vectors that it generates. In short, its shape is given by (time step, batch size, number of hidden units). 
+Unlike the recurrent neural network implemented in the previous section, the input shape of `rnn_layer` is given by (time step, batch size, number of inputs). In the case of a language model the number of inputs would be the one-hot vector length (the dictionary size). In addition, as an `rnn.RNN` instance in Gluon, `rnn_layer` returns the output and hidden state after forward computation. The output refers to the sequence of hidden states that the RNN computes over various time steps. They are used as input for subsequent output layers. Note that the output does not involve any conversion to characters or any other post-processing. This is so, since the RNN itself has no concept of what to do with the vectors that it generates. In short, its shape is given by (time step, batch size, number of hidden units).
 
-The hidden state returned by the `rnn.RNN` instance in the forward computation is the state of the hidden layer available at the last time step. This can be used to initialize the next time step: when there are multiple layers in the hidden layer, the hidden state of each layer is recorded in this variable. For recurrent neural networks such as [Long Short Term Memory](lstm.md) (LSTM) networks, the variables also contains other state information. We will introduce LSTM and deep RNNs later in this chapter.
+The hidden state returned by the `rnn.RNN` instance in the forward computation
+is the state of the hidden layer available at the last time step. This can be
+used to initialize the next time step: when there are multiple layers in the
+hidden layer, the hidden state of each layer is recorded in this variable. For
+recurrent neural networks such as the long short term memory (LSTM) networks
+(:numref:`chapter_lstm`), the variables also contains other state
+information. We will introduce LSTM and deep RNNs later in this chapter.
 
 ```{.python .input  n=38}
 num_steps = 35
@@ -109,12 +116,12 @@ def grad_clipping_gluon(model, theta, ctx):
     d2l.grad_clipping(params, theta, ctx)
 ```
 
-Its training algorithm is the same as in the previous section. But we only use the sequential partitioning below for simplicity. 
+Its training algorithm is the same as in the previous section. But we only use the sequential partitioning below for simplicity.
 
 ```{.python .input  n=18}
 # This function is saved in the d2l package for future use
-def train_and_predict_rnn_gluon(model, num_hiddens, corpus_indices, vocab, 
-                                ctx, num_epochs, num_steps, lr, 
+def train_and_predict_rnn_gluon(model, num_hiddens, corpus_indices, vocab,
+                                ctx, num_epochs, num_steps, lr,
                                 clipping_theta, batch_size, prefixes):
     loss = gloss.SoftmaxCrossEntropyLoss()
     model.initialize(ctx=ctx, force_reinit=True, init=init.Normal(0.01))
@@ -161,7 +168,7 @@ train_and_predict_rnn_gluon(model, num_hiddens, corpus_indices, vocab, ctx,
                             batch_size, prefixes)
 ```
 
-The model achieves comparable perplexity, albeit within a shorter period of time, due to the code being more optimized. 
+The model achieves comparable perplexity, albeit within a shorter period of time, due to the code being more optimized.
 
 ## Summary
 
@@ -171,15 +178,15 @@ The model achieves comparable perplexity, albeit within a shorter period of time
 
 ## Exercises
 
-1. Compare the implementation with the previous section. 
-    * Why does Gluon's implementation run faster? 
+1. Compare the implementation with the previous section.
+    * Why does Gluon's implementation run faster?
     * If you observe a significant difference beyond speed, try to find the reason.
 1. Can you make the model overfit?
     * Increase the number of hidden units.
     * Increase the number of iterations.
-    * What happens if you adjust the clipping parameter? 
-1. Implement the autoregressive model of the introduction to the current chapter using an RNN. 
-1. Modify the `predict_rnn_gluon` such as to use sampling rather than picking the most likely next character. 
+    * What happens if you adjust the clipping parameter?
+1. Implement the autoregressive model of the introduction to the current chapter using an RNN.
+1. Modify the `predict_rnn_gluon` such as to use sampling rather than picking the most likely next character.
     * What happens?
     * Bias the model towards more likely outputs, e.g. by sampling from $q(w_t|w_{t-1}, \ldots w_1) \propto p^\alpha(w_t|w_{t-1}, \ldots w_1)$ for $\alpha > 1$.
 1. What happens if you increase the number of hidden layers in the RNN model? Can you make the model work?

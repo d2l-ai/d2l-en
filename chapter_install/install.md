@@ -1,4 +1,5 @@
 # Installation
+:label:`chapter_installation`
 
 To get you up and running with hands-on experiences, we'll need you to set up with a Python environment, Jupyter's interactive notebooks, the relevant libraries, and the code needed to *run the book*.
 
@@ -13,7 +14,7 @@ If it is your first time to run the code of this book, you need to complete the 
 
 Step 1 is to download and install [Miniconda](https://conda.io/en/master/miniconda.html) according to the operating system in use. During the installation, it is required to choose the option "Add Anaconda to the system PATH environment variable".
 
-Step 2 is to download the compressed file containing the code of this book. It is available at https://www.d2l.ai/d2l-en-1.0.zip. After downloading the zip file, create a folder `d2l-en` and extract the zip file into the folder. At the current folder, enter `cmd` on the address bar of File Explorer to enter the command line mode.
+Step 2 is to download the compressed file containing the code of this book. It is available at https://www.d2l.ai/d2l-en.zip. After downloading the zip file, create a folder `d2l-en` and extract the zip file into the folder. At the current folder, enter `cmd` on the address bar of File Explorer to enter the command line mode.
 
 Step 3 is to create a virtual (running) environment using conda to install the libraries needed by this book. Here `environment.yml` is placed in the downloaded zip file. Open the file with a text editor to see the libraries (such as MXNet and `d2lzh` package) and their version numbers on which running the code of the book is dependent.
 
@@ -62,7 +63,7 @@ Step 2 is to download the compressed file containing the code of this book, and 
 
 ```
 mkdir d2l-en && cd d2l-en
-curl https://www.d2l.ai/d2l-en-1.0.zip -o d2l-en.zip
+curl https://www.d2l.ai/d2l-en.zip -o d2l-en.zip
 unzip d2l-en.zip && rm d2l-en.zip
 ```
 

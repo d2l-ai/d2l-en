@@ -4,7 +4,12 @@ One of the reasons for the success of deep learning can be found in the wide ran
 
 ## Layers without Parameters
 
-Since this is slightly intricate, we start with a custom layer (aka Block) that doesn't have any inherent parameters. Our first step is very similar to when we [introduced blocks](model-construction.md) previously. The following `CenteredLayer` class constructs a layer that subtracts the mean from the input. We build it by inheriting from the Block class and implementing the `forward` method.
+Since this is slightly intricate, we start with a custom layer (aka Block) that
+doesn't have any inherent parameters. Our first step is very similar to when we
+introduced blocks in :numref:`chapter_model_construction`. The following
+`CenteredLayer` class constructs a layer that subtracts the mean from the
+input. We build it by inheriting from the Block class and implementing the
+`forward` method.
 
 ```{.python .input  n=1}
 from mxnet import gluon, nd

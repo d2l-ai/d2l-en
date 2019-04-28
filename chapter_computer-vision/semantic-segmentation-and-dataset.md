@@ -204,7 +204,7 @@ for X, Y in train_iter:
 
 ## Exercises
 
-* Recall the content we covered in the ["Image Augmentation"](image-augmentation.md) section. Which of the image augmentation methods used in image classification would be hard to use in semantic segmentation?
+* Recall the content we covered in :numref:`chapter_image_augmentation`. Which of the image augmentation methods used in image classification would be hard to use in semantic segmentation?
 
 ##  Reference
 

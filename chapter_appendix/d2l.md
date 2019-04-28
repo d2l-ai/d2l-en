@@ -1,4 +1,5 @@
 # `d2l` API Document
+:label:`chapter_d2l`
 
 ## Basic and Plotting
 
