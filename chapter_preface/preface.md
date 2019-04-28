@@ -188,7 +188,7 @@ introduction to deep learning in :numref:`chapter_introduction`.  In
 :numref:`chapter_crashcourse`, we'll quickly bring you up to speed on the
 prerequisites required for hands-on deep learning, such as how to acquire and
 run the codes covered in the book.  :numref:`chapter_linear` and
-:numref:`chapter_mlp` cover the most basic concepts and techniques of deep
+:numref:`chapter_perceptrons` cover the most basic concepts and techniques of deep
 learning, such as linear regression, multi-layer perceptrons and regularization.
 <!--If you are short on time or you only want to learn only
 about the most basic concepts and techniques of deep learning,
