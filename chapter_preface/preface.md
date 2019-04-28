@@ -42,7 +42,7 @@ mature, well-maintained tools.
 The key ideas should be clearly distilled,
 minimizing the onboarding time needed to bring new practitioners up to date.
 Mature libraries should automate common tasks,
-and exemplary code should make it easy for practitioners
+and exemplar code should make it easy for practitioners
 to modify, apply, and extend common applications to suit their needs.
 Take dynamic web applications as an example.
 Despite a large number of companies, like Amazon,
