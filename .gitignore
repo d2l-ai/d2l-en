@@ -24,3 +24,4 @@ aclImdb*
 /_build/
 graffle/*/*.svg
 graffle/*/*.pdf
+build/
