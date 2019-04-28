@@ -4,14 +4,29 @@ stage("Build and Publish") {
       checkout scm
       echo "Setup environment"
       sh '''set -ex
-      conda remove -n d2l-en-build --all
+      conda remove -n d2l-en-build --all -y
       conda create -n d2l-en-build pip -y
       conda activate d2l-en-build
-      pip install d2lbook>=0.1.5 d2l>=0.9.1 mxnet-cu100>=1.5.0b20190428
+      pip install mxnet-cu100
+      pip install d2lbook>=0.1.5 d2l>=0.9.1
       '''
       echo "Execute notebooks"
+      sh '''set -ex
+      conda activate d2l-en-build
+      d2lbook build eval
+      '''
       echo "Build HTML/PDF/Pakage"
-      echo "Publish"
+      sh '''set -ex
+      conda activate d2l-en-build
+      d2lbook build html pdf pkg
+      '''
+      if (env.BRANCH_NAME == 'master') {
+        echo "Publish"
+        sh '''set -ex
+        conda activate d2l-en-build
+        d2lbook deploy html pdf pkg
+      '''
+      }
 	}
   }
 }
