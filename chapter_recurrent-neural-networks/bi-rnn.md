@@ -2,17 +2,17 @@
 
 So far we assumed that our goal is to model the next word given what we've seen so far, e.g. in the context of a time series or in the context of a language model. While this is a typical scenario, it is not the only one we might encounter. To illustrate the issue, consider the following three tasks of filling in the blanks in a text:
 
-```{.python .input}
-I am _____ 
-I am _____ very hungry,
+```text
+I am _____
+I am _____ very hungry.
 I am _____ very hungry, I could eat half a pig.
 ```
 
-Depending on the amount of information available we might fill the blanks with very different words such as *'happy'*, *'not'*, and *'very'*. Clearly the end of the phrase (if available) conveys significant information about which word to pick. A sequence model that is incapable of taking advantage of this will perform poorly on related tasks. For instance, to do well in named entity recognition (e.g. to recognize whether *Green* refers to *Mr. Green* or to the color) longer-range context is equally vital. To get some inspiration for addressing the problem let's take a detour to graphical models. 
+Depending on the amount of information available we might fill the blanks with very different words such as *'happy'*, *'not'*, and *'very'*. Clearly the end of the phrase (if available) conveys significant information about which word to pick. A sequence model that is incapable of taking advantage of this will perform poorly on related tasks. For instance, to do well in named entity recognition (e.g. to recognize whether *Green* refers to *Mr. Green* or to the color) longer-range context is equally vital. To get some inspiration for addressing the problem let's take a detour to graphical models.
 
 ## Dynamic Programming
 
-This section serves to *illustrate* the problem. The specific technical details do not matter for understanding the deep learning counterpart but they help in motivating why one might use deep learning and why one might pick specific architectures. These insights will come in handy later when it comes to [Natural Language Processing](../chapter_natural-language-processing/index.md). 
+This section serves to *illustrate* the problem. The specific technical details do not matter for understanding the deep learning counterpart but they help in motivating why one might use deep learning and why one might pick specific architectures.
 
 If we want to solve the problem using graphical models we could for instance design a latent variable model as follows: we assume that there exists some latent variable $h_t$ which governs the emissions $x_t$ that we observe via $p(x_t|h_t)$. Moreover, the transitions $h_t \to h_{t+1}$ are given by some state transition probability $p(h_t|h_{t-1})$. The graphical model then looks as follows:
 
@@ -26,9 +26,9 @@ Now assume that we observe all $x_i$ with the exception of some $x_j$ and it is 
 
 $$\begin{aligned}
     p(x) & = \sum_h p(h_1) p(x_1|h_1) \prod_{i=2}^T p(h_t|h_{t-1}) p(x_t|h_t) \\
-    & = \sum_{h_2, \ldots h_T} \underbrace{\left[\sum_{h_1} p(h_1) p(x_1|h_1) p(h_2|h_1)\right]}_{=: \pi_2(h_2)} 
+    & = \sum_{h_2, \ldots h_T} \underbrace{\left[\sum_{h_1} p(h_1) p(x_1|h_1) p(h_2|h_1)\right]}_{=: \pi_2(h_2)}
     p(x_2|h_2) \prod_{i=2}^T p(h_t|h_{t-1}) p(x_t|h_t) \\
-    & = \sum_{h_3, \ldots h_T} \underbrace{\left[\sum_{h_2} \pi_2(h_2) p(x_2|h_2) p(h_3|h_2)\right]}_{=: \pi_3(h_3)} 
+    & = \sum_{h_3, \ldots h_T} \underbrace{\left[\sum_{h_2} \pi_2(h_2) p(x_2|h_2) p(h_3|h_2)\right]}_{=: \pi_3(h_3)}
     p(x_3|h_3) \prod_{i=3}^T p(h_t|h_{t-1}) p(x_t|h_t)
 \end{aligned}$$
 
@@ -40,9 +40,9 @@ The recursion is initialized as $\pi_1(h_1) = p(h_1)$. In abstract terms this ca
 
 $$\begin{aligned}
     p(x) & = \sum_h \prod_{i=1}^{T-1} p(h_t|h_{t-1}) p(x_t|h_t) \cdot p(h_T|h_{T-1}) p(x_T|h_T) \\
-    & = \sum_{h_1, \ldots h_{T-1}} \prod_{i=1}^{T-1} p(h_t|h_{t-1}) p(x_t|h_t) \cdot 
+    & = \sum_{h_1, \ldots h_{T-1}} \prod_{i=1}^{T-1} p(h_t|h_{t-1}) p(x_t|h_t) \cdot
     \underbrace{\left[\sum_{h_T} p(h_T|h_{T-1}) p(x_T|h_T)\right]}_{=: \rho_{T-1}(h_{T-1})} \\
-    & = \sum_{h_1, \ldots h_{T-2}} \prod_{i=1}^{T-2} p(h_t|h_{t-1}) p(x_t|h_t) \cdot 
+    & = \sum_{h_1, \ldots h_{T-2}} \prod_{i=1}^{T-2} p(h_t|h_{t-1}) p(x_t|h_t) \cdot
     \underbrace{\left[\sum_{h_{T-1}} p(h_{T-1}|h_{T-2}) p(x_{T-1}|h_{T-1})\right]}_{=: \rho_{T-2}(h_{T-2})}
 \end{aligned}$$
 
@@ -54,7 +54,7 @@ with initialization $\rho_T(h_T) = 1$. These two recursions allow us to sum over
 
 $$p(x_j|x_{-j}) \propto \sum_{h_j} \pi_j(h_j) \rho_j(h_j) p(x_j|h_j).$$
 
-Note that in abstract terms the backward recursion can be written as $\rho_{t-1} = g(\rho_t, x_t)$, where $g$ is some learned function. Again, this looks very much like an update equation, just running backwards unlike what we've seen so far in RNNs. And, indeed, HMMs benefit from knowing future data when it is available. Signal processing scientists distinguish between the two cases of knowing and not knowing future observations as filtering vs.\ smoothing. See e.g.\ the introductory chapter of the book by [Doucet, de Freitas and Gordon, 2001](https://www.stats.ox.ac.uk/~doucet/doucet_defreitas_gordon_smcbookintro.pdf) on Sequential Monte Carlo algorithms for more detail. 
+Note that in abstract terms the backward recursion can be written as $\rho_{t-1} = g(\rho_t, x_t)$, where $g$ is some learned function. Again, this looks very much like an update equation, just running backwards unlike what we've seen so far in RNNs. And, indeed, HMMs benefit from knowing future data when it is available. Signal processing scientists distinguish between the two cases of knowing and not knowing future observations as filtering vs.\ smoothing. See e.g.\ the introductory chapter of the book by [Doucet, de Freitas and Gordon, 2001](https://www.stats.ox.ac.uk/~doucet/doucet_defreitas_gordon_smcbookintro.pdf) on Sequential Monte Carlo algorithms for more detail.
 
 ## Bidirectional Model
 
@@ -62,7 +62,7 @@ If we want to have a mechanism in RNNs that offers comparable look-ahead ability
 
 ![ Architecture of a bidirectional recurrent neural network. ](../img/birnn.svg)
 
-In fact, this is not too dissimilar to the forward and backward recurrences we encountered above. The main distinction is that in the previous case these equations had a specific statistical meaning. Now they're devoid of such easily accessible interpretaton and we can just treat them as generic functions. This transition epitomizes many of the principles guiding the design of modern deep networks - use the type of functional dependencies common to classical statistical models and use them in a generic form. 
+In fact, this is not too dissimilar to the forward and backward recurrences we encountered above. The main distinction is that in the previous case these equations had a specific statistical meaning. Now they're devoid of such easily accessible interpretaton and we can just treat them as generic functions. This transition epitomizes many of the principles guiding the design of modern deep networks - use the type of functional dependencies common to classical statistical models and use them in a generic form.
 
 ### Definition
 
@@ -87,9 +87,9 @@ Here, the weight parameter $\mathbf{W}_{hq} \in \mathbb{R}^{2h \times q}$ and bi
 
 ### Computational Cost and Applications
 
-One of the key features of a bidirectional RNN is that information from both ends of the sequence is used to estimate the output. That is, we use information from future and past observations to predict the current one (a smoothing scenario). In the case of language models this isn't quite what we want. After all, we don't have the luxury of knowing the next to next symbol when predicting the next one. Hence, if we were to use a bidirectional RNN naively we wouldn't get very good accuracy: during training we have past and future data to estimate the present. During test time we only have past data and thus poor accuracy (we will illustrate this in an experiment below). 
+One of the key features of a bidirectional RNN is that information from both ends of the sequence is used to estimate the output. That is, we use information from future and past observations to predict the current one (a smoothing scenario). In the case of language models this isn't quite what we want. After all, we don't have the luxury of knowing the next to next symbol when predicting the next one. Hence, if we were to use a bidirectional RNN naively we wouldn't get very good accuracy: during training we have past and future data to estimate the present. During test time we only have past data and thus poor accuracy (we will illustrate this in an experiment below).
 
-To add insult to injury bidirectional RNNs are also exceedingly slow. The main reason for this is that they require both a forward and a backward pass and that the backward pass is dependent on the outcomes of the forward pass. Hence gradients will have a very long dependency chain. 
+To add insult to injury bidirectional RNNs are also exceedingly slow. The main reason for this is that they require both a forward and a backward pass and that the backward pass is dependent on the outcomes of the forward pass. Hence gradients will have a very long dependency chain.
 
 In practice bidirectional layers are used very sparingly and only for a narrow set of applications, such as filling in missing words, annotating tokens (e.g. for named entity recognition), or encoding sequences wholesale as a step in a sequence processing pipeline (e.g. for machine translation). In short, handle with care!
 
@@ -106,36 +106,37 @@ import d2l
 from mxnet import nd
 from mxnet.gluon import rnn
 
-(corpus_indices, char_to_idx, idx_to_char, vocab_size) = d2l.load_data_time_machine()
+corpus_indices, vocab = d2l.load_data_time_machine()
 
-num_inputs, num_hiddens, num_layers, num_outputs = vocab_size, 256, 2, vocab_size
+num_inputs, num_hiddens, num_layers, num_outputs = len(vocab), 256, 2, len(vocab)
 ctx = d2l.try_gpu()
-num_epochs, num_steps, batch_size, lr, clipping_theta = 1000, 35, 32, 100, 1e-2
-pred_period, pred_len, prefixes = 200, 50, ['traveller', 'time traveller']
+num_epochs, num_steps, batch_size, lr, clipping_theta = 500, 35, 32, 1, 1
+prefixes = ['traveller', 'time traveller']
 
 lstm_layer = rnn.LSTM(hidden_size = num_hiddens, num_layers=num_layers,
                       bidirectional = True)
-model = d2l.RNNModel(lstm_layer, vocab_size)
-d2l.train_and_predict_rnn_gluon(model, num_hiddens, vocab_size, ctx,
-                                corpus_indices, idx_to_char, char_to_idx,
-                                num_epochs, num_steps, lr, clipping_theta,
-                                batch_size, pred_period, pred_len, prefixes)
+model = d2l.RNNModel(lstm_layer, len(vocab))
+d2l.train_and_predict_rnn_gluon(model, num_hiddens, corpus_indices, vocab,
+                                ctx, num_epochs, num_steps, lr,
+                                clipping_theta, batch_size, prefixes)
 ```
 
-The output is clearly unsatisfactory for the reasons described above. For a discussion of more effective uses of bidirectional models see e.g. the later section on [Sentiment Classification](../chapter_natural-language-processing/sentiment-analysis-rnn.md). 
+The output is clearly unsatisfactory for the reasons described above. For a
+discussion of more effective uses of bidirectional models see e.g. the sentiment
+classification in :numref:`chapter_sentiment_rnn`.
 
 ## Summary
 
 * In bidirectional recurrent neural networks, the hidden state for each time step is simultaneously determined by the data prior and after the current timestep.
-* Bidirectional RNNs bear a striking resemblance with the forward-backward algorithm in graphical models. 
-* Bidirectional RNNs are mostly useful for sequence embedding and the estimation of observations given bidirectional context. 
-* Bidirectional RNNs are very costly to train due to long gradient chains. 
+* Bidirectional RNNs bear a striking resemblance with the forward-backward algorithm in graphical models.
+* Bidirectional RNNs are mostly useful for sequence embedding and the estimation of observations given bidirectional context.
+* Bidirectional RNNs are very costly to train due to long gradient chains.
 
 ## Exercises
 
 1. If the different directions use a different number of hidden units, how will the shape of $\boldsymbol{H}_t$ change?
 1. Design a bidirectional recurrent neural network with multiple hidden layers.
-1. Implement a sequence classification algorithm using bidirectional RNNs. Hint - use the RNN to embed each word and then aggregate (average) all embedded outputs before sending the output into an MLP for classification. For instance, if we have $(\mathbf{o}_1, \mathbf{o}_2, \mathbf{o}_3)$ we compute $\bar{\mathbf{o}} = \frac{1}{3} \sum_i \mathbf{o}_i$ first and then use the latter for sentiment classification. 
+1. Implement a sequence classification algorithm using bidirectional RNNs. Hint - use the RNN to embed each word and then aggregate (average) all embedded outputs before sending the output into an MLP for classification. For instance, if we have $(\mathbf{o}_1, \mathbf{o}_2, \mathbf{o}_3)$ we compute $\bar{\mathbf{o}} = \frac{1}{3} \sum_i \mathbf{o}_i$ first and then use the latter for sentiment classification.
 
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2370)

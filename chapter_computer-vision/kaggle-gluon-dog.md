@@ -9,7 +9,8 @@ In this competition, we attempt to identify 120 different breeds of dogs. The da
 
 Figure 9.17 shows the information on the competition's webpage. In order to submit the results, please register an account on the Kaggle website first.
 
-![Dog breed identification competition website. The data set for the competition can be accessed by clicking the "Data" tab. (Source: www.](../img/kaggle-dog.png)
+![Dog breed identification competition website. The data set for the competition can be accessed by clicking the "Data" tab.](../img/kaggle-dog.png)
+:width:`600px`
 
 First, import the packages or modules required for the competition.
 
@@ -187,7 +188,21 @@ test_iter = gdata.DataLoader(test_ds.transform_first(transform_test),
 
 ## Define the Model
 
-The data set for this competition is a subset of the ImageNet data set. Therefore, we can use the approach discussed in the ["Fine Tuning"](fine-tuning.md) section to select a model pre-trained on the entire ImageNet data set and use it to extract image features to be input in the custom small-scale output network. Gluon provides a wide range of pre-trained models. Here, we will use the pre-trained ResNet-34 model. Because the competition data set is a subset of the pre-training data set, we simply reuse the input of the pre-trained model's output layer, i.e. the extracted features. Then, we can replace the original output layer with a small custom output network that can be trained, such as two fully connected layers in a series. Different from the experiment in the ["Fine Tuning"](fine-tuning.md) section, here, we do not retrain the pre-trained model used for feature extraction. This reduces the training time and the memory required to store model parameter gradients.
+The data set for this competition is a subset of the ImageNet data
+set. Therefore, we can use the approach discussed in
+:numref:`chapter_fine_tuning`
+to select a model pre-trained on the
+entire ImageNet data set and use it to extract image features to be input in the
+custom small-scale output network. Gluon provides a wide range of pre-trained
+models. Here, we will use the pre-trained ResNet-34 model. Because the
+competition data set is a subset of the pre-training data set, we simply reuse
+the input of the pre-trained model's output layer, i.e. the extracted
+features. Then, we can replace the original output layer with a small custom
+output network that can be trained, such as two fully connected layers in a
+series. Different from the experiment in
+:numref:`chapter_fine_tuning`, here, we do not retrain the pre-trained model used for feature
+extraction. This reduces the training time and the memory required to store
+model parameter gradients.
 
 You must note that, during image augmentation, we use the mean values and standard deviations of the three RGB channels for the entire ImageNet data set for normalization. This is consistent with the normalization of the pre-trained model.
 
@@ -292,7 +307,10 @@ with open('submission.csv', 'w') as f:
             [str(num) for num in output]) + '\n')
 ```
 
-After executing the above code, we will generate a "submission.csv" file. The format of this file is consistent with the Kaggle competition requirements. The method for submitting results is similar to method in the ["Get Started with Kaggle Competition: Predicting House Prices"](../chapter_deep-learning-basics/kaggle-house-price.md) section.
+After executing the above code, we will generate a "submission.csv" file. The
+format of this file is consistent with the Kaggle competition requirements. The
+method for submitting results is similar to method in
+:numref:`chapter_kaggle_house`.
 
 
 ## Summary

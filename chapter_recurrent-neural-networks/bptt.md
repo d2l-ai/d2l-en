@@ -1,8 +1,9 @@
 # Backpropagation Through Time
+:label:`chapter_bptt`
 
 So far we repeatedly alluded to things like *exploding gradients*,
 *vanishing gradients*, *truncating backprop*, and the need to
-*detach the computational graph*. For instance, in the previous 
+*detach the computational graph*. For instance, in the previous
 section we invoked `s.detach()` on the sequence. None of this was really fully
 explained, in the interest of being able to build a model quickly and
 to see how it works. In this section we will delve a bit more deeply
@@ -12,13 +13,13 @@ randomization and backprop also see the paper by
 [Tallec and Ollivier, 2017](https://arxiv.org/abs/1705.08209).
 
 We encountered some of the effects of gradient explosion when we first
-[implemented recurrent neural networks](rnn-scratch.md). In
+implemented recurrent neural networks (:numref:`chapter_rnn_scratch`). In
 particular, if you solved the problems in the problem set, you would
 have seen that gradient clipping is vital to ensure proper
 convergence. To provide a better understanding of this issue, this
 section will review how gradients are computed for sequences. Note
-that there is nothing conceptually new in how it works. After all, we are still merely applying the chain rule to compute gradients. Nonetheless it is 
-worth while reviewing [backpropagation](../chapter_deep-learning-basics/backprop.md) for
+that there is nothing conceptually new in how it works. After all, we are still merely applying the chain rule to compute gradients. Nonetheless it is
+worth while reviewing backpropagation (:numref:`chapter_backprop`) for
 another time.
 
 Forward propagation in a recurrent neural network is relatively
@@ -59,7 +60,7 @@ This chain can get *very* long whenever $t$ is large. While we can use the chain
 since subtle changes in the initial conditions can potentially affect
 the outcome a lot. That is, we could see things similar to the
 butterfly effect where minimal changes in the initial conditions lead to disproportionate changes in the outcome. This is actually quite undesirable in terms of the model that we want to estimate. After all, we are looking for robust estimators that generalize well. Hence this strategy is almost never used in practice.
-  
+
 **Truncate the sum after $\tau$ steps.** This is what we've been
 discussing so far. This leads to an *approximation* of the true
 gradient, simply by terminating the sum above at $\partial_w
@@ -80,7 +81,7 @@ $\Pr(\xi_t = \pi^{-1}) = \pi$. We use this to replace the gradient:
 
 $$z_t  = \partial_w f(x_t, h_{t-1}, w) + \xi_t \partial_h f(x_t, h_{t-1}, w) \partial_w h_{t-1}$$
 
-It follows from the definition of $\xi_t$ that $\mathbf{E}[z_t] = \partial_w h_t$. Whenever $\xi_t = 0$ the expansion terminates at that point. This leads to a weighted sum of sequences of varying lengths where long sequences are rare but appropriately overweighted. [Tallec and Ollivier, 2017](https://arxiv.org/abs/1705.08209) proposed this in their paper. Unfortunately, while appealing in theory, the model does not work much better than simple truncation, most likely due to a number of factors. Firstly, the effect of an observation after a number of backpropagation steps into the past is quite sufficient to capture dependencies in practice. Secondly, the increased variance counteracts the fact that the gradient is more accurate. Thirdly, we actually *want* models that have only a short range of interaction. Hence BPTT has a slight regularizing effect which can be desirable. 
+It follows from the definition of $\xi_t$ that $\mathbf{E}[z_t] = \partial_w h_t$. Whenever $\xi_t = 0$ the expansion terminates at that point. This leads to a weighted sum of sequences of varying lengths where long sequences are rare but appropriately overweighted. [Tallec and Ollivier, 2017](https://arxiv.org/abs/1705.08209) proposed this in their paper. Unfortunately, while appealing in theory, the model does not work much better than simple truncation, most likely due to a number of factors. Firstly, the effect of an observation after a number of backpropagation steps into the past is quite sufficient to capture dependencies in practice. Secondly, the increased variance counteracts the fact that the gradient is more accurate. Thirdly, we actually *want* models that have only a short range of interaction. Hence BPTT has a slight regularizing effect which can be desirable.
 
 ![From top to bottom: randomized BPTT, regularly truncated BPTT and full BPTT](../img/truncated-bptt.svg)
 
@@ -99,14 +100,14 @@ Now that we discussed the general principle let's discuss BPTT in detail, distin
 $$\mathbf{h}_t = \mathbf{W}_{hx} \mathbf{x}_t + \mathbf{W}_{hh} \mathbf{h}_{t-1} \text{ and }
 \mathbf{o}_t = \mathbf{W}_{oh} \mathbf{h}_t$$
 
-Following the discussion of the section on ["backprop"](../chapter_deep-learning-basics/backprop.md) we compute gradients $\partial L/\partial \mathbf{W}_{hx}$, $\partial L/\partial \mathbf{W}_{hh}$, and $\partial L/\partial \mathbf{W}_{oh}$ for 
+Following the discussion in :numref:`chapter_backprop` we compute gradients $\partial L/\partial \mathbf{W}_{hx}$, $\partial L/\partial \mathbf{W}_{hh}$, and $\partial L/\partial \mathbf{W}_{oh}$ for
 $L(\mathbf{x}, \mathbf{y}, \mathbf{W}) = \sum_{t=1}^T l(\mathbf{o}_t, y_t)$.
 Taking the derivatives with respect to $W_{oh}$ is fairly straightforward and we obtain
 
 $$\partial_{\mathbf{W}_{oh}} L = \sum_{t=1}^T \mathrm{prod}
 \left(\partial_{\mathbf{o}_t} l(\mathbf{o}_t, y_t), \mathbf{h}_t\right)$$
 
-The dependency on $\mathbf{W}_{hx}$ and $\mathbf{W}_{hh}$ is a bit more tricky since it involves a chain of derivatives. We begin with 
+The dependency on $\mathbf{W}_{hx}$ and $\mathbf{W}_{hh}$ is a bit more tricky since it involves a chain of derivatives. We begin with
 
 $$\begin{aligned}
 \partial_{\mathbf{W}_{hh}} L & = \sum_{t=1}^T \mathrm{prod}
@@ -115,7 +116,7 @@ $$\begin{aligned}
 \left(\partial_{\mathbf{o}_t} l(\mathbf{o}_t, y_t), \mathbf{W}_{oh}, \partial_{\mathbf{W}_{hx}} \mathbf{h}_t\right)
 \end{aligned}$$
 
-After all, hidden states depend on each other and on past inputs. The key quantity is how past hidden states affect future hidden states. 
+After all, hidden states depend on each other and on past inputs. The key quantity is how past hidden states affect future hidden states.
 
 $$\partial_{\mathbf{h}_t} \mathbf{h}_{t+1} = \mathbf{W}_{hh}^\top
 \text{ and thus }
@@ -128,24 +129,22 @@ $$\begin{aligned}
 \partial_{\mathbf{W}_{hx}} \mathbf{h}_t & = \sum_{j=1}^t \left(\mathbf{W}_{hh}^\top\right)^{t-j} \mathbf{x}_j.
 \end{aligned}$$
 
-A number of things follow from this potentially very intimidating expression. Firstly, it pays to store intermediate results, i.e. powers of $\mathbf{W}_{hh}$ as we work our way through the terms of the loss function $L$. Secondly, this simple *linear* example already exhibits some key problems of long sequence models: it involves potentially very large powers $\mathbf{W}_{hh}^j$. In it, eigenvalues smaller than $1$ vanish for large $j$ and eigenvalues larger than $1$ diverge. This is numerically unstable and gives undue importance to potentially irrelvant past detail. One way to address this is to truncate the sum at a computationally convenient size. Later on in this chapter we will see how more sophisticated sequence models such as LSTMs can alleviate this further. In code, this truncation is effected by *detaching* the gradient after a given number of steps. 
+A number of things follow from this potentially very intimidating expression. Firstly, it pays to store intermediate results, i.e. powers of $\mathbf{W}_{hh}$ as we work our way through the terms of the loss function $L$. Secondly, this simple *linear* example already exhibits some key problems of long sequence models: it involves potentially very large powers $\mathbf{W}_{hh}^j$. In it, eigenvalues smaller than $1$ vanish for large $j$ and eigenvalues larger than $1$ diverge. This is numerically unstable and gives undue importance to potentially irrelvant past detail. One way to address this is to truncate the sum at a computationally convenient size. Later on in this chapter we will see how more sophisticated sequence models such as LSTMs can alleviate this further. In code, this truncation is effected by *detaching* the gradient after a given number of steps.
 
 ## Summary
 
 * Back-propagation through time is merely an application of backprop to sequence models with a hidden state.
 * Truncation is needed for computational convencient and numerical stability.
 * High powers of matrices can lead top divergent and vanishing eigenvalues. This manifests itself in the form of exploding or vanishing gradients.
-* For efficient computation intermediate values are cached. 
+* For efficient computation intermediate values are cached.
 
 ## Exercises
 
 1. Assume that we have a symmetric matrix $\mathbf{M} \in \mathbb{R}^{n \times n}$ with eigenvalues $\lambda_i$. Without loss of generality assume that they are ordered in ascending order $\lambda_i \leq \lambda_{i+1}$. Show that $\mathbf{M}^k$ has eigenvalues $\lambda_i^k$.
-1. Prove that for a random vector $\mathbf{x} \in \mathbb{R}^n$ with high probability $\mathbf{M}^k \mathbf{x}$ will by very much aligned with the largest eigenvector $\mathbf{v}_n$ of $\mathbf{M}$. Formalize this statement. 
+1. Prove that for a random vector $\mathbf{x} \in \mathbb{R}^n$ with high probability $\mathbf{M}^k \mathbf{x}$ will by very much aligned with the largest eigenvector $\mathbf{v}_n$ of $\mathbf{M}$. Formalize this statement.
 1. What does the above result mean for gradients in a recurrent neural network?
 1. Besides gradient clipping, can you think of any other methods to cope with gradient explosion in recurrent neural networks?
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2366)
 
 ![](../img/qr_bptt.svg)
-
-

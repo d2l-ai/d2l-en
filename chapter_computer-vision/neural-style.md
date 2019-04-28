@@ -199,7 +199,12 @@ def get_inits(X, ctx, lr, styles_Y):
 
 ## Training
 
-During model training, we constantly extract the content and style features of the composite image and calculate the loss function. Recall our discussion of how synchronization functions force the front end to wait for computation results in the ["Asynchronous Computation"](../chapter_computational-performance/async-computation.md) section. Because we only call the `asscalar` synchronization function every 50 epochs, the process may occupy a great deal of memory. Therefore, we call the `waitall` synchronization function during every epoch.
+During model training, we constantly extract the content and style features of
+the composite image and calculate the loss function. Recall our discussion of
+how synchronization functions force the front end to wait for computation
+results in :numref:`chapter_async`. Because we only call the `asscalar` synchronization function every 50
+epochs, the process may occupy a great deal of memory. Therefore, we call the
+`waitall` synchronization function during every epoch.
 
 ```{.python .input  n=16}
 def train(X, contents_Y, styles_Y, ctx, lr, max_epochs, lr_decay_epoch):

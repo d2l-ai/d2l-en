@@ -1,11 +1,20 @@
 # Word Embedding (word2vec)
+:label:`chapter_word2vec`
 
 A natural language is a complex system that we use to communicate. Words are commonly used as the unit of analysis in natural language processing. As its name implies, a word vector is a vector used to represent a word. It can also be thought of as the feature vector of a word. The technique of mapping words to vectors of real numbers is also known as word embedding. Over the last few years, word embedding has gradually become basic knowledge in natural language processing.
 
 ## Why not Use One-hot Vectors?
 
-We used one-hot vectors to represent words (characters are words) in the ["Implementation of the Recurrent Neural Network from Scratch"](../chapter_recurrent-neural-networks/rnn-scratch.md) section. Recall that when we assume the number of different words in a dictionary (the dictionary size) is $N$, each word can correspond one-to-one with consecutive integers from 0 to $N-1$. These integers that correspond to words are called the indices of the words.
-We assume that the index of a word is $i$. In order to get the one-hot vector representation of the word, we create a vector of all 0s with a length of $N$ and set element $i$ to 1. In this way, each word is represented as a vector of length $N$ that can be used directly by the neural network.
+We used one-hot vectors to represent words (characters are words) in
+:numref:`chapter_rnn_scratch` .
+Recall that when we assume the number of different words in a
+dictionary (the dictionary size) is $N$, each word can correspond one-to-one
+with consecutive integers from 0 to $N-1$. These integers that correspond to
+words are called the indices of the words.  We assume that the index of a word
+is $i$. In order to get the one-hot vector representation of the word, we create
+a vector of all 0s with a length of $N$ and set element $i$ to 1. In this way,
+each word is represented as a vector of length $N$ that can be used directly by
+the neural network.
 
 Although one-hot word vectors are easy to construct, they are usually not a good choice. One of the major reasons is that the one-hot word vectors cannot accurately express the similarity between different words, such as the cosine similarity that we commonly use. For the vectors $\mathbf{x}, \mathbf{y} \in \mathbb{R}^d$, their cosine similarities are the cosines of the angles between them:
 

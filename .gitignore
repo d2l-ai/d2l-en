@@ -21,3 +21,6 @@ build/d2l
 /chapter_recurrent-neural-networks/fra-eng.zip
 img/*.pdf
 aclImdb*
+/_build/
+graffle/*/*.svg
+graffle/*/*.pdf

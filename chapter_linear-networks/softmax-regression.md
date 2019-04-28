@@ -1,14 +1,16 @@
 # Softmax Regression
+:label:`chapter_softmax`
 
-In the last two sections, we worked through implementations
-linear regression, building everything [*from scratch*](linear-regression-scratch.ipynb) and again [using Gluon](linear-regression-gluon.ipynb) to automate the most repetitive work.
+In the last two chapters, we worked through implementations
+linear regression, building everything from scratch
+(:numref:`chapter_linear_scratch`) and again using Gluon (:numref:`chapter_linear_gluon`) to automate the most repetitive work.
 
-Regression is the hammer we reach for 
+Regression is the hammer we reach for
 when we want to answer *how much?* or *how many?* questions.
-If you want to predict the number of dollars (the *price*) 
+If you want to predict the number of dollars (the *price*)
 at which a house will be sold,
 or the number of wins a baseball team might have,
-or the number of days that a patient 
+or the number of days that a patient
 will remain hospitalized before being discharged,
 then you're probably looking for a regression model.
 
@@ -27,8 +29,8 @@ Colloquially, we use the word *classification* to describe two subtly different 
 
 To get our feet wet, let's start off with a somewhat contrived image classification problem. Here, each input will be a grayscale 2-by-2 image. We can represent each pixel location as a single scalar, representing each image with four features $x_1, x_2, x_3, x_4$. Further, let's assume that each image belongs to one among the categories "cat", "chicken" and "dog".
 
-First, we have to choose how to represent the labels. We have two obvious choices. Perhaps the most natural impulse would be to choose $y \in \{1, 2, 3\}$, where the integers represent {dog, cat, chicken} respectively. This is a great way of *storing* such information on a computer. 
-If the categories had some natural ordering among them, say if we were trying to predict {baby, child, adolescent, adult}, then it might even make sense to cast this problem as a regression and keep the labels in this format. 
+First, we have to choose how to represent the labels. We have two obvious choices. Perhaps the most natural impulse would be to choose $y \in \{1, 2, 3\}$, where the integers represent {dog, cat, chicken} respectively. This is a great way of *storing* such information on a computer.
+If the categories had some natural ordering among them, say if we were trying to predict {baby, child, adolescent, adult}, then it might even make sense to cast this problem as a regression and keep the labels in this format.
 
 But general classification problems do not come with natural orderings among the classes. To deal with problems like this, statisticians invented an alternative way to represent categorical data: the one hot encoding. Here we have a vector with one component for every possible category. For a given instance, we set the component correponding to *its category* to 1, and set all other components to 0.
 
@@ -65,12 +67,12 @@ However, there are a few problems with using the output from the output layer di
 Moreover how do we train this model. If the argmax matches the label, then we have no error at all! And if if the argmax is not equal to the label, then no infinitesimal change in our weights will decrease our error. That takes gradient-based learning off the table.
 
 We might like for our outputs to correspond to probabilities, but then we would need a way to guarantee that on new (unseen) data the probabilities would be nonnegative and sum up to 1. Moreover, we would need a training objective that encouraged the model to actually estimate *probabilities*.
-Fortunately, statisticians have conveniently invented a model 
+Fortunately, statisticians have conveniently invented a model
 called softmax logistic regression that does precisely this.
 
 In order to ensure that our outputs are nonnegative and sum to 1,
-while requiring that our model remains differentiable, 
-we subject the outputs of the linear portion of our model 
+while requiring that our model remains differentiable,
+we subject the outputs of the linear portion of our model
 to a nonlinear *softmax* function:
 
 $$
@@ -101,6 +103,7 @@ $$
 This accelerates the dominant operation into a matrix-matrix product $\mathbf{W} \mathbf{X}$ vs the matrix-vector products we would be exectuting if we processed one example at a time. The softmax itself can be computed by exponentiating all entries in $\mathbf{O}$ and then normalizing them by the sum appropriately.
 
 ## Loss Function
+:label:`section_cross_entropy`
 
 Now that we have some mechanism for outputting probabilities, we need to transform this into a measure of how accurate things are, i.e. we need a *loss function*. For this, we use the same concept that we already encountered in linear regression, namely likelihood maximization.
 
@@ -114,8 +117,9 @@ p(Y|X) = \prod_{i=1}^n p(y^{(i)}|x^{(i)})
 -\log p(Y|X) = \sum_{i=1}^n -\log p(y^{(i)}|x^{(i)})
 $$
 
-Maximizing $p(Y|X)$ (and thus equivalently minimizing $-\log p(Y|X)$) 
-corresponds to predicting the label well. 
+
+Maximizing $p(Y|X)$ (and thus equivalently minimizing $-\log p(Y|X)$)
+corresponds to predicting the label well.
 This yields the loss function (we dropped the superscript $(i)$ to avoid notation clutter):
 
 $$

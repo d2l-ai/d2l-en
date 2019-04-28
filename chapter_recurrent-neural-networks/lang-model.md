@@ -43,7 +43,10 @@ occurrences of *'Statistics is'* are a lot less frequent. In
 particular, for some unusual word combinations it may be tricky to
 find enough occurrences to get accurate estimates. Things take a turn for the worse for 3 word combinations and beyond. There will be many plausible 3-word combinations that we likely won't see in our dataset. Unless we provide some solution to give such word combinations nonzero weight we will not be able to use these as a language model. If the dataset is small or if the words are very rare, we might not find even a single one of them.
 
-A common strategy is to perform some form of Laplace smoothing. We already encountered this in our discussion of [Naive Bayes](../chapter_crashcourse/naive-bayes.md) where the solution was to add a small constant to all counts. This helps with singletons, e.g. via
+A common strategy is to perform some form of Laplace smoothing. We already
+encountered this in our discussion of
+naive bayes in :numref:`chapter_naive_bayes` where the solution was to
+add a small constant to all counts. This helps with singletons, e.g. via
 
 $$\begin{aligned}
 	\hat{p}(w) & = \frac{n(w) + \epsilon_1/m}{n + \epsilon_1} \\

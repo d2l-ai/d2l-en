@@ -1,6 +1,6 @@
 # Multiscale Object Detection
 
-In the ["Anchor Box"](anchor.md) section, we generated multiple anchor boxes centered on each pixel of the input image.  These anchor boxes are used to sample different regions of the input image. However, if anchor boxes are generated centered on each pixel of the image, soon there will be too many anchor boxes for us to compute. For example, we assume that the input image has a height and a width of 561 and 728 pixels respectively. If five different shapes of anchor boxes are generated centered on each pixel, over two million anchor boxes ($561 \times 728 \times 5$) need to be predicted and labeled on the image.
+In :numref:`chapter_anchor`, we generated multiple anchor boxes centered on each pixel of the input image.  These anchor boxes are used to sample different regions of the input image. However, if anchor boxes are generated centered on each pixel of the image, soon there will be too many anchor boxes for us to compute. For example, we assume that the input image has a height and a width of 561 and 728 pixels respectively. If five different shapes of anchor boxes are generated centered on each pixel, over two million anchor boxes ($561 \times 728 \times 5$) need to be predicted and labeled on the image.
 
 It is not difficult to reduce the number of anchor boxes.  An easy way is to apply uniform sampling on a small portion of pixels from the input image and generate anchor boxes centered on the sampled pixels. In addition, we can generate anchor boxes of varied numbers and sizes on multiple scales. Notice that smaller objects are more likely to be positioned on the image than larger ones.  Here, we will use a simple example: Objects with shapes of $1 \times 1$, $1 \times 2$, and $2 \times 2$ may have 4, 2, and 1 possible position(s) on an image with the shape $2 \times 2$. Therefore, when using smaller anchor boxes to detect smaller objects, we can sample more regions; when using larger anchor boxes to detect larger objects, we can sample fewer regions.
 
@@ -19,8 +19,10 @@ h, w = img.shape[0:2]
 h, w
 ```
 
-In the ["Two-Dimensional Convolutional Layer"](../chapter_convolutional-neural-networks/conv-layer.md) section, the 2D array output of the convolutional neural network (CNN) is called a feature map.
-We can determine the midpoints of anchor boxes uniformly sampled on any image by defining the shape of the feature map.
+In
+:numref:`chapter_conv_layer`, the 2D array output of the convolutional neural network (CNN) is called
+a feature map.  We can determine the midpoints of anchor boxes uniformly sampled
+on any image by defining the shape of the feature map.
 
 The function `display_anchors` is defined below.  We are going to generate anchor boxes `anchors` centered on each unit (pixel) on the feature map `fmap`.  Since the coordinates of axes $x$ and $y$ in anchor boxes `anchors` have been divided by the width and height of the feature map `fmap`, values between 0 and 1 can be used to represent relative positions of anchor boxes in the feature map.  Since the midpoints of anchor boxes `anchors` overlap with all the units on feature map `fmap`, the relative spatial positions of the midpoints of the `anchors` on any image must have a uniform distribution.  Specifically, when the width and height of the feature map are set to `fmap_w` and `fmap_h` respectively, the function will conduct uniform sampling for `fmap_h` rows and `fmap_w` columns of pixels and use them as midpoints to generate anchor boxes with size `s` (we assume that the length of list `s` is 1) and different aspect ratios (`ratios`).
 
@@ -59,10 +61,18 @@ Since we have generated anchor boxes of different sizes on multiple scales, we w
 At a certain scale, suppose we generate $h \times w$ sets of anchor boxes with different midpoints based on $c_i$ feature maps with the shape $h \times w$ and the number of anchor boxes in each set is $a$. For example, for the first scale of the experiment, we generate 16 sets of anchor boxes with different midpoints based on 10 (number of channels) feature maps with a shape of $4 \times 4$, and each set contains 3 anchor boxes.
 Next, each anchor box is labeled with a category and offset based on the classification and position of the ground-truth bounding box. At the current scale, the object detection model needs to predict the category and offset of $h \times w$ sets of anchor boxes with different midpoints based on the input image.
 
-We assume that the $c_i$ feature maps are the intermediate output of the CNN based on the input image. Since each feature map has $h \times w$ different spatial positions, the same position will have $c_i$ units.
-According to the definition of receptive field in the ["Two-Dimensional Convolutional Layer"](../chapter_convolutional-neural-networks/conv-layer.md) section, the $c_i$ units of the feature map at the same spatial position have the same receptive field on the input image. Thus, they represent the information of the input image in this same receptive field.
-Therefore, we can transform the $c_i$ units of the feature map at the same spatial position into the categories and offsets of the $a$ anchor boxes generated using that position as a midpoint.
-It is not hard to see that, in essence, we use the information of the input image in a certain receptive field to predict the category and offset of the anchor boxes close to the field on the input image.
+We assume that the $c_i$ feature maps are the intermediate output of the CNN
+based on the input image. Since each feature map has $h \times w$ different
+spatial positions, the same position will have $c_i$ units.  According to the
+definition of receptive field in the
+:numref:`chapter_conv_layer`, the $c_i$ units of the feature map at the same spatial position have
+the same receptive field on the input image. Thus, they represent the
+information of the input image in this same receptive field.  Therefore, we can
+transform the $c_i$ units of the feature map at the same spatial position into
+the categories and offsets of the $a$ anchor boxes generated using that position
+as a midpoint.  It is not hard to see that, in essence, we use the information
+of the input image in a certain receptive field to predict the category and
+offset of the anchor boxes close to the field on the input image.
 
 When the feature maps of different layers have receptive fields of different sizes on the input image, they are used to detect objects of different sizes. For example, we can design a network to have a wider receptive field for each unit in the feature map that is closer to the output layer, to detect objects with larger sizes in the input image.
 
