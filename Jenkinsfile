@@ -15,13 +15,23 @@ stage("Build and Publish") {
       conda activate d2l-en-build
       d2lbook build eval
       '''
-      echo "Build HTML/PDF/Pakage"
+      echo "Build HTML"
       sh '''set -ex
       conda activate d2l-en-build
-      d2lbook build html pdf
+      d2lbook build rst
       # copy frontpage
-      cp frontpage/frontpage.html _build/html/
+      cp frontpage/frontpage.html _build/rst/
+      d2lbook build html
       cp -r frontpage/img/ _build/html/_images/
+      '''
+      echo "Build PDF"
+      sh '''set -ex
+      conda activate d2l-en-build
+      d2lbook build pdf
+      '''
+      echo "Build Package"
+      sh '''set -ex
+      conda activate d2l-en-build
       # don't pack downloaded data into the pkg
       mv _build/eval/data _build/data_tmp
       cp -r data _build/eval
