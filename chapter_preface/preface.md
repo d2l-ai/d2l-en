@@ -194,7 +194,7 @@ such as linear regression, multi-layer perceptrons and regularization.
 <!--If you are short on time or you only want to learn only
 about the most basic concepts and techniques of deep learning,
 it is sufficient to read the first section only.-->
-* The next four chapters focus on modern deep learning techniques.
+* The next five chapters focus on modern deep learning techniques.
 :numref:`chapter_computation`
 describes the various key components of deep learning calculations
 and lays the groundwork for the later implementation of more complex models.
@@ -203,7 +203,8 @@ powerful tools that form the backbone of most modern computer vision systems in 
 Subsequently, we introduce :numref:`chapter_rnn`
 models that exploit temporal or sequential structure in data,
 and are commonly used for natural language processing and time series
-prediction. :numref:`chapter_attention` introduces recent models exploring the attention mechanism.
+prediction. :numref:`chapter_attention` introduces the attention mechanism,
+which becomes a key component in the recent state-of-the-art deep learning models.
 These sections will get you up to speed on the basic tools behind most modern deep learning.
 
 * Part three discusses scalability, efficiency and applications.
