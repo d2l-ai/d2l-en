@@ -194,11 +194,10 @@ such as linear regression, multi-layer perceptrons and regularization.
 <!--If you are short on time or you only want to learn only
 about the most basic concepts and techniques of deep learning,
 it is sufficient to read the first section only.-->
-* The next five chapters focus on modern deep learning techniques.
-:numref:`chapter_computation`
-describes the various key components of deep learning calculations
+* The next five chapters focus on modern deep learning techniques. :numref:`chapter_computation` describes
+the various key components of deep learning calculations
 and lays the groundwork for the later implementation of more complex models.
-Next we explain in :numref:`chapter_cnn` and :numref:`chapter_mordern_cnn`,
+Next we explain in :numref:`chapter_cnn` and :numref:`chapter_cnn_modern`,
 powerful tools that form the backbone of most modern computer vision systems in recent years.
 Subsequently, we introduce :numref:`chapter_rnn`
 models that exploit temporal or sequential structure in data,

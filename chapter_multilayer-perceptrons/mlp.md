@@ -1,5 +1,4 @@
 # Multilayer Perceptron
-:label:`chapter_mlp`
 
 In the previous chapters, we showed how you could implement multiclass logistic regression (also called softmax regression)
 for classifying images of clothing into the 10 possible categories.
