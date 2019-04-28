@@ -122,7 +122,8 @@ for i, num_convs in enumerate(num_convs_in_dense_blocks):
     # A transition layer that haves the number of channels is added between
     # the dense blocks
     if i != len(num_convs_in_dense_blocks) - 1:
-        net.add(transition_block(num_channels // 2))
+        num_channels //= 2
+        net.add(transition_block(num_channels))
 ```
 
 Similar to ResNet, a global pooling layer and fully connected layer are connected at the end to produce the output.
