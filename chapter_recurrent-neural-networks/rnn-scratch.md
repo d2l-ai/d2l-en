@@ -196,7 +196,7 @@ It can be best understood as the harmonic mean of the number of real choices
 that we have when deciding which word to pick next. Note that Perplexity
 naturally generalizes the notion of the cross entropy loss defined when we
 introduced
-the softmax regression (:numref:`chapter_softmax_regression`). That
+the softmax regression (:numref:`chapter_softmax`). That
 is, for a single symbol both definitions are identical bar the fact that one is
 the exponential of the other. Let's look at a number of cases:
 

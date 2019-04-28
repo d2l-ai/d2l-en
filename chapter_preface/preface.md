@@ -183,40 +183,39 @@ we can just use the ``Gluon`` version in subsequent tutorials.
 
 The book can be roughly divided into three sections:
 
-* The first part covers prerequisites and basics.
-The first chapter offers an introduction to deep learning in :numref:`chapter_introduction`.
-In :numref:`chapter_crashcourse`,
-we'll quickly bring you up to speed on the prerequisites required for hands-on deep learning,
-such as how to acquire and run the codes covered in the book.
-:numref:`chapter_linear` and :numref:`chapter_mlp`
-cover the most basic concepts and techniques of deep learning,
-such as linear regression, multi-layer perceptrons and regularization.
+* The first part covers prerequisites and basics.  The first chapter offers an
+introduction to deep learning in :numref:`chapter_introduction`.  In
+:numref:`chapter_crashcourse`, we'll quickly bring you up to speed on the
+prerequisites required for hands-on deep learning, such as how to acquire and
+run the codes covered in the book.  :numref:`chapter_linear` and
+:numref:`chapter_mlp` cover the most basic concepts and techniques of deep
+learning, such as linear regression, multi-layer perceptrons and regularization.
 <!--If you are short on time or you only want to learn only
 about the most basic concepts and techniques of deep learning,
 it is sufficient to read the first section only.-->
+
 * The next four chapters focus on modern deep learning techniques.
-:numref:`chapter_computation`
-describes the various key components of deep learning calculations
-and lays the groundwork for the later implementation of more complex models.
-Next we explain in :numref:`chapter_cnn` and :numref:`chapter_mordern_cnn`,
-powerful tools that form the backbone of most modern computer vision systems in recent years.
-Subsequently, we introduce :numref:`chapter_rnn`
-models that exploit temporal or sequential structure in data,
-and are commonly used for natural language processing and time series
-prediction. :numref:`chapter_attention` introduces recent models exploring the attention mechanism.
-These sections will get you up to speed on the basic tools behind most modern deep learning.
+:numref:`chapter_computation` describes the various key components of deep
+learning calculations and lays the groundwork for the later implementation of
+more complex models.  Next we explain in :numref:`chapter_cnn` and
+:numref:`chapter_modern_cnn`, powerful tools that form the backbone of most
+modern computer vision systems in recent years.  Subsequently, we introduce
+:numref:`chapter_rnn` models that exploit temporal or sequential structure in
+data, and are commonly used for natural language processing and time series
+prediction. :numref:`chapter_attention` introduces recent models exploring the
+attention mechanism.  These sections will get you up to speed on the basic tools
+behind most modern deep learning.
 
-* Part three discusses scalability, efficiency and applications.
-First we discuss several common :numref:`chapter_optimization`
-used to train deep learning models.
-The next chapter, :numref:`chapter_performance`
-examines several important factors that affect the computational performance of your deep learning code.
-:numref:`chapter_cv` and :numref:`chapter_nlp`
-illustrate major applications of deep learning
-in computer vision and natural language processing, respectively.
+* Part three discusses scalability, efficiency and applications.  First we
+discuss several common :numref:`chapter_optimization` used to train deep
+learning models.  The next chapter, :numref:`chapter_performance` examines
+several important factors that affect the computational performance of your deep
+learning code.  :numref:`chapter_cv` and :numref:`chapter_nlp` illustrate major
+applications of deep learning in computer vision and natural language
+processing, respectively.
 
-An outline of the book together with possible flows for navigating it is given below.
-The arrows provide a graph of prerequisites:
+An outline of the book together with possible flows for navigating it is given
+below.  The arrows provide a graph of prerequisites:
 
 ![Book structure](../img/book-org.svg)
 
