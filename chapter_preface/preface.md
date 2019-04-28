@@ -86,7 +86,7 @@ While sporadic topics have been covered in blog posts,
 e.g. on the website [Distill](http://distill.pub) or personal blogs,
 they only covered selected topics in deep learning, and often lacked associated code.
 On the other hand, while several textbooks have emerged,
-most notably [Goodfellow, Bengio and Courville, 2016](https://www.deeplearningbook.org/),
+most notably :cite:`Goodfellow-et-al-2016`,
 which offers an excellent survey of the concepts behind deep learning,
 these resources don't marry the descriptions to realizations of the concepts in code,
 sometimes leaving readers clueless as to how to implement them.
@@ -110,7 +110,7 @@ accessible both as executable code, as a physical book,
 as a downloadable PDF, and on the internet as a website.
 At present there exist no tools and no workflow
 perfectly suited to these demands, so we had to assemble our own.
-We describe our approach in detail in the [appendix](../chapter_appendix/how-to-contribute.md).
+We describe our approach in detail in :numref:`chapter_contribute`.
 We settled on Github to share the source and to allow for edits,
 Jupyter notebooks for mixing code, equations and text,
 Sphinx as a rendering engine to generate multiple outputs,
@@ -183,41 +183,39 @@ we can just use the ``Gluon`` version in subsequent tutorials.
 
 The book can be roughly divided into three sections:
 
-* The first part covers prerequisites and basics.
-The first chapter offers an [Introduction to Deep Learning](../chapter_introduction/index.md).
-In [Crashcourse](../chapter_crashcourse/index.md),
-we'll quickly bring you up to speed on the prerequisites required for hands-on deep learning,
-such as how to acquire and run the codes covered in the book.
-[Linear Neural Networks](../chapter_linear-networks/index.md) and [Multilayer Perceptrons](../chapter_multilayer-perceptrons/index.md)
-cover the most basic concepts and techniques of deep learning,
-such as multi-layer perceptrons and regularization.
+* The first part covers prerequisites and basics.  The first chapter offers an
+introduction to deep learning in :numref:`chapter_introduction`.  In
+:numref:`chapter_crashcourse`, we'll quickly bring you up to speed on the
+prerequisites required for hands-on deep learning, such as how to acquire and
+run the codes covered in the book.  :numref:`chapter_linear` and
+:numref:`chapter_perceptrons` cover the most basic concepts and techniques of deep
+learning, such as linear regression, multi-layer perceptrons and regularization.
 <!--If you are short on time or you only want to learn only
 about the most basic concepts and techniques of deep learning,
 it is sufficient to read the first section only.-->
-* The next five chapters focus on modern deep learning techniques.
-[Deep Learning Computation](../chapter_deep-learning-computation/index.md)
-describes the various key components of deep learning calculations
-and lays the groundwork for the later implementation of more complex models.
-Next we explain [Convolutional Neural Networks](../chapter_convolutional-neural-networks/index.md)
-and [Modern Convolutional Networks](../chapter_convolutional-modern/index.md),
-powerful tools that form the backbone of most modern computer vision systems in recent years.
-Subsequently, we introduce [Recurrent Neural Networks](../chapter_recurrent-neural-networks/index.md),
-models that exploit temporal or sequential structure in data,
-and are commonly used for natural language processing and time series prediction.
-Then we introduce the [Attention Mechanism](../chapter_attention-mechanism/index.md),
-which becomes a key component in the recent state-of-the-art deep learning models.
-These sections will get you up to speed on the basic tools behind most modern deep learning.
 
-* Part three discusses scalability, efficiency and applications.
-First we discuss several common [Optimization Algorithms](../chapter_optimization/index.md)
-used to train deep learning models.
-The next chapter, [Performance](../chapter_computational-performance/index.md),
-examines several important factors that affect the computational performance of your deep learning code.
-Chapters 9 and 10  illustrate major applications of deep learning
-in computer vision and natural language processing, respectively.
+* The next four chapters focus on modern deep learning techniques.
+:numref:`chapter_computation` describes the various key components of deep
+learning calculations and lays the groundwork for the later implementation of
+more complex models.  Next we explain in :numref:`chapter_cnn` and
+:numref:`chapter_modern_cnn`, powerful tools that form the backbone of most
+modern computer vision systems in recent years.  Subsequently, we introduce
+:numref:`chapter_rnn` models that exploit temporal or sequential structure in
+data, and are commonly used for natural language processing and time series
+prediction. :numref:`chapter_attention` introduces recent models exploring the
+attention mechanism.  These sections will get you up to speed on the basic tools
+behind most modern deep learning.
 
-An outline of the book together with possible flows for navigating it is given below.
-The arrows provide a graph of prerequisites:
+* Part three discusses scalability, efficiency and applications.  First we
+discuss several common :numref:`chapter_optimization` used to train deep
+learning models.  The next chapter, :numref:`chapter_performance` examines
+several important factors that affect the computational performance of your deep
+learning code.  :numref:`chapter_cv` and :numref:`chapter_nlp` illustrate major
+applications of deep learning in computer vision and natural language
+processing, respectively.
+
+An outline of the book together with possible flows for navigating it is given
+below.  The arrows provide a graph of prerequisites:
 
 ![Book structure](../img/book-org.svg)
 
@@ -245,13 +243,12 @@ All of the code in this book has passed tests under MXNet 1.2.0.
 However, due to the rapid development of deep learning,
 some code *in the print edition* may not work properly in future versions of MXNet.
 However, we plan to keep the online version remain up-to-date.
-In case of such problems, please consult the section
-["Installation and Running"](../chapter_prerequisite/install.md)
+In case of such problems, please consult :ref:`chapter_installation`
 to update the code and runtime environment.
 At times, to avoid unnecessary repetition,
 we encapsulate the frequently-imported and referred-to functions, classes, etc.
-in this book in the `gluonbook` package, version number 1.0.0.
-We give a detailed overview of these functions and classes in the appendix [“gluonbook package index”](../chapter_appendix/gluonbook.md)
+in this book in the `d2l` package.
+We give a detailed overview of these functions and classes in :numref:`chapter_d2l`.
 
 
 ### Target Audience

@@ -1,14 +1,21 @@
 # Image Classification (CIFAR-10) on Kaggle
+:label:`chapter_kaggle_cifar10`
 
 So far, we have been using Gluon's `data` package to directly obtain image data sets in NDArray format. In practice, however, image data sets often exist in the format of image files. In this section, we will start with the original image files and organize, read, and convert the files to NDArray format step by step.
 
-We performed an experiment on the CIFAR-10 data set in the ["Image Augmentation"](image-augmentation.md) section. This is an important data set in the computer vision field. Now, we will apply the knowledge we learned in the previous sections in order to participate in the Kaggle competition, which addresses CIFAR-10 image classification problems. The competition’s web address is
+We performed an experiment on the CIFAR-10 data set in :numref:`chapter_image_augmentation`.
+This is an important data
+set in the computer vision field. Now, we will apply the knowledge we learned in
+the previous sections in order to participate in the Kaggle competition, which
+addresses CIFAR-10 image classification problems. The competition’s web address
+is
 
 > https://www.kaggle.com/c/cifar-10
 
 Figure 9.16 shows the information on the competition's webpage. In order to submit the results, please register an account on the Kaggle website first.
 
-![CIFAR-10 image classification competition webpage information. The data set for the competition can be accessed by clicking the "Data" tab. (Source: www.](../img/kaggle_cifar10.png)
+![CIFAR-10 image classification competition webpage information. The data set for the competition can be accessed by clicking the "Data" tab.](../img/kaggle_cifar10.png)
+:width:`600px`
 
 First, import the packages or modules required for the competition.
 
@@ -205,7 +212,9 @@ test_iter = gdata.DataLoader(test_ds.transform_first(transform_test),
 
 ## Define the Model
 
-Here, we build the residual blocks based on the HybridBlock class, which is slightly different than the implementation described in the [“Residual networks (ResNet)”](../chapter_convolutional-neural-networks/resnet.md) section. This is done to improve execution efficiency.
+Here, we build the residual blocks based on the HybridBlock class, which is
+slightly different than the implementation described in
+:numref:`chapter_resnet`. This is done to improve execution efficiency.
 
 ```{.python .input  n=11}
 class Residual(nn.HybridBlock):
@@ -334,7 +343,9 @@ df['label'] = df['label'].apply(lambda x: train_valid_ds.synsets[x])
 df.to_csv('submission.csv', index=False)
 ```
 
-After executing the above code, we will get a "submission.csv" file. The format of this file is consistent with the Kaggle competition requirements. The method for submitting results is similar to method in the [“Get Started with Kaggle Competition: Predicting House Prices”](../chapter_deep-learning-basics/kaggle-house-price.md) section.
+After executing the above code, we will get a "submission.csv" file. The format
+of this file is consistent with the Kaggle competition requirements. The method
+for submitting results is similar to method in :numref:`chapter_kaggle_house`.
 
 ## Summary
 

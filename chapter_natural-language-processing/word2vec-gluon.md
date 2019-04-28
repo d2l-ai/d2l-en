@@ -1,7 +1,16 @@
 # Implementation of Word2vec
+:label:`chapter_word2vec_gluon`
 
 
-This section is a practice exercise for the two previous sections. We use the skip-gram model from the ["Word Embedding (word2vec)”](word2vec.md) section and negative sampling from the ["Approximate Training" ](approx-training.md) section as examples to introduce the implementation of word embedding model training on a corpus. We will also introduce some implementation tricks, such as subsampling and mask variables.
+This section is a practice exercise for the two previous sections. We use the
+skip-gram model from
+:numref:`chapter_word2vec`
+and
+negative sampling from
+:numref:`chapter_approx_train`
+as examples to introduce the implementation of word embedding model training on
+a corpus. We will also introduce some implementation tricks, such as subsampling
+and mask variables.
 
 First, import the packages and modules required for the experiment.
 
@@ -28,7 +37,7 @@ Penn Tree Bank (PTB) is a small commonly-used corpus[1]. It takes samples from W
 ```{.python .input  n=2}
 with zipfile.ZipFile('../data/ptb.zip', 'r') as f:
     raw_text = f.read('ptb/ptb.train.txt').decode("utf-8").lower()
-sentences = [line.split() for line in raw_text.split('\n')]    
+sentences = [line.split() for line in raw_text.split('\n')]
 '# sentences: %d' % len(sentences)
 ```
 
@@ -55,7 +64,7 @@ Here, $f(w_i)$ is the ratio of the instances of word $w_i$ to the total number o
 
 ```{.python .input  n=16}
 # Map low frequency words into <unk>
-sentences = [[vocab.idx_to_token[vocab[tk]] for tk in line] 
+sentences = [[vocab.idx_to_token[vocab[tk]] for tk in line]
              for line in sentences]
 # Count the frequency for each word
 tokens = expand(sentences)
@@ -107,7 +116,7 @@ corpus[0:3]
 
 ## Read the Data Set
 
-Next we read the corpus with token indicies into data batches for training. 
+Next we read the corpus with token indicies into data batches for training.
 
 ### Extract Central Target Words and Context Words
 
@@ -152,7 +161,7 @@ all_centers, all_contexts = get_centers_and_contexts(corpus, 5)
 
 We use negative sampling for approximate training. For a central and context word pair, we randomly sample $K$ noise words ($K=5$ in the experiment). According to the suggestion in the Word2vec paper, the noise word sampling probability $\mathbb{P}(w)$ is the ratio of the word frequency of $w$ to the total word frequency raised to the power of 0.75 [2].
 
-We first define a class to draw a candidate according to the sampling weights. It caches a 10000 size random number bank instead of calling `random.choices` every time. 
+We first define a class to draw a candidate according to the sampling weights. It caches a 10000 size random number bank instead of calling `random.choices` every time.
 
 ```{.python .input}
 class RandomGenerator(object):
@@ -162,7 +171,7 @@ class RandomGenerator(object):
         self.sampling_weights = sampling_weights
         self.candidates = []
         self.i = 0
-        
+
     def draw(self):
         if self.i == len(self.candidates):
             self.candidates = random.choices(
@@ -170,7 +179,7 @@ class RandomGenerator(object):
             self.i = 0
         self.i += 1
         return self.candidates[self.i-1]
-    
+
 generator = RandomGenerator([2,3,4])
 [generator.draw() for _ in range(10)]
 ```
@@ -314,7 +323,7 @@ mask = nd.array([[1, 1, 1, 1], [1, 1, 0, 0]])
 loss(pred, label, mask)
 ```
 
-We can normalize the loss in each example due to various lengths in each example. 
+We can normalize the loss in each example due to various lengths in each example.
 
 ```{.python .input}
 loss(pred, label, mask) / mask.sum(axis=1) * mask.shape[1]

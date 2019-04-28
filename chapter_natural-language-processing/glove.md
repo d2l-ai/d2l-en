@@ -1,4 +1,5 @@
 # Word Embedding with Global Vectors (GloVe)
+:label:`chapter_glove`
 
 First, we should review the skip-gram model in word2vec.  The conditional probability $\mathbb{P}(w_j\mid w_i)$ expressed in the skip-gram model using the softmax operation will be recorded as $q_{ij}$, that is:
 
@@ -16,7 +17,16 @@ $$-\sum_{i\in\mathcal{V}} x_i \sum_{j\in\mathcal{V}} p_{ij} \log\,q_{ij}.$$
 
 In the formula above, $\sum_{j\in\mathcal{V}} p_{ij} \log\,q_{ij}$ computes the conditional probability distribution $p_{ij}$ for context word generation based on the central target word $w_i$ and the cross-entropy of conditional probability distribution $q_{ij}$ predicted by the model.  The loss function is weighted using the sum of the number of context words with the central target word $w_i$.  If we minimize the loss function from the formula above, we will be able to allow the predicted conditional probability distribution to approach as close as possible to the true conditional probability distribution.
 
-However, although the most common type of loss function, the cross-entropy loss function is sometimes not a good choice. On the one hand, as we mentioned in the ["Approximate Training"](approx-training.md) section, the cost of letting the model prediction $q_{ij}$ become the legal probability distribution has the sum of all items in the entire dictionary in its denominator. This can easily lead to excessive computational overhead. On the other hand, there are often a lot of uncommon words in the dictionary, and they appear rarely in the data set. In the cross-entropy loss function, the final prediction of the conditional probability distribution on a large number of uncommon words is likely to be inaccurate.
+However, although the most common type of loss function, the cross-entropy loss
+function is sometimes not a good choice. On the one hand, as we mentioned in
+:numref:`chapter_approx_train`
+the cost of letting the
+model prediction $q_{ij}$ become the legal probability distribution has the sum
+of all items in the entire dictionary in its denominator. This can easily lead
+to excessive computational overhead. On the other hand, there are often a lot of
+uncommon words in the dictionary, and they appear rarely in the data set. In the
+cross-entropy loss function, the final prediction of the conditional probability
+distribution on a large number of uncommon words is likely to be inaccurate.
 
 
 

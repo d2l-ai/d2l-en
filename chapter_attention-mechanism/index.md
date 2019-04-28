@@ -1,12 +1,10 @@
 # Attention Mechanism
+:label:`chapter_attention`
 
-```eval_rst
+```toc
+:maxdepth: 2
 
-.. toctree::
-   :maxdepth: 2
-
-   attention
-   seq2seq-attention
-   transformer
-
+attention
+seq2seq-attention
+transformer
 ```

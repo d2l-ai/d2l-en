@@ -1,0 +1,1356 @@
+~/d2l-en $ d2lbook build html
+/home/ubuntu/d2l-book/d2lbook/config_default.ini
+[d2lbook:build.py:L349] INFO   Copy resources "img/ data/ d2l/ d2l.bib frontpage.html" from . to _build/eval
+[d2lbook:build.py:L332] INFO   4 notedowns and 0 markdowns are out dated
+[d2lbook:build.py:L334] INFO   Evaluating ./chapter_convolutional-modern/index.md, save as _build/eval/chapter_convolutional-modern/index.ipynb
+[d2lbook:execute.py:L353] INFO   Executing notebook with kernel: python
+[d2lbook:build.py:L339] INFO   Finished in 3.2 sec
+[d2lbook:build.py:L334] INFO   Evaluating ./chapter_multilayer-perceptrons/numerical-stability-and-init.md, save as _build/eval/chapter_multilayer-perceptrons/numerical-stability-and-init.ipynb
+[d2lbook:execute.py:L353] INFO   Executing notebook with kernel: python
+[d2lbook:build.py:L339] INFO   Finished in 3.3 sec
+[d2lbook:build.py:L334] INFO   Evaluating ./chapter_recurrent-neural-networks/rnn-scratch.md, save as _build/eval/chapter_recurrent-neural-networks/rnn-scratch.ipynb
+[d2lbook:execute.py:L353] INFO   Executing notebook with kernel: python
+[d2lbook:build.py:L339] INFO   Finished in 209.7 sec
+[d2lbook:build.py:L334] INFO   Evaluating ./chapter_deep-learning-computation/custom-layer.md, save as _build/eval/chapter_deep-learning-computation/custom-layer.ipynb
+[d2lbook:execute.py:L353] INFO   Executing notebook with kernel: python
+[d2lbook:build.py:L339] INFO   Finished in 3.3 sec
+[d2lbook:build.py:L372] INFO   4 rst files are outdated
+[d2lbook:build.py:L374] INFO   Convert _build/eval/chapter_convolutional-modern/index.ipynb to _build/rst/chapter_convolutional-modern/index.rst
+/home/ubuntu/miniconda3/lib/python3.7/site-packages/nbconvert/utils/pandoc.py:52: RuntimeWarning: You are using an unsupported version of pandoc (2.2.3.2).
+Your version must be at least (1.12.1) but less than (2.0.0).
+Refer to http://pandoc.org/installing.html.
+Continuing with doubts...
+  check_pandoc_version()
+/home/ubuntu/miniconda3/lib/python3.7/site-packages/nbconvert/utils/pandoc.py:52: RuntimeWarning: You are using an unsupported version of pandoc (2.2.3.2).
+Your version must be at least (1.12.1) but less than (2.0.0).
+Refer to http://pandoc.org/installing.html.
+Continuing with doubts...
+  check_pandoc_version()
+[d2lbook:build.py:L374] INFO   Convert _build/eval/chapter_multilayer-perceptrons/numerical-stability-and-init.ipynb to _build/rst/chapter_multilayer-perceptrons/numerical-stability-and-init.rst
+/home/ubuntu/miniconda3/lib/python3.7/site-packages/nbconvert/utils/pandoc.py:52: RuntimeWarning: You are using an unsupported version of pandoc (2.2.3.2).
+Your version must be at least (1.12.1) but less than (2.0.0).
+Refer to http://pandoc.org/installing.html.
+Continuing with doubts...
+  check_pandoc_version()
+/home/ubuntu/miniconda3/lib/python3.7/site-packages/nbconvert/utils/pandoc.py:52: RuntimeWarning: You are using an unsupported version of pandoc (2.2.3.2).
+Your version must be at least (1.12.1) but less than (2.0.0).
+Refer to http://pandoc.org/installing.html.
+Continuing with doubts...
+  check_pandoc_version()
+/home/ubuntu/miniconda3/lib/python3.7/site-packages/nbconvert/utils/pandoc.py:52: RuntimeWarning: You are using an unsupported version of pandoc (2.2.3.2).
+Your version must be at least (1.12.1) but less than (2.0.0).
+Refer to http://pandoc.org/installing.html.
+Continuing with doubts...
+  check_pandoc_version()
+.. parsed-literal::
+   :class: output
+[d2lbook:build.py:L374] INFO   Convert _build/eval/chapter_recurrent-neural-networks/rnn-scratch.ipynb to _build/rst/chapter_recurrent-neural-networks/rnn-scratch.rst
+/home/ubuntu/miniconda3/lib/python3.7/site-packages/nbconvert/utils/pandoc.py:52: RuntimeWarning: You are using an unsupported version of pandoc (2.2.3.2).
+Your version must be at least (1.12.1) but less than (2.0.0).
+Refer to http://pandoc.org/installing.html.
+Continuing with doubts...
+  check_pandoc_version()
+/home/ubuntu/miniconda3/lib/python3.7/site-packages/nbconvert/utils/pandoc.py:52: RuntimeWarning: You are using an unsupported version of pandoc (2.2.3.2).
+Your version must be at least (1.12.1) but less than (2.0.0).
+Refer to http://pandoc.org/installing.html.
+Continuing with doubts...
+  check_pandoc_version()
+/home/ubuntu/miniconda3/lib/python3.7/site-packages/nbconvert/utils/pandoc.py:52: RuntimeWarning: You are using an unsupported version of pandoc (2.2.3.2).
+Your version must be at least (1.12.1) but less than (2.0.0).
+Refer to http://pandoc.org/installing.html.
+Continuing with doubts...
+  check_pandoc_version()
+/home/ubuntu/miniconda3/lib/python3.7/site-packages/nbconvert/utils/pandoc.py:52: RuntimeWarning: You are using an unsupported version of pandoc (2.2.3.2).
+Your version must be at least (1.12.1) but less than (2.0.0).
+Refer to http://pandoc.org/installing.html.
+Continuing with doubts...
+  check_pandoc_version()
+/home/ubuntu/miniconda3/lib/python3.7/site-packages/nbconvert/utils/pandoc.py:52: RuntimeWarning: You are using an unsupported version of pandoc (2.2.3.2).
+Your version must be at least (1.12.1) but less than (2.0.0).
+Refer to http://pandoc.org/installing.html.
+Continuing with doubts...
+  check_pandoc_version()
+/home/ubuntu/miniconda3/lib/python3.7/site-packages/nbconvert/utils/pandoc.py:52: RuntimeWarning: You are using an unsupported version of pandoc (2.2.3.2).
+Your version must be at least (1.12.1) but less than (2.0.0).
+Refer to http://pandoc.org/installing.html.
+Continuing with doubts...
+  check_pandoc_version()
+/home/ubuntu/miniconda3/lib/python3.7/site-packages/nbconvert/utils/pandoc.py:52: RuntimeWarning: You are using an unsupported version of pandoc (2.2.3.2).
+Your version must be at least (1.12.1) but less than (2.0.0).
+Refer to http://pandoc.org/installing.html.
+Continuing with doubts...
+  check_pandoc_version()
+/home/ubuntu/miniconda3/lib/python3.7/site-packages/nbconvert/utils/pandoc.py:52: RuntimeWarning: You are using an unsupported version of pandoc (2.2.3.2).
+Your version must be at least (1.12.1) but less than (2.0.0).
+Refer to http://pandoc.org/installing.html.
+Continuing with doubts...
+  check_pandoc_version()
+/home/ubuntu/miniconda3/lib/python3.7/site-packages/nbconvert/utils/pandoc.py:52: RuntimeWarning: You are using an unsupported version of pandoc (2.2.3.2).
+Your version must be at least (1.12.1) but less than (2.0.0).
+Refer to http://pandoc.org/installing.html.
+Continuing with doubts...
+  check_pandoc_version()
+/home/ubuntu/miniconda3/lib/python3.7/site-packages/nbconvert/utils/pandoc.py:52: RuntimeWarning: You are using an unsupported version of pandoc (2.2.3.2).
+Your version must be at least (1.12.1) but less than (2.0.0).
+Refer to http://pandoc.org/installing.html.
+Continuing with doubts...
+  check_pandoc_version()
+/home/ubuntu/miniconda3/lib/python3.7/site-packages/nbconvert/utils/pandoc.py:52: RuntimeWarning: You are using an unsupported version of pandoc (2.2.3.2).
+Your version must be at least (1.12.1) but less than (2.0.0).
+Refer to http://pandoc.org/installing.html.
+Continuing with doubts...
+  check_pandoc_version()
+/home/ubuntu/miniconda3/lib/python3.7/site-packages/nbconvert/utils/pandoc.py:52: RuntimeWarning: You are using an unsupported version of pandoc (2.2.3.2).
+Your version must be at least (1.12.1) but less than (2.0.0).
+Refer to http://pandoc.org/installing.html.
+Continuing with doubts...
+  check_pandoc_version()
+/home/ubuntu/miniconda3/lib/python3.7/site-packages/nbconvert/utils/pandoc.py:52: RuntimeWarning: You are using an unsupported version of pandoc (2.2.3.2).
+Your version must be at least (1.12.1) but less than (2.0.0).
+Refer to http://pandoc.org/installing.html.
+Continuing with doubts...
+  check_pandoc_version()
+/home/ubuntu/miniconda3/lib/python3.7/site-packages/nbconvert/utils/pandoc.py:52: RuntimeWarning: You are using an unsupported version of pandoc (2.2.3.2).
+Your version must be at least (1.12.1) but less than (2.0.0).
+Refer to http://pandoc.org/installing.html.
+Continuing with doubts...
+  check_pandoc_version()
+/home/ubuntu/miniconda3/lib/python3.7/site-packages/nbconvert/utils/pandoc.py:52: RuntimeWarning: You are using an unsupported version of pandoc (2.2.3.2).
+Your version must be at least (1.12.1) but less than (2.0.0).
+Refer to http://pandoc.org/installing.html.
+Continuing with doubts...
+  check_pandoc_version()
+.. parsed-literal::
+   :class: output
+.. parsed-literal::
+   :class: output
+.. parsed-literal::
+   :class: output
+.. parsed-literal::
+   :class: output
+.. parsed-literal::
+   :class: output
+.. parsed-literal::
+   :class: output
+.. parsed-literal::
+   :class: output
+[d2lbook:build.py:L374] INFO   Convert _build/eval/chapter_deep-learning-computation/custom-layer.ipynb to _build/rst/chapter_deep-learning-computation/custom-layer.rst
+/home/ubuntu/miniconda3/lib/python3.7/site-packages/nbconvert/utils/pandoc.py:52: RuntimeWarning: You are using an unsupported version of pandoc (2.2.3.2).
+Your version must be at least (1.12.1) but less than (2.0.0).
+Refer to http://pandoc.org/installing.html.
+Continuing with doubts...
+  check_pandoc_version()
+/home/ubuntu/miniconda3/lib/python3.7/site-packages/nbconvert/utils/pandoc.py:52: RuntimeWarning: You are using an unsupported version of pandoc (2.2.3.2).
+Your version must be at least (1.12.1) but less than (2.0.0).
+Refer to http://pandoc.org/installing.html.
+Continuing with doubts...
+  check_pandoc_version()
+/home/ubuntu/miniconda3/lib/python3.7/site-packages/nbconvert/utils/pandoc.py:52: RuntimeWarning: You are using an unsupported version of pandoc (2.2.3.2).
+Your version must be at least (1.12.1) but less than (2.0.0).
+Refer to http://pandoc.org/installing.html.
+Continuing with doubts...
+  check_pandoc_version()
+/home/ubuntu/miniconda3/lib/python3.7/site-packages/nbconvert/utils/pandoc.py:52: RuntimeWarning: You are using an unsupported version of pandoc (2.2.3.2).
+Your version must be at least (1.12.1) but less than (2.0.0).
+Refer to http://pandoc.org/installing.html.
+Continuing with doubts...
+  check_pandoc_version()
+/home/ubuntu/miniconda3/lib/python3.7/site-packages/nbconvert/utils/pandoc.py:52: RuntimeWarning: You are using an unsupported version of pandoc (2.2.3.2).
+Your version must be at least (1.12.1) but less than (2.0.0).
+Refer to http://pandoc.org/installing.html.
+Continuing with doubts...
+  check_pandoc_version()
+/home/ubuntu/miniconda3/lib/python3.7/site-packages/nbconvert/utils/pandoc.py:52: RuntimeWarning: You are using an unsupported version of pandoc (2.2.3.2).
+Your version must be at least (1.12.1) but less than (2.0.0).
+Refer to http://pandoc.org/installing.html.
+Continuing with doubts...
+  check_pandoc_version()
+/home/ubuntu/miniconda3/lib/python3.7/site-packages/nbconvert/utils/pandoc.py:52: RuntimeWarning: You are using an unsupported version of pandoc (2.2.3.2).
+Your version must be at least (1.12.1) but less than (2.0.0).
+Refer to http://pandoc.org/installing.html.
+Continuing with doubts...
+  check_pandoc_version()
+/home/ubuntu/miniconda3/lib/python3.7/site-packages/nbconvert/utils/pandoc.py:52: RuntimeWarning: You are using an unsupported version of pandoc (2.2.3.2).
+Your version must be at least (1.12.1) but less than (2.0.0).
+Refer to http://pandoc.org/installing.html.
+Continuing with doubts...
+  check_pandoc_version()
+/home/ubuntu/miniconda3/lib/python3.7/site-packages/nbconvert/utils/pandoc.py:52: RuntimeWarning: You are using an unsupported version of pandoc (2.2.3.2).
+Your version must be at least (1.12.1) but less than (2.0.0).
+Refer to http://pandoc.org/installing.html.
+Continuing with doubts...
+  check_pandoc_version()
+/home/ubuntu/miniconda3/lib/python3.7/site-packages/nbconvert/utils/pandoc.py:52: RuntimeWarning: You are using an unsupported version of pandoc (2.2.3.2).
+Your version must be at least (1.12.1) but less than (2.0.0).
+Refer to http://pandoc.org/installing.html.
+Continuing with doubts...
+  check_pandoc_version()
+.. parsed-literal::
+   :class: output
+.. parsed-literal::
+   :class: output
+.. parsed-literal::
+   :class: output
+.. parsed-literal::
+   :class: output
+.. parsed-literal::
+   :class: output
+.. parsed-literal::
+   :class: output
+[d2lbook:build.py:L349] INFO   Copy resources "img/ data/ d2l/ d2l.bib frontpage.html" from . to _build/rst
+Running Sphinx v2.0.1
+making output directory... done
+building [mo]: targets for 0 po files that are out of date
+building [html]: targets for 119 source files that are out of date
+updating environment: 119 added, 0 changed, 0 removed
+reading sources... [  0%] chapter_appendix/aws
+reading sources... [  1%] chapter_appendix/buy-gpu
+reading sources... [  2%] chapter_appendix/d2l
+reading sources... [  3%] chapter_appendix/how-to-contribute
+reading sources... [  4%] chapter_appendix/index
+reading sources... [  5%] chapter_appendix/jupyter
+reading sources... [  5%] chapter_appendix/math
+reading sources... [  6%] chapter_appendix/notation
+reading sources... [  7%] chapter_appendix/zreferences
+checking for /home/ubuntu/d2l-en/_build/rst/d2l.bib in bibtex cache... not found
+parsing bibtex file /home/ubuntu/d2l-en/_build/rst/d2l.bib... parsed 1 entries
+reading sources... [  8%] chapter_attention-mechanism/attention
+reading sources... [  9%] chapter_attention-mechanism/index
+reading sources... [ 10%] chapter_attention-mechanism/seq2seq-attention
+reading sources... [ 10%] chapter_attention-mechanism/transformer
+reading sources... [ 11%] chapter_computational-performance/async-computation
+reading sources... [ 12%] chapter_computational-performance/auto-parallelism
+reading sources... [ 13%] chapter_computational-performance/hybridize
+reading sources... [ 14%] chapter_computational-performance/index
+reading sources... [ 15%] chapter_computational-performance/multiple-gpus
+reading sources... [ 15%] chapter_computational-performance/multiple-gpus-gluon
+reading sources... [ 16%] chapter_computer-vision/anchor
+reading sources... [ 17%] chapter_computer-vision/bounding-box
+reading sources... [ 18%] chapter_computer-vision/fcn
+reading sources... [ 19%] chapter_computer-vision/fine-tuning
+reading sources... [ 20%] chapter_computer-vision/image-augmentation
+reading sources... [ 21%] chapter_computer-vision/index
+reading sources... [ 21%] chapter_computer-vision/kaggle-gluon-cifar10
+reading sources... [ 22%] chapter_computer-vision/kaggle-gluon-dog
+reading sources... [ 23%] chapter_computer-vision/multiscale-object-detection
+reading sources... [ 24%] chapter_computer-vision/neural-style
+reading sources... [ 25%] chapter_computer-vision/object-detection-dataset
+reading sources... [ 26%] chapter_computer-vision/rcnn
+reading sources... [ 26%] chapter_computer-vision/semantic-segmentation-and-dataset
+reading sources... [ 27%] chapter_computer-vision/ssd
+reading sources... [ 28%] chapter_convolutional-modern/alexnet
+reading sources... [ 29%] chapter_convolutional-modern/batch-norm
+reading sources... [ 30%] chapter_convolutional-modern/densenet
+reading sources... [ 31%] chapter_convolutional-modern/googlenet
+reading sources... [ 31%] chapter_convolutional-modern/index
+reading sources... [ 32%] chapter_convolutional-modern/nin
+reading sources... [ 33%] chapter_convolutional-modern/resnet
+reading sources... [ 34%] chapter_convolutional-modern/vgg
+reading sources... [ 35%] chapter_convolutional-neural-networks/channels
+reading sources... [ 36%] chapter_convolutional-neural-networks/conv-layer
+reading sources... [ 36%] chapter_convolutional-neural-networks/index
+reading sources... [ 37%] chapter_convolutional-neural-networks/lenet
+reading sources... [ 38%] chapter_convolutional-neural-networks/padding-and-strides
+reading sources... [ 39%] chapter_convolutional-neural-networks/pooling
+reading sources... [ 40%] chapter_convolutional-neural-networks/why-conv
+reading sources... [ 41%] chapter_crashcourse/autograd
+reading sources... [ 42%] chapter_crashcourse/index
+reading sources... [ 42%] chapter_crashcourse/linear-algebra
+reading sources... [ 43%] chapter_crashcourse/lookup-api
+reading sources... [ 44%] chapter_crashcourse/naive-bayes
+reading sources... [ 45%] chapter_crashcourse/ndarray
+reading sources... [ 46%] chapter_crashcourse/probability
+reading sources... [ 47%] chapter_deep-learning-computation/custom-layer
+reading sources... [ 47%] chapter_deep-learning-computation/deferred-init
+reading sources... [ 48%] chapter_deep-learning-computation/index
+reading sources... [ 49%] chapter_deep-learning-computation/model-construction
+reading sources... [ 50%] chapter_deep-learning-computation/parameters
+reading sources... [ 51%] chapter_deep-learning-computation/read-write
+reading sources... [ 52%] chapter_deep-learning-computation/use-gpu
+reading sources... [ 52%] chapter_install/install
+reading sources... [ 53%] chapter_introduction/intro
+reading sources... [ 54%] chapter_linear-networks/fashion-mnist
+reading sources... [ 55%] chapter_linear-networks/index
+reading sources... [ 56%] chapter_linear-networks/linear-regression
+reading sources... [ 57%] chapter_linear-networks/linear-regression-gluon
+reading sources... [ 57%] chapter_linear-networks/linear-regression-scratch
+reading sources... [ 58%] chapter_linear-networks/softmax-regression
+reading sources... [ 59%] chapter_linear-networks/softmax-regression-gluon
+reading sources... [ 60%] chapter_linear-networks/softmax-regression-scratch
+reading sources... [ 61%] chapter_multilayer-perceptrons/backprop
+reading sources... [ 62%] chapter_multilayer-perceptrons/dropout
+reading sources... [ 63%] chapter_multilayer-perceptrons/environment
+reading sources... [ 63%] chapter_multilayer-perceptrons/index
+reading sources... [ 64%] chapter_multilayer-perceptrons/kaggle-house-price
+reading sources... [ 65%] chapter_multilayer-perceptrons/mlp
+reading sources... [ 66%] chapter_multilayer-perceptrons/mlp-gluon
+reading sources... [ 67%] chapter_multilayer-perceptrons/mlp-scratch
+reading sources... [ 68%] chapter_multilayer-perceptrons/numerical-stability-and-init
+reading sources... [ 68%] chapter_multilayer-perceptrons/underfit-overfit
+reading sources... [ 69%] chapter_multilayer-perceptrons/weight-decay
+reading sources... [ 70%] chapter_natural-language-processing/approx-training
+reading sources... [ 71%] chapter_natural-language-processing/fasttext
+reading sources... [ 72%] chapter_natural-language-processing/glove
+reading sources... [ 73%] chapter_natural-language-processing/index
+reading sources... [ 73%] chapter_natural-language-processing/sentiment-analysis-cnn
+reading sources... [ 74%] chapter_natural-language-processing/sentiment-analysis-rnn
+reading sources... [ 75%] chapter_natural-language-processing/similarity-analogy
+reading sources... [ 76%] chapter_natural-language-processing/word2vec
+reading sources... [ 77%] chapter_natural-language-processing/word2vec-gluon
+reading sources... [ 78%] chapter_optimization/adadelta
+reading sources... [ 78%] chapter_optimization/adagrad
+reading sources... [ 79%] chapter_optimization/adam
+reading sources... [ 80%] chapter_optimization/gd-sgd
+reading sources... [ 81%] chapter_optimization/index
+reading sources... [ 82%] chapter_optimization/minibatch-sgd
+reading sources... [ 83%] chapter_optimization/momentum
+reading sources... [ 84%] chapter_optimization/optimization-intro
+reading sources... [ 84%] chapter_optimization/rmsprop
+reading sources... [ 85%] chapter_preface/preface
+reading sources... [ 86%] chapter_recurrent-neural-networks/beam-search
+reading sources... [ 87%] chapter_recurrent-neural-networks/bi-rnn
+reading sources... [ 88%] chapter_recurrent-neural-networks/bptt
+reading sources... [ 89%] chapter_recurrent-neural-networks/deep-rnn
+reading sources... [ 89%] chapter_recurrent-neural-networks/encoder-decoder
+reading sources... [ 90%] chapter_recurrent-neural-networks/gru
+reading sources... [ 91%] chapter_recurrent-neural-networks/index
+reading sources... [ 92%] chapter_recurrent-neural-networks/lang-model
+reading sources... [ 93%] chapter_recurrent-neural-networks/lang-model-dataset
+reading sources... [ 94%] chapter_recurrent-neural-networks/lstm
+reading sources... [ 94%] chapter_recurrent-neural-networks/machine-translation
+reading sources... [ 95%] chapter_recurrent-neural-networks/rnn
+reading sources... [ 96%] chapter_recurrent-neural-networks/rnn-gluon
+reading sources... [ 97%] chapter_recurrent-neural-networks/rnn-scratch
+reading sources... [ 98%] chapter_recurrent-neural-networks/seq2seq
+reading sources... [ 99%] chapter_recurrent-neural-networks/sequence
+reading sources... [100%] index
+
+/home/ubuntu/d2l-en/d2l/model.py:docstring of d2l.model.Residual.forward:5: WARNING: Unexpected section title.
+
+Parameters
+----------
+/home/ubuntu/d2l-en/d2l/model.py:docstring of d2l.model.Residual.forward:6: WARNING: Inline emphasis start-string without end-string.
+/home/ubuntu/d2l-en/d2l/model.py:docstring of d2l.model.RNNModel.forward:5: WARNING: Unexpected section title.
+
+Parameters
+----------
+/home/ubuntu/d2l-en/d2l/model.py:docstring of d2l.model.RNNModel.forward:6: WARNING: Inline emphasis start-string without end-string.
+/home/ubuntu/d2l-en/d2l/model.py:docstring of d2l.model.Encoder.forward:5: WARNING: Unexpected section title.
+
+Parameters
+----------
+/home/ubuntu/d2l-en/d2l/model.py:docstring of d2l.model.Encoder.forward:6: WARNING: Inline emphasis start-string without end-string.
+/home/ubuntu/d2l-en/d2l/model.py:docstring of d2l.model.Decoder.forward:5: WARNING: Unexpected section title.
+
+Parameters
+----------
+/home/ubuntu/d2l-en/d2l/model.py:docstring of d2l.model.Decoder.forward:6: WARNING: Inline emphasis start-string without end-string.
+/home/ubuntu/d2l-en/d2l/model.py:docstring of d2l.model.EncoderDecoder.forward:5: WARNING: Unexpected section title.
+
+Parameters
+----------
+/home/ubuntu/d2l-en/d2l/model.py:docstring of d2l.model.EncoderDecoder.forward:6: WARNING: Inline emphasis start-string without end-string.
+/home/ubuntu/d2l-en/d2l/model.py:docstring of d2l.model.DotProductAttention.forward:5: WARNING: Unexpected section title.
+
+Parameters
+----------
+/home/ubuntu/d2l-en/d2l/model.py:docstring of d2l.model.DotProductAttention.forward:6: WARNING: Inline emphasis start-string without end-string.
+/home/ubuntu/d2l-en/d2l/model.py:docstring of d2l.model.MLPAttention.forward:5: WARNING: Unexpected section title.
+
+Parameters
+----------
+/home/ubuntu/d2l-en/d2l/model.py:docstring of d2l.model.MLPAttention.forward:6: WARNING: Inline emphasis start-string without end-string.
+/home/ubuntu/d2l-en/d2l/model.py:docstring of d2l.model.Seq2SeqEncoder.forward:5: WARNING: Unexpected section title.
+
+Parameters
+----------
+/home/ubuntu/d2l-en/d2l/model.py:docstring of d2l.model.Seq2SeqEncoder.forward:6: WARNING: Inline emphasis start-string without end-string.
+WARNING: autodoc: failed to import module 'predict' from module 'd2l'; the following exception was raised:
+No module named 'd2l.predict'
+/home/ubuntu/d2l-en/_build/rst/chapter_computational-performance/multiple-gpus.rst:23: WARNING: Undefined substitution referenced: "-------------------------------+----------------------+----------------------+ | GPU Name Persistence-M".
+/home/ubuntu/d2l-en/_build/rst/chapter_computational-performance/multiple-gpus.rst:23: WARNING: Undefined substitution referenced: "===============================+======================+======================".
+/home/ubuntu/d2l-en/_build/rst/chapter_computational-performance/multiple-gpus.rst:23: WARNING: Undefined substitution referenced: "=============================================================================".
+/home/ubuntu/d2l-en/_build/rst/chapter_crashcourse/lookup-api.rst:49: WARNING: Inline strong start-string without end-string.
+/home/ubuntu/d2l-en/_build/rst/chapter_crashcourse/probability.rst:822: WARNING: Duplicate substitution definition name: "image0".
+/home/ubuntu/d2l-en/_build/rst/chapter_deep-learning-computation/custom-layer.rst:158: WARNING: Unknown target name: "mydense0".
+/home/ubuntu/d2l-en/_build/rst/chapter_deep-learning-computation/deferred-init.rst:64: WARNING: Unknown target name: "sequential0".
+/home/ubuntu/d2l-en/_build/rst/chapter_deep-learning-computation/deferred-init.rst:91: WARNING: Unknown target name: "sequential0".
+/home/ubuntu/d2l-en/_build/rst/chapter_deep-learning-computation/deferred-init.rst:115: WARNING: Unknown target name: "sequential0".
+/home/ubuntu/d2l-en/_build/rst/chapter_deep-learning-computation/parameters.rst:68: WARNING: Unknown target name: "dense0".
+/home/ubuntu/d2l-en/_build/rst/chapter_deep-learning-computation/parameters.rst:68: WARNING: Unknown target name: "dense1".
+/home/ubuntu/d2l-en/_build/rst/chapter_deep-learning-computation/parameters.rst:194: WARNING: Unknown target name: "dense0".
+/home/ubuntu/d2l-en/_build/rst/chapter_deep-learning-computation/parameters.rst:194: WARNING: Unknown target name: "sequential0".
+/home/ubuntu/d2l-en/_build/rst/chapter_deep-learning-computation/parameters.rst:237: WARNING: Unknown target name: "sequential0".
+/home/ubuntu/d2l-en/_build/rst/chapter_deep-learning-computation/parameters.rst:237: WARNING: Unknown target name: "sequential0".
+/home/ubuntu/d2l-en/_build/rst/chapter_deep-learning-computation/parameters.rst:303: WARNING: Unknown target name: "sequential1".
+/home/ubuntu/d2l-en/_build/rst/chapter_deep-learning-computation/use-gpu.rst:74: WARNING: Undefined substitution referenced: "-------------------------------+----------------------+----------------------+ | GPU Name Persistence-M".
+/home/ubuntu/d2l-en/_build/rst/chapter_deep-learning-computation/use-gpu.rst:74: WARNING: Undefined substitution referenced: "===============================+======================+======================".
+/home/ubuntu/d2l-en/_build/rst/chapter_deep-learning-computation/use-gpu.rst:74: WARNING: Undefined substitution referenced: "=============================================================================".
+/home/ubuntu/d2l-en/_build/rst/chapter_multilayer-perceptrons/mlp.rst:5: WARNING: duplicate label chapter_mlp, other instance in /home/ubuntu/d2l-en/_build/rst/chapter_multilayer-perceptrons/index.rst
+/home/ubuntu/d2l-en/_build/rst/chapter_recurrent-neural-networks/rnn-gluon.rst:175: WARNING: Unknown target name: "travelleroqqoci.i".
+looking for now-outdated files... none found
+pickling environment... done
+checking consistency... done
+preparing documents... done
+writing output... [ 14%] chapter_appendix/buy-gpu .. chapter_computer-vision/anchor
+writing output... [ 28%] chapter_computer-vision/bounding-box .. chapter_convolutional-modern/nin
+writing output... [ 42%] chapter_convolutional-modern/resnet .. chapter_deep-learning-computation/index
+writing output... [ 57%] chapter_deep-learning-computation/model-construction .. chapter_multilayer-perceptrons/kaggle-house-price
+writing output... [ 71%] chapter_multilayer-perceptrons/mlp .. chapter_optimization/gd-sgd
+writing output... [ 85%] chapter_optimization/index .. chapter_recurrent-neural-networks/rnn-gluon
+/home/ubuntu/d2l-en/_build/rst/chapter_preface/preface.rst:180: WARNING: undefined label: chapter_mordern_cnn
+/home/ubuntu/d2l-en/_build/rst/chapter_computational-performance/multiple-gpus.rst:16: WARNING: Could not lex literal_block as "python". Highlighting skipped.
+writing output... [100%] chapter_recurrent-neural-networks/rnn-scratch .. index
+
+waiting for workers...
+/home/ubuntu/d2l-en/_build/rst/chapter_deep-learning-computation/use-gpu.rst:67: WARNING: Could not lex literal_block as "python". Highlighting skipped.
+generating indices... genindex py-modindex
+writing additional pages... search
+copying images... [  0%] chapter_appendix/../img/aws.png
+copying images... [  0%] chapter_appendix/../img/ec2.png
+copying images... [  0%] chapter_appendix/../img/os.png
+copying images... [  1%] chapter_appendix/../img/p2x.png
+copying images... [  1%] chapter_appendix/../img/limits.png
+copying images... [  1%] chapter_appendix/../img/disk.png
+copying images... [  2%] chapter_appendix/../img/keypair.png
+copying images... [  2%] chapter_appendix/../img/launching.png
+copying images... [  2%] chapter_appendix/../img/connect.png
+copying images... [  2%] chapter_appendix/../img/cuda.png
+copying images... [  3%] chapter_appendix/../img/jupyter.png
+copying images... [  3%] chapter_appendix/../img/qr_aws.svg
+copying images... [  3%] chapter_appendix/../img/flopsvsprice.svg
+copying images... [  4%] chapter_appendix/../img/wattvsprice.svg
+copying images... [  4%] chapter_appendix/../img/qr_buy-gpu.svg
+copying images... [  4%] chapter_appendix/../img/contribute.svg
+copying images... [  4%] chapter_appendix/../img/git-fork.png
+copying images... [  5%] chapter_appendix/../img/git-forked.png
+copying images... [  5%] chapter_appendix/../img/git-clone.png
+copying images... [  5%] chapter_appendix/../img/git-newpr.png
+copying images... [  6%] chapter_appendix/../img/git-createpr.png
+copying images... [  6%] chapter_appendix/../img/qr_how-to-contribute.svg
+copying images... [  6%] chapter_appendix/../img/jupyter00.png
+copying images... [  6%] chapter_appendix/../img/jupyter01.png
+copying images... [  7%] chapter_appendix/../img/jupyter02.png
+copying images... [  7%] chapter_appendix/../img/jupyter03.png
+copying images... [  7%] chapter_appendix/../img/jupyter04.png
+copying images... [  8%] chapter_appendix/../img/jupyter05.png
+copying images... [  8%] chapter_appendix/../img/jupyter06.png
+copying images... [  8%] chapter_appendix/../img/qr_jupyter.svg
+copying images... [  8%] chapter_appendix/../img/intersect.svg
+copying images... [  9%] chapter_appendix/../img/qr_math.svg
+copying images... [  9%] chapter_attention-mechanism/../img/attention.svg
+copying images... [  9%] chapter_attention-mechanism/../img/seq2seq_attention.svg
+copying images... [ 10%] chapter_attention-mechanism/../img/seq2seq-attention-details.svg
+copying images... [ 10%] chapter_attention-mechanism/../img/self-attention.svg
+copying images... [ 10%] chapter_attention-mechanism/../img/transformer.svg
+copying images... [ 10%] chapter_attention-mechanism/../img/multi-head-attention.svg
+copying images... [ 11%] chapter_attention-mechanism/transformer/output_21_0.svg
+copying images... [ 11%] chapter_attention-mechanism/../img/self-attention-predict.svg
+copying images... [ 11%] chapter_computational-performance/../img/qr_async-computation.svg
+copying images... [ 12%] chapter_computational-performance/../img/qr_auto-parallelism.svg
+copying images... [ 12%] chapter_computational-performance/../img/qr_hybridize.svg
+copying images... [ 12%] chapter_computational-performance/../img/data-parallel.svg
+copying images... [ 12%] chapter_computational-performance/../img/qr_multiple-gpus.svg
+copying images... [ 13%] chapter_computational-performance/../img/qr_multiple-gpus-gluon.svg
+copying images... [ 13%] chapter_computer-vision/anchor/output_9_0.svg
+copying images... [ 13%] chapter_computer-vision/../img/iou.svg
+copying images... [ 14%] chapter_computer-vision/../img/anchor-label.svg
+copying images... [ 14%] chapter_computer-vision/anchor/output_11_0.svg
+copying images... [ 14%] chapter_computer-vision/anchor/output_23_0.svg
+copying images... [ 14%] chapter_computer-vision/anchor/output_27_0.svg
+copying images... [ 15%] chapter_computer-vision/../img/qr_anchor.svg
+copying images... [ 15%] chapter_computer-vision/bounding-box/output_3_0.svg
+copying images... [ 15%] chapter_computer-vision/bounding-box/output_9_0.svg
+copying images... [ 16%] chapter_computer-vision/../img/qr_bounding-box.svg
+copying images... [ 16%] chapter_computer-vision/../img/fcn.svg
+copying images... [ 16%] chapter_computer-vision/fcn/output_25_1.svg
+copying images... [ 16%] chapter_computer-vision/fcn/output_37_0.svg
+copying images... [ 17%] chapter_computer-vision/../img/qr_fcn.svg
+copying images... [ 17%] chapter_computer-vision/../img/finetune.svg
+copying images... [ 17%] chapter_computer-vision/fine-tuning/output_7_0.png
+copying images... [ 18%] chapter_computer-vision/../img/qr_fine-tuning.svg
+copying images... [ 18%] chapter_computer-vision/image-augmentation/output_3_1.svg
+copying images... [ 18%] chapter_computer-vision/image-augmentation/output_9_0.svg
+copying images... [ 18%] chapter_computer-vision/image-augmentation/output_11_0.svg
+copying images... [ 19%] chapter_computer-vision/image-augmentation/output_13_0.svg
+copying images... [ 19%] chapter_computer-vision/image-augmentation/output_15_0.svg
+copying images... [ 19%] chapter_computer-vision/image-augmentation/output_17_0.svg
+copying images... [ 20%] chapter_computer-vision/image-augmentation/output_19_0.svg
+copying images... [ 20%] chapter_computer-vision/image-augmentation/output_21_0.svg
+copying images... [ 20%] chapter_computer-vision/image-augmentation/output_23_1.svg
+copying images... [ 20%] chapter_computer-vision/../img/qr_image-augmentation.svg
+copying images... [ 21%] chapter_computer-vision/../img/kaggle_cifar10.png
+copying images... [ 21%] chapter_computer-vision/../img/qr_kaggle-gluon-cifar10.svg
+copying images... [ 21%] chapter_computer-vision/../img/kaggle-dog.png
+copying images... [ 22%] chapter_computer-vision/../img/qr_kaggle-gluon-dog.svg
+copying images... [ 22%] chapter_computer-vision/multiscale-object-detection/output_5_0.svg
+copying images... [ 22%] chapter_computer-vision/multiscale-object-detection/output_7_0.svg
+copying images... [ 22%] chapter_computer-vision/multiscale-object-detection/output_9_0.svg
+copying images... [ 23%] chapter_computer-vision/../img/qr_multiscale-object-detection.svg
+copying images... [ 23%] chapter_computer-vision/../img/style-transfer.svg
+copying images... [ 23%] chapter_computer-vision/../img/neural-style.svg
+copying images... [ 24%] chapter_computer-vision/neural-style/output_1_0.svg
+copying images... [ 24%] chapter_computer-vision/neural-style/output_2_0.svg
+copying images... [ 24%] chapter_computer-vision/../img/neural-style-1.png
+copying images... [ 24%] chapter_computer-vision/../img/neural-style-2.png
+copying images... [ 25%] chapter_computer-vision/../img/qr_neural-style.svg
+copying images... [ 25%] chapter_computer-vision/object-detection-dataset/output_7_0.png
+copying images... [ 25%] chapter_computer-vision/../img/qr_object-detection-dataset.svg
+copying images... [ 26%] chapter_computer-vision/../img/r-cnn.svg
+copying images... [ 26%] chapter_computer-vision/../img/fast-rcnn.svg
+copying images... [ 26%] chapter_computer-vision/../img/roi.svg
+copying images... [ 26%] chapter_computer-vision/../img/faster-rcnn.svg
+copying images... [ 27%] chapter_computer-vision/../img/mask-rcnn.svg
+copying images... [ 27%] chapter_computer-vision/../img/qr_rcnn.svg
+copying images... [ 27%] chapter_computer-vision/../img/segmentation.svg
+copying images... [ 28%] chapter_computer-vision/semantic-segmentation-and-dataset/output_7_0.png
+copying images... [ 28%] chapter_computer-vision/semantic-segmentation-and-dataset/output_15_0.png
+copying images... [ 28%] chapter_computer-vision/../img/qr_semantic-segmentation-and-dataset.svg
+copying images... [ 28%] chapter_computer-vision/../img/ssd.svg
+copying images... [ 29%] chapter_computer-vision/ssd/output_41_0.svg
+copying images... [ 29%] chapter_computer-vision/ssd/output_43_0.svg
+copying images... [ 29%] chapter_computer-vision/ssd/output_45_0.svg
+copying images... [ 30%] chapter_computer-vision/../img/qr_ssd.svg
+copying images... [ 30%] chapter_convolutional-modern/../img/filters.png
+copying images... [ 30%] chapter_convolutional-modern/../img/alexnet-all.svg
+copying images... [ 30%] chapter_convolutional-modern/../img/qr_alexnet.svg
+copying images... [ 31%] chapter_convolutional-modern/../img/qr_batch-norm.svg
+copying images... [ 31%] chapter_convolutional-modern/../img/densenet.svg
+copying images... [ 31%] chapter_convolutional-modern/../img/DenseNetDense.svg
+copying images... [ 32%] chapter_convolutional-modern/../img/qr_densenet.svg
+copying images... [ 32%] chapter_convolutional-modern/../img/inception.svg
+copying images... [ 32%] chapter_convolutional-modern/../img/inception-full.svg
+copying images... [ 32%] chapter_convolutional-modern/../img/qr_googlenet.svg
+copying images... [ 33%] chapter_convolutional-modern/../img/nin-compare.svg
+copying images... [ 33%] chapter_convolutional-modern/../img/qr_nin.svg
+copying images... [ 33%] chapter_convolutional-modern/../img/functionclasses.svg
+copying images... [ 34%] chapter_convolutional-modern/../img/residual-block.svg
+copying images... [ 34%] chapter_convolutional-modern/../img/ResNetBlock.svg
+copying images... [ 34%] chapter_convolutional-modern/../img/ResNetFull.svg
+copying images... [ 34%] chapter_convolutional-modern/../img/qr_resnet.svg
+copying images... [ 35%] chapter_convolutional-modern/../img/vgg.svg
+copying images... [ 35%] chapter_convolutional-modern/../img/qr_vgg.svg
+copying images... [ 35%] chapter_convolutional-neural-networks/../img/conv_multi_in.svg
+copying images... [ 36%] chapter_convolutional-neural-networks/../img/conv_1x1.svg
+copying images... [ 36%] chapter_convolutional-neural-networks/../img/qr_channels.svg
+copying images... [ 36%] chapter_convolutional-neural-networks/../img/correlation.svg
+copying images... [ 36%] chapter_convolutional-neural-networks/../img/qr_conv-layer.svg
+copying images... [ 37%] chapter_convolutional-neural-networks/../img/lenet.svg
+copying images... [ 37%] chapter_convolutional-neural-networks/../img/lenet-vert.svg
+copying images... [ 37%] chapter_convolutional-neural-networks/../img/qr_lenet.svg
+copying images... [ 38%] chapter_convolutional-neural-networks/../img/conv_pad.svg
+copying images... [ 38%] chapter_convolutional-neural-networks/../img/conv_stride.svg
+copying images... [ 38%] chapter_convolutional-neural-networks/../img/qr_padding-and-strides.svg
+copying images... [ 38%] chapter_convolutional-neural-networks/../img/pooling.svg
+copying images... [ 39%] chapter_convolutional-neural-networks/../img/qr_pooling.svg
+copying images... [ 39%] chapter_convolutional-neural-networks/../img/where-wally-walker-books.jpg
+copying images... [ 39%] chapter_convolutional-neural-networks/../img/waldo-mask.jpg
+copying images... [ 40%] chapter_convolutional-neural-networks/../img/qr_why-conv.svg
+copying images... [ 40%] chapter_crashcourse/../img/qr_autograd.svg
+copying images... [ 40%] chapter_crashcourse/../img/qr_linear-algebra.svg
+copying images... [ 40%] chapter_crashcourse/../img/qr_lookup-api.svg
+copying images... [ 41%] chapter_crashcourse/naive-bayes/output_4_0.svg
+copying images... [ 41%] chapter_crashcourse/naive-bayes/output_8_0.svg
+copying images... [ 41%] chapter_crashcourse/../img/qr_naive-bayes.svg
+copying images... [ 42%] chapter_crashcourse/../img/qr_ndarray.svg
+copying images... [ 42%] chapter_crashcourse/../img/qr_probability.svg
+copying images... [ 42%] chapter_crashcourse/../img/whitecat20.jpg
+copying images... [ 42%] chapter_crashcourse/../img/whitecat40.jpg
+copying images... [ 43%] chapter_crashcourse/../img/whitecat80.jpg
+copying images... [ 43%] chapter_crashcourse/../img/whitecat160.jpg
+copying images... [ 43%] chapter_crashcourse/../img/whitedog10.jpg
+copying images... [ 44%] chapter_crashcourse/../img/whitedog20.jpg
+copying images... [ 44%] chapter_crashcourse/../img/whitedog40.jpg
+copying images... [ 44%] chapter_crashcourse/../img/whitedog80.jpg
+copying images... [ 44%] chapter_crashcourse/../img/whitedog160.jpg
+copying images... [ 45%] chapter_crashcourse/probability/output_15_0.svg
+copying images... [ 45%] chapter_crashcourse/probability/output_21_0.svg
+copying images... [ 45%] chapter_crashcourse/probability/output_23_0.svg
+copying images... [ 46%] chapter_crashcourse/probability/output_25_0.svg
+copying images... [ 46%] chapter_crashcourse/probability/output_27_1.svg
+copying images... [ 46%] chapter_deep-learning-computation/../img/qr_custom-layer.svg
+copying images... [ 46%] chapter_deep-learning-computation/../img/qr_deferred-init.svg
+copying images... [ 47%] chapter_deep-learning-computation/../img/blocks.svg
+copying images... [ 47%] chapter_deep-learning-computation/../img/qr_model-construction.svg
+copying images... [ 47%] chapter_deep-learning-computation/../img/qr_parameters.svg
+copying images... [ 48%] chapter_deep-learning-computation/../img/qr_read-write.svg
+copying images... [ 48%] chapter_deep-learning-computation/../img/copyto.svg
+copying images... [ 48%] chapter_deep-learning-computation/../img/qr_use-gpu.svg
+copying images... [ 48%] chapter_install/../img/qr_install.svg
+copying images... [ 49%] chapter_introduction/../img/wake-word.svg
+copying images... [ 49%] chapter_introduction/../img/ml-loop.svg
+copying images... [ 49%] chapter_introduction/../img/cat1.png
+copying images... [ 50%] chapter_introduction/../img/cat2.jpg
+copying images... [ 50%] chapter_introduction/../img/dog1.jpg
+copying images... [ 50%] chapter_introduction/../img/dog2.jpg
+copying images... [ 51%] chapter_introduction/../img/supervised-learning.svg
+copying images... [ 51%] chapter_introduction/../img/death_cap.jpg
+copying images... [ 51%] chapter_introduction/../img/sharks.png
+copying images... [ 51%] chapter_introduction/../img/stackedanimals.jpg
+copying images... [ 52%] chapter_introduction/../img/deeplearning_amazon.png
+copying images... [ 52%] chapter_introduction/../img/speech.png
+copying images... [ 52%] chapter_introduction/../img/data-collection.svg
+copying images... [ 53%] chapter_introduction/../img/rl-environment.svg
+copying images... [ 53%] chapter_introduction/../img/koebel.jpg
+copying images... [ 53%] chapter_introduction/../img/qr_intro.svg
+copying images... [ 53%] chapter_linear-networks/fashion-mnist/output_17_0.svg
+copying images... [ 54%] chapter_linear-networks/../img/qr_fashion-mnist.svg
+copying images... [ 54%] chapter_linear-networks/../img/linearregression.svg
+copying images... [ 54%] chapter_linear-networks/../img/singleneuron.svg
+copying images... [ 55%] chapter_linear-networks/../img/Neuron.svg
+copying images... [ 55%] chapter_linear-networks/linear-regression/output_7_0.svg
+copying images... [ 55%] chapter_linear-networks/../img/qr_linear-regression.svg
+copying images... [ 55%] chapter_linear-networks/../img/qr_linear-regression-gluon.svg
+copying images... [ 56%] chapter_linear-networks/linear-regression-scratch/output_7_0.svg
+copying images... [ 56%] chapter_linear-networks/../img/qr_linear-regression-scratch.svg
+copying images... [ 56%] chapter_linear-networks/../img/softmaxreg.svg
+copying images... [ 57%] chapter_linear-networks/../img/qr_softmax-regression.svg
+copying images... [ 57%] chapter_linear-networks/../img/qr_softmax-regression-gluon.svg
+copying images... [ 57%] chapter_linear-networks/softmax-regression-scratch/output_31_0.svg
+copying images... [ 57%] chapter_linear-networks/../img/qr_softmax-regression-scratch.svg
+copying images... [ 58%] chapter_multilayer-perceptrons/../img/forward.svg
+copying images... [ 58%] chapter_multilayer-perceptrons/../img/qr_backprop.svg
+copying images... [ 58%] chapter_multilayer-perceptrons/../img/dropout2.svg
+copying images... [ 59%] chapter_multilayer-perceptrons/../img/qr_dropout.svg
+copying images... [ 59%] chapter_multilayer-perceptrons/../img/cat3.jpg
+copying images... [ 59%] chapter_multilayer-perceptrons/../img/cat2.jpg
+copying images... [ 59%] chapter_multilayer-perceptrons/../img/dog1.jpg
+copying images... [ 60%] chapter_multilayer-perceptrons/../img/dog2.jpg
+copying images... [ 60%] chapter_multilayer-perceptrons/../img/cat-cartoon1.png
+copying images... [ 60%] chapter_multilayer-perceptrons/../img/cat-cartoon2.png
+copying images... [ 61%] chapter_multilayer-perceptrons/../img/dog-cartoon1.png
+copying images... [ 61%] chapter_multilayer-perceptrons/../img/dog-cartoon2.png
+copying images... [ 61%] chapter_multilayer-perceptrons/../img/popvssoda.png
+copying images... [ 61%] chapter_multilayer-perceptrons/../img/qr_environment.svg
+copying images... [ 62%] chapter_multilayer-perceptrons/../img/kaggle.png
+copying images... [ 62%] chapter_multilayer-perceptrons/../img/house_pricing.png
+copying images... [ 62%] chapter_multilayer-perceptrons/kaggle-house-price/output_27_0.svg
+copying images... [ 63%] chapter_multilayer-perceptrons/kaggle-house-price/output_31_0.svg
+copying images... [ 63%] chapter_multilayer-perceptrons/../img/kaggle_submit2.png
+copying images... [ 63%] chapter_multilayer-perceptrons/../img/qr_kaggle-house-price.svg
+copying images... [ 63%] chapter_multilayer-perceptrons/../img/singlelayer.svg
+copying images... [ 64%] chapter_multilayer-perceptrons/../img/mlp.svg
+copying images... [ 64%] chapter_multilayer-perceptrons/mlp/output_3_0.svg
+copying images... [ 64%] chapter_multilayer-perceptrons/mlp/output_5_0.svg
+copying images... [ 65%] chapter_multilayer-perceptrons/mlp/output_7_0.svg
+copying images... [ 65%] chapter_multilayer-perceptrons/mlp/output_9_0.svg
+copying images... [ 65%] chapter_multilayer-perceptrons/mlp/output_11_0.svg
+copying images... [ 65%] chapter_multilayer-perceptrons/mlp/output_13_0.svg
+copying images... [ 66%] chapter_multilayer-perceptrons/../img/qr_mlp.svg
+copying images... [ 66%] chapter_multilayer-perceptrons/../img/qr_mlp-gluon.svg
+copying images... [ 66%] chapter_multilayer-perceptrons/mlp-scratch/output_15_0.svg
+copying images... [ 67%] chapter_multilayer-perceptrons/../img/qr_mlp-scratch.svg
+copying images... [ 67%] chapter_multilayer-perceptrons/numerical-stability-and-init/output_1_0.png
+copying images... [ 67%] chapter_multilayer-perceptrons/../img/qr_numerical-stability-and-init.svg
+copying images... [ 67%] chapter_multilayer-perceptrons/../img/capacity_vs_error.svg
+copying images... [ 68%] chapter_multilayer-perceptrons/underfit-overfit/output_11_1.svg
+copying images... [ 68%] chapter_multilayer-perceptrons/underfit-overfit/output_13_1.svg
+copying images... [ 68%] chapter_multilayer-perceptrons/underfit-overfit/output_15_1.svg
+copying images... [ 69%] chapter_multilayer-perceptrons/../img/qr_underfit-overfit.svg
+copying images... [ 69%] chapter_multilayer-perceptrons/weight-decay/output_9_0.svg
+copying images... [ 69%] chapter_multilayer-perceptrons/weight-decay/output_11_0.svg
+copying images... [ 69%] chapter_multilayer-perceptrons/weight-decay/output_15_0.svg
+copying images... [ 70%] chapter_multilayer-perceptrons/weight-decay/output_16_0.svg
+copying images... [ 70%] chapter_multilayer-perceptrons/../img/qr_weight-decay.svg
+copying images... [ 70%] chapter_natural-language-processing/../img/hi-softmax.svg
+copying images... [ 71%] chapter_natural-language-processing/../img/qr_approx-training.svg
+copying images... [ 71%] chapter_natural-language-processing/../img/qr_fasttext.svg
+copying images... [ 71%] chapter_natural-language-processing/../img/qr_glove.svg
+copying images... [ 71%] chapter_natural-language-processing/../img/conv1d.svg
+copying images... [ 72%] chapter_natural-language-processing/../img/conv1d-channel.svg
+copying images... [ 72%] chapter_natural-language-processing/../img/conv1d-2d.svg
+copying images... [ 72%] chapter_natural-language-processing/../img/textcnn.svg
+copying images... [ 73%] chapter_natural-language-processing/../img/qr_sentiment-analysis-cnn.svg
+copying images... [ 73%] chapter_natural-language-processing/../img/qr_sentiment-analysis-rnn.svg
+copying images... [ 73%] chapter_natural-language-processing/../img/qr_similarity-analogy.svg
+copying images... [ 73%] chapter_natural-language-processing/../img/skip-gram.svg
+copying images... [ 74%] chapter_natural-language-processing/../img/cbow.svg
+copying images... [ 74%] chapter_natural-language-processing/../img/qr_word2vec.svg
+copying images... [ 74%] chapter_natural-language-processing/word2vec-gluon/output_9_0.svg
+copying images... [ 75%] chapter_natural-language-processing/../img/qr_word2vec-gluon.svg
+copying images... [ 75%] chapter_optimization/adadelta/output_3_1.svg
+copying images... [ 75%] chapter_optimization/adadelta/output_5_1.svg
+copying images... [ 75%] chapter_optimization/../img/qr_adadelta.svg
+copying images... [ 76%] chapter_optimization/adagrad/output_1_1.svg
+copying images... [ 76%] chapter_optimization/adagrad/output_3_1.svg
+copying images... [ 76%] chapter_optimization/adagrad/output_7_1.svg
+copying images... [ 77%] chapter_optimization/adagrad/output_9_1.svg
+copying images... [ 77%] chapter_optimization/../img/qr_adagrad.svg
+copying images... [ 77%] chapter_optimization/adam/output_3_1.svg
+copying images... [ 77%] chapter_optimization/adam/output_5_1.svg
+copying images... [ 78%] chapter_optimization/../img/qr_adam.svg
+copying images... [ 78%] chapter_optimization/gd-sgd/output_5_0.svg
+copying images... [ 78%] chapter_optimization/gd-sgd/output_7_1.svg
+copying images... [ 79%] chapter_optimization/gd-sgd/output_9_1.svg
+copying images... [ 79%] chapter_optimization/gd-sgd/output_13_1.svg
+copying images... [ 79%] chapter_optimization/gd-sgd/output_15_1.svg
+copying images... [ 79%] chapter_optimization/../img/qr_gd-sgd.svg
+copying images... [ 80%] chapter_optimization/minibatch-sgd/output_8_1.svg
+copying images... [ 80%] chapter_optimization/minibatch-sgd/output_10_1.svg
+copying images... [ 80%] chapter_optimization/minibatch-sgd/output_12_1.svg
+copying images... [ 81%] chapter_optimization/minibatch-sgd/output_14_1.svg
+copying images... [ 81%] chapter_optimization/minibatch-sgd/output_16_0.svg
+copying images... [ 81%] chapter_optimization/minibatch-sgd/output_20_1.svg
+copying images... [ 81%] chapter_optimization/../img/qr_minibatch-sgd.svg
+copying images... [ 82%] chapter_optimization/momentum/output_1_1.svg
+copying images... [ 82%] chapter_optimization/momentum/output_3_1.svg
+copying images... [ 82%] chapter_optimization/momentum/output_5_1.svg
+copying images... [ 83%] chapter_optimization/momentum/output_7_1.svg
+copying images... [ 83%] chapter_optimization/momentum/output_11_1.svg
+copying images... [ 83%] chapter_optimization/momentum/output_13_1.svg
+copying images... [ 83%] chapter_optimization/momentum/output_15_1.svg
+copying images... [ 84%] chapter_optimization/momentum/output_17_1.svg
+copying images... [ 84%] chapter_optimization/../img/qr_momentum.svg
+copying images... [ 84%] chapter_optimization/optimization-intro/output_3_0.svg
+copying images... [ 85%] chapter_optimization/optimization-intro/output_5_0.svg
+copying images... [ 85%] chapter_optimization/optimization-intro/output_7_0.svg
+copying images... [ 85%] chapter_optimization/optimization-intro/output_9_0.svg
+copying images... [ 85%] chapter_optimization/optimization-intro/output_11_0.svg
+copying images... [ 86%] chapter_optimization/../img/qr_optimization-intro.svg
+copying images... [ 86%] chapter_optimization/rmsprop/output_1_1.svg
+copying images... [ 86%] chapter_optimization/rmsprop/output_5_1.svg
+copying images... [ 87%] chapter_optimization/rmsprop/output_7_1.svg
+copying images... [ 87%] chapter_optimization/../img/qr_rmsprop.svg
+copying images... [ 87%] chapter_preface/../img/book-org.svg
+copying images... [ 87%] chapter_preface/../img/qr_preface.svg
+copying images... [ 88%] chapter_recurrent-neural-networks/../img/s2s_prob1.svg
+copying images... [ 88%] chapter_recurrent-neural-networks/../img/s2s_prob2.svg
+copying images... [ 88%] chapter_recurrent-neural-networks/../img/beam_search.svg
+copying images... [ 89%] chapter_recurrent-neural-networks/../img/qr_beam-search.svg
+copying images... [ 89%] chapter_recurrent-neural-networks/../img/hmm.svg
+copying images... [ 89%] chapter_recurrent-neural-networks/../img/birnn.svg
+copying images... [ 89%] chapter_recurrent-neural-networks/../img/qr_bi-rnn.svg
+copying images... [ 90%] chapter_recurrent-neural-networks/../img/truncated-bptt.svg
+copying images... [ 90%] chapter_recurrent-neural-networks/../img/rnn-bptt.svg
+copying images... [ 90%] chapter_recurrent-neural-networks/../img/qr_bptt.svg
+copying images... [ 91%] chapter_recurrent-neural-networks/../img/deep-rnn.svg
+copying images... [ 91%] chapter_recurrent-neural-networks/../img/qr_deep-rnn.svg
+copying images... [ 91%] chapter_recurrent-neural-networks/../img/encoder-decoder.svg
+copying images... [ 91%] chapter_recurrent-neural-networks/../img/gru_1.svg
+copying images... [ 92%] chapter_recurrent-neural-networks/../img/gru_2.svg
+copying images... [ 92%] chapter_recurrent-neural-networks/../img/gru_3.svg
+copying images... [ 92%] chapter_recurrent-neural-networks/../img/qr_gru.svg
+copying images... [ 93%] chapter_recurrent-neural-networks/lang-model/output_5_0.svg
+copying images... [ 93%] chapter_recurrent-neural-networks/lang-model/output_9_0.svg
+copying images... [ 93%] chapter_recurrent-neural-networks/../img/qr_lang-model.svg
+copying images... [ 93%] chapter_recurrent-neural-networks/../img/timemachine-5gram.svg
+copying images... [ 94%] chapter_recurrent-neural-networks/../img/qr_lang-model-dataset.svg
+copying images... [ 94%] chapter_recurrent-neural-networks/../img/lstm_0.svg
+copying images... [ 94%] chapter_recurrent-neural-networks/../img/lstm_1.svg
+copying images... [ 95%] chapter_recurrent-neural-networks/../img/lstm_2.svg
+copying images... [ 95%] chapter_recurrent-neural-networks/../img/lstm_3.svg
+copying images... [ 95%] chapter_recurrent-neural-networks/../img/qr_lstm.svg
+copying images... [ 95%] chapter_recurrent-neural-networks/machine-translation/output_9_0.svg
+copying images... [ 96%] chapter_recurrent-neural-networks/../img/rnn.svg
+copying images... [ 96%] chapter_recurrent-neural-networks/../img/rnn-train.svg
+copying images... [ 96%] chapter_recurrent-neural-networks/../img/qr_rnn.svg
+copying images... [ 97%] chapter_recurrent-neural-networks/../img/qr_rnn-gluon.svg
+copying images... [ 97%] chapter_recurrent-neural-networks/../img/qr_rnn-scratch.svg
+copying images... [ 97%] chapter_recurrent-neural-networks/../img/seq2seq.svg
+copying images... [ 97%] chapter_recurrent-neural-networks/../img/seq2seq-details.svg
+copying images... [ 98%] chapter_recurrent-neural-networks/../img/seq2seq_predict.svg
+copying images... [ 98%] chapter_recurrent-neural-networks/../img/ftse100.png
+copying images... [ 98%] chapter_recurrent-neural-networks/sequence/output_1_0.svg
+copying images... [ 99%] chapter_recurrent-neural-networks/sequence/output_7_0.svg
+copying images... [ 99%] chapter_recurrent-neural-networks/sequence/output_9_0.svg
+copying images... [ 99%] chapter_recurrent-neural-networks/sequence/output_11_0.svg
+copying images... [100%] chapter_recurrent-neural-networks/../img/qr_sequence.svg
+
+copying static files... done
+copying extra files... done
+dumping search index in English (code: en) ... done
+dumping object inventory... done
+build succeeded, 41 warnings.
+
+The HTML pages are in _build/html.
+~/d2l-en $ ls
+Jenkinsfile                            chapter_natural-language-processing
+LICENSE                                chapter_optimization
+README.md                              chapter_preface
+STYLE_GUIDE.md                         chapter_recurrent-neural-networks
+_build                                 config.ini
+chapter_appendix                       contrib
+chapter_attention-mechanism            d2l
+chapter_computational-performance      d2l.bib
+chapter_computer-vision                data
+chapter_convolutional-modern           environment.yml
+chapter_convolutional-neural-networks  frontpage.html
+chapter_crashcourse                    graffle
+chapter_deep-learning-computation      img
+chapter_install                        index.md
+chapter_introduction                   setup.py
+chapter_linear-networks                tmp
+chapter_multilayer-perceptrons
+~/d2l-en $ rm -rf _build/html/
+~/d2l-en $ d2lbook build html
+/home/ubuntu/d2l-book/d2lbook/config_default.ini
+[d2lbook:build.py:L349] INFO   Copy resources "img/ data/ d2l/ d2l.bib frontpage.html" from . to _build/eval
+[d2lbook:build.py:L332] INFO   0 notedowns and 0 markdowns are out dated
+[d2lbook:build.py:L372] INFO   0 rst files are outdated
+[d2lbook:build.py:L349] INFO   Copy resources "img/ data/ d2l/ d2l.bib frontpage.html" from . to _build/rst
+Running Sphinx v2.0.1
+making output directory... done
+building [mo]: targets for 0 po files that are out of date
+building [html]: targets for 119 source files that are out of date
+updating environment: 119 added, 0 changed, 0 removed
+reading sources... [  0%] chapter_appendix/aws
+reading sources... [  1%] chapter_appendix/buy-gpu
+reading sources... [  2%] chapter_appendix/d2l
+reading sources... [  3%] chapter_appendix/how-to-contribute
+reading sources... [  4%] chapter_appendix/index
+reading sources... [  5%] chapter_appendix/jupyter
+reading sources... [  5%] chapter_appendix/math
+reading sources... [  6%] chapter_appendix/notation
+reading sources... [  7%] chapter_appendix/zreferences
+checking for /home/ubuntu/d2l-en/_build/rst/d2l.bib in bibtex cache... not found
+parsing bibtex file /home/ubuntu/d2l-en/_build/rst/d2l.bib... parsed 1 entries
+reading sources... [  8%] chapter_attention-mechanism/attention
+reading sources... [  9%] chapter_attention-mechanism/index
+reading sources... [ 10%] chapter_attention-mechanism/seq2seq-attention
+reading sources... [ 10%] chapter_attention-mechanism/transformer
+reading sources... [ 11%] chapter_computational-performance/async-computation
+reading sources... [ 12%] chapter_computational-performance/auto-parallelism
+reading sources... [ 13%] chapter_computational-performance/hybridize
+reading sources... [ 14%] chapter_computational-performance/index
+reading sources... [ 15%] chapter_computational-performance/multiple-gpus
+reading sources... [ 15%] chapter_computational-performance/multiple-gpus-gluon
+reading sources... [ 16%] chapter_computer-vision/anchor
+reading sources... [ 17%] chapter_computer-vision/bounding-box
+reading sources... [ 18%] chapter_computer-vision/fcn
+reading sources... [ 19%] chapter_computer-vision/fine-tuning
+reading sources... [ 20%] chapter_computer-vision/image-augmentation
+reading sources... [ 21%] chapter_computer-vision/index
+reading sources... [ 21%] chapter_computer-vision/kaggle-gluon-cifar10
+reading sources... [ 22%] chapter_computer-vision/kaggle-gluon-dog
+reading sources... [ 23%] chapter_computer-vision/multiscale-object-detection
+reading sources... [ 24%] chapter_computer-vision/neural-style
+reading sources... [ 25%] chapter_computer-vision/object-detection-dataset
+reading sources... [ 26%] chapter_computer-vision/rcnn
+reading sources... [ 26%] chapter_computer-vision/semantic-segmentation-and-dataset
+reading sources... [ 27%] chapter_computer-vision/ssd
+reading sources... [ 28%] chapter_convolutional-modern/alexnet
+reading sources... [ 29%] chapter_convolutional-modern/batch-norm
+reading sources... [ 30%] chapter_convolutional-modern/densenet
+reading sources... [ 31%] chapter_convolutional-modern/googlenet
+reading sources... [ 31%] chapter_convolutional-modern/index
+reading sources... [ 32%] chapter_convolutional-modern/nin
+reading sources... [ 33%] chapter_convolutional-modern/resnet
+reading sources... [ 34%] chapter_convolutional-modern/vgg
+reading sources... [ 35%] chapter_convolutional-neural-networks/channels
+reading sources... [ 36%] chapter_convolutional-neural-networks/conv-layer
+reading sources... [ 36%] chapter_convolutional-neural-networks/index
+reading sources... [ 37%] chapter_convolutional-neural-networks/lenet
+reading sources... [ 38%] chapter_convolutional-neural-networks/padding-and-strides
+reading sources... [ 39%] chapter_convolutional-neural-networks/pooling
+reading sources... [ 40%] chapter_convolutional-neural-networks/why-conv
+reading sources... [ 41%] chapter_crashcourse/autograd
+reading sources... [ 42%] chapter_crashcourse/index
+reading sources... [ 42%] chapter_crashcourse/linear-algebra
+reading sources... [ 43%] chapter_crashcourse/lookup-api
+reading sources... [ 44%] chapter_crashcourse/naive-bayes
+reading sources... [ 45%] chapter_crashcourse/ndarray
+reading sources... [ 46%] chapter_crashcourse/probability
+reading sources... [ 47%] chapter_deep-learning-computation/custom-layer
+reading sources... [ 47%] chapter_deep-learning-computation/deferred-init
+reading sources... [ 48%] chapter_deep-learning-computation/index
+reading sources... [ 49%] chapter_deep-learning-computation/model-construction
+reading sources... [ 50%] chapter_deep-learning-computation/parameters
+reading sources... [ 51%] chapter_deep-learning-computation/read-write
+reading sources... [ 52%] chapter_deep-learning-computation/use-gpu
+reading sources... [ 52%] chapter_install/install
+reading sources... [ 53%] chapter_introduction/intro
+reading sources... [ 54%] chapter_linear-networks/fashion-mnist
+reading sources... [ 55%] chapter_linear-networks/index
+reading sources... [ 56%] chapter_linear-networks/linear-regression
+reading sources... [ 57%] chapter_linear-networks/linear-regression-gluon
+reading sources... [ 57%] chapter_linear-networks/linear-regression-scratch
+reading sources... [ 58%] chapter_linear-networks/softmax-regression
+reading sources... [ 59%] chapter_linear-networks/softmax-regression-gluon
+reading sources... [ 60%] chapter_linear-networks/softmax-regression-scratch
+reading sources... [ 61%] chapter_multilayer-perceptrons/backprop
+reading sources... [ 62%] chapter_multilayer-perceptrons/dropout
+reading sources... [ 63%] chapter_multilayer-perceptrons/environment
+reading sources... [ 63%] chapter_multilayer-perceptrons/index
+reading sources... [ 64%] chapter_multilayer-perceptrons/kaggle-house-price
+reading sources... [ 65%] chapter_multilayer-perceptrons/mlp
+reading sources... [ 66%] chapter_multilayer-perceptrons/mlp-gluon
+reading sources... [ 67%] chapter_multilayer-perceptrons/mlp-scratch
+reading sources... [ 68%] chapter_multilayer-perceptrons/numerical-stability-and-init
+reading sources... [ 68%] chapter_multilayer-perceptrons/underfit-overfit
+reading sources... [ 69%] chapter_multilayer-perceptrons/weight-decay
+reading sources... [ 70%] chapter_natural-language-processing/approx-training
+reading sources... [ 71%] chapter_natural-language-processing/fasttext
+reading sources... [ 72%] chapter_natural-language-processing/glove
+reading sources... [ 73%] chapter_natural-language-processing/index
+reading sources... [ 73%] chapter_natural-language-processing/sentiment-analysis-cnn
+reading sources... [ 74%] chapter_natural-language-processing/sentiment-analysis-rnn
+reading sources... [ 75%] chapter_natural-language-processing/similarity-analogy
+reading sources... [ 76%] chapter_natural-language-processing/word2vec
+reading sources... [ 77%] chapter_natural-language-processing/word2vec-gluon
+reading sources... [ 78%] chapter_optimization/adadelta
+reading sources... [ 78%] chapter_optimization/adagrad
+reading sources... [ 79%] chapter_optimization/adam
+reading sources... [ 80%] chapter_optimization/gd-sgd
+reading sources... [ 81%] chapter_optimization/index
+reading sources... [ 82%] chapter_optimization/minibatch-sgd
+reading sources... [ 83%] chapter_optimization/momentum
+reading sources... [ 84%] chapter_optimization/optimization-intro
+reading sources... [ 84%] chapter_optimization/rmsprop
+reading sources... [ 85%] chapter_preface/preface
+reading sources... [ 86%] chapter_recurrent-neural-networks/beam-search
+reading sources... [ 87%] chapter_recurrent-neural-networks/bi-rnn
+reading sources... [ 88%] chapter_recurrent-neural-networks/bptt
+reading sources... [ 89%] chapter_recurrent-neural-networks/deep-rnn
+reading sources... [ 89%] chapter_recurrent-neural-networks/encoder-decoder
+reading sources... [ 90%] chapter_recurrent-neural-networks/gru
+reading sources... [ 91%] chapter_recurrent-neural-networks/index
+reading sources... [ 92%] chapter_recurrent-neural-networks/lang-model
+reading sources... [ 93%] chapter_recurrent-neural-networks/lang-model-dataset
+reading sources... [ 94%] chapter_recurrent-neural-networks/lstm
+reading sources... [ 94%] chapter_recurrent-neural-networks/machine-translation
+reading sources... [ 95%] chapter_recurrent-neural-networks/rnn
+reading sources... [ 96%] chapter_recurrent-neural-networks/rnn-gluon
+reading sources... [ 97%] chapter_recurrent-neural-networks/rnn-scratch
+reading sources... [ 98%] chapter_recurrent-neural-networks/seq2seq
+reading sources... [ 99%] chapter_recurrent-neural-networks/sequence
+reading sources... [100%] index
+
+/home/ubuntu/d2l-en/d2l/model.py:docstring of d2l.model.Residual.forward:5: WARNING: Unexpected section title.
+
+Parameters
+----------
+/home/ubuntu/d2l-en/d2l/model.py:docstring of d2l.model.Residual.forward:6: WARNING: Inline emphasis start-string without end-string.
+/home/ubuntu/d2l-en/d2l/model.py:docstring of d2l.model.RNNModel.forward:5: WARNING: Unexpected section title.
+
+Parameters
+----------
+/home/ubuntu/d2l-en/d2l/model.py:docstring of d2l.model.RNNModel.forward:6: WARNING: Inline emphasis start-string without end-string.
+/home/ubuntu/d2l-en/d2l/model.py:docstring of d2l.model.Encoder.forward:5: WARNING: Unexpected section title.
+
+Parameters
+----------
+/home/ubuntu/d2l-en/d2l/model.py:docstring of d2l.model.Encoder.forward:6: WARNING: Inline emphasis start-string without end-string.
+/home/ubuntu/d2l-en/d2l/model.py:docstring of d2l.model.Decoder.forward:5: WARNING: Unexpected section title.
+
+Parameters
+----------
+/home/ubuntu/d2l-en/d2l/model.py:docstring of d2l.model.Decoder.forward:6: WARNING: Inline emphasis start-string without end-string.
+/home/ubuntu/d2l-en/d2l/model.py:docstring of d2l.model.EncoderDecoder.forward:5: WARNING: Unexpected section title.
+
+Parameters
+----------
+/home/ubuntu/d2l-en/d2l/model.py:docstring of d2l.model.EncoderDecoder.forward:6: WARNING: Inline emphasis start-string without end-string.
+/home/ubuntu/d2l-en/d2l/model.py:docstring of d2l.model.DotProductAttention.forward:5: WARNING: Unexpected section title.
+
+Parameters
+----------
+/home/ubuntu/d2l-en/d2l/model.py:docstring of d2l.model.DotProductAttention.forward:6: WARNING: Inline emphasis start-string without end-string.
+/home/ubuntu/d2l-en/d2l/model.py:docstring of d2l.model.MLPAttention.forward:5: WARNING: Unexpected section title.
+
+Parameters
+----------
+/home/ubuntu/d2l-en/d2l/model.py:docstring of d2l.model.MLPAttention.forward:6: WARNING: Inline emphasis start-string without end-string.
+/home/ubuntu/d2l-en/d2l/model.py:docstring of d2l.model.Seq2SeqEncoder.forward:5: WARNING: Unexpected section title.
+
+Parameters
+----------
+/home/ubuntu/d2l-en/d2l/model.py:docstring of d2l.model.Seq2SeqEncoder.forward:6: WARNING: Inline emphasis start-string without end-string.
+WARNING: autodoc: failed to import module 'predict' from module 'd2l'; the following exception was raised:
+No module named 'd2l.predict'
+/home/ubuntu/d2l-en/_build/rst/chapter_computational-performance/multiple-gpus.rst:23: WARNING: Undefined substitution referenced: "-------------------------------+----------------------+----------------------+ | GPU Name Persistence-M".
+/home/ubuntu/d2l-en/_build/rst/chapter_computational-performance/multiple-gpus.rst:23: WARNING: Undefined substitution referenced: "===============================+======================+======================".
+/home/ubuntu/d2l-en/_build/rst/chapter_computational-performance/multiple-gpus.rst:23: WARNING: Undefined substitution referenced: "=============================================================================".
+/home/ubuntu/d2l-en/_build/rst/chapter_crashcourse/lookup-api.rst:49: WARNING: Inline strong start-string without end-string.
+/home/ubuntu/d2l-en/_build/rst/chapter_crashcourse/probability.rst:822: WARNING: Duplicate substitution definition name: "image0".
+/home/ubuntu/d2l-en/_build/rst/chapter_deep-learning-computation/custom-layer.rst:158: WARNING: Unknown target name: "mydense0".
+/home/ubuntu/d2l-en/_build/rst/chapter_deep-learning-computation/deferred-init.rst:64: WARNING: Unknown target name: "sequential0".
+/home/ubuntu/d2l-en/_build/rst/chapter_deep-learning-computation/deferred-init.rst:91: WARNING: Unknown target name: "sequential0".
+/home/ubuntu/d2l-en/_build/rst/chapter_deep-learning-computation/deferred-init.rst:115: WARNING: Unknown target name: "sequential0".
+/home/ubuntu/d2l-en/_build/rst/chapter_deep-learning-computation/parameters.rst:68: WARNING: Unknown target name: "dense0".
+/home/ubuntu/d2l-en/_build/rst/chapter_deep-learning-computation/parameters.rst:68: WARNING: Unknown target name: "dense1".
+/home/ubuntu/d2l-en/_build/rst/chapter_deep-learning-computation/parameters.rst:194: WARNING: Unknown target name: "dense0".
+/home/ubuntu/d2l-en/_build/rst/chapter_deep-learning-computation/parameters.rst:194: WARNING: Unknown target name: "sequential0".
+/home/ubuntu/d2l-en/_build/rst/chapter_deep-learning-computation/parameters.rst:237: WARNING: Unknown target name: "sequential0".
+/home/ubuntu/d2l-en/_build/rst/chapter_deep-learning-computation/parameters.rst:237: WARNING: Unknown target name: "sequential0".
+/home/ubuntu/d2l-en/_build/rst/chapter_deep-learning-computation/parameters.rst:303: WARNING: Unknown target name: "sequential1".
+/home/ubuntu/d2l-en/_build/rst/chapter_deep-learning-computation/use-gpu.rst:74: WARNING: Undefined substitution referenced: "-------------------------------+----------------------+----------------------+ | GPU Name Persistence-M".
+/home/ubuntu/d2l-en/_build/rst/chapter_deep-learning-computation/use-gpu.rst:74: WARNING: Undefined substitution referenced: "===============================+======================+======================".
+/home/ubuntu/d2l-en/_build/rst/chapter_deep-learning-computation/use-gpu.rst:74: WARNING: Undefined substitution referenced: "=============================================================================".
+/home/ubuntu/d2l-en/_build/rst/chapter_multilayer-perceptrons/mlp.rst:5: WARNING: duplicate label chapter_mlp, other instance in /home/ubuntu/d2l-en/_build/rst/chapter_multilayer-perceptrons/index.rst
+/home/ubuntu/d2l-en/_build/rst/chapter_recurrent-neural-networks/rnn-gluon.rst:175: WARNING: Unknown target name: "travelleroqqoci.i".
+looking for now-outdated files... none found
+pickling environment... done
+checking consistency... done
+preparing documents... done
+writing output... [ 14%] chapter_appendix/buy-gpu .. chapter_computer-vision/anchor
+writing output... [ 28%] chapter_computer-vision/bounding-box .. chapter_convolutional-modern/nin
+writing output... [ 42%] chapter_convolutional-modern/resnet .. chapter_deep-learning-computation/index
+writing output... [ 57%] chapter_deep-learning-computation/model-construction .. chapter_multilayer-perceptrons/kaggle-house-price
+writing output... [ 71%] chapter_multilayer-perceptrons/mlp .. chapter_optimization/gd-sgd
+writing output... [ 85%] chapter_optimization/index .. chapter_recurrent-neural-networks/rnn-gluon
+/home/ubuntu/d2l-en/_build/rst/chapter_preface/preface.rst:180: WARNING: undefined label: chapter_mordern_cnn
+/home/ubuntu/d2l-en/_build/rst/chapter_computational-performance/multiple-gpus.rst:16: WARNING: Could not lex literal_block as "python". Highlighting skipped.
+writing output... [100%] chapter_recurrent-neural-networks/rnn-scratch .. index
+
+waiting for workers...
+/home/ubuntu/d2l-en/_build/rst/chapter_deep-learning-computation/use-gpu.rst:67: WARNING: Could not lex literal_block as "python". Highlighting skipped.
+generating indices... genindex py-modindex
+writing additional pages... search
+copying images... [  0%] chapter_appendix/../img/aws.png
+copying images... [  0%] chapter_appendix/../img/ec2.png
+copying images... [  0%] chapter_appendix/../img/os.png
+copying images... [  1%] chapter_appendix/../img/p2x.png
+copying images... [  1%] chapter_appendix/../img/limits.png
+copying images... [  1%] chapter_appendix/../img/disk.png
+copying images... [  2%] chapter_appendix/../img/keypair.png
+copying images... [  2%] chapter_appendix/../img/launching.png
+copying images... [  2%] chapter_appendix/../img/connect.png
+copying images... [  2%] chapter_appendix/../img/cuda.png
+copying images... [  3%] chapter_appendix/../img/jupyter.png
+copying images... [  3%] chapter_appendix/../img/qr_aws.svg
+copying images... [  3%] chapter_appendix/../img/flopsvsprice.svg
+copying images... [  4%] chapter_appendix/../img/wattvsprice.svg
+copying images... [  4%] chapter_appendix/../img/qr_buy-gpu.svg
+copying images... [  4%] chapter_appendix/../img/contribute.svg
+copying images... [  4%] chapter_appendix/../img/git-fork.png
+copying images... [  5%] chapter_appendix/../img/git-forked.png
+copying images... [  5%] chapter_appendix/../img/git-clone.png
+copying images... [  5%] chapter_appendix/../img/git-newpr.png
+copying images... [  6%] chapter_appendix/../img/git-createpr.png
+copying images... [  6%] chapter_appendix/../img/qr_how-to-contribute.svg
+copying images... [  6%] chapter_appendix/../img/jupyter00.png
+copying images... [  6%] chapter_appendix/../img/jupyter01.png
+copying images... [  7%] chapter_appendix/../img/jupyter02.png
+copying images... [  7%] chapter_appendix/../img/jupyter03.png
+copying images... [  7%] chapter_appendix/../img/jupyter04.png
+copying images... [  8%] chapter_appendix/../img/jupyter05.png
+copying images... [  8%] chapter_appendix/../img/jupyter06.png
+copying images... [  8%] chapter_appendix/../img/qr_jupyter.svg
+copying images... [  8%] chapter_appendix/../img/intersect.svg
+copying images... [  9%] chapter_appendix/../img/qr_math.svg
+copying images... [  9%] chapter_attention-mechanism/../img/attention.svg
+copying images... [  9%] chapter_attention-mechanism/../img/seq2seq_attention.svg
+copying images... [ 10%] chapter_attention-mechanism/../img/seq2seq-attention-details.svg
+copying images... [ 10%] chapter_attention-mechanism/../img/self-attention.svg
+copying images... [ 10%] chapter_attention-mechanism/../img/transformer.svg
+copying images... [ 10%] chapter_attention-mechanism/../img/multi-head-attention.svg
+copying images... [ 11%] chapter_attention-mechanism/transformer/output_21_0.svg
+copying images... [ 11%] chapter_attention-mechanism/../img/self-attention-predict.svg
+copying images... [ 11%] chapter_computational-performance/../img/qr_async-computation.svg
+copying images... [ 12%] chapter_computational-performance/../img/qr_auto-parallelism.svg
+copying images... [ 12%] chapter_computational-performance/../img/qr_hybridize.svg
+copying images... [ 12%] chapter_computational-performance/../img/data-parallel.svg
+copying images... [ 12%] chapter_computational-performance/../img/qr_multiple-gpus.svg
+copying images... [ 13%] chapter_computational-performance/../img/qr_multiple-gpus-gluon.svg
+copying images... [ 13%] chapter_computer-vision/anchor/output_9_0.svg
+copying images... [ 13%] chapter_computer-vision/../img/iou.svg
+copying images... [ 14%] chapter_computer-vision/../img/anchor-label.svg
+copying images... [ 14%] chapter_computer-vision/anchor/output_11_0.svg
+copying images... [ 14%] chapter_computer-vision/anchor/output_23_0.svg
+copying images... [ 14%] chapter_computer-vision/anchor/output_27_0.svg
+copying images... [ 15%] chapter_computer-vision/../img/qr_anchor.svg
+copying images... [ 15%] chapter_computer-vision/bounding-box/output_3_0.svg
+copying images... [ 15%] chapter_computer-vision/bounding-box/output_9_0.svg
+copying images... [ 16%] chapter_computer-vision/../img/qr_bounding-box.svg
+copying images... [ 16%] chapter_computer-vision/../img/fcn.svg
+copying images... [ 16%] chapter_computer-vision/fcn/output_25_1.svg
+copying images... [ 16%] chapter_computer-vision/fcn/output_37_0.svg
+copying images... [ 17%] chapter_computer-vision/../img/qr_fcn.svg
+copying images... [ 17%] chapter_computer-vision/../img/finetune.svg
+copying images... [ 17%] chapter_computer-vision/fine-tuning/output_7_0.png
+copying images... [ 18%] chapter_computer-vision/../img/qr_fine-tuning.svg
+copying images... [ 18%] chapter_computer-vision/image-augmentation/output_3_1.svg
+copying images... [ 18%] chapter_computer-vision/image-augmentation/output_9_0.svg
+copying images... [ 18%] chapter_computer-vision/image-augmentation/output_11_0.svg
+copying images... [ 19%] chapter_computer-vision/image-augmentation/output_13_0.svg
+copying images... [ 19%] chapter_computer-vision/image-augmentation/output_15_0.svg
+copying images... [ 19%] chapter_computer-vision/image-augmentation/output_17_0.svg
+copying images... [ 20%] chapter_computer-vision/image-augmentation/output_19_0.svg
+copying images... [ 20%] chapter_computer-vision/image-augmentation/output_21_0.svg
+copying images... [ 20%] chapter_computer-vision/image-augmentation/output_23_1.svg
+copying images... [ 20%] chapter_computer-vision/../img/qr_image-augmentation.svg
+copying images... [ 21%] chapter_computer-vision/../img/kaggle_cifar10.png
+copying images... [ 21%] chapter_computer-vision/../img/qr_kaggle-gluon-cifar10.svg
+copying images... [ 21%] chapter_computer-vision/../img/kaggle-dog.png
+copying images... [ 22%] chapter_computer-vision/../img/qr_kaggle-gluon-dog.svg
+copying images... [ 22%] chapter_computer-vision/multiscale-object-detection/output_5_0.svg
+copying images... [ 22%] chapter_computer-vision/multiscale-object-detection/output_7_0.svg
+copying images... [ 22%] chapter_computer-vision/multiscale-object-detection/output_9_0.svg
+copying images... [ 23%] chapter_computer-vision/../img/qr_multiscale-object-detection.svg
+copying images... [ 23%] chapter_computer-vision/../img/style-transfer.svg
+copying images... [ 23%] chapter_computer-vision/../img/neural-style.svg
+copying images... [ 24%] chapter_computer-vision/neural-style/output_1_0.svg
+copying images... [ 24%] chapter_computer-vision/neural-style/output_2_0.svg
+copying images... [ 24%] chapter_computer-vision/../img/neural-style-1.png
+copying images... [ 24%] chapter_computer-vision/../img/neural-style-2.png
+copying images... [ 25%] chapter_computer-vision/../img/qr_neural-style.svg
+copying images... [ 25%] chapter_computer-vision/object-detection-dataset/output_7_0.png
+copying images... [ 25%] chapter_computer-vision/../img/qr_object-detection-dataset.svg
+copying images... [ 26%] chapter_computer-vision/../img/r-cnn.svg
+copying images... [ 26%] chapter_computer-vision/../img/fast-rcnn.svg
+copying images... [ 26%] chapter_computer-vision/../img/roi.svg
+copying images... [ 26%] chapter_computer-vision/../img/faster-rcnn.svg
+copying images... [ 27%] chapter_computer-vision/../img/mask-rcnn.svg
+copying images... [ 27%] chapter_computer-vision/../img/qr_rcnn.svg
+copying images... [ 27%] chapter_computer-vision/../img/segmentation.svg
+copying images... [ 28%] chapter_computer-vision/semantic-segmentation-and-dataset/output_7_0.png
+copying images... [ 28%] chapter_computer-vision/semantic-segmentation-and-dataset/output_15_0.png
+copying images... [ 28%] chapter_computer-vision/../img/qr_semantic-segmentation-and-dataset.svg
+copying images... [ 28%] chapter_computer-vision/../img/ssd.svg
+copying images... [ 29%] chapter_computer-vision/ssd/output_41_0.svg
+copying images... [ 29%] chapter_computer-vision/ssd/output_43_0.svg
+copying images... [ 29%] chapter_computer-vision/ssd/output_45_0.svg
+copying images... [ 30%] chapter_computer-vision/../img/qr_ssd.svg
+copying images... [ 30%] chapter_convolutional-modern/../img/filters.png
+copying images... [ 30%] chapter_convolutional-modern/../img/alexnet-all.svg
+copying images... [ 30%] chapter_convolutional-modern/../img/qr_alexnet.svg
+copying images... [ 31%] chapter_convolutional-modern/../img/qr_batch-norm.svg
+copying images... [ 31%] chapter_convolutional-modern/../img/densenet.svg
+copying images... [ 31%] chapter_convolutional-modern/../img/DenseNetDense.svg
+copying images... [ 32%] chapter_convolutional-modern/../img/qr_densenet.svg
+copying images... [ 32%] chapter_convolutional-modern/../img/inception.svg
+copying images... [ 32%] chapter_convolutional-modern/../img/inception-full.svg
+copying images... [ 32%] chapter_convolutional-modern/../img/qr_googlenet.svg
+copying images... [ 33%] chapter_convolutional-modern/../img/nin-compare.svg
+copying images... [ 33%] chapter_convolutional-modern/../img/qr_nin.svg
+copying images... [ 33%] chapter_convolutional-modern/../img/functionclasses.svg
+copying images... [ 34%] chapter_convolutional-modern/../img/residual-block.svg
+copying images... [ 34%] chapter_convolutional-modern/../img/ResNetBlock.svg
+copying images... [ 34%] chapter_convolutional-modern/../img/ResNetFull.svg
+copying images... [ 34%] chapter_convolutional-modern/../img/qr_resnet.svg
+copying images... [ 35%] chapter_convolutional-modern/../img/vgg.svg
+copying images... [ 35%] chapter_convolutional-modern/../img/qr_vgg.svg
+copying images... [ 35%] chapter_convolutional-neural-networks/../img/conv_multi_in.svg
+copying images... [ 36%] chapter_convolutional-neural-networks/../img/conv_1x1.svg
+copying images... [ 36%] chapter_convolutional-neural-networks/../img/qr_channels.svg
+copying images... [ 36%] chapter_convolutional-neural-networks/../img/correlation.svg
+copying images... [ 36%] chapter_convolutional-neural-networks/../img/qr_conv-layer.svg
+copying images... [ 37%] chapter_convolutional-neural-networks/../img/lenet.svg
+copying images... [ 37%] chapter_convolutional-neural-networks/../img/lenet-vert.svg
+copying images... [ 37%] chapter_convolutional-neural-networks/../img/qr_lenet.svg
+copying images... [ 38%] chapter_convolutional-neural-networks/../img/conv_pad.svg
+copying images... [ 38%] chapter_convolutional-neural-networks/../img/conv_stride.svg
+copying images... [ 38%] chapter_convolutional-neural-networks/../img/qr_padding-and-strides.svg
+copying images... [ 38%] chapter_convolutional-neural-networks/../img/pooling.svg
+copying images... [ 39%] chapter_convolutional-neural-networks/../img/qr_pooling.svg
+copying images... [ 39%] chapter_convolutional-neural-networks/../img/where-wally-walker-books.jpg
+copying images... [ 39%] chapter_convolutional-neural-networks/../img/waldo-mask.jpg
+copying images... [ 40%] chapter_convolutional-neural-networks/../img/qr_why-conv.svg
+copying images... [ 40%] chapter_crashcourse/../img/qr_autograd.svg
+copying images... [ 40%] chapter_crashcourse/../img/qr_linear-algebra.svg
+copying images... [ 40%] chapter_crashcourse/../img/qr_lookup-api.svg
+copying images... [ 41%] chapter_crashcourse/naive-bayes/output_4_0.svg
+copying images... [ 41%] chapter_crashcourse/naive-bayes/output_8_0.svg
+copying images... [ 41%] chapter_crashcourse/../img/qr_naive-bayes.svg
+copying images... [ 42%] chapter_crashcourse/../img/qr_ndarray.svg
+copying images... [ 42%] chapter_crashcourse/../img/qr_probability.svg
+copying images... [ 42%] chapter_crashcourse/../img/whitecat20.jpg
+copying images... [ 42%] chapter_crashcourse/../img/whitecat40.jpg
+copying images... [ 43%] chapter_crashcourse/../img/whitecat80.jpg
+copying images... [ 43%] chapter_crashcourse/../img/whitecat160.jpg
+copying images... [ 43%] chapter_crashcourse/../img/whitedog10.jpg
+copying images... [ 44%] chapter_crashcourse/../img/whitedog20.jpg
+copying images... [ 44%] chapter_crashcourse/../img/whitedog40.jpg
+copying images... [ 44%] chapter_crashcourse/../img/whitedog80.jpg
+copying images... [ 44%] chapter_crashcourse/../img/whitedog160.jpg
+copying images... [ 45%] chapter_crashcourse/probability/output_15_0.svg
+copying images... [ 45%] chapter_crashcourse/probability/output_21_0.svg
+copying images... [ 45%] chapter_crashcourse/probability/output_23_0.svg
+copying images... [ 46%] chapter_crashcourse/probability/output_25_0.svg
+copying images... [ 46%] chapter_crashcourse/probability/output_27_1.svg
+copying images... [ 46%] chapter_deep-learning-computation/../img/qr_custom-layer.svg
+copying images... [ 46%] chapter_deep-learning-computation/../img/qr_deferred-init.svg
+copying images... [ 47%] chapter_deep-learning-computation/../img/blocks.svg
+copying images... [ 47%] chapter_deep-learning-computation/../img/qr_model-construction.svg
+copying images... [ 47%] chapter_deep-learning-computation/../img/qr_parameters.svg
+copying images... [ 48%] chapter_deep-learning-computation/../img/qr_read-write.svg
+copying images... [ 48%] chapter_deep-learning-computation/../img/copyto.svg
+copying images... [ 48%] chapter_deep-learning-computation/../img/qr_use-gpu.svg
+copying images... [ 48%] chapter_install/../img/qr_install.svg
+copying images... [ 49%] chapter_introduction/../img/wake-word.svg
+copying images... [ 49%] chapter_introduction/../img/ml-loop.svg
+copying images... [ 49%] chapter_introduction/../img/cat1.png
+copying images... [ 50%] chapter_introduction/../img/cat2.jpg
+copying images... [ 50%] chapter_introduction/../img/dog1.jpg
+copying images... [ 50%] chapter_introduction/../img/dog2.jpg
+copying images... [ 51%] chapter_introduction/../img/supervised-learning.svg
+copying images... [ 51%] chapter_introduction/../img/death_cap.jpg
+copying images... [ 51%] chapter_introduction/../img/sharks.png
+copying images... [ 51%] chapter_introduction/../img/stackedanimals.jpg
+copying images... [ 52%] chapter_introduction/../img/deeplearning_amazon.png
+copying images... [ 52%] chapter_introduction/../img/speech.png
+copying images... [ 52%] chapter_introduction/../img/data-collection.svg
+copying images... [ 53%] chapter_introduction/../img/rl-environment.svg
+copying images... [ 53%] chapter_introduction/../img/koebel.jpg
+copying images... [ 53%] chapter_introduction/../img/qr_intro.svg
+copying images... [ 53%] chapter_linear-networks/fashion-mnist/output_17_0.svg
+copying images... [ 54%] chapter_linear-networks/../img/qr_fashion-mnist.svg
+copying images... [ 54%] chapter_linear-networks/../img/linearregression.svg
+copying images... [ 54%] chapter_linear-networks/../img/singleneuron.svg
+copying images... [ 55%] chapter_linear-networks/../img/Neuron.svg
+copying images... [ 55%] chapter_linear-networks/linear-regression/output_7_0.svg
+copying images... [ 55%] chapter_linear-networks/../img/qr_linear-regression.svg
+copying images... [ 55%] chapter_linear-networks/../img/qr_linear-regression-gluon.svg
+copying images... [ 56%] chapter_linear-networks/linear-regression-scratch/output_7_0.svg
+copying images... [ 56%] chapter_linear-networks/../img/qr_linear-regression-scratch.svg
+copying images... [ 56%] chapter_linear-networks/../img/softmaxreg.svg
+copying images... [ 57%] chapter_linear-networks/../img/qr_softmax-regression.svg
+copying images... [ 57%] chapter_linear-networks/../img/qr_softmax-regression-gluon.svg
+copying images... [ 57%] chapter_linear-networks/softmax-regression-scratch/output_31_0.svg
+copying images... [ 57%] chapter_linear-networks/../img/qr_softmax-regression-scratch.svg
+copying images... [ 58%] chapter_multilayer-perceptrons/../img/forward.svg
+copying images... [ 58%] chapter_multilayer-perceptrons/../img/qr_backprop.svg
+copying images... [ 58%] chapter_multilayer-perceptrons/../img/dropout2.svg
+copying images... [ 59%] chapter_multilayer-perceptrons/../img/qr_dropout.svg
+copying images... [ 59%] chapter_multilayer-perceptrons/../img/cat3.jpg
+copying images... [ 59%] chapter_multilayer-perceptrons/../img/cat2.jpg
+copying images... [ 59%] chapter_multilayer-perceptrons/../img/dog1.jpg
+copying images... [ 60%] chapter_multilayer-perceptrons/../img/dog2.jpg
+copying images... [ 60%] chapter_multilayer-perceptrons/../img/cat-cartoon1.png
+copying images... [ 60%] chapter_multilayer-perceptrons/../img/cat-cartoon2.png
+copying images... [ 61%] chapter_multilayer-perceptrons/../img/dog-cartoon1.png
+copying images... [ 61%] chapter_multilayer-perceptrons/../img/dog-cartoon2.png
+copying images... [ 61%] chapter_multilayer-perceptrons/../img/popvssoda.png
+copying images... [ 61%] chapter_multilayer-perceptrons/../img/qr_environment.svg
+copying images... [ 62%] chapter_multilayer-perceptrons/../img/kaggle.png
+copying images... [ 62%] chapter_multilayer-perceptrons/../img/house_pricing.png
+copying images... [ 62%] chapter_multilayer-perceptrons/kaggle-house-price/output_27_0.svg
+copying images... [ 63%] chapter_multilayer-perceptrons/kaggle-house-price/output_31_0.svg
+copying images... [ 63%] chapter_multilayer-perceptrons/../img/kaggle_submit2.png
+copying images... [ 63%] chapter_multilayer-perceptrons/../img/qr_kaggle-house-price.svg
+copying images... [ 63%] chapter_multilayer-perceptrons/../img/singlelayer.svg
+copying images... [ 64%] chapter_multilayer-perceptrons/../img/mlp.svg
+copying images... [ 64%] chapter_multilayer-perceptrons/mlp/output_3_0.svg
+copying images... [ 64%] chapter_multilayer-perceptrons/mlp/output_5_0.svg
+copying images... [ 65%] chapter_multilayer-perceptrons/mlp/output_7_0.svg
+copying images... [ 65%] chapter_multilayer-perceptrons/mlp/output_9_0.svg
+copying images... [ 65%] chapter_multilayer-perceptrons/mlp/output_11_0.svg
+copying images... [ 65%] chapter_multilayer-perceptrons/mlp/output_13_0.svg
+copying images... [ 66%] chapter_multilayer-perceptrons/../img/qr_mlp.svg
+copying images... [ 66%] chapter_multilayer-perceptrons/../img/qr_mlp-gluon.svg
+copying images... [ 66%] chapter_multilayer-perceptrons/mlp-scratch/output_15_0.svg
+copying images... [ 67%] chapter_multilayer-perceptrons/../img/qr_mlp-scratch.svg
+copying images... [ 67%] chapter_multilayer-perceptrons/numerical-stability-and-init/output_1_0.png
+copying images... [ 67%] chapter_multilayer-perceptrons/../img/qr_numerical-stability-and-init.svg
+copying images... [ 67%] chapter_multilayer-perceptrons/../img/capacity_vs_error.svg
+copying images... [ 68%] chapter_multilayer-perceptrons/underfit-overfit/output_11_1.svg
+copying images... [ 68%] chapter_multilayer-perceptrons/underfit-overfit/output_13_1.svg
+copying images... [ 68%] chapter_multilayer-perceptrons/underfit-overfit/output_15_1.svg
+copying images... [ 69%] chapter_multilayer-perceptrons/../img/qr_underfit-overfit.svg
+copying images... [ 69%] chapter_multilayer-perceptrons/weight-decay/output_9_0.svg
+copying images... [ 69%] chapter_multilayer-perceptrons/weight-decay/output_11_0.svg
+copying images... [ 69%] chapter_multilayer-perceptrons/weight-decay/output_15_0.svg
+copying images... [ 70%] chapter_multilayer-perceptrons/weight-decay/output_16_0.svg
+copying images... [ 70%] chapter_multilayer-perceptrons/../img/qr_weight-decay.svg
+copying images... [ 70%] chapter_natural-language-processing/../img/hi-softmax.svg
+copying images... [ 71%] chapter_natural-language-processing/../img/qr_approx-training.svg
+copying images... [ 71%] chapter_natural-language-processing/../img/qr_fasttext.svg
+copying images... [ 71%] chapter_natural-language-processing/../img/qr_glove.svg
+copying images... [ 71%] chapter_natural-language-processing/../img/conv1d.svg
+copying images... [ 72%] chapter_natural-language-processing/../img/conv1d-channel.svg
+copying images... [ 72%] chapter_natural-language-processing/../img/conv1d-2d.svg
+copying images... [ 72%] chapter_natural-language-processing/../img/textcnn.svg
+copying images... [ 73%] chapter_natural-language-processing/../img/qr_sentiment-analysis-cnn.svg
+copying images... [ 73%] chapter_natural-language-processing/../img/qr_sentiment-analysis-rnn.svg
+copying images... [ 73%] chapter_natural-language-processing/../img/qr_similarity-analogy.svg
+copying images... [ 73%] chapter_natural-language-processing/../img/skip-gram.svg
+copying images... [ 74%] chapter_natural-language-processing/../img/cbow.svg
+copying images... [ 74%] chapter_natural-language-processing/../img/qr_word2vec.svg
+copying images... [ 74%] chapter_natural-language-processing/word2vec-gluon/output_9_0.svg
+copying images... [ 75%] chapter_natural-language-processing/../img/qr_word2vec-gluon.svg
+copying images... [ 75%] chapter_optimization/adadelta/output_3_1.svg
+copying images... [ 75%] chapter_optimization/adadelta/output_5_1.svg
+copying images... [ 75%] chapter_optimization/../img/qr_adadelta.svg
+copying images... [ 76%] chapter_optimization/adagrad/output_1_1.svg
+copying images... [ 76%] chapter_optimization/adagrad/output_3_1.svg
+copying images... [ 76%] chapter_optimization/adagrad/output_7_1.svg
+copying images... [ 77%] chapter_optimization/adagrad/output_9_1.svg
+copying images... [ 77%] chapter_optimization/../img/qr_adagrad.svg
+copying images... [ 77%] chapter_optimization/adam/output_3_1.svg
+copying images... [ 77%] chapter_optimization/adam/output_5_1.svg
+copying images... [ 78%] chapter_optimization/../img/qr_adam.svg
+copying images... [ 78%] chapter_optimization/gd-sgd/output_5_0.svg
+copying images... [ 78%] chapter_optimization/gd-sgd/output_7_1.svg
+copying images... [ 79%] chapter_optimization/gd-sgd/output_9_1.svg
+copying images... [ 79%] chapter_optimization/gd-sgd/output_13_1.svg
+copying images... [ 79%] chapter_optimization/gd-sgd/output_15_1.svg
+copying images... [ 79%] chapter_optimization/../img/qr_gd-sgd.svg
+copying images... [ 80%] chapter_optimization/minibatch-sgd/output_8_1.svg
+copying images... [ 80%] chapter_optimization/minibatch-sgd/output_10_1.svg
+copying images... [ 80%] chapter_optimization/minibatch-sgd/output_12_1.svg
+copying images... [ 81%] chapter_optimization/minibatch-sgd/output_14_1.svg
+copying images... [ 81%] chapter_optimization/minibatch-sgd/output_16_0.svg
+copying images... [ 81%] chapter_optimization/minibatch-sgd/output_20_1.svg
+copying images... [ 81%] chapter_optimization/../img/qr_minibatch-sgd.svg
+copying images... [ 82%] chapter_optimization/momentum/output_1_1.svg
+copying images... [ 82%] chapter_optimization/momentum/output_3_1.svg
+copying images... [ 82%] chapter_optimization/momentum/output_5_1.svg
+copying images... [ 83%] chapter_optimization/momentum/output_7_1.svg
+copying images... [ 83%] chapter_optimization/momentum/output_11_1.svg
+copying images... [ 83%] chapter_optimization/momentum/output_13_1.svg
+copying images... [ 83%] chapter_optimization/momentum/output_15_1.svg
+copying images... [ 84%] chapter_optimization/momentum/output_17_1.svg
+copying images... [ 84%] chapter_optimization/../img/qr_momentum.svg
+copying images... [ 84%] chapter_optimization/optimization-intro/output_3_0.svg
+copying images... [ 85%] chapter_optimization/optimization-intro/output_5_0.svg
+copying images... [ 85%] chapter_optimization/optimization-intro/output_7_0.svg
+copying images... [ 85%] chapter_optimization/optimization-intro/output_9_0.svg
+copying images... [ 85%] chapter_optimization/optimization-intro/output_11_0.svg
+copying images... [ 86%] chapter_optimization/../img/qr_optimization-intro.svg
+copying images... [ 86%] chapter_optimization/rmsprop/output_1_1.svg
+copying images... [ 86%] chapter_optimization/rmsprop/output_5_1.svg
+copying images... [ 87%] chapter_optimization/rmsprop/output_7_1.svg
+copying images... [ 87%] chapter_optimization/../img/qr_rmsprop.svg
+copying images... [ 87%] chapter_preface/../img/book-org.svg
+copying images... [ 87%] chapter_preface/../img/qr_preface.svg
+copying images... [ 88%] chapter_recurrent-neural-networks/../img/s2s_prob1.svg
+copying images... [ 88%] chapter_recurrent-neural-networks/../img/s2s_prob2.svg
+copying images... [ 88%] chapter_recurrent-neural-networks/../img/beam_search.svg
+copying images... [ 89%] chapter_recurrent-neural-networks/../img/qr_beam-search.svg
+copying images... [ 89%] chapter_recurrent-neural-networks/../img/hmm.svg
+copying images... [ 89%] chapter_recurrent-neural-networks/../img/birnn.svg
+copying images... [ 89%] chapter_recurrent-neural-networks/../img/qr_bi-rnn.svg
+copying images... [ 90%] chapter_recurrent-neural-networks/../img/truncated-bptt.svg
+copying images... [ 90%] chapter_recurrent-neural-networks/../img/rnn-bptt.svg
+copying images... [ 90%] chapter_recurrent-neural-networks/../img/qr_bptt.svg
+copying images... [ 91%] chapter_recurrent-neural-networks/../img/deep-rnn.svg
+copying images... [ 91%] chapter_recurrent-neural-networks/../img/qr_deep-rnn.svg
+copying images... [ 91%] chapter_recurrent-neural-networks/../img/encoder-decoder.svg
+copying images... [ 91%] chapter_recurrent-neural-networks/../img/gru_1.svg
+copying images... [ 92%] chapter_recurrent-neural-networks/../img/gru_2.svg
+copying images... [ 92%] chapter_recurrent-neural-networks/../img/gru_3.svg
+copying images... [ 92%] chapter_recurrent-neural-networks/../img/qr_gru.svg
+copying images... [ 93%] chapter_recurrent-neural-networks/lang-model/output_5_0.svg
+copying images... [ 93%] chapter_recurrent-neural-networks/lang-model/output_9_0.svg
+copying images... [ 93%] chapter_recurrent-neural-networks/../img/qr_lang-model.svg
+copying images... [ 93%] chapter_recurrent-neural-networks/../img/timemachine-5gram.svg
+copying images... [ 94%] chapter_recurrent-neural-networks/../img/qr_lang-model-dataset.svg
+copying images... [ 94%] chapter_recurrent-neural-networks/../img/lstm_0.svg
+copying images... [ 94%] chapter_recurrent-neural-networks/../img/lstm_1.svg
+copying images... [ 95%] chapter_recurrent-neural-networks/../img/lstm_2.svg
+copying images... [ 95%] chapter_recurrent-neural-networks/../img/lstm_3.svg
+copying images... [ 95%] chapter_recurrent-neural-networks/../img/qr_lstm.svg
+copying images... [ 95%] chapter_recurrent-neural-networks/machine-translation/output_9_0.svg
+copying images... [ 96%] chapter_recurrent-neural-networks/../img/rnn.svg
+copying images... [ 96%] chapter_recurrent-neural-networks/../img/rnn-train.svg
+copying images... [ 96%] chapter_recurrent-neural-networks/../img/qr_rnn.svg
+copying images... [ 97%] chapter_recurrent-neural-networks/../img/qr_rnn-gluon.svg
+copying images... [ 97%] chapter_recurrent-neural-networks/../img/qr_rnn-scratch.svg
+copying images... [ 97%] chapter_recurrent-neural-networks/../img/seq2seq.svg
+copying images... [ 97%] chapter_recurrent-neural-networks/../img/seq2seq-details.svg
+copying images... [ 98%] chapter_recurrent-neural-networks/../img/seq2seq_predict.svg
+copying images... [ 98%] chapter_recurrent-neural-networks/../img/ftse100.png
+copying images... [ 98%] chapter_recurrent-neural-networks/sequence/output_1_0.svg
+copying images... [ 99%] chapter_recurrent-neural-networks/sequence/output_7_0.svg
+copying images... [ 99%] chapter_recurrent-neural-networks/sequence/output_9_0.svg
+copying images... [ 99%] chapter_recurrent-neural-networks/sequence/output_11_0.svg
+copying images... [100%] chapter_recurrent-neural-networks/../img/qr_sequence.svg
+
+copying static files... done
+copying extra files... done
+dumping search index in English (code: en) ... done
+dumping object inventory... done
+build succeeded, 41 warnings.
+
+The HTML pages are in _build/html.
+~/d2l-en $

@@ -1,6 +1,6 @@
 # Beam Search
 
-In the previous section, we discussed how to train an encoder-decoder with input and output sequences that are both of variable length. In this section, we are going to introduce how to use the encoder-decoder to predict sequences of variable length.
+In :numref:`chapter_seq2seq`, we discussed how to train an encoder-decoder with input and output sequences that are both of variable length. In this section, we are going to introduce how to use the encoder-decoder to predict sequences of variable length.
 
 As in the previous section, when preparing to train the data set, we normally attach a special symbol "&lt;eos&gt;" after each sentence to indicate the termination of the sequence. We will continue to use this mathematical symbol in the discussion below. For ease of discussion, we assume that the output of the decoder is a sequence of text. Let the size of output text dictionary $\mathcal{Y}$ (contains special symbol "&lt;eos&gt;") be $\left|\mathcal{Y}\right|$, and the maximum length of the output sequence be $T'$. There are a total $\mathcal{O}(\left|\mathcal{Y}\right|^{T'})$ types of possible output sequences. All the subsequences after the special symbol "&lt;eos&gt;" in these output sequences will be discarded.
 
@@ -57,7 +57,7 @@ Here, $L$ is the length of the final candidate sequence and the selection for $\
 ## Exercises
 
 * Can we treat an exhaustive search as a beam search with a special beam size? Why?
-* We used language models to create lyrics in the ["Implementation of the Recurrent Neural Network from Scratch"](../chapter_recurrent-neural-networks/rnn-scratch.md) section. Which kind of search does this output use? Can you improve it?
+* We used language models to generate sentences in :numref:`chapter_rnn_scratch`. Which kind of search does this output use? Can you improve it?
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2394)
 

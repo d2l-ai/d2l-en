@@ -1,4 +1,5 @@
 # Recurrent Neural Networks
+:label:`chapter_rnn`
 
 So far we encountered two types of data: generic vectors and
 images. For the latter we designed specialized layers to take
@@ -42,23 +43,22 @@ that may be encountered in recurrent neural network training. For some
 of these problems, we can use gated recurrent neural networks, such as
 LSTMs and GRUs, described later in this chapter.
 
-```eval_rst
+```toc
+:maxdepth: 2
 
-.. toctree::
-   :maxdepth: 2
-
-   sequence
-   lang-model
-   rnn
-   lang-model-dataset
-   rnn-scratch
-   rnn-gluon
-   bptt
-   gru
-   lstm
-   deep-rnn
-   bi-rnn
-   machine-translation
-   encoder-decoder
-   seq2seq
+sequence
+lang-model
+rnn
+lang-model-dataset
+rnn-scratch
+rnn-gluon
+bptt
+gru
+lstm
+deep-rnn
+bi-rnn
+machine-translation
+encoder-decoder
+seq2seq
+beam-search
 ```

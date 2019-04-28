@@ -1,10 +1,11 @@
-#  Sequence to Sequence 
+#  Sequence to Sequence
+:label:`chapter_seq2seq`
 
 The sequence to sequence (seq2seq) model is based on the encoder-decoder architecture to generate a sequence output for a sequence input. Both the encoder and the decoder use recurrent neural networks to handle sequence inputs. The hidden state of the encoder is used directly to initialize the decoder hidden state to pass information from the encoder to the decoder.
 
 ![The sequence to sequence model architecture.](../img/seq2seq.svg)
 
-The layers in the encoder and the decoder are illustrated in the following figure. 
+The layers in the encoder and the decoder are illustrated in the following figure.
 
 ![](../img/seq2seq-details.svg)
 
@@ -159,7 +160,7 @@ def train_ch7(model, data_iter, lr, num_epochs, ctx):  # Saved in d2l
             print("epoch %d, loss %.3f, time %.1f sec" % (
                 epoch, l_sum/num_tokens_sum, time.time()-tic))
             tic = time.time()
-            
+
 ```
 
 Next, we create a model instance and set hyper-parameters. Then, we can train the model.
@@ -181,12 +182,12 @@ train_ch7(model, train_iter, lr, num_epochs, ctx)
 
 ## Predicting
 
-We introduced three methods to generate the output of the decoder at each time step in the ["Beam Search"](beam-search.md) section. Here we implement the simplest method, greedy search.
-
+Here we implement the simplest method, greedy search, to generate an output
+sequence.
+During predicting, we feed the same "&lt;bos&gt;" token to the decoder as training at time step 0. But the input token for a later time step is the predicted token from the previous time step.
 
 ![Sequence to sequence model predicting with greedy search](../img/seq2seq_predict.svg)
 
-During predicting, we feed the same "&lt;bos&gt;" token to the decoder as training at time step 0. But the input token for a later time step is the predicted token from the previous time step.
 
 ```{.python .input  n=15}
 def translate_ch7(model, src_sentence, src_vocab, tgt_vocab, max_len, ctx):
@@ -203,7 +204,7 @@ def translate_ch7(model, src_sentence, src_vocab, tgt_vocab, max_len, ctx):
     predict_tokens = []
     for _ in range(max_len):
         Y, dec_state = model.decoder(dec_X, dec_state)
-        # The token with highest score is used as the next time step input. 
+        # The token with highest score is used as the next time step input.
         dec_X = Y.argmax(axis=2)
         py = dec_X.squeeze(axis=0).astype('int32').asscalar()
         if py == tgt_vocab.eos:
