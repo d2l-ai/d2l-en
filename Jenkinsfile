@@ -33,6 +33,7 @@ stage("Build and Publish") {
       sh '''set -ex
       conda activate d2l-en-build
       # don't pack downloaded data into the pkg
+      rm -rf _build/eval/*.zip
       mv _build/eval/data _build/data_tmp
       cp -r data _build/eval
       d2lbook build html pkg
