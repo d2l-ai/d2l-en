@@ -2,19 +2,30 @@ stage("Build and Publish") {
   node {
     ws('workspace/d2l-en') {
       checkout scm
-      sh "git submodule update --init"
-      sh "build/utils/sanity_check.sh"
-      sh "build/utils/clean_build.sh"
-      sh "conda env update -f build/env.yml"
-      sh "build/utils/build_html.sh en"
-      sh "build/utils/build_pdf.sh en"
-      sh "build/utils/build_pkg.sh en"
+      echo "Setup environment"
+      sh '''set -ex
+      conda remove -n d2l-en-build --all -y
+      conda create -n d2l-en-build pip -y
+      conda activate d2l-en-build
+      pip install mxnet-cu100
+      pip install d2lbook>=0.1.5 d2l>=0.9.1
+      '''
+      echo "Execute notebooks"
+      sh '''set -ex
+      conda activate d2l-en-build
+      d2lbook build eval
+      '''
+      echo "Build HTML/PDF/Pakage"
+      sh '''set -ex
+      conda activate d2l-en-build
+      d2lbook build html pdf pkg
+      '''
       if (env.BRANCH_NAME == 'master') {
-        sh "build/utils/publish_website.sh en"
-        withCredentials([usernamePassword(credentialsId: 'ea9ac23b-cc0d-4d2c-a080-67d829e1415a',
-                         passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-          sh "build/publish_notebook.sh"
-        }
+        echo "Publish"
+        sh '''set -ex
+        conda activate d2l-en-build
+        d2lbook deploy html pdf pkg
+      '''
       }
 	}
   }

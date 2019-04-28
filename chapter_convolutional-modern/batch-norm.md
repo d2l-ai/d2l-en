@@ -1,4 +1,5 @@
 # Batch Normalization
+:label:`chapter_batch_norm`
 
 Training very deep models is difficult and it can be tricky to get the models to converge (or converge within a reasonable amount of time) when training. It can be equally challenging to ensure that they do not overfit. This is one of the reasons why it took a long time for very deep networks with over 100 layers to gain popularity.
 
@@ -130,7 +131,7 @@ class BatchNorm(nn.Block):
 
 ## Use a Batch Normalization LeNet
 
-Next, we will modify the [LeNet model](lenet.md) in order to apply the batch normalization layer. We add the batch normalization layer after all the convolutional layers and after all fully connected layers. As discussed, we add it  before the activation layer.
+Next, we will modify the LeNet model (:numref:`chapter_lenet`) in order to apply the batch normalization layer. We add the batch normalization layer after all the convolutional layers and after all fully connected layers. As discussed, we add it  before the activation layer.
 
 ```{.python .input  n=74}
 net = nn.Sequential()

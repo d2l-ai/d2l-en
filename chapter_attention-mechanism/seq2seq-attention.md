@@ -1,10 +1,17 @@
 # Sequence to Sequence with Attention Mechanism
 
-In this section, we add the attention mechanism to the sequence to sequence model introduced in the ["Sequence to Sequence"](../chapter_recurrent-neural-networks/seq2seq.md) section to explicitly select state. The following figure shows the model architecture for a decoding time step. As can be seen, the memory of the attention layer consists of the encoder outputs of each time step. During decoding, the decoder output from the previous time step is used as the query, the attention output is then fed into the decoder with the input to provide attentional context information. 
+In this section, we add the attention mechanism to the sequence to sequence
+model introduced in :numref:`chapter_seq2seq`
+to explicitly select state. The following figure shows the model
+architecture for a decoding time step. As can be seen, the memory of the
+attention layer consists of the encoder outputs of each time step. During
+decoding, the decoder output from the previous time step is used as the query,
+the attention output is then fed into the decoder with the input to provide
+attentional context information.
 
 ![The second time step in decoding for the sequence to sequence model with attention mechanism.](../img/seq2seq_attention.svg)
 
-The layer structure in the encoder and the decoder is shown in the following figure. 
+The layer structure in the encoder and the decoder is shown in the following figure.
 
 ![](../img/seq2seq-attention-details.svg)
 
@@ -19,10 +26,10 @@ import d2l
 
 ## Decoder
 
-Now let's implement the decoder of this model. We add a MLP attention layer which has the same hidden size as the LSTM layer. The state passed from the encoder to the decoder contains three items: 
+Now let's implement the decoder of this model. We add a MLP attention layer which has the same hidden size as the LSTM layer. The state passed from the encoder to the decoder contains three items:
 - the encoder outputs of all time steps, which are used as the attention layer's memory with identical keys and values
 - the hidden state of the last time step that is used to initialize the encoder's hidden state
-- valid lengths of the decoder inputs so the attention layer will not consider encoder outputs for padding tokens. 
+- valid lengths of the decoder inputs so the attention layer will not consider encoder outputs for padding tokens.
 
 In each time step of decoding, we use the output of the last RNN layer as the query for the attention layer. Its output is then concatenated with the input embedding vector to feed into the RNN layer. Despite the RNN layer hidden state also contains history information from decoder, the attention output explicitly selects the encoder outputs that are correlated to the query and suspends other non-correlated information.
 
@@ -38,7 +45,7 @@ class Seq2SeqAttentionDecoder(d2l.Decoder):
 
     def init_state(self, enc_outputs, enc_valid_len, *args):
         outputs, hidden_state = enc_outputs
-        # Transpose outputs to (batch_size, seq_len, hidden_size) 
+        # Transpose outputs to (batch_size, seq_len, hidden_size)
         return (outputs.swapaxes(0,1), hidden_state, enc_valid_len)
 
     def forward(self, X, state):
@@ -57,7 +64,7 @@ class Seq2SeqAttentionDecoder(d2l.Decoder):
             out, hidden_state = self.rnn(x.swapaxes(0, 1), hidden_state)
             outputs.append(out)
         outputs = self.dense(nd.concat(*outputs, dim=0))
-        return outputs.swapaxes(0, 1), [enc_outputs, hidden_state, 
+        return outputs.swapaxes(0, 1), [enc_outputs, hidden_state,
                                         enc_valid_len]
 ```
 
@@ -67,7 +74,7 @@ Use the same hyper-parameters to create an encoder and decoder as the ["Sequence
 encoder = d2l.Seq2SeqEncoder(vocab_size=10, embed_size=8,
                              num_hiddens=16, num_layers=2)
 encoder.initialize()
-decoder = Seq2SeqAttentionDecoder(vocab_size=10, embed_size=8, 
+decoder = Seq2SeqAttentionDecoder(vocab_size=10, embed_size=8,
                                   num_hiddens=16, num_layers=2)
 decoder.initialize()
 X = nd.zeros((4, 7))
@@ -78,7 +85,12 @@ out.shape, len(state), state[0].shape, len(state[1]), state[1][0].shape
 
 ## Training
 
-Again, we use the same training hyper-parameters as the ["Sequence to Sequence"](../chapter_recurrent-neural-networks/seq2seq.md) section. The training loss is similar to the seq2seq model, because the sequences in the training dataset are relative short. The additional attention layer doesn't lead to a significant different. But due to both attention layer computational overhead and we unroll the time steps in the decoder, this model is much slower than the seq2seq model.
+Again, we use the same training hyper-parameters as in
+:numref:`chapter_seq2seq`. The training loss is similar to the seq2seq model, because the
+sequences in the training dataset are relative short. The additional attention
+layer doesn't lead to a significant different. But due to both attention layer
+computational overhead and we unroll the time steps in the decoder, this model
+is much slower than the seq2seq model.
 
 ```{.python .input  n=5}
 embed_size, num_hiddens, num_layers, dropout = 32, 32, 2, 0.0
