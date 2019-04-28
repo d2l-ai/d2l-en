@@ -18,7 +18,11 @@ stage("Build and Publish") {
       echo "Build HTML/PDF/Pakage"
       sh '''set -ex
       conda activate d2l-en-build
-      d2lbook build html pdf pkg
+      d2lbook build html pdf
+      mv _build/eval/data _build/data_tmp
+      cp -r data _build/eval
+      d2lbook build html pkg
+      mv _build/data_tmp _build/eval/data
       '''
       if (env.BRANCH_NAME == 'master') {
         echo "Publish"
