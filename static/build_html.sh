@@ -10,7 +10,9 @@ for fn in `find _build/html/_images/ -iname '*.svg' `; do
     if [[ $fn == *'qr_'* ]] || [[ $fn == *'output_'* ]]; then
         continue
     fi
-    echo "Zoom in $fn by 1.15x"
-    rsvg-convert -z 1.15 -f svg -o tmp.svg $fn
+    # echo "Zoom in $fn by 1.15x"
+    # rsvg-convert installed on ubuntu changes unit from px to pt, so evening no
+    # change of the size makes the svg larger...
+    rsvg-convert -z 1 -f svg -o tmp.svg $fn
     mv tmp.svg $fn
 done
