@@ -4,7 +4,8 @@ stage("Build and Publish") {
       checkout scm
       echo "Setup environment"
       sh '''set -ex
-      conda remove -n d2l-en-build --all -y
+      # conda remove -n d2l-en-build --all -y
+      rm -rf ~/miniconda3/envs/d2l-en-build
       conda create -n d2l-en-build pip -y
       conda activate d2l-en-build
       pip install mxnet-cu100
