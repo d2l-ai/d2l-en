@@ -21,12 +21,7 @@ stage("Build and Publish") {
       echo "Build HTML"
       sh '''set -ex
       conda activate d2l-en-build-${EXECUTOR_NUMBER}
-      rm -rf _build/rst
-      d2lbook build rst
-      # copy frontpage
-      cp frontpage/frontpage.html _build/rst/
-      d2lbook build html
-      cp frontpage/_images/* _build/html/_images/
+      ./static/build_html.sh
       '''
       echo "Build PDF"
       sh '''set -ex
