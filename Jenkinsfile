@@ -23,7 +23,7 @@ stage("Build and Publish") {
       # copy frontpage
       cp frontpage/frontpage.html _build/rst/
       d2lbook build html
-      cp -r frontpage/img/ _build/html/_images/
+      cp frontpage/_images/* _build/html/_images/
       '''
       echo "Build PDF"
       sh '''set -ex
