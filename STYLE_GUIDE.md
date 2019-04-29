@@ -130,13 +130,9 @@
     * 1. → `1.0`
     * remove namescope
 
-## Hyperlinks
+## References
 
-* Internal hyperlinks
-    * In the [“Linear Regression”](linear-reg.md) section
-* External hyperlinks
-    * [Layer](http:bla)
-
+* Refer to [d2lbook](http://book.d2l.ai/examples/markdown.html#cross-references)how to add references for figure, table and equations.
 
 ## QR Code
 
@@ -146,6 +142,7 @@
 
 ## References
 
-* Append references at the end of each section
-    * Google Scholar: APA format
-    * All references are to be consolidated by the Press
+* The bibfile is `d2l.bib` on the root folder
+* Use bibtool generate consistent keys, install it by * `brew install bib-tool`
+* Then after inserting entry into `d2l.bib`, run
+  `bibtool -f "%3n(author).%d(year)" d2l.bib -o d2l.bib`

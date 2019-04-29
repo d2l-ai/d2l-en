@@ -10,10 +10,10 @@ requirements = [
 
 setup(
     name='d2l',
-    version=VERSION,
-    author='Contributors',
+    version=__version__,
     python_requires='>=3.6',
-    author_email='D2L Developers',
+    author='D2L Developers',
+    author_email='d2l.devs@google.com',
     url='https://d2l.ai',
     description='Dive into Deep Learning',
     license='CC BY-NC-SA',
