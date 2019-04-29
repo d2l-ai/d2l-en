@@ -123,8 +123,7 @@ We believe that this might be the first book published using such an integrated 
 ### Learning by Doing
 
 Many textbooks teach a series of topics, each in exhaustive detail.
-For example, Chris Bishop's excellent textbook,
-[Pattern Recognition and Machine Learning](https://www.amazon.com/Pattern-Recognition-Learning-Information-Statistics/dp/0387310738),
+For example, Chris Bishop's excellent textbook :cite:`Bishop.2006`,
 teaches each topic so thoroughly, that getting to the chapter
 on linear regression requires a non-trivial amount of work.
 While experts love this book precisely for its thoroughness,
@@ -253,23 +252,21 @@ We give a detailed overview of these functions and classes in :numref:`chapter_d
 
 ### Target Audience
 
-This book is for students (undergraduate or graduate),
-engineers, and researchers, who seek a solid grasp
-of the practical techniques of deep learning.
-Because we explain every concept from scratch,
-no previous background in deep learning or machine learning is required.
-Fully explaining the methods of deep learning
-requires some mathematics and programming,
-but we'll only assume that you come in with some basics,
-including (the very basics of) linear algebra, calculus, probability,
-and Python programming.
-Moreover, this book's appendix provides a refresher
-on most of the mathematics covered in this book.
-Most of the time, we will prioritize intuition and ideas
-over mathematical rigor.
-There are many terrific books which can lead the interested reader further. For instance [Linear Analysis](https://www.amazon.com/Linear-Analysis-Introductory-Cambridge-Mathematical/dp/0521655773) by Bela Bollobas covers linear algebra and functional analysis in great depth. [All of Statistics](https://www.amazon.com/All-Statistics-Statistical-Inference-Springer/dp/0387402721) is a terrific guide to statistics.
-And if you have not used Python before,
-you may want to peruse the [Python tutorial](http://learnpython.org/).
+This book is for students (undergraduate or graduate), engineers, and
+researchers, who seek a solid grasp of the practical techniques of deep
+learning.  Because we explain every concept from scratch, no previous background
+in deep learning or machine learning is required.  Fully explaining the methods
+of deep learning requires some mathematics and programming, but we'll only
+assume that you come in with some basics, including (the very basics of) linear
+algebra, calculus, probability, and Python programming.  Moreover, this book's
+appendix provides a refresher on most of the mathematics covered in this book.
+Most of the time, we will prioritize intuition and ideas over mathematical
+rigor.  There are many terrific books which can lead the interested reader
+further. For instance Linear Analysis by Bela Bollobas :cite:`Bollobas.1990`
+covers linear algebra and functional analysis in great
+depth. All of Statistics :cite:`Wasserman.2013`
+is a terrific guide to statistics.  And if you have not used Python before, you
+may want to peruse the [Python tutorial](http://learnpython.org/).
 
 
 ### Forum
