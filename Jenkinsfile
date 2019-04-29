@@ -18,6 +18,7 @@ stage("Build and Publish") {
       echo "Build HTML"
       sh '''set -ex
       conda activate d2l-en-build
+      rm -rf _build/rst
       d2lbook build rst
       # copy frontpage
       cp frontpage/frontpage.html _build/rst/
