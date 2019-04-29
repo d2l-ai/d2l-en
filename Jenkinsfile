@@ -9,7 +9,6 @@ stage("Build and Publish") {
       echo ${env.EXECUTOR_NUMBER}
       echo "Setup environment"
       '''
-      }
 	}
   }
 }
