@@ -8,7 +8,7 @@ stage("Build and Publish") {
       conda create -n d2l-en-build pip -y
       conda activate d2l-en-build
       pip install mxnet-cu100
-      pip install d2lbook>=0.1.5 d2l>=0.9.2
+      pip install d2lbook>=0.1.6 d2l>=0.9.2
       '''
       echo "Execute notebooks"
       sh '''set -ex
@@ -34,7 +34,6 @@ stage("Build and Publish") {
       sh '''set -ex
       conda activate d2l-en-build
       # don't pack downloaded data into the pkg
-      rm -rf _build/eval/*.zip
       mv _build/eval/data _build/data_tmp
       cp -r data _build/eval
       d2lbook build html pkg
