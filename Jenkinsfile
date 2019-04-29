@@ -1,5 +1,8 @@
 stage("Build and Publish") {
   node {
+    environment {
+    EID = '${EXECUTOR_NUMBER}'
+    }
     ws('workspace/d2l-en') {
       checkout scm
       echo "Setup environment"
