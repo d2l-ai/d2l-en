@@ -12,6 +12,7 @@ In this chapter, we explore common deep learning optimization algorithms in dept
 :maxdepth: 2
 
 optimization-intro
+convexity
 gd-sgd
 minibatch-sgd
 momentum
