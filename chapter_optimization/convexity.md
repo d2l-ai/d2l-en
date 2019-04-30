@@ -8,9 +8,9 @@ Convexity plays a vital role in the design of optimization algorithms. This is l
 
 ### Sets
 
-Sets are the basis of convexity. Simply put, a set $X$ in a vector space is convex if for any $a, b \in X$ the line segment connecting $a$ and $b$ is also in $X$. In mathematical terms this can be written as
+Sets are the basis of convexity. Simply put, a set $X$ in a vector space is convex if for any $a, b \in X$ the line segment connecting $a$ and $b$ is also in $X$. In mathematical terms this means that for all $\lambda \in [0,1]$ we have 
 
-$$\text{For all } \lambda \in [0,1] \text{ we have } \lambda \cdot a + (1-\lambda) \cdot b \in X \text{ whenever } a, b \in X.$$
+$$\lambda \cdot a + (1-\lambda) \cdot b \in X \text{ whenever } a, b \in X.$$
 
 This sounds a bit abstract. Consider the picture below. The first set isn't convex since there are line segments that are not contained in it. The other two sets suffer no such problem. 
 
@@ -29,9 +29,9 @@ Typically the problems in deep learning are defined on convex domains. For insta
 
 ### Functions
 
-Now that we have convex sets we can introduce convex functions $f$. Given a convex set $X$ a function defined on it $f: X \to \mathbb{R}$ is convex if 
+Now that we have convex sets we can introduce convex functions $f$. Given a convex set $X$ a function defined on it $f: X \to \mathbb{R}$ is convex if for all $x, x' \in X$ and for all $\lambda \in [0,1]$ we have 
 
-$$\lambda f(x) + (1-\lambda) f(x') \geq f(\lambda x + (1-\lambda) x') \text{ for all } \lambda \in [0,1] \text{ and } x, x' \in X.$$
+$$\lambda f(x) + (1-\lambda) f(x') \geq f(\lambda x + (1-\lambda) x').$$
 
 To illustrate this let's plot a few functions and check which ones satisfy the requirement. We need to import a few  libraries.
 
@@ -68,16 +68,19 @@ As expected, the cosine function is nonconvex, whereas the parabola and the expo
 
 One of the most useful tools is Jensen's inequality. It amounts to a generalization of the definition of convexity. 
 
-$$\sum_i \alpha_i f(x_i) \geq f\left(\sum_i \alpha_i x_i\right)
-\text{ and }
-\mathbf{E}_x[f(x)] \geq f\left(\mathbf{E}_x[x]\right)$$
+$$\begin{aligned}
+    \sum_i \alpha_i f(x_i) & \geq f\left(\sum_i \alpha_i x_i\right) \\
+    \text{ and }
+    \mathbf{E}_x[f(x)] & \geq f\left(\mathbf{E}_x[x]\right)
+\end{aligned}$$
 
 In other words, the expectation of a convex function is larger than the convex function of an expectation. To prove the first inequality we repeatedly apply the definition of convexity to one term in the sum at a time. The expectation can be proven by taking the limit over finite segments.  
 
 One of the common applications of Jensen's inequality is with regard to the log-likelihood of partially observed random variables. That is, we use
 
-$$\mathbf{E}_{y \sim p(y)}[-\log p(x|y)] \geq -\log \mathbf{E}_{y \sim p(y)}[p(x|y)] = -\log p(x)$$
+$$\mathbf{E}_{y \sim p(y)}[-\log p(x|y)] \geq -\log p(x).$$
 
+This follows since $\int p(y) p(x|y) dy = p(x)$. 
 This is used in variational methods. Here $y$ is typically the unobserved random variable, $p(y)$ is the best guess of how it might be distributed and $p(x)$ is the distribution with $y$ integrated out. For instance, in clustering $y$ might be the cluster labels and $p(x|y)$ is the generative model when applying cluster labels.
 
 
@@ -134,7 +137,7 @@ The first thing to realize is that we only need to prove this property for one-d
 
 To see that $f''(x) \geq 0$ for convex functions we use the fact that 
 
-$$\frac{1}{2} f(x + \epsilon) + \frac{1}{2} f(x - \epsilon) \geq f\left(\frac{1}{2}(x + \epsilon) + \frac{1}{2}(x - \epsilon)\right) = f(x)$$
+$$\frac{1}{2} f(x + \epsilon) + \frac{1}{2} f(x - \epsilon) \geq f\left(\frac{x + \epsilon}{2} + \frac{x - \epsilon}{2}\right) = f(x)$$
 
 Since the second derivative is given by the limit over finite differences it follows that 
 
@@ -149,7 +152,11 @@ f(b) - f(x) & = (b-x) f'(\beta) \text{ for some } \beta \in [x,b].
 
 By monotonicity $f'(\beta) \geq f'(\alpha)$, hence 
 
-$$f(b) - f(a) = f(b) - f(x) + f(x) - f(a) = (b-x) f'(\beta) + (x-a) f'(\alpha) \geq (b-a) f'(\alpha).$$
+$$\begin{aligned}
+    f(b) - f(a) & = f(b) - f(x) + f(x) - f(a) \\
+    & = (b-x) f'(\beta) + (x-a) f'(\alpha) \\
+    & \geq (b-a) f'(\alpha).
+\end{aligned}$$
 
 By geometry it follows that $f(x)$ is below the line connecting $f(a)$ and $f(b)$, thus proving convexity. We omit a more formal derivation in favor of a graph below.
 
@@ -170,7 +177,9 @@ _ = fig.axes.annotate('x', xy=(-0.5, f(-0.5)), xytext=(-1.5, f(-0.5)), arrowprop
 
 One of the nice properties of convex optimization is that it allows us to handle constraints efficiently. That is, it allows us to solve problems of the form:
 
-$$\mathop{\mathrm{minimize}}_{\mathbf{x}} f(\mathbf{x}) \text{ subject to } c_i(\mathbf{x}) \leq 0 \text{ for all } i \in \{1, \ldots N\}$$
+$$\begin{aligned} \mathop{\mathrm{minimize~}}_{\mathbf{x}} & f(\mathbf{x}) \\
+    \text{ subject to } & c_i(\mathbf{x}) \leq 0 \text{ for all } i \in \{1, \ldots N\}
+\end{aligned}$$
 
 Here $f$ is the objective and the functions $c_i$ are constraint functions. To see what this does consider the case where $c_1(\mathbf{x}) = \|\mathbf{x}\|_2 - 1$. In this case the parameters $\mathbf{x}$ are constrained to the unit ball. If a second constraint is $c_2(\mathbf{x}) = \mathbf{v}^\top \mathbf{x} + b$, then this corresponds to all $\mathbf{x}$ lying on a halfspace. Satisfying both constraints simultaneously amounts to selecting a slice of a ball as the constraint set. 
 
@@ -234,4 +243,3 @@ In the context of deep learning the main purpose of convex functions is to motiv
     * As intermediate step write out the penalized objective $\|\mathbf{w} - \mathbf{w}'\|_2^2 + \lambda \|\mathbf{w}'\|_1$ and compute the solution for a given $\lambda > 0$. 
     * Can you find the 'right' value of $\lambda$ without a lot of trial and error? 
 1. Given a convex set $X$ and two vectors $\mathbf{x}$ and $\mathbf{y}$ prove that projections never increase distances, i.e. $\|\mathbf{x} - \mathbf{y}\| \geq \|\mathrm{Proj}_X(\mathbf{x}) - \mathrm{Proj}_X(\mathbf{y})\|$.
-
