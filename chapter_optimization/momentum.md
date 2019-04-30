@@ -1,11 +1,25 @@
 # Momentum
+:label:`chapter_momentum`
 
-In the ["Gradient Descent and Stochastic Gradient Descent"](./gd-sgd.md) section, we mentioned that the gradient of the objective function's independent variable represents the direction of the objective function's fastest descend at the current position of the independent variable. Therefore, gradient descent is also called steepest descent. In each iteration, the gradient descends according to the current position of the independent variable while updating the latter along the current position of the gradient. However, this can lead to problems if the iterative direction of the independent variable relies exclusively on the current position of the independent variable.
+In :numref:`chapter_gd_sgd`, we
+mentioned that the gradient of the objective function's independent variable
+represents the direction of the objective function's fastest descend at the
+current position of the independent variable. Therefore, gradient descent is
+also called steepest descent. In each iteration, the gradient descends according
+to the current position of the independent variable while updating the latter
+along the current position of the gradient. However, this can lead to problems
+if the iterative direction of the independent variable relies exclusively on the
+current position of the independent variable.
 
 
 ## Exercises with Gradient Descent
 
-Now, we will consider an objective function $f(\boldsymbol{x})=0.1x_1^2+2x_2^2$, whose input and output are a two-dimensional vector $\boldsymbol{x} = [x_1, x_2]$ and a scalar, respectively. In contrast to the ["Gradient Descent and Stochastic Gradient Descent"](./gd-sgd.md) section, here, the coefficient $x_1^2$ is reduced from $1$ to $0.1$. We are going to implement gradient descent based on this objective function, and demonstrate the iterative trajectory of the independent variable using the learning rate $0.4$.
+Now, we will consider an objective function $f(\boldsymbol{x})=0.1x_1^2+2x_2^2$,
+whose input and output are a two-dimensional vector $\boldsymbol{x} =
+[x_1, x_2]$ and a scalar, respectively. In contrast to :numref:`chapter_gd_sgd`,
+here, the coefficient $x_1^2$ is reduced from $1$ to $0.1$. We are going to
+implement gradient descent based on this objective function, and demonstrate the
+iterative trajectory of the independent variable using the learning rate $0.4$.
 
 ```{.python .input  n=3}
 import sys
@@ -37,8 +51,15 @@ d2l.show_trace_2d(f_2d, d2l.train_2d(gd_2d))
 
 ## The Momentum Method
 
-The momentum method was proposed to solve the gradient descent problem described above. Since mini-batch stochastic gradient descent is more general than gradient descent, the subsequent discussion in this chapter will continue to use the definition for mini-batch stochastic gradient descent $\boldsymbol{g}_t$ at time step $t$ given in the ["Mini-batch Stochastic Gradient Descent"](minibatch-sgd.md) section. We set the independent variable at time step $t$ to $\boldsymbol{x}_t$ and the learning rate to $\eta_t$.
-At time step $0$, momentum creates the velocity variable $\boldsymbol{v}_0$ and initializes its elements to zero. At time step $t>0$, momentum modifies the steps of each iteration as follows:
+The momentum method was proposed to solve the gradient descent problem described
+above. Since mini-batch stochastic gradient descent is more general than
+gradient descent, the subsequent discussion in this chapter will continue to use
+the definition for mini-batch stochastic gradient descent $\boldsymbol{g}_t$ at
+time step $t$ given in :numref:`chapter_minibatch_sgd`.  We set the independent
+variable at time step $t$ to $\boldsymbol{x}_t$ and the learning rate to
+$\eta_t$.  At time step $0$, momentum creates the velocity variable
+$\boldsymbol{v}_0$ and initializes its elements to zero. At time step $t>0$,
+momentum modifies the steps of each iteration as follows:
 
 $$
 \begin{aligned}

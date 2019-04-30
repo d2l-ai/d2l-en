@@ -1,4 +1,5 @@
 # Text Sentiment Classification: Using Recurrent Neural Networks
+:label:`chapter_sentiment_rnn`
 
 Text classification is a common task in natural language processing, which transforms a sequence of text of indefinite length into a category of text. This section will focus on one of the sub-questions in this field: using text sentiment classification to analyze the emotions of the text's author. This problem is also called sentiment analysis and has a wide range of applications. For example, we can analyze user reviews of products to obtain user satisfaction statistics, or analyze user sentiments about market conditions and use it to predict future trends.
 
@@ -25,7 +26,7 @@ We use Stanford's Large Movie Review Dataset as the data set for text sentiment 
 We first download this data set to the "../data" path and extract it to "../data/aclImdb".
 
 ```{.python .input  n=23}
-data_dir = './'
+data_dir = '../data'
 url = 'http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz'
 fname = gutils.download(url, data_dir)
 with tarfile.open(fname, 'r') as f:
@@ -52,7 +53,7 @@ for x, y in zip(train_data[0][:3], train_data[1][:3]):
     print('label:', y, 'review:', x[0:60])
 ```
 
-### Tokenization and Vocabulary 
+### Tokenization and Vocabulary
 
 We use a word as a token, which can be split based on spaces.
 
@@ -64,7 +65,7 @@ train_tokens = tokenize(train_data[0])
 test_tokens = tokenize(test_data[0])
 ```
 
-Then we can create a dictionary based on the training data set with the words segmented. 
+Then we can create a dictionary based on the training data set with the words segmented.
 Here, we have filtered out words that appear less than 5 times.
 
 ```{.python .input}
@@ -79,11 +80,11 @@ Because the reviews have different lengths, so they cannot be directly combined 
 max_len = 500
 
 def pad(x):
-    if len(x) > max_len:        
+    if len(x) > max_len:
         return x[:max_len]
     else:
         return x + [vocab.unk] * (max_len - len(x))
-    
+
 train_features = nd.array([pad(vocab[line]) for line in train_tokens])
 test_features = nd.array([pad(vocab[line]) for line in test_tokens])
 ```
@@ -109,7 +110,7 @@ for X, y in train_iter:
 '# batches:', len(train_iter)
 ```
 
-Lastly, we will save a function `get_data_imdb` into `d2l`, which returns the vocabulary and data iterators. 
+Lastly, we will save a function `get_data_imdb` into `d2l`, which returns the vocabulary and data iterators.
 
 ## Use a Recurrent Neural Network Model
 

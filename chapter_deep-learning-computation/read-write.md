@@ -41,7 +41,20 @@ mydict2
 
 ## Gluon Model Parameters
 
-Saving individual weight vectors (or other NDArray tensors) is useful but it gets very tedious if we want to save (and later load) an entire model. After all, we might have hundreds of parameter groups sprinkled throughout. Writing a script that collects all the terms and matches them to an architecture is quite some work. For this reason Gluon provides built-in functionality to load and save entire networks rather than just single weight vectors. An important detail to note is that this saves model *parameters* and not the entire model. I.e. if we have a 3 layer MLP we need to specify the *architecture* separately. The reason for this is that the models themselves can contain arbitrary code, hence they cannot be serialized quite so easily (there is a way to do this for compiled models - please refer to the [MXNet documentation](http://www.mxnet.io) for the technical details on it). The result is that in order to reinstate a model we need to generate the architecture in code and then load the parameters from disk. The [deferred initialization](deferred-init.md) is quite advantageous here since we can simply define a model without the need to put actual values in place. Let's start with our favorite MLP.
+Saving individual weight vectors (or other NDArray tensors) is useful but it
+gets very tedious if we want to save (and later load) an entire model. After
+all, we might have hundreds of parameter groups sprinkled throughout. Writing a
+script that collects all the terms and matches them to an architecture is quite
+some work. For this reason Gluon provides built-in functionality to load and
+save entire networks rather than just single weight vectors. An important detail
+to note is that this saves model *parameters* and not the entire model. I.e. if
+we have a 3 layer MLP we need to specify the *architecture* separately. The
+reason for this is that the models themselves can contain arbitrary code, hence
+they cannot be serialized quite so easily (there is a way to do this for
+compiled models - please refer to the [MXNet documentation](http://www.mxnet.io)
+for the technical details on it). The result is that in order to reinstate a
+model we need to generate the architecture in code and then load the parameters
+from disk. The deferred initialization (:numref:`chapter_deferred_init`) is quite advantageous here since we can simply define a model without the need to put actual values in place. Let's start with our favorite MLP.
 
 ```{.python .input  n=6}
 class MLP(nn.Block):

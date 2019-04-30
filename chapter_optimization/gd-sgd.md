@@ -1,10 +1,17 @@
 # Gradient Descent and Stochastic Gradient Descent
+:label:`chapter_gd_sgd`
 
 In this section, we are going to introduce the basic principles of gradient descent. Although it is not common for gradient descent to be used directly in deep learning, an understanding of gradients and the reason why the value of an objective function might decline when updating the independent variable along the opposite direction of the gradient is the foundation for future studies on optimization algorithms. Next, we are going to introduce stochastic gradient descent (SGD).
 
 ## Gradient Descent in One-Dimensional Space
 
-Here, we will use a simple gradient descent in one-dimensional space as an example to explain why the gradient descent algorithm may reduce the value of the objective function. We assume that the input and output of the continuously differentiable function $f: \mathbb{R} \rightarrow \mathbb{R}$ are both scalars. Given $\epsilon$ with a small enough absolute value, according to the Taylor's expansion formula from the ["Mathematical basics"](../chapter_appendix/math.md) section, we get the following approximation:
+Here, we will use a simple gradient descent in one-dimensional space as an
+example to explain why the gradient descent algorithm may reduce the value of
+the objective function. We assume that the input and output of the continuously
+differentiable function $f: \mathbb{R} \rightarrow \mathbb{R}$ are both
+scalars. Given $\epsilon$ with a small enough absolute value, according to the
+Taylor's expansion formula from :numref:`chapter_math`, we get the following
+approximation:
 
 $$f(x + \epsilon) \approx f(x) + \epsilon f'(x) .$$
 
@@ -96,7 +103,7 @@ For brevity, we use $\nabla f(\boldsymbol{x})$ instead of $\nabla_{\boldsymbol{x
 
 $$\text{D}_{\boldsymbol{u}} f(\boldsymbol{x}) = \lim_{h \rightarrow 0}  \frac{f(\boldsymbol{x} + h \boldsymbol{u}) - f(\boldsymbol{x})}{h}.$$
 
-According to the property of directional derivatives \[1，Chapter 14.6 Theorem 3\], the aforementioned directional derivative can be rewritten as
+According to the property of directional derivatives, the aforementioned directional derivative can be rewritten as
 
 $$\text{D}_{\boldsymbol{u}} f(\boldsymbol{x}) = \nabla f(\boldsymbol{x}) \cdot \boldsymbol{u}.$$
 

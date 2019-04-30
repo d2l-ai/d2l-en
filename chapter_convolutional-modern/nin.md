@@ -1,14 +1,46 @@
 # Network in Network (NiN)
+:label:`chapter_nin`
 
-LeNet, AlexNet, and VGG all share a common design pattern: extract the spatial features through a sequence of convolutions and pooling layers and then post-process the representations via fully connected layers. The improvements upon LeNet by AlexNet and VGG mainly lie in how these later networks widen and deepen these two modules. An alternative is to use fully connected layers much earlier in the process. However, a careless use of a dense layer would destroy the spatial structure of the data entirely, since fully connected layers mangle all inputs. Network in Network (NiN) blocks offer an alternative. They were proposed by [Lin, Chen and Yan, 2013](https://arxiv.org/pdf/1312.4400.pdf) based on a very simple insight - to use an MLP on the channels for each pixel separately.
+LeNet, AlexNet, and VGG all share a common design pattern:
+extract features exploiting *spatial* structure
+via a sequence of convolutions and pooling layers
+and then post-process the representations via fully-connected layers.
+The improvements upon LeNet by AlexNet and VGG mainly lie
+in how these later networks widen and deepen these two modules.
+Alternatively, one could imagine using fully-connected layers
+earlier in the process.
+However, a careless use of dense layers might give up the
+the spatial structure of the representation entirely,
+Network in Network (NiN) blocks offer an alternative.
+They were proposed by [Lin, Chen and Yan, 2013](https://arxiv.org/pdf/1312.4400.pdf) based on a very simple insight---to
+use an MLP on the channels for each pixel separately.
 
 ## NiN Blocks
 
-We know that the inputs and outputs of convolutional layers are usually four-dimensional arrays (example, channel, height, width), while the inputs and outputs of fully connected layers are usually two-dimensional arrays (example, feature). This means that once we process data by a fully connected layer it's virtually impossible to recover the spatial structure of the representation. But we could apply a fully connected layer at a pixel level: Recall the $1\times 1$ convolutional layer described in the section discussing [channels](channels.md). This somewhat unusual convolution can be thought of as a fully connected layer processing channel activations on a per pixel level. Another way to view this is to think of each element in the spatial dimension (height and width) as equivalent to an example, and the channel as equivalent to a feature. NiNs use the $1\times 1$ convolutional layer instead of a fully connected layer. The spatial information can then be naturally passed to the subsequent layers. The figure below illustrates the main structural differences between NiN and AlexNet, VGG, and other networks.
+Recall that the inputs and outputs of convolutional layers
+consist of four-dimensional arrays with axes
+corresponding to the batch, channel, height, and width.
+Also recall that the inputs and outputs of fully-connected layers
+are typically two-dimensional arrays corresponding to the batch, and features.
+The idea of behind NiN is to apply a fully-connected layer
+at each pixel location (for each height and  width).
+If we tie the weights across each spatial location,
+we could think of this as a $1\times 1$ convolutional layer
+(as described in :numref:`chapter_channels`)
+or as a fully-connected layer acting indepdendently on each pixel location.
+Another way to view this is to think of each element in the spatial dimension
+(height and width) as equivalent to an example
+and the channel as equivalent to a feature.
+The figure below illustrates the main structural differences
+between NiN and AlexNet, VGG, and other networks.
 
 ![The figure on the left shows the network structure of AlexNet and VGG, and the figure on the right shows the network structure of NiN. ](../img/nin-compare.svg)
 
-The NiN block is the basic block in NiN. It concatenates a convolutional layer and two $1\times 1$ convolutional layers that act as fully connected layers (with ReLU in between). The convolution width of the first layer is typically set by the user. The subsequent widths are fixed to $1 \times 1$.
+The NiN block consists of one convolutional layer
+followed by two $1\times 1$ convolutional layers that act as
+per-pixel fully-connected layers with ReLU activations.
+The convolution width of the first layer is typically set by the user.
+The subsequent widths are fixed to $1 \times 1$.
 
 ```{.python .input  n=2}
 import sys
@@ -28,9 +60,21 @@ def nin_block(num_channels, kernel_size, strides, padding):
 
 ## NiN Model
 
-NiN was proposed shortly after the release of AlexNet. Their convolutional layer settings share some similarities. NiN uses convolutional layers with convolution window shapes of $11\times 11$, $5\times 5$, and $3\times 3$, and the corresponding numbers of output channels are the same as in AlexNet. Each NiN block is followed by a maximum pooling layer with a stride of 2 and a window shape of $3\times 3$.
+The original NiN network was proposed shortly after AlexNet
+and clearly draws some inspiration.
+NiN uses convolutional layers with window shapes
+of $11\times 11$, $5\times 5$, and $3\times 3$,
+and the corresponding numbers of output channels are the same as in AlexNet. Each NiN block is followed by a maximum pooling layer
+with a stride of 2 and a window shape of $3\times 3$.
 
-In addition to using NiN blocks, NiN’s design is significantly different from AlexNet by avoiding dense connections entirely: Instead, NiN uses a NiN block with a number of output channels equal to the number of label classes, and then uses a global average pooling layer to average all elements in each channel for direct use in classification. Here, the global average pooling layer, i.e. the window shape, is equal to the average pooling layer of the input spatial dimension shape. The advantage of NiN's design is that it can significantly reduce the size of model parameters, thus mitigating overfitting. In other words, short of the average pooling all operations are convolutions. However, this design sometimes results in an increase in model training time.
+Once significant difference between NiN and AlexNet
+is that NiN avoids dense connections altogether.
+Instead, NiN uses an NiN block with a number of output channels equal to the number of label classes, followed by a *global* average pooling layer,
+yielding a vector of logits.
+One advantage of NiN's design is that it significantly
+reduces the number of required model parameters.
+However, in practice, this design sometimes requires
+increased model training time.
 
 ```{.python .input  n=9}
 net = nn.Sequential()
@@ -63,7 +107,9 @@ for layer in net:
 
 ## Data Acquisition and Training
 
-As before we use Fashion-MNIST to train the model. NiN's training is similar to that for AlexNet and VGG, but it often uses a larger learning rate.
+As before we use Fashion-MNIST to train the model.
+NiN's training is similar to that for AlexNet and VGG,
+but it often uses a larger learning rate.
 
 ```{.python .input}
 lr, num_epochs, batch_size, ctx = 0.1, 5, 128, d2l.try_gpu()
