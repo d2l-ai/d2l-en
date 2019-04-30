@@ -40,7 +40,7 @@ For any computing technology to reach its full impact,
 it must be well-understood, well-documented, and supported by
 mature, well-maintained tools.
 The key ideas should be clearly distilled,
-minimizing the onboarding time needing to bring new practitioners up to date.
+minimizing the onboarding time needed to bring new practitioners up to date.
 Mature libraries should automate common tasks,
 and exemplar code should make it easy for practitioners
 to modify, apply, and extend common applications to suit their needs.
@@ -61,7 +61,7 @@ Applying deep learning requires simultaneously understanding
 (iv) and the engineering required to train models efficiently,
 navigating the pitfalls of numerical computing and getting the most
 out of available hardware.
-Teaching both the critical thinking skills required to formulate problems,
+Teaching the critical thinking skills required to formulate problems,
 the mathematics to solve them, and the software tools to implement those
 solutions all in one place presents formidable challenges.
 Our goal in this book is to present a unified resource
@@ -77,7 +77,7 @@ and (3) interleaved the exposition one expects from an engaging textbook
 with the clean runnable code one seeks in hands-on tutorials.
 We found plenty of code examples for how to use a given deep learning
 framework (e.g. how to do basic numerical computing with matrices in TensorFlow)
-or for implementing particular techniques (e.g. code snippets for LeNet, AlexNet, ResNets, etc)
+or for implementing particular techniques (e.g. code snippets for LeNet, AlexNet, ResNets, etc.)
 in the form of blog posts or on GitHub.
 However, these examples typically focused on
 *how* to implement a given approach,
@@ -97,7 +97,7 @@ We set out to create a resource that could
 (2) offer sufficient technical depth to provide a starting point on the path
 to actually becoming an applied machine learning scientist,
 (3) include runnable code, showing readers *how* to solve problems in practice,
-and (4) that allowed for rapid updates, both by us, and also by the community at large,
+(4) that allowed for rapid updates, both by us, and also by the community at large,
 and (5) be complemented by a [forum](http://discuss.mxnet.io)
 for interactive discussion of technical details and to answer questions.
 
@@ -106,7 +106,7 @@ Equations, theorems, and citations are best managed and laid out in LaTeX.
 Code is best described in Python.
 And webpages are native in HTML and JavaScript.
 Furthermore, we want the content to be
-accessible both as executable code, as a physical book,
+accessible as executable code, as a physical book,
 as a downloadable PDF, and on the internet as a website.
 At present there exist no tools and no workflow
 perfectly suited to these demands, so we had to assemble our own.

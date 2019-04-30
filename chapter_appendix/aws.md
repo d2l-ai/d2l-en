@@ -110,8 +110,8 @@ Here, "/path/to/key.pem" is the path of the locally-stored key used to access th
 It is a good idea to update the instance with the latest drivers.
 
 ```
-sudo apt update
-sudo apt dist-upgrade
+sudo apt-get update
+sudo apt-get dist-upgrade
 ```
 
 Your server is ready now.
@@ -222,7 +222,7 @@ to PATH in your /home/ubuntu/.bashrc ? [yes|no]
 After installation, run `source ~/.bashrc` once to activate CUDA and Conda. Next, download the code for this book and install and activate the Conda environment. To use GPUs you need to update MXNet to request the CUDA 10.0 build.
 
 ```
-sudo apt install unzip
+sudo apt-get install unzip
 mkdir d2l-en && cd d2l-en
 wget https://www.d2l.ai/d2l-en.zip
 unzip d2l-en.zip && rm d2l-en.zip
