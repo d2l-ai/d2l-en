@@ -169,7 +169,7 @@ with just one line of code.
 
 ```{.python .input  n=16}
 def cross_entropy(y_hat, y):
-    return - nd.pick(y_hat, y).log()
+    return -nd.pick(y_hat, y).log()
 ```
 
 
