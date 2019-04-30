@@ -182,8 +182,7 @@ Independence is when the occurrence of one event does not reveal any information
 Let's put our skills to the test. Assume that a doctor administers an AIDS test to a patient. This test is fairly accurate and it fails only with 1% probability if the patient is healthy by reporting him as diseased. Moreover,
 it never fails to detect HIV if the patient actually has it. We use $D$ to indicate the diagnosis and $H$ to denote the HIV status. Written as a table the outcome $\Pr(D | H)$ looks as follows:
 
-|
-outcome| HIV positive | HIV negative |
+|outcome| HIV positive | HIV negative |
 |:------------|-------------:|-------------:|
 |Test positive|            1 |         0.01 |
 |Test negative|            0 |         0.99 |
