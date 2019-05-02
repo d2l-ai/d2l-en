@@ -54,12 +54,3 @@
    :members:
 
 ```
-
-## Predicting
-
-```eval_rst
-
-.. automodule:: d2l.predict
-   :members:
-
-```

@@ -377,6 +377,7 @@ So far, we covered probabilities, independence, conditional independence, and ho
 1. Assume that we have a sequence of events, say $A$, $B$ and $C$, where $B$ only depends on $A$ and $C$ only on $B$, can you simplify the joint probability? Hint - this is a [Markov Chain](https://en.wikipedia.org/wiki/Markov_chain).
 
 ## Scan the QR Code to
+
 [Discuss](https://discuss.mxnet.io/t/2319)
 
-![](../img/qr_probability.svg)
+![qr](../img/qr_probability.svg)
