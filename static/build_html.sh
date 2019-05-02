@@ -7,10 +7,9 @@ d2lbook build html
 cp static/frontpage/_images/* _build/html/_images/
 
 for fn in `find _build/html/_images/ -iname '*.svg' `; do
-    if [[ $fn == *'qr_'* ]] || [[ $fn == *'output_'* ]]; then
+    if [[ $fn == *'qr_'* ]] ; then # || [[ $fn == *'output_'* ]]
         continue
     fi
-    # echo "Zoom in $fn by 1.15x"
     # rsvg-convert installed on ubuntu changes unit from px to pt, so evening no
     # change of the size makes the svg larger...
     rsvg-convert -z 1 -f svg -o tmp.svg $fn
