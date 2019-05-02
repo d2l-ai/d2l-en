@@ -9,7 +9,7 @@ stage("Build and Publish") {
       conda create -n d2l-en-build-${EXECUTOR_NUMBER} pip -y
       conda activate d2l-en-build-${EXECUTOR_NUMBER}
       pip install mxnet-cu100
-      pip install d2lbook==0.1.8 d2l>=0.9.2
+      pip install d2lbook==0.1.9 d2l>=0.9.2
       pip list
       '''
       echo "Execute notebooks"
