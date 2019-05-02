@@ -24,7 +24,8 @@ stage("Build and Publish") {
       ./static/build_html.sh
       '''
       echo "Build PDF"
-      sh '''set -ex
+      sh '''#!/bin/bash
+      set -ex
       conda activate d2l-en-build-${EXECUTOR_NUMBER}
       d2lbook build pdf
       '''
