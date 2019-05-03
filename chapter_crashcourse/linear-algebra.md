@@ -3,7 +3,7 @@
 
 Now that you can store and manipulate data,
 let's briefly review the subset of basic linear algebra
-that you will need to understand most of the models.
+that you will need to understand for most of the models.
 We will introduce all the basic concepts,
 the corresponding mathematical notation,
 and their realization in code all in one place.
