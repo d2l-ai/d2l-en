@@ -21,8 +21,7 @@ we want to find those that fit our data the *best*.
 Determining which way to move each parameter at each step of an algorithm
 requires a little bit of calculus.
 Fortunately, Apache MXNet's autograd package covers this for us,
-and we will cover it next. Machine learning is concerned with making predictions:
-*what is the likely value of some unknown attribute,
+and we will cover it next. Next, machine learning is concerned with making predictions:*what is the likely value of some unknown attribute,
 given the information that we observe?*
 To reason rigorously under uncertainty
 we will need to invoke the language of probability and statistics.
