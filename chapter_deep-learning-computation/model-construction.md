@@ -26,7 +26,7 @@ This generates a network with a hidden layer of 256 units, followed by a ReLU ac
 
 ![Multiple layers are combined into blocks](../img/blocks.svg)
 
-In the following we will explain the various steps needed to go from defining layers to defining blocks (of one or more layers). To get started we need a bit of reasoning about software. For most intents and purposes a block behaves very much like a fancy layer. That is, it provides the following functionality:
+In the following we will explain the various steps needed to go from defining layers to defining blocks (of one or more layers). To get started, we need a bit of reasoning about software. For most intents and purposes a block behaves very much like a fancy layer. That is, it provides the following functionality:
 
 1. It needs to ingest data (the input).
 1. It needs to produce a meaningful output. This is typically encoded in what we will call the `forward` function. It allows us to invoke a block via `net(X)` to obtain the desired output. What happens behind the scenes is that it invokes `forward` to perform forward propagation.
@@ -108,9 +108,7 @@ net.initialize()
 net(x)
 ```
 
-Indeed, it is no different than It can observed here that the use of the
-`MySequential` class is no different from the use of the Sequential class
-described in :numref:`chapter_mlp_gluon`.
+Indeed, it can be observed that the use of the `MySequential` class is no different from the use of the Sequential class described in :numref:`chapter_mlp_gluon`.
 
 
 ## Blocks with Code
