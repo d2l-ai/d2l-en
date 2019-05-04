@@ -54,6 +54,7 @@
    :members:
 
 ```
+<<<<<<< HEAD
 
 ## Prediciting
 
@@ -63,3 +64,5 @@
    :members:
 
 ```
+=======
+>>>>>>> 08bfeaf... Fix some  warnings, improve PDF

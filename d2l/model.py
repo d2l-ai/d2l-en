@@ -37,6 +37,7 @@ class Residual(nn.Block):
         self.bn2 = nn.BatchNorm()
 
     def forward(self, X):
+        """Forward function"""
         Y = nd.relu(self.bn1(self.conv1(X)))
         Y = self.bn2(self.conv2(Y))
         if self.conv3:
@@ -77,12 +78,14 @@ class RNNModel(nn.Block):
         self.dense = nn.Dense(vocab_size)
 
     def forward(self, inputs, state):
+        """Forward function"""
         X = nd.one_hot(inputs.T, self.vocab_size)
         Y, state = self.rnn(X, state)
         output = self.dense(Y.reshape((-1, Y.shape[-1])))
         return output, state
 
     def begin_state(self, *args, **kwargs):
+        """Return the begin state"""
         return self.rnn.begin_state(*args, **kwargs)
 
 class Encoder(nn.Block):
@@ -91,6 +94,7 @@ class Encoder(nn.Block):
         super(Encoder, self).__init__(**kwargs)
 
     def forward(self, X, *args):
+        """Forward function"""
         raise NotImplementedError
 
 class Decoder(nn.Block):
@@ -99,9 +103,11 @@ class Decoder(nn.Block):
         super(Decoder, self).__init__(**kwargs)
 
     def init_state(self, enc_outputs, *args):
+        """Return the begin state"""
         raise NotImplementedError
 
     def forward(self, X, state):
+        """Forward function"""
         raise NotImplementedError
 
 class EncoderDecoder(nn.Block):
@@ -112,6 +118,7 @@ class EncoderDecoder(nn.Block):
         self.decoder = decoder
 
     def forward(self, enc_X, dec_X, *args):
+        """Forward function"""
         enc_outputs = self.encoder(enc_X, *args)
         dec_state = self.decoder.init_state(enc_outputs, *args)
         return self.decoder(dec_X, dec_state)
@@ -124,6 +131,7 @@ class Seq2SeqEncoder(Encoder):
         self.rnn = rnn.LSTM(num_hiddens, num_layers, dropout=dropout)
 
     def forward(self, X, *args):
+        """Forward function"""
         X = self.embedding(X)
         X = X.swapaxes(0, 1)
         state = self.rnn.begin_state(batch_size=X.shape[1], ctx=X.context)
@@ -149,6 +157,7 @@ class DotProductAttention(nn.Block):
         self.dropout = nn.Dropout(dropout)
 
     def forward(self, query, key, value, valid_length=None):
+        """Forward function"""
         d = query.shape[-1]
         scores = nd.batch_dot(query, key, transpose_b=True) / math.sqrt(d)
         attention_weights = self.dropout(masked_softmax(scores, valid_length))
@@ -165,6 +174,7 @@ class MLPAttention(nn.Block):
         self.dropout = nn.Dropout(dropout)
 
     def forward(self, query, key, value, valid_length):
+        """Forward function"""
         query, key = self.W_k(query), self.W_q(key)
         features = query.expand_dims(axis=2) + key.expand_dims(axis=1)
         scores = self.v(features).squeeze(axis=-1)
