@@ -262,7 +262,7 @@ algebra, calculus, probability, and Python programming.  Moreover, this book's
 appendix provides a refresher on most of the mathematics covered in this book.
 Most of the time, we will prioritize intuition and ideas over mathematical
 rigor.  There are many terrific books which can lead the interested reader
-further. For instance Linear Analysis by Bela Bollobas :cite:`Bollobas.1990`
+further. For instance Linear Analysis by Bela Bollobas :cite:`Bollobas.1999`
 covers linear algebra and functional analysis in great
 depth. All of Statistics :cite:`Wasserman.2013`
 is a terrific guide to statistics.  And if you have not used Python before, you
