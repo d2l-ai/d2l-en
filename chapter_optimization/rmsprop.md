@@ -1,22 +1,42 @@
 # RMSProp
+:label:`chapter_rmsprop`
 
-In the experiment in the ["Adagrad"](adagrad.md) section, the learning rate of each element in the independent variable of the objective function declines (or remains unchanged) during iteration because the variable $\boldsymbol{s}_t$ in the denominator is increased by the square by element operation of the mini-batch stochastic gradient, adjusting the learning rate. Therefore, when the learning rate declines very fast during early iteration, yet the current solution is still not desirable, Adagrad might have difficulty finding a useful solution because the learning rate will be too small at later stages of iteration. To tackle this problem, the RMSProp algorithm made a small modification to Adagrad[1].
+In the experiment in :numref:`chapter_adagrad`, the learning rate of each element in the independent variable of the objective function declines (or remains unchanged) during iteration because the variable $\mathbf{s}_t$ in the denominator is increased by the square by element operation of the mini-batch stochastic gradient, adjusting the learning rate. Therefore, when the learning rate declines very fast during early iteration, yet the current solution is still not desirable, Adagrad might have difficulty finding a useful solution because the learning rate will be too small at later stages of iteration. To tackle this problem, the RMSProp algorithm made a small modification to Adagrad[1].
 
 ## The Algorithm
 
-We introduced EWMA (exponentially weighted moving average) in the ["Momentum"](momentum.md) section. Unlike in Adagrad, the state variable $\boldsymbol{s}_t$ is the sum of the square by element all the mini-batch stochastic gradients $\boldsymbol{g}_t$ up to the time step $t$, RMSProp uses the EWMA on the square by element results of these gradients. Specifically, given the hyperparameter $0 \leq \gamma < 1$, RMSProp is computed at time step $t>0$.
+Unlike in Adagrad, the state variable
+$\mathbf{s}_t$ is the sum of the square by element all the mini-batch
+stochastic gradients $\mathbf{g}_t$ up to the time step $t$, RMSProp uses
+the exponentially weighted moving average on the square by element results of these gradients. Specifically,
+given the hyperparameter $0 \leq \gamma < 1$, RMSProp is computed at time step
+$t>0$.
 
-$$\boldsymbol{s}_t \leftarrow \gamma \boldsymbol{s}_{t-1} + (1 - \gamma) \boldsymbol{g}_t \odot \boldsymbol{g}_t. $$
+$$\mathbf{s}_t \leftarrow \gamma \mathbf{s}_{t-1} + (1 - \gamma) \mathbf{g}_t \odot \mathbf{g}_t. $$
 
 Like Adagrad, RMSProp re-adjusts the learning rate of each element in the independent variable of the objective function with element operations and then updates the independent variable.
 
-$$\boldsymbol{x}_t \leftarrow \boldsymbol{x}_{t-1} - \frac{\eta}{\sqrt{\boldsymbol{s}_t + \epsilon}} \odot \boldsymbol{g}_t, $$
+$$\mathbf{x}_t \leftarrow \mathbf{x}_{t-1} - \frac{\eta}{\sqrt{\mathbf{s}_t + \epsilon}} \odot \mathbf{g}_t, $$
 
-Here, $\eta$ is the learning rate while $\epsilon$ is a constant added to maintain numerical stability, such as $10^{-6}$. Because the state variable of RMSProp is an EWMA of the squared term $\boldsymbol{g}_t \odot \boldsymbol{g}_t$, it can be seen as the weighted average of the mini-batch stochastic gradient's squared terms from the last $1/(1-\gamma)$ time steps. Therefore, the learning rate of each element in the independent variable will not always decline (or remain unchanged) during iteration.
+Here, $\eta$ is the learning rate while $\epsilon$ is a constant added to maintain numerical stability, such as $10^{-6}$.
 
-By convention, we will use the objective function $f(\boldsymbol{x})=0.1x_1^2+2x_2^2$ to observe the iterative trajectory of the independent variable in RMSProp. Recall that in the ["Adagrad"](adagrad.md) section, when we used Adagrad with a learning rate of 0.4, the independent variable moved less in later stages of iteration. However, at the same learning rate, RMSProp can approach the optimal solution faster.
+### Exponentially Weighted Moving Average (EWMA)
 
-```{.python .input  n=3}
+Now let expand the definition of $\mathbf{s}_t$, we can see that
+
+$$
+\begin{aligned}
+\mathbf{s}_t &= (1 - \gamma) \mathbf{g}_t \odot \mathbf{g}_t + \gamma \mathbf{s}_{t-1} \\
+&= (1 - \gamma) \left(\mathbf{g}_t \odot \mathbf{g}_t + \gamma \mathbf{g}_{t-1} \odot \mathbf{g}_{t-1}\right) + \gamma^2 \mathbf{s}_{t-2} \\ &\cdots\\
+&= (1 - \gamma)\left( \mathbf{g}_t \odot \mathbf{g}_t + \gamma \mathbf{g}_{t-1} \odot \mathbf{g}_{t-1} + \cdots + \gamma^{t-1}\mathbf{g}_{1} \odot \mathbf{g}_{1} \right).
+\end{aligned}
+$$
+
+In :numref:`chapter_momentum` we see that $\frac{1}{1-\gamma} = 1 + \gamma + \gamma^2 + \cdots$, so the sum of weights equals to 1. In addition, these weights decrease exponentially, it is called exponentially weighted moving average.
+
+We visualize the weights in the past 40 time steps with various $\gamma$s.
+
+```{.python .input  n=1}
 import sys
 sys.path.insert(0, '..')
 
@@ -25,6 +45,25 @@ import d2l
 import math
 from mxnet import nd
 
+gammas = [0.95, 0.9, 0.8, 0.7]
+d2l.set_figsize()
+for gamma in gammas:
+    x = nd.arange(40).asnumpy()
+    d2l.plt.plot(x, (1-gamma) * gamma ** x)
+d2l.plt.xlabel('time')
+d2l.plt.legend(['gamma = %.2f'%g for g in gammas]);
+```
+
+## Implementation from Scratch
+
+By convention, we will use the objective function
+$f(\mathbf{x})=0.1x_1^2+2x_2^2$ to observe the iterative trajectory of the
+independent variable in RMSProp. Recall that in
+:numref:`chapter_adagrad`, when we used Adagrad with a learning rate of 0.4, the independent
+variable moved less in later stages of iteration. However, at the same learning
+rate, RMSProp can approach the optimal solution faster.
+
+```{.python .input}
 def rmsprop_2d(x1, x2, s1, s2):
     g1, g2, eps = 0.2 * x1, 4 * x2, 1e-6
     s1 = gamma * s1 + (1 - gamma) * g1 ** 2
@@ -39,8 +78,6 @@ def f_2d(x1, x2):
 eta, gamma = 0.4, 0.9
 d2l.show_trace_2d(f_2d, d2l.train_2d(rmsprop_2d))
 ```
-
-## Implementation from Scratch
 
 Next, we implement RMSProp with the formula in the algorithm.
 

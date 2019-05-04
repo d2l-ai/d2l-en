@@ -1,4 +1,5 @@
 # A Hybrid of Imperative and Symbolic Programming
+:label:`chapter_hybridize`
 
 So far, this book has focused on imperative programming, which makes use of programming statements to change a program’s state. Consider the following example of simple imperative programming code.
 

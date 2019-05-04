@@ -1,16 +1,14 @@
 # Appendix
 
 
-```eval_rst
+```toc
+:maxdepth: 2
 
-.. toctree::
-   :maxdepth: 2
-
-   notation
-   math
-   jupyter
-   aws
-   buy-gpu
-   how-to-contribute
-   d2l
+notation
+math
+jupyter
+aws
+buy-gpu
+how-to-contribute
+d2l
 ```

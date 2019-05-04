@@ -1,27 +1,28 @@
 # Gated Recurrent Units (GRU)
 
-In the previous section we discussed how gradients are calculated in a recurrent neural network. In particular we found that long products of matrices can lead to vanishing or divergent gradients. Let's briefly think about what such gradient anomalies mean in practice: 
+In the previous section we discussed how gradients are calculated in a recurrent neural network. In particular we found that long products of matrices can lead to vanishing or divergent gradients. Let's briefly think about what such gradient anomalies mean in practice:
 
-* We might encounter a situation where an early observation is highly significant for predicting all future observations. Consider the somewhat contrived case where the first observation contains a checksum and the goal is to discern whether the checksum is correct at the end of the sequence. In this case the influence of the first token is vital. We would like to have some mechanism for storing vital early information in a *memory cell*. Without such a mechanism we will have to assign a very large gradient to this observation, since it affects all subsequent observations. 
+* We might encounter a situation where an early observation is highly significant for predicting all future observations. Consider the somewhat contrived case where the first observation contains a checksum and the goal is to discern whether the checksum is correct at the end of the sequence. In this case the influence of the first token is vital. We would like to have some mechanism for storing vital early information in a *memory cell*. Without such a mechanism we will have to assign a very large gradient to this observation, since it affects all subsequent observations.
 * We might encounter situations where some symbols carry no pertinent observation. For instance, when parsing a webpage there might be auxiliary HTML code that is irrelevant for the purpose of assessing the sentiment conveyed on the page. We would like to have some mechanism for *skipping such symbols* in the latent state representation.
-* We might encounter situations where there is a logical break between parts of a sequence. For instance there might be a transition between chapters in a book, a transition between a bear and a bull market for securities, etc.; In this case it would be nice to have a means of *resetting* our internal state representation. 
+* We might encounter situations where there is a logical break between parts of a sequence. For instance there might be a transition between chapters in a book, a transition between a bear and a bull market for securities, etc.; In this case it would be nice to have a means of *resetting* our internal state representation.
 
-A number of methods have been proposed to address this. One of the earliest is the Long Short Term Memory (LSTM) of [Hochreiter and Schmidhuber, 1997](http://papers.nips.cc/paper/1215-lstm-can-solve-hard-long-time-lag-problems.pdf) which we will discuss in a [later section](../chapter_recurrent-neural-networks/lstm.md). The Gated Recurrent Unit (GRU) of [Cho et al., 2014](https://arxiv.org/abs/1409.1259) is a slightly more streamlined variant that often offers comparable performance and is significantly faster to compute. See also [Chung et al., 2014](https://arxiv.org/abs/1412.3555) for more details. Due to its simplicity we start with the GRU. 
+A number of methods have been proposed to address this. One of the earliest is the Long Short Term Memory (LSTM) of [Hochreiter and Schmidhuber, 1997](http://papers.nips.cc/paper/1215-lstm-can-solve-hard-long-time-lag-problems.pdf) which we will discuss in :numref:`chapter_lstm`. The Gated Recurrent Unit (GRU) of [Cho et al., 2014](https://arxiv.org/abs/1409.1259) is a slightly more streamlined variant that often offers comparable performance and is significantly faster to compute. See also [Chung et al., 2014](https://arxiv.org/abs/1412.3555) for more details. Due to its simplicity we start with the GRU.
 
 
 ## Gating the Hidden State
 
-The key distinction between regular RNNs and GRUs is that the latter support gating of the hidden state. This means that we have dedicated mechanisms for when the hidden state should be updated and also when it should be reset. These mechanisms are learned and they address the concerns listed above. For instance, if the first symbol is of great importance we will learn not to update the hidden state after the first observation. Likewise, we will learn to skip irrelevant temporary observations. Lastly, we will learn to reset the latent state whenever needed. We discuss this in detail below. 
+The key distinction between regular RNNs and GRUs is that the latter support gating of the hidden state. This means that we have dedicated mechanisms for when the hidden state should be updated and also when it should be reset. These mechanisms are learned and they address the concerns listed above. For instance, if the first symbol is of great importance we will learn not to update the hidden state after the first observation. Likewise, we will learn to skip irrelevant temporary observations. Lastly, we will learn to reset the latent state whenever needed. We discuss this in detail below.
 
 ### Reset Gates and Update Gates
 
-The first thing we need to introduce are reset and update gates. We engineer them to be vectors with entries in $(0,1)$ such that we can perform convex combinations, e.g.\ of a hidden state and an alternative. For instance, a reset variable would allow us to control how much of the previous state we might still want to remember. Likewise, an update variable would allow us to control how much of the new state is just a copy of the old state. 
+The first thing we need to introduce are reset and update gates. We engineer them to be vectors with entries in $(0,1)$ such that we can perform convex combinations, e.g.\ of a hidden state and an alternative. For instance, a reset variable would allow us to control how much of the previous state we might still want to remember. Likewise, an update variable would allow us to control how much of the new state is just a copy of the old state.
 
-We begin by engineering gates to generate these variables. The figure below illustrates the inputs for both reset and update gates in a GRU, given the current time step input $\mathbf{X}_t$ and the hidden state of the previous time step $\mathbf{H}_{t-1}$. The output is given by a fully connected layer with a sigmoid as its activation function.  
+We begin by engineering gates to generate these variables. The figure below illustrates the inputs for both reset and update gates in a GRU, given the current time step input $\mathbf{X}_t$ and the hidden state of the previous time step $\mathbf{H}_{t-1}$. The output is given by a fully connected layer with a sigmoid as its activation function.
 
 ![ Reset and update gate in a GRU. ](../img/gru_1.svg)
 
-Here, we assume there are $h$ hidden units and, for a given time step $t$, the mini-batch input is $\mathbf{X}_t \in \mathbb{R}^{n \times d}$ (number of examples: $n$, number of inputs: $d$）and the hidden state of the last time step is $\mathbf{H}_{t-1} \in \mathbb{R}^{n \times h}$. Then, the reset gate $\mathbf{R}_t \in \mathbb{R}^{n \times h}$ and update gate $\mathbf{Z}_t \in \mathbb{R}^{n \times h}$ are computed as follows:
+Here, we assume there are $h$ hidden units and, for a given time step $t$, the
+mini-batch input is $\mathbf{X}_t \in \mathbb{R}^{n \times d}$ (number of examples: $n$, number of inputs: $d$) and the hidden state of the last time step is $\mathbf{H}_{t-1} \in \mathbb{R}^{n \times h}$. Then, the reset gate $\mathbf{R}_t \in \mathbb{R}^{n \times h}$ and update gate $\mathbf{Z}_t \in \mathbb{R}^{n \times h}$ are computed as follows:
 
 $$
 \begin{aligned}
@@ -30,7 +31,10 @@ $$
 \end{aligned}
 $$
 
-Here, $\mathbf{W}_{xr}, \mathbf{W}_{xz} \in \mathbb{R}^{d \times h}$ and $\mathbf{W}_{hr}, \mathbf{W}_{hz} \in \mathbb{R}^{h \times h}$ are weight parameters and $\mathbf{b}_r, \mathbf{b}_z \in \mathbb{R}^{1 \times h}$ are biases. We use a sigmoid function (see e.g. the [MLP](../chapter_deep-learning-basics/mlp.md) section for a description) to transform values to the interval $(0,1)$. 
+Here, $\mathbf{W}_{xr}, \mathbf{W}_{xz} \in \mathbb{R}^{d \times h}$ and
+$\mathbf{W}_{hr}, \mathbf{W}_{hz} \in \mathbb{R}^{h \times h}$ are weight
+parameters and $\mathbf{b}_r, \mathbf{b}_z \in \mathbb{R}^{1 \times h}$ are
+biases. We use a sigmoid function (see e.g. refer to :numref:`chapter_mlp` for a description) to transform values to the interval $(0,1)$.
 
 ### Reset Gate in Action
 
@@ -43,13 +47,13 @@ If we want to be able to reduce the influence of previous states we can multiply
 
 $$\tilde{\mathbf{H}}_t = \tanh(\mathbf{X}_t \mathbf{W}_{xh} + \left(\mathbf{R}_t \odot \mathbf{H}_{t-1}\right) \mathbf{W}_{hh} + \mathbf{b}_h)$$
 
-The figure below illustrates the computational flow after applying the reset gate. The symbol $\odot$ indicates pointwise multiplication between tensors.  
+The figure below illustrates the computational flow after applying the reset gate. The symbol $\odot$ indicates pointwise multiplication between tensors.
 
 ![ Candidate hidden state computation in a GRU. The multiplication is carried out elementwise. ](../img/gru_2.svg)
 
 ### Update Gate in Action
 
-Next we need to incorporate the effect of the update gate. This determines the extent to which the new state $\mathbf{H}_t$ is just the old state $\mathbf{H}_{t-1}$ and by how much the new candidate state $\tilde{\mathbf{H}}_t$ is used. The gating variable $\mathbf{Z}_t$ can be used for this purpose, simply by taking elementwise convex combinations between both candidates. This leads to the final update equation for the GRU. 
+Next we need to incorporate the effect of the update gate. This determines the extent to which the new state $\mathbf{H}_t$ is just the old state $\mathbf{H}_{t-1}$ and by how much the new candidate state $\tilde{\mathbf{H}}_t$ is used. The gating variable $\mathbf{Z}_t$ can be used for this purpose, simply by taking elementwise convex combinations between both candidates. This leads to the final update equation for the GRU.
 
 $$\mathbf{H}_t = \mathbf{Z}_t \odot \mathbf{H}_{t-1}  + (1 - \mathbf{Z}_t) \odot \tilde{\mathbf{H}}_t.$$
 
@@ -63,11 +67,12 @@ Whenever the update gate is close to $1$ we simply retain the old state. In this
 
 ## Implementation from Scratch
 
-To gain a better understanding of the model let us implement a GRU from scratch. 
+To gain a better understanding of the model let us implement a GRU from scratch.
 
 ### Reading the Data Set
 
-We begin by reading *The Time Machine* corpus that we used in the previous section discussing [Recurrent Neural Networks](rnn.md). The code for reading the data set is given below:
+We begin by reading *The Time Machine* corpus that we used in :numref:`chapter_rnn_scratch`. The code for reading the
+data set is given below:
 
 ```{.python .input  n=1}
 import sys
@@ -112,7 +117,7 @@ def get_params():
 
 ### Define the Model
 
-Now we will define the hidden state initialization function `init_gru_state`. Just like the `init_rnn_state` function defined in the ["Implementation of the Recurrent Neural Network from Scratch"](rnn-scratch.md) section, this function returns a tuple composed of an NDArray with a shape (batch size, number of hidden units) and with all values set to 0.
+Now we will define the hidden state initialization function `init_gru_state`. Just like the `init_rnn_state` function defined in :numref:`chapter_rnn_scratch`, this function returns a tuple composed of an NDArray with a shape (batch size, number of hidden units) and with all values set to 0.
 
 ```{.python .input  n=3}
 def init_gru_state(batch_size, num_hiddens, ctx):
@@ -145,7 +150,7 @@ num_epochs, num_steps, batch_size, lr, clipping_theta = 100, 35, 32, 1, 1
 prefixes = ['traveller', 'time traveller']
 
 d2l.train_and_predict_rnn(gru, get_params, init_gru_state, num_hiddens,
-                          corpus_indices, vocab, ctx, False, num_epochs, 
+                          corpus_indices, vocab, ctx, False, num_epochs,
                           num_steps, lr, clipping_theta, batch_size, prefixes)
 ```
 
@@ -156,8 +161,8 @@ In Gluon, we can directly call the `GRU` class in the `rnn` module. This encapsu
 ```{.python .input  n=6}
 gru_layer = rnn.GRU(num_hiddens)
 model = d2l.RNNModel(gru_layer, len(vocab))
-d2l.train_and_predict_rnn_gluon(model, num_hiddens, corpus_indices, vocab, 
-                                ctx, num_epochs*5, num_steps, lr, 
+d2l.train_and_predict_rnn_gluon(model, num_hiddens, corpus_indices, vocab,
+                                ctx, num_epochs*5, num_steps, lr,
                                 clipping_theta, batch_size, prefixes)
 ```
 
@@ -166,15 +171,15 @@ d2l.train_and_predict_rnn_gluon(model, num_hiddens, corpus_indices, vocab,
 * Gated recurrent neural networks are better at capturing dependencies for time series with large time step distances.
 * Reset gates help capture short-term dependencies in time series.
 * Update gates help capture long-term dependencies in time series.
-* GRUs contain basic RNNs as their extreme case whenever the reset gate is switched on. They can ignore sequences as needed. 
+* GRUs contain basic RNNs as their extreme case whenever the reset gate is switched on. They can ignore sequences as needed.
 
 
 ## Exercises
 
-1. Compare runtimes, perplexity and the extracted strings for `rnn.RNN` and `rnn.GRU` implementations with each other. 
+1. Compare runtimes, perplexity and the extracted strings for `rnn.RNN` and `rnn.GRU` implementations with each other.
 1. Assume that we only want to use the input for time step $t'$ to predict the output at time step $t > t'$. What are the best values for reset and update gates for each time step?
 1. Adjust the hyper-parameters and observe and analyze the impact on running time, perplexity, and the written lyrics.
-1. What happens if you implement only parts of a GRU? That is, implement a recurrent cell that only has a reset gate. Likewise, implement a recurrent cell only with an update gate. 
+1. What happens if you implement only parts of a GRU? That is, implement a recurrent cell that only has a reset gate. Likewise, implement a recurrent cell only with an update gate.
 
 ## References
 

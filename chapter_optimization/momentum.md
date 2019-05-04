@@ -1,11 +1,25 @@
 # Momentum
+:label:`chapter_momentum`
 
-In the ["Gradient Descent and Stochastic Gradient Descent"](./gd-sgd.md) section, we mentioned that the gradient of the objective function's independent variable represents the direction of the objective function's fastest descend at the current position of the independent variable. Therefore, gradient descent is also called steepest descent. In each iteration, the gradient descends according to the current position of the independent variable while updating the latter along the current position of the gradient. However, this can lead to problems if the iterative direction of the independent variable relies exclusively on the current position of the independent variable.
+In :numref:`chapter_gd`, we
+mentioned that the gradient of the objective function's independent variable
+represents the direction of the objective function's fastest descend at the
+current position of the independent variable. Therefore, gradient descent is
+also called steepest descent. In each iteration, the gradient descends according
+to the current position of the independent variable while updating the latter
+along the current position of the gradient. However, this can lead to problems
+if the iterative direction of the independent variable relies exclusively on the
+current position of the independent variable.
 
 
 ## Exercises with Gradient Descent
 
-Now, we will consider an objective function $f(\boldsymbol{x})=0.1x_1^2+2x_2^2$, whose input and output are a two-dimensional vector $\boldsymbol{x} = [x_1, x_2]$ and a scalar, respectively. In contrast to the ["Gradient Descent and Stochastic Gradient Descent"](./gd-sgd.md) section, here, the coefficient $x_1^2$ is reduced from $1$ to $0.1$. We are going to implement gradient descent based on this objective function, and demonstrate the iterative trajectory of the independent variable using the learning rate $0.4$.
+Now, we will consider an objective function $f(\boldsymbol{x})=0.1x_1^2+2x_2^2$,
+whose input and output are a two-dimensional vector $\boldsymbol{x} =
+[x_1, x_2]$ and a scalar, respectively. In contrast to :numref:`chapter_gd`,
+here, the coefficient $x_1^2$ is reduced from $1$ to $0.1$. We are going to
+implement gradient descent based on this objective function, and demonstrate the
+iterative trajectory of the independent variable using the learning rate $0.4$.
 
 ```{.python .input  n=3}
 import sys
@@ -37,13 +51,20 @@ d2l.show_trace_2d(f_2d, d2l.train_2d(gd_2d))
 
 ## The Momentum Method
 
-The momentum method was proposed to solve the gradient descent problem described above. Since mini-batch stochastic gradient descent is more general than gradient descent, the subsequent discussion in this chapter will continue to use the definition for mini-batch stochastic gradient descent $\boldsymbol{g}_t$ at time step $t$ given in the ["Mini-batch Stochastic Gradient Descent"](minibatch-sgd.md) section. We set the independent variable at time step $t$ to $\boldsymbol{x}_t$ and the learning rate to $\eta_t$.
-At time step $0$, momentum creates the velocity variable $\boldsymbol{v}_0$ and initializes its elements to zero. At time step $t>0$, momentum modifies the steps of each iteration as follows:
+The momentum method was proposed to solve the gradient descent problem described
+above. Since mini-batch stochastic gradient descent is more general than
+gradient descent, the subsequent discussion in this chapter will continue to use
+the definition for mini-batch stochastic gradient descent $\mathbf{g}_t$ at
+time step $t$ given in :numref:`chapter_minibatch_sgd`.  We set the independent
+variable at time step $t$ to $\mathbf{x}_t$ and the learning rate to
+$\eta_t$.  At time step $0$, momentum creates the velocity variable
+$\mathbf{v}_0$ and initializes its elements to zero. At time step $t>0$,
+momentum modifies the steps of each iteration as follows:
 
 $$
 \begin{aligned}
-\boldsymbol{v}_t &\leftarrow \gamma \boldsymbol{v}_{t-1} + \eta_t \boldsymbol{g}_t, \\
-\boldsymbol{x}_t &\leftarrow \boldsymbol{x}_{t-1} - \boldsymbol{v}_t,
+\mathbf{v}_t &\leftarrow \gamma \mathbf{v}_{t-1} + \eta_t \mathbf{g}_t, \\
+\mathbf{x}_t &\leftarrow \mathbf{x}_{t-1} - \mathbf{v}_t,
 \end{aligned}
 $$
 
@@ -68,41 +89,36 @@ eta = 0.6
 d2l.show_trace_2d(f_2d, d2l.train_2d(momentum_2d))
 ```
 
-### Exponentially Weighted Moving Average (EWMA)
+### Expanding the velocity variable $\mathbf v_t$
 
-In order to understand the momentum method mathematically, we must first explain the exponentially weighted moving average (EWMA). Given hyperparameter $0 \leq \gamma < 1$, the variable $y_t$ of the current time step $t$ is the linear combination of variable $y_{t-1}$ from the previous time step $t-1$ and another variable $x_t$ of the current step.
-
-$$y_t = \gamma y_{t-1} + (1-\gamma) x_t.$$
-
-We can expand $y_t$:
+To understand the momentum method, we can expand the velocity variable over time:
 
 $$
 \begin{aligned}
-y_t  &= (1-\gamma) x_t + \gamma y_{t-1}\\
-         &= (1-\gamma)x_t + (1-\gamma) \cdot \gamma x_{t-1} + \gamma^2y_{t-2}\\
-         &= (1-\gamma)x_t + (1-\gamma) \cdot \gamma x_{t-1} + (1-\gamma) \cdot \gamma^2x_{t-2} + \gamma^3y_{t-3}\\
-         &\ldots
+\mathbf{v}_t &= \eta_t \mathbf{g}_t + \gamma \mathbf{v}_{t-1}, \\
+             &= \eta_t \mathbf{g}_t + \gamma \eta_{t-1} \mathbf{g}_{t-1} + \gamma\mathbf{v}_{t-1}, \\
+             &\ldots\\
+             &= \eta_t \mathbf{g}_t + \gamma \eta_{t-1} \mathbf{g}_{t-1} + \ldots +  \gamma^{t-1}\eta_1\mathbf g_1. \\
 \end{aligned}
 $$
 
-Let $n = 1/(1-\gamma)$, so $\left(1-1/n\right)^n = \gamma^{1/(1-\gamma)}$. Because
+As we can see that $\mathbf v_t$ is a weighted sum over all past gradients multiplied by the according learning rate, which is the weight update in normal gradient descent. We just call it the scaled gradient. The weights deceases exponentially with the speed controlled by $\gamma$.
 
-$$ \lim_{n \rightarrow \infty}  \left(1-\frac{1}{n}\right)^n = \exp(-1) \approx 0.3679,$$
+The following code block shows the weights for the past 40 time steps under various $\gamma$s.
 
-when $\gamma \rightarrow 1$, $\gamma^{1/(1-\gamma)}=\exp(-1)$. For example, $0.95^{20} \approx \exp(-1)$. If we treat $\exp(-1)$ as a relatively small number, we can ignore all the terms that have $\gamma^{1/(1-\gamma)}$ or coefficients of higher order than $\gamma^{1/(1-\gamma)}$ in them. For example, when $\gamma=0.95$,
+```{.python .input}
+gammas = [0.95, 0.9, 0.6, 0]
+d2l.set_figsize()
+for gamma in gammas:
+    x = nd.arange(40).asnumpy()
+    d2l.plt.plot(x, gamma ** x)
+d2l.plt.xlabel('time')
+d2l.plt.legend(['gamma = %.2f'%g for g in gammas]);
+```
 
-$$y_t \approx 0.05 \sum_{i=0}^{19} 0.95^i x_{t-i}.$$
+A small $\gamma$ will let the velocity variable focus on more recent scaled gradients. While a large value will have the velocity variable to include more past scaled gradients. Compared to the plain gradient descent, momentum will make the weight updates be more consistent over time. It might smooth the training progress if $\mathbf x$ enters the region that the gradient vary, or walk out region that is too flat.
 
-Therefore, in practice, we often treat $y_t$ as the weighted average of the $x_t$ values from the last $1/(1-\gamma)$ time steps. For example, when $\gamma = 0.95$, $y_t$ can be treated as the weighted average of the $x_t$ values from the last 20 time steps; when $\gamma = 0.9$, $y_t$ can be treated as the weighted average of the $x_t$ values from the last 10 time steps. Additionally, the closer the $x_t$ value is to the current time step $t$, the greater the value's weight (closer to 1).
-
-
-### Understanding Momentum through EWMA
-
-Now, we are going to deform the velocity variable of momentum:
-
-$$\boldsymbol{v}_t \leftarrow \gamma \boldsymbol{v}_{t-1} + (1 - \gamma) \left(\frac{\eta_t}{1 - \gamma} \boldsymbol{g}_t\right). $$
-
-By the form of EWMA, velocity variable $\boldsymbol{v}_t$ is actually an EWMA of time series $\{\eta_{t-i}\boldsymbol{g}_{t-i} /(1-\gamma):i=0,\ldots,1/(1-\gamma)-1\}$. In other words, considering mini-batch SGD, the update of an independent variable with momentum at each time step approximates the EWMA of the updates in the last $1/(1-\gamma)$ time steps without momentum, divided by $1-\gamma$. Thus, with momentum, the movement size at each direction not only depends on the current gradient, but also depends on whether the past gradients are aligned at each direction. In the optimization problem mentioned earlier in this section, all the gradients are positive in the horizontal direction (rightward), but are occasionally positive (up) or negative (down) in the vertical direction. As a result, we can use a larger learning rate to allow the independent variable move faster towards the optimum.
+Also note that $\frac{1}{1-\gamma} = 1 + \gamma + \gamma^2 + \cdots$. So all scaled gradients are similar to each other, e.g. $\eta_t\mathbf g_t\approx \eta\mathbf g$ for all $t$s, then the momentum changes the weight updates from $\eta\mathbf g$ in normal gradient descent into $\frac{\eta}{1-\gamma} \mathbf g$.
 
 ## Implementation from Scratch
 

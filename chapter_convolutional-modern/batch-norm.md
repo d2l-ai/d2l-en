@@ -1,4 +1,5 @@
 # Batch Normalization
+:label:`chapter_batch_norm`
 
 Training deep models is difficult and getting them 
 to converge in a reasonable amount of time can be tricky.
@@ -256,7 +257,7 @@ class BatchNorm(nn.Block):
 
 ## Use a Batch Normalization LeNet
 
-Next, we will modify the [LeNet model](lenet.md) 
+Next, we will modify the LeNet model (:numref:`chapter_lenet`)
 in order to apply the batch normalization layer. 
 We add the batch normalization layer 
 after all the convolutional layers and after all fully-connected layers. 

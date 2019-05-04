@@ -1,9 +1,13 @@
 # Layers and Blocks
+:label:`chapter_model_construction`
 
 One of the key components that helped propel deep learning is powerful software. In an analogous manner to semiconductor design where engineers went from specifying transistors to logical circuits to writing code we now witness similar progress in the design of deep networks. The previous chapters have seen us move from designing single neurons to entire layers of neurons. However, even network design by layers can be tedious when we have 152 layers, as is the case in ResNet-152, which was proposed by [He et al.](https://www.cv-foundation.org/openaccess/content_cvpr_2016/papers/He_Deep_Residual_Learning_CVPR_2016_paper.pdf) in 2016 for computer vision problems.
 Such networks have a fair degree of regularity and they consist of *blocks* of repeated (or at least similarly designed) layers. These blocks then form the basis of more complex network designs. In short, blocks are combinations of one or more layers. This design is aided by code that generates such blocks on demand, just like a Lego factory generates blocks which can be combined to produce terrific artifacts.
 
-We start with very simple block, namely the block for a multilayer perceptron, such as the one we encountered [previously](../chapter_deep-learning-basics/mlp-gluon.md). A common strategy would be to construct a two-layer network as follows:
+We start with very simple block, namely the block for a multilayer perceptron,
+such as the one we encountered in :numref:`chapter_mlp_gluon`.
+A common strategy
+would be to construct a two-layer network as follows:
 
 ```{.python .input  n=1}
 from mxnet import nd
@@ -104,7 +108,9 @@ net.initialize()
 net(x)
 ```
 
-Indeed, it is no different than It can observed here that the use of the `MySequential` class is no different from the use of the Sequential class described in the [“Concise Implementation of Multilayer Perceptron”](../chapter_deep-learning-basics/mlp-gluon.md) section.
+Indeed, it is no different than It can observed here that the use of the
+`MySequential` class is no different from the use of the Sequential class
+described in :numref:`chapter_mlp_gluon`.
 
 
 ## Blocks with Code
@@ -179,7 +185,13 @@ chimera(x)
 
 The avid reader is probably starting to worry about the efficiency of this. After all, we have lots of dictionary lookups, code execution, and lots of other Pythonic things going on in what is supposed to be a high performance deep learning library. The problems of Python's [Global Interpreter Lock](https://wiki.python.org/moin/GlobalInterpreterLock) are well known. In the context of deep learning it means that we have a super fast GPU (or multiple of them) which might have to wait until a puny single CPU core running Python gets a chance to tell it what to do next. This is clearly awful and there are many ways around it. The best way to speed up Python is by avoiding it altogether.
 
-Gluon does this by allowing for [Hybridization](../chapter_computational-performance/hybridize.md). In it, the Python interpreter executes the block the first time it's invoked. The Gluon runtime records what is happening and the next time around it short circuits any calls to Python. This can accelerate things considerably in some cases but care needs to be taken with control flow. We suggest that the interested reader skip forward to the section covering hybridization and compilation after finishing the current chapter.
+Gluon does this by allowing for Hybridization (:numref:`chapter_hybridize`). In it, the Python
+interpreter executes the block the first time it's invoked. The Gluon runtime
+records what is happening and the next time around it short circuits any calls
+to Python. This can accelerate things considerably in some cases but care needs
+to be taken with control flow. We suggest that the interested reader skip
+forward to the section covering hybridization and compilation after finishing
+the current chapter.
 
 
 ## Summary

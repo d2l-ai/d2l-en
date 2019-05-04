@@ -1,4 +1,5 @@
 # Text Sentiment Classification: Using Convolutional Neural Networks (textCNN)
+:label:`chapter_sentiment_cnn`
 
 In the "Convolutional Neural Networks" chapter, we explored how to process two-dimensional image data with two-dimensional convolutional neural networks. In the previous language models and text classification tasks, we treated text data as a time series with only one dimension, and naturally, we used recurrent neural networks to process such data. In fact, we can also treat text as a one-dimensional image, so that we can use one-dimensional convolutional neural networks to capture associations between adjacent words. This section describes a groundbreaking approach to applying convolutional neural networks to text analysis: textCNN[1]. First, import the packages and modules required for the experiment.
 
@@ -60,7 +61,13 @@ The definition of a two-dimensional cross-correlation operation tells us that a 
 
 ![Two-dimensional cross-correlation operation with a single input channel. The highlighted parts are the first output element and the input and kernel array elements used in its calculation: $2\times(-1)+3\times(-3)+1\times3+2\times4+0\times1+1\times2=2$. ](../img/conv1d-2d.svg)
 
-Both the outputs in Figure 12.4 and Figure 12.5 have only one channel. We discussed how to specify multiple output channels in a two-dimensional convolutional layer in the [“Multiple Input and Output Channels”](../chapter_convolutional-neural-networks/channels.md)section. Similarly, we can also specify multiple output channels in the one-dimensional convolutional layer to extend the model parameters in the convolutional layer.
+Both the outputs in Figure 12.4 and Figure 12.5 have only one channel. We
+discussed how to specify multiple output channels in a two-dimensional
+convolutional layer in
+:numref:`chapter_channels`.
+Similarly,
+we can also specify multiple output channels in the one-dimensional
+convolutional layer to extend the model parameters in the convolutional layer.
 
 
 ## Max-Over-Time Pooling Layer
