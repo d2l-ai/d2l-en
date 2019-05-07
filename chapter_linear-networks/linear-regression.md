@@ -49,7 +49,7 @@ Above, the vector $\mathbf{x}$ corresponds to a single data point.
 Commonly, we will want notation to refer to
 the entire dataset of all input data points.
 This matrix, often denoted using a capital letter $X$,
-is called the *design matrix* and contrains one row for every example,
+is called the *design matrix* and contains one row for every example,
 and one column for every feature.
 
 Given a collection of data points $X$ and a vector
