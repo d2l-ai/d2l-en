@@ -264,7 +264,7 @@ Brain *structures* vary significantly. Some look (to us) rather arbitrary wherea
 
 ### Vectorization for Speed
 
-In model training or prediction, we often use vector calculations and process multiple observations at the same time. To illustrate why this matters, consider two methods of adding vectors. We begin by creating two 1000 dimensional ones first.
+In model training or prediction, we often use vector calculations and process multiple observations at the same time. To illustrate why this matters, consider two methods of adding vectors. We begin by creating two 10000 dimensional ones first.
 
 ```{.python .input  n=1}
 from mxnet import nd
