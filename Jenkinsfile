@@ -2,8 +2,8 @@ stage("Build and Publish") {
   node {
     ws('workspace/d2l-en') {
       checkout scm
-      echo "=== Setup environment ==="
-      sh '''set -ex
+
+      sh label: "Build Environment", script: '''set -ex
       # conda remove -n d2l-en-build --all -y
       rm -rf ~/miniconda3/envs/d2l-en-build-${EXECUTOR_NUMBER}
       conda create -n d2l-en-build-${EXECUTOR_NUMBER} pip -y
