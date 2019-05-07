@@ -21,11 +21,11 @@ stage("Build and Publish") {
       d2lbook build eval
       '''
 
-      echo "Check Links"
-      sh '''set -ex
-      conda activate d2l-en-build-${EXECUTOR_NUMBER}
-      d2lbook build linkcheck
-      '''
+      // echo "Check Links"
+      // sh '''set -ex
+      // conda activate d2l-en-build-${EXECUTOR_NUMBER}
+      // d2lbook build linkcheck
+      // '''
 
       echo "Build HTML"
       sh '''set -ex
