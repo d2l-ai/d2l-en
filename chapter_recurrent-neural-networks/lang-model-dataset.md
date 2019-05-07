@@ -1,7 +1,15 @@
 # Text Preprocessing
 :label:`chapter_lang_model_dataset`
 
-In the previous section we discussed some properties that make language unique. The key is that the number of tokens (aka words) is large and very unevenly distributed. Hence, a naive multiclass classification approach to predict the next symbol doesn't always work very well. Moreover, we need to turn text into a format that we can optimize over, i.e. we need to map it to vectors. At its extreme we have two alternatives. One is to treat each word as a unique entity, as proposed e.g. by [Salton, Wong and Yang, 1975](https://dl.acm.org/citation.cfm?id=361220). The problem with this strategy is that we might well have to deal with 100,000 to 1,000,000 vectors for very large and diverse corpora.
+In the previous section we discussed some properties that make language
+unique. The key is that the number of tokens (aka words) is large and very
+unevenly distributed. Hence, a naive multiclass classification approach to
+predict the next symbol doesn't always work very well. Moreover, we need to turn
+text into a format that we can optimize over, i.e. we need to map it to
+vectors. At its extreme we have two alternatives. One is to treat each word as a
+unique entity, e.g. :cite:`Salton.Wong.Yang.1975`.  The problem with this
+strategy is that we might well have to deal with 100,000 to 1,000,000 vectors
+for very large and diverse corpora.
 
 At the other extreme lies the strategy to predict one character at a time, as
 suggested e.g. by [Ling et al., 2015](https://arxiv.org/pdf/1508.02096.pdf). A

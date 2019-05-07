@@ -5,7 +5,13 @@ This section summarizes basic tools from linear algebra, differentiation, and pr
 
 ## Linear Algebra
 
-This is a brief summary of vectors, matrices, operators, norms, eigenvectors, and eigenvalues. They're needed since a significant part of deep learning revolves around manipulating matrices and vectors. For a much more in-depth introduction to linear algebra in Python see e.g. the [Jupyter notebooks] of Gilbert Strang's MIT course on [Linear Algebra](https://www.amazon.com/exec/obidos/ASIN/0980232716/).
+This is a brief summary of vectors, matrices, operators, norms, eigenvectors,
+and eigenvalues. They're needed since a significant part of deep learning
+revolves around manipulating matrices and vectors. For a much more in-depth
+introduction to linear algebra in Python see e.g. the
+[Jupyter notebooks](https://github.com/juanklopper/MIT_OCW_Linear_Algebra_18_06)
+of Gilbert Strang's MIT course on
+[Linear Algebra](http://web.mit.edu/18.06/www/videos.shtml).
 
 ### Vectors
 
@@ -71,7 +77,7 @@ $$
 \end{bmatrix}.
 $$
 
-The transpose of a matrix $\mathbf{A}^\top \in \mathbb{R}^{n \times m}$ is a matrix with $n$ rows and $m$ columns which are formed by 'flipping' over the original matrix as follows:
+The transpose of a matrix $\mathbf{A}^\top \in \mathbb{R}^{n \times m}$ is a matrix with $n$ rows and $m$ columns which are formed by "flipping" over the original matrix as follows:
 
 $$
 \mathbf{A}^\top =
@@ -92,7 +98,7 @@ $$
     a_{21} + b_{21} & a_{22} + b_{22} & \dots  & a_{2n} + b_{2n} \\
     \vdots & \vdots & \ddots & \vdots \\
     a_{m1} + b_{m1} & a_{m2} + b_{m2} & \dots  & a_{mn} + b_{mn}
-\end{bmatrix}
+\end{bmatrix}.
 $$
 
 We use the symbol $\odot$ to indicate the element-wise multiplication of two matrices (in Matlab notation this is `.*`):
@@ -104,7 +110,7 @@ $$
     a_{21}  b_{21} & a_{22}  b_{22} & \dots  & a_{2n}  b_{2n} \\
     \vdots & \vdots & \ddots & \vdots \\
     a_{m1}  b_{m1} & a_{m2}  b_{m2} & \dots  & a_{mn}  b_{mn}
-\end{bmatrix}
+\end{bmatrix}.
 $$
 
 Define a scalar $k$. Multiplication of scalars and matrices is also an element-wise multiplication:
@@ -154,11 +160,11 @@ $$\|\mathbf{x}\|_p = \left(\sum_{i=1}^n \left|x_i \right|^p \right)^{1/p}.$$
 
 For example, the $\ell_1$ norm of $\mathbf{x}$ is the sum of the absolute values of the vector elements:
 
-$$\|\mathbf{x}\|_1 = \sum_{i=1}^n \left|x_i \right|$$
+$$\|\mathbf{x}\|_1 = \sum_{i=1}^n \left|x_i \right|.$$
 
 The $\ell_2$ norm of $\mathbf{x}$ is the square root of the sum of the squares of the vector elements:
 
-$$\|\mathbf{x}\|_2 = \sqrt{\sum_{i=1}^n x_i^2}$$
+$$\|\mathbf{x}\|_2 = \sqrt{\sum_{i=1}^n x_i^2}.$$
 
 We usually use $\|\mathbf{x}\|$ to refer to the $\ell_2$ norm of $\mathbf{x}$. Lastly, the $\ell_\infty$ norm of a vector is the limit of the above definition. This works out to
 
@@ -166,7 +172,7 @@ $$\|\mathbf{x}\|_\infty = \mathop{\mathrm{max}}_i |x_i|.$$
 
 Assume $\mathbf{X}$ is a matrix with $m$ rows and $n$ columns. The Frobenius norm of matrix $\mathbf{X}$ is the square root of the sum of the squares of the matrix elements:
 
-$$\|\mathbf{X}\|_F = \sqrt{\sum_{i=1}^m \sum_{j=1}^n x_{ij}^2}$$
+$$\|\mathbf{X}\|_F = \sqrt{\sum_{i=1}^m \sum_{j=1}^n x_{ij}^2}.$$
 
 Here, $x_{ij}$ is the element of matrix $\mathbf{X}$ in row $i$ and column $j$. In other words, the Frobenius norm behaves as if it were an $\ell_2$ norm of a matrix-shaped vector.
 
@@ -283,7 +289,7 @@ $$
 \frac{\partial^2 f}{\partial x_2 \partial x_1} & \frac{\partial^2 f}{\partial x_2^2} & \dots  & \frac{\partial^2 f}{\partial x_2 \partial x_n} \\
 \vdots & \vdots & \ddots & \vdots \\
 \frac{\partial^2 f}{\partial x_n \partial x_1} & \frac{\partial^2 f}{\partial x_n \partial x_2} & \dots  & \frac{\partial^2 f}{\partial x_n^2}
-\end{bmatrix},
+\end{bmatrix}.
 $$
 
 Here, the second-order partial derivative is evaluated
