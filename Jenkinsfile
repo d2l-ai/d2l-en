@@ -2,7 +2,7 @@ stage("Build and Publish") {
   node {
     ws('workspace/d2l-en') {
       checkout scm
-      echo "Setup environment"
+      echo "=== Setup environment ==="
       sh '''set -ex
       # conda remove -n d2l-en-build --all -y
       rm -rf ~/miniconda3/envs/d2l-en-build-${EXECUTOR_NUMBER}
@@ -20,7 +20,7 @@ stage("Build and Publish") {
       d2lbook build outputcheck
       '''
 
-      echo "Execute notebooks"
+      echo "== Execute Notebooks ==="
       sh '''set -ex
       conda activate d2l-en-build-${EXECUTOR_NUMBER}
       export CUDA_VISIBLE_DEVICES=$((EXECUTOR_NUMBER*2)),$((EXECUTOR_NUMBER*2+1))
@@ -33,20 +33,20 @@ stage("Build and Publish") {
       // d2lbook build linkcheck
       // '''
 
-      echo "Build HTML"
+      echo "=== Build HTML ==="
       sh '''set -ex
       conda activate d2l-en-build-${EXECUTOR_NUMBER}
       ./static/build_html.sh
       '''
 
-      echo "Build PDF"
+      echo "=== Build PDF ==="
       sh '''#!/bin/bash
       set -ex
       conda activate d2l-en-build-${EXECUTOR_NUMBER}
       d2lbook build pdf
       '''
 
-      echo "Build Package"
+      echo "=== Build Package ==="
       sh '''set -ex
       conda activate d2l-en-build-${EXECUTOR_NUMBER}
       # don't pack downloaded data into the pkg
@@ -56,7 +56,7 @@ stage("Build and Publish") {
       mv _build/data_tmp _build/eval/data
       '''
       if (env.BRANCH_NAME == 'master') {
-        echo "Publish"
+        echo "=== Publish ==="
         sh '''set -ex
         conda activate d2l-en-build-${EXECUTOR_NUMBER}
         d2lbook deploy html pdf pkg
