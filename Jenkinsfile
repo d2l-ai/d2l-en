@@ -4,7 +4,6 @@ stage("Build and Publish") {
       checkout scm
 
       sh label: "Build Environment", script: '''set -ex
-      # conda remove -n d2l-en-build --all -y
       rm -rf ~/miniconda3/envs/d2l-en-build-${EXECUTOR_NUMBER}
       conda create -n d2l-en-build-${EXECUTOR_NUMBER} pip -y
       conda activate d2l-en-build-${EXECUTOR_NUMBER}
@@ -14,40 +13,33 @@ stage("Build and Publish") {
       pip list
       '''
 
-      echo "=== Check Execution Output ==="
-      sh script: '''set -ex
+      sh label: "Check Execution Output", script: '''set -ex
       conda activate d2l-en-build-${EXECUTOR_NUMBER}
       d2lbook build outputcheck
-      ''', label: "Check Execution Output"
+      '''
 
-      echo "== Execute Notebooks ==="
-      sh '''set -ex
+      sh label: "Execute Notebooks", script: '''set -ex
       conda activate d2l-en-build-${EXECUTOR_NUMBER}
       export CUDA_VISIBLE_DEVICES=$((EXECUTOR_NUMBER*2)),$((EXECUTOR_NUMBER*2+1))
       d2lbook build eval
       '''
 
-      // echo "Check Links"
       // sh '''set -ex
       // conda activate d2l-en-build-${EXECUTOR_NUMBER}
       // d2lbook build linkcheck
       // '''
 
-      echo "=== Build HTML ==="
-      sh '''set -ex
+      sh label:"Build HTML", script:'''set -ex
       conda activate d2l-en-build-${EXECUTOR_NUMBER}
       ./static/build_html.sh
       '''
 
-      echo "=== Build PDF ==="
-      sh '''#!/bin/bash
-      set -ex
+      sh label:"Build PDF", script:'''set -ex
       conda activate d2l-en-build-${EXECUTOR_NUMBER}
       d2lbook build pdf
       '''
 
-      echo "=== Build Package ==="
-      sh '''set -ex
+      sh label:"Build Package", script:'''set -ex
       conda activate d2l-en-build-${EXECUTOR_NUMBER}
       # don't pack downloaded data into the pkg
       mv _build/eval/data _build/data_tmp
@@ -55,9 +47,9 @@ stage("Build and Publish") {
       d2lbook build html pkg
       mv _build/data_tmp _build/eval/data
       '''
+
       if (env.BRANCH_NAME == 'master') {
-        echo "=== Publish ==="
-        sh '''set -ex
+        sh label:"Publish", script:'''set -ex
         conda activate d2l-en-build-${EXECUTOR_NUMBER}
         d2lbook deploy html pdf pkg
       '''
