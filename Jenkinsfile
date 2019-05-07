@@ -13,23 +13,33 @@ stage("Build and Publish") {
       pip install git+https://github.com/d2l-ai/d2l-book
       pip list
       '''
+
       echo "Execute notebooks"
       sh '''set -ex
       conda activate d2l-en-build-${EXECUTOR_NUMBER}
       export CUDA_VISIBLE_DEVICES=$((EXECUTOR_NUMBER*2)),$((EXECUTOR_NUMBER*2+1))
       d2lbook build eval
       '''
+
+      // echo "Check Links"
+      // sh '''set -ex
+      // conda activate d2l-en-build-${EXECUTOR_NUMBER}
+      // d2lbook build linkcheck
+      // '''
+
       echo "Build HTML"
       sh '''set -ex
       conda activate d2l-en-build-${EXECUTOR_NUMBER}
       ./static/build_html.sh
       '''
+
       echo "Build PDF"
       sh '''#!/bin/bash
       set -ex
       conda activate d2l-en-build-${EXECUTOR_NUMBER}
       d2lbook build pdf
       '''
+
       echo "Build Package"
       sh '''set -ex
       conda activate d2l-en-build-${EXECUTOR_NUMBER}
