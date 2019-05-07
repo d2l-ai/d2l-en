@@ -18,7 +18,7 @@ stage("Build and Publish") {
       sh script: '''set -ex
       conda activate d2l-en-build-${EXECUTOR_NUMBER}
       d2lbook build outputcheck
-      ''', label "Check Execution Output"
+      ''', label: "Check Execution Output"
 
       echo "== Execute Notebooks ==="
       sh '''set -ex
