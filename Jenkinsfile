@@ -14,6 +14,12 @@ stage("Build and Publish") {
       pip list
       '''
 
+      echo "=== Check Execution Output ==="
+      sh '''set -ex
+      conda activate d2l-en-build-${EXECUTOR_NUMBER}
+      d2lbook build outputcheck
+      '''
+
       echo "Execute notebooks"
       sh '''set -ex
       conda activate d2l-en-build-${EXECUTOR_NUMBER}
