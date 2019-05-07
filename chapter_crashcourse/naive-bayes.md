@@ -64,13 +64,6 @@ py = ycount / ycount.sum()
 px = (xcount / ycount.reshape(1,10))
 ```
 
-```{.python .input  n=9}
-for data, label in mnist_train:
-    y = int(label)
-    ycount[y] += 1
-    xcount[:,y] += data.reshape((784))
-```
-
 Now that we computed per-pixel counts of occurrence for all pixels, it's time to see how our model behaves. Time to plot it. This is where it is so much more convenient to work with images. Visualizing 28x28x10 probabilities (for each pixel for each class) would typically be an exercise in futility. However, by plotting them as images we get a quick overview. The astute reader probably noticed by now that these are some mean looking digits ...
 
 ```{.python .input  n=2}
