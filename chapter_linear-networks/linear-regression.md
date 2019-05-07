@@ -214,11 +214,11 @@ After completing the training process, we record the estimated model parameters,
 (in general the "hat" symbol denotes estimates).
 Note that the parameters that we learn via gradient descent
 are not exactly equal to the true minimizers of the loss on the training set,
-that's be cause gradient descent converges slowly to a local minimum but does not achieve it exactly.
+that's because gradient descent converges slowly to a local minimum but does not achieve it exactly.
 Moreover if the problem has multiple local minimum, we may not necessarily achieve the lowest minimum.
 Fortunately, for deep neural networks, finding parameters that minimize the loss *on training data* is seldom a significant problem. The more formidable task is to find parameters that will achieve low loss on data that we have not seen before, a challenge called *generalization*. We return to these topics throughout the book.
 
-Given the learned learned linear regression model $\hat{\mathbf{w}}^\top x + \hat{b}$, we can now estimate the price of any house outside the training data set with area (square feet) as $x_1$ and house age (year) as $x_2$. Here, estimation also referred to as ‘model prediction’ or ‘model inference’.
+Given the learned linear regression model $\hat{\mathbf{w}}^\top x + \hat{b}$, we can now estimate the price of any house outside the training data set with area (square feet) as $x_1$ and house age (year) as $x_2$. Here, estimation also referred to as ‘model prediction’ or ‘model inference’.
 
 Note that calling this step 'inference' is a misnomer,
 but has become standard jargon in deep learning.
@@ -264,7 +264,7 @@ Brain *structures* vary significantly. Some look (to us) rather arbitrary wherea
 
 ### Vectorization for Speed
 
-In model training or prediction, we often use vector calculations and process multiple observations at the same time. To illustrate why this matters, consider two methods of adding vectors. We begin by creating two 1000 dimensional ones first.
+In model training or prediction, we often use vector calculations and process multiple observations at the same time. To illustrate why this matters, consider two methods of adding vectors. We begin by creating two 10000 dimensional ones first.
 
 ```{.python .input  n=1}
 from mxnet import nd
