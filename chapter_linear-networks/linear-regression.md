@@ -214,7 +214,7 @@ After completing the training process, we record the estimated model parameters,
 (in general the "hat" symbol denotes estimates).
 Note that the parameters that we learn via gradient descent
 are not exactly equal to the true minimizers of the loss on the training set,
-that's be cause gradient descent converges slowly to a local minimum but does not achieve it exactly.
+that's because gradient descent converges slowly to a local minimum but does not achieve it exactly.
 Moreover if the problem has multiple local minimum, we may not necessarily achieve the lowest minimum.
 Fortunately, for deep neural networks, finding parameters that minimize the loss *on training data* is seldom a significant problem. The more formidable task is to find parameters that will achieve low loss on data that we have not seen before, a challenge called *generalization*. We return to these topics throughout the book.
 
