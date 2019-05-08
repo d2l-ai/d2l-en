@@ -36,7 +36,7 @@ so that we can easily visualize the data
 and compare the true pattern to the learned parameters.
 We will set the number of examples in our training set to be 1000
 and the number of features (or covariates) to 2.
-This our synthetic dataset will be an object
+Thus our synthetic dataset will be an object
 $\mathbf{X}\in \mathbb{R}^{1000 \times 2}$.
 In this example, we will synthesize our data by sampling
 each data point $\mathbf{x}_i$ from a Gaussian distribution.
