@@ -52,7 +52,7 @@ $$\mathbf{y}= \mathbf{X} \mathbf{w} + b + \mathbf\epsilon$$
 
 Following standard assumptions, we choose a noise term $\epsilon$
 that obeys a normal distribution with mean of $0$,
-and in this example, we'll set the its standard deviation to $0.01$.
+and in this example, we'll set its standard deviation to $0.01$.
 The following code generates our synthetic dataset:
 
 ```{.python .input  n=2}
