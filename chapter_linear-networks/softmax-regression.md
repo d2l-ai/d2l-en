@@ -17,8 +17,8 @@ then you're probably looking for a regression model.
 In practice, we're more often interested in classification:
 asking not *how much* but *which one*.
 
-* Does this email belong in the spam folder or the inbox*?
-* Is this customer more likley *to sign up* or *not to sign up* for a subscription service?*
+* Does this email belong in the spam folder or the inbox?
+* Is this customer more likely *to sign up* or *not to sign up* for a subscription service?
 * Does this image depict a donkey, a dog, a cat, or a rooster?
 * Which movie is user most likely to watch next?
 
@@ -32,7 +32,7 @@ To get our feet wet, let's start off with a somewhat contrived image classificat
 First, we have to choose how to represent the labels. We have two obvious choices. Perhaps the most natural impulse would be to choose $y \in \{1, 2, 3\}$, where the integers represent {dog, cat, chicken} respectively. This is a great way of *storing* such information on a computer.
 If the categories had some natural ordering among them, say if we were trying to predict {baby, child, adolescent, adult}, then it might even make sense to cast this problem as a regression and keep the labels in this format.
 
-But general classification problems do not come with natural orderings among the classes. To deal with problems like this, statisticians invented an alternative way to represent categorical data: the one hot encoding. Here we have a vector with one component for every possible category. For a given instance, we set the component correponding to *its category* to 1, and set all other components to 0.
+But general classification problems do not come with natural orderings among the classes. To deal with problems like this, statisticians invented an alternative way to represent categorical data: the one hot encoding. Here we have a vector with one component for every possible category. For a given instance, we set the component corresponding to *its category* to 1, and set all other components to 0.
 
 $$y \in \{(1, 0, 0), (0, 1, 0), (0, 0, 1)\}$$
 
@@ -40,7 +40,7 @@ In our case, $y$ would be a three-dimensional vector, with $(1,0,0)$ correspondi
 
 ### Network Architecture
 
-In order to estimate multiple classes, we need a model with multiple outputs, one per category. This is one of the main differences beween classification and regression models. To address classification with linear models, we will need as many linear functions as we have outputs. Each output will correpsond to its own linear function. In our case, since we have 4 features and 3 possible output categories, we will need 12 scalars to represent the weights,  ($w$ with subscripts) and 3 scalars to represent the biases ($b$ with subscripts). We compute these three outputs, $o_1, o_2$, and $o_3$, for each input:
+In order to estimate multiple classes, we need a model with multiple outputs, one per category. This is one of the main differences between classification and regression models. To address classification with linear models, we will need as many linear functions as we have outputs. Each output will correspond to its own linear function. In our case, since we have 4 features and 3 possible output categories, we will need 12 scalars to represent the weights,  ($w$ with subscripts) and 3 scalars to represent the biases ($b$ with subscripts). We compute these three outputs, $o_1, o_2$, and $o_3$, for each input:
 
 $$
 \begin{aligned}
@@ -60,7 +60,7 @@ We can depict this calculation with the neural network diagram below. Just as in
 To express the model more compactly, we can use linear algebra notation. In vector form, we arrive at $\mathbf{o} = \mathbf{W} \mathbf{x} + \mathbf{b}$, a form better suited both for mathematics, and for writing code. Note that we have gathered all of our weights into a $3\times4$ matrix and that for a given example $\mathbf{x}$ our outputs are given by a matrix vector product of our weights by our inputs plus our biases $\mathbf{b}$.
 
 
-If we are inerested in hard classifications, we need to convert these outputs into a discrete prediction. One straightforward way to do this is to treat the output values $o_i$ as the relative confidence levels that the item belongs to each category $i$. Then we can choose the class with the largest output value as our prediction $\operatorname*{argmax}_i o_i$. For example, if $o_1$, $o_2$, and $o_3$ are 0.1, 10, and 0.1, respectively, then we predict category 2, which represents "chicken".
+If we are interested in hard classifications, we need to convert these outputs into a discrete prediction. One straightforward way to do this is to treat the output values $o_i$ as the relative confidence levels that the item belongs to each category $i$. Then we can choose the class with the largest output value as our prediction $\operatorname*{argmax}_i o_i$. For example, if $o_1$, $o_2$, and $o_3$ are 0.1, 10, and 0.1, respectively, then we predict category 2, which represents "chicken".
 
 However, there are a few problems with using the output from the output layer directly. First, because the range of output values from the output layer is uncertain, it is difficult to judge the meaning of these values. For instance, the output value 10 from the previous example appears to indicate that we are *very confident* that the image category is *chicken*. But just how confident? Is it 100 times more likely to be a chicken than a dog or are we less confident?
 
@@ -86,12 +86,12 @@ $$
 \hat{\imath}(\mathbf{o}) = \operatorname*{argmax}_i o_i = \operatorname*{argmax}_i \hat y_i
 $$
 
-In short, the softmax operation perserves the orderings of its inputs, and thus does not alter the predicted category vs our simpler *argmax* model. However, it gives the outputs $\mathbf{o}$ proper meaning: they are the pre-softmax values determining the probabilities assigned to each category. Summarizing it all in vector notation we get ${\mathbf{o}}^{(i)} = \mathbf{W} {\mathbf{x}}^{(i)} + {\mathbf{b}}$ where ${\hat{\mathbf{y}}}^{(i)} = \mathrm{softmax}({\mathbf{o}}^{(i)})$.
+In short, the softmax operation preserves the orderings of its inputs, and thus does not alter the predicted category vs our simpler *argmax* model. However, it gives the outputs $\mathbf{o}$ proper meaning: they are the pre-softmax values determining the probabilities assigned to each category. Summarizing it all in vector notation we get ${\mathbf{o}}^{(i)} = \mathbf{W} {\mathbf{x}}^{(i)} + {\mathbf{b}}$ where ${\hat{\mathbf{y}}}^{(i)} = \mathrm{softmax}({\mathbf{o}}^{(i)})$.
 
 
 ### Vectorization for Minibatches
 
-Again, to improve computational efficiency and take advantage of GPUs, we will typicaly carry out vector calculations for mini-batches of data. Assume that we are given a mini-batch $\mathbf{X}$ of examples with dimensionality $d$ and batch size $n$. Moreover, assume that we have $q$ categories (outputs). Then the minibatch features $\mathbf{X}$ are in $\mathbb{R}^{n \times d}$, weights $\mathbf{W} \in \mathbb{R}^{d \times q}$ and the bias satisfies $\mathbf{b} \in \mathbb{R}^q$.
+Again, to improve computational efficiency and take advantage of GPUs, we will typically carry out vector calculations for mini-batches of data. Assume that we are given a mini-batch $\mathbf{X}$ of examples with dimensionality $d$ and batch size $n$. Moreover, assume that we have $q$ categories (outputs). Then the minibatch features $\mathbf{X}$ are in $\mathbb{R}^{n \times d}$, weights $\mathbf{W} \in \mathbb{R}^{d \times q}$ and the bias satisfies $\mathbf{b} \in \mathbb{R}^q$.
 
 $$
 \begin{aligned}
@@ -100,7 +100,7 @@ $$
 \end{aligned}
 $$
 
-This accelerates the dominant operation into a matrix-matrix product $\mathbf{W} \mathbf{X}$ vs the matrix-vector products we would be exectuting if we processed one example at a time. The softmax itself can be computed by exponentiating all entries in $\mathbf{O}$ and then normalizing them by the sum appropriately.
+This accelerates the dominant operation into a matrix-matrix product $\mathbf{W} \mathbf{X}$ vs the matrix-vector products we would be executing if we processed one example at a time. The softmax itself can be computed by exponentiating all entries in $\mathbf{O}$ and then normalizing them by the sum appropriately.
 
 ## Loss Function
 :label:`section_cross_entropy`
