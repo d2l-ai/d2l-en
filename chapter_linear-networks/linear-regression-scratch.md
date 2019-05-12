@@ -231,7 +231,7 @@ The size of the update step is determined by the learning rate `lr`.
 Because our loss is calculated as a sum over the batch of examples,
 we normalize our step size by the batch size (`batch_size`),
 so that the magnitude of a typical step size
-doesn't depend heavily our choice of the batch size.
+doesn't depend heavily on our choice of the batch size.
 
 ```{.python .input  n=11}
 # This function has been saved in the d2l package for future use
