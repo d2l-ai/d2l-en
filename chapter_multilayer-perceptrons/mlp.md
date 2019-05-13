@@ -14,7 +14,7 @@ using deep neural networks.
 
 ## Hidden Layers
 
-Recall that for linear regression and sofmax regression,
+Recall that for linear regression and softmax regression,
 we mapped our inputs directly to our outputs
 via a single linear transformation:
 
