@@ -58,7 +58,7 @@ based on whether they depict *cats* or *dogs* given black-and-white images.
 If we use a linear model, we'd basically be saying that
 for each pixel, increasing its value (making it more white)
 must always increases the probability that the image depicts a dog
-or must always increase the probability thatthe image depicts a cat.
+or must always increase the probability that the image depicts a cat.
 We would be making the absurd assumption that the only requirement
 for differentiating cats vs. dogs is to assess how bright they are.
 That approach is doomed to fail in a work
@@ -76,7 +76,7 @@ The easiest way to do this is to stack
 many layers of neurons on top of each other.
 Each layer feeds into the layer above it, until we generate an output.
 This architecture is commonly called a *multilayer perceptron*,
-often abbriviated as *MLP*.
+often abbreviated as *MLP*.
 The neural network diagram for an MLP looks like this:
 
 ![Multilayer perceptron with hidden layers. This example contains a hidden layer with 5 hidden units in it. ](../img/mlp.svg)
@@ -119,7 +119,7 @@ $$\mathbf{o} = \mathbf{W}_2 \mathbf{h} + \mathbf{b}_2 = \mathbf{W}_2 (\mathbf{W}
 
 In order to get a benefit from multilayer architectures,
 we need another key ingredient—a nonlinearity $\sigma$ to be applied to each of the hidden units after each layer's linear transformation.
-The most popular choice for the nonlinearity these days is the recitified linear unit (ReLU) $\mathrm{max}(x,0)$.
+The most popular choice for the nonlinearity these days is the rectified linear unit (ReLU) $\mathrm{max}(x,0)$.
 After incorporating these non-linearities
 it becomes impossible to merge layers.
 
@@ -138,7 +138,7 @@ on top of each other to obtain a true multilayer perceptron.
 
 Multilayer perceptrons can account for complex interactions in the inputs
 because the hidden neurons depend on the values of each of the inputs.
-It’s easy to design a hidden node that that does arbitrary computation,
+It’s easy to design a hidden node that does arbitrary computation,
 such as, for instance, logical operations on its inputs.
 Moreover, for certain choices of the activation function
 it’s widely known that multilayer perceptrons are universal approximators.
@@ -147,7 +147,7 @@ with enough nodes, and the right set of weights,
 we can model any function at all!
 *Actually learning that function is the hard part.*
 
-Moreover, just be cause a single-layer network *can* learn any function
+Moreover, just because a single-layer network *can* learn any function
 doesn't mean that you should try to solve all of your problems with single-layer networks.
 It turns out that we can approximate many functions
 much more compactly if we use deeper (vs wider) neural networks.
@@ -181,7 +181,7 @@ This is true for most activation functions
 
 ## Activation Functions
 
-Beause they are so fundamental to deep leanring, before going further,
+Because they are so fundamental to deep learning, before going further,
 let's take a brief look at some common activation functions.
 
 ### ReLU Function
@@ -198,7 +198,7 @@ $$\mathrm{ReLU}(z) = \max(z, 0).$$
 It can be understood that the ReLU function retains only positive elements and discards negative elements (setting those nodes to 0).
 To get a better idea of what it looks like, we can plot it.
 For convenience, we define a plotting function `xyplot`
-to take care of the gruntwork.
+to take care of the groundwork.
 
 ```{.python .input  n=1}
 import sys
@@ -253,7 +253,7 @@ The reason for using the ReLU is that its derivatives are particularly well beha
 ### Sigmoid Function
 
 The sigmoid function transforms its inputs which take values in $\mathbb{R}$ to the interval $(0,1)$.
-Forthat reason, the sigmoid is often called a *squashing* function:
+For that reason, the sigmoid is often called a *squashing* function:
 it squashes any input in the range (-inf, inf)
 to some value in the range (0,1).
 

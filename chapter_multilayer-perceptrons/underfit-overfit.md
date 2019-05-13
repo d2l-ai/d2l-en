@@ -9,7 +9,7 @@ Each person's genes uniquely identify them,
 not just among people represented in our dataset,
 but among all people on earth!
 
-Given the genetic markers representing a some person,
+Given the genetic markers representing some person,
 we don't want our model to simply recognize "oh, that's Bob",
 and then output the classification,
 say among {*dementia*, *mild cognitive impairment*, *healthy*},
@@ -17,10 +17,10 @@ that corresponds to Bob.
 Rather, our goal is to discover patterns
 that capture regularities in the underlying population
 from which our training set was drawn.
-If we are successfuly in this endeavour,
-then we can could successfully assess risk
+If we are successfully in this endeavor,
+then we could successfully assess risk
 even for individuals that we have never encountered before.
-This problem---how to disover patterns that *generalize*---is
+This problem---how to discover patterns that *generalize*---is
 the fundamental problem of machine learning.
 
 
@@ -83,7 +83,7 @@ were we to apply it to an infinite stream of additional data points
 drawn from the same underlying data distribution as our original sample.
 
 Problematically, *we can never calculate the generalization error exactly*.
-That's because the imaginary stream of inifinit data is an imaginary object.
+That's because the imaginary stream of infinite data is an imaginary object.
 In practice, we must *estimate* the generalization error
 by applying our model to an independent test set
 constituted of a random selection of data points
@@ -104,19 +104,19 @@ Another student might prepare by trying to understand
 the reasons for giving certain answers.
 In most cases, the latter student will do much better.
 
-Likewise, consider a model that simply uses a lookup table to answer questions. If the set of allowable inputs is discrete and reasonably small, then perhaps after viewing *many* training examples, this approach would perform well. Still this model has no ability to do better than random guessing when faced with exampels that it has never seen before.
-In reality the input spaces are far too large to memorize the answers corresponding to every conceivable input. For example, consider the black and white $28\times28$ images. If each pixel can take one among $256$ gray scale values, then there are $256^784$ possible images. That means that there are far more low-res grayscale thumbnail-sized images than there are atoms in the universe. Even if we could encounter this data, we could never afford to store the lookuptable.
+Likewise, consider a model that simply uses a lookup table to answer questions. If the set of allowable inputs is discrete and reasonably small, then perhaps after viewing *many* training examples, this approach would perform well. Still this model has no ability to do better than random guessing when faced with examples that it has never seen before.
+In reality the input spaces are far too large to memorize the answers corresponding to every conceivable input. For example, consider the black and white $28\times28$ images. If each pixel can take one among $256$ gray scale values, then there are $256^{784}$ possible images. That means that there are far more low-res grayscale thumbnail-sized images than there are atoms in the universe. Even if we could encounter this data, we could never afford to store the lookup table.
 
 Lastly, consider the problem of trying
 to classify the outcomes of coin tosses (class 0: heads, class 1: tails)
 based on some contextual features that might be available.
-No matter what what algorithm we come up with,
+No matter what algorithm we come up with,
 because the generalization error will always be $\frac{1}{2}$.
 However, for most algorithms,
 we should expect our training error to be considerably lower,
 depending on the luck of the draw,
 even if we didn't have any features!
-Consder the dataset {0, 1, 1, 1, 0, 1}.
+Consider the dataset {0, 1, 1, 1, 0, 1}.
 Our feature-less would have to fall back on always predicting
 the *majority class*, which appears from our limited sample to be *1*.
 In this case, the model that always predicts class 1
