@@ -7,6 +7,9 @@ Put simply, this means that for each of the model's parameters, we can determine
 The autograd package expedites this work by automatically calculating derivatives. And while many other libraries require that we compile a symbolic graph to take automatic derivatives, `autograd` allows us to take derivatives while writing  ordinary imperative code. Every time we pass data through our model, `autograd` builds a graph on the fly, tracking which data combined through which operations to produce the output. This graph enables `autograd` to subsequently backpropagate gradients on command. Here *backpropagate* simply means to trace through the compute graph, filling in the partial derivatives with respect to each parameter. If you are unfamiliar with some of the math, e.g. gradients, please refer to :numref:`chapter_math`.
 
 ```{.python .input  n=1}
+import mxnet as mx
+mx.set_np_compat(True)
+
 from mxnet import numpy as np, autograd, nd
 ```
 
@@ -31,9 +34,8 @@ Now we are going to compute ``y`` and MXNet will generate a computation graph on
 Note that building the computation graph requires a nontrivial amount of computation. So MXNet will *only* build the graph when explicitly told to do so. This happens by placing code inside a ``with autograd.record():`` block.
 
 ```{.python .input  n=4}
-#FIXME, cannot execute 2.0 * np.dot(x.T, x)
 with autograd.record():
-    y = np.dot(x.T, x)
+    y = 2 * np.dot(x.T, x)
 print(y)
 ```
 
@@ -46,7 +48,8 @@ y.backward()
 The gradient of the function $y = 2\mathbf{x}^{\top}\mathbf{x}$ with respect to $\mathbf{x}$ should be $4\mathbf{x}$. Now let's verify that the gradient produced is correct.
 
 ```{.python .input  n=6}
-#print((x.grad - 4 * x).norm().asscalar() == 0)
+#FIXME
+#print((x.grad - 4 * x).norm() == 0)
 print(x.grad)
 ```
 
@@ -82,8 +85,8 @@ Note that the number of iterations of the while loop and the execution of the co
 
 ```{.python .input  n=9}
 #FIXME, no random
-#a = nd.random.normal(shape=1).as_np_ndarray()
-#a.attach_grad()
+a = nd.random.normal(shape=1).as_np_ndarray()
+a.attach_grad()
 #FIXME, cannot execute f
 #with autograd.record():
 #    d = f(a)
