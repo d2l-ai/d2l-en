@@ -8,11 +8,11 @@ stage("Build and Publish") {
       def ENV_NAME = "${TASK}-${EXECUTOR_NUMBER}"
       checkout scm
 
-      sh '''set -ex
+      sh """set -ex
       echo ${TASK}
       echo "${TASK}"
       echo "${ENV_NAME}"
-      '''
+      """
     }
   }
 }
