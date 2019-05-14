@@ -21,7 +21,7 @@ stage("Build and Publish") {
 
       sh label: "Execute Notebooks", script: """set -ex
       conda activate ${ENV_NAME}
-      export CUDA_VISIBLE_DEVICES=$((EXECUTOR_NUMBER*2)),$((EXECUTOR_NUMBER*2+1))
+      # export CUDA_VISIBLE_DEVICES=$((EXECUTOR_NUMBER*2)),$((EXECUTOR_NUMBER*2+1))
       d2lbook build eval
       """
 
