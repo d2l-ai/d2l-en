@@ -56,7 +56,6 @@ stage("Build and Publish") {
         d2lbook deploy html pdf pkg
       '''
       }
-	}
     }
   }
 }
