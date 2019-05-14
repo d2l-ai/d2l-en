@@ -47,7 +47,8 @@ stage("Build and Publish") {
         sh label:"Publish", script:"""set -ex
         conda activate ${ENV_NAME}
         d2lbook deploy html pdf pkg
-      """
+        """
+      }
     }
   }
 }
