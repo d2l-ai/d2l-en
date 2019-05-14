@@ -13,7 +13,7 @@ stage("Build and Publish") {
       pip install d2l>=0.9.2
       pip install git+https://github.com/d2l-ai/d2l-book
       pip list
-      '''
+      """
     }
   }
 }
