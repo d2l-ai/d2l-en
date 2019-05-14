@@ -2,10 +2,10 @@ stage("Build and Publish") {
   def TASK = "d2l-en-numpy"
   def ENV_NAME = "${TASK}-${EXECUTOR_NUMBER}"
   node {
-    ws('workspace/${TASK}') {
+    ws("workspace/${TASK}") {
       checkout scm
 
-      sh label: "Build Environment", script: '''set -ex
+      sh label: "Build Environment", script: """set -ex
       rm -rf ~/miniconda3/envs/${ENV_NAME}
       conda create -n ${ENV_NAME} pip -y
       conda activate ${ENV_NAME}
