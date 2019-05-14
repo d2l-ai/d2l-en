@@ -267,20 +267,21 @@ Brain *structures* vary significantly. Some look (to us) rather arbitrary wherea
 In model training or prediction, we often use vector calculations and process multiple observations at the same time. To illustrate why this matters, consider two methods of adding vectors. We begin by creating two 10000 dimensional ones first.
 
 ```{.python .input  n=1}
-from mxnet import nd
+from mxnet import numpy as np, nd
 from time import time
 
-a = nd.ones(shape=10000)
-b = nd.ones(shape=10000)
+a = np.ones(shape=10000)
+b = np.ones(shape=10000)
 ```
 
 One way to add vectors is to add them one coordinate at a time using a for loop.
 
 ```{.python .input  n=2}
 start = time()
-c = nd.zeros(shape=10000)
-for i in range(10000):
-    c[i] = a[i] + b[i]
+c = np.zeros(shape=10000)
+#FIXME
+#for i in range(10000):
+#    c[i] = a[i] + b[i]
 time() - start
 ```
 
@@ -306,10 +307,10 @@ It can be visualized as follows:
 %matplotlib inline
 from matplotlib import pyplot as plt
 from IPython import display
-from mxnet import nd
 import math
 
-x = nd.arange(-7, 7, 0.01)
+#FIMXME
+x = nd.arange(-7, 7, 0.01).as_np_ndarray()
 # Mean and variance pairs
 parameters = [(0,1), (0,2), (3,1)]
 
@@ -317,8 +318,10 @@ parameters = [(0,1), (0,2), (3,1)]
 display.set_matplotlib_formats('svg')
 plt.figure(figsize=(10, 6))
 for (mu, sigma) in parameters:
-    p = (1/math.sqrt(2 * math.pi * sigma**2)) * nd.exp(-(0.5/sigma**2) * (x-mu)**2)
-    plt.plot(x.asnumpy(), p.asnumpy(), label='mean ' + str(mu) + ', variance ' + str(sigma))
+    #FIXME
+    #p = (1/math.sqrt(2 * math.pi * sigma**2)) * np.exp(-(0.5/sigma**2) * (x-mu)**2)
+    #plt.plot(x, p, label='mean ' + str(mu) + ', variance ' + str(sigma))
+    pass
 
 plt.legend()
 plt.show()
