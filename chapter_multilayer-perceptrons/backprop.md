@@ -8,7 +8,7 @@ we only worried about the calculations involved
 in *forward propagation* through the model.
 In other words, we implemented the calculations
 required for the model to generate output
-corresponding to come given input,
+corresponding to some given input,
 but when it came time to calculate the gradients of each of our parameters,
 we invoked the `backward` function,
 relying on the `autograd` module to figure out what to do.
@@ -31,7 +31,7 @@ if you want to go beyond a shallow understanding of deep learning.
 
 In this section, we'll peel back the curtain on some of the details
 of backward propagation (more commonly called *backpropagation* or *backprop*).
-To convey some insight for both the techniques and how they are implementated,
+To convey some insight for both the techniques and how they are implemented,
 we will rely on both mathematics and computational graphs
 to describe the mechanics behind neural network computations.
 To start, we will focus our exposition on
@@ -140,7 +140,7 @@ are $\mathbf{W}^{(1)}$ and $\mathbf{W}^{(2)}$.
 The objective of backpropagation is to
 calculate the gradients $\partial J/\partial \mathbf{W}^{(1)}$
 and $\partial J/\partial \mathbf{W}^{(2)}$.
-To accompish this, we will apply the chain rule
+To accomplish this, we will apply the chain rule
 and calculate, in turn, the gradient of
 each intermediate variable and parameter.
 The order of calculations are reversed
