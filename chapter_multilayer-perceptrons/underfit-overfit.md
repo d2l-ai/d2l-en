@@ -264,7 +264,7 @@ we will typically employ a validation set.
 ### Validation Data Set
 
 In principle we should not touch our test set
-until after we have chosen our all our hyper-parameters.
+until after we have chosen all our hyper-parameters.
 Were we to use the test data in the model selection process,
 there's a risk that we might overfit the test data.
 Then we would be in serious trouble.
