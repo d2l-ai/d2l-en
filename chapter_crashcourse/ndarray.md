@@ -197,7 +197,7 @@ z[:] = x + y
 print('id(z):', id(z))
 ```
 
-While this looks pretty, `x+y` here will still allocate a temporary buffer to store the result of `x+y` before copying it to `y[:]`. To make even better use of memory, we can directly invoke the underlying `ndarray` operation, in this case `elemwise_add`, avoiding temporary buffers. We do this by specifying the `out` keyword argument, which every `ndarray` operator supports:
+While this looks pretty, `x+y` here will still allocate a temporary buffer to store the result of `x+y` before copying it to `z[:]`. To make even better use of memory, we can directly invoke the underlying `ndarray` operation, in this case `elemwise_add`, avoiding temporary buffers. We do this by specifying the `out` keyword argument, which every `ndarray` operator supports:
 
 ```{.python .input  n=17}
 before = id(z)

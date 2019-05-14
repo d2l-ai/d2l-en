@@ -1,6 +1,6 @@
 # Documentation
 
-Due to constraints on the length of this book, we cannot possibly introduce every single MXNet function and class (and you probably would no want us to). The API documentation and additional tutorials and examples provide plenty of documentation beyond the book. In this section we provide you some guidance to exploring the MXNet API.
+Due to constraints on the length of this book, we cannot possibly introduce every single MXNet function and class (and you probably would not want us to). The API documentation and additional tutorials and examples provide plenty of documentation beyond the book. In this section we provide you some guidance to exploring the MXNet API.
 
 ## Finding all the functions and classes in the module
 
