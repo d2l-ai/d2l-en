@@ -18,10 +18,6 @@ mx.set_np_compat(True)
 from mxnet import numpy as np
 ```
 
-```{.python .input}
-import numpy as onp
-```
-
 NDArrays represent (possibly multi-dimensional) arrays of numerical values. NDArrays with one axis correspond (in math-speak) to *vectors*. NDArrays with two axes correspond to *matrices*. For arrays with more than two axes, mathematicians do not have special names---they simply call them *tensors*.
 
 The simplest object we can create is a vector. To start, we can use `arange` to create a row vector with 12 consecutive integers.
