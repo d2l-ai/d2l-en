@@ -6,8 +6,8 @@ stage("Build and Publish") {
       checkout scm
 
       sh '''set -ex
-      echo ${TASK}
-      sh echo ${ENV_NAME}
+      echo "${TASK}"
+      echo "${ENV_NAME}"
       '''
     }
   }
