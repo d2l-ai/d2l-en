@@ -23,7 +23,7 @@ lots of page real estate to deriving update rules.
 
 While we plan to continue relying on `autograd`,
 and we have already come a long way
-without every discussing how these gradients
+without even discussing how these gradients
 are calculated efficiently under the hood,
 it's important that you know
 how updates are actually calculated
