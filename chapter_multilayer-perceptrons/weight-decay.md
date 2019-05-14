@@ -81,7 +81,7 @@ $y^{(i)}$ are labels, and $(\mathbf{w}, b)$
 are the weight and bias parameters respectively.
 To arrive at a new loss function
 that penalizes the size of the weight vector,
-we need to add $||mathbf{w}||^2$, but how much should we add?
+we need to add $||\mathbf{w}||^2$, but how much should we add?
 To address this, we need to add a new hyperparameter,
 that we will call the *regularization constant* and denote by $\lambda$:
 
