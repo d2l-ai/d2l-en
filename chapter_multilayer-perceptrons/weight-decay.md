@@ -57,7 +57,7 @@ For our present purposes, a very simple interpretation will suffice:
 We will consider a linear function
 $f(\mathbf{x}) = \mathbf{w}^\top \mathbf{x}$
 to be simple if its weight vector is small.
-We can measure this via $||mathbf{w}||^2$.
+We can measure this via $||\mathbf{w}||^2$.
 One way of keeping the weight vector small
 is to add its norm as a penalty term
 to the problem of minimizing the loss.
@@ -81,13 +81,13 @@ $y^{(i)}$ are labels, and $(\mathbf{w}, b)$
 are the weight and bias parameters respectively.
 To arrive at a new loss function
 that penalizes the size of the weight vector,
-we need to add $||mathbf{w}||^2$, but how much should we add?
+we need to add $||\mathbf{w}||^2$, but how much should we add?
 To address this, we need to add a new hyperparameter,
 that we will call the *regularization constant* and denote by $\lambda$:
 
 $$l(\mathbf{w}, b) + \frac{\lambda}{2} \|\boldsymbol{w}\|^2$$
 
-This non-negatice parameter $\lambda \geq 0$
+This non-negative parameter $\lambda \geq 0$
 governs the amount of regularization.
 For $\lambda = 0$, we recover our original loss function,
 whereas for $\lambda > 0$ we ensure that $\mathbf{w}$ cannot grow too large. The astute reader might wonder why we are squaring

@@ -146,7 +146,7 @@ In the **standard supervised learning setting**, which we have addressed up unti
 we assume that both the training data and the test data
 are drawn *independently* from *identical* distributions
 (commonly called the i.i.d. assumption).
-This means that when whatever process samples our data has no *memory*.
+This means that the process that samples our data has no *memory*.
 The 2nd example drawn and the 3rd drawn
 are no more correlated than the 2nd and the 2-millionth sample drawn.
 
@@ -170,10 +170,10 @@ and yet we have useful tools for face recognition,
 speech recognition, language translation, etc.
 
 Other violations are sure to cause trouble.
-Imagine, ofr example, if we tried to train
+Imagine, for example, if we tried to train
 a face recognition system by training it
-exclusivey on university students
-and then and then want to deploy it as a tool
+exclusively on university students
+and then want to deploy it as a tool
 for monitoring geriatrics in a nursing home population.
 This is unlikely to work well since college students
 tend to look considerably different from the elderly.
@@ -186,11 +186,11 @@ Moreover, elucidating the precise theoretical foundations
 that might explain why deep neural networks generalize as well as they do
 continues to vexes the greatest minds in learning theory.
 
-When we train our models, we attempt are searching for a function
+When we train our models, we attempt searching for a function
 that fits the training data as well as possible.
 If the function is so flexible that it can catch on to spurious patterns
 just as easily as to the true associations,
-then it might peform *too well* without producing a model
+then it might perform *too well* without producing a model
 that generalizes well to unseen data.
 This is precisely what we want to avoid (or at least control).
 Many of the techniques in deep learning are heuristics and tricks
@@ -264,7 +264,7 @@ we will typically employ a validation set.
 ### Validation Data Set
 
 In principle we should not touch our test set
-until after we have chosen our all our hyper-parameters.
+until after we have chosen all our hyper-parameters.
 Were we to use the test data in the model selection process,
 there's a risk that we might overfit the test data.
 Then we would be in serious trouble.
@@ -310,7 +310,7 @@ When training data is scarce,
 we might not even be able to afford to hold out
 enough data to constitute a proper validation set.
 One popular solution to this problem is to employ
-*$K$-fold cross-validation*.
+$K$*-fold cross-validation*.
 Here, the original training data is split into $K$ non-overlapping subsets.
 Then model training and validation are executed $K$ times,
 each time training on $K-1$ subsets and validating
@@ -330,15 +330,15 @@ If the model is unable to reduce the training error,
 that could mean that our model is too simple
 (i.e., insufficiently expressive)
 to capture the pattern that we are trying to model.
-Moreover, since the *generalziation gap*
-between our training and valdiation errors is small,
+Moreover, since the *generalization gap*
+between our training and validation errors is small,
 we have reason to believe that we could get away with a more complex model.
 This phenomenon is known as underfitting.
 
 On the other hand, as we discussed above,
 we want to watch out for the cases
 when our training error is significantly lower
-than our calidation error, indicating severe overfitting.
+than our validation error, indicating severe overfitting.
 Note that overfitting is not always a bad thing.
 With deep learning especially, it's well known
 that the best predictive models often perform
@@ -346,7 +346,7 @@ far better on training data than on holdout data.
 Ultimately, we usually care more about the validation error
 than about the gap between the training and validation errors.
 
-Whether we ovefit or underfit can depend
+Whether we overfit or underfit can depend
 both on the complexity of our model
 and the size of the available training datasets,
 two topics that we discuss below.
@@ -364,7 +364,7 @@ $$\hat{y}= \sum_{i=0}^d x^i w_i$$
 
 to estimate the labels $y$.
 This is just a linear regression problem
-where our featrues are given by the powers of $x$,
+where our features are given by the powers of $x$,
 the $w_i$ given the model’s weights,
 and the bias is given by $w_0$ since $x^0 = 1$ for all $x$.
 Since this is just a linear regression problem,
@@ -392,7 +392,7 @@ and under- vs over-fitting below.
 
 The other big consideration to bear in mind is the dataset size.
 Fixing our model, the fewer samples we have in the training dataset,
-the more likely (and more serverely) we are to encounter overfitting.
+the more likely (and more severely) we are to encounter overfitting.
 As we increase the amount of training data,
 the generalization error typically decreases.
 Moreover, in general, more data never hurts.
