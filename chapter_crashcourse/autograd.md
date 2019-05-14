@@ -83,7 +83,7 @@ Note that the number of iterations of the while loop and the execution of the co
 ```{.python .input  n=9}
 #FIXME, no random
 #a = nd.random.normal(shape=1).as_np_ndarray()
-a.attach_grad()
+#a.attach_grad()
 #FIXME, cannot execute f
 #with autograd.record():
 #    d = f(a)
