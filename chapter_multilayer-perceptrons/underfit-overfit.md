@@ -310,7 +310,7 @@ When training data is scarce,
 we might not even be able to afford to hold out
 enough data to constitute a proper validation set.
 One popular solution to this problem is to employ
-*$K$-fold cross-validation*.
+$K$*-fold cross-validation*.
 Here, the original training data is split into $K$ non-overlapping subsets.
 Then model training and validation are executed $K$ times,
 each time training on $K-1$ subsets and validating
