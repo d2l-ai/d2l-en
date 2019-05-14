@@ -87,7 +87,7 @@ that we will call the *regularization constant* and denote by $\lambda$:
 
 $$l(\mathbf{w}, b) + \frac{\lambda}{2} \|\boldsymbol{w}\|^2$$
 
-This non-negatice parameter $\lambda \geq 0$
+This non-negative parameter $\lambda \geq 0$
 governs the amount of regularization.
 For $\lambda = 0$, we recover our original loss function,
 whereas for $\lambda > 0$ we ensure that $\mathbf{w}$ cannot grow too large. The astute reader might wonder why we are squaring
