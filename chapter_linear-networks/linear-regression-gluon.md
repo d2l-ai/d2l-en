@@ -40,7 +40,7 @@ we can call upon Gluon's `data` module to read data.
 Since `data` is often used as a variable name,
 we will replace it with the pseudonym `gdata`
 (adding the first letter of Gluon),
-too differentiate the imported `data` module
+to differentiate the imported `data` module
 from a variable we might define.
 The first step will be to instantiate an `ArrayDataset`,
 which takes in one or more NDArrays as arguments.
