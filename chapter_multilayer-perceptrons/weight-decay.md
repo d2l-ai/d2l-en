@@ -57,7 +57,7 @@ For our present purposes, a very simple interpretation will suffice:
 We will consider a linear function
 $f(\mathbf{x}) = \mathbf{w}^\top \mathbf{x}$
 to be simple if its weight vector is small.
-We can measure this via $||mathbf{w}||^2$.
+We can measure this via $||\mathbf{w}||^2$.
 One way of keeping the weight vector small
 is to add its norm as a penalty term
 to the problem of minimizing the loss.
