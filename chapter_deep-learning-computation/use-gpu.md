@@ -1,4 +1,5 @@
 # GPUs
+:label:`chapter_use_gpu`
 
 In the introduction to this book we discussed the rapid growth of computation over the past two decades. In a nutshell, GPU performance has increased by a factor of 1000 every decade since 2000. This offers great opportunity but it also suggests a significant need to provide such performance.
 

@@ -1,4 +1,5 @@
 # Text Sentiment Classification: Using Convolutional Neural Networks (textCNN)
+:label:`chapter_sentiment_cnn`
 
 In the "Convolutional Neural Networks" chapter, we explored how to process two-dimensional image data with two-dimensional convolutional neural networks. In the previous language models and text classification tasks, we treated text data as a time series with only one dimension, and naturally, we used recurrent neural networks to process such data. In fact, we can also treat text as a one-dimensional image, so that we can use one-dimensional convolutional neural networks to capture associations between adjacent words. This section describes a groundbreaking approach to applying convolutional neural networks to text analysis: textCNN[1]. First, import the packages and modules required for the experiment.
 
@@ -9,7 +10,7 @@ sys.path.insert(0, '..')
 import d2l
 from mxnet import gluon, init, nd
 from mxnet.contrib import text
-from mxnet.gluon import data as gdata, loss as gloss, nn
+from mxnet.gluon import loss as gloss, nn
 ```
 
 ## One-dimensional Convolutional Layer
@@ -60,7 +61,13 @@ The definition of a two-dimensional cross-correlation operation tells us that a 
 
 ![Two-dimensional cross-correlation operation with a single input channel. The highlighted parts are the first output element and the input and kernel array elements used in its calculation: $2\times(-1)+3\times(-3)+1\times3+2\times4+0\times1+1\times2=2$. ](../img/conv1d-2d.svg)
 
-Both the outputs in Figure 12.4 and Figure 12.5 have only one channel. We discussed how to specify multiple output channels in a two-dimensional convolutional layer in the [“Multiple Input and Output Channels”](../chapter_convolutional-neural-networks/channels.md)section. Similarly, we can also specify multiple output channels in the one-dimensional convolutional layer to extend the model parameters in the convolutional layer.
+Both the outputs in Figure 12.4 and Figure 12.5 have only one channel. We
+discussed how to specify multiple output channels in a two-dimensional
+convolutional layer in
+:numref:`chapter_channels`.
+Similarly,
+we can also specify multiple output channels in the one-dimensional
+convolutional layer to extend the model parameters in the convolutional layer.
 
 
 ## Max-Over-Time Pooling Layer
@@ -75,14 +82,7 @@ To improve computing performance, we often combine timing examples of different 
 We still use the same IMDb data set as n the previous section for sentiment analysis. The following steps for reading and preprocessing the data set are the same as in the previous section.
 
 ```{.python .input  n=2}
-batch_size = 64
-d2l.download_imdb()
-train_data, test_data = d2l.read_imdb('train'), d2l.read_imdb('test')
-vocab = d2l.get_vocab_imdb(train_data)
-train_iter = gdata.DataLoader(gdata.ArrayDataset(
-    *d2l.preprocess_imdb(train_data, vocab)), batch_size, shuffle=True)
-test_iter = gdata.DataLoader(gdata.ArrayDataset(
-    *d2l.preprocess_imdb(test_data, vocab)), batch_size)
+vocab, train_iter, test_iter = d2l.load_data_imdb(batch_size=64)
 ```
 
 ## The TextCNN Model
@@ -101,12 +101,12 @@ Next, we will implement a textCNN model. Compared with the previous section, in 
 
 ```{.python .input  n=10}
 class TextCNN(nn.Block):
-    def __init__(self, vocab, embed_size, kernel_sizes, num_channels,
+    def __init__(self, vocab_size, embed_size, kernel_sizes, num_channels,
                  **kwargs):
         super(TextCNN, self).__init__(**kwargs)
-        self.embedding = nn.Embedding(len(vocab), embed_size)
+        self.embedding = nn.Embedding(vocab_size, embed_size)
         # The embedding layer does not participate in training
-        self.constant_embedding = nn.Embedding(len(vocab), embed_size)
+        self.constant_embedding = nn.Embedding(vocab_size, embed_size)
         self.dropout = nn.Dropout(0.5)
         self.decoder = nn.Dense(2)
         # The max-over-time pooling layer has no weight, so it can share an
@@ -143,7 +143,7 @@ Create a TextCNN instance. It has 3 convolutional layers with kernel widths of 3
 ```{.python .input}
 embed_size, kernel_sizes, nums_channels = 100, [3, 4, 5], [100, 100, 100]
 ctx = d2l.try_all_gpus()
-net = TextCNN(vocab, embed_size, kernel_sizes, nums_channels)
+net = TextCNN(len(vocab), embed_size, kernel_sizes, nums_channels)
 net.initialize(init.Xavier(), ctx=ctx)
 ```
 
@@ -151,12 +151,12 @@ net.initialize(init.Xavier(), ctx=ctx)
 
 As in the previous section, load pre-trained 100-dimensional GloVe word vectors and initialize the embedding layers `embedding` and `constant_embedding`. Here, the former participates in training while the latter has a fixed weight.
 
-```{.python .input  n=7}
+```{.python .input}
 glove_embedding = text.embedding.create(
-    'glove', pretrained_file_name='glove.6B.100d.txt', vocabulary=vocab)
-net.embedding.weight.set_data(glove_embedding.idx_to_vec)
-net.constant_embedding.weight.set_data(glove_embedding.idx_to_vec)
-net.constant_embedding.collect_params().setattr('grad_req', 'null')
+    'glove', pretrained_file_name='glove.6B.100d.txt')
+embeds = glove_embedding.get_vecs_by_tokens(vocab.idx_to_token)
+net.embedding.weight.set_data(embeds)
+net.embedding.collect_params().setattr('grad_req', 'null')
 ```
 
 ### Train and Evaluate the Model
@@ -173,11 +173,11 @@ d2l.train(train_iter, test_iter, net, loss, trainer, ctx, num_epochs)
 Below, we use the trained model to the classify sentiments of two simple sentences.
 
 ```{.python .input}
-d2l.predict_sentiment(net, vocab, ['this', 'movie', 'is', 'so', 'great'])
+d2l.predict_sentiment(net, vocab, 'this movie is so great')
 ```
 
 ```{.python .input}
-d2l.predict_sentiment(net, vocab, ['this', 'movie', 'is', 'so', 'bad'])
+d2l.predict_sentiment(net, vocab, 'this movie is so bad')
 ```
 
 ## Summary

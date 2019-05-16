@@ -1,4 +1,5 @@
 # Deferred Initialization
+:label:`chapter_deferred_init`
 
 In the previous examples we played fast and loose with setting up our networks. In particular we did the following things that *shouldn't* work:
 
@@ -39,7 +40,7 @@ net.initialize()
 net.collect_params()
 ```
 
-As we can see, nothing really changed. Only once we provide the network with some data do we see a difference. Let's try it out.
+As we can see, nothing really changed. Only once we provide the network with some data, we see a difference. Let's try it out.
 
 ```{.python .input}
 x = nd.random.uniform(shape=(2, 20))
@@ -64,7 +65,7 @@ net = getnet()
 net.initialize(init=MyInit())
 ```
 
-Note that, although `MyInit` will print information about the model parameters when it is called, the above `initialize` function does not print any information after it has been executed.  Therefore there is no real initialization parameter when calling the `initialize` function. Next, we define the input and perform a forward calculation.
+Note that, although `MyInit` will print information about the model parameters when it is called, the above `initialize` function does not print any information after it has been executed. Therefore, there is no real parameter initialization when calling the `initialize` function. Next, we define the input and perform a forward calculation.
 
 ```{.python .input  n=25}
 x = nd.random.uniform(shape=(2, 20))

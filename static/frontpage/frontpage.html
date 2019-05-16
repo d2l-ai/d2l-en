@@ -1,0 +1,223 @@
+<link href="_static/frontpage.css" rel="stylesheet">
+<head>
+  <style>
+h1, .side-doc-outline  {
+    display: none;
+}
+.document .page-content {
+    width: 100%;
+}
+h2, h3, h4 {
+    letter-spacing: 2px;
+}
+.mdl-grid {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 150px 0 0 0;
+}
+h2.toc {
+    padding: 150px 0 0 0;
+}
+.header h2 {
+    font-size: 30px;
+    padding-bottom: 35px;
+}
+.header p {
+    font-size: 24px;
+    letter-spacing: 2px;
+    line-height: 36px;
+    padding-bottom: 10px;
+}
+.header img {
+    max-width: 350px;
+}
+.header .mdl-button {
+  margin: 0px 10px;
+  letter-spacing: 2px;
+  font-size: 16px;
+  margin: 1rem 1.5rem;
+  height: 40px;
+  width: 120px;
+}
+.author-item {
+  max-width: 300px;
+}
+.author-item h3 {
+    padding-top: 25px;
+    padding-bottom: 10px;
+}
+.author-item img {
+    border-radius: 50%;
+    width: 120px;
+}
+.authors h4 {
+    width: 100%;
+}
+.features .mdl-cell {
+    padding: 0 36px;
+}
+.features h2, .features-2 h2 {
+    padding-bottom: 24px;
+}
+.features-2 p {
+    padding: 0 200px;
+}
+@media (max-width: 1000px) {
+    .mdl-grid, h2.toc {
+        padding: 50px 0 0 0;
+    }
+    .header img, .features-2 img {
+        max-width: 300px;
+    }
+    .header .mdl-cell--1-col {
+        display: none;
+    }
+    .features img {
+        max-width: 350px;
+    }
+    .features-2 p {
+        padding: 0 24px;
+    }
+}
+    </style>
+</head>
+
+<div class = "mdl-grid header">
+  <div class = "mdl-cell mdl-cell--4-col">
+    <img src="_images/front.jpg" class="img-fluid" alt="">
+  </div>
+  <div class = "mdl-cell mdl-cell--1-col">
+  </div>
+  <div class = "mdl-cell mdl-cell--4-col mdl-cell--middle">
+    <h2>Dive into Deep Learning</h2>
+    <p>An interactive deep learning book with code, math, and discussions<br><br><font color="#888"><small><i>The contents are under revision</i></small></font>
+    </p>
+  </div>
+</div>
+
+<div class = "authors mdl-grid">
+  <div class = "mdl-cell mdl-cell--3-col mdl-cell--top">
+    <div class="author-item">
+      <img src="./_images/aston.jpg"/>
+      <h3><a href="https://www.astonzhang.com/">Aston Zhang </a></h3>
+      <p>Amazon Applied Scientist<br>UIUC Ph.D.</p>
+    </div>
+  </div>
+  <div class = "mdl-cell mdl-cell--3-col mdl-cell--top">
+    <div class="author-item">
+      <img src="./_images/zack.jpg"/>
+      <h3><a href="http://zacklipton.com/">Zack C. Lipton</a></h3>
+      <p>Amazon Applied Scientist<br>
+        CMU Assistant Professor<br>
+        UCSD Ph.D.</p>
+    </div>
+  </div>
+  <div class = "mdl-cell mdl-cell--3-col mdl-cell--top">
+    <div class="author-item">
+      <img src="./_images/mu.jpg"/>
+      <h3><a href="http://www.cs.cmu.edu/~muli/">Mu Li</a></h3>
+      <p>Amazon Principal Scientist<br>
+      CMU Ph.D.</p>
+    </div>
+  </div>
+  <div class = "mdl-cell mdl-cell--3-col mdl-cell--top">
+    <div class="author-item">
+      <img src="./_images/alex.jpg"/>
+      <h3><a href="https://alex.smola.org/">Alex J. Smola</a></h3>
+      <p>Amazon VP/Distinguished Scientist<br>
+        TU Berlin Ph.D.
+      </p>
+    </div>
+  </div>
+  <h3> We thank all the <a href="https://github.com/diveintodeeplearning/d2l-en/graphs/contributors">community contributors</a><br>for making this open source book better for everyone.</h3>
+  <h4><a href="https://github.com/diveintodeeplearning/d2l-en/blob/master/README.md#contribute-learn-how">Contribute to the book.</a></h4>
+</div>
+
+<div class = "features mdl-grid">
+  <div class = "mdl-cell mdl-cell--5-col mdl-cell--middle">
+    <div class="content">
+      <h2>Each section is an executable <a href="chapter_crashcourse/install.html">Jupyter notebook</a></h2>
+      <p>You can modify the code and tune hyperparameters to get instant
+      feedback to accumulate practical experiences in deep learning.</p>
+    </div>
+  </div>
+  <div class = "mdl-cell mdl-cell--7-col">
+	<img src="_images/notebook.gif">
+  </div>
+</div>
+
+<div class = "features-2 mdl-grid">
+  <h2>Mathematics + Figures + Code </h2>
+  <p>We offer an interactive learning experience with mathematics, figures,
+  code, text, and discussions, where concepts and techniques are illustrated
+    and implemented with experiments on real data sets.
+  </p>
+
+  <div class = "mdl-cell mdl-cell--4-col">
+    <img src="_images/eq.jpg"/>
+  </div>
+  <div class = "mdl-cell mdl-cell--4-col">
+    <img src="_images/figure.jpg"/>
+  </div>
+  <div class = "mdl-cell mdl-cell--4-col">
+    <img src="_images/code.jpg"/>
+  </div>
+</div>
+
+<div class = "features mdl-grid">
+  <div class = "mdl-cell mdl-cell--7-col">
+    <img src="_images/forum.gif">
+  </div>
+  <div class = "mdl-cell mdl-cell--5-col mdl-cell--middle">
+    <div class="content">
+      <h2>Active <a href="https://discuss.mxnet.io">community</a> support</h2>
+      <p>You can discuss and learn with thousands of peers in the community
+        through the link provided in each section.
+        </p>
+    </div>
+  </div>
+</div>
+
+<div class="mdl-grid">
+  <div>
+    <h3>D2L as a textbook or a reference book</h3>
+    <br>
+    Georgia Institute of Technology<br>
+    University of California, Berkeley<br>
+    University of California, Los Angeles<br>
+    University of California, Santa Barbara<br>
+    University of Illinois at Urbana-Champaign<br>
+    University of Maryland<br>
+    University of New Hampshire<br>
+    University of North Carolina at Chapel Hill<br>
+    University of Science and Technology of China<br>
+    University of Technology Sydney<br>
+    University of Washington<br>
+    Universitat Politècnica de Catalunya<br>
+    Shanghai Jiao Tong University<br>
+    Shanghai University of Finance and Economics<br>
+    Zhejiang University
+  </div>
+</div>
+
+<div class="mdl-grid">
+  <div>
+    <h3>BibTeX entry for citing the book</h3>
+    <br>
+    <div align="left">
+      <tt>
+      <pre>
+      @book{zhang2019dive,
+          title={Dive into Deep Learning},
+          author={Aston Zhang and Zachary C. Lipton and Mu Li and Alexander J. Smola},
+          note={\url{http://www.d2l.ai}},
+          year={2019}
+      }
+      </pre>
+      </tt>
+    </div>
+  </div>
+</div>
+
+<h2 class="toc"> Table of contents </h2>

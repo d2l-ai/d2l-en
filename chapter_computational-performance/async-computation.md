@@ -1,4 +1,5 @@
 # Asynchronous Computing
+:label:`chapter_async`
 
 MXNet utilizes asynchronous programming to improve computing performance. Understanding how asynchronous programming works helps us to develop more efficient programs, by proactively reducing computational requirements and thereby minimizing the memory overhead required in the case of limited memory resources. First, we will import the package or module needed for this section’s experiment.
 
@@ -187,7 +188,7 @@ for X, y in data_iter():
     with autograd.record():
         l = loss(y, net(X))
     l.backward()
-    trainer.step(x.shape[0])
+    trainer.step(X.shape[0])
 nd.waitall()
 print('increased memory: %f MB' % (get_mem() - mem))
 ```

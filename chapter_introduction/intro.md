@@ -1,4 +1,5 @@
 # Introduction
+:label:`chapter_introduction`
 
 Until recently, nearly all of the computer programs
 that we interacted with every day were coded
@@ -29,24 +30,22 @@ and confidently launch it *before ever seeing a real customer*.
 Our ability to design automated systems from first principles
 that drive functioning products and systems,
 often in novel situations, is a remarkable cognitive feat.
-And when you're able to devise solutions that work $100\%$ of the time.
+And when you're able to devise solutions that work $100\%$ of the time,
 *you should not be using machine learning*.
 
 Fortunately—for the growing community of ML scientists—many
 problems in automation don't bend so easily to human ingenuity.
 Imagine huddling around the whiteboard with the smartest minds you know,
 but this time you are tackling any of the following problems:
- * Write a program that predicts tomorrow's weather
-given geographic information, satellite images,
-and a trailing window of past weather.
- * Write a program that takes in a question,
- expressed in free-form text, and answers it correctly.
- * Write a program that given an image
- can identify all the people it contains,
+
+* Write a program that predicts tomorrow's weather given geographic
+information, satellite images, and a trailing window of past weather.
+* Write a program that takes in a question, expressed in free-form text, and
+ answers it correctly.
+* Write a program that given an image can identify all the people it contains,
  drawing outlines around each.
-  * Write a program that presents users with products
-  that they are likely to enjoy but unlikely,
-  in the natural course of browsing, to encounter.
+* Write a program that presents users with products that they are likely to
+  enjoy but unlikely, in the natural course of browsing, to encounter.
 
 In each of these cases, even elite programmers
 are incapable of coding up solutions from scratch.
@@ -107,7 +106,7 @@ If you're stuck, don't worry.
 We don't know how to write such a program from scratch either.
 That's why we use ML.
 
-![](../img/wake-word.svg)
+![Identify an awake word.](../img/wake-word.svg)
 
 
 Here's the trick.
@@ -174,9 +173,7 @@ The training process usually looks like this:
 1. Tweak the knobs so the model sucks less with respect to those examples
 1. Repeat until the model is awesome.
 
-![](../img/ml-loop.svg)
-
-
+![A typical training process. ](../img/ml-loop.svg)
 
 To summarize, rather than code up a wake word recognizer,
 we code up a program that can *learn* to recognize wake words,
@@ -184,10 +181,10 @@ we code up a program that can *learn* to recognize wake words,
 You can think of this act
 of determining a program's behavior by presenting it with a dataset
 as *programming with data*.
-We can 'program' a cat detector by providing our machine learning system
+We can "program" a cat detector by providing our machine learning system
 with many examples of cats and dogs, such as the images below:
 
-|![](../img/cat1.png)|![](../img/cat2.jpg)|![](../img/dog1.jpg)|![](../img/dog2.jpg)|
+| ![cat1](../img/cat1.png) | ![cat2](../img/cat2.jpg) | ![dog1](../img/dog1.jpg) |![dog2](../img/dog2.jpg) |
 |:---------------:|:---------------:|:---------------:|:---------------:|
 |cat|cat|dog|dog|
 
@@ -369,7 +366,7 @@ owing to non-differentiability or other complications.
 In these cases, it's common to optimize a surrogate objective.
 
 Typically, the loss function is defined
-with respect to the models parameters
+with respect to the model's parameters
 and depends upon the dataset.
 The best values of our model's parameters are learned
 by minimizing the loss incurred on a *training set*
@@ -459,7 +456,7 @@ and outputs another function, *the learned model*.
 Then, given a learned model,
 we can take a new previously unseen input, and predict the corresponding label.
 
-![](../img/supervised-learning.svg)
+![Supervised learning.](../img/supervised-learning.svg)
 
 
 
@@ -592,9 +589,8 @@ In MXNet Gluon, the corresponding loss function can be found [here](https://mxne
 
 Note that the most likely class is not necessarily the one that you're going to use for your decision. Assume that you find this beautiful mushroom in your backyard:
 
-|![](../img/death_cap.jpg)|
-|:-------:|
-|Death cap - do not eat!|
+![Death cap - do not eat!](../img/death_cap.jpg)
+:width:`400px`
 
 Now, assume that you built a classifier and trained it
 to predict if a mushroom is poisonous based on a photograph.
@@ -610,7 +606,7 @@ $$L(\mathrm{action}| x) = \mathbf{E}_{y \sim p(y| x)}[\mathrm{loss}(\mathrm{acti
 Hence, the loss $L$ incurred by eating the mushroom is $L(a=\mathrm{eat}| x) = 0.2 * \infty + 0.8 * 0 = \infty$, whereas the cost of discarding it is $L(a=\mathrm{discard}| x) = 0.2 * 0 + 0.8 * 1 = 0.8$.
 
 Our caution was justified: as any mycologist would tell us, the above mushroom actually *is* a death cap.
-Classification can get much more complicated than just binary, multiclass, of even multi-label classification.
+Classification can get much more complicated than just binary, multiclass, or even multi-label classification.
 For instance, there are some variants of classification for addressing hierarchies.
 Hierarchies assume that there exist some relationships among the many classes.
 So not all errors are equal - we prefer to misclassify to a related class than to a distant class.
@@ -618,7 +614,8 @@ Usually, this is referred to as *hierarchical classification*.
 One early example is due to [Linnaeus](https://en.wikipedia.org/wiki/Carl_Linnaeus),
 who organized the animals in a hierarchy.
 
-![](../img/sharks.png)
+![Classify sharks](../img/sharks.png)
+:width:`500px`
 
 In the case of animal classification, it might not be so bad to mistake a poodle for a schnauzer,
 but our model would pay a huge penalty if it confused a poodle for a dinosaur.
@@ -634,15 +631,16 @@ Given the current state of computer vision,
 we can do this easily, with off-the-shelf tools.
 Nonetheless, no matter how accurate our model gets, we might find ourselves in trouble when the classifier encounters an image of the Town Musicians of Bremen.
 
-![](../img/stackedanimals.jpg)
+![A cat, a roster, a dog and a donkey](../img/stackedanimals.jpg)
+:width:`500px`
 
 
-As you can see, there's a cat in the picture, and a rooster, a dog and a donkey, with some trees in the background.
+As you can see, there's a cat in the picture, and a rooster, a dog, a donkey and a bird, with some trees in the background.
 Depending on what we want to do with our model ultimately,
 treating this as a binary classification problem
 might not make a lot of sense.
 Instead, we might want to give the model the option
-of saying the image depicts a cat *and* a dog *and* a donkey *and* a rooster.
+of saying the image depicts a cat *and* a dog *and* a donkey *and* a rooster *and* a bird.
 
 The problem of learning to predict classes
 that are *not mutually exclusive*
@@ -686,7 +684,7 @@ Such problems occur, e.g. for movie, product or music recommendation. In some ca
 
 Given such a model, then for any given user, we could retrieve the set of objects with the largest scores $y_{ij}$, which are then used as a recommendation. Production systems are considerably more advanced and take detailed user activity and item characteristics into account when computing such scores. The following image is an example of deep learning books recommended by Amazon based on personalization algorithms tuned to the author's preferences.
 
-![](../img/deeplearning_amazon.png)
+![Deep learning books recommended by Amazon.](../img/deeplearning_amazon.png)
 
 
 #### Sequence Learning
@@ -719,7 +717,7 @@ if their risk of death in the next 24 hours exceeds some threshold.
 We definitely wouldn't want this model to throw away everything it knows about the patient history each hour,
 and just make its predictions based on the most recent measurements.
 
-These problems are among the more exciting applications of machine learning
+These problems are among the most exciting applications of machine learning
 and they are instances of *sequence learning*.
 They require a model to either ingest sequences of inputs
 or to emit sequences of outputs (or both!).
@@ -733,9 +731,10 @@ a number of special cases are worth mentioning:
 
 This involves annotating a text sequence with attributes. In other words, the number of inputs and outputs is essentially the same. For instance, we might want to know where the verbs and subjects are. Alternatively, we might want to know which words are the named entities. In general, the goal is to decompose and annotate text based on structural and grammatical assumptions to get some annotation. This sounds more complex than it actually is. Below is a very simple example of annotating a sentence with tags indicating which words refer to named entities.
 
-|Tom | has | dinner | in | Washington | with | Sally.|
-|:--:|:--:|:--:|:--:|:--:|:--:|:--:|
-|Ent | - | - | - | Ent | - | Ent|
+```text
+Tom has dinner in Washington with Sally.
+Ent  -    -    -     Ent      -    Ent
+```
 
 
 ##### Automatic Speech Recognition
@@ -746,9 +745,8 @@ The challenge is that there are many more audio frames (sound is typically sampl
 since thousands of samples correspond to a single spoken word.
 These are ``seq2seq`` problems where the output is much shorter than the input.
 
-|`-D-e-e-p- L-ea-r-ni-ng-`|
-|:--------------:|
-|![Deep Learning](../img/speech.png)|
+![`-D-e-e-p- L-ea-r-ni-ng-`](../img/speech.png)
+:width:`700px`
 
 ##### Text to Speech
 
@@ -768,13 +766,14 @@ neither the number of inputs and outputs
 nor the order of corresponding data points
 are assumed to be the same.
 Consider the following illustrative example of the obnoxious tendency of Germans
-(*Alex writing here*)
+<!-- Alex writing here -->
 to place the verbs at the end of sentences.
 
-|German |Haben Sie sich schon dieses grossartige Lehrwerk angeschaut?|
-|:------|:---------|
-|English|Did you already check out this excellent tutorial?|
-|Wrong alignment |Did you yourself already this excellent tutorial looked-at?|
+```text
+German:           Haben Sie sich schon dieses grossartige Lehrwerk angeschaut?
+English:          Did you already check out this excellent tutorial?
+Wrong alignment:  Did you yourself already this excellent tutorial looked-at?
+```
 
 A number of related problems exist.
 For instance, determining the order in which a user reads a webpage
@@ -824,7 +823,7 @@ Because all of the learning takes place after the algorithm is disconnected from
 this is called *offline learning*.
 For supervised learning, the process looks like this:
 
-![](../img/data-collection.svg)
+![Collect data for supervised learning from an environment.](../img/data-collection.svg)
 
 
 This simplicity of offline learning has its charms.
@@ -877,7 +876,7 @@ The behavior of an RL agent is governed by a *policy*.
 In short, a *policy* is just a function that maps from observations (of the environment) to actions.
 The goal of reinforcement learning is to produce a good policy.
 
-![](../img/rl-environment.svg)
+![The interaction between reinforcement learning and an environment.](../img/rl-environment.svg)
 
 It's hard to overstate the generality of the RL framework.
 For example, we can cast any supervised learning problem as an RL problem.
@@ -943,12 +942,13 @@ Although deep learning is a recent invention, humans have held the desire to ana
 Even in the middle ages mathematicians had a keen intuition of estimates. For instance, the geometry book of [Jacob Köbel (1460-1533)](https://www.maa.org/press/periodicals/convergence/mathematical-treasures-jacob-kobels-geometry) illustrates averaging the length of 16 adult men's feet to obtain the average foot length.
 
 ![Estimating the length of a foot](../img/koebel.jpg)
+:width:`500px`
 
 Figure 1.1 illustrates how this estimator works. 16 adult men were asked to line up in a row, when leaving church. Their aggregate length was then divided by 16 to obtain an estimate for what now amounts to 1 foot. This 'algorithm' was later improved to deal with misshapen feet - the 2 men with the shortest and longest feet respectively were sent away, averaging only over the remainder. This is one of the earliest examples of the trimmed mean estimate.
 
 Statistics really took off with the collection and availability of data. One of its titans, [Ronald Fisher (1890-1962)](https://en.wikipedia.org/wiki/Ronald_Fisher), contributed significantly to its theory and also its applications in genetics. Many of his algorithms (such as Linear Discriminant Analysis) and formulae (such as the Fisher Information Matrix) are still in frequent use today (even the Iris dataset that he released in 1936 is still used sometimes to illustrate machine learning algorithms).
 
-A second influence for machine learning came from Information Theory [(Claude Shannon, 1916-2001)](https://en.wikipedia.org/wiki/Claude_Shannon) and the Theory of computation via [Alan Turing (1912-1954)](https://en.wikipedia.org/wiki/Alan_Turing). Turing posed the question "can machines think?” in his famous paper [Computing machinery and intelligence](https://www.jstor.org/stable/2251299) (Mind, October 1950). In what he described as the Turing test, a machine can be considered intelligent if it is difficult for a human evaluator to distinguish between the replies from a machine and a human being through textual interactions. To this day, the development of intelligent machines is changing rapidly and continuously.
+A second influence for machine learning came from Information Theory [(Claude Shannon, 1916-2001)](https://en.wikipedia.org/wiki/Claude_Shannon) and the Theory of computation via [Alan Turing (1912-1954)](https://en.wikipedia.org/wiki/Alan_Turing). Turing posed the question "can machines think?” in his famous paper [Computing machinery and intelligence](https://en.wikipedia.org/wiki/Computing_Machinery_and_Intelligence) (Mind, October 1950). In what he described as the Turing test, a machine can be considered intelligent if it is difficult for a human evaluator to distinguish between the replies from a machine and a human being through textual interactions. To this day, the development of intelligent machines is changing rapidly and continuously.
 
 Another influence can be found in neuroscience and psychology. After all, humans clearly exhibit intelligent behavior. It is thus only reasonable to ask whether one could explain and possibly reverse engineer these insights. One of the oldest algorithms to accomplish this was formulated by [Donald Hebb (1904-1985)](https://en.wikipedia.org/wiki/Donald_O._Hebb).
 
@@ -965,7 +965,9 @@ Given the scarcity of data and computation, strong statistical tools such as Ker
 
 ## The Road to Deep Learning
 
-Much of this changed with the ready availability of large amounts of data, due to the World Wide Web, the advent of companies serving hundreds of millions of users online, a dissemination of cheap, high quality sensors, cheap data storage (Kryder's law), and cheap computation (Moore's law), in particular in the form of GPUs, originally engineered for computer gaming. Suddenly algorithms and models that seemed computationally infeasible became relevant (and vice versa). This is best illustrated in the table below:
+Much of this changed with the ready availability of large amounts of data, due to the World Wide Web, the advent of companies serving hundreds of millions of users online, a dissemination of cheap, high quality sensors, cheap data storage (Kryder's law), and cheap computation (Moore's law), in particular in the form of GPUs, originally engineered for computer gaming. Suddenly algorithms and models that seemed computationally infeasible became relevant (and vice versa). This is best illustrated in :numref:`tab_intro_decade`.
+
+:Dataset versus computer memory and computational power
 
 |Decade|Dataset|Memory|Floating Point Calculations per Second|
 |:--|:-|:-|:-|
@@ -975,6 +977,7 @@ Much of this changed with the ready availability of large amounts of data, due t
 |2000|10 M (web pages)|100 MB|1 GF (Intel Core)|
 |2010|10 G (advertising)|1 GB|1 TF (Nvidia C2050)|
 |2020|1 T (social network)|100 GB|1 PF (Nvidia DGX-2)|
+:label:`tab_intro_decade`
 
 It is quite evident that RAM has not kept pace with the growth in data. At the same time, the increase in computational power has outpaced that of the data available. This means that statistical models needed to become more memory efficient (this is typically achieved by adding nonlinearities) while simultaneously being able to spend more time on optimizing these parameters, due to an increased compute budget. Consequently the sweet spot in machine learning and statistics moved from (generalized) linear models and kernel methods to deep networks. This is also one of the reasons why many of the mainstays of deep learning, such as Multilayer Perceptrons (e.g. McCulloch & Pitts, 1943), Convolutional Neural Networks (Le Cun, 1992), Long Short Term Memory (Hochreiter & Schmidhuber, 1997), Q-Learning (Watkins, 1989), were essentially 'rediscovered' in the past decade, after laying dormant for considerable time.
 
@@ -1001,7 +1004,16 @@ It is only recently that AI has been in the limelight, mostly due to solutions t
 * A key ingredient in digital assistants is the ability to recognize speech accurately. Gradually the accuracy of such systems has increased to the point where they reach human parity [14] for certain applications.
 * Object recognition likewise has come a long way. Estimating the object in a picture was a fairly challenging task in 2010. On the ImageNet benchmark Lin et al. [15] achieved a top-5 error rate of 28%. By 2017 Hu et al. [16] reduced this error rate to 2.25%. Similarly stunning results have been achieved for identifying birds, or diagnosing skin cancer.
 * Games used to be a bastion of human intelligence. Starting from TDGammon [23], a program for playing Backgammon using temporal difference (TD) reinforcement learning, algorithmic and computational progress has led to algorithms for a wide range of applications. Unlike Backgammon, chess has a much more complex state space and set of actions. DeepBlue beat Gary Kasparov, Campbell et al. [17], using massive parallelism, special purpose hardware and efficient search through the game tree. Go is more difficult still, due to its huge state space. AlphaGo reached human parity in 2015,  Silver et al. [18] using Deep Learning combined with Monte Carlo tree sampling. The challenge in Poker was that the state space is large and it is not fully observed (we don't know the opponents' cards). Libratus exceeded human performance in Poker using efficiently structured strategies; Brown and Sandholm [19]. This illustrates the impressive progress in games and the fact that advanced algorithms played a crucial part in them.
-* Another indication of progress in AI is the advent of self-driving cars and trucks. While full autonomy is not quite within reach yet, excellent progress has been made in this direction, with companies such as [Momenta](https://www.momenta.ai/en), [Tesla](http://www.tesla.com), [NVIDIA](http://www.nvidia.com), [MobilEye](http://www.mobileye.com) and [Waymo](http://www.waymo.com) shipping products that enable at least partial autonomy. What makes full autonomy so challenging is that proper driving requires the ability to perceive, to reason and to incorporate rules into a system. At present, Deep Learning is used primarily in the computer vision aspect of these problems. The rest is heavily tuned by engineers.
+* Another indication of progress in AI is the advent of self-driving cars and
+  trucks. While full autonomy is not quite within reach yet, excellent progress
+  has been made in this direction, with companies such as
+  Momenta, Tesla,
+  NVIDIA, MobilEye
+  and Waymo shipping products that enable at least
+  partial autonomy. What makes full autonomy so challenging is that proper
+  driving requires the ability to perceive, to reason and to incorporate rules
+  into a system. At present, Deep Learning is used primarily in the computer
+  vision aspect of these problems. The rest is heavily tuned by engineers.
 
 Again, the above list barely scratches the surface of what is considered intelligent and where machine learning has led to impressive progress in a field. For instance, robotics, logistics, computational biology, particle physics and astronomy owe some of their most impressive recent advances at least in parts to machine learning. ML is thus becoming a ubiquitous tool for engineers and scientists.
 

@@ -14,7 +14,14 @@ Next, we will describe the implementation of the modules in the figure. First, w
 
 ### Category Prediction Layer
 
-Set the number of object categories to $q$. In this case, the number of anchor box categories is $q+1$, with 0 indicating an anchor box that only contains background. For a certain scale, set the height and width of the feature map to $h$ and $w$, respectively. If we use each element as the center to generate $a$ anchor boxes, we need to classify a total of $hwa$ anchor boxes. If we use a fully connected layer (FCN) for the output, this will likely result in an excessive number of model parameters. Recall how we used convolutional layer channels to output category predictions in the ["Network in Network (NiN)"](../chapter_convolutional-neural-networks/nin.md) section. SSD uses the same method to reduce the model complexity.
+Set the number of object categories to $q$. In this case, the number of anchor
+box categories is $q+1$, with 0 indicating an anchor box that only contains
+background. For a certain scale, set the height and width of the feature map to
+$h$ and $w$, respectively. If we use each element as the center to generate $a$
+anchor boxes, we need to classify a total of $hwa$ anchor boxes. If we use a
+fully connected layer (FCN) for the output, this will likely result in an
+excessive number of model parameters. Recall how we used convolutional layer
+channels to output category predictions in :numref:`chapter_nin`. SSD uses the same method to reduce the model complexity.
 
 Specifically, the category prediction layer uses a convolutional layer that maintains the input height and width. Thus, the output and input have a one-to-one correspondence to the spatial coordinates along the width and height of the feature map. Assuming that the output and input have the same spatial coordinates $(x,y)$, the channel for the coordinates $(x,y)$ on the output feature map contains the category predictions for all anchor boxes generated using the input feature map coordinates $(x,y)$ as the center. Therefore, there are $a(q+1)$ output channels, with the output channels indexed as $i(q+1) + j$ ($0 \leq j \leq q$) representing the predictions of the category index $j$ for the anchor box index $i$.
 

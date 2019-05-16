@@ -1,4 +1,5 @@
 # `d2l` API Document
+:label:`chapter_d2l`
 
 ## Basic and Plotting
 
@@ -50,15 +51,6 @@
 ```eval_rst
 
 .. automodule:: d2l.train
-   :members:
-
-```
-
-## Prediciting
-
-```eval_rst
-
-.. automodule:: d2l.predict
    :members:
 
 ```

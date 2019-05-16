@@ -40,7 +40,7 @@ For any computing technology to reach its full impact,
 it must be well-understood, well-documented, and supported by
 mature, well-maintained tools.
 The key ideas should be clearly distilled,
-minimizing the onboarding time needing to bring new practitioners up to date.
+minimizing the onboarding time needed to bring new practitioners up to date.
 Mature libraries should automate common tasks,
 and exemplar code should make it easy for practitioners
 to modify, apply, and extend common applications to suit their needs.
@@ -61,7 +61,7 @@ Applying deep learning requires simultaneously understanding
 (iv) and the engineering required to train models efficiently,
 navigating the pitfalls of numerical computing and getting the most
 out of available hardware.
-Teaching both the critical thinking skills required to formulate problems,
+Teaching the critical thinking skills required to formulate problems,
 the mathematics to solve them, and the software tools to implement those
 solutions all in one place presents formidable challenges.
 Our goal in this book is to present a unified resource
@@ -77,7 +77,7 @@ and (3) interleaved the exposition one expects from an engaging textbook
 with the clean runnable code one seeks in hands-on tutorials.
 We found plenty of code examples for how to use a given deep learning
 framework (e.g. how to do basic numerical computing with matrices in TensorFlow)
-or for implementing particular techniques (e.g. code snippets for LeNet, AlexNet, ResNets, etc)
+or for implementing particular techniques (e.g. code snippets for LeNet, AlexNet, ResNets, etc.)
 in the form of blog posts or on GitHub.
 However, these examples typically focused on
 *how* to implement a given approach,
@@ -86,7 +86,7 @@ While sporadic topics have been covered in blog posts,
 e.g. on the website [Distill](http://distill.pub) or personal blogs,
 they only covered selected topics in deep learning, and often lacked associated code.
 On the other hand, while several textbooks have emerged,
-most notably [Goodfellow, Bengio and Courville, 2016](https://www.deeplearningbook.org/),
+most notably :cite:`Goodfellow.Bengio.Courville.2016`,
 which offers an excellent survey of the concepts behind deep learning,
 these resources don't marry the descriptions to realizations of the concepts in code,
 sometimes leaving readers clueless as to how to implement them.
@@ -97,7 +97,7 @@ We set out to create a resource that could
 (2) offer sufficient technical depth to provide a starting point on the path
 to actually becoming an applied machine learning scientist,
 (3) include runnable code, showing readers *how* to solve problems in practice,
-and (4) that allowed for rapid updates, both by us, and also by the community at large,
+(4) that allowed for rapid updates, both by us, and also by the community at large,
 and (5) be complemented by a [forum](http://discuss.mxnet.io)
 for interactive discussion of technical details and to answer questions.
 
@@ -106,11 +106,11 @@ Equations, theorems, and citations are best managed and laid out in LaTeX.
 Code is best described in Python.
 And webpages are native in HTML and JavaScript.
 Furthermore, we want the content to be
-accessible both as executable code, as a physical book,
+accessible as executable code, as a physical book,
 as a downloadable PDF, and on the internet as a website.
 At present there exist no tools and no workflow
 perfectly suited to these demands, so we had to assemble our own.
-We describe our approach in detail in the [appendix](../chapter_appendix/how-to-contribute.md).
+We describe our approach in detail in :numref:`chapter_contribute`.
 We settled on Github to share the source and to allow for edits,
 Jupyter notebooks for mixing code, equations and text,
 Sphinx as a rendering engine to generate multiple outputs,
@@ -123,8 +123,7 @@ We believe that this might be the first book published using such an integrated 
 ### Learning by Doing
 
 Many textbooks teach a series of topics, each in exhaustive detail.
-For example, Chris Bishop's excellent textbook,
-[Pattern Recognition and Machine Learning](https://www.amazon.com/Pattern-Recognition-Learning-Information-Statistics/dp/0387310738),
+For example, Chris Bishop's excellent textbook :cite:`Bishop.2006`,
 teaches each topic so thoroughly, that getting to the chapter
 on linear regression requires a non-trivial amount of work.
 While experts love this book precisely for its thoroughness,
@@ -183,38 +182,39 @@ we can just use the ``Gluon`` version in subsequent tutorials.
 
 The book can be roughly divided into three sections:
 
-* The first part covers prerequisites and basics.
-The first chapter offers an [Introduction to Deep Learning](../chapter_introduction/index.md).
-In [Crashcourse](../chapter_crashcourse/index.md),
-we'll quickly bring you up to speed on the prerequisites required for hands-on deep learning,
-such as how to acquire and run the codes covered in the book.
-[Deep Learning Basics](../chapter_deep-learning-basics/index.md)
-covers the most basic concepts and techniques of deep learning,
-such as multi-layer perceptrons and regularization.
+* The first part covers prerequisites and basics.  The first chapter offers an
+introduction to deep learning in :numref:`chapter_introduction`.  In
+:numref:`chapter_crashcourse`, we'll quickly bring you up to speed on the
+prerequisites required for hands-on deep learning, such as how to acquire and
+run the codes covered in the book.  :numref:`chapter_linear` and
+:numref:`chapter_perceptrons` cover the most basic concepts and techniques of deep
+learning, such as linear regression, multi-layer perceptrons and regularization.
 <!--If you are short on time or you only want to learn only
 about the most basic concepts and techniques of deep learning,
 it is sufficient to read the first section only.-->
-* The next three chapters focus on modern deep learning techniques.
-[Deep Learning Computation](../chapter_deep-learning-computation/index.md)
-describes the various key components of deep learning calculations
-and lays the groundwork for the later implementation of more complex models.
-Next we explain [Convolutional Neural Networks](../chapter_convolutional-neural-networks/index.md),
-powerful tools that form the backbone of most modern computer vision systems in recent years.
-Subsequently, we introduce [Recurrent Neural Networks](../chapter_recurrent-neural-networks/index.md),
-models that exploit temporal or sequential structure in data,
-and are commonly used for natural language processing and time series prediction.
-These sections will get you up to speed on the basic tools behind most modern deep learning.
 
-* Part three discusses scalability, efficiency and applications.
-First we discuss several common [Optimization Algorithms](../chapter_optimization/index.md)
-used to train deep learning models.
-The next chapter, [Performance](../chapter_computational-performance/index.md),
-examines several important factors that affect the computational performance of your deep learning code.
-Chapters 9 and 10  illustrate major applications of deep learning
-in computer vision and natural language processing, respectively.
+* The next four chapters focus on modern deep learning techniques.
+:numref:`chapter_computation` describes the various key components of deep
+learning calculations and lays the groundwork for the later implementation of
+more complex models.  Next we explain in :numref:`chapter_cnn` and
+:numref:`chapter_modern_cnn`, powerful tools that form the backbone of most
+modern computer vision systems in recent years.  Subsequently, we introduce
+:numref:`chapter_rnn` models that exploit temporal or sequential structure in
+data, and are commonly used for natural language processing and time series
+prediction. :numref:`chapter_attention` introduces recent models exploring the
+attention mechanism.  These sections will get you up to speed on the basic tools
+behind most modern deep learning.
 
-An outline of the book together with possible flows for navigating it is given below.
-The arrows provide a graph of prerequisites:
+* Part three discusses scalability, efficiency and applications.  First we
+discuss several common :numref:`chapter_optimization` used to train deep
+learning models.  The next chapter, :numref:`chapter_performance` examines
+several important factors that affect the computational performance of your deep
+learning code.  :numref:`chapter_cv` and :numref:`chapter_nlp` illustrate major
+applications of deep learning in computer vision and natural language
+processing, respectively.
+
+An outline of the book together with possible flows for navigating it is given
+below.  The arrows provide a graph of prerequisites:
 
 ![Book structure](../img/book-org.svg)
 
@@ -228,7 +228,7 @@ tweaking the code in small ways and observing the results.
 Ideally, an elegant mathematical theory might tell us
 precisely how to tweak our code to achieve a desired result.
 Unfortunately, at present such elegant theories elude us.
-Despite our best attempts, our explanations for of various techniques might be lacking,
+Despite our best attempts, our explanations of various techniques might be lacking,
 sometimes on account of our shortcomings,
 and equally often on account of the nascent state of the science of deep learning.
 We are hopeful that as the theory of deep learning progresses,
@@ -242,34 +242,31 @@ All of the code in this book has passed tests under MXNet 1.2.0.
 However, due to the rapid development of deep learning,
 some code *in the print edition* may not work properly in future versions of MXNet.
 However, we plan to keep the online version remain up-to-date.
-In case of such problems, please consult the section
-["Installation and Running"](../chapter_prerequisite/install.md)
+In case of such problems, please consult :ref:`chapter_installation`
 to update the code and runtime environment.
 At times, to avoid unnecessary repetition,
 we encapsulate the frequently-imported and referred-to functions, classes, etc.
-in this book in the `gluonbook` package, version number 1.0.0.
-We give a detailed overview of these functions and classes in the appendix [“gluonbook package index”](../chapter_appendix/gluonbook.md)
+in this book in the `d2l` package.
+We give a detailed overview of these functions and classes in :numref:`chapter_d2l`.
 
 
 ### Target Audience
 
-This book is for students (undergraduate or graduate),
-engineers, and researchers, who seek a solid grasp
-of the practical techniques of deep learning.
-Because we explain every concept from scratch,
-no previous background in deep learning or machine learning is required.
-Fully explaining the methods of deep learning
-requires some mathematics and programming,
-but we'll only assume that you come in with some basics,
-including (the very basics of) linear algebra, calculus, probability,
-and Python programming.
-Moreover, this book's appendix provides a refresher
-on most of the mathematics covered in this book.
-Most of the time, we will prioritize intuition and ideas
-over mathematical rigor.
-There are many terrific books which can lead the interested reader further. For instance [Linear Analysis](https://www.amazon.com/Linear-Analysis-Introductory-Cambridge-Mathematical/dp/0521655773) by Bela Bollobas covers linear algebra and functional analysis in great depth. [All of Statistics](https://www.amazon.com/All-Statistics-Statistical-Inference-Springer/dp/0387402721) is a terrific guide to statistics.
-And if you have not used Python before,
-you may want to peruse the [Python tutorial](http://learnpython.org/).
+This book is for students (undergraduate or graduate), engineers, and
+researchers, who seek a solid grasp of the practical techniques of deep
+learning.  Because we explain every concept from scratch, no previous background
+in deep learning or machine learning is required.  Fully explaining the methods
+of deep learning requires some mathematics and programming, but we'll only
+assume that you come in with some basics, including (the very basics of) linear
+algebra, calculus, probability, and Python programming.  Moreover, this book's
+appendix provides a refresher on most of the mathematics covered in this book.
+Most of the time, we will prioritize intuition and ideas over mathematical
+rigor.  There are many terrific books which can lead the interested reader
+further. For instance Linear Analysis by Bela Bollobas :cite:`Bollobas.1999`
+covers linear algebra and functional analysis in great
+depth. All of Statistics :cite:`Wasserman.2013`
+is a terrific guide to statistics.  And if you have not used Python before, you
+may want to peruse the [Python tutorial](http://learnpython.org/).
 
 
 ### Forum
@@ -290,16 +287,15 @@ the English and the Chinese drafts.
 They helped improve the content and offered valuable feedback.
 Specifically, we thank every contributor of this English draft
 for making it better for everyone.
-Their GitHub IDs or names are (in no particular order):
+Their GitHub usernames or names are (in no particular order):
 alxnorden, avinashingit, bowen0701, brettkoonce, Chaitanya Prakash Bapat,
 cryptonaut, Davide Fiocco, edgarroman, gkutiel, John Mitro, Liang Pu, Rahul Agarwal, mohamed-ali,
 mstewart141, Mike Müller, NRauschmayr, Prakhar Srivastav, sad-, sfermigier, Sheng Zha, sundeepteki,
-topecongiro, tpdi, vermicelli, Vishaal Kapoor, vishwesh5, YaYaB, Yuhong Chen, Evgeniy Smirnov, lgov, Simon Corston-Oliver, IgorDzreyev, trungha-ngx, pmuens, alukovenko, senorcinco, vfdev-5, dsweet, Mohammad Mahdi Rahimi, Abhishek Gupta, uwsd, DomKM, Lisa Oakley, bowen0701, arush15june, prasanth5reddy.
+topecongiro, tpdi, vermicelli, Vishaal Kapoor, vishwesh5, YaYaB, Yuhong Chen, Evgeniy Smirnov, lgov, Simon Corston-Oliver, IgorDzreyev, trungha-ngx, pmuens, alukovenko, senorcinco, vfdev-5, dsweet, Mohammad Mahdi Rahimi, Abhishek Gupta, uwsd, DomKM, Lisa Oakley, bowen0701, arush15june, prasanth5reddy, brianhendee, mani2106, mtn, lkevinzc, caojilin, Lakshya, Fiete Lüer, Surbhi Vijayvargeeya, Muhyun Kim, dennismalmgren, adursun, AnirudhDagar.
 Moreover, we thank Amazon Web Services, especially Swami Sivasubramanian,
 Raju Gulabani, Charlie Bell, and Andrew Jassy for their generous support in writing this book.
 Without the available time, resources, discussions with colleagues,
 and continuous encouragement this book would not have happened.
-
 
 
 ## Summary

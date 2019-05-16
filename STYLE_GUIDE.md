@@ -11,7 +11,7 @@
     * Be consistent in the structure of each section
         * Summary
         * Exercises
-        * Scan the QR Code to Access Discussions
+        * Scan the QR Code to access discussions
         * References (if any)
 * Quotes
     * Use double quotes
@@ -46,8 +46,8 @@
     * the equation above/below (Equation numbering is to be consolidated by the Press)
     * the N equations above/below
 * Place punctuations within equations if necessary
-    * e.g., comma and period
-* Assignment sumbol
+    * e.g. comma and period
+* Assignment symbol
     * \leftarrow
 
 ## Figure
@@ -66,7 +66,8 @@
         * 1pt
         * arrow head size: 50%
     * Font：
-        * Arial, 9pt（subscripts：7pt）
+        * STIXGeneral, 9pt（subscripts/superscripts：6pt）
+        * Do not italize numbers or parentheses in subscripts or superscripts
     * Color：
         * Blue as background (text is black)
             * Dark：66BFFF
@@ -110,7 +111,7 @@
         * labels：`labels`
         * DataLoader instance：`train_iter`, `test_iter`, `data_iter`
 * Comments
-    * Add period at the end of comments.
+    * Add period at the end of comments
 * imports
     * import alphabetically
     * `from mxnet.gluon import data as gdata, loss as gloss, nn, utils as gutils`
@@ -118,7 +119,7 @@
     * `epoch, lr, loss, train acc, time`
     * Around 5 lines
 * Print variables
-    * if possible use `x, y` instead of `print('x:', x, 'y:', y)` at the end of the code block
+    * If possible use `x, y` instead of `print('x:', x, 'y:', y)` at the end of the code block
 * String
     * Use single quotes
 * Other items
@@ -129,13 +130,9 @@
     * 1. → `1.0`
     * remove namescope
 
-## Hyperlinks
+## References
 
-* Internal hyperlinks
-    * In the [“Linear Regression”](linear-reg.md) section
-* External hyperlinks
-    * [Layer](http:bla)
-
+* Refer to [d2lbook](http://book.d2l.ai/examples/markdown.html#cross-references)how to add references for figure, table and equations.
 
 ## QR Code
 
@@ -145,6 +142,7 @@
 
 ## References
 
-* Append references at the end of each section
-    * Google Scholar: APA format
-    * All references are to be consolidated by the Press
+* The bibfile is `d2l.bib` on the root folder
+* Use bibtool generate consistent keys, install it by * `brew install bib-tool`
+* Then after inserting entry into `d2l.bib`, run
+  `bibtool -f "%3n(author).%d(year)" d2l.bib -o d2l.bib`

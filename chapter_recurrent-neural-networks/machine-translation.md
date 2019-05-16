@@ -1,4 +1,5 @@
 # Machine Translation and Data Sets
+:label:`chapter_machine_translation`
 
 Machine translation (MT) refers to the automatic translation of a segment of text
 from one language to another. Solving this problem with neural networks is often
