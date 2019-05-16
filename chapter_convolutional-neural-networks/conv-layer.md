@@ -199,8 +199,8 @@ conv2d = nn.Conv2D(1, kernel_size=(1, 2))
 conv2d.initialize()
 
 # The two-dimensional convolutional layer uses four-dimensional input and
-# output in the format of (batch_size, channels, height, width), where the
-# batch_size (number of examples in the batch) and the number of channels are both 1
+# output in the format of (example, channel, height, width), where the batch
+# size (number of examples in the batch) and the number of channels are both 
 
 X = X.reshape((1, 1, 6, 8))
 Y = Y.reshape((1, 1, 6, 7))
