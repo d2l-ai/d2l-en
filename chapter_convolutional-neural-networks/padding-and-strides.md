@@ -36,9 +36,9 @@ One straightforward solution to this problem
 is to add extra pixels of filler around the boundary of our input image,
 thus increasing the effective size of the image
 Typically, we set the values of the extra pixels to 0.
-In the figure below, we pad a $3 \times 5$ input,
-increasing its size to $5 \times 7$.
-The corresponding output then increases to a $4 \times 6$ matrix.
+In the figure below, we pad a $3 \times 3$ input,
+increasing its size to $5 \times 5$.
+The corresponding output then increases to a $4 \times 4$ matrix.
 
 ![Two-dimensional cross-correlation with padding. The shaded portions are the input and kernel array elements used by the first output element: $0\times0+0\times1+0\times2+0\times3=0$. ](../img/conv_pad.svg)
 
