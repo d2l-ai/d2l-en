@@ -144,7 +144,7 @@ The convolutional layer uses a kernel
 with a height and width of 5,
 which with only $2$ pixels of padding in the first convolutional layer
 and none in the second convolutional layer
-leads to reductions in both height and width by 2 and 4 pixels, respectively.
+leads to reductions in both height and width by 0 and 4 pixels, respectively.
 Moreover each pooling layer halves the height and width.
 However, as we go up the stack of layers,
 the number of channels increases layer-over-layer
