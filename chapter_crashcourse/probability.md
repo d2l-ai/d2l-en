@@ -207,8 +207,7 @@ What should a patient do upon receiving such terrifying news? Likely, he/she
 would ask the physician to administer another test to get clarity. The second
 test has different characteristics (it isn't as good as the first one).
 
-|
-outcome |  HIV positive |  HIV negative |
+|outcome |  HIV positive |  HIV negative |
 |:------------|--------------:|--------------:|
 |Test positive|          0.98 |          0.03 |
 |Test negative|          0.02 |          0.97 |
@@ -280,6 +279,8 @@ p1 = np.cumsum(y >= 0.35) / x
 plt.figure(figsize=(15, 8))
 plt.semilogx(x, p0)
 plt.semilogx(x, p1)
+plt.axhline(y=0.35, color='black', linestyle='dashed')
+plt.axhline(y=0.65, color='black', linestyle='dashed')
 plt.show()
 ```
 
