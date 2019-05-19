@@ -40,7 +40,7 @@ the input subarray contained in that window
 and the kernel array are multiplied (element-wise)
 and the resulting array is summed up
 yielding a single scalar value.
-This result if precisely the value of the output array
+This result is precisely the value of the output array
 at the corresponding location.
 Here, the output array has a height of 2 and width of 2
 and the four elements are derived from
