@@ -156,7 +156,7 @@ e.g. if images turned out not to be translation invariant,
 
 Let's briefly review why the above operation is called a *convolution*.
 In mathematics, the convolution between two functions,
-say $f, g: \mathbb{R}^d \to R$ is defined as
+say $f, g: \mathbb{R}^d \to \mathbb{R}$ is defined as
 
 $$[f \circledast g](x) = \int_{\mathbb{R}^d} f(z) g(x-z) dz$$
 
