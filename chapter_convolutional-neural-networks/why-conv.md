@@ -12,9 +12,9 @@ which features are related to each other or in what way.
 
 Sometimes we truly may not have any knowledge
 to guide the construction of more cleverly-organized architectures.
-and in thise cases, a multilayer perceptron is often the best that we can do.
+and in these cases, a multilayer perceptron is often the best that we can do.
 However, once we start dealing with high-dimensional perceptual data,
-these *structure-less* netwroks can grow unwieldy.
+these *structure-less* networks can grow unwieldy.
 
 
 For instance, let's return to our running example
@@ -26,7 +26,7 @@ Even an aggressive reduction to *1,000 hidden dimensions*
 would require a *dense* (fully-connected) layer to support $10^9$ parameters.
 Unless we have an extremely large dataset (perhaps billions?),
 lots of GPUs, a talent for extreme distributed optimization,
-and an extraordinary ammount of patience,
+and an extraordinary amount of patience,
 learning the parameters of this network may turn out to be impossible.
 
 A careful reader might object to this argument
@@ -67,7 +67,7 @@ due to the large number  of confounders.
 
 Back to images, the intuitions we have been discussion could be made more concrete yielding a few key principles for building neural networks for computer vision:
 
-1. Our vision systems should, in some sense, respond similary to the same object regardless of where it appears in the image (Translation Invariance)
+1. Our vision systems should, in some sense, respond similarly to the same object regardless of where it appears in the image (Translation Invariance)
 1. Our visions systems should, in some sense, focus on local regions, without regard for what else is happening in the image at greater distances. (Locality)
 
 Let's see how this translates into mathematics.
@@ -121,7 +121,7 @@ This is a convolution!
 We are effectively weighting pixels $(i+a, j+b)$
 in the vicinity of $(i,j)$ with coefficients $V[a,b]$
 to obtain the value $h[i,j]$.
-Note that $V[a,b]$ needs many fewer coefficients than $V[i,j,a,b]$. For a 1 megapixel image it has at most 1 million coefficients. This is 1 million fewer parameters since it no longer depends on the location within the image. We have made significant progress!
+Note that $V[a,b]$ needs many fewer coefficients than $V[i,j,a,b]$. For a 1 megapixel image it has at most 1 million coefficients. This reduces the number of parameters by a factor of 1 million since it no longer depends on the location within the image. We have made significant progress!
 
 Now let's invoke the second principle - *locality*.
 As motivated above, we believe that we shouldn't have
@@ -156,11 +156,11 @@ e.g. if images turned out not to be translation invariant,
 
 Let's briefly review why the above operation is called a *convolution*.
 In mathematics, the convolution between two functions,
-say $f, g: \mathbb{R}^d \to R$ is defined as
+say $f, g: \mathbb{R}^d \to \mathbb{R}$ is defined as
 
 $$[f \circledast g](x) = \int_{\mathbb{R}^d} f(z) g(x-z) dz$$
 
-That is, we measure the overlap beween $f$ and $g$
+That is, we measure the overlap between $f$ and $g$
 when both functions are shifted by $x$ and 'flipped'.
 Whenever we have discrete objects, the integral turns into a sum.
 For instance, for vectors defined on $\ell_2$, i.e.,
@@ -213,7 +213,7 @@ we want to have a multidimensional hidden representations
 corresponding to each spatial location.
 We could think of the hidden representation as comprising a number of 2D grids stacked on top of each other.
 These are sometimes called *channels* or *feature maps*.
-Intuitively you might imaginee that at lower layers,
+Intuitively you might imagine that at lower layers,
 some channels specialize to recognizing edges,
 We can take care of this by adding a fourth coordinate to $V$
 via $V[a,b,c,d]$. Putting all together we have:
