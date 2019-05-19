@@ -41,7 +41,7 @@ and of spatially downsampling representations.
 ## Maximum Pooling and Average Pooling
 
 Like convolutional layers, pooling operators
-consist of a fixed-shape window that is slid over
+consist of a fixed-shape window that slides over
 all regions in the input according to its stride,
 computing a single output for each location traversed
 by the fixed-shape window (sometimes known as the *pooling window*).
