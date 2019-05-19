@@ -53,7 +53,7 @@ $$
 4\times0+5\times1+7\times2+8\times3=43.
 $$
 
-Note that along each axi, the output is slightly *smaller* than the input.
+Note that along each axis, the output is slightly *smaller* than the input.
 Because the kernel has a width greater than one,
 and we can only computer the cross-correlation
 for locations where the kernel fits wholly within the image,
