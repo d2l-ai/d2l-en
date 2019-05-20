@@ -10,7 +10,7 @@ in how these later networks widen and deepen these two modules.
 Alternatively, one could imagine using fully-connected layers
 earlier in the process.
 However, a careless use of dense layers might give up the
-the spatial structure of the representation entirely,
+spatial structure of the representation entirely,
 Network in Network (NiN) blocks offer an alternative.
 They were proposed by [Lin, Chen and Yan, 2013](https://arxiv.org/pdf/1312.4400.pdf) based on a very simple insight---to
 use an MLP on the channels for each pixel separately.
@@ -27,7 +27,7 @@ at each pixel location (for each height and  width).
 If we tie the weights across each spatial location,
 we could think of this as a $1\times 1$ convolutional layer
 (as described in :numref:`chapter_channels`)
-or as a fully-connected layer acting indepdendently on each pixel location.
+or as a fully-connected layer acting independently on each pixel location.
 Another way to view this is to think of each element in the spatial dimension
 (height and width) as equivalent to an example
 and the channel as equivalent to a feature.
