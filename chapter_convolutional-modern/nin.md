@@ -22,7 +22,7 @@ consist of four-dimensional arrays with axes
 corresponding to the batch, channel, height, and width.
 Also recall that the inputs and outputs of fully-connected layers
 are typically two-dimensional arrays corresponding to the batch, and features.
-The idea of behind NiN is to apply a fully-connected layer
+The idea behind NiN is to apply a fully-connected layer
 at each pixel location (for each height and  width).
 If we tie the weights across each spatial location,
 we could think of this as a $1\times 1$ convolutional layer
