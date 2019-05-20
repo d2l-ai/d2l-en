@@ -20,7 +20,7 @@ As a warmup we will review the latter for discrete outputs and $n=2$, i.e. for M
 
 Let us take a look at a multilayer perceptron with a single hidden layer. Given a mini-batch of instances $\mathbf{X} \in \mathbb{R}^{n \times d}$ with sample size $n$ and $d$ inputs (features or feature vector dimensions). Let the hidden layer's activation function be $\phi$. Hence the hidden layer's output $\mathbf{H} \in \mathbb{R}^{n \times h}$ is calculated as
 
-$$\mathbf{H} = \phi(\mathbf{X} \mathbf{W}_{xh} + \mathbf{b}_h),$$
+$$\mathbf{H} = \phi(\mathbf{X} \mathbf{W}_{xh} + \mathbf{b}_h).$$
 
 Here, we have the weight parameter $\mathbf{W}_{xh} \in \mathbb{R}^{d \times
 h}$, bias parameter $\mathbf{b}_h \in \mathbb{R}^{1 \times h}$, and the number
