@@ -111,7 +111,7 @@ the input shape for each layer.
 So here, we don't need to tell Gluon
 how many inputs go into this linear layer.
 When we first try to pass data through our model,
-e.g., when we exedcute `net(X)` later,
+e.g., when we execute `net(X)` later,
 Gluon will automatically infer the number of inputs to each layer.
 We will describe how this works in more detail
 in the chapter "Deep Learning Computation".
