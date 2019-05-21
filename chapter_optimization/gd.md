@@ -16,7 +16,7 @@ $$f(x - \eta f'(x)) = f(x) - \eta f'^2(x) + O(\eta^2 f'^2(x)).$$
 
 If the derivative $f'(x) \neq 0$ does not vanish we make progress since $\eta f'^2(x)>0$. Moreover, we can always choose $\eta$ small enough for the higher order terms to become irrelevant. Hence we arrive at
 
-$$f(x - \eta f'(x)) \lesssim f(x).$$
+$$f(x - \eta f'(x)) \lessapprox f(x).$$
 
 This means that, if we use
 
