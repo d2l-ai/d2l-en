@@ -303,7 +303,7 @@ for epoch in range(num_epochs):
 ```
 
 In this case, because we used synthetic data (that we synthesized ourselves!),
-we know preisely what the true parameters are. Thus, we can evaluate our success in training by comparing the true parameters with those that we learned through our training loop. Indeed they turn out to be very close to each other.
+we know precisely what the true parameters are. Thus, we can evaluate our success in training by comparing the true parameters with those that we learned through our training loop. Indeed they turn out to be very close to each other.
 
 ```{.python .input  n=13}
 print('Error in estimating w', true_w - w.reshape(true_w.shape))
