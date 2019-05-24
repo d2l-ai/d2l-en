@@ -1,5 +1,6 @@
 from setuptools import setup, find_packages
-from d2l import __version__
+import re
+import os
 
 requirements = [
     'jupyter',
@@ -8,9 +9,18 @@ requirements = [
     'pandas'
 ]
 
+# don't import d2l to get __version__ since it has deps
+ver_re = re.compile("__version__ = \'([\.\d]+).*")
+with open(os.path.join('d2l','__init__.py')) as f:
+    lines = f.readlines()
+for l in lines:
+    m = ver_re.match(l)
+    if m:
+        version = m[1]
+        break
 setup(
     name='d2l',
-    version=__version__,
+    version=version,
     python_requires='>=3.6',
     author='D2L Developers',
     author_email='d2l.devs@google.com',
