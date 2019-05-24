@@ -8,7 +8,8 @@ stage("Build and Publish") {
       conda create -n d2l-en-build-${EXECUTOR_NUMBER} pip -y
       conda activate d2l-en-build-${EXECUTOR_NUMBER}
       pip install mxnet-cu100
-      pip install d2l>=0.9.2
+      # pip install d2l>=0.9.2
+      python setup.py develop
       pip install git+https://github.com/d2l-ai/d2l-book
       pip list
       '''
