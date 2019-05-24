@@ -21,12 +21,12 @@ that means that after applying many successive convolutions,
 we will wind up with an output that is much smaller than our input.
 If we start with a 240x240 pixel image, 10 layers of 5x5 convolutions
 reduce the image to 200x200 pixels, slicing off 30% of the image and with it obliterating any interesting information on the boundaries of the original image. *Padding* handles this issue.
-* In some cases, we want to reduce the resolution drastically if say we find our original input resolution to be unweildy. *Strides* can help in these instances.
+* In some cases, we want to reduce the resolution drastically if say we find our original input resolution to be unwieldy. *Strides* can help in these instances.
 
 ## Padding
 
 As described above, one tricky issue when applying convolutional layers
-is that losing pixels on the permimeter of our image.
+is that losing pixels on the perimeter of our image.
 Since we typically use small kernels,
 for any given convolution,
 we might only lose a few pixels,
@@ -78,7 +78,7 @@ For any two-dimensional array `X`,
 when the kernels size is odd
 and the number of padding rows and columns
 on all sides are the same,
-producing an output with the have the same height and width as the input,
+producing an output with the same height and width as the input,
 we know that the output `Y[i,j]` is calculated
 by cross-correlation of the input and convolution kernel
 with the window centered on `X[i,j]`.

@@ -14,7 +14,6 @@ sys.path.insert(0, '..')
 %matplotlib inline
 import d2l
 from mxnet.gluon import data as gdata
-import sys
 import time
 ```
 

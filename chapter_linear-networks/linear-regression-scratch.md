@@ -36,7 +36,7 @@ so that we can easily visualize the data
 and compare the true pattern to the learned parameters.
 We will set the number of examples in our training set to be 1000
 and the number of features (or covariates) to 2.
-This our synthetic dataset will be an object
+Thus our synthetic dataset will be an object
 $\mathbf{X}\in \mathbb{R}^{1000 \times 2}$.
 In this example, we will synthesize our data by sampling
 each data point $\mathbf{x}_i$ from a Gaussian distribution.
@@ -52,7 +52,7 @@ $$\mathbf{y}= \mathbf{X} \mathbf{w} + b + \mathbf\epsilon$$
 
 Following standard assumptions, we choose a noise term $\epsilon$
 that obeys a normal distribution with mean of $0$,
-and in this example, we'll set the its standard deviation to $0.01$.
+and in this example, we'll set its standard deviation to $0.01$.
 The following code generates our synthetic dataset:
 
 ```{.python .input  n=2}
@@ -303,7 +303,7 @@ for epoch in range(num_epochs):
 ```
 
 In this case, because we used synthetic data (that we synthesized ourselves!),
-we know preisely what the true parameters are. Thus, we can evaluate our success in training by comparing the true parameters with those that we learned through our training loop. Indeed they turn out to be very close to each other.
+we know precisely what the true parameters are. Thus, we can evaluate our success in training by comparing the true parameters with those that we learned through our training loop. Indeed they turn out to be very close to each other.
 
 ```{.python .input  n=13}
 print('Error in estimating w', true_w - w.reshape(true_w.shape))
