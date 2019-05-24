@@ -32,7 +32,7 @@ is a sequence of the following layers:
 (ii) a nonlinearity such as a ReLu,
 One VGG block consistis of a sequence of convolutional layers, 
 followed by a max pooling layer for spatial downsampling. 
-In the original VSS paper,
+In the original VGG paper,
 [Simonyan and Ziserman, 2014](https://arxiv.org/abs/1409.1556) 
 employed convolutions with $3\times3$ kernels 
 and $2 \times 2$ max pooling with stride of $2$
