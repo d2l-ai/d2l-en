@@ -1,9 +1,10 @@
 """The image module contains functions for plotting"""
 from IPython import display
 from matplotlib import pyplot as plt
+from mxnet import nd
 import numpy as np
 
-__all__ = ['plt', 'bbox_to_rect', 'semilogy', 'set_figsize', 'show_bboxes',
+__all__ = ['plt', 'plot', 'scatter', 'show', 'bbox_to_rect', 'semilogy', 'set_figsize', 'show_bboxes',
            'show_images', 'show_trace_2d', 'use_svg_display']
 
 def bbox_to_rect(bbox, color):
@@ -24,6 +25,51 @@ def semilogy(x_vals, y_vals, x_label, y_label, x2_vals=None, y2_vals=None,
         plt.legend(legend)
     plt.show()
 
+def _preprocess_2d(X):
+    def _nd2np(x):
+        return x.asnumpy() if isinstance(x, nd.NDArray) else x
+    X = _nd2np(X)
+    if isinstance(X, list) or isinstance(X, tuple):
+        X = np.array([_nd2np(x) for x in X])
+    if X.ndim == 1:
+        X = X.reshape((1, -1))
+    return X
+
+def _check_shape_2d(X, Y):
+    assert X.ndim == 2
+    assert Y.ndim == 2
+    assert X.shape[-1] == Y.shape[-1]
+    assert len(X) == len(Y) or len(X) == 1
+
+def _draw(func, X, Y, x_label, y_label, legend, xlim, ylim, axes):
+    X, Y = _preprocess_2d(X), _preprocess_2d(Y)
+    _check_shape_2d(X, Y)
+    ax = axes if axes else plt
+    ax.cla()
+    for i in range(len(Y)):
+        x = X[0,:] if len(X) == 1 else X[i,:]
+        getattr(ax, func)(x, Y[i,:])
+    ax.set_xlabel(x_label)
+    ax.set_ylabel(y_label)
+    if legend:
+        ax.legend(legend)
+    ax.set_xlim(xlim)
+    ax.set_ylim(ylim)
+
+def plot(X, Y, x_label=None, y_label=None, legend=None, xlim=None, ylim=None,
+         axes=None):
+    """plot(x,y) for (x,y) in zip(X,Y)."""
+    _draw('plot', X, Y, x_label, y_label, legend, xlim, ylim, axes)
+
+def scatter(X, Y, x_label=None, y_label=None, legend=None, xlim=None, ylim=None,
+            axes=None):
+    """plot(x,y) for (x,y) in zip(X,Y)."""
+    _draw('scatter', X, Y, x_label, y_label, legend, xlim, ylim, axes)
+
+
+def show(obj):
+    display.display(obj)
+    display.clear_output(wait=True)
 
 def set_figsize(figsize=(3.5, 2.5)):
     """Set matplotlib figure size."""
