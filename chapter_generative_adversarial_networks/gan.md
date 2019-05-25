@@ -1,4 +1,5 @@
 # Generative Adversarial Networks
+:label:`chapter_basic_gan`
 
 Throughout most of this book, we've talked about how to make predictions. In some form or another, we used deep neural networks learned mappings from data points to labels. This kind of learning is called discriminative learning, as in, we'd like to be able to discriminate between photos cats and photos of dogs. Classifiers and regressors are both examples of discriminative learning. And neural networks trained by backpropagation have upended everything we thought we knew about discriminative learning on large complicated datasets. Classification accuracies on high-res images has gone from useless to human-level (with some caveats) in just 5-6 years. We'll spare you another spiel about all the other discriminative tasks where deep neural networks do astoundingly well.
 
@@ -11,14 +12,14 @@ In 2014, a breakthrough paper introduced Generative Adversarial Networks (GANs) 
 ![Generative Adversarial Networks](../img/gan.svg)
 :label:`fig:gan`
 
-The GANs architecture is illustrated in :numref:`fig:gan`. 
+The GANs architecture is illustrated in :numref:`fig:gan`.
 As you can see, there are two pieces to GANs - first off, we need a device (say, a deep network but it really could be anything, such as a game rendering engine) that might potentially be able to generate data that looks just like the real thing. If we are dealing with images, this needs to generate images. If we're dealing with speech, it needs to generate audio sequences, and so on. We call this the generator network. The second component is the discriminator network. It attempts to distinguish fake and real data from each other. Both networks are in competition with each other. The generator network attempts to fool the discriminator network. At that point, the discriminator network adapts to the new fake data. This information, in turn is used to improve the generator network, and so on.
 
 The discriminator is a binary classifier to distinguish if the input $x$ is real (from real data) or fake (from the generator). Typically, the discriminator outputs a scalar prediction $o\in\mathbb R$ for input $\mathbf x$, such as using a dense layer with hidden size 1, and then applies sigmoid function to obtain the predicted probability $D(\mathbf x) = 1/(1+e^{-o})$. Assume the label $y$ for true data is $1$ and $0$ for fake data. We train the discriminator to minimize the cross entropy loss, i.e.
 
 $$ \min - y \log D(\mathbf x) - (1-y)\log(1-D(\mathbf x)),$$
 
-For the generator, it first draws some parameter $\mathbf z\in\mathbb R^d$ from a source of randomness, e.g. a normal distribution $\mathbf z\sim\mathcal(0,1)$. We often call $\mathbf z$ the latent variable. 
+For the generator, it first draws some parameter $\mathbf z\in\mathbb R^d$ from a source of randomness, e.g. a normal distribution $\mathbf z\sim\mathcal(0,1)$. We often call $\mathbf z$ the latent variable.
 It then applies a function to generate $\mathbf x'=G(\mathbf z)$. The goal of the generator is to fool the discriminator to classify $\mathbf x'$ as true data. In other words, we update the parameters of the generator to maximize the cross entropy loss when $y=0$, i.e.
 
 $$ \max - \log(1-D(\mathbf x')).$$
@@ -27,7 +28,7 @@ If the discriminator does a perfect job, then $D(\mathbf x')\approx 1$ so the ab
 
 $$ \max \log(D(\mathbf x')), $$
 
-which is just feed $\mathbf x'$ into the discriminator but giving label $y=1$. 
+which is just feed $\mathbf x'$ into the discriminator but giving label $y=1$.
 
 
 Many of the GANs applications are in the context of images. As a demonstration purpose, we're going to content ourselves with fitting a much simpler distribution first. We will illustrate what happens if we use GANs to build the world's most inefficient estimator of parameters for a Gaussian. Let's get started.
@@ -88,7 +89,7 @@ net_D.add(nn.Dense(5, activation='tanh'),
 
 ## Training
 
-First we define a function to update the discriminator. 
+First we define a function to update the discriminator.
 
 ```{.python .input  n=7}
 def update_D(X, Z, net_D, net_G, loss, trainer_D):
@@ -99,9 +100,9 @@ def update_D(X, Z, net_D, net_G, loss, trainer_D):
     with autograd.record():
         real_Y = net_D(X)
         fake_X = net_G(Z)
-        # Don't need to compute gradient for net_G, detach it from 
+        # Don't need to compute gradient for net_G, detach it from
         # computing gradients.
-        fake_Y = net_D(fake_X.detach())                
+        fake_Y = net_D(fake_X.detach())
         loss_D = (loss(real_Y, ones) + loss(fake_Y, zeros)) / 2
     loss_D.backward()
     trainer_D.step(batch_size)
@@ -115,10 +116,10 @@ def update_G(Z, net_D, net_G, loss, trainer_G):
     """Update generator"""
     batch_size = Z.shape[0]
     ones = nd.ones((batch_size,), ctx=X.context)
-    with autograd.record():   
+    with autograd.record():
         # We could reuse fake_X from update_D to save computation.
         fake_X = net_G(Z)
-        # Recomputing fake_Y is needed since net_D is changed.        
+        # Recomputing fake_Y is needed since net_D is changed.
         fake_Y = net_D(fake_X)
         loss_G = loss(fake_Y, ones)
     loss_G.backward()
@@ -126,7 +127,7 @@ def update_G(Z, net_D, net_G, loss, trainer_G):
     return loss_G.mean().asscalar()
 ```
 
-In each iteration, we first update the discriminator and then the generator. We visualize losses for each network, and also show the generated data from the generator. 
+In each iteration, we first update the discriminator and then the generator. We visualize losses for each network, and also show the generated data from the generator.
 
 ```{.python .input  n=9}
 def train():
@@ -142,8 +143,8 @@ def train():
         # Show progress.
         all_loss_D.append(total_loss_D/len(data_iter))
         all_loss_G.append(total_loss_G/len(data_iter))
-        d2l.plot(list(range(1, epoch+1)), [all_loss_G, all_loss_D], 
-                 'epoch', 'loss', ['generator', 'discriminator'], 
+        d2l.plot(list(range(1, epoch+1)), [all_loss_G, all_loss_D],
+                 'epoch', 'loss', ['generator', 'discriminator'],
                  xlim=[0, num_epochs+1], axes=ax1)
         # Show generated examples
         Z = nd.random.normal(0, 1, shape=(100, latent_dim))
@@ -153,7 +154,7 @@ def train():
         d2l.show(fig)
 ```
 
-Now we specify the hyper-parameters to fit the Gaussian distribution. 
+Now we specify the hyper-parameters to fit the Gaussian distribution.
 
 ```{.python .input  n=10}
 lr_D = 0.05
@@ -164,9 +165,9 @@ num_epochs = 20
 loss = gluon.loss.SigmoidBCELoss()
 net_D.initialize(init=init.Normal(0.02), force_reinit=True)
 net_G.initialize(init=init.Normal(0.02), force_reinit=True)
-trainer_D = gluon.Trainer(net_D.collect_params(), 
+trainer_D = gluon.Trainer(net_D.collect_params(),
                           'adam', {'learning_rate': lr_D})
-trainer_G = gluon.Trainer(net_G.collect_params(), 
+trainer_G = gluon.Trainer(net_G.collect_params(),
                           'adam', {'learning_rate': lr_G})
 
 train()
