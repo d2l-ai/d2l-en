@@ -95,7 +95,7 @@ misses out on what is happening internally in the network.
 Their proposed idea is called *dropout*,
 and it is now a standard technique
 that is widely used for training neural networks.
-Throughout trainin, on each iteration,
+Throughout training, on each iteration,
 dropout regularization consists simply of zeroing out
 some fraction (typically 50%) of the nodes in each layer
 before calculating the subsequent layer.
