@@ -7,7 +7,7 @@ in the computer vision and machine learning communities
 following the introduction of LeNet,
 they did not immediately dominate the field.
 Although LeNet achieved good results on early small data sets,
-the performance and feasability of training convolutional networks
+the performance and feasibility of training convolutional networks
 on larger, more realistic datasets had yet to be established
 In fact, for much of the intervening time between the early 1990s
 and the watershed results of 2012,
@@ -82,7 +82,7 @@ Indeed, [Krizhevski, Sutskever and Hinton, 2012](https://papers.nips.cc/paper/48
 which achieved excellent performance in the ImageNet challenge.
 
 Interestingly in the lowest layers of the network,
-the model learned featrue extractors that resembled some traditional filters.
+the model learned feature extractors that resembled some traditional filters.
 The figure below is reproduced from this paper
 and describes lower-level image descriptors.
 
@@ -107,7 +107,7 @@ The ultimate breakthrough in 2012 can be attributed to two key factors.
 
 Deep models with many layers require large amounts of data
 in order to enter the regime
-where they signficantly outperform traditional methods
+where they significantly outperform traditional methods
 based on convex optimizations (e.g. linear and kernel methods).
 However, given the limited storage capacity of computers,
 the relative expense of sensors,
@@ -134,7 +134,7 @@ at a greater scale than academics had previously considered.
 
 ### Missing Ingredient - Hardware
 
-Deep learning models are varacious consumers of compute cycles.
+Deep learning models are voracious consumers of compute cycles.
 Training can take hundreds of epochs, and each iteration
 requires passing data through many layers of computationally-expensive
 linear algebra operations.
@@ -144,7 +144,7 @@ convex objectives were preferred.
 
 Graphical processing units (GPUs) proved to be a game changer
 in make deep learning feasible.
-These chips had long been develoepd for accelerating
+These chips had long been developed for accelerating
 graphics processing to benefit computer games.
 In particular, they were optimized for high throughput 4x4 matrix-vector products, which are needed for many computer graphics tasks.
 Fortunately, this math is strikingly similar
