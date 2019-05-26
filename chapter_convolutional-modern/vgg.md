@@ -9,7 +9,7 @@ commonly used to design deep networks.
 Progress in this field mirrors that in chip design 
 where engineers went from placing transistors
 to logical elements to logic blocks. 
-Similarly, the design of neural nework architectures 
+Similarly, the design of neural network architectures 
 had grown progressively more abstract,
 with researchers moving from thinking in terms of 
 individual neurons to whole layers, 
@@ -19,7 +19,7 @@ The idea of using blocks first emerged from the
 [Visual Geometry Group](http://www.robots.ox.ac.uk/~vgg/) (VGG) 
 at Oxford University. 
 In their eponymously-named VGG network,
-It's easy to implemented these repeated structures in code
+It's easy to implement these repeated structures in code
 with any modern deep learning framework by using loops and subroutines. 
 
 
@@ -30,7 +30,7 @@ is a sequence of the following layers:
 (i) a convolutional layer 
 (with padding to maintain the resolution), 
 (ii) a nonlinearity such as a ReLu,
-One VGG block consistis of a sequence of convolutional layers, 
+One VGG block consists of a sequence of convolutional layers, 
 followed by a max pooling layer for spatial downsampling. 
 In the original VGG paper,
 [Simonyan and Ziserman, 2014](https://arxiv.org/abs/1409.1556) 
@@ -65,7 +65,7 @@ def vgg_block(num_convs, num_channels):
 
 Like AlexNet and LeNet, 
 the VGG Network can be partitioned into two parts:
-the first consiting mostly of convolutional and pooling layers
+the first consisting mostly of convolutional and pooling layers
 and a second consisting of fully-connected layers. 
 The convolutional portion of the net connects several `vgg_block` modules 
 in succession.
