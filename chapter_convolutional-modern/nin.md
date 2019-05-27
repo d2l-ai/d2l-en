@@ -70,7 +70,7 @@ with a stride of 2 and a window shape of $3\times 3$.
 Once significant difference between NiN and AlexNet
 is that NiN avoids dense connections altogether.
 Instead, NiN uses an NiN block with a number of output channels equal to the number of label classes, followed by a *global* average pooling layer,
-yielding a vector of logits.
+yielding a vector of [logits](https://en.wikipedia.org/wiki/Logit).
 One advantage of NiN's design is that it significantly
 reduces the number of required model parameters.
 However, in practice, this design sometimes requires
