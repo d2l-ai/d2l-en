@@ -12,9 +12,6 @@ We begin by importing MXNet and the `ndarray` module from MXNet.
 Here, `nd` is short for `ndarray`.
 
 ```{.python .input  n=1}
-import mxnet as mx
-mx.set_np_compat(True)
-
 from mxnet import numpy as np
 ```
 
@@ -47,9 +44,7 @@ We use the `reshape` function to change the shape of one (possibly multi-dimensi
 For example, we can transform the shape of our line vector `x` to (3, 4), which contains the same values but interprets them as a matrix containing 3 rows and 4 columns. Note that although the shape has changed, the elements in `x` have not. Moreover, the `size` remains the same.
 
 ```{.python .input}
-x = np.reshape(x, (3,4))
-x
-# FIXME, cannot use x.reshape((3,4))
+x.reshape((3,4))
 ```
 
 Reshaping by manually specifying each of the dimensions can get annoying. Once we know one of the dimensions, why should we have to perform the division our selves to determine the other? For example, above, to get a matrix with 3 rows, we had to specify that it should have 4 columns (to account for the 12 elements). Fortunately, NDArray can automatically work out one dimension given the other. We can invoke this capability by placing `-1` for the dimension that we would like NDArray to automatically infer. In our case, instead of
@@ -93,11 +88,8 @@ Oftentimes, we want to apply functions to arrays. Some of the simplest and most 
 we can produce a vector $\mathbf{c} = F(\mathbf{u},\mathbf{v})$ by setting $c_i \gets f(u_i, v_i)$ for all $i$. Here, we produced the vector-valued $F: \mathbb{R}^d \rightarrow \mathbb{R}^d$ by *lifting* the scalar function to an element-wise vector operation. In MXNet, the common standard arithmetic operators (+,-,/,\*,\*\*) have all been *lifted* to element-wise operations for identically-shaped tensors of arbitrary shape. We can call element-wise operations on any two tensors of the same shape, including matrices.
 
 ```{.python .input}
-# FIXME, x's dtype is int64 instead of float32
-x = np.array([1, 2, 4, 8]).astype('float32')
-# FIXME, no ones_likes
-# y = np.ones_like(x) * 2
-y = np.ones(x.shape)*2
+x = np.array([1, 2, 4, 8])
+y = np.ones_like(x) * 2
 print('x =', x)
 print('x + y', x + y)
 print('x - y', x - y)
@@ -117,8 +109,8 @@ In addition to computations by element, we can also perform matrix operations, l
 ```{.python .input  n=13}
 # x = np.arange(12).reshape((3,4))
 # FIXME, dtype is int64 instead of float32
-x = np.reshape(np.array([1]*12), (3,4)).astype('float32')
-y = np.array([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]]).astype('float32')
+x = np.reshape(np.array([1]*12), (3,4))
+y = np.array([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 np.dot(x, y.T)
 ```
 
@@ -242,6 +234,18 @@ a = x.asnumpy()
 print(type(a))
 b = np.array(a)
 print(type(b))
+```
+
+## Compatibility with NumPy
+
+Data type
+
+```{.python .input}
+print("NumPy: ", onp.zeros((2,3)).dtype, "\nmxnet.numpy: ", np.zeros((2,3)).dtype)
+```
+
+```{.python .input}
+print("NumPy: ", onp.array([1,2]).dtype, "\nmxnet.numpy: ", np.array([1,2]).dtype)
 ```
 
 ## Mutual Transformation of Classic NDArray and Numpy-compatible NDArray
