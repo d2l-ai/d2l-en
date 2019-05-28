@@ -170,7 +170,7 @@ loss = gloss.SoftmaxCrossEntropyLoss()
 d2l.train(train_iter, test_iter, net, loss, trainer, ctx, num_epochs)
 ```
 
-Below, we use the trained model to the classify sentiments of two simple sentences.
+Below, we use the trained model to classify sentiments of two simple sentences.
 
 ```{.python .input}
 d2l.predict_sentiment(net, vocab, 'this movie is so great')
