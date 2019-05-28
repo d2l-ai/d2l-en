@@ -57,7 +57,7 @@ based on whether they depict *cats* or *dogs* given black-and-white images.
 
 If we use a linear model, we'd basically be saying that
 for each pixel, increasing its value (making it more white)
-must always increases the probability that the image depicts a dog
+must always increase the probability that the image depicts a dog
 or must always increase the probability that the image depicts a cat.
 We would be making the absurd assumption that the only requirement
 for differentiating cats vs. dogs is to assess how bright they are.
