@@ -111,7 +111,7 @@ so that the shape of the convolution kernel
 is $c_o\times c_i\times k_h\times k_w$.
 In cross-correlation operations,
 the result on each output channel is calculated
-from the convolution kernel corrsponding to that output channel
+from the convolution kernel corresponding to that output channel
 and takes input from all channels in the input array.
 
 We implement a cross-correlation function
