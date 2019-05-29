@@ -51,7 +51,7 @@ $(1\times1+2\times2+4\times3+5\times4)+(0\times0+1\times1+3\times2+4\times3)=56$
 ![Cross-correlation computation with 2 input channels. The shaded portions are the first output element as well as the input and kernel array elements used in its computation: $(1\times1+2\times2+4\times3+5\times4)+(0\times0+1\times1+3\times2+4\times3)=56$. ](../img/conv_multi_in.svg)
 
 
-To make sure we reall understand what's going on here,
+To make sure we really understand what's going on here,
 we can implement cross-correlation operations with multiple input channels ourselves.
 Notice that all we are doing is performing one cross-correlation operation
 per channel and then adding up the results using the `add_n` function.
@@ -111,7 +111,7 @@ so that the shape of the convolution kernel
 is $c_o\times c_i\times k_h\times k_w$.
 In cross-correlation operations,
 the result on each output channel is calculated
-from the convolution kernel corrsponding to that output channel
+from the convolution kernel corresponding to that output channel
 and takes input from all channels in the input array.
 
 We implement a cross-correlation function
