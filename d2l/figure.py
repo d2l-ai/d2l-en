@@ -42,9 +42,10 @@ def _check_shape_2d(X, Y):
     assert len(X) == len(Y) or len(X) == 1
 
 def _draw(func, X, Y, x_label, y_label, legend, xlim, ylim, axes):
+    use_svg_display()
     X, Y = _preprocess_2d(X), _preprocess_2d(Y)
     _check_shape_2d(X, Y)
-    ax = axes if axes else plt
+    ax = axes if axes else plt.gca()
     ax.cla()
     for i in range(len(Y)):
         x = X[0,:] if len(X) == 1 else X[i,:]

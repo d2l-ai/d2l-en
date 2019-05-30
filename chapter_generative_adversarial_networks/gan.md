@@ -10,9 +10,9 @@ Until recently, we had no method that could synthesize novel photorealistic imag
 In 2014, a breakthrough paper introduced Generative adversarial networks (GANs) :cite:`Goodfellow.Pouget-Abadie.Mirza.ea.2014`, a clever new way to leverage the power of discriminative models to get good generative models. At their heart, GANs rely on the idea that a data generator is good if we cannot tell fake data apart from real data. In statistics, this is called a two-sample test - a test to answer the question whether datasets $X=\{x_1,\ldots,x_n\}$ and $X'=\{x'_1,\ldots,x'_n\}$ were drawn from the same distribution. The main difference between most statistics papers and GANs is that the latter use this idea in a constructive way. In other words, rather than just training a model to say "hey, these two datasets don't look like they came from the same distribution", they use the [two-sample test](https://en.wikipedia.org/wiki/Two-sample_hypothesis_testing) to provide training signal to a generative model. This allows us to improve the data generator until it generates something that resembles the real data. At the very least, it needs to fool the classifier. And if our classifier is a state of the art deep neural network.
 
 ![Generative Adversarial Networks](../img/gan.svg)
-:label:`fig:gan`
+:label:`fig_gan`
 
-The GANs architecture is illustrated in :numref:`fig:gan`.
+The GANs architecture is illustrated in :numref:`fig_gan`.
 As you can see, there are two pieces to GANs - first off, we need a device (say, a deep network but it really could be anything, such as a game rendering engine) that might potentially be able to generate data that looks just like the real thing. If we are dealing with images, this needs to generate images. If we're dealing with speech, it needs to generate audio sequences, and so on. We call this the generator network. The second component is the discriminator network. It attempts to distinguish fake and real data from each other. Both networks are in competition with each other. The generator network attempts to fool the discriminator network. At that point, the discriminator network adapts to the new fake data. This information, in turn is used to improve the generator network, and so on.
 
 The discriminator is a binary classifier to distinguish if the input $x$ is real (from real data) or fake (from the generator). Typically, the discriminator outputs a scalar prediction $o\in\mathbb R$ for input $\mathbf x$, such as using a dense layer with hidden size 1, and then applies sigmoid function to obtain the predicted probability $D(\mathbf x) = 1/(1+e^{-o})$. Assume the label $y$ for true data is $1$ and $0$ for fake data. We train the discriminator to minimize the cross entropy loss, i.e.
@@ -92,7 +92,7 @@ net_D.add(nn.Dense(5, activation='tanh'),
 First we define a function to update the discriminator.
 
 ```{.python .input  n=7}
-def update_D(X, Z, net_D, net_G, loss, trainer_D):
+def update_D(X, Z, net_D, net_G, loss, trainer_D):  # saved in d2l
     """Update discriminator"""
     batch_size = X.shape[0]
     ones = nd.ones((batch_size,), ctx=X.context)
@@ -112,10 +112,10 @@ def update_D(X, Z, net_D, net_G, loss, trainer_D):
 The generator is updated similarly. Here we reuse the cross entropy loss but change the label of the fake data from $0$ to $1$.
 
 ```{.python .input  n=8}
-def update_G(Z, net_D, net_G, loss, trainer_G):
+def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
     """Update generator"""
     batch_size = Z.shape[0]
-    ones = nd.ones((batch_size,), ctx=X.context)
+    ones = nd.ones((batch_size,), ctx=Z.context)
     with autograd.record():
         # We could reuse fake_X from update_D to save computation.
         fake_X = net_G(Z)
@@ -183,3 +183,4 @@ train()
 ## Reference
 
 [1] Ian Goodfellow, Jean Pouget-Abadie, Mehdi Mirza, Bing Xu, David Warde-Farley, Sherjil Ozair, Aaron Courville, and Yoshua Bengio. Generative adversarial nets. In Advances in neural information processing systems, 2672–2680. 2014.
+
