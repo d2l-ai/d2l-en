@@ -222,7 +222,7 @@ In practice, we can remove prediction bounding boxes with lower confidence level
 ## Summary
 
 * We generate multiple anchor boxes with different sizes and aspect ratios, centered on each pixel.
-* IoU is the ratio of the intersecting area to the union area of two bounding boxes.
+* IoU, also called Jaccard index, measures the similarity of two bounding boxes. It is the ratio of the intersecting area to the union area of two bounding boxes.
 * In the training set, we mark two types of labels for each anchor box: one is the category of the target contained in the anchor box and the other is the offset of the ground-truth bounding box relative to the anchor box.
 * When predicting, we can use non-maximum suppression (NMS) to remove similar prediction bounding boxes, thereby simplifying the results.
 
