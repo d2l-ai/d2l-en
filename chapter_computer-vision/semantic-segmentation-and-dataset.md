@@ -199,6 +199,7 @@ for X, Y in train_iter:
 ## Summary
 
 * Semantic segmentation looks at how images can be segmented into regions with different semantic categories.
+* Semantic segmentation includes image segmentation and instance segmentation. The former uses correlations to distinguish semantics, while the latter not only differentiates semantics, but also different objects.
 * In the semantic segmentation field, one important data set is Pascal VOC2012.
 * Because the input images and labels in semantic segmentation have a one-to-one correspondence at the pixel level, we randomly crop them to a fixed size, rather than scaling them.
 

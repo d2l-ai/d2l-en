@@ -11,8 +11,8 @@ Another solution is to apply transfer learning to migrate the knowledge learned 
 
 In this section, we introduce a common technique in transfer learning: fine tuning. As shown in Figure 11.1, fine tuning consists of the following four steps:
 
-1. Pre-train a neural network model, i.e. the source model, on a source data set (e.g., the ImageNet data set).
-2. Create a new neural network model, i.e. the target model. This replicates all model designs and their parameters on the source model, except the output layer. We assume that these model parameters contain the knowledge learned from the source data set and that this knowledge will be equally applicable to the target data set. We also assume that the output layer of the source model is closely related to the labels of the source data set and is therefore not used in the target model.
+1. Pre-train a neural network model, i.e., the source model, on a source data set (e.g., the ImageNet data set).
+2. Create a new neural network model, i.e., the target model. This replicates all model designs and their parameters on the source model, except the output layer. We assume that these model parameters contain the knowledge learned from the source data set and this knowledge will be equally applicable to the target data set. We also assume that the output layer of the source model is closely related to the labels of the source data set and is therefore not used in the target model.
 3. Add an output layer whose output size is the number of target data set categories to the target model, and randomly initialize the model parameters of this layer.
 4. Train the target model on a target data set, such as a chair data set. We will train the output layer from scratch, while the parameters of all remaining layers are fine tuned based on the parameters of the source model.
 
