@@ -17,7 +17,7 @@ object-detection-dataset
 ssd
 rcnn
 semantic-segmentation-and-dataset
-tranpose-conv
+tranposed-conv
 fcn
 neural-style
 kaggle-gluon-cifar10
