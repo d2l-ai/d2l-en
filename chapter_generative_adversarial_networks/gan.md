@@ -92,7 +92,7 @@ net_D.add(nn.Dense(5, activation='tanh'),
 First we define a function to update the discriminator.
 
 ```{.python .input  n=7}
-def update_D(X, Z, net_D, net_G, loss, trainer_D):
+def update_D(X, Z, net_D, net_G, loss, trainer_D):  # saved in d2l
     """Update discriminator"""
     batch_size = X.shape[0]
     ones = nd.ones((batch_size,), ctx=X.context)
@@ -112,10 +112,10 @@ def update_D(X, Z, net_D, net_G, loss, trainer_D):
 The generator is updated similarly. Here we reuse the cross entropy loss but change the label of the fake data from $0$ to $1$.
 
 ```{.python .input  n=8}
-def update_G(Z, net_D, net_G, loss, trainer_G):
+def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
     """Update generator"""
     batch_size = Z.shape[0]
-    ones = nd.ones((batch_size,), ctx=X.context)
+    ones = nd.ones((batch_size,), ctx=Z.context)
     with autograd.record():
         # We could reuse fake_X from update_D to save computation.
         fake_X = net_G(Z)
@@ -176,5 +176,5 @@ train()
 ## Summary
 
 * Generative adversarial networks (GANs) composes of two deep networks, the generator and the discriminator.
-* The generator generates the image as much closer to the true image as possible to fool the discriminator, via maximizing the cross entropy loss, i.e., $\max \log(D(\mathbf{x'}))$. 
+* The generator generates the image as much closer to the true image as possible to fool the discriminator, via maximizing the cross entropy loss, i.e., $\max \log(D(\mathbf{x'}))$.
 * The discriminator tries to distinguish the generated images from the true images, via minimizing the cross entropy loss, i.e., $\min - y \log D(\mathbf{x}) - (1-y)\log(1-D(\mathbf{x}))$.
