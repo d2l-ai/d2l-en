@@ -35,7 +35,7 @@ with autograd.record():
 print(y)
 ```
 
-Since the shape of `x` is (4, 1), `y` is a scalar. Next, we can automatically find the gradient by calling the `backward` function. It should be noted that if `y` is not a scalar, MXNet will first sum the elements in `y` to get the new variable by default, and then find the gradient of the variable with respect to `x`.
+Since the shape of `x` is (4, 1), `y` is a scalar. Next, we can automatically find the gradient of all the inputs by calling the `backward` function. It should be noted that if `y` is not a scalar, MXNet will first sum the elements in `y` to get the new variable by default, and then find the analytical gradient of the variable with respect to `x` evaluated at its current value $\frac{dy}{dx}\bigr\rvert_{x}$.
 
 ```{.python .input  n=5}
 y.backward()
@@ -48,9 +48,11 @@ print((x.grad - 4 * x).norm().asscalar() == 0)
 print(x.grad)
 ```
 
+
+
 ## Training Mode and Prediction Mode
 
-As you can see from the above, after calling the `record` function, MXNet will record and calculate the gradient. In addition, `autograd` will also change the running mode from the prediction mode to the training mode by default. This can be viewed by calling the `is_training` function.
+As you can see from the above, after calling the `record` function, MXNet will record the operations and calculate the gradient. In addition, `autograd` will also change the running mode from the prediction mode to the training mode by default. This can be viewed by calling the `is_training` function.
 
 ```{.python .input  n=7}
 print(autograd.is_training())
@@ -62,7 +64,7 @@ In some cases, the same model behaves differently in the training and prediction
 
 ## Computing the Gradient of Python Control Flow
 
-One benefit of using automatic differentiation is that even if the computational graph of the function contains Python's control flow (such as conditional and loop control), we may still be able to find the gradient of a variable. Consider the following program:  It should be emphasized that the number of iterations of the loop (while loop) and the execution of the conditional judgment (if statement) depend on the value of the input `b`.
+One benefit of using automatic differentiation is that even if the computational graph of the function contains Python's control flow (such as conditional and loop control), we may still be able to find the gradient of a variable. Consider the following program:  It should be emphasized that the number of iterations of the loop (while loop) and the execution of the conditional statement (if statement) depend on the value of the input `b`.
 
 ```{.python .input  n=8}
 def f(a):
