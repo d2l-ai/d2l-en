@@ -22,8 +22,7 @@ VOC_COLORMAP = [[0, 0, 0], [128, 0, 0], [0, 128, 0], [128, 128, 0],
 def download_voc_pascal(data_dir='../data'):
     """Download the Pascal VOC2012 Dataset."""
     voc_dir = os.path.join(data_dir, 'VOCdevkit/VOC2012')
-    url = ('http://host.robots.ox.ac.uk/pascal/VOC/voc2012'
-           '/VOCtrainval_11-May-2012.tar')
+    url = 'http://data.mxnet.io/data/VOCtrainval_11-May-2012.tar'
     sha1 = '4e443f8a2eca6b1dac8a6c57641b67dd40621a49'
     fname = gutils.download(url, data_dir, sha1_hash=sha1)
     with tarfile.open(fname, 'r') as f:
