@@ -46,6 +46,7 @@ stage("Build and Publish") {
       mv _build/eval/data _build/data_tmp
       cp -r data _build/eval
       d2lbook build html pkg
+      rm -rf _build/eval/data
       mv _build/data_tmp _build/eval/data
       '''
 
