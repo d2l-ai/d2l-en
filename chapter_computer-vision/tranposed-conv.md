@@ -2,41 +2,146 @@
 :label:`chapter_transposed_conv`
 
 The layers we introduced so far for convolutional neural networks, including 
-convolutional layers (:numref:`chapter_conv_chapter`) and pooling layers (:numref:`chapter_pooling`), often reduce or do not change the input width and height. Applications such as semantic segmentation (:numref:`chapter_semantic_segmentation`) and 
+convolutional layers (:numref:`chapter_conv_layer`) and pooling layers (:numref:`chapter_pooling`), often reducethe input width and height, or keep them unchanged. Applications such as semantic segmentation (:numref:`chapter_semantic_segmentation`) and generative adversarial networks (:numref:`chapter_dcgan`), however, require to predict values for each pixel and therefore needs to increase input width and height. Transposed convolution, often named fractionally-strided convolution or deconvolution, serves this purpose.
 
-![Transposed convolution layer with a $2\times 2$ kernel.](../img/trans_conv.svg)
-:label:`fig_trans_conv`
-
-
-The transposed convolution layer takes its name from the matrix transposition operation. In fact, convolution operations can also be achieved by matrix multiplication. In the example below, we define input `X` with a height and width of 4 respectively, and a convolution kernel `K` with a height and width of 3 respectively. Print the output of the 2D convolution operation and the convolution kernel. As you can see, the output has a height and a width of 2.
-
-```{.python .input  n=13}
+```{.python .input  n=18}
 from mxnet import nd, init
 from mxnet.gluon import nn
 ```
 
-```{.python .input  n=17}
-conv_trans = nn.Conv2DTranspose(1, kernel_size=2)
-K = nd.array([[0,1],[2,3]]).reshape((1, 1, 2, 2))
-conv_trans.initialize(init.Constant(K))
-X = nd.array([[0,1],[2,3]])
-conv_trans(X.reshape((1,1,2,2)))
-          
+## Basic 2D Transposed Convolution
 
+Let's consider a basic case that both input and output channels are 1, with 0 padding and 1 stride. :numref:`fig_trans_conv` illustrates how transposed convolution with a $2\times 2$ kernel is computed on the $2\times 2$ input matrix. 
+
+![Transposed convolution layer with a $2\times 2$ kernel.](../img/trans_conv.svg)
+:label:`fig_trans_conv`
+
+We can implement this operation by giving matrix kernel $K$ and matrix input $X$. 
+
+```{.python .input  n=20}
+def trans_conv(X, K):
+    h, w = K.shape
+    Y = nd.zeros((X.shape[0] + h - 1, X.shape[1] + w - 1))
+    for i in range(X.shape[0]):
+        for j in range(X.shape[1]):
+            Y[i: i + h, j: j + w] += X[i, j] * K
+    return Y
 ```
 
-```{.json .output n=17}
+Remember the convolution computes results by `Y[i, j] = (X[i: i + h, j: j + w] * K).sum()` (refer to `corr2d` in :numref:`chapter_conv_layer`), which summarizes input values through the kernel. While the transposed convolution broadcasts input values through the kernel, which results in a larger output shape. 
+
+Verify the results in :numref:`fig_trans_conv`.
+
+```{.python .input  n=21}
+X = nd.array([[0,1], [2,3]])
+K = nd.array([[0,1], [2,3]])
+trans_conv(X, K)
+```
+
+```{.json .output n=21}
 [
  {
   "data": {
-   "text/plain": "\n[[[[ 0.  0.  1.]\n   [ 0.  4.  6.]\n   [ 4. 12.  9.]]]]\n<NDArray 1x1x3x3 @cpu(0)>"
+   "text/plain": "\n[[ 0.  0.  1.]\n [ 0.  4.  6.]\n [ 4. 12.  9.]]\n<NDArray 3x3 @cpu(0)>"
   },
-  "execution_count": 17,
+  "execution_count": 21,
   "metadata": {},
   "output_type": "execute_result"
  }
 ]
 ```
+
+Or we can use `nn.Conv2DTranspose` to obtain the same results. As `nn.Conv2D`, both input and kernel should be 4-D tensors. 
+
+```{.python .input  n=31}
+X, K = X.reshape((1, 1, 2, 2)),  K.reshape((1, 1, 2, 2))
+tconv = nn.Conv2DTranspose(1, kernel_size=2)
+tconv.initialize(init.Constant(K))
+tconv(X)
+```
+
+```{.json .output n=31}
+[
+ {
+  "data": {
+   "text/plain": "\n[[[[ 0.  0.  1.]\n   [ 0.  4.  6.]\n   [ 4. 12.  9.]]]]\n<NDArray 1x1x3x3 @cpu(0)>"
+  },
+  "execution_count": 31,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
+```
+
+## Padding, Strides, and Channels
+
+We apply padding elements to the input in convolution, while they are applied to the output in transposed convolution. A $1\times 1$ padding means we first compute the output as normal, then remove the first/last rows and columns. 
+
+```{.python .input  n=33}
+tconv = nn.Conv2DTranspose(1, kernel_size=2, padding=1)
+tconv.initialize(init.Constant(K))
+tconv(X)
+```
+
+```{.json .output n=33}
+[
+ {
+  "data": {
+   "text/plain": "\n[[[[4.]]]]\n<NDArray 1x1x1x1 @cpu(0)>"
+  },
+  "execution_count": 33,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
+```
+
+Similarly, strides are applied to outputs as well.
+
+```{.python .input  n=35}
+tconv = nn.Conv2DTranspose(1, kernel_size=2, strides=2)
+tconv.initialize(init.Constant(K))
+tconv(X)
+```
+
+```{.json .output n=35}
+[
+ {
+  "data": {
+   "text/plain": "\n[[[[0. 0. 0. 1.]\n   [0. 0. 2. 3.]\n   [0. 2. 0. 3.]\n   [4. 6. 6. 9.]]]]\n<NDArray 1x1x4x4 @cpu(0)>"
+  },
+  "execution_count": 35,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
+```
+
+But multi-channels work the same as convolution. As a result, if we feed $X$ into a convolutional layer $f$ to compute $Y=f(X)$ and create a transposed convolution layer $g$ with the same hyper-parameters as $f$ except for the output channel set to be the channel size of $X$, then $g(Y)$ should has the same shape as $X$. Let's verify this statement. 
+
+```{.python .input  n=37}
+X = nd.random.uniform(shape=(1, 10, 16, 16))
+conv = nn.Conv2D(20, kernel_size=5, padding=2, strides=3)
+tconv = nn.Conv2DTranspose(10, kernel_size=5, padding=2, strides=3)
+conv.initialize()
+tconv.initialize()
+tconv(conv(X)).shape == X.shape
+```
+
+```{.json .output n=37}
+[
+ {
+  "data": {
+   "text/plain": "True"
+  },
+  "execution_count": 37,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
+```
+
+## Relation to mm
 
 ```{.python .input  n=5}
 X = nd.arange(1, 17).reshape((1, 1, 4, 4))
