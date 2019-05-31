@@ -35,7 +35,7 @@ with autograd.record():
 print(y)
 ```
 
-Since the shape of `x` is (4, 1), `y` is a scalar. Next, we can automatically find the gradient of all the inputs by calling the `backward` function. It should be noted that if `y` is not a scalar, MXNet will first sum the elements in `y` to get the new variable by default, and then find the analytical gradient of the variable with respect to `x` evaluated at `x` that is $\frac{dy}{dx}\bigr\rvert_{x=x_0}$.
+Since the shape of `x` is (4, 1), `y` is a scalar. Next, we can automatically find the gradient of all the inputs by calling the `backward` function. It should be noted that if `y` is not a scalar, MXNet will first sum the elements in `y` to get the new variable by default, and then find the analytical gradient of the variable with respect to `x` evaluated at its current value $\frac{dy}{dx}\bigr\rvert_{x}$.
 
 ```{.python .input  n=5}
 y.backward()
