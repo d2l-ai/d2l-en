@@ -15,8 +15,8 @@ from mxnet import autograd, nd
 As a toy example, say that we are interested in differentiating the mapping $y = 2\mathbf{x}^{\top}\mathbf{x}$ with respect to the column vector $\mathbf{x}$. To start, let's create the variable `x` and assign it an initial value.
 
 ```{.python .input  n=2}
-x = nd.arange(4).reshape((4, 1))
-print(x)
+x = nd.arange(4)
+x
 ```
 
 Once we compute the gradient of ``y`` with respect to ``x``, we will need a place to store it. We can tell an NDArray that we plan to store a gradient by invoking its ``attach_grad()`` method.
@@ -27,15 +27,15 @@ x.attach_grad()
 
 Now we are going to compute ``y`` and MXNet will generate a computation graph on the fly. It is as if MXNet turned on a recording device and captured the exact path by which each variable was generated.
 
-Note that building the computation graph requires a nontrivial amount of computation. So MXNet will *only* build the graph when explicitly told to do so. This happens by placing code inside a ``with autograd.record():`` block.
+Note that building the computation graph requires a nontrivial amount of computation. So MXNet will only build the graph when explicitly told to do so. This happens by placing code inside a ``with autograd.record():`` block.
 
 ```{.python .input  n=4}
 with autograd.record():
-    y = 2 * nd.dot(x.T, x)
-print(y)
+    y = 2 * nd.dot(x, x)
+y
 ```
 
-Since the shape of `x` is (4, 1), `y` is a scalar. Next, we can automatically find the gradient by calling the `backward` function. It should be noted that if `y` is not a scalar, MXNet will first sum the elements in `y` to get the new variable by default, and then find the gradient of the variable with respect to `x`.
+Since `x` is a vector of length 4, `nd.dot` will perform inner product and therefore `y` is a scalar. Next, we can automatically find the gradient by calling the `backward` function. It should be noted that if `y` is not a scalar, MXNet will first sum the elements in `y` to get the new variable by default, and then find the gradient of the variable with respect to `x`.
 
 ```{.python .input  n=5}
 y.backward()
@@ -44,21 +44,93 @@ y.backward()
 The gradient of the function $y = 2\mathbf{x}^{\top}\mathbf{x}$ with respect to $\mathbf{x}$ should be $4\mathbf{x}$. Now let's verify that the gradient produced is correct.
 
 ```{.python .input  n=6}
-print((x.grad - 4 * x).norm().asscalar() == 0)
-print(x.grad)
+x.grad - 4 * x
 ```
 
-## Training Mode and Prediction Mode
+If $x$ is used in another computation to compute the gradient, previous `x.grad` contents will be overwritten.
 
-As you can see from the above, after calling the `record` function, MXNet will record and calculate the gradient. In addition, `autograd` will also change the running mode from the prediction mode to the training mode by default. This can be viewed by calling the `is_training` function.
-
-```{.python .input  n=7}
-print(autograd.is_training())
+```{.python .input}
 with autograd.record():
-    print(autograd.is_training())
+    y = x.norm()
+y.backward()
+x.grad
 ```
 
-In some cases, the same model behaves differently in the training and prediction modes (e.g. when using neural techniques such as dropout and batch normalization). In other cases, some models may store more auxiliary variables to make computing gradients easier. We will cover these differences in detail in later chapters. For now, you do not need to worry about them.
+## Backward for Non-scalar Variable
+
+When `y` is not a scalar, the gradients could be high order tensor and complex to compute (refer to :numref:`chapter_math`). In both machine learning and deep learning, luckily we only compute gradients for loss functions, whose values are often scalars. So in MXNet, we implicitly add a `sum()` operator if necessary before `backward`. In other words, `y.backward()` gives same results as `y.sum().backward()`.
+
+```{.python .input}
+with autograd.record():  # y is a vector
+    y = x * x
+y.backward()
+
+u = x.copy()
+u.attach_grad()
+with autograd.record():  # v is scalar
+    v = (u * u).sum()
+v.backward()
+
+x.grad - u.grad
+```
+
+## Detach Computations
+
+We could move some parts of computations out of the computation graph. Assume $y=f(x)$ and $z=g(y)$. Then `u = y.detach()` will return a new variable has the same values as $y$ but forgets how $u$ is computed. It equals to compute $u=f(x)$ not within a `autograd.record` scope, namely $u$ is treated as constant. The following backward computes $\partial u^2 x/\partial x$ with $u=x$ instead of $\partial x^3/\partial x$.
+
+```{.python .input}
+with autograd.record():
+    y = x * x
+    u = y.detach()
+    z = u * x
+z.backward()
+x.grad - u
+```
+
+Since the computation of $y$ is still recorded, we can call `y.backward()` to get $\partial y/\partial x = 2x$.
+
+```{.python .input}
+y.backward()
+x.grad - 2*x
+```
+
+## Attach Gradients to Internal Variables
+
+Attaching gradients to a variable `x` implicitly calls `x=x.detach()`. If `x` is computed based on other variables, this part of computation will not be used in the backward function.
+
+```{.python .input}
+y = nd.ones(4) * 2
+y.attach_grad()
+with autograd.record():
+    u = x * y
+    u.attach_grad()  # implicitly run u = u.detach()
+    z = u + x
+z.backward()
+x.grad, u.grad, y.grad
+```
+
+## Head gradients
+
+Detaching allows to breaks the computation into several parts. We could use chain rule :numref:`chapter_math` to compute the gradient for the whole computation.  Assume $u = f(x)$ and $z = g(u)$, by chain rule we have $\frac{dz}{dx} = \frac{dz}{du} \frac{du}{dx}.$ To compute $\frac{dz}{du}$, we can first detach $u$ from the computation and then call `z.backward()` to compute the first term.
+
+```{.python .input}
+y = nd.ones(4) * 2
+y.attach_grad()
+with autograd.record():
+    u = x * y
+    v = u.detach()  # u still keeps the computation graph
+    v.attach_grad()
+    z = v + x
+z.backward()
+x.grad, y.grad
+```
+
+Later on we call `u.backward()` to compute the second term, but pass the first term as the head gradients to multiply both terms so that `x.grad` will contains $\frac{dz}{dx}$ instead of $\frac{du}{dx}$.
+
+```{.python .input}
+u.backward(v.grad)
+x.grad, y.grad
+```
 
 ## Computing the Gradient of Python Control Flow
 
@@ -92,40 +164,28 @@ Let's analyze the `f` function defined above. As you can see, it is piecewise li
 print(a.grad == (d / a))
 ```
 
-## Head gradients and the chain rule
+## Training Mode and Prediction Mode
 
-*Caution: This part is tricky and not necessary to understanding subsequent sections. That said, it is needed if you want to build new layers from scratch. You can skip this on a first read.*
+As you can see from the above, after calling the `record` function, MXNet will record and calculate the gradient. In addition, `autograd` will also change the running mode from the prediction mode to the training mode by default. This can be viewed by calling the `is_training` function.
 
-Sometimes when we call the backward method, e.g. `y.backward()`, where
-`y` is a function of `x` we are just interested in the derivative of
-`y` with respect to `x`. Mathematicians write this as
-$\frac{dy(x)}{dx}$. At other times, we may be interested in the
-gradient of `z` with respect to `x`, where `z` is a function of `y`,
-which in turn, is a function of `x`. That is, we are interested in
-$\frac{d}{dx} z(y(x))$. Recall that by the chain rule
-
-$$\frac{d}{dx} z(y(x)) = \frac{dz(y)}{dy} \frac{dy(x)}{dx}.$$
-
-So, when ``y`` is part of a larger function ``z`` and we want ``x.grad`` to store $\frac{dz}{dx}$, we can pass in the *head gradient* $\frac{dz}{dy}$ as an input to ``backward()``. The default argument is ``nd.ones_like(y)``. See [Wikipedia](https://en.wikipedia.org/wiki/Chain_rule) for more details.
-
-```{.python .input  n=11}
+```{.python .input  n=7}
+print(autograd.is_training())
 with autograd.record():
-    y = x * 2
-    z = y * x
-
-head_gradient = nd.array([10, 1., .1, .01])
-z.backward(head_gradient)
-print(x.grad)
+    print(autograd.is_training())
 ```
+
+In some cases, the same model behaves differently in the training and prediction modes (e.g. when using neural techniques such as dropout :numref:`chapter_dropout` and batch normalization :numref:`chapter_batch_norm`). In other cases, some models may store more auxiliary variables to make computing gradients easier. We will cover these differences in detail in later chapters. For now, you do not need to worry about them.
+
 
 ## Summary
 
-* MXNet provides an `autograd` package to automate the derivation process.
-* MXNet's `autograd` package can be used to derive general imperative programs.
+* MXNet provides an `autograd` package to automate the derivation process. To do so, we first attach gradients to variables, record the computation, and then run the backward function.
+* We can detach gradients and pass head gradients to the backward function to control the part of the computation will be used in the backward function.
 * The running modes of MXNet include the training mode and the prediction mode. We can determine the running mode by `autograd.is_training()`.
 
 ## Exercises
 
+1. Try to run `y.backward()` twice.
 1. In the control flow example where we calculate the derivative of `d` with respect to `a`, what would happen if we changed the variable `a` to a random vector or matrix. At this point, the result of the calculation `f(a)` is no longer a scalar. What happens to the result? How do we analyze this?
 1. Redesign an example of finding the gradient of the control flow. Run and analyze the result.
 1. In a second-price auction (such as in eBay or in computational advertising), the winning bidder pays the second-highest price. Compute the gradient of the final price with respect to the winning bidder's bid using `autograd`. What does the result tell you about the mechanism? If you are curious to learn more about second-price auctions, check out this paper by [Edelman, Ostrovski and Schwartz, 2005](https://www.benedelman.org/publications/gsp-060801.pdf).
