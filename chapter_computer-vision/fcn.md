@@ -15,9 +15,6 @@ category prediction of the pixel corresponding to the location.
 We will first import the package or module needed for the experiment and then explain the transposed convolution layer.
 
 ```{.python .input  n=2}
-import sys
-sys.path.insert(0, '..')
-
 %matplotlib inline
 import d2l
 from mxnet import gluon, image, init, nd
@@ -26,12 +23,12 @@ import numpy as np
 import sys
 ```
 
-
 ## Construct a Model
 
-Here, we demonstrate the most basic design of a fully convolutional network model. As shown in Figure 11.11, the fully convolutional network first uses the convolutional neural network to extract image features, then transforms the number of channels into the number of categories through the $1\times 1$ convolution layer, and finally transforms the height and width of the feature map to the size of the input image by using the transposed convolution layer. The model output has the same height and width as the input image and has a one-to-one correspondence in spatial positions. The final output channel contains the category prediction of the pixel of the corresponding spatial position.
+Here, we demonstrate the most basic design of a fully convolutional network model. As shown in :numref:`fig_fcn`, the fully convolutional network first uses the convolutional neural network to extract image features, then transforms the number of channels into the number of categories through the $1\times 1$ convolution layer, and finally transforms the height and width of the feature map to the size of the input image by using the transposed convolution layer :numref:`chapter_transposed_conv`. The model output has the same height and width as the input image and has a one-to-one correspondence in spatial positions. The final output channel contains the category prediction of the pixel of the corresponding spatial position.
 
 ![Fully convolutional network. ](../img/fcn.svg)
+:label:`fig_fcn`
 
 Below, we use a ResNet-18 model pre-trained on the ImageNet data set to extract image features and record the network instance as `pretrained_net`. As you can see, the last two layers of the model member variable `features` are the global maximum pooling layer `GlobalAvgPool2D` and example flattening layer `Flatten`. The `output` module contains the fully connected layer used for output. These layers are not required for a fully convolutional network.
 
@@ -72,8 +69,8 @@ factor of $s$.
 ```{.python .input  n=8}
 num_classes = 21
 net.add(nn.Conv2D(num_classes, kernel_size=1),
-        nn.Conv2DTranspose(num_classes, kernel_size=64, padding=16,
-                           strides=32))
+        nn.Conv2DTranspose(
+            num_classes, kernel_size=64, padding=16, strides=32))
 ```
 
 ## Initialize the Transposed Convolution Layer
@@ -125,8 +122,8 @@ d2l.plt.imshow(out_img.asnumpy());
 In a fully convolutional network, we initialize the transposed convolution layer for upsampled bilinear interpolation. For a $1\times 1$ convolution layer, we use Xavier for randomly initialization.
 
 ```{.python .input  n=12}
-net[-1].initialize(init.Constant(bilinear_kernel(num_classes, num_classes,
-                                                 64)))
+W = bilinear_kernel(num_classes, num_classes, 64)
+net[-1].initialize(init.Constant(W))
 net[-2].initialize(init=init.Xavier())
 ```
 
@@ -200,24 +197,17 @@ d2l.show_images(imgs[::3] + imgs[1::3] + imgs[2::3], 3, n);
 
 ## Summary
 
-* We can implement convolution operations by matrix multiplication.
 * The fully convolutional network first uses the convolutional neural network to extract image features, then transforms the number of channels into the number of categories through the $1\times 1$ convolution layer, and finally transforms the height and width of the feature map to the size of the input image by using the transposed convolution layer to output the category of each pixel.
 * In a fully convolutional network, we initialize the transposed convolution layer for upsampled bilinear interpolation.
 
 
 ## Exercises
 
-* Is it efficient to use matrix multiplication to implement convolution operations? Why?
 * If we use Xavier to randomly initialize the transposed convolution layer, what will happen to the result?
 * Can you further improve the accuracy of the model by tuning the hyper-parameters?
 * Predict the categories of all pixels in the test image.
 * The outputs of some intermediate layers of the convolutional neural network are also used in the paper on fully convolutional networks[1]. Try to implement this idea.
 
-## References
-
-[1] Long, J., Shelhamer, E., & Darrell, T. (2015). Fully convolutional networks for semantic segmentation. In Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 3431-3440).
-
-[2] Dumoulin, V., & Visin, F. (2016).  guide to convolution arithmetic for deep learning. arXiv preprint arXiv:1603.07285.
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2454)
 
