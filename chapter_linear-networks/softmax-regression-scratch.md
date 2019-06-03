@@ -119,11 +119,11 @@ due to large (or very small) elements of the matrix,
 as we did in
 :numref:`chapter_naive_bayes`.
 
-
 ```{.python .input  n=13}
-X = nd.random.normal(shape=(2, 5))
+X = np.random.normal(size=(2, 5))
 X_prob = softmax(X)
-X_prob, X_prob.sum(axis=1)
+print(X_prob)
+print(X_prob.sum(axis=1))
 ```
 
 ## The Model
@@ -137,7 +137,7 @@ before passing the data through our model.
 
 ```{.python .input  n=14}
 def net(X):
-    X = X.as_np_ndarray()
+    X = X.as_np_ndarray()  # TODO(junwu): remove this
     return softmax(np.dot(X.reshape((-1, num_inputs)), W) + b)
 ```
 
@@ -166,8 +166,7 @@ the selected items corresponding to the rows in the first list.
 
 ```{.python .input  n=15}
 y_hat = np.array([[0.1, 0.3, 0.6], [0.3, 0.2, 0.5]])
-y = np.array([0, 2], dtype='int32')
-y_hat[[0, 1], y]
+y_hat[[0, 1], [0, 2]]
 ```
 
 Now we can implement the cross-entropy loss function efficiently
@@ -177,7 +176,6 @@ with just one line of code.
 def cross_entropy(y_hat, y):
     return -np.log(y_hat[range(len(y_hat)), y])
 ```
-
 
 ## Classification Accuracy
 
@@ -201,7 +199,7 @@ Taking the mean yields the desired result.
 
 ```{.python .input  n=17}
 def accuracy(y_hat, y):
-    return (y_hat.argmax(axis=1) == y.astype('float32')).mean()
+    return (y_hat.argmax(axis=1) == y).mean()
 ```
 
 We will continue to use the variables `y_hat` and `y`
@@ -216,6 +214,7 @@ which is consistent with the actual label, 2.
 Therefore, the classification accuracy rate for these two examples is 0.5.
 
 ```{.python .input  n=18}
+y = np.array([0, 2])
 accuracy(y_hat, y)
 ```
 
@@ -230,7 +229,7 @@ def evaluate_accuracy(data_iter, net):
     for X, y in data_iter:
         X = X.as_np_ndarray()
         y = y.astype('float32').as_np_ndarray()
-        acc_sum += (net(X).argmax(axis=1) == y).sum().item()
+        acc_sum += (net(X).argmax(axis=1) == y).sum()
         n += y.size
     return acc_sum / n
 ```
@@ -264,8 +263,8 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size,
     for epoch in range(num_epochs):
         train_l_sum, train_acc_sum, n = 0.0, 0.0, 0
         for X, y in train_iter:
-            X = X.as_np_ndarray()
-            y = y.as_np_ndarray()
+            X = X.as_np_ndarray()  # TODO(junwu): remove this
+            y = y.as_np_ndarray()  # TODO(junwu): remove this
             with autograd.record():
                 y_hat = net(X)
                 l = loss(y_hat, y).sum()
@@ -276,8 +275,8 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size,
                 # This will be illustrated in the next section
                 trainer.step(batch_size)
             y = y.astype('float32')
-            train_l_sum += l.item()
-            train_acc_sum += (y_hat.argmax(axis=1) == y).sum().item()
+            train_l_sum += l
+            train_acc_sum += (y_hat.argmax(axis=1) == y).sum()
             n += y.size
         test_acc = evaluate_accuracy(test_iter, net)
         print('epoch %d, loss %.4f, train acc %.3f, test acc %.3f'

@@ -34,7 +34,7 @@ but for now, remember that if you want to say that $x$ is a scalar,
 you can simply say $x \in \mathcal{R}$.
 The symbol $\in$ can be pronounced "in" and just denotes membership in a set.
 
-In MXNet, we work with scalars by creating ndarrays with just one element. These ndarrays' shapes are an empty tuple, i.e. `()`, indicating these are zero-dimension tensors.
+In MXNet, we work with scalars by creating ndarrays with just one element. These ndarrays' shapes are empty tuples, i.e. `()`, indicating these are zero-dimension tensors.
 In this snippet, we instantiate two scalars and perform some familiar arithmetic operations with them, such as addition, multiplication, division and exponentiation.
 
 ```{.python .input}
@@ -223,7 +223,9 @@ So far, we have only performed element-wise operations, sums and averages. And i
 ```{.python .input}
 x = np.array([0,1,2,3])
 y = np.ones(4)
-print(x, y, np.dot(x, y))
+print('x = ', x)
+print('y = ', y)
+print('dot(x, y) = ', np.dot(x, y))
 ```
 
 Note that we can express the dot product of two vectors ``np.dot(x, y)`` equivalently by performing an element-wise multiplication and then a sum:
@@ -416,7 +418,7 @@ by following the formal *matrix norm* definition, instead of the *entry-wise mat
 To calculate the L1-norm (entry-wise) we can simply perform the absolute value and then sum over the elements.
 
 ```{.python .input}
-np.sum(np.abs(x))
+np.abs(x).sum()
 ```
 
 ## Norms and objectives

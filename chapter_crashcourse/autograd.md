@@ -7,7 +7,6 @@ Put simply, this means that for each of the model's parameters, we can determine
 The autograd package expedites this work by automatically calculating derivatives. And while many other libraries require that we compile a symbolic graph to take automatic derivatives, `autograd` allows us to take derivatives while writing  ordinary imperative code. Every time we pass data through our model, `autograd` builds a graph on the fly, tracking which data combined through which operations to produce the output. This graph enables `autograd` to subsequently backpropagate gradients on command. Here *backpropagate* simply means to trace through the compute graph, filling in the partial derivatives with respect to each parameter. If you are unfamiliar with some of the math, e.g. gradients, please refer to :numref:`chapter_math`.
 
 ```{.python .input  n=1}
-
 from mxnet import numpy as np, autograd, nd
 ```
 
@@ -67,7 +66,7 @@ One benefit of using automatic differentiation is that even if the computational
 ```{.python .input  n=8}
 def f(a):
     b = a * 2
-    while np.linalg.norm(b) < 1000:
+    while np.abs(b).sum() < 1000:
         b = b * 2
     if b.sum() > 0:
         c = b
@@ -81,10 +80,9 @@ Note that the number of iterations of the while loop and the execution of the co
 ```{.python .input  n=9}
 a = np.random.normal()
 a.attach_grad()
-#FIXME, cannot execute f
-#with autograd.record():
-#    d = f(a)
-#d.backward()
+with autograd.record():
+    d = f(a)
+d.backward()
 ```
 
 Let's analyze the `f` function defined above. As you can see, it is piecewise linear in its input `a`. In other words, for any `a` there exists some constant such that for a given range `f(a) = g * a`. Consequently `d / a` allows us to verify that the gradient is correct:

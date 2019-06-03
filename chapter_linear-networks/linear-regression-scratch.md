@@ -116,11 +116,12 @@ In general, note that we want to use reasonably sized minibatches to take advant
 
 To build some intuition, let's read and print the first small batch of data examples. The shape of the features in each mini-batch tells us both the mini-batch size and the number of input features. Likewise, our mini-batch of labels will have a shape given by `batch_size`.
 
-```{.python .input  n=6}
+```{.python .input  n=7}
 batch_size = 10
 
 for X, y in data_iter(batch_size, features, labels):
-    print(X, y)
+    print(X)
+    print(y)
     break
 ```
 
@@ -143,7 +144,7 @@ In the following code, we initialize weights by sampling
 random numbers from a normal distribution with mean 0
 and a standard deviation of 0.01, setting the bias $b$ to 0.
 
-```{.python .input  n=7}
+```{.python .input  n=8}
 w = np.random.normal(scale=0.01, size=(num_inputs,))
 b = np.zeros(shape=())
 ```
@@ -167,11 +168,10 @@ that it should store a gradient for our parameters,
 we need to invoke the `attach_grad` function,
 allocating memory to store the gradients that we plan to take.
 
-```{.python .input  n=8}
+```{.python .input  n=9}
 w.attach_grad()
 b.attach_grad()
 ```
-
 
 ## Define the Model
 
@@ -185,7 +185,7 @@ Note that below `nd.dot(X, w)` is a vector and `b` is a scalar.
 Recall that when we add a vector and a scalar,
 the scalar is added to each component of the vector.
 
-```{.python .input  n=9}
+```{.python .input  n=10}
 # This function has been saved in the d2l package for future use
 def linreg(X, w, b):
     return np.dot(X, w) + b
@@ -201,7 +201,7 @@ In the implementation, we need to transform the true value `y` into the predicte
 The result returned by the following function
 will also be the same as the `y_hat` shape.
 
-```{.python .input  n=10}
+```{.python .input  n=11}
 # This function has been saved in the d2l package for future use
 def squared_loss(y_hat, y):
     return (y_hat - y.reshape(y_hat.shape)) ** 2 / 2
@@ -231,7 +231,7 @@ we normalize our step size by the batch size (`batch_size`),
 so that the magnitude of a typical step size
 doesn't depend heavily our choice of the batch size.
 
-```{.python .input  n=11}
+```{.python .input  n=12}
 # This function has been saved in the d2l package for future use
 def sgd(params, lr, batch_size):
     for param in params:
@@ -281,7 +281,7 @@ We elide these details for now but revise them
 later in
 :numref:`chapter_optimization`.
 
-```{.python .input  n=12}
+```{.python .input  n=13}
 lr = 0.03  # Learning rate
 num_epochs = 3  # Number of iterations
 net = linreg  # Our fancy linear model
@@ -298,13 +298,13 @@ for epoch in range(num_epochs):
         l.backward()  # Compute gradient on l with respect to [w,b]
         sgd([w, b], lr, batch_size)  # Update parameters using their gradient
     train_l = loss(net(features, w, b), labels)
-    print('epoch %d, loss %f' % (epoch + 1, train_l.mean().item()))
+    print('epoch %d, loss %f' % (epoch + 1, train_l.mean()))
 ```
 
 In this case, because we used synthetic data (that we synthesized ourselves!),
 we know preisely what the true parameters are. Thus, we can evaluate our success in training by comparing the true parameters with those that we learned through our training loop. Indeed they turn out to be very close to each other.
 
-```{.python .input  n=13}
+```{.python .input  n=14}
 print('Error in estimating w', true_w - w)
 print('Error in estimating b', true_b - b)
 ```

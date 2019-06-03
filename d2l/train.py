@@ -4,7 +4,7 @@ import math
 import time
 
 import mxnet as mx
-from mxnet import autograd, gluon, init, nd, np
+from mxnet import autograd, gluon, init, nd
 from mxnet.gluon import data as gdata, loss as gloss, nn, utils as gutils
 from .data import data_iter_consecutive, data_iter_random
 from .base import try_gpu
@@ -60,12 +60,9 @@ def grad_clipping_gluon(model, theta, ctx):
 def sgd(params, lr, batch_size):
     """Mini-batch stochastic gradient descent."""
     for param in params:
-        # param may be a scalar tensor, in that case, use `()` as idx for assignment
-        if isinstance(param, np.ndarray):
-            idx = ()
-        else:
-            idx = slice(None)
-        param[idx] = param - lr * param.grad / batch_size
+        # using `()` as index instead of `:` because param may be a
+        # scalar tensor, in which case, `:` cannot be an index.
+        param[()] = param - lr * param.grad / batch_size
 
 def train(train_iter, test_iter, net, loss, trainer, ctx, num_epochs):
     """Train and evaluate a model."""
