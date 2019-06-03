@@ -1,10 +1,10 @@
 """The train module contains functions for neural network training"""
-import numpy as np
+import numpy as onp
 import math
 import time
 
 import mxnet as mx
-from mxnet import autograd, gluon, init, nd
+from mxnet import autograd, gluon, init, nd, np
 from mxnet.gluon import data as gdata, loss as gloss, nn, utils as gutils
 from .data import data_iter_consecutive, data_iter_random
 from .base import try_gpu
@@ -60,7 +60,12 @@ def grad_clipping_gluon(model, theta, ctx):
 def sgd(params, lr, batch_size):
     """Mini-batch stochastic gradient descent."""
     for param in params:
-        param[:] = param - lr * param.grad / batch_size
+        # param may be a scalar tensor, in that case, use `()` as idx for assignment
+        if isinstance(param, np.ndarray):
+            idx = ()
+        else:
+            idx = slice(None)
+        param[idx] = param - lr * param.grad / batch_size
 
 def train(train_iter, test_iter, net, loss, trainer, ctx, num_epochs):
     """Train and evaluate a model."""
@@ -274,7 +279,7 @@ def train_ch9(trainer_fn, states, hyperparams, features, labels, batch_size=10,
                 ls.append(eval_loss())
     print('loss: %f, %f sec per epoch' % (ls[-1], time.time() - start))
     set_figsize()
-    plt.plot(np.linspace(0, num_epochs, len(ls)), ls)
+    plt.plot(onp.linspace(0, num_epochs, len(ls)), ls)
     plt.xlabel('epoch')
     plt.ylabel('loss')
 
@@ -306,7 +311,7 @@ def train_gluon_ch9(trainer_name, trainer_hyperparams, features, labels,
                 ls.append(eval_loss())
     print('loss: %f, %f sec per epoch' % (ls[-1], time.time() - start))
     set_figsize()
-    plt.plot(np.linspace(0, num_epochs, len(ls)), ls)
+    plt.plot(onp.linspace(0, num_epochs, len(ls)), ls)
     plt.xlabel('epoch')
     plt.ylabel('loss')
 

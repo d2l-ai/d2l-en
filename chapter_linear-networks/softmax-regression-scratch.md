@@ -17,7 +17,7 @@ sys.path.insert(0, '..')
 
 %matplotlib inline
 import d2l
-from mxnet import autograd, nd
+from mxnet import autograd, np
 ```
 
 We will work with the Fashion-MNIST dataset just introduced,
@@ -50,8 +50,8 @@ with Gaussian noise and our biases to take the initial value $0$.
 num_inputs = 784
 num_outputs = 10
 
-W = nd.random.normal(scale=0.01, shape=(num_inputs, num_outputs))
-b = nd.zeros(num_outputs)
+W = np.random.normal(scale=0.01, size=(num_inputs, num_outputs))
+b = np.zeros(num_outputs)
 ```
 
 Recall that we need to *attach gradients* to the model parameters.
@@ -79,7 +79,7 @@ rather than collapsing out the dimension that we summed over
 we can specify `keepdims=True` when invoking `sum`.
 
 ```{.python .input  n=11}
-X = nd.array([[1, 2, 3], [4, 5, 6]])
+X = np.array([[1, 2, 3], [4, 5, 6]])
 X.sum(axis=0, keepdims=True), X.sum(axis=1, keepdims=True)
 ```
 
@@ -106,7 +106,7 @@ over an ensemble of particles).
 
 ```{.python .input  n=12}
 def softmax(X):
-    X_exp = X.exp()
+    X_exp = np.exp(X)
     partition = X_exp.sum(axis=1, keepdims=True)
     return X_exp / partition  # The broadcast mechanism is applied here
 ```
@@ -137,7 +137,8 @@ before passing the data through our model.
 
 ```{.python .input  n=14}
 def net(X):
-    return softmax(nd.dot(X.reshape((-1, num_inputs)), W) + b)
+    X = X.as_np_ndarray()
+    return softmax(np.dot(X.reshape((-1, num_inputs)), W) + b)
 ```
 
 ## The Loss Function
@@ -152,16 +153,21 @@ classification problems far outnumber regression problems.
 Recall that cross entropy takes the negative log likelihood
 of the predicted probability assigned to the true label $-\log p(y|x)$.
 Rather than iterating over the predictions with a Python `for` loop
-(which tends to be inefficient), we can use the `pick` function
-which allows us to select the appropriate terms
+(which tends to be inefficient), we can use ndarray indexing operation
+to select the appropriate terms
 from the matrix of softmax entries easily.
-Below, we illustrate the `pick` function on a toy example,
-with 3 categories and 2 examples.
+Below, we illustrate the indexing operation on a toy example,
+with 3 categories and 2 examples. We want to select the first
+and the third items in the first and second examples, respectively.
+The index applied onto `y_hat` is `([0, 1], [0, 2])`, where the first
+list in the tuple represents the indices of the rows from which we want
+to get items, and the second list in the tuple represents the positions
+the selected items corresponding to the rows in the first list.
 
 ```{.python .input  n=15}
-y_hat = nd.array([[0.1, 0.3, 0.6], [0.3, 0.2, 0.5]])
-y = nd.array([0, 2], dtype='int32')
-nd.pick(y_hat, y)
+y_hat = np.array([[0.1, 0.3, 0.6], [0.3, 0.2, 0.5]])
+y = np.array([0, 2], dtype='int32')
+y_hat[[0, 1], y]
 ```
 
 Now we can implement the cross-entropy loss function efficiently
@@ -169,7 +175,7 @@ with just one line of code.
 
 ```{.python .input  n=16}
 def cross_entropy(y_hat, y):
-    return -nd.pick(y_hat, y).log()
+    return -np.log(y_hat[range(len(y_hat)), y])
 ```
 
 
@@ -195,7 +201,7 @@ Taking the mean yields the desired result.
 
 ```{.python .input  n=17}
 def accuracy(y_hat, y):
-    return (y_hat.argmax(axis=1) == y.astype('float32')).mean().asscalar()
+    return (y_hat.argmax(axis=1) == y.astype('float32')).mean()
 ```
 
 We will continue to use the variables `y_hat` and `y`
@@ -222,8 +228,9 @@ Similarly, we can evaluate the accuracy for model `net` on the data set
 def evaluate_accuracy(data_iter, net):
     acc_sum, n = 0.0, 0
     for X, y in data_iter:
-        y = y.astype('float32')
-        acc_sum += (net(X).argmax(axis=1) == y).sum().asscalar()
+        X = X.as_np_ndarray()
+        y = y.astype('float32').as_np_ndarray()
+        acc_sum += (net(X).argmax(axis=1) == y).sum().item()
         n += y.size
     return acc_sum / n
 ```
@@ -257,6 +264,8 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size,
     for epoch in range(num_epochs):
         train_l_sum, train_acc_sum, n = 0.0, 0.0, 0
         for X, y in train_iter:
+            X = X.as_np_ndarray()
+            y = y.as_np_ndarray()
             with autograd.record():
                 y_hat = net(X)
                 l = loss(y_hat, y).sum()
@@ -267,8 +276,8 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size,
                 # This will be illustrated in the next section
                 trainer.step(batch_size)
             y = y.astype('float32')
-            train_l_sum += l.asscalar()
-            train_acc_sum += (y_hat.argmax(axis=1) == y).sum().asscalar()
+            train_l_sum += l.item()
+            train_acc_sum += (y_hat.argmax(axis=1) == y).sum().item()
             n += y.size
         test_acc = evaluate_accuracy(test_iter, net)
         print('epoch %d, loss %.4f, train acc %.3f, test acc %.3f'
