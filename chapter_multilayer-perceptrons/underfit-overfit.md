@@ -419,7 +419,7 @@ sys.path.insert(0, '..')
 
 %matplotlib inline
 import d2l
-from mxnet import autograd, gluon, nd
+from mxnet import autograd, gluon, np, npx
 from mxnet.gluon import data as gdata, loss as gloss, nn
 ```
 
@@ -435,18 +435,20 @@ with a mean of 0 and a standard deviation of 0.1.
 We'll synthesize 100 samples each for the training set and test set.
 
 ```{.python .input  n=2}
+npx.set_np()  # set the current notebook to use NumPy semantics, i.e. NumPy-like shapes and arrays
+
 maxdegree = 20  # Maximum degree of the polynomial
 n_train, n_test = 100, 100  # Training and test data set sizes
-true_w = nd.zeros(maxdegree)  # Allocate lots of empty space
-true_w[0:4] = nd.array([5, 1.2, -3.4, 5.6])
+true_w = np.zeros(maxdegree)  # Allocate lots of empty space
+true_w[0:4] = np.array([5, 1.2, -3.4, 5.6])
 
-features = nd.random.normal(shape=(n_train + n_test, 1))
-features = nd.random.shuffle(features)
-poly_features = nd.power(features, nd.arange(maxdegree).reshape((1, -1)))
+features = np.random.normal(size=(n_train + n_test, 1))
+features = np.random.shuffle(features)
+poly_features = np.power(features, np.arange(maxdegree).reshape((1, -1)))
 poly_features = poly_features / (
-    nd.gamma(nd.arange(maxdegree) + 1).reshape((1, -1)))
-labels = nd.dot(poly_features, true_w)
-labels += nd.random.normal(scale=0.1, shape=labels.shape)
+    npx.gamma(np.arange(maxdegree) + 1).reshape((1, -1)))
+labels = np.dot(poly_features, true_w)
+labels += np.random.normal(scale=0.1, size=labels.shape)
 ```
 
 For optimization, we typically want to avoid
@@ -511,13 +513,13 @@ def fit_and_plot(train_features, test_features, train_labels, test_labels):
             l.backward()
             trainer.step(batch_size)
         train_ls.append(loss(net(train_features),
-                             train_labels).mean().asscalar())
+                             train_labels).mean())
         test_ls.append(loss(net(test_features),
-                            test_labels).mean().asscalar())
+                            test_labels).mean())
     print('final epoch: train loss', train_ls[-1], 'test loss', test_ls[-1])
     semilogy(range(1, num_epochs + 1), train_ls, 'epochs', 'loss',
              range(1, num_epochs + 1), test_ls, ['train', 'test'])
-    print('weight:', net[0].weight.data().asnumpy())
+    print('weight:', net[0].weight.data())
 ```
 
 ### Third-order Polynomial Function Fitting (Normal)
