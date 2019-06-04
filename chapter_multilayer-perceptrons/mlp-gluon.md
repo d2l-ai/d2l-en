@@ -8,7 +8,7 @@ import sys
 sys.path.insert(0, '..')
 
 import d2l
-from mxnet import gluon, init
+from mxnet import gluon, init, npx
 from mxnet.gluon import loss as gloss, nn
 ```
 
@@ -20,6 +20,8 @@ The first is our hidden layer, which has *256* hidden units
 and uses the ReLU activation function.
 
 ```{.python .input  n=5}
+npx.set_np()  # set the current notebook to use NumPy semantics, i.e. NumPy-like shapes and arrays
+
 net = nn.Sequential()
 net.add(nn.Dense(256, activation='relu'))
 net.add(nn.Dense(10))
