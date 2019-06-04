@@ -317,6 +317,7 @@ display.set_matplotlib_formats('svg')
 plt.figure(figsize=(10, 6))
 for (mu, sigma) in parameters:
     p = (1/math.sqrt(2 * math.pi * sigma**2)) * np.exp(-(0.5/sigma**2) * (x-mu)**2)
+    # TODO(junwu): check if we can remove `asnumpy()` calls.
     plt.plot(x.asnumpy(), p.asnumpy(), label='mean ' + str(mu) + ', variance ' + str(sigma))
 
 plt.legend()

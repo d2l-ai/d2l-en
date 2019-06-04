@@ -4,7 +4,7 @@ import math
 import time
 
 import mxnet as mx
-from mxnet import autograd, gluon, init, nd
+from mxnet import autograd, gluon, init, nd, npx
 from mxnet.gluon import data as gdata, loss as gloss, nn, utils as gutils
 from .data import data_iter_consecutive, data_iter_random
 from .base import try_gpu
@@ -24,19 +24,19 @@ def _get_batch(batch, ctx):
     return (gutils.split_and_load(features, ctx),
             gutils.split_and_load(labels, ctx), features.shape[0])
 
-def evaluate_accuracy(data_iter, net, ctx=[mx.cpu()]):
+def evaluate_accuracy(data_iter, net, ctx=[npx.cpu()]):
     """Evaluate accuracy of a model on the given data set."""
-    if isinstance(ctx, mx.Context):
+    if isinstance(ctx, npx.Context):
         ctx = [ctx]
-    acc_sum, n = nd.array([0]), 0
+    acc_sum, n = 0, 0
     for batch in data_iter:
         features, labels, _ = _get_batch(batch, ctx)
         for X, y in zip(features, labels):
             y = y.astype('float32')
-            acc_sum += (net(X).argmax(axis=1) == y).sum().copyto(mx.cpu())
+            acc_sum += (net(X).argmax(axis=1) == y).sum().copyto(npx.cpu())
             n += y.size
         acc_sum.wait_to_read()
-    return acc_sum.asscalar() / n
+    return acc_sum / n
 
 def squared_loss(y_hat, y):
     """Squared loss."""
@@ -217,8 +217,8 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size,
             else:
                 trainer.step(batch_size)
             y = y.astype('float32')
-            train_l_sum += l.asscalar()
-            train_acc_sum += (y_hat.argmax(axis=1) == y).sum().asscalar()
+            train_l_sum += l
+            train_acc_sum += (y_hat.argmax(axis=1) == y).sum()
             n += y.size
         test_acc = evaluate_accuracy(test_iter, net)
         print('epoch %d, loss %.4f, train acc %.3f, test acc %.3f'

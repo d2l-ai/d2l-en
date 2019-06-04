@@ -22,15 +22,15 @@ the linear regression model from the previous section much more concisely.
 To start, we will generate the same data set as that used in the previous section.
 
 ```{.python .input  n=2}
-from mxnet import autograd, nd
+from mxnet import autograd, np, npx
 
 num_inputs = 2
 num_examples = 1000
-true_w = nd.array([2, -3.4])
+true_w = np.array([2, -3.4])
 true_b = 4.2
-features = nd.random.normal(scale=1, shape=(num_examples, num_inputs))
-labels = nd.dot(features, true_w) + true_b
-labels += nd.random.normal(scale=0.01, shape=labels.shape)
+features = np.random.normal(scale=1, size=(num_examples, num_inputs))
+labels = np.dot(features, true_w) + true_b
+labels += np.random.normal(scale=0.01, size=labels.shape)
 ```
 
 ## Reading Data
@@ -54,6 +54,8 @@ on each epoch (pass through the dataset).
 ```{.python .input  n=3}
 from mxnet.gluon import data as gdata
 
+npx.set_np()  # set the current notebook to use NumPy semantics, i.e. NumPy-like shapes and arrays
+
 batch_size = 10
 # Combine the features and labels of the training data
 dataset = gdata.ArrayDataset(features, labels)
@@ -65,7 +67,8 @@ Now we can use `data_iter` in much the same way as we called the `data_iter` fun
 
 ```{.python .input  n=5}
 for X, y in data_iter:
-    print(X, y)
+    print(X)
+    print(y)
     break
 ```
 
@@ -85,7 +88,6 @@ In this example, since our model consists of only one layer,
 we do not really need `Sequential`.
 But since nearly all of our future models will involve multiple layers,
 let's get into the habit early.
-
 
 ```{.python .input  n=5}
 from mxnet.gluon import nn
@@ -209,7 +211,7 @@ for epoch in range(1, num_epochs + 1):
         l.backward()
         trainer.step(batch_size)
     l = loss(net(features), labels)
-    print('epoch %d, loss: %f' % (epoch, l.mean().asnumpy()))
+    print('epoch %d, loss: %f' % (epoch, l.mean()))
 ```
 
 The model parameters we have learned and the actual model parameters are compared as below. We get the layer we need from the `net` and access its weight (`weight`) and bias (`bias`). The parameters we have learned and the actual parameters are very close.
