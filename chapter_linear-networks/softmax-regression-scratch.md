@@ -17,13 +17,15 @@ sys.path.insert(0, '..')
 
 %matplotlib inline
 import d2l
-from mxnet import autograd, np
+from mxnet import autograd, np, npx
 ```
 
 We will work with the Fashion-MNIST dataset just introduced,
 cuing up an iterator with batch size 256.
 
 ```{.python .input}
+npx.set_np()  # use numpy like shapes and ndarrays in MXNet
+
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 ```
@@ -137,7 +139,6 @@ before passing the data through our model.
 
 ```{.python .input  n=14}
 def net(X):
-    X = X.as_np_ndarray()  # TODO(junwu): remove this
     return softmax(np.dot(X.reshape((-1, num_inputs)), W) + b)
 ```
 
@@ -227,8 +228,7 @@ Similarly, we can evaluate the accuracy for model `net` on the data set
 def evaluate_accuracy(data_iter, net):
     acc_sum, n = 0.0, 0
     for X, y in data_iter:
-        X = X.as_np_ndarray()
-        y = y.astype('float32').as_np_ndarray()
+        y = y.astype('float32')
         acc_sum += (net(X).argmax(axis=1) == y).sum()
         n += y.size
     return acc_sum / n
@@ -263,8 +263,6 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size,
     for epoch in range(num_epochs):
         train_l_sum, train_acc_sum, n = 0.0, 0.0, 0
         for X, y in train_iter:
-            X = X.as_np_ndarray()  # TODO(junwu): remove this
-            y = y.as_np_ndarray()  # TODO(junwu): remove this
             with autograd.record():
                 y_hat = net(X)
                 l = loss(y_hat, y).sum()
