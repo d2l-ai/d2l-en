@@ -1,6 +1,6 @@
 """The model module contains neural network building blocks"""
 import math
-from mxnet import nd
+from mxnet import nd, np
 from mxnet.gluon import nn, rnn, loss as gloss
 
 __all__ = ['corr2d', 'linreg', 'Residual', 'resnet18', 'RNNModel',
@@ -18,7 +18,7 @@ def corr2d(X, K):
 
 def linreg(X, w, b):
     """Linear regression."""
-    return nd.dot(X, w) + b
+    return np.dot(X, w) + b
 
 class Residual(nn.Block):
     """The residual block."""

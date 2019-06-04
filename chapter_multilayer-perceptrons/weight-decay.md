@@ -162,15 +162,18 @@ sys.path.insert(0, '..')
 
 %matplotlib inline
 import d2l
-from mxnet import autograd, gluon, init, nd
+from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import data as gdata, loss as gloss, nn
 
-n_train, n_test, num_inputs = 20, 100, 200
-true_w, true_b = nd.ones((num_inputs, 1)) * 0.01, 0.05
+npx.set_np()  # set the current notebook to use NumPy semantics, i.e. NumPy-like shapes and arrays
 
-features = nd.random.normal(shape=(n_train + n_test, num_inputs))
-labels = nd.dot(features, true_w) + true_b
-labels += nd.random.normal(scale=0.01, shape=labels.shape)
+
+n_train, n_test, num_inputs = 20, 100, 200
+true_w, true_b = np.ones(num_inputs) * 0.01, 0.05
+
+features = np.random.normal(size=(n_train + n_test, num_inputs))
+labels = np.dot(features, true_w) + true_b
+labels += np.random.normal(scale=0.01, size=labels.shape)
 train_features, test_features = features[:n_train, :], features[n_train:, :]
 train_labels, test_labels = labels[:n_train], labels[n_train:]
 ```
@@ -194,8 +197,8 @@ First, we'll define a function to randomly initialize our model parameters and r
 
 ```{.python .input  n=5}
 def init_params():
-    w = nd.random.normal(scale=1, shape=(num_inputs, 1))
-    b = nd.zeros(shape=(1,))
+    w = np.random.normal(scale=1, size=num_inputs)
+    b = np.zeros(shape=())
     w.attach_grad()
     b.attach_grad()
     return [w, b]
@@ -243,12 +246,12 @@ def fit_and_plot(lambd):
             l.backward()
             d2l.sgd([w, b], lr, batch_size)
         train_ls.append(loss(net(train_features, w, b),
-                             train_labels).mean().asscalar())
+                             train_labels).mean())
         test_ls.append(loss(net(test_features, w, b),
-                            test_labels).mean().asscalar())
+                            test_labels).mean())
     d2l.semilogy(range(1, num_epochs + 1), train_ls, 'epochs', 'loss',
                  range(1, num_epochs + 1), test_ls, ['train', 'test'])
-    print('l2 norm of w:', w.norm().asscalar())
+    print('l2 norm of w:', np.sqrt((w * w).sum()))
 ```
 
 ### Training without Regularization
@@ -322,12 +325,12 @@ def fit_and_plot_gluon(wd):
             trainer_w.step(batch_size)
             trainer_b.step(batch_size)
         train_ls.append(loss(net(train_features),
-                             train_labels).mean().asscalar())
+                             train_labels).mean())
         test_ls.append(loss(net(test_features),
-                            test_labels).mean().asscalar())
+                            test_labels).mean())
     d2l.semilogy(range(1, num_epochs + 1), train_ls, 'epochs', 'loss',
                  range(1, num_epochs + 1), test_ls, ['train', 'test'])
-    print('L2 norm of w:', net[0].weight.data().norm().asscalar())
+    print('L2 norm of w:', np.sqrt((net[0].weight.data() ** 2).sum()))
 ```
 
 The plots look just the same as when we implemented weight decay from scratch
