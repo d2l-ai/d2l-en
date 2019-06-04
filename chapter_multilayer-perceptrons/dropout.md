@@ -203,16 +203,19 @@ import sys
 sys.path.insert(0, '..')
 
 import d2l
-from mxnet import autograd, gluon, init, nd
+from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import loss as gloss, nn
+
+npx.set_np()  # set the current notebook to use NumPy semantics, i.e. NumPy-like shapes and arrays
+
 
 def dropout(X, drop_prob):
     assert 0 <= drop_prob <= 1
     # In this case, all elements are dropped out
     if drop_prob == 1:
-        return X.zeros_like()
-    mask = nd.random.uniform(0, 1, X.shape) > drop_prob
-    return mask * X / (1.0-drop_prob)
+        return np.zeros_like(X)
+    mask = np.random.uniform(0, 1, size=X.shape) > drop_prob
+    return mask * X / (1.0 - drop_prob)
 ```
 
 We can test out the `dropout` function on a few examples.
@@ -220,7 +223,7 @@ In the following lines of code, we pass our input `X`
 through the dropout operation, with probabilities 0, 0.5, and 1, respectively.
 
 ```{.python .input}
-X = nd.arange(16).reshape((2, 8))
+X = np.arange(16).reshape((2, 8))
 print(dropout(X, 0))
 print(dropout(X, 0.5))
 print(dropout(X, 1))
@@ -236,12 +239,12 @@ The two hidden layers both have 256 outputs.
 ```{.python .input}
 num_inputs, num_outputs, num_hiddens1, num_hiddens2 = 784, 10, 256, 256
 
-W1 = nd.random.normal(scale=0.01, shape=(num_inputs, num_hiddens1))
-b1 = nd.zeros(num_hiddens1)
-W2 = nd.random.normal(scale=0.01, shape=(num_hiddens1, num_hiddens2))
-b2 = nd.zeros(num_hiddens2)
-W3 = nd.random.normal(scale=0.01, shape=(num_hiddens2, num_outputs))
-b3 = nd.zeros(num_outputs)
+W1 = np.random.normal(scale=0.01, size=(num_inputs, num_hiddens1))
+b1 = np.zeros(num_hiddens1)
+W2 = np.random.normal(scale=0.01, size=(num_hiddens1, num_hiddens2))
+b2 = np.zeros(num_hiddens2)
+W3 = np.random.normal(scale=0.01, size=(num_hiddens2, num_outputs))
+b3 = np.zeros(num_outputs)
 
 params = [W1, b1, W2, b2, W3, b3]
 for param in params:
@@ -265,16 +268,16 @@ drop_prob1, drop_prob2 = 0.2, 0.5
 
 def net(X):
     X = X.reshape((-1, num_inputs))
-    H1 = (nd.dot(X, W1) + b1).relu()
+    H1 = npx.relu((X.dot(W1) + b1))
     # Use dropout only when training the model
     if autograd.is_training():
         # Add a dropout layer after the first fully connected layer
         H1 = dropout(H1, drop_prob1)
-    H2 = (nd.dot(H1, W2) + b2).relu()
+    H2 = npx.relu((H1.dot(W2) + b2))
     if autograd.is_training():
         # Add a dropout layer after the second fully connected layer
         H2 = dropout(H2, drop_prob2)
-    return nd.dot(H2, W3) + b3
+    return np.dot(H2, W3) + b3
 ```
 
 ### Training and Testing
