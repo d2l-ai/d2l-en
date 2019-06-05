@@ -8,9 +8,7 @@ stage("Build and Publish") {
       rm -rf ~/miniconda3/envs/${ENV_NAME}
       conda create -n ${ENV_NAME} pip -y
       conda activate ${ENV_NAME}
-      # pip install https://s3-us-west-2.amazonaws.com/apache-mxnet/dist/python/numpy/20190528/mxnet-1.5.0b20190528-py2.py3-none-manylinux1_x86_64.whl
       pip install https://s3-us-west-2.amazonaws.com/apache-mxnet/dist/python/numpy/20190605/mxnet-1.5.0b20190605-py2.py3-none-manylinux1_x86_64.whl
-      # pip install d2l>=0.9.2
       python setup.py develop
       pip install git+https://github.com/d2l-ai/d2l-book
       pip list
