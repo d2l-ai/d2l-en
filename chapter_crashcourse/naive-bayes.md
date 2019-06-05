@@ -1,19 +1,27 @@
 # Naive Bayes Classification
 :label:`chapter_naive_bayes`
 
-Before we worry about complex optimization algorithms or GPUs, we can already deploy our first classifier, relying only on simple statistical estimators and our understanding of conditional independence. Learning is all about making assumptions. If we want to classify a new data point that we've never seen before we have to make some assumptions about which data points are similar to each other.
+Before we worry about complex optimization algorithms or GPUs, we can already deploy our first classifier, relying only on simple statistical estimators and our understanding of conditional independence. Learning is all about making assumptions. If we want to classify a new data point that we've never seen before we have to make some assumptions about which data points are similar to each other. The naive Bayes classifier, a popular and remarkably simple algorithm, assumes all features are independent of each other to simplify the computation. In this chapter, we will apply this model to recognize characters in images. 
 
-## Optical Character Recognition
+Let's first import libraries and modules. 
 
-Since images are much easier to deal with, we will illustrate the workings of a Naive Bayes classifier for distinguishing digits on the MNIST dataset. This dataset is widely used 
-
-```{.python .input  n=44}
+```{.python .input  n=72}
 %matplotlib inline
 from matplotlib import pyplot as plt
 from IPython import display
-
 from mxnet import nd, gluon
+import inspect
 
+# SVG offers sharper plots. It will be saved in the d2l.use_svg_display 
+# function for future usages. 
+display.set_matplotlib_formats('svg')
+```
+
+## Optical Character Recognition
+
+MNIST :cite:`LeCun.Bottou.Bengio.ea.1998` is one of widely used datasets. It contains 60,000 images for training and 10,000 images for validation. Gluon, MXNet’s high-level interface for implementing neural networks, provides a `MNIST` class in the `data.vision` module to download and load this dataset. Each image is a gray image with both width and height of 28 with shape $(28,28,1)$. We use a customized transformation to remove the last channel dimension. In addition, each pixel is presented by a unsigned 8-bit integer, we quantize them into binary features to simplify the problem. 
+
+```{.python .input  n=44}
 def transform(data, label):
     return nd.floor(data/128).astype('float32').squeeze(axis=-1), label
 
@@ -21,12 +29,42 @@ mnist_train = gluon.data.vision.MNIST(train=True, transform=transform)
 mnist_test  = gluon.data.vision.MNIST(train=False, transform=transform)
 ```
 
+```{.python .input  n=77}
+%pinfo d2l.show_images
+```
+
+Now let's create a function to draw the first 10 examples. 
+
+```{.python .input  n=70}
+help(d2l.show_images)
+```
+
+```{.json .output n=70}
+[
+ {
+  "name": "stdout",
+  "output_type": "stream",
+  "text": "Help on function show_images in module d2l.utils:\n\nshow_images(imgs, num_rows, num_cols, scale=2)\n    Plot a list of images.\n\n"
+ }
+]
+```
+
 ```{.python .input}
-display.set_matplotlib_formats('svg')
+# This function will be saved in the d2l package for future usage.  
+def show_images(imgs, num_rows, num_cols, scale=2):
+    """Plot a list of images."""
+    figsize = (num_cols * scale, num_rows * scale)
+    _, axes = plt.subplots(num_rows, num_cols, figsize=figsize)
+    for i in range(num_rows):
+        for j in range(num_cols):
+            axes[i][j].imshow(imgs[i * num_cols + j].asnumpy())
+            axes[i][j].axes.get_xaxis().set_visible(False)
+            axes[i][j].axes.get_yaxis().set_visible(False)
+    return axes
 
 ```
 
-One popular (and remarkably simple) algorithm is the Naive Bayes Classifier. Note that one natural way to express the classification task is via the probabilistic question: what is the most likely label given the features?. Formally, we wish to output the prediction $\hat{y}$ given by the expression:
+ Note that one natural way to express the classification task is via the probabilistic question: what is the most likely label given the features?. Formally, we wish to output the prediction $\hat{y}$ given by the expression:
 
 $$\hat{y} = \text{argmax}_y \> p(y | \mathbf{x})$$
 
