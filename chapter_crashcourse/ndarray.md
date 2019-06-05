@@ -112,8 +112,8 @@ np.dot(x, y.T)
 We can also merge multiple ndarrays. For that, we need to tell the system along which dimension to merge. The example below merges two matrices along dimension 0 (along rows) and dimension 1 (along columns) respectively.
 
 ```{.python .input}
-np.concatenate(x, y, axis=0)
-np.concatenate(x, y, axis=1)
+np.concatenate([x, y], axis=0)
+np.concatenate([x, y], axis=1)
 ```
 
 We can transform the result into a scalar in Python using the `asscalar` function. In the following example, the $\ell_2$ norm of `x` yields a single element ndarray. The final result is transformed into a scalar.
