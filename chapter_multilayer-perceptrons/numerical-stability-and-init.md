@@ -81,14 +81,14 @@ vis-a-vis vanishing gradients.
 ```{.python .input}
 %matplotlib inline
 import mxnet as mx
-from mxnet import nd, autograd
+from mxnet import np, npx, autograd
 from matplotlib import pyplot as plt
 
 from mxnet import nd, autograd
-x = nd.arange(-8.0, 8.0, 0.1)
+x = np.arange(-8.0, 8.0, 0.1)
 x.attach_grad()
 with autograd.record():
-    y = x.sigmoid()
+    y = npx.sigmoid(x)
 y.backward()
 
 plt.figure(figsize=(8, 4))
@@ -128,14 +128,13 @@ we would have no realistic chance of getting
 a gradient descent optimizer to converge.
 
 ```{.python .input  n=5}
-M = nd.random.normal(shape=(4,4))
-print('A single matrix', M)
+M = np.random.normal(size=(4,4))
+print('A single matrix\n', M)
 for i in range(100):
-    M = nd.dot(M, nd.random.normal(shape=(4,4)))
+    M = np.dot(M, np.random.normal(size=(4,4)))
 
-print('After multiplying 100 matrices', M)
+print('After multiplying 100 matrices\n', M)
 ```
-
 
 ### Symmetry
 

@@ -10,7 +10,7 @@ sys.path.insert(0, '..')
 
 %matplotlib inline
 import d2l
-from mxnet import nd
+from mxnet import np, npx
 from mxnet.gluon import loss as gloss
 ```
 
@@ -19,6 +19,8 @@ we previously achieved with vanilla softmax regression,
 we continue to use the Fashion-MNIST image classification dataset.
 
 ```{.python .input  n=2}
+npx.set_np()  # set the current notebook to use NumPy semantics, i.e. NumPy-like shapes and arrays
+
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 ```
@@ -44,10 +46,10 @@ As always, we must call `attach_grad` to allocate memory for the gradients with 
 ```{.python .input  n=3}
 num_inputs, num_outputs, num_hiddens = 784, 10, 256
 
-W1 = nd.random.normal(scale=0.01, shape=(num_inputs, num_hiddens))
-b1 = nd.zeros(num_hiddens)
-W2 = nd.random.normal(scale=0.01, shape=(num_hiddens, num_outputs))
-b2 = nd.zeros(num_outputs)
+W1 = np.random.normal(scale=0.01, size=(num_inputs, num_hiddens))
+b1 = np.zeros(num_hiddens)
+W2 = np.random.normal(scale=0.01, size=(num_hiddens, num_outputs))
+b2 = np.zeros(num_outputs)
 params = [W1, b1, W2, b2]
 
 for param in params:
@@ -62,7 +64,7 @@ instead of invoking `nd.relu` directly.
 
 ```{.python .input  n=4}
 def relu(X):
-    return nd.maximum(X, 0)
+    return np.maximum(X, 0)
 ```
 
 ## The model
@@ -74,8 +76,8 @@ Finally, we cam implement our model with just a few lines of code.
 ```{.python .input  n=5}
 def net(X):
     X = X.reshape((-1, num_inputs))
-    H = relu(nd.dot(X, W1) + b1)
-    return nd.dot(H, W2) + b2
+    H = relu(X.dot(W1) + b1)
+    return H.dot(W2) + b2
 ```
 
 ## The Loss Function
@@ -112,8 +114,8 @@ If you're interested, compare the result to corresponding linear model in :numre
 for X, y in test_iter:
     break
 
-true_labels = d2l.get_fashion_mnist_labels(y.asnumpy())
-pred_labels = d2l.get_fashion_mnist_labels(net(X).argmax(axis=1).asnumpy())
+true_labels = d2l.get_fashion_mnist_labels(y)
+pred_labels = d2l.get_fashion_mnist_labels(net(X).argmax(axis=1))
 titles = [truelabel + '\n' + predlabel
           for truelabel, predlabel in zip(true_labels, pred_labels)]
 

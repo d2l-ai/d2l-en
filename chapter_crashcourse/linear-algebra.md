@@ -11,17 +11,14 @@ If you are already confident in your basic linear algebra,
 feel free to skim through or skip this chapter.
 
 ```{.python .input  n=1}
-import mxnet as mx
-mx.set_np_compat(True)
-
-from mxnet import numpy as np
+from mxnet import np
 ```
 
 ## Scalars
 
 If you never studied linear algebra or machine learning,
 you are probably used to working with one number at a time.
-And know how to do basic things like add them together or multiply them.
+And know how to do basic things like adding them together or multiplying them.
 For example, in Palo Alto, the temperature is $52$ degrees Fahrenheit.
 Formally, we call these values $scalars$.
 If you wanted to convert this value to Celsius (using metric system's more sensible unit of temperature measurement),
@@ -37,18 +34,17 @@ but for now, remember that if you want to say that $x$ is a scalar,
 you can simply say $x \in \mathcal{R}$.
 The symbol $\in$ can be pronounced "in" and just denotes membership in a set.
 
-In MXNet, we work with scalars by creating NDArrays with just one element.
+In MXNet, we work with scalars by creating ndarrays with just one element. These ndarrays' shapes are empty tuples, i.e. `()`, indicating these are zero-dimension tensors.
 In this snippet, we instantiate two scalars and perform some familiar arithmetic operations with them, such as addition, multiplication, division and exponentiation.
 
 ```{.python .input}
-x = np.array([3.0])
-y = np.array([2.0])
+x = np.array(3.0)
+y = np.array(2.0)
 
 print('x + y = ', x + y)
 print('x * y = ', x * y)
 print('x / y = ', x / y)
-#FIXME
-#print('x ** y = ', np.power(x,y))
+print('x ** y = ', x ** y)
 ```
 
 ## Vectors
@@ -67,12 +63,10 @@ whose components capture their most recent vital signs,
 cholesterol levels, minutes of exercise per day, etc.
 In math notation, we will usually denote vectors as bold-faced,
 lower-cased letters ($\mathbf{u}$, $\mathbf{v}$, $\mathbf{w})$.
-In MXNet, we work with vectors via 1D NDArrays with an arbitrary number of components.
+In MXNet, we work with vectors via 1D ndarrays with an arbitrary number of components.
 
 ```{.python .input}
-#FIXME
-#x = np.arange(4)
-x = np.array([0,1,2,3])
+x = np.arange(4)
 print('x = ', x)
 ```
 
@@ -80,11 +74,10 @@ We can refer to any element of a vector by using a subscript.
 For example, we can refer to the $4$th element of $\mathbf{u}$ by $u_4$.
 Note that the element $u_4$ is a scalar,
 so we do not bold-face the font when referring to it.
-In code, we access any element $i$ by indexing into the ``NDArray``.
+In code, we access any element $i$ by indexing into the ``ndarray``.
 
 ```{.python .input}
-#FIXME
-#x[3]
+x[3]
 ```
 
 ## Length, dimensionality and shape
@@ -93,11 +86,11 @@ Let's revisit some concepts from the previous section. A vector is just an array
 In math notation, if we want to say that a vector $\mathbf{x}$ consists of $n$ real-valued scalars,
 we can express this as $\mathbf{x} \in \mathcal{R}^n$.
 The length of a vector is commonly called its $dimension$.
-As with an ordinary Python array, we can access the length of an NDArray
+As with an ordinary Python array, we can access the length of an ndarray
 by calling Python's in-built ``len()`` function.
 
 We can also access a vector's length via its `.shape` attribute.
-The shape is a tuple that lists the dimensionality of the NDArray along each of its axes.
+The shape is a tuple that lists the dimensionality of the ndarray along each of its axes.
 Because a vector can only be indexed along one axis, its shape has just one element.
 
 ```{.python .input}
@@ -113,9 +106,8 @@ In this sense, a scalar *would have* $0$ dimensions and a vector *would have* $1
 
 ```{.python .input}
 a = 2
-#FIXME, dtype
-x = np.array([1,2,3]).astype('float32')
-y = np.array([10,20,30]).astype('float32')
+x = np.array([1,2,3])
+y = np.array([10,20,30])
 print(a * x)
 print(a * x + y)
 ```
@@ -143,9 +135,7 @@ when calling any of our favorite functions for instantiating an `ndarray`
 such as `ones`, or `zeros`.
 
 ```{.python .input}
-#FIXME
-#A = nd.arange(20).reshape((5,4))
-A = np.reshape(np.array([1]*20), (5,4))
+A = np.arange(20).reshape((5,4))
 print(A)
 ```
 
@@ -166,9 +156,7 @@ Just as vectors generalize scalars, and matrices generalize vectors, we can actu
 Using tensors will become more important when we start working with images, which arrive as 3D data structures, with axes corresponding to the height, width, and the three (RGB) color channels. But in this chapter, we're going to skip this part and make sure you know the basics.
 
 ```{.python .input}
-#FIXME
-#X = nd.arange(24).reshape((2, 3, 4))
-X = np.reshape(np.array([1]*24), (2,3,4))
+X = np.arange(24).reshape((2, 3, 4))
 print('X.shape =', X.shape)
 print('X =', X)
 ```
@@ -203,7 +191,7 @@ The next more sophisticated thing we can do with arbitrary tensors
 is to calculate the sum of their elements.
 In mathematical notation, we express sums using the $\sum$ symbol.
 To express the sum of the elements in a vector $\mathbf{u}$ of length $d$,
-we can write $\sum_{i=1}^d u_i$. In code, we can just call ``nd.sum()``.
+we can write $\sum_{i=1}^d u_i$. In code, we can just call ``np.sum()``.
 
 ```{.python .input}
 print(x)
@@ -222,12 +210,10 @@ We calculate the mean by dividing the sum by the total number of elements.
 With mathematical notation, we could write the average
 over a vector $\mathbf{u}$ as $\frac{1}{d} \sum_{i=1}^{d} u_i$
 and the average over a matrix $A$ as  $\frac{1}{n \cdot m} \sum_{i=1}^{m} \sum_{j=1}^{n} a_{ij}$.
-In code, we could just call ``nd.mean()`` on tensors of arbitrary shape:
+In code, we could just call ``np.mean()`` on tensors of arbitrary shape:
 
 ```{.python .input}
 print(np.mean(A))
-#FIXME
-print(np.sum(A.astype('float32')) / A.size)
 ```
 
 ## Dot products
@@ -235,12 +221,14 @@ print(np.sum(A.astype('float32')) / A.size)
 So far, we have only performed element-wise operations, sums and averages. And if this was all we could do, linear algebra probably would not deserve its own chapter. However, one of the most fundamental operations is the dot product. Given two vectors $\mathbf{u}$ and $\mathbf{v}$, the dot product $\mathbf{u}^T \mathbf{v}$ is a sum over the products of the corresponding elements: $\mathbf{u}^T \mathbf{v} = \sum_{i=1}^{d} u_i \cdot v_i$.
 
 ```{.python .input}
-x = np.array([0,1,2,3]).astype('float32')
-y = np.ones(4).astype('float32')
-print(x, y, np.dot(x, y))
+x = np.array([0,1,2,3])
+y = np.ones(4)
+print('x = ', x)
+print('y = ', y)
+print('dot(x, y) = ', np.dot(x, y))
 ```
 
-Note that we can express the dot product of two vectors ``nd.dot(x, y)`` equivalently by performing an element-wise multiplication and then a sum:
+Note that we can express the dot product of two vectors ``np.dot(x, y)`` equivalently by performing an element-wise multiplication and then a sum:
 
 ```{.python .input}
 np.sum(x * y)
@@ -307,7 +295,7 @@ These transformations turn out to be remarkably useful. For example, we can repr
 Expressing matrix-vector products in code with ``ndarray``, we use the same ``nd.dot()`` function as for dot products. When we call ``nd.dot(A, x)`` with a matrix ``A`` and a vector ``x``, MXNet knows to perform a matrix-vector product. Note that the column dimension of ``A`` must be the same as the dimension of ``x``.
 
 ```{.python .input}
-np.dot(A.astype('float32'), x)
+np.dot(A, x)
 ```
 
 ## Matrix-matrix multiplication
@@ -368,7 +356,7 @@ You can think of the matrix-matrix multiplication $AB$ as simply performing $m$ 
 
 ```{.python .input}
 B = np.ones((4, 3))
-np.dot(A.astype('float32'), B.astype('float32'))
+np.dot(A, B)
 ```
 
 ## Norms
@@ -416,16 +404,21 @@ We also commonly work with the $\ell_1$ norm.
 The $\ell_1$ norm is simply the sum of the absolute values.
 It has the convenient property of placing less emphasis on outliers.
 
-To calculate the $\ell_2$ norm, we can just call ``nd.norm()``.
+To calculate the $\ell_2$ norm, we can just call ``np.linalg.norm`` on the matrix `x`.
 
 ```{.python .input}
-#np.norm(x)
+np.linalg.norm(x)
 ```
 
-To calculate the L1-norm we can simply perform the absolute value and then sum over the elements.
+Please note that the term "norm" we used here refers to the so-called *entry-wise matrix norm*,
+instead of the formal *matrix norm* defined in a Banach space in mathematics, although in the above case, the
+$\ell_2$ norm coincides with the Frobenius norm of matrices. The operator ``np.linalg.norm`` was implemented
+by following the formal *matrix norm* definition, instead of the *entry-wise matrix norm*.
+
+To calculate the L1-norm (entry-wise) we can simply perform the absolute value and then sum over the elements.
 
 ```{.python .input}
-#np.sum(np.abs(x))
+np.abs(x).sum()
 ```
 
 ## Norms and objectives

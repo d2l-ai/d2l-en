@@ -267,7 +267,7 @@ Brain *structures* vary significantly. Some look (to us) rather arbitrary wherea
 In model training or prediction, we often use vector calculations and process multiple observations at the same time. To illustrate why this matters, consider two methods of adding vectors. We begin by creating two 10000 dimensional ones first.
 
 ```{.python .input  n=1}
-from mxnet import numpy as np, nd
+from mxnet import np
 from time import time
 
 a = np.ones(shape=10000)
@@ -279,9 +279,8 @@ One way to add vectors is to add them one coordinate at a time using a for loop.
 ```{.python .input  n=2}
 start = time()
 c = np.zeros(shape=10000)
-#FIXME
-#for i in range(10000):
-#    c[i] = a[i] + b[i]
+for i in range(10000):
+    c[i] = a[i] + b[i]
 time() - start
 ```
 
@@ -309,8 +308,7 @@ from matplotlib import pyplot as plt
 from IPython import display
 import math
 
-#FIMXME
-x = nd.arange(-7, 7, 0.01).as_np_ndarray()
+x = np.arange(-7, 7, 0.01)
 # Mean and variance pairs
 parameters = [(0,1), (0,2), (3,1)]
 
@@ -318,10 +316,9 @@ parameters = [(0,1), (0,2), (3,1)]
 display.set_matplotlib_formats('svg')
 plt.figure(figsize=(10, 6))
 for (mu, sigma) in parameters:
-    #FIXME
-    #p = (1/math.sqrt(2 * math.pi * sigma**2)) * np.exp(-(0.5/sigma**2) * (x-mu)**2)
-    #plt.plot(x, p, label='mean ' + str(mu) + ', variance ' + str(sigma))
-    pass
+    p = (1/math.sqrt(2 * math.pi * sigma**2)) * np.exp(-(0.5/sigma**2) * (x-mu)**2)
+    # TODO(junwu): check if we can remove `asnumpy()` calls.
+    plt.plot(x.asnumpy(), p.asnumpy(), label='mean ' + str(mu) + ', variance ' + str(sigma))
 
 plt.legend()
 plt.show()

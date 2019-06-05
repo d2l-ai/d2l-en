@@ -25,3 +25,4 @@ aclImdb*
 graffle/*/*.svg
 graffle/*/*.pdf
 build/
+.idea

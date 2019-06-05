@@ -25,7 +25,7 @@ To start off, we import the packages required to run this section's experiments:
 %matplotlib inline
 from IPython import display
 from matplotlib import pyplot as plt
-from mxnet import autograd, nd
+from mxnet import autograd, np
 import random
 ```
 
@@ -58,11 +58,11 @@ The following code generates our synthetic dataset:
 ```{.python .input  n=2}
 num_inputs = 2
 num_examples = 1000
-true_w = nd.array([2, -3.4])
+true_w = np.array([2, -3.4])
 true_b = 4.2
-features = nd.random.normal(scale=1, shape=(num_examples, num_inputs))
-labels = nd.dot(features, true_w) + true_b
-labels += nd.random.normal(scale=0.01, shape=labels.shape)
+features = np.random.normal(scale=1, size=(num_examples, num_inputs))
+labels = np.dot(features, true_w) + true_b
+labels += np.random.normal(scale=0.01, size=labels.shape)
 ```
 
 Note that each row in `features` consists of a 2-dimensional data point and that each row in `labels` consists of a 1-dimensional target value (a scalar).
@@ -108,21 +108,20 @@ def data_iter(batch_size, features, labels):
     # The examples are read at random, in no particular order
     random.shuffle(indices)
     for i in range(0, num_examples, batch_size):
-        j = nd.array(indices[i: min(i + batch_size, num_examples)])
-        yield features.take(j), labels.take(j)
-        # The “take” function will then return the corresponding element based
-        # on the indices
+        batch_indices = indices[i: min(i + batch_size, num_examples)]
+        yield features[batch_indices], labels[batch_indices]
 ```
 
 In general, note that we want to use reasonably sized minibatches to take advantage of the GPU hardware, which excels at parallelizing operations. Because each example can be fed through our models in parallel and the gradient of the loss function for each example can also be taken in parallel, GPUs allow us to process hundreds of examples in scarcely more time than it might take to process just a single example.
 
 To build some intuition, let's read and print the first small batch of data examples. The shape of the features in each mini-batch tells us both the mini-batch size and the number of input features. Likewise, our mini-batch of labels will have a shape given by `batch_size`.
 
-```{.python .input  n=6}
+```{.python .input  n=7}
 batch_size = 10
 
 for X, y in data_iter(batch_size, features, labels):
-    print(X, y)
+    print(X)
+    print(y)
     break
 ```
 
@@ -145,9 +144,9 @@ In the following code, we initialize weights by sampling
 random numbers from a normal distribution with mean 0
 and a standard deviation of 0.01, setting the bias $b$ to 0.
 
-```{.python .input  n=7}
-w = nd.random.normal(scale=0.01, shape=(num_inputs, 1))
-b = nd.zeros(shape=(1,))
+```{.python .input  n=8}
+w = np.random.normal(scale=0.01, size=(num_inputs,))
+b = np.zeros(shape=())
 ```
 
 Now that we have initialized our parameters,
@@ -169,11 +168,10 @@ that it should store a gradient for our parameters,
 we need to invoke the `attach_grad` function,
 allocating memory to store the gradients that we plan to take.
 
-```{.python .input  n=8}
+```{.python .input  n=9}
 w.attach_grad()
 b.attach_grad()
 ```
-
 
 ## Define the Model
 
@@ -187,10 +185,10 @@ Note that below `nd.dot(X, w)` is a vector and `b` is a scalar.
 Recall that when we add a vector and a scalar,
 the scalar is added to each component of the vector.
 
-```{.python .input  n=9}
+```{.python .input  n=10}
 # This function has been saved in the d2l package for future use
 def linreg(X, w, b):
-    return nd.dot(X, w) + b
+    return np.dot(X, w) + b
 ```
 
 ## Define the Loss Function
@@ -203,7 +201,7 @@ In the implementation, we need to transform the true value `y` into the predicte
 The result returned by the following function
 will also be the same as the `y_hat` shape.
 
-```{.python .input  n=10}
+```{.python .input  n=11}
 # This function has been saved in the d2l package for future use
 def squared_loss(y_hat, y):
     return (y_hat - y.reshape(y_hat.shape)) ** 2 / 2
@@ -233,11 +231,12 @@ we normalize our step size by the batch size (`batch_size`),
 so that the magnitude of a typical step size
 doesn't depend heavily our choice of the batch size.
 
-```{.python .input  n=11}
+```{.python .input  n=12}
 # This function has been saved in the d2l package for future use
 def sgd(params, lr, batch_size):
     for param in params:
-        param[:] = param - lr * param.grad / batch_size
+        # Using `()` as index because b as a scalar tensor cannot be indexed like b[:]
+        param[()] = param - lr * param.grad / batch_size
 ```
 
 ## Training
@@ -282,7 +281,7 @@ We elide these details for now but revise them
 later in
 :numref:`chapter_optimization`.
 
-```{.python .input  n=12}
+```{.python .input  n=13}
 lr = 0.03  # Learning rate
 num_epochs = 3  # Number of iterations
 net = linreg  # Our fancy linear model
@@ -299,14 +298,14 @@ for epoch in range(num_epochs):
         l.backward()  # Compute gradient on l with respect to [w,b]
         sgd([w, b], lr, batch_size)  # Update parameters using their gradient
     train_l = loss(net(features, w, b), labels)
-    print('epoch %d, loss %f' % (epoch + 1, train_l.mean().asnumpy()))
+    print('epoch %d, loss %f' % (epoch + 1, train_l.mean()))
 ```
 
 In this case, because we used synthetic data (that we synthesized ourselves!),
 we know preisely what the true parameters are. Thus, we can evaluate our success in training by comparing the true parameters with those that we learned through our training loop. Indeed they turn out to be very close to each other.
 
-```{.python .input  n=13}
-print('Error in estimating w', true_w - w.reshape(true_w.shape))
+```{.python .input  n=14}
+print('Error in estimating w', true_w - w)
 print('Error in estimating b', true_b - b)
 ```
 
