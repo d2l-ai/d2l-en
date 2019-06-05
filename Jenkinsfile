@@ -8,9 +8,9 @@ stage("Build and Publish") {
       rm -rf ~/miniconda3/envs/${ENV_NAME}
       conda create -n ${ENV_NAME} pip -y
       conda activate ${ENV_NAME}
-      // pip install https://s3-us-west-2.amazonaws.com/apache-mxnet/dist/python/numpy/20190528/mxnet-1.5.0b20190528-py2.py3-none-manylinux1_x86_64.whl
+      # pip install https://s3-us-west-2.amazonaws.com/apache-mxnet/dist/python/numpy/20190528/mxnet-1.5.0b20190528-py2.py3-none-manylinux1_x86_64.whl
       pip install https://s3-us-west-2.amazonaws.com/apache-mxnet/dist/python/numpy/20190605/mxnet-1.5.0b20190605-py2.py3-none-manylinux1_x86_64.whl
-      // pip install d2l>=0.9.2
+      # pip install d2l>=0.9.2
       pip install https://github.com/reminisce/d2l-en.git@fix_chapter_2_and_3
       pip install git+https://github.com/d2l-ai/d2l-book
       pip list
@@ -20,7 +20,7 @@ stage("Build and Publish") {
       conda activate ${ENV_NAME}
       d2lbook build outputcheck
       """
-      // export CUDA_VISIBLE_DEVICES=$((EXECUTOR_NUMBER*2)),$((EXECUTOR_NUMBER*2+1))
+      # export CUDA_VISIBLE_DEVICES=$((EXECUTOR_NUMBER*2)),$((EXECUTOR_NUMBER*2+1))
       sh label: "Execute Notebooks", script: """set -ex
       conda activate ${ENV_NAME}
       d2lbook build eval
