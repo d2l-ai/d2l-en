@@ -22,7 +22,12 @@ display.set_matplotlib_formats('svg')
 
 MNIST :cite:`LeCun.Bottou.Bengio.ea.1998` is one of widely used datasets. It contains 60,000 images for training and 10,000 images for validation. We will formally introduce training data in :numref:`chapter_linear_regression` and validation data in :numref:`chapter_model_selection` later, here we just simply remember we will train the naive Bayes model in the training data and then test its quality on the validation data. Each image contains a handwritten digit from 0 to 9. The task is classifying each image into the corresponding digit.
 
-Gluon, MXNet's high-level interface for implementing neural networks, provides a `MNIST` class in the `data.vision` module to download and load this dataset. Each image is a gray image with both width and height of 28 with shape $(28,28,1)$. We use a customized transformation to remove the last channel dimension. In addition, each pixel is presented by a unsigned 8-bit integer, we quantize them into binary features to simplify the problem.
+Gluon, MXNet's high-level interface for implementing neural networks, provides a `MNIST` class in the `data.vision` module to 
+automatically retrieve the dataset via our Internet connection.
+Subsequently, Gluon will use the already-downloaded local copy.
+We specify whether we are requesting the training set or the test set
+by setting the value of the parameter `train` to `True` or `False`, respectively.
+Each image is a gray image with both width and height of 28 with shape $(28,28,1)$. We use a customized transformation to remove the last channel dimension. In addition, each pixel is presented by a unsigned 8-bit integer, we quantize them into binary features to simplify the problem.
 
 ```{.python .input  n=44}
 def transform(data, label):
@@ -39,14 +44,26 @@ image, label = mnist_train[2]
 image.shape, label
 ```
 
-Or multiple examples.
+Our example, stored here in the variable `image` corresponds to an image with a height and width of 28 pixels. Each pixel is an 8-bit unsigned integer (uint8) with values between 0 and 255. It is stored in a 3D NDArray. Its last dimension is the number of channels. Since the data set is a grayscale image, the number of channels is 1. When we encounter color, images, we'll have 3 channels for red, green, and blue. To keep things simple, we will record the shape of the image with the height and width of $h$ and $w$ pixels, respectively, as $h \times w$ or `(h, w)`.
 
 ```{.python .input}
-images, labels = mnist_train[10:20]
+image.shape, image.dtype
+```
+
+The label of each image is represented as a scalar in NumPy. Its type is a 32-bit integer.
+
+```{.python .input}
+label, type(label), label.dtype
+```
+
+We can also access multiple examples at the same time. 
+
+```{.python .input}
+images, labels = mnist_train[10:38]
 images.shape, labels.shape
 ```
 
-Now let's create a function to visualize these 10 examples.
+ Now let's create a function to visualize these examples.
 
 ```{.python .input}
 # This function will be saved in d2l for future usage.
@@ -62,7 +79,7 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
             ax.set_title(titles[i])
     return axes
 
-show_images(images, 2, 5);
+show_images(images, 2, 9);
 ```
 
 ## The Probabilistic Model for Classification
@@ -177,15 +194,15 @@ Check if the prediction is correct.
 py.argmax(axis=0).asscalar() == label
 ```
 
-Now predict the first 10 validation examples, we can see the the Bayes
-classifier works pretty well except for the second last digit.
+Now predict a few validation examples, we can see the the Bayes
+classifier works pretty well except for the 9th 16th digits. 
 
 ```{.python .input}
 def predict(X):
     return [bayes_pred_stable(x).argmax(axis=0).asscalar() for x in X]
 
-X, y = mnist_test[:10]
-show_images(X, 2, 5, titles=predict(X));
+X, y = mnist_test[:18]
+show_images(X, 2, 9, titles=predict(X));
 ```
 
 Finally, let's compute the overall accuracy of the classifier.
