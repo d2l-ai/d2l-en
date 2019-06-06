@@ -157,22 +157,17 @@ setting the data dimension to $d = 200$
 and working with a relatively small number of training examples—here we'll set the sample size to 20:
 
 ```{.python .input  n=2}
-import sys
-sys.path.insert(0, '..')
-
 %matplotlib inline
 import d2l
 from mxnet import autograd, gluon, init, nd
-from mxnet.gluon import data as gdata, loss as gloss, nn
+from mxnet.gluon import nn
 
-n_train, n_test, num_inputs = 20, 100, 200
+n_train, n_test, num_inputs, batch_size = 20, 100, 200, 1
 true_w, true_b = nd.ones((num_inputs, 1)) * 0.01, 0.05
-
-features = nd.random.normal(shape=(n_train + n_test, num_inputs))
-labels = nd.dot(features, true_w) + true_b
-labels += nd.random.normal(scale=0.01, shape=labels.shape)
-train_features, test_features = features[:n_train, :], features[n_train:, :]
-train_labels, test_labels = labels[:n_train], labels[n_train:]
+train_data = d2l.synthetic_data(true_w, true_b, n_train)
+train_iter = d2l.load_array(*train_data, batch_size)
+test_data = d2l.synthetic_data(true_w, true_b, n_test)
+test_iter = d2l.load_array(*test_data, batch_size, is_train=False)
 ```
 
 ## Implementation from Scratch
@@ -227,12 +222,10 @@ so we'll just import them via `d2l.linreg` and `d2l.squared_loss`
 to reduce clutter.
 
 ```{.python .input  n=7}
-batch_size, num_epochs, lr = 1, 100, 0.003
+num_epochs, lr = 100, 0.003
 net, loss = d2l.linreg, d2l.squared_loss
-train_iter = gdata.DataLoader(gdata.ArrayDataset(
-    train_features, train_labels), batch_size, shuffle=True)
 
-def fit_and_plot(lambd):
+def train(lambd):
     w, b = init_params()
     train_ls, test_ls = [], []
     for _ in range(num_epochs):
@@ -242,10 +235,11 @@ def fit_and_plot(lambd):
                 l = loss(net(X, w, b), y) + lambd * l2_penalty(w)
             l.backward()
             d2l.sgd([w, b], lr, batch_size)
-        train_ls.append(loss(net(train_features, w, b),
-                             train_labels).mean().asscalar())
-        test_ls.append(loss(net(test_features, w, b),
-                            test_labels).mean().asscalar())
+        
+        train_ls.append(loss(net(train_data[0], w, b), 
+                             train_data[1]).mean().asscalar())
+        test_ls.append(loss(net(test_data[0], w, b),
+                            test_data[1]).mean().asscalar())
     d2l.semilogy(range(1, num_epochs + 1), train_ls, 'epochs', 'loss',
                  range(1, num_epochs + 1), test_ls, ['train', 'test'])
     print('l2 norm of w:', w.norm().asscalar())
@@ -259,7 +253,7 @@ As a result, while the training error decreases, the test error does not.
 This is a perfect example of overfitting.
 
 ```{.python .input  n=8}
-fit_and_plot(lambd=0)
+train(lambd=0)
 ```
 
 ### Using Weight Decay
@@ -272,7 +266,7 @@ In addition, the $\ell_2$ norm of the weight $\mathbf{w}$
 is smaller than without using weight decay.
 
 ```{.python .input  n=9}
-fit_and_plot(lambd=3)
+train(lambd=3)
 ```
 
 ## Concise Implementation
@@ -303,7 +297,7 @@ def fit_and_plot_gluon(wd):
     net = nn.Sequential()
     net.add(nn.Dense(1))
     net.initialize(init.Normal(sigma=1))
-    loss = gloss.L2Loss()
+    loss = gluon.loss.L2Loss()
     # The weight parameter has been decayed. Weight names generally end with
     # "weight".
     trainer_w = gluon.Trainer(net.collect_params('.*weight'), 'sgd',
@@ -321,10 +315,8 @@ def fit_and_plot_gluon(wd):
             # update the weight and bias separately
             trainer_w.step(batch_size)
             trainer_b.step(batch_size)
-        train_ls.append(loss(net(train_features),
-                             train_labels).mean().asscalar())
-        test_ls.append(loss(net(test_features),
-                            test_labels).mean().asscalar())
+        train_ls.append(d2l.evaluate_loss(net, train_iter, loss))
+        test_ls.append(d2l.evaluate_loss(net, test_iter, loss))
     d2l.semilogy(range(1, num_epochs + 1), train_ls, 'epochs', 'loss',
                  range(1, num_epochs + 1), test_ls, ['train', 'test'])
     print('L2 norm of w:', net[0].weight.data().norm().asscalar())

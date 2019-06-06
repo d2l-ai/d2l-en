@@ -21,16 +21,12 @@ the linear regression model in :numref:`chapter_linear_scratch` much more concis
 To start, we will generate the same data set as that used in the previous section.
 
 ```{.python .input  n=2}
-from mxnet import autograd, nd
+import d2l
+from mxnet import autograd, nd, gluon
 
-num_inputs = 2
-num_examples = 1000
 true_w = nd.array([2, -3.4])
 true_b = 4.2
-
-features = nd.random.normal(scale=1, shape=(num_examples, num_inputs))
-labels = nd.dot(features, true_w) + true_b
-labels += nd.random.normal(scale=0.01, shape=labels.shape)
+features, labels = d2l.synthetic_data(true_w, true_b, 1000)
 ```
 
 ## Reading Data
@@ -52,13 +48,14 @@ we want the `DataLoader` to shuffle the data
 on each epoch (pass through the dataset).
 
 ```{.python .input  n=3}
-from mxnet.gluon import data as gdata
-
+# This function is saved in the d2l package for future use.
+def load_array(features, labels, batch_size, is_train=True):
+    """Construct a Gluon data loader"""
+    dataset = gluon.data.ArrayDataset(features, labels)
+    return gluon.data.DataLoader(dataset, batch_size, shuffle=is_train)
+    
 batch_size = 10
-# Combine the features and labels of the training data
-dataset = gdata.ArrayDataset(features, labels)
-# Randomly reading mini-batches
-data_iter = gdata.DataLoader(dataset, batch_size, shuffle=True)
+data_iter = load_array(features, labels, batch_size)
 ```
 
 Now we can use `data_iter` in much the same way as we called the `data_iter` function in the previous section. To verify that it's working, we can read and print the first mini-batch of instances.
@@ -128,7 +125,7 @@ to access the `initializer` package.
 By calling `init.Normal(sigma=0.01)`, we specify that each *weight* parameter
 should be randomly sampled from a normal distribution
 with mean 0 and standard deviation 0.01.
-The *bias* parameter will be initialized to zero by default. Both weight and bias will be attached with gradients. 
+The *bias* parameter will be initialized to zero by default. Both weight and bias will be attached with gradients.
 
 ```{.python .input  n=7}
 from mxnet import init

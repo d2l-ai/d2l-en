@@ -51,14 +51,17 @@ and in this example, we'll set the its standard deviation to $0.01$.
 The following code generates our synthetic dataset:
 
 ```{.python .input  n=2}
-num_inputs = 2
-num_examples = 1000
+# This function is saved in the d2l package for future use.
+def synthetic_data(w, b, num_examples):
+    """generate y = X w + b + noise"""
+    features = nd.random.normal(scale=1, shape=(num_examples, len(w)))
+    labels = nd.dot(features, w) + b
+    labels += nd.random.normal(scale=0.01, shape=labels.shape)
+    return features, labels
+
 true_w = nd.array([2, -3.4])
 true_b = 4.2
-
-features = nd.random.normal(scale=1, shape=(num_examples, num_inputs))
-labels = nd.dot(features, true_w) + true_b
-labels += nd.random.normal(scale=0.01, shape=labels.shape)
+features, labels = synthetic_data(true_w, true_b, 1000)
 ```
 
 Note that each row in `features` consists of a 2-dimensional data point and that each row in `labels` consists of a 1-dimensional target value (a scalar).
@@ -129,7 +132,7 @@ random numbers from a normal distribution with mean 0
 and a standard deviation of 0.01, setting the bias $b$ to 0.
 
 ```{.python .input  n=7}
-w = nd.random.normal(scale=0.01, shape=(num_inputs, 1))
+w = nd.random.normal(scale=0.01, shape=(2, 1))
 b = nd.zeros(shape=(1,))
 ```
 
