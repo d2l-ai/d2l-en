@@ -8,7 +8,7 @@ import ritual.
 ```{.python .input  n=1}
 import d2l
 from mxnet import gluon, init
-from mxnet.gluon import loss as gloss, nn
+from mxnet.gluon import nn
 ```
 
 Let's stick with the Fashion-MNIST dataset and keep the batch size at $256$ as in the last section.
@@ -83,7 +83,7 @@ all at once inside the softmax_cross_entropy loss function,
 which does smart things like the log-sum-exp trick ([see on Wikipedia](https://en.wikipedia.org/wiki/LogSumExp)).
 
 ```{.python .input  n=4}
-loss = gloss.SoftmaxCrossEntropyLoss()
+loss = gluon.loss.SoftmaxCrossEntropyLoss()
 ```
 
 ## Optimization Algorithm
