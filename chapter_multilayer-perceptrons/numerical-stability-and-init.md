@@ -80,22 +80,17 @@ vis-a-vis vanishing gradients.
 
 ```{.python .input}
 %matplotlib inline
-import mxnet as mx
+import d2l
 from mxnet import nd, autograd
-from matplotlib import pyplot as plt
 
-from mxnet import nd, autograd
 x = nd.arange(-8.0, 8.0, 0.1)
 x.attach_grad()
 with autograd.record():
     y = x.sigmoid()
 y.backward()
 
-plt.figure(figsize=(8, 4))
-plt.plot(x.asnumpy(), y.asnumpy())
-plt.plot(x.asnumpy(), x.grad.asnumpy())
-plt.legend(['sigmoid', 'gradient'])
-plt.show()
+d2l.set_figsize((6, 3))
+d2l.plot(x, [y, x.grad], legend=['sigmoid', 'gradient'])
 ```
 
 As we can see, the gradient of the sigmoid vanishes
@@ -135,7 +130,6 @@ for i in range(100):
 
 print('After multiplying 100 matrices', M)
 ```
-
 
 ### Symmetry
 
@@ -238,8 +232,7 @@ $$
 \end{aligned}.
 $$
 
-This is the reasoning underlying the eponymous Xavier initialization,
-proposed by [Xavier Glorot and Yoshua Bengio](http://proceedings.mlr.press/v9/glorot10a/glorot10a.pdf) in 2010.
+This is the reasoning underlying the eponymous Xavier initialization :cite:`Glorot.Bengio.2010`. 
 It works well enough in practice.
 For Gaussian random variables, the Xavier initialization
 picks a normal distribution with zero mean
