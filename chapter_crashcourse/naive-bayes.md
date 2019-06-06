@@ -19,9 +19,9 @@ display.set_matplotlib_formats('svg')
 
 ## Optical Character Recognition
 
-MNIST :cite:`LeCun.Bottou.Bengio.ea.1998` is one of widely used datasets. It contains 60,000 images for training and 10,000 images for validation. Each image contains a handwritten digit from 0 to 9. The task is classifying each image into the corresponding digit.
+MNIST :cite:`LeCun.Bottou.Bengio.ea.1998` is one of widely used datasets. It contains 60,000 images for training and 10,000 images for validation. We will formally introduce training data in :numref:`chapter_linear_regression` and validation data in :numref:`chapter_model_selection` later, here we just simply remember we will train the naive Bayes model in the training data and then test its quality on the validation data. Each image contains a handwritten digit from 0 to 9. The task is classifying each image into the corresponding digit.
 
-Gluon, MXNet’s high-level interface for implementing neural networks, provides a `MNIST` class in the `data.vision` module to download and load this dataset. Each image is a gray image with both width and height of 28 with shape $(28,28,1)$. We use a customized transformation to remove the last channel dimension. In addition, each pixel is presented by a unsigned 8-bit integer, we quantize them into binary features to simplify the problem.
+Gluon, MXNet's high-level interface for implementing neural networks, provides a `MNIST` class in the `data.vision` module to download and load this dataset. Each image is a gray image with both width and height of 28 with shape $(28,28,1)$. We use a customized transformation to remove the last channel dimension. In addition, each pixel is presented by a unsigned 8-bit integer, we quantize them into binary features to simplify the problem.
 
 ```{.python .input  n=44}
 def transform(data, label):
@@ -66,7 +66,7 @@ show_images(images, 2, 5);
 
 ## The Probabilistic Model for Classification
 
-One natural way to express the classification task is via the probabilistic question: what is the most likely label given the features, e.g. image pixels?. Denote by $\mathbf x\in\mathbb R^d$ the features of the example and $y\in\mathbb R$ the label. In our example here, we can reshape a 2-dimensional image to a vector so that $d=28^2=784$. The $p(y | \mathbf{x})$ is the probability of the label given the features. If we are able to compute these probabilities, which are $p(y | \mathbf{x})$ for $y=0,\ldots,9$ in our example, then the classifier will output the prediction  $\hat{y}$ given by the expression:
+One natural way to express the classification task is via the probabilistic question: what is the most likely label given the features (i.e. image pixels)? Denote by $\mathbf x\in\mathbb R^d$ the features of the example and $y\in\mathbb R$ the label. Here features are image pixels, where we can reshape a 2-dimensional image to a vector so that $d=28^2=784$, and labels are digits. We will formally define general features and labels in :numref:`chapter_linear_regression`. The $p(y | \mathbf{x})$ is the probability of the label given the features. If we are able to compute these probabilities, which are $p(y | \mathbf{x})$ for $y=0,\ldots,9$ in our example, then the classifier will output the prediction  $\hat{y}$ given by the expression:
 
 $$\hat{y} = \operatorname*{argmax} \> p(y | \mathbf{x}).$$
 
