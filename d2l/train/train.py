@@ -11,9 +11,9 @@ from ..base import try_gpu
 from ..figure import set_figsize, plt
 from ..model import linreg
 
-__all__ = ['evaluate_accuracy', 'squared_loss', 'grad_clipping', 'grad_clipping_gluon', 'sgd', 'train',
+__all__ = ['evaluate_accuracy', 'grad_clipping', 'grad_clipping_gluon', 'train',
            'train_2d', 'train_and_predict_rnn', 'train_and_predict_rnn_gluon',
-           'train_ch3', 'train_ch5', 'train_ch9', 'train_gluon_ch9',
+           'train_ch5', 'train_ch9', 'train_gluon_ch9',
            'predict_sentiment', 'train_ch7', 'translate_ch7']
 
 def _get_batch(batch, ctx):
@@ -38,10 +38,6 @@ def evaluate_accuracy(data_iter, net, ctx=[mx.cpu()]):
         acc_sum.wait_to_read()
     return acc_sum.asscalar() / n
 
-def squared_loss(y_hat, y):
-    """Squared loss."""
-    return (y_hat - y.reshape(y_hat.shape)) ** 2 / 2
-
 def grad_clipping(params, theta, ctx):
     """Clip the gradient."""
     norm = nd.array([0], ctx)
@@ -57,10 +53,6 @@ def grad_clipping_gluon(model, theta, ctx):
     params = [p.data(ctx) for p in model.collect_params().values()]
     grad_clipping(params, theta, ctx)
 
-def sgd(params, lr, batch_size):
-    """Mini-batch stochastic gradient descent."""
-    for param in params:
-        param[:] = param - lr * param.grad / batch_size
 
 def train(train_iter, test_iter, net, loss, trainer, ctx, num_epochs):
     """Train and evaluate a model."""
@@ -199,28 +191,6 @@ def train_and_predict_rnn_gluon(model, num_hiddens, corpus_indices, vocab,
             for prefix in prefixes:
                 print(' -', predict_rnn_gluon(prefix, 50, model, vocab, ctx))
 
-
-def train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size,
-              params=None, lr=None, trainer=None):
-    """Train and evaluate a model with CPU."""
-    for epoch in range(num_epochs):
-        train_l_sum, train_acc_sum, n = 0.0, 0.0, 0
-        for X, y in train_iter:
-            with autograd.record():
-                y_hat = net(X)
-                l = loss(y_hat, y).sum()
-            l.backward()
-            if trainer is None:
-                sgd(params, lr, batch_size)
-            else:
-                trainer.step(batch_size)
-            y = y.astype('float32')
-            train_l_sum += l.asscalar()
-            train_acc_sum += (y_hat.argmax(axis=1) == y).sum().asscalar()
-            n += y.size
-        test_acc = evaluate_accuracy(test_iter, net)
-        print('epoch %d, loss %.4f, train acc %.3f, test acc %.3f'
-              % (epoch + 1, train_l_sum / n, train_acc_sum / n, test_acc))
 
 
 def train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,

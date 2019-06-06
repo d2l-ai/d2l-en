@@ -12,12 +12,9 @@ To begin, let's import our packages
 because we will be doing the heavy lifting ourselves.)
 
 ```{.python .input}
-import sys
-sys.path.insert(0, '..')
-
-%matplotlib inline
 import d2l
 from mxnet import autograd, nd
+from IPython import display
 ```
 
 We will work with the Fashion-MNIST dataset just introduced,
@@ -119,7 +116,6 @@ due to large (or very small) elements of the matrix,
 as we did in
 :numref:`chapter_naive_bayes`.
 
-
 ```{.python .input  n=13}
 X = nd.random.normal(shape=(2, 5))
 X_prob = softmax(X)
@@ -169,9 +165,8 @@ with just one line of code.
 
 ```{.python .input  n=16}
 def cross_entropy(y_hat, y):
-    return -nd.pick(y_hat, y).log()
+    return - nd.pick(y_hat, y).log()
 ```
-
 
 ## Classification Accuracy
 
@@ -195,7 +190,7 @@ Taking the mean yields the desired result.
 
 ```{.python .input  n=17}
 def accuracy(y_hat, y):
-    return (y_hat.argmax(axis=1) == y.astype('float32')).mean().asscalar()
+    return (y_hat.argmax(axis=1) == y.astype('float32')).sum().asscalar()
 ```
 
 We will continue to use the variables `y_hat` and `y`
@@ -210,7 +205,7 @@ which is consistent with the actual label, 2.
 Therefore, the classification accuracy rate for these two examples is 0.5.
 
 ```{.python .input  n=18}
-accuracy(y_hat, y)
+accuracy(y_hat, y) / len(y)
 ```
 
 Similarly, we can evaluate the accuracy for model `net` on the data set
@@ -223,7 +218,7 @@ def evaluate_accuracy(data_iter, net):
     acc_sum, n = 0.0, 0
     for X, y in data_iter:
         y = y.astype('float32')
-        acc_sum += (net(X).argmax(axis=1) == y).sum().asscalar()
+        acc_sum += accuracy(net(X), y)
         n += y.size
     return acc_sum / n
 ```
@@ -240,7 +235,70 @@ evaluate_accuracy(test_iter, net)
 
 The training loop for softmax regression should look strikingly familiar
 if you read through our implementation
-of linear regression earlier in this chapter.
+of linear regression in :numref:`chapter_linear_scratch`. Here we refactor the implementation to make it reusable. First, we define a function to train for one data epoch. 
+
+```{.python .input}
+def train_epoch_ch3(net, train_iter, loss, updater):
+    train_l_sum, train_acc_sum, n = 0.0, 0.0, 0
+    for X, y in train_iter:
+        # compute gradients and update parameters
+        with autograd.record():
+            y_hat = net(X)
+            l = loss(y_hat, y)
+        l.backward()
+        updater()
+        # measure loss and accuracy
+        train_l_sum += l.sum().asscalar()
+        train_acc_sum += accuracy(y_hat, y)
+        n += y.size
+    return train_l_sum/n, train_acc_sum/n
+```
+
+Then we define a convenient plot function that draws multiple lines in a figure, and a utility function that animates the training progress.
+
+```{.python .input}
+# A slightly improved versoin of this function has been saved in 
+# the d2l package for future use.
+def plot(X, Y, x_label=None, y_label=None, legend=None, 
+         xlim=None, ylim=None, axes=None):
+    """Plot multiple lines"""
+    ax = axes if axes else d2l.plt.gca()
+    ax.cla()
+    for i in range(len(Y)):
+        ax.plot(X, Y[i])
+    if x_label: ax.set_xlabel(x_label)
+    if y_label: ax.set_ylabel(y_label)
+    if xlim: ax.set_xlim(xlim)
+    if ylim: ax.set_ylim(ylim)
+    if legend: ax.legend(legend)
+
+# This function has been saved in the d2l package for future use        
+def show(obj):
+    """Show a figure"""
+    display.display(obj)
+    display.clear_output(wait=True)
+```
+
+The training function then runs multiple epochs and visualize the training progress. 
+
+```{.python .input}
+# This function has been saved in the d2l package for future use
+def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
+    trains, test_accs = [], []
+    d2l.use_svg_display()
+    fig, ax = d2l.plt.subplots(figsize=(4,3))
+    for epoch in range(num_epochs):
+        trains.append(train_epoch_ch3(net, train_iter, loss, updater))
+        test_accs.append(evaluate_accuracy(test_iter, net))
+        legend = ['train loss', 'train acc', 'test acc']
+        res = list(map(list, zip(*trains)))+[test_accs,]
+        plot(list(range(1, epoch+2)), res, 'epoch', legend=legend, 
+             xlim=[0,num_epochs+1], ylim=[0.4, 0.9], axes=ax)
+        show(fig)
+```
+
+
+
 Again, we use the mini-batch stochastic gradient descent
 to optimize the loss function of the model.
 Note that the number of epochs (`num_epochs`),
@@ -249,33 +307,9 @@ By changing their values, we may be able to increase the classification accuracy
 into training, validation, and test data, using the validation data to choose the best values of our hyperparameters.
 
 ```{.python .input  n=21}
-num_epochs, lr = 5, 0.1
-
-# This function has been saved in the d2l package for future use
-def train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size,
-              params=None, lr=None, trainer=None):
-    for epoch in range(num_epochs):
-        train_l_sum, train_acc_sum, n = 0.0, 0.0, 0
-        for X, y in train_iter:
-            with autograd.record():
-                y_hat = net(X)
-                l = loss(y_hat, y).sum()
-            l.backward()
-            if trainer is None:
-                d2l.sgd(params, lr, batch_size)
-            else:
-                # This will be illustrated in the next section
-                trainer.step(batch_size)
-            y = y.astype('float32')
-            train_l_sum += l.asscalar()
-            train_acc_sum += (y_hat.argmax(axis=1) == y).sum().asscalar()
-            n += y.size
-        test_acc = evaluate_accuracy(test_iter, net)
-        print('epoch %d, loss %.4f, train acc %.3f, test acc %.3f'
-              % (epoch + 1, train_l_sum / n, train_acc_sum / n, test_acc))
-
-train_ch3(net, train_iter, test_iter, cross_entropy, num_epochs,
-          batch_size, [W, b], lr)
+num_epochs, lr = 10, 0.1
+updater = lambda: d2l.sgd([W, b], lr, batch_size)
+train_ch3(net, train_iter, test_iter, cross_entropy, num_epochs, updater)
 ```
 
 ## Prediction
@@ -288,13 +322,12 @@ Given a series of images, we will compare their actual labels
 ```{.python .input}
 for X, y in test_iter:
     break
-
+    
+n = 9
 true_labels = d2l.get_fashion_mnist_labels(y.asnumpy())
 pred_labels = d2l.get_fashion_mnist_labels(net(X).argmax(axis=1).asnumpy())
-titles = [truelabel + '\n' + predlabel
-          for truelabel, predlabel in zip(true_labels, pred_labels)]
-
-d2l.show_fashion_mnist(X[0:9], titles[0:9])
+titles = [true + '\n' + pred for true, pred in zip(true_labels, pred_labels)]
+d2l.show_images(X[0:n].reshape((n,28,28)), 1, n, titles=titles[0:n]);
 ```
 
 ## Summary

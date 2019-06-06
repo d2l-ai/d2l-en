@@ -85,7 +85,6 @@ and a vector of labels, yielding minibatches of size `batch_size`,
 each consisting of a tuple of features and labels.
 
 ```{.python .input  n=5}
-# This function has been saved in the d2l package for future use
 def data_iter(batch_size, features, labels):
     num_examples = len(features)
     indices = list(range(num_examples))
