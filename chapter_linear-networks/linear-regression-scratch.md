@@ -1,23 +1,19 @@
 # Linear Regression Implementation from Scratch
 :label:`chapter_linear_scratch`
 
-Now that you have some background on the *ideas* behind linear regression,
-we are ready to step through a hands-on implementation.
-In this section, and similar ones that follow,
-we are going to implement all parts of linear regression:
-the data pipeline, the model, the loss function,
-and the gradient descent optimizer, from scratch.
-Not surprisingly, today's deep learning frameworks
-can automate nearly all of this work,
-but if you never learn to implement things from scratch,
-then you may never truly understand how the model works.
-Moreover, when it comes time to customize models,
-defining our own layers, loss functions, etc.,
-knowing how things work under the hood will come in handy.
-Thus, we start off describing how to implement linear regression
-relying only on the primitives in the NDArray and `autograd` packages.
-In the section immediately following, we will present the compact implementation, using all of Gluon's bells and whistles,
-but this is where we dive into the details.
+Now that you have some background on the *ideas* behind linear regression, we
+are ready to step through a hands-on implementation.  In this section, and
+similar ones that follow, we are going to implement all parts of linear
+regression: the data pipeline, the model, the loss function, and the gradient
+descent optimizer, from scratch.  Not surprisingly, today's deep learning
+frameworks can automate nearly all of this work, but if you never learn to
+implement things from scratch, then you may never truly understand how the model
+works.  Moreover, when it comes time to customize models, defining our own
+layers, loss functions, etc., knowing how things work under the hood will come
+in handy.  Thus, we start off describing how to implement linear regression
+relying only on the primitives in the NDArray and `autograd` packages.  In the
+section immediately following, we will present the compact implementation, using
+all of Gluon's bells and whistles, but this is where we dive into the details.
 
 To start off, we import the packages required to run this section's experiments.
 
