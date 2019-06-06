@@ -12,7 +12,8 @@ correspondence with input image in spatial dimension (height and width). Given a
 position on the spatial dimension, the output of the channel dimension will be a
 category prediction of the pixel corresponding to the location.
 
-We will first import the package or module needed for the experiment and then explain the transposed convolution layer.
+We will first import the package or module needed for the experiment and then
+explain the transposed convolution layer.
 
 ```{.python .input  n=2}
 %matplotlib inline
@@ -192,7 +193,7 @@ for i in range(n):
     X = image.fixed_crop(test_images[i], *crop_rect)
     pred = label2image(predict(X))
     imgs += [X, pred, image.fixed_crop(test_labels[i], *crop_rect)]
-d2l.show_images(imgs[::3] + imgs[1::3] + imgs[2::3], 3, n);
+d2l.show_images(imgs[::3] + imgs[1::3] + imgs[2::3], 3, n, scale=2);
 ```
 
 ## Summary

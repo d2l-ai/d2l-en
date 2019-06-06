@@ -47,7 +47,7 @@ Let's visualize the first 20 images.
 ```{.python .input  n=28}
 for X, y in data_iter:
     imgs = X[0:20,:,:,:].transpose((0,2,3,1))/2+0.5
-    d2l.show_images(imgs, num_rows=4, num_cols=5, scale=1.5)
+    d2l.show_images(imgs, num_rows=4, num_cols=5)
     break
 ```
 
