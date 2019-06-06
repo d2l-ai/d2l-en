@@ -27,6 +27,7 @@ num_inputs = 2
 num_examples = 1000
 true_w = nd.array([2, -3.4])
 true_b = 4.2
+
 features = nd.random.normal(scale=1, shape=(num_examples, num_inputs))
 labels = nd.dot(features, true_w) + true_b
 labels += nd.random.normal(scale=0.01, shape=labels.shape)
@@ -127,7 +128,7 @@ to access the `initializer` package.
 By calling `init.Normal(sigma=0.01)`, we specify that each *weight* parameter
 should be randomly sampled from a normal distribution
 with mean 0 and standard deviation 0.01.
-The *bias* parameter will be initialized to zero by default.
+The *bias* parameter will be initialized to zero by default. Both weight and bias will be attached with gradients. 
 
 ```{.python .input  n=7}
 from mxnet import init
