@@ -42,27 +42,12 @@ img = image.imread('../img/cat1.jpg')
 d2l.plt.imshow(img.asnumpy())
 ```
 
-The drawing function `show_images` is defined below.
-
-```{.python .input  n=23}
-# This function is saved in the d2l package for future use
-def show_images(imgs, num_rows, num_cols, scale=2):
-    figsize = (num_cols * scale, num_rows * scale)
-    _, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize)
-    for i in range(num_rows):
-        for j in range(num_cols):
-            axes[i][j].imshow(imgs[i * num_cols + j].asnumpy())
-            axes[i][j].axes.get_xaxis().set_visible(False)
-            axes[i][j].axes.get_yaxis().set_visible(False)
-    return axes
-```
-
 Most image augmentation methods have a certain degree of randomness. To make it easier for us to observe the effect of image augmentation, we next define the auxiliary function `apply`. This function runs the image augmentation method `aug` multiple times on the input image `img` and shows all results.
 
 ```{.python .input  n=24}
 def apply(img, aug, num_rows=2, num_cols=4, scale=1.5):
     Y = [aug(img) for _ in range(num_rows * num_cols)]
-    show_images(Y, num_rows, num_cols, scale)
+    d2l.show_images(Y, num_rows, num_cols, scale=scale)
 ```
 
 ### Flip and Crop
@@ -133,7 +118,7 @@ apply(img, augs)
 Next, we will look at how to apply image augmentation in actual training. Here, we use the CIFAR-10 data set, instead of the Fashion-MNIST data set we have been using. This is because the position and size of the objects in the Fashion-MNIST data set have been normalized, and the differences in color and size of the objects in CIFAR-10 data set are more significant. The first 32 training images in the CIFAR-10 data set are shown below.
 
 ```{.python .input  n=32}
-show_images(gdata.vision.CIFAR10(train=True)[0:32][0], 4, 8, scale=0.8);
+d2l.show_images(gdata.vision.CIFAR10(train=True)[0:32][0], 4, 8, scale=0.8);
 ```
 
 In order to obtain a definitive results during prediction, we usually only apply image augmentation to the training example, and do not use image augmentation with random operations during prediction. Here, we only use the simplest random left-right flipping method. In addition, we use a `ToTensor` instance to convert mini-batch images into the format required by MXNet, i.e. 32-bit floating point numbers with the shape of (batch size, number of channels, height, width) and value range between 0 and 1.

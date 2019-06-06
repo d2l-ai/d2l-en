@@ -66,7 +66,7 @@ We have ten images with bounding boxes on them. We can see that the angle, size,
 
 ```{.python .input  n=4}
 imgs = (batch.data[0][0:10].transpose((0, 2, 3, 1))) / 255
-axes = d2l.show_images(imgs, 2, 5).flatten()
+axes = d2l.show_images(imgs, 2, 5, scale=2)
 for ax, label in zip(axes, batch.label[0][0:10]):
     d2l.show_bboxes(ax, [label[0][1:5] * edge_size], colors=['w'])
 ```
