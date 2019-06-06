@@ -36,10 +36,10 @@ def _preprocess_2d(X):
     return X
 
 def _check_shape_2d(X, Y):
-    assert X.ndim == 2
-    assert Y.ndim == 2
-    assert X.shape[-1] == Y.shape[-1]
-    assert len(X) == len(Y) or len(X) == 1
+    assert X.ndim == 2, ('X', X)
+    assert Y.ndim == 2, ('Y', Y)
+    assert X.shape[-1] == Y.shape[-1], ('X', X, 'Y', Y)
+    assert len(X) == len(Y) or len(X) == 1, ('X', X, 'Y', Y)
 
 def _draw(func, X, Y, x_label, y_label, legend, xlim, ylim, axes):
     use_svg_display()
