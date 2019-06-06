@@ -7,13 +7,14 @@ Let's first import libraries and modules.
 
 ```{.python .input  n=72}
 %matplotlib inline
-from matplotlib import pyplot as plt
+# plt has been saved as d2l.plt for future use. 
+from matplotlib import pyplot as plt  
 from IPython import display
 from mxnet import nd, gluon
 import math
 
-# SVG offers sharper plots. It will be saved in the d2l.use_svg_display
-# function for future usages.
+# SVG offers sharper plots. It has been saved as d2l.use_svg_display
+# for future use.
 display.set_matplotlib_formats('svg')
 ```
 
