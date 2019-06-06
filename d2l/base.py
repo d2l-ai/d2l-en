@@ -3,8 +3,12 @@
 import time
 import mxnet as mx
 from mxnet import nd
+import sys
 
-__all__ = ['try_gpu', 'try_all_gpus', 'Benchmark']
+__all__ = ['try_gpu', 'try_all_gpus', 'Benchmark', 'get_dataloader_workers']
+
+
+
 
 def try_gpu():
     """If GPU is available, return mx.gpu(0); else return mx.cpu()."""
@@ -39,3 +43,10 @@ class Benchmark():
 
     def __exit__(self, *args):
         print('%stime: %.4f sec' % (self.prefix, time.time() - self.start))
+
+def get_dataloader_workers(num_workers=4):
+    # 0 means no additional process is used to speed up the reading of data.
+    if sys.platform.startswith('win'):
+        return 0
+    else:
+        return num_workers
