@@ -100,6 +100,7 @@ def show_bboxes(axes, bboxes, labels=None, colors=None):
 
 def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
     """Plot a list of images."""
+    use_svg_display()
     figsize = (num_cols * scale, num_rows * scale)
     axes = plt.subplots(num_rows, num_cols, figsize=figsize)[1].flatten()
     for i, (ax, img) in enumerate(zip(axes, imgs)):
