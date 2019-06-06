@@ -4,12 +4,9 @@
 Now that we learned how multilayer perceptrons (MLPs) work in theory, let's implement them. We begin, as always, by importing modules.
 
 ```{.python .input}
-import sys
-sys.path.insert(0, '..')
-
 import d2l
 from mxnet import gluon, init
-from mxnet.gluon import loss as gloss, nn
+from mxnet.gluon import nn
 ```
 
 ## The Model
@@ -21,8 +18,8 @@ and uses the ReLU activation function.
 
 ```{.python .input  n=5}
 net = nn.Sequential()
-net.add(nn.Dense(256, activation='relu'))
-net.add(nn.Dense(10))
+net.add(nn.Dense(256, activation='relu'),
+        nn.Dense(10))
 net.initialize(init.Normal(sigma=0.01))
 ```
 
@@ -37,14 +34,12 @@ infers the missing input dimensions to each layer.
 Training the model follows the exact same steps as in our softmax regression implementation.
 
 ```{.python .input  n=6}
-batch_size = 256
+batch_size, num_epochs = 256, 10
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
-
-loss = gloss.SoftmaxCrossEntropyLoss()
+loss = gluon.loss.SoftmaxCrossEntropyLoss()
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': 0.5})
-num_epochs = 10
-d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size, None,
-              None, trainer)
+d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, 
+              lambda: trainer.step(batch_size))
 ```
 
 ## Exercises
