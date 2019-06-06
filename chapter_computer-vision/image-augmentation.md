@@ -47,7 +47,7 @@ Most image augmentation methods have a certain degree of randomness. To make it 
 ```{.python .input  n=24}
 def apply(img, aug, num_rows=2, num_cols=4, scale=1.5):
     Y = [aug(img) for _ in range(num_rows * num_cols)]
-    d2l.show_images(Y, num_rows, num_cols, scale)
+    d2l.show_images(Y, num_rows, num_cols, scale=scale)
 ```
 
 ### Flip and Crop
