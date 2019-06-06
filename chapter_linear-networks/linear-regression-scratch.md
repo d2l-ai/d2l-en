@@ -55,6 +55,7 @@ num_inputs = 2
 num_examples = 1000
 true_w = nd.array([2, -3.4])
 true_b = 4.2
+
 features = nd.random.normal(scale=1, shape=(num_examples, num_inputs))
 labels = nd.dot(features, true_w) + true_b
 labels += nd.random.normal(scale=0.01, shape=labels.shape)
@@ -170,7 +171,7 @@ Recall that when we add a vector and a scalar,
 the scalar is added to each component of the vector.
 
 ```{.python .input  n=9}
-# This function has been saved in the d2l package for future use
+# This function has been saved in the d2l package for future use.
 def linreg(X, w, b):
     return nd.dot(X, w) + b
 ```
@@ -186,7 +187,7 @@ The result returned by the following function
 will also be the same as the `y_hat` shape.
 
 ```{.python .input  n=10}
-# This function has been saved in the d2l package for future use
+# This function has been saved in the d2l package for future use.
 def squared_loss(y_hat, y):
     return (y_hat - y.reshape(y_hat.shape)) ** 2 / 2
 ```
