@@ -76,7 +76,7 @@ an [efficient data analysis toolkit](http://pandas.pydata.org/pandas-docs/stable
 before proceeding further. Fortunately, if you're reading in Jupyter,
 we can install pandas without even leaving the notebook.
 
-```{.python .input  n=3}
+```{.python .input  n=1}
 # If pandas is not installed, please uncomment the following line:
 # !pip install pandas
 
@@ -85,9 +85,8 @@ sys.path.insert(0, '..')
 
 %matplotlib inline
 import d2l
-from mxnet import autograd, gluon, init, nd
+from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import data as gdata, loss as gloss, nn
-import numpy as np
 import pandas as pd
 ```
 
@@ -97,6 +96,8 @@ To load the two CSV (Comma Separated Values) files
 containing training and test data respectively we use Pandas.
 
 ```{.python .input  n=14}
+npx.set_np()  # set the current notebook to use NumPy semantics, i.e. NumPy-like shapes and arrays
+
 train_data = pd.read_csv('../data/kaggle_house_pred_train.csv')
 test_data = pd.read_csv('../data/kaggle_house_pred_test.csv')
 ```
@@ -183,9 +184,9 @@ Finally, via the `values` attribute,
 
 ```{.python .input  n=9}
 n_train = train_data.shape[0]
-train_features = nd.array(all_features[:n_train].values)
-test_features = nd.array(all_features[n_train:].values)
-train_labels = nd.array(train_data.SalePrice.values).reshape((-1, 1))
+train_features = np.array(all_features[:n_train].values)
+test_features = np.array(all_features[n_train:].values)
+train_labels = np.array(train_data.SalePrice.values).reshape((-1, 1))
 ```
 
 ## Training
@@ -239,9 +240,9 @@ $$L = \sqrt{\frac{1}{n}\sum_{i=1}^n\left(\log y_i -\log \hat{y}_i\right)^2}$$
 def log_rmse(net, features, labels):
     # To further stabilize the value when the logarithm is taken, set the
     # value less than 1 as 1
-    clipped_preds = nd.clip(net(features), 1, float('inf'))
-    rmse = nd.sqrt(2 * loss(clipped_preds.log(), labels.log()).mean())
-    return rmse.asscalar()
+    clipped_preds = net(features).clip(min=1)
+    rmse = np.sqrt(2 * loss(np.log(clipped_preds), np.log(labels)).mean())
+    return rmse
 ```
 
 Unlike in previous sections, our training functions here
@@ -293,7 +294,6 @@ if our dataset wasconsiderably larger.
 But this added complexity might obfuscate our code unnecessarily
 so we can safely omit here owing to the simplicity of our problem.
 
-
 ```{.python .input}
 def get_k_fold_data(k, i, X, y):
     assert k > 1
@@ -307,8 +307,8 @@ def get_k_fold_data(k, i, X, y):
         elif X_train is None:
             X_train, y_train = X_part, y_part
         else:
-            X_train = nd.concat(X_train, X_part, dim=0)
-            y_train = nd.concat(y_train, y_part, dim=0)
+            X_train = np.concatenate([X_train, X_part], axis=0)
+            y_train = np.concatenate([y_train, y_part], axis=0)
     return X_train, y_train, X_valid, y_valid
 ```
 
@@ -327,9 +327,10 @@ def k_fold(k, X_train, y_train, num_epochs,
         train_l_sum += train_ls[-1]
         valid_l_sum += valid_ls[-1]
         if i == 0:
-            d2l.semilogy(range(1, num_epochs + 1), train_ls, 'epochs', 'rmse',
-                         range(1, num_epochs + 1), valid_ls,
-                         ['train', 'valid'])
+            d2l.semilogy(range(1, num_epochs + 1),
+                         [float(ls) for ls in train_ls], 'epochs', 'rmse',
+                         range(1, num_epochs + 1),
+                         [float(ls) for ls in valid_ls], ['train', 'valid'])
         print('fold %d, train rmse: %f, valid rmse: %f' % (
             i, train_ls[-1], valid_ls[-1]))
     return train_l_sum / k, valid_l_sum / k
@@ -379,7 +380,7 @@ def train_and_pred(train_features, test_feature, train_labels, test_data,
     net = get_net()
     train_ls, _ = train(net, train_features, train_labels, None, None,
                         num_epochs, lr, weight_decay, batch_size)
-    d2l.semilogy(range(1, num_epochs + 1), train_ls, 'epochs', 'rmse')
+    d2l.semilogy(range(1, num_epochs + 1), [float(ls) for ls in train_ls], 'epochs', 'rmse')
     print('train rmse %f' % train_ls[-1])
     # Apply the network to the test set
     preds = net(test_features).asnumpy()

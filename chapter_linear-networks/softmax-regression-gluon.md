@@ -11,13 +11,15 @@ sys.path.insert(0, '..')
 
 %matplotlib inline
 import d2l
-from mxnet import gluon, init
+from mxnet import gluon, init, npx
 from mxnet.gluon import loss as gloss, nn
 ```
 
 Let's stick with the Fashion-MNIST dataset and keep the batch size at $256$ as in the last section.
 
 ```{.python .input  n=2}
+npx.set_np()  # set the current notebook to use NumPy semantics, i.e. NumPy-like shapes and arrays
+
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 ```

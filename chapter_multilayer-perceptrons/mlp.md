@@ -206,7 +206,7 @@ sys.path.insert(0, '..')
 
 %matplotlib inline
 import d2l
-from mxnet import autograd, nd
+from mxnet import autograd, np, npx
 
 def xyplot(x_vals, y_vals, name):
     d2l.set_figsize(figsize=(5, 2.5))
@@ -220,10 +220,10 @@ the `relu` function as a basic native operator.
 As you can see, the activation function is piece-wise linear.
 
 ```{.python .input  n=2}
-x = nd.arange(-8.0, 8.0, 0.1)
+x = np.arange(-8.0, 8.0, 0.1)
 x.attach_grad()
 with autograd.record():
-    y = x.relu()
+    y = npx.relu(x)
 xyplot(x, y, 'relu')
 ```
 
@@ -287,7 +287,7 @@ approaches a linear transformation.
 
 ```{.python .input  n=4}
 with autograd.record():
-    y = x.sigmoid()
+    y = npx.sigmoid(x)
 xyplot(x, y, 'sigmoid')
 ```
 
@@ -317,7 +317,7 @@ We plot the tanh function blow. Note that as the input nears 0, the tanh functio
 
 ```{.python .input  n=6}
 with autograd.record():
-    y = x.tanh()
+    y = np.tanh(x)
 xyplot(x, y, 'tanh')
 ```
 
