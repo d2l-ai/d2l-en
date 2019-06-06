@@ -1,10 +1,10 @@
 """The train module contains functions for neural network training"""
-import numpy as np
+import numpy as onp
 import math
 import time
 
 import mxnet as mx
-from mxnet import autograd, gluon, init, nd
+from mxnet import autograd, gluon, init, nd, np
 from mxnet.gluon import data as gdata, loss as gloss, nn, utils as gutils
 from .data import data_iter_consecutive, data_iter_random
 from .base import try_gpu
@@ -252,13 +252,13 @@ def train_ch9(trainer_fn, states, hyperparams, features, labels, batch_size=10,
               num_epochs=2):
     """Train a linear regression model."""
     net, loss = linreg, squared_loss
-    w, b = nd.random.normal(scale=0.01, shape=(
-        features.shape[1], 1)), nd.zeros(1)
+    w, b = np.random.normal(scale=0.01, size=(
+        features.shape[1], 1)), np.zeros(1)
     w.attach_grad()
     b.attach_grad()
 
     def eval_loss():
-        return loss(net(features, w, b), labels).mean().asscalar()
+        return float(loss(net(features, w, b), labels).mean())
 
     ls = [eval_loss()]
     data_iter = gdata.DataLoader(
@@ -274,7 +274,7 @@ def train_ch9(trainer_fn, states, hyperparams, features, labels, batch_size=10,
                 ls.append(eval_loss())
     print('loss: %f, %f sec per epoch' % (ls[-1], time.time() - start))
     set_figsize()
-    plt.plot(np.linspace(0, num_epochs, len(ls)), ls)
+    plt.plot(onp.linspace(0, num_epochs, len(ls)), ls)
     plt.xlabel('epoch')
     plt.ylabel('loss')
 
@@ -288,7 +288,7 @@ def train_gluon_ch9(trainer_name, trainer_hyperparams, features, labels,
     loss = gloss.L2Loss()
 
     def eval_loss():
-        return loss(net(features), labels).mean().asscalar()
+        return float(loss(net(features), labels).mean())
 
     ls = [eval_loss()]
     data_iter = gdata.DataLoader(
@@ -306,7 +306,7 @@ def train_gluon_ch9(trainer_name, trainer_hyperparams, features, labels,
                 ls.append(eval_loss())
     print('loss: %f, %f sec per epoch' % (ls[-1], time.time() - start))
     set_figsize()
-    plt.plot(np.linspace(0, num_epochs, len(ls)), ls)
+    plt.plot(onp.linspace(0, num_epochs, len(ls)), ls)
     plt.xlabel('epoch')
     plt.ylabel('loss')
 

@@ -43,12 +43,14 @@ sys.path.insert(0, '..')
 %matplotlib inline
 import d2l
 import math
-from mxnet import nd
+from mxnet import nd, np, npx
+
+npx.set_np()
 
 gammas = [0.95, 0.9, 0.8, 0.7]
 d2l.set_figsize()
 for gamma in gammas:
-    x = nd.arange(40).asnumpy()
+    x = np.arange(40).asnumpy()
     d2l.plt.plot(x, (1-gamma) * gamma ** x)
 d2l.plt.xlabel('time')
 d2l.plt.legend(['gamma = %.2f'%g for g in gammas]);
@@ -85,15 +87,15 @@ Next, we implement RMSProp with the formula in the algorithm.
 
 features, labels = d2l.get_data_ch7()
 def init_rmsprop_states():
-    s_w = nd.zeros((features.shape[1], 1))
-    s_b = nd.zeros(1)
+    s_w = np.zeros((features.shape[1], 1))
+    s_b = np.zeros(1)
     return (s_w, s_b)
 
 def rmsprop(params, states, hyperparams):
     gamma, eps = hyperparams['gamma'], 1e-6
     for p, s in zip(params, states):
-        s[:] = gamma * s + (1 - gamma) * p.grad.square()
-        p[:] -= hyperparams['lr'] * p.grad / (s + eps).sqrt()
+        s[:] = gamma * s + (1 - gamma) * np.square(p.grad)
+        p[:] -= hyperparams['lr'] * p.grad / np.sqrt(s + eps)
 ```
 
 We set the initial learning rate to 0.01 and the hyperparameter $\gamma$ to 0.9. Now, the variable $\boldsymbol{s}_t$ can be treated as the weighted average of the square term $\boldsymbol{g}_t \odot \boldsymbol{g}_t$ from the last $1/(1-0.9) = 10$ time steps.

@@ -32,10 +32,12 @@ MXNet can specify devices, such as CPUs and GPUs, for storage and calculation. B
 
 ```{.python .input}
 import mxnet as mx
-from mxnet import nd
+from mxnet import np, npx
 from mxnet.gluon import nn
 
-mx.cpu(), mx.gpu(), mx.gpu(1)
+npx.set_np()
+
+npx.cpu(), npx.gpu(), npx.gpu(1)
 ```
 
 ## NDArray and GPUs
@@ -43,7 +45,7 @@ mx.cpu(), mx.gpu(), mx.gpu(1)
 By default, NDArray objects are created on the CPU. Therefore, we will see the `@cpu(0)` identifier each time we print an NDArray.
 
 ```{.python .input  n=4}
-x = nd.array([1, 2, 3])
+x = np.array([1, 2, 3])
 x
 ```
 
@@ -58,14 +60,14 @@ x.context
 There are several ways to store an NDArray on the GPU. For example, we can specify a storage device with the `ctx` parameter when creating an NDArray. Next, we create the NDArray variable `a` on `gpu(0)`. Notice that when printing `a`, the device information becomes `@gpu(0)`. The NDArray created on a GPU only consumes the memory of this GPU. We can use the `nvidia-smi` command to view GPU memory usage. In general, we need to make sure we do not create data that exceeds the GPU memory limit.
 
 ```{.python .input  n=5}
-x = nd.ones((2, 3), ctx=mx.gpu())
+x = np.ones((2, 3), ctx=npx.gpu())
 x
 ```
 
 Assuming you have at least two GPUs, the following code will create a random array on `gpu(1)`.
 
 ```{.python .input}
-y = nd.random.uniform(shape=(2, 3), ctx=mx.gpu(1))
+y = np.random.uniform(size=(2, 3), ctx=npx.gpu(1))
 y
 ```
 
@@ -78,7 +80,7 @@ If we want to compute $\mathbf{x} + \mathbf{y}$ we need to decide where to perfo
 `copyto` copies the data to another device such that we can add them. Since $\mathbf{y}$ lives on the second GPU we need to move $\mathbf{x}$ there before we can add the two.
 
 ```{.python .input  n=7}
-z = x.copyto(mx.gpu(1))
+z = x.copyto(npx.gpu(1))
 print(x)
 print(z)
 ```
@@ -93,20 +95,20 @@ Imagine that your variable z already lives on your second GPU (gpu(1)). What hap
 There are times where depending on the environment our code is running in, two variables may already live on the same device. So we only want to make a copy if the variables currently lives on different contexts. In these cases, we can call `as_in_context()`. If the variable is already the specified context then this is a no-op. In fact, unless you specifically want to make a copy, `as_in_context()` is the method of choice.
 
 ```{.python .input}
-z = x.as_in_context(mx.gpu(1))
+z = x.as_in_context(npx.gpu(1))
 z
 ```
 
 It is important to note that, if the `context` of the source variable and the target variable are consistent, then the `as_in_context` function causes the target variable and the source variable to share the memory of the source variable.
 
 ```{.python .input  n=8}
-y.as_in_context(mx.gpu(1)) is y
+y.as_in_context(npx.gpu(1)) is y
 ```
 
 The `copyto` function always creates new memory for the target variable.
 
 ```{.python .input}
-y.copyto(mx.gpu()) is y
+y.copyto(npx.gpu()) is y
 ```
 
 ### Watch Out
@@ -125,7 +127,7 @@ Similar to NDArray, Gluon's model can specify devices through the `ctx` paramete
 ```{.python .input  n=12}
 net = nn.Sequential()
 net.add(nn.Dense(1))
-net.initialize(ctx=mx.gpu())
+net.initialize(ctx=npx.gpu())
 ```
 
 When the input is an NDArray on the GPU, Gluon will calculate the result on the same GPU.
