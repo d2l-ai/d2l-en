@@ -93,7 +93,7 @@ $$ \hat{y} = \operatorname*{argmax}_y \> \prod_{i=1}^d p(x_i | y) p(y).$$
 If we can estimate $\prod_i p(x_i=1 | y)$ for every $i$ and $y$, and save its value in $P_{xy}[i,y]$, here $P_{xy}$ is a $d\times n$ matrix with $n$ being the number of classes and $y\in\{1,\ldots,n\}$. In addition, we estimate $p(y)$ for every $y$ and save it in $P_y[y]$, with $P_y$ a $n$-length vector. Then for any new example $\mathbf x$, we could compute 
 
 $$ \hat{y} = \operatorname*{argmax}_y \> \prod_{i=1}^d P_{xy}[x_i, y]P_y[y],$$
-:label:`eq_naive_bayes_estimation`
+:eqlabel:`eq_naive_bayes_estimation`
 
 for any $y$. So our assumption of conditional independence has taken the complexity of our model from an exponential dependence on the number of features $O(2^dn)$ to a linear dependence, which is $O(dn)$. 
 
@@ -125,7 +125,7 @@ show_images(P_xy, 2, 5);
 
 By visualizing these $10\times 28\times 28$ probabilities (for each pixel for each class) we could get some mean looking digits.  ...
 
-Now we can use :numref:`eq_naive_bayes_estimation` to predict a new image. Given $\mathbf x$, the following functions computes $p(\mathbf x|y)p(y)$ for every $y$. 
+Now we can use :eqref:`eq_naive_bayes_estimation` to predict a new image. Given $\mathbf x$, the following functions computes $p(\mathbf x|y)p(y)$ for every $y$. 
 
 ```{.python .input}
 def bayes_pred(x):
@@ -149,7 +149,7 @@ print('underflow:', a**784)
 print('logrithm is normal:', 784*math.log(a))
 ```
 
-Since the logarithm is an increasing function, so we can rewrite :numref:`eq_naive_bayes_estimation` as 
+Since the logarithm is an increasing function, so we can rewrite :eqref:`eq_naive_bayes_estimation` as 
 
 $$ \hat{y} = \operatorname*{argmax}_y \> \sum_{i=1}^d \log P_{xy}[x_i, y] + \log P_y[y].$$
 
