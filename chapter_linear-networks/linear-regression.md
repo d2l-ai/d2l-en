@@ -166,7 +166,7 @@ start = time.time()
 c = np.zeros(n)
 for i in range(n):
     c[i] = a[i] + b[i]
-time.time() - start
+'%.2f sec' % (time.time() - start)
 ```
 
 Another way to add vectors is to add the vectors directly:
@@ -174,7 +174,7 @@ Another way to add vectors is to add the vectors directly:
 ```{.python .input  n=3}
 start = time.time()
 d = a + b
-time.time() - start
+'%.2f sec' % (time.time() - start)
 ```
 
 Obviously, the latter is vastly faster than the former. Vectorizing code is a good way of getting order of magnitude speedups. Likewise, as we saw above, it also greatly simplifies the mathematics and with it, it reduces the potential for errors in the notation.
