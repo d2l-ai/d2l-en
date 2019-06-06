@@ -3,7 +3,8 @@ from .train import evaluate_accuracy
 from mxnet import autograd
 from ..data import get_fashion_mnist_labels
 
-__all__  = ['sgd', 'squared_loss', 'train_epoch_ch3', 'train_ch3', 'predict_ch3']
+__all__  = ['sgd', 'squared_loss', 'train_epoch_ch3', 'train_ch3',
+            'predict_ch3', 'evaluate_loss']
 
 def sgd(params, lr, batch_size):
     """Mini-batch stochastic gradient descent."""
@@ -16,6 +17,15 @@ def squared_loss(y_hat, y):
 
 def accuracy(y_hat, y):
     return (y_hat.argmax(axis=1) == y.astype('float32')).sum().asscalar()
+
+def evaluate_loss(net, data_iter, loss):
+    """Evaluate the loss of a model on the given dataset"""
+    l, n = 0.0, 0
+    for X, y in data_iter:
+        l += loss(net(X), y).sum().asscalar()
+        n += X.shape[0]
+    return l / n
+
 
 def train_epoch_ch3(net, train_iter, loss, updater):
     train_l_sum, train_acc_sum, n = 0.0, 0.0, 0

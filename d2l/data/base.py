@@ -3,8 +3,20 @@ import random
 import numpy as np
 import zipfile
 import collections
-from mxnet import nd
+from mxnet import nd, gluon
 from mxnet.gluon import utils as gutils, data as gdata
+
+def synthetic_data(w, b, num_examples):
+    """generate y = X w + b + noise"""
+    features = nd.random.normal(scale=1, shape=(num_examples, len(w)))
+    labels = nd.dot(features, w) + b
+    labels += nd.random.normal(scale=0.01, shape=labels.shape)
+    return features, labels
+
+def load_array(features, labels, batch_size, is_train=True):
+    """Construct a Gluon data loader"""
+    dataset = gluon.data.ArrayDataset(features, labels)
+    return gluon.data.DataLoader(dataset, batch_size, shuffle=is_train)
 
 def data_iter_consecutive(corpus_indices, batch_size, num_steps, ctx=None):
     """Sample mini-batches in a consecutive order from sequential data."""

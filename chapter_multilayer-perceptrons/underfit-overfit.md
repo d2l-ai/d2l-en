@@ -463,9 +463,10 @@ features[:2], poly_features[:2], labels[:2]
 
 ### Defining, Training and Testing Model
 
-Let first implement a function to evaluate the loss on a given data. 
+Let first implement a function to evaluate the loss on a given data.
 
 ```{.python .input}
+# This function has been saved in the d2l package for future use.
 def evaluate_loss(net, data_iter, loss):
     """Evaluate the loss of a model on the given dataset"""
     l, n = 0.0, 0
@@ -475,7 +476,7 @@ def evaluate_loss(net, data_iter, loss):
     return l / n
 ```
 
-Now define the training function. 
+Now define the training function.
 
 ```{.python .input  n=5}
 def train(train_features, test_features, train_labels, test_labels, 
@@ -487,11 +488,9 @@ def train(train_features, test_features, train_labels, test_labels,
     net.add(nn.Dense(1, use_bias=False))
     net.initialize()
     batch_size = min(10, train_labels.shape[0])
-    train_iter = gluon.data.DataLoader(gluon.data.ArrayDataset(
-        train_features, train_labels), batch_size, shuffle=True)
-    test_iter = gluon.data.DataLoader(gluon.data.ArrayDataset(
-        test_features, test_labels), batch_size)    
-    trainer = gluon.Trainer(net.collect_params(), 'sgd',
+    train_iter = d2l.load_array(train_features, train_labels, batch_size)
+    test_iter = d2l.load_array(test_features, test_labels, batch_size, False)
+    trainer = gluon.Trainer(net.collect_params(), 'sgd', 
                             {'learning_rate': 0.01})
     train_ls, test_ls = [], []
     d2l.use_svg_display()
