@@ -1,8 +1,9 @@
-from ..figure import use_svg_display, plt, plot, show
+from ..figure import use_svg_display, plt, plot, show, show_images
 from .train import evaluate_accuracy
 from mxnet import autograd
+from ..data import get_fashion_mnist_labels
 
-__all__  = ['sgd', 'squared_loss', 'train_ch3']
+__all__  = ['sgd', 'squared_loss', 'train_ch3', 'predict_ch3']
 
 def sgd(params, lr, batch_size):
     """Mini-batch stochastic gradient descent."""
@@ -41,5 +42,14 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
         legend = ['train loss', 'train acc', 'test acc']
         res = list(map(list, zip(*trains)))+[test_accs,]
         plot(list(range(1, epoch+2)), res, 'epoch', legend=legend,
-             xlim=[0,num_epochs+1], ylim=[0.4, 0.9], axes=ax)
+             xlim=[0,num_epochs+1], ylim=[0.3, 0.9], axes=ax)
         show(fig)
+
+def predict_ch3(net, test_iter, n=9):
+    for X, y in test_iter:
+        break
+    trues = get_fashion_mnist_labels(y.asnumpy())
+    preds = get_fashion_mnist_labels(net(X).argmax(axis=1).asnumpy())
+    titles = [true+'\n'+ pred for true, pred in zip(trues, preds)]
+    show_images(X[0:n].reshape((n,28,28)), 1, n, titles=titles[0:n])
+    plt.show()

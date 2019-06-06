@@ -293,7 +293,7 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
         legend = ['train loss', 'train acc', 'test acc']
         res = list(map(list, zip(*trains)))+[test_accs,]
         plot(list(range(1, epoch+2)), res, 'epoch', legend=legend, 
-             xlim=[0,num_epochs+1], ylim=[0.4, 0.9], axes=ax)
+             xlim=[0,num_epochs+1], ylim=[0.3, 0.9], axes=ax)
         show(fig)
 ```
 
@@ -320,14 +320,16 @@ Given a series of images, we will compare their actual labels
 (second line of text output).
 
 ```{.python .input}
-for X, y in test_iter:
-    break
+# This function has been saved in the d2l package for future use
+def predict_ch3(net, test_iter, n=9):
+    for X, y in test_iter:
+        break
+    trues = d2l.get_fashion_mnist_labels(y.asnumpy())
+    preds = d2l.get_fashion_mnist_labels(net(X).argmax(axis=1).asnumpy())
+    titles = [true+'\n'+ pred for true, pred in zip(trues, preds)]
+    d2l.show_images(X[0:n].reshape((n,28,28)), 1, n, titles=titles[0:n])
     
-n = 9
-true_labels = d2l.get_fashion_mnist_labels(y.asnumpy())
-pred_labels = d2l.get_fashion_mnist_labels(net(X).argmax(axis=1).asnumpy())
-titles = [true + '\n' + pred for true, pred in zip(true_labels, pred_labels)]
-d2l.show_images(X[0:n].reshape((n,28,28)), 1, n, titles=titles[0:n]);
+predict_ch3(net, test_iter)
 ```
 
 ## Summary
