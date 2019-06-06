@@ -1,36 +1,25 @@
 # Image Classification Data (Fashion-MNIST)
 :label:`chapter_fashion_mnist`
 
-Before we implement softmax regression ourselves, let's pick a real dataset to work with. To make things visually compelling, we will pick an image classification dataset. The most commonly used image classification data set is the [MNIST](http://yann.lecun.com/exdb/mnist/) handwritten digit recognition data set, proposed by LeCun, Cortes and Burges in the 1990s. However, even simple models achieve classification accuracy over 95% on MNIST, so it is hard to spot the differences between better models and weaker ones. In order to get a better intuition, we will use the qualitatively similar, but comparatively complex [Fashion-MNIST](https://github.com/zalandoresearch/fashion-mnist) dataset, proposed by [Xiao, Rasul and Vollgraf](https://arxiv.org/abs/1708.07747) in 2017.
+In :numref:`chapter_naive_bayes` we trained a naive Bayes classifier on MNIST :cite:`LeCun.Bottou.Bengio.ea.1998` introduced in 1998. Despite its popularity, MNIST is considered as a simple dataset, on which even  simple models achieve classification accuracy over 95%. It is hard to spot the differences between better models and weaker ones. In order to get a better intuition, we will use the qualitatively similar, but comparatively complex Fashion-MNIS dataset :cite:`Xiao.Rasul.Vollgraf.2017` came out in 2017.
 
 ## Getting the Data
 
 First, import the packages or modules required in this section.
 
 ```{.python .input}
-import sys
-sys.path.insert(0, '..')
-
 %matplotlib inline
 import d2l
-from mxnet.gluon import data as gdata
+from mxnet import gluon 
 import time
+import sys
 ```
 
-Conveniently, Gluon's `data` package provides easy access
-to a number of benchmark datasets for testing our models.
-The first time we invoke `data.vision.FashionMNIST(train=True)`
-to collect the training data,
-Gluon will automatically retrieve the dataset via our Internet connection.
-Subsequently, Gluon will use the already-downloaded local copy.
-We specify whether we are requesting the training set or the test set
-by setting the value of the parameter `train` to `True` or `False`, respectively.
-Recall that we will only be using the training data for training,
-holding out the test set for a final evaluation of our model.
+Again, Gluon provides a similar `FashionMNIST` class to download and load this dataset. 
 
 ```{.python .input  n=23}
-mnist_train = gdata.vision.FashionMNIST(train=True)
-mnist_test = gdata.vision.FashionMNIST(train=False)
+mnist_train = gluon.data.vision.FashionMNIST(train=True)
+mnist_test = gluon.data.vision.FashionMNIST(train=False)
 ```
 
 The number of images for each category in the training set and the testing set is 6,000 and 1,000, respectively. Since there are 10 categories, the numbers of examples in the training set and the test set are 60,000 and 10,000, respectively.
@@ -39,23 +28,7 @@ The number of images for each category in the training set and the testing set i
 len(mnist_train), len(mnist_test)
 ```
 
-We can access any example by indexing into the dataset using square brackets `[]`. In the following code, we access the image and label corresponding to the first example.
-
-```{.python .input  n=24}
-feature, label = mnist_train[0]
-```
-
-Our example, stored here in the variable `feature` corresponds to an image with a height and width of 28 pixels. Each pixel is an 8-bit unsigned integer (uint8) with values between 0 and 255. It is stored in a 3D NDArray. Its last dimension is the number of channels. Since the data set is a grayscale image, the number of channels is 1. When we encounter color, images, we'll have 3 channels for red, green, and blue. To keep things simple, we will record the shape of the image with the height and width of $h$ and $w$ pixels, respectively, as $h \times w$ or `(h, w)`.
-
-```{.python .input}
-feature.shape, feature.dtype
-```
-
-The label of each image is represented as a scalar in NumPy. Its type is a 32-bit integer.
-
-```{.python .input}
-label, type(label), label.dtype
-```
+Please refer to :numref:`chapter_naive_bayes` for more detailed explanations about accessing these examples and the example format. 
 
 There are 10 categories in Fashion-MNIST: t-shirt, trousers, pullover, dress, coat, sandal, shirt, sneaker, bag and ankle boot. The following function can convert a numeric label into a corresponding text label.
 
@@ -67,26 +40,11 @@ def get_fashion_mnist_labels(labels):
     return [text_labels[int(i)] for i in labels]
 ```
 
-The following defines a function that can draw multiple images and corresponding labels in a single line.
+Next, let's take a look at the image contents and text labels for the first few examples in the training data set.
 
 ```{.python .input}
-# This function has been saved in the d2l package for future use
-def show_fashion_mnist(images, labels):
-    d2l.use_svg_display()
-    # Here _ means that we ignore (not use) variables
-    _, figs = d2l.plt.subplots(1, len(images), figsize=(12, 12))
-    for f, img, lbl in zip(figs, images, labels):
-        f.imshow(img.reshape((28, 28)).asnumpy())
-        f.set_title(lbl)
-        f.axes.get_xaxis().set_visible(False)
-        f.axes.get_yaxis().set_visible(False)
-```
-
-Next, let's take a look at the image contents and text labels for the first nine examples in the training data set.
-
-```{.python .input  n=27}
-X, y = mnist_train[0:9]
-show_fashion_mnist(X, get_fashion_mnist_labels(y))
+X, y = mnist_train[:18]
+d2l.show_images(X.squeeze(axis=-1), 2, 9, titles=get_fashion_mnist_labels(y));
 ```
 
 ## Reading a Minibatch
@@ -95,24 +53,30 @@ To make our life easier when reading from the training and test sets we use a `D
 
 In practice, reading data can often be a significant performance bottleneck for training, especially when the model is simple or when the computer is fast. A handy feature of Gluon's `DataLoader` is the ability to use multiple processes to speed up data reading (not currently supported on Windows). For instance, we can set aside 4 processes to read the data (via `num_workers`).
 
-In addition, we convert the image data from uint8 to 32-bit floating point numbers using the `ToTensor` class. Beyond that we divide all numbers by 255 so that all pixels have values between 0 and 1. The `ToTensor` class also moves the image channel from the last dimension to the first dimension to facilitate the convolutional neural network calculations introduced later. Through the `transform_first` function of the data set, we apply the transformation of `ToTensor` to the first element of each data example (image and label), i.e., the image.
+
+
+```{.python .input}
+# This function is saved in the d2l package for future use. 
+def get_dataloader_workers(num_workers=4):
+    # 0 means no additional process is used to speed up the reading of data.
+    if sys.platform.startswith('win'):
+        return 0
+    else:
+        return num_workers
+```
+
+In addition, we convert the image data from uint8 to 32-bit floating point numbers using the `ToTensor` class. Beyond that, it will divide all numbers by 255 so that all pixels have values between 0 and 1. The `ToTensor` class also moves the image channel from the last dimension to the first dimension to facilitate the convolutional neural network calculations introduced later. Through the `transform_first` function of the data set, we apply the transformation of `ToTensor` to the first element of each data example (image and label), i.e., the image.
 
 ```{.python .input  n=28}
 batch_size = 256
-transformer = gdata.vision.transforms.ToTensor()
-if sys.platform.startswith('win'):
-    # 0 means no additional processes are needed to speed up the reading of
-    # data
-    num_workers = 0
-else:
-    num_workers = 4
+transformer = gluon.data.vision.transforms.ToTensor()
 
-train_iter = gdata.DataLoader(mnist_train.transform_first(transformer),
-                              batch_size, shuffle=True,
-                              num_workers=num_workers)
-test_iter = gdata.DataLoader(mnist_test.transform_first(transformer),
-                             batch_size, shuffle=False,
-                             num_workers=num_workers)
+train_iter = gluon.data.DataLoader(mnist_train.transform_first(transformer),
+                                   batch_size, shuffle=True,
+                                   num_workers=get_dataloader_workers())
+test_iter = gluon.data.DataLoader(mnist_test.transform_first(transformer),
+                                  batch_size, shuffle=False,
+                                  num_workers=get_dataloader_workers())
 ```
 
 The logic that we will use to obtain and read the Fashion-MNIST data set is
