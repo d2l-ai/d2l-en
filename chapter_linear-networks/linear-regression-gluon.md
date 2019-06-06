@@ -13,9 +13,8 @@ data iterators, loss functions, model architectures, and optimizers,
 are so common, deep learning libraries will give us
 library functions for these as well.
 
-In this section, we will introduce Gluon, MXNet's high-level interface
-for implementing neural networks and show how we can implement
-the linear regression model from the previous section much more concisely.
+We have used Gluon to load the MNIST dataset in :label:`chapter_naive_bayes`. In this section, we will how we can implement
+the linear regression model in :numref:`chapter_linear_scratch` much more concisely with Gluon.
 
 ## Generating Data Sets
 
@@ -85,7 +84,6 @@ In this example, since our model consists of only one layer,
 we do not really need `Sequential`.
 But since nearly all of our future models will involve multiple layers,
 let's get into the habit early.
-
 
 ```{.python .input  n=5}
 from mxnet.gluon import nn
