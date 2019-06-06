@@ -3,7 +3,7 @@ from .train import evaluate_accuracy
 from mxnet import autograd
 from ..data import get_fashion_mnist_labels
 
-__all__  = ['sgd', 'squared_loss', 'train_ch3', 'predict_ch3']
+__all__  = ['sgd', 'squared_loss', 'train_epoch_ch3', 'train_ch3', 'predict_ch3']
 
 def sgd(params, lr, batch_size):
     """Mini-batch stochastic gradient descent."""
