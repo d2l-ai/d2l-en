@@ -248,7 +248,7 @@ to update the code and runtime environment.
 
 At times, to avoid unnecessary repetition,
 we encapsulate the frequently-imported and referred-to functions, classes, etc.
-in this book in the `d2l` package. For the first time to use them, we will use `d2l.show_source` to print its definition. For example: 
+in this book in the `d2l` package. For the first time to use a function or a class, we will use `d2l.show_source` to print its source codes. For example: 
 
 ```{.python .input  n=1}
 import d2l
