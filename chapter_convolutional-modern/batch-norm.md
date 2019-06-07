@@ -160,11 +160,8 @@ Consequently, BN behaves differently during training and at test time
 Next, we will implement the batch normalization layer with NDArray from scratch:
 
 ```{.python .input  n=72}
-import sys
-sys.path.insert(0, '..')
-
 import d2l
-from mxnet import autograd, gluon, init, nd
+from mxnet import autograd, gluon, nd
 from mxnet.gluon import nn
 
 def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
@@ -287,12 +284,9 @@ The code is virtually identical to that in previous steps.
 The main difference is the considerably larger learning rate.
 
 ```{.python .input  n=77}
-lr, num_epochs, batch_size, ctx = 1.0, 5, 256, d2l.try_gpu()
-net.initialize(ctx=ctx, init=init.Xavier())
-trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
+lr, num_epochs, batch_size = 1.0, 5, 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
-d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,
-              num_epochs)
+d2l.train_ch5(net, train_iter, test_iter, batch_size, num_epochs, lr)
 ```
 
 Let's have a look at the scale parameter `gamma` 
@@ -343,12 +337,8 @@ vs our custom implementation,
 which must be interpreted by Python.
 
 ```{.python .input}
-net.initialize(ctx=ctx, init=init.Xavier())
-trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
-d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,
-              num_epochs)
+d2l.train_ch5(net, train_iter, test_iter, batch_size, num_epochs, lr)
 ```
-
 
 ## Controversy
 

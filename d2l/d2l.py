@@ -1,3 +1,6 @@
+import sys
+d2l = sys.modules[__name__]
+
 # Defined in file: ./chapter_preface/preface.md
 from IPython import display
 import os
@@ -5,6 +8,7 @@ import sys
 from matplotlib import pyplot as plt
 from mxnet import nd, autograd, gluon, init, context
 from mxnet.gluon import nn
+import time
 
 # Defined in file: ./chapter_crashcourse/probability.md
 def use_svg_display():
@@ -187,8 +191,7 @@ def evaluate_accuracy(net, data_iter):
     return acc_sum.asscalar() / n
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
-def train_epoch_ch5(net, train_iter, batch_size, trainer, ctx):
-    loss = gluon.loss.SoftmaxCrossEntropyLoss()
+def train_epoch_ch5(net, train_iter, batch_size, loss, trainer, ctx):
     train_l_sum, train_acc_sum, n = 0.0, 0.0, 0
     for X, y in train_iter:
         # Here is the only difference compared to train_epoch_ch3
@@ -204,15 +207,19 @@ def train_epoch_ch5(net, train_iter, batch_size, trainer, ctx):
     return train_l_sum / n, train_acc_sum / n
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
-def train_ch5(net, train_iter, test_iter, batch_size, trainer, num_epochs, 
+def train_ch5(net, train_iter, test_iter, batch_size, num_epochs, lr, 
               ctx=d2l.try_gpu()):
+    net.initialize(force_reinit=True, ctx=ctx, init=init.Xavier())
+    loss = gluon.loss.SoftmaxCrossEntropyLoss()
+    trainer = gluon.Trainer(net.collect_params(),
+                            'sgd', {'learning_rate': lr})
     trains, test_accs = [], []
     d2l.use_svg_display()
     fig, ax = d2l.plt.subplots(figsize=(4, 3))
     start = time.time()
     for epoch in range(num_epochs):
         trains.append(train_epoch_ch5(
-            net, train_iter, batch_size, trainer, ctx))
+            net, train_iter, batch_size, loss, trainer, ctx))
         test_accs.append(evaluate_accuracy(net, test_iter))
         legend = ['train loss', 'train acc', 'test acc']
         res = list(map(list, zip(*trains)))+[test_accs,]
@@ -222,5 +229,3 @@ def train_ch5(net, train_iter, test_iter, batch_size, trainer, num_epochs,
     print('Done in %d sec on %s, loss %.3f, train acc %.3f, test acc %.3f'%(
         time.time()-start, ctx, *trains[-1], test_accs[-1]))
 
-import sys
-d2l = sys.modules[__name__]

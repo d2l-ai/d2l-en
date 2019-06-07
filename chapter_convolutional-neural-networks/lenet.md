@@ -204,8 +204,7 @@ prior to making the forward and backward passes.
 
 ```{.python .input}
 # Save to the d2l package.
-def train_epoch_ch5(net, train_iter, batch_size, trainer, ctx):
-    loss = gluon.loss.SoftmaxCrossEntropyLoss()
+def train_epoch_ch5(net, train_iter, batch_size, loss, trainer, ctx):
     train_l_sum, train_acc_sum, n = 0.0, 0.0, 0
     for X, y in train_iter:
         # Here is the only difference compared to train_epoch_ch3
@@ -221,19 +220,27 @@ def train_epoch_ch5(net, train_iter, batch_size, trainer, ctx):
     return train_l_sum / n, train_acc_sum / n
 ```
 
-The training function `train_ch5` is also very similar to `train_ch3` defined in :numref:`chapter_softmax_scratch`. Since we will deal with networks with tens of layers now, the function will only support Gluon models. 
+The training function `train_ch5` is also very similar to `train_ch3` defined in :numref:`chapter_softmax_scratch`. Since we will deal with networks with tens of layers now, the function will only support Gluon models. We initialize the model parameters on the device indicated by `ctx`,
+this time using the Xavier initializer.
+The loss function and the training algorithm
+still use the cross-entropy loss function
+and mini-batch stochastic gradient descent.
 
 ```{.python .input}
 # Save to the d2l package.
-def train_ch5(net, train_iter, test_iter, batch_size, trainer, num_epochs, 
+def train_ch5(net, train_iter, test_iter, batch_size, num_epochs, lr, 
               ctx=d2l.try_gpu()):
+    net.initialize(force_reinit=True, ctx=ctx, init=init.Xavier())
+    loss = gluon.loss.SoftmaxCrossEntropyLoss()
+    trainer = gluon.Trainer(net.collect_params(),
+                            'sgd', {'learning_rate': lr})
     trains, test_accs = [], []
     d2l.use_svg_display()
     fig, ax = d2l.plt.subplots(figsize=(4, 3))
     start = time.time()
     for epoch in range(num_epochs):
         trains.append(train_epoch_ch5(
-            net, train_iter, batch_size, trainer, ctx))
+            net, train_iter, batch_size, loss, trainer, ctx))
         test_accs.append(evaluate_accuracy(net, test_iter))
         legend = ['train loss', 'train acc', 'test acc']
         res = list(map(list, zip(*trains)))+[test_accs,]
@@ -244,17 +251,11 @@ def train_ch5(net, train_iter, test_iter, batch_size, trainer, num_epochs,
         time.time()-start, ctx, *trains[-1], test_accs[-1]))
 ```
 
-We initialize the model parameters on the device indicated by `ctx`,
-this time using the Xavier initializer.
-The loss function and the training algorithm
-still use the cross-entropy loss function
-and mini-batch stochastic gradient descent.
+Now let's train the model.
 
 ```{.python .input}
 lr, num_epochs = 0.9, 10
-net.initialize(force_reinit=True, ctx=d2l.try_gpu(), init=init.Xavier())
-trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
-train_ch5(net, train_iter, test_iter, batch_size, trainer, num_epochs)
+train_ch5(net, train_iter, test_iter, batch_size, num_epochs, lr)
 ```
 
 ## Summary
