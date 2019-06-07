@@ -46,7 +46,8 @@ sys.path.insert(0, '..')
 %matplotlib inline
 import d2l
 import math
-from mxnet import nd
+from mxnet import nd, np, npx
+npx.set_np()
 
 def adagrad_2d(x1, x2, s1, s2):
     # The first two terms are the independent variable gradients
@@ -79,15 +80,15 @@ Like the momentum method, Adagrad needs to maintain a state variable of the same
 features, labels = d2l.get_data_ch7()
 
 def init_adagrad_states():
-    s_w = nd.zeros((features.shape[1], 1))
-    s_b = nd.zeros(1)
+    s_w = np.zeros((features.shape[1], 1))
+    s_b = np.zeros(1)
     return (s_w, s_b)
 
 def adagrad(params, states, hyperparams):
     eps = 1e-6
     for p, s in zip(params, states):
-        s[:] += p.grad.square()
-        p[:] -= hyperparams['lr'] * p.grad / (s + eps).sqrt()
+        s[:] += np.square(p.grad)
+        p[:] -= hyperparams['lr'] * p.grad / np.sqrt(s + eps)
 ```
 
 Compared with the experiment in :numref:`chapter_minibatch_sgd`, here, we use a
