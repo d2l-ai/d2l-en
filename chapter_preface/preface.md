@@ -220,6 +220,7 @@ below.  The arrows provide a graph of prerequisites:
 
 
 ### Code
+:label:`chapter_code`
 
 Most sections of this book feature executable code.
 We recognize the importance of an interactive learning experience in deep learning.
@@ -238,15 +239,39 @@ Most of the code in this book is based on Apache MXNet.
 MXNet is an open-source framework for deep learning
 and the preferred choice of AWS (Amazon Web Services),
 as well as many colleges and companies.
-All of the code in this book has passed tests under MXNet 1.2.0.
+All of the code in this book has passed tests under the newest MXNet version.
 However, due to the rapid development of deep learning,
 some code *in the print edition* may not work properly in future versions of MXNet.
 However, we plan to keep the online version remain up-to-date.
 In case of such problems, please consult :ref:`chapter_installation`
 to update the code and runtime environment.
+
 At times, to avoid unnecessary repetition,
 we encapsulate the frequently-imported and referred-to functions, classes, etc.
-in this book in the `d2l` package.
+in this book in the `d2l` package. For the first time to use them, we will use `d2l.show_source` to print its definition. For example: 
+
+```{.python .input  n=1}
+import d2l
+
+d2l.show_source(d2l.show_source)
+```
+
+```{.json .output n=1}
+[
+ {
+  "data": {
+   "text/html": "<style type=\"text/css\">.highlight .hll { background-color: #ffffcc }\n.highlight  { background: #f8f8f8; }\n.highlight .c { color: #408080; font-style: italic } /* Comment */\n.highlight .err { border: 1px solid #FF0000 } /* Error */\n.highlight .k { color: #008000; font-weight: bold } /* Keyword */\n.highlight .o { color: #666666 } /* Operator */\n.highlight .ch { color: #408080; font-style: italic } /* Comment.Hashbang */\n.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */\n.highlight .cp { color: #BC7A00 } /* Comment.Preproc */\n.highlight .cpf { color: #408080; font-style: italic } /* Comment.PreprocFile */\n.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */\n.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */\n.highlight .gd { color: #A00000 } /* Generic.Deleted */\n.highlight .ge { font-style: italic } /* Generic.Emph */\n.highlight .gr { color: #FF0000 } /* Generic.Error */\n.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */\n.highlight .gi { color: #00A000 } /* Generic.Inserted */\n.highlight .go { color: #888888 } /* Generic.Output */\n.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */\n.highlight .gs { font-weight: bold } /* Generic.Strong */\n.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */\n.highlight .gt { color: #0044DD } /* Generic.Traceback */\n.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */\n.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */\n.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */\n.highlight .kp { color: #008000 } /* Keyword.Pseudo */\n.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */\n.highlight .kt { color: #B00040 } /* Keyword.Type */\n.highlight .m { color: #666666 } /* Literal.Number */\n.highlight .s { color: #BA2121 } /* Literal.String */\n.highlight .na { color: #7D9029 } /* Name.Attribute */\n.highlight .nb { color: #008000 } /* Name.Builtin */\n.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */\n.highlight .no { color: #880000 } /* Name.Constant */\n.highlight .nd { color: #AA22FF } /* Name.Decorator */\n.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */\n.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */\n.highlight .nf { color: #0000FF } /* Name.Function */\n.highlight .nl { color: #A0A000 } /* Name.Label */\n.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */\n.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */\n.highlight .nv { color: #19177C } /* Name.Variable */\n.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */\n.highlight .w { color: #bbbbbb } /* Text.Whitespace */\n.highlight .mb { color: #666666 } /* Literal.Number.Bin */\n.highlight .mf { color: #666666 } /* Literal.Number.Float */\n.highlight .mh { color: #666666 } /* Literal.Number.Hex */\n.highlight .mi { color: #666666 } /* Literal.Number.Integer */\n.highlight .mo { color: #666666 } /* Literal.Number.Oct */\n.highlight .sa { color: #BA2121 } /* Literal.String.Affix */\n.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */\n.highlight .sc { color: #BA2121 } /* Literal.String.Char */\n.highlight .dl { color: #BA2121 } /* Literal.String.Delimiter */\n.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */\n.highlight .s2 { color: #BA2121 } /* Literal.String.Double */\n.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */\n.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */\n.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */\n.highlight .sx { color: #008000 } /* Literal.String.Other */\n.highlight .sr { color: #BB6688 } /* Literal.String.Regex */\n.highlight .s1 { color: #BA2121 } /* Literal.String.Single */\n.highlight .ss { color: #19177C } /* Literal.String.Symbol */\n.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */\n.highlight .fm { color: #0000FF } /* Name.Function.Magic */\n.highlight .vc { color: #19177C } /* Name.Variable.Class */\n.highlight .vg { color: #19177C } /* Name.Variable.Global */\n.highlight .vi { color: #19177C } /* Name.Variable.Instance */\n.highlight .vm { color: #19177C } /* Name.Variable.Magic */\n.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */</style><div class=\"highlight\"><pre><span></span><span class=\"k\">def</span> <span class=\"nf\">show_source</span><span class=\"p\">(</span><span class=\"n\">obj</span><span class=\"p\">):</span>\n    <span class=\"sd\">&quot;&quot;&quot;Show the source codes &quot;&quot;&quot;</span>\n    <span class=\"n\">code</span> <span class=\"o\">=</span> <span class=\"n\">inspect</span><span class=\"o\">.</span><span class=\"n\">getsource</span><span class=\"p\">(</span><span class=\"n\">obj</span><span class=\"p\">)</span>\n    <span class=\"n\">formatter</span> <span class=\"o\">=</span> <span class=\"n\">pygments</span><span class=\"o\">.</span><span class=\"n\">formatters</span><span class=\"o\">.</span><span class=\"n\">HtmlFormatter</span><span class=\"p\">()</span>\n    <span class=\"k\">return</span> <span class=\"n\">IPython</span><span class=\"o\">.</span><span class=\"n\">display</span><span class=\"o\">.</span><span class=\"n\">HTML</span><span class=\"p\">(</span><span class=\"s1\">&#39;&lt;style type=&quot;text/css&quot;&gt;{}&lt;/style&gt;{}&#39;</span><span class=\"o\">.</span><span class=\"n\">format</span><span class=\"p\">(</span>\n        <span class=\"n\">formatter</span><span class=\"o\">.</span><span class=\"n\">get_style_defs</span><span class=\"p\">(</span><span class=\"s1\">&#39;.highlight&#39;</span><span class=\"p\">),</span>\n        <span class=\"n\">pygments</span><span class=\"o\">.</span><span class=\"n\">highlight</span><span class=\"p\">(</span><span class=\"n\">code</span><span class=\"p\">,</span> <span class=\"n\">pygments</span><span class=\"o\">.</span><span class=\"n\">lexers</span><span class=\"o\">.</span><span class=\"n\">PythonLexer</span><span class=\"p\">(),</span> <span class=\"n\">formatter</span><span class=\"p\">)))</span>\n</pre></div>\n",
+   "text/plain": "<IPython.core.display.HTML object>"
+  },
+  "execution_count": 1,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
+```
+
+
+
 We give a detailed overview of these functions and classes in :numref:`chapter_d2l`.
 
 
