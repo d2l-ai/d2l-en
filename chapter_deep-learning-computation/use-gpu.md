@@ -31,10 +31,33 @@ Note that this might be extravagant for most desktop computers but it is easily 
 MXNet can specify devices, such as CPUs and GPUs, for storage and calculation. By default, MXNet creates data in the main memory and then uses the CPU to calculate it. In MXNet, the CPU and GPU can be indicated by `cpu()` and `gpu()`. It should be noted that `cpu()` (or any integer in the parentheses) means all physical CPUs and memory. This means that MXNet's calculations will try to use all CPU cores. However, `gpu()` only represents one graphic card and the corresponding graphic memory. If there are multiple GPUs, we use `gpu(i)` to represent the $i$-th GPU ($i$ starts from 0). Also, `gpu(0)` and `gpu()` are equivalent.
 
 ```{.python .input}
-from mxnet import nd, context as ctx
+from mxnet import nd, context 
 from mxnet.gluon import nn
 
-ctx.cpu(), ctx.gpu(), ctx.gpu(1)
+context.cpu(), context.gpu(), context.gpu(1)
+```
+
+We can query the number of available GPUs through `num_gpus()`.
+
+```{.python .input}
+context.num_gpus()
+```
+
+Now we define two convenient functions that allows us to run codes even if the requested GPUs do not exist. 
+
+```{.python .input}
+# Save to the d2l package.
+def try_gpu(i=0):
+    """Return gpu(i) if exists, otherwise return cpu()."""
+    return context.gpu(i) if context.num_gpus() >= i else context.cpu()
+
+# Save to the d2l package.
+def try_all_gpus():
+    """Return all available GPUs, or [cpu(),] if no GPU exists."""
+    ctxes = [context.gpu(i) for i in range(context.num_gpus())]
+    return ctxes if ctxes else [context.cpu()]
+        
+try_gpu(), try_gpu(3), try_all_gpus()
 ```
 
 ## NDArray and GPUs
@@ -57,14 +80,14 @@ x.context
 There are several ways to store an NDArray on the GPU. For example, we can specify a storage device with the `ctx` parameter when creating an NDArray. Next, we create the NDArray variable `a` on `gpu(0)`. Notice that when printing `a`, the device information becomes `@gpu(0)`. The NDArray created on a GPU only consumes the memory of this GPU. We can use the `nvidia-smi` command to view GPU memory usage. In general, we need to make sure we do not create data that exceeds the GPU memory limit.
 
 ```{.python .input  n=5}
-x = nd.ones((2, 3), ctx=ctx.gpu())
+x = nd.ones((2, 3), ctx=try_gpu())
 x
 ```
 
 Assuming you have at least two GPUs, the following code will create a random array on `gpu(1)`.
 
 ```{.python .input}
-y = nd.random.uniform(shape=(2, 3), ctx=ctx.gpu(1))
+y = nd.random.uniform(shape=(2, 3), ctx=try_gpu(1))
 y
 ```
 
@@ -77,7 +100,7 @@ If we want to compute $\mathbf{x} + \mathbf{y}$ we need to decide where to perfo
 `copyto` copies the data to another device such that we can add them. Since $\mathbf{y}$ lives on the second GPU we need to move $\mathbf{x}$ there before we can add the two.
 
 ```{.python .input  n=7}
-z = x.copyto(ctx.gpu(1))
+z = x.copyto(try_gpu(1))
 print(x)
 print(z)
 ```
@@ -92,20 +115,20 @@ Imagine that your variable z already lives on your second GPU (gpu(1)). What hap
 There are times where depending on the environment our code is running in, two variables may already live on the same device. So we only want to make a copy if the variables currently lives on different contexts. In these cases, we can call `as_in_context()`. If the variable is already the specified context then this is a no-op. In fact, unless you specifically want to make a copy, `as_in_context()` is the method of choice.
 
 ```{.python .input}
-z = x.as_in_context(ctx.gpu(1))
+z = x.as_in_context(try_gpu(1))
 z
 ```
 
 It is important to note that, if the `context` of the source variable and the target variable are consistent, then the `as_in_context` function causes the target variable and the source variable to share the memory of the source variable.
 
 ```{.python .input  n=8}
-y.as_in_context(ctx.gpu(1)) is y
+y.as_in_context(try_gpu(1)) is y
 ```
 
 The `copyto` function always creates new memory for the target variable.
 
 ```{.python .input}
-y.copyto(ctx.gpu()) is y
+y.copyto(try_gpu(1)) is y
 ```
 
 ### Watch Out
@@ -124,7 +147,7 @@ Similar to NDArray, Gluon's model can specify devices through the `ctx` paramete
 ```{.python .input  n=12}
 net = nn.Sequential()
 net.add(nn.Dense(1))
-net.initialize(ctx=ctx.gpu())
+net.initialize(ctx=try_gpu())
 ```
 
 When the input is an NDArray on the GPU, Gluon will calculate the result on the same GPU.

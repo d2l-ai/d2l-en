@@ -259,7 +259,7 @@ from IPython import display
 import os
 import sys
 from matplotlib import pyplot as plt
-from mxnet import nd, autograd, gluon
+from mxnet import nd, autograd, gluon, init, context
 from mxnet.gluon import nn
 ```
 
