@@ -41,11 +41,13 @@ large numbers tell us that as the number of tosses grows this estimate will draw
 To start, let's import the necessary packages:
 
 ```{.python .input}
-import mxnet as mx
-from mxnet import nd
+%matplotlib inline
+from IPython import display
 import numpy as np
+from mxnet import nd
+import math
 from matplotlib import pyplot as plt
-
+import random
 ```
 
 Next, we'll want to be able to cast the die. In statistics we call this process
@@ -119,23 +121,26 @@ print(estimates[:,100])
 As you can see, after the first toss of the die, we get the extreme estimate
 that one of the numbers will be rolled with probability $1.0$ and that the
 others have probability $0$. After $100$ rolls, things already look a bit more
-reasonable. We can visualize this convergence by using the plotting package
-`matplotlib`. If you don't have it installed, now would be a good time to
-[install it](https://matplotlib.org/).
+reasonable. We can visualize this convergence. 
+
+First we define a function that specifies `matplotlib` to output the SVG figures for sharper images.
 
 ```{.python .input}
-%matplotlib inline
-from matplotlib import pyplot as plt
-from IPython import display
-display.set_matplotlib_formats('svg')
+# Save to the d2l package.
+def use_svg_display():
+    """Use the svg format to display plot in jupyter."""
+    display.set_matplotlib_formats('svg')
+```
 
-plt.figure(figsize=(8, 6))
+Now visualize the data.
+
+```{.python .input}
+use_svg_display()
+plt.figure(figsize=(6, 4))
 for i in range(6):
     plt.plot(estimates[i, :].asnumpy(), label=("P(die=" + str(i) +")"))
-
 plt.axhline(y=0.16666, color='black', linestyle='dashed')
-plt.legend()
-plt.show()
+plt.legend();
 ```
 
 Each solid curve corresponds to one of the six values of the die and gives our estimated probability that the die turns up that value as assessed after each of the 1000 turns. The dashed black line gives the true underlying probability. As we get more data, the solid curves converge towards the true answer.
@@ -226,7 +231,6 @@ That is, the second test allowed us to gain much higher confidence that not all 
 Often, when working with probabilistic models, we'll want not just to estimate distributions from data, but also to generate data by sampling from distributions. One of the simplest ways to sample random numbers is to invoke the `random` method from Python's `random` package.
 
 ```{.python .input}
-import random
 for i in range(10):
     print(random.random())
 ```
@@ -245,9 +249,8 @@ strategy would be to run sampler many times, say 1 million, and then count the
 number of times it generates each value to ensure that the results are approximately uniform.
 
 ```{.python .input}
-import math
 counts = np.zeros(100)
-fig, axes = plt.subplots(2, 3, figsize=(15, 8), sharex=True)
+fig, axes = plt.subplots(2, 3, sharex=True)
 axes = axes.reshape(6)
 # Mangle subplots such that we can index them in a linear fashion rather than
 # a 2D grid
@@ -255,7 +258,6 @@ for i in range(1, 1000001):
     counts[random.randint(0, 99)] += 1
     if i in [10, 100, 1000, 10000, 100000, 1000000]:
         axes[int(math.log10(i))-1].bar(np.arange(1, 101), counts)
-plt.show()
 ```
 
 We can see from these figures that the initial number of counts looks *strikingly* uneven. If we sample fewer than 100 draws from a distribution over
@@ -276,12 +278,10 @@ x = np.arange(1, n+1)
 p0 = np.cumsum(y < 0.35) / x
 p1 = np.cumsum(y >= 0.35) / x
 
-plt.figure(figsize=(15, 8))
 plt.semilogx(x, p0)
 plt.semilogx(x, p1)
 plt.axhline(y=0.35, color='black', linestyle='dashed')
-plt.axhline(y=0.65, color='black', linestyle='dashed')
-plt.show()
+plt.axhline(y=0.65, color='black', linestyle='dashed');
 ```
 
 As we can see, on average, this sampler will generate 35% zeros and 65% ones.
@@ -299,9 +299,7 @@ The standard Normal distribution (aka the standard Gaussian distribution) is giv
 ```{.python .input}
 x = np.arange(-10, 10, 0.01)
 p = (1/math.sqrt(2 * math.pi)) * np.exp(-0.5 * x**2)
-plt.figure(figsize=(10, 5))
-plt.plot(x, p)
-plt.show()
+plt.plot(x, p);
 ```
 
 Sampling from this distribution is less trivial. First off, the support is
@@ -338,13 +336,11 @@ print('mean {}, variance {}'.format(mean, variance))
 y = np.arange(1,10001).reshape(10000,1)
 z = np.cumsum(x,axis=0) / y
 
-plt.figure(figsize=(10,5))
 for i in range(10):
     plt.semilogx(y,z[:,i])
 
 plt.semilogx(y,(variance**0.5) * np.power(y,-0.5) + mean,'r')
-plt.semilogx(y,-(variance**0.5) * np.power(y,-0.5) + mean,'r')
-plt.show()
+plt.semilogx(y,-(variance**0.5) * np.power(y,-0.5) + mean,'r');
 ```
 
 This looks very similar to the initial example, at least in the limit of averages of large numbers of variables. This is confirmed by theory. Denote by

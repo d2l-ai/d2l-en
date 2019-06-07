@@ -6,17 +6,6 @@ import collections
 from mxnet import nd, gluon
 from mxnet.gluon import utils as gutils, data as gdata
 
-def synthetic_data(w, b, num_examples):
-    """generate y = X w + b + noise"""
-    X = nd.random.normal(scale=1, shape=(num_examples, len(w)))
-    y = nd.dot(X, w) + b
-    y += nd.random.normal(scale=0.01, shape=y.shape)
-    return X, y
-
-def load_array(features, labels, batch_size, is_train=True):
-    """Construct a Gluon data loader"""
-    dataset = gluon.data.ArrayDataset(features, labels)
-    return gluon.data.DataLoader(dataset, batch_size, shuffle=is_train)
 
 def data_iter_consecutive(corpus_indices, batch_size, num_steps, ctx=None):
     """Sample mini-batches in a consecutive order from sequential data."""

@@ -248,15 +248,20 @@ to update the code and runtime environment.
 
 At times, to avoid unnecessary repetition,
 we encapsulate the frequently-imported and referred-to functions, classes, etc.
-in this book in the `d2l` package. For the first time to use a function or a class, we will use `d2l.show_source` to print its source codes. For example: 
+in this book in the `d2l` package. For any block block such as a function, a
+class, or multiple imports to be saved in the package, we will mark it with `#
+Save to the d2l package`. For example, these are the packages and modules will
+be used by the `d2l` package.
 
-```{.python .input}
-import d2l
-
-d2l.show_source(d2l.show_source)
+```{.python .input  n=1}
+# Save to the d2l package
+from IPython import display
+import os
+import sys
+from matplotlib import pyplot as plt
+from mxnet import nd, autograd, gluon
+from mxnet.gluon import nn
 ```
-
-
 
 We give a detailed overview of these functions and classes in :numref:`chapter_d2l`.
 

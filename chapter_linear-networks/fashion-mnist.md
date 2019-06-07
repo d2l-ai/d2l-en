@@ -7,7 +7,7 @@ In :numref:`chapter_naive_bayes` we trained a naive Bayes classifier on MNIST :c
 
 First, import the packages or modules required in this section.
 
-```{.python .input}
+```{.python .input  n=7}
 %matplotlib inline
 import d2l
 from mxnet import gluon 
@@ -15,7 +15,7 @@ import time
 import sys
 ```
 
-Again, Gluon provides a similar `FashionMNIST` class to download and load this dataset. 
+Again, Gluon provides a similar `FashionMNIST` class to download and load this dataset.
 
 ```{.python .input  n=23}
 mnist_train = gluon.data.vision.FashionMNIST(train=True)
@@ -33,7 +33,7 @@ Please refer to :numref:`chapter_naive_bayes` for more detailed explanations abo
 There are 10 categories in Fashion-MNIST: t-shirt, trousers, pullover, dress, coat, sandal, shirt, sneaker, bag and ankle boot. The following function can convert a numeric label into a corresponding text label.
 
 ```{.python .input  n=25}
-# This function has been saved in the d2l package for future use
+# Save to the d2l package. 
 def get_fashion_mnist_labels(labels):
     text_labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
                    'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
@@ -53,10 +53,8 @@ To make our life easier when reading from the training and test sets we use a `D
 
 In practice, reading data can often be a significant performance bottleneck for training, especially when the model is simple or when the computer is fast. A handy feature of Gluon's `DataLoader` is the ability to use multiple processes to speed up data reading (not currently supported on Windows). For instance, we can set aside 4 processes to read the data (via `num_workers`).
 
-
-
 ```{.python .input}
-# This function is saved in the d2l package for future use. 
+# Save to the d2l package. 
 def get_dataloader_workers(num_workers=4):
     # 0 means no additional process is used to speed up the reading of data.
     if sys.platform.startswith('win'):
@@ -70,20 +68,10 @@ In addition, we convert the image data from uint8 to 32-bit floating point numbe
 ```{.python .input  n=28}
 batch_size = 256
 transformer = gluon.data.vision.transforms.ToTensor()
-
 train_iter = gluon.data.DataLoader(mnist_train.transform_first(transformer),
                                    batch_size, shuffle=True,
                                    num_workers=get_dataloader_workers())
-test_iter = gluon.data.DataLoader(mnist_test.transform_first(transformer),
-                                  batch_size, shuffle=False,
-                                  num_workers=get_dataloader_workers())
 ```
-
-The logic that we will use to obtain and read the Fashion-MNIST data set is
-encapsulated in the `d2l.load_data_fashion_mnist` function, which we will use in
-later chapters. This function will return two variables, `train_iter` and
-`test_iter`. As the content of this book continues to deepen, we will further
-improve this function. Its full implementation will be described in :numref:`chapter_alexnet`.
 
 Let's look at the time it takes to read the training data.
 
@@ -92,6 +80,35 @@ start = time.time()
 for X, y in train_iter:
     continue
 '%.2f sec' % (time.time() - start)
+```
+
+## Put all Things Together 
+
+Now we define the `load_data_fashion_mnist` function that obtains and reads the Fashion-MNIST data set. It returns the data iterators for both the training set and validation set. In addition, it accepts an optional argument to resize images to another shape. 
+
+```{.python .input  n=4}
+# Save to the d2l package. 
+def load_data_fashion_mnist(batch_size, resize=None):
+    """Download the Fashion-MNIST dataset and then load into memory."""
+    dataset = gluon.data.vision
+    trans = [dataset.transforms.Resize(resize)] if resize else []
+    trans.append(dataset.transforms.ToTensor())
+    trans = dataset.transforms.Compose(trans)
+    mnist_train = dataset.FashionMNIST(train=True).transform_first(trans)
+    mnist_test = dataset.FashionMNIST(train=False).transform_first(trans)
+    return (gluon.data.DataLoader(mnist_train, batch_size, shuffle=True,
+                                  num_workers=get_dataloader_workers()),
+            gluon.data.DataLoader(mnist_test, batch_size, shuffle=False,
+                                  num_workers=get_dataloader_workers()))
+```
+
+Verify image resizing works.
+
+```{.python .input  n=5}
+train_iter, test_iter = load_data_fashion_mnist(32, (64, 64))
+for X, y in train_iter:
+    print(X.shape)
+    break
 ```
 
 ## Summary

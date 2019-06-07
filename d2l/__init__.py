@@ -1,3 +1,4 @@
+from .d2l import *
 from .base import *
 from .figure import *
 from .data import *
