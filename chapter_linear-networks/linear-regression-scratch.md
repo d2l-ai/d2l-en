@@ -54,10 +54,10 @@ The following code generates our synthetic dataset:
 # This function is saved in the d2l package for future use.
 def synthetic_data(w, b, num_examples):
     """generate y = X w + b + noise"""
-    features = nd.random.normal(scale=1, shape=(num_examples, len(w)))
-    labels = nd.dot(features, w) + b
-    labels += nd.random.normal(scale=0.01, shape=labels.shape)
-    return features, labels
+    X = nd.random.normal(scale=1, shape=(num_examples, len(w)))
+    y = nd.dot(X, w) + b
+    y += nd.random.normal(scale=0.01, shape=y.shape)
+    return X, y
 
 true_w = nd.array([2, -3.4])
 true_b = 4.2
