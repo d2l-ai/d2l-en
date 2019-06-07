@@ -153,5 +153,14 @@ def predict_ch3(net, test_iter, n=9):
     d2l.show_images(X[0:n].reshape((n,28,28)), 1, n, titles=titles[0:n])
     
 
+# Defined in file: ./chapter_convolutional-neural-networks/conv-layer.md
+def corr2d(X, K):
+    h, w = K.shape
+    Y = nd.zeros((X.shape[0] - h + 1, X.shape[1] - w + 1))
+    for i in range(Y.shape[0]):
+        for j in range(Y.shape[1]):
+            Y[i, j] = (X[i: i + h, j: j + w] * K).sum()
+    return Y
+
 import sys
 d2l = sys.modules[__name__]
