@@ -12,10 +12,8 @@ We begin by importing MXNet and the `ndarray` module from MXNet.
 Here, `nd` is short for `ndarray`.
 
 ```{.python .input  n=1}
-import mxnet as mx
 from mxnet import nd
 ```
-
 
 NDArrays represent (possibly multi-dimensional) arrays of numerical values. NDArrays with one axis correspond (in math-speak) to *vectors*. NDArrays with two axes correspond to *matrices*. For arrays with more than two axes, mathematicians do not have special names---they simply call them *tensors*.
 
