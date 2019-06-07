@@ -3,19 +3,16 @@
 
 Before we worry about complex optimization algorithms or GPUs, we can already deploy our first classifier, relying only on simple statistical estimators and our understanding of conditional independence. Learning is all about making assumptions. If we want to classify a new data point that we've never seen before we have to make some assumptions about which data points are similar to each other. The naive Bayes classifier, a popular and remarkably simple algorithm, assumes all features are independent of each other to simplify the computation. In this chapter, we will apply this model to recognize characters in images.
 
-Let's first import libraries and modules.
+Let's first import libraries and modules. Especially, we import `d2l`, which now contains the function `use_svg_display` we defined in :numref:`chapter_prob`.
 
 ```{.python .input  n=72}
 %matplotlib inline
-# plt has been saved as d2l.plt for future use. 
+import d2l
 from matplotlib import pyplot as plt  
-from IPython import display
 from mxnet import nd, gluon
 import math
 
-# SVG offers sharper plots. It has been saved as d2l.use_svg_display
-# for future use.
-display.set_matplotlib_formats('svg')
+d2l.use_svg_display()
 ```
 
 ## Optical Character Recognition
@@ -56,17 +53,17 @@ The label of each image is represented as a scalar in NumPy. Its type is a 32-bi
 label, type(label), label.dtype
 ```
 
-We can also access multiple examples at the same time. 
+We can also access multiple examples at the same time.
 
 ```{.python .input}
 images, labels = mnist_train[10:38]
 images.shape, labels.shape
 ```
 
- Now let's create a function to visualize these examples.
+Now let's create a function to visualize these examples.
 
 ```{.python .input}
-# This function will be saved in d2l for future usage.
+# Save to the d2l package. 
 def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
     """Plot a list of images."""
     figsize = (num_cols * scale, num_rows * scale)
@@ -196,7 +193,7 @@ py.argmax(axis=0).asscalar() == label
 ```
 
 Now predict a few validation examples, we can see the the Bayes
-classifier works pretty well except for the 9th 16th digits. 
+classifier works pretty well except for the 9th 16th digits.
 
 ```{.python .input}
 def predict(X):

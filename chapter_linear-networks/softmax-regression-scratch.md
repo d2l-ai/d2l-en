@@ -189,6 +189,7 @@ The result is an NDArray containing entries of 0 (false) and 1 (true).
 Taking the mean yields the desired result.
 
 ```{.python .input  n=17}
+# Save to the d2l package. 
 def accuracy(y_hat, y):
     return (y_hat.argmax(axis=1) == y.astype('float32')).sum().asscalar()
 ```
@@ -212,8 +213,7 @@ Similarly, we can evaluate the accuracy for model `net` on the data set
 (accessed via `data_iter`).
 
 ```{.python .input  n=19}
-# The function will be gradually improved: the complete implementation will be
-# discussed in the "Image Augmentation" section
+# Save to the d2l package. 
 def evaluate_accuracy(data_iter, net):
     acc_sum, n = 0.0, 0
     for X, y in data_iter:
@@ -235,9 +235,10 @@ evaluate_accuracy(test_iter, net)
 
 The training loop for softmax regression should look strikingly familiar
 if you read through our implementation
-of linear regression in :numref:`chapter_linear_scratch`. Here we refactor the implementation to make it reusable. First, we define a function to train for one data epoch. 
+of linear regression in :numref:`chapter_linear_scratch`. Here we refactor the implementation to make it reusable. First, we define a function to train for one data epoch.
 
 ```{.python .input}
+# Save to the d2l package. 
 def train_epoch_ch3(net, train_iter, loss, updater):
     train_l_sum, train_acc_sum, n = 0.0, 0.0, 0
     for X, y in train_iter:
@@ -257,8 +258,7 @@ def train_epoch_ch3(net, train_iter, loss, updater):
 Then we define a convenient plot function that draws multiple lines in a figure, and a utility function that animates the training progress.
 
 ```{.python .input}
-# A slightly improved versoin of this function has been saved in 
-# the d2l package for future use.
+# Save to the d2l package. 
 def plot(X, Y, x_label=None, y_label=None, legend=None, 
          xlim=None, ylim=None, axes=None):
     """Plot multiple lines"""
@@ -272,17 +272,17 @@ def plot(X, Y, x_label=None, y_label=None, legend=None,
     if ylim: ax.set_ylim(ylim)
     if legend: ax.legend(legend)
 
-# This function has been saved in the d2l package for future use        
+# Save to the d2l package. 
 def show(obj):
     """Show a figure"""
     display.display(obj)
     display.clear_output(wait=True)
 ```
 
-The training function then runs multiple epochs and visualize the training progress. 
+The training function then runs multiple epochs and visualize the training progress.
 
 ```{.python .input}
-# This function has been saved in the d2l package for future use
+# Save to the d2l package. 
 def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
     trains, test_accs = [], []
     d2l.use_svg_display()
@@ -296,8 +296,6 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
              xlim=[0,num_epochs+1], ylim=[0.3, 0.9], axes=ax)
         show(fig)
 ```
-
-
 
 Again, we use the mini-batch stochastic gradient descent
 to optimize the loss function of the model.
@@ -320,7 +318,7 @@ Given a series of images, we will compare their actual labels
 (second line of text output).
 
 ```{.python .input}
-# This function has been saved in the d2l package for future use
+# Save to the d2l package. 
 def predict_ch3(net, test_iter, n=9):
     for X, y in test_iter:
         break
