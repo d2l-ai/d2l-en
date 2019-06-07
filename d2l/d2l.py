@@ -3,7 +3,7 @@ from IPython import display
 import os
 import sys
 from matplotlib import pyplot as plt
-from mxnet import nd, autograd, gluon
+from mxnet import nd, autograd, gluon, init, context
 from mxnet.gluon import nn
 
 # Defined in file: ./chapter_crashcourse/probability.md
@@ -85,7 +85,7 @@ def accuracy(y_hat, y):
     return (y_hat.argmax(axis=1) == y.astype('float32')).sum().asscalar()
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-def evaluate_accuracy(data_iter, net):
+def evaluate_accuracy(net, data_iter):
     acc_sum, n = 0.0, 0
     for X, y in data_iter:
         y = y.astype('float32')
@@ -136,7 +136,7 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
     fig, ax = d2l.plt.subplots(figsize=(4,3))
     for epoch in range(num_epochs):
         trains.append(train_epoch_ch3(net, train_iter, loss, updater))
-        test_accs.append(evaluate_accuracy(test_iter, net))
+        test_accs.append(evaluate_accuracy(net, test_iter))
         legend = ['train loss', 'train acc', 'test acc']
         res = list(map(list, zip(*trains)))+[test_accs,]
         plot(list(range(1, epoch+2)), res, 'epoch', legend=legend, 
@@ -153,14 +153,74 @@ def predict_ch3(net, test_iter, n=9):
     d2l.show_images(X[0:n].reshape((n,28,28)), 1, n, titles=titles[0:n])
     
 
+# Defined in file: ./chapter_deep-learning-computation/use-gpu.md
+def try_gpu(i=0):
+    """Return gpu(i) if exists, otherwise return cpu()."""
+    return context.gpu(i) if context.num_gpus() >= i else context.cpu()
+
+# Defined in file: ./chapter_deep-learning-computation/use-gpu.md
+def try_all_gpus():
+    """Return all available GPUs, or [cpu(),] if no GPU exists."""
+    ctxes = [context.gpu(i) for i in range(context.num_gpus())]
+    return ctxes if ctxes else [context.cpu()]
+        
+
 # Defined in file: ./chapter_convolutional-neural-networks/conv-layer.md
 def corr2d(X, K):
+    """Compute 2D cross-correlation."""
     h, w = K.shape
     Y = nd.zeros((X.shape[0] - h + 1, X.shape[1] - w + 1))
     for i in range(Y.shape[0]):
         for j in range(Y.shape[1]):
             Y[i, j] = (X[i: i + h, j: j + w] * K).sum()
     return Y
+
+# Defined in file: ./chapter_convolutional-neural-networks/lenet.md
+def evaluate_accuracy(net, data_iter):
+    # Query on which device the parameter is.
+    ctx = list(net.collect_params().values())[0].list_ctx()[0]
+    acc_sum, n = nd.array([0], ctx=ctx), 0
+    for X, y in data_iter:
+        X, y = X.as_in_context(ctx), y.as_in_context(ctx).astype('float32')
+        acc_sum += (net(X).argmax(axis=1) == y).sum()
+        n += y.size
+    return acc_sum.asscalar() / n
+
+# Defined in file: ./chapter_convolutional-neural-networks/lenet.md
+def train_epoch_ch5(net, train_iter, batch_size, trainer, ctx):
+    loss = gluon.loss.SoftmaxCrossEntropyLoss()
+    train_l_sum, train_acc_sum, n = 0.0, 0.0, 0
+    for X, y in train_iter:
+        # Here is the only difference compared to train_epoch_ch3
+        X, y = X.as_in_context(ctx), y.as_in_context(ctx)
+        with autograd.record():
+            y_hat = net(X)
+            l = loss(y_hat, y)
+        l.backward()
+        trainer.step(batch_size)
+        train_l_sum += l.sum().asscalar()
+        train_acc_sum += d2l.accuracy(y_hat, y)
+        n += y.size
+    return train_l_sum / n, train_acc_sum / n
+
+# Defined in file: ./chapter_convolutional-neural-networks/lenet.md
+def train_ch5(net, train_iter, test_iter, batch_size, trainer, num_epochs, 
+              ctx=d2l.try_gpu()):
+    trains, test_accs = [], []
+    d2l.use_svg_display()
+    fig, ax = d2l.plt.subplots(figsize=(4, 3))
+    start = time.time()
+    for epoch in range(num_epochs):
+        trains.append(train_epoch_ch5(
+            net, train_iter, batch_size, trainer, ctx))
+        test_accs.append(evaluate_accuracy(net, test_iter))
+        legend = ['train loss', 'train acc', 'test acc']
+        res = list(map(list, zip(*trains)))+[test_accs,]
+        d2l.plot(list(range(1, epoch+2)), res, 'epoch', legend=legend, 
+             xlim=[0,num_epochs+1], ylim=[0, 1], axes=ax)
+        d2l.show(fig)
+    print('Done in %d sec on %s, loss %.3f, train acc %.3f, test acc %.3f'%(
+        time.time()-start, ctx, *trains[-1], test_accs[-1]))
 
 import sys
 d2l = sys.modules[__name__]

@@ -214,7 +214,7 @@ Similarly, we can evaluate the accuracy for model `net` on the data set
 
 ```{.python .input  n=19}
 # Save to the d2l package. 
-def evaluate_accuracy(data_iter, net):
+def evaluate_accuracy(net, data_iter):
     acc_sum, n = 0.0, 0
     for X, y in data_iter:
         y = y.astype('float32')
@@ -228,7 +228,7 @@ the accuracy of this model should be close to random guessing,
 i.e. 0.1 for 10 classes.
 
 ```{.python .input  n=20}
-evaluate_accuracy(test_iter, net)
+evaluate_accuracy(net, test_iter)
 ```
 
 ## Model Training
@@ -289,7 +289,7 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
     fig, ax = d2l.plt.subplots(figsize=(4,3))
     for epoch in range(num_epochs):
         trains.append(train_epoch_ch3(net, train_iter, loss, updater))
-        test_accs.append(evaluate_accuracy(test_iter, net))
+        test_accs.append(evaluate_accuracy(net, test_iter))
         legend = ['train loss', 'train acc', 'test acc']
         res = list(map(list, zip(*trains)))+[test_accs,]
         plot(list(range(1, epoch+2)), res, 'epoch', legend=legend, 
