@@ -77,9 +77,11 @@ Through the use of experiments, this section will demonstrate the benefits of hy
 Previously, we learned how to use the Sequential class to concatenate multiple layers. Next, we will replace the Sequential class with the HybridSequential class in order to make use of hybrid programming.
 
 ```{.python .input}
-from mxnet import nd, sym
+from mxnet import nd, sym, np, npx
 from mxnet.gluon import nn
 import time
+
+npx.set_np()
 
 def get_net():
     net = nn.HybridSequential()  # Here we use the class HybridSequential
@@ -89,7 +91,7 @@ def get_net():
     net.initialize()
     return net
 
-x = nd.random.normal(shape=(1, 512))
+x = np.random.normal(size=(1, 512))
 net = get_net()
 net(x)
 ```
@@ -159,7 +161,7 @@ class HybridNet(nn.HybridBlock):
     def hybrid_forward(self, F, x):
         print('F: ', F)
         print('x: ', x)
-        x = F.relu(self.hidden(x))
+        x = F.npx.relu(self.hidden(x))
         print('hidden: ', x)
         return self.output(x)
 ```
@@ -171,7 +173,7 @@ The following creates a HybridBlock instance. As we can see, by default, `F` use
 ```{.python .input}
 net = HybridNet()
 net.initialize()
-x = nd.random.normal(shape=(1, 4))
+x = np.random.normal(size=(1, 4))
 net(x)
 ```
 

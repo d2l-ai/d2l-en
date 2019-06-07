@@ -37,9 +37,10 @@ We begin, as before, by loading the data and by mapping it into a sequence of wh
 import sys
 sys.path.insert(0, '..')
 
-from mxnet import nd
+from mxnet import nd, np, npx
 import random
 import collections
+npx.set_np()
 
 with open('../data/timemachine.txt', 'r') as f:
     raw_text = f.read()
@@ -154,7 +155,7 @@ def data_iter_random(corpus_indices, batch_size, num_steps, ctx=None):
         batch_indices = example_indices[i:(i+batch_size)]
         X = [_data(j) for j in batch_indices]
         Y = [_data(j + 1) for j in batch_indices]
-        yield nd.array(X, ctx), nd.array(Y, ctx)
+        yield np.array(X, ctx), np.array(Y, ctx)
 ```
 
 Let us generate an artificial sequence from 0 to 30. We assume that
@@ -181,7 +182,7 @@ def data_iter_consecutive(corpus_indices, batch_size, num_steps, ctx=None):
     offset = int(random.uniform(0,num_steps))
     # Slice out data - ignore num_steps and just wrap around
     num_indices = ((len(corpus_indices) - offset) // batch_size) * batch_size
-    indices = nd.array(corpus_indices[offset:(offset + num_indices)], ctx=ctx)
+    indices = np.array(corpus_indices[offset:(offset + num_indices)], ctx=ctx)
     indices = indices.reshape((batch_size,-1))
     # Need to leave one last token since targets are shifted by 1
     num_epochs = ((num_indices // batch_size) - 1) // num_steps
