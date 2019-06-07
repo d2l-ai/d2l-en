@@ -51,7 +51,7 @@ and in this example, we'll set the its standard deviation to $0.01$.
 The following code generates our synthetic dataset:
 
 ```{.python .input  n=2}
-# This function is saved in the d2l package for future use.
+# Save to the d2l package.
 def synthetic_data(w, b, num_examples):
     """generate y = X w + b + noise"""
     X = nd.random.normal(scale=1, shape=(num_examples, len(w)))
@@ -173,7 +173,7 @@ Recall that when we add a vector and a scalar,
 the scalar is added to each component of the vector.
 
 ```{.python .input  n=9}
-# This function has been saved in the d2l package for future use.
+# Save to the d2l package. 
 def linreg(X, w, b):
     return nd.dot(X, w) + b
 ```
@@ -189,7 +189,7 @@ The result returned by the following function
 will also be the same as the `y_hat` shape.
 
 ```{.python .input  n=10}
-# This function has been saved in the d2l package for future use.
+# Save to the d2l package. 
 def squared_loss(y_hat, y):
     return (y_hat - y.reshape(y_hat.shape)) ** 2 / 2
 ```
@@ -219,7 +219,7 @@ so that the magnitude of a typical step size
 doesn't depend heavily our choice of the batch size.
 
 ```{.python .input  n=11}
-# This function has been saved in the d2l package for future use
+# Save to the d2l package. 
 def sgd(params, lr, batch_size):
     for param in params:
         param[:] = param - lr * param.grad / batch_size

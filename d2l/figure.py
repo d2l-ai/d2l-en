@@ -4,9 +4,6 @@ from matplotlib import pyplot as plt
 from mxnet import nd
 import numpy as np
 
-__all__ = ['plt', 'plot', 'scatter', 'show', 'bbox_to_rect', 'semilogy', 'set_figsize', 'show_bboxes',
-           'show_images', 'show_trace_2d', 'use_svg_display']
-
 def bbox_to_rect(bbox, color):
     """Convert bounding box to matplotlib format."""
     return plt.Rectangle(xy=(bbox[0], bbox[1]), width=bbox[2]-bbox[0],
@@ -67,11 +64,6 @@ def scatter(X, Y, x_label=None, y_label=None, legend=None, xlim=None, ylim=None,
     """plot(x,y) for (x,y) in zip(X,Y)."""
     _draw('scatter', X, Y, x_label, y_label, legend, xlim, ylim, axes)
 
-
-def show(obj):
-    display.display(obj)
-    display.clear_output(wait=True)
-
 def set_figsize(figsize=(3.5, 2.5)):
     """Set matplotlib figure size."""
     use_svg_display()
@@ -98,21 +90,9 @@ def show_bboxes(axes, bboxes, labels=None, colors=None):
                       va='center', ha='center', fontsize=9, color=text_color,
                       bbox=dict(facecolor=color, lw=0))
 
-def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
-    """Plot a list of images."""
-    use_svg_display()
-    figsize = (num_cols * scale, num_rows * scale)
-    axes = plt.subplots(num_rows, num_cols, figsize=figsize)[1].flatten()
-    for i, (ax, img) in enumerate(zip(axes, imgs)):
-        ax.imshow(img.asnumpy())
-        ax.axes.get_xaxis().set_visible(False)
-        ax.axes.get_yaxis().set_visible(False)
-        if titles:
-            ax.set_title(titles[i])
-    return axes
 
 def show_trace_2d(f, res):
-    """Show the trace of 2d variables during optimization."""
+    """Show the trace of 2D variables during optimization."""
     x1, x2 = zip(*res)
     set_figsize()
     plt.plot(x1, x2, '-o', color='#ff7f0e')
@@ -122,7 +102,3 @@ def show_trace_2d(f, res):
     plt.contour(x1, x2, f(x1, x2), colors='#1f77b4')
     plt.xlabel('x1')
     plt.ylabel('x2')
-
-def use_svg_display():
-    """Use svg format to display plot in jupyter"""
-    display.set_matplotlib_formats('svg')

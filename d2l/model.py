@@ -3,22 +3,6 @@ import math
 from mxnet import nd
 from mxnet.gluon import nn, rnn, loss as gloss
 
-__all__ = ['corr2d', 'linreg', 'Residual', 'resnet18', 'RNNModel',
-           'Encoder', 'Decoder', 'EncoderDecoder', 'DotProductAttention',
-           'MLPAttention', 'Seq2SeqEncoder']
-
-def corr2d(X, K):
-    """Compute 2D cross-correlation."""
-    h, w = K.shape
-    Y = nd.zeros((X.shape[0] - h + 1, X.shape[1] - w + 1))
-    for i in range(Y.shape[0]):
-        for j in range(Y.shape[1]):
-            Y[i, j] = (X[i: i + h, j: j + w] * K).sum()
-    return Y
-
-def linreg(X, w, b):
-    """Linear regression."""
-    return nd.dot(X, w) + b
 
 class Residual(nn.Block):
     """The residual block."""
