@@ -4,6 +4,6 @@ from .data import *
 from .model import *
 from .train import *
 
-from .preface import *
+from .d2l import *
 
 __version__ = '0.9.3'
