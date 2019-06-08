@@ -38,32 +38,6 @@ def _check_shape_2d(X, Y):
     assert X.shape[-1] == Y.shape[-1], ('X', X, 'Y', Y)
     assert len(X) == len(Y) or len(X) == 1, ('X', X, 'Y', Y)
 
-def _draw(func, X, Y, x_label, y_label, legend, xlim, ylim, axes):
-    use_svg_display()
-    X, Y = _preprocess_2d(X), _preprocess_2d(Y)
-    _check_shape_2d(X, Y)
-    ax = axes if axes else plt.gca()
-    ax.cla()
-    for i in range(len(Y)):
-        x = X[0,:] if len(X) == 1 else X[i,:]
-        getattr(ax, func)(x, Y[i,:])
-    ax.set_xlabel(x_label)
-    ax.set_ylabel(y_label)
-    if legend:
-        ax.legend(legend)
-    ax.set_xlim(xlim)
-    ax.set_ylim(ylim)
-
-def plot(X, Y, x_label=None, y_label=None, legend=None, xlim=None, ylim=None,
-         axes=None):
-    """plot(x,y) for (x,y) in zip(X,Y)."""
-    _draw('plot', X, Y, x_label, y_label, legend, xlim, ylim, axes)
-
-def scatter(X, Y, x_label=None, y_label=None, legend=None, xlim=None, ylim=None,
-            axes=None):
-    """plot(x,y) for (x,y) in zip(X,Y)."""
-    _draw('scatter', X, Y, x_label, y_label, legend, xlim, ylim, axes)
-
 def set_figsize(figsize=(3.5, 2.5)):
     """Set matplotlib figure size."""
     use_svg_display()
