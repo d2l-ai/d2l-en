@@ -11,7 +11,6 @@ from mxnet.gluon import nn
 import d2l
 import zipfile
 import numpy as np
-import sys
 ```
 
 ## The Pokemon Dataset
@@ -39,12 +38,13 @@ transformer = gluon.data.vision.transforms.Compose([
 ])
 data_iter = gluon.data.DataLoader(
     pokemon.transform_first(transformer), batch_size=batch_size,
-    shuffle=True, num_workers=0 if sys.platform.startswith('win32') else 4)
+    shuffle=True, num_workers=d2l.get_dataloader_workers())
 ```
 
 Let's visualize the first 20 images.
 
 ```{.python .input  n=28}
+d2l.use_svg_display()
 for X, y in data_iter:
     imgs = X[0:20,:,:,:].transpose((0,2,3,1))/2+0.5
     d2l.show_images(imgs, num_rows=4, num_cols=5)
@@ -120,7 +120,8 @@ As it can be seen, it is normal ReLU if $\alpha=0$, and an identity function if 
 ```{.python .input}
 alphas = [0, 0.2, 0.4, .6, .8, 1]
 x = nd.arange(-2,1,0.1)
-d2l.plot(x, [nn.LeakyReLU(alpha)(x) for alpha in alphas], 'x', 'y', alphas)
+Y = [nn.LeakyReLU(alpha)(x).asnumpy() for alpha in alphas]
+d2l.plot(x.asnumpy(), Y, 'x', 'y', alphas)
 ```
 
 The basic block of the discriminator is a convolution layer followed by a batch normalization layer and a leaky ReLU activation. The hyper-parameters of the convolution layer are similar to the transpose convolution layer in the generator block.
@@ -170,47 +171,57 @@ net_D(x).shape
 
 ## Training
 
-The training function of DCGAN is similar to the basic GAN.
+Again, let's first the function to train one data epoch. Compared to the `train_epoch` in :numref:chapter_basic_gan, there are only two differences: `Z` is a 4-D tensor and we are using GPU to accelerate the computation. 
+
+
+```{.python .input}
+def train_epoch(net_D, net_G, loss, trainer_D, trainer_G, latent_dim, ctx):
+    total_loss_D, total_loss_G, n = 0.0, 0.0, 0
+    for X, _ in data_iter:
+        batch_size = X.shape[0]
+        Z = nd.random.normal(0, 1, shape=(batch_size, latent_dim, 1, 1))
+        X, Z = X.as_in_context(ctx), Z.as_in_context(ctx), 
+        total_loss_D += d2l.update_D(X, Z, net_D, net_G, loss, trainer_D)
+        total_loss_G += d2l.update_G(Z, net_D, net_G, loss, trainer_G)
+        n += batch_size
+    return total_loss_D/n, total_loss_G/n
+```
+
+Compared to the basic GAN, we use the same learning rate for both generator and discriminator since they are similar to each other. In addition, we change $\beta_1$ in Adam (:numref:`chapter_adam`) from $0.9$ to $0.5$. It decreases the smoothness of the momentum, the exponentially weighted moving average of past gradients, to take care of the rapid changing gradients because the generator and the discriminator fight with each other.
 
 ```{.python .input  n=16}
-def train():
-    all_loss_D, all_loss_G = [], []
+def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim, 
+          ctx=d2l.try_gpu()):
+    loss = gluon.loss.SigmoidBCELoss()
+    net_D.initialize(init=init.Normal(0.02), force_reinit=True, ctx=ctx)
+    net_G.initialize(init=init.Normal(0.02), force_reinit=True, ctx=ctx)
+    trainer_hp = {'learning_rate': lr, 'beta1': 0.5}
+    trainer_D = gluon.Trainer(net_D.collect_params(), 'adam', trainer_hp)
+    trainer_G = gluon.Trainer(net_G.collect_params(), 'adam', trainer_hp)
+    losses = []
     fig, (ax1, ax2) = d2l.plt.subplots(2, 1, figsize=(6,6))
     fig.subplots_adjust(hspace=0.3)
     for epoch in range(1, num_epochs+1):
-        total_loss_D, total_loss_G = 0.0, 0.0
-        for i, (X, _) in enumerate(data_iter):
-            X = X.as_in_context(ctx)
-            Z = nd.random.normal(0, 1, shape=(X.shape[0], latent_dim, 1, 1), ctx=ctx)
-            total_loss_D += d2l.update_D(X, Z, net_D, net_G, loss, trainer_D)
-            total_loss_G += d2l.update_G(Z, net_D, net_G, loss, trainer_G)
-        # Show progress.
-        all_loss_D.append(total_loss_D/len(data_iter))
-        all_loss_G.append(total_loss_G/len(data_iter))
-        d2l.plot(list(range(1, epoch+1)), [all_loss_G, all_loss_D],
+        losses.append(train_epoch(
+            net_D, net_G, loss, trainer_D, trainer_G, latent_dim, ctx))
+        # Visualize the losses.
+        d2l.plot(list(range(1, epoch+1)), list(map(list, zip(*losses))),
                  'epoch', 'loss', ['generator', 'discriminator'],
                  xlim=[0, num_epochs+1], axes=ax1)
         # Show generated examples
         Z = nd.random.normal(0, 1, shape=(21, latent_dim, 1, 1), ctx=ctx)
         fake_x = (net_G(Z).transpose((0,2,3,1))/2+0.5).asnumpy()
-        imgs = np.vstack([np.hstack(fake_x[i:i+7]) for i in range(0,len(fake_x),7)])
+        imgs = np.vstack([np.hstack(fake_x[i:i+7]) 
+                          for i in range(0,len(fake_x),7)])
         ax2.imshow(imgs)
         d2l.show(fig)
 ```
 
-Compared to the basic GAN, we use the same learning rate for both generator and discriminator since they are similar to each other. In addition, we change $\beta_1$ in Adam (:numref:`chapter_adam`) from $0.9$ to $0.5$. It decreases the smoothness of the momentum, the exponentially weighted moving average of past gradients, to take care of the rapid changing gradients because the generator and the discriminator fight with each other.
+Now let's train the model.
 
 ```{.python .input  n=17}
-latent_dim, lr, num_epochs, ctx = 100, 0.005, 25, d2l.try_gpu()
-loss = gluon.loss.SigmoidBCELoss()
-
-net_D.initialize(init=init.Normal(0.02), force_reinit=True, ctx=ctx)
-net_G.initialize(init=init.Normal(0.02), force_reinit=True, ctx=ctx)
-trainer_hp = {'learning_rate': lr, 'beta1': 0.5}
-trainer_D = gluon.Trainer(net_D.collect_params(), 'adam', trainer_hp)
-trainer_G = gluon.Trainer(net_G.collect_params(), 'adam', trainer_hp)
-
-train()
+latent_dim, lr, num_epochs = 100, 0.005, 40
+train(net_D, net_G, data_iter, num_epochs, lr, latent_dim)
 ```
 
 ## Summary
