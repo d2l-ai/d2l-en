@@ -10,11 +10,6 @@ from ..data import data_iter_consecutive, data_iter_random
 from ..d2l import try_gpu, linreg
 from ..figure import set_figsize, plt
 
-__all__ = ['evaluate_accuracy', 'grad_clipping', 'grad_clipping_gluon', 'train',
-           'train_2d', 'train_and_predict_rnn', 'train_and_predict_rnn_gluon',
-           'train_ch5', 'train_ch9', 'train_gluon_ch9',
-           'predict_sentiment', 'train_ch7', 'translate_ch7']
-
 def _get_batch(batch, ctx):
     """Return features and labels on ctx."""
     features, labels = batch
