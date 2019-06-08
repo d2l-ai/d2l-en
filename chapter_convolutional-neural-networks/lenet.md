@@ -94,13 +94,9 @@ is remarkably simple.
 Again, we'll rely on the Sequential class.
 
 ```{.python .input}
-import sys
-sys.path.insert(0, '..')
-
 import d2l
-import mxnet as mx
 from mxnet import autograd, gluon, init, nd
-from mxnet.gluon import loss as gloss, nn
+from mxnet.gluon import nn
 import time
 
 net = nn.Sequential()
@@ -162,14 +158,13 @@ Now that we've implemented the model,
 we might as well run some experiments
 to see what we can accomplish with the LeNet model.
 While it might serve nostalgia
-to train LeNet on the original MNIST OCR dataset,
+to train LeNet on the original MNIST dataset,
 that dataset has become too easy,
 with MLPs getting over 98% accuracy,
 so it would be hard to see the benefits of convolutional networks.
 Thus we will stick with Fashion-MNIST as our dataset
 because while it has the same shape ($28\times28$ images),
 this dataset is notably more challenging.
-
 
 ```{.python .input}
 batch_size = 256
@@ -182,44 +177,21 @@ to compute than a similarly deep multilayer perceptron
 so if you have access to a GPU, this might be a good time
 to put it into action to speed up training.
 
-Here's a simple function that we can use to detect whether we have a GPU.
-In it, we try to allocate an NDArray on `gpu(0)`,
-and use `gpu(0)` as our context if the operation proves successful.
-Otherwise, we catch the resulting exception and we stick with the CPU.
-
-```{.python .input}
-# This function has been saved in the d2l package for future use
-def try_gpu():
-    try:
-        ctx = mx.gpu()
-        _ = nd.zeros((1,), ctx=ctx)
-    except mx.base.MXNetError:
-        ctx = mx.cpu()
-    return ctx
-
-ctx = try_gpu()
-ctx
-```
-
 For evaluation, we need to make a slight modification
 to the `evaluate_accuracy` function that we described
-when implementing the softmax from scratch (:numref:`chapter_softmax_scratch`).
+in :numref:`chapter_softmax_scratch`.
 Since the full dataset lives on the CPU,
 we need to copy it to the GPU before we can compute our models.
 This is accomplished via the `as_in_context` function
-described in :numref:`chapter_use_gpu`.
-Note that we accumulate the errors on the device
-where the data eventually lives (in `acc`).
-This avoids intermediate copy operations that might harm performance.
+described in :numref:`chapter_use_gpu`. This implementation will overwrite the one introduced from :numref:`chapter_softmax_scratch` in the `d2l` package. 
 
 ```{.python .input}
-# This function has been saved in the d2l package for future use. The function
-# will be gradually improved. Its complete implementation will be discussed in
-# the "Image Augmentation" section
-def evaluate_accuracy(data_iter, net, ctx):
+# Save to the d2l package
+def evaluate_accuracy(net, data_iter):
+    # Query on which device the parameter is.
+    ctx = list(net.collect_params().values())[0].list_ctx()[0]
     acc_sum, n = nd.array([0], ctx=ctx), 0
     for X, y in data_iter:
-        # If ctx is the GPU, copy the data to the GPU.
         X, y = X.as_in_context(ctx), y.as_in_context(ctx).astype('float32')
         acc_sum += (net(X).argmax(axis=1) == y).sum()
         n += y.size
@@ -227,47 +199,63 @@ def evaluate_accuracy(data_iter, net, ctx):
 ```
 
 We also need to update our training function to deal with GPUs.
-Unlike `train_ch3` defined in :numref:`chapter_softmax_scratch`, we now need to move each batch of data
-to our designated context (hopefully, the GPU)
+Unlike the `train_epoch_ch3` defined in :numref:`chapter_softmax_scratch`, we now need to move each batch of data to our designated context (hopefully, the GPU)
 prior to making the forward and backward passes.
 
 ```{.python .input}
-# This function has been saved in the d2l package for future use
-def train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,
-              num_epochs):
-    print('training on', ctx)
-    loss = gloss.SoftmaxCrossEntropyLoss()
-    for epoch in range(num_epochs):
-        train_l_sum, train_acc_sum, n, start = 0.0, 0.0, 0, time.time()
-        for X, y in train_iter:
-            X, y = X.as_in_context(ctx), y.as_in_context(ctx)
-            with autograd.record():
-                y_hat = net(X)
-                l = loss(y_hat, y).sum()
-            l.backward()
-            trainer.step(batch_size)
-            y = y.astype('float32')
-            train_l_sum += l.asscalar()
-            train_acc_sum += (y_hat.argmax(axis=1) == y).sum().asscalar()
-            n += y.size
-        test_acc = evaluate_accuracy(test_iter, net, ctx)
-        print('epoch %d, loss %.4f, train acc %.3f, test acc %.3f, '
-              'time %.1f sec'
-              % (epoch + 1, train_l_sum / n, train_acc_sum / n, test_acc,
-                 time.time() - start))
+# Save to the d2l package.
+def train_epoch_ch5(net, train_iter, batch_size, loss, trainer, ctx):
+    train_l_sum, train_acc_sum, n = 0.0, 0.0, 0
+    for X, y in train_iter:
+        # Here is the only difference compared to train_epoch_ch3
+        X, y = X.as_in_context(ctx), y.as_in_context(ctx)
+        with autograd.record():
+            y_hat = net(X)
+            l = loss(y_hat, y)
+        l.backward()
+        trainer.step(batch_size)
+        train_l_sum += l.sum().asscalar()
+        train_acc_sum += d2l.accuracy(y_hat, y)
+        n += y.size
+    return train_l_sum / n, train_acc_sum / n
 ```
 
-We initialize the model parameters on the device indicated by `ctx`,
+The training function `train_ch5` is also very similar to `train_ch3` defined in :numref:`chapter_softmax_scratch`. Since we will deal with networks with tens of layers now, the function will only support Gluon models. We initialize the model parameters on the device indicated by `ctx`,
 this time using the Xavier initializer.
 The loss function and the training algorithm
 still use the cross-entropy loss function
 and mini-batch stochastic gradient descent.
 
 ```{.python .input}
-lr, num_epochs = 0.9, 5
-net.initialize(force_reinit=True, ctx=ctx, init=init.Xavier())
-trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
-train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
+# Save to the d2l package.
+def train_ch5(net, train_iter, test_iter, batch_size, num_epochs, lr, 
+              ctx=d2l.try_gpu()):
+    net.initialize(force_reinit=True, ctx=ctx, init=init.Xavier())
+    loss = gluon.loss.SoftmaxCrossEntropyLoss()
+    trainer = gluon.Trainer(net.collect_params(),
+                            'sgd', {'learning_rate': lr})
+    trains, test_accs = [], []
+    d2l.use_svg_display()
+    fig, ax = d2l.plt.subplots(figsize=(4, 3))
+    start = time.time()
+    for epoch in range(num_epochs):
+        trains.append(train_epoch_ch5(
+            net, train_iter, batch_size, loss, trainer, ctx))
+        test_accs.append(evaluate_accuracy(net, test_iter))
+        legend = ['train loss', 'train acc', 'test acc']
+        res = list(map(list, zip(*trains)))+[test_accs,]
+        d2l.plot(list(range(1, epoch+2)), res, 'epoch', legend=legend, 
+             xlim=[0,num_epochs+1], ylim=[0, 1], axes=ax)
+        d2l.show(fig)
+    print('Done in %d sec on %s, loss %.3f, train acc %.3f, test acc %.3f'%(
+        time.time()-start, ctx, *trains[-1], test_accs[-1]))
+```
+
+Now let's train the model.
+
+```{.python .input}
+lr, num_epochs = 0.9, 10
+train_ch5(net, train_iter, test_iter, batch_size, num_epochs, lr)
 ```
 
 ## Summary
@@ -290,10 +278,6 @@ train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx, num_epochs)
 1. Try out the improved network on the original MNIST dataset.
 1. Display the activations of the first and second layer of LeNet for different inputs (e.g. sweaters, coats).
 
-
-## References
-
-[1] LeCun, Y., Bottou, L., Bengio, Y., & Haffner, P. (1998). Gradient-based learning applied to document recognition. Proceedings of the IEEE, 86(11), 2278-2324.
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2353)
 
