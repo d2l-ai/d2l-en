@@ -90,11 +90,10 @@ Since they involve one, two or three terms, these are typically referred to as u
 Let's see how this works on real data. To get started we load text from H.G. Wells' [Time Machine](http://www.gutenberg.org/ebooks/35). This is a fairly small corpus of just over 30,000 words but for the purpose of what we want to illustrate this is just fine. More realistic document collections contain many billions of words. To begin, we split the document up into words and ignore punctuation and capitalization. While this discards some relevant information, it is useful for computing count statistics in general. Let's see what the first few lines look like.
 
 ```{.python .input}
-import sys
-sys.path.insert(0, '..')
-
 import collections
+import d2l
 import re
+
 with open('../data/timemachine.txt', 'r') as f:
     lines = f.readlines()
     raw_dataset = [re.sub('[^A-Za-z]+', ' ', st).lower().split()
@@ -117,13 +116,9 @@ print(counter.most_common(10))
 As we can see, the most popular words are actually quite boring to look at. In traditional NLP they're often referred to as [stopwords](https://en.wikipedia.org/wiki/Stop_words) and thus filtered out. That said, they still carry meaning and we will use them nonetheless. However, one thing that is quite clear is that the word frequency decays rather rapidly. The 10th word is less than $\frac{1}{5}$ as common as the most popular one. To get a better idea we plot the graph of word frequencies.
 
 ```{.python .input}
-%matplotlib inline
-from matplotlib import pyplot as plt
-from IPython import display
-display.set_matplotlib_formats('svg')
-
 wordcounts = [count for _,count in counter.most_common()]
-plt.loglog(wordcounts);
+d2l.use_svg_display()
+d2l.plt.loglog(wordcounts);
 ```
 
 We're on to something quite fundamental here - the word frequencies decay rapidly in a well defined way. After dealing with the first four words as exceptions ('the', 'i', 'and', 'of'), all remaining words follow a straight line on a log-log plot. This means that words satisfy [Zipf's law](https://en.wikipedia.org/wiki/Zipf%27s_law) which states that the item frequency is given by
@@ -149,10 +144,10 @@ counter_triples = collections.Counter(word_triples)
 
 bigramcounts = [count for _,count in counter_pairs.most_common()]
 triplecounts = [count for _,count in counter_triples.most_common()]
-plt.loglog(wordcounts, label='word counts');
-plt.loglog(bigramcounts, label='bigram counts');
-plt.loglog(triplecounts, label='triple counts');
-plt.legend();
+d2l.plt.loglog(wordcounts, label='word counts');
+d2l.plt.loglog(bigramcounts, label='bigram counts');
+d2l.plt.loglog(triplecounts, label='triple counts');
+d2l.plt.legend();
 ```
 
 The graph is quite exciting for a number of reasons. Firstly, beyond words, also sequences of words appear to be following Zipf's law, albeit with a lower exponent, depending on sequence length. Secondly, the number of distinct n-grams is not that large. This gives us hope that there is quite a lot of structure in language. Third, *many* n-grams occur very rarely, which makes Laplace smoothing rather unsuitable for language modeling. Instead, we will use deep learning based models.
