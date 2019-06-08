@@ -207,7 +207,7 @@ As before, we train our model using the Fashion-MNIST dataset.
 ```{.python .input  n=8}
 lr, num_epochs, batch_size = 0.1, 10, 128
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)
-d2l.train_ch5(net, train_iter, test_iter, batch_size, num_epochs, lr)
+d2l.train_ch5(net, train_iter, test_iter, num_epochs, lr)
 ```
 
 ## Summary
