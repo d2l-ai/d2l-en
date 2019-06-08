@@ -262,15 +262,22 @@ Then we define a convenient plot function that draws multiple lines in a figure,
 def plot(X, Y, x_label=None, y_label=None, legend=None, 
          xlim=None, ylim=None, axes=None):
     """Plot multiple lines"""
-    ax = axes if axes else d2l.plt.gca()
-    ax.cla()
-    for i in range(len(Y)):
-        ax.plot(X, Y[i])
-    if x_label: ax.set_xlabel(x_label)
-    if y_label: ax.set_ylabel(y_label)
-    if xlim: ax.set_xlim(xlim)
-    if ylim: ax.set_ylim(ylim)
-    if legend: ax.legend(legend)
+    axes = axes if axes else d2l.plt.gca()
+    draw(axes, axes.plot, X, Y, x_label, y_label, legend, xlim, ylim)
+    
+# Save to the d2l package. 
+def draw(axes, func, X, Y, x_label, y_label, legend, xlim, ylim):
+    """Draw multiple data series with customized func"""
+    if not hasattr(X[0], "__len__") or len(X[0]) != len(Y[0]):
+        X = [X] * len(Y)
+    axes.cla()
+    for x, y in zip(X, Y):
+        func(x, y)
+    if x_label: axes.set_xlabel(x_label)
+    if y_label: axes.set_ylabel(y_label)
+    if xlim: axes.set_xlim(xlim)
+    if ylim: axes.set_ylim(ylim)
+    if legend: axes.legend(legend)
 
 # Save to the d2l package. 
 def show(obj):
