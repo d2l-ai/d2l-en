@@ -252,7 +252,7 @@ def update_D(X, Z, net_D, net_G, loss, trainer_D):
         loss_D = (loss(real_Y, ones) + loss(fake_Y, zeros)) / 2
     loss_D.backward()
     trainer_D.step(batch_size)
-    return loss_D.mean().asscalar()
+    return loss_D.sum().asscalar()
 
 # Defined in file: ./chapter_generative_adversarial_networks/gan.md
 def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
@@ -267,12 +267,5 @@ def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
         loss_G = loss(fake_Y, ones)
     loss_G.backward()
     trainer_G.step(batch_size)
-    return loss_G.mean().asscalar()
-
-# Defined in file: ./chapter_generative_adversarial_networks/gan.md
-def scatter(X, Y, x_label=None, y_label=None, legend=None,
-            xlim=None, ylim=None, axes=None):
-    """A scatter plot of multiple data series"""
-    axes = axes if axes else d2l.plt.gca()
-    d2l.draw(axes, axes.scatter, X, Y, x_label, y_label, legend, xlim, ylim)
+    return loss_G.sum().asscalar()
 
