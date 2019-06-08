@@ -43,13 +43,9 @@ The function takes two arguments
 corresponding to the number of convolutional layers `num_convs` 
 and the number of output channels `num_channels`.
 
-
 ```{.python .input  n=1}
-import sys
-sys.path.insert(0, '..')
-
 import d2l
-from mxnet import gluon, init, nd
+from mxnet import gluon, nd
 from mxnet.gluon import nn
 
 def vgg_block(num_convs, num_channels):
@@ -140,12 +136,9 @@ Apart from using a slightly larger learning rate,
 the model training process is similar to that of AlexNet in the last section.
 
 ```{.python .input}
-lr, num_epochs, batch_size, ctx = 0.05, 5, 128, d2l.try_gpu()
-net.initialize(ctx=ctx, init=init.Xavier())
-trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
+lr, num_epochs, batch_size = 0.05, 10, 128, 
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)
-d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,
-              num_epochs)
+d2l.train_ch5(net, train_iter, test_iter, batch_size, num_epochs, lr)
 ```
 
 ## Summary
