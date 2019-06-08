@@ -137,7 +137,7 @@ net.add(nn.BatchNorm(),
 Since we are using a deeper network here, in this section, we will reduce the input height and width from 224 to 96 to simplify the computation.
 
 ```{.python .input}
-lr, num_epochs, batch_size = 0.1, 5, 256
+lr, num_epochs, batch_size = 0.1, 10, 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)
 d2l.train_ch5(net, train_iter, test_iter, batch_size, num_epochs, lr)
 ```
