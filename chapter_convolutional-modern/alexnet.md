@@ -273,14 +273,9 @@ This makes the model more robust and the larger sample size effectively reduces 
 We will discuss data augmentation in greater detail in :numref:`chapter_image_augmentation`.
 
 ```{.python .input  n=1}
-import sys
-sys.path.insert(0, '..')
-
 import d2l
-from mxnet import gluon, init, nd
-from mxnet.gluon import data as gdata, nn
-import os
-import sys
+from mxnet import gluon, nd
+from mxnet.gluon import nn
 
 net = nn.Sequential()
 # Here, we use a larger 11 x 11 window to capture objects. At the same time,
@@ -333,34 +328,11 @@ than ImageNet images.
 To make things work, we upsample them to $244 \times 244$
 (generally not a smart practice,
 but we do it here to be faithful to the AlexNet architecture).
-We perform this resizing with the `Resize` class,
-inserting it into the processing pipeline
-before using the `ToTensor` class.
-The `Compose` class concatenates these two changes for easy invocation.
+We perform this resizing with the `resize` argument in `load_data_fashion_mnist`.
 
 ```{.python .input  n=3}
-# This function has been saved in the d2l package for future use
-def load_data_fashion_mnist(batch_size, resize=None, root=os.path.join(
-        '~', '.mxnet', 'datasets', 'fashion-mnist')):
-    root = os.path.expanduser(root)  # Expand the user path '~'.
-    transformer = []
-    if resize:
-        transformer += [gdata.vision.transforms.Resize(resize)]
-    transformer += [gdata.vision.transforms.ToTensor()]
-    transformer = gdata.vision.transforms.Compose(transformer)
-    mnist_train = gdata.vision.FashionMNIST(root=root, train=True)
-    mnist_test = gdata.vision.FashionMNIST(root=root, train=False)
-    num_workers = 0 if sys.platform.startswith('win32') else 4
-    train_iter = gdata.DataLoader(
-        mnist_train.transform_first(transformer), batch_size, shuffle=True,
-        num_workers=num_workers)
-    test_iter = gdata.DataLoader(
-        mnist_test.transform_first(transformer), batch_size, shuffle=False,
-        num_workers=num_workers)
-    return train_iter, test_iter
-
 batch_size = 128
-train_iter, test_iter = load_data_fashion_mnist(batch_size, resize=224)
+train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)
 ```
 
 ## Training
@@ -372,11 +344,8 @@ and much slower training due to the deeper and wider network,
 the higher image resolution and the more costly convolutions.
 
 ```{.python .input  n=5}
-lr, num_epochs, ctx = 0.01, 5, d2l.try_gpu()
-net.initialize(force_reinit=True, ctx=ctx, init=init.Xavier())
-trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
-d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,
-              num_epochs)
+lr, num_epochs = 0.01, 10
+d2l.train_ch5(net, train_iter, test_iter, batch_size, num_epochs, lr)
 ```
 
 ## Summary
