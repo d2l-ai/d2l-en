@@ -199,7 +199,7 @@ def evaluate_accuracy(net, data_iter):
     return acc_sum.asscalar() / n
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
-def train_epoch_ch5(net, train_iter, batch_size, loss, trainer, ctx):
+def train_epoch_ch5(net, train_iter, loss, trainer, ctx):
     train_l_sum, train_acc_sum, n = 0.0, 0.0, 0
     for X, y in train_iter:
         # Here is the only difference compared to train_epoch_ch3
@@ -208,14 +208,14 @@ def train_epoch_ch5(net, train_iter, batch_size, loss, trainer, ctx):
             y_hat = net(X)
             l = loss(y_hat, y)
         l.backward()
-        trainer.step(batch_size)
+        trainer.step(X.shape[0])
         train_l_sum += l.sum().asscalar()
         train_acc_sum += d2l.accuracy(y_hat, y)
-        n += y.size
+        n += X.shape[0]
     return train_l_sum / n, train_acc_sum / n
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
-def train_ch5(net, train_iter, test_iter, batch_size, num_epochs, lr, 
+def train_ch5(net, train_iter, test_iter, num_epochs, lr, 
               ctx=d2l.try_gpu()):
     net.initialize(force_reinit=True, ctx=ctx, init=init.Xavier())
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
@@ -227,7 +227,7 @@ def train_ch5(net, train_iter, test_iter, batch_size, num_epochs, lr,
     start = time.time()
     for epoch in range(num_epochs):
         trains.append(train_epoch_ch5(
-            net, train_iter, batch_size, loss, trainer, ctx))
+            net, train_iter, loss, trainer, ctx))
         test_accs.append(evaluate_accuracy(net, test_iter))
         legend = ['train loss', 'train acc', 'test acc']
         res = list(map(list, zip(*trains)))+[test_accs,]

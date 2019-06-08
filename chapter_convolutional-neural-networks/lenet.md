@@ -228,8 +228,7 @@ and mini-batch stochastic gradient descent.
 
 ```{.python .input}
 # Save to the d2l package.
-def train_ch5(net, train_iter, test_iter, num_epochs, lr, 
-              ctx=d2l.try_gpu()):
+def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
     net.initialize(force_reinit=True, ctx=ctx, init=init.Xavier())
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
     trainer = gluon.Trainer(net.collect_params(),
@@ -244,7 +243,7 @@ def train_ch5(net, train_iter, test_iter, num_epochs, lr,
         test_accs.append(evaluate_accuracy(net, test_iter))
         legend = ['train loss', 'train acc', 'test acc']
         res = list(map(list, zip(*trains)))+[test_accs,]
-        d2l.plot(list(range(1, epoch+2)), res, 'epoch', legend=legend, 
+        d2l.plot(list(range(1, epoch+2)), res, 'epoch', legend=legend,
              xlim=[0,num_epochs+1], ylim=[0, 1], axes=ax)
         d2l.show(fig)
     print('Done in %d sec on %s, loss %.3f, train acc %.3f, test acc %.3f'%(
