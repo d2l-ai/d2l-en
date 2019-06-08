@@ -117,15 +117,23 @@ def train_epoch_ch3(net, train_iter, loss, updater):
 def plot(X, Y, x_label=None, y_label=None, legend=None, 
          xlim=None, ylim=None, axes=None):
     """Plot multiple lines"""
-    ax = axes if axes else d2l.plt.gca()
-    ax.cla()
-    for i in range(len(Y)):
-        ax.plot(X, Y[i])
-    if x_label: ax.set_xlabel(x_label)
-    if y_label: ax.set_ylabel(y_label)
-    if xlim: ax.set_xlim(xlim)
-    if ylim: ax.set_ylim(ylim)
-    if legend: ax.legend(legend)
+    axes = axes if axes else d2l.plt.gca()
+    draw(axes, axes.plot, X, Y, x_label, y_label, legend, xlim, ylim)
+    
+
+# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
+def draw(axes, func, X, Y, x_label, y_label, legend, xlim, ylim):
+    """Draw multiple data series with customized func"""
+    if not hasattr(X[0], "__len__") or len(X[0]) != len(Y[0]):
+        X = [X] * len(Y)
+    axes.cla()
+    for x, y in zip(X, Y):
+        func(x, y)
+    if x_label: axes.set_xlabel(x_label)
+    if y_label: axes.set_ylabel(y_label)
+    if xlim: axes.set_xlim(xlim)
+    if ylim: axes.set_ylim(ylim)
+    if legend: axes.legend(legend)
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def show(obj):
@@ -228,4 +236,43 @@ def train_ch5(net, train_iter, test_iter, batch_size, num_epochs, lr,
         d2l.show(fig)
     print('Done in %d sec on %s, loss %.3f, train acc %.3f, test acc %.3f'%(
         time.time()-start, ctx, *trains[-1], test_accs[-1]))
+
+# Defined in file: ./chapter_generative_adversarial_networks/gan.md
+def update_D(X, Z, net_D, net_G, loss, trainer_D):
+    """Update discriminator"""
+    batch_size = X.shape[0]
+    ones = nd.ones((batch_size,), ctx=X.context)
+    zeros = nd.zeros((batch_size,), ctx=X.context)
+    with autograd.record():
+        real_Y = net_D(X)
+        fake_X = net_G(Z)
+        # Don't need to compute gradient for net_G, detach it from
+        # computing gradients.
+        fake_Y = net_D(fake_X.detach())
+        loss_D = (loss(real_Y, ones) + loss(fake_Y, zeros)) / 2
+    loss_D.backward()
+    trainer_D.step(batch_size)
+    return loss_D.mean().asscalar()
+
+# Defined in file: ./chapter_generative_adversarial_networks/gan.md
+def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
+    """Update generator"""
+    batch_size = Z.shape[0]
+    ones = nd.ones((batch_size,), ctx=Z.context)
+    with autograd.record():
+        # We could reuse fake_X from update_D to save computation.
+        fake_X = net_G(Z)
+        # Recomputing fake_Y is needed since net_D is changed.
+        fake_Y = net_D(fake_X)
+        loss_G = loss(fake_Y, ones)
+    loss_G.backward()
+    trainer_G.step(batch_size)
+    return loss_G.mean().asscalar()
+
+# Defined in file: ./chapter_generative_adversarial_networks/gan.md
+def scatter(X, Y, x_label=None, y_label=None, legend=None,
+            xlim=None, ylim=None, axes=None):
+    """A scatter plot of multiple data series"""
+    axes = axes if axes else d2l.plt.gca()
+    d2l.draw(axes, axes.scatter, X, Y, x_label, y_label, legend, xlim, ylim)
 
