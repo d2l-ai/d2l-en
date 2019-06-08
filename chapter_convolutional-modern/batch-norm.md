@@ -337,7 +337,7 @@ vs our custom implementation,
 which must be interpreted by Python.
 
 ```{.python .input}
-d2l.train_ch5(net, train_iter, test_iter, batch_size, num_epochs, lr)
+d2l.train_ch5(net, train_iter, test_iter, num_epochs, lr)
 ```
 
 ## Controversy

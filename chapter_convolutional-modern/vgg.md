@@ -1,46 +1,46 @@
 # Networks Using Blocks (VGG)
 
-While AlexNet proved that deep convolutional neural networks 
+While AlexNet proved that deep convolutional neural networks
 can achieve good results, it didn't offer a general template
-to guide subsequent researchers in designing new networks. 
+to guide subsequent researchers in designing new networks.
 In the following sections, we will introduce several heuristic concepts
 commonly used to design deep networks.
 
-Progress in this field mirrors that in chip design 
+Progress in this field mirrors that in chip design
 where engineers went from placing transistors
-to logical elements to logic blocks. 
-Similarly, the design of neural nework architectures 
+to logical elements to logic blocks.
+Similarly, the design of neural network architectures
 had grown progressively more abstract,
-with researchers moving from thinking in terms of 
-individual neurons to whole layers, 
+with researchers moving from thinking in terms of
+individual neurons to whole layers,
 and now to blocks, repeating patterns of layers.
 
-The idea of using blocks first emerged from the 
-[Visual Geometry Group](http://www.robots.ox.ac.uk/~vgg/) (VGG) 
-at Oxford University. 
+The idea of using blocks first emerged from the
+[Visual Geometry Group](http://www.robots.ox.ac.uk/~vgg/) (VGG)
+at Oxford University.
 In their eponymously-named VGG network,
-It's easy to implemented these repeated structures in code
-with any modern deep learning framework by using loops and subroutines. 
+It's easy to implement these repeated structures in code
+with any modern deep learning framework by using loops and subroutines.
 
 
 ## VGG Blocks
 
-The basic building block of classic convolutional networks 
+The basic building block of classic convolutional networks
 is a sequence of the following layers:
-(i) a convolutional layer 
-(with padding to maintain the resolution), 
+(i) a convolutional layer
+(with padding to maintain the resolution),
 (ii) a nonlinearity such as a ReLu,
-One VGG block consistis of a sequence of convolutional layers, 
-followed by a max pooling layer for spatial downsampling. 
-In the original VSS paper,
-[Simonyan and Ziserman, 2014](https://arxiv.org/abs/1409.1556) 
-employed convolutions with $3\times3$ kernels 
+One VGG block consists of a sequence of convolutional layers,
+followed by a max pooling layer for spatial downsampling.
+In the original VGG paper,
+[Simonyan and Ziserman, 2014](https://arxiv.org/abs/1409.1556)
+employed convolutions with $3\times3$ kernels
 and $2 \times 2$ max pooling with stride of $2$
-(halving the resolution after each block). 
-In the code below, we define a function called `vgg_block` 
-to implement one VGG block. 
+(halving the resolution after each block).
+In the code below, we define a function called `vgg_block`
+to implement one VGG block.
 The function takes two arguments
-corresponding to the number of convolutional layers `num_convs` 
+corresponding to the number of convolutional layers `num_convs`
 and the number of output channels `num_channels`.
 
 ```{.python .input  n=1}
@@ -59,28 +59,28 @@ def vgg_block(num_convs, num_channels):
 
 ## VGG Network
 
-Like AlexNet and LeNet, 
+Like AlexNet and LeNet,
 the VGG Network can be partitioned into two parts:
-the first consiting mostly of convolutional and pooling layers
-and a second consisting of fully-connected layers. 
-The convolutional portion of the net connects several `vgg_block` modules 
+the first consisting mostly of convolutional and pooling layers
+and a second consisting of fully-connected layers.
+The convolutional portion of the net connects several `vgg_block` modules
 in succession.
 Below, the variable `conv_arch` consists of a list of tuples (one per block),
 where each contains two values: the number of convolutional layers
 and the number of output channels,
-which are precisely the arguments requires to call 
+which are precisely the arguments requires to call
 the `vgg_block` function.
 The fully-connected module is identical to that covered in AlexNet.
 
 ![Designing a network from building blocks](../img/vgg.svg)
 
-The original VGG network had 5 convolutional blocks, 
-among which the first two have one convolutional layer each 
-and the latter three contain two convolutional layers each. 
+The original VGG network had 5 convolutional blocks,
+among which the first two have one convolutional layer each
+and the latter three contain two convolutional layers each.
 The first block has 64 output channels
-and each subsequent block doubles the number of output channels, 
-until that number reaches $512$. 
-Since this network uses $8$ convolutional layers 
+and each subsequent block doubles the number of output channels,
+until that number reaches $512$.
+Since this network uses $8$ convolutional layers
 and $3$ fully-connected layers, it is often called VGG-11.
 
 ```{.python .input  n=2}
@@ -104,7 +104,7 @@ def vgg(conv_arch):
 net = vgg(conv_arch)
 ```
 
-Next, we will construct a single-channel data example 
+Next, we will construct a single-channel data example
 with a height and width of 224 to observe the output shape of each layer.
 
 ```{.python .input  n=4}
@@ -115,15 +115,15 @@ for blk in net:
     print(blk.name, 'output shape:\t', X.shape)
 ```
 
-As you can see, we halve height and width at each block, 
-finally reaching a height and width of 7 
-before flattening the representations 
-for processing by the fully-connected layer. 
+As you can see, we halve height and width at each block,
+finally reaching a height and width of 7
+before flattening the representations
+for processing by the fully-connected layer.
 
 ## Model Training
 
 Since VGG-11 is more computationally-heavy than AlexNet
-we construct a network with a smaller number of channels. 
+we construct a network with a smaller number of channels.
 This is more than sufficient for training on Fashion-MNIST.
 
 ```{.python .input  n=5}
@@ -132,13 +132,13 @@ small_conv_arch = [(pair[0], pair[1] // ratio) for pair in conv_arch]
 net = vgg(small_conv_arch)
 ```
 
-Apart from using a slightly larger learning rate, 
+Apart from using a slightly larger learning rate,
 the model training process is similar to that of AlexNet in the last section.
 
 ```{.python .input}
-lr, num_epochs, batch_size = 0.05, 10, 128, 
+lr, num_epochs, batch_size = 0.05, 10, 128,
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)
-d2l.train_ch5(net, train_iter, test_iter, batch_size, num_epochs, lr)
+d2l.train_ch5(net, train_iter, test_iter, num_epochs, lr)
 ```
 
 ## Summary

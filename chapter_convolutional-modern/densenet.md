@@ -139,7 +139,7 @@ Since we are using a deeper network here, in this section, we will reduce the in
 ```{.python .input}
 lr, num_epochs, batch_size = 0.1, 10, 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)
-d2l.train_ch5(net, train_iter, test_iter, batch_size, num_epochs, lr)
+d2l.train_ch5(net, train_iter, test_iter, num_epochs, lr)
 ```
 
 ## Summary
