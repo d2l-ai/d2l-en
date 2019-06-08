@@ -135,7 +135,7 @@ for layer in net:
 We train ResNet on the Fashion-MNIST data set, just like before. The only thing that has changed is the learning rate that decreased again, due to the more complex architecture.
 
 ```{.python .input}
-lr, num_epochs, batch_size = 0.05, 5, 256
+lr, num_epochs, batch_size = 0.05, 10, 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)
 d2l.train_ch5(net, train_iter, test_iter, batch_size, num_epochs, lr)
 ```

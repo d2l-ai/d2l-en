@@ -284,7 +284,7 @@ The code is virtually identical to that in previous steps.
 The main difference is the considerably larger learning rate.
 
 ```{.python .input  n=77}
-lr, num_epochs, batch_size = 1.0, 5, 256
+lr, num_epochs, batch_size = 1.0, 10, 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 d2l.train_ch5(net, train_iter, test_iter, batch_size, num_epochs, lr)
 ```
