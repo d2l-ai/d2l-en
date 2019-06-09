@@ -15,6 +15,12 @@ def use_svg_display():
     """Use the svg format to display plot in jupyter."""
     display.set_matplotlib_formats('svg')
 
+# Defined in file: ./chapter_crashcourse/probability.md
+def set_figsize(figsize):
+    """Change the default figure size"""
+    use_svg_display()
+    plt.rcParams['figure.figsize'] = figsize
+
 # Defined in file: ./chapter_crashcourse/naive-bayes.md
 def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
     """Plot a list of images."""

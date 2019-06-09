@@ -2,6 +2,7 @@
 from IPython import display
 from matplotlib import pyplot as plt
 from mxnet import nd
+from .d2l import set_figsize, use_svg_display
 import numpy as np
 
 def bbox_to_rect(bbox, color):
@@ -37,11 +38,6 @@ def _check_shape_2d(X, Y):
     assert Y.ndim == 2, ('Y', Y)
     assert X.shape[-1] == Y.shape[-1], ('X', X, 'Y', Y)
     assert len(X) == len(Y) or len(X) == 1, ('X', X, 'Y', Y)
-
-def set_figsize(figsize=(3.5, 2.5)):
-    """Set matplotlib figure size."""
-    use_svg_display()
-    plt.rcParams['figure.figsize'] = figsize
 
 def _make_list(obj, default_values=None):
     if obj is None:
