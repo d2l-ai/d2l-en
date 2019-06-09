@@ -248,6 +248,26 @@ def annotate(text, xy, xytext):
     d2l.plt.gca().annotate(text, xy=xy, xytext=xytext,
                            arrowprops=dict(arrowstyle='->'))
 
+# Defined in file: ./chapter_optimization/gd.md
+def train_2d(trainer):
+    # s1 and s2 are internal state variables and will 
+    # be used later in the chapter
+    x1, x2, s1, s2 = -5, -2, 0, 0
+    results = [(x1, x2)]
+    for i in range(20):
+        x1, x2, s1, s2 = trainer(x1, x2, s1, s2)
+        results.append((x1, x2))
+    print('epoch %d, x1 %f, x2 %f' % (i + 1, x1, x2))
+    return results
+
+# Defined in file: ./chapter_optimization/gd.md
+def show_trace_2d(f, results):
+    d2l.plt.plot(*zip(*results), '-o', color='#ff7f0e')
+    x1, x2 = np.meshgrid(np.arange(-5.5, 1.0, 0.1), np.arange(-3.0, 1.0, 0.1))
+    d2l.plt.contour(x1, x2, f(x1, x2), colors='#1f77b4')
+    d2l.plt.xlabel('x1')
+    d2l.plt.ylabel('x2')
+
 # Defined in file: ./chapter_generative_adversarial_networks/gan.md
 def update_D(X, Z, net_D, net_G, loss, trainer_D):
     """Update discriminator"""

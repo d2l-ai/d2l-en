@@ -75,18 +75,6 @@ def train(train_iter, test_iter, net, loss, trainer, ctx, num_epochs):
               % (epoch + 1, train_l_sum / n, train_acc_sum / m, test_acc,
                  time.time() - start))
 
-
-def train_2d(trainer):
-    """Optimize the objective function of 2D variables with a customized trainer."""
-    x1, x2 = -5, -2
-    s_x1, s_x2 = 0, 0
-    res = [(x1, x2)]
-    for i in range(20):
-        x1, x2, s_x1, s_x2 = trainer(x1, x2, s_x1, s_x2)
-        res.append((x1, x2))
-    print('epoch %d, x1 %f, x2 %f' % (i+1, x1, x2))
-    return res
-
 def train_and_predict_rnn(rnn, get_params, init_rnn_state, num_hiddens,
                           corpus_indices, vocab, ctx, is_random_iter,
                           num_epochs, num_steps, lr, clipping_theta,
@@ -184,68 +172,6 @@ def train_and_predict_rnn_gluon(model, num_hiddens, corpus_indices, vocab,
         if epoch % (num_epochs // 2) == 0:
             for prefix in prefixes:
                 print(' -', predict_rnn_gluon(prefix, 50, model, vocab, ctx))
-
-def train_ch9(trainer_fn, states, hyperparams, features, labels, batch_size=10,
-              num_epochs=2):
-    """Train a linear regression model."""
-    net, loss = linreg, squared_loss
-    w, b = nd.random.normal(scale=0.01, shape=(
-        features.shape[1], 1)), nd.zeros(1)
-    w.attach_grad()
-    b.attach_grad()
-
-    def eval_loss():
-        return loss(net(features, w, b), labels).mean().asscalar()
-
-    ls = [eval_loss()]
-    data_iter = gdata.DataLoader(
-        gdata.ArrayDataset(features, labels), batch_size, shuffle=True)
-    for _ in range(num_epochs):
-        start = time.time()
-        for batch_i, (X, y) in enumerate(data_iter):
-            with autograd.record():
-                l = loss(net(X, w, b), y).mean()
-            l.backward()
-            trainer_fn([w, b], states, hyperparams)
-            if (batch_i + 1) * batch_size % 100 == 0:
-                ls.append(eval_loss())
-    print('loss: %f, %f sec per epoch' % (ls[-1], time.time() - start))
-    set_figsize()
-    plt.plot(np.linspace(0, num_epochs, len(ls)), ls)
-    plt.xlabel('epoch')
-    plt.ylabel('loss')
-
-
-def train_gluon_ch9(trainer_name, trainer_hyperparams, features, labels,
-                    batch_size=10, num_epochs=2):
-    """Train a linear regression model with a given Gluon trainer."""
-    net = nn.Sequential()
-    net.add(nn.Dense(1))
-    net.initialize(init.Normal(sigma=0.01))
-    loss = gloss.L2Loss()
-
-    def eval_loss():
-        return loss(net(features), labels).mean().asscalar()
-
-    ls = [eval_loss()]
-    data_iter = gdata.DataLoader(
-        gdata.ArrayDataset(features, labels), batch_size, shuffle=True)
-    trainer = gluon.Trainer(net.collect_params(),
-                            trainer_name, trainer_hyperparams)
-    for _ in range(num_epochs):
-        start = time.time()
-        for batch_i, (X, y) in enumerate(data_iter):
-            with autograd.record():
-                l = loss(net(X), y)
-            l.backward()
-            trainer.step(batch_size)
-            if (batch_i + 1) * batch_size % 100 == 0:
-                ls.append(eval_loss())
-    print('loss: %f, %f sec per epoch' % (ls[-1], time.time() - start))
-    set_figsize()
-    plt.plot(np.linspace(0, num_epochs, len(ls)), ls)
-    plt.xlabel('epoch')
-    plt.ylabel('loss')
 
 def to_onehot(X, size):
     return [nd.one_hot(x, size) for x in X.T]
