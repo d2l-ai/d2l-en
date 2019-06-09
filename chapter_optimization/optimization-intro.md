@@ -16,16 +16,17 @@ training data set, the goal of optimization is to reduce the training error.
 However, the goal of statistical inference (and thus of deep learning) is to
 reduce the generalization error.  To accomplish the latter we need to pay
 attention to overfitting in addition to using the optimization algorithm to
-reduce the training error. We begin by importing a few libraries.
+reduce the training error. We begin by importing a few libraries with a function to annotate in a figure. 
 
 ```{.python .input  n=1}
-import sys
-sys.path.insert(0, '..')
-
 %matplotlib inline
 import d2l
 from mpl_toolkits import mplot3d
 import numpy as np
+
+def annotate(text, xy, xytext):
+    d2l.plt.gca().annotate(text, xy=xy, xytext=xytext,
+                           arrowprops=dict(arrowstyle='->'))
 ```
 
 The graph below illustrates the issue in some more detail. Since we have only a finite amount of data the minimum of the training error may be at a different location than the minimum of the expected error (or of the test error).
@@ -36,16 +37,10 @@ def g(x): return f(x) + 0.2 * np.cos(5 * np.pi * x)
 
 d2l.set_figsize((4.5, 2.5))
 x = np.arange(0.5, 1.5, 0.01)
-fig,  = d2l.plt.plot(x, f(x))
-fig,  = d2l.plt.plot(x, g(x))
-fig.axes.annotate('empirical risk', xy=(1.0, -1.2), xytext=(0.5, -1.1),
-                  arrowprops=dict(arrowstyle='->'))
-fig.axes.annotate('expected risk', xy=(1.1, -1.05), xytext=(0.95, -0.5),
-                  arrowprops=dict(arrowstyle='->'))
-d2l.plt.xlabel('x')
-d2l.plt.ylabel('risk');
+d2l.plot(x, [f(x), g(x)], 'x', 'risk')
+annotate('empirical risk', (1.0, -1.2), (0.5, -1.1))
+annotate('expected risk', (1.1, -1.05), (0.95, -0.5))
 ```
-
 
 ## Optimization Challenges in Deep Learning
 
@@ -72,15 +67,10 @@ we can approximate the local minimum and global minimum of this function.
 
 ```{.python .input  n=3}
 x = np.arange(-1.0, 2.0, 0.01)
-fig,  = d2l.plt.plot(x, f(x))
-fig.axes.annotate('local minimum', xy=(-0.3, -0.25), xytext=(-0.77, -1.0),
-                  arrowprops=dict(arrowstyle='->'))
-fig.axes.annotate('global minimum', xy=(1.1, -0.95), xytext=(0.6, 0.8),
-                  arrowprops=dict(arrowstyle='->'))
-d2l.plt.xlabel('x')
-d2l.plt.ylabel('f(x)');
+d2l.plot(x, [f(x), ], 'x', 'f(x)')
+annotate('local minimum', (-0.3, -0.25), (-0.77, -1.0))
+annotate('global minimum', (1.1, -0.95), (0.6, 0.8))
 ```
-
 
 The objective function of deep learning models usually has many local optima. When the numerical solution of an optimization problem is near the local optimum, the numerical solution obtained by the final iteration may only minimize the objective function locally, rather than globally, as the gradient of the objective function's solutions approaches or becomes zero. Only some degree of noise might knock the parameter out of the local minimum. In fact, this is one of the beneficial properties of stochastic gradient descent where the natural variation of gradients over minibatches is able to dislodge the parameters from local minima.
 
@@ -90,13 +80,9 @@ Besides local minima, saddle points are another reason for gradients to vanish. 
 
 ```{.python .input  n=4}
 x = np.arange(-2.0, 2.0, 0.01)
-fig, = d2l.plt.plot(x, x**3)
-fig.axes.annotate('saddle point', xy=(0, -0.2), xytext=(-0.52, -5.0),
-                  arrowprops=dict(arrowstyle='->'))
-d2l.plt.xlabel('x')
-d2l.plt.ylabel('f(x)');
+d2l.plot(x, [x**3], 'x', 'f(x)')
+annotate('saddle point', (0, -0.2), (-0.52, -5.0))
 ```
-
 
 Saddle points in higher dimensions are even more insidious, as the example below shows. Consider the function $f(x, y) = x^2 - y^2$. It has its saddle point at $(0,0)$. This is a maximum with respect to $y$ and a minimum with respect to $x$. Moreover, it *looks* like a saddle, which is where this mathematical property got its name.
 
@@ -115,7 +101,6 @@ ax.set_zticks(ticks)
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('y');
 ```
-
 
 We assume that the input of a function is a $k$-dimensional vector and its
 output is a scalar, so its Hessian matrix will have $k$ eigenvalues
@@ -136,13 +121,9 @@ Probably the most insidious problem to encounter are vanishing gradients. For in
 
 ```{.python .input  n=6}
 x = np.arange(-2.0, 5.0, 0.01)
-fig, = d2l.plt.plot(x, np.tanh(x))
-fig.axes.annotate('vanishing gradient', xy=(4, 1), xytext=(2, 0.0),
-                  arrowprops=dict(arrowstyle='->'))
-d2l.plt.xlabel('x')
-d2l.plt.ylabel('f(x)');
+d2l.plot(x, [np.tanh(x)], 'x', 'f(x)')
+annotate('vanishing gradient', (4, 1), (2, 0.0))
 ```
-
 
 As we saw, optimization for deep learning is full of challenges. Fortunately there exists a robust range of algorithms that perform well and that are easy to use even for beginners. Furthermore, it isn't really necessary to find *the* best solution. Local optima or even approximate solutions thereof are still very useful.
 
