@@ -242,6 +242,11 @@ def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
     print('Done in %d sec on %s, loss %.3f, train acc %.3f, test acc %.3f'%(
         time.time()-start, ctx, *trains[-1], test_accs[-1]))
 
+# Defined in file: ./chapter_optimization/optimization-intro.md
+def annotate(text, xy, xytext):
+    d2l.plt.gca().annotate(text, xy=xy, xytext=xytext,
+                           arrowprops=dict(arrowstyle='->'))
+
 # Defined in file: ./chapter_generative_adversarial_networks/gan.md
 def update_D(X, Z, net_D, net_G, loss, trainer_D):
     """Update discriminator"""

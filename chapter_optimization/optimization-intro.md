@@ -16,7 +16,7 @@ training data set, the goal of optimization is to reduce the training error.
 However, the goal of statistical inference (and thus of deep learning) is to
 reduce the generalization error.  To accomplish the latter we need to pay
 attention to overfitting in addition to using the optimization algorithm to
-reduce the training error. We begin by importing a few libraries with a function to annotate in a figure. 
+reduce the training error. We begin by importing a few libraries with a function to annotate in a figure.
 
 ```{.python .input  n=1}
 %matplotlib inline
@@ -24,6 +24,7 @@ import d2l
 from mpl_toolkits import mplot3d
 import numpy as np
 
+# Save to the d2l package.
 def annotate(text, xy, xytext):
     d2l.plt.gca().annotate(text, xy=xy, xytext=xytext,
                            arrowprops=dict(arrowstyle='->'))
