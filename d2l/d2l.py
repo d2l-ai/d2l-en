@@ -121,21 +121,22 @@ def train_epoch_ch3(net, train_iter, loss, updater):
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def plot(X, Y, x_label=None, y_label=None, legend=None,
-         xlim=None, ylim=None, axes=None):
+         xlim=None, ylim=None, fmts=None, axes=None):
     """Plot multiple lines"""
     axes = axes if axes else d2l.plt.gca()
-    draw(axes, axes.plot, X, Y, x_label, y_label, legend, xlim, ylim)
+    draw(axes, axes.plot, X, Y, x_label, y_label, legend, xlim, ylim, fmts)
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-def draw(axes, func, X, Y, x_label, y_label, legend, xlim, ylim):
+def draw(axes, func, X, Y, x_label, y_label, legend, xlim, ylim, fmts):
     """Draw multiple data series with customized func"""
     if not hasattr(X[0], "__len__") or len(X[0]) != len(Y[0]):
         X = [X] * len(Y)
+    if not fmts: fmts = ['-']*len(X)
     axes.cla()
-    for x, y in zip(X, Y):
+    for x, y, fmt in zip(X, Y, fmts):
         if isinstance(x, nd.NDArray): x = x.asnumpy()
         if isinstance(y, nd.NDArray): y = y.asnumpy()
-        func(x, y)
+        func(x, y, fmt)
     if x_label: axes.set_xlabel(x_label)
     if y_label: axes.set_ylabel(y_label)
     if xlim: axes.set_xlim(xlim)
