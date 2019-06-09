@@ -189,7 +189,7 @@ The result is an NDArray containing entries of 0 (false) and 1 (true).
 Taking the mean yields the desired result.
 
 ```{.python .input  n=17}
-# Save to the d2l package. 
+# Save to the d2l package.
 def accuracy(y_hat, y):
     return (y_hat.argmax(axis=1) == y.astype('float32')).sum().asscalar()
 ```
@@ -213,7 +213,7 @@ Similarly, we can evaluate the accuracy for model `net` on the data set
 (accessed via `data_iter`).
 
 ```{.python .input  n=19}
-# Save to the d2l package. 
+# Save to the d2l package.
 def evaluate_accuracy(net, data_iter):
     acc_sum, n = 0.0, 0
     for X, y in data_iter:
@@ -238,7 +238,7 @@ if you read through our implementation
 of linear regression in :numref:`chapter_linear_scratch`. Here we refactor the implementation to make it reusable. First, we define a function to train for one data epoch.
 
 ```{.python .input}
-# Save to the d2l package. 
+# Save to the d2l package.
 def train_epoch_ch3(net, train_iter, loss, updater):
     train_l_sum, train_acc_sum, n = 0.0, 0.0, 0
     for X, y in train_iter:
@@ -258,20 +258,22 @@ def train_epoch_ch3(net, train_iter, loss, updater):
 Then we define a convenient plot function that draws multiple lines in a figure, and a utility function that animates the training progress.
 
 ```{.python .input}
-# Save to the d2l package. 
-def plot(X, Y, x_label=None, y_label=None, legend=None, 
+# Save to the d2l package.
+def plot(X, Y, x_label=None, y_label=None, legend=None,
          xlim=None, ylim=None, axes=None):
     """Plot multiple lines"""
     axes = axes if axes else d2l.plt.gca()
     draw(axes, axes.plot, X, Y, x_label, y_label, legend, xlim, ylim)
-    
-# Save to the d2l package. 
+
+# Save to the d2l package.
 def draw(axes, func, X, Y, x_label, y_label, legend, xlim, ylim):
     """Draw multiple data series with customized func"""
     if not hasattr(X[0], "__len__") or len(X[0]) != len(Y[0]):
         X = [X] * len(Y)
     axes.cla()
     for x, y in zip(X, Y):
+        if isinstance(x, nd.NDArray): x = x.asnumpy()
+        if isinstance(y, nd.NDArray): y = y.asnumpy()
         func(x, y)
     if x_label: axes.set_xlabel(x_label)
     if y_label: axes.set_ylabel(y_label)
@@ -279,7 +281,7 @@ def draw(axes, func, X, Y, x_label, y_label, legend, xlim, ylim):
     if ylim: axes.set_ylim(ylim)
     if legend: axes.legend(legend)
 
-# Save to the d2l package. 
+# Save to the d2l package.
 def show(obj):
     """Show a figure"""
     display.display(obj)
@@ -289,7 +291,7 @@ def show(obj):
 The training function then runs multiple epochs and visualize the training progress.
 
 ```{.python .input}
-# Save to the d2l package. 
+# Save to the d2l package.
 def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
     trains, test_accs = [], []
     d2l.use_svg_display()
@@ -299,7 +301,7 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
         test_accs.append(evaluate_accuracy(net, test_iter))
         legend = ['train loss', 'train acc', 'test acc']
         res = list(map(list, zip(*trains)))+[test_accs,]
-        plot(list(range(1, epoch+2)), res, 'epoch', legend=legend, 
+        plot(list(range(1, epoch+2)), res, 'epoch', legend=legend,
              xlim=[0,num_epochs+1], ylim=[0.3, 0.9], axes=ax)
         show(fig)
 ```
@@ -325,7 +327,7 @@ Given a series of images, we will compare their actual labels
 (second line of text output).
 
 ```{.python .input}
-# Save to the d2l package. 
+# Save to the d2l package.
 def predict_ch3(net, test_iter, n=9):
     for X, y in test_iter:
         break
@@ -333,7 +335,7 @@ def predict_ch3(net, test_iter, n=9):
     preds = d2l.get_fashion_mnist_labels(net(X).argmax(axis=1).asnumpy())
     titles = [true+'\n'+ pred for true, pred in zip(trues, preds)]
     d2l.show_images(X[0:n].reshape((n,28,28)), 1, n, titles=titles[0:n])
-    
+
 predict_ch3(net, test_iter)
 ```
 

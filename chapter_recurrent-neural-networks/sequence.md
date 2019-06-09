@@ -69,17 +69,16 @@ After so much theory, let's try this out in practice. Since much of the modeling
 
 ```{.python .input}
 %matplotlib inline
-from IPython import display
-from matplotlib import pyplot as plt
+import d2l
 from mxnet import autograd, nd, gluon, init
-display.set_matplotlib_formats('svg')
+d2l.use_svg_display()
 
 embedding = 4  # Embedding dimension for autoregressive model
 T = 1000  # Generate a total of 1000 points
 time = nd.arange(0,T)
 x = nd.sin(0.01 * time) + 0.2 * nd.random.normal(shape=(T))
 
-plt.plot(time.asnumpy(), x.asnumpy());
+d2l.plt.plot(time.asnumpy(), x.asnumpy());
 ```
 
 Next we need to turn this 'time series' into data the network can train on. Based on the embedding dimension $\tau$ we map the data into pairs $y_t = x_t$ and $\mathbf{z}_t = (x_{t-1}, \ldots x_{t-\tau})$. The astute reader might have noticed that this gives us $\tau$ fewer datapoints, since we don't have sufficient history for the first $\tau$ of them. A simple fix, in particular if the time series is long is to discard those few terms. Alternatively we could pad the time series with zeros. The code below is essentially identical to the training code in previous sections.
@@ -137,9 +136,8 @@ The both training and test loss are small and we would expect our model to work 
 
 ```{.python .input}
 estimates = net(features)
-plt.plot(time.asnumpy(), x.asnumpy(), label='data');
-plt.plot(time[embedding:].asnumpy(), estimates.asnumpy(), label='estimate');
-plt.legend();
+d2l.plot([time, time[embedding:]], [x, estimates], 
+         legend=['data', 'estimate'])
 ```
 
 ## Predictions
@@ -161,11 +159,9 @@ for i in range(ntrain-embedding, T-embedding):
     predictions[i] = net(
         predictions[(i-embedding):i].reshape(1,-1)).reshape(1)
 
-plt.plot(time.asnumpy(), x.asnumpy(), label='data');
-plt.plot(time[embedding:].asnumpy(), estimates.asnumpy(), label='estimate');
-plt.plot(time[embedding:].asnumpy(), predictions.asnumpy(),
-         label='multistep');
-plt.legend();
+d2l.plot([time, time[embedding:], time[embedding:]],
+         [x, estimates, predictions], 
+         legend=['data', 'estimate', 'multistep'])
 ```
 
 As the above example shows, this is a spectacular failure. The estimates decay to 0 pretty quickly after a few prediction steps. Why did the algorithm work so poorly? This is ultimately due to the fact that errors build up. Let's say that after step 1 we have some error $\epsilon_1 = \bar\epsilon$. Now the *input* for step 2 is perturbed by $\epsilon_1$, hence we suffer some error in the order of $\epsilon_2 = \bar\epsilon + L \epsilon_1$, and so on. The error can diverge rather rapidly from the true observations. This is a common phenomenon - for instance weather forecasts for the next 24 hours tend to be pretty accurate but beyond that their accuracy declines rapidly. We will discuss methods for improvig this throughout this chapter and beyond.
@@ -183,9 +179,9 @@ for i in range(embedding, k):
     features[:,i] = net(features[:,(i-embedding):i]).reshape((-1))
 
 for i in (4, 8, 16, 32):
-    plt.plot(time[i:T-k+i].asnumpy(), features[:,i].asnumpy(),
+    d2l.plt.plot(time[i:T-k+i].asnumpy(), features[:,i].asnumpy(),
              label=('step ' + str(i)))
-plt.legend();
+d2l.plt.legend();
 ```
 
 This clearly illustrates how the quality of the estimates changes as we try to predict further into the future. While the 8-step predictions are still pretty good, anything beyond that is pretty useless.

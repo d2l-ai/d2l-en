@@ -114,12 +114,11 @@ def train_epoch_ch3(net, train_iter, loss, updater):
     return train_l_sum/n, train_acc_sum/n
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-def plot(X, Y, x_label=None, y_label=None, legend=None, 
+def plot(X, Y, x_label=None, y_label=None, legend=None,
          xlim=None, ylim=None, axes=None):
     """Plot multiple lines"""
     axes = axes if axes else d2l.plt.gca()
     draw(axes, axes.plot, X, Y, x_label, y_label, legend, xlim, ylim)
-    
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def draw(axes, func, X, Y, x_label, y_label, legend, xlim, ylim):
@@ -128,6 +127,8 @@ def draw(axes, func, X, Y, x_label, y_label, legend, xlim, ylim):
         X = [X] * len(Y)
     axes.cla()
     for x, y in zip(X, Y):
+        if isinstance(x, nd.NDArray): x = x.asnumpy()
+        if isinstance(y, nd.NDArray): y = y.asnumpy()
         func(x, y)
     if x_label: axes.set_xlabel(x_label)
     if y_label: axes.set_ylabel(y_label)
@@ -151,7 +152,7 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
         test_accs.append(evaluate_accuracy(net, test_iter))
         legend = ['train loss', 'train acc', 'test acc']
         res = list(map(list, zip(*trains)))+[test_accs,]
-        plot(list(range(1, epoch+2)), res, 'epoch', legend=legend, 
+        plot(list(range(1, epoch+2)), res, 'epoch', legend=legend,
              xlim=[0,num_epochs+1], ylim=[0.3, 0.9], axes=ax)
         show(fig)
 
@@ -163,7 +164,6 @@ def predict_ch3(net, test_iter, n=9):
     preds = d2l.get_fashion_mnist_labels(net(X).argmax(axis=1).asnumpy())
     titles = [true+'\n'+ pred for true, pred in zip(trues, preds)]
     d2l.show_images(X[0:n].reshape((n,28,28)), 1, n, titles=titles[0:n])
-    
 
 # Defined in file: ./chapter_deep-learning-computation/use-gpu.md
 def try_gpu(i=0):
@@ -215,8 +215,7 @@ def train_epoch_ch5(net, train_iter, loss, trainer, ctx):
     return train_l_sum / n, train_acc_sum / n
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
-def train_ch5(net, train_iter, test_iter, num_epochs, lr, 
-              ctx=d2l.try_gpu()):
+def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
     net.initialize(force_reinit=True, ctx=ctx, init=init.Xavier())
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
     trainer = gluon.Trainer(net.collect_params(),
@@ -231,7 +230,7 @@ def train_ch5(net, train_iter, test_iter, num_epochs, lr,
         test_accs.append(evaluate_accuracy(net, test_iter))
         legend = ['train loss', 'train acc', 'test acc']
         res = list(map(list, zip(*trains)))+[test_accs,]
-        d2l.plot(list(range(1, epoch+2)), res, 'epoch', legend=legend, 
+        d2l.plot(list(range(1, epoch+2)), res, 'epoch', legend=legend,
              xlim=[0,num_epochs+1], ylim=[0, 1], axes=ax)
         d2l.show(fig)
     print('Done in %d sec on %s, loss %.3f, train acc %.3f, test acc %.3f'%(
