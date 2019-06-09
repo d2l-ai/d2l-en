@@ -4,13 +4,9 @@
 In this section, we are going to introduce the basic principles of stochastic gradient descent.
 
 ```{.python .input  n=1}
-import sys
-sys.path.insert(0, '..')
-
 %matplotlib inline
 import d2l
 import math
-from mxnet import nd
 import numpy as np
 ```
 

@@ -5,6 +5,7 @@ d2l = sys.modules[__name__]
 from IPython import display
 import os
 import sys
+import numpy as np
 from matplotlib import pyplot as plt
 from mxnet import nd, autograd, gluon, init, context
 from mxnet.gluon import nn
@@ -250,6 +251,7 @@ def annotate(text, xy, xytext):
 
 # Defined in file: ./chapter_optimization/gd.md
 def train_2d(trainer):
+    """Optimize a 2-dim objective function with a customized trainer."""
     # s1 and s2 are internal state variables and will 
     # be used later in the chapter
     x1, x2, s1, s2 = -5, -2, 0, 0
@@ -262,6 +264,8 @@ def train_2d(trainer):
 
 # Defined in file: ./chapter_optimization/gd.md
 def show_trace_2d(f, results):
+    """Show the trace of 2D variables during optimization."""
+    d2l.set_figsize((3.5, 2.5))
     d2l.plt.plot(*zip(*results), '-o', color='#ff7f0e')
     x1, x2 = np.meshgrid(np.arange(-5.5, 1.0, 0.1), np.arange(-3.0, 1.0, 0.1))
     d2l.plt.contour(x1, x2, f(x1, x2), colors='#1f77b4')
