@@ -121,9 +121,9 @@ print(estimates[:,100])
 As you can see, after the first toss of the die, we get the extreme estimate
 that one of the numbers will be rolled with probability $1.0$ and that the
 others have probability $0$. After $100$ rolls, things already look a bit more
-reasonable. We can visualize this convergence. 
+reasonable. We can visualize this convergence.
 
-First we define a function that specifies `matplotlib` to output the SVG figures for sharper images, and another one to specify the figure sizes. 
+First we define a function that specifies `matplotlib` to output the SVG figures for sharper images, and another one to specify the figure sizes.
 
 ```{.python .input}
 # Save to the d2l package.
@@ -132,7 +132,7 @@ def use_svg_display():
     display.set_matplotlib_formats('svg')
 
 # Save to the d2l package.
-def set_figsize(figsize):
+def set_figsize(figsize=(3.5, 2.5)):
     """Change the default figure size"""
     use_svg_display()
     plt.rcParams['figure.figsize'] = figsize

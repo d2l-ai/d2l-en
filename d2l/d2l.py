@@ -21,7 +21,7 @@ def use_svg_display():
     display.set_matplotlib_formats('svg')
 
 # Defined in file: ./chapter_crashcourse/probability.md
-def set_figsize(figsize):
+def set_figsize(figsize=(3.5, 2.5)):
     """Change the default figure size"""
     use_svg_display()
     plt.rcParams['figure.figsize'] = figsize
