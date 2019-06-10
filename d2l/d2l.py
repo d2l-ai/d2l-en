@@ -1,3 +1,7 @@
+# This file is generated automatically through:
+#    d2lbook build lib
+# Don't edit it directly
+
 import sys
 d2l = sys.modules[__name__]
 
@@ -173,6 +177,15 @@ def predict_ch3(net, test_iter, n=9):
     titles = [true+'\n'+ pred for true, pred in zip(trues, preds)]
     d2l.show_images(X[0:n].reshape((n,28,28)), 1, n, titles=titles[0:n])
 
+# Defined in file: ./chapter_multilayer-perceptrons/underfit-overfit.md
+def evaluate_loss(net, data_iter, loss):
+    """Evaluate the loss of a model on the given dataset"""
+    l, n = 0.0, 0
+    for X, y in data_iter:
+        l += loss(net(X), y).sum().asscalar()
+        n += X.shape[0]
+    return l / n
+
 # Defined in file: ./chapter_deep-learning-computation/use-gpu.md
 def try_gpu(i=0):
     """Return gpu(i) if exists, otherwise return cpu()."""
@@ -271,6 +284,40 @@ def show_trace_2d(f, results):
     d2l.plt.contour(x1, x2, f(x1, x2), colors='#1f77b4')
     d2l.plt.xlabel('x1')
     d2l.plt.ylabel('x2')
+
+# Defined in file: ./chapter_optimization/minibatch-sgd.md
+def get_data_ch7(batch_size=10, n=1500):
+    data = np.genfromtxt('../data/airfoil_self_noise.dat', delimiter='\t')
+    data = (data - data.mean(axis=0)) / data.std(axis=0)
+    return d2l.load_array(nd.array(data[:n, :-1]), 
+                          nd.array(data[:n, -1]), batch_size, is_train=True)
+
+# Defined in file: ./chapter_optimization/minibatch-sgd.md
+def train_gluon_ch10(trainer_name, trainer_hyperparams, 
+                     data_iter, num_epochs):
+    # Initialization
+    net = nn.Sequential()
+    net.add(nn.Dense(1))
+    net.initialize(init.Normal(sigma=0.01))
+    trainer = gluon.Trainer(
+        net.collect_params(), trainer_name, trainer_hyperparams)
+    loss = gloss.L2Loss()
+    eval_loss = lambda: d2l.evaluate_loss(net, data_iter, loss)
+    losses, t, n, start = [eval_loss()], 0, 0, time.time()
+    for _ in range(num_epochs):
+        for X, y in data_iter:
+            start = time.time()
+            with autograd.record():
+                l = loss(net(X), y)
+            l.backward()
+            trainer.step(X.shape[0])
+            n, t = n + X.shape[0], time.time() - start + t
+            if n % 100 == 0:
+                losses.append(eval_loss())
+    # Print and plot the results
+    print('loss: %.3f, %.3f sec per epoch' % (losses[-1], t/num_epochs))
+    d2l.set_figsize((3.5, 2.5))
+    d2l.plot(np.linspace(0,num_epochs,len(losses)), [losses], 'epoch', 'loss')
 
 # Defined in file: ./chapter_generative_adversarial_networks/gan.md
 def update_D(X, Z, net_D, net_G, loss, trainer_D):
