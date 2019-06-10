@@ -22,9 +22,6 @@ implement gradient descent based on this objective function, and demonstrate the
 iterative trajectory of the independent variable using the learning rate $0.4$.
 
 ```{.python .input  n=3}
-import sys
-sys.path.insert(0, '..')
-
 %matplotlib inline
 import d2l
 from mxnet import nd
@@ -108,12 +105,12 @@ The following code block shows the weights for the past 40 time steps under vari
 
 ```{.python .input}
 gammas = [0.95, 0.9, 0.6, 0]
-d2l.set_figsize()
+d2l.set_figsize((3.5, 2.5))
 for gamma in gammas:
     x = nd.arange(40).asnumpy()
-    d2l.plt.plot(x, gamma ** x)
+    d2l.plt.plot(x, gamma ** x, label='gamma = %.2f'%gamma)
 d2l.plt.xlabel('time')
-d2l.plt.legend(['gamma = %.2f'%g for g in gammas]);
+d2l.plt.legend();
 ```
 
 A small $\gamma$ will let the velocity variable focus on more recent scaled gradients. While a large value will have the velocity variable to include more past scaled gradients. Compared to the plain gradient descent, momentum will make the weight updates be more consistent over time. It might smooth the training progress if $\mathbf x$ enters the region that the gradient vary, or walk out region that is too flat.
@@ -125,10 +122,8 @@ Also note that $\frac{1}{1-\gamma} = 1 + \gamma + \gamma^2 + \cdots$. So all sca
 Compared with mini-batch SGD, the momentum method needs to maintain a velocity variable of the same shape for each independent variable and a momentum hyperparameter is added to the hyperparameter category. In the implementation, we use the state variable `states` to represent the velocity variable in a more general sense.
 
 ```{.python .input  n=13}
-features, labels = d2l.get_data_ch7()
-
-def init_momentum_states():
-    v_w = nd.zeros((features.shape[1], 1))
+def init_momentum_states(feature_dim):
+    v_w = nd.zeros((feature_dim, 1))
     v_b = nd.zeros(1)
     return (v_w, v_b)
 
@@ -141,22 +136,25 @@ def sgd_momentum(params, states, hyperparams):
 When we set the momentum hyperparameter `momentum` to 0.5, it can be treated as a mini-batch SGD: the mini-batch gradient here is the weighted average of twice the mini-batch gradient of the last two time steps.
 
 ```{.python .input  n=15}
-d2l.train_ch9(sgd_momentum, init_momentum_states(),
-             {'lr': 0.02, 'momentum': 0.5}, features, labels)
+def train_momentum(lr, momentum, num_epochs=2):
+    d2l.train_ch10(sgd_momentum, init_momentum_states(feature_dim),
+                   {'lr': lr, 'momentum': momentum}, data_iter, 
+                   feature_dim, num_epochs)
+    
+data_iter, feature_dim = d2l.get_data_ch10(batch_size=10)
+train_momentum(0.02, 0.5)
 ```
 
 When we increase the momentum hyperparameter `momentum` to 0.9, it can still be treated as a mini-batch SGD: the mini-batch gradient here will be the weighted average of ten times the mini-batch gradient of the last 10 time steps. Now we keep the learning rate at 0.02.
 
 ```{.python .input  n=8}
-d2l.train_ch9(sgd_momentum, init_momentum_states(),
-              {'lr': 0.02, 'momentum': 0.9}, features, labels)
+train_momentum(0.02, 0.9)
 ```
 
 We can see that the value change of the objective function is not smooth enough at later stages of iteration. Intuitively, ten times the mini-batch gradient is five times larger than two times the mini-batch gradient, so we can try to reduce the learning rate to 1/5 of its original value. Now, the value change of the objective function becomes smoother after its period of decline.
 
 ```{.python .input}
-d2l.train_ch9(sgd_momentum, init_momentum_states(),
-              {'lr': 0.004, 'momentum': 0.9}, features, labels)
+train_momentum(0.004, 0.9)
 ```
 
 ## Concise Implementation
@@ -164,8 +162,8 @@ d2l.train_ch9(sgd_momentum, init_momentum_states(),
 In Gluon, we only need to use `momentum` to define the momentum hyperparameter in the `Trainer` instance to implement momentum.
 
 ```{.python .input  n=9}
-d2l.train_gluon_ch9('sgd', {'learning_rate': 0.004, 'momentum': 0.9},
-                    features, labels)
+d2l.train_gluon_ch10('sgd', {'learning_rate': 0.004, 'momentum': 0.9},
+                     data_iter)
 ```
 
 ## Summary

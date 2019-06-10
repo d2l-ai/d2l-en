@@ -2,6 +2,7 @@
 from IPython import display
 from matplotlib import pyplot as plt
 from mxnet import nd
+from .d2l import set_figsize, use_svg_display
 import numpy as np
 
 def bbox_to_rect(bbox, color):
@@ -38,11 +39,6 @@ def _check_shape_2d(X, Y):
     assert X.shape[-1] == Y.shape[-1], ('X', X, 'Y', Y)
     assert len(X) == len(Y) or len(X) == 1, ('X', X, 'Y', Y)
 
-def set_figsize(figsize=(3.5, 2.5)):
-    """Set matplotlib figure size."""
-    use_svg_display()
-    plt.rcParams['figure.figsize'] = figsize
-
 def _make_list(obj, default_values=None):
     if obj is None:
         obj = default_values
@@ -63,16 +59,3 @@ def show_bboxes(axes, bboxes, labels=None, colors=None):
             axes.text(rect.xy[0], rect.xy[1], labels[i],
                       va='center', ha='center', fontsize=9, color=text_color,
                       bbox=dict(facecolor=color, lw=0))
-
-
-def show_trace_2d(f, res):
-    """Show the trace of 2D variables during optimization."""
-    x1, x2 = zip(*res)
-    set_figsize()
-    plt.plot(x1, x2, '-o', color='#ff7f0e')
-    x1 = np.arange(-5.5, 1.0, 0.1)
-    x2 = np.arange(min(-3.0, min(x2) - 1), max(1.0, max(x2) + 1), 0.1)
-    x1, x2 = np.meshgrid(x1, x2)
-    plt.contour(x1, x2, f(x1, x2), colors='#1f77b4')
-    plt.xlabel('x1')
-    plt.ylabel('x2')
