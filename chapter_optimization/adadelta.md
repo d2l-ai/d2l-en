@@ -30,18 +30,13 @@ As we can see, if the impact of $\epsilon$ is not considered here, Adadelta diff
 Adadelta needs to maintain two state variables for each independent variable, $\boldsymbol{s}_t$ and $\Delta\boldsymbol{x}_t$. We use the formula from the algorithm to implement Adadelta.
 
 ```{.python .input  n=11}
-import sys
-sys.path.insert(0, '..')
-
 %matplotlib inline
 import d2l
 from mxnet import nd
 
-features, labels = d2l.get_data_ch7()
-
-def init_adadelta_states():
-    s_w, s_b = nd.zeros((features.shape[1], 1)), nd.zeros(1)
-    delta_w, delta_b = nd.zeros((features.shape[1], 1)), nd.zeros(1)
+def init_adadelta_states(feature_dim):
+    s_w, s_b = nd.zeros((feature_dim, 1)), nd.zeros(1)
+    delta_w, delta_b = nd.zeros((feature_dim, 1)), nd.zeros(1)
     return ((s_w, delta_w), (s_b, delta_b))
 
 def adadelta(params, states, hyperparams):
@@ -56,8 +51,9 @@ def adadelta(params, states, hyperparams):
 Then, we train the model with the hyperparameter $\rho=0.9$.
 
 ```{.python .input  n=12}
-d2l.train_ch9(adadelta, init_adadelta_states(), {'rho': 0.9}, features,
-              labels)
+data_iter, feature_dim = d2l.get_data_ch10(batch_size=10)
+d2l.train_ch10(adadelta, init_adadelta_states(feature_dim), 
+               {'rho': 0.9}, data_iter, feature_dim);
 ```
 
 ## Concise Implementation
@@ -65,7 +61,8 @@ d2l.train_ch9(adadelta, init_adadelta_states(), {'rho': 0.9}, features,
 From the `Trainer` instance for the algorithm named "adadelta", we can implement Adadelta in Gluon. Its hyperparameters can be specified by `rho`.
 
 ```{.python .input  n=9}
-d2l.train_gluon_ch9('adadelta', {'rho': 0.9}, features, labels)
+d2l.train_gluon_ch10('adadelta', {'rho': 0.9}, data_iter)
+
 ```
 
 ## Summary

@@ -73,8 +73,7 @@ features[0], labels[0]
 By generating a scatter plot using the second `features[:, 1]` and `labels`, we can clearly observe the linear correlation between the two.
 
 ```{.python .input  n=18}
-d2l.use_svg_display()
-d2l.plt.figure(figsize=((3.5, 2.5)))
+d2l.set_figsize((3.5, 2.5))
 d2l.plt.scatter(features[:, 1].asnumpy(), labels.asnumpy(), 1);
 ```
 

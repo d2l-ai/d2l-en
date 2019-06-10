@@ -121,22 +121,27 @@ print(estimates[:,100])
 As you can see, after the first toss of the die, we get the extreme estimate
 that one of the numbers will be rolled with probability $1.0$ and that the
 others have probability $0$. After $100$ rolls, things already look a bit more
-reasonable. We can visualize this convergence. 
+reasonable. We can visualize this convergence.
 
-First we define a function that specifies `matplotlib` to output the SVG figures for sharper images.
+First we define a function that specifies `matplotlib` to output the SVG figures for sharper images, and another one to specify the figure sizes.
 
 ```{.python .input}
 # Save to the d2l package.
 def use_svg_display():
     """Use the svg format to display plot in jupyter."""
     display.set_matplotlib_formats('svg')
+
+# Save to the d2l package.
+def set_figsize(figsize=(3.5, 2.5)):
+    """Change the default figure size"""
+    use_svg_display()
+    plt.rcParams['figure.figsize'] = figsize
 ```
 
 Now visualize the data.
 
 ```{.python .input}
-use_svg_display()
-plt.figure(figsize=(6, 4))
+set_figsize((6, 4))
 for i in range(6):
     plt.plot(estimates[i, :].asnumpy(), label=("P(die=" + str(i) +")"))
 plt.axhline(y=0.16666, color='black', linestyle='dashed')
@@ -250,14 +255,14 @@ number of times it generates each value to ensure that the results are approxima
 
 ```{.python .input}
 counts = np.zeros(100)
-fig, axes = plt.subplots(2, 3, sharex=True)
-axes = axes.reshape(6)
+fig, axes = plt.subplots(2, 2, sharex=True)
+axes = axes.flatten()
 # Mangle subplots such that we can index them in a linear fashion rather than
 # a 2D grid
-for i in range(1, 1000001):
+for i in range(1, 100001):
     counts[random.randint(0, 99)] += 1
-    if i in [10, 100, 1000, 10000, 100000, 1000000]:
-        axes[int(math.log10(i))-1].bar(np.arange(1, 101), counts)
+    if i in [100, 1000, 10000, 100000]:
+        axes[int(math.log10(i))-2].bar(np.arange(1, 101), counts)
 ```
 
 We can see from these figures that the initial number of counts looks *strikingly* uneven. If we sample fewer than 100 draws from a distribution over

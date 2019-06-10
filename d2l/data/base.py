@@ -46,12 +46,6 @@ def data_iter_random(corpus_indices, batch_size, num_steps, ctx=None):
         Y = [_data(j + 1) for j in batch_indices]
         yield nd.array(X, ctx), nd.array(Y, ctx)
 
-def get_data_ch7():
-    """Get the data set used in Chapter 7."""
-    data = np.genfromtxt('../data/airfoil_self_noise.dat', delimiter='\t')
-    data = (data - data.mean(axis=0)) / data.std(axis=0)
-    return nd.array(data[:, :-1]), nd.array(data[:, -1])
-
 def load_data_time_machine(num_examples=10000):
     """Load the time machine data set (available in the English book)."""
     with open('../data/timemachine.txt') as f:

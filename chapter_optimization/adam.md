@@ -35,18 +35,13 @@ $$\boldsymbol{x}_t \leftarrow \boldsymbol{x}_{t-1} - \boldsymbol{g}_t'. $$
 We use the formula from the algorithm to implement Adam. Here, time step $t$ uses `hyperparams` to input parameters to the `adam` function.
 
 ```{.python .input  n=2}
-import sys
-sys.path.insert(0, '..')
-
 %matplotlib inline
 import d2l
 from mxnet import nd
 
-features, labels = d2l.get_data_ch7()
-
-def init_adam_states():
-    v_w, v_b = nd.zeros((features.shape[1], 1)), nd.zeros(1)
-    s_w, s_b = nd.zeros((features.shape[1], 1)), nd.zeros(1)
+def init_adam_states(feature_dim):
+    v_w, v_b = nd.zeros((feature_dim, 1)), nd.zeros(1)
+    s_w, s_b = nd.zeros((feature_dim, 1)), nd.zeros(1)
     return ((v_w, s_w), (v_b, s_b))
 
 def adam(params, states, hyperparams):
@@ -63,8 +58,9 @@ def adam(params, states, hyperparams):
 Use Adam to train the model with a learning rate of $0.01$.
 
 ```{.python .input  n=5}
-d2l.train_ch9(adam, init_adam_states(), {'lr': 0.01, 't': 1}, features,
-              labels)
+data_iter, feature_dim = d2l.get_data_ch10(batch_size=10)
+d2l.train_ch10(adam, init_adam_states(feature_dim), 
+               {'lr': 0.01, 't': 1}, data_iter, feature_dim);
 ```
 
 ## Concise Implementation
@@ -72,7 +68,7 @@ d2l.train_ch9(adam, init_adam_states(), {'lr': 0.01, 't': 1}, features,
 From the `Trainer` instance of the algorithm named "adam", we can implement Adam with Gluon.
 
 ```{.python .input  n=11}
-d2l.train_gluon_ch9('adam', {'learning_rate': 0.01}, features, labels)
+d2l.train_gluon_ch10('adam', {'learning_rate': 0.01}, data_iter)
 ```
 
 ## Summary

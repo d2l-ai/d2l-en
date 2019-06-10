@@ -27,9 +27,6 @@ to iterate $x$, the value of function $f(x)$ might decline. Therefore, in gradie
 For simplicity we choose the objective function $f(x)=x^2$ to illustrate how to implement gradient descent. Although we know that $x=0$ is the solution to minimize $f(x)$, we still use this simple function to observe how $x$ changes. As always, we begin by importing all required modules.
 
 ```{.python .input  n=3}
-import sys
-sys.path.insert(0, '..')
-
 %matplotlib inline
 import d2l
 import numpy as np
@@ -60,11 +57,9 @@ The progress of optimizing over $x$ can be plotted as follows.
 def show_trace(res):
     n = max(abs(min(res)), abs(max(res)))
     f_line = np.arange(-n, n, 0.01)
-    d2l.set_figsize()
-    d2l.plt.plot(f_line, [f(x) for x in f_line])
-    d2l.plt.plot(res, [f(x) for x in res], '-o')
-    d2l.plt.xlabel('x')
-    d2l.plt.ylabel('f(x)')
+    d2l.set_figsize((3.5, 2.5))
+    d2l.plot([f_line, res], [[f(x) for x in f_line], [f(x) for x in res]], 
+             'x', 'f(x)', fmts=['-', '-o'])
 
 show_trace(res)
 ```
@@ -113,9 +108,10 @@ $\mathbf{x} \leftarrow \mathbf{x} - \eta \nabla f(\mathbf{x}).$
 
 To see how the algorithm behaves in practice let's construct an objective function $f(\mathbf{x})=x_1^2+2x_2^2$ with a two-dimensional vector $\mathbf{x} = [x_1, x_2]^\top$ as input and a scalar as output. The gradient is given by $\nabla f(\mathbf{x}) = [2x_1, 4x_2]^\top$. We will observe the trajectory of $\mathbf{x}$ by gradient descent from the initial position $[-5,-2]$. We need two more helper functions. The first uses an update function and applies it $20$ times to the initial value. The second helper visualizes the trajectory of $\mathbf{x}$.
 
-```{.python .input  n=10}
-# This function is saved in the d2l package for future use
+```{.python .input  n=1}
+# Save to the d2l package.
 def train_2d(trainer):
+    """Optimize a 2-dim objective function with a customized trainer."""
     # s1 and s2 are internal state variables and will 
     # be used later in the chapter
     x1, x2, s1, s2 = -5, -2, 0, 0
@@ -126,8 +122,10 @@ def train_2d(trainer):
     print('epoch %d, x1 %f, x2 %f' % (i + 1, x1, x2))
     return results
 
-# This function is saved in the d2l package for future use
+# Save to the d2l package.
 def show_trace_2d(f, results):
+    """Show the trace of 2D variables during optimization."""
+    d2l.set_figsize((3.5, 2.5))
     d2l.plt.plot(*zip(*results), '-o', color='#ff7f0e')
     x1, x2 = np.meshgrid(np.arange(-5.5, 1.0, 0.1), np.arange(-3.0, 1.0, 0.1))
     d2l.plt.contour(x1, x2, f(x1, x2), colors='#1f77b4')
@@ -201,7 +199,7 @@ def hessf(x): return - 2 * c * math.sin(c * x) - x * c**2 * math.cos(c * x)
 show_trace(newton())
 ```
 
-This went spectacularly wrong. How can we fix it? One way would be to 'fix' the Hessian by taking its absolute value instead. Another strategy is to bring back the learning rate. This seems to defeat the purpose, but not quite. Having second order information allows us to be cautious whenever the curvature is large and to take longer steps whenever the objective is flat. Let's see how this works with a slightly smaller learning rate, say $\eta = 0.5$. As we can see, we have quite an efficient algorithm. 
+This went spectacularly wrong. How can we fix it? One way would be to 'fix' the Hessian by taking its absolute value instead. Another strategy is to bring back the learning rate. This seems to defeat the purpose, but not quite. Having second order information allows us to be cautious whenever the curvature is large and to take longer steps whenever the objective is flat. Let's see how this works with a slightly smaller learning rate, say $\eta = 0.5$. As we can see, we have quite an efficient algorithm.
 
 ```{.python .input}
 show_trace(newton(0.5))

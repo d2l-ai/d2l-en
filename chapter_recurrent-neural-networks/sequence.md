@@ -78,7 +78,7 @@ T = 1000  # Generate a total of 1000 points
 time = nd.arange(0,T)
 x = nd.sin(0.01 * time) + 0.2 * nd.random.normal(shape=(T))
 
-d2l.plt.plot(time.asnumpy(), x.asnumpy());
+d2l.plot(time, [x]);
 ```
 
 Next we need to turn this 'time series' into data the network can train on. Based on the embedding dimension $\tau$ we map the data into pairs $y_t = x_t$ and $\mathbf{z}_t = (x_{t-1}, \ldots x_{t-\tau})$. The astute reader might have noticed that this gives us $\tau$ fewer datapoints, since we don't have sufficient history for the first $\tau$ of them. A simple fix, in particular if the time series is long is to discard those few terms. Alternatively we could pad the time series with zeros. The code below is essentially identical to the training code in previous sections.

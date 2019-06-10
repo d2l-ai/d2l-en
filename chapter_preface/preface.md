@@ -258,6 +258,7 @@ be used by the `d2l` package.
 from IPython import display
 import os
 import sys
+import numpy as np
 from matplotlib import pyplot as plt
 from mxnet import nd, autograd, gluon, init, context
 from mxnet.gluon import nn

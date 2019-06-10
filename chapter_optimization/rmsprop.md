@@ -37,21 +37,17 @@ In :numref:`chapter_momentum` we see that $\frac{1}{1-\gamma} = 1 + \gamma + \ga
 We visualize the weights in the past 40 time steps with various $\gamma$s.
 
 ```{.python .input  n=1}
-import sys
-sys.path.insert(0, '..')
-
 %matplotlib inline
 import d2l
 import math
 from mxnet import nd
 
 gammas = [0.95, 0.9, 0.8, 0.7]
-d2l.set_figsize()
+d2l.set_figsize((3.5, 2.5))
 for gamma in gammas:
     x = nd.arange(40).asnumpy()
-    d2l.plt.plot(x, (1-gamma) * gamma ** x)
-d2l.plt.xlabel('time')
-d2l.plt.legend(['gamma = %.2f'%g for g in gammas]);
+    d2l.plt.plot(x, (1-gamma) * gamma ** x, label='gamma = %.2f'%gamma)
+d2l.plt.xlabel('time');
 ```
 
 ## Implementation from Scratch
@@ -82,10 +78,8 @@ d2l.show_trace_2d(f_2d, d2l.train_2d(rmsprop_2d))
 Next, we implement RMSProp with the formula in the algorithm.
 
 ```{.python .input  n=22}
-
-features, labels = d2l.get_data_ch7()
-def init_rmsprop_states():
-    s_w = nd.zeros((features.shape[1], 1))
+def init_rmsprop_states(feature_dim):
+    s_w = nd.zeros((feature_dim, 1))
     s_b = nd.zeros(1)
     return (s_w, s_b)
 
@@ -99,8 +93,9 @@ def rmsprop(params, states, hyperparams):
 We set the initial learning rate to 0.01 and the hyperparameter $\gamma$ to 0.9. Now, the variable $\boldsymbol{s}_t$ can be treated as the weighted average of the square term $\boldsymbol{g}_t \odot \boldsymbol{g}_t$ from the last $1/(1-0.9) = 10$ time steps.
 
 ```{.python .input  n=24}
-d2l.train_ch9(rmsprop, init_rmsprop_states(), {'lr': 0.01, 'gamma': 0.9},
-              features, labels)
+data_iter, feature_dim = d2l.get_data_ch10(batch_size=10)
+d2l.train_ch10(rmsprop, init_rmsprop_states(feature_dim), 
+               {'lr': 0.01, 'gamma': 0.9}, data_iter, feature_dim);
 ```
 
 ## Concise Implementation
@@ -108,8 +103,8 @@ d2l.train_ch9(rmsprop, init_rmsprop_states(), {'lr': 0.01, 'gamma': 0.9},
 From the `Trainer` instance of the algorithm named "rmsprop", we can implement the RMSProp algorithm with Gluon to train models. Note that the hyperparameter $\gamma$ is assigned by `gamma1`.
 
 ```{.python .input  n=29}
-d2l.train_gluon_ch9('rmsprop', {'learning_rate': 0.01, 'gamma1': 0.9},
-                    features, labels)
+d2l.train_gluon_ch10('rmsprop', {'learning_rate': 0.01, 'gamma1': 0.9},
+                     data_iter)
 ```
 
 ## Summary

@@ -1,4 +1,4 @@
-"""The train modules contains functions for neural network training"""
+"""The train module contains functions for neural network training"""
 import numpy as np
 import math
 import time
@@ -75,18 +75,6 @@ def train(train_iter, test_iter, net, loss, trainer, ctx, num_epochs):
               % (epoch + 1, train_l_sum / n, train_acc_sum / m, test_acc,
                  time.time() - start))
 
-
-def train_2d(trainer):
-    """Optimize the objective function of 2d variables with a customized trainer."""
-    x1, x2 = -5, -2
-    s_x1, s_x2 = 0, 0
-    res = [(x1, x2)]
-    for i in range(20):
-        x1, x2, s_x1, s_x2 = trainer(x1, x2, s_x1, s_x2)
-        res.append((x1, x2))
-    print('epoch %d, x1 %f, x2 %f' % (i+1, x1, x2))
-    return res
-
 def train_and_predict_rnn(rnn, get_params, init_rnn_state, num_hiddens,
                           corpus_indices, vocab, ctx, is_random_iter,
                           num_epochs, num_steps, lr, clipping_theta,
@@ -150,7 +138,7 @@ def train_and_predict_rnn(rnn, get_params, init_rnn_state, num_hiddens,
 def train_and_predict_rnn_gluon(model, num_hiddens, corpus_indices, vocab,
                                 ctx, num_epochs, num_steps, lr,
                                 clipping_theta, batch_size, prefixes):
-    """Train an Gluon RNN model and predict the next item in the sequence."""
+    """Train a Gluon RNN model and predict the next item in the sequence."""
     loss = gloss.SoftmaxCrossEntropyLoss()
     model.initialize(ctx=ctx, force_reinit=True, init=init.Normal(0.01))
     trainer = gluon.Trainer(model.collect_params(), 'sgd',
@@ -185,79 +173,17 @@ def train_and_predict_rnn_gluon(model, num_hiddens, corpus_indices, vocab,
             for prefix in prefixes:
                 print(' -', predict_rnn_gluon(prefix, 50, model, vocab, ctx))
 
-def train_ch9(trainer_fn, states, hyperparams, features, labels, batch_size=10,
-              num_epochs=2):
-    """Train a linear regression model."""
-    net, loss = linreg, squared_loss
-    w, b = nd.random.normal(scale=0.01, shape=(
-        features.shape[1], 1)), nd.zeros(1)
-    w.attach_grad()
-    b.attach_grad()
-
-    def eval_loss():
-        return loss(net(features, w, b), labels).mean().asscalar()
-
-    ls = [eval_loss()]
-    data_iter = gdata.DataLoader(
-        gdata.ArrayDataset(features, labels), batch_size, shuffle=True)
-    for _ in range(num_epochs):
-        start = time.time()
-        for batch_i, (X, y) in enumerate(data_iter):
-            with autograd.record():
-                l = loss(net(X, w, b), y).mean()
-            l.backward()
-            trainer_fn([w, b], states, hyperparams)
-            if (batch_i + 1) * batch_size % 100 == 0:
-                ls.append(eval_loss())
-    print('loss: %f, %f sec per epoch' % (ls[-1], time.time() - start))
-    set_figsize()
-    plt.plot(np.linspace(0, num_epochs, len(ls)), ls)
-    plt.xlabel('epoch')
-    plt.ylabel('loss')
-
-
-def train_gluon_ch9(trainer_name, trainer_hyperparams, features, labels,
-                    batch_size=10, num_epochs=2):
-    """Train a linear regression model with a given Gluon trainer."""
-    net = nn.Sequential()
-    net.add(nn.Dense(1))
-    net.initialize(init.Normal(sigma=0.01))
-    loss = gloss.L2Loss()
-
-    def eval_loss():
-        return loss(net(features), labels).mean().asscalar()
-
-    ls = [eval_loss()]
-    data_iter = gdata.DataLoader(
-        gdata.ArrayDataset(features, labels), batch_size, shuffle=True)
-    trainer = gluon.Trainer(net.collect_params(),
-                            trainer_name, trainer_hyperparams)
-    for _ in range(num_epochs):
-        start = time.time()
-        for batch_i, (X, y) in enumerate(data_iter):
-            with autograd.record():
-                l = loss(net(X), y)
-            l.backward()
-            trainer.step(batch_size)
-            if (batch_i + 1) * batch_size % 100 == 0:
-                ls.append(eval_loss())
-    print('loss: %f, %f sec per epoch' % (ls[-1], time.time() - start))
-    set_figsize()
-    plt.plot(np.linspace(0, num_epochs, len(ls)), ls)
-    plt.xlabel('epoch')
-    plt.ylabel('loss')
-
 def to_onehot(X, size):
     return [nd.one_hot(x, size) for x in X.T]
 
 def predict_rnn(prefix, num_chars, rnn, params, init_rnn_state,
                 num_hiddens, vocab, ctx):
-    """Predict next chars with a RNN model"""
+    """Predict next chars with an RNN model"""
     state = init_rnn_state(1, num_hiddens, ctx)
     output = [vocab[prefix[0]]]
     for t in range(num_chars + len(prefix) - 1):
         # The output of the previous time step is taken as the input of the
-        # current time step.
+        # current time step
         X = to_onehot(nd.array([output[-1]], ctx=ctx), len(vocab))
         # Calculate the output and update the hidden state
         (Y, state) = rnn(X, state, params)
@@ -267,15 +193,15 @@ def predict_rnn(prefix, num_chars, rnn, params, init_rnn_state,
             # Read off from the given sequence of characters
             output.append(vocab[prefix[t + 1]])
         else:
-            # This is maximum likelihood decoding. Modify this if you want
+            # This is maximum likelihood decoding. Modify this if you want to
             # use sampling, beam search or beam sampling for better sequences.
             output.append(int(Y[0].argmax(axis=1).asscalar()))
     return ''.join([vocab.idx_to_token[i] for i in output])
 
 
 def predict_rnn_gluon(prefix, num_chars, model, vocab, ctx):
-    """Precit next chars with a Gluon RNN model"""
-    # Use the model's member function to initialize the hidden state.
+    """Predict next chars with a Gluon RNN model."""
+    # Use the model's member function to initialize the hidden state
     state = model.begin_state(batch_size=1, ctx=ctx)
     output = [vocab[prefix[0]]]
     for t in range(num_chars + len(prefix) - 1):
@@ -295,7 +221,7 @@ def predict_sentiment(net, vocab, sentence):
     return 'positive' if label.asscalar() == 1 else 'negative'
 
 def train_ch7(model, data_iter, lr, num_epochs, ctx):
-    """Train an encoder-encoder model"""
+    """Train an encoder-decoder model"""
     model.initialize(init.Xavier(), force_reinit=True, ctx=ctx)
     trainer = gluon.Trainer(model.collect_params(),
                             'adam', {'learning_rate': lr})
@@ -321,7 +247,7 @@ def train_ch7(model, data_iter, lr, num_epochs, ctx):
             tic = time.time()
 
 def translate_ch7(model, src_sentence, src_vocab, tgt_vocab, max_len, ctx):
-    """Translate based on an encode-decoder model with greedy search"""
+    """Translate based on an encoder-decoder model with greedy search."""
     src_tokens = src_vocab[src_sentence.lower().split(' ')]
     src_len = len(src_tokens)
     if src_len < max_len:

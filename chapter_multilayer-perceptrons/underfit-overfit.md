@@ -466,7 +466,7 @@ features[:2], poly_features[:2], labels[:2]
 Let first implement a function to evaluate the loss on a given data.
 
 ```{.python .input}
-# Save to the d2l pacakge. 
+# Save to the d2l package.
 def evaluate_loss(net, data_iter, loss):
     """Evaluate the loss of a model on the given dataset"""
     l, n = 0.0, 0
@@ -479,7 +479,7 @@ def evaluate_loss(net, data_iter, loss):
 Now define the training function.
 
 ```{.python .input  n=5}
-def train(train_features, test_features, train_labels, test_labels, 
+def train(train_features, test_features, train_labels, test_labels,
           num_epochs=1000):
     loss = gluon.loss.L2Loss()
     net = nn.Sequential()
@@ -490,19 +490,19 @@ def train(train_features, test_features, train_labels, test_labels,
     batch_size = min(10, train_labels.shape[0])
     train_iter = d2l.load_array(train_features, train_labels, batch_size)
     test_iter = d2l.load_array(test_features, test_labels, batch_size, False)
-    trainer = gluon.Trainer(net.collect_params(), 'sgd', 
+    trainer = gluon.Trainer(net.collect_params(), 'sgd',
                             {'learning_rate': 0.01})
     train_ls, test_ls = [], []
     d2l.use_svg_display()
     fig, ax = d2l.plt.subplots(figsize=(4,3))
     for epoch in range(1, num_epochs+1):
-        d2l.train_epoch_ch3(net, train_iter, loss, 
+        d2l.train_epoch_ch3(net, train_iter, loss,
                             lambda: trainer.step(batch_size))
         train_ls.append(evaluate_loss(net, train_iter, loss))
-        test_ls.append(evaluate_loss(net, test_iter, loss))                        
+        test_ls.append(evaluate_loss(net, test_iter, loss))
         if epoch % 50 == 0:
             d2l.plot(list(range(1, epoch+1)), [train_ls, test_ls], 'epoch',
-                     'loss', xlim=[0,num_epochs+1], ylim=[1e-3, 1e2], 
+                     'loss', xlim=[0,num_epochs+1], ylim=[1e-3, 1e2],
                      legend=['train', 'test'], axes=ax)
             ax.set_yscale('log')
             d2l.show(fig)
@@ -563,8 +563,8 @@ to gain some intuition of what is happening.
 ```{.python .input  n=8}
 n_subset = 100  # Subset of data to train on
 n_degree = 20   # Degree of polynomials
-train(poly_features[1:n_subset, 0:n_degree], 
-      poly_features[n_train:, 0:n_degree], labels[1:n_subset], 
+train(poly_features[1:n_subset, 0:n_degree],
+      poly_features[n_train:, 0:n_degree], labels[1:n_subset],
       labels[n_train:])
 ```
 
