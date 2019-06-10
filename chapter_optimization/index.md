@@ -8,7 +8,7 @@ Optimization algorithms are important for deep learning. On one hand, training a
 
 In this chapter, we explore common deep learning optimization algorithms in depth. Almost all optimization problems arising in deep learning are *nonconvex*. Nonetheless, the design and analysis of algorithms in the context of convex problems has proven to be very instructive. It is for that reason that this section includes a primer on convex optimization and the proof for a very simple stochastic gradient descent algorithm on a convex objective function.
 
-```toc
+```{.python .input .toc}
 :maxdepth: 2
 
 optimization-intro

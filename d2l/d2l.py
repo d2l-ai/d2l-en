@@ -286,22 +286,57 @@ def show_trace_2d(f, results):
     d2l.plt.ylabel('x2')
 
 # Defined in file: ./chapter_optimization/minibatch-sgd.md
-def get_data_ch7(batch_size=10, n=1500):
+def get_data_ch10(batch_size=10, n=1500):
     data = np.genfromtxt('../data/airfoil_self_noise.dat', delimiter='\t')
-    data = (data - data.mean(axis=0)) / data.std(axis=0)
-    return d2l.load_array(nd.array(data[:n, :-1]), 
-                          nd.array(data[:n, -1]), batch_size, is_train=True)
+    data = nd.array((data - data.mean(axis=0)) / data.std(axis=0))
+    data_iter = d2l.load_array(data[:n, :-1], data[:n, -1], 
+                               batch_size, is_train=True)
+    return data_iter, data.shape[1]-1
+
+# Defined in file: ./chapter_optimization/minibatch-sgd.md
+def train_ch10(trainer_fn, states, hyperparams, data_iter, 
+               feature_dim, num_epochs=2):
+    # Initialization 
+    net, loss = d2l.linreg, d2l.squared_loss
+    w = nd.random.normal(scale=0.01, shape=(feature_dim, 1))
+    b = nd.zeros(1)
+    w.attach_grad()
+    b.attach_grad()
+    def eval_loss():
+        return d2l.evaluate_loss(lambda X: net(X, w, b), data_iter, loss)
+    # Train
+    d2l.use_svg_display()
+    fig, ax = d2l.plt.subplots(figsize=(4, 3))
+    losses, times, n, start = [eval_loss()], [0,], 0, time.time()
+    for _ in range(num_epochs):
+        for X, y in data_iter:
+            with autograd.record():
+                l = loss(net(X, w, b), y).mean()  
+            l.backward()
+            trainer_fn([w, b], states, hyperparams)
+            n += X.shape[0]
+            if n % 100 == 0:
+                times.append(time.time() - start + times[-1])
+                losses.append(eval_loss())
+                x = np.linspace(0, n/X.shape[0]/len(data_iter), len(losses))
+                d2l.plot(x, [losses], 'epoch', 'loss', xlim=[0, num_epochs], 
+                         ylim=[0.22, 0.5], axes=ax)
+                d2l.show(fig)
+                start = time.time()
+    print('loss: %.3f, %.3f sec per epoch' % (
+        losses[-1], times[-1]/num_epochs))
+    return times, losses
 
 # Defined in file: ./chapter_optimization/minibatch-sgd.md
 def train_gluon_ch10(trainer_name, trainer_hyperparams, 
-                     data_iter, num_epochs):
+                     data_iter, num_epochs=2):
     # Initialization
     net = nn.Sequential()
     net.add(nn.Dense(1))
     net.initialize(init.Normal(sigma=0.01))
     trainer = gluon.Trainer(
         net.collect_params(), trainer_name, trainer_hyperparams)
-    loss = gloss.L2Loss()
+    loss = gluon.loss.L2Loss()
     eval_loss = lambda: d2l.evaluate_loss(net, data_iter, loss)
     losses, t, n, start = [eval_loss()], 0, 0, time.time()
     for _ in range(num_epochs):
