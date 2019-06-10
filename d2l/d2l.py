@@ -1,3 +1,7 @@
+# This file is generated automatically through:
+#    d2lbook build lib
+# Don't edit it directly
+
 import sys
 d2l = sys.modules[__name__]
 
@@ -5,6 +9,7 @@ d2l = sys.modules[__name__]
 from IPython import display
 import os
 import sys
+import numpy as np
 from matplotlib import pyplot as plt
 from mxnet import nd, autograd, gluon, init, context
 from mxnet.gluon import nn
@@ -14,6 +19,12 @@ import time
 def use_svg_display():
     """Use the svg format to display plot in jupyter."""
     display.set_matplotlib_formats('svg')
+
+# Defined in file: ./chapter_crashcourse/probability.md
+def set_figsize(figsize=(3.5, 2.5)):
+    """Change the default figure size"""
+    use_svg_display()
+    plt.rcParams['figure.figsize'] = figsize
 
 # Defined in file: ./chapter_crashcourse/naive-bayes.md
 def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
@@ -115,21 +126,22 @@ def train_epoch_ch3(net, train_iter, loss, updater):
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def plot(X, Y, x_label=None, y_label=None, legend=None,
-         xlim=None, ylim=None, axes=None):
+         xlim=None, ylim=None, fmts=None, axes=None):
     """Plot multiple lines"""
     axes = axes if axes else d2l.plt.gca()
-    draw(axes, axes.plot, X, Y, x_label, y_label, legend, xlim, ylim)
+    draw(axes, axes.plot, X, Y, x_label, y_label, legend, xlim, ylim, fmts)
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-def draw(axes, func, X, Y, x_label, y_label, legend, xlim, ylim):
+def draw(axes, func, X, Y, x_label, y_label, legend, xlim, ylim, fmts):
     """Draw multiple data series with customized func"""
     if not hasattr(X[0], "__len__") or len(X[0]) != len(Y[0]):
         X = [X] * len(Y)
+    if not fmts: fmts = ['-']*len(X)
     axes.cla()
-    for x, y in zip(X, Y):
+    for x, y, fmt in zip(X, Y, fmts):
         if isinstance(x, nd.NDArray): x = x.asnumpy()
         if isinstance(y, nd.NDArray): y = y.asnumpy()
-        func(x, y)
+        func(x, y, fmt)
     if x_label: axes.set_xlabel(x_label)
     if y_label: axes.set_ylabel(y_label)
     if xlim: axes.set_xlim(xlim)
@@ -164,6 +176,15 @@ def predict_ch3(net, test_iter, n=9):
     preds = d2l.get_fashion_mnist_labels(net(X).argmax(axis=1).asnumpy())
     titles = [true+'\n'+ pred for true, pred in zip(trues, preds)]
     d2l.show_images(X[0:n].reshape((n,28,28)), 1, n, titles=titles[0:n])
+
+# Defined in file: ./chapter_multilayer-perceptrons/underfit-overfit.md
+def evaluate_loss(net, data_iter, loss):
+    """Evaluate the loss of a model on the given dataset"""
+    l, n = 0.0, 0
+    for X, y in data_iter:
+        l += loss(net(X), y).sum().asscalar()
+        n += X.shape[0]
+    return l / n
 
 # Defined in file: ./chapter_deep-learning-computation/use-gpu.md
 def try_gpu(i=0):
@@ -235,6 +256,103 @@ def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
         d2l.show(fig)
     print('Done in %d sec on %s, loss %.3f, train acc %.3f, test acc %.3f'%(
         time.time()-start, ctx, *trains[-1], test_accs[-1]))
+
+# Defined in file: ./chapter_optimization/optimization-intro.md
+def annotate(text, xy, xytext):
+    d2l.plt.gca().annotate(text, xy=xy, xytext=xytext,
+                           arrowprops=dict(arrowstyle='->'))
+
+# Defined in file: ./chapter_optimization/gd.md
+def train_2d(trainer):
+    """Optimize a 2-dim objective function with a customized trainer."""
+    # s1 and s2 are internal state variables and will 
+    # be used later in the chapter
+    x1, x2, s1, s2 = -5, -2, 0, 0
+    results = [(x1, x2)]
+    for i in range(20):
+        x1, x2, s1, s2 = trainer(x1, x2, s1, s2)
+        results.append((x1, x2))
+    print('epoch %d, x1 %f, x2 %f' % (i + 1, x1, x2))
+    return results
+
+# Defined in file: ./chapter_optimization/gd.md
+def show_trace_2d(f, results):
+    """Show the trace of 2D variables during optimization."""
+    d2l.set_figsize((3.5, 2.5))
+    d2l.plt.plot(*zip(*results), '-o', color='#ff7f0e')
+    x1, x2 = np.meshgrid(np.arange(-5.5, 1.0, 0.1), np.arange(-3.0, 1.0, 0.1))
+    d2l.plt.contour(x1, x2, f(x1, x2), colors='#1f77b4')
+    d2l.plt.xlabel('x1')
+    d2l.plt.ylabel('x2')
+
+# Defined in file: ./chapter_optimization/minibatch-sgd.md
+def get_data_ch10(batch_size=10, n=1500):
+    data = np.genfromtxt('../data/airfoil_self_noise.dat', delimiter='\t')
+    data = nd.array((data - data.mean(axis=0)) / data.std(axis=0))
+    data_iter = d2l.load_array(data[:n, :-1], data[:n, -1], 
+                               batch_size, is_train=True)
+    return data_iter, data.shape[1]-1
+
+# Defined in file: ./chapter_optimization/minibatch-sgd.md
+def train_ch10(trainer_fn, states, hyperparams, data_iter, 
+               feature_dim, num_epochs=2):
+    # Initialization 
+    net, loss = d2l.linreg, d2l.squared_loss
+    w = nd.random.normal(scale=0.01, shape=(feature_dim, 1))
+    b = nd.zeros(1)
+    w.attach_grad()
+    b.attach_grad()
+    def eval_loss():
+        return d2l.evaluate_loss(lambda X: net(X, w, b), data_iter, loss)
+    # Train
+    d2l.use_svg_display()
+    fig, ax = d2l.plt.subplots(figsize=(4, 3))
+    losses, times, n, start = [eval_loss()], [0,], 0, time.time()
+    for _ in range(num_epochs):
+        for X, y in data_iter:
+            with autograd.record():
+                l = loss(net(X, w, b), y).mean()  
+            l.backward()
+            trainer_fn([w, b], states, hyperparams)
+            n += X.shape[0]
+            if n % 100 == 0:
+                times.append(time.time() - start + times[-1])
+                losses.append(eval_loss())
+                x = np.linspace(0, n/X.shape[0]/len(data_iter), len(losses))
+                d2l.plot(x, [losses], 'epoch', 'loss', xlim=[0, num_epochs], 
+                         ylim=[0.22, 0.5], axes=ax)
+                d2l.show(fig)
+                start = time.time()
+    print('loss: %.3f, %.3f sec per epoch' % (
+        losses[-1], times[-1]/num_epochs))
+    return times, losses
+
+# Defined in file: ./chapter_optimization/minibatch-sgd.md
+def train_gluon_ch10(trainer_name, trainer_hyperparams, 
+                     data_iter, num_epochs=2):
+    # Initialization
+    net = nn.Sequential()
+    net.add(nn.Dense(1))
+    net.initialize(init.Normal(sigma=0.01))
+    trainer = gluon.Trainer(
+        net.collect_params(), trainer_name, trainer_hyperparams)
+    loss = gluon.loss.L2Loss()
+    eval_loss = lambda: d2l.evaluate_loss(net, data_iter, loss)
+    losses, t, n, start = [eval_loss()], 0, 0, time.time()
+    for _ in range(num_epochs):
+        for X, y in data_iter:
+            start = time.time()
+            with autograd.record():
+                l = loss(net(X), y)
+            l.backward()
+            trainer.step(X.shape[0])
+            n, t = n + X.shape[0], time.time() - start + t
+            if n % 100 == 0:
+                losses.append(eval_loss())
+    # Print and plot the results
+    print('loss: %.3f, %.3f sec per epoch' % (losses[-1], t/num_epochs))
+    d2l.set_figsize((3.5, 2.5))
+    d2l.plot(np.linspace(0,num_epochs,len(losses)), [losses], 'epoch', 'loss')
 
 # Defined in file: ./chapter_generative_adversarial_networks/gan.md
 def update_D(X, Z, net_D, net_G, loss, trainer_D):
