@@ -71,13 +71,15 @@ After so much theory, let's try this out in practice. Since much of the modeling
 %matplotlib inline
 from IPython import display
 from matplotlib import pyplot as plt
-from mxnet import autograd, nd, gluon, init
+from mxnet import autograd, np, npx, gluon, init
+
+npx.set_np()
 display.set_matplotlib_formats('svg')
 
 embedding = 4  # Embedding dimension for autoregressive model
 T = 1000  # Generate a total of 1000 points
-time = nd.arange(0,T)
-x = nd.sin(0.01 * time) + 0.2 * nd.random.normal(shape=(T))
+time = np.arange(0,T)
+x = np.sin(0.01 * time) + 0.2 * np.random.normal(size=T)
 
 plt.plot(time.asnumpy(), x.asnumpy());
 ```
@@ -85,7 +87,7 @@ plt.plot(time.asnumpy(), x.asnumpy());
 Next we need to turn this 'time series' into data the network can train on. Based on the embedding dimension $\tau$ we map the data into pairs $y_t = x_t$ and $\mathbf{z}_t = (x_{t-1}, \ldots x_{t-\tau})$. The astute reader might have noticed that this gives us $\tau$ fewer datapoints, since we don't have sufficient history for the first $\tau$ of them. A simple fix, in particular if the time series is long is to discard those few terms. Alternatively we could pad the time series with zeros. The code below is essentially identical to the training code in previous sections.
 
 ```{.python .input}
-features = nd.zeros((T-embedding, embedding))
+features = np.zeros((T-embedding, embedding))
 for i in range(embedding):
     features[:,i] = x[i:T-embedding+i]
 labels = x[embedding:]
@@ -122,15 +124,15 @@ def train_net(net, data, loss, epochs, learningrate):
                 l = loss(net(X), y)
             l.backward()
             trainer.step(batch_size)
-        l = loss(net(data[:][0]), nd.array(data[:][1]))
-        print('epoch %d, loss: %f' % (epoch, l.mean().asnumpy()))
+        l = loss(net(data[:][0]), np.array(data[:][1]))
+        print('epoch %d, loss: %f' % (epoch, l.mean()))
     return net
 
 net = get_net()
 net = train_net(net, train_data, loss, 10, 0.01)
 
-l = loss(net(test_data[:][0]), nd.array(test_data[:][1]))
-print('test loss: %f' % l.mean().asnumpy())
+l = loss(net(test_data[:][0]), np.array(test_data[:][1]))
+print('test loss: %f' % l.mean())
 ```
 
 The both training and test loss are small and we would expect our model to work well. Let's see what this means in practice. The first thing to check is how well the model is able to predict what happens in the next timestep.
@@ -155,11 +157,11 @@ x_{603} & = f(x_{602}, \ldots, x_{599})
 In other words, very quickly will we have to use our own predictions to make future predictions. Let's see how well this goes.
 
 ```{.python .input}
-predictions = nd.zeros_like(estimates)
+predictions = np.zeros_like(estimates)
+print(predictions.shape)
 predictions[:(ntrain-embedding)] = estimates[:(ntrain-embedding)]
 for i in range(ntrain-embedding, T-embedding):
-    predictions[i] = net(
-        predictions[(i-embedding):i].reshape(1,-1)).reshape(1)
+    predictions[i] = net(predictions[(i-embedding):i].reshape((1, -1)))
 
 plt.plot(time.asnumpy(), x.asnumpy(), label='data');
 plt.plot(time[embedding:].asnumpy(), estimates.asnumpy(), label='estimate');
@@ -175,7 +177,7 @@ Let's verify this observation by computing the $k$-step predictions on the entir
 ```{.python .input}
 k = 33  # Look up to k - embedding steps ahead
 
-features = nd.zeros((T-k, k))
+features = np.zeros((T-k, k))
 for i in range(embedding):
     features[:,i] = x[i:T-k+i]
 
