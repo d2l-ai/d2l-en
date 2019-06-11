@@ -60,7 +60,7 @@ In principle, there's nothing wrong with unfolding $p(x_1, \ldots x_T)$ in rever
 
 $$p(x_1, \ldots x_T) = \prod_{t=T}^1 p(x_t|x_{t+1}, \ldots x_T).$$
 
-In fact, if we have a Markov model we can obtain a reverse conditional probability distribution, too.
+In fact, if we have a Markov model, we can obtain a reverse conditional probability distribution, too.
 In many cases, however, there exists a natural direction for the data, namely going forward in time. It is clear that future events cannot influence the past. Hence, if we change $x_t$, we may be able to influence what happens for $x_{t+1}$ going forward but not the converse. That is, if we change $x_t$, the distribution over past events will not change. Consequently, it ought to be easier to explain $x_{t+1}|x_t$ rather than $x_t|x_{t+1}$. For instance, [Hoyer et al., 2008](https://papers.nips.cc/paper/3548-nonlinear-causal-discovery-with-additive-noise-models) show that in some cases we can find $x_{t+1} = f(x_t) + \epsilon$ for some additive noise, whereas the converse is not true. This is great news, since it is typically the forward direction that we're interested in estimating. For more on this topic see e.g. the book by [Peters, Janzing and Schölkopf, 2015](https://mitpress.mit.edu/books/elements-causal-inference). We are barely scratching the surface of it.
 
 ## Toy Example
@@ -76,7 +76,7 @@ d2l.use_svg_display()
 embedding = 4  # Embedding dimension for autoregressive model
 T = 1000  # Generate a total of 1000 points
 time = nd.arange(0,T)
-x = nd.sin(0.01 * time) + 0.2 * nd.random.normal(shape=(T))
+x = nd.sin(0.01 * time) + 0.2 * nd.random.normal(shape=T)
 
 d2l.plot(time, [x]);
 ```
@@ -181,7 +181,7 @@ for i in range(embedding, k):
 for i in (4, 8, 16, 32):
     d2l.plt.plot(time[i:T-k+i].asnumpy(), features[:,i].asnumpy(),
              label=('step ' + str(i)))
-d2l.plt.legend();
+d2l.plt.legend()
 ```
 
 This clearly illustrates how the quality of the estimates changes as we try to predict further into the future. While the 8-step predictions are still pretty good, anything beyond that is pretty useless.

@@ -60,7 +60,7 @@ ones. Moreover, $m$ is the total number of words we encounter. The
 above is a rather primitive variant of what is Kneser-Ney smoothing
 and Bayesian Nonparametrics can accomplish. See e.g. the Sequence
 Memoizer of Wood et al., 2012 for more details of how to accomplish
-this. Unfortunately models like this get unwieldy rather quickly:
+this. Unfortunately, models like this get unwieldy rather quickly:
 first off, we need to store all counts and secondly, this entirely
 ignores the meaning of the words. For instance, *'cat'* and *'feline'*
 should occur in related contexts. Deep learning based language models
@@ -99,12 +99,12 @@ with open('../data/timemachine.txt', 'r') as f:
     raw_dataset = [re.sub('[^A-Za-z]+', ' ', st).lower().split()
                    for st in lines]
 
-# Let's read the first 10 lines of the text
+# Let's read 2 sample lines of the text
 for st in raw_dataset[8:10]:
     print('# tokens:', len(st), st)
 ```
 
-Now we need to insert this into a word counter. This is where the `collections` datastructure comes in handy. It takes care of all the accounting for us.
+Now we need to insert this into a word counter. This is where the `collections` data structure comes in handy. It takes care of all the accounting for us.
 
 ```{.python .input}
 counter = collections.Counter([tk for st in raw_dataset for tk in st])
@@ -142,11 +142,11 @@ Two things are notable. Out of the 10 most frequent word pairs, 9 are composed o
 word_triples = [triple for triple in zip(wseq[:-2], wseq[1:-1], wseq[2:])]
 counter_triples = collections.Counter(word_triples)
 
-bigramcounts = [count for _,count in counter_pairs.most_common()]
-triplecounts = [count for _,count in counter_triples.most_common()]
-d2l.plt.loglog(wordcounts, label='word counts');
-d2l.plt.loglog(bigramcounts, label='bigram counts');
-d2l.plt.loglog(triplecounts, label='triple counts');
+bigramcounts = [count for _, count in counter_pairs.most_common()]
+triplecounts = [count for _, count in counter_triples.most_common()]
+d2l.plt.loglog(wordcounts, label='word counts')
+d2l.plt.loglog(bigramcounts, label='bigram counts')
+d2l.plt.loglog(triplecounts, label='triple counts')
 d2l.plt.legend();
 ```
 
