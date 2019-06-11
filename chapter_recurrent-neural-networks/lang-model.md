@@ -147,7 +147,7 @@ triplecounts = [count for _, count in counter_triples.most_common()]
 d2l.plt.loglog(wordcounts, label='word counts')
 d2l.plt.loglog(bigramcounts, label='bigram counts')
 d2l.plt.loglog(triplecounts, label='triple counts')
-d2l.plt.legend()
+d2l.plt.legend();
 ```
 
 The graph is quite exciting for a number of reasons. Firstly, beyond words, also sequences of words appear to be following Zipf's law, albeit with a lower exponent, depending on sequence length. Secondly, the number of distinct n-grams is not that large. This gives us hope that there is quite a lot of structure in language. Third, *many* n-grams occur very rarely, which makes Laplace smoothing rather unsuitable for language modeling. Instead, we will use deep learning based models.
