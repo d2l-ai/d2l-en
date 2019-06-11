@@ -9,9 +9,11 @@ sys.path.insert(0, '..')
 
 import d2l
 import math
-from mxnet import autograd, nd
+from mxnet import autograd, np, npx
 from mxnet.gluon import loss as gloss
 import time
+
+npx.set_np()
 
 corpus_indices, vocab = d2l.load_data_time_machine()
 ```
@@ -21,7 +23,20 @@ corpus_indices, vocab = d2l.load_data_time_machine()
 One-hot encoding vectors provide an easy way to express words as vectors in order to process them in a deep network. In a nutshell, we map each word to a different unit vector: assume that the number of different characters in the dictionary is $N$ (the `len(vocab)`) and each character has a one-to-one correspondence with a single value in the index of successive integers from 0 to $N-1$. If the index of a character is the integer $i$, then we create a vector $\mathbf{e}_i$ of all 0s with a length of $N$ and set the element at position $i$ to 1. This vector is the one-hot vector of the original character. The one-hot vectors with indices 0 and 2 are shown below (the length of the vector is equal to the dictionary size).
 
 ```{.python .input  n=2}
-nd.one_hot(nd.array([0, 2]), len(vocab))
+npx.one_hot(np.array([0, 2]), len(vocab))
+```
+
+```{.json .output n=2}
+[
+ {
+  "data": {
+   "text/plain": "[[1. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.\n  0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]\n [0. 0. 1. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.\n  0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]]\n<ndarray shape=(2, 44)>"
+  },
+  "execution_count": 2,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
 ```
 
 Note that one-hot encodings are just a convenient way of separating the encoding (e.g. mapping the character `a` to $(1,0,0, \ldots) vector)$ from the embedding (i.e. multiplying the encoded vectors by some weight matrix $\mathbf{W}$). This simplifies the code greatly relative to storing an embedding matrix that the user needs to maintain.
@@ -31,11 +46,24 @@ The shape of the mini-batch we sample each time is (batch size, time step). The 
 ```{.python .input  n=3}
 # This function is saved in the d2l package for future use
 def to_onehot(X, size):
-    return [nd.one_hot(x, size) for x in X.T]
+    return [npx.one_hot(x, size) for x in X.T]
 
-X = nd.arange(10).reshape((2, 5))
+X = np.arange(10).reshape((2, 5))
 inputs = to_onehot(X, len(vocab))
 len(inputs), inputs[0].shape
+```
+
+```{.json .output n=3}
+[
+ {
+  "data": {
+   "text/plain": "(5, (2, 44))"
+  },
+  "execution_count": 3,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
 ```
 
 The code above generates 5 minibatches containing 2 vectors each. Since we have a total of 43 distinct symbols in "The Time Machine" we get 43-dimensional vectors.
@@ -52,20 +80,30 @@ print('Using', ctx)
 # Create the parameters of the model, initialize them and attach gradients
 def get_params():
     def _one(shape):
-        return nd.random.normal(scale=0.01, shape=shape, ctx=ctx)
+        return np.random.normal(scale=0.01, size=shape, ctx=ctx)
 
     # Hidden layer parameters
     W_xh = _one((num_inputs, num_hiddens))
     W_hh = _one((num_hiddens, num_hiddens))
-    b_h = nd.zeros(num_hiddens, ctx=ctx)
+    b_h = np.zeros(num_hiddens, ctx=ctx)
     # Output layer parameters
     W_hq = _one((num_hiddens, num_outputs))
-    b_q = nd.zeros(num_outputs, ctx=ctx)
+    b_q = np.zeros(num_outputs, ctx=ctx)
     # Attach a gradient
     params = [W_xh, W_hh, b_h, W_hq, b_q]
     for param in params:
         param.attach_grad()
     return params
+```
+
+```{.json .output n=4}
+[
+ {
+  "name": "stdout",
+  "output_type": "stream",
+  "text": "Using cpu(0)\n"
+ }
+]
 ```
 
 ## Sequence Modeling
@@ -76,7 +114,7 @@ We implement this model based on the definition of an RNN. First, we need an `in
 
 ```{.python .input  n=5}
 def init_rnn_state(batch_size, num_hiddens, ctx):
-    return (nd.zeros(shape=(batch_size, num_hiddens), ctx=ctx), )
+    return (np.zeros(shape=(batch_size, num_hiddens), ctx=ctx), )
 ```
 
 The following `rnn` function defines how to compute the hidden state and output
@@ -93,8 +131,8 @@ def rnn(inputs, state, params):
     H, = state
     outputs = []
     for X in inputs:
-        H = nd.tanh(nd.dot(X, W_xh) + nd.dot(H, W_hh) + b_h)
-        Y = nd.dot(H, W_hq) + b_q
+        H = np.tanh(np.dot(X, W_xh) + np.dot(H, W_hh) + b_h)
+        Y = np.dot(H, W_hq) + b_q
         outputs.append(Y)
     return outputs, (H,)
 ```
@@ -109,11 +147,24 @@ outputs, state_new = rnn(inputs, state, params)
 len(outputs), outputs[0].shape, state_new[0].shape
 ```
 
+```{.json .output n=7}
+[
+ {
+  "data": {
+   "text/plain": "(5, (2, 44), (2, 512))"
+  },
+  "execution_count": 7,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
+```
+
 ### Prediction Function
 
 The following function predicts the next `num_chars` characters based on the `prefix` (a string containing several characters). This function is a bit more complicated. Whenever the actual sequence is known, i.e. for the beginning of the sequence, we only update the hidden state. After that we begin generating new characters and emitting them. For convenience we use the recurrent neural unit `rnn` as a function parameter, so that this function can be reused in the other recurrent neural networks described in following sections.
 
-```{.python .input  n=8}
+```{.python .input  n=10}
 # This function is saved in the d2l package for future use
 def predict_rnn(prefix, num_chars, rnn, params, init_rnn_state,
                 num_hiddens, vocab, ctx):
@@ -122,7 +173,7 @@ def predict_rnn(prefix, num_chars, rnn, params, init_rnn_state,
     for t in range(num_chars + len(prefix) - 1):
         # The output of the previous time step is taken as the input of the
         # current time step.
-        X = to_onehot(nd.array([output[-1]], ctx=ctx), len(vocab))
+        X = to_onehot(np.array([output[-1]], ctx=ctx), len(vocab))
         # Calculate the output and update the hidden state
         (Y, state) = rnn(X, state, params)
         # The input to the next time step is the character in the prefix or
@@ -139,9 +190,30 @@ def predict_rnn(prefix, num_chars, rnn, params, init_rnn_state,
 
 We test the `predict_rnn` function first. Given that we didn't train the network it will generate nonsensical predictions. We initialize it with the sequence `traveller ` and have it generate 10 additional characters.
 
-```{.python .input  n=9}
+```{.python .input  n=11}
 predict_rnn('traveller ', 10, rnn, params, init_rnn_state, num_hiddens,
             vocab, ctx)
+```
+
+```{.json .output n=11}
+[
+ {
+  "ename": "MXNetError",
+  "evalue": "[00:26:34] src/operator/numpy/np_dot.cc:83: Case 5 not implemented yet...\nStack trace:\n  [bt] (0) 1   libmxnet.so                         0x000000011843d139 dmlc::LogMessageFatal::~LogMessageFatal() + 57\n  [bt] (1) 2   libmxnet.so                         0x000000011893adaa mxnet::op::NumpyDotShape(nnvm::NodeAttrs const&, std::__1::vector<mxnet::TShape, std::__1::allocator<mxnet::TShape> >*, std::__1::vector<mxnet::TShape, std::__1::allocator<mxnet::TShape> >*) + 1434\n  [bt] (2) 3   libmxnet.so                         0x000000011998e0f3 mxnet::imperative::SetShapeType(mxnet::Context const&, nnvm::NodeAttrs const&, std::__1::vector<mxnet::NDArray*, std::__1::allocator<mxnet::NDArray*> > const&, std::__1::vector<mxnet::NDArray*, std::__1::allocator<mxnet::NDArray*> > const&, mxnet::DispatchMode*) + 1683\n  [bt] (3) 4   libmxnet.so                         0x000000011998ca20 mxnet::Imperative::Invoke(mxnet::Context const&, nnvm::NodeAttrs const&, std::__1::vector<mxnet::NDArray*, std::__1::allocator<mxnet::NDArray*> > const&, std::__1::vector<mxnet::NDArray*, std::__1::allocator<mxnet::NDArray*> > const&) + 688\n  [bt] (4) 5   libmxnet.so                         0x00000001198bd3b5 MXImperativeInvokeImpl(void*, int, void**, int*, void***, int, char const**, char const**) + 389\n  [bt] (5) 6   libmxnet.so                         0x00000001198be4b0 MXImperativeInvokeEx + 176\n  [bt] (6) 7   libffi.6.dylib                      0x000000010f981884 ffi_call_unix64 + 76\n\n",
+  "output_type": "error",
+  "traceback": [
+   "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+   "\u001b[0;31mMXNetError\u001b[0m                                Traceback (most recent call last)",
+   "\u001b[0;32m<ipython-input-11-19341ff523eb>\u001b[0m in \u001b[0;36m<module>\u001b[0;34m()\u001b[0m\n\u001b[1;32m      1\u001b[0m predict_rnn('traveller ', 10, rnn, params, init_rnn_state, num_hiddens,\n\u001b[0;32m----> 2\u001b[0;31m             vocab, ctx)\n\u001b[0m",
+   "\u001b[0;32m<ipython-input-10-2c7c542875df>\u001b[0m in \u001b[0;36mpredict_rnn\u001b[0;34m(prefix, num_chars, rnn, params, init_rnn_state, num_hiddens, vocab, ctx)\u001b[0m\n\u001b[1;32m      9\u001b[0m         \u001b[0mX\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mto_onehot\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mnp\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0marray\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0moutput\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0;34m-\u001b[0m\u001b[0;36m1\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mctx\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mctx\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mlen\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mvocab\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     10\u001b[0m         \u001b[0;31m# Calculate the output and update the hidden state\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m---> 11\u001b[0;31m         \u001b[0;34m(\u001b[0m\u001b[0mY\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mstate\u001b[0m\u001b[0;34m)\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mrnn\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mX\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mstate\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mparams\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m     12\u001b[0m         \u001b[0;31m# The input to the next time step is the character in the prefix or\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     13\u001b[0m         \u001b[0;31m# the current best predicted character\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+   "\u001b[0;32m<ipython-input-6-cf5c90f361de>\u001b[0m in \u001b[0;36mrnn\u001b[0;34m(inputs, state, params)\u001b[0m\n\u001b[1;32m      6\u001b[0m     \u001b[0moutputs\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0;34m[\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      7\u001b[0m     \u001b[0;32mfor\u001b[0m \u001b[0mX\u001b[0m \u001b[0;32min\u001b[0m \u001b[0minputs\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m----> 8\u001b[0;31m         \u001b[0mH\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mnp\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mtanh\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mnp\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mdot\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mX\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mW_xh\u001b[0m\u001b[0;34m)\u001b[0m \u001b[0;34m+\u001b[0m \u001b[0mnp\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mdot\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mH\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mW_hh\u001b[0m\u001b[0;34m)\u001b[0m \u001b[0;34m+\u001b[0m \u001b[0mb_h\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      9\u001b[0m         \u001b[0mY\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mnp\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mdot\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mH\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mW_hq\u001b[0m\u001b[0;34m)\u001b[0m \u001b[0;34m+\u001b[0m \u001b[0mb_q\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     10\u001b[0m         \u001b[0moutputs\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mappend\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mY\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+   "\u001b[0;32m/anaconda3/lib/python3.7/site-packages/mxnet-1.5.0-py3.7.egg/mxnet/ndarray/register.py\u001b[0m in \u001b[0;36mdot\u001b[0;34m(a, b, out, name, **kwargs)\u001b[0m\n",
+   "\u001b[0;32m/anaconda3/lib/python3.7/site-packages/mxnet-1.5.0-py3.7.egg/mxnet/_ctypes/ndarray.py\u001b[0m in \u001b[0;36m_imperative_invoke\u001b[0;34m(handle, ndargs, keys, vals, out, is_np_op)\u001b[0m\n\u001b[1;32m     98\u001b[0m         \u001b[0mc_str_array\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mkeys\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     99\u001b[0m         \u001b[0mc_str_array\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0mstr\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0ms\u001b[0m\u001b[0;34m)\u001b[0m \u001b[0;32mfor\u001b[0m \u001b[0ms\u001b[0m \u001b[0;32min\u001b[0m \u001b[0mvals\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 100\u001b[0;31m         ctypes.byref(out_stypes)))\n\u001b[0m\u001b[1;32m    101\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    102\u001b[0m     \u001b[0mcreate_ndarray_fn\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0m_np_ndarray_cls\u001b[0m \u001b[0;32mif\u001b[0m \u001b[0mis_np_op\u001b[0m \u001b[0;32melse\u001b[0m \u001b[0m_ndarray_cls\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+   "\u001b[0;32m/anaconda3/lib/python3.7/site-packages/mxnet-1.5.0-py3.7.egg/mxnet/base.py\u001b[0m in \u001b[0;36mcheck_call\u001b[0;34m(ret)\u001b[0m\n\u001b[1;32m    251\u001b[0m     \"\"\"\n\u001b[1;32m    252\u001b[0m     \u001b[0;32mif\u001b[0m \u001b[0mret\u001b[0m \u001b[0;34m!=\u001b[0m \u001b[0;36m0\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 253\u001b[0;31m         \u001b[0;32mraise\u001b[0m \u001b[0mMXNetError\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mpy_str\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0m_LIB\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mMXGetLastError\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    254\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    255\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n",
+   "\u001b[0;31mMXNetError\u001b[0m: [00:26:34] src/operator/numpy/np_dot.cc:83: Case 5 not implemented yet...\nStack trace:\n  [bt] (0) 1   libmxnet.so                         0x000000011843d139 dmlc::LogMessageFatal::~LogMessageFatal() + 57\n  [bt] (1) 2   libmxnet.so                         0x000000011893adaa mxnet::op::NumpyDotShape(nnvm::NodeAttrs const&, std::__1::vector<mxnet::TShape, std::__1::allocator<mxnet::TShape> >*, std::__1::vector<mxnet::TShape, std::__1::allocator<mxnet::TShape> >*) + 1434\n  [bt] (2) 3   libmxnet.so                         0x000000011998e0f3 mxnet::imperative::SetShapeType(mxnet::Context const&, nnvm::NodeAttrs const&, std::__1::vector<mxnet::NDArray*, std::__1::allocator<mxnet::NDArray*> > const&, std::__1::vector<mxnet::NDArray*, std::__1::allocator<mxnet::NDArray*> > const&, mxnet::DispatchMode*) + 1683\n  [bt] (3) 4   libmxnet.so                         0x000000011998ca20 mxnet::Imperative::Invoke(mxnet::Context const&, nnvm::NodeAttrs const&, std::__1::vector<mxnet::NDArray*, std::__1::allocator<mxnet::NDArray*> > const&, std::__1::vector<mxnet::NDArray*, std::__1::allocator<mxnet::NDArray*> > const&) + 688\n  [bt] (4) 5   libmxnet.so                         0x00000001198bd3b5 MXImperativeInvokeImpl(void*, int, void**, int*, void***, int, char const**, char const**) + 389\n  [bt] (5) 6   libmxnet.so                         0x00000001198be4b0 MXImperativeInvokeEx + 176\n  [bt] (6) 7   libffi.6.dylib                      0x000000010f981884 ffi_call_unix64 + 76\n\n"
+  ]
+ }
+]
 ```
 
 ## Gradient Clipping

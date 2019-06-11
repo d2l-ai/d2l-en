@@ -64,20 +64,22 @@ The figure below shows the computational logic of an RNN at three adjacent time 
 As discussed, the computation in the hidden state uses $\mathbf{H}_t = \mathbf{X}_t \mathbf{W}_{xh} + \mathbf{H}_{t-1} \mathbf{W}_{hh}$ to generate an object matching $\mathbf{H}_{t-1}$ in dimensionality. Moreover, we use $\mathbf{H}_t$ to generate the output $\mathbf{O}_t = \mathbf{H}_t \mathbf{W}_{hq}$.
 
 ```{.python .input  n=1}
-from mxnet import nd
+from mxnet import np, npx
+
+npx.set_np()
 
 # Data X and hidden state H
-X = nd.random.normal(shape=(3, 1))
-H = nd.random.normal(shape=(3, 2))
+X = np.random.normal(size=(3, 1))
+H = np.random.normal(size=(3, 2))
 
 # Weights
-W_xh = nd.random.normal(shape=(1, 2))
-W_hh = nd.random.normal(shape=(2, 2))
-W_hq = nd.random.normal(shape=(2, 3))
+W_xh = np.random.normal(size=(1, 2))
+W_hh = np.random.normal(size=(2, 2))
+W_hq = np.random.normal(size=(2, 3))
 
 def net(X, H):
-    H = nd.relu(nd.dot(X, W_xh) + nd.dot(H, W_hh))
-    O = nd.relu(nd.dot(H, W_hq))
+    H = npx.relu(np.dot(X, W_xh) + np.dot(H, W_hh))
+    O = npx.relu(np.dot(H, W_hq))
     return H, O
 ```
 
@@ -91,9 +93,19 @@ unreasonable to assume that the later text relies indiscriminately on all
 occurrences that happened, say, 10,000 characters in the past. Truncation
 methods such as BPTT (:numref:`chapter_bptt`) and long short term memory (:numref:`chapter_lstm`) are useful to address this in a more principled manner. For now, let's see how a state update works.
 
-```{.python .input}
+```{.python .input  n=6}
 (H, O) = net(X,H)
-print(H, O)
+print(H, '\n', O)
+```
+
+```{.json .output n=6}
+[
+ {
+  "name": "stdout",
+  "output_type": "stream",
+  "text": "[[2.1798675  0.31628072]\n [0.7802107  0.0389483 ]\n [0.631605   0.1638964 ]]\n<ndarray shape=(3, 2)> \n [[1.2345108  1.0510507  0.        ]\n [0.36193395 0.42179012 0.        ]\n [0.43546036 0.26016176 0.        ]]\n<ndarray shape=(3, 3)>\n"
+ }
+]
 ```
 
 ## Steps in a Language Model
