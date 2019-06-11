@@ -32,7 +32,6 @@ In order to implement data parallelism in a multi-GPU training scenario from scr
 %matplotlib inline
 import d2l
 from mxnet import autograd, nd, gluon
-import time
 ```
 
 ## Define the Model
