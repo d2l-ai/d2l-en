@@ -242,8 +242,9 @@ def corr2d(X, K):
     return Y
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
-def evaluate_accuracy_gpu(net, data_iter):
-    ctx = list(net.collect_params().values())[0].list_ctx()[0]
+def evaluate_accuracy_gpu(net, data_iter, ctx=None):
+    if not ctx:  # Query the first device the first parameter is on.
+        ctx = list(net.collect_params().values())[0].list_ctx()[0]
     acc_sum, n = nd.array([0], ctx=ctx), 0
     for X, y in data_iter:
         X, y = X.as_in_context(ctx), y.as_in_context(ctx).astype('float32')
@@ -348,35 +349,29 @@ def get_data_ch10(batch_size=10, n=1500):
 def train_ch10(trainer_fn, states, hyperparams, data_iter, 
                feature_dim, num_epochs=2):
     # Initialization 
-    net, loss = d2l.linreg, d2l.squared_loss
     w = nd.random.normal(scale=0.01, shape=(feature_dim, 1))
     b = nd.zeros(1)
     w.attach_grad()
     b.attach_grad()
-    def eval_loss():
-        return d2l.evaluate_loss(lambda X: net(X, w, b), data_iter, loss)
+    net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss
     # Train
-    d2l.use_svg_display()
-    fig, ax = d2l.plt.subplots(figsize=(4, 3))
-    losses, times, n, start = [eval_loss()], [0,], 0, time.time()
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss', 
+                            xlim=[0, num_epochs], ylim=[0.22, 0.35])
+    n, timer = 0, d2l.Timer()
     for _ in range(num_epochs):
         for X, y in data_iter:
             with autograd.record():
-                l = loss(net(X, w, b), y).mean()  
+                l = loss(net(X), y).mean()  
             l.backward()
             trainer_fn([w, b], states, hyperparams)
             n += X.shape[0]
-            if n % 100 == 0:
-                times.append(time.time() - start + times[-1])
-                losses.append(eval_loss())
-                x = np.linspace(0, n/X.shape[0]/len(data_iter), len(losses))
-                d2l.plot(x, [losses], 'epoch', 'loss', xlim=[0, num_epochs], 
-                         ylim=[0.22, 0.5], axes=ax)
-                d2l.show(fig)
-                start = time.time()
-    print('loss: %.3f, %.3f sec per epoch' % (
-        losses[-1], times[-1]/num_epochs))
-    return times, losses
+            if n % 200 == 0:
+                timer.stop()
+                animator.add(n/X.shape[0]/len(data_iter),
+                             d2l.evaluate_loss(net, data_iter, loss))
+                timer.start()
+    print('loss: %.3f, %.3f sec/epoch'%(animator.Y[0][-1], timer.avg_time()))
+    return timer.cum_times(), animator.Y[0]
 
 # Defined in file: ./chapter_optimization/minibatch-sgd.md
 def train_gluon_ch10(trainer_name, trainer_hyperparams, 
@@ -388,22 +383,23 @@ def train_gluon_ch10(trainer_name, trainer_hyperparams,
     trainer = gluon.Trainer(
         net.collect_params(), trainer_name, trainer_hyperparams)
     loss = gluon.loss.L2Loss()
-    eval_loss = lambda: d2l.evaluate_loss(net, data_iter, loss)
-    losses, t, n, start = [eval_loss()], 0, 0, time.time()
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss', 
+                            xlim=[0, num_epochs], ylim=[0.22, 0.35])
+    n, timer = 0, d2l.Timer()
     for _ in range(num_epochs):
         for X, y in data_iter:
-            start = time.time()
             with autograd.record():
                 l = loss(net(X), y)
             l.backward()
             trainer.step(X.shape[0])
-            n, t = n + X.shape[0], time.time() - start + t
-            if n % 100 == 0:
-                losses.append(eval_loss())
-    # Print and plot the results
-    print('loss: %.3f, %.3f sec per epoch' % (losses[-1], t/num_epochs))
-    d2l.set_figsize((3.5, 2.5))
-    d2l.plot(np.linspace(0,num_epochs,len(losses)), [losses], 'epoch', 'loss')
+            n += X.shape[0]
+            if n % 200 == 0:
+                timer.stop()
+                animator.add(n/X.shape[0]/len(data_iter),
+                             d2l.evaluate_loss(net, data_iter, loss))
+                timer.start()
+    print('loss: %.3f, %.3f sec/epoch'%(animator.Y[0][-1], timer.avg_time()))
+    return timer.cum_times(), animator.Y[0]
 
 # Defined in file: ./chapter_computational-performance/multiple-gpus.md
 def split_batch(X, y, ctx_list):
@@ -413,7 +409,19 @@ def split_batch(X, y, ctx_list):
             gluon.utils.split_and_load(y, ctx_list))
 
 # Defined in file: ./chapter_computational-performance/multiple-gpus-gluon.md
-def evaluate_accuracy_gpu(net, data_iter):
+def resnet18(num_classes):
+    def resnet_block(num_channels, num_residuals, first_block=False):
+        blk = nn.Sequential()
+        for i in range(num_residuals):
+            if i == 0 and not first_block:
+                blk.add(d2l.Residual(
+                    num_channels, use_1x1conv=True, strides=2))
+            else:
+                blk.add(d2l.Residual(num_channels))
+        return blk
+
+# Defined in file: ./chapter_computational-performance/multiple-gpus-gluon.md
+def evaluate_accuracy_gpus(net, data_iter):
     # Query the list of devices.
     ctx_list = list(net.collect_params().values())[0].list_ctx()
     acc_sum, n = 0.0, 0

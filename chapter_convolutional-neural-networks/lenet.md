@@ -188,8 +188,9 @@ described in :numref:`chapter_use_gpu`.
 
 ```{.python .input}
 # Save to the d2l package
-def evaluate_accuracy_gpu(net, data_iter):
-    ctx = list(net.collect_params().values())[0].list_ctx()[0]
+def evaluate_accuracy_gpu(net, data_iter, ctx=None):
+    if not ctx:  # Query the first device the first parameter is on.
+        ctx = list(net.collect_params().values())[0].list_ctx()[0]
     acc_sum, n = nd.array([0], ctx=ctx), 0
     for X, y in data_iter:
         X, y = X.as_in_context(ctx), y.as_in_context(ctx).astype('float32')
