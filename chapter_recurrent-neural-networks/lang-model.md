@@ -118,7 +118,7 @@ As we can see, the most popular words are actually quite boring to look at. In t
 ```{.python .input}
 wordcounts = [count for _,count in counter.most_common()]
 d2l.use_svg_display()
-d2l.plt.loglog(wordcounts)
+d2l.plt.loglog(wordcounts);
 ```
 
 We're on to something quite fundamental here - the word frequencies decay rapidly in a well defined way. After dealing with the first four words as exceptions ('the', 'i', 'and', 'of'), all remaining words follow a straight line on a log-log plot. This means that words satisfy [Zipf's law](https://en.wikipedia.org/wiki/Zipf%27s_law) which states that the item frequency is given by
