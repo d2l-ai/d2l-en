@@ -492,20 +492,15 @@ def train(train_features, test_features, train_labels, test_labels,
     test_iter = d2l.load_array(test_features, test_labels, batch_size, False)
     trainer = gluon.Trainer(net.collect_params(), 'sgd',
                             {'learning_rate': 0.01})
-    train_ls, test_ls = [], []
-    d2l.use_svg_display()
-    fig, ax = d2l.plt.subplots(figsize=(4,3))
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss', yscale='log',
+                            xlim=[1,num_epochs], ylim=[1e-3, 1e2], 
+                            legend=['train', 'test'])
     for epoch in range(1, num_epochs+1):
         d2l.train_epoch_ch3(net, train_iter, loss,
                             lambda: trainer.step(batch_size))
-        train_ls.append(evaluate_loss(net, train_iter, loss))
-        test_ls.append(evaluate_loss(net, test_iter, loss))
         if epoch % 50 == 0:
-            d2l.plot(list(range(1, epoch+1)), [train_ls, test_ls], 'epoch',
-                     'loss', xlim=[0,num_epochs+1], ylim=[1e-3, 1e2],
-                     legend=['train', 'test'], axes=ax)
-            ax.set_yscale('log')
-            d2l.show(fig)
+            animator.add(epoch, (evaluate_loss(net, train_iter, loss),
+                                 evaluate_loss(net, test_iter, loss)))
     print('weight:', net[0].weight.data().asnumpy())
 ```
 
