@@ -184,7 +184,7 @@ in :numref:`chapter_softmax_scratch`.
 Since the full dataset lives on the CPU,
 we need to copy it to the GPU before we can compute our models.
 This is accomplished via the `as_in_context` function
-described in :numref:`chapter_use_gpu`. 
+described in :numref:`chapter_use_gpu`.
 
 ```{.python .input}
 # Save to the d2l package
@@ -199,29 +199,7 @@ def evaluate_accuracy_gpu(net, data_iter, ctx=None):
     return acc_sum.asscalar() / n
 ```
 
-We also need to update our training function to deal with GPUs.
-Unlike the `train_epoch_ch3` defined in :numref:`chapter_softmax_scratch`, we now need to move each batch of data to our designated context (hopefully, the GPU)
-prior to making the forward and backward passes.
-
-```{.python .input}
-# Save to the d2l package.
-def train_epoch_ch5(net, train_iter, loss, trainer, ctx):
-    train_l_sum, train_acc_sum, n = 0.0, 0.0, 0
-    for X, y in train_iter:
-        # Here is the only difference compared to train_epoch_ch3
-        X, y = X.as_in_context(ctx), y.as_in_context(ctx)
-        with autograd.record():
-            y_hat = net(X)
-            l = loss(y_hat, y)
-        l.backward()
-        trainer.step(X.shape[0])
-        train_l_sum += l.sum().asscalar()
-        train_acc_sum += d2l.accuracy(y_hat, y)
-        n += X.shape[0]
-    return train_l_sum / n, train_acc_sum / n
-```
-
-Since the computation is complex, we are paying attention to the computation time. We define a timer to do simply analysis of the running time. 
+Since the computation is complex, we are paying attention to the computation time. We define a timer to do simply analysis of the running time.
 
 ```{.python .input}
 # Save to the d2l package.
@@ -239,20 +217,28 @@ class Timer(object):
         """Stop the timer and record the time in a list"""
         self.times.append(time.time() - self.start_time)
         
-    def avg_time(self):
+    def avg(self):
         """Return the average time"""
         return sum(self.times)/len(self.times)
     
-    def cum_times(self):
+    def sum(self):
+        """Return the sum of time"""
+        return sum(self.times)
+        
+    def cumsum(self):
         """Return the accumuated times"""
         return np.array(self.times).cumsum().tolist()
 ```
+
+We also need to update our training function to deal with GPUs.
+Unlike the `train_epoch_ch3` defined in :numref:`chapter_softmax_scratch`, we now need to move each batch of data to our designated context (hopefully, the GPU)
+prior to making the forward and backward passes.
 
 The training function `train_ch5` is also very similar to `train_ch3` defined in :numref:`chapter_softmax_scratch`. Since we will deal with networks with tens of layers now, the function will only support Gluon models. We initialize the model parameters on the device indicated by `ctx`,
 this time using the Xavier initializer.
 The loss function and the training algorithm
 still use the cross-entropy loss function
-and mini-batch stochastic gradient descent.
+and mini-batch stochastic gradient descent. Since each epoch takes tens of second to run, we visualize the training loss in a finer granularity. 
 
 ```{.python .input}
 # Save to the d2l package.
@@ -261,17 +247,32 @@ def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
     trainer = gluon.Trainer(net.collect_params(),
                             'sgd', {'learning_rate': lr})
-    animator = d2l.Animator(xlabel='epoch', xlim=[1,num_epochs], ylim=[0,1],
-                            legend=['train loss', 'train acc', 'test acc'])
+    animator = d2l.Animator(xlabel='epoch', xlim=[0,num_epochs], ylim=[0,2],
+                            legend=['train loss','train acc','test acc'])
     timer = Timer()
     for epoch in range(num_epochs):
-        timer.start()
-        train_metrics = train_epoch_ch5(net, train_iter, loss, trainer, ctx)
-        timer.stop()
+        train_l_sum, train_acc_sum, n = 0.0, 0.0, 0
+        for i, (X, y) in enumerate(train_iter):
+            timer.start()
+            # Here is the only difference compared to train_epoch_ch3
+            X, y = X.as_in_context(ctx), y.as_in_context(ctx)
+            with autograd.record():
+                y_hat = net(X)
+                l = loss(y_hat, y)
+            l.backward()
+            trainer.step(X.shape[0])
+            train_l_sum += l.sum().asscalar()
+            train_acc_sum += d2l.accuracy(y_hat, y)
+            n += X.shape[0]
+            timer.stop()
+            if (i+1) % 50 == 0:
+                animator.add(epoch+i/len(train_iter), 
+                             (train_l_sum/n, train_acc_sum/n, None))
         test_acc = evaluate_accuracy_gpu(net, test_iter)
-        animator.add(epoch+1, train_metrics+(test_acc,)) 
-    print('loss %.3f, train acc %.3f, test acc %.3f, %.1f sec/epoch on %s'%(
-        *train_metrics, test_acc, timer.avg_time(), ctx))
+        animator.add(epoch+1, (None, None, test_acc))
+    print('loss %.3f, train acc %.3f, test acc %.3f' % (
+        train_l_sum/n, train_acc_sum/n, test_acc))
+    print('%.1f exampes/sec on %s'%(n*num_epochs/timer.sum(), ctx))
 ```
 
 Now let's train the model.

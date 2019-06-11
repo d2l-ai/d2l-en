@@ -142,18 +142,20 @@ class Animator(object):
             set_one('set_xscale', xscale),
             set_one('set_yscale', yscale),
             set_one('legend', legend))
-        self.raw_X, self.raw_Y = [], []
-        self.fmts = fmts
+        self.X, self.Y, self.fmts = None, None, fmts
         
     def add(self, x, y):
         """Add multiple data points into the figure."""
-        if not hasattr(x, "__len__"): y = [y]
-        if not hasattr(x, "__len__"): x = [x] * len(y)
-        self.raw_X.append(x)
-        self.raw_Y.append(y)
-        self.X = list(map(list, zip(*self.raw_X)))  # tranpose raw_X
-        self.Y = list(map(list, zip(*self.raw_Y)))
-        if not self.fmts: self.fmts = ['-'] * len(self.Y)
+        if not hasattr(y, "__len__"): y = [y]
+        n = len(y)
+        if not hasattr(x, "__len__"): x = [x] * n
+        if not self.X: self.X = [[] for _ in range(n)]
+        if not self.Y: self.Y = [[] for _ in range(n)]
+        if not self.fmts: self.fmts = ['-'] * n
+        for i, (a, b) in enumerate(zip(x, y)):
+            if a is not None and b is not None:
+                self.X[i].append(a)
+                self.Y[i].append(b)        
         self.axes.cla()
         for x, y, fmt in zip(self.X, self.Y, self.fmts):
             self.axes.plot(x, y, fmt)
@@ -253,22 +255,6 @@ def evaluate_accuracy_gpu(net, data_iter, ctx=None):
     return acc_sum.asscalar() / n
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
-def train_epoch_ch5(net, train_iter, loss, trainer, ctx):
-    train_l_sum, train_acc_sum, n = 0.0, 0.0, 0
-    for X, y in train_iter:
-        # Here is the only difference compared to train_epoch_ch3
-        X, y = X.as_in_context(ctx), y.as_in_context(ctx)
-        with autograd.record():
-            y_hat = net(X)
-            l = loss(y_hat, y)
-        l.backward()
-        trainer.step(X.shape[0])
-        train_l_sum += l.sum().asscalar()
-        train_acc_sum += d2l.accuracy(y_hat, y)
-        n += X.shape[0]
-    return train_l_sum / n, train_acc_sum / n
-
-# Defined in file: ./chapter_convolutional-neural-networks/lenet.md
 class Timer(object):
     """Record multiple running times."""
     def __init__(self):
@@ -283,11 +269,15 @@ class Timer(object):
         """Stop the timer and record the time in a list"""
         self.times.append(time.time() - self.start_time)
         
-    def avg_time(self):
+    def avg(self):
         """Return the average time"""
         return sum(self.times)/len(self.times)
     
-    def cum_times(self):
+    def sum(self):
+        """Return the sum of time"""
+        return sum(self.times)
+        
+    def cumsum(self):
         """Return the accumuated times"""
         return np.array(self.times).cumsum().tolist()
 
@@ -297,17 +287,32 @@ def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
     trainer = gluon.Trainer(net.collect_params(),
                             'sgd', {'learning_rate': lr})
-    animator = d2l.Animator(xlabel='epoch', xlim=[1,num_epochs], ylim=[0,1],
-                            legend=['train loss', 'train acc', 'test acc'])
+    animator = d2l.Animator(xlabel='epoch', xlim=[0,num_epochs], ylim=[0,2],
+                            legend=['train loss','train acc','test acc'])
     timer = Timer()
     for epoch in range(num_epochs):
-        timer.start()
-        train_metrics = train_epoch_ch5(net, train_iter, loss, trainer, ctx)
-        timer.stop()
+        train_l_sum, train_acc_sum, n = 0.0, 0.0, 0
+        for i, (X, y) in enumerate(train_iter):
+            timer.start()
+            # Here is the only difference compared to train_epoch_ch3
+            X, y = X.as_in_context(ctx), y.as_in_context(ctx)
+            with autograd.record():
+                y_hat = net(X)
+                l = loss(y_hat, y)
+            l.backward()
+            trainer.step(X.shape[0])
+            train_l_sum += l.sum().asscalar()
+            train_acc_sum += d2l.accuracy(y_hat, y)
+            n += X.shape[0]
+            timer.stop()
+            if (i+1) % 50 == 0:
+                animator.add(epoch+i/len(train_iter), 
+                             (train_l_sum/n, train_acc_sum/n, None))
         test_acc = evaluate_accuracy_gpu(net, test_iter)
-        animator.add(epoch+1, train_metrics+(test_acc,)) 
-    print('loss %.3f, train acc %.3f, test acc %.3f, %.1f sec/epoch on %s'%(
-        *train_metrics, test_acc, timer.avg_time(), ctx))
+        animator.add(epoch+1, (None, None, test_acc))
+    print('loss %.3f, train acc %.3f, test acc %.3f' % (
+        train_l_sum/n, train_acc_sum/n, test_acc))
+    print('%.1f exampes/sec on %s'%(n*num_epochs/timer.sum(), ctx))
 
 # Defined in file: ./chapter_optimization/optimization-intro.md
 def annotate(text, xy, xytext):
@@ -371,7 +376,7 @@ def train_ch10(trainer_fn, states, hyperparams, data_iter,
                              d2l.evaluate_loss(net, data_iter, loss))
                 timer.start()
     print('loss: %.3f, %.3f sec/epoch'%(animator.Y[0][-1], timer.avg_time()))
-    return timer.cum_times(), animator.Y[0]
+    return timer.cumsum(), animator.Y[0]
 
 # Defined in file: ./chapter_optimization/minibatch-sgd.md
 def train_gluon_ch10(trainer_name, trainer_hyperparams, 
@@ -398,14 +403,14 @@ def train_gluon_ch10(trainer_name, trainer_hyperparams,
                 animator.add(n/X.shape[0]/len(data_iter),
                              d2l.evaluate_loss(net, data_iter, loss))
                 timer.start()
-    print('loss: %.3f, %.3f sec/epoch'%(animator.Y[0][-1], timer.avg_time()))
-    return timer.cum_times(), animator.Y[0]
+    print('loss: %.3f, %.3f sec/epoch'%(animator.Y[0][-1], timer.avg()))
+    return timer.cumsum(), animator.Y[0]
 
 # Defined in file: ./chapter_computational-performance/multiple-gpus.md
 def split_batch(X, y, ctx_list):
     """Split X and y into multiple devices specified by ctx"""
     assert X.shape[0] == y.shape[0]
-    return (gluon.utils.split_and_load(X, ctx_list), 
+    return (gluon.utils.split_and_load(X, ctx_list),
             gluon.utils.split_and_load(y, ctx_list))
 
 # Defined in file: ./chapter_computational-performance/multiple-gpus-gluon.md
