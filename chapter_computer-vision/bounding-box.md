@@ -9,9 +9,6 @@ Object detection is widely used in many fields. For example, in self-driving tec
 In the next few sections, we will introduce multiple deep learning models used for object detection. Before that, we should discuss the concept of target location. First, import the packages and modules required for the experiment.
 
 ```{.python .input}
-import sys
-sys.path.insert(0, '..')
-
 %matplotlib inline
 import d2l
 from mxnet import image
@@ -20,9 +17,9 @@ from mxnet import image
 Next, we will load the sample images that will be used in this section. We can see there is a dog on the left side of the image and a cat on the right. They are the two main targets in this image.
 
 ```{.python .input}
-d2l.set_figsize()
+d2l.set_figsize((3.5, 2.5))
 img = image.imread('../img/catdog.jpg').asnumpy()
-d2l.plt.imshow(img);  # Add a semicolon to only display the image
+d2l.plt.imshow(img); 
 ```
 
 ## Bounding Box
@@ -37,7 +34,7 @@ dog_bbox, cat_bbox = [60, 45, 378, 516], [400, 112, 655, 493]
 We can draw the bounding box in the image to check if it is accurate. Before drawing the box, we will define a helper function `bbox_to_rect`. It represents the bounding box in the bounding box format of matplotlib.
 
 ```{.python .input  n=3}
-# This function has been saved in the d2l package for future use
+# Save to the d2l package.
 def bbox_to_rect(bbox, color):
     # Convert the bounding box (top-left x, top-left y, bottom-right x,
     # bottom-right y) format to matplotlib format: ((upper-left x,

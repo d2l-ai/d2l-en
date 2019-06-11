@@ -521,6 +521,35 @@ class Accumulator(object):
     def __getitem__(self, i):
         return self.data[i]
 
+# Defined in file: ./chapter_computer-vision/bounding-box.md
+def bbox_to_rect(bbox, color):
+    # Convert the bounding box (top-left x, top-left y, bottom-right x,
+    # bottom-right y) format to matplotlib format: ((upper-left x,
+    # upper-left y), width, height)
+    return d2l.plt.Rectangle(
+        xy=(bbox[0], bbox[1]), width=bbox[2]-bbox[0], height=bbox[3]-bbox[1],
+        fill=False, edgecolor=color, linewidth=2)
+
+# Defined in file: ./chapter_computer-vision/anchor.md
+def show_bboxes(axes, bboxes, labels=None, colors=None):
+    def _make_list(obj, default_values=None):
+        if obj is None:
+            obj = default_values
+        elif not isinstance(obj, (list, tuple)):
+            obj = [obj]
+        return obj
+    labels = _make_list(labels)
+    colors = _make_list(colors, ['b', 'g', 'r', 'm', 'c'])
+    for i, bbox in enumerate(bboxes):
+        color = colors[i % len(colors)]
+        rect = d2l.bbox_to_rect(bbox.asnumpy(), color)
+        axes.add_patch(rect)
+        if labels and len(labels) > i:
+            text_color = 'k' if color == 'w' else 'w'
+            axes.text(rect.xy[0], rect.xy[1], labels[i],
+                      va='center', ha='center', fontsize=9, color=text_color,
+                      bbox=dict(facecolor=color, lw=0))
+
 # Defined in file: ./chapter_generative_adversarial_networks/gan.md
 def update_D(X, Z, net_D, net_G, loss, trainer_D):
     """Update discriminator"""
