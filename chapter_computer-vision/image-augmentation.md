@@ -168,7 +168,7 @@ def train_batch_ch12(net, features, labels, loss, trainer, ctx_list):
 # Save to the d2l package.
 def train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs,
                ctx_list=d2l.try_all_gpus()):
-    timer = d2l.Timer()
+    num_batches, timer = len(train_iter), d2l.Timer()
     animator = d2l.Animator(xlabel='epoch', xlim=[0,num_epochs], ylim=[0,2],
                             legend=['train loss','train acc','test acc'])
     for epoch in range(num_epochs):
@@ -180,8 +180,8 @@ def train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs,
                 net, features, labels, loss, trainer, ctx_list)
             metric.add([l, acc, labels.shape[0], labels.size])
             timer.stop()
-            if (i+1) % 50 == 0:
-                animator.add(epoch+i/len(train_iter), 
+            if (i+1) % (num_batches // 5) == 0:
+                animator.add(epoch+i/num_batches, 
                              (metric[0]/metric[2], metric[1]/metric[3], None))
         test_acc = d2l.evaluate_accuracy_gpus(net, test_iter)
         animator.add(epoch+1, (None, None, test_acc))
@@ -194,7 +194,6 @@ def train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs,
 Now, we can define the `train_with_data_aug` function to use image augmentation to train the model. This function obtains all available GPUs and uses Adam as the optimization algorithm for training. It then applies image augmentation to the training data set, and finally calls the `train` function just defined to train and evaluate the model.
 
 ```{.python .input  n=18}
-# Save to the d2l package.
 def train_with_data_aug(train_augs, test_augs, lr=0.001):
     batch_size, ctx, net = 256, d2l.try_all_gpus(), d2l.resnet18(10)
     net.initialize(ctx=ctx, init=init.Xavier())
