@@ -125,6 +125,62 @@ def train_epoch_ch3(net, train_iter, loss, updater):
     return train_l_sum/n, train_acc_sum/n
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
+class Animator(object):
+    def __init__(self, xlabel=None, ylabel=None, legend=None, xlim=None, 
+                 ylim=None, xscale=None, yscale=None, fmts=None, 
+                 figsize=(3.5, 2.5)):
+        """Incrementally plot multiple lines."""
+        d2l.use_svg_display()
+        self.fig, self.axes = d2l.plt.subplots(figsize=figsize)
+        set_one = lambda name, var : getattr(
+            self.axes, name)(var) if var else None
+        self.set_axes = lambda : (
+            set_one('set_xlabel', xlabel),
+            set_one('set_ylabel', ylabel),
+            set_one('set_xlim', xlim),
+            set_one('set_ylim', ylim),
+            set_one('set_xscale', xscale),
+            set_one('set_yscale', yscale),
+            set_one('legend', legend))
+        self.raw_X, self.raw_Y = [], []
+        self.fmts = fmts
+        
+    def add(self, x, y):
+        """Add multiple data points into the figure."""
+        if not hasattr(x, "__len__"): y = [y]
+        if not hasattr(x, "__len__"): x = [x] * len(y)
+        self.raw_X.append(x)
+        self.raw_Y.append(y)
+        self.X = list(map(list, zip(*self.raw_X)))  # tranpose raw_X
+        self.Y = list(map(list, zip(*self.raw_Y)))
+        if not self.fmts: self.fmts = ['-'] * len(self.Y)
+        self.axes.cla()
+        for x, y, fmt in zip(self.X, self.Y, self.fmts):
+            self.axes.plot(x, y, fmt)
+        self.set_axes()
+        display.display(self.fig)
+        display.clear_output(wait=True)
+
+# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
+def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
+    trains, test_accs = [], []
+    animator = Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0.3, 0.9],
+                       legend=['train loss', 'train acc', 'test acc'])
+    for epoch in range(num_epochs):
+        train_metrics = train_epoch_ch3(net, train_iter, loss, updater)
+        test_acc = evaluate_accuracy(net, test_iter)
+        animator.add(epoch+1, train_metrics+(test_acc,))
+
+# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
+def predict_ch3(net, test_iter, n=6):
+    for X, y in test_iter:
+        break
+    trues = d2l.get_fashion_mnist_labels(y.asnumpy())
+    preds = d2l.get_fashion_mnist_labels(net(X).argmax(axis=1).asnumpy())
+    titles = [true+'\n'+ pred for true, pred in zip(trues, preds)]
+    d2l.show_images(X[0:n].reshape((n,28,28)), 1, n, titles=titles[0:n])
+
+# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def plot(X, Y, x_label=None, y_label=None, legend=None,
          xlim=None, ylim=None, fmts=None, axes=None):
     """Plot multiple lines"""
@@ -153,29 +209,6 @@ def show(obj):
     """Show a figure"""
     display.display(obj)
     display.clear_output(wait=True)
-
-# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
-    trains, test_accs = [], []
-    d2l.use_svg_display()
-    fig, ax = d2l.plt.subplots(figsize=(4,3))
-    for epoch in range(num_epochs):
-        trains.append(train_epoch_ch3(net, train_iter, loss, updater))
-        test_accs.append(evaluate_accuracy(net, test_iter))
-        legend = ['train loss', 'train acc', 'test acc']
-        res = list(map(list, zip(*trains)))+[test_accs,]
-        plot(list(range(1, epoch+2)), res, 'epoch', legend=legend,
-             xlim=[0,num_epochs+1], ylim=[0.3, 0.9], axes=ax)
-        show(fig)
-
-# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-def predict_ch3(net, test_iter, n=9):
-    for X, y in test_iter:
-        break
-    trues = d2l.get_fashion_mnist_labels(y.asnumpy())
-    preds = d2l.get_fashion_mnist_labels(net(X).argmax(axis=1).asnumpy())
-    titles = [true+'\n'+ pred for true, pred in zip(trues, preds)]
-    d2l.show_images(X[0:n].reshape((n,28,28)), 1, n, titles=titles[0:n])
 
 # Defined in file: ./chapter_multilayer-perceptrons/underfit-overfit.md
 def evaluate_loss(net, data_iter, loss):
@@ -209,8 +242,7 @@ def corr2d(X, K):
     return Y
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
-def evaluate_accuracy(net, data_iter):
-    # Query on which device the parameter is.
+def evaluate_accuracy_gpu(net, data_iter):
     ctx = list(net.collect_params().values())[0].list_ctx()[0]
     acc_sum, n = nd.array([0], ctx=ctx), 0
     for X, y in data_iter:
@@ -353,6 +385,39 @@ def train_gluon_ch10(trainer_name, trainer_hyperparams,
     print('loss: %.3f, %.3f sec per epoch' % (losses[-1], t/num_epochs))
     d2l.set_figsize((3.5, 2.5))
     d2l.plot(np.linspace(0,num_epochs,len(losses)), [losses], 'epoch', 'loss')
+
+# Defined in file: ./chapter_computational-performance/multiple-gpus.md
+def split_batch(X, y, ctx_list):
+    """Split X and y into multiple devices specified by ctx"""
+    assert X.shape[0] == y.shape[0]
+    return (gluon.utils.split_and_load(X, ctx_list), 
+            gluon.utils.split_and_load(y, ctx_list))
+
+# Defined in file: ./chapter_computational-performance/multiple-gpus.md
+class Timer(object):
+    def __init__(self):
+        self.times = []
+        self.start()
+    def start(self):
+        self.start_time = time.time()
+    def stop(self):
+        self.times.append(time.time() - self.start_time)
+    def avg_time(self):
+        return sum(self.times)/len(self.times)
+    def cum_times(self):
+        return np.array(self.times).cumsum().tolist()
+
+# Defined in file: ./chapter_computational-performance/multiple-gpus-gluon.md
+def evaluate_accuracy_gpu(net, data_iter):
+    # Query the list of devices.
+    ctx_list = list(net.collect_params().values())[0].list_ctx()
+    acc_sum, n = 0.0, 0
+    for features, labels in data_iter:
+        Xs, ys = d2l.split_batch(features, labels, ctx_list)
+        pys = [net(X) for X in Xs]  # run in parallel
+        acc_sum += sum(d2l.accuracy(py, y) for py, y in zip(pys, ys))
+        n += features.shape[0]
+    return acc_sum / n
 
 # Defined in file: ./chapter_generative_adversarial_networks/gan.md
 def update_D(X, Z, net_D, net_G, loss, trainer_D):
