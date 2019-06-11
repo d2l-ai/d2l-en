@@ -95,6 +95,7 @@ Again, we'll rely on the Sequential class.
 
 ```{.python .input}
 import d2l
+import numpy as np
 from mxnet import autograd, gluon, init, nd
 from mxnet.gluon import nn
 import time
@@ -183,12 +184,11 @@ in :numref:`chapter_softmax_scratch`.
 Since the full dataset lives on the CPU,
 we need to copy it to the GPU before we can compute our models.
 This is accomplished via the `as_in_context` function
-described in :numref:`chapter_use_gpu`. This implementation will overwrite the one introduced from :numref:`chapter_softmax_scratch` in the `d2l` package.
+described in :numref:`chapter_use_gpu`. 
 
 ```{.python .input}
 # Save to the d2l package
-def evaluate_accuracy(net, data_iter):
-    # Query on which device the parameter is.
+def evaluate_accuracy_gpu(net, data_iter):
     ctx = list(net.collect_params().values())[0].list_ctx()[0]
     acc_sum, n = nd.array([0], ctx=ctx), 0
     for X, y in data_iter:
@@ -220,6 +220,33 @@ def train_epoch_ch5(net, train_iter, loss, trainer, ctx):
     return train_l_sum / n, train_acc_sum / n
 ```
 
+Since the computation is complex, we are paying attention to the computation time. We define a timer to do simply analysis of the running time. 
+
+```{.python .input}
+# Save to the d2l package.
+class Timer(object):
+    """Record multiple running times."""
+    def __init__(self):
+        self.times = []
+        self.start()
+        
+    def start(self):
+        """Start the timer"""
+        self.start_time = time.time()
+    
+    def stop(self):
+        """Stop the timer and record the time in a list"""
+        self.times.append(time.time() - self.start_time)
+        
+    def avg_time(self):
+        """Return the average time"""
+        return sum(self.times)/len(self.times)
+    
+    def cum_times(self):
+        """Return the accumuated times"""
+        return np.array(self.times).cumsum().tolist()
+```
+
 The training function `train_ch5` is also very similar to `train_ch3` defined in :numref:`chapter_softmax_scratch`. Since we will deal with networks with tens of layers now, the function will only support Gluon models. We initialize the model parameters on the device indicated by `ctx`,
 this time using the Xavier initializer.
 The loss function and the training algorithm
@@ -233,21 +260,17 @@ def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
     trainer = gluon.Trainer(net.collect_params(),
                             'sgd', {'learning_rate': lr})
-    trains, test_accs = [], []
-    d2l.use_svg_display()
-    fig, ax = d2l.plt.subplots(figsize=(4, 3))
-    start = time.time()
+    animator = d2l.Animator(xlabel='epoch', xlim=[1,num_epochs], ylim=[0,1],
+                            legend=['train loss', 'train acc', 'test acc'])
+    timer = Timer()
     for epoch in range(num_epochs):
-        trains.append(train_epoch_ch5(
-            net, train_iter, loss, trainer, ctx))
-        test_accs.append(evaluate_accuracy(net, test_iter))
-        legend = ['train loss', 'train acc', 'test acc']
-        res = list(map(list, zip(*trains)))+[test_accs,]
-        d2l.plot(list(range(1, epoch+2)), res, 'epoch', legend=legend,
-             xlim=[0,num_epochs+1], ylim=[0, 1], axes=ax)
-        d2l.show(fig)
-    print('Done in %d sec on %s, loss %.3f, train acc %.3f, test acc %.3f'%(
-        time.time()-start, ctx, *trains[-1], test_accs[-1]))
+        timer.start()
+        train_metrics = train_epoch_ch5(net, train_iter, loss, trainer, ctx)
+        timer.stop()
+        test_acc = evaluate_accuracy_gpu(net, test_iter)
+        animator.add(epoch+1, train_metrics+(test_acc,)) 
+    print('loss %.3f, train acc %.3f, test acc %.3f, %.1f sec/epoch on %s'%(
+        *train_metrics, test_acc, timer.avg_time(), ctx))
 ```
 
 Now let's train the model.

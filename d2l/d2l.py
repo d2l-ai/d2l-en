@@ -268,26 +268,45 @@ def train_epoch_ch5(net, train_iter, loss, trainer, ctx):
     return train_l_sum / n, train_acc_sum / n
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
+class Timer(object):
+    """Record multiple running times."""
+    def __init__(self):
+        self.times = []
+        self.start()
+        
+    def start(self):
+        """Start the timer"""
+        self.start_time = time.time()
+    
+    def stop(self):
+        """Stop the timer and record the time in a list"""
+        self.times.append(time.time() - self.start_time)
+        
+    def avg_time(self):
+        """Return the average time"""
+        return sum(self.times)/len(self.times)
+    
+    def cum_times(self):
+        """Return the accumuated times"""
+        return np.array(self.times).cumsum().tolist()
+
+# Defined in file: ./chapter_convolutional-neural-networks/lenet.md
 def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
     net.initialize(force_reinit=True, ctx=ctx, init=init.Xavier())
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
     trainer = gluon.Trainer(net.collect_params(),
                             'sgd', {'learning_rate': lr})
-    trains, test_accs = [], []
-    d2l.use_svg_display()
-    fig, ax = d2l.plt.subplots(figsize=(4, 3))
-    start = time.time()
+    animator = d2l.Animator(xlabel='epoch', xlim=[1,num_epochs], ylim=[0,1],
+                            legend=['train loss', 'train acc', 'test acc'])
+    timer = Timer()
     for epoch in range(num_epochs):
-        trains.append(train_epoch_ch5(
-            net, train_iter, loss, trainer, ctx))
-        test_accs.append(evaluate_accuracy(net, test_iter))
-        legend = ['train loss', 'train acc', 'test acc']
-        res = list(map(list, zip(*trains)))+[test_accs,]
-        d2l.plot(list(range(1, epoch+2)), res, 'epoch', legend=legend,
-             xlim=[0,num_epochs+1], ylim=[0, 1], axes=ax)
-        d2l.show(fig)
-    print('Done in %d sec on %s, loss %.3f, train acc %.3f, test acc %.3f'%(
-        time.time()-start, ctx, *trains[-1], test_accs[-1]))
+        timer.start()
+        train_metrics = train_epoch_ch5(net, train_iter, loss, trainer, ctx)
+        timer.stop()
+        test_acc = evaluate_accuracy_gpu(net, test_iter)
+        animator.add(epoch+1, train_metrics+(test_acc,)) 
+    print('loss %.3f, train acc %.3f, test acc %.3f, %.1f sec/epoch on %s'%(
+        *train_metrics, test_acc, timer.avg_time(), ctx))
 
 # Defined in file: ./chapter_optimization/optimization-intro.md
 def annotate(text, xy, xytext):
@@ -392,20 +411,6 @@ def split_batch(X, y, ctx_list):
     assert X.shape[0] == y.shape[0]
     return (gluon.utils.split_and_load(X, ctx_list), 
             gluon.utils.split_and_load(y, ctx_list))
-
-# Defined in file: ./chapter_computational-performance/multiple-gpus.md
-class Timer(object):
-    def __init__(self):
-        self.times = []
-        self.start()
-    def start(self):
-        self.start_time = time.time()
-    def stop(self):
-        self.times.append(time.time() - self.start_time)
-    def avg_time(self):
-        return sum(self.times)/len(self.times)
-    def cum_times(self):
-        return np.array(self.times).cumsum().tolist()
 
 # Defined in file: ./chapter_computational-performance/multiple-gpus-gluon.md
 def evaluate_accuracy_gpu(net, data_iter):
