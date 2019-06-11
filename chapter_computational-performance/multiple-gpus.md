@@ -192,12 +192,12 @@ def train(num_gpus, batch_size, lr):
 We will start by training with a single GPU. Assume the batch size is 256 and the learning rate is 0.2.
 
 ```{.python .input  n=62}
-acces1, times1 = train(num_gpus=1, batch_size=256, lr=0.2)
+train(num_gpus=1, batch_size=256, lr=0.2)
 ```
 
 By keeping the batch size and learning rate unchanged and changing the number of GPUs to 2, we can see that the improvement in test accuracy is roughly the same as in the results from the previous experiment. In terms of the optimization algorithms, they are identical. 
 
-Because of the extra communication overhead, and relative simple model we used here, there is no reduction in the training time. We will consider a more complex model in the next chapter. 
+Because of the extra communication overhead, and relative simple model we used here, there is no reduction in the training time. We will consider a more complex model in the next chapter.
 
 ```{.python .input  n=13}
 train(num_gpus=2, batch_size=256, lr=0.2)
