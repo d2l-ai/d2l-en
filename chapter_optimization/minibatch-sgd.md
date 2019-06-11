@@ -27,7 +27,6 @@ import d2l
 from mxnet import autograd, gluon, init, nd
 from mxnet.gluon import nn
 import numpy as np
-import time
 
 # Save to the d2l package. 
 def get_data_ch10(batch_size=10, n=1500):
@@ -57,44 +56,34 @@ def sgd(params, states, hyperparams):
 
 Next, we are going to implement a generic training function to facilitate the use of the other optimization algorithms introduced later in this chapter. It initializes a linear regression model and can then be used to train the model with the mini-batch SGD and other algorithms introduced in subsequent sections.
 
-```{.python .input}
-np.linspace(0, 2.3, 3)
-```
-
 ```{.python .input  n=3}
 # Save to the d2l package.
 def train_ch10(trainer_fn, states, hyperparams, data_iter, 
                feature_dim, num_epochs=2):
     # Initialization 
-    net, loss = d2l.linreg, d2l.squared_loss
     w = nd.random.normal(scale=0.01, shape=(feature_dim, 1))
     b = nd.zeros(1)
     w.attach_grad()
     b.attach_grad()
-    def eval_loss():
-        return d2l.evaluate_loss(lambda X: net(X, w, b), data_iter, loss)
+    net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss
     # Train
-    d2l.use_svg_display()
-    fig, ax = d2l.plt.subplots(figsize=(4, 3))
-    losses, times, n, start = [eval_loss()], [0,], 0, time.time()
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss', 
+                            xlim=[0, num_epochs], ylim=[0.22, 0.35])
+    n, timer = 0, d2l.Timer()
     for _ in range(num_epochs):
         for X, y in data_iter:
             with autograd.record():
-                l = loss(net(X, w, b), y).mean()  
+                l = loss(net(X), y).mean()  
             l.backward()
             trainer_fn([w, b], states, hyperparams)
             n += X.shape[0]
-            if n % 100 == 0:
-                times.append(time.time() - start + times[-1])
-                losses.append(eval_loss())
-                x = np.linspace(0, n/X.shape[0]/len(data_iter), len(losses))
-                d2l.plot(x, [losses], 'epoch', 'loss', xlim=[0, num_epochs], 
-                         ylim=[0.22, 0.5], axes=ax)
-                d2l.show(fig)
-                start = time.time()
-    print('loss: %.3f, %.3f sec per epoch' % (
-        losses[-1], times[-1]/num_epochs))
-    return times, losses
+            if n % 200 == 0:
+                timer.stop()
+                animator.add(n/X.shape[0]/len(data_iter),
+                             d2l.evaluate_loss(net, data_iter, loss))
+                timer.start()
+    print('loss: %.3f, %.3f sec/epoch'%(animator.Y[0][-1], timer.avg_time()))
+    return timer.cum_times(), animator.Y[0]
 ```
 
 When the batch size equals 1500 (the total number of examples), we use gradient descent for optimization. The model parameters will be iterated only once for each epoch of the gradient descent. As we can see, the downward trend of the value of the objective function (training loss) flattened out after 6 iterations.
@@ -133,7 +122,7 @@ Finally, we compare the time versus loss for the preview four experiments. As ca
 ```{.python .input  n=8}
 d2l.set_figsize([6, 3])
 d2l.plot(*list(map(list, zip(gd_res, sgd_res, mini1_res, mini2_res))),
-        'time (sec)', 'loss', xlim=[1e-3, 1], 
+        'time (sec)', 'loss', xlim=[1e-2, 10], 
         legend=['gd', 'sgd', 'batch size=100', 'batch size=10'])
 d2l.plt.gca().set_xscale('log')
 ```
@@ -153,29 +142,30 @@ def train_gluon_ch10(trainer_name, trainer_hyperparams,
     trainer = gluon.Trainer(
         net.collect_params(), trainer_name, trainer_hyperparams)
     loss = gluon.loss.L2Loss()
-    eval_loss = lambda: d2l.evaluate_loss(net, data_iter, loss)
-    losses, t, n, start = [eval_loss()], 0, 0, time.time()
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss', 
+                            xlim=[0, num_epochs], ylim=[0.22, 0.35])
+    n, timer = 0, d2l.Timer()
     for _ in range(num_epochs):
         for X, y in data_iter:
-            start = time.time()
             with autograd.record():
                 l = loss(net(X), y)
             l.backward()
             trainer.step(X.shape[0])
-            n, t = n + X.shape[0], time.time() - start + t
-            if n % 100 == 0:
-                losses.append(eval_loss())
-    # Print and plot the results
-    print('loss: %.3f, %.3f sec per epoch' % (losses[-1], t/num_epochs))
-    d2l.set_figsize((3.5, 2.5))
-    d2l.plot(np.linspace(0,num_epochs,len(losses)), [losses], 'epoch', 'loss')
+            n += X.shape[0]
+            if n % 200 == 0:
+                timer.stop()
+                animator.add(n/X.shape[0]/len(data_iter),
+                             d2l.evaluate_loss(net, data_iter, loss))
+                timer.start()
+    print('loss: %.3f, %.3f sec/epoch'%(animator.Y[0][-1], timer.avg_time()))
+    return timer.cum_times(), animator.Y[0]
 ```
 
 Use Gluon to repeat the last experiment.
 
 ```{.python .input  n=10}
 data_iter, _ = get_data_ch10(10)
-train_gluon_ch10('sgd', {'learning_rate': 0.05}, data_iter)
+train_gluon_ch10('sgd', {'learning_rate': 0.05}, data_iter);
 ```
 
 ## Summary

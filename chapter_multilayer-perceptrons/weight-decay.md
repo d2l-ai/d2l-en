@@ -222,26 +222,22 @@ so we'll just import them via `d2l.linreg` and `d2l.squared_loss`
 to reduce clutter.
 
 ```{.python .input  n=7}
-num_epochs, lr = 100, 0.003
-net, loss = d2l.linreg, d2l.squared_loss
-
 def train(lambd):
     w, b = init_params()
-    train_ls, test_ls = [], []
-    for _ in range(num_epochs):
+    net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss
+    num_epochs, lr = 100, 0.003
+    animator = d2l.Animator(xlabel='epochs', ylabel='loss', yscale='log',
+                            xlim=[1, num_epochs], legend=['train', 'test'])
+    for epoch in range(1, num_epochs+1):
         for X, y in train_iter:
             with autograd.record():
                 # The L2 norm penalty term has been added
-                l = loss(net(X, w, b), y) + lambd * l2_penalty(w)
+                l = loss(net(X), y) + lambd * l2_penalty(w)
             l.backward()
             d2l.sgd([w, b], lr, batch_size)
-        
-        train_ls.append(loss(net(train_data[0], w, b), 
-                             train_data[1]).mean().asscalar())
-        test_ls.append(loss(net(test_data[0], w, b),
-                            test_data[1]).mean().asscalar())
-    d2l.semilogy(range(1, num_epochs + 1), train_ls, 'epochs', 'loss',
-                 range(1, num_epochs + 1), test_ls, ['train', 'test'])
+        if epoch % 5 == 0:
+            animator.add(epoch+1, (d2l.evaluate_loss(net, train_iter, loss), 
+                                   d2l.evaluate_loss(net, test_iter, loss)))
     print('l2 norm of w:', w.norm().asscalar())
 ```
 
@@ -293,11 +289,12 @@ with weight decay for the weights $\mathbf{w}$
 and another without weight decay to take care of the bias $b$.
 
 ```{.python .input}
-def fit_and_plot_gluon(wd):
+def train_gluon(wd):
     net = nn.Sequential()
     net.add(nn.Dense(1))
     net.initialize(init.Normal(sigma=1))
     loss = gluon.loss.L2Loss()
+    num_epochs, lr = 100, 0.003
     # The weight parameter has been decayed. Weight names generally end with
     # "weight".
     trainer_w = gluon.Trainer(net.collect_params('.*weight'), 'sgd',
@@ -305,8 +302,9 @@ def fit_and_plot_gluon(wd):
     # The bias parameter has not decayed. Bias names generally end with "bias"
     trainer_b = gluon.Trainer(net.collect_params('.*bias'), 'sgd',
                               {'learning_rate': lr})
-    train_ls, test_ls = [], []
-    for _ in range(num_epochs):
+    animator = d2l.Animator(xlabel='epochs', ylabel='loss', yscale='log',
+                            xlim=[1, num_epochs], legend=['train', 'test'])
+    for epoch in range(1, num_epochs+1):
         for X, y in train_iter:
             with autograd.record():
                 l = loss(net(X), y)
@@ -315,10 +313,9 @@ def fit_and_plot_gluon(wd):
             # update the weight and bias separately
             trainer_w.step(batch_size)
             trainer_b.step(batch_size)
-        train_ls.append(d2l.evaluate_loss(net, train_iter, loss))
-        test_ls.append(d2l.evaluate_loss(net, test_iter, loss))
-    d2l.semilogy(range(1, num_epochs + 1), train_ls, 'epochs', 'loss',
-                 range(1, num_epochs + 1), test_ls, ['train', 'test'])
+        if epoch % 5 == 0:
+            animator.add(epoch+1, (d2l.evaluate_loss(net, train_iter, loss), 
+                                   d2l.evaluate_loss(net, test_iter, loss)))
     print('L2 norm of w:', net[0].weight.data().norm().asscalar())
 ```
 
@@ -327,11 +324,11 @@ but they run a bit faster and are easier to implement,
 a benefit that will become more pronounced for large problems.
 
 ```{.python .input}
-fit_and_plot_gluon(0)
+train_gluon(0)
 ```
 
 ```{.python .input}
-fit_and_plot_gluon(3)
+train_gluon(3)
 ```
 
 So far, we only touched upon one notion of

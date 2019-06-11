@@ -84,7 +84,7 @@ for X, y in train_iter:
 
 ## Put all Things Together 
 
-Now we define the `load_data_fashion_mnist` function that obtains and reads the Fashion-MNIST data set. It returns the data iterators for both the training set and validation set. In addition, it accepts an optional argument to resize images to another shape. 
+Now we define the `load_data_fashion_mnist` function that obtains and reads the Fashion-MNIST data set. It returns the data iterators for both the training set and validation set. In addition, it accepts an optional argument to resize images to another shape.
 
 ```{.python .input  n=4}
 # Save to the d2l package. 

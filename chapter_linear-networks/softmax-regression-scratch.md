@@ -255,9 +255,114 @@ def train_epoch_ch3(net, train_iter, loss, updater):
     return train_l_sum/n, train_acc_sum/n
 ```
 
-Then we define a convenient plot function that draws multiple lines in a figure, and a utility function that animates the training progress.
+Then we define a class that draw data in animation.
 
 ```{.python .input  n=17}
+# Save to the d2l package
+class Animator(object):
+    def __init__(self, xlabel=None, ylabel=None, legend=None, xlim=None, 
+                 ylim=None, xscale=None, yscale=None, fmts=None, 
+                 figsize=(3.5, 2.5)):
+        """Incrementally plot multiple lines."""
+        d2l.use_svg_display()
+        self.fig, self.axes = d2l.plt.subplots(figsize=figsize)
+        set_one = lambda name, var : getattr(
+            self.axes, name)(var) if var else None
+        self.set_axes = lambda : (
+            set_one('set_xlabel', xlabel),
+            set_one('set_ylabel', ylabel),
+            set_one('set_xlim', xlim),
+            set_one('set_ylim', ylim),
+            set_one('set_xscale', xscale),
+            set_one('set_yscale', yscale),
+            set_one('legend', legend))
+        self.raw_X, self.raw_Y = [], []
+        self.fmts = fmts
+        
+    def add(self, x, y):
+        """Add multiple data points into the figure."""
+        if not hasattr(x, "__len__"): y = [y]
+        if not hasattr(x, "__len__"): x = [x] * len(y)
+        self.raw_X.append(x)
+        self.raw_Y.append(y)
+        self.X = list(map(list, zip(*self.raw_X)))  # tranpose raw_X
+        self.Y = list(map(list, zip(*self.raw_Y)))
+        if not self.fmts: self.fmts = ['-'] * len(self.Y)
+        self.axes.cla()
+        for x, y, fmt in zip(self.X, self.Y, self.fmts):
+            self.axes.plot(x, y, fmt)
+        self.set_axes()
+        display.display(self.fig)
+        display.clear_output(wait=True)
+```
+
+The training function then runs multiple epochs and visualize the training progress.
+
+```{.python .input  n=18}
+# Save to the d2l package.
+def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
+    trains, test_accs = [], []
+    animator = Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0.3, 0.9],
+                       legend=['train loss', 'train acc', 'test acc'])
+    for epoch in range(num_epochs):
+        train_metrics = train_epoch_ch3(net, train_iter, loss, updater)
+        test_acc = evaluate_accuracy(net, test_iter)
+        animator.add(epoch+1, train_metrics+(test_acc,))
+```
+
+Again, we use the mini-batch stochastic gradient descent
+to optimize the loss function of the model.
+Note that the number of epochs (`num_epochs`),
+and learning rate (`lr`) are both adjustable hyper-parameters.
+By changing their values, we may be able to increase the classification accuracy of the model. In practice we'll want to split our data three ways
+into training, validation, and test data, using the validation data to choose the best values of our hyperparameters.
+
+```{.python .input  n=19}
+num_epochs, lr = 10, 0.1
+updater = lambda: d2l.sgd([W, b], lr, batch_size)
+train_ch3(net, train_iter, test_iter, cross_entropy, num_epochs, updater)
+```
+
+## Prediction
+
+Now that training is complete, our model is ready to classify some images.
+Given a series of images, we will compare their actual labels
+(first line of text output) and the model predictions
+(second line of text output).
+
+```{.python .input  n=20}
+# Save to the d2l package.
+def predict_ch3(net, test_iter, n=6):
+    for X, y in test_iter:
+        break
+    trues = d2l.get_fashion_mnist_labels(y.asnumpy())
+    preds = d2l.get_fashion_mnist_labels(net(X).argmax(axis=1).asnumpy())
+    titles = [true+'\n'+ pred for true, pred in zip(trues, preds)]
+    d2l.show_images(X[0:n].reshape((n,28,28)), 1, n, titles=titles[0:n])
+
+predict_ch3(net, test_iter)
+```
+
+## Summary
+
+With softmax regression, we can train models for multi-category classification. The training loop is very similar to that in linear regression: retrieve and read data, define models and loss functions,
+then train models using optimization algorithms. As you'll soon find out, most common deep learning models have similar training procedures.
+
+## Exercises
+
+1. In this section, we directly implemented the softmax function based on the mathematical definition of the softmax operation. What problems might this cause (hint - try to calculate the size of $\exp(50)$)?
+1. The function `cross_entropy` in this section is implemented according to the definition of the cross-entropy loss function.  What could be the problem with this implementation (hint - consider the domain of the logarithm)?
+1. What solutions you can think of to fix the two problems above?
+1. Is it always a good idea to return the most likely label. E.g. would you do this for medical diagnosis?
+1. Assume that we want to use softmax regression to predict the next word based on some features. What are some problems that might arise from a large vocabulary?
+
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2336)
+
+![](../img/qr_softmax-regression-scratch.svg)
+
+```{.python .input}
+# TODO Will remove these functions later.
+
 # Save to the d2l package.
 def plot(X, Y, x_label=None, y_label=None, legend=None,
          xlim=None, ylim=None, fmts=None, axes=None):
@@ -288,71 +393,3 @@ def show(obj):
     display.display(obj)
     display.clear_output(wait=True)
 ```
-
-The training function then runs multiple epochs and visualize the training progress.
-
-```{.python .input  n=18}
-# Save to the d2l package.
-def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
-    trains, test_accs = [], []
-    d2l.use_svg_display()
-    fig, ax = d2l.plt.subplots(figsize=(4,3))
-    for epoch in range(num_epochs):
-        trains.append(train_epoch_ch3(net, train_iter, loss, updater))
-        test_accs.append(evaluate_accuracy(net, test_iter))
-        legend = ['train loss', 'train acc', 'test acc']
-        res = list(map(list, zip(*trains)))+[test_accs,]
-        plot(list(range(1, epoch+2)), res, 'epoch', legend=legend,
-             xlim=[0,num_epochs+1], ylim=[0.3, 0.9], axes=ax)
-        show(fig)
-```
-
-Again, we use the mini-batch stochastic gradient descent
-to optimize the loss function of the model.
-Note that the number of epochs (`num_epochs`),
-and learning rate (`lr`) are both adjustable hyper-parameters.
-By changing their values, we may be able to increase the classification accuracy of the model. In practice we'll want to split our data three ways
-into training, validation, and test data, using the validation data to choose the best values of our hyperparameters.
-
-```{.python .input  n=19}
-num_epochs, lr = 10, 0.1
-updater = lambda: d2l.sgd([W, b], lr, batch_size)
-train_ch3(net, train_iter, test_iter, cross_entropy, num_epochs, updater)
-```
-
-## Prediction
-
-Now that training is complete, our model is ready to classify some images.
-Given a series of images, we will compare their actual labels
-(first line of text output) and the model predictions
-(second line of text output).
-
-```{.python .input  n=20}
-# Save to the d2l package.
-def predict_ch3(net, test_iter, n=9):
-    for X, y in test_iter:
-        break
-    trues = d2l.get_fashion_mnist_labels(y.asnumpy())
-    preds = d2l.get_fashion_mnist_labels(net(X).argmax(axis=1).asnumpy())
-    titles = [true+'\n'+ pred for true, pred in zip(trues, preds)]
-    d2l.show_images(X[0:n].reshape((n,28,28)), 1, n, titles=titles[0:n])
-
-predict_ch3(net, test_iter)
-```
-
-## Summary
-
-With softmax regression, we can train models for multi-category classification. The training loop is very similar to that in linear regression: retrieve and read data, define models and loss functions,
-then train models using optimization algorithms. As you'll soon find out, most common deep learning models have similar training procedures.
-
-## Exercises
-
-1. In this section, we directly implemented the softmax function based on the mathematical definition of the softmax operation. What problems might this cause (hint - try to calculate the size of $\exp(50)$)?
-1. The function `cross_entropy` in this section is implemented according to the definition of the cross-entropy loss function.  What could be the problem with this implementation (hint - consider the domain of the logarithm)?
-1. What solutions you can think of to fix the two problems above?
-1. Is it always a good idea to return the most likely label. E.g. would you do this for medical diagnosis?
-1. Assume that we want to use softmax regression to predict the next word based on some features. What are some problems that might arise from a large vocabulary?
-
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2336)
-
-![](../img/qr_softmax-regression-scratch.svg)
