@@ -34,7 +34,7 @@ def resnet18(num_classes):
             else:
                 blk.add(d2l.Residual(num_channels))
         return blk
-
+    
     net = nn.Sequential()
     # This model uses a smaller convolution kernel, stride, and padding and
     # removes the maximum pooling layer

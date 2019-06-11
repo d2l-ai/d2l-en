@@ -65,7 +65,7 @@ def load_array(features, labels, batch_size, is_train=True):
     """Construct a Gluon data loader"""
     dataset = gluon.data.ArrayDataset(features, labels)
     return gluon.data.DataLoader(dataset, batch_size, shuffle=is_train)
-    
+
 
 # Defined in file: ./chapter_linear-networks/fashion-mnist.md
 def get_fashion_mnist_labels(labels):
@@ -126,8 +126,8 @@ def train_epoch_ch3(net, train_iter, loss, updater):
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 class Animator(object):
-    def __init__(self, xlabel=None, ylabel=None, legend=None, xlim=None, 
-                 ylim=None, xscale=None, yscale=None, fmts=None, 
+    def __init__(self, xlabel=None, ylabel=None, legend=None, xlim=None,
+                 ylim=None, xscale=None, yscale=None, fmts=None,
                  figsize=(3.5, 2.5)):
         """Incrementally plot multiple lines."""
         d2l.use_svg_display()
@@ -143,7 +143,7 @@ class Animator(object):
             set_one('set_yscale', yscale),
             set_one('legend', legend))
         self.X, self.Y, self.fmts = None, None, fmts
-        
+
     def add(self, x, y):
         """Add multiple data points into the figure."""
         if not hasattr(y, "__len__"): y = [y]
@@ -155,11 +155,12 @@ class Animator(object):
         for i, (a, b) in enumerate(zip(x, y)):
             if a is not None and b is not None:
                 self.X[i].append(a)
-                self.Y[i].append(b)        
+                self.Y[i].append(b)
         self.axes.cla()
         for x, y, fmt in zip(self.X, self.Y, self.fmts):
             self.axes.plot(x, y, fmt)
         self.set_axes()
+        self.axes.grid()
         display.display(self.fig)
         display.clear_output(wait=True)
 
@@ -231,7 +232,7 @@ def try_all_gpus():
     """Return all available GPUs, or [cpu(),] if no GPU exists."""
     ctxes = [context.gpu(i) for i in range(context.num_gpus())]
     return ctxes if ctxes else [context.cpu()]
-        
+
 
 # Defined in file: ./chapter_convolutional-neural-networks/conv-layer.md
 def corr2d(X, K):
@@ -260,23 +261,23 @@ class Timer(object):
     def __init__(self):
         self.times = []
         self.start()
-        
+
     def start(self):
         """Start the timer"""
         self.start_time = time.time()
-    
+
     def stop(self):
         """Stop the timer and record the time in a list"""
         self.times.append(time.time() - self.start_time)
-        
+
     def avg(self):
         """Return the average time"""
         return sum(self.times)/len(self.times)
-    
+
     def sum(self):
         """Return the sum of time"""
         return sum(self.times)
-        
+
     def cumsum(self):
         """Return the accumuated times"""
         return np.array(self.times).cumsum().tolist()
@@ -287,7 +288,7 @@ def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
     trainer = gluon.Trainer(net.collect_params(),
                             'sgd', {'learning_rate': lr})
-    animator = d2l.Animator(xlabel='epoch', xlim=[0,num_epochs], ylim=[0,2],
+    animator = d2l.Animator(xlabel='epoch', xlim=[0,num_epochs],
                             legend=['train loss','train acc','test acc'])
     timer = Timer()
     for epoch in range(num_epochs):
@@ -306,13 +307,35 @@ def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
             n += X.shape[0]
             timer.stop()
             if (i+1) % 50 == 0:
-                animator.add(epoch+i/len(train_iter), 
+                animator.add(epoch+i/len(train_iter),
                              (train_l_sum/n, train_acc_sum/n, None))
         test_acc = evaluate_accuracy_gpu(net, test_iter)
         animator.add(epoch+1, (None, None, test_acc))
     print('loss %.3f, train acc %.3f, test acc %.3f' % (
         train_l_sum/n, train_acc_sum/n, test_acc))
     print('%.1f exampes/sec on %s'%(n*num_epochs/timer.sum(), ctx))
+
+# Defined in file: ./chapter_convolutional-modern/resnet.md
+class Residual(nn.Block):
+    def __init__(self, num_channels, use_1x1conv=False, strides=1, **kwargs):
+        super(Residual, self).__init__(**kwargs)
+        self.conv1 = nn.Conv2D(num_channels, kernel_size=3, padding=1,
+                               strides=strides)
+        self.conv2 = nn.Conv2D(num_channels, kernel_size=3, padding=1)
+        if use_1x1conv:
+            self.conv3 = nn.Conv2D(num_channels, kernel_size=1,
+                                   strides=strides)
+        else:
+            self.conv3 = None
+        self.bn1 = nn.BatchNorm()
+        self.bn2 = nn.BatchNorm()
+
+    def forward(self, X):
+        Y = nd.relu(self.bn1(self.conv1(X)))
+        Y = self.bn2(self.conv2(Y))
+        if self.conv3:
+            X = self.conv3(X)
+        return nd.relu(Y + X)
 
 # Defined in file: ./chapter_optimization/optimization-intro.md
 def annotate(text, xy, xytext):
@@ -322,7 +345,7 @@ def annotate(text, xy, xytext):
 # Defined in file: ./chapter_optimization/gd.md
 def train_2d(trainer):
     """Optimize a 2-dim objective function with a customized trainer."""
-    # s1 and s2 are internal state variables and will 
+    # s1 and s2 are internal state variables and will
     # be used later in the chapter
     x1, x2, s1, s2 = -5, -2, 0, 0
     results = [(x1, x2)]
@@ -346,27 +369,27 @@ def show_trace_2d(f, results):
 def get_data_ch10(batch_size=10, n=1500):
     data = np.genfromtxt('../data/airfoil_self_noise.dat', delimiter='\t')
     data = nd.array((data - data.mean(axis=0)) / data.std(axis=0))
-    data_iter = d2l.load_array(data[:n, :-1], data[:n, -1], 
+    data_iter = d2l.load_array(data[:n, :-1], data[:n, -1],
                                batch_size, is_train=True)
     return data_iter, data.shape[1]-1
 
 # Defined in file: ./chapter_optimization/minibatch-sgd.md
-def train_ch10(trainer_fn, states, hyperparams, data_iter, 
+def train_ch10(trainer_fn, states, hyperparams, data_iter,
                feature_dim, num_epochs=2):
-    # Initialization 
+    # Initialization
     w = nd.random.normal(scale=0.01, shape=(feature_dim, 1))
     b = nd.zeros(1)
     w.attach_grad()
     b.attach_grad()
     net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss
     # Train
-    animator = d2l.Animator(xlabel='epoch', ylabel='loss', 
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[0, num_epochs], ylim=[0.22, 0.35])
     n, timer = 0, d2l.Timer()
     for _ in range(num_epochs):
         for X, y in data_iter:
             with autograd.record():
-                l = loss(net(X), y).mean()  
+                l = loss(net(X), y).mean()
             l.backward()
             trainer_fn([w, b], states, hyperparams)
             n += X.shape[0]
@@ -379,7 +402,7 @@ def train_ch10(trainer_fn, states, hyperparams, data_iter,
     return timer.cumsum(), animator.Y[0]
 
 # Defined in file: ./chapter_optimization/minibatch-sgd.md
-def train_gluon_ch10(trainer_name, trainer_hyperparams, 
+def train_gluon_ch10(trainer_name, trainer_hyperparams,
                      data_iter, num_epochs=2):
     # Initialization
     net = nn.Sequential()
@@ -388,7 +411,7 @@ def train_gluon_ch10(trainer_name, trainer_hyperparams,
     trainer = gluon.Trainer(
         net.collect_params(), trainer_name, trainer_hyperparams)
     loss = gluon.loss.L2Loss()
-    animator = d2l.Animator(xlabel='epoch', ylabel='loss', 
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[0, num_epochs], ylim=[0.22, 0.35])
     n, timer = 0, d2l.Timer()
     for _ in range(num_epochs):
@@ -425,6 +448,18 @@ def resnet18(num_classes):
                 blk.add(d2l.Residual(num_channels))
         return blk
 
+    net = nn.Sequential()
+    # This model uses a smaller convolution kernel, stride, and padding and
+    # removes the maximum pooling layer
+    net.add(nn.Conv2D(64, kernel_size=3, strides=1, padding=1),
+            nn.BatchNorm(), nn.Activation('relu'))
+    net.add(resnet_block(64, 2, first_block=True),
+            resnet_block(128, 2),
+            resnet_block(256, 2),
+            resnet_block(512, 2))
+    net.add(nn.GlobalAvgPool2D(), nn.Dense(num_classes))
+    return net
+
 # Defined in file: ./chapter_computational-performance/multiple-gpus-gluon.md
 def evaluate_accuracy_gpus(net, data_iter):
     # Query the list of devices.
@@ -436,6 +471,66 @@ def evaluate_accuracy_gpus(net, data_iter):
         acc_sum += sum(d2l.accuracy(py, y) for py, y in zip(pys, ys))
         n += features.shape[0]
     return acc_sum / n
+
+# Defined in file: ./chapter_computer-vision/image-augmentation.md
+def train_batch_ch12(net, features, labels, loss, trainer, ctx_list):
+    Xs, ys = d2l.split_batch(features, labels, ctx_list)
+    with autograd.record():
+        pys = [net(X) for X in Xs]
+        ls = [loss(py, y) for py, y in zip(pys, ys)]
+    for l in ls:
+        l.backward()
+    trainer.step(features.shape[0])
+    train_loss_sum = sum([l.sum().asscalar() for l in ls])
+    train_acc_sum = sum(d2l.accuracy(py, y) for py, y in zip(pys, ys))
+    return train_loss_sum, train_acc_sum
+
+# Defined in file: ./chapter_computer-vision/image-augmentation.md
+def train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs,
+               ctx_list=d2l.try_all_gpus()):
+    timer = d2l.Timer()
+    animator = d2l.Animator(xlabel='epoch', xlim=[0,num_epochs], ylim=[0,2],
+                            legend=['train loss','train acc','test acc'])
+    for epoch in range(num_epochs):
+        # store training_loss, training_accuracy, num_examples, num_features
+        metric = d2l.Accumulator(4)
+        for i, (features, labels) in enumerate(train_iter):
+            timer.start()
+            l, acc = train_batch_ch12(
+                net, features, labels, loss, trainer, ctx_list)
+            metric.add([l, acc, labels.shape[0], labels.size])
+            timer.stop()
+            if (i+1) % 50 == 0:
+                animator.add(epoch+i/len(train_iter),
+                             (metric[0]/metric[2], metric[1]/metric[3], None))
+        test_acc = d2l.evaluate_accuracy_gpus(net, test_iter)
+        animator.add(epoch+1, (None, None, test_acc))
+    print('loss %.3f, train acc %.3f, test acc %.3f' % (
+        metric[0]/metric[2], metric[1]/metric[3], test_acc))
+    print('%.1f exampes/sec on %s' % (
+        metric[2]*num_epochs/timer.sum(), ctx_list))
+
+# Defined in file: ./chapter_computer-vision/image-augmentation.md
+def train_with_data_aug(train_augs, test_augs, lr=0.001):
+    batch_size, ctx, net = 256, d2l.try_all_gpus(), d2l.resnet18(10)
+    net.initialize(ctx=ctx, init=init.Xavier())
+    trainer = gluon.Trainer(net.collect_params(), 'adam',
+                            {'learning_rate': lr})
+    loss = gluon.loss.SoftmaxCrossEntropyLoss()
+    train_iter = load_cifar10(True, train_augs, batch_size)
+    test_iter = load_cifar10(False, test_augs, batch_size)
+    train_ch12(net, train_iter, test_iter, loss, trainer, 10, ctx)
+
+# Defined in file: ./chapter_computer-vision/image-augmentation.md
+class Accumulator(object):
+    def __init__(self, n):
+        self.data = [0.0] * n
+    def add(self, x):
+        self.data = [a+b for a, b in zip(self.data, x)]
+    def reset(self):
+        self.data = [0] * len(self.data)
+    def __getitem__(self, i):
+        return self.data[i]
 
 # Defined in file: ./chapter_generative_adversarial_networks/gan.md
 def update_D(X, Z, net_D, net_G, loss, trainer_D):
@@ -468,4 +563,3 @@ def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
     loss_G.backward()
     trainer_G.step(batch_size)
     return loss_G.sum().asscalar()
-

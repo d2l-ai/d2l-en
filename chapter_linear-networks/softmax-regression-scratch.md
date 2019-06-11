@@ -294,6 +294,7 @@ class Animator(object):
         for x, y, fmt in zip(self.X, self.Y, self.fmts):
             self.axes.plot(x, y, fmt)
         self.set_axes()
+        self.axes.grid()
         display.display(self.fig)
         display.clear_output(wait=True)
 ```

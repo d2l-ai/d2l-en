@@ -238,7 +238,7 @@ The training function `train_ch5` is also very similar to `train_ch3` defined in
 this time using the Xavier initializer.
 The loss function and the training algorithm
 still use the cross-entropy loss function
-and mini-batch stochastic gradient descent. Since each epoch takes tens of second to run, we visualize the training loss in a finer granularity. 
+and mini-batch stochastic gradient descent. Since each epoch takes tens of second to run, we visualize the training loss in a finer granularity.
 
 ```{.python .input}
 # Save to the d2l package.
@@ -247,7 +247,7 @@ def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
     trainer = gluon.Trainer(net.collect_params(),
                             'sgd', {'learning_rate': lr})
-    animator = d2l.Animator(xlabel='epoch', xlim=[0,num_epochs], ylim=[0,2],
+    animator = d2l.Animator(xlabel='epoch', xlim=[0,num_epochs],
                             legend=['train loss','train acc','test acc'])
     timer = Timer()
     for epoch in range(num_epochs):
