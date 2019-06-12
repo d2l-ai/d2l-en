@@ -61,13 +61,15 @@ import sys
 sys.path.insert(0, '..')
 
 import d2l
-from mxnet import nd
+from mxnet import nd, np, npx
+
+npx.set_np()
 
 def corr2d_multi_in(X, K):
     # First, traverse along the 0th dimension (channel dimension) of X and K.
     # Then, add them together by using * to turn the result list into a
     # positional argument of the add_n function
-    return nd.add_n(*[d2l.corr2d(x, k) for x, k in zip(X, K)])
+    return nd.add_n(*[d2l.corr2d(x, k).as_nd_ndarray() for x, k in zip(X, K)]).as_np_ndarray()
 ```
 
 We can construct the input array `X` and the kernel array `K`
@@ -75,9 +77,9 @@ corresponding to the values in the above diagram
 to validate the output of the cross-correlation operation.
 
 ```{.python .input  n=2}
-X = nd.array([[[0, 1, 2], [3, 4, 5], [6, 7, 8]],
+X = np.array([[[0, 1, 2], [3, 4, 5], [6, 7, 8]],
               [[1, 2, 3], [4, 5, 6], [7, 8, 9]]])
-K = nd.array([[[0, 1], [2, 3]], [[1, 2], [3, 4]]])
+K = np.array([[[0, 1], [2, 3]], [[1, 2], [3, 4]]])
 
 corr2d_multi_in(X, K)
 ```
@@ -122,7 +124,7 @@ def corr2d_multi_in_out(X, K):
     # Traverse along the 0th dimension of K, and each time, perform
     # cross-correlation operations with input X. All of the results are merged
     # together using the stack function
-    return nd.stack(*[corr2d_multi_in(X, k) for k in K])
+    return np.stack([corr2d_multi_in(X, k) for k in K])
 ```
 
 We construct a convolution kernel with 3 output channels
@@ -130,7 +132,7 @@ by concatenating the kernel array `K` with `K+1`
 (plus one for each element in `K`) and `K+2`.
 
 ```{.python .input  n=4}
-K = nd.stack(K, K + 1, K + 2)
+K = np.stack([K, K + 1, K + 2])
 K.shape
 ```
 
@@ -194,7 +196,7 @@ def corr2d_multi_in_out_1x1(X, K):
     c_o = K.shape[0]
     X = X.reshape((c_i, h * w))
     K = K.reshape((c_o, c_i))
-    Y = nd.dot(K, X)  # Matrix multiplication in the fully connected layer
+    Y = np.dot(K, X)  # Matrix multiplication in the fully connected layer
     return Y.reshape((c_o, h, w))
 ```
 
@@ -203,13 +205,13 @@ the above function is equivalent to the previously implemented cross-correlation
 Let's check this with some reference data.
 
 ```{.python .input  n=7}
-X = nd.random.uniform(shape=(3, 3, 3))
-K = nd.random.uniform(shape=(2, 3, 1, 1))
+X = np.random.uniform(size=(3, 3, 3))
+K = np.random.uniform(size=(2, 3, 1, 1))
 
 Y1 = corr2d_multi_in_out_1x1(X, K)
 Y2 = corr2d_multi_in_out(X, K)
 
-(Y1 - Y2).norm().asscalar() < 1e-6
+np.sqrt(np.sum((Y1 - Y2) * (Y1 - Y2))) < 1e-6
 ```
 
 ## Summary
