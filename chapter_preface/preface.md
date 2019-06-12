@@ -260,9 +260,10 @@ import os
 import sys
 import numpy as np
 from matplotlib import pyplot as plt
-from mxnet import nd, autograd, gluon, init, context
+from mxnet import nd, autograd, gluon, init, context, image
 from mxnet.gluon import nn
 import time
+import tarfile
 ```
 
 We give a detailed overview of these functions and classes in :numref:`chapter_d2l`.

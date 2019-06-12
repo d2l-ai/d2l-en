@@ -1,57 +1,12 @@
 # `d2l` API Document
 :label:`chapter_d2l`
 
-## Basic and Plotting
 
 ```eval_rst
 
-.. automodule:: d2l.base
+.. automodule:: d2l
    :members:
-
-.. automodule:: d2l.figure
-   :members:
-
-```
-
-## Loading Data
-
-```eval_rst
-
-.. automodule:: d2l.data
-   :members:
-
-.. automodule:: d2l.data.base
-   :members:
-
-.. automodule:: d2l.data.fashion_mnist
-   :members:
-
-.. automodule:: d2l.data.imdb
-   :members:
-
-.. automodule:: d2l.data.pikachu
-   :members:
-
-.. automodule:: d2l.data.voc
-   :members:
-
-```
-
-## Building Neural Networks
-
-```eval_rst
-
-.. automodule:: d2l.model
-   :members:
-
-```
-
-## Training
-
-```eval_rst
-
-.. automodule:: d2l.train
-   :members:
+   :imported-members:
 
 ```
 <<<<<<< HEAD

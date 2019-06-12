@@ -23,8 +23,9 @@ model uses a smaller convolution kernel, stride, and padding at the beginning
 and removes the maximum pooling layer.
 
 ```{.python .input  n=2}
-# Save to the d2l package. 
+# Save to the d2l package.
 def resnet18(num_classes):
+    """A slightly modified ResNet-18 model"""
     def resnet_block(num_channels, num_residuals, first_block=False):
         blk = nn.Sequential()
         for i in range(num_residuals):
@@ -89,7 +90,7 @@ def evaluate_accuracy_gpus(net, data_iter):
         Xs, ys = d2l.split_batch(features, labels, ctx_list)
         pys = [net(X) for X in Xs]  # run in parallel
         acc_sum += sum(d2l.accuracy(py, y) for py, y in zip(pys, ys))
-        n += features.shape[0]
+        n += labels.size
     return acc_sum / n
 ```
 
@@ -101,7 +102,7 @@ When we use multiple GPUs to train the model, the `Trainer` instance will automa
 def train(num_gpus, batch_size, lr):
     train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
     ctx_list = [d2l.try_gpu(i) for i in range(num_gpus)]
-    net.initialize(init=init.Normal(sigma=0.01), 
+    net.initialize(init=init.Normal(sigma=0.01),
                    ctx=ctx_list, force_reinit=True)
     trainer = gluon.Trainer(
         net.collect_params(), 'sgd', {'learning_rate': lr})
@@ -121,7 +122,7 @@ def train(num_gpus, batch_size, lr):
         timer.stop()
         animator.add(epoch+1, evaluate_accuracy_gpus(net, test_iter))
     print('test acc: %.2f, %.1f sec/epoch on %s' % (
-        animator.Y[0][-1], timer.avg_time(), ctx_list))
+        animator.Y[0][-1], timer.avg(), ctx_list))
 ```
 
 First, use a single GPU for training.

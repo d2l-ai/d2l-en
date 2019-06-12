@@ -26,14 +26,10 @@ Next, we will use a specific example for practice: hot dog recognition. We will 
 First, import the packages and modules required for the experiment.  Gluon's `model_zoo` package provides a common pre-trained model. If you want to get more pre-trained models for computer vision, you can use the GluonCV Toolkit[1].
 
 ```{.python .input  n=1}
-import sys
-sys.path.insert(0, '..')
-
 %matplotlib inline
 import d2l
 from mxnet import gluon, init, nd
-from mxnet.gluon import data as gdata, loss as gloss, model_zoo
-from mxnet.gluon import utils as gutils
+from mxnet.gluon import nn
 import os
 import zipfile
 ```
@@ -47,7 +43,7 @@ We first download the compressed data set to the path `../data`. Then, we unzip 
 ```{.python .input  n=2}
 data_dir = '../data'
 base_url = 'https://apache-mxnet.s3-accelerate.amazonaws.com/'
-fname = gutils.download(
+fname = gluon.utils.download(
     base_url + 'gluon/dataset/hotdog.zip',
     path=data_dir, sha1_hash='fba480ffa8aa7e0febbb511d181409f899b9baa5')
 with zipfile.ZipFile(fname, 'r') as z:
@@ -57,9 +53,9 @@ with zipfile.ZipFile(fname, 'r') as z:
 We create two `ImageFolderDataset` instances to read all the image files in the training data set and testing data set, respectively.
 
 ```{.python .input  n=3}
-train_imgs = gdata.vision.ImageFolderDataset(
+train_imgs = gluon.data.vision.ImageFolderDataset(
     os.path.join(data_dir, 'hotdog/train'))
-test_imgs = gdata.vision.ImageFolderDataset(
+test_imgs = gluon.data.vision.ImageFolderDataset(
     os.path.join(data_dir, 'hotdog/test'))
 ```
 
@@ -75,19 +71,19 @@ During training, we first crop a random area with random size and random aspect 
 
 ```{.python .input  n=5}
 # We specify the mean and variance of the three RGB channels to normalize the image channel.
-normalize = gdata.vision.transforms.Normalize(
+normalize = gluon.data.vision.transforms.Normalize(
     [0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 
-train_augs = gdata.vision.transforms.Compose([
-    gdata.vision.transforms.RandomResizedCrop(224),
-    gdata.vision.transforms.RandomFlipLeftRight(),
-    gdata.vision.transforms.ToTensor(),
+train_augs = gluon.data.vision.transforms.Compose([
+    gluon.data.vision.transforms.RandomResizedCrop(224),
+    gluon.data.vision.transforms.RandomFlipLeftRight(),
+    gluon.data.vision.transforms.ToTensor(),
     normalize])
 
-test_augs = gdata.vision.transforms.Compose([
-    gdata.vision.transforms.Resize(256),
-    gdata.vision.transforms.CenterCrop(224),
-    gdata.vision.transforms.ToTensor(),
+test_augs = gluon.data.vision.transforms.Compose([
+    gluon.data.vision.transforms.Resize(256),
+    gluon.data.vision.transforms.CenterCrop(224),
+    gluon.data.vision.transforms.ToTensor(),
     normalize])
 ```
 
@@ -96,7 +92,7 @@ test_augs = gdata.vision.transforms.Compose([
 We use ResNet-18, which was pre-trained on the ImageNet data set, as the source model. Here, we specify `pretrained=True` to automatically download and load the pre-trained model parameters. The first time they are used, the model parameters need to be downloaded from the Internet.
 
 ```{.python .input  n=6}
-pretrained_net = model_zoo.vision.resnet18_v2(pretrained=True)
+pretrained_net = gluon.model_zoo.vision.resnet18_v2(pretrained=True)
 ```
 
 The pre-trained source model instance contains two member variables: `features` and `output`. The former contains all layers of the model, except the output layer, and the latter is the output layer of the model. The main purpose of this division is to facilitate the fine tuning of the model parameters of all layers except the output layer. The member variable `output` of source model is given below. As a fully connected layer, it transforms ResNet's final global average pooling layer output into 1000 class output on the ImageNet data set.
@@ -108,7 +104,7 @@ pretrained_net.output
 We then build a new neural network to use as the target model. It is defined in the same way as the pre-trained source model, but the final number of outputs is equal to the number of categories in the target data set. In the code below, the model parameters in the member variable `features` of the target model instance `finetune_net` are initialized to model parameters of the corresponding layer of the source model. Because the model parameters in `features` are obtained by pre-training on the ImageNet data set, it is good enough. Therefore, we generally only need to use small learning rates to "fine tune" these parameters. In contrast, model parameters in the member variable `output` are randomly initialized and generally require a larger learning rate to learn from scratch. Assume the learning rate in the `Trainer` instance is $\eta$ and use a learning rate of $10\eta$ to update the model parameters in the member variable `output`.
 
 ```{.python .input  n=9}
-finetune_net = model_zoo.vision.resnet18_v2(classes=2)
+finetune_net = gluon.model_zoo.vision.resnet18_v2(classes=2)
 finetune_net.features = pretrained_net.features
 finetune_net.output.initialize(init.Xavier())
 # The model parameters in output will be updated using a learning rate ten
@@ -122,17 +118,17 @@ We first define a training function `train_fine_tuning` that uses fine tuning so
 
 ```{.python .input  n=10}
 def train_fine_tuning(net, learning_rate, batch_size=128, num_epochs=5):
-    train_iter = gdata.DataLoader(
+    train_iter = gluon.data.DataLoader(
         train_imgs.transform_first(train_augs), batch_size, shuffle=True)
-    test_iter = gdata.DataLoader(
+    test_iter = gluon.data.DataLoader(
         test_imgs.transform_first(test_augs), batch_size)
     ctx = d2l.try_all_gpus()
     net.collect_params().reset_ctx(ctx)
     net.hybridize()
-    loss = gloss.SoftmaxCrossEntropyLoss()
+    loss = gluon.loss.SoftmaxCrossEntropyLoss()
     trainer = gluon.Trainer(net.collect_params(), 'sgd', {
         'learning_rate': learning_rate, 'wd': 0.001})
-    d2l.train(train_iter, test_iter, net, loss, trainer, ctx, num_epochs)
+    d2l.train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs, ctx)
 ```
 
 We set the learning rate in the `Trainer` instance to a smaller value, such as 0.01, in order to fine tune the model parameters obtained in pre-training. Based on the previous settings, we will train the output layer parameters of the target model from scratch using a learning rate ten times greater.
@@ -144,7 +140,7 @@ train_fine_tuning(finetune_net, 0.01)
 For comparison, we define an identical model, but initialize all of its model parameters to random values. Since the entire model needs to be trained from scratch, we can use a larger learning rate.
 
 ```{.python .input  n=12}
-scratch_net = model_zoo.vision.resnet18_v2(classes=2)
+scratch_net = gluon.model_zoo.vision.resnet18_v2(classes=2)
 scratch_net.initialize(init=init.Xavier())
 train_fine_tuning(scratch_net, 0.1)
 ```

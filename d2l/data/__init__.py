@@ -3,5 +3,3 @@
 from .base import *
 from .imdb import *
 from .nmt import *
-from .pikachu import *
-from .voc import *

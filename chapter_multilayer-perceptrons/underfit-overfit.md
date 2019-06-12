@@ -472,7 +472,7 @@ def evaluate_loss(net, data_iter, loss):
     l, n = 0.0, 0
     for X, y in data_iter:
         l += loss(net(X), y).sum().asscalar()
-        n += X.shape[0]
+        n += y.size
     return l / n
 ```
 
@@ -493,7 +493,7 @@ def train(train_features, test_features, train_labels, test_labels,
     trainer = gluon.Trainer(net.collect_params(), 'sgd',
                             {'learning_rate': 0.01})
     animator = d2l.Animator(xlabel='epoch', ylabel='loss', yscale='log',
-                            xlim=[1,num_epochs], ylim=[1e-3, 1e2], 
+                            xlim=[1,num_epochs], ylim=[1e-3, 1e2],
                             legend=['train', 'test'])
     for epoch in range(1, num_epochs+1):
         d2l.train_epoch_ch3(net, train_iter, loss,
