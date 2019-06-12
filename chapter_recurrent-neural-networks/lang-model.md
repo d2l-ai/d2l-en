@@ -1,7 +1,8 @@
 # Language Models
 
-Text is an important example of sequence data. In fact, we will use natural language models as the basis for many of the examples in this chapter. Given that, it's worth while discussing some things in a bit more detail. In the following we will view words (or sequences of characters) as a time series of discrete observations.
-Assuming the words in a text of length $T$ are in turn $w_1, w_2, \ldots, w_T$, then, in the discrete time series, $w_t$($1 \leq t \leq T$) can be considered as the output or label of time step $t$. Given such a sequence, the goal of a language model is to estimate the probability
+
+In :numref:`chapter_text_preprocessing`, we see how to map text data into tokens, and these tokens can be viewed as a time series of discrete observations.
+Assuming the tokens in a text of length $T$ are in turn $w_1, w_2, \ldots, w_T$, then, in the discrete time series, $w_t$($1 \leq t \leq T$) can be considered as the output or label of time step $t$. Given such a sequence, the goal of a language model is to estimate the probability
 
 $$p(w_1, w_2, \ldots, w_T).$$
 
@@ -87,38 +88,23 @@ Since they involve one, two or three terms, these are typically referred to as u
 
 ## Natural Language Statistics
 
-Let's see how this works on real data. To get started we load text from H.G. Wells' [Time Machine](http://www.gutenberg.org/ebooks/35). This is a fairly small corpus of just over 30,000 words but for the purpose of what we want to illustrate this is just fine. More realistic document collections contain many billions of words. To begin, we split the document up into words and ignore punctuation and capitalization. While this discards some relevant information, it is useful for computing count statistics in general. Let's see what the first few lines look like.
+Let's see how this works on real data. We construct a vocabulary based on the time machine data similar to :numref:`chapter_text_preprocessing` and print the top words
 
 ```{.python .input}
-import collections
 import d2l
-import re
 
-with open('../data/timemachine.txt', 'r') as f:
-    lines = f.readlines()
-    raw_dataset = [re.sub('[^A-Za-z]+', ' ', st).lower().split()
-                   for st in lines]
-
-# Let's read 2 sample lines of the text
-for st in raw_dataset[8:10]:
-    print('# tokens:', len(st), st)
+lines = d2l.read_time_machine()
+tokens = d2l.tokenize(lines)
+vocab = d2l.Vocab(tokens)
+print(vocab.token_freqs[:10])
 ```
 
-Now we need to insert this into a word counter. This is where the `collections` data structure comes in handy. It takes care of all the accounting for us.
+As we can see, the most popular words are actually quite boring to look at. They are often referred to as [stop words](https://en.wikipedia.org/wiki/Stop_words) and thus filtered out. That said, they still carry meaning and we will use them nonetheless. However, one thing that is quite clear is that the word frequency decays rather rapidly. The 10th word is less than $1/5$ as common as the most popular one. To get a better idea we plot the graph of word frequencies.
 
 ```{.python .input}
-counter = collections.Counter([tk for st in raw_dataset for tk in st])
-print("frequency of 'traveller':", counter['traveller'])
-# Print the 10 most frequent words with word frequency count
-print(counter.most_common(10))
-```
-
-As we can see, the most popular words are actually quite boring to look at. In traditional NLP they're often referred to as [stopwords](https://en.wikipedia.org/wiki/Stop_words) and thus filtered out. That said, they still carry meaning and we will use them nonetheless. However, one thing that is quite clear is that the word frequency decays rather rapidly. The 10th word is less than $\frac{1}{5}$ as common as the most popular one. To get a better idea we plot the graph of word frequencies.
-
-```{.python .input}
-wordcounts = [count for _,count in counter.most_common()]
-d2l.use_svg_display()
-d2l.plt.loglog(wordcounts);
+freqs = [freq for token, freq in vocab.token_freqs]
+d2l.plot(freqs, xlabel='token', ylabel='frequency',
+         xscale='log', yscale='log')
 ```
 
 We're on to something quite fundamental here - the word frequencies decay rapidly in a well defined way. After dealing with the first four words as exceptions ('the', 'i', 'and', 'of'), all remaining words follow a straight line on a log-log plot. This means that words satisfy [Zipf's law](https://en.wikipedia.org/wiki/Zipf%27s_law) which states that the item frequency is given by
@@ -129,25 +115,28 @@ $$n(x) \propto (x + c)^{-\alpha} \text{ and hence }
 This should already give us pause if we want to model words by count statistics and smoothing. After all, we will significantly overestimate the frequency of the tail, aka the infrequent words. But what about word pairs (and trigrams and beyond)? Let's see.
 
 ```{.python .input}
-wseq = [tk for st in raw_dataset for tk in st]
-word_pairs = [pair for pair in zip(wseq[:-1], wseq[1:])]
-print('Beginning of the book\n', word_pairs[:10])
-counter_pairs = collections.Counter(word_pairs)
-print('Most common word pairs\n', counter_pairs.most_common(10))
+bigram_tokens = [[pair for pair in zip(line[:-1], line[1:])] for line in tokens]
+bigram_vocab = d2l.Vocab(bigram_tokens)
+print(bigram_vocab.token_freqs[:10])
 ```
 
 Two things are notable. Out of the 10 most frequent word pairs, 9 are composed of stop words and only one is relevant to the actual book - 'the time'. Let's see whether the bigram frequencies behave in the same manner as the unigram frequencies.
 
 ```{.python .input}
-word_triples = [triple for triple in zip(wseq[:-2], wseq[1:-1], wseq[2:])]
-counter_triples = collections.Counter(word_triples)
+trigram_tokens = [[triple for triple in zip(line[:-2], line[1:-1], line[2:])]
+                  for line in tokens]
+trigram_vocab = d2l.Vocab(trigram_tokens)
+print(trigram_vocab.token_freqs[:10])
+```
 
-bigramcounts = [count for _, count in counter_pairs.most_common()]
-triplecounts = [count for _, count in counter_triples.most_common()]
-d2l.plt.loglog(wordcounts, label='word counts')
-d2l.plt.loglog(bigramcounts, label='bigram counts')
-d2l.plt.loglog(triplecounts, label='triple counts')
-d2l.plt.legend();
+Last, let's visualize the token frequencies among these three gram models. 
+
+```{.python .input}
+bigram_freqs = [freq for token, freq in bigram_vocab.token_freqs]
+trigram_freqs = [freq for token, freq in trigram_vocab.token_freqs]
+d2l.plot([freqs, bigram_freqs, trigram_freqs], xlabel='token', 
+         ylabel='frequency', xscale='log', yscale='log', 
+         legend=['unigram', 'bigram', 'trigram'])
 ```
 
 The graph is quite exciting for a number of reasons. Firstly, beyond words, also sequences of words appear to be following Zipf's law, albeit with a lower exponent, depending on sequence length. Secondly, the number of distinct n-grams is not that large. This gives us hope that there is quite a lot of structure in language. Third, *many* n-grams occur very rarely, which makes Laplace smoothing rather unsuitable for language modeling. Instead, we will use deep learning based models.

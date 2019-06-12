@@ -7,12 +7,14 @@ d2l = sys.modules[__name__]
 
 # Defined in file: ./chapter_preface/preface.md
 from IPython import display
+import collections
 import os
 import sys
 import numpy as np
 from matplotlib import pyplot as plt
 from mxnet import nd, autograd, gluon, init, context, image
 from mxnet.gluon import nn
+import re
 import time
 import tarfile
 
@@ -129,24 +131,30 @@ def train_epoch_ch3(net, train_iter, loss, updater):
     return train_l_sum/n, train_acc_sum/n
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
+def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
+    """A utility function to set matplotlib axes"""
+    axes.set_xlabel(xlabel)
+    axes.set_ylabel(ylabel)
+    axes.set_xscale(xscale)
+    axes.set_yscale(yscale)
+    axes.set_xlim(xlim)
+    axes.set_ylim(ylim)
+    axes.legend(legend)
+    axes.grid()
+    
+
+# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 class Animator(object):
-    def __init__(self, xlabel=None, ylabel=None, legend=None, xlim=None,
-                 ylim=None, xscale=None, yscale=None, fmts=None,
+    def __init__(self, xlabel=None, ylabel=None, legend=[], xlim=None,
+                 ylim=None, xscale='linear', yscale='linear', fmts=None,
                  nrows=1, ncols=1, figsize=(3.5, 2.5)):
         """Incrementally plot multiple lines."""
         d2l.use_svg_display()
         self.fig, self.axes = d2l.plt.subplots(nrows, ncols, figsize=figsize)
         if nrows * ncols == 1: self.axes = [self.axes,]
-        set_one = lambda name, var : getattr(
-            self.axes[0], name)(var) if var else None
-        self.set_axes = lambda : (
-            set_one('set_xlabel', xlabel),
-            set_one('set_ylabel', ylabel),
-            set_one('set_xlim', xlim),
-            set_one('set_ylim', ylim),
-            set_one('set_xscale', xscale),
-            set_one('set_yscale', yscale),
-            set_one('legend', legend))
+        # use a lambda to capture arguments
+        self.config_axes = lambda : set_axes(
+            self.axes[0], xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
         self.X, self.Y, self.fmts = None, None, fmts
 
     def add(self, x, y):
@@ -164,8 +172,7 @@ class Animator(object):
         self.axes[0].cla()
         for x, y, fmt in zip(self.X, self.Y, self.fmts):
             self.axes[0].plot(x, y, fmt)
-        self.set_axes()
-        self.axes[0].grid()
+        self.config_axes()
         display.display(self.fig)
         display.clear_output(wait=True)
 
@@ -190,29 +197,26 @@ def predict_ch3(net, test_iter, n=6):
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-def plot(X, Y, x_label=None, y_label=None, legend=None,
-         xlim=None, ylim=None, fmts=None, axes=None):
+def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
+         ylim=None, xscale='linear', yscale='linear', fmts=None,
+         figsize=(3.5, 2.5), axes=None):
     """Plot multiple lines"""
+    d2l.set_figsize(figsize)
     axes = axes if axes else d2l.plt.gca()
-    draw(axes, axes.plot, X, Y, x_label, y_label, legend, xlim, ylim, fmts)
-
-
-# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-def draw(axes, func, X, Y, x_label, y_label, legend, xlim, ylim, fmts):
-    """Draw multiple data series with customized func"""
-    if not hasattr(X[0], "__len__") or len(X[0]) != len(Y[0]):
-        X = [X] * len(Y)
+    if not hasattr(X[0], "__len__"): X = [X]
+    if Y is None: X, Y = [[]]*len(X), X
+    if not hasattr(Y[0], "__len__"): Y = [Y]
+    if len(X) != len(Y): X = X * len(Y)
     if not fmts: fmts = ['-']*len(X)
     axes.cla()
     for x, y, fmt in zip(X, Y, fmts):
         if isinstance(x, nd.NDArray): x = x.asnumpy()
         if isinstance(y, nd.NDArray): y = y.asnumpy()
-        func(x, y, fmt)
-    if x_label: axes.set_xlabel(x_label)
-    if y_label: axes.set_ylabel(y_label)
-    if xlim: axes.set_xlim(xlim)
-    if ylim: axes.set_ylim(ylim)
-    if legend: axes.legend(legend)
+        if len(x):
+            axes.plot(x, y, fmt)
+        else:
+            axes.plot(y, fmt)
+    set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
@@ -346,6 +350,65 @@ class Residual(nn.Block):
         if self.conv3:
             X = self.conv3(X)
         return nd.relu(Y + X)
+
+# Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
+def read_time_machine():
+    """Load the time machine book into a list of sentences."""
+    with open('../data/timemachine.txt', 'r') as f:
+        lines = f.readlines()
+    
+    return [re.sub('[^A-Za-z]+', ' ', line.strip().lower()) for line in lines]
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
+def tokenize(lines, token='word'):
+    """Split sentences into word or char tokens"""
+    if token == 'word':
+        return [line.split(' ') for line in lines]
+    elif token == 'char':
+        return [list(line) for line in lines]
+    else:
+        print('ERROR: unkown token type '+token)
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
+class Vocab(object):
+    def __init__(self, tokens, min_freq=0, use_special_tokens=False):
+        # Flatten a list of token lists into a list of tokens
+        tokens = [tk for line in tokens for tk in line]
+        # sort by frequency and token
+        counter = collections.Counter(tokens)
+        self.token_freqs = sorted(counter.items(), key=lambda x: x[0])
+        self.token_freqs.sort(key=lambda x: x[1], reverse=True)
+        if use_special_tokens:
+            # padding, begin of sentence, end of sentence, unknown
+            self.pad, self.bos, self.eos, self.unk = (0, 1, 2, 3)
+            tokens = ['<pad>', '<bos>', '<eos>', '<unk>']
+        else:
+            self.unk = 0
+            tokens = ['<unk>']
+        tokens +=  [token for token, freq in self.token_freqs 
+                    if freq >= min_freq]
+        self.idx_to_token = []
+        self.token_to_idx = dict()
+        for token in tokens:
+            self.idx_to_token.append(token)
+            self.token_to_idx[token] = len(self.idx_to_token) - 1
+
+    def __len__(self):
+        return len(self.idx_to_token)
+
+    def __getitem__(self, tokens):
+        if not isinstance(tokens, (list, tuple)):
+            return self.token_to_idx.get(tokens, self.unk)
+        else:
+            return [self.__getitem__(token) for token in tokens]
+
+    def to_tokens(self, indices):
+        if not isinstance(indices, (list, tuple)):
+            return self.idx_to_token[indices]
+        else:
+            return [self.idx_to_token[index] for index in indices]
 
 # Defined in file: ./chapter_optimization/optimization-intro.md
 def annotate(text, xy, xytext):
