@@ -31,7 +31,7 @@ import d2l
 from mxnet import gluon, nd
 from mxnet.gluon import nn
 
-# This class has been saved in the d2l package for future use
+# Save to the d2l package. 
 class Residual(nn.Block):
     def __init__(self, num_channels, use_1x1conv=False, strides=1, **kwargs):
         super(Residual, self).__init__(**kwargs)
@@ -45,7 +45,7 @@ class Residual(nn.Block):
             self.conv3 = None
         self.bn1 = nn.BatchNorm()
         self.bn2 = nn.BatchNorm()
-
+    
     def forward(self, X):
         Y = nd.relu(self.bn1(self.conv1(X)))
         Y = self.bn2(self.conv2(Y))

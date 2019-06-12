@@ -7,9 +7,6 @@ It is not difficult to reduce the number of anchor boxes.  An easy way is to app
 To demonstrate how to generate anchor boxes on multiple scales, let us read an image first.  It has a height and width of 561 * 728 pixels.
 
 ```{.python .input  n=1}
-import sys
-sys.path.insert(0, '..')
-
 %matplotlib inline
 import d2l
 from mxnet import contrib, image, nd
@@ -27,9 +24,8 @@ on any image by defining the shape of the feature map.
 The function `display_anchors` is defined below.  We are going to generate anchor boxes `anchors` centered on each unit (pixel) on the feature map `fmap`.  Since the coordinates of axes $x$ and $y$ in anchor boxes `anchors` have been divided by the width and height of the feature map `fmap`, values between 0 and 1 can be used to represent relative positions of anchor boxes in the feature map.  Since the midpoints of anchor boxes `anchors` overlap with all the units on feature map `fmap`, the relative spatial positions of the midpoints of the `anchors` on any image must have a uniform distribution.  Specifically, when the width and height of the feature map are set to `fmap_w` and `fmap_h` respectively, the function will conduct uniform sampling for `fmap_h` rows and `fmap_w` columns of pixels and use them as midpoints to generate anchor boxes with size `s` (we assume that the length of list `s` is 1) and different aspect ratios (`ratios`).
 
 ```{.python .input  n=2}
-d2l.set_figsize()
-
 def display_anchors(fmap_w, fmap_h, s):
+    d2l.set_figsize((3.5, 2.5))
     # The values from the first two dimensions will not affect the output
     fmap = nd.zeros((1, 10, fmap_w, fmap_h))
     anchors = contrib.nd.MultiBoxPrior(fmap, sizes=s, ratios=[1, 2, 0.5])

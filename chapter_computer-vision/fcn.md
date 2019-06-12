@@ -19,9 +19,8 @@ explain the transposed convolution layer.
 %matplotlib inline
 import d2l
 from mxnet import gluon, image, init, nd
-from mxnet.gluon import data as gdata, loss as gloss, model_zoo, nn
+from mxnet.gluon import nn
 import numpy as np
-import sys
 ```
 
 ## Construct a Model
@@ -34,7 +33,7 @@ Here, we demonstrate the most basic design of a fully convolutional network mode
 Below, we use a ResNet-18 model pre-trained on the ImageNet data set to extract image features and record the network instance as `pretrained_net`. As you can see, the last two layers of the model member variable `features` are the global maximum pooling layer `GlobalAvgPool2D` and example flattening layer `Flatten`. The `output` module contains the fully connected layer used for output. These layers are not required for a fully convolutional network.
 
 ```{.python .input  n=5}
-pretrained_net = model_zoo.vision.resnet18_v2(pretrained=True)
+pretrained_net = gluon.model_zoo.vision.resnet18_v2(pretrained=True)
 pretrained_net.features[-4:], pretrained_net.output
 ```
 
@@ -113,7 +112,7 @@ out_img = Y[0].transpose((1, 2, 0))
 As you can see, the transposed convolution layer magnifies both the height and width of the image by a factor of 2. It is worth mentioning that, besides to the difference in coordinate scale, the image magnified by bilinear interpolation and original image printed in :numref:`chapter_bbox` look the same.
 
 ```{.python .input}
-d2l.set_figsize()
+d2l.set_figsize((3.5, 2.5))
 print('input image shape:', img.shape)
 d2l.plt.imshow(img.asnumpy());
 print('output image shape:', out_img.shape)
@@ -133,18 +132,8 @@ net[-2].initialize(init=init.Xavier())
 We read the data set using the method described in the previous section. Here, we specify shape of the randomly cropped output image as $320\times 480$, so both the height and width are divisible by 32.
 
 ```{.python .input  n=13}
-crop_size, batch_size, colormap2label = (320, 480), 32, nd.zeros(256**3)
-for i, cm in enumerate(d2l.VOC_COLORMAP):
-    colormap2label[(cm[0] * 256 + cm[1]) * 256 + cm[2]] = i
-voc_dir = d2l.download_voc_pascal(data_dir='../data')
-
-num_workers = 0 if sys.platform.startswith('win32') else 4
-train_iter = gdata.DataLoader(
-    d2l.VOCSegDataset(True, crop_size, voc_dir, colormap2label), batch_size,
-    shuffle=True, last_batch='discard', num_workers=num_workers)
-test_iter = gdata.DataLoader(
-    d2l.VOCSegDataset(False, crop_size, voc_dir, colormap2label), batch_size,
-    last_batch='discard', num_workers=num_workers)
+batch_size, crop_size = 32, (320, 480)
+train_iter, test_iter = d2l.load_data_voc(batch_size, crop_size)
 ```
 
 ## Training
@@ -152,12 +141,12 @@ test_iter = gdata.DataLoader(
 Now we can start training the model. The loss function and accuracy calculation here are not substantially different from those used in image classification. Because we use the channel of the transposed convolution layer to predict pixel categories, the `axis=1` (channel dimension) option is specified in `SoftmaxCrossEntropyLoss`. In addition, the model calculates the accuracy based on whether the prediction category of each pixel is correct.
 
 ```{.python .input  n=12}
-ctx = d2l.try_all_gpus()
-loss = gloss.SoftmaxCrossEntropyLoss(axis=1)
+num_epochs, lr, wd, ctx = 5, 0.1, 1e-3, d2l.try_all_gpus()
+loss = gluon.loss.SoftmaxCrossEntropyLoss(axis=1)
 net.collect_params().reset_ctx(ctx)
-trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': 0.1,
-                                                      'wd': 1e-3})
-d2l.train(train_iter, test_iter, net, loss, trainer, ctx, num_epochs=5)
+trainer = gluon.Trainer(net.collect_params(), 'sgd', 
+                        {'learning_rate': lr, 'wd': wd})
+d2l.train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs, ctx)
 ```
 
 ## Prediction
