@@ -11,7 +11,7 @@ import os
 import sys
 import numpy as np
 from matplotlib import pyplot as plt
-from mxnet import nd, autograd, gluon, init, context
+from mxnet import nd, autograd, gluon, init, context, image
 from mxnet.gluon import nn
 import time
 
@@ -269,6 +269,7 @@ class Timer(object):
     def stop(self):
         """Stop the timer and record the time in a list"""
         self.times.append(time.time() - self.start_time)
+        return self.times[-1]
         
     def avg(self):
         """Return the average time"""
@@ -369,27 +370,27 @@ def show_trace_2d(f, results):
 def get_data_ch10(batch_size=10, n=1500):
     data = np.genfromtxt('../data/airfoil_self_noise.dat', delimiter='\t')
     data = nd.array((data - data.mean(axis=0)) / data.std(axis=0))
-    data_iter = d2l.load_array(data[:n, :-1], data[:n, -1], 
+    data_iter = d2l.load_array(data[:n, :-1], data[:n, -1],
                                batch_size, is_train=True)
     return data_iter, data.shape[1]-1
 
 # Defined in file: ./chapter_optimization/minibatch-sgd.md
-def train_ch10(trainer_fn, states, hyperparams, data_iter, 
+def train_ch10(trainer_fn, states, hyperparams, data_iter,
                feature_dim, num_epochs=2):
-    # Initialization 
+    # Initialization
     w = nd.random.normal(scale=0.01, shape=(feature_dim, 1))
     b = nd.zeros(1)
     w.attach_grad()
     b.attach_grad()
     net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss
     # Train
-    animator = d2l.Animator(xlabel='epoch', ylabel='loss', 
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[0, num_epochs], ylim=[0.22, 0.35])
     n, timer = 0, d2l.Timer()
     for _ in range(num_epochs):
         for X, y in data_iter:
             with autograd.record():
-                l = loss(net(X), y).mean()  
+                l = loss(net(X), y).mean()
             l.backward()
             trainer_fn([w, b], states, hyperparams)
             n += X.shape[0]
@@ -398,11 +399,11 @@ def train_ch10(trainer_fn, states, hyperparams, data_iter,
                 animator.add(n/X.shape[0]/len(data_iter),
                              d2l.evaluate_loss(net, data_iter, loss))
                 timer.start()
-    print('loss: %.3f, %.3f sec/epoch'%(animator.Y[0][-1], timer.avg_time()))
+    print('loss: %.3f, %.3f sec/epoch'%(animator.Y[0][-1], timer.avg()))
     return timer.cumsum(), animator.Y[0]
 
 # Defined in file: ./chapter_optimization/minibatch-sgd.md
-def train_gluon_ch10(trainer_name, trainer_hyperparams, 
+def train_gluon_ch10(trainer_name, trainer_hyperparams,
                      data_iter, num_epochs=2):
     # Initialization
     net = nn.Sequential()
@@ -411,7 +412,7 @@ def train_gluon_ch10(trainer_name, trainer_hyperparams,
     trainer = gluon.Trainer(
         net.collect_params(), trainer_name, trainer_hyperparams)
     loss = gluon.loss.L2Loss()
-    animator = d2l.Animator(xlabel='epoch', ylabel='loss', 
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[0, num_epochs], ylim=[0.22, 0.35])
     n, timer = 0, d2l.Timer()
     for _ in range(num_epochs):

@@ -216,6 +216,7 @@ class Timer(object):
     def stop(self):
         """Stop the timer and record the time in a list"""
         self.times.append(time.time() - self.start_time)
+        return self.times[-1]
         
     def avg(self):
         """Return the average time"""

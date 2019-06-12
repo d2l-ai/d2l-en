@@ -260,7 +260,7 @@ import os
 import sys
 import numpy as np
 from matplotlib import pyplot as plt
-from mxnet import nd, autograd, gluon, init, context
+from mxnet import nd, autograd, gluon, init, context, image
 from mxnet.gluon import nn
 import time
 ```
