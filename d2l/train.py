@@ -240,8 +240,8 @@ def train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,
             l.backward()
             trainer.step(batch_size)
             y = y.astype('float32')
-            train_l_sum += l.asscalar()
-            train_acc_sum += (y_hat.argmax(axis=1) == y).sum().asscalar()
+            train_l_sum += l
+            train_acc_sum += (y_hat.argmax(axis=1) == y).sum()
             n += y.size
         test_acc = evaluate_accuracy(test_iter, net, ctx)
         print('epoch %d, loss %.4f, train acc %.3f, test acc %.3f, '

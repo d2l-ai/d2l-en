@@ -99,9 +99,10 @@ sys.path.insert(0, '..')
 
 import d2l
 import mxnet as mx
-from mxnet import autograd, gluon, init, nd
+from mxnet import autograd, gluon, init, nd, np, npx
 from mxnet.gluon import loss as gloss, nn
 import time
+npx.set_np()
 
 net = nn.Sequential()
 net.add(nn.Conv2D(channels=6, kernel_size=5, padding=2, activation='sigmoid'),
@@ -130,7 +131,7 @@ printing the output shape at each layer
 to make sure we understand what's happening here.
 
 ```{.python .input}
-X = nd.random.uniform(shape=(1, 1, 28, 28))
+X = np.random.uniform(size=(1, 1, 28, 28))
 net.initialize()
 for layer in net:
     X = layer(X)
@@ -187,12 +188,12 @@ In it, we try to allocate an NDArray on `gpu(0)`,
 and use `gpu(0)` as our context if the operation proves successful.
 Otherwise, we catch the resulting exception and we stick with the CPU.
 
-```{.python .input}
+```{.python .input  n=4}
 # This function has been saved in the d2l package for future use
 def try_gpu():
     try:
         ctx = mx.gpu()
-        _ = nd.zeros((1,), ctx=ctx)
+        _ = np.zeros((1,), ctx=ctx)
     except mx.base.MXNetError:
         ctx = mx.cpu()
     return ctx
@@ -212,18 +213,18 @@ Note that we accumulate the errors on the device
 where the data eventually lives (in `acc`).
 This avoids intermediate copy operations that might harm performance.
 
-```{.python .input}
+```{.python .input  n=5}
 # This function has been saved in the d2l package for future use. The function
 # will be gradually improved. Its complete implementation will be discussed in
 # the "Image Augmentation" section
 def evaluate_accuracy(data_iter, net, ctx):
-    acc_sum, n = nd.array([0], ctx=ctx), 0
+    acc_sum, n = np.array([0], ctx=ctx), 0
     for X, y in data_iter:
         # If ctx is the GPU, copy the data to the GPU.
         X, y = X.as_in_context(ctx), y.as_in_context(ctx).astype('float32')
         acc_sum += (net(X).argmax(axis=1) == y).sum()
         n += y.size
-    return acc_sum.asscalar() / n
+    return acc_sum / n
 ```
 
 We also need to update our training function to deal with GPUs.
@@ -231,7 +232,7 @@ Unlike `train_ch3` defined in :numref:`chapter_softmax_scratch`, we now need to 
 to our designated context (hopefully, the GPU)
 prior to making the forward and backward passes.
 
-```{.python .input}
+```{.python .input  n=6}
 # This function has been saved in the d2l package for future use
 def train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,
               num_epochs):
@@ -247,8 +248,8 @@ def train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,
             l.backward()
             trainer.step(batch_size)
             y = y.astype('float32')
-            train_l_sum += l.asscalar()
-            train_acc_sum += (y_hat.argmax(axis=1) == y).sum().asscalar()
+            train_l_sum += l
+            train_acc_sum += (y_hat.argmax(axis=1) == y).sum()
             n += y.size
         test_acc = evaluate_accuracy(test_iter, net, ctx)
         print('epoch %d, loss %.4f, train acc %.3f, test acc %.3f, '
@@ -263,7 +264,7 @@ The loss function and the training algorithm
 still use the cross-entropy loss function
 and mini-batch stochastic gradient descent.
 
-```{.python .input}
+```{.python .input  n=7}
 lr, num_epochs = 0.9, 5
 net.initialize(force_reinit=True, ctx=ctx, init=init.Xavier())
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
