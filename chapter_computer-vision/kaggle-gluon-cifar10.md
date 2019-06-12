@@ -20,12 +20,9 @@ Figure 11.16 shows the information on the competition's webpage. In order to sub
 First, import the packages or modules required for the competition.
 
 ```{.python .input  n=1}
-import sys
-sys.path.insert(0, '..')
-
 import d2l
 from mxnet import autograd, gluon, init
-from mxnet.gluon import data as gdata, loss as gloss, nn
+from mxnet.gluon import nn
 import os
 import pandas as pd
 import shutil
@@ -83,7 +80,7 @@ def read_label_file(data_dir, label_file, train_dir, valid_ratio):
 Below we define a helper function to create a path only if the path does not already exist.
 
 ```{.python .input  n=4}
- # This function has been saved in the d2l package for future use
+# save to the d2l package.
 def mkdir_if_not_exist(path):
     if not os.path.exists(os.path.join(*path)):
         os.makedirs(os.path.join(*path))
@@ -155,28 +152,28 @@ reorg_cifar10_data(data_dir, label_file, train_dir, test_dir, input_dir,
 To cope with overfitting, we use image augmentation. For example, by adding `transforms.RandomFlipLeftRight()`, the images can be flipped at random. We can also perform normalization for the three RGB channels of color images using `transforms.Normalize()`. Below, we list some of these operations that you can choose to use or modify depending on requirements.
 
 ```{.python .input  n=9}
-transform_train = gdata.vision.transforms.Compose([
+transform_train = gluon.data.vision.transforms.Compose([
     # Magnify the image to a square of 40 pixels in both height and width
-    gdata.vision.transforms.Resize(40),
+    gluon.data.vision.transforms.Resize(40),
     # Randomly crop a square image of 40 pixels in both height and width to
     # produce a small square of 0.64 to 1 times the area of the original
     # image, and then shrink it to a square of 32 pixels in both height and
     # width
-    gdata.vision.transforms.RandomResizedCrop(32, scale=(0.64, 1.0),
+    gluon.data.vision.transforms.RandomResizedCrop(32, scale=(0.64, 1.0),
                                               ratio=(1.0, 1.0)),
-    gdata.vision.transforms.RandomFlipLeftRight(),
-    gdata.vision.transforms.ToTensor(),
+    gluon.data.vision.transforms.RandomFlipLeftRight(),
+    gluon.data.vision.transforms.ToTensor(),
     # Normalize each channel of the image
-    gdata.vision.transforms.Normalize([0.4914, 0.4822, 0.4465],
+    gluon.data.vision.transforms.Normalize([0.4914, 0.4822, 0.4465],
                                       [0.2023, 0.1994, 0.2010])])
 ```
 
 In order to ensure the certainty of the output during testing, we only perform normalization on the image.
 
 ```{.python .input}
-transform_test = gdata.vision.transforms.Compose([
-    gdata.vision.transforms.ToTensor(),
-    gdata.vision.transforms.Normalize([0.4914, 0.4822, 0.4465],
+transform_test = gluon.data.vision.transforms.Compose([
+    gluon.data.vision.transforms.ToTensor(),
+    gluon.data.vision.transforms.Normalize([0.4914, 0.4822, 0.4465],
                                       [0.2023, 0.1994, 0.2010])])
 ```
 
@@ -187,26 +184,26 @@ Next, we can create the `ImageFolderDataset` instance to read the organized data
 ```{.python .input  n=10}
 # Read the original image file. Flag=1 indicates that the input image has
 # three channels (color)
-train_ds = gdata.vision.ImageFolderDataset(
+train_ds = gluon.data.vision.ImageFolderDataset(
     os.path.join(data_dir, input_dir, 'train'), flag=1)
-valid_ds = gdata.vision.ImageFolderDataset(
+valid_ds = gluon.data.vision.ImageFolderDataset(
     os.path.join(data_dir, input_dir, 'valid'), flag=1)
-train_valid_ds = gdata.vision.ImageFolderDataset(
+train_valid_ds = gluon.data.vision.ImageFolderDataset(
     os.path.join(data_dir, input_dir, 'train_valid'), flag=1)
-test_ds = gdata.vision.ImageFolderDataset(
+test_ds = gluon.data.vision.ImageFolderDataset(
     os.path.join(data_dir, input_dir, 'test'), flag=1)
 ```
 
 We specify the defined image augmentation operation in `DataLoader`. During training, we only use the validation set to evaluate the model, so we need to ensure the certainty of the output. During prediction, we will train the model on the combined training set and validation set to make full use of all labelled data.
 
 ```{.python .input}
-train_iter = gdata.DataLoader(train_ds.transform_first(transform_train),
+train_iter = gluon.data.DataLoader(train_ds.transform_first(transform_train),
                               batch_size, shuffle=True, last_batch='keep')
-valid_iter = gdata.DataLoader(valid_ds.transform_first(transform_test),
+valid_iter = gluon.data.DataLoader(valid_ds.transform_first(transform_test),
                               batch_size, shuffle=True, last_batch='keep')
-train_valid_iter = gdata.DataLoader(train_valid_ds.transform_first(
+train_valid_iter = gluon.data.DataLoader(train_valid_ds.transform_first(
     transform_train), batch_size, shuffle=True, last_batch='keep')
-test_iter = gdata.DataLoader(test_ds.transform_first(transform_test),
+test_iter = gluon.data.DataLoader(test_ds.transform_first(transform_test),
                              batch_size, shuffle=False, last_batch='keep')
 ```
 
@@ -273,7 +270,7 @@ def get_net(ctx):
     net.initialize(ctx=ctx, init=init.Xavier())
     return net
 
-loss = gloss.SoftmaxCrossEntropyLoss()
+loss = gluon.loss.SoftmaxCrossEntropyLoss()
 ```
 
 ## Define the Training Functions
@@ -301,7 +298,7 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
             n += y.size
         time_s = "time %.2f sec" % (time.time() - start)
         if valid_iter is not None:
-            valid_acc = d2l.evaluate_accuracy(valid_iter, net, ctx)
+            valid_acc = d2l.evaluate_accuracy_gpu(net, valid_iter)
             epoch_s = ("epoch %d, loss %f, train acc %f, valid acc %f, "
                        % (epoch + 1, train_l_sum / n, train_acc_sum / n,
                        valid_acc))
