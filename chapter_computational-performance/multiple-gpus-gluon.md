@@ -25,6 +25,7 @@ and removes the maximum pooling layer.
 ```{.python .input  n=2}
 # Save to the d2l package.
 def resnet18(num_classes):
+    """A slightly modified ResNet-18 model"""
     def resnet_block(num_channels, num_residuals, first_block=False):
         blk = nn.Sequential()
         for i in range(num_residuals):
@@ -34,7 +35,7 @@ def resnet18(num_classes):
             else:
                 blk.add(d2l.Residual(num_channels))
         return blk
-    
+
     net = nn.Sequential()
     # This model uses a smaller convolution kernel, stride, and padding and
     # removes the maximum pooling layer
@@ -89,7 +90,7 @@ def evaluate_accuracy_gpus(net, data_iter):
         Xs, ys = d2l.split_batch(features, labels, ctx_list)
         pys = [net(X) for X in Xs]  # run in parallel
         acc_sum += sum(d2l.accuracy(py, y) for py, y in zip(pys, ys))
-        n += features.shape[0]
+        n += labels.size
     return acc_sum / n
 ```
 

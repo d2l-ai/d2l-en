@@ -36,6 +36,7 @@ We can draw the bounding box in the image to check if it is accurate. Before dra
 ```{.python .input  n=3}
 # Save to the d2l package.
 def bbox_to_rect(bbox, color):
+    """Convert bounding box to matplotlib format."""
     # Convert the bounding box (top-left x, top-left y, bottom-right x,
     # bottom-right y) format to matplotlib format: ((upper-left x,
     # upper-left y), width, height)

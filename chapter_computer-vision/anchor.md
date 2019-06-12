@@ -47,6 +47,7 @@ In order to describe all anchor boxes centered on one pixel in the image, we fir
 ```{.python .input  n=4}
 # Save to the d2l package. 
 def show_bboxes(axes, bboxes, labels=None, colors=None):
+    """Show bounding boxes."""
     def _make_list(obj, default_values=None):
         if obj is None:
             obj = default_values

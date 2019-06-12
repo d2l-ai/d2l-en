@@ -3,4 +3,3 @@
 from .base import *
 from .imdb import *
 from .nmt import *
-from .voc import *

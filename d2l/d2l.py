@@ -14,11 +14,13 @@ from matplotlib import pyplot as plt
 from mxnet import nd, autograd, gluon, init, context, image
 from mxnet.gluon import nn
 import time
+import tarfile
 
 # Defined in file: ./chapter_crashcourse/probability.md
 def use_svg_display():
     """Use the svg format to display plot in jupyter."""
     display.set_matplotlib_formats('svg')
+
 
 # Defined in file: ./chapter_crashcourse/probability.md
 def set_figsize(figsize=(3.5, 2.5)):
@@ -39,6 +41,7 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
             ax.set_title(titles[i])
     return axes
 
+
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def synthetic_data(w, b, num_examples):
     """generate y = X w + b + noise"""
@@ -46,6 +49,7 @@ def synthetic_data(w, b, num_examples):
     y = nd.dot(X, w) + b
     y += nd.random.normal(scale=0.01, shape=y.shape)
     return X, y
+
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def linreg(X, w, b):
@@ -183,12 +187,14 @@ def predict_ch3(net, test_iter, n=6):
     titles = [true+'\n'+ pred for true, pred in zip(trues, preds)]
     d2l.show_images(X[0:n].reshape((n,28,28)), 1, n, titles=titles[0:n])
 
+
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def plot(X, Y, x_label=None, y_label=None, legend=None,
          xlim=None, ylim=None, fmts=None, axes=None):
     """Plot multiple lines"""
     axes = axes if axes else d2l.plt.gca()
     draw(axes, axes.plot, X, Y, x_label, y_label, legend, xlim, ylim, fmts)
+
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def draw(axes, func, X, Y, x_label, y_label, legend, xlim, ylim, fmts):
@@ -207,6 +213,7 @@ def draw(axes, func, X, Y, x_label, y_label, legend, xlim, ylim, fmts):
     if ylim: axes.set_ylim(ylim)
     if legend: axes.legend(legend)
 
+
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def show(obj):
     """Show a figure"""
@@ -219,13 +226,14 @@ def evaluate_loss(net, data_iter, loss):
     l, n = 0.0, 0
     for X, y in data_iter:
         l += loss(net(X), y).sum().asscalar()
-        n += X.shape[0]
+        n += y.size
     return l / n
 
 # Defined in file: ./chapter_deep-learning-computation/use-gpu.md
 def try_gpu(i=0):
     """Return gpu(i) if exists, otherwise return cpu()."""
     return context.gpu(i) if context.num_gpus() >= i else context.cpu()
+
 
 # Defined in file: ./chapter_deep-learning-computation/use-gpu.md
 def try_all_gpus():
@@ -356,6 +364,7 @@ def train_2d(trainer):
     print('epoch %d, x1 %f, x2 %f' % (i + 1, x1, x2))
     return results
 
+
 # Defined in file: ./chapter_optimization/gd.md
 def show_trace_2d(f, results):
     """Show the trace of 2D variables during optimization."""
@@ -439,6 +448,7 @@ def split_batch(X, y, ctx_list):
 
 # Defined in file: ./chapter_computational-performance/multiple-gpus-gluon.md
 def resnet18(num_classes):
+    """A slightly modified ResNet-18 model"""
     def resnet_block(num_channels, num_residuals, first_block=False):
         blk = nn.Sequential()
         for i in range(num_residuals):
@@ -448,7 +458,7 @@ def resnet18(num_classes):
             else:
                 blk.add(d2l.Residual(num_channels))
         return blk
-    
+
     net = nn.Sequential()
     # This model uses a smaller convolution kernel, stride, and padding and
     # removes the maximum pooling layer
@@ -461,6 +471,7 @@ def resnet18(num_classes):
     net.add(nn.GlobalAvgPool2D(), nn.Dense(num_classes))
     return net
 
+
 # Defined in file: ./chapter_computational-performance/multiple-gpus-gluon.md
 def evaluate_accuracy_gpus(net, data_iter):
     # Query the list of devices.
@@ -470,7 +481,7 @@ def evaluate_accuracy_gpus(net, data_iter):
         Xs, ys = d2l.split_batch(features, labels, ctx_list)
         pys = [net(X) for X in Xs]  # run in parallel
         acc_sum += sum(d2l.accuracy(py, y) for py, y in zip(pys, ys))
-        n += features.shape[0]
+        n += labels.size
     return acc_sum / n
 
 # Defined in file: ./chapter_computer-vision/image-augmentation.md
@@ -524,6 +535,7 @@ class Accumulator(object):
 
 # Defined in file: ./chapter_computer-vision/bounding-box.md
 def bbox_to_rect(bbox, color):
+    """Convert bounding box to matplotlib format."""
     # Convert the bounding box (top-left x, top-left y, bottom-right x,
     # bottom-right y) format to matplotlib format: ((upper-left x,
     # upper-left y), width, height)
@@ -533,6 +545,7 @@ def bbox_to_rect(bbox, color):
 
 # Defined in file: ./chapter_computer-vision/anchor.md
 def show_bboxes(axes, bboxes, labels=None, colors=None):
+    """Show bounding boxes."""
     def _make_list(obj, default_values=None):
         if obj is None:
             obj = default_values
@@ -579,6 +592,116 @@ def load_data_pikachu(batch_size, edge_size=256):
         path_imgrec=os.path.join(data_dir, 'val.rec'), batch_size=batch_size,
         data_shape=(3, edge_size, edge_size), shuffle=False)
     return train_iter, val_iter
+
+# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
+def download_voc_pascal(data_dir='../data'):
+    """Download the VOC2012 segmentation dataset."""
+    voc_dir = os.path.join(data_dir, 'VOCdevkit/VOC2012')
+    url = ('http://data.mxnet.io/data/VOCtrainval_11-May-2012.tar')
+    sha1 = '4e443f8a2eca6b1dac8a6c57641b67dd40621a49'
+    fname = gluon.utils.download(url, data_dir, sha1_hash=sha1)
+    with tarfile.open(fname, 'r') as f:
+        f.extractall(data_dir)
+    return voc_dir
+
+
+# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
+def read_voc_images(root='../data/VOCdevkit/VOC2012', is_train=True):
+    """Read all VOC feature and label images."""
+    txt_fname = '%s/ImageSets/Segmentation/%s' % (
+        root, 'train.txt' if is_train else 'val.txt')
+    with open(txt_fname, 'r') as f:
+        images = f.read().split()
+    features, labels = [None] * len(images), [None] * len(images)
+    for i, fname in enumerate(images):
+        features[i] = image.imread('%s/JPEGImages/%s.jpg' % (root, fname))
+        labels[i] = image.imread(
+            '%s/SegmentationClass/%s.png' % (root, fname))
+    return features, labels
+
+
+# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
+VOC_COLORMAP = [[0, 0, 0], [128, 0, 0], [0, 128, 0], [128, 128, 0],
+                [0, 0, 128], [128, 0, 128], [0, 128, 128], [128, 128, 128],
+                [64, 0, 0], [192, 0, 0], [64, 128, 0], [192, 128, 0],
+                [64, 0, 128], [192, 0, 128], [64, 128, 128], [192, 128, 128],
+                [0, 64, 0], [128, 64, 0], [0, 192, 0], [128, 192, 0],
+                [0, 64, 128]]
+
+# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
+VOC_CLASSES = ['background', 'aeroplane', 'bicycle', 'bird', 'boat',
+               'bottle', 'bus', 'car', 'cat', 'chair', 'cow',
+               'diningtable', 'dog', 'horse', 'motorbike', 'person',
+               'potted plant', 'sheep', 'sofa', 'train', 'tv/monitor']
+
+# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
+def build_colormap2label():
+    """Build a RGB color to label mapping for segmentation."""
+    colormap2label = nd.zeros(256 ** 3)
+    for i, colormap in enumerate(VOC_COLORMAP):
+        colormap2label[(colormap[0]*256 + colormap[1])*256 + colormap[2]] = i
+    return colormap2label
+
+
+# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
+def voc_label_indices(colormap, colormap2label):
+    """Map a RGB color to a label."""
+    colormap = colormap.astype('int32')
+    idx = ((colormap[:, :, 0] * 256 + colormap[:, :, 1]) * 256
+           + colormap[:, :, 2])
+    return colormap2label[idx]
+
+# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
+def voc_rand_crop(feature, label, height, width):
+    """Randomly crop for both feature and label images."""
+    feature, rect = image.random_crop(feature, (width, height))
+    label = image.fixed_crop(label, *rect)
+    return feature, label
+
+
+# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
+class VOCSegDataset(gluon.data.Dataset):
+    """A customized dataset to load VOC dataset."""
+    def __init__(self, is_train, crop_size, voc_dir):
+        self.rgb_mean = nd.array([0.485, 0.456, 0.406])
+        self.rgb_std = nd.array([0.229, 0.224, 0.225])
+        self.crop_size = crop_size
+        features, labels = read_voc_images(root=voc_dir, is_train=is_train)
+        self.features = [self.normalize_image(feature)
+                         for feature in self.filter(features)]
+        self.labels = self.filter(labels)
+        self.colormap2label = build_colormap2label()
+        print('read ' + str(len(self.features)) + ' examples')
+
+    def normalize_image(self, img):
+        return (img.astype('float32') / 255 - self.rgb_mean) / self.rgb_std
+
+    def filter(self, imgs):
+        return [img for img in imgs if (
+            img.shape[0] >= self.crop_size[0] and
+            img.shape[1] >= self.crop_size[1])]
+
+    def __getitem__(self, idx):
+        feature, label = voc_rand_crop(self.features[idx], self.labels[idx],
+                                       *self.crop_size)
+        return (feature.transpose((2, 0, 1)),
+                voc_label_indices(label, self.colormap2label))
+
+    def __len__(self):
+        return len(self.features)
+
+# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
+def load_data_voc(batch_size, crop_size):
+    """Download and load the VOC2012 semantic dataset."""
+    voc_dir = d2l.download_voc_pascal()
+    num_workers = d2l.get_dataloader_workers()
+    train_iter = gluon.data.DataLoader(
+        VOCSegDataset(True, crop_size, voc_dir), batch_size,
+        shuffle=True, last_batch='discard', num_workers=num_workers)
+    test_iter = gluon.data.DataLoader(
+        VOCSegDataset(False, crop_size, voc_dir), batch_size,
+        last_batch='discard', num_workers=num_workers)
+    return train_iter, test_iter
 
 # Defined in file: ./chapter_generative_adversarial_networks/gan.md
 def update_D(X, Z, net_D, net_G, loss, trainer_D):
