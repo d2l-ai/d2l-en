@@ -11,14 +11,16 @@ import os
 import sys
 import numpy as np
 from matplotlib import pyplot as plt
-from mxnet import nd, autograd, gluon, init, context
+from mxnet import nd, autograd, gluon, init, context, image
 from mxnet.gluon import nn
 import time
+import tarfile
 
 # Defined in file: ./chapter_crashcourse/probability.md
 def use_svg_display():
     """Use the svg format to display plot in jupyter."""
     display.set_matplotlib_formats('svg')
+
 
 # Defined in file: ./chapter_crashcourse/probability.md
 def set_figsize(figsize=(3.5, 2.5)):
@@ -39,6 +41,7 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
             ax.set_title(titles[i])
     return axes
 
+
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def synthetic_data(w, b, num_examples):
     """generate y = X w + b + noise"""
@@ -46,6 +49,7 @@ def synthetic_data(w, b, num_examples):
     y = nd.dot(X, w) + b
     y += nd.random.normal(scale=0.01, shape=y.shape)
     return X, y
+
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def linreg(X, w, b):
@@ -142,22 +146,25 @@ class Animator(object):
             set_one('set_xscale', xscale),
             set_one('set_yscale', yscale),
             set_one('legend', legend))
-        self.raw_X, self.raw_Y = [], []
-        self.fmts = fmts
+        self.X, self.Y, self.fmts = None, None, fmts
         
     def add(self, x, y):
         """Add multiple data points into the figure."""
-        if not hasattr(x, "__len__"): y = [y]
-        if not hasattr(x, "__len__"): x = [x] * len(y)
-        self.raw_X.append(x)
-        self.raw_Y.append(y)
-        self.X = list(map(list, zip(*self.raw_X)))  # tranpose raw_X
-        self.Y = list(map(list, zip(*self.raw_Y)))
-        if not self.fmts: self.fmts = ['-'] * len(self.Y)
+        if not hasattr(y, "__len__"): y = [y]
+        n = len(y)
+        if not hasattr(x, "__len__"): x = [x] * n
+        if not self.X: self.X = [[] for _ in range(n)]
+        if not self.Y: self.Y = [[] for _ in range(n)]
+        if not self.fmts: self.fmts = ['-'] * n
+        for i, (a, b) in enumerate(zip(x, y)):
+            if a is not None and b is not None:
+                self.X[i].append(a)
+                self.Y[i].append(b)        
         self.axes.cla()
         for x, y, fmt in zip(self.X, self.Y, self.fmts):
             self.axes.plot(x, y, fmt)
         self.set_axes()
+        self.axes.grid()
         display.display(self.fig)
         display.clear_output(wait=True)
 
@@ -180,12 +187,14 @@ def predict_ch3(net, test_iter, n=6):
     titles = [true+'\n'+ pred for true, pred in zip(trues, preds)]
     d2l.show_images(X[0:n].reshape((n,28,28)), 1, n, titles=titles[0:n])
 
+
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def plot(X, Y, x_label=None, y_label=None, legend=None,
          xlim=None, ylim=None, fmts=None, axes=None):
     """Plot multiple lines"""
     axes = axes if axes else d2l.plt.gca()
     draw(axes, axes.plot, X, Y, x_label, y_label, legend, xlim, ylim, fmts)
+
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def draw(axes, func, X, Y, x_label, y_label, legend, xlim, ylim, fmts):
@@ -204,6 +213,7 @@ def draw(axes, func, X, Y, x_label, y_label, legend, xlim, ylim, fmts):
     if ylim: axes.set_ylim(ylim)
     if legend: axes.legend(legend)
 
+
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def show(obj):
     """Show a figure"""
@@ -216,13 +226,14 @@ def evaluate_loss(net, data_iter, loss):
     l, n = 0.0, 0
     for X, y in data_iter:
         l += loss(net(X), y).sum().asscalar()
-        n += X.shape[0]
+        n += y.size
     return l / n
 
 # Defined in file: ./chapter_deep-learning-computation/use-gpu.md
 def try_gpu(i=0):
     """Return gpu(i) if exists, otherwise return cpu()."""
     return context.gpu(i) if context.num_gpus() >= i else context.cpu()
+
 
 # Defined in file: ./chapter_deep-learning-computation/use-gpu.md
 def try_all_gpus():
@@ -253,22 +264,6 @@ def evaluate_accuracy_gpu(net, data_iter, ctx=None):
     return acc_sum.asscalar() / n
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
-def train_epoch_ch5(net, train_iter, loss, trainer, ctx):
-    train_l_sum, train_acc_sum, n = 0.0, 0.0, 0
-    for X, y in train_iter:
-        # Here is the only difference compared to train_epoch_ch3
-        X, y = X.as_in_context(ctx), y.as_in_context(ctx)
-        with autograd.record():
-            y_hat = net(X)
-            l = loss(y_hat, y)
-        l.backward()
-        trainer.step(X.shape[0])
-        train_l_sum += l.sum().asscalar()
-        train_acc_sum += d2l.accuracy(y_hat, y)
-        n += X.shape[0]
-    return train_l_sum / n, train_acc_sum / n
-
-# Defined in file: ./chapter_convolutional-neural-networks/lenet.md
 class Timer(object):
     """Record multiple running times."""
     def __init__(self):
@@ -282,12 +277,17 @@ class Timer(object):
     def stop(self):
         """Stop the timer and record the time in a list"""
         self.times.append(time.time() - self.start_time)
+        return self.times[-1]
         
-    def avg_time(self):
+    def avg(self):
         """Return the average time"""
         return sum(self.times)/len(self.times)
     
-    def cum_times(self):
+    def sum(self):
+        """Return the sum of time"""
+        return sum(self.times)
+        
+    def cumsum(self):
         """Return the accumuated times"""
         return np.array(self.times).cumsum().tolist()
 
@@ -297,17 +297,54 @@ def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
     trainer = gluon.Trainer(net.collect_params(),
                             'sgd', {'learning_rate': lr})
-    animator = d2l.Animator(xlabel='epoch', xlim=[1,num_epochs], ylim=[0,1],
-                            legend=['train loss', 'train acc', 'test acc'])
+    animator = d2l.Animator(xlabel='epoch', xlim=[0,num_epochs],
+                            legend=['train loss','train acc','test acc'])
     timer = Timer()
     for epoch in range(num_epochs):
-        timer.start()
-        train_metrics = train_epoch_ch5(net, train_iter, loss, trainer, ctx)
-        timer.stop()
+        train_l_sum, train_acc_sum, n = 0.0, 0.0, 0
+        for i, (X, y) in enumerate(train_iter):
+            timer.start()
+            # Here is the only difference compared to train_epoch_ch3
+            X, y = X.as_in_context(ctx), y.as_in_context(ctx)
+            with autograd.record():
+                y_hat = net(X)
+                l = loss(y_hat, y)
+            l.backward()
+            trainer.step(X.shape[0])
+            train_l_sum += l.sum().asscalar()
+            train_acc_sum += d2l.accuracy(y_hat, y)
+            n += X.shape[0]
+            timer.stop()
+            if (i+1) % 50 == 0:
+                animator.add(epoch+i/len(train_iter), 
+                             (train_l_sum/n, train_acc_sum/n, None))
         test_acc = evaluate_accuracy_gpu(net, test_iter)
-        animator.add(epoch+1, train_metrics+(test_acc,)) 
-    print('loss %.3f, train acc %.3f, test acc %.3f, %.1f sec/epoch on %s'%(
-        *train_metrics, test_acc, timer.avg_time(), ctx))
+        animator.add(epoch+1, (None, None, test_acc))
+    print('loss %.3f, train acc %.3f, test acc %.3f' % (
+        train_l_sum/n, train_acc_sum/n, test_acc))
+    print('%.1f exampes/sec on %s'%(n*num_epochs/timer.sum(), ctx))
+
+# Defined in file: ./chapter_convolutional-modern/resnet.md
+class Residual(nn.Block):
+    def __init__(self, num_channels, use_1x1conv=False, strides=1, **kwargs):
+        super(Residual, self).__init__(**kwargs)
+        self.conv1 = nn.Conv2D(num_channels, kernel_size=3, padding=1,
+                               strides=strides)
+        self.conv2 = nn.Conv2D(num_channels, kernel_size=3, padding=1)
+        if use_1x1conv:
+            self.conv3 = nn.Conv2D(num_channels, kernel_size=1,
+                                   strides=strides)
+        else:
+            self.conv3 = None
+        self.bn1 = nn.BatchNorm()
+        self.bn2 = nn.BatchNorm()
+    
+    def forward(self, X):
+        Y = nd.relu(self.bn1(self.conv1(X)))
+        Y = self.bn2(self.conv2(Y))
+        if self.conv3:
+            X = self.conv3(X)
+        return nd.relu(Y + X)
 
 # Defined in file: ./chapter_optimization/optimization-intro.md
 def annotate(text, xy, xytext):
@@ -327,6 +364,7 @@ def train_2d(trainer):
     print('epoch %d, x1 %f, x2 %f' % (i + 1, x1, x2))
     return results
 
+
 # Defined in file: ./chapter_optimization/gd.md
 def show_trace_2d(f, results):
     """Show the trace of 2D variables during optimization."""
@@ -341,27 +379,27 @@ def show_trace_2d(f, results):
 def get_data_ch10(batch_size=10, n=1500):
     data = np.genfromtxt('../data/airfoil_self_noise.dat', delimiter='\t')
     data = nd.array((data - data.mean(axis=0)) / data.std(axis=0))
-    data_iter = d2l.load_array(data[:n, :-1], data[:n, -1], 
+    data_iter = d2l.load_array(data[:n, :-1], data[:n, -1],
                                batch_size, is_train=True)
     return data_iter, data.shape[1]-1
 
 # Defined in file: ./chapter_optimization/minibatch-sgd.md
-def train_ch10(trainer_fn, states, hyperparams, data_iter, 
+def train_ch10(trainer_fn, states, hyperparams, data_iter,
                feature_dim, num_epochs=2):
-    # Initialization 
+    # Initialization
     w = nd.random.normal(scale=0.01, shape=(feature_dim, 1))
     b = nd.zeros(1)
     w.attach_grad()
     b.attach_grad()
     net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss
     # Train
-    animator = d2l.Animator(xlabel='epoch', ylabel='loss', 
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[0, num_epochs], ylim=[0.22, 0.35])
     n, timer = 0, d2l.Timer()
     for _ in range(num_epochs):
         for X, y in data_iter:
             with autograd.record():
-                l = loss(net(X), y).mean()  
+                l = loss(net(X), y).mean()
             l.backward()
             trainer_fn([w, b], states, hyperparams)
             n += X.shape[0]
@@ -370,11 +408,11 @@ def train_ch10(trainer_fn, states, hyperparams, data_iter,
                 animator.add(n/X.shape[0]/len(data_iter),
                              d2l.evaluate_loss(net, data_iter, loss))
                 timer.start()
-    print('loss: %.3f, %.3f sec/epoch'%(animator.Y[0][-1], timer.avg_time()))
-    return timer.cum_times(), animator.Y[0]
+    print('loss: %.3f, %.3f sec/epoch'%(animator.Y[0][-1], timer.avg()))
+    return timer.cumsum(), animator.Y[0]
 
 # Defined in file: ./chapter_optimization/minibatch-sgd.md
-def train_gluon_ch10(trainer_name, trainer_hyperparams, 
+def train_gluon_ch10(trainer_name, trainer_hyperparams,
                      data_iter, num_epochs=2):
     # Initialization
     net = nn.Sequential()
@@ -383,7 +421,7 @@ def train_gluon_ch10(trainer_name, trainer_hyperparams,
     trainer = gluon.Trainer(
         net.collect_params(), trainer_name, trainer_hyperparams)
     loss = gluon.loss.L2Loss()
-    animator = d2l.Animator(xlabel='epoch', ylabel='loss', 
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[0, num_epochs], ylim=[0.22, 0.35])
     n, timer = 0, d2l.Timer()
     for _ in range(num_epochs):
@@ -398,18 +436,19 @@ def train_gluon_ch10(trainer_name, trainer_hyperparams,
                 animator.add(n/X.shape[0]/len(data_iter),
                              d2l.evaluate_loss(net, data_iter, loss))
                 timer.start()
-    print('loss: %.3f, %.3f sec/epoch'%(animator.Y[0][-1], timer.avg_time()))
-    return timer.cum_times(), animator.Y[0]
+    print('loss: %.3f, %.3f sec/epoch'%(animator.Y[0][-1], timer.avg()))
+    return timer.cumsum(), animator.Y[0]
 
 # Defined in file: ./chapter_computational-performance/multiple-gpus.md
 def split_batch(X, y, ctx_list):
     """Split X and y into multiple devices specified by ctx"""
     assert X.shape[0] == y.shape[0]
-    return (gluon.utils.split_and_load(X, ctx_list), 
+    return (gluon.utils.split_and_load(X, ctx_list),
             gluon.utils.split_and_load(y, ctx_list))
 
 # Defined in file: ./chapter_computational-performance/multiple-gpus-gluon.md
 def resnet18(num_classes):
+    """A slightly modified ResNet-18 model"""
     def resnet_block(num_channels, num_residuals, first_block=False):
         blk = nn.Sequential()
         for i in range(num_residuals):
@@ -420,6 +459,19 @@ def resnet18(num_classes):
                 blk.add(d2l.Residual(num_channels))
         return blk
 
+    net = nn.Sequential()
+    # This model uses a smaller convolution kernel, stride, and padding and
+    # removes the maximum pooling layer
+    net.add(nn.Conv2D(64, kernel_size=3, strides=1, padding=1),
+            nn.BatchNorm(), nn.Activation('relu'))
+    net.add(resnet_block(64, 2, first_block=True),
+            resnet_block(128, 2),
+            resnet_block(256, 2),
+            resnet_block(512, 2))
+    net.add(nn.GlobalAvgPool2D(), nn.Dense(num_classes))
+    return net
+
+
 # Defined in file: ./chapter_computational-performance/multiple-gpus-gluon.md
 def evaluate_accuracy_gpus(net, data_iter):
     # Query the list of devices.
@@ -429,8 +481,227 @@ def evaluate_accuracy_gpus(net, data_iter):
         Xs, ys = d2l.split_batch(features, labels, ctx_list)
         pys = [net(X) for X in Xs]  # run in parallel
         acc_sum += sum(d2l.accuracy(py, y) for py, y in zip(pys, ys))
-        n += features.shape[0]
+        n += labels.size
     return acc_sum / n
+
+# Defined in file: ./chapter_computer-vision/image-augmentation.md
+def train_batch_ch12(net, features, labels, loss, trainer, ctx_list):
+    Xs, ys = d2l.split_batch(features, labels, ctx_list)
+    with autograd.record():
+        pys = [net(X) for X in Xs]
+        ls = [loss(py, y) for py, y in zip(pys, ys)]
+    for l in ls:
+        l.backward()
+    trainer.step(features.shape[0])
+    train_loss_sum = sum([l.sum().asscalar() for l in ls])
+    train_acc_sum = sum(d2l.accuracy(py, y) for py, y in zip(pys, ys))
+    return train_loss_sum, train_acc_sum
+
+# Defined in file: ./chapter_computer-vision/image-augmentation.md
+def train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs,
+               ctx_list=d2l.try_all_gpus()):
+    num_batches, timer = len(train_iter), d2l.Timer()
+    animator = d2l.Animator(xlabel='epoch', xlim=[0,num_epochs], ylim=[0,2],
+                            legend=['train loss','train acc','test acc'])
+    for epoch in range(num_epochs):
+        # store training_loss, training_accuracy, num_examples, num_features
+        metric = d2l.Accumulator(4)
+        for i, (features, labels) in enumerate(train_iter):
+            timer.start()
+            l, acc = train_batch_ch12(
+                net, features, labels, loss, trainer, ctx_list)
+            metric.add([l, acc, labels.shape[0], labels.size])
+            timer.stop()
+            if (i+1) % (num_batches // 5) == 0:
+                animator.add(epoch+i/num_batches, 
+                             (metric[0]/metric[2], metric[1]/metric[3], None))
+        test_acc = d2l.evaluate_accuracy_gpus(net, test_iter)
+        animator.add(epoch+1, (None, None, test_acc))
+    print('loss %.3f, train acc %.3f, test acc %.3f' % (
+        metric[0]/metric[2], metric[1]/metric[3], test_acc))
+    print('%.1f exampes/sec on %s' % (
+        metric[2]*num_epochs/timer.sum(), ctx_list))
+
+# Defined in file: ./chapter_computer-vision/image-augmentation.md
+class Accumulator(object):
+    def __init__(self, n):
+        self.data = [0.0] * n
+    def add(self, x):
+        self.data = [a+b for a, b in zip(self.data, x)]
+    def reset(self):
+        self.data = [0] * len(self.data)
+    def __getitem__(self, i):
+        return self.data[i]
+
+# Defined in file: ./chapter_computer-vision/bounding-box.md
+def bbox_to_rect(bbox, color):
+    """Convert bounding box to matplotlib format."""
+    # Convert the bounding box (top-left x, top-left y, bottom-right x,
+    # bottom-right y) format to matplotlib format: ((upper-left x,
+    # upper-left y), width, height)
+    return d2l.plt.Rectangle(
+        xy=(bbox[0], bbox[1]), width=bbox[2]-bbox[0], height=bbox[3]-bbox[1],
+        fill=False, edgecolor=color, linewidth=2)
+
+# Defined in file: ./chapter_computer-vision/anchor.md
+def show_bboxes(axes, bboxes, labels=None, colors=None):
+    """Show bounding boxes."""
+    def _make_list(obj, default_values=None):
+        if obj is None:
+            obj = default_values
+        elif not isinstance(obj, (list, tuple)):
+            obj = [obj]
+        return obj
+    labels = _make_list(labels)
+    colors = _make_list(colors, ['b', 'g', 'r', 'm', 'c'])
+    for i, bbox in enumerate(bboxes):
+        color = colors[i % len(colors)]
+        rect = d2l.bbox_to_rect(bbox.asnumpy(), color)
+        axes.add_patch(rect)
+        if labels and len(labels) > i:
+            text_color = 'k' if color == 'w' else 'w'
+            axes.text(rect.xy[0], rect.xy[1], labels[i],
+                      va='center', ha='center', fontsize=9, color=text_color,
+                      bbox=dict(facecolor=color, lw=0))
+
+# Defined in file: ./chapter_computer-vision/object-detection-dataset.md
+def download_pikachu(data_dir):
+    root_url = ('https://apache-mxnet.s3-accelerate.amazonaws.com/'
+                'gluon/dataset/pikachu/')
+    dataset = {'train.rec': 'e6bcb6ffba1ac04ff8a9b1115e650af56ee969c8',
+               'train.idx': 'dcf7318b2602c06428b9988470c731621716c393',
+               'val.rec': 'd6c33f799b4d058e82f2cb5bd9a976f69d72d520'}
+    for k, v in dataset.items():
+        gluon.utils.download(
+            root_url + k, os.path.join(data_dir, k), sha1_hash=v)
+
+# Defined in file: ./chapter_computer-vision/object-detection-dataset.md
+def load_data_pikachu(batch_size, edge_size=256):
+    """Load the pikachu dataset"""
+    data_dir = '../data/pikachu'
+    download_pikachu(data_dir)
+    train_iter = image.ImageDetIter(
+        path_imgrec=os.path.join(data_dir, 'train.rec'),
+        path_imgidx=os.path.join(data_dir, 'train.idx'),
+        batch_size=batch_size,
+        data_shape=(3, edge_size, edge_size),  # The shape of the output image
+        shuffle=True,  # Read the data set in random order
+        rand_crop=1,  # The probability of random cropping is 1
+        min_object_covered=0.95, max_attempts=200)
+    val_iter = image.ImageDetIter(
+        path_imgrec=os.path.join(data_dir, 'val.rec'), batch_size=batch_size,
+        data_shape=(3, edge_size, edge_size), shuffle=False)
+    return train_iter, val_iter
+
+# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
+def download_voc_pascal(data_dir='../data'):
+    """Download the VOC2012 segmentation dataset."""
+    voc_dir = os.path.join(data_dir, 'VOCdevkit/VOC2012')
+    url = ('http://data.mxnet.io/data/VOCtrainval_11-May-2012.tar')
+    sha1 = '4e443f8a2eca6b1dac8a6c57641b67dd40621a49'
+    fname = gluon.utils.download(url, data_dir, sha1_hash=sha1)
+    with tarfile.open(fname, 'r') as f:
+        f.extractall(data_dir)
+    return voc_dir
+
+
+# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
+def read_voc_images(root='../data/VOCdevkit/VOC2012', is_train=True):
+    """Read all VOC feature and label images."""
+    txt_fname = '%s/ImageSets/Segmentation/%s' % (
+        root, 'train.txt' if is_train else 'val.txt')
+    with open(txt_fname, 'r') as f:
+        images = f.read().split()
+    features, labels = [None] * len(images), [None] * len(images)
+    for i, fname in enumerate(images):
+        features[i] = image.imread('%s/JPEGImages/%s.jpg' % (root, fname))
+        labels[i] = image.imread(
+            '%s/SegmentationClass/%s.png' % (root, fname))
+    return features, labels
+
+
+# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
+VOC_COLORMAP = [[0, 0, 0], [128, 0, 0], [0, 128, 0], [128, 128, 0],
+                [0, 0, 128], [128, 0, 128], [0, 128, 128], [128, 128, 128],
+                [64, 0, 0], [192, 0, 0], [64, 128, 0], [192, 128, 0],
+                [64, 0, 128], [192, 0, 128], [64, 128, 128], [192, 128, 128],
+                [0, 64, 0], [128, 64, 0], [0, 192, 0], [128, 192, 0],
+                [0, 64, 128]]
+
+# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
+VOC_CLASSES = ['background', 'aeroplane', 'bicycle', 'bird', 'boat',
+               'bottle', 'bus', 'car', 'cat', 'chair', 'cow',
+               'diningtable', 'dog', 'horse', 'motorbike', 'person',
+               'potted plant', 'sheep', 'sofa', 'train', 'tv/monitor']
+
+# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
+def build_colormap2label():
+    """Build a RGB color to label mapping for segmentation."""
+    colormap2label = nd.zeros(256 ** 3)
+    for i, colormap in enumerate(VOC_COLORMAP):
+        colormap2label[(colormap[0]*256 + colormap[1])*256 + colormap[2]] = i
+    return colormap2label
+
+
+# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
+def voc_label_indices(colormap, colormap2label):
+    """Map a RGB color to a label."""
+    colormap = colormap.astype('int32')
+    idx = ((colormap[:, :, 0] * 256 + colormap[:, :, 1]) * 256
+           + colormap[:, :, 2])
+    return colormap2label[idx]
+
+# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
+def voc_rand_crop(feature, label, height, width):
+    """Randomly crop for both feature and label images."""
+    feature, rect = image.random_crop(feature, (width, height))
+    label = image.fixed_crop(label, *rect)
+    return feature, label
+
+
+# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
+class VOCSegDataset(gluon.data.Dataset):
+    """A customized dataset to load VOC dataset."""
+    def __init__(self, is_train, crop_size, voc_dir):
+        self.rgb_mean = nd.array([0.485, 0.456, 0.406])
+        self.rgb_std = nd.array([0.229, 0.224, 0.225])
+        self.crop_size = crop_size
+        features, labels = read_voc_images(root=voc_dir, is_train=is_train)
+        self.features = [self.normalize_image(feature)
+                         for feature in self.filter(features)]
+        self.labels = self.filter(labels)
+        self.colormap2label = build_colormap2label()
+        print('read ' + str(len(self.features)) + ' examples')
+
+    def normalize_image(self, img):
+        return (img.astype('float32') / 255 - self.rgb_mean) / self.rgb_std
+
+    def filter(self, imgs):
+        return [img for img in imgs if (
+            img.shape[0] >= self.crop_size[0] and
+            img.shape[1] >= self.crop_size[1])]
+
+    def __getitem__(self, idx):
+        feature, label = voc_rand_crop(self.features[idx], self.labels[idx],
+                                       *self.crop_size)
+        return (feature.transpose((2, 0, 1)),
+                voc_label_indices(label, self.colormap2label))
+
+    def __len__(self):
+        return len(self.features)
+
+# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
+def load_data_voc(batch_size, crop_size):
+    """Download and load the VOC2012 semantic dataset."""
+    voc_dir = d2l.download_voc_pascal()
+    num_workers = d2l.get_dataloader_workers()
+    train_iter = gluon.data.DataLoader(
+        VOCSegDataset(True, crop_size, voc_dir), batch_size,
+        shuffle=True, last_batch='discard', num_workers=num_workers)
+    test_iter = gluon.data.DataLoader(
+        VOCSegDataset(False, crop_size, voc_dir), batch_size,
+        last_batch='discard', num_workers=num_workers)
+    return train_iter, test_iter
 
 # Defined in file: ./chapter_generative_adversarial_networks/gan.md
 def update_D(X, Z, net_D, net_G, loss, trainer_D):

@@ -114,7 +114,7 @@ print('after allreduce:', data)
 
 ## Split a Data Batch into Multiple GPUs
 
-The `utils` module in Gluon provides a function to evenly split an array into multiple parts along the first dimension, and then copy the $i$-th part into the the $i$-th device. It's straightforward to implement, but we will use the pre-implemented version so later chapters can reuse the `split_batch` function we will define later. 
+The `utils` module in Gluon provides a function to evenly split an array into multiple parts along the first dimension, and then copy the $i$-th part into the the $i$-th device. It's straightforward to implement, but we will use the pre-implemented version so later chapters can reuse the `split_batch` function we will define later.
 
 Now, we try to divide the 6 data instances equally between 2 GPUs using the `split_and_load` function.
 
@@ -134,7 +134,7 @@ The `split_batch` function then splits both the features and labels.
 def split_batch(X, y, ctx_list):
     """Split X and y into multiple devices specified by ctx"""
     assert X.shape[0] == y.shape[0]
-    return (gluon.utils.split_and_load(X, ctx_list), 
+    return (gluon.utils.split_and_load(X, ctx_list),
             gluon.utils.split_and_load(y, ctx_list))
 ```
 
@@ -181,9 +181,9 @@ def train(num_gpus, batch_size, lr):
         timer.stop()
         # Verify the model on GPU 0
         animator.add(epoch+1, d2l.evaluate_accuracy_gpu(
-            lambda x: lenet(x, gpu_params[0]), test_iter, ctx[0])) 
+            lambda x: lenet(x, gpu_params[0]), test_iter, ctx[0]))
     print('test acc: %.2f, %.1f sec/epoch on %s' % (
-            animator.Y[0][-1], timer.avg_time(), ctx_list))
+            animator.Y[0][-1], timer.avg(), ctx_list))
 
 ```
 
@@ -195,7 +195,7 @@ We will start by training with a single GPU. Assume the batch size is 256 and th
 train(num_gpus=1, batch_size=256, lr=0.2)
 ```
 
-By keeping the batch size and learning rate unchanged and changing the number of GPUs to 2, we can see that the improvement in test accuracy is roughly the same as in the results from the previous experiment. In terms of the optimization algorithms, they are identical. 
+By keeping the batch size and learning rate unchanged and changing the number of GPUs to 2, we can see that the improvement in test accuracy is roughly the same as in the results from the previous experiment. In terms of the optimization algorithms, they are identical.
 
 Because of the extra communication overhead, and relative simple model we used here, there is no reduction in the training time. We will consider a more complex model in the next chapter.
 
