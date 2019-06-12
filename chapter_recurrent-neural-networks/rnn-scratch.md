@@ -26,19 +26,6 @@ One-hot encoding vectors provide an easy way to express words as vectors in orde
 npx.one_hot(np.array([0, 2]), len(vocab))
 ```
 
-```{.json .output n=2}
-[
- {
-  "data": {
-   "text/plain": "[[1. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.\n  0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]\n [0. 0. 1. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.\n  0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.]]\n<ndarray shape=(2, 44)>"
-  },
-  "execution_count": 2,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 Note that one-hot encodings are just a convenient way of separating the encoding (e.g. mapping the character `a` to $(1,0,0, \ldots) vector)$ from the embedding (i.e. multiplying the encoded vectors by some weight matrix $\mathbf{W}$). This simplifies the code greatly relative to storing an embedding matrix that the user needs to maintain.
 
 The shape of the mini-batch we sample each time is (batch size, time step). The following function transforms such mini-batches into a number of matrices with the shape of (batch size, dictionary size) that can be entered into the network. The total number of vectors is equal to the number of time steps. That is, the input of time step $t$ is $\boldsymbol{X}_t \in \mathbb{R}^{n \times d}$, where $n$ is the batch size and $d$ is the number of inputs. That is the one-hot vector length (the dictionary size).
@@ -51,19 +38,6 @@ def to_onehot(X, size):
 X = np.arange(10).reshape((2, 5))
 inputs = to_onehot(X, len(vocab))
 len(inputs), inputs[0].shape
-```
-
-```{.json .output n=3}
-[
- {
-  "data": {
-   "text/plain": "(5, (2, 44))"
-  },
-  "execution_count": 3,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 The code above generates 5 minibatches containing 2 vectors each. Since we have a total of 43 distinct symbols in "The Time Machine" we get 43-dimensional vectors.
@@ -94,16 +68,6 @@ def get_params():
     for param in params:
         param.attach_grad()
     return params
-```
-
-```{.json .output n=4}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "Using cpu(0)\n"
- }
-]
 ```
 
 ## Sequence Modeling
@@ -147,19 +111,6 @@ outputs, state_new = rnn(inputs, state, params)
 len(outputs), outputs[0].shape, state_new[0].shape
 ```
 
-```{.json .output n=7}
-[
- {
-  "data": {
-   "text/plain": "(5, (2, 44), (2, 512))"
-  },
-  "execution_count": 7,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 ### Prediction Function
 
 The following function predicts the next `num_chars` characters based on the `prefix` (a string containing several characters). This function is a bit more complicated. Whenever the actual sequence is known, i.e. for the beginning of the sequence, we only update the hidden state. After that we begin generating new characters and emitting them. For convenience we use the recurrent neural unit `rnn` as a function parameter, so that this function can be reused in the other recurrent neural networks described in following sections.
@@ -184,7 +135,7 @@ def predict_rnn(prefix, num_chars, rnn, params, init_rnn_state,
         else:
             # This is maximum likelihood decoding. Modify this if you want
             # use sampling, beam search or beam sampling for better sequences.
-            output.append(int(Y[0].argmax(axis=1).asscalar()))
+            output.append(int(Y[0].argmax(axis=1)))
     return ''.join([vocab.idx_to_token[i] for i in output])
 ```
 
@@ -193,27 +144,6 @@ We test the `predict_rnn` function first. Given that we didn't train the network
 ```{.python .input  n=11}
 predict_rnn('traveller ', 10, rnn, params, init_rnn_state, num_hiddens,
             vocab, ctx)
-```
-
-```{.json .output n=11}
-[
- {
-  "ename": "MXNetError",
-  "evalue": "[00:26:34] src/operator/numpy/np_dot.cc:83: Case 5 not implemented yet...\nStack trace:\n  [bt] (0) 1   libmxnet.so                         0x000000011843d139 dmlc::LogMessageFatal::~LogMessageFatal() + 57\n  [bt] (1) 2   libmxnet.so                         0x000000011893adaa mxnet::op::NumpyDotShape(nnvm::NodeAttrs const&, std::__1::vector<mxnet::TShape, std::__1::allocator<mxnet::TShape> >*, std::__1::vector<mxnet::TShape, std::__1::allocator<mxnet::TShape> >*) + 1434\n  [bt] (2) 3   libmxnet.so                         0x000000011998e0f3 mxnet::imperative::SetShapeType(mxnet::Context const&, nnvm::NodeAttrs const&, std::__1::vector<mxnet::NDArray*, std::__1::allocator<mxnet::NDArray*> > const&, std::__1::vector<mxnet::NDArray*, std::__1::allocator<mxnet::NDArray*> > const&, mxnet::DispatchMode*) + 1683\n  [bt] (3) 4   libmxnet.so                         0x000000011998ca20 mxnet::Imperative::Invoke(mxnet::Context const&, nnvm::NodeAttrs const&, std::__1::vector<mxnet::NDArray*, std::__1::allocator<mxnet::NDArray*> > const&, std::__1::vector<mxnet::NDArray*, std::__1::allocator<mxnet::NDArray*> > const&) + 688\n  [bt] (4) 5   libmxnet.so                         0x00000001198bd3b5 MXImperativeInvokeImpl(void*, int, void**, int*, void***, int, char const**, char const**) + 389\n  [bt] (5) 6   libmxnet.so                         0x00000001198be4b0 MXImperativeInvokeEx + 176\n  [bt] (6) 7   libffi.6.dylib                      0x000000010f981884 ffi_call_unix64 + 76\n\n",
-  "output_type": "error",
-  "traceback": [
-   "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
-   "\u001b[0;31mMXNetError\u001b[0m                                Traceback (most recent call last)",
-   "\u001b[0;32m<ipython-input-11-19341ff523eb>\u001b[0m in \u001b[0;36m<module>\u001b[0;34m()\u001b[0m\n\u001b[1;32m      1\u001b[0m predict_rnn('traveller ', 10, rnn, params, init_rnn_state, num_hiddens,\n\u001b[0;32m----> 2\u001b[0;31m             vocab, ctx)\n\u001b[0m",
-   "\u001b[0;32m<ipython-input-10-2c7c542875df>\u001b[0m in \u001b[0;36mpredict_rnn\u001b[0;34m(prefix, num_chars, rnn, params, init_rnn_state, num_hiddens, vocab, ctx)\u001b[0m\n\u001b[1;32m      9\u001b[0m         \u001b[0mX\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mto_onehot\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mnp\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0marray\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0moutput\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0;34m-\u001b[0m\u001b[0;36m1\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mctx\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0mctx\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mlen\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mvocab\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     10\u001b[0m         \u001b[0;31m# Calculate the output and update the hidden state\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m---> 11\u001b[0;31m         \u001b[0;34m(\u001b[0m\u001b[0mY\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mstate\u001b[0m\u001b[0;34m)\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mrnn\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mX\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mstate\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mparams\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m     12\u001b[0m         \u001b[0;31m# The input to the next time step is the character in the prefix or\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     13\u001b[0m         \u001b[0;31m# the current best predicted character\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
-   "\u001b[0;32m<ipython-input-6-cf5c90f361de>\u001b[0m in \u001b[0;36mrnn\u001b[0;34m(inputs, state, params)\u001b[0m\n\u001b[1;32m      6\u001b[0m     \u001b[0moutputs\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0;34m[\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      7\u001b[0m     \u001b[0;32mfor\u001b[0m \u001b[0mX\u001b[0m \u001b[0;32min\u001b[0m \u001b[0minputs\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m----> 8\u001b[0;31m         \u001b[0mH\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mnp\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mtanh\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mnp\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mdot\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mX\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mW_xh\u001b[0m\u001b[0;34m)\u001b[0m \u001b[0;34m+\u001b[0m \u001b[0mnp\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mdot\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mH\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mW_hh\u001b[0m\u001b[0;34m)\u001b[0m \u001b[0;34m+\u001b[0m \u001b[0mb_h\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      9\u001b[0m         \u001b[0mY\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mnp\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mdot\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mH\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mW_hq\u001b[0m\u001b[0;34m)\u001b[0m \u001b[0;34m+\u001b[0m \u001b[0mb_q\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     10\u001b[0m         \u001b[0moutputs\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mappend\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mY\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
-   "\u001b[0;32m/anaconda3/lib/python3.7/site-packages/mxnet-1.5.0-py3.7.egg/mxnet/ndarray/register.py\u001b[0m in \u001b[0;36mdot\u001b[0;34m(a, b, out, name, **kwargs)\u001b[0m\n",
-   "\u001b[0;32m/anaconda3/lib/python3.7/site-packages/mxnet-1.5.0-py3.7.egg/mxnet/_ctypes/ndarray.py\u001b[0m in \u001b[0;36m_imperative_invoke\u001b[0;34m(handle, ndargs, keys, vals, out, is_np_op)\u001b[0m\n\u001b[1;32m     98\u001b[0m         \u001b[0mc_str_array\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mkeys\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     99\u001b[0m         \u001b[0mc_str_array\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m[\u001b[0m\u001b[0mstr\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0ms\u001b[0m\u001b[0;34m)\u001b[0m \u001b[0;32mfor\u001b[0m \u001b[0ms\u001b[0m \u001b[0;32min\u001b[0m \u001b[0mvals\u001b[0m\u001b[0;34m]\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m,\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 100\u001b[0;31m         ctypes.byref(out_stypes)))\n\u001b[0m\u001b[1;32m    101\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    102\u001b[0m     \u001b[0mcreate_ndarray_fn\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0m_np_ndarray_cls\u001b[0m \u001b[0;32mif\u001b[0m \u001b[0mis_np_op\u001b[0m \u001b[0;32melse\u001b[0m \u001b[0m_ndarray_cls\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
-   "\u001b[0;32m/anaconda3/lib/python3.7/site-packages/mxnet-1.5.0-py3.7.egg/mxnet/base.py\u001b[0m in \u001b[0;36mcheck_call\u001b[0;34m(ret)\u001b[0m\n\u001b[1;32m    251\u001b[0m     \"\"\"\n\u001b[1;32m    252\u001b[0m     \u001b[0;32mif\u001b[0m \u001b[0mret\u001b[0m \u001b[0;34m!=\u001b[0m \u001b[0;36m0\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m--> 253\u001b[0;31m         \u001b[0;32mraise\u001b[0m \u001b[0mMXNetError\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mpy_str\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0m_LIB\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mMXGetLastError\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m    254\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m    255\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n",
-   "\u001b[0;31mMXNetError\u001b[0m: [00:26:34] src/operator/numpy/np_dot.cc:83: Case 5 not implemented yet...\nStack trace:\n  [bt] (0) 1   libmxnet.so                         0x000000011843d139 dmlc::LogMessageFatal::~LogMessageFatal() + 57\n  [bt] (1) 2   libmxnet.so                         0x000000011893adaa mxnet::op::NumpyDotShape(nnvm::NodeAttrs const&, std::__1::vector<mxnet::TShape, std::__1::allocator<mxnet::TShape> >*, std::__1::vector<mxnet::TShape, std::__1::allocator<mxnet::TShape> >*) + 1434\n  [bt] (2) 3   libmxnet.so                         0x000000011998e0f3 mxnet::imperative::SetShapeType(mxnet::Context const&, nnvm::NodeAttrs const&, std::__1::vector<mxnet::NDArray*, std::__1::allocator<mxnet::NDArray*> > const&, std::__1::vector<mxnet::NDArray*, std::__1::allocator<mxnet::NDArray*> > const&, mxnet::DispatchMode*) + 1683\n  [bt] (3) 4   libmxnet.so                         0x000000011998ca20 mxnet::Imperative::Invoke(mxnet::Context const&, nnvm::NodeAttrs const&, std::__1::vector<mxnet::NDArray*, std::__1::allocator<mxnet::NDArray*> > const&, std::__1::vector<mxnet::NDArray*, std::__1::allocator<mxnet::NDArray*> > const&) + 688\n  [bt] (4) 5   libmxnet.so                         0x00000001198bd3b5 MXImperativeInvokeImpl(void*, int, void**, int*, void***, int, char const**, char const**) + 389\n  [bt] (5) 6   libmxnet.so                         0x00000001198be4b0 MXImperativeInvokeEx + 176\n  [bt] (6) 7   libffi.6.dylib                      0x000000010f981884 ffi_call_unix64 + 76\n\n"
-  ]
- }
-]
 ```
 
 ## Gradient Clipping
@@ -230,15 +160,15 @@ Sometimes the gradients can be quite large and the optimization algorithm may fa
 
 $$\mathbf{g} \leftarrow \min\left(1, \frac{\theta}{\|\mathbf{g}\|}\right) \mathbf{g}.$$
 
-By doing so we know that the gradient norm never exceeds $\theta$ and that the updated gradient is entirely aligned with the original direction $\mathbf{g}$. It also has the desirable side-effect of limiting the influence any given minibatch (and within it any given sample) can exert on the weight vectors. This bestows a certain degree of robustness to the model. Back to the case at hand - optimization in RNNs. One of the issues is that the gradients in an RNN may either explode or vanish. Consider the chain of matrix-products involved in backpropagation. If the largest eigenvalue of the matrices is typically larger than $1$, then the product of many such matrices can be much larger than $1$. As a result, the aggregate gradient might explode. Gradient clipping provides a quick fix. While it doesn't entire solve the problem, it is one of the many techniques to alleviate it.
+By doing so we know that the gradient norm never exceeds $\theta$ and that the updated gradient is entirely aligned with the original direction $\mathbf{g}$. It also has the desirable side-effect of limiting the influence any given minibatch (and within it any given sample) can exert on the weight vectors. This bestows a certain degree of robustness to the model. Back to the case at hand - optimization in RNNs. One of the issues is that the gradients in an RNN may either explode or vanish. Consider the chain of matrix-products involved in backpropagation. If the largest eigenvalue of the matrices is typically larger than $1$, then the product of many such matrices can be much larger than $1$. As a result, the aggregate gradient might explode. Gradient clipping provides a quick fix. While it doesn't entirely solve the problem, it is one of the many techniques to alleviate it.
 
 ```{.python .input  n=10}
 # This function is saved in the d2l package for future use
 def grad_clipping(params, theta, ctx):
-    norm = nd.array([0], ctx)
+    norm = np.array([0], ctx=ctx)
     for param in params:
         norm += (param.grad ** 2).sum()
-    norm = norm.sqrt().asscalar()
+    norm = np.sqrt(norm)
     if norm > theta:
         for param in params:
             param.grad[:] *= theta / norm
@@ -325,7 +255,7 @@ def train_and_predict_rnn(rnn, get_params, init_rnn_state, num_hiddens,
                 # outputs is num_steps terms of shape (batch_size, len(vocab))
                 (outputs, state) = rnn(inputs, state, params)
                 # After stitching it is (num_steps * batch_size, len(vocab))
-                outputs = nd.concat(*outputs, dim=0)
+                outputs = np.concatenate(outputs, axis=0)
                 # The shape of Y is (batch_size, num_steps), and then becomes
                 # a vector with a length of batch * num_steps after
                 # transposition. This gives it a one-to-one correspondence
@@ -337,7 +267,8 @@ def train_and_predict_rnn(rnn, get_params, init_rnn_state, num_hiddens,
             grad_clipping(params, clipping_theta, ctx)  # Clip the gradient
             d2l.sgd(params, lr, 1)
             # Since the error is the mean, no need to average gradients here
-            l_sum += l.asscalar() * y.size
+            # `l` is a scalar tensor. Use `float(l)` to convert it to a Python scalar.
+            l_sum += float(l) * y.size
             n += y.size
         if (epoch + 1) % 50 == 0:
             print('epoch %d, perplexity %f, time %.2f sec' % (

@@ -12,7 +12,7 @@ def data_iter_consecutive(corpus_indices, batch_size, num_steps, ctx=None):
     offset = int(random.uniform(0, num_steps))
     # Slice out data - ignore num_steps and just wrap around
     num_indices = ((len(corpus_indices) - offset) // batch_size) * batch_size
-    indices = nd.array(corpus_indices[offset:(offset + num_indices)], ctx=ctx)
+    indices = np.array(corpus_indices[offset:(offset + num_indices)], ctx=ctx)
     indices = indices.reshape((batch_size, -1))
     # Need to leave one last token since targets are shifted by 1
     num_epochs = ((num_indices // batch_size) - 1) // num_steps
@@ -43,7 +43,7 @@ def data_iter_random(corpus_indices, batch_size, num_steps, ctx=None):
         batch_indices = example_indices[i:(i+batch_size)]
         X = [_data(j) for j in batch_indices]
         Y = [_data(j + 1) for j in batch_indices]
-        yield nd.array(X, ctx), nd.array(Y, ctx)
+        yield np.array(X, ctx=ctx), np.array(Y, ctx=ctx)
 
 def get_data_ch7():
     """Get the data set used in Chapter 7."""
