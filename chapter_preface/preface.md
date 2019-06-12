@@ -220,6 +220,7 @@ below.  The arrows provide a graph of prerequisites:
 
 
 ### Code
+:label:`chapter_code`
 
 Most sections of this book feature executable code.
 We recognize the importance of an interactive learning experience in deep learning.
@@ -238,15 +239,33 @@ Most of the code in this book is based on Apache MXNet.
 MXNet is an open-source framework for deep learning
 and the preferred choice of AWS (Amazon Web Services),
 as well as many colleges and companies.
-All of the code in this book has passed tests under MXNet 1.2.0.
+All of the code in this book has passed tests under the newest MXNet version.
 However, due to the rapid development of deep learning,
 some code *in the print edition* may not work properly in future versions of MXNet.
 However, we plan to keep the online version remain up-to-date.
 In case of such problems, please consult :ref:`chapter_installation`
 to update the code and runtime environment.
+
 At times, to avoid unnecessary repetition,
 we encapsulate the frequently-imported and referred-to functions, classes, etc.
-in this book in the `d2l` package.
+in this book in the `d2l` package. For any block block such as a function, a
+class, or multiple imports to be saved in the package, we will mark it with `#
+Save to the d2l package`. For example, these are the packages and modules will
+be used by the `d2l` package.
+
+```{.python .input  n=1}
+# Save to the d2l package
+from IPython import display
+import os
+import sys
+import numpy as np
+from matplotlib import pyplot as plt
+from mxnet import nd, autograd, gluon, init, context, image
+from mxnet.gluon import nn
+import time
+import tarfile
+```
+
 We give a detailed overview of these functions and classes in :numref:`chapter_d2l`.
 
 
@@ -291,7 +310,7 @@ Their GitHub usernames or names are (in no particular order):
 alxnorden, avinashingit, bowen0701, brettkoonce, Chaitanya Prakash Bapat,
 cryptonaut, Davide Fiocco, edgarroman, gkutiel, John Mitro, Liang Pu, Rahul Agarwal, mohamed-ali,
 mstewart141, Mike Müller, NRauschmayr, Prakhar Srivastav, sad-, sfermigier, Sheng Zha, sundeepteki,
-topecongiro, tpdi, vermicelli, Vishaal Kapoor, vishwesh5, YaYaB, Yuhong Chen, Evgeniy Smirnov, lgov, Simon Corston-Oliver, IgorDzreyev, trungha-ngx, pmuens, alukovenko, senorcinco, vfdev-5, dsweet, Mohammad Mahdi Rahimi, Abhishek Gupta, uwsd, DomKM, Lisa Oakley, bowen0701, arush15june, prasanth5reddy, brianhendee, mani2106, mtn, lkevinzc, caojilin, Lakshya, Fiete Lüer, Surbhi Vijayvargeeya, Muhyun Kim, dennismalmgren, adursun, Anirudh Dagar, liqingnz, Pedro Larroy, lgov, ati-ozgur, goldmermaid.
+topecongiro, tpdi, vermicelli, Vishaal Kapoor, vishwesh5, YaYaB, Yuhong Chen, Evgeniy Smirnov, lgov, Simon Corston-Oliver, IgorDzreyev, trungha-ngx, pmuens, alukovenko, senorcinco, vfdev-5, dsweet, Mohammad Mahdi Rahimi, Abhishek Gupta, uwsd, DomKM, Lisa Oakley, bowen0701, arush15june, prasanth5reddy, brianhendee, mani2106, mtn, lkevinzc, caojilin, Lakshya, Fiete Lüer, Surbhi Vijayvargeeya, Muhyun Kim, dennismalmgren, adursun, Anirudh Dagar, liqingnz, Pedro Larroy, lgov, ati-ozgur, goldmermaid, Jun Wu.
 Moreover, we thank Amazon Web Services, especially Swami Sivasubramanian,
 Raju Gulabani, Charlie Bell, and Andrew Jassy for their generous support in writing this book.
 Without the available time, resources, discussions with colleagues,

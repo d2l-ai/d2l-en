@@ -13,24 +13,20 @@ data iterators, loss functions, model architectures, and optimizers,
 are so common, deep learning libraries will give us
 library functions for these as well.
 
-In this section, we will introduce Gluon, MXNet's high-level interface
-for implementing neural networks and show how we can implement
-the linear regression model from the previous section much more concisely.
+We have used Gluon to load the MNIST dataset in :numref:`chapter_naive_bayes`. In this section, we will how we can implement
+the linear regression model in :numref:`chapter_linear_scratch` much more concisely with Gluon.
 
 ## Generating Data Sets
 
 To start, we will generate the same data set as that used in the previous section.
 
 ```{.python .input  n=2}
-from mxnet import autograd, nd
+import d2l
+from mxnet import autograd, nd, gluon
 
-num_inputs = 2
-num_examples = 1000
 true_w = nd.array([2, -3.4])
 true_b = 4.2
-features = nd.random.normal(scale=1, shape=(num_examples, num_inputs))
-labels = nd.dot(features, true_w) + true_b
-labels += nd.random.normal(scale=0.01, shape=labels.shape)
+features, labels = d2l.synthetic_data(true_w, true_b, 1000)
 ```
 
 ## Reading Data
@@ -52,13 +48,14 @@ we want the `DataLoader` to shuffle the data
 on each epoch (pass through the dataset).
 
 ```{.python .input  n=3}
-from mxnet.gluon import data as gdata
-
+# Save to the d2l package. 
+def load_array(features, labels, batch_size, is_train=True):
+    """Construct a Gluon data loader"""
+    dataset = gluon.data.ArrayDataset(features, labels)
+    return gluon.data.DataLoader(dataset, batch_size, shuffle=is_train)
+    
 batch_size = 10
-# Combine the features and labels of the training data
-dataset = gdata.ArrayDataset(features, labels)
-# Randomly reading mini-batches
-data_iter = gdata.DataLoader(dataset, batch_size, shuffle=True)
+data_iter = load_array(features, labels, batch_size)
 ```
 
 Now we can use `data_iter` in much the same way as we called the `data_iter` function in the previous section. To verify that it's working, we can read and print the first mini-batch of instances.
@@ -85,7 +82,6 @@ In this example, since our model consists of only one layer,
 we do not really need `Sequential`.
 But since nearly all of our future models will involve multiple layers,
 let's get into the habit early.
-
 
 ```{.python .input  n=5}
 from mxnet.gluon import nn
@@ -129,7 +125,7 @@ to access the `initializer` package.
 By calling `init.Normal(sigma=0.01)`, we specify that each *weight* parameter
 should be randomly sampled from a normal distribution
 with mean 0 and standard deviation 0.01.
-The *bias* parameter will be initialized to zero by default.
+The *bias* parameter will be initialized to zero by default. Both weight and bias will be attached with gradients.
 
 ```{.python .input  n=7}
 from mxnet import init

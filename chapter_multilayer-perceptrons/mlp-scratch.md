@@ -5,13 +5,8 @@ Now that we know how multilayer perceptrons (MLPs) work in theory,
 let's implement them. First, we import the required packages.
 
 ```{.python .input  n=9}
-import sys
-sys.path.insert(0, '..')
-
-%matplotlib inline
 import d2l
-from mxnet import nd
-from mxnet.gluon import loss as gloss
+from mxnet import nd, gluon
 ```
 
 To compare against the results
@@ -90,7 +85,7 @@ We encourage the interested reader to examing the source code
 for `mxnet.gluon.loss.SoftmaxCrossEntropyLoss` for more details.
 
 ```{.python .input  n=6}
-loss = gloss.SoftmaxCrossEntropyLoss()
+loss = gluon.loss.SoftmaxCrossEntropyLoss()
 ```
 
 ## Training
@@ -101,23 +96,15 @@ We set the number of epochs to $10$ and the learning rate to $0.5$.
 
 ```{.python .input  n=7}
 num_epochs, lr = 10, 0.5
-d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size,
-              params, lr)
+d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, 
+             lambda: d2l.sgd(params, lr, batch_size))
 ```
 
 To see how well we did, let's apply the model to some test data.
 If you're interested, compare the result to corresponding linear model in :numref:`chapter_softmax_scratch`.
 
 ```{.python .input}
-for X, y in test_iter:
-    break
-
-true_labels = d2l.get_fashion_mnist_labels(y.asnumpy())
-pred_labels = d2l.get_fashion_mnist_labels(net(X).argmax(axis=1).asnumpy())
-titles = [truelabel + '\n' + predlabel
-          for truelabel, predlabel in zip(true_labels, pred_labels)]
-
-d2l.show_fashion_mnist(X[0:9], titles[0:9])
+d2l.predict_ch3(net, test_iter)
 ```
 
 This looks a bit better than our previous result, a good sign that we're on the right path.

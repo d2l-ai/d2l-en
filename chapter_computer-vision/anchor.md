@@ -6,9 +6,6 @@ Object detection algorithms usually sample a large number of regions in the inpu
 First, import the packages or modules required for this section. Here, we have introduced the `contrib` package, and modified the printing accuracy of NumPy. Because printing NDArray actually calls the print function of NumPy, the floating-point numbers in NDArray printed in this section are more concise.
 
 ```{.python .input  n=1}
-import sys
-sys.path.insert(0, '..')
-
 %matplotlib inline
 import d2l
 from mxnet import contrib, gluon, image, nd
@@ -48,15 +45,15 @@ boxes[250, 250, 0, :]
 In order to describe all anchor boxes centered on one pixel in the image, we first define the `show_bboxes` function to draw multiple bounding boxes on the image.
 
 ```{.python .input  n=4}
-# This function is saved in the d2l package for future use
+# Save to the d2l package. 
 def show_bboxes(axes, bboxes, labels=None, colors=None):
+    """Show bounding boxes."""
     def _make_list(obj, default_values=None):
         if obj is None:
             obj = default_values
         elif not isinstance(obj, (list, tuple)):
             obj = [obj]
         return obj
-
     labels = _make_list(labels)
     colors = _make_list(colors, ['b', 'g', 'r', 'm', 'c'])
     for i, bbox in enumerate(bboxes):
@@ -73,7 +70,7 @@ def show_bboxes(axes, bboxes, labels=None, colors=None):
 As we just saw, the coordinate values of the $x$ and $y$ axis in the variable `boxes` have been divided by the width and height of the image, respectively. When drawing images, we need to restore the original coordinate values of the anchor boxes and therefore define the variable `bbox_scale`. Now, we can draw all the anchor boxes centered on (250, 250) in the image. As you can see, the blue anchor box with a size of 0.75 and an aspect ratio of 1 covers the dog in the image well.
 
 ```{.python .input  n=5}
-d2l.set_figsize()
+d2l.set_figsize((3.5, 2.5)) 
 bbox_scale = nd.array((w, h, w, h))
 fig = d2l.plt.imshow(img)
 show_bboxes(fig.axes, boxes[250, 250, :, :] * bbox_scale,

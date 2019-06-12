@@ -21,29 +21,20 @@ The cost for computing each iteration is $\mathcal{O}(|\mathcal{B}|)$. When the 
 
 In this chapter, we will use a data set developed by NASA to test the wing noise from different aircraft to compare these optimization algorithms[1]. We will use the first 1500 examples of the data set, 5 features, and a normalization method to preprocess the data.
 
-```{.python .input}
-#!pip install matplotlib
-```
-
 ```{.python .input  n=1}
-import sys
-sys.path.insert(0, '..')
-
 %matplotlib inline
 import d2l
 from mxnet import autograd, gluon, init, nd
-from mxnet.gluon import nn, data as gdata, loss as gloss
+from mxnet.gluon import nn
 import numpy as np
-import time
 
-# This function is saved in the d2l package for future use
-def get_data_ch7():
+# Save to the d2l package.
+def get_data_ch10(batch_size=10, n=1500):
     data = np.genfromtxt('../data/airfoil_self_noise.dat', delimiter='\t')
-    data = (data - data.mean(axis=0)) / data.std(axis=0)
-    return nd.array(data[:1500, :-1]), nd.array(data[:1500, -1])
-
-features, labels = get_data_ch7()
-features.shape
+    data = nd.array((data - data.mean(axis=0)) / data.std(axis=0))
+    data_iter = d2l.load_array(data[:n, :-1], data[:n, -1],
+                               batch_size, is_train=True)
+    return data_iter, data.shape[1]-1
 ```
 
 ## Implementation from Scratch
@@ -65,52 +56,43 @@ def sgd(params, states, hyperparams):
 
 Next, we are going to implement a generic training function to facilitate the use of the other optimization algorithms introduced later in this chapter. It initializes a linear regression model and can then be used to train the model with the mini-batch SGD and other algorithms introduced in subsequent sections.
 
-```{.python .input  n=29}
-# This function is saved in the d2l package for future use
-def train_ch7(trainer_fn, states, hyperparams, features, labels,
-              batch_size=10, num_epochs=2):
-    # Initialize model parameters
-    net, loss = d2l.linreg, d2l.squared_loss
-    w = nd.random.normal(scale=0.01, shape=(features.shape[1], 1))
+```{.python .input  n=3}
+# Save to the d2l package.
+def train_ch10(trainer_fn, states, hyperparams, data_iter,
+               feature_dim, num_epochs=2):
+    # Initialization
+    w = nd.random.normal(scale=0.01, shape=(feature_dim, 1))
     b = nd.zeros(1)
     w.attach_grad()
     b.attach_grad()
-
-    def eval_loss():
-        return loss(net(features, w, b), labels).mean().asscalar()
-
-    ls, ts = [eval_loss()], [0,]
-    data_iter = gdata.DataLoader(
-        gdata.ArrayDataset(features, labels), batch_size, shuffle=True)
-    start = time.time()
+    net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss
+    # Train
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss',
+                            xlim=[0, num_epochs], ylim=[0.22, 0.35])
+    n, timer = 0, d2l.Timer()
     for _ in range(num_epochs):
-        for batch_i, (X, y) in enumerate(data_iter):
+        for X, y in data_iter:
             with autograd.record():
-                l = loss(net(X, w, b), y).mean()  # Average the loss
+                l = loss(net(X), y).mean()
             l.backward()
-            # Update model parameters
             trainer_fn([w, b], states, hyperparams)
-            if (batch_i + 1) * batch_size % 10 == 0:
-                # Record the current training error for every 10 examples
-                ts.append(time.time() - start + ts[-1])
-                ls.append(eval_loss())
-                start = time.time()
-
-    # Print and plot the results.
-    print('loss: %f, %f sec per epoch' % (ls[-1], ts[-1]/num_epochs))
-    d2l.set_figsize()
-    d2l.plt.plot(np.linspace(0, num_epochs, len(ls)), ls)
-    d2l.plt.xlabel('epoch')
-    d2l.plt.ylabel('loss')
-    return ts, ls
+            n += X.shape[0]
+            if n % 200 == 0:
+                timer.stop()
+                animator.add(n/X.shape[0]/len(data_iter),
+                             d2l.evaluate_loss(net, data_iter, loss))
+                timer.start()
+    print('loss: %.3f, %.3f sec/epoch'%(animator.Y[0][-1], timer.avg()))
+    return timer.cumsum(), animator.Y[0]
 ```
 
 When the batch size equals 1500 (the total number of examples), we use gradient descent for optimization. The model parameters will be iterated only once for each epoch of the gradient descent. As we can see, the downward trend of the value of the objective function (training loss) flattened out after 6 iterations.
 
-```{.python .input  n=30}
+```{.python .input  n=4}
 def train_sgd(lr, batch_size, num_epochs=2):
-    return train_ch7(
-        sgd, None, {'lr': lr}, features, labels, batch_size, num_epochs)
+    data_iter, feature_dim = get_data_ch10(batch_size)
+    return train_ch10(
+        sgd, None, {'lr': lr}, data_iter, feature_dim, num_epochs)
 
 gd_res = train_sgd(1, 1500, 6)
 ```
@@ -125,27 +107,24 @@ sgd_res = train_sgd(0.005, 1)
 
 When the batch size equals 100, we use mini-batch SGD for optimization. The time required for one epoch is between the time needed for gradient descent and SGD to complete the same epoch.
 
-```{.python .input  n=37}
+```{.python .input  n=6}
 mini1_res = train_sgd(.4, 100)
 ```
 
 Reduce the batch size to 10, the time for each epoch increases because the workload for each batch is less efficient to execute.
 
-```{.python .input  n=38}
+```{.python .input  n=7}
 mini2_res = train_sgd(.05, 10)
 ```
 
 Finally, we compare the time versus loss for the preview four experiments. As can be seen, despite SGD converges faster than GD in terms of number of examples processed, it uses more time to reach the same loss than GD because that computing gradient example by example is not efficient. Mini-batch SGD is able to trade-off the convergence speed and computation efficiency. Here, a batch size 10 improves SGD, and a batch size 100 even outperforms GD.
 
-```{.python .input  n=40}
+```{.python .input  n=8}
 d2l.set_figsize([6, 3])
-for res in [gd_res, sgd_res, mini1_res, mini2_res]:
-    d2l.plt.plot(res[0], res[1])
-d2l.plt.xlabel('time (sec)')
-d2l.plt.ylabel('loss')
-d2l.plt.xscale('log')
-d2l.plt.xlim([1e-3, 1])
-d2l.plt.legend(['gd', 'sgd', 'batch size=100', 'batch size=10']);
+d2l.plot(*list(map(list, zip(gd_res, sgd_res, mini1_res, mini2_res))),
+        'time (sec)', 'loss', xlim=[1e-2, 10],
+        legend=['gd', 'sgd', 'batch size=100', 'batch size=10'])
+d2l.plt.gca().set_xscale('log')
 ```
 
 ## Concise Implementation
@@ -153,46 +132,40 @@ d2l.plt.legend(['gd', 'sgd', 'batch size=100', 'batch size=10']);
 In Gluon, we can use the `Trainer` class to call optimization algorithms. Next, we are going to implement a generic training function that uses the optimization name `trainer name` and hyperparameter `trainer_hyperparameter` to create the instance `Trainer`.
 
 ```{.python .input  n=9}
-# This function is saved in the d2l package for future use
-def train_gluon_ch9(trainer_name, trainer_hyperparams, features, labels,
-                    batch_size=10, num_epochs=2):
-    # Initialize model parameters
+# Save to the d2l package.
+def train_gluon_ch10(trainer_name, trainer_hyperparams,
+                     data_iter, num_epochs=2):
+    # Initialization
     net = nn.Sequential()
     net.add(nn.Dense(1))
     net.initialize(init.Normal(sigma=0.01))
-    loss = gloss.L2Loss()
-
-    def eval_loss():
-        return loss(net(features), labels).mean().asscalar()
-
-    ls = [eval_loss()]
-    data_iter = gdata.DataLoader(
-        gdata.ArrayDataset(features, labels), batch_size, shuffle=True)
-    # Create the instance "Trainer" to update model parameter(s)
     trainer = gluon.Trainer(
         net.collect_params(), trainer_name, trainer_hyperparams)
+    loss = gluon.loss.L2Loss()
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss',
+                            xlim=[0, num_epochs], ylim=[0.22, 0.35])
+    n, timer = 0, d2l.Timer()
     for _ in range(num_epochs):
-        start = time.time()
-        for batch_i, (X, y) in enumerate(data_iter):
+        for X, y in data_iter:
             with autograd.record():
                 l = loss(net(X), y)
             l.backward()
-            # Average the gradient in the "Trainer" instance
-            trainer.step(batch_size)
-            if (batch_i + 1) * batch_size % 100 == 0:
-                ls.append(eval_loss())
-    # Print and plot the results
-    print('loss: %f, %f sec per epoch' % (ls[-1], time.time() - start))
-    d2l.set_figsize()
-    d2l.plt.plot(np.linspace(0, num_epochs, len(ls)), ls)
-    d2l.plt.xlabel('epoch')
-    d2l.plt.ylabel('loss')
+            trainer.step(X.shape[0])
+            n += X.shape[0]
+            if n % 200 == 0:
+                timer.stop()
+                animator.add(n/X.shape[0]/len(data_iter),
+                             d2l.evaluate_loss(net, data_iter, loss))
+                timer.start()
+    print('loss: %.3f, %.3f sec/epoch'%(animator.Y[0][-1], timer.avg()))
+    return timer.cumsum(), animator.Y[0]
 ```
 
 Use Gluon to repeat the last experiment.
 
 ```{.python .input  n=10}
-train_gluon_ch9('sgd', {'learning_rate': 0.05}, features, labels, 10)
+data_iter, _ = get_data_ch10(10)
+train_gluon_ch10('sgd', {'learning_rate': 0.05}, data_iter);
 ```
 
 ## Summary

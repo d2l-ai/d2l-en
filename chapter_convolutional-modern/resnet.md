@@ -27,14 +27,11 @@ Let us focus on a local neural network, as depicted below. Denote the input by $
 ResNet follows VGG's full $3\times 3$ convolutional layer design. The residual block has two $3\times 3$ convolutional layers with the same number of output channels. Each convolutional layer is followed by a batch normalization layer and a ReLU activation function. Then, we skip these two convolution operations and add the input directly before the final ReLU activation function. This kind of design requires that the output of the two convolutional layers be of the same shape as the input, so that they can be added together. If we want to change the number of channels or the the stride, we need to introduce an additional $1\times 1$ convolutional layer to transform the input into the desired shape for the addition operation. Let's have a look at the code below.
 
 ```{.python .input  n=1}
-import sys
-sys.path.insert(0, '..')
-
 import d2l
-from mxnet import gluon, init, nd
+from mxnet import gluon, nd
 from mxnet.gluon import nn
 
-# This class has been saved in the d2l package for future use
+# Save to the d2l package. 
 class Residual(nn.Block):
     def __init__(self, num_channels, use_1x1conv=False, strides=1, **kwargs):
         super(Residual, self).__init__(**kwargs)
@@ -48,7 +45,7 @@ class Residual(nn.Block):
             self.conv3 = None
         self.bn1 = nn.BatchNorm()
         self.bn2 = nn.BatchNorm()
-
+    
     def forward(self, X):
         Y = nd.relu(self.bn1(self.conv1(X)))
         Y = self.bn2(self.conv2(Y))
@@ -138,12 +135,9 @@ for layer in net:
 We train ResNet on the Fashion-MNIST data set, just like before. The only thing that has changed is the learning rate that decreased again, due to the more complex architecture.
 
 ```{.python .input}
-lr, num_epochs, batch_size, ctx = 0.05, 5, 256, d2l.try_gpu()
-net.initialize(force_reinit=True, ctx=ctx, init=init.Xavier())
-trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
+lr, num_epochs, batch_size = 0.05, 10, 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=96)
-d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,
-              num_epochs)
+d2l.train_ch5(net, train_iter, test_iter, num_epochs, lr)
 ```
 
 ## Summary

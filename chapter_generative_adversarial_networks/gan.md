@@ -35,11 +35,9 @@ Many of the GANs applications are in the context of images. As a demonstration p
 
 ```{.python .input  n=1}
 %matplotlib inline
-
 import d2l
 from mxnet import nd, gluon, autograd, init
 from mxnet.gluon import nn
-from IPython import display
 ```
 
 ## Generate some "real" data
@@ -56,7 +54,8 @@ data = nd.dot(X, A) + b
 Let's see what we got. This should be a Gaussian shifted in some rather arbitrary way with mean $b$ and covariance matrix $A^TA$.
 
 ```{.python .input  n=3}
-d2l.set_figsize((6, 3))
+d2l.use_svg_display()
+#d2l.plt.figure(figsize=())
 d2l.plt.scatter(data[:100,0].asnumpy(), data[:100,1].asnumpy());
 print("The covariance matrix is", nd.dot(A.T,A))
 ```
@@ -92,7 +91,8 @@ net_D.add(nn.Dense(5, activation='tanh'),
 First we define a function to update the discriminator.
 
 ```{.python .input  n=7}
-def update_D(X, Z, net_D, net_G, loss, trainer_D):  # saved in d2l
+# Save to the d2l package. 
+def update_D(X, Z, net_D, net_G, loss, trainer_D):
     """Update discriminator"""
     batch_size = X.shape[0]
     ones = nd.ones((batch_size,), ctx=X.context)
@@ -106,12 +106,13 @@ def update_D(X, Z, net_D, net_G, loss, trainer_D):  # saved in d2l
         loss_D = (loss(real_Y, ones) + loss(fake_Y, zeros)) / 2
     loss_D.backward()
     trainer_D.step(batch_size)
-    return loss_D.mean().asscalar()
+    return loss_D.sum().asscalar()
 ```
 
 The generator is updated similarly. Here we reuse the cross entropy loss but change the label of the fake data from $0$ to $1$.
 
 ```{.python .input  n=8}
+# Save to the d2l package. 
 def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
     """Update generator"""
     batch_size = Z.shape[0]
@@ -124,53 +125,68 @@ def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
         loss_G = loss(fake_Y, ones)
     loss_G.backward()
     trainer_G.step(batch_size)
-    return loss_G.mean().asscalar()
+    return loss_G.sum().asscalar()
 ```
 
-In each iteration, we first update the discriminator and then the generator. We visualize losses for each network, and also show the generated data from the generator.
+In each iteration, we first update the discriminator and then the generator. The following function runs one data epoch and return both the discriminator loss and generator loss. 
+
+```{.python .input}
+def train_epoch(net_D, net_G, loss, trainer_D, trainer_G, latent_dim):
+    total_loss_D, total_loss_G, n = 0.0, 0.0, 0
+    for X in data_iter:
+        batch_size = X.shape[0]
+        Z = nd.random.normal(0, 1, shape=(batch_size, latent_dim))
+        total_loss_D += update_D(X, Z, net_D, net_G, loss, trainer_D)
+        total_loss_G += update_G(Z, net_D, net_G, loss, trainer_G)
+        n += batch_size
+    return total_loss_D/n, total_loss_G/n
+```
+
+Similar to the `plot` function defined in :numref:`chapter_softmax_scratch`, here we create a convenient `scatter` function. 
+
+```{.python .input}
+def scatter(X, Y, x_label=None, y_label=None, legend=None,
+            xlim=None, ylim=None, axes=None):
+    """A scatter plot of multiple data series"""
+    axes = axes if axes else d2l.plt.gca()
+    d2l.draw(axes, axes.scatter, X, Y, x_label, y_label, legend, xlim, ylim)
+```
+
+Both the discriminator and the generator performs a binary logistic regression with the cross entropy loss. We use Adam to smooth the training process. We visualize both losses and generated examples. 
 
 ```{.python .input  n=9}
-def train():
-    all_loss_D, all_loss_G = [], []
-    fig, (ax1, ax2) = d2l.plt.subplots(2, 1, figsize=(6,6))
+def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
+    loss = gluon.loss.SigmoidBCELoss()
+    net_D.initialize(init=init.Normal(0.02), force_reinit=True)
+    net_G.initialize(init=init.Normal(0.02), force_reinit=True)
+    trainer_D = gluon.Trainer(net_D.collect_params(),
+                              'adam', {'learning_rate': lr_D})
+    trainer_G = gluon.Trainer(net_G.collect_params(),
+                              'adam', {'learning_rate': lr_G})
+    losses = []
+    fig, (ax1, ax2) = d2l.plt.subplots(2, 1, figsize=(6, 6))
     fig.subplots_adjust(hspace=0.3)
     for epoch in range(1, num_epochs+1):
-        total_loss_D, total_loss_G = 0.0, 0.0
-        for i, X in enumerate(data_iter):
-            Z = nd.random.normal(0, 1, shape=(batch_size, latent_dim))
-            total_loss_D += update_D(X, Z, net_D, net_G, loss, trainer_D)
-            total_loss_G += update_G(Z, net_D, net_G, loss, trainer_G)
-        # Show progress.
-        all_loss_D.append(total_loss_D/len(data_iter))
-        all_loss_G.append(total_loss_G/len(data_iter))
-        d2l.plot(list(range(1, epoch+1)), [all_loss_G, all_loss_D],
+        losses.append(train_epoch(
+            net_D, net_G, loss, trainer_D, trainer_G, latent_dim))
+        # Visualize the losses.
+        d2l.plot(list(range(1, epoch+1)), list(map(list, zip(*losses))),
                  'epoch', 'loss', ['generator', 'discriminator'],
                  xlim=[0, num_epochs+1], axes=ax1)
         # Show generated examples
         Z = nd.random.normal(0, 1, shape=(100, latent_dim))
-        fake_X = net_G(Z)
-        d2l.scatter([data[:100,0], fake_X[:,0]], [data[:100,1], fake_X[:,1]],
-                    'x', 'y', ['real', 'generated'], axes=ax2)
+        fake_X = net_G(Z).asnumpy()
+        scatter([data[:,0], fake_X[:,0]], [data[:,1], fake_X[:,1]],
+                'x', 'y', ['real', 'generated'], axes=ax2)
         d2l.show(fig)
 ```
 
 Now we specify the hyper-parameters to fit the Gaussian distribution.
 
 ```{.python .input  n=10}
-lr_D = 0.05
-lr_G = 0.005
-latent_dim = 2
-num_epochs = 20
-
-loss = gluon.loss.SigmoidBCELoss()
-net_D.initialize(init=init.Normal(0.02), force_reinit=True)
-net_G.initialize(init=init.Normal(0.02), force_reinit=True)
-trainer_D = gluon.Trainer(net_D.collect_params(),
-                          'adam', {'learning_rate': lr_D})
-trainer_G = gluon.Trainer(net_G.collect_params(),
-                          'adam', {'learning_rate': lr_G})
-
-train()
+lr_D, lr_G, latent_dim, num_epochs = 0.05, 0.005, 2, 20
+train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, 
+      latent_dim, data[:100].asnumpy())
 ```
 
 ## Summary
