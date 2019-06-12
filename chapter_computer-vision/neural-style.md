@@ -2,15 +2,19 @@
 
 If you use social sharing apps or happen to be an amateur photographer, you are familiar with filters. Filters can alter the color styles of photos to make the background sharper or people's faces whiter. However, a filter generally can only change one aspect of a photo. To create the ideal photo, you often need to try many different filter combinations. This process is as complex as tuning the hyper-parameters of a model.
 
-In this section, we will discuss how we can use convolution neural networks (CNNs) to automatically apply the style of one image to another image, an operation known as style transfer[1]. Here, we need two input images, one content image and one style image. We use a neural network to alter the content image so that its style mirrors that of the style image. In Figure 11.12, the content image is a landscape photo the author took in Mount Rainier National Part near Seattle. The style image is an oil painting of oak trees in autumn. The output composite image retains the overall shapes of the objects in the content image, but applies the oil painting brushwork of the style image and makes the overall color more vivid.
+In this section, we will discuss how we can use convolution neural networks (CNNs) to automatically apply the style of one image to another image, an operation known as style transfer[1]. Here, we need two input images, one content image and one style image. We use a neural network to alter the content image so that its style mirrors that of the style image. In :numref:`fig_style-transfer`, the content image is a landscape photo the author took in Mount Rainier National Part near Seattle. The style image is an oil painting of oak trees in autumn. The output composite image retains the overall shapes of the objects in the content image, but applies the oil painting brushwork of the style image and makes the overall color more vivid.
 
 ![Content and style input images and composite image produced by style transfer. ](../img/style-transfer.svg)
+:label:`fig_style_transfer`
 
 ## Technique
 
-Figure 11.13 shows an output of the CNN-based style transfer method. First, we initialize the composite image. For example, we can initialize it as the content image. This composite image is the only variable that needs to be updated in the style transfer process, i.e. the model parameter to be updated in style transfer. Then, we select a pre-trained CNN to extract image features. These model parameters do not need to be updated during training. The deep CNN uses multiple neural layers that successively extract image features. We can select the output of certain layers to use as content features or style features. If we use the structure in Figure 11.13, the pretrained neural network contains three convolutional layers. The second layer outputs the image content features, while the outputs of the first and third layers are used as style features. Next, we use forward propagation (in the direction of the solid lines) to compute the style transfer loss function and backward propagation (in the direction of the dotted lines) to update the model parameter, constantly updating the composite image. The loss functions used in style transfer generally have three parts: 1. Content loss is used to make the composite image approximate the content image as regards content features. 2. Style loss is used to make the composite image approximate the style image in terms of style features. 3. Total variation loss helps reduce the noise in the composite image. Finally, after we finish training the model, we output the style transfer model parameters to obtain the final composite image.
+The CNN-based style transfer model is shown in :numref:`fig_style_transfer_model`.
+First, we initialize the composite image. For example, we can initialize it as the content image. This composite image is the only variable that needs to be updated in the style transfer process, i.e. the model parameter to be updated in style transfer. Then, we select a pre-trained CNN to extract image features. These model parameters do not need to be updated during training. The deep CNN uses multiple neural layers that successively extract image features. We can select the output of certain layers to use as content features or style features. If we use the structure in :numref:`fig_style_transfer_model`, the pretrained neural network contains three convolutional layers. The second layer outputs the image content features, while the outputs of the first and third layers are used as style features. Next, we use forward propagation (in the direction of the solid lines) to compute the style transfer loss function and backward propagation (in the direction of the dotted lines) to update the model parameter, constantly updating the composite image. The loss functions used in style transfer generally have three parts: 1. Content loss is used to make the composite image approximate the content image as regards content features. 2. Style loss is used to make the composite image approximate the style image in terms of style features. 3. Total variation loss helps reduce the noise in the composite image. Finally, after we finish training the model, we output the style transfer model parameters to obtain the final composite image.
 
 ![CNN-based style transfer process. Solid lines show the direction of forward propagation and dotted lines show backward propagation. ](../img/neural-style.svg)
+:label:`fig_style_transfer_model`
+
 
 Next, we will perform an experiment to help us better understand the technical details of style transfer.
 
@@ -19,16 +23,12 @@ Next, we will perform an experiment to help us better understand the technical d
 First, we read the content and style images. By printing out the image coordinate axes, we can see that they have different dimensions.
 
 ```{.python .input  n=1}
-import sys
-sys.path.insert(0, '..')
-
 %matplotlib inline
 import d2l
 from mxnet import autograd, gluon, image, init, nd
-from mxnet.gluon import model_zoo, nn
-import time
+from mxnet.gluon import nn
 
-d2l.set_figsize()
+d2l.set_figsize((3.5, 2.5))
 content_img = image.imread('../img/rainier.jpg')
 d2l.plt.imshow(content_img.asnumpy());
 ```
@@ -61,10 +61,10 @@ def postprocess(img):
 We use the VGG-19 model pre-trained on the ImageNet data set to extract image features[1].
 
 ```{.python .input  n=4}
-pretrained_net = model_zoo.vision.vgg19(pretrained=True)
+pretrained_net = gluon.model_zoo.vision.vgg19(pretrained=True)
 ```
 
-To extract image content and style features, we can select the outputs of certain layers in the VGG network. In general, the closer an output is to the input layer, the easier it is to extract image detail information. The farther away an output is, the easier it is to extract global information. To prevent the composite image from retaining too many details from the content image, we select a VGG network layer near the output layer to output the image content features. This layer is called the content layer. We also select the outputs of different layers from the VGG network for matching local and global styles. These are called the style layers. As we mentioned in the ["Networks Using Duplicates (VGG)"](../chapter_convolutional-neural-networks/vgg.md) section, VGG networks have five convolutional blocks. In this experiment, we select the last convolutional layer of the fourth convolutional block as the content layer and the first layer of each block as style layers. We can obtain the indexes for these layers by printing the `pretrained_net` instance.
+To extract image content and style features, we can select the outputs of certain layers in the VGG network. In general, the closer an output is to the input layer, the easier it is to extract image detail information. The farther away an output is, the easier it is to extract global information. To prevent the composite image from retaining too many details from the content image, we select a VGG network layer near the output layer to output the image content features. This layer is called the content layer. We also select the outputs of different layers from the VGG network for matching local and global styles. These are called the style layers. As we mentioned in :numref:`chapter_vgg`, VGG networks have five convolutional blocks. In this experiment, we select the last convolutional layer of the fourth convolutional block as the content layer and the first layer of each block as style layers. We can obtain the indexes for these layers by printing the `pretrained_net` instance.
 
 ```{.python .input  n=5}
 style_layers, content_layers = [0, 5, 10, 19, 28], [25]
@@ -207,10 +207,12 @@ epochs, the process may occupy a great deal of memory. Therefore, we call the
 `waitall` synchronization function during every epoch.
 
 ```{.python .input  n=16}
-def train(X, contents_Y, styles_Y, ctx, lr, max_epochs, lr_decay_epoch):
+def train(X, contents_Y, styles_Y, ctx, lr, num_epochs, lr_decay_epoch):
     X, styles_Y_gram, trainer = get_inits(X, ctx, lr, styles_Y)
-    for i in range(max_epochs):
-        start = time.time()
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss', xlim=[1, num_epochs],
+                            legend=['content', 'style', 'TV'],
+                            ncols=2, figsize=(7,2.5))
+    for epoch in range(1, num_epochs+1):
         with autograd.record():
             contents_Y_hat, styles_Y_hat = extract_features(
                 X, content_layers, style_layers)
@@ -219,15 +221,12 @@ def train(X, contents_Y, styles_Y, ctx, lr, max_epochs, lr_decay_epoch):
         l.backward()
         trainer.step(1)
         nd.waitall()
-        if i % 50 == 0 and i != 0:
-            print('epoch %3d, content loss %.2f, style loss %.2f, '
-                  'TV loss %.2f, %.2f sec'
-                  % (i, nd.add_n(*contents_l).asscalar(),
-                     nd.add_n(*styles_l).asscalar(), tv_l.asscalar(),
-                     time.time() - start))
-        if i % lr_decay_epoch == 0 and i != 0:
+        if epoch % lr_decay_epoch == 0:
             trainer.set_learning_rate(trainer.learning_rate * 0.1)
-            print('change lr to %.1e' % trainer.learning_rate)
+        if epoch % 10 == 0:
+            animator.axes[1].imshow(postprocess(X).asnumpy())
+            animator.add(epoch, [nd.add_n(*contents_l).asscalar(),
+                     nd.add_n(*styles_l).asscalar(), tv_l.asscalar()])
     return X
 ```
 
@@ -241,29 +240,23 @@ _, styles_Y = get_styles(image_shape, ctx)
 output = train(content_X, contents_Y, styles_Y, ctx, 0.01, 500, 200)
 ```
 
-Next, we save the trained composite image. As you can see, the composite image in Figure 11.14 retains the scenery and objects of the content image, while introducing the color of the style image. Because the image is relatively small, the details are a bit fuzzy.
+As you can see, the composite image retains the scenery and objects of the content image, while introducing the color of the style image. Because the image is relatively small, the details are a bit fuzzy.
 
-```{.python .input  n=18}
-d2l.plt.imsave('../img/neural-style-1.png', postprocess(output).asnumpy())
-```
-
-![$150 \times 225$ composite image. ](../img/neural-style-1.png)
-
-To obtain a clearer composite image, we train the model using a larger image size: $300 \times 450$. We increase the height and width of the image in Figure 11.14 by a factor of two and initialize a larger composite image.
+To obtain a clearer composite image, we train the model using a larger image size: $900 \times 600$. We increase the height and width of the image used before by a factor of four and initialize a larger composite image.
 
 ```{.python .input  n=19}
-image_shape = (450, 300)
+image_shape = (900, 600)
 _, content_Y = get_contents(image_shape, ctx)
 _, style_Y = get_styles(image_shape, ctx)
 X = preprocess(postprocess(output) * 255, image_shape)
 output = train(X, content_Y, style_Y, ctx, 0.01, 300, 100)
-d2l.plt.imsave('../img/neural-style-2.png', postprocess(output).asnumpy())
+d2l.plt.imsave('../img/neural-style.png', postprocess(output).asnumpy())
 ```
 
-As you can see, each epoch takes more time due to the larger image size. As shown in Figure 11.15, the composite image produced retains more detail due to its larger size. The composite image not only has large blocks of color like the style image, but these blocks even have the subtle texture of brush strokes.
+As you can see, each epoch takes more time due to the larger image size. As shown in :numref:`fig_style_transfer_large`, the composite image produced retains more detail due to its larger size. The composite image not only has large blocks of color like the style image, but these blocks even have the subtle texture of brush strokes.
 
-![$300 \times 450$ composite image. ](../img/neural-style-2.png)
-
+![$900 \times 600$ composite image. ](../img/neural-style.png)
+:label:`fig_style_transfer_large`
 
 ## Summary
 

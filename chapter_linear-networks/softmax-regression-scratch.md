@@ -258,16 +258,17 @@ def train_epoch_ch3(net, train_iter, loss, updater):
 Then we define a class that draw data in animation.
 
 ```{.python .input  n=16}
-# Save to the d2l package
+# Save to the d2l package.
 class Animator(object):
-    def __init__(self, xlabel=None, ylabel=None, legend=None, xlim=None, 
-                 ylim=None, xscale=None, yscale=None, fmts=None, 
-                 figsize=(3.5, 2.5)):
+    def __init__(self, xlabel=None, ylabel=None, legend=None, xlim=None,
+                 ylim=None, xscale=None, yscale=None, fmts=None,
+                 nrows=1, ncols=1, figsize=(3.5, 2.5)):
         """Incrementally plot multiple lines."""
         d2l.use_svg_display()
-        self.fig, self.axes = d2l.plt.subplots(figsize=figsize)
+        self.fig, self.axes = d2l.plt.subplots(nrows, ncols, figsize=figsize)
+        if nrows * ncols == 1: self.axes = [self.axes,]
         set_one = lambda name, var : getattr(
-            self.axes, name)(var) if var else None
+            self.axes[0], name)(var) if var else None
         self.set_axes = lambda : (
             set_one('set_xlabel', xlabel),
             set_one('set_ylabel', ylabel),
@@ -277,7 +278,7 @@ class Animator(object):
             set_one('set_yscale', yscale),
             set_one('legend', legend))
         self.X, self.Y, self.fmts = None, None, fmts
-        
+
     def add(self, x, y):
         """Add multiple data points into the figure."""
         if not hasattr(y, "__len__"): y = [y]
@@ -289,12 +290,12 @@ class Animator(object):
         for i, (a, b) in enumerate(zip(x, y)):
             if a is not None and b is not None:
                 self.X[i].append(a)
-                self.Y[i].append(b)        
-        self.axes.cla()
+                self.Y[i].append(b)
+        self.axes[0].cla()
         for x, y, fmt in zip(self.X, self.Y, self.fmts):
-            self.axes.plot(x, y, fmt)
+            self.axes[0].plot(x, y, fmt)
         self.set_axes()
-        self.axes.grid()
+        self.axes[0].grid()
         display.display(self.fig)
         display.clear_output(wait=True)
 ```

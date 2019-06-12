@@ -15,14 +15,11 @@ Figure 11.17 shows the information on the competition's webpage. In order to sub
 First, import the packages or modules required for the competition.
 
 ```{.python .input}
-import sys
-sys.path.insert(0, '..')
-
 import collections
 import d2l
 import math
 from mxnet import autograd, gluon, init, nd
-from mxnet.gluon import data as gdata, loss as gloss, model_zoo, nn
+from mxnet.gluon import nn
 import os
 import shutil
 import time
@@ -127,34 +124,34 @@ else:
 The size of the images in this section are larger than the images in the previous section. Here are some more image augmentation operations that might be useful.
 
 ```{.python .input  n=4}
-transform_train = gdata.vision.transforms.Compose([
+transform_train = gluon.data.vision.transforms.Compose([
     # Randomly crop the image to obtain an image with an area of 0.08 to 1 of
     # the original area and height to width ratio between 3/4 and 4/3. Then,
     # scale the image to create a new image with a height and width of 224
     # pixels each
-    gdata.vision.transforms.RandomResizedCrop(224, scale=(0.08, 1.0),
+    gluon.data.vision.transforms.RandomResizedCrop(224, scale=(0.08, 1.0),
                                               ratio=(3.0/4.0, 4.0/3.0)),
-    gdata.vision.transforms.RandomFlipLeftRight(),
+    gluon.data.vision.transforms.RandomFlipLeftRight(),
     # Randomly change the brightness, contrast, and saturation
-    gdata.vision.transforms.RandomColorJitter(brightness=0.4, contrast=0.4,
+    gluon.data.vision.transforms.RandomColorJitter(brightness=0.4, contrast=0.4,
                                               saturation=0.4),
     # Add random noise
-    gdata.vision.transforms.RandomLighting(0.1),
-    gdata.vision.transforms.ToTensor(),
+    gluon.data.vision.transforms.RandomLighting(0.1),
+    gluon.data.vision.transforms.ToTensor(),
     # Standardize each channel of the image
-    gdata.vision.transforms.Normalize([0.485, 0.456, 0.406],
+    gluon.data.vision.transforms.Normalize([0.485, 0.456, 0.406],
                                       [0.229, 0.224, 0.225])])
 ```
 
 During testing, we only use definite image preprocessing operations.
 
 ```{.python .input}
-transform_test = gdata.vision.transforms.Compose([
-    gdata.vision.transforms.Resize(256),
+transform_test = gluon.data.vision.transforms.Compose([
+    gluon.data.vision.transforms.Resize(256),
     # Crop a square of 224 by 224 from the center of the image
-    gdata.vision.transforms.CenterCrop(224),
-    gdata.vision.transforms.ToTensor(),
-    gdata.vision.transforms.Normalize([0.485, 0.456, 0.406],
+    gluon.data.vision.transforms.CenterCrop(224),
+    gluon.data.vision.transforms.ToTensor(),
+    gluon.data.vision.transforms.Normalize([0.485, 0.456, 0.406],
                                       [0.229, 0.224, 0.225])])
 ```
 
@@ -163,26 +160,26 @@ transform_test = gdata.vision.transforms.Compose([
 As in the previous section, we can create an `ImageFolderDataset` instance to read the data set containing the original image files.
 
 ```{.python .input  n=5}
-train_ds = gdata.vision.ImageFolderDataset(
+train_ds = gluon.data.vision.ImageFolderDataset(
     os.path.join(data_dir, input_dir, 'train'), flag=1)
-valid_ds = gdata.vision.ImageFolderDataset(
+valid_ds = gluon.data.vision.ImageFolderDataset(
     os.path.join(data_dir, input_dir, 'valid'), flag=1)
-train_valid_ds = gdata.vision.ImageFolderDataset(
+train_valid_ds = gluon.data.vision.ImageFolderDataset(
     os.path.join(data_dir, input_dir, 'train_valid'), flag=1)
-test_ds = gdata.vision.ImageFolderDataset(
+test_ds = gluon.data.vision.ImageFolderDataset(
     os.path.join(data_dir, input_dir, 'test'), flag=1)
 ```
 
 Here, we create a `DataLoader` instance, just like in the previous section.
 
 ```{.python .input}
-train_iter = gdata.DataLoader(train_ds.transform_first(transform_train),
+train_iter = gluon.data.DataLoader(train_ds.transform_first(transform_train),
                               batch_size, shuffle=True, last_batch='keep')
-valid_iter = gdata.DataLoader(valid_ds.transform_first(transform_test),
+valid_iter = gluon.data.DataLoader(valid_ds.transform_first(transform_test),
                               batch_size, shuffle=True, last_batch='keep')
-train_valid_iter = gdata.DataLoader(train_valid_ds.transform_first(
+train_valid_iter = gluon.data.DataLoader(train_valid_ds.transform_first(
     transform_train), batch_size, shuffle=True, last_batch='keep')
-test_iter = gdata.DataLoader(test_ds.transform_first(transform_test),
+test_iter = gluon.data.DataLoader(test_ds.transform_first(transform_test),
                              batch_size, shuffle=False, last_batch='keep')
 ```
 
@@ -208,7 +205,7 @@ You must note that, during image augmentation, we use the mean values and standa
 
 ```{.python .input  n=6}
 def get_net(ctx):
-    finetune_net = model_zoo.vision.resnet34_v2(pretrained=True)
+    finetune_net = gluon.model_zoo.vision.resnet34_v2(pretrained=True)
     # Define a new output network
     finetune_net.output_new = nn.HybridSequential(prefix='')
     finetune_net.output_new.add(nn.Dense(256, activation='relu'))
@@ -224,7 +221,7 @@ def get_net(ctx):
 When calculating the loss, we first use the member variable `features` to obtain the input of the pre-trained model's output layer, i.e. the extracted feature. Then, we use this feature as the input for our small custom output network and compute the output.
 
 ```{.python .input}
-loss = gloss.SoftmaxCrossEntropyLoss()
+loss = gluon.loss.SoftmaxCrossEntropyLoss()
 
 def evaluate_loss(data_iter, net, ctx):
     l_sum, n = 0.0, 0
