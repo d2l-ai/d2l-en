@@ -72,8 +72,10 @@ import sys
 sys.path.insert(0, '..')
 
 import d2l
-from mxnet import nd, init
+from mxnet import np, npx, init
 from mxnet.gluon import rnn
+
+npx.set_np()
 
 corpus_indices, vocab = d2l.load_data_time_machine()
 ```
@@ -88,12 +90,12 @@ ctx = d2l.try_gpu()
 
 def get_params():
     def _one(shape):
-        return nd.random.normal(scale=0.01, shape=shape, ctx=ctx)
+        return np.random.normal(scale=0.01, size=shape, ctx=ctx)
 
     def _three():
         return (_one((num_inputs, num_hiddens)),
                 _one((num_hiddens, num_hiddens)),
-                nd.zeros(num_hiddens, ctx=ctx))
+                np.zeros(num_hiddens, ctx=ctx))
 
     W_xi, W_hi, b_i = _three()  # Input gate parameters
     W_xf, W_hf, b_f = _three()  # Forget gate parameters
@@ -101,7 +103,7 @@ def get_params():
     W_xc, W_hc, b_c = _three()  # Candidate cell parameters
     # Output layer parameters
     W_hq = _one((num_hiddens, num_outputs))
-    b_q = nd.zeros(num_outputs, ctx=ctx)
+    b_q = np.zeros(num_outputs, ctx=ctx)
     # Create gradient
     params = [W_xi, W_hi, b_i, W_xf, W_hf, b_f, W_xo, W_ho, b_o, W_xc, W_hc,
               b_c, W_hq, b_q]
@@ -116,8 +118,8 @@ In the initialization function, the hidden state of the LSTM needs to return an 
 
 ```{.python .input  n=3}
 def init_lstm_state(batch_size, num_hiddens, ctx):
-    return (nd.zeros(shape=(batch_size, num_hiddens), ctx=ctx),
-            nd.zeros(shape=(batch_size, num_hiddens), ctx=ctx))
+    return (np.zeros(shape=(batch_size, num_hiddens), ctx=ctx),
+            np.zeros(shape=(batch_size, num_hiddens), ctx=ctx))
 ```
 
 The actual model is defined just like we discussed it before with three gates and an auxiliary memory cell. Note that only the hidden state is passed on to the output layer. The memory cells do not participate in the computation directly.
@@ -129,13 +131,13 @@ def lstm(inputs, state, params):
     (H, C) = state
     outputs = []
     for X in inputs:
-        I = nd.sigmoid(nd.dot(X, W_xi) + nd.dot(H, W_hi) + b_i)
-        F = nd.sigmoid(nd.dot(X, W_xf) + nd.dot(H, W_hf) + b_f)
-        O = nd.sigmoid(nd.dot(X, W_xo) + nd.dot(H, W_ho) + b_o)
-        C_tilda = nd.tanh(nd.dot(X, W_xc) + nd.dot(H, W_hc) + b_c)
+        I = npx.sigmoid(np.dot(X, W_xi) + np.dot(H, W_hi) + b_i)
+        F = npx.sigmoid(np.dot(X, W_xf) + np.dot(H, W_hf) + b_f)
+        O = npx.sigmoid(np.dot(X, W_xo) + np.dot(H, W_ho) + b_o)
+        C_tilda = np.tanh(np.dot(X, W_xc) + np.dot(H, W_hc) + b_c)
         C = F * C + I * C_tilda
-        H = O * C.tanh()
-        Y = nd.dot(H, W_hq) + b_q
+        H = O * np.tanh(C)
+        Y = np.dot(H, W_hq) + b_q
         outputs.append(Y)
     return outputs, (H, C)
 ```
