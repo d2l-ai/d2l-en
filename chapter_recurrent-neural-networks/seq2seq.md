@@ -16,9 +16,11 @@ import sys
 sys.path.insert(0, '..')
 
 import time
-from mxnet import nd, init, gluon, autograd
+from mxnet import np, npx, init, gluon, autograd
 from mxnet.gluon import nn, rnn, loss as gloss
 import d2l
+
+npx.set_np()
 ```
 
 ## Encoder
@@ -50,7 +52,7 @@ Next, we will create a mini-batch sequence input with a batch size of 4 and 7 ti
 encoder = Seq2SeqEncoder(vocab_size=10, embed_size=8,
                          num_hiddens=16, num_layers=2)
 encoder.initialize()
-X = nd.zeros((4, 7))
+X = np.zeros((4, 7))
 output, state = encoder(X)
 output.shape, len(state), state[0].shape, state[1].shape
 ```
@@ -99,15 +101,15 @@ For each time step, the decoder outputs a vocabulary size confident score vector
 To implement the loss function that filters out some entries, we will use an operator called `SequenceMask`. It can specify to mask the first dimension (`axis=0`) or the second one (`axis=1`). If the second one is chosen, given a valid length vector `len` and 2-dim input `X`, this operator sets `X[i, len[i]:] = 0` for all $i$'s.
 
 ```{.python .input  n=7}
-X = nd.array([[1,2,3], [4,5,6]])
-nd.SequenceMask(X, nd.array([1,2]), True, axis=1)
+X = np.array([[1,2,3], [4,5,6]])
+npx.SequenceMask(X, np.array([1,2]), True, axis=1)
 ```
 
 Apply to $n$-dim tensor $X$, it sets `X[i, len[i]:, :, ..., :] = 0`. In addition, we can specify the filling value beyond 0.
 
 ```{.python .input  n=8}
-X = nd.ones((2, 3, 4))
-nd.SequenceMask(X, nd.array([1,2]), True, value=-1, axis=1)
+X = np.ones((2, 3, 4))
+npx.SequenceMask(X, np.array([1,2]), True, value=-1, axis=1)
 ```
 
 Now we can implement the masked version of the softmax cross-entropy loss. Note that each Gluon loss function allows to specify per-example weights, in default they are 1s. Then we can just use a zero weight for each example we would like to remove. So our customized loss function accepts an additional `valid_length` argument to ignore some failing elements in each sequence.
@@ -119,8 +121,9 @@ class MaskedSoftmaxCELoss(gloss.SoftmaxCELoss):
     # valid_length shape: (batch_size, )
     def forward(self, pred, label, valid_length):
         # the sample weights shape should be (batch_size, seq_len, 1)
-        weights = nd.ones_like(label).expand_dims(axis=-1)
-        weights = nd.SequenceMask(weights, valid_length, True, axis=1)
+        weights = np.ones_like(label)
+        weights = np.expand_dims(weights, axis=-1)
+        weights = npx.SequenceMask(weights, valid_length, True, axis=1)
         return super(MaskedSoftmaxCELoss, self).forward(pred, label, weights)
 ```
 
@@ -128,7 +131,7 @@ For a sanity check, we create identical three sequences, keep 4 elements for the
 
 ```{.python .input  n=10}
 loss = MaskedSoftmaxCELoss()
-loss(nd.ones((3, 4, 10)), nd.ones((3, 4)), nd.array([4, 2, 0]))
+loss(np.ones((3, 4, 10)), np.ones((3, 4)), np.array([4, 2, 0]))
 ```
 
 ## Training
@@ -152,10 +155,10 @@ def train_ch7(model, data_iter, lr, num_epochs, ctx):  # Saved in d2l
                 l = loss(Y_hat, Y_label, Y_vlen)
             l.backward()
             d2l.grad_clipping_gluon(model, 5, ctx)
-            num_tokens = Y_vlen.sum().asscalar()
+            num_tokens = Y_vlen.sum()
             trainer.step(num_tokens)
-            l_sum += l.sum().asscalar()
-            num_tokens_sum += num_tokens
+            l_sum += float(l.sum())
+            num_tokens_sum += int(num_tokens)
         if epoch % 50 == 0:
             print("epoch %d, loss %.3f, time %.1f sec" % (
                 epoch, l_sum/num_tokens_sum, time.time()-tic))
@@ -188,25 +191,26 @@ During predicting, we feed the same "&lt;bos&gt;" token to the decoder as traini
 
 ![Sequence to sequence model predicting with greedy search](../img/seq2seq_predict.svg)
 
-
 ```{.python .input  n=15}
 def translate_ch7(model, src_sentence, src_vocab, tgt_vocab, max_len, ctx):
     src_tokens = src_vocab[src_sentence.lower().split(' ')]
     src_len = len(src_tokens)
     if src_len < max_len:
         src_tokens += [src_vocab.pad] * (max_len - src_len)
-    enc_X = nd.array(src_tokens, ctx=ctx)
-    enc_valid_length = nd.array([src_len], ctx=ctx)
+    enc_X = np.array(src_tokens, ctx=ctx)
+    enc_valid_length = np.array([src_len], ctx=ctx)
     # use expand_dim to add the batch_size dimension.
-    enc_outputs = model.encoder(enc_X.expand_dims(axis=0), enc_valid_length)
+    enc_X = np.expand_dims(enc_X, axis=0)
+    enc_outputs = model.encoder(enc_X, enc_valid_length)
     dec_state = model.decoder.init_state(enc_outputs, enc_valid_length)
-    dec_X = nd.array([tgt_vocab.bos], ctx=ctx).expand_dims(axis=0)
+    dec_X = np.array([tgt_vocab.bos], ctx=ctx)
+    dec_X = np.expand_dims(dec_X, axis=0)
     predict_tokens = []
     for _ in range(max_len):
         Y, dec_state = model.decoder(dec_X, dec_state)
         # The token with highest score is used as the next time step input.
         dec_X = Y.argmax(axis=2)
-        py = dec_X.squeeze(axis=0).astype('int32').asscalar()
+        py = int(dec_X.squeeze(axis=0).astype('int32'))
         if py == tgt_vocab.eos:
             break
         predict_tokens.append(py)

@@ -13,8 +13,10 @@ import collections
 import d2l
 import zipfile
 
-from mxnet import nd
+from mxnet import np, npx
 from mxnet.gluon import utils as gutils, data as gdata
+
+npx.set_np()
 ```
 
 ## Read and Pre-process Data
@@ -104,7 +106,7 @@ def build_array(lines, vocab, max_len, is_source):
     lines = [vocab[line] for line in lines]
     if not is_source:
         lines = [[vocab.bos] + line + [vocab.eos] for line in lines]
-    array = nd.array([pad(line, max_len, vocab.pad) for line in lines])
+    array = np.array([pad(line, max_len, vocab.pad) for line in lines])
     valid_len = (array != vocab.pad).sum(axis=1)
     return array, valid_len
 ```

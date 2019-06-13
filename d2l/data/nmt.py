@@ -1,4 +1,4 @@
-from mxnet import nd
+from mxnet import np
 from mxnet.gluon import utils as gutils, data as gdata
 import zipfile
 from .base import Vocab
@@ -47,7 +47,7 @@ def load_data_nmt(batch_size, max_len, num_examples=1000):
         lines = [vocab[line] for line in lines]
         if not is_source:
             lines = [[vocab.bos] + line + [vocab.eos] for line in lines]
-        array = nd.array([pad(line, max_len, vocab.pad) for line in lines])
+        array = np.array([pad(line, max_len, vocab.pad) for line in lines])
         valid_len = (array != vocab.pad).sum(axis=1)
         return array, valid_len
 
