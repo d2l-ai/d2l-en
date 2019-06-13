@@ -35,20 +35,21 @@ sys.path.insert(0, '..')
 
 %matplotlib inline
 import d2l
-from mxnet import nd
+from mxnet import nd, np, npx
+npx.set_np()
 
 features, labels = d2l.get_data_ch7()
 
 def init_adadelta_states():
-    s_w, s_b = nd.zeros((features.shape[1], 1)), nd.zeros(1)
-    delta_w, delta_b = nd.zeros((features.shape[1], 1)), nd.zeros(1)
+    s_w, s_b = np.zeros((features.shape[1], 1)), np.zeros(1)
+    delta_w, delta_b = np.zeros((features.shape[1], 1)), np.zeros(1)
     return ((s_w, delta_w), (s_b, delta_b))
 
 def adadelta(params, states, hyperparams):
     rho, eps = hyperparams['rho'], 1e-5
     for p, (s, delta) in zip(params, states):
-        s[:] = rho * s + (1 - rho) * p.grad.square()
-        g = ((delta + eps).sqrt() / (s + eps).sqrt()) * p.grad
+        s[:] = rho * s + (1 - rho) * np.square(p.grad)
+        g = (np.sqrt(delta + eps) / np.sqrt(s + eps)) * p.grad
         p[:] -= g
         delta[:] = rho * delta + (1 - rho) * g * g
 ```

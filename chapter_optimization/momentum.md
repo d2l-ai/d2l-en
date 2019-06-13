@@ -27,7 +27,8 @@ sys.path.insert(0, '..')
 
 %matplotlib inline
 import d2l
-from mxnet import nd
+from mxnet import nd, np, npx
+npx.set_np()
 
 eta = 0.4
 
@@ -110,7 +111,7 @@ The following code block shows the weights for the past 40 time steps under vari
 gammas = [0.95, 0.9, 0.6, 0]
 d2l.set_figsize()
 for gamma in gammas:
-    x = nd.arange(40).asnumpy()
+    x = np.arange(40).asnumpy()
     d2l.plt.plot(x, gamma ** x)
 d2l.plt.xlabel('time')
 d2l.plt.legend(['gamma = %.2f'%g for g in gammas]);
@@ -128,8 +129,8 @@ Compared with mini-batch SGD, the momentum method needs to maintain a velocity v
 features, labels = d2l.get_data_ch7()
 
 def init_momentum_states():
-    v_w = nd.zeros((features.shape[1], 1))
-    v_b = nd.zeros(1)
+    v_w = np.zeros((features.shape[1], 1))
+    v_b = np.zeros(1)
     return (v_w, v_b)
 
 def sgd_momentum(params, states, hyperparams):

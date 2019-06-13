@@ -31,16 +31,17 @@ sys.path.insert(0, '..')
 
 %matplotlib inline
 import d2l
-from mxnet import autograd, gluon, init, nd
+from mxnet import autograd, gluon, init, nd, np, npx
 from mxnet.gluon import nn, data as gdata, loss as gloss
-import numpy as np
+import numpy as onp
 import time
+npx.set_np()
 
 # This function is saved in the d2l package for future use
 def get_data_ch7():
-    data = np.genfromtxt('../data/airfoil_self_noise.dat', delimiter='\t')
+    data = onp.genfromtxt('../data/airfoil_self_noise.dat', delimiter='\t')
     data = (data - data.mean(axis=0)) / data.std(axis=0)
-    return nd.array(data[:1500, :-1]), nd.array(data[:1500, -1])
+    return np.array(data[:1500, :-1]), np.array(data[:1500, -1])
 
 features, labels = get_data_ch7()
 features.shape
@@ -71,13 +72,13 @@ def train_ch7(trainer_fn, states, hyperparams, features, labels,
               batch_size=10, num_epochs=2):
     # Initialize model parameters
     net, loss = d2l.linreg, d2l.squared_loss
-    w = nd.random.normal(scale=0.01, shape=(features.shape[1], 1))
-    b = nd.zeros(1)
+    w = np.random.normal(scale=0.01, size=(features.shape[1], 1))
+    b = np.zeros(1)
     w.attach_grad()
     b.attach_grad()
 
     def eval_loss():
-        return loss(net(features, w, b), labels).mean().asscalar()
+        return loss(net(features, w, b), labels).mean()
 
     ls, ts = [eval_loss()], [0,]
     data_iter = gdata.DataLoader(
@@ -99,7 +100,7 @@ def train_ch7(trainer_fn, states, hyperparams, features, labels,
     # Print and plot the results.
     print('loss: %f, %f sec per epoch' % (ls[-1], ts[-1]/num_epochs))
     d2l.set_figsize()
-    d2l.plt.plot(np.linspace(0, num_epochs, len(ls)), ls)
+    d2l.plt.plot(onp.linspace(0, num_epochs, len(ls)), ls)
     d2l.plt.xlabel('epoch')
     d2l.plt.ylabel('loss')
     return ts, ls
@@ -163,7 +164,7 @@ def train_gluon_ch9(trainer_name, trainer_hyperparams, features, labels,
     loss = gloss.L2Loss()
 
     def eval_loss():
-        return loss(net(features), labels).mean().asscalar()
+        return loss(net(features), labels).mean()
 
     ls = [eval_loss()]
     data_iter = gdata.DataLoader(
@@ -184,7 +185,7 @@ def train_gluon_ch9(trainer_name, trainer_hyperparams, features, labels,
     # Print and plot the results
     print('loss: %f, %f sec per epoch' % (ls[-1], time.time() - start))
     d2l.set_figsize()
-    d2l.plt.plot(np.linspace(0, num_epochs, len(ls)), ls)
+    d2l.plt.plot(onp.linspace(0, num_epochs, len(ls)), ls)
     d2l.plt.xlabel('epoch')
     d2l.plt.ylabel('loss')
 ```
