@@ -188,7 +188,7 @@ In it, we try to allocate an NDArray on `gpu(0)`,
 and use `gpu(0)` as our context if the operation proves successful.
 Otherwise, we catch the resulting exception and we stick with the CPU.
 
-```{.python .input  n=4}
+```{.python .input}
 # This function has been saved in the d2l package for future use
 def try_gpu():
     try:
@@ -213,7 +213,7 @@ Note that we accumulate the errors on the device
 where the data eventually lives (in `acc`).
 This avoids intermediate copy operations that might harm performance.
 
-```{.python .input  n=5}
+```{.python .input}
 # This function has been saved in the d2l package for future use. The function
 # will be gradually improved. Its complete implementation will be discussed in
 # the "Image Augmentation" section
@@ -232,7 +232,7 @@ Unlike `train_ch3` defined in :numref:`chapter_softmax_scratch`, we now need to 
 to our designated context (hopefully, the GPU)
 prior to making the forward and backward passes.
 
-```{.python .input  n=6}
+```{.python .input}
 # This function has been saved in the d2l package for future use
 def train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,
               num_epochs):
@@ -264,7 +264,7 @@ The loss function and the training algorithm
 still use the cross-entropy loss function
 and mini-batch stochastic gradient descent.
 
-```{.python .input  n=7}
+```{.python .input}
 lr, num_epochs = 0.9, 5
 net.initialize(force_reinit=True, ctx=ctx, init=init.Xavier())
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})

@@ -69,7 +69,7 @@ Next, we implement the above process in the `corr2d` function.
 It accepts the input array `X` with the kernel array `K`
 and outputs the array `Y`.
 
-```{.python .input  n=1}
+```{.python .input}
 from mxnet import autograd, nd, np, npx
 from mxnet.gluon import nn
 npx.set_np()
@@ -89,7 +89,7 @@ from the figure above
 to validate the output of the above implementations
 of the two-dimensional cross-correlation operation.
 
-```{.python .input  n=2}
+```{.python .input}
 X = np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]])
 K = np.array([[0, 1], [2, 3]])
 corr2d(X, K)
@@ -115,7 +115,7 @@ As with $h \times w$ cross-correlation
 we also refer to convolutional layers
 as $h \times w$ convolutions.
 
-```{.python .input  n=3}
+```{.python .input  n=70}
 class Conv2D(nn.Block):
     def __init__(self, kernel_size, **kwargs):
         super(Conv2D, self).__init__(**kwargs)
@@ -134,7 +134,7 @@ by finding the location of the pixel change.
 First, we construct an 'image' of $6\times 8$ pixels.
 The middle four columns are black (0) and the rest are white (1).
 
-```{.python .input  n=4}
+```{.python .input  n=66}
 X = np.ones((6, 8))
 X[:, 2:6] = 0
 X
@@ -145,7 +145,7 @@ When we perform the cross-correlation operation with the input,
 if the horizontally adjacent elements are the same,
 the output is 0. Otherwise, the output is non-zero.
 
-```{.python .input  n=5}
+```{.python .input  n=67}
 K = np.array([[1, -1]])
 ```
 
@@ -155,7 +155,7 @@ As you can see, we will detect 1 for the edge from white to black
 and -1 for the edge from black to white.
 The rest of the outputs are 0.
 
-```{.python .input  n=6}
+```{.python .input  n=69}
 Y = corr2d(X, K)
 Y
 ```
@@ -163,7 +163,7 @@ Y
 Let's apply the kernel to the transposed image.
 As expected, it vanishes. The kernel `K` only detects vertical edges.
 
-```{.python .input  n=7}
+```{.python .input}
 corr2d(X.T, K)
 ```
 
@@ -191,7 +191,7 @@ However, since we used single-element assignments,
 Gluon has some trouble finding the gradient.
 Instead, we use the built-in `Conv2D` class provided by Gluon below.
 
-```{.python .input  n=8}
+```{.python .input  n=83}
 # Construct a convolutional layer with 1 output channel
 # (channels will be introduced in the following section)
 # and a kernel array shape of (1, 2)
@@ -219,7 +219,7 @@ for i in range(10):
 
 As you can see, the error has dropped to a small value after 10 iterations. Now we will take a look at the kernel array we learned.
 
-```{.python .input  n=9}
+```{.python .input}
 conv2d.weight.data().reshape((1, 2))
 ```
 
