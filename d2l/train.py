@@ -138,7 +138,7 @@ def train_and_predict_rnn(rnn, get_params, init_rnn_state, num_hiddens,
                 # outputs is num_steps terms of shape (batch_size, len(vocab))
                 (outputs, state) = rnn(inputs, state, params)
                 # After stitching it is (num_steps * batch_size, len(vocab))
-                outputs = nd.concat(*outputs, dim=0)
+                outputs = np.concatenate(outputs, axis=0)
                 # The shape of Y is (batch_size, num_steps), and then becomes
                 # a vector with a length of batch * num_steps after
                 # transposition. This gives it a one-to-one correspondence
@@ -150,7 +150,7 @@ def train_and_predict_rnn(rnn, get_params, init_rnn_state, num_hiddens,
             grad_clipping(params, clipping_theta, ctx)  # Clip the gradient
             sgd(params, lr, 1)
             # Since the error is the mean, no need to average gradients here
-            l_sum += l.asscalar() * y.size
+            l_sum += float(l) * y.size
             n += y.size
         if epoch % (num_epochs // 4) == 0:
             print('epoch %d, perplexity %f, time %.2f sec' % (
@@ -190,7 +190,7 @@ def train_and_predict_rnn_gluon(model, num_hiddens, corpus_indices, vocab,
             # Since the error has already taken the mean, the gradient does
             # not need to be averaged
             trainer.step(1)
-            l_sum += l.asscalar() * y.size
+            l_sum += float(l) * y.size
             n += y.size
 
         if epoch % (num_epochs // 4) == 0:
@@ -313,7 +313,7 @@ def train_gluon_ch9(trainer_name, trainer_hyperparams, features, labels,
     plt.ylabel('loss')
 
 def to_onehot(X, size):
-    return [nd.one_hot(x, size) for x in X.T]
+    return [npx.one_hot(x, size) for x in X.T]
 
 def predict_rnn(prefix, num_chars, rnn, params, init_rnn_state,
                 num_hiddens, vocab, ctx):
@@ -323,7 +323,7 @@ def predict_rnn(prefix, num_chars, rnn, params, init_rnn_state,
     for t in range(num_chars + len(prefix) - 1):
         # The output of the previous time step is taken as the input of the
         # current time step
-        X = to_onehot(nd.array([output[-1]], ctx=ctx), len(vocab))
+        X = to_onehot(np.array([output[-1]], ctx=ctx), len(vocab))
         # Calculate the output and update the hidden state
         (Y, state) = rnn(X, state, params)
         # The input to the next time step is the character in the prefix or
@@ -334,7 +334,7 @@ def predict_rnn(prefix, num_chars, rnn, params, init_rnn_state,
         else:
             # This is maximum likelihood decoding. Modify this if you want to
             # use sampling, beam search or beam sampling for better sequences.
-            output.append(int(Y[0].argmax(axis=1).asscalar()))
+            output.append(int(Y[0].argmax(axis=1)))
     return ''.join([vocab.idx_to_token[i] for i in output])
 
 
@@ -344,13 +344,13 @@ def predict_rnn_gluon(prefix, num_chars, model, vocab, ctx):
     state = model.begin_state(batch_size=1, ctx=ctx)
     output = [vocab[prefix[0]]]
     for t in range(num_chars + len(prefix) - 1):
-        X = nd.array([output[-1]], ctx=ctx).reshape((1, 1))
+        X = np.array([output[-1]], ctx=ctx).reshape((1, 1))
         # Forward computation does not require incoming model parameters
         (Y, state) = model(X, state)
         if t < len(prefix) - 1:
             output.append(vocab[prefix[t + 1]])
         else:
-            output.append(int(Y.argmax(axis=1).asscalar()))
+            output.append(int(Y.argmax(axis=1)))
     return ''.join([vocab.idx_to_token[i] for i in output])
 
 def predict_sentiment(net, vocab, sentence):

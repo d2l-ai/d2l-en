@@ -1,6 +1,6 @@
 """The model module contains neural network building blocks"""
 import math
-from mxnet import nd, np
+from mxnet import nd, np, npx
 from mxnet.gluon import nn, rnn, loss as gloss
 
 __all__ = ['corr2d', 'linreg', 'Residual', 'resnet18', 'RNNModel',
@@ -79,7 +79,7 @@ class RNNModel(nn.Block):
 
     def forward(self, inputs, state):
         """Forward function"""
-        X = nd.one_hot(inputs.T, self.vocab_size)
+        X = npx.one_hot(inputs.T, self.vocab_size)
         Y, state = self.rnn(X, state)
         output = self.dense(Y.reshape((-1, Y.shape[-1])))
         return output, state

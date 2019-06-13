@@ -79,8 +79,10 @@ import sys
 sys.path.insert(0, '..')
 
 import d2l
-from mxnet import nd, init
+from mxnet import np, npx, init
 from mxnet.gluon import rnn
+
+npx.set_np()
 
 corpus_indices, vocab = d2l.load_data_time_machine()
 ```
@@ -95,19 +97,19 @@ ctx = d2l.try_gpu()
 
 def get_params():
     def _one(shape):
-        return nd.random.normal(scale=0.01, shape=shape, ctx=ctx)
+        return np.random.normal(scale=0.01, size=shape, ctx=ctx)
 
     def _three():
         return (_one((num_inputs, num_hiddens)),
                 _one((num_hiddens, num_hiddens)),
-                nd.zeros(num_hiddens, ctx=ctx))
+                np.zeros(num_hiddens, ctx=ctx))
 
     W_xz, W_hz, b_z = _three()  # Update gate parameter
     W_xr, W_hr, b_r = _three()  # Reset gate parameter
     W_xh, W_hh, b_h = _three()  # Candidate hidden state parameter
     # Output layer parameters
     W_hq = _one((num_hiddens, num_outputs))
-    b_q = nd.zeros(num_outputs, ctx=ctx)
+    b_q = np.zeros(num_outputs, ctx=ctx)
     # Create gradient
     params = [W_xz, W_hz, b_z, W_xr, W_hr, b_r, W_xh, W_hh, b_h, W_hq, b_q]
     for param in params:
@@ -121,7 +123,7 @@ Now we will define the hidden state initialization function `init_gru_state`. Ju
 
 ```{.python .input  n=3}
 def init_gru_state(batch_size, num_hiddens, ctx):
-    return (nd.zeros(shape=(batch_size, num_hiddens), ctx=ctx), )
+    return (np.zeros(shape=(batch_size, num_hiddens), ctx=ctx), )
 ```
 
 Now we are ready to define the actual model. Its structure is the same as the basic RNN cell, just that the update equations are more complex.
@@ -132,11 +134,11 @@ def gru(inputs, state, params):
     H, = state
     outputs = []
     for X in inputs:
-        Z = nd.sigmoid(nd.dot(X, W_xz) + nd.dot(H, W_hz) + b_z)
-        R = nd.sigmoid(nd.dot(X, W_xr) + nd.dot(H, W_hr) + b_r)
-        H_tilda = nd.tanh(nd.dot(X, W_xh) + nd.dot(R * H, W_hh) + b_h)
+        Z = npx.sigmoid(np.dot(X, W_xz) + np.dot(H, W_hz) + b_z)
+        R = npx.sigmoid(np.dot(X, W_xr) + np.dot(H, W_hr) + b_r)
+        H_tilda = np.tanh(np.dot(X, W_xh) + np.dot(R * H, W_hh) + b_h)
         H = Z * H + (1 - Z) * H_tilda
-        Y = nd.dot(H, W_hq) + b_q
+        Y = np.dot(H, W_hq) + b_q
         outputs.append(Y)
     return outputs, (H,)
 ```
@@ -148,7 +150,9 @@ Training and prediction work in exactly the same manner as before. That is, we n
 ```{.python .input  n=5}
 num_epochs, num_steps, batch_size, lr, clipping_theta = 100, 35, 32, 1, 1
 prefixes = ['traveller', 'time traveller']
+```
 
+```{.python .input  n=5}
 d2l.train_and_predict_rnn(gru, get_params, init_gru_state, num_hiddens,
                           corpus_indices, vocab, ctx, False, num_epochs,
                           num_steps, lr, clipping_theta, batch_size, prefixes)
