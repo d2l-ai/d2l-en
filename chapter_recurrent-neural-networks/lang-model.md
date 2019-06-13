@@ -1,4 +1,4 @@
-# Language Models
+# Language Models and Data Sets
 
 
 In :numref:`chapter_text_preprocessing`, we see how to map text data into tokens, and these tokens can be viewed as a time series of discrete observations.
@@ -90,18 +90,19 @@ Since they involve one, two or three terms, these are typically referred to as u
 
 Let's see how this works on real data. We construct a vocabulary based on the time machine data similar to :numref:`chapter_text_preprocessing` and print the top words
 
-```{.python .input}
+```{.python .input  n=1}
 import d2l
+from mxnet import nd
+import random
 
-lines = d2l.read_time_machine()
-tokens = d2l.tokenize(lines)
+tokens = d2l.tokenize(d2l.read_time_machine())
 vocab = d2l.Vocab(tokens)
 print(vocab.token_freqs[:10])
 ```
 
 As we can see, the most popular words are actually quite boring to look at. They are often referred to as [stop words](https://en.wikipedia.org/wiki/Stop_words) and thus filtered out. That said, they still carry meaning and we will use them nonetheless. However, one thing that is quite clear is that the word frequency decays rather rapidly. The 10th word is less than $1/5$ as common as the most popular one. To get a better idea we plot the graph of word frequencies.
 
-```{.python .input}
+```{.python .input  n=2}
 freqs = [freq for token, freq in vocab.token_freqs]
 d2l.plot(freqs, xlabel='token', ylabel='frequency',
          xscale='log', yscale='log')
@@ -114,7 +115,7 @@ $$n(x) \propto (x + c)^{-\alpha} \text{ and hence }
 
 This should already give us pause if we want to model words by count statistics and smoothing. After all, we will significantly overestimate the frequency of the tail, aka the infrequent words. But what about word pairs (and trigrams and beyond)? Let's see.
 
-```{.python .input}
+```{.python .input  n=3}
 bigram_tokens = [[pair for pair in zip(line[:-1], line[1:])] for line in tokens]
 bigram_vocab = d2l.Vocab(bigram_tokens)
 print(bigram_vocab.token_freqs[:10])
@@ -122,32 +123,122 @@ print(bigram_vocab.token_freqs[:10])
 
 Two things are notable. Out of the 10 most frequent word pairs, 9 are composed of stop words and only one is relevant to the actual book - 'the time'. Let's see whether the bigram frequencies behave in the same manner as the unigram frequencies.
 
-```{.python .input}
+```{.python .input  n=4}
 trigram_tokens = [[triple for triple in zip(line[:-2], line[1:-1], line[2:])]
                   for line in tokens]
 trigram_vocab = d2l.Vocab(trigram_tokens)
 print(trigram_vocab.token_freqs[:10])
 ```
 
-Last, let's visualize the token frequencies among these three gram models. 
+Last, let's visualize the token frequencies among these three gram models.
 
-```{.python .input}
+```{.python .input  n=5}
 bigram_freqs = [freq for token, freq in bigram_vocab.token_freqs]
 trigram_freqs = [freq for token, freq in trigram_vocab.token_freqs]
-d2l.plot([freqs, bigram_freqs, trigram_freqs], xlabel='token', 
-         ylabel='frequency', xscale='log', yscale='log', 
+d2l.plot([freqs, bigram_freqs, trigram_freqs], xlabel='token',
+         ylabel='frequency', xscale='log', yscale='log',
          legend=['unigram', 'bigram', 'trigram'])
 ```
 
 The graph is quite exciting for a number of reasons. Firstly, beyond words, also sequences of words appear to be following Zipf's law, albeit with a lower exponent, depending on sequence length. Secondly, the number of distinct n-grams is not that large. This gives us hope that there is quite a lot of structure in language. Third, *many* n-grams occur very rarely, which makes Laplace smoothing rather unsuitable for language modeling. Instead, we will use deep learning based models.
 
+## Training Data Preparation
+
+Before introducing the model, let's assume we will use a neural network to train a language model. Now the question is how to read mini-batches of examples and labels at
+random. Since sequence data is by its very nature sequential, we need to address
+the issue of processing it. We did so in a rather ad-hoc manner when we
+introduced in :numref:`chapter_sequence`. Let's formalize this a bit. 
+
+In :numref:`fig_timemachine_5gram`, we visualized several possible ways to obtain 5-grams in a sentence, here a token is a character. Note that we have quite some freedom since we could pick an arbitrary offset.
+
+![Different offsets lead to different subsequences when splitting up text.](../img/timemachine-5gram.svg)
+:label:`fig_timemachine_5gram`
+
+In fact, any one of these offsets is fine. Hence, which one should we pick? In fact, all of them are equally good. But if we pick all offsets we end up with rather redundant data due to overlap, particularly if the sequences are long. Picking just a random set of initial positions is no good either since it does not guarantee uniform coverage of the array. For instance, if we pick $n$ elements at random out of a set of $n$ with random replacement, the probability for a particular element not being picked is $(1-1/n)^n \to e^{-1}$. This means that we cannot expect uniform coverage this way. Even randomly permuting a set of all offsets does not offer good guarantees. Instead we can use a simple trick to get both *coverage* and *randomness*: use a random offset, after which one uses the terms sequentially. We describe how to accomplish this for both random sampling and sequential partitioning strategies below.
+
+### Random Sampling
+
+The following code randomly generates a minibatch from the data each time. Here, the batch size `batch_size` indicates to the number of examples in each mini-batch and `num_steps` is the length of the sequence (or time steps if we have a time series) included in each example.
+In random sampling, each example is a sequence arbitrarily captured on the original sequence. The positions of two adjacent random mini-batches on the original sequence are not necessarily adjacent. The target is to predict the next character based on what we've seen so far, hence the labels are the original sequence, shifted by one character.
+
+```{.python .input}
+type(random.randint(0, 4))
+```
+
+```{.python .input}
+list(range(0, (13//4)*4, 4))
+```
+
+```{.python .input  n=5}
+# Save to the d2l package.
+def seq_data_iter_random(corpus, batch_size, num_steps, ctx=None):
+    # Offset the iterator over the data for uniform starts
+    corpus = corpus[random.randint(0, num_steps):]
+    # Subtract 1 extra since we need to account for label
+    num_examples = ((len(corpus) - 1) // num_steps)
+    example_indices = list(range(0, num_examples * num_steps, num_steps))
+    random.shuffle(example_indices)
+    # This returns a sequence of the length num_steps starting from pos
+    data = lambda pos: corpus[pos: pos + num_steps]
+    # Discard half empty batches
+    num_batches = num_examples // batch_size
+    for i in range(0, batch_size * num_batches, batch_size):
+        # Batch_size indicates the random examples read each time
+        batch_indices = example_indices[i:(i+batch_size)]
+        X = [data(j) for j in batch_indices]
+        Y = [data(j + 1) for j in batch_indices]
+        yield nd.array(X, ctx), nd.array(Y, ctx)
+```
+
+Let us generate an artificial sequence from 0 to 30. We assume that
+the batch size and numbers of time steps are 2 and 5
+respectively. This means that depending on the offset we can generate between 4 and 5 $(x,y)$ pairs. With a minibatch size of 2 we only get 2 minibatches.
+
+```{.python .input  n=6}
+my_seq = list(range(30))
+for X, Y in seq_data_iter_random(my_seq, batch_size=2, num_steps=6):
+    print('X: ', X, '\nY:', Y)
+```
+
+### Sequential partitioning
+
+In addition to random sampling of the original sequence, we can also make the positions of two adjacent random mini-batches adjacent in the original sequence. 
+
+```{.python .input  n=7}
+# Save to the d2l package.
+def seq_data_iter_consecutive(corpus, batch_size, num_steps, ctx=None):
+    # Offset for the iterator over the data for uniform starts
+    offset = random.randint(0, num_steps)
+    # Slice out data - ignore num_steps and just wrap around
+    num_indices = ((len(corpus) - offset - 1) // batch_size) * batch_size
+    Xs = nd.array(corpus[offset:offset+num_indices], ctx=ctx)
+    Ys = nd.array(corpus[offset+1:offset+1+num_indices], ctx=ctx)
+    Xs, Ys = Xs.reshape((batch_size, -1)), Ys.reshape((batch_size, -1))
+    num_batches = Xs.shape[1] // num_steps
+    for i in range(0, num_batches * num_steps, num_steps):
+        X = Xs[:,i:(i+num_steps)]
+        Y = Ys[:,i:(i+num_steps)]
+        yield X, Y
+```
+
+Using the same settings, print input `X` and label `Y` for each mini-batch of examples read by random sampling. The positions of two adjacent random mini-batches on the original sequence are adjacent.
+
+```{.python .input  n=8}
+for X, Y in seq_data_iter_consecutive(my_seq, batch_size=2, num_steps=6):
+    print('X: ', X, '\nY:', Y)
+```
+
+Sequential partitioning decomposes the sequence into `batch_size` many strips of data which are traversed as we iterate over minibatches. Note that the $i$-th element in a minibatch matches with the $i$-th element of the next minibatch rather than within a minibatch.
+
 ## Summary
 
 * Language models are an important technology for natural language processing.
 * $n$-grams provide a convenient model for dealing with long sequences by truncating the dependence.
-* Long sequences suffer from the problem that they occur very rarely or never. This requires smoothing, e.g. via Bayesian Nonparametrics or alternatively via deep learning.
+* Long sequences suffer from the problem that they occur very rarely or never. 
 * Zipf's law governs the word distribution for both unigrams and n-grams.
 * There's a lot of structure but not enough frequency to deal with infrequent word combinations efficiently via smoothing.
+* The main choices for sequence partitioning are whether we pick consecutive or random sequences. 
+* Given the overall document length, it is usually acceptable to be slightly wasteful with the documents and discard half-empty minibatches.
 
 ## Exercises
 
@@ -155,6 +246,12 @@ The graph is quite exciting for a number of reasons. Firstly, beyond words, also
 1. Review the smoothed probability estimates. Why are they not accurate? Hint - we are dealing with a contiguous sequence rather than singletons.
 1. How would you model a dialogue?
 1. Estimate the exponent of Zipf's law for unigrams, bigrams and trigrams.
+1. Which other other mini-batch data sampling methods can you think of?
+1. Why is it a good idea to have a random offset?
+    * Does it really lead to a perfectly uniform distribution over the sequences on the document?
+    * What would you have to do to make things even more uniform?
+1. If we want a sequence example to be a complete sentence, what kinds of problems does this introduce in mini-batch sampling? Why would we want to do this anyway?
+
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2361)
 

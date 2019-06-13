@@ -12,7 +12,7 @@ Text is an important example of sequence data. An article can be simply viewed a
 
 To get started we load text from H.G. Wells' [Time Machine](http://www.gutenberg.org/ebooks/35). This is a fairly small corpus of just over 30,000 words but for the purpose of what we want to illustrate this is just fine. More realistic document collections contain many billions of words. The following function read the dataset into a list of sentences, each sentence is a string. Here we ignore punctuation and capitalization.
 
-```{.python .input}
+```{.python .input  n=1}
 import collections
 import re
 
@@ -28,11 +28,24 @@ lines = read_time_machine()
 '# sentences %d' % len(lines)
 ```
 
+```{.json .output n=1}
+[
+ {
+  "data": {
+   "text/plain": "'# sentences 3221'"
+  },
+  "execution_count": 1,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
+```
+
 ## Tokenization
 
 For each sentence, we split it into a list of tokens. A token, often a word or a char, a data point the model will train and predict.
 
-```{.python .input}
+```{.python .input  n=2}
 # Save to the d2l package.
 def tokenize(lines, token='word'):
     """Split sentences into word or char tokens"""
@@ -47,11 +60,24 @@ tokens = tokenize(lines)
 tokens[0:2]
 ```
 
+```{.json .output n=2}
+[
+ {
+  "data": {
+   "text/plain": "[['the', 'time', 'machine', 'by', 'h', 'g', 'wells', ''], ['']]"
+  },
+  "execution_count": 2,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
+```
+
 ## Vocabulary
 
 Then we need to map tokens into numerical indices. We often call it a vocabulary. Its input is a list of token lists,  called a corpus. Then it counts the frequency of each token in this corpus, and then assigns an numerical index to each token according to its frequency. Rarely appeared tokens are often removed to reduce the complexity. A token doesn't exist in corpus or has been removed is mapped into a special unknown (“&lt;unk&gt;”) token. We optionally add another three special tokens: “&lt;pad&gt;” a token for padding, “&lt;bos&gt;” to present the beginning for a sentence, and “&lt;eos&gt;” for the ending of a sentence.
 
-```{.python .input  n=9}
+```{.python .input  n=3}
 # Save to the d2l package. 
 class Vocab(object):
     def __init__(self, tokens, min_freq=0, use_special_tokens=False):
@@ -94,49 +120,59 @@ class Vocab(object):
 
 We construct a vocabulary with the time machine dataset as the corpus, and then print the map between a few tokens to indices.
 
-```{.python .input  n=23}
+```{.python .input  n=4}
 vocab = Vocab(tokens)
 print(list(vocab.token_to_idx.items())[0:10])
 ```
 
+```{.json .output n=4}
+[
+ {
+  "name": "stdout",
+  "output_type": "stream",
+  "text": "[('<unk>', 0), ('the', 1), ('', 2), ('i', 3), ('and', 4), ('of', 5), ('a', 6), ('to', 7), ('was', 8), ('in', 9)]\n"
+ }
+]
+```
+
 After that, each character in the training data set is converted into an index ID. To illustrate things we print the first 20 characters and their corresponding indices.
 
-```{.python .input  n=25}
+```{.python .input  n=5}
 for i in range(8, 10):
     print('words:', tokens[i]) 
     print('indices:', vocab[tokens[i]])
 ```
 
-## Put all things together.
-
-
-We packaged the above code in the `(corpus_indices, vocab) = load_data_timemachine()` function of the `d2l` package to make it easier to call it in later chapters.
-
-
-
-```{.python .input}
-def xx():
-    pass
+```{.json .output n=5}
+[
+ {
+  "name": "stdout",
+  "output_type": "stream",
+  "text": "words: ['the', 'time', 'traveller', 'for', 'so', 'it', 'will', 'be', 'convenient', 'to', 'speak', 'of', 'him', '']\nindices: [1, 20, 72, 17, 38, 12, 120, 43, 706, 7, 660, 5, 112, 2]\nwords: ['was', 'expounding', 'a', 'recondite', 'matter', 'to', 'us', 'his', 'grey', 'eyes', 'shone', 'and']\nindices: [8, 1654, 6, 3864, 634, 7, 131, 26, 344, 127, 484, 4]\n"
+ }
+]
 ```
 
-Sequential partitioning decomposes the sequence into `batch_size` many strips of data which are traversed as we iterate over minibatches. Note that the $i$-th element in a minibatch matches with the $i$-th element of the next minibatch rather than within a minibatch.
+## Put all things together.
+
+We packaged the above code in the `load_data_time_machine` function, which returns `corpus`, a list of token indices, and `vocab`, the vocabulary. It will use characters as tokens. 
+
+```{.python .input  n=6}
+# Save to the d2l package.
+def load_data_time_machine():
+    lines = read_time_machine()
+    tokens = tokenize(lines, 'char')
+    vocab = Vocab(tokens)
+    corpus = [vocab[tk] for line in tokens for tk in line]
+    return corpus, vocab
+```
 
 ## Summary
 
-* Documents are preprocessed by tokenizing the words and mapping them into IDs. There are multiple methods:
-    * Character encoding which uses individual characters (good e.g. for Chinese)
-    * Word encoding (good e.g. for English)
-    * Byte-pair encoding (good for languages that have lots of morphology, e.g. German)
-* The main choices for sequence partitioning are whether we pick consecutive or random sequences. In particular for recurrent networks the former is critical.
-* Given the overall document length, it is usually acceptable to be slightly wasteful with the documents and discard half-empty minibatches.
+* Documents are preprocessed by tokenizing the words or characters and mapping them into indices.
 
 ## Exercises
 
-1. Which other other mini-batch data sampling methods can you think of?
-1. Why is it a good idea to have a random offset?
-    * Does it really lead to a perfectly uniform distribution over the sequences on the document?
-    * What would you have to do to make things even more uniform?
-1. If we want a sequence example to be a complete sentence, what kinds of problems does this introduce in mini-batch sampling? Why would we want to do this anyway?
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2363)
 
