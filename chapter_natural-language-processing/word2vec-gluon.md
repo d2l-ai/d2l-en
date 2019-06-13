@@ -21,11 +21,13 @@ sys.path.insert(0, '..')
 import collections
 import d2l
 import math
-from mxnet import autograd, gluon, nd
+from mxnet import autograd, gluon, np, npx
 from mxnet.gluon import data as gdata, loss as gloss, nn
 import random
 import time
 import zipfile
+
+npx.set_np()
 ```
 
 ## Pre-process the Data Set
@@ -222,8 +224,8 @@ def batchify(data):
         contexts_negatives += [context + negative + [0] * (max_len - cur_len)]
         masks += [[1] * cur_len + [0] * (max_len - cur_len)]
         labels += [[1] * len(context) + [0] * (max_len - len(context))]
-    return (nd.array(centers).reshape((-1, 1)), nd.array(contexts_negatives),
-            nd.array(masks), nd.array(labels))
+    return (np.array(centers).reshape((-1, 1)), np.array(contexts_negatives),
+            np.array(masks), np.array(labels))
 ```
 
 Construct two simple examples:
@@ -268,7 +270,7 @@ embed.weight
 The input of the embedding layer is the index of the word. When we enter the index $i$ of a word, the embedding layer returns the $i$th row of the weight matrix as its word vector. Below we enter an index of shape (2,3) into the embedding layer. Because the dimension of the word vector is 4, we obtain a word vector of shape (2,3,4).
 
 ```{.python .input  n=16}
-x = nd.array([[1, 2, 3], [4, 5, 6]])
+x = np.array([[1, 2, 3], [4, 5, 6]])
 embed(x)
 ```
 
@@ -277,9 +279,9 @@ embed(x)
 We can multiply the matrices in two mini-batches one by one, by the mini-batch multiplication operation `batch_dot`. Suppose the first batch contains $n$ matrices $\boldsymbol{X}_1, \ldots, \boldsymbol{X}_n$ with a shape of $a\times b$, and the second batch contains $n$ matrices $\boldsymbol{Y}_1, \ldots, \boldsymbol{Y}_n$ with a shape of $b\times c$. The output of matrix multiplication on these two batches are $n$ matrices $\boldsymbol{X}_1\boldsymbol{Y}_1, \ldots, \boldsymbol{X}_n\boldsymbol{Y}_n$ with a shape of $a\times c$. Therefore, given two NDArrays of shape ($n$, $a$, $b$) and ($n$, $b$, $c$), the shape of the mini-batch multiplication output is ($n$, $a$, $c$).
 
 ```{.python .input  n=17}
-X = nd.ones((2, 1, 4))
-Y = nd.ones((2, 4, 6))
-nd.batch_dot(X, Y).shape
+X = np.ones((2, 1, 4))
+Y = np.ones((2, 4, 6))
+npx.batch_dot(X, Y).shape
 ```
 
 ### Skip-gram Model Forward Calculation
@@ -290,14 +292,14 @@ In forward calculation, the input of the skip-gram model contains the central ta
 def skip_gram(center, contexts_and_negatives, embed_v, embed_u):
     v = embed_v(center)
     u = embed_u(contexts_and_negatives)
-    pred = nd.batch_dot(v, u.swapaxes(1, 2))
+    pred = npx.batch_dot(v, u.swapaxes(1, 2))
     return pred
 ```
 
 Verify that the output shape should be (batch size, 1, `max_len`).
 
 ```{.python .input}
-skip_gram(nd.ones((2,1)), nd.ones((2,4)), embed, embed).shape
+skip_gram(np.ones((2,1)), np.ones((2,4)), embed, embed).shape
 ```
 
 ## Training
@@ -317,9 +319,9 @@ It is worth mentioning that we can use the mask variable to specify the partial 
 Given two identical examples, different masks lead to different loss values.
 
 ```{.python .input}
-pred = nd.array([[.5]*4]*2)
-label = nd.array([[1,0,1,0]]*2)
-mask = nd.array([[1, 1, 1, 1], [1, 1, 0, 0]])
+pred = np.array([[.5]*4]*2)
+label = np.array([[1,0,1,0]]*2)
+mask = np.array([[1, 1, 1, 1], [1, 1, 0, 0]])
 loss(pred, label, mask)
 ```
 
@@ -362,7 +364,7 @@ def train(net, lr, num_epochs):
                      / mask.sum(axis=1) * mask.shape[1])
             l.backward()
             trainer.step(batch_size)
-            l_sum += l.sum().asscalar()
+            l_sum += float(l.sum())
             n += l.size
         print('epoch %d, loss %.2f, time %.2fs'
               % (epoch, l_sum/n, time.time() - start))
@@ -383,10 +385,11 @@ def get_similar_tokens(query_token, k, embed):
     W = embed.weight.data()
     x = W[vocab[query_token]]
     # Compute the cosine similarity. Add 1e-9 for numerical stability.
-    cos = nd.dot(W, x) / (nd.sum(W * W, axis=1) * nd.sum(x * x) + 1e-9).sqrt()
-    topk = nd.topk(cos, k=k+1, ret_typ='indices').asnumpy().astype('int32')
+    cos = np.dot(W, x) / np.sqrt(((W * W).sum(axis=1) * (x * x).sum() + 1e-9))
+    topk = npx.topk(cos, k=k+1).astype('int32')
     for i in topk[1:]:  # Remove the input words
-        print('cosine sim=%.3f: %s' % (cos[i].asscalar(), (vocab.idx_to_token[i])))
+        i = int(i)  # `i` is a scalar tensor. Convert it to a Python integer to be used as an index.
+        print('cosine sim=%.3f: %s' % (cos[i], (vocab.idx_to_token[i])))
 
 get_similar_tokens('chip', 3, net[0])
 ```
