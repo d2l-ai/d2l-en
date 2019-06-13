@@ -14,6 +14,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from mxnet import nd, autograd, gluon, init, context, image
 from mxnet.gluon import nn
+import random
 import re
 import time
 import tarfile
@@ -131,19 +132,6 @@ def train_epoch_ch3(net, train_iter, loss, updater):
     return train_l_sum/n, train_acc_sum/n
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
-    """A utility function to set matplotlib axes"""
-    axes.set_xlabel(xlabel)
-    axes.set_ylabel(ylabel)
-    axes.set_xscale(xscale)
-    axes.set_yscale(yscale)
-    axes.set_xlim(xlim)
-    axes.set_ylim(ylim)
-    axes.legend(legend)
-    axes.grid()
-    
-
-# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 class Animator(object):
     def __init__(self, xlabel=None, ylabel=None, legend=[], xlim=None,
                  ylim=None, xscale='linear', yscale='linear', fmts=None,
@@ -175,6 +163,19 @@ class Animator(object):
         self.config_axes()
         display.display(self.fig)
         display.clear_output(wait=True)
+        
+
+# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
+def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
+    """A utility function to set matplotlib axes"""
+    axes.set_xlabel(xlabel)
+    axes.set_ylabel(ylabel)
+    axes.set_xscale(xscale)
+    axes.set_yscale(yscale)
+    axes.set_xlim(xlim)
+    axes.set_ylim(ylim)
+    axes.legend(legend)
+    axes.grid()        
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
@@ -409,6 +410,48 @@ class Vocab(object):
             return self.idx_to_token[indices]
         else:
             return [self.idx_to_token[index] for index in indices]
+
+# Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
+def load_data_time_machine():
+    lines = read_time_machine()
+    tokens = tokenize(lines, 'char')
+    vocab = Vocab(tokens)
+    corpus = [vocab[tk] for line in tokens for tk in line]
+    return corpus, vocab
+
+# Defined in file: ./chapter_recurrent-neural-networks/lang-model.md
+def seq_data_iter_random(corpus, batch_size, num_steps, ctx=None):
+    # Offset the iterator over the data for uniform starts
+    corpus = corpus[random.randint(0, num_steps):]
+    # Subtract 1 extra since we need to account for label
+    num_examples = ((len(corpus) - 1) // num_steps)
+    example_indices = list(range(0, num_examples * num_steps, num_steps))
+    random.shuffle(example_indices)
+    # This returns a sequence of the length num_steps starting from pos
+    data = lambda pos: corpus[pos: pos + num_steps]
+    # Discard half empty batches
+    num_batches = num_examples // batch_size
+    for i in range(0, batch_size * num_batches, batch_size):
+        # Batch_size indicates the random examples read each time
+        batch_indices = example_indices[i:(i+batch_size)]
+        X = [data(j) for j in batch_indices]
+        Y = [data(j + 1) for j in batch_indices]
+        yield nd.array(X, ctx), nd.array(Y, ctx)
+
+# Defined in file: ./chapter_recurrent-neural-networks/lang-model.md
+def seq_data_iter_consecutive(corpus, batch_size, num_steps, ctx=None):
+    # Offset for the iterator over the data for uniform starts
+    offset = random.randint(0, num_steps)
+    # Slice out data - ignore num_steps and just wrap around
+    num_indices = ((len(corpus) - offset - 1) // batch_size) * batch_size
+    Xs = nd.array(corpus[offset:offset+num_indices], ctx=ctx)
+    Ys = nd.array(corpus[offset+1:offset+1+num_indices], ctx=ctx)
+    Xs, Ys = Xs.reshape((batch_size, -1)), Ys.reshape((batch_size, -1))
+    num_batches = Xs.shape[1] // num_steps
+    for i in range(0, num_batches * num_steps, num_steps):
+        X = Xs[:,i:(i+num_steps)]
+        Y = Ys[:,i:(i+num_steps)]
+        yield X, Y
 
 # Defined in file: ./chapter_optimization/optimization-intro.md
 def annotate(text, xy, xytext):

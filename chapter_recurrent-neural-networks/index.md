@@ -47,9 +47,9 @@ LSTMs and GRUs, described later in this chapter.
 :maxdepth: 2
 
 sequence
+text-preprocessing
 lang-model
 rnn
-lang-model-dataset
 rnn-scratch
 rnn-gluon
 bptt

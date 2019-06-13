@@ -161,14 +161,6 @@ In fact, any one of these offsets is fine. Hence, which one should we pick? In f
 The following code randomly generates a minibatch from the data each time. Here, the batch size `batch_size` indicates to the number of examples in each mini-batch and `num_steps` is the length of the sequence (or time steps if we have a time series) included in each example.
 In random sampling, each example is a sequence arbitrarily captured on the original sequence. The positions of two adjacent random mini-batches on the original sequence are not necessarily adjacent. The target is to predict the next character based on what we've seen so far, hence the labels are the original sequence, shifted by one character.
 
-```{.python .input}
-type(random.randint(0, 4))
-```
-
-```{.python .input}
-list(range(0, (13//4)*4, 4))
-```
-
 ```{.python .input  n=5}
 # Save to the d2l package.
 def seq_data_iter_random(corpus, batch_size, num_steps, ctx=None):

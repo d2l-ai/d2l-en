@@ -12,7 +12,7 @@ Text is an important example of sequence data. An article can be simply viewed a
 
 To get started we load text from H.G. Wells' [Time Machine](http://www.gutenberg.org/ebooks/35). This is a fairly small corpus of just over 30,000 words but for the purpose of what we want to illustrate this is just fine. More realistic document collections contain many billions of words. The following function read the dataset into a list of sentences, each sentence is a string. Here we ignore punctuation and capitalization.
 
-```{.python .input  n=1}
+```{.python .input}
 import collections
 import re
 
@@ -28,24 +28,11 @@ lines = read_time_machine()
 '# sentences %d' % len(lines)
 ```
 
-```{.json .output n=1}
-[
- {
-  "data": {
-   "text/plain": "'# sentences 3221'"
-  },
-  "execution_count": 1,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 ## Tokenization
 
 For each sentence, we split it into a list of tokens. A token, often a word or a char, a data point the model will train and predict.
 
-```{.python .input  n=2}
+```{.python .input}
 # Save to the d2l package.
 def tokenize(lines, token='word'):
     """Split sentences into word or char tokens"""
@@ -60,24 +47,11 @@ tokens = tokenize(lines)
 tokens[0:2]
 ```
 
-```{.json .output n=2}
-[
- {
-  "data": {
-   "text/plain": "[['the', 'time', 'machine', 'by', 'h', 'g', 'wells', ''], ['']]"
-  },
-  "execution_count": 2,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 ## Vocabulary
 
 Then we need to map tokens into numerical indices. We often call it a vocabulary. Its input is a list of token lists,  called a corpus. Then it counts the frequency of each token in this corpus, and then assigns an numerical index to each token according to its frequency. Rarely appeared tokens are often removed to reduce the complexity. A token doesn't exist in corpus or has been removed is mapped into a special unknown (“&lt;unk&gt;”) token. We optionally add another three special tokens: “&lt;pad&gt;” a token for padding, “&lt;bos&gt;” to present the beginning for a sentence, and “&lt;eos&gt;” for the ending of a sentence.
 
-```{.python .input  n=3}
+```{.python .input  n=9}
 # Save to the d2l package. 
 class Vocab(object):
     def __init__(self, tokens, min_freq=0, use_special_tokens=False):
@@ -120,44 +94,24 @@ class Vocab(object):
 
 We construct a vocabulary with the time machine dataset as the corpus, and then print the map between a few tokens to indices.
 
-```{.python .input  n=4}
+```{.python .input  n=23}
 vocab = Vocab(tokens)
 print(list(vocab.token_to_idx.items())[0:10])
 ```
 
-```{.json .output n=4}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "[('<unk>', 0), ('the', 1), ('', 2), ('i', 3), ('and', 4), ('of', 5), ('a', 6), ('to', 7), ('was', 8), ('in', 9)]\n"
- }
-]
-```
-
 After that, each character in the training data set is converted into an index ID. To illustrate things we print the first 20 characters and their corresponding indices.
 
-```{.python .input  n=5}
+```{.python .input  n=25}
 for i in range(8, 10):
     print('words:', tokens[i]) 
     print('indices:', vocab[tokens[i]])
 ```
 
-```{.json .output n=5}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "words: ['the', 'time', 'traveller', 'for', 'so', 'it', 'will', 'be', 'convenient', 'to', 'speak', 'of', 'him', '']\nindices: [1, 20, 72, 17, 38, 12, 120, 43, 706, 7, 660, 5, 112, 2]\nwords: ['was', 'expounding', 'a', 'recondite', 'matter', 'to', 'us', 'his', 'grey', 'eyes', 'shone', 'and']\nindices: [8, 1654, 6, 3864, 634, 7, 131, 26, 344, 127, 484, 4]\n"
- }
-]
-```
-
-## Put all things together.
+## Put All Things Together
 
 We packaged the above code in the `load_data_time_machine` function, which returns `corpus`, a list of token indices, and `vocab`, the vocabulary. It will use characters as tokens. 
 
-```{.python .input  n=6}
+```{.python .input}
 # Save to the d2l package.
 def load_data_time_machine():
     lines = read_time_machine()
