@@ -98,16 +98,6 @@ methods such as BPTT (:numref:`chapter_bptt`) and long short term memory (:numre
 print(H, '\n', O)
 ```
 
-```{.json .output n=6}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "[[2.1798675  0.31628072]\n [0.7802107  0.0389483 ]\n [0.631605   0.1638964 ]]\n<ndarray shape=(3, 2)> \n [[1.2345108  1.0510507  0.        ]\n [0.36193395 0.42179012 0.        ]\n [0.43546036 0.26016176 0.        ]]\n<ndarray shape=(3, 3)>\n"
- }
-]
-```
-
 ## Steps in a Language Model
 
 We conclude this section by illustrating how RNNs can be used to build a language model. For simplicity of illustration we use words rather than characters, since the former are easier to comprehend. Let the number of mini-batch examples be 1, and the sequence of the text be the beginning of our dataset, i.e. "the time machine by h. g. wells". The figure below illustrates how to estimate the next character based on the present and previous characters. During the training process, we run a softmax operation on the output from the output layer for each time step, and then use the cross-entropy loss function to compute the error between the result and the label. Due to the recurrent computation of the hidden state in the hidden layer, the output of time step 3 $\mathbf{O}_3$ is determined by the text sequence "the", "time", "machine".  Since the next word of the sequence in the training data is "by", the loss of time step 3 will depend on the probability distribution of the next word generated based on the sequence "the", "time", "machine" and the label "by" of this time step.
