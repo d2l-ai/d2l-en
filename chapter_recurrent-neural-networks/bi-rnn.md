@@ -8,6 +8,7 @@ I am _____ very hungry.
 I am _____ very hungry, I could eat half a pig.
 ```
 
+
 Depending on the amount of information available we might fill the blanks with very different words such as *'happy'*, *'not'*, and *'very'*. Clearly the end of the phrase (if available) conveys significant information about which word to pick. A sequence model that is incapable of taking advantage of this will perform poorly on related tasks. For instance, to do well in named entity recognition (e.g. to recognize whether *Green* refers to *Mr. Green* or to the color) longer-range context is equally vital. To get some inspiration for addressing the problem let's take a detour to graphical models.
 
 ## Dynamic Programming
@@ -103,8 +104,10 @@ import sys
 sys.path.insert(0, '..')
 
 import d2l
-from mxnet import nd
+from mxnet import npx
 from mxnet.gluon import rnn
+
+npx.set_np()
 
 corpus_indices, vocab = d2l.load_data_time_machine()
 
