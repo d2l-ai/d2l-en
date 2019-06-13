@@ -386,7 +386,7 @@ def get_similar_tokens(query_token, k, embed):
     x = W[vocab[query_token]]
     # Compute the cosine similarity. Add 1e-9 for numerical stability.
     cos = np.dot(W, x) / np.sqrt(((W * W).sum(axis=1) * (x * x).sum() + 1e-9))
-    topk = npx.topk(cos, k=k+1).astype('int32')
+    topk = npx.topk(cos, k=k+1)
     for i in topk[1:]:  # Remove the input words
         i = int(i)  # `i` is a scalar tensor. Convert it to a Python integer to be used as an index.
         print('cosine sim=%.3f: %s' % (cos[i], (vocab.idx_to_token[i])))

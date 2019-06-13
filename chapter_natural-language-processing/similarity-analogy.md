@@ -14,8 +14,10 @@ subsequent sections.
 MXNet's `contrib.text` package provides functions and classes related to natural language processing (see the GluonNLP tool package[1] for more details). Next, let us check out names of the provided pre-trained word embeddings.
 
 ```{.python .input}
-from mxnet import nd
+from mxnet import np, npx
 from mxnet.contrib import text
+
+npx.set_np()
 
 text.embedding.get_pretrained_file_names().keys()
 ```
@@ -61,10 +63,10 @@ seeking analogies, we encapsulate this part of the logic separately in the `knn`
 ```{.python .input}
 def knn(W, x, k):
     # The added 1e-9 is for numerical stability
-    cos = nd.dot(W, x.reshape((-1,))) / (
-        (nd.sum(W * W, axis=1) + 1e-9).sqrt() * nd.sum(x * x).sqrt())
-    topk = nd.topk(cos, k=k, ret_typ='indices').asnumpy().astype('int32')
-    return topk, [cos[i].asscalar() for i in topk]
+    cos = np.dot(W, x.reshape((-1,))) / (
+        np.sqrt(((W * W).sum(axis=1) + 1e-9)) * np.sqrt((x * x).sum()))
+    topk = npx.topk(cos, k=k).astype('int32').asnumpy()
+    return topk, [cos[int(i)] for i in topk]
 ```
 
 Then, we search for synonyms by pre-training the word vector instance `embed`.
