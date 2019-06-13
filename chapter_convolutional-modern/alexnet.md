@@ -277,10 +277,12 @@ import sys
 sys.path.insert(0, '..')
 
 import d2l
-from mxnet import gluon, init, nd
+from mxnet import gluon, init, nd, np, npx
 from mxnet.gluon import data as gdata, nn
 import os
 import sys
+
+npx.set_np()
 
 net = nn.Sequential()
 # Here, we use a larger 11 x 11 window to capture objects. At the same time,
@@ -315,7 +317,7 @@ net.add(nn.Conv2D(96, kernel_size=11, strides=4, activation='relu'),
 We construct a single-channel data instance with both height and width of 224 to observe the output shape of each layer. It matches our diagram above.
 
 ```{.python .input  n=2}
-X = nd.random.uniform(shape=(1, 1, 224, 224))
+X = np.random.uniform(size=(1, 1, 224, 224))
 net.initialize()
 for layer in net:
     X = layer(X)

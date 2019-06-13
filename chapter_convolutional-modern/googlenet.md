@@ -43,8 +43,9 @@ import sys
 sys.path.insert(0, '..')
 
 import d2l
-from mxnet import gluon, init, nd
+from mxnet import gluon, init, nd, np, npx
 from mxnet.gluon import nn
+npx.set_np()
 
 class Inception(nn.Block):
     # c1 - c4 are the number of output channels for each layer in the path
@@ -73,7 +74,7 @@ class Inception(nn.Block):
         p3 = self.p3_2(self.p3_1(x))
         p4 = self.p4_2(self.p4_1(x))
         # Concatenate the outputs on the channel dimension
-        return nd.concat(p1, p2, p3, p4, dim=1)
+        return np.concatenate([p1, p2, p3, p4], axis=1)
 ```
 
 To gain some intuition for why this network works so well, 
@@ -194,7 +195,7 @@ The changes in the shape of the output
 between the various modules is demonstrated below.
 
 ```{.python .input  n=7}
-X = nd.random.uniform(shape=(1, 1, 96, 96))
+X = np.random.uniform(size=(1, 1, 96, 96))
 net.initialize()
 for layer in net:
     X = layer(X)
