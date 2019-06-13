@@ -44,10 +44,10 @@ def squared_loss(y_hat, y):
 
 def grad_clipping(params, theta, ctx):
     """Clip the gradient."""
-    norm = nd.array([0], ctx)
+    norm = 0
     for param in params:
         norm += (param.grad ** 2).sum()
-    norm = norm.sqrt().asscalar()
+    norm = np.sqrt(norm)
     if norm > theta:
         for param in params:
             param.grad[:] *= theta / norm

@@ -9,9 +9,11 @@ sys.path.insert(0, '..')
 
 import d2l
 import math
-from mxnet import autograd, gluon, init, nd
+from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import loss as gloss, nn, rnn
 import time
+
+npx.set_np()
 
 corpus_indices, vocab = d2l.load_data_time_machine()
 ```
@@ -46,7 +48,7 @@ information. We will introduce LSTM and deep RNNs later in this chapter.
 
 ```{.python .input  n=38}
 num_steps = 35
-X = nd.random.uniform(shape=(num_steps, batch_size, len(vocab)))
+X = np.random.uniform(size=(num_steps, batch_size, len(vocab)))
 Y, state_new = rnn_layer(X, state)
 Y.shape, len(state_new), state_new[0].shape
 ```
@@ -65,7 +67,7 @@ class RNNModel(nn.Block):
     def forward(self, inputs, state):
         # Get the one-hot vector representation by transposing the input to
         # (num_steps, batch_size)
-        X = nd.one_hot(inputs.T, self.vocab_size)
+        X = npx.one_hot(inputs.T, self.vocab_size)
         Y, state = self.rnn(X, state)
         # The fully connected layer will first change the shape of Y to
         # (num_steps * batch_size, num_hiddens)
@@ -88,13 +90,13 @@ def predict_rnn_gluon(prefix, num_chars, model, vocab, ctx):
     state = model.begin_state(batch_size=1, ctx=ctx)
     output = [vocab[prefix[0]]]
     for t in range(num_chars + len(prefix) - 1):
-        X = nd.array([output[-1]], ctx=ctx).reshape((1, 1))
+        X = np.array([output[-1]], ctx=ctx).reshape((1, 1))
         # Forward computation does not require incoming model parameters
         (Y, state) = model(X, state)
         if t < len(prefix) - 1:
             output.append(vocab[prefix[t + 1]])
         else:
-            output.append(int(Y.argmax(axis=1).asscalar()))
+            output.append(int(Y.argmax(axis=1)))
     return ''.join([vocab.idx_to_token[i] for i in output])
 ```
 
@@ -146,7 +148,7 @@ def train_and_predict_rnn_gluon(model, num_hiddens, corpus_indices, vocab,
             # Since the error has already taken the mean, the gradient does
             # not need to be averaged
             trainer.step(1)
-            l_sum += l.asscalar() * y.size
+            l_sum += float(l) * y.size
             n += y.size
 
         if (epoch + 1) % 50 == 0:
