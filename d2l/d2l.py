@@ -11,6 +11,7 @@ import collections
 import os
 import sys
 import numpy as np
+import math
 from matplotlib import pyplot as plt
 from mxnet import nd, autograd, gluon, init, context, image
 from mxnet.gluon import nn
@@ -357,8 +358,8 @@ def read_time_machine():
     """Load the time machine book into a list of sentences."""
     with open('../data/timemachine.txt', 'r') as f:
         lines = f.readlines()
-    
-    return [re.sub('[^A-Za-z]+', ' ', line.strip().lower()) for line in lines]
+    return [re.sub('[^A-Za-z]+', ' ', line.strip().lower()) 
+            for line in lines]
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
@@ -452,6 +453,124 @@ def seq_data_iter_consecutive(corpus, batch_size, num_steps, ctx=None):
         X = Xs[:,i:(i+num_steps)]
         Y = Ys[:,i:(i+num_steps)]
         yield X, Y
+
+# Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
+class RNNModelScratch(object):
+    def __init__(self, vocab_size, num_hiddens,
+                 get_params, init_state, forward):
+        self.num_hiddens, self.vocab_size = num_hiddens, vocab_size
+        self.get_params, self.init_state = get_params, init_state
+        self.forward_fn = forward
+
+    def initialize(self, ctx, **kwargs):
+        """xxx"""
+        self.params = get_params(self.vocab_size, self.num_hiddens, ctx)
+
+    def __call__(self, X, state):
+        X = nd.one_hot(X.T, self.vocab_size)
+        return self.forward_fn(X, state, self.params)
+
+    def begin_state(self, batch_size, ctx):
+        return self.init_state(batch_size, self.num_hiddens, ctx)
+
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
+def predict_ch9(prefix, num_predicts, model, vocab, ctx):
+    state = model.begin_state(batch_size=1, ctx=ctx)
+    outputs = [vocab[prefix[0]]]
+    get_input = lambda: nd.array([outputs[-1]], ctx=ctx).reshape((1, 1))
+    for y in prefix[1:]:  # Warmup state with prefix
+        _, state = model(get_input(), state)
+        outputs.append(vocab[y])
+    for _ in range(num_predicts):  # Predict num_predicts steps
+        Y, state = model(get_input(), state)
+        outputs.append(int(Y.argmax(axis=1).reshape(1).asscalar()))
+    return ''.join([vocab.idx_to_token[i] for i in outputs])
+
+# Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
+def grad_clipping(model, theta, ctx):
+    if hasattr(model, 'params'):
+        params = model.params
+    else:  # model is a nn.Block object.
+        params = [p.data(ctx) for p in model.collect_params().values()]
+    norm = nd.array([0], ctx)
+    for param in params:
+        norm += (param.grad ** 2).sum()
+    norm = norm.sqrt().asscalar()
+    if norm > theta:
+        for param in params:
+            param.grad[:] *= theta / norm
+
+# Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
+def train_epoch_ch9(model, train_iter, loss, updater, batch_size, ctx, use_random_iter):
+    timer = d2l.Timer()
+    if not use_random_iter:
+        # Hidden state is initialized at the beginning of each epoch
+        # for the consecutive sampling. Otherwise, will initialize for each
+        # iteration.
+        state = model.begin_state(batch_size=batch_size, ctx=ctx)
+    metric = d2l.Accumulator(2)  # loss_sum, num_examples
+    for X, Y in train_iter:
+        if use_random_iter:
+            state = model.begin_state(batch_size=batch_size, ctx=ctx)
+        else:
+            # Detach gradient to avoid backpropagation beyond the
+            # current batch for the consecutive sampling.
+            for s in state: s.detach()
+        y = Y.T.reshape((-1,))
+        with autograd.record():
+            py, state = model(X, state)
+            #print(py.shape, Y.T.shape)
+            l = loss(py, y).mean()
+        l.backward()
+        grad_clipping(model, 1, ctx)
+        updater(batch_size=1)  # Since used mean already.
+        metric.add((l.asscalar() * y.size, y.size))
+    print(timer.stop())
+    return math.exp(metric[0]/metric[1])
+
+# Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
+def train_ch9(model, corpus, vocab, updater, num_epochs, batch_size, num_steps, 
+              ctx, use_random_iter=False):
+    if use_random_iter:
+        data_iter_fn = d2l.seq_data_iter_random
+    else:
+        data_iter_fn = d2l.seq_data_iter_consecutive
+    loss = gluon.loss.SoftmaxCrossEntropyLoss()
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss', legend=['train'],
+                            xlim=[1, num_epochs])
+    if hasattr(updater, 'step'): updater = updater.step  # It's Gluon Trainer.
+    for epoch in range(num_epochs):
+        data_iter = data_iter_fn(corpus, batch_size, num_steps, ctx)
+        train_err = train_epoch_ch9(
+            model, data_iter, loss, updater, batch_size, ctx, use_random_iter)
+        if epoch % 10 == 0:
+            print(predict_ch9('time traveller', 50, model, vocab, ctx))
+            animator.add(epoch+1, [train_err])
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/rnn-gluon.md
+class RNNModel(nn.Block):
+    def __init__(self, rnn_layer, vocab_size, **kwargs):
+        super(RNNModel, self).__init__(**kwargs)
+        self.rnn = rnn_layer
+        self.vocab_size = vocab_size
+        self.dense = nn.Dense(vocab_size)
+
+    def forward(self, inputs, state):
+        # Get the one-hot vector representation by transposing the input to
+        # (num_steps, batch_size)
+        X = nd.one_hot(inputs.T, self.vocab_size)
+        Y, state = self.rnn(X, state)
+        # The fully connected layer will first change the shape of Y to
+        # (num_steps * batch_size, num_hiddens)
+        # Its output shape is (num_steps * batch_size, vocab_size)
+        output = self.dense(Y.reshape((-1, Y.shape[-1])))
+        return output, state
+
+    def begin_state(self, *args, **kwargs):
+        return self.rnn.begin_state(*args, **kwargs)
 
 # Defined in file: ./chapter_optimization/optimization-intro.md
 def annotate(text, xy, xytext):

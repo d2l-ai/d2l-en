@@ -105,6 +105,39 @@ We conclude this section by illustrating how RNNs can be used to build a languag
 The number of words is huge compared to the number of characters. This is why quite often (such as in the subsequent sections) we will use a character-level RNN instead. In the next few sections, we will introduce its implementation.
 
 
+## Perplexity
+
+One way of measuring how well a sequence model works is to check how surprising the text is. A good language model is able to predict with high accuracy what we will see next. Consider the following continuations of the phrase `It is raining`, as proposed by different language models:
+
+1. `It is raining outside`
+1. `It is raining banana tree`
+1. `It is raining piouw;kcj pwepoiut`
+
+In terms of quality, example 1 is clearly the best. The words are sensible and logically coherent. While it might not quite so accurately reflect which word follows (`in San Francisco` and `in winter` would have been perfectly reasonable extensions), the model is able to capture which kind of word follows. Example 2 is considerably worse by producing a nonsensical and borderline dysgrammatical extension. Nonetheless, at least the model has learned how to spell words and some degree of correlation between words. Lastly, example 3 indicates a poorly trained model that doesn't fit data.
+
+One way of measuring the quality of the model is to compute $p(w)$, i.e. the likelihood of the sequence. Unfortunately this is a number that is hard to understand and difficult to compare. After all, shorter sequences are *much* more likely than long ones, hence evaluating the model on Tolstoy's magnum opus ['War and Peace'](https://www.gutenberg.org/files/2600/2600-h/2600-h.htm) will inevitably produce a much smaller likelihood than, say, on Saint-Exupery's novella ['The Little Prince'](https://en.wikipedia.org/wiki/The_Little_Prince). What is missing is the equivalent of an average.
+
+Information Theory comes handy here. If we want to compress text we can ask about estimating the next symbol given the current set of symbols. A lower bound on the number of bits is given by $-\log_2 p(w_t|w_{t-1}, \ldots w_1)$. A good language model should allow us to predict the next word quite accurately and thus it should allow us to spend very few bits on compressing the sequence. One way of measuring it is by the average number of bits that we need to spend.
+
+$$\frac{1}{n} \sum_{t=1}^n -\log p(w_t|w_{t-1}, \ldots w_1) = \frac{1}{|w|} -\log p(w)$$
+
+This makes the performance on documents of different lengths comparable. For historical reasons scientists in natural language processing prefer to use a quantity called perplexity rather than bitrate. In a nutshell it is the exponential of the above:
+
+$$\mathrm{PPL} := \exp\left(-\frac{1}{n} \sum_{t=1}^n \log p(w_t|w_{t-1}, \ldots w_1)\right)$$
+
+It can be best understood as the harmonic mean of the number of real choices
+that we have when deciding which word to pick next. Note that Perplexity
+naturally generalizes the notion of the cross entropy loss defined when we
+introduced
+the softmax regression (:numref:`chapter_softmax`). That
+is, for a single symbol both definitions are identical bar the fact that one is
+the exponential of the other. Let's look at a number of cases:
+
+* In the best case scenario, the model always estimates the probability of the next symbol as $1$. In this case the perplexity of the model is $1$.
+* In the worst case scenario, the model always predicts the probability of the label category as 0. In this situation, the perplexity is infinite.
+* At the baseline, the model predicts a uniform distribution over all tokens. In this case the perplexity equals the size of the dictionary `len(vocab)`. In fact, if we were to store the sequence without any compression this would be the best we could do to encode it. Hence this provides a nontrivial upper bound that any model must satisfy.
+
+
 ## Summary
 
 * A network that uses recurrent computation is called a recurrent neural network (RNN).

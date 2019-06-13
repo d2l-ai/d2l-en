@@ -21,8 +21,8 @@ def read_time_machine():
     """Load the time machine book into a list of sentences."""
     with open('../data/timemachine.txt', 'r') as f:
         lines = f.readlines()
-    
-    return [re.sub('[^A-Za-z]+', ' ', line.strip().lower()) for line in lines]
+    return [re.sub('[^A-Za-z]+', ' ', line.strip().lower()) 
+            for line in lines]
 
 lines = read_time_machine()
 '# sentences %d' % len(lines)
@@ -109,7 +109,7 @@ for i in range(8, 10):
 
 ## Put All Things Together
 
-We packaged the above code in the `load_data_time_machine` function, which returns `corpus`, a list of token indices, and `vocab`, the vocabulary. It will use characters as tokens. 
+We packaged the above code in the `load_data_time_machine` function, which returns `corpus`, a list of token indices, and `vocab`, the vocabulary. It will use characters as tokens.
 
 ```{.python .input}
 # Save to the d2l package.

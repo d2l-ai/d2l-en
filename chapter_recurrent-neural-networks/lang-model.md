@@ -194,7 +194,7 @@ for X, Y in seq_data_iter_random(my_seq, batch_size=2, num_steps=6):
 
 ### Sequential partitioning
 
-In addition to random sampling of the original sequence, we can also make the positions of two adjacent random mini-batches adjacent in the original sequence. 
+In addition to random sampling of the original sequence, we can also make the positions of two adjacent random mini-batches adjacent in the original sequence.
 
 ```{.python .input  n=7}
 # Save to the d2l package.
