@@ -29,23 +29,21 @@ Just as with multilayer perceptrons, the number of hidden layers $L$ and number 
 Fortunately many of the logistical details required to implement multiple layers of an RNN are readily available in Gluon. To keep things simple we only illustrate the implementation using such built-in functionality. The code is very similar to the one we used previously for LSTMs. In fact, the only difference is that we specify the number of layers explicitly rather than picking the default of a single layer. Let's begin by importing the appropriate modules and data.
 
 ```{.python .input  n=17}
-import sys
-sys.path.insert(0, '..')
-
 import d2l
 from mxnet import nd
 from mxnet.gluon import rnn
 
-corpus_indices, vocab = d2l.load_data_time_machine()
+batch_size, num_steps = 32, 35
+train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 ```
 
 The architectural decisions (parameters, etc.) are very similar to those of previous sections. We pick the same number of inputs and outputs as we have distinct tokens, i.e. `vocab_size`. The number of hidden units is still 256 and we retain a learning rate of 100. The only difference is that we now select a nontrivial number of layers `num_layers = 2`. Since the model is somewhat slower to train we use 3000 iterations.
 
 ```{.python .input  n=22}
-num_inputs, num_hiddens, num_layers, num_outputs = len(vocab), 256, 2, len(vocab)
-ctx = d2l.try_gpu()
-num_epochs, num_steps, batch_size, lr, clipping_theta = 500, 35, 32, 5, 1
-prefixes = ['traveller', 'time traveller']
+vocab_size, num_hiddens, num_layers, ctx = len(vocab), 256, 2, d2l.try_gpu()
+lstm_layer = rnn.LSTM(num_hiddens, num_layers)
+model = d2l.RNNModel(lstm_layer, len(vocab))
+
 ```
 
 ## Training
@@ -53,12 +51,8 @@ prefixes = ['traveller', 'time traveller']
 The actual invocation logic is identical to before and we re-use `train_and_predict_rnn_gluon`. The only difference is that we now instantiate two layers with LSTMs. This rather more complex architecture and the large number of epochs slow down training considerably.
 
 ```{.python .input  n=8}
-lstm_layer = rnn.LSTM(hidden_size = num_hiddens, num_layers=num_layers)
-model = d2l.RNNModel(lstm_layer, len(vocab))
-d2l.train_and_predict_rnn_gluon(model, num_hiddens, corpus_indices, vocab,
-                                ctx, num_epochs, num_steps, lr,
-                                clipping_theta, batch_size, prefixes)
-
+num_epochs, lr = 500, 2
+d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, ctx)
 ```
 
 ## Summary

@@ -76,7 +76,7 @@ data set is given below:
 
 ```{.python .input  n=6}
 import d2l
-from mxnet import nd, init, gluon
+from mxnet import nd
 from mxnet.gluon import rnn
 
 batch_size, num_steps = 32, 35

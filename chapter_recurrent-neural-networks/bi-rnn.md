@@ -2,7 +2,7 @@
 
 So far we assumed that our goal is to model the next word given what we've seen so far, e.g. in the context of a time series or in the context of a language model. While this is a typical scenario, it is not the only one we might encounter. To illustrate the issue, consider the following three tasks of filling in the blanks in a text:
 
-```text
+```{.python .input .text}
 I am _____
 I am _____ very hungry.
 I am _____ very hungry, I could eat half a pig.
@@ -99,26 +99,19 @@ In practice bidirectional layers are used very sparingly and only for a narrow s
 If we were to ignore all advice regarding the fact that bidirectional LSTMs use past and future data and simply apply it to language models we will get estimates with acceptable perplexity. Nonetheless the ability of the model to predict future symbols is severely compromised as the example below illustrates. Despite reasonable perplexity numbers it only generates gibberish even after many iterations. We include the code below as a cautionary example against using them in the wrong context.
 
 ```{.python .input}
-import sys
-sys.path.insert(0, '..')
-
 import d2l
 from mxnet import nd
 from mxnet.gluon import rnn
 
-corpus_indices, vocab = d2l.load_data_time_machine()
+batch_size, num_steps = 32, 35
+train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 
-num_inputs, num_hiddens, num_layers, num_outputs = len(vocab), 256, 2, len(vocab)
-ctx = d2l.try_gpu()
-num_epochs, num_steps, batch_size, lr, clipping_theta = 500, 35, 32, 1, 1
-prefixes = ['traveller', 'time traveller']
-
-lstm_layer = rnn.LSTM(hidden_size = num_hiddens, num_layers=num_layers,
-                      bidirectional = True)
+vocab_size, num_hiddens, num_layers, ctx = len(vocab), 256, 2, d2l.try_gpu()
+lstm_layer = rnn.LSTM(num_hiddens, num_layers, bidirectional=True)
 model = d2l.RNNModel(lstm_layer, len(vocab))
-d2l.train_and_predict_rnn_gluon(model, num_hiddens, corpus_indices, vocab,
-                                ctx, num_epochs, num_steps, lr,
-                                clipping_theta, batch_size, prefixes)
+
+num_epochs, lr = 500, 1
+d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, ctx)
 ```
 
 The output is clearly unsatisfactory for the reasons described above. For a
