@@ -1,16 +1,16 @@
 # Text Preprocessing
 :label:`chapter_text_preprocessing`
 
-Text is an important example of sequence data. An article can be simply viewed as a sequence of words, or even a sequence of chars in a more simplified viewpoint. Text data is the second major input data format besides images we will consider in this book. In this section, we will introduce the common preprocessing steps for text data. It often consists of four steps:
+Text is an important example of sequence data. An article can be simply viewed as a sequence of words, or a sequence of characters. Given text data is a major data format besides images we are using in this book, this section will dedicate to explain the common preprocessing steps for text data. Such preprocessing often consists of four steps:
 
-1. Loads the dataset as strings into memory.
-1. Splits strings into tokens, a token could be a word or a char. 
+1. Loads texts as strings into memory.
+1. Splits strings into tokens, a token could be a word or a character. 
 1. Builds a vocabulary for these tokens to map them into numerical indices. 
 1. Maps all tokens in the data into indices to facilitate to feed into models. 
 
 ## Data Loading
 
-To get started we load text from H.G. Wells' [Time Machine](http://www.gutenberg.org/ebooks/35). This is a fairly small corpus of just over 30,000 words but for the purpose of what we want to illustrate this is just fine. More realistic document collections contain many billions of words. The following function read the dataset into a list of sentences, each sentence is a string. Here we ignore punctuation and capitalization.
+To get started we load text from H. G. Wells' [Time Machine](http://www.gutenberg.org/ebooks/35). This is a fairly small corpus of just over 30,000 words but for the purpose of what we want to illustrate this is just fine. More realistic document collections contain many billions of words. The following function read the dataset into a list of sentences, each sentence is a string. Here we ignore punctuation and capitalization.
 
 ```{.python .input}
 import collections
@@ -30,7 +30,7 @@ lines = read_time_machine()
 
 ## Tokenization
 
-For each sentence, we split it into a list of tokens. A token, often a word or a char, a data point the model will train and predict.
+For each sentence, we split it into a list of tokens. A token is a data point the model will train and predict. The following function supports split a sentence into words or characters, and return a list of split sentences.   
 
 ```{.python .input}
 # Save to the d2l package.
@@ -48,6 +48,10 @@ tokens[0:2]
 ```
 
 ## Vocabulary
+
+A token has a string type, we 
+
+Each a token is a 
 
 Then we need to map tokens into numerical indices. We often call it a vocabulary. Its input is a list of token lists,  called a corpus. Then it counts the frequency of each token in this corpus, and then assigns an numerical index to each token according to its frequency. Rarely appeared tokens are often removed to reduce the complexity. A token doesn't exist in corpus or has been removed is mapped into a special unknown (“&lt;unk&gt;”) token. We optionally add another three special tokens: “&lt;pad&gt;” a token for padding, “&lt;bos&gt;” to present the beginning for a sentence, and “&lt;eos&gt;” for the ending of a sentence.
 
