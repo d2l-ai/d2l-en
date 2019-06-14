@@ -168,19 +168,18 @@ As the above example shows, this is a spectacular failure. The estimates decay t
 Let's verify this observation by computing the $k$-step predictions on the entire sequence.
 
 ```{.python .input}
-k = 33  # Look up to k - embedding steps ahead
+k = 33  # Look up to k - tau steps ahead
 
-features = nd.zeros((T-k, k))
-for i in range(embedding):
-    features[:,i] = x[i:T-k+i]
+features = nd.zeros((k, T-k))
+for i in range(tau):  # Copy the first tau features from x
+    features[i] = x[i:T-k+i]
 
-for i in range(embedding, k):
-    features[:,i] = net(features[:,(i-embedding):i]).reshape((-1))
+for i in range(tau, k):  # Predict the (i-tau)-th step
+    features[i] = net(features[(i-tau):i].T).T
 
-for i in (4, 8, 16, 32):
-    d2l.plt.plot(time[i:T-k+i].asnumpy(), features[:,i].asnumpy(),
-             label=('step ' + str(i)))
-d2l.plt.legend()
+steps = (4, 8, 16, 32)
+d2l.plot([time[i:T-k+i] for i in steps], [features[i] for i in steps], 
+         legend=['step %d'%i for i in steps], figsize=(4.5, 2.5))
 ```
 
 This clearly illustrates how the quality of the estimates changes as we try to predict further into the future. While the 8-step predictions are still pretty good, anything beyond that is pretty useless.
