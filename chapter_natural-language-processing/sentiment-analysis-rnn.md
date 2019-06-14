@@ -5,16 +5,18 @@ Text classification is a common task in natural language processing, which trans
 
 Similar to search synonyms and analogies, text classification is also a downstream application of word embedding. In this section, we will apply pre-trained word vectors and bidirectional recurrent neural networks with multiple hidden layers. We will use them to determine whether a text sequence of indefinite length contains positive or negative emotion. Import the required package or module before starting the experiment.
 
-```{.python .input  n=2}
+```{.python .input  n=1}
 import sys
 sys.path.insert(0, '..')
 
 import d2l
-from mxnet import gluon, init, nd
+from mxnet import gluon, init, np, npx
 from mxnet.gluon import data as gdata, loss as gloss, nn, rnn, utils as gutils
 from mxnet.contrib import text
 import os
 import tarfile
+
+npx.set_np()
 ```
 
 ## Text Sentiment Classification Data
@@ -25,7 +27,7 @@ We use Stanford's Large Movie Review Dataset as the data set for text sentiment 
 
 We first download this data set to the "../data" path and extract it to "../data/aclImdb".
 
-```{.python .input  n=23}
+```{.python .input  n=2}
 data_dir = '../data'
 url = 'http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz'
 fname = gutils.download(url, data_dir)
@@ -35,7 +37,7 @@ with tarfile.open(fname, 'r') as f:
 
 Next, read the training and test data sets. Each example is a review and its corresponding label: 1 indicates "positive" and 0 indicates "negative".
 
-```{.python .input  n=24}
+```{.python .input  n=3}
 def read_imdb(folder='train'):
     data, labels = [], []
     for label in ['pos', 'neg']:
@@ -57,7 +59,7 @@ for x, y in zip(train_data[0][:3], train_data[1][:3]):
 
 We use a word as a token, which can be split based on spaces.
 
-```{.python .input  n=28}
+```{.python .input  n=4}
 def tokenize(sentences):
     return [line.split(' ') for line in sentences]
 
@@ -68,7 +70,7 @@ test_tokens = tokenize(test_data[0])
 Then we can create a dictionary based on the training data set with the words segmented.
 Here, we have filtered out words that appear less than 5 times.
 
-```{.python .input}
+```{.python .input  n=5}
 vocab = d2l.Vocab([tk for line in train_tokens for tk in line], min_freq=5)
 ```
 
@@ -76,7 +78,7 @@ vocab = d2l.Vocab([tk for line in train_tokens for tk in line], min_freq=5)
 
 Because the reviews have different lengths, so they cannot be directly combined into mini-batches. Here we fix the length of each comment to 500 by truncating or adding "&lt;unk&gt;" indices.
 
-```{.python .input  n=44}
+```{.python .input  n=6}
 max_len = 500
 
 def pad(x):
@@ -85,15 +87,15 @@ def pad(x):
     else:
         return x + [vocab.unk] * (max_len - len(x))
 
-train_features = nd.array([pad(vocab[line]) for line in train_tokens])
-test_features = nd.array([pad(vocab[line]) for line in test_tokens])
+train_features = np.array([pad(vocab[line]) for line in train_tokens])
+test_features = np.array([pad(vocab[line]) for line in test_tokens])
 ```
 
 ### Create Data Iterator
 
 Now, we will create a data iterator. Each iteration will return a mini-batch of data.
 
-```{.python .input}
+```{.python .input  n=7}
 batch_size = 64
 train_set = gdata.ArrayDataset(train_features, train_data[1])
 test_set = gdata.ArrayDataset(test_features, test_data[1])
@@ -103,7 +105,7 @@ test_iter = gdata.DataLoader(test_set, batch_size)
 
 Print the shape of the first mini-batch of data and the number of mini-batches in the training set.
 
-```{.python .input}
+```{.python .input  n=8}
 for X, y in train_iter:
     print('X', X.shape, 'y', y.shape)
     break
@@ -116,7 +118,7 @@ Lastly, we will save a function `get_data_imdb` into `d2l`, which returns the vo
 
 In this model, each word first obtains a feature vector from the embedding layer. Then, we further encode the feature sequence using a bidirectional recurrent neural network to obtain sequence information. Finally, we transform the encoded sequence information to output through the fully connected layer. Specifically, we can concatenate hidden states of bidirectional long-short term memory in the initial time step and final time step and pass it to the output layer classification as encoded feature sequence information. In the `BiRNN` class implemented below, the `Embedding` instance is the embedding layer, the `LSTM` instance is the hidden layer for sequence encoding, and the `Dense` instance is the output layer for generated classification results.
 
-```{.python .input  n=46}
+```{.python .input  n=9}
 class BiRNN(nn.Block):
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers, **kwargs):
         super(BiRNN, self).__init__(**kwargs)
@@ -141,14 +143,14 @@ class BiRNN(nn.Block):
         # Concatenate the hidden states of the initial time step and final
         # time step to use as the input of the fully connected layer. Its
         # shape is (batch size, 4 * number of hidden units)
-        encoding = nd.concat(outputs[0], outputs[-1])
+        encoding = np.concatenate([outputs[0], outputs[-1]], axis=1)
         outs = self.decoder(encoding)
         return outs
 ```
 
 Create a bidirectional recurrent neural network with two hidden layers.
 
-```{.python .input}
+```{.python .input  n=10}
 embed_size, num_hiddens, num_layers, ctx = 100, 100, 2, d2l.try_all_gpus()
 net = BiRNN(len(vocab), embed_size, num_hiddens, num_layers)
 net.initialize(init.Xavier(), ctx=ctx)
@@ -158,21 +160,21 @@ net.initialize(init.Xavier(), ctx=ctx)
 
 Because the training data set for sentiment classification is not very large, in order to deal with overfitting, we will directly use word vectors pre-trained on a larger corpus as the feature vectors of all words. Here, we load a 100-dimensional GloVe word vector for each word in the dictionary `vocab`.
 
-```{.python .input}
+```{.python .input  n=11}
 glove_embedding = text.embedding.create(
     'glove', pretrained_file_name='glove.6B.100d.txt')
 ```
 
 Query the word vectors that in our vocabulary.
 
-```{.python .input}
+```{.python .input  n=12}
 embeds = glove_embedding.get_vecs_by_tokens(vocab.idx_to_token)
 embeds.shape
 ```
 
 Then, we will use these word vectors as feature vectors for each word in the reviews. Note that the dimensions of the pre-trained word vectors need to be consistent with the embedding layer output size `embed_size` in the created model. In addition, we no longer update these word vectors during training.
 
-```{.python .input  n=47}
+```{.python .input  n=13}
 net.embedding.weight.set_data(embeds)
 net.embedding.collect_params().setattr('grad_req', 'null')
 ```
@@ -181,7 +183,7 @@ net.embedding.collect_params().setattr('grad_req', 'null')
 
 Now, we can start training.
 
-```{.python .input  n=48}
+```{.python .input  n=14}
 lr, num_epochs = 0.01, 5
 trainer = gluon.Trainer(net.collect_params(), 'adam', {'learning_rate': lr})
 loss = gloss.SoftmaxCrossEntropyLoss()
@@ -192,9 +194,9 @@ Finally, define the prediction function.
 
 ```{.python .input  n=49}
 def predict_sentiment(net, vocab, sentence):
-    sentence = nd.array(vocab[sentence.split()], ctx=d2l.try_gpu())
-    label = nd.argmax(net(sentence.reshape((1, -1))), axis=1)
-    return 'positive' if label.asscalar() == 1 else 'negative'
+    sentence = np.array(vocab[sentence.split()], ctx=d2l.try_gpu())
+    label = net(sentence.reshape((1, -1))).argmax(axis=1)
+    return 'positive' if label == 1 else 'negative'
 ```
 
 Then, use the trained model to classify the sentiments of two simple sentences.
