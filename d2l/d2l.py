@@ -164,7 +164,7 @@ class Animator(object):
         self.config_axes()
         display.display(self.fig)
         display.clear_output(wait=True)
-        
+
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
@@ -175,8 +175,8 @@ def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
     axes.set_yscale(yscale)
     axes.set_xlim(xlim)
     axes.set_ylim(ylim)
-    axes.legend(legend)
-    axes.grid()        
+    if legend: axes.legend(legend)
+    axes.grid()
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
@@ -205,6 +205,8 @@ def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
     """Plot multiple lines"""
     d2l.set_figsize(figsize)
     axes = axes if axes else d2l.plt.gca()
+    if isinstance(X, nd.NDArray): X = X.asnumpy()
+    if isinstance(Y, nd.NDArray): Y = Y.asnumpy()
     if not hasattr(X[0], "__len__"): X = [X]
     if Y is None: X, Y = [[]]*len(X), X
     if not hasattr(Y[0], "__len__"): Y = [Y]
