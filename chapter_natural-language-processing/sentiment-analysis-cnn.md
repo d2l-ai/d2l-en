@@ -8,9 +8,11 @@ import sys
 sys.path.insert(0, '..')
 
 import d2l
-from mxnet import gluon, init, nd
+from mxnet import gluon, init, np, npx
 from mxnet.contrib import text
 from mxnet.gluon import loss as gloss, nn
+
+npx.set_np()
 ```
 
 ## One-dimensional Convolutional Layer
@@ -24,7 +26,7 @@ Next, we implement one-dimensional cross-correlation in the `corr1d` function. I
 ```{.python .input  n=3}
 def corr1d(X, K):
     w = K.shape[0]
-    Y = nd.zeros((X.shape[0] - w + 1))
+    Y = np.zeros((X.shape[0] - w + 1))
     for i in range(Y.shape[0]):
         Y[i] = (X[i: i + w] * K).sum()
     return Y
@@ -33,7 +35,7 @@ def corr1d(X, K):
 Now, we will reproduce the results of the one-dimensional cross-correlation operation in Figure 12.4.
 
 ```{.python .input  n=4}
-X, K = nd.array([0, 1, 2, 3, 4, 5, 6]), nd.array([1, 2])
+X, K = np.array([0, 1, 2, 3, 4, 5, 6]), np.array([1, 2])
 corr1d(X, K)
 ```
 
@@ -48,12 +50,12 @@ def corr1d_multi_in(X, K):
     # First, we traverse along the 0th dimension (channel dimension) of X and
     # K. Then, we add them together by using * to turn the result list into a
     # positional argument of the add_n function
-    return nd.add_n(*[corr1d(x, k) for x, k in zip(X, K)])
+    return sum([corr1d(x, k) for x, k in zip(X, K)])
 
-X = nd.array([[0, 1, 2, 3, 4, 5, 6],
+X = np.array([[0, 1, 2, 3, 4, 5, 6],
               [1, 2, 3, 4, 5, 6, 7],
               [2, 3, 4, 5, 6, 7, 8]])
-K = nd.array([[1, 2], [3, 4], [-1, -3]])
+K = np.array([[1, 2], [3, 4], [-1, -3]])
 corr1d_multi_in(X, K)
 ```
 
@@ -120,18 +122,18 @@ class TextCNN(nn.Block):
     def forward(self, inputs):
         # Concatenate the output of two embedding layers with shape of
         # (batch size, number of words, word vector dimension) by word vector
-        embeddings = nd.concat(
-            self.embedding(inputs), self.constant_embedding(inputs), dim=2)
+        embeddings = np.concatenate(
+            [self.embedding(inputs), self.constant_embedding(inputs)], axis=2)
         # According to the input format required by Conv1D, the word vector
         # dimension, that is, the channel dimension of the one-dimensional
         # convolutional layer, is transformed into the previous dimension
-        embeddings = embeddings.transpose((0, 2, 1))
+        embeddings = embeddings.transpose(0, 2, 1)
         # For each one-dimensional convolutional layer, after max-over-time
         # pooling, an NDArray with the shape of (batch size, channel size, 1)
         # can be obtained. Use the flatten function to remove the last
         # dimension and then concatenate on the channel dimension
-        encoding = nd.concat(*[nd.flatten(
-            self.pool(conv(embeddings))) for conv in self.convs], dim=1)
+        encoding = np.concatenate([npx.batch_flatten(
+            self.pool(conv(embeddings))) for conv in self.convs], axis=1)
         # After applying the dropout method, use a fully connected layer to
         # obtain the output
         outputs = self.decoder(self.dropout(encoding))

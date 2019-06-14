@@ -355,9 +355,9 @@ def predict_rnn_gluon(prefix, num_chars, model, vocab, ctx):
 
 def predict_sentiment(net, vocab, sentence):
     """Predict the sentiment of a given sentence."""
-    sentence = nd.array(vocab[sentence.split()], ctx=try_gpu())
-    label = nd.argmax(net(sentence.reshape((1, -1))), axis=1)
-    return 'positive' if label.asscalar() == 1 else 'negative'
+    sentence = np.array(vocab[sentence.split()], ctx=try_gpu())
+    label = net(sentence.reshape((1, -1))).argmax(axis=1)
+    return 'positive' if label == 1 else 'negative'
 
 def train_ch7(model, data_iter, lr, num_epochs, ctx):
     """Train an encoder-decoder model"""
