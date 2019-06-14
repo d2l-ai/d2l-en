@@ -109,15 +109,16 @@ for i in range(8, 10):
 
 ## Put All Things Together
 
-We packaged the above code in the `load_data_time_machine` function, which returns `corpus`, a list of token indices, and `vocab`, the vocabulary. It will use characters as tokens.
+We packaged the above code in the `load_corpus_time_machine` function, which returns `corpus`, a list of token indices, and `vocab`, the vocabulary. It will use characters as tokens.
 
 ```{.python .input}
 # Save to the d2l package.
-def load_data_time_machine():
+def load_corpus_time_machine(max_tokens=-1):
     lines = read_time_machine()
     tokens = tokenize(lines, 'char')
     vocab = Vocab(tokens)
     corpus = [vocab[tk] for line in tokens for tk in line]
+    if max_tokens > 0: corpus = corpus[:max_tokens]
     return corpus, vocab
 ```
 

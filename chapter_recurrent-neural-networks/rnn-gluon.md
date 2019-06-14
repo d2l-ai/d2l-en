@@ -9,7 +9,8 @@ import math
 from mxnet import gluon, init, nd
 from mxnet.gluon import nn, rnn
 
-corpus, vocab = d2l.load_data_time_machine()
+batch_size, num_steps = 32, 35
+train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 ```
 
 ## Defining the Model
@@ -84,7 +85,6 @@ ctx = d2l.try_gpu()
 model = RNNModel(rnn_layer, len(vocab))
 model.initialize(force_reinit=True, ctx=ctx)
 d2l.predict_ch9('time traveller', 10, model, vocab, ctx)
-
 ```
 
 As is quite obvious, this model doesn't work at all (just yet). Next, we implement the training function. We first implement a wrap function to clip the gradients of a Gluon model.
@@ -94,14 +94,8 @@ Its training algorithm is the same as in the previous section. But we only use t
 Let's train the model using the same hyper-parameters as in the previous section. The primary difference is that we are now using built-in functions that are considerably faster than when writing code explicitly in Python.
 
 ```{.python .input  n=19}
-num_epochs, batch_size, lr, clipping_theta = 500, 32, 1, 1
-model.initialize(ctx=ctx, force_reinit=True, init=init.Normal(0.01))
-trainer = gluon.Trainer(model.collect_params(), 'sgd', {'learning_rate': lr})
-#updater = lambda batch_size : trainer.step(batch_size)
-
-#updater = lambda batch_size: d2l.sgd(model.params, lr, batch_size)
-d2l.train_ch9(model, corpus, vocab, trainer,
-              num_epochs, batch_size, num_steps, ctx, use_random_iter=False)
+num_epochs, lr = 500, 1
+d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, ctx)
 ```
 
 The model achieves comparable perplexity, albeit within a shorter period of time, due to the code being more optimized.

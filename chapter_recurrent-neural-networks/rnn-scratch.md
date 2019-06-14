@@ -1,14 +1,16 @@
 # Implementation of Recurrent Neural Networks from Scratch
 :label:`chapter_rnn_scratch`
 
-In this section we implement a language model from scratch. It is based on a character-level recurrent neural network trained on H. G. Wells' *The Time Machine*. As before, we start by reading the data set first, which is introduced in :numref:`chapter_text_preprocessing`.
+In this section we implement a language model from scratch. It is based on a character-level recurrent neural network trained on H. G. Wells' *The Time Machine*. As before, we start by reading the data set first, which is introduced in :numref:`chapter_text_preprocessing`. We only use the first $10,000$ tokens in the data set to make the training easy. 
 
 ```{.python .input  n=14}
+%matplotlib inline
 import d2l
 import math
 from mxnet import autograd, nd, gluon
 
-corpus, vocab = d2l.load_data_time_machine()
+batch_size, num_steps = 32, 35
+train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 ```
 
 ## One-hot Encoding
@@ -21,14 +23,12 @@ nd.one_hot(nd.array([0, 2]), len(vocab))
 
 Note that one-hot encodings are just a convenient way of separating the encoding (e.g. mapping the character `a` to $(1,0,0, \ldots)$ vector) from the embedding (i.e. multiplying the encoded vectors by some weight matrix $\mathbf{W}$). This simplifies the code greatly relative to storing an embedding matrix that the user needs to maintain.
 
-The shape of the mini-batch we sample each time is (batch size, time step). The following function transforms such mini-batches into a number of matrices with the shape of (batch size, dictionary size) that can be entered into the network. The total number of matrices is equal to the number of time steps. That is, the input of time step $t$ is $\boldsymbol{X}_t \in \mathbb{R}^{n \times d}$, where $n$ is the batch size and $d$ is the number of inputs. That is the one-hot vector length (the dictionary size).
+The shape of the mini-batch we sample each time is (batch size, time step). The `one_hot` function transforms such a mini-batch into a 3-D tensor with the last dimension equals to the vocabulary size. We also transpose the input so that we will obtain a (time step, batch size, vocabulary size) output that fits into a sequence model easier. 
 
 ```{.python .input  n=18}
 X = nd.arange(10).reshape((2, 5))
 nd.one_hot(X.T, 28).shape
 ```
-
-The code above generates 5 minibatches containing 2 vectors each. Since we have a total of 43 distinct symbols in "The Time Machine" we get 43-dimensional vectors.
 
 ## Initializing the Model Parameters
 
@@ -52,11 +52,9 @@ def get_params(vocab_size, num_hiddens, ctx):
     return params
 ```
 
-## Sequence Modeling
+## RNN Model 
 
-### RNN Model
-
-We implement this model based on the definition of an RNN. First, we need an `init_rnn_state` function to return the hidden state at initialization. It returns a tuple consisting of an NDArray with a value of 0 and a shape of (batch size, number of hidden units). Using tuples makes it easier to handle situations where the hidden state contains multiple NDArrays (e.g. when combining multiple layers in an RNN where each layers requires initializing).
+First, we need an `init_rnn_state` function to return the hidden state at initialization. It returns a tuple consisting of an NDArray with a value of 0 and a shape of (batch size, number of hidden units). Using tuples makes it easier to handle situations where the hidden state contains multiple NDArrays (e.g. when combining multiple layers in an RNN where each layers requires initializing).
 
 ```{.python .input  n=20}
 def init_rnn_state(batch_size, num_hiddens, ctx):
@@ -71,31 +69,30 @@ distributed over the real numbers.
 
 ```{.python .input  n=6}
 def rnn(inputs, state, params):
-    # Both inputs and outputs are composed of num_steps matrices of the shape
-    # (batch_size, len(vocab))
+    # inputs shape: (num_steps, batch_size, vocab_size)
     W_xh, W_hh, b_h, W_hq, b_q = params
     H, = state
     outputs = []
     for X in inputs:
         H = nd.tanh(nd.dot(X, W_xh) + nd.dot(H, W_hh) + b_h)
         Y = nd.dot(H, W_hq) + b_q
-        outputs.append(Y)#.expand_dims(axis=0))
-    #return nd.concatenate(outputs), (H,)
+        outputs.append(Y)
     return nd.concat(*outputs, dim=0), (H,)
 ```
+
+With the state initialization and model forward functions, we now can define a RNN class. 
 
 ```{.python .input}
 # Save to the d2l package.
 class RNNModelScratch(object):
-    def __init__(self, vocab_size, num_hiddens,
+    """A RNN Model based on scratch implementations"""
+    def __init__(self, vocab_size, num_hiddens, ctx,
                  get_params, init_state, forward):
-        self.num_hiddens, self.vocab_size = num_hiddens, vocab_size
-        self.get_params, self.init_state = get_params, init_state
+        self.vocab_size = vocab_size
+        self.params = get_params(vocab_size, num_hiddens, ctx)
+        self.init_state = init_state
         self.forward_fn = forward
-
-    def initialize(self, ctx, **kwargs):
-        """xxx"""
-        self.params = get_params(self.vocab_size, self.num_hiddens, ctx)
+        self.num_hiddens = num_hiddens
 
     def __call__(self, X, state):
         X = nd.one_hot(X.T, self.vocab_size)
@@ -103,22 +100,13 @@ class RNNModelScratch(object):
 
     def begin_state(self, batch_size, ctx):
         return self.init_state(batch_size, self.num_hiddens, ctx)
-
-
 ```
 
 Let's run a simple test to check whether the model makes any sense at all. In particular, let's check whether inputs and outputs have the correct dimensions, e.g. to ensure that the dimensionality of the hidden state hasn't changed.
 
 ```{.python .input}
 vocab_size, num_hiddens, ctx = len(vocab), 512, d2l.try_gpu()
-
-#state = init_rnn_state(X.shape[0], num_hiddens, ctx)
-#inputs = nd.one_hot(X.as_in_context(ctx).T, len(vocab))
-#params = get_params(vocab_size, num_hiddens, ctx)
-#outputs, state_new = rnn(inputs, state, params)
-#outputs.shape, outputs[0].shape, state_new[0].shape
-
-model = RNNModelScratch(len(vocab), num_hiddens, get_params,
+model = RNNModelScratch(len(vocab), num_hiddens, ctx, get_params, 
                         init_rnn_state, rnn)
 model.initialize(ctx)
 state = model.begin_state(X.shape[0], ctx)
@@ -126,13 +114,15 @@ Y, new_state = model(X.as_in_context(ctx), state)
 Y.shape, len(new_state), new_state[0].shape
 ```
 
-### Prediction Function
+We can see that the output shape is (number steps $\times$ batch size, vocabulary size), while the state shape is unchanged. 
 
-The following function predicts the next `num_chars` characters based on the `prefix` (a string containing several characters). This function is a bit more complicated. Whenever the actual sequence is known, i.e. for the beginning of the sequence, we only update the hidden state. After that we begin generating new characters and emitting them. For convenience we use the recurrent neural unit `rnn` as a function parameter, so that this function can be reused in the other recurrent neural networks described in following sections.
+## Prediction
+
+The following function predicts the next `num_predicts` characters based on the `prefix` (a string containing several characters). For the beginning of the sequence, we only update the hidden state. After that we begin generating new characters and emitting them. 
 
 ```{.python .input}
 # Save to the d2l package.
-def predict_ch9(prefix, num_predicts, model, vocab, ctx):
+def predict_ch8(prefix, num_predicts, model, vocab, ctx):
     state = model.begin_state(batch_size=1, ctx=ctx)
     outputs = [vocab[prefix[0]]]
     get_input = lambda: nd.array([outputs[-1]], ctx=ctx).reshape((1, 1))
@@ -148,7 +138,7 @@ def predict_ch9(prefix, num_predicts, model, vocab, ctx):
 We test the `predict_rnn` function first. Given that we didn't train the network it will generate nonsensical predictions. We initialize it with the sequence `traveller ` and have it generate 10 additional characters.
 
 ```{.python .input  n=9}
-predict_ch9('traveller ', 10, model, vocab, ctx)
+predict_ch8('traveller ', 10, model, vocab, ctx)
 ```
 
 ## Gradient Clipping
@@ -169,95 +159,92 @@ By doing so we know that the gradient norm never exceeds $\theta$ and that the u
 
 ```{.python .input  n=10}
 # Save to the d2l package.
-def grad_clipping(model, theta, ctx):
-    if hasattr(model, 'params'):
+def grad_clipping(model, theta):
+    if isinstance(model, gluon.Block):
+        params = [p.data() for p in model.collect_params().values()]
+    else:
         params = model.params
-    else:  # model is a nn.Block object.
-        params = [p.data(ctx) for p in model.collect_params().values()]
-    norm = nd.array([0], ctx)
-    for param in params:
-        norm += (param.grad ** 2).sum()
-    norm = norm.sqrt().asscalar()
+    norm = math.sqrt(sum((p.grad ** 2).sum().asscalar() for p in params))
     if norm > theta:
         for param in params:
             param.grad[:] *= theta / norm
 ```
 
-## Training the Model
+## Training 
 
-Training a sequence model proceeds quite different from previous codes. In particular we need to take care of the following changes due to the fact that the tokens appear in order:
+Similar to :numref:`chapter_linear_scratch`, let's first define the function to train the model on one data epoch. It differs to the models training from previous chapters in three places:
 
-1. We use perplexity to evaluate the model. This ensures that different tests are comparable.
-1. We clip the gradient before updating the model parameters. This ensures that the model doesn't diverge even when gradients blow up at some point during the training process (effectively it reduces the stepsize automatically).
 1. Different sampling methods for sequential data (independent sampling and
    sequential partitioning) will result in differences in the initialization of
-   hidden states. We discussed these issues in detail when we covered
-   :numref:`chapter_lang_model_dataset`.
+   hidden states. 
+1. We clip the gradient before updating the model parameters. This ensures that the model doesn't diverge even when gradients blow up at some point during the training process (effectively it reduces the stepsize automatically).
+1. We use perplexity to evaluate the model. This ensures that different tests are comparable.
 
-### Optimization Loop
-
-Now, we can use a hidden state of the last time step of a mini-batch to initialize the hidden state of the next mini-batch, so that the output of the next mini-batch is also dependent on the input of the mini-batch, with this pattern continuing in subsequent mini-batches. This has two effects on the implementation of a recurrent neural network. On the one hand,
-when training the model, we only need to initialize the hidden state at the beginning of each epoch.
-On the other hand, when multiple adjacent mini-batches are concatenated by passing hidden states, the gradient calculation of the model parameters will depend on all the mini-batch sequences that are concatenated. In the same epoch as the number of iterations increases, the costs of gradient calculation rise.
-So that the model parameter gradient calculations only depend on the mini-batch sequence read by one iteration, we can separate the hidden state from the computational graph before reading the mini-batch (this can be done by detaching the graph). We will gain a deeper understand this approach in the following sections.
+When the consecutive sampling is used, we initialize the hidden state at the beginning of each epoch. Since the $i$-th example in the next mini-batch is adjacent to the current $i$-th example, so we next mini-batch can use the current hidden state directly, we only detach the gradient so that we only compute the gradients within a mini-batch. When using the random sampling, we need to re-initialize the hidden state for each iteration since each example is sampled with a random position. Same to the `train_epoch_ch3` function (:numref:`chapter_linear_scratch`), we use generalized `updater`, which could be a Gluon trainer or a scratched implementation. 
 
 ```{.python .input}
 # Save to the d2l package.
-def train_epoch_ch9(model, train_iter, loss, updater, batch_size, ctx, use_random_iter):
-    timer = d2l.Timer()
-    if not use_random_iter:
-        # Hidden state is initialized at the beginning of each epoch
-        # for the consecutive sampling. Otherwise, will initialize for each
-        # iteration.
-        state = model.begin_state(batch_size=batch_size, ctx=ctx)
+def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):
+    state, timer = None, d2l.Timer()
     metric = d2l.Accumulator(2)  # loss_sum, num_examples
     for X, Y in train_iter:
-        if use_random_iter:
-            state = model.begin_state(batch_size=batch_size, ctx=ctx)
-        else:
-            # Detach gradient to avoid backpropagation beyond the
-            # current batch for the consecutive sampling.
+        if state is None or use_random_iter:
+            # Initialize state when either it's the first iteration or 
+            # using random sampling.
+            state = model.begin_state(batch_size=X.shape[0], ctx=ctx)
+        else:            
             for s in state: s.detach()
         y = Y.T.reshape((-1,))
+        X, y = X.as_in_context(ctx), y.as_in_context(ctx) 
         with autograd.record():
             py, state = model(X, state)
-            #print(py.shape, Y.T.shape)
             l = loss(py, y).mean()
         l.backward()
-        grad_clipping(model, 1, ctx)
+        grad_clipping(model, 1)
         updater(batch_size=1)  # Since used mean already.
         metric.add((l.asscalar() * y.size, y.size))
-    print(timer.stop())
-    return math.exp(metric[0]/metric[1])
+    return math.exp(metric[0]/metric[1]), metric[1]/timer.stop()
 ```
+
+The training function 
 
 ```{.python .input  n=11}
 # Save to the d2l package.
-def train_ch9(model, corpus, vocab, updater, num_epochs, batch_size, num_steps, 
-              ctx, use_random_iter=False):
-    if use_random_iter:
-        data_iter_fn = d2l.seq_data_iter_random
-    else:
-        data_iter_fn = d2l.seq_data_iter_consecutive
+def train_ch8(model, train_iter, vocab, lr, num_epochs, ctx, 
+              use_random_iter=False):
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
-    animator = d2l.Animator(xlabel='epoch', ylabel='loss', legend=['train'],
-                            xlim=[1, num_epochs])
-    if hasattr(updater, 'step'): updater = updater.step  # It's Gluon Trainer.
+    animator = d2l.Animator(xlabel='epoch', ylabel='perplexity', 
+                            legend=['train'], xlim=[1, num_epochs])
+    if isinstance(model, gluon.Block):
+        model.initialize(ctx=ctx, force_reinit=True, init=init.Normal(0.01))
+        trainer = gluon.Trainer(model.collect_params(), 'sgd', {'learning_rate': lr})
+        updater = lambda batch_size : trainer.step(batch_size)
+    else:
+        updater = lambda batch_size : d2l.sgd(model.params, lr, batch_size)
+    
+    predict = lambda prefix: predict_ch8(prefix, 50, model, vocab, ctx)
+    
+    if hasattr(updater, 'step'): updater = updater.step  
     for epoch in range(num_epochs):
-        data_iter = data_iter_fn(corpus, batch_size, num_steps, ctx)
-        train_err = train_epoch_ch9(
-            model, data_iter, loss, updater, batch_size, ctx, use_random_iter)
+        ppl, speed = train_epoch_ch8(
+            model, train_iter, loss, updater, ctx, use_random_iter)
         if epoch % 10 == 0:
-            print(predict_ch9('time traveller', 50, model, vocab, ctx))
-            animator.add(epoch+1, [train_err])
+            print(predict('time traveller'))
+            animator.add(epoch+1, [ppl])
+    print('Perplexity %.1f, %d tokens/sec on %s' % (ppl, speed, ctx))
+    print(predict('time traveller'))
+    print(predict('traveller'))
+```
 
+Train a model.
+
+```{.python .input}
+num_epochs, lr = 500, 1
+train_ch8(model, train_iter, vocab, lr, num_epochs, ctx, use_random_iter=False)
 ```
 
 ```{.python .input}
-num_epochs, num_steps, batch_size, lr = 50, 64, 32, 1
-updater = lambda batch_size: d2l.sgd(model.params, lr, batch_size)
-train_ch9(model, corpus, vocab, updater,  num_epochs, batch_size, num_steps,
-              ctx, use_random_iter=False)
+train_ch8(model, train_iter, vocab, updater, num_epochs, ctx, use_random_iter=True)
 ```
 
 In the following we will see how to improve significantly on the current model and how to make it faster and easier to implement.

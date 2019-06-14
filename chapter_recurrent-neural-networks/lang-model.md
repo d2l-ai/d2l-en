@@ -163,7 +163,7 @@ In random sampling, each example is a sequence arbitrarily captured on the origi
 
 ```{.python .input  n=5}
 # Save to the d2l package.
-def seq_data_iter_random(corpus, batch_size, num_steps, ctx=None):
+def seq_data_iter_random(corpus, batch_size, num_steps):
     # Offset the iterator over the data for uniform starts
     corpus = corpus[random.randint(0, num_steps):]
     # Subtract 1 extra since we need to account for label
@@ -179,7 +179,7 @@ def seq_data_iter_random(corpus, batch_size, num_steps, ctx=None):
         batch_indices = example_indices[i:(i+batch_size)]
         X = [data(j) for j in batch_indices]
         Y = [data(j + 1) for j in batch_indices]
-        yield nd.array(X, ctx), nd.array(Y, ctx)
+        yield nd.array(X), nd.array(Y)
 ```
 
 Let us generate an artificial sequence from 0 to 30. We assume that
@@ -198,13 +198,13 @@ In addition to random sampling of the original sequence, we can also make the po
 
 ```{.python .input  n=7}
 # Save to the d2l package.
-def seq_data_iter_consecutive(corpus, batch_size, num_steps, ctx=None):
+def seq_data_iter_consecutive(corpus, batch_size, num_steps):
     # Offset for the iterator over the data for uniform starts
     offset = random.randint(0, num_steps)
     # Slice out data - ignore num_steps and just wrap around
     num_indices = ((len(corpus) - offset - 1) // batch_size) * batch_size
-    Xs = nd.array(corpus[offset:offset+num_indices], ctx=ctx)
-    Ys = nd.array(corpus[offset+1:offset+1+num_indices], ctx=ctx)
+    Xs = nd.array(corpus[offset:offset+num_indices])
+    Ys = nd.array(corpus[offset+1:offset+1+num_indices])
     Xs, Ys = Xs.reshape((batch_size, -1)), Ys.reshape((batch_size, -1))
     num_batches = Xs.shape[1] // num_steps
     for i in range(0, num_batches * num_steps, num_steps):
@@ -218,6 +218,31 @@ Using the same settings, print input `X` and label `Y` for each mini-batch of ex
 ```{.python .input  n=8}
 for X, Y in seq_data_iter_consecutive(my_seq, batch_size=2, num_steps=6):
     print('X: ', X, '\nY:', Y)
+```
+
+```{.python .input}
+# Save to the d2l package.
+class SeqDataLoader(object):
+    """A iterator to load sequence data"""
+    def __init__(self, batch_size, num_steps, use_random_iter, max_tokens):
+        if use_random_iter:
+            data_iter_fn = d2l.seq_data_iter_random
+        else:
+            data_iter_fn = d2l.seq_data_iter_consecutive
+        self.corpus, self.vocab = d2l.load_corpus_time_machine(max_tokens)
+        self.get_iter = lambda: data_iter_fn(self.corpus, batch_size, num_steps)
+
+    def __iter__(self):
+        return self.get_iter()
+```
+
+```{.python .input}
+# Save to the d2l package.
+def load_data_time_machine(batch_size, num_steps, use_random_iter=False, 
+                           max_tokens=10000):
+    data_iter = SeqDataLoader(
+        batch_size, num_steps, use_random_iter, max_tokens)
+    return data_iter, data_iter.vocab    
 ```
 
 Sequential partitioning decomposes the sequence into `batch_size` many strips of data which are traversed as we iterate over minibatches. Note that the $i$-th element in a minibatch matches with the $i$-th element of the next minibatch rather than within a minibatch.

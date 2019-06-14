@@ -413,15 +413,16 @@ class Vocab(object):
             return [self.idx_to_token[index] for index in indices]
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
-def load_data_time_machine():
+def load_corpus_time_machine(max_tokens=-1):
     lines = read_time_machine()
     tokens = tokenize(lines, 'char')
     vocab = Vocab(tokens)
     corpus = [vocab[tk] for line in tokens for tk in line]
+    if max_tokens > 0: corpus = corpus[:max_tokens]
     return corpus, vocab
 
 # Defined in file: ./chapter_recurrent-neural-networks/lang-model.md
-def seq_data_iter_random(corpus, batch_size, num_steps, ctx=None):
+def seq_data_iter_random(corpus, batch_size, num_steps):
     # Offset the iterator over the data for uniform starts
     corpus = corpus[random.randint(0, num_steps):]
     # Subtract 1 extra since we need to account for label
@@ -437,16 +438,16 @@ def seq_data_iter_random(corpus, batch_size, num_steps, ctx=None):
         batch_indices = example_indices[i:(i+batch_size)]
         X = [data(j) for j in batch_indices]
         Y = [data(j + 1) for j in batch_indices]
-        yield nd.array(X, ctx), nd.array(Y, ctx)
+        yield nd.array(X), nd.array(Y)
 
 # Defined in file: ./chapter_recurrent-neural-networks/lang-model.md
-def seq_data_iter_consecutive(corpus, batch_size, num_steps, ctx=None):
+def seq_data_iter_consecutive(corpus, batch_size, num_steps):
     # Offset for the iterator over the data for uniform starts
     offset = random.randint(0, num_steps)
     # Slice out data - ignore num_steps and just wrap around
     num_indices = ((len(corpus) - offset - 1) // batch_size) * batch_size
-    Xs = nd.array(corpus[offset:offset+num_indices], ctx=ctx)
-    Ys = nd.array(corpus[offset+1:offset+1+num_indices], ctx=ctx)
+    Xs = nd.array(corpus[offset:offset+num_indices])
+    Ys = nd.array(corpus[offset+1:offset+1+num_indices])
     Xs, Ys = Xs.reshape((batch_size, -1)), Ys.reshape((batch_size, -1))
     num_batches = Xs.shape[1] // num_steps
     for i in range(0, num_batches * num_steps, num_steps):
@@ -454,17 +455,37 @@ def seq_data_iter_consecutive(corpus, batch_size, num_steps, ctx=None):
         Y = Ys[:,i:(i+num_steps)]
         yield X, Y
 
+# Defined in file: ./chapter_recurrent-neural-networks/lang-model.md
+class SeqDataLoader(object):
+    """A iterator to load sequence data"""
+    def __init__(self, batch_size, num_steps, use_random_iter, max_tokens):
+        if use_random_iter:
+            data_iter_fn = d2l.seq_data_iter_random
+        else:
+            data_iter_fn = d2l.seq_data_iter_consecutive
+        self.corpus, self.vocab = d2l.load_corpus_time_machine(max_tokens)
+        self.get_iter = lambda: data_iter_fn(self.corpus, batch_size, num_steps)
+
+    def __iter__(self):
+        return self.get_iter()
+
+# Defined in file: ./chapter_recurrent-neural-networks/lang-model.md
+def load_data_time_machine(batch_size, num_steps, use_random_iter=False, 
+                           max_tokens=10000):
+    data_iter = SeqDataLoader(
+        batch_size, num_steps, use_random_iter, max_tokens)
+    return data_iter, data_iter.vocab    
+
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
 class RNNModelScratch(object):
-    def __init__(self, vocab_size, num_hiddens,
+    """A RNN Model based on scratch implementations"""
+    def __init__(self, vocab_size, num_hiddens, ctx,
                  get_params, init_state, forward):
-        self.num_hiddens, self.vocab_size = num_hiddens, vocab_size
-        self.get_params, self.init_state = get_params, init_state
+        self.vocab_size = vocab_size
+        self.params = get_params(vocab_size, num_hiddens, ctx)
+        self.init_state = init_state
         self.forward_fn = forward
-
-    def initialize(self, ctx, **kwargs):
-        """xxx"""
-        self.params = get_params(self.vocab_size, self.num_hiddens, ctx)
+        self.num_hiddens = num_hiddens
 
     def __call__(self, X, state):
         X = nd.one_hot(X.T, self.vocab_size)
@@ -473,10 +494,8 @@ class RNNModelScratch(object):
     def begin_state(self, batch_size, ctx):
         return self.init_state(batch_size, self.num_hiddens, ctx)
 
-
-
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def predict_ch9(prefix, num_predicts, model, vocab, ctx):
+def predict_ch8(prefix, num_predicts, model, vocab, ctx):
     state = model.begin_state(batch_size=1, ctx=ctx)
     outputs = [vocab[prefix[0]]]
     get_input = lambda: nd.array([outputs[-1]], ctx=ctx).reshape((1, 1))
@@ -489,66 +508,63 @@ def predict_ch9(prefix, num_predicts, model, vocab, ctx):
     return ''.join([vocab.idx_to_token[i] for i in outputs])
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def grad_clipping(model, theta, ctx):
-    if hasattr(model, 'params'):
+def grad_clipping(model, theta):
+    if isinstance(model, gluon.Block):
+        params = [p.data() for p in model.collect_params().values()]
+    else:
         params = model.params
-    else:  # model is a nn.Block object.
-        params = [p.data(ctx) for p in model.collect_params().values()]
-    norm = nd.array([0], ctx)
-    for param in params:
-        norm += (param.grad ** 2).sum()
-    norm = norm.sqrt().asscalar()
+    norm = math.sqrt(sum((p.grad ** 2).sum().asscalar() for p in params))
     if norm > theta:
         for param in params:
             param.grad[:] *= theta / norm
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def train_epoch_ch9(model, train_iter, loss, updater, batch_size, ctx, use_random_iter):
-    timer = d2l.Timer()
-    if not use_random_iter:
-        # Hidden state is initialized at the beginning of each epoch
-        # for the consecutive sampling. Otherwise, will initialize for each
-        # iteration.
-        state = model.begin_state(batch_size=batch_size, ctx=ctx)
+def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):
+    state, timer = None, d2l.Timer()
     metric = d2l.Accumulator(2)  # loss_sum, num_examples
     for X, Y in train_iter:
-        if use_random_iter:
-            state = model.begin_state(batch_size=batch_size, ctx=ctx)
-        else:
-            # Detach gradient to avoid backpropagation beyond the
-            # current batch for the consecutive sampling.
+        if state is None or use_random_iter:
+            # Initialize state when either it's the first iteration or 
+            # using random sampling.
+            state = model.begin_state(batch_size=X.shape[0], ctx=ctx)
+        else:            
             for s in state: s.detach()
         y = Y.T.reshape((-1,))
+        X, y = X.as_in_context(ctx), y.as_in_context(ctx) 
         with autograd.record():
             py, state = model(X, state)
-            #print(py.shape, Y.T.shape)
             l = loss(py, y).mean()
         l.backward()
-        grad_clipping(model, 1, ctx)
+        grad_clipping(model, 1)
         updater(batch_size=1)  # Since used mean already.
         metric.add((l.asscalar() * y.size, y.size))
-    print(timer.stop())
-    return math.exp(metric[0]/metric[1])
+    return math.exp(metric[0]/metric[1]), metric[1]/timer.stop()
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def train_ch9(model, corpus, vocab, updater, num_epochs, batch_size, num_steps, 
-              ctx, use_random_iter=False):
-    if use_random_iter:
-        data_iter_fn = d2l.seq_data_iter_random
-    else:
-        data_iter_fn = d2l.seq_data_iter_consecutive
+def train_ch8(model, train_iter, vocab, lr, num_epochs, ctx, 
+              use_random_iter=False):
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
-    animator = d2l.Animator(xlabel='epoch', ylabel='loss', legend=['train'],
-                            xlim=[1, num_epochs])
-    if hasattr(updater, 'step'): updater = updater.step  # It's Gluon Trainer.
+    animator = d2l.Animator(xlabel='epoch', ylabel='perplexity', 
+                            legend=['train'], xlim=[1, num_epochs])
+    if isinstance(model, gluon.Block):
+        model.initialize(ctx=ctx, force_reinit=True, init=init.Normal(0.01))
+        trainer = gluon.Trainer(model.collect_params(), 'sgd', {'learning_rate': lr})
+        updater = lambda batch_size : trainer.step(batch_size)
+    else:
+        updater = lambda batch_size : d2l.sgd(model.params, lr, batch_size)
+    
+    predict = lambda prefix: predict_ch8(prefix, 50, model, vocab, ctx)
+    
+    if hasattr(updater, 'step'): updater = updater.step  
     for epoch in range(num_epochs):
-        data_iter = data_iter_fn(corpus, batch_size, num_steps, ctx)
-        train_err = train_epoch_ch9(
-            model, data_iter, loss, updater, batch_size, ctx, use_random_iter)
+        ppl, speed = train_epoch_ch8(
+            model, train_iter, loss, updater, ctx, use_random_iter)
         if epoch % 10 == 0:
-            print(predict_ch9('time traveller', 50, model, vocab, ctx))
-            animator.add(epoch+1, [train_err])
-
+            print(predict('time traveller'))
+            animator.add(epoch+1, [ppl])
+    print('Perplexity %.1f, %d tokens/sec on %s' % (ppl, speed, ctx))
+    print(predict('time traveller'))
+    print(predict('traveller'))
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-gluon.md
 class RNNModel(nn.Block):

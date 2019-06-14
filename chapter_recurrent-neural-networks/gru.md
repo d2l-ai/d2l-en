@@ -74,15 +74,13 @@ To gain a better understanding of the model let us implement a GRU from scratch.
 We begin by reading *The Time Machine* corpus that we used in :numref:`chapter_rnn_scratch`. The code for reading the
 data set is given below:
 
-```{.python .input  n=1}
-import sys
-sys.path.insert(0, '..')
-
+```{.python .input  n=6}
 import d2l
-from mxnet import nd, init
+from mxnet import nd, init, gluon
 from mxnet.gluon import rnn
 
-corpus_indices, vocab = d2l.load_data_time_machine()
+batch_size, num_steps = 32, 35
+train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 ```
 
 ### Initialize Model Parameters
@@ -90,23 +88,17 @@ corpus_indices, vocab = d2l.load_data_time_machine()
 The next step is to initialize the model parameters. We draw the weights from a Gaussian with variance $0.01$ and set the bias to $0$. The hyper-parameter `num_hiddens` defines the number of hidden units. We instantiate all terms relating to update and reset gate and the candidate hidden state itself. Subsequently we attach gradients to all parameters.
 
 ```{.python .input  n=2}
-num_inputs, num_hiddens, num_outputs = len(vocab), 256, len(vocab)
-ctx = d2l.try_gpu()
-
-def get_params():
-    def _one(shape):
-        return nd.random.normal(scale=0.01, shape=shape, ctx=ctx)
-
-    def _three():
-        return (_one((num_inputs, num_hiddens)),
-                _one((num_hiddens, num_hiddens)),
-                nd.zeros(num_hiddens, ctx=ctx))
-
-    W_xz, W_hz, b_z = _three()  # Update gate parameter
-    W_xr, W_hr, b_r = _three()  # Reset gate parameter
-    W_xh, W_hh, b_h = _three()  # Candidate hidden state parameter
+def get_params(vocab_size, num_hiddens, ctx):
+    num_inputs = num_outputs = vocab_size
+    normal = lambda shape : nd.random.normal(scale=0.01, shape=shape, ctx=ctx)
+    three = lambda : (normal((num_inputs, num_hiddens)),
+                      normal((num_hiddens, num_hiddens)),
+                      nd.zeros(num_hiddens, ctx=ctx))
+    W_xz, W_hz, b_z = three()  # Update gate parameter
+    W_xr, W_hr, b_r = three()  # Reset gate parameter
+    W_xh, W_hh, b_h = three()  # Candidate hidden state parameter
     # Output layer parameters
-    W_hq = _one((num_hiddens, num_outputs))
+    W_hq = normal((num_hiddens, num_outputs))
     b_q = nd.zeros(num_outputs, ctx=ctx)
     # Create gradient
     params = [W_xz, W_hz, b_z, W_xr, W_hr, b_r, W_xh, W_hh, b_h, W_hq, b_q]
@@ -138,32 +130,35 @@ def gru(inputs, state, params):
         H = Z * H + (1 - Z) * H_tilda
         Y = nd.dot(H, W_hq) + b_q
         outputs.append(Y)
-    return outputs, (H,)
+    return nd.concat(*outputs, dim=0), (H,)
 ```
 
 ### Training and Prediction
 
 Training and prediction work in exactly the same manner as before. That is, we need to define a number of epochs, a number of steps for truncation, the minibatch size, a learning rate and how aggressively we should be clipping the gradients. Lastly we create a string of 50 characters based on the prefixes *traveller* and *time traveller*.
 
-```{.python .input  n=5}
-num_epochs, num_steps, batch_size, lr, clipping_theta = 100, 35, 32, 1, 1
-prefixes = ['traveller', 'time traveller']
+```{.python .input  n=3}
+vocab_size, num_hiddens, ctx = len(vocab), 256, d2l.try_gpu()
+num_epochs, lr = 500, 1
 
-d2l.train_and_predict_rnn(gru, get_params, init_gru_state, num_hiddens,
-                          corpus_indices, vocab, ctx, False, num_epochs,
-                          num_steps, lr, clipping_theta, batch_size, prefixes)
+model = d2l.RNNModelScratch(len(vocab), num_hiddens, ctx, get_params, 
+                            init_gru_state, gru)
+
+d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, ctx)
+
 ```
 
 ## Concise Implementation
 
 In Gluon, we can directly call the `GRU` class in the `rnn` module. This encapsulates all the configuration details that we made explicit above. The code is significantly faster as it uses compiled operators rather than Python for many details that we spelled out in detail before.
 
-```{.python .input  n=6}
+```{.python .input  n=9}
 gru_layer = rnn.GRU(num_hiddens)
 model = d2l.RNNModel(gru_layer, len(vocab))
-d2l.train_and_predict_rnn_gluon(model, num_hiddens, corpus_indices, vocab,
-                                ctx, num_epochs*5, num_steps, lr,
-                                clipping_theta, batch_size, prefixes)
+
+d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, ctx)
+
+
 ```
 
 ## Summary
