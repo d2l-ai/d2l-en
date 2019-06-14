@@ -49,6 +49,12 @@ tokens[0:2]
 
 ## Vocabulary
 
+The string type of the token is inconvienet to be used by models, which take numerical inputs. Now let's build a dictionary, often called vocabulary as well, to map string tokens into numerical indices. To so do, we count 
+
+ by m
+
+The token has a string type, 
+
 A token has a string type, we 
 
 Each a token is a 
@@ -68,32 +74,28 @@ class Vocab(object):
         if use_special_tokens:
             # padding, begin of sentence, end of sentence, unknown
             self.pad, self.bos, self.eos, self.unk = (0, 1, 2, 3)
-            tokens = ['<pad>', '<bos>', '<eos>', '<unk>']
+            uniq_tokens = ['<pad>', '<bos>', '<eos>', '<unk>']
         else:
-            self.unk = 0
-            tokens = ['<unk>']
-        tokens +=  [token for token, freq in self.token_freqs 
-                    if freq >= min_freq]
-        self.idx_to_token = []
-        self.token_to_idx = dict()
-        for token in tokens:
+            self.unk, uniq_tokens = 0, ['<unk>']
+        uniq_tokens +=  [token for token, freq in self.token_freqs 
+                         if freq >= min_freq]
+        self.idx_to_token, self.idx_to_token = [], dict()
+        for token in uniq_tokens:
             self.idx_to_token.append(token)
             self.token_to_idx[token] = len(self.idx_to_token) - 1
-
+            
     def __len__(self):
         return len(self.idx_to_token)
 
     def __getitem__(self, tokens):
         if not isinstance(tokens, (list, tuple)):
             return self.token_to_idx.get(tokens, self.unk)
-        else:
-            return [self.__getitem__(token) for token in tokens]
+        return [self.__getitem__(token) for token in tokens]
 
     def to_tokens(self, indices):
         if not isinstance(indices, (list, tuple)):
             return self.idx_to_token[indices]
-        else:
-            return [self.idx_to_token[index] for index in indices]
+        return [self.idx_to_token[index] for index in indices]
 ```
 
 We construct a vocabulary with the time machine dataset as the corpus, and then print the map between a few tokens to indices.
