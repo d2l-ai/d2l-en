@@ -15,7 +15,7 @@ train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 
 ## One-hot Encoding
 
-Remember that each token is presented as a numerical index in `train_iter`. Feeding these indices directly to the neural network might make it hard to learn. We often present each token as a more expressive feature vector. The easiest presentation is called *one-hot encoding*. 
+Remember that each token is presented as a numerical index in `train_iter`. Feeding these indices directly to the neural network might make it hard to learn. We often present each token as a more expressive feature vector. The easiest presentation is called *one-hot encoding*.
 
 In a nutshell, we map each index to a different unit vector: assume that the number of different toeksn in the vocabulary is $N$ (the `len(vocab)`) and the token indices range from 0 to $N-1$. If the index of a token is the integer $i$, then we create a vector $\mathbf{e}_i$ of all 0s with a length of $N$ and set the element at position $i$ to 1. This vector is the one-hot vector of the original token. The one-hot vectors with indices 0 and 2 are shown below.
 
@@ -106,7 +106,6 @@ Let's do a sanity check whether inputs and outputs have the correct dimensions, 
 vocab_size, num_hiddens, ctx = len(vocab), 512, d2l.try_gpu()
 model = RNNModelScratch(len(vocab), num_hiddens, ctx, get_params,
                         init_rnn_state, rnn)
-model.initialize(ctx)
 state = model.begin_state(X.shape[0], ctx)
 Y, new_state = model(X.as_in_context(ctx), state)
 Y.shape, len(new_state), new_state[0].shape
@@ -141,7 +140,7 @@ predict_ch8('time traveller ', 10, model, vocab, ctx)
 
 ## Gradient Clipping
 
-For a sequence of length $T$, we compute the gradients over these $T$ time steps in an iteration, which results in a chain of matrix-products with length  $O(T)$ during backpropagating. As mentioned in :numref:`chapter_numerical_stability`, it might result in numerical instability,  e.g. the gradients may either explode or vanish, when $T$ is large. Therefore RNN models often need extra help to stabilize the training.  
+For a sequence of length $T$, we compute the gradients over these $T$ time steps in an iteration, which results in a chain of matrix-products with length  $O(T)$ during backpropagating. As mentioned in :numref:`chapter_numerical_stability`, it might result in numerical instability,  e.g. the gradients may either explode or vanish, when $T$ is large. Therefore RNN models often need extra help to stabilize the training.
 
 Recall that when solving an optimization problem, we take update steps for the weights $\mathbf{w}$ in the general direction of the negative gradient $\mathbf{g}_t$ on a minibatch, say $\mathbf{w} - \eta \cdot \mathbf{g}_t$. Let's further assume that the objective is well behaved, i.e. it is Lipschitz continuous with constant $L$, i.e.
 
@@ -236,7 +235,7 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, ctx,
     print(predict('traveller'))
 ```
 
-Finally we can train a model. Since we only use 10,000 tokens in the dataset, so here we need more data epochs to converge. 
+Finally we can train a model. Since we only use 10,000 tokens in the dataset, so here we need more data epochs to converge.
 
 ```{.python .input}
 num_epochs, lr = 500, 1
