@@ -2,46 +2,39 @@
 :label:`chapter_plain_rnn`
 
 
-In the previous section we introduced $n$-gram models, where the conditional probability of word $w_t$ at position $t$ only depends on the $n-1$ previous words. If we want to check the possible effect of words earlier than $t-(n-1)$ on $w_t$, we need to increase $n$. However, the number of model parameters would also increase exponentially with it, as we need to store $|V|^n$ numbers for a vocabulary $V$. Hence, rather than modeling $p(w_t|w_{t-1}, \ldots w_{t-n+1})$ it is preferable to use a latent variable model in which we have
+In :numref:`chapter_language_model` we introduced $n$-gram models, where the conditional probability of word $x_t$ at position $t$ only depends on the $n-1$ previous words. If we want to check the possible effect of words earlier than $t-(n-1)$ on $x_t$, we need to increase $n$. However, the number of model parameters would also increase exponentially with it, as we need to store $|V|^n$ numbers for a vocabulary $V$. Hence, rather than modeling $p(x_t|x_{t-1}, \ldots x_{t-n+1})​$ it is preferable to use a latent variable model in which we have
 
-$$p(w_t|w_{t-1}, \ldots w_1) \approx p(w_t|h_t(w_{t-1}, h_{t-1})).$$
+$$p(x_t|x_{t-1}, \ldots x_1) \approx p(x_t|x_{t-1}, h_{t}).$$
 
-For a sufficiently powerful function $h_t$ this is not an approximation. After
-all, $h_t$ could simply store all the data it observed so far. We discussed this
-in :numref:`chapter_sequence`. Let's see why
-building such models is a bit more tricky than simple autoregressive models
-where
+Here $h_t$ is a *latent variable* that stores the sequence information. A latent variable is also called as *hidden variable*, *hidden state* or *hidden state variable*. The hidden state at time $t$ could be computed based on both input $x_{t-1}$ and hidden state $h_{t-1}$ at time $t-1​$, that is
 
-$$p(w_t|w_{t-1}, \ldots w_1) \approx p(w_t|f(w_{t-1}, \ldots w_{t-n+1})).$$
+$$h_t = f(x_{t-1}, h_{t-1}).$$
 
-As a warmup we will review the latter for discrete outputs and $n=2$, i.e. for Markov model of first order. To simplify things further we use a single layer in the design of the RNN. Later on we will see how to add more expressivity efficiently across items.
+For a sufficiently powerful function $f$, the latent variable model is not an approximation. After all, $h_t$ could simply store all the data it observed so far. We discussed this in :numref:`chapter_sequence`. But it could potentially makes both computation and storage expensive.
+
+Note that we also use $h​$ to denote by the number of hidden units of a hidden layer. Hidden layers and hidden states refer to two very different concepts. Hidden layers are, as explained, layers that are hidden from view on the path from input to output. Hidden states are technically speaking *inputs* to whatever we do at a given step. Instead, they can only be computed by looking at data at previous iterations. In this sense they have much in common with latent variable models in statistics, such as clustering or topic models where the clusters affect the output but cannot be directly observed.
+
+Recurrent neural networks are neural networks with hidden states. Before introducing this model, let's first revisit  the multi-layer 
+
+Building a latent variable model is a bit more tricky than simple autoregressive models introduced in :numref:`chapter_sequence`, where
+
+$$p(x_t|x_{t-1}, \ldots x_1) \approx p(x_t|f(x_{t-1}, \ldots x_{t-n+1})).$$
+
+As a warmup we will review the latter for discrete outputs and $n=2​$, i.e. for Markov model of first order. To simplify things further we use a single layer in the design of the RNN. Later on we will see how to add more expressivity efficiently across items.
 
 ## Recurrent Networks Without Hidden States
 
-Let us take a look at a multilayer perceptron with a single hidden layer. Given a mini-batch of instances $\mathbf{X} \in \mathbb{R}^{n \times d}$ with sample size $n$ and $d$ inputs (features or feature vector dimensions). Let the hidden layer's activation function be $\phi$. Hence the hidden layer's output $\mathbf{H} \in \mathbb{R}^{n \times h}$ is calculated as
+Let us take a look at a multilayer perceptron with a single hidden layer. Given a mini-batch of instances $\mathbf{X} \in \mathbb{R}^{n \times d}$ with sample size $n$ and $d$ inputs (features or feature vector dimensions). Let the hidden layer's activation function be $\phi$. Hence the hidden layer's output $\mathbf{H} \in \mathbb{R}^{n \times h}​$ is calculated as
 
-$$\mathbf{H} = \phi(\mathbf{X} \mathbf{W}_{xh} + \mathbf{b}_h).$$
+$$\mathbf{H} = \phi(\mathbf{X} \mathbf{W}_{xh} + \mathbf{b}_h).​$$
 
-Here, we have the weight parameter $\mathbf{W}_{xh} \in \mathbb{R}^{d \times
-h}$, bias parameter $\mathbf{b}_h \in \mathbb{R}^{1 \times h}$, and the number
-of hidden units $h$, for the hidden layer. Recall that $\mathbf{b}_h$ is just a
-vector - its values are replicated using the broadcasting mechanism (:numref:`chapter_ndarray`) to match those of the matrix-matrix product.
-
-Also note that hidden *state* and hidden *layer* refer to two very different concepts. Hidden layers are, as explained, layers that are hidden from view on the path from input to output. Hidden states are technically speaking *inputs* to whatever we do at a given step. Instead, they can only be computed by looking at data at previous iterations. In this sense they have much in common with latent variable models in statistics, such as clustering or topic models where e.g. the cluster ID affects the output but cannot be directly observed.
+Here, we have the weight parameter $\mathbf{W}_{xh} \in \mathbb{R}^{d \times h}$, bias parameter $\mathbf{b}_h \in \mathbb{R}^{1 \times h}$, and the number of hidden units $h$, for the hidden layer. Recall that $\mathbf{b}_h​$ is just a vector - its values are replicated using the broadcasting mechanism (:numref:`chapter_ndarray`) to match those of the matrix-matrix product.
 
 The hidden variable $\mathbf{H}$ is used as the input of the output layer. For classification purposes, such as predicting the next character, the output dimensionality $q$ might e.g. match the number of categories in the classification problem. Lastly the output layer is given by
 
 $$\mathbf{O} = \mathbf{H} \mathbf{W}_{hq} + \mathbf{b}_q.$$
 
-Here, $\mathbf{O} \in \mathbb{R}^{n \times q}$ is the output variable,
-$\mathbf{W}_{hq} \in \mathbb{R}^{h \times q}$ is the weight parameter, and
-$\mathbf{b}_q \in \mathbb{R}^{1 \times q}$ is the bias parameter of the output
-layer.  If it is a classification problem, we can use
-$\text{softmax}(\mathbf{O})$ to compute the probability distribution of the
-output category. This is entirely analogous to the regression problem we solved
-previously in :numref:`chapter_sequence`, hence we omit details. Suffice it to say that we can
-pick $(w_t, w_{t-1})$ pairs at random and estimate the parameters $\mathbf{W}$
-and $\mathbf{b}$ of our network via autograd and stochastic gradient descent.
+Here, $\mathbf{O} \in \mathbb{R}^{n \times q}$ is the output variable, $\mathbf{W}_{hq} \in \mathbb{R}^{h \times q}$ is the weight parameter, and $\mathbf{b}_q \in \mathbb{R}^{1 \times q}$ is the bias parameter of the output layer.  If it is a classification problem, we can use $\text{softmax}(\mathbf{O})$ to compute the probability distribution of the output category. This is entirely analogous to the regression problem we solved previously in :numref:`chapter_sequence`, hence we omit details. Suffice it to say that we can pick $(x_t, x_{t-1})$ pairs at random and estimate the parameters $\mathbf{W}$ and $\mathbf{b}​$ of our network via autograd and stochastic gradient descent.
 
 ## Recurrent Networks with Hidden States
 
@@ -81,15 +74,7 @@ def net(X, H):
     return H, O
 ```
 
-The recurrent network defined above takes observations `X` and a hidden state
-`H` as arguments and uses them to update the hidden state and emit an output
-`O`. Since this chain could go on for a very long time, training the model with
-backprop is out of the question (at least without some approximation). After
-all, this leads to a very long chain of dependencies that would be prohibitive
-to solve exactly: books typically have more than 100,000 characters and it is
-unreasonable to assume that the later text relies indiscriminately on all
-occurrences that happened, say, 10,000 characters in the past. Truncation
-methods such as BPTT (:numref:`chapter_bptt`) and long short term memory (:numref:`chapter_lstm`) are useful to address this in a more principled manner. For now, let's see how a state update works.
+The recurrent network defined above takes observations `X` and a hidden state `H` as arguments and uses them to update the hidden state and emit an output `O`. Since this chain could go on for a very long time, training the model with backprop is out of the question (at least without some approximation). After all, this leads to a very long chain of dependencies that would be prohibitive to solve exactly: books typically have more than 100,000 characters and it is unreasonable to assume that the later text relies indiscriminately on all occurrences that happened, say, 10,000 characters in the past. Truncation methods such as BPTT (:numref:`chapter_bptt`) and long short term memory (:numref:`chapter_lstm`) are useful to address this in a more principled manner. For now, let's see how a state update works.
 
 ```{.python .input}
 (H, O) = net(X,H)
@@ -117,21 +102,15 @@ In terms of quality, example 1 is clearly the best. The words are sensible and l
 
 One way of measuring the quality of the model is to compute $p(w)$, i.e. the likelihood of the sequence. Unfortunately this is a number that is hard to understand and difficult to compare. After all, shorter sequences are *much* more likely than long ones, hence evaluating the model on Tolstoy's magnum opus ['War and Peace'](https://www.gutenberg.org/files/2600/2600-h/2600-h.htm) will inevitably produce a much smaller likelihood than, say, on Saint-Exupery's novella ['The Little Prince'](https://en.wikipedia.org/wiki/The_Little_Prince). What is missing is the equivalent of an average.
 
-Information Theory comes handy here. If we want to compress text we can ask about estimating the next symbol given the current set of symbols. A lower bound on the number of bits is given by $-\log_2 p(w_t|w_{t-1}, \ldots w_1)$. A good language model should allow us to predict the next word quite accurately and thus it should allow us to spend very few bits on compressing the sequence. One way of measuring it is by the average number of bits that we need to spend.
+Information Theory comes handy here. If we want to compress text we can ask about estimating the next symbol given the current set of symbols. A lower bound on the number of bits is given by $-\log_2 p(x_t|x_{t-1}, \ldots x_1)$. A good language model should allow us to predict the next word quite accurately and thus it should allow us to spend very few bits on compressing the sequence. One way of measuring it is by the average number of bits that we need to spend.
 
-$$\frac{1}{n} \sum_{t=1}^n -\log p(w_t|w_{t-1}, \ldots w_1) = \frac{1}{|w|} -\log p(w)$$
+$$\frac{1}{n} \sum_{t=1}^n -\log p(x_t|x_{t-1}, \ldots x_1) = \frac{1}{|w|} -\log p(w)$$
 
 This makes the performance on documents of different lengths comparable. For historical reasons scientists in natural language processing prefer to use a quantity called perplexity rather than bitrate. In a nutshell it is the exponential of the above:
 
-$$\mathrm{PPL} := \exp\left(-\frac{1}{n} \sum_{t=1}^n \log p(w_t|w_{t-1}, \ldots w_1)\right)$$
+$$\mathrm{PPL} := \exp\left(-\frac{1}{n} \sum_{t=1}^n \log p(x_t|x_{t-1}, \ldots x_1)\right)$$
 
-It can be best understood as the harmonic mean of the number of real choices
-that we have when deciding which word to pick next. Note that Perplexity
-naturally generalizes the notion of the cross entropy loss defined when we
-introduced
-the softmax regression (:numref:`chapter_softmax`). That
-is, for a single symbol both definitions are identical bar the fact that one is
-the exponential of the other. Let's look at a number of cases:
+It can be best understood as the harmonic mean of the number of real choices that we have when deciding which word to pick next. Note that Perplexity naturally generalizes the notion of the cross entropy loss defined when we introduced the softmax regression (:numref:`chapter_softmax`). That is, for a single symbol both definitions are identical bar the fact that one is the exponential of the other. Let's look at a number of cases:
 
 * In the best case scenario, the model always estimates the probability of the next symbol as $1$. In this case the perplexity of the model is $1$.
 * In the worst case scenario, the model always predicts the probability of the label category as 0. In this situation, the perplexity is infinite.

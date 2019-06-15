@@ -1,10 +1,11 @@
 # Language Models and Data Sets
 
+:label:`chapter_language_model`
 
-In :numref:`chapter_text_preprocessing`, we see how to map text data into tokens, and these tokens can be viewed as a time series of discrete observations.
-Assuming the tokens in a text of length $T$ are in turn $w_1, w_2, \ldots, w_T$, then, in the discrete time series, $w_t$($1 \leq t \leq T$) can be considered as the output or label of time step $t$. Given such a sequence, the goal of a language model is to estimate the probability
 
-$$p(w_1, w_2, \ldots, w_T).$$
+In :numref:`chapter_text_preprocessing`, we see how to map text data into tokens, and these tokens can be viewed as a time series of discrete observations. Assuming the tokens in a text of length $T$ are in turn $x_1, x_2, \ldots, x_T$, then, in the discrete time series, $x_t$($1 \leq t \leq T$) can be considered as the output or label of time step $t$. Given such a sequence, the goal of a language model is to estimate the probability
+
+$$p(x_1,x_2, \ldots, x_T).$$
 
 Language models are incredibly useful. For instance, an ideal language model would be able to generate natural text just on its own, simply by drawing one word at a time $w_t \sim p(w_t|w_{t-1}, \ldots w_1)$. Quite unlike the monkey using a typewriter, all text emerging from such a model would pass as natural language, e.g. English text. Furthermore, it would be sufficient for generating a meaningful dialog, simply by conditioning the text on previous dialog fragments. Clearly we are still very far from designing such a system, since it would need to *understand* the text rather than just generate grammatically sensible content.
 
@@ -28,7 +29,7 @@ Wikipedia entries, Project Gutenberg, or all text posted online on the
 web. The probability of words can be calculated from the relative word
 frequency of a given word in the training data set.
 
-For example, $p(\mathrm{Statistics})$ can be calculated as the
+For example, $p(\mathrm{Statistics})​$ can be calculated as the
 probability of any sentence starting with the word 'statistics'. A
 slightly less accurate approach would be to count all occurrences of
 the word 'statistics' and divide it by the total number of words in
@@ -111,7 +112,7 @@ d2l.plot(freqs, xlabel='token', ylabel='frequency',
 We're on to something quite fundamental here - the word frequencies decay rapidly in a well defined way. After dealing with the first four words as exceptions ('the', 'i', 'and', 'of'), all remaining words follow a straight line on a log-log plot. This means that words satisfy [Zipf's law](https://en.wikipedia.org/wiki/Zipf%27s_law) which states that the item frequency is given by
 
 $$n(x) \propto (x + c)^{-\alpha} \text{ and hence }
-\log n(x) = -\alpha \log (x+c) + \mathrm{const.}$$
+\log n(x) = -\alpha \log (x+c) + \mathrm{const.}​$$
 
 This should already give us pause if we want to model words by count statistics and smoothing. After all, we will significantly overestimate the frequency of the tail, aka the infrequent words. But what about word pairs (and trigrams and beyond)? Let's see.
 
@@ -154,7 +155,7 @@ In :numref:`fig_timemachine_5gram`, we visualized several possible ways to obtai
 ![Different offsets lead to different subsequences when splitting up text.](../img/timemachine-5gram.svg)
 :label:`fig_timemachine_5gram`
 
-In fact, any one of these offsets is fine. Hence, which one should we pick? In fact, all of them are equally good. But if we pick all offsets we end up with rather redundant data due to overlap, particularly if the sequences are long. Picking just a random set of initial positions is no good either since it does not guarantee uniform coverage of the array. For instance, if we pick $n$ elements at random out of a set of $n$ with random replacement, the probability for a particular element not being picked is $(1-1/n)^n \to e^{-1}$. This means that we cannot expect uniform coverage this way. Even randomly permuting a set of all offsets does not offer good guarantees. Instead we can use a simple trick to get both *coverage* and *randomness*: use a random offset, after which one uses the terms sequentially. We describe how to accomplish this for both random sampling and sequential partitioning strategies below.
+In fact, any one of these offsets is fine. Hence, which one should we pick? In fact, all of them are equally good. But if we pick all offsets we end up with rather redundant data due to overlap, particularly if the sequences are long. Picking just a random set of initial positions is no good either since it does not guarantee uniform coverage of the array. For instance, if we pick $n​$ elements at random out of a set of $n​$ with random replacement, the probability for a particular element not being picked is $(1-1/n)^n \to e^{-1}​$. This means that we cannot expect uniform coverage this way. Even randomly permuting a set of all offsets does not offer good guarantees. Instead we can use a simple trick to get both *coverage* and *randomness*: use a random offset, after which one uses the terms sequentially. We describe how to accomplish this for both random sampling and sequential partitioning strategies below.
 
 ### Random Sampling
 
@@ -220,6 +221,8 @@ for X, Y in seq_data_iter_consecutive(my_seq, batch_size=2, num_steps=6):
     print('X: ', X, '\nY:', Y)
 ```
 
+Now we wrap the above two sampling functions to a class so that we can use it as a normal Gluon data iterator later.
+
 ```{.python .input}
 # Save to the d2l package.
 class SeqDataLoader(object):
@@ -236,6 +239,8 @@ class SeqDataLoader(object):
         return self.get_iter()
 ```
 
+Lastly, we define a function `load_data_time_machine` that returns both the data iterator and the vocabulary, so we can use it similarly as other functions with `load_data` prefix. 
+
 ```{.python .input}
 # Save to the d2l package.
 def load_data_time_machine(batch_size, num_steps, use_random_iter=False, 
@@ -244,8 +249,6 @@ def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
         batch_size, num_steps, use_random_iter, max_tokens)
     return data_iter, data_iter.vocab    
 ```
-
-Sequential partitioning decomposes the sequence into `batch_size` many strips of data which are traversed as we iterate over minibatches. Note that the $i$-th element in a minibatch matches with the $i$-th element of the next minibatch rather than within a minibatch.
 
 ## Summary
 
