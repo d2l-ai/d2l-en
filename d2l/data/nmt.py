@@ -1,7 +1,7 @@
 from mxnet import nd
 from mxnet.gluon import utils as gutils, data as gdata
 import zipfile
-from .base import Vocab
+from ..d2l import Vocab
 
 __all__  = ['load_data_nmt']
 

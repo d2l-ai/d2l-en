@@ -7,12 +7,16 @@ d2l = sys.modules[__name__]
 
 # Defined in file: ./chapter_preface/preface.md
 from IPython import display
+import collections
 import os
 import sys
 import numpy as np
+import math
 from matplotlib import pyplot as plt
 from mxnet import nd, autograd, gluon, init, context, image
 from mxnet.gluon import nn
+import random
+import re
 import time
 import tarfile
 
@@ -130,23 +134,16 @@ def train_epoch_ch3(net, train_iter, loss, updater):
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 class Animator(object):
-    def __init__(self, xlabel=None, ylabel=None, legend=None, xlim=None,
-                 ylim=None, xscale=None, yscale=None, fmts=None,
+    def __init__(self, xlabel=None, ylabel=None, legend=[], xlim=None,
+                 ylim=None, xscale='linear', yscale='linear', fmts=None,
                  nrows=1, ncols=1, figsize=(3.5, 2.5)):
         """Incrementally plot multiple lines."""
         d2l.use_svg_display()
         self.fig, self.axes = d2l.plt.subplots(nrows, ncols, figsize=figsize)
         if nrows * ncols == 1: self.axes = [self.axes,]
-        set_one = lambda name, var : getattr(
-            self.axes[0], name)(var) if var else None
-        self.set_axes = lambda : (
-            set_one('set_xlabel', xlabel),
-            set_one('set_ylabel', ylabel),
-            set_one('set_xlim', xlim),
-            set_one('set_ylim', ylim),
-            set_one('set_xscale', xscale),
-            set_one('set_yscale', yscale),
-            set_one('legend', legend))
+        # use a lambda to capture arguments
+        self.config_axes = lambda : set_axes(
+            self.axes[0], xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
         self.X, self.Y, self.fmts = None, None, fmts
 
     def add(self, x, y):
@@ -164,10 +161,22 @@ class Animator(object):
         self.axes[0].cla()
         for x, y, fmt in zip(self.X, self.Y, self.fmts):
             self.axes[0].plot(x, y, fmt)
-        self.set_axes()
-        self.axes[0].grid()
+        self.config_axes()
         display.display(self.fig)
         display.clear_output(wait=True)
+
+
+# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
+def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
+    """A utility function to set matplotlib axes"""
+    axes.set_xlabel(xlabel)
+    axes.set_ylabel(ylabel)
+    axes.set_xscale(xscale)
+    axes.set_yscale(yscale)
+    axes.set_xlim(xlim)
+    axes.set_ylim(ylim)
+    if legend: axes.legend(legend)
+    axes.grid()
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
@@ -190,29 +199,28 @@ def predict_ch3(net, test_iter, n=6):
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-def plot(X, Y, x_label=None, y_label=None, legend=None,
-         xlim=None, ylim=None, fmts=None, axes=None):
+def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
+         ylim=None, xscale='linear', yscale='linear', fmts=None,
+         figsize=(3.5, 2.5), axes=None):
     """Plot multiple lines"""
+    d2l.set_figsize(figsize)
     axes = axes if axes else d2l.plt.gca()
-    draw(axes, axes.plot, X, Y, x_label, y_label, legend, xlim, ylim, fmts)
-
-
-# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-def draw(axes, func, X, Y, x_label, y_label, legend, xlim, ylim, fmts):
-    """Draw multiple data series with customized func"""
-    if not hasattr(X[0], "__len__") or len(X[0]) != len(Y[0]):
-        X = [X] * len(Y)
+    if isinstance(X, nd.NDArray): X = X.asnumpy()
+    if isinstance(Y, nd.NDArray): Y = Y.asnumpy()
+    if not hasattr(X[0], "__len__"): X = [X]
+    if Y is None: X, Y = [[]]*len(X), X
+    if not hasattr(Y[0], "__len__"): Y = [Y]
+    if len(X) != len(Y): X = X * len(Y)
     if not fmts: fmts = ['-']*len(X)
     axes.cla()
     for x, y, fmt in zip(X, Y, fmts):
         if isinstance(x, nd.NDArray): x = x.asnumpy()
         if isinstance(y, nd.NDArray): y = y.asnumpy()
-        func(x, y, fmt)
-    if x_label: axes.set_xlabel(x_label)
-    if y_label: axes.set_ylabel(y_label)
-    if xlim: axes.set_xlim(xlim)
-    if ylim: axes.set_ylim(ylim)
-    if legend: axes.legend(legend)
+        if len(x):
+            axes.plot(x, y, fmt)
+        else:
+            axes.plot(y, fmt)
+    set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
@@ -346,6 +354,234 @@ class Residual(nn.Block):
         if self.conv3:
             X = self.conv3(X)
         return nd.relu(Y + X)
+
+# Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
+def read_time_machine():
+    """Load the time machine book into a list of sentences."""
+    with open('../data/timemachine.txt', 'r') as f:
+        lines = f.readlines()
+    return [re.sub('[^A-Za-z]+', ' ', line.strip().lower()) 
+            for line in lines]
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
+def tokenize(lines, token='word'):
+    """Split sentences into word or char tokens"""
+    if token == 'word':
+        return [line.split(' ') for line in lines]
+    elif token == 'char':
+        return [list(line) for line in lines]
+    else:
+        print('ERROR: unkown token type '+token)
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
+class Vocab(object):
+    def __init__(self, tokens, min_freq=0, use_special_tokens=False):
+        # Flatten a list of token lists into a list of tokens
+        tokens = [tk for line in tokens for tk in line]
+        # sort by frequency and token
+        counter = collections.Counter(tokens)
+        self.token_freqs = sorted(counter.items(), key=lambda x: x[0])
+        self.token_freqs.sort(key=lambda x: x[1], reverse=True)
+        if use_special_tokens:
+            # padding, begin of sentence, end of sentence, unknown
+            self.pad, self.bos, self.eos, self.unk = (0, 1, 2, 3)
+            uniq_tokens = ['<pad>', '<bos>', '<eos>', '<unk>']
+        else:
+            self.unk, uniq_tokens = 0, ['<unk>']
+        uniq_tokens +=  [token for token, freq in self.token_freqs 
+                         if freq >= min_freq]
+        self.idx_to_token, self.token_to_idx = [], dict()
+        for token in uniq_tokens:
+            self.idx_to_token.append(token)
+            self.token_to_idx[token] = len(self.idx_to_token) - 1
+            
+    def __len__(self):
+        return len(self.idx_to_token)
+
+    def __getitem__(self, tokens):
+        if not isinstance(tokens, (list, tuple)):
+            return self.token_to_idx.get(tokens, self.unk)
+        return [self.__getitem__(token) for token in tokens]
+
+    def to_tokens(self, indices):
+        if not isinstance(indices, (list, tuple)):
+            return self.idx_to_token[indices]
+        return [self.idx_to_token[index] for index in indices]
+
+# Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
+def load_corpus_time_machine(max_tokens=-1):
+    lines = read_time_machine()
+    tokens = tokenize(lines, 'char')
+    vocab = Vocab(tokens)
+    corpus = [vocab[tk] for line in tokens for tk in line]
+    if max_tokens > 0: corpus = corpus[:max_tokens]
+    return corpus, vocab
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/lang-model.md
+def seq_data_iter_random(corpus, batch_size, num_steps):
+    # Offset the iterator over the data for uniform starts
+    corpus = corpus[random.randint(0, num_steps):]
+    # Subtract 1 extra since we need to account for label
+    num_examples = ((len(corpus) - 1) // num_steps)
+    example_indices = list(range(0, num_examples * num_steps, num_steps))
+    random.shuffle(example_indices)
+    # This returns a sequence of the length num_steps starting from pos
+    data = lambda pos: corpus[pos: pos + num_steps]
+    # Discard half empty batches
+    num_batches = num_examples // batch_size
+    for i in range(0, batch_size * num_batches, batch_size):
+        # Batch_size indicates the random examples read each time
+        batch_indices = example_indices[i:(i+batch_size)]
+        X = [data(j) for j in batch_indices]
+        Y = [data(j + 1) for j in batch_indices]
+        yield nd.array(X), nd.array(Y)
+
+# Defined in file: ./chapter_recurrent-neural-networks/lang-model.md
+def seq_data_iter_consecutive(corpus, batch_size, num_steps):
+    # Offset for the iterator over the data for uniform starts
+    offset = random.randint(0, num_steps)
+    # Slice out data - ignore num_steps and just wrap around
+    num_indices = ((len(corpus) - offset - 1) // batch_size) * batch_size
+    Xs = nd.array(corpus[offset:offset+num_indices])
+    Ys = nd.array(corpus[offset+1:offset+1+num_indices])
+    Xs, Ys = Xs.reshape((batch_size, -1)), Ys.reshape((batch_size, -1))
+    num_batches = Xs.shape[1] // num_steps
+    for i in range(0, num_batches * num_steps, num_steps):
+        X = Xs[:,i:(i+num_steps)]
+        Y = Ys[:,i:(i+num_steps)]
+        yield X, Y
+
+# Defined in file: ./chapter_recurrent-neural-networks/lang-model.md
+class SeqDataLoader(object):
+    """A iterator to load sequence data"""
+    def __init__(self, batch_size, num_steps, use_random_iter, max_tokens):
+        if use_random_iter:
+            data_iter_fn = d2l.seq_data_iter_random
+        else:
+            data_iter_fn = d2l.seq_data_iter_consecutive
+        self.corpus, self.vocab = d2l.load_corpus_time_machine(max_tokens)
+        self.get_iter = lambda: data_iter_fn(self.corpus, batch_size, num_steps)
+
+    def __iter__(self):
+        return self.get_iter()
+
+# Defined in file: ./chapter_recurrent-neural-networks/lang-model.md
+def load_data_time_machine(batch_size, num_steps, use_random_iter=False, 
+                           max_tokens=10000):
+    data_iter = SeqDataLoader(
+        batch_size, num_steps, use_random_iter, max_tokens)
+    return data_iter, data_iter.vocab    
+
+# Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
+class RNNModelScratch(object):
+    """A RNN Model based on scratch implementations"""
+    def __init__(self, vocab_size, num_hiddens, ctx,
+                 get_params, init_state, forward):
+        self.vocab_size, self.num_hiddens = vocab_size, num_hiddens
+        self.params = get_params(vocab_size, num_hiddens, ctx)
+        self.init_state, self.forward_fn = init_state, forward
+
+    def __call__(self, X, state):
+        X = nd.one_hot(X.T, self.vocab_size)
+        return self.forward_fn(X, state, self.params)
+
+    def begin_state(self, batch_size, ctx):
+        return self.init_state(batch_size, self.num_hiddens, ctx)
+
+# Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
+def predict_ch8(prefix, num_predicts, model, vocab, ctx):
+    state = model.begin_state(batch_size=1, ctx=ctx)
+    outputs = [vocab[prefix[0]]]
+    get_input = lambda: nd.array([outputs[-1]], ctx=ctx).reshape((1, 1))
+    for y in prefix[1:]:  # Warmup state with prefix
+        _, state = model(get_input(), state)
+        outputs.append(vocab[y])
+    for _ in range(num_predicts):  # Predict num_predicts steps
+        Y, state = model(get_input(), state)
+        outputs.append(int(Y.argmax(axis=1).reshape(1).asscalar()))
+    return ''.join([vocab.idx_to_token[i] for i in outputs])
+
+# Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
+def grad_clipping(model, theta):
+    if isinstance(model, gluon.Block):
+        params = [p.data() for p in model.collect_params().values()]
+    else:
+        params = model.params
+    norm = math.sqrt(sum((p.grad ** 2).sum().asscalar() for p in params))
+    if norm > theta:
+        for param in params:
+            param.grad[:] *= theta / norm
+
+# Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
+def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):
+    state, timer = None, d2l.Timer()
+    metric = d2l.Accumulator(2)  # loss_sum, num_examples
+    for X, Y in train_iter:
+        if state is None or use_random_iter:
+            # Initialize state when either it's the first iteration or
+            # using random sampling.
+            state = model.begin_state(batch_size=X.shape[0], ctx=ctx)
+        else:
+            for s in state: s.detach()
+        y = Y.T.reshape((-1,))
+        X, y = X.as_in_context(ctx), y.as_in_context(ctx)
+        with autograd.record():
+            py, state = model(X, state)
+            l = loss(py, y).mean()
+        l.backward()
+        grad_clipping(model, 1)
+        updater(batch_size=1)  # Since used mean already.
+        metric.add((l.asscalar() * y.size, y.size))
+    return math.exp(metric[0]/metric[1]), metric[1]/timer.stop()
+
+# Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
+def train_ch8(model, train_iter, vocab, lr, num_epochs, ctx,
+              use_random_iter=False):
+    # Initialize
+    loss = gluon.loss.SoftmaxCrossEntropyLoss()
+    animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
+                            legend=['train'], xlim=[1, num_epochs])
+    if isinstance(model, gluon.Block):
+        model.initialize(ctx=ctx, force_reinit=True, init=init.Normal(0.01))
+        trainer = gluon.Trainer(model.collect_params(), 'sgd', {'learning_rate': lr})
+        updater = lambda batch_size : trainer.step(batch_size)
+    else:
+        updater = lambda batch_size : d2l.sgd(model.params, lr, batch_size)
+
+    predict = lambda prefix: predict_ch8(prefix, 50, model, vocab, ctx)
+    # Train and check the progress.
+    for epoch in range(num_epochs):
+        ppl, speed = train_epoch_ch8(
+            model, train_iter, loss, updater, ctx, use_random_iter)
+        if epoch % 10 == 0:
+            print(predict('time traveller'))
+            animator.add(epoch+1, [ppl])
+    print('Perplexity %.1f, %d tokens/sec on %s' % (ppl, speed, ctx))
+    print(predict('time traveller'))
+    print(predict('traveller'))
+
+# Defined in file: ./chapter_recurrent-neural-networks/rnn-gluon.md
+class RNNModel(nn.Block):
+    def __init__(self, rnn_layer, vocab_size, **kwargs):
+        super(RNNModel, self).__init__(**kwargs)
+        self.rnn = rnn_layer
+        self.vocab_size = vocab_size
+        self.dense = nn.Dense(vocab_size)
+
+    def forward(self, inputs, state):
+        X = nd.one_hot(inputs.T, self.vocab_size)
+        Y, state = self.rnn(X, state)
+        # The fully connected layer will first change the shape of Y to
+        # (num_steps * batch_size, num_hiddens)
+        # Its output shape is (num_steps * batch_size, vocab_size)
+        output = self.dense(Y.reshape((-1, Y.shape[-1])))
+        return output, state
+
+    def begin_state(self, *args, **kwargs):
+        return self.rnn.begin_state(*args, **kwargs)
 
 # Defined in file: ./chapter_optimization/optimization-intro.md
 def annotate(text, xy, xytext):
