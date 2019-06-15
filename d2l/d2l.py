@@ -19,6 +19,7 @@ import random
 import re
 import time
 import tarfile
+import zipfile
 
 # Defined in file: ./chapter_crashcourse/probability.md
 def use_svg_display():
@@ -69,9 +70,9 @@ def sgd(params, lr, batch_size):
         param[:] = param - lr * param.grad / batch_size
 
 # Defined in file: ./chapter_linear-networks/linear-regression-gluon.md
-def load_array(features, labels, batch_size, is_train=True):
+def load_array(data_arrays, batch_size, is_train=True):
     """Construct a Gluon data loader"""
-    dataset = gluon.data.ArrayDataset(features, labels)
+    dataset = gluon.data.ArrayDataset(*data_arrays)
     return gluon.data.DataLoader(dataset, batch_size, shuffle=is_train)
     
 
@@ -583,6 +584,64 @@ class RNNModel(nn.Block):
     def begin_state(self, *args, **kwargs):
         return self.rnn.begin_state(*args, **kwargs)
 
+# Defined in file: ./chapter_recurrent-neural-networks/machine-translation.md
+def read_data_nmt():
+    fname = gluon.utils.download('http://data.mxnet.io/data/fra-eng.zip')
+    with zipfile.ZipFile(fname, 'r') as f:
+        return f.read('fra.txt').decode("utf-8")
+    
+
+# Defined in file: ./chapter_recurrent-neural-networks/machine-translation.md
+def preprocess_nmt(text):
+    text = text.replace('\u202f', ' ').replace('\xa0', ' ')
+    no_space = lambda char, prev_char: (
+        True if char in (',', '!', '.') and prev_char != ' ' else False)
+    out = [' '+char if i > 0 and no_space(char, text[i-1]) else char 
+           for i, char in enumerate(text.lower())]
+    return ''.join(out)
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/machine-translation.md
+def tokenize_nmt(text, num_examples = None):
+    source, target = [], []
+    for i, line in enumerate(text.split('\n')):
+        if num_examples and i > num_examples: break
+        parts = line.split('\t')
+        if len(parts) == 2:
+            source.append(parts[0].split(' '))
+            target.append(parts[1].split(' '))
+    return source, target
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/machine-translation.md
+def trim_pad(line, num_steps, padding_token):
+    if len(line) > num_steps: return line[:num_steps]  # Trim
+    return line + [padding_token] * (num_steps - len(line))  # Pad
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/machine-translation.md
+def build_array(lines, vocab, num_steps, is_source):
+    lines = [vocab[l] for l in lines] 
+    if not is_source: 
+        lines = [[vocab.bos] + l + [vocab.eos] for l in lines]
+    array = nd.array([trim_pad(l, num_steps, vocab.pad) for l in lines])
+    valid_len = (array != vocab.pad).sum(axis=1)
+    return array, valid_len
+
+# Defined in file: ./chapter_recurrent-neural-networks/machine-translation.md
+def load_data_nmt(batch_size, num_steps, num_examples=1000):
+    text = preprocess_nmt(read_data_nmt())
+    source, target = tokenize_nmt(text)
+    src_vocab = d2l.Vocab(source, min_freq=3, use_special_tokens=True)
+    tgt_vocab = d2l.Vocab(target, min_freq=3, use_special_tokens=True)
+    src_array, src_valid_len = build_array(
+        source, src_vocab, num_steps, True)
+    tgt_array, tgt_valid_len = build_array(
+        target, tgt_vocab, num_steps, False)
+    data_arrays = (src_array, src_valid_len, tgt_array, tgt_valid_len)
+    data_iter = d2l.load_array(data_arrays, batch_size)
+    return src_vocab, tgt_vocab, data_iter
+
 # Defined in file: ./chapter_optimization/optimization-intro.md
 def annotate(text, xy, xytext):
     d2l.plt.gca().annotate(text, xy=xy, xytext=xytext,
@@ -616,7 +675,7 @@ def show_trace_2d(f, results):
 def get_data_ch10(batch_size=10, n=1500):
     data = np.genfromtxt('../data/airfoil_self_noise.dat', delimiter='\t')
     data = nd.array((data - data.mean(axis=0)) / data.std(axis=0))
-    data_iter = d2l.load_array(data[:n, :-1], data[:n, -1],
+    data_iter = d2l.load_array((data[:n, :-1], data[:n, -1]),
                                batch_size, is_train=True)
     return data_iter, data.shape[1]-1
 

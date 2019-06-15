@@ -79,7 +79,7 @@ x = nd.sin(0.01 * time) + 0.2 * nd.random.normal(shape=T)
 d2l.plot(time, x)
 ```
 
-Next we need to turn this 'time series' into data the network can train on. Based on the embedding dimension $\tau$ we map the data into pairs $y_t = x_t$ and $\mathbf{z}_t = (x_{t-1}, \ldots x_{t-\tau})$. The astute reader might have noticed that this gives us $\tau$ fewer datapoints, since we don't have sufficient history for the first $\tau$ of them. A simple fix, in particular if the time series is long is to discard those few terms. Alternatively we could pad the time series with zeros. The code below is essentially identical to the training code in previous sections. We kept the architecture fairly simple. A few layers of a fully connected network, ReLU activation and $\ell_2$ loss. 
+Next we need to turn this 'time series' into data the network can train on. Based on the embedding dimension $\tau$ we map the data into pairs $y_t = x_t$ and $\mathbf{z}_t = (x_{t-1}, \ldots x_{t-\tau})$. The astute reader might have noticed that this gives us $\tau$ fewer datapoints, since we don't have sufficient history for the first $\tau$ of them. A simple fix, in particular if the time series is long is to discard those few terms. Alternatively we could pad the time series with zeros. The code below is essentially identical to the training code in previous sections. We kept the architecture fairly simple. A few layers of a fully connected network, ReLU activation and $\ell_2$ loss.
 
 ```{.python .input}
 tau = 4
@@ -89,9 +89,9 @@ for i in range(tau):
 labels = x[tau:]
 
 batch_size, n_train = 16, 600
-train_iter = d2l.load_array(features[:n_train], labels[:n_train], 
+train_iter = d2l.load_array((features[:n_train], labels[:n_train]),
                             batch_size, is_train=True)
-test_iter = d2l.load_array(features[:n_train], labels[:n_train],
+test_iter = d2l.load_array((features[:n_train], labels[:n_train]),
                            batch_size, is_train=False)
 
 # Vanilla MLP architecture
@@ -111,7 +111,7 @@ Now we are ready to train.
 
 ```{.python .input}
 def train_net(net, train_iter, loss, epochs, lr):
-    trainer = gluon.Trainer(net.collect_params(), 'adam', 
+    trainer = gluon.Trainer(net.collect_params(), 'adam',
                             {'learning_rate': lr})
     for epoch in range(1, epochs + 1):
         for X, y in train_iter:
@@ -136,7 +136,7 @@ The both training and test loss are small and we would expect our model to work 
 
 ```{.python .input}
 estimates = net(features)
-d2l.plot([time, time[tau:]], [x, estimates], 
+d2l.plot([time, time[tau:]], [x, estimates],
          legend=['data', 'estimate'])
 ```
 
@@ -159,7 +159,7 @@ for i in range(n_train, T):
     predictions[i] = net(
         predictions[(i-tau):i].reshape(1,-1)).reshape(1)
 d2l.plot([time, time[tau:], time[n_train:]],
-         [x, estimates, predictions[n_train:]], 
+         [x, estimates, predictions[n_train:]],
          legend=['data', 'estimate', 'multistep'], figsize=(4.5, 2.5))
 ```
 
@@ -178,7 +178,7 @@ for i in range(tau, k):  # Predict the (i-tau)-th step
     features[i] = net(features[(i-tau):i].T).T
 
 steps = (4, 8, 16, 32)
-d2l.plot([time[i:T-k+i] for i in steps], [features[i] for i in steps], 
+d2l.plot([time[i:T-k+i] for i in steps], [features[i] for i in steps],
          legend=['step %d'%i for i in steps], figsize=(4.5, 2.5))
 ```
 
