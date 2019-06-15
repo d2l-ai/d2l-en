@@ -256,12 +256,16 @@ be used by the `d2l` package.
 ```{.python .input  n=1}
 # Save to the d2l package
 from IPython import display
+import collections
 import os
 import sys
 import numpy as np
+import math
 from matplotlib import pyplot as plt
 from mxnet import nd, autograd, gluon, init, context, image
 from mxnet.gluon import nn
+import random
+import re
 import time
 import tarfile
 ```
