@@ -102,7 +102,7 @@ def get_lstm_params(vocab_size, num_hiddens, ctx):
     return params
 ```
 
-## Define the Model
+### Define the Model
 
 In the initialization function, the hidden state of the LSTM needs to return an additional memory cell with a value of $0$ and a shape of (batch size, number of hidden units). Hence we get the following state initialization.
 
@@ -132,9 +132,9 @@ def lstm(inputs, state, params):
     return nd.concat(*outputs, dim=0), (H, C)
 ```
 
-### Training and Prediction
+### Training
 
-As in the previous section, during model training, we only use adjacent sampling. After setting the hyper-parameters, we train and model and create a 50 character string of text based on the prefixes "traveller" and "time traveller".
+Again, we just train as before. 
 
 ```{.python .input  n=9}
 vocab_size, num_hiddens, ctx = len(vocab), 256, d2l.try_gpu()

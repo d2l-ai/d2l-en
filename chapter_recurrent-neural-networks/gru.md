@@ -135,15 +135,13 @@ def gru(inputs, state, params):
 
 ### Training and Prediction
 
-Training and prediction work in exactly the same manner as before. That is, we need to define a number of epochs, a number of steps for truncation, the minibatch size, a learning rate and how aggressively we should be clipping the gradients. Lastly we create a string of 50 characters based on the prefixes *traveller* and *time traveller*.
+Training and prediction work in exactly the same manner as before. 
 
 ```{.python .input  n=3}
 vocab_size, num_hiddens, ctx = len(vocab), 256, d2l.try_gpu()
 num_epochs, lr = 500, 1
-
 model = d2l.RNNModelScratch(len(vocab), num_hiddens, ctx, get_params, 
                             init_gru_state, gru)
-
 d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, ctx)
 
 ```
@@ -155,10 +153,7 @@ In Gluon, we can directly call the `GRU` class in the `rnn` module. This encapsu
 ```{.python .input  n=9}
 gru_layer = rnn.GRU(num_hiddens)
 model = d2l.RNNModel(gru_layer, len(vocab))
-
 d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, ctx)
-
-
 ```
 
 ## Summary
