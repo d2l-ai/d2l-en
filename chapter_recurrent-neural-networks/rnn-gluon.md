@@ -31,7 +31,7 @@ state = rnn_layer.begin_state(batch_size=batch_size)
 len(state), state[0].shape
 ```
 
-With a state variable and an input, we can compute the output with the updated state. 
+With a state variable and an input, we can compute the output with the updated state.
 
 ```{.python .input  n=38}
 num_steps = 1
@@ -40,10 +40,10 @@ Y, state_new = rnn_layer(X, state)
 Y.shape, len(state_new), state_new[0].shape
 ```
 
-Similar to :numref:`chapter_rnn_scratch`, we define an `RNNModel` block by subclassing the `Block` class for a complete recurrent neural network. Note that `rnn_layer` only contains the hidden recurrent layers, we need to create a separate output layer. While in the previous section, we have the output layer within the `rnn` block. 
+Similar to :numref:`chapter_rnn_scratch`, we define an `RNNModel` block by subclassing the `Block` class for a complete recurrent neural network. Note that `rnn_layer` only contains the hidden recurrent layers, we need to create a separate output layer. While in the previous section, we have the output layer within the `rnn` block.
 
 ```{.python .input  n=39}
-# Save to the d2l package. 
+# Save to the d2l package.
 class RNNModel(nn.Block):
     def __init__(self, rnn_layer, vocab_size, **kwargs):
         super(RNNModel, self).__init__(**kwargs)
@@ -72,10 +72,10 @@ Let's make a prediction with the a model that has random weights.
 ctx = d2l.try_gpu()
 model = RNNModel(rnn_layer, len(vocab))
 model.initialize(force_reinit=True, ctx=ctx)
-d2l.predict_ch9('time traveller', 10, model, vocab, ctx)
+d2l.predict_ch8('time traveller', 10, model, vocab, ctx)
 ```
 
-As is quite obvious, this model doesn't work at all (just yet). Next, we call just `train_ch8` defined in :numref:`chapter_rnn_scratch` with the same hyper-parameters to train our model. 
+As is quite obvious, this model doesn't work at all (just yet). Next, we call just `train_ch8` defined in :numref:`chapter_rnn_scratch` with the same hyper-parameters to train our model.
 
 ```{.python .input  n=19}
 num_epochs, lr = 500, 1
