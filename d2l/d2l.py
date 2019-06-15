@@ -387,32 +387,28 @@ class Vocab(object):
         if use_special_tokens:
             # padding, begin of sentence, end of sentence, unknown
             self.pad, self.bos, self.eos, self.unk = (0, 1, 2, 3)
-            tokens = ['<pad>', '<bos>', '<eos>', '<unk>']
+            uniq_tokens = ['<pad>', '<bos>', '<eos>', '<unk>']
         else:
-            self.unk = 0
-            tokens = ['<unk>']
-        tokens +=  [token for token, freq in self.token_freqs 
-                    if freq >= min_freq]
-        self.idx_to_token = []
-        self.token_to_idx = dict()
-        for token in tokens:
+            self.unk, uniq_tokens = 0, ['<unk>']
+        uniq_tokens +=  [token for token, freq in self.token_freqs 
+                         if freq >= min_freq]
+        self.idx_to_token, self.token_to_idx = [], dict()
+        for token in uniq_tokens:
             self.idx_to_token.append(token)
             self.token_to_idx[token] = len(self.idx_to_token) - 1
-
+            
     def __len__(self):
         return len(self.idx_to_token)
 
     def __getitem__(self, tokens):
         if not isinstance(tokens, (list, tuple)):
             return self.token_to_idx.get(tokens, self.unk)
-        else:
-            return [self.__getitem__(token) for token in tokens]
+        return [self.__getitem__(token) for token in tokens]
 
     def to_tokens(self, indices):
         if not isinstance(indices, (list, tuple)):
             return self.idx_to_token[indices]
-        else:
-            return [self.idx_to_token[index] for index in indices]
+        return [self.idx_to_token[index] for index in indices]
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
 def load_corpus_time_machine(max_tokens=-1):
@@ -422,6 +418,7 @@ def load_corpus_time_machine(max_tokens=-1):
     corpus = [vocab[tk] for line in tokens for tk in line]
     if max_tokens > 0: corpus = corpus[:max_tokens]
     return corpus, vocab
+
 
 # Defined in file: ./chapter_recurrent-neural-networks/lang-model.md
 def seq_data_iter_random(corpus, batch_size, num_steps):
@@ -483,11 +480,9 @@ class RNNModelScratch(object):
     """A RNN Model based on scratch implementations"""
     def __init__(self, vocab_size, num_hiddens, ctx,
                  get_params, init_state, forward):
-        self.vocab_size = vocab_size
+        self.vocab_size, self.num_hiddens = vocab_size, num_hiddens
         self.params = get_params(vocab_size, num_hiddens, ctx)
-        self.init_state = init_state
-        self.forward_fn = forward
-        self.num_hiddens = num_hiddens
+        self.init_state, self.forward_fn = init_state, forward
 
     def __call__(self, X, state):
         X = nd.one_hot(X.T, self.vocab_size)
@@ -526,13 +521,13 @@ def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):
     metric = d2l.Accumulator(2)  # loss_sum, num_examples
     for X, Y in train_iter:
         if state is None or use_random_iter:
-            # Initialize state when either it's the first iteration or 
+            # Initialize state when either it's the first iteration or
             # using random sampling.
             state = model.begin_state(batch_size=X.shape[0], ctx=ctx)
-        else:            
+        else:
             for s in state: s.detach()
         y = Y.T.reshape((-1,))
-        X, y = X.as_in_context(ctx), y.as_in_context(ctx) 
+        X, y = X.as_in_context(ctx), y.as_in_context(ctx)
         with autograd.record():
             py, state = model(X, state)
             l = loss(py, y).mean()
@@ -543,10 +538,11 @@ def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):
     return math.exp(metric[0]/metric[1]), metric[1]/timer.stop()
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
-def train_ch8(model, train_iter, vocab, lr, num_epochs, ctx, 
+def train_ch8(model, train_iter, vocab, lr, num_epochs, ctx,
               use_random_iter=False):
+    # Initialize
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
-    animator = d2l.Animator(xlabel='epoch', ylabel='perplexity', 
+    animator = d2l.Animator(xlabel='epoch', ylabel='perplexity',
                             legend=['train'], xlim=[1, num_epochs])
     if isinstance(model, gluon.Block):
         model.initialize(ctx=ctx, force_reinit=True, init=init.Normal(0.01))
@@ -554,10 +550,9 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, ctx,
         updater = lambda batch_size : trainer.step(batch_size)
     else:
         updater = lambda batch_size : d2l.sgd(model.params, lr, batch_size)
-    
+
     predict = lambda prefix: predict_ch8(prefix, 50, model, vocab, ctx)
-    
-    if hasattr(updater, 'step'): updater = updater.step  
+    # Train and check the progress.
     for epoch in range(num_epochs):
         ppl, speed = train_epoch_ch8(
             model, train_iter, loss, updater, ctx, use_random_iter)
@@ -577,8 +572,6 @@ class RNNModel(nn.Block):
         self.dense = nn.Dense(vocab_size)
 
     def forward(self, inputs, state):
-        # Get the one-hot vector representation by transposing the input to
-        # (num_steps, batch_size)
         X = nd.one_hot(inputs.T, self.vocab_size)
         Y, state = self.rnn(X, state)
         # The fully connected layer will first change the shape of Y to
