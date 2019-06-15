@@ -488,8 +488,8 @@ def train(train_features, test_features, train_labels, test_labels,
     net.add(nn.Dense(1, use_bias=False))
     net.initialize()
     batch_size = min(10, train_labels.shape[0])
-    train_iter = d2l.load_array(train_features, train_labels, batch_size)
-    test_iter = d2l.load_array(test_features, test_labels, batch_size, False)
+    train_iter = d2l.load_array((train_features, train_labels), batch_size)
+    test_iter = d2l.load_array((test_features, test_labels), batch_size, False)
     trainer = gluon.Trainer(net.collect_params(), 'sgd',
                             {'learning_rate': 0.01})
     animator = d2l.Animator(xlabel='epoch', ylabel='loss', yscale='log',

@@ -165,9 +165,9 @@ from mxnet.gluon import nn
 n_train, n_test, num_inputs, batch_size = 20, 100, 200, 1
 true_w, true_b = nd.ones((num_inputs, 1)) * 0.01, 0.05
 train_data = d2l.synthetic_data(true_w, true_b, n_train)
-train_iter = d2l.load_array(*train_data, batch_size)
+train_iter = d2l.load_array(train_data, batch_size)
 test_data = d2l.synthetic_data(true_w, true_b, n_test)
-test_iter = d2l.load_array(*test_data, batch_size, is_train=False)
+test_iter = d2l.load_array(test_data, batch_size, is_train=False)
 ```
 
 ## Implementation from Scratch
@@ -236,7 +236,7 @@ def train(lambd):
             l.backward()
             d2l.sgd([w, b], lr, batch_size)
         if epoch % 5 == 0:
-            animator.add(epoch+1, (d2l.evaluate_loss(net, train_iter, loss), 
+            animator.add(epoch+1, (d2l.evaluate_loss(net, train_iter, loss),
                                    d2l.evaluate_loss(net, test_iter, loss)))
     print('l2 norm of w:', w.norm().asscalar())
 ```
@@ -314,7 +314,7 @@ def train_gluon(wd):
             trainer_w.step(batch_size)
             trainer_b.step(batch_size)
         if epoch % 5 == 0:
-            animator.add(epoch+1, (d2l.evaluate_loss(net, train_iter, loss), 
+            animator.add(epoch+1, (d2l.evaluate_loss(net, train_iter, loss),
                                    d2l.evaluate_loss(net, test_iter, loss)))
     print('L2 norm of w:', net[0].weight.data().norm().asscalar())
 ```

@@ -32,7 +32,7 @@ import numpy as np
 def get_data_ch10(batch_size=10, n=1500):
     data = np.genfromtxt('../data/airfoil_self_noise.dat', delimiter='\t')
     data = nd.array((data - data.mean(axis=0)) / data.std(axis=0))
-    data_iter = d2l.load_array(data[:n, :-1], data[:n, -1],
+    data_iter = d2l.load_array((data[:n, :-1], data[:n, -1]),
                                batch_size, is_train=True)
     return data_iter, data.shape[1]-1
 ```

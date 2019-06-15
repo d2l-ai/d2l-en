@@ -49,13 +49,13 @@ on each epoch (pass through the dataset).
 
 ```{.python .input  n=3}
 # Save to the d2l package. 
-def load_array(features, labels, batch_size, is_train=True):
+def load_array(data_arrays, batch_size, is_train=True):
     """Construct a Gluon data loader"""
-    dataset = gluon.data.ArrayDataset(features, labels)
+    dataset = gluon.data.ArrayDataset(*data_arrays)
     return gluon.data.DataLoader(dataset, batch_size, shuffle=is_train)
     
 batch_size = 10
-data_iter = load_array(features, labels, batch_size)
+data_iter = load_array((features, labels), batch_size)
 ```
 
 Now we can use `data_iter` in much the same way as we called the `data_iter` function in the previous section. To verify that it's working, we can read and print the first mini-batch of instances.
