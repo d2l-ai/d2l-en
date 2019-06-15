@@ -6,7 +6,6 @@ import time
 import mxnet as mx
 from mxnet import autograd, gluon, init, nd
 from mxnet.gluon import data as gdata, loss as gloss, nn, utils as gutils
-from ..data import data_iter_consecutive, data_iter_random
 from ..d2l import try_gpu, linreg
 from ..figure import set_figsize, plt
 
