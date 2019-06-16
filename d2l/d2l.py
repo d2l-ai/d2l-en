@@ -772,6 +772,60 @@ def predict_s2s_ch8(model, src_sentence, src_vocab, tgt_vocab, num_steps, ctx):
         predict_tokens.append(py)
     return ' '.join(tgt_vocab.to_tokens(predict_tokens))
 
+# Defined in file: ./chapter_attention-mechanism/attention.md
+def masked_softmax(X, valid_length):
+    # X: 3-D tensor, valid_length: 1-D or 2-D tensor
+    if valid_length is None:
+        return X.softmax()
+    else:
+        shape = X.shape
+        if valid_length.ndim == 1:
+            valid_length = valid_length.repeat(shape[1], axis=0)
+        else:
+            valid_length = valid_length.reshape((-1,))
+        # fill masked elements with a large negative, whose exp is 0
+        X = nd.SequenceMask(X.reshape((-1, shape[-1])), valid_length, True,
+                            axis=1, value=-1e6)
+        return X.softmax().reshape(shape)
+
+# Defined in file: ./chapter_attention-mechanism/attention.md
+class DotProductAttention(nn.Block): 
+    def __init__(self, dropout, **kwargs):
+        super(DotProductAttention, self).__init__(**kwargs)
+        self.dropout = nn.Dropout(dropout)
+
+    # query: (batch_size, #queries, d)
+    # key: (batch_size, #kv_pairs, d)
+    # value: (batch_size, #kv_pairs, dim_v)
+    # valid_length: either (batch_size, ) or (batch_size, xx)
+    def forward(self, query, key, value, valid_length=None):
+        d = query.shape[-1]
+        # set transpose_b=True to swap the last two dimensions of key
+        scores = nd.batch_dot(query, key, transpose_b=True) / math.sqrt(d)
+        attention_weights = self.dropout(masked_softmax(scores, valid_length))
+        return nd.batch_dot(attention_weights, value)
+
+# Defined in file: ./chapter_attention-mechanism/attention.md
+class MLPAttention(nn.Block):  
+    def __init__(self, units, dropout, **kwargs):
+        super(MLPAttention, self).__init__(**kwargs)
+        # Use flatten=True to keep query's and key's 3-D shapes.
+        self.W_k = nn.Dense(units, activation='tanh',
+                            use_bias=False, flatten=False)
+        self.W_q = nn.Dense(units, activation='tanh',
+                            use_bias=False, flatten=False)
+        self.v = nn.Dense(1, use_bias=False, flatten=False)
+        self.dropout = nn.Dropout(dropout)
+
+    def forward(self, query, key, value, valid_length):
+        query, key = self.W_k(query), self.W_q(key)
+        # expand query to (batch_size, #querys, 1, units), and key to
+        # (batch_size, 1, #kv_pairs, units). Then plus them with broadcast.
+        features = query.expand_dims(axis=2) + key.expand_dims(axis=1)
+        scores = self.v(features).squeeze(axis=-1)
+        attention_weights = self.dropout(masked_softmax(scores, valid_length))
+        return nd.batch_dot(attention_weights, value)
+
 # Defined in file: ./chapter_optimization/optimization-intro.md
 def annotate(text, xy, xytext):
     d2l.plt.gca().annotate(text, xy=xy, xytext=xytext,
