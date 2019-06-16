@@ -19,9 +19,11 @@ The layer structure in the encoder and the decoder is shown in the following fig
 import sys
 sys.path.insert(0, '..')
 
-from mxnet import nd
+from mxnet import np, npx
 from mxnet.gluon import rnn, nn
 import d2l
+
+npx.set_np()
 ```
 
 ## Decoder
@@ -54,16 +56,16 @@ class Seq2SeqAttentionDecoder(d2l.Decoder):
         outputs = []
         for x in X:
             # query shape: (batch_size, 1, hidden_size)
-            query = hidden_state[0][-1].expand_dims(axis=1)
+            query = np.expand_dims(hidden_state[0][-1], axis=1)
             # context has same shape as query
             context = self.attention_cell(
                 query, enc_outputs, enc_outputs, enc_valid_len)
             # concatenate on the feature dimension
-            x = nd.concat(context, x.expand_dims(axis=1), dim=-1)
+            x = np.concatenate([context, np.expand_dims(x, axis=1)], axis=-1)
             # reshape x to (1, batch_size, embed_size+hidden_size)
             out, hidden_state = self.rnn(x.swapaxes(0, 1), hidden_state)
             outputs.append(out)
-        outputs = self.dense(nd.concat(*outputs, dim=0))
+        outputs = self.dense(np.concatenate(outputs, axis=0))
         return outputs.swapaxes(0, 1), [enc_outputs, hidden_state,
                                         enc_valid_len]
 ```
@@ -77,7 +79,7 @@ encoder.initialize()
 decoder = Seq2SeqAttentionDecoder(vocab_size=10, embed_size=8,
                                   num_hiddens=16, num_layers=2)
 decoder.initialize()
-X = nd.zeros((4, 7))
+X = np.zeros((4, 7))
 state = decoder.init_state(encoder(X), None)
 out, state = decoder(X, state)
 out.shape, len(state), state[0].shape, len(state[1]), state[1][0].shape
@@ -97,6 +99,7 @@ embed_size, num_hiddens, num_layers, dropout = 32, 32, 2, 0.0
 batch_size, num_examples, max_len = 64, 1e3, 10
 lr, num_epochs, ctx = 0.005, 200, d2l.try_gpu()
 
+# FIXME: Failed to download
 src_vocab, tgt_vocab, train_iter = d2l.load_data_nmt(
     batch_size, max_len, num_examples)
 encoder = d2l.Seq2SeqEncoder(

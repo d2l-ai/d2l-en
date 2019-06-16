@@ -140,16 +140,16 @@ class Seq2SeqEncoder(Encoder):
 
 def masked_softmax(X, valid_length):
     if valid_length is None:
-        return X.softmax()
+        return npx.softmax(X)
     else:
         shape = X.shape
         if valid_length.ndim == 1:
             valid_length = valid_length.repeat(shape[1], axis=0)
         else:
             valid_length = valid_length.reshape((-1,))
-        X = nd.SequenceMask(X.reshape((-1, shape[-1])), valid_length, True,
-                            axis=1, value=-1e6)
-        return X.softmax().reshape(shape)
+        X = npx.SequenceMask(X.reshape((-1, shape[-1])), valid_length, True,
+                             axis=1, value=-1e6)
+        return npx.softmax(X).reshape(shape)
 
 class DotProductAttention(nn.Block):
     def __init__(self, dropout, **kwargs):
@@ -176,7 +176,7 @@ class MLPAttention(nn.Block):
     def forward(self, query, key, value, valid_length):
         """Forward function"""
         query, key = self.W_k(query), self.W_q(key)
-        features = query.expand_dims(axis=2) + key.expand_dims(axis=1)
+        features = np.expand_dims(query, axis=2) + np.expand_dims(key, axis=1)
         scores = self.v(features).squeeze(axis=-1)
         attention_weights = self.dropout(masked_softmax(scores, valid_length))
-        return nd.batch_dot(attention_weights, value)
+        return npx.batch_dot(attention_weights, value)

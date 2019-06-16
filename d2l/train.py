@@ -376,9 +376,9 @@ def train_ch7(model, data_iter, lr, num_epochs, ctx):
                 l = loss(Y_hat, Y_label, Y_vlen)
             l.backward()
             grad_clipping_gluon(model, 5, ctx)
-            num_tokens = Y_vlen.sum().asscalar()
+            num_tokens = int(Y_vlen.sum())
             trainer.step(num_tokens)
-            l_sum += l.sum().asscalar()
+            l_sum += float(l.sum())
             num_tokens_sum += num_tokens
         if epoch % (num_epochs // 4) == 0:
             print("epoch %d, loss %.3f, time %.1f sec" % (
@@ -391,16 +391,16 @@ def translate_ch7(model, src_sentence, src_vocab, tgt_vocab, max_len, ctx):
     src_len = len(src_tokens)
     if src_len < max_len:
         src_tokens += [src_vocab.pad] * (max_len - src_len)
-    enc_X = nd.array(src_tokens, ctx=ctx)
-    enc_valid_length = nd.array([src_len], ctx=ctx)
-    enc_outputs = model.encoder(enc_X.expand_dims(axis=0), enc_valid_length)
+    enc_X = np.array(src_tokens, ctx=ctx)
+    enc_valid_length = np.array([src_len], ctx=ctx)
+    enc_outputs = model.encoder(np.expand_dims(enc_X, axis=0), enc_valid_length)
     dec_state = model.decoder.init_state(enc_outputs, enc_valid_length)
-    dec_X = nd.array([tgt_vocab.bos], ctx=ctx).expand_dims(axis=0)
+    dec_X = np.expand_dims(np.array([tgt_vocab.bos], ctx=ctx), axis=0)
     predict_tokens = []
     for _ in range(max_len):
         Y, dec_state = model.decoder(dec_X, dec_state)
         dec_X = Y.argmax(axis=2)
-        py = dec_X.squeeze(axis=0).astype('int32').asscalar()
+        py = int(dec_X.squeeze(axis=0).astype('int32'))
         if py == tgt_vocab.eos:
             break
         predict_tokens.append(py)
@@ -408,6 +408,7 @@ def translate_ch7(model, src_sentence, src_vocab, tgt_vocab, max_len, ctx):
 
 class MaskedSoftmaxCELoss(gloss.SoftmaxCELoss):
     def forward(self, pred, label, valid_length):
-        weights = nd.ones_like(label).expand_dims(axis=-1)
-        weights = nd.SequenceMask(weights, valid_length, True, axis=1)
+        weights = np.ones_like(label)
+        weights = np.expand_dims(weights, axis=-1)
+        weights = npx.SequenceMask(weights, valid_length, True, axis=1)
         return super(MaskedSoftmaxCELoss, self).forward(pred, label, weights)
