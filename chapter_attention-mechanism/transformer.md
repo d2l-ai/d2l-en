@@ -21,14 +21,10 @@ It can also be seen that the transformer differs to the seq2seq with attention m
 In the rest of this section, we will explain every new layer introduced by the transformer, and construct a model to train on the machine translation dataset.
 
 ```{.python .input  n=1}
-import sys
-sys.path.insert(0, '..')
-
 import math
-import time
 import d2l
 from mxnet import nd, autograd
-from mxnet.gluon import nn, utils as gutils, data as gdata
+from mxnet.gluon import nn
 ```
 
 ## Multi-Head Attention
@@ -206,12 +202,11 @@ class PositionalEncoding(nn.Block):
 Now we visualize the position values for 4 dimensions. As can be seen, the 4th dimension has the same frequency as the 5th but with different offset. The 5th dimension then has a lower frequency.
 
 ```{.python .input  n=11}
-d2l.set_figsize((8, 3))
 pe = PositionalEncoding(20, 0)
 pe.initialize()
 Y = pe(nd.zeros((1, 100, 20 )))
-d2l.plt.plot(nd.arange(100).asnumpy(), Y[0, :,4:8].asnumpy())
-d2l.plt.legend(["dim %d"%p for p in [4,5,6,7, 20]]);
+d2l.plot(nd.arange(100), Y[0, :,4:8].T, figsize=(6, 2.5),
+        legend=["dim %d"%p for p in [4,5,6,7]])
 ```
 
 ## Encoder
@@ -360,19 +355,18 @@ We use similar hyper-parameters as for the seq2seq with attention model: two tra
 
 ```{.python .input  n=31}
 embed_size, units, num_layers, dropout = 32, 32, 2, 0.0 
-batch_size, num_examples, max_len = 64, 1024, 10
+batch_size, num_steps = 64, 10
 lr, num_epochs, ctx = 0.005, 100, d2l.try_gpu()
 num_hiddens, num_heads = 64, 4
 
-src_vocab, tgt_vocab, train_iter = d2l.load_data_nmt(
-    batch_size, max_len, num_examples)
+src_vocab, tgt_vocab, train_iter = d2l.load_data_nmt(batch_size, num_steps)
 
 encoder = TransformerEncoder(
     len(src_vocab), units, num_hiddens, num_heads, num_layers, dropout)
 decoder = TransformerDecoder(
     len(src_vocab), units, num_hiddens, num_heads, num_layers, dropout)
 model = d2l.EncoderDecoder(encoder, decoder)
-d2l.train_ch7(model, train_iter, lr, num_epochs, ctx)
+d2l.train_s2s_ch8(model, train_iter, lr, num_epochs, ctx)
 ```
 
 Compared to the seq2seq model with attention model, the transformer runs faster per epoch, and converges faster at the beginning. 
@@ -381,8 +375,8 @@ Finally, we translate three sentences.
 
 ```{.python .input  n=28}
 for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
-    print(sentence + ' => ' + d2l.translate_ch7(
-        model, sentence, src_vocab, tgt_vocab, max_len, ctx))
+    print(sentence + ' => ' + d2l.predict_s2s_ch8(
+        model, sentence, src_vocab, tgt_vocab, num_steps, ctx))
 ```
 
 ## Summary
