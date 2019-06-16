@@ -414,13 +414,9 @@ by fitting polynomials to data.
 To get started we'll import our usual packages.
 
 ```{.python .input  n=1}
-import sys
-sys.path.insert(0, '..')
-
-%matplotlib inline
 import d2l
 from mxnet import autograd, gluon, nd
-from mxnet.gluon import data as gdata, loss as gloss, nn
+from mxnet.gluon import nn
 ```
 
 ### Generating Data Sets
@@ -467,56 +463,44 @@ features[:2], poly_features[:2], labels[:2]
 
 ### Defining, Training and Testing Model
 
-We first define the plotting function`semilogy`,
-where the $y$ axis makes use of the logarithmic scale.
+Let first implement a function to evaluate the loss on a given data.
 
-```{.python .input  n=4}
-# This function has been saved in the d2l package for future use
-def semilogy(x_vals, y_vals, x_label, y_label, x2_vals=None, y2_vals=None,
-             legend=None, figsize=(3.5, 2.5)):
-    d2l.set_figsize(figsize)
-    d2l.plt.xlabel(x_label)
-    d2l.plt.ylabel(y_label)
-    d2l.plt.semilogy(x_vals, y_vals)
-    if x2_vals and y2_vals:
-        d2l.plt.semilogy(x2_vals, y2_vals, linestyle=':')
-        d2l.plt.legend(legend)
+```{.python .input}
+# Save to the d2l package.
+def evaluate_loss(net, data_iter, loss):
+    """Evaluate the loss of a model on the given dataset"""
+    l, n = 0.0, 0
+    for X, y in data_iter:
+        l += loss(net(X), y).sum().asscalar()
+        n += y.size
+    return l / n
 ```
 
-Since we will be attempting to fit the generated dataset
-using models of varying complexity,
-we insert the model definition into the `fit_and_plot` function.
-The training and testing steps involved in polynomial function fitting
-are similar to those previously described in softmax regression.
+Now define the training function.
 
 ```{.python .input  n=5}
-num_epochs, loss = 200, gloss.L2Loss()
-
-def fit_and_plot(train_features, test_features, train_labels, test_labels):
+def train(train_features, test_features, train_labels, test_labels,
+          num_epochs=1000):
+    loss = gluon.loss.L2Loss()
     net = nn.Sequential()
     # Switch off the bias since we already catered for it in the polynomial
     # features
     net.add(nn.Dense(1, use_bias=False))
     net.initialize()
     batch_size = min(10, train_labels.shape[0])
-    train_iter = gdata.DataLoader(gdata.ArrayDataset(
-        train_features, train_labels), batch_size, shuffle=True)
+    train_iter = d2l.load_array((train_features, train_labels), batch_size)
+    test_iter = d2l.load_array((test_features, test_labels), batch_size, False)
     trainer = gluon.Trainer(net.collect_params(), 'sgd',
                             {'learning_rate': 0.01})
-    train_ls, test_ls = [], []
-    for _ in range(num_epochs):
-        for X, y in train_iter:
-            with autograd.record():
-                l = loss(net(X), y)
-            l.backward()
-            trainer.step(batch_size)
-        train_ls.append(loss(net(train_features),
-                             train_labels).mean().asscalar())
-        test_ls.append(loss(net(test_features),
-                            test_labels).mean().asscalar())
-    print('final epoch: train loss', train_ls[-1], 'test loss', test_ls[-1])
-    semilogy(range(1, num_epochs + 1), train_ls, 'epochs', 'loss',
-             range(1, num_epochs + 1), test_ls, ['train', 'test'])
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss', yscale='log',
+                            xlim=[1,num_epochs], ylim=[1e-3, 1e2],
+                            legend=['train', 'test'])
+    for epoch in range(1, num_epochs+1):
+        d2l.train_epoch_ch3(net, train_iter, loss,
+                            lambda: trainer.step(batch_size))
+        if epoch % 50 == 0:
+            animator.add(epoch, (evaluate_loss(net, train_iter, loss),
+                                 evaluate_loss(net, test_iter, loss)))
     print('weight:', net[0].weight.data().asnumpy())
 ```
 
@@ -530,11 +514,10 @@ The trained model parameters are also close
 to the true values $w = [5, 1.2, -3.4, 5.6]$.
 
 ```{.python .input  n=6}
-num_epochs = 1000
 # Pick the first four dimensions, i.e. 1, x, x^2, x^3 from the polynomial
 # features
-fit_and_plot(poly_features[:n_train, 0:4], poly_features[n_train:, 0:4],
-             labels[:n_train], labels[n_train:])
+train(poly_features[:n_train, 0:4], poly_features[n_train:, 0:4],
+      labels[:n_train], labels[n_train:])
 ```
 
 ### Linear Function Fitting (Underfitting)
@@ -550,10 +533,9 @@ When used to fit non-linear patterns
 linear models are liable to underfit.
 
 ```{.python .input  n=7}
-num_epochs = 1000
 # Pick the first four dimensions, i.e. 1, x from the polynomial features
-fit_and_plot(poly_features[:n_train, 0:3], poly_features[n_train:, 0:3],
-             labels[:n_train], labels[n_train:])
+train(poly_features[:n_train, 0:3], poly_features[n_train:, 0:3],
+      labels[:n_train], labels[n_train:])
 ```
 
 ### Insufficient Training (Overfitting)
@@ -574,12 +556,11 @@ and training set sizes (`n_subset`)
 to gain some intuition of what is happening.
 
 ```{.python .input  n=8}
-num_epochs = 1000
 n_subset = 100  # Subset of data to train on
 n_degree = 20   # Degree of polynomials
-fit_and_plot(poly_features[1:n_subset, 0:n_degree],
-             poly_features[n_train:, 0:n_degree], labels[1:n_subset],
-             labels[n_train:])
+train(poly_features[1:n_subset, 0:n_degree],
+      poly_features[n_train:, 0:n_degree], labels[1:n_subset],
+      labels[n_train:])
 ```
 
 In later chapters, we will continue

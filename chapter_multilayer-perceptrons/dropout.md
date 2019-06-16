@@ -78,13 +78,13 @@ to the pixels should be mostly harmless.
 
 In 1995, Christopher Bishop formalized
 a form of this idea when he proved
-that [*training with input noise is equivalent to Tikhonov regularization*](https://www.mitpressjournals.org/doi/10.1162/neco.1995.7.1.108).
+that training with input noise is equivalent to Tikhonov regularization :cite:`Bishop.1995`.
 In other words, he drew a clear mathematical connection
 between the requirement that a function be smooth (and thus simple),
 as we discussed in the section on weight decay,
 with and the requirement that it be resilient to perturbations in the input.
 
-Then in 2014, [Srivastava et al., 2014](http://jmlr.org/papers/volume15/srivastava14a.old/srivastava14a.pdf),
+Then in 2014, Srivastava et al. :cite:`Srivastava.Hinton.Krizhevsky.ea.2014`
 developed a clever idea for how to apply Bishop's idea
 to the *internal* layers of the network, too.
 Namely they proposed to inject noise into each layer of the network
@@ -198,13 +198,10 @@ with probability `drop_prob`,
 rescaling the remainder as described above
 (dividing the survivors by `1.0-drop_prob`).
 
-```{.python .input}
-import sys
-sys.path.insert(0, '..')
-
+```{.python .input  n=1}
 import d2l
 from mxnet import autograd, gluon, init, nd
-from mxnet.gluon import loss as gloss, nn
+from mxnet.gluon import nn
 
 def dropout(X, drop_prob):
     assert 0 <= drop_prob <= 1
@@ -219,7 +216,7 @@ We can test out the `dropout` function on a few examples.
 In the following lines of code, we pass our input `X`
 through the dropout operation, with probabilities 0, 0.5, and 1, respectively.
 
-```{.python .input}
+```{.python .input  n=2}
 X = nd.arange(16).reshape((2, 8))
 print(dropout(X, 0))
 print(dropout(X, 0.5))
@@ -233,7 +230,7 @@ introduced in :numref:`chapter_softmax_scratch`.
 We will define a multilayer perceptron with two hidden layers.
 The two hidden layers both have 256 outputs.
 
-```{.python .input}
+```{.python .input  n=3}
 num_inputs, num_outputs, num_hiddens1, num_hiddens2 = 784, 10, 256, 256
 
 W1 = nd.random.normal(scale=0.01, shape=(num_inputs, num_hiddens1))
@@ -260,7 +257,7 @@ The model defined below concatenates the fully-connected layer
  By using the `is_training` function described in :numref:`chapter_autograd`,
  we can ensure that dropout is only active during training.
 
-```{.python .input}
+```{.python .input  n=4}
 drop_prob1, drop_prob2 = 0.2, 0.5
 
 def net(X):
@@ -281,12 +278,12 @@ def net(X):
 
 This is similar to the training and testing of multilayer perceptrons described previously.
 
-```{.python .input}
+```{.python .input  n=5}
 num_epochs, lr, batch_size = 10, 0.5, 256
-loss = gloss.SoftmaxCrossEntropyLoss()
+loss = gluon.loss.SoftmaxCrossEntropyLoss()
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
-d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size,
-              params, lr)
+d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, 
+             lambda: d2l.sgd(params, lr, batch_size))
 ```
 
 ## Concise Implementation
@@ -302,7 +299,7 @@ according to the specified dropout probability.
 When MXNet is not in training mode,
 the `Dropout` layer simply passes the data through during testing.
 
-```{.python .input}
+```{.python .input  n=6}
 net = nn.Sequential()
 net.add(nn.Dense(256, activation="relu"),
         # Add a dropout layer after the first fully connected layer
@@ -316,10 +313,10 @@ net.initialize(init.Normal(sigma=0.01))
 
 Next, we train and test the model.
 
-```{.python .input}
+```{.python .input  n=7}
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
-d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size, None,
-              None, trainer)
+d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, 
+              lambda: trainer.step(batch_size))
 ```
 
 ## Summary
@@ -340,9 +337,6 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size, None,
 1. What happens if we apply dropout to the individual weights of the weight matrix rather than the activations?
 1. Replace the dropout activation with a random variable that takes on values of $[0, \gamma/2, \gamma]$. Can you design something that works better than the binary dropout function? Why might you want to use it? Why not?
 
-## References
-
-[1] Srivastava, N., Hinton, G., Krizhevsky, A., Sutskever, I., & Salakhutdinov, R. (2014).  JMLR
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2343)
 

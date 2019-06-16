@@ -1,21 +1,11 @@
 # Softmax Regression
 :label:`chapter_softmax`
 
-In the last two chapters, we worked through implementations
-linear regression, building everything from scratch
-(:numref:`chapter_linear_scratch`) and again using Gluon (:numref:`chapter_linear_gluon`) to automate the most repetitive work.
+In :numref:`chapter_linear_regression` we introduced linear regression, and worked through building everything from scratch in :numref:`chapter_linear_scratch` and using Gluon in :numref:`chapter_linear_gluon` to automate the most repetitive work.
 
-Regression is the hammer we reach for
-when we want to answer *how much?* or *how many?* questions.
-If you want to predict the number of dollars (the *price*)
-at which a house will be sold,
-or the number of wins a baseball team might have,
-or the number of days that a patient
-will remain hospitalized before being discharged,
-then you're probably looking for a regression model.
+Regression is the hammer we reach for when we want to answer *how much?* or *how many?* questions.  If you want to predict the number of dollars (the *price*) at which a house will be sold, or the number of wins a baseball team might have, or the number of days that a patient will remain hospitalized before being discharged, then you're probably looking for a regression model.
 
-In practice, we're more often interested in classification:
-asking not *how much* but *which one*.
+In practice, we're more often interested in classification: asking not *how much* but *which one*.
 
 * Does this email belong in the spam folder or the inbox?
 * Is this customer more likely *to sign up* or *not to sign up* for a subscription service?
@@ -36,7 +26,7 @@ But general classification problems do not come with natural orderings among the
 
 $$y \in \{(1, 0, 0), (0, 1, 0), (0, 0, 1)\}$$
 
-In our case, $y$ would be a three-dimensional vector, with $(1,0,0)$ corresponding to "cat", $(0,1,0)$ to "chicken" and $(0,0,1)$ to "dog".
+In our case, $y$ would be a three-dimensional vector, with $(1,0,0)$ corresponding to "cat", $(0,1,0)$ to "chicken" and $(0,0,1)$ to "dog". It is often called the *one-hot encoding*.
 
 ### Network Architecture
 
@@ -76,7 +66,7 @@ we subject the outputs of the linear portion of our model
 to a nonlinear *softmax* function:
 
 $$
-\hat{\mathbf{y}} = \mathrm{softmax}(\mathbf{o}) \text{ where }
+\hat{\mathbf{y}} = \mathrm{softmax}(\mathbf{o})\quad \text{where}\quad
 \hat{y}_i = \frac{\exp(o_i)}{\sum_j \exp(o_j)}
 $$
 

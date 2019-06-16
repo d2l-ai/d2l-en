@@ -68,14 +68,12 @@ $$\mathbf{H}_t = \mathbf{O}_t \odot \tanh(\mathbf{C}_t).$$
 Now it's time to implement an LSTM. We begin with a model built from scratch. As with the experiments in the previous sections we first need to load the data. We use *The Time Machine* for this.
 
 ```{.python .input  n=1}
-import sys
-sys.path.insert(0, '..')
-
 import d2l
-from mxnet import nd, init
+from mxnet import nd
 from mxnet.gluon import rnn
 
-corpus_indices, vocab = d2l.load_data_time_machine()
+batch_size, num_steps = 32, 35
+train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 ```
 
 ### Initialize Model Parameters
@@ -83,24 +81,18 @@ corpus_indices, vocab = d2l.load_data_time_machine()
 Next we need to define and initialize the model parameters. As previously, the hyperparameter `num_hiddens` defines the number of hidden units. We initialize weights with a Gaussian with $0.01$ variance and we set the biases to $0$.
 
 ```{.python .input  n=2}
-num_inputs, num_hiddens, num_outputs = len(vocab), 256, len(vocab)
-ctx = d2l.try_gpu()
-
-def get_params():
-    def _one(shape):
-        return nd.random.normal(scale=0.01, shape=shape, ctx=ctx)
-
-    def _three():
-        return (_one((num_inputs, num_hiddens)),
-                _one((num_hiddens, num_hiddens)),
-                nd.zeros(num_hiddens, ctx=ctx))
-
-    W_xi, W_hi, b_i = _three()  # Input gate parameters
-    W_xf, W_hf, b_f = _three()  # Forget gate parameters
-    W_xo, W_ho, b_o = _three()  # Output gate parameters
-    W_xc, W_hc, b_c = _three()  # Candidate cell parameters
+def get_lstm_params(vocab_size, num_hiddens, ctx):
+    num_inputs = num_outputs = vocab_size
+    normal = lambda shape : nd.random.normal(scale=0.01, shape=shape, ctx=ctx)
+    three = lambda : (normal((num_inputs, num_hiddens)),
+                      normal((num_hiddens, num_hiddens)),
+                      nd.zeros(num_hiddens, ctx=ctx))
+    W_xi, W_hi, b_i = three()  # Input gate parameters
+    W_xf, W_hf, b_f = three()  # Forget gate parameters
+    W_xo, W_ho, b_o = three()  # Output gate parameters
+    W_xc, W_hc, b_c = three()  # Candidate cell parameters
     # Output layer parameters
-    W_hq = _one((num_hiddens, num_outputs))
+    W_hq = normal((num_hiddens, num_outputs))
     b_q = nd.zeros(num_outputs, ctx=ctx)
     # Create gradient
     params = [W_xi, W_hi, b_i, W_xf, W_hf, b_f, W_xo, W_ho, b_o, W_xc, W_hc,
@@ -110,7 +102,7 @@ def get_params():
     return params
 ```
 
-## Define the Model
+### Define the Model
 
 In the initialization function, the hidden state of the LSTM needs to return an additional memory cell with a value of $0$ and a shape of (batch size, number of hidden units). Hence we get the following state initialization.
 
@@ -137,20 +129,19 @@ def lstm(inputs, state, params):
         H = O * C.tanh()
         Y = nd.dot(H, W_hq) + b_q
         outputs.append(Y)
-    return outputs, (H, C)
+    return nd.concat(*outputs, dim=0), (H, C)
 ```
 
-### Training and Prediction
+### Training
 
-As in the previous section, during model training, we only use adjacent sampling. After setting the hyper-parameters, we train and model and create a 50 character string of text based on the prefixes "traveller" and "time traveller".
+Again, we just train as before. 
 
 ```{.python .input  n=9}
-num_epochs, num_steps, batch_size, lr, clipping_theta = 100, 35, 32, 3, 1
-prefixes = ['traveller', 'time traveller']
-
-d2l.train_and_predict_rnn(lstm, get_params, init_lstm_state, num_hiddens,
-                          corpus_indices, vocab, ctx, False, num_epochs,
-                          num_steps, lr, clipping_theta, batch_size, prefixes)
+vocab_size, num_hiddens, ctx = len(vocab), 256, d2l.try_gpu()
+num_epochs, lr = 500, 1
+model = d2l.RNNModelScratch(len(vocab), num_hiddens, ctx, get_lstm_params, 
+                            init_lstm_state, lstm)
+d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, ctx)
 ```
 
 ## Concise Implementation
@@ -160,9 +151,7 @@ In Gluon, we can call the `LSTM` class in the `rnn` module directly to instantia
 ```{.python .input  n=10}
 lstm_layer = rnn.LSTM(num_hiddens)
 model = d2l.RNNModel(lstm_layer, len(vocab))
-d2l.train_and_predict_rnn_gluon(model, num_hiddens, corpus_indices, vocab,
-                                ctx, num_epochs*5, num_steps, lr,
-                                clipping_theta, batch_size, prefixes)
+d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, ctx)
 ```
 
 ## Summary

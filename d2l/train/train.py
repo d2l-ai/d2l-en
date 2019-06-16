@@ -6,15 +6,8 @@ import time
 import mxnet as mx
 from mxnet import autograd, gluon, init, nd
 from mxnet.gluon import data as gdata, loss as gloss, nn, utils as gutils
-from ..data import data_iter_consecutive, data_iter_random
-from ..base import try_gpu
+from ..d2l import try_gpu, linreg
 from ..figure import set_figsize, plt
-from ..model import linreg
-
-__all__ = ['evaluate_accuracy', 'squared_loss', 'grad_clipping', 'grad_clipping_gluon', 'sgd', 'train',
-           'train_2d', 'train_and_predict_rnn', 'train_and_predict_rnn_gluon',
-           'train_ch3', 'train_ch5', 'train_ch9', 'train_gluon_ch9',
-           'predict_sentiment', 'train_ch7', 'translate_ch7']
 
 def _get_batch(batch, ctx):
     """Return features and labels on ctx."""
@@ -38,10 +31,6 @@ def evaluate_accuracy(data_iter, net, ctx=[mx.cpu()]):
         acc_sum.wait_to_read()
     return acc_sum.asscalar() / n
 
-def squared_loss(y_hat, y):
-    """Squared loss."""
-    return (y_hat - y.reshape(y_hat.shape)) ** 2 / 2
-
 def grad_clipping(params, theta, ctx):
     """Clip the gradient."""
     norm = nd.array([0], ctx)
@@ -57,10 +46,6 @@ def grad_clipping_gluon(model, theta, ctx):
     params = [p.data(ctx) for p in model.collect_params().values()]
     grad_clipping(params, theta, ctx)
 
-def sgd(params, lr, batch_size):
-    """Mini-batch stochastic gradient descent."""
-    for param in params:
-        param[:] = param - lr * param.grad / batch_size
 
 def train(train_iter, test_iter, net, loss, trainer, ctx, num_epochs):
     """Train and evaluate a model."""
@@ -88,18 +73,6 @@ def train(train_iter, test_iter, net, loss, trainer, ctx, num_epochs):
               'time %.1f sec'
               % (epoch + 1, train_l_sum / n, train_acc_sum / m, test_acc,
                  time.time() - start))
-
-
-def train_2d(trainer):
-    """Optimize the objective function of 2D variables with a customized trainer."""
-    x1, x2 = -5, -2
-    s_x1, s_x2 = 0, 0
-    res = [(x1, x2)]
-    for i in range(20):
-        x1, x2, s_x1, s_x2 = trainer(x1, x2, s_x1, s_x2)
-        res.append((x1, x2))
-    print('epoch %d, x1 %f, x2 %f' % (i+1, x1, x2))
-    return res
 
 def train_and_predict_rnn(rnn, get_params, init_rnn_state, num_hiddens,
                           corpus_indices, vocab, ctx, is_random_iter,
@@ -198,117 +171,6 @@ def train_and_predict_rnn_gluon(model, num_hiddens, corpus_indices, vocab,
         if epoch % (num_epochs // 2) == 0:
             for prefix in prefixes:
                 print(' -', predict_rnn_gluon(prefix, 50, model, vocab, ctx))
-
-
-def train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size,
-              params=None, lr=None, trainer=None):
-    """Train and evaluate a model with CPU."""
-    for epoch in range(num_epochs):
-        train_l_sum, train_acc_sum, n = 0.0, 0.0, 0
-        for X, y in train_iter:
-            with autograd.record():
-                y_hat = net(X)
-                l = loss(y_hat, y).sum()
-            l.backward()
-            if trainer is None:
-                sgd(params, lr, batch_size)
-            else:
-                trainer.step(batch_size)
-            y = y.astype('float32')
-            train_l_sum += l.asscalar()
-            train_acc_sum += (y_hat.argmax(axis=1) == y).sum().asscalar()
-            n += y.size
-        test_acc = evaluate_accuracy(test_iter, net)
-        print('epoch %d, loss %.4f, train acc %.3f, test acc %.3f'
-              % (epoch + 1, train_l_sum / n, train_acc_sum / n, test_acc))
-
-
-def train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,
-              num_epochs):
-    """Train and evaluate a model with CPU or GPU."""
-    print('training on', ctx)
-    loss = gloss.SoftmaxCrossEntropyLoss()
-    for epoch in range(num_epochs):
-        train_l_sum, train_acc_sum, n, start = 0.0, 0.0, 0, time.time()
-        for X, y in train_iter:
-            X, y = X.as_in_context(ctx), y.as_in_context(ctx)
-            with autograd.record():
-                y_hat = net(X)
-                l = loss(y_hat, y).sum()
-            l.backward()
-            trainer.step(batch_size)
-            y = y.astype('float32')
-            train_l_sum += l.asscalar()
-            train_acc_sum += (y_hat.argmax(axis=1) == y).sum().asscalar()
-            n += y.size
-        test_acc = evaluate_accuracy(test_iter, net, ctx)
-        print('epoch %d, loss %.4f, train acc %.3f, test acc %.3f, '
-              'time %.1f sec'
-              % (epoch + 1, train_l_sum / n, train_acc_sum / n, test_acc,
-                 time.time() - start))
-
-
-def train_ch9(trainer_fn, states, hyperparams, features, labels, batch_size=10,
-              num_epochs=2):
-    """Train a linear regression model."""
-    net, loss = linreg, squared_loss
-    w, b = nd.random.normal(scale=0.01, shape=(
-        features.shape[1], 1)), nd.zeros(1)
-    w.attach_grad()
-    b.attach_grad()
-
-    def eval_loss():
-        return loss(net(features, w, b), labels).mean().asscalar()
-
-    ls = [eval_loss()]
-    data_iter = gdata.DataLoader(
-        gdata.ArrayDataset(features, labels), batch_size, shuffle=True)
-    for _ in range(num_epochs):
-        start = time.time()
-        for batch_i, (X, y) in enumerate(data_iter):
-            with autograd.record():
-                l = loss(net(X, w, b), y).mean()
-            l.backward()
-            trainer_fn([w, b], states, hyperparams)
-            if (batch_i + 1) * batch_size % 100 == 0:
-                ls.append(eval_loss())
-    print('loss: %f, %f sec per epoch' % (ls[-1], time.time() - start))
-    set_figsize()
-    plt.plot(np.linspace(0, num_epochs, len(ls)), ls)
-    plt.xlabel('epoch')
-    plt.ylabel('loss')
-
-
-def train_gluon_ch9(trainer_name, trainer_hyperparams, features, labels,
-                    batch_size=10, num_epochs=2):
-    """Train a linear regression model with a given Gluon trainer."""
-    net = nn.Sequential()
-    net.add(nn.Dense(1))
-    net.initialize(init.Normal(sigma=0.01))
-    loss = gloss.L2Loss()
-
-    def eval_loss():
-        return loss(net(features), labels).mean().asscalar()
-
-    ls = [eval_loss()]
-    data_iter = gdata.DataLoader(
-        gdata.ArrayDataset(features, labels), batch_size, shuffle=True)
-    trainer = gluon.Trainer(net.collect_params(),
-                            trainer_name, trainer_hyperparams)
-    for _ in range(num_epochs):
-        start = time.time()
-        for batch_i, (X, y) in enumerate(data_iter):
-            with autograd.record():
-                l = loss(net(X), y)
-            l.backward()
-            trainer.step(batch_size)
-            if (batch_i + 1) * batch_size % 100 == 0:
-                ls.append(eval_loss())
-    print('loss: %f, %f sec per epoch' % (ls[-1], time.time() - start))
-    set_figsize()
-    plt.plot(np.linspace(0, num_epochs, len(ls)), ls)
-    plt.xlabel('epoch')
-    plt.ylabel('loss')
 
 def to_onehot(X, size):
     return [nd.one_hot(x, size) for x in X.T]

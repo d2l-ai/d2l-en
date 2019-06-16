@@ -36,14 +36,9 @@ $$\lambda f(x) + (1-\lambda) f(x') \geq f(\lambda x + (1-\lambda) x').$$
 To illustrate this let's plot a few functions and check which ones satisfy the requirement. We need to import a few  libraries.
 
 ```{.python .input  n=1}
-import sys
-sys.path.insert(0, '..')
-
 %matplotlib inline
 import d2l
-d2l.use_svg_display()
 from mpl_toolkits import mplot3d
-import matplotlib.pyplot as plt
 import numpy as np
 ```
 
@@ -55,11 +50,11 @@ def g(x): return np.cos(np.pi * x) # nonconvex
 def h(x): return np.exp(0.5 * x)   # convex
 
 x, segment = np.arange(-2, 2, 0.01), np.array([-1.5, 1])
-_, figarr = d2l.plt.subplots(1, 3, figsize=(9, 3))
+d2l.use_svg_display()
+_, axes = d2l.plt.subplots(1, 3, figsize=(9, 3))
 
-for fig, func in zip(figarr, [f, g, h]):
-    fig.plot(x, func(x))
-    fig.plot(segment, func(segment))
+for ax, func in zip(axes, [f, g, h]):
+    d2l.plot([x, segment], [func(x), func(segment)], axes=ax)
 ```
 
 As expected, the cosine function is nonconvex, whereas the parabola and the exponential function are. Note that the requirement that $X$ is necessary for the condition to make sense. Otherwise the outcome of $f(\lambda x + (1-\lambda) x')$ might not be well defined. Convex functions have a number of desirable properties.
@@ -96,9 +91,8 @@ This contradicts the assumption that $f(x)$ is a local minimum. For instance, th
 
 ```{.python .input}
 def f(x): return (x-1)**2 * (x+1)
-d2l.set_figsize()
-fig,  = d2l.plt.plot(x, f(x))
-fig,  = d2l.plt.plot(segment, f(segment))
+d2l.set_figsize((3.5, 2.5))
+d2l.plot([x, segment], [f(x), f(segment)], 'x', 'f(x)')
 ```
 
 The fact that convex functions have no local minima is very convenient. It means that if we minimize functions we cannot 'get stuck'. Note, though, that this doesn't means that there cannot be more than one global minimum or that there might even exist one. For instance, the function $f(x) = \mathrm{max}(|x|-1, 0)$ attains its minimum value over the interval $[-1, 1]$. Conversely, the function $f(x) = \exp(x)$ does not attain a minimum value on $\mathbb{R}$. For $x \to -\infty$ it asymptotes to $0$, however there is no $x$ for which $f(x) = 0$.
@@ -125,8 +119,7 @@ ax.contour(x, y, z, offset=-1)
 ax.set_zlim(-1, 1.5)
 
 # Adjust labels
-for func in [plt.xticks, plt.yticks, ax.set_zticks]: func([-1,0,1])
-plt.show()
+for func in [d2l.plt.xticks, d2l.plt.yticks, ax.set_zticks]: func([-1,0,1])
 ```
 
 ### Derivatives and Convexity
@@ -163,14 +156,12 @@ By geometry it follows that $f(x)$ is below the line connecting $f(a)$ and $f(b)
 ```{.python .input}
 def f(x): return 0.5 * x**2        
 x, axb, ab = np.arange(-2, 2, 0.01), np.array([-1.5, -0.5, 1]), np.array([-1.5, 1])
-d2l.set_figsize()
 
-for data in [x, axb, ab]:
-    fig, = d2l.plt.plot(data, f(data))
-
-_ = fig.axes.annotate('a', xy=(-1.5, f(-1.5)), xytext=(-1.5, 1.5), arrowprops=dict(arrowstyle='->'))
-_ = fig.axes.annotate('b', xy=(1, f(1)), xytext=(1, 1.5), arrowprops=dict(arrowstyle='->'))
-_ = fig.axes.annotate('x', xy=(-0.5, f(-0.5)), xytext=(-1.5, f(-0.5)), arrowprops=dict(arrowstyle='->'))
+d2l.set_figsize((3.5, 2.5))
+d2l.plot([x, axb, ab], [f(x) for x in [x, axb, ab]], 'x', 'f(x)')
+d2l.annotate('a', (-1.5, f(-1.5)), (-1.5, 1.5))
+d2l.annotate('b', (1, f(1)), (1, 1.5))
+d2l.annotate('x', (-0.5, f(-0.5)), (-1.5, f(-0.5)))
 ```
 
 ## Constraints

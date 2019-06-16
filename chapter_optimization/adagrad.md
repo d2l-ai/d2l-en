@@ -40,9 +40,6 @@ We should emphasize that the cumulative variable $\boldsymbol{s}_t$ produced by 
 Below we will continue to use the objective function $f(\boldsymbol{x})=0.1x_1^2+2x_2^2$ as an example to observe the iterative trajectory of the independent variable in Adagrad. We are going to implement Adagrad using the same learning rate as the experiment in last section, 0.4. As we can see, the iterative trajectory of the independent variable is smoother. However, due to the cumulative effect of $\boldsymbol{s}_t$, the learning rate continuously decays, so the independent variable does not move as much during later stages of iteration.
 
 ```{.python .input  n=1}
-import sys
-sys.path.insert(0, '..')
-
 %matplotlib inline
 import d2l
 import math
@@ -76,10 +73,9 @@ d2l.show_trace_2d(f_2d, d2l.train_2d(adagrad_2d))
 Like the momentum method, Adagrad needs to maintain a state variable of the same shape for each independent variable. We use the formula from the algorithm to implement Adagrad.
 
 ```{.python .input  n=3}
-features, labels = d2l.get_data_ch7()
 
-def init_adagrad_states():
-    s_w = nd.zeros((features.shape[1], 1))
+def init_adagrad_states(feature_dim):
+    s_w = nd.zeros((feature_dim, 1))
     s_b = nd.zeros(1)
     return (s_w, s_b)
 
@@ -94,7 +90,9 @@ Compared with the experiment in :numref:`chapter_minibatch_sgd`, here, we use a
 larger learning rate to train the model.
 
 ```{.python .input  n=4}
-d2l.train_ch9(adagrad, init_adagrad_states(), {'lr': 0.1}, features, labels)
+data_iter, feature_dim = d2l.get_data_ch10(batch_size=10)
+d2l.train_ch10(adagrad, init_adagrad_states(feature_dim), 
+               {'lr': 0.1}, data_iter, feature_dim);
 ```
 
 ## Concise Implementation
@@ -102,7 +100,7 @@ d2l.train_ch9(adagrad, init_adagrad_states(), {'lr': 0.1}, features, labels)
 Using the `Trainer` instance of the algorithm named “adagrad”, we can implement the Adagrad algorithm with Gluon to train models.
 
 ```{.python .input  n=5}
-d2l.train_gluon_ch9('adagrad', {'learning_rate': 0.1}, features, labels)
+d2l.train_gluon_ch10('adagrad', {'learning_rate': 0.1}, data_iter)
 ```
 
 ## Summary

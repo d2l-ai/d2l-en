@@ -8,23 +8,21 @@ There are no small data sets, like MNIST or Fashion-MNIST, in the object detecti
 The Pikachu data set in RecordIO format can be downloaded directly from the Internet. The operation for downloading the data set is defined in the function `_download_pikachu`.
 
 ```{.python .input  n=1}
-import sys
-sys.path.insert(0, '..')
-
 %matplotlib inline
 import d2l
 from mxnet import gluon, image
-from mxnet.gluon import utils as gutils
 import os
 
-def _download_pikachu(data_dir):
+# Save to the d2l package.
+def download_pikachu(data_dir):
     root_url = ('https://apache-mxnet.s3-accelerate.amazonaws.com/'
                 'gluon/dataset/pikachu/')
     dataset = {'train.rec': 'e6bcb6ffba1ac04ff8a9b1115e650af56ee969c8',
                'train.idx': 'dcf7318b2602c06428b9988470c731621716c393',
                'val.rec': 'd6c33f799b4d058e82f2cb5bd9a976f69d72d520'}
     for k, v in dataset.items():
-        gutils.download(root_url + k, os.path.join(data_dir, k), sha1_hash=v)
+        gluon.utils.download(
+            root_url + k, os.path.join(data_dir, k), sha1_hash=v)
 ```
 
 ## Read the Data Set
@@ -32,11 +30,11 @@ def _download_pikachu(data_dir):
 We are going to read the object detection data set by creating the instance `ImageDetIter`. The "Det" in the name refers to Detection. We will read the training data set in random order. Since the format of the data set is RecordIO, we need the image index file `'train.idx'` to read random mini-batches. In addition, for each image of the training set, we will use random cropping and require the cropped image to cover at least 95% of each object. Since the cropping is random, this requirement is not always satisfied. We preset the maximum number of random cropping attempts to 200. If none of them meets the requirement, the image will not be cropped. To ensure the certainty of the output, we will not randomly crop the images in the test data set. We also do not need to read the test data set in random order.
 
 ```{.python .input  n=2}
-# This function has been saved in the d2l package for future use
-# Edge_size: the width and height of the output image
+# Save to the d2l package.
 def load_data_pikachu(batch_size, edge_size=256):
+    """Load the pikachu dataset"""
     data_dir = '../data/pikachu'
-    _download_pikachu(data_dir)
+    download_pikachu(data_dir)
     train_iter = image.ImageDetIter(
         path_imgrec=os.path.join(data_dir, 'train.rec'),
         path_imgidx=os.path.join(data_dir, 'train.idx'),
@@ -66,7 +64,7 @@ We have ten images with bounding boxes on them. We can see that the angle, size,
 
 ```{.python .input  n=4}
 imgs = (batch.data[0][0:10].transpose((0, 2, 3, 1))) / 255
-axes = d2l.show_images(imgs, 2, 5).flatten()
+axes = d2l.show_images(imgs, 2, 5, scale=2)
 for ax, label in zip(axes, batch.label[0][0:10]):
     d2l.show_bboxes(ax, [label[0][1:5] * edge_size], colors=['w'])
 ```

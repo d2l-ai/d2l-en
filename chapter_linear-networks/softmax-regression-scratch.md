@@ -11,19 +11,16 @@ To begin, let's import our packages
 (only `autograd`, `nd` are needed here
 because we will be doing the heavy lifting ourselves.)
 
-```{.python .input}
-import sys
-sys.path.insert(0, '..')
-
-%matplotlib inline
+```{.python .input  n=1}
 import d2l
 from mxnet import autograd, nd
+from IPython import display
 ```
 
 We will work with the Fashion-MNIST dataset just introduced,
 cuing up an iterator with batch size 256.
 
-```{.python .input}
+```{.python .input  n=2}
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 ```
@@ -46,7 +43,7 @@ and the biases will constitute a $1 \times 10$ vector.
 As with linear regression, we will initialize our weights $W$
 with Gaussian noise and our biases to take the initial value $0$.
 
-```{.python .input  n=9}
+```{.python .input  n=3}
 num_inputs = 784
 num_outputs = 10
 
@@ -58,7 +55,7 @@ Recall that we need to *attach gradients* to the model parameters.
 More literally, we are allocating memory for future gradients to be stored
 and notifiying MXNet that we want gradients to be calculated with respect to these parameters in the first place.
 
-```{.python .input  n=10}
+```{.python .input  n=4}
 W.attach_grad()
 b.attach_grad()
 ```
@@ -78,7 +75,7 @@ If we want to keep the number of axes in the original array
 rather than collapsing out the dimension that we summed over
 we can specify `keepdims=True` when invoking `sum`.
 
-```{.python .input  n=11}
+```{.python .input  n=5}
 X = nd.array([[1, 2, 3], [4, 5, 6]])
 X.sum(axis=0, keepdims=True), X.sum(axis=1, keepdims=True)
 ```
@@ -104,7 +101,7 @@ The origins of that name are in [statistical physics](https://en.wikipedia.org/w
 where a related equation models the distribution
 over an ensemble of particles).
 
-```{.python .input  n=12}
+```{.python .input  n=6}
 def softmax(X):
     X_exp = X.exp()
     partition = X_exp.sum(axis=1, keepdims=True)
@@ -119,8 +116,7 @@ due to large (or very small) elements of the matrix,
 as we did in
 :numref:`chapter_naive_bayes`.
 
-
-```{.python .input  n=13}
+```{.python .input  n=7}
 X = nd.random.normal(shape=(2, 5))
 X_prob = softmax(X)
 X_prob, X_prob.sum(axis=1)
@@ -135,7 +131,7 @@ Note that we flatten each original image in the batch
 into a vector with length `num_inputs` with the `reshape` function
 before passing the data through our model.
 
-```{.python .input  n=14}
+```{.python .input  n=8}
 def net(X):
     return softmax(nd.dot(X.reshape((-1, num_inputs)), W) + b)
 ```
@@ -158,7 +154,7 @@ from the matrix of softmax entries easily.
 Below, we illustrate the `pick` function on a toy example,
 with 3 categories and 2 examples.
 
-```{.python .input  n=15}
+```{.python .input  n=9}
 y_hat = nd.array([[0.1, 0.3, 0.6], [0.3, 0.2, 0.5]])
 y = nd.array([0, 2], dtype='int32')
 nd.pick(y_hat, y)
@@ -167,11 +163,10 @@ nd.pick(y_hat, y)
 Now we can implement the cross-entropy loss function efficiently
 with just one line of code.
 
-```{.python .input  n=16}
+```{.python .input  n=10}
 def cross_entropy(y_hat, y):
-    return -nd.pick(y_hat, y).log()
+    return - nd.pick(y_hat, y).log()
 ```
-
 
 ## Classification Accuracy
 
@@ -193,9 +188,10 @@ we also need to convert both to the same type (we pick `float32`).
 The result is an NDArray containing entries of 0 (false) and 1 (true).
 Taking the mean yields the desired result.
 
-```{.python .input  n=17}
+```{.python .input  n=11}
+# Save to the d2l package.
 def accuracy(y_hat, y):
-    return (y_hat.argmax(axis=1) == y.astype('float32')).mean().asscalar()
+    return (y_hat.argmax(axis=1) == y.astype('float32')).sum().asscalar()
 ```
 
 We will continue to use the variables `y_hat` and `y`
@@ -209,21 +205,20 @@ The second example's prediction category is 2
 which is consistent with the actual label, 2.
 Therefore, the classification accuracy rate for these two examples is 0.5.
 
-```{.python .input  n=18}
-accuracy(y_hat, y)
+```{.python .input  n=12}
+accuracy(y_hat, y) / len(y)
 ```
 
 Similarly, we can evaluate the accuracy for model `net` on the data set
 (accessed via `data_iter`).
 
-```{.python .input  n=19}
-# The function will be gradually improved: the complete implementation will be
-# discussed in the "Image Augmentation" section
-def evaluate_accuracy(data_iter, net):
+```{.python .input  n=13}
+# Save to the d2l package.
+def evaluate_accuracy(net, data_iter):
     acc_sum, n = 0.0, 0
     for X, y in data_iter:
         y = y.astype('float32')
-        acc_sum += (net(X).argmax(axis=1) == y).sum().asscalar()
+        acc_sum += accuracy(net(X), y)
         n += y.size
     return acc_sum / n
 ```
@@ -232,15 +227,97 @@ Because we initialized the `net` model with random weights,
 the accuracy of this model should be close to random guessing,
 i.e. 0.1 for 10 classes.
 
-```{.python .input  n=20}
-evaluate_accuracy(test_iter, net)
+```{.python .input  n=14}
+evaluate_accuracy(net, test_iter)
 ```
 
 ## Model Training
 
 The training loop for softmax regression should look strikingly familiar
 if you read through our implementation
-of linear regression earlier in this chapter.
+of linear regression in :numref:`chapter_linear_scratch`. Here we refactor the implementation to make it reusable. First, we define a function to train for one data epoch.
+
+```{.python .input  n=15}
+# Save to the d2l package.
+def train_epoch_ch3(net, train_iter, loss, updater):
+    train_l_sum, train_acc_sum, n = 0.0, 0.0, 0
+    for X, y in train_iter:
+        # compute gradients and update parameters
+        with autograd.record():
+            y_hat = net(X)
+            l = loss(y_hat, y)
+        l.backward()
+        updater()
+        # measure loss and accuracy
+        train_l_sum += l.sum().asscalar()
+        train_acc_sum += accuracy(y_hat, y)
+        n += y.size
+    return train_l_sum/n, train_acc_sum/n
+```
+
+Then we define a class that draw data in animation.
+
+```{.python .input  n=16}
+# Save to the d2l package.
+class Animator(object):
+    def __init__(self, xlabel=None, ylabel=None, legend=[], xlim=None,
+                 ylim=None, xscale='linear', yscale='linear', fmts=None,
+                 nrows=1, ncols=1, figsize=(3.5, 2.5)):
+        """Incrementally plot multiple lines."""
+        d2l.use_svg_display()
+        self.fig, self.axes = d2l.plt.subplots(nrows, ncols, figsize=figsize)
+        if nrows * ncols == 1: self.axes = [self.axes,]
+        # use a lambda to capture arguments
+        self.config_axes = lambda : set_axes(
+            self.axes[0], xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
+        self.X, self.Y, self.fmts = None, None, fmts
+
+    def add(self, x, y):
+        """Add multiple data points into the figure."""
+        if not hasattr(y, "__len__"): y = [y]
+        n = len(y)
+        if not hasattr(x, "__len__"): x = [x] * n
+        if not self.X: self.X = [[] for _ in range(n)]
+        if not self.Y: self.Y = [[] for _ in range(n)]
+        if not self.fmts: self.fmts = ['-'] * n
+        for i, (a, b) in enumerate(zip(x, y)):
+            if a is not None and b is not None:
+                self.X[i].append(a)
+                self.Y[i].append(b)
+        self.axes[0].cla()
+        for x, y, fmt in zip(self.X, self.Y, self.fmts):
+            self.axes[0].plot(x, y, fmt)
+        self.config_axes()
+        display.display(self.fig)
+        display.clear_output(wait=True)
+
+# Save to the d2l package.
+def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
+    """A utility function to set matplotlib axes"""
+    axes.set_xlabel(xlabel)
+    axes.set_ylabel(ylabel)
+    axes.set_xscale(xscale)
+    axes.set_yscale(yscale)
+    axes.set_xlim(xlim)
+    axes.set_ylim(ylim)
+    if legend: axes.legend(legend)
+    axes.grid()
+```
+
+The training function then runs multiple epochs and visualize the training progress.
+
+```{.python .input  n=17}
+# Save to the d2l package.
+def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
+    trains, test_accs = [], []
+    animator = Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0.3, 0.9],
+                       legend=['train loss', 'train acc', 'test acc'])
+    for epoch in range(num_epochs):
+        train_metrics = train_epoch_ch3(net, train_iter, loss, updater)
+        test_acc = evaluate_accuracy(net, test_iter)
+        animator.add(epoch+1, train_metrics+(test_acc,))
+```
+
 Again, we use the mini-batch stochastic gradient descent
 to optimize the loss function of the model.
 Note that the number of epochs (`num_epochs`),
@@ -248,34 +325,10 @@ and learning rate (`lr`) are both adjustable hyper-parameters.
 By changing their values, we may be able to increase the classification accuracy of the model. In practice we'll want to split our data three ways
 into training, validation, and test data, using the validation data to choose the best values of our hyperparameters.
 
-```{.python .input  n=21}
-num_epochs, lr = 5, 0.1
-
-# This function has been saved in the d2l package for future use
-def train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size,
-              params=None, lr=None, trainer=None):
-    for epoch in range(num_epochs):
-        train_l_sum, train_acc_sum, n = 0.0, 0.0, 0
-        for X, y in train_iter:
-            with autograd.record():
-                y_hat = net(X)
-                l = loss(y_hat, y).sum()
-            l.backward()
-            if trainer is None:
-                d2l.sgd(params, lr, batch_size)
-            else:
-                # This will be illustrated in the next section
-                trainer.step(batch_size)
-            y = y.astype('float32')
-            train_l_sum += l.asscalar()
-            train_acc_sum += (y_hat.argmax(axis=1) == y).sum().asscalar()
-            n += y.size
-        test_acc = evaluate_accuracy(test_iter, net)
-        print('epoch %d, loss %.4f, train acc %.3f, test acc %.3f'
-              % (epoch + 1, train_l_sum / n, train_acc_sum / n, test_acc))
-
-train_ch3(net, train_iter, test_iter, cross_entropy, num_epochs,
-          batch_size, [W, b], lr)
+```{.python .input  n=18}
+num_epochs, lr = 10, 0.1
+updater = lambda: d2l.sgd([W, b], lr, batch_size)
+train_ch3(net, train_iter, test_iter, cross_entropy, num_epochs, updater)
 ```
 
 ## Prediction
@@ -285,16 +338,17 @@ Given a series of images, we will compare their actual labels
 (first line of text output) and the model predictions
 (second line of text output).
 
-```{.python .input}
-for X, y in test_iter:
-    break
+```{.python .input  n=19}
+# Save to the d2l package.
+def predict_ch3(net, test_iter, n=6):
+    for X, y in test_iter:
+        break
+    trues = d2l.get_fashion_mnist_labels(y.asnumpy())
+    preds = d2l.get_fashion_mnist_labels(net(X).argmax(axis=1).asnumpy())
+    titles = [true+'\n'+ pred for true, pred in zip(trues, preds)]
+    d2l.show_images(X[0:n].reshape((n,28,28)), 1, n, titles=titles[0:n])
 
-true_labels = d2l.get_fashion_mnist_labels(y.asnumpy())
-pred_labels = d2l.get_fashion_mnist_labels(net(X).argmax(axis=1).asnumpy())
-titles = [truelabel + '\n' + predlabel
-          for truelabel, predlabel in zip(true_labels, pred_labels)]
-
-d2l.show_fashion_mnist(X[0:9], titles[0:9])
+predict_ch3(net, test_iter)
 ```
 
 ## Summary
@@ -313,3 +367,37 @@ then train models using optimization algorithms. As you'll soon find out, most c
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2336)
 
 ![](../img/qr_softmax-regression-scratch.svg)
+
+```{.python .input  n=20}
+# TODO Will remove these functions later.
+
+# Save to the d2l package.
+def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
+         ylim=None, xscale='linear', yscale='linear', fmts=None,
+         figsize=(3.5, 2.5), axes=None):
+    """Plot multiple lines"""
+    d2l.set_figsize(figsize)
+    axes = axes if axes else d2l.plt.gca()
+    if isinstance(X, nd.NDArray): X = X.asnumpy()
+    if isinstance(Y, nd.NDArray): Y = Y.asnumpy()
+    if not hasattr(X[0], "__len__"): X = [X]
+    if Y is None: X, Y = [[]]*len(X), X
+    if not hasattr(Y[0], "__len__"): Y = [Y]
+    if len(X) != len(Y): X = X * len(Y)
+    if not fmts: fmts = ['-']*len(X)
+    axes.cla()
+    for x, y, fmt in zip(X, Y, fmts):
+        if isinstance(x, nd.NDArray): x = x.asnumpy()
+        if isinstance(y, nd.NDArray): y = y.asnumpy()
+        if len(x):
+            axes.plot(x, y, fmt)
+        else:
+            axes.plot(y, fmt)
+    set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
+
+# Save to the d2l package.
+def show(obj):
+    """Show a figure"""
+    display.display(obj)
+    display.clear_output(wait=True)
+```

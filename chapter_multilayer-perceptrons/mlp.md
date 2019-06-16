@@ -179,6 +179,12 @@ we can calculate each nodes activation without looking at the values taken by th
 This is true for most activation functions
 (the batch normalization operation will be introduced in :numref:`chapter_batch_norm` is a notable exception to that rule).
 
+```{.python .input  n=1}
+%matplotlib inline
+import d2l
+from mxnet import autograd, nd
+```
+
 ## Activation Functions
 
 Because they are so fundamental to deep learning, before going further,
@@ -197,23 +203,7 @@ $$\mathrm{ReLU}(z) = \max(z, 0).$$
 
 It can be understood that the ReLU function retains only positive elements and discards negative elements (setting those nodes to 0).
 To get a better idea of what it looks like, we can plot it.
-For convenience, we define a plotting function `xyplot`
-to take care of the groundwork.
 
-```{.python .input  n=1}
-import sys
-sys.path.insert(0, '..')
-
-%matplotlib inline
-import d2l
-from mxnet import autograd, nd
-
-def xyplot(x_vals, y_vals, name):
-    d2l.set_figsize(figsize=(5, 2.5))
-    d2l.plt.plot(x_vals.asnumpy(), y_vals.asnumpy())
-    d2l.plt.xlabel('x')
-    d2l.plt.ylabel(name + '(x)')
-```
 
 Because it is used so commonly, NDarray supports
 the `relu` function as a basic native operator.
@@ -224,7 +214,8 @@ x = nd.arange(-8.0, 8.0, 0.1)
 x.attach_grad()
 with autograd.record():
     y = x.relu()
-xyplot(x, y, 'relu')
+d2l.set_figsize((4, 2.5))    
+d2l.plot(x, y, 'x', 'relu(x)')
 ```
 
 When the input is negative, the derivative of ReLU function is 0
@@ -241,7 +232,7 @@ See the derivative of the ReLU function plotted below.
 
 ```{.python .input  n=3}
 y.backward()
-xyplot(x, x.grad, 'grad of relu')
+d2l.plot(x, x.grad, 'x', 'grad of relu')
 ```
 
 Note that there are many variants to the ReLU function, such as the parameterized ReLU (pReLU) of [He et al., 2015](https://arxiv.org/abs/1502.01852). This variation adds a linear term to the ReLU, so some information still gets through, even when the argument is negative.
@@ -288,7 +279,7 @@ approaches a linear transformation.
 ```{.python .input  n=4}
 with autograd.record():
     y = x.sigmoid()
-xyplot(x, y, 'sigmoid')
+d2l.plot(x, y, 'x', 'sigmoid(x)')
 ```
 
 The derivative of sigmoid function is given by the following equation:
@@ -302,7 +293,7 @@ reaches a maximum of 0.25. As the input diverges from 0 in either direction, the
 
 ```{.python .input  n=5}
 y.backward()
-xyplot(x, x.grad, 'grad of sigmoid')
+d2l.plot(x, x.grad, 'x', 'grad of sigmoid')
 ```
 
 ### Tanh Function
@@ -318,7 +309,7 @@ We plot the tanh function blow. Note that as the input nears 0, the tanh functio
 ```{.python .input  n=6}
 with autograd.record():
     y = x.tanh()
-xyplot(x, y, 'tanh')
+d2l.plot(x, y, 'x', 'tanh(x)')
 ```
 
 The derivative of the Tanh function is:
@@ -334,7 +325,7 @@ the derivative of the tanh function approaches 0.
 
 ```{.python .input  n=7}
 y.backward()
-xyplot(x, x.grad, 'grad of tanh')
+d2l.plot(x, x.grad, 'x', 'grad of tanh')
 ```
 
 In summary, we now know how to incorporate nonlinearities

@@ -6,13 +6,9 @@ convenient for implementing classification models.  Again, we begin with our
 import ritual.
 
 ```{.python .input  n=1}
-import sys
-sys.path.insert(0, '..')
-
-%matplotlib inline
 import d2l
 from mxnet import gluon, init
-from mxnet.gluon import loss as gloss, nn
+from mxnet.gluon import nn
 ```
 
 Let's stick with the Fashion-MNIST dataset and keep the batch size at $256$ as in the last section.
@@ -24,7 +20,7 @@ train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 
 ## Initialize Model Parameters
 
-As [mentioned previously](softmax-regression.md), the output layer of softmax regression is a fully connected (`Dense`) layer. Therefore, to implement our model, we just need to add one `Dense` layer with 10 outputs to our `Sequential`. Again, here, the `Sequential` isn't really necessary, but we might as well form the habit since it will be ubiquitous when implementing deep models. Again, we initialize the weights at random with zero mean and standard deviation 0.01.
+As mentioned in :numref:`chapter_softmax`, the output layer of softmax regression is a fully connected (`Dense`) layer. Therefore, to implement our model, we just need to add one `Dense` layer with 10 outputs to our `Sequential`. Again, here, the `Sequential` isn't really necessary, but we might as well form the habit since it will be ubiquitous when implementing deep models. Again, we initialize the weights at random with zero mean and standard deviation 0.01.
 
 ```{.python .input  n=3}
 net = nn.Sequential()
@@ -87,7 +83,7 @@ all at once inside the softmax_cross_entropy loss function,
 which does smart things like the log-sum-exp trick ([see on Wikipedia](https://en.wikipedia.org/wiki/LogSumExp)).
 
 ```{.python .input  n=4}
-loss = gloss.SoftmaxCrossEntropyLoss()
+loss = gluon.loss.SoftmaxCrossEntropyLoss()
 ```
 
 ## Optimization Algorithm
@@ -99,6 +95,7 @@ and it illustrates the general applicability of the optimizers.
 
 ```{.python .input  n=5}
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': 0.1})
+updater = lambda: trainer.step(batch_size)
 ```
 
 ## Training
@@ -106,9 +103,8 @@ trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': 0.1})
 Next, we use the training functions defined in the last section to train a model.
 
 ```{.python .input  n=6}
-num_epochs = 5
-d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, batch_size, None,
-              None, trainer)
+num_epochs = 10
+d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, updater)
 ```
 
 Just as before, this algorithm converges to a solution

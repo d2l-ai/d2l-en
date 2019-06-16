@@ -1,32 +1,27 @@
 # Linear Regression Implementation from Scratch
 :label:`chapter_linear_scratch`
 
-Now that you have some background on the *ideas* behind linear regression,
-we are ready to step through a hands-on implementation.
-In this section, and similar ones that follow,
-we are going to implement all parts of linear regression:
-the data pipeline, the model, the loss function,
-and the gradient descent optimizer, from scratch.
-Not surprisingly, today's deep learning frameworks
-can automate nearly all of this work,
-but if you never learn to implement things from scratch,
-then you may never truly understand how the model works.
-Moreover, when it comes time to customize models,
-defining our own layers, loss functions, etc.,
-knowing how things work under the hood will come in handy.
-Thus, we start off describing how to implement linear regression
-relying only on the primitives in the NDArray and `autograd` packages.
-In the section immediately following, we will present the compact implementation, using all of Gluon's bells and whistles,
-but this is where we dive into the details.
+Now that you have some background on the *ideas* behind linear regression, we
+are ready to step through a hands-on implementation.  In this section, and
+similar ones that follow, we are going to implement all parts of linear
+regression: the data pipeline, the model, the loss function, and the gradient
+descent optimizer, from scratch.  Not surprisingly, today's deep learning
+frameworks can automate nearly all of this work, but if you never learn to
+implement things from scratch, then you may never truly understand how the model
+works.  Moreover, when it comes time to customize models, defining our own
+layers, loss functions, etc., knowing how things work under the hood will come
+in handy.  Thus, we start off describing how to implement linear regression
+relying only on the primitives in the NDArray and `autograd` packages.  In the
+section immediately following, we will present the compact implementation, using
+all of Gluon's bells and whistles, but this is where we dive into the details.
 
-To start off, we import the packages required to run this section's experiments: we'll be using `matplotlib` for plotting, setting it to embed in the GUI.
+To start off, we import the packages required to run this section's experiments.
 
 ```{.python .input  n=1}
 %matplotlib inline
-from IPython import display
-from matplotlib import pyplot as plt
 from mxnet import autograd, nd
 import random
+import d2l
 ```
 
 ## Generating Data Sets
@@ -56,13 +51,17 @@ and in this example, we'll set its standard deviation to $0.01$.
 The following code generates our synthetic dataset:
 
 ```{.python .input  n=2}
-num_inputs = 2
-num_examples = 1000
+# Save to the d2l package.
+def synthetic_data(w, b, num_examples):
+    """generate y = X w + b + noise"""
+    X = nd.random.normal(scale=1, shape=(num_examples, len(w)))
+    y = nd.dot(X, w) + b
+    y += nd.random.normal(scale=0.01, shape=y.shape)
+    return X, y
+
 true_w = nd.array([2, -3.4])
 true_b = 4.2
-features = nd.random.normal(scale=1, shape=(num_examples, num_inputs))
-labels = nd.dot(features, true_w) + true_b
-labels += nd.random.normal(scale=0.01, shape=labels.shape)
+features, labels = synthetic_data(true_w, true_b, 1000)
 ```
 
 Note that each row in `features` consists of a 2-dimensional data point and that each row in `labels` consists of a 1-dimensional target value (a scalar).
@@ -73,23 +72,10 @@ features[0], labels[0]
 
 By generating a scatter plot using the second `features[:, 1]` and `labels`, we can clearly observe the linear correlation between the two.
 
-```{.python .input  n=4}
-def use_svg_display():
-    # Display in vector graphics
-    display.set_matplotlib_formats('svg')
-
-def set_figsize(figsize=(3.5, 2.5)):
-    use_svg_display()
-    # Set the size of the graph to be plotted
-    plt.rcParams['figure.figsize'] = figsize
-
-set_figsize()
-plt.figure(figsize=(10, 6))
-plt.scatter(features[:, 1].asnumpy(), labels.asnumpy(), 1);
+```{.python .input  n=18}
+d2l.set_figsize((3.5, 2.5))
+d2l.plt.scatter(features[:, 1].asnumpy(), labels.asnumpy(), 1);
 ```
-
-The plotting function `plt` as well as the `use_svg_display` and `set_figsize` functions are defined in the `d2l` package. Now that you know how to make plots yourself, we will call `d2l.plt` directly for future plotting. To print the vector diagram and set its size, we only need to call `d2l.set_figsize()` before plotting, because `plt` is a global variable in the `d2l` package.
-
 
 ## Reading Data
 
@@ -101,7 +87,6 @@ and a vector of labels, yielding minibatches of size `batch_size`,
 each consisting of a tuple of features and labels.
 
 ```{.python .input  n=5}
-# This function has been saved in the d2l package for future use
 def data_iter(batch_size, features, labels):
     num_examples = len(features)
     indices = list(range(num_examples))
@@ -146,7 +131,7 @@ random numbers from a normal distribution with mean 0
 and a standard deviation of 0.01, setting the bias $b$ to 0.
 
 ```{.python .input  n=7}
-w = nd.random.normal(scale=0.01, shape=(num_inputs, 1))
+w = nd.random.normal(scale=0.01, shape=(2, 1))
 b = nd.zeros(shape=(1,))
 ```
 
@@ -174,7 +159,6 @@ w.attach_grad()
 b.attach_grad()
 ```
 
-
 ## Define the Model
 
 Next, we must define our model,
@@ -188,7 +172,7 @@ Recall that when we add a vector and a scalar,
 the scalar is added to each component of the vector.
 
 ```{.python .input  n=9}
-# This function has been saved in the d2l package for future use
+# Save to the d2l package. 
 def linreg(X, w, b):
     return nd.dot(X, w) + b
 ```
@@ -204,7 +188,7 @@ The result returned by the following function
 will also be the same as the `y_hat` shape.
 
 ```{.python .input  n=10}
-# This function has been saved in the d2l package for future use
+# Save to the d2l package. 
 def squared_loss(y_hat, y):
     return (y_hat - y.reshape(y_hat.shape)) ** 2 / 2
 ```
@@ -234,7 +218,7 @@ so that the magnitude of a typical step size
 doesn't depend heavily on our choice of the batch size.
 
 ```{.python .input  n=11}
-# This function has been saved in the d2l package for future use
+# Save to the d2l package. 
 def sgd(params, lr, batch_size):
     for param in params:
         param[:] = param - lr * param.grad / batch_size

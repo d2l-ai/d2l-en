@@ -43,11 +43,8 @@ The convolution width of the first layer is typically set by the user.
 The subsequent widths are fixed to $1 \times 1$.
 
 ```{.python .input  n=2}
-import sys
-sys.path.insert(0, '..')
-
 import d2l
-from mxnet import gluon, init, nd
+from mxnet import gluon, nd
 from mxnet.gluon import nn
 
 def nin_block(num_channels, kernel_size, strides, padding):
@@ -112,12 +109,9 @@ NiN's training is similar to that for AlexNet and VGG,
 but it often uses a larger learning rate.
 
 ```{.python .input}
-lr, num_epochs, batch_size, ctx = 0.1, 5, 128, d2l.try_gpu()
-net.initialize(force_reinit=True, ctx=ctx, init=init.Xavier())
-trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
+lr, num_epochs, batch_size = 0.1, 10, 128
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size, resize=224)
-d2l.train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,
-              num_epochs)
+d2l.train_ch5(net, train_iter, test_iter, num_epochs, lr)
 ```
 
 ## Summary
