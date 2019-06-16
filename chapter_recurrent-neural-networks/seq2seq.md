@@ -12,12 +12,8 @@ The layers in the encoder and the decoder are illustrated in the following figur
 In this section we will implement the seq2seq model to train on the machine translation dataset.
 
 ```{.python .input  n=1}
-import sys
-sys.path.insert(0, '..')
-
-import time
 from mxnet import nd, init, gluon, autograd
-from mxnet.gluon import nn, rnn, loss as gloss
+from mxnet.gluon import nn, rnn
 import d2l
 ```
 
@@ -26,6 +22,7 @@ import d2l
 In the encoder, we use the word embedding layer to obtain a feature index from the word index of the input language and then input it into a multi-level LSTM recurrent unit. The input for the encoder is a batch of sequences, which is 2-D tensor with shape (batch size, sequence length). It outputs both the LSTM outputs, e.g the hidden state, for each time step and the hidden state and memory cell of the last time step.
 
 ```{.python .input  n=3}
+# Save to the d2l package.
 class Seq2SeqEncoder(d2l.Encoder):
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0, **kwargs):
@@ -62,6 +59,7 @@ We directly use the hidden state of the encoder in the final time step as the in
 The forward calculation of the decoder is similar to the encoder's. The only difference is we add a dense layer with the hidden size to be the vocabulary size to output the predicted confidence score for each word.
 
 ```{.python .input  n=5}
+# Save to the d2l package.
 class Seq2SeqDecoder(d2l.Decoder):
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0, **kwargs):
@@ -113,7 +111,8 @@ nd.SequenceMask(X, nd.array([1,2]), True, value=-1, axis=1)
 Now we can implement the masked version of the softmax cross-entropy loss. Note that each Gluon loss function allows to specify per-example weights, in default they are 1s. Then we can just use a zero weight for each example we would like to remove. So our customized loss function accepts an additional `valid_length` argument to ignore some failing elements in each sequence.
 
 ```{.python .input  n=9}
-class MaskedSoftmaxCELoss(gloss.SoftmaxCELoss):
+# Save to the d2l package.
+class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
     # pred shape: (batch_size, seq_len, vocab_size)
     # label shape: (batch_size, seq_len)
     # valid_length shape: (batch_size, )
@@ -136,14 +135,18 @@ loss(nd.ones((3, 4, 10)), nd.ones((3, 4)), nd.array([4, 2, 0]))
 During training, if the target sequence has length $n$, we feed the first $n-1$ tokens into the decoder as inputs, and the last $n-1$ tokens are used as ground truth label.
 
 ```{.python .input  n=13}
-def train_ch7(model, data_iter, lr, num_epochs, ctx):  # Saved in d2l
+# Save to the d2l package.
+def train_s2s_ch8(model, data_iter, lr, num_epochs, ctx):
     model.initialize(init.Xavier(), force_reinit=True, ctx=ctx)
     trainer = gluon.Trainer(model.collect_params(),
                             'adam', {'learning_rate': lr})
     loss = MaskedSoftmaxCELoss()
-    tic = time.time()
+    #tic = time.time()
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss', 
+                            xlim=[1, num_epochs], ylim=[0, 0.25])
     for epoch in range(1, num_epochs+1):
-        l_sum, num_tokens_sum = 0.0, 0.0
+        timer = d2l.Timer()
+        metric = d2l.Accumulator(2)  # loss_sum, num_tokens
         for batch in data_iter:
             X, X_vlen, Y, Y_vlen = [x.as_in_context(ctx) for x in batch]
             Y_input, Y_label, Y_vlen = Y[:,:-1], Y[:,1:], Y_vlen-1
@@ -151,33 +154,30 @@ def train_ch7(model, data_iter, lr, num_epochs, ctx):  # Saved in d2l
                 Y_hat, _ = model(X, Y_input, X_vlen, Y_vlen)
                 l = loss(Y_hat, Y_label, Y_vlen)
             l.backward()
-            d2l.grad_clipping_gluon(model, 5, ctx)
+            d2l.grad_clipping(model, 1)
             num_tokens = Y_vlen.sum().asscalar()
             trainer.step(num_tokens)
-            l_sum += l.sum().asscalar()
-            num_tokens_sum += num_tokens
-        if epoch % 50 == 0:
-            print("epoch %d, loss %.3f, time %.1f sec" % (
-                epoch, l_sum/num_tokens_sum, time.time()-tic))
-            tic = time.time()
-
+            metric.add((l.sum().asscalar(), num_tokens))
+        if epoch % 10 == 0:
+            animator.add(epoch, metric[0]/metric[1])
+    print('loss %.3f, %d tokens/sec on %s ' % (
+        metric[0]/metric[1], metric[1]/timer.stop(), ctx))
 ```
 
 Next, we create a model instance and set hyper-parameters. Then, we can train the model.
 
 ```{.python .input  n=14}
 embed_size, num_hiddens, num_layers, dropout = 32, 32, 2, 0.0
-batch_size, num_examples, max_len = 64, 1e3, 10
+batch_size, num_steps = 64, 10
 lr, num_epochs, ctx = 0.005, 300, d2l.try_gpu()
 
-src_vocab, tgt_vocab, train_iter = d2l.load_data_nmt(
-    batch_size, max_len, num_examples)
+src_vocab, tgt_vocab, train_iter = d2l.load_data_nmt(batch_size, num_steps)
 encoder = Seq2SeqEncoder(
     len(src_vocab), embed_size, num_hiddens, num_layers, dropout)
 decoder = Seq2SeqDecoder(
     len(tgt_vocab), embed_size, num_hiddens, num_layers, dropout)
 model = d2l.EncoderDecoder(encoder, decoder)
-train_ch7(model, train_iter, lr, num_epochs, ctx)
+train_s2s_ch8(model, train_iter, lr, num_epochs, ctx)
 ```
 
 ## Predicting
@@ -188,21 +188,19 @@ During predicting, we feed the same "&lt;bos&gt;" token to the decoder as traini
 
 ![Sequence to sequence model predicting with greedy search](../img/seq2seq_predict.svg)
 
-
 ```{.python .input  n=15}
-def translate_ch7(model, src_sentence, src_vocab, tgt_vocab, max_len, ctx):
+# Save to the d2l package.
+def predict_s2s_ch8(model, src_sentence, src_vocab, tgt_vocab, num_steps, ctx):
     src_tokens = src_vocab[src_sentence.lower().split(' ')]
-    src_len = len(src_tokens)
-    if src_len < max_len:
-        src_tokens += [src_vocab.pad] * (max_len - src_len)
+    enc_valid_length = nd.array([len(src_tokens)], ctx=ctx)
+    src_tokens = d2l.trim_pad(src_tokens, num_steps, src_vocab.pad)
     enc_X = nd.array(src_tokens, ctx=ctx)
-    enc_valid_length = nd.array([src_len], ctx=ctx)
-    # use expand_dim to add the batch_size dimension.
+    # add the batch_size dimension.
     enc_outputs = model.encoder(enc_X.expand_dims(axis=0), enc_valid_length)
     dec_state = model.decoder.init_state(enc_outputs, enc_valid_length)
     dec_X = nd.array([tgt_vocab.bos], ctx=ctx).expand_dims(axis=0)
     predict_tokens = []
-    for _ in range(max_len):
+    for _ in range(num_steps):
         Y, dec_state = model.decoder(dec_X, dec_state)
         # The token with highest score is used as the next time step input.
         dec_X = Y.argmax(axis=2)
@@ -217,8 +215,8 @@ Try several examples:
 
 ```{.python .input  n=16}
 for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
-    print(sentence + ' => ' + translate_ch7(
-        model, sentence, src_vocab, tgt_vocab, max_len, ctx))
+    print(sentence + ' => ' + predict_s2s_ch8(
+        model, sentence, src_vocab, tgt_vocab, num_steps, ctx))
 ```
 
 ## Summary

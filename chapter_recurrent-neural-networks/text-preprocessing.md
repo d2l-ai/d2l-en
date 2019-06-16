@@ -55,10 +55,8 @@ The string type of the token is inconvienet to be used by models, which take num
 # Save to the d2l package. 
 class Vocab(object):
     def __init__(self, tokens, min_freq=0, use_special_tokens=False):
-        # Flatten a list of token lists into a list of tokens
-        tokens = [tk for line in tokens for tk in line]
-        # sort by frequency and token
-        counter = collections.Counter(tokens)
+        # Sort according to frequencies
+        counter = count_corpus(tokens)
         self.token_freqs = sorted(counter.items(), key=lambda x: x[0])
         self.token_freqs.sort(key=lambda x: x[1], reverse=True)
         if use_special_tokens:
@@ -68,7 +66,7 @@ class Vocab(object):
         else:
             self.unk, uniq_tokens = 0, ['<unk>']
         uniq_tokens +=  [token for token, freq in self.token_freqs 
-                         if freq >= min_freq]
+                         if freq >= min_freq and token not in uniq_tokens]
         self.idx_to_token, self.token_to_idx = [], dict()
         for token in uniq_tokens:
             self.idx_to_token.append(token)
@@ -86,6 +84,12 @@ class Vocab(object):
         if not isinstance(indices, (list, tuple)):
             return self.idx_to_token[indices]
         return [self.idx_to_token[index] for index in indices]
+
+# Save to the d2l package.
+def count_corpus(sentences):
+    # Flatten a list of token lists into a list of tokens
+    tokens = [tk for line in sentences for tk in line]
+    return collections.Counter(tokens)
 ```
 
 We construct a vocabulary with the time machine dataset as the corpus, and then print the map between a few tokens to indices.

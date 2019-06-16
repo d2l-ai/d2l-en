@@ -14,7 +14,7 @@ import numpy as np
 import math
 from matplotlib import pyplot as plt
 from mxnet import nd, autograd, gluon, init, context, image
-from mxnet.gluon import nn
+from mxnet.gluon import nn, rnn
 import random
 import re
 import time
@@ -379,10 +379,8 @@ def tokenize(lines, token='word'):
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
 class Vocab(object):
     def __init__(self, tokens, min_freq=0, use_special_tokens=False):
-        # Flatten a list of token lists into a list of tokens
-        tokens = [tk for line in tokens for tk in line]
-        # sort by frequency and token
-        counter = collections.Counter(tokens)
+        # Sort according to frequencies
+        counter = count_corpus(tokens)
         self.token_freqs = sorted(counter.items(), key=lambda x: x[0])
         self.token_freqs.sort(key=lambda x: x[1], reverse=True)
         if use_special_tokens:
@@ -392,7 +390,7 @@ class Vocab(object):
         else:
             self.unk, uniq_tokens = 0, ['<unk>']
         uniq_tokens +=  [token for token, freq in self.token_freqs 
-                         if freq >= min_freq]
+                         if freq >= min_freq and token not in uniq_tokens]
         self.idx_to_token, self.token_to_idx = [], dict()
         for token in uniq_tokens:
             self.idx_to_token.append(token)
@@ -410,6 +408,13 @@ class Vocab(object):
         if not isinstance(indices, (list, tuple)):
             return self.idx_to_token[indices]
         return [self.idx_to_token[index] for index in indices]
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
+def count_corpus(sentences):
+    # Flatten a list of token lists into a list of tokens
+    tokens = [tk for line in sentences for tk in line]
+    return collections.Counter(tokens)
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
 def load_corpus_time_machine(max_tokens=-1):
@@ -631,7 +636,7 @@ def build_array(lines, vocab, num_steps, is_source):
 # Defined in file: ./chapter_recurrent-neural-networks/machine-translation.md
 def load_data_nmt(batch_size, num_steps, num_examples=1000):
     text = preprocess_nmt(read_data_nmt())
-    source, target = tokenize_nmt(text)
+    source, target = tokenize_nmt(text, num_examples)
     src_vocab = d2l.Vocab(source, min_freq=3, use_special_tokens=True)
     tgt_vocab = d2l.Vocab(target, min_freq=3, use_special_tokens=True)
     src_array, src_valid_len = build_array(
@@ -641,6 +646,191 @@ def load_data_nmt(batch_size, num_steps, num_examples=1000):
     data_arrays = (src_array, src_valid_len, tgt_array, tgt_valid_len)
     data_iter = d2l.load_array(data_arrays, batch_size)
     return src_vocab, tgt_vocab, data_iter
+
+# Defined in file: ./chapter_recurrent-neural-networks/encoder-decoder.md
+class Encoder(nn.Block):
+    """The base encoder interface for the encoder-decoder architecture."""
+    def __init__(self, **kwargs):
+        super(Encoder, self).__init__(**kwargs)
+
+    def forward(self, X):
+        raise NotImplementedError
+
+# Defined in file: ./chapter_recurrent-neural-networks/encoder-decoder.md
+class Decoder(nn.Block):
+    """The base decoder interface for the encoder-decoder archtecture."""
+    def __init__(self, **kwargs):
+        super(Decoder, self).__init__(**kwargs)
+
+    def init_state(self, enc_outputs, *args):
+        raise NotImplementedError
+
+    def forward(self, X, state):
+        raise NotImplementedError
+
+# Defined in file: ./chapter_recurrent-neural-networks/encoder-decoder.md
+class EncoderDecoder(nn.Block):
+    """The base class for the encoder-decoder architecture."""
+    def __init__(self, encoder, decoder, **kwargs):
+        super(EncoderDecoder, self).__init__(**kwargs)
+        self.encoder = encoder
+        self.decoder = decoder
+
+    def forward(self, enc_X, dec_X, *args):
+        enc_outputs = self.encoder(enc_X, *args)
+        dec_state = self.decoder.init_state(enc_outputs, *args)
+        return self.decoder(dec_X, dec_state)
+
+# Defined in file: ./chapter_recurrent-neural-networks/seq2seq.md
+class Seq2SeqEncoder(d2l.Encoder):
+    def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
+                 dropout=0, **kwargs):
+        super(Seq2SeqEncoder, self).__init__(**kwargs)
+        self.embedding = nn.Embedding(vocab_size, embed_size)
+        self.rnn = rnn.LSTM(num_hiddens, num_layers, dropout=dropout)
+
+    def forward(self, X, *args):
+        X = self.embedding(X) # X shape: (batch_size, seq_len, embed_size)
+        X = X.swapaxes(0, 1)  # RNN needs first axes to be time
+        state = self.rnn.begin_state(batch_size=X.shape[1], ctx=X.context)
+        out, state = self.rnn(X, state)
+        # The shape of out is (seq_len, batch_size, num_hiddens).
+        # state contains the hidden state and the memory cell
+        # of the last time step, the shape is (num_layers, batch_size, num_hiddens)
+        return out, state
+
+# Defined in file: ./chapter_recurrent-neural-networks/seq2seq.md
+class Seq2SeqDecoder(d2l.Decoder):
+    def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
+                 dropout=0, **kwargs):
+        super(Seq2SeqDecoder, self).__init__(**kwargs)
+        self.embedding = nn.Embedding(vocab_size, embed_size)
+        self.rnn = rnn.LSTM(num_hiddens, num_layers, dropout=dropout)
+        self.dense = nn.Dense(vocab_size, flatten=False)
+
+    def init_state(self, enc_outputs, *args):
+        return enc_outputs[1]
+
+    def forward(self, X, state):
+        X = self.embedding(X).swapaxes(0, 1)
+        out, state = self.rnn(X, state)
+        # Make the batch to be the first dimension to simplify loss computation.
+        out = self.dense(out).swapaxes(0, 1)
+        return out, state
+
+# Defined in file: ./chapter_recurrent-neural-networks/seq2seq.md
+class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
+    # pred shape: (batch_size, seq_len, vocab_size)
+    # label shape: (batch_size, seq_len)
+    # valid_length shape: (batch_size, )
+    def forward(self, pred, label, valid_length):
+        # the sample weights shape should be (batch_size, seq_len, 1)
+        weights = nd.ones_like(label).expand_dims(axis=-1)
+        weights = nd.SequenceMask(weights, valid_length, True, axis=1)
+        return super(MaskedSoftmaxCELoss, self).forward(pred, label, weights)
+
+# Defined in file: ./chapter_recurrent-neural-networks/seq2seq.md
+def train_s2s_ch8(model, data_iter, lr, num_epochs, ctx):
+    model.initialize(init.Xavier(), force_reinit=True, ctx=ctx)
+    trainer = gluon.Trainer(model.collect_params(),
+                            'adam', {'learning_rate': lr})
+    loss = MaskedSoftmaxCELoss()
+    #tic = time.time()
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss', 
+                            xlim=[1, num_epochs], ylim=[0, 0.25])
+    for epoch in range(1, num_epochs+1):
+        timer = d2l.Timer()
+        metric = d2l.Accumulator(2)  # loss_sum, num_tokens
+        for batch in data_iter:
+            X, X_vlen, Y, Y_vlen = [x.as_in_context(ctx) for x in batch]
+            Y_input, Y_label, Y_vlen = Y[:,:-1], Y[:,1:], Y_vlen-1
+            with autograd.record():
+                Y_hat, _ = model(X, Y_input, X_vlen, Y_vlen)
+                l = loss(Y_hat, Y_label, Y_vlen)
+            l.backward()
+            d2l.grad_clipping(model, 1)
+            num_tokens = Y_vlen.sum().asscalar()
+            trainer.step(num_tokens)
+            metric.add((l.sum().asscalar(), num_tokens))
+        if epoch % 10 == 0:
+            animator.add(epoch, metric[0]/metric[1])
+    print('loss %.3f, %d tokens/sec on %s ' % (
+        metric[0]/metric[1], metric[1]/timer.stop(), ctx))
+
+# Defined in file: ./chapter_recurrent-neural-networks/seq2seq.md
+def predict_s2s_ch8(model, src_sentence, src_vocab, tgt_vocab, num_steps, ctx):
+    src_tokens = src_vocab[src_sentence.lower().split(' ')]
+    enc_valid_length = nd.array([len(src_tokens)], ctx=ctx)
+    src_tokens = d2l.trim_pad(src_tokens, num_steps, src_vocab.pad)
+    enc_X = nd.array(src_tokens, ctx=ctx)
+    # add the batch_size dimension.
+    enc_outputs = model.encoder(enc_X.expand_dims(axis=0), enc_valid_length)
+    dec_state = model.decoder.init_state(enc_outputs, enc_valid_length)
+    dec_X = nd.array([tgt_vocab.bos], ctx=ctx).expand_dims(axis=0)
+    predict_tokens = []
+    for _ in range(num_steps):
+        Y, dec_state = model.decoder(dec_X, dec_state)
+        # The token with highest score is used as the next time step input.
+        dec_X = Y.argmax(axis=2)
+        py = dec_X.squeeze(axis=0).astype('int32').asscalar()
+        if py == tgt_vocab.eos:
+            break
+        predict_tokens.append(py)
+    return ' '.join(tgt_vocab.to_tokens(predict_tokens))
+
+# Defined in file: ./chapter_attention-mechanism/attention.md
+def masked_softmax(X, valid_length):
+    # X: 3-D tensor, valid_length: 1-D or 2-D tensor
+    if valid_length is None:
+        return X.softmax()
+    else:
+        shape = X.shape
+        if valid_length.ndim == 1:
+            valid_length = valid_length.repeat(shape[1], axis=0)
+        else:
+            valid_length = valid_length.reshape((-1,))
+        # fill masked elements with a large negative, whose exp is 0
+        X = nd.SequenceMask(X.reshape((-1, shape[-1])), valid_length, True,
+                            axis=1, value=-1e6)
+        return X.softmax().reshape(shape)
+
+# Defined in file: ./chapter_attention-mechanism/attention.md
+class DotProductAttention(nn.Block): 
+    def __init__(self, dropout, **kwargs):
+        super(DotProductAttention, self).__init__(**kwargs)
+        self.dropout = nn.Dropout(dropout)
+
+    # query: (batch_size, #queries, d)
+    # key: (batch_size, #kv_pairs, d)
+    # value: (batch_size, #kv_pairs, dim_v)
+    # valid_length: either (batch_size, ) or (batch_size, xx)
+    def forward(self, query, key, value, valid_length=None):
+        d = query.shape[-1]
+        # set transpose_b=True to swap the last two dimensions of key
+        scores = nd.batch_dot(query, key, transpose_b=True) / math.sqrt(d)
+        attention_weights = self.dropout(masked_softmax(scores, valid_length))
+        return nd.batch_dot(attention_weights, value)
+
+# Defined in file: ./chapter_attention-mechanism/attention.md
+class MLPAttention(nn.Block):  
+    def __init__(self, units, dropout, **kwargs):
+        super(MLPAttention, self).__init__(**kwargs)
+        # Use flatten=True to keep query's and key's 3-D shapes.
+        self.W_k = nn.Dense(units, activation='tanh',
+                            use_bias=False, flatten=False)
+        self.W_q = nn.Dense(units, activation='tanh',
+                            use_bias=False, flatten=False)
+        self.v = nn.Dense(1, use_bias=False, flatten=False)
+        self.dropout = nn.Dropout(dropout)
+
+    def forward(self, query, key, value, valid_length):
+        query, key = self.W_k(query), self.W_q(key)
+        # expand query to (batch_size, #querys, 1, units), and key to
+        # (batch_size, 1, #kv_pairs, units). Then plus them with broadcast.
+        features = query.expand_dims(axis=2) + key.expand_dims(axis=1)
+        scores = self.v(features).squeeze(axis=-1)
+        attention_weights = self.dropout(masked_softmax(scores, valid_length))
+        return nd.batch_dot(attention_weights, value)
 
 # Defined in file: ./chapter_optimization/optimization-intro.md
 def annotate(text, xy, xytext):
@@ -998,6 +1188,107 @@ def load_data_voc(batch_size, crop_size):
         VOCSegDataset(False, crop_size, voc_dir), batch_size,
         last_batch='discard', num_workers=num_workers)
     return train_iter, test_iter
+
+# Defined in file: ./chapter_natural-language-processing/word2vec-data-set.md
+def read_ptb():
+    with zipfile.ZipFile('../data/ptb.zip', 'r') as f:
+        raw_text = f.read('ptb/ptb.train.txt').decode("utf-8")
+    return [line.split() for line in raw_text.split('\n')]
+
+
+# Defined in file: ./chapter_natural-language-processing/word2vec-data-set.md
+def subsampling(sentences, vocab):
+    # Map low frequency words into <unk>
+    sentences = [[vocab.idx_to_token[vocab[tk]] for tk in line]
+                 for line in sentences]
+    # Count the frequency for each word
+    counter = d2l.count_corpus(sentences)
+    num_tokens = sum(counter.values())
+    # Return True if to keep this token during subsampling
+    keep = lambda token: (
+        random.uniform(0, 1) < math.sqrt(1e-4 / counter[token] * num_tokens))
+    # Now do the subsampling.
+    return [[tk for tk in line if keep(tk)] for line in sentences]
+
+
+# Defined in file: ./chapter_natural-language-processing/word2vec-data-set.md
+def get_centers_and_contexts(corpus, max_window_size):
+    centers, contexts = [], []
+    for line in corpus:
+        # Each sentence needs at least 2 words to form a
+        # "central target word - context word" pair
+        if len(line) < 2: continue
+        centers += line
+        for i in range(len(line)):  # Context window centered at i
+            window_size = random.randint(1, max_window_size)
+            indices = list(range(max(0, i - window_size),
+                                 min(len(line), i + 1 + window_size)))
+            # Exclude the central target word from the context words
+            indices.remove(i)
+            contexts.append([line[idx] for idx in indices])
+    return centers, contexts
+
+# Defined in file: ./chapter_natural-language-processing/word2vec-data-set.md
+class RandomGenerator(object):
+    """Draw a random int in [0, n] according to n sampling weights"""
+    def __init__(self, sampling_weights):
+        self.population = list(range(len(sampling_weights)))
+        self.sampling_weights = sampling_weights
+        self.candidates = []
+        self.i = 0
+
+    def draw(self):
+        if self.i == len(self.candidates):
+            self.candidates = random.choices(
+                self.population, self.sampling_weights, k=10000)
+            self.i = 0
+        self.i += 1
+        return self.candidates[self.i-1]
+
+
+# Defined in file: ./chapter_natural-language-processing/word2vec-data-set.md
+def get_negatives(all_contexts, corpus, K):
+    counter = d2l.count_corpus(corpus)
+    sampling_weights = [counter[i]**0.75 for i in range(len(counter))]
+    all_negatives, generator = [], RandomGenerator(sampling_weights)
+    for contexts in all_contexts:
+        negatives = []
+        while len(negatives) < len(contexts) * K:
+            neg = generator.draw()
+            # Noise words cannot be context words
+            if neg not in contexts:
+                negatives.append(neg)
+        all_negatives.append(negatives)
+    return all_negatives
+
+
+# Defined in file: ./chapter_natural-language-processing/word2vec-data-set.md
+def batchify(data):
+    max_len = max(len(c) + len(n) for _, c, n in data)
+    centers, contexts_negatives, masks, labels = [], [], [], []
+    for center, context, negative in data:
+        cur_len = len(context) + len(negative)
+        centers += [center]
+        contexts_negatives += [context + negative + [0] * (max_len - cur_len)]
+        masks += [[1] * cur_len + [0] * (max_len - cur_len)]
+        labels += [[1] * len(context) + [0] * (max_len - len(context))]
+    return (nd.array(centers).reshape((-1, 1)), nd.array(contexts_negatives),
+            nd.array(masks), nd.array(labels))
+
+# Defined in file: ./chapter_natural-language-processing/word2vec-data-set.md
+def load_data_ptb(batch_size, max_window_size, num_noise_words):
+    sentences = read_ptb()
+    vocab = d2l.Vocab(sentences, min_freq=10)
+    subsampled = subsampling(sentences, vocab)
+    corpus = [vocab[line] for line in subsampled]
+    all_centers, all_contexts = get_centers_and_contexts(
+        corpus, max_window_size)
+    all_negatives = get_negatives(all_contexts, corpus, num_noise_words)
+    dataset = gluon.data.ArrayDataset(
+        all_centers, all_contexts, all_negatives)
+    data_iter = gluon.data.DataLoader(dataset, batch_size, shuffle=True,
+                                      batchify_fn=batchify)
+    return data_iter, vocab
 
 # Defined in file: ./chapter_generative_adversarial_networks/gan.md
 def update_D(X, Z, net_D, net_G, loss, trainer_D):
