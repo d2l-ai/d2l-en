@@ -15,7 +15,9 @@ from mxnet.gluon import nn
 The encoder is a normal neural network that takes inputs, e.g. a source sentence, to return outputs.
 
 ```{.python .input  n=2}
+# Save to the d2l package.
 class Encoder(nn.Block):
+    """The base encoder interface for the encoder-decoder architecture."""
     def __init__(self, **kwargs):
         super(Encoder, self).__init__(**kwargs)
 
@@ -28,7 +30,9 @@ class Encoder(nn.Block):
 The decoder has an additional method `init_state` to parse the outputs of the encoder with possible additional information, e.g. the valid lengths of inputs, to return the state it needs. In the forward method, the decoder takes both inputs, e.g. a target sentence, and the state. It returns outputs, with potentially modified state if the encoder contains RNN layers.
 
 ```{.python .input  n=3}
+# Save to the d2l package.
 class Decoder(nn.Block):
+    """The base decoder interface for the encoder-decoder archtecture."""
     def __init__(self, **kwargs):
         super(Decoder, self).__init__(**kwargs)
 
@@ -44,14 +48,16 @@ class Decoder(nn.Block):
 The encoder-decoder model contains both an encoder an decoder. We implement its forward method for training. It takes both encoder inputs and decoder inputs, with optional additional information. During computation, it first compute encoder outputs to initialize the decoder state, and then returns the decoder outputs.
 
 ```{.python .input  n=4}
+# Save to the d2l package.
 class EncoderDecoder(nn.Block):
+    """The base class for the encoder-decoder architecture."""
     def __init__(self, encoder, decoder, **kwargs):
         super(EncoderDecoder, self).__init__(**kwargs)
         self.encoder = encoder
         self.decoder = decoder
 
     def forward(self, enc_X, dec_X, *args):
-        enc_outputs = self.encoder(enc_X)
+        enc_outputs = self.encoder(enc_X, *args)
         dec_state = self.decoder.init_state(enc_outputs, *args)
         return self.decoder(dec_X, dec_state)
 ```

@@ -16,12 +16,9 @@ The layer structure in the encoder and the decoder is shown in the following fig
 ![](../img/seq2seq-attention-details.svg)
 
 ```{.python .input  n=1}
-import sys
-sys.path.insert(0, '..')
-
+import d2l
 from mxnet import nd
 from mxnet.gluon import rnn, nn
-import d2l
 ```
 
 ## Decoder
@@ -94,25 +91,24 @@ is much slower than the seq2seq model.
 
 ```{.python .input  n=5}
 embed_size, num_hiddens, num_layers, dropout = 32, 32, 2, 0.0
-batch_size, num_examples, max_len = 64, 1e3, 10
+batch_size, num_steps = 64, 10
 lr, num_epochs, ctx = 0.005, 200, d2l.try_gpu()
 
-src_vocab, tgt_vocab, train_iter = d2l.load_data_nmt(
-    batch_size, max_len, num_examples)
+src_vocab, tgt_vocab, train_iter = d2l.load_data_nmt(batch_size, num_steps)
 encoder = d2l.Seq2SeqEncoder(
     len(src_vocab), embed_size, num_hiddens, num_layers, dropout)
 decoder = Seq2SeqAttentionDecoder(
     len(tgt_vocab), embed_size, num_hiddens, num_layers, dropout)
 model = d2l.EncoderDecoder(encoder, decoder)
-d2l.train_ch7(model, train_iter, lr, num_epochs, ctx)
+d2l.train_s2s_ch8(model, train_iter, lr, num_epochs, ctx)
 ```
 
 Lastly, we predict several sample examples.
 
 ```{.python .input  n=6}
 for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
-    print(sentence + ' => ' + d2l.translate_ch7(
-        model, sentence, src_vocab, tgt_vocab, max_len, ctx))
+    print(sentence + ' => ' + d2l.predict_s2s_ch8(
+        model, sentence, src_vocab, tgt_vocab, num_steps, ctx))
 ```
 
 ## Summary
