@@ -379,10 +379,8 @@ def tokenize(lines, token='word'):
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
 class Vocab(object):
     def __init__(self, tokens, min_freq=0, use_special_tokens=False):
-        # Flatten a list of token lists into a list of tokens
-        tokens = [tk for line in tokens for tk in line]
-        # sort by frequency and token
-        counter = collections.Counter(tokens)
+        # Sort according to frequencies
+        counter = count_corpus(tokens)
         self.token_freqs = sorted(counter.items(), key=lambda x: x[0])
         self.token_freqs.sort(key=lambda x: x[1], reverse=True)
         if use_special_tokens:
@@ -392,7 +390,7 @@ class Vocab(object):
         else:
             self.unk, uniq_tokens = 0, ['<unk>']
         uniq_tokens +=  [token for token, freq in self.token_freqs 
-                         if freq >= min_freq]
+                         if freq >= min_freq and token not in uniq_tokens]
         self.idx_to_token, self.token_to_idx = [], dict()
         for token in uniq_tokens:
             self.idx_to_token.append(token)
@@ -410,6 +408,13 @@ class Vocab(object):
         if not isinstance(indices, (list, tuple)):
             return self.idx_to_token[indices]
         return [self.idx_to_token[index] for index in indices]
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
+def count_corpus(sentences):
+    # Flatten a list of token lists into a list of tokens
+    tokens = [tk for line in sentences for tk in line]
+    return collections.Counter(tokens)
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
 def load_corpus_time_machine(max_tokens=-1):
@@ -734,7 +739,8 @@ def train_s2s_ch8(model, data_iter, lr, num_epochs, ctx):
     animator = d2l.Animator(xlabel='epoch', ylabel='loss', 
                             xlim=[1, num_epochs], ylim=[0, 0.25])
     for epoch in range(1, num_epochs+1):
-        timer, metric = d2l.Timer(), d2l.Accumulator(2)  # loss_sum, num_tokens
+        timer = d2l.Timer()
+        metric = d2l.Accumulator(2)  # loss_sum, num_tokens
         for batch in data_iter:
             X, X_vlen, Y, Y_vlen = [x.as_in_context(ctx) for x in batch]
             Y_input, Y_label, Y_vlen = Y[:,:-1], Y[:,1:], Y_vlen-1
@@ -1182,6 +1188,107 @@ def load_data_voc(batch_size, crop_size):
         VOCSegDataset(False, crop_size, voc_dir), batch_size,
         last_batch='discard', num_workers=num_workers)
     return train_iter, test_iter
+
+# Defined in file: ./chapter_natural-language-processing/word2vec-data-set.md
+def read_ptb():
+    with zipfile.ZipFile('../data/ptb.zip', 'r') as f:
+        raw_text = f.read('ptb/ptb.train.txt').decode("utf-8")
+    return [line.split() for line in raw_text.split('\n')]
+
+
+# Defined in file: ./chapter_natural-language-processing/word2vec-data-set.md
+def subsampling(sentences, vocab):
+    # Map low frequency words into <unk>
+    sentences = [[vocab.idx_to_token[vocab[tk]] for tk in line]
+                 for line in sentences]
+    # Count the frequency for each word
+    counter = d2l.count_corpus(sentences)
+    num_tokens = sum(counter.values())
+    # Return True if to keep this token during subsampling
+    keep = lambda token: (
+        random.uniform(0, 1) < math.sqrt(1e-4 / counter[token] * num_tokens))
+    # Now do the subsampling.
+    return [[tk for tk in line if keep(tk)] for line in sentences]
+
+
+# Defined in file: ./chapter_natural-language-processing/word2vec-data-set.md
+def get_centers_and_contexts(corpus, max_window_size):
+    centers, contexts = [], []
+    for line in corpus:
+        # Each sentence needs at least 2 words to form a
+        # "central target word - context word" pair
+        if len(line) < 2: continue
+        centers += line
+        for i in range(len(line)):  # Context window centered at i
+            window_size = random.randint(1, max_window_size)
+            indices = list(range(max(0, i - window_size),
+                                 min(len(line), i + 1 + window_size)))
+            # Exclude the central target word from the context words
+            indices.remove(i)
+            contexts.append([line[idx] for idx in indices])
+    return centers, contexts
+
+# Defined in file: ./chapter_natural-language-processing/word2vec-data-set.md
+class RandomGenerator(object):
+    """Draw a random int in [0, n] according to n sampling weights"""
+    def __init__(self, sampling_weights):
+        self.population = list(range(len(sampling_weights)))
+        self.sampling_weights = sampling_weights
+        self.candidates = []
+        self.i = 0
+
+    def draw(self):
+        if self.i == len(self.candidates):
+            self.candidates = random.choices(
+                self.population, self.sampling_weights, k=10000)
+            self.i = 0
+        self.i += 1
+        return self.candidates[self.i-1]
+
+
+# Defined in file: ./chapter_natural-language-processing/word2vec-data-set.md
+def get_negatives(all_contexts, corpus, K):
+    counter = d2l.count_corpus(corpus)
+    sampling_weights = [counter[i]**0.75 for i in range(len(counter))]
+    all_negatives, generator = [], RandomGenerator(sampling_weights)
+    for contexts in all_contexts:
+        negatives = []
+        while len(negatives) < len(contexts) * K:
+            neg = generator.draw()
+            # Noise words cannot be context words
+            if neg not in contexts:
+                negatives.append(neg)
+        all_negatives.append(negatives)
+    return all_negatives
+
+
+# Defined in file: ./chapter_natural-language-processing/word2vec-data-set.md
+def batchify(data):
+    max_len = max(len(c) + len(n) for _, c, n in data)
+    centers, contexts_negatives, masks, labels = [], [], [], []
+    for center, context, negative in data:
+        cur_len = len(context) + len(negative)
+        centers += [center]
+        contexts_negatives += [context + negative + [0] * (max_len - cur_len)]
+        masks += [[1] * cur_len + [0] * (max_len - cur_len)]
+        labels += [[1] * len(context) + [0] * (max_len - len(context))]
+    return (nd.array(centers).reshape((-1, 1)), nd.array(contexts_negatives),
+            nd.array(masks), nd.array(labels))
+
+# Defined in file: ./chapter_natural-language-processing/word2vec-data-set.md
+def load_data_ptb(batch_size, max_window_size, num_noise_words):
+    sentences = read_ptb()
+    vocab = d2l.Vocab(sentences, min_freq=10)
+    subsampled = subsampling(sentences, vocab)
+    corpus = [vocab[line] for line in subsampled]
+    all_centers, all_contexts = get_centers_and_contexts(
+        corpus, max_window_size)
+    all_negatives = get_negatives(all_contexts, corpus, num_noise_words)
+    dataset = gluon.data.ArrayDataset(
+        all_centers, all_contexts, all_negatives)
+    data_iter = gluon.data.DataLoader(dataset, batch_size, shuffle=True,
+                                      batchify_fn=batchify)
+    return data_iter, vocab
 
 # Defined in file: ./chapter_generative_adversarial_networks/gan.md
 def update_D(X, Z, net_D, net_G, loss, trainer_D):
