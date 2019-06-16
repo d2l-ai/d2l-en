@@ -24,8 +24,11 @@ from mxnet.gluon import rnn, nn
 ## Decoder
 
 Now let's implement the decoder of this model. We add a MLP attention layer which has the same hidden size as the LSTM layer. The state passed from the encoder to the decoder contains three items:
+
 - the encoder outputs of all time steps, which are used as the attention layer's memory with identical keys and values
+
 - the hidden state of the last time step that is used to initialize the encoder's hidden state
+
 - valid lengths of the decoder inputs so the attention layer will not consider encoder outputs for padding tokens.
 
 In each time step of decoding, we use the output of the last RNN layer as the query for the attention layer. Its output is then concatenated with the input embedding vector to feed into the RNN layer. Despite the RNN layer hidden state also contains history information from decoder, the attention output explicitly selects the encoder outputs that are correlated to the query and suspends other non-correlated information.
@@ -112,3 +115,5 @@ for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
 ```
 
 ## Summary
+
+* Seq2seq with attention adds an additional attention layer to use encoder’s outputs as memory and its output is used as part of decoder’s input.
