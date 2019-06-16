@@ -159,9 +159,9 @@ class DotProductAttention(nn.Block):
     def forward(self, query, key, value, valid_length=None):
         """Forward function"""
         d = query.shape[-1]
-        scores = nd.batch_dot(query, key, transpose_b=True) / math.sqrt(d)
+        scores = npx.batch_dot(query, key, transpose_b=True) / math.sqrt(d)
         attention_weights = self.dropout(masked_softmax(scores, valid_length))
-        return nd.batch_dot(attention_weights, value)
+        return npx.batch_dot(attention_weights, value)
 
 class MLPAttention(nn.Block):
     def __init__(self, units, dropout, **kwargs):
