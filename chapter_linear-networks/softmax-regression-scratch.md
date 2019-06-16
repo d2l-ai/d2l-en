@@ -258,26 +258,20 @@ def train_epoch_ch3(net, train_iter, loss, updater):
 Then we define a class that draw data in animation.
 
 ```{.python .input  n=16}
-# Save to the d2l package
+# Save to the d2l package.
 class Animator(object):
-    def __init__(self, xlabel=None, ylabel=None, legend=None, xlim=None, 
-                 ylim=None, xscale=None, yscale=None, fmts=None, 
-                 figsize=(3.5, 2.5)):
+    def __init__(self, xlabel=None, ylabel=None, legend=[], xlim=None,
+                 ylim=None, xscale='linear', yscale='linear', fmts=None,
+                 nrows=1, ncols=1, figsize=(3.5, 2.5)):
         """Incrementally plot multiple lines."""
         d2l.use_svg_display()
-        self.fig, self.axes = d2l.plt.subplots(figsize=figsize)
-        set_one = lambda name, var : getattr(
-            self.axes, name)(var) if var else None
-        self.set_axes = lambda : (
-            set_one('set_xlabel', xlabel),
-            set_one('set_ylabel', ylabel),
-            set_one('set_xlim', xlim),
-            set_one('set_ylim', ylim),
-            set_one('set_xscale', xscale),
-            set_one('set_yscale', yscale),
-            set_one('legend', legend))
+        self.fig, self.axes = d2l.plt.subplots(nrows, ncols, figsize=figsize)
+        if nrows * ncols == 1: self.axes = [self.axes,]
+        # use a lambda to capture arguments
+        self.config_axes = lambda : set_axes(
+            self.axes[0], xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
         self.X, self.Y, self.fmts = None, None, fmts
-        
+
     def add(self, x, y):
         """Add multiple data points into the figure."""
         if not hasattr(y, "__len__"): y = [y]
@@ -289,14 +283,25 @@ class Animator(object):
         for i, (a, b) in enumerate(zip(x, y)):
             if a is not None and b is not None:
                 self.X[i].append(a)
-                self.Y[i].append(b)        
-        self.axes.cla()
+                self.Y[i].append(b)
+        self.axes[0].cla()
         for x, y, fmt in zip(self.X, self.Y, self.fmts):
-            self.axes.plot(x, y, fmt)
-        self.set_axes()
-        self.axes.grid()
+            self.axes[0].plot(x, y, fmt)
+        self.config_axes()
         display.display(self.fig)
         display.clear_output(wait=True)
+
+# Save to the d2l package.
+def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
+    """A utility function to set matplotlib axes"""
+    axes.set_xlabel(xlabel)
+    axes.set_ylabel(ylabel)
+    axes.set_xscale(xscale)
+    axes.set_yscale(yscale)
+    axes.set_xlim(xlim)
+    axes.set_ylim(ylim)
+    if legend: axes.legend(legend)
+    axes.grid()
 ```
 
 The training function then runs multiple epochs and visualize the training progress.
@@ -367,28 +372,28 @@ then train models using optimization algorithms. As you'll soon find out, most c
 # TODO Will remove these functions later.
 
 # Save to the d2l package.
-def plot(X, Y, x_label=None, y_label=None, legend=None,
-         xlim=None, ylim=None, fmts=None, axes=None):
+def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
+         ylim=None, xscale='linear', yscale='linear', fmts=None,
+         figsize=(3.5, 2.5), axes=None):
     """Plot multiple lines"""
+    d2l.set_figsize(figsize)
     axes = axes if axes else d2l.plt.gca()
-    draw(axes, axes.plot, X, Y, x_label, y_label, legend, xlim, ylim, fmts)
-
-# Save to the d2l package.
-def draw(axes, func, X, Y, x_label, y_label, legend, xlim, ylim, fmts):
-    """Draw multiple data series with customized func"""
-    if not hasattr(X[0], "__len__") or len(X[0]) != len(Y[0]):
-        X = [X] * len(Y)
+    if isinstance(X, nd.NDArray): X = X.asnumpy()
+    if isinstance(Y, nd.NDArray): Y = Y.asnumpy()
+    if not hasattr(X[0], "__len__"): X = [X]
+    if Y is None: X, Y = [[]]*len(X), X
+    if not hasattr(Y[0], "__len__"): Y = [Y]
+    if len(X) != len(Y): X = X * len(Y)
     if not fmts: fmts = ['-']*len(X)
     axes.cla()
     for x, y, fmt in zip(X, Y, fmts):
         if isinstance(x, nd.NDArray): x = x.asnumpy()
         if isinstance(y, nd.NDArray): y = y.asnumpy()
-        func(x, y, fmt)
-    if x_label: axes.set_xlabel(x_label)
-    if y_label: axes.set_ylabel(y_label)
-    if xlim: axes.set_xlim(xlim)
-    if ylim: axes.set_ylim(ylim)
-    if legend: axes.legend(legend)
+        if len(x):
+            axes.plot(x, y, fmt)
+        else:
+            axes.plot(y, fmt)
+    set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
 
 # Save to the d2l package.
 def show(obj):
