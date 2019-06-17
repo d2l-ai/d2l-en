@@ -1,12 +1,36 @@
 # Gated Recurrent Units (GRU)
 
-In the previous section we discussed how gradients are calculated in a recurrent neural network. In particular we found that long products of matrices can lead to vanishing or divergent gradients. Let's briefly think about what such gradient anomalies mean in practice:
+In the previous section we discussed how gradients are calculated in a recurrent
+neural network. In particular we found that long products of matrices can lead
+to vanishing or divergent gradients. Let's briefly think about what such
+gradient anomalies mean in practice:
 
-* We might encounter a situation where an early observation is highly significant for predicting all future observations. Consider the somewhat contrived case where the first observation contains a checksum and the goal is to discern whether the checksum is correct at the end of the sequence. In this case the influence of the first token is vital. We would like to have some mechanism for storing vital early information in a *memory cell*. Without such a mechanism we will have to assign a very large gradient to this observation, since it affects all subsequent observations.
-* We might encounter situations where some symbols carry no pertinent observation. For instance, when parsing a webpage there might be auxiliary HTML code that is irrelevant for the purpose of assessing the sentiment conveyed on the page. We would like to have some mechanism for *skipping such symbols* in the latent state representation.
-* We might encounter situations where there is a logical break between parts of a sequence. For instance there might be a transition between chapters in a book, a transition between a bear and a bull market for securities, etc.; In this case it would be nice to have a means of *resetting* our internal state representation.
+* We might encounter a situation where an early observation is highly
+  significant for predicting all future observations. Consider the somewhat
+  contrived case where the first observation contains a checksum and the goal is
+  to discern whether the checksum is correct at the end of the sequence. In this
+  case the influence of the first token is vital. We would like to have some
+  mechanism for storing vital early information in a *memory cell*. Without such
+  a mechanism we will have to assign a very large gradient to this observation,
+  since it affects all subsequent observations.
+* We might encounter situations where some symbols carry no pertinent
+  observation. For instance, when parsing a webpage there might be auxiliary
+  HTML code that is irrelevant for the purpose of assessing the sentiment
+  conveyed on the page. We would like to have some mechanism for *skipping such
+  symbols* in the latent state representation.
+* We might encounter situations where there is a logical break between parts of
+  a sequence. For instance there might be a transition between chapters in a
+  book, a transition between a bear and a bull market for securities, etc.; In
+  this case it would be nice to have a means of *resetting* our internal state
+  representation.
 
-A number of methods have been proposed to address this. One of the earliest is the Long Short Term Memory (LSTM) of [Hochreiter and Schmidhuber, 1997](http://papers.nips.cc/paper/1215-lstm-can-solve-hard-long-time-lag-problems.pdf) which we will discuss in :numref:`chapter_lstm`. The Gated Recurrent Unit (GRU) of [Cho et al., 2014](https://arxiv.org/abs/1409.1259) is a slightly more streamlined variant that often offers comparable performance and is significantly faster to compute. See also [Chung et al., 2014](https://arxiv.org/abs/1412.3555) for more details. Due to its simplicity we start with the GRU.
+A number of methods have been proposed to address this. One of the earliest is
+the Long Short Term Memory (LSTM) :cit:`Hochreiter.Schmidhuber.1997` which we
+will discuss in :numref:`chapter_lstm`. The Gated Recurrent Unit (GRU)
+:cite:`Cho.Van-Merrienboer.Bahdanau.ea.2014` is a slightly more streamlined
+variant that often offers comparable performance and is significantly faster to
+compute. See also :cite:`Chung.Gulcehre.Cho.ea.2014` for more
+details. Due to its simplicity we start with the GRU.
 
 
 ## Gating the Hidden State
@@ -135,12 +159,12 @@ def gru(inputs, state, params):
 
 ### Training and Prediction
 
-Training and prediction work in exactly the same manner as before. 
+Training and prediction work in exactly the same manner as before.
 
 ```{.python .input  n=3}
 vocab_size, num_hiddens, ctx = len(vocab), 256, d2l.try_gpu()
 num_epochs, lr = 500, 1
-model = d2l.RNNModelScratch(len(vocab), num_hiddens, ctx, get_params, 
+model = d2l.RNNModelScratch(len(vocab), num_hiddens, ctx, get_params,
                             init_gru_state, gru)
 d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, ctx)
 
@@ -171,11 +195,6 @@ d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, ctx)
 1. Adjust the hyper-parameters and observe and analyze the impact on running time, perplexity, and the written lyrics.
 1. What happens if you implement only parts of a GRU? That is, implement a recurrent cell that only has a reset gate. Likewise, implement a recurrent cell only with an update gate.
 
-## References
-
-[1] Cho, K., Van Merriënboer, B., Bahdanau, D., & Bengio, Y. (2014). On the properties of neural machine translation: Encoder-decoder approaches. arXiv preprint arXiv:1409.1259.
-
-[2] Chung, J., Gulcehre, C., Cho, K., & Bengio, Y. (2014). Empirical evaluation of gated recurrent neural networks on sequence modeling. arXiv preprint arXiv:1412.3555.
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2367)
 
