@@ -16,7 +16,7 @@ with open(os.path.join('d2l','__init__.py')) as f:
 for l in lines:
     m = ver_re.match(l)
     if m:
-        version = m[1]
+        version = m.group(1)
         break
 setup(
     name='d2l',
