@@ -14,12 +14,8 @@ Typically, a single operator will use all the computational resources on all CPU
 First, import the required packages or modules for experiment in this section. Note that we need at least one GPU to run the experiment in this section.
 
 ```{.python .input}
-import sys
-sys.path.insert(0, '..')
-
 import d2l
-import mxnet as mx
-from mxnet import nd
+from mxnet import nd, context
 ```
 
 ## Parallel Computation using CPUs and GPUs
@@ -35,7 +31,7 @@ Next, create an NDArray on both the CPU and GPU.
 
 ```{.python .input}
 x_cpu = nd.random.uniform(shape=(2000, 2000))
-x_gpu = nd.random.uniform(shape=(6000, 6000), ctx=mx.gpu(0))
+x_gpu = nd.random.uniform(shape=(6000, 6000), ctx=d2l.try_gpu())
 ```
 
 Then, use the two NDArrays to run the `run` function on both the CPU and GPU and print the time required.
@@ -45,22 +41,26 @@ run(x_cpu)  # Warm-up begins
 run(x_gpu)
 nd.waitall()  # Warm-up ends
 
-with d2l.Benchmark('Run on CPU.'):
-    run(x_cpu)
-    nd.waitall()
+timer = d2l.Timer()
+run(x_cpu)
+nd.waitall()
+print('Run on %s: %.4f sec' % (x_cpu.context, timer.stop()))
 
-with d2l.Benchmark('Then run on GPU.'):
-    run(x_gpu)
-    nd.waitall()
+timer.start()
+run(x_gpu)
+nd.waitall()
+print('Run on %s: %.4f sec' % (x_gpu.context, timer.stop()))
 ```
 
 We remove `nd.waitall()` between the two computing tasks `run(x_cpu)` and `run(x_gpu)` and hope the system can automatically parallel these two tasks.
 
 ```{.python .input}
-with d2l.Benchmark('Run on both CPU and GPU in parallel.'):
-    run(x_cpu)
-    run(x_gpu)
-    nd.waitall()
+timer.start()
+run(x_cpu)
+run(x_gpu)
+nd.waitall()
+print('Run on both %s and %s: %.4f sec' % (
+    x_cpu.context, x_gpu.context, timer.stop()))
 ```
 
 As we can see, when two computing tasks are executed together, the total execution time is less than the sum of their separate execution times. This means that MXNet can effectively automate parallel computation on CPUs and GPUs.
@@ -72,24 +72,27 @@ In computations that use both the CPU and GPU, we often need to copy data betwee
 
 ```{.python .input}
 def copy_to_cpu(x):
-    return [y.copyto(mx.cpu()) for y in x]
+    return [y.copyto(context.cpu()) for y in x]
 
-with d2l.Benchmark('Run on GPU.'):
-    y = run(x_gpu)
-    nd.waitall()
+timer.start()
+y = run(x_gpu)
+nd.waitall()
+print('Run on %s: %.4f sec' % (x_gpu.context, timer.stop()))
 
-with d2l.Benchmark('Then copy to CPU.'):
-    copy_to_cpu(y)
-    nd.waitall()
+timer.start()
+y_cpu = copy_to_cpu(y)
+nd.waitall()
+print('The copy to %s: %.4f sec' % (y_cpu[0].context, timer.stop()))
 ```
 
 We remove the `waitall` function between computation and communication and print the total time need to complete both tasks.
 
 ```{.python .input}
-with d2l.Benchmark('Run and copy in parallel.'):
-    y = run(x_gpu)
-    copy_to_cpu(y)
-    nd.waitall()
+timer.start()
+y = run(x_gpu)
+y_cpu = copy_to_cpu(y)
+nd.waitall()
+print('Run and copy in parallel: %.4f sec' % timer.stop())
 ```
 
 As we can see, the total time required to perform computation and communication is less than the sum of their separate execution times. It should be noted that this computation and communication task is different from the parallel computation task that simultaneously used the CPU and GPU described earlier in this section. Here, there is a dependency between execution and communication: `y[i]` must be computed before it can be copied to the CPU. Fortunately, the system can copy `y[i-1]` when computing `y[i]` to reduce the total running time of computation and communication.
