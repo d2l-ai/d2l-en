@@ -187,10 +187,19 @@ chapter.
 
 ## Summary
 
-* An R-CNN model selects several proposed regions and uses a CNN to perform forward computation and extract the features from each proposed region. It then uses these features to predict the categories and bounding boxes of proposed regions.
-* Fast R-CNN improves on the R-CNN by only performing CNN forward computation on the image as a whole. It introduces an RoI pooling layer to extract features of the same shape from RoIs of different shapes.
-* Faster R-CNN replaces the selective search used in Fast R-CNN with a region proposal network. This reduces the number of proposed regions generated, while ensuring precise object detection.
-* Mask R-CNN uses the same basic structure as Faster R-CNN, but adds a fully convolution layer to help locate objects at the pixel level and further improve the precision of object detection.
+* An R-CNN model selects several proposed regions and uses a CNN to perform
+  forward computation and extract the features from each proposed region. It
+  then uses these features to predict the categories and bounding boxes of
+  proposed regions.
+* Fast R-CNN improves on the R-CNN by only performing CNN forward computation on
+  the image as a whole. It introduces an RoI pooling layer to extract features
+  of the same shape from RoIs of different shapes.
+* Faster R-CNN replaces the selective search used in Fast R-CNN with a region
+  proposal network. This reduces the number of proposed regions generated, while
+  ensuring precise object detection.
+* Mask R-CNN uses the same basic structure as Faster R-CNN, but adds a fully
+  convolution layer to help locate objects at the pixel level and further
+  improve the precision of object detection.
 
 
 ## Exercises
