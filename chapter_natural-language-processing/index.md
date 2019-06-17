@@ -15,6 +15,7 @@ word2vec-gluon
 fasttext
 glove
 similarity-analogy
+sentiment-analysis
 sentiment-analysis-rnn
 sentiment-analysis-cnn
 ```
