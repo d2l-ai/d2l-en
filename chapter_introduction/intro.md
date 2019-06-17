@@ -1,42 +1,36 @@
 # Introduction
 :label:`chapter_introduction`
 
-Until recently, nearly all of the computer programs
-that we interacted with every day were coded
-by software developers from first principles.
-Say that we wanted to write an application to manage an e-commerce platform.
-After huddling around a whiteboard for a few hours to ponder the problem,
-we would come up with the broad strokes of a working solution
-that would probably look something like this:
-(i) users would interact with the application
-through an interface running in a web browser or mobile application
-(ii) our application would rely on a commerical database engine
-to keep track of each user's state and maintain records
-of all historical transactions
-(ii) at the heart of our application, running in parallel across many servers, the *business logic* (you might say, the *brains*)
-would map out in methodical details the appropriate action to take
+Until recently, nearly all of the computer programs that we interacted with
+every day were coded by software developers from first principles.  Say that we
+wanted to write an application to manage an e-commerce platform.  After huddling
+around a whiteboard for a few hours to ponder the problem, we would come up with
+the broad strokes of a working solution that would probably look something like
+this: (i) users would interact with the application through an interface running
+in a web browser or mobile application (ii) our application would rely on a
+commerical database engine to keep track of each user's state and maintain
+records of all historical transactions (ii) at the heart of our application,
+running in parallel across many servers, the *business logic* (you might say,
+the *brains*) would map out in methodical details the appropriate action to take
 in every conceivable circumstance.
 
-To build the *brains* of our application,
-we'd have to step through every possible corner case
-that we anticipate encountering, devising appropriate rules.
-Each time a customer clicks to add an item to their shopping cart,
-we add an entry to the shopping cart database table,
-associating that user's ID with the requested product’s ID.
-While few developers ever get it completely right the first time
-(it might take some test runs to work out the kinks),
-for the most part, we could write such a program from first principles
-and confidently launch it *before ever seeing a real customer*.
-Our ability to design automated systems from first principles
-that drive functioning products and systems,
-often in novel situations, is a remarkable cognitive feat.
-And when you're able to devise solutions that work $100\%$ of the time,
-*you should not be using machine learning*.
+To build the *brains* of our application, we'd have to step through every
+possible corner case that we anticipate encountering, devising appropriate
+rules.  Each time a customer clicks to add an item to their shopping cart, we
+add an entry to the shopping cart database table, associating that user's ID
+with the requested product’s ID.  While few developers ever get it completely
+right the first time (it might take some test runs to work out the kinks), for
+the most part, we could write such a program from first principles and
+confidently launch it *before ever seeing a real customer*.  Our ability to
+design automated systems from first principles that drive functioning products
+and systems, often in novel situations, is a remarkable cognitive feat.  And
+when you're able to devise solutions that work $100\%$ of the time, *you should
+not be using machine learning*.
 
-Fortunately—for the growing community of ML scientists—many
-problems in automation don't bend so easily to human ingenuity.
-Imagine huddling around the whiteboard with the smartest minds you know,
-but this time you are tackling any of the following problems:
+Fortunately—for the growing community of ML scientists—many problems in
+automation don't bend so easily to human ingenuity.  Imagine huddling around the
+whiteboard with the smartest minds you know, but this time you are tackling any
+of the following problems:
 
 * Write a program that predicts tomorrow's weather given geographic
 information, satellite images, and a trailing window of past weather.
@@ -47,124 +41,91 @@ information, satellite images, and a trailing window of past weather.
 * Write a program that presents users with products that they are likely to
   enjoy but unlikely, in the natural course of browsing, to encounter.
 
-In each of these cases, even elite programmers
-are incapable of coding up solutions from scratch.
-The reasons for this can vary.
-Sometimes the program that we are looking for
-follows a pattern that changes over time,
-and we need our programs to adapt.
-In other cases, the relationship
-(say between pixels, and abstract categories)
-may be too complicated, requiring thousands or millions of computations
-that are beyond our conscious understanding
-(even if our eyes manage the task effortlessly).
-Machine learning (ML) is the study of powerful techniques
-that can *learn behavior* from *experience*.
-As ML algorithm accumulates more experience,
-typically in the form of observational data
-or interactions with an environment, their performance improves.
-Contrast this with our deterministic e-commerce platform,
-which performs according to the same business logic,
-no matter how much experience accrues,
-until the developers themselves *learn* and decide
-that it's time to update the software.
-In this book, we will teach you the fundamentals of machine learning,
-and focus in particular on deep learning,
-a powerful set of techniques driving innovations
-in areas as diverse as computer vision, natural language processing,
-healthcare, and genomics.
+In each of these cases, even elite programmers are incapable of coding up
+solutions from scratch.  The reasons for this can vary.  Sometimes the program
+that we are looking for follows a pattern that changes over time, and we need
+our programs to adapt.  In other cases, the relationship (say between pixels,
+and abstract categories) may be too complicated, requiring thousands or millions
+of computations that are beyond our conscious understanding (even if our eyes
+manage the task effortlessly).  Machine learning (ML) is the study of powerful
+techniques that can *learn behavior* from *experience*.  As ML algorithm
+accumulates more experience, typically in the form of observational data or
+interactions with an environment, their performance improves.  Contrast this
+with our deterministic e-commerce platform, which performs according to the same
+business logic, no matter how much experience accrues, until the developers
+themselves *learn* and decide that it's time to update the software.  In this
+book, we will teach you the fundamentals of machine learning, and focus in
+particular on deep learning, a powerful set of techniques driving innovations in
+areas as diverse as computer vision, natural language processing, healthcare,
+and genomics.
 
 ## A Motivating Example
 
-Before we could begin writing, the authors of this book,
-like much of the work force, had to become caffeinated.
-We hopped in the car and started driving.
-Using an iPhone, Alex called out 'Hey Siri',
-awakening the phone's voice recognition system.
-Then Mu commanded 'directions to Blue Bottle coffee shop'.
-The phone quickly displayed the transcription of his command.
-It also recognized that we were asking for directions
-and launched the Maps application to fulfill our request.
-Once launched, the Maps app identified a number of routes.
-Next to each route, the phone displayed a predicted transit time.
-While we fabricated this story for pedagogical convenience,
-it demonstrates that in the span of just a few seconds,
-our everyday interactions with a smartphone
+Before we could begin writing, the authors of this book, like much of the work
+force, had to become caffeinated.  We hopped in the car and started driving.
+Using an iPhone, Alex called out 'Hey Siri', awakening the phone's voice
+recognition system.  Then Mu commanded 'directions to Blue Bottle coffee shop'.
+The phone quickly displayed the transcription of his command.  It also
+recognized that we were asking for directions and launched the Maps application
+to fulfill our request.  Once launched, the Maps app identified a number of
+routes.  Next to each route, the phone displayed a predicted transit time.
+While we fabricated this story for pedagogical convenience, it demonstrates that
+in the span of just a few seconds, our everyday interactions with a smartphone
 can engage several machine learning models.
 
-Imagine just writing a program to respond to a *wake word*
-like 'Alexa', 'Okay, Google' or 'Siri'.
-Try coding it up in a room by yourself
-with nothing but a computer and a code editor.
-How would you write such a program from first principles?
-Think about it... the problem is hard.
-Every second, the microphone will collect roughly 44,000 samples.
-What rule could map reliably from a snippet of raw audio
-to confident predictions ``{yes, no}``
-on whether the snippet contains the wake word?
-If you're stuck, don't worry.
-We don't know how to write such a program from scratch either.
-That's why we use ML.
+Imagine just writing a program to respond to a *wake word* like 'Alexa', 'Okay,
+Google' or 'Siri'.  Try coding it up in a room by yourself with nothing but a
+computer and a code editor.  How would you write such a program from first
+principles?  Think about it... the problem is hard.  Every second, the
+microphone will collect roughly 44,000 samples.  What rule could map reliably
+from a snippet of raw audio to confident predictions ``{yes, no}`` on whether
+the snippet contains the wake word?  If you're stuck, don't worry.  We don't
+know how to write such a program from scratch either.  That's why we use ML.
 
 ![Identify an awake word.](../img/wake-word.svg)
 
 
-Here's the trick.
-Often, even when we don't know how to tell a computer
-explicitly how to map from inputs to outputs,
-we are nonetheless capable of performing the cognitive feat ourselves.
-In other words, even if you don't know *how to program a computer*
-to recognize the word 'Alexa',
-you yourself *are able* to recognize the word 'Alexa'.
-Armed with this ability,
-we can collect a huge *dataset* containing examples of audio
-and label those that *do* and that *do not* contain the wake word.
-In the ML approach, we do not design a system *explicitly*
-to recognize wake words.
-Instead, we define a flexible program
-whose behavior is determined by a number of *parameters*.
-Then we use the dataset to determine
-the best possible set of parameters,
-those that improve the performance of our program
-with respect to some measure of performance on the task of interest.
+Here's the trick.  Often, even when we don't know how to tell a computer
+explicitly how to map from inputs to outputs, we are nonetheless capable of
+performing the cognitive feat ourselves.  In other words, even if you don't know
+*how to program a computer* to recognize the word 'Alexa', you yourself *are
+able* to recognize the word 'Alexa'.  Armed with this ability, we can collect a
+huge *dataset* containing examples of audio and label those that *do* and that
+*do not* contain the wake word.  In the ML approach, we do not design a system
+*explicitly* to recognize wake words.  Instead, we define a flexible program
+whose behavior is determined by a number of *parameters*.  Then we use the
+dataset to determine the best possible set of parameters, those that improve the
+performance of our program with respect to some measure of performance on the
+task of interest.
 
-You can think of the parameters as knobs that we can turn,
-manipulating the behavior of the program.
-Fixing the parameters, we call the program a *model*.
-The set of all distinct programs (input-output mappings)
-that we can produce just by manipulating the parameters
-is called a *family* of models.
-And the *meta-program* that uses our dataset
-to choose the parameters is called a *learning algorithm*.
+You can think of the parameters as knobs that we can turn, manipulating the
+behavior of the program.  Fixing the parameters, we call the program a *model*.
+The set of all distinct programs (input-output mappings) that we can produce
+just by manipulating the parameters is called a *family* of models.  And the
+*meta-program* that uses our dataset to choose the parameters is called a
+*learning algorithm*.
 
-Before we can go ahead and engage the learning algorithm,
-we have to define the problem precisely,
-pinning down the exact nature of the inputs and outputs,
-and choosing an appropriate model family.
-In this case, our model receives a snippet of audio as *input*,
-and it generates a selection among ``{yes, no}`` as *output*—which,
-if all goes according to plan,
-will closely approximate whether (or not)
-the snippet contains the wake word.
+Before we can go ahead and engage the learning algorithm, we have to define the
+problem precisely, pinning down the exact nature of the inputs and outputs, and
+choosing an appropriate model family.  In this case, our model receives a
+snippet of audio as *input*, and it generates a selection among ``{yes, no}`` as
+*output*—which, if all goes according to plan, will closely approximate whether
+(or not) the snippet contains the wake word.
 
-If we choose the right family of models,
-then there should exist one setting of the knobs
-such that the model fires ``yes`` every time it hears the word 'Alexa'.
-Because the exact choice of the wake word is arbitrary,
-we'll probably need a model family capable, via another setting of the knobs,
-of firing ``yes`` on the word 'Apricot'.
-We expect that the same model should apply to 'Alexa' recognition and 'Apricot' recognition because these are similar tasks.
-However, we might need a different family of models entirely
-if we want to deal with fundamentally different inputs or outputs,
-say if we wanted to map from images to captions,
-or from English sentences to Chinese sentences.
+If we choose the right family of models, then there should exist one setting of
+the knobs such that the model fires ``yes`` every time it hears the word
+'Alexa'.  Because the exact choice of the wake word is arbitrary, we'll probably
+need a model family capable, via another setting of the knobs, of firing ``yes``
+on the word 'Apricot'.  We expect that the same model should apply to 'Alexa'
+recognition and 'Apricot' recognition because these are similar tasks.  However,
+we might need a different family of models entirely if we want to deal with
+fundamentally different inputs or outputs, say if we wanted to map from images
+to captions, or from English sentences to Chinese sentences.
 
-As you might guess, if we just set all of the knobs randomly,
-it's not likely that our model will recognize 'Alexa', 'Apricot',
-or any other English word.
-In deep learning, the *learning* is the process
-by which we discover the right setting of the knobs
-coercing the desired behaviour from our model.
+As you might guess, if we just set all of the knobs randomly, it's not likely
+that our model will recognize 'Alexa', 'Apricot', or any other English word.  In
+deep learning, the *learning* is the process by which we discover the right
+setting of the knobs coercing the desired behaviour from our model.
 
 The training process usually looks like this:
 
@@ -175,48 +136,39 @@ The training process usually looks like this:
 
 ![A typical training process. ](../img/ml-loop.svg)
 
-To summarize, rather than code up a wake word recognizer,
-we code up a program that can *learn* to recognize wake words,
-*if we present it with a large labeled dataset*.
-You can think of this act
-of determining a program's behavior by presenting it with a dataset
-as *programming with data*.
-We can "program" a cat detector by providing our machine learning system
-with many examples of cats and dogs, such as the images below:
+To summarize, rather than code up a wake word recognizer, we code up a program
+that can *learn* to recognize wake words, *if we present it with a large labeled
+dataset*.  You can think of this act of determining a program's behavior by
+presenting it with a dataset as *programming with data*.  We can "program" a cat
+detector by providing our machine learning system with many examples of cats and
+dogs, such as the images below:
 
 | ![cat1](../img/cat1.png) | ![cat2](../img/cat2.jpg) | ![dog1](../img/dog1.jpg) |![dog2](../img/dog2.jpg) |
 |:---------------:|:---------------:|:---------------:|:---------------:|
 |cat|cat|dog|dog|
 
-This way the detector will eventually learn to emit
-a very large positive number if it's a cat,
-a very large negative number if it's a dog,
-and something closer to zero if it isn't sure,
-and this barely scratches the surface of what ML can do.
+This way the detector will eventually learn to emit a very large positive number
+if it's a cat, a very large negative number if it's a dog, and something closer
+to zero if it isn't sure, and this barely scratches the surface of what ML can
+do.
 
-Deep learning is just one among many
-popular frameworks for solving machine learning problems.
-While thus far, we've only talked about machine learning broadly
-and not deep learning, there's a couple points worth sneaking in here:
-First, the problems that we've discussed thus far:
-learning from raw audio signal,
-directly from the pixels in images,
-and mapping between sentences of arbitrary lengths and across languages
-are problems where deep learning excels and traditional ML tools faltered.
-Deep models are *deep* in precisely the sense that they learn
-many *layers* of computation.
-It turns out that these many-layered (or hierarchical) models
-are capable of addressing low-level perceptual data
-in a way that previous tools could not.
-In bygone days, the crucial part of applying ML to these problems
-consisted of coming up with manually engineered ways of transforming
-the data into some form amenable to *shallow* models.
-One key advantage of deep learning is that it replaces not only the *shallow* models
-at the end of traditional learning pipelines,
-but also the labor-intensive feature engineering.
-Secondly, by replacing much of the *domain-specific preprocessing*,
-deep learning has eliminated many of the boundaries
-that previously separated computer vision, speech recognition,
+Deep learning is just one among many popular frameworks for solving machine
+learning problems.  While thus far, we've only talked about machine learning
+broadly and not deep learning, there's a couple points worth sneaking in here:
+First, the problems that we've discussed thus far: learning from raw audio
+signal, directly from the pixels in images, and mapping between sentences of
+arbitrary lengths and across languages are problems where deep learning excels
+and traditional ML tools faltered.  Deep models are *deep* in precisely the
+sense that they learn many *layers* of computation.  It turns out that these
+many-layered (or hierarchical) models are capable of addressing low-level
+perceptual data in a way that previous tools could not.  In bygone days, the
+crucial part of applying ML to these problems consisted of coming up with
+manually engineered ways of transforming the data into some form amenable to
+*shallow* models.  One key advantage of deep learning is that it replaces not
+only the *shallow* models at the end of traditional learning pipelines, but also
+the labor-intensive feature engineering.  Secondly, by replacing much of the
+*domain-specific preprocessing*, deep learning has eliminated many of the
+boundaries that previously separated computer vision, speech recognition,
 natural language processing, medical informatics, and other application areas,
 offering a unified set of tools for tackling diverse problems.
 
@@ -366,7 +318,7 @@ owing to non-differentiability or other complications.
 In these cases, it's common to optimize a surrogate objective.
 
 Typically, the loss function is defined
-with respect to the models parameters
+with respect to the model's parameters
 and depends upon the dataset.
 The best values of our model's parameters are learned
 by minimizing the loss incurred on a *training set*
@@ -606,7 +558,7 @@ $$L(\mathrm{action}| x) = \mathbf{E}_{y \sim p(y| x)}[\mathrm{loss}(\mathrm{acti
 Hence, the loss $L$ incurred by eating the mushroom is $L(a=\mathrm{eat}| x) = 0.2 * \infty + 0.8 * 0 = \infty$, whereas the cost of discarding it is $L(a=\mathrm{discard}| x) = 0.2 * 0 + 0.8 * 1 = 0.8$.
 
 Our caution was justified: as any mycologist would tell us, the above mushroom actually *is* a death cap.
-Classification can get much more complicated than just binary, multiclass, of even multi-label classification.
+Classification can get much more complicated than just binary, multiclass, or even multi-label classification.
 For instance, there are some variants of classification for addressing hierarchies.
 Hierarchies assume that there exist some relationships among the many classes.
 So not all errors are equal - we prefer to misclassify to a related class than to a distant class.
@@ -635,97 +587,119 @@ Nonetheless, no matter how accurate our model gets, we might find ourselves in t
 :width:`500px`
 
 
-As you can see, there's a cat in the picture, and a rooster, a dog and a donkey, with some trees in the background.
-Depending on what we want to do with our model ultimately,
-treating this as a binary classification problem
-might not make a lot of sense.
-Instead, we might want to give the model the option
-of saying the image depicts a cat *and* a dog *and* a donkey *and* a rooster.
+As you can see, there's a cat in the picture, and a rooster, a dog, a donkey and
+a bird, with some trees in the background.  Depending on what we want to do with
+our model ultimately, treating this as a binary classification problem might not
+make a lot of sense.  Instead, we might want to give the model the option of
+saying the image depicts a cat *and* a dog *and* a donkey *and* a rooster *and*
+a bird.
 
-The problem of learning to predict classes
-that are *not mutually exclusive*
-is called multi-label classification.
-Auto-tagging problems are typically best described
-as multi-label classification problems.
-Think of the tags people might apply to posts on a tech blog,
-e.g., 'machine learning', 'technology', 'gadgets',
-'programming languages', 'linux', 'cloud computing', 'AWS'.
-A typical article might have 5-10 tags applied
-because these concepts are correlated.
-Posts about 'cloud computing' are likely to mention 'AWS'
-and posts about 'machine learning' could also deal with 'programming languages'.
+The problem of learning to predict classes that are *not mutually exclusive* is
+called multi-label classification.  Auto-tagging problems are typically best
+described as multi-label classification problems.  Think of the tags people
+might apply to posts on a tech blog, e.g., 'machine learning', 'technology',
+'gadgets', 'programming languages', 'linux', 'cloud computing', 'AWS'.  A
+typical article might have 5-10 tags applied because these concepts are
+correlated.  Posts about 'cloud computing' are likely to mention 'AWS' and posts
+about 'machine learning' could also deal with 'programming languages'.
 
-We also have to deal with this kind of problem when dealing with the biomedical literature,
-where correctly tagging articles is important
-because it allows researchers to do exhaustive reviews of the literature.
-At the National Library of Medicine, a number of professional annotators
-go over each article that gets indexed in PubMed
-to associate it with the relevant terms from MeSH,
-a collection of roughly 28k tags.
-This is a time-consuming process and the annotators typically have a one year lag between archiving and tagging. Machine learning can be used here to provide provisional tags
-until each article can have a proper manual review.
-Indeed, for several years, the BioASQ organization has [hosted a competition](http://bioasq.org/)
-to do precisely this.
+We also have to deal with this kind of problem when dealing with the biomedical
+literature, where correctly tagging articles is important because it allows
+researchers to do exhaustive reviews of the literature.  At the National Library
+of Medicine, a number of professional annotators go over each article that gets
+indexed in PubMed to associate it with the relevant terms from MeSH, a
+collection of roughly 28k tags.  This is a time-consuming process and the
+annotators typically have a one year lag between archiving and tagging. Machine
+learning can be used here to provide provisional tags until each article can
+have a proper manual review.  Indeed, for several years, the BioASQ organization
+has [hosted a competition](http://bioasq.org/) to do precisely this.
 
 
 #### Search and ranking
 
-Sometimes we don't just want to assign each example to a bucket or to a real value. In the field of information retrieval, we want to impose a ranking on a set of items. Take web search for example, the goal is less to determine whether a particular page is relevant for a query, but rather, which one of the plethora of search results should be displayed for the user. We really care about the ordering of the relevant search results and our learning algorithm needs to produce ordered subsets of elements from a larger set. In other words, if we are asked to produce the first 5 letters from the alphabet, there is a difference between returning ``A B C D E`` and ``C A B E D``. Even if the result set is the same, the ordering within the set matters nonetheless.
+Sometimes we don't just want to assign each example to a bucket or to a real
+value. In the field of information retrieval, we want to impose a ranking on a
+set of items. Take web search for example, the goal is less to determine whether
+a particular page is relevant for a query, but rather, which one of the plethora
+of search results should be displayed for the user. We really care about the
+ordering of the relevant search results and our learning algorithm needs to
+produce ordered subsets of elements from a larger set. In other words, if we are
+asked to produce the first 5 letters from the alphabet, there is a difference
+between returning ``A B C D E`` and ``C A B E D``. Even if the result set is the
+same, the ordering within the set matters nonetheless.
 
-One possible solution to this problem is to score every element in the set of possible sets along with a corresponding relevance score and then to retrieve the top-rated elements. [PageRank](https://en.wikipedia.org/wiki/PageRank) is an early example of such a relevance score. One of the peculiarities is that it didn't depend on the actual query. Instead, it simply helped to order the results that contained the query terms. Nowadays search engines use machine learning and behavioral models to obtain query-dependent relevance scores. There are entire conferences devoted to this subject.
+One possible solution to this problem is to score every element in the set of
+possible sets along with a corresponding relevance score and then to retrieve
+the top-rated elements. [PageRank](https://en.wikipedia.org/wiki/PageRank) is an
+early example of such a relevance score. One of the peculiarities is that it
+didn't depend on the actual query. Instead, it simply helped to order the
+results that contained the query terms. Nowadays search engines use machine
+learning and behavioral models to obtain query-dependent relevance scores. There
+are entire conferences devoted to this subject.
 
 <!-- Add / clean up-->
 
 #### Recommender systems
 
-Recommender systems are another problem setting that is related to search and ranking. The problems are  similar insofar as the goal is to display a set of relevant items to the user. The main difference is the emphasis on *personalization* to specific users in the context of recommender systems. For instance, for movie recommendations, the results page for a SciFi fan and the results page for a connoisseur of Woody Allen comedies might differ significantly.
+Recommender systems are another problem setting that is related to search and
+ranking. The problems are similar insofar as the goal is to display a set of
+relevant items to the user. The main difference is the emphasis on
+*personalization* to specific users in the context of recommender systems. For
+instance, for movie recommendations, the results page for a SciFi fan and the
+results page for a connoisseur of Woody Allen comedies might differ
+significantly.
 
-Such problems occur, e.g. for movie, product or music recommendation. In some cases, customers will provide explicit details about how much they liked the product (e.g. Amazon product reviews). In some other cases, they might simply provide feedback if they are dissatisfied with the result (skipping titles on a playlist). Generally, such systems strive to estimate some score $y_{ij}$, such as an estimated rating or probability of purchase, given a user $u_i$ and product $p_j$.
+Such problems occur, e.g. for movie, product or music recommendation. In some
+cases, customers will provide explicit details about how much they liked the
+product (e.g. Amazon product reviews). In some other cases, they might simply
+provide feedback if they are dissatisfied with the result (skipping titles on a
+playlist). Generally, such systems strive to estimate some score $y_{ij}$, such
+as an estimated rating or probability of purchase, given a user $u_i$ and
+product $p_j$.
 
-Given such a model, then for any given user, we could retrieve the set of objects with the largest scores $y_{ij}$, which are then used as a recommendation. Production systems are considerably more advanced and take detailed user activity and item characteristics into account when computing such scores. The following image is an example of deep learning books recommended by Amazon based on personalization algorithms tuned to the author's preferences.
+Given such a model, then for any given user, we could retrieve the set of
+objects with the largest scores $y_{ij}$, which are then used as a
+recommendation. Production systems are considerably more advanced and take
+detailed user activity and item characteristics into account when computing such
+scores. The following image is an example of deep learning books recommended by
+Amazon based on personalization algorithms tuned to the author's preferences.
 
 ![Deep learning books recommended by Amazon.](../img/deeplearning_amazon.png)
 
 
 #### Sequence Learning
 
-So far we've looked at problems where we have some fixed number of inputs
-and produce a fixed number of outputs.
-Before we considered predicting home prices from a fixed set of features:
-square footage, number of bedrooms, number of bathrooms, walking time to downtown.
-We also discussed mapping from an image (of fixed dimension),
-to the predicted probabilities that it belongs to each of a fixed number of classes,
-or taking a user ID and a product ID, and predicting a star rating.
-In these cases, once we feed our fixed-length input into the model to generate an output,
-the model immediately forgets what it just saw.
+So far we've looked at problems where we have some fixed number of inputs and
+produce a fixed number of outputs.  Before we considered predicting home prices
+from a fixed set of features: square footage, number of bedrooms, number of
+bathrooms, walking time to downtown.  We also discussed mapping from an image
+(of fixed dimension), to the predicted probabilities that it belongs to each of
+a fixed number of classes, or taking a user ID and a product ID, and predicting
+a star rating.  In these cases, once we feed our fixed-length input into the
+model to generate an output, the model immediately forgets what it just saw.
 
-This might be fine if our inputs truly all have the same dimensions
-and if successive inputs truly have nothing to do with each other.
-But how would we deal with video snippets?
-In this case, each snippet might consist of a different number of frames.
-And our guess of what's going on in each frame
-might be much stronger if we take into account
-the previous or succeeding frames.
-Same goes for language.
-One popular deep learning problem is machine translation:
-the task of ingesting sentences in some source language
-and predicting their translation in another language.
+This might be fine if our inputs truly all have the same dimensions and if
+successive inputs truly have nothing to do with each other.  But how would we
+deal with video snippets?  In this case, each snippet might consist of a
+different number of frames.  And our guess of what's going on in each frame
+might be much stronger if we take into account the previous or succeeding
+frames.  Same goes for language.  One popular deep learning problem is machine
+translation: the task of ingesting sentences in some source language and
+predicting their translation in another language.
 
-These problems also occur in medicine.
-We might want a model to monitor patients in the intensive care unit and to fire off alerts
-if their risk of death in the next 24 hours exceeds some threshold.
-We definitely wouldn't want this model to throw away everything it knows about the patient history each hour,
-and just make its predictions based on the most recent measurements.
+These problems also occur in medicine.  We might want a model to monitor
+patients in the intensive care unit and to fire off alerts if their risk of
+death in the next 24 hours exceeds some threshold.  We definitely wouldn't want
+this model to throw away everything it knows about the patient history each
+hour, and just make its predictions based on the most recent measurements.
 
-These problems are among the more exciting applications of machine learning
-and they are instances of *sequence learning*.
-They require a model to either ingest sequences of inputs
-or to emit sequences of outputs (or both!).
-These latter problems are sometimes referred to as ``seq2seq`` problems.
-Language translation is a ``seq2seq`` problem.
-Transcribing text from spoken speech is also a ``seq2seq`` problem.
-While it is impossible to consider all types of sequence transformations,
-a number of special cases are worth mentioning:
+These problems are among the most exciting applications of machine learning and
+they are instances of *sequence learning*.  They require a model to either
+ingest sequences of inputs or to emit sequences of outputs (or both!).  These
+latter problems are sometimes referred to as ``seq2seq`` problems.  Language
+translation is a ``seq2seq`` problem.  Transcribing text from spoken speech is
+also a ``seq2seq`` problem.  While it is impossible to consider all types of
+sequence transformations, a number of special cases are worth mentioning:
 
 ##### Tagging and Parsing
 
@@ -979,23 +953,126 @@ Much of this changed with the ready availability of large amounts of data, due t
 |2020|1 T (social network)|100 GB|1 PF (Nvidia DGX-2)|
 :label:`tab_intro_decade`
 
-It is quite evident that RAM has not kept pace with the growth in data. At the same time, the increase in computational power has outpaced that of the data available. This means that statistical models needed to become more memory efficient (this is typically achieved by adding nonlinearities) while simultaneously being able to spend more time on optimizing these parameters, due to an increased compute budget. Consequently the sweet spot in machine learning and statistics moved from (generalized) linear models and kernel methods to deep networks. This is also one of the reasons why many of the mainstays of deep learning, such as Multilayer Perceptrons (e.g. McCulloch & Pitts, 1943), Convolutional Neural Networks (Le Cun, 1992), Long Short Term Memory (Hochreiter & Schmidhuber, 1997), Q-Learning (Watkins, 1989), were essentially 'rediscovered' in the past decade, after laying dormant for considerable time.
+It is quite evident that RAM has not kept pace with the growth in data. At the
+same time, the increase in computational power has outpaced that of the data
+available. This means that statistical models needed to become more memory
+efficient (this is typically achieved by adding nonlinearities) while
+simultaneously being able to spend more time on optimizing these parameters, due
+to an increased compute budget. Consequently the sweet spot in machine learning
+and statistics moved from (generalized) linear models and kernel methods to deep
+networks. This is also one of the reasons why many of the mainstays of deep
+learning, such as Multilayer Perceptrons (:cite:`McCulloch.Pitts.1943`),
+Convolutional Neural Networks (:cite:`LeCun.Bottou.Bengio.ea.1998`), Long Short
+Term Memory (:cite:`Hochreiter.Schmidhuber.1997`), Q-Learning
+(:cite:`Watkins.Dayan.1992`), were essentially 'rediscovered' in the past
+decade, after laying dormant for considerable time.
 
-The recent progress in statistical models, applications, and algorithms, has sometimes been likened to the Cambrian Explosion: a moment of rapid progress in the evolution of species. Indeed, the state of the art is not just a mere consequence of available resources, applied to decades old algorithms. Note that the list below barely scratches the surface of the ideas that have helped researchers achieve tremendous progress over the past decade.
+The recent progress in statistical models, applications, and algorithms, has
+sometimes been likened to the Cambrian Explosion: a moment of rapid progress in
+the evolution of species. Indeed, the state of the art is not just a mere
+consequence of available resources, applied to decades old algorithms. Note that
+the list below barely scratches the surface of the ideas that have helped
+researchers achieve tremendous progress over the past decade.
 
-* Novel methods for capacity control, such as Dropout [3] allowed for training of relatively large networks without the danger of overfitting, i.e. without the danger of merely memorizing large parts of the training data. This was achieved by applying noise injection [4] throughout the network, replacing weights by random variables for training purposes.
-* Attention mechanisms solved a second problem that had plagued statistics for over a century: how to increase the memory and complexity of a system without increasing the number of learnable parameters. [5] found an elegant solution by using what can only be viewed as a learnable pointer structure. That is, rather than having to remember an entire sentence, e.g. for machine translation in a fixed-dimensional representation, all that needed to be stored was a pointer to the intermediate state of the translation process. This allowed for significantly increased accuracy for long sentences, since the model no longer needed to remember the entire sentence before beginning to generate sentences.
-* Multi-stage designs, e.g. via the Memory Networks [6] and the Neural Programmer-Interpreter [7] allowed statistical modelers to describe iterative approaches to reasoning. These tools allow for an internal state of the deep network to be modified repeatedly, thus carrying out subsequent steps in a chain of reasoning, similar to how a processor can modify memory for a computation.
-* Another key development was the invention of Generative Adversarial Networks [8]. Traditionally statistical methods for density estimation and generative models focused on finding proper probability distributions and (often approximate) algorithms for sampling from them. As a result, these algorithms were largely limited by the lack of flexibility inherent in the statistical models. The crucial innovation in GANs was to replace the sampler by an arbitrary algorithm with differentiable parameters. These are then adjusted in such a way that the discriminator (effectively a two-sample test) cannot distinguish fake from real data. Through the ability to use arbitrary algorithms to generate data it opened up density estimation to a wide variety of techniques. Examples of galloping Zebras [9] and of fake celebrity faces [10] are both testimony to this progress.
-* In many cases a single GPU is insufficient to process the large amounts of data available for training. Over the past decade the ability to build parallel distributed training algorithms has improved significantly. One of the key challenges in designing scalable algorithms is that the workhorse of deep learning optimization, stochastic gradient descent, relies on relatively small minibatches of data to be processed. At the same time, small batches limit the efficiency of GPUs. Hence, training on 1024 GPUs with a minibatch size of, say 32 images per batch amounts to an aggregate minibatch of 32k images. Recent work, first by Li [11],  and subsequently by You et al. [12] and Jia et al. [13] pushed the size up to 64k observations, reducing training time for ResNet50 on ImageNet to less than 7 minutes. For comparison - initially training times were measured in the order of days.
-* The ability to parallelize computation has also contributed quite crucially to progress in reinforcement learning, at least whenever simulation is an option. This has led to significant progress in computers achieving superhuman performance in Go, Atari games, Starcraft, and in physics simulations (e.g. using MuJoCo). See e.g. Silver et al. [18] for a description of how to achieve this in AlphaGo. In a nutshell, reinforcement learning works best if plenty of (state, action, reward) triples are available, i.e. whenever it is possible to try out lots of things to learn how they relate to each other. Simulation provides such an avenue.
-* Deep Learning frameworks have played a crucial role in disseminating ideas. The first generation of frameworks allowing for easy modeling encompassed [Caffe](https://github.com/BVLC/caffe), [Torch](https://github.com/torch), and [Theano](https://github.com/Theano/Theano). Many seminal papers were written using these tools. By now they have been superseded by [TensorFlow](https://github.com/tensorflow/tensorflow), often used via its high level API [Keras](https://github.com/keras-team/keras), [CNTK](https://github.com/Microsoft/CNTK), [Caffe 2](https://github.com/caffe2/caffe2), and [Apache MxNet](https://github.com/apache/incubator-mxnet). The third generation of tools, namely imperative tools for deep learning, was arguably spearheaded by [Chainer](https://github.com/chainer/chainer), which used a syntax similar to Python NumPy to describe models. This idea was adopted by [PyTorch](https://github.com/pytorch/pytorch) and the [Gluon API](https://github.com/apache/incubator-mxnet) of MxNet. It is the latter that this course uses to teach Deep Learning.
+* Novel methods for capacity control, such as Dropout
+  :cite:`Srivastava.Hinton.Krizhevsky.ea.2014` allowed for training of
+  relatively large networks without the danger of overfitting, i.e. without the
+  danger of merely memorizing large parts of the training data. This was
+  achieved by applying noise injection :cite:`Bishop.1995` throughout the
+  network, replacing weights by random variables for training purposes.
+* Attention mechanisms solved a second problem that had plagued statistics for
+  over a century: how to increase the memory and complexity of a system without
+  increasing the number of learnable
+  parameters. :cite:`Bahdanau.Cho.Bengio.2014` found an elegant solution
+  by using what can only be viewed as a learnable pointer structure. That is,
+  rather than having to remember an entire sentence, e.g. for machine
+  translation in a fixed-dimensional representation, all that needed to be
+  stored was a pointer to the intermediate state of the translation
+  process. This allowed for significantly increased accuracy for long sentences,
+  since the model no longer needed to remember the entire sentence before
+  beginning to generate sentences.
+* Multi-stage designs, e.g. via the Memory Networks
+  :cite:`Sukhbaatar.Weston.Fergus.ea.2015` and the Neural Programmer-Interpreter
+  :cite:`Reed.De-Freitas.2015` allowed statistical modelers to describe
+  iterative approaches to reasoning. These tools allow for an internal state of
+  the deep network to be modified repeatedly, thus carrying out subsequent steps
+  in a chain of reasoning, similar to how a processor can modify memory for a
+  computation.
+* Another key development was the invention of Generative Adversarial Networks
+  :cite:`Goodfellow.Pouget-Abadie.Mirza.ea.2014`. Traditionally statistical
+  methods for density estimation and generative models focused on finding proper
+  probability distributions and (often approximate) algorithms for sampling from
+  them. As a result, these algorithms were largely limited by the lack of
+  flexibility inherent in the statistical models. The crucial innovation in GANs
+  was to replace the sampler by an arbitrary algorithm with differentiable
+  parameters. These are then adjusted in such a way that the discriminator
+  (effectively a two-sample test) cannot distinguish fake from real
+  data. Through the ability to use arbitrary algorithms to generate data it
+  opened up density estimation to a wide variety of techniques. Examples of
+  galloping Zebras :cite:`Zhu.Park.Isola.ea.2017` and of fake celebrity faces
+  :cite:`Karras.Aila.Laine.ea.2017` are both testimony to this progress.
+* In many cases a single GPU is insufficient to process the large amounts of
+  data available for training. Over the past decade the ability to build
+  parallel distributed training algorithms has improved significantly. One of
+  the key challenges in designing scalable algorithms is that the workhorse of
+  deep learning optimization, stochastic gradient descent, relies on relatively
+  small minibatches of data to be processed. At the same time, small batches
+  limit the efficiency of GPUs. Hence, training on 1024 GPUs with a minibatch
+  size of, say 32 images per batch amounts to an aggregate minibatch of 32k
+  images. Recent work, first by Li :cite:`Li.2017`, and subsequently by
+  :cite:`You.Gitman.Ginsburg.2017` and :cite:`Jia.Song.He.ea.2018` pushed the
+  size up to 64k observations, reducing training time for ResNet50 on ImageNet
+  to less than 7 minutes. For comparison - initially training times were
+  measured in the order of days.
+* The ability to parallelize computation has also contributed quite crucially to
+  progress in reinforcement learning, at least whenever simulation is an
+  option. This has led to significant progress in computers achieving superhuman
+  performance in Go, Atari games, Starcraft, and in physics simulations
+  (e.g. using MuJoCo). See e.g. :cite:`Silver.Huang.Maddison.ea.2016` for a description of how to
+  achieve this in AlphaGo. In a nutshell, reinforcement learning works best if
+  plenty of (state, action, reward) triples are available, i.e. whenever it is
+  possible to try out lots of things to learn how they relate to each
+  other. Simulation provides such an avenue.
+* Deep Learning frameworks have played a crucial role in disseminating
+  ideas. The first generation of frameworks allowing for easy modeling
+  encompassed [Caffe](https://github.com/BVLC/caffe),
+  [Torch](https://github.com/torch), and
+  [Theano](https://github.com/Theano/Theano). Many seminal papers were written
+  using these tools. By now they have been superseded by
+  [TensorFlow](https://github.com/tensorflow/tensorflow), often used via its
+  high level API [Keras](https://github.com/keras-team/keras),
+  [CNTK](https://github.com/Microsoft/CNTK),
+  [Caffe 2](https://github.com/caffe2/caffe2), and
+  [Apache MxNet](https://github.com/apache/incubator-mxnet). The third
+  generation of tools, namely imperative tools for deep learning, was arguably
+  spearheaded by [Chainer](https://github.com/chainer/chainer), which used a
+  syntax similar to Python NumPy to describe models. This idea was adopted by
+  [PyTorch](https://github.com/pytorch/pytorch) and the
+  [Gluon API](https://github.com/apache/incubator-mxnet) of MXNet. It is the
+  latter that this course uses to teach Deep Learning.
 
-The division of labor between systems researchers building better tools for training and statistical modelers building better networks has greatly simplified things. For instance, training a linear logistic regression model used to be a nontrivial homework problem, worthy to give to new Machine Learning PhD students at Carnegie Mellon University in 2014. By now, this task can be accomplished with less than 10 lines of code, putting it firmly into the grasp of programmers.
+The division of labor between systems researchers building better tools for
+training and statistical modelers building better networks has greatly
+simplified things. For instance, training a linear logistic regression model
+used to be a nontrivial homework problem, worthy to give to new Machine Learning
+PhD students at Carnegie Mellon University in 2014. By now, this task can be
+accomplished with less than 10 lines of code, putting it firmly into the grasp
+of programmers.
 
 ## Success Stories
 
-Artificial Intelligence has a long history of delivering results that would be difficult to accomplish otherwise. For instance, mail is sorted using optical character recognition. These systems have been deployed since the 90s (this is, after all, the source of the famous MNIST and USPS sets of handwritten digits). The same applies to reading checks for bank deposits and scoring creditworthiness of applicants. Financial transactions are checked for fraud automatically. This forms the backbone of many e-commerce payment systems, such as PayPal, Stripe, AliPay, WeChat, Apple, Visa, MasterCard. Computer programs for chess have been competitive for decades. Machine learning feeds search, recommendation, personalization and ranking on the internet. In other words, artificial intelligence and machine learning are pervasive, albeit often hidden from sight.
+Artificial Intelligence has a long history of delivering results that would be
+difficult to accomplish otherwise. For instance, mail is sorted using optical
+character recognition. These systems have been deployed since the 90s (this is,
+after all, the source of the famous MNIST and USPS sets of handwritten
+digits). The same applies to reading checks for bank deposits and scoring
+creditworthiness of applicants. Financial transactions are checked for fraud
+automatically. This forms the backbone of many e-commerce payment systems, such
+as PayPal, Stripe, AliPay, WeChat, Apple, Visa, MasterCard. Computer programs
+for chess have been competitive for decades. Machine learning feeds search,
+recommendation, personalization and ranking on the internet. In other words,
+artificial intelligence and machine learning are pervasive, albeit often hidden
+from sight.
 
 It is only recently that AI has been in the limelight, mostly due to solutions to problems that were considered intractable previously.
 
@@ -1036,55 +1113,6 @@ A much more realistic concern is how AI is being used in our daily lives. It is 
 1. Which problems that you encounter have many examples for how to solve them, yet no specific way to automate them? These may be prime candidates for using Deep Learning.
 1. Viewing the development of Artificial Intelligence as a new industrial revolution, what is the relationship between algorithms and data? Is it similar to steam engines and coal (what is the fundamental difference)?
 1. Where else can you apply the end-to-end training approach? Physics? Engineering? Econometrics?
-
-## References
-
-[1] Turing, A. M. (1950). Computing machinery and intelligence. Mind, 59(236), 433.
-
-[2] Hebb, D. O. (1949). The organization of behavior; a neuropsychological theory. A Wiley Book in Clinical Psychology. 62-78.
-
-[3] Srivastava, N., Hinton, G., Krizhevsky, A., Sutskever, I., & Salakhutdinov, R. (2014). Dropout: a simple way to prevent neural networks from overfitting. The Journal of Machine Learning Research, 15(1), 1929-1958.
-
-[4] Bishop, C. M. (1995). Training with noise is equivalent to Tikhonov regularization. Neural computation, 7(1), 108-116.
-
-[5] Bahdanau, D., Cho, K., & Bengio, Y. (2014). Neural machine translation by jointly learning to align and translate. arXiv preprint arXiv:1409.0473.
-
-[6] Sukhbaatar, S., Weston, J., & Fergus, R. (2015). End-to-end memory networks. In Advances in neural information processing systems (pp. 2440-2448).
-
-[7] Reed, S., & De Freitas, N. (2015). Neural programmer-interpreters. arXiv preprint arXiv:1511.06279.
-
-[8] Goodfellow, I., Pouget-Abadie, J., Mirza, M., Xu, B., Warde-Farley, D., Ozair, S., … & Bengio, Y. (2014). Generative adversarial nets. In Advances in neural information processing systems (pp. 2672-2680).
-
-[9] Zhu, J. Y., Park, T., Isola, P., & Efros, A. A. (2017). Unpaired image-to-image translation using cycle-consistent adversarial networks. arXiv preprint.
-
-[10] Karras, T., Aila, T., Laine, S., & Lehtinen, J. (2017). Progressive growing of gans for improved quality, stability, and variation. arXiv preprint arXiv:1710.10196.
-
-[11] Li, M. (2017). Scaling Distributed Machine Learning with System and Algorithm Co-design (Doctoral dissertation, PhD thesis, Intel).
-
-[12] You, Y., Gitman, I., & Ginsburg, B. Large batch training of convolutional networks. ArXiv e-prints.
-
-[13] Jia, X., Song, S., He, W., Wang, Y., Rong, H., Zhou, F., … & Chen, T. (2018). Highly Scalable Deep Learning Training System with Mixed-Precision: Training ImageNet in Four Minutes. arXiv preprint arXiv:1807.11205.
-
-[14] Xiong, W., Droppo, J., Huang, X., Seide, F., Seltzer, M., Stolcke, A., … & Zweig, G. (2017, March). The Microsoft 2016 conversational speech recognition system. In Acoustics, Speech and Signal Processing (ICASSP), 2017 IEEE International Conference on (pp. 5255-5259). IEEE.
-
-[15] Lin, Y., Lv, F., Zhu, S., Yang, M., Cour, T., Yu, K., … & Huang, T. (2010). Imagenet classification: fast descriptor coding and large-scale svm training. Large scale visual recognition challenge.
-
-[16] Hu, J., Shen, L., & Sun, G. (2017). Squeeze-and-excitation networks. arXiv preprint arXiv:1709.01507, 7.
-
-[17] Campbell, M., Hoane Jr, A. J., & Hsu, F. H. (2002). Deep blue. Artificial intelligence, 134 (1-2), 57-83.
-
-[18] Silver, D., Huang, A., Maddison, C. J., Guez, A., Sifre, L., Van Den Driessche, G., … & Dieleman, S. (2016). Mastering the game of Go with deep neural networks and tree search. Nature, 529 (7587), 484.
-
-[19] Brown, N., & Sandholm, T. (2017, August). Libratus: The superhuman ai for no-limit poker. In Proceedings of the Twenty-Sixth International Joint Conference on Artificial Intelligence.
-
-[20] Canny, J. (1986). A computational approach to edge detection. IEEE Transactions on pattern analysis and machine intelligence, (6), 679-698.
-
-[21] Lowe, D. G. (2004). Distinctive image features from scale-invariant keypoints. International journal of computer vision, 60(2), 91-110.
-
-[22] Salton, G., & McGill, M. J. (1986). Introduction to modern information retrieval.
-
-[23] Tesauro, G. (1995), Transactions of the ACM, (38) 3, 58-68
-
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2310)
 
