@@ -1,6 +1,6 @@
 # Networks with Parallel Concatenations (GoogLeNet)
 
-In 2014, [Szegedy et al., 2014](https://arxiv.org/abs/1409.4842)
+In 2014, :cite:`Szegedy.Liu.Jia.ea.2015`
 won the ImageNet Challenge, proposing a structure
 that combined the strengths of the NiN and repeated blocks paradigms.
 One focus of the paper was to address the question
@@ -219,25 +219,19 @@ d2l.train_ch5(net, train_iter, test_iter, num_epochs, lr)
 ## Exercises
 
 1. There are several iterations of GoogLeNet. Try to implement and run them. Some of them include the following:
-    * Add a batch normalization layer, as described later in this chapter [2].
-    * Make adjustments to the Inception block [3].
-    * Use "label smoothing" for model regularization [3].
-    * Include it in the residual connection, as described later in this chapter [4].
+    * Add a batch normalization layer :cite:`Ioffe.Szegedy.2015`, as described
+      later in :numref:`chapter_batch_norm`.
+    * Make adjustments to the Inception block
+      :cite:`Szegedy.Vanhoucke.Ioffe.ea.2016`.
+    * Use "label smoothing" for model regularization
+      :cite:`Szegedy.Vanhoucke.Ioffe.ea.2016`.
+    * Include it in the residual connection
+      :cite:`Szegedy.Ioffe.Vanhoucke.ea.2017`, as described later in
+      :numref:`chapter_resnet`.
 1. What is the minimum image size for GoogLeNet to work?
 1. Compare the model parameter sizes of AlexNet, VGG, and NiN with GoogLeNet. How do the latter two network architectures significantly reduce the model parameter size?
 1. Why do we need a large range convolution initially?
 
-
-
-## References
-
-[1] Szegedy, C., Liu, W., Jia, Y., Sermanet, P., Reed, S., & Anguelov, D. & Rabinovich, A. (2015). Going deeper with convolutions. In Proceedings of the IEEE conference on computer vision and pattern recognition (pp. 1-9).
-
-[2] Ioffe, S., & Szegedy, C. (2015). Batch normalization: Accelerating deep network training by reducing internal covariate shift. arXiv preprint arXiv:1502.03167.
-
-[3] Szegedy, C., Vanhoucke, V., Ioffe, S., Shlens, J., & Wojna, Z. (2016). Rethinking the inception architecture for computer vision. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (pp. 2818-2826).
-
-[4] Szegedy, C., Ioffe, S., Vanhoucke, V., & Alemi, A. A. (2017, February). Inception-v4, inception-resnet and the impact of residual connections on learning. In Proceedings of the AAAI Conference on Artificial Intelligence (Vol. 4, p. 12).
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2357)
 

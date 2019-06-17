@@ -10,7 +10,11 @@ The key point is that it decomposes the function into increasingly higher order 
 
 $$f(\mathbf{x}) = \mathbf{x} + g(\mathbf{x})$$
 
-That is, ResNet decomposes $f$ into a simple linear term and a more complex nonlinear one. What if we want to go beyond two terms? A solution was proposed by [Huang et al, 2016](https://arxiv.org/abs/1608.06993) in the form of DenseNet, an architecture that reported record performance on the ImageNet dataset.
+That is, ResNet decomposes $f$ into a simple linear term and a more complex
+nonlinear one. What if we want to go beyond two terms? A solution was proposed
+by :cite:`Huang.Liu.Van-Der-Maaten.ea.2017` in the form of
+DenseNet, an architecture that reported record performance on the ImageNet
+dataset.
 
 ![The main difference between ResNet (left) and DenseNet (right) in cross-layer connections: use of addition and use of concatenation. ](../img/densenet.svg)
 
@@ -155,14 +159,10 @@ d2l.train_ch5(net, train_iter, test_iter, num_epochs, lr)
 1. One problem for which DenseNet has been criticized is its high memory consumption.
     * Is this really the case? Try to change the input shape to $224\times 224$ to see the actual (GPU) memory consumption.
     * Can you think of an alternative means of reducing the memory consumption? How would you need to change the framework?
-1. Implement the various DenseNet versions presented in Table 1 of the [DenseNet paper](https://arxiv.org/abs/1608.06993).
+1. Implement the various DenseNet versions presented in Table 1 of :cite:`Huang.Liu.Van-Der-Maaten.ea.2017`.
 1. Why do we not need to concatenate terms if we are just interested in $\mathbf{x}$ and $f(\mathbf{x})$ for ResNet? Why do we need this for more than two layers in DenseNet?
 1. Design a DenseNet for fully connected networks and apply it to the Housing Price prediction task.
 
-
-## References
-
-[1] Huang, G., Liu, Z., Weinberger, K. Q., & van der Maaten, L. (2017). Densely connected convolutional networks. In Proceedings of the IEEE conference on computer vision and pattern recognition (Vol. 1, No. 2).
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2360)
 

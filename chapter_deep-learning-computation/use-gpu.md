@@ -31,7 +31,7 @@ Note that this might be extravagant for most desktop computers but it is easily 
 MXNet can specify devices, such as CPUs and GPUs, for storage and calculation. By default, MXNet creates data in the main memory and then uses the CPU to calculate it. In MXNet, the CPU and GPU can be indicated by `cpu()` and `gpu()`. It should be noted that `cpu()` (or any integer in the parentheses) means all physical CPUs and memory. This means that MXNet's calculations will try to use all CPU cores. However, `gpu()` only represents one graphic card and the corresponding graphic memory. If there are multiple GPUs, we use `gpu(i)` to represent the $i$-th GPU ($i$ starts from 0). Also, `gpu(0)` and `gpu()` are equivalent.
 
 ```{.python .input}
-from mxnet import nd, context 
+from mxnet import nd, context
 from mxnet.gluon import nn
 
 context.cpu(), context.gpu(), context.gpu(1)
@@ -43,7 +43,7 @@ We can query the number of available GPUs through `num_gpus()`.
 context.num_gpus()
 ```
 
-Now we define two convenient functions that allows us to run codes even if the requested GPUs do not exist. 
+Now we define two convenient functions that allows us to run codes even if the requested GPUs do not exist.
 
 ```{.python .input}
 # Save to the d2l package.
@@ -56,7 +56,7 @@ def try_all_gpus():
     """Return all available GPUs, or [cpu(),] if no GPU exists."""
     ctxes = [context.gpu(i) for i in range(context.num_gpus())]
     return ctxes if ctxes else [context.cpu()]
-        
+
 try_gpu(), try_gpu(3), try_all_gpus()
 ```
 
@@ -176,10 +176,6 @@ In short, as long as all data and parameters are on the same device, we can lear
 1. How should we read and write model parameters on the GPU?
 1. Measure the time it takes to compute 1000 matrix-matrix multiplications of $100 \times 100$ matrices and log the matrix norm $\mathrm{tr} M M^\top$ one result at a time vs. keeping a log on the GPU and transferring only the final result.
 1. Measure how much time it takes to perform two matrix-matrix multiplications on two GPUs at the same time vs. in sequence on one GPU (hint - you should see almost linear scaling).
-
-## References
-
-[1] CUDA download address. https://developer.nvidia.com/cuda-downloads
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2330)
 

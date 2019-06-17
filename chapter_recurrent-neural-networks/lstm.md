@@ -1,9 +1,22 @@
 # Long Short Term Memory (LSTM)
 :label:`chapter_lstm`
 
-The challenge to address long-term information preservation and short-term input skipping in latent variable models has existed for a long time. One of the earliest approaches to address this was the LSTM by [Hochreiter and Schmidhuber, 1997](http://papers.nips.cc/paper/1215-lstm-can-solve-hard-long-time-lag-problems.pdf). It shares many of the properties of the Gated Recurrent Unit (GRU) and predates it by almost two decades. Its design is slightly more complex.
+The challenge to address long-term information preservation and short-term input
+skipping in latent variable models has existed for a long time. One of the
+earliest approaches to address this was the LSTM
+:cite:`Hochreiter.Schmidhuber.1997`.  It shares many of the properties of the
+Gated Recurrent Unit (GRU) and predates it by almost two decades. Its design is
+slightly more complex.
 
-Arguably it is inspired by logic gates of a computer. To control a memory cell we need a number of gates. One gate is needed to read out the entries from the cell (as opposed to reading any other cell). We will refer to this as the *output* gate. A second gate is needed to decide when to read data into the cell. We refer to this as the *input* gate. Lastly, we need a mechanism to reset the contents of the cell, governed by a *forget* gate. The motivation for such a design is the same as before, namely to be able to decide when to remember and when to ignore inputs into the latent state via a dedicated mechanism. Let's see how this works in practice.
+Arguably it is inspired by logic gates of a computer. To control a memory cell
+we need a number of gates. One gate is needed to read out the entries from the
+cell (as opposed to reading any other cell). We will refer to this as the
+*output* gate. A second gate is needed to decide when to read data into the
+cell. We refer to this as the *input* gate. Lastly, we need a mechanism to reset
+the contents of the cell, governed by a *forget* gate. The motivation for such a
+design is the same as before, namely to be able to decide when to remember and
+when to ignore inputs into the latent state via a dedicated mechanism. Let's see
+how this works in practice.
 
 ## Gated Memory Cells
 
@@ -134,12 +147,12 @@ def lstm(inputs, state, params):
 
 ### Training
 
-Again, we just train as before. 
+Again, we just train as before.
 
 ```{.python .input  n=9}
 vocab_size, num_hiddens, ctx = len(vocab), 256, d2l.try_gpu()
 num_epochs, lr = 500, 1
-model = d2l.RNNModelScratch(len(vocab), num_hiddens, ctx, get_lstm_params, 
+model = d2l.RNNModelScratch(len(vocab), num_hiddens, ctx, get_lstm_params,
                             init_lstm_state, lstm)
 d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, ctx)
 ```
@@ -171,10 +184,6 @@ d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, ctx)
 1. Since the candidate memory cells ensure that the value range is between -1 and 1 using the tanh function, why does the hidden state need to use the tanh function again to ensure that the output value range is between -1 and 1?
 1. Implement an LSTM for time series prediction rather than character sequences.
 
-
-## References
-
-[1] Hochreiter, S., & Schmidhuber, J. (1997). Long short-term memory. Neural computation, 9(8), 1735-1780.
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2368)
 

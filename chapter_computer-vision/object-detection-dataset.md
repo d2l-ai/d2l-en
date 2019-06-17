@@ -1,6 +1,6 @@
 # Object Detection Data Set (Pikachu)
 
-There are no small data sets, like MNIST or Fashion-MNIST, in the object detection field. In order to quickly test models, we are going to assemble a small data set. First, we generate 1000 Pikachu images of different angles and sizes using an open source 3D Pikachu model. Then, we collect a series of background images and place a Pikachu image at a random position on each image. We use the im2rec tool provided by MXNet to convert the images to binary RecordIO format[1]. This format can reduce the storage overhead of the data set on the disk and improve the reading efficiency. If you want to learn more about how to read images, refer to the documentation for the GluonCV Toolkit[2].
+There are no small data sets, like MNIST or Fashion-MNIST, in the object detection field. In order to quickly test models, we are going to assemble a small data set. First, we generate 1000 Pikachu images of different angles and sizes using an open source 3D Pikachu model. Then, we collect a series of background images and place a Pikachu image at a random position on each image. We use the [im2rec tool](https://github.com/apache/incubator-mxnet/blob/master/tools/im2rec.py) provided by MXNet to convert the images to binary RecordIO format[1]. This format can reduce the storage overhead of the data set on the disk and improve the reading efficiency. If you want to learn more about how to read images, refer to the documentation for the [GluonCV Toolkit](https://gluon-cv.mxnet.io/).
 
 
 ## Download the Data Set
@@ -78,12 +78,6 @@ for ax, label in zip(axes, batch.label[0][0:10]):
 ## Exercises
 
 * Referring to the MXNet documentation, what are the parameters for the constructors of the `image.ImageDetIter` and `image.CreateDetAugmenter` classes? What is their significance?
-
-## References
-
-[1] im2rec Tool. https://github.com/apache/incubator-mxnet/blob/master/tools/im2rec.py
-
-[2] GluonCV Toolkit. https://gluon-cv.mxnet.io/
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2452)
 
