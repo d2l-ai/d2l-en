@@ -99,9 +99,10 @@ sys.path.insert(0, '..')
 
 import d2l
 import mxnet as mx
-from mxnet import autograd, gluon, init, nd
+from mxnet import autograd, gluon, init, nd, np, npx
 from mxnet.gluon import loss as gloss, nn
 import time
+npx.set_np()
 
 net = nn.Sequential()
 net.add(nn.Conv2D(channels=6, kernel_size=5, padding=2, activation='sigmoid'),
@@ -130,7 +131,7 @@ printing the output shape at each layer
 to make sure we understand what's happening here.
 
 ```{.python .input}
-X = nd.random.uniform(shape=(1, 1, 28, 28))
+X = np.random.uniform(size=(1, 1, 28, 28))
 net.initialize()
 for layer in net:
     X = layer(X)
@@ -192,7 +193,7 @@ Otherwise, we catch the resulting exception and we stick with the CPU.
 def try_gpu():
     try:
         ctx = mx.gpu()
-        _ = nd.zeros((1,), ctx=ctx)
+        _ = np.zeros((1,), ctx=ctx)
     except mx.base.MXNetError:
         ctx = mx.cpu()
     return ctx
@@ -217,13 +218,13 @@ This avoids intermediate copy operations that might harm performance.
 # will be gradually improved. Its complete implementation will be discussed in
 # the "Image Augmentation" section
 def evaluate_accuracy(data_iter, net, ctx):
-    acc_sum, n = nd.array([0], ctx=ctx), 0
+    acc_sum, n = np.array([0], ctx=ctx), 0
     for X, y in data_iter:
         # If ctx is the GPU, copy the data to the GPU.
         X, y = X.as_in_context(ctx), y.as_in_context(ctx).astype('float32')
         acc_sum += (net(X).argmax(axis=1) == y).sum()
         n += y.size
-    return acc_sum.asscalar() / n
+    return acc_sum / n
 ```
 
 We also need to update our training function to deal with GPUs.
@@ -247,8 +248,8 @@ def train_ch5(net, train_iter, test_iter, batch_size, trainer, ctx,
             l.backward()
             trainer.step(batch_size)
             y = y.astype('float32')
-            train_l_sum += l.asscalar()
-            train_acc_sum += (y_hat.argmax(axis=1) == y).sum().asscalar()
+            train_l_sum += l
+            train_acc_sum += (y_hat.argmax(axis=1) == y).sum()
             n += y.size
         test_acc = evaluate_accuracy(test_iter, net, ctx)
         print('epoch %d, loss %.4f, train acc %.3f, test acc %.3f, '

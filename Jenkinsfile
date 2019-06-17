@@ -5,6 +5,7 @@ stage("Build and Publish") {
       checkout scm
       def ENV_NAME = "${TASK}-${EXECUTOR_NUMBER}"
       sh label: "Build Environment", script: """set -ex
+      conda env remove -n ${ENV_NAME} -y
       rm -rf ~/miniconda3/envs/${ENV_NAME}
       conda create -n ${ENV_NAME} pip -y
       conda activate ${ENV_NAME}

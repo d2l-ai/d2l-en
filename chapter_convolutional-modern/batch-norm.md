@@ -164,8 +164,9 @@ import sys
 sys.path.insert(0, '..')
 
 import d2l
-from mxnet import autograd, gluon, init, nd
+from mxnet import autograd, gluon, init, nd, np, npx
 from mxnet.gluon import nn
+npx.set_np()
 
 def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
     # Use autograd to determine whether the current mode is training mode or
@@ -173,7 +174,7 @@ def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
     if not autograd.is_training():
         # If it is the prediction mode, directly use the mean and variance
         # obtained from the incoming moving average
-        X_hat = (X - moving_mean) / nd.sqrt(moving_var + eps)
+        X_hat = (X - moving_mean) / np.sqrt(moving_var + eps)
     else:
         assert len(X.shape) in (2, 4)
         if len(X.shape) == 2:
@@ -190,7 +191,7 @@ def batch_norm(X, gamma, beta, moving_mean, moving_var, eps, momentum):
             var = ((X - mean) ** 2).mean(axis=(0, 2, 3), keepdims=True)
         # In training mode, the current mean and variance are used for the
         # standardization
-        X_hat = (X - mean) / nd.sqrt(var + eps)
+        X_hat = (X - mean) / np.sqrt(var + eps)
         # Update the mean and variance of the moving average
         moving_mean = momentum * moving_mean + (1.0 - momentum) * mean
         moving_var = momentum * moving_var + (1.0 - momentum) * var
@@ -239,8 +240,8 @@ class BatchNorm(nn.Block):
         self.beta = self.params.get('beta', shape=shape, init=init.Zero())
         # All the variables not involved in gradient finding and iteration are
         # initialized to 0 on the CPU
-        self.moving_mean = nd.zeros(shape)
-        self.moving_var = nd.zeros(shape)
+        self.moving_mean = np.zeros(shape)
+        self.moving_var = np.zeros(shape)
 
     def forward(self, X):
         # If X is not on the CPU, copy moving_mean and moving_var to the
