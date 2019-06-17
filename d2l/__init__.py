@@ -1,7 +1,5 @@
 from .base import *
 from .figure import *
-from .data import *
-from .train import *
 
 from .d2l import *
 

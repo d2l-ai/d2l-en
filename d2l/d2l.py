@@ -1290,6 +1290,49 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
                                       batchify_fn=batchify)
     return data_iter, vocab
 
+# Defined in file: ./chapter_natural-language-processing/sentiment-analysis.md
+def download_imdb(data_dir='../data'):
+    url = 'http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz'
+    fname = gluon.utils.download(url, data_dir)
+    with tarfile.open(fname, 'r') as f:
+        f.extractall(data_dir)
+        
+
+# Defined in file: ./chapter_natural-language-processing/sentiment-analysis.md
+def read_imdb(folder='train', data_dir='../data'):
+    data, labels = [], []
+    for label in ['pos', 'neg']:
+        folder_name = os.path.join(data_dir, 'aclImdb', folder, label)
+        for file in os.listdir(folder_name):
+            with open(os.path.join(folder_name, file), 'rb') as f:
+                review = f.read().decode('utf-8').replace('\n', '')
+                data.append(review)
+                labels.append(1 if label == 'pos' else 0)
+    return data, labels
+
+
+# Defined in file: ./chapter_natural-language-processing/sentiment-analysis.md
+def load_data_imdb(batch_size, num_steps=500):
+    download_imdb()
+    train_data, test_data = read_imdb('train'), read_imdb('test')
+    train_tokens = d2l.tokenize(train_data[0], token='word')
+    test_tokens = d2l.tokenize(test_data[0], token='word')
+    vocab = d2l.Vocab(train_tokens, min_freq=5)
+    train_features = nd.array([d2l.trim_pad(vocab[line], num_steps, vocab.unk) 
+                               for line in train_tokens])
+    test_features = nd.array([d2l.trim_pad(vocab[line], num_steps, vocab.unk) 
+                               for line in test_tokens])
+    train_iter = d2l.load_array((train_features, train_data[1]), batch_size)
+    test_iter = d2l.load_array((test_features, test_data[1]), batch_size, 
+                               is_train=False)
+    return train_iter, test_iter, vocab
+
+# Defined in file: ./chapter_natural-language-processing/sentiment-analysis-rnn.md
+def predict_sentiment(net, vocab, sentence):
+    sentence = nd.array(vocab[sentence.split()], ctx=d2l.try_gpu())
+    label = nd.argmax(net(sentence.reshape((1, -1))), axis=1)
+    return 'positive' if label.asscalar() == 1 else 'negative'
+
 # Defined in file: ./chapter_generative_adversarial_networks/gan.md
 def update_D(X, Z, net_D, net_G, loss, trainer_D):
     """Update discriminator"""

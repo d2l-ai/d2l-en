@@ -4,13 +4,14 @@
 In the "Convolutional Neural Networks" chapter, we explored how to process two-dimensional image data with two-dimensional convolutional neural networks. In the previous language models and text classification tasks, we treated text data as a time series with only one dimension, and naturally, we used recurrent neural networks to process such data. In fact, we can also treat text as a one-dimensional image, so that we can use one-dimensional convolutional neural networks to capture associations between adjacent words. This section describes a groundbreaking approach to applying convolutional neural networks to text analysis: textCNN[1]. First, import the packages and modules required for the experiment.
 
 ```{.python .input  n=2}
-import sys
-sys.path.insert(0, '..')
-
 import d2l
 from mxnet import gluon, init, nd
 from mxnet.contrib import text
-from mxnet.gluon import loss as gloss, nn
+from mxnet.gluon import nn
+
+
+batch_size = 64
+train_iter, test_iter, vocab = d2l.load_data_imdb(batch_size)
 ```
 
 ## One-dimensional Convolutional Layer
@@ -75,15 +76,6 @@ convolutional layer to extend the model parameters in the convolutional layer.
 Similarly, we have a one-dimensional pooling layer. The max-over-time pooling layer used in TextCNN actually corresponds to a one-dimensional global maximum pooling layer. Assuming that the input contains multiple channels, and each channel consists of values on different time steps, the output of each channel will be the largest value of all time steps in the channel. Therefore, the input of the max-over-time pooling layer can have different time steps on each channel.
 
 To improve computing performance, we often combine timing examples of different lengths into a mini-batch and make the lengths of each timing example in the batch consistent by appending special characters (such as 0) to the end of shorter examples. Naturally, the added special characters have no intrinsic meaning. Because the main purpose of the max-over-time pooling layer is to capture the most important features of timing, it usually allows the model to be unaffected by the manually added characters.
-
-
-## Read and Preprocess IMDb Data Sets
-
-We still use the same IMDb data set as n the previous section for sentiment analysis. The following steps for reading and preprocessing the data set are the same as in the previous section.
-
-```{.python .input  n=2}
-vocab, train_iter, test_iter = d2l.load_data_imdb(batch_size=64)
-```
 
 ## The TextCNN Model
 
@@ -166,8 +158,8 @@ Now we can train the model.
 ```{.python .input  n=30}
 lr, num_epochs = 0.001, 5
 trainer = gluon.Trainer(net.collect_params(), 'adam', {'learning_rate': lr})
-loss = gloss.SoftmaxCrossEntropyLoss()
-d2l.train(train_iter, test_iter, net, loss, trainer, ctx, num_epochs)
+loss = gluon.loss.SoftmaxCrossEntropyLoss()
+d2l.train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs, ctx)
 ```
 
 Below, we use the trained model to the classify sentiments of two simple sentences.
