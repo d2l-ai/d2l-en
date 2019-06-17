@@ -1,116 +1,18 @@
 # Text Sentiment Classification: Using Recurrent Neural Networks
 :label:`chapter_sentiment_rnn`
 
-Text classification is a common task in natural language processing, which transforms a sequence of text of indefinite length into a category of text. This section will focus on one of the sub-questions in this field: using text sentiment classification to analyze the emotions of the text's author. This problem is also called sentiment analysis and has a wide range of applications. For example, we can analyze user reviews of products to obtain user satisfaction statistics, or analyze user sentiments about market conditions and use it to predict future trends.
 
 Similar to search synonyms and analogies, text classification is also a downstream application of word embedding. In this section, we will apply pre-trained word vectors and bidirectional recurrent neural networks with multiple hidden layers. We will use them to determine whether a text sequence of indefinite length contains positive or negative emotion. Import the required package or module before starting the experiment.
 
 ```{.python .input  n=2}
-import sys
-sys.path.insert(0, '..')
-
 import d2l
 from mxnet import gluon, init, nd
-from mxnet.gluon import data as gdata, loss as gloss, nn, rnn, utils as gutils
+from mxnet.gluon import nn, rnn
 from mxnet.contrib import text
-import os
-import tarfile
-```
 
-## Text Sentiment Classification Data
-
-We use Stanford's Large Movie Review Dataset as the data set for text sentiment classification[1]. This data set is divided into two data sets for training and testing purposes, each containing 25,000 movie reviews downloaded from IMDb. In each data set, the number of comments labeled as "positive" and "negative" is equal.
-
-###  Reading Data
-
-We first download this data set to the "../data" path and extract it to "../data/aclImdb".
-
-```{.python .input  n=23}
-data_dir = '../data'
-url = 'http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz'
-fname = gutils.download(url, data_dir)
-with tarfile.open(fname, 'r') as f:
-    f.extractall(data_dir)
-```
-
-Next, read the training and test data sets. Each example is a review and its corresponding label: 1 indicates "positive" and 0 indicates "negative".
-
-```{.python .input  n=24}
-def read_imdb(folder='train'):
-    data, labels = [], []
-    for label in ['pos', 'neg']:
-        folder_name = os.path.join(data_dir, 'aclImdb', folder, label)
-        for file in os.listdir(folder_name):
-            with open(os.path.join(folder_name, file), 'rb') as f:
-                review = f.read().decode('utf-8').replace('\n', '')
-                data.append(review)
-                labels.append(1 if label == 'pos' else 0)
-    return data, labels
-
-train_data, test_data = read_imdb('train'), read_imdb('test')
-print('# trainings:', len(train_data[0]), '\n# tests:', len(test_data[0]))
-for x, y in zip(train_data[0][:3], train_data[1][:3]):
-    print('label:', y, 'review:', x[0:60])
-```
-
-### Tokenization and Vocabulary
-
-We use a word as a token, which can be split based on spaces.
-
-```{.python .input  n=28}
-def tokenize(sentences):
-    return [line.split(' ') for line in sentences]
-
-train_tokens = tokenize(train_data[0])
-test_tokens = tokenize(test_data[0])
-```
-
-Then we can create a dictionary based on the training data set with the words segmented.
-Here, we have filtered out words that appear less than 5 times.
-
-```{.python .input}
-vocab = d2l.Vocab([tk for line in train_tokens for tk in line], min_freq=5)
-```
-
-### Padding to the Same Length
-
-Because the reviews have different lengths, so they cannot be directly combined into mini-batches. Here we fix the length of each comment to 500 by truncating or adding "&lt;unk&gt;" indices.
-
-```{.python .input  n=44}
-max_len = 500
-
-def pad(x):
-    if len(x) > max_len:
-        return x[:max_len]
-    else:
-        return x + [vocab.unk] * (max_len - len(x))
-
-train_features = nd.array([pad(vocab[line]) for line in train_tokens])
-test_features = nd.array([pad(vocab[line]) for line in test_tokens])
-```
-
-### Create Data Iterator
-
-Now, we will create a data iterator. Each iteration will return a mini-batch of data.
-
-```{.python .input}
 batch_size = 64
-train_set = gdata.ArrayDataset(train_features, train_data[1])
-test_set = gdata.ArrayDataset(test_features, test_data[1])
-train_iter = gdata.DataLoader(train_set, batch_size, shuffle=True)
-test_iter = gdata.DataLoader(test_set, batch_size)
+train_iter, test_iter, vocab = d2l.load_data_imdb(batch_size)
 ```
-
-Print the shape of the first mini-batch of data and the number of mini-batches in the training set.
-
-```{.python .input}
-for X, y in train_iter:
-    print('X', X.shape, 'y', y.shape)
-    break
-'# batches:', len(train_iter)
-```
-
-Lastly, we will save a function `get_data_imdb` into `d2l`, which returns the vocabulary and data iterators.
 
 ## Use a Recurrent Neural Network Model
 
@@ -184,13 +86,14 @@ Now, we can start training.
 ```{.python .input  n=48}
 lr, num_epochs = 0.01, 5
 trainer = gluon.Trainer(net.collect_params(), 'adam', {'learning_rate': lr})
-loss = gloss.SoftmaxCrossEntropyLoss()
-d2l.train(train_iter, test_iter, net, loss, trainer, ctx, num_epochs)
+loss = gluon.loss.SoftmaxCrossEntropyLoss()
+d2l.train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs, ctx)
 ```
 
 Finally, define the prediction function.
 
 ```{.python .input  n=49}
+# Save to the d2l package.
 def predict_sentiment(net, vocab, sentence):
     sentence = nd.array(vocab[sentence.split()], ctx=d2l.try_gpu())
     label = nd.argmax(net(sentence.reshape((1, -1))), axis=1)
