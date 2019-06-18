@@ -215,7 +215,7 @@ learning models.  The next chapter, :numref:`chapter_performance` examines
 several important factors that affect the computational performance of your deep
 learning code.    :numref:`chapter_cv` and :numref:`chapter_nlp` illustrate major
 applications of deep learning in computer vision and natural language
-processing, respectively. Finally, :numref:`chapter_gans` presents an emerging family of models called generative adversarial networks. 
+processing, respectively. Finally, :number:`chapter_gans` presents an emerging family of models called generative adversarial networks.
 
 
 
@@ -259,10 +259,10 @@ from IPython import display
 import collections
 import os
 import sys
-import numpy as np
+import numpy as onp
 import math
 from matplotlib import pyplot as plt
-from mxnet import nd, autograd, gluon, init, context, image
+from mxnet import np, npx, autograd, gluon, init, context, image
 from mxnet.gluon import nn, rnn
 import random
 import re
@@ -306,9 +306,20 @@ frequently participate in forum discussions.
 
 ## Acknowledgments
 
-We are indebted to the hundreds of contributors for both the English and the Chinese drafts. They helped improve the content and offered valuable feedback. Specifically, we thank every contributor of this English draft for making it better for everyone. Their GitHub IDs or names are (in no particular order): alxnorden, avinashingit, bowen0701, brettkoonce, Chaitanya Prakash Bapat, cryptonaut, Davide Fiocco, edgarroman, gkutiel, John Mitro, Liang Pu, Rahul Agarwal, Mohamed Ali Jamaoui, Michael (Stu) Stewart, Mike Müller, NRauschmayr, Prakhar Srivastav, sad-, sfermigier, Sheng Zha, sundeepteki, topecongiro, tpdi, vermicelli, Vishaal Kapoor, vishwesh5, YaYaB, Yuhong Chen, Evgeniy Smirnov, lgov, Simon Corston-Oliver, IgorDzreyev, Ha Nguyen, pmuens, alukovenko, senorcinco, vfdev-5, dsweet, Mohammad Mahdi Rahimi, Abhishek Gupta, uwsd, DomKM, Lisa Oakley, Bowen Li, Aarush Ahuja, prasanth5reddy, brianhendee, mani2106, mtn, lkevinzc, caojilin, Lakshya, Fiete Lüer, Surbhi Vijayvargeeya, Muhyun Kim, dennismalmgren, adursun, Anirudh Dagar, liqingnz, Pedro Larroy, lgov, ati-ozgur, goldmermaid, Jun Wu, Matthias Blume, apeforest, geogunow, Josh Gardner, Maximilian Böther, Rakib Islam, Leonard Lausen, Abhinav Upadhyay, rongruosong, Steve Sedlmeyer, ruslo, Rafael Schlatter, liusy182, GIannis Pappas, ruslo, ati-ozgur, qbaza, dchoi77.
-
-Moreover, we thank Amazon Web Services, especially Swami Sivasubramanian, Raju Gulabani, Charlie Bell, and Andrew Jassy for their generous support in writing this book. Without the available time, resources, discussions with colleagues, and continuous encouragement this book would not have happened.
+We are indebted to the hundreds of contributors for both
+the English and the Chinese drafts.
+They helped improve the content and offered valuable feedback.
+Specifically, we thank every contributor of this English draft
+for making it better for everyone.
+Their GitHub IDs or names are (in no particular order):
+alxnorden, avinashingit, bowen0701, brettkoonce, Chaitanya Prakash Bapat,
+cryptonaut, Davide Fiocco, edgarroman, gkutiel, John Mitro, Liang Pu, Rahul Agarwal, mohamed-ali,
+mstewart141, Mike Müller, NRauschmayr, Prakhar Srivastav, sad-, sfermigier, Sheng Zha, sundeepteki,
+topecongiro, tpdi, vermicelli, Vishaal Kapoor, vishwesh5, YaYaB, Yuhong Chen, Evgeniy Smirnov, lgov, Simon Corston-Oliver, IgorDzreyev, trungha-ngx, pmuens, alukovenko, senorcinco, vfdev-5, dsweet, Mohammad Mahdi Rahimi, Abhishek Gupta, uwsd, DomKM, Lisa Oakley, bowen0701, arush15june, prasanth5reddy, brianhendee, mani2106, mtn, lkevinzc, caojilin, Lakshya, Fiete Lüer, Surbhi Vijayvargeeya, Muhyun Kim, dennismalmgren, adursun, Anirudh Dagar, liqingnz, Pedro Larroy, lgov, ati-ozgur, goldmermaid, Jun Wu, Matthias Blume.
+Moreover, we thank Amazon Web Services, especially Swami Sivasubramanian,
+Raju Gulabani, Charlie Bell, and Andrew Jassy for their generous support in writing this book.
+Without the available time, resources, discussions with colleagues,
+and continuous encouragement this book would not have happened.
 
 
 ## Summary

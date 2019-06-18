@@ -13,8 +13,9 @@ because we will be doing the heavy lifting ourselves.)
 
 ```{.python .input  n=1}
 import d2l
-from mxnet import autograd, nd, gluon
+from mxnet import autograd, np, npx, gluon
 from IPython import display
+npx.set_np()
 ```
 
 We will work with the Fashion-MNIST dataset just introduced,
@@ -47,8 +48,8 @@ with Gaussian noise and our biases to take the initial value $0$.
 num_inputs = 784
 num_outputs = 10
 
-W = nd.random.normal(scale=0.01, shape=(num_inputs, num_outputs))
-b = nd.zeros(num_outputs)
+W = np.random.normal(0, 0.01, (num_inputs, num_outputs))
+b = np.zeros(num_outputs)
 ```
 
 Recall that we need to *attach gradients* to the model parameters.
@@ -76,8 +77,8 @@ rather than collapsing out the dimension that we summed over
 we can specify `keepdims=True` when invoking `sum`.
 
 ```{.python .input  n=5}
-X = nd.array([[1, 2, 3], [4, 5, 6]])
-X.sum(axis=0, keepdims=True), X.sum(axis=1, keepdims=True)
+X = np.array([[1, 2, 3], [4, 5, 6]])
+print(X.sum(axis=0, keepdims=True), '\n', X.sum(axis=1, keepdims=True))
 ```
 
 We are now ready to implement the softmax function.
@@ -103,7 +104,7 @@ over an ensemble of particles).
 
 ```{.python .input  n=6}
 def softmax(X):
-    X_exp = X.exp()
+    X_exp = np.exp(X)
     partition = X_exp.sum(axis=1, keepdims=True)
     return X_exp / partition  # The broadcast mechanism is applied here
 ```
@@ -117,7 +118,7 @@ as we did in
 :numref:`chapter_naive_bayes`.
 
 ```{.python .input  n=7}
-X = nd.random.normal(shape=(2, 5))
+X = np.random.normal(size=(2, 5))
 X_prob = softmax(X)
 X_prob, X_prob.sum(axis=1)
 ```
@@ -133,7 +134,7 @@ before passing the data through our model.
 
 ```{.python .input  n=8}
 def net(X):
-    return softmax(nd.dot(X.reshape((-1, num_inputs)), W) + b)
+    return softmax(np.dot(X.reshape((-1, num_inputs)), W) + b)
 ```
 
 ## The Loss Function
@@ -155,9 +156,9 @@ Below, we illustrate the `pick` function on a toy example,
 with 3 categories and 2 examples.
 
 ```{.python .input  n=9}
-y_hat = nd.array([[0.1, 0.3, 0.6], [0.3, 0.2, 0.5]])
-y = nd.array([0, 2], dtype='int32')
-nd.pick(y_hat, y)
+y_hat = np.array([[0.1, 0.3, 0.6], [0.3, 0.2, 0.5]])
+y_hat[[0, 1], [0, 2]]
+
 ```
 
 Now we can implement the cross-entropy loss function efficiently
@@ -165,7 +166,7 @@ with just one line of code.
 
 ```{.python .input  n=10}
 def cross_entropy(y_hat, y):
-    return - nd.pick(y_hat, y).log()
+    return - np.log(y_hat[range(len(y_hat)), y])
 ```
 
 ## Classification Accuracy
@@ -191,7 +192,7 @@ Taking the mean yields the desired result.
 ```{.python .input  n=11}
 # Save to the d2l package.
 def accuracy(y_hat, y):
-    return (y_hat.argmax(axis=1) == y.astype('float32')).sum().asscalar()
+    return (y_hat.argmax(axis=1) == y.astype('float32')).sum()
 ```
 
 We will continue to use the variables `y_hat` and `y`
@@ -206,6 +207,7 @@ which is consistent with the actual label, 2.
 Therefore, the classification accuracy rate for these two examples is 0.5.
 
 ```{.python .input  n=12}
+y = np.array([0, 2])
 accuracy(y_hat, y) / len(y)
 ```
 
@@ -217,7 +219,6 @@ Similarly, we can evaluate the accuracy for model `net` on the data set
 def evaluate_accuracy(net, data_iter):
     metric = Accumulator(2) # num_corrected_examples, num_examples
     for X, y in data_iter:
-        y = y.astype('float32')
         metric.add(accuracy(net(X), y), y.size)
     return metric[0] / metric[1]
 ```
@@ -265,7 +266,7 @@ def train_epoch_ch3(net, train_iter, loss, updater):
             l = loss(y_hat, y)
         l.backward()
         updater(X.shape[0])
-        metric.add(l.sum().asscalar(), accuracy(y_hat, y), y.size)
+        metric.add(l.sum(), accuracy(y_hat, y), y.size)
     # Return training loss and training accuracy
     return metric[0]/metric[2], metric[1]/metric[2]
 ```
@@ -307,7 +308,7 @@ class Animator(object):
         display.clear_output(wait=True)
 ```
 
-The training function then runs multiple epochs and visualize the training progress. 
+The training function then runs multiple epochs and visualize the training progress.
 
 ```{.python .input  n=17}
 # Save to the d2l package.
@@ -347,8 +348,8 @@ Given a series of images, we will compare their actual labels
 def predict_ch3(net, test_iter, n=6):
     for X, y in test_iter:
         break
-    trues = d2l.get_fashion_mnist_labels(y.asnumpy())
-    preds = d2l.get_fashion_mnist_labels(net(X).argmax(axis=1).asnumpy())
+    trues = d2l.get_fashion_mnist_labels(y)
+    preds = d2l.get_fashion_mnist_labels(net(X).argmax(axis=1))
     titles = [true+'\n'+ pred for true, pred in zip(trues, preds)]
     d2l.show_images(X[0:n].reshape((n,28,28)), 1, n, titles=titles[0:n])
 

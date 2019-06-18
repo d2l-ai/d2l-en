@@ -20,8 +20,9 @@ To start off, we import the packages required to run this section's experiments.
 ```{.python .input  n=1}
 %matplotlib inline
 import d2l
-from mxnet import autograd, nd
+from mxnet import autograd, np, npx
 import random
+npx.set_np()
 ```
 
 ## Generating Data Sets
@@ -54,12 +55,12 @@ The following code generates our synthetic dataset:
 # Save to the d2l package.
 def synthetic_data(w, b, num_examples):
     """generate y = X w + b + noise"""
-    X = nd.random.normal(scale=1, shape=(num_examples, len(w)))
-    y = nd.dot(X, w) + b
-    y += nd.random.normal(scale=0.01, shape=y.shape)
+    X = np.random.normal(0, 1, (num_examples, len(w)))
+    y = np.dot(X, w) + b
+    y += np.random.normal(0, 0.01, y.shape)
     return X, y
 
-true_w = nd.array([2, -3.4])
+true_w = np.array([2, -3.4])
 true_b = 4.2
 features, labels = synthetic_data(true_w, true_b, 1000)
 ```
@@ -67,7 +68,7 @@ features, labels = synthetic_data(true_w, true_b, 1000)
 Note that each row in `features` consists of a 2-dimensional data point and that each row in `labels` consists of a 1-dimensional target value (a scalar).
 
 ```{.python .input  n=3}
-features[0], labels[0]
+print('features:', features[0],'\nlabel:', labels[0])
 ```
 
 By generating a scatter plot using the second `features[:, 1]` and `labels`, we can clearly observe the linear correlation between the two.
@@ -93,10 +94,8 @@ def data_iter(batch_size, features, labels):
     # The examples are read at random, in no particular order
     random.shuffle(indices)
     for i in range(0, num_examples, batch_size):
-        j = nd.array(indices[i: min(i + batch_size, num_examples)])
-        yield features.take(j), labels.take(j)
-        # The “take” function will then return the corresponding element
-        # based on the indices
+        batch_indices = np.array(indices[i: min(i + batch_size, num_examples)])
+        yield features[batch_indices], labels[batch_indices]
 ```
 
 In general, note that we want to use reasonably sized minibatches to take advantage of the GPU hardware, which excels at parallelizing operations. Because each example can be fed through our models in parallel and the gradient of the loss function for each example can also be taken in parallel, GPUs allow us to process hundreds of examples in scarcely more time than it might take to process just a single example.
@@ -107,7 +106,7 @@ To build some intuition, let's read and print the first small batch of data exam
 batch_size = 10
 
 for X, y in data_iter(batch_size, features, labels):
-    print(X, y)
+    print(X, '\n', y)
     break
 ```
 
@@ -131,8 +130,8 @@ random numbers from a normal distribution with mean 0
 and a standard deviation of 0.01, setting the bias $b$ to 0.
 
 ```{.python .input  n=7}
-w = nd.random.normal(scale=0.01, shape=(2, 1))
-b = nd.zeros(shape=(1,))
+w = np.random.normal(0, 0.01, (2, 1))
+b = np.zeros(1)
 ```
 
 Now that we have initialized our parameters,
@@ -174,7 +173,7 @@ the scalar is added to each component of the vector.
 ```{.python .input  n=9}
 # Save to the d2l package. 
 def linreg(X, w, b):
-    return nd.dot(X, w) + b
+    return np.dot(X, w) + b
 ```
 
 ## Define the Loss Function

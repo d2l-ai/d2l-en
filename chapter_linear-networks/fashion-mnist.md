@@ -12,6 +12,7 @@ First, import the packages or modules required in this section.
 import d2l
 from mxnet import gluon 
 import sys
+d2l.use_svg_display()
 ```
 
 Again, Gluon provides a similar `FashionMNIST` class to download and load this dataset.

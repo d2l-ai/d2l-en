@@ -299,7 +299,7 @@ Now we are ready to state one of the most fundamental theorems in statistics, th
 
 ```{.python .input}
 # Generate 10 random sequences of 10,000 uniformly distributed random variables
-tmp = np.random.uniform(size=(10000,10))
+tmp = onp.random.uniform(size=(10000,10))
 x = 1.0 * (tmp > 0.3) + 1.0 * (tmp > 0.8)
 mean = 1 * 0.5 + 2 * 0.2
 variance = 1 * 0.5 + 4 * 0.2 - mean**2
@@ -310,10 +310,10 @@ y = onp.arange(1,10001).reshape(10000,1)
 z = onp.cumsum(x,axis=0) / y
 
 for i in range(10):
-    plt.semilogx(y,z[:,i])
+    plt.semilogx(y, z[:,i])
 
-plt.semilogx(y,(variance**0.5) * np.power(y,-0.5) + mean,'r')
-plt.semilogx(y,-(variance**0.5) * np.power(y,-0.5) + mean,'r');
+plt.semilogx(y, (variance**0.5) * onp.power(y,-0.5) + mean,'r')
+plt.semilogx(y,-(variance**0.5) * onp.power(y,-0.5) + mean,'r');
 ```
 
 This looks very similar to the initial example, at least in the limit of averages of large numbers of variables. This is confirmed by theory. Denote by
