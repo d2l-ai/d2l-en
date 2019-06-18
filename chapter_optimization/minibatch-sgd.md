@@ -164,7 +164,7 @@ Use Gluon to repeat the last experiment.
 
 ```{.python .input  n=10}
 data_iter, _ = get_data_ch10(10)
-train_gluon_ch10('sgd', {'learning_rate': 0.05}, data_iter);
+train_gluon_ch10('sgd', {'learning_rate': 0.05}, data_iter)
 ```
 
 ## Summary
