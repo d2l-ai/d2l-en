@@ -9,7 +9,7 @@ Each person's genes uniquely identify them,
 not just among people represented in our dataset,
 but among all people on earth!
 
-Given the genetic markers representing a some person,
+Given the genetic markers representing some person,
 we don't want our model to simply recognize "oh, that's Bob",
 and then output the classification,
 say among {*dementia*, *mild cognitive impairment*, *healthy*},
@@ -17,10 +17,10 @@ that corresponds to Bob.
 Rather, our goal is to discover patterns
 that capture regularities in the underlying population
 from which our training set was drawn.
-If we are successfuly in this endeavour,
-then we can could successfully assess risk
+If we are successfully in this endeavor,
+then we could successfully assess risk
 even for individuals that we have never encountered before.
-This problem---how to disover patterns that *generalize*---is
+This problem---how to discover patterns that *generalize*---is
 the fundamental problem of machine learning.
 
 
@@ -83,7 +83,7 @@ were we to apply it to an infinite stream of additional data points
 drawn from the same underlying data distribution as our original sample.
 
 Problematically, *we can never calculate the generalization error exactly*.
-That's because the imaginary stream of inifinit data is an imaginary object.
+That's because the imaginary stream of infinite data is an imaginary object.
 In practice, we must *estimate* the generalization error
 by applying our model to an independent test set
 constituted of a random selection of data points
@@ -104,19 +104,19 @@ Another student might prepare by trying to understand
 the reasons for giving certain answers.
 In most cases, the latter student will do much better.
 
-Likewise, consider a model that simply uses a lookup table to answer questions. If the set of allowable inputs is discrete and reasonably small, then perhaps after viewing *many* training examples, this approach would perform well. Still this model has no ability to do better than random guessing when faced with exampels that it has never seen before.
-In reality the input spaces are far too large to memorize the answers corresponding to every conceivable input. For example, consider the black and white $28\times28$ images. If each pixel can take one among $256$ gray scale values, then there are $256^784$ possible images. That means that there are far more low-res grayscale thumbnail-sized images than there are atoms in the universe. Even if we could encounter this data, we could never afford to store the lookuptable.
+Likewise, consider a model that simply uses a lookup table to answer questions. If the set of allowable inputs is discrete and reasonably small, then perhaps after viewing *many* training examples, this approach would perform well. Still this model has no ability to do better than random guessing when faced with examples that it has never seen before.
+In reality the input spaces are far too large to memorize the answers corresponding to every conceivable input. For example, consider the black and white $28\times28$ images. If each pixel can take one among $256$ gray scale values, then there are $256^{784}$ possible images. That means that there are far more low-res grayscale thumbnail-sized images than there are atoms in the universe. Even if we could encounter this data, we could never afford to store the lookup table.
 
 Lastly, consider the problem of trying
 to classify the outcomes of coin tosses (class 0: heads, class 1: tails)
 based on some contextual features that might be available.
-No matter what what algorithm we come up with,
+No matter what algorithm we come up with,
 because the generalization error will always be $\frac{1}{2}$.
 However, for most algorithms,
 we should expect our training error to be considerably lower,
 depending on the luck of the draw,
 even if we didn't have any features!
-Consder the dataset {0, 1, 1, 1, 0, 1}.
+Consider the dataset {0, 1, 1, 1, 0, 1}.
 Our feature-less would have to fall back on always predicting
 the *majority class*, which appears from our limited sample to be *1*.
 In this case, the model that always predicts class 1
@@ -146,7 +146,7 @@ In the **standard supervised learning setting**, which we have addressed up unti
 we assume that both the training data and the test data
 are drawn *independently* from *identical* distributions
 (commonly called the i.i.d. assumption).
-This means that when whatever process samples our data has no *memory*.
+This means that the process that samples our data has no *memory*.
 The 2nd example drawn and the 3rd drawn
 are no more correlated than the 2nd and the 2-millionth sample drawn.
 
@@ -170,10 +170,10 @@ and yet we have useful tools for face recognition,
 speech recognition, language translation, etc.
 
 Other violations are sure to cause trouble.
-Imagine, ofr example, if we tried to train
+Imagine, for example, if we tried to train
 a face recognition system by training it
-exclusivey on university students
-and then and then want to deploy it as a tool
+exclusively on university students
+and then want to deploy it as a tool
 for monitoring geriatrics in a nursing home population.
 This is unlikely to work well since college students
 tend to look considerably different from the elderly.
@@ -186,11 +186,11 @@ Moreover, elucidating the precise theoretical foundations
 that might explain why deep neural networks generalize as well as they do
 continues to vexes the greatest minds in learning theory.
 
-When we train our models, we attempt are searching for a function
+When we train our models, we attempt searching for a function
 that fits the training data as well as possible.
 If the function is so flexible that it can catch on to spurious patterns
 just as easily as to the true associations,
-then it might peform *too well* without producing a model
+then it might perform *too well* without producing a model
 that generalizes well to unseen data.
 This is precisely what we want to avoid (or at least control).
 Many of the techniques in deep learning are heuristics and tricks
@@ -264,11 +264,11 @@ we will typically employ a validation set.
 ### Validation Data Set
 
 In principle we should not touch our test set
-until after we have chosen our all our hyper-parameters.
+until after we have chosen all our hyper-parameters.
 Were we to use the test data in the model selection process,
 there's a risk that we might overfit the test data.
 Then we would be in serious trouble.
-If we over fit our training data,
+If we overfit our training data,
 there's always the evaluation on test data to keep us honest.
 But if we overfit the test data, how would we ever know?
 
@@ -310,7 +310,7 @@ When training data is scarce,
 we might not even be able to afford to hold out
 enough data to constitute a proper validation set.
 One popular solution to this problem is to employ
-*$K$-fold cross-validation*.
+$K$*-fold cross-validation*.
 Here, the original training data is split into $K$ non-overlapping subsets.
 Then model training and validation are executed $K$ times,
 each time training on $K-1$ subsets and validating
@@ -330,15 +330,15 @@ If the model is unable to reduce the training error,
 that could mean that our model is too simple
 (i.e., insufficiently expressive)
 to capture the pattern that we are trying to model.
-Moreover, since the *generalziation gap*
-between our training and valdiation errors is small,
+Moreover, since the *generalization gap*
+between our training and validation errors is small,
 we have reason to believe that we could get away with a more complex model.
 This phenomenon is known as underfitting.
 
 On the other hand, as we discussed above,
 we want to watch out for the cases
 when our training error is significantly lower
-than our calidation error, indicating severe overfitting.
+than our validation error, indicating severe overfitting.
 Note that overfitting is not always a bad thing.
 With deep learning especially, it's well known
 that the best predictive models often perform
@@ -346,7 +346,7 @@ far better on training data than on holdout data.
 Ultimately, we usually care more about the validation error
 than about the gap between the training and validation errors.
 
-Whether we ovefit or underfit can depend
+Whether we overfit or underfit can depend
 both on the complexity of our model
 and the size of the available training datasets,
 two topics that we discuss below.
@@ -364,7 +364,7 @@ $$\hat{y}= \sum_{i=0}^d x^i w_i$$
 
 to estimate the labels $y$.
 This is just a linear regression problem
-where our featrues are given by the powers of $x$,
+where our features are given by the powers of $x$,
 the $w_i$ given the model’s weights,
 and the bias is given by $w_0$ since $x^0 = 1$ for all $x$.
 Since this is just a linear regression problem,
@@ -392,7 +392,7 @@ and under- vs over-fitting below.
 
 The other big consideration to bear in mind is the dataset size.
 Fixing our model, the fewer samples we have in the training dataset,
-the more likely (and more serverely) we are to encounter overfitting.
+the more likely (and more severely) we are to encounter overfitting.
 As we increase the amount of training data,
 the generalization error typically decreases.
 Moreover, in general, more data never hurts.
@@ -415,8 +415,9 @@ To get started we'll import our usual packages.
 
 ```{.python .input  n=1}
 import d2l
-from mxnet import autograd, gluon, nd
+from mxnet import autograd, gluon, np, npx
 from mxnet.gluon import nn
+npx.set_np()
 ```
 
 ### Generating Data Sets
@@ -432,17 +433,17 @@ We'll synthesize 100 samples each for the training set and test set.
 
 ```{.python .input  n=2}
 maxdegree = 20  # Maximum degree of the polynomial
-n_train, n_test = 100, 1000  # Training and test data set sizes
-true_w = nd.zeros(maxdegree)  # Allocate lots of empty space
-true_w[0:4] = nd.array([5, 1.2, -3.4, 5.6])
+n_train, n_test = 100, 100  # Training and test data set sizes
+true_w = np.zeros(maxdegree)  # Allocate lots of empty space
+true_w[0:4] = np.array([5, 1.2, -3.4, 5.6])
 
-features = nd.random.normal(shape=(n_train + n_test, 1))
-features = nd.random.shuffle(features)
-poly_features = nd.power(features, nd.arange(maxdegree).reshape((1, -1)))
+features = np.random.normal(size=(n_train + n_test, 1))
+features = np.random.shuffle(features)
+poly_features = np.power(features, np.arange(maxdegree).reshape((1, -1)))
 poly_features = poly_features / (
-    nd.gamma(nd.arange(maxdegree) + 1).reshape((1, -1)))
-labels = nd.dot(poly_features, true_w)
-labels += nd.random.normal(scale=0.1, shape=labels.shape)
+    npx.gamma(np.arange(maxdegree) + 1).reshape((1, -1)))
+labels = np.dot(poly_features, true_w)
+labels += np.random.normal(scale=0.1, size=labels.shape)
 ```
 
 For optimization, we typically want to avoid
@@ -471,7 +472,7 @@ def evaluate_loss(net, data_iter, loss):
     """Evaluate the loss of a model on the given dataset"""
     metric = d2l.Accumulator(2)  # sum_loss, num_examples
     for X, y in data_iter:
-        metric.add(loss(net(X), y).sum().asscalar(), y.size)
+        metric.add(loss(net(X), y).sum(), y.size)
     return metric[0] / metric[1]
 ```
 
