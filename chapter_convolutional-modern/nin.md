@@ -12,7 +12,7 @@ earlier in the process.
 However, a careless use of dense layers might give up the
 spatial structure of the representation entirely,
 Network in Network (NiN) blocks offer an alternative.
-They were proposed by [Lin, Chen and Yan, 2013](https://arxiv.org/pdf/1312.4400.pdf) based on a very simple insight---to
+They were proposed in :cite:`Lin.Chen.Yan.2013` based on a very simple insight---to
 use an MLP on the channels for each pixel separately.
 
 ## NiN Blocks
