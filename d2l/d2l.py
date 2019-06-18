@@ -314,7 +314,7 @@ def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
                             'sgd', {'learning_rate': lr})
     animator = d2l.Animator(xlabel='epoch', xlim=[0,num_epochs],
                             legend=['train loss','train acc','test acc'])
-    timer = Timer()
+    timer = d2l.Timer()
     for epoch in range(num_epochs):
         train_l_sum, train_acc_sum, n = 0.0, 0.0, 0
         for i, (X, y) in enumerate(train_iter):
@@ -331,7 +331,7 @@ def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
             n += X.shape[0]
             timer.stop()
             if (i+1) % 50 == 0:
-                animator.add(epoch+i/len(train_iter), 
+                animator.add(epoch+i/len(train_iter),
                              (train_l_sum/n, train_acc_sum/n, None))
         test_acc = evaluate_accuracy_gpu(net, test_iter)
         animator.add(epoch+1, (None, None, test_acc))
