@@ -37,7 +37,8 @@ def set_figsize(figsize=(3.5, 2.5)):
 def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
     """Plot a list of images."""
     figsize = (num_cols * scale, num_rows * scale)
-    axes = plt.subplots(num_rows, num_cols, figsize=figsize)[1].flatten()
+    _, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize)
+    axes = axes.flatten()
     for i, (ax, img) in enumerate(zip(axes, imgs)):
         ax.imshow(img.asnumpy())
         ax.axes.get_xaxis().set_visible(False)
@@ -250,7 +251,7 @@ def try_all_gpus():
     """Return all available GPUs, or [cpu(),] if no GPU exists."""
     ctxes = [context.gpu(i) for i in range(context.num_gpus())]
     return ctxes if ctxes else [context.cpu()]
-        
+
 
 # Defined in file: ./chapter_convolutional-neural-networks/conv-layer.md
 def corr2d(X, K):
@@ -348,7 +349,7 @@ class Residual(nn.Block):
             self.conv3 = None
         self.bn1 = nn.BatchNorm()
         self.bn2 = nn.BatchNorm()
-    
+
     def forward(self, X):
         Y = nd.relu(self.bn1(self.conv1(X)))
         Y = self.bn2(self.conv2(Y))
