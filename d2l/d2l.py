@@ -275,7 +275,7 @@ def evaluate_loss(net, data_iter, loss):
 # Defined in file: ./chapter_deep-learning-computation/use-gpu.md
 def try_gpu(i=0):
     """Return gpu(i) if exists, otherwise return cpu()."""
-    return context.gpu(i) if context.num_gpus() >= i else context.cpu()
+    return context.gpu(i) if context.num_gpus() >= i + 1 else context.cpu()
 
 
 # Defined in file: ./chapter_deep-learning-computation/use-gpu.md
