@@ -34,7 +34,7 @@ and the channel as equivalent to a feature.
 The figure below illustrates the main structural differences
 between NiN and AlexNet, VGG, and other networks.
 
-![The figure on the left shows the network structure of AlexNet and VGG, and the figure on the right shows the network structure of NiN. ](../img/nin-compare.svg)
+![The figure on the left shows the network structure of AlexNet and VGG, and the figure on the right shows the network structure of NiN. ](../img/nin.svg)
 
 The NiN block consists of one convolutional layer
 followed by two $1\times 1$ convolutional layers that act as

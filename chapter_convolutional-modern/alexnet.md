@@ -220,7 +220,7 @@ Note that we provide a slightly streamlined version of AlexNet
 removing some of the design quirks that were needed in 2012
 to make the model fit on two small GPUs.
 
-![LeNet (left) and AlexNet (right)](../img/alexnet-all.svg)
+![LeNet (left) and AlexNet (right)](../img/alexnet.svg)
 
 The design philosophies of AlexNet and LeNet are very similar,
 but there are also significant differences.
