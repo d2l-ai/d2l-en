@@ -48,6 +48,12 @@ stage("Build and Publish") {
       mv _build/data_tmp _build/eval/data
       """
 
+      if (env.BRANCH_NAME == 'numpy2) {
+        sh label:"Publish", script:"""set -ex
+        conda activate ${ENV_NAME}
+        d2lbook deploy html pdf pkg
+      """
+      }
 	}
   }
 }
