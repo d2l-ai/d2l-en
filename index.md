@@ -6,12 +6,14 @@ Dive into Deep Learning
    :file: frontpage.html
 ```
 
+
 ```toc
 :maxdepth: 1
 
 chapter_preface/preface
 chapter_install/install
 ```
+
 
 ```toc
 :maxdepth: 2
@@ -20,6 +22,8 @@ chapter_install/install
 chapter_introduction/intro
 chapter_crashcourse/index
 chapter_linear-networks/index
+```
+
 chapter_multilayer-perceptrons/index
 chapter_deep-learning-computation/index
 chapter_convolutional-neural-networks/index
@@ -32,7 +36,7 @@ chapter_computer-vision/index
 chapter_natural-language-processing/index
 chapter_generative_adversarial_networks/index
 chapter_appendix/index
-```
+
 
 ```toc
 :maxdepth: 1
