@@ -926,7 +926,6 @@ def train_gluon_ch10(trainer_name, trainer_hyperparams,
                              d2l.evaluate_loss(net, data_iter, loss))
                 timer.start()
     print('loss: %.3f, %.3f sec/epoch'%(animator.Y[0][-1], timer.avg()))
-    return timer.cumsum(), animator.Y[0]
 
 # Defined in file: ./chapter_computational-performance/multiple-gpus.md
 def split_batch(X, y, ctx_list):

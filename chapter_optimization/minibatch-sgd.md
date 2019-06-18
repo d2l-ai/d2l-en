@@ -19,7 +19,7 @@ The cost for computing each iteration is $\mathcal{O}(|\mathcal{B}|)$. When the 
 
 ## Reading Data
 
-In this chapter, we will use a data set developed by NASA to test the wing noise from different aircraft to compare these optimization algorithms[1]. We will use the first 1500 examples of the data set, 5 features, and a normalization method to preprocess the data.
+In this chapter, we will use a [data set](https://archive.ics.uci.edu/ml/datasets/Airfoil+Self-Noise) developed by NASA to test the wing noise from different aircraft to compare these optimization algorithms. We will use the first 1500 examples of the data set, 5 features, and a normalization method to preprocess the data.
 
 ```{.python .input  n=1}
 %matplotlib inline
@@ -158,7 +158,6 @@ def train_gluon_ch10(trainer_name, trainer_hyperparams,
                              d2l.evaluate_loss(net, data_iter, loss))
                 timer.start()
     print('loss: %.3f, %.3f sec/epoch'%(animator.Y[0][-1], timer.avg()))
-    return timer.cumsum(), animator.Y[0]
 ```
 
 Use Gluon to repeat the last experiment.
@@ -179,11 +178,6 @@ train_gluon_ch10('sgd', {'learning_rate': 0.05}, data_iter);
 * Modify the batch size and learning rate and observe the rate of decline for the value of the objective function and the time consumed in each epoch.
 * Read the MXNet documentation and use the `Trainer` class `set_learning_rate` function to reduce the learning rate of the mini-batch SGD to 1/10 of its previous value after each epoch.
 
-
-
-## Reference
-
-[1] Aircraft wing noise data set. https://archive.ics.uci.edu/ml/datasets/Airfoil+Self-Noise
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2373)
 
