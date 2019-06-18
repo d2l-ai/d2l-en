@@ -1,5 +1,5 @@
 stage("Build and Publish") {
-  def TASK = "d2l-en-classic"
+  def TASK = "d2l-en-numpy2"
   node {
     ws("workspace/${TASK}") {
       checkout scm
@@ -9,9 +9,9 @@ stage("Build and Publish") {
 
       sh label: "Build Environment", script: """set -ex
       rm -rf ~/miniconda3/envs/${ENV_NAME}
-      conda create -n ${ENV_NAME} pip python=3.7.3 -y
+      conda create -n ${ENV_NAME} pip -y
       conda activate ${ENV_NAME}
-      pip install mxnet-cu100==1.5.0
+      pip install https://s3-us-west-2.amazonaws.com/apache-mxnet/dist/python/numpy/20190618/mxnet-1.5.0b20190618-py2.py3-none-manylinux1_x86_64.whl
       pip install git+https://github.com/d2l-ai/d2l-book
       python setup.py develop
       pip list
@@ -24,12 +24,12 @@ stage("Build and Publish") {
 
       sh label: "Execute Notebooks", script: """set -ex
       conda activate ${ENV_NAME}
-      export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
       d2lbook build eval
       """
 
       sh label:"Build HTML", script:"""set -ex
       conda activate ${ENV_NAME}
+      export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
       ./static/build_html.sh
       """
 
@@ -48,12 +48,6 @@ stage("Build and Publish") {
       mv _build/data_tmp _build/eval/data
       """
 
-      if (env.BRANCH_NAME == 'classic') {
-        sh label:"Publish", script:"""set -ex
-        conda activate ${ENV_NAME}
-        d2lbook deploy html pdf pkg
-      """
-      }
 	}
   }
 }
