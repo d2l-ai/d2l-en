@@ -4,7 +4,7 @@ stage("Build and Publish") {
     ws("workspace/${TASK}") {
       checkout scm
       def ENV_NAME = "${TASK}-${EXECUTOR_NUMBER}";
-      def CUDA_VISIBLE_DEVICES=${EXECUTOR_NUMBER}.toInteger()*2;
+      def CUDA_VISIBLE_DEVICES=EXECUTOR_NUMBER.toInteger()*2;
 
       sh """
       echo ${CUDA_VISIBLE_DEVICES}
