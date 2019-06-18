@@ -250,7 +250,7 @@ evaluate_accuracy(net, test_iter)
 
 The training loop for softmax regression should look strikingly familiar
 if you read through our implementation
-of linear regression in :numref:`chapter_linear_scratch`. Here we refactor the implementation to make it reusable. First, we define a function to train for one data epoch. Note that `updater` is general function to update the model parameters, which accepts the batch size as an argument.  
+of linear regression in :numref:`chapter_linear_scratch`. Here we refactor the implementation to make it reusable. First, we define a function to train for one data epoch. Note that `updater` is general function to update the model parameters, which accepts the batch size as an argument.
 
 ```{.python .input  n=15}
 # Save to the d2l package.
@@ -305,7 +305,7 @@ class Animator(object):
         display.clear_output(wait=True)
 ```
 
-The training function then runs multiple epochs and visualize the training progress.
+The training function then runs multiple epochs and visualize the training progress. The `updater` here can be either a wrapper of `d2l.sgd` or a Gluon trainer. 
 
 ```{.python .input  n=17}
 # Save to the d2l package.
