@@ -199,38 +199,6 @@ def evaluate_accuracy_gpu(net, data_iter, ctx=None):
     return acc_sum.asscalar() / n
 ```
 
-Since the computation is complex, we are paying attention to the computation time. We define a timer to do simply analysis of the running time.
-
-```{.python .input}
-# Save to the d2l package.
-class Timer(object):
-    """Record multiple running times."""
-    def __init__(self):
-        self.times = []
-        self.start()
-        
-    def start(self):
-        """Start the timer"""
-        self.start_time = time.time()
-    
-    def stop(self):
-        """Stop the timer and record the time in a list"""
-        self.times.append(time.time() - self.start_time)
-        return self.times[-1]
-        
-    def avg(self):
-        """Return the average time"""
-        return sum(self.times)/len(self.times)
-    
-    def sum(self):
-        """Return the sum of time"""
-        return sum(self.times)
-        
-    def cumsum(self):
-        """Return the accumuated times"""
-        return np.array(self.times).cumsum().tolist()
-```
-
 We also need to update our training function to deal with GPUs.
 Unlike the `train_epoch_ch3` defined in :numref:`chapter_softmax_scratch`, we now need to move each batch of data to our designated context (hopefully, the GPU)
 prior to making the forward and backward passes.
@@ -250,7 +218,7 @@ def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
                             'sgd', {'learning_rate': lr})
     animator = d2l.Animator(xlabel='epoch', xlim=[0,num_epochs],
                             legend=['train loss','train acc','test acc'])
-    timer = Timer()
+    timer = d2l.Timer()
     for epoch in range(num_epochs):
         train_l_sum, train_acc_sum, n = 0.0, 0.0, 0
         for i, (X, y) in enumerate(train_iter):
@@ -267,7 +235,7 @@ def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
             n += X.shape[0]
             timer.stop()
             if (i+1) % 50 == 0:
-                animator.add(epoch+i/len(train_iter), 
+                animator.add(epoch+i/len(train_iter),
                              (train_l_sum/n, train_acc_sum/n, None))
         test_acc = evaluate_accuracy_gpu(net, test_iter)
         animator.add(epoch+1, (None, None, test_acc))
