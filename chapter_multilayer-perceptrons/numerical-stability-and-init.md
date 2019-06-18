@@ -81,12 +81,13 @@ vis-a-vis vanishing gradients.
 ```{.python .input}
 %matplotlib inline
 import d2l
-from mxnet import nd, autograd
+from mxnet import np, npx, autograd
+npx.set_np()
 
-x = nd.arange(-8.0, 8.0, 0.1)
+x = np.arange(-8.0, 8.0, 0.1)
 x.attach_grad()
 with autograd.record():
-    y = x.sigmoid()
+    y = npx.sigmoid(x)
 y.backward()
 
 d2l.plot(x, [y, x.grad], legend=['sigmoid', 'gradient'], figsize=(4.5, 2.5))
@@ -122,10 +123,10 @@ we would have no realistic chance of getting
 a gradient descent optimizer to converge.
 
 ```{.python .input  n=5}
-M = nd.random.normal(shape=(4,4))
+M = np.random.normal(size=(4,4))
 print('A single matrix', M)
 for i in range(100):
-    M = nd.dot(M, nd.random.normal(shape=(4,4)))
+    M = np.dot(M, np.random.normal(size=(4,4)))
 
 print('After multiplying 100 matrices', M)
 ```
