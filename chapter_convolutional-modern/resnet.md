@@ -59,7 +59,7 @@ class Residual(nn.Block):
 
 This code generates two types of networks: one where we add the input to the output before applying the ReLU nonlinearity, and whenever `use_1x1conv=True`, one where we adjust channels and resolution by means of a $1 \times 1$ convolution before adding. The diagram below illustrates this:
 
-![Left: regular ResNet block; Right: ResNet block with 1x1 convolution](../img/ResNetBlock.svg)
+![Left: regular ResNet block; Right: ResNet block with 1x1 convolution](../img/resnet-block.svg)
 
 Now let us look at a situation where the input and output are of the same shape.
 

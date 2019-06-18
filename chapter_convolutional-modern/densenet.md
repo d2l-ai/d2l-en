@@ -16,7 +16,7 @@ by :cite:`Huang.Liu.Van-Der-Maaten.ea.2017` in the form of
 DenseNet, an architecture that reported record performance on the ImageNet
 dataset.
 
-![The main difference between ResNet (left) and DenseNet (right) in cross-layer connections: use of addition and use of concatenation. ](../img/densenet.svg)
+![The main difference between ResNet (left) and DenseNet (right) in cross-layer connections: use of addition and use of concatenation. ](../img/densenet-block.svg)
 
 The key difference between ResNet and DenseNet is that in the latter case outputs are *concatenated* rather than added. As a result we perform a mapping from $\mathbf{x}$ to its values after applying an increasingly complex sequence of functions.
 
@@ -24,7 +24,7 @@ $$\mathbf{x} \to \left[\mathbf{x}, f_1(\mathbf{x}), f_2(\mathbf{x}, f_1(\mathbf{
 
 In the end, all these functions are combined in an MLP to reduce the number of features again. In terms of implementation this is quite simple - rather than adding terms, we concatenate them. The name DenseNet arises from the fact that the dependency graph between variables becomes quite dense. The last layer of such a chain is densely connected to all previous layers. The main components that compose a DenseNet are dense blocks and transition layers. The former defines how the inputs and outputs are concatenated, while the latter controls the number of channels so that it is not too large.
 
-![Dense connections in DenseNet](../img/DenseNetDense.svg)
+![Dense connections in DenseNet](../img/densenet.svg)
 
 ## Dense Blocks
 

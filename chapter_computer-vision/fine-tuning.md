@@ -23,7 +23,7 @@ In this section, we introduce a common technique in transfer learning: fine tuni
 
 Next, we will use a specific example for practice: hot dog recognition. We will fine tune the ResNet model trained on the ImageNet data set based on a small data set. This small data set contains thousands of images, some of which contain hot dogs. We will use the model obtained by fine tuning to identify whether an image contains a hot dog.
 
-First, import the packages and modules required for the experiment.  Gluon's `model_zoo` package provides a common pre-trained model. If you want to get more pre-trained models for computer vision, you can use the GluonCV Toolkit[1].
+First, import the packages and modules required for the experiment.  Gluon's `model_zoo` package provides a common pre-trained model. If you want to get more pre-trained models for computer vision, you can use the [GluonCV Toolkit](https://gluon-cv.mxnet.io).
 
 ```{.python .input  n=1}
 %matplotlib inline
@@ -173,10 +173,6 @@ weight = pretrained_net.output.weight
 hotdog_w = nd.split(weight.data(), 1000, axis=0)[713]
 hotdog_w.shape
 ```
-
-## Reference
-
-[1] GluonCV Toolkit. https://gluon-cv.mxnet.io/
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2443)
 

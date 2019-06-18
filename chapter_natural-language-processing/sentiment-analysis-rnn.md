@@ -2,7 +2,13 @@
 :label:`chapter_sentiment_rnn`
 
 
-Similar to search synonyms and analogies, text classification is also a downstream application of word embedding. In this section, we will apply pre-trained word vectors and bidirectional recurrent neural networks with multiple hidden layers. We will use them to determine whether a text sequence of indefinite length contains positive or negative emotion. Import the required package or module before starting the experiment.
+Similar to search synonyms and analogies, text classification is also a
+downstream application of word embedding. In this section, we will apply
+pre-trained word vectors and bidirectional recurrent neural networks with
+multiple hidden layers :cite:`Maas.Daly.Pham.ea.2011`. We will use them to
+determine whether a text sequence of indefinite length contains positive or
+negative emotion. Import the required package or module before starting the
+experiment.
 
 ```{.python .input  n=2}
 import d2l
@@ -16,7 +22,16 @@ train_iter, test_iter, vocab = d2l.load_data_imdb(batch_size)
 
 ## Use a Recurrent Neural Network Model
 
-In this model, each word first obtains a feature vector from the embedding layer. Then, we further encode the feature sequence using a bidirectional recurrent neural network to obtain sequence information. Finally, we transform the encoded sequence information to output through the fully connected layer. Specifically, we can concatenate hidden states of bidirectional long-short term memory in the initial time step and final time step and pass it to the output layer classification as encoded feature sequence information. In the `BiRNN` class implemented below, the `Embedding` instance is the embedding layer, the `LSTM` instance is the hidden layer for sequence encoding, and the `Dense` instance is the output layer for generated classification results.
+In this model, each word first obtains a feature vector from the embedding
+layer. Then, we further encode the feature sequence using a bidirectional
+recurrent neural network to obtain sequence information. Finally, we transform
+the encoded sequence information to output through the fully connected
+layer. Specifically, we can concatenate hidden states of bidirectional
+long-short term memory in the initial time step and final time step and pass it
+to the output layer classification as encoded feature sequence information. In
+the `BiRNN` class implemented below, the `Embedding` instance is the embedding
+layer, the `LSTM` instance is the hidden layer for sequence encoding, and the
+`Dense` instance is the output layer for generated classification results.
 
 ```{.python .input  n=46}
 class BiRNN(nn.Block):
@@ -125,12 +140,6 @@ predict_sentiment(net, vocab, 'this movie is so bad')
 * Can we improve the classification accuracy by using the spaCy word tokenization tool? You need to install spaCy: `pip install spacy` and install the English package: `python -m spacy download en`. In the code, first import spacy: `import spacy`. Then, load the spacy English package: `spacy_en = spacy.load('en')`. Finally, define the function `def tokenizer(text): return [tok.text for tok in spacy_en.tokenizer(text)]` and replace the original `tokenizer` function. It should be noted that GloVe's word vector uses "-" to connect each word when storing noun phrases. For example, the phrase "new york" is represented as "new-york" in GloVe. After using spaCy tokenization, "new york" may be stored as "new york".
 
 
-
-
-
-## Reference
-
-[1] Maas, A. L., Daly, R. E., Pham, P. T., Huang, D., Ng, A. Y., & Potts, C. (2011, June). Learning word vectors for sentiment analysis. In Proceedings of the 49th annual meeting of the association for computational linguistics: Human language technologies-volume 1 (pp. 142-150). Association for Computational Linguistics.
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2391)
 

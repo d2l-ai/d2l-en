@@ -32,7 +32,8 @@ distribution on a large number of uncommon words is likely to be inaccurate.
 
 ## The GloVe Model
 
-To address this, GloVe, a word embedding model that came after word2vec, adopts square loss and makes three changes to the skip-gram model based on this loss[1].
+To address this, GloVe :cite:`Pennington.Socher.Manning.2014`, a word embedding model that came after word2vec, adopts
+square loss and makes three changes to the skip-gram model based on this loss.
 
 1. Here, we use the non-probability distribution variables $p'_{ij}=x_{ij}$ and $q'_{ij}=\exp(\mathbf{u}_j^\top \mathbf{v}_i)$ and take their logs. Therefore, we get the square loss $\left(\log\,p'_{ij} - \log\,q'_{ij}\right)^2 = \left(\mathbf{u}_j^\top \mathbf{v}_i - \log\,x_{ij}\right)^2$.
 2. We add two scalar model parameters for each word $w_i$: the bias terms $b_i$ (for central target words) and $c_i$( for context words).
@@ -49,7 +50,7 @@ Notice that if word $w_i$ appears in the context window of word $w_j$, then word
 
 ## Understanding GloVe from Conditional Probability Ratios
 
-We can also try to understand GloVe word embedding from another perspective. We will continue the use of symbols from earlier in this section, $\mathbb{P}(w_j \mid w_i)$ represents the conditional probability of generating context word $w_j$ with central target word $w_i$ in the data set, and it will be recorded as $p_{ij}$. From a real example from a large corpus, here we have the following two sets of conditional probabilities with "ice" and "steam" as the central target words and the ratio between them[1]:
+We can also try to understand GloVe word embedding from another perspective. We will continue the use of symbols from earlier in this section, $\mathbb{P}(w_j \mid w_i)$ represents the conditional probability of generating context word $w_j$ with central target word $w_i$ in the data set, and it will be recorded as $p_{ij}$. From a real example from a large corpus, here we have the following two sets of conditional probabilities with "ice" and "steam" as the central target words and the ratio between them:
 
 |$w_k$=|“solid”|“gas”|“water”|“fashion”|
 |--:|:-:|:-:|:-:|:-:|
@@ -87,13 +88,12 @@ By taking the square error and weighting the left and right sides of the formula
 
 ## Exercises
 
-* If a word appears in the context window of another word, how can we use the distance between them in the text sequence to redesign the method for computing the conditional probability $p_{ij}$? Hint: See section 4.2 from the paper GloVe[1].
+* If a word appears in the context window of another word, how can we use the
+  distance between them in the text sequence to redesign the method for
+  computing the conditional probability $p_{ij}$? Hint: See section 4.2 from the
+  paper GloVe :cite:`Pennington.Socher.Manning.2014`.
 * For any word, will its central target word bias term and context word bias term be equivalent to each other in GloVe? Why?
 
-
-## Reference
-
-[1] Pennington, J., Socher, R., & Manning, C. (2014). Glove: Global vectors for word representation. In Proceedings of the 2014 conference on empirical methods in natural language processing (EMNLP) (pp. 1532-1543).
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2389)
 

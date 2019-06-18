@@ -7,10 +7,11 @@ In this section, we will tackle the dog breed identification challenge in the Ka
 
 In this competition, we attempt to identify 120 different breeds of dogs. The data set used in this competition is actually a subset of the famous ImageNet data set. Different from the images in the CIFAR-10 data set used in the previous section, the images in the ImageNet data set are higher and wider and their dimensions are inconsistent.
 
-Figure 9.17 shows the information on the competition's webpage. In order to submit the results, please register an account on the Kaggle website first.
+:numref:`fig_kaggle_dog` shows the information on the competition's webpage. In order to submit the results, please register an account on the Kaggle website first.
 
 ![Dog breed identification competition website. The data set for the competition can be accessed by clicking the "Data" tab.](../img/kaggle-dog.png)
 :width:`600px`
+:label:`fig_kaggle_dog`
 
 First, import the packages or modules required for the competition.
 
@@ -32,7 +33,7 @@ The competition data is divided into a training set and testing set. The trainin
 
 ### Download the Data Set
 
-After logging in to Kaggle, we can click on the "Data" tab on the dog breed identification competition webpage shown in Figure 9.17 and download the training data set "train.zip", the testing data set "test.zip", and the training data set labels "label.csv.zip". After downloading the files, place them in the three paths below:
+After logging in to Kaggle, we can click on the "Data" tab on the dog breed identification competition webpage shown in :numref:`fig_kaggle_dog` and download the training data set "train.zip", the testing data set "test.zip", and the training data set labels "label.csv.zip". After downloading the files, place them in the three paths below:
 
 * ../data/kaggle_dog/train.zip
 * ../data/kaggle_dog/test.zip
@@ -320,10 +321,6 @@ method for submitting results is similar to method in
 * When using the entire Kaggle data set, what kind of results do you get when you increase the `batch_size` (batch size) and `num_epochs` (number of epochs)?
 * Do you get better results if you use a deeper pre-trained model?
 * Scan the QR code to access the relevant discussions and exchange ideas about the methods used and the results obtained with the community. Can you come up with any better techniques?
-
-## Reference
-
-[1] Kaggle ImageNet Dog Breed Identification website. https://www.kaggle.com/c/dog-breed-identification
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2451)
 

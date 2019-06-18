@@ -49,7 +49,7 @@ Now we define two convenient functions that allows us to run codes even if the r
 # Save to the d2l package.
 def try_gpu(i=0):
     """Return gpu(i) if exists, otherwise return cpu()."""
-    return context.gpu(i) if context.num_gpus() >= i else context.cpu()
+    return context.gpu(i) if context.num_gpus() >= i + 1 else context.cpu()
 
 # Save to the d2l package.
 def try_all_gpus():

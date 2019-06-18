@@ -48,7 +48,7 @@ The shaded portions are the first output element
 as well as the input and kernel array elements used in its computation:
 $(1\times1+2\times2+4\times3+5\times4)+(0\times0+1\times1+3\times2+4\times3)=56$.
 
-![Cross-correlation computation with 2 input channels. The shaded portions are the first output element as well as the input and kernel array elements used in its computation: $(1\times1+2\times2+4\times3+5\times4)+(0\times0+1\times1+3\times2+4\times3)=56$. ](../img/conv_multi_in.svg)
+![Cross-correlation computation with 2 input channels. The shaded portions are the first output element as well as the input and kernel array elements used in its computation: $(1\times1+2\times2+4\times3+5\times4)+(0\times0+1\times1+3\times2+4\times3)=56$. ](../img/conv-multi-in.svg)
 
 
 To make sure we reall understand what's going on here,
@@ -57,9 +57,6 @@ Notice that all we are doing is performing one cross-correlation operation
 per channel and then adding up the results using the `add_n` function.
 
 ```{.python .input  n=1}
-import sys
-sys.path.insert(0, '..')
-
 import d2l
 from mxnet import nd
 
@@ -180,7 +177,7 @@ Thus the $1\times 1$ convolutional layer requires $c_o\times c_i$ weights
 (plus the bias terms).
 
 
-![The cross-correlation computation uses the $1\times 1$ convolution kernel with 3 input channels and 2 output channels. The inputs and outputs have the same height and width. ](../img/conv_1x1.svg)
+![The cross-correlation computation uses the $1\times 1$ convolution kernel with 3 input channels and 2 output channels. The inputs and outputs have the same height and width. ](../img/conv-1x1.svg)
 
 Let's check whether this works in practice:
 we implement the $1 \times 1$ convolution

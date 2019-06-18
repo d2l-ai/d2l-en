@@ -2,7 +2,9 @@
 
 If you use social sharing apps or happen to be an amateur photographer, you are familiar with filters. Filters can alter the color styles of photos to make the background sharper or people's faces whiter. However, a filter generally can only change one aspect of a photo. To create the ideal photo, you often need to try many different filter combinations. This process is as complex as tuning the hyper-parameters of a model.
 
-In this section, we will discuss how we can use convolution neural networks (CNNs) to automatically apply the style of one image to another image, an operation known as style transfer[1]. Here, we need two input images, one content image and one style image. We use a neural network to alter the content image so that its style mirrors that of the style image. In :numref:`fig_style_transfer`, the content image is a landscape photo the author took in Mount Rainier National Part near Seattle. The style image is an oil painting of oak trees in autumn. The output composite image retains the overall shapes of the objects in the content image, but applies the oil painting brushwork of the style image and makes the overall color more vivid.
+In this section, we will discuss how we can use convolution neural networks
+(CNNs) to automatically apply the style of one image to another image, an
+operation known as style transfer :cite:`Gatys.Ecker.Bethge.2016`. Here, we need two input images, one content image and one style image. We use a neural network to alter the content image so that its style mirrors that of the style image. In :numref:`fig_style_transfer`, the content image is a landscape photo the author took in Mount Rainier National Part near Seattle. The style image is an oil painting of oak trees in autumn. The output composite image retains the overall shapes of the objects in the content image, but applies the oil painting brushwork of the style image and makes the overall color more vivid.
 
 ![Content and style input images and composite image produced by style transfer. ](../img/style-transfer.svg)
 :label:`fig_style_transfer`
@@ -270,10 +272,6 @@ As you can see, each epoch takes more time due to the larger image size. As show
 * How does the output change when you select different content and style layers?
 * Adjust the weight hyper-parameters in the loss function. Does the output retain more content or have less noise?
 * Use different content and style images. Can you create more interesting composite images?
-
-## Reference
-
-[1] Gatys, L. A., Ecker, A. S., & Bethge, M. (2016). Image style transfer using convolutional neural networks. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (pp. 2414-2423).
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2449)
 
