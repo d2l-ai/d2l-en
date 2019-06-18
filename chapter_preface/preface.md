@@ -180,7 +180,11 @@ we can just use the ``Gluon`` version in subsequent tutorials.
 
 ### Content and Structure
 
-The book can be roughly divided into three sections:
+The book can be roughly divided into three parts, which are presented by different colors in :numref:`fig_book_org`:
+
+![Book structure](../img/book-org.svg)
+:label:`fig_book_org`
+
 
 * The first part covers prerequisites and basics.  The first chapter offers an
 introduction to deep learning in :numref:`chapter_introduction`.  In
@@ -209,14 +213,10 @@ behind most modern deep learning.
 discuss several common :numref:`chapter_optimization` used to train deep
 learning models.  The next chapter, :numref:`chapter_performance` examines
 several important factors that affect the computational performance of your deep
-learning code.  :numref:`chapter_cv` and :numref:`chapter_nlp` illustrate major
+learning code.    :numref:`chapter_cv` and :numref:`chapter_nlp` illustrate major
 applications of deep learning in computer vision and natural language
-processing, respectively.
+processing, respectively. Finally, :number:`chapter_gans` presents an emerging family of models called generative adversarial networks. 
 
-An outline of the book together with possible flows for navigating it is given
-below.  The arrows provide a graph of prerequisites:
-
-![Book structure](../img/book-org.svg)
 
 
 ### Code
