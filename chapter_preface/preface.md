@@ -215,7 +215,7 @@ learning models.  The next chapter, :numref:`chapter_performance` examines
 several important factors that affect the computational performance of your deep
 learning code.    :numref:`chapter_cv` and :numref:`chapter_nlp` illustrate major
 applications of deep learning in computer vision and natural language
-processing, respectively. Finally, :number:`chapter_gans` presents an emerging family of models called generative adversarial networks. 
+processing, respectively. Finally, :number:`chapter_gans` presents an emerging family of models called generative adversarial networks.
 
 
 
@@ -259,10 +259,10 @@ from IPython import display
 import collections
 import os
 import sys
-import numpy as np
+import numpy as onp
 import math
 from matplotlib import pyplot as plt
-from mxnet import nd, autograd, gluon, init, context, image
+from mxnet import np, npx, autograd, gluon, init, context, image
 from mxnet.gluon import nn, rnn
 import random
 import re

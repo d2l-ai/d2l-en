@@ -22,9 +22,10 @@ To start, we will generate the same data set as that used in the previous sectio
 
 ```{.python .input  n=2}
 import d2l
-from mxnet import autograd, nd, gluon
+from mxnet import autograd, np, npx, gluon
+npx.set_np()
 
-true_w = nd.array([2, -3.4])
+true_w = np.array([2, -3.4])
 true_b = 4.2
 features, labels = d2l.synthetic_data(true_w, true_b, 1000)
 ```
@@ -62,7 +63,7 @@ Now we can use `data_iter` in much the same way as we called the `data_iter` fun
 
 ```{.python .input  n=5}
 for X, y in data_iter:
-    print(X, y)
+    print(X, '\n', y)
     break
 ```
 
