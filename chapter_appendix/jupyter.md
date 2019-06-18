@@ -1,4 +1,5 @@
 # Using Jupyter
+:label:`chapter_jupyter`
 
 This section describes how to edit and run the code in the chapters of this book
 using Jupyter Notebooks. Make sure you have Jupyter installed and downloaded the

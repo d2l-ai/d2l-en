@@ -1,4 +1,5 @@
 # Weight Decay
+:label:`chapter_weight_decay`
 
 Now that we have characterized the problem of overfitting
 and motivated the need for capacity control,

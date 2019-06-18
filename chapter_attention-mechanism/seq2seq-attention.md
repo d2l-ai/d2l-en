@@ -68,7 +68,7 @@ class Seq2SeqAttentionDecoder(d2l.Decoder):
                                         enc_valid_len]
 ```
 
-Use the same hyper-parameters to create an encoder and decoder as the ["Sequence to Sequence"](../chapter_recurrent-neural-networks/seq2seq.md) section, we get the same decoder output shape, but the state structure is changed.
+Use the same hyper-parameters to create an encoder and decoder as in :numref:`chapter_seq2seq`, we get the same decoder output shape, but the state structure is changed.
 
 ```{.python .input  n=3}
 encoder = d2l.Seq2SeqEncoder(vocab_size=10, embed_size=8,
