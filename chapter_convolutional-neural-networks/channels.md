@@ -177,7 +177,7 @@ Thus the $1\times 1$ convolutional layer requires $c_o\times c_i$ weights
 (plus the bias terms).
 
 
-![The cross-correlation computation uses the $1\times 1$ convolution kernel with 3 input channels and 2 output channels. The inputs and outputs have the same height and width. ](../img/conv_1x1.svg)
+![The cross-correlation computation uses the $1\times 1$ convolution kernel with 3 input channels and 2 output channels. The inputs and outputs have the same height and width. ](../img/conv-1x1.svg)
 
 Let's check whether this works in practice:
 we implement the $1 \times 1$ convolution
