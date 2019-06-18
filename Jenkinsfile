@@ -4,10 +4,14 @@ stage("Build and Publish") {
     ws("workspace/${TASK}") {
       checkout scm
       def ENV_NAME = "${TASK}-${EXECUTOR_NUMBER}"
-      def CUDA_VISIBLE_DEVICES="$((EXECUTOR_NUMBER*2)),$((EXECUTOR_NUMBER*2+1))"
+      def CUDA_VISIBLE_DEVICES=${EXECUTOR_NUMBER}.toInteger()*2
+
+      sh """
+      echo ${CUDA_VISIBLE_DEVICES}
+      ./static/test.sh
+      """
 
       sh label: "Build Environment", script: """set -ex
-      echo ${CUDA_VISIBLE_DEVICES}
       rm -rf ~/miniconda3/envs/${ENV_NAME}
       conda create -n ${ENV_NAME} pip -y
       conda activate ${ENV_NAME}
