@@ -7,35 +7,38 @@ So far we discussed how to process data, how to build, train and test deep learn
 In its simplest form, we can directly use the `save` and `load` functions to store and read NDArrays separately. This works just as expected.
 
 ```{.python .input}
-from mxnet import nd
+from mxnet import np, npx
 from mxnet.gluon import nn
 
-x = nd.arange(4)
-nd.save('x-file', x)
+npx.set_np()
+
+x = np.arange(4)
+np.save('x-file', x)
 ```
 
 Then, we read the data from the stored file back into memory.
 
 ```{.python .input}
-x2 = nd.load('x-file')
+x2 = np.load('x-file')
 x2
 ```
 
 We can also store a list of NDArrays and read them back into memory.
 
 ```{.python .input  n=2}
-y = nd.zeros(4)
-nd.save('x-files', [x, y])
-x2, y2 = nd.load('x-files')
-(x2, y2)
+y = np.zeros(4)
+np.save('x-files', [x, y])
+x2, y2 = np.load('x-files')
+print('x2 =\n', x2)
+print('y2 =\n', y2)
 ```
 
 We can even write and read a dictionary that maps from a string to an NDArray. This is convenient, for instance when we want to read or write all the weights in a model.
 
 ```{.python .input  n=4}
 mydict = {'x': x, 'y': y}
-nd.save('mydict', mydict)
-mydict2 = nd.load('mydict')
+np.save('mydict', mydict)
+mydict2 = np.load('mydict')
 mydict2
 ```
 
@@ -68,7 +71,7 @@ class MLP(nn.Block):
 
 net = MLP()
 net.initialize()
-x = nd.random.uniform(shape=(2, 20))
+x = np.random.uniform(size=(2, 20))
 y = net(x)
 ```
 

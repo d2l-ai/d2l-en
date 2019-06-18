@@ -12,8 +12,10 @@ input. We build it by inheriting from the Block class and implementing the
 `forward` method.
 
 ```{.python .input  n=1}
-from mxnet import gluon, nd
+from mxnet import gluon, np, npx
 from mxnet.gluon import nn
+
+npx.set_np()
 
 class CenteredLayer(nn.Block):
     def __init__(self, **kwargs):
@@ -27,12 +29,25 @@ To see how it works let's feed some data into the layer.
 
 ```{.python .input  n=2}
 layer = CenteredLayer()
-layer(nd.array([1, 2, 3, 4, 5]))
+layer(np.array([1, 2, 3, 4, 5]))
+```
+
+```{.json .output n=2}
+[
+ {
+  "data": {
+   "text/plain": "[-2. -1.  0.  1.  2.]\n<ndarray shape=(5,)>"
+  },
+  "execution_count": 2,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
 ```
 
 We can also use it to construct more complex models.
 
-```{.python .input  n=3}
+```{.python .input  n=5}
 net = nn.Sequential()
 net.add(nn.Dense(128), CenteredLayer())
 net.initialize()
@@ -40,9 +55,22 @@ net.initialize()
 
 Let's see whether the centering layer did its job. For that we send random data through the network and check whether the mean vanishes. Note that since we're dealing with floating point numbers, we're going to see a very small albeit typically nonzero number.
 
-```{.python .input  n=4}
-y = net(nd.random.uniform(shape=(4, 8)))
-y.mean().asscalar()
+```{.python .input  n=6}
+y = net(np.random.uniform(size=(4, 8)))
+y.mean()
+```
+
+```{.json .output n=6}
+[
+ {
+  "data": {
+   "text/plain": "-7.212293e-10"
+  },
+  "execution_count": 6,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
 ```
 
 ## Layers with Parameters

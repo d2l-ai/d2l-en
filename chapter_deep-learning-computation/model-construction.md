@@ -10,10 +10,12 @@ A common strategy
 would be to construct a two-layer network as follows:
 
 ```{.python .input  n=1}
-from mxnet import nd
+from mxnet import np, npx
 from mxnet.gluon import nn
 
-x = nd.random.uniform(shape=(2, 20))
+npx.set_np()
+
+x = np.random.uniform(size=(2, 20))
 
 net = nn.Sequential()
 net.add(nn.Dense(256, activation='relu'))
@@ -137,15 +139,15 @@ class FancyMLP(nn.Block):
         x = self.dense(x)
         # Use the constant parameters created, as well as the relu and dot
         # functions of NDArray
-        x = nd.relu(nd.dot(x, self.rand_weight.data()) + 1)
+        x = npx.relu(np.dot(x, self.rand_weight.data()) + 1)
         # Reuse the fully connected layer. This is equivalent to sharing
         # parameters with two fully connected layers
         x = self.dense(x)
         # Here in Control flow, we need to call asscalar to return the scalar
         # for comparison
-        while x.norm().asscalar() > 1:
+        while np.sqrt((x * x).sum()) > 1:
             x /= 2
-        if x.norm().asscalar() < 0.8:
+        if np.sqrt((x * x).sum()) < 0.8:
             x *= 10
         return x.sum()
 ```
