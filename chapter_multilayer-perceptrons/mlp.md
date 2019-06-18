@@ -182,7 +182,8 @@ This is true for most activation functions
 ```{.python .input  n=1}
 %matplotlib inline
 import d2l
-from mxnet import autograd, nd
+from mxnet import autograd, np, npx
+npx.set_np()
 ```
 
 ## Activation Functions
@@ -210,10 +211,10 @@ the `relu` function as a basic native operator.
 As you can see, the activation function is piece-wise linear.
 
 ```{.python .input  n=2}
-x = nd.arange(-8.0, 8.0, 0.1)
+x = np.arange(-8.0, 8.0, 0.1)
 x.attach_grad()
 with autograd.record():
-    y = x.relu()
+    y = npx.relu(x)
 d2l.set_figsize((4, 2.5))    
 d2l.plot(x, y, 'x', 'relu(x)')
 ```
@@ -278,7 +279,7 @@ approaches a linear transformation.
 
 ```{.python .input  n=4}
 with autograd.record():
-    y = x.sigmoid()
+    y = npx.sigmoid(x)
 d2l.plot(x, y, 'x', 'sigmoid(x)')
 ```
 
@@ -308,7 +309,7 @@ We plot the tanh function blow. Note that as the input nears 0, the tanh functio
 
 ```{.python .input  n=6}
 with autograd.record():
-    y = x.tanh()
+    y = np.tanh(x)  
 d2l.plot(x, y, 'x', 'tanh(x)')
 ```
 

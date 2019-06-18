@@ -22,9 +22,9 @@ chapter_install/install
 chapter_introduction/intro
 chapter_crashcourse/index
 chapter_linear-networks/index
+chapter_multilayer-perceptrons/index
 ```
 
-chapter_multilayer-perceptrons/index
 chapter_deep-learning-computation/index
 chapter_convolutional-neural-networks/index
 chapter_convolutional-modern/index
