@@ -137,7 +137,7 @@ detailed description of `DataLoader`, refer to :numref:`chapter_fashion_mnist`.
 def load_cifar10(is_train, augs, batch_size):
     return gluon.data.DataLoader(
         gluon.data.vision.CIFAR10(train=is_train).transform_first(augs),
-        batch_size=batch_size, shuffle=is_train, 
+        batch_size=batch_size, shuffle=is_train,
         num_workers=d2l.get_dataloader_workers())
 ```
 
@@ -178,10 +178,10 @@ def train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs,
             timer.start()
             l, acc = train_batch_ch12(
                 net, features, labels, loss, trainer, ctx_list)
-            metric.add([l, acc, labels.shape[0], labels.size])
+            metric.add(l, acc, labels.shape[0], labels.size)
             timer.stop()
             if (i+1) % (num_batches // 5) == 0:
-                animator.add(epoch+i/num_batches, 
+                animator.add(epoch+i/num_batches,
                              (metric[0]/metric[2], metric[1]/metric[3], None))
         test_acc = d2l.evaluate_accuracy_gpus(net, test_iter)
         animator.add(epoch+1, (None, None, test_acc))

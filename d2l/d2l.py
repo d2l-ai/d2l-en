@@ -545,7 +545,7 @@ def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):
         l.backward()
         grad_clipping(model, 1)
         updater(batch_size=1)  # Since used mean already.
-        metric.add((l.asscalar() * y.size, y.size))
+        metric.add(l.asscalar() * y.size, y.size)
     return math.exp(metric[0]/metric[1]), metric[1]/timer.stop()
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
@@ -741,7 +741,7 @@ def train_s2s_ch8(model, data_iter, lr, num_epochs, ctx):
                             'adam', {'learning_rate': lr})
     loss = MaskedSoftmaxCELoss()
     #tic = time.time()
-    animator = d2l.Animator(xlabel='epoch', ylabel='loss', 
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[1, num_epochs], ylim=[0, 0.25])
     for epoch in range(1, num_epochs+1):
         timer = d2l.Timer()
@@ -756,7 +756,7 @@ def train_s2s_ch8(model, data_iter, lr, num_epochs, ctx):
             d2l.grad_clipping(model, 1)
             num_tokens = Y_vlen.sum().asscalar()
             trainer.step(num_tokens)
-            metric.add((l.sum().asscalar(), num_tokens))
+            metric.add(l.sum().asscalar(), num_tokens)
         if epoch % 10 == 0:
             animator.add(epoch, metric[0]/metric[1])
     print('loss %.3f, %d tokens/sec on %s ' % (
@@ -1001,10 +1001,10 @@ def train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs,
             timer.start()
             l, acc = train_batch_ch12(
                 net, features, labels, loss, trainer, ctx_list)
-            metric.add([l, acc, labels.shape[0], labels.size])
+            metric.add(l, acc, labels.shape[0], labels.size)
             timer.stop()
             if (i+1) % (num_batches // 5) == 0:
-                animator.add(epoch+i/num_batches, 
+                animator.add(epoch+i/num_batches,
                              (metric[0]/metric[2], metric[1]/metric[3], None))
         test_acc = d2l.evaluate_accuracy_gpus(net, test_iter)
         animator.add(epoch+1, (None, None, test_acc))
