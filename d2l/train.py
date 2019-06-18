@@ -400,7 +400,7 @@ def translate_ch7(model, src_sentence, src_vocab, tgt_vocab, max_len, ctx):
     for _ in range(max_len):
         Y, dec_state = model.decoder(dec_X, dec_state)
         dec_X = Y.argmax(axis=2)
-        py = int(dec_X.squeeze(axis=0).astype('int32'))
+        py = int(dec_X.squeeze(axis=0))
         if py == tgt_vocab.eos:
             break
         predict_tokens.append(py)
