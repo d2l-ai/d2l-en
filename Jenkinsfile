@@ -7,12 +7,6 @@ stage("Build and Publish") {
       def EID = EXECUTOR_NUMBER.toInteger()
       def CUDA_VISIBLE_DEVICES=(EID*2).toString() + ',' + (EID*2+1).toString();
 
-      sh """
-      export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
-      echo ${CUDA_VISIBLE_DEVICES}
-      ./static/test.sh
-      """
-
       sh label: "Build Environment", script: """set -ex
       rm -rf ~/miniconda3/envs/${ENV_NAME}
       conda create -n ${ENV_NAME} pip -y
@@ -35,6 +29,7 @@ stage("Build and Publish") {
 
       sh label:"Build HTML", script:"""set -ex
       conda activate ${ENV_NAME}
+      export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
       ./static/build_html.sh
       """
 
