@@ -315,9 +315,9 @@ for epoch in range(num_epochs):
                           bbox_masks)
         l.backward()
         trainer.step(batch_size)
-        metric.add((cls_eval(cls_preds, cls_labels), cls_labels.size,
+        metric.add(cls_eval(cls_preds, cls_labels), cls_labels.size,
                     bbox_eval(bbox_preds, bbox_labels, bbox_masks),
-                    bbox_labels.size))
+                    bbox_labels.size)
     cls_err, bbox_mae = 1-metric[0]/metric[1], metric[2]/metric[3]
     animator.add(epoch+1, (cls_err, bbox_mae))
 print('class err %.2e, bbox mae %.2e' % (cls_err, bbox_mae))

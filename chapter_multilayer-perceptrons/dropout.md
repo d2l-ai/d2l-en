@@ -283,7 +283,7 @@ num_epochs, lr, batch_size = 10, 0.5, 256
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, 
-             lambda: d2l.sgd(params, lr, batch_size))
+             lambda batch_size: d2l.sgd(params, lr, batch_size))
 ```
 
 ## Concise Implementation
@@ -315,8 +315,7 @@ Next, we train and test the model.
 
 ```{.python .input  n=7}
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
-d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, 
-              lambda: trainer.step(batch_size))
+d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 ```
 
 ## Summary

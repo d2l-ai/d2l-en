@@ -95,7 +95,6 @@ and it illustrates the general applicability of the optimizers.
 
 ```{.python .input  n=5}
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': 0.1})
-updater = lambda: trainer.step(batch_size)
 ```
 
 ## Training
@@ -104,7 +103,7 @@ Next, we use the training functions defined in the last section to train a model
 
 ```{.python .input  n=6}
 num_epochs = 10
-d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, updater)
+d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 ```
 
 Just as before, this algorithm converges to a solution

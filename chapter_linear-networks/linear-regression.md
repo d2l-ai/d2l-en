@@ -146,35 +146,69 @@ Brain *structures* vary significantly. Some look (to us) rather arbitrary wherea
 
 ### Vectorization for Speed
 
-In model training or prediction, we often use vector calculations and process multiple observations at the same time. To illustrate why this matters, consider two methods of adding vectors. We begin by creating two 10000 dimensional ones first.
+In model training or prediction, we often use vector calculations and process multiple observations at the same time. To illustrate why this matters, consider two methods of adding vectors. We begin by creating two 100000 dimensional ones first.
 
-```{.python .input  n=1}
-import numpy as np
-import time
-import math
+```{.python .input}
+%matplotlib inline
 import d2l 
+import numpy as np
+import math
+from mxnet import nd
+import time
 
 n = 100000
 a = np.ones(n)
 b = np.ones(n)
 ```
 
-One way to add vectors is to add them one coordinate at a time using a for loop.
+Since we will benchmark the running time frequently in this book, let's define a timer to do simply analysis of the running time.
+
+```{.python .input  n=1}
+# Save to the d2l package.
+class Timer(object):
+    """Record multiple running times."""
+    def __init__(self):
+        self.times = []
+        self.start()
+        
+    def start(self):
+        """Start the timer"""
+        self.start_time = time.time()
+    
+    def stop(self):
+        """Stop the timer and record the time in a list"""
+        self.times.append(time.time() - self.start_time)
+        return self.times[-1]
+        
+    def avg(self):
+        """Return the average time"""
+        return sum(self.times)/len(self.times)
+    
+    def sum(self):
+        """Return the sum of time"""
+        return sum(self.times)
+        
+    def cumsum(self):
+        """Return the accumuated times"""
+        return np.array(self.times).cumsum().tolist()
+```
+
+Now we can benchmark the workloads. One way to add vectors is to add them one coordinate at a time using a for loop.
 
 ```{.python .input  n=2}
-start = time.time()
+timer = Timer()
 c = np.zeros(n)
 for i in range(n):
     c[i] = a[i] + b[i]
-'%.5f sec' % (time.time() - start)
+'%.5f sec' % timer.stop()
 ```
 
 Another way to add vectors is to add the vectors directly:
 
 ```{.python .input  n=3}
-start = time.time()
+timer.start()
 d = a + b
-'%.5f sec' % (time.time() - start)
+'%.5f sec' % timer.stop()
 ```
 
 Obviously, the latter is vastly faster than the former. Vectorizing code is a good way of getting order of magnitude speedups. Likewise, as we saw above, it also greatly simplifies the mathematics and with it, it reduces the potential for errors in the notation.
@@ -185,19 +219,64 @@ The following is optional and can be skipped but it will greatly help with under
 
 $$p(x) = \frac{1}{\sqrt{2 \pi \sigma^2}} \exp\left(-\frac{1}{2 \sigma^2} (x - \mu)^2\right)$$
 
-It can be visualized as follows:
+Let's define the function to compute the normal distribution. 
+
+```{.python .input}
+x = np.arange(-7, 7, 0.01)
+
+def normal(x, mu, sigma):
+    p = 1 / math.sqrt(2 * math.pi * sigma**2) 
+    return p * np.exp(- 0.5 / sigma**2 * (x - mu)**2)
+```
+
+For a similar reason to create a `Timer` class, we define a `plot` function to draw multiple lines and set the figure properly, since we will visualize lines frequently later. 
+
+```{.python .input}
+# Save to the d2l package.
+def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
+         ylim=None, xscale='linear', yscale='linear', fmts=None,
+         figsize=(3.5, 2.5), axes=None):
+    """Plot multiple lines"""
+    d2l.set_figsize(figsize)
+    axes = axes if axes else d2l.plt.gca()
+    if isinstance(X, nd.NDArray): X = X.asnumpy()
+    if isinstance(Y, nd.NDArray): Y = Y.asnumpy()
+    if not hasattr(X[0], "__len__"): X = [X]
+    if Y is None: X, Y = [[]]*len(X), X
+    if not hasattr(Y[0], "__len__"): Y = [Y]
+    if len(X) != len(Y): X = X * len(Y)
+    if not fmts: fmts = ['-']*len(X)
+    axes.cla()
+    for x, y, fmt in zip(X, Y, fmts):
+        if isinstance(x, nd.NDArray): x = x.asnumpy()
+        if isinstance(y, nd.NDArray): y = y.asnumpy()
+        if len(x):
+            axes.plot(x, y, fmt)
+        else:
+            axes.plot(y, fmt)
+    set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
+
+# Save to the d2l package.
+def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
+    """A utility function to set matplotlib axes"""
+    axes.set_xlabel(xlabel)
+    axes.set_ylabel(ylabel)
+    axes.set_xscale(xscale)
+    axes.set_yscale(yscale)
+    axes.set_xlim(xlim)
+    axes.set_ylim(ylim)
+    if legend: axes.legend(legend)
+    axes.grid()
+```
+
+Now visualize the normal distributions. 
 
 ```{.python .input  n=2}
-%matplotlib inline
-d2l.use_svg_display()
 # Mean and variance pairs
 parameters = [(0,1), (0,2), (3,1)]
-x = np.arange(-7, 7, 0.01)
-for (mu, sigma) in parameters:
-    p = 1 / math.sqrt(2 * math.pi * sigma**2) 
-    p = p * np.exp(- 0.5 / sigma**2 * (x - mu)**2)
-    d2l.plt.plot(x, p, label='mean %d, variance %d' %(mu, sigma))
-d2l.plt.legend();
+plot(x, [normal(x, mu, sigma) for mu, sigma in parameters], 
+     xlabel='x', ylabel='p(x)', figsize=(4.5, 2.5),
+     legend = ['mean %d, var %d'%(mu, sigma) for mu, sigma in parameters])
 ```
 
 As can be seen in the figure above, changing the mean shifts the function, increasing the variance makes it more spread-out with a lower peak. The key assumption in linear regression with least mean squares loss is that the observations actually arise from noisy observations, where noise is added to the data, e.g. as part of the observations process.

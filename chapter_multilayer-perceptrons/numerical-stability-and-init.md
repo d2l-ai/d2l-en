@@ -89,8 +89,7 @@ with autograd.record():
     y = x.sigmoid()
 y.backward()
 
-d2l.set_figsize((6, 3))
-d2l.plot(x, [y, x.grad], legend=['sigmoid', 'gradient'])
+d2l.plot(x, [y, x.grad], legend=['sigmoid', 'gradient'], figsize=(4.5, 2.5))
 ```
 
 As we can see, the gradient of the sigmoid vanishes

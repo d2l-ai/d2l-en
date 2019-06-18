@@ -38,8 +38,7 @@ batch_size, num_epochs = 256, 10
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': 0.5})
-d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, 
-              lambda: trainer.step(batch_size))
+d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 ```
 
 ## Exercises

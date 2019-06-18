@@ -90,7 +90,7 @@ net_D.add(nn.Dense(5, activation='tanh'),
 First we define a function to update the discriminator.
 
 ```{.python .input  n=7}
-# Save to the d2l package. 
+# Save to the d2l package.
 def update_D(X, Z, net_D, net_G, loss, trainer_D):
     """Update discriminator"""
     batch_size = X.shape[0]
@@ -111,7 +111,7 @@ def update_D(X, Z, net_D, net_G, loss, trainer_D):
 The generator is updated similarly. Here we reuse the cross entropy loss but change the label of the fake data from $0$ to $1$.
 
 ```{.python .input  n=8}
-# Save to the d2l package. 
+# Save to the d2l package.
 def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
     """Update generator"""
     batch_size = Z.shape[0]
@@ -138,7 +138,7 @@ def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
                               'adam', {'learning_rate': lr_D})
     trainer_G = gluon.Trainer(net_G.collect_params(),
                               'adam', {'learning_rate': lr_G})
-    animator = d2l.Animator(xlabel='epoch', ylabel='loss', 
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[1, num_epochs], nrows=2, figsize=(5,5),
                             legend=['generator', 'discriminator'])
     animator.fig.subplots_adjust(hspace=0.3)
@@ -149,9 +149,9 @@ def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
         for X in data_iter:
             batch_size = X.shape[0]
             Z = nd.random.normal(0, 1, shape=(batch_size, latent_dim))
-            metric.add((update_D(X, Z, net_D, net_G, loss, trainer_D),
-                        update_G(Z, net_D, net_G, loss, trainer_G), 
-                        batch_size))
+            metric.add(update_D(X, Z, net_D, net_G, loss, trainer_D),
+                        update_G(Z, net_D, net_G, loss, trainer_G),
+                        batch_size)
         # Visualize generated examples
         Z = nd.random.normal(0, 1, shape=(100, latent_dim))
         fake_X = net_G(Z).asnumpy()
@@ -170,7 +170,7 @@ Now we specify the hyper-parameters to fit the Gaussian distribution.
 
 ```{.python .input  n=10}
 lr_D, lr_G, latent_dim, num_epochs = 0.05, 0.005, 2, 20
-train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, 
+train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G,
       latent_dim, data[:100].asnumpy())
 ```
 

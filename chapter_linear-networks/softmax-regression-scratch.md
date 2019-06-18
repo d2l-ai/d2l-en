@@ -13,7 +13,7 @@ because we will be doing the heavy lifting ourselves.)
 
 ```{.python .input  n=1}
 import d2l
-from mxnet import autograd, nd
+from mxnet import autograd, nd, gluon
 from IPython import display
 ```
 
@@ -215,12 +215,27 @@ Similarly, we can evaluate the accuracy for model `net` on the data set
 ```{.python .input  n=13}
 # Save to the d2l package.
 def evaluate_accuracy(net, data_iter):
-    acc_sum, n = 0.0, 0
+    metric = Accumulator(2) # num_corrected_examples, num_examples
     for X, y in data_iter:
         y = y.astype('float32')
-        acc_sum += accuracy(net(X), y)
-        n += y.size
-    return acc_sum / n
+        metric.add(accuracy(net(X), y), y.size)
+    return metric[0] / metric[1]
+```
+
+Here `Accumulator` is a utility class to accumulated sum over multiple numbers.
+
+```{.python .input}
+# Save to the d2l package.
+class Accumulator(object):
+    """Sum a list of numbers over time"""
+    def __init__(self, n):
+        self.data = [0.0] * n
+    def add(self, *args):
+        self.data = [a+b for a, b in zip(self.data, args)]
+    def reset(self):
+        self.data = [0] * len(self.data)
+    def __getitem__(self, i):
+        return self.data[i]
 ```
 
 Because we initialized the `net` model with random weights,
@@ -235,27 +250,27 @@ evaluate_accuracy(net, test_iter)
 
 The training loop for softmax regression should look strikingly familiar
 if you read through our implementation
-of linear regression in :numref:`chapter_linear_scratch`. Here we refactor the implementation to make it reusable. First, we define a function to train for one data epoch.
+of linear regression in :numref:`chapter_linear_scratch`. Here we refactor the implementation to make it reusable. First, we define a function to train for one data epoch. Note that `updater` is general function to update the model parameters, which accepts the batch size as an argument. It can be either a wrapper of `d2l.sgd` or a Gluon trainer.
 
 ```{.python .input  n=15}
 # Save to the d2l package.
 def train_epoch_ch3(net, train_iter, loss, updater):
-    train_l_sum, train_acc_sum, n = 0.0, 0.0, 0
+    metric = Accumulator(3) # train_loss_sum, train_acc_sum, num_examples
+    if isinstance(updater, gluon.Trainer):
+        updater = updater.step
     for X, y in train_iter:
         # compute gradients and update parameters
         with autograd.record():
             y_hat = net(X)
             l = loss(y_hat, y)
         l.backward()
-        updater()
-        # measure loss and accuracy
-        train_l_sum += l.sum().asscalar()
-        train_acc_sum += accuracy(y_hat, y)
-        n += y.size
-    return train_l_sum/n, train_acc_sum/n
+        updater(X.shape[0])
+        metric.add(l.sum().asscalar(), accuracy(y_hat, y), y.size)
+    # Return training loss and training accuracy
+    return metric[0]/metric[2], metric[1]/metric[2]
 ```
 
-Then we define a class that draw data in animation.
+Before showing the implementation of the training function, we define a utility class that draw data in animation. Again, it aims to simplify the codes in later chapters.
 
 ```{.python .input  n=16}
 # Save to the d2l package.
@@ -268,7 +283,7 @@ class Animator(object):
         self.fig, self.axes = d2l.plt.subplots(nrows, ncols, figsize=figsize)
         if nrows * ncols == 1: self.axes = [self.axes,]
         # use a lambda to capture arguments
-        self.config_axes = lambda : set_axes(
+        self.config_axes = lambda : d2l.set_axes(
             self.axes[0], xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
         self.X, self.Y, self.fmts = None, None, fmts
 
@@ -290,28 +305,17 @@ class Animator(object):
         self.config_axes()
         display.display(self.fig)
         display.clear_output(wait=True)
-
-# Save to the d2l package.
-def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
-    """A utility function to set matplotlib axes"""
-    axes.set_xlabel(xlabel)
-    axes.set_ylabel(ylabel)
-    axes.set_xscale(xscale)
-    axes.set_yscale(yscale)
-    axes.set_xlim(xlim)
-    axes.set_ylim(ylim)
-    if legend: axes.legend(legend)
-    axes.grid()
 ```
 
-The training function then runs multiple epochs and visualize the training progress.
+The training function then runs multiple epochs and visualize the training progress. 
 
 ```{.python .input  n=17}
 # Save to the d2l package.
 def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
     trains, test_accs = [], []
-    animator = Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0.3, 0.9],
-                       legend=['train loss', 'train acc', 'test acc'])
+    animator = Animator(xlabel='epoch', xlim=[1, num_epochs], 
+                        ylim=[0.3, 0.9], 
+                        legend=['train loss', 'train acc', 'test acc'])
     for epoch in range(num_epochs):
         train_metrics = train_epoch_ch3(net, train_iter, loss, updater)
         test_acc = evaluate_accuracy(net, test_iter)
@@ -327,7 +331,7 @@ into training, validation, and test data, using the validation data to choose th
 
 ```{.python .input  n=18}
 num_epochs, lr = 10, 0.1
-updater = lambda: d2l.sgd([W, b], lr, batch_size)
+updater = lambda batch_size: d2l.sgd([W, b], lr, batch_size)
 train_ch3(net, train_iter, test_iter, cross_entropy, num_epochs, updater)
 ```
 
@@ -367,37 +371,3 @@ then train models using optimization algorithms. As you'll soon find out, most c
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2336)
 
 ![](../img/qr_softmax-regression-scratch.svg)
-
-```{.python .input  n=20}
-# TODO Will remove these functions later.
-
-# Save to the d2l package.
-def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
-         ylim=None, xscale='linear', yscale='linear', fmts=None,
-         figsize=(3.5, 2.5), axes=None):
-    """Plot multiple lines"""
-    d2l.set_figsize(figsize)
-    axes = axes if axes else d2l.plt.gca()
-    if isinstance(X, nd.NDArray): X = X.asnumpy()
-    if isinstance(Y, nd.NDArray): Y = Y.asnumpy()
-    if not hasattr(X[0], "__len__"): X = [X]
-    if Y is None: X, Y = [[]]*len(X), X
-    if not hasattr(Y[0], "__len__"): Y = [Y]
-    if len(X) != len(Y): X = X * len(Y)
-    if not fmts: fmts = ['-']*len(X)
-    axes.cla()
-    for x, y, fmt in zip(X, Y, fmts):
-        if isinstance(x, nd.NDArray): x = x.asnumpy()
-        if isinstance(y, nd.NDArray): y = y.asnumpy()
-        if len(x):
-            axes.plot(x, y, fmt)
-        else:
-            axes.plot(y, fmt)
-    set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
-
-# Save to the d2l package.
-def show(obj):
-    """Show a figure"""
-    display.display(obj)
-    display.clear_output(wait=True)
-```
