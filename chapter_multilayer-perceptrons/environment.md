@@ -20,7 +20,7 @@ finding that the choice of footware was associated with risk of default
 (Oxfords indicate repayment, sneakers indicate default).
 We might be inclined to thereafter grant loans
 to all applicants wearing Oxfords
-and to deny all appplicants wearing sneakers.
+and to deny all applicants wearing sneakers.
 But our ill-conceived leap from pattern recognition to decision-making
 and our failure to think critically about the environment
 might have disastrous consequences.
@@ -28,7 +28,7 @@ For starters, as soon as we began making decisions based on footware,
 customers would catch on and change their behavior.
 Before long, all applicants would be wearing Oxfords,
 and yet there would be no coinciding improvement in credit-worthiness.
-Think about this deeply because similar issues abound in the application of machine learning: by introducing our model-based decisions to the environnment,
+Think about this deeply because similar issues abound in the application of machine learning: by introducing our model-based decisions to the environment,
 we might break the model.
 
 In this chapter, we describe some common concerns
