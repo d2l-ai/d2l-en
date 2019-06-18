@@ -8,10 +8,8 @@ Let's first import libraries and modules. Especially, we import `d2l`, which now
 ```{.python .input  n=72}
 %matplotlib inline
 import d2l
-from matplotlib import pyplot as plt  
-from mxnet import nd, gluon
 import math
-
+from mxnet import nd, gluon
 d2l.use_svg_display()
 ```
 
@@ -67,7 +65,8 @@ Now let's create a function to visualize these examples.
 def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
     """Plot a list of images."""
     figsize = (num_cols * scale, num_rows * scale)
-    axes = plt.subplots(num_rows, num_cols, figsize=figsize)[1].flatten()
+    _, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize)
+    axes = axes.flatten()
     for i, (ax, img) in enumerate(zip(axes, imgs)):
         ax.imshow(img.asnumpy())
         ax.axes.get_xaxis().set_visible(False)
