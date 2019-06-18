@@ -57,9 +57,6 @@ Notice that all we are doing is performing one cross-correlation operation
 per channel and then adding up the results using the `add_n` function.
 
 ```{.python .input  n=1}
-import sys
-sys.path.insert(0, '..')
-
 import d2l
 from mxnet import nd
 

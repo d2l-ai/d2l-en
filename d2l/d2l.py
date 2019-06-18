@@ -299,12 +299,11 @@ def corr2d(X, K):
 def evaluate_accuracy_gpu(net, data_iter, ctx=None):
     if not ctx:  # Query the first device the first parameter is on.
         ctx = list(net.collect_params().values())[0].list_ctx()[0]
-    acc_sum, n = nd.array([0], ctx=ctx), 0
+    metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
     for X, y in data_iter:
-        X, y = X.as_in_context(ctx), y.as_in_context(ctx).astype('float32')
-        acc_sum += (net(X).argmax(axis=1) == y).sum()
-        n += y.size
-    return acc_sum.asscalar() / n
+        X, y = X.as_in_context(ctx), y.as_in_context(ctx)
+        metric.add(d2l.accuracy(net(X), y), y.size)
+    return metric[0]/metric[1]
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
 def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
@@ -316,7 +315,7 @@ def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
                             legend=['train loss','train acc','test acc'])
     timer = d2l.Timer()
     for epoch in range(num_epochs):
-        train_l_sum, train_acc_sum, n = 0.0, 0.0, 0
+        metric = d2l.Accumulator(3)  # train_loss, train_acc, num_examples
         for i, (X, y) in enumerate(train_iter):
             timer.start()
             # Here is the only difference compared to train_epoch_ch3
@@ -326,18 +325,17 @@ def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
                 l = loss(y_hat, y)
             l.backward()
             trainer.step(X.shape[0])
-            train_l_sum += l.sum().asscalar()
-            train_acc_sum += d2l.accuracy(y_hat, y)
-            n += X.shape[0]
+            metric.add(l.sum().asscalar(), d2l.accuracy(y_hat, y), X.shape[0])
             timer.stop()
+            train_loss, train_acc = metric[0]/metric[2], metric[1]/metric[2]
             if (i+1) % 50 == 0:
-                animator.add(epoch+i/len(train_iter),
-                             (train_l_sum/n, train_acc_sum/n, None))
+                animator.add(epoch + i/len(train_iter),
+                             (train_loss, train_acc, None))
         test_acc = evaluate_accuracy_gpu(net, test_iter)
         animator.add(epoch+1, (None, None, test_acc))
     print('loss %.3f, train acc %.3f, test acc %.3f' % (
-        train_l_sum/n, train_acc_sum/n, test_acc))
-    print('%.1f exampes/sec on %s'%(n*num_epochs/timer.sum(), ctx))
+        train_loss, train_acc, test_acc))
+    print('%.1f exampes/sec on %s'%(metric[2]*num_epochs/timer.sum(), ctx))
 
 # Defined in file: ./chapter_convolutional-modern/resnet.md
 class Residual(nn.Block):
