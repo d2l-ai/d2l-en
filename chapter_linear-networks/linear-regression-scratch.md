@@ -19,9 +19,9 @@ To start off, we import the packages required to run this section's experiments.
 
 ```{.python .input  n=1}
 %matplotlib inline
+import d2l
 from mxnet import autograd, nd
 import random
-import d2l
 ```
 
 ## Generating Data Sets
@@ -95,8 +95,8 @@ def data_iter(batch_size, features, labels):
     for i in range(0, num_examples, batch_size):
         j = nd.array(indices[i: min(i + batch_size, num_examples)])
         yield features.take(j), labels.take(j)
-        # The “take” function will then return the corresponding element based
-        # on the indices
+        # The “take” function will then return the corresponding element
+        # based on the indices
 ```
 
 In general, note that we want to use reasonably sized minibatches to take advantage of the GPU hardware, which excels at parallelizing operations. Because each example can be fed through our models in parallel and the gradient of the loss function for each example can also be taken in parallel, GPUs allow us to process hundreds of examples in scarcely more time than it might take to process just a single example.

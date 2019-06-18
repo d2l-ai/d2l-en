@@ -174,7 +174,7 @@ net_D(x).shape
 Compared to the basic GAN in :numref:`chapter_basic_gan`, we use the same learning rate for both generator and discriminator since they are similar to each other. In addition, we change $\beta_1$ in Adam (:numref:`chapter_adam`) from $0.9$ to $0.5$. It decreases the smoothness of the momentum, the exponentially weighted moving average of past gradients, to take care of the rapid changing gradients because the generator and the discriminator fight with each other. Besides, `Z` is a 4-D tensor and we are using GPU to accelerate the computation.
 
 ```{.python .input  n=16}
-def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim, 
+def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
           ctx=d2l.try_gpu()):
     loss = gluon.loss.SigmoidBCELoss()
     net_D.initialize(init=init.Normal(0.02), force_reinit=True, ctx=ctx)
@@ -182,9 +182,9 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
     trainer_hp = {'learning_rate': lr, 'beta1': 0.5}
     trainer_D = gluon.Trainer(net_D.collect_params(), 'adam', trainer_hp)
     trainer_G = gluon.Trainer(net_G.collect_params(), 'adam', trainer_hp)
-    animator = d2l.Animator(xlabel='epoch', ylabel='loss', 
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[1, num_epochs], nrows=2, figsize=(5,5),
-                            legend=['generator', 'discriminator'])    
+                            legend=['generator', 'discriminator'])
     animator.fig.subplots_adjust(hspace=0.3)
     for epoch in range(1, num_epochs+1):
         # Train one epoch
@@ -194,13 +194,13 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
             batch_size = X.shape[0]
             Z = nd.random.normal(0, 1, shape=(batch_size, latent_dim, 1, 1))
             X, Z = X.as_in_context(ctx), Z.as_in_context(ctx),
-            metric.add((d2l.update_D(X, Z, net_D, net_G, loss, trainer_D),
-                        d2l.update_G(Z, net_D, net_G, loss, trainer_G), 
-                        batch_size))
+            metric.add(d2l.update_D(X, Z, net_D, net_G, loss, trainer_D),
+                        d2l.update_G(Z, net_D, net_G, loss, trainer_G),
+                        batch_size)
         # Show generated examples
         Z = nd.random.normal(0, 1, shape=(21, latent_dim, 1, 1), ctx=ctx)
         fake_x = (net_G(Z).transpose((0,2,3,1))/2+0.5).asnumpy()
-        imgs = np.vstack([np.hstack(fake_x[i:i+7]) 
+        imgs = np.vstack([np.hstack(fake_x[i:i+7])
                           for i in range(0,len(fake_x),7)])
         animator.axes[1].cla()
         animator.axes[1].imshow(imgs)
@@ -209,7 +209,7 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
         animator.add(epoch, (loss_D, loss_G))
     print('loss_D %.3f, loss_G %.3f, %d examples/sec on %s' % (
         loss_D, loss_G, metric[2]/timer.stop(), ctx))
-    
+
 ```
 
 Now let's train the model.

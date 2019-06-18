@@ -201,7 +201,7 @@ def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):
         l.backward()
         grad_clipping(model, 1)
         updater(batch_size=1)  # Since used mean already.
-        metric.add((l.asscalar() * y.size, y.size))
+        metric.add(l.asscalar() * y.size, y.size)
     return math.exp(metric[0]/metric[1]), metric[1]/timer.stop()
 ```
 

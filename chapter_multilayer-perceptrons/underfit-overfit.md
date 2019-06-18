@@ -469,11 +469,10 @@ Let first implement a function to evaluate the loss on a given data.
 # Save to the d2l package.
 def evaluate_loss(net, data_iter, loss):
     """Evaluate the loss of a model on the given dataset"""
-    l, n = 0.0, 0
+    metric = d2l.Accumulator(2)  # sum_loss, num_examples
     for X, y in data_iter:
-        l += loss(net(X), y).sum().asscalar()
-        n += y.size
-    return l / n
+        metric.add(loss(net(X), y).sum().asscalar(), y.size)
+    return metric[0] / metric[1]
 ```
 
 Now define the training function.
@@ -489,15 +488,15 @@ def train(train_features, test_features, train_labels, test_labels,
     net.initialize()
     batch_size = min(10, train_labels.shape[0])
     train_iter = d2l.load_array((train_features, train_labels), batch_size)
-    test_iter = d2l.load_array((test_features, test_labels), batch_size, False)
+    test_iter = d2l.load_array((test_features, test_labels), batch_size, 
+                               is_train=False)
     trainer = gluon.Trainer(net.collect_params(), 'sgd',
                             {'learning_rate': 0.01})
     animator = d2l.Animator(xlabel='epoch', ylabel='loss', yscale='log',
                             xlim=[1,num_epochs], ylim=[1e-3, 1e2],
                             legend=['train', 'test'])
     for epoch in range(1, num_epochs+1):
-        d2l.train_epoch_ch3(net, train_iter, loss,
-                            lambda: trainer.step(batch_size))
+        d2l.train_epoch_ch3(net, train_iter, loss, trainer)
         if epoch % 50 == 0:
             animator.add(epoch, (evaluate_loss(net, train_iter, loss),
                                  evaluate_loss(net, test_iter, loss)))
