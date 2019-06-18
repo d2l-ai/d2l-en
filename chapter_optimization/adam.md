@@ -5,7 +5,7 @@ Created on the basis of RMSProp, Adam also uses EWMA on the mini-batch stochasti
 
 ## The Algorithm
 
-Adam uses the momentum variable $\boldsymbol{v}_t$ and variable $\boldsymbol{s}_t$, which is an EWMA on the squares of elements in the mini-batch stochastic gradient from RMSProp, and initializes each element of the variables to 0 at time step 0. Given the hyperparameter $0 \leq \beta_1 < 1$ (the author of the algorithm suggests a value of 0.9), the momentum variable $\boldsymbol{v}_t$ at time step $t$ is the EWMA of the mini-batch stochastic gradient $\boldsymbol{g}_t$:
+Adam :cite:`Kingma.Ba.2014` uses the momentum variable $\boldsymbol{v}_t$ and variable $\boldsymbol{s}_t$, which is an EWMA on the squares of elements in the mini-batch stochastic gradient from RMSProp, and initializes each element of the variables to 0 at time step 0. Given the hyperparameter $0 \leq \beta_1 < 1$ (the author of the algorithm suggests a value of 0.9), the momentum variable $\boldsymbol{v}_t$ at time step $t$ is the EWMA of the mini-batch stochastic gradient $\boldsymbol{g}_t$:
 
 $$\boldsymbol{v}_t \leftarrow \beta_1 \boldsymbol{v}_{t-1} + (1 - \beta_1) \boldsymbol{g}_t. $$
 
@@ -59,7 +59,7 @@ Use Adam to train the model with a learning rate of $0.01$.
 
 ```{.python .input  n=5}
 data_iter, feature_dim = d2l.get_data_ch10(batch_size=10)
-d2l.train_ch10(adam, init_adam_states(feature_dim), 
+d2l.train_ch10(adam, init_adam_states(feature_dim),
                {'lr': 0.01, 't': 1}, data_iter, feature_dim);
 ```
 
@@ -82,11 +82,6 @@ d2l.train_gluon_ch10('adam', {'learning_rate': 0.01}, data_iter)
 * Some people say that Adam is a combination of RMSProp and momentum. Why do you think they say this?
 
 
-
-
-## Reference
-
-[1] Kingma, D. P., & Ba, J. (2014). Adam: A method for stochastic optimization. arXiv preprint arXiv:1412.6980.
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2378)
 

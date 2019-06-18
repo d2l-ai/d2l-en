@@ -59,20 +59,15 @@ Beyond local editing there are two things that are quite important: editing the 
 
 ### Markdown Files in Jupyter
 
-If you wish to contribute to the content of this book, you need to modify the source file (.md file, not .ipynb file) on GitHub. Using the notedown plugin we can modify notebooks in .md format directly in Jupyter. Linux/MacOS users can execute the following commands to obtain the GitHub source files and activate the runtime environment. If you haven't done so already, install the environment needed for MXNet Gluon.
+If you wish to contribute to the content of this book, you need to modify the
+source file (.md file, not .ipynb file) on GitHub. Using the notedown plugin we
+can modify notebooks in .md format directly in Jupyter.
+
+
+First, install the notedown plugin, run Jupyter Notebook, and load the plugin:
 
 ```
-git clone https://github.com/d2l-ai/d2l-en.git
-cd d2l-en
-sed -i 's/mxnet/mxnet-cu100/g' environment.yml  # Only use this if you have a GPU
-conda env create -f environment.yml
-source activate gluon # Windows users run "activate gluon"
-```
-
-Next, install the notedown plugin, run Jupyter Notebook, and load the plugin:
-
-```
-pip install https://github.com/mli/notedown/tarball/master
+pip install mu-notedown  # You may need to uninstall the original notedown.
 jupyter notebook --NotebookApp.contents_manager_class='notedown.NotedownContentsManager'
 ```
 

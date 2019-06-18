@@ -93,7 +93,7 @@ After all, each minibatch has different data,
 different labels and with it, different activations, predictions and errors. As it turns out, this is actually beneficial.
 This natural variation appears to act as a form of regularization,
 conferring benefits (as observed empirically) in mitigating overfitting.
-In other recent preliminary research, [Teye, Azizpour and Smith, 2018](https://arxiv.org/pdf/1802.06455.pdf) and [Luo et al, 2018](https://arxiv.org/pdf/1809.00846.pdf) relate the properties of BN
+In other recent preliminary research, :cite:`Teye.Azizpour.Smith.2018` and :cite:`Luo.Wang.Shao.ea.2018` relate the properties of BN
 to Bayesian Priors and penalties respectively.
 In particular, this sheds some light on the puzzle why BN works best
 for moderate sizes of minibatches in the range 50-100.

@@ -1,4 +1,5 @@
 # Gated Recurrent Units (GRU)
+:label:`chapter_gru`
 
 In the previous section we discussed how gradients are calculated in a recurrent
 neural network. In particular we found that long products of matrices can lead

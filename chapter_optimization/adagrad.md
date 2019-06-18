@@ -16,7 +16,7 @@ variables to iterate too slowly in the dimension with smaller gradient
 values. The momentum method relies on the exponentially weighted moving average
 (EWMA) to make the direction of the independent variable more consistent, thus
 reducing the possibility of divergence. In this section, we are going to
-introduce Adagrad, an algorithm that adjusts the learning rate according to the
+introduce Adagrad :cite:`Duchi.Hazan.Singer.2011`, an algorithm that adjusts the learning rate according to the
 gradient value of the independent variable in each dimension to eliminate
 problems caused when a unified learning rate has to adapt to all dimensions.
 
@@ -91,7 +91,7 @@ larger learning rate to train the model.
 
 ```{.python .input  n=4}
 data_iter, feature_dim = d2l.get_data_ch10(batch_size=10)
-d2l.train_ch10(adagrad, init_adagrad_states(feature_dim), 
+d2l.train_ch10(adagrad, init_adagrad_states(feature_dim),
                {'lr': 0.1}, data_iter, feature_dim);
 ```
 
@@ -113,11 +113,6 @@ d2l.train_gluon_ch10('adagrad', {'learning_rate': 0.1}, data_iter)
 * When introducing the features of Adagrad, we mentioned a potential problem. What solutions can you think of to fix this problem?
 * Try to use other initial learning rates in the experiment. How does this change the results?
 
-
-
-## Reference
-
-[1] Duchi, J., Hazan, E., & Singer, Y. (2011). Adaptive subgradient methods for online learning and stochastic optimization. Journal of Machine Learning Research, 12(Jul), 2121-2159.
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2375)
 

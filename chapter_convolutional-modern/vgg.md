@@ -33,8 +33,8 @@ is a sequence of the following layers:
 (ii) a nonlinearity such as a ReLu,
 One VGG block consists of a sequence of convolutional layers,
 followed by a max pooling layer for spatial downsampling.
-In the original VGG paper,
-[Simonyan and Ziserman, 2014](https://arxiv.org/abs/1409.1556)
+In the original VGG paper :cite:`Simonyan.Zisserman.2014`,
+the authors 
 employed convolutions with $3\times3$ kernels
 and $2 \times 2$ max pooling with stride of $2$
 (halving the resolution after each block).
@@ -74,6 +74,7 @@ the `vgg_block` function.
 The fully-connected module is identical to that covered in AlexNet.
 
 ![Designing a network from building blocks](../img/vgg.svg)
+:label:`fig_vgg`
 
 The original VGG network had 5 convolutional blocks,
 among which the first two have one convolutional layer each
@@ -153,7 +154,7 @@ d2l.train_ch5(net, train_iter, test_iter, num_epochs, lr)
 1. When printing out the dimensions of the layers we only saw 8 results rather than 11. Where did the remaining 3 layer informations go?
 1. Compared with AlexNet, VGG is much slower in terms of computation, and it also needs more GPU memory. Try to analyze the reasons for this.
 1. Try to change the height and width of the images in Fashion-MNIST from 224 to 96. What influence does this have on the experiments?
-1. Refer to Table 1 in the original [VGG Paper](https://arxiv.org/abs/1409.1556) to construct other common models, such as VGG-16 or VGG-19.
+1. Refer to Table 1 in :cite:`Simonyan.Zisserman.2014` to construct other common models, such as VGG-16 or VGG-19.
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2355)
 

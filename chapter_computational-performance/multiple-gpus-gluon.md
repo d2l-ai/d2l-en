@@ -85,13 +85,13 @@ Remember we define the `evaluate_accuracy_gpu` in :numref:`chapter_lenet` to sup
 def evaluate_accuracy_gpus(net, data_iter):
     # Query the list of devices.
     ctx_list = list(net.collect_params().values())[0].list_ctx()
-    acc_sum, n = 0.0, 0
+    metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
     for features, labels in data_iter:
         Xs, ys = d2l.split_batch(features, labels, ctx_list)
         pys = [net(X) for X in Xs]  # run in parallel
-        acc_sum += sum(d2l.accuracy(py, y) for py, y in zip(pys, ys))
-        n += labels.size
-    return acc_sum / n
+        metric.add(sum(d2l.accuracy(py, y) for py, y in zip(pys, ys)), 
+                   labels.size)
+    return metric[0]/metric[1]
 ```
 
 ## Multi-GPU Model Training

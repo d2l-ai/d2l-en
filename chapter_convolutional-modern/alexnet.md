@@ -78,7 +78,7 @@ the features ought to be hierarchically composed
 with multiple jointly learned layers, each with learnable parameters.
 In the case of an image, the lowest layers might come
 to detect edges, colors, and textures.
-Indeed, [Krizhevski, Sutskever and Hinton, 2012](https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks) designed a new variant of a convolutional neural network
+Indeed, :cite:`Krizhevsky.Sutskever.Hinton.2012` proposed a new variant of a convolutional neural network
 which achieved excellent performance in the ImageNet challenge.
 
 Interestingly in the lowest layers of the network,
@@ -209,7 +209,7 @@ the first couple years of the deep learning boom.
 ## AlexNet
 
 AlexNet was introduced in 2012, named after Alex Krizhevsky,
-the first author of [the breakthrough ImageNet classification paper](https://papers.nips.cc/paper/4824-imagenet-classification-with-deep-convolutional-neural-networks). AlexNet, which employed an 8-layer convolutional neural network,
+the first author of the breakthrough ImageNet classification paper :cite:`Krizhevsky.Sutskever.Hinton.2012`. AlexNet, which employed an 8-layer convolutional neural network,
 won the ImageNet Large Scale Visual Recognition Challenge 2012
 by a phenomenally large margin.
 This network proved, for the first time,
@@ -220,7 +220,7 @@ Note that we provide a slightly streamlined version of AlexNet
 removing some of the design quirks that were needed in 2012
 to make the model fit on two small GPUs.
 
-![LeNet (left) and AlexNet (right)](../img/alexnet-all.svg)
+![LeNet (left) and AlexNet (right)](../img/alexnet.svg)
 
 The design philosophies of AlexNet and LeNet are very similar,
 but there are also significant differences.

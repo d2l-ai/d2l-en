@@ -12,7 +12,7 @@ earlier in the process.
 However, a careless use of dense layers might give up the
 the spatial structure of the representation entirely,
 Network in Network (NiN) blocks offer an alternative.
-They were proposed by [Lin, Chen and Yan, 2013](https://arxiv.org/pdf/1312.4400.pdf) based on a very simple insight---to
+They were proposed in :cite:`Lin.Chen.Yan.2013` based on a very simple insight---to
 use an MLP on the channels for each pixel separately.
 
 ## NiN Blocks
@@ -34,7 +34,7 @@ and the channel as equivalent to a feature.
 The figure below illustrates the main structural differences
 between NiN and AlexNet, VGG, and other networks.
 
-![The figure on the left shows the network structure of AlexNet and VGG, and the figure on the right shows the network structure of NiN. ](../img/nin-compare.svg)
+![The figure on the left shows the network structure of AlexNet and VGG, and the figure on the right shows the network structure of NiN. ](../img/nin.svg)
 
 The NiN block consists of one convolutional layer
 followed by two $1\times 1$ convolutional layers that act as

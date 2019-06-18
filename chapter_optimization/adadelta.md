@@ -1,7 +1,11 @@
 # Adadelta
 :label:`chapter_adadelta`
 
-In addition to RMSProp, Adadelta is another common optimization algorithm that helps improve the chances of finding useful solutions at later stages of iteration, which is difficult to do when using the Adagrad algorithm for the same purpose[1]. The interesting thing is that there is no learning rate hyperparameter in the Adadelta algorithm.
+In addition to RMSProp, Adadelta is another common optimization algorithm that
+helps improve the chances of finding useful solutions at later stages of
+iteration, which is difficult to do when using the Adagrad algorithm for the
+same purpose :cite:`Zeiler.2012`. The interesting thing is that there is no learning rate
+hyperparameter in the Adadelta algorithm.
 
 ## The Algorithm
 
@@ -52,7 +56,7 @@ Then, we train the model with the hyperparameter $\rho=0.9$.
 
 ```{.python .input  n=12}
 data_iter, feature_dim = d2l.get_data_ch10(batch_size=10)
-d2l.train_ch10(adadelta, init_adadelta_states(feature_dim), 
+d2l.train_ch10(adadelta, init_adadelta_states(feature_dim),
                {'rho': 0.9}, data_iter, feature_dim);
 ```
 
@@ -72,10 +76,6 @@ d2l.train_gluon_ch10('adadelta', {'rho': 0.9}, data_iter)
 ## Exercises
 
 * Adjust the value of $\rho$ and observe the experimental results.
-
-## Reference
-
-[1] Zeiler, M. D. (2012). ADADELTA: an adaptive learning rate method. arXiv preprint arXiv:1212.5701.
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2377)
 
