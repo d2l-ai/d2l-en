@@ -32,19 +32,6 @@ layer = CenteredLayer()
 layer(np.array([1, 2, 3, 4, 5]))
 ```
 
-```{.json .output n=2}
-[
- {
-  "data": {
-   "text/plain": "[-2. -1.  0.  1.  2.]\n<ndarray shape=(5,)>"
-  },
-  "execution_count": 2,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 We can also use it to construct more complex models.
 
 ```{.python .input  n=5}
@@ -58,19 +45,6 @@ Let's see whether the centering layer did its job. For that we send random data 
 ```{.python .input  n=6}
 y = net(np.random.uniform(size=(4, 8)))
 y.mean()
-```
-
-```{.json .output n=6}
-[
- {
-  "data": {
-   "text/plain": "-7.212293e-10"
-  },
-  "execution_count": 6,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ## Layers with Parameters
