@@ -1,7 +1,15 @@
 # Text Sentiment Classification: Using Convolutional Neural Networks (textCNN)
 :label:`chapter_sentiment_cnn`
 
-In the "Convolutional Neural Networks" chapter, we explored how to process two-dimensional image data with two-dimensional convolutional neural networks. In the previous language models and text classification tasks, we treated text data as a time series with only one dimension, and naturally, we used recurrent neural networks to process such data. In fact, we can also treat text as a one-dimensional image, so that we can use one-dimensional convolutional neural networks to capture associations between adjacent words. This section describes a groundbreaking approach to applying convolutional neural networks to text analysis: textCNN[1]. First, import the packages and modules required for the experiment.
+In :numref:`chapter_cnn`, we explored how to process
+two-dimensional image data with two-dimensional convolutional neural
+networks. In the previous language models and text classification tasks, we
+treated text data as a time series with only one dimension, and naturally, we
+used recurrent neural networks to process such data. In fact, we can also treat
+text as a one-dimensional image, so that we can use one-dimensional
+convolutional neural networks to capture associations between adjacent
+words. This section describes a groundbreaking approach to applying
+convolutional neural networks to text analysis: textCNN :cite:`Kim.2014`. First, import the packages and modules required for the experiment.
 
 ```{.python .input  n=2}
 import d2l
@@ -186,13 +194,6 @@ d2l.predict_sentiment(net, vocab, 'this movie is so bad')
 * Can you further improve the accuracy of the model on the test set by using the three methods introduced in the previous section: tuning hyper-parameters, using larger pre-trained word vectors, and using the spaCy word tokenization tool?
 * What other natural language processing tasks can you use textCNN for?
 
-
-
-
-
-## Reference
-
-[1] Kim, Y. (2014). Convolutional neural networks for sentence classification. arXiv preprint arXiv:1408.5882.
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2392)
 

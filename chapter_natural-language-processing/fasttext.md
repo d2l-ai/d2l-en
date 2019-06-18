@@ -3,7 +3,13 @@
 
 English words usually have internal structures and formation methods. For example, we can deduce the relationship between "dog", "dogs", and "dogcatcher" by their spelling. All these words have the same root, "dog", but they use different suffixes to change the meaning of the word. Moreover, this association can be extended to other words. For example, the relationship between "dog" and "dogs" is just like the relationship between "cat" and "cats". The relationship between "boy" and "boyfriend" is just like the relationship between "girl" and "girlfriend". This characteristic is not unique to English. In French and Spanish, a lot of verbs can have more than 40 different forms depending on the context. In Finnish, a noun may have more than 15 forms. In fact, morphology, which is an important branch of linguistics, studies the internal structure and formation of words.
 
-In word2vec, we did not directly use morphology information.  In both the skip-gram model and continuous bag-of-words model, we use different vectors to represent words with different forms. For example, "dog" and "dogs" are represented by two different vectors, while the relationship between these two vectors is not directly represented in the model. In view of this, fastText proposes the method of subword embedding, thereby attempting to introduce morphological information in the skip-gram model in word2vec[1].
+In word2vec, we did not directly use morphology information.  In both the
+skip-gram model and continuous bag-of-words model, we use different vectors to
+represent words with different forms. For example, "dog" and "dogs" are
+represented by two different vectors, while the relationship between these two
+vectors is not directly represented in the model. In view of this, fastText :cite:`Bojanowski.Grave.Joulin.ea.2017`
+proposes the method of subword embedding, thereby attempting to introduce
+morphological information in the skip-gram model in word2vec.
 
 In fastText, each central word is represented as a collection of subwords. Below we use the word "where" as an example to understand how subwords are formed. First, we add the special characters “&lt;” and “&gt;” at the beginning and end of the word to distinguish the subwords used as prefixes and suffixes. Then, we treat the word as a sequence of characters to extract the $n$-grams. For example, when $n=3$, we can get all subwords with a length of 3:
 
@@ -30,11 +36,6 @@ The rest of the fastText process is consistent with the skip-gram model, so it i
 * How can you design a subword embedding model based on the continuous bag-of-words model?
 
 
-
-
-## Reference
-
-[1] Bojanowski, P., Grave, E., Joulin, A., & Mikolov, T. (2016). Enriching word vectors with subword information. arXiv preprint arXiv:1607.04606.
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2388)
 

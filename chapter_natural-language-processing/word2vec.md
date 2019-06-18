@@ -22,7 +22,13 @@ $$\frac{\mathbf{x}^\top \mathbf{y}}{\|\mathbf{x}\| \|\mathbf{y}\|} \in [-1, 1].$
 
 Since the cosine similarity between the one-hot vectors of any two different words is 0, it is difficult to use the one-hot vector to accurately represent the similarity between multiple different words.
 
-Word2vec is a tool that we came up with to solve the problem above[1].  It represents each word with a fixed-length vector and uses these vectors to better indicate the similarity and analogy relationships between different words. The Word2vec tool contains two models: skip-gram[2] and continuous bag of words (CBOW)[3]. Next, we will take a look at the two models and their training methods.
+[Word2vec](https://code.google.com/archive/p/word2vec/) is a tool that we came
+up with to solve the problem above.  It represents each word with a
+fixed-length vector and uses these vectors to better indicate the similarity and
+analogy relationships between different words. The Word2vec tool contains two
+models: skip-gram :cite:`Mikolov.Sutskever.Chen.ea.2013` and continuous bag of
+words (CBOW) :cite:`Mikolov.Chen.Corrado.ea.2013`. Next, we will take a
+look at the two models and their training methods.
 
 
 ## The Skip-Gram Model
@@ -127,15 +133,6 @@ We then use the same method to obtain the gradients for other word vectors. Unli
 * Use the skip-gram model as an example to think about the design of a word2vec model. What is the relationship between the inner product of two word vectors and the cosine similarity in the skip-gram model? For a pair of words with close semantical meaning, why it is likely for their word vector cosine similarity to be high?
 
 
-
-
-## Reference
-
-[1] Word2vec tool.  https://code.google.com/archive/p/word2vec/
-
-[2] Mikolov, T., Sutskever, I., Chen, K., Corrado, G. S., & Dean, J. (2013). Distributed representations of words and phrases and their compositionality. In Advances in neural information processing systems (pp. 3111-3119).
-
-[3] Mikolov, T., Chen, K., Corrado, G., & Dean, J. (2013). Efficient estimation of word representations in vector space. arXiv preprint arXiv:1301.3781.
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2385)
 
