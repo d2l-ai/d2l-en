@@ -1076,21 +1076,45 @@ from sight.
 
 It is only recently that AI has been in the limelight, mostly due to solutions to problems that were considered intractable previously.
 
-* Intelligent assistants, such as Apple's Siri, Amazon's Alexa, or Google's assistant are able to answer spoken questions with a reasonable degree of accuracy. This includes menial tasks such as turning on light switches (a boon to the disabled) up to making barber's appointments and offering phone support dialog. This is likely the most noticeable sign that AI is affecting our lives.
+* Intelligent assistants, such as Apple's Siri, Amazon's Alexa, or Google's
+  assistant are able to answer spoken questions with a reasonable degree of
+  accuracy. This includes menial tasks such as turning on light switches (a boon
+  to the disabled) up to making barber's appointments and offering phone support
+  dialog. This is likely the most noticeable sign that AI is affecting our
+  lives.
 
-* A key ingredient in digital assistants is the ability to recognize speech accurately. Gradually the accuracy of such systems has increased to the point where they reach human parity [14] for certain applications.
-* Object recognition likewise has come a long way. Estimating the object in a picture was a fairly challenging task in 2010. On the ImageNet benchmark Lin et al. [15] achieved a top-5 error rate of 28%. By 2017 Hu et al. [16] reduced this error rate to 2.25%. Similarly stunning results have been achieved for identifying birds, or diagnosing skin cancer.
-* Games used to be a bastion of human intelligence. Starting from TDGammon [23], a program for playing Backgammon using temporal difference (TD) reinforcement learning, algorithmic and computational progress has led to algorithms for a wide range of applications. Unlike Backgammon, chess has a much more complex state space and set of actions. DeepBlue beat Gary Kasparov, Campbell et al. [17], using massive parallelism, special purpose hardware and efficient search through the game tree. Go is more difficult still, due to its huge state space. AlphaGo reached human parity in 2015,  Silver et al. [18] using Deep Learning combined with Monte Carlo tree sampling. The challenge in Poker was that the state space is large and it is not fully observed (we don't know the opponents' cards). Libratus exceeded human performance in Poker using efficiently structured strategies; Brown and Sandholm [19]. This illustrates the impressive progress in games and the fact that advanced algorithms played a crucial part in them.
+* A key ingredient in digital assistants is the ability to recognize speech
+  accurately. Gradually the accuracy of such systems has increased to the point
+  where they reach human parity :cite:`Xiong.Wu.Alleva.ea.2018` for certain
+  applications.
+* Object recognition likewise has come a long way. Estimating the object in a
+  picture was a fairly challenging task in 2010. On the ImageNet benchmark
+  :cite:`Lin.Lv.Zhu.ea.2010` achieved a top-5 error rate of 28%. By 2017,
+  :cite:`Hu.Shen.Sun.2018` reduced this error rate to 2.25%. Similarly stunning
+  results have been achieved for identifying birds, or diagnosing skin cancer.
+* Games used to be a bastion of human intelligence. Starting from TDGammon [23],
+  a program for playing Backgammon using temporal difference (TD) reinforcement
+  learning, algorithmic and computational progress has led to algorithms for a
+  wide range of applications. Unlike Backgammon, chess has a much more complex
+  state space and set of actions. DeepBlue beat Gary Kasparov, Campbell et
+  al. :cite:`Campbell.Hoane-Jr.Hsu.2002`, using massive parallelism, special
+  purpose hardware and efficient search through the game tree. Go is more
+  difficult still, due to its huge state space. AlphaGo reached human parity in
+  2015, :cite:`Silver.Huang.Maddison.ea.2016` using Deep Learning combined with
+  Monte Carlo tree sampling. The challenge in Poker was that the state space is
+  large and it is not fully observed (we don't know the opponents'
+  cards). Libratus exceeded human performance in Poker using efficiently
+  structured strategies :cite:`Brown.Sandholm.2017`. This illustrates the
+  impressive progress in games and the fact that advanced algorithms played a
+  crucial part in them.
 * Another indication of progress in AI is the advent of self-driving cars and
   trucks. While full autonomy is not quite within reach yet, excellent progress
-  has been made in this direction, with companies such as
-  Momenta, Tesla,
-  NVIDIA, MobilEye
-  and Waymo shipping products that enable at least
-  partial autonomy. What makes full autonomy so challenging is that proper
-  driving requires the ability to perceive, to reason and to incorporate rules
-  into a system. At present, Deep Learning is used primarily in the computer
-  vision aspect of these problems. The rest is heavily tuned by engineers.
+  has been made in this direction, with companies such as Momenta, Tesla,
+  NVIDIA, MobilEye and Waymo shipping products that enable at least partial
+  autonomy. What makes full autonomy so challenging is that proper driving
+  requires the ability to perceive, to reason and to incorporate rules into a
+  system. At present, Deep Learning is used primarily in the computer vision
+  aspect of these problems. The rest is heavily tuned by engineers.
 
 Again, the above list barely scratches the surface of what is considered intelligent and where machine learning has led to impressive progress in a field. For instance, robotics, logistics, computational biology, particle physics and astronomy owe some of their most impressive recent advances at least in parts to machine learning. ML is thus becoming a ubiquitous tool for engineers and scientists.
 
