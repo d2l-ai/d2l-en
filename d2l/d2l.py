@@ -48,6 +48,71 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
     return axes
 
 
+# Defined in file: ./chapter_linear-networks/linear-regression.md
+class Timer(object):
+    """Record multiple running times."""
+    def __init__(self):
+        self.times = []
+        self.start()
+        
+    def start(self):
+        """Start the timer"""
+        self.start_time = time.time()
+    
+    def stop(self):
+        """Stop the timer and record the time in a list"""
+        self.times.append(time.time() - self.start_time)
+        return self.times[-1]
+        
+    def avg(self):
+        """Return the average time"""
+        return sum(self.times)/len(self.times)
+    
+    def sum(self):
+        """Return the sum of time"""
+        return sum(self.times)
+        
+    def cumsum(self):
+        """Return the accumuated times"""
+        return np.array(self.times).cumsum().tolist()
+
+# Defined in file: ./chapter_linear-networks/linear-regression.md
+def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
+         ylim=None, xscale='linear', yscale='linear', fmts=None,
+         figsize=(3.5, 2.5), axes=None):
+    """Plot multiple lines"""
+    d2l.set_figsize(figsize)
+    axes = axes if axes else d2l.plt.gca()
+    if isinstance(X, nd.NDArray): X = X.asnumpy()
+    if isinstance(Y, nd.NDArray): Y = Y.asnumpy()
+    if not hasattr(X[0], "__len__"): X = [X]
+    if Y is None: X, Y = [[]]*len(X), X
+    if not hasattr(Y[0], "__len__"): Y = [Y]
+    if len(X) != len(Y): X = X * len(Y)
+    if not fmts: fmts = ['-']*len(X)
+    axes.cla()
+    for x, y, fmt in zip(X, Y, fmts):
+        if isinstance(x, nd.NDArray): x = x.asnumpy()
+        if isinstance(y, nd.NDArray): y = y.asnumpy()
+        if len(x):
+            axes.plot(x, y, fmt)
+        else:
+            axes.plot(y, fmt)
+    set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
+
+
+# Defined in file: ./chapter_linear-networks/linear-regression.md
+def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
+    """A utility function to set matplotlib axes"""
+    axes.set_xlabel(xlabel)
+    axes.set_ylabel(ylabel)
+    axes.set_xscale(xscale)
+    axes.set_yscale(yscale)
+    axes.set_xlim(xlim)
+    axes.set_ylim(ylim)
+    if legend: axes.legend(legend)
+    axes.grid()
+
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def synthetic_data(w, b, num_examples):
     """generate y = X w + b + noise"""
@@ -111,28 +176,37 @@ def accuracy(y_hat, y):
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def evaluate_accuracy(net, data_iter):
-    acc_sum, n = 0.0, 0
+    metric = Accumulator(2) # num_corrected_examples, num_examples
     for X, y in data_iter:
         y = y.astype('float32')
-        acc_sum += accuracy(net(X), y)
-        n += y.size
-    return acc_sum / n
+        metric.add(accuracy(net(X), y), y.size)
+    return metric[0] / metric[1]
+
+# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
+class Accumulator(object):
+    """Sum a list of numbers over time"""
+    def __init__(self, n):
+        self.data = [0.0] * n
+    def add(self, *args):
+        self.data = [a+b for a, b in zip(self.data, args)]
+    def reset(self):
+        self.data = [0] * len(self.data)
+    def __getitem__(self, i):
+        return self.data[i]
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def train_epoch_ch3(net, train_iter, loss, updater):
-    train_l_sum, train_acc_sum, n = 0.0, 0.0, 0
+    metric = Accumulator(3) # train_loss_sum, train_acc_sum, num_examples
     for X, y in train_iter:
         # compute gradients and update parameters
         with autograd.record():
             y_hat = net(X)
             l = loss(y_hat, y)
         l.backward()
-        updater()
-        # measure loss and accuracy
-        train_l_sum += l.sum().asscalar()
-        train_acc_sum += accuracy(y_hat, y)
-        n += y.size
-    return train_l_sum/n, train_acc_sum/n
+        updater(X.shape[0])
+        metric.add(l.sum().asscalar(), accuracy(y_hat, y), y.size)
+    # Return training loss and training accuracy
+    return metric[0]/metric[2], metric[1]/metric[2]
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 class Animator(object):
@@ -144,7 +218,7 @@ class Animator(object):
         self.fig, self.axes = d2l.plt.subplots(nrows, ncols, figsize=figsize)
         if nrows * ncols == 1: self.axes = [self.axes,]
         # use a lambda to capture arguments
-        self.config_axes = lambda : set_axes(
+        self.config_axes = lambda : d2l.set_axes(
             self.axes[0], xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
         self.X, self.Y, self.fmts = None, None, fmts
 
@@ -167,24 +241,14 @@ class Animator(object):
         display.display(self.fig)
         display.clear_output(wait=True)
 
-
-# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
-    """A utility function to set matplotlib axes"""
-    axes.set_xlabel(xlabel)
-    axes.set_ylabel(ylabel)
-    axes.set_xscale(xscale)
-    axes.set_yscale(yscale)
-    axes.set_xlim(xlim)
-    axes.set_ylim(ylim)
-    if legend: axes.legend(legend)
-    axes.grid()
-
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
     trains, test_accs = [], []
-    animator = Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0.3, 0.9],
-                       legend=['train loss', 'train acc', 'test acc'])
+    animator = Animator(xlabel='epoch', xlim=[1, num_epochs], 
+                        ylim=[0.3, 0.9], 
+                        legend=['train loss', 'train acc', 'test acc'])
+    if isinstance(updater, gluon.Trainer):
+        updater = updater.step
     for epoch in range(num_epochs):
         train_metrics = train_epoch_ch3(net, train_iter, loss, updater)
         test_acc = evaluate_accuracy(net, test_iter)
@@ -199,37 +263,6 @@ def predict_ch3(net, test_iter, n=6):
     titles = [true+'\n'+ pred for true, pred in zip(trues, preds)]
     d2l.show_images(X[0:n].reshape((n,28,28)), 1, n, titles=titles[0:n])
 
-
-# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
-         ylim=None, xscale='linear', yscale='linear', fmts=None,
-         figsize=(3.5, 2.5), axes=None):
-    """Plot multiple lines"""
-    d2l.set_figsize(figsize)
-    axes = axes if axes else d2l.plt.gca()
-    if isinstance(X, nd.NDArray): X = X.asnumpy()
-    if isinstance(Y, nd.NDArray): Y = Y.asnumpy()
-    if not hasattr(X[0], "__len__"): X = [X]
-    if Y is None: X, Y = [[]]*len(X), X
-    if not hasattr(Y[0], "__len__"): Y = [Y]
-    if len(X) != len(Y): X = X * len(Y)
-    if not fmts: fmts = ['-']*len(X)
-    axes.cla()
-    for x, y, fmt in zip(X, Y, fmts):
-        if isinstance(x, nd.NDArray): x = x.asnumpy()
-        if isinstance(y, nd.NDArray): y = y.asnumpy()
-        if len(x):
-            axes.plot(x, y, fmt)
-        else:
-            axes.plot(y, fmt)
-    set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
-
-
-# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-def show(obj):
-    """Show a figure"""
-    display.display(obj)
-    display.clear_output(wait=True)
 
 # Defined in file: ./chapter_multilayer-perceptrons/underfit-overfit.md
 def evaluate_loss(net, data_iter, loss):
@@ -273,34 +306,6 @@ def evaluate_accuracy_gpu(net, data_iter, ctx=None):
         acc_sum += (net(X).argmax(axis=1) == y).sum()
         n += y.size
     return acc_sum.asscalar() / n
-
-# Defined in file: ./chapter_convolutional-neural-networks/lenet.md
-class Timer(object):
-    """Record multiple running times."""
-    def __init__(self):
-        self.times = []
-        self.start()
-        
-    def start(self):
-        """Start the timer"""
-        self.start_time = time.time()
-    
-    def stop(self):
-        """Stop the timer and record the time in a list"""
-        self.times.append(time.time() - self.start_time)
-        return self.times[-1]
-        
-    def avg(self):
-        """Return the average time"""
-        return sum(self.times)/len(self.times)
-    
-    def sum(self):
-        """Return the sum of time"""
-        return sum(self.times)
-        
-    def cumsum(self):
-        """Return the accumuated times"""
-        return np.array(self.times).cumsum().tolist()
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
 def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
@@ -1008,17 +1013,6 @@ def train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs,
         metric[0]/metric[2], metric[1]/metric[3], test_acc))
     print('%.1f exampes/sec on %s' % (
         metric[2]*num_epochs/timer.sum(), ctx_list))
-
-# Defined in file: ./chapter_computer-vision/image-augmentation.md
-class Accumulator(object):
-    def __init__(self, n):
-        self.data = [0.0] * n
-    def add(self, x):
-        self.data = [a+b for a, b in zip(self.data, x)]
-    def reset(self):
-        self.data = [0] * len(self.data)
-    def __getitem__(self, i):
-        return self.data[i]
 
 # Defined in file: ./chapter_computer-vision/bounding-box.md
 def bbox_to_rect(bbox, color):

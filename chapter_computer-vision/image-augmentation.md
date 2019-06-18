@@ -232,17 +232,3 @@ train_with_data_aug(test_augs, test_augs)
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2442)
 
 ![](../img/qr_image-augmentation.svg)
-
-```{.python .input  n=15}
-# TODO, find a better place 
-# Save to the d2l package.
-class Accumulator(object):
-    def __init__(self, n):
-        self.data = [0.0] * n
-    def add(self, x):
-        self.data = [a+b for a, b in zip(self.data, x)]
-    def reset(self):
-        self.data = [0] * len(self.data)
-    def __getitem__(self, i):
-        return self.data[i]
-```
