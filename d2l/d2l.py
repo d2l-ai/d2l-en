@@ -197,6 +197,8 @@ class Accumulator(object):
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def train_epoch_ch3(net, train_iter, loss, updater):
     metric = Accumulator(3) # train_loss_sum, train_acc_sum, num_examples
+    if isinstance(updater, gluon.Trainer):
+        updater = updater.step
     for X, y in train_iter:
         # compute gradients and update parameters
         with autograd.record():
@@ -247,8 +249,6 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
     animator = Animator(xlabel='epoch', xlim=[1, num_epochs], 
                         ylim=[0.3, 0.9], 
                         legend=['train loss', 'train acc', 'test acc'])
-    if isinstance(updater, gluon.Trainer):
-        updater = updater.step
     for epoch in range(num_epochs):
         train_metrics = train_epoch_ch3(net, train_iter, loss, updater)
         test_acc = evaluate_accuracy(net, test_iter)
@@ -267,11 +267,10 @@ def predict_ch3(net, test_iter, n=6):
 # Defined in file: ./chapter_multilayer-perceptrons/underfit-overfit.md
 def evaluate_loss(net, data_iter, loss):
     """Evaluate the loss of a model on the given dataset"""
-    l, n = 0.0, 0
+    metric = d2l.Accumulator(2)  # sum_loss, num_examples
     for X, y in data_iter:
-        l += loss(net(X), y).sum().asscalar()
-        n += y.size
-    return l / n
+        metric.add(loss(net(X), y).sum().asscalar(), y.size)
+    return metric[0] / metric[1]
 
 # Defined in file: ./chapter_deep-learning-computation/use-gpu.md
 def try_gpu(i=0):

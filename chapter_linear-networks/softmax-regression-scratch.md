@@ -250,12 +250,14 @@ evaluate_accuracy(net, test_iter)
 
 The training loop for softmax regression should look strikingly familiar
 if you read through our implementation
-of linear regression in :numref:`chapter_linear_scratch`. Here we refactor the implementation to make it reusable. First, we define a function to train for one data epoch. Note that `updater` is general function to update the model parameters, which accepts the batch size as an argument.
+of linear regression in :numref:`chapter_linear_scratch`. Here we refactor the implementation to make it reusable. First, we define a function to train for one data epoch. Note that `updater` is general function to update the model parameters, which accepts the batch size as an argument. It can be either a wrapper of `d2l.sgd` or a Gluon trainer.
 
 ```{.python .input  n=15}
 # Save to the d2l package.
 def train_epoch_ch3(net, train_iter, loss, updater):
     metric = Accumulator(3) # train_loss_sum, train_acc_sum, num_examples
+    if isinstance(updater, gluon.Trainer):
+        updater = updater.step
     for X, y in train_iter:
         # compute gradients and update parameters
         with autograd.record():
@@ -305,7 +307,7 @@ class Animator(object):
         display.clear_output(wait=True)
 ```
 
-The training function then runs multiple epochs and visualize the training progress. The `updater` here can be either a wrapper of `d2l.sgd` or a Gluon trainer. 
+The training function then runs multiple epochs and visualize the training progress. 
 
 ```{.python .input  n=17}
 # Save to the d2l package.
@@ -314,8 +316,6 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
     animator = Animator(xlabel='epoch', xlim=[1, num_epochs], 
                         ylim=[0.3, 0.9], 
                         legend=['train loss', 'train acc', 'test acc'])
-    if isinstance(updater, gluon.Trainer):
-        updater = updater.step
     for epoch in range(num_epochs):
         train_metrics = train_epoch_ch3(net, train_iter, loss, updater)
         test_acc = evaluate_accuracy(net, test_iter)
