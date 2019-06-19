@@ -25,19 +25,6 @@ c = a * b + 2
 c
 ```
 
-```{.json .output n=2}
-[
- {
-  "data": {
-   "text/plain": "[[3. 3.]]\n<ndarray shape=(1, 2)>"
-  },
-  "execution_count": 2,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 In Asynchronous Computing, whenever the Python front-end thread executes one of the first three statements, it simply returns the task to the back-end queue. When the last statement’s results need to be printed, the Python front-end thread will wait for the C++ back-end thread to finish computing result of the variable `c`. One benefit of such as design is that the Python front-end thread in this example does not need to perform actual computations. Thus, there is little impact on the program’s overall performance, regardless of Python’s performance. MXNet will deliver consistently high performance, regardless of the front-end language’s performance, provided the C++ back-end can meet the efficiency requirements.
 
 The following example uses timing to demonstrate the effect of asynchronous programming. As we can see, when `y = nd.dot(x, x).sum()` is returned, it does not actually wait for the variable `y` to be calculated. Only when the `print` function needs to print the variable `y` must the function wait for it to be calculated.
@@ -50,16 +37,6 @@ print('Workloads are queued. Time %.4f sec' % timer.stop())
 
 print('sum =', y)
 print('Workloads are finished. Time %.4f sec' % timer.stop())
-```
-
-```{.json .output n=3}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "Workloads are queued. Time 0.0012 sec\nsum = 2000366100.0\nWorkloads are finished. Time 0.1844 sec\n"
- }
-]
 ```
 
 In truth, whether or not the current result is already calculated in the memory is irrelevant, unless we need to print or save the computation results. So long as the data is stored in NDArray and the operators provided by MXNet are used, MXNet will utilize asynchronous programming by default to attain superior computing performance.
@@ -78,16 +55,6 @@ y.wait_to_read()
 print('Done in %.4f sec' % timer.stop())
 ```
 
-```{.json .output n=4}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "Done in 0.0305 sec\n"
- }
-]
-```
-
 Below, we use `waitall` as an example. The time output includes the calculation time of `y` and `z` respectively.
 
 ```{.python .input  n=5}
@@ -96,16 +63,6 @@ y = x.dot(x)
 z = x.dot(x)
 npx.waitall()
 print('Done in %.4f sec' % timer.stop())
-```
-
-```{.json .output n=5}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "Done in 0.0566 sec\n"
- }
-]
 ```
 
 Additionally, any operation that does not support asynchronous programming but converts the NDArray into another data structure will cause the front-end to have to wait for computation results. For example, calling the `asnumpy` and `item` functions:
@@ -117,31 +74,11 @@ y.asnumpy()
 print('Done in %.4f sec' % timer.stop())
 ```
 
-```{.json .output n=6}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "Done in 0.0309 sec\n"
- }
-]
-```
-
 ```{.python .input  n=7}
 timer.start()
 y = x.dot(x)
 np.abs(y).sum().item()
 print('Done in %.4f sec' % timer.stop())
-```
-
-```{.json .output n=7}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "Done in 0.1048 sec\n"
- }
-]
 ```
 
 The `wait_to_read`, `waitall`, `asnumpy`, `item` and the`print` functions described above will cause the front-end to wait for the back-end computation results. Such functions are often referred to as synchronization functions.
@@ -163,16 +100,6 @@ for _ in range(1000):
     y = x + 1
 npx.waitall()
 print('Asynchronous. Done in %.4f sec' % timer.stop())
-```
-
-```{.json .output n=8}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "Synchronous. Done in 0.3282 sec\nAsynchronous. Done in 0.2213 sec\n"
- }
-]
 ```
 
 We have observed that certain aspects of computing performance can be improved by making use of asynchronous programming. To explain this, we will slightly simplify the interaction between the Python front-end thread and the C++ back-end thread. In each loop, the interaction between front and back-ends can be largely divided into three stages:
@@ -246,16 +173,6 @@ npx.waitall()
 print('increased memory: %f MB' % (get_mem() - mem))
 ```
 
-```{.json .output n=13}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "batch 50, time 1.5674 sec\nbatch 100, time 3.1617 sec\nincreased memory: 3.744000 MB\n"
- }
-]
-```
-
 Even though each mini-batch’s generation interval is shorter, the memory usage may still be high during training if the synchronization function is removed. This is because, in default asynchronous programming, the front-end will pass on all mini-batch computations to the back-end in a short amount of time. As a result of this, a large amount of intermediate results cannot be released and may end up piled up in memory. In this experiment, we can see that all data (`X` and `y`) is generated in under a second. However, because of an insufficient training speed, this data can only be stored in the memory and cannot be cleared in time, resulting in extra memory usage.
 
 ```{.python .input  n=14}
@@ -267,16 +184,6 @@ for X, y in data_iter():
     trainer.step(X.shape[0])
 npx.waitall()
 print('increased memory: %f MB' % (get_mem() - mem))
-```
-
-```{.json .output n=14}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "batch 50, time 0.1453 sec\nbatch 100, time 0.2872 sec\nincreased memory: 11.032000 MB\n"
- }
-]
 ```
 
 ## Summary
