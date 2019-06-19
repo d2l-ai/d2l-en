@@ -40,19 +40,21 @@ Now on to slightly more difficult things—$p(x_i | y)$. Since we picked black a
 from matplotlib import pyplot as plt
 from IPython import display
 display.set_matplotlib_formats('svg')
+import numpy as onp
 import mxnet as mx
-from mxnet import nd
-import numpy as np
+from mxnet import np, npx
+
+npx.set_np()
 
 # We go over one observation at a time (speed doesn't matter here)
 def transform(data, label):
-    return (nd.floor(data/128)).astype(np.float32), label.astype(np.float32)
+    return np.floor(data.astype('float32')/128), label.astype('float32')
 mnist_train = mx.gluon.data.vision.MNIST(train=True, transform=transform)
 mnist_test  = mx.gluon.data.vision.MNIST(train=False, transform=transform)
 
 # Initialize the counters
-xcount = nd.ones((784,10))
-ycount = nd.ones((10))
+xcount = np.ones((784,10))
+ycount = np.ones((10))
 
 for data, label in mnist_train:
     y = int(label)
@@ -61,14 +63,14 @@ for data, label in mnist_train:
 
 # using broadcast again for division
 py = ycount / ycount.sum()
-px = (xcount / ycount.reshape(1,10))
+px = xcount / ycount.reshape(1,10)
 ```
 
 ```{.python .input  n=9}
 for data, label in mnist_train:
     y = int(label)
     ycount[y] += 1
-    xcount[:,y] += data.reshape((784))
+    xcount[:,y] += data.reshape(784)
 ```
 
 Now that we computed per-pixel counts of occurrence for all pixels, it's time to see how our model behaves. Time to plot it. This is where it is so much more convenient to work with images. Visualizing 28x28x10 probabilities (for each pixel for each class) would typically be an exercise in futility. However, by plotting them as images we get a quick overview. The astute reader probably noticed by now that these are some mean looking digits ...
@@ -119,9 +121,9 @@ $$\frac{\exp(a)}{\exp(a) + \exp(b)} = \frac{\exp(a + c)}{\exp(a + c) + \exp(b + 
 In particular, we can pick $c = -\max(a,b)$, which ensures that at least one of the terms in the denominator is $1$.
 
 ```{.python .input  n=4}
-logpx = nd.log(px)
-logpxneg = nd.log(1-px)
-logpy = nd.log(py)
+logpx = np.log(px)
+logpxneg = np.log(1-px)
+logpy = np.log(py)
 
 def bayespost(data):
     # We need to incorporate the prior probability p(y) since p(y|x) is
@@ -130,9 +132,9 @@ def bayespost(data):
     logpost += (logpx * data + logpxneg * (1-data)).sum(0)
     # Normalize to prevent overflow or underflow by subtracting the largest
     # value
-    logpost -= nd.max(logpost)
+    logpost -= np.max(logpost)
     # Compute the softmax using logpx
-    post = nd.exp(logpost).asnumpy()
+    post = np.exp(logpost)
     post /= np.sum(post)
     return post
 
@@ -147,7 +149,7 @@ for data, label in mnist_test:
     post = bayespost(x)
 
     # Bar chart and image of digit
-    figarr[1, ctr].bar(range(10), post)
+    figarr[1, ctr].bar(range(10), post.asnumpy())
     figarr[1, ctr].axes.get_yaxis().set_visible(False)
     figarr[0, ctr].imshow(x.reshape((28, 28)).asnumpy(), cmap='hot')
     figarr[0, ctr].axes.get_xaxis().set_visible(False)

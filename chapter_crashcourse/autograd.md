@@ -7,7 +7,9 @@ Put simply, this means that for each of the model's parameters, we can determine
 The autograd package expedites this work by automatically calculating derivatives. And while many other libraries require that we compile a symbolic graph to take automatic derivatives, `autograd` allows us to take derivatives while writing  ordinary imperative code. Every time we pass data through our model, `autograd` builds a graph on the fly, tracking which data combined through which operations to produce the output. This graph enables `autograd` to subsequently backpropagate gradients on command. Here *backpropagate* simply means to trace through the compute graph, filling in the partial derivatives with respect to each parameter. If you are unfamiliar with some of the math, e.g. gradients, please refer to :numref:`chapter_math`.
 
 ```{.python .input  n=1}
-from mxnet import numpy as np, autograd, nd
+from mxnet import numpy as np, npx, autograd
+
+npx.set_np()
 ```
 
 ## A Simple Example

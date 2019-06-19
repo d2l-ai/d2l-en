@@ -11,7 +11,9 @@ If you are already confident in your basic linear algebra,
 feel free to skim through or skip this chapter.
 
 ```{.python .input  n=1}
-from mxnet import np
+from mxnet import np, npx
+
+npx.set_np()
 ```
 
 ## Scalars
