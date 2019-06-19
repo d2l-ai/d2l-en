@@ -90,8 +90,9 @@ Given an input with a height and width of 8,
  we find that the height and width of the output is also 8.
 
 ```{.python .input  n=1}
-from mxnet import nd
+from mxnet import np, npx
 from mxnet.gluon import nn
+npx.set_np()
 
 # For convenience, we define a function to calculate the convolutional layer.
 # This function initializes the convolutional layer weights and performs
@@ -110,7 +111,7 @@ def comp_conv2d(conv2d, X):
 # Note that here 1 row or column is padded on either side, so a total of 2
 # rows or columns are added
 conv2d = nn.Conv2D(1, kernel_size=3, padding=1)
-X = nd.random.uniform(shape=(8, 8))
+X = np.random.uniform(size=(8, 8))
 comp_conv2d(conv2d, X).shape
 ```
 
