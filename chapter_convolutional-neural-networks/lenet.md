@@ -95,8 +95,9 @@ Again, we'll rely on the Sequential class.
 
 ```{.python .input}
 import d2l
-from mxnet import autograd, gluon, init, nd
+from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
+npx.set_np()
 
 net = nn.Sequential()
 net.add(nn.Conv2D(channels=6, kernel_size=5, padding=2, activation='sigmoid'),
@@ -125,7 +126,7 @@ printing the output shape at each layer
 to make sure we understand what's happening here.
 
 ```{.python .input}
-X = nd.random.uniform(shape=(1, 1, 28, 28))
+X = np.random.uniform(size=(1, 1, 28, 28))
 net.initialize()
 for layer in net:
     X = layer(X)
@@ -227,7 +228,7 @@ def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
                 l = loss(y_hat, y)
             l.backward()
             trainer.step(X.shape[0])
-            metric.add(l.sum().asscalar(), d2l.accuracy(y_hat, y), X.shape[0])
+            metric.add(l.sum(), d2l.accuracy(y_hat, y), X.shape[0])
             timer.stop()
             train_loss, train_acc = metric[0]/metric[2], metric[1]/metric[2]
             if (i+1) % 50 == 0:
