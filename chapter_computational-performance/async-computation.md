@@ -4,11 +4,11 @@
 MXNet utilizes asynchronous programming to improve computing performance. Understanding how asynchronous programming works helps us to develop more efficient programs, by proactively reducing computational requirements and thereby minimizing the memory overhead required in the case of limited memory resources. First, we will import the package or module needed for this section’s experiment.
 
 ```{.python .input  n=1}
+import d2l
 from mxnet import autograd, gluon, nd
-from mxnet.gluon import loss as gloss, nn
+from mxnet.gluon import nn
 import os
 import subprocess
-import time
 ```
 
 ## Asynchronous Programming in MXNet
@@ -26,30 +26,16 @@ c
 
 In Asynchronous Computing, whenever the Python front-end thread executes one of the first three statements, it simply returns the task to the back-end queue. When the last statement’s results need to be printed, the Python front-end thread will wait for the C++ back-end thread to finish computing result of the variable `c`. One benefit of such as design is that the Python front-end thread in this example does not need to perform actual computations. Thus, there is little impact on the program’s overall performance, regardless of Python’s performance. MXNet will deliver consistently high performance, regardless of the front-end language’s performance, provided the C++ back-end can meet the efficiency requirements.
 
-To further demonstrate the asynchronous computation’s performance, we will implement a simple timing class.
-
-```{.python .input}
-# This class has been saved in the Gluonbook module for future use
-class Benchmark():
-    def __init__(self, prefix=None):
-        self.prefix = prefix + ' ' if prefix else ''
-
-    def __enter__(self):
-        self.start = time.time()
-
-    def __exit__(self, *args):
-        print('%stime: %.4f sec' % (self.prefix, time.time() - self.start))
-```
-
 The following example uses timing to demonstrate the effect of asynchronous programming. As we can see, when `y = nd.dot(x, x).sum()` is returned, it does not actually wait for the variable `y` to be calculated. Only when the `print` function needs to print the variable `y` must the function wait for it to be calculated.
 
 ```{.python .input  n=4}
-with Benchmark('Workloads are queued.'):
-    x = nd.random.uniform(shape=(2000, 2000))
-    y = nd.dot(x, x).sum()
+timer = d2l.Timer()
+x = nd.random.uniform(shape=(2000, 2000))
+y = nd.dot(x, x).sum()
+print('Workloads are queued. Time %.4f sec' % timer.stop())
 
-with Benchmark('Workloads are finished.'):
-    print('sum =', y)
+print('sum =', y)
+print('Workloads are finished. Time %.4f sec' % timer.stop())
 ```
 
 In truth, whether or not the current result is already calculated in the memory is irrelevant, unless we need to print or save the computation results. So long as the data is stored in NDArray and the operators provided by MXNet are used, MXNet will utilize asynchronous programming by default to attain superior computing performance.
@@ -62,32 +48,36 @@ In addition to the `print` function we just introduced, there are other ways to 
 Below, we use the `wait_to_read` function as an example. The time output includes the calculation time of `y`.
 
 ```{.python .input  n=5}
-with Benchmark():
-    y = nd.dot(x, x)
-    y.wait_to_read()
+timer.start()
+y = nd.dot(x, x)
+y.wait_to_read()
+print('Done in %.4f sec' % timer.stop())
 ```
 
 Below, we use `waitall` as an example. The time output includes the calculation time of `y` and `z` respectively.
 
 ```{.python .input  n=6}
-with Benchmark():
-    y = nd.dot(x, x)
-    z = nd.dot(x, x)
-    nd.waitall()
+timer.start()
+y = nd.dot(x, x)
+z = nd.dot(x, x)
+nd.waitall()
+print('Done in %.4f sec' % timer.stop())
 ```
 
 Additionally, any operation that does not support asynchronous programming but converts the NDArray into another data structure will cause the front-end to have to wait for computation results. For example, calling the `asnumpy` and `asscalar` functions:
 
 ```{.python .input  n=7}
-with Benchmark():
-    y = nd.dot(x, x)
-    y.asnumpy()
+timer.start()
+y = nd.dot(x, x)
+y.asnumpy()
+print('Done in %.4f sec' % timer.stop())
 ```
 
 ```{.python .input  n=8}
-with Benchmark():
-    y = nd.dot(x, x)
-    y.norm().asscalar()
+timer.start()
+y = nd.dot(x, x)
+y.norm().asscalar()
+print('Done in %.4f sec' % timer.stop())
 ```
 
 The `wait_to_read`, `waitall`, `asnumpy`, `asscalar` and the`print` functions described above will cause the front-end to wait for the back-end computation results. Such functions are often referred to as synchronization functions.
@@ -98,15 +88,17 @@ The `wait_to_read`, `waitall`, `asnumpy`, `asscalar` and the`print` functions de
 In the following example, we will use the “for” loop to continuously assign values to the variable `y`. Asynchronous programming is not used in tasks when the synchronization function `wait_to_read` is used in the “for” loop. However, when the synchronization function `waitall` is used outside of the “for” loop, asynchronous programming is used.
 
 ```{.python .input  n=9}
-with Benchmark('synchronous.'):
-    for _ in range(1000):
-        y = x + 1
-        y.wait_to_read()
+timer.start()
+for _ in range(1000):
+    y = x + 1
+    y.wait_to_read()
+print('Synchronous. Done in %.4f sec' % timer.stop())
 
-with Benchmark('asynchronous.'):
-    for _ in range(1000):
-        y = x + 1
-    nd.waitall()
+timer.start()
+for _ in range(1000):
+    y = x + 1
+nd.waitall()
+print('Asynchronous. Done in %.4f sec' % timer.stop())
 ```
 
 We have observed that certain aspects of computing performance can be improved by making use of asynchronous programming. To explain this, we will slightly simplify the interaction between the Python front-end thread and the C++ back-end thread. In each loop, the interaction between front and back-ends can be largely divided into three stages:
@@ -127,14 +119,14 @@ Next, we will demonstrate asynchronous programming’s impact on memory. We will
 
 ```{.python .input  n=11}
 def data_iter():
-    start = time.time()
+    timer.start()
     num_batches, batch_size = 100, 1024
     for i in range(num_batches):
         X = nd.random.normal(shape=(batch_size, 512))
         y = nd.ones((batch_size,))
         yield X, y
         if (i + 1) % 50 == 0:
-            print('batch %d, time %f sec' % (i + 1, time.time() - start))
+            print('batch %d, time %.4f sec' % (i + 1, timer.stop()))
 ```
 
 The multilayer perceptron, optimization algorithm, and loss function are defined below.
@@ -146,7 +138,7 @@ net.add(nn.Dense(2048, activation='relu'),
         nn.Dense(1))
 net.initialize()
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': 0.005})
-loss = gloss.L2Loss()
+loss = gluon.loss.L2Loss()
 ```
 
 A helper function to monitor memory use is defined here. It should be noted that this function can only be run on Linux or MacOS operating systems.
@@ -157,7 +149,7 @@ def get_mem():
     return int(str(res).split()[15]) / 1e3
 ```
 
-Now we can begin testing. To initialize the `net` parameters we will try running the system once. See the section [“Deferred Initialization of Model Parameters”](../chapter_deep-learning-computation/deferred-init.md) for further discussions related to initialization.
+Now we can begin testing. To initialize the `net` parameters we will try running the system once. See :numref:`chapter_deferred_init` for further discussions related to initialization.
 
 ```{.python .input  n=14}
 for X, y in data_iter():

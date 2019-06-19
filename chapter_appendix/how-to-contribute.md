@@ -1,7 +1,7 @@
 # How to Contribute to This Book
 :label:`chapter_contribute`
 
-Contributions by readers [1] help us improve this book. If you find a typo, an outdated link, something where you think we missed a citation, where the code doesn't look elegant or where an explanation is unclear, please contribute back and help us help our readers. While in regular books the delay between print runs (and thus between typo corrections) can be measured in years, it typically takes hours to days to incorporate an improvement in this book. This is all possible due to version control and continuous integration testing. To do so you need to install Git and submit a pull request [2] to the GitHub repository. When your pull request is merged into the code repository by the author, you will become a contributor. In a nutshell the process works as described in the diagram below.
+Contributions by [readers](https://github.com/d2l-ai/d2l-en/graphs/contributors) help us improve this book. If you find a typo, an outdated link, something where you think we missed a citation, where the code doesn't look elegant or where an explanation is unclear, please contribute back and help us help our readers. While in regular books the delay between print runs (and thus between typo corrections) can be measured in years, it typically takes hours to days to incorporate an improvement in this book. This is all possible due to version control and continuous integration testing. To do so you need to install Git and submit a [pull request](https://github.com/d2l-ai/d2l-en/pulls) to the GitHub repository. When your pull request is merged into the code repository by the author, you will become a contributor. In a nutshell the process works as described in the diagram below.
 
 ![Contributing to the book.](../img/contribute.svg)
 
@@ -11,11 +11,11 @@ We will walk you through the steps in detail. If you are already familiar with G
 
 ### Install Git
 
-The Git open source book [3] describes how to install Git. This typically works via `apt install git` on Ubuntu Linux, by installing the Xcode developer tools on macOS, or by using GitHub's [desktop client](https://desktop.github.com). If you don't have a GitHub account, you need to sign up for one [4].
+The Git open source book describes [how to install Git](https://git-scm.com/book/zh/v2). This typically works via `apt install git` on Ubuntu Linux, by installing the Xcode developer tools on macOS, or by using GitHub's [desktop client](https://desktop.github.com). If you don't have a GitHub account, you need to sign up for one [4].
 
 ### Log in to GitHub
 
-Enter the address of the book's code repository in your browser [2]. Click on the `Fork` button in the red box at the top-right of the figure below, to make a copy of the repository of this book. This is now *your copy* and you can change it any way you want.
+Enter the [address](https://github.com/d2l-ai/d2l-en/) of the book's code repository in your browser. Click on the `Fork` button in the red box at the top-right of the figure below, to make a copy of the repository of this book. This is now *your copy* and you can change it any way you want.
 
 ![The code repository page.](../img/git-fork.png)
 :width:`700px`
@@ -27,7 +27,7 @@ Now, the code repository of this book will be copied to your username, such as `
 
 ### Clone the Repository
 
-To clone the repository (i.e. to make a local copy) we need to get its repository address. The green button on the picture below displays this. Make sure that your local copy is up to date with the main repository if you decide to keep this fork around for longer. For now simply follow the instructions in the [Installation](../chapter_prerequisite/install.md) section to get started. The main difference is that you're now downloading *your own fork* of the repository.
+To clone the repository (i.e. to make a local copy) we need to get its repository address. The green button on the picture below displays this. Make sure that your local copy is up to date with the main repository if you decide to keep this fork around for longer. For now simply follow the instructions in :numref:`chapter_installation` to get started. The main difference is that you're now downloading *your own fork* of the repository.
 
 ![Git clone.](../img/git-clone.png)
 :width:`700px`
@@ -41,7 +41,7 @@ On Unix the above command copies all the code from GitHub to the directory `d2l-
 
 ### Edit the Book and Push
 
-Now it's time to edit the book. It's best to edit the notebooks in Jupyter following the [instructions](../chapter_appendix/jupyter.md) in the appendix. Make the changes and check that they're OK. Assume we have modified a typo in the file `~/d2l-en/chapter_appendix/how-to-contribute.md`.
+Now it's time to edit the book. It's best to edit the notebooks in Jupyter following instructions in :numref:`chapter_jupyter`. Make the changes and check that they're OK. Assume we have modified a typo in the file `~/d2l-en/chapter_appendix/how-to-contribute.md`.
 You can then check which files you have changed:
 
 ```
@@ -100,17 +100,6 @@ Your pull request will appear among the list of requests in the main repository.
 1. Star and fork the `d2l-en` repository.
 1. Find some code that needs improvement and submit a pull request.
 1. Find a reference that we missed and submit a pull request.
-
-
-## References
-
-[1] List of contributors to this book. https://github.com/d2l-ai/d2l-en/graphs/contributors
-
-[2] Address of the code repository of this book. https://github.com/d2l-ai/d2l-en
-
-[3] Install Git. https://git-scm.com/book/zh/v2
-
-[4] URL of GitHub. https://github.com/
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2401)
 

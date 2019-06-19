@@ -37,7 +37,8 @@ def set_figsize(figsize=(3.5, 2.5)):
 def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
     """Plot a list of images."""
     figsize = (num_cols * scale, num_rows * scale)
-    axes = plt.subplots(num_rows, num_cols, figsize=figsize)[1].flatten()
+    _, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize)
+    axes = axes.flatten()
     for i, (ax, img) in enumerate(zip(axes, imgs)):
         ax.imshow(img.asnumpy())
         ax.axes.get_xaxis().set_visible(False)
@@ -46,6 +47,71 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
             ax.set_title(titles[i])
     return axes
 
+
+# Defined in file: ./chapter_linear-networks/linear-regression.md
+class Timer(object):
+    """Record multiple running times."""
+    def __init__(self):
+        self.times = []
+        self.start()
+        
+    def start(self):
+        """Start the timer"""
+        self.start_time = time.time()
+    
+    def stop(self):
+        """Stop the timer and record the time in a list"""
+        self.times.append(time.time() - self.start_time)
+        return self.times[-1]
+        
+    def avg(self):
+        """Return the average time"""
+        return sum(self.times)/len(self.times)
+    
+    def sum(self):
+        """Return the sum of time"""
+        return sum(self.times)
+        
+    def cumsum(self):
+        """Return the accumuated times"""
+        return np.array(self.times).cumsum().tolist()
+
+# Defined in file: ./chapter_linear-networks/linear-regression.md
+def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
+         ylim=None, xscale='linear', yscale='linear', fmts=None,
+         figsize=(3.5, 2.5), axes=None):
+    """Plot multiple lines"""
+    d2l.set_figsize(figsize)
+    axes = axes if axes else d2l.plt.gca()
+    if isinstance(X, nd.NDArray): X = X.asnumpy()
+    if isinstance(Y, nd.NDArray): Y = Y.asnumpy()
+    if not hasattr(X[0], "__len__"): X = [X]
+    if Y is None: X, Y = [[]]*len(X), X
+    if not hasattr(Y[0], "__len__"): Y = [Y]
+    if len(X) != len(Y): X = X * len(Y)
+    if not fmts: fmts = ['-']*len(X)
+    axes.cla()
+    for x, y, fmt in zip(X, Y, fmts):
+        if isinstance(x, nd.NDArray): x = x.asnumpy()
+        if isinstance(y, nd.NDArray): y = y.asnumpy()
+        if len(x):
+            axes.plot(x, y, fmt)
+        else:
+            axes.plot(y, fmt)
+    set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
+
+
+# Defined in file: ./chapter_linear-networks/linear-regression.md
+def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
+    """A utility function to set matplotlib axes"""
+    axes.set_xlabel(xlabel)
+    axes.set_ylabel(ylabel)
+    axes.set_xscale(xscale)
+    axes.set_yscale(yscale)
+    axes.set_xlim(xlim)
+    axes.set_ylim(ylim)
+    if legend: axes.legend(legend)
+    axes.grid()
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def synthetic_data(w, b, num_examples):
@@ -110,28 +176,39 @@ def accuracy(y_hat, y):
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def evaluate_accuracy(net, data_iter):
-    acc_sum, n = 0.0, 0
+    metric = Accumulator(2) # num_corrected_examples, num_examples
     for X, y in data_iter:
         y = y.astype('float32')
-        acc_sum += accuracy(net(X), y)
-        n += y.size
-    return acc_sum / n
+        metric.add(accuracy(net(X), y), y.size)
+    return metric[0] / metric[1]
+
+# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
+class Accumulator(object):
+    """Sum a list of numbers over time"""
+    def __init__(self, n):
+        self.data = [0.0] * n
+    def add(self, *args):
+        self.data = [a+b for a, b in zip(self.data, args)]
+    def reset(self):
+        self.data = [0] * len(self.data)
+    def __getitem__(self, i):
+        return self.data[i]
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def train_epoch_ch3(net, train_iter, loss, updater):
-    train_l_sum, train_acc_sum, n = 0.0, 0.0, 0
+    metric = Accumulator(3) # train_loss_sum, train_acc_sum, num_examples
+    if isinstance(updater, gluon.Trainer):
+        updater = updater.step
     for X, y in train_iter:
         # compute gradients and update parameters
         with autograd.record():
             y_hat = net(X)
             l = loss(y_hat, y)
         l.backward()
-        updater()
-        # measure loss and accuracy
-        train_l_sum += l.sum().asscalar()
-        train_acc_sum += accuracy(y_hat, y)
-        n += y.size
-    return train_l_sum/n, train_acc_sum/n
+        updater(X.shape[0])
+        metric.add(l.sum().asscalar(), accuracy(y_hat, y), y.size)
+    # Return training loss and training accuracy
+    return metric[0]/metric[2], metric[1]/metric[2]
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 class Animator(object):
@@ -143,7 +220,7 @@ class Animator(object):
         self.fig, self.axes = d2l.plt.subplots(nrows, ncols, figsize=figsize)
         if nrows * ncols == 1: self.axes = [self.axes,]
         # use a lambda to capture arguments
-        self.config_axes = lambda : set_axes(
+        self.config_axes = lambda : d2l.set_axes(
             self.axes[0], xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
         self.X, self.Y, self.fmts = None, None, fmts
 
@@ -166,24 +243,12 @@ class Animator(object):
         display.display(self.fig)
         display.clear_output(wait=True)
 
-
-# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
-    """A utility function to set matplotlib axes"""
-    axes.set_xlabel(xlabel)
-    axes.set_ylabel(ylabel)
-    axes.set_xscale(xscale)
-    axes.set_yscale(yscale)
-    axes.set_xlim(xlim)
-    axes.set_ylim(ylim)
-    if legend: axes.legend(legend)
-    axes.grid()
-
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
     trains, test_accs = [], []
-    animator = Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0.3, 0.9],
-                       legend=['train loss', 'train acc', 'test acc'])
+    animator = Animator(xlabel='epoch', xlim=[1, num_epochs], 
+                        ylim=[0.3, 0.9], 
+                        legend=['train loss', 'train acc', 'test acc'])
     for epoch in range(num_epochs):
         train_metrics = train_epoch_ch3(net, train_iter, loss, updater)
         test_acc = evaluate_accuracy(net, test_iter)
@@ -199,50 +264,18 @@ def predict_ch3(net, test_iter, n=6):
     d2l.show_images(X[0:n].reshape((n,28,28)), 1, n, titles=titles[0:n])
 
 
-# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
-         ylim=None, xscale='linear', yscale='linear', fmts=None,
-         figsize=(3.5, 2.5), axes=None):
-    """Plot multiple lines"""
-    d2l.set_figsize(figsize)
-    axes = axes if axes else d2l.plt.gca()
-    if isinstance(X, nd.NDArray): X = X.asnumpy()
-    if isinstance(Y, nd.NDArray): Y = Y.asnumpy()
-    if not hasattr(X[0], "__len__"): X = [X]
-    if Y is None: X, Y = [[]]*len(X), X
-    if not hasattr(Y[0], "__len__"): Y = [Y]
-    if len(X) != len(Y): X = X * len(Y)
-    if not fmts: fmts = ['-']*len(X)
-    axes.cla()
-    for x, y, fmt in zip(X, Y, fmts):
-        if isinstance(x, nd.NDArray): x = x.asnumpy()
-        if isinstance(y, nd.NDArray): y = y.asnumpy()
-        if len(x):
-            axes.plot(x, y, fmt)
-        else:
-            axes.plot(y, fmt)
-    set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
-
-
-# Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
-def show(obj):
-    """Show a figure"""
-    display.display(obj)
-    display.clear_output(wait=True)
-
 # Defined in file: ./chapter_multilayer-perceptrons/underfit-overfit.md
 def evaluate_loss(net, data_iter, loss):
     """Evaluate the loss of a model on the given dataset"""
-    l, n = 0.0, 0
+    metric = d2l.Accumulator(2)  # sum_loss, num_examples
     for X, y in data_iter:
-        l += loss(net(X), y).sum().asscalar()
-        n += y.size
-    return l / n
+        metric.add(loss(net(X), y).sum().asscalar(), y.size)
+    return metric[0] / metric[1]
 
 # Defined in file: ./chapter_deep-learning-computation/use-gpu.md
 def try_gpu(i=0):
     """Return gpu(i) if exists, otherwise return cpu()."""
-    return context.gpu(i) if context.num_gpus() >= i else context.cpu()
+    return context.gpu(i) if context.num_gpus() >= i + 1 else context.cpu()
 
 
 # Defined in file: ./chapter_deep-learning-computation/use-gpu.md
@@ -250,7 +283,7 @@ def try_all_gpus():
     """Return all available GPUs, or [cpu(),] if no GPU exists."""
     ctxes = [context.gpu(i) for i in range(context.num_gpus())]
     return ctxes if ctxes else [context.cpu()]
-        
+
 
 # Defined in file: ./chapter_convolutional-neural-networks/conv-layer.md
 def corr2d(X, K):
@@ -266,40 +299,11 @@ def corr2d(X, K):
 def evaluate_accuracy_gpu(net, data_iter, ctx=None):
     if not ctx:  # Query the first device the first parameter is on.
         ctx = list(net.collect_params().values())[0].list_ctx()[0]
-    acc_sum, n = nd.array([0], ctx=ctx), 0
+    metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
     for X, y in data_iter:
-        X, y = X.as_in_context(ctx), y.as_in_context(ctx).astype('float32')
-        acc_sum += (net(X).argmax(axis=1) == y).sum()
-        n += y.size
-    return acc_sum.asscalar() / n
-
-# Defined in file: ./chapter_convolutional-neural-networks/lenet.md
-class Timer(object):
-    """Record multiple running times."""
-    def __init__(self):
-        self.times = []
-        self.start()
-        
-    def start(self):
-        """Start the timer"""
-        self.start_time = time.time()
-    
-    def stop(self):
-        """Stop the timer and record the time in a list"""
-        self.times.append(time.time() - self.start_time)
-        return self.times[-1]
-        
-    def avg(self):
-        """Return the average time"""
-        return sum(self.times)/len(self.times)
-    
-    def sum(self):
-        """Return the sum of time"""
-        return sum(self.times)
-        
-    def cumsum(self):
-        """Return the accumuated times"""
-        return np.array(self.times).cumsum().tolist()
+        X, y = X.as_in_context(ctx), y.as_in_context(ctx)
+        metric.add(d2l.accuracy(net(X), y), y.size)
+    return metric[0]/metric[1]
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
 def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
@@ -309,9 +313,9 @@ def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
                             'sgd', {'learning_rate': lr})
     animator = d2l.Animator(xlabel='epoch', xlim=[0,num_epochs],
                             legend=['train loss','train acc','test acc'])
-    timer = Timer()
+    timer = d2l.Timer()
     for epoch in range(num_epochs):
-        train_l_sum, train_acc_sum, n = 0.0, 0.0, 0
+        metric = d2l.Accumulator(3)  # train_loss, train_acc, num_examples
         for i, (X, y) in enumerate(train_iter):
             timer.start()
             # Here is the only difference compared to train_epoch_ch3
@@ -321,18 +325,17 @@ def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
                 l = loss(y_hat, y)
             l.backward()
             trainer.step(X.shape[0])
-            train_l_sum += l.sum().asscalar()
-            train_acc_sum += d2l.accuracy(y_hat, y)
-            n += X.shape[0]
+            metric.add(l.sum().asscalar(), d2l.accuracy(y_hat, y), X.shape[0])
             timer.stop()
+            train_loss, train_acc = metric[0]/metric[2], metric[1]/metric[2]
             if (i+1) % 50 == 0:
-                animator.add(epoch+i/len(train_iter), 
-                             (train_l_sum/n, train_acc_sum/n, None))
+                animator.add(epoch + i/len(train_iter),
+                             (train_loss, train_acc, None))
         test_acc = evaluate_accuracy_gpu(net, test_iter)
         animator.add(epoch+1, (None, None, test_acc))
     print('loss %.3f, train acc %.3f, test acc %.3f' % (
-        train_l_sum/n, train_acc_sum/n, test_acc))
-    print('%.1f exampes/sec on %s'%(n*num_epochs/timer.sum(), ctx))
+        train_loss, train_acc, test_acc))
+    print('%.1f exampes/sec on %s'%(metric[2]*num_epochs/timer.sum(), ctx))
 
 # Defined in file: ./chapter_convolutional-modern/resnet.md
 class Residual(nn.Block):
@@ -348,7 +351,7 @@ class Residual(nn.Block):
             self.conv3 = None
         self.bn1 = nn.BatchNorm()
         self.bn2 = nn.BatchNorm()
-    
+
     def forward(self, X):
         Y = nd.relu(self.bn1(self.conv1(X)))
         Y = self.bn2(self.conv2(Y))
@@ -540,7 +543,7 @@ def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):
         l.backward()
         grad_clipping(model, 1)
         updater(batch_size=1)  # Since used mean already.
-        metric.add((l.asscalar() * y.size, y.size))
+        metric.add(l.asscalar() * y.size, y.size)
     return math.exp(metric[0]/metric[1]), metric[1]/timer.stop()
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
@@ -736,7 +739,7 @@ def train_s2s_ch8(model, data_iter, lr, num_epochs, ctx):
                             'adam', {'learning_rate': lr})
     loss = MaskedSoftmaxCELoss()
     #tic = time.time()
-    animator = d2l.Animator(xlabel='epoch', ylabel='loss', 
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[1, num_epochs], ylim=[0, 0.25])
     for epoch in range(1, num_epochs+1):
         timer = d2l.Timer()
@@ -751,7 +754,7 @@ def train_s2s_ch8(model, data_iter, lr, num_epochs, ctx):
             d2l.grad_clipping(model, 1)
             num_tokens = Y_vlen.sum().asscalar()
             trainer.step(num_tokens)
-            metric.add((l.sum().asscalar(), num_tokens))
+            metric.add(l.sum().asscalar(), num_tokens)
         if epoch % 10 == 0:
             animator.add(epoch, metric[0]/metric[1])
     print('loss %.3f, %d tokens/sec on %s ' % (
@@ -923,7 +926,6 @@ def train_gluon_ch10(trainer_name, trainer_hyperparams,
                              d2l.evaluate_loss(net, data_iter, loss))
                 timer.start()
     print('loss: %.3f, %.3f sec/epoch'%(animator.Y[0][-1], timer.avg()))
-    return timer.cumsum(), animator.Y[0]
 
 # Defined in file: ./chapter_computational-performance/multiple-gpus.md
 def split_batch(X, y, ctx_list):
@@ -962,13 +964,13 @@ def resnet18(num_classes):
 def evaluate_accuracy_gpus(net, data_iter):
     # Query the list of devices.
     ctx_list = list(net.collect_params().values())[0].list_ctx()
-    acc_sum, n = 0.0, 0
+    metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
     for features, labels in data_iter:
         Xs, ys = d2l.split_batch(features, labels, ctx_list)
         pys = [net(X) for X in Xs]  # run in parallel
-        acc_sum += sum(d2l.accuracy(py, y) for py, y in zip(pys, ys))
-        n += labels.size
-    return acc_sum / n
+        metric.add(sum(d2l.accuracy(py, y) for py, y in zip(pys, ys)), 
+                   labels.size)
+    return metric[0]/metric[1]
 
 # Defined in file: ./chapter_computer-vision/image-augmentation.md
 def train_batch_ch12(net, features, labels, loss, trainer, ctx_list):
@@ -996,10 +998,10 @@ def train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs,
             timer.start()
             l, acc = train_batch_ch12(
                 net, features, labels, loss, trainer, ctx_list)
-            metric.add([l, acc, labels.shape[0], labels.size])
+            metric.add(l, acc, labels.shape[0], labels.size)
             timer.stop()
             if (i+1) % (num_batches // 5) == 0:
-                animator.add(epoch+i/num_batches, 
+                animator.add(epoch+i/num_batches,
                              (metric[0]/metric[2], metric[1]/metric[3], None))
         test_acc = d2l.evaluate_accuracy_gpus(net, test_iter)
         animator.add(epoch+1, (None, None, test_acc))
@@ -1007,17 +1009,6 @@ def train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs,
         metric[0]/metric[2], metric[1]/metric[3], test_acc))
     print('%.1f exampes/sec on %s' % (
         metric[2]*num_epochs/timer.sum(), ctx_list))
-
-# Defined in file: ./chapter_computer-vision/image-augmentation.md
-class Accumulator(object):
-    def __init__(self, n):
-        self.data = [0.0] * n
-    def add(self, x):
-        self.data = [a+b for a, b in zip(self.data, x)]
-    def reset(self):
-        self.data = [0] * len(self.data)
-    def __getitem__(self, i):
-        return self.data[i]
 
 # Defined in file: ./chapter_computer-vision/bounding-box.md
 def bbox_to_rect(bbox, color):
@@ -1289,6 +1280,49 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
     data_iter = gluon.data.DataLoader(dataset, batch_size, shuffle=True,
                                       batchify_fn=batchify)
     return data_iter, vocab
+
+# Defined in file: ./chapter_natural-language-processing/sentiment-analysis.md
+def download_imdb(data_dir='../data'):
+    url = 'http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz'
+    fname = gluon.utils.download(url, data_dir)
+    with tarfile.open(fname, 'r') as f:
+        f.extractall(data_dir)
+        
+
+# Defined in file: ./chapter_natural-language-processing/sentiment-analysis.md
+def read_imdb(folder='train', data_dir='../data'):
+    data, labels = [], []
+    for label in ['pos', 'neg']:
+        folder_name = os.path.join(data_dir, 'aclImdb', folder, label)
+        for file in os.listdir(folder_name):
+            with open(os.path.join(folder_name, file), 'rb') as f:
+                review = f.read().decode('utf-8').replace('\n', '')
+                data.append(review)
+                labels.append(1 if label == 'pos' else 0)
+    return data, labels
+
+
+# Defined in file: ./chapter_natural-language-processing/sentiment-analysis.md
+def load_data_imdb(batch_size, num_steps=500):
+    download_imdb()
+    train_data, test_data = read_imdb('train'), read_imdb('test')
+    train_tokens = d2l.tokenize(train_data[0], token='word')
+    test_tokens = d2l.tokenize(test_data[0], token='word')
+    vocab = d2l.Vocab(train_tokens, min_freq=5)
+    train_features = nd.array([d2l.trim_pad(vocab[line], num_steps, vocab.unk) 
+                               for line in train_tokens])
+    test_features = nd.array([d2l.trim_pad(vocab[line], num_steps, vocab.unk) 
+                               for line in test_tokens])
+    train_iter = d2l.load_array((train_features, train_data[1]), batch_size)
+    test_iter = d2l.load_array((test_features, test_data[1]), batch_size, 
+                               is_train=False)
+    return train_iter, test_iter, vocab
+
+# Defined in file: ./chapter_natural-language-processing/sentiment-analysis-rnn.md
+def predict_sentiment(net, vocab, sentence):
+    sentence = nd.array(vocab[sentence.split()], ctx=d2l.try_gpu())
+    label = nd.argmax(net(sentence.reshape((1, -1))), axis=1)
+    return 'positive' if label.asscalar() == 1 else 'negative'
 
 # Defined in file: ./chapter_generative_adversarial_networks/gan.md
 def update_D(X, Z, net_D, net_G, loss, trainer_D):

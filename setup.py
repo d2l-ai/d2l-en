@@ -16,12 +16,12 @@ with open(os.path.join('d2l','__init__.py')) as f:
 for l in lines:
     m = ver_re.match(l)
     if m:
-        version = m[1]
+        version = m.group(1)
         break
 setup(
     name='d2l',
     version=version,
-    python_requires='>=3.6',
+    python_requires='>=3.5',
     author='D2L Developers',
     author_email='d2l.devs@google.com',
     url='https://d2l.ai',

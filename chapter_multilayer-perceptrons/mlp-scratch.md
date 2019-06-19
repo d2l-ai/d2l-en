@@ -91,13 +91,13 @@ loss = gluon.loss.SoftmaxCrossEntropyLoss()
 ## Training
 
 Steps for training the MLP are no different than for softmax regression.
-In the `d2l` package, we directly call the `train_ch3` function, whose implementation was introduced [here](softmax-regression-scratch.md).
+In the `d2l` package, we directly call the `train_ch3` function, whose implementation was introduced in :numref:`chapter_softmax_scratch`.
 We set the number of epochs to $10$ and the learning rate to $0.5$.
 
 ```{.python .input  n=7}
 num_epochs, lr = 10, 0.5
 d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, 
-             lambda: d2l.sgd(params, lr, batch_size))
+             lambda batch_size: d2l.sgd(params, lr, batch_size))
 ```
 
 To see how well we did, let's apply the model to some test data.

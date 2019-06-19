@@ -2,7 +2,7 @@
 
 In this section, we add the attention mechanism to the sequence to sequence
 model introduced in :numref:`chapter_seq2seq`
-to explicitly select state. The following figure shows the model
+to explicitly select state. :numref:`fig_s2s_attention` shows the model
 architecture for a decoding time step. As can be seen, the memory of the
 attention layer consists of the encoder outputs of each time step. During
 decoding, the decoder output from the previous time step is used as the query,
@@ -10,10 +10,13 @@ the attention output is then fed into the decoder with the input to provide
 attentional context information.
 
 ![The second time step in decoding for the sequence to sequence model with attention mechanism.](../img/seq2seq_attention.svg)
+:label:`fig_s2s_attention`
 
-The layer structure in the encoder and the decoder is shown in the following figure.
+The layer structure in the encoder and the decoder is shown in :numref:`fig_s2s_attention_details`.
 
-![](../img/seq2seq-attention-details.svg)
+![The layers in the sequence to sequence model with attention mechanism.](../img/seq2seq-attention-details.svg)
+:label:`fig_s2s_attention_details`
+
 
 ```{.python .input  n=1}
 import d2l
@@ -65,7 +68,7 @@ class Seq2SeqAttentionDecoder(d2l.Decoder):
                                         enc_valid_len]
 ```
 
-Use the same hyper-parameters to create an encoder and decoder as the ["Sequence to Sequence"](../chapter_recurrent-neural-networks/seq2seq.md) section, we get the same decoder output shape, but the state structure is changed.
+Use the same hyper-parameters to create an encoder and decoder as in :numref:`chapter_seq2seq`, we get the same decoder output shape, but the state structure is changed.
 
 ```{.python .input  n=3}
 encoder = d2l.Seq2SeqEncoder(vocab_size=10, embed_size=8,

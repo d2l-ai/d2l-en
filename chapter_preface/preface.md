@@ -180,7 +180,11 @@ we can just use the ``Gluon`` version in subsequent tutorials.
 
 ### Content and Structure
 
-The book can be roughly divided into three sections:
+The book can be roughly divided into three parts, which are presented by different colors in :numref:`fig_book_org`:
+
+![Book structure](../img/book-org.svg)
+:label:`fig_book_org`
+
 
 * The first part covers prerequisites and basics.  The first chapter offers an
 introduction to deep learning in :numref:`chapter_introduction`.  In
@@ -209,14 +213,10 @@ behind most modern deep learning.
 discuss several common :numref:`chapter_optimization` used to train deep
 learning models.  The next chapter, :numref:`chapter_performance` examines
 several important factors that affect the computational performance of your deep
-learning code.  :numref:`chapter_cv` and :numref:`chapter_nlp` illustrate major
+learning code.    :numref:`chapter_cv` and :numref:`chapter_nlp` illustrate major
 applications of deep learning in computer vision and natural language
-processing, respectively.
+processing, respectively. Finally, :number:`chapter_gans` presents an emerging family of models called generative adversarial networks. 
 
-An outline of the book together with possible flows for navigating it is given
-below.  The arrows provide a graph of prerequisites:
-
-![Book structure](../img/book-org.svg)
 
 
 ### Code
@@ -315,7 +315,7 @@ Their GitHub usernames or names are (in no particular order):
 alxnorden, avinashingit, bowen0701, brettkoonce, Chaitanya Prakash Bapat,
 cryptonaut, Davide Fiocco, edgarroman, gkutiel, John Mitro, Liang Pu, Rahul Agarwal, mohamed-ali,
 mstewart141, Mike Müller, NRauschmayr, Prakhar Srivastav, sad-, sfermigier, Sheng Zha, sundeepteki,
-topecongiro, tpdi, vermicelli, Vishaal Kapoor, vishwesh5, YaYaB, Yuhong Chen, Evgeniy Smirnov, lgov, Simon Corston-Oliver, IgorDzreyev, trungha-ngx, pmuens, alukovenko, senorcinco, vfdev-5, dsweet, Mohammad Mahdi Rahimi, Abhishek Gupta, uwsd, DomKM, Lisa Oakley, bowen0701, arush15june, prasanth5reddy, brianhendee, mani2106, mtn, lkevinzc, caojilin, Lakshya, Fiete Lüer, Surbhi Vijayvargeeya, Muhyun Kim, dennismalmgren, adursun, Anirudh Dagar, liqingnz, Pedro Larroy, lgov, ati-ozgur, goldmermaid, Jun Wu, Matthias Blume.
+topecongiro, tpdi, vermicelli, Vishaal Kapoor, vishwesh5, YaYaB, Yuhong Chen, Evgeniy Smirnov, lgov, Simon Corston-Oliver, IgorDzreyev, trungha-ngx, pmuens, alukovenko, senorcinco, vfdev-5, dsweet, Mohammad Mahdi Rahimi, Abhishek Gupta, uwsd, DomKM, Lisa Oakley, bowen0701, arush15june, prasanth5reddy, brianhendee, mani2106, mtn, lkevinzc, caojilin, Lakshya, Fiete Lüer, Surbhi Vijayvargeeya, Muhyun Kim, dennismalmgren, adursun, Anirudh Dagar, liqingnz, Pedro Larroy, lgov, ati-ozgur, goldmermaid, Jun Wu, Matthias Blume, apeforest.
 Moreover, we thank Amazon Web Services, especially Swami Sivasubramanian,
 Raju Gulabani, Charlie Bell, and Andrew Jassy for their generous support in writing this book.
 Without the available time, resources, discussions with colleagues,

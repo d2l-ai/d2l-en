@@ -142,7 +142,7 @@ def train_s2s_ch8(model, data_iter, lr, num_epochs, ctx):
                             'adam', {'learning_rate': lr})
     loss = MaskedSoftmaxCELoss()
     #tic = time.time()
-    animator = d2l.Animator(xlabel='epoch', ylabel='loss', 
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[1, num_epochs], ylim=[0, 0.25])
     for epoch in range(1, num_epochs+1):
         timer = d2l.Timer()
@@ -157,7 +157,7 @@ def train_s2s_ch8(model, data_iter, lr, num_epochs, ctx):
             d2l.grad_clipping(model, 1)
             num_tokens = Y_vlen.sum().asscalar()
             trainer.step(num_tokens)
-            metric.add((l.sum().asscalar(), num_tokens))
+            metric.add(l.sum().asscalar(), num_tokens)
         if epoch % 10 == 0:
             animator.add(epoch, metric[0]/metric[1])
     print('loss %.3f, %d tokens/sec on %s ' % (
