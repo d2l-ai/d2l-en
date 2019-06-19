@@ -240,7 +240,7 @@ def train(lambd):
         if epoch % 5 == 0:
             animator.add(epoch+1, (d2l.evaluate_loss(net, train_iter, loss),
                                    d2l.evaluate_loss(net, test_iter, loss)))
-    print('l2 norm of w:', w.norm().asscalar())
+    print('l1 norm of w:', np.abs(w).sum())
 ```
 
 ### Training without Regularization
@@ -318,7 +318,7 @@ def train_gluon(wd):
         if epoch % 5 == 0:
             animator.add(epoch+1, (d2l.evaluate_loss(net, train_iter, loss),
                                    d2l.evaluate_loss(net, test_iter, loss)))
-    print('L2 norm of w:', net[0].weight.data().norm().asscalar())
+    print('L1 norm of w:', np.abs(net[0].weight.data()).sum())
 ```
 
 The plots look just the same as when we implemented weight decay from scratch
