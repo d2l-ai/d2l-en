@@ -25,3 +25,6 @@ aclImdb*
 graffle/*/*.svg
 graffle/*/*.pdf
 build/
+/chapter_deep-learning-computation/mydict
+/chapter_deep-learning-computation/x-file
+/chapter_deep-learning-computation/x-files
