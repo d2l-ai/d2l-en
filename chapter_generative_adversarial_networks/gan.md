@@ -36,8 +36,9 @@ Many of the GANs applications are in the context of images. As a demonstration p
 ```{.python .input  n=1}
 %matplotlib inline
 import d2l
-from mxnet import nd, gluon, autograd, init
+from mxnet import np, npx, gluon, autograd, init
 from mxnet.gluon import nn
+npx.set_np()
 ```
 
 ## Generate some "real" data
@@ -45,19 +46,18 @@ from mxnet.gluon import nn
 Since this is going to be the world's lamest example, we simply generate data drawn from a Gaussian.
 
 ```{.python .input  n=2}
-X = nd.random.normal(shape=(1000, 2))
-A = nd.array([[1, 2], [-0.1, 0.5]])
-b = nd.array([1, 2])
-data = nd.dot(X, A) + b
+X = np.random.normal(size=(1000, 2))
+A = np.array([[1, 2], [-0.1, 0.5]])
+b = np.array([1, 2])
+data = X.dot(A) + b
 ```
 
 Let's see what we got. This should be a Gaussian shifted in some rather arbitrary way with mean $b$ and covariance matrix $A^TA$.
 
 ```{.python .input  n=3}
 d2l.set_figsize((3.5, 2.5))
-#d2l.plt.figure(figsize=())
 d2l.plt.scatter(data[:100,0].asnumpy(), data[:100,1].asnumpy());
-print("The covariance matrix is", nd.dot(A.T,A))
+print("The covariance matrix is\n%s" % np.dot(A.T, A))
 ```
 
 ```{.python .input  n=4}
@@ -94,8 +94,8 @@ First we define a function to update the discriminator.
 def update_D(X, Z, net_D, net_G, loss, trainer_D):
     """Update discriminator"""
     batch_size = X.shape[0]
-    ones = nd.ones((batch_size,), ctx=X.context)
-    zeros = nd.zeros((batch_size,), ctx=X.context)
+    ones = np.ones((batch_size,), ctx=X.context)
+    zeros = np.zeros((batch_size,), ctx=X.context)
     with autograd.record():
         real_Y = net_D(X)
         fake_X = net_G(Z)
@@ -105,7 +105,7 @@ def update_D(X, Z, net_D, net_G, loss, trainer_D):
         loss_D = (loss(real_Y, ones) + loss(fake_Y, zeros)) / 2
     loss_D.backward()
     trainer_D.step(batch_size)
-    return loss_D.sum().asscalar()
+    return loss_D.sum()
 ```
 
 The generator is updated similarly. Here we reuse the cross-entropy loss but change the label of the fake data from $0$ to $1$.
@@ -115,7 +115,7 @@ The generator is updated similarly. Here we reuse the cross-entropy loss but cha
 def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
     """Update generator"""
     batch_size = Z.shape[0]
-    ones = nd.ones((batch_size,), ctx=Z.context)
+    ones = np.ones((batch_size,), ctx=Z.context)
     with autograd.record():
         # We could reuse fake_X from update_D to save computation.
         fake_X = net_G(Z)
@@ -124,7 +124,7 @@ def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
         loss_G = loss(fake_Y, ones)
     loss_G.backward()
     trainer_G.step(batch_size)
-    return loss_G.sum().asscalar()
+    return loss_G.sum()
 ```
 
 Both the discriminator and the generator performs a binary logistic regression with the cross-entropy loss. We use Adam to smooth the training process. In each iteration, we first update the discriminator and then the generator. We visualize both losses and generated examples.
@@ -148,12 +148,12 @@ def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
         metric = d2l.Accumulator(3)  # loss_D, loss_G, num_examples
         for X in data_iter:
             batch_size = X.shape[0]
-            Z = nd.random.normal(0, 1, shape=(batch_size, latent_dim))
+            Z = np.random.normal(0, 1, size=(batch_size, latent_dim))
             metric.add(update_D(X, Z, net_D, net_G, loss, trainer_D),
                         update_G(Z, net_D, net_G, loss, trainer_G),
                         batch_size)
         # Visualize generated examples
-        Z = nd.random.normal(0, 1, shape=(100, latent_dim))
+        Z = np.random.normal(0, 1, size=(100, latent_dim))
         fake_X = net_G(Z).asnumpy()
         animator.axes[1].cla()
         animator.axes[1].scatter(data[:,0], data[:,1])
