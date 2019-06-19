@@ -44,8 +44,9 @@ The subsequent widths are fixed to $1 \times 1$.
 
 ```{.python .input  n=2}
 import d2l
-from mxnet import gluon, nd
+from mxnet import gluon, np, npx
 from mxnet.gluon import nn
+npx.set_np()
 
 def nin_block(num_channels, kernel_size, strides, padding):
     blk = nn.Sequential()
@@ -95,7 +96,7 @@ net.add(nin_block(96, kernel_size=11, strides=4, padding=0),
 We create a data example to see the output shape of each block.
 
 ```{.python .input}
-X = nd.random.uniform(shape=(1, 1, 224, 224))
+X = np.random.uniform(size=(1, 1, 224, 224))
 net.initialize()
 for layer in net:
     X = layer(X)
