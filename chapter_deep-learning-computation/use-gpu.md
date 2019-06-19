@@ -163,7 +163,6 @@ Let us confirm that the model parameters are stored on the same GPU.
 net[0].weight.data()
 ```
 
-
 In short, as long as all data and parameters are on the same device, we can learn models efficiently. In the following we will see several such examples.
 
 ## Summary
