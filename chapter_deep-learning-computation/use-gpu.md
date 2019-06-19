@@ -31,16 +31,17 @@ Note that this might be extravagant for most desktop computers but it is easily 
 MXNet can specify devices, such as CPUs and GPUs, for storage and calculation. By default, MXNet creates data in the main memory and then uses the CPU to calculate it. In MXNet, the CPU and GPU can be indicated by `cpu()` and `gpu()`. It should be noted that `cpu()` (or any integer in the parentheses) means all physical CPUs and memory. This means that MXNet's calculations will try to use all CPU cores. However, `gpu()` only represents one graphic card and the corresponding graphic memory. If there are multiple GPUs, we use `gpu(i)` to represent the $i$-th GPU ($i$ starts from 0). Also, `gpu(0)` and `gpu()` are equivalent.
 
 ```{.python .input}
-from mxnet import nd, context
+from mxnet import np, npx
 from mxnet.gluon import nn
+npx.set_np()
 
-context.cpu(), context.gpu(), context.gpu(1)
+npx.cpu(), npx.gpu(), npx.gpu(1)
 ```
 
 We can query the number of available GPUs through `num_gpus()`.
 
 ```{.python .input}
-context.num_gpus()
+npx.num_gpus()
 ```
 
 Now we define two convenient functions that allows us to run codes even if the requested GPUs do not exist.
@@ -49,13 +50,13 @@ Now we define two convenient functions that allows us to run codes even if the r
 # Save to the d2l package.
 def try_gpu(i=0):
     """Return gpu(i) if exists, otherwise return cpu()."""
-    return context.gpu(i) if context.num_gpus() >= i + 1 else context.cpu()
+    return npx.gpu(i) if npx.num_gpus() >= i + 1 else npx.cpu()
 
 # Save to the d2l package.
 def try_all_gpus():
     """Return all available GPUs, or [cpu(),] if no GPU exists."""
-    ctxes = [context.gpu(i) for i in range(context.num_gpus())]
-    return ctxes if ctxes else [context.cpu()]
+    ctxes = [npx.gpu(i) for i in range(npx.num_gpus())]
+    return ctxes if ctxes else [npx.cpu()]
 
 try_gpu(), try_gpu(3), try_all_gpus()
 ```
@@ -65,7 +66,7 @@ try_gpu(), try_gpu(3), try_all_gpus()
 By default, NDArray objects are created on the CPU. Therefore, we will see the `@cpu(0)` identifier each time we print an NDArray.
 
 ```{.python .input  n=4}
-x = nd.array([1, 2, 3])
+x = np.array([1, 2, 3])
 x
 ```
 
@@ -80,14 +81,14 @@ x.context
 There are several ways to store an NDArray on the GPU. For example, we can specify a storage device with the `ctx` parameter when creating an NDArray. Next, we create the NDArray variable `a` on `gpu(0)`. Notice that when printing `a`, the device information becomes `@gpu(0)`. The NDArray created on a GPU only consumes the memory of this GPU. We can use the `nvidia-smi` command to view GPU memory usage. In general, we need to make sure we do not create data that exceeds the GPU memory limit.
 
 ```{.python .input  n=5}
-x = nd.ones((2, 3), ctx=try_gpu())
+x = np.ones((2, 3), ctx=try_gpu())
 x
 ```
 
 Assuming you have at least two GPUs, the following code will create a random array on `gpu(1)`.
 
 ```{.python .input}
-y = nd.random.uniform(shape=(2, 3), ctx=try_gpu(1))
+y = np.random.uniform(size=(2, 3), ctx=try_gpu(1))
 y
 ```
 
