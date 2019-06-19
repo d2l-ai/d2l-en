@@ -32,8 +32,9 @@ Fortunately many of the logistical details required to implement multiple layers
 
 ```{.python .input  n=17}
 import d2l
-from mxnet import nd
+from mxnet import npx
 from mxnet.gluon import rnn
+npx.set_np()
 
 batch_size, num_steps = 32, 35
 train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
