@@ -40,7 +40,7 @@ In the figure below, we pad a $3 \times 3$ input,
 increasing its size to $5 \times 5$.
 The corresponding output then increases to a $4 \times 4$ matrix.
 
-![Two-dimensional cross-correlation with padding. The shaded portions are the input and kernel array elements used by the first output element: $0\times0+0\times1+0\times2+0\times3=0$. ](../img/conv_pad.svg)
+![Two-dimensional cross-correlation with padding. The shaded portions are the input and kernel array elements used by the first output element: $0\times0+0\times1+0\times2+0\times3=0$. ](../img/conv-pad.svg)
 
 In general, if we add a total of $p_h$ rows of padding
 (roughly half on top and half on bottom)
@@ -150,7 +150,7 @@ when the second element of the first row is output.
 When the convolution window slides two columns to the right on the input, there is no output because the input element cannot fill the window
 (unless we add padding).
 
-![Cross-correlation with strides of 3 and 2 for height and width respectively. The shaded portions are the output element and the input and core array elements used in its computation: $0\times0+0\times1+1\times2+2\times3=8$, $0\times0+6\times1+0\times2+0\times3=6$. ](../img/conv_stride.svg)
+![Cross-correlation with strides of 3 and 2 for height and width respectively. The shaded portions are the output element and the input and core array elements used in its computation: $0\times0+0\times1+1\times2+2\times3=8$, $0\times0+6\times1+0\times2+0\times3=6$. ](../img/conv-stride.svg)
 
 In general, when the stride for the height is $s_h$
 and the stride for the width is $s_w$,

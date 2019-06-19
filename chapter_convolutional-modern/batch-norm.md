@@ -1,36 +1,46 @@
 # Batch Normalization
 :label:`chapter_batch_norm`
 
-Training deep models is difficult and getting them
-to converge in a reasonable amount of time can be tricky.
-In this section, we describe batch normalization,
-one popular and effective technique
-that has been found to accelerate the convergence of deep nets
-and ([together with residual blocks, which we cover next](resnet.md))
-has recently enabled practitioners
-to routinely train networks with over 100 layers.
+Training deep models is difficult and getting them to converge in a reasonable
+amount of time can be tricky.  In this section, we describe batch normalization (BN)
+:cite:`Ioffe.Szegedy.2015`, one popular and effective technique that has been
+found to accelerate the convergence of deep nets, and together with residual
+blocks, which we cover in :numref:`chapter_resnet`, has recently enabled
+practitioners to routinely train networks with over 100 layers.
 
 ## Training Deep Networks
 
 Let's review some of the practical challenges when training deep networks.
 
-1. Data preprocessing often proves to be a crucial consideration for effective statistical modeling. Recall our application of deep networks to [predicting house prices](../chapter_deep-learning-basics/kaggle-house-price.md). In that example, we standardized our input features to each have a mean of *zero* and variance of *one*. Standardizing input data typically makes it easier to train models since parameters are a-priori at a similar scale.
-1. For a typical MLP or CNN, as we train the model, the activations in intermediate layers of the network may assume different orders of magnitude (both across nodes in the same layer, and over time due to updating the model's parameters). The authors of the batch normalization technique postulated that this drift in the distribution of activations could hamper the convergence of the network. Intuitively, we might conjecture that if one layer has activation values that are 100x that of another layer, we might need to adjust learning rates adaptively per layer (or even per node within a layer).
-1. Deeper networks are complex and easily capable of overfitting. This means that regularization becomes more critical. Empirically, we note that even with dropout, models can overfit badly and we might benefit from other regularization heuristics.
+1. Data preprocessing often proves to be a crucial consideration for effective
+   statistical modeling. Recall our application of deep networks to
+   predicting house prices in :numref:`chapter_kaggle_house`.
+   In that example, we standardized our input features to each have a mean of
+   *zero* and variance of *one*. Standardizing input data typically makes it
+   easier to train models since parameters are a-priori at a similar scale.
+1. For a typical MLP or CNN, as we train the model, the activations in
+   intermediate layers of the network may assume different orders of magnitude
+   (both across nodes in the same layer, and over time due to updating the
+   model's parameters). The authors of the batch normalization technique
+   postulated that this drift in the distribution of activations could hamper
+   the convergence of the network. Intuitively, we might conjecture that if one
+   layer has activation values that are 100x that of another layer, we might
+   need to adjust learning rates adaptively per layer (or even per node within a
+   layer).
+1. Deeper networks are complex and easily capable of overfitting. This means
+   that regularization becomes more critical. Empirically, we note that even
+   with dropout, models can overfit badly and we might benefit from other
+   regularization heuristics.
 
-In 2015, [Ioffe and Szegedy introduced Batch Normalization (BN)](https://arxiv.org/abs/1502.03167), a clever heuristic
-that has proved immensely useful for improving the reliability
-and speed of convergence when training deep models.
-In each training iteration, BN normalizes
-the activations of each hidden layer node
-(on each layer where it is applied)
-by subtracting its mean and dividing by its standard deviation,
-estimating both based on the current minibatch.
-Note that if our batch size was $1$,
-we wouldn't be able to learn anything
-because during training, every hidden node would take value $0$.
-However, with large enough minibatches,
-the approach proves effective and stable.
+In 2015, a clever heuristic called batch normalization (BN) that has proved
+immensely useful for improving the reliability and speed of convergence when
+training deep models :cite:`Ioffe.Szegedy.2015`.  In each training iteration, BN
+normalizes the activations of each hidden layer node (on each layer where it is
+applied) by subtracting its mean and dividing by its standard deviation,
+estimating both based on the current minibatch.  Note that if our batch size was
+$1$, we wouldn't be able to learn anything because during training, every hidden
+node would take value $0$.  However, with large enough minibatches, the approach
+proves effective and stable.
 
 
 In a nutshell, the idea in Batch Normalization is
@@ -83,7 +93,7 @@ After all, each minibatch has different data,
 different labels and with it, different activations, predictions and errors. As it turns out, this is actually beneficial.
 This natural variation appears to act as a form of regularization,
 conferring benefits (as observed empirically) in mitigating overfitting.
-In other recent preliminary research, [Teye, Azizpour and Smith, 2018](https://arxiv.org/pdf/1802.06455.pdf) and [Luo et al, 2018](https://arxiv.org/pdf/1809.00846.pdf) relate the properties of BN
+In other recent preliminary research, :cite:`Teye.Azizpour.Smith.2018` and :cite:`Luo.Wang.Shao.ea.2018` relate the properties of BN
 to Bayesian Priors and penalties respectively.
 In particular, this sheds some light on the puzzle why BN works best
 for moderate sizes of minibatches in the range 50-100.
@@ -374,20 +384,17 @@ and start writing your own research papers
 you will want to be clear to delineate
 between technical claims and hunches.
 
-Following the success of batch normalization,
-its explanation and via *internal covariate shift*
-became a hot topic that has been revisted several times
-both in the technical literature and in the broader discourse
-about how machine learning research ought to be presented.
-Ali Rahimi popularly raised this issue during a memorable
-speech while accepting a Test of Time Award at the NeurIPS conference in 2017
-and the issue was revisited in a recent position paper
-on troubling trends in machine learning
-([Lipton et al, 2018](https://arxiv.org/abs/1807.03341)).
-In the technical literature other authors
-([Santukar et al., 2018](https://arxiv.org/abs/1805.11604))
-have proposed alternative explanations for the success of BN,
-some claiming that BN's success comes despite exhibiting behavior that is in some ways opposite to those claimed in the original paper.
+Following the success of batch normalization, its explanation and via *internal
+covariate shift* became a hot topic that has been revisted several times both in
+the technical literature and in the broader discourse about how machine learning
+research ought to be presented.  Ali Rahimi popularly raised this issue during a
+memorable speech while accepting a Test of Time Award at the NeurIPS conference
+in 2017 and the issue was revisited in a recent position paper on troubling
+trends in machine learning :cite:`Lipton.Steinhardt.2018`.  In the technical
+literature other authors (:cite:`Santurkar.Tsipras.Ilyas.ea.2018`) have proposed
+alternative explanations for the success of BN, some claiming that BN's success
+comes despite exhibiting behavior that is in some ways opposite to those claimed
+in the original paper.
 
 
 ## Summary
@@ -410,11 +417,6 @@ some claiming that BN's success comes despite exhibiting behavior that is in som
 1. Fix the coefficients `beta` and `gamma` (add the parameter `grad_req='null'` at the time of construction to avoid calculating the gradient), and observe and analyze the results.
 1. Review the Gluon documentation for `BatchNorm` to see the other applications for Batch Normalization.
 1. Research ideas - think of other normalization transforms that you can apply? Can you apply the probability integral transform? How about a full rank covariance estimate?
-
-
-## References
-
-[1] Ioffe, S., & Szegedy, C. (2015). Batch normalization: Accelerating deep network training by reducing internal covariate shift. arXiv preprint arXiv:1502.03167.
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2358)
 

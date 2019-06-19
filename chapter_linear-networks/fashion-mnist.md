@@ -11,7 +11,6 @@ First, import the packages or modules required in this section.
 %matplotlib inline
 import d2l
 from mxnet import gluon 
-import time
 import sys
 ```
 
@@ -76,10 +75,10 @@ train_iter = gluon.data.DataLoader(mnist_train.transform_first(transformer),
 Let's look at the time it takes to read the training data.
 
 ```{.python .input}
-start = time.time()
+timer = d2l.Timer()
 for X, y in train_iter:
     continue
-'%.2f sec' % (time.time() - start)
+'%.2f sec' % timer.stop()
 ```
 
 ## Put all Things Together 

@@ -80,9 +80,6 @@ we can install pandas without even leaving the notebook.
 # If pandas is not installed, please uncomment the following line:
 # !pip install pandas
 
-import sys
-sys.path.insert(0, '..')
-
 %matplotlib inline
 import d2l
 from mxnet import autograd, gluon, init, nd
@@ -293,7 +290,6 @@ if our dataset wasconsiderably larger.
 But this added complexity might obfuscate our code unnecessarily
 so we can safely omit here owing to the simplicity of our problem.
 
-
 ```{.python .input}
 def get_k_fold_data(k, i, X, y):
     assert k > 1
@@ -327,9 +323,9 @@ def k_fold(k, X_train, y_train, num_epochs,
         train_l_sum += train_ls[-1]
         valid_l_sum += valid_ls[-1]
         if i == 0:
-            d2l.semilogy(range(1, num_epochs + 1), train_ls, 'epochs', 'rmse',
-                         range(1, num_epochs + 1), valid_ls,
-                         ['train', 'valid'])
+            d2l.plot(list(range(1, num_epochs+1)), [train_ls, valid_ls],
+                     xlabel='epoch', ylabel='rmse', 
+                     legend=['train', 'valid'], yscale='log')
         print('fold %d, train rmse: %f, valid rmse: %f' % (
             i, train_ls[-1], valid_ls[-1]))
     return train_l_sum / k, valid_l_sum / k
@@ -379,7 +375,8 @@ def train_and_pred(train_features, test_feature, train_labels, test_data,
     net = get_net()
     train_ls, _ = train(net, train_features, train_labels, None, None,
                         num_epochs, lr, weight_decay, batch_size)
-    d2l.semilogy(range(1, num_epochs + 1), train_ls, 'epochs', 'rmse')
+    d2l.plot(range(1, num_epochs+1), train_ls, xlabel='epoch', ylabel='rmse',
+            yscale='log')
     print('train rmse %f' % train_ls[-1])
     # Apply the network to the test set
     preds = net(test_features).asnumpy()

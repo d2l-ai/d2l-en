@@ -1,7 +1,16 @@
 # RMSProp
 :label:`chapter_rmsprop`
 
-In the experiment in :numref:`chapter_adagrad`, the learning rate of each element in the independent variable of the objective function declines (or remains unchanged) during iteration because the variable $\mathbf{s}_t$ in the denominator is increased by the square by element operation of the mini-batch stochastic gradient, adjusting the learning rate. Therefore, when the learning rate declines very fast during early iteration, yet the current solution is still not desirable, Adagrad might have difficulty finding a useful solution because the learning rate will be too small at later stages of iteration. To tackle this problem, the RMSProp algorithm made a small modification to Adagrad[1].
+In the experiment in :numref:`chapter_adagrad`, the learning rate of each
+element in the independent variable of the objective function declines (or
+remains unchanged) during iteration because the variable $\mathbf{s}_t$ in the
+denominator is increased by the square by element operation of the mini-batch
+stochastic gradient, adjusting the learning rate. Therefore, when the learning
+rate declines very fast during early iteration, yet the current solution is
+still not desirable, Adagrad might have difficulty finding a useful solution
+because the learning rate will be too small at later stages of iteration. To
+tackle this problem, the RMSProp algorithm :cite:`Tieleman.Hinton.2012` made a
+small modification to Adagrad.
 
 ## The Algorithm
 
@@ -94,7 +103,7 @@ We set the initial learning rate to 0.01 and the hyperparameter $\gamma$ to 0.9.
 
 ```{.python .input  n=24}
 data_iter, feature_dim = d2l.get_data_ch10(batch_size=10)
-d2l.train_ch10(rmsprop, init_rmsprop_states(feature_dim), 
+d2l.train_ch10(rmsprop, init_rmsprop_states(feature_dim),
                {'lr': 0.01, 'gamma': 0.9}, data_iter, feature_dim);
 ```
 
@@ -116,12 +125,6 @@ d2l.train_gluon_ch10('rmsprop', {'learning_rate': 0.01, 'gamma1': 0.9},
 * What happens to the experimental results if we set the value of $\gamma$ to 1? Why?
 * Try using other combinations of initial learning rates and $\gamma$ hyperparameters and observe and analyze the experimental results.
 
-
-
-
-## Reference
-
-[1] Tieleman, T., & Hinton, G. (2012). Lecture 6.5-rmsprop: Divide the gradient by a running average of its recent magnitude. COURSERA: Neural networks for machine learning, 4(2), 26-31.
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2376)
 

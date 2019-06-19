@@ -92,7 +92,6 @@ But the low-frequency word "join" is completely preserved.
 compare_counts('join')
 ```
 
-
 Lastly, we map each token into an index to construct the corpus.
 
 ```{.python .input  n=20}
@@ -229,7 +228,7 @@ We use the `batchify` function just defined to specify the mini-batch reading me
 
 ## Put All Things Together
 
-Lastly, we define the `load_data_ptb` function that read the PTB data set and return the data loader. 
+Lastly, we define the `load_data_ptb` function that read the PTB data set and return the data loader.
 
 ```{.python .input}
 # Save to the d2l package.
@@ -248,7 +247,7 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
     return data_iter, vocab
 ```
 
-Let's print the first mini-batch of the data iterator. 
+Let's print the first mini-batch of the data iterator.
 
 ```{.python .input  n=14}
 data_iter, vocab = load_data_ptb(512, 5, 5)
@@ -266,4 +265,3 @@ for batch in data_iter:
 ## Exercises
 
 * We use the `batchify` function to specify the mini-batch reading method in the `DataLoader` instance and print the shape of each variable in the first batch read. How should these shapes be calculated?
-
