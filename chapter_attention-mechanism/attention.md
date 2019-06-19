@@ -22,8 +22,9 @@ Different choices of the score function lead to different attention layers. We w
 
 ```{.python .input  n=1}
 import math
-from mxnet import nd
+from mxnet import np, npx
 from mxnet.gluon import nn
+npx.set_np()
 ```
 
 The masked softmax takes a 3-dim input and allows to filter out some elements by
@@ -36,7 +37,7 @@ definition of a valid length.)
 def masked_softmax(X, valid_length):
     # X: 3-D tensor, valid_length: 1-D or 2-D tensor
     if valid_length is None:
-        return X.softmax()
+        return npx.softmax(X)
     else:
         shape = X.shape
         if valid_length.ndim == 1:
@@ -44,21 +45,21 @@ def masked_softmax(X, valid_length):
         else:
             valid_length = valid_length.reshape((-1,))
         # fill masked elements with a large negative, whose exp is 0
-        X = nd.SequenceMask(X.reshape((-1, shape[-1])), valid_length, True,
+        X = npx.SequenceMask(X.reshape((-1, shape[-1])), valid_length, True,
                             axis=1, value=-1e6)
-        return X.softmax().reshape(shape)
+        return npx.softmax(X).reshape(shape)
 ```
 
 Construct two examples, which each example is a 2-by-4 matrix, as the input. If specify the valid length for the first example to be 2, then only the first two columns of this example are used to compute softmax.
 
 ```{.python .input  n=5}
-masked_softmax(nd.random.uniform(shape=(2,2,4)), nd.array([2,3]))
+masked_softmax(np.random.uniform(size=(2,2,4)), np.array([2,3]))
 ```
 
 The operator `nd.batched_dot` takes two inputs $X$ and $Y$ with shapes $(b, n, m)$ and $(b, m, k)$, respectively. It computes $b$ dot products, with `Z[i,:,:]=dot(X[i,:,:], Y[i,:,:]` for $i=1,\ldots,n$.
 
 ```{.python .input  n=4}
-nd.batch_dot(nd.ones((2,1,3)), nd.ones((2,3,2)))
+npx.batch_dot(np.ones((2,1,3)), np.ones((2,3,2)))
 ```
 
 ## Dot Product Attention
@@ -87,9 +88,9 @@ class DotProductAttention(nn.Block):
     def forward(self, query, key, value, valid_length=None):
         d = query.shape[-1]
         # set transpose_b=True to swap the last two dimensions of key
-        scores = nd.batch_dot(query, key, transpose_b=True) / math.sqrt(d)
+        scores = npx.batch_dot(query, key, transpose_b=True) / math.sqrt(d)
         attention_weights = self.dropout(masked_softmax(scores, valid_length))
-        return nd.batch_dot(attention_weights, value)
+        return npx.batch_dot(attention_weights, value)
 ```
 
 Now we create two batches, and each batch has one query and 10 key-value pairs.  We specify through `valid_length` that the first batch we will only pay attention to the first 2 key-value pairs, while the second batch will check the first 6 key-value pairs. Therefore, both batches have the same query, key-value pairs, we obtain different outputs.
@@ -97,9 +98,9 @@ Now we create two batches, and each batch has one query and 10 key-value pairs. 
 ```{.python .input  n=6}
 atten = DotProductAttention(dropout=0.5)
 atten.initialize()
-keys = nd.ones((2,10,2))
-values = nd.arange(40).reshape((1,10,4)).repeat(2,axis=0)
-atten(nd.ones((2,1,2)), keys, values, nd.array([2, 6]))
+keys = np.ones((2,10,2))
+values = np.arange(40).reshape((1,10,4)).repeat(2,axis=0)
+atten(np.ones((2,1,2)), keys, values, np.array([2, 6]))
 ```
 
 ## Multilayer Perception Attention
@@ -129,10 +130,10 @@ class MLPAttention(nn.Block):
         query, key = self.W_k(query), self.W_q(key)
         # expand query to (batch_size, #querys, 1, units), and key to
         # (batch_size, 1, #kv_pairs, units). Then plus them with broadcast.
-        features = query.expand_dims(axis=2) + key.expand_dims(axis=1)
-        scores = self.v(features).squeeze(axis=-1)
+        features = np.expand_dims(query, axis=2) + np.expand_dims(key, axis=1)
+        scores = np.squeeze(self.v(features), axis=-1)
         attention_weights = self.dropout(masked_softmax(scores, valid_length))
-        return nd.batch_dot(attention_weights, value)
+        return npx.batch_dot(attention_weights, value)
 ```
 
 Despite `MLPAttention` contains an additional MLP model in it, given the same inputs with identical keys, we obtain the same output as for `DotProductAttention`.
@@ -140,7 +141,7 @@ Despite `MLPAttention` contains an additional MLP model in it, given the same in
 ```{.python .input  n=8}
 atten = MLPAttention(units=8, dropout=0.1)
 atten.initialize()
-atten(nd.ones((2,1,2)), keys, values, nd.array([2, 6]))
+atten(np.ones((2,1,2)), keys, values, np.array([2, 6]))
 ```
 
 ## Summary
