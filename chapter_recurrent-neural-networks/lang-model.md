@@ -93,8 +93,9 @@ Let's see how this works on real data. We construct a vocabulary based on the ti
 
 ```{.python .input  n=1}
 import d2l
-from mxnet import nd
+from mxnet import np, npx
 import random
+npx.set_np()
 
 tokens = d2l.tokenize(d2l.read_time_machine())
 vocab = d2l.Vocab(tokens)
@@ -180,7 +181,7 @@ def seq_data_iter_random(corpus, batch_size, num_steps):
         batch_indices = example_indices[i:(i+batch_size)]
         X = [data(j) for j in batch_indices]
         Y = [data(j + 1) for j in batch_indices]
-        yield nd.array(X), nd.array(Y)
+        yield np.array(X), np.array(Y)
 ```
 
 Let us generate an artificial sequence from 0 to 30. We assume that
@@ -204,8 +205,8 @@ def seq_data_iter_consecutive(corpus, batch_size, num_steps):
     offset = random.randint(0, num_steps)
     # Slice out data - ignore num_steps and just wrap around
     num_indices = ((len(corpus) - offset - 1) // batch_size) * batch_size
-    Xs = nd.array(corpus[offset:offset+num_indices])
-    Ys = nd.array(corpus[offset+1:offset+1+num_indices])
+    Xs = np.array(corpus[offset:offset+num_indices])
+    Ys = np.array(corpus[offset+1:offset+1+num_indices])
     Xs, Ys = Xs.reshape((batch_size, -1)), Ys.reshape((batch_size, -1))
     num_batches = Xs.shape[1] // num_steps
     for i in range(0, num_batches * num_steps, num_steps):
@@ -239,7 +240,7 @@ class SeqDataLoader(object):
         return self.get_iter()
 ```
 
-Lastly, we define a function `load_data_time_machine` that returns both the data iterator and the vocabulary, so we can use it similarly as other functions with `load_data` prefix. 
+Lastly, we define a function `load_data_time_machine` that returns both the data iterator and the vocabulary, so we can use it similarly as other functions with `load_data` prefix.
 
 ```{.python .input}
 # Save to the d2l package.
