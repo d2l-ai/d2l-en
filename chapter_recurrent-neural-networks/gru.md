@@ -101,8 +101,9 @@ data set is given below:
 
 ```{.python .input  n=6}
 import d2l
-from mxnet import nd
+from mxnet import np, npx
 from mxnet.gluon import rnn
+npx.set_np()
 
 batch_size, num_steps = 32, 35
 train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
@@ -115,16 +116,16 @@ The next step is to initialize the model parameters. We draw the weights from a 
 ```{.python .input  n=2}
 def get_params(vocab_size, num_hiddens, ctx):
     num_inputs = num_outputs = vocab_size
-    normal = lambda shape : nd.random.normal(scale=0.01, shape=shape, ctx=ctx)
+    normal = lambda shape : np.random.normal(scale=0.01, size=shape, ctx=ctx)
     three = lambda : (normal((num_inputs, num_hiddens)),
                       normal((num_hiddens, num_hiddens)),
-                      nd.zeros(num_hiddens, ctx=ctx))
+                      np.zeros(num_hiddens, ctx=ctx))
     W_xz, W_hz, b_z = three()  # Update gate parameter
     W_xr, W_hr, b_r = three()  # Reset gate parameter
     W_xh, W_hh, b_h = three()  # Candidate hidden state parameter
     # Output layer parameters
     W_hq = normal((num_hiddens, num_outputs))
-    b_q = nd.zeros(num_outputs, ctx=ctx)
+    b_q = np.zeros(num_outputs, ctx=ctx)
     # Create gradient
     params = [W_xz, W_hz, b_z, W_xr, W_hr, b_r, W_xh, W_hh, b_h, W_hq, b_q]
     for param in params:
@@ -138,7 +139,7 @@ Now we will define the hidden state initialization function `init_gru_state`. Ju
 
 ```{.python .input  n=3}
 def init_gru_state(batch_size, num_hiddens, ctx):
-    return (nd.zeros(shape=(batch_size, num_hiddens), ctx=ctx), )
+    return (np.zeros(shape=(batch_size, num_hiddens), ctx=ctx), )
 ```
 
 Now we are ready to define the actual model. Its structure is the same as the basic RNN cell, just that the update equations are more complex.
@@ -149,13 +150,13 @@ def gru(inputs, state, params):
     H, = state
     outputs = []
     for X in inputs:
-        Z = nd.sigmoid(nd.dot(X, W_xz) + nd.dot(H, W_hz) + b_z)
-        R = nd.sigmoid(nd.dot(X, W_xr) + nd.dot(H, W_hr) + b_r)
-        H_tilda = nd.tanh(nd.dot(X, W_xh) + nd.dot(R * H, W_hh) + b_h)
+        Z = npx.sigmoid(np.dot(X, W_xz) + np.dot(H, W_hz) + b_z)
+        R = npx.sigmoid(np.dot(X, W_xr) + np.dot(H, W_hr) + b_r)
+        H_tilda = np.tanh(np.dot(X, W_xh) + np.dot(R * H, W_hh) + b_h)
         H = Z * H + (1 - Z) * H_tilda
-        Y = nd.dot(H, W_hq) + b_q
+        Y = np.dot(H, W_hq) + b_q
         outputs.append(Y)
-    return nd.concat(*outputs, dim=0), (H,)
+    return np.concatenate(outputs, axis=0), (H,)
 ```
 
 ### Training and Prediction

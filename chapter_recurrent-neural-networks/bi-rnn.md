@@ -98,8 +98,9 @@ If we were to ignore all advice regarding the fact that bidirectional LSTMs use 
 
 ```{.python .input}
 import d2l
-from mxnet import nd
+from mxnet import npx
 from mxnet.gluon import rnn
+npx.set_np()
 
 # Load data
 batch_size, num_steps = 32, 35

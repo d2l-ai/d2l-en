@@ -82,8 +82,9 @@ Now it's time to implement an LSTM. We begin with a model built from scratch. As
 
 ```{.python .input  n=1}
 import d2l
-from mxnet import nd
+from mxnet import np, npx
 from mxnet.gluon import rnn
+npx.set_np()
 
 batch_size, num_steps = 32, 35
 train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
@@ -96,17 +97,17 @@ Next we need to define and initialize the model parameters. As previously, the h
 ```{.python .input  n=2}
 def get_lstm_params(vocab_size, num_hiddens, ctx):
     num_inputs = num_outputs = vocab_size
-    normal = lambda shape : nd.random.normal(scale=0.01, shape=shape, ctx=ctx)
+    normal = lambda shape : np.random.normal(scale=0.01, size=shape, ctx=ctx)
     three = lambda : (normal((num_inputs, num_hiddens)),
                       normal((num_hiddens, num_hiddens)),
-                      nd.zeros(num_hiddens, ctx=ctx))
+                      np.zeros(num_hiddens, ctx=ctx))
     W_xi, W_hi, b_i = three()  # Input gate parameters
     W_xf, W_hf, b_f = three()  # Forget gate parameters
     W_xo, W_ho, b_o = three()  # Output gate parameters
     W_xc, W_hc, b_c = three()  # Candidate cell parameters
     # Output layer parameters
     W_hq = normal((num_hiddens, num_outputs))
-    b_q = nd.zeros(num_outputs, ctx=ctx)
+    b_q = np.zeros(num_outputs, ctx=ctx)
     # Create gradient
     params = [W_xi, W_hi, b_i, W_xf, W_hf, b_f, W_xo, W_ho, b_o, W_xc, W_hc,
               b_c, W_hq, b_q]
@@ -121,8 +122,8 @@ In the initialization function, the hidden state of the LSTM needs to return an 
 
 ```{.python .input  n=3}
 def init_lstm_state(batch_size, num_hiddens, ctx):
-    return (nd.zeros(shape=(batch_size, num_hiddens), ctx=ctx),
-            nd.zeros(shape=(batch_size, num_hiddens), ctx=ctx))
+    return (np.zeros(shape=(batch_size, num_hiddens), ctx=ctx),
+            np.zeros(shape=(batch_size, num_hiddens), ctx=ctx))
 ```
 
 The actual model is defined just like we discussed it before with three gates and an auxiliary memory cell. Note that only the hidden state is passed on to the output layer. The memory cells do not participate in the computation directly.
@@ -134,15 +135,15 @@ def lstm(inputs, state, params):
     (H, C) = state
     outputs = []
     for X in inputs:
-        I = nd.sigmoid(nd.dot(X, W_xi) + nd.dot(H, W_hi) + b_i)
-        F = nd.sigmoid(nd.dot(X, W_xf) + nd.dot(H, W_hf) + b_f)
-        O = nd.sigmoid(nd.dot(X, W_xo) + nd.dot(H, W_ho) + b_o)
-        C_tilda = nd.tanh(nd.dot(X, W_xc) + nd.dot(H, W_hc) + b_c)
+        I = npx.sigmoid(np.dot(X, W_xi) + np.dot(H, W_hi) + b_i)
+        F = npx.sigmoid(np.dot(X, W_xf) + np.dot(H, W_hf) + b_f)
+        O = npx.sigmoid(np.dot(X, W_xo) + np.dot(H, W_ho) + b_o)
+        C_tilda = np.tanh(np.dot(X, W_xc) + np.dot(H, W_hc) + b_c)
         C = F * C + I * C_tilda
-        H = O * C.tanh()
-        Y = nd.dot(H, W_hq) + b_q
+        H = O * np.tanh(C)
+        Y = np.dot(H, W_hq) + b_q
         outputs.append(Y)
-    return nd.concat(*outputs, dim=0), (H, C)
+    return np.concatenate(outputs, axis=0), (H, C)
 ```
 
 ### Training
