@@ -271,6 +271,71 @@ def evaluate_loss(net, data_iter, loss):
         metric.add(loss(net(X), y).sum(), y.size)
     return metric[0] / metric[1]
 
+# Defined in file: ./chapter_deep-learning-computation/use-gpu.md
+def try_gpu(i=0):
+    """Return gpu(i) if exists, otherwise return cpu()."""
+    return npx.gpu(i) if npx.num_gpus() >= i + 1 else npx.cpu()
+
+
+# Defined in file: ./chapter_deep-learning-computation/use-gpu.md
+def try_all_gpus():
+    """Return all available GPUs, or [cpu(),] if no GPU exists."""
+    ctxes = [npx.gpu(i) for i in range(npx.num_gpus())]
+    return ctxes if ctxes else [npx.cpu()]
+
+
+# Defined in file: ./chapter_convolutional-neural-networks/conv-layer.md
+def corr2d(X, K):
+    """Compute 2D cross-correlation."""
+    h, w = K.shape
+    Y = np.zeros((X.shape[0] - h + 1, X.shape[1] - w + 1))
+    for i in range(Y.shape[0]):
+        for j in range(Y.shape[1]):
+            Y[i, j] = (X[i: i + h, j: j + w] * K).sum()
+    return Y
+
+# Defined in file: ./chapter_convolutional-neural-networks/lenet.md
+def evaluate_accuracy_gpu(net, data_iter, ctx=None):
+    if not ctx:  # Query the first device the first parameter is on.
+        ctx = list(net.collect_params().values())[0].list_ctx()[0]
+    metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
+    for X, y in data_iter:
+        X, y = X.as_in_context(ctx), y.as_in_context(ctx)
+        metric.add(d2l.accuracy(net(X), y), y.size)
+    return metric[0]/metric[1]
+
+# Defined in file: ./chapter_convolutional-neural-networks/lenet.md
+def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
+    net.initialize(force_reinit=True, ctx=ctx, init=init.Xavier())
+    loss = gluon.loss.SoftmaxCrossEntropyLoss()
+    trainer = gluon.Trainer(net.collect_params(),
+                            'sgd', {'learning_rate': lr})
+    animator = d2l.Animator(xlabel='epoch', xlim=[0,num_epochs],
+                            legend=['train loss','train acc','test acc'])
+    timer = d2l.Timer()
+    for epoch in range(num_epochs):
+        metric = d2l.Accumulator(3)  # train_loss, train_acc, num_examples
+        for i, (X, y) in enumerate(train_iter):
+            timer.start()
+            # Here is the only difference compared to train_epoch_ch3
+            X, y = X.as_in_context(ctx), y.as_in_context(ctx)
+            with autograd.record():
+                y_hat = net(X)
+                l = loss(y_hat, y)
+            l.backward()
+            trainer.step(X.shape[0])
+            metric.add(l.sum(), d2l.accuracy(y_hat, y), X.shape[0])
+            timer.stop()
+            train_loss, train_acc = metric[0]/metric[2], metric[1]/metric[2]
+            if (i+1) % 50 == 0:
+                animator.add(epoch + i/len(train_iter),
+                             (train_loss, train_acc, None))
+        test_acc = evaluate_accuracy_gpu(net, test_iter)
+        animator.add(epoch+1, (None, None, test_acc))
+    print('loss %.3f, train acc %.3f, test acc %.3f' % (
+        train_loss, train_acc, test_acc))
+    print('%.1f exampes/sec on %s'%(metric[2]*num_epochs/timer.sum(), ctx))
+
 # Defined in file: ./chapter_optimization/optimization-intro.md
 def annotate(text, xy, xytext):
     d2l.plt.gca().annotate(text, xy=xy, xytext=xytext,
