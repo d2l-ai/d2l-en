@@ -17,11 +17,11 @@ The layer structure in the encoder and the decoder is shown in :numref:`fig_s2s_
 ![The layers in the sequence to sequence model with attention mechanism.](../img/seq2seq-attention-details.svg)
 :label:`fig_s2s_attention_details`
 
-
 ```{.python .input  n=1}
 import d2l
-from mxnet import nd
+from mxnet import np, npx
 from mxnet.gluon import rnn, nn
+npx.set_np()
 ```
 
 ## Decoder
@@ -54,16 +54,16 @@ class Seq2SeqAttentionDecoder(d2l.Decoder):
         outputs = []
         for x in X:
             # query shape: (batch_size, 1, hidden_size)
-            query = hidden_state[0][-1].expand_dims(axis=1)
+            query = np.expand_dims(hidden_state[0][-1], axis=1)
             # context has same shape as query
             context = self.attention_cell(
                 query, enc_outputs, enc_outputs, enc_valid_len)
             # concatenate on the feature dimension
-            x = nd.concat(context, x.expand_dims(axis=1), dim=-1)
+            x = np.concatenate((context, np.expand_dims(x, axis=1)), axis=-1)
             # reshape x to (1, batch_size, embed_size+hidden_size)
             out, hidden_state = self.rnn(x.swapaxes(0, 1), hidden_state)
             outputs.append(out)
-        outputs = self.dense(nd.concat(*outputs, dim=0))
+        outputs = self.dense(np.concatenate(outputs, axis=0))
         return outputs.swapaxes(0, 1), [enc_outputs, hidden_state,
                                         enc_valid_len]
 ```
@@ -77,7 +77,7 @@ encoder.initialize()
 decoder = Seq2SeqAttentionDecoder(vocab_size=10, embed_size=8,
                                   num_hiddens=16, num_layers=2)
 decoder.initialize()
-X = nd.zeros((4, 7))
+X = np.zeros((4, 7))
 state = decoder.init_state(encoder(X), None)
 out, state = decoder(X, state)
 out.shape, len(state), state[0].shape, len(state[1]), state[1][0].shape

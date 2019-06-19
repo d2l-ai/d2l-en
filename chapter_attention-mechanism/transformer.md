@@ -32,11 +32,12 @@ It can also be seen that the transformer differs to the seq2seq with attention m
 
 In the rest of this section, we will explain every new layer introduced by the transformer, and construct a model to train on the machine translation dataset.
 
-```{.python .input  n=1}
+```{.python .input  n=5}
 import math
 import d2l
-from mxnet import nd, autograd
+from mxnet import np, npx, autograd
 from mxnet.gluon import nn
+npx.set_np()
 ```
 
 ## Multi-Head Attention
@@ -61,7 +62,7 @@ $$\mathbf o = \mathbf W_o \begin{bmatrix}\mathbf o^{(1)}\\\vdots\\\mathbf o^{(h)
 
 In practice, we often use $p_q=p_k=p_v=d_o/h$. The hyper-parameters for a multi-head attention, therefore, contain the number heads $h$, and output feature size $d_o$.
 
-```{.python .input  n=2}
+```{.python .input  n=6}
 class MultiHeadAttention(nn.Block):
     def __init__(self, units, num_heads, dropout, **kwargs):  # units = d_o
         super(MultiHeadAttention, self).__init__(**kwargs)
@@ -82,9 +83,9 @@ class MultiHeadAttention(nn.Block):
         if valid_length is not None:
             # Copy valid_length by num_heads times
             if valid_length.ndim == 1:
-                valid_length = valid_length.tile(self.num_heads)
+                valid_length = np.tile(valid_length, self.num_heads)
             else:
-                valid_length = valid_length.tile((self.num_heads, 1))
+                valid_length = np.tile(valid_length, (self.num_heads, 1))
         output = self.attention(query, key, value, valid_length)
         # Transpose from (batch_size * num_heads, num_items, p) back to
         # (batch_size, num_items, units)
@@ -93,31 +94,31 @@ class MultiHeadAttention(nn.Block):
 
 Here are the definitions of the transpose functions.
 
-```{.python .input  n=3}
+```{.python .input  n=7}
 def transpose_qkv(X, num_heads):
     # Shape after reshape: (batch_size, num_items, num_heads, p)
-    # 0 means copying the shape element, -1 means inferring its value
-    X = X.reshape((0, 0, num_heads, -1))
+    # -1 means inferring its value
+    X = X.reshape((X.shape[0], X.shape[1], num_heads, -1))
     # Swap the num_items and the num_heads dimensions
-    X = X.transpose((0, 2, 1, 3))
+    X = X.transpose(0, 2, 1, 3)
     # Merge the first two dimensions. Use reverse=True to infer
     # shape from right to left
-    return X.reshape((-1, 0, 0), reverse=True)
+    return X.reshape((-1, X.shape[2], X.shape[3]))
 
 def transpose_output(X, num_heads):
     # A reversed version of transpose_qkv
-    X = X.reshape((-1, num_heads, 0, 0), reverse=True)
-    X = X.transpose((0, 2, 1, 3))
-    return X.reshape((0, 0, -1))
+    X = X.reshape((-1, num_heads, X.shape[1], X.shape[2]))
+    X = X.transpose(0, 2, 1, 3)
+    return X.reshape((X.shape[0], X.shape[1], -1))
 ```
 
 Create a multi-head attention with the output size $d_o$ equals to 100, the output will share the same batch size and sequence length as the input, but the last dimension will be equal to $d_o$.
 
-```{.python .input  n=4}
+```{.python .input  n=8}
 cell = MultiHeadAttention(100, 10, 0.5)
 cell.initialize()
-X = nd.ones((2, 4, 5))
-valid_length = nd.array([2,3])
+X = np.ones((2, 4, 5))
+valid_length = np.array([2,3])
 cell(X, X, X, valid_length).shape
 ```
 
@@ -142,7 +143,7 @@ Similar to the muti-head attention, the position-wise feed-forward network will 
 ```{.python .input  n=6}
 ffn = PositionWiseFFN(4, 8)
 ffn.initialize()
-ffn(nd.ones((2, 3, 4)))[0]
+ffn(np.ones((2, 3, 4)))[0]
 ```
 
 ## Add and Norm
@@ -156,7 +157,7 @@ layer = nn.LayerNorm()
 layer.initialize()
 batch = nn.BatchNorm()
 batch.initialize()
-X = nd.array([[1,2],[2,3]])
+X = np.array([[1,2],[2,3]])
 # compute mean and variance from X in the training mode.
 with autograd.record():
     print('layer norm:',layer(X), '\nbatch norm:', batch(X))
@@ -180,7 +181,7 @@ Due to the residual connection, $X$ and $Y$ should have the same shape.
 ```{.python .input  n=9}
 add_norm = AddNorm(0.5)
 add_norm.initialize()
-add_norm(nd.ones((2,3,4)), nd.ones((2,3,4))).shape
+add_norm(np.ones((2,3,4)), np.ones((2,3,4))).shape
 ```
 
 ## Positional Encoding
@@ -199,11 +200,11 @@ class PositionalEncoding(nn.Block):
         super(PositionalEncoding, self).__init__()
         self.dropout = nn.Dropout(dropout)
         # Create a long enougn P
-        self.P = nd.zeros((1, max_len, units))
-        X = nd.arange(0, max_len).reshape((-1,1)) / nd.power(
-            10000, nd.arange(0, units, 2)/units)
-        self.P[:, :, 0::2] = nd.sin(X)
-        self.P[:, :, 1::2] = nd.cos(X)
+        self.P = np.zeros((1, max_len, units))
+        X = np.arange(0, max_len).reshape((-1,1)) / np.power(
+            10000, np.arange(0, units, 2)/units)
+        self.P[:, :, 0::2] = np.sin(X)
+        self.P[:, :, 1::2] = np.cos(X)
 
     def forward(self, X):
         X = X + self.P[:, :X.shape[1], :].as_in_context(X.context)
@@ -216,8 +217,8 @@ Now we visualize the position values for 4 dimensions. As can be seen, the 4th d
 ```{.python .input  n=11}
 pe = PositionalEncoding(20, 0)
 pe.initialize()
-Y = pe(nd.zeros((1, 100, 20 )))
-d2l.plot(nd.arange(100), Y[0, :,4:8].T, figsize=(6, 2.5),
+Y = pe(np.zeros((1, 100, 20 )))
+d2l.plot(np.arange(100), Y[0, :,4:8].T, figsize=(6, 2.5),
         legend=["dim %d"%p for p in [4,5,6,7]])
 ```
 
@@ -244,7 +245,7 @@ Due to the residual connections, this block will not change the input shape. It 
 ```{.python .input  n=13}
 encoder_blk = EncoderBlock(24, 48, 8, 0.5)
 encoder_blk.initialize()
-encoder_blk(nd.ones((2, 100, 24)), valid_length).shape
+encoder_blk(np.ones((2, 100, 24)), valid_length).shape
 ```
 
 The encoder stacks $n$ blocks. Due to the residual connection again, the embedding layer size $d$ is same as the transformer block output size. Also note that we multiple the embedding output by $\sqrt{d}$ to avoid its values are too small compared to positional encodings.
@@ -274,7 +275,7 @@ Create an encoder with two transformer blocks, whose hyper-parameters are same a
 ```{.python .input  n=15}
 encoder = TransformerEncoder(200, 24, 48, 8, 2, 0.5)
 encoder.initialize()
-encoder(nd.ones((2, 100)), valid_length).shape
+encoder(np.ones((2, 100)), valid_length).shape
 ```
 
 ## Decoder
@@ -306,14 +307,14 @@ class DecoderBlock(nn.Block):
         if state[2][self.i] is None:
             key_values = X
         else:
-            key_values = nd.concat(state[2][self.i], X, dim=1)
+            key_values = np.concatenate((state[2][self.i], X), axis=1)
         state[2][self.i] = key_values
         if autograd.is_training():
             batch_size, seq_len, _ = X.shape
             # shape: (batch_size, seq_len), the values in the j-th column
             # are j+1
-            valid_length = nd.arange(
-                1, seq_len+1, ctx=X.context).tile((batch_size, 1))
+            valid_length = np.tile(np.arange(1, seq_len+1, ctx=X.context),
+                                   (batch_size, 1))
         else:
             valid_length = None
 
@@ -329,7 +330,7 @@ Similar to the encoder block, `units` should be equal to the last dimension size
 ```{.python .input  n=17}
 decoder_blk = DecoderBlock(24, 48, 8, 0.5, 0)
 decoder_blk.initialize()
-X = nd.ones((2, 100, 24))
+X = np.ones((2, 100, 24))
 state = [encoder_blk(X, valid_length), valid_length, [None]]
 decoder_blk(X, state)[0].shape
 ```
