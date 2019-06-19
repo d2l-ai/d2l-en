@@ -12,8 +12,9 @@ input. We build it by inheriting from the Block class and implementing the
 `forward` method.
 
 ```{.python .input  n=1}
-from mxnet import gluon, nd
+from mxnet import gluon, np, npx
 from mxnet.gluon import nn
+npx.set_np()
 
 class CenteredLayer(nn.Block):
     def __init__(self, **kwargs):
@@ -27,7 +28,7 @@ To see how it works let's feed some data into the layer.
 
 ```{.python .input  n=2}
 layer = CenteredLayer()
-layer(nd.array([1, 2, 3, 4, 5]))
+layer(np.array([1, 2, 3, 4, 5]))
 ```
 
 We can also use it to construct more complex models.
@@ -41,8 +42,8 @@ net.initialize()
 Let's see whether the centering layer did its job. For that we send random data through the network and check whether the mean vanishes. Note that since we're dealing with floating point numbers, we're going to see a very small albeit typically nonzero number.
 
 ```{.python .input  n=4}
-y = net(nd.random.uniform(shape=(4, 8)))
-y.mean().asscalar()
+y = net(np.random.uniform(size=(4, 8)))
+y.mean()
 ```
 
 ## Layers with Parameters
@@ -69,8 +70,8 @@ class MyDense(nn.Block):
         self.bias = self.params.get('bias', shape=(units,))
 
     def forward(self, x):
-        linear = nd.dot(x, self.weight.data()) + self.bias.data()
-        return nd.relu(linear)
+        linear = np.dot(x, self.weight.data()) + self.bias.data()
+        return npx.relu(linear)
 ```
 
 Naming the parameters allows us to access them by name through dictionary lookup later. It's a good idea to give them instructive names. Next, we instantiate the `MyDense` class and access its model parameters.
@@ -84,7 +85,7 @@ We can directly carry out forward calculations using custom layers.
 
 ```{.python .input  n=20}
 dense.initialize()
-dense(nd.random.uniform(shape=(2, 5)))
+dense(np.random.uniform(size=(2, 5)))
 ```
 
 We can also construct models using custom layers. Once we have that we can use it just like the built-in dense layer. The only exception is that in our case size inference is not automagic. Please consult the [MXNet documentation](http://www.mxnet.io) for details on how to do this.
@@ -94,7 +95,7 @@ net = nn.Sequential()
 net.add(MyDense(8, in_units=64),
         MyDense(1, in_units=8))
 net.initialize()
-net(nd.random.uniform(shape=(2, 64)))
+net(np.random.uniform(size=(2, 64)))
 ```
 
 ## Summary
