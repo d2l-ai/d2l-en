@@ -90,7 +90,7 @@ def evaluate_accuracy_gpus(net, data_iter):
     for features, labels in data_iter:
         Xs, ys = d2l.split_batch(features, labels, ctx_list)
         pys = [net(X) for X in Xs]  # run in parallel
-        metric.add(sum(d2l.accuracy(py, y) for py, y in zip(pys, ys)), 
+        metric.add(sum(d2l.accuracy(py, y).item() for py, y in zip(pys, ys)), 
                    labels.size)
     return metric[0]/metric[1]
 ```
@@ -108,7 +108,7 @@ def train(num_gpus, batch_size, lr):
     trainer = gluon.Trainer(
         net.collect_params(), 'sgd', {'learning_rate': lr})
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
-    timer, num_epochs = d2l.Timer(), 5
+    timer, num_epochs = d2l.Timer(), 2
     animator = d2l.Animator('epoch', 'test acc', xlim=[1, num_epochs])
     for epoch in range(num_epochs):
         timer.start()
