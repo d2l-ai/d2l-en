@@ -22,7 +22,9 @@ reduce the training error. We begin by importing a few libraries with a function
 %matplotlib inline
 import d2l
 from mpl_toolkits import mplot3d
-import numpy as np
+import numpy as onp
+from mxnet import np, npx
+npx.set_np()
 
 # Save to the d2l package.
 def annotate(text, xy, xytext):
@@ -33,8 +35,8 @@ def annotate(text, xy, xytext):
 The graph below illustrates the issue in some more detail. Since we have only a finite amount of data the minimum of the training error may be at a different location than the minimum of the expected error (or of the test error).
 
 ```{.python .input  n=2}
-def f(x): return x * np.cos(np.pi * x)
-def g(x): return f(x) + 0.2 * np.cos(5 * np.pi * x)
+def f(x): return x * np.cos(onp.pi * x)
+def g(x): return f(x) + 0.2 * np.cos(5 * onp.pi * x)
 
 d2l.set_figsize((4.5, 2.5))
 x = np.arange(0.5, 1.5, 0.01)
@@ -88,7 +90,7 @@ annotate('saddle point', (0, -0.2), (-0.52, -5.0))
 Saddle points in higher dimensions are even more insidious, as the example below shows. Consider the function $f(x, y) = x^2 - y^2$. It has its saddle point at $(0,0)$. This is a maximum with respect to $y$ and a minimum with respect to $x$. Moreover, it *looks* like a saddle, which is where this mathematical property got its name.
 
 ```{.python .input  n=5}
-x, y = np.mgrid[-1: 1: 101j, -1: 1: 101j]
+x, y = onp.mgrid[-1: 1: 101j, -1: 1: 101j]
 
 z = x**2 - y**2
 

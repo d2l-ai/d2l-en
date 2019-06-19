@@ -24,7 +24,8 @@ iterative trajectory of the independent variable using the learning rate $0.4$.
 ```{.python .input  n=3}
 %matplotlib inline
 import d2l
-from mxnet import nd
+from mxnet import np, npx
+npx.set_np()
 
 eta = 0.4
 
@@ -107,7 +108,7 @@ The following code block shows the weights for the past 40 time steps under vari
 gammas = [0.95, 0.9, 0.6, 0]
 d2l.set_figsize((3.5, 2.5))
 for gamma in gammas:
-    x = nd.arange(40).asnumpy()
+    x = np.arange(40).asnumpy()
     d2l.plt.plot(x, gamma ** x, label='gamma = %.2f'%gamma)
 d2l.plt.xlabel('time')
 d2l.plt.legend();
@@ -123,8 +124,8 @@ Compared with mini-batch SGD, the momentum method needs to maintain a velocity v
 
 ```{.python .input  n=13}
 def init_momentum_states(feature_dim):
-    v_w = nd.zeros((feature_dim, 1))
-    v_b = nd.zeros(1)
+    v_w = np.zeros((feature_dim, 1))
+    v_b = np.zeros(1)
     return (v_w, v_b)
 
 def sgd_momentum(params, states, hyperparams):

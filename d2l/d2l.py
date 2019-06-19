@@ -74,7 +74,7 @@ class Timer(object):
         
     def cumsum(self):
         """Return the accumuated times"""
-        return np.array(self.times).cumsum().tolist()
+        return onp.array(self.times).cumsum().tolist()
 
 # Defined in file: ./chapter_linear-networks/linear-regression.md
 def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
@@ -270,4 +270,96 @@ def evaluate_loss(net, data_iter, loss):
     for X, y in data_iter:
         metric.add(loss(net(X), y).sum(), y.size)
     return metric[0] / metric[1]
+
+# Defined in file: ./chapter_optimization/optimization-intro.md
+def annotate(text, xy, xytext):
+    d2l.plt.gca().annotate(text, xy=xy, xytext=xytext,
+                           arrowprops=dict(arrowstyle='->'))
+
+# Defined in file: ./chapter_optimization/gd.md
+def train_2d(trainer):
+    """Optimize a 2-dim objective function with a customized trainer."""
+    # s1 and s2 are internal state variables and will 
+    # be used later in the chapter
+    x1, x2, s1, s2 = -5, -2, 0, 0
+    results = [(x1, x2)]
+    for i in range(20):
+        x1, x2, s1, s2 = trainer(x1, x2, s1, s2)
+        results.append((x1, x2))
+    print('epoch %d, x1 %f, x2 %f' % (i + 1, x1, x2))
+    return results
+
+
+# Defined in file: ./chapter_optimization/gd.md
+def show_trace_2d(f, results):
+    """Show the trace of 2D variables during optimization."""
+    d2l.set_figsize((3.5, 2.5))
+    d2l.plt.plot(*zip(*results), '-o', color='#ff7f0e')
+    x1, x2 = onp.meshgrid(np.arange(-5.5, 1.0, 0.1), np.arange(-3.0, 1.0, 0.1))
+    d2l.plt.contour(x1, x2, f(np.array(x1), np.array(x2)), colors='#1f77b4')
+    d2l.plt.xlabel('x1')
+    d2l.plt.ylabel('x2')
+
+# Defined in file: ./chapter_optimization/minibatch-sgd.md
+def get_data_ch10(batch_size=10, n=1500):
+    data = onp.genfromtxt('../data/airfoil_self_noise.dat', delimiter='\t')
+    data = np.array((data - data.mean(axis=0)) / data.std(axis=0))
+    data_iter = d2l.load_array((data[:n, :-1], data[:n, -1]),
+                               batch_size, is_train=True)
+    return data_iter, data.shape[1]-1
+
+# Defined in file: ./chapter_optimization/minibatch-sgd.md
+def train_ch10(trainer_fn, states, hyperparams, data_iter,
+               feature_dim, num_epochs=2):
+    # Initialization
+    w = np.random.normal(scale=0.01, size=(feature_dim, 1))
+    b = np.zeros(1)
+    w.attach_grad()
+    b.attach_grad()
+    net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss
+    # Train
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss',
+                            xlim=[0, num_epochs], ylim=[0.22, 0.35])
+    n, timer = 0, d2l.Timer()
+    for _ in range(num_epochs):
+        for X, y in data_iter:
+            with autograd.record():
+                l = loss(net(X), y).mean()
+            l.backward()
+            trainer_fn([w, b], states, hyperparams)
+            n += X.shape[0]
+            if n % 200 == 0:
+                timer.stop()
+                animator.add(n/X.shape[0]/len(data_iter),
+                             (d2l.evaluate_loss(net, data_iter, loss),))
+                timer.start()
+    print('loss: %.3f, %.3f sec/epoch'%(animator.Y[0][-1], timer.avg()))
+    return timer.cumsum(), animator.Y[0]
+
+# Defined in file: ./chapter_optimization/minibatch-sgd.md
+def train_gluon_ch10(trainer_name, trainer_hyperparams,
+                     data_iter, num_epochs=2):
+    # Initialization
+    net = nn.Sequential()
+    net.add(nn.Dense(1))
+    net.initialize(init.Normal(sigma=0.01))
+    trainer = gluon.Trainer(
+        net.collect_params(), trainer_name, trainer_hyperparams)
+    loss = gluon.loss.L2Loss()
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss',
+                            xlim=[0, num_epochs], ylim=[0.22, 0.35])
+    n, timer = 0, d2l.Timer()
+    for _ in range(num_epochs):
+        for X, y in data_iter:
+            with autograd.record():
+                l = loss(net(X), y)
+            l.backward()
+            trainer.step(X.shape[0])
+            n += X.shape[0]
+            if n % 200 == 0:
+                timer.stop()
+                animator.add(n/X.shape[0]/len(data_iter),
+                             (d2l.evaluate_loss(net, data_iter, loss),))
+                timer.start()
+    print('loss: %.3f, %.3f sec/epoch'%(animator.Y[0][-1], timer.avg()))
 

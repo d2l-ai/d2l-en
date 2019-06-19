@@ -7,7 +7,8 @@ In this section, we are going to introduce the basic principles of stochastic gr
 %matplotlib inline
 import d2l
 import math
-import numpy as np
+from mxnet import np, npx 
+npx.set_np()
 ```
 
 ## Stochastic Gradient Updates
