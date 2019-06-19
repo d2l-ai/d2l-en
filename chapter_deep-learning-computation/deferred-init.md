@@ -14,8 +14,9 @@ All of those things sound impossible and indeed, they are. After all, there's no
 Let's see what happens when we instantiate a network. We start with our trusty MLP as before.
 
 ```{.python .input}
-from mxnet import init, nd
+from mxnet import init, np, npx
 from mxnet.gluon import nn
+npx.set_np()
 
 def getnet():
     net = nn.Sequential()
@@ -43,7 +44,7 @@ net.collect_params()
 As we can see, nothing really changed. Only once we provide the network with some data, we see a difference. Let's try it out.
 
 ```{.python .input}
-x = nd.random.uniform(shape=(2, 20))
+x = np.random.uniform(size=(2, 20))
 net(x)  # Forward computation
 
 net.collect_params()
@@ -68,7 +69,7 @@ net.initialize(init=MyInit())
 Note that, although `MyInit` will print information about the model parameters when it is called, the above `initialize` function does not print any information after it has been executed. Therefore, there is no real parameter initialization when calling the `initialize` function. Next, we define the input and perform a forward calculation.
 
 ```{.python .input  n=25}
-x = nd.random.uniform(shape=(2, 20))
+x = np.random.uniform(size=(2, 20))
 y = net(x)
 ```
 

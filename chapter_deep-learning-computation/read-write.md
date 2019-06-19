@@ -7,36 +7,37 @@ So far we discussed how to process data, how to build, train and test deep learn
 In its simplest form, we can directly use the `save` and `load` functions to store and read NDArrays separately. This works just as expected.
 
 ```{.python .input}
-from mxnet import nd
+from mxnet import np, npx
 from mxnet.gluon import nn
+npx.set_np()
 
-x = nd.arange(4)
-nd.save('x-file', x)
+x = np.arange(4)
+# np.save('x-file', x)  # FIXME
 ```
 
 Then, we read the data from the stored file back into memory.
 
 ```{.python .input}
-x2 = nd.load('x-file')
-x2
+#x2 = np.load('x-file')
+#x2
 ```
 
 We can also store a list of NDArrays and read them back into memory.
 
 ```{.python .input  n=2}
-y = nd.zeros(4)
-nd.save('x-files', [x, y])
-x2, y2 = nd.load('x-files')
-(x2, y2)
+y = np.zeros(4)
+#nd.save('x-files', [x, y])
+#x2, y2 = nd.load('x-files')
+#(x2, y2)
 ```
 
 We can even write and read a dictionary that maps from a string to an NDArray. This is convenient, for instance when we want to read or write all the weights in a model.
 
 ```{.python .input  n=4}
 mydict = {'x': x, 'y': y}
-nd.save('mydict', mydict)
-mydict2 = nd.load('mydict')
-mydict2
+#np.save('mydict', mydict)
+#mydict2 = nd.load('mydict')
+#mydict2
 ```
 
 ## Gluon Model Parameters
@@ -68,7 +69,7 @@ class MLP(nn.Block):
 
 net = MLP()
 net.initialize()
-x = nd.random.uniform(shape=(2, 20))
+x = np.random.uniform(size=(2, 20))
 y = net(x)
 ```
 
@@ -82,14 +83,14 @@ To check whether we are able to recover the model we instantiate a clone of the 
 
 ```{.python .input  n=8}
 clone = MLP()
-clone.load_parameters('mlp.params')
+# clone.load_parameters('mlp.params') FIXME
 ```
 
 Since both instances have the same model parameters, the computation result of the same input `x` should be the same. Let's verify this.
 
 ```{.python .input}
-yclone = clone(x)
-yclone == y
+#yclone = clone(x)
+#yclone == y
 ```
 
 ## Summary

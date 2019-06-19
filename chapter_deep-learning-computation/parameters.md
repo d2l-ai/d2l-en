@@ -9,15 +9,16 @@ The ultimate goal of training deep networks is to find good parameter values for
 As always, we start from our trusty Multilayer Perceptron with a hidden layer. This will serve as our choice for demonstrating the various features.
 
 ```{.python .input  n=1}
-from mxnet import init, nd
+from mxnet import init, np, npx
 from mxnet.gluon import nn
+npx.set_np()
 
 net = nn.Sequential()
 net.add(nn.Dense(256, activation='relu'))
 net.add(nn.Dense(10))
 net.initialize()  # Use the default initialization method
 
-x = nd.random.uniform(shape=(2, 20))
+x = np.random.uniform(size=(2, 20))
 net(x)  # Forward computation
 ```
 
@@ -171,7 +172,7 @@ $$
 class MyInit(init.Initializer):
     def _init_weight(self, name, data):
         print('Init', name, data.shape)
-        data[:] = nd.random.uniform(low=-10, high=10, shape=data.shape)
+        data[:] = np.random.uniform(-10, 10, data.shape)
         data *= data.abs() >= 5
 
 net.initialize(MyInit(), force_reinit=True)
@@ -195,21 +196,21 @@ net = nn.Sequential()
 # We need to give the shared layer a name such that we can reference its
 # parameters
 shared = nn.Dense(8, activation='relu')
-net.add(nn.Dense(8, activation='relu'),
-        shared,
-        nn.Dense(8, activation='relu', params=shared.params),
+net.add(nn.Dense(8, activation='relu'), # FIXME
+        #shared, # FIXME
+        #nn.Dense(8, activation='relu', params=shared.params),
         nn.Dense(10))
 net.initialize()
 
-x = nd.random.uniform(shape=(2, 20))
+x = np.random.uniform(size=(2, 20))
 net(x)
 
 # Check whether the parameters are the same
-print(net[1].weight.data()[0] == net[2].weight.data()[0])
-net[1].weight.data()[0,0] = 100
+#print(net[1].weight.data()[0] == net[2].weight.data()[0])
+#net[1].weight.data()[0,0] = 100
 # Make sure that they're actually the same object rather than just having the
 # same value
-print(net[1].weight.data()[0] == net[2].weight.data()[0])
+#print(net[1].weight.data()[0] == net[2].weight.data()[0])
 ```
 
 The above example shows that the parameters of the second and third layer are tied. They are identical rather than just being equal. That is, by changing one of the parameters the other one changes, too. What happens to the gradients is quite ingenious. Since the model parameters contain gradients, the gradients of the second hidden layer and the third hidden layer are accumulated in the `shared.params.grad( )` during backpropagation.
