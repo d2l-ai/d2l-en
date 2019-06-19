@@ -35,8 +35,9 @@ First, we implement this architecture in the
 
 ```{.python .input  n=1}
 import d2l
-from mxnet import gluon, nd
+from mxnet import gluon, np, npx
 from mxnet.gluon import nn
+npx.set_np()
 
 def conv_block(num_channels):
     blk = nn.Sequential()
@@ -61,7 +62,7 @@ class DenseBlock(nn.Block):
             Y = blk(X)
             # Concatenate the input and output of each block on the channel
             # dimension
-            X = nd.concat(X, Y, dim=1)
+            X = np.concatenate((X, Y), axis=1)
         return X
 ```
 
@@ -70,7 +71,7 @@ In the following example, we define a convolution block with two blocks of 10 ou
 ```{.python .input  n=8}
 blk = DenseBlock(2, 10)
 blk.initialize()
-X = nd.random.uniform(shape=(4, 3, 8, 8))
+X = np.random.uniform(size=(4, 3, 8, 8))
 Y = blk(X)
 Y.shape
 ```

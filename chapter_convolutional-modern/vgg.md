@@ -46,8 +46,9 @@ and the number of output channels `num_channels`.
 
 ```{.python .input  n=1}
 import d2l
-from mxnet import gluon, nd
+from mxnet import gluon, np, npx
 from mxnet.gluon import nn
+npx.set_np()
 
 def vgg_block(num_convs, num_channels):
     blk = nn.Sequential()
@@ -111,7 +112,7 @@ with a height and width of 224 to observe the output shape of each layer.
 
 ```{.python .input  n=4}
 net.initialize()
-X = nd.random.uniform(shape=(1, 1, 224, 224))
+X = np.random.uniform(size=(1, 1, 224, 224))
 for blk in net:
     X = blk(X)
     print(blk.name, 'output shape:\t', X.shape)
