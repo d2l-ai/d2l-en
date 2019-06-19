@@ -15,7 +15,8 @@ First, import the required packages or modules for experiment in this section. N
 
 ```{.python .input}
 import d2l
-from mxnet import nd, context
+from mxnet import np, npx
+npx.set_np()
 ```
 
 ## Parallel Computation using CPUs and GPUs
@@ -24,14 +25,14 @@ First, we will discuss parallel computation using CPUs and GPUs, for example, wh
 
 ```{.python .input}
 def run(x):
-    return [nd.dot(x, x) for _ in range(10)]
+    return [x.dot(x) for _ in range(10)]
 ```
 
 Next, create an NDArray on both the CPU and GPU.
 
 ```{.python .input}
-x_cpu = nd.random.uniform(shape=(2000, 2000))
-x_gpu = nd.random.uniform(shape=(6000, 6000), ctx=d2l.try_gpu())
+x_cpu = np.random.uniform(size=(2000, 2000))
+x_gpu = np.random.uniform(size=(6000, 6000), ctx=d2l.try_gpu())
 ```
 
 Then, use the two NDArrays to run the `run` function on both the CPU and GPU and print the time required.
@@ -39,16 +40,16 @@ Then, use the two NDArrays to run the `run` function on both the CPU and GPU and
 ```{.python .input}
 run(x_cpu)  # Warm-up begins
 run(x_gpu)
-nd.waitall()  # Warm-up ends
+npx.waitall()  # Warm-up ends
 
 timer = d2l.Timer()
 run(x_cpu)
-nd.waitall()
+npx.waitall()
 print('Run on %s: %.4f sec' % (x_cpu.context, timer.stop()))
 
 timer.start()
 run(x_gpu)
-nd.waitall()
+npx.waitall()
 print('Run on %s: %.4f sec' % (x_gpu.context, timer.stop()))
 ```
 
@@ -58,7 +59,7 @@ We remove `nd.waitall()` between the two computing tasks `run(x_cpu)` and `run(x
 timer.start()
 run(x_cpu)
 run(x_gpu)
-nd.waitall()
+npx.waitall()
 print('Run on both %s and %s: %.4f sec' % (
     x_cpu.context, x_gpu.context, timer.stop()))
 ```
@@ -72,16 +73,16 @@ In computations that use both the CPU and GPU, we often need to copy data betwee
 
 ```{.python .input}
 def copy_to_cpu(x):
-    return [y.copyto(context.cpu()) for y in x]
+    return [y.copyto(npx.cpu()) for y in x]
 
 timer.start()
 y = run(x_gpu)
-nd.waitall()
+npx.waitall()
 print('Run on %s: %.4f sec' % (x_gpu.context, timer.stop()))
 
 timer.start()
 y_cpu = copy_to_cpu(y)
-nd.waitall()
+npx.waitall()
 print('The copy to %s: %.4f sec' % (y_cpu[0].context, timer.stop()))
 ```
 
@@ -91,7 +92,7 @@ We remove the `waitall` function between computation and communication and print
 timer.start()
 y = run(x_gpu)
 y_cpu = copy_to_cpu(y)
-nd.waitall()
+npx.waitall()
 print('Run and copy in parallel: %.4f sec' % timer.stop())
 ```
 
