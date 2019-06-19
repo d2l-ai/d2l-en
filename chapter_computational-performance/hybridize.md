@@ -77,9 +77,10 @@ Through the use of experiments, this section will demonstrate the benefits of hy
 Previously, we learned how to use the Sequential class to concatenate multiple layers. Next, we will replace the Sequential class with the HybridSequential class in order to make use of hybrid programming.
 
 ```{.python .input}
-from mxnet import nd, sym
+import d2l
+from mxnet import np, npx, sym
 from mxnet.gluon import nn
-import time
+npx.set_np()
 
 def get_net():
     net = nn.HybridSequential()  # Here we use the class HybridSequential
@@ -89,7 +90,7 @@ def get_net():
     net.initialize()
     return net
 
-x = nd.random.normal(shape=(1, 512))
+x = np.random.normal(size=(1, 512))
 net = get_net()
 net(x)
 ```
@@ -110,12 +111,12 @@ To demonstrate the performance improvement gained by the use of symbolic program
 
 ```{.python .input}
 def benchmark(net, x):
-    start = time.time()
+    timer = d2l.Timer()
     for i in range(1000):
         _ = net(x)
     # To facilitate timing, we wait for all computations to be completed
-    nd.waitall()
-    return time.time() - start
+    npx.waitall()
+    return timer.stop()
 
 net = get_net()
 print('before hybridizing: %.4f sec' % (benchmark(net, x)))
@@ -131,7 +132,7 @@ As is observed in the above results, after a HybridSequential instance calls the
 We can save the symbolic program and model parameters to the hard disk through the use of the `export` function after the `net` model has finished computing the output based on the input, such as in the case of `net(x)` in the `benchmark` function.
 
 ```{.python .input}
-net.export('my_mlp')
+#net.export('my_mlp')  # FIXME
 ```
 
 The .json and .params files generated during this process are a symbolic program and a model parameter, respectively. They can be read by other front-end languages supported by Python or MXNet, such as C++, R, Scala, and Perl. This allows us to deploy trained models to other devices and easily use other front-end programming languages. At the same time, because symbolic programming was used during deployment, the computing performance is often superior to that based on imperative programming.
@@ -139,8 +140,8 @@ The .json and .params files generated during this process are a symbolic program
 In MXNet, a symbolic program refers to a program that makes use of the Symbol type. We know that, when the NDArray input `x` is provided to `net`, `net(x)` will directly calculate the model output and return a result based on `x`. For models that have called the `hybridize` function, we can also provide a Symbol-type input variable, and `net(x)` will return Symbol type results.
 
 ```{.python .input}
-x = sym.var('data')
-net(x)
+#x = sym.np.var('data')  # FIXME
+#net(x)
 ```
 
 ## Constructing Models Using the HybridBlock Class
@@ -159,7 +160,7 @@ class HybridNet(nn.HybridBlock):
     def hybrid_forward(self, F, x):
         print('F: ', F)
         print('x: ', x)
-        x = F.relu(self.hidden(x))
+        # x = F.np.relu(self.hidden(x))  # FIMXE
         print('hidden: ', x)
         return self.output(x)
 ```
@@ -171,7 +172,7 @@ The following creates a HybridBlock instance. As we can see, by default, `F` use
 ```{.python .input}
 net = HybridNet()
 net.initialize()
-x = nd.random.normal(shape=(1, 4))
+x = np.random.normal(size=(1, 4))
 net(x)
 ```
 
