@@ -12,32 +12,32 @@ from mxnet.gluon import nn
 npx.set_np()
 
 x = np.arange(4)
-# np.save('x-file', x)  # FIXME
+np.save('x-file', x) 
 ```
 
 Then, we read the data from the stored file back into memory.
 
 ```{.python .input}
-#x2 = np.load('x-file')
-#x2
+x2 = np.load('x-file')
+x2
 ```
 
 We can also store a list of NDArrays and read them back into memory.
 
 ```{.python .input  n=2}
 y = np.zeros(4)
-#nd.save('x-files', [x, y])
-#x2, y2 = nd.load('x-files')
-#(x2, y2)
+np.save('x-files', [x, y])
+x2, y2 = np.load('x-files')
+(x2, y2)
 ```
 
 We can even write and read a dictionary that maps from a string to an NDArray. This is convenient, for instance when we want to read or write all the weights in a model.
 
 ```{.python .input  n=4}
 mydict = {'x': x, 'y': y}
-#np.save('mydict', mydict)
-#mydict2 = nd.load('mydict')
-#mydict2
+np.save('mydict', mydict)
+mydict2 = np.load('mydict')
+mydict2
 ```
 
 ## Gluon Model Parameters
@@ -83,14 +83,14 @@ To check whether we are able to recover the model we instantiate a clone of the 
 
 ```{.python .input  n=8}
 clone = MLP()
-# clone.load_parameters('mlp.params') FIXME
+clone.load_parameters('mlp.params') 
 ```
 
 Since both instances have the same model parameters, the computation result of the same input `x` should be the same. Let's verify this.
 
 ```{.python .input}
-#yclone = clone(x)
-#yclone == y
+yclone = clone(x)
+yclone == y
 ```
 
 ## Summary
