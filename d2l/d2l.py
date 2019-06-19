@@ -927,3 +927,48 @@ def train_gluon_ch10(trainer_name, trainer_hyperparams,
                 timer.start()
     print('loss: %.3f, %.3f sec/epoch'%(animator.Y[0][-1], timer.avg()))
 
+# Defined in file: ./chapter_computational-performance/multiple-gpus.md
+def split_batch(X, y, ctx_list):
+    """Split X and y into multiple devices specified by ctx"""
+    assert X.shape[0] == y.shape[0]
+    return (gluon.utils.split_and_load(X, ctx_list),
+            gluon.utils.split_and_load(y, ctx_list))
+
+# Defined in file: ./chapter_computational-performance/multiple-gpus-gluon.md
+def resnet18(num_classes):
+    """A slightly modified ResNet-18 model"""
+    def resnet_block(num_channels, num_residuals, first_block=False):
+        blk = nn.Sequential()
+        for i in range(num_residuals):
+            if i == 0 and not first_block:
+                blk.add(d2l.Residual(
+                    num_channels, use_1x1conv=True, strides=2))
+            else:
+                blk.add(d2l.Residual(num_channels))
+        return blk
+
+    net = nn.Sequential()
+    # This model uses a smaller convolution kernel, stride, and padding and
+    # removes the maximum pooling layer
+    net.add(nn.Conv2D(64, kernel_size=3, strides=1, padding=1),
+            nn.BatchNorm(), nn.Activation('relu'))
+    net.add(resnet_block(64, 2, first_block=True),
+            resnet_block(128, 2),
+            resnet_block(256, 2),
+            resnet_block(512, 2))
+    net.add(nn.GlobalAvgPool2D(), nn.Dense(num_classes))
+    return net
+
+
+# Defined in file: ./chapter_computational-performance/multiple-gpus-gluon.md
+def evaluate_accuracy_gpus(net, data_iter):
+    # Query the list of devices.
+    ctx_list = list(net.collect_params().values())[0].list_ctx()
+    metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
+    for features, labels in data_iter:
+        Xs, ys = d2l.split_batch(features, labels, ctx_list)
+        pys = [net(X) for X in Xs]  # run in parallel
+        metric.add(sum(d2l.accuracy(py, y) for py, y in zip(pys, ys)), 
+                   labels.size)
+    return metric[0]/metric[1]
+

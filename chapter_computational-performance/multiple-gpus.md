@@ -28,45 +28,46 @@ Assume there are $k$ GPUs on a machine. Given the model to be trained, each GPU 
 
 In order to implement data parallelism in a multi-GPU training scenario from scratch, we first import the required packages or modules.
 
-```{.python .input  n=33}
+```{.python .input  n=2}
 %matplotlib inline
 import d2l
-from mxnet import autograd, nd, gluon
+from mxnet import autograd, np, npx, gluon
+npx.set_np()
 ```
 
 ## Define the Model
 
 We use LeNet, introduced in :numref:`chapter_lenet`, as the sample model for this section. Here, the model implementation only uses NDArray.
 
-```{.python .input  n=3}
+```{.python .input  n=10}
 # Initialize model parameters
 scale = 0.01
-W1 = nd.random.normal(scale=scale, shape=(20, 1, 3, 3))
-b1 = nd.zeros(shape=20)
-W2 = nd.random.normal(scale=scale, shape=(50, 20, 5, 5))
-b2 = nd.zeros(shape=50)
-W3 = nd.random.normal(scale=scale, shape=(800, 128))
-b3 = nd.zeros(shape=128)
-W4 = nd.random.normal(scale=scale, shape=(128, 10))
-b4 = nd.zeros(shape=10)
+W1 = np.random.normal(scale=scale, size=(20, 1, 3, 3))
+b1 = np.zeros(20)
+W2 = np.random.normal(scale=scale, size=(50, 20, 5, 5))
+b2 = np.zeros(50)
+W3 = np.random.normal(scale=scale, size=(800, 128))
+b3 = np.zeros(128)
+W4 = np.random.normal(scale=scale, size=(128, 10))
+b4 = np.zeros(10)
 params = [W1, b1, W2, b2, W3, b3, W4, b4]
 
 # Define the model
 def lenet(X, params):
-    h1_conv = nd.Convolution(data=X, weight=params[0], bias=params[1],
+    h1_conv = npx.Convolution(data=X, weight=params[0], bias=params[1],
                              kernel=(3, 3), num_filter=20)
-    h1_activation = nd.relu(h1_conv)
-    h1 = nd.Pooling(data=h1_activation, pool_type='avg', kernel=(2, 2),
+    h1_activation = npx.relu(h1_conv)
+    h1 = npx.Pooling(data=h1_activation, pool_type='avg', kernel=(2, 2),
                     stride=(2, 2))
-    h2_conv = nd.Convolution(data=h1, weight=params[2], bias=params[3],
+    h2_conv = npx.Convolution(data=h1, weight=params[2], bias=params[3],
                              kernel=(5, 5), num_filter=50)
-    h2_activation = nd.relu(h2_conv)
-    h2 = nd.Pooling(data=h2_activation, pool_type='avg', kernel=(2, 2),
+    h2_activation = npx.relu(h2_conv)
+    h2 = npx.Pooling(data=h2_activation, pool_type='avg', kernel=(2, 2),
                     stride=(2, 2))
-    h2 = nd.flatten(h2)
-    h3_linear = nd.dot(h2, params[4]) + params[5]
-    h3 = nd.relu(h3_linear)
-    y_hat = nd.dot(h3, params[6]) + params[7]
+    h2 = h2.reshape((h2.shape[0], -1))
+    h3_linear = np.dot(h2, params[4]) + params[5]
+    h3 = npx.relu(h3_linear)
+    y_hat = np.dot(h3, params[6]) + params[7]
     return y_hat
 
 # Cross-entropy loss function
@@ -77,7 +78,7 @@ loss = gluon.loss.SoftmaxCrossEntropyLoss()
 
 We need to implement some auxiliary functions to synchronize data among the multiple GPUs. The following `get_params` function copies the model parameters to a specific GPU and initializes the gradient.
 
-```{.python .input  n=4}
+```{.python .input  n=12}
 def get_params(params, ctx):
     new_params = [p.copyto(ctx) for p in params]
     for p in new_params:
@@ -87,7 +88,7 @@ def get_params(params, ctx):
 
 Try to copy the model parameter `params` to `gpu(0)`.
 
-```{.python .input  n=5}
+```{.python .input  n=13}
 new_params = get_params(params, d2l.try_gpu(0))
 print('b1 weight:', new_params[1])
 print('b1 grad:', new_params[1].grad)
@@ -95,7 +96,7 @@ print('b1 grad:', new_params[1].grad)
 
 Here, the data is distributed among multiple GPUs. The following `allreduce` function adds up the data on each GPU and then broadcasts it to all the GPUs.
 
-```{.python .input  n=6}
+```{.python .input  n=14}
 def allreduce(data):
     for i in range(1, len(data)):
         data[0][:] += data[i].copyto(data[0].context)
@@ -105,11 +106,11 @@ def allreduce(data):
 
 Perform a simple test of the `allreduce` function.
 
-```{.python .input  n=7}
-data = [nd.ones((1, 2), ctx=d2l.try_gpu(i)) * (i + 1) for i in range(2)]
-print('before allreduce:', data)
+```{.python .input  n=16}
+data = [np.ones((1, 2), ctx=d2l.try_gpu(i)) * (i + 1) for i in range(2)]
+print('before allreduce:\n', data[0], '\n', data[1])
 allreduce(data)
-print('after allreduce:', data)
+print('after allreduce:\n', data[0], '\n', data[1])
 ```
 
 ## Split a Data Batch into Multiple GPUs
@@ -119,7 +120,7 @@ The `utils` module in Gluon provides a function to evenly split an array into mu
 Now, we try to divide the 6 data instances equally between 2 GPUs using the `split_and_load` function.
 
 ```{.python .input  n=8}
-data = nd.arange(24).reshape((6, 4))
+data = np.arange(24).reshape((6, 4))
 ctx = d2l.try_all_gpus()
 splitted = gluon.utils.split_and_load(data, ctx)
 print('input: ', data)
@@ -177,11 +178,11 @@ def train(num_gpus, batch_size, lr):
         for X, y in train_iter:
             # Perform multi-GPU training for a single mini-batch
             train_batch(X, y, gpu_params, ctx_list, lr)
-            nd.waitall()
+            npx.waitall()
         timer.stop()
         # Verify the model on GPU 0
-        animator.add(epoch+1, d2l.evaluate_accuracy_gpu(
-            lambda x: lenet(x, gpu_params[0]), test_iter, ctx[0]))
+        animator.add(epoch+1, (d2l.evaluate_accuracy_gpu(
+            lambda x: lenet(x, gpu_params[0]), test_iter, ctx[0]),))
     print('test acc: %.2f, %.1f sec/epoch on %s' % (
             animator.Y[0][-1], timer.avg(), ctx_list))
 
