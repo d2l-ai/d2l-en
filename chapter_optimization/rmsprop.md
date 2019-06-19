@@ -49,12 +49,13 @@ We visualize the weights in the past 40 time steps with various $\gamma$s.
 %matplotlib inline
 import d2l
 import math
-from mxnet import nd
+from mxnet import np, npx
+npx.set_np()
 
 gammas = [0.95, 0.9, 0.8, 0.7]
 d2l.set_figsize((3.5, 2.5))
 for gamma in gammas:
-    x = nd.arange(40).asnumpy()
+    x = np.arange(40).asnumpy()
     d2l.plt.plot(x, (1-gamma) * gamma ** x, label='gamma = %.2f'%gamma)
 d2l.plt.xlabel('time');
 ```
@@ -88,15 +89,15 @@ Next, we implement RMSProp with the formula in the algorithm.
 
 ```{.python .input  n=22}
 def init_rmsprop_states(feature_dim):
-    s_w = nd.zeros((feature_dim, 1))
-    s_b = nd.zeros(1)
+    s_w = np.zeros((feature_dim, 1))
+    s_b = np.zeros(1)
     return (s_w, s_b)
 
 def rmsprop(params, states, hyperparams):
     gamma, eps = hyperparams['gamma'], 1e-6
     for p, s in zip(params, states):
-        s[:] = gamma * s + (1 - gamma) * p.grad.square()
-        p[:] -= hyperparams['lr'] * p.grad / (s + eps).sqrt()
+        s[:] = gamma * s + (1 - gamma) * np.square(p.grad)
+        p[:] -= hyperparams['lr'] * p.grad / np.sqrt(s + eps)
 ```
 
 We set the initial learning rate to 0.01 and the hyperparameter $\gamma$ to 0.9. Now, the variable $\boldsymbol{s}_t$ can be treated as the weighted average of the square term $\boldsymbol{g}_t \odot \boldsymbol{g}_t$ from the last $1/(1-0.9) = 10$ time steps.

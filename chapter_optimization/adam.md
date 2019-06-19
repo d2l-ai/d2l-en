@@ -37,21 +37,22 @@ We use the formula from the algorithm to implement Adam. Here, time step $t$ use
 ```{.python .input  n=2}
 %matplotlib inline
 import d2l
-from mxnet import nd
+from mxnet import np, npx
+npx.set_np()
 
 def init_adam_states(feature_dim):
-    v_w, v_b = nd.zeros((feature_dim, 1)), nd.zeros(1)
-    s_w, s_b = nd.zeros((feature_dim, 1)), nd.zeros(1)
+    v_w, v_b = np.zeros((feature_dim, 1)), np.zeros(1)
+    s_w, s_b = np.zeros((feature_dim, 1)), np.zeros(1)
     return ((v_w, s_w), (v_b, s_b))
 
 def adam(params, states, hyperparams):
     beta1, beta2, eps = 0.9, 0.999, 1e-6
     for p, (v, s) in zip(params, states):
         v[:] = beta1 * v + (1 - beta1) * p.grad
-        s[:] = beta2 * s + (1 - beta2) * p.grad.square()
+        s[:] = beta2 * s + (1 - beta2) * np.square(p.grad)
         v_bias_corr = v / (1 - beta1 ** hyperparams['t'])
         s_bias_corr = s / (1 - beta2 ** hyperparams['t'])
-        p[:] -= hyperparams['lr'] * v_bias_corr / (s_bias_corr.sqrt() + eps)
+        p[:] -= hyperparams['lr'] * v_bias_corr / (np.sqrt(s_bias_corr) + eps)
     hyperparams['t'] += 1
 ```
 
