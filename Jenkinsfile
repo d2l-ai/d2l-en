@@ -24,12 +24,12 @@ stage("Build and Publish") {
 
       sh label: "Execute Notebooks", script: """set -ex
       conda activate ${ENV_NAME}
+      export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
       d2lbook build eval
       """
 
       sh label:"Build HTML", script:"""set -ex
       conda activate ${ENV_NAME}
-      export CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES}
       ./static/build_html.sh
       """
 
