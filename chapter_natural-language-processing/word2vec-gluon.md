@@ -113,7 +113,7 @@ def train(net, data_iter, lr, num_epochs, ctx=d2l.try_gpu()):
     net.initialize(ctx=ctx, force_reinit=True)
     trainer = gluon.Trainer(net.collect_params(), 'adam',
                             {'learning_rate': lr})
-    animator = d2l.Animator(xlabel='epoch', ylabel='loss', 
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[0, num_epochs])
     for epoch in range(num_epochs):
         timer = d2l.Timer()
@@ -127,7 +127,7 @@ def train(net, data_iter, lr, num_epochs, ctx=d2l.try_gpu()):
                      / mask.sum(axis=1) * mask.shape[1])
             l.backward()
             trainer.step(batch_size)
-            metric.add((l.sum().asscalar(), l.size))
+            metric.add(l.sum().asscalar(), l.size)
             if (i+1) % 50 == 0:
                 animator.add(epoch+(i+1)/len(data_iter), metric[0]/metric[1])
     print('loss %.3f, %d tokens/sec on %s ' % (

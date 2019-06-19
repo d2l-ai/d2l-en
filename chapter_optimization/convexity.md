@@ -188,13 +188,13 @@ Here the variables $\alpha_i$ are the so-called *Lagrange Multipliers* that ensu
 
 One way of satisfying constrained optimization problems at least approximately is to adapt the Lagrange function $L$. Rather than satisfying $c_i(\mathbf{x}) \leq 0$ we simply add $\alpha_i c_i(\mathbf{x})$ to the objective function $f(x)$. This ensures that the constraints won't be violated too badly. 
 
-In fact, we've been using this trick all along. Consider [weight-decay regularization](../chapter_multilayer-perceptrons/weight-decay.md). In it we add $\frac{\lambda}{2} \|\mathbf{w}\|^2$ to the objective function to ensure that $\mathbf{w}$ doesn't grow too large. Using the constrained optimization point of view we can see that this will ensure that $\|\mathbf{w}\|^2 - r^2 \leq 0$ for some radius $r$. Adjusting the value of $\lambda$ allows us to vary the size of $\mathbf{w}$.
+In fact, we've been using this trick all along. Consider weight decay in :numref:`chapter_weight_decay`. In it we add $\frac{\lambda}{2} \|\mathbf{w}\|^2$ to the objective function to ensure that $\mathbf{w}$ doesn't grow too large. Using the constrained optimization point of view we can see that this will ensure that $\|\mathbf{w}\|^2 - r^2 \leq 0$ for some radius $r$. Adjusting the value of $\lambda$ allows us to vary the size of $\mathbf{w}$.
 
 In general, adding penalties is a good way of ensuring approximate constraint satisfaction. In practice this turns out to be much more robust than exact satisfaction. Furthermore, for nonconvex problems many of the properties that make the exact approach so appealing in the convex case (e.g. optimality) no longer hold. 
 
 ### Projections
 
-An alternative strategy for satisfying constraints are projections. Again, we encountered them before, e.g. when dealing with [gradient clipping](../chapter_recurrent-neural-networks/rnn-scratch.md). There we ensured that a gradient has length bounded by $c$ via 
+An alternative strategy for satisfying constraints are projections. Again, we encountered them before, e.g. when dealing with gradient clipping in :numref:`chapter_rnn_scratch`. There we ensured that a gradient has length bounded by $c$ via
 
 $$\mathbf{g} \leftarrow \mathbf{g} \cdot \mathrm{min}(1, c/\|\mathbf{g}\|).$$
 

@@ -54,7 +54,7 @@ data = nd.dot(X, A) + b
 Let's see what we got. This should be a Gaussian shifted in some rather arbitrary way with mean $b$ and covariance matrix $A^TA$.
 
 ```{.python .input  n=3}
-d2l.use_svg_display()
+d2l.set_figsize((3.5, 2.5))
 #d2l.plt.figure(figsize=())
 d2l.plt.scatter(data[:100,0].asnumpy(), data[:100,1].asnumpy());
 print("The covariance matrix is", nd.dot(A.T,A))
@@ -62,8 +62,7 @@ print("The covariance matrix is", nd.dot(A.T,A))
 
 ```{.python .input  n=4}
 batch_size = 8
-dataset = gluon.data.ArrayDataset(data)
-data_iter = gluon.data.DataLoader(dataset, batch_size, shuffle=True)
+data_iter = d2l.load_array((data,), batch_size)
 ```
 
 ## Generator
@@ -91,7 +90,7 @@ net_D.add(nn.Dense(5, activation='tanh'),
 First we define a function to update the discriminator.
 
 ```{.python .input  n=7}
-# Save to the d2l package. 
+# Save to the d2l package.
 def update_D(X, Z, net_D, net_G, loss, trainer_D):
     """Update discriminator"""
     batch_size = X.shape[0]
@@ -112,7 +111,7 @@ def update_D(X, Z, net_D, net_G, loss, trainer_D):
 The generator is updated similarly. Here we reuse the cross entropy loss but change the label of the fake data from $0$ to $1$.
 
 ```{.python .input  n=8}
-# Save to the d2l package. 
+# Save to the d2l package.
 def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
     """Update generator"""
     batch_size = Z.shape[0]
@@ -128,31 +127,7 @@ def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
     return loss_G.sum().asscalar()
 ```
 
-In each iteration, we first update the discriminator and then the generator. The following function runs one data epoch and return both the discriminator loss and generator loss. 
-
-```{.python .input}
-def train_epoch(net_D, net_G, loss, trainer_D, trainer_G, latent_dim):
-    total_loss_D, total_loss_G, n = 0.0, 0.0, 0
-    for X in data_iter:
-        batch_size = X.shape[0]
-        Z = nd.random.normal(0, 1, shape=(batch_size, latent_dim))
-        total_loss_D += update_D(X, Z, net_D, net_G, loss, trainer_D)
-        total_loss_G += update_G(Z, net_D, net_G, loss, trainer_G)
-        n += batch_size
-    return total_loss_D/n, total_loss_G/n
-```
-
-Similar to the `plot` function defined in :numref:`chapter_softmax_scratch`, here we create a convenient `scatter` function. 
-
-```{.python .input}
-def scatter(X, Y, x_label=None, y_label=None, legend=None,
-            xlim=None, ylim=None, axes=None):
-    """A scatter plot of multiple data series"""
-    axes = axes if axes else d2l.plt.gca()
-    d2l.draw(axes, axes.scatter, X, Y, x_label, y_label, legend, xlim, ylim)
-```
-
-Both the discriminator and the generator performs a binary logistic regression with the cross entropy loss. We use Adam to smooth the training process. We visualize both losses and generated examples. 
+Both the discriminator and the generator performs a binary logistic regression with the cross entropy loss. We use Adam to smooth the training process. In each iteration, we first update the discriminator and then the generator. We visualize both losses and generated examples.
 
 ```{.python .input  n=9}
 def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
@@ -163,29 +138,39 @@ def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
                               'adam', {'learning_rate': lr_D})
     trainer_G = gluon.Trainer(net_G.collect_params(),
                               'adam', {'learning_rate': lr_G})
-    losses = []
-    fig, (ax1, ax2) = d2l.plt.subplots(2, 1, figsize=(6, 6))
-    fig.subplots_adjust(hspace=0.3)
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss',
+                            xlim=[1, num_epochs], nrows=2, figsize=(5,5),
+                            legend=['generator', 'discriminator'])
+    animator.fig.subplots_adjust(hspace=0.3)
     for epoch in range(1, num_epochs+1):
-        losses.append(train_epoch(
-            net_D, net_G, loss, trainer_D, trainer_G, latent_dim))
-        # Visualize the losses.
-        d2l.plot(list(range(1, epoch+1)), list(map(list, zip(*losses))),
-                 'epoch', 'loss', ['generator', 'discriminator'],
-                 xlim=[0, num_epochs+1], axes=ax1)
-        # Show generated examples
+        # Train one epoch
+        timer = d2l.Timer()
+        metric = d2l.Accumulator(3)  # loss_D, loss_G, num_examples
+        for X in data_iter:
+            batch_size = X.shape[0]
+            Z = nd.random.normal(0, 1, shape=(batch_size, latent_dim))
+            metric.add(update_D(X, Z, net_D, net_G, loss, trainer_D),
+                        update_G(Z, net_D, net_G, loss, trainer_G),
+                        batch_size)
+        # Visualize generated examples
         Z = nd.random.normal(0, 1, shape=(100, latent_dim))
         fake_X = net_G(Z).asnumpy()
-        scatter([data[:,0], fake_X[:,0]], [data[:,1], fake_X[:,1]],
-                'x', 'y', ['real', 'generated'], axes=ax2)
-        d2l.show(fig)
+        animator.axes[1].cla()
+        animator.axes[1].scatter(data[:,0], data[:,1])
+        animator.axes[1].scatter(fake_X[:,0], fake_X[:,1])
+        animator.axes[1].legend(['real', 'generated'])
+        # Show the losses
+        loss_D, loss_G = metric[0]/metric[2], metric[1]/metric[2]
+        animator.add(epoch, (loss_D, loss_G))
+    print('loss_D %.3f, loss_G %.3f, %d examples/sec' % (
+        loss_D, loss_G, metric[2]/timer.stop()))
 ```
 
 Now we specify the hyper-parameters to fit the Gaussian distribution.
 
 ```{.python .input  n=10}
 lr_D, lr_G, latent_dim, num_epochs = 0.05, 0.005, 2, 20
-train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, 
+train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G,
       latent_dim, data[:100].asnumpy())
 ```
 
