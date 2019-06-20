@@ -16,8 +16,9 @@ language processing (see the [GluonNLP](https://gluon-nlp.mxnet.io/) tool packag
 let us check out names of the provided pre-trained word embeddings.
 
 ```{.python .input}
-from mxnet import nd
+from mxnet import np, npx
 from mxnet.contrib import text
+npx.set_np()
 
 text.embedding.get_pretrained_file_names().keys()
 ```
@@ -63,10 +64,10 @@ seeking analogies, we encapsulate this part of the logic separately in the `knn`
 ```{.python .input}
 def knn(W, x, k):
     # The added 1e-9 is for numerical stability
-    cos = nd.dot(W, x.reshape((-1,))) / (
-        (nd.sum(W * W, axis=1) + 1e-9).sqrt() * nd.sum(x * x).sqrt())
-    topk = nd.topk(cos, k=k, ret_typ='indices').asnumpy().astype('int32')
-    return topk, [cos[i].asscalar() for i in topk]
+    cos = np.dot(W, x.reshape((-1,))) / (
+        np.sqrt(np.sum(W * W, axis=1) + 1e-9) * np.sqrt((x * x).sum()))
+    topk = npx.topk(cos, k=k, ret_typ='indices')
+    return topk, [cos[int(i)] for i in topk]
 ```
 
 Then, we search for synonyms by pre-training the word vector instance `embed`.
@@ -76,7 +77,7 @@ def get_similar_tokens(query_token, k, embed):
     topk, cos = knn(embed.idx_to_vec,
                     embed.get_vecs_by_tokens([query_token]), k+1)
     for i, c in zip(topk[1:], cos[1:]):  # Remove input words
-        print('cosine sim=%.3f: %s' % (c, (embed.idx_to_token[i])))
+        print('cosine sim=%.3f: %s' % (c, (embed.idx_to_token[int(i)])))
 ```
 
 The dictionary of pre-trained word vector instance `glove_6b50d` already created contains 400,000 words and a special unknown token. Excluding input words and unknown words, we search for the three words that are the most similar in meaning to "chip".
