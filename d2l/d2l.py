@@ -968,7 +968,7 @@ def evaluate_accuracy_gpus(net, data_iter):
     for features, labels in data_iter:
         Xs, ys = d2l.split_batch(features, labels, ctx_list)
         pys = [net(X) for X in Xs]  # run in parallel
-        metric.add(sum(d2l.accuracy(py, y) for py, y in zip(pys, ys)), 
+        metric.add(sum(d2l.accuracy(py, y).item() for py, y in zip(pys, ys)), 
                    labels.size)
     return metric[0]/metric[1]
 
@@ -1003,4 +1003,188 @@ def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
     loss_G.backward()
     trainer_G.step(batch_size)
     return loss_G.sum()
+
+# Defined in file: ./chapter_natural-language-processing/word2vec-data-set.md
+def read_ptb():
+    with zipfile.ZipFile('../data/ptb.zip', 'r') as f:
+        raw_text = f.read('ptb/ptb.train.txt').decode("utf-8")
+    return [line.split() for line in raw_text.split('\n')]
+
+
+# Defined in file: ./chapter_natural-language-processing/word2vec-data-set.md
+def subsampling(sentences, vocab):
+    # Map low frequency words into <unk>
+    sentences = [[vocab.idx_to_token[vocab[tk]] for tk in line]
+                 for line in sentences]
+    # Count the frequency for each word
+    counter = d2l.count_corpus(sentences)
+    num_tokens = sum(counter.values())
+    # Return True if to keep this token during subsampling
+    keep = lambda token: (
+        random.uniform(0, 1) < math.sqrt(1e-4 / counter[token] * num_tokens))
+    # Now do the subsampling.
+    return [[tk for tk in line if keep(tk)] for line in sentences]
+
+
+# Defined in file: ./chapter_natural-language-processing/word2vec-data-set.md
+def get_centers_and_contexts(corpus, max_window_size):
+    centers, contexts = [], []
+    for line in corpus:
+        # Each sentence needs at least 2 words to form a
+        # "central target word - context word" pair
+        if len(line) < 2: continue
+        centers += line
+        for i in range(len(line)):  # Context window centered at i
+            window_size = random.randint(1, max_window_size)
+            indices = list(range(max(0, i - window_size),
+                                 min(len(line), i + 1 + window_size)))
+            # Exclude the central target word from the context words
+            indices.remove(i)
+            contexts.append([line[idx] for idx in indices])
+    return centers, contexts
+
+# Defined in file: ./chapter_natural-language-processing/word2vec-data-set.md
+class RandomGenerator(object):
+    """Draw a random int in [0, n] according to n sampling weights"""
+    def __init__(self, sampling_weights):
+        self.population = list(range(len(sampling_weights)))
+        self.sampling_weights = sampling_weights
+        self.candidates = []
+        self.i = 0
+
+    def draw(self):
+        if self.i == len(self.candidates):
+            self.candidates = random.choices(
+                self.population, self.sampling_weights, k=10000)
+            self.i = 0
+        self.i += 1
+        return self.candidates[self.i-1]
+
+
+# Defined in file: ./chapter_natural-language-processing/word2vec-data-set.md
+def get_negatives(all_contexts, corpus, K):
+    counter = d2l.count_corpus(corpus)
+    sampling_weights = [counter[i]**0.75 for i in range(len(counter))]
+    all_negatives, generator = [], RandomGenerator(sampling_weights)
+    for contexts in all_contexts:
+        negatives = []
+        while len(negatives) < len(contexts) * K:
+            neg = generator.draw()
+            # Noise words cannot be context words
+            if neg not in contexts:
+                negatives.append(neg)
+        all_negatives.append(negatives)
+    return all_negatives
+
+
+# Defined in file: ./chapter_natural-language-processing/word2vec-data-set.md
+def batchify(data):
+    max_len = max(len(c) + len(n) for _, c, n in data)
+    centers, contexts_negatives, masks, labels = [], [], [], []
+    for center, context, negative in data:
+        cur_len = len(context) + len(negative)
+        centers += [center]
+        contexts_negatives += [context + negative + [0] * (max_len - cur_len)]
+        masks += [[1] * cur_len + [0] * (max_len - cur_len)]
+        labels += [[1] * len(context) + [0] * (max_len - len(context))]
+    return (np.array(centers).reshape((-1, 1)), np.array(contexts_negatives),
+            np.array(masks), np.array(labels))
+
+# Defined in file: ./chapter_natural-language-processing/word2vec-data-set.md
+def load_data_ptb(batch_size, max_window_size, num_noise_words):
+    sentences = read_ptb()
+    vocab = d2l.Vocab(sentences, min_freq=10)
+    subsampled = subsampling(sentences, vocab)
+    corpus = [vocab[line] for line in subsampled]
+    all_centers, all_contexts = get_centers_and_contexts(
+        corpus, max_window_size)
+    all_negatives = get_negatives(all_contexts, corpus, num_noise_words)
+    dataset = gluon.data.ArrayDataset(
+        all_centers, all_contexts, all_negatives)
+    data_iter = gluon.data.DataLoader(dataset, batch_size, shuffle=True,
+                                      batchify_fn=batchify)
+    return data_iter, vocab
+
+# Defined in file: ./chapter_natural-language-processing/sentiment-analysis.md
+def download_imdb(data_dir='../data'):
+    url = 'http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz'
+    fname = gluon.utils.download(url, data_dir)
+    with tarfile.open(fname, 'r') as f:
+        f.extractall(data_dir)
+        
+
+# Defined in file: ./chapter_natural-language-processing/sentiment-analysis.md
+def read_imdb(folder='train', data_dir='../data'):
+    data, labels = [], []
+    for label in ['pos', 'neg']:
+        folder_name = os.path.join(data_dir, 'aclImdb', folder, label)
+        for file in os.listdir(folder_name):
+            with open(os.path.join(folder_name, file), 'rb') as f:
+                review = f.read().decode('utf-8').replace('\n', '')
+                data.append(review)
+                labels.append(1 if label == 'pos' else 0)
+    return data, labels
+
+
+# Defined in file: ./chapter_natural-language-processing/sentiment-analysis.md
+def load_data_imdb(batch_size, num_steps=500):
+    download_imdb()
+    train_data, test_data = read_imdb('train'), read_imdb('test')
+    train_tokens = d2l.tokenize(train_data[0], token='word')
+    test_tokens = d2l.tokenize(test_data[0], token='word')
+    vocab = d2l.Vocab(train_tokens, min_freq=5)
+    train_features = np.array([d2l.trim_pad(vocab[line], num_steps, vocab.unk) 
+                               for line in train_tokens])
+    test_features = np.array([d2l.trim_pad(vocab[line], num_steps, vocab.unk) 
+                               for line in test_tokens])
+    train_iter = d2l.load_array((train_features, train_data[1]), batch_size)
+    test_iter = d2l.load_array((test_features, test_data[1]), batch_size, 
+                               is_train=False)
+    return train_iter, test_iter, vocab
+
+# Defined in file: ./chapter_natural-language-processing/sentiment-analysis-rnn.md
+def train_batch_ch12(net, features, labels, loss, trainer, ctx_list):
+    Xs, ys = d2l.split_batch(features, labels, ctx_list)
+    with autograd.record():
+        pys = [net(X) for X in Xs]
+        ls = [loss(py, y) for py, y in zip(pys, ys)]
+    for l in ls:
+        l.backward()
+    trainer.step(features.shape[0])
+    train_loss_sum = sum([l.sum().item() for l in ls])
+    train_acc_sum = sum(d2l.accuracy(py, y).item() for py, y in zip(pys, ys))
+    return train_loss_sum, train_acc_sum
+
+
+# Defined in file: ./chapter_natural-language-processing/sentiment-analysis-rnn.md
+def train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs,
+               ctx_list=d2l.try_all_gpus()):
+    num_batches, timer = len(train_iter), d2l.Timer()
+    animator = d2l.Animator(xlabel='epoch', xlim=[0,num_epochs], ylim=[0,2],
+                            legend=['train loss','train acc','test acc'])
+    for epoch in range(num_epochs):
+        # store training_loss, training_accuracy, num_examples, num_features
+        metric = d2l.Accumulator(4)
+        for i, (features, labels) in enumerate(train_iter):
+            timer.start()
+            l, acc = train_batch_ch12(
+                net, features, labels, loss, trainer, ctx_list)
+            metric.add(l, acc, labels.shape[0], labels.size)
+            timer.stop()
+            if (i+1) % (num_batches // 5) == 0:
+                animator.add(epoch+i/num_batches,
+                             (metric[0]/metric[2], metric[1]/metric[3], None))
+        test_acc = d2l.evaluate_accuracy_gpus(net, test_iter)
+        animator.add(epoch+1, (None, None, test_acc))
+    print('loss %.3f, train acc %.3f, test acc %.3f' % (
+        metric[0]/metric[2], metric[1]/metric[3], test_acc))
+    print('%.1f exampes/sec on %s' % (
+        metric[2]*num_epochs/timer.sum(), ctx_list))
+    
+
+# Defined in file: ./chapter_natural-language-processing/sentiment-analysis-rnn.md
+def predict_sentiment(net, vocab, sentence):
+    sentence = np.array(vocab[sentence.split()], ctx=d2l.try_gpu())
+    label = np.argmax(net(sentence.reshape((1, -1))), axis=1)
+    return 'positive' if label == 1 else 'negative'
 
