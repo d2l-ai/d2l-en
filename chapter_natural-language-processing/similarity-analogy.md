@@ -105,7 +105,7 @@ def get_analogy(token_a, token_b, token_c, embed):
     vecs = embed.get_vecs_by_tokens([token_a, token_b, token_c])
     x = vecs[1] - vecs[0] + vecs[2]
     topk, cos = knn(embed.idx_to_vec, x, 1)
-    return embed.idx_to_token[topk[0]]  # Remove unknown words
+    return embed.idx_to_token[int(topk[0])]  # Remove unknown words
 ```
 
 Verify the "male-female" analogy.
