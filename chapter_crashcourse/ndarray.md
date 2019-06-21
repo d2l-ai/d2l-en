@@ -202,8 +202,6 @@ id(x) == before
 Converting MXNet NDArrays to and from NumPy is easy. The converted arrays do *not* share memory. This minor inconvenience is actually quite important: when you perform operations on the CPU or one of the GPUs, you do not want MXNet having to wait whether NumPy might want to be doing something else with the same chunk of memory. The  `array` and `asnumpy` functions do the trick.
 
 ```{.python .input  n=22}
-import numpy as onp
-
 a = x.asnumpy()
 print(type(a))
 b = np.array(a)

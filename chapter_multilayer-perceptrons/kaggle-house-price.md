@@ -84,7 +84,6 @@ we can install pandas without even leaving the notebook.
 import d2l
 from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
-import numpy as onp
 import pandas as pd
 npx.set_np()
 ```
