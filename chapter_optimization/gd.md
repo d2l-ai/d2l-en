@@ -30,7 +30,6 @@ For simplicity we choose the objective function $f(x)=x^2$ to illustrate how to 
 %matplotlib inline
 import d2l
 from mxnet import np, npx
-import numpy as onp
 npx.set_np()
 import math
 
@@ -86,7 +85,7 @@ show_trace(gd(1.1))
 To illustrate what happens for nonconvex functions consider the case of $f(x) = x \cdot \cos c x$. This function has infinitely many local minima. Depending on our choice of learning rate and depending on how well conditioned the problem is, we may end up with one of many solutions. The example below illustrates how an (unrealistically) high learning rate will lead to a poor local minimum.
 
 ```{.python .input}
-c = 0.15 * math.pi
+c = 0.15 * np.pi
 def f(x):     return x*math.cos(c * x) 
 def gradf(x): return math.cos(c * x) - c * x * math.sin(c * x)
 
@@ -129,8 +128,8 @@ def show_trace_2d(f, results):
     """Show the trace of 2D variables during optimization."""
     d2l.set_figsize((3.5, 2.5))
     d2l.plt.plot(*zip(*results), '-o', color='#ff7f0e')
-    x1, x2 = onp.meshgrid(np.arange(-5.5, 1.0, 0.1), np.arange(-3.0, 1.0, 0.1))
-    d2l.plt.contour(x1, x2, f(np.array(x1), np.array(x2)), colors='#1f77b4')
+    x1, x2 = np.meshgrid(np.arange(-5.5, 1.0, 0.1), np.arange(-3.0, 1.0, 0.1))
+    d2l.plt.contour(x1, x2, f(x1, x2), colors='#1f77b4')
     d2l.plt.xlabel('x1')
     d2l.plt.ylabel('x2')
 ```

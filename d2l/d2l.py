@@ -859,8 +859,8 @@ def show_trace_2d(f, results):
     """Show the trace of 2D variables during optimization."""
     d2l.set_figsize((3.5, 2.5))
     d2l.plt.plot(*zip(*results), '-o', color='#ff7f0e')
-    x1, x2 = onp.meshgrid(np.arange(-5.5, 1.0, 0.1), np.arange(-3.0, 1.0, 0.1))
-    d2l.plt.contour(x1, x2, f(np.array(x1), np.array(x2)), colors='#1f77b4')
+    x1, x2 = np.meshgrid(np.arange(-5.5, 1.0, 0.1), np.arange(-3.0, 1.0, 0.1))
+    d2l.plt.contour(x1, x2, f(x1, x2), colors='#1f77b4')
     d2l.plt.xlabel('x1')
     d2l.plt.ylabel('x2')
 
