@@ -31,7 +31,6 @@ For simplicity we choose the objective function $f(x)=x^2$ to illustrate how to 
 import d2l
 from mxnet import np, npx
 npx.set_np()
-import math
 
 def f(x):     return x**2  # objective function
 def gradf(x): return 2 * x # its derivative
@@ -86,8 +85,8 @@ To illustrate what happens for nonconvex functions consider the case of $f(x) = 
 
 ```{.python .input}
 c = 0.15 * np.pi
-def f(x):     return x*math.cos(c * x) 
-def gradf(x): return math.cos(c * x) - c * x * math.sin(c * x)
+def f(x):     return x* np.cos(c * x) 
+def gradf(x): return np.cos(c * x) - c * x * np.sin(c * x)
 
 show_trace(gd(2))
 ```
@@ -172,9 +171,9 @@ For $f(x) = \frac{1}{2} x^2$ we have $\nabla f(x) = x$ and $H_f = 1$. Hence for 
 
 ```{.python .input}
 c = 0.5
-def f(x):     return math.cosh(c * x)        # objective
-def gradf(x): return c * math.sinh(c * x)    # derivative
-def hessf(x): return c**2 * math.cosh(c * x) # hessian
+def f(x):     return np.cosh(c * x)        # objective
+def gradf(x): return c * np.sinh(c * x)    # derivative
+def hessf(x): return c**2 * np.cosh(c * x) # hessian
 
 # hide learning rate for now
 def newton(eta = 1):
@@ -192,10 +191,10 @@ show_trace(newton())
 Now let's see what happens when we have a *nonconvex* function, such as $f(x) = x \cos(c x)$. After all, note that in Newton's method we end up dividing by the Hessian. This means that if the second derivative is *negative* we would walk into the direction of *increasing* $f$. That is a fatal flaw of the algorithm. Let's see what happens in practice.
 
 ```{.python .input}
-c = 0.15 * math.pi
-def f(x):     return x*math.cos(c * x) 
-def gradf(x): return math.cos(c * x) - c * x * math.sin(c * x)
-def hessf(x): return - 2 * c * math.sin(c * x) - x * c**2 * math.cos(c * x)
+c = 0.15 * np.pi
+def f(x):     return x * np.cos(c * x) 
+def gradf(x): return np.cos(c * x) - c * x * np.sin(c * x)
+def hessf(x): return - 2 * c * np.sin(c * x) - x * c**2 * np.cos(c * x)
 
 show_trace(newton())
 ```
