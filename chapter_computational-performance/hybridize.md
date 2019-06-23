@@ -132,7 +132,7 @@ As is observed in the above results, after a HybridSequential instance calls the
 We can save the symbolic program and model parameters to the hard disk through the use of the `export` function after the `net` model has finished computing the output based on the input, such as in the case of `net(x)` in the `benchmark` function.
 
 ```{.python .input}
-net.export('my_mlp')  # FIXME
+net.export('my_mlp')
 ```
 
 The .json and .params files generated during this process are a symbolic program and a model parameter, respectively. They can be read by other front-end languages supported by Python or MXNet, such as C++, R, Scala, and Perl. This allows us to deploy trained models to other devices and easily use other front-end programming languages. At the same time, because symbolic programming was used during deployment, the computing performance is often superior to that based on imperative programming.

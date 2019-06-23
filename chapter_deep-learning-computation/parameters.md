@@ -197,7 +197,7 @@ net = nn.Sequential()
 # parameters
 shared = nn.Dense(8, activation='relu')
 net.add(nn.Dense(8, activation='relu'),
-        shared, # FIXME
+        shared,
         nn.Dense(8, activation='relu', params=shared.params),
         nn.Dense(10))
 net.initialize()
