@@ -132,7 +132,7 @@ As is observed in the above results, after a HybridSequential instance calls the
 We can save the symbolic program and model parameters to the hard disk through the use of the `export` function after the `net` model has finished computing the output based on the input, such as in the case of `net(x)` in the `benchmark` function.
 
 ```{.python .input}
-#net.export('my_mlp')  # FIXME
+net.export('my_mlp')
 ```
 
 The .json and .params files generated during this process are a symbolic program and a model parameter, respectively. They can be read by other front-end languages supported by Python or MXNet, such as C++, R, Scala, and Perl. This allows us to deploy trained models to other devices and easily use other front-end programming languages. At the same time, because symbolic programming was used during deployment, the computing performance is often superior to that based on imperative programming.
@@ -140,6 +140,7 @@ The .json and .params files generated during this process are a symbolic program
 In MXNet, a symbolic program refers to a program that makes use of the Symbol type. We know that, when the NDArray input `x` is provided to `net`, `net(x)` will directly calculate the model output and return a result based on `x`. For models that have called the `hybridize` function, we can also provide a Symbol-type input variable, and `net(x)` will return Symbol type results.
 
 ```{.python .input}
+# Delete this since symbol is not supposed to be exposed directly to users?
 #x = sym.np.var('data')  # FIXME
 #net(x)
 ```
@@ -160,7 +161,7 @@ class HybridNet(nn.HybridBlock):
     def hybrid_forward(self, F, x):
         print('F: ', F)
         print('x: ', x)
-        # x = F.np.relu(self.hidden(x))  # FIMXE
+        x = F.npx.relu(self.hidden(x))
         print('hidden: ', x)
         return self.output(x)
 ```

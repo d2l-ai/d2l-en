@@ -40,7 +40,6 @@ To illustrate this let's plot a few functions and check which ones satisfy the r
 import d2l
 from mpl_toolkits import mplot3d
 from mxnet import np, npx
-import numpy as onp
 npx.set_np()
 ```
 
@@ -48,7 +47,7 @@ Let's define a few functions, both convex and nonconvex.
 
 ```{.python .input}
 def f(x): return 0.5 * x**2        # convex
-def g(x): return np.cos(onp.pi * x) # nonconvex
+def g(x): return np.cos(np.pi * x) # nonconvex
 def h(x): return np.exp(0.5 * x)   # convex
 
 x, segment = np.arange(-2, 2, 0.01), np.array([-1.5, 1])
@@ -110,8 +109,9 @@ Such sets are convex. Let's prove this quickly. Remember that for any $x, x' \in
 Have a look at the function $f(x,y) = 0.5 x^2 + \cos(2 \pi y)$ below. It is clearly nonconvex. The level sets are correspondingly nonconvex. In fact, they're typically composed of disjoint sets.
 
 ```{.python .input}
-x, y = onp.mgrid[-1: 1: 101j, -1: 1: 101j]
-z = x**2 + 0.5 * onp.cos(2 * onp.pi * y)
+x, y = np.meshgrid(np.linspace(-1, 1, 101), np.linspace(-1, 1, 101), indexing='ij')
+
+z = x**2 + 0.5 * np.cos(2 * np.pi * y)
 
 # Plot the 3D surface
 d2l.set_figsize((6,4))

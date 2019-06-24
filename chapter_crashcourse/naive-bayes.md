@@ -137,7 +137,7 @@ Now on to slightly more difficult things $P_{xy}$. Since we picked black and whi
 ```{.python .input  n=66}
 n_x = np.zeros((10, 28, 28))
 for y in range(10):
-    n_x[y] = np.array(X.asnumpy()[Y==y].sum(axis=0))
+    n_x[y] = np.array(X.asnumpy()[Y.asnumpy()==y].sum(axis=0))
 P_xy = (n_x+1) / (n_y+1).reshape((10,1,1))
 
 show_images(P_xy, 2, 5);
@@ -155,7 +155,7 @@ np.expand_dims?
 def bayes_pred(x):
     x = np.expand_dims(x, axis=0)  # (28, 28) -> (1, 28, 28)
     p_xy = P_xy * x + (1-P_xy)*(1-x)
-    p_xy = p_xy.reshape((10,-1)).asnumpy().prod(axis=1) # p(x|y)  # FIXME
+    p_xy = p_xy.reshape((10,-1)).prod(axis=1) # p(x|y)
     return np.array(p_xy) * P_y
 
 image, label = mnist_test[0]
@@ -197,7 +197,9 @@ py
 Check if the prediction is correct.
 
 ```{.python .input}
-py.argmax(axis=0) == label
+# convert label which is a scalar tensor of int32 dtype
+# to a Python scalar integer for comparison
+py.argmax(axis=0) == int(label)
 ```
 
 Now predict a few validation examples, we can see the the Bayes
@@ -205,17 +207,19 @@ classifier works pretty well except for the 9th 16th digits.
 
 ```{.python .input}
 def predict(X):
-    return [str(bayes_pred_stable(x).argmax(axis=0)) for x in X]
+    return [bayes_pred_stable(x).argmax(axis=0).astype(np.int32) for x in X]
 
 X, y = mnist_test[:18]
-show_images(X, 2, 9, titles=predict(X));
+preds = predict(X)
+show_images(X, 2, 9, titles=[str(d) for d in preds]);
 ```
 
 Finally, let's compute the overall accuracy of the classifier.
 
 ```{.python .input}
-X, y = mnist_test[:]  # FIXME, y is a numpy not mx.np
-'Validation accuracy', (np.array(predict(X)) == np.array(y)).sum() / len(y)
+X, y = mnist_test[:]
+preds = np.array(predict(X), dtype=np.int32)
+'Validation accuracy', float((preds == y).sum()) / len(y)
 ```
 
 Modern deep networks achieve error rates of less than 0.01. While Naive Bayes classifiers used to be popular in the 80s and 90s, e.g. for spam filtering, their heydays are over. The poor performance is due to the incorrect statistical assumptions that we made in our model: we assumed that each and every pixel are *independently* generated, depending only on the label. This is clearly not how humans write digits, and this wrong assumption led to the downfall of our overly naive (Bayes) classifier. Time to start building Deep Networks.
