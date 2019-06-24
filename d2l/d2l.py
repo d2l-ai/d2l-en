@@ -10,7 +10,6 @@ from IPython import display
 import collections
 import os
 import sys
-import numpy as onp
 import math
 from matplotlib import pyplot as plt
 from mxnet import np, npx, autograd, gluon, init, context, image
@@ -74,7 +73,7 @@ class Timer(object):
         
     def cumsum(self):
         """Return the accumuated times"""
-        return onp.array(self.times).cumsum().tolist()
+        return np.array(self.times).cumsum().tolist()
 
 # Defined in file: ./chapter_linear-networks/linear-regression.md
 def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
@@ -866,8 +865,8 @@ def show_trace_2d(f, results):
 
 # Defined in file: ./chapter_optimization/minibatch-sgd.md
 def get_data_ch10(batch_size=10, n=1500):
-    data = onp.genfromtxt('../data/airfoil_self_noise.dat', delimiter='\t')
-    data = np.array((data - data.mean(axis=0)) / data.std(axis=0))
+    data = np.genfromtxt('../data/airfoil_self_noise.dat', dtype=np.float32, delimiter='\t')
+    data = (data - data.mean(axis=0)) / data.std(axis=0)
     data_iter = d2l.load_array((data[:n, :-1], data[:n, -1]),
                                batch_size, is_train=True)
     return data_iter, data.shape[1]-1
