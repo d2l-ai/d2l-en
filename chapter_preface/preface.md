@@ -259,7 +259,6 @@ from IPython import display
 import collections
 import os
 import sys
-import numpy as onp
 import math
 from matplotlib import pyplot as plt
 from mxnet import np, npx, autograd, gluon, init, context, image
