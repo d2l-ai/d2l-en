@@ -153,7 +153,6 @@ In model training or prediction, we often use vector calculations and process mu
 import d2l 
 import math
 from mxnet import np
-import numpy as onp
 import time
 
 n = 10000
@@ -190,7 +189,7 @@ class Timer(object):
         
     def cumsum(self):
         """Return the accumuated times"""
-        return onp.array(self.times).cumsum().tolist()
+        return np.array(self.times).cumsum().tolist()
 ```
 
 Now we can benchmark the workloads. One way to add vectors is to add them one coordinate at a time using a for loop.
