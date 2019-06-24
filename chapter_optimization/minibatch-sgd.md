@@ -26,13 +26,12 @@ In this chapter, we will use a [data set](https://archive.ics.uci.edu/ml/dataset
 import d2l
 from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
-import numpy as onp
 npx.set_np()
 
 # Save to the d2l package.
 def get_data_ch10(batch_size=10, n=1500):
-    data = onp.genfromtxt('../data/airfoil_self_noise.dat', delimiter='\t')
-    data = np.array((data - data.mean(axis=0)) / data.std(axis=0))
+    data = np.genfromtxt('../data/airfoil_self_noise.dat', dtype=np.float32, delimiter='\t')
+    data = (data - data.mean(axis=0)) / data.std(axis=0)
     data_iter = d2l.load_array((data[:n, :-1], data[:n, -1]),
                                batch_size, is_train=True)
     return data_iter, data.shape[1]-1
