@@ -12,13 +12,13 @@ from mxnet.gluon import nn
 npx.set_np()
 
 x = np.arange(4)
-np.save('x-file', x) 
+npx.save('x-file', x) 
 ```
 
 Then, we read the data from the stored file back into memory.
 
 ```{.python .input}
-x2 = np.load('x-file')
+x2 = npx.load('x-file')
 x2
 ```
 
@@ -26,8 +26,8 @@ We can also store a list of NDArrays and read them back into memory.
 
 ```{.python .input  n=2}
 y = np.zeros(4)
-np.save('x-files', [x, y])
-x2, y2 = np.load('x-files')
+npx.save('x-files', [x, y])
+x2, y2 = npx.load('x-files')
 (x2, y2)
 ```
 
@@ -35,8 +35,8 @@ We can even write and read a dictionary that maps from a string to an NDArray. T
 
 ```{.python .input  n=4}
 mydict = {'x': x, 'y': y}
-np.save('mydict', mydict)
-mydict2 = np.load('mydict')
+npx.save('mydict', mydict)
+mydict2 = npx.load('mydict')
 mydict2
 ```
 
