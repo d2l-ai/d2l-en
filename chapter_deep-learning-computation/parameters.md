@@ -173,7 +173,7 @@ class MyInit(init.Initializer):
     def _init_weight(self, name, data):
         print('Init', name, data.shape)
         data[:] = np.random.uniform(-10, 10, data.shape)
-        data *= data.abs() >= 5
+        data *= np.abs(data) >= 5
 
 net.initialize(MyInit(), force_reinit=True)
 net[0].weight.data()[0]
@@ -196,9 +196,9 @@ net = nn.Sequential()
 # We need to give the shared layer a name such that we can reference its
 # parameters
 shared = nn.Dense(8, activation='relu')
-net.add(nn.Dense(8, activation='relu'), # FIXME
-        #shared, # FIXME
-        #nn.Dense(8, activation='relu', params=shared.params),
+net.add(nn.Dense(8, activation='relu'),
+        shared,
+        nn.Dense(8, activation='relu', params=shared.params),
         nn.Dense(10))
 net.initialize()
 
@@ -206,11 +206,11 @@ x = np.random.uniform(size=(2, 20))
 net(x)
 
 # Check whether the parameters are the same
-#print(net[1].weight.data()[0] == net[2].weight.data()[0])
-#net[1].weight.data()[0,0] = 100
+print(net[1].weight.data()[0] == net[2].weight.data()[0])
+net[1].weight.data()[0,0] = 100
 # Make sure that they're actually the same object rather than just having the
 # same value
-#print(net[1].weight.data()[0] == net[2].weight.data()[0])
+print(net[1].weight.data()[0] == net[2].weight.data()[0])
 ```
 
 The above example shows that the parameters of the second and third layer are tied. They are identical rather than just being equal. That is, by changing one of the parameters the other one changes, too. What happens to the gradients is quite ingenious. Since the model parameters contain gradients, the gradients of the second hidden layer and the third hidden layer are accumulated in the `shared.params.grad( )` during backpropagation.
