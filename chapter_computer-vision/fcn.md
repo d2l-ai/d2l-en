@@ -18,9 +18,11 @@ explain the transposed convolution layer.
 ```{.python .input  n=2}
 %matplotlib inline
 import d2l
-from mxnet import gluon, image, init, nd
+from mxnet import gluon, image, init, np, npx
 from mxnet.gluon import nn
-import numpy as np
+
+
+npx.set_np()
 ```
 
 ## Construct a Model
@@ -48,7 +50,7 @@ for layer in pretrained_net.features[:-2]:
 Given an input of a height and width of 320 and 480 respectively, the forward computation of `net` will reduce the height and width of the input to $1/32$ of the original, i.e. 10 and 15.
 
 ```{.python .input  n=7}
-X = nd.random.uniform(shape=(1, 3, 320, 480))
+X = np.random.uniform(size=(1, 3, 320, 480))
 net(X).shape
 ```
 
@@ -84,13 +86,12 @@ def bilinear_kernel(in_channels, out_channels, kernel_size):
         center = factor - 1
     else:
         center = factor - 0.5
-    og = np.ogrid[:kernel_size, :kernel_size]
-    filt = (1 - abs(og[0] - center) / factor) * \
-           (1 - abs(og[1] - center) / factor)
-    weight = np.zeros((in_channels, out_channels, kernel_size, kernel_size),
-                      dtype='float32')
+    og = np.arange(kernel_size).reshape(-1, 1), np.arange(kernel_size).reshape(1, -1)
+    filt = (1 - np.abs(og[0] - center) / factor) * \
+           (1 - np.abs(og[1] - center) / factor)
+    weight = np.zeros((in_channels, out_channels, kernel_size, kernel_size))
     weight[range(in_channels), range(out_channels), :, :] = filt
-    return nd.array(weight)
+    return np.array(weight)
 ```
 
 Now, we will experiment with bilinear interpolation upsampling implemented by transposed convolution layers. Construct a transposed convolution layer that magnifies height and width of input by a factor of 2 and initialize its convolution kernel with the `bilinear_kernel` function.
@@ -104,9 +105,9 @@ Read the image `X` and record the result of upsampling as `Y`. In order to print
 
 ```{.python .input}
 img = image.imread('../img/catdog.jpg')
-X = img.astype('float32').transpose((2, 0, 1)).expand_dims(axis=0) / 255
+X = np.expand_dims(img.astype('float32').transpose(2, 0, 1), axis=0) / 255
 Y = conv_trans(X)
-out_img = Y[0].transpose((1, 2, 0))
+out_img = Y[0].transpose(1, 2, 0)
 ```
 
 As you can see, the transposed convolution layer magnifies both the height and width of the image by a factor of 2. It is worth mentioning that, besides to the difference in coordinate scale, the image magnified by bilinear interpolation and original image printed in :numref:`chapter_bbox` look the same.
@@ -156,16 +157,16 @@ During predicting, we need to standardize the input image in each channel and tr
 ```{.python .input  n=13}
 def predict(img):
     X = test_iter._dataset.normalize_image(img)
-    X = X.transpose((2, 0, 1)).expand_dims(axis=0)
-    pred = nd.argmax(net(X.as_in_context(ctx[0])), axis=1)
-    return pred.reshape((pred.shape[1], pred.shape[2]))
+    X = np.expand_dims(X.transpose(2, 0, 1), axis=0)
+    pred = net(X.as_in_context(ctx[0])).argmax(axis=1)
+    return pred.reshape(pred.shape[1], pred.shape[2])
 ```
 
 To visualize the predicted categories for each pixel, we map the predicted categories back to their labeled colors in the data set.
 
 ```{.python .input  n=14}
 def label2image(pred):
-    colormap = nd.array(d2l.VOC_COLORMAP, ctx=ctx[0], dtype='uint8')
+    colormap = np.array(d2l.VOC_COLORMAP, ctx=ctx[0], dtype='uint8')
     X = pred.astype('int32')
     return colormap[X, :]
 ```
