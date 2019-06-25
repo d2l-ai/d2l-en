@@ -1003,6 +1003,214 @@ def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
     trainer_G.step(batch_size)
     return loss_G.sum()
 
+# Defined in file: ./chapter_computer-vision/image-augmentation.md
+def train_batch_ch12(net, features, labels, loss, trainer, ctx_list):
+    Xs, ys = d2l.split_batch(features, labels, ctx_list)
+    with autograd.record():
+        pys = [net(X) for X in Xs]
+        ls = [loss(py, y) for py, y in zip(pys, ys)]
+    for l in ls:
+        l.backward()
+    trainer.step(features.shape[0])
+    train_loss_sum = sum([float(l.sum()) for l in ls])
+    train_acc_sum = sum(d2l.accuracy(py, y) for py, y in zip(pys, ys))
+    return train_loss_sum, train_acc_sum
+
+# Defined in file: ./chapter_computer-vision/image-augmentation.md
+def train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs,
+               ctx_list=d2l.try_all_gpus()):
+    num_batches, timer = len(train_iter), d2l.Timer()
+    animator = d2l.Animator(xlabel='epoch', xlim=[0,num_epochs], ylim=[0,2],
+                            legend=['train loss','train acc','test acc'])
+    for epoch in range(num_epochs):
+        # store training_loss, training_accuracy, num_examples, num_features
+        metric = d2l.Accumulator(4)
+        for i, (features, labels) in enumerate(train_iter):
+            timer.start()
+            l, acc = train_batch_ch12(
+                net, features, labels, loss, trainer, ctx_list)
+            metric.add(l, acc, labels.shape[0], labels.size)
+            timer.stop()
+            if (i+1) % (num_batches // 5) == 0:
+                animator.add(epoch+i/num_batches,
+                             (metric[0]/metric[2], metric[1]/metric[3], None))
+        test_acc = d2l.evaluate_accuracy_gpus(net, test_iter)
+        animator.add(epoch+1, (None, None, test_acc))
+    print('loss %.3f, train acc %.3f, test acc %.3f' % (
+        metric[0]/metric[2], metric[1]/metric[3], test_acc))
+    print('%.1f exampes/sec on %s' % (
+        metric[2]*num_epochs/timer.sum(), ctx_list))
+
+# Defined in file: ./chapter_computer-vision/bounding-box.md
+def bbox_to_rect(bbox, color):
+    """Convert bounding box to matplotlib format."""
+    # Convert the bounding box (top-left x, top-left y, bottom-right x,
+    # bottom-right y) format to matplotlib format: ((upper-left x,
+    # upper-left y), width, height)
+    return d2l.plt.Rectangle(
+        xy=(bbox[0], bbox[1]), width=bbox[2]-bbox[0], height=bbox[3]-bbox[1],
+        fill=False, edgecolor=color, linewidth=2)
+
+# Defined in file: ./chapter_computer-vision/anchor.md
+def show_bboxes(axes, bboxes, labels=None, colors=None):
+    """Show bounding boxes."""
+    def _make_list(obj, default_values=None):
+        if obj is None:
+            obj = default_values
+        elif not isinstance(obj, (list, tuple)):
+            obj = [obj]
+        return obj
+    labels = _make_list(labels)
+    colors = _make_list(colors, ['b', 'g', 'r', 'm', 'c'])
+    for i, bbox in enumerate(bboxes):
+        color = colors[i % len(colors)]
+        rect = d2l.bbox_to_rect(bbox.asnumpy(), color)
+        axes.add_patch(rect)
+        if labels and len(labels) > i:
+            text_color = 'k' if color == 'w' else 'w'
+            axes.text(rect.xy[0], rect.xy[1], labels[i],
+                      va='center', ha='center', fontsize=9, color=text_color,
+                      bbox=dict(facecolor=color, lw=0))
+
+# Defined in file: ./chapter_computer-vision/object-detection-dataset.md
+def download_pikachu(data_dir):
+    root_url = ('https://apache-mxnet.s3-accelerate.amazonaws.com/'
+                'gluon/dataset/pikachu/')
+    dataset = {'train.rec': 'e6bcb6ffba1ac04ff8a9b1115e650af56ee969c8',
+               'train.idx': 'dcf7318b2602c06428b9988470c731621716c393',
+               'val.rec': 'd6c33f799b4d058e82f2cb5bd9a976f69d72d520'}
+    for k, v in dataset.items():
+        gluon.utils.download(
+            root_url + k, os.path.join(data_dir, k), sha1_hash=v)
+
+# Defined in file: ./chapter_computer-vision/object-detection-dataset.md
+def load_data_pikachu(batch_size, edge_size=256):
+    """Load the pikachu dataset"""
+    data_dir = '../data/pikachu'
+    download_pikachu(data_dir)
+    train_iter = image.ImageDetIter(
+        path_imgrec=os.path.join(data_dir, 'train.rec'),
+        path_imgidx=os.path.join(data_dir, 'train.idx'),
+        batch_size=batch_size,
+        data_shape=(3, edge_size, edge_size),  # The shape of the output image
+        shuffle=True,  # Read the data set in random order
+        rand_crop=1,  # The probability of random cropping is 1
+        min_object_covered=0.95, max_attempts=200)
+    val_iter = image.ImageDetIter(
+        path_imgrec=os.path.join(data_dir, 'val.rec'), batch_size=batch_size,
+        data_shape=(3, edge_size, edge_size), shuffle=False)
+    return train_iter, val_iter
+
+# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
+def download_voc_pascal(data_dir='../data'):
+    """Download the VOC2012 segmentation dataset."""
+    voc_dir = os.path.join(data_dir, 'VOCdevkit/VOC2012')
+    url = ('http://data.mxnet.io/data/VOCtrainval_11-May-2012.tar')
+    sha1 = '4e443f8a2eca6b1dac8a6c57641b67dd40621a49'
+    fname = gluon.utils.download(url, data_dir, sha1_hash=sha1)
+    with tarfile.open(fname, 'r') as f:
+        f.extractall(data_dir)
+    return voc_dir
+
+
+# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
+def read_voc_images(root='../data/VOCdevkit/VOC2012', is_train=True):
+    """Read all VOC feature and label images."""
+    txt_fname = '%s/ImageSets/Segmentation/%s' % (
+        root, 'train.txt' if is_train else 'val.txt')
+    with open(txt_fname, 'r') as f:
+        images = f.read().split()
+    features, labels = [None] * len(images), [None] * len(images)
+    for i, fname in enumerate(images):
+        features[i] = image.imread('%s/JPEGImages/%s.jpg' % (root, fname))
+        labels[i] = image.imread(
+            '%s/SegmentationClass/%s.png' % (root, fname))
+    return features, labels
+
+
+# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
+VOC_COLORMAP = [[0, 0, 0], [128, 0, 0], [0, 128, 0], [128, 128, 0],
+                [0, 0, 128], [128, 0, 128], [0, 128, 128], [128, 128, 128],
+                [64, 0, 0], [192, 0, 0], [64, 128, 0], [192, 128, 0],
+                [64, 0, 128], [192, 0, 128], [64, 128, 128], [192, 128, 128],
+                [0, 64, 0], [128, 64, 0], [0, 192, 0], [128, 192, 0],
+                [0, 64, 128]]
+
+# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
+VOC_CLASSES = ['background', 'aeroplane', 'bicycle', 'bird', 'boat',
+               'bottle', 'bus', 'car', 'cat', 'chair', 'cow',
+               'diningtable', 'dog', 'horse', 'motorbike', 'person',
+               'potted plant', 'sheep', 'sofa', 'train', 'tv/monitor']
+
+# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
+def build_colormap2label():
+    """Build a RGB color to label mapping for segmentation."""
+    colormap2label = nd.zeros(256 ** 3)
+    for i, colormap in enumerate(VOC_COLORMAP):
+        colormap2label[(colormap[0]*256 + colormap[1])*256 + colormap[2]] = i
+    return colormap2label
+
+
+# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
+def voc_label_indices(colormap, colormap2label):
+    """Map a RGB color to a label."""
+    colormap = colormap.astype('int32')
+    idx = ((colormap[:, :, 0] * 256 + colormap[:, :, 1]) * 256
+           + colormap[:, :, 2])
+    return colormap2label[idx]
+
+# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
+def voc_rand_crop(feature, label, height, width):
+    """Randomly crop for both feature and label images."""
+    feature, rect = image.random_crop(feature, (width, height))
+    label = image.fixed_crop(label, *rect)
+    return feature, label
+
+
+# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
+class VOCSegDataset(gluon.data.Dataset):
+    """A customized dataset to load VOC dataset."""
+    def __init__(self, is_train, crop_size, voc_dir):
+        self.rgb_mean = nd.array([0.485, 0.456, 0.406])
+        self.rgb_std = nd.array([0.229, 0.224, 0.225])
+        self.crop_size = crop_size
+        features, labels = read_voc_images(root=voc_dir, is_train=is_train)
+        self.features = [self.normalize_image(feature)
+                         for feature in self.filter(features)]
+        self.labels = self.filter(labels)
+        self.colormap2label = build_colormap2label()
+        print('read ' + str(len(self.features)) + ' examples')
+
+    def normalize_image(self, img):
+        return (img.astype('float32') / 255 - self.rgb_mean) / self.rgb_std
+
+    def filter(self, imgs):
+        return [img for img in imgs if (
+            img.shape[0] >= self.crop_size[0] and
+            img.shape[1] >= self.crop_size[1])]
+
+    def __getitem__(self, idx):
+        feature, label = voc_rand_crop(self.features[idx], self.labels[idx],
+                                       *self.crop_size)
+        return (feature.transpose((2, 0, 1)),
+                voc_label_indices(label, self.colormap2label))
+
+    def __len__(self):
+        return len(self.features)
+
+# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
+def load_data_voc(batch_size, crop_size):
+    """Download and load the VOC2012 semantic dataset."""
+    voc_dir = d2l.download_voc_pascal()
+    num_workers = d2l.get_dataloader_workers()
+    train_iter = gluon.data.DataLoader(
+        VOCSegDataset(True, crop_size, voc_dir), batch_size,
+        shuffle=True, last_batch='discard', num_workers=num_workers)
+    test_iter = gluon.data.DataLoader(
+        VOCSegDataset(False, crop_size, voc_dir), batch_size,
+        last_batch='discard', num_workers=num_workers)
+    return train_iter, test_iter
+
 # Defined in file: ./chapter_natural-language-processing/word2vec-data-set.md
 def read_ptb():
     with zipfile.ZipFile('../data/ptb.zip', 'r') as f:
