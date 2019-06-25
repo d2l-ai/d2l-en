@@ -64,7 +64,7 @@ def relu(X):
 
 As in softmax regression, we will `reshape` each 2D image
 into a flat vector of length  `num_inputs`.
-Finally, we cam implement our model with just a few lines of code.
+Finally, we can implement our model with just a few lines of code.
 
 ```{.python .input  n=5}
 def net(X):
@@ -119,7 +119,7 @@ That said, with a large number of layers, this can get messy
 
 1. Change the value of the hyper-parameter `num_hiddens` in order to see how this hyperparameter influences your results.
 1. Try adding a new hidden layer to see how it affects the results.
-1. How does changing the learning rate change the result.
+1. How does changing the learning rate change the result?
 1. What is the best result you can get by optimizing over all the parameters (learning rate, iterations, number of hidden layers, number of hidden units per layer)?
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2339)
