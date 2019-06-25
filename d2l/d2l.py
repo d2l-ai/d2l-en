@@ -1145,7 +1145,7 @@ VOC_CLASSES = ['background', 'aeroplane', 'bicycle', 'bird', 'boat',
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
 def build_colormap2label():
     """Build a RGB color to label mapping for segmentation."""
-    colormap2label = nd.zeros(256 ** 3)
+    colormap2label = np.zeros(256 ** 3)
     for i, colormap in enumerate(VOC_COLORMAP):
         colormap2label[(colormap[0]*256 + colormap[1])*256 + colormap[2]] = i
     return colormap2label
@@ -1154,7 +1154,7 @@ def build_colormap2label():
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
 def voc_label_indices(colormap, colormap2label):
     """Map a RGB color to a label."""
-    colormap = colormap.astype('int32')
+    colormap = colormap.astype(np.int32)
     idx = ((colormap[:, :, 0] * 256 + colormap[:, :, 1]) * 256
            + colormap[:, :, 2])
     return colormap2label[idx]
@@ -1171,8 +1171,8 @@ def voc_rand_crop(feature, label, height, width):
 class VOCSegDataset(gluon.data.Dataset):
     """A customized dataset to load VOC dataset."""
     def __init__(self, is_train, crop_size, voc_dir):
-        self.rgb_mean = nd.array([0.485, 0.456, 0.406])
-        self.rgb_std = nd.array([0.229, 0.224, 0.225])
+        self.rgb_mean = np.array([0.485, 0.456, 0.406])
+        self.rgb_std = np.array([0.229, 0.224, 0.225])
         self.crop_size = crop_size
         features, labels = read_voc_images(root=voc_dir, is_train=is_train)
         self.features = [self.normalize_image(feature)
@@ -1192,7 +1192,7 @@ class VOCSegDataset(gluon.data.Dataset):
     def __getitem__(self, idx):
         feature, label = voc_rand_crop(self.features[idx], self.labels[idx],
                                        *self.crop_size)
-        return (feature.transpose((2, 0, 1)),
+        return (feature.transpose(2, 0, 1),
                 voc_label_indices(label, self.colormap2label))
 
     def __len__(self):
