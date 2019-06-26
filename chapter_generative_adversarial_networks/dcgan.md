@@ -10,7 +10,6 @@ from mxnet import nd, gluon, autograd, init, np, npx
 from mxnet.gluon import nn
 import d2l
 import zipfile
-import numpy as onp
 
 npx.set_np()
 ```
@@ -201,11 +200,12 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
                         batch_size)
         # Show generated examples
         Z = np.random.normal(0, 1, size=(21, latent_dim, 1, 1), ctx=ctx)
-        fake_x = (net_G(Z).transpose(0,2,3,1)/2+0.5).asnumpy()
-        imgs = onp.vstack([onp.hstack(fake_x[i:i+7])
-                           for i in range(0,len(fake_x),7)])
+        fake_x = net_G(Z).transpose(0,2,3,1)/2+0.5
+        imgs = np.concatenate(
+            [np.concatenate([fake_x[i * 7 + j] for j in range(7)], axis=1)
+             for i in range(len(fake_x)//7)], axis=0)
         animator.axes[1].cla()
-        animator.axes[1].imshow(imgs)
+        animator.axes[1].imshow(imgs.asnumpy())
         # Show the losses
         loss_D, loss_G = metric[0]/metric[2], metric[1]/metric[2]
         animator.add(epoch, (loss_D, loss_G))
