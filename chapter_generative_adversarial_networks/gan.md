@@ -105,7 +105,7 @@ def update_D(X, Z, net_D, net_G, loss, trainer_D):
         loss_D = (loss(real_Y, ones) + loss(fake_Y, zeros)) / 2
     loss_D.backward()
     trainer_D.step(batch_size)
-    return loss_D.sum()
+    return float(loss_D.sum())
 ```
 
 The generator is updated similarly. Here we reuse the cross entropy loss but change the label of the fake data from $0$ to $1$.
@@ -124,7 +124,7 @@ def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
         loss_G = loss(fake_Y, ones)
     loss_G.backward()
     trainer_G.step(batch_size)
-    return loss_G.sum()
+    return float(loss_G.sum())
 ```
 
 Both the discriminator and the generator performs a binary logistic regression with the cross entropy loss. We use Adam to smooth the training process. In each iteration, we first update the discriminator and then the generator. We visualize both losses and generated examples.
