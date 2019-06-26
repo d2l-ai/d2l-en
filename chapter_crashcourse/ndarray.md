@@ -150,7 +150,7 @@ a + b
 Just like in any other Python array, elements in an ndarray can be accessed by its index. In good Python tradition the first element has index 0 and ranges are specified to include the first but not the last element. 
 
 By this logic, `[-1]` selects the last element and `[1:3]` selects the second and third element. 
-Notice that if you slice only one element from the ndarray, it will return a scalar. However, if you slice with an array of indexes, it will return an array of scalars. Let's try this out and compare the outputs.
+Notice that if you slice only one element from the ndarray, it will return a scalar. However, if you slice with an array of indices, it will return an array of scalars. Let's try this out and compare the outputs.
 
 ```{.python .input  n=19}
 print('x[-1] : ', x[-1])
