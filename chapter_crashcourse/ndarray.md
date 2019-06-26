@@ -72,7 +72,7 @@ y = np.array([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 y
 ```
 
-In some cases, we will want to randomly sample the values of each element in the ndarray according to some known probability distribution. This is especially common when we intend to use the array as a parameter in a neural network. The following snippet creates an ndarray with a shape of (3,4). Each of its elements is randomly sampled in a normal distribution with zero mean and standard deviation.
+In some cases, we will want to randomly sample the values of each element in the ndarray according to some known probability distribution. This is especially common when we intend to use the array as a parameter in a neural network. The following snippet creates an ndarray with a shape of (3,4). Each of its elements is randomly sampled in a normal distribution with zero mean and one standard deviation.
 
 ```{.python .input  n=7}
 np.random.normal(0, 1, size=(3, 4))
@@ -147,7 +147,10 @@ a + b
 
 ## Indexing and Slicing
 
-Just like in any other Python array, elements in an ndarray can be accessed by its index. In good Python tradition the first element has index 0 and ranges are specified to include the first but not the last element. By this logic `1:3` selects the second and third element. Let's try this out by selecting the respective rows in a matrix.
+Just like in any other Python array, elements in an ndarray can be accessed by its index. In good Python tradition the first element has index 0 and ranges are specified to include the first but not the last element. 
+
+By this logic, `[-1]` selects the last element and `[1:3]` selects the second and third element. 
+Notice that if you slice only one element from the ndarray, it will return a scalar. However, if you slice with an array of indexes, it will return an array of scalars. Let's try this out and compare the outputs.
 
 ```{.python .input  n=19}
 print('x[-1] : ', x[-1])
@@ -200,7 +203,7 @@ id(x) == before
 
 ## `mxnet.numpy.ndarray` and `numpy.ndarray`
 
-Converting MXNet ndarrays to and from NumPy is easy. The converted arrays do **not** share memory. This minor inconvenience is actually quite important: when you perform operations on the CPU or one of the GPUs, you do not want MXNet having to wait whether NumPy might want to be doing something else with the same chunk of memory. The  `array` and `asnumpy` functions do the trick.
+Transforming an ndarray from an object in NumPy (a scientific computing package of Python) to an object in MXNet package, or *vice versa*, is easy. The converted array does not share memory. This minor inconvenience is actually quite important: when you perform operations on the CPU or one of the GPUs, you do not want MXNet having to wait whether NumPy might want to be doing something else with the same chunk of memory. The  `array` and `asnumpy` functions do the trick.
 
 ```{.python .input  n=22}
 a = x.asnumpy()
