@@ -4,7 +4,6 @@
 It is impossible to get anything done if we cannot manipulate data. Generally, there are two important things we need to do with data: (i) acquire it and (ii) process it once it is inside the computer. There is no point in acquiring data if we do not even know how to store it, so let's get our hands dirty first by playing with synthetic data. We will start by introducing the N-dimensional array (ndarray), MXNet's primary tool for storing and transforming data. 
 If you have worked with NumPy, a scientific computing package of Python, you are ready to fly. You will notice that the MXNet's ndarray is an extension to NumPy's ndarray with a few key advantages. First, the former supports asynchronous computation on CPU, GPU, and distributed cloud architectures, whereas the latter only supports CPU computation. Second, MXNet's ndarray supports for automatic differentiation. These properties make MXNet's ndarray indispensable for deep learning.
 
-
 ## Getting Started
 
 Throughout this chapter, we are aiming to get you up and running with the basic functionality. Do not worry if you do not understand all of the basic math, like element-wise operations or normal distributions. In the next two chapters we will take another pass at the same material with practical examples. On the other hand, if you want to go deeper into the mathematical content, see :numref:`chapter_math`.
@@ -73,7 +72,7 @@ y = np.array([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 y
 ```
 
-In some cases, we will want to randomly sample the values of each element in the ndarray according to some known probability distribution. This is especially common when we intend to use the array as a parameter in a neural network. The following snippet creates an ndarray with a shape of (3,4). Each of its elements is randomly sampled in a normal distribution with zero mean and one standard deviation.
+In some cases, we will want to randomly sample the values of each element in the ndarray according to some known probability distribution. This is especially common when we intend to use the array as a parameter in a neural network. The following snippet creates an ndarray with a shape of (3,4). Each of its elements is randomly sampled in a normal distribution with zero mean and standard deviation.
 
 ```{.python .input  n=7}
 np.random.normal(0, 1, size=(3, 4))
@@ -148,11 +147,7 @@ a + b
 
 ## Indexing and Slicing
 
-Just like in any other Python array, elements in an ndarray can be accessed by its index. In good Python tradition the first element has index 0 and ranges are specified to include the first but not the last element. 
-
-By this logic, `[-1]` selects the last element and `[1:3]` selects the second and the third elements. 
-Notice that if you specify an integer index of an ndarray, it will return a scalar.
-However, if you specify an array of indices as the slicing range, it will return an array of scalars. Let's try this out and compare the outputs.
+Just like in any other Python array, elements in an ndarray can be accessed by its index. In good Python tradition the first element has index 0 and ranges are specified to include the first but not the last element. By this logic `1:3` selects the second and third element. Let's try this out by selecting the respective rows in a matrix.
 
 ```{.python .input  n=19}
 print('x[-1] : ', x[-1])
@@ -205,7 +200,7 @@ id(x) == before
 
 ## `mxnet.numpy.ndarray` and `numpy.ndarray`
 
-Transforming an ndarray from an object in NumPy (a scientific computing package of Python) to an object in MXNet package, or *vice versa*, is easy. The converted array does not share memory. This minor inconvenience is actually quite important: when you perform operations on the CPU or one of the GPUs, you do not want MXNet having to wait whether NumPy might want to be doing something else with the same chunk of memory. The  `array` and `asnumpy` functions do the trick.
+Converting MXNet ndarrays to and from NumPy is easy. The converted arrays do **not** share memory. This minor inconvenience is actually quite important: when you perform operations on the CPU or one of the GPUs, you do not want MXNet having to wait whether NumPy might want to be doing something else with the same chunk of memory. The  `array` and `asnumpy` functions do the trick.
 
 ```{.python .input  n=22}
 a = x.asnumpy()
