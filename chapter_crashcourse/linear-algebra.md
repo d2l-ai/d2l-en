@@ -408,8 +408,7 @@ It has the convenient property of placing less emphasis on outliers.
 To calculate the $\ell_2$ norm, we can just call ``norm()``.
 
 ```{.python .input}
-(x*x).sum()
-npx.norm(x)
+np.linalg.norm(x)
 ```
 
 To calculate the L1-norm we can simply perform the absolute value and then sum over the elements.
