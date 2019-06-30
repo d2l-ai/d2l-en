@@ -135,7 +135,7 @@ def get_params(vocab_size, num_hiddens, ctx):
 
 ### Define the Model
 
-Now we will define the hidden state initialization function `init_gru_state`. Just like the `init_rnn_state` function defined in :numref:`chapter_rnn_scratch`, this function returns a tuple composed of an NDArray with a shape (batch size, number of hidden units) and with all values set to 0.
+Now we will define the hidden state initialization function `init_gru_state`. Just like the `init_rnn_state` function defined in :numref:`chapter_rnn_scratch`, this function returns an ndarray with a shape (batch size, number of hidden units) whose values are all zeros.
 
 ```{.python .input  n=3}
 def init_gru_state(batch_size, num_hiddens, ctx):
