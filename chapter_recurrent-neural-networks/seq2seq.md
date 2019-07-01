@@ -99,14 +99,14 @@ To implement the loss function that filters out some entries, we will use an ope
 
 ```{.python .input  n=7}
 X = np.array([[1,2,3], [4,5,6]])
-npx.SequenceMask(X, np.array([1,2]), True, axis=1)
+npx.sequence_mask(X, np.array([1,2]), True, axis=1)
 ```
 
 Apply to $n$-dim tensor $X$, it sets `X[i, len[i]:, :, ..., :] = 0`. In addition, we can specify the filling value beyond 0.
 
 ```{.python .input  n=8}
 X = np.ones((2, 3, 4))
-npx.SequenceMask(X, np.array([1,2]), True, value=-1, axis=1)
+npx.sequence_mask(X, np.array([1,2]), True, value=-1, axis=1)
 ```
 
 Now we can implement the masked version of the softmax cross-entropy loss. Note that each Gluon loss function allows to specify per-example weights, in default they are 1s. Then we can just use a zero weight for each example we would like to remove. So our customized loss function accepts an additional `valid_length` argument to ignore some failing elements in each sequence.
@@ -120,7 +120,7 @@ class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
     def forward(self, pred, label, valid_length):
         # the sample weights shape should be (batch_size, seq_len, 1)
         weights = np.expand_dims(np.ones_like(label),axis=-1)
-        weights = npx.SequenceMask(weights, valid_length, True, axis=1)
+        weights = npx.sequence_mask(weights, valid_length, True, axis=1)
         return super(MaskedSoftmaxCELoss, self).forward(pred, label, weights)
 ```
 

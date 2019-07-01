@@ -57,12 +57,12 @@ def lenet(X, params):
     h1_conv = npx.convolution(data=X, weight=params[0], bias=params[1],
                               kernel=(3, 3), num_filter=20)
     h1_activation = npx.relu(h1_conv)
-    h1 = npx.Pooling(data=h1_activation, pool_type='avg', kernel=(2, 2),
+    h1 = npx.pooling(data=h1_activation, pool_type='avg', kernel=(2, 2),
                     stride=(2, 2))
     h2_conv = npx.convolution(data=h1, weight=params[2], bias=params[3],
                               kernel=(5, 5), num_filter=50)
     h2_activation = npx.relu(h2_conv)
-    h2 = npx.Pooling(data=h2_activation, pool_type='avg', kernel=(2, 2),
+    h2 = npx.pooling(data=h2_activation, pool_type='avg', kernel=(2, 2),
                     stride=(2, 2))
     h2 = h2.reshape((h2.shape[0], -1))
     h3_linear = np.dot(h2, params[4]) + params[5]
