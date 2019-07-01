@@ -9,7 +9,9 @@ To demonstrate how to generate anchor boxes on multiple scales, let us read an i
 ```{.python .input  n=1}
 %matplotlib inline
 import d2l
-from mxnet import contrib, image, nd
+from mxnet import contrib, image, np, npx
+
+npx.set_np()
 
 img = image.imread('../img/catdog.jpg')
 h, w = img.shape[0:2]
@@ -27,9 +29,9 @@ The function `display_anchors` is defined below.  We are going to generate ancho
 def display_anchors(fmap_w, fmap_h, s):
     d2l.set_figsize((3.5, 2.5))
     # The values from the first two dimensions will not affect the output
-    fmap = nd.zeros((1, 10, fmap_w, fmap_h))
-    anchors = contrib.nd.MultiBoxPrior(fmap, sizes=s, ratios=[1, 2, 0.5])
-    bbox_scale = nd.array((w, h, w, h))
+    fmap = np.zeros((1, 10, fmap_w, fmap_h))
+    anchors = npx.multibox_prior(fmap, sizes=s, ratios=[1, 2, 0.5])
+    bbox_scale = np.array((w, h, w, h))
     d2l.show_bboxes(d2l.plt.imshow(img.asnumpy()).axes,
                     anchors[0] * bbox_scale)
 ```

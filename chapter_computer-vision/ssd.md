@@ -69,8 +69,10 @@ convolutional layer remain unchanged.
 ```{.python .input  n=1}
 %matplotlib inline
 import d2l
-from mxnet import autograd, contrib, gluon, image, init, nd
+from mxnet import autograd, contrib, gluon, image, init, np, npx
 from mxnet.gluon import nn
+
+npx.set_np()
 
 def cls_predictor(num_anchors, num_classes):
     return nn.Conv2D(num_anchors * (num_classes + 1), kernel_size=3,
@@ -97,8 +99,8 @@ def forward(x, block):
     block.initialize()
     return block(x)
 
-Y1 = forward(nd.zeros((2, 8, 20, 20)), cls_predictor(5, 10))
-Y2 = forward(nd.zeros((2, 16, 10, 10)), cls_predictor(3, 10))
+Y1 = forward(np.zeros((2, 8, 20, 20)), cls_predictor(5, 10))
+Y2 = forward(np.zeros((2, 16, 10, 10)), cls_predictor(3, 10))
 (Y1.shape, Y2.shape)
 ```
 
@@ -106,10 +108,10 @@ The channel dimension contains the predictions for all anchor boxes with the sam
 
 ```{.python .input  n=4}
 def flatten_pred(pred):
-    return pred.transpose((0, 2, 3, 1)).flatten()
+    return npx.batch_flatten(pred.transpose(0, 2, 3, 1))
 
 def concat_preds(preds):
-    return nd.concat(*[flatten_pred(p) for p in preds], dim=1)
+    return np.concatenate([flatten_pred(p) for p in preds], axis=1)
 ```
 
 Thus, regardless of the different shapes of `Y1` and `Y2`, we can still concatenate the prediction results for the two different scales of the same batch.
@@ -136,7 +138,7 @@ def down_sample_blk(num_channels):
 By testing forward computation in the height and width downsample block, we can see that it changes the number of input channels and halves the height and width.
 
 ```{.python .input  n=7}
-forward(nd.zeros((2, 3, 20, 20)), down_sample_blk(10)).shape
+forward(np.zeros((2, 3, 20, 20)), down_sample_blk(10)).shape
 ```
 
 ### Base Network Block
@@ -150,7 +152,7 @@ def base_net():
         blk.add(down_sample_blk(num_filters))
     return blk
 
-forward(nd.zeros((2, 3, 256, 256)), base_net()).shape
+forward(np.zeros((2, 3, 256, 256)), base_net()).shape
 ```
 
 ### The Complete Model
@@ -178,7 +180,7 @@ Now, we will define the forward computation process for each module. In contrast
 ```{.python .input  n=10}
 def blk_forward(X, blk, size, ratio, cls_predictor, bbox_predictor):
     Y = blk(X)
-    anchors = contrib.ndarray.MultiBoxPrior(Y, sizes=size, ratios=ratio)
+    anchors = npx.multibox_prior(Y, sizes=size, ratios=ratio)
     cls_preds = cls_predictor(Y)
     bbox_preds = bbox_predictor(Y)
     return (Y, anchors, cls_preds, bbox_preds)
@@ -216,9 +218,11 @@ class TinySSD(nn.Block):
                 getattr(self, 'cls_%d' % i), getattr(self, 'bbox_%d' % i))
         # In the reshape function, 0 indicates that the batch size remains
         # unchanged
-        return (nd.concat(*anchors, dim=1),
-                concat_preds(cls_preds).reshape(
-                    (0, -1, self.num_classes + 1)), concat_preds(bbox_preds))
+        anchors = np.concatenate(anchors, axis=1)
+        cls_preds = concat_preds(cls_preds)
+        cls_preds = cls_preds.reshape(cls_preds.shape[0], -1, self.num_classes + 1)
+        bbox_preds = concat_preds(bbox_preds)
+        return anchors, cls_preds, bbox_preds
 ```
 
 We now create an SSD model instance and use it to perform forward computation on image mini-batch `X`, which has a height and width of 256 pixels. As we verified previously, the first module outputs a feature map with the shape $32 \times 32$. Because modules two to four are height and width downsample blocks, module five is a global pooling layer, and each element in the feature map is used as the center for 4 anchor boxes, a total of $(32^2 + 16^2 + 8^2 + 4^2 + 1)\times 4 = 5444$ anchor boxes are generated for each image at the five scales.
@@ -226,7 +230,7 @@ We now create an SSD model instance and use it to perform forward computation on
 ```{.python .input  n=13}
 net = TinySSD(num_classes=1)
 net.initialize()
-X = nd.zeros((32, 3, 256, 256))
+X = np.zeros((32, 3, 256, 256))
 anchors, cls_preds, bbox_preds = net(X)
 
 print('output anchors:', anchors.shape)
@@ -245,10 +249,6 @@ We read the Pikachu data set we created in the previous section.
 ```{.python .input  n=14}
 batch_size = 32
 train_iter, _ = d2l.load_data_pikachu(batch_size)
-```
-
-```{.python .input}
-
 ```
 
 There is 1 category in the Pikachu data set. After defining the module, we need to initialize the model parameters and define the optimization algorithm.
@@ -280,10 +280,10 @@ We can use the accuracy rate to evaluate the classification results. As we use t
 def cls_eval(cls_preds, cls_labels):
     # Because the category prediction results are placed in the final
     # dimension, argmax must specify this dimension
-    return (cls_preds.argmax(axis=-1) == cls_labels).sum().asscalar()
+    return float((cls_preds.argmax(axis=-1) == cls_labels).sum())
 
 def bbox_eval(bbox_preds, bbox_labels, bbox_masks):
-    return ((bbox_labels - bbox_preds) * bbox_masks).abs().sum().asscalar()
+    return float((np.abs((bbox_labels - bbox_preds) * bbox_masks)).sum())
 ```
 
 ### Train the Model
@@ -307,8 +307,8 @@ for epoch in range(num_epochs):
             # offset of each
             anchors, cls_preds, bbox_preds = net(X)
             # Label the category and offset of each anchor box
-            bbox_labels, bbox_masks, cls_labels = contrib.nd.MultiBoxTarget(
-                anchors, Y, cls_preds.transpose((0, 2, 1)))
+            bbox_labels, bbox_masks, cls_labels = npx.multibox_target(
+                anchors, Y, cls_preds.transpose(0, 2, 1))
             # Calculate the loss function using the predicted and labeled
             # category and offset values
             l = calc_loss(cls_preds, cls_labels, bbox_preds, bbox_labels,
@@ -331,7 +331,7 @@ In the prediction stage, we want to detect all objects of interest in the image.
 ```{.python .input  n=20}
 img = image.imread('../img/pikachu.jpg')
 feature = image.imresize(img, 256, 256).astype('float32')
-X = feature.transpose((2, 0, 1)).expand_dims(axis=0)
+X = np.expand_dims(feature.transpose(2, 0, 1), axis=0)
 ```
 
 Using the `MultiBoxDetection` function, we predict the bounding boxes based on the anchor boxes and their predicted offsets. Then, we use non-maximum suppression to remove similar bounding boxes.
@@ -339,9 +339,9 @@ Using the `MultiBoxDetection` function, we predict the bounding boxes based on t
 ```{.python .input  n=21}
 def predict(X):
     anchors, cls_preds, bbox_preds = net(X.as_in_context(ctx))
-    cls_probs = cls_preds.softmax().transpose((0, 2, 1))
-    output = contrib.nd.MultiBoxDetection(cls_probs, bbox_preds, anchors)
-    idx = [i for i, row in enumerate(output[0]) if row[0].asscalar() != -1]
+    cls_probs = npx.softmax(cls_preds).transpose(0, 2, 1)
+    output = npx.multibox_detection(cls_probs, bbox_preds, anchors)
+    idx = [i for i, row in enumerate(output[0]) if row[0] != -1]
     return output[0, idx]
 
 output = predict(X)
@@ -354,11 +354,11 @@ def display(img, output, threshold):
     d2l.set_figsize((5, 5))
     fig = d2l.plt.imshow(img.asnumpy())
     for row in output:
-        score = row[1].asscalar()
+        score = float(row[1])
         if score < threshold:
             continue
         h, w = img.shape[0:2]
-        bbox = [row[2:6] * nd.array((w, h, w, h), ctx=row.context)]
+        bbox = [row[2:6] * np.array((w, h, w, h), ctx=row.context)]
         d2l.show_bboxes(fig.axes, bbox, '%.2f' % score, 'w')
 
 display(img, output, threshold=0.3)
@@ -393,11 +393,11 @@ When $\sigma$ is large, this loss is similar to the $L_1$ norm loss. When the va
 ```{.python .input  n=23}
 sigmas = [10, 1, 0.5]
 lines = ['-', '--', '-.']
-x = nd.arange(-2, 2, 0.1)
+x = np.arange(-2, 2, 0.1)
 d2l.set_figsize()
 
 for l, s in zip(lines, sigmas):
-    y = nd.smooth_l1(x, scalar=s)
+    y = npx.smooth_l1(x, scalar=s)
     d2l.plt.plot(x.asnumpy(), y.asnumpy(), l, label='sigma=%.1f' % s)
 d2l.plt.legend();
 ```
@@ -414,9 +414,9 @@ As you can see, by increasing $\gamma$, we can effectively reduce the loss when 
 
 ```{.python .input  n=24}
 def focal_loss(gamma, x):
-    return -(1 - x) ** gamma * x.log()
+    return -(1 - x) ** gamma * np.log(x)
 
-x = nd.arange(0.01, 1, 0.01)
+x = np.arange(0.01, 1, 0.01)
 for l, gamma in zip(lines, [0, 1, 5]):
     y = d2l.plt.plot(x.asnumpy(), focal_loss(gamma, x).asnumpy(), l,
                      label='gamma=%.1f' % gamma)

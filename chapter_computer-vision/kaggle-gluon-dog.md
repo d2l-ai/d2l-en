@@ -19,12 +19,14 @@ First, import the packages or modules required for the competition.
 import collections
 import d2l
 import math
-from mxnet import autograd, gluon, init, nd
+from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
 import os
 import shutil
 import time
 import zipfile
+
+npx.set_np()
 ```
 
 ## Obtain and Organize the Data Sets
@@ -230,7 +232,7 @@ def evaluate_loss(data_iter, net, ctx):
         y = y.as_in_context(ctx)
         output_features = net.features(X.as_in_context(ctx))
         outputs = net.output_new(output_features)
-        l_sum += loss(outputs, y).sum().asscalar()
+        l_sum += float(loss(outputs, y).sum())
         n += y.size
     return l_sum / n
 ```
@@ -257,7 +259,7 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
                 l = loss(outputs, y).sum()
             l.backward()
             trainer.step(batch_size)
-            train_l_sum += l.asscalar()
+            train_l_sum += float(l)
             n += y.size
         time_s = "time %.2f sec" % (time.time() - start)
         if valid_iter is not None:
@@ -295,7 +297,7 @@ train(net, train_valid_iter, None, num_epochs, lr, wd, ctx, lr_period,
 preds = []
 for data, label in test_iter:
     output_features = net.features(data.as_in_context(ctx))
-    output = nd.softmax(net.output_new(output_features))
+    output = npx.softmax(net.output_new(output_features))
     preds.extend(output.asnumpy())
 ids = sorted(os.listdir(os.path.join(data_dir, input_dir, 'test/unknown')))
 with open('submission.csv', 'w') as f:

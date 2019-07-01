@@ -107,22 +107,24 @@ is the largest); 8 and 9 (9 is the largest); and 10.
 We use the `ROIPooling` function to demonstrate the RoI pooling layer computation. Assume that the CNN extracts the feature `X` with both a height and width of 4 and only a single channel.
 
 ```{.python .input  n=4}
-from mxnet import nd
+from mxnet import np, npx
 
-X = nd.arange(16).reshape((1, 1, 4, 4))
+npx.set_np()
+
+X = np.arange(16).reshape(1, 1, 4, 4)
 X
 ```
 
 Assume that the height and width of the image are both 40 pixels and that selective search generates two proposed regions on the image. Each region is expressed as five elements: the region's object category and the $x,y$ coordinates of its upper-left and bottom-right corners.
 
 ```{.python .input  n=5}
-rois = nd.array([[0, 0, 0, 20, 20], [0, 0, 10, 30, 30]])
+rois = np.array([[0, 0, 0, 20, 20], [0, 0, 10, 30, 30]])
 ```
 
 Because the height and width of `X` are $1/10$ of the height and width of the image, the coordinates of the two proposed regions are multiplied by 0.1 according to the `spatial_scale`, and then the RoIs are labeled on `X` as `X[:,:,0:3,0:3]` and `X[:,:,1:4,0:4]`, respectively. Finally, we divide the two RoIs into a sub-window grid and extract features with a height and width of 2.
 
 ```{.python .input  n=6}
-nd.ROIPooling(X, rois, pooled_size=(2, 2), spatial_scale=0.1)
+npx.roi_pooling(X, rois, pooled_size=(2, 2), spatial_scale=0.1)
 ```
 
 ## Faster R-CNN

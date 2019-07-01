@@ -11,7 +11,9 @@ In the next few sections, we will introduce multiple deep learning models used f
 ```{.python .input}
 %matplotlib inline
 import d2l
-from mxnet import image
+from mxnet import image, npx
+
+npx.set_np()
 ```
 
 Next, we will load the sample images that will be used in this section. We can see there is a dog on the left side of the image and a cat on the right. They are the two main targets in this image.
