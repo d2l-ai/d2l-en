@@ -10,8 +10,10 @@ The Pikachu data set in RecordIO format can be downloaded directly from the Inte
 ```{.python .input  n=1}
 %matplotlib inline
 import d2l
-from mxnet import gluon, image
+from mxnet import gluon, image, np, npx
 import os
+
+npx.set_np()
 
 # Save to the d2l package.
 def download_pikachu(data_dir):
@@ -63,7 +65,7 @@ batch.data[0].shape, batch.label[0].shape
 We have ten images with bounding boxes on them. We can see that the angle, size, and position of Pikachu are different in each image. Of course, this is a simple man-made data set. In actual practice, the data is usually much more complicated.
 
 ```{.python .input  n=4}
-imgs = (batch.data[0][0:10].transpose((0, 2, 3, 1))) / 255
+imgs = (batch.data[0][0:10].transpose(0, 2, 3, 1)) / 255
 axes = d2l.show_images(imgs, 2, 5, scale=2)
 for ax, label in zip(axes, batch.label[0][0:10]):
     d2l.show_bboxes(ax, [label[0][1:5] * edge_size], colors=['w'])

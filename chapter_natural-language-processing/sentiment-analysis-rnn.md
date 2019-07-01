@@ -99,54 +99,11 @@ net.embedding.collect_params().setattr('grad_req', 'null')
 
 Now, we can start training.
 
-```{.python .input}
-# Copied from image-augmentation.md, should move back later. FIXME
-
-# Save to the d2l package.
-def train_batch_ch12(net, features, labels, loss, trainer, ctx_list):
-    Xs, ys = d2l.split_batch(features, labels, ctx_list)
-    with autograd.record():
-        pys = [net(X) for X in Xs]
-        ls = [loss(py, y) for py, y in zip(pys, ys)]
-    for l in ls:
-        l.backward()
-    trainer.step(features.shape[0])
-    train_loss_sum = sum([l.sum().item() for l in ls])
-    train_acc_sum = sum(d2l.accuracy(py, y).item() for py, y in zip(pys, ys))
-    return train_loss_sum, train_acc_sum
-
-# Save to the d2l package.
-def train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs,
-               ctx_list=d2l.try_all_gpus()):
-    num_batches, timer = len(train_iter), d2l.Timer()
-    animator = d2l.Animator(xlabel='epoch', xlim=[0,num_epochs], ylim=[0,2],
-                            legend=['train loss','train acc','test acc'])
-    for epoch in range(num_epochs):
-        # store training_loss, training_accuracy, num_examples, num_features
-        metric = d2l.Accumulator(4)
-        for i, (features, labels) in enumerate(train_iter):
-            timer.start()
-            l, acc = train_batch_ch12(
-                net, features, labels, loss, trainer, ctx_list)
-            metric.add(l, acc, labels.shape[0], labels.size)
-            timer.stop()
-            if (i+1) % (num_batches // 5) == 0:
-                animator.add(epoch+i/num_batches,
-                             (metric[0]/metric[2], metric[1]/metric[3], None))
-        test_acc = d2l.evaluate_accuracy_gpus(net, test_iter)
-        animator.add(epoch+1, (None, None, test_acc))
-    print('loss %.3f, train acc %.3f, test acc %.3f' % (
-        metric[0]/metric[2], metric[1]/metric[3], test_acc))
-    print('%.1f exampes/sec on %s' % (
-        metric[2]*num_epochs/timer.sum(), ctx_list))
-    
-```
-
 ```{.python .input  n=48}
 lr, num_epochs = 0.01, 5
 trainer = gluon.Trainer(net.collect_params(), 'adam', {'learning_rate': lr})
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
-train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs, ctx)
+d2l.train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs, ctx)
 ```
 
 Finally, define the prediction function.

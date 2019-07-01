@@ -90,7 +90,7 @@ def evaluate_accuracy_gpus(net, data_iter):
     for features, labels in data_iter:
         Xs, ys = d2l.split_batch(features, labels, ctx_list)
         pys = [net(X) for X in Xs]  # run in parallel
-        metric.add(sum(d2l.accuracy(py, y).item() for py, y in zip(pys, ys)), 
+        metric.add(sum(float(d2l.accuracy(py, y)) for py, y in zip(pys, ys)), 
                    labels.size)
     return metric[0]/metric[1]
 ```
