@@ -192,7 +192,7 @@ Taking the mean yields the desired result.
 ```{.python .input  n=11}
 # Save to the d2l package.
 def accuracy(y_hat, y):
-    return (y_hat.argmax(axis=1) == y.astype('float32')).sum()
+    return float((y_hat.argmax(axis=1) == y.astype('float32')).sum())
 ```
 
 We will continue to use the variables `y_hat` and `y`

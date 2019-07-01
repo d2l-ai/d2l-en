@@ -171,7 +171,7 @@ def load_data_fashion_mnist(batch_size, resize=None):
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def accuracy(y_hat, y):
-    return (y_hat.argmax(axis=1) == y.astype('float32')).sum()
+    return float((y_hat.argmax(axis=1) == y.astype('float32')).sum())
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def evaluate_accuracy(net, data_iter):
