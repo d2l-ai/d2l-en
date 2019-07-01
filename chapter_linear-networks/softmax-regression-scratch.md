@@ -266,7 +266,7 @@ def train_epoch_ch3(net, train_iter, loss, updater):
             l = loss(y_hat, y)
         l.backward()
         updater(X.shape[0])
-        metric.add(l.sum(), accuracy(y_hat, y), y.size)
+        metric.add(float(l.sum()), accuracy(y_hat, y), y.size)
     # Return training loss and training accuracy
     return metric[0]/metric[2], metric[1]/metric[2]
 ```
@@ -314,8 +314,8 @@ The training function then runs multiple epochs and visualize the training progr
 # Save to the d2l package.
 def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
     trains, test_accs = [], []
-    animator = Animator(xlabel='epoch', xlim=[1, num_epochs], 
-                        ylim=[0.3, 0.9], 
+    animator = Animator(xlabel='epoch', xlim=[1, num_epochs],
+                        ylim=[0.3, 0.9],
                         legend=['train loss', 'train acc', 'test acc'])
     for epoch in range(num_epochs):
         train_metrics = train_epoch_ch3(net, train_iter, loss, updater)
