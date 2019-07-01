@@ -28,10 +28,12 @@ First, import the packages and modules required for the experiment.  Gluon's `mo
 ```{.python .input  n=1}
 %matplotlib inline
 import d2l
-from mxnet import gluon, init, nd
+from mxnet import gluon, init, np, npx
 from mxnet.gluon import nn
 import os
 import zipfile
+
+npx.set_np()
 ```
 
 ### Get the Data Set
@@ -103,7 +105,7 @@ pretrained_net.output
 
 We then build a new neural network to use as the target model. It is defined in the same way as the pre-trained source model, but the final number of outputs is equal to the number of categories in the target data set. In the code below, the model parameters in the member variable `features` of the target model instance `finetune_net` are initialized to model parameters of the corresponding layer of the source model. Because the model parameters in `features` are obtained by pre-training on the ImageNet data set, it is good enough. Therefore, we generally only need to use small learning rates to "fine tune" these parameters. In contrast, model parameters in the member variable `output` are randomly initialized and generally require a larger learning rate to learn from scratch. Assume the learning rate in the `Trainer` instance is $\eta$ and use a learning rate of $10\eta$ to update the model parameters in the member variable `output`.
 
-```{.python .input  n=9}
+```{.python .input  n=8}
 finetune_net = gluon.model_zoo.vision.resnet18_v2(classes=2)
 finetune_net.features = pretrained_net.features
 finetune_net.output.initialize(init.Xavier())
@@ -116,7 +118,7 @@ finetune_net.output.collect_params().setattr('lr_mult', 10)
 
 We first define a training function `train_fine_tuning` that uses fine tuning so it can be called multiple times.
 
-```{.python .input  n=10}
+```{.python .input  n=9}
 def train_fine_tuning(net, learning_rate, batch_size=128, num_epochs=5):
     train_iter = gluon.data.DataLoader(
         train_imgs.transform_first(train_augs), batch_size, shuffle=True)
@@ -133,7 +135,7 @@ def train_fine_tuning(net, learning_rate, batch_size=128, num_epochs=5):
 
 We set the learning rate in the `Trainer` instance to a smaller value, such as 0.01, in order to fine tune the model parameters obtained in pre-training. Based on the previous settings, we will train the output layer parameters of the target model from scratch using a learning rate ten times greater.
 
-```{.python .input  n=11}
+```{.python .input  n=10}
 train_fine_tuning(finetune_net, 0.01)
 ```
 
@@ -170,7 +172,7 @@ finetune_net.features.collect_params().setattr('grad_req', 'null')
 
 ```{.python .input  n=13}
 weight = pretrained_net.output.weight
-hotdog_w = nd.split(weight.data(), 1000, axis=0)[713]
+hotdog_w = np.split(weight.data(), 1000, axis=0)[713]
 hotdog_w.shape
 ```
 
