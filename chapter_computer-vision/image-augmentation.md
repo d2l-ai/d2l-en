@@ -22,8 +22,10 @@ First, import the packages or modules required for the experiment in this sectio
 ```{.python .input  n=1}
 %matplotlib inline
 import d2l
-from mxnet import autograd, gluon, image, init, nd
+from mxnet import autograd, gluon, image, init, np, npx
 from mxnet.gluon import nn
+
+npx.set_np()
 ```
 
 ## Common Image Augmentation Method
@@ -159,7 +161,7 @@ def train_batch_ch12(net, features, labels, loss, trainer, ctx_list):
     for l in ls:
         l.backward()
     trainer.step(features.shape[0])
-    train_loss_sum = sum([l.sum().asscalar() for l in ls])
+    train_loss_sum = sum([float(l.sum()) for l in ls])
     train_acc_sum = sum(d2l.accuracy(py, y) for py, y in zip(pys, ys))
     return train_loss_sum, train_acc_sum
 ```
