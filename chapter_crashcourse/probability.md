@@ -56,7 +56,7 @@ which assigns probabilities to a number of discrete choices is called the
 *multinomial* distribution. We'll give a more formal definition of
 *distribution* later, but at a high level, think of it as just an assignment of
 probabilities to events. In MXNet, we can sample from the multinomial
-distribution via the aptly named `nd.random.multinomial` function.
+distribution via the aptly named `np.random.multinomial` function.
 The function
 can be called in many ways, but we'll focus on the simplest.
 To draw a single
