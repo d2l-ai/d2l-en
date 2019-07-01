@@ -30,12 +30,12 @@ chapter_recurrent-neural-networks/index
 chapter_attention-mechanism/index
 chapter_optimization/index
 chapter_computational-performance/index
-chapter_generative_adversarial_networks/index
+chapter_computer-vision/index
 chapter_natural-language-processing/index
+chapter_generative_adversarial_networks/index
 chapter_appendix/index
 ```
 
-chapter_computer-vision/index
 
 
 ```toc

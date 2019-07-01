@@ -44,8 +44,8 @@ def masked_softmax(X, valid_length):
         else:
             valid_length = valid_length.reshape((-1,))
         # fill masked elements with a large negative, whose exp is 0
-        X = npx.SequenceMask(X.reshape((-1, shape[-1])), valid_length, True,
-                            axis=1, value=-1e6)
+        X = npx.sequence_mask(X.reshape((-1, shape[-1])), valid_length, True,
+                              axis=1, value=-1e6)
         return npx.softmax(X).reshape(shape)
 ```
 
@@ -75,7 +75,7 @@ Now let's implement this layer that supports a batch of queries and key-value pa
 
 ```{.python .input  n=5}
 # Save to the d2l package.
-class DotProductAttention(nn.Block): 
+class DotProductAttention(nn.Block):
     def __init__(self, dropout, **kwargs):
         super(DotProductAttention, self).__init__(**kwargs)
         self.dropout = nn.Dropout(dropout)
