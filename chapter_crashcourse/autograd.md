@@ -20,7 +20,7 @@ x = np.arange(4)
 x
 ```
 
-Once we compute the gradient of ``y`` with respect to ``x``, we will need a place to store it. We can tell an NDArray that we plan to store a gradient by invoking its ``attach_grad()`` method.
+Once we compute the gradient of ``y`` with respect to ``x``, we will need a place to store it. We can tell an ndarray to store a gradient by invoking its ``attach_grad()`` method.
 
 ```{.python .input  n=3}
 x.attach_grad()
@@ -40,7 +40,7 @@ with autograd.record():
 y
 ```
 
-Since `x` is a vector of length 4, `nd.dot` will perform inner product and
+Since `x` is a vector of length 4, `np.dot` will perform inner product and
 therefore `y` is a scalar. Next, we can automatically
 find the gradient of all the inputs by calling the `backward` function.
 

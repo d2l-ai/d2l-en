@@ -4,7 +4,7 @@ Due to constraints on the length of this book, we cannot possibly introduce ever
 
 ## Finding all the functions and classes in the module
 
-In order to know which functions and classes can be called in a module, we invoke the `dir` function. For instance, we can query all properties in the `nd.random` module as follows:
+In order to know which functions and classes can be called in a module, we invoke the `dir` function. For instance, we can query all properties in the `np.random` module as follows:
 
 ```{.python .input  n=1}
 from mxnet import np
@@ -15,13 +15,13 @@ Generally, we can ignore functions that start and end with `__` (special objects
 
 ## Finding the usage of specific functions and classes
 
-For more specific instructions on how to use a given function or class, we can invoke the  `help` function. As an example, let's explore the usage instructions for NDArray's `ones_like` function.
+For more specific instructions on how to use a given function or class, we can invoke the  `help` function. As an example, let's explore the usage instructions for ndarray's `ones_like` function.
 
 ```{.python .input}
 help(np.ones_like)
 ```
 
-From the documentation, we can see that the `ones_like` function creates a new array with the same shape as the supplied NDArray and all elements set to `1`. Whenever possible, you should run a quick test to confirm your interpretation:
+From the documentation, we can see that the `ones_like` function creates a new array with the same shape as the supplied ndarray and all elements set to `1`. Whenever possible, you should run a quick test to confirm your interpretation:
 
 ```{.python .input}
 x = np.array([[0, 0, 0], [2, 2, 2]])
@@ -29,7 +29,7 @@ y = np.ones_like(x)
 y
 ```
 
-In the Jupyter notebook, we can use `?` to display the document in another window. For example, `nd.random.uniform?` will create content that is almost identical to `help(nd.random.uniform)`, displaying it in a new browser window. In addition, if we use two question marks, e.g. `nd.random.uniform??`, the code implementing the function will also be displayed.
+In the Jupyter notebook, we can use `?` to display the document in another window. For example, `np.random.uniform?` will create content that is almost identical to `help(np.random.uniform)`, displaying it in a new browser window. In addition, if we use two question marks, e.g. `np.random.uniform??`, the code implementing the function will also be displayed.
 
 ## API Documentation
 
