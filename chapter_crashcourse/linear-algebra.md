@@ -35,7 +35,7 @@ but for now, remember that if you want to say that $x$ is a scalar,
 you can simply say $x \in \mathcal{R}$.
 The symbol $\in$ can be pronounced "in" and just denotes membership in a set.
 
-In MXNet, we work with scalars by creating NDArrays with just one element.
+In MXNet, we work with scalars by creating ndarrays with just one element.
 In this snippet, we instantiate two scalars and perform some familiar arithmetic operations with them, such as addition, multiplication, division and exponentiation.
 
 ```{.python .input}
@@ -64,7 +64,7 @@ whose components capture their most recent vital signs,
 cholesterol levels, minutes of exercise per day, etc.
 In math notation, we will usually denote vectors as bold-faced,
 lower-cased letters ($\mathbf{u}$, $\mathbf{v}$, $\mathbf{w})$.
-In MXNet, we work with vectors via 1D NDArrays with an arbitrary number of components.
+In MXNet, we work with vectors via 1D ndarrays with arbitrary number of components.
 
 ```{.python .input}
 x = np.arange(4)
@@ -75,7 +75,7 @@ We can refer to any element of a vector by using a subscript.
 For example, we can refer to the $4$th element of $\mathbf{u}$ by $u_4$.
 Note that the element $u_4$ is a scalar,
 so we do not bold-face the font when referring to it.
-In code, we access any element $i$ by indexing into the ``NDArray``.
+In code, we access any element $i$ by indexing into the `ndarray`.
 
 ```{.python .input}
 x[3]
@@ -87,11 +87,11 @@ Let's revisit some concepts from the previous section. A vector is just an array
 In math notation, if we want to say that a vector $\mathbf{x}$ consists of $n$ real-valued scalars,
 we can express this as $\mathbf{x} \in \mathcal{R}^n$.
 The length of a vector is commonly called its $dimension$.
-As with an ordinary Python array, we can access the length of an NDArray
+As with an ordinary Python array, we can measure the length of an ndarray
 by calling Python's in-built ``len()`` function.
 
 We can also access a vector's length via its `.shape` attribute.
-The shape is a tuple that lists the dimensionality of the NDArray along each of its axes.
+The shape is a tuple that lists the dimensionality along each axis of the ndarray.
 Because a vector can only be indexed along one axis, its shape has just one element.
 
 ```{.python .input}
@@ -192,7 +192,7 @@ The next more sophisticated thing we can do with arbitrary tensors
 is to calculate the sum of their elements.
 In mathematical notation, we express sums using the $\sum$ symbol.
 To express the sum of the elements in a vector $\mathbf{u}$ of length $d$,
-we can write $\sum_{i=1}^d u_i$. In code, we can just call ``nd.sum()``.
+we can write $\sum_{i=1}^d u_i$. In code, we can just call ``sum()``.
 
 ```{.python .input}
 print(x)
@@ -211,7 +211,7 @@ We calculate the mean by dividing the sum by the total number of elements.
 With mathematical notation, we could write the average
 over a vector $\mathbf{u}$ as $\frac{1}{d} \sum_{i=1}^{d} u_i$
 and the average over a matrix $A$ as  $\frac{1}{n \cdot m} \sum_{i=1}^{m} \sum_{j=1}^{n} a_{ij}$.
-In code, we could just call ``nd.mean()`` on tensors of arbitrary shape:
+In code, we could just call ``mean()`` on tensors of arbitrary shape:
 
 ```{.python .input}
 print(A.mean())
@@ -228,10 +228,11 @@ y = np.ones(4)
 print(x, y, np.dot(x, y))
 ```
 
-Note that we can express the dot product of two vectors ``nd.dot(x, y)`` equivalently by performing an element-wise multiplication and then a sum:
+Note that we can express the dot product of two vectors `dot(x, y)` equivalently by performing an element-wise multiplication and then a sum:
 
 ```{.python .input}
 np.sum(x * y)
+np.dot(x, y)
 ```
 
 Dot products are useful in a wide range of contexts. For example, given a set of weights $\mathbf{w}$, the weighted sum of some values ${u}$ could be expressed as the dot product $\mathbf{u}^T \mathbf{w}$. When the weights are non-negative and sum to one $\left(\sum_{i=1}^{d} {w_i} = 1\right)$, the dot product expresses a *weighted average*. When two vectors each have length one (we will discuss what *length* means below in the section on norms), dot products can also capture the cosine of the angle between them.
@@ -292,7 +293,7 @@ So you can think of multiplication by a matrix $A\in \mathbb{R}^{n \times m}$ as
 
 These transformations turn out to be remarkably useful. For example, we can represent rotations as multiplications by a square matrix. As we will see in subsequent chapters, we can also use matrix-vector products to describe the calculations of each layer in a neural network.
 
-Expressing matrix-vector products in code with ``ndarray``, we use the same ``nd.dot()`` function as for dot products. When we call ``nd.dot(A, x)`` with a matrix ``A`` and a vector ``x``, MXNet knows to perform a matrix-vector product. Note that the column dimension of ``A`` must be the same as the dimension of ``x``.
+Expressing matrix-vector products in code with ``ndarray``, we use the same ``dot()`` function as for dot products. When we call ``np.dot(A, x)`` with a matrix ``A`` and a vector ``x``, MXNet knows to perform a matrix-vector product. Note that the column dimension of ``A`` must be the same as the dimension of ``x``.
 
 ```{.python .input}
 np.dot(A, x)
@@ -352,7 +353,7 @@ $$C = AB = \begin{pmatrix}
 \end{pmatrix}
 $$
 
-You can think of the matrix-matrix multiplication $AB$ as simply performing $m$ matrix-vector products and stitching the results together to form an $n \times m$ matrix. Just as with ordinary dot products and matrix-vector products, we can compute matrix-matrix products in MXNet by using ``nd.dot()``.
+You can think of the matrix-matrix multiplication $AB$ as simply performing $m$ matrix-vector products and stitching the results together to form an $n \times m$ matrix. Just as with ordinary dot products and matrix-vector products, we can compute matrix-matrix products in MXNet by using ``dot()``.
 
 ```{.python .input}
 B = np.ones(shape=(4, 3))
@@ -404,10 +405,10 @@ We also commonly work with the $\ell_1$ norm.
 The $\ell_1$ norm is simply the sum of the absolute values.
 It has the convenient property of placing less emphasis on outliers.
 
-To calculate the $\ell_2$ norm, we can just call ``nd.norm()``.
+To calculate the $\ell_2$ norm, we can just call ``norm()``.
 
 ```{.python .input}
-(x*x).sum()
+np.linalg.norm(x)
 ```
 
 To calculate the L1-norm we can simply perform the absolute value and then sum over the elements.
