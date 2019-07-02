@@ -30,9 +30,6 @@ Now we are going to compute ``y`` and MXNet will generate a computation graph on
 
 Note that building the computation graph requires a nontrivial amount of computation. So MXNet will only build the graph when explicitly told to do so. This happens by placing code inside a ``with autograd.record():`` block.
 
-```{.python .input}
-(x*x).sum()
-```
 
 ```{.python .input  n=4}
 with autograd.record():
