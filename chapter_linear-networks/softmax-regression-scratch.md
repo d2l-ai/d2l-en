@@ -7,9 +7,7 @@ is similarly fundamental and you ought to know
 the gory details of how to implement it from scratch.
 As with linear regression, after doing things by hand
 we will breeze through an implementation in Gluon for comparison.
-To begin, let's import our packages
-(only `autograd`, `nd` are needed here
-because we will be doing the heavy lifting ourselves.)
+To begin, let's import our packages.
 
 ```{.python .input  n=1}
 import d2l
@@ -65,9 +63,9 @@ b.attach_grad()
 
 Before implementing the softmax regression model,
 let's briefly review how operators such as `sum` work
-along specific dimensions in an NDArray.
+along specific dimensions in an ndarray.
 Given a matrix `X` we can sum over all elements (default) or only
-over elements in the same column (`axis=0`) or the same row (`axis=1`).
+over elements in the same axis, *i.e.*, the column (`axis=0`) or the same row (`axis=1`).
 Note that if `X` is an array with shape `(2, 3)`
 and we sum over the columns (`X.sum(axis=0`),
 the result will be a (1D) vector with shape `(3,)`.
@@ -186,7 +184,7 @@ Now we just need to check how frequently the two match.
 Since the equality operator `==` is datatype-sensitive
 (e.g. an `int` and a `float32` are never equal),
 we also need to convert both to the same type (we pick `float32`).
-The result is an NDArray containing entries of 0 (false) and 1 (true).
+The result is an ndarray containing entries of 0 (false) and 1 (true).
 Taking the mean yields the desired result.
 
 ```{.python .input  n=11}
