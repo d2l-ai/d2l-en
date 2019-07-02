@@ -4,7 +4,6 @@
 It is impossible to get anything done if we cannot manipulate data. Generally, there are two important things we need to do with data: (i) acquire it and (ii) process it once it is inside the computer. There is no point in acquiring data if we do not even know how to store it, so let's get our hands dirty first by playing with synthetic data. We will start by introducing the N-dimensional array (ndarray), MXNet's primary tool for storing and transforming data. 
 If you have worked with NumPy, a scientific computing package of Python, you are ready to fly. You will notice that the MXNet's ndarray is an extension to NumPy's ndarray with a few key advantages. First, the former supports asynchronous computation on CPU, GPU, and distributed cloud architectures, whereas the latter only supports CPU computation. Second, MXNet's ndarray supports for automatic differentiation. These properties make MXNet's ndarray indispensable for deep learning.
 
-
 ## Getting Started
 
 Throughout this chapter, we are aiming to get you up and running with the basic functionality. Do not worry if you do not understand all of the basic math, like element-wise operations or normal distributions. In the next two chapters we will take another pass at the same material with practical examples. On the other hand, if you want to go deeper into the mathematical content, see :numref:`chapter_math`.
