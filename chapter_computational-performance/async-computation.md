@@ -27,7 +27,7 @@ c
 
 In Asynchronous Computing, whenever the Python front-end thread executes one of the first three statements, it simply returns the task to the back-end queue. When the last statement’s results need to be printed, the Python front-end thread will wait for the C++ back-end thread to finish computing result of the variable `c`. One benefit of such as design is that the Python front-end thread in this example does not need to perform actual computations. Thus, there is little impact on the program’s overall performance, regardless of Python’s performance. MXNet will deliver consistently high performance, regardless of the front-end language’s performance, provided the C++ back-end can meet the efficiency requirements.
 
-The following example uses timing to demonstrate the effect of asynchronous programming. As we can see, when `y = nd.dot(x, x).sum()` is returned, it does not actually wait for the variable `y` to be calculated. Only when the `print` function needs to print the variable `y` must the function wait for it to be calculated.
+The following example uses timing to demonstrate the effect of asynchronous programming. As we can see, when `y = x.dot(x).sum()` is returned, it does not actually wait for the variable `y` to be calculated. Only when the `print` function needs to print the variable `y` must the function wait for it to be calculated.
 
 ```{.python .input  n=3}
 timer = d2l.Timer()

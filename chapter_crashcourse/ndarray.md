@@ -126,7 +126,7 @@ Summing all the elements in the ndarray yields an ndarray with only one element.
 x.sum()
 ```
 
-For stylistic convenience, we can write `y.exp()`, `x.sum()`, `x.norm()`, etc. also as `nd.exp(y)`, `nd.sum(x)`, `nd.norm(x)`.
+For stylistic convenience, we can write `y.exp()`, `x.sum()`, `x.norm()`, etc. also as `np.exp(y)`, `np.sum(x)`, `np.linalg.norm(x)`.
 
 ## Broadcast Mechanism
 
@@ -217,7 +217,7 @@ print(type(b))
 
 1. Run the code in this section. Change the conditional statement `x == y` in this section to `x < y` or `x > y`, and then see what kind of ndarray you can get.
 1. Replace the two ndarrays that operate by element in the broadcast mechanism with other shapes, e.g. three dimensional tensors. Is the result the same as expected?
-1. Assume that we have three matrices `a`, `b` and `c`. Rewrite `c = nd.dot(a, b.T) + c` in the most memory efficient manner.
+1. Assume that we have three matrices `a`, `b` and `c`. Rewrite `c = np.linalg.dot(a, b.T) + c` in the most memory efficient manner.
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2316)
 
