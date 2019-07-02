@@ -6,7 +6,7 @@ In :numref:`chapter_basic_gan`, we introduced the basic ideas behind how GANs wo
 In this section, we'll demonstrate how you can use GANs to generate photorealistic images. We'll be basing our models on the deep convolutional GANs (DCGAN) introduced in :cite:`Radford.Metz.Chintala.2015`. We'll borrow the convolutional architecture that have proven so successful for discriminative computer vision problems and show how via GANs, they can be leveraged to generate photorealistic images.
 
 ```{.python .input  n=1}
-from mxnet import nd, gluon, autograd, init, np, npx
+from mxnet import gluon, autograd, init, np, npx
 from mxnet.gluon import nn
 import d2l
 import zipfile
