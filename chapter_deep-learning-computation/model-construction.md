@@ -40,7 +40,6 @@ In the following we will explain the various steps needed to go from defining la
 The `nn.Block` class provides the functionality required for much of what we need. It is a model constructor provided in the `nn` module, which we can inherit to define the model we want. The following inherits the Block class to construct the multilayer perceptron mentioned at the beginning of this section. The `MLP` class defined here overrides the `__init__` and `forward` functions of the Block class. They are used to create model parameters and define forward computations, respectively. Forward computation is also forward propagation.
 
 ```{.python .input  n=1}
-from mxnet import nd
 from mxnet.gluon import nn
 
 class MLP(nn.Block):
@@ -138,8 +137,7 @@ class FancyMLP(nn.Block):
 
     def forward(self, x):
         x = self.dense(x)
-        # Use the constant parameters created, as well as the relu and dot
-        # functions of NDArray
+        # Use the constant parameters created, as well as the relu and dot functions
         x = npx.relu(np.dot(x, self.rand_weight.data()) + 1)
         # Reuse the fully connected layer. This is equivalent to sharing
         # parameters with two fully connected layers
@@ -153,7 +151,7 @@ class FancyMLP(nn.Block):
         return x.sum()
 ```
 
-In this `FancyMLP` model, we used constant weight `Rand_weight` (note that it is not a model parameter), performed a matrix multiplication operation (`nd.dot<`), and reused the *same* `Dense` layer. Note that this is very different from using two dense layers with different sets of parameters. Instead, we used the same network twice. Quite often in deep networks one also says that the parameters are *tied* when one wants to express that multiple parts of a network share the same parameters. Let's see what happens if we construct it and feed data through it.
+In this `FancyMLP` model, we used constant weight `Rand_weight` (note that it is not a model parameter), performed a matrix multiplication operation (`np.dot<`), and reused the *same* `Dense` layer. Note that this is very different from using two dense layers with different sets of parameters. Instead, we used the same network twice. Quite often in deep networks one also says that the parameters are *tied* when one wants to express that multiple parts of a network share the same parameters. Let's see what happens if we construct it and feed data through it.
 
 ```{.python .input  n=6}
 net = FancyMLP()
