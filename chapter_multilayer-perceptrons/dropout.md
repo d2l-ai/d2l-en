@@ -193,7 +193,7 @@ then we can keep those nodes for which the corresponding
 sample is greater than $p$, dropping the rest.
 
 In the following code, we implement a `dropout` function
-that drops out the elements in the NDArray input `X`
+that drops out the elements in the ndarray input `X`
 with probability `drop_prob`,
 rescaling the remainder as described above
 (dividing the survivors by `1.0-drop_prob`).
