@@ -1,12 +1,9 @@
 # Concise Implementation of Linear Regression
 :label:`chapter_linear_gluon`
 
-The surge of deep learning has inspired the development
-of a variety of mature software frameworks,
-that automate much of the repetitive work
-of implementing deep learning models.
-In the previous section we relied only
-on NDarray for data storage and linear algebra
+The surge of deep learning has inspired the development of a variety of mature software frameworks, 
+that automate much of the repetitive work of implementing deep learning models.
+In the previous section we relied only on NDarray for data storage and linear algebra
 and the auto-differentiation capabilities in the `autograd` package.
 In practice, because many of the more abstract operations, e.g.
 data iterators, loss functions, model architectures, and optimizers,
@@ -40,7 +37,7 @@ we will replace it with the pseudonym `gdata`
 too differentiate the imported `data` module
 from a variable we might define.
 The first step will be to instantiate an `ArrayDataset`,
-which takes in one or more NDArrays as arguments.
+which takes in one or more ndarrays as arguments.
 Here, we pass in `features` and `labels` as arguments.
 Next, we will use the ArrayDataset to instantiate a DataLoader,
 which also requires that we specify a `batch_size`

@@ -10,8 +10,8 @@ frameworks can automate nearly all of this work, but if you never learn to
 implement things from scratch, then you may never truly understand how the model
 works.  Moreover, when it comes time to customize models, defining our own
 layers, loss functions, etc., knowing how things work under the hood will come
-in handy.  Thus, we start off describing how to implement linear regression
-relying only on the primitives in the NDArray and `autograd` packages.  In the
+in handy. Thus, we start off describing how to implement linear regression
+relying only on the primitives in the ndarray and `autograd` packages.  In the
 section immediately following, we will present the compact implementation, using
 all of Gluon's bells and whistles, but this is where we dive into the details.
 
@@ -166,7 +166,7 @@ Recall that to calculate the output of the linear model,
 we simply take the matrix-vector dot product
 of the examples $\mathbf{X}$ and the models weights $w$,
 and add the offset $b$ to each example.
-Note that below `nd.dot(X, w)` is a vector and `b` is a scalar.
+Note that below `np.dot(X, w)` is a vector and `b` is a scalar.
 Recall that when we add a vector and a scalar,
 the scalar is added to each component of the vector.
 
@@ -312,7 +312,7 @@ there exist many sets of parameters that work well.
 ## Summary
 
 We saw how a deep network can be implemented
-and optimized from scratch, using just NDArray and `autograd`,
+and optimized from scratch, using just ndarray and `autograd`,
 without any need for defining layers, fancy optimizers, etc.
 This only scratches the surface of what is possible.
 In the following sections, we will describe additional models
