@@ -179,3 +179,5 @@ train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G,
 * Generative adversarial networks (GANs) composes of two deep networks, the generator and the discriminator.
 * The generator generates the image as much closer to the true image as possible to fool the discriminator, via maximizing the cross entropy loss, i.e., $\max \log(D(\mathbf{x'}))$.
 * The discriminator tries to distinguish the generated images from the true images, via minimizing the cross entropy loss, i.e., $\min - y \log D(\mathbf{x}) - (1-y)\log(1-D(\mathbf{x}))$.
+
+## Reference

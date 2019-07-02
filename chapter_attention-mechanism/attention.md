@@ -144,3 +144,6 @@ atten(nd.ones((2,1,2)), keys, values, nd.array([2, 6]))
 ```
 
 ## Summary
+
+* An attention layer explicitly selects related information.
+* An attention layer's memory consists of key-value pairs, so its output is close to the values whose keys are similar to the query.

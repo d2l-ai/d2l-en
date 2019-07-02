@@ -170,7 +170,7 @@ loss = gluon.loss.SoftmaxCrossEntropyLoss()
 d2l.train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs, ctx)
 ```
 
-Below, we use the trained model to the classify sentiments of two simple sentences.
+Below, we use the trained model to classify sentiments of two simple sentences.
 
 ```{.python .input}
 d2l.predict_sentiment(net, vocab, 'this movie is so great')
