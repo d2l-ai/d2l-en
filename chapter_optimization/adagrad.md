@@ -23,7 +23,7 @@ problems caused when a unified learning rate has to adapt to all dimensions.
 
 ## The Algorithm
 
-The Adadelta algorithm uses the cumulative variable $\boldsymbol{s}_t$ obtained from a square by element operation on the mini-batch stochastic gradient $\boldsymbol{g}_t$. At time step 0, Adagrad initializes each element in $\boldsymbol{s}_0$ to 0. At time step $t$, we first sum the results of the square by element operation for the mini-batch gradient $\boldsymbol{g}_t$ to get the variable $\boldsymbol{s}_t$:
+The Adagrad algorithm uses the cumulative variable $\boldsymbol{s}_t$ obtained from a square by element operation on the mini-batch stochastic gradient $\boldsymbol{g}_t$. At time step 0, Adagrad initializes each element in $\boldsymbol{s}_0$ to 0. At time step $t$, we first sum the results of the square by element operation for the mini-batch gradient $\boldsymbol{g}_t$ to get the variable $\boldsymbol{s}_t$:
 
 $$\boldsymbol{s}_t \leftarrow \boldsymbol{s}_{t-1} + \boldsymbol{g}_t \odot \boldsymbol{g}_t,$$
 

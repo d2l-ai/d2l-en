@@ -217,7 +217,7 @@ This holds for some $\xi_k \in [x_k - e_k, x_k]$. Recall that we have the update
 
 $$e_k - f'(x_k) / f''(x_k) = \frac{1}{2} e_k^2 f'''(\xi_k) / f'(x_k)$$ 
 
-Plugging in the update equations leads to the following bound $e_{k+1} \leq e_k^2 f'''(\xi_k) / f'(x_k)$. Consequently, whenever we are in a region of bounded $f'''(\xi_k) / f'(x_k) \leq c$, we have a quadratically decreasing error $e_{k+1}^2 \leq c e_k$. 
+Plugging in the update equations leads to the following bound $e_{k+1} \leq e_k^2 f'''(\xi_k) / f'(x_k)$. Consequently, whenever we are in a region of bounded $f'''(\xi_k) / f'(x_k) \leq c$, we have a quadratically decreasing error $e_{k+1} \leq c e_k^2$. 
 
 As an aside, optimization researchers call this *linear* convergence, whereas a condition such as $e_{k+1} \leq \alpha e_k$ would be called a *constant* rate of convergence. 
 Note that this analysis comes with a number of caveats: We don't really have much of a guarantee when we will reach the region of rapid convergence. Instead, we only know that once we reach it, convergence will be very quick. Second, this requires that $f$ is well-behaved up to higher order derivatives. It comes down to ensuring that $f$ doesn't have any 'surprising' properties in terms of how it might change its values. 
