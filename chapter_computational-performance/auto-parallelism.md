@@ -5,7 +5,7 @@ MXNet automatically constructs computational graphs at the back end. Using a
 computational graph, the system is aware of all the computational dependencies,
 and can selectively execute multiple non-interdependent tasks in parallel to
 improve computing performance. For instance, the first example in
-:numref:`chapter_async` executes `a = nd.ones((1, 2))` and `b = nd.ones((1, 2))`
+:numref:`chapter_async` executes `a = np.ones((1, 2))` and `b = np.ones((1, 2))`
 in turn. There is no dependency between these two steps, so the system can
 choose to execute them in parallel.
 
@@ -53,7 +53,7 @@ npx.waitall()
 print('Run on %s: %.4f sec' % (x_gpu.context, timer.stop()))
 ```
 
-We remove `nd.waitall()` between the two computing tasks `run(x_cpu)` and `run(x_gpu)` and hope the system can automatically parallel these two tasks.
+We remove `npx.waitall()` between the two computing tasks `run(x_cpu)` and `run(x_gpu)` and hope the system can automatically parallel these two tasks.
 
 ```{.python .input}
 timer.start()
