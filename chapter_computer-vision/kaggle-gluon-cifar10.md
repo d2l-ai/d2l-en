@@ -1,7 +1,7 @@
 # Image Classification (CIFAR-10) on Kaggle
 :label:`chapter_kaggle_cifar10`
 
-So far, we have been using Gluon's `data` package to directly obtain image data sets in NDArray format. In practice, however, image data sets often exist in the format of image files. In this section, we will start with the original image files and organize, read, and convert the files to NDArray format step by step.
+So far, we have been using Gluon's `data` package to directly obtain image data sets in the ndarray format. In practice, however, image data sets often exist in the format of image files. In this section, we will start with the original image files and organize, read, and convert the files to the ndarray format step by step.
 
 We performed an experiment on the CIFAR-10 data set in :numref:`chapter_image_augmentation`.
 This is an important data
