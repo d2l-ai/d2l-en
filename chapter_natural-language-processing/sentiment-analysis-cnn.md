@@ -127,7 +127,7 @@ class TextCNN(nn.Block):
         # convolutional layer, is transformed into the previous dimension
         embeddings = embeddings.transpose(0, 2, 1)
         # For each one-dimensional convolutional layer, after max-over-time
-        # pooling, an NDArray with the shape of (batch size, channel size, 1)
+        # pooling, an ndarray with the shape of (batch size, channel size, 1)
         # can be obtained. Use the flatten function to remove the last
         # dimension and then concatenate on the channel dimension
         encoding = np.concatenate([
@@ -171,7 +171,7 @@ loss = gluon.loss.SoftmaxCrossEntropyLoss()
 d2l.train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs, ctx)
 ```
 
-Below, we use the trained model to the classify sentiments of two simple sentences.
+Below, we use the trained model to classify sentiments of two simple sentences.
 
 ```{.python .input}
 d2l.predict_sentiment(net, vocab, 'this movie is so great')
