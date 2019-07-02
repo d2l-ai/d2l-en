@@ -149,9 +149,9 @@ def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
         for X in data_iter:
             batch_size = X.shape[0]
             Z = nd.random.normal(0, 1, shape=(batch_size, latent_dim))
-            metric.add(update_D(X, Z, net_D, net_G, loss, trainer_D),
+            metric.add([update_D(X, Z, net_D, net_G, loss, trainer_D),
                         update_G(Z, net_D, net_G, loss, trainer_G),
-                        batch_size)
+                        batch_size])
         # Visualize generated examples
         Z = nd.random.normal(0, 1, shape=(100, latent_dim))
         fake_X = net_G(Z).asnumpy()
