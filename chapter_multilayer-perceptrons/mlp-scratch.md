@@ -33,7 +33,7 @@ that could be set based on performance on validation data.
 Typically, we'll choose layer widths as powers of $2$
 to make everything align nicely in memory.
 
-Again, we will allocate several NDArrays to represent our parameters.
+Again, we will represent our parameters with several ndarrays.
 Note that we now have one weight matrix and one bias vector *per layer*.
 As always, we must call `attach_grad` to allocate memory for the gradients with respect to these parameters.
 
@@ -54,7 +54,7 @@ for param in params:
 
 To make sure we know how everything works,
 we will use the `maximum` function to implement ReLU ourselves,
-instead of invoking `nd.relu` directly.
+instead of invoking `npx.relu` directly.
 
 ```{.python .input  n=4}
 def relu(X):
