@@ -167,7 +167,7 @@ Consequently, BN behaves differently during training and at test time
 
 ## Implementation from Scratch
 
-Next, we will implement the batch normalization layer with NDArray from scratch:
+Next, we will implement the batch normalization layer with ndarrays from scratch:
 
 ```{.python .input  n=72}
 import d2l
