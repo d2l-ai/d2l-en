@@ -44,7 +44,7 @@ def masked_softmax(X, valid_length):
         else:
             valid_length = valid_length.reshape((-1,))
         # fill masked elements with a large negative, whose exp is 0
-        X = npx.SequenceMask(X.reshape((-1, shape[-1])), valid_length, True,
+        X = npx.sequence_mask(X.reshape((-1, shape[-1])), valid_length, True,
                             axis=1, value=-1e6)
         return npx.softmax(X).reshape(shape)
 ```
