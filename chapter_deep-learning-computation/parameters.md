@@ -156,7 +156,7 @@ print(net[0].weight.data()[0])
 
 ### Custom Initialization
 
-Sometimes, the initialization methods we need are not provided in the `init` module. At this point, we can implement a subclass of the `Initializer` class so that we can use it like any other initialization method. Usually, we only need to implement the `_init_weight` function and modify the incoming NDArray according to the initial result. In the example below, we  pick a decidedly bizarre and nontrivial distribution, just to prove the point. We draw the coefficients from the following distribution:
+Sometimes, the initialization methods we need are not provided in the `init` module. At this point, we can implement a subclass of the `Initializer` class so that we can use it like any other initialization method. Usually, we only need to implement the `_init_weight` function and modify the incoming ndarray according to the initial result. In the example below, we  pick a decidedly bizarre and nontrivial distribution, just to prove the point. We draw the coefficients from the following distribution:
 
 $$
 \begin{aligned}
@@ -179,7 +179,7 @@ net.initialize(MyInit(), force_reinit=True)
 net[0].weight.data()[0]
 ```
 
-If even this functionality is insufficient, we can set parameters directly. Since `data()` returns an NDArray we can access it just like any other matrix. A note for advanced users - if you want to adjust parameters within an `autograd` scope you need to use `set_data` to avoid confusing the automatic differentiation mechanics.
+If even this functionality is insufficient, we can set parameters directly. Since `data()` returns an ndarray we can access it just like any other matrix. A note for advanced users - if you want to adjust parameters within an `autograd` scope you need to use `set_data` to avoid confusing the automatic differentiation mechanics.
 
 ```{.python .input  n=13}
 net[0].weight.data()[:] += 1
