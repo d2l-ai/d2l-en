@@ -18,7 +18,7 @@ The output is then a weighted sum of the values
 
 $$\mathbf o = \sum_{i=1}^n b_i \mathbf v_i.$$
 
-Different choices of the score function lead to different attention layers. We will discuss two commonly used attention layers in the rest of this section. Before diving into the implementation, we first introduce a masked version of the softmax operator and explain a specialized dot operator `nd.batched_dot`.
+Different choices of the score function lead to different attention layers. We will discuss two commonly used attention layers in the rest of this section. Before diving into the implementation, we first introduce a masked version of the softmax operator and explain a specialized dot operator `npx.batched_dot`.
 
 ```{.python .input  n=1}
 import math
@@ -44,8 +44,8 @@ def masked_softmax(X, valid_length):
         else:
             valid_length = valid_length.reshape((-1,))
         # fill masked elements with a large negative, whose exp is 0
-        X = npx.sequence_mask(X.reshape((-1, shape[-1])), valid_length, True,
-                              axis=1, value=-1e6)
+        X = npx.SequenceMask(X.reshape((-1, shape[-1])), valid_length, True,
+                            axis=1, value=-1e6)
         return npx.softmax(X).reshape(shape)
 ```
 
@@ -55,7 +55,7 @@ Construct two examples, where each example is a 2-by-4 matrix, as the input. If 
 masked_softmax(np.random.uniform(size=(2,2,4)), np.array([2,3]))
 ```
 
-The operator `nd.batched_dot` takes two inputs $X$ and $Y$ with shapes $(b, n, m)$ and $(b, m, k)$, respectively. It computes $b$ dot products, with `Z[i,:,:]=dot(X[i,:,:], Y[i,:,:]` for $i=1,\ldots,n$.
+The operator `npx.batched_dot` takes two inputs $X$ and $Y$ with shapes $(b, n, m)$ and $(b, m, k)$, respectively. It computes $b$ dot products, with `Z[i,:,:]=dot(X[i,:,:], Y[i,:,:]` for $i=1,\ldots,n$.
 
 ```{.python .input  n=4}
 npx.batch_dot(np.ones((2,1,3)), np.ones((2,3,2)))
@@ -75,7 +75,7 @@ Now let's implement this layer that supports a batch of queries and key-value pa
 
 ```{.python .input  n=5}
 # Save to the d2l package.
-class DotProductAttention(nn.Block):
+class DotProductAttention(nn.Block): 
     def __init__(self, dropout, **kwargs):
         super(DotProductAttention, self).__init__(**kwargs)
         self.dropout = nn.Dropout(dropout)
