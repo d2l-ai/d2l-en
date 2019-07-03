@@ -15,6 +15,8 @@ stage("Build and Publish") {
       pip install git+https://github.com/d2l-ai/d2l-book
       python setup.py develop
       pip list
+      which rsvg-convert
+      rsvg-convert --version
       """
 
       sh label: "Check Execution Output", script: """set -ex
