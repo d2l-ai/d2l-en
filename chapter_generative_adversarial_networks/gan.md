@@ -180,4 +180,11 @@ train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G,
 * The generator generates the image as much closer to the true image as possible to fool the discriminator, via maximizing the cross entropy loss, i.e., $\max \log(D(\mathbf{x'}))$.
 * The discriminator tries to distinguish the generated images from the true images, via minimizing the cross entropy loss, i.e., $\min - y \log D(\mathbf{x}) - (1-y)\log(1-D(\mathbf{x}))$.
 
-## Reference
+## Exercises
+
+* Does an equilibrium exist where the generator wins, i.e. the discriminator ends up unable to distinguish the two distributions on finite samples?
+
+
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/)
+
+![](../img/qr_gan.svg)
