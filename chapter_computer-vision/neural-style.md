@@ -131,7 +131,7 @@ Style loss, similar to content loss, uses a square error function to measure the
 ```{.python .input  n=11}
 def gram(X):
     num_channels, n = X.shape[1], X.size // X.shape[1]
-    X = X.reshape((num_channels, n))
+    X = X.reshape(num_channels, n)
     return np.dot(X, X.T) / (num_channels * n)
 ```
 

@@ -136,7 +136,7 @@ when calling any of our favorite functions for instantiating an `ndarray`
 such as `ones`, or `zeros`.
 
 ```{.python .input}
-A = np.arange(20).reshape((5,4))
+A = np.arange(20).reshape(5,4)
 print(A)
 ```
 
@@ -157,7 +157,7 @@ Just as vectors generalize scalars, and matrices generalize vectors, we can actu
 Using tensors will become more important when we start working with images, which arrive as 3D data structures, with axes corresponding to the height, width, and the three (RGB) color channels. But in this chapter, we're going to skip this part and make sure you know the basics.
 
 ```{.python .input}
-X = np.arange(24).reshape((2, 3, 4))
+X = np.arange(24).reshape(2, 3, 4)
 print('X.shape =', X.shape)
 print('X =', X)
 ```

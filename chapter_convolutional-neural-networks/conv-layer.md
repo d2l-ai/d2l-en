@@ -202,8 +202,8 @@ conv2d.initialize()
 # The two-dimensional convolutional layer uses four-dimensional input and
 # output in the format of (example, channel, height, width), where the batch
 # size (number of examples in the batch) and the number of channels are both 1
-X = X.reshape((1, 1, 6, 8))
-Y = Y.reshape((1, 1, 6, 7))
+X = X.reshape(1, 1, 6, 8)
+Y = Y.reshape(1, 1, 6, 7)
 
 for i in range(10):
     with autograd.record():
@@ -219,7 +219,7 @@ for i in range(10):
 As you can see, the error has dropped to a small value after 10 iterations. Now we will take a look at the kernel array we learned.
 
 ```{.python .input}
-conv2d.weight.data().reshape((1, 2))
+conv2d.weight.data().reshape(1, 2)
 ```
 
 Indeed, the learned kernel array is remarkably close
