@@ -69,7 +69,7 @@ Finally, we cam implement our model with just a few lines of code.
 
 ```{.python .input  n=5}
 def net(X):
-    X = X.reshape((-1, num_inputs))
+    X = X.reshape(-1, num_inputs)
     H = relu(np.dot(X, W1) + b1)
     return np.dot(H, W2) + b2
 ```

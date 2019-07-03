@@ -180,7 +180,7 @@ We can also reshape any 1D array into a 2D ndarray by calling `ndarray`'s reshap
 
 ```python
 x = nd.arange(20)
-A = x.reshape((5, 4))
+A = x.reshape(5, 4)
 A
 ```
 
@@ -216,7 +216,7 @@ Using tensors will become more important when we start working with images, whic
 
 
 ```python
-X = nd.arange(24).reshape((2, 3, 4))
+X = nd.arange(24).reshape(2, 3, 4)
 print('X.shape =', X.shape)
 print('X =', X)
 ```
