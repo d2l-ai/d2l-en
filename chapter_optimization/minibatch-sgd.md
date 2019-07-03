@@ -129,7 +129,7 @@ d2l.plt.gca().set_xscale('log')
 
 ## Concise Implementation
 
-In Gluon, we can use the `Trainer` class to call optimization algorithms. Next, we are going to implement a generic training function that uses the optimization name `trainer name` and hyperparameter `trainer_hyperparameter` to create the instance `Trainer`.
+In Gluon, we can use the `Trainer` class to call optimization algorithms. Next, we are going to implement a generic training function that uses the optimization name `trainer_name` and hyperparameter `trainer_hyperparameter` to create the instance `Trainer`.
 
 ```{.python .input  n=9}
 # Save to the d2l package.

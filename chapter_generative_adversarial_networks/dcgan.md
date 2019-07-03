@@ -222,3 +222,18 @@ train(net_D, net_G, data_iter, num_epochs, lr, latent_dim)
 ```
 
 ## Summary
+
+* DCGAN architecture has four convolutional layers for the Discriminator and four “four fractionally-strided convolutions” layers for the Generator.
+* The Discriminator is a 4-layer strided convolutions with batch normalization (except its input layer) and leaky ReLU activations. 
+* Leaky ReLU is a nonlinear function that give a non-zero output for a negative input. It aims to fix the “dying ReLU” problem and helps the gradients flow easier through the architecture.
+
+
+## Exercises
+
+* What will happen if we use standard ReLU activation rather than leaky ReLU?
+* Apply DCGAN on Fashion-MNIST and see which category works well and which does not.
+
+
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/)
+
+![](../img/qr_dcgan.svg)
