@@ -15,8 +15,6 @@ stage("Build and Publish") {
       pip install git+https://github.com/d2l-ai/d2l-book
       python setup.py develop
       pip list
-      which rsvg-convert
-      rsvg-convert --version
       """
 
       sh label: "Check Execution Output", script: """set -ex
@@ -38,7 +36,9 @@ stage("Build and Publish") {
 
       sh label:"Build PDF", script:"""set -ex
       conda activate ${ENV_NAME}
-      d2lbook build pdf
+      which rsvg-convert
+      rsvg-convert --version
+      # d2lbook build pdf
       """
 
       sh label:"Build Package", script:"""set -ex
