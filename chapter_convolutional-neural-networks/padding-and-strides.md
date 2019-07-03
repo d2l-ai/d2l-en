@@ -102,7 +102,7 @@ def comp_conv2d(conv2d, X):
     conv2d.initialize()
     # (1,1) indicates that the batch size and the number of channels
     # (described in later chapters) are both 1
-    X = X.reshape(1, 1) + X.shape
+    X = X.reshape((1, 1) + X.shape)
     Y = conv2d(X)
     # Exclude the first two dimensions that do not interest us: batch and
     # channel
