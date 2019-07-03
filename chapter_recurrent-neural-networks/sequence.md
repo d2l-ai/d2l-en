@@ -152,7 +152,7 @@ predictions = np.zeros(T)
 predictions[:n_train] = x[:n_train]
 for i in range(n_train, T):
     predictions[i] = net(
-        predictions[(i-tau):i].reshape((1,-1))).reshape(1)
+        predictions[(i-tau):i].reshape(1,-1)).reshape(1)
 d2l.plot([time, time[tau:], time[n_train:]],
          [x, estimates, predictions[n_train:]],
          legend=['data', 'estimate', 'multistep'], figsize=(4.5, 2.5))

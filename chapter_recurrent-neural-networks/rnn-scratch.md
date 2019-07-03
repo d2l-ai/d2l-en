@@ -27,7 +27,7 @@ npx.one_hot(np.array([0, 2]), len(vocab))
 The shape of the mini-batch we sample each time is (batch size, time step). The `one_hot` function transforms such a mini-batch into a 3-D tensor with the last dimension equals to the vocabulary size. We often transpose the input so that we will obtain a (time step, batch size, vocabulary size) output that fits into a sequence model easier.
 
 ```{.python .input  n=18}
-X = np.arange(10).reshape((2, 5))
+X = np.arange(10).reshape(2, 5)
 npx.one_hot(X.T, 28).shape
 ```
 
@@ -123,7 +123,7 @@ We first explain the predicting function so we can regularly check the predictio
 def predict_ch8(prefix, num_predicts, model, vocab, ctx):
     state = model.begin_state(batch_size=1, ctx=ctx)
     outputs = [vocab[prefix[0]]]
-    get_input = lambda: np.array([outputs[-1]], ctx=ctx).reshape((1, 1))
+    get_input = lambda: np.array([outputs[-1]], ctx=ctx).reshape(1, 1)
     for y in prefix[1:]:  # Warmup state with prefix
         _, state = model(get_input(), state)
         outputs.append(vocab[y])
@@ -194,7 +194,7 @@ def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):
             state = model.begin_state(batch_size=X.shape[0], ctx=ctx)
         else:
             for s in state: s.detach()
-        y = Y.T.reshape((-1,))
+        y = Y.T.reshape(-1)
         X, y = X.as_in_context(ctx), y.as_in_context(ctx)
         with autograd.record():
             py, state = model(X, state)
