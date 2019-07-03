@@ -1,7 +1,7 @@
 # Generative Adversarial Networks
 :label:`chapter_basic_gan`
 
-Throughout most of this book, we've talked about how to make predictions. In some form or another, we used deep neural networks to learn mappings from data points to labels. This kind of learning is called discriminative learning, as in, we'd like to be able to discriminate between photos of cats and photos of dogs. Classifiers and regressors are both examples of discriminative learning. And neural networks trained by backpropagation have upended everything we thought we knew about discriminative learning on large complicated datasets. Classification accuracies on high-res images has gone from useless to human-level (with some caveats) in just 5-6 years. We'll spare you another spiel about all the other discriminative tasks where deep neural networks do astoundingly well.
+Throughout most of this book, we've talked about how to make predictions. In some form or another, we used deep neural networks learned mappings from data points to labels. This kind of learning is called discriminative learning, as in, we'd like to be able to discriminate between photos cats and photos of dogs. Classifiers and regressors are both examples of discriminative learning. And neural networks trained by backpropagation have upended everything we thought we knew about discriminative learning on large complicated datasets. Classification accuracies on high-res images has gone from useless to human-level (with some caveats) in just 5-6 years. We'll spare you another spiel about all the other discriminative tasks where deep neural networks do astoundingly well.
 
 But there's more to machine learning than just solving discriminative tasks. For example, given a large dataset, without any labels, we might want to learn a model that concisely captures the characteristics of this data. Given such a model, we could sample synthetic data points that resemble the distribution of the training data. For example, given a large corpus of photographs of faces, we might want to be able to generate a new photorealistic image that looks like it might plausibly have come from the same dataset. This kind of learning is called generative modeling.
 
@@ -180,4 +180,11 @@ train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G,
 * The generator generates the image as much closer to the true image as possible to fool the discriminator, via maximizing the cross entropy loss, i.e., $\max \log(D(\mathbf{x'}))$.
 * The discriminator tries to distinguish the generated images from the true images, via minimizing the cross entropy loss, i.e., $\min - y \log D(\mathbf{x}) - (1-y)\log(1-D(\mathbf{x}))$.
 
-## Reference
+## Exercises
+
+* Does an equilibrium exist where the generator wins, i.e. the discriminator ends up unable to distinguish the two distributions on finite samples?
+
+
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/)
+
+![](../img/qr_gan.svg)
