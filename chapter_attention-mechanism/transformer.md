@@ -98,18 +98,18 @@ Here are the definitions of the transpose functions.
 def transpose_qkv(X, num_heads):
     # Shape after reshape: (batch_size, num_items, num_heads, p)
     # -1 means inferring its value
-    X = X.reshape((X.shape[0], X.shape[1], num_heads, -1))
+    X = X.reshape(X.shape[0], X.shape[1], num_heads, -1)
     # Swap the num_items and the num_heads dimensions
     X = X.transpose(0, 2, 1, 3)
     # Merge the first two dimensions. Use reverse=True to infer
     # shape from right to left
-    return X.reshape((-1, X.shape[2], X.shape[3]))
+    return X.reshape(-1, X.shape[2], X.shape[3])
 
 def transpose_output(X, num_heads):
     # A reversed version of transpose_qkv
-    X = X.reshape((-1, num_heads, X.shape[1], X.shape[2]))
+    X = X.reshape(-1, num_heads, X.shape[1], X.shape[2])
     X = X.transpose(0, 2, 1, 3)
-    return X.reshape((X.shape[0], X.shape[1], -1))
+    return X.reshape(X.shape[0], X.shape[1], -1)
 ```
 
 Create a multi-head attention with the output size $d_o$ equals to 100, the output will share the same batch size and sequence length as the input, but the last dimension will be equal to $d_o$.
@@ -201,7 +201,7 @@ class PositionalEncoding(nn.Block):
         self.dropout = nn.Dropout(dropout)
         # Create a long enougn P
         self.P = np.zeros((1, max_len, units))
-        X = np.arange(0, max_len).reshape((-1,1)) / np.power(
+        X = np.arange(0, max_len).reshape(-1,1) / np.power(
             10000, np.arange(0, units, 2)/units)
         self.P[:, :, 0::2] = np.sin(X)
         self.P[:, :, 1::2] = np.cos(X)

@@ -58,7 +58,7 @@ class RNNModel(nn.Block):
         # The fully connected layer will first change the shape of Y to
         # (num_steps * batch_size, num_hiddens)
         # Its output shape is (num_steps * batch_size, vocab_size)
-        output = self.dense(Y.reshape((-1, Y.shape[-1])))
+        output = self.dense(Y.reshape(-1, Y.shape[-1]))
         return output, state
 
     def begin_state(self, *args, **kwargs):
