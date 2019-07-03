@@ -218,7 +218,7 @@ In the following lines of code, we pass our input `X`
 through the dropout operation, with probabilities 0, 0.5, and 1, respectively.
 
 ```{.python .input  n=2}
-X = np.arange(16).reshape((2, 8))
+X = np.arange(16).reshape(2, 8)
 print(dropout(X, 0))
 print(dropout(X, 0.5))
 print(dropout(X, 1))
@@ -262,7 +262,7 @@ The model defined below concatenates the fully-connected layer
 drop_prob1, drop_prob2 = 0.2, 0.5
 
 def net(X):
-    X = X.reshape((-1, num_inputs))
+    X = X.reshape(-1, num_inputs)
     H1 = npx.relu(np.dot(X, W1) + b1)
     # Use dropout only when training the model
     if autograd.is_training():

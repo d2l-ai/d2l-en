@@ -190,10 +190,10 @@ to the data shape before and after the matrix multiplication.
 def corr2d_multi_in_out_1x1(X, K):
     c_i, h, w = X.shape
     c_o = K.shape[0]
-    X = X.reshape((c_i, h * w))
-    K = K.reshape((c_o, c_i))
+    X = X.reshape(c_i, h * w)
+    K = K.reshape(c_o, c_i)
     Y = np.dot(K, X)  # Matrix multiplication in the fully connected layer
-    return Y.reshape((c_o, h, w))
+    return Y.reshape(c_o, h, w)
 ```
 
 When performing $1\times 1$ convolution,
