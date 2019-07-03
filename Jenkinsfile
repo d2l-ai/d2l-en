@@ -55,7 +55,7 @@ stage("Build and Publish") {
       if (env.BRANCH_NAME == 'numpy2') {
         sh label:"Publish", script:"""set -ex
         conda activate ${ENV_NAME}
-        d2lbook deploy html pdf pkg
+        d2lbook deploy html pkg # pdf
       """
       }
 	}
