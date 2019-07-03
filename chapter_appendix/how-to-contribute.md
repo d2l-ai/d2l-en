@@ -37,23 +37,34 @@ To clone the repository (i.e. to make a local copy) we need to get its repositor
 git clone https://github.com/your_github_username/d2l-en.git
 ```
 
-On Unix the above command copies all the code from GitHub to the directory `d2l-en`.
+Please note we will need to contribute to the **numpy2** branch. Hence, we will need checkout `origin/numpy2` manually.
+
+```
+cd d2l-en
+git checkout -b numpy2 origin/numpy2
+git status
+```
+
+Now, we are at `numpy2` branch where nothing has been changed.
+```
+mylaptop:d2l-en smola$ git status
+On branch numpy2
+Your branch is up to date with 'origin/numpy2'.
+
+nothing to commit, working tree clean
+```
 
 ### Edit the Book and Push
 
 Now it's time to edit the book. It's best to edit the notebooks in Jupyter following instructions in :numref:`chapter_jupyter`. Make the changes and check that they're OK. Assume we have modified a typo in the file `~/d2l-en/chapter_appendix/how-to-contribute.md`.
 You can then check which files you have changed:
 
-```
-git status
-```
-
 At this point Git will prompt that the `chapter_appendix/how-to-contribute.md` file has been modified.
 
 ```
 mylaptop:d2l-en smola$ git status
-On branch master
-Your branch is up-to-date with 'origin/master'.
+On branch numpy2
+Your branch is up-to-date with 'origin/numpy2'.
 
 Changes not staged for commit:
   (use "git add <file>..." to update what will be committed)
