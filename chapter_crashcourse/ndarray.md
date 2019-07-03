@@ -40,12 +40,12 @@ We use the `reshape` function to change the shape of one (possibly multi-dimensi
 For example, we can transform the shape of our line vector `x` to (3, 4), which contains the same values but interprets them as a matrix containing 3 rows and 4 columns. Note that although the shape has changed, the elements in `x` have not. Moreover, the `size` remains the same.
 
 ```{.python .input  n=3}
-x = x.reshape((3, 4))
+x = x.reshape(3, 4)
 x
 ```
 
 Reshaping by manually specifying each of the dimensions can get annoying. Once we know one of the dimensions, why should we have to perform the division ourselves to determine the other? For example, above, to get a matrix with 3 rows, we had to specify that it should have 4 columns (to account for the 12 elements). Fortunately, ndarray can automatically work out one dimension given the other. We can invoke this capability by placing `-1` for the dimension that we would like ndarray to automatically infer. In our case, instead of
-`x.reshape((3, 4))`, we could have equivalently used `x.reshape((-1, 4))` or `x.reshape((3, -1))`.
+`x.reshape(3, 4)`, we could have equivalently used `x.reshape(-1, 4)` or `x.reshape(3, -1)`.
 
 ```{.python .input}
 np.empty((3, 4))
@@ -103,7 +103,7 @@ np.exp(x)
 In addition to computations by element, we can also perform matrix operations, like matrix multiplication using the `dot` function. Next, we will perform matrix multiplication of `x` and the transpose of `y`. We define `x` as a matrix of 3 rows and 4 columns, and `y` is transposed into a matrix of 4 rows and 3 columns. The two matrices are multiplied to obtain a matrix of 3 rows and 3 columns (if you are confused about what this means, do not worry - we will explain matrix operations in much more detail in :numref:`chapter_linear_algebra`).
 
 ```{.python .input  n=13}
-x = np.arange(12).reshape((3,4))
+x = np.arange(12).reshape(3,4)
 y = np.array([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 np.dot(x, y.T)
 ```
@@ -133,8 +133,8 @@ For stylistic convenience, we can write `y.exp()`, `x.sum()`, `x.norm()`, etc. a
 In the above section, we saw how to perform operations on two ndarrays of the same shape. When their shapes differ, a broadcasting mechanism may be triggered: first, copy the elements appropriately so that the two ndarrays have the same shape, and then carry out operations by element.
 
 ```{.python .input  n=14}
-a = np.arange(3).reshape((3, 1))
-b = np.arange(2).reshape((1, 2))
+a = np.arange(3).reshape(3, 1)
+b = np.arange(2).reshape(1, 2)
 print('a : ', a)
 print('b : ', b)
 ```

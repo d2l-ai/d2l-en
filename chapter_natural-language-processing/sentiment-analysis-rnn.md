@@ -112,7 +112,7 @@ Finally, define the prediction function.
 # Save to the d2l package.
 def predict_sentiment(net, vocab, sentence):
     sentence = np.array(vocab[sentence.split()], ctx=d2l.try_gpu())
-    label = np.argmax(net(sentence.reshape((1, -1))), axis=1)
+    label = np.argmax(net(sentence.reshape(1, -1)), axis=1)
     return 'positive' if label == 1 else 'negative'
 ```
 

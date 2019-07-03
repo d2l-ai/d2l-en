@@ -44,7 +44,7 @@ trans_conv(X, K)
 Or we can use `nn.Conv2DTranspose` to obtain the same results. As `nn.Conv2D`, both input and kernel should be 4-D tensors.
 
 ```{.python .input  n=17}
-X, K = X.reshape((1, 1, 2, 2)),  K.reshape((1, 1, 2, 2))
+X, K = X.reshape(1, 1, 2, 2),  K.reshape(1, 1, 2, 2)
 tconv = nn.Conv2DTranspose(1, kernel_size=2)
 tconv.initialize(init.Constant(K))
 tconv(X)

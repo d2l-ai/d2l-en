@@ -138,7 +138,7 @@ Now on to slightly more difficult things $P_{xy}$. Since we picked black and whi
 n_x = np.zeros((10, 28, 28))
 for y in range(10):
     n_x[y] = np.array(X.asnumpy()[Y.asnumpy()==y].sum(axis=0))
-P_xy = (n_x+1) / (n_y+1).reshape((10,1,1))
+P_xy = (n_x+1) / (n_y+1).reshape(10,1,1)
 
 show_images(P_xy, 2, 5);
 ```
@@ -155,7 +155,7 @@ np.expand_dims?
 def bayes_pred(x):
     x = np.expand_dims(x, axis=0)  # (28, 28) -> (1, 28, 28)
     p_xy = P_xy * x + (1-P_xy)*(1-x)
-    p_xy = p_xy.reshape((10,-1)).prod(axis=1) # p(x|y)
+    p_xy = p_xy.reshape(10,-1).prod(axis=1) # p(x|y)
     return np.array(p_xy) * P_y
 
 image, label = mnist_test[0]
@@ -187,7 +187,7 @@ log_P_y = np.log(P_y)
 def bayes_pred_stable(x):
     x = np.expand_dims(x, axis=0)  # (28, 28) -> (1, 28, 28)
     p_xy = log_P_xy * x + log_P_xy_neg * (1-x)
-    p_xy = p_xy.reshape((10,-1)).sum(axis=1) # p(x|y)
+    p_xy = p_xy.reshape(10,-1).sum(axis=1) # p(x|y)
     return p_xy + log_P_y
 
 py = bayes_pred_stable(image)

@@ -64,7 +64,7 @@ def lenet(X, params):
     h2_activation = npx.relu(h2_conv)
     h2 = npx.pooling(data=h2_activation, pool_type='avg', kernel=(2, 2),
                     stride=(2, 2))
-    h2 = h2.reshape((h2.shape[0], -1))
+    h2 = h2.reshape(h2.shape[0], -1)
     h3_linear = np.dot(h2, params[4]) + params[5]
     h3 = npx.relu(h3_linear)
     y_hat = np.dot(h3, params[6]) + params[7]
@@ -120,7 +120,7 @@ The `utils` module in Gluon provides a function to evenly split an array into mu
 Now, we try to divide the 6 data instances equally between 2 GPUs using the `split_and_load` function.
 
 ```{.python .input  n=8}
-data = np.arange(24).reshape((6, 4))
+data = np.arange(24).reshape(6, 4)
 ctx = d2l.try_all_gpus()
 splitted = gluon.utils.split_and_load(data, ctx)
 print('input: ', data)

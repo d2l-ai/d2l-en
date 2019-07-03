@@ -439,9 +439,9 @@ true_w[0:4] = np.array([5, 1.2, -3.4, 5.6])
 
 features = np.random.normal(size=(n_train + n_test, 1))
 features = np.random.shuffle(features)
-poly_features = np.power(features, np.arange(maxdegree).reshape((1, -1)))
+poly_features = np.power(features, np.arange(maxdegree).reshape(1, -1))
 poly_features = poly_features / (
-    npx.gamma(np.arange(maxdegree) + 1).reshape((1, -1)))
+    npx.gamma(np.arange(maxdegree) + 1).reshape(1, -1))
 labels = np.dot(poly_features, true_w)
 labels += np.random.normal(scale=0.1, size=labels.shape)
 ```

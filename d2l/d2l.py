@@ -259,7 +259,7 @@ def predict_ch3(net, test_iter, n=6):
     trues = d2l.get_fashion_mnist_labels(y)
     preds = d2l.get_fashion_mnist_labels(net(X).argmax(axis=1))
     titles = [true+'\n'+ pred for true, pred in zip(trues, preds)]
-    d2l.show_images(X[0:n].reshape((n,28,28)), 1, n, titles=titles[0:n])
+    d2l.show_images(X[0:n].reshape(n,28,28), 1, n, titles=titles[0:n])
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/underfit-overfit.md
@@ -454,7 +454,7 @@ def seq_data_iter_consecutive(corpus, batch_size, num_steps):
     num_indices = ((len(corpus) - offset - 1) // batch_size) * batch_size
     Xs = np.array(corpus[offset:offset+num_indices])
     Ys = np.array(corpus[offset+1:offset+1+num_indices])
-    Xs, Ys = Xs.reshape((batch_size, -1)), Ys.reshape((batch_size, -1))
+    Xs, Ys = Xs.reshape(batch_size, -1), Ys.reshape(batch_size, -1)
     num_batches = Xs.shape[1] // num_steps
     for i in range(0, num_batches * num_steps, num_steps):
         X = Xs[:,i:(i+num_steps)]
@@ -502,7 +502,7 @@ class RNNModelScratch(object):
 def predict_ch8(prefix, num_predicts, model, vocab, ctx):
     state = model.begin_state(batch_size=1, ctx=ctx)
     outputs = [vocab[prefix[0]]]
-    get_input = lambda: np.array([outputs[-1]], ctx=ctx).reshape((1, 1))
+    get_input = lambda: np.array([outputs[-1]], ctx=ctx).reshape(1, 1)
     for y in prefix[1:]:  # Warmup state with prefix
         _, state = model(get_input(), state)
         outputs.append(vocab[y])
@@ -533,7 +533,7 @@ def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):
             state = model.begin_state(batch_size=X.shape[0], ctx=ctx)
         else:
             for s in state: s.detach()
-        y = Y.T.reshape((-1,))
+        y = Y.T.reshape(-1)
         X, y = X.as_in_context(ctx), y.as_in_context(ctx)
         with autograd.record():
             py, state = model(X, state)
@@ -584,7 +584,7 @@ class RNNModel(nn.Block):
         # The fully connected layer will first change the shape of Y to
         # (num_steps * batch_size, num_hiddens)
         # Its output shape is (num_steps * batch_size, vocab_size)
-        output = self.dense(Y.reshape((-1, Y.shape[-1])))
+        output = self.dense(Y.reshape(-1, Y.shape[-1]))
         return output, state
 
     def begin_state(self, *args, **kwargs):
@@ -790,9 +790,9 @@ def masked_softmax(X, valid_length):
         if valid_length.ndim == 1:
             valid_length = valid_length.repeat(shape[1], axis=0)
         else:
-            valid_length = valid_length.reshape((-1,))
+            valid_length = valid_length.reshape(-1)
         # fill masked elements with a large negative, whose exp is 0
-        X = npx.sequence_mask(X.reshape((-1, shape[-1])), valid_length, True,
+        X = npx.sequence_mask(X.reshape(-1, shape[-1]), valid_length, True,
                               axis=1, value=-1e6)
         return npx.softmax(X).reshape(shape)
 
@@ -1262,7 +1262,7 @@ def batchify(data):
         contexts_negatives += [context + negative + [0] * (max_len - cur_len)]
         masks += [[1] * cur_len + [0] * (max_len - cur_len)]
         labels += [[1] * len(context) + [0] * (max_len - len(context))]
-    return (np.array(centers).reshape((-1, 1)), np.array(contexts_negatives),
+    return (np.array(centers).reshape(-1, 1), np.array(contexts_negatives),
             np.array(masks), np.array(labels))
 
 # Defined in file: ./chapter_natural-language-processing/word2vec-data-set.md
@@ -1320,7 +1320,7 @@ def load_data_imdb(batch_size, num_steps=500):
 # Defined in file: ./chapter_natural-language-processing/sentiment-analysis-rnn.md
 def predict_sentiment(net, vocab, sentence):
     sentence = np.array(vocab[sentence.split()], ctx=d2l.try_gpu())
-    label = np.argmax(net(sentence.reshape((1, -1))), axis=1)
+    label = np.argmax(net(sentence.reshape(1, -1)), axis=1)
     return 'positive' if label == 1 else 'negative'
 
 # Defined in file: ./chapter_generative_adversarial_networks/gan.md

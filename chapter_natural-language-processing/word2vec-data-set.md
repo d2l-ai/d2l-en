@@ -208,7 +208,7 @@ def batchify(data):
         contexts_negatives += [context + negative + [0] * (max_len - cur_len)]
         masks += [[1] * cur_len + [0] * (max_len - cur_len)]
         labels += [[1] * len(context) + [0] * (max_len - len(context))]
-    return (np.array(centers).reshape((-1, 1)), np.array(contexts_negatives),
+    return (np.array(centers).reshape(-1, 1), np.array(contexts_negatives),
             np.array(masks), np.array(labels))
 ```
 

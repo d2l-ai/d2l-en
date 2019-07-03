@@ -141,7 +141,7 @@ We first construct an input data of shape `(1, 1, 4, 4)`,
 where the first two dimensions are batch and channel.
 
 ```{.python .input  n=15}
-X = np.arange(16).reshape((1, 1, 4, 4))
+X = np.arange(16).reshape(1, 1, 4, 4)
 X
 ```
 

@@ -43,9 +43,9 @@ def masked_softmax(X, valid_length):
         if valid_length.ndim == 1:
             valid_length = valid_length.repeat(shape[1], axis=0)
         else:
-            valid_length = valid_length.reshape((-1,))
+            valid_length = valid_length.reshape(-1)
         # fill masked elements with a large negative, whose exp is 0
-        X = npx.sequence_mask(X.reshape((-1, shape[-1])), valid_length, True, axis=1, value=-1e6)
+        X = npx.sequence_mask(X.reshape(-1, shape[-1]), valid_length, True, axis=1, value=-1e6)
         return npx.softmax(X).reshape(shape)
 ```
 
@@ -98,7 +98,7 @@ Now we create two batches, and each batch has one query and 10 key-value pairs. 
 atten = DotProductAttention(dropout=0.5)
 atten.initialize()
 keys = np.ones((2,10,2))
-values = np.arange(40).reshape((1,10,4)).repeat(2,axis=0)
+values = np.arange(40).reshape(1,10,4).repeat(2,axis=0)
 atten(np.ones((2,1,2)), keys, values, np.array([2, 6]))
 ```
 

@@ -64,7 +64,7 @@ seeking analogies, we encapsulate this part of the logic separately in the `knn`
 ```{.python .input}
 def knn(W, x, k):
     # The added 1e-9 is for numerical stability
-    cos = np.dot(W, x.reshape((-1,))) / (
+    cos = np.dot(W, x.reshape(-1,)) / (
         np.sqrt(np.sum(W * W, axis=1) + 1e-9) * np.sqrt((x * x).sum()))
     topk = npx.topk(cos, k=k, ret_typ='indices')
     return topk, [cos[int(i)] for i in topk]

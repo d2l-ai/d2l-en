@@ -207,7 +207,7 @@ def seq_data_iter_consecutive(corpus, batch_size, num_steps):
     num_indices = ((len(corpus) - offset - 1) // batch_size) * batch_size
     Xs = np.array(corpus[offset:offset+num_indices])
     Ys = np.array(corpus[offset+1:offset+1+num_indices])
-    Xs, Ys = Xs.reshape((batch_size, -1)), Ys.reshape((batch_size, -1))
+    Xs, Ys = Xs.reshape(batch_size, -1), Ys.reshape(batch_size, -1)
     num_batches = Xs.shape[1] // num_steps
     for i in range(0, num_batches * num_steps, num_steps):
         X = Xs[:,i:(i+num_steps)]

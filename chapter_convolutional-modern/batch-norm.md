@@ -305,7 +305,7 @@ and the shift parameter `beta` learned
 from the first batch normalization layer.
 
 ```{.python .input  n=60}
-net[1].gamma.data().reshape((-1,)), net[1].beta.data().reshape((-1,))
+net[1].gamma.data().reshape(-1,), net[1].beta.data().reshape(-1,)
 ```
 
 ## Concise Implementation
