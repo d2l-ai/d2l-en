@@ -147,3 +147,12 @@ atten(np.ones((2,1,2)), keys, values, np.array([2, 6]))
 
 * An attention layer explicitly selects related information.
 * An attention layer's memory consists of key-value pairs, so its output is close to the values whose keys are similar to the query.
+
+## Exercises
+
+* What are the advantages and disadantages for DotProductAttention and MLPAttention, respectively?
+
+
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/attention/4343)
+
+![](../img/qr_attention.svg)
