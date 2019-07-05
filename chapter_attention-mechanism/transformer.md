@@ -399,3 +399,15 @@ for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
 * Position-wise feed-forward network equals to apply 2 $Conv(1,1)$ layers.
 * Layer normalization differs from batch normalization by normalizaing along the last dimension (the feature dimension) instead of the first (batchsize) dimension.
 * Positional encoding is the only place that adds positional information to the transformer model.
+
+
+## Exercises
+
+* Try a large size of epochs and compare the loss between seq2seq model and transformer model in earlier stage and later stage.
+* Can you think of another functions for positional encoding?
+* Compare layer normalization and batch normalization, what are the suitable scenarios to apply them?
+
+
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/attention/4344)
+
+![](../img/qr_transformer.svg)
