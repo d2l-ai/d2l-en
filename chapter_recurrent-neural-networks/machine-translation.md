@@ -146,7 +146,7 @@ for X, X_vlen, Y, Y_vlen, in train_iter:
 ## Summary
 
 * Machine translation (MT) refers to the automatic translation of a segment of text from one language to another. 
-* We read, preprocess and tokenize the datasets from both source language and target language.
+* We read, preprocess, and tokenize the datasets from both source language and target language.
 
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/machine-translation/2396)
