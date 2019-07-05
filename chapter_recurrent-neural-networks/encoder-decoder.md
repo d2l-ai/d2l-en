@@ -63,3 +63,15 @@ class EncoderDecoder(nn.Block):
 ```
 
 ## Summary
+
+* Machine translation (MT) refers to the automatic translation of a segment of text from one language to another. 
+* We read, preprocess and tokenize the datasets from both source language and target language.
+
+
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/encoder-decoder/2396)
+
+![](../img/qr_encoder-decoder.svg)
+
+
+
+
