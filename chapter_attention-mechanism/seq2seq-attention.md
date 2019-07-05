@@ -120,3 +120,12 @@ for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
 ## Summary
 
 * Seq2seq with attention adds an additional attention layer to use encoder’s outputs as memory and its output is used as part of decoder’s input.
+
+## Exercises
+
+* Compare Seq2SeqAttentionDecoder versus the standard Seq2seqDecoder. Use the same parameters and compare their losses.
+
+
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/seq2seq-attention/4345)
+
+![](../img/qr_seq2seq-attention.svg)
