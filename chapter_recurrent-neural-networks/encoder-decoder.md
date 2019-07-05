@@ -72,7 +72,3 @@ class EncoderDecoder(nn.Block):
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/encoder-decoder/2396)
 
 ![](../img/qr_encoder-decoder.svg)
-
-
-
-
