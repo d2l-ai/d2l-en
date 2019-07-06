@@ -1,13 +1,82 @@
 # Layers and Blocks
 :label:`chapter_model_construction`
 
-One of the key components that helped propel deep learning is powerful software. In an analogous manner to semiconductor design where engineers went from specifying transistors to logical circuits to writing code we now witness similar progress in the design of deep networks. The previous chapters have seen us move from designing single neurons to entire layers of neurons. However, even network design by layers can be tedious when we have 152 layers, as is the case in ResNet-152, which was proposed by [He et al.](https://www.cv-foundation.org/openaccess/content_cvpr_2016/papers/He_Deep_Residual_Learning_CVPR_2016_paper.pdf) in 2016 for computer vision problems.
-Such networks have a fair degree of regularity and they consist of *blocks* of repeated (or at least similarly designed) layers. These blocks then form the basis of more complex network designs. In short, blocks are combinations of one or more layers. This design is aided by code that generates such blocks on demand, just like a Lego factory generates blocks which can be combined to produce terrific artifacts.
 
-We start with very simple block, namely the block for a multilayer perceptron,
-such as the one we encountered in :numref:`chapter_mlp_gluon`.
-A common strategy
-would be to construct a two-layer network as follows:
+
+When we first started talking about neural networks,
+we introduced linear models with a single output.
+Here, the entire model consists of just a single neuron.
+By itself, a single neuron takes some set of inputs,
+generates a corresponding (*scalar*) output,
+and has a set of associated parameters that can be updated
+to optimize some objective function of interest. 
+Then, once we started thinking about networks with multiple outputs,
+we leveraged vectorized arithmetic, 
+we showed how we could use linear algebra
+to efficiently express an entire *layer* of neurons. 
+Layers too expect some inputs, generate corresponding outputs,
+and are described by a set of tunable parameters.
+
+When we worked through softmax regression,
+a single *layer* was itself *the model*.
+However, when we subsequently introduced multilayer perceptrons,
+we developed models consisting of multiple layers.
+One interesting property of multilayer neural networks
+is that the *entire model* and its *constituent layers*
+share the same basic structure. 
+The model takes the true inputs (as stated in the problem formulation),
+outputs predictions of the true outputs,
+and possesses parameters (the combined set of all parameters from all layers)
+Likewise any individual constituent layer in a multilayer perceptron
+ingests inputs (supplied by the previous layer)
+generates outputs (which form the inputs to the subsequent layer),
+and possesses a set of tunable parameters 
+tht are updated with respect to the ultimate objective 
+(using the signal that flows backwards through the subsequent layer).
+
+While you might think that neurons, layers, and models 
+give us enough abstractions to go about our business,
+it turns out that we'll often want to express our model
+in terms of a components that are large than an indivudal layer.
+For example, when designing models, like ResNet-152,
+which possess hundreds (152, thus the name) of layers,
+implementing the network one layer at a time can grow tedious.
+Moreover, this concern is not just hypothetical---such deep networks
+dominate numerous application areas, especally when training data is abundant. 
+For example the ResNet architecture mentioned above ([He et al.](https://www.cv-foundation.org/openaccess/content_cvpr_2016/papers/He_Deep_Residual_Learning_CVPR_2016_paper.pdf))
+won the 2015 ImageNet and COCO computer vision compeititions
+for both recognition and detection.
+Deep networks with many layers arranged into components
+with various repeating patterns are now ubiquitous in other domains
+including natural language processing and speech.
+
+To facilitate the implementation of networks consisting of components
+of arbitrary complecity, we introduce a new flexible concept: 
+a neural network *block*.
+A block could describe a single neuron, 
+a high-dimensional layer, 
+or an arbitrarily-complex component consisting of multiple layers.
+From a software development, a `Block` is a class.
+Any subclass of `Block` must define a method called `forward`
+that transforms its input into output,
+and must store any necessary parameters. 
+Note that some Blocks do not require any parameters at all!
+Finally a `Block` must possess a `backward` method,
+for purposes of calculating gradients.
+Fortunately, due to some behind-the-scenes magic 
+supplied by the autograd  `autograd` package 
+(introduced in :numref`chapter_crashcourse`)
+when defining our own `Block` typically requires
+only that we worry about parameters and the `forward` function.
+
+
+By defining code to generate Blocks of arbitrary complexity on demand,
+we can write surprisingly compact code 
+and still implement complex neural networks.
+
+To begin, we revisit the Blocks that played a role 
+in our implementation of the multilayer perceptron 
+in :numref:`chapter_mlp_gluon`:
 
 ```{.python .input  n=1}
 from mxnet import np, npx
@@ -23,7 +92,15 @@ net.initialize()
 net(x)
 ```
 
-This generates a network with a hidden layer of 256 units, followed by a ReLU activation and another 10 units governing the output. In particular, we used the `nn.Sequential` constructor to generate an empty network into which we then inserted both layers. What exactly happens inside `nn.Sequential` has remained rather mysterious so far. In the following we will see that this really just constructs a block. These blocks can be combined into larger artifacts, often recursively. The diagram below shows how:
+This code generates a network with a hidden layer of 256 units, 
+followed by a ReLU activation and another 10 units governing the output. 
+Note that we used the `nn.Sequential` constructor 
+to generate an empty network into which we then inserted both layers. 
+What exactly happens inside `nn.Sequential` 
+has remained rather mysterious so far. 
+In the following, we will see that this really just constructs a block. 
+These blocks can be combined into larger artifacts, often recursively. T
+he diagram below shows how:
 
 ![Multiple layers are combined into blocks](../img/blocks.svg)
 
