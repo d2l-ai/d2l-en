@@ -112,6 +112,6 @@ Your pull request will appear among the list of requests in the main repository.
 1. Find some code that needs improvement and submit a pull request.
 1. Find a reference that we missed and submit a pull request.
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2401)
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/how-to-contribute-to-this-book/2401)
 
 ![](../img/qr_how-to-contribute.svg)

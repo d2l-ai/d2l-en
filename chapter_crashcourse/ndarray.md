@@ -213,6 +213,11 @@ b = np.array(a)
 print(type(b))
 ```
 
+## Summary
+
+* We introduce N-dimensional array (ndarray) in MXNet, an extention of NumPy’s ndarray.
+* Ndarray contains a variety of functionalities such as basic mathematics operations, broadcasting, indexing, slicing, memory saving and loading. 
+
 ## Exercises
 
 1. Run the code in this section. Change the conditional statement `x == y` in this section to `x < y` or `x > y`, and then see what kind of ndarray you can get.
