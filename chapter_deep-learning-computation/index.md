@@ -1,8 +1,7 @@
 # Deep Learning Computation
 :label:`chapter_computation`
 
-
-Along side giant datasets and powerful hardware, 
+Alongside giant datasets and powerful hardware, 
 great software tools have played an indispensable role
 in the rapid progress of deep learning.
 Starting with the pathbreaking Theano library released in 2007, 
