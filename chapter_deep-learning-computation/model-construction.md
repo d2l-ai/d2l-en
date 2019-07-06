@@ -65,9 +65,16 @@ Finally a `Block` must possess a `backward` method,
 for purposes of calculating gradients.
 Fortunately, due to some behind-the-scenes magic 
 supplied by the autograd  `autograd` package 
-(introduced in :numref`chapter_crashcourse`)
+(introduced in :numref:`chapter_crashcourse`)
 when defining our own `Block` typically requires
 only that we worry about parameters and the `forward` function.
+
+
+One benefit of working with the `Block` abstraction is that 
+they can be combined into larger artifacts, often recursively,
+e.g., as illustrated in the following diagram:
+
+![Multiple layers are combined into blocks](../img/blocks.svg)
 
 
 By defining code to generate Blocks of arbitrary complexity on demand,
@@ -76,7 +83,17 @@ and still implement complex neural networks.
 
 To begin, we revisit the Blocks that played a role 
 in our implementation of the multilayer perceptron 
-in :numref:`chapter_mlp_gluon`:
+(:numref:`chapter_mlp_gluon`).
+The following code generates a network 
+with one fully-connected hidden layer containing 256 units
+followed by a ReLU activation,
+and then another fully-connected layer
+consisting of 10 units (with no activation function).
+Because there are no more layers, 
+this last 10-unit layer is regarded as the *output layer*
+and its outputs are also the model's output. 
+
+
 
 ```{.python .input  n=1}
 from mxnet import np, npx
@@ -92,29 +109,57 @@ net.initialize()
 net(x)
 ```
 
-This code generates a network with a hidden layer of 256 units, 
-followed by a ReLU activation and another 10 units governing the output. 
-Note that we used the `nn.Sequential` constructor 
-to generate an empty network into which we then inserted both layers. 
-What exactly happens inside `nn.Sequential` 
-has remained rather mysterious so far. 
-In the following, we will see that this really just constructs a block. 
-These blocks can be combined into larger artifacts, often recursively. T
-he diagram below shows how:
+In this example, as in previous chapters, 
+our model consists of an object returned by the `nn.Sequential` constructor.
+After instantiating a `nn.Sequential` and storing the `net` variable,
+we repeatedly called its `.add()` method,
+appending layers in the order that they should be executed. 
+We suspect that you might have already understood *more or less*
+what was going on here the first time you saw this code. 
+You may even have understood it well enough 
+to modify the code and design your own networks.
+However, the details regarding 
+what exactly happens inside `nn.Sequential` 
+have remained mysterious so far.
 
-![Multiple layers are combined into blocks](../img/blocks.svg)
+In short, `nn.Sequential` just defines a special kind of Block.
+Specifically, an `nn.Sequential` maintains a list of constitutent `Blocks`,
+stored in a particular order.
+You might think of `nnSequential` as your first meta-Block.
+The `add` method simply facilitates 
+the addition of each successive `Block` to the list. 
+Note that each our layers are instances of the `Dense` class
+which is itself a subclass of `Block`.
+The `forward` function is also remarkably simple:
+it chains each Block in the list together, 
+passing the output of each as the input to the next. 
 
-In the following we will explain the various steps needed to go from defining layers to defining blocks (of one or more layers). To get started we need a bit of reasoning about software. For most intents and purposes a block behaves very much like a fancy layer. That is, it provides the following functionality:
+Note that until now, we have been invoking our models
+via the construction `net(X)` to obtain their outputs.
+This is actually just shorthand for `net.forward(X)`,
+a slick Python trick achieved via the Block class's `__call__` function.
 
-1. It needs to ingest data (the input).
-1. It needs to produce a meaningful output. This is typically encoded in what we will call the `forward` function. It allows us to invoke a block via `net(X)` to obtain the desired output. What happens behind the scenes is that it invokes `forward` to perform forward propagation.
-1. It needs to produce a gradient with regard to its input when invoking `backward`. Typically this is automatic.
-1. It needs to store parameters that are inherent to the block. For instance, the block above contains two hidden layers, and we need a place to store parameters for it.
-1. Obviously it also needs to initialize these parameters as needed.
+
+Before we dive in to implementing our own custom `Block`,
+we briefly summarize the basic functionality that each `Block` must perform the following duties:
+
+1. Ingest input data as arguments to its `forward` function.
+1. Generate an output via the value returned by its `forward` function. Note that the output may have a different shape from the input. For example, the first Dense layer in our model above ingests an input of arbitrary dimension but returns an output of dimension 256. 
+1. Calculate the gradient of its output with respect to its input, which can be accessed via its `backward` method. Typically this happens automatically.
+1. Store and provide access to those parameters necessary to execute the `forward` computation.
+1. Initialize these parameters as needed.
 
 ## A Custom Block
 
-The `nn.Block` class provides the functionality required for much of what we need. It is a model constructor provided in the `nn` module, which we can inherit to define the model we want. The following inherits the Block class to construct the multilayer perceptron mentioned at the beginning of this section. The `MLP` class defined here overrides the `__init__` and `forward` functions of the Block class. They are used to create model parameters and define forward computations, respectively. Forward computation is also forward propagation.
+Perhaps the easiest way to develop intuition about how `nn.Block` works 
+is to just dive right in and implement one ourselves.
+In the following snippet, instead of relying on `nn.Sequential`,
+we just code up a Block from scratch that implements a multilayer perceptron with one hidden layer, 256 hidden nodes, and 10 outputs.
+
+Our `MLP` class below inherits the `Block` class. 
+While we rely on some predefined methods in the parent class,
+we need to supply our own `__init__` and `forward` functions
+to uniquely define the behavior of our model. 
 
 ```{.python .input  n=1}
 from mxnet.gluon import nn
@@ -137,9 +182,32 @@ class MLP(nn.Block):
         return self.output(self.hidden(x))
 ```
 
-Let's look at it a bit more closely. The `forward` method invokes a network simply by evaluating the hidden layer `self.hidden(x)` and subsequently by evaluating the output layer `self.output( ... )`. This is what we expect in the forward pass of this block.
 
-In order for the block to know what it needs to evaluate, we first need to define the layers. This is what the `__init__` method does. It first initializes all of the Block-related parameters and then constructs the requisite layers. This attached the corresponding layers and the required parameters to the class. Note that there is no need to define a backpropagation method in the class. The system automatically generates the `backward` method needed for back propagation by automatically finding the gradient. The same applies to the `initialize` method, which is generated automatically. Let's try this out:
+This code may be easiest to understand by working backwards from `forward`.
+Note that the `forward` method takes as input `x`.
+The forward method first evaluates `self.hidden(x)` 
+to produce the hidden representation, passing this output
+as the input to the output layer `self.output( ... )`. 
+
+The constituent layers of each `MLP` must be instance-level variables. 
+After all, if we instantiated two such models `net1` and `net2` 
+and trained them on different data, 
+we would expect them to them to represent two different learned models. 
+
+The `__init__` method is the most natural place to instantiate the layers 
+that we subsequently invoke on each call to the `forward` method.
+Note that before getting on with the interesting parts, 
+our customized `__init__` method must invoke the parent class's
+init method: `super(MLP, self).__init__(**kwargs)`
+to save us from reimplementing boilerplate code applicable to most Blocks. 
+Then, all that's left is to instantiate our two `Dense` layers,
+assigning them to `self.hidden` and `self.output`, respectively. 
+Again note that when dealing with standard functionality like this,
+we don't have to worry about backpropagation,
+since the `backward` method is generated for us automatically. 
+The same goes for the `initialize` method. 
+Let's try this out:
+
 
 ```{.python .input  n=2}
 net = MLP()
@@ -147,12 +215,29 @@ net.initialize()
 net(x)
 ```
 
-As explained above, the block class can be quite versatile in terms of what it does. For instance, its subclass can be a layer (such as the `Dense` class provided by Gluon), it can be a model (such as the `MLP` class we just derived), or it can be a part of a model (this is what typically happens when designing very deep networks). Throughout this chapter we will see how to use this with great flexibility.
+As we argued earlier, the primary virtue of the `Block` abstraction 
+is its versatility.
+We can subclass `Block` to create layers 
+(such as the `Dense` class provided by Gluon),
+entire models (such as the `MLP` class implemented above), 
+or various components of intermediate complexity,
+a pattern that we will lean on heavily throughout 
+the next chapters on convolutinoal neural networks. 
 
-## A Sequential Block
 
-The Block class is a generic component describing dataflow. In fact, the Sequential class is derived from the Block class: when the forward computation of the model is a simple concatenation of computations for each layer, we can define the model in a much simpler way. The purpose of the Sequential class is to provide some useful convenience functions. In particular, the `add` method allows us to add concatenated Block subclass instances one by one, while the forward computation of the model is to compute these instances one by one in the order of addition.
-Below, we implement a `MySequential` class that has the same functionality as the Sequential class. This may help you understand more clearly how the Sequential class works.
+## The Sequential Block
+
+As we described earlier, the `Sequential` class itself
+is also just a subclass of `Block`,
+designed specifically for daisy-chaining other Blocks together.
+All we need to do to implement our own `MySequential` block
+is to define a few convenience functions:
+1. An `add` method for appending Blocks one by one to a list.
+2. A `forward` method to pass inputs through the chain of Blocks
+(in the order of addition).
+
+The following `MySequential` class delivers the same functionality 
+as Gluon's default Sequential class:
 
 ```{.python .input  n=3}
 class MySequential(nn.Block):
@@ -185,9 +270,7 @@ net.initialize()
 net(x)
 ```
 
-Indeed, it is no different than It can observed here that the use of the
-`MySequential` class is no different from the use of the Sequential class
-described in :numref:`chapter_mlp_gluon`.
+Indeed, it can be observed that the use of the `MySequential` class is no different from the use of the Sequential class described in :numref:`chapter_mlp_gluon`.
 
 
 ## Blocks with Code
