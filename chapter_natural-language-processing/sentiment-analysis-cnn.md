@@ -157,7 +157,9 @@ glove_embedding = text.embedding.create(
     'glove', pretrained_file_name='glove.6B.100d.txt')
 embeds = glove_embedding.get_vecs_by_tokens(vocab.idx_to_token)
 net.embedding.weight.set_data(embeds)
-net.embedding.collect_params().setattr('grad_req', 'null')
+net.constant_embedding.weight.set_data(embeds)
+net.constant_embedding.collect_params().setattr('grad_req', 'null')
+
 ```
 
 ### Train and Evaluate the Model
