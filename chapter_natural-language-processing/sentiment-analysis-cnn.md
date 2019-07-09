@@ -159,6 +159,7 @@ embeds = glove_embedding.get_vecs_by_tokens(vocab.idx_to_token)
 net.embedding.weight.set_data(embeds)
 net.constant_embedding.weight.set_data(embeds)
 net.constant_embedding.collect_params().setattr('grad_req', 'null')
+
 ```
 
 ### Train and Evaluate the Model
