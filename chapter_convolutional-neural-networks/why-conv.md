@@ -65,7 +65,7 @@ due to the large number  of confounders.
 :label:`img_waldo`
 
 
-Back to images, the intuitions we have been discussion could be made more concrete yielding a few key principles for building neural networks for computer vision:
+Back to images, the intuitions we have been discussing could be made more concrete yielding a few key principles for building neural networks for computer vision:
 
 1. Our vision systems should, in some sense, respond similarly to the same object regardless of where it appears in the image (Translation Invariance)
 1. Our visions systems should, in some sense, focus on local regions, without regard for what else is happening in the image at greater distances. (Locality)
