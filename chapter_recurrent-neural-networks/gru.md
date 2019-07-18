@@ -26,7 +26,7 @@ gradient anomalies mean in practice:
   representation.
 
 A number of methods have been proposed to address this. One of the earliest is
-the Long Short Term Memory (LSTM) :cit:`Hochreiter.Schmidhuber.1997` which we
+the Long Short Term Memory (LSTM) :cite:`Hochreiter.Schmidhuber.1997` which we
 will discuss in :numref:`chapter_lstm`. The Gated Recurrent Unit (GRU)
 :cite:`Cho.Van-Merrienboer.Bahdanau.ea.2014` is a slightly more streamlined
 variant that often offers comparable performance and is significantly faster to

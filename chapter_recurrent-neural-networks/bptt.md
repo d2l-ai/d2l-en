@@ -134,7 +134,7 @@ A number of things follow from this potentially very intimidating expression. Fi
 ## Summary
 
 * Back-propagation through time is merely an application of backprop to sequence models with a hidden state.
-* Truncation is needed for computational convencient and numerical stability.
+* Truncation is needed for computational convenience and numerical stability.
 * High powers of matrices can lead top divergent and vanishing eigenvalues. This manifests itself in the form of exploding or vanishing gradients.
 * For efficient computation intermediate values are cached.
 

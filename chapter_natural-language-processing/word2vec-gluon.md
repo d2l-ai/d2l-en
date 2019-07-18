@@ -70,7 +70,7 @@ Before training the word embedding model, we need to define the loss function of
 
 ### Binary Cross Entropy Loss Function
 
-According to the definition of the loss function in negative sampling, we can directly use Gluon's binary cross entropy loss function `SigmoidBinaryCrossEntropyLoss`.
+According to the definition of the loss function in negative sampling, we can directly use Gluon's binary cross-entropy loss function `SigmoidBinaryCrossEntropyLoss`.
 
 ```{.python .input  n=19}
 loss = gluon.loss.SigmoidBinaryCrossEntropyLoss()

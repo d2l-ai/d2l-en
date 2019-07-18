@@ -32,7 +32,7 @@ The decoder has an additional method `init_state` to parse the outputs of the en
 ```{.python .input  n=3}
 # Save to the d2l package.
 class Decoder(nn.Block):
-    """The base decoder interface for the encoder-decoder archtecture."""
+    """The base decoder interface for the encoder-decoder architecture."""
     def __init__(self, **kwargs):
         super(Decoder, self).__init__(**kwargs)
 

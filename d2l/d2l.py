@@ -661,7 +661,7 @@ class Encoder(nn.Block):
 
 # Defined in file: ./chapter_recurrent-neural-networks/encoder-decoder.md
 class Decoder(nn.Block):
-    """The base decoder interface for the encoder-decoder archtecture."""
+    """The base decoder interface for the encoder-decoder architecture."""
     def __init__(self, **kwargs):
         super(Decoder, self).__init__(**kwargs)
 
