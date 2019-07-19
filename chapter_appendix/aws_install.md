@@ -11,7 +11,7 @@ This process applies to other instances (and other clouds), too, albeit with som
 
 ## Register Account and Log In
 
-First, we need to register an account at https://aws.amazon.com/. We strongly encourage you to use two-factor authentication for additional security. Furthermore, it is a good idea to set up detailed billing and spending alerts to avoid any unexpected surprises if you forget to suspend your computers. Note that you will need a credit card.
+Firstly, we need to register an account at https://aws.amazon.com/. We strongly encourage you to use two-factor authentication for additional security. Furthermore, it is a good idea to set up detailed billing and spending alerts to avoid any unexpected surprises if you forget to suspend your computers. Note that you will need a credit card.
 After logging into your AWS account, click "EC2" (marked by the red box in :numref:`fig_aws`) to go to the EC2 panel.
 
 ![ Open the EC2 console. ](../img/aws.png)
@@ -21,24 +21,40 @@ After logging into your AWS account, click "EC2" (marked by the red box in :numr
 
 ## Create and Run an EC2 Instance
 
-:numref:`fig_ec2` shows the EC2 panel with sensitive account information greyed out. Select a
-nearby data center to reduce latency, e.g. Oregon. If you are located in China
-you can select a nearby Asia Pacific region, such as Seoul or Tokyo. Please note
-that some data centers may not have GPU instances. Click the "Launch Instance"
-button marked by the red box in :numref:`fig_ec2` to launch your instance.
+:numref:`fig_ec2` shows the EC2 panel with sensitive account information greyed out. 
 
 ![ EC2 panel. ](../img/ec2.png)
 :width:`700px`
 :label:`fig_ec2`
 
-We begin by selecting a suitable AMI (AWS Machine Image). Search for **Ubuntu**:
+### Preset 1
+Select a nearby data center to reduce latency, e.g. **Oregon**. (marked by the red box in the top-right of :numref:`fig_ec2`) If you are located in China
+you can select a nearby Asia Pacific region, such as Seoul or Tokyo. Please note
+that some data centers may not have GPU instances. 
+
+### Preset 2
+Before choosing an instance, check if there are quantity 
+restrictions by clicking the **Limits** label in the bar on the left as shown in
+:numref:`fig_ec2`. :numref:`fig_limits` shows an example of such a
+limitation. The account currently cannot open "p2.xlarge" instance per region. If
+you need to open one or more instances, click on the **Request limit increase** link to
+apply for a higher instance quota. Generally, it takes one business day to
+process an application.
+
+![ Instance quantity restrictions. ](../img/limits.png)
+:width:`700px`
+:label:`fig_limits`
+
+
+### Launch Instance
+Next, click the "Launch Instance" button marked by the red box in :numref:`fig_ec2` to launch your instance.
+
+We begin by selecting a suitable AMI (AWS Machine Image). Enter **Ubuntu** in the search box (marked by the red box in :numref:`fig_ubuntu`):
 
 
 ![ Choose an operating system. ](../img/ubuntu_new.png)
 :width:`700px`
 :label:`fig_ubuntu`
-
-
 
 EC2 provides many different instance configurations to choose from. This can sometimes feel overwhelming to a beginner. Here's a table of suitable machines:
 
@@ -50,7 +66,7 @@ EC2 provides many different instance configurations to choose from. This can som
 | p3   | Volta V100  | high performance for FP16     |
 | g4   | Turing T4   | inference optimized FP16/INT8 |
 
-All the above servers come in multiple flavors indicating the number of GPUs used. E.g. a p2.xlarge has 1 GPU and a p2.16xlarge has 16 GPUs and more memory. For more details see e.g. the [AWS EC2 documentation](https://aws.amazon.com/ec2/instance-types/) or a [summary page](https://www.ec2instances.info). For the purpose of illustration a p2.xlarge will suffice.
+All the above servers come in multiple flavors indicating the number of GPUs used. E.g. a p2.xlarge has 1 GPU and a p2.16xlarge has 16 GPUs and more memory. For more details see e.g. the [AWS EC2 documentation](https://aws.amazon.com/ec2/instance-types/) or a [summary page](https://www.ec2instances.info). For the purpose of illustration, a p2.xlarge will suffice (marked in red box of :numref:`fig_p2x`).
 
 **Note:** you must use a GPU enabled instance with suitable drivers and a version of MXNet that is GPU enabled. Otherwise you will not see any benefit from using GPUs.
 
@@ -58,19 +74,7 @@ All the above servers come in multiple flavors indicating the number of GPUs use
 :width:`700px`
 :label:`fig_p2x`
 
-Before choosing an instance, we suggest you check if there are quantity
-restrictions by clicking the "Limits" label in the bar on the left as shown in
-:numref:`fig_p2x`. :numref:`fig_limits` shows an example of such a
-limitation. The account can only open one "p2.xlarge" instance per region. If
-you need to open more instances, click on the "Request limit increase" link to
-apply for a higher instance quota. Generally, it takes one business day to
-process an application.
-
-![ Instance quantity restrictions. ](../img/limits.png)
-:width:`700px`
-:label:`fig_limits`
-
-So far, we have finished the first two of seven steps for launching an EC2 instance, as shown on the top of Fig 14.13. In this example, we keep the default configurations for the steps "3. Configure Instance", "5. Add Tags", and "6. Configure Security Group". Tap on "4. Add Storage" and increase the default hard disk size to 64 GB. Note that CUDA by itself already takes up 4GB.
+So far, we have finished the first two of seven steps for launching an EC2 instance, as shown on the top of Fig 14.13. In this example, we keep the default configurations for the steps "3. Configure Instance", "5. Add Tags", and "6. Configure Security Group". Tap on "4. Add Storage" and increase the default hard disk size to 64 GB (marked in red box of :numref:`fig_disk`). Note that CUDA by itself already takes up 4GB.
 
 ![ Modify instance hard disk size. ](../img/disk.png)
 :width:`700px`
@@ -96,16 +100,14 @@ instance ID shown in :numref:`fig_launching` to view the status of this instance
 :width:`700px`
 :label:`fig_launching`
 
-![ View instance access and startup method. ](../img/connect.png)
-:width:`700px`
-:label:`fig_connect`
 
+### Connect Instance
 
 As shown in :numref:`fig_connect`, after the instance state turns green, right-click the instance and select `Connect` to view the instance access method. 
 
-![ View instance access and startup method. ](../img/chmod.png)
+![ View instance access and startup method. ](../img/connect.png)
 :width:`700px`
-:label:`chmod`
+:label:`fig_connect`
 
 If this is a new key, it must not be publicly viewable for SSH to work. Go to the folder where you store `D2L_key.pem` (*e.g.* Downloads folder) and make the key to be not publicly viewable.
 
@@ -114,7 +116,12 @@ cd /Downloads  ## if D2L_key.pem is stored in Downloads folder
 chmod 400 D2L_key.pem
 ```
 
-Now, enter the following in the command line:
+![ View instance access and startup method. ](../img/chmod.png)
+:width:`700px`
+:label:`fig_chmod`
+
+
+Now, copy the ssh command in the lower red box of :numref:`fig_chmod` and paste onto the command line:
 
 ```bash
 ssh -i "D2L_key.pem" ubuntu@ec2-xx-xxx-xxx-xxx.y.compute.amazonaws.com
@@ -122,23 +129,15 @@ ssh -i "D2L_key.pem" ubuntu@ec2-xx-xxx-xxx-xxx.y.compute.amazonaws.com
 
 When the command line prompts "Are you sure you want to continue connecting (yes/no)", enter "yes" and press Enter to log into the instance.
 
-It is a good idea to update the instance with the latest drivers.
-
-```bash
-sudo apt-get update
-sudo apt-get dist-upgrade
-```
-
 Your server is ready now.
+
 
 ## Installing CUDA
 
-Firstly, update and install the package needed for compilation.
+Before installing CUDA, be sure to update the instance with the latest drivers.
 
 ```bash
-sudo apt update
-sudo apt dist-upgrade
-sudo apt install -y build-essential git libgfortran3
+sudo apt-get update && sudo apt-get install -y build-essential git libgfortran3
 ```
 
 Here we download CUDA 10.1. Visit NVIDIA's official repository at (https://developer.nvidia.com/cuda-toolkit-archive) to find the download link of CUDA 10.1 as shown below.
@@ -147,24 +146,27 @@ Here we download CUDA 10.1. Visit NVIDIA's official repository at (https://devel
 :width:`700px`
 :label:`fig_cuda`
 
-Right click at `Download` and click `Copy Link Address`, then go back to terminal and enter the following command lines to install `CUDA 10.1` :
+Right click at `Download` and click `Copy Link Address` (as shown in :numref:`fig_cuda`), then go back to the terminal and paste onto the command line to install `CUDA 10.1` :
 
 ```bash
-# The download link and file name are subject to change, so always use those
-# from the NVIDIA website
-wget https://developer.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.168_418.67_linux.run 
 ## paste the copied link from CUDA website
+wget https://developer.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.168_418.67_linux.run 
 
 sudo sh cuda_10.1.168_418.67_linux.run
 ## this command line may take a while to run
 ```
 
-Enter `accept`  for the following inquiry.
+Enter `accept`  for the following inquiry as shown in :numref:`fig_cuda_accept`.
 
 ![ Accept EULA. ](../img/cuda_accept.png)
 :width:`700px`
 :label:`fig_cuda_accept`
 
+If the following image shows up, choose **install** and tap **Enter** as shown in :numref:`fig_cuda_install`.
+
+![ Install and Enter. ](../img/cuda_install.png)
+:width:`700px`
+:label:`fig_cuda_install`
 
 You may also need to answer the following questions.
 
@@ -195,11 +197,14 @@ Install the CUDA 10.1 Samples?
 (y)es/(n)o/(q)uit: n
 ```
 
-After installing the program, run the following command to view the instance GPU.
+After installing the program, run the following command to view the instance GPU (as shown in :numref:`fig_nvidia-smi`).
 
 ```bash
 nvidia-smi
 ```
+![ nvidia-smi. ](../img/nvidia-smi.png)
+:width:`700px`
+:label:`fig_nvidia-smi`
 
 Finally, add CUDA to the library path to help other libraries find it.
 
@@ -209,48 +214,51 @@ echo "export LD_LIBRARY_PATH=\${LD_LIBRARY_PATH}:/usr/local/cuda/lib64" >> ~/.ba
 
 ## Install MXNet and Download the D2L Notebooks
 
-First, install [Miniconda](https://conda.io/en/latest/miniconda.html) for Linux. 
+Firstly, to simplify the installation, you need to install [Miniconda](https://conda.io/en/latest/miniconda.html) for Linux. The download link and file name are subject to changes, so please go the Miniconda website and click **Copy Link Address** as shown in :numref:`fig_miniconda`.
 
 ![ Download Miniconda. ](../img/miniconda.png)
 :width:`700px`
 :label:`fig_miniconda`
 
 ```bash
-# The download link and file name are subject to change, so always use those
-# from the Miniconda website
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 sudo sh Miniconda3-latest-Linux-x86_64.sh
 ```
 
-Now, you need to answer the following questions:
+You need to answer the following questions:
 
 ```bash
 Do you accept the license terms? [yes|no]
 [no] >>> yes
-Do you wish the installer to prepend the Miniconda3 install location
-to PATH in your /home/ubuntu/.bashrc ? [yes|no]
-[no] >>> yes
+
+Miniconda3 will now be installed into this location:
+/home/ubuntu/miniconda3
+  - Press ENTER to confirm the location
+  - Press CTRL-C to abort the installation
+  - Or specify a different location below
+>>> <ENTER>
+
 Do you wish the installer to initialize Miniconda3
 by running conda init? [yes|no]
 [no] >>> yes
 ```
 
-After installation, run following code to activate CUDA and Conda. 
+After miniconda installation, run the following command to activate CUDA and Conda.
 
 ```bash
 source ~/.bashrc
 ```
 
-
-Next, download the code for this book and install and activate the Conda environment. To use GPUs you need to update MXNet to request the CUDA 10.1 build.
+Next, download the code for this book.
 
 ```bash
 sudo apt-get install unzip
 mkdir d2l-en && cd d2l-en
-wget https://www.d2l.ai/d2l-en.zip && unzip d2l-en.zip && rm d2l-en.zip
+wget http://numpy.d2l.ai/d2l-en.zip
+unzip d2l-en.zip && rm d2l-en.zip
 ```
 
-Now, create the conda `d2l` environment and enter `y` for the proceed inquiry.
+Then create the conda `d2l` environment and enter `y` for the proceed inquiry as shown in :numref:`fig_conda_create_d2l`.
 ```bash
 conda create --name d2l
 ```
@@ -261,14 +269,15 @@ conda create --name d2l
 
 After create `d2l` environment, activate it and install `pip`.
 ```bash
-conda activate d2l && conda install pip
+conda activate d2l
+conda install pip
 ```
 
 Finally, install `MXNet` and `d2l`.
 
 ```bash
 ## mxnet
-pip install https://apache-mxnet.s3-us-west-2.amazonaws.com/dist/python/numpy/latest/mxnet_cu100mkl-1.5.0-py2.py3-none-manylinux1_x86_64.whl
+pip install https://apache-mxnet.s3-us-west-2.amazonaws.com/dist/python/numpy/latest/mxnet_cu101mkl-1.5.0-py2.py3-none-manylinux1_x86_64.whl
 
 ## d2l
 pip install git+https://github.com/d2l-ai/d2l-en@numpy2
@@ -282,6 +291,7 @@ $ python
 >>> ctx = mx.gpu(0)
 >>> x = mx.ndarray.zeros(shape=(1024,1024), ctx=ctx)
 ```
+
 
 ## Running Jupyter
 
