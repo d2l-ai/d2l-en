@@ -37,7 +37,7 @@ that it typically takes to learn good hidden representations of images.
 Learning a binary classifier with so many parameters
 might seem to require that we collect an enormous dataset,
 perhaps comparable to the number of dogs and cats on the planet.
-And yet Yet both humans and computers are able to distinguish cats from dogs quite well, seemingly contradicting these conclusions.
+And yet both humans and computers are able to distinguish cats from dogs quite well, seemingly contradicting these conclusions.
 That's because images exhibit rich structure
 that is typically exploited by humans and machine learning models alike.
 
@@ -214,7 +214,7 @@ corresponding to each spatial location.
 We could think of the hidden representation as comprising a number of 2D grids stacked on top of each other.
 These are sometimes called *channels* or *feature maps*.
 Intuitively you might imagine that at lower layers,
-some channels specialize to recognizing edges,
+some channels specialize to recognizing edges.
 We can take care of this by adding a fourth coordinate to $V$
 via $V[a,b,c,d]$. Putting all together we have:
 

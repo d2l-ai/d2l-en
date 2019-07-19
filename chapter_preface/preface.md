@@ -248,7 +248,7 @@ to update the code and runtime environment.
 
 At times, to avoid unnecessary repetition,
 we encapsulate the frequently-imported and referred-to functions, classes, etc.
-in this book in the `d2l` package. For any block block such as a function, a
+in this book in the `d2l` package. For any block such as a function, a
 class, or multiple imports to be saved in the package, we will mark it with `#
 Save to the d2l package`. For example, these are the packages and modules 
 used by the `d2l` package.

@@ -5,7 +5,7 @@ In several of our previous examples, we have already come up
 against image data, which consist of pixels arranged in a 2D grid.
 Depending on whether we are looking at a black and white or color image,
 we might have either one or multiple numerical values
-correspnding to each pixel location.
+corresponding to each pixel location.
 Until now, we have dealt with this rich structure
 in the least satisfying possible way.
 We simply threw away this spatial structure
