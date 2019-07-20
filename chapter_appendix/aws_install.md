@@ -9,9 +9,9 @@ Many deep learning applications require significant amounts of computation. Your
 This process applies to other instances (and other clouds), too, albeit with some minor modifications.
 
 
-## Register Account and Log In
+## Registering Account and Logging In
 
-Firstly, we need to register an account at https://aws.amazon.com/. We strongly encourage you to use two-factor authentication for additional security. Furthermore, it is a good idea to set up detailed billing and spending alerts to avoid any unexpected surprises if you forget to suspend your computers. Note that you will need a credit card.
+First, we need to register an account at https://aws.amazon.com/. We strongly encourage you to use two-factor authentication for additional security. Furthermore, it is a good idea to set up detailed billing and spending alerts to avoid any unexpected surprises if you forget to suspend your computers. Note that you will need a credit card.
 After logging into your AWS account, click "EC2" (marked by the red box in :numref:`fig_aws`) to go to the EC2 panel.
 
 ![ Open the EC2 console. ](../img/aws.png)
@@ -19,7 +19,7 @@ After logging into your AWS account, click "EC2" (marked by the red box in :numr
 :label:`fig_aws`
 
 
-## Create and Run an EC2 Instance
+## Creating and Running an EC2 Instance
 
 :numref:`fig_ec2` shows the EC2 panel with sensitive account information greyed out. 
 
@@ -27,17 +27,17 @@ After logging into your AWS account, click "EC2" (marked by the red box in :numr
 :width:`700px`
 :label:`fig_ec2`
 
-### Preset 1
-Select a nearby data center to reduce latency, e.g. **Oregon**. (marked by the red box in the top-right of :numref:`fig_ec2`) If you are located in China
+### Presetting Location
+Select a nearby data center to reduce latency, e.g. "Oregon". (marked by the red box in the top-right of :numref:`fig_ec2`) If you are located in China
 you can select a nearby Asia Pacific region, such as Seoul or Tokyo. Please note
 that some data centers may not have GPU instances. 
 
-### Preset 2
+### Increasing Limits
 Before choosing an instance, check if there are quantity 
-restrictions by clicking the **Limits** label in the bar on the left as shown in
+restrictions by clicking the "Limits" label in the bar on the left as shown in
 :numref:`fig_ec2`. :numref:`fig_limits` shows an example of such a
 limitation. The account currently cannot open "p2.xlarge" instance per region. If
-you need to open one or more instances, click on the **Request limit increase** link to
+you need to open one or more instances, click on the "Request limit increase" link to
 apply for a higher instance quota. Generally, it takes one business day to
 process an application.
 
@@ -46,10 +46,10 @@ process an application.
 :label:`fig_limits`
 
 
-### Launch Instance
+### Launching Instance
 Next, click the "Launch Instance" button marked by the red box in :numref:`fig_ec2` to launch your instance.
 
-We begin by selecting a suitable AMI (AWS Machine Image). Enter **Ubuntu** in the search box (marked by the red box in :numref:`fig_ubuntu`):
+We begin by selecting a suitable AMI (AWS Machine Image). Enter "Ubuntu" in the search box (marked by the red box in :numref:`fig_ubuntu`):
 
 
 ![ Choose an operating system. ](../img/ubuntu_new.png)
@@ -80,7 +80,7 @@ So far, we have finished the first two of seven steps for launching an EC2 insta
 :width:`700px`
 :label:`fig_disk`
 
-Finally, go to **7. Review** and click `Launch` to launch the configured
+Finally, go to "7. Review" and click `Launch` to launch the configured
 instance. The system will now prompt you to select the key pair used to access
 the instance. If you do not have a key pair, select "Create a new key pair" in
 the first drop-down menu in :numref:`fig_keypair` to generate a key pair. Subsequently,
@@ -101,7 +101,7 @@ instance ID shown in :numref:`fig_launching` to view the status of this instance
 :label:`fig_launching`
 
 
-### Connect Instance
+### Connecting Instance
 
 As shown in :numref:`fig_connect`, after the instance state turns green, right-click the instance and select `Connect` to view the instance access method. 
 
@@ -162,7 +162,7 @@ Enter `accept`  for the following inquiry as shown in :numref:`fig_cuda_accept`.
 :width:`700px`
 :label:`fig_cuda_accept`
 
-If the following image shows up, choose **install** and tap **Enter** as shown in :numref:`fig_cuda_install`.
+If the following image shows up, choose "Install" and tap "Enter" as shown in :numref:`fig_cuda_install`.
 
 ![ Install and Enter. ](../img/cuda_install.png)
 :width:`700px`
@@ -212,9 +212,9 @@ Finally, add CUDA to the library path to help other libraries find it.
 echo "export LD_LIBRARY_PATH=\${LD_LIBRARY_PATH}:/usr/local/cuda/lib64" >> ~/.bashrc
 ```
 
-## Install MXNet and Download the D2L Notebooks
+## Installing MXNet and Downloading the D2L Notebooks
 
-Firstly, to simplify the installation, you need to install [Miniconda](https://conda.io/en/latest/miniconda.html) for Linux. The download link and file name are subject to changes, so please go the Miniconda website and click **Copy Link Address** as shown in :numref:`fig_miniconda`.
+First, to simplify the installation, you need to install [Miniconda](https://conda.io/en/latest/miniconda.html) for Linux. The download link and file name are subject to changes, so please go the Miniconda website and click "Copy Link Address" as shown in :numref:`fig_miniconda`.
 
 ![ Download Miniconda. ](../img/miniconda.png)
 :width:`700px`
@@ -314,7 +314,7 @@ Since you used port forwarding to port 8889 you will need to replace the port nu
 
 ## Closing Unused Instances
 
-As cloud services are **billed by the time of use**, you should close instances that are not being used. Note that there are alternatives: **Stopping** an instance means that you will be able to start it again. This is akin to switching off the power for your regular server. However, stopped instances will still be billed a small amount for the hard disk space retained. **Terminate** deletes all data associated with it. This includes the disk, hence you cannot start it again. Only do this if you know that you won't need it in the future.
+As cloud services are billed by the time of use, you should close instances that are not being used. Note that there are alternatives: "Stopping" an instance means that you will be able to start it again. This is akin to switching off the power for your regular server. However, stopped instances will still be billed a small amount for the hard disk space retained. "Terminate" deletes all data associated with it. This includes the disk, hence you cannot start it again. Only do this if you know that you won't need it in the future.
 
 If you want to use the instance as a template for many more instances,
 right-click on the example in Figure 14.16 :numref:`fig_connect` and select "Image" $\rightarrow$
@@ -340,6 +340,6 @@ environments.
 1. Experiment with different GPU servers. How fast are they?
 1. Experiment with multi-GPU servers. How well can you scale things up?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2399)
+## Scanning the QR Code to [Discuss](https://discuss.mxnet.io/t/2399)
 
 ![](../img/qr_aws.svg)
