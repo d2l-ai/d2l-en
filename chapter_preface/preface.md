@@ -209,8 +209,8 @@ prediction. :numref:`chapter_attention` introduces recent models exploring the
 attention mechanism.  These sections will get you up to speed on the basic tools
 behind most modern deep learning.
 
-* Part three discusses scalability, efficiency and applications.  First we
-discuss several common :numref:`chapter_optimization` used to train deep
+* Part three discusses scalability, efficiency and applications.  First, in :numref:`chapter_optimization`,  we
+discuss several common optimization algorithms used to train deep
 learning models.  The next chapter, :numref:`chapter_performance` examines
 several important factors that affect the computational performance of your deep
 learning code.    :numref:`chapter_cv` and :numref:`chapter_nlp` illustrate major
@@ -242,16 +242,16 @@ as well as many colleges and companies.
 All of the code in this book has passed tests under the newest MXNet version.
 However, due to the rapid development of deep learning,
 some code *in the print edition* may not work properly in future versions of MXNet.
-However, we plan to keep the online version remain up-to-date.
+However, we plan to keep the online version up-to-date.
 In case of such problems, please consult :ref:`chapter_installation`
 to update the code and runtime environment.
 
 At times, to avoid unnecessary repetition,
 we encapsulate the frequently-imported and referred-to functions, classes, etc.
-in this book in the `d2l` package. For any block block such as a function, a
+in this book in the `d2l` package. For any block such as a function, a
 class, or multiple imports to be saved in the package, we will mark it with `#
-Save to the d2l package`. For example, these are the packages and modules will
-be used by the `d2l` package.
+Save to the d2l package`. For example, these are the packages and modules 
+used by the `d2l` package.
 
 ```{.python .input  n=1}
 # Save to the d2l package
@@ -315,7 +315,7 @@ Their GitHub usernames or names are (in no particular order):
 alxnorden, avinashingit, bowen0701, brettkoonce, Chaitanya Prakash Bapat,
 cryptonaut, Davide Fiocco, edgarroman, gkutiel, John Mitro, Liang Pu, Rahul Agarwal, mohamed-ali,
 mstewart141, Mike Müller, NRauschmayr, Prakhar Srivastav, sad-, sfermigier, Sheng Zha, sundeepteki,
-topecongiro, tpdi, vermicelli, Vishaal Kapoor, vishwesh5, YaYaB, Yuhong Chen, Evgeniy Smirnov, lgov, Simon Corston-Oliver, IgorDzreyev, trungha-ngx, pmuens, alukovenko, senorcinco, vfdev-5, dsweet, Mohammad Mahdi Rahimi, Abhishek Gupta, uwsd, DomKM, Lisa Oakley, bowen0701, arush15june, prasanth5reddy, brianhendee, mani2106, mtn, lkevinzc, caojilin, Lakshya, Fiete Lüer, Surbhi Vijayvargeeya, Muhyun Kim, dennismalmgren, adursun, Anirudh Dagar, liqingnz, Pedro Larroy, lgov, ati-ozgur, goldmermaid, Jun Wu, Matthias Blume, apeforest, geogunow, jpgard, MaxiBoether, rislam, Leonard Lausen.
+topecongiro, tpdi, vermicelli, Vishaal Kapoor, vishwesh5, YaYaB, Yuhong Chen, Evgeniy Smirnov, lgov, Simon Corston-Oliver, IgorDzreyev, trungha-ngx, pmuens, alukovenko, senorcinco, vfdev-5, dsweet, Mohammad Mahdi Rahimi, Abhishek Gupta, uwsd, DomKM, Lisa Oakley, bowen0701, arush15june, prasanth5reddy, brianhendee, mani2106, mtn, lkevinzc, caojilin, Lakshya, Fiete Lüer, Surbhi Vijayvargeeya, Muhyun Kim, dennismalmgren, adursun, Anirudh Dagar, liqingnz, Pedro Larroy, lgov, ati-ozgur, goldmermaid, Jun Wu, Matthias Blume, apeforest, geogunow, jpgard, MaxiBoether, rislam, Leonard Lausen, abhinav-upadhyay, rongruosong, BigBubba, ruslo, rafaelschlatter.
 Moreover, we thank Amazon Web Services, especially Swami Sivasubramanian,
 Raju Gulabani, Charlie Bell, and Andrew Jassy for their generous support in writing this book.
 Without the available time, resources, discussions with colleagues,

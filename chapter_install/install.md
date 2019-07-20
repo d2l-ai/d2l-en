@@ -14,7 +14,7 @@ unzip d2l-en.zip -d d2l-en
 
 ## Installing Running Environment
 
-If you have both Python 3.5 or older and pip installed, the easiest way to install the running environment through pip. Two packages are needed, `d2l` for all dependencies such as Jupyter and saved code blocks, and `mxnet` for deep learning framework we are using. First install `d2l` by
+If you have both Python 3.5 or newer and pip installed, the easiest way to install the running environment through pip. Two packages are needed, `d2l` for all dependencies such as Jupyter and saved code blocks, and `mxnet` for deep learning framework we are using. First install `d2l` by
 
 ```bash
 pip install d2l

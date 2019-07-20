@@ -464,7 +464,7 @@ we need to know for which populations it may work and which it may not.
 Overlooking foreseeable risks to the welfare of a subpopulation
 would run afoul of basic ethical principles.
 Moreover, "accuracy" is seldom the right metric.
-When translating predictions in to actions
+When translating predictions into actions
 we'll often want to take into account the potential cost sensitivity
 of erring in various ways.
 If one way that you might classify an image could be perceived as a racial sleight, while misclassification to a different category

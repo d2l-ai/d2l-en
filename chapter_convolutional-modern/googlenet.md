@@ -147,7 +147,7 @@ followed by the first path with only the $1\times 1$ convolutional layer,
 the third path with the $5\times 5$ convolutional layer,
 and the fourth path with the $3\times 3$ maximum pooling layer.
 The second and third paths will first reduce
-the number of channels according the ratio.
+the number of channels according to the ratio.
 These ratios are slightly different in different Inception blocks.
 
 ```{.python .input  n=5}
