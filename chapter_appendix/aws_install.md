@@ -28,7 +28,7 @@ After logging into your AWS account, click "EC2" (marked by the red box in :numr
 :label:`fig_ec2`
 
 ### Presetting Location
-Select a nearby data center to reduce latency, e.g. "Oregon". (marked by the red box in the top-right of :numref:`fig_ec2`) If you are located in China
+Select a nearby data center to reduce latency, *e.g.,* "Oregon". (marked by the red box in the top-right of :numref:`fig_ec2`) If you are located in China
 you can select a nearby Asia Pacific region, such as Seoul or Tokyo. Please note
 that some data centers may not have GPU instances. 
 
@@ -66,7 +66,7 @@ EC2 provides many different instance configurations to choose from. This can som
 | p3   | Volta V100  | high performance for FP16     |
 | g4   | Turing T4   | inference optimized FP16/INT8 |
 
-All the above servers come in multiple flavors indicating the number of GPUs used. E.g. a p2.xlarge has 1 GPU and a p2.16xlarge has 16 GPUs and more memory. For more details see e.g. the [AWS EC2 documentation](https://aws.amazon.com/ec2/instance-types/) or a [summary page](https://www.ec2instances.info). For the purpose of illustration, a p2.xlarge will suffice (marked in red box of :numref:`fig_p2x`).
+All the above servers come in multiple flavors indicating the number of GPUs used. For example, a p2.xlarge has 1 GPU and a p2.16xlarge has 16 GPUs and more memory. For more details see *e.g.,* the [AWS EC2 documentation](https://aws.amazon.com/ec2/instance-types/) or a [summary page](https://www.ec2instances.info). For the purpose of illustration, a p2.xlarge will suffice (marked in red box of :numref:`fig_p2x`).
 
 **Note:** you must use a GPU enabled instance with suitable drivers and a version of MXNet that is GPU enabled. Otherwise you will not see any benefit from using GPUs.
 
@@ -74,18 +74,18 @@ All the above servers come in multiple flavors indicating the number of GPUs use
 :width:`700px`
 :label:`fig_p2x`
 
-So far, we have finished the first two of seven steps for launching an EC2 instance, as shown on the top of Fig 14.13. In this example, we keep the default configurations for the steps "3. Configure Instance", "5. Add Tags", and "6. Configure Security Group". Tap on "4. Add Storage" and increase the default hard disk size to 64 GB (marked in red box of :numref:`fig_disk`). Note that CUDA by itself already takes up 4GB.
+So far, we have finished the first two of seven steps for launching an EC2 instance, as shown on the top of :numref:`fig_disk`. In this example, we keep the default configurations for the steps "3. Configure Instance", "5. Add Tags", and "6. Configure Security Group". Tap on "4. Add Storage" and increase the default hard disk size to 64 GB (marked in red box of :numref:`fig_disk`). Note that CUDA by itself already takes up 4GB.
 
 ![ Modify instance hard disk size. ](../img/disk.png)
 :width:`700px`
 :label:`fig_disk`
 
-Finally, go to "7. Review" and click `Launch` to launch the configured
+Finally, go to "7. Review" and click "Launch" to launch the configured
 instance. The system will now prompt you to select the key pair used to access
 the instance. If you do not have a key pair, select "Create a new key pair" in
 the first drop-down menu in :numref:`fig_keypair` to generate a key pair. Subsequently,
 you can select "Choose an existing key pair" for this menu and then select the
-previously generated key pair. Click `Launch Instances` to launch the created
+previously generated key pair. Click "Launch Instances" to launch the created
 instance.
 
 ![ Select a key pair. ](../img/keypair.png)
@@ -109,7 +109,7 @@ As shown in :numref:`fig_connect`, after the instance state turns green, right-c
 :width:`700px`
 :label:`fig_connect`
 
-If this is a new key, it must not be publicly viewable for SSH to work. Go to the folder where you store `D2L_key.pem` (*e.g.* Downloads folder) and make the key to be not publicly viewable.
+If this is a new key, it must not be publicly viewable for SSH to work. Go to the folder where you store `D2L_key.pem` (*e.g.,* Downloads folder) and make the key to be not publicly viewable.
 
 ```bash
 cd /Downloads  ## if D2L_key.pem is stored in Downloads folder 
