@@ -4,6 +4,7 @@ data/
 *.json
 *.params
 *.DS_Store
+*.Rhistory
 *.csv
 build/README.md
 build/environment.yml
