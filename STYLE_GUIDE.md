@@ -20,7 +20,7 @@
 * Symbol Descriptions
     * time step t（not t time step）
 * Tools, Class, and Functions
-    * Gluon, MXNet, NumPy, spaCy, NDArray, Symbol, Block, HybridBlock, ResNet-18 Fashion-MNIST, matplotlib
+    * Gluon, MXNet, NumPy, spaCy, NDArray, Symbol, Block, HybridBlock, ResNet-18, Fashion-MNIST, matplotlib
         * Consider these as words without accents (``)
     * Sequential class/instance, HybridSequential class/instance
         * Without accents (``)
