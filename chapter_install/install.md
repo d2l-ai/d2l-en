@@ -5,15 +5,15 @@ To get you up and running with hands-on experiences, we'll need you to set up wi
 
 ## Installing Miniconda
 
-To simplify the installation, we need to install [Miniconda](https://conda.io/en/latest/miniconda.html). The download link and file name are subject to changes, so please go the Miniconda website.
+To simplify the installation, we need to install [Miniconda](https://conda.io/en/latest/miniconda.html). Download the corresponing Miniconda "sh" file from the website and then execute the command line `sudo sh <FILENAME>`, *e.g.*,
 
 ```bash
-# For Mac users
-wget https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
+# The download link and file name are subject to name changes.
+
+# For Mac users, 
 sudo sh Miniconda3-latest-MacOSX-x86_64.sh
 
 # For Linux users
-wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 sudo sh Miniconda3-latest-Linux-x86_64.sh
 ```
 
@@ -38,20 +38,24 @@ by running conda init? [yes|no]
 After miniconda installation, run the following command to activate conda.
 
 ```bash
+# For Mac user
+source ~/.bash_profile
+
+# For Linux user
 source ~/.bashrc
 ```
 
-Then create the conda `d2l` environment and enter `y` for the proceed inquiry as shown in :numref:`fig_conda_create_d2l`.
+Then create the conda "d2l"" environment and enter `y` for the following inquiries as shown in :numref:`fig_conda_create_d2l`.
 ```bash
 conda create --name d2l
 ```
 
-![ Conda create environment D2L. ](../img/conda_create_d2l.png)
+![ Conda create environment d2l. ](../img/conda_create_d2l.png)
 :width:`700px`
 :label:`fig_conda_create_d2l`
 
 
-## Downloading the D2L Notebooks
+## Downloading the d2l Notebooks
 
 Now, let us download the code for this book.
 
@@ -62,13 +66,14 @@ wget http://numpy.d2l.ai/d2l-en.zip
 unzip d2l-en.zip && rm d2l-en.zip
 ```
 
-Within `d2l` environment, activate it and install `pip`. Enter `y` for any proceed inquiry.
+Within the "d2l" environment, activate it and install `pip`. Enter `y` for the following inquiries.
+
 ```bash
 conda activate d2l
 conda install pip
 ```
 
-Finally, install `D2L` within the environment "d2l" that we created. 
+Finally, install "d2l" package within the environment "d2l" that we created. 
 ```
 pip install git+https://github.com/d2l-ai/d2l-en@numpy2
 ```
@@ -112,7 +117,7 @@ At this point open http://localhost:8888 (which usually opens automatically) in 
 Both this book and MXNet are keeping improving. Please check a new version from time to time.
 
 1. The URL  http://numpy.d2l.ai/d2l-en.zip always points to the latest contents.
-2. Please upgrade `d2l` by `pip install git+https://github.com/d2l-ai/d2l-en@numpy2`.
+2. Please upgrade "d2l" by `pip install git+https://github.com/d2l-ai/d2l-en@numpy2`.
 3. For the CPU version, MXNet can be upgraded by `pip uninstall mxnet` then re-running the aforementioned `pip install https...whl` command.
 
 
