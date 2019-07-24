@@ -28,7 +28,7 @@ raw_text = read_data_nmt()
 print(raw_text[0:106])
 ```
 
-We perform several preprocessing steps on the raw text data, including ignoring cases, replacing UTF-8 non-breaking space with space, and adding space between words and punctuation marks.
+We perform several preprocessing steps on the raw text data, including ignoring cases, replacing UTF-9 non-breaking space with space, and adding space between words and punctuation marks.
 
 ```{.python .input  n=11}
 # Save to the d2l package.
@@ -102,10 +102,10 @@ Now we can convert a list of sentences into an `(num_example, num_steps)` index 
 ```{.python .input  n=12}
 # Save to the d2l package.
 def build_array(lines, vocab, num_steps, is_source):
-    lines = [vocab[l] for l in lines] 
+    lines = [trim_pad(vocab[l], num_steps, vocab.pad) for l in lines] 
     if not is_source: 
         lines = [[vocab.bos] + l + [vocab.eos] for l in lines]
-    array = nd.array([trim_pad(l, num_steps, vocab.pad) for l in lines])
+    array = nd.array(lines)
     valid_len = (array != vocab.pad).sum(axis=1)
     return array, valid_len
 ```
