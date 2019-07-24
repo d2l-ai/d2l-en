@@ -1,22 +1,79 @@
 # Installation
 :label:`chapter_installation`
 
-To get you up and running with hands-on experiences, we'll need you to set up with a Python environment, Jupyter's interactive notebooks, the relevant libraries, and the code needed to *run the book*.
+To get you up and running with hands-on experiences, we'll need you to set up with a Python environment, Jupyter's interactive notebooks, the relevant libraries, and the code needed to run the book.
 
-## Obtaining Source Codes
+## Installing Miniconda
 
-The source code package containing all notebooks is available at http://numpy.d2l.ai/d2l-en.zip. Please download it and extract it into a folder. For example, on Linux/macos, if you have both `wget` and `unzip` installed, you can do it through:
+To simplify the installation, we need to install [Miniconda](https://conda.io/en/latest/miniconda.html). Download the corresponing Miniconda "sh" file from the website and then execute the command line `sudo sh <FILENAME>`, *e.g.*,
 
+```bash
+# The download link and file name are subject to name changes.
+
+# For Mac users, 
+sudo sh Miniconda3-latest-MacOSX-x86_64.sh
+
+# For Linux users
+sudo sh Miniconda3-latest-Linux-x86_64.sh
 ```
+
+You need to answer the following questions:
+
+```bash
+Do you accept the license terms? [yes|no]
+[no] >>> yes
+
+Miniconda3 will now be installed into this location:
+/home/rlhu/miniconda3
+  - Press ENTER to confirm the location
+  - Press CTRL-C to abort the installation
+  - Or specify a different location below
+>>> <ENTER>
+
+Do you wish the installer to initialize Miniconda3
+by running conda init? [yes|no]
+[no] >>> yes
+```
+
+After miniconda installation, run the following command to activate conda.
+
+```bash
+# For Mac user
+source ~/.bash_profile
+
+# For Linux user
+source ~/.bashrc
+```
+
+Then create the conda "d2l"" environment and enter `y` for the following inquiries as shown in :numref:`fig_conda_create_d2l`.
+```bash
+conda create --name d2l
+```
+
+![ Conda create environment d2l. ](../img/conda_create_d2l.png)
+:width:`700px`
+:label:`fig_conda_create_d2l`
+
+
+## Downloading the d2l Notebooks
+
+Now, let us download the code for this book.
+
+```bash
+sudo apt-get install unzip
+mkdir d2l-en && cd d2l-en
 wget http://numpy.d2l.ai/d2l-en.zip
-unzip d2l-en.zip -d d2l-en
+unzip d2l-en.zip && rm d2l-en.zip
 ```
 
+Within the "d2l" environment, activate it and install `pip`. Enter `y` for the following inquiries.
 
-## Installing Running Environment
+```bash
+conda activate d2l
+conda install pip
+```
 
-If you have both Python 3.5 or later and pip installed, the easiest way to install the running environment is through pip. Two packages are needed, `d2l` for all dependencies such as Jupyter and saved code blocks, and `mxnet` for deep learning framework we are using. First install `d2l` by
-
+Finally, install "d2l" package within the environment "d2l" that we created. 
 ```
 pip install git+https://github.com/d2l-ai/d2l-en@numpy2
 ```
@@ -27,7 +84,10 @@ If unfortunately something went wrong, please check
 2. You are using a recent `pip`, such as version 19. Otherwise you can upgrade it through `pip install --upgrade pip`
 3. If you don't have permission to install package in system wide, you can install to your home directory by adding a `--user` flag. Such as `pip install d2l --user`
 
-Before installing `mxnet`, please first check if you are able to access GPUs. If so, please go to :ref:`sec_gpu` for instructions to install a GPU-supported `mxnet`. Otherwise, we can install the CPU version, which is still good enough for the first few chapters.
+
+## Installing MXNet
+
+Before installing `mxnet`, please first check if you are able to access GPUs. If so, please go to :ref:`sec_gpu` for instructions to install a GPU-supported `mxnet`. Otherwise, you can install the CPU version, which is still good enough for the first few chapters.
 
 ```
 # For Linux users
@@ -50,14 +110,14 @@ jupyter notebook
 ```
 
 
-At this point open http://localhost:8888 (which usually opens automatically) in the browser, then you can view and run the code in each section of the book.
+At this point open http://localhost:8888 (which usually opens automatically) in the browser, then we can view and run the code in each section of the book.
 
 ## Upgrade to a New Version
 
-Both this book and MXNet are keeping improving. You may want to check a new version from time to time.
+Both this book and MXNet are keeping improving. Please check a new version from time to time.
 
 1. The URL  http://numpy.d2l.ai/d2l-en.zip always points to the latest contents.
-2. You can upgrade `d2l` by `pip install git+https://github.com/d2l-ai/d2l-en@numpy2`.
+2. Please upgrade "d2l" by `pip install git+https://github.com/d2l-ai/d2l-en@numpy2`.
 3. For the CPU version, MXNet can be upgraded by `pip uninstall mxnet` then re-running the aforementioned `pip install https...whl` command.
 
 
@@ -74,7 +134,7 @@ pip uninstall mxnet
 ```
 
 
-Then you need to find the CUDA version you installed. You may check it through `nvcc --version` or `cat /usr/local/cuda/version.txt`. Assume you have installed CUDA 10.1, then you can install the according MXNet version by
+Then we need to find the CUDA version you installed. You may check it through `nvcc --version` or `cat /usr/local/cuda/version.txt`. Assume you have installed CUDA 10.1, then you can install the according MXNet version by
 
 ```
 pip install https://apache-mxnet.s3-accelerate.amazonaws.com/dist/python/numpy/latest/mxnet_cu101-1.5.0-py2.py3-none-manylinux1_x86_64.whl
