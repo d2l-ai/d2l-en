@@ -8,12 +8,10 @@ To get you up and running with hands-on experiences, we'll need you to set up wi
 To simplify the installation, we need to install [Miniconda](https://conda.io/en/latest/miniconda.html). Download the corresponing Miniconda "sh" file from the website and then execute the command line `sudo sh <FILENAME>`, *e.g.*,
 
 ```bash
-# The download link and file name are subject to name changes.
-
-# For Mac users, 
+# For Mac users (the file name is subject to changes)
 sudo sh Miniconda3-latest-MacOSX-x86_64.sh
 
-# For Linux users
+# For Linux users (the file name is subject to changes)
 sudo sh Miniconda3-latest-Linux-x86_64.sh
 ```
 
