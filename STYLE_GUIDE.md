@@ -13,6 +13,8 @@
         * Exercises
         * Scan the QR Code to access discussions
         * References (if any)
+* Environments
+    * Use double quotes
 * Quotes
     * Use double quotes
 * Symbol Descriptions
