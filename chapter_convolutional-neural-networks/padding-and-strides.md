@@ -148,8 +148,7 @@ We can see that when the second element of the first column is output,
 the convolution window slides down three rows.
 The convolution window slides two columns to the right
 when the second element of the first row is output.
-When the convolution window slides two columns to the right on the input, there is no output because the input element cannot fill the window
-(unless we add padding).
+When the convolution window slides three columns to the right on the input, there is no output because the input element cannot fill the window (unless we add another column of padding).
 
 ![Cross-correlation with strides of 3 and 2 for height and width respectively. The shaded portions are the output element and the input and core array elements used in its computation: $0\times0+0\times1+1\times2+2\times3=8$, $0\times0+6\times1+0\times2+0\times3=6$. ](../img/conv-stride.svg)
 
