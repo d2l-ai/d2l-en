@@ -25,7 +25,7 @@ For instance, if we take the image `X`
 with a sharp delineation between black and white
 and shift the whole image by one pixel to the right,
 i.e. `Z[i,j] = X[i,j+1]`,
-then the output for for the new image `Z` might be vastly different.
+then the output for the new image `Z` might be vastly different.
 The edge will have shifted by one pixel and with it all the activations.
 In reality, objects hardly ever occur exactly at the same place.
 In fact, even with a tripod and a stationary object,
