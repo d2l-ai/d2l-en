@@ -28,7 +28,7 @@ raw_text = read_data_nmt()
 print(raw_text[0:106])
 ```
 
-We perform several preprocessing steps on the raw text data, including ignoring cases, replacing UTF-9 non-breaking space with space, and adding space between words and punctuation marks.
+We perform several preprocessing steps on the raw text data, including ignoring cases, replacing UTF-8 non-breaking space with space, and adding space between words and punctuation marks.
 
 ```{.python .input  n=11}
 # Save to the d2l package.
