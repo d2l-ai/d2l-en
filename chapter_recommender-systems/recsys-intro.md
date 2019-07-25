@@ -1,4 +1,4 @@
-# 1. Overview of Recommender Systems
+# Overview of Recommender Systems
 
 
 
@@ -7,7 +7,7 @@ service providers and is a important of source of revenue.  This chapter will in
 
 
 
-## 1.1 Collaborative Filtering
+## Collaborative Filtering
 
 We start the journey with the important concept in recommender systems - collaborative filtering
 (CF), which was firstly coined by the [Tapestry](https://dl.acm.org/citation.cfm?id=138867) system, referring to "people collaborate to help one another perform the filtering process  in order to handle the large amounts of email and messages posted to newsgroups". This term has been enriched with more senses. In a broad sense, it is the process of
@@ -19,7 +19,7 @@ better capability in dealing with sparsity and scalability.  Many model-based CF
 
 
 
-## 1.2 Explicit Feedback and Implicit Feedback 
+## Explicit Feedback and Implicit Feedback 
 
 To know user's preference, the system shall collect feedback from them.  The feedback can be either explicit or implicit. For example,  [IMDB](https://www.imdb.com/) collects star ratings range from one to ten stars for movies. YouTube provides the thumbs-up and thumbs-down buttons for users to show their preferences.  It is apparent that
 gathering explicit feedback requires users to indicate their interests proactively.  Nonetheless,  explicit feedback is not always available as many users may be reluctant to rate products or gathering it is too expensive.  As such, many recommender systems are centered on implicit feedback which
@@ -27,18 +27,18 @@ indirectly reflects user's opinion through observing user behavior.   There are 
 
 
 
-## 1.3 Recommendation Tasks 
+## Recommendation Tasks 
 
 A number of recommendation tasks have been investigated in the past decade.  Based on the domain of applications, there are movies recommendation, news recommendations, point-of-interest recommendation and so forth.  It is also possible to differentiate the tasks based on the types of feedback and input data, for example, the rating prediction task aims to predict the explicit ratings. Top-n recommendation (collaborative ranking) ranks all items for each users personally based on the implicit feedback. If timestamp information is also included, we can build sequence-aware recommendation.  Another popular task is called click-through rate prediction, which is also based on implicit feedback, but various categorical features can be utilized.  
 
 
 
-## 1.4 Summary
+## Summary
 
 * Recommender systems are important for individual users and industries. Collaborative filtering is a key concept in recommendation.
 * There are two types of feedbacks: implicit feedback and explicit feedback.  A number recommendation tasks have been explored during the last decade.
 
-## 1.5 Exercises
+## Exercises
 
 1. Can you explain how recommender systems influence your daily life ?
 2. What interesting recommendation tasks do you think can be investigated ?
