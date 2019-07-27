@@ -191,7 +191,7 @@ Check if the prediction is correct.
 py.argmax(axis=0).asscalar() == label
 ```
 
-Now predict a few validation examples, we can see the the Bayes
+Now predict a few validation examples, we can see the Bayes
 classifier works pretty well except for the 9th 16th digits.
 
 ```{.python .input}

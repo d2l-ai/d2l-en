@@ -66,7 +66,7 @@ class RNNModel(nn.Block):
 
 ## Training
 
-Let's make a prediction with the a model that has random weights.
+Let's make a prediction with the model that has random weights.
 
 ```{.python .input  n=42}
 ctx = d2l.try_gpu()

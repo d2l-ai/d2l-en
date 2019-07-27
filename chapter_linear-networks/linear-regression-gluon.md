@@ -68,7 +68,7 @@ for X, y in data_iter:
 
 ## Define the Model
 
-When we implemented linear regression from scratch in the previous section, we had to define the model parameters and explicitly write out the calculation to produce output using basic linear algebra opertions. You should know how to do this. But once your models get more complex, even qualitatively simple changes to the model might result in many low-level changes.
+When we implemented linear regression from scratch in the previous section, we had to define the model parameters and explicitly write out the calculation to produce output using basic linear algebra operations. You should know how to do this. But once your models get more complex, even qualitatively simple changes to the model might result in many low-level changes.
 
 For standard operations, we can use Gluon's predefined layers, which allow us to focus especially on the layers used to construct the model rather than having to focus on the implementation.
 
