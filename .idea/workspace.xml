@@ -3,10 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="517c00b2-9162-45ca-a83b-5c6856dc42bf" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Jenkinsfile" beforeDir="false" afterPath="$PROJECT_DIR$/Jenkinsfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_computational-performance/async-computation.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_computational-performance/async-computation.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_computer-vision/fcn.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_computer-vision/fcn.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_natural-language-processing/approx-training.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_natural-language-processing/approx-training.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_linear-networks/linear-regression-gluon.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_linear-networks/linear-regression-gluon.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_natural-language-processing/sentiment-analysis-cnn.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_natural-language-processing/sentiment-analysis-cnn.md" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />

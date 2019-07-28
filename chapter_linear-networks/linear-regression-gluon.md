@@ -3,14 +3,14 @@
 
 The surge of deep learning has inspired the development of a variety of mature software frameworks, 
 that automate much of the repetitive work of implementing deep learning models.
-In the previous section we relied only on ndarray for data storage and linear algebra
+In the previous section we relied only on NDarray for data storage and linear algebra
 and the auto-differentiation capabilities in the `autograd` package.
 In practice, because many of the more abstract operations, e.g.
 data iterators, loss functions, model architectures, and optimizers,
 are so common, deep learning libraries will give us
 library functions for these as well.
 
-We have used Gluon to load the MNIST dataset in :numref:`chapter_naive_bayes`. In this section, we will learn how we can implement
+We have used Gluon to load the MNIST dataset in :numref:`chapter_naive_bayes`. In this section, we will how we can implement
 the linear regression model in :numref:`chapter_linear_scratch` much more concisely with Gluon.
 
 ## Generating Data Sets
