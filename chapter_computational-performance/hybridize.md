@@ -68,7 +68,7 @@ A comparison of these two programming methods shows that
 
 Most deep learning frameworks choose either imperative or symbolic programming. For example, both Theano and TensorFlow (inspired by the latter) make use of symbolic programming, while Chainer and PyTorch utilize imperative programming. When designing Gluon, developers considered whether it was possible to harness the benefits of both imperative and symbolic programming. The developers believed that users should be able to develop and debug using pure imperative programming, while having the ability to convert most programs into symbolic programming to be run when product-level computing performance and deployment are required This was achieved by Gluon through the introduction of hybrid programming.
 
-In hybrid programming, we can build models using either the HybridBlock or the HybridSequential classes. By default, they are executed in the same way Block or Sequential classes are executed in imperative programming. When the `hybridize` function is called, Gluon will convert the program’s execution into the style used in symbolic programming. In fact, most models can make use of hybrid programming’s execution style.
+In hybrid programming, we can build models using either the HybridBlock or the HybridSequential classes. By default, they are executed in the same way Block or Sequential classes are executed in imperative programming. Similar to the correlation between the Sequential Block classes, the HybridSequential class is a HybridBlock subclass. When the `hybridize` function is called, Gluon will convert the program’s execution into the style used in symbolic programming. In fact, most models can make use of hybrid programming’s execution style.
 
 Through the use of experiments, this section will demonstrate the benefits of hybrid programming.
 
@@ -77,9 +77,10 @@ Through the use of experiments, this section will demonstrate the benefits of hy
 Previously, we learned how to use the Sequential class to concatenate multiple layers. Next, we will replace the Sequential class with the HybridSequential class in order to make use of hybrid programming.
 
 ```{.python .input}
-from mxnet import nd, sym
+import d2l
+from mxnet import np, npx, sym
 from mxnet.gluon import nn
-import time
+npx.set_np()
 
 def get_net():
     net = nn.HybridSequential()  # Here we use the class HybridSequential
@@ -89,7 +90,7 @@ def get_net():
     net.initialize()
     return net
 
-x = nd.random.normal(shape=(1, 512))
+x = np.random.normal(size=(1, 512))
 net = get_net()
 net(x)
 ```
@@ -110,12 +111,12 @@ To demonstrate the performance improvement gained by the use of symbolic program
 
 ```{.python .input}
 def benchmark(net, x):
-    start = time.time()
+    timer = d2l.Timer()
     for i in range(1000):
         _ = net(x)
     # To facilitate timing, we wait for all computations to be completed
-    nd.waitall()
-    return time.time() - start
+    npx.waitall()
+    return timer.stop()
 
 net = get_net()
 print('before hybridizing: %.4f sec' % (benchmark(net, x)))
@@ -136,16 +137,12 @@ net.export('my_mlp')
 
 The .json and .params files generated during this process are a symbolic program and a model parameter, respectively. They can be read by other front-end languages supported by Python or MXNet, such as C++, R, Scala, and Perl. This allows us to deploy trained models to other devices and easily use other front-end programming languages. At the same time, because symbolic programming was used during deployment, the computing performance is often superior to that based on imperative programming.
 
-In MXNet, a symbolic program refers to a program that makes use of the Symbol type. We know that, when the NDArray input `x` is provided to `net`, `net(x)` will directly calculate the model output and return a result based on `x`. For models that have called the `hybridize` function, we can also provide a Symbol-type input variable, and `net(x)` will return Symbol type results.
+In MXNet, a symbolic program refers to a program that makes use of the Symbol type. We know that, when the ndarray input `x` is provided to `net`, `net(x)` will directly calculate the model output and return a result based on `x`. For models that have called the `hybridize` function, we can also provide a Symbol-type input variable, and `net(x)` will return Symbol type results.
 
-```{.python .input}
-x = sym.var('data')
-net(x)
-```
 
 ## Constructing Models Using the HybridBlock Class
 
-Similar to the correlation between the Sequential Block classes, the HybridSequential class is a HybridBlock subclass. Contrary to the Block instance, which needs to use the `forward` function, for a HybridBlock instance we need to use the `hybrid_forward` function.
+Contrary to the Block instance, which needs to use the `forward` function, for a HybridBlock instance we need to use the `hybrid_forward` function.
 
 Earlier, we demonstrated that, after calling the `hybridize` function, the model is able to achieve superior computing performance and portability. In addition, model flexibility can be affected after calling the `hybridize` function. We will demonstrate this by constructing a model using the HybridBlock class.
 
@@ -159,19 +156,19 @@ class HybridNet(nn.HybridBlock):
     def hybrid_forward(self, F, x):
         print('F: ', F)
         print('x: ', x)
-        x = F.relu(self.hidden(x))
+        x = F.npx.relu(self.hidden(x))
         print('hidden: ', x)
         return self.output(x)
 ```
 
-We need to add the additional input `F` to the `hybrid_forward` function when inheriting the HybridBlock class. We already know that MXNet uses both an NDArray class and a Symbol class, which are based on imperative programming and symbolic programming, respectively. Since these two classes perform very similar functions, MXNet will determine whether `F` will call NDArray or Symbol based on the input provided.
+We need to add the additional input `F` to the `hybrid_forward` function when inheriting the HybridBlock class. We already know that MXNet uses both an ndarray class and a Symbol class, which are based on imperative programming and symbolic programming, respectively. Since these two classes perform very similar functions, MXNet will determine whether `F` will call ndarray or Symbol based on the input provided.
 
-The following creates a HybridBlock instance. As we can see, by default, `F` uses NDArray. We also printed out the `x` input as well as the hidden layer’s output using the ReLU activation function.
+The following creates a HybridNet instance. As we can see, by default, `F` uses ndarray. We also printed out the `x` input as well as the hidden layer’s output using the ReLU activation function.
 
 ```{.python .input}
 net = HybridNet()
 net.initialize()
-x = nd.random.normal(shape=(1, 4))
+x = np.random.normal(size=(1, 4))
 net(x)
 ```
 
@@ -188,7 +185,7 @@ net.hybridize()
 net(x)
 ```
 
-We can see that `F` turns into a Symbol. Moreover, even though the input data is still NDArray, the same input and intermediate output will all be converted to Symbol type in the `hybrid_forward` function.
+We can see that `F` turns into a Symbol. Moreover, even though the input data is still an ndarray, the same input and intermediate output will all be converted to Symbol type in the `hybrid_forward` function.
 
 Now, we repeat the forward computation.
 

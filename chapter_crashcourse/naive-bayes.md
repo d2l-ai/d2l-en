@@ -9,7 +9,8 @@ Let's first import libraries and modules. Especially, we import `d2l`, which now
 %matplotlib inline
 import d2l
 import math
-from mxnet import nd, gluon
+from mxnet import np, npx, gluon
+npx.set_np()
 d2l.use_svg_display()
 ```
 
@@ -26,7 +27,7 @@ Each image is a grayscale image with both width and height of 28 with shape $(28
 
 ```{.python .input  n=44}
 def transform(data, label):
-    return nd.floor(data/128).astype('float32').squeeze(axis=-1), label
+    return np.floor(data.astype('float32')/128).squeeze(axis=-1), label
 
 mnist_train = gluon.data.vision.MNIST(train=True, transform=transform)
 mnist_test  = gluon.data.vision.MNIST(train=False, transform=transform)
@@ -39,7 +40,7 @@ image, label = mnist_train[2]
 image.shape, label
 ```
 
-Our example, stored here in the variable `image` corresponds to an image with a height and width of 28 pixels. Each pixel is an 8-bit unsigned integer (uint8) with values between 0 and 255. It is stored in a 3D NDArray. Its last dimension is the number of channels. Since the data set is a grayscale image, the number of channels is 1. When we encounter color, images, we'll have 3 channels for red, green, and blue. To keep things simple, we will record the shape of the image with the height and width of $h$ and $w$ pixels, respectively, as $h \times w$ or `(h, w)`.
+Our example, stored here in the variable `image` corresponds to an image with a height and width of 28 pixels. Each pixel is an 8-bit unsigned integer (uint8) with values between 0 and 255. It is stored in a 3D ndarray, whose last dimension is the number of channels. Since the data set is a grayscale image, the number of channels is 1. When we encounter color, images, we'll have 3 channels for red, green, and blue. To keep things simple, we will record the shape of the image with the height and width of $h$ and $w$ pixels, respectively, as $h \times w$ or `(h, w)`.
 
 ```{.python .input}
 image.shape, image.dtype
@@ -120,7 +121,7 @@ The problem now is that we don't actually know $P_{xy}$ and $P_y$. So we need to
 ```{.python .input  n=50}
 X, Y = mnist_train[:]  # all training examples
 
-n_y = nd.zeros((10))
+n_y = np.zeros((10))
 for y in range(10):
     n_y[y] = (Y==y).sum()
 P_y = n_y / n_y.sum()
@@ -130,10 +131,10 @@ P_y
 Now on to slightly more difficult things $P_{xy}$. Since we picked black and white images, $p(x_i | y)$ denotes the probability that pixel $i$ is switched on for class $y$. Just like before we can go and count the number of times $n_{iy}$ such that an event occurs and divide it by the total number of occurrences of $y$, i.e. $n_y$. But there's something slightly troubling: certain pixels may never be black (e.g. for very well cropped images the corner pixels might always be white). A convenient way for statisticians to deal with this problem is to add pseudo counts to all occurrences. Hence, rather than $n_{iy}$ we use $n_{iy}+1$ and instead of $n_y$ we use $n_{y} + 1$. This is also called [Laplace Smoothing](https://en.wikipedia.org/wiki/Additive_smoothing).
 
 ```{.python .input  n=66}
-n_x = nd.zeros((10, 28, 28))
+n_x = np.zeros((10, 28, 28))
 for y in range(10):
-    n_x[y] = nd.array(X.asnumpy()[Y==y].sum(axis=0))
-P_xy = (n_x+1) / (n_y+1).reshape((10,1,1))
+    n_x[y] = np.array(X.asnumpy()[Y.asnumpy()==y].sum(axis=0))
+P_xy = (n_x+1) / (n_y+1).reshape(10,1,1)
 
 show_images(P_xy, 2, 5);
 ```
@@ -144,10 +145,10 @@ Now we can use :eqref:`eq_naive_bayes_estimation` to predict a new image. Given 
 
 ```{.python .input}
 def bayes_pred(x):
-    x = x.expand_dims(axis=0)  # (28, 28) -> (1, 28, 28)
+    x = np.expand_dims(x, axis=0)  # (28, 28) -> (1, 28, 28)
     p_xy = P_xy * x + (1-P_xy)*(1-x)
-    p_xy = p_xy.reshape((10,-1)).prod(axis=1) # p(x|y)
-    return p_xy * P_y
+    p_xy = p_xy.reshape(10,-1).prod(axis=1) # p(x|y)
+    return np.array(p_xy) * P_y
 
 image, label = mnist_test[0]
 bayes_pred(image)
@@ -171,14 +172,14 @@ $$ \hat{y} = \operatorname*{argmax}_y \> \sum_{i=1}^d \log P_{xy}[x_i, y] + \log
 We can implement the following stable version:
 
 ```{.python .input}
-log_P_xy = nd.log(P_xy)
-log_P_xy_neg = nd.log(1-P_xy)
-log_P_y = nd.log(P_y)
+log_P_xy = np.log(P_xy)
+log_P_xy_neg = np.log(1-P_xy)
+log_P_y = np.log(P_y)
 
 def bayes_pred_stable(x):
-    x = x.expand_dims(axis=0)  # (28, 28) -> (1, 28, 28)
+    x = np.expand_dims(x, axis=0)  # (28, 28) -> (1, 28, 28)
     p_xy = log_P_xy * x + log_P_xy_neg * (1-x)
-    p_xy = p_xy.reshape((10,-1)).sum(axis=1) # p(x|y)
+    p_xy = p_xy.reshape(10,-1).sum(axis=1) # p(x|y)
     return p_xy + log_P_y
 
 py = bayes_pred_stable(image)
@@ -188,7 +189,9 @@ py
 Check if the prediction is correct.
 
 ```{.python .input}
-py.argmax(axis=0).asscalar() == label
+# convert label which is a scalar tensor of int32 dtype
+# to a Python scalar integer for comparison
+py.argmax(axis=0) == int(label)
 ```
 
 Now predict a few validation examples, we can see the Bayes
@@ -196,18 +199,19 @@ classifier works pretty well except for the 9th 16th digits.
 
 ```{.python .input}
 def predict(X):
-    return [bayes_pred_stable(x).argmax(axis=0).asscalar() for x in X]
+    return [bayes_pred_stable(x).argmax(axis=0).astype(np.int32) for x in X]
 
 X, y = mnist_test[:18]
-show_images(X, 2, 9, titles=predict(X));
+preds = predict(X)
+show_images(X, 2, 9, titles=[str(d) for d in preds]);
 ```
 
 Finally, let's compute the overall accuracy of the classifier.
 
 ```{.python .input}
 X, y = mnist_test[:]
-py = predict(X)
-'Validation accuracy', (nd.array(py).asnumpy() == y).sum() / len(y)
+preds = np.array(predict(X), dtype=np.int32)
+'Validation accuracy', float((preds == y).sum()) / len(y)
 ```
 
 Modern deep networks achieve error rates of less than 0.01. While Naive Bayes classifiers used to be popular in the 80s and 90s, e.g. for spam filtering, their heydays are over. The poor performance is due to the incorrect statistical assumptions that we made in our model: we assumed that each and every pixel are *independently* generated, depending only on the label. This is clearly not how humans write digits, and this wrong assumption led to the downfall of our overly naive (Bayes) classifier. Time to start building Deep Networks.

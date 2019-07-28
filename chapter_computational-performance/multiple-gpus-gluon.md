@@ -10,8 +10,9 @@ First, import the required packages or modules for the experiment in this sectio
 
 ```{.python .input  n=1}
 import d2l
-from mxnet import autograd, gluon, init, nd
+from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
+npx.set_np()
 ```
 
 ## Initialize Model Parameters on Multiple GPUs
@@ -61,7 +62,7 @@ net.initialize(init=init.Normal(sigma=0.01), ctx=ctx)
 Gluon provides the `split_and_load` function implemented in the previous section. It can divide a mini-batch of data instances and copy them to each CPU or GPU. Then, the model computation for the data input to each CPU or GPU occurs on that same CPU or GPU.
 
 ```{.python .input  n=4}
-x = nd.random.uniform(shape=(4, 1, 28, 28))
+x = np.random.uniform(size=(4, 1, 28, 28))
 gpu_x = gluon.utils.split_and_load(x, ctx)
 net(gpu_x[0]), net(gpu_x[1])
 ```
@@ -89,7 +90,7 @@ def evaluate_accuracy_gpus(net, data_iter):
     for features, labels in data_iter:
         Xs, ys = d2l.split_batch(features, labels, ctx_list)
         pys = [net(X) for X in Xs]  # run in parallel
-        metric.add(sum(d2l.accuracy(py, y) for py, y in zip(pys, ys)), 
+        metric.add(sum(float(d2l.accuracy(py, y)) for py, y in zip(pys, ys)), 
                    labels.size)
     return metric[0]/metric[1]
 ```
@@ -107,7 +108,7 @@ def train(num_gpus, batch_size, lr):
     trainer = gluon.Trainer(
         net.collect_params(), 'sgd', {'learning_rate': lr})
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
-    timer, num_epochs = d2l.Timer(), 5
+    timer, num_epochs = d2l.Timer(), 2
     animator = d2l.Animator('epoch', 'test acc', xlim=[1, num_epochs])
     for epoch in range(num_epochs):
         timer.start()
@@ -118,9 +119,9 @@ def train(num_gpus, batch_size, lr):
             for l in ls:
                 l.backward()
             trainer.step(batch_size)
-        nd.waitall()
+        npx.waitall()
         timer.stop()
-        animator.add(epoch+1, evaluate_accuracy_gpus(net, test_iter))
+        animator.add(epoch+1, (evaluate_accuracy_gpus(net, test_iter),))
     print('test acc: %.2f, %.1f sec/epoch on %s' % (
         animator.Y[0][-1], timer.avg(), ctx_list))
 ```

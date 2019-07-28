@@ -1,12 +1,9 @@
 # Concise Implementation of Linear Regression
 :label:`chapter_linear_gluon`
 
-The surge of deep learning has inspired the development
-of a variety of mature software frameworks,
-that automate much of the repetitive work
-of implementing deep learning models.
-In the previous section we relied only
-on NDarray for data storage and linear algebra
+The surge of deep learning has inspired the development of a variety of mature software frameworks, 
+that automate much of the repetitive work of implementing deep learning models.
+In the previous section we relied only on ndarray for data storage and linear algebra
 and the auto-differentiation capabilities in the `autograd` package.
 In practice, because many of the more abstract operations, e.g.
 data iterators, loss functions, model architectures, and optimizers,
@@ -22,9 +19,10 @@ To start, we will generate the same data set as that used in the previous sectio
 
 ```{.python .input  n=2}
 import d2l
-from mxnet import autograd, nd, gluon
+from mxnet import autograd, np, npx, gluon
+npx.set_np()
 
-true_w = nd.array([2, -3.4])
+true_w = np.array([2, -3.4])
 true_b = 4.2
 features, labels = d2l.synthetic_data(true_w, true_b, 1000)
 ```
@@ -39,7 +37,7 @@ we will replace it with the pseudonym `gdata`
 to differentiate the imported `data` module
 from a variable we might define.
 The first step will be to instantiate an `ArrayDataset`,
-which takes in one or more NDArrays as arguments.
+which takes in one or more ndarrays as arguments.
 Here, we pass in `features` and `labels` as arguments.
 Next, we will use the ArrayDataset to instantiate a DataLoader,
 which also requires that we specify a `batch_size`
@@ -62,7 +60,7 @@ Now we can use `data_iter` in much the same way as we called the `data_iter` fun
 
 ```{.python .input  n=5}
 for X, y in data_iter:
-    print(X, y)
+    print(X, '\n', y)
     break
 ```
 

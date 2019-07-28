@@ -7,7 +7,8 @@ Put simply, this means that for each of the model's parameters, we can determine
 The autograd package expedites this work by automatically calculating derivatives. And while many other libraries require that we compile a symbolic graph to take automatic derivatives, `autograd` allows us to take derivatives while writing  ordinary imperative code. Every time we pass data through our model, `autograd` builds a graph on the fly, tracking which data combined through which operations to produce the output. This graph enables `autograd` to subsequently backpropagate gradients on command. Here *backpropagate* simply means to trace through the compute graph, filling in the partial derivatives with respect to each parameter. If you are unfamiliar with some of the math, e.g. gradients, please refer to :numref:`chapter_math`.
 
 ```{.python .input  n=1}
-from mxnet import autograd, nd
+from mxnet import autograd, np, npx
+npx.set_np()
 ```
 
 ## A Simple Example
@@ -15,11 +16,11 @@ from mxnet import autograd, nd
 As a toy example, say that we are interested in differentiating the mapping $y = 2\mathbf{x}^{\top}\mathbf{x}$ with respect to the column vector $\mathbf{x}$. To start, let's create the variable `x` and assign it an initial value.
 
 ```{.python .input  n=2}
-x = nd.arange(4)
+x = np.arange(4)
 x
 ```
 
-Once we compute the gradient of ``y`` with respect to ``x``, we will need a place to store it. We can tell an NDArray that we plan to store a gradient by invoking its ``attach_grad()`` method.
+Once we compute the gradient of ``y`` with respect to ``x``, we will need a place to store it. We can tell an ndarray to store a gradient by invoking its ``attach_grad()`` method.
 
 ```{.python .input  n=3}
 x.attach_grad()
@@ -29,13 +30,14 @@ Now we are going to compute ``y`` and MXNet will generate a computation graph on
 
 Note that building the computation graph requires a nontrivial amount of computation. So MXNet will only build the graph when explicitly told to do so. This happens by placing code inside a ``with autograd.record():`` block.
 
+
 ```{.python .input  n=4}
 with autograd.record():
-    y = 2 * nd.dot(x, x)
+    y = 2.0 * np.dot(x, x)
 y
 ```
 
-Since `x` is a vector of length 4, `nd.dot` will perform inner product and
+Since `x` is a vector of length 4, `np.dot` will perform inner product and
 therefore `y` is a scalar. Next, we can automatically
 find the gradient of all the inputs by calling the `backward` function.
 
@@ -53,11 +55,10 @@ If $x$ is used in another computation to compute the gradient, previous `x.grad`
 
 ```{.python .input}
 with autograd.record():
-    y = x.norm()
+    y = x.sum()
 y.backward()
 x.grad
 ```
-
 
 ## Backward for Non-scalar Variable
 
@@ -107,14 +108,14 @@ x.grad - 2*x
 Attaching gradients to a variable `x` implicitly calls `x=x.detach()`. If `x` is computed based on other variables, this part of computation will not be used in the backward function.
 
 ```{.python .input}
-y = nd.ones(4) * 2
+y = np.ones(4) * 2
 y.attach_grad()
 with autograd.record():
     u = x * y
     u.attach_grad()  # implicitly run u = u.detach()
     z = u + x
 z.backward()
-x.grad, u.grad, y.grad
+print(x.grad, '\n', u.grad, '\n', y.grad)
 ```
 
 ## Head gradients
@@ -122,7 +123,7 @@ x.grad, u.grad, y.grad
 Detaching allows to breaks the computation into several parts. We could use chain rule :numref:`chapter_math` to compute the gradient for the whole computation.  Assume $u = f(x)$ and $z = g(u)$, by chain rule we have $\frac{dz}{dx} = \frac{dz}{du} \frac{du}{dx}.$ To compute $\frac{dz}{du}$, we can first detach $u$ from the computation and then call `z.backward()` to compute the first term.
 
 ```{.python .input}
-y = nd.ones(4) * 2
+y = np.ones(4) * 2
 y.attach_grad()
 with autograd.record():
     u = x * y
@@ -130,14 +131,14 @@ with autograd.record():
     v.attach_grad()
     z = v + x
 z.backward()
-x.grad, y.grad
+print(x.grad, '\n', y.grad)
 ```
 
 Later on we call `u.backward()` to compute the second term, but pass the first term as the head gradients to multiply both terms so that `x.grad` will contains $\frac{dz}{dx}$ instead of $\frac{du}{dx}$.
 
 ```{.python .input}
 u.backward(v.grad)
-x.grad, y.grad
+print(x.grad, '\n', y.grad)
 ```
 
 ## Computing the Gradient of Python Control Flow
@@ -147,9 +148,9 @@ One benefit of using automatic differentiation is that even if the computational
 ```{.python .input  n=8}
 def f(a):
     b = a * 2
-    while b.norm().asscalar() < 1000:
+    while np.abs(b).sum() < 1000:
         b = b * 2
-    if b.sum().asscalar() > 0:
+    if b.sum() > 0:
         c = b
     else:
         c = 100 * b
@@ -159,7 +160,7 @@ def f(a):
 Note that the number of iterations of the while loop and the execution of the conditional statement (if then else) depend on the value of `a`. To compute gradients, we need to `record` the calculation, and then call the `backward` function to calculate the gradient.
 
 ```{.python .input  n=9}
-a = nd.random.normal(shape=1)
+a = np.random.normal()
 a.attach_grad()
 with autograd.record():
     d = f(a)

@@ -40,14 +40,13 @@ large numbers tell us that as the number of tosses grows this estimate will draw
 
 To start, let's import the necessary packages:
 
-```{.python .input}
+```{.python .input  n=13}
 %matplotlib inline
 from IPython import display
-import numpy as np
-from mxnet import nd
-import math
+from mxnet import np, npx
 from matplotlib import pyplot as plt
 import random
+npx.set_np()
 ```
 
 Next, we'll want to be able to cast the die. In statistics we call this process
@@ -57,15 +56,14 @@ which assigns probabilities to a number of discrete choices is called the
 *multinomial* distribution. We'll give a more formal definition of
 *distribution* later, but at a high level, think of it as just an assignment of
 probabilities to events. In MXNet, we can sample from the multinomial
-distribution via the aptly named `nd.random.multinomial` function.
+distribution via the aptly named `np.random.multinomial` function.
 The function
 can be called in many ways, but we'll focus on the simplest.
 To draw a single
 sample, we simply pass in a vector of probabilities.
 
-```{.python .input}
-probabilities = nd.ones(6) / 6
-nd.random.multinomial(probabilities)
+```{.python .input  n=14}
+np.random.multinomial(1, [1.0/6]*6)
 ```
 
 If you run the sampler a bunch of times, you'll find that you get out random
@@ -75,57 +73,24 @@ do this with a Python `for` loop, so `random.multinomial` supports drawing
 multiple samples at once, returning an array of independent samples in any shape
 we might desire.
 
-```{.python .input}
-print(nd.random.multinomial(probabilities, shape=(10)))
-print(nd.random.multinomial(probabilities, shape=(5,10)))
+```{.python .input  n=15}
+np.random.multinomial(10, [1.0/6]*6)
 ```
 
 Now that we know how to sample rolls of a die, we can simulate 1000 rolls. We
 can then go through and count, after each of the 1000 rolls, how many times each
 number was rolled.
 
-```{.python .input}
-rolls = nd.random.multinomial(probabilities, shape=(1000))
-counts = nd.zeros((6,1000))
-totals = nd.zeros(6)
-for i, roll in enumerate(rolls):
-    totals[int(roll.asscalar())] += 1
-    counts[:, i] = totals
-```
-
-To start, we can inspect the final tally at the end of $1000$ rolls.
-
-```{.python .input}
-totals / 1000
+```{.python .input  n=16}
+counts = np.random.multinomial(1000, [1.0/6]*6).astype(np.float32)
+counts / 1000
 ```
 
 As you can see, the lowest estimated probability for any of the numbers is about $.15$ and the highest estimated probability is $0.188$. Because we generated the data from a fair die, we know that each number actually has probability of $1/6$, roughly $.167$, so these estimates are pretty good. We can also visualize how these probabilities converge over time towards reasonable estimates.
 
-To start let's take a look at the `counts` array which has shape `(6, 1000)`.
-For each time step (out of 1000), `counts` says how many times each of the numbers has shown up. So we can normalize each $j$-th column of the counts vector by the number of tosses to give the `current` estimated probabilities at that time. The counts object looks like this:
-
-```{.python .input}
-counts
-```
-
-Normalizing by the number of tosses, we get:
-
-```{.python .input}
-x = nd.arange(1000).reshape((1,1000)) + 1
-estimates = counts / x
-print(estimates[:,0])
-print(estimates[:,1])
-print(estimates[:,100])
-```
-
-As you can see, after the first toss of the die, we get the extreme estimate
-that one of the numbers will be rolled with probability $1.0$ and that the
-others have probability $0$. After $100$ rolls, things already look a bit more
-reasonable. We can visualize this convergence.
-
 First we define a function that specifies `matplotlib` to output the SVG figures for sharper images, and another one to specify the figure sizes.
 
-```{.python .input}
+```{.python .input  n=17}
 # Save to the d2l package.
 def use_svg_display():
     """Use the svg format to display plot in jupyter."""
@@ -140,10 +105,13 @@ def set_figsize(figsize=(3.5, 2.5)):
 
 Now visualize the data.
 
-```{.python .input}
+```{.python .input  n=18}
+estimates = np.random.multinomial(100, [1.0/6]*6, size=100).astype(np.float32).cumsum(axis=0)
+estimates = estimates / estimates.sum(axis=1, keepdims=True)
+
 set_figsize((6, 4))
 for i in range(6):
-    plt.plot(estimates[i, :].asnumpy(), label=("P(die=" + str(i) +")"))
+    plt.plot(estimates[:,i].asnumpy(), label=("P(die=" + str(i) +")"))
 plt.axhline(y=0.16666, color='black', linestyle='dashed')
 plt.legend();
 ```
@@ -235,25 +203,23 @@ That is, the second test allowed us to gain much higher confidence that not all 
 
 Often, when working with probabilistic models, we'll want not just to estimate distributions from data, but also to generate data by sampling from distributions. One of the simplest ways to sample random numbers is to invoke the `random` method from Python's `random` package.
 
-```{.python .input}
-for i in range(10):
-    print(random.random())
+```{.python .input  n=7}
+[random.random() for _ in range(10)]
 ```
 
 ### Uniform Distribution
 
 These numbers likely *appear* random. Note that their range is between 0 and 1 and they are evenly distributed. Because these numbers are generated by default from the uniform distribution, there should be no two sub-intervals of $[0,1]$ of equal size where numbers are more likely to lie in one interval than the other. In other words, the chances of any of these numbers to fall into the interval $[0.2,0.3)$ are the same as in the interval $[.593264, .693264)$. In fact, these numbers are pseudo-random, and the computer generates them by first producing a random integer and then dividing it by its maximum range. To sample random integers directly, we can run the following snippet, which generates integers in the range between 1 and 100.
 
-```{.python .input}
-for i in range(10):
-    print(random.randint(1, 100))
+```{.python .input  n=8}
+[random.randint(1, 100) for _ in range(10)]
 ```
 
 How might we check that ``randint`` is really uniform? Intuitively, the best
 strategy would be to run sampler many times, say 1 million, and then count the
 number of times it generates each value to ensure that the results are approximately uniform.
 
-```{.python .input}
+```{.python .input  n=9}
 counts = np.zeros(100)
 fig, axes = plt.subplots(2, 2, sharex=True)
 axes = axes.flatten()
@@ -262,7 +228,7 @@ axes = axes.flatten()
 for i in range(1, 100001):
     counts[random.randint(0, 99)] += 1
     if i in [100, 1000, 10000, 100000]:
-        axes[int(math.log10(i))-2].bar(np.arange(1, 101), counts)
+        axes[int(np.log10(i))-2].bar(np.arange(1, 101).asnumpy(), counts)
 ```
 
 We can see from these figures that the initial number of counts looks *strikingly* uneven. If we sample fewer than 100 draws from a distribution over
@@ -274,7 +240,7 @@ situation where the probability of drawing a number $x$ is given by $p(x)$.
 
 Drawing from a uniform distribution over a set of 100 outcomes is simple. But what if we have nonuniform probabilities? Let's start with a simple case, a biased coin which comes up heads with probability 0.35 and tails with probability 0.65. A simple way to sample from that is to generate a uniform random variable over $[0,1]$ and if the number is less than $0.35$, we output heads and otherwise we generate tails. Let's try this out.
 
-```{.python .input}
+```{.python .input  n=12}
 # Number of samples
 n = 1000000
 y = np.random.uniform(0, 1, n)
@@ -283,8 +249,8 @@ x = np.arange(1, n+1)
 p0 = np.cumsum(y < 0.35) / x
 p1 = np.cumsum(y >= 0.35) / x
 
-plt.semilogx(x, p0)
-plt.semilogx(x, p1)
+plt.semilogx(x.asnumpy(), p0.asnumpy())
+plt.semilogx(x.asnumpy(), p1.asnumpy())
 plt.axhline(y=0.35, color='black', linestyle='dashed')
 plt.axhline(y=0.65, color='black', linestyle='dashed');
 ```
@@ -303,8 +269,8 @@ The standard Normal distribution (aka the standard Gaussian distribution) is giv
 
 ```{.python .input}
 x = np.arange(-10, 10, 0.01)
-p = (1/math.sqrt(2 * math.pi)) * np.exp(-0.5 * x**2)
-plt.plot(x, p);
+p = (1/np.sqrt(2 * np.pi)) * np.exp(-0.5 * x**2)
+plt.plot(x.asnumpy(), p.asnumpy());
 ```
 
 Sampling from this distribution is less trivial. First off, the support is
@@ -342,10 +308,10 @@ y = np.arange(1,10001).reshape(10000,1)
 z = np.cumsum(x,axis=0) / y
 
 for i in range(10):
-    plt.semilogx(y,z[:,i])
+    plt.semilogx(y.asnumpy(), z[:,i].asnumpy())
 
-plt.semilogx(y,(variance**0.5) * np.power(y,-0.5) + mean,'r')
-plt.semilogx(y,-(variance**0.5) * np.power(y,-0.5) + mean,'r');
+plt.semilogx(y.asnumpy(), ((variance**0.5) * np.power(y,-0.5) + mean).asnumpy(),'r')
+plt.semilogx(y.asnumpy(), (-(variance**0.5) * np.power(y,-0.5) + mean).asnumpy(),'r');
 ```
 
 This looks very similar to the initial example, at least in the limit of averages of large numbers of variables. This is confirmed by theory. Denote by

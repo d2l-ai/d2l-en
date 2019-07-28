@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="517c00b2-9162-45ca-a83b-5c6856dc42bf" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_appendix/how-to-contribute.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_appendix/how-to-contribute.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_appendix/notation.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_appendix/notation.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_attention-mechanism/attention.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_attention-mechanism/attention.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_attention-mechanism/seq2seq-attention.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_attention-mechanism/seq2seq-attention.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_attention-mechanism/transformer.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_attention-mechanism/transformer.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_computational-performance/async-computation.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_computational-performance/async-computation.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_computational-performance/auto-parallelism.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_computational-performance/auto-parallelism.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_computational-performance/hybridize.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_computational-performance/hybridize.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_computational-performance/multiple-gpus-gluon.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_computational-performance/multiple-gpus-gluon.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_computational-performance/multiple-gpus.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_computational-performance/multiple-gpus.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_computer-vision/rcnn.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_computer-vision/rcnn.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_convolutional-modern/alexnet.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_convolutional-modern/alexnet.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_convolutional-modern/batch-norm.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_convolutional-modern/batch-norm.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_convolutional-modern/densenet.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_convolutional-modern/densenet.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_convolutional-modern/googlenet.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_convolutional-modern/googlenet.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_convolutional-modern/nin.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_convolutional-modern/nin.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_convolutional-modern/resnet.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_convolutional-modern/resnet.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_convolutional-modern/vgg.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_convolutional-modern/vgg.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_convolutional-neural-networks/channels.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_convolutional-neural-networks/channels.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_convolutional-neural-networks/conv-layer.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_convolutional-neural-networks/conv-layer.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_convolutional-neural-networks/lenet.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_convolutional-neural-networks/lenet.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_convolutional-neural-networks/padding-and-strides.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_convolutional-neural-networks/padding-and-strides.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_convolutional-neural-networks/pooling.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_convolutional-neural-networks/pooling.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_crashcourse/autograd.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_crashcourse/autograd.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_crashcourse/linear-algebra.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_crashcourse/linear-algebra.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_crashcourse/lookup-api.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_crashcourse/lookup-api.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_crashcourse/naive-bayes.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_crashcourse/naive-bayes.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_crashcourse/ndarray.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_crashcourse/ndarray.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_crashcourse/probability.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_crashcourse/probability.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_generative_adversarial_networks/dcgan.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_generative_adversarial_networks/dcgan.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_generative_adversarial_networks/gan.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_generative_adversarial_networks/gan.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_install/install.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_install/install.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_linear-networks/fashion-mnist.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_linear-networks/fashion-mnist.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_linear-networks/linear-regression-gluon.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_linear-networks/linear-regression-gluon.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_linear-networks/linear-regression-scratch.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_linear-networks/linear-regression-scratch.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_linear-networks/linear-regression.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_linear-networks/linear-regression.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_linear-networks/softmax-regression-gluon.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_linear-networks/softmax-regression-gluon.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_linear-networks/softmax-regression-scratch.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_linear-networks/softmax-regression-scratch.md" afterDir="false" />
+    </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="numpy3" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1OeRetjl0GbvwHiXMkhVdlSHrZY" />
+  <component name="PropertiesComponent">
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="preferences.keymap" />
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="517c00b2-9162-45ca-a83b-5c6856dc42bf" name="Default Changelist" comment="" />
+      <created>1564336175123</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1564336175123</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="1">
+          <value>
+            <State>
+              <option name="FILTERS">
+                <map>
+                  <entry key="range">
+                    <value>
+                      <list>
+                        <option value="HEAD..master" />
+                      </list>
+                    </value>
+                  </entry>
+                </map>
+              </option>
+            </State>
+          </value>
+        </entry>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="OPEN_TABS">
+      <set>
+        <option value="1" />
+      </set>
+    </option>
+  </component>
+</project>

@@ -31,7 +31,7 @@ ResNet follows VGG's full $3\times 3$ convolutional layer design. The residual b
 
 ```{.python .input  n=1}
 import d2l
-from mxnet import gluon, nd
+from mxnet import gluon, np, npx
 from mxnet.gluon import nn
 
 # Save to the d2l package.
@@ -50,11 +50,11 @@ class Residual(nn.Block):
         self.bn2 = nn.BatchNorm()
 
     def forward(self, X):
-        Y = nd.relu(self.bn1(self.conv1(X)))
+        Y = npx.relu(self.bn1(self.conv1(X)))
         Y = self.bn2(self.conv2(Y))
         if self.conv3:
             X = self.conv3(X)
-        return nd.relu(Y + X)
+        return npx.relu(Y + X)
 ```
 
 This code generates two types of networks: one where we add the input to the output before applying the ReLU nonlinearity, and whenever `use_1x1conv=True`, one where we adjust channels and resolution by means of a $1 \times 1$ convolution before adding. The diagram below illustrates this:
@@ -66,7 +66,7 @@ Now let us look at a situation where the input and output are of the same shape.
 ```{.python .input  n=2}
 blk = Residual(3)
 blk.initialize()
-X = nd.random.uniform(shape=(4, 3, 6, 6))
+X = np.random.uniform(size=(4, 3, 6, 6))
 blk(X).shape
 ```
 
@@ -126,7 +126,7 @@ There are 4 convolutional layers in each module (excluding the $1\times 1$ convo
 Before training ResNet, let us observe how the input shape changes between different modules in ResNet. As in all previous architectures, the resolution decreases while the number of channels increases up until the point where a global average pooling layer aggregates all features.
 
 ```{.python .input  n=6}
-X = nd.random.uniform(shape=(1, 1, 224, 224))
+X = np.random.uniform(size=(1, 1, 224, 224))
 net.initialize()
 for layer in net:
     X = layer(X)
