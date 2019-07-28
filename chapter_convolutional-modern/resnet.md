@@ -33,6 +33,7 @@ ResNet follows VGG's full $3\times 3$ convolutional layer design. The residual b
 import d2l
 from mxnet import gluon, np, npx
 from mxnet.gluon import nn
+npx.set_np()
 
 # Save to the d2l package.
 class Residual(nn.Block):

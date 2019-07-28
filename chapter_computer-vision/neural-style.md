@@ -27,8 +27,10 @@ First, we read the content and style images. By printing out the image coordinat
 ```{.python .input  n=1}
 %matplotlib inline
 import d2l
-from mxnet import autograd, gluon, image, init, nd
+from mxnet import autograd, gluon, image, init, np, npx
 from mxnet.gluon import nn
+
+npx.set_np()
 
 d2l.set_figsize((3.5, 2.5))
 content_img = image.imread('../img/rainier.jpg')
@@ -45,17 +47,17 @@ d2l.plt.imshow(style_img.asnumpy());
 Below, we define the functions for image preprocessing and postprocessing. The `preprocess` function normalizes each of the three RGB channels of the input images and transforms the results to a format that can be input to the CNN. The `postprocess` function restores the pixel values in the output image to their original values before normalization. Because the image printing function requires that each pixel has a floating point value from 0 to 1, we use the `clip` function to replace values smaller than 0 or greater than 1 with 0 or 1, respectively.
 
 ```{.python .input  n=3}
-rgb_mean = nd.array([0.485, 0.456, 0.406])
-rgb_std = nd.array([0.229, 0.224, 0.225])
+rgb_mean = np.array([0.485, 0.456, 0.406])
+rgb_std = np.array([0.229, 0.224, 0.225])
 
 def preprocess(img, image_shape):
     img = image.imresize(img, *image_shape)
     img = (img.astype('float32') / 255 - rgb_mean) / rgb_std
-    return img.transpose((2, 0, 1)).expand_dims(axis=0)
+    return np.expand_dims(img.transpose(2, 0, 1), axis=0)
 
 def postprocess(img):
     img = img[0].as_in_context(rgb_std.context)
-    return (img.transpose((1, 2, 0)) * rgb_std + rgb_mean).clip(0, 1)
+    return (img.transpose(1, 2, 0) * rgb_std + rgb_mean).clip(0, 1)
 ```
 
 ## Extract Features
@@ -117,27 +119,27 @@ Next, we will look at the loss function used for style transfer. The loss functi
 
 Similar to the loss function used in linear regression, content loss uses a square error function to measure the difference in content features between the composite image and content image. The two inputs of the square error function are both content layer outputs obtained from the `extract_features` function.
 
-```{.python .input  n=9}
+```{.python .input  n=10}
 def content_loss(Y_hat, Y):
-    return (Y_hat - Y).square().mean()
+    return np.square(Y_hat - Y).mean()
 ```
 
 ### Style Loss
 
 Style loss, similar to content loss, uses a square error function to measure the difference in style between the composite image and style image. To express the styles output by the style layers, we first use the `extract_features` function to compute the style layer output. Assuming that the output has 1 example, $c$ channels, and a height and width of $h$ and $w$, we can transform the output into the matrix $\boldsymbol{X}$, which has $c$ rows and $h \cdot w$ columns. You can think of matrix $\boldsymbol{X}$ as the combination of the $c$ vectors $\boldsymbol{x}_1, \ldots, \boldsymbol{x}_c$, which have a length of $hw$. Here, the vector $\boldsymbol{x}_i$ represents the style feature of channel $i$. In the Gram matrix of these vectors $\boldsymbol{X}\boldsymbol{X}^\top \in \mathbb{R}^{c \times c}$, element $x_{ij}$ in row $i$ column $j$ is the inner product of vectors $\boldsymbol{x}_i$ and $\boldsymbol{x}_j$. It represents the correlation of the style features of channels $i$ and $j$. We use this type of Gram matrix to represent the style output by the style layers. You must note that, when the $h \cdot w$ value is large, this often leads to large values in the Gram matrix. In addition, the height and width of the Gram matrix are both the number of channels $c$. To ensure that the style loss is not affected by the size of these values, we define the `gram` function below to divide the Gram matrix by the number of its elements, i.e. $c \cdot h \cdot w$.
 
-```{.python .input  n=10}
+```{.python .input  n=11}
 def gram(X):
     num_channels, n = X.shape[1], X.size // X.shape[1]
-    X = X.reshape((num_channels, n))
-    return nd.dot(X, X.T) / (num_channels * n)
+    X = X.reshape(num_channels, n)
+    return np.dot(X, X.T) / (num_channels * n)
 ```
 
 Naturally, the two Gram matrix inputs of the square error function for style loss are taken from the composite image and style image style layer outputs. Here, we assume that the Gram matrix of the style image, `gram_Y`, has been computed in advance.
 
-```{.python .input  n=11}
+```{.python .input  n=12}
 def style_loss(Y_hat, gram_Y):
-    return (gram(Y_hat) - gram_Y).square().mean()
+    return np.square(gram(Y_hat) - gram_Y).mean()
 ```
 
 ### Total Variance Loss
@@ -148,17 +150,17 @@ $$\sum_{i,j} \left|x_{i,j} - x_{i+1,j}\right| + \left|x_{i,j} - x_{i,j+1}\right|
 
 We try to make the values of neighboring pixels as similar as possible.
 
-```{.python .input  n=12}
+```{.python .input  n=13}
 def tv_loss(Y_hat):
-    return 0.5 * ((Y_hat[:, :, 1:, :] - Y_hat[:, :, :-1, :]).abs().mean() +
-                  (Y_hat[:, :, :, 1:] - Y_hat[:, :, :, :-1]).abs().mean())
+    return 0.5 * (np.abs(Y_hat[:, :, 1:, :] - Y_hat[:, :, :-1, :]).mean() +
+                  np.abs(Y_hat[:, :, :, 1:] - Y_hat[:, :, :, :-1]).mean())
 ```
 
 ### Loss Function
 
 The loss function for style transfer is the weighted sum of the content loss, style loss, and total variance loss. By adjusting these weight hyper-parameters, we can balance the retained content, transferred style, and noise reduction in the composite image according to their relative importance.
 
-```{.python .input  n=13}
+```{.python .input  n=14}
 content_weight, style_weight, tv_weight = 1, 1e3, 10
 
 def compute_loss(X, contents_Y_hat, styles_Y_hat, contents_Y, styles_Y_gram):
@@ -169,7 +171,7 @@ def compute_loss(X, contents_Y_hat, styles_Y_hat, contents_Y, styles_Y_gram):
         styles_Y_hat, styles_Y_gram)]
     tv_l = tv_loss(X) * tv_weight
     # Add up all the losses
-    l = nd.add_n(*styles_l) + nd.add_n(*contents_l) + tv_l
+    l = sum(styles_l + contents_l + [tv_l])
     return contents_l, styles_l, tv_l, l
 ```
 
@@ -177,7 +179,7 @@ def compute_loss(X, contents_Y_hat, styles_Y_hat, contents_Y, styles_Y_gram):
 
 In style transfer, the composite image is the only variable that needs to be updated. Therefore, we can define a simple model, `GeneratedImage`, and treat the composite image as a model parameter. In the model, forward computation only returns the model parameter.
 
-```{.python .input  n=14}
+```{.python .input  n=15}
 class GeneratedImage(nn.Block):
     def __init__(self, img_shape, **kwargs):
         super(GeneratedImage, self).__init__(**kwargs)
@@ -189,7 +191,7 @@ class GeneratedImage(nn.Block):
 
 Next, we define the `get_inits` function. This function creates a composite image model instance and initializes it to the image `X`. The Gram matrix for the various style layers of the style image, `styles_Y_gram`, is computed prior to training.
 
-```{.python .input  n=15}
+```{.python .input  n=16}
 def get_inits(X, ctx, lr, styles_Y):
     gen_img = GeneratedImage(X.shape)
     gen_img.initialize(init.Constant(X), ctx=ctx, force_reinit=True)
@@ -208,7 +210,7 @@ results in :numref:`chapter_async`. Because we only call the `asscalar` synchron
 epochs, the process may occupy a great deal of memory. Therefore, we call the
 `waitall` synchronization function during every epoch.
 
-```{.python .input  n=16}
+```{.python .input  n=17}
 def train(X, contents_Y, styles_Y, ctx, lr, num_epochs, lr_decay_epoch):
     X, styles_Y_gram, trainer = get_inits(X, ctx, lr, styles_Y)
     animator = d2l.Animator(xlabel='epoch', ylabel='loss', xlim=[1, num_epochs],
@@ -222,19 +224,20 @@ def train(X, contents_Y, styles_Y, ctx, lr, num_epochs, lr_decay_epoch):
                 X, contents_Y_hat, styles_Y_hat, contents_Y, styles_Y_gram)
         l.backward()
         trainer.step(1)
-        nd.waitall()
+        npx.waitall()
         if epoch % lr_decay_epoch == 0:
             trainer.set_learning_rate(trainer.learning_rate * 0.1)
         if epoch % 10 == 0:
             animator.axes[1].imshow(postprocess(X).asnumpy())
-            animator.add(epoch, [nd.add_n(*contents_l).asscalar(),
-                     nd.add_n(*styles_l).asscalar(), tv_l.asscalar()])
+            animator.add(epoch, [float(sum(contents_l)),
+                                 float(sum(styles_l)),
+                                 float(tv_l)])
     return X
 ```
 
 Next, we start to train the model. First, we set the height and width of the content and style images to 150 by 225 pixels. We use the content image to initialize the composite image.
 
-```{.python .input  n=17}
+```{.python .input  n=18}
 ctx, image_shape = d2l.try_gpu(), (225, 150)
 net.collect_params().reset_ctx(ctx)
 content_X, contents_Y = get_contents(image_shape, ctx)

@@ -24,14 +24,14 @@ In this chapter, we will use a [data set](https://archive.ics.uci.edu/ml/dataset
 ```{.python .input  n=1}
 %matplotlib inline
 import d2l
-from mxnet import autograd, gluon, init, nd
+from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
-import numpy as np
+npx.set_np()
 
 # Save to the d2l package.
 def get_data_ch10(batch_size=10, n=1500):
-    data = np.genfromtxt('../data/airfoil_self_noise.dat', delimiter='\t')
-    data = nd.array((data - data.mean(axis=0)) / data.std(axis=0))
+    data = np.genfromtxt('../data/airfoil_self_noise.dat', dtype=np.float32, delimiter='\t')
+    data = (data - data.mean(axis=0)) / data.std(axis=0)
     data_iter = d2l.load_array((data[:n, :-1], data[:n, -1]),
                                batch_size, is_train=True)
     return data_iter, data.shape[1]-1
@@ -61,8 +61,8 @@ Next, we are going to implement a generic training function to facilitate the us
 def train_ch10(trainer_fn, states, hyperparams, data_iter,
                feature_dim, num_epochs=2):
     # Initialization
-    w = nd.random.normal(scale=0.01, shape=(feature_dim, 1))
-    b = nd.zeros(1)
+    w = np.random.normal(scale=0.01, size=(feature_dim, 1))
+    b = np.zeros(1)
     w.attach_grad()
     b.attach_grad()
     net, loss = lambda X: d2l.linreg(X, w, b), d2l.squared_loss
@@ -80,7 +80,7 @@ def train_ch10(trainer_fn, states, hyperparams, data_iter,
             if n % 200 == 0:
                 timer.stop()
                 animator.add(n/X.shape[0]/len(data_iter),
-                             d2l.evaluate_loss(net, data_iter, loss))
+                             (d2l.evaluate_loss(net, data_iter, loss),))
                 timer.start()
     print('loss: %.3f, %.3f sec/epoch'%(animator.Y[0][-1], timer.avg()))
     return timer.cumsum(), animator.Y[0]
@@ -155,7 +155,7 @@ def train_gluon_ch10(trainer_name, trainer_hyperparams,
             if n % 200 == 0:
                 timer.stop()
                 animator.add(n/X.shape[0]/len(data_iter),
-                             d2l.evaluate_loss(net, data_iter, loss))
+                             (d2l.evaluate_loss(net, data_iter, loss),))
                 timer.start()
     print('loss: %.3f, %.3f sec/epoch'%(animator.Y[0][-1], timer.avg()))
 ```

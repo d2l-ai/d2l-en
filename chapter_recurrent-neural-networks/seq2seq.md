@@ -12,9 +12,10 @@ The layers in the encoder and the decoder are illustrated in the following figur
 In this section we will implement the seq2seq model to train on the machine translation dataset.
 
 ```{.python .input  n=1}
-from mxnet import nd, init, gluon, autograd
-from mxnet.gluon import nn, rnn
 import d2l
+from mxnet import np, npx, init, gluon, autograd
+from mxnet.gluon import nn, rnn
+npx.set_np()
 ```
 
 ## Encoder
@@ -47,7 +48,7 @@ Next, we will create a mini-batch sequence input with a batch size of 4 and 7 ti
 encoder = Seq2SeqEncoder(vocab_size=10, embed_size=8,
                          num_hiddens=16, num_layers=2)
 encoder.initialize()
-X = nd.zeros((4, 7))
+X = np.zeros((4, 7))
 output, state = encoder(X)
 output.shape, len(state), state[0].shape, state[1].shape
 ```
@@ -97,15 +98,15 @@ For each time step, the decoder outputs a vocabulary size confident score vector
 To implement the loss function that filters out some entries, we will use an operator called `SequenceMask`. It can specify to mask the first dimension (`axis=0`) or the second one (`axis=1`). If the second one is chosen, given a valid length vector `len` and 2-dim input `X`, this operator sets `X[i, len[i]:] = 0` for all $i$'s.
 
 ```{.python .input  n=7}
-X = nd.array([[1,2,3], [4,5,6]])
-nd.SequenceMask(X, nd.array([1,2]), True, axis=1)
+X = np.array([[1,2,3], [4,5,6]])
+npx.sequence_mask(X, np.array([1,2]), True, axis=1)
 ```
 
 Apply to $n$-dim tensor $X$, it sets `X[i, len[i]:, :, ..., :] = 0`. In addition, we can specify the filling value beyond 0.
 
 ```{.python .input  n=8}
-X = nd.ones((2, 3, 4))
-nd.SequenceMask(X, nd.array([1,2]), True, value=-1, axis=1)
+X = np.ones((2, 3, 4))
+npx.sequence_mask(X, np.array([1,2]), True, value=-1, axis=1)
 ```
 
 Now we can implement the masked version of the softmax cross-entropy loss. Note that each Gluon loss function allows to specify per-example weights, in default they are 1s. Then we can just use a zero weight for each example we would like to remove. So our customized loss function accepts an additional `valid_length` argument to ignore some failing elements in each sequence.
@@ -118,8 +119,8 @@ class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
     # valid_length shape: (batch_size, )
     def forward(self, pred, label, valid_length):
         # the sample weights shape should be (batch_size, seq_len, 1)
-        weights = nd.ones_like(label).expand_dims(axis=-1)
-        weights = nd.SequenceMask(weights, valid_length, True, axis=1)
+        weights = np.expand_dims(np.ones_like(label),axis=-1)
+        weights = npx.sequence_mask(weights, valid_length, True, axis=1)
         return super(MaskedSoftmaxCELoss, self).forward(pred, label, weights)
 ```
 
@@ -127,7 +128,7 @@ For a sanity check, we create identical three sequences, keep 4 elements for the
 
 ```{.python .input  n=10}
 loss = MaskedSoftmaxCELoss()
-loss(nd.ones((3, 4, 10)), nd.ones((3, 4)), nd.array([4, 2, 0]))
+loss(np.ones((3, 4, 10)), np.ones((3, 4)), np.array([4, 2, 0]))
 ```
 
 ## Training
@@ -155,11 +156,11 @@ def train_s2s_ch8(model, data_iter, lr, num_epochs, ctx):
                 l = loss(Y_hat, Y_label, Y_vlen)
             l.backward()
             d2l.grad_clipping(model, 1)
-            num_tokens = Y_vlen.sum().asscalar()
+            num_tokens = Y_vlen.sum()
             trainer.step(num_tokens)
-            metric.add(l.sum().asscalar(), num_tokens)
+            metric.add(l.sum(), num_tokens)
         if epoch % 10 == 0:
-            animator.add(epoch, metric[0]/metric[1])
+            animator.add(epoch, (metric[0]/metric[1],))
     print('loss %.3f, %d tokens/sec on %s ' % (
         metric[0]/metric[1], metric[1]/timer.stop(), ctx))
 ```
@@ -192,19 +193,20 @@ During predicting, we feed the same "&lt;bos&gt;" token to the decoder as traini
 # Save to the d2l package.
 def predict_s2s_ch8(model, src_sentence, src_vocab, tgt_vocab, num_steps, ctx):
     src_tokens = src_vocab[src_sentence.lower().split(' ')]
-    enc_valid_length = nd.array([len(src_tokens)], ctx=ctx)
+    enc_valid_length = np.array([len(src_tokens)], ctx=ctx)
     src_tokens = d2l.trim_pad(src_tokens, num_steps, src_vocab.pad)
-    enc_X = nd.array(src_tokens, ctx=ctx)
+    enc_X = np.array(src_tokens, ctx=ctx)
     # add the batch_size dimension.
-    enc_outputs = model.encoder(enc_X.expand_dims(axis=0), enc_valid_length)
+    enc_outputs = model.encoder(np.expand_dims(enc_X, axis=0), 
+                                enc_valid_length)
     dec_state = model.decoder.init_state(enc_outputs, enc_valid_length)
-    dec_X = nd.array([tgt_vocab.bos], ctx=ctx).expand_dims(axis=0)
+    dec_X = np.expand_dims(np.array([tgt_vocab.bos], ctx=ctx), axis=0)
     predict_tokens = []
     for _ in range(num_steps):
         Y, dec_state = model.decoder(dec_X, dec_state)
         # The token with highest score is used as the next time step input.
         dec_X = Y.argmax(axis=2)
-        py = dec_X.squeeze(axis=0).astype('int32').asscalar()
+        py = dec_X.squeeze(axis=0).astype('int32').item()
         if py == tgt_vocab.eos:
             break
         predict_tokens.append(py)
@@ -220,3 +222,9 @@ for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
 ```
 
 ## Summary
+* The sequence to sequence (seq2seq) model is based on the encoder-decoder architecture to generate a sequence output for a sequence input.
+* We use multiple LSTM layers for encoder and decoder.
+
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/seq2seq-discussion/4357)
+
+![](../img/qr_seq2seq.svg)

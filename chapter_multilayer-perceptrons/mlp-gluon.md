@@ -5,8 +5,9 @@ Now that we learned how multilayer perceptrons (MLPs) work in theory, let's impl
 
 ```{.python .input}
 import d2l
-from mxnet import gluon, init
+from mxnet import gluon, npx, init
 from mxnet.gluon import nn
+npx.set_np()
 ```
 
 ## The Model

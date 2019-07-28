@@ -7,7 +7,8 @@ In this section, we are going to introduce the basic principles of stochastic gr
 %matplotlib inline
 import d2l
 import math
-import numpy as np
+from mxnet import np, npx 
+npx.set_np()
 ```
 
 Next, we use $x=10$ as the initial value and assume $\eta=0.2$. Using gradient descent to iterate $x$ 10 times, we can see that, eventually, the value of $x$ approaches the optimal solution.

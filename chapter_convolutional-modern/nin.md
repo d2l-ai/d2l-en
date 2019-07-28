@@ -46,6 +46,7 @@ The subsequent widths are fixed to $1 \times 1$.
 import d2l
 from mxnet import gluon, np, npx
 from mxnet.gluon import nn
+npx.set_np()
 
 def nin_block(num_channels, kernel_size, strides, padding):
     blk = nn.Sequential()

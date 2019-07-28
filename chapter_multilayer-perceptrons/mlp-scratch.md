@@ -6,7 +6,8 @@ let's implement them. First, we import the required packages.
 
 ```{.python .input  n=9}
 import d2l
-from mxnet import nd, gluon
+from mxnet import np, npx, gluon
+npx.set_np()
 ```
 
 To compare against the results
@@ -32,17 +33,17 @@ that could be set based on performance on validation data.
 Typically, we'll choose layer widths as powers of $2$
 to make everything align nicely in memory.
 
-Again, we will allocate several NDArrays to represent our parameters.
+Again, we will represent our parameters with several ndarrays.
 Note that we now have one weight matrix and one bias vector *per layer*.
 As always, we must call `attach_grad` to allocate memory for the gradients with respect to these parameters.
 
 ```{.python .input  n=3}
 num_inputs, num_outputs, num_hiddens = 784, 10, 256
 
-W1 = nd.random.normal(scale=0.01, shape=(num_inputs, num_hiddens))
-b1 = nd.zeros(num_hiddens)
-W2 = nd.random.normal(scale=0.01, shape=(num_hiddens, num_outputs))
-b2 = nd.zeros(num_outputs)
+W1 = np.random.normal(scale=0.01, size=(num_inputs, num_hiddens))
+b1 = np.zeros(num_hiddens)
+W2 = np.random.normal(scale=0.01, size=(num_hiddens, num_outputs))
+b2 = np.zeros(num_outputs)
 params = [W1, b1, W2, b2]
 
 for param in params:
@@ -53,24 +54,24 @@ for param in params:
 
 To make sure we know how everything works,
 we will use the `maximum` function to implement ReLU ourselves,
-instead of invoking `nd.relu` directly.
+instead of invoking `npx.relu` directly.
 
 ```{.python .input  n=4}
 def relu(X):
-    return nd.maximum(X, 0)
+    return np.maximum(X, 0)
 ```
 
 ## The model
 
 As in softmax regression, we will `reshape` each 2D image
 into a flat vector of length  `num_inputs`.
-Finally, we can implement our model with just a few lines of code.
+Finally, we cam implement our model with just a few lines of code.
 
 ```{.python .input  n=5}
 def net(X):
-    X = X.reshape((-1, num_inputs))
-    H = relu(nd.dot(X, W1) + b1)
-    return nd.dot(H, W2) + b2
+    X = X.reshape(-1, num_inputs)
+    H = relu(np.dot(X, W1) + b1)
+    return np.dot(H, W2) + b2
 ```
 
 ## The Loss Function

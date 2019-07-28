@@ -39,7 +39,8 @@ To illustrate this let's plot a few functions and check which ones satisfy the r
 %matplotlib inline
 import d2l
 from mpl_toolkits import mplot3d
-import numpy as np
+from mxnet import np, npx
+npx.set_np()
 ```
 
 Let's define a few functions, both convex and nonconvex.
@@ -108,7 +109,8 @@ Such sets are convex. Let's prove this quickly. Remember that for any $x, x' \in
 Have a look at the function $f(x,y) = 0.5 x^2 + \cos(2 \pi y)$ below. It is clearly nonconvex. The level sets are correspondingly nonconvex. In fact, they're typically composed of disjoint sets.
 
 ```{.python .input}
-x, y = np.mgrid[-1: 1: 101j, -1: 1: 101j]
+x, y = np.meshgrid(np.linspace(-1, 1, 101), np.linspace(-1, 1, 101), indexing='ij')
+
 z = x**2 + 0.5 * np.cos(2 * np.pi * y)
 
 # Plot the 3D surface
@@ -234,3 +236,9 @@ In the context of deep learning the main purpose of convex functions is to motiv
     * As intermediate step write out the penalized objective $\|\mathbf{w} - \mathbf{w}'\|_2^2 + \lambda \|\mathbf{w}'\|_1$ and compute the solution for a given $\lambda > 0$. 
     * Can you find the 'right' value of $\lambda$ without a lot of trial and error? 
 1. Given a convex set $X$ and two vectors $\mathbf{x}$ and $\mathbf{y}$ prove that projections never increase distances, i.e. $\|\mathbf{x} - \mathbf{y}\| \geq \|\mathrm{Proj}_X(\mathbf{x}) - \mathrm{Proj}_X(\mathbf{y})\|$.
+
+
+
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/convexity-discussion/4368)
+
+![](../img/qr_convexity.svg)

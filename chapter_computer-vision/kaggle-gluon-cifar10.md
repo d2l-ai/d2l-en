@@ -1,7 +1,7 @@
 # Image Classification (CIFAR-10) on Kaggle
 :label:`chapter_kaggle_cifar10`
 
-So far, we have been using Gluon's `data` package to directly obtain image data sets in NDArray format. In practice, however, image data sets often exist in the format of image files. In this section, we will start with the original image files and organize, read, and convert the files to NDArray format step by step.
+So far, we have been using Gluon's `data` package to directly obtain image data sets in the ndarray format. In practice, however, image data sets often exist in the format of image files. In this section, we will start with the original image files and organize, read, and convert the files to the ndarray format step by step.
 
 We performed an experiment on the CIFAR-10 data set in :numref:`chapter_image_augmentation`.
 This is an important data
@@ -21,12 +21,14 @@ First, import the packages or modules required for the competition.
 
 ```{.python .input  n=1}
 import d2l
-from mxnet import autograd, gluon, init
+from mxnet import autograd, gluon, init, npx
 from mxnet.gluon import nn
 import os
 import pandas as pd
 import shutil
 import time
+
+npx.set_np()
 ```
 
 ## Obtain and Organize the Data Sets
@@ -229,11 +231,11 @@ class Residual(nn.HybridBlock):
         self.bn2 = nn.BatchNorm()
 
     def hybrid_forward(self, F, X):
-        Y = F.relu(self.bn1(self.conv1(X)))
+        Y = F.npx.relu(self.bn1(self.conv1(X)))
         Y = self.bn2(self.conv2(Y))
         if self.conv3:
             X = self.conv3(X)
-        return F.relu(Y + X)
+        return F.npx.relu(Y + X)
 ```
 
 Next, we define the ResNet-18 model.
@@ -293,8 +295,8 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
                 l = loss(y_hat, y).sum()
             l.backward()
             trainer.step(batch_size)
-            train_l_sum += l.asscalar()
-            train_acc_sum += (y_hat.argmax(axis=1) == y).sum().asscalar()
+            train_l_sum += float(l)
+            train_acc_sum += float((y_hat.argmax(axis=1) == y).sum())
             n += y.size
         time_s = "time %.2f sec" % (time.time() - start)
         if valid_iter is not None:

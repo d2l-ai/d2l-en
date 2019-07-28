@@ -7,7 +7,8 @@ In this section we implement a language model introduce in :numref:`chapter_rnn`
 %matplotlib inline
 import d2l
 import math
-from mxnet import autograd, nd, gluon
+from mxnet import autograd, np, npx, gluon
+npx.set_np()
 
 batch_size, num_steps = 32, 35
 train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
@@ -20,14 +21,14 @@ Remember that each token is presented as a numerical index in `train_iter`. Feed
 In a nutshell, we map each index to a different unit vector: assume that the number of different toeksn in the vocabulary is $N$ (the `len(vocab)`) and the token indices range from 0 to $N-1$. If the index of a token is the integer $i$, then we create a vector $\mathbf{e}_i$ of all 0s with a length of $N$ and set the element at position $i$ to 1. This vector is the one-hot vector of the original token. The one-hot vectors with indices 0 and 2 are shown below.
 
 ```{.python .input  n=21}
-nd.one_hot(nd.array([0, 2]), len(vocab))
+npx.one_hot(np.array([0, 2]), len(vocab))
 ```
 
 The shape of the mini-batch we sample each time is (batch size, time step). The `one_hot` function transforms such a mini-batch into a 3-D tensor with the last dimension equals to the vocabulary size. We often transpose the input so that we will obtain a (time step, batch size, vocabulary size) output that fits into a sequence model easier.
 
 ```{.python .input  n=18}
-X = nd.arange(10).reshape((2, 5))
-nd.one_hot(X.T, 28).shape
+X = np.arange(10).reshape(2, 5)
+npx.one_hot(X.T, 28).shape
 ```
 
 ## Initializing the Model Parameters
@@ -37,15 +38,15 @@ Next, we initialize the model parameters for a RNN model. The number of hidden u
 ```{.python .input  n=19}
 def get_params(vocab_size, num_hiddens, ctx):
     num_inputs = num_outputs = vocab_size
-    normal = lambda shape: nd.random.normal(
-        scale=0.01, shape=shape, ctx=ctx)
+    normal = lambda shape: np.random.normal(
+        scale=0.01, size=shape, ctx=ctx)
     # Hidden layer parameters
     W_xh = normal((num_inputs, num_hiddens))
     W_hh = normal((num_hiddens, num_hiddens))
-    b_h = nd.zeros(num_hiddens, ctx=ctx)
+    b_h = np.zeros(num_hiddens, ctx=ctx)
     # Output layer parameters
     W_hq = normal((num_hiddens, num_outputs))
-    b_q = nd.zeros(num_outputs, ctx=ctx)
+    b_q = np.zeros(num_outputs, ctx=ctx)
     # Attach a gradient
     params = [W_xh, W_hh, b_h, W_hq, b_q]
     for param in params: param.attach_grad()
@@ -54,11 +55,11 @@ def get_params(vocab_size, num_hiddens, ctx):
 
 ## RNN Model
 
-First, we need an `init_rnn_state` function to return the hidden state at initialization. It returns a tuple consisting of an NDArray with a value of 0 and a shape of (batch size, number of hidden units). Using tuples makes it easier to handle situations where the hidden state contains multiple variables (e.g. when combining multiple layers in an RNN where each layers requires initializing).
+First, we need an `init_rnn_state` function to return the hidden state at initialization. It returns an ndarray filled with 0 and with a shape of (batch size, number of hidden units). Using tuples makes it easier to handle situations where the hidden state contains multiple variables (e.g. when combining multiple layers in an RNN where each layers requires initializing).
 
 ```{.python .input  n=20}
 def init_rnn_state(batch_size, num_hiddens, ctx):
-    return (nd.zeros(shape=(batch_size, num_hiddens), ctx=ctx), )
+    return (np.zeros(shape=(batch_size, num_hiddens), ctx=ctx), )
 ```
 
 The following `rnn` function defines how to compute the hidden state and output
@@ -74,10 +75,10 @@ def rnn(inputs, state, params):
     H, = state
     outputs = []
     for X in inputs:
-        H = nd.tanh(nd.dot(X, W_xh) + nd.dot(H, W_hh) + b_h)
-        Y = nd.dot(H, W_hq) + b_q
+        H = np.tanh(np.dot(X, W_xh) + np.dot(H, W_hh) + b_h)
+        Y = np.dot(H, W_hq) + b_q
         outputs.append(Y)
-    return nd.concat(*outputs, dim=0), (H,)
+    return np.concatenate(outputs, axis=0), (H,)
 ```
 
 Now we have all functions defined, next we create a class to wrap these functions and store parameters.
@@ -93,7 +94,7 @@ class RNNModelScratch(object):
         self.init_state, self.forward_fn = init_state, forward
 
     def __call__(self, X, state):
-        X = nd.one_hot(X.T, self.vocab_size)
+        X = npx.one_hot(X.T, self.vocab_size)
         return self.forward_fn(X, state, self.params)
 
     def begin_state(self, batch_size, ctx):
@@ -122,13 +123,13 @@ We first explain the predicting function so we can regularly check the predictio
 def predict_ch8(prefix, num_predicts, model, vocab, ctx):
     state = model.begin_state(batch_size=1, ctx=ctx)
     outputs = [vocab[prefix[0]]]
-    get_input = lambda: nd.array([outputs[-1]], ctx=ctx).reshape((1, 1))
+    get_input = lambda: np.array([outputs[-1]], ctx=ctx).reshape(1, 1)
     for y in prefix[1:]:  # Warmup state with prefix
         _, state = model(get_input(), state)
         outputs.append(vocab[y])
     for _ in range(num_predicts):  # Predict num_predicts steps
         Y, state = model(get_input(), state)
-        outputs.append(int(Y.argmax(axis=1).reshape(1).asscalar()))
+        outputs.append(int(Y.argmax(axis=1).reshape(1)))
     return ''.join([vocab.idx_to_token[i] for i in outputs])
 ```
 
@@ -163,7 +164,7 @@ def grad_clipping(model, theta):
         params = [p.data() for p in model.collect_params().values()]
     else:
         params = model.params
-    norm = math.sqrt(sum((p.grad ** 2).sum().asscalar() for p in params))
+    norm = math.sqrt(sum((p.grad ** 2).sum() for p in params))
     if norm > theta:
         for param in params:
             param.grad[:] *= theta / norm
@@ -193,7 +194,7 @@ def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):
             state = model.begin_state(batch_size=X.shape[0], ctx=ctx)
         else:
             for s in state: s.detach()
-        y = Y.T.reshape((-1,))
+        y = Y.T.reshape(-1)
         X, y = X.as_in_context(ctx), y.as_in_context(ctx)
         with autograd.record():
             py, state = model(X, state)
@@ -201,7 +202,7 @@ def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):
         l.backward()
         grad_clipping(model, 1)
         updater(batch_size=1)  # Since used mean already.
-        metric.add(l.asscalar() * y.size, y.size)
+        metric.add(l * y.size, y.size)
     return math.exp(metric[0]/metric[1]), metric[1]/timer.stop()
 ```
 

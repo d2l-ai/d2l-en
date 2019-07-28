@@ -6,8 +6,9 @@ While :numref:`chapter_rnn_scratch` was instructive to see how recurrent neural 
 ```{.python .input  n=1}
 import d2l
 import math
-from mxnet import gluon, init, nd
+from mxnet import gluon, init, np, npx
 from mxnet.gluon import nn, rnn
+npx.set_np()
 
 batch_size, num_steps = 32, 35
 train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
@@ -35,7 +36,7 @@ With a state variable and an input, we can compute the output with the updated s
 
 ```{.python .input  n=38}
 num_steps = 1
-X = nd.random.uniform(shape=(num_steps, batch_size, len(vocab)))
+X = np.random.uniform(size=(num_steps, batch_size, len(vocab)))
 Y, state_new = rnn_layer(X, state)
 Y.shape, len(state_new), state_new[0].shape
 ```
@@ -52,12 +53,12 @@ class RNNModel(nn.Block):
         self.dense = nn.Dense(vocab_size)
 
     def forward(self, inputs, state):
-        X = nd.one_hot(inputs.T, self.vocab_size)
+        X = npx.one_hot(inputs.T, self.vocab_size)
         Y, state = self.rnn(X, state)
         # The fully connected layer will first change the shape of Y to
         # (num_steps * batch_size, num_hiddens)
         # Its output shape is (num_steps * batch_size, vocab_size)
-        output = self.dense(Y.reshape((-1, Y.shape[-1])))
+        output = self.dense(Y.reshape(-1, Y.shape[-1]))
         return output, state
 
     def begin_state(self, *args, **kwargs):

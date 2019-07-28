@@ -433,16 +433,16 @@ We'll synthesize 100 samples each for the training set and test set.
 ```{.python .input  n=2}
 maxdegree = 20  # Maximum degree of the polynomial
 n_train, n_test = 100, 100  # Training and test data set sizes
-true_w = nd.zeros(maxdegree)  # Allocate lots of empty space
-true_w[0:4] = nd.array([5, 1.2, -3.4, 5.6])
+true_w = np.zeros(maxdegree)  # Allocate lots of empty space
+true_w[0:4] = np.array([5, 1.2, -3.4, 5.6])
 
-features = nd.random.normal(shape=(n_train + n_test, 1))
-features = nd.random.shuffle(features)
-poly_features = nd.power(features, nd.arange(maxdegree).reshape((1, -1)))
+features = np.random.normal(size=(n_train + n_test, 1))
+features = np.random.shuffle(features)
+poly_features = np.power(features, np.arange(maxdegree).reshape(1, -1))
 poly_features = poly_features / (
-    nd.gamma(nd.arange(maxdegree) + 1).reshape((1, -1)))
-labels = nd.dot(poly_features, true_w)
-labels += nd.random.normal(scale=0.1, shape=labels.shape)
+    npx.gamma(np.arange(maxdegree) + 1).reshape(1, -1))
+labels = np.dot(poly_features, true_w)
+labels += np.random.normal(scale=0.1, size=labels.shape)
 ```
 
 For optimization, we typically want to avoid
@@ -471,7 +471,7 @@ def evaluate_loss(net, data_iter, loss):
     """Evaluate the loss of a model on the given dataset"""
     metric = d2l.Accumulator(2)  # sum_loss, num_examples
     for X, y in data_iter:
-        metric.add(loss(net(X), y).sum().asscalar(), y.size)
+        metric.add(loss(net(X), y).sum(), y.size)
     return metric[0] / metric[1]
 ```
 

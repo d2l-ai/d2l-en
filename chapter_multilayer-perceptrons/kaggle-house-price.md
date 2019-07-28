@@ -82,10 +82,10 @@ we can install pandas without even leaving the notebook.
 
 %matplotlib inline
 import d2l
-from mxnet import autograd, gluon, init, nd
-from mxnet.gluon import data as gdata, loss as gloss, nn
-import numpy as np
+from mxnet import autograd, gluon, init, np, npx
+from mxnet.gluon import nn
 import pandas as pd
+npx.set_np()
 ```
 
 For convenience, we already downloaded the data
@@ -176,13 +176,13 @@ You can see that this conversion increases the number of features
 from 79 to 331.
 Finally, via the `values` attribute,
  we can extract the NumPy format from the Pandas dataframe
- and convert it into MXNet's native NDArray representation for training.
+ and convert it into MXNet's native ndarray representation for training.
 
 ```{.python .input  n=9}
 n_train = train_data.shape[0]
-train_features = nd.array(all_features[:n_train].values)
-test_features = nd.array(all_features[n_train:].values)
-train_labels = nd.array(train_data.SalePrice.values).reshape((-1, 1))
+train_features = np.array(all_features[:n_train].values)
+test_features = np.array(all_features[n_train:].values)
+train_labels = np.array(train_data.SalePrice.values).reshape(-1, 1)
 ```
 
 ## Training
@@ -201,7 +201,7 @@ gets to the best reported models, giving us a sense
 of how much gain we should expect from fancier models.
 
 ```{.python .input  n=13}
-loss = gloss.L2Loss()
+loss = gluon.loss.L2Loss()
 
 def get_net():
     net = nn.Sequential()
@@ -236,9 +236,8 @@ $$L = \sqrt{\frac{1}{n}\sum_{i=1}^n\left(\log y_i -\log \hat{y}_i\right)^2}$$
 def log_rmse(net, features, labels):
     # To further stabilize the value when the logarithm is taken, set the
     # value less than 1 as 1
-    clipped_preds = nd.clip(net(features), 1, float('inf'))
-    rmse = nd.sqrt(2 * loss(clipped_preds.log(), labels.log()).mean())
-    return rmse.asscalar()
+    clipped_preds = np.clip(net(features), 1, float('inf'))
+    return np.sqrt(2 * loss(np.log(clipped_preds), np.log(labels)).mean())
 ```
 
 Unlike in previous sections, our training functions here
@@ -256,8 +255,7 @@ when we discuss the details in :numref:`chapter_optimization`.
 def train(net, train_features, train_labels, test_features, test_labels,
           num_epochs, learning_rate, weight_decay, batch_size):
     train_ls, test_ls = [], []
-    train_iter = gdata.DataLoader(gdata.ArrayDataset(
-        train_features, train_labels), batch_size, shuffle=True)
+    train_iter = d2l.load_array((train_features, train_labels), batch_size)
     # The Adam optimization algorithm is used here
     trainer = gluon.Trainer(net.collect_params(), 'adam', {
         'learning_rate': learning_rate, 'wd': weight_decay})
@@ -303,8 +301,8 @@ def get_k_fold_data(k, i, X, y):
         elif X_train is None:
             X_train, y_train = X_part, y_part
         else:
-            X_train = nd.concat(X_train, X_part, dim=0)
-            y_train = nd.concat(y_train, y_part, dim=0)
+            X_train = np.concatenate((X_train, X_part), axis=0)
+            y_train = np.concatenate((y_train, y_part), axis=0)
     return X_train, y_train, X_valid, y_valid
 ```
 
@@ -375,7 +373,7 @@ def train_and_pred(train_features, test_feature, train_labels, test_data,
     net = get_net()
     train_ls, _ = train(net, train_features, train_labels, None, None,
                         num_epochs, lr, weight_decay, batch_size)
-    d2l.plot(range(1, num_epochs+1), train_ls, xlabel='epoch', ylabel='rmse',
+    d2l.plot(range(1, num_epochs+1), [train_ls], xlabel='epoch', ylabel='rmse',
             yscale='log')
     print('train rmse %f' % train_ls[-1])
     # Apply the network to the test set
