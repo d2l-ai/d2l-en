@@ -3,68 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="517c00b2-9162-45ca-a83b-5c6856dc42bf" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/STYLE_GUIDE.md" beforeDir="false" afterPath="$PROJECT_DIR$/STYLE_GUIDE.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_computer-vision/anchor.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_computer-vision/anchor.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_computer-vision/bounding-box.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_computer-vision/bounding-box.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Jenkinsfile" beforeDir="false" afterPath="$PROJECT_DIR$/Jenkinsfile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_computational-performance/async-computation.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_computational-performance/async-computation.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/chapter_computer-vision/fcn.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_computer-vision/fcn.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_computer-vision/fine-tuning.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_computer-vision/fine-tuning.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_computer-vision/image-augmentation.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_computer-vision/image-augmentation.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_computer-vision/kaggle-gluon-cifar10.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_computer-vision/kaggle-gluon-cifar10.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_computer-vision/kaggle-gluon-dog.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_computer-vision/kaggle-gluon-dog.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_computer-vision/multiscale-object-detection.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_computer-vision/multiscale-object-detection.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_computer-vision/neural-style.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_computer-vision/neural-style.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_computer-vision/object-detection-dataset.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_computer-vision/object-detection-dataset.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_computer-vision/semantic-segmentation-and-dataset.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_computer-vision/semantic-segmentation-and-dataset.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_computer-vision/ssd.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_computer-vision/ssd.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_computer-vision/tranposed-conv.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_computer-vision/tranposed-conv.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_convolutional-modern/nin.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_convolutional-modern/nin.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_convolutional-modern/resnet.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_convolutional-modern/resnet.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_deep-learning-computation/custom-layer.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_deep-learning-computation/custom-layer.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_deep-learning-computation/deferred-init.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_deep-learning-computation/deferred-init.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_deep-learning-computation/index.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_deep-learning-computation/index.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_deep-learning-computation/model-construction.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_deep-learning-computation/model-construction.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_deep-learning-computation/parameters.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_deep-learning-computation/parameters.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_deep-learning-computation/read-write.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_deep-learning-computation/read-write.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_deep-learning-computation/use-gpu.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_deep-learning-computation/use-gpu.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_multilayer-perceptrons/dropout.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_multilayer-perceptrons/dropout.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_multilayer-perceptrons/kaggle-house-price.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_multilayer-perceptrons/kaggle-house-price.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_multilayer-perceptrons/mlp-gluon.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_multilayer-perceptrons/mlp-gluon.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_multilayer-perceptrons/mlp-scratch.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_multilayer-perceptrons/mlp-scratch.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_multilayer-perceptrons/mlp.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_multilayer-perceptrons/mlp.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_multilayer-perceptrons/numerical-stability-and-init.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_multilayer-perceptrons/numerical-stability-and-init.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_multilayer-perceptrons/underfit-overfit.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_multilayer-perceptrons/underfit-overfit.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_multilayer-perceptrons/weight-decay.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_multilayer-perceptrons/weight-decay.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_natural-language-processing/sentiment-analysis-cnn.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_natural-language-processing/sentiment-analysis-cnn.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_natural-language-processing/sentiment-analysis-rnn.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_natural-language-processing/sentiment-analysis-rnn.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_natural-language-processing/sentiment-analysis.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_natural-language-processing/sentiment-analysis.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_natural-language-processing/similarity-analogy.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_natural-language-processing/similarity-analogy.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_natural-language-processing/word2vec-data-set.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_natural-language-processing/word2vec-data-set.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_natural-language-processing/word2vec-gluon.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_natural-language-processing/word2vec-gluon.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_optimization/adadelta.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_optimization/adadelta.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_optimization/adagrad.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_optimization/adagrad.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_optimization/adam.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_optimization/adam.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_optimization/convexity.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_optimization/convexity.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_optimization/gd.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_optimization/gd.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_optimization/minibatch-sgd.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_optimization/minibatch-sgd.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_optimization/momentum.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_optimization/momentum.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_optimization/optimization-intro.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_optimization/optimization-intro.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_optimization/rmsprop.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_optimization/rmsprop.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_optimization/sgd.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_optimization/sgd.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_preface/preface.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_preface/preface.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_recurrent-neural-networks/bi-rnn.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_recurrent-neural-networks/bi-rnn.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_recurrent-neural-networks/deep-rnn.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_recurrent-neural-networks/deep-rnn.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_recurrent-neural-networks/encoder-decoder.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_recurrent-neural-networks/encoder-decoder.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_recurrent-neural-networks/gru.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_recurrent-neural-networks/gru.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_recurrent-neural-networks/lang-model.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_recurrent-neural-networks/lang-model.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_recurrent-neural-networks/lstm.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_recurrent-neural-networks/lstm.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_recurrent-neural-networks/machine-translation.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_recurrent-neural-networks/machine-translation.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_recurrent-neural-networks/rnn-gluon.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_recurrent-neural-networks/rnn-gluon.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_recurrent-neural-networks/rnn-scratch.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_recurrent-neural-networks/rnn-scratch.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_recurrent-neural-networks/seq2seq.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_recurrent-neural-networks/seq2seq.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chapter_recurrent-neural-networks/sequence.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_recurrent-neural-networks/sequence.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/d2l/d2l.py" beforeDir="false" afterPath="$PROJECT_DIR$/d2l/d2l.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/index.md" beforeDir="false" afterPath="$PROJECT_DIR$/index.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chapter_natural-language-processing/approx-training.md" beforeDir="false" afterPath="$PROJECT_DIR$/chapter_natural-language-processing/approx-training.md" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />

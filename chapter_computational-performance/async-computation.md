@@ -39,7 +39,7 @@ print('sum =', y)
 print('Workloads are finished. Time %.4f sec' % timer.stop())
 ```
 
-In truth, whether or not the current result is already calculated in the memory is irrelevant, unless we need to print or save the computation results. So long as the data is stored in ndarray and the operators provided by MXNet are used, MXNet will utilize asynchronous programming by default to attain superior computing performance.
+In truth, whether or not the current result is already calculated in-memory is irrelevant, unless we need to print or save the computation results. So long as the data is stored in ndarray and the operators provided by MXNet are used, MXNet will utilize asynchronous programming by default to attain superior computing performance.
 
 
 ## Use of the Synchronization Function to Allow the Front-End to Wait for the Computation Results

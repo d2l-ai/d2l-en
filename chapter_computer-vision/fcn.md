@@ -21,6 +21,7 @@ import d2l
 from mxnet import gluon, image, init, np, npx
 from mxnet.gluon import nn
 
+
 npx.set_np()
 ```
 
