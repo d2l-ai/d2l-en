@@ -12,6 +12,7 @@ The Pikachu data set in RecordIO format can be downloaded directly from the Inte
 import d2l
 from mxnet import gluon, image, np, npx
 import os
+npx.set_np()
 
 npx.set_np()
 

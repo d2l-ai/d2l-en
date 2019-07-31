@@ -41,7 +41,7 @@ classical pipelines looked more like this:
 1. Obtain an interesting dataset. In early days, these datasets required expensive sensors (at the time, 1 megapixel images were state of the art).
 1. Preprocess the dataset with hand-crafted features based on some knowledge of optics, geometry, other analytic tools, and occasionally on the serendipitous discoveries of lucky graduate students.
 1. Feed the data through a standard set of feature extractors such as [SIFT](https://en.wikipedia.org/wiki/Scale-invariant_feature_transform), the Scale-Invariant Feature Transform, or [SURF](https://en.wikipedia.org/wiki/Speeded_up_robust_features), the Speeded-Up Robust Features, or any number of other hand-tuned pipelines.
-1. Dummp the resulting representations into your favorite classifier, likely a linear model or kernel method, to learn a classifier.
+1. Dump the resulting representations into your favorite classifier, likely a linear model or kernel method, to learn a classifier.
 
 If you spoke to machine learning researchers,
 they believed that machine learning was both important and beautiful.

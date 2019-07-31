@@ -185,7 +185,7 @@ Next, in each iteration, we will use the squared error
 to compare `Y` and the output of the convolutional layer,
 then calculate the gradient to update the weight.
 For the sake of simplicity, in this convolutional layer,
-we will ignores the bias.
+we will ignore the bias.
 
 We previously constructed the `Conv2D` class.
 However, since we used single-element assignments,

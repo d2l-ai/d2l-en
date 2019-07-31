@@ -34,7 +34,7 @@ but this can add up as we apply
 many successive convolutional layers.
 One straightforward solution to this problem
 is to add extra pixels of filler around the boundary of our input image,
-thus increasing the effective size of the image
+thus increasing the effective size of the image.
 Typically, we set the values of the extra pixels to 0.
 In the figure below, we pad a $3 \times 3$ input,
 increasing its size to $5 \times 5$.

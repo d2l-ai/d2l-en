@@ -280,7 +280,7 @@ print((a * x).shape)
 print((a * x + y).shape)
 ```
 
-Shape is not the the only property preserved under addition and multiplication by a scalar. These operations also preserve membership in a vector space. But we'll postpone this discussion for the second half of this chapter because it's not critical to getting your first models up and running. 
+Shape is not the only property preserved under addition and multiplication by a scalar. These operations also preserve membership in a vector space. But we'll postpone this discussion for the second half of this chapter because it's not critical to getting your first models up and running.
 
 ## Sums and means 
 

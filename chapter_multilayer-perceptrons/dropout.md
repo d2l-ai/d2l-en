@@ -60,7 +60,7 @@ Yet even in these situations, when there is no true pattern to be learned, neura
 Let's think briefly about what we expect from a good statistical model.
 We want it to do well on unseen test data.
 One way we can accomplish this is by asking
-what constitutes a a 'simple' model?
+what constitutes a 'simple' model?
 Simplicity can come in the form
 of a small number of dimensions,
 which is what we did when discussing fitting a model
@@ -174,7 +174,7 @@ to prevent the *co-adaptation* of feature detectors.
 
 At test time, we typically do not use dropout.
 However, we note that there are some exceptions:
-some researchers use dropout at test time as a heuristic appraoch
+some researchers use dropout at test time as a heuristic approach
 for estimating the *confidence* of neural network predictions:
 if the predictions agree across many different dropout masks,
 then we might say that the network is more confident.
@@ -189,7 +189,7 @@ we must draw as many samples from a Bernoulli (binary) random variable
 as our layer has dimensions, where the random variable takes value $1$ (keep) with probability $1-p$ and $0$ (drop) with probability $p$.
 One easy way to implement this is to first draw samples
 from the uniform distribution $U[0,1]$.
-then we can keep those nodes for which the corresponding
+Then we can keep those nodes for which the corresponding
 sample is greater than $p$, dropping the rest.
 
 In the following code, we implement a `dropout` function
@@ -295,7 +295,7 @@ after each fully-connected layer, passing in the dropout probability
 as the only argument to its constructor.
 During training, the `Dropout` layer will randomly
 drop out outputs of the previous layer
-(or equivalently, the inputs to the subequent layer)
+(or equivalently, the inputs to the subsequent layer)
 according to the specified dropout probability.
 When MXNet is not in training mode,
 the `Dropout` layer simply passes the data through during testing.
@@ -330,7 +330,7 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 
 1. Try out what happens if you change the dropout probabilities for layers 1 and 2. In particular, what happens if you switch the ones for both layers?
 1. Increase the number of epochs and compare the results obtained when using dropout with those when not using it.
-1. Compute the variance of the the activation random variables after applying dropout.
+1. Compute the variance of the activation random variables after applying dropout.
 1. Why should you typically not using dropout?
 1. If changes are made to the model to make it more complex, such as adding hidden layer units, will the effect of using dropout to cope with overfitting be more obvious?
 1. Using the model in this section as an example, compare the effects of using dropout and weight decay. What if dropout and weight decay are used at the same time?

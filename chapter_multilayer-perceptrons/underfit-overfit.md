@@ -268,7 +268,7 @@ until after we have chosen all our hyper-parameters.
 Were we to use the test data in the model selection process,
 there's a risk that we might overfit the test data.
 Then we would be in serious trouble.
-If we over fit our training data,
+If we overfit our training data,
 there's always the evaluation on test data to keep us honest.
 But if we overfit the test data, how would we ever know?
 

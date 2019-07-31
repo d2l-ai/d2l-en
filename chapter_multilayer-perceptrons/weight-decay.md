@@ -277,7 +277,7 @@ Moreover, this integration serves a computational benefit,
 allowing implementation tricks to add weight decay to the algorithm,
 without any additional computational overhead.
 Since the weight decay portion of the update
-depdends only on the current value of each parameter,
+depends only on the current value of each parameter,
 and the optimizer must to touch each parameter once anyway.
 
 In the following code, we specify
