@@ -14,8 +14,6 @@ from mxnet import gluon, image, np, npx
 import os
 npx.set_np()
 
-npx.set_np()
-
 # Save to the d2l package.
 def download_pikachu(data_dir):
     root_url = ('https://apache-mxnet.s3-accelerate.amazonaws.com/'
