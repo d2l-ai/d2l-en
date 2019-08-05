@@ -77,7 +77,7 @@ Afterwards, we put the above steps together and save it for further use.
 def split_and_load_ml100k(test_size=0.1, batch_size=128):
     df, num_users, num_items = read_data_ml100k()
     train_data, test_data = split_data(test_size)
-    return load_dataset(train_data), load_dataset(test_data)
+    return load_dataset_ml100k(train_data), load_dataset_ml100k(test_data)
 ```
 
 The results can be used by gluon `Dataset` and `DataLoader`. For example, an `ArrayDataset` can be used to wrap the results and 'DataLoader' can be used for mini-batch sampling.
