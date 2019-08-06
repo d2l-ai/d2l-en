@@ -88,4 +88,4 @@ The results can be used by gluon `Dataset` and `DataLoader`. For example, an `Ar
 
 ## Exercise
 * What other similar recommendation datasets can you find?
-* Read the provided README file to see
+* Read the provided README file for detailed description of the dataset.
