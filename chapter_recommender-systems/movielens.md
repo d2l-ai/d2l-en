@@ -83,7 +83,7 @@ def split_and_load_ml100k(test_size=0.1, batch_size=128):
 The results can be used by gluon `Dataset` and `DataLoader`. For example, an `ArrayDataset` can be used to wrap the results and 'DataLoader' can be used for mini-batch sampling.
 
 ## Summary 
-* MovieLens datasets are widely used for recommendation research. It is public available and free to use.
+* MovieLens datasets are widely used for recommendation research. It is publicly available and free to use.
 * We downloaded and preprocessed the MovieLens 100k dataset for further use in later sections. 
 
 ## Exercise
