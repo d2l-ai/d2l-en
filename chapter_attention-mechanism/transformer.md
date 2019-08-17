@@ -73,7 +73,7 @@ class MultiHeadAttention(nn.Block):
         self.W_v = nn.Dense(units, use_bias=False, flatten=False)
 
     # query, key, and value shape: (batch_size, num_items, dim)
-    # valid_length shape is either (bathc_size, ) or (batch_size, num_items)
+    # valid_length shape is either (batch_size, ) or (batch_size, num_items)
     def forward(self, query, key, value, valid_length):
         # Project and transpose from (batch_size, num_items, units) to
         # (batch_size * num_heads, num_items, p), where units = p * num_heads.
@@ -396,5 +396,5 @@ for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
 * Transformer model is based on N*N encoder-decoder architecture. It differs from Seq2seq with attention in 3 major places.
 * Multi-head attention layer contains $h$ parallel attention layers.
 * Position-wise feed-forward network equals to apply 2 $Conv(1,1)$ layers.
-* Layer normalization differs from batch normalization by normalizaing along the last dimension (the feature dimension) instead of the first (batchsize) dimension.
+* Layer normalization differs from batch normalization by normalizing along the last dimension (the feature dimension) instead of the first (batchsize) dimension.
 * Positional encoding is the only place that adds positional information to the transformer model.

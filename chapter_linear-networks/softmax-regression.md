@@ -186,7 +186,7 @@ After training the softmax regression model, given any example features, we can 
 1. Show that the Kullback-Leibler divergence $D(p\|q)$ is nonnegative for all distributions $p$ and $q$. Hint - use Jensen's inequality, i.e. use the fact that $-\log x$ is a convex function.
 1. Show that $\log \sum_j \exp(o_j)$ is a convex function in $o$.
 1. We can explore the connection between exponential families and the softmax in some more depth
-    * Compute the second derivative of the cross entropy loss $l(y,\hat{y})$ for the softmax.
+    * Compute the second derivative of the cross-entropy loss $l(y,\hat{y})$ for the softmax.
     * Compute the variance of the distribution given by $\mathrm{softmax}(o)$ and show that it matches the second derivative computed above.
 1. Assume that we three classes which occur with equal probability, i.e. the probability vector is $(\frac{1}{3}, \frac{1}{3}, \frac{1}{3})$.
     * What is the problem if we try to design a binary code for it? Can we match the entropy lower bound on the number of bits?
