@@ -297,6 +297,7 @@ net.add(nn.Conv2D(96, kernel_size=11, strides=4, activation='relu'),
         nn.Conv2D(384, kernel_size=3, padding=1, activation='relu'),
         nn.Conv2D(256, kernel_size=3, padding=1, activation='relu'),
         nn.MaxPool2D(pool_size=3, strides=2),
+        nn.Flatten()
         # Here, the number of outputs of the fully connected layer is several
         # times larger than that in LeNet. Use the dropout layer to mitigate
         # overfitting
