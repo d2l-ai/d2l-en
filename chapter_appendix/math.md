@@ -272,8 +272,6 @@ $$
 \end{aligned}
 $$
 
-Note, that the third identity is true only for a square $n \times n$ matrix $\mathbf{A}$.
-
 Similarly if $\mathbf{X}$ is a matrix, then
 $$\nabla_{\mathbf{X}} \|\mathbf{X} \|_F^2 = 2\mathbf{X}.$$
 
