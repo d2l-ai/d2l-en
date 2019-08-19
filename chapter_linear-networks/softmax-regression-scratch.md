@@ -282,6 +282,7 @@ class Animator(object):
         d2l.use_svg_display()
         self.fig, self.axes = d2l.plt.subplots(nrows, ncols, figsize=figsize)
         if nrows * ncols == 1: self.axes = [self.axes,]
+        if nrows > 1 and ncols > 1: self.axes = self.axes.flatten()
         # use a lambda to capture arguments
         self.config_axes = lambda : d2l.set_axes(
             self.axes[0], xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
