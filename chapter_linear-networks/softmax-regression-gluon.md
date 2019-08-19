@@ -38,8 +38,7 @@ numerical stability issues, a matter we've already discussed a few times
 (e.g. in :numref:`chapter_naive_bayes`) and
 in the problem set of the previous chapter). Recall that the softmax function
 calculates $\hat y_j = \frac{e^{z_j}}{\sum_{i=1}^{n} e^{z_i}}$, where $\hat y_j$
-is the j-th element of ``yhat`` and $z_j$ is the j-th element of the input
-``y_linear`` variable, as computed by the softmax.
+is the j-th element of ``yhat`` and $z_j$ is the j-th element of the input variable to the softmax function.
 
 If some of the $z_i$ are very large (i.e. very positive),
 $e^{z_i}$ might be larger than the largest number
@@ -78,7 +77,7 @@ $$
 We'll want to keep the conventional softmax function handy
 in case we ever want to evaluate the probabilities output by our model.
 But instead of passing softmax probabilities into our new loss function,
-we'll just pass $\hat{y}$ and compute the softmax and its log
+we'll just pass $z$ and compute the softmax and its log
 all at once inside the softmax_cross_entropy loss function,
 which does smart things like the log-sum-exp trick ([see on Wikipedia](https://en.wikipedia.org/wiki/LogSumExp)).
 
