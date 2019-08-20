@@ -4,11 +4,11 @@
 
 In :numref:`chapter_language_model` we introduced $n$-gram models, where the conditional probability of word $x_t$ at position $t$ only depends on the $n-1$ previous words. If we want to check the possible effect of words earlier than $t-(n-1)$ on $x_t$, we need to increase $n$. However, the number of model parameters would also increase exponentially with it, as we need to store $|V|^n$ numbers for a vocabulary $V$. Hence, rather than modeling $p(x_t|x_{t-1}, \ldots x_{t-n+1})$ it is preferable to use a latent variable model in which we have
 
-$$p(x_t|x_{t-1}, \ldots x_1) \approx p(x_t|x_{t-1}, h_{t}).$$
+$$p(x_t|x_{t-1}, \ldots x_1) \approx p(x_t|x_{t-1}, h_{t-1}).$$
 
 Here $h_t$ is a *latent variable* that stores the sequence information. A latent variable is also called as *hidden variable*, *hidden state* or *hidden state variable*. The hidden state at time $t$ could be computed based on both input $x_{t-1}$ and hidden state $h_{t-1}$ at time $t-1$, that is
 
-$$h_t = f(x_{t-1}, h_{t-1}).$$
+$$h_t = f(x_{t}, h_{t-1}).$$
 
 For a sufficiently powerful function $f$, the latent variable model is not an approximation. After all, $h_t$ could simply store all the data it observed so far. We discussed this in :numref:`chapter_sequence`. But it could potentially makes both computation and storage expensive.
 
