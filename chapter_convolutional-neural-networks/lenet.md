@@ -188,7 +188,7 @@ described in :numref:`chapter_use_gpu`.
 # Save to the d2l package
 def evaluate_accuracy_gpu(net, data_iter, ctx=None):
     if not ctx:  # Query the first device the first parameter is on.
-        ctx = list(net.collect_params().values())[0].list_ctx()[0]
+        ctx = net[0].weight.list_ctx()[0]
     metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
     for X, y in data_iter:
         X, y = X.as_in_context(ctx), y.as_in_context(ctx)
