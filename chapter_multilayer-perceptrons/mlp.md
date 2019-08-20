@@ -164,9 +164,9 @@ can thus be expressed:
 
 $$
 \begin{aligned}
-    \mathbf{H}_1 & = \sigma(\mathbf{W}_1 \mathbf{X} + \mathbf{b}_1) \\
-    \mathbf{H}_2 & = \sigma(\mathbf{W}_2 \mathbf{H}_1 + \mathbf{b}_2) \\
-    \mathbf{O} & = \mathrm{softmax}(\mathbf{W}_3 \mathbf{H}_2 + \mathbf{b}_3)
+    \mathbf{H}_1 & = \sigma(\mathbf{X}_1 \mathbf{W} + \mathbf{b}_1) \\
+    \mathbf{H}_2 & = \sigma( \mathbf{H}_1 \mathbf{W}_2 + \mathbf{b}_2) \\
+    \mathbf{O} & = \mathrm{softmax}(\mathbf{H}_2 \mathbf{W}_3 + \mathbf{b}_3)
 \end{aligned}
 $$
 
