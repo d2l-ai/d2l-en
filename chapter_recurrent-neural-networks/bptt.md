@@ -116,18 +116,35 @@ $$\begin{aligned}
 \left(\partial_{\mathbf{o}_t} l(\mathbf{o}_t, y_t), \mathbf{W}_{oh}, \partial_{\mathbf{W}_{hx}} \mathbf{h}_t\right)
 \end{aligned}$$
 
-After all, hidden states depend on each other and on past inputs. The key quantity is how past hidden states affect future hidden states.
+Taking $\partial_{\mathbf{W}_{hh}}$ into $\mathbf{h}_{t}=\mathbf{W}_{hx}\mathbf{x}_{t}+\mathbf{W}_{hh}\mathbf{h}_{t-1}$,
+we have 
 
-$$\partial_{\mathbf{h}_t} \mathbf{h}_{t+1} = \mathbf{W}_{hh}^\top
-\text{ and thus }
-\partial_{\mathbf{h}_t} \mathbf{h}_T = \left(\mathbf{W}_{hh}^\top\right)^{T-t}$$
+$$
+\begin{align*}
+\partial_{\mathbf{W}_{hh}}\mathbf{h}_{t} & =\partial_{\mathbf{W}_{hh}}\left(\mathbf{W}_{hh}\mathbf{h}_{t-1}\right)\\
+ & =\mathbf{h}_{t-1}\otimes\mathbf{I}_{h}+\left(\partial_{\mathbf{W}_{hh}}\mathbf{h}_{t-1}\right)\mathbf{W}_{hh}^{T},
+\end{align*}
+$$ 
+where $\mathbf{I}_{h}$ denotes the identity matrix of order $h$
+and $\mathbf{A}\otimes\mathbf{B}$ denotes the Kronecker product (or
+the tensor product) of the matrices $\mathbf{A}$ and $\mathbf{B}$;
+that is, if $\mathbf{A}=\begin{bmatrix}a_{ij}\end{bmatrix}\in\mathbb{R}^{p\times q}$
+and $\mathbf{B}\in\mathbb{R}^{r\times s}$, then $\mathbf{A}\otimes\mathbf{B}$
+is the $pr\times qs$ matrix defined by $\mathbf{A}\otimes\mathbf{B}=\begin{bmatrix}a_{ij}\mathbf{B}\end{bmatrix}$,
+$i=1,\ldots,p$, $j=1,\ldots q$.
 
-Chaining terms together yields
 
-$$\begin{aligned}
-\partial_{\mathbf{W}_{hh}} \mathbf{h}_t & = \sum_{j=1}^t \left(\mathbf{W}_{hh}^\top\right)^{t-j} \mathbf{h}_j \\
-\partial_{\mathbf{W}_{hx}} \mathbf{h}_t & = \sum_{j=1}^t \left(\mathbf{W}_{hh}^\top\right)^{t-j} \mathbf{x}_j.
-\end{aligned}$$
+Since $\mathbf{A}_{t}=\mathbf{B}_{t}+\mathbf{A}_{t-1}\mathbf{C}$
+with $\mathbf{A}_{o}=\mathbf{O}$ implies $\mathbf{A}_{t}=\sum_{j=1}^{t}\mathbf{B}_{j}\mathbf{C}^{t-j}$,
+we have 
+$$
+\partial_{\mathbf{W}_{hh}}\mathbf{h}_{t}=\sum_{j=1}^{t}\left(\mathbf{h}_{j-1}\otimes\mathbf{I}_{h}\right)\left(\mathbf{W}_{hh}^{T}\right)^{t-j}.
+$$
+
+Similarly, we can also show 
+$$
+\partial_{\mathbf{W}_{hx}}\mathbf{h}_{t}=\sum_{j=1}^{t}\left(\mathbf{x}_{t}\otimes\mathbf{I}_{h}\right)\left(\mathbf{W}_{hh}^{T}\right)^{t-j}.
+$$
 
 A number of things follow from this potentially very intimidating expression. Firstly, it pays to store intermediate results, i.e. powers of $\mathbf{W}_{hh}$ as we work our way through the terms of the loss function $L$. Secondly, this simple *linear* example already exhibits some key problems of long sequence models: it involves potentially very large powers $\mathbf{W}_{hh}^j$. In it, eigenvalues smaller than $1$ vanish for large $j$ and eigenvalues larger than $1$ diverge. This is numerically unstable and gives undue importance to potentially irrelvant past detail. One way to address this is to truncate the sum at a computationally convenient size. Later on in this chapter we will see how more sophisticated sequence models such as LSTMs can alleviate this further. In code, this truncation is effected by *detaching* the gradient after a given number of steps.
 
