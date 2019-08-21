@@ -47,12 +47,23 @@ $$\begin{aligned}
 	& = \sum_{t=1}^T \partial_{o_t} l(y_t, o_t) \left[\partial_w g(h_t, w) + \partial_{h_t} g(h_t,w) \partial_w h_t\right]
 \end{aligned}$$
 
-The first part of the derivative is easy to compute (this is after all the instantaneous loss gradient at time $t$). The second part is where things get tricky, since we need to compute the effect of the parameters on $h_t$. For each term we have the recursion:
+The first part of the derivative is easy to compute (this is after all the instantaneous loss gradient at time $t$). The second part is where things get tricky, since we need to compute the effect of the parameters on $h_t$.
 
-$$\begin{aligned}
-	\partial_w h_t & = \partial_w f(x_t, h_{t-1}, w) + \partial_h f(x_t, h_{t-1}, w) \partial_w h_{t-1} \\
-	& = \sum_{i=t}^1 \left[\prod_{j=t}^i \partial_h f(x_j, h_{j-1}, w) \right] \partial_w f(x_{i}, h_{i-1}, w)
-\end{aligned}$$
+If we have three sequences $\{a_{t}\},\{b_{t}\},\{c_{t}\}$ satisfying
+$a_{0}=0,a_{1}=b_{1}$, and $a_{t}=b_{t}+c_{t}a_{t-1}$ for $t=1,2,\ldots$,
+then it is easy to show 
+$$
+a_{t}=b_{t}+\sum_{i=1}^{t-1}\left(\prod_{j=i+1}^{t}c_{j}\right)b_{i}
+$$
+for $t\geq1$, where we assume that the summation is zero when $t=1$.
+Therefore, the following recursion 
+$$
+\partial_{w}h_{t}=\partial_{w}f(x_{t},h_{t-1},w)+\partial_{h}f(x_{t},h_{t-1},w)\partial_{w}h_{t-1}
+$$
+implies 
+$$
+\partial_{w}h_{t}=\partial_{w}f(x_{t},h_{t-1},w)+\sum_{i=1}^{t-1}\left(\prod_{j=i+1}^{t}\partial_{h}f(x_{j},h_{j-1},w)\right)\partial_{w}f(x_{i},h_{i-1},w).
+$$
 
 This chain can get *very* long whenever $t$ is large. While we can use the chain rule to compute $\partial_w h_t$ recursively, this might not be ideal. Let's discuss a number of strategies for dealing with this problem:
 
