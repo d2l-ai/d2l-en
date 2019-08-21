@@ -152,13 +152,27 @@ Sometimes the gradients can be quite large and the optimization algorithm may fa
 
 $$\mathbf{g} \leftarrow \min\left(1, \frac{\theta}{\|\mathbf{g}\|}\right) \mathbf{g}.$$
 
-By doing so we know that the gradient norm never exceeds $\theta$ and that the updated gradient is entirely aligned with the original direction $\mathbf{g}$. It also has the desirable side-effect of limiting the influence any given minibatch (and within it any given sample) can exert on the weight vectors. This bestows a certain degree of robustness to the model. Gradient clipping provides a quick fix to the gradient exploding. While it doesn't entire solve the problem, it is one of the many techniques to alleviate it.
+By doing so we know that the gradient norm never exceeds $\theta$ and that the updated gradient is entirely aligned with the original direction $\mathbf{g}$. It also has the desirable side-effect of limiting the influence any given minibatch (and within it any given sample) can exert on the weight vectors. This bestows a certain degree of robustness to the model.
+
+To prevent vanishing gradients, we can also set another radius $\mu$ (which is less than $\theta$) and clip the gradients as follows:
+$$\mathbf{g} \leftarrow \max\left(1, \frac{\mu}{\|\mathbf{g}\|}\right) \mathbf{g}.$$
+
+Note that 
+$$
+\max\left(1,\frac{\mu}{||\mathbf{g}||}\right)\cdot\min\left(1,\frac{\theta}{||\mathbf{g}||}\right)\mathbf{g}=\begin{cases}
+\frac{\mu}{||\mathbf{g}||}\cdot\mathbf{g}, & \text{if }||\mathbf{g}||<\mu\\
+\mathbf{g}, & \text{if }\mu\leq||\mathbf{g}||\leq\theta\\
+\frac{\theta}{||\mathbf{g}||}\cdot\mathbf{g}, & \text{if }||\mathbf{g}||>\theta
+\end{cases}
+$$
+
+Gradient clipping provides a quick fix to the gradient exploding or vanishing. While it doesn't entire solve the problem, it is one of the many techniques to alleviate it.
 
 Below we define a function to clip the gradients of a model that is either a `RNNModelScratch` instance or a Gluon model. Also note that we compute the gradient norm over all parameters.
 
 ```{.python .input  n=10}
 # Save to the d2l package.
-def grad_clipping(model, theta):
+def grad_clipping(model, mu, theta):
     if isinstance(model, gluon.Block):
         params = [p.data() for p in model.collect_params().values()]
     else:
@@ -167,6 +181,9 @@ def grad_clipping(model, theta):
     if norm > theta:
         for param in params:
             param.grad[:] *= theta / norm
+    if norm < mu:
+        for param in params:
+            param.grad[:] *= mu / norm
 ```
 
 ## Training
@@ -199,7 +216,7 @@ def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):
             py, state = model(X, state)
             l = loss(py, y).mean()
         l.backward()
-        grad_clipping(model, 1)
+        grad_clipping(model, 0.1, 1)
         updater(batch_size=1)  # Since used mean already.
         metric.add(l.asscalar() * y.size, y.size)
     return math.exp(metric[0]/metric[1]), metric[1]/timer.stop()
@@ -255,7 +272,7 @@ In the following we will see how to improve significantly on the current model a
 * Sequence models need state initialization for training.
 * Between sequential models you need to ensure to detach the gradient, to ensure that the automatic differentiation does not propagate effects beyond the current sample.
 * A simple RNN language model consists of an encoder, an RNN model and a decoder.
-* Gradient clipping prevents gradient explosion (but it cannot fix vanishing gradients).
+* Gradient clipping prevents gradient explosion.
 * Perplexity calibrates model performance across variable sequence length. It is the exponentiated average of the cross-entropy loss.
 * Sequential partitioning typically leads to better models.
 
