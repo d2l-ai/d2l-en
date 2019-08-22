@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xl="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" viewBox="13 69 188 103" width="188" height="103">
+  <defs>
+    <font-face font-family="Arial" font-size="9" panose-1="2 11 7 4 2 2 2 9 2 4" units-per-em="1000" underline-position="-105.95703" underline-thickness="104.98047" slope="-1333.3333" x-height="518.5547" cap-height="715.332" ascent="905.2734" descent="-211.91406" font-style="italic" font-weight="700">
+      <font-face-src>
+        <font-face-name name="Arial-BoldItalicMT"/>
+      </font-face-src>
+    </font-face>
+    <font-face font-family="Arial" font-size="7" panose-1="2 11 6 4 2 2 2 9 2 4" units-per-em="1000" underline-position="-105.95703" underline-thickness="73.24219" slope="-1714.2857" x-height="518.5547" cap-height="715.8203" ascent="905.2734" descent="-211.91406" font-style="italic" font-weight="400">
+      <font-face-src>
+        <font-face-name name="Arial-ItalicMT"/>
+      </font-face-src>
+    </font-face>
+    <marker orient="auto" overflow="visible" markerUnits="strokeWidth" id="StickArrow_Marker" stroke-linejoin="miter" stroke-miterlimit="10" viewBox="-1 -3 6 6" markerWidth="6" markerHeight="6" color="black">
+      <g>
+        <path d="M 4 0 L 0 0 M 0 -1.5 L 4 0 L 0 1.5" fill="none" stroke="currentColor" stroke-width="1"/>
+      </g>
+    </marker>
+    <font-face font-family="PingFang SC" font-size="9" panose-1="2 11 4 0 0 0 0 0 0 0" units-per-em="1000" underline-position="-150" underline-thickness="58" slope="0" x-height="600" cap-height="860" ascent="1060.0021" descent="-340.0007" font-weight="400">
+      <font-face-src>
+        <font-face-name name="PingFangSC-Regular"/>
+      </font-face-src>
+    </font-face>
+    <font-face font-family="Helvetica Neue" font-size="8" panose-1="2 0 5 3 0 0 0 2 0 4" units-per-em="1000" underline-position="-100" underline-thickness="50" slope="0" x-height="517" cap-height="714" ascent="951.9958" descent="-212.99744" font-weight="400">
+      <font-face-src>
+        <font-face-name name="HelveticaNeue"/>
+      </font-face-src>
+    </font-face>
+  </defs>
+  <metadata> Produced by OmniGraffle 7.10.2 
+    <dc:date>2019-08-22 22:42:44 +0000</dc:date>
+  </metadata>
+  <g id="Canvas_1" fill="none" stroke="none" fill-opacity="1" stroke-opacity="1" stroke-dasharray="none">
+    <title>Canvas 1</title>
+    <g id="Canvas_1: Layer 2">
+      <title>Layer 2</title>
+      <g id="Graphic_18">
+        <rect x="72.27983" y="111.10084" width="26" height="20" fill="#b2d9ff"/>
+        <rect x="72.27983" y="111.10084" width="26" height="20" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(77.27983 115.48634)" fill="black">
+          <tspan font-family="Arial" font-size="9" font-style="italic" font-weight="700" fill="black" x="1.166748" y="8">h</tspan>
+          <tspan font-family="Arial" font-size="7" font-style="italic" font-weight="400" fill="black" y="10">t-1</tspan>
+        </text>
+      </g>
+      <g id="Graphic_17">
+        <rect x="122.89375" y="111.10084" width="26" height="20" fill="#b2d9ff"/>
+        <rect x="122.89375" y="111.10084" width="26" height="20" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(127.89375 115.48634)" fill="black">
+          <tspan font-family="Arial" font-size="9" font-style="italic" font-weight="700" fill="black" x="4.2788086" y="8">h</tspan>
+          <tspan font-family="Arial" font-size="7" font-style="italic" font-weight="400" fill="black" y="10">t</tspan>
+        </text>
+      </g>
+      <g id="Graphic_16">
+        <rect x="173.80624" y="111.10084" width="26.659664" height="20" fill="#b2d9ff"/>
+        <rect x="173.80624" y="111.10084" width="26.659664" height="20" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(178.80624 115.48634)" fill="black">
+          <tspan font-family="Arial" font-size="9" font-style="italic" font-weight="700" fill="black" x=".618162" y="8">h</tspan>
+          <tspan font-family="Arial" font-size="7" font-style="italic" font-weight="400" fill="black" y="10">t+1</tspan>
+        </text>
+      </g>
+      <g id="Graphic_15">
+        <rect x="72.27983" y="74" width="26" height="20" fill="#66bfff"/>
+        <rect x="72.27983" y="74" width="26" height="20" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(77.27983 78.3855)" fill="black">
+          <tspan font-family="Arial" font-size="9" font-style="italic" font-weight="700" fill="black" x="0" y="8">x</tspan>
+          <tspan font-family="Arial" font-size="7" font-style="italic" font-weight="400" fill="black" y="10">t-1</tspan>
+        </text>
+      </g>
+      <g id="Graphic_14">
+        <rect x="122.89375" y="74" width="26" height="20" fill="#66bfff"/>
+        <rect x="122.89375" y="74" width="26" height="20" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(127.89375 78.3855)" fill="black">
+          <tspan font-family="Arial" font-size="9" font-style="italic" font-weight="700" fill="black" x="4.5249023" y="8">x</tspan>
+          <tspan font-family="Arial" font-size="7" font-style="italic" font-weight="400" fill="black" y="10">t</tspan>
+        </text>
+      </g>
+      <g id="Graphic_13">
+        <rect x="173.80624" y="74" width="26" height="20" fill="#66bfff"/>
+        <rect x="173.80624" y="74" width="26" height="20" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(178.80624 78.3855)" fill="black">
+          <tspan font-family="Arial" font-size="9" font-style="italic" font-weight="700" fill="black" x=".5344238" y="8">x</tspan>
+          <tspan font-family="Arial" font-size="7" font-style="italic" font-weight="400" fill="black" y="10">t+1</tspan>
+        </text>
+      </g>
+      <g id="Line_12">
+        <line x1="98.27983" y1="121.10084" x2="116.99375" y2="121.10084" marker-end="url(#StickArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Line_11">
+        <line x1="148.89375" y1="121.10084" x2="167.90624" y2="121.10084" marker-end="url(#StickArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Line_10">
+        <line x1="85.27983" y1="111.10084" x2="85.27983" y2="99.9" marker-end="url(#StickArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Line_9">
+        <line x1="135.89375" y1="111.10084" x2="135.89375" y2="99.9" marker-end="url(#StickArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Line_8">
+        <line x1="187.04717" y1="111.10084" x2="186.9476" y2="99.89977" marker-end="url(#StickArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_4">
+        <text transform="translate(19.821 108.10084)" fill="black">
+          <tspan font-family="PingFang SC" font-size="9" font-weight="400" fill="black" x="8526513e-20" y="10">Hidden</tspan>
+          <tspan font-family="PingFang SC" font-size="9" font-weight="400" fill="black" x="4.1985" y="23">state</tspan>
+        </text>
+      </g>
+      <g id="Graphic_3">
+        <text transform="translate(18.678 77)" fill="black">
+          <tspan font-family="PingFang SC" font-size="9" font-weight="400" fill="black" x="1.4985" y="10">Output </tspan>
+        </text>
+      </g>
+      <g id="Graphic_50">
+        <text transform="translate(77.9395 74.559665)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="8" font-weight="400" fill="black" x=".1" y="8">^</tspan>
+        </text>
+      </g>
+      <g id="Graphic_51">
+        <text transform="translate(132.62642 74.559665)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="8" font-weight="400" fill="black" x=".1" y="8">^</tspan>
+        </text>
+      </g>
+      <g id="Graphic_52">
+        <text transform="translate(180.03797 74.559665)" fill="black">
+          <tspan font-family="Helvetica Neue" font-size="8" font-weight="400" fill="black" x=".1" y="8">^</tspan>
+        </text>
+      </g>
+      <g id="Graphic_61">
+        <rect x="72.9395" y="150.55583" width="26" height="20" fill="#66bfff"/>
+        <rect x="72.9395" y="150.55583" width="26" height="20" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(77.9395 154.94133)" fill="black">
+          <tspan font-family="Arial" font-size="9" font-style="italic" font-weight="700" fill="black" x="0" y="8">x</tspan>
+          <tspan font-family="Arial" font-size="7" font-style="italic" font-weight="400" fill="black" y="10">t-2</tspan>
+        </text>
+      </g>
+      <g id="Graphic_60">
+        <rect x="123.55342" y="150.55583" width="26" height="20" fill="#66bfff"/>
+        <rect x="123.55342" y="150.55583" width="26" height="20" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(128.55342 154.94133)" fill="black">
+          <tspan font-family="Arial" font-size="9" font-style="italic" font-weight="700" fill="black" x="1.4128418" y="8">x</tspan>
+          <tspan font-family="Arial" font-size="7" font-style="italic" font-weight="400" fill="black" y="10">t-1</tspan>
+        </text>
+      </g>
+      <g id="Graphic_59">
+        <rect x="174.4659" y="150.55583" width="26" height="20" fill="#66bfff"/>
+        <rect x="174.4659" y="150.55583" width="26" height="20" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+        <text transform="translate(179.4659 154.94133)" fill="black">
+          <tspan font-family="Arial" font-size="9" font-style="italic" font-weight="700" fill="black" x="4.5249023" y="8">x</tspan>
+          <tspan font-family="Arial" font-size="7" font-style="italic" font-weight="400" fill="black" y="10">t</tspan>
+        </text>
+      </g>
+      <g id="Line_63">
+        <line x1="85.4395" y1="150.55583" x2="85.36602" y2="137.00075" marker-end="url(#StickArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Line_64">
+        <line x1="136.21308" y1="150.55583" x2="136.06612" y2="137.0005" marker-end="url(#StickArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Line_65">
+        <line x1="186.98587" y1="150.55583" x2="187.055" y2="137.00076" marker-end="url(#StickArrow_Marker)" stroke="black" stroke-linecap="round" stroke-linejoin="round" stroke-width="1"/>
+      </g>
+      <g id="Graphic_66">
+        <text transform="translate(23.808 151.55583)" fill="black">
+          <tspan font-family="PingFang SC" font-size="9" font-weight="400" fill="black" x="1.4985" y="10">Input </tspan>
+        </text>
+      </g>
+    </g>
+  </g>
+</svg>
