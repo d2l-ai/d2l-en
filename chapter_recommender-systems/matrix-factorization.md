@@ -55,6 +55,8 @@ class MatrixFactorization(nn.Block):
         pred = (p * q).sum(axis=1) + np.squeeze(b_u) + np.squeeze(b_i)
         return pred.flatten()
 ```
+## Evaluate the Model
+
 We then implement the RMSE (root-mean-square error) measurement, which is commonly used to measure the performance of rating prediction models.  Here, we can use the RMSE function provided by `mx.metric`. Note that the evaluation is also done in batch mode.
 
 ```
