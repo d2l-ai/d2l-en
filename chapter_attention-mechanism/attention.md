@@ -105,7 +105,7 @@ atten(nd.ones((2,1,2)), keys, values, nd.array([2, 6]))
 
 In multilayer perceptron attention, we first project both query and keys into $\mathbb R^{h}$.
 
-To be more specific, assume learnable parameters $\mathbf W_k\in\mathbb R^{h\times d_k}$, $\mathbf W_q\in\mathbb R^{h\times d_q}$, and $\mathbf v\in\mathbb R^{p}$.  Then the score function is defined by
+To be more specific, assume learnable parameters $\mathbf W_k\in\mathbb R^{h\times d_k}$, $\mathbf W_q\in\mathbb R^{h\times d_q}$, and $\mathbf v\in\mathbb R^{h}$.  Then the score function is defined by
 
 $$\alpha(\mathbf k, \mathbf q) = \mathbf v^T \text{tanh}(\mathbf W_k \mathbf k + \mathbf W_q\mathbf q). $$
 
