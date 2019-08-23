@@ -38,7 +38,7 @@ numerical stability issues, a matter we've already discussed a few times
 (e.g. in :numref:`chapter_naive_bayes`) and
 in the problem set of the previous chapter). Recall that the softmax function
 calculates $\hat y_j = \frac{e^{z_j}}{\sum_{i=1}^{n} e^{z_i}}$, where $\hat y_j$
-is the j-th element of ``yhat`` and $z_j$ is the j-th element of the input variable to the softmax function.
+is the j-th element of yhat and $z_j$ is the j-th element of the input $\mathbf{z}$ variable, as computed by $\mathbf{z}=\mathbf{W}\mathbf{x}+\mathbf{b}$.
 
 If some of the $z_i$ are very large (i.e. very positive),
 $e^{z_i}$ might be larger than the largest number
