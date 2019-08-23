@@ -18,16 +18,16 @@ If we want to solve the problem using graphical models we could for instance des
 
 For a sequence of $T$ observations we have thus the following joint probability distribution over observed and hidden states:
 
-$$p(x,h) = p(h_1) p(x_1|h_1) \prod_{i=2}^T p(h_t|h_{t-1}) p(x_t|h_t)$$
+$$p(x,h) = p(h_1) p(x_1|h_1) \prod_{t=2}^T p(h_t|h_{t-1}) p(x_t|h_t)$$
 
 Now assume that we observe all $x_i$ with the exception of some $x_j$ and it is our goal to compute $p(x_j|x_{-j})$ which denotes $p(x_j|x_1, \ldots, x_{j-1}, x_{j+1}, \ldots, x_T)$. To accomplish this we need to sum over all possible choices of $h = (h_1, \ldots, h_T)$. In case $h_i$ can take on $k$ distinct values this means that we need to sum over $k^T$ terms - mission impossible! Fortunately there's an elegant solution for this: dynamic programming. To see how it works consider summing over the first two hidden variable $h_1$ and $h_2$. This yields:
 
 $$\begin{aligned}
-    p(x) & = \sum_h p(h_1) p(x_1|h_1) \prod_{i=2}^T p(h_t|h_{t-1}) p(x_t|h_t) \\
+    p(x) & = \sum_h p(h_1) p(x_1|h_1) \prod_{t=2}^T p(h_t|h_{t-1}) p(x_t|h_t) \\
     & = \sum_{h_2, \ldots h_T} \underbrace{\left[\sum_{h_1} p(h_1) p(x_1|h_1) p(h_2|h_1)\right]}_{=: \pi_2(h_2)}
-    p(x_2|h_2) \prod_{i=3}^T p(h_t|h_{t-1}) p(x_t|h_t) \\
+    p(x_2|h_2) \prod_{t=3}^T p(h_t|h_{t-1}) p(x_t|h_t) \\
     & = \sum_{h_3, \ldots h_T} \underbrace{\left[\sum_{h_2} \pi_2(h_2) p(x_2|h_2) p(h_3|h_2)\right]}_{=: \pi_3(h_3)}
-    p(x_3|h_3) \prod_{i=4}^T p(h_t|h_{t-1}) p(x_t|h_t)
+    p(x_3|h_3) \prod_{t=4}^T p(h_t|h_{t-1}) p(x_t|h_t)
 \end{aligned}$$
 
 In general we have the *forward* recursion
