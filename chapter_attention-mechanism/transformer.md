@@ -59,7 +59,7 @@ Then we concatenate all outputs and project them to obtain the multi-head attent
 
 $$\mathbf o = \mathbf W_o \begin{bmatrix}\mathbf o^{(1)}\\\vdots\\\mathbf o^{(h)}\end{bmatrix}.$$
 
-In practice, we often use $p_q=p_k=p_v=d_o/h$. The hyper-parameters for a multi-head attention, therefore, contain the number heads $h$, and output feature size $d_o$.
+In practice, we often use $p_q=p_k=p_v=d_o/h$. The hyper-parameters for a multi-head attention, therefore, contain the number heads $h$, and output feature size $d_o$. Here we do not include the dense layer $\mathbf W_o\in\mathbb R^{d_o\times d_0}$, simply assuming it is identity.
 
 ```{.python .input  n=2}
 class MultiHeadAttention(nn.Block):
