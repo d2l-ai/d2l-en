@@ -32,8 +32,8 @@ def read_data_ml100k(path = "ml-100k/u.data",
         return df, num_users, num_items
 
 df, num_users, num_items = read_data_ml100k()
-#print('number of users: %d, number of items: %d.'%(num_users, num_items))
-#print(df.head(5))
+print('number of users: %d, number of items: %d.'%(num_users, num_items))
+print(df.head(5))
 ```
 
 We can see that each line consists of four columns, including user id (1-943), item id (1-1682), rating (1-5) and timestamp. We can construct an interaction matrix of size $\text{num_users} * \text{num_items}$.  This data set only
