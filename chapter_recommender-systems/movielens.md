@@ -17,6 +17,7 @@ from mxnet import np, npx, gluon
 
 Then, we download the MovieLens 100k dataset and load the interactions as `DataFrame`.
 # Save to the d2l package.
+```
 def read_data_ml100k(path = "ml-100k/u.data", 
                      names=['user_id','item_id','rating','timestamp'],
                      sep="\t"):
@@ -32,6 +33,8 @@ def read_data_ml100k(path = "ml-100k/u.data",
 df, num_users, num_items = read_data_ml100k()
 #print('number of users: %d, number of items: %d.'%(num_users, num_items))
 #print(df.head(5))
+```
+
 We can see that each line consists of four columns, including user id (1-943), item id (1-1682), rating (1-5) and timestamp. We can construct an interaction matrix of size $\text{num_users} * \text{num_items}$.  This data set only
 records the existed ratings and most of the values in the interaction matrix are unknown as users have not rated the majority of movies. Clearly, the interaction matrix is extremely sparse (sparsity = 93.685%). The case in data sets from real-world applications can be even worse, and data sparsity has been a long- standing challenge in recommender systems.
 
