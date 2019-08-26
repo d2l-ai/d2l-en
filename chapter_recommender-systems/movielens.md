@@ -16,8 +16,9 @@ from mxnet import np, npx, gluon
 ```
 
 Then, we download the MovieLens 100k dataset and load the interactions as `DataFrame`.
-# Save to the d2l package.
+
 ```
+# Save to the d2l package.
 def read_data_ml100k(path = "ml-100k/u.data", 
                      names=['user_id','item_id','rating','timestamp'],
                      sep="\t"):
