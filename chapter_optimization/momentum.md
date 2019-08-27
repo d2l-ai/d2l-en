@@ -93,7 +93,7 @@ To understand the momentum method, we can expand the velocity variable over time
 $$
 \begin{aligned}
 \mathbf{v}_t &= \eta_t \mathbf{g}_t + \gamma \mathbf{v}_{t-1}, \\
-             &= \eta_t \mathbf{g}_t + \gamma \eta_{t-1} \mathbf{g}_{t-1} + \gamma\mathbf{v}_{t-1}, \\
+             &= \eta_t \mathbf{g}_t + \gamma \eta_{t-1} \mathbf{g}_{t-1} + \gamma^2 \mathbf{v}_{t-2}, \\
              &\ldots\\
              &= \eta_t \mathbf{g}_t + \gamma \eta_{t-1} \mathbf{g}_{t-1} + \ldots +  \gamma^{t-1}\eta_1\mathbf g_1. \\
 \end{aligned}
@@ -115,7 +115,7 @@ d2l.plt.legend();
 
 A small $\gamma$ will let the velocity variable focus on more recent scaled gradients. While a large value will have the velocity variable to include more past scaled gradients. Compared to the plain gradient descent, momentum will make the weight updates be more consistent over time. It might smooth the training progress if $\mathbf x$ enters the region that the gradient vary, or walk out region that is too flat.
 
-Also note that $\frac{1}{1-\gamma} = 1 + \gamma + \gamma^2 + \cdots$. So all scaled gradients are similar to each other, e.g. $\eta_t\mathbf g_t\approx \eta\mathbf g$ for all $t$s, then the momentum changes the weight updates from $\eta\mathbf g$ in normal gradient descent into $\frac{\eta}{1-\gamma} \mathbf g$.
+Also note that $\frac{1}{1-\gamma} = 1 + \gamma + \gamma^2 + \cdots$. So if all scaled gradients are similar to each other, e.g. $\eta_t\mathbf g_t\approx \eta\mathbf g$ for all $t$s, then the momentum changes the weight updates from $\eta\mathbf g$ in normal gradient descent into $\frac{\eta}{1-\gamma} \mathbf g$.
 
 ## Implementation from Scratch
 
@@ -168,7 +168,7 @@ d2l.train_gluon_ch10('sgd', {'learning_rate': 0.004, 'momentum': 0.9},
 
 ## Summary
 
-* The momentum method uses the EWMA concept. It takes the weighted average of past time steps, with weights that decay exponentially by the time step.
+* The momentum method uses the exponentially weighted moving average (EWMA) concept. It takes the weighted average of past time steps, with weights that decay exponentially by the time step.
 * Momentum makes independent variable updates for adjacent time steps more consistent in direction.
 
 ## Exercises
