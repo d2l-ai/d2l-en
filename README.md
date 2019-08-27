@@ -4,6 +4,8 @@
 
 [Book website](http://www.d2l.ai/) | [STAT 157 Course at UC Berkeley, Spring 2019](http://courses.d2l.ai/berkeley-stat-157/index.html)
 
+This version is based on the classic `ndarray` interface.
+
 
 ## Contribute ([learn how](http://en.diveintodeeplearning.org/chapter_appendix/how-to-contribute.html))
 
