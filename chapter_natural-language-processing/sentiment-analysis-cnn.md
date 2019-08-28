@@ -11,7 +11,7 @@ convolutional neural networks to capture associations between adjacent
 words. This section describes a groundbreaking approach to applying
 convolutional neural networks to text analysis: textCNN :cite:`Kim.2014`. First, import the packages and modules required for the experiment.
 
-```{.python .input  n=2}
+```{.python .input  n=1}
 import d2l
 from mxnet import gluon, init, np, npx
 from mxnet.contrib import text
@@ -30,7 +30,7 @@ Before introducing the model, let us explain how a one-dimensional convolutional
 
 Next, we implement one-dimensional cross-correlation in the `corr1d` function. It accepts the input array `X` and kernel array `K` and outputs the array `Y`.
 
-```{.python .input  n=3}
+```{.python .input  n=2}
 def corr1d(X, K):
     w = K.shape[0]
     Y = np.zeros((X.shape[0] - w + 1))
@@ -41,7 +41,7 @@ def corr1d(X, K):
 
 Now, we will reproduce the results of the one-dimensional cross-correlation operation in Figure 12.4.
 
-```{.python .input  n=4}
+```{.python .input  n=3}
 X, K = np.array([0, 1, 2, 3, 4, 5, 6]), np.array([1, 2])
 corr1d(X, K)
 ```
@@ -52,7 +52,7 @@ The one-dimensional cross-correlation operation for multiple input channels is a
 
 Now, we reproduce the results of the one-dimensional cross-correlation operation with multi-input channel in Figure 12.5.
 
-```{.python .input  n=5}
+```{.python .input  n=4}
 def corr1d_multi_in(X, K):
     # First, we traverse along the 0th dimension (channel dimension) of X and
     # K. Then, we add them together by using * to turn the result list into a
@@ -99,7 +99,7 @@ Figure 12.7 gives an example to illustrate the textCNN. The input here is a sent
 
 Next, we will implement a textCNN model. Compared with the previous section, in addition to replacing the recurrent neural network with a one-dimensional convolutional layer, here we use two embedding layers, one with a fixed weight and another that participates in training.
 
-```{.python .input  n=10}
+```{.python .input  n=5}
 class TextCNN(nn.Block):
     def __init__(self, vocab_size, embed_size, kernel_sizes, num_channels,
                  **kwargs):
@@ -141,7 +141,7 @@ class TextCNN(nn.Block):
 
 Create a TextCNN instance. It has 3 convolutional layers with kernel widths of 3, 4, and 5, all with 100 output channels.
 
-```{.python .input}
+```{.python .input  n=6}
 embed_size, kernel_sizes, nums_channels = 100, [3, 4, 5], [100, 100, 100]
 ctx = d2l.try_all_gpus()
 net = TextCNN(len(vocab), embed_size, kernel_sizes, nums_channels)
@@ -152,7 +152,7 @@ net.initialize(init.Xavier(), ctx=ctx)
 
 As in the previous section, load pre-trained 100-dimensional GloVe word vectors and initialize the embedding layers `embedding` and `constant_embedding`. Here, the former participates in training while the latter has a fixed weight.
 
-```{.python .input}
+```{.python .input  n=7}
 glove_embedding = text.embedding.create(
     'glove', pretrained_file_name='glove.6B.100d.txt')
 embeds = glove_embedding.get_vecs_by_tokens(vocab.idx_to_token)
@@ -166,7 +166,7 @@ net.constant_embedding.collect_params().setattr('grad_req', 'null')
 
 Now we can train the model.
 
-```{.python .input  n=30}
+```{.python .input  n=8}
 lr, num_epochs = 0.001, 5
 trainer = gluon.Trainer(net.collect_params(), 'adam', {'learning_rate': lr})
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
@@ -175,11 +175,11 @@ d2l.train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs, ctx)
 
 Below, we use the trained model to classify sentiments of two simple sentences.
 
-```{.python .input}
+```{.python .input  n=9}
 d2l.predict_sentiment(net, vocab, 'this movie is so great')
 ```
 
-```{.python .input}
+```{.python .input  n=10}
 d2l.predict_sentiment(net, vocab, 'this movie is so bad')
 ```
 
