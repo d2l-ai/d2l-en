@@ -28,9 +28,10 @@ Assume there are $k$ GPUs on a machine. Given the model to be trained, each GPU 
 
 In order to implement data parallelism in a multi-GPU training scenario from scratch, we first import the required packages or modules.
 
-```{.python .input  n=33}
+```{.python .input  n=2}
 %matplotlib inline
 import d2l
+import mxnet as mx
 from mxnet import autograd, nd, gluon
 ```
 
@@ -120,7 +121,7 @@ Now, we try to divide the 6 data instances equally between 2 GPUs using the `spl
 
 ```{.python .input  n=8}
 data = nd.arange(24).reshape((6, 4))
-ctx = d2l.try_all_gpus()
+ctx = [mx.gpu(0), mx.gpu(1)]
 splitted = gluon.utils.split_and_load(data, ctx)
 print('input: ', data)
 print('load into', ctx)
