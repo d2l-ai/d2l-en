@@ -110,13 +110,13 @@ To see how the algorithm behaves in practice let's construct an objective functi
 
 ```{.python .input  n=1}
 # Save to the d2l package.
-def train_2d(trainer):
+def train_2d(trainer, steps=20):
     """Optimize a 2-dim objective function with a customized trainer."""
     # s1 and s2 are internal state variables and will 
     # be used later in the chapter
     x1, x2, s1, s2 = -5, -2, 0, 0
     results = [(x1, x2)]
-    for i in range(20):
+    for i in range(steps):
         x1, x2, s1, s2 = trainer(x1, x2, s1, s2)
         results.append((x1, x2))
     print('epoch %d, x1 %f, x2 %f' % (i + 1, x1, x2))
