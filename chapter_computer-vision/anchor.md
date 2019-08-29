@@ -23,7 +23,7 @@ $$(s_1, r_1), (s_1, r_2), \ldots, (s_1, r_m), (s_2, r_1), (s_3, r_1), \ldots, (s
 
 That is, the number of anchor boxes centered on the same pixel is $n+m-1$. For the entire input image, we will generate a total of $wh(n+m-1)$ anchor boxes.
 
-The above method of generating anchor boxes has been implemented in the `MultiBoxPrior` function. We specify the input, a set of sizes, and a set of aspect ratios, and this function will return all the anchor boxes entered.
+The above method of generating anchor boxes has been implemented in the `MultiBoxPrior` function. We specify the input, a set of sizes, and a set of aspect ratios, and this function will return all the anchor boxes entered; to be more exact, the function constructs anchor boxes with the width and height of $\delta ws \sqrt{r}$ and $hs/\sqrt{r}$, respectively, where $\delta\approx 0.77$ is a constant.
 
 ```{.python .input  n=2}
 img = image.imread('../img/catdog.jpg').asnumpy()
