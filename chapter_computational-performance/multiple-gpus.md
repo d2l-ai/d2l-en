@@ -134,9 +134,11 @@ The `split_batch` function then splits both the features and labels.
 # Save to the d2l package.
 def split_batch(X, y, ctx_list):
     """Split X and y into multiple devices specified by ctx"""
-    assert X.shape[0] == y.shape[0]
-    return (gluon.utils.split_and_load(X, ctx_list),
-            gluon.utils.split_and_load(y, ctx_list))
+    if not isinstance(X, list):
+        X = [X]
+    X = tuple(gluon.utils.split_and_load(feature, ctx_list) for feature in list(X))
+    y = tuple(gluon.utils.split_and_load(y, ctx_list))
+    return X + y
 ```
 
 ## Multi-GPU Training on a Single Mini-batch
