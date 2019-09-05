@@ -393,7 +393,7 @@ That makes sense, in most contexts the smallest *size* for anything is 0.
 The final rule basically says that the smallest norm is achieved by a matrix or vector consisting of all zeros.
 It is possible to define a norm that gives zero norm to nonzero matrices,
 but you cannot give nonzero norm to zero matrices.
-That may seem like a mouthful, but if you digest it then you probably have grepped the important concepts here.
+That may seem like a mouthful, but if you digest it then you probably have grokked the important concepts here.
 
 If you remember Euclidean distances (think Pythagoras' theorem) from grade school,
 then non-negativity and the triangle inequality might ring a bell.
