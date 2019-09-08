@@ -30,7 +30,7 @@ Here, we demonstrate the most basic design of a fully convolutional network mode
 ![Fully convolutional network. ](../img/fcn.svg)
 :label:`fig_fcn`
 
-Below, we use a ResNet-18 model pre-trained on the ImageNet data set to extract image features and record the network instance as `pretrained_net`. As you can see, the last two layers of the model member variable `features` are the global maximum pooling layer `GlobalAvgPool2D` and example flattening layer `Flatten`. The `output` module contains the fully connected layer used for output. These layers are not required for a fully convolutional network.
+Below, we use a ResNet-18 model pre-trained on the ImageNet data set to extract image features and record the network instance as `pretrained_net`. As you can see, the last two layers of the model member variable `features` are the global average pooling layer `GlobalAvgPool2D` and example flattening layer `Flatten`. The `output` module contains the fully connected layer used for output. These layers are not required for a fully convolutional network.
 
 ```{.python .input  n=5}
 pretrained_net = gluon.model_zoo.vision.resnet18_v2(pretrained=True)
