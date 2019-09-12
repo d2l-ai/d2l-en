@@ -139,7 +139,7 @@ Assume that we have a deep network
 with one hidden layer with two units, say $h_1$ and $h_2$.
 In this case, we could permute the weights $\mathbf{W}_1$
 of the first layer and likewise permute the weights of the output layer
-to obtain the same function function.
+to obtain the same function.
 There is nothing special differentiating
 the first hidden unit vs the second hidden unit.
 In other words, we have permutation symmetry
