@@ -46,7 +46,7 @@ filling in the partial derivatives with respect to each parameter.
 If you are unfamiliar with some of the math, 
 e.g., gradients, please refer to :numref:`chapter_math`.
 
-```{.python .input  n=34}
+```{.python .input  n=1}
 from mxnet import autograd, np, npx
 npx.set_np()
 ```
@@ -59,22 +59,9 @@ $y = 2\mathbf{x}^{\top}\mathbf{x}$
 with respect to the column vector $\mathbf{x}$. 
 To start, let's create the variable `x` and assign it an initial value.
 
-```{.python .input  n=35}
+```{.python .input  n=2}
 x = np.arange(4)
 x
-```
-
-```{.json .output n=35}
-[
- {
-  "data": {
-   "text/plain": "array([0., 1., 2., 3.])"
-  },
-  "execution_count": 35,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 Note that before we even calculate the gradient 
@@ -94,7 +81,7 @@ as an attribute the NDArray `x` itself.
 We allocate memory for an NDArray's gradient
 by invoking its ``attach_grad()`` method.
 
-```{.python .input  n=36}
+```{.python .input  n=3}
 x.attach_grad()
 ```
 
@@ -110,21 +97,8 @@ we ensure that any update accidentally exectuted
 before a gradient has actually been calculated
 will not alter the variable's value.
 
-```{.python .input  n=37}
+```{.python .input}
 x.grad
-```
-
-```{.json .output n=37}
-[
- {
-  "data": {
-   "text/plain": "array([0., 0., 0., 0.])"
-  },
-  "execution_count": 37,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 Now let's calculate ``y``. 
@@ -139,23 +113,10 @@ So MXNet will only build the graph when explicitly told to do so.
 We can invoke this behavior by placing our code 
 inside a ``with autograd.record():`` block.
 
-```{.python .input  n=38}
+```{.python .input  n=4}
 with autograd.record():
     y = 2.0 * np.dot(x, x)
 y
-```
-
-```{.json .output n=38}
-[
- {
-  "data": {
-   "text/plain": "array(28.)"
-  },
-  "execution_count": 38,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 Since `x` is an NDArray of length 4, 
@@ -165,27 +126,14 @@ Next, we can automatically calculate the gradient of `y`
 with respect to each component of `x` 
 by calling `y`'s `backward` function.
 
-```{.python .input  n=39}
+```{.python .input  n=5}
 y.backward()
 ```
 
 If we recheck the value of `x.grad`, we will find its contents overwritten by the newly calculated gradient.
 
-```{.python .input  n=41}
+```{.python .input}
 x.grad
-```
-
-```{.json .output n=41}
-[
- {
-  "data": {
-   "text/plain": "array([ 0.,  4.,  8., 12.])"
-  },
-  "execution_count": 41,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 The gradient of the function $y = 2\mathbf{x}^{\top}\mathbf{x}$ 
@@ -194,45 +142,19 @@ Let's quickly verify that our desired gradient was calculated correctly.
 If the two NDArrays are indeed the same, 
 then their difference should consist of all zeros.
 
-```{.python .input  n=44}
+```{.python .input  n=6}
 x.grad - 4 * x
-```
-
-```{.json .output n=44}
-[
- {
-  "data": {
-   "text/plain": "array([  1.,  -3.,  -7., -11.])"
-  },
-  "execution_count": 44,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 If we subsequently compute the gradient of another variable
 whose value was calculated as a function of `x`, 
 the contents of `x.grad` will be overwritten.
 
-```{.python .input  n=45}
+```{.python .input}
 with autograd.record():
     y = x.sum()
 y.backward()
 x.grad
-```
-
-```{.json .output n=45}
-[
- {
-  "data": {
-   "text/plain": "array([1., 1., 1., 1.])"
-  },
-  "execution_count": 45,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ## Backward for Non-scalar Variable
@@ -259,7 +181,7 @@ In short, MXNet, will create a new scalar variable
 by summing the elements in `y`,
 and compute the gradient of that variable with respect to `x`.
 
-```{.python .input  n=46}
+```{.python .input}
 with autograd.record():  # y is a vector
     y = x * x
 y.backward()
@@ -271,19 +193,6 @@ with autograd.record():  # v is scalar
 v.backward()
 
 x.grad - u.grad
-```
-
-```{.json .output n=46}
-[
- {
-  "data": {
-   "text/plain": "array([0., 0., 0., 0.])"
-  },
-  "execution_count": 46,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ## Advanced Autograd
@@ -316,7 +225,7 @@ The following backward computes $\partial (u \odot x)/\partial x$
 instead of $\partial (x \odot x \odot x) /\partial x$,
 where $\odot$ stands for element-wise multiplication.
 
-```{.python .input  n=47}
+```{.python .input}
 with autograd.record():
     y = x * x
     u = y.detach()
@@ -325,38 +234,12 @@ z.backward()
 x.grad - u
 ```
 
-```{.json .output n=47}
-[
- {
-  "data": {
-   "text/plain": "array([0., 0., 0., 0.])"
-  },
-  "execution_count": 47,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 Since the computation of $y$ was recorded, 
 we can subsequently call `y.backward()` to get $\partial y/\partial x = 2x$.
 
-```{.python .input  n=48}
+```{.python .input}
 y.backward()
 x.grad - 2*x
-```
-
-```{.json .output n=48}
-[
- {
-  "data": {
-   "text/plain": "array([0., 0., 0., 0.])"
-  },
-  "execution_count": 48,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ## Attach Gradients to Internal Variables
@@ -365,7 +248,7 @@ Attaching gradients to a variable `x` implicitly calls `x=x.detach()`.
 If `x` is computed based on other variables, 
 this part of computation will not be used in the backward function.
 
-```{.python .input  n=49}
+```{.python .input}
 y = np.ones(4) * 2
 y.attach_grad()
 with autograd.record():
@@ -376,21 +259,11 @@ z.backward()
 print(x.grad, '\n', u.grad, '\n', y.grad)
 ```
 
-```{.json .output n=49}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "[1. 1. 1. 1.] \n [1. 1. 1. 1.] \n [0. 0. 0. 0.]\n"
- }
-]
-```
-
 ## Head gradients
 
 Detaching allows to breaks the computation into several parts. We could use chain rule :numref:`chapter_math` to compute the gradient for the whole computation.  Assume $u = f(x)$ and $z = g(u)$, by chain rule we have $\frac{dz}{dx} = \frac{dz}{du} \frac{du}{dx}.$ To compute $\frac{dz}{du}$, we can first detach $u$ from the computation and then call `z.backward()` to compute the first term.
 
-```{.python .input  n=50}
+```{.python .input}
 y = np.ones(4) * 2
 y.attach_grad()
 with autograd.record():
@@ -402,33 +275,13 @@ z.backward()
 print(x.grad, '\n', y.grad)
 ```
 
-```{.json .output n=50}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "[1. 1. 1. 1.] \n [0. 0. 0. 0.]\n"
- }
-]
-```
-
 Subsequently, we can call `u.backward()` to compute the second term, 
 but pass the first term as the head gradients to multiply both terms 
 so that `x.grad` will contains $\frac{dz}{dx}$ instead of $\frac{du}{dx}$.
 
-```{.python .input  n=51}
+```{.python .input}
 u.backward(v.grad)
 print(x.grad, '\n', y.grad)
-```
-
-```{.json .output n=51}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "[2. 2. 2. 2.] \n [0. 1. 2. 3.]\n"
- }
-]
 ```
 
 ## Computing the Gradient of Python Control Flow
@@ -443,7 +296,7 @@ the number of iterations of the `while` loop
 and the evaluation of the `if` statement
 both depend on the value of the input `b`.
 
-```{.python .input  n=54}
+```{.python .input  n=8}
 def f(a):
     b = a * 2
     while np.abs(b).sum() < 1000:
@@ -458,7 +311,7 @@ def f(a):
 Again to compute gradients, we just need to `record` the calculation
 and then call the `backward` function.
 
-```{.python .input  n=55}
+```{.python .input  n=9}
 a = np.random.normal()
 a.attach_grad()
 with autograd.record():
@@ -472,18 +325,8 @@ In other words, for any `a` there exists some constant
 such that for a given range `f(a) = g * a`. 
 Consequently `d / a` allows us to verify that the gradient is correct:
 
-```{.python .input  n=56}
+```{.python .input  n=10}
 print(a.grad == (d / a))
-```
-
-```{.json .output n=56}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "1.0\n"
- }
-]
 ```
 
 ## Training Mode and Prediction Mode
@@ -495,20 +338,10 @@ Additionally, `autograd.record` will change
 the running mode from *prediction* mode to *training* mode. 
 We can verify this behavior by calling the `is_training` function.
 
-```{.python .input  n=57}
+```{.python .input  n=7}
 print(autograd.is_training())
 with autograd.record():
     print(autograd.is_training())
-```
-
-```{.json .output n=57}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "False\nTrue\n"
- }
-]
 ```
 
 When we get to complicated deep learning models,
@@ -526,9 +359,9 @@ We will cover these differences in detail in later chapters.
 
 ## Summary
 
-* MXNet provides an `autograd` package to automate the calculation of derivatives. To use it so, we first attach gradients to variables, record the computation, and then run the backward function.
+* MXNet provides an `autograd` package to automate the calculation of derivatives. To use it, we first attach gradients to those variables with respect to which we desire partial derivartives. We then record the computation of our target value, executed its backward function, and access the resulting gradient via our variable's `grad` attribute.
 * We can detach gradients and pass head gradients to the backward function to control the part of the computation will be used in the backward function.
-* The running modes of MXNet include the training mode and the prediction mode. We can determine the running mode by `autograd.is_training()`.
+* The running modes of MXNet include *training mode* and *prediction mode*. We can determine the running mode by calling `autograd.is_training()`.
 
 ## Exercises
 
