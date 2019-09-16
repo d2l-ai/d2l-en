@@ -150,16 +150,15 @@ as we did before when introducing other layers.
 When applying BN to fully-connected layers,
 we usually inser BN after the affine transformation
 and before the nonlinear activation function.
-In the following, we denote the input to the layer by $\mathbf{x}$,
+Denoting the input to the layer by $\mathbf{x}$,
 the linear transform (with weights $\theta$) by $f_{\theta}(\cdot)$,
-the activation function by $\phi(\cdot)$ and the BN operation by $\mathrm{BN}_{\mathbf{\beta}, \mathbf{\gamma}}$. 
-
-
-Finally, we would compute the output of a BN-enabled fully-connected layer $\mathbf{h}$ as folows:
+the activation function by $\phi(\cdot)$,
+and the BN operation with parameters $\mathbf{\beta}$ and $\mathbf{\gamma}$ 
+by $\mathrm{BN}_{\mathbf{\beta}, \mathbf{\gamma}}$, 
+we can express the computation of a BN-enabled, 
+fully-connected layer $\mathbf{h}$ as folows:
 
 $$\mathbf{h} = \phi(\mathrm{BN}_{\mathbf{\beta}, \mathbf{\gamma}}(f_{\mathbf{\theta}}(\mathbf{x}) ) ) $$
-
-
 
 Recall that mean and variance are computed
 on the *same* minibatch $\mathcal{B}$
