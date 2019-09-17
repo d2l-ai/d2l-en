@@ -101,6 +101,7 @@ Before installing `mxnet`, please first check if you are able to access GPUs. If
 pip install mxnet==1.6.0b20190915
 ```
 
+
 Once both packages are installed, we now open the Jupyter notebook by
 
 ```
@@ -116,7 +117,7 @@ Both this book and MXNet are keeping improving. Please check a new version from 
 
 1. The URL  http://numpy.d2l.ai/d2l-en.zip always points to the latest contents.
 2. Please upgrade "d2l" by `pip install git+https://github.com/d2l-ai/d2l-en@numpy2`.
-3. For the CPU version, MXNet can be upgraded by `pip uninstall mxnet` then re-running the aforementioned `pip install https...whl` command.
+3. For the CPU version, MXNet can be upgraded by `pip uninstall mxnet` then re-running the aforementioned `pip install mxnet==...` command.
 
 
 ## GPU Support
@@ -138,6 +139,7 @@ Then we need to find the CUDA version you installed. You may check it through `n
 # For Linux and macOS users (Windows support coming soon)
 pip install mxnet-cu101==1.6.0b20190915
 ```
+
 
 You may change the last digits according to your CUDA version, e.g. `cu100` for CUDA 10.0 and `cu90` for CUDA 9.0. You can find all available MXNet versions by `pip search mxnet`.
 
