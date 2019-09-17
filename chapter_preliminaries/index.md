@@ -1,4 +1,4 @@
-#  The Preliminaries: A Crashcourse
+#  The Preliminaries
 :label:`chapter_crashcourse`
 
 To get started with deep learning,
@@ -30,9 +30,6 @@ we will need to invoke the language of probability and statistics.
 To conclude the chapter, we will present
 your first basic classifier, *Naive Bayes*.
 
-
-
-
 ```toc
 :maxdepth: 2
 
@@ -43,3 +40,4 @@ probability
 naive-bayes
 lookup-api
 ```
+
