@@ -20,7 +20,7 @@ chapter_install/install
 :numbered:
 
 chapter_introduction/intro
-chapter_crashcourse/index
+chapter_preliminaries/index
 chapter_linear-networks/index
 chapter_multilayer-perceptrons/index
 chapter_deep-learning-computation/index
