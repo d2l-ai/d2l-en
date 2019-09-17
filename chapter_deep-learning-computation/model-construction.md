@@ -65,7 +65,7 @@ Finally a `Block` must possess a `backward` method,
 for purposes of calculating gradients.
 Fortunately, due to some behind-the-scenes magic 
 supplied by the autograd  `autograd` package 
-(introduced in :numref:`chapter_crashcourse`)
+(introduced in :numref:`chapter_preliminaries`)
 when defining our own `Block` typically requires
 only that we worry about parameters and the `forward` function.
 
@@ -91,9 +91,7 @@ and then another fully-connected layer
 consisting of 10 units (with no activation function).
 Because there are no more layers, 
 this last 10-unit layer is regarded as the *output layer*
-and its outputs are also the model's output. 
-
-
+and its outputs are also the model's output.
 
 ```{.python .input  n=1}
 from mxnet import np, npx
@@ -159,7 +157,7 @@ we just code up a Block from scratch that implements a multilayer perceptron wit
 Our `MLP` class below inherits the `Block` class. 
 While we rely on some predefined methods in the parent class,
 we need to supply our own `__init__` and `forward` functions
-to uniquely define the behavior of our model. 
+to uniquely define the behavior of our model.
 
 ```{.python .input  n=1}
 from mxnet.gluon import nn
@@ -181,7 +179,6 @@ class MLP(nn.Block):
     def forward(self, x):
         return self.output(self.hidden(x))
 ```
-
 
 This code may be easiest to understand by working backwards from `forward`.
 Note that the `forward` method takes as input `x`.
@@ -207,7 +204,6 @@ we don't have to worry about backpropagation,
 since the `backward` method is generated for us automatically. 
 The same goes for the `initialize` method. 
 Let's try this out:
-
 
 ```{.python .input  n=2}
 net = MLP()
