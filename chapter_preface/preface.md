@@ -188,7 +188,7 @@ The book can be roughly divided into three parts, which are presented by differe
 
 * The first part covers prerequisites and basics.  The first chapter offers an
 introduction to deep learning in :numref:`chapter_introduction`.  In
-:numref:`chapter_crashcourse`, we'll quickly bring you up to speed on the
+:numref:`chapter_preliminaries`, we'll quickly bring you up to speed on the
 prerequisites required for hands-on deep learning, such as how to acquire and
 run the codes covered in the book.  :numref:`chapter_linear` and
 :numref:`chapter_perceptrons` cover the most basic concepts and techniques of deep
