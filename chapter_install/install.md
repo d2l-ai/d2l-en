@@ -15,6 +15,7 @@ sudo sh Miniconda3-latest-MacOSX-x86_64.sh
 sudo sh Miniconda3-latest-Linux-x86_64.sh
 ```
 
+
 You need to answer the following questions:
 
 ```bash
@@ -33,6 +34,7 @@ by running conda init? [yes|no]
 [no] >>> yes
 ```
 
+
 After miniconda installation, run the following command to activate conda.
 
 ```bash
@@ -43,10 +45,13 @@ source ~/.bash_profile
 source ~/.bashrc
 ```
 
+
 Then create the conda "d2l"" environment and enter `y` for the following inquiries as shown in :numref:`fig_conda_create_d2l`.
+
 ```bash
 conda create --name d2l
 ```
+
 
 ![ Conda create environment d2l. ](../img/conda_create_d2l.png)
 :width:`700px`
@@ -64,6 +69,7 @@ wget http://numpy.d2l.ai/d2l-en.zip
 unzip d2l-en.zip && rm d2l-en.zip
 ```
 
+
 Within the "d2l" environment, activate it and install `pip`. Enter `y` for the following inquiries.
 
 ```bash
@@ -71,10 +77,13 @@ conda activate d2l
 conda install pip
 ```
 
-Finally, install "d2l" package within the environment "d2l" that we created. 
+
+Finally, install "d2l" package within the environment "d2l" that we created.
+
 ```
 pip install git+https://github.com/d2l-ai/d2l-en@numpy2
 ```
+
 
 If unfortunately something went wrong, please check
 
@@ -88,17 +97,8 @@ If unfortunately something went wrong, please check
 Before installing `mxnet`, please first check if you are able to access GPUs. If so, please go to :ref:`sec_gpu` for instructions to install a GPU-supported `mxnet`. Otherwise, you can install the CPU version, which is still good enough for the first few chapters.
 
 ```
-# For Linux users
-pip install https://apache-mxnet.s3-accelerate.amazonaws.com/dist/python/numpy/latest/mxnet-1.5.0-py2.py3-none-manylinux1_x86_64.whl
-
-# For macOS with Python 2.7 users
-pip install https://apache-mxnet.s3-us-west-2.amazonaws.com/dist/python/numpy/latest/mxnet-1.5.0-cp27-cp27m-macosx_10_11_x86_64.whl
-
-# For macOS with Python 3.6 users
-pip install https://apache-mxnet.s3-us-west-2.amazonaws.com/dist/python/numpy/latest/mxnet-1.5.0-cp36-cp36m-macosx_10_11_x86_64.whl
-
-# For macOS with Python 3.7 users
-pip install https://apache-mxnet.s3-us-west-2.amazonaws.com/dist/python/numpy/latest/mxnet-1.5.0-cp37-cp37m-macosx_10_11_x86_64.whl
+# For Linux and macOS users (Windows support coming soon)
+pip install mxnet==1.6.0b20190915
 ```
 
 Once both packages are installed, we now open the Jupyter notebook by
@@ -135,9 +135,9 @@ pip uninstall mxnet
 Then we need to find the CUDA version you installed. You may check it through `nvcc --version` or `cat /usr/local/cuda/version.txt`. Assume you have installed CUDA 10.1, then you can install the according MXNet version by
 
 ```
-pip install https://apache-mxnet.s3-accelerate.amazonaws.com/dist/python/numpy/latest/mxnet_cu101-1.5.0-py2.py3-none-manylinux1_x86_64.whl
+# For Linux and macOS users (Windows support coming soon)
+pip install mxnet-cu101==1.6.0b20190915
 ```
-
 
 You may change the last digits according to your CUDA version, e.g. `cu100` for CUDA 10.0 and `cu90` for CUDA 9.0. You can find all available MXNet versions by `pip search mxnet`.
 
