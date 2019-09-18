@@ -6,7 +6,7 @@ we will need to develop a few basic skills.
 All machine learning is concerned
 with extracting information from data.
 So we will begin by learning the practical skills
-for storing, manipulating, and preprocessing data with MXNet's NumPy interface.
+for storing, manipulating, and preprocessing data with the NumPy interface of MXNet.
 
 Moreover, machine learning typically requires
 working with large datasets, which we can think of as tables,
