@@ -1,57 +1,59 @@
-# Data Manipulation
+# Data Manipulation and Preprocessing
 :label:`chapter_ndarray`
 
 In order to get anything done, we must have some way to manipulate data. 
 Generally, there are two important things we need to do with data: 
-(i) acquire it and (ii) process it once it is inside the computer. 
+(i) acquire them and (ii) process them once they are inside the computer. 
 There is no point in acquiring data if we do not even know how to store it, 
-so let's get our hands dirty first by playing with synthetic data. 
-We will start by introducing the N-dimensional array (ndarray), 
-MXNet's primary tool for storing and transforming data. 
+so let us get our hands dirty first by playing with synthetic data. 
+We will start by introducing the N-dimensional array (`ndarray`), 
+MXNet's primary tool for storing and transforming data.
+In MXNet, `ndarray` is a class and we also call its instance
+an `ndarray` for brevity.
+
 If you have worked with NumPy, perhaps the most widely-used 
 scientific computing package in Python, then you are ready to fly. 
-In short, we designed MXNet's ndarray to be 
-an extension to NumPy's ndarray with a few key advantages.
-First, MXNet's ndarray supports asynchronous computation 
+In short, we designed MXNet's `ndarray` to be 
+an extension to NumPy's `ndarray` with a few key advantages.
+First, MXNet's `ndarray` supports asynchronous computation 
 on CPU, GPU, and distributed cloud architectures, 
 whereas the latter only supports CPU computation. 
-Second, MXNet's ndarray supports automatic differentiation. 
-These properties make MXNet's ndarray indispensable for deep learning.
+Second, MXNet's `ndarray` supports automatic differentiation. 
+These properties make MXNet's `ndarray` indispensable for deep learning.
+
 
 ## Getting Started
 
 Throughout this chapter, our aim is to get you up and running,
-equipping you with the the basic maths and numerical computing tools
+equipping you with the the basic math and numerical computing tools
 that you will be mastering throughout the course of the book. 
 Do not worry if you are not completely comfortable 
 with all of the mathematical concepts or library functions. 
-In the following chapters we will revist the same material 
+In the following sections we will revisit the same material 
 in the context practical examples. 
 On the other hand, if you already have some background 
-and want to go deeper into the mathematical content, see :numref:`chapter_math`.
+and want to go deeper into the mathematical content, just skip this section.
 
-To start, we import the `np` and `npx` modules from MXNet. 
+To start, we import the `np` (`numpy`) and `npx` (`numpy_extension`) modules from MXNet. 
 Here, `np` module includes the same functions supported by NumPy, 
-while `npx` module contains a set of extendions 
+while `npx` module contains a set of extensions 
 developed to empower deep learning within a NumPy-like environment. 
-When using ndarray, we almost always invoke the `set_np` function: 
-this is for compatibility of ndarray processing by other components of MXNet.
+When using `ndarray`, we almost always invoke the `set_np` function: 
+this is for compatibility of `ndarray` processing by other components of MXNet.
 
 ```{.python .input  n=1}
 from mxnet import np, npx
 npx.set_np()
 ```
 
-An ndarray represents a (possibly multi-dimensional) array of numerical values. 
-With one axis, an ndarray corresponds (in math-speak) to a *vector*. 
-With two axes, an ndarray corresponds to a *matrix*. 
+An `ndarray` represents an array of numerical values, which are possibly multi-dimensional. 
+With one axis, an `ndarray` corresponds (in math) to a *vector*. 
+With two axes, an `ndarray` corresponds to a *matrix*. 
 Arrays with more than two axes do not have special mathematical names---we simply call them *tensors*.
 
-The simplest object we can create is a vector. 
 To start, we can use `arange` to create a row vector `x` 
-containing the first 12 integers 
-(the values are integers but datatype defaults to float). 
-Unless otherwise specified, a new ndarray 
+containing the first 12 integers. 
+Unless otherwise specified, a new `ndarray` 
 will be stored in main memory and designated for CPU-based computation.
 
 ```{.python .input  n=2}
@@ -59,35 +61,34 @@ x = np.arange(12)
 x
 ```
 
-We can access an ndarray's shape (the lengths along each axis)
-by inspecting its `shape` property:
+We can access an `ndarray`'s shape (the length along each axis)
+by inspecting its `shape` property.
 
-```{.python .input  n=8}
+```{.python .input  n=3}
 x.shape
 ```
 
-If we just want to know the total number of elements in the ndarray,
-i.e. the product of all of the shape elements, 
+If we just want to know the total number of elements in an `ndarray`,
+*i.e.*, the product of all of the shape elements, 
 we can inspect its `size` property. 
 Because we are dealing with a vector here, 
-the shape only has one component
-and thus the two are identical.
+the single element of its `shape` is identical to its `size`. 
 
-```{.python .input  n=9}
+```{.python .input  n=4}
 x.size
 ```
 
-To change the shape of an ndarray 
+To change the shape of an `ndarray` 
 without altering either the number of elements or their values,
 we can invoke the `reshape` function.
-For example, we can transform our ndarray `x` 
-from a line vector with shape (12) to a matrix  to (3, 4).
-This new vector contains the exact same values 
-treats them as a matrix organized as 3 rows and 4 columns. 
+For example, we can transform our `ndarray`, `x`, 
+from a row vector with shape (12,) to a matrix of shape (3, 4).
+This new `ndarray` contains the exact same values, and 
+treats such values as a matrix organized as 3 rows and 4 columns. 
 To reiterate, although the shape has changed, the elements in `x` have not. 
 Consequently, the `size` remains the same.
 
-```{.python .input  n=3}
+```{.python .input  n=5}
 x = x.reshape(3, 4)
 x
 ```
@@ -104,7 +105,7 @@ that we would like ndarray to automatically infer.
 In our case, instead of calling `x.reshape(3, 4)`, 
 we could have equivalently called `x.reshape(-1, 4)` or `x.reshape(3, -1)`.
 
-```{.python .input}
+```{.python .input  n=6}
 np.empty((3, 4))
 ```
 
@@ -119,19 +120,19 @@ Perhaps most often, we want an array of all zeros.
 To create an ndarray representing a tensor with all elements set to 0 
 and a shape of (2, 3, 4) we can invoke:
 
-```{.python .input  n=4}
+```{.python .input  n=7}
 np.zeros((2, 3, 4))
 ```
 
 We can create tensors with each element set to 1 as follows:
 
-```{.python .input  n=5}
+```{.python .input  n=8}
 np.ones((2, 3, 4))
 ```
 
 We can also specify the value of each element in the desired ndarray by supplying a Python list containing the numerical values. The supplied values can be integers or floats (or a mix) but the resulting ndarray will contain floats.
 
-```{.python .input  n=6}
+```{.python .input  n=9}
 y = np.array([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 y
 ```
@@ -146,7 +147,7 @@ Each of its elements is randomly sampled
 from a standard Gaussian (normal) distribution 
 with a mean of $0$ and a standard deviation of $1$.
 
-```{.python .input  n=7}
+```{.python .input  n=10}
 np.random.normal(0, 1, size=(3, 4))
 ```
 
@@ -185,7 +186,7 @@ for any identically-shaped tensors of arbitrary shape.
 We can call element-wise operations on any two tensors 
 of the same shape.
 
-```{.python .input}
+```{.python .input  n=11}
 x = np.array([1, 2, 4, 8])
 y = np.ones_like(x) * 2
 print('x =', x)
@@ -229,7 +230,7 @@ and tell the system along which axis to concatenate.
 The example below shows what happens when we concatenate 
 two matrices along axis 0 (the rows) vs. axis 1 (the columns):
 
-```{.python .input}
+```{.python .input  n=14}
 np.concatenate([x, y], axis=0), np.concatenate([x, y], axis=1)
 ```
 
@@ -239,13 +240,13 @@ For each position, if `x` and `y` are equal at that position,
 the corresponding entry in the new ndarray takes a value of $1$,
 otherwise that position takes value $0$.
 
-```{.python .input}
+```{.python .input  n=15}
 x == y
 ```
 
 Summing all the elements in the ndarray yields an ndarray with only one element:
 
-```{.python .input}
+```{.python .input  n=16}
 x.sum()
 ```
 
@@ -268,7 +269,7 @@ on the resulting matrices.
 We usually broadcast along an axis where an array
 initially only has length 1.
 
-```{.python .input  n=14}
+```{.python .input  n=17}
 a = np.arange(3).reshape(3, 1)
 b = np.arange(2).reshape(1, 2)
 print('a : ', a)
@@ -282,7 +283,7 @@ for matrix `a` it replicates the columns,
 for matrix `b` it replicates the rows 
 before adding up both element-wise.
 
-```{.python .input}
+```{.python .input  n=18}
 a + b
 ```
 
@@ -339,7 +340,7 @@ allocating new memory for the result
 and then subsequently redirects `y` 
 to point at this new location in memory.
 
-```{.python .input  n=15}
+```{.python .input  n=22}
 before = id(y)
 y = y + x
 id(y) == before
@@ -365,7 +366,7 @@ To illustrate this concept, we first create a new matrix `z`
 with the same shape as another `y`, 
 using `zeros_like` to allocate a block of 0 entries.
 
-```{.python .input  n=16}
+```{.python .input  n=23}
 z = np.zeros_like(y)  
 print('id(z):', id(z))
 z[:] = x + y
@@ -376,7 +377,7 @@ If the value of `x ` is not reused in subsequent computations,
 we can also use `x[:] = x + y` or `x += y`
 to reduce the memory overhead of the operation.
 
-```{.python .input  n=18}
+```{.python .input  n=24}
 before = id(x)
 x += y
 id(x) == before
@@ -395,7 +396,7 @@ whether NumPy might want to be doing something else
 with the same chunk of memory. 
 The  `array` and `asnumpy` functions do the trick.
 
-```{.python .input  n=22}
+```{.python .input  n=25}
 a = x.asnumpy()
 print(type(a))
 b = np.array(a)
