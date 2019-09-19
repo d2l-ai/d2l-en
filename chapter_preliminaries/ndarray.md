@@ -52,7 +52,8 @@ With two axes, an `ndarray` corresponds to a *matrix*.
 Arrays with more than two axes do not have special mathematical names---we simply call them *tensors*.
 
 To start, we can use `arange` to create a row vector `x` 
-containing the first 12 integers. 
+containing the first 12 integers, though they are created as floats by default.
+Each of these 12 numbers is called an *element* of the `ndarray` `x`.
 Unless otherwise specified, a new `ndarray` 
 will be stored in main memory and designated for CPU-based computation.
 
@@ -61,21 +62,60 @@ x = np.arange(12)
 x
 ```
 
-We can access an `ndarray`'s shape (the length along each axis)
+```{.json .output n=2}
+[
+ {
+  "data": {
+   "text/plain": "array([ 0.,  1.,  2.,  3.,  4.,  5.,  6.,  7.,  8.,  9., 10., 11.])"
+  },
+  "execution_count": 2,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
+```
+
+We can access an `ndarray`'s *shape* (the length along each axis)
 by inspecting its `shape` property.
 
 ```{.python .input  n=3}
 x.shape
 ```
 
+```{.json .output n=3}
+[
+ {
+  "data": {
+   "text/plain": "(12,)"
+  },
+  "execution_count": 3,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
+```
+
 If we just want to know the total number of elements in an `ndarray`,
 *i.e.*, the product of all of the shape elements, 
 we can inspect its `size` property. 
 Because we are dealing with a vector here, 
-the single element of its `shape` is identical to its `size`. 
+the single element of its `shape` is identical to its `size`.
 
 ```{.python .input  n=4}
 x.size
+```
+
+```{.json .output n=4}
+[
+ {
+  "data": {
+   "text/plain": "12"
+  },
+  "execution_count": 4,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
 ```
 
 To change the shape of an `ndarray` 
@@ -93,35 +133,74 @@ x = x.reshape(3, 4)
 x
 ```
 
+```{.json .output n=5}
+[
+ {
+  "data": {
+   "text/plain": "array([[ 0.,  1.,  2.,  3.],\n       [ 4.,  5.,  6.,  7.],\n       [ 8.,  9., 10., 11.]])"
+  },
+  "execution_count": 5,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
+```
+
 Reshaping by manually specifying each of the dimensions can sometimes get annoying. 
-For instance, if our target shape is a matrix with shape `(height, width)`,
-after we know the `width`, the height is given implicitly.
+For instance, if our target shape is a matrix with shape (height, width),
+after we know the width, the height is given implicitly.
 Why should we have to perform the division ourselves? 
 In the example above, to get a matrix with 3 rows, 
 we specified both that it should have 3 rows and 4 columns. 
-Fortunately, ndarray can automatically work out one dimension given the other. 
+Fortunately, `ndarray` can automatically work out one dimension given the rest. 
 We invoke this capability by placing `-1` for the dimension
-that we would like ndarray to automatically infer. 
+that we would like `ndarray` to automatically infer. 
 In our case, instead of calling `x.reshape(3, 4)`, 
 we could have equivalently called `x.reshape(-1, 4)` or `x.reshape(3, -1)`.
+
+The `empty` method grabs a chunk of memory and hands us back a matrix 
+without bothering to change the value of any of its entries. 
+This is remarkably efficient but we must be careful because 
+the entries might take arbitrary values, including very big ones!
 
 ```{.python .input  n=6}
 np.empty((3, 4))
 ```
 
-The `empty` method grabs a chunk of memory and hands us back a matrix 
-without bothering to change the values of any of its entries. 
-This is remarkably efficient but we must be careful because 
-the entries might take arbitrary values, including very big ones! 
-Typically, we'll want our matrices initialized either with ones, zeros, 
-some known constant or numbers randomly sampled from a known distribution.
+```{.json .output n=6}
+[
+ {
+  "data": {
+   "text/plain": "array([[-2.2379092e+38,  3.0797738e-41,  0.0000000e+00,  0.0000000e+00],\n       [ 0.0000000e+00,  0.0000000e+00,  0.0000000e+00,  0.0000000e+00],\n       [ 0.0000000e+00,  0.0000000e+00,  0.0000000e+00,  0.0000000e+00]])"
+  },
+  "execution_count": 6,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
+```
 
+Typically, we will want our matrices initialized either with ones, zeros, 
+some known constants, or numbers randomly sampled from a known distribution.
 Perhaps most often, we want an array of all zeros. 
-To create an ndarray representing a tensor with all elements set to 0 
-and a shape of (2, 3, 4) we can invoke:
+To create an `ndarray` representing a tensor with all elements set to 0 
+and a shape of (2, 3, 4) we can invoke
 
 ```{.python .input  n=7}
 np.zeros((2, 3, 4))
+```
+
+```{.json .output n=7}
+[
+ {
+  "data": {
+   "text/plain": "array([[[0., 0., 0., 0.],\n        [0., 0., 0., 0.],\n        [0., 0., 0., 0.]],\n\n       [[0., 0., 0., 0.],\n        [0., 0., 0., 0.],\n        [0., 0., 0., 0.]]])"
+  },
+  "execution_count": 7,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
 ```
 
 We can create tensors with each element set to 1 as follows:
@@ -130,25 +209,64 @@ We can create tensors with each element set to 1 as follows:
 np.ones((2, 3, 4))
 ```
 
-We can also specify the value of each element in the desired ndarray by supplying a Python list containing the numerical values. The supplied values can be integers or floats (or a mix) but the resulting ndarray will contain floats.
+```{.json .output n=8}
+[
+ {
+  "data": {
+   "text/plain": "array([[[1., 1., 1., 1.],\n        [1., 1., 1., 1.],\n        [1., 1., 1., 1.]],\n\n       [[1., 1., 1., 1.],\n        [1., 1., 1., 1.],\n        [1., 1., 1., 1.]]])"
+  },
+  "execution_count": 8,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
+```
+
+In some cases, we will want to randomly sample the values 
+of all the elements in the `ndarray` according 
+to some known probability distribution. 
+One common case is when we construct an array 
+to serve as a parameter in a neural network. 
+The following snippet creates an `ndarray` with the shape (3, 4). 
+Each of its elements is randomly sampled 
+from a standard Gaussian (normal) distribution 
+with a mean of 0 and a standard deviation of 1.
+
+```{.python .input  n=10}
+np.random.normal(0, 1, size=(3, 4))
+```
+
+```{.json .output n=10}
+[
+ {
+  "data": {
+   "text/plain": "array([[ 2.2122064 ,  0.7740038 ,  1.0434403 ,  1.1839255 ],\n       [ 1.8917114 , -1.2347414 , -1.771029  , -0.45138445],\n       [ 0.57938355, -1.856082  , -1.9768796 , -0.20801921]])"
+  },
+  "execution_count": 10,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
+```
+
+We can also specify the value of each element in the desired `ndarray` by supplying a Python list containing the numerical values. The supplied values can be integers or floats (or a mix).
 
 ```{.python .input  n=9}
 y = np.array([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 y
 ```
 
-In some cases, we will want to randomly sample the values 
-of each element in the ndarray according 
-to some known probability distribution. 
-One common case is when we construct an array 
-to serve as a parameter in a neural network. 
-The following snippet creates an ndarray with the shape (3,4). 
-Each of its elements is randomly sampled 
-from a standard Gaussian (normal) distribution 
-with a mean of $0$ and a standard deviation of $1$.
-
-```{.python .input  n=10}
-np.random.normal(0, 1, size=(3, 4))
+```{.json .output n=9}
+[
+ {
+  "data": {
+   "text/plain": "array([[2., 1., 4., 3.],\n       [1., 2., 3., 4.],\n       [4., 3., 2., 1.]])"
+  },
+  "execution_count": 9,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
 ```
 
 ## Operations
@@ -197,10 +315,33 @@ print('x ** y', x ** y)
 print('x / y', x / y)
 ```
 
+```{.json .output n=11}
+[
+ {
+  "name": "stdout",
+  "output_type": "stream",
+  "text": "x = [1. 2. 4. 8.]\nx + y [ 3.  4.  6. 10.]\nx - y [-1.  0.  2.  6.]\nx * y [ 2.  4.  8. 16.]\nx ** y [ 1.  4. 16. 64.]\nx / y [0.5 1.  2.  4. ]\n"
+ }
+]
+```
+
 Many more operations can be applied element-wise, including unary operators like exponentiation:
 
 ```{.python .input  n=12}
 np.exp(x)
+```
+
+```{.json .output n=12}
+[
+ {
+  "data": {
+   "text/plain": "array([2.7182817e+00, 7.3890562e+00, 5.4598148e+01, 2.9809580e+03])"
+  },
+  "execution_count": 12,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
 ```
 
 In addition to element-wise computations, 
@@ -223,6 +364,19 @@ y = np.array([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 np.dot(x, y.T)
 ```
 
+```{.json .output n=13}
+[
+ {
+  "data": {
+   "text/plain": "array([[ 18.,  20.,  10.],\n       [ 58.,  60.,  50.],\n       [ 98., 100.,  90.]])"
+  },
+  "execution_count": 13,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
+```
+
 We can also concatenate multiple ndarrays together,
 stacking them end-to-end to form a larger ndarray. 
 We just need to provide a list of ndarrays 
@@ -232,6 +386,19 @@ two matrices along axis 0 (the rows) vs. axis 1 (the columns):
 
 ```{.python .input  n=14}
 np.concatenate([x, y], axis=0), np.concatenate([x, y], axis=1)
+```
+
+```{.json .output n=14}
+[
+ {
+  "data": {
+   "text/plain": "(array([[ 0.,  1.,  2.,  3.],\n        [ 4.,  5.,  6.,  7.],\n        [ 8.,  9., 10., 11.],\n        [ 2.,  1.,  4.,  3.],\n        [ 1.,  2.,  3.,  4.],\n        [ 4.,  3.,  2.,  1.]]),\n array([[ 0.,  1.,  2.,  3.,  2.,  1.,  4.,  3.],\n        [ 4.,  5.,  6.,  7.,  1.,  2.,  3.,  4.],\n        [ 8.,  9., 10., 11.,  4.,  3.,  2.,  1.]]))"
+  },
+  "execution_count": 14,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
 ```
 
 Sometimes, we want to construct binary ndarrays via logical statements. 
@@ -244,10 +411,36 @@ otherwise that position takes value $0$.
 x == y
 ```
 
+```{.json .output n=15}
+[
+ {
+  "data": {
+   "text/plain": "array([[0., 1., 0., 1.],\n       [0., 0., 0., 0.],\n       [0., 0., 0., 0.]])"
+  },
+  "execution_count": 15,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
+```
+
 Summing all the elements in the ndarray yields an ndarray with only one element:
 
 ```{.python .input  n=16}
 x.sum()
+```
+
+```{.json .output n=16}
+[
+ {
+  "data": {
+   "text/plain": "array(66.)"
+  },
+  "execution_count": 16,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
 ```
 
 For stylistic convenience, we can write `y.exp()`, `x.sum()`, `x.norm()`, etc. also as `np.exp(y)`, `np.sum(x)`, `np.linalg.norm(x)`.
@@ -276,6 +469,16 @@ print('a : ', a)
 print('b : ', b)
 ```
 
+```{.json .output n=17}
+[
+ {
+  "name": "stdout",
+  "output_type": "stream",
+  "text": "a :  [[0.]\n [1.]\n [2.]]\nb :  [[0. 1.]]\n"
+ }
+]
+```
+
 Since `a` and `b` are ($3\times1$) and ($1\times2$) matrices respectively, 
 their shapes do not match up if we want to add them. 
 We 'broadcast' the entries of both matrices into a larger (3x2) matrix as follows: 
@@ -285,6 +488,19 @@ before adding up both element-wise.
 
 ```{.python .input  n=18}
 a + b
+```
+
+```{.json .output n=18}
+[
+ {
+  "data": {
+   "text/plain": "array([[0., 1.],\n       [1., 2.],\n       [2., 3.]])"
+  },
+  "execution_count": 18,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
 ```
 
 ## Indexing and Slicing
@@ -305,11 +521,34 @@ print('x[-1] : ', x[-1])
 print('x[1:3] : ', x[1:3])
 ```
 
+```{.json .output n=19}
+[
+ {
+  "name": "stdout",
+  "output_type": "stream",
+  "text": "x[-1] :  [ 8.  9. 10. 11.]\nx[1:3] :  [[ 4.  5.  6.  7.]\n [ 8.  9. 10. 11.]]\n"
+ }
+]
+```
+
 Beyond reading, we can also write elements of a matrix.
 
 ```{.python .input  n=20}
 x[1, 2] = 9
 x
+```
+
+```{.json .output n=20}
+[
+ {
+  "data": {
+   "text/plain": "array([[ 0.,  1.,  2.,  3.],\n       [ 4.,  5.,  9.,  7.],\n       [ 8.,  9., 10., 11.]])"
+  },
+  "execution_count": 20,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
 ```
 
 If we want to assign multiple elements the same value, 
@@ -322,6 +561,19 @@ and for tensors of more than 2 dimensions.
 ```{.python .input  n=21}
 x[0:2, :] = 12
 x
+```
+
+```{.json .output n=21}
+[
+ {
+  "data": {
+   "text/plain": "array([[12., 12., 12., 12.],\n       [12., 12., 12., 12.],\n       [ 8.,  9., 10., 11.]])"
+  },
+  "execution_count": 21,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
 ```
 
 ## Saving Memory
@@ -344,6 +596,19 @@ to point at this new location in memory.
 before = id(y)
 y = y + x
 id(y) == before
+```
+
+```{.json .output n=22}
+[
+ {
+  "data": {
+   "text/plain": "False"
+  },
+  "execution_count": 22,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
 ```
 
 This might be undesirable for two reasons.
@@ -373,6 +638,16 @@ z[:] = x + y
 print('id(z):', id(z))
 ```
 
+```{.json .output n=23}
+[
+ {
+  "name": "stdout",
+  "output_type": "stream",
+  "text": "id(z): 139812969904160\nid(z): 139812969904160\n"
+ }
+]
+```
+
 If the value of `x ` is not reused in subsequent computations, 
 we can also use `x[:] = x + y` or `x += y`
 to reduce the memory overhead of the operation.
@@ -381,6 +656,19 @@ to reduce the memory overhead of the operation.
 before = id(x)
 x += y
 id(x) == before
+```
+
+```{.json .output n=24}
+[
+ {
+  "data": {
+   "text/plain": "True"
+  },
+  "execution_count": 24,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
 ```
 
 ## `mxnet.numpy.ndarray` and `numpy.ndarray`
@@ -401,6 +689,16 @@ a = x.asnumpy()
 print(type(a))
 b = np.array(a)
 print(type(b))
+```
+
+```{.json .output n=25}
+[
+ {
+  "name": "stdout",
+  "output_type": "stream",
+  "text": "<class 'numpy.ndarray'>\n<class 'mxnet.numpy.ndarray'>\n"
+ }
+]
 ```
 
 ## Summary
