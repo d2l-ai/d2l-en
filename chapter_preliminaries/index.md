@@ -19,7 +19,7 @@ of matrix operations and their implementation.
 
 Additionally, deep learning is all about optimization.
 We have a model with some parameters and
-we want to find those that fit our data the best.
+we want to find those that fit our data *the best*.
 Determining which way to move each parameter at each step of an algorithm
 requires a little bit of calculus, which will be briefly introduced.
 Fortunately, MXNet's `autograd` package automatically computes differentation for us,
