@@ -960,20 +960,20 @@ def resnet18(num_classes):
 
 
 # Defined in file: ./chapter_computational-performance/multiple-gpus-gluon.md
-def evaluate_accuracy_gpus(net, data_iter):
+def evaluate_accuracy_gpus(net, data_iter, split_f = d2l.split_batch):
     # Query the list of devices.
     ctx_list = list(net.collect_params().values())[0].list_ctx()
     metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
     for features, labels in data_iter:
-        Xs, ys = d2l.split_batch(features, labels, ctx_list)
+        Xs, ys = split_f(features, labels, ctx_list)
         pys = [net(X) for X in Xs]  # run in parallel
         metric.add(sum(float(d2l.accuracy(py, y)) for py, y in zip(pys, ys)), 
                    labels.size)
     return metric[0]/metric[1]
 
 # Defined in file: ./chapter_computer-vision/image-augmentation.md
-def train_batch_ch12(net, features, labels, loss, trainer, ctx_list):
-    Xs, ys = d2l.split_batch(features, labels, ctx_list)
+def train_batch_ch12(net, features, labels, loss, trainer, ctx_list, split_f = d2l.split_batch):
+    Xs, ys = split_f(features, labels, ctx_list)
     with autograd.record():
         pys = [net(X) for X in Xs]
         ls = [loss(py, y) for py, y in zip(pys, ys)]
@@ -986,7 +986,7 @@ def train_batch_ch12(net, features, labels, loss, trainer, ctx_list):
 
 # Defined in file: ./chapter_computer-vision/image-augmentation.md
 def train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs,
-               ctx_list=d2l.try_all_gpus()):
+               ctx_list=d2l.try_all_gpus(), split_f = d2l.split_batch):
     num_batches, timer = len(train_iter), d2l.Timer()
     animator = d2l.Animator(xlabel='epoch', xlim=[0,num_epochs], ylim=[0,2],
                             legend=['train loss','train acc','test acc'])
@@ -996,13 +996,13 @@ def train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs,
         for i, (features, labels) in enumerate(train_iter):
             timer.start()
             l, acc = train_batch_ch12(
-                net, features, labels, loss, trainer, ctx_list)
+                net, features, labels, loss, trainer, ctx_list, split_f)
             metric.add(l, acc, labels.shape[0], labels.size)
             timer.stop()
             if (i+1) % (num_batches // 5) == 0:
                 animator.add(epoch+i/num_batches,
                              (metric[0]/metric[2], metric[1]/metric[3], None))
-        test_acc = d2l.evaluate_accuracy_gpus(net, test_iter)
+        test_acc = d2l.evaluate_accuracy_gpus(net, test_iter, split_f)
         animator.add(epoch+1, (None, None, test_acc))
     print('loss %.3f, train acc %.3f, test acc %.3f' % (
         metric[0]/metric[2], metric[1]/metric[3], test_acc))
