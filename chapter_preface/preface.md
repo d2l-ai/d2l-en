@@ -170,7 +170,7 @@ This comes up especially in the basic tutorials,
 where we want you to understand everything that happens in a given layer or optimizer.
 In these cases, we'll often present two versions of the example:
 one where we implement everything from scratch,
-relying only on NDArray and automatic differentiation,
+relying only on `ndarray` and automatic differentiation,
 and another, more practical example, where we write succinct code using ``Gluon``.
 Once we've taught you how some component works,
 we can just use the ``Gluon`` version in subsequent tutorials.

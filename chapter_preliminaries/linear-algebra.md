@@ -49,7 +49,7 @@ Analagously, we could write $x,y \in \{0,1\}$
 to state that $x$ and $y$ are numbers 
 whose value can only be $0$ or $1$.
 
-In MXNet code, a scalars is represented by an ndarray with just one element.
+In MXNet code, a scalars is represented by an `ndarray` with just one element.
 In the next snippet, we instantiate two scalars 
 and perform some familiar arithmetic operations with them, 
 namely addition, multiplication, division, and exponentiation.
@@ -96,7 +96,7 @@ We can refer to any element of a vector by using a subscript.
 For example, we can refer to the $4$th element of $\mathbf{u}$ by $u_4$.
 Note that the element $u_4$ is a scalar,
 so we do not bold-face the font when referring to it.
-In code, we access any element $i$ by indexing into the ndarray.
+In code, we access any element $i$ by indexing into the `ndarray`.
 
 ```{.python .input  n=5}
 x[3]
@@ -111,14 +111,14 @@ In math notation, if we want to say that a vector $\mathbf{x}$
 consists of $n$ real-valued scalars,
 we can express this as $\mathbf{x} \in \mathcal{R}^n$.
 The length of a vector is commonly called its *dimension*.
-As with an ordinary Python array, we can access the length of an ndarray
+As with an ordinary Python array, we can access the length of an `ndarray`
 by calling Python's in-built ``len()`` function.
 
-When an ndarray represents a vector (has precisely one axis),
+When an `ndarray` represents a vector (has precisely one axis),
 we can also access its length via the `.shape` attribute.
 The shape is a tuple that lists the dimensionality 
-along each axis of the ndarray.
-For ndarray's with just one axis, the shape has just one element.
+along each axis of the `ndarray`.
+For `ndarray`'s with just one axis, the shape has just one element.
 
 ```{.python .input  n=7}
 x.shape
@@ -377,7 +377,7 @@ to describe the most intensive calculations
 required when computing each layer in a neural network
 given the values of the previous layer.
 
-Expressing matrix-vector products in code with ndarray, 
+Expressing matrix-vector products in code with `ndarray`, 
 we use the same ``dot()`` function as for dot products. 
 When we call ``np.dot(A, x)`` with a matrix ``A`` and a vector ``x``, 
 MXNet knows to perform a matrix-vector product. 
@@ -504,7 +504,7 @@ which is expressed as the sum of the absolute values of the components.
 As compared to the $\ell_2$ norm,
 it is less influenced by outliers.
 
-In code, we can calculate the $\ell_2$ norm of an ndarray by calling ``norm()``.
+In code, we can calculate the $\ell_2$ norm of an `ndarray` by calling ``norm()``.
 
 ```{.python .input}
 np.linalg.norm(x)

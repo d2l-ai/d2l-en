@@ -77,8 +77,8 @@ Note also that a gradient with respect to a vector $x$
 is itself vector-valued and has the same shape as $x$.
 Thus it is intuitive that in code, 
 we will access a gradient taken with respect to `x` 
-as an attribute the NDArray `x` itself.
-We allocate memory for an NDArray's gradient
+as an attribute the `ndarray` `x` itself.
+We allocate memory for an `ndarray`'s gradient
 by invoking its ``attach_grad()`` method.
 
 ```{.python .input  n=3}
@@ -119,7 +119,7 @@ with autograd.record():
 y
 ```
 
-Since `x` is an NDArray of length 4, 
+Since `x` is an `ndarray` of length 4, 
 `np.dot` will perform an inner product of `x` and `x`,
 yielding the scalar output that we assign to `y`. 
 Next, we can automatically calculate the gradient of `y`

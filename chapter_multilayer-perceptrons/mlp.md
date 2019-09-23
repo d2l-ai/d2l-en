@@ -206,7 +206,7 @@ It can be understood that the ReLU function retains only positive elements and d
 To get a better idea of what it looks like, we can plot it.
 
 
-Because it is used so commonly, NDarray supports
+Because it is used so commonly, `ndarray` supports
 the `relu` function as a basic native operator.
 As you can see, the activation function is piece-wise linear.
 

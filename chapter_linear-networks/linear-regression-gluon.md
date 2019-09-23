@@ -3,7 +3,7 @@
 
 The surge of deep learning has inspired the development of a variety of mature software frameworks, 
 that automate much of the repetitive work of implementing deep learning models.
-In the previous section we relied only on NDarray for data storage and linear algebra
+In the previous section we relied only on `ndarray` for data storage and linear algebra
 and the auto-differentiation capabilities in the `autograd` package.
 In practice, because many of the more abstract operations, e.g.
 data iterators, loss functions, model architectures, and optimizers,

@@ -12,9 +12,9 @@ In the introduction to this book we discussed the rapid growth of computation ov
 |2010|10 G (advertising)|1 GB|1 TF (NVIDIA C2050)|
 |2020|1 T (social network)|100 GB|1 PF (NVIDIA DGX-2)|
 
-In this section we begin to discuss how to harness this compute performance for your research. First by using single GPUs and at a later point, how to use multiple GPUs and multiple servers (with multiple GPUs). You might have noticed that MXNet ndarray looks almost identical to NumPy. But there are a few crucial differences. One of the key features that differentiates MXNet from NumPy is its support for diverse hardware devices.
+In this section we begin to discuss how to harness this compute performance for your research. First by using single GPUs and at a later point, how to use multiple GPUs and multiple servers (with multiple GPUs). You might have noticed that MXNet `ndarray` looks almost identical to NumPy. But there are a few crucial differences. One of the key features that differentiates MXNet from NumPy is its support for diverse hardware devices.
 
-In MXNet, every array has a context. In fact, whenever we displayed an ndarray so far, it added a cryptic `@cpu(0)` notice to the output which remained unexplained so far. As we will discover, this just indicates that the computation is being executed on the CPU. Other contexts might be various GPUs. Things can get even hairier when we deploy jobs across multiple servers. By assigning arrays to contexts intelligently, we can minimize the time spent transferring data between devices. For example, when training neural networks on a server with a GPU, we typically prefer for the model’s parameters to live on the GPU.
+In MXNet, every array has a context. In fact, whenever we displayed an `ndarray` so far, it added a cryptic `@cpu(0)` notice to the output which remained unexplained so far. As we will discover, this just indicates that the computation is being executed on the CPU. Other contexts might be various GPUs. Things can get even hairier when we deploy jobs across multiple servers. By assigning arrays to contexts intelligently, we can minimize the time spent transferring data between devices. For example, when training neural networks on a server with a GPU, we typically prefer for the model’s parameters to live on the GPU.
 
 In short, for complex neural networks and large-scale data, using only CPUs for computation may be inefficient. In this section, we will discuss how to use a single NVIDIA GPU for calculations. First, make sure you have at least one NVIDIA GPU installed. Then, [download CUDA](https://developer.nvidia.com/cuda-downloads) and follow the prompts to set the appropriate path. Once these preparations are complete, the `nvidia-smi` command can be used to view the graphics card information.
 
@@ -61,16 +61,16 @@ def try_all_gpus():
 try_gpu(), try_gpu(3), try_all_gpus()
 ```
 
-## ndarray and GPUs
+## `ndarray` and GPUs
 
-By default, ndarray objects are created on the CPU. Therefore, we will see the `@cpu(0)` identifier each time we print an ndarray.
+By default, `ndarray` objects are created on the CPU. Therefore, we will see the `@cpu(0)` identifier each time we print an `ndarray`.
 
 ```{.python .input  n=4}
 x = np.array([1, 2, 3])
 x
 ```
 
-We can use the `context` property of ndarray to view the device where the ndarray is located. It is important to note that whenever we want to operate on multiple terms they need to be in the same context. For instance, if we sum two variables, we need to make sure that both arguments are on the same device - otherwise MXNet would not know where to store the result or even how to decide where to perform the computation.
+We can use the `context` property of `ndarray` to view the device where the `ndarray` is located. It is important to note that whenever we want to operate on multiple terms they need to be in the same context. For instance, if we sum two variables, we need to make sure that both arguments are on the same device - otherwise MXNet would not know where to store the result or even how to decide where to perform the computation.
 
 ```{.python .input}
 x.context
@@ -78,7 +78,7 @@ x.context
 
 ### Storage on the GPU
 
-There are several ways to store an ndarray on the GPU. For example, we can specify a storage device with the `ctx` parameter when creating an ndarray. Next, we create the ndarray variable `a` on `gpu(0)`. Notice that when printing `a`, the device information becomes `@gpu(0)`. The ndarray created on a GPU only consumes the memory of this GPU. We can use the `nvidia-smi` command to view GPU memory usage. In general, we need to make sure we do not create data that exceeds the GPU memory limit.
+There are several ways to store an `ndarray` on the GPU. For example, we can specify a storage device with the `ctx` parameter when creating an `ndarray`. Next, we create the `ndarray` variable `a` on `gpu(0)`. Notice that when printing `a`, the device information becomes `@gpu(0)`. The `ndarray` created on a GPU only consumes the memory of this GPU. We can use the `nvidia-smi` command to view GPU memory usage. In general, we need to make sure we do not create data that exceeds the GPU memory limit.
 
 ```{.python .input  n=5}
 x = np.ones((2, 3), ctx=try_gpu())
@@ -151,7 +151,7 @@ net.add(nn.Dense(1))
 net.initialize(ctx=try_gpu())
 ```
 
-When the input is an ndarray on the GPU, Gluon will calculate the result on the same GPU.
+When the input is an `ndarray` on the GPU, Gluon will calculate the result on the same GPU.
 
 ```{.python .input  n=13}
 net(x)

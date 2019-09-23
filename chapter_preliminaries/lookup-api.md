@@ -15,13 +15,13 @@ Generally, we can ignore functions that start and end with `__` (special objects
 
 ## Finding the usage of specific functions and classes
 
-For more specific instructions on how to use a given function or class, we can invoke the  `help` function. As an example, let's explore the usage instructions for ndarray's `ones_like` function.
+For more specific instructions on how to use a given function or class, we can invoke the  `help` function. As an example, let's explore the usage instructions for `ndarray`'s `ones_like` function.
 
 ```{.python .input}
 help(np.ones_like)
 ```
 
-From the documentation, we can see that the `ones_like` function creates a new array with the same shape as the supplied ndarray and all elements set to `1`. Whenever possible, you should run a quick test to confirm your interpretation:
+From the documentation, we can see that the `ones_like` function creates a new array with the same shape as the supplied `ndarray` and all elements set to `1`. Whenever possible, you should run a quick test to confirm your interpretation:
 
 ```{.python .input}
 x = np.array([[0, 0, 0], [2, 2, 2]])

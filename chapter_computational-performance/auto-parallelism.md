@@ -28,7 +28,7 @@ def run(x):
     return [x.dot(x) for _ in range(10)]
 ```
 
-Next, create an ndarray on both the CPU and GPU.
+Next, create an `ndarray` on both the CPU and GPU.
 
 ```{.python .input}
 x_cpu = np.random.uniform(size=(2000, 2000))
