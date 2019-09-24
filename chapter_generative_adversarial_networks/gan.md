@@ -127,7 +127,7 @@ def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
     return float(loss_G.sum())
 ```
 
-Both the discriminator and the generator performs a binary logistic regression with the cross entropy loss. We use Adam to smooth the training process. In each iteration, we first update the discriminator and then the generator. We visualize both losses and generated examples.
+Both the discriminator and the generator perform a binary logistic regression with the cross entropy loss. We use Adam to smooth the training process. In each iteration, we first update the discriminator and then the generator. We visualize both losses and generated examples.
 
 ```{.python .input  n=9}
 def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
@@ -176,8 +176,8 @@ train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G,
 
 ## Summary
 
-* Generative adversarial networks (GANs) composes of two deep networks, the generator and the discriminator.
-* The generator generates the image as much closer to the true image as possible to fool the discriminator, via maximizing the cross entropy loss, i.e., $\max \log(D(\mathbf{x'}))$.
+* Generative adversarial networks (GANs) consist of two deep networks, the generator and the discriminator.
+* The generator generates the image as close to the true image as possible to fool the discriminator, via maximizing the cross entropy loss, i.e., $\max \log(D(\mathbf{x'}))$.
 * The discriminator tries to distinguish the generated images from the true images, via minimizing the cross entropy loss, i.e., $\min - y \log D(\mathbf{x}) - (1-y)\log(1-D(\mathbf{x}))$.
 
 ## Exercises
