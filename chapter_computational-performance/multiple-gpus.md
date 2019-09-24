@@ -117,11 +117,11 @@ print('after allreduce:\n', data[0], '\n', data[1])
 
 The `utils` module in Gluon provides a function to evenly split an array into multiple parts along the first dimension, and then copy the $i$-th part into the $i$-th device. It's straightforward to implement, but we will use the pre-implemented version so later chapters can reuse the `split_batch` function we will define later.
 
-Now, we try to divide the 6 data instances equally between 2 GPUs using the `split_and_load` function.
+Now, we try to divide the 4 data instances equally between 2 GPUs using the `split_and_load` function.
 
 ```{.python .input  n=8}
 data = np.arange(24).reshape(4, 6)
-ctx = d2l.try_all_gpus()
+ctx = [npx.gpu(0), npx.gpu(1)]
 splitted = gluon.utils.split_and_load(data, ctx)
 print('input: ', data)
 print('load into', ctx)
