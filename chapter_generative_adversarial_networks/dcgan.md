@@ -3,7 +3,7 @@
 
 In :numref:`chapter_basic_gan`, we introduced the basic ideas behind how GANs work. We showed that they can draw samples from some simple, easy-to-sample distribution, like a uniform or normal distribution, and transform them into samples that appear to match the distribution of some data set. And while our example of matching a 2D Gaussian distribution got the point across, it's not especially exciting.
 
-In this section, we'll demonstrate how you can use GANs to generate photorealistic images. We'll be basing our models on the deep convolutional GANs (DCGAN) introduced in :cite:`Radford.Metz.Chintala.2015`. We'll borrow the convolutional architecture that have proven so successful for discriminative computer vision problems and show how via GANs, they can be leveraged to generate photorealistic images.
+In this section, we'll demonstrate how you can use GANs to generate photorealistic images. We'll be basing our models on the deep convolutional GANs (DCGAN) introduced in :cite:`Radford.Metz.Chintala.2015`. We'll borrow the convolutional architecture that has proven so successful for discriminative computer vision problems and show how via GANs, they can be leveraged to generate photorealistic images.
 
 ```{.python .input  n=1}
 from mxnet import gluon, autograd, init, np, npx
@@ -54,7 +54,7 @@ for X, y in data_iter:
 
 ## The Generator
 
-The generator needs to map the noise variable $\mathbf z\in\mathbb R^d$, a length-$d$ vector, to a RGB image with both width and height to be 64. In :numref:`chapter_fcn` we introduced the fully convolutional network that uses transposed convolution layer (refer to :numref:`chapter_transposed_conv`) to enlarge input size. The basic block of the generator contains a transposed convolution layer followed by the batch normalization and ReLU activation.
+The generator needs to map the noise variable $\mathbf z\in\mathbb R^d$, a length-$d$ vector, to a RGB image with both width and height to be 64. In :numref:`chapter_fcn` we introduced the fully convolutional network that uses transposed convolution layers (refer to :numref:`chapter_transposed_conv`) to enlarge the input size. The basic block of the generator contains a transposed convolution layer followed by the batch normalization and ReLU activation.
 
 ```{.python .input  n=5}
 class G_block(nn.Block):
@@ -70,7 +70,7 @@ class G_block(nn.Block):
         return self.activation(self.batch_norm(self.conv2d_trans(X)))
 ```
 
-In default, the transposed convolution layer uses a $4\times 4$ kernel, $2\times 2$ strides and $1\times 1$ padding. It will double input's width and height.
+In default, the transposed convolution layer uses a $4\times 4$ kernel, $2\times 2$ strides and $1\times 1$ padding. It will double the input's width and height.
 
 ```{.python .input  n=6}
 x = np.zeros((2, 3, 16, 16))
@@ -88,7 +88,7 @@ g_blk.initialize()
 g_blk(x).shape
 ```
 
-The generator consists of four basic blocks that increase input's both width and height from 1 to 32. At the same time, it first projects the latent variable into $64\times 8$ channels, and then halve the channels each time. At last, a transposed convolution layer is used to generate the output. It further doubles the width and height to match the desired $64\times 64$ shape, and reduces the channel size to $3$. The tanh activation function is applied to project output values into the $(-1, 1)$ range.
+The generator consists of four basic blocks that increase both the input's width as well as its height from 1 to 32. At the same time, it first projects the latent variable into $64\times 8$ channels, and then halves the channels each time. At last, a transposed convolution layer is used to generate the output. It further doubles the width and height to match the desired $64\times 64$ shape, and reduces the channel size to $3$. The tanh activation function is applied to project output values into the $(-1, 1)$ range.
 
 ```{.python .input  n=8}
 n_G = 64
@@ -112,11 +112,11 @@ net_G(x).shape
 
 ## Discriminator
 
-The discriminator is a normal convolutional network network except that it uses a leaky ReLU as its activation function. Given $\alpha \in[0,1]$, its definition is
+The discriminator is a normal convolutional network except that it uses a leaky ReLU as its activation function. Given $\alpha \in[0,1]$, its definition is
 
 $$\textrm{leaky ReLU}(x) = \begin{cases}x & \text{if}\ x > 0\\ \alpha x &\text{otherwise}\end{cases}.$$
 
-As it can be seen, it is normal ReLU if $\alpha=0$, and an identity function if $\alpha=1$. For $\alpha \in (0,1)$, leaky ReLU is a nonlinear function that give a non-zero output for a negative input. It aims to fix the "dying ReLU" problem that a neuron might always output a negative value and therefore cannot make any progress since the gradient of ReLU is 0.
+As it can be seen, it equals the normal ReLU if $\alpha=0$, and an identity function if $\alpha=1$. For $\alpha \in (0,1)$, leaky ReLU is a nonlinear function that give a non-zero output for a negative input. It aims to fix the "dying ReLU" problem where a neuron might always output a negative value and therefore cannot make any progress since the gradient of ReLU is 0.
 
 ```{.python .input  n=10}
 alphas = [0, 0.2, 0.4, .6, .8, 1]
