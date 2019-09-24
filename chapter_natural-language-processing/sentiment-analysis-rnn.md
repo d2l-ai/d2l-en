@@ -10,11 +10,12 @@ determine whether a text sequence of indefinite length contains positive or
 negative emotion. Import the required package or module before starting the
 experiment.
 
-```{.python .input  n=2}
+```{.python .input  n=1}
 import d2l
-from mxnet import gluon, init, nd
+from mxnet import gluon, init, np, npx, autograd
 from mxnet.gluon import nn, rnn
 from mxnet.contrib import text
+npx.set_np()
 
 batch_size = 64
 train_iter, test_iter, vocab = d2l.load_data_imdb(batch_size)
@@ -58,7 +59,7 @@ class BiRNN(nn.Block):
         # Concatenate the hidden states of the initial time step and final
         # time step to use as the input of the fully connected layer. Its
         # shape is (batch size, 4 * number of hidden units)
-        encoding = nd.concat(outputs[0], outputs[-1])
+        encoding = np.concatenate((outputs[0], outputs[-1]), axis=1)
         outs = self.decoder(encoding)
         return outs
 ```
@@ -110,9 +111,9 @@ Finally, define the prediction function.
 ```{.python .input  n=49}
 # Save to the d2l package.
 def predict_sentiment(net, vocab, sentence):
-    sentence = nd.array(vocab[sentence.split()], ctx=d2l.try_gpu())
-    label = nd.argmax(net(sentence.reshape((1, -1))), axis=1)
-    return 'positive' if label.asscalar() == 1 else 'negative'
+    sentence = np.array(vocab[sentence.split()], ctx=d2l.try_gpu())
+    label = np.argmax(net(sentence.reshape(1, -1)), axis=1)
+    return 'positive' if label == 1 else 'negative'
 ```
 
 Then, use the trained model to classify the sentiments of two simple sentences.

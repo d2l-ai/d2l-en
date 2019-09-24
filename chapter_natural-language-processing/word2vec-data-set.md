@@ -11,7 +11,7 @@ First, import the packages and modules required for the experiment.
 import collections
 import d2l
 import math
-from mxnet import nd, gluon
+from mxnet import np, gluon
 import random
 import zipfile
 ```
@@ -20,7 +20,7 @@ import zipfile
 
 This data set has already been preprocessed. Each line of the data set acts as a sentence. All the words in a sentence are separated by spaces. In the word embedding task, each word is a token.
 
-```{.python .input  n=7}
+```{.python .input  n=2}
 # Save to the d2l package.
 def read_ptb():
     with zipfile.ZipFile('../data/ptb.zip', 'r') as f:
@@ -33,7 +33,7 @@ sentences = read_ptb()
 
 Next we build a vocabulary with words appeared not greater than 10 times mapped into a "&lt;unk&gt;" token. Note that the preprocessed PTB data also contains "&lt;unk&gt;" tokens presenting rare words.
 
-```{.python .input  n=8}
+```{.python .input  n=3}
 vocab = d2l.Vocab(sentences, min_freq=10)
 'vocab size: %d' % len(vocab)
 ```
@@ -46,7 +46,7 @@ $$ \mathbb{P}(w_i) = \max\left(1 - \sqrt{\frac{t}{f(w_i)}}, 0\right),$$
 
 Here, $f(w_i)$ is the ratio of the instances of word $w_i$ to the total number of words in the data set, and the constant $t$ is a hyper-parameter (set to $10^{-4}$ in this experiment). As we can see, it is only possible to drop out the word $w_i$ in subsampling when $f(w_i) > t$. The higher the word's frequency, the higher its dropout probability.
 
-```{.python .input  n=16}
+```{.python .input  n=4}
 # Save to the d2l package.
 def subsampling(sentences, vocab):
     # Map low frequency words into <unk>
@@ -66,7 +66,7 @@ subsampled = subsampling(sentences, vocab)
 
 Compare the sequence lengths before and after sampling, we can see subsampling significantly reduced the sequence length.
 
-```{.python .input  n=17}
+```{.python .input  n=5}
 d2l.set_figsize((3.5, 2.5))
 d2l.plt.hist([[len(line) for line in sentences],
               [len(line) for line in subsampled]] )
@@ -77,7 +77,7 @@ d2l.plt.legend(['origin', 'subsampled']);
 
 For individual tokens, the sampling rate of the high-frequency word "the" is less than 1/20.
 
-```{.python .input  n=18}
+```{.python .input  n=6}
 def compare_counts(token):
     return '# of "%s": before=%d, after=%d' % (token, sum(
         [line.count(token) for line in sentences]), sum(
@@ -88,13 +88,13 @@ compare_counts('the')
 
 But the low-frequency word "join" is completely preserved.
 
-```{.python .input  n=19}
+```{.python .input  n=7}
 compare_counts('join')
 ```
 
 Lastly, we map each token into an index to construct the corpus.
 
-```{.python .input  n=20}
+```{.python .input  n=8}
 corpus = [vocab[line] for line in subsampled]
 corpus[0:3]
 ```
@@ -107,7 +107,7 @@ Next we read the corpus with token indicies into data batches for training.
 
 We use words with a distance from the central target word not exceeding the context window size as the context words of the given center target word. The following definition function extracts all the central target words and their context words. It uniformly and randomly samples an integer to be used as the context window size between integer 1 and the `max_window_size` (maximum context window).
 
-```{.python .input  n=21}
+```{.python .input  n=9}
 # Save to the d2l package.
 def get_centers_and_contexts(corpus, max_window_size):
     centers, contexts = [], []
@@ -128,7 +128,7 @@ def get_centers_and_contexts(corpus, max_window_size):
 
 Next, we create an artificial data set containing two sentences of 7 and 3 words, respectively. Assume the maximum context window is 2 and print all the central target words and their context words.
 
-```{.python .input  n=22}
+```{.python .input  n=10}
 tiny_dataset = [list(range(7)), list(range(7, 10))]
 print('dataset', tiny_dataset)
 for center, context in zip(*get_centers_and_contexts(tiny_dataset, 2)):
@@ -137,7 +137,7 @@ for center, context in zip(*get_centers_and_contexts(tiny_dataset, 2)):
 
 We set the maximum context window size to 5. The following extracts all the central target words and their context words in the data set.
 
-```{.python .input  n=23}
+```{.python .input  n=11}
 all_centers, all_contexts = get_centers_and_contexts(corpus, 5)
 '# center-context pairs: %d' % len(all_centers)
 ```
@@ -148,7 +148,7 @@ We use negative sampling for approximate training. For a central and context wor
 
 We first define a class to draw a candidate according to the sampling weights. It caches a 10000 size random number bank instead of calling `random.choices` every time.
 
-```{.python .input}
+```{.python .input  n=12}
 # Save to the d2l package.
 class RandomGenerator(object):
     """Draw a random int in [0, n] according to n sampling weights"""
@@ -170,7 +170,7 @@ generator = RandomGenerator([2,3,4])
 [generator.draw() for _ in range(10)]
 ```
 
-```{.python .input  n=12}
+```{.python .input  n=13}
 # Save to the d2l package.
 def get_negatives(all_contexts, corpus, K):
     counter = d2l.count_corpus(corpus)
@@ -197,7 +197,7 @@ In a mini-batch of data, the $i$-th example includes a central word and its corr
 
 Next, we will implement the mini-batch reading function `batchify`. Its mini-batch input `data` is a list whose length is the batch size, each element of which contains central target words `center`, context words `context`, and noise words `negative`. The mini-batch data returned by this function conforms to the format we need, for example, it includes the mask variable.
 
-```{.python .input  n=13}
+```{.python .input  n=14}
 # Save to the d2l package.
 def batchify(data):
     max_len = max(len(c) + len(n) for _, c, n in data)
@@ -208,13 +208,13 @@ def batchify(data):
         contexts_negatives += [context + negative + [0] * (max_len - cur_len)]
         masks += [[1] * cur_len + [0] * (max_len - cur_len)]
         labels += [[1] * len(context) + [0] * (max_len - len(context))]
-    return (nd.array(centers).reshape((-1, 1)), nd.array(contexts_negatives),
-            nd.array(masks), nd.array(labels))
+    return (np.array(centers).reshape(-1, 1), np.array(contexts_negatives),
+            np.array(masks), np.array(labels))
 ```
 
 Construct two simple examples:
 
-```{.python .input}
+```{.python .input  n=15}
 x_1 = (1, [2,2], [3,3,3,3])
 x_2 = (1, [2,2,2], [3,3])
 batch = batchify((x_1, x_2))
@@ -230,7 +230,7 @@ We use the `batchify` function just defined to specify the mini-batch reading me
 
 Lastly, we define the `load_data_ptb` function that read the PTB data set and return the data loader.
 
-```{.python .input}
+```{.python .input  n=16}
 # Save to the d2l package.
 def load_data_ptb(batch_size, max_window_size, num_noise_words):
     sentences = read_ptb()
@@ -249,7 +249,7 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
 
 Let's print the first mini-batch of the data iterator.
 
-```{.python .input  n=14}
+```{.python .input  n=17}
 data_iter, vocab = load_data_ptb(512, 5, 5)
 for batch in data_iter:
     for name, data in zip(names, batch):
@@ -265,3 +265,8 @@ for batch in data_iter:
 ## Exercises
 
 * We use the `batchify` function to specify the mini-batch reading method in the `DataLoader` instance and print the shape of each variable in the first batch read. How should these shapes be calculated?
+
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/4356)
+
+![](../img/qr_word2vec-data-set.svg)
+

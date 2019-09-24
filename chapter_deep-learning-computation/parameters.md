@@ -9,15 +9,16 @@ The ultimate goal of training deep networks is to find good parameter values for
 As always, we start from our trusty Multilayer Perceptron with a hidden layer. This will serve as our choice for demonstrating the various features.
 
 ```{.python .input  n=1}
-from mxnet import init, nd
+from mxnet import init, np, npx
 from mxnet.gluon import nn
+npx.set_np()
 
 net = nn.Sequential()
 net.add(nn.Dense(256, activation='relu'))
 net.add(nn.Dense(10))
 net.initialize()  # Use the default initialization method
 
-x = nd.random.uniform(shape=(2, 20))
+x = np.random.uniform(size=(2, 20))
 net(x)  # Forward computation
 ```
 
@@ -155,7 +156,7 @@ print(net[0].weight.data()[0])
 
 ### Custom Initialization
 
-Sometimes, the initialization methods we need are not provided in the `init` module. At this point, we can implement a subclass of the `Initializer` class so that we can use it like any other initialization method. Usually, we only need to implement the `_init_weight` function and modify the incoming NDArray according to the initial result. In the example below, we  pick a decidedly bizarre and nontrivial distribution, just to prove the point. We draw the coefficients from the following distribution:
+Sometimes, the initialization methods we need are not provided in the `init` module. At this point, we can implement a subclass of the `Initializer` class so that we can use it like any other initialization method. Usually, we only need to implement the `_init_weight` function and modify the incoming ndarray according to the initial result. In the example below, we  pick a decidedly bizarre and nontrivial distribution, just to prove the point. We draw the coefficients from the following distribution:
 
 $$
 \begin{aligned}
@@ -171,14 +172,14 @@ $$
 class MyInit(init.Initializer):
     def _init_weight(self, name, data):
         print('Init', name, data.shape)
-        data[:] = nd.random.uniform(low=-10, high=10, shape=data.shape)
-        data *= data.abs() >= 5
+        data[:] = np.random.uniform(-10, 10, data.shape)
+        data *= np.abs(data) >= 5
 
 net.initialize(MyInit(), force_reinit=True)
 net[0].weight.data()[0]
 ```
 
-If even this functionality is insufficient, we can set parameters directly. Since `data()` returns an NDArray we can access it just like any other matrix. A note for advanced users - if you want to adjust parameters within an `autograd` scope you need to use `set_data` to avoid confusing the automatic differentiation mechanics.
+If even this functionality is insufficient, we can set parameters directly. Since `data()` returns an ndarray we can access it just like any other matrix. A note for advanced users - if you want to adjust parameters within an `autograd` scope you need to use `set_data` to avoid confusing the automatic differentiation mechanics.
 
 ```{.python .input  n=13}
 net[0].weight.data()[:] += 1
@@ -201,7 +202,7 @@ net.add(nn.Dense(8, activation='relu'),
         nn.Dense(10))
 net.initialize()
 
-x = nd.random.uniform(shape=(2, 20))
+x = np.random.uniform(size=(2, 20))
 net(x)
 
 # Check whether the parameters are the same

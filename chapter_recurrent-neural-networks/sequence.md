@@ -34,7 +34,10 @@ $$x_t \sim p(x_t|x_{t-1}, \ldots x_1).$$
 In order to achieve this, our trader could use a regressor such as the one we trained in :numref:`chapter_linear_gluon`. There's just a major problem - the number of inputs, $x_{t-1}, \ldots x_1$ varies, depending on $t$. That is, the number increases with the amount of data that we encounter, and we will need an approximation to make this computationally tractable. Much of what follows in this chapter will revolve around how to estimate $p(x_t|x_{t-1}, \ldots x_1)$ efficiently. In a nutshell it boils down to two strategies:
 
 1. Assume that the potentially rather long sequence $x_{t-1}, \ldots x_1$ isn't really necessary. In this case we might content ourselves with some timespan $\tau$ and only use $x_{t-1}, \ldots x_{t-\tau}$ observations. The immediate benefit is that now the number of arguments is always the same, at least for $t > \tau$. This allows us to train a deep network as indicated above. Such models will be called *autoregressive* models, as they quite literally perform regression on themselves.
-1. Another strategy is to try and keep some summary $h_t$ of the past observations around and update that in addition to the actual prediction. This leads to models that estimate $p( x_t|x_{t-1}, h_{t-1})$ and moreover updates of the form  $h_t = g(h_{t-1}, x_{t-1})$. Since $h_t$ is never observed, these models are also called *latent autoregressive models*. LSTMs and GRUs are examples of this.
+1. Another strategy, shown in :numref:`fig_sequence-model`, is to try and keep some summary $h_t$ of the past observations, at the same time update $h_t$ in addition to the prediction $\hat{x_t}$. This leads to models that estimate $x_t$ with $\hat{x_t} = p(x_t|x_{t-1}, h_{t})$ and moreover updates of the form  $h_t = g(h_{t-1}, x_{t-1})$. Since $h_t$ is never observed, these models are also called *latent autoregressive models*. LSTMs and GRUs are examples of this.
+
+![A latent autoregressive model. ](../img/sequence-model.svg)
+:label:`fig_sequence-model`
 
 Both cases raise the obvious question how to generate training data. One typically uses historical observations to predict the next observation given the ones up to right now. Obviously we do not expect time to stand still. However, a common assumption is that while the specific values of $x_t$ might change, at least the dynamics of the time series itself won't. This is reasonable, since novel dynamics are just that, novel and thus not predictable using data we have so far. Statisticians call dynamics that don't change *stationary*. Regardless of what we do, we will thus get an estimate of the entire time series via
 
@@ -70,20 +73,21 @@ After so much theory, let's try this out in practice. Since much of the modeling
 ```{.python .input}
 %matplotlib inline
 import d2l
-from mxnet import autograd, nd, gluon, init
+from mxnet import autograd, np, npx, gluon, init
 from mxnet.gluon import nn
+npx.set_np()
 
 T = 1000  # Generate a total of 1000 points
-time = nd.arange(0, T)
-x = nd.sin(0.01 * time) + 0.2 * nd.random.normal(shape=T)
-d2l.plot(time, x)
+time = np.arange(0, T)
+x = np.sin(0.01 * time) + 0.2 * np.random.normal(size=T)
+d2l.plot(time, [x])
 ```
 
 Next we need to turn this 'time series' into data the network can train on. Based on the embedding dimension $\tau$ we map the data into pairs $y_t = x_t$ and $\mathbf{z}_t = (x_{t-1}, \ldots x_{t-\tau})$. The astute reader might have noticed that this gives us $\tau$ fewer datapoints, since we don't have sufficient history for the first $\tau$ of them. A simple fix, in particular if the time series is long is to discard those few terms. Alternatively we could pad the time series with zeros. The code below is essentially identical to the training code in previous sections. We kept the architecture fairly simple. A few layers of a fully connected network, ReLU activation and $\ell_2$ loss.
 
 ```{.python .input}
 tau = 4
-features = nd.zeros((T-tau, tau))
+features = np.zeros((T-tau, tau))
 for i in range(tau):
     features[:, i] = x[i: T-tau+i]
 labels = x[tau:]
@@ -98,7 +102,6 @@ test_iter = d2l.load_array((features[:n_train], labels[:n_train]),
 def get_net():
     net = gluon.nn.Sequential()
     net.add(nn.Dense(10, activation='relu'),
-            #nn.Dense(10, activation='relu'),
             nn.Dense(1))
     net.initialize(init.Xavier())
     return net
@@ -121,15 +124,9 @@ def train_net(net, train_iter, loss, epochs, lr):
             trainer.step(batch_size)
         print('epoch %d, loss: %f' % (
             epoch, d2l.evaluate_loss(net, train_iter, loss)))
-        #l = loss(net(data[:][0]), nd.array(data[:][1]))
-        #print('epoch %d, loss: %f' % (epoch, l.mean().asnumpy()))
-    #return net
 
 net = get_net()
 train_net(net, train_iter, loss, 10, 0.01)
-
-#l = loss(net(test_data[:][0]), nd.array(test_data[:][1]))
-#print('test loss: %f' % l.mean().asnumpy())
 ```
 
 The both training and test loss are small and we would expect our model to work well. Let's see what this means in practice. The first thing to check is how well the model is able to predict what happens in the next timestep.
@@ -153,7 +150,7 @@ x_{603} & = f(x_{602}, \ldots, x_{599})
 In other words, very quickly will we have to use our own predictions to make future predictions. Let's see how well this goes.
 
 ```{.python .input}
-predictions = nd.zeros(T)
+predictions = np.zeros(T)
 predictions[:n_train] = x[:n_train]
 for i in range(n_train, T):
     predictions[i] = net(
@@ -170,7 +167,7 @@ Let's verify this observation by computing the $k$-step predictions on the entir
 ```{.python .input}
 k = 33  # Look up to k - tau steps ahead
 
-features = nd.zeros((k, T-k))
+features = np.zeros((k, T-k))
 for i in range(tau):  # Copy the first tau features from x
     features[i] = x[i:T-k+i]
 

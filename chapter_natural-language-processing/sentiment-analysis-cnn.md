@@ -11,12 +11,12 @@ convolutional neural networks to capture associations between adjacent
 words. This section describes a groundbreaking approach to applying
 convolutional neural networks to text analysis: textCNN :cite:`Kim.2014`. First, import the packages and modules required for the experiment.
 
-```{.python .input  n=2}
+```{.python .input  n=1}
 import d2l
-from mxnet import gluon, init, nd
+from mxnet import gluon, init, np, npx
 from mxnet.contrib import text
 from mxnet.gluon import nn
-
+npx.set_np()
 
 batch_size = 64
 train_iter, test_iter, vocab = d2l.load_data_imdb(batch_size)
@@ -30,10 +30,10 @@ Before introducing the model, let us explain how a one-dimensional convolutional
 
 Next, we implement one-dimensional cross-correlation in the `corr1d` function. It accepts the input array `X` and kernel array `K` and outputs the array `Y`.
 
-```{.python .input  n=3}
+```{.python .input  n=2}
 def corr1d(X, K):
     w = K.shape[0]
-    Y = nd.zeros((X.shape[0] - w + 1))
+    Y = np.zeros((X.shape[0] - w + 1))
     for i in range(Y.shape[0]):
         Y[i] = (X[i: i + w] * K).sum()
     return Y
@@ -41,8 +41,8 @@ def corr1d(X, K):
 
 Now, we will reproduce the results of the one-dimensional cross-correlation operation in Figure 12.4.
 
-```{.python .input  n=4}
-X, K = nd.array([0, 1, 2, 3, 4, 5, 6]), nd.array([1, 2])
+```{.python .input  n=3}
+X, K = np.array([0, 1, 2, 3, 4, 5, 6]), np.array([1, 2])
 corr1d(X, K)
 ```
 
@@ -52,17 +52,17 @@ The one-dimensional cross-correlation operation for multiple input channels is a
 
 Now, we reproduce the results of the one-dimensional cross-correlation operation with multi-input channel in Figure 12.5.
 
-```{.python .input  n=5}
+```{.python .input  n=4}
 def corr1d_multi_in(X, K):
     # First, we traverse along the 0th dimension (channel dimension) of X and
     # K. Then, we add them together by using * to turn the result list into a
     # positional argument of the add_n function
-    return nd.add_n(*[corr1d(x, k) for x, k in zip(X, K)])
+    return sum(corr1d(x, k) for x, k in zip(X, K))
 
-X = nd.array([[0, 1, 2, 3, 4, 5, 6],
+X = np.array([[0, 1, 2, 3, 4, 5, 6],
               [1, 2, 3, 4, 5, 6, 7],
               [2, 3, 4, 5, 6, 7, 8]])
-K = nd.array([[1, 2], [3, 4], [-1, -3]])
+K = np.array([[1, 2], [3, 4], [-1, -3]])
 corr1d_multi_in(X, K)
 ```
 
@@ -99,7 +99,7 @@ Figure 12.7 gives an example to illustrate the textCNN. The input here is a sent
 
 Next, we will implement a textCNN model. Compared with the previous section, in addition to replacing the recurrent neural network with a one-dimensional convolutional layer, here we use two embedding layers, one with a fixed weight and another that participates in training.
 
-```{.python .input  n=10}
+```{.python .input  n=5}
 class TextCNN(nn.Block):
     def __init__(self, vocab_size, embed_size, kernel_sizes, num_channels,
                  **kwargs):
@@ -120,18 +120,19 @@ class TextCNN(nn.Block):
     def forward(self, inputs):
         # Concatenate the output of two embedding layers with shape of
         # (batch size, number of words, word vector dimension) by word vector
-        embeddings = nd.concat(
-            self.embedding(inputs), self.constant_embedding(inputs), dim=2)
+        embeddings = np.concatenate((
+            self.embedding(inputs), self.constant_embedding(inputs)), axis=2)
         # According to the input format required by Conv1D, the word vector
         # dimension, that is, the channel dimension of the one-dimensional
         # convolutional layer, is transformed into the previous dimension
-        embeddings = embeddings.transpose((0, 2, 1))
+        embeddings = embeddings.transpose(0, 2, 1)
         # For each one-dimensional convolutional layer, after max-over-time
-        # pooling, an NDArray with the shape of (batch size, channel size, 1)
+        # pooling, an ndarray with the shape of (batch size, channel size, 1)
         # can be obtained. Use the flatten function to remove the last
         # dimension and then concatenate on the channel dimension
-        encoding = nd.concat(*[nd.flatten(
-            self.pool(conv(embeddings))) for conv in self.convs], dim=1)
+        encoding = np.concatenate([
+            np.squeeze(self.pool(conv(embeddings)), axis=-1) 
+            for conv in self.convs], axis=1)
         # After applying the dropout method, use a fully connected layer to
         # obtain the output
         outputs = self.decoder(self.dropout(encoding))
@@ -140,7 +141,7 @@ class TextCNN(nn.Block):
 
 Create a TextCNN instance. It has 3 convolutional layers with kernel widths of 3, 4, and 5, all with 100 output channels.
 
-```{.python .input}
+```{.python .input  n=6}
 embed_size, kernel_sizes, nums_channels = 100, [3, 4, 5], [100, 100, 100]
 ctx = d2l.try_all_gpus()
 net = TextCNN(len(vocab), embed_size, kernel_sizes, nums_channels)
@@ -151,20 +152,21 @@ net.initialize(init.Xavier(), ctx=ctx)
 
 As in the previous section, load pre-trained 100-dimensional GloVe word vectors and initialize the embedding layers `embedding` and `constant_embedding`. Here, the former participates in training while the latter has a fixed weight.
 
-```{.python .input}
+```{.python .input  n=7}
 glove_embedding = text.embedding.create(
     'glove', pretrained_file_name='glove.6B.100d.txt')
 embeds = glove_embedding.get_vecs_by_tokens(vocab.idx_to_token)
 net.embedding.weight.set_data(embeds)
 net.constant_embedding.weight.set_data(embeds)
 net.constant_embedding.collect_params().setattr('grad_req', 'null')
+
 ```
 
 ### Train and Evaluate the Model
 
 Now we can train the model.
 
-```{.python .input  n=30}
+```{.python .input  n=8}
 lr, num_epochs = 0.001, 5
 trainer = gluon.Trainer(net.collect_params(), 'adam', {'learning_rate': lr})
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
@@ -173,11 +175,11 @@ d2l.train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs, ctx)
 
 Below, we use the trained model to classify sentiments of two simple sentences.
 
-```{.python .input}
+```{.python .input  n=9}
 d2l.predict_sentiment(net, vocab, 'this movie is so great')
 ```
 
-```{.python .input}
+```{.python .input  n=10}
 d2l.predict_sentiment(net, vocab, 'this movie is so bad')
 ```
 

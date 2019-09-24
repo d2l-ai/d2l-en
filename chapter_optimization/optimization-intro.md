@@ -22,7 +22,8 @@ reduce the training error. We begin by importing a few libraries with a function
 %matplotlib inline
 import d2l
 from mpl_toolkits import mplot3d
-import numpy as np
+from mxnet import np, npx
+npx.set_np()
 
 # Save to the d2l package.
 def annotate(text, xy, xytext):
@@ -88,7 +89,7 @@ annotate('saddle point', (0, -0.2), (-0.52, -5.0))
 Saddle points in higher dimensions are even more insidious, as the example below shows. Consider the function $f(x, y) = x^2 - y^2$. It has its saddle point at $(0,0)$. This is a maximum with respect to $y$ and a minimum with respect to $x$. Moreover, it *looks* like a saddle, which is where this mathematical property got its name.
 
 ```{.python .input  n=5}
-x, y = np.mgrid[-1: 1: 101j, -1: 1: 101j]
+x, y = np.meshgrid(np.linspace(-1, 1, 101), np.linspace(-1, 1, 101), indexing='ij')
 
 z = x**2 - y**2
 

@@ -21,9 +21,11 @@ In the semantic segmentation field, one important data set is [Pascal VOC2012](h
 ```{.python .input  n=1}
 %matplotlib inline
 import d2l
-from mxnet import gluon, image, nd
+from mxnet import gluon, image, np, npx
 import os
 import tarfile
+
+npx.set_np()
 ```
 
 The original site might be unstable, we download the data from a mirror site. 
@@ -95,7 +97,7 @@ After defining the two constants above, we can easily find the category index fo
 # Save to the d2l package.
 def build_colormap2label():
     """Build a RGB color to label mapping for segmentation."""
-    colormap2label = nd.zeros(256 ** 3)
+    colormap2label = np.zeros(256 ** 3)
     for i, colormap in enumerate(VOC_COLORMAP):
         colormap2label[(colormap[0]*256 + colormap[1])*256 + colormap[2]] = i
     return colormap2label
@@ -103,7 +105,7 @@ def build_colormap2label():
 # Save to the d2l package.
 def voc_label_indices(colormap, colormap2label):
     """Map a RGB color to a label."""
-    colormap = colormap.astype('int32')
+    colormap = colormap.astype(np.int32)
     idx = ((colormap[:, :, 0] * 256 + colormap[:, :, 1]) * 256
            + colormap[:, :, 2])
     return colormap2label[idx]
@@ -143,8 +145,8 @@ We use the inherited `Dataset` class provided by Gluon to customize the semantic
 class VOCSegDataset(gluon.data.Dataset):
     """A customized dataset to load VOC dataset."""
     def __init__(self, is_train, crop_size, voc_dir):
-        self.rgb_mean = nd.array([0.485, 0.456, 0.406])
-        self.rgb_std = nd.array([0.229, 0.224, 0.225])
+        self.rgb_mean = np.array([0.485, 0.456, 0.406])
+        self.rgb_std = np.array([0.229, 0.224, 0.225])
         self.crop_size = crop_size
         features, labels = read_voc_images(root=voc_dir, is_train=is_train)
         self.features = [self.normalize_image(feature)
@@ -164,7 +166,7 @@ class VOCSegDataset(gluon.data.Dataset):
     def __getitem__(self, idx):
         feature, label = voc_rand_crop(self.features[idx], self.labels[idx],
                                        *self.crop_size)
-        return (feature.transpose((2, 0, 1)),
+        return (feature.transpose(2, 0, 1),
                 voc_label_indices(label, self.colormap2label))
 
     def __len__(self):
@@ -183,11 +185,11 @@ voc_test = VOCSegDataset(False, crop_size, voc_dir)
 
 We set the batch size to 64 and define the iterators for the training and testing sets. Print the shape of the first mini-batch. In contrast to image classification and object recognition, labels here are three-dimensional arrays.
 
-```{.python .input  n=11}
+```{.python .input  n=12}
 batch_size = 64
 train_iter = gluon.data.DataLoader(voc_train, batch_size, shuffle=True,
-                              last_batch='discard', 
-                              num_workers=d2l.get_dataloader_workers())
+                                   last_batch='discard',
+                                   num_workers=d2l.get_dataloader_workers())
 for X, Y in train_iter:
     print(X.shape)
     print(Y.shape)
@@ -196,9 +198,9 @@ for X, Y in train_iter:
 
 ## Put All Things Together
 
-Finally, we define a function `load_data_voc` that  downloads and loads this data set, and then returns the data loaders. 
+Finally, we define a function `load_data_voc` that  downloads and loads this data set, and then returns the data loaders.
 
-```{.python .input  n=12}
+```{.python .input  n=13}
 # Save to the d2l package. 
 def load_data_voc(batch_size, crop_size):
     """Download and load the VOC2012 semantic dataset."""

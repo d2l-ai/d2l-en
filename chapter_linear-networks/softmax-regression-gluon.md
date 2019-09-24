@@ -7,8 +7,9 @@ import ritual.
 
 ```{.python .input  n=1}
 import d2l
-from mxnet import gluon, init
+from mxnet import gluon, init, npx
 from mxnet.gluon import nn
+npx.set_np()
 ```
 
 Let's stick with the Fashion-MNIST dataset and keep the batch size at $256$ as in the last section.

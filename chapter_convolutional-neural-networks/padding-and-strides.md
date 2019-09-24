@@ -90,8 +90,9 @@ Given an input with a height and width of 8,
  we find that the height and width of the output is also 8.
 
 ```{.python .input  n=1}
-from mxnet import nd
+from mxnet import np, npx
 from mxnet.gluon import nn
+npx.set_np()
 
 # For convenience, we define a function to calculate the convolutional layer.
 # This function initializes the convolutional layer weights and performs
@@ -110,7 +111,7 @@ def comp_conv2d(conv2d, X):
 # Note that here 1 row or column is padded on either side, so a total of 2
 # rows or columns are added
 conv2d = nn.Conv2D(1, kernel_size=3, padding=1)
-X = nd.random.uniform(shape=(8, 8))
+X = np.random.uniform(size=(8, 8))
 comp_conv2d(conv2d, X).shape
 ```
 
@@ -147,8 +148,7 @@ We can see that when the second element of the first column is output,
 the convolution window slides down three rows.
 The convolution window slides two columns to the right
 when the second element of the first row is output.
-When the convolution window slides two columns to the right on the input, there is no output because the input element cannot fill the window
-(unless we add padding).
+When the convolution window slides three columns to the right on the input, there is no output because the input element cannot fill the window (unless we add another column of padding).
 
 ![Cross-correlation with strides of 3 and 2 for height and width respectively. The shaded portions are the output element and the input and core array elements used in its computation: $0\times0+0\times1+1\times2+2\times3=8$, $0\times0+6\times1+0\times2+0\times3=6$. ](../img/conv-stride.svg)
 

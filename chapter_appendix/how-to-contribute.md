@@ -29,7 +29,7 @@ Now, the code repository of this book will be copied to your username, such as `
 
 To clone the repository (i.e. to make a local copy) we need to get its repository address. The green button on the picture below displays this. Make sure that your local copy is up to date with the main repository if you decide to keep this fork around for longer. For now simply follow the instructions in :numref:`chapter_installation` to get started. The main difference is that you're now downloading *your own fork* of the repository.
 
-![Git clone.](../img/git-clone.png)
+![ Git clone. ](../img/git-clone-numpy2.png)
 :width:`700px`
 
 ```
@@ -37,23 +37,34 @@ To clone the repository (i.e. to make a local copy) we need to get its repositor
 git clone https://github.com/your_github_username/d2l-en.git
 ```
 
-On Unix the above command copies all the code from GitHub to the directory `d2l-en`.
+Please note we will need to contribute to the **numpy2** branch. Hence, we will need checkout `origin/numpy2` manually.
+
+```
+cd d2l-en
+git checkout -b numpy2 origin/numpy2
+git status
+```
+
+Now, we are at `numpy2` branch where nothing has been changed.
+```
+mylaptop:d2l-en smola$ git status
+On branch numpy2
+Your branch is up to date with 'origin/numpy2'.
+
+nothing to commit, working tree clean
+```
 
 ### Edit the Book and Push
 
 Now it's time to edit the book. It's best to edit the notebooks in Jupyter following instructions in :numref:`chapter_jupyter`. Make the changes and check that they're OK. Assume we have modified a typo in the file `~/d2l-en/chapter_appendix/how-to-contribute.md`.
 You can then check which files you have changed:
 
-```
-git status
-```
-
 At this point Git will prompt that the `chapter_appendix/how-to-contribute.md` file has been modified.
 
 ```
 mylaptop:d2l-en smola$ git status
-On branch master
-Your branch is up-to-date with 'origin/master'.
+On branch numpy2
+Your branch is up-to-date with 'origin/numpy2'.
 
 Changes not staged for commit:
   (use "git add <file>..." to update what will be committed)
@@ -76,7 +87,7 @@ The changed code will then be in your personal fork of the repository. To reques
 
 Go to your fork of the repository on GitHub and select "New pull request". This will open up a screen that shows you the changes between your edits and what is current in the main repository of the book.
 
-![Pull Request.](../img/git-newpr.png)
+![Pull Request.](../img/git-newpr-numpy2.png)
 :width:`700px`
 
 
@@ -84,7 +95,7 @@ Go to your fork of the repository on GitHub and select "New pull request". This 
 
 Finally, submit a pull request. Make sure to describe the changes you have made in the pull request. This will make it easier for the authors to review it and to merge it with the book. Depending on the changes, this might get accepted right away, rejected, or more likely, you'll get some feedback on the changes. Once you've incorporated them, you're good to go.
 
-![Create Pull Request.](../img/git-createpr.png)
+![Create Pull Request.](../img/git-createpr-numpy2.png)
 :width:`700px`
 
 Your pull request will appear among the list of requests in the main repository. We will make every effort to process it quickly.
@@ -101,6 +112,6 @@ Your pull request will appear among the list of requests in the main repository.
 1. Find some code that needs improvement and submit a pull request.
 1. Find a reference that we missed and submit a pull request.
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2401)
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/how-to-contribute-to-this-book/2401)
 
 ![](../img/qr_how-to-contribute.svg)

@@ -150,13 +150,12 @@ In model training or prediction, we often use vector calculations and process mu
 
 ```{.python .input}
 %matplotlib inline
-import d2l 
-import numpy as np
+import d2l
 import math
-from mxnet import nd
+from mxnet import np
 import time
 
-n = 100000
+n = 10000
 a = np.ones(n)
 b = np.ones(n)
 ```
@@ -170,24 +169,24 @@ class Timer(object):
     def __init__(self):
         self.times = []
         self.start()
-        
+
     def start(self):
         """Start the timer"""
         self.start_time = time.time()
-    
+
     def stop(self):
         """Stop the timer and record the time in a list"""
         self.times.append(time.time() - self.start_time)
         return self.times[-1]
-        
+
     def avg(self):
         """Return the average time"""
         return sum(self.times)/len(self.times)
-    
+
     def sum(self):
         """Return the sum of time"""
         return sum(self.times)
-        
+
     def cumsum(self):
         """Return the accumuated times"""
         return np.array(self.times).cumsum().tolist()
@@ -219,17 +218,17 @@ The following is optional and can be skipped but it will greatly help with under
 
 $$p(x) = \frac{1}{\sqrt{2 \pi \sigma^2}} \exp\left(-\frac{1}{2 \sigma^2} (x - \mu)^2\right)$$
 
-Let's define the function to compute the normal distribution. 
+Let's define the function to compute the normal distribution.
 
 ```{.python .input}
 x = np.arange(-7, 7, 0.01)
 
 def normal(x, mu, sigma):
-    p = 1 / math.sqrt(2 * math.pi * sigma**2) 
+    p = 1 / math.sqrt(2 * math.pi * sigma**2)
     return p * np.exp(- 0.5 / sigma**2 * (x - mu)**2)
 ```
 
-For a similar reason to create a `Timer` class, we define a `plot` function to draw multiple lines and set the figure properly, since we will visualize lines frequently later. 
+For a similar reason to create a `Timer` class, we define a `plot` function to draw multiple lines and set the figure properly, since we will visualize lines frequently later.
 
 ```{.python .input}
 # Save to the d2l package.
@@ -239,8 +238,8 @@ def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
     """Plot multiple lines"""
     d2l.set_figsize(figsize)
     axes = axes if axes else d2l.plt.gca()
-    if isinstance(X, nd.NDArray): X = X.asnumpy()
-    if isinstance(Y, nd.NDArray): Y = Y.asnumpy()
+    if isinstance(X, np.ndarray): X = X.asnumpy()
+    if isinstance(Y, np.ndarray): Y = Y.asnumpy()
     if not hasattr(X[0], "__len__"): X = [X]
     if Y is None: X, Y = [[]]*len(X), X
     if not hasattr(Y[0], "__len__"): Y = [Y]
@@ -248,8 +247,8 @@ def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
     if not fmts: fmts = ['-']*len(X)
     axes.cla()
     for x, y, fmt in zip(X, Y, fmts):
-        if isinstance(x, nd.NDArray): x = x.asnumpy()
-        if isinstance(y, nd.NDArray): y = y.asnumpy()
+        if isinstance(x, np.ndarray): x = x.asnumpy()
+        if isinstance(y, np.ndarray): y = y.asnumpy()
         if len(x):
             axes.plot(x, y, fmt)
         else:
@@ -269,12 +268,12 @@ def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
     axes.grid()
 ```
 
-Now visualize the normal distributions. 
+Now visualize the normal distributions.
 
 ```{.python .input  n=2}
 # Mean and variance pairs
 parameters = [(0,1), (0,2), (3,1)]
-plot(x, [normal(x, mu, sigma) for mu, sigma in parameters], 
+plot(x, [normal(x, mu, sigma) for mu, sigma in parameters],
      xlabel='x', ylabel='p(x)', figsize=(4.5, 2.5),
      legend = ['mean %d, var %d'%(mu, sigma) for mu, sigma in parameters])
 ```

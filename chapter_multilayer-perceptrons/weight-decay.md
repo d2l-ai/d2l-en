@@ -160,11 +160,12 @@ and working with a relatively small number of training examples—here we'll set
 ```{.python .input  n=2}
 %matplotlib inline
 import d2l
-from mxnet import autograd, gluon, init, nd
+from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
+npx.set_np()
 
 n_train, n_test, num_inputs, batch_size = 20, 100, 200, 1
-true_w, true_b = nd.ones((num_inputs, 1)) * 0.01, 0.05
+true_w, true_b = np.ones((num_inputs, 1)) * 0.01, 0.05
 train_data = d2l.synthetic_data(true_w, true_b, n_train)
 train_iter = d2l.load_array(train_data, batch_size)
 test_data = d2l.synthetic_data(true_w, true_b, n_test)
@@ -190,8 +191,8 @@ First, we'll define a function to randomly initialize our model parameters and r
 
 ```{.python .input  n=5}
 def init_params():
-    w = nd.random.normal(scale=1, shape=(num_inputs, 1))
-    b = nd.zeros(shape=(1,))
+    w = np.random.normal(scale=1, size=(num_inputs, 1))
+    b = np.zeros(1)
     w.attach_grad()
     b.attach_grad()
     return [w, b]
@@ -239,7 +240,7 @@ def train(lambd):
         if epoch % 5 == 0:
             animator.add(epoch+1, (d2l.evaluate_loss(net, train_iter, loss),
                                    d2l.evaluate_loss(net, test_iter, loss)))
-    print('l2 norm of w:', w.norm().asscalar())
+    print('l1 norm of w:', np.abs(w).sum())
 ```
 
 ### Training without Regularization
@@ -317,7 +318,7 @@ def train_gluon(wd):
         if epoch % 5 == 0:
             animator.add(epoch+1, (d2l.evaluate_loss(net, train_iter, loss),
                                    d2l.evaluate_loss(net, test_iter, loss)))
-    print('L2 norm of w:', net[0].weight.data().norm().asscalar())
+    print('L1 norm of w:', np.abs(net[0].weight.data()).sum())
 ```
 
 The plots look just the same as when we implemented weight decay from scratch

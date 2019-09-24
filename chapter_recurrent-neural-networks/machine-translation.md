@@ -10,7 +10,8 @@ import collections
 import d2l
 import zipfile
 
-from mxnet import nd, gluon
+from mxnet import np, npx, gluon
+npx.set_np()
 ```
 
 ## Read and Pre-process Data
@@ -105,7 +106,7 @@ def build_array(lines, vocab, num_steps, is_source):
     lines = [vocab[l] for l in lines] 
     if not is_source: 
         lines = [[vocab.bos] + l + [vocab.eos] for l in lines]
-    array = nd.array([trim_pad(l, num_steps, vocab.pad) for l in lines])
+    array = np.array([trim_pad(l, num_steps, vocab.pad) for l in lines])
     valid_len = (array != vocab.pad).sum(axis=1)
     return array, valid_len
 ```
@@ -143,3 +144,11 @@ for X, X_vlen, Y, Y_vlen, in train_iter:
 ```
 
 ## Summary
+
+* Machine translation (MT) refers to the automatic translation of a segment of text from one language to another. 
+* We read, preprocess, and tokenize the datasets from both source language and target language.
+
+
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/machine-translation/2396)
+
+![](../img/qr_machine-translation.svg)

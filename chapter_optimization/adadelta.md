@@ -33,21 +33,26 @@ As we can see, if the impact of $\epsilon$ is not considered here, Adadelta diff
 
 Adadelta needs to maintain two state variables for each independent variable, $\boldsymbol{s}_t$ and $\Delta\boldsymbol{x}_t$. We use the formula from the algorithm to implement Adadelta.
 
+```{.python .input}
+
+```
+
 ```{.python .input  n=11}
 %matplotlib inline
 import d2l
-from mxnet import nd
+from mxnet import np, npx
+npx.set_np()
 
 def init_adadelta_states(feature_dim):
-    s_w, s_b = nd.zeros((feature_dim, 1)), nd.zeros(1)
-    delta_w, delta_b = nd.zeros((feature_dim, 1)), nd.zeros(1)
+    s_w, s_b = np.zeros((feature_dim, 1)), np.zeros(1)
+    delta_w, delta_b = np.zeros((feature_dim, 1)), np.zeros(1)
     return ((s_w, delta_w), (s_b, delta_b))
 
 def adadelta(params, states, hyperparams):
     rho, eps = hyperparams['rho'], 1e-5
     for p, (s, delta) in zip(params, states):
-        s[:] = rho * s + (1 - rho) * p.grad.square()
-        g = ((delta + eps).sqrt() / (s + eps).sqrt()) * p.grad
+        s[:] = rho * s + (1 - rho) * np.square(p.grad)
+        g = (np.sqrt(delta + eps) / np.sqrt(s + eps)) * p.grad
         p[:] -= g
         delta[:] = rho * delta + (1 - rho) * g * g
 ```

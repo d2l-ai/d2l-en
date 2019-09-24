@@ -18,12 +18,13 @@ The output is then a weighted sum of the values
 
 $$\mathbf o = \sum_{i=1}^n b_i \mathbf v_i.$$
 
-Different choices of the score function lead to different attention layers. We will discuss two commonly used attention layers in the rest of this section. Before diving into the implementation, we first introduce a masked version of the softmax operator and explain a specialized dot operator `nd.batched_dot`.
+Different choices of the score function lead to different attention layers. We will discuss two commonly used attention layers in the rest of this section. Before diving into the implementation, we first introduce a masked version of the softmax operator and explain a specialized dot operator `npx.batched_dot`.
 
 ```{.python .input  n=1}
 import math
-from mxnet import nd
+from mxnet import np, npx
 from mxnet.gluon import nn
+npx.set_np()
 ```
 
 The masked softmax takes a 3-dim input and allows us to filter out some elements by specifying valid lengths for the last dimension. (Refer to
@@ -35,29 +36,29 @@ definition of a valid length.)
 def masked_softmax(X, valid_length):
     # X: 3-D tensor, valid_length: 1-D or 2-D tensor
     if valid_length is None:
-        return X.softmax()
+        return npx.softmax(X)
     else:
         shape = X.shape
         if valid_length.ndim == 1:
             valid_length = valid_length.repeat(shape[1], axis=0)
         else:
-            valid_length = valid_length.reshape((-1,))
+            valid_length = valid_length.reshape(-1)
         # fill masked elements with a large negative, whose exp is 0
-        X = nd.SequenceMask(X.reshape((-1, shape[-1])), valid_length, True,
-                            axis=1, value=-1e6)
-        return X.softmax().reshape(shape)
+        X = npx.sequence_mask(X.reshape(-1, shape[-1]), valid_length, True,
+                              axis=1, value=-1e6)
+        return npx.softmax(X).reshape(shape)
 ```
 
 Construct two examples, where each example is a 2-by-4 matrix, as the input. If we specify the valid length for the first example to be 2, then only the first two columns of this example are used to compute softmax.
 
 ```{.python .input  n=5}
-masked_softmax(nd.random.uniform(shape=(2,2,4)), nd.array([2,3]))
+masked_softmax(np.random.uniform(size=(2,2,4)), np.array([2,3]))
 ```
 
-The operator `nd.batched_dot` takes two inputs $X$ and $Y$ with shapes $(b, n, m)$ and $(b, m, k)$, respectively. It computes $b$ dot products, with `Z[i,:,:]=dot(X[i,:,:], Y[i,:,:]` for $i=1,\ldots,n$.
+The operator `npx.batched_dot` takes two inputs $X$ and $Y$ with shapes $(b, n, m)$ and $(b, m, k)$, respectively. It computes $b$ dot products, with `Z[i,:,:]=dot(X[i,:,:], Y[i,:,:]` for $i=1,\ldots,n$.
 
 ```{.python .input  n=4}
-nd.batch_dot(nd.ones((2,1,3)), nd.ones((2,3,2)))
+npx.batch_dot(np.ones((2,1,3)), np.ones((2,3,2)))
 ```
 
 ## Dot Product Attention
@@ -74,7 +75,7 @@ Now let's implement this layer that supports a batch of queries and key-value pa
 
 ```{.python .input  n=5}
 # Save to the d2l package.
-class DotProductAttention(nn.Block): 
+class DotProductAttention(nn.Block):
     def __init__(self, dropout, **kwargs):
         super(DotProductAttention, self).__init__(**kwargs)
         self.dropout = nn.Dropout(dropout)
@@ -86,9 +87,9 @@ class DotProductAttention(nn.Block):
     def forward(self, query, key, value, valid_length=None):
         d = query.shape[-1]
         # set transpose_b=True to swap the last two dimensions of key
-        scores = nd.batch_dot(query, key, transpose_b=True) / math.sqrt(d)
+        scores = npx.batch_dot(query, key, transpose_b=True) / math.sqrt(d)
         attention_weights = self.dropout(masked_softmax(scores, valid_length))
-        return nd.batch_dot(attention_weights, value)
+        return npx.batch_dot(attention_weights, value)
 ```
 
 Now we create two batches, and each batch has one query and 10 key-value pairs.  We specify through `valid_length` that for the first batch, we will only pay attention to the first 2 key-value pairs, while for the second batch, we will check the first 6 key-value pairs. Therefore, though both batches have the same query and key-value pairs, we obtain different outputs.
@@ -96,9 +97,9 @@ Now we create two batches, and each batch has one query and 10 key-value pairs. 
 ```{.python .input  n=6}
 atten = DotProductAttention(dropout=0.5)
 atten.initialize()
-keys = nd.ones((2,10,2))
-values = nd.arange(40).reshape((1,10,4)).repeat(2,axis=0)
-atten(nd.ones((2,1,2)), keys, values, nd.array([2, 6]))
+keys = np.ones((2,10,2))
+values = np.arange(40).reshape(1,10,4).repeat(2,axis=0)
+atten(np.ones((2,1,2)), keys, values, np.array([2, 6]))
 ```
 
 ## Multilayer Perceptron Attention
@@ -128,10 +129,10 @@ class MLPAttention(nn.Block):
         query, key = self.W_k(query), self.W_q(key)
         # expand query to (batch_size, #querys, 1, units), and key to
         # (batch_size, 1, #kv_pairs, units). Then plus them with broadcast.
-        features = query.expand_dims(axis=2) + key.expand_dims(axis=1)
-        scores = self.v(features).squeeze(axis=-1)
+        features = np.expand_dims(query, axis=2) + np.expand_dims(key, axis=1)
+        scores = np.squeeze(self.v(features), axis=-1)
         attention_weights = self.dropout(masked_softmax(scores, valid_length))
-        return nd.batch_dot(attention_weights, value)
+        return npx.batch_dot(attention_weights, value)
 ```
 
 Despite `MLPAttention` containing an additional MLP model, given the same inputs with identical keys, we obtain the same output as for `DotProductAttention`.
@@ -139,10 +140,19 @@ Despite `MLPAttention` containing an additional MLP model, given the same inputs
 ```{.python .input  n=8}
 atten = MLPAttention(units=8, dropout=0.1)
 atten.initialize()
-atten(nd.ones((2,1,2)), keys, values, nd.array([2, 6]))
+atten(np.ones((2,1,2)), keys, values, np.array([2, 6]))
 ```
 
 ## Summary
 
 * An attention layer explicitly selects related information.
 * An attention layer's memory consists of key-value pairs, so its output is close to the values whose keys are similar to the query.
+
+## Exercises
+
+* What are the advantages and disadantages for DotProductAttention and MLPAttention, respectively?
+
+
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/attention/4343)
+
+![](../img/qr_attention.svg)

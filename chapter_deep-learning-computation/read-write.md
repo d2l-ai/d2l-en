@@ -2,46 +2,47 @@
 
 So far we discussed how to process data, how to build, train and test deep learning models. However, at some point we are likely happy with what we obtained and we want to save the results for later use and distribution. Likewise, when running a long training process it is best practice to save intermediate results (checkpointing) to ensure that we don't lose several days worth of computation when tripping over the power cord of our server. At the same time, we might want to load a pretrained model (e.g. we might have word embeddings for English and use it for our fancy spam classifier). For all of these cases we need to load and store both individual weight vectors and entire models. This section addresses both issues.
 
-## NDArray
+## Load and Save ndarray
 
-In its simplest form, we can directly use the `save` and `load` functions to store and read NDArrays separately. This works just as expected.
+In its simplest form, we can directly use the `load` and `save` functions to store and read ndarrays separately. This works just as expected.
 
 ```{.python .input}
-from mxnet import nd
+from mxnet import np, npx
 from mxnet.gluon import nn
+npx.set_np()
 
-x = nd.arange(4)
-nd.save('x-file', x)
+x = np.arange(4)
+npx.save('x-file', x) 
 ```
 
 Then, we read the data from the stored file back into memory.
 
 ```{.python .input}
-x2 = nd.load('x-file')
+x2 = npx.load('x-file')
 x2
 ```
 
-We can also store a list of NDArrays and read them back into memory.
+We can also store a list of ndarrays and read them back into memory.
 
 ```{.python .input  n=2}
-y = nd.zeros(4)
-nd.save('x-files', [x, y])
-x2, y2 = nd.load('x-files')
+y = np.zeros(4)
+npx.save('x-files', [x, y])
+x2, y2 = npx.load('x-files')
 (x2, y2)
 ```
 
-We can even write and read a dictionary that maps from a string to an NDArray. This is convenient, for instance when we want to read or write all the weights in a model.
+We can even write and read a dictionary that maps from a string to an ndarray. This is convenient, for instance when we want to read or write all the weights in a model.
 
 ```{.python .input  n=4}
 mydict = {'x': x, 'y': y}
-nd.save('mydict', mydict)
-mydict2 = nd.load('mydict')
+npx.save('mydict', mydict)
+mydict2 = npx.load('mydict')
 mydict2
 ```
 
 ## Gluon Model Parameters
 
-Saving individual weight vectors (or other NDArray tensors) is useful but it
+Saving individual weight vectors (or other ndarray tensors) is useful but it
 gets very tedious if we want to save (and later load) an entire model. After
 all, we might have hundreds of parameter groups sprinkled throughout. Writing a
 script that collects all the terms and matches them to an architecture is quite
@@ -68,7 +69,7 @@ class MLP(nn.Block):
 
 net = MLP()
 net.initialize()
-x = nd.random.uniform(shape=(2, 20))
+x = np.random.uniform(size=(2, 20))
 y = net(x)
 ```
 
@@ -82,7 +83,7 @@ To check whether we are able to recover the model we instantiate a clone of the 
 
 ```{.python .input  n=8}
 clone = MLP()
-clone.load_parameters('mlp.params')
+clone.load_parameters('mlp.params') 
 ```
 
 Since both instances have the same model parameters, the computation result of the same input `x` should be the same. Let's verify this.
@@ -94,7 +95,7 @@ yclone == y
 
 ## Summary
 
-* The `save` and `load` functions can be used to perform File I/O for NDArray objects.
+* The `save` and `load` functions can be used to perform File I/O for ndarray objects.
 * The `load_parameters` and `save_parameters` functions allow us to save entire sets of parameters for a network in Gluon.
 * Saving the architecture has to be done in code rather than in parameters.
 

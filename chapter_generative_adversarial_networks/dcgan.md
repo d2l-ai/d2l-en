@@ -6,11 +6,12 @@ In :numref:`chapter_basic_gan`, we introduced the basic ideas behind how GANs wo
 In this section, we'll demonstrate how you can use GANs to generate photorealistic images. We'll be basing our models on the deep convolutional GANs (DCGAN) introduced in :cite:`Radford.Metz.Chintala.2015`. We'll borrow the convolutional architecture that have proven so successful for discriminative computer vision problems and show how via GANs, they can be leveraged to generate photorealistic images.
 
 ```{.python .input  n=1}
-from mxnet import nd, gluon, autograd, init
+from mxnet import gluon, autograd, init, np, npx
 from mxnet.gluon import nn
 import d2l
 import zipfile
-import numpy as np
+
+npx.set_np()
 ```
 
 ## The Pokemon Dataset
@@ -29,7 +30,7 @@ pokemon = gluon.data.vision.datasets.ImageFolderDataset(data_dir+'pokemon')
 
 We resize each image into $64\times 64$. The `ToTensor` transformation will project the pixel value into $[0,1]$, while our generator will use the tanh function to obtain outputs in $[-1,1]$. Therefore we normalize the data with $1/2$ mean and $1/2$ variance to match the value range.
 
-```{.python .input  n=21}
+```{.python .input  n=3}
 batch_size = 256
 transformer = gluon.data.vision.transforms.Compose([
     gluon.data.vision.transforms.Resize(64),
@@ -43,10 +44,10 @@ data_iter = gluon.data.DataLoader(
 
 Let's visualize the first 20 images.
 
-```{.python .input  n=28}
+```{.python .input  n=4}
 d2l.set_figsize((4, 4))
 for X, y in data_iter:
-    imgs = X[0:20,:,:,:].transpose((0,2,3,1))/2+0.5
+    imgs = X[0:20,:,:,:].transpose(0,2,3,1)/2+0.5
     d2l.show_images(imgs, num_rows=4, num_cols=5)
     break
 ```
@@ -55,7 +56,7 @@ for X, y in data_iter:
 
 The generator needs to map the noise variable $\mathbf z\in\mathbb R^d$, a length-$d$ vector, to a RGB image with both width and height to be 64. In :numref:`chapter_fcn` we introduced the fully convolutional network that uses transposed convolution layer (refer to :numref:`chapter_transposed_conv`) to enlarge input size. The basic block of the generator contains a transposed convolution layer followed by the batch normalization and ReLU activation.
 
-```{.python .input  n=6}
+```{.python .input  n=5}
 class G_block(nn.Block):
     def __init__(self, channels, kernel_size=4,
                  strides=2, padding=1, **kwargs):
@@ -71,8 +72,8 @@ class G_block(nn.Block):
 
 In default, the transposed convolution layer uses a $4\times 4$ kernel, $2\times 2$ strides and $1\times 1$ padding. It will double input's width and height.
 
-```{.python .input  n=8}
-x = nd.zeros((2, 3, 16, 16))
+```{.python .input  n=6}
+x = np.zeros((2, 3, 16, 16))
 g_blk = G_block(20)
 g_blk.initialize()
 g_blk(x).shape
@@ -81,7 +82,7 @@ g_blk(x).shape
 Changing strides to $1$ and padding to $0$ will lead to increase both input's width and height by 3.
 
 ```{.python .input  n=7}
-x = nd.zeros((2, 3, 1, 1))
+x = np.zeros((2, 3, 1, 1))
 g_blk = G_block(20, strides=1, padding=0)
 g_blk.initialize()
 g_blk(x).shape
@@ -89,7 +90,7 @@ g_blk(x).shape
 
 The generator consists of four basic blocks that increase input's both width and height from 1 to 32. At the same time, it first projects the latent variable into $64\times 8$ channels, and then halve the channels each time. At last, a transposed convolution layer is used to generate the output. It further doubles the width and height to match the desired $64\times 64$ shape, and reduces the channel size to $3$. The tanh activation function is applied to project output values into the $(-1, 1)$ range.
 
-```{.python .input  n=9}
+```{.python .input  n=8}
 n_G = 64
 net_G = nn.Sequential()
 net_G.add(G_block(n_G*8, strides=1, padding=0),  # output: (64*8, 4, 4)
@@ -103,8 +104,8 @@ net_G.add(G_block(n_G*8, strides=1, padding=0),  # output: (64*8, 4, 4)
 
 Generate a 100 dimensional latent variable to verify the generator's output shape.
 
-```{.python .input  n=10}
-x = nd.zeros((1, 100, 1, 1))
+```{.python .input  n=9}
+x = np.zeros((1, 100, 1, 1))
 net_G.initialize()
 net_G(x).shape
 ```
@@ -117,9 +118,9 @@ $$\textrm{leaky ReLU}(x) = \begin{cases}x & \text{if}\ x > 0\\ \alpha x &\text{o
 
 As it can be seen, it is normal ReLU if $\alpha=0$, and an identity function if $\alpha=1$. For $\alpha \in (0,1)$, leaky ReLU is a nonlinear function that give a non-zero output for a negative input. It aims to fix the "dying ReLU" problem that a neuron might always output a negative value and therefore cannot make any progress since the gradient of ReLU is 0.
 
-```{.python .input}
+```{.python .input  n=10}
 alphas = [0, 0.2, 0.4, .6, .8, 1]
-x = nd.arange(-2,1,0.1)
+x = np.arange(-2,1,0.1)
 Y = [nn.LeakyReLU(alpha)(x).asnumpy() for alpha in alphas]
 d2l.plot(x.asnumpy(), Y, 'x', 'y', alphas)
 ```
@@ -143,7 +144,7 @@ class D_block(nn.Block):
 A basic block will halve the width and height of the inputs.
 
 ```{.python .input  n=12}
-x = nd.zeros((2, 3, 16, 16))
+x = np.zeros((2, 3, 16, 16))
 d_blk = D_block(20)
 d_blk.initialize()
 d_blk(x).shape
@@ -163,8 +164,8 @@ net_D.add(D_block(n_D),    # output: (64, 32, 32)
 
 It uses a convolution layer with output channel $1$ as the last layer to obtain a single prediction value.
 
-```{.python .input  n=14}
-x = nd.zeros((1, 3, 64, 64))
+```{.python .input  n=15}
+x = np.zeros((1, 3, 64, 64))
 net_D.initialize()
 net_D(x).shape
 ```
@@ -173,7 +174,7 @@ net_D(x).shape
 
 Compared to the basic GAN in :numref:`chapter_basic_gan`, we use the same learning rate for both generator and discriminator since they are similar to each other. In addition, we change $\beta_1$ in Adam (:numref:`chapter_adam`) from $0.9$ to $0.5$. It decreases the smoothness of the momentum, the exponentially weighted moving average of past gradients, to take care of the rapid changing gradients because the generator and the discriminator fight with each other. Besides, `Z` is a 4-D tensor and we are using GPU to accelerate the computation.
 
-```{.python .input  n=16}
+```{.python .input  n=20}
 def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
           ctx=d2l.try_gpu()):
     loss = gluon.loss.SigmoidBCELoss()
@@ -192,18 +193,19 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
         metric = d2l.Accumulator(3)  # loss_D, loss_G, num_examples
         for X, _ in data_iter:
             batch_size = X.shape[0]
-            Z = nd.random.normal(0, 1, shape=(batch_size, latent_dim, 1, 1))
+            Z = np.random.normal(0, 1, size=(batch_size, latent_dim, 1, 1))
             X, Z = X.as_in_context(ctx), Z.as_in_context(ctx),
             metric.add(d2l.update_D(X, Z, net_D, net_G, loss, trainer_D),
                         d2l.update_G(Z, net_D, net_G, loss, trainer_G),
                         batch_size)
         # Show generated examples
-        Z = nd.random.normal(0, 1, shape=(21, latent_dim, 1, 1), ctx=ctx)
-        fake_x = (net_G(Z).transpose((0,2,3,1))/2+0.5).asnumpy()
-        imgs = np.vstack([np.hstack(fake_x[i:i+7])
-                          for i in range(0,len(fake_x),7)])
+        Z = np.random.normal(0, 1, size=(21, latent_dim, 1, 1), ctx=ctx)
+        fake_x = net_G(Z).transpose(0,2,3,1)/2+0.5
+        imgs = np.concatenate(
+            [np.concatenate([fake_x[i * 7 + j] for j in range(7)], axis=1)
+             for i in range(len(fake_x)//7)], axis=0)
         animator.axes[1].cla()
-        animator.axes[1].imshow(imgs)
+        animator.axes[1].imshow(imgs.asnumpy())
         # Show the losses
         loss_D, loss_G = metric[0]/metric[2], metric[1]/metric[2]
         animator.add(epoch, (loss_D, loss_G))
@@ -214,9 +216,24 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
 
 Now let's train the model.
 
-```{.python .input  n=17}
+```{.python .input  n=21}
 latent_dim, lr, num_epochs = 100, 0.005, 40
 train(net_D, net_G, data_iter, num_epochs, lr, latent_dim)
 ```
 
 ## Summary
+
+* DCGAN architecture has four convolutional layers for the Discriminator and four “four fractionally-strided convolutions” layers for the Generator.
+* The Discriminator is a 4-layer strided convolutions with batch normalization (except its input layer) and leaky ReLU activations. 
+* Leaky ReLU is a nonlinear function that give a non-zero output for a negative input. It aims to fix the “dying ReLU” problem and helps the gradients flow easier through the architecture.
+
+
+## Exercises
+
+* What will happen if we use standard ReLU activation rather than leaky ReLU?
+* Apply DCGAN on Fashion-MNIST and see which category works well and which does not.
+
+
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/dcgan-discussion/4354)
+
+![](../img/qr_dcgan.svg)
