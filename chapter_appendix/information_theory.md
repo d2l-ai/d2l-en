@@ -81,7 +81,7 @@ From the above examples and interpretations, we can derive the following propert
 
 ## Mutual Information
 
-![](../img/mutual_information1.png)
+![](../img/mutual_information.png)
 
 
 Last section we defined entropy for a single random variable, $X$, now let us extend it to a pair, $(X,Y)$. For the following discussion, we always use $(X,Y)$ as a pair of random variables that follows a joint probability distribution $P$ with a p.d.f. or a p.m.f. $p(x,y)$.
@@ -150,7 +150,7 @@ A few notable notations to keep in mind:
 
 ### Motivation
 
-Norm is used to measure the distance between two points in any dimension space, but can we measure the distance between two probability distributions? The answer points out to *Kullback–Leibler Divergence*, which is extremely useful in many machine learning problems when we are estimating a true probability distribution $P$ with another probability distribution $Q$, and computing the error.
+Norm is used to measure the distance between two points in any dimension space, but can we measure the distance between two probability distributions, $P$ and $Q$? The answer points out to *Kullback–Leibler Divergence*, which is extremely useful in many machine learning problems when we are estimating a true probability distribution $P$ with another probability distribution $Q$, and computing the error.
 
 
 ### Definition
@@ -218,6 +218,13 @@ From the above example, we can conclude the follwoing properties:
 1. Non-symmetric: $D_{\mathrm{KL}}(P\|Q) \neq D_{\mathrm{KL}}(Q\|P)$, if $P \neq Q$;
 1. Non-negative: $D_{\mathrm{KL}}(P\|Q) \geq 0$, with equality holds only when $P = Q$;
 1. Infinite case: If there exists an $x$ such that $p(x) > 0$ and $q(x) = 0$, then $D_{\mathrm{KL}}(P\|Q) = \infty$.
+1. Relationship with mutual information: 
+
+\begin{align}
+I(X,Y) &= D_{\mathrm{KL}}(P(X, Y)  \ \| \ P(X)P(Y)) \\
+  &= E_Y \{ D_{\mathrm{KL}}(P(X \mid Y) \ \| \ P(X)) \}\\
+  &= E_X \{ D_{\mathrm{KL}}(P(Y \mid X) \ \| \ P(Y)) \}.\\
+\end{align}
 
 
 ### Application: Variational Inequality
