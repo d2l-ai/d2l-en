@@ -176,9 +176,9 @@ p = np.random.normal(loc=0.0, scale=1.0, size=(shape, 1))
 q1 = np.random.normal(loc=-1.0, scale=1.0, size=(shape, 1))
 q2 = np.random.normal(loc=1.0, scale=1.0, size=(shape, 1))
 
-p = mxnet.np.array(sorted(p.asnumpy()))
-q1 = mxnet.np.array(sorted(q1.asnumpy()))
-q2 = mxnet.np.array(sorted(q2.asnumpy()))
+p = np.array(sorted(p.asnumpy()))
+q1 = np.array(sorted(q1.asnumpy()))
+q2 = np.array(sorted(q2.asnumpy()))
 ```
 
 
