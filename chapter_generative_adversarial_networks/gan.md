@@ -19,12 +19,12 @@ The discriminator is a binary classifier to distinguish if the input $x$ is real
 
 $$ \min - y \log D(\mathbf x) - (1-y)\log(1-D(\mathbf x)),$$
 
-For the generator, it first draws some parameter $\mathbf z\in\mathbb R^d$ from a source of randomness, e.g. a normal distribution $\mathbf z\sim\mathcal(0,1)$. We often call $\mathbf z$ the latent variable.
+For the generator, it first draws some parameter $\mathbf z\in\mathbb R^d$ from a source of randomness, e.g. a normal distribution $\mathbf z\sim\mathcal{N}(0,1)$. We often call $\mathbf z$ the latent variable.
 It then applies a function to generate $\mathbf x'=G(\mathbf z)$. The goal of the generator is to fool the discriminator to classify $\mathbf x'$ as true data. In other words, we update the parameters of the generator to maximize the cross entropy loss when $y=0$, i.e.
 
 $$ \max - \log(1-D(\mathbf x')).$$
 
-If the discriminator does a perfect job, then $D(\mathbf x')\approx 1$ so the above loss near 0, which results the gradients are too small to make a good progress for the discriminator. So commonly we minimize the following loss
+If the discriminator does an almost perfect job, then $D(\mathbf x')\approx 1$ so the above loss is near 0, which results in gradients which are too small to make a good progress for the discriminator. So commonly we minimize the following loss
 
 $$ \max \log(D(\mathbf x')), $$
 
