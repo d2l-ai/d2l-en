@@ -169,6 +169,8 @@ Firstly, let us build a toy model: generating and sorting three 1,000,000 length
 
 
 ```{.python .input  n=2}
+from mxnet import np
+
 shape = 1000000
 p = np.random.normal(loc=0.0, scale=1.0, size=(shape, 1))
 q1 = np.random.normal(loc=-1.0, scale=1.0, size=(shape, 1))
@@ -183,7 +185,6 @@ q2 = mxnet.np.array(sorted(q2.asnumpy()))
 Next, define the above KL Divergence formula in MXNet.
 
 ```{.python .input  n=1}
-from mxnet import np
 from mxnet.ndarray import nansum
 
 def KLDivergence(p, q):
@@ -198,18 +199,24 @@ Since $q_1$ and $q_2$ are symmetric about the y-axis, we expect a similar absolu
 
 ```{.python .input  n=2}
 kl_pq1 = KLDivergence(p,q1)
-print('KL Divergence between p and q1 is '.format(kl_pq1))
+print('KL Divergence between p and q1 is {}.'.format(kl_pq1.asscalar()))
 
 kl_pq2 = KLDivergence(p,q2)
-print('KL Divergence between p and q2 is '.format(kl_pq2))
+print('KL Divergence between p and q2 is {}.'.format(kl_pq2.asscalar()))
 
-kl_q2p = KLDivergence(q2,p)
-print('KL Divergence between q2 and p is '.format(kl_q2p))
+similar = (kl_pq1.abs() - kl_pq2.abs()).abs().asscalar()
+print('Similar KL Divergence in absolute value: {}.'.format(similar))
 ```
 
 On the flip side, you may find $D_{\mathrm{KL}}(q_2 \|p)$ and $D_{\mathrm{KL}}(p \| q_2)$ are off a lot in absolute value, and that comes to the following properties of KL Divergence.
 
+```{.python .input  n=2}
+kl_q2p = KLDivergence(q2,p)
+print('KL Divergence between q2 and p is {}.'.format(kl_q2p.asscalar()))
 
+differ = (kl_q2p.abs() - kl_pq2.abs()).abs().asscalar()
+print('Dramatically different KL Divergence: {}.'.format(differ))
+```
 
 ### KL Divergence Properties
 
@@ -359,6 +366,6 @@ To verify the above proof by algorithm, let us apply the built-in metric `Negati
 ```{.python .input  n=5}
 from mxnet.metric import NegativeLogLikelihood
 nll_loss = NegativeLogLikelihood()
-nll_loss.update(labels.as_nd_ndarray(), pred.as_nd_ndarray())
+nll_loss.update(labels.as_nd_ndarray(), preds.as_nd_ndarray())
 print(nll_loss.get())
 ```
