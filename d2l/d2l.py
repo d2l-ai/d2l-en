@@ -20,31 +20,18 @@ import time
 import tarfile
 import zipfile
 
-# Defined in file: ./chapter_crashcourse/probability.md
+
+# Defined in file: ./chapter_preliminaries/probability.md
 def use_svg_display():
     """Use the svg format to display plot in jupyter."""
     display.set_matplotlib_formats('svg')
 
 
-# Defined in file: ./chapter_crashcourse/probability.md
+# Defined in file: ./chapter_preliminaries/probability.md
 def set_figsize(figsize=(3.5, 2.5)):
     """Change the default figure size"""
     use_svg_display()
     plt.rcParams['figure.figsize'] = figsize
-
-# Defined in file: ./chapter_crashcourse/naive-bayes.md
-def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
-    """Plot a list of images."""
-    figsize = (num_cols * scale, num_rows * scale)
-    _, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize)
-    axes = axes.flatten()
-    for i, (ax, img) in enumerate(zip(axes, imgs)):
-        ax.imshow(img.asnumpy())
-        ax.axes.get_xaxis().set_visible(False)
-        ax.axes.get_yaxis().set_visible(False)
-        if titles:
-            ax.set_title(titles[i])
-    return axes
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression.md
@@ -74,6 +61,7 @@ class Timer(object):
     def cumsum(self):
         """Return the accumuated times"""
         return np.array(self.times).cumsum().tolist()
+
 
 # Defined in file: ./chapter_linear-networks/linear-regression.md
 def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
@@ -112,6 +100,7 @@ def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
     if legend: axes.legend(legend)
     axes.grid()
 
+
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def synthetic_data(w, b, num_examples):
     """generate y = X w + b + noise"""
@@ -125,14 +114,17 @@ def synthetic_data(w, b, num_examples):
 def linreg(X, w, b):
     return np.dot(X, w) + b
 
+
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def squared_loss(y_hat, y):
     return (y_hat - y.reshape(y_hat.shape)) ** 2 / 2
+
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def sgd(params, lr, batch_size):
     for param in params:
         param[:] = param - lr * param.grad / batch_size
+
 
 # Defined in file: ./chapter_linear-networks/linear-regression-gluon.md
 def load_array(data_arrays, batch_size, is_train=True):
@@ -141,11 +133,28 @@ def load_array(data_arrays, batch_size, is_train=True):
     return gluon.data.DataLoader(dataset, batch_size, shuffle=is_train)
     
 
+
 # Defined in file: ./chapter_linear-networks/fashion-mnist.md
 def get_fashion_mnist_labels(labels):
     text_labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
                    'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
     return [text_labels[int(i)] for i in labels]
+
+
+# Defined in file: ./chapter_linear-networks/fashion-mnist.md
+def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
+    """Plot a list of images."""
+    figsize = (num_cols * scale, num_rows * scale)
+    _, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize)
+    axes = axes.flatten()
+    for i, (ax, img) in enumerate(zip(axes, imgs)):
+        ax.imshow(img.asnumpy())
+        ax.axes.get_xaxis().set_visible(False)
+        ax.axes.get_yaxis().set_visible(False)
+        if titles:
+            ax.set_title(titles[i])
+    return axes
+
 
 # Defined in file: ./chapter_linear-networks/fashion-mnist.md
 def get_dataloader_workers(num_workers=4):
@@ -154,6 +163,7 @@ def get_dataloader_workers(num_workers=4):
         return 0
     else:
         return num_workers
+
 
 # Defined in file: ./chapter_linear-networks/fashion-mnist.md
 def load_data_fashion_mnist(batch_size, resize=None):
@@ -169,9 +179,11 @@ def load_data_fashion_mnist(batch_size, resize=None):
             gluon.data.DataLoader(mnist_test, batch_size, shuffle=False,
                                   num_workers=get_dataloader_workers()))
 
+
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def accuracy(y_hat, y):
     return float((y_hat.argmax(axis=1) == y.astype('float32')).sum())
+
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def evaluate_accuracy(net, data_iter):
@@ -179,6 +191,7 @@ def evaluate_accuracy(net, data_iter):
     for X, y in data_iter:
         metric.add(accuracy(net(X), y), y.size)
     return metric[0] / metric[1]
+
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 class Accumulator(object):
@@ -191,6 +204,7 @@ class Accumulator(object):
         self.data = [0] * len(self.data)
     def __getitem__(self, i):
         return self.data[i]
+
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def train_epoch_ch3(net, train_iter, loss, updater):
@@ -207,6 +221,7 @@ def train_epoch_ch3(net, train_iter, loss, updater):
         metric.add(float(l.sum()), accuracy(y_hat, y), y.size)
     # Return training loss and training accuracy
     return metric[0]/metric[2], metric[1]/metric[2]
+
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 class Animator(object):
@@ -241,6 +256,7 @@ class Animator(object):
         display.display(self.fig)
         display.clear_output(wait=True)
 
+
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
     trains, test_accs = [], []
@@ -251,6 +267,7 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
         train_metrics = train_epoch_ch3(net, train_iter, loss, updater)
         test_acc = evaluate_accuracy(net, test_iter)
         animator.add(epoch+1, train_metrics+(test_acc,))
+
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def predict_ch3(net, test_iter, n=6):
@@ -269,6 +286,7 @@ def evaluate_loss(net, data_iter, loss):
     for X, y in data_iter:
         metric.add(loss(net(X), y).sum(), y.size)
     return metric[0] / metric[1]
+
 
 # Defined in file: ./chapter_deep-learning-computation/use-gpu.md
 def try_gpu(i=0):
@@ -293,6 +311,7 @@ def corr2d(X, K):
             Y[i, j] = (X[i: i + h, j: j + w] * K).sum()
     return Y
 
+
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
 def evaluate_accuracy_gpu(net, data_iter, ctx=None):
     if not ctx:  # Query the first device the first parameter is on.
@@ -302,6 +321,7 @@ def evaluate_accuracy_gpu(net, data_iter, ctx=None):
         X, y = X.as_in_context(ctx), y.as_in_context(ctx)
         metric.add(d2l.accuracy(net(X), y), y.size)
     return metric[0]/metric[1]
+
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
 def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
@@ -335,6 +355,7 @@ def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
         train_loss, train_acc, test_acc))
     print('%.1f exampes/sec on %s'%(metric[2]*num_epochs/timer.sum(), ctx))
 
+
 # Defined in file: ./chapter_convolutional-modern/resnet.md
 class Residual(nn.Block):
     def __init__(self, num_channels, use_1x1conv=False, strides=1, **kwargs):
@@ -356,6 +377,7 @@ class Residual(nn.Block):
         if self.conv3:
             X = self.conv3(X)
         return npx.relu(Y + X)
+
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
 def read_time_machine():
@@ -417,6 +439,7 @@ def count_corpus(sentences):
     tokens = [tk for line in sentences for tk in line]
     return collections.Counter(tokens)
 
+
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
 def load_corpus_time_machine(max_tokens=-1):
     lines = read_time_machine()
@@ -446,6 +469,7 @@ def seq_data_iter_random(corpus, batch_size, num_steps):
         Y = [data(j + 1) for j in batch_indices]
         yield np.array(X), np.array(Y)
 
+
 # Defined in file: ./chapter_recurrent-neural-networks/lang-model.md
 def seq_data_iter_consecutive(corpus, batch_size, num_steps):
     # Offset for the iterator over the data for uniform starts
@@ -461,6 +485,7 @@ def seq_data_iter_consecutive(corpus, batch_size, num_steps):
         Y = Ys[:,i:(i+num_steps)]
         yield X, Y
 
+
 # Defined in file: ./chapter_recurrent-neural-networks/lang-model.md
 class SeqDataLoader(object):
     """A iterator to load sequence data"""
@@ -475,12 +500,14 @@ class SeqDataLoader(object):
     def __iter__(self):
         return self.get_iter()
 
+
 # Defined in file: ./chapter_recurrent-neural-networks/lang-model.md
 def load_data_time_machine(batch_size, num_steps, use_random_iter=False, 
                            max_tokens=10000):
     data_iter = SeqDataLoader(
         batch_size, num_steps, use_random_iter, max_tokens)
     return data_iter, data_iter.vocab    
+
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
 class RNNModelScratch(object):
@@ -498,6 +525,7 @@ class RNNModelScratch(object):
     def begin_state(self, batch_size, ctx):
         return self.init_state(batch_size, self.num_hiddens, ctx)
 
+
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
 def predict_ch8(prefix, num_predicts, model, vocab, ctx):
     state = model.begin_state(batch_size=1, ctx=ctx)
@@ -511,6 +539,7 @@ def predict_ch8(prefix, num_predicts, model, vocab, ctx):
         outputs.append(int(Y.argmax(axis=1).reshape(1)))
     return ''.join([vocab.idx_to_token[i] for i in outputs])
 
+
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
 def grad_clipping(model, theta):
     if isinstance(model, gluon.Block):
@@ -521,6 +550,7 @@ def grad_clipping(model, theta):
     if norm > theta:
         for param in params:
             param.grad[:] *= theta / norm
+
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
 def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):
@@ -543,6 +573,7 @@ def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):
         updater(batch_size=1)  # Since used mean already.
         metric.add(l * y.size, y.size)
     return math.exp(metric[0]/metric[1]), metric[1]/timer.stop()
+
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
 def train_ch8(model, train_iter, vocab, lr, num_epochs, ctx,
@@ -570,6 +601,7 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, ctx,
     print(predict('time traveller'))
     print(predict('traveller'))
 
+
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-gluon.md
 class RNNModel(nn.Block):
     def __init__(self, rnn_layer, vocab_size, **kwargs):
@@ -590,12 +622,14 @@ class RNNModel(nn.Block):
     def begin_state(self, *args, **kwargs):
         return self.rnn.begin_state(*args, **kwargs)
 
+
 # Defined in file: ./chapter_recurrent-neural-networks/machine-translation.md
 def read_data_nmt():
     fname = gluon.utils.download('http://data.mxnet.io/data/fra-eng.zip')
     with zipfile.ZipFile(fname, 'r') as f:
         return f.read('fra.txt').decode("utf-8")
     
+
 
 # Defined in file: ./chapter_recurrent-neural-networks/machine-translation.md
 def preprocess_nmt(text):
@@ -634,6 +668,7 @@ def build_array(lines, vocab, num_steps, is_source):
     valid_len = (array != vocab.pad).sum(axis=1)
     return array, valid_len
 
+
 # Defined in file: ./chapter_recurrent-neural-networks/machine-translation.md
 def load_data_nmt(batch_size, num_steps, num_examples=1000):
     text = preprocess_nmt(read_data_nmt())
@@ -648,6 +683,7 @@ def load_data_nmt(batch_size, num_steps, num_examples=1000):
     data_iter = d2l.load_array(data_arrays, batch_size)
     return src_vocab, tgt_vocab, data_iter
 
+
 # Defined in file: ./chapter_recurrent-neural-networks/encoder-decoder.md
 class Encoder(nn.Block):
     """The base encoder interface for the encoder-decoder architecture."""
@@ -657,9 +693,10 @@ class Encoder(nn.Block):
     def forward(self, X):
         raise NotImplementedError
 
+
 # Defined in file: ./chapter_recurrent-neural-networks/encoder-decoder.md
 class Decoder(nn.Block):
-    """The base decoder interface for the encoder-decoder archtecture."""
+    """The base decoder interface for the encoder-decoder architecture."""
     def __init__(self, **kwargs):
         super(Decoder, self).__init__(**kwargs)
 
@@ -668,6 +705,7 @@ class Decoder(nn.Block):
 
     def forward(self, X, state):
         raise NotImplementedError
+
 
 # Defined in file: ./chapter_recurrent-neural-networks/encoder-decoder.md
 class EncoderDecoder(nn.Block):
@@ -681,6 +719,7 @@ class EncoderDecoder(nn.Block):
         enc_outputs = self.encoder(enc_X, *args)
         dec_state = self.decoder.init_state(enc_outputs, *args)
         return self.decoder(dec_X, dec_state)
+
 
 # Defined in file: ./chapter_recurrent-neural-networks/seq2seq.md
 class Seq2SeqEncoder(d2l.Encoder):
@@ -699,6 +738,7 @@ class Seq2SeqEncoder(d2l.Encoder):
         # state contains the hidden state and the memory cell
         # of the last time step, the shape is (num_layers, batch_size, num_hiddens)
         return out, state
+
 
 # Defined in file: ./chapter_recurrent-neural-networks/seq2seq.md
 class Seq2SeqDecoder(d2l.Decoder):
@@ -719,6 +759,7 @@ class Seq2SeqDecoder(d2l.Decoder):
         out = self.dense(out).swapaxes(0, 1)
         return out, state
 
+
 # Defined in file: ./chapter_recurrent-neural-networks/seq2seq.md
 class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
     # pred shape: (batch_size, seq_len, vocab_size)
@@ -729,6 +770,7 @@ class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
         weights = np.expand_dims(np.ones_like(label),axis=-1)
         weights = npx.sequence_mask(weights, valid_length, True, axis=1)
         return super(MaskedSoftmaxCELoss, self).forward(pred, label, weights)
+
 
 # Defined in file: ./chapter_recurrent-neural-networks/seq2seq.md
 def train_s2s_ch8(model, data_iter, lr, num_epochs, ctx):
@@ -758,6 +800,7 @@ def train_s2s_ch8(model, data_iter, lr, num_epochs, ctx):
     print('loss %.3f, %d tokens/sec on %s ' % (
         metric[0]/metric[1], metric[1]/timer.stop(), ctx))
 
+
 # Defined in file: ./chapter_recurrent-neural-networks/seq2seq.md
 def predict_s2s_ch8(model, src_sentence, src_vocab, tgt_vocab, num_steps, ctx):
     src_tokens = src_vocab[src_sentence.lower().split(' ')]
@@ -780,6 +823,7 @@ def predict_s2s_ch8(model, src_sentence, src_vocab, tgt_vocab, num_steps, ctx):
         predict_tokens.append(py)
     return ' '.join(tgt_vocab.to_tokens(predict_tokens))
 
+
 # Defined in file: ./chapter_attention-mechanism/attention.md
 def masked_softmax(X, valid_length):
     # X: 3-D tensor, valid_length: 1-D or 2-D tensor
@@ -795,6 +839,7 @@ def masked_softmax(X, valid_length):
         X = npx.sequence_mask(X.reshape(-1, shape[-1]), valid_length, True,
                               axis=1, value=-1e6)
         return npx.softmax(X).reshape(shape)
+
 
 # Defined in file: ./chapter_attention-mechanism/attention.md
 class DotProductAttention(nn.Block):
@@ -812,6 +857,7 @@ class DotProductAttention(nn.Block):
         scores = npx.batch_dot(query, key, transpose_b=True) / math.sqrt(d)
         attention_weights = self.dropout(masked_softmax(scores, valid_length))
         return npx.batch_dot(attention_weights, value)
+
 
 # Defined in file: ./chapter_attention-mechanism/attention.md
 class MLPAttention(nn.Block):  
@@ -834,10 +880,12 @@ class MLPAttention(nn.Block):
         attention_weights = self.dropout(masked_softmax(scores, valid_length))
         return npx.batch_dot(attention_weights, value)
 
+
 # Defined in file: ./chapter_optimization/optimization-intro.md
 def annotate(text, xy, xytext):
     d2l.plt.gca().annotate(text, xy=xy, xytext=xytext,
                            arrowprops=dict(arrowstyle='->'))
+
 
 # Defined in file: ./chapter_optimization/gd.md
 def train_2d(trainer):
@@ -863,6 +911,7 @@ def show_trace_2d(f, results):
     d2l.plt.xlabel('x1')
     d2l.plt.ylabel('x2')
 
+
 # Defined in file: ./chapter_optimization/minibatch-sgd.md
 def get_data_ch10(batch_size=10, n=1500):
     data = np.genfromtxt('../data/airfoil_self_noise.dat', dtype=np.float32, delimiter='\t')
@@ -870,6 +919,7 @@ def get_data_ch10(batch_size=10, n=1500):
     data_iter = d2l.load_array((data[:n, :-1], data[:n, -1]),
                                batch_size, is_train=True)
     return data_iter, data.shape[1]-1
+
 
 # Defined in file: ./chapter_optimization/minibatch-sgd.md
 def train_ch10(trainer_fn, states, hyperparams, data_iter,
@@ -899,6 +949,7 @@ def train_ch10(trainer_fn, states, hyperparams, data_iter,
     print('loss: %.3f, %.3f sec/epoch'%(animator.Y[0][-1], timer.avg()))
     return timer.cumsum(), animator.Y[0]
 
+
 # Defined in file: ./chapter_optimization/minibatch-sgd.md
 def train_gluon_ch10(trainer_name, trainer_hyperparams,
                      data_iter, num_epochs=2):
@@ -926,12 +977,14 @@ def train_gluon_ch10(trainer_name, trainer_hyperparams,
                 timer.start()
     print('loss: %.3f, %.3f sec/epoch'%(animator.Y[0][-1], timer.avg()))
 
+
 # Defined in file: ./chapter_computational-performance/multiple-gpus.md
 def split_batch(X, y, ctx_list):
     """Split X and y into multiple devices specified by ctx"""
     assert X.shape[0] == y.shape[0]
     return (gluon.utils.split_and_load(X, ctx_list),
             gluon.utils.split_and_load(y, ctx_list))
+
 
 # Defined in file: ./chapter_computational-performance/multiple-gpus-gluon.md
 def resnet18(num_classes):
@@ -971,6 +1024,7 @@ def evaluate_accuracy_gpus(net, data_iter):
                    labels.size)
     return metric[0]/metric[1]
 
+
 # Defined in file: ./chapter_computer-vision/image-augmentation.md
 def train_batch_ch12(net, features, labels, loss, trainer, ctx_list):
     Xs, ys = d2l.split_batch(features, labels, ctx_list)
@@ -983,6 +1037,7 @@ def train_batch_ch12(net, features, labels, loss, trainer, ctx_list):
     train_loss_sum = sum([float(l.sum()) for l in ls])
     train_acc_sum = sum(d2l.accuracy(py, y) for py, y in zip(pys, ys))
     return train_loss_sum, train_acc_sum
+
 
 # Defined in file: ./chapter_computer-vision/image-augmentation.md
 def train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs,
@@ -1009,6 +1064,7 @@ def train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs,
     print('%.1f exampes/sec on %s' % (
         metric[2]*num_epochs/timer.sum(), ctx_list))
 
+
 # Defined in file: ./chapter_computer-vision/bounding-box.md
 def bbox_to_rect(bbox, color):
     """Convert bounding box to matplotlib format."""
@@ -1018,6 +1074,7 @@ def bbox_to_rect(bbox, color):
     return d2l.plt.Rectangle(
         xy=(bbox[0], bbox[1]), width=bbox[2]-bbox[0], height=bbox[3]-bbox[1],
         fill=False, edgecolor=color, linewidth=2)
+
 
 # Defined in file: ./chapter_computer-vision/anchor.md
 def show_bboxes(axes, bboxes, labels=None, colors=None):
@@ -1040,6 +1097,7 @@ def show_bboxes(axes, bboxes, labels=None, colors=None):
                       va='center', ha='center', fontsize=9, color=text_color,
                       bbox=dict(facecolor=color, lw=0))
 
+
 # Defined in file: ./chapter_computer-vision/object-detection-dataset.md
 def download_pikachu(data_dir):
     root_url = ('https://apache-mxnet.s3-accelerate.amazonaws.com/'
@@ -1050,6 +1108,7 @@ def download_pikachu(data_dir):
     for k, v in dataset.items():
         gluon.utils.download(
             root_url + k, os.path.join(data_dir, k), sha1_hash=v)
+
 
 # Defined in file: ./chapter_computer-vision/object-detection-dataset.md
 def load_data_pikachu(batch_size, edge_size=256):
@@ -1068,6 +1127,7 @@ def load_data_pikachu(batch_size, edge_size=256):
         path_imgrec=os.path.join(data_dir, 'val.rec'), batch_size=batch_size,
         data_shape=(3, edge_size, edge_size), shuffle=False)
     return train_iter, val_iter
+
 
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
 def download_voc_pascal(data_dir='../data'):
@@ -1104,11 +1164,13 @@ VOC_COLORMAP = [[0, 0, 0], [128, 0, 0], [0, 128, 0], [128, 128, 0],
                 [0, 64, 0], [128, 64, 0], [0, 192, 0], [128, 192, 0],
                 [0, 64, 128]]
 
+
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
 VOC_CLASSES = ['background', 'aeroplane', 'bicycle', 'bird', 'boat',
                'bottle', 'bus', 'car', 'cat', 'chair', 'cow',
                'diningtable', 'dog', 'horse', 'motorbike', 'person',
                'potted plant', 'sheep', 'sofa', 'train', 'tv/monitor']
+
 
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
 def build_colormap2label():
@@ -1126,6 +1188,7 @@ def voc_label_indices(colormap, colormap2label):
     idx = ((colormap[:, :, 0] * 256 + colormap[:, :, 1]) * 256
            + colormap[:, :, 2])
     return colormap2label[idx]
+
 
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
 def voc_rand_crop(feature, label, height, width):
@@ -1166,6 +1229,7 @@ class VOCSegDataset(gluon.data.Dataset):
     def __len__(self):
         return len(self.features)
 
+
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
 def load_data_voc(batch_size, crop_size):
     """Download and load the VOC2012 semantic dataset."""
@@ -1178,6 +1242,7 @@ def load_data_voc(batch_size, crop_size):
         VOCSegDataset(False, crop_size, voc_dir), batch_size,
         last_batch='discard', num_workers=num_workers)
     return train_iter, test_iter
+
 
 # Defined in file: ./chapter_natural-language-processing/word2vec-data-set.md
 def read_ptb():
@@ -1217,6 +1282,7 @@ def get_centers_and_contexts(corpus, max_window_size):
             indices.remove(i)
             contexts.append([line[idx] for idx in indices])
     return centers, contexts
+
 
 # Defined in file: ./chapter_natural-language-processing/word2vec-data-set.md
 class RandomGenerator(object):
@@ -1265,6 +1331,7 @@ def batchify(data):
     return (np.array(centers).reshape(-1, 1), np.array(contexts_negatives),
             np.array(masks), np.array(labels))
 
+
 # Defined in file: ./chapter_natural-language-processing/word2vec-data-set.md
 def load_data_ptb(batch_size, max_window_size, num_noise_words):
     sentences = read_ptb()
@@ -1280,6 +1347,7 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
                                       batchify_fn=batchify)
     return data_iter, vocab
 
+
 # Defined in file: ./chapter_natural-language-processing/sentiment-analysis.md
 def download_imdb(data_dir='../data'):
     url = 'http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz'
@@ -1287,6 +1355,7 @@ def download_imdb(data_dir='../data'):
     with tarfile.open(fname, 'r') as f:
         f.extractall(data_dir)
         
+
 
 # Defined in file: ./chapter_natural-language-processing/sentiment-analysis.md
 def read_imdb(folder='train', data_dir='../data'):
@@ -1317,11 +1386,13 @@ def load_data_imdb(batch_size, num_steps=500):
                                is_train=False)
     return train_iter, test_iter, vocab
 
+
 # Defined in file: ./chapter_natural-language-processing/sentiment-analysis-rnn.md
 def predict_sentiment(net, vocab, sentence):
     sentence = np.array(vocab[sentence.split()], ctx=d2l.try_gpu())
     label = np.argmax(net(sentence.reshape(1, -1)), axis=1)
     return 'positive' if label == 1 else 'negative'
+
 
 # Defined in file: ./chapter_generative_adversarial_networks/gan.md
 def update_D(X, Z, net_D, net_G, loss, trainer_D):
@@ -1340,6 +1411,7 @@ def update_D(X, Z, net_D, net_G, loss, trainer_D):
     trainer_D.step(batch_size)
     return float(loss_D.sum())
 
+
 # Defined in file: ./chapter_generative_adversarial_networks/gan.md
 def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
     """Update generator"""
@@ -1354,4 +1426,5 @@ def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
     loss_G.backward()
     trainer_G.step(batch_size)
     return float(loss_G.sum())
+
 
