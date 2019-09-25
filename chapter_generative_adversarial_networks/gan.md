@@ -24,7 +24,7 @@ It then applies a function to generate $\mathbf x'=G(\mathbf z)$. The goal of th
 
 $$ \max - \log(1-D(\mathbf x')).$$
 
-If the discriminator does an almost perfect job, then $D(\mathbf x')\approx 1$ so the above loss is near 0, which results in gradients which are too small to make a good progress for the discriminator. So commonly we minimize the following loss
+If the discriminator does an almost perfect job, then $D(\mathbf x')\approx 1$ and the above loss is near 0. As a result, the gradients are too small to make a good progress. So commonly we minimize the following loss
 
 $$ \max \log(D(\mathbf x')), $$
 
