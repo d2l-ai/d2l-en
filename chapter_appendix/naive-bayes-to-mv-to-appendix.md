@@ -63,24 +63,10 @@ images, labels = mnist_train[10:38]
 images.shape, labels.shape
 ```
 
-Now let's create a function to visualize these examples.
+Now let's visualize these examples.
 
 ```{.python .input}
-# Save to the d2l package. 
-def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
-    """Plot a list of images."""
-    figsize = (num_cols * scale, num_rows * scale)
-    _, axes = d2l.plt.subplots(num_rows, num_cols, figsize=figsize)
-    axes = axes.flatten()
-    for i, (ax, img) in enumerate(zip(axes, imgs)):
-        ax.imshow(img.asnumpy())
-        ax.axes.get_xaxis().set_visible(False)
-        ax.axes.get_yaxis().set_visible(False)
-        if titles:
-            ax.set_title(titles[i])
-    return axes
-
-show_images(images, 2, 9);
+d2l.show_images(images, 2, 9);
 ```
 
 ## The Probabilistic Model for Classification
@@ -140,7 +126,7 @@ for y in range(10):
     n_x[y] = np.array(X.asnumpy()[Y.asnumpy()==y].sum(axis=0))
 P_xy = (n_x+1) / (n_y+1).reshape(10,1,1)
 
-show_images(P_xy, 2, 5);
+d2l.show_images(P_xy, 2, 5);
 ```
 
 By visualizing these $10\times 28\times 28$ probabilities (for each pixel for each class) we could get some mean looking digits.  ...
@@ -211,7 +197,7 @@ def predict(X):
 
 X, y = mnist_test[:18]
 preds = predict(X)
-show_images(X, 2, 9, titles=[str(d) for d in preds]);
+d2l.show_images(X, 2, 9, titles=[str(d) for d in preds]);
 ```
 
 Finally, let's compute the overall accuracy of the classifier.
