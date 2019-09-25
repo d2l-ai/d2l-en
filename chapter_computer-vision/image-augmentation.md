@@ -214,13 +214,6 @@ Now we train the model using image augmentation of random flipping left and righ
 train_with_data_aug(train_augs, test_augs, net)
 ```
 
-Compare to training without image augmentation.
-
-```{.python .input}
-net.initialize(init=init.Xavier(), ctx=ctx)                                                  
-train_with_data_aug(train_augs, test_augs, net)
-```
-
 ## Summary
 
 * Image augmentation generates random images based on existing training data to cope with overfitting.
