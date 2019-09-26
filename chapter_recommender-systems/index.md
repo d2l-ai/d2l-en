@@ -5,4 +5,8 @@
 :maxdepth: 2
 
 recsys-intro
+movielens
+mf
+autorec
 ```
+
