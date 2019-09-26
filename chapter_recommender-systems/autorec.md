@@ -74,9 +74,9 @@ Now, let's train and evaluate AutoRec on the MovieLens dataset. We can clearly s
 ctx = d2l.try_all_gpus()
 # Load the MovieLens 100K dataset.
 df, num_users, num_items = d2l.read_data()
-train_data, test_data = d2l.split_data(df)
-_, _, _, train_inter_mat = d2l.load_dataset(train_data)
-_, _, _, test_inter_mat = d2l.load_dataset(test_data)
+train_data, test_data = d2l.split_data(df, num_users, num_items)
+_, _, _, train_inter_mat = d2l.load_dataset(train_data, num_users, num_items)
+_, _, _, test_inter_mat = d2l.load_dataset(test_data, num_users, num_items)
 train_iter = gluon.data.DataLoader(train_inter_mat, shuffle=True, 
                                    last_batch="rollover", 
                                    batch_size=128)
