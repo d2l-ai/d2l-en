@@ -113,7 +113,7 @@ Afterwards, we put the above steps together and save it for further use. The res
 # Save to the d2l package
 def split_and_load_ml100k(split_mode="time-aware", feedback="explicit", 
                           test_size=0.1, batch_size=256):
-    data, num_users, num_items = read_data_ml100k()
+    data, num_users, num_items = read_data()
     train_data, test_data = split_data(data, split_mode, test_size)
     train_u, train_i, train_r, _ = load_dataset(train_data, feedback)
     test_u, test_i, test_r, _ = load_dataset(test_data, feedback) 
