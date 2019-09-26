@@ -154,7 +154,7 @@ class D_block(nn.Block):
 
 
 
-A basic block with default settings will halve the width and height of the inputs, as we demonstrated in :numref:`chapter_padding`. For example, given a input shape $n_h^{'} \times n_w^{'} = 16 \times 16$, with a kernel shape $k_h = k_w = 4$, a stride shape $s_h = s_w = 2$, and a padding shape $p_h = p_w = 1$, the output shape will be:
+A basic block with default settings will halve the width and height of the inputs, as we demonstrated in :numref:`chapter_padding`. For example, given a input shape $n_h = n_w = 16 $, with a kernel shape $k_h = k_w = 4$, a stride shape $s_h = s_w = 2$, and a padding shape $p_h = p_w = 1$, the output shape will be:
 
 $$
 \begin{aligned}
