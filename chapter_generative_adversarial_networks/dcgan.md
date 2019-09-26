@@ -70,7 +70,16 @@ class G_block(nn.Block):
         return self.activation(self.batch_norm(self.conv2d_trans(X)))
 ```
 
-In default, the transposed convolution layer uses a $4\times 4$ kernel, $2\times 2$ strides and $1\times 1$ padding. With a input size of $16 \times 16$, it will double input's width and height.
+In default, the transposed convolution layer uses a $k_h = k_w = 4$ kernel, a $s_h = s_w = 2$ strides, and a $p_h = p_w = 1$ padding. With a input shape of $n_h^{'} \times n_w^{'} = 16 \times 16$, the generator block will double input's width and height.
+
+$$
+\begin{aligned}
+n_h^{'} \times n_w^{'} &= [(n_h k_h - (n_h-1)(k_h-s_h)- 2p_h] \times [(n_w k_w - (n_w-1)(k_w-s_w)- 2p_w]\\
+  &= [(k_h + s_h (n_h-1)- 2p_h] \times [(k_w + s_w (n_w-1)- 2p_w]\\
+  &= [(4 + 2 \times (16-1)- 2 \times 1] \times [(4 + 2 \times (16-1)- 2 \times 1]\\
+  &= 32 \times 32 .\\
+\end{aligned}
+$$
 
 ```{.python .input  n=6}
 x = np.zeros((2, 3, 16, 16))
@@ -141,7 +150,16 @@ class D_block(nn.Block):
         return self.activation(self.batch_norm(self.conv2d(X)))
 ```
 
-A basic block with default settings will halve the width and height of the inputs. 
+
+A basic block with default settings will halve the width and height of the inputs, as we demonstrated in :numref:`chapter_padding`. For example, given a input shape $n_h = n_w = 16 $, with a kernel shape $k_h = k_w = 4$, a stride shape $s_h = s_w = 2$, and a padding shape $p_h = p_w = 1$, the output shape will be:
+
+$$
+\begin{aligned}
+n_h^{'} \times n_w^{'} &= \lfloor(n_h-k_h+2p_h+s_h)/s_h\rfloor \times \lfloor(n_w-k_w+2p_w+s_w)/s_w\rfloor\\
+  &= \lfloor(16-4+2\times 1+2)/2\rfloor \times \lfloor(16-4+2\times 1+2)/2\rfloor\\
+  &= 8 \times 8 .\\
+\end{aligned}
+$$
 
 ```{.python .input  n=12}
 x = np.zeros((2, 3, 16, 16))
