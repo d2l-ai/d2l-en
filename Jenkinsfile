@@ -38,7 +38,7 @@ stage("Build and Publish") {
       conda activate ${ENV_NAME}
       which rsvg-convert
       rsvg-convert --version
-      # d2lbook build pdf
+      d2lbook build pdf
       """
 
       sh label:"Build Package", script:"""set -ex
