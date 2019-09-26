@@ -19,6 +19,7 @@ import re
 import time
 import tarfile
 import zipfile
+import pandas as pd
 
 
 # Defined in file: ./chapter_preliminaries/probability.md
@@ -1392,6 +1393,122 @@ def predict_sentiment(net, vocab, sentence):
     sentence = np.array(vocab[sentence.split()], ctx=d2l.try_gpu())
     label = np.argmax(net(sentence.reshape(1, -1)), axis=1)
     return 'positive' if label == 1 else 'negative'
+
+
+# Defined in file: ./chapter_recommender-systems/movielens.md
+def read_data(path = "ml-100k/u.data", 
+                     names=['user_id','item_id','rating','timestamp'],
+                     sep="\t"):
+    fname = gluon.utils.download(
+        'http://files.grouplens.org/datasets/movielens/ml-100k.zip')
+    with zipfile.ZipFile(fname, 'r') as inzipfile:
+        inzipfile.extract(path)
+        data = pd.read_csv(path, sep=sep, names=names, engine='python')
+        num_users = data.user_id.unique().shape[0]
+        num_items = data.item_id.unique().shape[0]
+        return data, num_users, num_items
+
+
+# Defined in file: ./chapter_recommender-systems/movielens.md
+def split_data(data, num_users, num_items, 
+               split_mode="random", test_size = 0.1):
+    """Split the dataset in random mode or time-aware mode."""
+    if split_mode == "time-aware":
+        train_items, test_items, train_list = {}, {}, []
+        for line in data.itertuples():
+            u, i, rating, time = line[1], line[2], line[3], line[4]
+            train_items.setdefault(u,[]).append((u, i, rating, time))
+            if u not in test_items or test_items[u][-1] < time:
+                test_items[u] = (i, rating, time)
+        for u in range(1, num_users+1):
+            train_list.extend(sorted(train_items[u], key=lambda k: k[3]))
+        test_data = [(key, *value) for key, value in test_items.items()]
+        train_data = [item for item in train_list if item not in test_data]
+        train_data = pd.DataFrame(train_data)
+        test_data = pd.DataFrame(test_data)
+    else:
+        msk = [True if x == 1 else False for x in 
+        np.random.uniform(0, 1, (len(data))) < 1 - test_size]
+        neg_msk = [not x for x in msk]
+        train_data, test_data = data[msk], data[neg_msk]
+    return train_data, test_data
+
+
+# Defined in file: ./chapter_recommender-systems/movielens.md
+def load_dataset(data, num_users, num_items, feedback="explicit"):
+    users, items, scores = [], [], []
+    inter = np.zeros((num_items, num_users)) if feedback == "explicit" else {}
+    for line in data.itertuples():
+        user_index, item_index = int(line[1] - 1), int(line[2] - 1)
+        score = int(line[3]) if feedback == "explicit" else 1
+        users.append(user_index)
+        items.append(item_index)
+        scores.append(score)
+        if feedback == "implicit":
+            inter.setdefault(user_index, []).append(item_index)
+        else:
+            inter[item_index, user_index] = score
+    return users, items, scores, inter
+
+
+# Defined in file: ./chapter_recommender-systems/movielens.md
+def split_and_load_ml100k(split_mode="time-aware", feedback="explicit", 
+                          test_size=0.1, batch_size=256):
+    data, num_users, num_items = read_data()
+    train_data, test_data = split_data(data, num_users, num_items, 
+                                       split_mode, test_size)
+    train_u, train_i, train_r, _ = load_dataset(train_data, num_users, 
+                                                num_items, feedback)
+    test_u, test_i, test_r, _ = load_dataset(test_data, num_users, 
+                                             num_items, feedback) 
+    train_arraydataset = gluon.data.ArrayDataset(np.array(train_u), 
+                                                 np.array(train_i), 
+                                                 np.array(train_r))
+    test_arraydataset = gluon.data.ArrayDataset(np.array(test_u), 
+                                                 np.array(test_i), 
+                                                 np.array(test_r))
+    train_data = gluon.data.DataLoader(train_arraydataset, shuffle=True, 
+                                       last_batch="rollover", 
+                                       batch_size=batch_size)
+    test_data = gluon.data.DataLoader(test_arraydataset, 
+                                      batch_size=batch_size)
+
+    return num_users, num_items, train_data, test_data
+
+
+# Defined in file: ./chapter_recommender-systems/mf.md
+def train_explicit(net, train_iter, test_iter, loss, trainer, num_epochs, 
+                   ctx_list=d2l.try_all_gpus(), evaluator=None, **kwargs):
+    num_batches, timer = len(train_iter), d2l.Timer()
+    animator = d2l.Animator(xlabel='epoch', xlim=[0,num_epochs], ylim=[0,2],
+                            legend=['train loss','test RMSE'])
+    for epoch in range(num_epochs):
+        metric, l = d2l.Accumulator(3), 0.
+        for i, values in enumerate(train_iter):
+            timer.start()
+            input_data = []
+            values = values if isinstance(values, list) else [values]
+            for v in values:
+                input_data.append(gluon.utils.split_and_load(v, ctx_list))
+            train_feat = input_data[0:-1] if len(values) > 1 else input_data
+            train_label = input_data[-1]
+            with autograd.record():
+                preds = [net(*t) for t in zip(*train_feat)]
+                losses = [loss(p, s) for p, s in zip(preds, train_label)]
+            [l.backward() for l in losses]
+            l += sum([l.asnumpy() for l in losses]).mean() / len(ctx_list)
+            trainer.step(values[0].shape[0])
+            metric.add(l, values[0].shape[0], values[0].size)
+            timer.stop()
+        if len(kwargs) > 0:
+            test_acc = evaluator(net, test_iter, kwargs['inter_mat'],ctx_list)
+        else:
+            test_acc = evaluator(net, test_iter, ctx_list)
+        train_loss = l /(i+1)
+        animator.add(epoch+1, (train_loss, None, test_acc))
+    print('loss %.3f, test RMSE %.3f' % (metric[0]/metric[1], test_acc))
+    print('%.1f exampes/sec on %s' % (metric[2]*num_epochs/timer.sum(), 
+                                      ctx_list))
 
 
 # Defined in file: ./chapter_generative_adversarial_networks/gan.md
