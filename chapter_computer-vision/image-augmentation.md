@@ -196,27 +196,22 @@ def train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs,
 Now, we can define the `train_with_data_aug` function to use image augmentation to train the model. This function obtains all available GPUs and uses Adam as the optimization algorithm for training. It then applies image augmentation to the training data set, and finally calls the `train` function just defined to train and evaluate the model.
 
 ```{.python .input  n=18}
-def train_with_data_aug(train_augs, test_augs, lr=0.001):
-    batch_size, ctx, net = 256, d2l.try_all_gpus(), d2l.resnet18(10)
-    net.initialize(ctx=ctx, init=init.Xavier())
-    trainer = gluon.Trainer(net.collect_params(), 'adam',
-                            {'learning_rate': lr})
+batch_size, ctx, net = 256, d2l.try_all_gpus(), d2l.resnet18(10)                    
+net.initialize(init=init.Xavier(), ctx=ctx) 
+
+def train_with_data_aug(train_augs, test_augs, net, lr=0.001):                      
+    train_iter = load_cifar10(True, train_augs, batch_size)                         
+    test_iter = load_cifar10(False, test_augs, batch_size)                       
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
-    train_iter = load_cifar10(True, train_augs, batch_size)
-    test_iter = load_cifar10(False, test_augs, batch_size)
+    trainer = gluon.Trainer(net.collect_params(), 'adam',
+                            {'learning_rate': lr})                                  
     train_ch12(net, train_iter, test_iter, loss, trainer, 10, ctx)
 ```
 
 Now we train the model using image augmentation of random flipping left and right.
 
 ```{.python .input  n=19}
-train_with_data_aug(train_augs, test_augs)
-```
-
-Compare to training without image augmentation.
-
-```{.python .input}
-train_with_data_aug(test_augs, test_augs)
+train_with_data_aug(train_augs, test_augs, net)
 ```
 
 ## Summary
