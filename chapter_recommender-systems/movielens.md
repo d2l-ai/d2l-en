@@ -44,7 +44,7 @@ print('matrix sparsity: %f' % sparsity)
 print(data.head(5))
 ```
 
-We can see that each line consists of four columns, including user id (1-943), item id (1-1682), rating (1-5) and timestamp. We can construct an interaction matrix of size $\text{num_users} * \text{num_items}$.  This data set only records the existed ratings and most of the values in the interaction matrix are unknown as users have not rated the majority of movies. Clearly, the interaction matrix is extremely sparse (sparsity = 93.695%). The case in data sets from large scale real-world applications can be even worse, and data sparsity has been a long- standing challenge in building recommender systems.
+We can see that each line consists of four columns, including user id (1-943), item id (1-1682), rating (1-5) and timestamp. We can construct an interaction matrix of size num_users * num_items.  This data set only records the existed ratings and most of the values in the interaction matrix are unknown as users have not rated the majority of movies. Clearly, the interaction matrix is extremely sparse (sparsity = 93.695%). The case in data sets from large scale real-world applications can be even worse, and data sparsity has been a long- standing challenge in building recommender systems.
 
 We then plot the distribution of the count of different ratings. As expected, it appears to be a normal distribution, with most ratings beings that a movie was good but not amazing.
 
