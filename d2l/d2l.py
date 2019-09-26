@@ -1440,7 +1440,7 @@ def load_dataset(data, num_users, num_items, feedback="explicit"):
     inter = np.zeros((num_items, num_users)) if feedback == "explicit" else {}
     for line in data.itertuples():
         user_index, item_index = int(line[1] - 1), int(line[2] - 1)
-        score = int(line[3]) if type_feedback == "explicit" else 1
+        score = int(line[3]) if feedback == "explicit" else 1
         users.append(user_index)
         items.append(item_index)
         scores.append(score)
