@@ -28,7 +28,7 @@ with zipfile.ZipFile(fname) as f:
 pokemon = gluon.data.vision.datasets.ImageFolderDataset(data_dir+'pokemon')
 ```
 
-We resize each image into $64\times 64$. The `ToTensor` transformation will project the pixel value into $[0,1]$, while our generator will use the tanh function to obtain outputs in $[-1,1]$. Therefore we normalize the data with $1/2$ mean and $1/2$ variance to match the value range.
+We resize each image into $64\times 64$. The `ToTensor` transformation will project the pixel value into $[0,1]$, while our generator will use the tanh function to obtain outputs in $[-1,1]$. Therefore we normalize the data with $0.5$ mean and $0.5$ standard deviation to match the value range.
 
 ```{.python .input  n=3}
 batch_size = 256
@@ -54,7 +54,7 @@ for X, y in data_iter:
 
 ## The Generator
 
-The generator needs to map the noise variable $\mathbf z\in\mathbb R^d$, a length-$d$ vector, to a RGB image with both width and height to be 64. In :numref:`chapter_fcn` we introduced the fully convolutional network that uses transposed convolution layer (refer to :numref:`chapter_transposed_conv`) to enlarge input size. The basic block of the generator contains a transposed convolution layer followed by the batch normalization and ReLU activation.
+The generator needs to map the noise variable $\mathbf z\in\mathbb R^d$, a length-$d$ vector, to a RGB image with width and height to be $64\times 64$ . In :numref:`chapter_fcn` we introduced the fully convolutional network that uses transposed convolution layer (refer to :numref:`chapter_transposed_conv`) to enlarge input size. The basic block of the generator contains a transposed convolution layer followed by the batch normalization and ReLU activation.
 
 ```{.python .input  n=5}
 class G_block(nn.Block):
@@ -70,7 +70,7 @@ class G_block(nn.Block):
         return self.activation(self.batch_norm(self.conv2d_trans(X)))
 ```
 
-In default, the transposed convolution layer uses a $4\times 4$ kernel, $2\times 2$ strides and $1\times 1$ padding. It will double input's width and height.
+In default, the transposed convolution layer uses a $4\times 4$ kernel, $2\times 2$ strides and $1\times 1$ padding. With a input size of $16 \times 16$, it will double input's width and height.
 
 ```{.python .input  n=6}
 x = np.zeros((2, 3, 16, 16))
@@ -79,7 +79,7 @@ g_blk.initialize()
 g_blk(x).shape
 ```
 
-Changing strides to $1$ and padding to $0$ will lead to increase both input's width and height by 3.
+If changing the transposed convolution layer to a $4\times 4$ kernel, $1\times 1$ strides and zero padding. With a input size of $1 \times 1$, the output will have its width and height increased by 3 respectively.
 
 ```{.python .input  n=7}
 x = np.zeros((2, 3, 1, 1))
@@ -141,7 +141,7 @@ class D_block(nn.Block):
         return self.activation(self.batch_norm(self.conv2d(X)))
 ```
 
-A basic block will halve the width and height of the inputs.
+A basic block with default settings will halve the width and height of the inputs. 
 
 ```{.python .input  n=12}
 x = np.zeros((2, 3, 16, 16))
@@ -172,7 +172,7 @@ net_D(x).shape
 
 ## Training
 
-Compared to the basic GAN in :numref:`chapter_basic_gan`, we use the same learning rate for both generator and discriminator since they are similar to each other. In addition, we change $\beta_1$ in Adam (:numref:`chapter_adam`) from $0.9$ to $0.5$. It decreases the smoothness of the momentum, the exponentially weighted moving average of past gradients, to take care of the rapid changing gradients because the generator and the discriminator fight with each other. Besides, `Z` is a 4-D tensor and we are using GPU to accelerate the computation.
+Compared to the basic GAN in :numref:`chapter_basic_gan`, we use the same learning rate for both generator and discriminator since they are similar to each other. In addition, we change $\beta_1$ in Adam (:numref:`chapter_adam`) from $0.9$ to $0.5$. It decreases the smoothness of the momentum, the exponentially weighted moving average of past gradients, to take care of the rapid changing gradients because the generator and the discriminator fight with each other. Besides, the random generated noise `Z`, is a 4-D tensor and we are using GPU to accelerate the computation.
 
 ```{.python .input  n=20}
 def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
@@ -185,7 +185,7 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
     trainer_G = gluon.Trainer(net_G.collect_params(), 'adam', trainer_hp)
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[1, num_epochs], nrows=2, figsize=(5,5),
-                            legend=['generator', 'discriminator'])
+                            legend=['discriminator', 'generator'])
     animator.fig.subplots_adjust(hspace=0.3)
     for epoch in range(1, num_epochs+1):
         # Train one epoch
@@ -200,7 +200,7 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
                         batch_size)
         # Show generated examples
         Z = np.random.normal(0, 1, size=(21, latent_dim, 1, 1), ctx=ctx)
-        fake_x = net_G(Z).transpose(0,2,3,1)/2+0.5
+        fake_x = net_G(Z).transpose(0,2,3,1)/2+0.5  # Noramlize the synthetic data to N(0,1)
         imgs = np.concatenate(
             [np.concatenate([fake_x[i * 7 + j] for j in range(7)], axis=1)
              for i in range(len(fake_x)//7)], axis=0)
@@ -223,7 +223,7 @@ train(net_D, net_G, data_iter, num_epochs, lr, latent_dim)
 
 ## Summary
 
-* DCGAN architecture has four convolutional layers for the Discriminator and four “four fractionally-strided convolutions” layers for the Generator.
+* DCGAN architecture has four convolutional layers for the Discriminator and four "fractionally-strided" convolutional layers for the Generator.
 * The Discriminator is a 4-layer strided convolutions with batch normalization (except its input layer) and leaky ReLU activations. 
 * Leaky ReLU is a nonlinear function that give a non-zero output for a negative input. It aims to fix the “dying ReLU” problem and helps the gradients flow easier through the architecture.
 
