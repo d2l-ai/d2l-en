@@ -1473,6 +1473,41 @@ def split_and_load_ml100k(split_mode="time-aware", feedback="explicit",
     return num_users, num_items, train_data, test_data
 
 
+# Defined in file: ./chapter_recommender-systems/mf.md
+def train_explicit(net, train_iter, test_iter, loss, trainer, num_epochs, 
+                   ctx_list=d2l.try_all_gpus(), evaluator=None, **kwargs):
+    num_batches, timer = len(train_iter), d2l.Timer()
+    animator = d2l.Animator(xlabel='epoch', xlim=[0,num_epochs], ylim=[0,2],
+                            legend=['train loss','test RMSE'])
+    for epoch in range(num_epochs):
+        metric, l = d2l.Accumulator(3), 0.
+        for i, values in enumerate(train_iter):
+            timer.start()
+            input_data = []
+            values = values if isinstance(values, list) else [values]
+            for v in values:
+                input_data.append(gluon.utils.split_and_load(v, ctx_list))
+            train_feat = input_data[0:-1] if len(values) > 1 else input_data
+            train_label = input_data[-1]
+            with autograd.record():
+                preds = [net(*t) for t in zip(*train_feat)]
+                losses = [loss(p, s) for p, s in zip(preds, train_label)]
+            [l.backward() for l in losses]
+            l += sum([l.asnumpy() for l in losses]).mean() / len(ctx_list)
+            trainer.step(values[0].shape[0])
+            metric.add(l, values[0].shape[0], values[0].size)
+            timer.stop()
+        if len(kwargs) > 0:
+            test_acc = evaluator(net, test_iter, kwargs['inter_mat'],ctx_list)
+        else:
+            test_acc = evaluator(net, test_iter, ctx_list)
+        train_loss = l /(i+1)
+        animator.add(epoch+1, (train_loss, None, test_acc))
+    print('loss %.3f, test RMSE %.3f' % (metric[0]/metric[1], test_acc))
+    print('%.1f exampes/sec on %s' % (metric[2]*num_epochs/timer.sum(), 
+                                      ctx_list))
+
+
 # Defined in file: ./chapter_generative_adversarial_networks/gan.md
 def update_D(X, Z, net_D, net_G, loss, trainer_D):
     """Update discriminator"""

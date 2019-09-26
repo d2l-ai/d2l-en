@@ -6,5 +6,7 @@
 
 recsys-intro
 movielens
+mf
+autorec
 ```
 
