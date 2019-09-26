@@ -1,7 +1,12 @@
 # Information Theory
 :label:`chapter_information_theory`
 
-Machine learning, which studies how computer systems can use data to improve performance, is aimed to extract critical and interesting signals from data. While, information theory, which studies encoding, decoding, transmitting and manipulating information (aka data), can help us measure and compare how much information are presented in different signals. As a result, information theory provides a strong backbone to the fundamental of machine learning. For example, “cross entropy loss” is used as an objective function in many machine learning algorithms. This is a direct application of an information theory to measure the loss. In addition, in the rule-based learning algorithm (such as the decision tree algorithm), we can use entropy as a unit to quantify the amount of information gained from the best split at each node. In this section, we will talk about the most fundamental concept of information theory and its applications via several examples.
+Machine learning is aimed at extracting interesting signals from data and making critical predictions. While, information theory can help us measure and compare how much information are presented in different signals. As a result, information theory provides a strong backbone of fundamental machine learning.
+
+, which studies encoding, decoding, transmitting and manipulating information (aka data),
+
+
+ For example, “cross entropy loss” is used as an objective function in many machine learning algorithms. This is a direct application of an information theory to measure the loss. In addition, in the rule-based learning algorithm (such as the decision tree algorithm), we can use entropy as a unit to quantify the amount of information gained from the best split at each node. In this section, we will talk about the most fundamental concept of information theory and its applications via several examples.
 
 ## Information
 ### Motivation
