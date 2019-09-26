@@ -1396,9 +1396,8 @@ def predict_sentiment(net, vocab, sentence):
 
 
 # Defined in file: ./chapter_recommender-systems/movielens.md
-def read_data(path = "ml-100k/u.data", 
-                     names=['user_id','item_id','rating','timestamp'],
-                     sep="\t"):
+def read_data(path="ml-100k/u.data",
+              names=['user_id','item_id','rating','timestamp'], sep="\t"):
     fname = gluon.utils.download(
         'http://files.grouplens.org/datasets/movielens/ml-100k.zip')
     with zipfile.ZipFile(fname, 'r') as inzipfile:
@@ -1420,17 +1419,17 @@ def split_data(data, num_users, num_items,
             train_items.setdefault(u,[]).append((u, i, rating, time))
             if u not in test_items or test_items[u][-1] < time:
                 test_items[u] = (i, rating, time)
-        for u in range(1, num_users+1):
+        for u in range(1, num_users + 1):
             train_list.extend(sorted(train_items[u], key=lambda k: k[3]))
         test_data = [(key, *value) for key, value in test_items.items()]
         train_data = [item for item in train_list if item not in test_data]
         train_data = pd.DataFrame(train_data)
         test_data = pd.DataFrame(test_data)
     else:
-        msk = [True if x == 1 else False for x in 
-        np.random.uniform(0, 1, (len(data))) < 1 - test_size]
-        neg_msk = [not x for x in msk]
-        train_data, test_data = data[msk], data[neg_msk]
+        mask = [True if x == 1 else False for x in np.random.uniform(
+            0, 1, (len(data))) < 1 - test_size]
+        neg_mask = [not x for x in mask]
+        train_data, test_data = data[mask], data[neg_mask]
     return train_data, test_data
 
 
@@ -1455,24 +1454,21 @@ def load_dataset(data, num_users, num_items, feedback="explicit"):
 def split_and_load_ml100k(split_mode="time-aware", feedback="explicit", 
                           test_size=0.1, batch_size=256):
     data, num_users, num_items = read_data()
-    train_data, test_data = split_data(data, num_users, num_items, 
-                                       split_mode, test_size)
-    train_u, train_i, train_r, _ = load_dataset(train_data, num_users, 
-                                                num_items, feedback)
-    test_u, test_i, test_r, _ = load_dataset(test_data, num_users, 
-                                             num_items, feedback) 
-    train_arraydataset = gluon.data.ArrayDataset(np.array(train_u), 
-                                                 np.array(train_i), 
-                                                 np.array(train_r))
-    test_arraydataset = gluon.data.ArrayDataset(np.array(test_u), 
-                                                 np.array(test_i), 
-                                                 np.array(test_r))
-    train_data = gluon.data.DataLoader(train_arraydataset, shuffle=True, 
-                                       last_batch="rollover", 
-                                       batch_size=batch_size)
-    test_data = gluon.data.DataLoader(test_arraydataset, 
-                                      batch_size=batch_size)
-
+    train_data, test_data = split_data(
+        data, num_users, num_items, split_mode, test_size)
+    train_u, train_i, train_r, _ = load_dataset(
+        train_data, num_users, num_items, feedback)
+    test_u, test_i, test_r, _ = load_dataset(
+        test_data, num_users, num_items, feedback) 
+    train_arraydataset = gluon.data.ArrayDataset(
+        np.array(train_u), np.array(train_i), np.array(train_r))
+    test_arraydataset = gluon.data.ArrayDataset(
+        np.array(test_u), np.array(test_i), np.array(test_r))
+    train_data = gluon.data.DataLoader(
+        train_arraydataset, shuffle=True, last_batch="rollover",
+        batch_size=batch_size)
+    test_data = gluon.data.DataLoader(
+        test_arraydataset, batch_size=batch_size)
     return num_users, num_items, train_data, test_data
 
 

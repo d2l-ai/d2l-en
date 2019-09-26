@@ -1,28 +1,27 @@
-#  Exploring the MovieLens Dataset
+#  MovieLens Dataset
 
-There are a number of data sets available for recommendation research. The [MovieLens](https://movielens.org/) data set is probably the most popular one. MovieLens is a non-commercial web-based movie recommender system, created in1997 and run by GroupLens, a research lab at the University of Minnesota, in order to gather movie rating data for research use.  MovieLens data has been critical for several research studies including personalized recommendation and social psychology.  
+There are a number of datasets that are available for recommendation research. Among then, the [MovieLens](https://movielens.org/) dataset is probably the most popular one. MovieLens is a non-commercial web-based movie recommender system, created in 1997 and run by GroupLens, a research lab at the University of Minnesota, in order to gather movie rating data for research use.  MovieLens data has been critical for several research studies including personalized recommendation and social psychology.
 
 
-## Getting the data
+## Getting the Data
 
-The MovieLens data set is hosted by the [GroupLens](https://grouplens.org/datasets/movielens/) website. Several versions are available. We will use the MovieLens 100K Dataset.   This data set is comprised of 100,000 ratings, ranging from 1 to 5 stars, from 943 users on 1682 movies. It has been cleaned up so that each user has rated at least 20 movies. Some simple demographic information such as age, gender, genres for the users and items are also available.  We can download the [ml-100k.zip](http://files.grouplens.org/datasets/movielens/ml-100k.zip) and extract the u.data file, which contains all the 100,000 ratings in csv format. There are many other files in the folder, a detailed description for each file can be found in the [ReadMe](http://files.grouplens.org/datasets/movielens/ml-100k-README.txt) file of the dataset. 
+The MovieLens dataset is hosted by the [GroupLens](https://grouplens.org/datasets/movielens/) website. Several versions are available. We will use the MovieLens 100K dataset.  This dataset is comprised of 100,000 ratings, ranging from 1 to 5 stars, from 943 users on 1682 movies. It has been cleaned up so that each user has rated at least 20 movies. Some simple demographic information such as age, gender, genres for the users and items are also available.  We can download the [ml-100k.zip](http://files.grouplens.org/datasets/movielens/ml-100k.zip) and extract the `u.data` file, which contains all the 100,000 ratings in the csv format. There are many other files in the folder, a detailed description for each file can be found in the [README](http://files.grouplens.org/datasets/movielens/ml-100k-README.txt) file of the dataset. 
 
-At first, we import libraries that are needed.
+To begin with, let us import the packages required to run this section’s experiments.
 
 ```{.python .input  n=2}
 import d2l
+from mxnet import gluon, np, npx
 import pandas as pd
 import zipfile
-from mxnet import gluon, np, npx 
 ```
 
 Then, we download the MovieLens 100k dataset and load the interactions as `DataFrame`.
 
 ```{.python .input  n=3}
 # Save to the d2l package
-def read_data(path = "ml-100k/u.data", 
-                     names=['user_id','item_id','rating','timestamp'],
-                     sep="\t"):
+def read_data(path="ml-100k/u.data",
+              names=['user_id','item_id','rating','timestamp'], sep="\t"):
     fname = gluon.utils.download(
         'http://files.grouplens.org/datasets/movielens/ml-100k.zip')
     with zipfile.ZipFile(fname, 'r') as inzipfile:
@@ -34,7 +33,8 @@ def read_data(path = "ml-100k/u.data",
 ```
 
 ## Statistics of the Dataset
-Let's load up the data and inspect the first five records manually. It is an effective way to learn about the data structure and verify that they have been loaded properly.
+
+Let us load up the data and inspect the first five records manually. It is an effective way to learn the data structure and verify that they have been loaded properly.
 
 ```{.python .input  n=4}
 data, num_users, num_items = read_data()
@@ -44,7 +44,7 @@ print('matrix sparsity: %f' % sparsity)
 print(data.head(5))
 ```
 
-We can see that each line consists of four columns, including user id (1-943), item id (1-1682), rating (1-5) and timestamp. We can construct an interaction matrix of size num_users * num_items.  This data set only records the existed ratings and most of the values in the interaction matrix are unknown as users have not rated the majority of movies. Clearly, the interaction matrix is extremely sparse (sparsity = 93.695%). The case in data sets from large scale real-world applications can be even worse, and data sparsity has been a long- standing challenge in building recommender systems.
+We can see that each line consists of four columns, including "user id" (1--943), "item id" (1--1682), "rating" (1--5) and "timestamp". We can construct an interaction matrix of size $n \times m$, where $n$ and $m$ are the number of users and the number of items respectively. This dataset only records the existing ratings and most of the values in the interaction matrix are unknown as users have not rated the majority of movies. Clearly, the interaction matrix is extremely sparse (sparsity = 93.695%). The case in datasets from large scale real-world applications can be even worse, and data sparsity has been a long-standing challenge in building recommender systems.
 
 We then plot the distribution of the count of different ratings. As expected, it appears to be a normal distribution, with most ratings beings that a movie was good but not amazing.
 
@@ -56,9 +56,9 @@ d2l.plt.title("Distribution of Ratings in MovieLens 100K")
 d2l.plt.show()
 ```
 
-## Splitting the data
+## Splitting the dataset
 
-Then, we split the dataset into training and test sets. The following function provides two split modes including `random` and `time-aware`. In the `time-aware` mode, we leave out the latest rated item of each user for test and the rest for training. In the `random` mode, it splits the data set randomly and uses the 90% of the data as training samples and the rest 10% as test samples by default.
+Then, we split the dataset into training and test sets. The following function provides two split modes including `random` and `time-aware`. In the `time-aware` mode, we leave out the latest rated item of each user for test and the rest for training. In the `random` mode, the function splits the dataset randomly and uses the 90% of the data as training samples and the rest 10% as test samples by default.
 
 ```{.python .input  n=6}
 # Save to the d2l package
@@ -72,22 +72,23 @@ def split_data(data, num_users, num_items,
             train_items.setdefault(u,[]).append((u, i, rating, time))
             if u not in test_items or test_items[u][-1] < time:
                 test_items[u] = (i, rating, time)
-        for u in range(1, num_users+1):
+        for u in range(1, num_users + 1):
             train_list.extend(sorted(train_items[u], key=lambda k: k[3]))
         test_data = [(key, *value) for key, value in test_items.items()]
         train_data = [item for item in train_list if item not in test_data]
         train_data = pd.DataFrame(train_data)
         test_data = pd.DataFrame(test_data)
     else:
-        msk = [True if x == 1 else False for x in 
-        np.random.uniform(0, 1, (len(data))) < 1 - test_size]
-        neg_msk = [not x for x in msk]
-        train_data, test_data = data[msk], data[neg_msk]
+        mask = [True if x == 1 else False for x in np.random.uniform(
+            0, 1, (len(data))) < 1 - test_size]
+        neg_mask = [not x for x in mask]
+        train_data, test_data = data[mask], data[neg_mask]
     return train_data, test_data
 ```
 
 ## Loading the data
-After dataset splitting, we will convert the training set and test set into lists and dictionaries/matrix for the sake of convienience. The following function reads the dataframe line by line and make the index of users/items start from zero, and returns lists of users, items, ratings and a dictiobnary/matrix that records the interactions. We can specify the type of feedback to either `explicit` or `implicit`.
+
+After dataset splitting, we will convert the training set and test set into lists and dictionaries/matrix for the sake of convenience. The following function reads the dataframe line by line and make the index of users/items start from zero. The function then returns lists of users, items, ratings and a dictionary/matrix that records the interactions. We can specify the type of feedback to either `explicit` or `implicit`.
 
 ```{.python .input  n=25}
 # Save to the d2l package
@@ -107,38 +108,38 @@ def load_dataset(data, num_users, num_items, feedback="explicit"):
     return users, items, scores, inter
 ```
 
-Afterwards, we put the above steps together and save it for further use. The results are wrapped with gluon `Dataset` and `DataLoader`. Note that the `last_batch` of `DataLoader` for training data is set to the `rollover` mode and orders are shuffled.
+Afterwards, we put the above steps together and save it for further use. The results are wrapped with `Dataset` and `DataLoader`. Note that the `last_batch` of `DataLoader` for training data is set to the `rollover` mode and orders are shuffled.
 
 ```{.python .input  n=26}
 # Save to the d2l package
 def split_and_load_ml100k(split_mode="time-aware", feedback="explicit", 
                           test_size=0.1, batch_size=256):
     data, num_users, num_items = read_data()
-    train_data, test_data = split_data(data, num_users, num_items, 
-                                       split_mode, test_size)
-    train_u, train_i, train_r, _ = load_dataset(train_data, num_users, 
-                                                num_items, feedback)
-    test_u, test_i, test_r, _ = load_dataset(test_data, num_users, 
-                                             num_items, feedback) 
-    train_arraydataset = gluon.data.ArrayDataset(np.array(train_u), 
-                                                 np.array(train_i), 
-                                                 np.array(train_r))
-    test_arraydataset = gluon.data.ArrayDataset(np.array(test_u), 
-                                                 np.array(test_i), 
-                                                 np.array(test_r))
-    train_data = gluon.data.DataLoader(train_arraydataset, shuffle=True, 
-                                       last_batch="rollover", 
-                                       batch_size=batch_size)
-    test_data = gluon.data.DataLoader(test_arraydataset, 
-                                      batch_size=batch_size)
-
+    train_data, test_data = split_data(
+        data, num_users, num_items, split_mode, test_size)
+    train_u, train_i, train_r, _ = load_dataset(
+        train_data, num_users, num_items, feedback)
+    test_u, test_i, test_r, _ = load_dataset(
+        test_data, num_users, num_items, feedback) 
+    train_arraydataset = gluon.data.ArrayDataset(
+        np.array(train_u), np.array(train_i), np.array(train_r))
+    test_arraydataset = gluon.data.ArrayDataset(
+        np.array(test_u), np.array(test_i), np.array(test_r))
+    train_data = gluon.data.DataLoader(
+        train_arraydataset, shuffle=True, last_batch="rollover",
+        batch_size=batch_size)
+    test_data = gluon.data.DataLoader(
+        test_arraydataset, batch_size=batch_size)
     return num_users, num_items, train_data, test_data
 ```
 
-## Summary 
+## Summary
+
 * MovieLens datasets are widely used for recommendation research. It is public available and free to use.
 * We downloaded and preprocessed the MovieLens 100k dataset for further use in later sections. 
 
+
 ## Exercise
+
 * What other similar recommendation datasets can you find?
 * Read the README file of the MovieLens datasets.
