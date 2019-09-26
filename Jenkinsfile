@@ -36,8 +36,6 @@ stage("Build and Publish") {
 
       sh label:"Build PDF", script:"""set -ex
       conda activate ${ENV_NAME}
-      which rsvg-convert
-      rsvg-convert --version
       d2lbook build pdf
       """
 
@@ -55,7 +53,7 @@ stage("Build and Publish") {
       if (env.BRANCH_NAME == 'numpy2') {
         sh label:"Publish", script:"""set -ex
         conda activate ${ENV_NAME}
-        d2lbook deploy html pkg # pdf
+        d2lbook deploy html pdf pkg
       """
       }
 	}
