@@ -97,7 +97,10 @@ If unfortunately something went wrong, please check
 Before installing `mxnet`, please first check if you are able to access GPUs. If so, please go to :ref:`sec_gpu` for instructions to install a GPU-supported `mxnet`. Otherwise, you can install the CPU version, which is still good enough for the first few chapters.
 
 ```
-# For Linux and macOS users (Windows support coming soon)
+# For Windows users
+pip install mxnet==1.6.0b20190926
+
+# For Linux and macOS users
 pip install mxnet==1.6.0b20190915
 ```
 
@@ -136,7 +139,10 @@ pip uninstall mxnet
 Then we need to find the CUDA version you installed. You may check it through `nvcc --version` or `cat /usr/local/cuda/version.txt`. Assume you have installed CUDA 10.1, then you can install the according MXNet version by
 
 ```
-# For Linux and macOS users (Windows support coming soon)
+# For Windows users
+pip install mxnet-cu101==1.6.0b20190926
+
+# For Linux and macOS users
 pip install mxnet-cu101==1.6.0b20190915
 ```
 
