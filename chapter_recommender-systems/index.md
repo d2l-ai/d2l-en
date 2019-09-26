@@ -5,4 +5,6 @@
 :maxdepth: 2
 
 recsys-intro
+movielens
 ```
+

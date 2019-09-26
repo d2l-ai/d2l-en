@@ -268,6 +268,7 @@ import re
 import time
 import tarfile
 import zipfile
+import pandas as pd
 ```
 
 We give a detailed overview of these functions and classes in :numref:`chapter_d2l`.
