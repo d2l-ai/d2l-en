@@ -141,7 +141,7 @@ lr, num_epochs, wd, optimizer = 0.001, 25, 1e-5, 'adam'
 loss = gluon.loss.L2Loss()
 trainer = gluon.Trainer(net.collect_params(), optimizer, 
                         {"learning_rate": lr, 'wd': wd})
-train_explicit(net, train_iter, test_iter, loss, trainer, num_epochs, ctx, 
+train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs, ctx, 
                evaluator)
 ```
 
