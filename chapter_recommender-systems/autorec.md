@@ -10,15 +10,19 @@ Autorec differs from traditional autoencoder in that autorec focuses on the outp
 There are two variants of Autorec, user and item based Autorec. For the sake of brevity, we only introduce the item based AutoRec. User based AutoRec can be derived accordingly.
 
 Let $\mathbf{R}_{*i}$ denote the $i^{th}$ column of the rating matrix. The unknown ratings  are set to zeros by default. The neural architecture is defined as:
+
 $$
 h(\mathbf{R}_{*i}) = f(\mathbf{W} \cdot g(\mathbf{V} \mathbf{R}_{*i} + \mu) + b)
 $$
+
 where $f(\cdot)$ and $g(\cdot)$ represent activation functions. $\mathbf{W}$ and $\mathbf{V}$ are weight matrices, $\mu$ and $b$ are biases. The output $h(\mathbf{R}_{*i})$ is the reconstruction of the $i^{th}$ column of the rating matrix.
 
-The following objective function aims to minimize the reconstruction error .
+The following objective function aims to minimize the reconstruction error.
+
 $$
 \underset{\mathbf{W},\mathbf{V},\mu, b}{\arg \min} \sum_{i=1}^M{\parallel \mathbf{R}_{*i} - h(\mathbf{R}_{*i})\parallel_{\mathcal{O}}^2} +\lambda(\parallel \mathbf{W} \parallel_F^2 + \parallel \mathbf{V}\parallel_F^2)
 $$
+
 where $\parallel \cdot \parallel_{\mathcal{O}}$ means only the contribution of observed ratings are considered, that is, only weights that are associated with observed inputs are updated during backpropagation.
 
 ```{.python .input  n=1}
