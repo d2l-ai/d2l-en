@@ -9,12 +9,12 @@ a lot of attention and created the hype of recommender system research. Later on
 
 Matrix factorization is a class of collaborative filtering algorithms. Simply put, this algorithm factorizes the user-item interaction matrix into the product of two lower-rank matrices.  Let $\mathbf{R}  \in \mathbb{R}^{M \times N}$ denote the interaction matrix with $M$ users and $N$ items, and the values of $\mathbf{R}$ represent explicit ratings. It will be factorized into a user latent matrix $\mathbf{P} \in \mathbb{R}^{M \times k}$ and an item latent matrix $\mathbf{Q} \in \mathbb{R}^{N \times k}$, where $k \ll M, N$.  These factors might measure obvious dimensions such as movies' genres or are completely uninterpretable.  For a given item $i$, the elements of $\mathbf{Q}_i$ measure the extent to which the item possesses those characteristics. For a given user $u$, the elements of $\mathbf{P}_u$ measure the extent of interest the user has in items' corresponding characteristics.  The predicted ratings can be estimated by 
 
-$$\hat{\mathbf{R}} = \mathbf{PQ}^T$$
+$$\hat{\mathbf{R}} = \mathbf{PQ}^\top$$
 
 One major problem of this prediction rule is that users/items biases can not be modeled. For example, some users tend to give higher ratings or some items always get lower ratings due to poorer quality. These biases are commonplace in real-world applications. To capture these biases, user specific and item specific bias terms are introduced. Specifically, the predicted rating user $u$ gives to item $i$ is calculated by
 
 $$
-\hat{\mathbf{R}}_{ui} = \mathbf{P}_u\mathbf{Q}^T_i + b_u + b_i
+\hat{\mathbf{R}}_{ui} = \mathbf{P}_u\mathbf{Q}^\top_i + b_u + b_i
 $$
 
 Then, we train this model by minimizing the mean squared error between predicted rating scores and real rating scores.  The objective function is defined as follows:
@@ -35,6 +35,8 @@ An intuitive illustration of the matrix factorization algorithm is shown below:
 In the rest of this section, we will explain the implementation of matrix factorization and train the model on the MovieLens dataset.
 
 ```{.python .input  n=1}
+import sys
+sys.path.insert(0, '..')
 import d2l
 from mxnet import autograd, init, gluon, np, npx
 from mxnet.gluon import nn
@@ -72,7 +74,7 @@ $$
 \mathrm{RMSE} = \sqrt{\frac{1}{|\mathcal{T}|}\sum_{(u,i) \in \mathcal{T}}(\mathbf{R}_{ui} -\hat{\mathbf{R}}_{ui})^2}
 $$
 
-where $\mathcal{T}$ is the test set. We can use the RMSE function provided by `mx.metric`.
+where $\mathcal{T}$ is the set consisting of pairs of users and items that you want to evaluate on. We can use the RMSE function provided by `mx.metric`.
 
 ```{.python .input  n=3}
 def evaluator(net, test_iter, ctx):

@@ -1396,20 +1396,21 @@ def predict_sentiment(net, vocab, sentence):
 
 
 # Defined in file: ./chapter_recommender-systems/movielens.md
-def read_data(path="ml-100k/u.data",
+def read_data_ml100k(path="../data/", member="ml-100k/u.data",
               names=['user_id','item_id','rating','timestamp'], sep="\t"):
     fname = gluon.utils.download(
-        'http://files.grouplens.org/datasets/movielens/ml-100k.zip')
+        'http://files.grouplens.org/datasets/movielens/ml-100k.zip',
+    path=path)
     with zipfile.ZipFile(fname, 'r') as inzipfile:
-        inzipfile.extract(path)
-        data = pd.read_csv(path, sep=sep, names=names, engine='python')
+        inzipfile.extract(member, path)
+        data = pd.read_csv(path + member, sep, names=names, engine='python')
         num_users = data.user_id.unique().shape[0]
         num_items = data.item_id.unique().shape[0]
         return data, num_users, num_items
 
 
 # Defined in file: ./chapter_recommender-systems/movielens.md
-def split_data(data, num_users, num_items, 
+def split_data_ml100k(data, num_users, num_items, 
                split_mode="random", test_size = 0.1):
     """Split the dataset in random mode or time-aware mode."""
     if split_mode == "time-aware":
@@ -1434,7 +1435,7 @@ def split_data(data, num_users, num_items,
 
 
 # Defined in file: ./chapter_recommender-systems/movielens.md
-def load_dataset(data, num_users, num_items, feedback="explicit"):
+def load_data_ml100k(data, num_users, num_items, feedback="explicit"):
     users, items, scores = [], [], []
     inter = np.zeros((num_items, num_users)) if feedback == "explicit" else {}
     for line in data.itertuples():
@@ -1451,14 +1452,14 @@ def load_dataset(data, num_users, num_items, feedback="explicit"):
 
 
 # Defined in file: ./chapter_recommender-systems/movielens.md
-def split_and_load_ml100k(split_mode="time-aware", feedback="explicit", 
+def split_and_load_ml100k(split_mode="seq-aware", feedback="explicit", 
                           test_size=0.1, batch_size=256):
-    data, num_users, num_items = read_data()
-    train_data, test_data = split_data(
+    data, num_users, num_items = read_data_ml100k()
+    train_data, test_data = split_data_ml100k(
         data, num_users, num_items, split_mode, test_size)
-    train_u, train_i, train_r, _ = load_dataset(
+    train_u, train_i, train_r, _ = load_data_ml100k(
         train_data, num_users, num_items, feedback)
-    test_u, test_i, test_r, _ = load_dataset(
+    test_u, test_i, test_r, _ = load_data_ml100k(
         test_data, num_users, num_items, feedback) 
     train_arraydataset = gluon.data.ArrayDataset(
         np.array(train_u), np.array(train_i), np.array(train_r))
