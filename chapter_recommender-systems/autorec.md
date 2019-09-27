@@ -1,6 +1,6 @@
 # AutoRec: An Autoencoder Framework for Rating Prediction
 
-Although the matrix factorization model achieves decent performances on the rating prediction task, it is essentially a linear model. Such models are not capable of capturing complex nonlinear and intricate relationships that may be predictive of users' preferences. In this section, we introduce a nonlinear neural network collaborative filtering model, AutoRec, that identifies collaborative filtering as an autoencoder architecture. This model aims to integrate nonlinear transformations into CF on the basis of explicit feedback.  Neural networks have been proven to be capable of approximating any continuous function,  making it suitable to address this limitation and enrich the expressiveness of matrix factorization.   
+Although the matrix factorization model achieves decent performances on the rating prediction task, it is essentially a linear model. Such models are not capable of capturing complex nonlinear and intricate relationships that may be predictive of users' preferences. In this section, we introduce a nonlinear neural network collaborative filtering model, AutoRec, that identifies collaborative filtering as an autoencoder architecture. This model aims to integrate nonlinear transformations into CF on the basis of explicit feedback. Neural networks have been proven to be capable of approximating any continuous function,  making it suitable to address this limitation and enrich the expressiveness of matrix factorization.   
 
 This model has the same structure as autoencoder which consists of an input layer, a hidden layer and a reconstruction (output) layer.  An autoencoder is a neural network that learns to copy its input to its output in order to code the inputs into the hidden and usually low dimensional representations. In AutoRec, instead of explicitly embedding users/items into a low-dimensional space, it uses the column/row of the interaction matrix as input, then reconstructs the interaction matrix in the output layer.
 
@@ -73,7 +73,7 @@ def evaluator(network, inter_matrix,  test_data, ctx):
 ## Training and Evaluating the Model
 Now, let's train and evaluate AutoRec on the MovieLens dataset. We can clearly see that the test RMSE is lower than the matrix factorization model, confirming the effectiveness of neural networks in the rating prediction task.
 
-```{.python .input  n=5}
+```{.python .input  n=4}
 ctx = d2l.try_all_gpus()
 # Load the MovieLens 100K dataset.
 df, num_users, num_items = d2l.read_data_ml100k()

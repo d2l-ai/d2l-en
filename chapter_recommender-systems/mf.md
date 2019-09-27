@@ -134,7 +134,7 @@ Finally,  let's put all things together and train the model. Here, we set the la
 ```{.python .input  n=5}
 ctx = d2l.try_all_gpus()
 num_users, num_items, train_iter, test_iter = d2l.split_and_load_ml100k(
-    test_size=0.1, batch_size=128)
+    test_ratio=0.1, batch_size=128)
 net = MF(50, num_users, num_items)
 net.initialize(ctx=ctx, force_reinit=True, init = mx.init.Normal(0.01))
 lr, num_epochs, wd, optimizer = 0.001, 25, 1e-5, 'adam'

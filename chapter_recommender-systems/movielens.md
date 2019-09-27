@@ -1,6 +1,6 @@
 #  MovieLens Dataset
 
-There are a number of datasets that are available for recommendation research. Among then, the [MovieLens](https://movielens.org/) dataset is probably the most popular one. MovieLens is a non-commercial web-based movie recommender system, created in 1997 and run by GroupLens, a research lab at the University of Minnesota, in order to gather movie rating data for research use.  MovieLens data has been critical for several research studies including personalized recommendation and social psychology.
+There are a number of datasets that are available for recommendation research. Among then, the [MovieLens](https://movielens.org/) dataset is probably the most popular one. MovieLens is a non-commercial web-based movie recommender system. It is created in 1997 and run by GroupLens, a research lab at the University of Minnesota, in order to gather movie rating data for research use.  MovieLens data has been critical for several research studies including personalized recommendation and social psychology.
 
 
 ## Getting the Data
@@ -9,7 +9,7 @@ The MovieLens dataset is hosted by the [GroupLens](https://grouplens.org/dataset
 
 To begin with, let us import the packages required to run this section’s experiments.
 
-```{.python .input  n=2}
+```{.python .input  n=1}
 import d2l
 from mxnet import gluon, np, npx
 import pandas as pd
@@ -18,7 +18,7 @@ import zipfile
 
 Then, we download the MovieLens 100k dataset and load the interactions as `DataFrame`.
 
-```{.python .input  n=3}
+```{.python .input  n=2}
 # Save to the d2l package
 def read_data_ml100k(path="../data/", member="ml-100k/u.data",
               names=['user_id','item_id','rating','timestamp'], sep="\t"):
@@ -37,7 +37,7 @@ def read_data_ml100k(path="../data/", member="ml-100k/u.data",
 
 Let us load up the data and inspect the first five records manually. It is an effective way to learn the data structure and verify that they have been loaded properly.
 
-```{.python .input  n=4}
+```{.python .input  n=3}
 data, num_users, num_items = read_data_ml100k()
 sparsity = 1 - len(data) / (num_users * num_items)
 print('number of users: %d, number of items: %d.'%(num_users, num_items))
@@ -45,11 +45,11 @@ print('matrix sparsity: %f' % sparsity)
 print(data.head(5))
 ```
 
-We can see that each line consists of four columns, including "user id" (1--943), "item id" (1--1682), "rating" (1--5) and "timestamp". We can construct an interaction matrix of size $n \times m$, where $n$ and $m$ are the number of users and the number of items respectively. This dataset only records the existing ratings and most of the values in the interaction matrix are unknown as users have not rated the majority of movies. Clearly, the interaction matrix is extremely sparse (sparsity = 93.695%). The case in datasets from large scale real-world applications can be even worse, and data sparsity has been a long-standing challenge in building recommender systems.
+We can see that each line consists of four columns, including "user id" (1--943), "item id" (1--1682), "rating" (1--5) and "timestamp". We can construct an interaction matrix of size $n \times m$, where $n$ and $m$ are the number of users and the number of items respectively. This dataset only records the existing ratings and most of the values in the interaction matrix are unknown as users have not rated the majority of movies. We alsoe show the sparsity of this dataset. The sparsity is defined as `1 - number of nonzero entries / ( number of users * number of items)`. Clearly, the interaction matrix is extremely sparse (sparsity = 93.695%). The case in datasets from large scale real-world applications can be even worse, and data sparsity has been a long-standing challenge in building recommender systems. A viable solution is to use additional information such as user/item features to allievate the sparsity.
 
-We then plot the distribution of the count of different ratings. As expected, it appears to be a normal distribution, with most ratings beings that a movie was good but not amazing.
+We then plot the distribution of the count of different ratings. As expected, it appears to be a normal distribution, with most ratings centered at 3-4.
 
-```{.python .input  n=5}
+```{.python .input  n=4}
 d2l.plt.hist(data['rating'], bins=5, ec='black')
 d2l.plt.xlabel("Rating")
 d2l.plt.ylabel("Count")
@@ -59,14 +59,14 @@ d2l.plt.show()
 
 ## Splitting the dataset
 
-Then, we split the dataset into training and test sets. The following function provides two split modes including `random` and `time-aware`. In the `time-aware` mode, we leave out the latest rated item of each user for test and the rest for training. In the `random` mode, the function splits the dataset randomly and uses the 90% of the data as training samples and the rest 10% as test samples by default.
+Then, we split the dataset into training and test sets. The following function provides two split modes including `random` and `seq-aware`. In the `random` mode, the function splits the 100k interactions randomly without considering timestamp and uses the 90% of the data as training samples and the rest 10% as test samples by default. In the `seq-aware` mode, we leave out the item that a user rated most recently for test, and users' historical interactions as training set.  User historical interactions are sorted from older to newest based on timestamp. This mode will be used in the sequence-aware recommendation section.
 
-```{.python .input  n=6}
+```{.python .input  n=5}
 # Save to the d2l package
 def split_data_ml100k(data, num_users, num_items, 
-               split_mode="random", test_size = 0.1):
-    """Split the dataset in random mode or time-aware mode."""
-    if split_mode == "time-aware":
+               split_mode="random", test_ratio = 0.1):
+    """Split the dataset in random mode or seq-aware mode."""
+    if split_mode == "seq-aware":
         train_items, test_items, train_list = {}, {}, []
         for line in data.itertuples():
             u, i, rating, time = line[1], line[2], line[3], line[4]
@@ -81,7 +81,7 @@ def split_data_ml100k(data, num_users, num_items,
         test_data = pd.DataFrame(test_data)
     else:
         mask = [True if x == 1 else False for x in np.random.uniform(
-            0, 1, (len(data))) < 1 - test_size]
+            0, 1, (len(data))) < 1 - test_ratio]
         neg_mask = [not x for x in mask]
         train_data, test_data = data[mask], data[neg_mask]
     return train_data, test_data
@@ -91,7 +91,7 @@ def split_data_ml100k(data, num_users, num_items,
 
 After dataset splitting, we will convert the training set and test set into lists and dictionaries/matrix for the sake of convenience. The following function reads the dataframe line by line and make the index of users/items start from zero. The function then returns lists of users, items, ratings and a dictionary/matrix that records the interactions. We can specify the type of feedback to either `explicit` or `implicit`.
 
-```{.python .input  n=8}
+```{.python .input  n=6}
 # Save to the d2l package
 def load_data_ml100k(data, num_users, num_items, feedback="explicit"):
     users, items, scores = [], [], []
@@ -109,28 +109,28 @@ def load_data_ml100k(data, num_users, num_items, feedback="explicit"):
     return users, items, scores, inter
 ```
 
-Afterwards, we put the above steps together and save it for further use. The results are wrapped with `Dataset` and `DataLoader`. Note that the `last_batch` of `DataLoader` for training data is set to the `rollover` mode and orders are shuffled.
+Afterwards, we put the above steps together and it will be used in the next section. The results are wrapped with `Dataset` and `DataLoader`. Note that the `last_batch` of `DataLoader` for training data is set to the `rollover` mode (The remaining samples are rolled over to the next epoch.) and orders are shuffled.
 
-```{.python .input  n=9}
+```{.python .input  n=7}
 # Save to the d2l package
 def split_and_load_ml100k(split_mode="seq-aware", feedback="explicit", 
-                          test_size=0.1, batch_size=256):
+                          test_ratio=0.1, batch_size=256):
     data, num_users, num_items = read_data_ml100k()
     train_data, test_data = split_data_ml100k(
-        data, num_users, num_items, split_mode, test_size)
+        data, num_users, num_items, split_mode, test_ratio)
     train_u, train_i, train_r, _ = load_data_ml100k(
         train_data, num_users, num_items, feedback)
     test_u, test_i, test_r, _ = load_data_ml100k(
         test_data, num_users, num_items, feedback) 
-    train_arraydataset = gluon.data.ArrayDataset(
+    train_set = gluon.data.ArrayDataset(
         np.array(train_u), np.array(train_i), np.array(train_r))
-    test_arraydataset = gluon.data.ArrayDataset(
+    test_set = gluon.data.ArrayDataset(
         np.array(test_u), np.array(test_i), np.array(test_r))
-    train_data = gluon.data.DataLoader(
-        train_arraydataset, shuffle=True, last_batch="rollover",
+    train_iter = gluon.data.DataLoader(
+        train_set, shuffle=True, last_batch="rollover",
         batch_size=batch_size)
-    test_data = gluon.data.DataLoader(
-        test_arraydataset, batch_size=batch_size)
+    test_iter = gluon.data.DataLoader(
+        test_set, batch_size=batch_size)
     return num_users, num_items, train_data, test_data
 ```
 
@@ -144,7 +144,3 @@ def split_and_load_ml100k(split_mode="seq-aware", feedback="explicit",
 
 * What other similar recommendation datasets can you find?
 * Go through the [https://movielens.org/](https://movielens.org/) site for more information about MovieLens.
-
-```{.python .input}
-
-```
