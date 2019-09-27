@@ -1396,23 +1396,24 @@ def predict_sentiment(net, vocab, sentence):
 
 
 # Defined in file: ./chapter_recommender-systems/movielens.md
-def read_data(path="ml-100k/u.data",
+def read_data_ml100k(path="../data/", member="ml-100k/u.data",
               names=['user_id','item_id','rating','timestamp'], sep="\t"):
     fname = gluon.utils.download(
-        'http://files.grouplens.org/datasets/movielens/ml-100k.zip')
+        'http://files.grouplens.org/datasets/movielens/ml-100k.zip',
+    path=path)
     with zipfile.ZipFile(fname, 'r') as inzipfile:
-        inzipfile.extract(path)
-        data = pd.read_csv(path, sep=sep, names=names, engine='python')
+        inzipfile.extract(member, path)
+        data = pd.read_csv(path + member, sep, names=names, engine='python')
         num_users = data.user_id.unique().shape[0]
         num_items = data.item_id.unique().shape[0]
         return data, num_users, num_items
 
 
 # Defined in file: ./chapter_recommender-systems/movielens.md
-def split_data(data, num_users, num_items, 
-               split_mode="random", test_size = 0.1):
-    """Split the dataset in random mode or time-aware mode."""
-    if split_mode == "time-aware":
+def split_data_ml100k(data, num_users, num_items, 
+               split_mode="random", test_ratio = 0.1):
+    """Split the dataset in random mode or seq-aware mode."""
+    if split_mode == "seq-aware":
         train_items, test_items, train_list = {}, {}, []
         for line in data.itertuples():
             u, i, rating, time = line[1], line[2], line[3], line[4]
@@ -1427,14 +1428,14 @@ def split_data(data, num_users, num_items,
         test_data = pd.DataFrame(test_data)
     else:
         mask = [True if x == 1 else False for x in np.random.uniform(
-            0, 1, (len(data))) < 1 - test_size]
+            0, 1, (len(data))) < 1 - test_ratio]
         neg_mask = [not x for x in mask]
         train_data, test_data = data[mask], data[neg_mask]
     return train_data, test_data
 
 
 # Defined in file: ./chapter_recommender-systems/movielens.md
-def load_dataset(data, num_users, num_items, feedback="explicit"):
+def load_data_ml100k(data, num_users, num_items, feedback="explicit"):
     users, items, scores = [], [], []
     inter = np.zeros((num_items, num_users)) if feedback == "explicit" else {}
     for line in data.itertuples():
@@ -1451,29 +1452,29 @@ def load_dataset(data, num_users, num_items, feedback="explicit"):
 
 
 # Defined in file: ./chapter_recommender-systems/movielens.md
-def split_and_load_ml100k(split_mode="time-aware", feedback="explicit", 
-                          test_size=0.1, batch_size=256):
-    data, num_users, num_items = read_data()
-    train_data, test_data = split_data(
-        data, num_users, num_items, split_mode, test_size)
-    train_u, train_i, train_r, _ = load_dataset(
+def split_and_load_ml100k(split_mode="seq-aware", feedback="explicit", 
+                          test_ratio=0.1, batch_size=256):
+    data, num_users, num_items = read_data_ml100k()
+    train_data, test_data = split_data_ml100k(
+        data, num_users, num_items, split_mode, test_ratio)
+    train_u, train_i, train_r, _ = load_data_ml100k(
         train_data, num_users, num_items, feedback)
-    test_u, test_i, test_r, _ = load_dataset(
+    test_u, test_i, test_r, _ = load_data_ml100k(
         test_data, num_users, num_items, feedback) 
-    train_arraydataset = gluon.data.ArrayDataset(
+    train_set = gluon.data.ArrayDataset(
         np.array(train_u), np.array(train_i), np.array(train_r))
-    test_arraydataset = gluon.data.ArrayDataset(
+    test_set = gluon.data.ArrayDataset(
         np.array(test_u), np.array(test_i), np.array(test_r))
-    train_data = gluon.data.DataLoader(
-        train_arraydataset, shuffle=True, last_batch="rollover",
+    train_iter = gluon.data.DataLoader(
+        train_set, shuffle=True, last_batch="rollover",
         batch_size=batch_size)
-    test_data = gluon.data.DataLoader(
-        test_arraydataset, batch_size=batch_size)
-    return num_users, num_items, train_data, test_data
+    test_iter = gluon.data.DataLoader(
+        test_set, batch_size=batch_size)
+    return num_users, num_items, train_iter, test_iter
 
 
 # Defined in file: ./chapter_recommender-systems/mf.md
-def train_explicit(net, train_iter, test_iter, loss, trainer, num_epochs, 
+def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs, 
                    ctx_list=d2l.try_all_gpus(), evaluator=None, **kwargs):
     num_batches, timer = len(train_iter), d2l.Timer()
     animator = d2l.Animator(xlabel='epoch', xlim=[0,num_epochs], ylim=[0,2],
