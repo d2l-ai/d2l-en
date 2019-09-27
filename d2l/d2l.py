@@ -1470,11 +1470,11 @@ def split_and_load_ml100k(split_mode="seq-aware", feedback="explicit",
         batch_size=batch_size)
     test_iter = gluon.data.DataLoader(
         test_set, batch_size=batch_size)
-    return num_users, num_items, train_data, test_data
+    return num_users, num_items, train_iter, test_iter
 
 
 # Defined in file: ./chapter_recommender-systems/mf.md
-def train_explicit(net, train_iter, test_iter, loss, trainer, num_epochs, 
+def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs, 
                    ctx_list=d2l.try_all_gpus(), evaluator=None, **kwargs):
     num_batches, timer = len(train_iter), d2l.Timer()
     animator = d2l.Animator(xlabel='epoch', xlim=[0,num_epochs], ylim=[0,2],
