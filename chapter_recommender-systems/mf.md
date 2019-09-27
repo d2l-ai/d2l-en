@@ -95,7 +95,7 @@ In the training function, we adopt the $L_2$ loss with weight decay. The weight 
 
 ```{.python .input  n=4}
 # Save to the d2l package.
-def train_explicit(net, train_iter, test_iter, loss, trainer, num_epochs, 
+def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs, 
                    ctx_list=d2l.try_all_gpus(), evaluator=None, **kwargs):
     num_batches, timer = len(train_iter), d2l.Timer()
     animator = d2l.Animator(xlabel='epoch', xlim=[0,num_epochs], ylim=[0,2],

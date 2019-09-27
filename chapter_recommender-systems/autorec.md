@@ -92,7 +92,7 @@ lr, num_epochs, wd, optimizer = 0.001, 50, 1e-5, 'adam'
 loss = gluon.loss.L2Loss()
 trainer = gluon.Trainer(net.collect_params(), optimizer, 
                         {"learning_rate": lr, 'wd': wd})
-d2l.train_explicit(net, train_iter, test_iter, loss, trainer, num_epochs, 
+d2l.train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs, 
                    ctx, evaluator, inter_mat = test_inter_mat)
 ```
 
