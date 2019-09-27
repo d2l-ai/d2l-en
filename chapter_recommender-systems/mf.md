@@ -95,10 +95,11 @@ In the training function, we adopt the $L_2$ loss with weight decay. The weight 
 
 ```{.python .input  n=4}
 # Save to the d2l package.
-def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs, 
-                   ctx_list=d2l.try_all_gpus(), evaluator=None, **kwargs):
+def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
+                        ctx_list=d2l.try_all_gpus(), evaluator=None,
+                        **kwargs):
     num_batches, timer = len(train_iter), d2l.Timer()
-    animator = d2l.Animator(xlabel='epoch', xlim=[0,num_epochs], ylim=[0,2],
+    animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs], ylim=[0, 2],
                             legend=['train loss','test RMSE'])
     for epoch in range(num_epochs):
         metric, l = d2l.Accumulator(3), 0.
@@ -119,14 +120,16 @@ def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
             metric.add(l, values[0].shape[0], values[0].size)
             timer.stop()
         if len(kwargs) > 0:
-            test_acc = evaluator(net, test_iter, kwargs['inter_mat'],ctx_list)
+            test_acc = evaluator(net, test_iter, kwargs['inter_mat'],
+                                 ctx_list)
         else:
             test_acc = evaluator(net, test_iter, ctx_list)
-        train_loss = l /(i+1)
-        animator.add(epoch+1, (train_loss, None, test_acc))
-    print('loss %.3f, test RMSE %.3f' % (metric[0]/metric[1], test_acc))
-    print('%.1f exampes/sec on %s' % (metric[2]*num_epochs/timer.sum(), 
-                                      ctx_list))
+        train_loss = l / (i + 1)
+        animator.add(epoch + 1, (train_loss, None, test_acc))
+    print('train loss %.3f, test RMSE %.3f'
+          % (metric[0] / metric[1], test_acc))
+    print('%.1f examples/sec on %s'
+          % (metric[2] * num_epochs / timer.sum(), ctx_list))
 ```
 
 Finally,  let's put all things together and train the model. Here, we set the latent factor dimension to 50.
@@ -136,13 +139,13 @@ ctx = d2l.try_all_gpus()
 num_users, num_items, train_iter, test_iter = d2l.split_and_load_ml100k(
     test_ratio=0.1, batch_size=128)
 net = MF(50, num_users, num_items)
-net.initialize(ctx=ctx, force_reinit=True, init = mx.init.Normal(0.01))
+net.initialize(ctx=ctx, force_reinit=True, init=mx.init.Normal(0.01))
 lr, num_epochs, wd, optimizer = 0.001, 25, 1e-5, 'adam'
 loss = gluon.loss.L2Loss()
 trainer = gluon.Trainer(net.collect_params(), optimizer, 
                         {"learning_rate": lr, 'wd': wd})
-train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs, ctx, 
-               evaluator)
+train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
+                    ctx, evaluator)
 ```
 
 Below, we use the trained model to predict the rating that a user (ID 20) might give to an item (ID 30).
