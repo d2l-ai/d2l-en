@@ -6,7 +6,7 @@ Generally, there are two important things we need to do with data:
 (i) acquire them and (ii) process them once they are inside the computer. 
 There is no point in acquiring data if we do not even know how to store it, 
 so let us get our hands dirty first by playing with synthetic data. 
-We will start by introducing the N-dimensional array (`ndarray`), 
+We will start by introducing the $n$-dimensional array (`ndarray`), 
 MXNet's primary tool for storing and transforming data.
 In MXNet, `ndarray` is a class and we also call its instance
 an `ndarray` for brevity.
@@ -154,7 +154,7 @@ y
 
 ## Operations
 
-This book isn't about web development—it's 
+This book is not about Web development---it is
 not enough to just read and write values.
 We want to perform mathematical operations on these arrays.
 Some of the simplest and most useful operations 
@@ -406,7 +406,7 @@ print(type(b))
 
 ## Summary
 
-* We introduce N-dimensional array (ndarray) in MXNet, an extention of NumPy’s ndarray.
+* We introduce $n$-dimensional array (ndarray) in MXNet, an extention of NumPy’s ndarray.
 * Ndarray contains a variety of functionalities such as basic mathematics operations, broadcasting, indexing, slicing, memory saving and loading. 
 
 ## Exercises
