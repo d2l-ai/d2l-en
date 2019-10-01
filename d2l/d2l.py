@@ -1025,6 +1025,7 @@ def evaluate_accuracy_gpus(net, data_iter, split_f = d2l.split_batch):
                    labels.size)
     return metric[0]/metric[1]
 
+
 # Defined in file: ./chapter_computer-vision/image-augmentation.md
 def train_batch_ch12(net, features, labels, loss, trainer, ctx_list, split_f = d2l.split_batch):
     Xs, ys = split_f(features, labels, ctx_list)
@@ -1037,6 +1038,7 @@ def train_batch_ch12(net, features, labels, loss, trainer, ctx_list, split_f = d
     train_loss_sum = sum([float(l.sum()) for l in ls])
     train_acc_sum = sum(d2l.accuracy(py, y) for py, y in zip(pys, ys))
     return train_loss_sum, train_acc_sum
+
 
 # Defined in file: ./chapter_computer-vision/image-augmentation.md
 def train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs,
@@ -1472,10 +1474,11 @@ def split_and_load_ml100k(split_mode="seq-aware", feedback="explicit",
 
 
 # Defined in file: ./chapter_recommender-systems/mf.md
-def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs, 
-                   ctx_list=d2l.try_all_gpus(), evaluator=None, **kwargs):
+def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
+                        ctx_list=d2l.try_all_gpus(), evaluator=None,
+                        **kwargs):
     num_batches, timer = len(train_iter), d2l.Timer()
-    animator = d2l.Animator(xlabel='epoch', xlim=[0,num_epochs], ylim=[0,2],
+    animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs], ylim=[0, 2],
                             legend=['train loss','test RMSE'])
     for epoch in range(num_epochs):
         metric, l = d2l.Accumulator(3), 0.
@@ -1496,14 +1499,16 @@ def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
             metric.add(l, values[0].shape[0], values[0].size)
             timer.stop()
         if len(kwargs) > 0:
-            test_acc = evaluator(net, test_iter, kwargs['inter_mat'],ctx_list)
+            test_acc = evaluator(net, test_iter, kwargs['inter_mat'],
+                                 ctx_list)
         else:
             test_acc = evaluator(net, test_iter, ctx_list)
-        train_loss = l /(i+1)
-        animator.add(epoch+1, (train_loss, None, test_acc))
-    print('loss %.3f, test RMSE %.3f' % (metric[0]/metric[1], test_acc))
-    print('%.1f exampes/sec on %s' % (metric[2]*num_epochs/timer.sum(), 
-                                      ctx_list))
+        train_loss = l / (i + 1)
+        animator.add(epoch + 1, (train_loss, None, test_acc))
+    print('train loss %.3f, test RMSE %.3f'
+          % (metric[0] / metric[1], test_acc))
+    print('%.1f examples/sec on %s'
+          % (metric[2] * num_epochs / timer.sum(), ctx_list))
 
 
 # Defined in file: ./chapter_generative_adversarial_networks/gan.md
