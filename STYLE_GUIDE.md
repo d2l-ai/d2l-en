@@ -72,8 +72,10 @@
         * Do not italize numbers or parentheses in subscripts or superscripts
     * Color：
         * Blue as background (text is black)
+            * Extra Dark：3FA3FD
             * Dark：66BFFF
             * Light：B2D9FF
+            * Extra Light: CFF4FF
 * Be careful about copyright
 * Reference
     * e.g., Figure 7.1 (manually)
