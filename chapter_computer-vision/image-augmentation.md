@@ -153,8 +153,8 @@ Next, we define the training function to train and evaluate the model using mult
 
 ```{.python .input  n=14}
 # Save to the d2l package.
-def train_batch_ch12(net, features, labels, loss, trainer, ctx_list):
-    Xs, ys = d2l.split_batch(features, labels, ctx_list)
+def train_batch_ch12(net, features, labels, loss, trainer, ctx_list, split_f = d2l.split_batch):
+    Xs, ys = split_f(features, labels, ctx_list)
     with autograd.record():
         pys = [net(X) for X in Xs]
         ls = [loss(py, y) for py, y in zip(pys, ys)]
@@ -169,7 +169,7 @@ def train_batch_ch12(net, features, labels, loss, trainer, ctx_list):
 ```{.python .input  n=16}
 # Save to the d2l package.
 def train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs,
-               ctx_list=d2l.try_all_gpus()):
+               ctx_list=d2l.try_all_gpus(), split_f = d2l.split_batch):
     num_batches, timer = len(train_iter), d2l.Timer()
     animator = d2l.Animator(xlabel='epoch', xlim=[0,num_epochs], ylim=[0,2],
                             legend=['train loss','train acc','test acc'])
@@ -179,13 +179,13 @@ def train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs,
         for i, (features, labels) in enumerate(train_iter):
             timer.start()
             l, acc = train_batch_ch12(
-                net, features, labels, loss, trainer, ctx_list)
+                net, features, labels, loss, trainer, ctx_list, split_f)
             metric.add(l, acc, labels.shape[0], labels.size)
             timer.stop()
             if (i+1) % (num_batches // 5) == 0:
                 animator.add(epoch+i/num_batches,
                              (metric[0]/metric[2], metric[1]/metric[3], None))
-        test_acc = d2l.evaluate_accuracy_gpus(net, test_iter)
+        test_acc = d2l.evaluate_accuracy_gpus(net, test_iter, split_f)
         animator.add(epoch+1, (None, None, test_acc))
     print('loss %.3f, train acc %.3f, test acc %.3f' % (
         metric[0]/metric[2], metric[1]/metric[3], test_acc))
