@@ -145,27 +145,26 @@ with a mean of 0 and a standard deviation of 1.
 np.random.normal(0, 1, size=(3, 4))
 ```
 
-We can also specify the value of each element in the desired `ndarray` by supplying a Python list containing the numerical values. The supplied values can be integers or floats (or a mix).
+We can also specify the value of each element in the desired `ndarray` by supplying a Python list containing the numerical values.
 
 ```{.python .input  n=9}
-y = np.array([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
-y
+np.array([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 ```
 
 ## Operations
 
 This book is not about Web development---it is
 not enough to just read and write values.
-We want to perform mathematical operations on these arrays.
+We want to perform mathematical operations on those arrays.
 Some of the simplest and most useful operations 
-are the *element-wise* functions. 
+are the *element-wise* operations. 
 These apply a standard scalar operation 
 to each element of an array.
 For functions that take two arrays as inputs,
 element-wise operations apply some standard binary operator 
 on each pair of corresponding elements from the two arrays. 
 We can create an element-wise function from any function 
-that maps from the scalars to the scalars. 
+that maps from a scalar to a scalar. 
 
 In math notation, we would denote such 
 a *unary* scalar operator (taking one input) 
@@ -175,30 +174,27 @@ and a *binary* scalar operator (taking two inputs)
 by the signature
 $f: \mathbb{R}, \mathbb{R} \rightarrow \mathbb{R}$. 
 Given any two vectors $\mathbf{u}$ and $\mathbf{v}$ *of the same shape*, 
-and a binary operator f, we can produce a vector 
+and a binary operator $f$, we can produce a vector 
 $\mathbf{c} = F(\mathbf{u},\mathbf{v})$ 
-by setting $c_i \gets f(u_i, v_i)$ for all $i$. 
+by setting $c_i \gets f(u_i, v_i)$ for all $i$,
+where $c_i, u_i$, and $v_i$ are the $i^\mathrm{th}$ elements of vectors $\mathbf{c}, \mathbf{u}$, and $\mathbf{v}$.
 Here, we produced the vector-valued 
 $F: \mathbb{R}^d, \mathbb{R}^d \rightarrow \mathbb{R}^d$ 
-by *lifting* the scalar function to an element-wise vector operation. 
-In MXNet, the common standard arithmetic operators (+,-,/,\*,\*\*) 
+by *lifting* the scalar function to an element-wise vector operation.
+
+In MXNet, the common standard arithmetic operators (`+`, `-`, `*`, `/`, and `**`) 
 have all been *lifted* to element-wise operations 
-for any identically-shaped tensors of arbitrary shape. 
+for any identically-shaped tensors of an arbitrary shape. 
 We can call element-wise operations on any two tensors 
 of the same shape.
 
 ```{.python .input  n=11}
 x = np.array([1, 2, 4, 8])
-y = np.ones_like(x) * 2
-print('x =', x)
-print('x + y', x + y)
-print('x - y', x - y)
-print('x * y', x * y)
-print('x ** y', x ** y)
-print('x / y', x / y)
+y = np.array([2, 2, 2, 2])
+x + y, x - y, x * y, x / y, x ** y  # ** is exponentiation
 ```
 
-Many more operations can be applied element-wise, including unary operators like exponentiation:
+Many more operations can be applied element-wise, including unary operators like exponentiation.
 
 ```{.python .input  n=12}
 np.exp(x)
@@ -206,52 +202,46 @@ np.exp(x)
 
 In addition to element-wise computations, 
 we can also perform linear algebra operations, 
-including vector dot products and matrix multiplication. 
-In the following snippet, we perform matrix multiplication 
-on `x` and the transpose of `y`. 
-Here, `x` and `y` are both matrices with 3 rows and 4 columns.
-After applying the transpose operation,
-`y` becomes a matrix with 4 rows and 3 columns. 
-After multiplication, we obtain a matrix 
-with 3 rows and 3 columns.
-Do not worry if you are getting lost here.
+including vector dot products and matrix multiplication.
 We will explain the crucial bits of linear algebra 
-(with no assumed prior knowledge) in :numref:`chapter_linear_algebra`).
+(with no assumed prior knowledge) in :numref:`chapter_linear_algebra`.
 
-```{.python .input  n=13}
-x = np.arange(12).reshape(3,4)
-y = np.array([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
-np.dot(x, y.T)
-```
-
-We can also concatenate multiple ndarrays together,
-stacking them end-to-end to form a larger ndarray. 
-We just need to provide a list of ndarrays 
+We can also *concatenate* multiple `ndarray`s together,
+stacking them end-to-end to form a larger `ndarray`. 
+We just need to provide a list of `ndarray`s 
 and tell the system along which axis to concatenate. 
 The example below shows what happens when we concatenate 
-two matrices along axis 0 (the rows) vs. axis 1 (the columns):
+two matrices along rows (axis 0, the first element of the shape)
+vs. columns (axis 1, the second element of the shape).
+We can see that, the first output `ndarray`'s axis-0 length (6)
+is the sum of the two input `ndarray`s' axis-0 lengths ($3 + 3$);
+while the second output `ndarray`'s axis-1 length (8)
+is the sum of the two input `ndarray`s' axis-1 lengths ($4 + 4$).
 
 ```{.python .input  n=14}
+x = np.arange(12).reshape(3, 4)
+y = np.array([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 np.concatenate([x, y], axis=0), np.concatenate([x, y], axis=1)
 ```
 
-Sometimes, we want to construct binary ndarrays via logical statements. 
+Sometimes, we want to construct a binary `ndarray` via *logical statements*. 
 Take `x == y` as an example. 
-For each position, if `x` and `y` are equal at that position, 
-the corresponding entry in the new ndarray takes a value of $1$,
-otherwise that position takes value $0$.
+For each position, if `x` and `y` are equal at that position,
+the corresponding entry in the new `ndarray` takes a value of $1$,
+meaning that the logical statement `x == y` is true at that position;
+otherwise that position takes $0$.
 
 ```{.python .input  n=15}
 x == y
 ```
 
-Summing all the elements in the ndarray yields an ndarray with only one element:
+Summing all the elements in the `ndarray` yields an `ndarray` with only one element.
 
 ```{.python .input  n=16}
 x.sum()
 ```
 
-For stylistic convenience, we can write `y.exp()`, `x.sum()`, `x.norm()`, etc. also as `np.exp(y)`, `np.sum(x)`, `np.linalg.norm(x)`.
+For stylistic convenience, we can write `x.sum()`as `np.sum(x)`.
 
 ## Broadcast Mechanism
 
@@ -273,8 +263,8 @@ initially only has length 1.
 ```{.python .input  n=17}
 a = np.arange(3).reshape(3, 1)
 b = np.arange(2).reshape(1, 2)
-print('a : ', a)
-print('b : ', b)
+print('a: ', a)
+print('b: ', b)
 ```
 
 Since `a` and `b` are ($3\times1$) and ($1\times2$) matrices respectively, 
@@ -302,8 +292,8 @@ it will return an array of scalars.
 Let's try this out and compare the outputs:
 
 ```{.python .input  n=19}
-print('x[-1] : ', x[-1])
-print('x[1:3] : ', x[1:3])
+print('x[-1]: ', x[-1])
+print('x[1:3]: ', x[1:3])
 ```
 
 Beyond reading, we can also write elements of a matrix.

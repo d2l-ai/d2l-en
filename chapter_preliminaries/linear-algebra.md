@@ -193,8 +193,7 @@ When we exchange a matrix's rows and columns,
 the result is called the "transpose".
 Formally, we signify a matrix $A$'s transpose by $A^T$
 and if $B = A^T$, then $b_{ij} = a_{ji}$ for any $i$ and $j$.
-In code, we access a matrix's transpose via the `.T` attribute. 
-
+In code, we access a matrix's transpose via the `.T` attribute.
 
 ```{.python .input}
 print(A.T)
