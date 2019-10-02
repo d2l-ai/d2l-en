@@ -20,6 +20,9 @@ on CPU, GPU, and distributed cloud architectures,
 whereas the latter only supports CPU computation. 
 Second, MXNet's `ndarray` supports automatic differentiation. 
 These properties make MXNet's `ndarray` indispensable for deep learning.
+Throughout the book, the term `ndarray` refers to MXNet's `ndarray`
+unless otherwise stated.
+
 
 
 ## Getting Started
@@ -70,7 +73,7 @@ x.shape
 ```
 
 If we just want to know the total number of elements in an `ndarray`,
-*i.e.*, the product of all of the shape elements, 
+i.e., the product of all of the shape elements, 
 we can inspect its `size` property. 
 Because we are dealing with a vector here, 
 the single element of its `shape` is identical to its `size`.
@@ -187,6 +190,8 @@ have all been *lifted* to element-wise operations
 for any identically-shaped tensors of an arbitrary shape. 
 We can call element-wise operations on any two tensors 
 of the same shape.
+In the following example, we use commas to formulate a 5-element tuple,
+where each element is the result of an element-wise operation.
 
 ```{.python .input  n=11}
 x = np.array([1, 2, 4, 8])
@@ -243,35 +248,35 @@ x.sum()
 
 For stylistic convenience, we can write `x.sum()`as `np.sum(x)`.
 
-## Broadcast Mechanism
+## Broadcasting Mechanism
 
 In the above section, we saw how to perform 
-element-wise operations on two ndarrays of the same shape.
+element-wise operations on two `ndarray`s of the same shape.
 Under certain conditions, even when shapes differ,
 we can still perform element-wise operations
-by invoking a broadcast mechanism.
+by invoking the *broadcasting mechanism*.
 These mechanisms work in the following way:
-First, exapand one or both arrays
+First, expand one or both arrays
 by copying elements appropriately 
 so that after this transformation, 
-the two ndarrays have the same shape.
+the two `ndarray`s have the same shape.
 Second, carry out the element-wise operations
-on the resulting matrices.
-We usually broadcast along an axis where an array
-initially only has length 1.
+on the resulting arrays.
+
+In most cases, we broadcast along an axis where an array
+initially only has length 1, such as in the following example:
 
 ```{.python .input  n=17}
 a = np.arange(3).reshape(3, 1)
 b = np.arange(2).reshape(1, 2)
-print('a: ', a)
-print('b: ', b)
+a, b
 ```
 
-Since `a` and `b` are ($3\times1$) and ($1\times2$) matrices respectively, 
+Since `a` and `b` are $3\times1$ and $1\times2$ matrices respectively, 
 their shapes do not match up if we want to add them. 
-We 'broadcast' the entries of both matrices into a larger (3x2) matrix as follows: 
-for matrix `a` it replicates the columns, 
-for matrix `b` it replicates the rows 
+We *broadcast* the entries of both matrices into a larger $3\times2$ matrix as follows: 
+for matrix `a` it replicates the columns
+and for matrix `b` it replicates the rows
 before adding up both element-wise.
 
 ```{.python .input  n=18}
@@ -280,23 +285,19 @@ a + b
 
 ## Indexing and Slicing
 
-Just as in any other Python array, elements in an ndarray can be accessed by index. 
+Just as in any other Python array, elements in an `ndarray` can be accessed by index. 
 As in any Python array, the first element has index 0
-and ranges are specified to include the first but not the last element. 
+and ranges are specified to include the first but *before* the last element. 
 
 By this logic, `[-1]` selects the last element and `[1:3]` 
 selects the second and the third elements. 
-Notice that if you specify an integer index of an ndarray, it will return a scalar.
-However, if you specify an array of indices as the slicing range, 
-it will return an array of scalars. 
-Let's try this out and compare the outputs:
+Let us try this out and compare the outputs.
 
 ```{.python .input  n=19}
-print('x[-1]: ', x[-1])
-print('x[1:3]: ', x[1:3])
+x[-1], x[1:3]
 ```
 
-Beyond reading, we can also write elements of a matrix.
+Beyond reading, we can also write elements of a matrix by specifying indices.
 
 ```{.python .input  n=20}
 x[1, 2] = 9
@@ -320,15 +321,15 @@ x
 In the previous example, every time we ran an operation,
 we allocated new memory to host its results. 
 For example, if we write `y = x + y`, 
-we will dereference the matrix that `y` used to point to 
-and instead point it at the newly allocated memory. 
+we will dereference the `ndarray` that `y` used to point to 
+and instead point `y` at the newly allocated memory. 
 In the following example, we demonstrate this with Python's `id()` function, 
 which gives us the exact address of the referenced object in memory. 
 After running `y = y + x`, we will find 
 that `id(y)` points to a different location. 
 That is because Python first evaluates `y + x`, 
 allocating new memory for the result 
-and then subsequently redirects `y` 
+and then redirects `y` 
 to point at this new location in memory.
 
 ```{.python .input  n=22}
@@ -345,7 +346,8 @@ hundreds of megabytes of parameters
 and update all of them multiple times per second. 
 Typically, we will want to perform these updates *in place*. 
 Second, we might point at the same parameters from multiple variables. 
-If we do not update in place, this could cause a memory leak, 
+If we do not update in place, this could cause that
+discarded memory is not released,
 and make it possible for parts of our code
 to inadvertently reference stale parameters.
 
@@ -364,7 +366,7 @@ z[:] = x + y
 print('id(z):', id(z))
 ```
 
-If the value of `x ` is not reused in subsequent computations, 
+If the value of `x` is not reused in subsequent computations, 
 we can also use `x[:] = x + y` or `x += y`
 to reduce the memory overhead of the operation.
 
@@ -374,36 +376,44 @@ x += y
 id(x) == before
 ```
 
-## `mxnet.numpy.ndarray` and `numpy.ndarray`
+## Conversion with Other Python Objects
 
-Transforming an ndarray from an object in NumPy 
-(a scientific computing package of Python) 
-to an object in MXNet package, or *vice versa*, is easy. 
-The converted array does not share memory. 
+Converting an MXNet's `ndarray` to an object in the NumPy package of Python, or vice versa, is easy.
+The converted result does not share memory.
 This minor inconvenience is actually quite important: 
 when you perform operations on the CPU or on GPUs, 
 you do not want MXNet to halt computation, waiting to see
-whether NumPy might want to be doing something else 
+whether the NumPy package of Python might want to be doing something else 
 with the same chunk of memory. 
-The  `array` and `asnumpy` functions do the trick.
+The `array` and `asnumpy` functions do the trick.
 
 ```{.python .input  n=25}
 a = x.asnumpy()
-print(type(a))
 b = np.array(a)
-print(type(b))
+type(a), type(b)
+```
+
+To convert a size-1 `ndarray` to a Python scalar, we can invoke the `item` function or Python's built-in functions.
+
+```{.python .input}
+a = np.array([3.5])
+a, a.item(), float(a), int(a)
 ```
 
 ## Summary
 
-* We introduce $n$-dimensional array (ndarray) in MXNet, an extention of NumPy’s ndarray.
-* Ndarray contains a variety of functionalities such as basic mathematics operations, broadcasting, indexing, slicing, memory saving and loading. 
+
+* MXNet's `ndarray` is an extension to NumPy's `ndarray` with a few key advantages that make the former indispensable for deep learning.
+
+* MXNet's `ndarray` provides a variety of functionalities such as basic mathematics operations, broadcasting, indexing, slicing, memory saving, and conversion to other Python objects.
+
+
 
 ## Exercises
 
-1. Run the code in this section. Change the conditional statement `x == y` in this section to `x < y` or `x > y`, and then see what kind of ndarray you can get.
-1. Replace the two ndarrays that operate by element in the broadcast mechanism with other shapes, e.g. three dimensional tensors. Is the result the same as expected?
-1. Assume that we have three matrices `a`, `b` and `c`. Rewrite `c = np.linalg.dot(a, b.T) + c` in the most memory efficient manner.
+1. Run the code in this section. Change the conditional statement `x == y` in this section to `x < y` or `x > y`, and then see what kind of `ndarray` you can get.
+1. Replace the two `ndarray`s that operate by element in the broadcasting mechanism with other shapes, e.g., three dimensional tensors. Is the result the same as expected?
+
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2316)
 
