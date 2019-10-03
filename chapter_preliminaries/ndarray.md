@@ -408,9 +408,10 @@ we often begin with preprocessing raw data, rather than those nicely prepared da
 Among popular data analytic tools in Python, the `pandas` package is commonly used.
 Like many other extension packages in the vast ecosystem of Python,
 `pandas` can work together with `ndarray`.
-Before wrapping up this introductory section,
+So, before wrapping up this introductory section,
 we will briefly walk through steps for preprocessing raw data with `pandas`
 and converting them into the `ndarray` format.
+We will cover more data preprocessing techniques in later chapters.
 
 
 ### Loading Data
