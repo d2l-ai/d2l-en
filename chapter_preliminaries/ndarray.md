@@ -404,8 +404,10 @@ a, a.item(), float(a), int(a)
 
 So far we have introduced a variety of techniques for manipulating data that are already stored in `ndarray`s.
 To apply deep learning to solving real-world problems,
-we often begin with preprocessing raw data.
-Among data analytic tools in Python, `pandas` is commonly used.
+we often begin with preprocessing raw data, rather than those nicely prepared data in the `ndarray` format.
+Among popular data analytic tools in Python, the `pandas` package is commonly used.
+Like many other extension packages in the vast ecosystem of Python,
+`pandas` can work together with `ndarray`.
 Before wrapping up this introductory section,
 we will briefly walk through steps for preprocessing raw data with `pandas`
 and converting them into the `ndarray` format.
@@ -416,7 +418,7 @@ and converting them into the `ndarray` format.
 As an example, we begin by creating an artificial dataset that is stored in a csv (comma-separated values) file. Data stored in other formats may be processed in similar ways.
 
 ```{.python .input}
-data_file = '../data/house_tiny.csv'  # csv: comma-separated values
+data_file = '../data/house_tiny.csv'
 with open(data_file, 'w') as f:
     f.write('NumRooms,Alley,Price\n')
     f.write('NA,Pave,127500\n')
@@ -442,8 +444,8 @@ data
 
 Note that "NaN" entries are missing values.
 To handle missing data, typical methods include *imputation* and *deletion*,
-where imputation replaces missing values with substituted values,
-while deletion ignores missing values. We consider imputation in the following.
+where imputation replaces missing values with substituted ones,
+while deletion ignores missing values. Here we will consider imputation.
 
 By integer-location based indexing (`iloc`), we split `data` into `inputs` and `outputs`,
 where the former takes the first 2 columns while the later only keeps the last column.
@@ -459,16 +461,16 @@ For categorical or discrete values in `inputs`, we consider "NaN" as a category.
 Since the "Alley" column only takes 2 types of categorical values "Pave" and "NaN",
 `pandas` can automatically convert this column to 2 columns "Alley_Pave" and "Alley_nan".
 A row whose alley type is "Pave" will set values of "Alley_Pave" and "Alley_nan" to 1 and 0.
-A row with a missing alley type will set values of "Alley_Pave" and "Alley_nan" to 0 and 1.
+A row with a missing alley type will set their values to 0 and 1.
 
 ```{.python .input}
 inputs = pd.get_dummies(inputs, dummy_na=True)
 inputs
 ```
 
-### Conversion to `ndarray`s
+### Conversion to the  `ndarray` Format
 
-Since all the entries in `inputs` and `outputs` are numerical, they can now be converted to `ndarray`s, which may be further manipulated in MXNet.
+Now that all the entries in `inputs` and `outputs` are numerical, they can be converted to the `ndarray` format, which can be further manipulated with those `ndarray` functionalities that we have introduced earlier.
 
 ```{.python .input}
 X, y = np.array(inputs.values), np.array(outputs.values)
@@ -479,15 +481,16 @@ X, y
 
 
 * MXNet's `ndarray` is an extension to NumPy's `ndarray` with a few key advantages that make the former indispensable for deep learning.
-
 * MXNet's `ndarray` provides a variety of functionalities such as basic mathematics operations, broadcasting, indexing, slicing, memory saving, and conversion to other Python objects.
-
+* Like many other extension packages in the vast ecosystem of Python, `pandas` can work together with `ndarray`.
+* Imputation and deletion can be used to handle missing data.
 
 
 ## Exercises
 
 1. Run the code in this section. Change the conditional statement `x == y` in this section to `x < y` or `x > y`, and then see what kind of `ndarray` you can get.
 1. Replace the two `ndarray`s that operate by element in the broadcasting mechanism with other shapes, e.g., three dimensional tensors. Is the result the same as expected?
+1. Create a raw dataset with more rows and columns. Delete the column with the most missing values, then convert the preprocessed dataset to the `ndarray` format.
 
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2316)
