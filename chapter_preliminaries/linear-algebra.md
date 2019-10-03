@@ -147,6 +147,9 @@ print(a * x + y)
 
 ## Matrices
 
+
+#TODO: Transpose
+
 Just as vectors generalize scalars from order $0$ to order $1$,
 matrices generalize vectors from $1D$ to $2D$.
 Matrices, which we'll typically denote with capital letters ($A$, $B$, $C$),
@@ -516,7 +519,7 @@ the absolute value function with a sum over the elements.
 np.abs(x).sum()
 ```
 
-## Norms and objectives
+### Norms and objectives
 
 While we do not want to get too far ahead of ourselves,
 we can plant some intuition already about why these concepts are useful.
