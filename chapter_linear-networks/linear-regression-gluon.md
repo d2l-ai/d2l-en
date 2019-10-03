@@ -10,7 +10,7 @@ data iterators, loss functions, model architectures, and optimizers,
 are so common, deep learning libraries will give us
 library functions for these as well.
 
-We have used Gluon to load the MNIST dataset in :numref:`chapter_naive_bayes`. In this section, we will learn how we can implement
+In this section, we will learn how we can implement
 the linear regression model in :numref:`chapter_linear_scratch` much more concisely with Gluon.
 
 ## Generating Data Sets
