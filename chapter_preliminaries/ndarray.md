@@ -376,7 +376,7 @@ x += y
 id(x) == before
 ```
 
-## Conversion with Other Python Objects
+## Conversion to Other Python Objects
 
 Converting an MXNet's `ndarray` to an object in the NumPy package of Python, or vice versa, is easy.
 The converted result does not share memory.
@@ -398,6 +398,79 @@ To convert a size-1 `ndarray` to a Python scalar, we can invoke the `item` funct
 ```{.python .input}
 a = np.array([3.5])
 a, a.item(), float(a), int(a)
+```
+
+## Data Preprocessing
+
+So far we have introduced a variety of techniques for manipulating data that are already stored in `ndarray`s.
+To apply deep learning to solving real-world problems,
+we often begin with preprocessing raw data.
+Among data analytic tools in Python, `pandas` is commonly used.
+Before wrapping up this introductory section,
+we will briefly walk through steps for preprocessing raw data with `pandas`
+and converting them into the `ndarray` format.
+
+
+### Loading Data
+
+As an example, we begin by creating an artificial dataset that is stored in a csv (comma-separated values) file. Data stored in other formats may be processed in similar ways.
+
+```{.python .input}
+data_file = '../data/house_tiny.csv'  # csv: comma-separated values
+with open(data_file, 'w') as f:
+    f.write('NumRooms,Alley,Price\n')
+    f.write('NA,Pave,127500\n')
+    f.write('2,NA,106000\n')
+    f.write('4,NA,178100\n')
+    f.write('NA,NA,140000\n')
+```
+
+To load the raw dataset from the created csv file,
+we import the `pandas` package and invoke the `read_csv` function.
+This dataset has 4 rows and 3 columns, where each row describes the number of rooms ("NumRooms"), the alley type ("Alley"), and the price ("Price") of a house.
+
+```{.python .input}
+# If pandas is not installed, just uncomment the following line:
+# !pip install pandas
+import pandas as pd
+
+data = pd.read_csv(data_file)
+data
+```
+
+### Handling Missing Data
+
+Note that "NaN" entries are missing values.
+To handle missing data, typical methods include *imputation* and *deletion*,
+where imputation replaces missing values with substituted values,
+while deletion ignores missing values. We consider imputation in the following.
+
+By integer-location based indexing (`iloc`), we split `data` into `inputs` and `outputs`,
+where the former takes the first 2 columns while the later only keeps the last column.
+For numerical values in `inputs` that are missing, we replace the "NaN" entries with the mean value of the same column.
+
+```{.python .input}
+inputs, outputs = data.iloc[:, 0:2], data.iloc[:, 2]
+inputs = inputs.fillna(inputs.mean())
+inputs
+```
+
+For categorical or discrete values in `inputs`, we consider "NaN" as a category.
+Since the "Alley" column only takes 2 types of categorical values "Pave" and "NaN",
+`pandas` can automatically convert this column to 2 columns "Alley_Pave" and "Alley_nan".
+A row whose alley type is "Pave" will set values of "Alley_Pave" and "Alley_nan" to 1 and 0.
+A row with a missing alley type will set values of "Alley_Pave" and "Alley_nan" to 0 and 1.
+
+```{.python .input}
+inputs = pd.get_dummies(inputs, dummy_na=True)
+inputs
+```
+
+Since all the entries in `inputs` and `outputs` are numerical, they can now be converted to `ndarray`s, which may be further manipulated in MXNet.
+
+```{.python .input}
+X, y = np.array(inputs.values), np.array(outputs.values)
+X, y
 ```
 
 ## Summary
