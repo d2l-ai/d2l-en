@@ -1,47 +1,113 @@
 # Linear Regression
 :label:`chapter_linear_regression`
 
-To start off, we will introduce the problem of regression.  This is the task of predicting a *real valued target* $y$ given a data point $\mathbf{x}$.  Regression problems are common in practice, arising whenever we want to predict a continuous numerical value.  Some examples of regression problems include predicting house prices, stock prices, length of stay (for patients in the hospital), tomorrow's temperature, demand forecasting (for retail sales), and many more.  Note that not every prediction problem is a regression problem.  In subsequent sections we will discuss classification problems, where our predictions are discrete categories.
+Regression refers to a set of methods for modeling 
+the relationship between data points $\mathbf{x}$ 
+and corresponding real-valued targets $y$. 
+In the natural sciences and social sciences,
+the purpose of regression is most often to 
+*characterize* the relationship between the inputs and outputs. 
+Machine learning, on the other hand, 
+is most often concerned with *prediction*. 
+
+Regression problems pop up whenever we want to predict a numerical value. 
+Common examples include predicting prices (of homes, stocks, etc.), 
+predicting length of stay (for patients in the hospital),
+demand forecasting (for retail sales), among countless others.  
+Not every prediction problem is a classic *regression* problem.  
+In subsequent sections, we will introduce classification problems, 
+where the goal is to predict membership among a set of categories.
 
 ## Basic Elements of Linear Regression
 
-Linear regression, which dates to Gauss and Legendre, is perhaps the simplest, and by far the most popular approach to solving regression problems.  What makes linear regression *linear* is that we assume that the output truly can be expressed as a *linear* combination of the input features.
+*Linear regression* may be both the simplest 
+and most popular among the standard tools to regression.
+Dating back to the dawn of the 19th century, 
+linear regression flows from a few simple assumptions.
+First, we assume we assume that the relationship between 
+the features $\mathbf{x}$ and targets $y$ is linear,
+i.e., that $y$ is a weighted sum of the inputs $\textbf{x}$,
+give or take some noise on the observations. 
+Secondly we assume that this noise is well-behaved,
+following a standard normal distribution.
 
 
 ### Linear Model
 
-To keep things simple, we will start with running example in which we consider the problem of estimating the price of a house (e.g. in dollars) based on area (e.g. in square feet) and age (e.g. in years).  More formally, the assumption of linearity suggests that our model can be expressed in the following form:
+To keep things simple, we will start with running example: 
+say we wish to estimate the price of a house (in dollars) 
+based on area (in square feet) and age (in years).  
+The linearity assumption requires that price
+can be represented as a weighted sum of the other features:
 
-$$\mathrm{price} = w_{\mathrm{area}} \cdot \mathrm{area} + w_{\mathrm{age}} \cdot \mathrm{age} + b$$
+$$\mathrm{price} = w_{\mathrm{area}} \cdot \mathrm{area} + w_{\mathrm{age}} \cdot \mathrm{age} + b.$$
 
-In economics papers, it is common for authors to write out linear models in this format with a gigantic equation that spans multiple lines containing terms for every single feature.  For the high-dimensional data that we often address in machine learning, writing out the entire model can be tedious.  In these cases, we will find it more convenient to use linear algebra notation.  In the case of $d$ variables, we could express our prediction $\hat{y}$ as follows:
-
-$$\hat{y} = w_1 \cdot x_1 + ... + w_d \cdot x_d + b$$
-
-or alternatively, collecting all features into a single vector $\mathbf{x}$ and all parameters into a vector $\mathbf{w}$, we can express our linear model as 
+In some disciplines, researchers will write out their linear model
+with a gigantic equation that spans multiple lines 
+explicitly enumerating the weights and variables 
+corresponding to each input feature.
+In machine learning, where datasets are commonly high-dimensional,
+writing out the entire model can be tedious,
+making it convenient to use linear algebra notation.  
+When our inputs consist of $d$ features, 
+we can express our prediction $\hat{y}$ as
+$$\hat{y} = w_1 \cdot x_1 + ... + w_d \cdot x_d + b.$$
+Collecting all features into a single vector $\mathbf{x}$ 
+and all parameters into a vector $\mathbf{w}$, 
+we can express this compactly using a dot product:
 
 $$\hat{y} = \mathbf{w}^T \mathbf{x} + b.$$
 :eqlabel:`eq_linear_regression_single`
 
-Above, the vector $\mathbf{x}$ corresponds to a single data point.  Commonly, we will want notation to refer to the entire dataset of all input data points.  This matrix, often denoted using a capital letter $X$, is called the *design matrix* and contains one row for every example, and one column for every feature.
+Here, the vector $\mathbf{x}$ corresponds to a single data point.  
+We will often find it convenient to use matrix notation 
+to refer to the entire dataset of all input data points.  
+This matrix, denoted by a capital letter $X$, is called the *design matrix* 
+and contains one row for every example and one column for every feature.
 
-Given a collection of data points $X$ and a vector containing the corresponding target values $\mathbf{y}$, the goal of linear regression is to find the *weight* vector $w$ and bias term $b$ (also called an *offset* or *intercept*) that associates each data point $\mathbf{x}_i$ with an approximation $\hat{y}_i$ of its corresponding label $y_i$.
+Given a collection of data points $X$ and a vector 
+containing the corresponding target values $\mathbf{y}$,
+the goal of linear regression is to find the *weight* vector $w$ and bias term $b$ 
+(also called an *offset* or *intercept*) 
+that associates each data point $\mathbf{x}_i$ 
+with an approximation $\hat{y}_i$ of its corresponding label $y_i$.
 
-Expressed in terms of a single data point, this gives us the expression same as :eqref:`eq_linear_regression_single`. 
+Expressed in terms of a single data point, 
+this gives us the expression same as :eqref:`eq_linear_regression_single`. 
 
-Finally, for a collection of data points $\mathbf{X}$, the predictions $\hat{\mathbf{y}}$ can be expressed via the matrix-vector product:
+Finally, for a collection of data points $\mathbf{X}$, 
+the predictions $\hat{\mathbf{y}}$ can be expressed via the matrix-vector product:
 
 $${\hat{\mathbf{y}}} = \mathbf X \mathbf{w} + b.$$
 :eqlabel:`eq_linear_regression`
 
+Even if we believe that the best model to relate $\mathbf{x}$ and $y$ is linear, 
+we would not expect to find real-world data where 
+$y_i$ exactly equals $\mathbf{w}^T \mathbf{x}+b$ for all points ($\mathbf{x}_i, y_i)$. 
+For example, whatever instruments we use to observe 
+the features $X$ and labels $\mathbf{y}$
+might suffer small amount of measurement error.
+Thus, even when we are confident that the underlying relationship is linear,
+we typically incorporate a noise term to account for such errors.
 
-Even if we believe that the best model to relate $\mathbf{x}$ and $y$ is linear, it's unlikely that we'd find data where $y$ lines up exactly as a linear function of $\mathbf{x}$.  For example, both the target values $y$ and the features $X$ might be subject to some amount of measurement error.  Thus even when we believe that the linearity assumption holds, we will typically incorporate a noise term to account for such errors.
-
-Before we can go about solving for the best setting of the parameters $w$ and $b$, we will need two more things: (i) some way to measure the quality of the current model and (ii) some way to manipulate the model to improve its quality.
+Before we can go about solving for the best setting of the parameters $w$ and $b$, 
+we will need two more things: 
+(i) some way to measure the quality of the current model; and 
+(ii) some way to manipulate the model to improve its quality.
 
 ### Training Data
 
-The first thing that we need is training data.  Sticking with our running example, we'll need some collection of examples for which we know both the actual selling price of each house as well as their corresponding area and age.  Our goal is to identify model parameters that minimize the error between the predicted price and the real price.  In the terminology of machine learning, the data set is called a *training data* or *training set*, a house (often a house and its price) here comprises one *sample*, and its actual selling price is called a *label*.  The two factors used to predict the label are called *features* or *covariates*.
+The first thing that we need is training data.  
+Sticking with our running example, we'll need some collection of examples 
+for which we know both the actual selling price of each house 
+as well as their corresponding area and age. 
+Our goal is to identify model parameters 
+that minimize the error between the predicted price and the real price. 
+In the terminology of machine learning,
+the data set is called a *training data* or *training set*,
+a house (often a house and its price) here comprises one *sample*, 
+and its actual selling price is called a *label*.  
+The two factors used to predict the label are called *features* or *covariates*.
 
 Typically, we will use $n$ to denote the number of samples in our dataset.
 We index the samples by $i$, denoting each input data point as $x^{(i)} = [x_1^{(i)}, x_2^{(i)}]$ and the corresponding label as $y^{(i)}$.
