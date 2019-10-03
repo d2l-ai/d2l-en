@@ -346,4 +346,4 @@ So far, we covered probabilities, independence, conditional independence, and ho
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2319)
 
-![qr](../img/qr_probability.svg)
+![](../img/qr_probability.svg)

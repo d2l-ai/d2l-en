@@ -69,6 +69,6 @@ class EncoderDecoder(nn.Block):
 * An decoder is a network (usually the same network structure as encoder) that takes the feature vector from the encoder, and gives the best closest match to the actual input or intended output.
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/encoder-decoder/2396)
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2393)
 
 ![](../img/qr_encoder-decoder.svg)
