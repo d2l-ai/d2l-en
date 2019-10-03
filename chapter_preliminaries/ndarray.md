@@ -196,7 +196,7 @@ where each element is the result of an element-wise operation.
 ```{.python .input  n=11}
 x = np.array([1, 2, 4, 8])
 y = np.array([2, 2, 2, 2])
-x + y, x - y, x * y, x / y, x ** y  # ** is exponentiation
+x + y, x - y, x * y, x / y, x ** y  # The ** operator is exponentiation
 ```
 
 Many more operations can be applied element-wise, including unary operators like exponentiation.
@@ -472,7 +472,8 @@ inputs
 
 ### Conversion to the  `ndarray` Format
 
-Now that all the entries in `inputs` and `outputs` are numerical, they can be converted to the `ndarray` format, which can be further manipulated with those `ndarray` functionalities that we have introduced earlier.
+Now that all the entries in `inputs` and `outputs` are numerical, they can be converted to the `ndarray` format.
+Once data are in this format, they can be further manipulated with those `ndarray` functionalities that we have introduced earlier.
 
 ```{.python .input}
 X, y = np.array(inputs.values), np.array(outputs.values)
