@@ -466,6 +466,8 @@ inputs = pd.get_dummies(inputs, dummy_na=True)
 inputs
 ```
 
+### Conversion to `ndarray`s
+
 Since all the entries in `inputs` and `outputs` are numerical, they can now be converted to `ndarray`s, which may be further manipulated in MXNet.
 
 ```{.python .input}
