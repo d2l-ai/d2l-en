@@ -10,7 +10,7 @@ data iterators, loss functions, model architectures, and optimizers,
 are so common, deep learning libraries will give us
 library functions for these as well.
 
-We have used Gluon to load the MNIST dataset in :numref:`chapter_naive_bayes`. In this section, we will how we can implement
+In this section, we will learn how we can implement
 the linear regression model in :numref:`chapter_linear_scratch` much more concisely with Gluon.
 
 ## Generating Data Sets
@@ -31,11 +31,7 @@ features, labels = d2l.synthetic_data(true_w, true_b, 1000)
 
 Rather than rolling our own iterator,
 we can call upon Gluon's `data` module to read data.
-Since `data` is often used as a variable name,
-we will replace it with the pseudonym `gdata`
-(adding the first letter of Gluon),
-too differentiate the imported `data` module
-from a variable we might define.
+
 The first step will be to instantiate an `ArrayDataset`,
 which takes in one or more ndarrays as arguments.
 Here, we pass in `features` and `labels` as arguments.
@@ -66,7 +62,7 @@ for X, y in data_iter:
 
 ## Define the Model
 
-When we implemented linear regression from scratch in the previous section, we had to define the model parameters and explicitly write out the calculation to produce output using basic linear algebra opertions. You should know how to do this. But once your models get more complex, even qualitatively simple changes to the model might result in many low-level changes.
+When we implemented linear regression from scratch in the previous section, we had to define the model parameters and explicitly write out the calculation to produce output using basic linear algebra operations. You should know how to do this. But once your models get more complex, even qualitatively simple changes to the model might result in many low-level changes.
 
 For standard operations, we can use Gluon's predefined layers, which allow us to focus especially on the layers used to construct the model rather than having to focus on the implementation.
 
@@ -105,7 +101,7 @@ the input shape for each layer.
 So here, we don't need to tell Gluon
 how many inputs go into this linear layer.
 When we first try to pass data through our model,
-e.g., when we exedcute `net(X)` later,
+e.g., when we execute `net(X)` later,
 Gluon will automatically infer the number of inputs to each layer.
 We will describe how this works in more detail
 in the chapter "Deep Learning Computation".
