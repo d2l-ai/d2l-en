@@ -149,7 +149,7 @@ we get sample-efficient models
 that generalize well to unseen data.
 But of course, if those biases do not agree with reality,
 e.g. if images turned out not to be translation invariant,
-
+the model will fail to generalize.
 
 
 ## Convolutions
