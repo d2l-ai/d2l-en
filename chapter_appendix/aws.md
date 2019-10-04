@@ -116,6 +116,7 @@ cd /Downloads  ## if D2L_key.pem is stored in Downloads folder
 chmod 400 D2L_key.pem
 ```
 
+
 ![ View instance access and startup method. ](../img/chmod.png)
 :width:`700px`
 :label:`fig_chmod`
@@ -126,6 +127,7 @@ Now, copy the ssh command in the lower red box of :numref:`fig_chmod` and paste 
 ```bash
 ssh -i "D2L_key.pem" ubuntu@ec2-xx-xxx-xxx-xxx.y.compute.amazonaws.com
 ```
+
 
 When the command line prompts "Are you sure you want to continue connecting (yes/no)", enter "yes" and press Enter to log into the instance.
 
@@ -139,6 +141,7 @@ Before installing CUDA, be sure to update the instance with the latest drivers.
 ```bash
 sudo apt-get update && sudo apt-get install -y build-essential git libgfortran3
 ```
+
 
 Here we download CUDA 10.1. Visit NVIDIA's official repository at (https://developer.nvidia.com/cuda-toolkit-archive) to find the download link of CUDA 10.1 as shown below.
 
@@ -155,6 +158,7 @@ wget https://developer.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_1
 sudo sh cuda_10.1.168_418.67_linux.run
 ## this command line may take a while to run
 ```
+
 
 Enter `accept`  for the following inquiry as shown in :numref:`fig_cuda_accept`.
 
@@ -197,11 +201,14 @@ Install the CUDA 10.1 Samples?
 (y)es/(n)o/(q)uit: n
 ```
 
+
 After installing the program, run the following command to view the instance GPU (as shown in :numref:`fig_nvidia-smi`).
 
 ```bash
 nvidia-smi
 ```
+
+
 ![ nvidia-smi. ](../img/nvidia-smi.png)
 :width:`700px`
 :label:`fig_nvidia-smi`
@@ -211,6 +218,7 @@ Finally, add CUDA to the library path to help other libraries find it.
 ```bash
 echo "export LD_LIBRARY_PATH=\${LD_LIBRARY_PATH}:/usr/local/cuda/lib64" >> ~/.bashrc
 ```
+
 
 ## Installing MXNet and Downloading the D2L Notebooks
 
@@ -224,6 +232,7 @@ First, to simplify the installation, you need to install [Miniconda](https://con
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 sudo sh Miniconda3-latest-Linux-x86_64.sh
 ```
+
 
 You need to answer the following questions:
 
@@ -243,11 +252,13 @@ by running conda init? [yes|no]
 [no] >>> yes
 ```
 
+
 After miniconda installation, run the following command to activate CUDA and Conda.
 
 ```bash
 source ~/.bashrc
 ```
+
 
 Next, download the code for this book.
 
@@ -258,20 +269,25 @@ wget http://numpy.d2l.ai/d2l-en.zip
 unzip d2l-en.zip && rm d2l-en.zip
 ```
 
+
 Then create the conda `d2l` environment and enter `y` for the proceed inquiry as shown in :numref:`fig_conda_create_d2l`.
+
 ```bash
 conda create --name d2l
 ```
+
 
 ![ Conda create environment D2L. ](../img/conda_create_d2l.png)
 :width:`700px`
 :label:`fig_conda_create_d2l`
 
 After create `d2l` environment, activate it and install `pip`.
+
 ```bash
 conda activate d2l
 conda install pip
 ```
+
 
 Finally, install `MXNet` and `d2l`.
 
@@ -283,13 +299,13 @@ pip install https://apache-mxnet.s3-us-west-2.amazonaws.com/dist/python/numpy/la
 pip install git+https://github.com/d2l-ai/d2l-en@numpy2
 ```
 
+
 You can test quickly whether everything went well as follows:
 
 ```
 $ python
->>> import mxnet as mx
->>> ctx = mx.gpu(0)
->>> x = mx.ndarray.zeros(shape=(1024,1024), ctx=ctx)
+>>> from mxnet import np, npx
+>>> np.zeros((1024, 1024), ctx=npx.gpu())
 ```
 
 
@@ -303,6 +319,7 @@ ssh -i "/path/to/key.pem" ubuntu@ec2-xx-xxx-xxx-xxx.y.compute.amazonaws.com -L 8
 conda activate d2l
 jupyter notebook
 ```
+
 
 :numref:`fig_jupyter` shows the possible output after you run Jupyter Notebook. The last row is the URL for port 8888.
 

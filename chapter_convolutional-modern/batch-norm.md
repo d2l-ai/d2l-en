@@ -101,7 +101,7 @@ You might think that this noisiness should be a problem.
 As it turns out, this is actually beneficial.
 
 This turns out to be a recurring theme in deep learning. 
-For reasonss that are not yet well-characterized theoretically,
+For reasons that are not yet well-characterized theoretically,
 various sources of noise in optimization 
 often lead to faster training and less overfitting. 
 While traditional machine learning theorists 
@@ -120,7 +120,7 @@ Once training is complete, why would we want
 the same image to be classified differently,
 depending on the batch in which it happens to reside?
 During training, such exact calculation is infeasible
-because the activations for all datapoints
+because the activations for all data points
 change every time we update our model.
 However, once the model is trained, 
 we can calculate the means and variances 
@@ -156,7 +156,7 @@ the activation function by $\phi(\cdot)$,
 and the BN operation with parameters $\mathbf{\beta}$ and $\mathbf{\gamma}$ 
 by $\mathrm{BN}_{\mathbf{\beta}, \mathbf{\gamma}}$, 
 we can express the computation of a BN-enabled, 
-fully-connected layer $\mathbf{h}$ as folows:
+fully-connected layer $\mathbf{h}$ as follows:
 
 $$\mathbf{h} = \phi(\mathrm{BN}_{\mathbf{\beta}, \mathbf{\gamma}}(f_{\mathbf{\theta}}(\mathbf{x}) ) ) $$
 
@@ -191,7 +191,7 @@ to normalize the values at each spatial location.
 
 ### Batch Normalization During Prediction
 
-As we mentioned earlier, BN typicaly behaves differently
+As we mentioned earlier, BN typically behaves differently
 in training mode and prediction mode. 
 First, the noise in $\mathbf{\mu}$ and $\mathbf{\sigma}$
 arising from estimating each on minibatches
@@ -208,7 +208,7 @@ Recall that dropout also exhibits this characteristic.
 
 ## Implementation from Scratch
 
-Below, we implement a batch normalization layer with ndarrays from scratch:
+Below, we implement a batch normalization layer with `ndarray`s from scratch:
 
 ```{.python .input  n=72}
 import d2l
