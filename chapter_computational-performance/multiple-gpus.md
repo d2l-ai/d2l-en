@@ -37,7 +37,7 @@ npx.set_np()
 
 ## Define the Model
 
-We use LeNet, introduced in :numref:`chapter_lenet`, as the sample model for this section. Here, the model implementation only uses ndarrays.
+We use LeNet, introduced in :numref:`chapter_lenet`, as the sample model for this section. Here, the model implementation only uses `ndarray`s.
 
 ```{.python .input  n=10}
 # Initialize model parameters

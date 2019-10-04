@@ -11,7 +11,7 @@ implement things from scratch, then you may never truly understand how the model
 works.  Moreover, when it comes time to customize models, defining our own
 layers, loss functions, etc., knowing how things work under the hood will come
 in handy. Thus, we start off describing how to implement linear regression
-relying only on the primitives in the ndarray and `autograd` packages.  In the
+relying only on the primitives in the `ndarray` and `autograd` packages.  In the
 section immediately following, we will present the compact implementation, using
 all of Gluon's bells and whistles, but this is where we dive into the details.
 
@@ -312,7 +312,7 @@ there exist many sets of parameters that work well.
 ## Summary
 
 We saw how a deep network can be implemented
-and optimized from scratch, using just ndarray and `autograd`,
+and optimized from scratch, using just `ndarray` and `autograd`,
 without any need for defining layers, fancy optimizers, etc.
 This only scratches the surface of what is possible.
 In the following sections, we will describe additional models
