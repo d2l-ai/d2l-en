@@ -3,169 +3,263 @@
 
 Regression refers to a set of methods for modeling 
 the relationship between data points $\mathbf{x}$ 
-and corresponding real-valued targets $y$. 
+and corresponding real-valued targets $y$.
 In the natural sciences and social sciences,
-the purpose of regression is most often to 
-*characterize* the relationship between the inputs and outputs. 
-Machine learning, on the other hand, 
-is most often concerned with *prediction*. 
+the purpose of regression is most often to
+*characterize* the relationship between the inputs and outputs.
+Machine learning, on the other hand,
+is most often concerned with *prediction*.
 
 Regression problems pop up whenever we want to predict a numerical value. 
 Common examples include predicting prices (of homes, stocks, etc.), 
 predicting length of stay (for patients in the hospital),
-demand forecasting (for retail sales), among countless others.  
-Not every prediction problem is a classic *regression* problem.  
-In subsequent sections, we will introduce classification problems, 
+demand forecasting (for retail sales), among countless others.
+Not every prediction problem is a classic *regression* problem.
+In subsequent sections, we will introduce classification problems,
 where the goal is to predict membership among a set of categories.
+
+
 
 ## Basic Elements of Linear Regression
 
-*Linear regression* may be both the simplest 
+*Linear regression* may be both the simplest
 and most popular among the standard tools to regression.
-Dating back to the dawn of the 19th century, 
+Dating back to the dawn of the 19th century,
 linear regression flows from a few simple assumptions.
-First, we assume we assume that the relationship between 
-the features $\mathbf{x}$ and targets $y$ is linear,
-i.e., that $y$ is a weighted sum of the inputs $\textbf{x}$,
-give or take some noise on the observations. 
-Secondly we assume that this noise is well-behaved,
-following a standard normal distribution.
+First, we assume that the relationship between
+the *features* $\mathbf{x}$ and targets $y$ is linear,
+i.e., that $y$ can be expressed as a weighted sum 
+of the inputs $\textbf{x}$,
+give or take some noise on the observations.
+Second, we assume that any noise is well-behaved
+(following a Gaussian distribution). 
+To motivate the approach, let's start with a running example.
+Suppose that we wish to estimate the prices of houses (in dollars) 
+based on their area (in square feet) and age (in years).  
+
+To actually fit a model for predicting house prices,
+we would need to get our hands on a dataset
+consisting of sales for which we know
+the sale price, area and age for each home.
+In the terminology of machine learning,
+the data set is called a *training data* or *training set*,
+and each row (here the data corresponding to one sale)
+is called an *instance* or *example*.
+The thing we are trying to predict (here, the price)
+is called a *target* or *label*.  
+The variables (here *age* and *area*)
+upon which the predictions are based
+are called *features* or *covariates*.
+
+Typically, we will use $n$ to denote 
+the number of examples in our dataset.
+We index the samples by $i$, denoting each input data point 
+as $x^{(i)} = [x_1^{(i)}, x_2^{(i)}]$ 
+and the corresponding label as $y^{(i)}$.
 
 
 ### Linear Model
 
-To keep things simple, we will start with running example: 
-say we wish to estimate the price of a house (in dollars) 
-based on area (in square feet) and age (in years).  
-The linearity assumption requires that price
-can be represented as a weighted sum of the other features:
+The linearity assumption just says that the target (price)
+can be expressed as a weighted sum of the features (area and age):
 
 $$\mathrm{price} = w_{\mathrm{area}} \cdot \mathrm{area} + w_{\mathrm{age}} \cdot \mathrm{age} + b.$$
 
-In some disciplines, researchers will write out their linear model
-with a gigantic equation that spans multiple lines 
-explicitly enumerating the weights and variables 
-corresponding to each input feature.
-In machine learning, where datasets are commonly high-dimensional,
-writing out the entire model can be tedious,
-making it convenient to use linear algebra notation.  
+Here, $w_{\mathrm{area}}$ and $w_{\mathrm{age}}$ 
+are called *weights*, and $b$ is called a *bias* 
+(also called an *offset* or *intercept*).
+The weights determine the influence of each feature
+on our prediction and the bias just says 
+what value the predicted price should take
+when all of the features take value $0$.
+Even if we will never see any homes with zero area,
+or that are precisely zero years old,
+we still need the intercept or else we will 
+limit the expressivity of our linear model.
+
+Given a dataset, our goal is to choose 
+the weights $w$ and bias $b$ such that on average, 
+the predictions made according our  model
+best fit the true prices observed in the data.
+
+In disciplines where it is common to focus 
+on datasets with just a few features, 
+explicitly expressing models long-form like this is common.
+In ML, we usually work with high-dimensional datasets,
+so it is more convenient to employ linear algebra notation.  
 When our inputs consist of $d$ features, 
-we can express our prediction $\hat{y}$ as
+we express our prediction $\hat{y}$ as
+
 $$\hat{y} = w_1 \cdot x_1 + ... + w_d \cdot x_d + b.$$
-Collecting all features into a single vector $\mathbf{x}$ 
-and all parameters into a vector $\mathbf{w}$, 
-we can express this compactly using a dot product:
+
+Collecting all features into a vector $\mathbf{x}$ 
+and all weights into a vector $\mathbf{w}$, 
+we can express our model compactly using a dot product:
 
 $$\hat{y} = \mathbf{w}^T \mathbf{x} + b.$$
 :eqlabel:`eq_linear_regression_single`
 
 Here, the vector $\mathbf{x}$ corresponds to a single data point.  
-We will often find it convenient to use matrix notation 
-to refer to the entire dataset of all input data points.  
-This matrix, denoted by a capital letter $X$, is called the *design matrix* 
-and contains one row for every example and one column for every feature.
+We will often find it convenient 
+to refer to our entire dataset via the *design matrix* $X$.
+Here, $X$ contains one row for every example 
+and one column for every feature.
 
-Given a collection of data points $X$ and a vector 
-containing the corresponding target values $\mathbf{y}$,
-the goal of linear regression is to find the *weight* vector $w$ and bias term $b$ 
-(also called an *offset* or *intercept*) 
-that associates each data point $\mathbf{x}_i$ 
-with an approximation $\hat{y}_i$ of its corresponding label $y_i$.
-
-Expressed in terms of a single data point, 
-this gives us the expression same as :eqref:`eq_linear_regression_single`. 
-
-Finally, for a collection of data points $\mathbf{X}$, 
-the predictions $\hat{\mathbf{y}}$ can be expressed via the matrix-vector product:
+For a collection of data points $\mathbf{X}$, 
+the predictions $\hat{\mathbf{y}}$ 
+can be expressed via the matrix-vector product:
 
 $${\hat{\mathbf{y}}} = \mathbf X \mathbf{w} + b.$$
 :eqlabel:`eq_linear_regression`
 
-Even if we believe that the best model to relate $\mathbf{x}$ and $y$ is linear, 
+Given a training dataset $X$ 
+and corresponding (known) targets $\mathbf{y}$,
+the goal of linear regression is to find 
+the *weight* vector $w$ and bias term $b$ 
+that given some a new data point $\mathbf{x}_i$,
+sampled from the same distribution as the training data
+will (in expectation) predict the target $y_i$ with the lowest error.
+
+Even if we believe that the best model for 
+predicting $y$ given  $\mathbf{x}$ is linear, 
 we would not expect to find real-world data where 
-$y_i$ exactly equals $\mathbf{w}^T \mathbf{x}+b$ for all points ($\mathbf{x}_i, y_i)$. 
+$y_i$ exactly equals $\mathbf{w}^T \mathbf{x}+b$ 
+for all points ($\mathbf{x}, y)$. 
 For example, whatever instruments we use to observe 
 the features $X$ and labels $\mathbf{y}$
 might suffer small amount of measurement error.
-Thus, even when we are confident that the underlying relationship is linear,
-we typically incorporate a noise term to account for such errors.
+Thus, even when we are confident 
+that the underlying relationship is linear,
+we will incorporate a noise term to account for such errors.
 
-Before we can go about solving for the best setting of the parameters $w$ and $b$, 
+Before we can go about searching for the best parameters $w$ and $b$, 
 we will need two more things: 
-(i) some way to measure the quality of the current model; and 
-(ii) some way to manipulate the model to improve its quality.
-
-### Training Data
-
-The first thing that we need is training data.  
-Sticking with our running example, we'll need some collection of examples 
-for which we know both the actual selling price of each house 
-as well as their corresponding area and age. 
-Our goal is to identify model parameters 
-that minimize the error between the predicted price and the real price. 
-In the terminology of machine learning,
-the data set is called a *training data* or *training set*,
-a house (often a house and its price) here comprises one *sample*, 
-and its actual selling price is called a *label*.  
-The two factors used to predict the label are called *features* or *covariates*.
-
-Typically, we will use $n$ to denote the number of samples in our dataset.
-We index the samples by $i$, denoting each input data point as $x^{(i)} = [x_1^{(i)}, x_2^{(i)}]$ and the corresponding label as $y^{(i)}$.
+(i) a quality measure for some given model; 
+and (ii) a procedure for updating the model to improve its quality.
 
 ### Loss Function
 
-In model training, we need to measure the error between the predicted value and the real value of the price.  Usually, we will choose a non-negative number as the error.  The smaller the value, the smaller the error.  A common choice is the square function.  For given parameters $\mathbf{w}$ and $b$, we can express the error of our prediction on a given a sample as follows:
+Before we start thinking about how *to fit* our model, 
+we need to determine a measure of *fitness*.
+The *loss function* quantifies the distance 
+between the *real* and *predicted* value of the target.  
+The loss will usually be a non-negative number
+where smaller values are better 
+and perfect predictions incur a loss of $0$.  
+The most popular loss function in regression problems
+is the sum of squared errors. 
+When our prediction for some example $i$ is $\hat{y}^{(i)}$
+and the corresponding true label is $y^{(i)}$,
+the squared error is given by:
 
-$$l^{(i)}(\mathbf{w}, b) = \frac{1}{2} \left(\hat{y}^{(i)} - y^{(i)}\right)^2,$$
+$$l^{(i)}(\mathbf{w}, b) = \frac{1}{2} \left(\hat{y}^{(i)} - y^{(i)}\right)^2.$$
 
-The constant $1/2$ is just for mathematical convenience, ensuring that after we take the derivative of the loss, the constant coefficient will be $1$.  The smaller the error, the closer the predicted price is to the actual price, and when the two are equal, the error will be zero.
-
-Since the training dataset is given to us, and thus out of our control, the error is only a function of the model parameters.  In machine learning, we call the function that measures the error the *loss function*.  The squared error function used here is commonly referred to as *square loss*.
-
-To make things a bit more concrete, consider the example below where we plot a regression problem for a one-dimensional case, e.g. for a model where house prices depend only on area.
+The constant $1/2$ makes no real difference 
+but will prove notationally convenient, 
+cancelling out when we take the dervative of the loss.
+Since the training dataset is given to us, and thus out of our control, 
+the empirical error is only a function of the model parameters.
+To make things more concrete, consider the example below 
+where we plot a regression problem for a one-dimensional case:
 
 ![Fit data with a linear model.](../img/fit_linreg.svg)
 
-As you can see, large differences between estimates $\hat{y}^{(i)}$ and observations $y^{(i)}$ lead to even larger contributions in terms of the loss, due to the quadratic dependence. To measure the quality of a model on the entire dataset, we can simply average the losses on the training set.
-
-
+Note that large differences between
+estimates $\hat{y}^{(i)}$ and observations $y^{(i)}$
+lead to even larger contributions to the loss,
+due to the quadratic dependence.
+To measure the quality of a model on the entire dataset,
+we simply average (or equivalently, sum)
+the losses on the training set.
 
 $$L(\mathbf{w}, b) =\frac{1}{n}\sum_{i=1}^n l^{(i)}(\mathbf{w}, b) =\frac{1}{n} \sum_{i=1}^n \frac{1}{2}\left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right)^2.$$
 
-When training the model, we want to find parameters ($\mathbf{w}^*, b^*$) that minimize the average loss across all training samples:
+When training the model, we want to find parameters ($\mathbf{w}^*, b^*$)
+that minimize the total loss across all training samples:
 
 $$\mathbf{w}^*, b^* = \operatorname*{argmin}_{\mathbf{w}, b}\  L(\mathbf{w}, b).$$
 
 
 ### Analytic Solution
 
-Linear regression happens to be an unusually simple optimization problem.  Unlike nearly every other model that we will encounter in this book, linear regression can be solved easily with a simple formula, yielding a global optimum.  To start we can subsume the bias $b$ into the parameter $\mathbf{w}$ by appending a column to the design matrix consisting of all $1s$.  Then our prediction problem is to minimize $||\mathbf{y} - X\mathbf{w}||$.  Because this expression has a quadratic form it is clearly convex, and so long as the problem is not degenerate (our features are linearly independent), it is strictly convex.
+Linear regression happens to be an unusually simple optimization problem.
+Unlike most other models that we will encounter in this book,
+linear regression can be solved analytically by applying a simple formula, 
+yielding a global optimum.  
+To start, we can subsume the bias $b$ into the parameter $\mathbf{w}$
+by appending a column to the design matrix consisting of all $1s$.  
+Then our prediction problem is to minimize $||\mathbf{y} - X\mathbf{w}||$.
+Because this expression has a quadratic form, it is convex,
+and so long as the problem is not degenerate 
+(our features are linearly independent), it is strictly convex.
 
-Thus there is just one global critical point on the loss surface corresponding to the global minimum.  Taking the derivative of the loss with respect to $\mathbf{w}$ and setting it equal to 0 gives the analytic solution:
+Thus there is just one critical point on the loss surface 
+and it corresponds to the global minimum.
+Taking the derivative of the loss with respect to $\mathbf{w}$ 
+and setting it equal to $0$ yields the analytic solution:
 
 $$\mathbf{w}^* = (\mathbf X^T \mathbf X)^{-1}\mathbf X^T y$$
 
-While simple problems like linear regression may admit analytic solutions, you should not get used to such good fortune.  Although analytic solutions allow for nice mathematical analysis, the requirement of an analytic solution confines one to an restrictive set of models that would exclude all of deep learning.
+While simple problems like linear regression 
+may admit analytic solutions, 
+you should not get used to such good fortune.
+Although analytic solutions allow for nice mathematical analysis,
+the requirement of an analytic solution is so restrictive 
+that it would exclude all of deep learning.
 
 ### Gradient descent
 
-Even in cases where we cannot solve the models analytically, and even when the loss surfaces are high-dimensional and nonconvex, it turns out that we can still make progress.  Moreover, when those difficult-to-optimize models are sufficiently superior for the task at hand, figuring out how to train them is well worth the trouble.
+Even in cases where we cannot solve the models analytically,
+and even when the loss surfaces are high-dimensional and nonconvex,
+it turns out that we can still train models effectively in practice.
+Moreover, for many tasks, these difficult-to-optimize models
+turn out to be so much better that figuring out how to train them
+ends up being well worth the trouble.
 
-The key trick behind nearly all of deep learning and that we will repeatedly throughout this book is to reduce the error gradually by iteratively updating the parameters, each step moving the parameters in the direction that incrementally lowers the loss function.  This algorithm is called gradient descent.  On convex loss surfaces it will eventually converge to a global minimum, and while the same can't be said for nonconvex surfaces, it will at least lead towards a (hopefully good) local minimum.
+The key technique for optimizing nearly any deep learning model,
+and which we will call upon throughout this book,
+consists of iteratively reducing the error
+by updating the parameters in the direction
+that incrementally lowers the loss function.
+This algorithm is called *gradient descent*.
+On convex loss surfaces, it will eventually converge to a global minimum, 
+and while the same can't be said for nonconvex surfaces, 
+it will at least lead towards a (hopefully good) local minimum.
 
-The most naive application of gradient descent consists of taking the derivative of the true loss, which is an average of the losses computed on every single example in the dataset. In practice, this can be extremely slow. We must pass over the entire dataset before making a single update.  Thus, we'll often settle for sampling a random mini-batch of examples every time we need to computer the update, a variant called *stochastic gradient descent*.
+The most naive application of gradient descent 
+consists of taking the derivative of the true loss, 
+which is an average of the losses computed 
+on every single example in the dataset. 
+In practice, this can be extremely slow. 
+We must pass over the entire dataset before making a single update.
+Thus, we'll often settle for sampling a random mini-batch of examples 
+every time we need to computer the update, 
+a variant called *stochastic gradient descent*.
 
-In each iteration, we first randomly and uniformly sample a mini-batch $\mathcal{B}$ consisting of a fixed number of training data examples.  We then compute the derivative (gradient) of the average loss on the mini batch with regard to the model parameters.  Finally, the product of this result and a predetermined step size $\eta > 0$ are used to update the parameters in the direction that lowers the loss.
+In each iteration, we first randomly sample a mini-batch $\mathcal{B}$ 
+consisting of a fixed number of training data examples.  
+We then compute the derivative (gradient) of the average loss 
+on the mini batch with regard to the model parameters.
+Finally, we multiply the gradient by a predetermined step size $\eta > 0$ 
+and subtract the resulting term from the current parameter values.
 
-We can express the update mathematically as follows ($\partial$ denotes the partial derivative):
+We can express the update mathematically as follows
+($\partial$ denotes the partial derivative) :
 
 $$(\mathbf{w},b) \leftarrow (\mathbf{w},b) - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_{(\mathbf{w},b)} l^{(i)}(\mathbf{w},b)$$
 
 
-To summarize, steps of the algorithm are the following: (i) we initialize the values of the model parameters, typically at random; (ii) we iterate over the data many times, updating the parameters in each by moving the parameters in the direction of the negative gradient, as calculated on a random minibatch of data.
+To summarize, steps of the algorithm are the following:
+(i) we initialize the values of the model parameters, typically at random;
+(ii) we iteratively sample random batches from the the data (many times),
+updating the parameters in the direction of the negative gradient.
 
-
-For quadratic losses and linear functions we can write this out explicitly as follows. Note that $\mathbf{w}$ and $\mathbf{x}$ are vectors. Here the more elegant vector notation makes the math much more readable than expressing things in terms of coefficients, say $w_1, w_2, \ldots w_d$.
+For quadratic losses and linear functions,
+we can write this out explicitly as follows:
+Note that $\mathbf{w}$ and $\mathbf{x}$ are vectors. 
+Here, the more elegant vector notation makes the math 
+much more readable than expressing things in terms of coefficients, 
+say $w_1, w_2, \ldots w_d$.
 
 $$
 \begin{aligned}
@@ -176,29 +270,83 @@ b - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \left(\mathbf{w}^\top \m
 \end{aligned}
 $$
 
-In the above equation $|\mathcal{B}|$ represents the number of samples (batch size) in each mini-batch, $\eta$ is referred to as *learning rate* and takes a positive number. It should be emphasized that the values of the batch size and learning rate are set somewhat manually and are typically not learned through model training. Therefore, they are referred to as *hyper-parameters*. What we usually call *tuning hyper-parameters* refers to the adjustment of these terms. In the worst case this is performed through repeated trial and error until the appropriate hyper-parameters are found. A better approach is to learn these as parts of model training. This is an advanced topic and we do not cover them here for the sake of simplicity.
+In the above equation, $|\mathcal{B}|$ represents 
+the number of examples in each mini-batch (the *batch size*)
+and $\eta$ denotes the *learning rate*. 
+We emphasize that the values of the batch size and learning rate 
+are manually pre-specified and not typically learned through model training. 
+These parameters that are tunable but not updated 
+in the training loop are called *hyper-parameters*. 
+*Hyperparameter tuning* is the process by which these are chosen,
+and typically requires that we adjust the hyperparameters 
+based on the results of the inner (training) loop
+as assessed on a separate *validation* split of the data. 
 
 ### Model Prediction
 
-After completing the training process, we record the estimated model parameters, denoted $\hat{\mathbf{w}}, \hat{b}$ (in general the "hat" symbol denotes estimates).  Note that the parameters that we learn via gradient descent are not exactly equal to the true minimizers of the loss on the training set, that's because gradient descent converges slowly to a local minimum but does not achieve it exactly.  Moreover if the problem has multiple local minimum, we may not necessarily achieve the lowest minimum.  Fortunately, for deep neural networks, finding parameters that minimize the loss *on training data* is seldom a significant problem. The more formidable task is to find parameters that will achieve low loss on data that we have not seen before, a challenge called *generalization*. We return to these topics throughout the book.
+After completing the training process,
+we record the estimated model parameters,
+denoted $\hat{\mathbf{w}}, \hat{b}$
+(in general the "hat" symbol denotes estimates).
+Note that the parameters that we learn via gradient descent
+are not exactly equal to the true minimizers of the loss on the training set,
+that's because gradient descent converges slowly to a local minimum
+but does not achieve it exactly.
+Moreover, if the problem has multiple local minimum,
+we may not necessarily achieve the lowest minimum.
+Fortunately, for deep neural networks,
+finding parameters that minimize the loss *on training data*
+is seldom a significant problem.
+The more formidable task is to find parameters
+that will achieve low loss on data
+that we have not seen before,
+a challenge called *generalization*.
+We return to these topics throughout the book.
 
-Given the learned linear regression model $\hat{\mathbf{w}}^\top x + \hat{b}$, we can now estimate the price of any house outside the training data set with area (square feet) as $x_1$ and house age (year) as $x_2$. Here, estimation also referred to as ‘model prediction’ or ‘model inference’.
+Given the learned linear regression model 
+$\hat{\mathbf{w}}^\top x + \hat{b}$,
+we can now estimate the price of any house 
+outside the training data set with area (square feet) 
+as $x_1$ and house age (year) as $x_2$. 
+Here, estimation also referred to as ‘model prediction’ or ‘model inference’.
 
-Note that calling this step *inference* is a misnomer, but has become standard jargon in deep learning.  In statistics, inference means estimating parameters and outcomes based on other data.  This misuse of terminology in deep learning can be a source of confusion when talking to statisticians.
+Note that calling this step *inference* is a misnomer,
+but has become standard jargon in deep learning.
+In statistics, inference means estimating parameters 
+and outcomes based on other data.
+This misuse of terminology in deep learning 
+can be a source of confusion when talking to statisticians.
 
 
 ## From Linear Regression to Deep Networks
 
-So far we only talked about linear functions. While neural networks cover a much richer family of models, we can begin thinking of the linear model as a neural network by expressing it the language of neural networks. To begin, let's start by rewriting things in a 'layer' notation.
+So far we only talked about linear functions.
+While neural networks cover a much richer family of models,
+we can begin thinking of the linear model
+as a neural network by expressing it the language of neural networks.
+To begin, let's start by rewriting things in a 'layer' notation.
 
 ### Neural Network Diagram
 
-Commonly, deep learning practitioners represent models visually using neural network diagrams. In :numref:`fig_single_neuron`, we represent linear regression with a neural network diagram. The diagram shows the connectivity among the inputs and output, but does not depict the weights or biases (which are given implicitly).
+Commonly, deep learning practitioners 
+represent models visually using neural network diagrams.
+In :numref:`fig_single_neuron`,
+we represent linear regression 
+with a neural network diagram. 
+The diagram shows the connectivity among the inputs and output,
+but does not depict the weights or biases (which are given implicitly).
 
 ![Linear regression is a single-layer neural network. ](../img/singleneuron.svg)
 :label:`fig_single_neuron`
 
-In the above network, the inputs are $x_1, x_2, \ldots x_d$.  Sometimes the number of inputs are referred to as the feature dimension.  For linear regression models, we act upon $d$ inputs and output $1$ value.  Because there is just a single computed neuron (node) in the graph, we can think of linear models as neural networks consisting of just a single neuron. Since all inputs are connected to all outputs (in this case it's just one), this layer can also be regarded as an instance of a *fully-connected layer*, also commonly called a *dense layer*.
+In the above network, the inputs are $x_1, x_2, \ldots x_d$.
+Sometimes the number of inputs are referred to as the feature dimension.
+For linear regression models, we act upon $d$ inputs and output $1$ value.
+Because there is just a single computed neuron (node) in the graph,
+we can think of linear models as neural networks consisting of just a single neuron.
+Since all inputs are connected to all outputs (in this case it's just one),
+this layer can also be regarded as an instance of a *fully-connected layer*,
+also commonly called a *dense layer*.
 
 ### Biology
 
