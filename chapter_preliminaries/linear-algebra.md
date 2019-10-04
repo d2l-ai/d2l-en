@@ -6,8 +6,8 @@ let us briefly review the subset of basic linear algebra
 that you will need to understand and implement 
 most of models covered in this book.
 Below, we introduce the basic concepts,
-expressing each both through mathematical notations
-and the corresponding implementations in code.
+expressing each both through mathematical notation
+and the corresponding implementation in code.
 If you are already confident in your basic linear algebra,
 feel free to skim or skip this section.
 
@@ -30,22 +30,22 @@ Formally, we call values consisting
 of just one numerical quantity *scalars*.
 If you wanted to convert this value to Celsius 
 (the metric system's more sensible temperature scale),
-you would evaluate the expression $c = (f - 32) * 5/9$, setting $f$ to $52$.
-In this equation, each of the terms—$32$, $5$, and $9$—are scalar values.
+you would evaluate the expression $c = \frac{5}{9}(f - 32)$, setting $f$ to $52$.
+In this equation, each of the terms---$5$, $9$, and $32$---are scalar values.
 The placeholders $c$ and $f$ are called *variables*
 and they represented unknown scalar values.
 
 In this book, we adopt the mathematical notation 
 where scalar variables are denoted 
-by ordinary lower-cased letters ($x$, $y$, $z$).
+by ordinary lower-cased letters (e.g., $x$, $y$, and $z$).
 We denote the space of all (continuous) *real-valued* scalars by $\mathcal{R}$.
 For expedience, we will punt on rigorous definitions
-of what precisely a *space* is, 
+of what precisely *space* is, 
 but just remember for now that the expression $x \in \mathcal{R}$
 is a formal way to say that $x$ is a real-valued scalar.
 The symbol $\in$ can be pronounced "in" 
 and simply denotes membership in a set.
-Analagously, we could write $x,y \in \{0,1\}$ 
+Analogously, we could write $x,y \in \{0,1\}$ 
 to state that $x$ and $y$ are numbers 
 whose value can only be $0$ or $1$.
 
