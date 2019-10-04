@@ -55,8 +55,8 @@ With two axes, an `ndarray` corresponds to a *matrix*.
 Arrays with more than two axes do not have special mathematical names---we simply call them *tensors*.
 
 To start, we can use `arange` to create a row vector `x` 
-containing the first 12 integers, though they are created as floats by default.
-Each of these 12 numbers is called an *element* of the `ndarray` `x`.
+containing the first $12$ integers, though they are created as floats by default.
+Each of these $12$ numbers is called an *element* of the `ndarray` `x`.
 Unless otherwise specified, a new `ndarray` 
 will be stored in main memory and designated for CPU-based computation.
 
@@ -86,9 +86,9 @@ To change the shape of an `ndarray`
 without altering either the number of elements or their values,
 we can invoke the `reshape` function.
 For example, we can transform our `ndarray`, `x`, 
-from a row vector with shape (12,) to a matrix of shape (3, 4).
+from a row vector with shape ($12$,) to a matrix of shape ($3$, $4$).
 This new `ndarray` contains the exact same values, and 
-treats such values as a matrix organized as 3 rows and 4 columns. 
+treats such values as a matrix organized as $3$ rows and $4$ columns. 
 To reiterate, although the shape has changed, the elements in `x` have not. 
 Consequently, the `size` remains the same.
 
@@ -101,8 +101,8 @@ Reshaping by manually specifying each of the dimensions can sometimes get annoyi
 For instance, if our target shape is a matrix with shape (height, width),
 after we know the width, the height is given implicitly.
 Why should we have to perform the division ourselves? 
-In the example above, to get a matrix with 3 rows, 
-we specified both that it should have 3 rows and 4 columns. 
+In the example above, to get a matrix with $3$ rows, 
+we specified both that it should have $3$ rows and $4$ columns. 
 Fortunately, `ndarray` can automatically work out one dimension given the rest. 
 We invoke this capability by placing `-1` for the dimension
 that we would like `ndarray` to automatically infer. 
@@ -121,8 +121,8 @@ np.empty((3, 4))
 Typically, we will want our matrices initialized either with ones, zeros, 
 some known constants, or numbers randomly sampled from a known distribution.
 Perhaps most often, we want an array of all zeros. 
-To create an `ndarray` representing a tensor with all elements set to 0 
-and a shape of (2, 3, 4) we can invoke
+To create an `ndarray` representing a tensor with all elements set to $0$ 
+and a shape of ($2$, $3$, $4$) we can invoke
 
 ```{.python .input  n=7}
 np.zeros((2, 3, 4))
@@ -139,10 +139,10 @@ of all the elements in the `ndarray` according
 to some known probability distribution. 
 One common case is when we construct an array 
 to serve as a parameter in a neural network. 
-The following snippet creates an `ndarray` with the shape (3, 4). 
+The following snippet creates an `ndarray` with the shape ($3$, $4$). 
 Each of its elements is randomly sampled 
 from a standard Gaussian (normal) distribution 
-with a mean of 0 and a standard deviation of 1.
+with a mean of $0$ and a standard deviation of $1$.
 
 ```{.python .input  n=10}
 np.random.normal(0, 1, size=(3, 4))
@@ -190,7 +190,7 @@ have all been *lifted* to element-wise operations
 for any identically-shaped tensors of an arbitrary shape. 
 We can call element-wise operations on any two tensors 
 of the same shape.
-In the following example, we use commas to formulate a 5-element tuple,
+In the following example, we use commas to formulate a $5$-element tuple,
 where each element is the result of an element-wise operation.
 
 ```{.python .input  n=11}
@@ -216,12 +216,12 @@ stacking them end-to-end to form a larger `ndarray`.
 We just need to provide a list of `ndarray`s 
 and tell the system along which axis to concatenate. 
 The example below shows what happens when we concatenate 
-two matrices along rows (axis 0, the first element of the shape)
-vs. columns (axis 1, the second element of the shape).
-We can see that, the first output `ndarray`'s axis-0 length (6)
-is the sum of the two input `ndarray`s' axis-0 lengths ($3 + 3$);
-while the second output `ndarray`'s axis-1 length (8)
-is the sum of the two input `ndarray`s' axis-1 lengths ($4 + 4$).
+two matrices along rows (axis $0$, the first element of the shape)
+vs. columns (axis $1$, the second element of the shape).
+We can see that, the first output `ndarray`'s axis-$0$ length ($6$)
+is the sum of the two input `ndarray`s' axis-$0$ lengths ($3 + 3$);
+while the second output `ndarray`'s axis-$1$ length ($8$)
+is the sum of the two input `ndarray`s' axis-$1$ lengths ($4 + 4$).
 
 ```{.python .input  n=14}
 x = np.arange(12).reshape(3, 4)
@@ -264,7 +264,7 @@ Second, carry out the element-wise operations
 on the resulting arrays.
 
 In most cases, we broadcast along an axis where an array
-initially only has length 1, such as in the following example:
+initially only has length $1$, such as in the following example:
 
 ```{.python .input  n=17}
 a = np.arange(3).reshape(3, 1)
@@ -286,7 +286,7 @@ a + b
 ## Indexing and Slicing
 
 Just as in any other Python array, elements in an `ndarray` can be accessed by index. 
-As in any Python array, the first element has index 0
+As in any Python array, the first element has index $0$
 and ranges are specified to include the first but *before* the last element. 
 
 By this logic, `[-1]` selects the last element and `[1:3]` 
@@ -309,7 +309,7 @@ we simply index all of them and then assign them the value.
 For instance, `[0:2, :]` accesses the first and second rows. 
 While we discussed indexing for matrices, 
 this obviously also works for vectors 
-and for tensors of more than 2 dimensions.
+and for tensors of more than $2$ dimensions.
 
 ```{.python .input  n=21}
 x[0:2, :] = 12
@@ -357,7 +357,7 @@ to a previously allocated array with slice notation,
 e.g., `y[:] = <expression>`. 
 To illustrate this concept, we first create a new matrix `z`
 with the same shape as another `y`, 
-using `zeros_like` to allocate a block of 0 entries.
+using `zeros_like` to allocate a block of $0$ entries.
 
 ```{.python .input  n=23}
 z = np.zeros_like(y)  
@@ -393,7 +393,7 @@ b = np.array(a)
 type(a), type(b)
 ```
 
-To convert a size-1 `ndarray` to a Python scalar, we can invoke the `item` function or Python's built-in functions.
+To convert a size-$1$ `ndarray` to a Python scalar, we can invoke the `item` function or Python's built-in functions.
 
 ```{.python .input}
 a = np.array([3.5])
@@ -431,7 +431,7 @@ with open(data_file, 'w') as f:
 
 To load the raw dataset from the created csv file,
 we import the `pandas` package and invoke the `read_csv` function.
-This dataset has 4 rows and 3 columns, where each row describes the number of rooms ("NumRooms"), the alley type ("Alley"), and the price ("Price") of a house.
+This dataset has $4$ rows and $3$ columns, where each row describes the number of rooms ("NumRooms"), the alley type ("Alley"), and the price ("Price") of a house.
 
 ```{.python .input}
 # If pandas is not installed, just uncomment the following line:
@@ -462,8 +462,8 @@ inputs
 For categorical or discrete values in `inputs`, we consider "NaN" as a category.
 Since the "Alley" column only takes 2 types of categorical values "Pave" and "NaN",
 `pandas` can automatically convert this column to 2 columns "Alley_Pave" and "Alley_nan".
-A row whose alley type is "Pave" will set values of "Alley_Pave" and "Alley_nan" to 1 and 0.
-A row with a missing alley type will set their values to 0 and 1.
+A row whose alley type is "Pave" will set values of "Alley_Pave" and "Alley_nan" to $1$ and $0$.
+A row with a missing alley type will set their values to $0$ and $1$.
 
 ```{.python .input}
 inputs = pd.get_dummies(inputs, dummy_na=True)
