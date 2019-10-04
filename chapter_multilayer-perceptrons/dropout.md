@@ -163,7 +163,7 @@ Consequently, the calculation of $y$ no longer depends on $h_2$ and $h_5$
 and their respective gradient also vanishes when performing backprop.
 In this way, the calculation of the output layer
 cannot be overly dependent on any one element of $h_1, \ldots, h_5$.
-Intuitively, deep learning researchers often explain the inutition thusly:
+Intuitively, deep learning researchers often explain the intuition thusly:
 we do not want the network's output to depend
 too precariously on the exact activation pathway through the network.
 The original authors of the dropout technique
@@ -193,7 +193,7 @@ Then we can keep those nodes for which the corresponding
 sample is greater than $p$, dropping the rest.
 
 In the following code, we implement a `dropout` function
-that drops out the elements in the ndarray input `X`
+that drops out the elements in the `ndarray` input `X`
 with probability `drop_prob`,
 rescaling the remainder as described above
 (dividing the survivors by `1.0-drop_prob`).

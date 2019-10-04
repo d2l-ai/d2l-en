@@ -137,7 +137,7 @@ net.export('my_mlp')
 
 The .json and .params files generated during this process are a symbolic program and a model parameter, respectively. They can be read by other front-end languages supported by Python or MXNet, such as C++, R, Scala, and Perl. This allows us to deploy trained models to other devices and easily use other front-end programming languages. At the same time, because symbolic programming was used during deployment, the computing performance is often superior to that based on imperative programming.
 
-In MXNet, a symbolic program refers to a program that makes use of the Symbol type. We know that, when the ndarray input `x` is provided to `net`, `net(x)` will directly calculate the model output and return a result based on `x`. For models that have called the `hybridize` function, we can also provide a Symbol-type input variable, and `net(x)` will return Symbol type results.
+In MXNet, a symbolic program refers to a program that makes use of the Symbol type. We know that, when the `ndarray` input `x` is provided to `net`, `net(x)` will directly calculate the model output and return a result based on `x`. For models that have called the `hybridize` function, we can also provide a Symbol-type input variable, and `net(x)` will return Symbol type results.
 
 
 ## Constructing Models Using the HybridBlock Class
@@ -161,9 +161,9 @@ class HybridNet(nn.HybridBlock):
         return self.output(x)
 ```
 
-We need to add the additional input `F` to the `hybrid_forward` function when inheriting the HybridBlock class. We already know that MXNet uses both an ndarray class and a Symbol class, which are based on imperative programming and symbolic programming, respectively. Since these two classes perform very similar functions, MXNet will determine whether `F` will call ndarray or Symbol based on the input provided.
+We need to add the additional input `F` to the `hybrid_forward` function when inheriting the HybridBlock class. We already know that MXNet uses both an `ndarray` class and a Symbol class, which are based on imperative programming and symbolic programming, respectively. Since these two classes perform very similar functions, MXNet will determine whether `F` will call `ndarray` or Symbol based on the input provided.
 
-The following creates a HybridNet instance. As we can see, by default, `F` uses ndarray. We also printed out the `x` input as well as the hidden layer’s output using the ReLU activation function.
+The following creates a HybridNet instance. As we can see, by default, `F` uses `ndarray`. We also printed out the `x` input as well as the hidden layer’s output using the ReLU activation function.
 
 ```{.python .input}
 net = HybridNet()
@@ -185,7 +185,7 @@ net.hybridize()
 net(x)
 ```
 
-We can see that `F` turns into a Symbol. Moreover, even though the input data is still an ndarray, the same input and intermediate output will all be converted to Symbol type in the `hybrid_forward` function.
+We can see that `F` turns into a Symbol. Moreover, even though the input data is still an `ndarray`, the same input and intermediate output will all be converted to Symbol type in the `hybrid_forward` function.
 
 Now, we repeat the forward computation.
 

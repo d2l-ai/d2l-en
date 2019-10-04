@@ -63,7 +63,7 @@ b.attach_grad()
 
 Before implementing the softmax regression model,
 let's briefly review how operators such as `sum` work
-along specific dimensions in an ndarray.
+along specific dimensions in an `ndarray`.
 Given a matrix `X` we can sum over all elements (default) or only
 over elements in the same axis, *i.e.*, the column (`axis=0`) or the same row (`axis=1`).
 Note that if `X` is an array with shape `(2, 3)`
@@ -184,7 +184,7 @@ Now we just need to check how frequently the two match.
 Since the equality operator `==` is datatype-sensitive
 (e.g. an `int` and a `float32` are never equal),
 we also need to convert both to the same type (we pick `float32`).
-The result is an ndarray containing entries of 0 (false) and 1 (true).
+The result is an `ndarray` containing entries of 0 (false) and 1 (true).
 Taking the mean yields the desired result.
 
 ```{.python .input  n=11}

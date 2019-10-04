@@ -28,14 +28,14 @@ def run(x):
     return [x.dot(x) for _ in range(10)]
 ```
 
-Next, create an ndarray on both the CPU and GPU.
+Next, create an `ndarray` on both the CPU and GPU.
 
 ```{.python .input}
 x_cpu = np.random.uniform(size=(2000, 2000))
 x_gpu = np.random.uniform(size=(6000, 6000), ctx=d2l.try_gpu())
 ```
 
-Then, apply `run` function to the two ndarrays on both the CPU and GPU and print the time required.
+Then, apply `run` function to the two `ndarray`s on both the CPU and GPU and print the time required.
 
 ```{.python .input}
 run(x_cpu)  # Warm-up begins
