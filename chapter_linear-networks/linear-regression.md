@@ -282,40 +282,50 @@ and typically requires that we adjust the hyperparameters
 based on the results of the inner (training) loop
 as assessed on a separate *validation* split of the data. 
 
-### Model Prediction
-
-After completing the training process,
+After training for some predetermined number of iterations
+(or until some other stopping criteria is met),
 we record the estimated model parameters,
 denoted $\hat{\mathbf{w}}, \hat{b}$
 (in general the "hat" symbol denotes estimates).
-Note that the parameters that we learn via gradient descent
-are not exactly equal to the true minimizers of the loss on the training set,
-that's because gradient descent converges slowly to a local minimum
-but does not achieve it exactly.
-Moreover, if the problem has multiple local minimum,
-we may not necessarily achieve the lowest minimum.
-Fortunately, for deep neural networks,
-finding parameters that minimize the loss *on training data*
-is seldom a significant problem.
+Note that even if our function is truly linear and noiseless,
+these parameters will not be the exact minimizers of the loss
+because, although the algorithm converges slowly towards a local minimum
+it cannot achieve it exactly in a finite number of steps.
+
+Linear regression happens to be a convex learning problem,
+and thus there is only one (global) minimum.
+However, for more complicated models, like deep networks,
+the loss surfaces contain many minima.
+Fortunately, for reasons that are not yet fully understood,
+deep learning practitioners seldom stuggle to find parameters
+that minimize the loss *on training data*.
 The more formidable task is to find parameters
 that will achieve low loss on data
 that we have not seen before,
 a challenge called *generalization*.
 We return to these topics throughout the book.
 
+
+
+### Making Predictions with the Learned Model
+
+
 Given the learned linear regression model 
 $\hat{\mathbf{w}}^\top x + \hat{b}$,
-we can now estimate the price of any house 
-outside the training data set with area (square feet) 
-as $x_1$ and house age (year) as $x_2$. 
-Here, estimation also referred to as ‘model prediction’ or ‘model inference’.
+we can now estimate the price of a new house 
+(not contained in the training data) 
+given its area $x_1$ and age (year) $x_2$. 
+Estimating targets given features is 
+commonly called *prediction* and *inference*.
 
-Note that calling this step *inference* is a misnomer,
-but has become standard jargon in deep learning.
-In statistics, inference means estimating parameters 
-and outcomes based on other data.
-This misuse of terminology in deep learning 
-can be a source of confusion when talking to statisticians.
+We will try to stick with *prediction* because
+calling this step *inference*,
+despite emerging as standard jargon in deep learning,
+is somewhat of a misnomer.
+In statistics, *inference* more often denotes
+estimating parameters based on a dataset.
+This misuse of terminology is a common source of confusion 
+when deep learning practitioners talk to statisticians.
 
 
 ## From Linear Regression to Deep Networks
