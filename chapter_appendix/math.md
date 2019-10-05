@@ -15,7 +15,8 @@ of Gilbert Strang's MIT course on
 
 ### Vectors
 
-By default we refer to column vectors in this book. An $n$-dimensional vector $\mathbf{x}$ can be written as
+
+An $n$-dimensional vector $\mathbf{x}$ can be written as
 
 $$
 \mathbf{x} =
