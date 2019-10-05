@@ -38,8 +38,8 @@ On the other hand, if you already have some background
 and want to go deeper into the mathematical content, just skip this section.
 
 To start, we import the `np` (`numpy`) and `npx` (`numpy_extension`) modules from MXNet. 
-Here, `np` module includes the same functions supported by NumPy, 
-while `npx` module contains a set of extensions 
+Here, the `np` module includes the same functions supported by NumPy, 
+while the `npx` module contains a set of extensions 
 developed to empower deep learning within a NumPy-like environment. 
 When using `ndarray`, we almost always invoke the `set_np` function: 
 this is for compatibility of `ndarray` processing by other components of MXNet.
@@ -55,8 +55,9 @@ With two axes, an `ndarray` corresponds to a *matrix*.
 Arrays with more than two axes do not have special mathematical names---we simply call them *tensors*.
 
 To start, we can use `arange` to create a row vector `x` 
-containing the first $12$ integers, though they are created as floats by default.
-Each of these $12$ numbers is called an *element* of the `ndarray` `x`.
+containing the first $12$ integers starting with $0$, though they are created as floats by default.
+Each of the values in an `ndarray` is called an *element* of the `ndarray`.
+For instance, there are $12$ elements in the `ndarray` `x`.
 Unless otherwise specified, a new `ndarray` 
 will be stored in main memory and designated for CPU-based computation.
 
@@ -135,11 +136,11 @@ np.ones((2, 3, 4))
 ```
 
 In some cases, we will want to randomly sample the values 
-of all the elements in the `ndarray` according 
+of all the elements in an `ndarray` according 
 to some known probability distribution. 
 One common case is when we construct an array 
 to serve as a parameter in a neural network. 
-The following snippet creates an `ndarray` with the shape ($3$, $4$). 
+The following snippet creates an `ndarray` with shape ($3$, $4$). 
 Each of its elements is randomly sampled 
 from a standard Gaussian (normal) distribution 
 with a mean of $0$ and a standard deviation of $1$.
@@ -306,7 +307,8 @@ x
 
 If we want to assign multiple elements the same value, 
 we simply index all of them and then assign them the value. 
-For instance, `[0:2, :]` accesses the first and second rows. 
+For instance, `[0:2, :]` accesses the first and second rows,
+where `:` takes all the elements along axis $1$ (column).
 While we discussed indexing for matrices, 
 this obviously also works for vectors 
 and for tensors of more than $2$ dimensions.
@@ -360,7 +362,7 @@ with the same shape as another `y`,
 using `zeros_like` to allocate a block of $0$ entries.
 
 ```{.python .input  n=23}
-z = np.zeros_like(y)  
+z = np.zeros_like(y)
 print('id(z):', id(z))
 z[:] = x + y
 print('id(z):', id(z))
@@ -401,6 +403,7 @@ a, a.item(), float(a), int(a)
 ```
 
 ## Data Preprocessing
+:label:`subsec_data_preprocessing`
 
 So far we have introduced a variety of techniques for manipulating data that are already stored in `ndarray`s.
 To apply deep learning to solving real-world problems,
