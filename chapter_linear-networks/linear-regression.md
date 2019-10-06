@@ -639,13 +639,13 @@ statistics, and computer science.
 ## Exercises
 
 1. Assume that we have some data $x_1, \ldots x_n \in \mathbb{R}$. Our goal is to find a constant $b$ such that $\sum_i (x_i - b)^2$ is minimized.
-    * Find the optimal closed form solution.
-    * What does this mean in terms of the Normal distribution?
-1. Assume that we want to solve the optimization problem for linear regression with quadratic loss explicitly in closed form. To keep things simple, you can omit the bias $b$ from the problem.
-    * Rewrite the problem in matrix and vector notation (hint - treat all the data as a single matrix).
-    * Compute the gradient of the optimization problem with respect to $w$.
-    * Find the closed form solution by solving a matrix equation.
-    * When might this be better than using stochastic gradient descent (i.e. the incremental optimization approach that we discussed above)? When will this break (hint - what happens for high-dimensional $x$, what if many observations are very similar)?.
+    * Find a closed-form solution for the optimal value of $b$.
+    * How does this problem and its solution relate to the normal distribution?
+1. Derive the closed-form solution to the optimization problem for linear regression with squared error. To keep things simple, you can omit the bias $b$ from the problem (we can do this in principled fashion by adding one column to $X$ consisting of all ones).
+    * Write out the optimization problem in matrix and vector notation (treat all the data as a single matrix, all the target values as a single vector).
+    * Compute the gradient of the loss with respect to $w$.
+    * Find the closed form solution by setting the gradient equal to zero and solving the matrix equation.
+    * When might this be better than using stochastic gradient descent? When might this method break? 
 1. Assume that the noise model governing the additive noise $\epsilon$ is the exponential distribution. That is, $p(\epsilon) = \frac{1}{2} \exp(-|\epsilon|)$.
     * Write out the negative log-likelihood of the data under the model $-\log p(Y|X)$.
     * Can you find a closed form solution?
