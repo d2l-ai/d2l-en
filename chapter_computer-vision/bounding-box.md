@@ -1,5 +1,5 @@
 # Object Detection and Bounding Boxes
-:label:`chapter_bbox`
+:label:`sec_bbox`
 
 
 In the previous section, we introduced many models for image classification. In image classification tasks, we assume that there is only one main target in the image and we only focus on how to identify the target category. However, in many situations, there are multiple targets in the image that we are interested in. We not only want to classify them, but also want to obtain their specific positions in the image. In computer vision, we refer to such tasks as object detection (or object recognition).

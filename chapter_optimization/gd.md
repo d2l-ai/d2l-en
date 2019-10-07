@@ -1,11 +1,11 @@
 # Gradient Descent
-:label:`chapter_gd`
+:label:`sec_gd`
 
 In this section we are going to introduce the basic concepts underlying gradient descent. This is brief by necessity. See e.g. :cite:`Boyd.Vandenberghe.2004` for an in-depth introduction to convex optimization. Although the latter is rarely used directly in deep learning, an understanding of gradient descent is key to understanding stochastic gradient descent algorithms. For instance, the optimization problem might diverge due to an overly large learning rate. This phenomenon can already be seen in gradient descent. Likewise, preconditioning is a common technique in gradient descent and carries over to more advanced algorithms. Let's start with a simple special case.
 
 ## Gradient Descent in One Dimension
 
-Gradient descent in one dimension is an excellent example to explain why the gradient descent algorithm may reduce the value of the objective function. Consider some continously differentiable real-valued function $f: \mathbb{R} \rightarrow \mathbb{R}$. Using a Taylor expansion (:numref:`chapter_math`) we obtain that 
+Gradient descent in one dimension is an excellent example to explain why the gradient descent algorithm may reduce the value of the objective function. Consider some continously differentiable real-valued function $f: \mathbb{R} \rightarrow \mathbb{R}$. Using a Taylor expansion (:numref:`sec_math`) we obtain that 
 
 $$f(x + \epsilon) = f(x) + \epsilon f'(x) + O(\epsilon^2).$$
 :eqlabel:`gd-taylor`

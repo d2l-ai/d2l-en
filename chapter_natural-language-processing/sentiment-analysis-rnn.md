@@ -1,5 +1,5 @@
 # Text Sentiment Classification: Using Recurrent Neural Networks
-:label:`chapter_sentiment_rnn`
+:label:`sec_sentiment_rnn`
 
 
 Similar to search synonyms and analogies, text classification is also a

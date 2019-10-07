@@ -1,5 +1,5 @@
 # Mini-batch Stochastic Gradient Descent
-:label:`chapter_minibatch_sgd`
+:label:`sec_minibatch_sgd`
 
 In each iteration, the gradient descent uses the entire training data set to compute the gradient, so it is sometimes referred to as batch gradient descent. Stochastic gradient descent (SGD) only randomly select one example in each iteration to compute the gradient. Just like in the previous chapters, we can perform random uniform sampling for each iteration to form a mini-batch and then use this mini-batch to compute the gradient. Now, we are going to discuss mini-batch stochastic gradient descent.
 
@@ -40,7 +40,7 @@ def get_data_ch10(batch_size=10, n=1500):
 ## Implementation from Scratch
 
 We have already implemented the mini-batch SGD algorithm in the
-:numref:`chapter_linear_scratch`. We have made its input parameters more generic
+:numref:`sec_linear_scratch`. We have made its input parameters more generic
 here, so that we can conveniently use the same input for the other optimization
 algorithms introduced later in this chapter. Specifically, we add the status
 input `states` and place the hyper-parameter in dictionary `hyperparams`. In

@@ -1,7 +1,7 @@
 # Finding Synonyms and Analogies
-:label:`chapter_synonyms`
+:label:`sec_synonyms`
 
-In :numref:`chapter_word2vec_gluon` we trained a word2vec word embedding model
+In :numref:`sec_word2vec_gluon` we trained a word2vec word embedding model
 on a small-scale data set and searched for synonyms using the cosine similarity
 of word vectors. In practice, word vectors pre-trained on a large-scale corpus
 can often be applied to downstream natural language processing tasks. This
@@ -55,7 +55,7 @@ Below, we demonstrate the application of pre-trained word vectors, using GloVe a
 ### Finding Synonyms
 
 Here, we re-implement the algorithm used to search for synonyms by cosine
-similarity introduced in :numref:`chapter_word2vec`
+similarity introduced in :numref:`sec_word2vec`
 
 In order to reuse the logic for seeking the $k$ nearest neighbors when
 seeking analogies, we encapsulate this part of the logic separately in the `knn`

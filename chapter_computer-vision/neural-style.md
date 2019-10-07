@@ -68,7 +68,7 @@ We use the VGG-19 model pre-trained on the ImageNet data set to extract image fe
 pretrained_net = gluon.model_zoo.vision.vgg19(pretrained=True)
 ```
 
-To extract image content and style features, we can select the outputs of certain layers in the VGG network. In general, the closer an output is to the input layer, the easier it is to extract image detail information. The farther away an output is, the easier it is to extract global information. To prevent the composite image from retaining too many details from the content image, we select a VGG network layer near the output layer to output the image content features. This layer is called the content layer. We also select the outputs of different layers from the VGG network for matching local and global styles. These are called the style layers. As we mentioned in :numref:`chapter_vgg`, VGG networks have five convolutional blocks. In this experiment, we select the last convolutional layer of the fourth convolutional block as the content layer and the first layer of each block as style layers. We can obtain the indexes for these layers by printing the `pretrained_net` instance.
+To extract image content and style features, we can select the outputs of certain layers in the VGG network. In general, the closer an output is to the input layer, the easier it is to extract image detail information. The farther away an output is, the easier it is to extract global information. To prevent the composite image from retaining too many details from the content image, we select a VGG network layer near the output layer to output the image content features. This layer is called the content layer. We also select the outputs of different layers from the VGG network for matching local and global styles. These are called the style layers. As we mentioned in :numref:`sec_vgg`, VGG networks have five convolutional blocks. In this experiment, we select the last convolutional layer of the fourth convolutional block as the content layer and the first layer of each block as style layers. We can obtain the indexes for these layers by printing the `pretrained_net` instance.
 
 ```{.python .input  n=5}
 style_layers, content_layers = [0, 5, 10, 19, 28], [25]
@@ -206,7 +206,7 @@ def get_inits(X, ctx, lr, styles_Y):
 During model training, we constantly extract the content and style features of
 the composite image and calculate the loss function. Recall our discussion of
 how synchronization functions force the front end to wait for computation
-results in :numref:`chapter_async`. Because we only call the `asscalar` synchronization function every 50
+results in :numref:`sec_async`. Because we only call the `asscalar` synchronization function every 50
 epochs, the process may occupy a great deal of memory. Therefore, we call the
 `waitall` synchronization function during every epoch.
 

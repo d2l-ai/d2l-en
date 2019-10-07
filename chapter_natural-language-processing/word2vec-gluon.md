@@ -1,8 +1,8 @@
 # Implementation of Word2vec
-:label:`chapter_word2vec_gluon`
+:label:`sec_word2vec_gluon`
 
 In this section, we will train a skip-gram model defined in
-:numref:`chapter_word2vec`.
+:numref:`sec_word2vec`.
 
 First, import the packages and modules required for the experiment, and load the PTB data set.
 

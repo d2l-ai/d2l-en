@@ -1,5 +1,5 @@
 # Convexity
-:label:`chapter_convexity`
+:label:`sec_convexity`
 
 Convexity plays a vital role in the design of optimization algorithms. This is largely due to the fact that it is much easier to analyze and test algorithms in this context. In other words, if the algorithm performs poorly even in the convex setting we should not hope to see great results otherwise. Furthermore, even though the optimization problems in deep learning are generally nonconvex, they often exhibit some properties of convex ones near local minima. This can lead to exciting new optimization variants such as [Stochastic Weight Averaging](https://arxiv.org/abs/1803.05407) by Izmailov et al., 2018. Let's begin with the basics.
 
@@ -190,13 +190,13 @@ Here the variables $\alpha_i$ are the so-called *Lagrange Multipliers* that ensu
 
 One way of satisfying constrained optimization problems at least approximately is to adapt the Lagrange function $L$. Rather than satisfying $c_i(\mathbf{x}) \leq 0$ we simply add $\alpha_i c_i(\mathbf{x})$ to the objective function $f(x)$. This ensures that the constraints won't be violated too badly. 
 
-In fact, we've been using this trick all along. Consider weight decay in :numref:`chapter_weight_decay`. In it we add $\frac{\lambda}{2} \|\mathbf{w}\|^2$ to the objective function to ensure that $\mathbf{w}$ doesn't grow too large. Using the constrained optimization point of view we can see that this will ensure that $\|\mathbf{w}\|^2 - r^2 \leq 0$ for some radius $r$. Adjusting the value of $\lambda$ allows us to vary the size of $\mathbf{w}$.
+In fact, we've been using this trick all along. Consider weight decay in :numref:`sec_weight_decay`. In it we add $\frac{\lambda}{2} \|\mathbf{w}\|^2$ to the objective function to ensure that $\mathbf{w}$ doesn't grow too large. Using the constrained optimization point of view we can see that this will ensure that $\|\mathbf{w}\|^2 - r^2 \leq 0$ for some radius $r$. Adjusting the value of $\lambda$ allows us to vary the size of $\mathbf{w}$.
 
 In general, adding penalties is a good way of ensuring approximate constraint satisfaction. In practice this turns out to be much more robust than exact satisfaction. Furthermore, for nonconvex problems many of the properties that make the exact approach so appealing in the convex case (e.g. optimality) no longer hold. 
 
 ### Projections
 
-An alternative strategy for satisfying constraints are projections. Again, we encountered them before, e.g. when dealing with gradient clipping in :numref:`chapter_rnn_scratch`. There we ensured that a gradient has length bounded by $c$ via
+An alternative strategy for satisfying constraints are projections. Again, we encountered them before, e.g. when dealing with gradient clipping in :numref:`sec_rnn_scratch`. There we ensured that a gradient has length bounded by $c$ via
 
 $$\mathbf{g} \leftarrow \mathbf{g} \cdot \mathrm{min}(1, c/\|\mathbf{g}\|).$$
 

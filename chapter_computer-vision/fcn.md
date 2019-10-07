@@ -1,5 +1,5 @@
 # Fully Convolutional Networks (FCN)
-:label:`chapter_fcn`
+:label:`sec_fcn`
 
 We previously discussed semantic segmentation using each pixel in an image for
 category prediction. A fully convolutional network (FCN)
@@ -27,7 +27,7 @@ npx.set_np()
 
 ## Construct a Model
 
-Here, we demonstrate the most basic design of a fully convolutional network model. As shown in :numref:`fig_fcn`, the fully convolutional network first uses the convolutional neural network to extract image features, then transforms the number of channels into the number of categories through the $1\times 1$ convolution layer, and finally transforms the height and width of the feature map to the size of the input image by using the transposed convolution layer :numref:`chapter_transposed_conv`. The model output has the same height and width as the input image and has a one-to-one correspondence in spatial positions. The final output channel contains the category prediction of the pixel of the corresponding spatial position.
+Here, we demonstrate the most basic design of a fully convolutional network model. As shown in :numref:`fig_fcn`, the fully convolutional network first uses the convolutional neural network to extract image features, then transforms the number of channels into the number of categories through the $1\times 1$ convolution layer, and finally transforms the height and width of the feature map to the size of the input image by using the transposed convolution layer :numref:`sec_transposed_conv`. The model output has the same height and width as the input image and has a one-to-one correspondence in spatial positions. The final output channel contains the category prediction of the pixel of the corresponding spatial position.
 
 ![Fully convolutional network. ](../img/fcn.svg)
 :label:`fig_fcn`
@@ -59,7 +59,7 @@ Pascal VOC2012 (21) through the $1\times 1$ convolution layer. Finally, we need
 to magnify the height and width of the feature map by a factor of 32 to change
 them back to the height and width of the input image. Recall the calculation
 method for the convolution layer output shape described in
-:numref:`chapter_padding`. Because
+:numref:`sec_padding`. Because
 $(320-64+16\times2+32)/32=10$ and $(480-64+16\times2+32)/32=15$, we construct a
 transposed convolution layer with a stride of 32 and set the height and width of
 the convolution kernel to 64 and the padding to 16. It is not difficult to see
@@ -110,7 +110,7 @@ Y = conv_trans(X)
 out_img = Y[0].transpose(1, 2, 0)
 ```
 
-As you can see, the transposed convolution layer magnifies both the height and width of the image by a factor of 2. It is worth mentioning that, besides to the difference in coordinate scale, the image magnified by bilinear interpolation and original image printed in :numref:`chapter_bbox` look the same.
+As you can see, the transposed convolution layer magnifies both the height and width of the image by a factor of 2. It is worth mentioning that, besides to the difference in coordinate scale, the image magnified by bilinear interpolation and original image printed in :numref:`sec_bbox` look the same.
 
 ```{.python .input}
 d2l.set_figsize((3.5, 2.5))

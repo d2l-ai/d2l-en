@@ -1,7 +1,7 @@
 # Concise Implementation of Softmax Regression
 
 Just as Gluon made it much easier to implement linear regression in
-:numref:`chapter_linear_gluon`, we'll find it similarly (or possibly more)
+:numref:`sec_linear_gluon`, we'll find it similarly (or possibly more)
 convenient for implementing classification models.  Again, we begin with our
 import ritual.
 
@@ -21,7 +21,7 @@ train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 
 ## Initialize Model Parameters
 
-As mentioned in :numref:`chapter_softmax`, the output layer of softmax regression is a fully connected (`Dense`) layer. Therefore, to implement our model, we just need to add one `Dense` layer with 10 outputs to our `Sequential`. Again, here, the `Sequential` isn't really necessary, but we might as well form the habit since it will be ubiquitous when implementing deep models. Again, we initialize the weights at random with zero mean and standard deviation 0.01.
+As mentioned in :numref:`sec_softmax`, the output layer of softmax regression is a fully connected (`Dense`) layer. Therefore, to implement our model, we just need to add one `Dense` layer with 10 outputs to our `Sequential`. Again, here, the `Sequential` isn't really necessary, but we might as well form the habit since it will be ubiquitous when implementing deep models. Again, we initialize the weights at random with zero mean and standard deviation 0.01.
 
 ```{.python .input  n=3}
 net = nn.Sequential()
@@ -36,7 +36,7 @@ output through the cross-entropy loss. At its heart it uses `-nd.pick(y_hat,
 y).log()`. Mathematically, that's a perfectly reasonable thing to do. However,
 computationally, things can get hairy when dealing with exponentiation due to
 numerical stability issues, a matter we've already discussed a few times
-(e.g. in :numref:`chapter_naive_bayes`) and
+(e.g. in :numref:`sec_naive_bayes`) and
 in the problem set of the previous chapter). Recall that the softmax function
 calculates $\hat y_j = \frac{e^{z_j}}{\sum_{i=1}^{n} e^{z_i}}$, where $\hat y_j$
 is the j-th element of ``yhat`` and $z_j$ is the j-th element of the input

@@ -116,7 +116,7 @@ d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, ctx)
 
 The output is clearly unsatisfactory for the reasons described above. For a
 discussion of more effective uses of bidirectional models see e.g. the sentiment
-classification in :numref:`chapter_sentiment_rnn`.
+classification in :numref:`sec_sentiment_rnn`.
 
 ## Summary
 

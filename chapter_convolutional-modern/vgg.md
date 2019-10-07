@@ -1,5 +1,5 @@
 # Networks Using Blocks (VGG)
-:label:`chapter_vgg`
+:label:`sec_vgg`
 
 While AlexNet proved that deep convolutional neural networks
 can achieve good results, it didn't offer a general template

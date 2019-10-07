@@ -190,7 +190,7 @@ test_iter = gluon.data.DataLoader(test_ds.transform_first(transform_test),
 
 The data set for this competition is a subset of the ImageNet data
 set. Therefore, we can use the approach discussed in
-:numref:`chapter_fine_tuning`
+:numref:`sec_fine_tuning`
 to select a model pre-trained on the
 entire ImageNet data set and use it to extract image features to be input in the
 custom small-scale output network. Gluon provides a wide range of pre-trained
@@ -200,7 +200,7 @@ the input of the pre-trained model's output layer, i.e. the extracted
 features. Then, we can replace the original output layer with a small custom
 output network that can be trained, such as two fully connected layers in a
 series. Different from the experiment in
-:numref:`chapter_fine_tuning`, here, we do not retrain the pre-trained model used for feature
+:numref:`sec_fine_tuning`, here, we do not retrain the pre-trained model used for feature
 extraction. This reduces the training time and the memory required to store
 model parameter gradients.
 
@@ -310,7 +310,7 @@ with open('submission.csv', 'w') as f:
 After executing the above code, we will generate a "submission.csv" file. The
 format of this file is consistent with the Kaggle competition requirements. The
 method for submitting results is similar to method in
-:numref:`chapter_kaggle_house`.
+:numref:`sec_kaggle_house`.
 
 
 ## Summary

@@ -1,7 +1,7 @@
 # Momentum
-:label:`chapter_momentum`
+:label:`sec_momentum`
 
-In :numref:`chapter_gd`, we
+In :numref:`sec_gd`, we
 mentioned that the gradient of the objective function's independent variable
 represents the direction of the objective function's fastest descend at the
 current position of the independent variable. Therefore, gradient descent is
@@ -16,7 +16,7 @@ current position of the independent variable.
 
 Now, we will consider an objective function $f(\boldsymbol{x})=0.1x_1^2+2x_2^2$,
 whose input and output are a two-dimensional vector $\boldsymbol{x} =
-[x_1, x_2]$ and a scalar, respectively. In contrast to :numref:`chapter_gd`,
+[x_1, x_2]$ and a scalar, respectively. In contrast to :numref:`sec_gd`,
 here, the coefficient $x_1^2$ is reduced from $1$ to $0.1$. We are going to
 implement gradient descent based on this objective function, and demonstrate the
 iterative trajectory of the independent variable using the learning rate $0.4$.
@@ -53,7 +53,7 @@ The momentum method was proposed to solve the gradient descent problem described
 above. Since mini-batch stochastic gradient descent is more general than
 gradient descent, the subsequent discussion in this chapter will continue to use
 the definition for mini-batch stochastic gradient descent $\mathbf{g}_t$ at
-time step $t$ given in :numref:`chapter_minibatch_sgd`.  We set the independent
+time step $t$ given in :numref:`sec_minibatch_sgd`.  We set the independent
 variable at time step $t$ to $\mathbf{x}_t$ and the learning rate to
 $\eta_t$.  At time step $0$, momentum creates the velocity variable
 $\mathbf{v}_0$ and initializes its elements to zero. At time step $t>0$,

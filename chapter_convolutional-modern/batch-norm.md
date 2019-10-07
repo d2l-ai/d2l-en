@@ -1,12 +1,12 @@
 # Batch Normalization
-:label:`chapter_batch_norm`
+:label:`sec_batch_norm`
 
 Training deep neural nets is difficult.
 And getting them to converge in a reasonable amount of time can be tricky.  
 In this section, we describe batch normalization (BN)
 :cite:`Ioffe.Szegedy.2015`, a popular and effective technique 
 that consistently accelerates the convergence of deep nets. 
-Together with residual blocks—covered in :numref:`chapter_resnet`—BN
+Together with residual blocks—covered in :numref:`sec_resnet`—BN
 has made it possible for practitioners 
 to routinely train networks with over 100 layers.
 
@@ -21,7 +21,7 @@ when training ML models and neural nets in particular.
 1. Choices regarding data preprocessing often 
    make an enormous difference in the final results.
    Recall our application of multilayer perceptrons 
-   to predicting house prices (:numref:`chapter_kaggle_house`).
+   to predicting house prices (:numref:`sec_kaggle_house`).
    Our first step when working with real data 
    was to standardize our input features 
    to each have a mean of *zero* and variance of *one*. 
@@ -307,7 +307,7 @@ class BatchNorm(nn.Block):
 ## Use a Batch Normalization LeNet
 
 To see how to apply `BatchNorm` in context, 
-below we apply it to a traditional LeNet model (:numref:`chapter_lenet`).
+below we apply it to a traditional LeNet model (:numref:`sec_lenet`).
 Recall that BN is typically applied 
 after the convolutional layers and fully-connected layers
 but before the corresponding activation functions.
@@ -332,7 +332,7 @@ net.add(nn.Conv2D(6, kernel_size=5),
 ```
 
 As before, we will train our network on the Fashion-MNIST dataset.
-This code is virtually identical to that when we first trained LeNet (:numref:`chapter_lenet`).
+This code is virtually identical to that when we first trained LeNet (:numref:`sec_lenet`).
 The main difference is the considerably larger learning rate.
 
 ```{.python .input  n=77}

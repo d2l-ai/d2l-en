@@ -1,5 +1,5 @@
 # `d2l` API Document
-:label:`chapter_d2l`
+:label:`sec_d2l`
 
 
 ```eval_rst

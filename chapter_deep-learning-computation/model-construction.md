@@ -1,5 +1,5 @@
 # Layers and Blocks
-:label:`chapter_model_construction`
+:label:`sec_model_construction`
 
 
 
@@ -65,7 +65,7 @@ Finally a `Block` must possess a `backward` method,
 for purposes of calculating gradients.
 Fortunately, due to some behind-the-scenes magic 
 supplied by the autograd  `autograd` package 
-(introduced in :numref:`chapter_preliminaries`)
+(introduced in :numref:`sec_preliminaries`)
 when defining our own `Block` typically requires
 only that we worry about parameters and the `forward` function.
 
@@ -83,7 +83,7 @@ and still implement complex neural networks.
 
 To begin, we revisit the Blocks that played a role 
 in our implementation of the multilayer perceptron 
-(:numref:`chapter_mlp_gluon`).
+(:numref:`sec_mlp_gluon`).
 The following code generates a network 
 with one fully-connected hidden layer containing 256 units
 followed by a ReLU activation,
@@ -266,7 +266,7 @@ net.initialize()
 net(x)
 ```
 
-Indeed, it can be observed that the use of the `MySequential` class is no different from the use of the Sequential class described in :numref:`chapter_mlp_gluon`.
+Indeed, it can be observed that the use of the `MySequential` class is no different from the use of the Sequential class described in :numref:`sec_mlp_gluon`.
 
 
 ## Blocks with Code
@@ -340,7 +340,7 @@ chimera(x)
 
 The avid reader is probably starting to worry about the efficiency of this. After all, we have lots of dictionary lookups, code execution, and lots of other Pythonic things going on in what is supposed to be a high performance deep learning library. The problems of Python's [Global Interpreter Lock](https://wiki.python.org/moin/GlobalInterpreterLock) are well known. In the context of deep learning it means that we have a super fast GPU (or multiple of them) which might have to wait until a puny single CPU core running Python gets a chance to tell it what to do next. This is clearly awful and there are many ways around it. The best way to speed up Python is by avoiding it altogether.
 
-Gluon does this by allowing for Hybridization (:numref:`chapter_hybridize`). In it, the Python
+Gluon does this by allowing for Hybridization (:numref:`sec_hybridize`). In it, the Python
 interpreter executes the block the first time it's invoked. The Gluon runtime
 records what is happening and the next time around it short circuits any calls
 to Python. This can accelerate things considerably in some cases but care needs

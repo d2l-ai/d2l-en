@@ -1,5 +1,5 @@
 # Deferred Initialization
-:label:`chapter_deferred_init`
+:label:`sec_deferred_init`
 
 In the previous examples we played fast and loose with setting up our networks. In particular we did the following things that *shouldn't* work:
 

@@ -1,5 +1,5 @@
 #  Preliminaries
-:label:`chapter_preliminaries`
+:label:`sec_preliminaries`
 
 To get started with deep learning,
 we will need to develop a few basic skills.

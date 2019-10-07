@@ -8,7 +8,7 @@ Although optimization provides a way to minimize the loss function for deep
 learning, in essence, the goals of optimization and deep learning are
 fundamentally different. The former is primarily concerned with minimizing an
 objective whereas the latter is concerned with finding a suitable model, given a
-finite amount of data.  In :numref:`chapter_model_selection`,
+finite amount of data.  In :numref:`sec_model_selection`,
 we discussed the difference between these two goals in detail. For instance,
 training error and generalization error generally differ: since the objective
 function of the optimization algorithm is usually a loss function based on the
@@ -48,7 +48,7 @@ annotate('expected risk', (1.1, -1.05), (0.95, -0.5))
 
 In this chapter, we are going to focus specifically on the performance of the
 optimization algorithm in minimizing the objective function, rather than a
-model's generalization error.  In :numref:`chapter_linear_regression`
+model's generalization error.  In :numref:`sec_linear_regression`
 we distinguished between analytical solutions and numerical solutions in
 optimization problems. In deep learning, most objective functions are
 complicated and do not have analytical solutions. Instead, we must use numerical
@@ -106,7 +106,7 @@ d2l.plt.ylabel('y');
 
 We assume that the input of a function is a $k$-dimensional vector and its
 output is a scalar, so its Hessian matrix will have $k$ eigenvalues
-(refer to :numref:`chapter_math`).
+(refer to :numref:`sec_math`).
 The solution of the
 function could be a local minimum, a local maximum, or a saddle point at a
 position where the function gradient is zero:

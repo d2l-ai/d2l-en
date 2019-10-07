@@ -1,5 +1,5 @@
 # Pooling
-:label:`chapter_pooling`
+:label:`sec_pooling`
 
 
 Often, as we process images, we want to gradually
@@ -19,7 +19,7 @@ while keeping all of the advantages of convolutional layers at the intermediate 
 
 
 Moreover, when detecting lower-level features, such as edges
-(as discussed in :numref:`chapter_conv_layer`),
+(as discussed in :numref:`sec_conv_layer`),
 we often want our representations to be somewhat invariant to translation.
 For instance, if we take the image `X`
 with a sharp delineation between black and white
@@ -94,7 +94,7 @@ moves no more than one element in height and width.
 In the code below, we implement the forward computation
 of the pooling layer in the `pool2d` function.
 This function is similar to the `corr2d` function
-in :numref:`chapter_conv_layer`.
+in :numref:`sec_conv_layer`.
 However, here we have no kernel, computing the output
 as either the max or the average of each region in the input..
 

@@ -1,5 +1,5 @@
 # Backpropagation Through Time
-:label:`chapter_bptt`
+:label:`sec_bptt`
 
 So far we repeatedly alluded to things like *exploding gradients*,
 *vanishing gradients*, *truncating backprop*, and the need to
@@ -13,13 +13,13 @@ randomization and backprop also see the paper by
 [Tallec and Ollivier, 2017](https://arxiv.org/abs/1705.08209).
 
 We encountered some of the effects of gradient explosion when we first
-implemented recurrent neural networks (:numref:`chapter_rnn_scratch`). In
+implemented recurrent neural networks (:numref:`sec_rnn_scratch`). In
 particular, if you solved the problems in the problem set, you would
 have seen that gradient clipping is vital to ensure proper
 convergence. To provide a better understanding of this issue, this
 section will review how gradients are computed for sequences. Note
 that there is nothing conceptually new in how it works. After all, we are still merely applying the chain rule to compute gradients. Nonetheless it is
-worth while reviewing backpropagation (:numref:`chapter_backprop`) for
+worth while reviewing backpropagation (:numref:`sec_backprop`) for
 another time.
 
 Forward propagation in a recurrent neural network is relatively
@@ -100,7 +100,7 @@ Now that we discussed the general principle let's discuss BPTT in detail, distin
 $$\mathbf{h}_t = \mathbf{W}_{hx} \mathbf{x}_t + \mathbf{W}_{hh} \mathbf{h}_{t-1} \text{ and }
 \mathbf{o}_t = \mathbf{W}_{oh} \mathbf{h}_t$$
 
-Following the discussion in :numref:`chapter_backprop` we compute gradients $\partial L/\partial \mathbf{W}_{hx}$, $\partial L/\partial \mathbf{W}_{hh}$, and $\partial L/\partial \mathbf{W}_{oh}$ for
+Following the discussion in :numref:`sec_backprop` we compute gradients $\partial L/\partial \mathbf{W}_{hx}$, $\partial L/\partial \mathbf{W}_{hh}$, and $\partial L/\partial \mathbf{W}_{oh}$ for
 $L(\mathbf{x}, \mathbf{y}, \mathbf{W}) = \sum_{t=1}^T l(\mathbf{o}_t, y_t)$.
 Taking the derivatives with respect to $W_{oh}$ is fairly straightforward and we obtain
 

@@ -29,7 +29,7 @@ In the end, all these functions are combined in an MLP to reduce the number of f
 ## Dense Blocks
 
 DenseNet uses the modified "batch normalization, activation, and convolution"
-architecture of ResNet (see the exercise in :numref:`chapter_resnet`).
+architecture of ResNet (see the exercise in :numref:`sec_resnet`).
 First, we implement this architecture in the
 `conv_block` function.
 

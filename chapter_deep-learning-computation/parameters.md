@@ -120,7 +120,7 @@ rgnet[0][1][0].bias.data()
 
 Now that we know how to access the parameters, let's look at how to initialize
 them properly. We discussed the need for
-initialization in :numref:`chapter_numerical_stability`. By default, MXNet initializes the weight matrices
+initialization in :numref:`sec_numerical_stability`. By default, MXNet initializes the weight matrices
 uniformly by drawing from $U[-0.07, 0.07]$ and the bias parameters are all set
 to $0$. However, we often need to use other methods to initialize the
 weights. MXNet's `init` module provides a variety of preset initialization
@@ -189,7 +189,7 @@ net[0].weight.data()[0]
 
 ## Tied Parameters
 
-In some cases, we want to share model parameters across multiple layers. For instance when we want to find good word embeddings we may decide to use the same parameters both for encoding and decoding of words. We discussed one such case when we introduced :numref:`chapter_model_construction`. Let's see how to do this a bit more elegantly. In the following we allocate a dense layer and then use its parameters specifically to set those of another layer.
+In some cases, we want to share model parameters across multiple layers. For instance when we want to find good word embeddings we may decide to use the same parameters both for encoding and decoding of words. We discussed one such case when we introduced :numref:`sec_model_construction`. Let's see how to do this a bit more elegantly. In the following we allocate a dense layer and then use its parameters specifically to set those of another layer.
 
 ```{.python .input  n=14}
 net = nn.Sequential()
@@ -224,7 +224,7 @@ The above example shows that the parameters of the second and third layer are ti
 
 ## Exercises
 
-1. Use the FancyMLP defined in :numref:`chapter_model_construction` and access the parameters of the various layers.
+1. Use the FancyMLP defined in :numref:`sec_model_construction` and access the parameters of the various layers.
 1. Look at the [MXNet documentation](http://beta.mxnet.io/api/gluon-related/mxnet.initializer.html) and explore different initializers.
 1. Try accessing the model parameters after `net.initialize()` and before `net(x)` to observe the shape of the model parameters. What changes? Why?
 1. Construct a multilayer perceptron containing a shared parameter layer and train it. During the training process, observe the model parameters and gradients of each layer.

@@ -1,5 +1,5 @@
 # Linear Regression Implementation from Scratch
-:label:`chapter_linear_scratch`
+:label:`sec_linear_scratch`
 
 Now that you have some background on the *ideas* behind linear regression, we
 are ready to step through a hands-on implementation.  In this section, and
@@ -145,7 +145,7 @@ in the direction that reduces the loss.
 Since nobody wants to compute gradients explicitly
 (this is tedious and error prone),
 we use automatic differentiation to compute the gradient.
-See :numref:`chapter_autograd`
+See :numref:`sec_autograd`
 for more details.
 Recall from the autograd chapter
 that in order for `autograd` to know
@@ -263,7 +263,7 @@ The number of epochs `num_epochs` and the learning rate `lr` are both hyper-para
 and requires some adjustment by trial and error.
 We elide these details for now but revise them
 later in
-:numref:`chapter_optimization`.
+:numref:`sec_optimization`.
 
 ```{.python .input  n=12}
 lr = 0.03  # Learning rate

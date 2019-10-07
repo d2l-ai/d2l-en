@@ -1,5 +1,5 @@
 # Linear Algebra
-:label:`chapter_linear_algebra`
+:label:`sec_linear_algebra`
 
 Now that you can store and manipulate data,
 let us briefly review the subset of basic linear algebra
@@ -115,7 +115,7 @@ x[3]
 
 ### Length, Dimensionality, and Shape
 
-Let us revisit some concepts from :numref:`chapter_ndarray`.
+Let us revisit some concepts from :numref:`sec_ndarray`.
 A vector is just an array of numbers.
 And just as every array has a length, so does every vector.
 In math notation, if we want to say that a vector $\mathbf{x}$

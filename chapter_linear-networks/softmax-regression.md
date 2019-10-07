@@ -1,7 +1,7 @@
 # Softmax Regression
-:label:`chapter_softmax`
+:label:`sec_softmax`
 
-In :numref:`chapter_linear_regression` we introduced linear regression, and worked through building everything from scratch in :numref:`chapter_linear_scratch` and using Gluon in :numref:`chapter_linear_gluon` to automate the most repetitive work.
+In :numref:`sec_linear_regression` we introduced linear regression, and worked through building everything from scratch in :numref:`sec_linear_scratch` and using Gluon in :numref:`sec_linear_gluon` to automate the most repetitive work.
 
 Regression is the hammer we reach for when we want to answer *how much?* or *how many?* questions.  If you want to predict the number of dollars (the *price*) at which a house will be sold, or the number of wins a baseball team might have, or the number of days that a patient will remain hospitalized before being discharged, then you're probably looking for a regression model.
 

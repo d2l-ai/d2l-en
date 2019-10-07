@@ -1,5 +1,5 @@
 # Deep Learning Computation
-:label:`chapter_computation`
+:label:`sec_computation`
 
 Alongside giant datasets and powerful hardware, 
 great software tools have played an indispensable role

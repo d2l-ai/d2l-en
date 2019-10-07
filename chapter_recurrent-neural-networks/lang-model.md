@@ -1,9 +1,9 @@
 # Language Models and Data Sets
 
-:label:`chapter_language_model`
+:label:`sec_language_model`
 
 
-In :numref:`chapter_text_preprocessing`, we see how to map text data into tokens, and these tokens can be viewed as a time series of discrete observations. Assuming the tokens in a text of length $T$ are in turn $x_1, x_2, \ldots, x_T$, then, in the discrete time series, $x_t$($1 \leq t \leq T$) can be considered as the output or label of time step $t$. Given such a sequence, the goal of a language model is to estimate the probability
+In :numref:`sec_text_preprocessing`, we see how to map text data into tokens, and these tokens can be viewed as a time series of discrete observations. Assuming the tokens in a text of length $T$ are in turn $x_1, x_2, \ldots, x_T$, then, in the discrete time series, $x_t$($1 \leq t \leq T$) can be considered as the output or label of time step $t$. Given such a sequence, the goal of a language model is to estimate the probability
 
 $$p(x_1,x_2, \ldots, x_T).$$
 
@@ -47,7 +47,7 @@ find enough occurrences to get accurate estimates. Things take a turn for the wo
 
 A common strategy is to perform some form of Laplace smoothing. We already
 encountered this in our discussion of
-naive bayes in :numref:`chapter_naive_bayes` where the solution was to
+naive bayes in :numref:`sec_naive_bayes` where the solution was to
 add a small constant to all counts. This helps with singletons, e.g. via
 
 $$\begin{aligned}
@@ -89,7 +89,7 @@ Since they involve one, two or three terms, these are typically referred to as u
 
 ## Natural Language Statistics
 
-Let's see how this works on real data. We construct a vocabulary based on the time machine data similar to :numref:`chapter_text_preprocessing` and print the top words
+Let's see how this works on real data. We construct a vocabulary based on the time machine data similar to :numref:`sec_text_preprocessing` and print the top words
 
 ```{.python .input  n=1}
 import d2l
@@ -149,7 +149,7 @@ The graph is quite exciting for a number of reasons. Firstly, beyond words, also
 Before introducing the model, let's assume we will use a neural network to train a language model. Now the question is how to read mini-batches of examples and labels at
 random. Since sequence data is by its very nature sequential, we need to address
 the issue of processing it. We did so in a rather ad-hoc manner when we
-introduced in :numref:`chapter_sequence`. Let's formalize this a bit. 
+introduced in :numref:`sec_sequence`. Let's formalize this a bit. 
 
 In :numref:`fig_timemachine_5gram`, we visualized several possible ways to obtain 5-grams in a sentence, here a token is a character. Note that we have quite some freedom since we could pick an arbitrary offset.
 

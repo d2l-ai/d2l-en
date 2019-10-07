@@ -1,5 +1,5 @@
 # Padding and Stride
-:label:`chapter_padding`
+:label:`sec_padding`
 
 In the previous example, our input had a height and width of 3
 and a convolution kernel with a height and width of 2,

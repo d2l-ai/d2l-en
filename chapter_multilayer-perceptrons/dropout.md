@@ -1,5 +1,5 @@
 # Dropout
-:label:`chapter_dropout`
+:label:`sec_dropout`
 
 Just now, we introduced the classical approach
 of regularizing statistical models by penalyzing
@@ -143,7 +143,7 @@ During training, we replace intermediate activations with random variables.
 
 ## Dropout in Practice
 
-Recall the multilayer perceptron (:numref:`chapter_mlp`) with a hidden layer and 5 hidden units. Its architecture is given by
+Recall the multilayer perceptron (:numref:`sec_mlp`) with a hidden layer and 5 hidden units. Its architecture is given by
 
 $$
 \begin{aligned}
@@ -227,7 +227,7 @@ print(dropout(X, 1))
 ### Defining Model Parameters
 
 Again, we can use the Fashion-MNIST dataset,
-introduced in :numref:`chapter_softmax_scratch`.
+introduced in :numref:`sec_softmax_scratch`.
 We will define a multilayer perceptron with two hidden layers.
 The two hidden layers both have 256 outputs.
 
@@ -255,7 +255,7 @@ The model defined below concatenates the fully-connected layer
  It is generally recommended to set
  a lower dropout probability closer to the input layer.
  Below we set it to 0.2 and 0.5 for the first and second hidden layer respectively.
- By using the `is_training` function described in :numref:`chapter_autograd`,
+ By using the `is_training` function described in :numref:`sec_autograd`,
  we can ensure that dropout is only active during training.
 
 ```{.python .input  n=4}

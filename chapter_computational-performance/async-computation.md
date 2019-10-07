@@ -1,5 +1,5 @@
 # Asynchronous Computing
-:label:`chapter_async`
+:label:`sec_async`
 
 MXNet utilizes asynchronous programming to improve computing performance. Understanding how asynchronous programming works helps us to develop more efficient programs, by proactively reducing computational requirements and thereby minimizing the memory overhead required in the case of limited memory resources. First, we will import the package or module needed for this section’s experiment.
 
@@ -150,7 +150,7 @@ def get_mem():
     return int(str(res).split()[15]) / 1e3
 ```
 
-Now we can begin testing. To initialize the `net` parameters we will try running the system once. See :numref:`chapter_deferred_init` for further discussions related to initialization.
+Now we can begin testing. To initialize the `net` parameters we will try running the system once. See :numref:`sec_deferred_init` for further discussions related to initialization.
 
 ```{.python .input  n=12}
 for X, y in data_iter():

@@ -1,5 +1,5 @@
 # Weight Decay
-:label:`chapter_weight_decay`
+:label:`sec_weight_decay`
 
 Now that we have characterized the problem of overfitting
 and motivated the need for capacity control,
@@ -72,7 +72,7 @@ minimizing the norm $|| \mathbf{w} ||^2$
 versus minimizing the training error.
 That's exactly what we want.
 To illustrate things in code, let's revive our previous example
-from :numref:`chapter_linear_regression` for linear regression.
+from :numref:`sec_linear_regression` for linear regression.
 There, our loss was given by
 
 $$l(\mathbf{w}, b) = \frac{1}{n}\sum_{i=1}^n \frac{1}{2}\left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right)^2.$$

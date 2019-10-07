@@ -1,8 +1,8 @@
 # Data Sets for Word2vec
-:label:`chapter_word2vec_data`
+:label:`sec_word2vec_data`
 
 In this section, we will introduce how to preprocess a data set with
-negative sampling :numref:`chapter_approx_train` and load into mini-batches for
+negative sampling :numref:`sec_approx_train` and load into mini-batches for
 word2vec training. The data set we use is [Penn Tree Bank (PTB)]( https://catalog.ldc.upenn.edu/LDC99T42), which is a small but commonly-used corpus. It takes samples from Wall Street Journal articles and includes training sets, validation sets, and test sets. 
 
 First, import the packages and modules required for the experiment.

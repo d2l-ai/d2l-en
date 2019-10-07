@@ -1,5 +1,5 @@
 # Adadelta
-:label:`chapter_adadelta`
+:label:`sec_adadelta`
 
 In addition to RMSProp, Adadelta is another common optimization algorithm that
 helps improve the chances of finding useful solutions at later stages of

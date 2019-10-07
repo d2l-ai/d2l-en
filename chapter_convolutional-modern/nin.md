@@ -1,5 +1,5 @@
 # Network in Network (NiN)
-:label:`chapter_nin`
+:label:`sec_nin`
 
 LeNet, AlexNet, and VGG all share a common design pattern:
 extract features exploiting *spatial* structure
@@ -10,7 +10,7 @@ in how these later networks widen and deepen these two modules.
 Alternatively, one could imagine using fully-connected layers
 earlier in the process.
 However, a careless use of dense layers might give up the
-the spatial structure of the representation entirely,
+spatial structure of the representation entirely,
 Network in Network (NiN) blocks offer an alternative.
 They were proposed in :cite:`Lin.Chen.Yan.2013` based on a very simple insight---to
 use an MLP on the channels for each pixel separately.
@@ -22,12 +22,12 @@ consist of four-dimensional arrays with axes
 corresponding to the batch, channel, height, and width.
 Also recall that the inputs and outputs of fully-connected layers
 are typically two-dimensional arrays corresponding to the batch, and features.
-The idea of behind NiN is to apply a fully-connected layer
+The idea behind NiN is to apply a fully-connected layer
 at each pixel location (for each height and  width).
 If we tie the weights across each spatial location,
 we could think of this as a $1\times 1$ convolutional layer
-(as described in :numref:`chapter_channels`)
-or as a fully-connected layer acting indepdendently on each pixel location.
+(as described in :numref:`sec_channels`)
+or as a fully-connected layer acting independently on each pixel location.
 Another way to view this is to think of each element in the spatial dimension
 (height and width) as equivalent to an example
 and the channel as equivalent to a feature.
@@ -68,7 +68,7 @@ with a stride of 2 and a window shape of $3\times 3$.
 Once significant difference between NiN and AlexNet
 is that NiN avoids dense connections altogether.
 Instead, NiN uses an NiN block with a number of output channels equal to the number of label classes, followed by a *global* average pooling layer,
-yielding a vector of logits.
+yielding a vector of [logits](https://en.wikipedia.org/wiki/Logit).
 One advantage of NiN's design is that it significantly
 reduces the number of required model parameters.
 However, in practice, this design sometimes requires

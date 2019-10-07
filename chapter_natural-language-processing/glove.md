@@ -1,5 +1,5 @@
 # Word Embedding with Global Vectors (GloVe)
-:label:`chapter_glove`
+:label:`sec_glove`
 
 First, we should review the skip-gram model in word2vec.  The conditional probability $\mathbb{P}(w_j\mid w_i)$ expressed in the skip-gram model using the softmax operation will be recorded as $q_{ij}$, that is:
 
@@ -19,7 +19,7 @@ In the formula above, $\sum_{j\in\mathcal{V}} p_{ij} \log\,q_{ij}$ computes the 
 
 However, although the most common type of loss function, the cross-entropy loss
 function is sometimes not a good choice. On the one hand, as we mentioned in
-:numref:`chapter_approx_train`
+:numref:`sec_approx_train`
 the cost of letting the
 model prediction $q_{ij}$ become the legal probability distribution has the sum
 of all items in the entire dictionary in its denominator. This can easily lead

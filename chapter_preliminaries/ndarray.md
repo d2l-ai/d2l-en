@@ -1,5 +1,5 @@
 # Data Manipulation and Preprocessing
-:label:`chapter_ndarray`
+:label:`sec_ndarray`
 
 In order to get anything done, we must have some way to manipulate data. 
 Generally, there are two important things we need to do with data: 
@@ -210,7 +210,7 @@ In addition to elementwise computations,
 we can also perform linear algebra operations, 
 including vector dot products and matrix multiplication.
 We will explain the crucial bits of linear algebra 
-(with no assumed prior knowledge) in :numref:`chapter_linear_algebra`.
+(with no assumed prior knowledge) in :numref:`sec_linear_algebra`.
 
 We can also *concatenate* multiple `ndarray`s together,
 stacking them end-to-end to form a larger `ndarray`. 
