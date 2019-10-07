@@ -34,7 +34,9 @@ chapter_computer-vision/index
 chapter_natural-language-processing/index
 chapter_recommender-systems/index
 chapter_generative_adversarial_networks/index
-chapter_appendix/index
+chapter_appendix_math/index
+chapter_appendix_tools/index
+
 ```
 
 
