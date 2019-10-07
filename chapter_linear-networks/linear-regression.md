@@ -97,7 +97,6 @@ and all weights into a vector $\mathbf{w}$,
 we can express our model compactly using a dot product:
 
 $$\hat{y} = \mathbf{w}^T \mathbf{x} + b.$$
-:eqlabel:`eq_linear_regression_single`
 
 Here, the vector $\mathbf{x}$ corresponds to a single data point.  
 We will often find it convenient 
@@ -110,7 +109,6 @@ the predictions $\hat{\mathbf{y}}$
 can be expressed via the matrix-vector product:
 
 $${\hat{\mathbf{y}}} = \mathbf X \mathbf{w} + b.$$
-:eqlabel:`eq_linear_regression`
 
 Given a training dataset $X$ 
 and corresponding (known) targets $\mathbf{y}$,
