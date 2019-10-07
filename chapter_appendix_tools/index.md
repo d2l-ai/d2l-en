@@ -1,11 +1,9 @@
-# Appendix
+# Appendix: Tools
 
 
 ```toc
 :maxdepth: 2
 
-notation
-math
 jupyter
 aws
 buy-gpu
