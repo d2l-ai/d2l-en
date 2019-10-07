@@ -399,7 +399,7 @@ for i in range(n):
 '%.5f sec' % timer.stop()
 ```
 
-Alternatively, we rely on `np` to compute the element-wise sum:
+Alternatively, we rely on `np` to compute the elementwise sum:
 
 ```{.python .input  n=3}
 timer.start()

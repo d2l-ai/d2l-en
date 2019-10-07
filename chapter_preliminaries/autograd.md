@@ -223,7 +223,7 @@ calculated `u` as a function of `x` outside of the `autograd.record` scope,
 yielding a `u` that will be treated as a constant in any called to `backward`. 
 The following backward computes $\partial (u \odot x)/\partial x$ 
 instead of $\partial (x \odot x \odot x) /\partial x$,
-where $\odot$ stands for element-wise multiplication.
+where $\odot$ stands for elementwise multiplication.
 
 ```{.python .input}
 with autograd.record():

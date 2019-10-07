@@ -28,7 +28,7 @@ $$
 \end{bmatrix}.
 $$
 
-Here $x_1, \ldots, x_n$ are elements of the vector. To express that $\mathbf{x}$ is an $n$-dimensional vector with elements from the set of real numbers, we write $\mathbf{x} \in \mathbb{R}^{n}$ or $\mathbf{x} \in \mathbb{R}^{n \times 1}$. Vectors satisfy the basic operations of a *vector space*, namely that you can add them together and multiply them with scalars (in our case element-wise) and you still get a vector back: assuming that $\mathbf{a}, \mathbf{b} \in \mathbb{R}^n$ and $\alpha \in \mathbb{R}$ we have that
+Here $x_1, \ldots, x_n$ are elements of the vector. To express that $\mathbf{x}$ is an $n$-dimensional vector with elements from the set of real numbers, we write $\mathbf{x} \in \mathbb{R}^{n}$ or $\mathbf{x} \in \mathbb{R}^{n \times 1}$. Vectors satisfy the basic operations of a *vector space*, namely that you can add them together and multiply them with scalars (in our case elementwise) and you still get a vector back: assuming that $\mathbf{a}, \mathbf{b} \in \mathbb{R}^n$ and $\alpha \in \mathbb{R}$ we have that
 $\mathbf{a} + \mathbf{b} \in \mathbb{R}^n$ and $\alpha \cdot \mathbf{a} \in \mathbb{R}^n$. Furthermore they satisfy the distributive law
 
 $$\alpha \cdot (\mathbf{a} + \mathbf{b}) = \alpha \cdot \mathbf{a} + \alpha \cdot \mathbf{b}.$$
@@ -90,7 +90,7 @@ $$
 \end{bmatrix}
 $$
 
-To add two matrices of the same shape, we add them element-wise:
+To add two matrices of the same shape, we add them elementwise:
 
 $$
 \mathbf{A} + \mathbf{B} =
@@ -102,7 +102,7 @@ $$
 \end{bmatrix}.
 $$
 
-We use the symbol $\odot$ to indicate the element-wise multiplication of two matrices (in Matlab notation this is `.*`):
+We use the symbol $\odot$ to indicate the elementwise multiplication of two matrices (in Matlab notation this is `.*`):
 
 $$
 \mathbf{A} \odot \mathbf{B} =
@@ -114,7 +114,7 @@ $$
 \end{bmatrix}.
 $$
 
-Define a scalar $k$. Multiplication of scalars and matrices is also an element-wise multiplication:
+Define a scalar $k$. Multiplication of scalars and matrices is also an elementwise multiplication:
 
 $$
 k \cdot \mathbf{A} =
@@ -128,7 +128,7 @@ $$
 
 Other operations such as scalar and matrix addition, and division by an element are similar to the multiplication operation in the above equation. Calculating the square root or taking logarithms of a matrix are performed by calculating the square root or logarithm, respectively, of each element of the matrix to obtain a matrix with the same shape as the original matrix.
 
-Matrix multiplication is different from element-wise matrix multiplication. Assume $\mathbf{A}$ is a matrix with $m$ rows and $p$ columns and $\mathbf{B}$ is a matrix with $p$ rows and $n$ columns. The product (matrix multiplication) of these two matrices is denoted as
+Matrix multiplication is different from elementwise matrix multiplication. Assume $\mathbf{A}$ is a matrix with $m$ rows and $p$ columns and $\mathbf{B}$ is a matrix with $p$ rows and $n$ columns. The product (matrix multiplication) of these two matrices is denoted as
 
 $$
 \mathbf{A} \mathbf{B} =

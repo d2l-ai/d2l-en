@@ -62,7 +62,7 @@ $$\mathbf{C}_t = \mathbf{F}_t \odot \mathbf{C}_{t-1} + \mathbf{I}_t \odot \tilde
 
 If the forget gate is always approximately 1 and the input gate is always approximately 0, the past memory cells will be saved over time and passed to the current time step. This design was introduced to alleviate the vanishing gradient problem and to better capture dependencies for time series with long range dependencies. We thus arrive at the following flow diagram.
 
-![Computation of memory cells in an LSTM. Here, the multiplication is carried out element-wise. ](../img/lstm_2.svg)
+![Computation of memory cells in an LSTM. Here, the multiplication is carried out elementwise. ](../img/lstm_2.svg)
 
 
 ### Hidden States
@@ -71,7 +71,7 @@ Lastly we need to define how to compute the hidden state $\mathbf{H}_t \in \math
 
 $$\mathbf{H}_t = \mathbf{O}_t \odot \tanh(\mathbf{C}_t).$$
 
-![Computation of the hidden state. Multiplication is element-wise. ](../img/lstm_3.svg)
+![Computation of the hidden state. Multiplication is elementwise. ](../img/lstm_3.svg)
 
 
 
