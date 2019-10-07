@@ -244,10 +244,10 @@ np.arange(24).reshape(2, 3, 4)
 Scalars, vectors, matrices, and tensors of any order
 have some nice properties that often come in handy.
 For example, you might have noticed
-from the definition of an element-wise operation,
+from the definition of an elementwise operation,
 any elementwise unary operation does not change the shape of its operand.
 Similarly, given any two tensors with the same shape,
-the result of any binary element-wise operation
+the result of any binary elementwise operation
 will be a tensor of that same shape.
 The same holds for multiplication by a scalar.
 Using math notation, given any two tensors $X, Y \in \mathcal{R}^{m \times n}$,
@@ -305,7 +305,7 @@ print(A.sum() / A.size)
 
 ## Dot Products
 
-So far, we have only performed element-wise operations, sums and averages. And if this was all we could do, linear algebra probably would not deserve its own chapter. However, one of the most fundamental operations is the dot product. Given two vectors $\mathbf{u}$ and $\mathbf{v}$, the dot product $\mathbf{u}^T \mathbf{v}$ is a sum over the products of the corresponding elements: $\mathbf{u}^T \mathbf{v} = \sum_{i=1}^{d} u_i \cdot v_i$.
+So far, we have only performed elementwise operations, sums and averages. And if this was all we could do, linear algebra probably would not deserve its own chapter. However, one of the most fundamental operations is the dot product. Given two vectors $\mathbf{u}$ and $\mathbf{v}$, the dot product $\mathbf{u}^T \mathbf{v}$ is a sum over the products of the corresponding elements: $\mathbf{u}^T \mathbf{v} = \sum_{i=1}^{d} u_i \cdot v_i$.
 
 ```{.python .input  n=14}
 x = np.arange(4)
@@ -313,7 +313,7 @@ y = np.ones(4)
 print(x, y, np.dot(x, y))
 ```
 
-Note that we can express the dot product of two vectors `dot(x, y)` equivalently by performing an element-wise multiplication and then a sum:
+Note that we can express the dot product of two vectors `dot(x, y)` equivalently by performing an elementwise multiplication and then a sum:
 
 ```{.python .input  n=15}
 np.sum(x * y)
