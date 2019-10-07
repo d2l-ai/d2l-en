@@ -47,7 +47,7 @@ $h$ and $w$, respectively. If we use each element as the center to generate $a$
 anchor boxes, we need to classify a total of $hwa$ anchor boxes. If we use a
 fully connected layer (FCN) for the output, this will likely result in an
 excessive number of model parameters. Recall how we used convolutional layer
-channels to output category predictions in :numref:`chapter_nin`. SSD uses the
+channels to output category predictions in :numref:`sec_nin`. SSD uses the
 same method to reduce the model complexity.
 
 Specifically, the category prediction layer uses a convolutional layer that

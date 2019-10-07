@@ -1,7 +1,7 @@
 # Implementation of Recurrent Neural Networks from Scratch
-:label:`chapter_rnn_scratch`
+:label:`sec_rnn_scratch`
 
-In this section we implement a language model introduce in :numref:`chapter_rnn` from scratch. It is based on a character-level recurrent neural network trained on H. G. Wells' *The Time Machine*. As before, we start by reading the data set first, which is introduced in :numref:`chapter_language_model`.
+In this section we implement a language model introduce in :numref:`sec_rnn` from scratch. It is based on a character-level recurrent neural network trained on H. G. Wells' *The Time Machine*. As before, we start by reading the data set first, which is introduced in :numref:`sec_language_model`.
 
 ```{.python .input  n=14}
 %matplotlib inline
@@ -18,7 +18,7 @@ train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 
 Remember that each token is presented as a numerical index in `train_iter`. Feeding these indices directly to the neural network might make it hard to learn. We often present each token as a more expressive feature vector. The easiest presentation is called *one-hot encoding*.
 
-In a nutshell, we map each index to a different unit vector: assume that the number of different toeksn in the vocabulary is $N$ (the `len(vocab)`) and the token indices range from 0 to $N-1$. If the index of a token is the integer $i$, then we create a vector $\mathbf{e}_i$ of all 0s with a length of $N$ and set the element at position $i$ to 1. This vector is the one-hot vector of the original token. The one-hot vectors with indices 0 and 2 are shown below.
+In a nutshell, we map each index to a different unit vector: assume that the number of different tokens in the vocabulary is $N$ (the `len(vocab)`) and the token indices range from 0 to $N-1$. If the index of a token is the integer $i$, then we create a vector $\mathbf{e}_i$ of all 0s with a length of $N$ and set the element at position $i$ to 1. This vector is the one-hot vector of the original token. The one-hot vectors with indices 0 and 2 are shown below.
 
 ```{.python .input  n=21}
 npx.one_hot(np.array([0, 2]), len(vocab))
@@ -64,7 +64,7 @@ def init_rnn_state(batch_size, num_hiddens, ctx):
 
 The following `rnn` function defines how to compute the hidden state and output
 in a time step. The activation function here uses the tanh function. As
-described in :numref:`chapter_mlp`, the
+described in :numref:`sec_mlp`, the
 mean value of the $\tanh$ function values is 0 when the elements are evenly
 distributed over the real numbers.
 
@@ -141,7 +141,7 @@ predict_ch8('time traveller ', 10, model, vocab, ctx)
 
 ## Gradient Clipping
 
-For a sequence of length $T$, we compute the gradients over these $T$ time steps in an iteration, which results in a chain of matrix-products with length  $O(T)$ during backpropagating. As mentioned in :numref:`chapter_numerical_stability`, it might result in numerical instability,  e.g. the gradients may either explode or vanish, when $T$ is large. Therefore RNN models often need extra help to stabilize the training.
+For a sequence of length $T$, we compute the gradients over these $T$ time steps in an iteration, which results in a chain of matrix-products with length  $O(T)$ during backpropagating. As mentioned in :numref:`sec_numerical_stability`, it might result in numerical instability,  e.g. the gradients may either explode or vanish, when $T$ is large. Therefore RNN models often need extra help to stabilize the training.
 
 Recall that when solving an optimization problem, we take update steps for the weights $\mathbf{w}$ in the general direction of the negative gradient $\mathbf{g}_t$ on a minibatch, say $\mathbf{w} - \eta \cdot \mathbf{g}_t$. Let's further assume that the objective is well behaved, i.e. it is Lipschitz continuous with constant $L$, i.e.
 
@@ -172,7 +172,7 @@ def grad_clipping(model, theta):
 
 ## Training
 
-Similar to :numref:`chapter_linear_scratch`, let's first define the function to train the model on one data epoch. It differs to the models training from previous chapters in three places:
+Similar to :numref:`sec_linear_scratch`, let's first define the function to train the model on one data epoch. It differs to the models training from previous chapters in three places:
 
 1. Different sampling methods for sequential data (independent sampling and
    sequential partitioning) will result in differences in the initialization of
@@ -180,7 +180,7 @@ Similar to :numref:`chapter_linear_scratch`, let's first define the function to 
 1. We clip the gradient before updating the model parameters. This ensures that the model doesn't diverge even when gradients blow up at some point during the training process (effectively it reduces the stepsize automatically).
 1. We use perplexity to evaluate the model. This ensures that different tests are comparable.
 
-When the consecutive sampling is used, we initialize the hidden state at the beginning of each epoch. Since the $i$-th example in the next mini-batch is adjacent to the current $i$-th example, so we next mini-batch can use the current hidden state directly, we only detach the gradient so that we only compute the gradients within a mini-batch. When using the random sampling, we need to re-initialize the hidden state for each iteration since each example is sampled with a random position. Same to the `train_epoch_ch3` function (:numref:`chapter_linear_scratch`), we use generalized `updater`, which could be a Gluon trainer or a scratched implementation.
+When the consecutive sampling is used, we initialize the hidden state at the beginning of each epoch. Since the $i$-th example in the next mini-batch is adjacent to the current $i$-th example, so the next mini-batch can use the current hidden state directly, we only detach the gradient so that we only compute the gradients within a mini-batch. When using the random sampling, we need to re-initialize the hidden state for each iteration since each example is sampled with a random position. Same to the `train_epoch_ch3` function (:numref:`sec_linear_scratch`), we use generalized `updater`, which could be a Gluon trainer or a scratched implementation.
 
 ```{.python .input}
 # Save to the d2l package.

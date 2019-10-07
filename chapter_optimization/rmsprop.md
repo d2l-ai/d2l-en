@@ -1,7 +1,7 @@
 # RMSProp
-:label:`chapter_rmsprop`
+:label:`sec_rmsprop`
 
-In the experiment in :numref:`chapter_adagrad`, the learning rate of each
+In the experiment in :numref:`sec_adagrad`, the learning rate of each
 element in the independent variable of the objective function declines (or
 remains unchanged) during iteration because the variable $\mathbf{s}_t$ in the
 denominator is increased by the square by element operation of the mini-batch
@@ -41,7 +41,7 @@ $$
 \end{aligned}
 $$
 
-In :numref:`chapter_momentum` we see that $\frac{1}{1-\gamma} = 1 + \gamma + \gamma^2 + \cdots$, so the sum of weights equals to 1. In addition, these weights decrease exponentially, it is called exponentially weighted moving average.
+In :numref:`sec_momentum` we see that $\frac{1}{1-\gamma} = 1 + \gamma + \gamma^2 + \cdots$, so the sum of weights equals to 1. In addition, these weights decrease exponentially, it is called exponentially weighted moving average.
 
 We visualize the weights in the past 40 time steps with various $\gamma$s.
 
@@ -65,7 +65,7 @@ d2l.plt.xlabel('time');
 By convention, we will use the objective function
 $f(\mathbf{x})=0.1x_1^2+2x_2^2$ to observe the iterative trajectory of the
 independent variable in RMSProp. Recall that in
-:numref:`chapter_adagrad`, when we used Adagrad with a learning rate of 0.4, the independent
+:numref:`sec_adagrad`, when we used Adagrad with a learning rate of 0.4, the independent
 variable moved less in later stages of iteration. However, at the same learning
 rate, RMSProp can approach the optimal solution faster.
 

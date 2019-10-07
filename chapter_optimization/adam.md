@@ -1,5 +1,5 @@
 # Adam
-:label:`chapter_adam`
+:label:`sec_adam`
 
 Created on the basis of RMSProp, Adam also uses EWMA on the mini-batch stochastic gradient[1]. Here, we are going to introduce this algorithm.
 

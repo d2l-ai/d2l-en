@@ -1,5 +1,5 @@
 # Numerical Stability and Initialization
-:label:`chapter_numerical_stability`
+:label:`sec_numerical_stability`
 
 In the past few sections, each model that we implemented
 required initializing our parameters according to some specified distribution.
@@ -67,8 +67,8 @@ and thus the learning process makes no progress.
 One major culprit in the vanishing gradient problem
 is the choices of the activation functions $\sigma$
 that are interleaved with the linear operations in each layer.
-Historically, a the sigmoid function $(1 + \exp(-x))$
-(introduced in :numref:`chapter_mlp`)
+Historically, the sigmoid function $(1 + \exp(-x))$
+(introduced in :numref:`sec_mlp`)
 was a popular choice owing to its similarity to a thresholding function.
 Since early artificial neural networks were inspired
 by biological neural networks,
@@ -139,7 +139,7 @@ Assume that we have a deep network
 with one hidden layer with two units, say $h_1$ and $h_2$.
 In this case, we could permute the weights $\mathbf{W}_1$
 of the first layer and likewise permute the weights of the output layer
-to obtain the same function function.
+to obtain the same function.
 There is nothing special differentiating
 the first hidden unit vs the second hidden unit.
 In other words, we have permutation symmetry
@@ -164,7 +164,7 @@ dropout regularization would!
 
 One way of addressing, or at least mitigating the issues raised above
 is through careful initialization of the weight vectors.
-This way we can ensure that (at least initially) the gradients do not vanish a
+This way we can ensure that (at least initially) the gradients do not vanish
 and that they maintain a reasonable scale
 where the network weights do not diverge.
 Additional care during optimization and suitable regularization
@@ -173,7 +173,7 @@ ensures that things never get too bad.
 
 ### Default Initialization
 
-In the previous sections, e.g., in :numref:`chapter_linear_gluon`,
+In the previous sections, e.g., in :numref:`sec_linear_gluon`,
 we used `net.initialize(init.Normal(sigma=0.01))`
 to initialize the values of our weights.
 If the initialization method is not specified,

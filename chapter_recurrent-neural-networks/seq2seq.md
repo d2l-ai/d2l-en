@@ -1,5 +1,5 @@
 #  Sequence to Sequence
-:label:`chapter_seq2seq`
+:label:`sec_seq2seq`
 
 The sequence to sequence (seq2seq) model is based on the encoder-decoder architecture to generate a sequence output for a sequence input. Both the encoder and the decoder use recurrent neural networks to handle sequence inputs. The hidden state of the encoder is used directly to initialize the decoder hidden state to pass information from the encoder to the decoder.
 

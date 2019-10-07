@@ -1,5 +1,5 @@
 # How to Contribute to This Book
-:label:`chapter_contribute`
+:label:`sec_contribute`
 
 Contributions by [readers](https://github.com/d2l-ai/d2l-en/graphs/contributors) help us improve this book. If you find a typo, an outdated link, something where you think we missed a citation, where the code doesn't look elegant or where an explanation is unclear, please contribute back and help us help our readers. While in regular books the delay between print runs (and thus between typo corrections) can be measured in years, it typically takes hours to days to incorporate an improvement in this book. This is all possible due to version control and continuous integration testing. To do so you need to install Git and submit a [pull request](https://github.com/d2l-ai/d2l-en/pulls) to the GitHub repository. When your pull request is merged into the code repository by the author, you will become a contributor. In a nutshell the process works as described in the diagram below.
 
@@ -27,7 +27,7 @@ Now, the code repository of this book will be copied to your username, such as `
 
 ### Clone the Repository
 
-To clone the repository (i.e. to make a local copy) we need to get its repository address. The green button on the picture below displays this. Make sure that your local copy is up to date with the main repository if you decide to keep this fork around for longer. For now simply follow the instructions in :numref:`chapter_installation` to get started. The main difference is that you're now downloading *your own fork* of the repository.
+To clone the repository (i.e. to make a local copy) we need to get its repository address. The green button on the picture below displays this. Make sure that your local copy is up to date with the main repository if you decide to keep this fork around for longer. For now simply follow the instructions in :numref:`sec_installation` to get started. The main difference is that you're now downloading *your own fork* of the repository.
 
 ![ Git clone. ](../img/git-clone-numpy2.png)
 :width:`700px`
@@ -56,10 +56,10 @@ nothing to commit, working tree clean
 
 ### Edit the Book and Push
 
-Now it's time to edit the book. It's best to edit the notebooks in Jupyter following instructions in :numref:`chapter_jupyter`. Make the changes and check that they're OK. Assume we have modified a typo in the file `~/d2l-en/chapter_appendix/how-to-contribute.md`.
+Now it's time to edit the book. It's best to edit the notebooks in Jupyter following instructions in :numref:`sec_jupyter`. Make the changes and check that they're OK. Assume we have modified a typo in the file `~/d2l-en/chapter_appendix/how-to-contribute.md`.
 You can then check which files you have changed:
 
-At this point Git will prompt that the `chapter_appendix/how-to-contribute.md` file has been modified.
+At this point Git will prompt that the `sec_appendix/how-to-contribute.md` file has been modified.
 
 ```
 mylaptop:d2l-en smola$ git status

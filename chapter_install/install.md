@@ -1,5 +1,5 @@
 # Installation
-:label:`chapter_installation`
+:label:`sec_installation`
 
 To get you up and running with hands-on experiences, we'll need you to set up with a Python environment, Jupyter's interactive notebooks, the relevant libraries, and the code needed to run the book.
 

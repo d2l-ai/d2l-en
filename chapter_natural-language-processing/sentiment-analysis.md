@@ -1,7 +1,7 @@
 # Text Classification and Data Sets
-:label:`chapter_sentiment`
+:label:`sec_sentiment`
 
-Text classification is a common task in natural language processing, which transforms a sequence of text of indefinite length into a category of text. It's similar to the image classification, the most frequently used application in this book, e.g. :numref:`chapter_naive_bayes`. The only difference is that, rather than an image, text classification's example is a text sentence. 
+Text classification is a common task in natural language processing, which transforms a sequence of text of indefinite length into a category of text. It's similar to the image classification, the most frequently used application in this book, e.g. :numref:`sec_naive_bayes`. The only difference is that, rather than an image, text classification's example is a text sentence. 
 
 This section will focus on loading data for one of the sub-questions in this field: using text sentiment classification to analyze the emotions of the text's author. This problem is also called sentiment analysis and has a wide range of applications. For example, we can analyze user reviews of products to obtain user satisfaction statistics, or analyze user sentiments about market conditions and use it to predict future trends.
 

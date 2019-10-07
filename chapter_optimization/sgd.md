@@ -1,5 +1,5 @@
 # Stochastic Gradient Descent
-:label:`chapter_sgd`
+:label:`sec_sgd`
 
 In this section, we are going to introduce the basic principles of stochastic gradient descent.
 

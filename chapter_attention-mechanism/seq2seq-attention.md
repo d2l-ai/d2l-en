@@ -1,7 +1,7 @@
 # Sequence to Sequence with Attention Mechanism
 
 In this section, we add the attention mechanism to the sequence to sequence
-model introduced in :numref:`chapter_seq2seq`
+model introduced in :numref:`sec_seq2seq`
 to explicitly select state. :numref:`fig_s2s_attention` shows the model
 architecture for a decoding time step. As can be seen, the memory of the
 attention layer consists of the encoder outputs of each time step. During
@@ -71,7 +71,7 @@ class Seq2SeqAttentionDecoder(d2l.Decoder):
                                         enc_valid_len]
 ```
 
-Use the same hyper-parameters to create an encoder and decoder as in :numref:`chapter_seq2seq`, we get the same decoder output shape, but the state structure is changed.
+Use the same hyper-parameters to create an encoder and decoder as in :numref:`sec_seq2seq`, we get the same decoder output shape, but the state structure is changed.
 
 ```{.python .input  n=3}
 encoder = d2l.Seq2SeqEncoder(vocab_size=10, embed_size=8,
@@ -89,7 +89,7 @@ out.shape, len(state), state[0].shape, len(state[1]), state[1][0].shape
 ## Training
 
 Again, we use the same training hyper-parameters as in
-:numref:`chapter_seq2seq`. The training loss is similar to the seq2seq model, because the
+:numref:`sec_seq2seq`. The training loss is similar to the seq2seq model, because the
 sequences in the training dataset are relative short. The additional attention
 layer doesn't lead to a significant different. But due to both attention layer
 computational overhead and we unroll the time steps in the decoder, this model

@@ -1,5 +1,5 @@
 # Linear Regression
-:label:`chapter_linear_regression`
+:label:`sec_linear_regression`
 
 Regression refers to a set of methods for modeling 
 the relationship between data points $\mathbf{x}$ 

@@ -1,8 +1,8 @@
 # Recurrent Neural Networks
-:label:`chapter_plain_rnn`
+:label:`sec_plain_rnn`
 
 
-In :numref:`chapter_language_model` we introduced $n$-gram models, where the conditional probability of word $x_t$ at position $t$ only depends on the $n-1$ previous words. If we want to check the possible effect of words earlier than $t-(n-1)$ on $x_t$, we need to increase $n$. However, the number of model parameters would also increase exponentially with it, as we need to store $|V|^n$ numbers for a vocabulary $V$. Hence, rather than modeling $p(x_t|x_{t-1}, \ldots x_{t-n+1})$ it is preferable to use a latent variable model in which we have
+In :numref:`sec_language_model` we introduced $n$-gram models, where the conditional probability of word $x_t$ at position $t$ only depends on the $n-1$ previous words. If we want to check the possible effect of words earlier than $t-(n-1)$ on $x_t$, we need to increase $n$. However, the number of model parameters would also increase exponentially with it, as we need to store $|V|^n$ numbers for a vocabulary $V$. Hence, rather than modeling $p(x_t|x_{t-1}, \ldots x_{t-n+1})$ it is preferable to use a latent variable model in which we have
 
 $$p(x_t|x_{t-1}, \ldots x_1) \approx p(x_t|x_{t-1}, h_{t}).$$
 
@@ -10,11 +10,11 @@ Here $h_t$ is a *latent variable* that stores the sequence information. A latent
 
 $$h_t = f(x_{t-1}, h_{t-1}).$$
 
-For a sufficiently powerful function $f$, the latent variable model is not an approximation. After all, $h_t$ could simply store all the data it observed so far. We discussed this in :numref:`chapter_sequence`. But it could potentially makes both computation and storage expensive.
+For a sufficiently powerful function $f$, the latent variable model is not an approximation. After all, $h_t$ could simply store all the data it observed so far. We discussed this in :numref:`sec_sequence`. But it could potentially makes both computation and storage expensive.
 
 Note that we also use $h$ to denote by the number of hidden units of a hidden layer. Hidden layers and hidden states refer to two very different concepts. Hidden layers are, as explained, layers that are hidden from view on the path from input to output. Hidden states are technically speaking *inputs* to whatever we do at a given step. Instead, they can only be computed by looking at data at previous iterations. In this sense they have much in common with latent variable models in statistics, such as clustering or topic models where the clusters affect the output but cannot be directly observed.
 
-Recurrent neural networks are neural networks with hidden states. Before introducing this model, let's first revisit the multi-layer perceptron introduced in :numref:`chapter_mlp`.
+Recurrent neural networks are neural networks with hidden states. Before introducing this model, let's first revisit the multi-layer perceptron introduced in :numref:`sec_mlp`.
 
 ## Recurrent Networks Without Hidden States
 
@@ -34,7 +34,7 @@ Here, $\mathbf{O} \in \mathbb{R}^{n \times q}$ is the output variable, $\mathbf{
 
 
 
-This is entirely analogous to the regression problem we solved previously in :numref:`chapter_sequence`, hence we omit details. Suffice it to say that we can pick $(x_t, x_{t-1})$ pairs at random and estimate the parameters $\mathbf{W}$ and $\mathbf{b}$ of our network via autograd and stochastic gradient descent.
+This is entirely analogous to the regression problem we solved previously in :numref:`sec_sequence`, hence we omit details. Suffice it to say that we can pick $(x_t, x_{t-1})$ pairs at random and estimate the parameters $\mathbf{W}$ and $\mathbf{b}$ of our network via autograd and stochastic gradient descent.
 
 ## Recurrent Networks with Hidden States
 
@@ -84,7 +84,7 @@ This makes the performance on documents of different lengths comparable. For his
 
 $$\mathrm{PPL} := \exp\left(-\frac{1}{n} \sum_{t=1}^n \log p(x_t|x_{t-1}, \ldots x_1)\right)$$
 
-It can be best understood as the harmonic mean of the number of real choices that we have when deciding which word to pick next. Note that perplexity naturally generalizes the notion of the cross-entropy loss defined when we introduced the softmax regression (:numref:`chapter_softmax`). That is, for a single symbol both definitions are identical bar the fact that one is the exponential of the other. Let's look at a number of cases:
+It can be best understood as the harmonic mean of the number of real choices that we have when deciding which word to pick next. Note that perplexity naturally generalizes the notion of the cross-entropy loss defined when we introduced the softmax regression (:numref:`sec_softmax`). That is, for a single symbol both definitions are identical bar the fact that one is the exponential of the other. Let's look at a number of cases:
 
 * In the best case scenario, the model always estimates the probability of the next symbol as $1$. In this case the perplexity of the model is $1$.
 * In the worst case scenario, the model always predicts the probability of the label category as 0. In this situation, the perplexity is infinite.
