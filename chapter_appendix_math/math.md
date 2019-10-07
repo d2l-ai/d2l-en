@@ -1,4 +1,4 @@
-# Mathematical Basics
+# Basics
 :label:`chapter_math`
 
 This section summarizes basic tools from linear algebra, differentiation, and probability required to understand the contents in this book. We avoid details beyond the bare minimum to keep things streamlined and easily accessible. In some cases we simplify things to keep them easily accessible. For more background see e.g. the excellent [Data Science 100](http://ds100.org) course at UC Berkeley.
