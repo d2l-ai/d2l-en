@@ -163,13 +163,8 @@ to express that the matrix $\mathbf{A}$ consists of $n$ rows and $m$ columns of 
 Visually, we can illustrate any matrix $\mathbf{A} \in \mathbb{R}^{n \times m}$ as a table,
 where each element $a_{ij}$ belongs to the $i^{\text{th}}$ row and $j^{\text{th}}$ column:
 
-$$\mathbf{A}=\begin{bmatrix}
- a_{11} & a_{12} & \cdots & a_{1m} \\
- a_{21} & a_{22} & \cdots & a_{2m} \\
-\vdots & \vdots & \ddots & \vdots \\
- a_{n1} & a_{n2} & \cdots & a_{nm} \\
-\end{bmatrix}.$$
-:eqlabel:`matrix_def`
+$$\mathbf{A}=\begin{bmatrix} a_{11} & a_{12} & \cdots & a_{1m} \\ a_{21} & a_{22} & \cdots & a_{2m} \\ \vdots & \vdots & \ddots & \vdots \\ a_{n1} & a_{n2} & \cdots & a_{nm} \\ \end{bmatrix}.$$
+:eqlabel:`eq_matrix_def`
 
 
 For any $\mathbf{A} \in \mathbb{R}^{n \times m}$, the shape of $\mathbf{A}$
@@ -183,7 +178,7 @@ A = np.arange(20).reshape(5, 4)
 A
 ```
 
-We can access the scalar element $a_{ij}$ of a matrix $\mathbf{A}$ in :eqref:`matrix_def`
+We can access the scalar element $a_{ij}$ of a matrix $\mathbf{A}$ in :eqref:`eq_matrix_def`
 by specifying the indices for the row ($i$) and column ($j$) respectively,
 such as $[\mathbf{A}]_{ij}$.
 To keep notation simple, commas are inserted to separate indices only when necessary,
@@ -195,7 +190,7 @@ When we exchange a matrix's rows and columns,
 the result is called the *transpose* of the matrix.
 Formally, we signify a matrix $\mathbf{A}$'s transpose by $\mathbf{A}^\top$
 and if $B = A^\top$, then $b_{ij} = a_{ji}$ for any $i$ and $j$.
-Thus, the transpose of $\mathbf{A}$ in :eqref:`matrix_def` is
+Thus, the transpose of $\mathbf{A}$ in :eqref:`eq_matrix_def` is
 a $m \times n$ matrix:
 
 $$
@@ -236,12 +231,11 @@ or just data points if no mini-batch exists.
 
 Just as vectors generalize scalars, and matrices generalize vectors, we can build data structures with even more axes. Tensors give us a generic way of describing arrays with an arbitrary number of axes. Vectors, for example, are first-order tensors, and matrices are second-order tensors.
 
-Tensors will become more important when we start working with images, which arrive as 3D data structures, with axes corresponding to the height, width, and a *channel* axis for stacking the three (RGB) color channels. For now, we will skip over higher order tensors and focus on the basics.
+Tensors will become more important when we start working with images, which arrive as `ndarray`s with 3 axes corresponding to the height, width, and a *channel* axis for stacking the color channels (red, green, and blue). For now, we will skip over higher order tensors and focus on the basics.
 
 ```{.python .input  n=9}
 X = np.arange(24).reshape(2, 3, 4)
-print('X.shape =', X.shape)
-print('X =', X)
+X
 ```
 
 ## Basic properties of tensor arithmetic
