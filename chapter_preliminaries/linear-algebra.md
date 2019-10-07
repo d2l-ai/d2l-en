@@ -229,7 +229,14 @@ or just data points if no mini-batch exists.
 
 ## Tensors
 
-Just as vectors generalize scalars, and matrices generalize vectors, we can build data structures with even more axes. Tensors give us a generic way of describing arrays with an arbitrary number of axes. Vectors, for example, are first-order tensors, and matrices are second-order tensors.
+Just as vectors generalize scalars, and matrices generalize vectors, we can build data structures with even more axes. Tensors give us a generic way of describing `ndarray`s with an arbitrary number of axes. Vectors, for example, are first-order tensors, and matrices are second-order tensors.
+Tensors are denoted with capital letters 
+
+
+Matrices, which we will typically denote with bold-faced, capital letters
+(e.g., $\mathbf{X}$, $\mathbf{Y}$, and $\mathbf{Z}$),
+are represented in code as `ndarray`s with $2$ axes.
+
 
 Tensors will become more important when we start working with images, which arrive as `ndarray`s with 3 axes corresponding to the height, width, and a *channel* axis for stacking the color channels (red, green, and blue). For now, we will skip over higher order tensors and focus on the basics.
 
