@@ -196,10 +196,10 @@ $$
 = {\mathbf{W}^{(2)}}^\top \frac{\partial J}{\partial \mathbf{o}}.
 $$
 
-Since the activation function $\phi$ applies element-wise,
+Since the activation function $\phi$ applies elementwise,
 calculating the gradient $\partial J/\partial \mathbf{z} \in \mathbb{R}^h$
 of the intermediate variable $\mathbf{z}$
-requires that we use the element-wise multiplication operator,
+requires that we use the elementwise multiplication operator,
 which we denote by $\odot$.
 
 $$
