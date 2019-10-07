@@ -8,16 +8,16 @@ Information theory is a field of study about encoding, decoding, transmitting an
 
 ## Information
 
-*Information* is conveyed by a particular sequence of stuffs. Rather than caring about the knowledge within the entity, information represents the degree of surprise or the abstract possibility of the event. Suppose that there is a file on your laptop and you are curious about how much information it contains. No matter whether it is a song, a movie or a text document, you may find the amount of information is measured in a unit of *bit*, for the size of the file. So what is a "bit" and why do we use it to measure information? Historically, an antique transmitter can only send or receive two codes: 0 and 1. In this way, any information symbol is encoded by a series of 0 and 1, and each digit represents 1 bit. 
+*Information* is conveyed by a particular sequence of stuffs. Rather than caring about the knowledge within the entity, information represents the degree of surprise or the abstract possibility of the event. Suppose that there is a file on your laptop and you are curious about how much information it contains. No matter whether it is a song, a movie or a text document, you may find the amount of information is measured in a unit of *bit*, for the size of the file. So what is a "bit" and why do we use it to measure information? Historically, an antique transmitter can only send or receive two codes: $0$ and $1$. In this way, any information symbol is encoded by a series of $0$ and $1$, and each digit represents 1 bit. 
 
 ### Self-information
 
-Since information embodies the abstract possibility of an event, how do we map the possibility to the number of bits? Suppose that for any series of codes, each 0 or 1 occurs with a probability of $\frac{1}{2}$. Hence, an event $X$, with a series of codes of length $n$, occurs with a probability of $\frac{1}{2^n}$. At the same time, this series contains $n$ bits of information. Therefore, we can define *self-information*
+Since information embodies the abstract possibility of an event, how do we map the possibility to the number of bits? Suppose that for any series of codes, each $0$ or $1$ occurs with a probability of $\frac{1}{2}$. Hence, an event $X$, with a series of codes of length $n$, occurs with a probability of $\frac{1}{2^n}$. At the same time, this series contains $n$ bits of information. Therefore, we can define *self-information*
 
 $$I(X) = - \log_2 (p(x)) = - \log (p(x))$$
 
-as the *bits* of information we have received for this code $X$. You may also hear of the term *nats*, which is another measurement unit using base-$e$ logarithms. Note that, in this section, we will always use base-2 logarithms for the sake of simplicity, *i.e.*, $log (\cdot) = log_2 (\cdot)$. For example, the code "0010" has a self-information:
-$$I(\text{"0010"}) = - \log_2 (p(\text{"0010"})) = - \log (p(\text{"0010"})) = - \log (\frac{1}{2^4}) = 4 \text{ bits}.$$
+as the *bits* of information we have received for this code $X$. You may also hear of the term *nats*, which is another measurement unit using base-$e$ logarithms. Note that, in this section, we will always use base-2 logarithms for the sake of simplicity, i.e., $log (\cdot) = log_2 (\cdot)$. For example, the code "0010" has a self-information:
+$$I(\text{``0010"}) = - \log_2 (p(\text{``0010"})) = - \log (p(\text{``0010"})) = - \log (\frac{1}{2^4}) = 4 \text{ bits}.$$
 
 
 ## Entropy 
@@ -40,13 +40,13 @@ Imagine that you are a movie director and you are collecting some feedbacks of y
 Without loss of generality, assume that any review is of the similar length and at the same price. Therefore, each review possesses the same amount of information per dollar. Limited by budget, you can only choose one vendor to partner with. Intuitively, the more balanced the polarity is in a dataset, the more comprehensive feedback we can obtain. Therefore, vendor $C$ may be the best one to coorperate with. But can we make the decision by more convincible math? Information theory can reveal the mask.
 
 Let us compute the entropy of each dataset. The entropy of movie reviews from vendor $A$'s dataset is:
-$$H(A) = - E_{x \sim P_{A}} [\log p_{A}(x)] = - [\frac{1}{6} \times \log(\frac{1}{6}) +\frac{5}{6} \times \log(\frac{5}{6})] = 0.1957.$$
+$$H(A) = - E_{x \sim P_{A}} [\log p_{A}(x)] = - \Big[\frac{1}{6} \times \log \Big(\frac{1}{6} \Big) +\frac{5}{6} \times \log \Big(\frac{5}{6} \Big) \Big] = 0.1957.$$
 
 For vendor $B$'s dataset, the entropy is:
-$$H(B) = - E_{x \sim P_{B}} [\log p_{B}(x)] = - [\frac{1}{3} \times \log(\frac{1}{3}) +\frac{2}{3} \times \log(\frac{2}{3})] = 0.2764.$$
+$$H(B) = - E_{x \sim P_{B}} [\log p_{B}(x)] = - \Big[\frac{1}{3} \times \log \Big (\frac{1}{3} \Big) +\frac{2}{3} \times \log \Big(\frac{2}{3} \Big) \Big] = 0.2764.$$
 
 And for vendor $C$'s dataset:
-$$H(C) = - E_{x \sim P_{C}} [\log p_{C}(x)] = - [\frac{1}{2} \times \log(\frac{1}{2}) +\frac{1}{2} \times \log(\frac{1}{2})] = 0.3010.$$
+$$H(C) = - E_{x \sim P_{C}} [\log p_{C}(x)] = - \Big[\frac{1}{2} \times \log \Big(\frac{1}{2} \Big) +\frac{1}{2} \times \log \Big(\frac{1}{2} \Big) \Big] = 0.3010.$$
 
 As a result, the vendor $C$ has the largest polarity entropy of movie reviews, and hence it may be more comprehensive to be analyzed.
 
@@ -55,11 +55,11 @@ As a result, the vendor $C$ has the largest polarity entropy of movie reviews, a
 
 You may be curious about that: in the entropy definition, why we use an expectation of a negative logarithm? Here are some intuitions:
 
-Firstly, why we use a "logarithm" function $\log$? Suppose that the $p(x) = f_1(x) f_2(x) ... f_n(x)$, where $f_i(x)$ functions are independent. This means that each $f_i(x)$ contributes individually to the total information obtained from $p(x)$. As a result, we need the entropy formula to possess the additive functionality over a mixed independent distributions. Luckily, $\log$ can naturally turn a product of probability distributions to a summation of their individual information.
+First, why we use a "logarithm" function $\log$? Suppose that the $p(x) = f_1(x) f_2(x) \ldots f_n(x)$, where $f_i(x)$ functions are independent. This means that each $f_i(x)$ contributes individually to the total information obtained from $p(x)$. As a result, we need the entropy formula to possess the additive functionality over a mixed independent distributions. Luckily, $\log$ can naturally turn a product of probability distributions to a summation of their individual information.
 
 Next, why we use a "negative" $\log$? Intuitively, more frequent events should contain less information than less common events, since we often gain more information from an unusual case than a regular one. However, because of $\log$ monotonically increasing with the probabilities, we need a negative sign to reverse their relationship.
 
-Lastly, where does the "expectation" function come from? Well, for a random variable $X$ follows a given probability distribution, entropy can be interpreted as the average amount of surprise from observing $X$. For example, imagine that a slot machine system emits statistical independently symbols ${s_1,...s_k}$ with probabilities ${p_1,...p_k}$ respectively. Then the entropy of this system equals to the average amount of self-information from observing each output, *i.e.*,
+Last, where does the "expectation" function come from? Well, for a random variable $X$ follows a given probability distribution, entropy can be interpreted as the average amount of surprise from observing $X$. For example, imagine that a slot machine system emits statistical independently symbols ${s_1, \ldots, s_k}$ with probabilities ${p_1, \ldots, p_k}$ respectively. Then the entropy of this system equals to the average amount of self-information from observing each output, i.e.,
 
 $$H(S) = \sum_i {p_i \cdot I(s_i)} = - \sum_i {p_i \cdot \log p_i}.$$
 
@@ -79,7 +79,8 @@ Conversely, if $P$ is continuous, then the further $P$ is from a uniform distrib
 
 ## Mutual Information
 
-![](../img/mutual_information.png)
+![Mutual information's relationship with joint entropy and conditional entropy.](../img/mutual_information.png)
+
 
 Previouly we defined entropy of a single random variable $X$, now let us extend the definition to a pair $(X,Y)$. For the following discussion of joint entropy, conditional entropy, and mutual information, we always use $(X,Y)$ as a pair of random variables that follows a joint probability distribution $P$ with a p.d.f. or a p.m.f. $p_{X,Y}(x,y)$, while X and Y follow probability distribution $p_X(x)$ and $p_Y(y)$, respectively. 
 
@@ -105,7 +106,7 @@ Specificly, if $(X,Y)$ is a pair of discrete random variables, then $$H(Y \mid X
 On the flip side, if $(X,Y)$ is a pair of continuous random variables, then the *differential joint entropy* is defined as $$H(Y \mid X) = - \int_x \int_y p(x,y) \ \log p(y \mid x) \ dx dy.$$
 
 
-In addition, the naturalness of above definitions alludes that the entropy of a pair of random variables is the entropy of one plus the conditional entropy of the other, *i.e.*,
+In addition, the naturalness of above definitions alludes that the entropy of a pair of random variables is the entropy of one plus the conditional entropy of the other, i.e.,
 
 $$H(X,Y) = H(X)+H(Y \mid X).$$
 
@@ -117,14 +118,14 @@ Given the previous setting of random variables $(X, Y)$, you may wonder: "How mu
 $$I(X,Y) = −E_{x} E_{y} \left\{ p_{X,Y}(x, y) \log\frac{p_{X,Y}(x, y)}{p_X(x) p_Y(y)} \right\}. $$
 
 
-As shown in the earlier image, if we know $H(X)$ (*i.e.*, the amount of uncertainty in $X$) and $H(X \mid Y)$ (*i.e.*, amount of uncertainty in $X$ which remains after $Y$ is known), mutual information tells us the average reduction in uncertainty about $X$ that results from learning the value of $Y$, *i.e.*,
+As shown in the earlier image, if we know $H(X)$ (i.e., the amount of uncertainty in $X$) and $H(X \mid Y)$ (i.e., amount of uncertainty in $X$ which remains after $Y$ is known), mutual information tells us the average reduction in uncertainty about $X$ that results from learning the value of $Y$, i.e.,
 
-\begin{align}
+\begin{aligned}
 I(X,Y) &= H(X) − H(X \mid Y) \\
 &= H(Y) − H(Y \mid X) \\
 &= H(X) + H(Y) − H(X,Y) \\
 &= H(X,Y) - H(Y \mid X) − H(X \mid Y). \\
-\end{align}
+\end{aligned}
 
 
 ### Properties of Mutual Information
@@ -147,12 +148,12 @@ Norm is used to measure the distance between two points in any dimension space, 
 
 Given a random variable $X$ that follows the true probability distribution $P$ with a p.d.f. or a p.m.f. $p(x)$, and we estimate $P$ by another probability distribution $Q$ with a p.d.f. or a p.m.f. $q(x)$. Then the *Kullback–Leibler(KL) Divergence* (or *Relative Entropy*) between $P$ and $Q$ is:
 
-$$D_{\mathrm{KL}}(P\|Q) = E_{x \sim P} [\log \frac{p(x)}{q(x)}] = E_{x \sim P} [\log p(x) - \log q(x)].$$
+$$D_{\mathrm{KL}}(P\|Q) = E_{x \sim P} \Big[\log \frac{p(x)}{q(x)} \Big] = E_{x \sim P} [\log p(x) - \log q(x)].$$
 
 
 ### Example: Implementation of KL Divergence from Scratch
 
-Let us build a toy model. Firstly, generate and sort three 1,000,000 length ndarrays: an objective ndarray $p$ which follows a normal distribution $N(0,1)$, and two candidate ndarrays $q_1$ and $q_2$ which follow normal distributions $N(-1,1)$ and $N(1,1)$ respectively.
+Let us build a toy model. First, generate and sort three $1,000,000$ length ndarrays: an objective ndarray $p$ which follows a normal distribution $N(0,1)$, and two candidate ndarrays $q_1$ and $q_2$ which follow normal distributions $N(-1,1)$ and $N(1,1)$ respectively.
 
 
 ```{.python .input  n=0}
@@ -181,7 +182,7 @@ def KLDivergence(p, q):
 ```
 
 
-Since $q_1$ and $q_2$ are symmetric with respect to the y-axis (x=0), we expect a similar absolute value of KL divergence between $D_{\mathrm{KL}}(p\|q_1)$ and $D_{\mathrm{KL}}(p\|q_2)$. 
+Since $q_1$ and $q_2$ are symmetric with respect to the y-axis ($x=0$), we expect a similar absolute value of KL divergence between $D_{\mathrm{KL}}(p\|q_1)$ and $D_{\mathrm{KL}}(p\|q_2)$. 
 
 
 ```{.python .input  n=2}
@@ -230,27 +231,27 @@ $$\log E_{x \sim P} (X) = \sup_Q \{E_{x \sim Q} (\log(x)) - D_{\mathrm{KL}} (Q\|
 
 Even though the equation looks a bit formidable, it has profound influence in reinforcement learning, one of the popular area of machine learning. Here is the essence of the algorithm: for an unknown true distribution $P$, we can apply Variational Inequality by maximizing the above objective function respective to a new probability distribution $Q$. 
 
-To be specific, we firstly draw samples from a randomly initialized $Q$ and calculate $E_{x \sim Q} (\log(x))$. Then we calculate the estimation error between current batch of true dataset $P$ and samples from $Q$, *i.e.*, $D_{\mathrm{KL}} (Q\|P)$. To update the weights of $Q$, we maxmize the difference, *i.e.*, $E_{x \sim Q} (\log(x)) - D_{\mathrm{KL}} (Q\|P)$ respective to $Q$. Finanlly, we move to the next batch, draw new samples from the updated $Q$, and roll back to the start of the algorithm.
+To be specific, we first draw samples from a randomly initialized $Q$ and calculate $E_{x \sim Q} (\log(x))$. Then we calculate the estimation error between current batch of true dataset $P$ and samples from $Q$, i.e., $D_{\mathrm{KL}} (Q\|P)$. To update the weights of $Q$, we maxmize the difference, i.e., $E_{x \sim Q} (\log(x)) - D_{\mathrm{KL}} (Q\|P)$ respective to $Q$. Finanlly, we move to the next batch, draw new samples from the updated $Q$, and roll back to the start of the algorithm.
 
 
 ## Cross Entropy
 
-Say now we have a binary classification problem. Assume that we encode "1" and "0" as the positive and negative class label respectively, and our neural network is parameterized by $\theta$. If we aim to find a best $\theta$ so that $\hat{y}= p_{\theta}(y \mid x)$, it is natually to apply the maximum log-likelihood approach. To to specific, for true labels $y_i$ and predictions $\hat{y_i}= p_{\theta}(y_i \mid x_i)$, the probability to be classified as positive is $\pi_i= p_{\theta}(y_i = 1 \mid x_i)$. Hence, the likelihood function would be:
+Say now we have a binary classification problem. Assume that we encode "$1$" and "$0$" as the positive and negative class label respectively, and our neural network is parameterized by $\theta$. If we aim to find a best $\theta$ so that $\hat{y}= p_{\theta}(y \mid x)$, it is natually to apply the maximum log-likelihood approach. To to specific, for true labels $y_i$ and predictions $\hat{y_i}= p_{\theta}(y_i \mid x_i)$, the probability to be classified as positive is $\pi_i= p_{\theta}(y_i = 1 \mid x_i)$. Hence, the likelihood function would be:
 
-\begin{align}
-\mathcal{L}(\theta) &= \prod_{i=1}^n \pi_i^{y_i} (1 - \pi_i)^{1 - y_i} \\
+\begin{aligned}
+\mathrm{L}(\theta) &= \prod_{i=1}^n \pi_i^{y_i} (1 - \pi_i)^{1 - y_i} \\
   &= \prod_{i=1}^n  p_{\theta}(y_i = 1 \mid x_i)^{y_i}  p_{\theta}(y_i =0 \mid x_i))^{1 - y_i}.\\
-\end{align}
+\end{aligned}
 
 And the log-likelihood function would be:
 
-\begin{align}
-\mathcal{l}(\theta) &= \sum_{i=1}^n y_i \log(\pi_i) + (1 - y_i) \log (1 - \pi_i) \\
+\begin{aligned}
+\mathrm{l}(\theta) &= \sum_{i=1}^n y_i \log(\pi_i) + (1 - y_i) \log (1 - \pi_i) \\
   &= \sum_{i=1}^n {y_i} \log(p_{\theta}(y_i \mid x_i))  + {(1 - y_i)} \log(1 - p_{\theta}(y_i \mid x_i)).\\
-\end{align}
+\end{aligned}
 
 
-Maximizing the log-likelihood function $\mathcal{l}(\theta)$ is identical to minimizing $- \mathcal{l}(\theta)$, and hence we can find the best $\theta$ from here. To generalize the above loss to any distributions, we also called $-\mathcal{l}(\theta)$ the *Cross Entropy loss* $\mathcal{CE}(y, \hat{y})$, where $y$ follows the true distribution $P$ and $\hat{y}$ follows the estimating distribution $Q$.
+Maximizing the log-likelihood function $\mathrm{l(\theta)}$ is identical to minimizing $- \mathrm{l(\theta)}$, and hence we can find the best $\theta$ from here. To generalize the above loss to any distributions, we also called $-l(\theta)$ the *Cross Entropy loss* $\mathrm{CE}(y, \hat{y})$, where $y$ follows the true distribution $P$ and $\hat{y}$ follows the estimating distribution $Q$.
 
 
 
@@ -260,7 +261,7 @@ Like KL Divengence, for a random variable $X$, we can also measure the divergenc
 
 $$H(P,Q) = - E_{x \sim P} [\log(q(x))].$$
 
-It can also be interpreted as the summation of the entropy $H(P)$ and the KL Divergence between $P$ and $Q$, *i.e.*,
+It can also be interpreted as the summation of the entropy $H(P)$ and the KL Divergence between $P$ and $Q$, i.e.,
 
 $$H(P, Q) = H(P) + D_{\mathrm{KL}}(P\|Q).$$
 
@@ -274,7 +275,7 @@ As widely accepted, cross entropy can be used to define a loss function in the o
 
 ### Example: Implementation of Cross Entropy from Scratch
 
-Firstly, let us define the cross entropy formula in MXNet.
+First, let us define the cross entropy formula in MXNet.
 
 ```{.python .input  n=4}
 from mxnet import np
@@ -296,56 +297,56 @@ cross_entropy(preds, labels)
 
 ### Cross Entropy as An Objective Function of Multi-class Classification
 
-If we dive deep into the classification objective function with cross entropy loss $\mathcal{CE}$, you may find minimizing $\mathcal{CE}$ is equivalent to maximizing the log-likelihood function $\mathcal{L}$. Let us work through a toy example together. 
+If we dive deep into the classification objective function with cross entropy loss $\mathrm{CE}$, you may find minimizing $\mathrm{CE}$ is equivalent to maximizing the log-likelihood function $\mathrm{L}$. Let us work through a toy example together. 
 
 
-To begin with, we represent any $k$-class labels by *one-hot encoding* method: setting the component corresponding to its category to be 1, and all other components to be 0, i.e. 
+To begin with, we represent any $k$-class labels by *one-hot encoding* method: setting the component corresponding to its category to be $1$, and all other components to be $0$, i.e. 
 
 \begin{equation}
-  \mathbf{y_i} = (y_{i1}, ..., y_{ik}) \text{, where } y_{ij} = \begin{cases}
+  \mathbf{y}_i = (y_{i1}, \ldots, y_{ik}) \text{, where } y_{ij} = \begin{cases}
     1, & \text{if data point $i$ belongs to category $j$ ;}\\
     0, & \text{otherwise}.
   \end{cases}
 \end{equation}
 
 
-For instance, if a multi-class classfication problem contains three classes A, B and C, then the labels $\mathbf{y_i}$ can be encoded in {A: (1, 0, 0); B: (0, 1, 0); C: (0, 0, 1)}.
+For instance, if a multi-class classfication problem contains three classes $A$, $B$ and $C$, then the labels $\mathbf{y}_i$ can be encoded in {$A: (1, 0, 0); B: (0, 1, 0); C: (0, 0, 1)$}.
 
 
-Assume that there are $k$ classes and our neural network is parameterized by $\theta$. For true label vectors $\mathbf{y_i}$ and predictions $\hat{\mathbf{y_i}}= p_{\theta}(\mathbf{y_i} \mid \mathbf{x_i})$, the *cross entropy (CE) loss* would be:
+Assume that there are $k$ classes and our neural network is parameterized by $\theta$. For true label vectors $\mathbf{y}_i$ and predictions $\hat{\mathbf{y}_i}= p_{\theta}(\mathbf{y}_i \mid \mathbf{x}_i)$, the *cross entropy (CE) loss* would be:
 
 
-\begin{align}
-\mathcal{CE}(\mathbf{y}, \hat{\mathbf{y}}) &= - \sum_{i=1}^n \mathbf{y_i} \log \hat{\mathbf{y_i}} \\
-  &= - \sum_{i=1}^n \mathbf{y_i} \log{p_{\theta} (\mathbf{y_i}  \mid  \mathbf{x_i})} \\
-  &= - \sum_{i=1}^n \sum_{j=1}^k y_{ij} \log{p_{\theta} (y_{ij}  \mid  \mathbf{x_i})}.\\
-\end{align}
+\begin{aligned}
+\mathrm{CE}(\mathbf{y}, \hat{\mathbf{y}}) &= - \sum_{i=1}^n \mathbf{y}_i \log \hat{\mathbf{y}_i} \\
+  &= - \sum_{i=1}^n \mathbf{y}_i \log{p_{\theta} (\mathbf{y}_i  \mid  \mathbf{x}_i)} \\
+  &= - \sum_{i=1}^n \sum_{j=1}^k y_{ij} \log{p_{\theta} (y_{ij}  \mid  \mathbf{x}_i)}.\\
+\end{aligned}
 
 
-On the other side, we can also demystify the myth through probabilistic approach. To begin with, let us quickly introduce a $k$-class multinoulli distribution. It is an extension of the bernoulli distribution from binary class to multi-class. If a random variable $\mathbf{y} = (y_{1}, ..., y_{k})$ is followed a $k$-class *multinoulli distribution* with probabilities $\boldsymbol{p} =$ ($p_{1}$, ..., $p_{k}$), *i.e.*, 
-$$p(\mathbf{y}) = p(y_1, ..., y_k) = \mathcal{Multi} (p_1, ..., p_k), \text{ where } \sum_{i=1}^k p_i = 1,$$
+On the other side, we can also demystify the myth through probabilistic approach. To begin with, let us quickly introduce a $k$-class multinoulli distribution. It is an extension of the bernoulli distribution from binary class to multi-class. If a random variable $\mathbf{y} = (y_{1}, \ldots, y_{k})$ is followed a $k$-class *multinoulli distribution* with probabilities $\boldsymbol{p} =$ ($p_{1}$, \ldots, $p_{k}$), i.e., 
+$$p(\mathbf{y}) = p(y_1, \ldots, y_k) = \mathrm{Multi} (p_1, \ldots, p_k), \text{ where } \sum_{i=1}^k p_i = 1,$$
 then the joint probability mass function(p.m.f.) of $\mathbf{y}$ is:
 $$\boldsymbol{p}^\mathbf{y} = \prod_{j=1}^k p_{j}^{y_{j}}.$$
 
 
-Now back to our example, it is easy to see that each data point, $\mathbf{y_i}$, is following a $k$-class multinoulli distribution with probabilities $\boldsymbol{\pi} =$ ($\pi_{1}$, ..., $\pi_{k}$). Therefore, the joint p.m.f. of $\mathbf{y_i}$ is: $\boldsymbol{\pi}^\mathbf{y_i} = \prod_{j=1}^k \pi_{j}^{y_{ij}}.$
+Now back to our example, it is easy to see that each data point, $\mathbf{y}_i$, is following a $k$-class multinoulli distribution with probabilities $\boldsymbol{\pi} =$ ($\pi_{1}$, \ldots, $\pi_{k}$). Therefore, the joint p.m.f. of $\mathbf{y}_i$ is: $\boldsymbol{\pi}^\mathbf{y}_i = \prod_{j=1}^k \pi_{j}^{y_{ij}}.$
 Hence, the likelihood function of the given dataset with $n$ samples would be:
 
-\begin{align}
-\mathcal{L}(\theta) = \prod_{i=1}^n \boldsymbol{\pi_i}^{\mathbf{y_i}}
+\begin{aligned}
+\mathrm{L}(\theta) = \prod_{i=1}^n \boldsymbol{\pi_i}^{\mathbf{y}_i}
  = \prod_{i=1}^n \prod_{j=1}^k \pi_{ij}^{y_{ij}}
- = \prod_{i=1}^n \prod_{j=1}^k p_{\theta}(y_{ij} \mid \mathbf{x_i})^{y_{ij}}.\\
-\end{align}
+ = \prod_{i=1}^n \prod_{j=1}^k p_{\theta}(y_{ij} \mid \mathbf{x}_i)^{y_{ij}}.\\
+\end{aligned}
 
 And the log-likelihood function would be:
 
 
-\begin{align}
-\mathcal{l}(\theta) = \log \mathcal{L}(\theta) = \sum_{i=1}^n \sum_{j=1}^k y_{ij} \log{p_{\theta} (y_{ij}  \mid  \mathbf{x_i})}.\\
-\end{align}
+\begin{aligned}
+\mathrm{l}(\theta) = \log \mathrm{L}(\theta) = \sum_{i=1}^n \sum_{j=1}^k y_{ij} \log{p_{\theta} (y_{ij}  \mid  \mathbf{x}_i)}.\\
+\end{aligned}
 
 
-Therefore, for any multi-class classification, maximizing the above log-likelihood function $\mathcal{l}(\theta)$ is equivalent to minimizing the CE loss $\mathcal{CE}(y, \hat{y})$.
+Therefore, for any multi-class classification, maximizing the above log-likelihood function $\mathrm{l}(\theta)$ is equivalent to minimizing the CE loss $\mathrm{CE}(y, \hat{y})$.
 
 
 To verify the above proof by algorithm, let us apply the built-in metric `NegativeLogLikelihood` in MXNet. Using the same "labels" and "preds" as the earlier example, we will get the same numerical loss as the previous example.
