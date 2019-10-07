@@ -1,7 +1,3 @@
----
-output:
-  html_document: default
----
 # Information Theory
 :label:`chapter_information_theory`
 
