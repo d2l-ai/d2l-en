@@ -6,5 +6,4 @@
 
 notation
 math
-info-theory
 ```
