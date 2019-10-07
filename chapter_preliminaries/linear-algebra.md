@@ -208,7 +208,7 @@ $$
 In code, we access a matrix's transpose via the `.T` attribute.
 
 ```{.python .input  n=8}
-print(A.T)
+A.T
 ```
 
 Matrices are useful data structures: 
@@ -230,22 +230,16 @@ or just data points if no mini-batch exists.
 ## Tensors
 
 Just as vectors generalize scalars, and matrices generalize vectors, we can build data structures with even more axes. Tensors give us a generic way of describing `ndarray`s with an arbitrary number of axes. Vectors, for example, are first-order tensors, and matrices are second-order tensors.
-Tensors are denoted with capital letters 
-
-
-Matrices, which we will typically denote with bold-faced, capital letters
-(e.g., $\mathbf{X}$, $\mathbf{Y}$, and $\mathbf{Z}$),
-are represented in code as `ndarray`s with $2$ axes.
-
+Tensors are denoted with capital letters of a special font face
+(e.g., $\mathsf{X}$, $\mathsf{Y}$, and $\mathsf{Z}$).
 
 Tensors will become more important when we start working with images, which arrive as `ndarray`s with 3 axes corresponding to the height, width, and a *channel* axis for stacking the color channels (red, green, and blue). For now, we will skip over higher order tensors and focus on the basics.
 
 ```{.python .input  n=9}
-X = np.arange(24).reshape(2, 3, 4)
-X
+np.arange(24).reshape(2, 3, 4)
 ```
 
-## Basic properties of tensor arithmetic
+## Basic Properties of Tensor Arithmetic
 
 Scalars, vectors, matrices, and tensors of any order
 have some nice properties that often come in handy.
@@ -276,7 +270,7 @@ These operations also preserve membership in a vector space.
 But, again we will punt discussion of *vector spaces*
 in favor of information more critical to getting your first models up and running.
 
-## Sums and means
+## Sums and Means
 
 One useful operation that we can perform with arbitrary tensors
 is to calculate the sum of their elements.
@@ -309,7 +303,7 @@ print(A.mean())
 print(A.sum() / A.size)
 ```
 
-## Dot products
+## Dot Products
 
 So far, we have only performed element-wise operations, sums and averages. And if this was all we could do, linear algebra probably would not deserve its own chapter. However, one of the most fundamental operations is the dot product. Given two vectors $\mathbf{u}$ and $\mathbf{v}$, the dot product $\mathbf{u}^T \mathbf{v}$ is a sum over the products of the corresponding elements: $\mathbf{u}^T \mathbf{v} = \sum_{i=1}^{d} u_i \cdot v_i$.
 
@@ -341,7 +335,7 @@ the dot products express the cosine of the angle between them.
 We formally introduce this notion of *length* below in the section on norms.
 
 
-## Matrix-vector products
+## Matrix-Vector Products
 
 Now that we know how to calculate dot products,
 we can begin to understand matrix-vector products.
@@ -421,7 +415,7 @@ must be the same as the dimension of ``x`` (its length).
 np.dot(A, x)
 ```
 
-## Matrix-matrix multiplication
+## Matrix-Matrix Multiplication
 
 If you have gotten the hang of dot products and matrix-vector multiplication,
 then matrix-matrix multiplications should be straightforward.
@@ -550,7 +544,7 @@ the absolute value function with a sum over the elements.
 np.abs(x).sum()
 ```
 
-### Norms and objectives
+### Norms and Objectives
 
 While we do not want to get too far ahead of ourselves,
 we can plant some intuition already about why these concepts are useful.
