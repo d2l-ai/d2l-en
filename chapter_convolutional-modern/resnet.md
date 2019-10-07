@@ -1,5 +1,5 @@
 # Residual Networks (ResNet)
-:label:`chapter_resnet`
+:label:`sec_resnet`
 
 As we design increasingly deeper networks it becomes imperative to understand how adding layers can increase the complexity and expressiveness of the network. Even more important is the ability to design networks where adding layers makes networks strictly more expressive rather than just different. To make some progress we need a bit of theory.
 

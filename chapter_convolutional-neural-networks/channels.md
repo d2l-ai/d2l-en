@@ -1,5 +1,5 @@
 # Multiple Input and Output Channels
-:label:`chapter_channels`
+:label:`sec_channels`
 
 While we have described the multiple channels
 that comprise each image (e.g. color images have the standard RGB channels

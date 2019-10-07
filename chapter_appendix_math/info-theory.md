@@ -1,9 +1,9 @@
 # Information Theory
-:label:`chapter_information_theory`
+:label:`sec_information_theory`
 
 Imagine that you have two ideas and want to assess which one is better. If you are a scholar, you can write two papers and see which one received more citations; if you are a netizen, you can post the two ideas on social media and see which one get more likes; if you are a musician, you can write two songs and see which one become more popular. No matter how are you going to convey your ideas, you are trying to encode them with one or another communication format. However, regardless the encoding format, the idea itself is supposed to have the same amount of “information”.
 
-Information theory is a field of study about encoding, decoding, transmitting and manipulating information. With information theory, we can measure and compare how much information is presented in different signals. While machine learning is aimed at extracting interesting signals from data and making critical predictions. As a result, information theory provides a strong backbone of fundamental machine learning. For example, cross entropy loss in :numref:`chapter_softmax` is used as an objective function in many machine learning algorithms. Such a loss is a direct application to information theory. In this section, by several examples, we will illustrate the fundamental concepts of information theory and their application.
+Information theory is a field of study about encoding, decoding, transmitting and manipulating information. With information theory, we can measure and compare how much information is presented in different signals. While machine learning is aimed at extracting interesting signals from data and making critical predictions. As a result, information theory provides a strong backbone of fundamental machine learning. For example, cross entropy loss in :numref:`sec_softmax` is used as an objective function in many machine learning algorithms. Such a loss is a direct application to information theory. In this section, by several examples, we will illustrate the fundamental concepts of information theory and their application.
 
 
 ## Information

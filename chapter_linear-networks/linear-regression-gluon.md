@@ -1,5 +1,5 @@
 # Concise Implementation of Linear Regression
-:label:`chapter_linear_gluon`
+:label:`sec_linear_gluon`
 
 The surge of deep learning has inspired the development of a variety of mature software frameworks, 
 that automate much of the repetitive work of implementing deep learning models.
@@ -11,7 +11,7 @@ are so common, deep learning libraries will give us
 library functions for these as well.
 
 In this section, we will learn how we can implement
-the linear regression model in :numref:`chapter_linear_scratch` much more concisely with Gluon.
+the linear regression model in :numref:`sec_linear_scratch` much more concisely with Gluon.
 
 ## Generating Data Sets
 

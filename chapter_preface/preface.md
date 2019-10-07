@@ -110,7 +110,7 @@ accessible as executable code, as a physical book,
 as a downloadable PDF, and on the internet as a website.
 At present there exist no tools and no workflow
 perfectly suited to these demands, so we had to assemble our own.
-We describe our approach in detail in :numref:`chapter_contribute`.
+We describe our approach in detail in :numref:`sec_contribute`.
 We settled on Github to share the source and to allow for edits,
 Jupyter notebooks for mixing code, equations and text,
 Sphinx as a rendering engine to generate multiple outputs,
@@ -187,40 +187,40 @@ The book can be roughly divided into three parts, which are presented by differe
 
 
 * The first part covers prerequisites and basics.  The first chapter offers an
-introduction to deep learning in :numref:`chapter_introduction`.  In
-:numref:`chapter_preliminaries`, we'll quickly bring you up to speed on the
+introduction to deep learning in :numref:`sec_introduction`.  In
+:numref:`sec_preliminaries`, we'll quickly bring you up to speed on the
 prerequisites required for hands-on deep learning, such as how to acquire and
-run the codes covered in the book.  :numref:`chapter_linear` and
-:numref:`chapter_perceptrons` cover the most basic concepts and techniques of deep
+run the codes covered in the book.  :numref:`sec_linear` and
+:numref:`sec_perceptrons` cover the most basic concepts and techniques of deep
 learning, such as linear regression, multi-layer perceptrons and regularization.
 <!--If you are short on time or you only want to learn only
 about the most basic concepts and techniques of deep learning,
 it is sufficient to read the first section only.-->
 
 * The next four chapters focus on modern deep learning techniques.
-:numref:`chapter_computation` describes the various key components of deep
+:numref:`sec_computation` describes the various key components of deep
 learning calculations and lays the groundwork for the later implementation of
-more complex models.  Next we explain in :numref:`chapter_cnn` and
-:numref:`chapter_modern_cnn`, powerful tools that form the backbone of most
+more complex models.  Next we explain in :numref:`sec_cnn` and
+:numref:`sec_modern_cnn`, powerful tools that form the backbone of most
 modern computer vision systems in recent years.  Subsequently, we introduce
-:numref:`chapter_rnn` models that exploit temporal or sequential structure in
+:numref:`sec_rnn` models that exploit temporal or sequential structure in
 data, and are commonly used for natural language processing and time series
-prediction. :numref:`chapter_attention` introduces recent models exploring the
+prediction. :numref:`sec_attention` introduces recent models exploring the
 attention mechanism.  These sections will get you up to speed on the basic tools
 behind most modern deep learning.
 
 * Part three discusses scalability, efficiency and applications.  First we
-discuss several common :numref:`chapter_optimization` used to train deep
-learning models.  The next chapter, :numref:`chapter_performance` examines
+discuss several common :numref:`sec_optimization` used to train deep
+learning models.  The next chapter, :numref:`sec_performance` examines
 several important factors that affect the computational performance of your deep
-learning code.    :numref:`chapter_cv` and :numref:`chapter_nlp` illustrate major
+learning code.    :numref:`sec_cv` and :numref:`sec_nlp` illustrate major
 applications of deep learning in computer vision and natural language
-processing, respectively. Finally, :number:`chapter_gans` presents an emerging family of models called generative adversarial networks.
+processing, respectively. Finally, :number:`sec_gans` presents an emerging family of models called generative adversarial networks.
 
 
 
 ### Code
-:label:`chapter_code`
+:label:`sec_code`
 
 Most sections of this book feature executable code.
 We recognize the importance of an interactive learning experience in deep learning.
@@ -243,7 +243,7 @@ All of the code in this book has passed tests under the newest MXNet version.
 However, due to the rapid development of deep learning,
 some code *in the print edition* may not work properly in future versions of MXNet.
 However, we plan to keep the online version remain up-to-date.
-In case of such problems, please consult :ref:`chapter_installation`
+In case of such problems, please consult :ref:`sec_installation`
 to update the code and runtime environment.
 
 At times, to avoid unnecessary repetition,
@@ -271,7 +271,7 @@ import zipfile
 import pandas as pd
 ```
 
-We give a detailed overview of these functions and classes in :numref:`chapter_d2l`.
+We give a detailed overview of these functions and classes in :numref:`sec_d2l`.
 
 
 ### Target Audience

@@ -1,9 +1,9 @@
 # Image Classification (CIFAR-10) on Kaggle
-:label:`chapter_kaggle_cifar10`
+:label:`sec_kaggle_cifar10`
 
 So far, we have been using Gluon's `data` package to directly obtain image data sets in the `ndarray` format. In practice, however, image data sets often exist in the format of image files. In this section, we will start with the original image files and organize, read, and convert the files to the `ndarray` format step by step.
 
-We performed an experiment on the CIFAR-10 data set in :numref:`chapter_image_augmentation`.
+We performed an experiment on the CIFAR-10 data set in :numref:`sec_image_augmentation`.
 This is an important data
 set in the computer vision field. Now, we will apply the knowledge we learned in
 the previous sections in order to participate in the Kaggle competition, which
@@ -213,7 +213,7 @@ test_iter = gluon.data.DataLoader(test_ds.transform_first(transform_test),
 
 Here, we build the residual blocks based on the HybridBlock class, which is
 slightly different than the implementation described in
-:numref:`chapter_resnet`. This is done to improve execution efficiency.
+:numref:`sec_resnet`. This is done to improve execution efficiency.
 
 ```{.python .input  n=11}
 class Residual(nn.HybridBlock):
@@ -344,7 +344,7 @@ df.to_csv('submission.csv', index=False)
 
 After executing the above code, we will get a "submission.csv" file. The format
 of this file is consistent with the Kaggle competition requirements. The method
-for submitting results is similar to method in :numref:`chapter_kaggle_house`.
+for submitting results is similar to method in :numref:`sec_kaggle_house`.
 
 ## Summary
 

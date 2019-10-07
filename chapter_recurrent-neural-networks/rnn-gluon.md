@@ -1,7 +1,7 @@
 # Concise Implementation of Recurrent Neural Networks
-:label:`chapter_rnn_gluon`
+:label:`sec_rnn_gluon`
 
-While :numref:`chapter_rnn_scratch` was instructive to see how recurrent neural networks are implemented, this isn't convenient or fast. The current section will show how to implement the same language model more efficiently using functions provided by Gluon. We begin as before by reading the 'Time Machine" corpus.
+While :numref:`sec_rnn_scratch` was instructive to see how recurrent neural networks are implemented, this isn't convenient or fast. The current section will show how to implement the same language model more efficiently using functions provided by Gluon. We begin as before by reading the 'Time Machine" corpus.
 
 ```{.python .input  n=1}
 import d2l
@@ -24,7 +24,7 @@ rnn_layer = rnn.RNN(num_hiddens)
 rnn_layer.initialize()
 ```
 
-Initializing the state is straightforward. We invoke the member function `rnn_layer.begin_state(batch_size)`. This returns an initial state for each element in the minibatch. That is, it returns an object that is of size (hidden layers, batch size, number of hidden units). The number of hidden layers defaults to 1. In fact, we haven't even discussed yet what it means to have multiple layers - this will happen in :numref:`chapter_deep_rnn`. For now, suffice it to say that multiple layers simply amount to the output of one RNN being used as the input for the next RNN.
+Initializing the state is straightforward. We invoke the member function `rnn_layer.begin_state(batch_size)`. This returns an initial state for each element in the minibatch. That is, it returns an object that is of size (hidden layers, batch size, number of hidden units). The number of hidden layers defaults to 1. In fact, we haven't even discussed yet what it means to have multiple layers - this will happen in :numref:`sec_deep_rnn`. For now, suffice it to say that multiple layers simply amount to the output of one RNN being used as the input for the next RNN.
 
 ```{.python .input  n=37}
 batch_size = 1
@@ -41,7 +41,7 @@ Y, state_new = rnn_layer(X, state)
 Y.shape, len(state_new), state_new[0].shape
 ```
 
-Similar to :numref:`chapter_rnn_scratch`, we define an `RNNModel` block by subclassing the `Block` class for a complete recurrent neural network. Note that `rnn_layer` only contains the hidden recurrent layers, we need to create a separate output layer. While in the previous section, we have the output layer within the `rnn` block.
+Similar to :numref:`sec_rnn_scratch`, we define an `RNNModel` block by subclassing the `Block` class for a complete recurrent neural network. Note that `rnn_layer` only contains the hidden recurrent layers, we need to create a separate output layer. While in the previous section, we have the output layer within the `rnn` block.
 
 ```{.python .input  n=39}
 # Save to the d2l package.
@@ -76,7 +76,7 @@ model.initialize(force_reinit=True, ctx=ctx)
 d2l.predict_ch8('time traveller', 10, model, vocab, ctx)
 ```
 
-As is quite obvious, this model doesn't work at all (just yet). Next, we call just `train_ch8` defined in :numref:`chapter_rnn_scratch` with the same hyper-parameters to train our model.
+As is quite obvious, this model doesn't work at all (just yet). Next, we call just `train_ch8` defined in :numref:`sec_rnn_scratch` with the same hyper-parameters to train our model.
 
 ```{.python .input  n=19}
 num_epochs, lr = 500, 1

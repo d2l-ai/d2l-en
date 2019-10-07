@@ -1,10 +1,10 @@
 # Image Augmentation
-:label:`chapter_image_augmentation`
+:label:`sec_image_augmentation`
 
 
 We mentioned that large-scale data sets are prerequisites for the successful
 application of deep neural networks in
-:numref:`chapter_alexnet`. Image augmentation technology expands the scale of training data sets
+:numref:`sec_alexnet`. Image augmentation technology expands the scale of training data sets
 by making a series of random changes to the training images to produce similar,
 but different, training examples. Another way to explain image augmentation is
 that randomly changing training examples can reduce a model's dependence on
@@ -62,7 +62,7 @@ apply(img, gluon.data.vision.transforms.RandomFlipTopBottom())
 
 In the example image we used, the cat is in the middle of the image, but this
 may not be the case for all images. In
-:numref:`chapter_pooling`,
+:numref:`sec_pooling`,
 we explained that the pooling layer can reduce the sensitivity of the
 convolutional layer to the target location. In addition, we can make objects
 appear at different positions in the image in different proportions by randomly
@@ -133,7 +133,7 @@ Next, we define an auxiliary function to make it easier to read the image and
 apply image augmentation. The `transform_first` function provided by Gluon's
 data set applies image augmentation to the first element of each training
 example (image and label), i.e., the element at the top of the image. For
-detailed description of `DataLoader`, refer to :numref:`chapter_fashion_mnist`.
+detailed description of `DataLoader`, refer to :numref:`sec_fashion_mnist`.
 
 ```{.python .input  n=13}
 def load_cifar10(is_train, augs, batch_size):
@@ -145,9 +145,9 @@ def load_cifar10(is_train, augs, batch_size):
 
 ### Using a Multi-GPU Training Model
 
-We train the ResNet-18 model described in :numref:`chapter_resnet` on the
+We train the ResNet-18 model described in :numref:`sec_resnet` on the
 CIFAR-10 data set. We will also apply the methods described in
-:numref:`chapter_multi_gpu_gluon` and use a multi-GPU training model.
+:numref:`sec_multi_gpu_gluon` and use a multi-GPU training model.
 
 Next, we define the training function to train and evaluate the model using multiple GPUs.
 

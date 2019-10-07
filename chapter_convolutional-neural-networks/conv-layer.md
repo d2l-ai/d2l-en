@@ -1,5 +1,5 @@
 # Convolutions for Images
-:label:`chapter_conv_layer`
+:label:`sec_conv_layer`
 
 Now that we understand how convolutional layers work in theory,
 we are ready to see how this works in practice.

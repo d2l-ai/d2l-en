@@ -1,5 +1,5 @@
 # Long Short Term Memory (LSTM)
-:label:`chapter_lstm`
+:label:`sec_lstm`
 
 The challenge to address long-term information preservation and short-term input
 skipping in latent variable models has existed for a long time. One of the

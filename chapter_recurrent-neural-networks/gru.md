@@ -1,5 +1,5 @@
 # Gated Recurrent Units (GRU)
-:label:`chapter_gru`
+:label:`sec_gru`
 
 In the previous section we discussed how gradients are calculated in a recurrent
 neural network. In particular we found that long products of matrices can lead
@@ -27,7 +27,7 @@ gradient anomalies mean in practice:
 
 A number of methods have been proposed to address this. One of the earliest is
 the Long Short Term Memory (LSTM) :cite:`Hochreiter.Schmidhuber.1997` which we
-will discuss in :numref:`chapter_lstm`. The Gated Recurrent Unit (GRU)
+will discuss in :numref:`sec_lstm`. The Gated Recurrent Unit (GRU)
 :cite:`Cho.Van-Merrienboer.Bahdanau.ea.2014` is a slightly more streamlined
 variant that often offers comparable performance and is significantly faster to
 compute. See also :cite:`Chung.Gulcehre.Cho.ea.2014` for more
@@ -59,7 +59,7 @@ $$
 Here, $\mathbf{W}_{xr}, \mathbf{W}_{xz} \in \mathbb{R}^{d \times h}$ and
 $\mathbf{W}_{hr}, \mathbf{W}_{hz} \in \mathbb{R}^{h \times h}$ are weight
 parameters and $\mathbf{b}_r, \mathbf{b}_z \in \mathbb{R}^{1 \times h}$ are
-biases. We use a sigmoid function (see e.g. refer to :numref:`chapter_mlp` for a description) to transform values to the interval $(0,1)$.
+biases. We use a sigmoid function (see e.g. refer to :numref:`sec_mlp` for a description) to transform values to the interval $(0,1)$.
 
 ### Reset Gate in Action
 
@@ -96,7 +96,7 @@ To gain a better understanding of the model let us implement a GRU from scratch.
 
 ### Reading the Data Set
 
-We begin by reading *The Time Machine* corpus that we used in :numref:`chapter_rnn_scratch`. The code for reading the
+We begin by reading *The Time Machine* corpus that we used in :numref:`sec_rnn_scratch`. The code for reading the
 data set is given below:
 
 ```{.python .input  n=6}
@@ -135,7 +135,7 @@ def get_params(vocab_size, num_hiddens, ctx):
 
 ### Define the Model
 
-Now we will define the hidden state initialization function `init_gru_state`. Just like the `init_rnn_state` function defined in :numref:`chapter_rnn_scratch`, this function returns an `ndarray` with a shape (batch size, number of hidden units) whose values are all zeros.
+Now we will define the hidden state initialization function `init_gru_state`. Just like the `init_rnn_state` function defined in :numref:`sec_rnn_scratch`, this function returns an `ndarray` with a shape (batch size, number of hidden units) whose values are all zeros.
 
 ```{.python .input  n=3}
 def init_gru_state(batch_size, num_hiddens, ctx):

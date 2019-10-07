@@ -1,5 +1,5 @@
 # Implementation of Multilayer Perceptron from Scratch
-:label:`chapter_mlp_scratch`
+:label:`sec_mlp_scratch`
 
 Now that we know how multilayer perceptrons (MLPs) work in theory,
 let's implement them. First, we import the required packages.
@@ -77,11 +77,11 @@ def net(X):
 ## The Loss Function
 
 For better numerical stability and because we already know
-how to implement softmax regression completely from scratch in :numref:`chapter_softmax_scratch`,
+how to implement softmax regression completely from scratch in :numref:`sec_softmax_scratch`,
 we will use Gluon's integrated function
 for calculating the softmax and cross-entropy loss.
 Recall that we discussed some of these intricacies
-in :numref:`chapter_mlp`.
+in :numref:`sec_mlp`.
 We encourage the interested reader to examing the source code
 for `mxnet.gluon.loss.SoftmaxCrossEntropyLoss` for more details.
 
@@ -92,7 +92,7 @@ loss = gluon.loss.SoftmaxCrossEntropyLoss()
 ## Training
 
 Steps for training the MLP are no different than for softmax regression.
-In the `d2l` package, we directly call the `train_ch3` function, whose implementation was introduced in :numref:`chapter_softmax_scratch`.
+In the `d2l` package, we directly call the `train_ch3` function, whose implementation was introduced in :numref:`sec_softmax_scratch`.
 We set the number of epochs to $10$ and the learning rate to $0.5$.
 
 ```{.python .input  n=7}
@@ -102,7 +102,7 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs,
 ```
 
 To see how well we did, let's apply the model to some test data.
-If you're interested, compare the result to corresponding linear model in :numref:`chapter_softmax_scratch`.
+If you're interested, compare the result to corresponding linear model in :numref:`sec_softmax_scratch`.
 
 ```{.python .input}
 d2l.predict_ch3(net, test_iter)

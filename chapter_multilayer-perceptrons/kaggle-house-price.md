@@ -1,5 +1,5 @@
 # Predicting House Prices on Kaggle
-:label:`chapter_kaggle_house`
+:label:`sec_kaggle_house`
 
 In the previous sections, we introduced
 the basic tools for building deep networks
@@ -249,7 +249,7 @@ given unlimited resources for hyperparameter optimization,
 people tend to find that it is significantly less sensitive
 to the initial learning rate.
 This will be covered in further detail later on
-when we discuss the details in :numref:`chapter_optimization`.
+when we discuss the details in :numref:`sec_optimization`.
 
 ```{.python .input  n=14}
 def train(net, train_features, train_labels, test_features, test_labels,
@@ -276,7 +276,7 @@ def train(net, train_features, train_labels, test_features, test_labels,
 If you are reading in a linear fashion,
 you might recall that we intorduced k-fold cross-validation
 in the section where we discussed how to deal
-with model section (:numref:`chapter_model_selection`). We will put this to good use to select the model design
+with model section (:numref:`sec_model_selection`). We will put this to good use to select the model design
 and to adjust the hyperparameters.
 We first need a function that returns
 the i-th fold of the data in a k-fold cross-validation procedure.

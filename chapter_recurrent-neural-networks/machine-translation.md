@@ -1,9 +1,9 @@
 # Machine Translation and Data Sets
-:label:`chapter_machine_translation`
+:label:`sec_machine_translation`
 
 So far we see how to use recurrent neural networks for language models, in which we predict the next token given all previous tokens in an article. Now let's have a look at a different application, machine translation, whose predict output is no longer a single token, but a list of tokens. 
 
-Machine translation (MT) refers to the automatic translation of a segment of text from one language to another. Solving this problem with neural networks is often called neural machine translation (NMT). Compared to language models (:numref:`chapter_language_model`), in which the corpus only contains a single language, machine translation data set has at least two languages, the source language and the target language. In addition, each sentence in the source language is mapped to the according translation in the target language. Therefore, the data preprocessing for machine translation data is different to the one for language models. This section is dedicated to demonstrate how to pre-process such a data set and then load into a set of mini-batches.
+Machine translation (MT) refers to the automatic translation of a segment of text from one language to another. Solving this problem with neural networks is often called neural machine translation (NMT). Compared to language models (:numref:`sec_language_model`), in which the corpus only contains a single language, machine translation data set has at least two languages, the source language and the target language. In addition, each sentence in the source language is mapped to the according translation in the target language. Therefore, the data preprocessing for machine translation data is different to the one for language models. This section is dedicated to demonstrate how to pre-process such a data set and then load into a set of mini-batches.
 
 ```{.python .input  n=1}
 import collections
@@ -47,7 +47,7 @@ print(text[0:95])
 
 ## Tokenization
 
-Different to using character tokens in :numref:`chapter_language_model`, here a token is either a word or a punctuation mark. The following function tokenize the text data to return `source` and `target`. Each one is a list of token list, with `source[i]` is the i-th sentence in the source language and `target[i]` is the i-th sentence in the target language. To make the latter training faster, we sample the first `num_examples` sentences pairs.
+Different to using character tokens in :numref:`sec_language_model`, here a token is either a word or a punctuation mark. The following function tokenize the text data to return `source` and `target`. Each one is a list of token list, with `source[i]` is the i-th sentence in the source language and `target[i]` is the i-th sentence in the target language. To make the latter training faster, we sample the first `num_examples` sentences pairs.
 
 ```{.python .input  n=14}
 # Save to the d2l package.
@@ -76,7 +76,7 @@ d2l.plt.legend(loc='upper right');
 
 ## Vocabulary
 
-Since the tokens in the source language could be different to the ones in the target language, we need to build a vocabulary for each of them. Since we are using words instead of characters  as tokens, it makes the vocabulary size significantly large. Here we map every token that appears less than 3 times into the &lt;unk&gt; token :numref:`chapter_text_preprocessing`. In addition, we need other special tokens such as padding and sentence beginnings.
+Since the tokens in the source language could be different to the ones in the target language, we need to build a vocabulary for each of them. Since we are using words instead of characters  as tokens, it makes the vocabulary size significantly large. Here we map every token that appears less than 3 times into the &lt;unk&gt; token :numref:`sec_text_preprocessing`. In addition, we need other special tokens such as padding and sentence beginnings.
 
 ```{.python .input  n=16}
 src_vocab = d2l.Vocab(source, min_freq=3, use_special_tokens=True)

@@ -1,5 +1,5 @@
 # Text Preprocessing
-:label:`chapter_text_preprocessing`
+:label:`sec_text_preprocessing`
 
 Text is an important example of sequence data. An article can be simply viewed as a sequence of words, or a sequence of characters. Given text data is a major data format besides images we are using in this book, this section will dedicate to explain the common preprocessing steps for text data. Such preprocessing often consists of four steps:
 

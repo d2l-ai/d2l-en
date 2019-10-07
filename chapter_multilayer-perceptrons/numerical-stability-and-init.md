@@ -1,5 +1,5 @@
 # Numerical Stability and Initialization
-:label:`chapter_numerical_stability`
+:label:`sec_numerical_stability`
 
 In the past few sections, each model that we implemented
 required initializing our parameters according to some specified distribution.
@@ -68,7 +68,7 @@ One major culprit in the vanishing gradient problem
 is the choices of the activation functions $\sigma$
 that are interleaved with the linear operations in each layer.
 Historically, the sigmoid function $(1 + \exp(-x))$
-(introduced in :numref:`chapter_mlp`)
+(introduced in :numref:`sec_mlp`)
 was a popular choice owing to its similarity to a thresholding function.
 Since early artificial neural networks were inspired
 by biological neural networks,
@@ -173,7 +173,7 @@ ensures that things never get too bad.
 
 ### Default Initialization
 
-In the previous sections, e.g., in :numref:`chapter_linear_gluon`,
+In the previous sections, e.g., in :numref:`sec_linear_gluon`,
 we used `net.initialize(init.Normal(sigma=0.01))`
 to initialize the values of our weights.
 If the initialization method is not specified,

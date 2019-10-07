@@ -1,5 +1,5 @@
 # Basics
-:label:`chapter_math`
+:label:`sec_math`
 
 This section summarizes basic tools from linear algebra, differentiation, and probability required to understand the contents in this book. We avoid details beyond the bare minimum to keep things streamlined and easily accessible. In some cases we simplify things to keep them easily accessible. For more background see e.g. the excellent [Data Science 100](http://ds100.org) course at UC Berkeley.
 
@@ -346,7 +346,7 @@ The Normal Distribution, also called Gaussian is given by $p(x) = \frac{1}{2 \pi
 \sigma^2} \exp\left(-\frac{1}{2 \sigma^2} (x-\mu)^2\right)$. Its expectation is
 $\mu$ and its variance is $\sigma^2$. For more details on probability and
 statistics see
-:numref:`chapter_prob`.
+:numref:`sec_prob`.
 
 ## Summary
 

@@ -1,6 +1,6 @@
 # Deep Recurrent Neural Networks
 
-:label:`chapter_deep_rnn`
+:label:`sec_deep_rnn`
 
 Up to now, we only discussed recurrent neural networks with a single unidirectional hidden layer. In it the specific functional form of how latent variables and observations interact was rather arbitrary. This isn't a big problem as long as we have enough flexibility to model different types of interactions. With a single layer, however, this can be quite challenging. In the case of the perceptron we fixed this problem by adding more layers. Within RNNs this is a bit more tricky, since we first need to decide how and where to add extra nonlinearity. Our discussion below focuses primarily on LSTMs but it applies to other sequence models, too.
 
@@ -66,7 +66,7 @@ d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, ctx)
 
 ## Exercises
 
-1. Try to implement a two-layer RNN from scratch using the single layer implementation we discussed in :numref:`chapter_rnn_scratch`.
+1. Try to implement a two-layer RNN from scratch using the single layer implementation we discussed in :numref:`sec_rnn_scratch`.
 2. Replace the LSTM by a GRU and compare the accuracy.
 3. Increase the training data to include multiple books. How low can you go on the perplexity scale?
 4. Would you want to combine sources of different authors when modeling text? Why is this a good idea? What could go wrong?
