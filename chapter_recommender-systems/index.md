@@ -1,5 +1,5 @@
 # Recommender Systems
-:label:`sec_recsys
+:label:`chap_recsys`
 
 ```toc
 :maxdepth: 2

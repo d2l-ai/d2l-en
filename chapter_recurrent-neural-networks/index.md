@@ -1,6 +1,5 @@
 # Recurrent Neural Networks
-
-:label:`sec_rnn`
+:label:`chap_rnn`
 
 So far we encountered two types of data: generic vectors and images. For the latter we designed specialized layers to take advantage of the regularity properties in them. In other words, if we were to permute the pixels in an image, it would be much more difficult to reason about its content of something that would look much like the background of a test pattern in the times of Analog TV.
 

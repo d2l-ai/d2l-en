@@ -1,5 +1,5 @@
 # Generative Adversarial Networks
-:label:`sec_gans`
+:label:`chap_gans`
 
 ```toc
 :maxdepth: 2
