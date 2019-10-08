@@ -45,7 +45,7 @@ print('matrix sparsity: %f' % sparsity)
 print(data.head(5))
 ```
 
-We can see that each line consists of four columns, including "user id" (1--943), "item id" (1--1682), "rating" (1--5) and "timestamp". We can construct an interaction matrix of size $n \times m$, where $n$ and $m$ are the number of users and the number of items respectively. This dataset only records the existing ratings and most of the values in the interaction matrix are unknown as users have not rated the majority of movies. We alsoe show the sparsity of this dataset. The sparsity is defined as `1 - number of nonzero entries / ( number of users * number of items)`. Clearly, the interaction matrix is extremely sparse (sparsity = 93.695%). The case in datasets from large scale real-world applications can be even worse, and data sparsity has been a long-standing challenge in building recommender systems. A viable solution is to use additional information such as user/item features to allievate the sparsity.
+We can see that each line consists of four columns, including "user id" 1-943, "item id" 1-1682, "rating" 1-5 and "timestamp". We can construct an interaction matrix of size $n \times m$, where $n$ and $m$ are the number of users and the number of items respectively. This dataset only records the existing ratings, so we can also call it rating matrix and we will use interaction matrix and rating matrix interchangeably in case that the values of this matrix represent exact ratings. Most of the values in the rating matrix are unknown as users have not rated the majority of movies. We also show the sparsity of this dataset. The sparsity is defined as `1 - number of nonzero entries / ( number of users * number of items)`. Clearly, the interaction matrix is extremely sparse (sparsity = 93.695%). The case in datasets from large scale real-world applications can be even worse, and data sparsity has been a long-standing challenge in building recommender systems. A viable solution is to use additional information such as user/item features to allievate the sparsity.
 
 We then plot the distribution of the count of different ratings. As expected, it appears to be a normal distribution, with most ratings centered at 3-4.
 
@@ -59,7 +59,7 @@ d2l.plt.show()
 
 ## Splitting the dataset
 
-Then, we split the dataset into training and test sets. The following function provides two split modes including `random` and `seq-aware`. In the `random` mode, the function splits the 100k interactions randomly without considering timestamp and uses the 90% of the data as training samples and the rest 10% as test samples by default. In the `seq-aware` mode, we leave out the item that a user rated most recently for test, and users' historical interactions as training set.  User historical interactions are sorted from older to newest based on timestamp. This mode will be used in the sequence-aware recommendation section.
+Then, we split the dataset into training and test sets. The following function provides two split modes including `random` and `seq-aware`. In the `random` mode, the function splits the 100k interactions randomly without considering timestamp and uses the 90% of the data as training samples and the rest 10% as test samples by default. In the `seq-aware` mode, we leave out the item that a user rated most recently for test, and users' historical interactions as training set.  User historical interactions are sorted from oldest to newest based on timestamp. This mode will be used in the sequence-aware recommendation section.
 
 ```{.python .input  n=5}
 # Save to the d2l package
@@ -89,7 +89,7 @@ def split_data_ml100k(data, num_users, num_items,
 
 ## Loading the data
 
-After dataset splitting, we will convert the training set and test set into lists and dictionaries/matrix for the sake of convenience. The following function reads the dataframe line by line and make the index of users/items start from zero. The function then returns lists of users, items, ratings and a dictionary/matrix that records the interactions. We can specify the type of feedback to either `explicit` or `implicit`.
+After dataset splitting, we will convert the training set and test set into lists and dictionaries/matrix for the sake of convenience. The following function reads the dataframe line by line and enumerates the index of users/items start from zero. The function then returns lists of users, items, ratings and a dictionary/matrix that records the interactions. We can specify the type of feedback to either `explicit` or `implicit`.
 
 ```{.python .input  n=6}
 # Save to the d2l package
