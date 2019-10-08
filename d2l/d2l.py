@@ -1492,21 +1492,21 @@ def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
             train_label = input_data[-1]
             with autograd.record():
                 preds = [net(*t) for t in zip(*train_feat)]
-                losses = [loss(p, s) for p, s in zip(preds, train_label)]
-            [l.backward() for l in losses]
-            l += sum([l.asnumpy() for l in losses]).mean() / len(ctx_list)
+                ls = [loss(p, s) for p, s in zip(preds, train_label)]
+            [l.backward() for l in ls]
+            l += sum([l.asnumpy() for l in ls]).mean() / len(ctx_list)
             trainer.step(values[0].shape[0])
             metric.add(l, values[0].shape[0], values[0].size)
             timer.stop()
-        if len(kwargs) > 0:
-            test_acc = evaluator(net, test_iter, kwargs['inter_mat'],
+        if len(kwargs) > 0: # it will be used in section AutoRec.
+            test_rmse = evaluator(net, test_iter, kwargs['inter_mat'],
                                  ctx_list)
         else:
-            test_acc = evaluator(net, test_iter, ctx_list)
-        train_loss = l / (i + 1)
-        animator.add(epoch + 1, (train_loss, None, test_acc))
+            test_rmse = evaluator(net, test_iter, ctx_list)
+        train_l = l / (i + 1)
+        animator.add(epoch + 1, (train_l, None, test_rmse))
     print('train loss %.3f, test RMSE %.3f'
-          % (metric[0] / metric[1], test_acc))
+          % (metric[0] / metric[1], test_rmse))
     print('%.1f examples/sec on %s'
           % (metric[2] * num_epochs / timer.sum(), ctx_list))
 

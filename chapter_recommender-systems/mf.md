@@ -38,8 +38,6 @@ An intuitive illustration of the matrix factorization model is shown below:
 In the rest of this section, we will explain the implementation of matrix factorization and train the model on the MovieLens dataset.
 
 ```{.python .input  n=3}
-import sys
-sys.path.insert(0, '..')
 import d2l
 from mxnet import autograd, init, gluon, np, npx
 from mxnet.gluon import nn
