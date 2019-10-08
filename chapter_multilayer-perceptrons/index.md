@@ -1,5 +1,5 @@
 # Multilayer Perceptrons
-:label:`sec_perceptrons`
+:label:`chap_perceptrons`
 
 In this chapter, we will introduce your first truly *deep* networks.
 The simplest deep networks are called multilayer perceptrons,

@@ -4,7 +4,7 @@
 This section describes how to edit and run the code in the chapters of this book
 using Jupyter Notebooks. Make sure you have Jupyter installed and downloaded the
 code as described in
-:ref:`sec_installation`.
+:numref:`chap_installation`.
  If you want to know more about Jupyter see the excellent tutorial in
 the [Documentation](https://jupyter.readthedocs.io/en/latest/).
 

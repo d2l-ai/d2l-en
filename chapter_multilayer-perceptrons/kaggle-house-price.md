@@ -249,7 +249,7 @@ given unlimited resources for hyperparameter optimization,
 people tend to find that it is significantly less sensitive
 to the initial learning rate.
 This will be covered in further detail later on
-when we discuss the details in :numref:`sec_optimization`.
+when we discuss the details in :numref:`chap_optimization`.
 
 ```{.python .input  n=14}
 def train(net, train_features, train_labels, test_features, test_labels,
@@ -322,7 +322,7 @@ def k_fold(k, X_train, y_train, num_epochs,
         valid_l_sum += valid_ls[-1]
         if i == 0:
             d2l.plot(list(range(1, num_epochs+1)), [train_ls, valid_ls],
-                     xlabel='epoch', ylabel='rmse', 
+                     xlabel='epoch', ylabel='rmse',
                      legend=['train', 'valid'], yscale='log')
         print('fold %d, train rmse: %f, valid rmse: %f' % (
             i, train_ls[-1], valid_ls[-1]))

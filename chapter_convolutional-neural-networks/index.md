@@ -1,5 +1,5 @@
 # Convolutional Neural Networks
-:label:`sec_cnn`
+:label:`chap_cnn`
 
 In several of our previous examples, we have already come up
 against image data, which consist of pixels arranged in a 2D grid.

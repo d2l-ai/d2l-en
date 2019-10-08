@@ -1,7 +1,7 @@
 # Text Sentiment Classification: Using Convolutional Neural Networks (textCNN)
 :label:`sec_sentiment_cnn`
 
-In :numref:`sec_cnn`, we explored how to process
+In :numref:`chap_cnn`, we explored how to process
 two-dimensional image data with two-dimensional convolutional neural
 networks. In the previous language models and text classification tasks, we
 treated text data as a time series with only one dimension, and naturally, we
@@ -131,7 +131,7 @@ class TextCNN(nn.Block):
         # can be obtained. Use the flatten function to remove the last
         # dimension and then concatenate on the channel dimension
         encoding = np.concatenate([
-            np.squeeze(self.pool(conv(embeddings)), axis=-1) 
+            np.squeeze(self.pool(conv(embeddings)), axis=-1)
             for conv in self.convs], axis=1)
         # After applying the dropout method, use a fully connected layer to
         # obtain the output
