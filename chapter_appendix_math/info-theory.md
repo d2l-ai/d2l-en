@@ -120,12 +120,14 @@ $$I(X,Y) = −E_{x} E_{y} \left\{ p_{X,Y}(x, y) \log\frac{p_{X,Y}(x, y)}{p_X(x) 
 
 As shown in the earlier image, if we know $H(X)$ (i.e., the amount of uncertainty in $X$) and $H(X \mid Y)$ (i.e., amount of uncertainty in $X$ which remains after $Y$ is known), mutual information tells us the average reduction in uncertainty about $X$ that results from learning the value of $Y$, i.e.,
 
+$$
 \begin{aligned}
 I(X,Y) &= H(X) − H(X \mid Y) \\
 &= H(Y) − H(Y \mid X) \\
 &= H(X) + H(Y) − H(X,Y) \\
 &= H(X,Y) - H(Y \mid X) − H(X \mid Y). \\
 \end{aligned}
+$$
 
 
 ### Properties of Mutual Information
@@ -238,18 +240,21 @@ To be specific, we first draw samples from a randomly initialized $Q$ and calcul
 
 Say now we have a binary classification problem. Assume that we encode "$1$" and "$0$" as the positive and negative class label respectively, and our neural network is parameterized by $\theta$. If we aim to find a best $\theta$ so that $\hat{y}= p_{\theta}(y \mid x)$, it is natually to apply the maximum log-likelihood approach. To to specific, for true labels $y_i$ and predictions $\hat{y_i}= p_{\theta}(y_i \mid x_i)$, the probability to be classified as positive is $\pi_i= p_{\theta}(y_i = 1 \mid x_i)$. Hence, the likelihood function would be:
 
+$$
 \begin{aligned}
 \mathrm{L}(\theta) &= \prod_{i=1}^n \pi_i^{y_i} (1 - \pi_i)^{1 - y_i} \\
   &= \prod_{i=1}^n  p_{\theta}(y_i = 1 \mid x_i)^{y_i}  p_{\theta}(y_i =0 \mid x_i))^{1 - y_i}.\\
 \end{aligned}
+$$
 
 And the log-likelihood function would be:
 
+$$
 \begin{aligned}
 \mathrm{l}(\theta) &= \sum_{i=1}^n y_i \log(\pi_i) + (1 - y_i) \log (1 - \pi_i) \\
   &= \sum_{i=1}^n {y_i} \log(p_{\theta}(y_i \mid x_i))  + {(1 - y_i)} \log(1 - p_{\theta}(y_i \mid x_i)).\\
 \end{aligned}
-
+$$
 
 Maximizing the log-likelihood function $\mathrm{l(\theta)}$ is identical to minimizing $- \mathrm{l(\theta)}$, and hence we can find the best $\theta$ from here. To generalize the above loss to any distributions, we also called $-l(\theta)$ the *Cross Entropy loss* $\mathrm{CE}(y, \hat{y})$, where $y$ follows the true distribution $P$ and $\hat{y}$ follows the estimating distribution $Q$.
 
@@ -316,12 +321,13 @@ For instance, if a multi-class classfication problem contains three classes $A$,
 Assume that there are $k$ classes and our neural network is parameterized by $\theta$. For true label vectors $\mathbf{y}_i$ and predictions $\hat{\mathbf{y}_i}= p_{\theta}(\mathbf{y}_i \mid \mathbf{x}_i)$, the *cross entropy (CE) loss* would be:
 
 
+$$
 \begin{aligned}
 \mathrm{CE}(\mathbf{y}, \hat{\mathbf{y}}) &= - \sum_{i=1}^n \mathbf{y}_i \log \hat{\mathbf{y}_i} \\
   &= - \sum_{i=1}^n \mathbf{y}_i \log{p_{\theta} (\mathbf{y}_i  \mid  \mathbf{x}_i)} \\
   &= - \sum_{i=1}^n \sum_{j=1}^k y_{ij} \log{p_{\theta} (y_{ij}  \mid  \mathbf{x}_i)}.\\
 \end{aligned}
-
+$$
 
 On the other side, we can also demystify the myth through probabilistic approach. To begin with, let us quickly introduce a $k$-class multinoulli distribution. It is an extension of the bernoulli distribution from binary class to multi-class. If a random variable $\mathbf{y} = (y_{1}, \ldots, y_{k})$ is followed a $k$-class *multinoulli distribution* with probabilities $\boldsymbol{p} =$ ($p_{1}$, \ldots, $p_{k}$), i.e., 
 $$p(\mathbf{y}) = p(y_1, \ldots, y_k) = \mathrm{Multi} (p_1, \ldots, p_k), \text{ where } \sum_{i=1}^k p_i = 1,$$
@@ -332,19 +338,21 @@ $$\boldsymbol{p}^\mathbf{y} = \prod_{j=1}^k p_{j}^{y_{j}}.$$
 Now back to our example, it is easy to see that each data point, $\mathbf{y}_i$, is following a $k$-class multinoulli distribution with probabilities $\boldsymbol{\pi} =$ ($\pi_{1}$, \ldots, $\pi_{k}$). Therefore, the joint p.m.f. of $\mathbf{y}_i$ is: $\boldsymbol{\pi}^\mathbf{y}_i = \prod_{j=1}^k \pi_{j}^{y_{ij}}.$
 Hence, the likelihood function of the given dataset with $n$ samples would be:
 
+$$
 \begin{aligned}
 \mathrm{L}(\theta) = \prod_{i=1}^n \boldsymbol{\pi_i}^{\mathbf{y}_i}
  = \prod_{i=1}^n \prod_{j=1}^k \pi_{ij}^{y_{ij}}
  = \prod_{i=1}^n \prod_{j=1}^k p_{\theta}(y_{ij} \mid \mathbf{x}_i)^{y_{ij}}.\\
 \end{aligned}
+$$
 
 And the log-likelihood function would be:
 
-
+$$
 \begin{aligned}
 \mathrm{l}(\theta) = \log \mathrm{L}(\theta) = \sum_{i=1}^n \sum_{j=1}^k y_{ij} \log{p_{\theta} (y_{ij}  \mid  \mathbf{x}_i)}.\\
 \end{aligned}
-
+$$
 
 Therefore, for any multi-class classification, maximizing the above log-likelihood function $\mathrm{l}(\theta)$ is equivalent to minimizing the CE loss $\mathrm{CE}(y, \hat{y})$.
 
