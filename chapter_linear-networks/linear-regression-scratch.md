@@ -228,7 +228,7 @@ At each step, using one batch randomly drawn from our dataset,
 we will estimate the gradient of the loss with respect to our parameters.
 Next, we will update our parameters (a small amount)
 in the direction that reduces the loss.
-Recall from :numref:`chapter_autograd` that after we call `backward`
+Recall from :numref:`sec_autograd` that after we call `backward`
 each parameter (`param`) will have its gradient stored in `param.grad`.
 The following code applies the SGD update,
 given a set of parameters, a learning rate, and a batch size.
@@ -336,9 +336,10 @@ However, in machine learning, we are typically less concerned
 with recovering true underlying parameters,
 and more concerned with parameters that lead to accurate prediction.
 Fortunately, even on difficult optimization problems,
-that stochastic gradient descent can often lead to remarkably good solutions,
-due in part to the fact that for the models we will be working with,
-there exist many sets of parameters that work well.
+stochastic gradient descent can often find remarkably good solutions,
+owing partly to the fact that, for deep networks,
+there exist many configurations of the parameters 
+that lead to accurate prediction.
 
 ## Summary
 
@@ -354,7 +355,7 @@ and learn how to implement them more concisely.
 
 1. What would happen if we were to initialize the weights $\mathbf{w} = 0$. Would the algorithm still work?
 1. Assume that you're [Georg Simon Ohm](https://en.wikipedia.org/wiki/Georg_Ohm) trying to come up with a model between voltage and current. Can you use `autograd` to learn the parameters of your model.
-1. Can you use [Planck's Law](https://en.wikipedia.org/wiki/Planck%27s_law) to determine the temperature of an object using spectral energy density.
+1. Can you use [Planck's Law](https://en.wikipedia.org/wiki/Planck%27s_law) to determine the temperature of an object using spectral energy density?
 1. What are the problems you might encounter if you wanted to extend `autograd` to second derivatives? How would you fix them?
 1.  Why is the `reshape` function needed in the `squared_loss` function?
 1. Experiment using different learning rates to find out how fast the loss function value drops.
