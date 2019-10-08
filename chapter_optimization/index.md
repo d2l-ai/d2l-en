@@ -1,5 +1,5 @@
 # Optimization Algorithms
-:label:`chapter_optimization`
+:label:`chap_optimization`
 
 If you read the book in sequence up to this point you already used a number of advanced optimization algorithms to train deep learning models. They were the tools that allowed us to continue updating model parameters and to minimize the value of the loss function, as evaluated on the training set. Indeed, anyone content with treating optimization as a black box device to minimize objective functions in a simple setting might well content oneself with the knowledge that there exists an array of incantations of such a procedure (with names such as 'Adam', 'NAG', or 'SGD').
 

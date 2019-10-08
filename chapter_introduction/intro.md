@@ -1,5 +1,5 @@
 # Introduction
-:label:`chapter_introduction`
+:label:`chap_introduction`
 
 Until recently, nearly all of the computer programs that we interacted with
 every day were coded by software developers from first principles.  Say that we

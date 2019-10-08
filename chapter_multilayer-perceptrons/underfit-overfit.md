@@ -1,5 +1,5 @@
 # Model Selection, Underfitting and Overfitting
-:label:`chapter_model_selection`
+:label:`sec_model_selection`
 
 As machine learning scientists, our goal is to discover general patterns.
 Say, for example, that we wish to learn the pattern

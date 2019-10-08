@@ -1,5 +1,5 @@
 # Network in Network (NiN)
-:label:`chapter_nin`
+:label:`sec_nin`
 
 LeNet, AlexNet, and VGG all share a common design pattern:
 extract features exploiting *spatial* structure
@@ -26,7 +26,7 @@ The idea behind NiN is to apply a fully-connected layer
 at each pixel location (for each height and  width).
 If we tie the weights across each spatial location,
 we could think of this as a $1\times 1$ convolutional layer
-(as described in :numref:`chapter_channels`)
+(as described in :numref:`sec_channels`)
 or as a fully-connected layer acting independently on each pixel location.
 Another way to view this is to think of each element in the spatial dimension
 (height and width) as equivalent to an example

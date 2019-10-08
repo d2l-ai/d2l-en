@@ -1,12 +1,12 @@
 # Word Embedding (word2vec)
-:label:`chapter_word2vec`
+:label:`sec_word2vec`
 
 A natural language is a complex system that we use to communicate. Words are commonly used as the unit of analysis in natural language processing. As its name implies, a word vector is a vector used to represent a word. It can also be thought of as the feature vector of a word. The technique of mapping words to vectors of real numbers is also known as word embedding. Over the last few years, word embedding has gradually become basic knowledge in natural language processing.
 
 ## Why not Use One-hot Vectors?
 
 We used one-hot vectors to represent words (characters are words) in
-:numref:`chapter_rnn_scratch` .
+:numref:`sec_rnn_scratch` .
 Recall that when we assume the number of different words in a
 dictionary (the dictionary size) is $N$, each word can correspond one-to-one
 with consecutive integers from 0 to $N-1$. These integers that correspond to

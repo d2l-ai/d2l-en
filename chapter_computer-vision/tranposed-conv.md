@@ -1,8 +1,8 @@
 # Transposed Convolution
-:label:`chapter_transposed_conv`
+:label:`sec_transposed_conv`
 
 The layers we introduced so far for convolutional neural networks, including 
-convolutional layers (:numref:`chapter_conv_layer`) and pooling layers (:numref:`chapter_pooling`), often reducethe input width and height, or keep them unchanged. Applications such as semantic segmentation (:numref:`chapter_semantic_segmentation`) and generative adversarial networks (:numref:`chapter_dcgan`), however, require to predict values for each pixel and therefore needs to increase input width and height. Transposed convolution, also named fractionally-strided convolution :ref:`Dumoulin.Visin.2016` or deconvolution :ref:`Long.Shelhamer.Darrell.2015`, serves this purpose.
+convolutional layers (:numref:`sec_conv_layer`) and pooling layers (:numref:`sec_pooling`), often reducethe input width and height, or keep them unchanged. Applications such as semantic segmentation (:numref:`sec_semantic_segmentation`) and generative adversarial networks (:numref:`sec_dcgan`), however, require to predict values for each pixel and therefore needs to increase input width and height. Transposed convolution, also named fractionally-strided convolution :ref:`Dumoulin.Visin.2016` or deconvolution :ref:`Long.Shelhamer.Darrell.2015`, serves this purpose.
 
 ```{.python .input  n=13}
 from mxnet import np, npx, init
@@ -31,7 +31,7 @@ def trans_conv(X, K):
     return Y
 ```
 
-Remember the convolution computes results by `Y[i, j] = (X[i: i + h, j: j + w] * K).sum()` (refer to `corr2d` in :numref:`chapter_conv_layer`), which summarizes input values through the kernel. While the transposed convolution broadcasts input values through the kernel, which results in a larger output shape. 
+Remember the convolution computes results by `Y[i, j] = (X[i: i + h, j: j + w] * K).sum()` (refer to `corr2d` in :numref:`sec_conv_layer`), which summarizes input values through the kernel. While the transposed convolution broadcasts input values through the kernel, which results in a larger output shape. 
 
 Verify the results in :numref:`fig_trans_conv`.
 

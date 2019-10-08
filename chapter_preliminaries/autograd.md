@@ -1,5 +1,5 @@
 # Automatic Differentiation
-:label:`chapter_autograd`
+:label:`sec_autograd`
 
 In machine learning, we *train* models, updating them successively 
 so that they get better and better as they see more and more data. 
@@ -44,7 +44,7 @@ to subsequently backpropagate gradients on command.
 Here, *backpropagate* simply means to trace through the compute graph, 
 filling in the partial derivatives with respect to each parameter. 
 If you are unfamiliar with some of the math, 
-e.g., gradients, please refer to :numref:`chapter_math`.
+e.g., gradients, please refer to :numref:`sec_math`.
 
 ```{.python .input  n=1}
 from mxnet import autograd, np, npx
@@ -164,7 +164,7 @@ the most natural interpretation of the gradient of `y` (a vector of length $m$)
 with respect to `x` (a vector of length $n$) is the Jacobian (an $m\times n$ matrix).
 For higher-order and higher-dimensional $y$ and $x$, 
 the Jacobian could be a gnarly high order tensor 
-and complex to compute (refer to :numref:`chapter_math`). 
+and complex to compute (refer to :numref:`sec_math`). 
 
 However, while these more exotic objects do show up 
 in advanced machine learning (including in deep learning),
@@ -223,7 +223,7 @@ calculated `u` as a function of `x` outside of the `autograd.record` scope,
 yielding a `u` that will be treated as a constant in any called to `backward`. 
 The following backward computes $\partial (u \odot x)/\partial x$ 
 instead of $\partial (x \odot x \odot x) /\partial x$,
-where $\odot$ stands for element-wise multiplication.
+where $\odot$ stands for elementwise multiplication.
 
 ```{.python .input}
 with autograd.record():
@@ -261,7 +261,7 @@ print(x.grad, '\n', u.grad, '\n', y.grad)
 
 ## Head gradients
 
-Detaching allows to breaks the computation into several parts. We could use chain rule :numref:`chapter_math` to compute the gradient for the whole computation.  Assume $u = f(x)$ and $z = g(u)$, by chain rule we have $\frac{dz}{dx} = \frac{dz}{du} \frac{du}{dx}.$ To compute $\frac{dz}{du}$, we can first detach $u$ from the computation and then call `z.backward()` to compute the first term.
+Detaching allows to breaks the computation into several parts. We could use chain rule :numref:`sec_math` to compute the gradient for the whole computation.  Assume $u = f(x)$ and $z = g(u)$, by chain rule we have $\frac{dz}{dx} = \frac{dz}{du} \frac{du}{dx}.$ To compute $\frac{dz}{du}$, we can first detach $u$ from the computation and then call `z.backward()` to compute the first term.
 
 ```{.python .input}
 y = np.ones(4) * 2
@@ -348,8 +348,8 @@ When we get to complicated deep learning models,
 we will encounter some algorithms where the model
 behaves differently during training and 
 when we subsequently use it to make predictions. 
-The popular neural network techniques *dropout* :numref:`chapter_dropout` 
-and *batch normalization* :numref:`chapter_batch_norm`
+The popular neural network techniques *dropout* :numref:`sec_dropout` 
+and *batch normalization* :numref:`sec_batch_norm`
 both exhibit this characteristic.
 In other cases, our models may store auxiliary variables in *training* mode 
 for purposes of make computing gradients easier 

@@ -1,6 +1,6 @@
 # Multiscale Object Detection
 
-In :numref:`chapter_anchor`, we generated multiple anchor boxes centered on each pixel of the input image.  These anchor boxes are used to sample different regions of the input image. However, if anchor boxes are generated centered on each pixel of the image, soon there will be too many anchor boxes for us to compute. For example, we assume that the input image has a height and a width of 561 and 728 pixels respectively. If five different shapes of anchor boxes are generated centered on each pixel, over two million anchor boxes ($561 \times 728 \times 5$) need to be predicted and labeled on the image.
+In :numref:`sec_anchor`, we generated multiple anchor boxes centered on each pixel of the input image.  These anchor boxes are used to sample different regions of the input image. However, if anchor boxes are generated centered on each pixel of the image, soon there will be too many anchor boxes for us to compute. For example, we assume that the input image has a height and a width of 561 and 728 pixels respectively. If five different shapes of anchor boxes are generated centered on each pixel, over two million anchor boxes ($561 \times 728 \times 5$) need to be predicted and labeled on the image.
 
 It is not difficult to reduce the number of anchor boxes.  An easy way is to apply uniform sampling on a small portion of pixels from the input image and generate anchor boxes centered on the sampled pixels. In addition, we can generate anchor boxes of varied numbers and sizes on multiple scales. Notice that smaller objects are more likely to be positioned on the image than larger ones.  Here, we will use a simple example: Objects with shapes of $1 \times 1$, $1 \times 2$, and $2 \times 2$ may have 4, 2, and 1 possible position(s) on an image with the shape $2 \times 2$. Therefore, when using smaller anchor boxes to detect smaller objects, we can sample more regions; when using larger anchor boxes to detect larger objects, we can sample fewer regions.
 
@@ -19,7 +19,7 @@ h, w
 ```
 
 In
-:numref:`chapter_conv_layer`, the 2D array output of the convolutional neural network (CNN) is called
+:numref:`sec_conv_layer`, the 2D array output of the convolutional neural network (CNN) is called
 a feature map.  We can determine the midpoints of anchor boxes uniformly sampled
 on any image by defining the shape of the feature map.
 
@@ -63,7 +63,7 @@ We assume that the $c_i$ feature maps are the intermediate output of the CNN
 based on the input image. Since each feature map has $h \times w$ different
 spatial positions, the same position will have $c_i$ units.  According to the
 definition of receptive field in the
-:numref:`chapter_conv_layer`, the $c_i$ units of the feature map at the same spatial position have
+:numref:`sec_conv_layer`, the $c_i$ units of the feature map at the same spatial position have
 the same receptive field on the input image. Thus, they represent the
 information of the input image in this same receptive field.  Therefore, we can
 transform the $c_i$ units of the feature map at the same spatial position into

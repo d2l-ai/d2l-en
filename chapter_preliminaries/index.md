@@ -1,5 +1,5 @@
 #  Preliminaries
-:label:`chapter_preliminaries`
+:label:`chap_preliminaries`
 
 To get started with deep learning,
 we will need to develop a few basic skills.
@@ -32,7 +32,7 @@ To reason rigorously under uncertainty
 we will need to invoke the language of probability and statistics.
 
 In the end, the official documentation provides
-plenty of descriptions and examples that are beyond this book. 
+plenty of descriptions and examples that are beyond this book.
 To conclude the chapter, we will show you how to look up documentation for
 the needed information.
 

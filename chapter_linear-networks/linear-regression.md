@@ -1,5 +1,5 @@
 # Linear Regression
-:label:`chapter_linear_regression`
+:label:`sec_linear_regression`
 
 Regression refers to a set of methods for modeling 
 the relationship between data points $\mathbf{x}$ 
@@ -97,7 +97,6 @@ and all weights into a vector $\mathbf{w}$,
 we can express our model compactly using a dot product:
 
 $$\hat{y} = \mathbf{w}^T \mathbf{x} + b.$$
-:eqlabel:`eq_linear_regression_single`
 
 Here, the vector $\mathbf{x}$ corresponds to a single data point.  
 We will often find it convenient 
@@ -110,7 +109,6 @@ the predictions $\hat{\mathbf{y}}$
 can be expressed via the matrix-vector product:
 
 $${\hat{\mathbf{y}}} = \mathbf X \mathbf{w} + b.$$
-:eqlabel:`eq_linear_regression`
 
 Given a training dataset $X$ 
 and corresponding (known) targets $\mathbf{y}$,
@@ -401,7 +399,7 @@ for i in range(n):
 '%.5f sec' % timer.stop()
 ```
 
-Alternatively, we rely on `np` to compute the element-wise sum:
+Alternatively, we rely on `np` to compute the elementwise sum:
 
 ```{.python .input  n=3}
 timer.start()

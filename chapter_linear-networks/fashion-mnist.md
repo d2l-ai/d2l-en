@@ -1,7 +1,7 @@
 # Image Classification Data (Fashion-MNIST)
-:label:`chapter_fashion_mnist`
+:label:`sec_fashion_mnist`
 
-In :numref:`chapter_naive_bayes` we trained a naive Bayes classifier on MNIST :cite:`LeCun.Bottou.Bengio.ea.1998` introduced in 1998. Despite its popularity, MNIST is considered as a simple dataset, on which even  simple models achieve classification accuracy over 95%. It is hard to spot the differences between better models and weaker ones. In order to get a better intuition, we will use the qualitatively similar, but comparatively complex Fashion-MNIS dataset :cite:`Xiao.Rasul.Vollgraf.2017` came out in 2017.
+In :numref:`sec_naive_bayes` we trained a naive Bayes classifier on MNIST :cite:`LeCun.Bottou.Bengio.ea.1998` introduced in 1998. Despite its popularity, MNIST is considered as a simple dataset, on which even  simple models achieve classification accuracy over 95%. It is hard to spot the differences between better models and weaker ones. In order to get a better intuition, we will use the qualitatively similar, but comparatively complex Fashion-MNIS dataset :cite:`Xiao.Rasul.Vollgraf.2017` came out in 2017.
 
 ## Getting the Data
 
@@ -28,7 +28,7 @@ The number of images for each category in the training set and the testing set i
 len(mnist_train), len(mnist_test)
 ```
 
-Please refer to :numref:`chapter_naive_bayes` for more detailed explanations about accessing these examples and the example format. 
+Please refer to :numref:`sec_naive_bayes` for more detailed explanations about accessing these examples and the example format. 
 
 There are 10 categories in Fashion-MNIST: t-shirt, trousers, pullover, dress, coat, sandal, shirt, sneaker, bag and ankle boot. The following function can convert a numeric label into a corresponding text label.
 
@@ -67,7 +67,7 @@ show_images(X.squeeze(axis=-1), 2, 9, titles=get_fashion_mnist_labels(y));
 
 ## Reading a Minibatch
 
-To make our life easier when reading from the training and test sets we use a `DataLoader` rather than creating one from scratch, as we did in :numref:`chapter_linear_scratch`. Recall that a data loader reads a mini-batch of data with an example number of `batch_size` each time.
+To make our life easier when reading from the training and test sets we use a `DataLoader` rather than creating one from scratch, as we did in :numref:`sec_linear_scratch`. Recall that a data loader reads a mini-batch of data with an example number of `batch_size` each time.
 
 In practice, reading data can often be a significant performance bottleneck for training, especially when the model is simple or when the computer is fast. A handy feature of Gluon's `DataLoader` is the ability to use multiple processes to speed up data reading (not currently supported on Windows). For instance, we can set aside 4 processes to read the data (via `num_workers`).
 

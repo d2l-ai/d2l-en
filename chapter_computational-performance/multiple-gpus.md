@@ -1,5 +1,5 @@
 # Multi-GPU Computation Implementation from Scratch
-:label:`chapter_multi_gpu`
+:label:`sec_multi_gpu`
 
 In this section, we will show how to use multiple GPU for computation. For example, we can train the same model using multiple GPUs. As you might expect, running the programs in this section requires at least two GPUs. In fact, installing multiple GPUs on a single machine is common because there are usually multiple PCIe slots on the motherboard. If the NVIDIA driver is properly installed, we can use the `nvidia-smi` command to view all GPUs on the current computer.
 
@@ -8,7 +8,7 @@ In this section, we will show how to use multiple GPU for computation. For examp
 ```
 
 As we discussed in
-:numref:`chapter_auto_para`, most operations can use all the computational resources of all CPUs, or
+:numref:`sec_auto_para`, most operations can use all the computational resources of all CPUs, or
 all computational resources of a single GPU. However, if we use multiple GPUs
 for model training, we still need to implement the corresponding algorithms. Of
 these, the most commonly used algorithm is called data parallelism.
@@ -19,7 +19,7 @@ these, the most commonly used algorithm is called data parallelism.
 In the deep learning field, Data Parallelism is currently the most widely used
 method for dividing model training tasks among multiple GPUs. Recall the process
 for training models using optimization algorithms described in
-:numref:`chapter_minibatch_sgd`. Now, we will demonstrate how data parallelism works using mini-batch
+:numref:`sec_minibatch_sgd`. Now, we will demonstrate how data parallelism works using mini-batch
 stochastic gradient descent as an example.
 
 Assume there are $k$ GPUs on a machine. Given the model to be trained, each GPU will maintain a complete set of model parameters independently. In any iteration of model training, given a random mini-batch, we divide the examples in the batch into $k$ portions and distribute one to each GPU. Then, each GPU will calculate the local gradient of the model parameters based on the mini-batch subset it was assigned and the model parameters it maintains. Next, we add together the local gradients on the $k$ GPUs to get the current mini-batch stochastic gradient. After that, each GPU uses this mini-batch stochastic gradient to update the complete set of model parameters that it maintains. Figure 10.1 depicts the mini-batch stochastic gradient calculation using data parallelism and two GPUs.
@@ -37,7 +37,7 @@ npx.set_np()
 
 ## Define the Model
 
-We use LeNet, introduced in :numref:`chapter_lenet`, as the sample model for this section. Here, the model implementation only uses `ndarray`s.
+We use LeNet, introduced in :numref:`sec_lenet`, as the sample model for this section. Here, the model implementation only uses `ndarray`s.
 
 ```{.python .input  n=10}
 # Initialize model parameters

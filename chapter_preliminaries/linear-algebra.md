@@ -1,5 +1,5 @@
 # Linear Algebra
-:label:`chapter_linear_algebra`
+:label:`sec_linear_algebra`
 
 Now that you can store and manipulate data,
 let us briefly review the subset of basic linear algebra
@@ -115,7 +115,7 @@ x[3]
 
 ### Length, Dimensionality, and Shape
 
-Let us revisit some concepts from :numref:`chapter_ndarray`.
+Let us revisit some concepts from :numref:`sec_ndarray`.
 A vector is just an array of numbers.
 And just as every array has a length, so does every vector.
 In math notation, if we want to say that a vector $\mathbf{x}$
@@ -163,13 +163,8 @@ to express that the matrix $\mathbf{A}$ consists of $n$ rows and $m$ columns of 
 Visually, we can illustrate any matrix $\mathbf{A} \in \mathbb{R}^{n \times m}$ as a table,
 where each element $a_{ij}$ belongs to the $i^{\text{th}}$ row and $j^{\text{th}}$ column:
 
-$$\mathbf{A}=\begin{bmatrix}
- a_{11} & a_{12} & \cdots & a_{1m} \\
- a_{21} & a_{22} & \cdots & a_{2m} \\
-\vdots & \vdots & \ddots & \vdots \\
- a_{n1} & a_{n2} & \cdots & a_{nm} \\
-\end{bmatrix}.$$
-:eqlabel:`matrix_def`
+$$\mathbf{A}=\begin{bmatrix} a_{11} & a_{12} & \cdots & a_{1m} \\ a_{21} & a_{22} & \cdots & a_{2m} \\ \vdots & \vdots & \ddots & \vdots \\ a_{n1} & a_{n2} & \cdots & a_{nm} \\ \end{bmatrix}.$$
+:eqlabel:`eq_matrix_def`
 
 
 For any $\mathbf{A} \in \mathbb{R}^{n \times m}$, the shape of $\mathbf{A}$
@@ -183,7 +178,7 @@ A = np.arange(20).reshape(5, 4)
 A
 ```
 
-We can access the scalar element $a_{ij}$ of a matrix $\mathbf{A}$ in :eqref:`matrix_def`
+We can access the scalar element $a_{ij}$ of a matrix $\mathbf{A}$ in :eqref:`eq_matrix_def`
 by specifying the indices for the row ($i$) and column ($j$) respectively,
 such as $[\mathbf{A}]_{ij}$.
 To keep notation simple, commas are inserted to separate indices only when necessary,
@@ -195,7 +190,7 @@ When we exchange a matrix's rows and columns,
 the result is called the *transpose* of the matrix.
 Formally, we signify a matrix $\mathbf{A}$'s transpose by $\mathbf{A}^\top$
 and if $B = A^\top$, then $b_{ij} = a_{ji}$ for any $i$ and $j$.
-Thus, the transpose of $\mathbf{A}$ in :eqref:`matrix_def` is
+Thus, the transpose of $\mathbf{A}$ in :eqref:`eq_matrix_def` is
 a $m \times n$ matrix:
 
 $$
@@ -213,7 +208,7 @@ $$
 In code, we access a matrix's transpose via the `.T` attribute.
 
 ```{.python .input  n=8}
-print(A.T)
+A.T
 ```
 
 Matrices are useful data structures: 
@@ -234,25 +229,25 @@ or just data points if no mini-batch exists.
 
 ## Tensors
 
-Just as vectors generalize scalars, and matrices generalize vectors, we can build data structures with even more axes. Tensors give us a generic way of describing arrays with an arbitrary number of axes. Vectors, for example, are first-order tensors, and matrices are second-order tensors.
+Just as vectors generalize scalars, and matrices generalize vectors, we can build data structures with even more axes. Tensors give us a generic way of describing `ndarray`s with an arbitrary number of axes. Vectors, for example, are first-order tensors, and matrices are second-order tensors.
+Tensors are denoted with capital letters of a special font face
+(e.g., $\mathsf{X}$, $\mathsf{Y}$, and $\mathsf{Z}$).
 
-Tensors will become more important when we start working with images, which arrive as 3D data structures, with axes corresponding to the height, width, and a *channel* axis for stacking the three (RGB) color channels. For now, we will skip over higher order tensors and focus on the basics.
+Tensors will become more important when we start working with images, which arrive as `ndarray`s with 3 axes corresponding to the height, width, and a *channel* axis for stacking the color channels (red, green, and blue). For now, we will skip over higher order tensors and focus on the basics.
 
 ```{.python .input  n=9}
-X = np.arange(24).reshape(2, 3, 4)
-print('X.shape =', X.shape)
-print('X =', X)
+np.arange(24).reshape(2, 3, 4)
 ```
 
-## Basic properties of tensor arithmetic
+## Basic Properties of Tensor Arithmetic
 
 Scalars, vectors, matrices, and tensors of any order
 have some nice properties that often come in handy.
 For example, you might have noticed
-from the definition of an element-wise operation,
+from the definition of an elementwise operation,
 any elementwise unary operation does not change the shape of its operand.
 Similarly, given any two tensors with the same shape,
-the result of any binary element-wise operation
+the result of any binary elementwise operation
 will be a tensor of that same shape.
 The same holds for multiplication by a scalar.
 Using math notation, given any two tensors $X, Y \in \mathcal{R}^{m \times n}$,
@@ -275,7 +270,7 @@ These operations also preserve membership in a vector space.
 But, again we will punt discussion of *vector spaces*
 in favor of information more critical to getting your first models up and running.
 
-## Sums and means
+## Sums and Means
 
 One useful operation that we can perform with arbitrary tensors
 is to calculate the sum of their elements.
@@ -308,9 +303,9 @@ print(A.mean())
 print(A.sum() / A.size)
 ```
 
-## Dot products
+## Dot Products
 
-So far, we have only performed element-wise operations, sums and averages. And if this was all we could do, linear algebra probably would not deserve its own chapter. However, one of the most fundamental operations is the dot product. Given two vectors $\mathbf{u}$ and $\mathbf{v}$, the dot product $\mathbf{u}^T \mathbf{v}$ is a sum over the products of the corresponding elements: $\mathbf{u}^T \mathbf{v} = \sum_{i=1}^{d} u_i \cdot v_i$.
+So far, we have only performed elementwise operations, sums and averages. And if this was all we could do, linear algebra probably would not deserve its own chapter. However, one of the most fundamental operations is the dot product. Given two vectors $\mathbf{u}$ and $\mathbf{v}$, the dot product $\mathbf{u}^T \mathbf{v}$ is a sum over the products of the corresponding elements: $\mathbf{u}^T \mathbf{v} = \sum_{i=1}^{d} u_i \cdot v_i$.
 
 ```{.python .input  n=14}
 x = np.arange(4)
@@ -318,7 +313,7 @@ y = np.ones(4)
 print(x, y, np.dot(x, y))
 ```
 
-Note that we can express the dot product of two vectors `dot(x, y)` equivalently by performing an element-wise multiplication and then a sum:
+Note that we can express the dot product of two vectors `dot(x, y)` equivalently by performing an elementwise multiplication and then a sum:
 
 ```{.python .input  n=15}
 np.sum(x * y)
@@ -340,7 +335,7 @@ the dot products express the cosine of the angle between them.
 We formally introduce this notion of *length* below in the section on norms.
 
 
-## Matrix-vector products
+## Matrix-Vector Products
 
 Now that we know how to calculate dot products,
 we can begin to understand matrix-vector products.
@@ -420,7 +415,7 @@ must be the same as the dimension of ``x`` (its length).
 np.dot(A, x)
 ```
 
-## Matrix-matrix multiplication
+## Matrix-Matrix Multiplication
 
 If you have gotten the hang of dot products and matrix-vector multiplication,
 then matrix-matrix multiplications should be straightforward.
@@ -549,7 +544,7 @@ the absolute value function with a sum over the elements.
 np.abs(x).sum()
 ```
 
-### Norms and objectives
+### Norms and Objectives
 
 While we do not want to get too far ahead of ourselves,
 we can plant some intuition already about why these concepts are useful.

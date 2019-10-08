@@ -1,5 +1,5 @@
 # Adagrad
-:label:`chapter_adagrad`
+:label:`sec_adagrad`
 
 In the optimization algorithms we introduced previously, each element of the objective function's independent variables uses the same learning rate at the same time step for self-iteration. For example, if we assume that the objective function is $f$ and the independent variable is a two-dimensional vector $[x_1, x_2]^\top$, each element in the vector uses the same learning rate when iterating. For example, in gradient descent with the learning rate $\eta$, element $x_1$ and $x_2$ both use the same learning rate $\eta$ for iteration:
 
@@ -8,7 +8,7 @@ x_1 \leftarrow x_1 - \eta \frac{\partial{f}}{\partial{x_1}}, \quad
 x_2 \leftarrow x_2 - \eta \frac{\partial{f}}{\partial{x_2}}.
 $$
 
-In :numref:`chapter_momentum`, we can see that, when there is a big difference
+In :numref:`sec_momentum`, we can see that, when there is a big difference
 between the gradient values $x_1$ and $x_2$, a sufficiently small learning rate
 needs to be selected so that the independent variable will not diverge in the
 dimension of larger gradient values. However, this will cause the independent
@@ -87,7 +87,7 @@ def adagrad(params, states, hyperparams):
         p[:] -= hyperparams['lr'] * p.grad / np.sqrt(s + eps)
 ```
 
-Compared with the experiment in :numref:`chapter_minibatch_sgd`, here, we use a
+Compared with the experiment in :numref:`sec_minibatch_sgd`, here, we use a
 larger learning rate to train the model.
 
 ```{.python .input  n=4}

@@ -1,5 +1,5 @@
 # Implementation of Softmax Regression from Scratch
-:label:`chapter_softmax_scratch`
+:label:`sec_softmax_scratch`
 
 Just as we implemented linear regression from scratch,
 we believe that multiclass logistic (softmax) regression
@@ -113,7 +113,7 @@ we were a bit sloppy in our implementation
 because failed to take precautions against numerical overflow or underflow
 due to large (or very small) elements of the matrix,
 as we did in
-:numref:`chapter_naive_bayes`.
+:numref:`sec_naive_bayes`.
 
 ```{.python .input  n=7}
 X = np.random.normal(size=(2, 5))
@@ -138,7 +138,7 @@ def net(X):
 ## The Loss Function
 
 Next, we need to implement the cross-entropy loss function,
-introduced in :numref:`chapter_softmax`.
+introduced in :numref:`sec_softmax`.
 This may be the most common loss function
 in all of deep learning because, at the moment,
 classification problems far outnumber regression problems.
@@ -249,7 +249,7 @@ evaluate_accuracy(net, test_iter)
 
 The training loop for softmax regression should look strikingly familiar
 if you read through our implementation
-of linear regression in :numref:`chapter_linear_scratch`. Here we refactor the implementation to make it reusable. First, we define a function to train for one data epoch. Note that `updater` is general function to update the model parameters, which accepts the batch size as an argument. It can be either a wrapper of `d2l.sgd` or a Gluon trainer.
+of linear regression in :numref:`sec_linear_scratch`. Here we refactor the implementation to make it reusable. First, we define a function to train for one data epoch. Note that `updater` is general function to update the model parameters, which accepts the batch size as an argument. It can be either a wrapper of `d2l.sgd` or a Gluon trainer.
 
 ```{.python .input  n=15}
 # Save to the d2l package.

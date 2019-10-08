@@ -1,5 +1,5 @@
 # Data Manipulation and Preprocessing
-:label:`chapter_ndarray`
+:label:`sec_ndarray`
 
 In order to get anything done, we must have some way to manipulate data. 
 Generally, there are two important things we need to do with data: 
@@ -161,13 +161,13 @@ This book is not about Web development---it is
 not enough to just read and write values.
 We want to perform mathematical operations on those arrays.
 Some of the simplest and most useful operations 
-are the *element-wise* operations. 
+are the *elementwise* operations. 
 These apply a standard scalar operation 
 to each element of an array.
 For functions that take two arrays as inputs,
-element-wise operations apply some standard binary operator 
+elementwise operations apply some standard binary operator 
 on each pair of corresponding elements from the two arrays. 
-We can create an element-wise function from any function 
+We can create an elementwise function from any function 
 that maps from a scalar to a scalar. 
 
 In math notation, we would denote such 
@@ -184,15 +184,15 @@ by setting $c_i \gets f(u_i, v_i)$ for all $i$,
 where $c_i, u_i$, and $v_i$ are the $i^\mathrm{th}$ elements of vectors $\mathbf{c}, \mathbf{u}$, and $\mathbf{v}$.
 Here, we produced the vector-valued 
 $F: \mathbb{R}^d, \mathbb{R}^d \rightarrow \mathbb{R}^d$ 
-by *lifting* the scalar function to an element-wise vector operation.
+by *lifting* the scalar function to an elementwise vector operation.
 
 In MXNet, the common standard arithmetic operators (`+`, `-`, `*`, `/`, and `**`) 
-have all been *lifted* to element-wise operations 
+have all been *lifted* to elementwise operations 
 for any identically-shaped tensors of an arbitrary shape. 
-We can call element-wise operations on any two tensors 
+We can call elementwise operations on any two tensors 
 of the same shape.
 In the following example, we use commas to formulate a $5$-element tuple,
-where each element is the result of an element-wise operation.
+where each element is the result of an elementwise operation.
 
 ```{.python .input  n=11}
 x = np.array([1, 2, 4, 8])
@@ -200,17 +200,17 @@ y = np.array([2, 2, 2, 2])
 x + y, x - y, x * y, x / y, x ** y  # The ** operator is exponentiation
 ```
 
-Many more operations can be applied element-wise, including unary operators like exponentiation.
+Many more operations can be applied elementwise, including unary operators like exponentiation.
 
 ```{.python .input  n=12}
 np.exp(x)
 ```
 
-In addition to element-wise computations, 
+In addition to elementwise computations, 
 we can also perform linear algebra operations, 
 including vector dot products and matrix multiplication.
 We will explain the crucial bits of linear algebra 
-(with no assumed prior knowledge) in :numref:`chapter_linear_algebra`.
+(with no assumed prior knowledge) in :numref:`sec_linear_algebra`.
 
 We can also *concatenate* multiple `ndarray`s together,
 stacking them end-to-end to form a larger `ndarray`. 
@@ -252,16 +252,16 @@ For stylistic convenience, we can write `x.sum()`as `np.sum(x)`.
 ## Broadcasting Mechanism
 
 In the above section, we saw how to perform 
-element-wise operations on two `ndarray`s of the same shape.
+elementwise operations on two `ndarray`s of the same shape.
 Under certain conditions, even when shapes differ,
-we can still perform element-wise operations
+we can still perform elementwise operations
 by invoking the *broadcasting mechanism*.
 These mechanisms work in the following way:
 First, expand one or both arrays
 by copying elements appropriately 
 so that after this transformation, 
 the two `ndarray`s have the same shape.
-Second, carry out the element-wise operations
+Second, carry out the elementwise operations
 on the resulting arrays.
 
 In most cases, we broadcast along an axis where an array
@@ -278,7 +278,7 @@ their shapes do not match up if we want to add them.
 We *broadcast* the entries of both matrices into a larger $3\times2$ matrix as follows: 
 for matrix `a` it replicates the columns
 and for matrix `b` it replicates the rows
-before adding up both element-wise.
+before adding up both elementwise.
 
 ```{.python .input  n=18}
 a + b

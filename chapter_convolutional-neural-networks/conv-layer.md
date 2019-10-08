@@ -1,5 +1,5 @@
 # Convolutions for Images
-:label:`chapter_conv_layer`
+:label:`sec_conv_layer`
 
 Now that we understand how convolutional layers work in theory,
 we are ready to see how this works in practice.
@@ -37,7 +37,7 @@ and slide it across the input array,
 both from left to right and top to bottom.
 When the convolution window slides to a certain position,
 the input subarray contained in that window
-and the kernel array are multiplied (element-wise)
+and the kernel array are multiplied (elementwise)
 and the resulting array is summed up
 yielding a single scalar value.
 This result is precisely the value of the output array

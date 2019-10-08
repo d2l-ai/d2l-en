@@ -221,14 +221,14 @@ d2l.train_ch5(net, train_iter, test_iter, num_epochs, lr)
 
 1. There are several iterations of GoogLeNet. Try to implement and run them. Some of them include the following:
     * Add a batch normalization layer :cite:`Ioffe.Szegedy.2015`, as described
-      later in :numref:`chapter_batch_norm`.
+      later in :numref:`sec_batch_norm`.
     * Make adjustments to the Inception block
       :cite:`Szegedy.Vanhoucke.Ioffe.ea.2016`.
     * Use "label smoothing" for model regularization
       :cite:`Szegedy.Vanhoucke.Ioffe.ea.2016`.
     * Include it in the residual connection
       :cite:`Szegedy.Ioffe.Vanhoucke.ea.2017`, as described later in
-      :numref:`chapter_resnet`.
+      :numref:`sec_resnet`.
 1. What is the minimum image size for GoogLeNet to work?
 1. Compare the model parameter sizes of AlexNet, VGG, and NiN with GoogLeNet. How do the latter two network architectures significantly reduce the model parameter size?
 1. Why do we need a large range convolution initially?

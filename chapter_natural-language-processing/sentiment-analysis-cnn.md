@@ -1,7 +1,7 @@
 # Text Sentiment Classification: Using Convolutional Neural Networks (textCNN)
-:label:`chapter_sentiment_cnn`
+:label:`sec_sentiment_cnn`
 
-In :numref:`chapter_cnn`, we explored how to process
+In :numref:`chap_cnn`, we explored how to process
 two-dimensional image data with two-dimensional convolutional neural
 networks. In the previous language models and text classification tasks, we
 treated text data as a time series with only one dimension, and naturally, we
@@ -73,7 +73,7 @@ The definition of a two-dimensional cross-correlation operation tells us that a 
 Both the outputs in Figure 12.4 and Figure 12.5 have only one channel. We
 discussed how to specify multiple output channels in a two-dimensional
 convolutional layer in
-:numref:`chapter_channels`.
+:numref:`sec_channels`.
 Similarly,
 we can also specify multiple output channels in the one-dimensional
 convolutional layer to extend the model parameters in the convolutional layer.
@@ -131,7 +131,7 @@ class TextCNN(nn.Block):
         # can be obtained. Use the flatten function to remove the last
         # dimension and then concatenate on the channel dimension
         encoding = np.concatenate([
-            np.squeeze(self.pool(conv(embeddings)), axis=-1) 
+            np.squeeze(self.pool(conv(embeddings)), axis=-1)
             for conv in self.convs], axis=1)
         # After applying the dropout method, use a fully connected layer to
         # obtain the output

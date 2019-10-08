@@ -1,5 +1,5 @@
 # Linear Regression Implementation from Scratch
-:label:`chapter_linear_scratch`
+:label:`sec_linear_scratch`
 
 Now that you understand the key ideas behind linear regression,
 we can begin to work through a hands-on implementation in code.
@@ -166,7 +166,7 @@ in the direction that reduces the loss.
 Since nobody wants to compute gradients explicitly
 (this is tedious and error prone),
 we use automatic differentiation to compute the gradient.
-See :numref:`chapter_autograd` for more details.
+See :numref:`sec_autograd` for more details.
 Recall from the autograd chapter
 that in order for `autograd` to know
 that it should store a gradient for our parameters,
@@ -191,7 +191,7 @@ Recall that when we add a vector and a scalar,
 the scalar is added to each component of the vector.
 
 ```{.python .input  n=9}
-# Save to the d2l package. 
+# Save to the d2l package.
 def linreg(X, w, b):
     return np.dot(X, w) + b
 ```
@@ -209,7 +209,7 @@ The result returned by the following function
 will also be the same as the `y_hat` shape.
 
 ```{.python .input  n=10}
-# Save to the d2l package. 
+# Save to the d2l package.
 def squared_loss(y_hat, y):
     return (y_hat - y.reshape(y_hat.shape)) ** 2 / 2
 ```
@@ -239,7 +239,7 @@ so that the magnitude of a typical step size
 doesn't depend heavily on our choice of the batch size.
 
 ```{.python .input  n=11}
-# Save to the d2l package. 
+# Save to the d2l package.
 def sgd(params, lr, batch_size):
     for param in params:
         param[:] = param - lr * param.grad / batch_size
@@ -288,7 +288,7 @@ Unfortunately, setting hyper-parameters is tricky
 and requires some adjustment by trial and error.
 We elide these details for now but revise them
 later in
-:numref:`chapter_optimization`.
+:numref:`chap_optimization`.
 
 ```{.python .input  n=12}
 lr = 0.03  # Learning rate

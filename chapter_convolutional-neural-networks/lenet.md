@@ -1,9 +1,9 @@
 # Convolutional Neural Networks (LeNet)
-:label:`chapter_lenet`
+:label:`sec_lenet`
 
 We are now ready to put all of the tools together
 to deploy your first fully-functional convolutional neural network.
-In our first encounter with image data we applied a multilayer perceptron (:numref:`chapter_mlp_scratch`)
+In our first encounter with image data we applied a multilayer perceptron (:numref:`sec_mlp_scratch`)
 to pictures of clothing in the Fashion-MNIST data set.
 Each image in Fashion-MNIST consisted of
 a two-dimensional $28 \times 28$ matrix.
@@ -179,11 +179,11 @@ to put it into action to speed up training.
 
 For evaluation, we need to make a slight modification
 to the `evaluate_accuracy` function that we described
-in :numref:`chapter_softmax_scratch`.
+in :numref:`sec_softmax_scratch`.
 Since the full dataset lives on the CPU,
 we need to copy it to the GPU before we can compute our models.
 This is accomplished via the `as_in_context` function
-described in :numref:`chapter_use_gpu`.
+described in :numref:`sec_use_gpu`.
 
 ```{.python .input}
 # Save to the d2l package
@@ -198,10 +198,10 @@ def evaluate_accuracy_gpu(net, data_iter, ctx=None):
 ```
 
 We also need to update our training function to deal with GPUs.
-Unlike the `train_epoch_ch3` defined in :numref:`chapter_softmax_scratch`, we now need to move each batch of data to our designated context (hopefully, the GPU)
+Unlike the `train_epoch_ch3` defined in :numref:`sec_softmax_scratch`, we now need to move each batch of data to our designated context (hopefully, the GPU)
 prior to making the forward and backward passes.
 
-The training function `train_ch5` is also very similar to `train_ch3` defined in :numref:`chapter_softmax_scratch`. Since we will deal with networks with tens of layers now, the function will only support Gluon models. We initialize the model parameters on the device indicated by `ctx`,
+The training function `train_ch5` is also very similar to `train_ch3` defined in :numref:`sec_softmax_scratch`. Since we will deal with networks with tens of layers now, the function will only support Gluon models. We initialize the model parameters on the device indicated by `ctx`,
 this time using the Xavier initializer.
 The loss function and the training algorithm
 still use the cross-entropy loss function
