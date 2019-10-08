@@ -187,35 +187,35 @@ The book can be roughly divided into three parts, which are presented by differe
 
 
 * The first part covers prerequisites and basics.  The first chapter offers an
-introduction to deep learning in :numref:`sec_introduction`.  In
-:numref:`sec_preliminaries`, we'll quickly bring you up to speed on the
+introduction to deep learning in :numref:`chap_introduction`.  In
+:numref:`chap_preliminaries`, we'll quickly bring you up to speed on the
 prerequisites required for hands-on deep learning, such as how to acquire and
-run the codes covered in the book.  :numref:`sec_linear` and
-:numref:`sec_perceptrons` cover the most basic concepts and techniques of deep
+run the codes covered in the book.  :numref:`chap_linear` and
+:numref:`chap_perceptrons` cover the most basic concepts and techniques of deep
 learning, such as linear regression, multi-layer perceptrons and regularization.
 <!--If you are short on time or you only want to learn only
 about the most basic concepts and techniques of deep learning,
 it is sufficient to read the first section only.-->
 
 * The next four chapters focus on modern deep learning techniques.
-:numref:`sec_computation` describes the various key components of deep
+:numref:`chap_computation` describes the various key components of deep
 learning calculations and lays the groundwork for the later implementation of
-more complex models.  Next we explain in :numref:`sec_cnn` and
-:numref:`sec_modern_cnn`, powerful tools that form the backbone of most
+more complex models.  Next we explain in :numref:`chap_cnn` and
+:numref:`chap_modern_cnn`, powerful tools that form the backbone of most
 modern computer vision systems in recent years.  Subsequently, we introduce
-:numref:`sec_rnn` models that exploit temporal or sequential structure in
+:numref:`chap_rnn` models that exploit temporal or sequential structure in
 data, and are commonly used for natural language processing and time series
-prediction. :numref:`sec_attention` introduces recent models exploring the
+prediction. :numref:`chap_attention` introduces recent models exploring the
 attention mechanism.  These sections will get you up to speed on the basic tools
 behind most modern deep learning.
 
 * Part three discusses scalability, efficiency and applications.  First we
-discuss several common :numref:`sec_optimization` used to train deep
-learning models.  The next chapter, :numref:`sec_performance` examines
+discuss several common :numref:`chap_optimization` used to train deep
+learning models.  The next chapter, :numref:`chap_performance` examines
 several important factors that affect the computational performance of your deep
-learning code.    :numref:`sec_cv` and :numref:`sec_nlp` illustrate major
+learning code.    :numref:`chap_cv` and :numref:`chap_nlp` illustrate major
 applications of deep learning in computer vision and natural language
-processing, respectively. Finally, :number:`sec_gans` presents an emerging family of models called generative adversarial networks.
+processing, respectively. Finally, :number:`chap_gans` presents an emerging family of models called generative adversarial networks.
 
 
 
@@ -243,7 +243,7 @@ All of the code in this book has passed tests under the newest MXNet version.
 However, due to the rapid development of deep learning,
 some code *in the print edition* may not work properly in future versions of MXNet.
 However, we plan to keep the online version remain up-to-date.
-In case of such problems, please consult :ref:`sec_installation`
+In case of such problems, please consult :ref:`chap_installation`
 to update the code and runtime environment.
 
 At times, to avoid unnecessary repetition,

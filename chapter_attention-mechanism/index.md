@@ -1,5 +1,5 @@
 # Attention Mechanism
-:label:`sec_attention`
+:label:`chap_attention`
 
 Attention is a generalized pooling method with bias alignment over inputs.
 
