@@ -1,23 +1,23 @@
 # AutoRec: Rating Prediction with Autoencoders
 
-Although the matrix factorization model achieves decent performance on the rating prediction task, it is essentially a linear model. Thus, such models are not capable of capturing complex nonlinear and intricate relationships that may be predictive of users' preferences. In this section, we introduce a nonlinear neural network collaborative filtering model, AutoRec. It identifies collaborative filtering (CF) with an autoencoder architecture. This model aims to integrate nonlinear transformations into CF on the basis of explicit feedback. Neural networks have been proven to be capable of approximating any continuous function, making it suitable to address this limitation and enrich the expressiveness of matrix factorization.
+Although the matrix factorization model achieves decent performance on the rating prediction task, it is essentially a linear model. Thus, such models are not capable of capturing complex nonlinear and intricate relationships that may be predictive of users' preferences. In this section, we introduce a nonlinear neural network collaborative filtering model, AutoRec. It identifies collaborative filtering (CF) with an autoencoder architecture and aims to integrate nonlinear transformations into CF on the basis of explicit feedback. Neural networks have been proven to be capable of approximating any continuous function, making it suitable to address the limitation of matrix factorization and enrich the expressiveness of matrix factorization.
 
 On one hand, AutoRec has the same structure as an autoencoder which consists of an input layer, a hidden layer, and a reconstruction (output) layer.  An autoencoder is a neural network that learns to copy its input to its output in order to code the inputs into the hidden (and usually low-dimensional) representations. In AutoRec, instead of explicitly embedding users/items into low-dimensional space, it uses the column/row of the interaction matrix as the input, then reconstructs the interaction matrix in the output layer.
 
-On the other hand, AutoRec differs from a traditional autoencoder: rather than learning the hidden representations, AutoRec focuses on learning the output layer. It uses a partially observed interaction matrix as the input, aiming to reconstruct a completed rating matrix by predicting missing entries in the output layer for the purpose of recommendation. 
+On the other hand, AutoRec differs from a traditional autoencoder: rather than learning the hidden representations, AutoRec focuses on learning/reconstructing the output layer. It uses a partially observed interaction matrix as the input, aiming to reconstruct a completed rating matrix. In the meantime, the missing entries of the input are filled in the output layer via reconstruction for the purpose of recommendation. 
 
 There are two variants of AutoRec: user-based and item-based. For brevity, here we only introduce the item-based AutoRec. User-based AutoRec can be derived accordingly.
 
 
 ## Model
 
-Let $\mathbf{R}_{*i}$ denote the $i^{th}$ column of the rating matrix, where unknown ratings are set to zeros by default. The neural architecture is defined as:
+Let $\mathbf{R}_{*i}$ denote the $i^{\text{th}}$ column of the rating matrix, where unknown ratings are set to zeros by default. The neural architecture is defined as:
 
 $$
 h(\mathbf{R}_{*i}) = f(\mathbf{W} \cdot g(\mathbf{V} \mathbf{R}_{*i} + \mu) + b)
 $$
 
-where $f(\cdot)$ and $g(\cdot)$ represent activation functions, $\mathbf{W}$ and $\mathbf{V}$ are weight matrices, $\mu$ and $b$ are biases. The output $h(\mathbf{R}_{*i})$ is the reconstruction of the $i^{th}$ column of the rating matrix.
+where $f(\cdot)$ and $g(\cdot)$ represent activation functions, $\mathbf{W}$ and $\mathbf{V}$ are weight matrices, $\mu$ and $b$ are biases. Let $h( \cdot )$ denote the whole network of AutoRec. The output $h(\mathbf{R}_{*i})$ is the reconstruction of the $i^{\text{th}}$ column of the rating matrix.
 
 The following objective function aims to minimize the reconstruction error:
 
@@ -40,7 +40,7 @@ npx.set_np()
 A typical autoencoder consists of an encoder and a decoder. The encoder projects the input to hidden representations and the decoder maps the hidden layer to the reconstruction layer. We follow this practice and create the encoder and decoder with dense layers. The activation of encoder is set to `sigmoid` by default and no activation is applied for decoder. Dropout is included after the encoding transformation to reduce overfitting. The gradients of unobserved inputs are masked out to ensure that only observed ratings contribute to the model learning process.
 
 ```{.python .input  n=2}
-class autorec(nn.Block):
+class AutoRec(nn.Block):
     def __init__(self, num_hidden, num_users, dropout_rate=0.05):
         super(autorec, self).__init__()
         self.encoder = gluon.nn.Dense(num_hidden, activation='sigmoid', 
@@ -92,7 +92,7 @@ train_iter = gluon.data.DataLoader(train_inter_mat, shuffle=True,
 test_iter = gluon.data.DataLoader(np.array(train_inter_mat),shuffle=False, 
                                   last_batch="keep", batch_size=1024)
 # Model initialization, training, and evaluation
-net = autorec(500, num_users)
+net = AutoRec(500, num_users)
 net.initialize(ctx=ctx, force_reinit=True, init=mx.init.Normal(0.01))
 lr, num_epochs, wd, optimizer = 0.001, 50, 1e-5, 'adam'
 loss = gluon.loss.L2Loss()
@@ -117,4 +117,4 @@ d2l.train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
 
 ## References
 
-* Sedhain, Suvash, et al. "Autorec: Autoencoders meet collaborative filtering." Proceedings of the 24th International Conference on World Wide Web. ACM, 2015.
+* Sedhain, Suvash, et al. "AutoRec: Autoencoders meet collaborative filtering." Proceedings of the 24th International Conference on World Wide Web. ACM, 2015.
