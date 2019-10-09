@@ -155,7 +155,6 @@ $$D_{\mathrm{KL}}(P\|Q) = E_{x \sim P} \Big[\log \frac{p(x)}{q(x)} \Big] = E_{x 
 
 Let us build a toy model. First, generate and sort three $1,000,000$ length ndarrays: an objective ndarray $p$ which follows a normal distribution $N(0,1)$, and two candidate ndarrays $q_1$ and $q_2$ which follow normal distributions $N(-1,1)$ and $N(1,1)$ respectively.
 
-
 ```{.python .input  n=0}
 from mxnet import np
 
@@ -169,7 +168,6 @@ q1 = np.array(sorted(q1.asnumpy()))
 q2 = np.array(sorted(q2.asnumpy()))
 ```
 
-
 Next, define the above KL Divergence formula in MXNet.
 
 ```{.python .input  n=1}
@@ -181,9 +179,7 @@ def KLDivergence(p, q):
     return out
 ```
 
-
-Since $q_1$ and $q_2$ are symmetric with respect to the y-axis ($x=0$), we expect a similar absolute value of KL divergence between $D_{\mathrm{KL}}(p\|q_1)$ and $D_{\mathrm{KL}}(p\|q_2)$. 
-
+Since $q_1$ and $q_2$ are symmetric with respect to the y-axis ($x=0$), we expect a similar absolute value of KL divergence between $D_{\mathrm{KL}}(p\|q_1)$ and $D_{\mathrm{KL}}(p\|q_2)$.
 
 ```{.python .input  n=2}
 kl_pq1 = KLDivergence(p,q1)
@@ -296,7 +292,6 @@ preds = np.array([[0.3, 0.6, 0.1], [0.2, 0.3, 0.5]])
 
 cross_entropy(preds, labels)
 ```
-
 
 ### Cross Entropy as An Objective Function of Multi-class Classification
 
