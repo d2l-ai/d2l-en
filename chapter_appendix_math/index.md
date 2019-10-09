@@ -6,5 +6,6 @@ label:`chap_appendix_math`
 
 notation
 math
+info-theory
 ```
 
