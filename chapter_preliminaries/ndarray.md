@@ -188,7 +188,7 @@ by *lifting* the scalar function to an elementwise vector operation.
 
 In MXNet, the common standard arithmetic operators (`+`, `-`, `*`, `/`, and `**`) 
 have all been *lifted* to elementwise operations 
-for any identically-shaped tensors of an arbitrary shape. 
+for any identically-shaped tensors of arbitrary shape. 
 We can call elementwise operations on any two tensors 
 of the same shape.
 In the following example, we use commas to formulate a $5$-element tuple,
