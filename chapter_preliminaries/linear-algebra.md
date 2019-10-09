@@ -105,6 +105,8 @@ $$
     x_{n}
 \end{bmatrix},
 $$
+:eqlabel:`eq_vec_def`
+
 
 where $x_1, \ldots, x_n$ are elements of the vector.
 In code, we access any element by indexing into the `ndarray`.
@@ -158,19 +160,19 @@ Matrices, which we will typically denote with bold-faced, capital letters
 (e.g., $\mathbf{X}$, $\mathbf{Y}$, and $\mathbf{Z}$),
 are represented in code as `ndarray`s with $2$ axes.
 
-In math notation, we use $\mathbf{A} \in \mathbb{R}^{n \times m}$
-to express that the matrix $\mathbf{A}$ consists of $n$ rows and $m$ columns of real-valued scalars.
-Visually, we can illustrate any matrix $\mathbf{A} \in \mathbb{R}^{n \times m}$ as a table,
+In math notation, we use $\mathbf{A} \in \mathbb{R}^{m \times n}$
+to express that the matrix $\mathbf{A}$ consists of $m$ rows and $n$ columns of real-valued scalars.
+Visually, we can illustrate any matrix $\mathbf{A} \in \mathbb{R}^{m \times n}$ as a table,
 where each element $a_{ij}$ belongs to the $i^{\text{th}}$ row and $j^{\text{th}}$ column:
 
-$$\mathbf{A}=\begin{bmatrix} a_{11} & a_{12} & \cdots & a_{1m} \\ a_{21} & a_{22} & \cdots & a_{2m} \\ \vdots & \vdots & \ddots & \vdots \\ a_{n1} & a_{n2} & \cdots & a_{nm} \\ \end{bmatrix}.$$
+$$\mathbf{A}=\begin{bmatrix} a_{11} & a_{12} & \cdots & a_{1n} \\ a_{21} & a_{22} & \cdots & a_{2n} \\ \vdots & \vdots & \ddots & \vdots \\ a_{m1} & a_{m2} & \cdots & a_{mn} \\ \end{bmatrix}.$$
 :eqlabel:`eq_matrix_def`
 
 
-For any $\mathbf{A} \in \mathbb{R}^{n \times m}$, the shape of $\mathbf{A}$
-is ($n$, $m$) or $n \times m$.
-We can create an $n \times m$ matrix in MXNet
-by specifying a shape with two components $n$ and $m$
+For any $\mathbf{A} \in \mathbb{R}^{m \times n}$, the shape of $\mathbf{A}$
+is ($m$, $n$) or $m \times n$.
+We can create an $m \times n$ matrix in MXNet
+by specifying a shape with two components $m$ and $n$
 when calling any of our favorite functions for instantiating an `ndarray`.
 
 ```{.python .input  n=24}
@@ -191,15 +193,15 @@ the result is called the *transpose* of the matrix.
 Formally, we signify a matrix $\mathbf{A}$'s transpose by $\mathbf{A}^\top$
 and if $B = A^\top$, then $b_{ij} = a_{ji}$ for any $i$ and $j$.
 Thus, the transpose of $\mathbf{A}$ in :eqref:`eq_matrix_def` is
-a $m \times n$ matrix:
+a $n \times m$ matrix:
 
 $$
 \mathbf{A}^\top =
 \begin{bmatrix}
-    a_{11} & a_{21} & \dots  & a_{n1} \\
-    a_{12} & a_{22} & \dots  & a_{n2} \\
+    a_{11} & a_{21} & \dots  & a_{m1} \\
+    a_{12} & a_{22} & \dots  & a_{m2} \\
     \vdots & \vdots & \ddots & \vdots \\
-    a_{1m} & a_{2m} & \dots  & a_{nm}
+    a_{1n} & a_{2n} & \dots  & a_{mn}
 \end{bmatrix}.
 $$
 
@@ -251,15 +253,40 @@ that any elementwise unary operation does not change the shape of its operand.
 Similarly, given any two tensors with the same shape,
 the result of any binary elementwise operation
 will be a tensor of that same shape.
-The same holds for addition or multiplication by a scalar,
+For example, adding two matrices of the same shape
+performs elementwise addition over these two matrices.
+
+```{.python .input}
+B = np.arange(20).reshape(5, 4)
+A + B
+```
+
+Specifically, elementwise multiplication of two matrices is called their *Hadamard product* (math notation $\odot$).
+Consider matrix $\mathbf{B} \in \mathbb{R}^{m \times n}$ whose element of row $i$ and column $j$ is $b_{ij}$. The Hadamard product of matrices $\mathbf{A}$ (defined in :eqref:`eq_matrix_def`) and $\mathbf{B}$
+
+$$
+\mathbf{A} \odot \mathbf{B} = 
+\begin{bmatrix}
+    a_{11}  b_{11} & a_{12}  b_{12} & \dots  & a_{1n}  b_{1n} \\
+    a_{21}  b_{21} & a_{22}  b_{22} & \dots  & a_{2n}  b_{2n} \\
+    \vdots & \vdots & \ddots & \vdots \\
+    a_{m1}  b_{m1} & a_{m2}  b_{m2} & \dots  & a_{mn}  b_{mn}
+\end{bmatrix}.
+$$
+
+```{.python .input}
+A * B
+```
+
+Multiplying or adding a tensor by a scalar also does not change the shape of the tensor,
 where each element of the operand tensor will be added or multiplied by the scalar.
 
-```{.python .input  n=10}
+```{.python .input}
 a = 2
 a + X, (a * X).shape
 ```
 
-## Sums and Means
+## Reducing along Axes
 
 One useful operation that we can perform with arbitrary tensors
 is to calculate the sum of their elements.
