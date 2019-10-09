@@ -1,6 +1,6 @@
 # Dive into Deep Learning (D2L Book)
 
-[![Build Status](http://ci.d2l.ai/job/d2l-en/job/master/badge/icon)](http://ci.d2l.ai/job/d2l-en/job/master/)
+[![Build Status](http://ci.d2l.ai/job/d2l-en/job/numpy2/badge/icon)](http://ci.d2l.ai/job/d2l-en/job/numpy2/)
 
 [Book website](http://numpy.d2l.ai/) | [STAT 157 Course at UC Berkeley, Spring 2019](http://courses.d2l.ai/berkeley-stat-157/index.html)
 
