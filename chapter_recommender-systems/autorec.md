@@ -42,7 +42,7 @@ A typical autoencoder consists of an encoder and a decoder. The encoder projects
 ```{.python .input  n=2}
 class AutoRec(nn.Block):
     def __init__(self, num_hidden, num_users, dropout_rate=0.05):
-        super(autorec, self).__init__()
+        super(AutoRec, self).__init__()
         self.encoder = gluon.nn.Dense(num_hidden, activation='sigmoid', 
                                       use_bias=True)
         self.decoder = gluon.nn.Dense(num_users, use_bias=True)
