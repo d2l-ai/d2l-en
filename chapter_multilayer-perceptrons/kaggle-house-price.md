@@ -279,8 +279,8 @@ in the section where we discussed how to deal
 with model section (:numref:`sec_model_selection`). We will put this to good use to select the model design
 and to adjust the hyperparameters.
 We first need a function that returns
-the i-th fold of the data in a k-fold cross-validation procedure.
-It proceeds by slicing out the i-th segment as validation data
+the $i^\mathrm{th}$ fold of the data in a k-fold cross-validation procedure.
+It proceeds by slicing out the $i^\mathrm{th}$ segment as validation data
 and returning the rest as training data.
 Note that this is not the most efficient way of handling data
 and we would definitely do something much smarter

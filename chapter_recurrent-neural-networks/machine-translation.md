@@ -47,7 +47,7 @@ print(text[0:95])
 
 ## Tokenization
 
-Different to using character tokens in :numref:`sec_language_model`, here a token is either a word or a punctuation mark. The following function tokenize the text data to return `source` and `target`. Each one is a list of token list, with `source[i]` is the i-th sentence in the source language and `target[i]` is the i-th sentence in the target language. To make the latter training faster, we sample the first `num_examples` sentences pairs.
+Different to using character tokens in :numref:`sec_language_model`, here a token is either a word or a punctuation mark. The following function tokenize the text data to return `source` and `target`. Each one is a list of token list, with `source[i]` is the $i^\mathrm{th}$ sentence in the source language and `target[i]` is the $i^\mathrm{th}$ sentence in the target language. To make the latter training faster, we sample the first `num_examples` sentences pairs.
 
 ```{.python .input  n=14}
 # Save to the d2l package.
