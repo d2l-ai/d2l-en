@@ -284,7 +284,7 @@ Let first look at how a decoder behaviors during predicting. Similar to the seq2
 
 ![Predict at time step $t$ for a self-attention layer.](../img/self-attention-predict.svg)
 
-During training, because the output for the $t$-query could depend all $T$ key-value pairs, which results in an inconsistent behavior than prediction. We can eliminate it by specifying the valid length to be $t$ for the $t$-th query.
+During training, because the output for the $t$-query could depend all $T$ key-value pairs, which results in an inconsistent behavior than prediction. We can eliminate it by specifying the valid length to be $t$ for the $t^\textrm{th}$ query.
 
 Another difference compared to the encoder transformer block is that the decoder block has an additional multi-head attention layer that accepts the encoder outputs as keys and values.
 

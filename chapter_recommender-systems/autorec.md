@@ -11,13 +11,13 @@ There are two variants of AutoRec: user-based and item-based. For brevity, here 
 
 ## Model
 
-Let $\mathbf{R}_{*i}$ denote the $i^{th}$ column of the rating matrix, where unknown ratings are set to zeros by default. The neural architecture is defined as:
+Let $\mathbf{R}_{*i}$ denote the $i^\mathrm{th}$ column of the rating matrix, where unknown ratings are set to zeros by default. The neural architecture is defined as:
 
 $$
 h(\mathbf{R}_{*i}) = f(\mathbf{W} \cdot g(\mathbf{V} \mathbf{R}_{*i} + \mu) + b)
 $$
 
-where $f(\cdot)$ and $g(\cdot)$ represent activation functions, $\mathbf{W}$ and $\mathbf{V}$ are weight matrices, $\mu$ and $b$ are biases. The output $h(\mathbf{R}_{*i})$ is the reconstruction of the $i^{th}$ column of the rating matrix.
+where $f(\cdot)$ and $g(\cdot)$ represent activation functions, $\mathbf{W}$ and $\mathbf{V}$ are weight matrices, $\mu$ and $b$ are biases. The output $h(\mathbf{R}_{*i})$ is the reconstruction of the $i^\mathrm{th}$ column of the rating matrix.
 
 The following objective function aims to minimize the reconstruction error:
 

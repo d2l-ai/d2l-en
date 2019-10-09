@@ -163,7 +163,7 @@ are represented in code as `ndarray`s with $2$ axes.
 In math notation, we use $\mathbf{A} \in \mathbb{R}^{m \times n}$
 to express that the matrix $\mathbf{A}$ consists of $m$ rows and $n$ columns of real-valued scalars.
 Visually, we can illustrate any matrix $\mathbf{A} \in \mathbb{R}^{m \times n}$ as a table,
-where each element $a_{ij}$ belongs to the $i^{\text{th}}$ row and $j^{\text{th}}$ column:
+where each element $a_{ij}$ belongs to the $i^{\mathrm{th}}$ row and $j^{\mathrm{th}}$ column:
 
 $$\mathbf{A}=\begin{bmatrix} a_{11} & a_{12} & \cdots & a_{1n} \\ a_{21} & a_{22} & \cdots & a_{2n} \\ \vdots & \vdots & \ddots & \vdots \\ a_{m1} & a_{m2} & \cdots & a_{mn} \\ \end{bmatrix}.$$
 :eqlabel:`eq_matrix_def`
@@ -286,7 +286,7 @@ a = 2
 a + X, (a * X).shape
 ```
 
-## Reductions along Axes
+## Reduction
 
 One useful operation that we can perform with arbitrary tensors
 is to calculate the sum of their elements.
@@ -382,62 +382,38 @@ We will formally introduce this notion of *length* later in this section.
 
 Now that we know how to calculate dot products,
 we can begin to understand matrix-vector products.
-Let's start off by visualizing a matrix $A$ and a column vector $\mathbf{x}$.
+Recall the matrix $\mathbf{A} \in \mathbb{R}^{m \times n}$
+and the vector $\mathbf{x} \in \mathbb{R}^n$
+defined and visualized in :eqref:`eq_matrix_def` and :eqref:`eq_vec_def` respectively.
+Let us start off by visualizing the matrix $\mathbf{A}$ in terms of its row vectors
 
-$$A=\begin{bmatrix}
- a_{11} & a_{12} & \cdots & a_{1m} \\
- a_{21} & a_{22} & \cdots & a_{2m} \\
-\vdots & \vdots & \ddots & \vdots \\
- a_{n1} & a_{n2} & \cdots & a_{nm} \\
-\end{bmatrix},\quad\mathbf{x}=\begin{bmatrix}
- x_{1}  \\
- x_{2} \\
-\vdots\\
- x_{m}\\
-\end{bmatrix} $$
-
-We can visualize the matrix in terms of its row vectors
-
-$$A=
+$$\mathbf{A}=
 \begin{bmatrix}
-\mathbf{a}^T_{1} \\
-\mathbf{a}^T_{2} \\
+\mathbf{a}^\top_{1} \\
+\mathbf{a}^\top_{2} \\
 \vdots \\
-\mathbf{a}^T_n \\
+\mathbf{a}^\top_m \\
 \end{bmatrix},$$
 
-where each $\mathbf{a}^T_{i} \in \mathbb{R}^{m}$
-is a row vector representing the $i$-th row of the matrix $A$.
+where each $\mathbf{a}^\top_{i} \in \mathbb{R}^n$
+is a row vector representing the $i^\mathrm{th}$ row of the matrix $\mathbf{A}$.
+The matrix-vector product $\mathbf{A}\mathbf{x}$
+is simply a column vector of length $m$,
+whose $i^\mathrm{th}$ entry is the dot product $\mathbf{a}^\top_i \mathbf{x}$:
 
-The matrix vector product $\mathbf{y} = A\mathbf{x}$
-is simply a column vector $\mathbf{y} \in \mathbb{R}^n$,
-where each entry $y_i$ is the dot product $\mathbf{a}^T_i \mathbf{x}$.
-
-$$A\mathbf{x}=
-\begin{bmatrix}
-\mathbf{a}^T_{1}  \\
-\mathbf{a}^T_{2}  \\
- \vdots  \\
-\mathbf{a}^T_n \\
-\end{bmatrix}
-\begin{bmatrix}
- x_{1}  \\
- x_{2} \\
-\vdots\\
- x_{m}\\
-\end{bmatrix}
+$$
+\mathbf{A}\mathbf{x}
 = \begin{bmatrix}
- \mathbf{a}^T_{1} \mathbf{x}  \\
- \mathbf{a}^T_{2} \mathbf{x} \\
+ \mathbf{a}^\top_{1} \mathbf{x}  \\
+ \mathbf{a}^\top_{2} \mathbf{x} \\
 \vdots\\
- \mathbf{a}^T_{n} \mathbf{x}\\
-\end{bmatrix}
+ \mathbf{a}^\top_{m} \mathbf{x}\\
+\end{bmatrix}.
 $$
 
-You can think of multiplication by a matrix $A\in \mathbb{R}^{n \times m}$
+We can think of multiplication by a matrix $\mathbf{A}\in \mathbb{R}^{m \times n}$
 as a transformation that projects vectors
-from $\mathbb{R}^{m}$ to $\mathbb{R}^{n}$.
-
+from $\mathbb{R}^{n}$ to $\mathbb{R}^{m}$.
 These transformations turn out to be remarkably useful.
 For example, we can represent rotations
 as multiplications by a square matrix.
@@ -447,15 +423,15 @@ to describe the most intensive calculations
 required when computing each layer in a neural network
 given the values of the previous layer.
 
-Expressing matrix-vector products in code with `ndarray`,
-we use the same ``dot()`` function as for dot products.
-When we call ``np.dot(A, x)`` with a matrix ``A`` and a vector ``x``,
-MXNet knows to perform a matrix-vector product.
-Note that the column dimension of ``A`` (its length along axis 1)
-must be the same as the dimension of ``x`` (its length).
+Expressing matrix-vector products in code with `ndarray`s,
+we use the same `dot` function as for dot products.
+When we call `np.dot(A, x)` with a matrix `A` and a vector `x`,
+the matrix-vector product is performed.
+Note that the column dimension of `A` (its length along axis $1$)
+must be the same as the dimension of `x` (its length).
 
 ```{.python .input  n=16}
-np.dot(A, x)
+A.shape, x.shape, np.dot(A, x)
 ```
 
 ## Matrix-Matrix Multiplication
@@ -482,34 +458,34 @@ To produce the matrix product $C = AB$, it's easiest to think of $A$ in terms of
 
 $$A=
 \begin{bmatrix}
-\mathbf{a}^T_{1} \\
-\mathbf{a}^T_{2} \\
+\mathbf{a}^\top_{1} \\
+\mathbf{a}^\top_{2} \\
 \vdots \\
-\mathbf{a}^T_n \\
+\mathbf{a}^\top_n \\
 \end{bmatrix},
 \quad B=\begin{bmatrix}
  \mathbf{b}_{1} & \mathbf{b}_{2} & \cdots & \mathbf{b}_{m} \\
 \end{bmatrix}.
 $$
 
-Note here that each row vector $\mathbf{a}^T_{i}$ lies in $\mathbb{R}^k$ and that each column vector $\mathbf{b}_j$ also lies in $\mathbb{R}^k$.
+Note here that each row vector $\mathbf{a}^\top_{i}$ lies in $\mathbb{R}^k$ and that each column vector $\mathbf{b}_j$ also lies in $\mathbb{R}^k$.
 
-Then to produce the matrix product $C \in \mathbb{R}^{n \times m}$ we simply compute each entry $c_{ij}$ as the dot product $\mathbf{a}^T_i \mathbf{b}_j$.
+Then to produce the matrix product $C \in \mathbb{R}^{n \times m}$ we simply compute each entry $c_{ij}$ as the dot product $\mathbf{a}^\top_i \mathbf{b}_j$.
 
 $$C = AB = \begin{bmatrix}
-\mathbf{a}^T_{1} \\
-\mathbf{a}^T_{2} \\
+\mathbf{a}^\top_{1} \\
+\mathbf{a}^\top_{2} \\
 \vdots \\
-\mathbf{a}^T_n \\
+\mathbf{a}^\top_n \\
 \end{bmatrix}
 \begin{bmatrix}
  \mathbf{b}_{1} & \mathbf{b}_{2} & \cdots & \mathbf{b}_{m} \\
 \end{bmatrix}
 = \begin{bmatrix}
-\mathbf{a}^T_{1} \mathbf{b}_1 & \mathbf{a}^T_{1}\mathbf{b}_2& \cdots & \mathbf{a}^T_{1} \mathbf{b}_m \\
- \mathbf{a}^T_{2}\mathbf{b}_1 & \mathbf{a}^T_{2} \mathbf{b}_2 & \cdots & \mathbf{a}^T_{2} \mathbf{b}_m \\
+\mathbf{a}^\top_{1} \mathbf{b}_1 & \mathbf{a}^\top_{1}\mathbf{b}_2& \cdots & \mathbf{a}^\top_{1} \mathbf{b}_m \\
+ \mathbf{a}^\top_{2}\mathbf{b}_1 & \mathbf{a}^\top_{2} \mathbf{b}_2 & \cdots & \mathbf{a}^\top_{2} \mathbf{b}_m \\
  \vdots & \vdots & \ddots &\vdots\\
-\mathbf{a}^T_{n} \mathbf{b}_1 & \mathbf{a}^T_{n}\mathbf{b}_2& \cdots& \mathbf{a}^T_{n} \mathbf{b}_m
+\mathbf{a}^\top_{n} \mathbf{b}_1 & \mathbf{a}^\top_{n}\mathbf{b}_2& \cdots& \mathbf{a}^\top_{n} \mathbf{b}_m
 \end{bmatrix}
 $$
 

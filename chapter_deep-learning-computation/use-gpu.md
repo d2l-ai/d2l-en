@@ -28,7 +28,7 @@ Note that this might be extravagant for most desktop computers but it is easily 
 
 ## Computing Devices
 
-MXNet can specify devices, such as CPUs and GPUs, for storage and calculation. By default, MXNet creates data in the main memory and then uses the CPU to calculate it. In MXNet, the CPU and GPU can be indicated by `cpu()` and `gpu()`. It should be noted that `cpu()` (or any integer in the parentheses) means all physical CPUs and memory. This means that MXNet's calculations will try to use all CPU cores. However, `gpu()` only represents one graphic card and the corresponding graphic memory. If there are multiple GPUs, we use `gpu(i)` to represent the $i$-th GPU ($i$ starts from 0). Also, `gpu(0)` and `gpu()` are equivalent.
+MXNet can specify devices, such as CPUs and GPUs, for storage and calculation. By default, MXNet creates data in the main memory and then uses the CPU to calculate it. In MXNet, the CPU and GPU can be indicated by `cpu()` and `gpu()`. It should be noted that `cpu()` (or any integer in the parentheses) means all physical CPUs and memory. This means that MXNet's calculations will try to use all CPU cores. However, `gpu()` only represents one graphic card and the corresponding graphic memory. If there are multiple GPUs, we use `gpu(i)` to represent the $i^\mathrm{th}$ GPU ($i$ starts from 0). Also, `gpu(0)` and `gpu()` are equivalent.
 
 ```{.python .input}
 from mxnet import np, npx

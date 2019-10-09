@@ -62,7 +62,7 @@ Year of construction, for example, is represented with integers
 roof type is a discrete categorical feature,
 other features are represented with floating point numbers.
 And here is where reality comes in:
-for some exampels, some data is altogether missing
+for some examples, some data is altogether missing
 with the missing value marked simply as 'na'.
 The price of each house is included for the training set only
 (it's a competition after all).
@@ -198,7 +198,7 @@ that we have a data processing bug.
 And if things work, the linear model will serve as a baseline
 giving us some intuition about how close the simple model
 gets to the best reported models, giving us a sense
-of how much gain we should expect from fanicer models.
+of how much gain we should expect from fancier models.
 
 ```{.python .input  n=13}
 loss = gluon.loss.L2Loss()
@@ -279,12 +279,12 @@ in the section where we discussed how to deal
 with model section (:numref:`sec_model_selection`). We will put this to good use to select the model design
 and to adjust the hyperparameters.
 We first need a function that returns
-the i-th fold of the data in a k-fold cros-validation procedure.
-It proceeds by slicing out the i-th segment as validation data
+the $i^\mathrm{th}$ fold of the data in a k-fold cross-validation procedure.
+It proceeds by slicing out the $i^\mathrm{th}$ segment as validation data
 and returning the rest as training data.
 Note that this is not the most efficient way of handling data
 and we would definitely do something much smarter
-if our dataset wasconsiderably larger.
+if our dataset was considerably larger.
 But this added complexity might obfuscate our code unnecessarily
 so we can safely omit here owing to the simplicity of our problem.
 
@@ -361,7 +361,7 @@ in the k-fold cross-validation have also been reduced accordingly.
 Now that we know what a good choice of hyperparameters should be,
 we might as well use all the data to train on it
 (rather than just $1-1/k$ of the data
-that is used in the crossvalidation slices).
+that is used in the cross-validation slices).
 The model that we obtain in this way
 can then be applied to the test set.
 Saving the estimates in a CSV file
@@ -424,7 +424,7 @@ The steps are quite simple:
 1. Can you improve your model by minimizing the log-price directly? What happens if you try to predict the log price rather than the price?
 1. Is it always a good idea to replace missing values by their mean? Hint - can you construct a situation where the values are not missing at random?
 1. Find a better representation to deal with missing values. Hint - What happens if you add an indicator variable?
-1. Improve the score on Kaggle by tuning the hyperparameters through k-fold crossvalidation.
+1. Improve the score on Kaggle by tuning the hyperparameters through k-fold cross-validation.
 1. Improve the score by improving the model (layers, regularization, dropout).
 1. What happens if we do not standardize the continuous numerical features like we have done in this section?
 
