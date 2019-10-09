@@ -96,15 +96,7 @@ Extensive literature considers column vectors to be the default
 orientation of vectors, so does this book.
 In math, a vector $\mathbf{x}$ can be written as
 
-$$
-\mathbf{x} =
-\begin{bmatrix}
-    x_{1}  \\
-    x_{2}  \\
-    \vdots  \\
-    x_{n}
-\end{bmatrix},
-$$
+$$\mathbf{x} =\begin{bmatrix}x_{1}  \\x_{2}  \\ \vdots  \\x_{n}\end{bmatrix},$$
 :eqlabel:`eq_vec_def`
 
 
@@ -181,8 +173,11 @@ A
 ```
 
 We can access the scalar element $a_{ij}$ of a matrix $\mathbf{A}$ in :eqref:`eq_matrix_def`
-by specifying the indices for the row ($i$) and column ($j$) respectively,
+by specifying the indices for the row ($i$) and column ($j$),
 such as $[\mathbf{A}]_{ij}$.
+When the scalar elements of a matrix $\mathbf{A}$, such as in :eqref:`eq_matrix_def`, are not given,
+we may simply use the lower-case letter of the matrix $\mathbf{A}$ with the index subscript, $a_{ij}$,
+to refer to $[\mathbf{A}]_{ij}$.
 To keep notation simple, commas are inserted to separate indices only when necessary,
 such as $a_{2,3j}$ and $[\mathbf{A}]_{2i-1,3}$.
 
@@ -191,7 +186,7 @@ Sometimes, we want to flip the axes.
 When we exchange a matrix's rows and columns,
 the result is called the *transpose* of the matrix.
 Formally, we signify a matrix $\mathbf{A}$'s transpose by $\mathbf{A}^\top$
-and if $B = A^\top$, then $b_{ij} = a_{ji}$ for any $i$ and $j$.
+and if $\mathbf{B} = \mathbf{A}^\top$, then $b_{ij} = a_{ji}$ for any $i$ and $j$.
 Thus, the transpose of $\mathbf{A}$ in :eqref:`eq_matrix_def` is
 a $n \times m$ matrix:
 
@@ -200,14 +195,12 @@ $$
 \begin{bmatrix}
     a_{11} & a_{21} & \dots  & a_{m1} \\
     a_{12} & a_{22} & \dots  & a_{m2} \\
-    \vdots & \vdots & \ddots & \vdots \\
+    \vdots & \vdots & \ddots  & \vdots \\
     a_{1n} & a_{2n} & \dots  & a_{mn}
 \end{bmatrix}.
 $$
 
-
-
-In code, we access a matrix's transpose via the `.T` attribute.
+In code, we access a matrix's transpose via the `T` attribute.
 
 ```{.python .input  n=8}
 A.T
@@ -515,69 +508,90 @@ Matrix-matrix multiplication can be simply called *matrix multiplication*, and s
 
 ## Norms
 
-Before we can start implementing models,
-there is one last concept we are going to introduce.
-Some of the most useful operators in linear algebra are norms.
-Informally, they tell us how *big* a vector or matrix is.
+Some of the most useful operators in linear algebra are *norms*.
+Informally, the norm of a vector tells us how *big* a vector is.
 The notion of *size* under consideration here
 concerns not dimensionality
 but rather the magnitude of the components.
-We represent norms with the notation $\|\cdot\|$.
-The $\cdot$ in this expression is just a placeholder.
-For example, we would represent the norm of a vector $\mathbf{x}$
-or matrix $A$ as $\|\mathbf{x}\|$ or $\|A\|$, respectively.
 
-All norms must satisfy a handful of properties:
-
-1. $\|\alpha A\| = |\alpha| \|A\|$
-1. $\|A + B\| \leq \|A\| + \|B\|$
-1. $\|A\| \geq 0$
-1. If $\forall {i,j}, a_{ij} = 0$, then $\|A\|=0$
-
-To put it in words, the first rule says
-that if we scale all the components of a matrix or vector
+In linear algebra, a vector norm is a function $f$ that maps a vector
+to a scalar, satisfying a handful of properties.
+Given any vector $\mathbf{x}$,
+the first property says
+that if we scale all the elements of a vector
 by a constant factor $\alpha$,
 its norm also scales by the *absolute value*
-of the same constant factor.
-The second rule is the familiar triangle inequality.
-The third rule simply says that the norm must be non-negative.
-That makes sense, in most contexts the smallest *size* for anything is 0.
-The final rule requires that the smallest norm is achieved
-by a matrix or vector consisting of all zeros.
-It is possible to define a norm that gives zero norm to nonzero matrices,
-but you cannot give nonzero norm to zero matrices.
-That may seem like a mouthful, but if you digest it
-then you probably have digested the important concepts here.
+of the same constant factor:
+
+$$f(\alpha \mathbf{x}) = |\alpha| f(\mathbf{x}).$$
+
+
+The second property is the familiar triangle inequality:
+
+$$f(\mathbf{x} + \mathbf{y}) \leq f(\mathbf{x}) + f(\mathbf{y}).$$
+
+
+The third property simply says that the norm must be non-negative:
+
+$$f(\mathbf{x}) \geq 0.$$
+
+That makes sense, as in most contexts the smallest *size* for anything is 0.
+The final property requires that the smallest norm is achieved and only achieved
+by a vector consisting of all zeros.
+
+$$\forall i, [\mathbf{x}]_i = 0 \Leftrightarrow f(\mathbf{x})=0.$$
 
 You might notice that norms sound a lot like measures of distance.
-And you remember Euclidean distances
+And if you remember Euclidean distances
 (think Pythagoras' theorem) from grade school,
 then the concepts of non-negativity and the triangle inequality might ring a bell.
+In fact, the Euclidean distance is a norm:
+specifically it is the $\ell_2$ norm. 
+Suppose that the elements in the $n$-dimensional vector
+$\mathbf{x}$ are $x_1, \ldots, x_n$. 
+The *$\ell_2$ norm* of $\mathbf{x}$ is the square root of the sum of the squares of the vector elements:
 
-In fact, the Euclidean distance $\sqrt{x_1^2 + \cdots + x_n^2}$ is a norm.
-Specifically it is the $\ell_2$-norm.
-We call the analogous computation,
-performed over the entries of a matrix:
-$\sqrt{\sum_{i,j} a_{ij}^2}$,
-the *Frobenius norm*.
-In machine learning, we work more often
-with the squared $\ell_2$ norm (notated $\ell_2^2$).
-You will also frequently encounter the $\ell_1$ norm,
-which is expressed as the sum of the absolute values of the components.
-As compared to the $\ell_2$ norm,
-it is less influenced by outliers.
+$$\|\mathbf{x}\|_2 = \sqrt{\sum_{i=1}^n x_i^2},$$
 
-In code, we can calculate the $\ell_2$ norm of an `ndarray` by calling ``norm()``.
+where the subscript $2$ is often omitted in $\ell_2$ norms, i.e., $\|\mathbf{x}\|$ is equivalent to $\|\mathbf{x}\|_2$. In code, we can calculate the $\ell_2$ norm of a vector by calling `linalg.norm`.
 
 ```{.python .input  n=18}
-np.linalg.norm(x)
+u = np.array([3, -4])
+np.linalg.norm(u)
 ```
 
-To calculate the L1-norm, we compose
+In machine learning, we work more often
+with the squared $\ell_2$ norm.
+You will also frequently encounter the $\ell_1$ norm,
+which is expressed as the sum of the absolute values of the vector elements:
+
+$$\|\mathbf{x}\|_1 = \sum_{i=1}^n \left|x_i \right|.$$
+
+As compared with the $\ell_2$ norm,
+it is less influenced by outliers.
+To calculate the $\ell_1$ norm, we compose
 the absolute value function with a sum over the elements.
 
 ```{.python .input  n=19}
-np.abs(x).sum()
+np.abs(u).sum()
+```
+
+Both the $\ell_2$ norm and the $\ell_1$ norm
+are special cases of the more general $\ell_p$ norm:
+
+$$\|\mathbf{x}\|_p = \left(\sum_{i=1}^n \left|x_i \right|^p \right)^{1/p}.$$
+
+Analogous to $\ell_2$ norms of vectors,
+the *Frobenius norm* of a matrix $\mathbf{X} \in \mathbb{R}^{m \times n}$
+is the square root of the sum of the squares of the matrix elements:
+
+$$\|\mathbf{X}\|_F = \sqrt{\sum_{i=1}^m \sum_{j=1}^n x_{ij}^2}.$$
+
+The Frobenius norm satisfies all the properties of vector norms.
+It behaves as if it were an $\ell_2$ norm of a matrix-shaped vector. Invoking `linalg.norm` will calculate the Frobenius norm of a matrix.
+
+```{.python .input}
+np.linalg.norm(np.ones((4, 9)))
 ```
 
 ### Norms and Objectives
@@ -585,8 +599,8 @@ np.abs(x).sum()
 While we do not want to get too far ahead of ourselves,
 we can plant some intuition already about why these concepts are useful.
 In machine learning, we are often trying to solve optimization problems:
-*Maximize* the probability assigned to observed data.
-*Minimize* the distance between predictions
+*maximize* the probability assigned to observed data;
+*minimize* the distance between predictions
 and the ground-truth observations.
 Assign vector representations to items (like words, products, or news articles)
 such that the distance between similar items is minimized,
@@ -597,14 +611,15 @@ are expressed as norms.
 
 
 
-## Summary
+## What Is Next
 
 In just a few pages (or one Jupyter notebook),
 we have taught you all the linear algebra
 that you will need to understand
 a remarkable chunk of modern deep learning.
-There is a *lot* more to linear algebra
-and a lot of that math *is* useful for machine learning.
+
+There is a lot more to linear algebra
+and a lot of that mathematics is useful for machine learning.
 For example, matrices can be decomposed into factors,
 and these decompositions can reveal
 low-dimensional structure in real-world datasets.
@@ -616,19 +631,25 @@ But this book focuses on deep learning.
 And we believe you will be much more inclined to learn more mathematics
 once you have gotten your hands dirty
 deploying useful machine learning models on real datasets.
-So while we reserve the right to introduce more math much later on,
-we will wrap up this chapter here.
+So while we reserve the right to introduce more mathematics much later on,
+we will wrap up this section here.
 
 If you are eager to learn more about linear algebra,
-here are some of our favorite resources on the topic
+you may refer to either :numref:`chap_appendix_math`
+or other excellent resources :cite:`Strang.Strang.Strang.ea.1993`:cite:`Kolter.2008`:cite:`Petersen.Pedersen.ea.2008`.
 
-* For a solid primer on basics, check out Gilbert Strang's book [Introduction to Linear Algebra](http://math.mit.edu/~gs/linearalgebra/)
-* Zico Kolter's [Linear Algebra Review and Reference](http://www.cs.cmu.edu/~zkolter/course/15-884/linalg-review.pdf)
-* Kaare Brandt Peterson and Michael Syskind Peterson's [Matrix Cookbook](https://www.math.uwaterloo.ca/~hwolkowi/matrixcookbook.pdf)
+
+## Summary
+
+* Vectors generalize scalars, and matrices generalize vectors.
+* In the `ndarray` representation, scalars have no axis, vectors have 1 axis, matrices have 2 axes, and tensors come with an arbitrary number of axes.
+* We can perform a variety of operations over scalars, vectors, matrices, and tensors with `ndarray` functions.
+
 
 ## Exercises
 
 1. Consider a tensor with shape ($2$, $3$, $4$). What are the shapes of the summation outputs along axis $0$, $1$, and $2$?
+1. Feed a tensor with 3 or more axes to the `linalg.norm` function and observe its output. What does this function compute for `ndarray`s of arbitrary shape?
 
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2317)
