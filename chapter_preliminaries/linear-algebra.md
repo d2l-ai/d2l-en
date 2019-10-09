@@ -381,7 +381,7 @@ We will formally introduce this notion of *length* later in this section.
 ## Matrix-Vector Products
 
 Now that we know how to calculate dot products,
-we can begin to understand matrix-vector products.
+we can begin to understand *matrix-vector products*.
 Recall the matrix $\mathbf{A} \in \mathbb{R}^{m \times n}$
 and the vector $\mathbf{x} \in \mathbb{R}^n$
 defined and visualized in :eqref:`eq_matrix_def` and :eqref:`eq_vec_def` respectively.
@@ -399,10 +399,16 @@ where each $\mathbf{a}^\top_{i} \in \mathbb{R}^n$
 is a row vector representing the $i^\mathrm{th}$ row of the matrix $\mathbf{A}$.
 The matrix-vector product $\mathbf{A}\mathbf{x}$
 is simply a column vector of length $m$,
-whose $i^\mathrm{th}$ entry is the dot product $\mathbf{a}^\top_i \mathbf{x}$:
+whose $i^\mathrm{th}$ element is the dot product $\mathbf{a}^\top_i \mathbf{x}$:
 
 $$
 \mathbf{A}\mathbf{x}
+= \begin{bmatrix}
+\mathbf{a}^\top_{1} \\
+\mathbf{a}^\top_{2} \\
+\vdots \\
+\mathbf{a}^\top_m \\
+\end{bmatrix}\mathbf{x}
 = \begin{bmatrix}
  \mathbf{a}^\top_{1} \mathbf{x}  \\
  \mathbf{a}^\top_{2} \mathbf{x} \\
@@ -436,43 +442,47 @@ A.shape, x.shape, np.dot(A, x)
 
 ## Matrix-Matrix Multiplication
 
-If you have gotten the hang of dot products and matrix-vector multiplication,
-then matrix-matrix multiplications should be straightforward.
+If you have gotten the hang of dot products and matrix-vector products,
+then *matrix-matrix multiplication* should be straightforward.
 
-Say that we have two matrices, $A \in \mathbb{R}^{n \times k}$ and $B \in \mathbb{R}^{k \times m}$:
+Say that we have two matrices $\mathbf{A} \in \mathbb{R}^{n \times k}$ and $\mathbf{B} \in \mathbb{R}^{k \times m}$:
 
-$$A=\begin{bmatrix}
+$$\mathbf{A}=\begin{bmatrix}
  a_{11} & a_{12} & \cdots & a_{1k} \\
  a_{21} & a_{22} & \cdots & a_{2k} \\
 \vdots & \vdots & \ddots & \vdots \\
  a_{n1} & a_{n2} & \cdots & a_{nk} \\
 \end{bmatrix},\quad
-B=\begin{bmatrix}
+\mathbf{B}=\begin{bmatrix}
  b_{11} & b_{12} & \cdots & b_{1m} \\
  b_{21} & b_{22} & \cdots & b_{2m} \\
 \vdots & \vdots & \ddots & \vdots \\
  b_{k1} & b_{k2} & \cdots & b_{km} \\
-\end{bmatrix}$$
+\end{bmatrix}.$$
 
-To produce the matrix product $C = AB$, it's easiest to think of $A$ in terms of its row vectors and $B$ in terms of its column vectors:
 
-$$A=
+Denote by $\mathbf{a}^\top_{i} \in \mathbb{R}^k$
+the row vector representing the $i^\mathrm{th}$ row of the matrix $\mathbf{A}$,
+and let $\mathbf{b}_{j} \in \mathbb{R}^k$
+be the column vector from the $j^\mathrm{th}$ column of the matrix $\mathbf{B}$.
+To produce the matrix product $\mathbf{C} = \mathbf{A}\mathbf{B}$, it is easiest to think of $\mathbf{A}$ in terms of its row vectors and $\mathbf{B}$ in terms of its column vectors:
+
+$$\mathbf{A}=
 \begin{bmatrix}
 \mathbf{a}^\top_{1} \\
 \mathbf{a}^\top_{2} \\
 \vdots \\
 \mathbf{a}^\top_n \\
 \end{bmatrix},
-\quad B=\begin{bmatrix}
+\quad \mathbf{B}=\begin{bmatrix}
  \mathbf{b}_{1} & \mathbf{b}_{2} & \cdots & \mathbf{b}_{m} \\
 \end{bmatrix}.
 $$
 
-Note here that each row vector $\mathbf{a}^\top_{i}$ lies in $\mathbb{R}^k$ and that each column vector $\mathbf{b}_j$ also lies in $\mathbb{R}^k$.
 
-Then to produce the matrix product $C \in \mathbb{R}^{n \times m}$ we simply compute each entry $c_{ij}$ as the dot product $\mathbf{a}^\top_i \mathbf{b}_j$.
+Then the matrix product $\mathbf{C} \in \mathbb{R}^{n \times m}$ is produced as we simply compute each element $c_{ij}$ as the dot product $\mathbf{a}^\top_i \mathbf{b}_j$:
 
-$$C = AB = \begin{bmatrix}
+$$\mathbf{C} = \mathbf{AB} = \begin{bmatrix}
 \mathbf{a}^\top_{1} \\
 \mathbf{a}^\top_{2} \\
 \vdots \\
@@ -486,15 +496,22 @@ $$C = AB = \begin{bmatrix}
  \mathbf{a}^\top_{2}\mathbf{b}_1 & \mathbf{a}^\top_{2} \mathbf{b}_2 & \cdots & \mathbf{a}^\top_{2} \mathbf{b}_m \\
  \vdots & \vdots & \ddots &\vdots\\
 \mathbf{a}^\top_{n} \mathbf{b}_1 & \mathbf{a}^\top_{n}\mathbf{b}_2& \cdots& \mathbf{a}^\top_{n} \mathbf{b}_m
-\end{bmatrix}
+\end{bmatrix}.
 $$
 
-You can think of the matrix-matrix multiplication $AB$ as simply performing $m$ matrix-vector products and stitching the results together to form an $n \times m$ matrix. Just as with ordinary dot products and matrix-vector products, we can compute matrix-matrix products in MXNet by using ``dot()``.
+We can think of the matrix-matrix multiplication $\mathbf{AB}$ as simply performing $m$ matrix-vector products and stitching the results together to form an $n \times m$ matrix. Just as with ordinary dot products and matrix-vector products, we can compute matrix-matrix multiplication by using the `dot` function.
+In the following snippet, we perform matrix multiplication on `A` and `B`.
+Here, `A` is a matrix with $5$ rows and $4$ columns,
+and `B` is a matrix with $4$ rows and $3$ columns.
+After multiplication, we obtain a matrix with $5$ rows and $3$ columns.
 
 ```{.python .input  n=17}
 B = np.ones(shape=(4, 3))
 np.dot(A, B)
 ```
+
+Matrix-matrix multiplication can be simply called *matrix multiplication*, and should not be confused with the Hadamard product.
+
 
 ## Norms
 
