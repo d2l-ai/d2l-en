@@ -286,7 +286,7 @@ a = 2
 a + X, (a * X).shape
 ```
 
-## Reducing along Axes
+## Reductions along Axes
 
 One useful operation that we can perform with arbitrary tensors
 is to calculate the sum of their elements.
@@ -349,34 +349,33 @@ A.mean(axis=0), A.sum(axis=0) / A.shape[0]
 
 ## Dot Products
 
-So far, we have only performed elementwise operations, sums and averages. And if this was all we could do, linear algebra probably would not deserve its own chapter. However, one of the most fundamental operations is the dot product. Given two vectors $\mathbf{u}$ and $\mathbf{v}$, the dot product $\mathbf{u}^T \mathbf{v}$ is a sum over the products of the corresponding elements: $\mathbf{u}^T \mathbf{v} = \sum_{i=1}^{d} u_i \cdot v_i$.
+So far, we have only performed elementwise operations, sums, and averages. And if this was all we could do, linear algebra probably would not deserve its own section. However, one of the most fundamental operations is the dot product. Given two vectors $\mathbf{x}, \mathbf{y} \in \mathbb{R}^d$, their *dot product* $\mathbf{x}^\top \mathbf{y}$ (or $\langle \mathbf{x}, \mathbf{y}  \rangle$) is a sum over the products of the elements at the same position: $\mathbf{x}^\top \mathbf{y} = \sum_{i=1}^{d} x_i y_i$.
 
 ```{.python .input  n=14}
 x = np.arange(4)
 y = np.ones(4)
-print(x, y, np.dot(x, y))
+x, y, np.dot(x, y)
 ```
 
-Note that we can express the dot product of two vectors `dot(x, y)` equivalently by performing an elementwise multiplication and then a sum:
+Note that we can express the dot product of two vectors equivalently by performing an elementwise multiplication and then a sum:
 
 ```{.python .input  n=15}
 np.sum(x * y)
-np.dot(x, y)
 ```
 
 Dot products are useful in a wide range of contexts.
 For example, given some set of values,
-denoted by a vector $\mathbf{u}$
-and a set of weights denoted by $\mathbf{w}$,
-the weighted sum of the values in $\mathbf{u}$
+denoted by a vector $\mathbf{x}  \in \mathbb{R}^d$
+and a set of weights denoted by $\mathbf{w} \in \mathbb{R}^d$,
+the weighted sum of the values in $\mathbf{x}$
 according to the weights $\mathbf{w}$
-could be expressed as the dot product $\mathbf{u}^T \mathbf{w}$.
+could be expressed as the dot product $\mathbf{x}^\top \mathbf{w}$.
 When the weights are non-negative
 and sum to one (i.e., $\left(\sum_{i=1}^{d} {w_i} = 1\right)$),
 the dot product expresses a *weighted average*.
-After normalizing two vectors to have length one,
+After normalizing two vectors to have the unit length,
 the dot products express the cosine of the angle between them.
-We formally introduce this notion of *length* below in the section on norms.
+We will formally introduce this notion of *length* later in this section.
 
 
 ## Matrix-Vector Products
