@@ -231,12 +231,14 @@ or just data points if no mini-batch exists.
 
 Just as vectors generalize scalars, and matrices generalize vectors, we can build data structures with even more axes. Tensors give us a generic way of describing `ndarray`s with an arbitrary number of axes. Vectors, for example, are first-order tensors, and matrices are second-order tensors.
 Tensors are denoted with capital letters of a special font face
-(e.g., $\mathsf{X}$, $\mathsf{Y}$, and $\mathsf{Z}$).
+(e.g., $\mathsf{X}$, $\mathsf{Y}$, and $\mathsf{Z}$)
+and their indexing mechanism (e.g., $x_{ijk}$ and $[\mathsf{X}]_{1, 2i-1,3}$) is similar to that of matrices. 
 
 Tensors will become more important when we start working with images, which arrive as `ndarray`s with 3 axes corresponding to the height, width, and a *channel* axis for stacking the color channels (red, green, and blue). For now, we will skip over higher order tensors and focus on the basics.
 
 ```{.python .input  n=9}
-np.arange(24).reshape(2, 3, 4)
+X = np.arange(24).reshape(2, 3, 4)
+X
 ```
 
 ## Basic Properties of Tensor Arithmetic
@@ -244,63 +246,78 @@ np.arange(24).reshape(2, 3, 4)
 Scalars, vectors, matrices, and tensors of any order
 have some nice properties that often come in handy.
 For example, you might have noticed
-from the definition of an elementwise operation,
-any elementwise unary operation does not change the shape of its operand.
+from the definition of an elementwise operation
+that any elementwise unary operation does not change the shape of its operand.
 Similarly, given any two tensors with the same shape,
 the result of any binary elementwise operation
 will be a tensor of that same shape.
-The same holds for multiplication by a scalar.
-Using math notation, given any two tensors $X, Y \in \mathcal{R}^{m \times n}$,
-$\alpha X + Y \in  \mathcal{R}^{m \times n}$
-(numerical mathematicians call this the AXPY operation).
+The same holds for addition or multiplication by a scalar,
+where each element of the operand tensor will be added or multiplied by the scalar.
 
 ```{.python .input  n=10}
 a = 2
-x = np.ones(3)
-y = np.zeros(3)
-print(x.shape)
-print(y.shape)
-print((a * x).shape)
-print((a * x + y).shape)
+a + X, (a * X).shape
 ```
-
-Shape is not the the only property preserved
-under addition and multiplication by a scalar.
-These operations also preserve membership in a vector space.
-But, again we will punt discussion of *vector spaces*
-in favor of information more critical to getting your first models up and running.
 
 ## Sums and Means
 
 One useful operation that we can perform with arbitrary tensors
 is to calculate the sum of their elements.
 In mathematical notation, we express sums using the $\sum$ symbol.
-To express the sum of the elements in a vector $\mathbf{u}$ of length $d$,
-we write $\sum_{i=1}^d u_i$. In code, we can just call ``sum()``.
+To express the sum of the elements in a vector $\mathbf{x}$ of length $d$,
+we write $\sum_{i=1}^d x_i$. In code, we can just call the `sum` function.
 
 ```{.python .input  n=11}
-print(x)
-print(x.sum())
+x, x.sum()
 ```
 
 We can express sums over the elements of tensors of arbitrary shape.
-For example, the sum of the elements of an $m \times n$ matrix $A$ could be written $\sum_{i=1}^{m} \sum_{j=1}^{n} a_{ij}$.
+For example, the sum of the elements of an $m \times n$ matrix $\mathbf{A}$ could be written $\sum_{i=1}^{m} \sum_{j=1}^{n} a_{ij}$.
 
 ```{.python .input  n=12}
-print(A)
-print(A.sum())
+A.shape, A.sum()
+```
+
+By default, invoking the `sum` function *reduces* a tensor along all its axes to a scalar.
+We can also specify the axes along which the tensor is reduced via summation.
+Take matrices as an example. 
+To reduce the row dimension (axis $0$) by summing up elements of all the rows,
+we specify `axis=0` when invoking `sum`. 
+Since the input matrix reduces along axis $0$ to generate the output vector,
+the dimension of axis $0$ of the input is lost in the output shape.
+
+```{.python .input}
+A_sum_axis0 = A.sum(axis=0)
+A_sum_axis0, A_sum_axis0.shape
+```
+
+Specifying `axis=1` will reduce the column dimension (axis $1$) by summing up elements of all the columns.
+Thus, the dimension of axis $1$ of the input is lost in the output shape.
+
+```{.python .input}
+A_sum_axis1 = A.sum(axis=1)
+A_sum_axis1, A_sum_axis1.shape
+```
+
+Reducing a matrix along both rows and columns via summation
+is equivalent to summing up all the elements of the matrix.
+
+```{.python .input}
+A.sum(axis=[0, 1])  # Same as A.sum()
 ```
 
 A related quantity is the *mean*, which is also called the *average*.
 We calculate the mean by dividing the sum by the total number of elements.
-With mathematical notation, we could write the average
-over a vector $\mathbf{u}$ as $\frac{1}{d} \sum_{i=1}^{d} u_i$
-and the average over a matrix $A$ as  $\frac{1}{n \cdot m} \sum_{i=1}^{m} \sum_{j=1}^{n} a_{ij}$.
-In code, we could just call ``mean()`` on tensors of arbitrary shape:
+In code, we could just call `mean` on tensors of arbitrary shape.
 
 ```{.python .input  n=13}
-print(A.mean())
-print(A.sum() / A.size)
+A.mean(), A.sum() / A.size
+```
+
+Like `sum`, `mean` can also reduce along the specified axes.
+
+```{.python .input}
+A.mean(axis=0), A.sum(axis=0) / A.shape[0]
 ```
 
 ## Dot Products
@@ -589,6 +606,11 @@ here are some of our favorite resources on the topic
 * For a solid primer on basics, check out Gilbert Strang's book [Introduction to Linear Algebra](http://math.mit.edu/~gs/linearalgebra/)
 * Zico Kolter's [Linear Algebra Review and Reference](http://www.cs.cmu.edu/~zkolter/course/15-884/linalg-review.pdf)
 * Kaare Brandt Peterson and Michael Syskind Peterson's [Matrix Cookbook](https://www.math.uwaterloo.ca/~hwolkowi/matrixcookbook.pdf)
+
+## Exercises
+
+1. Consider a tensor with shape ($2$, $3$, $4$). What are the shapes of the summation outputs along axis $0$, $1$, and $2$?
+
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2317)
 
