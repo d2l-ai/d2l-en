@@ -51,9 +51,9 @@ further reviewing :ref:`chap_appendix_math` should be sufficient.
 
 ndarray
 pandas
-linear-algebra
+scalar-tensor
+reduction-norm
 autograd
 probability
 lookup-api
 ```
-
