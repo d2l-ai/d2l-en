@@ -57,19 +57,6 @@ y = np.array(2.0)
 x + y, x * y, x / y, x ** y
 ```
 
-```{.json .output n=1}
-[
- {
-  "data": {
-   "text/plain": "(array(5.), array(6.), array(1.5), array(9.))"
-  },
-  "execution_count": 1,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 ## Vectors
 
 You can think of a vector as simply a list of scalar values.
@@ -97,19 +84,6 @@ x = np.arange(4)
 x
 ```
 
-```{.json .output n=2}
-[
- {
-  "data": {
-   "text/plain": "array([0., 1., 2., 3.])"
-  },
-  "execution_count": 2,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 We can refer to any element of a vector by using a subscript.
 For example, we can refer to the $i^\mathrm{th}$ element of $\mathbf{x}$ by $x_i$.
 Note that the element $x_i$ is a scalar,
@@ -129,19 +103,6 @@ In code, we access any element by indexing into the `ndarray`.
 x[3]
 ```
 
-```{.json .output n=3}
-[
- {
-  "data": {
-   "text/plain": "array(3.)"
-  },
-  "execution_count": 3,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 ### Length, Dimensionality, and Shape
 
 Let us revisit some concepts from :numref:`sec_ndarray`.
@@ -159,19 +120,6 @@ by calling Python's built-in `len()` function.
 len(x)
 ```
 
-```{.json .output n=4}
-[
- {
-  "data": {
-   "text/plain": "4"
-  },
-  "execution_count": 4,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 When an `ndarray` represents a vector (with precisely one axis),
 we can also access its length via the `.shape` attribute.
 The shape is a tuple that lists the length (dimensionality)
@@ -180,19 +128,6 @@ For `ndarray`s with just one axis, the shape has just one element.
 
 ```{.python .input  n=5}
 x.shape
-```
-
-```{.json .output n=5}
-[
- {
-  "data": {
-   "text/plain": "(4,)"
-  },
-  "execution_count": 5,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 Note that the word "dimension" tends to get overloaded
@@ -233,19 +168,6 @@ A = np.arange(20).reshape(5, 4)
 A
 ```
 
-```{.json .output n=6}
-[
- {
-  "data": {
-   "text/plain": "array([[ 0.,  1.,  2.,  3.],\n       [ 4.,  5.,  6.,  7.],\n       [ 8.,  9., 10., 11.],\n       [12., 13., 14., 15.],\n       [16., 17., 18., 19.]])"
-  },
-  "execution_count": 6,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 We can access the scalar element $a_{ij}$ of a matrix $\mathbf{A}$ in :eqref:`eq_matrix_def`
 by specifying the indices for the row ($i$) and column ($j$),
 such as $[\mathbf{A}]_{ij}$.
@@ -280,19 +202,6 @@ In code, we access a matrix's transpose via the `T` attribute.
 A.T
 ```
 
-```{.json .output n=7}
-[
- {
-  "data": {
-   "text/plain": "array([[ 0.,  4.,  8., 12., 16.],\n       [ 1.,  5.,  9., 13., 17.],\n       [ 2.,  6., 10., 14., 18.],\n       [ 3.,  7., 11., 15., 19.]])"
-  },
-  "execution_count": 7,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 Matrices are useful data structures: 
 they allow us to organize data that have different modalities of variation. 
 For example, rows in our matrix might correspond to different houses (data points), 
@@ -321,19 +230,6 @@ Tensors will become more important when we start working with images, which arri
 ```{.python .input  n=9}
 X = np.arange(24).reshape(2, 3, 4)
 X
-```
-
-```{.json .output n=9}
-[
- {
-  "data": {
-   "text/plain": "(array([[[ 0.,  1.,  2.,  3.],\n         [ 4.,  5.,  6.,  7.],\n         [ 8.,  9., 10., 11.]],\n \n        [[12., 13., 14., 15.],\n         [16., 17., 18., 19.],\n         [20., 21., 22., 23.]]]), 2)"
-  },
-  "execution_count": 9,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ## Summary
