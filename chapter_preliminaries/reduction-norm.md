@@ -8,7 +8,7 @@ Specifically, as we will see in subsequent chapters,
 reduction, multiplication, and norms are arguably
 among the most commonly used operations.
 In this section, we start off by reviewing and summarizing basic properties of tensor arithmetic,
-then illustrate those operations.
+then illustrate those operations in both mathematics and code.
 
 
 ## Basic Properties of Tensor Arithmetic
