@@ -197,7 +197,7 @@ def predict_s2s_ch8(model, src_sentence, src_vocab, tgt_vocab, num_steps, ctx):
     src_tokens = d2l.trim_pad(src_tokens, num_steps, src_vocab.pad)
     enc_X = np.array(src_tokens, ctx=ctx)
     # add the batch_size dimension.
-    enc_outputs = model.encoder(np.expand_dims(enc_X, axis=0), 
+    enc_outputs = model.encoder(np.expand_dims(enc_X, axis=0),
                                 enc_valid_length)
     dec_state = model.decoder.init_state(enc_outputs, enc_valid_length)
     dec_X = np.expand_dims(np.array([tgt_vocab.bos], ctx=ctx), axis=0)
@@ -225,6 +225,6 @@ for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
 * The sequence to sequence (seq2seq) model is based on the encoder-decoder architecture to generate a sequence output for a sequence input.
 * We use multiple LSTM layers for encoder and decoder.
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/seq2seq-discussion/4357)
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/4357)
 
 ![](../img/qr_seq2seq.svg)

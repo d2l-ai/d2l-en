@@ -211,7 +211,7 @@ they allow us to organize data that have different modalities of variation.
 For example, rows in our matrix might correspond to different houses (data points), 
 while columns might correspond to different attributes.
 This should sound familiar if you have ever used spreadsheet software or
-have read :ref:`subsec_data_preprocessing`.
+have read :ref:`sec_pandas`.
 Thus, although the default orientation of a single vector is a column vector,
 in a matrix that represents a tabular dataset,
 it is more conventional to treat each data point as a row vector in the matrix.
