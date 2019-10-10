@@ -11,7 +11,6 @@ So, we will briefly walk through steps for preprocessing raw data with `pandas`
 and converting them into the `ndarray` format.
 We will cover more data preprocessing techniques in later chapters.
 
-
 ## Loading Data
 
 As an example, we begin by creating an artificial dataset that is stored in a csv (comma-separated values) file. Data stored in other formats may be processed in similar ways.
@@ -74,6 +73,8 @@ Now that all the entries in `inputs` and `outputs` are numerical, they can be co
 Once data are in this format, they can be further manipulated with those `ndarray` functionalities that we have introduced in :numref:`sec_ndarray`.
 
 ```{.python .input}
+from mxnet import np
+
 X, y = np.array(inputs.values), np.array(outputs.values)
 X, y
 ```
