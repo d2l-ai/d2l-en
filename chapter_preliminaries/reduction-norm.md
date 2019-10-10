@@ -397,7 +397,6 @@ In just :numref:`sec_scalar-tensor` and this section,
 we have taught you all the linear algebra
 that you will need to understand
 a remarkable chunk of modern deep learning.
-
 There is a lot more to linear algebra
 and a lot of that mathematics is useful for machine learning.
 For example, matrices can be decomposed into factors,
