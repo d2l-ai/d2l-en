@@ -44,7 +44,7 @@ Thus, this chapter provides a rapid introduction to
 basic and frequently-used mathematics to allow anyone to understand
 at least *most* of the mathematical content of the book.
 If you wish to understand *all* of the mathematical content,
-further reviewing :ref:`chap_appendix_math` should be sufficient.
+further reviewing :numref:`chap_appendix_math` should be sufficient.
 
 ```toc
 :maxdepth: 2
