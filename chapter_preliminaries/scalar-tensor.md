@@ -340,7 +340,7 @@ X
 
 * Scalars, vectors, matrices, and tensors are basic mathematical objects in linear algebra.
 * Vectors generalize scalars, and matrices generalize vectors.
-* In the `ndarray` representation, scalars have no axis, vectors have 1 axis, matrices have 2 axes, and tensors come with an arbitrary number of axes.
+* In the `ndarray` representation, scalars, vectors, matrices, and tensors have 0, 1, 2, and an arbitrary number of axes, respectively.
 
 
 ## Exercises

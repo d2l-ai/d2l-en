@@ -1,19 +1,19 @@
 # Reduction, Multiplication, and Norms
 :label:`sec_reduction-norm`
 
-Now that you can store and manipulate data,
-let us briefly review the subset of basic linear algebra
-that you will need to understand and implement
-most of models covered in this book.
-Below, we introduce the basic concepts,
-expressing each both through mathematical notation
-and the corresponding implementation in code.
-If you are already confident in your basic linear algebra,
-feel free to skim or skip this section.
+We have introduced scalars, vectors, matrices, and tensors in :numref:`sec_scalar-tensor`.
+Without operations on such basic mathematical objects in linear algebra,
+we cannot design any meaningful procedure for deep learning.
+Specifically, as we will see in subsequent chapters,
+reduction, multiplication, and norms are arguably
+among the most commonly used operations.
+In this section, we start off by reviewing and summarizing basic properties of tensor arithmetic,
+then illustrate those operations.
+
 
 ## Basic Properties of Tensor Arithmetic
 
-Scalars, vectors, matrices, and tensors of any order
+Scalars, vectors, matrices, and tensors of an arbitrary number of axes
 have some nice properties that often come in handy.
 For example, you might have noticed
 from the definition of an elementwise operation
@@ -115,7 +115,7 @@ In code, we could just call `mean` on tensors of arbitrary shape.
 A.mean(), A.sum() / A.size
 ```
 
-Like `sum`, `mean` can also reduce along the specified axes.
+Like `sum`, `mean` can also reduce a tensor along the specified axes.
 
 ```{.python .input}
 A.mean(axis=0), A.sum(axis=0) / A.shape[0]
@@ -340,7 +340,7 @@ u = np.array([3, -4])
 np.linalg.norm(u)
 ```
 
-In machine learning, we work more often
+In deep learning, we work more often
 with the squared $\ell_2$ norm.
 You will also frequently encounter the $\ell_1$ norm,
 which is expressed as the sum of the absolute values of the vector elements:
@@ -378,7 +378,7 @@ np.linalg.norm(np.ones((4, 9)))
 
 While we do not want to get too far ahead of ourselves,
 we can plant some intuition already about why these concepts are useful.
-In machine learning, we are often trying to solve optimization problems:
+In deep learning, we are often trying to solve optimization problems:
 *maximize* the probability assigned to observed data;
 *minimize* the distance between predictions
 and the ground-truth observations.
@@ -386,14 +386,14 @@ Assign vector representations to items (like words, products, or news articles)
 such that the distance between similar items is minimized,
 and the distance between dissimilar items is maximized.
 Oftentimes, the objectives, perhaps the most important components
-of machine learning algorithms (besides the data),
+of deep learning algorithms (besides the data),
 are expressed as norms.
 
 
 
-## What Is Next
+## More on Linear Algebra
 
-In just a few pages (or one Jupyter notebook),
+In just :numref:`sec_scalar-tensor` and this section,
 we have taught you all the linear algebra
 that you will need to understand
 a remarkable chunk of modern deep learning.
@@ -421,8 +421,9 @@ or other excellent resources :cite:`Strang.Strang.Strang.ea.1993`:cite:`Kolter.2
 
 ## Summary
 
-* Vectors generalize scalars, and matrices generalize vectors.
-* In the `ndarray` representation, scalars have no axis, vectors have 1 axis, matrices have 2 axes, and tensors come with an arbitrary number of axes.
+* A tensor can be reduced along the specified axes by `sum` and `mean`.
+* Elementwise multiplication of two matrices is called their Hadamard product. It is different from matrix multiplication.
+* In deep learning, we often work with norms such as the $\ell_1$ norm, the $\ell_2$ norm, and the Frobenius norm.
 * We can perform a variety of operations over scalars, vectors, matrices, and tensors with `ndarray` functions.
 
 
@@ -432,6 +433,6 @@ or other excellent resources :cite:`Strang.Strang.Strang.ea.1993`:cite:`Kolter.2
 1. Feed a tensor with 3 or more axes to the `linalg.norm` function and observe its output. What does this function compute for `ndarray`s of arbitrary shape?
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2317)
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/4974)
 
 ![](../img/qr_reduction-norm.svg)
