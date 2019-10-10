@@ -50,6 +50,7 @@ further reviewing :ref:`chap_appendix_math` should be sufficient.
 :maxdepth: 2
 
 ndarray
+pandas
 linear-algebra
 autograd
 probability

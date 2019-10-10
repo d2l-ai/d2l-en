@@ -1,6 +1,6 @@
 # Encoder-Decoder Architecture
 
-The encoder-decoder architecture is a neural network design pattern. In this architecture, the network is partitioned into two parts, the encoder and the decoder. The encoder's role is encoding the inputs into state, which often contains several tensors. Then the state is passed into the decoder to generate the outputs. In machine translation, the encoder transforms a source sentence, e.g. "Hello world.", into state, e.g. a vector, that captures its semantic information. The decoder then uses this state to generate the translated target sentence, e.g. "Bonjour le monde.". 
+The encoder-decoder architecture is a neural network design pattern. In this architecture, the network is partitioned into two parts, the encoder and the decoder. The encoder's role is encoding the inputs into state, which often contains several tensors. Then the state is passed into the decoder to generate the outputs. In machine translation, the encoder transforms a source sentence, e.g. "Hello world.", into state, e.g. a vector, that captures its semantic information. The decoder then uses this state to generate the translated target sentence, e.g. "Bonjour le monde.".
 
 ![The encoder-decoder architecture.](../img/encoder-decoder.svg)
 
@@ -69,6 +69,6 @@ class EncoderDecoder(nn.Block):
 * An decoder is a network (usually the same network structure as encoder) that takes the feature vector from the encoder, and gives the best closest match to the actual input or intended output.
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/encoder-decoder/2396)
+## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2396)
 
 ![](../img/qr_encoder-decoder.svg)
