@@ -3,7 +3,7 @@
 
 We previously discussed semantic segmentation using each pixel in an image for
 category prediction. A fully convolutional network (FCN)
-:ref:`Long.Shelhamer.Darrell.2015` uses a convolutional neural network to
+:cite:`Long.Shelhamer.Darrell.2015` uses a convolutional neural network to
 transform image pixels to pixel categories. Unlike the convolutional neural
 networks previously introduced, an FCN transforms the height and width of the
 intermediate layer feature map back to the size of input image through the
@@ -145,7 +145,7 @@ Now we can start training the model. The loss function and accuracy calculation 
 num_epochs, lr, wd, ctx = 5, 0.1, 1e-3, d2l.try_all_gpus()
 loss = gluon.loss.SoftmaxCrossEntropyLoss(axis=1)
 net.collect_params().reset_ctx(ctx)
-trainer = gluon.Trainer(net.collect_params(), 'sgd', 
+trainer = gluon.Trainer(net.collect_params(), 'sgd',
                         {'learning_rate': lr, 'wd': wd})
 d2l.train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs, ctx)
 ```

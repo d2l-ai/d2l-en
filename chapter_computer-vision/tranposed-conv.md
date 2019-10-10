@@ -1,8 +1,8 @@
 # Transposed Convolution
 :label:`sec_transposed_conv`
 
-The layers we introduced so far for convolutional neural networks, including 
-convolutional layers (:numref:`sec_conv_layer`) and pooling layers (:numref:`sec_pooling`), often reducethe input width and height, or keep them unchanged. Applications such as semantic segmentation (:numref:`sec_semantic_segmentation`) and generative adversarial networks (:numref:`sec_dcgan`), however, require to predict values for each pixel and therefore needs to increase input width and height. Transposed convolution, also named fractionally-strided convolution :ref:`Dumoulin.Visin.2016` or deconvolution :ref:`Long.Shelhamer.Darrell.2015`, serves this purpose.
+The layers we introduced so far for convolutional neural networks, including
+convolutional layers (:numref:`sec_conv_layer`) and pooling layers (:numref:`sec_pooling`), often reducethe input width and height, or keep them unchanged. Applications such as semantic segmentation (:numref:`sec_semantic_segmentation`) and generative adversarial networks (:numref:`sec_dcgan`), however, require to predict values for each pixel and therefore needs to increase input width and height. Transposed convolution, also named fractionally-strided convolution :cite:`Dumoulin.Visin.2016` or deconvolution :cite:`Long.Shelhamer.Darrell.2015`, serves this purpose.
 
 ```{.python .input  n=13}
 from mxnet import np, npx, init
@@ -14,7 +14,7 @@ npx.set_np()
 
 ## Basic 2D Transposed Convolution
 
-Let's consider a basic case that both input and output channels are 1, with 0 padding and 1 stride. :numref:`fig_trans_conv` illustrates how transposed convolution with a $2\times 2$ kernel is computed on the $2\times 2$ input matrix. 
+Let's consider a basic case that both input and output channels are 1, with 0 padding and 1 stride. :numref:`fig_trans_conv` illustrates how transposed convolution with a $2\times 2$ kernel is computed on the $2\times 2$ input matrix.
 
 ![Transposed convolution layer with a $2\times 2$ kernel.](../img/trans_conv.svg)
 :label:`fig_trans_conv`
@@ -31,7 +31,7 @@ def trans_conv(X, K):
     return Y
 ```
 
-Remember the convolution computes results by `Y[i, j] = (X[i: i + h, j: j + w] * K).sum()` (refer to `corr2d` in :numref:`sec_conv_layer`), which summarizes input values through the kernel. While the transposed convolution broadcasts input values through the kernel, which results in a larger output shape. 
+Remember the convolution computes results by `Y[i, j] = (X[i: i + h, j: j + w] * K).sum()` (refer to `corr2d` in :numref:`sec_conv_layer`), which summarizes input values through the kernel. While the transposed convolution broadcasts input values through the kernel, which results in a larger output shape.
 
 Verify the results in :numref:`fig_trans_conv`.
 
@@ -82,7 +82,7 @@ tconv.initialize()
 tconv(conv(X)).shape == X.shape
 ```
 
-## Analogy to Matrix Transposition 
+## Analogy to Matrix Transposition
 
 The transposed convolution takes its name from the matrix transposition. In fact, convolution operations can also be achieved by matrix multiplication. In the example below, we define a $3\times$ input $X$ with a $2\times 2$ kernel $K$, and then use `corr2d` to compute the convolution output.
 
@@ -120,11 +120,11 @@ Y = trans_conv(X, K)
 Y == np.dot(W.T, X.reshape(-1)).reshape(3, 3)
 ```
 
-## Summary 
+## Summary
 
-* Compared to convolutions that reduce inputs through kernels, transposed convolutions broadcast inputs. 
-* If a convolution layer reduces the input width and height by $n_w$ and $h_h$ time, respectively. Then a transposed convolution layer with the same kernel sizes, padding and strides will increase the input width and height by $n_w$ and $n_h$, respectively. 
-* We can implement convolution operations by the matrix multiplication, the corresponding transposed convolutions can be done by transposed matrix multiplication. 
+* Compared to convolutions that reduce inputs through kernels, transposed convolutions broadcast inputs.
+* If a convolution layer reduces the input width and height by $n_w$ and $h_h$ time, respectively. Then a transposed convolution layer with the same kernel sizes, padding and strides will increase the input width and height by $n_w$ and $n_h$, respectively.
+* We can implement convolution operations by the matrix multiplication, the corresponding transposed convolutions can be done by transposed matrix multiplication.
 
 ## Exercises
 

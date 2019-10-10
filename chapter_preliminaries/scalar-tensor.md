@@ -202,12 +202,12 @@ In code, we access a matrix's transpose via the `T` attribute.
 A.T
 ```
 
-Matrices are useful data structures: 
-they allow us to organize data that have different modalities of variation. 
-For example, rows in our matrix might correspond to different houses (data points), 
+Matrices are useful data structures:
+they allow us to organize data that have different modalities of variation.
+For example, rows in our matrix might correspond to different houses (data points),
 while columns might correspond to different attributes.
 This should sound familiar if you have ever used spreadsheet software or
-have read :ref:`sec_pandas`.
+have read :numref:`sec_pandas`.
 Thus, although the default orientation of a single vector is a column vector,
 in a matrix that represents a tabular dataset,
 it is more conventional to treat each data point as a row vector in the matrix.
@@ -223,7 +223,7 @@ or just data points if no mini-batch exists.
 Just as vectors generalize scalars, and matrices generalize vectors, we can build data structures with even more axes. Tensors give us a generic way of describing `ndarray`s with an arbitrary number of axes. Vectors, for example, are first-order tensors, and matrices are second-order tensors.
 Tensors are denoted with capital letters of a special font face
 (e.g., $\mathsf{X}$, $\mathsf{Y}$, and $\mathsf{Z}$)
-and their indexing mechanism (e.g., $x_{ijk}$ and $[\mathsf{X}]_{1, 2i-1,3}$) is similar to that of matrices. 
+and their indexing mechanism (e.g., $x_{ijk}$ and $[\mathsf{X}]_{1, 2i-1,3}$) is similar to that of matrices.
 
 Tensors will become more important when we start working with images, which arrive as `ndarray`s with 3 axes corresponding to the height, width, and a *channel* axis for stacking the color channels (red, green, and blue). For now, we will skip over higher order tensors and focus on the basics.
 
