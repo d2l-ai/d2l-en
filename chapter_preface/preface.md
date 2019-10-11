@@ -263,6 +263,7 @@ import math
 from matplotlib import pyplot as plt
 from mxnet import np, npx, autograd, gluon, init, context, image
 from mxnet.gluon import nn, rnn
+from mxnet.gluon.loss import Loss
 import random
 import re
 import time
