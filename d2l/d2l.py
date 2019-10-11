@@ -14,6 +14,7 @@ import math
 from matplotlib import pyplot as plt
 from mxnet import np, npx, autograd, gluon, init, context, image
 from mxnet.gluon import nn, rnn
+from mxnet.gluon.loss import Loss
 import random
 import re
 import time
@@ -809,7 +810,7 @@ def predict_s2s_ch8(model, src_sentence, src_vocab, tgt_vocab, num_steps, ctx):
     src_tokens = d2l.trim_pad(src_tokens, num_steps, src_vocab.pad)
     enc_X = np.array(src_tokens, ctx=ctx)
     # add the batch_size dimension.
-    enc_outputs = model.encoder(np.expand_dims(enc_X, axis=0), 
+    enc_outputs = model.encoder(np.expand_dims(enc_X, axis=0),
                                 enc_valid_length)
     dec_state = model.decoder.init_state(enc_outputs, enc_valid_length)
     dec_X = np.expand_dims(np.array([tgt_vocab.bos], ctx=ctx), axis=0)
@@ -1509,6 +1510,29 @@ def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
           % (metric[0] / metric[1], test_rmse))
     print('%.1f examples/sec on %s'
           % (metric[2] * num_epochs / timer.sum(), ctx_list))
+
+
+# Defined in file: ./chapter_recommender-systems/ranking.md
+class BPRLoss(Loss):
+    def __init__(self, weight=None, batch_axis=0, **kwargs):
+        super(BPRLoss, self).__init__(weight=None, batch_axis=0, **kwargs)
+
+    def forward(self, positive, negative):
+        distances = positive - negative
+        loss = - np.sum(np.log(npx.sigmoid(distances)), 0, keepdims=True)
+        return loss
+
+
+# Defined in file: ./chapter_recommender-systems/ranking.md
+class HingeLossbRec(Loss):
+    def __init__(self, weight=None, batch_axis=0, **kwargs):
+        super(HingeLossbRec, self).__init__(weight=None, batch_axis=0, 
+                                            **kwargs)
+
+    def forward(self, positive, negative, margin=1):
+        distances = positive - negative
+        loss = np.sum(np.maximum( - distances + margin, 0))
+        return loss
 
 
 # Defined in file: ./chapter_generative_adversarial_networks/gan.md
