@@ -25,7 +25,8 @@ $$
          &= \sum_{(u, i, j \in D)} \ln \sigma(\hat{y}_{ui} - \hat{y}_{uj}) - \lambda_\Theta \|\Theta \|^2
 \end{aligned}
 $$
-Where $D := \{(u, i, j) | i \in I^+_u \wedge j \in I \backslash I^+_u \}$ is the training set, with $I^+_u $ denoting the items the user $u$ liked,  $I$ denoting all items, and $I \backslash I^+_u$ indicating all other items excluding items the user liked. $\hat{y}_{ui}$ and $\hat{y}_{uj}$ are the predicted scores of the user $u$ to item $i$ and $j$, respectively. The prior $p(\Theta)$ is a normal distribution with zero mean and variance-covariance matrix $\Sigma_\Theta$. Here, we let $\Sigma_\Theta = \lambda_\Theta I$. 
+
+where $D := \{(u, i, j) | i \in I^+_u \wedge j \in I \backslash I^+_u \}$ is the training set, with $I^+_u$ denoting the items the user $u$ liked,  $I$ denoting all items, and $I \backslash I^+_u$ indicating all other items excluding items the user liked. $\hat{y}_{ui}$ and $\hat{y}_{uj}$ are the predicted scores of the user $u$ to item $i$ and $j$, respectively. The prior $p(\Theta)$ is a normal distribution with zero mean and variance-covariance matrix $\Sigma_\Theta$. Here, we let $\Sigma_\Theta = \lambda_\Theta I$. 
 ![Illustration of Bayesian Personalized Ranking](../img/rec-ranking.svg)
 We will implement the base class  `mxnet.gluon.loss.Loss`and override the `forward` method to construct the Bayesian personalized ranking loss. We begin by importing the Loss class and the np module.
 
@@ -52,9 +53,11 @@ class BPRLoss(Loss):
 ## Hinge Loss and its Implementation
 
 The Hinge loss for ranking has different form to the [hinge loss](https://mxnet.incubator.apache.org/api/python/gluon/loss.html#mxnet.gluon.loss.HingeLoss) provided within the gluon library that is often used in classifiers such as SVMs.  The loss used for ranking in recommender systems has the following form. 
+
 $$
  \sum_{(u, i, j \in D)} (\max( m - \hat{y}_{ui} + \hat{y}_{uj}), 0)
 $$
+
 where $m$ is the safety margin size. It aims to push negative items away from positive items. Similar to BPR, it aims to optimize for relevant distance between positive and negative samples instead of absolute outputs, making it well suited to recommenders.
 
 ```{.python .input  n=3}
