@@ -168,4 +168,3 @@ A similar reasoning shows that the probability of picking a sample exactly once 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2372)
 
 ![](../img/qr_gd-sgd.svg)
-
