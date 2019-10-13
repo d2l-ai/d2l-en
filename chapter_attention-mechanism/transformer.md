@@ -26,7 +26,7 @@ layer with vocabulary size to the last block's outputs.
 
 It can also be seen that the transformer differs to the seq2seq with attention model in three major places:
 
-1. A recurrent layer in seq2seq is replaced with a transformer block. This block contains a self-attention layer (muti-head attention) and a network with two dense layers (position-wise FFN) for the encoder. For the decoder, another mut-head attention layer is used to take the encoder state.
+1. A recurrent layer in seq2seq is replaced with a transformer block. This block contains a self-attention layer (multi-head attention) and a network with two dense layers (position-wise FFN) for the encoder. For the decoder, another multi-head attention layer is used to take the encoder state.
 1. The encoder state is passed to every transformer block in the decoder, instead of using as an additional input of the first recurrent layer in seq2seq.
 1. Since the self-attention layer does not distinguish the item order in a sequence, a positional encoding layer is used to add sequential information into each sequence item.
 
@@ -73,7 +73,7 @@ class MultiHeadAttention(nn.Block):
         self.W_v = nn.Dense(units, use_bias=False, flatten=False)
 
     # query, key, and value shape: (batch_size, num_items, dim)
-    # valid_length shape is either (bathc_size, ) or (batch_size, num_items)
+    # valid_length shape is either (batch_size, ) or (batch_size, num_items)
     def forward(self, query, key, value, valid_length):
         # Project and transpose from (batch_size, num_items, units) to
         # (batch_size * num_heads, num_items, p), where units = p * num_heads.
@@ -137,7 +137,7 @@ class PositionWiseFFN(nn.Block):
         return self.ffn_2(self.ffn_1(X))
 ```
 
-Similar to the muti-head attention, the position-wise feed-forward network will only change the last dimension size of the input. In addition, if two items in the input sequence are identical, the according outputs will be identical as well.
+Similar to the multi-head attention, the position-wise feed-forward network will only change the last dimension size of the input. In addition, if two items in the input sequence are identical, the according outputs will be identical as well.
 
 ```{.python .input  n=6}
 ffn = PositionWiseFFN(4, 8)
@@ -198,7 +198,7 @@ class PositionalEncoding(nn.Block):
     def __init__(self, units, dropout, max_len=1000):
         super(PositionalEncoding, self).__init__()
         self.dropout = nn.Dropout(dropout)
-        # Create a long enougn P
+        # Create a long enough P
         self.P = nd.zeros((1, max_len, units))
         X = nd.arange(0, max_len).reshape((-1,1)) / nd.power(
             10000, nd.arange(0, units, 2)/units)
@@ -211,7 +211,7 @@ class PositionalEncoding(nn.Block):
 
 ```
 
-Now we visualize the position values for 4 dimensions. As can be seen, the 4th dimension has the same frequency as the 5th but with different offset. The 5th dimension then has a lower frequency.
+Now we visualize the position values for 4 dimensions. As can be seen, the 4th dimension has the same frequency as the 5th but with different offset. The 5th and 6th dimension have a lower frequency.
 
 ```{.python .input  n=11}
 pe = PositionalEncoding(20, 0)
@@ -285,7 +285,7 @@ Let first look at how a decoder behaviors during predicting. Similar to the seq2
 
 During training, because the output for the $t$-query could depend all $T$ key-value pairs, which results in an inconsistent behavior than prediction. We can eliminate it by specifying the valid length to be $t$ for the $t$-th query.
 
-Another difference compared to the encoder transformer block is that the encoder block has an additional multi-head attention layer that accepts the encoder outputs as keys and values.
+Another difference compared to the encoder transformer block is that the decoder block has an additional multi-head attention layer that accepts the encoder outputs as keys and values.
 
 ```{.python .input  n=16}
 class DecoderBlock(nn.Block):
@@ -392,3 +392,9 @@ for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
 ```
 
 ## Summary
+
+* Transformer model is based on N*N encoder-decoder architecture. It differs from Seq2seq with attention in 3 major places.
+* Multi-head attention layer contains $h$ parallel attention layers.
+* Position-wise feed-forward network equals to apply 2 $Conv(1,1)$ layers.
+* Layer normalization differs from batch normalization by normalizing along the last dimension (the feature dimension) instead of the first (batchsize) dimension.
+* Positional encoding is the only place that adds positional information to the transformer model.

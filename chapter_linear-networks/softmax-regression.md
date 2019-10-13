@@ -34,9 +34,9 @@ In order to estimate multiple classes, we need a model with multiple outputs, on
 
 $$
 \begin{aligned}
-o_1 &= x_1 w_{11} + x_2 w_{21} + x_3 w_{31} + x_4 w_{41} + b_1,\\
-o_2 &= x_1 w_{12} + x_2 w_{22} + x_3 w_{32} + x_4 w_{42} + b_2,\\
-o_3 &= x_1 w_{13} + x_2 w_{23} + x_3 w_{33} + x_4 w_{43} + b_3.
+o_1 &= x_1 w_{11} + x_2 w_{12} + x_3 w_{13} + x_4 w_{14} + b_1,\\
+o_2 &= x_1 w_{21} + x_2 w_{22} + x_3 w_{23} + x_4 w_{24} + b_2,\\
+o_3 &= x_1 w_{31} + x_2 w_{32} + x_3 w_{33} + x_4 w_{34} + b_3.
 \end{aligned}
 $$
 
@@ -54,7 +54,7 @@ If we are interested in hard classifications, we need to convert these outputs i
 
 However, there are a few problems with using the output from the output layer directly. First, because the range of output values from the output layer is uncertain, it is difficult to judge the meaning of these values. For instance, the output value 10 from the previous example appears to indicate that we are *very confident* that the image category is *chicken*. But just how confident? Is it 100 times more likely to be a chicken than a dog or are we less confident?
 
-Moreover how do we train this model. If the argmax matches the label, then we have no error at all! And if if the argmax is not equal to the label, then no infinitesimal change in our weights will decrease our error. That takes gradient-based learning off the table.
+Moreover how do we train this model. If the argmax matches the label, then we have no error at all! And if the argmax is not equal to the label, then no infinitesimal change in our weights will decrease our error. That takes gradient-based learning off the table.
 
 We might like for our outputs to correspond to probabilities, but then we would need a way to guarantee that on new (unseen) data the probabilities would be nonnegative and sum up to 1. Moreover, we would need a training objective that encouraged the model to actually estimate *probabilities*.
 Fortunately, statisticians have conveniently invented a model
@@ -186,7 +186,7 @@ After training the softmax regression model, given any example features, we can 
 1. Show that the Kullback-Leibler divergence $D(p\|q)$ is nonnegative for all distributions $p$ and $q$. Hint - use Jensen's inequality, i.e. use the fact that $-\log x$ is a convex function.
 1. Show that $\log \sum_j \exp(o_j)$ is a convex function in $o$.
 1. We can explore the connection between exponential families and the softmax in some more depth
-    * Compute the second derivative of the cross entropy loss $l(y,\hat{y})$ for the softmax.
+    * Compute the second derivative of the cross-entropy loss $l(y,\hat{y})$ for the softmax.
     * Compute the variance of the distribution given by $\mathrm{softmax}(o)$ and show that it matches the second derivative computed above.
 1. Assume that we three classes which occur with equal probability, i.e. the probability vector is $(\frac{1}{3}, \frac{1}{3}, \frac{1}{3})$.
     * What is the problem if we try to design a binary code for it? Can we match the entropy lower bound on the number of bits?

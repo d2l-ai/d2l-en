@@ -15,12 +15,12 @@ In 2014, a breakthrough paper introduced Generative adversarial networks (GANs) 
 The GANs architecture is illustrated in :numref:`fig_gan`.
 As you can see, there are two pieces to GANs - first off, we need a device (say, a deep network but it really could be anything, such as a game rendering engine) that might potentially be able to generate data that looks just like the real thing. If we are dealing with images, this needs to generate images. If we're dealing with speech, it needs to generate audio sequences, and so on. We call this the generator network. The second component is the discriminator network. It attempts to distinguish fake and real data from each other. Both networks are in competition with each other. The generator network attempts to fool the discriminator network. At that point, the discriminator network adapts to the new fake data. This information, in turn is used to improve the generator network, and so on.
 
-The discriminator is a binary classifier to distinguish if the input $x$ is real (from real data) or fake (from the generator). Typically, the discriminator outputs a scalar prediction $o\in\mathbb R$ for input $\mathbf x$, such as using a dense layer with hidden size 1, and then applies sigmoid function to obtain the predicted probability $D(\mathbf x) = 1/(1+e^{-o})$. Assume the label $y$ for true data is $1$ and $0$ for fake data. We train the discriminator to minimize the cross entropy loss, i.e.
+The discriminator is a binary classifier to distinguish if the input $x$ is real (from real data) or fake (from the generator). Typically, the discriminator outputs a scalar prediction $o\in\mathbb R$ for input $\mathbf x$, such as using a dense layer with hidden size 1, and then applies sigmoid function to obtain the predicted probability $D(\mathbf x) = 1/(1+e^{-o})$. Assume the label $y$ for true data is $1$ and $0$ for fake data. We train the discriminator to minimize the cross-entropy loss, i.e.
 
 $$ \min - y \log D(\mathbf x) - (1-y)\log(1-D(\mathbf x)),$$
 
 For the generator, it first draws some parameter $\mathbf z\in\mathbb R^d$ from a source of randomness, e.g. a normal distribution $\mathbf z\sim\mathcal(0,1)$. We often call $\mathbf z$ the latent variable.
-It then applies a function to generate $\mathbf x'=G(\mathbf z)$. The goal of the generator is to fool the discriminator to classify $\mathbf x'$ as true data. In other words, we update the parameters of the generator to maximize the cross entropy loss when $y=0$, i.e.
+It then applies a function to generate $\mathbf x'=G(\mathbf z)$. The goal of the generator is to fool the discriminator to classify $\mathbf x'$ as true data. In other words, we update the parameters of the generator to maximize the cross-entropy loss when $y=0$, i.e.
 
 $$ \max - \log(1-D(\mathbf x')).$$
 
@@ -108,7 +108,7 @@ def update_D(X, Z, net_D, net_G, loss, trainer_D):
     return loss_D.sum().asscalar()
 ```
 
-The generator is updated similarly. Here we reuse the cross entropy loss but change the label of the fake data from $0$ to $1$.
+The generator is updated similarly. Here we reuse the cross-entropy loss but change the label of the fake data from $0$ to $1$.
 
 ```{.python .input  n=8}
 # Save to the d2l package.
@@ -127,7 +127,7 @@ def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
     return loss_G.sum().asscalar()
 ```
 
-Both the discriminator and the generator performs a binary logistic regression with the cross entropy loss. We use Adam to smooth the training process. In each iteration, we first update the discriminator and then the generator. We visualize both losses and generated examples.
+Both the discriminator and the generator performs a binary logistic regression with the cross-entropy loss. We use Adam to smooth the training process. In each iteration, we first update the discriminator and then the generator. We visualize both losses and generated examples.
 
 ```{.python .input  n=9}
 def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
@@ -177,5 +177,7 @@ train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G,
 ## Summary
 
 * Generative adversarial networks (GANs) composes of two deep networks, the generator and the discriminator.
-* The generator generates the image as much closer to the true image as possible to fool the discriminator, via maximizing the cross entropy loss, i.e., $\max \log(D(\mathbf{x'}))$.
-* The discriminator tries to distinguish the generated images from the true images, via minimizing the cross entropy loss, i.e., $\min - y \log D(\mathbf{x}) - (1-y)\log(1-D(\mathbf{x}))$.
+* The generator generates the image as much closer to the true image as possible to fool the discriminator, via maximizing the cross-entropy loss, i.e., $\max \log(D(\mathbf{x'}))$.
+* The discriminator tries to distinguish the generated images from the true images, via minimizing the cross-entropy loss, i.e., $\min - y \log D(\mathbf{x}) - (1-y)\log(1-D(\mathbf{x}))$.
+
+## Reference

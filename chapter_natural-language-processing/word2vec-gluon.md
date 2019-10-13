@@ -70,7 +70,7 @@ Before training the word embedding model, we need to define the loss function of
 
 ### Binary Cross Entropy Loss Function
 
-According to the definition of the loss function in negative sampling, we can directly use Gluon's binary cross entropy loss function `SigmoidBinaryCrossEntropyLoss`.
+According to the definition of the loss function in negative sampling, we can directly use Gluon's binary cross-entropy loss function `SigmoidBinaryCrossEntropyLoss`.
 
 ```{.python .input  n=19}
 loss = gluon.loss.SigmoidBinaryCrossEntropyLoss()
@@ -98,7 +98,7 @@ loss(pred, label, mask) / mask.sum(axis=1) * mask.shape[1]
 We construct the embedding layers of the central and context words, respectively, and set the hyper-parameter word vector dimension `embed_size` to 100.
 
 ```{.python .input  n=20}
-embed_size = 50
+embed_size = 100
 net = nn.Sequential()
 net.add(nn.Embedding(input_dim=len(vocab), output_dim=embed_size),
         nn.Embedding(input_dim=len(vocab), output_dim=embed_size))

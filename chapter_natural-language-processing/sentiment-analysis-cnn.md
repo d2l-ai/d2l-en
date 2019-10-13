@@ -156,7 +156,8 @@ glove_embedding = text.embedding.create(
     'glove', pretrained_file_name='glove.6B.100d.txt')
 embeds = glove_embedding.get_vecs_by_tokens(vocab.idx_to_token)
 net.embedding.weight.set_data(embeds)
-net.embedding.collect_params().setattr('grad_req', 'null')
+net.constant_embedding.weight.set_data(embeds)
+net.constant_embedding.collect_params().setattr('grad_req', 'null')
 ```
 
 ### Train and Evaluate the Model
@@ -170,7 +171,7 @@ loss = gluon.loss.SoftmaxCrossEntropyLoss()
 d2l.train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs, ctx)
 ```
 
-Below, we use the trained model to the classify sentiments of two simple sentences.
+Below, we use the trained model to classify sentiments of two simple sentences.
 
 ```{.python .input}
 d2l.predict_sentiment(net, vocab, 'this movie is so great')
