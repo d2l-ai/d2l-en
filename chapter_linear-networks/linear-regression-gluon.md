@@ -1,23 +1,25 @@
 # Concise Implementation of Linear Regression
 :label:`sec_linear_gluon`
 
-Resurgent interest deep learning has inspired the development
-of a variety of mature software frameworks,
+Broad and intense interest in deep learning for the past several years
+has inspired both companies, academics, and hobbyists 
+to develop a variety of mature open source frameworks
 for automating the repetitive work of implementing
 gradient-based learning algorithms.
-In the previous section we relied only on
-`ndarray` for data storage and linear algebra
-and on `autograd` to calculate derivatives.
+In the previous section, we relied only on
+(i) `ndarray` for data storage and linear algebra;
+and (ii) `autograd` for calculating derivatives.
 In practice, because data iterators, loss functions, optimizers,
 and neural network layers (and some whole architectures)
 are so common, modern libraries implement these components for us as well.
 
-In this section, we will learn how we can implement
-the linear regression model in :numref:`sec_linear_scratch` much more concisely with Gluon.
+In this section, we will show you how to implement
+the linear regression model from :numref:`sec_linear_scratch` 
+concisely by using Gluon.
 
 ## Generating Data Sets
 
-To start, we will generate the same data set as that used in the previous section.
+To start, we will generate the same data set as in the previous section.
 
 ```{.python .input  n=2}
 import d2l
@@ -66,40 +68,48 @@ for X, y in data_iter:
 
 ## Define the Model
 
-When we implemented linear regression from scratch (in :num_ref`sec_linear_scratch`), 
+When we implemented linear regression from scratch
+(in :num_ref`sec_linear_scratch`), 
 we defined our model parameters explicitly
-and coded up the calculations to produce output 
-using basic linear algebra operations. 
+and coded up the calculations to produce output
+using basic linear algebra operations.
 You *should* know how to do this.
-But once your models get more complex, 
-and once you have to do this every day,
+But once your models get more complex,
+and once you have to do this nearly every day,
 you will be glad for the assistance. 
+The situation is similar to coding up your own blog from scratch.
+Doing it once or twice is rewarding and instructive,
+but you would be a lousy web developer 
+if every time you needed a blog you spent a month 
+reinventing the weel.
 
 For standard operations, we can use Gluon's predefined layers,
 which allow us to focus especially 
 on the layers used to construct the model 
 rather than having to focus on the implementation.
-
 To define a linear model, we first import the `nn` module,
 which defines a large number of neural network layers
 (note that "nn" is an abbreviation for neural networks).
 We will first define a model variable `net`, 
-which is a `Sequential` instance. 
-In Gluon, a `Sequential` instance can be regarded as a container
-that concatenates the various layers in sequence.
-When input data is given, each layer in the container will be calculated in order, 
-and the output of one layer will be the input of the next layer.
-In this example, our model consists of only one layer,
+which will refer to an instance of the `Sequential` class. 
+In Gluon, `Sequential` defines a container
+for several layers that will be chained together.
+Given input data, a `Sequential` passes it through 
+the first layer, in turn passing the output 
+as the second layer's input and so forth.
+In the following example, our model consists of only one layer,
 so we do not really need `Sequential`.
-But since nearly all of our future models will involve multiple layers,
-let's get into the habit early.
+But since nearly all of our future models
+will involve multiple layers,
+we will use it anyway just to familiarize you 
+with the most standard workflow.
 
 ```{.python .input  n=5}
 from mxnet.gluon import nn
 net = nn.Sequential()
 ```
 
-Recall the architecture of a single layer network.
+Recall the architecture of a single-layer network.
 The layer is said to be *fully-connected* 
 because each of its inputs are connected to each of its outputs 
 by means of a matrix-vector multiplication.
@@ -138,15 +148,15 @@ we specify that each *weight* parameter
 should be randomly sampled from a normal distribution
 with mean $0$ and standard deviation $0.01$.
 The *bias* parameter will be initialized to zero by default. 
-Both the weight vector and bias will be attached with gradients.
+Both the weight vector and bias will have attached gradients.
 
 ```{.python .input  n=7}
 from mxnet import init
 net.initialize(init.Normal(sigma=0.01))
 ```
 
-The code above looks straightforward but in reality
-something quite strange is happening here.
+The code above may look straightforward but you should note 
+that something strange is happening here.
 We are initializing parameters for a network
 even though Gluon does not yet know 
 how many dimensions the input will have!
@@ -176,8 +186,8 @@ loss = gloss.L2Loss()  # The squared loss is also known as the L2 norm loss
 
 ## Define the Optimization Algorithm
 
-Not surpisingly, we aren't the first people
-to implement mini-batch stochastic gradient descent,
+Minibatch SGD and related variants
+are standard tools for optimizing neural networks
 and thus `Gluon` supports SGD alongside a number of
 variations on this algorithm through its `Trainer` class.
 When we instantiate the `Trainer`,
@@ -201,20 +211,20 @@ requires comparatively few lines of code.
 We didn't have to individually allocate parameters,
 define our loss function, or implement stochastic gradient descent.
 Once we start working with much more complex models,
-the benefits of relying on Gluon's abstractions will grow considerably.
-But once we have all the basic pieces in place,
+Gluon's advantages will grow considerably.
+However, once we have all the basic pieces in place,
 the training loop itself is strikingly similar
 to what we did when implementing everything from scratch.
 
 To refresh your memory: for some number of epochs,
 we'll make a complete pass over the dataset (train_data), 
-grabbing one minibatch of inputs 
-and corresponding ground-truth labels at a time. 
-For each batch, we will go through the following ritual:
+iteratively grabbing one minibatch of inputs 
+and the corresponding ground-truth labels. 
+For each minibatch, we go through the following ritual:
 
 * Generate predictions by calling `net(X)` and calculate the loss `l` (the forward pass).
 * Calculate gradients by calling `l.backward()` (the backward pass).
-* Update the model parameters by invoking our SGD optimizer (note that `trainer` already knows which parameters to optimize over, so we just need to pass in the batch size.
+* Update the model parameters by invoking our SGD optimizer (note that `trainer` already knows which parameters to optimize over, so we just need to pass in the minibatch size.
 
 For good measure, we compute the loss after each epoch and print it to monitor progress.
 
@@ -230,11 +240,16 @@ for epoch in range(1, num_epochs + 1):
     print('epoch %d, loss: %f' % (epoch, l.mean().asnumpy()))
 ```
 
-The model parameters we have learned 
-and the actual model parameters are compared as below. 
-We get the layer we need from the `net` 
-and access its weight (`weight`) and bias (`bias`). 
-The parameters we have learned and the actual parameters are very close.
+Below, we compare the model parameters learned by training on finite data
+and the actual parameters that generated our dataset. 
+To access parameters with Gluon, 
+we first access the layer that we need from `net` 
+and then access that layer's weight (`weight`) and bias (`bias`).
+To access each parameter's values as an `ndarray`,
+we invoke its `data()` method.
+As in our from-scratch implementation,
+note that our estimated parameters are 
+close to their ground truth counterparts.
 
 ```{.python .input  n=12}
 w = net[0].weight.data()
@@ -246,14 +261,14 @@ print('Error in estimating b', true_b - b)
 ## Summary
 
 * Using Gluon, we can implement models much more succinctly.
-* In Gluon, the module `data` provides tools for data processing, the module `nn` defines a large number of neural network layers, and the module `loss` defines various loss functions.
+* In Gluon, the `data` module provides tools for data processing, the `nn` module defines a large number of neural network layers, and the `loss` module defines many common loss functions.
 * MXNet's module `initializer` provides various methods for model parameter initialization.
-* Dimensionality and storage are automagically inferred (but caution if you want to access parameters before they've been initialized).
+* Dimensionality and storage are automatically inferred (but be careful not to attempt to access parameters before they have been initialized).
 
 
 ## Exercises
 
-1. If we replace `l = loss(output, y)` with `l = loss(output, y).mean()`, we need to change `trainer.step(batch_size)` to `trainer.step(1)` accordingly. Why?
+1. If we replace `l = loss(output, y)` with `l = loss(output, y).mean()`, we need to change `trainer.step(batch_size)` to `trainer.step(1)` for the code to behave identically. Why?
 1. Review the MXNet documentation to see what loss functions and initialization methods are provided in the modules `gluon.loss` and `init`. Replace the loss by Huber's loss.
 1. How do you access the gradient of `dense.weight`?
 
