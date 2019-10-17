@@ -159,6 +159,9 @@ $$\mathbf{A}=\begin{bmatrix} a_{11} & a_{12} & \cdots & a_{1n} \\ a_{21} & a_{22
 
 For any $\mathbf{A} \in \mathbb{R}^{m \times n}$, the shape of $\mathbf{A}$
 is ($m$, $n$) or $m \times n$.
+Specifically, when a matrix has the same number of rows and columns,
+its shape becomes a square; thus, it is called a *square matrix*.
+
 We can create an $m \times n$ matrix in MXNet
 by specifying a shape with two components $m$ and $n$
 when calling any of our favorite functions for instantiating an `ndarray`.
@@ -202,6 +205,19 @@ In code, we access a matrix's transpose via the `T` attribute.
 A.T
 ```
 
+As a special type of the square matrix,
+a *symmetric matrix* $\mathbf{A}$ is equal to its transpose:
+$\mathbf{A} = \mathbf{A}^\top$.
+
+```{.python .input}
+B = np.array([[1, 2, 3], [2, 0, 4], [3, 4, 5]])
+B
+```
+
+```{.python .input}
+B == B.T
+```
+
 Matrices are useful data structures:
 they allow us to organize data that have different modalities of variation.
 For example, rows in our matrix might correspond to different houses (data points),
@@ -241,8 +257,11 @@ X
 
 ## Exercises
 
+1. Prove that the transpose of a matrix $\mathbf{A}$'s transpose is $\mathbf{A}$: $(\mathbf{A}^\top)^\top = \mathbf{A}$.
+1. Given two matrices $\mathbf{A}$ and $\mathbf{B}$, show that the sum of transposes is equal to the transpose of a sum: $\mathbf{A}^\top + \mathbf{B}^\top = (\mathbf{A} + \mathbf{B})^\top$.
+1. Given any square matrix $\mathbf{A}$, is $\mathbf{A} + \mathbf{A}^\top$ always symmetric? Why?
 1. We defined the tensor `X` of shape ($2$, $3$, $4$) in this section. What is the output of `len(X)`?
-2. For a tensor `X` of arbitrary shape, does `len(X)` always correspond to the length of a certain axis of `X`? What is that axis?
+1. For a tensor `X` of arbitrary shape, does `len(X)` always correspond to the length of a certain axis of `X`? What is that axis?
 
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2317)

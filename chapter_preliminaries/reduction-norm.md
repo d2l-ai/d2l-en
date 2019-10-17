@@ -428,6 +428,7 @@ or other excellent resources :cite:`Strang.Strang.Strang.ea.1993`:cite:`Kolter.2
 
 ## Exercises
 
+1. When traveling between two points in Manhattan, what is the distance that you need to cover in terms of the coordinates, i.e., in terms of avenues and streets? Can you travel diagonally?
 1. Consider a tensor with shape ($2$, $3$, $4$). What are the shapes of the summation outputs along axis $0$, $1$, and $2$?
 1. Feed a tensor with 3 or more axes to the `linalg.norm` function and observe its output. What does this function compute for `ndarray`s of arbitrary shape?
 
