@@ -356,8 +356,8 @@ statistics see
 
 ## Exercises
 
-1. When traveling between two points in Manhattan, what is the distance that you need to cover in terms of the coordinates, i.e. in terms of avenues and streets? Can you travel diagonally?
-1. A square matrix is called antisymmetric if $\mathbf{A} = -\mathbf{A}^\top$. Show that you can decompose any square matrix into a symmetric and an antisymmetric matrix.
+
+
 1. Write out a permutation in matrix form.
 1. Find the gradient of the function $f(\mathbf{x}) = 3x_1^2 + 5e^{x_2}$.
 1. What is the gradient of the function $f(\mathbf{x}) = \|\mathbf{x}\|_2$?
