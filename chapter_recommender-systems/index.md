@@ -11,5 +11,6 @@ movielens
 mf
 autorec
 ranking
+neumf
 ```
 
