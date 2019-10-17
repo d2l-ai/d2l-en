@@ -37,14 +37,12 @@ The following figure illustrates the model architecture of NeuMF.
 ![Illustration of the NeuMF model](../img/rec-neumf.svg)
 
 ```{.python .input  n=1}
-import sys
-sys.path.insert(0, '..')
 import d2l
 from mxnet import autograd, init, gluon, np, npx
 from mxnet.gluon import nn
 import mxnet as mx
-import random
 import math
+import random
 npx.set_np()
 ```
 
