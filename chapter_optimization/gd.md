@@ -109,7 +109,7 @@ $\mathbf{x} \leftarrow \mathbf{x} - \eta \nabla f(\mathbf{x}).$
 To see how the algorithm behaves in practice let's construct an objective function $f(\mathbf{x})=x_1^2+2x_2^2$ with a two-dimensional vector $\mathbf{x} = [x_1, x_2]^\top$ as input and a scalar as output. The gradient is given by $\nabla f(\mathbf{x}) = [2x_1, 4x_2]^\top$. We will observe the trajectory of $\mathbf{x}$ by gradient descent from the initial position $[-5,-2]$. We need two more helper functions. The first uses an update function and applies it $20$ times to the initial value. The second helper visualizes the trajectory of $\mathbf{x}$.
 
 ```{.python .input  n=1}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def train_2d(trainer, steps=20):
     """Optimize a 2-dim objective function with a customized trainer."""
     # s1 and s2 are internal state variables and will 
@@ -122,7 +122,7 @@ def train_2d(trainer, steps=20):
     print('epoch %d, x1 %f, x2 %f' % (i + 1, x1, x2))
     return results
 
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def show_trace_2d(f, results):
     """Show the trace of 2D variables during optimization."""
     d2l.set_figsize((3.5, 2.5))

@@ -47,12 +47,12 @@ npx.num_gpus()
 Now we define two convenient functions that allows us to run codes even if the requested GPUs do not exist.
 
 ```{.python .input}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def try_gpu(i=0):
     """Return gpu(i) if exists, otherwise return cpu()."""
     return npx.gpu(i) if npx.num_gpus() >= i + 1 else npx.cpu()
 
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def try_all_gpus():
     """Return all available GPUs, or [cpu(),] if no GPU exists."""
     ctxes = [npx.gpu(i) for i in range(npx.num_gpus())]

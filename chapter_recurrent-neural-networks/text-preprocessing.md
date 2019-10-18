@@ -16,7 +16,7 @@ To get started we load text from H. G. Wells' [Time Machine](http://www.gutenber
 import collections
 import re
 
-# Save to the d2l package. 
+# Saved in the d2l package for later use 
 def read_time_machine():
     """Load the time machine book into a list of sentences."""
     with open('../data/timemachine.txt', 'r') as f:
@@ -33,7 +33,7 @@ lines = read_time_machine()
 For each sentence, we split it into a list of tokens. A token is a data point the model will train and predict. The following function supports split a sentence into words or characters, and return a list of split sentences.
 
 ```{.python .input}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def tokenize(lines, token='word'):
     """Split sentences into word or char tokens"""
     if token == 'word':
@@ -52,7 +52,7 @@ tokens[0:2]
 The string type of the token is inconvienet to be used by models, which take numerical inputs. Now let's build a dictionary, often called *vocabulary* as well, to map string tokens into numerical indices starting from 0. To so do, we first count the unique tokens in all documents, called *corpus*, and then assign a numerical index to each unique token according to its frequency. Rarely appeared tokens are often removed to reduce the complexity. A token doesn't exist in corpus or has been removed is mapped into a special unknown (“&lt;unk&gt;”) token. We optionally add another three special tokens: “&lt;pad&gt;” a token for padding, “&lt;bos&gt;” to present the beginning for a sentence, and “&lt;eos&gt;” for the ending of a sentence.
 
 ```{.python .input  n=9}
-# Save to the d2l package. 
+# Saved in the d2l package for later use 
 class Vocab(object):
     def __init__(self, tokens, min_freq=0, use_special_tokens=False):
         # Sort according to frequencies
@@ -85,7 +85,7 @@ class Vocab(object):
             return self.idx_to_token[indices]
         return [self.idx_to_token[index] for index in indices]
 
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def count_corpus(sentences):
     # Flatten a list of token lists into a list of tokens
     tokens = [tk for line in sentences for tk in line]
@@ -112,7 +112,7 @@ for i in range(8, 10):
 We packaged the above code in the `load_corpus_time_machine` function, which returns `corpus`, a list of token indices, and `vocab`, the vocabulary. The modification we did here is that `corpus` is a single list, not a list of token lists, since we do not the sequence information in the following models. Besides, we use character tokens to simplify the training in later sections.
 
 ```{.python .input}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def load_corpus_time_machine(max_tokens=-1):
     lines = read_time_machine()
     tokens = tokenize(lines, 'char')

@@ -33,7 +33,7 @@ Please refer to :numref:`sec_naive_bayes` for more detailed explanations about a
 There are 10 categories in Fashion-MNIST: t-shirt, trousers, pullover, dress, coat, sandal, shirt, sneaker, bag and ankle boot. The following function can convert a numeric label into a corresponding text label.
 
 ```{.python .input  n=25}
-# Save to the d2l package. 
+# Saved in the d2l package for later use 
 def get_fashion_mnist_labels(labels):
     text_labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
                    'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
@@ -43,7 +43,7 @@ def get_fashion_mnist_labels(labels):
 Now let's create a function to visualize these examples.
 
 ```{.python .input}
-# Save to the d2l package. 
+# Saved in the d2l package for later use 
 def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
     """Plot a list of images."""
     figsize = (num_cols * scale, num_rows * scale)
@@ -72,7 +72,7 @@ To make our life easier when reading from the training and test sets we use a `D
 In practice, reading data can often be a significant performance bottleneck for training, especially when the model is simple or when the computer is fast. A handy feature of Gluon's `DataLoader` is the ability to use multiple processes to speed up data reading (not currently supported on Windows). For instance, we can set aside 4 processes to read the data (via `num_workers`).
 
 ```{.python .input}
-# Save to the d2l package. 
+# Saved in the d2l package for later use 
 def get_dataloader_workers(num_workers=4):
     # 0 means no additional process is used to speed up the reading of data.
     if sys.platform.startswith('win'):
@@ -105,7 +105,7 @@ for X, y in train_iter:
 Now we define the `load_data_fashion_mnist` function that obtains and reads the Fashion-MNIST data set. It returns the data iterators for both the training set and validation set. In addition, it accepts an optional argument to resize images to another shape.
 
 ```{.python .input  n=4}
-# Save to the d2l package. 
+# Saved in the d2l package for later use 
 def load_data_fashion_mnist(batch_size, resize=None):
     """Download the Fashion-MNIST dataset and then load into memory."""
     dataset = gluon.data.vision

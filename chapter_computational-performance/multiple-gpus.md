@@ -131,7 +131,7 @@ print('output:', splitted)
 The `split_batch` function then splits both the features and labels.
 
 ```{.python .input  n=9}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def split_batch(X, y, ctx_list):
     """Split X and y into multiple devices specified by ctx"""
     assert X.shape[0] == y.shape[0]

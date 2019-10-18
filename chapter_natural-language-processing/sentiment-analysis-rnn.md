@@ -109,7 +109,7 @@ d2l.train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs, ctx)
 Finally, define the prediction function.
 
 ```{.python .input  n=49}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def predict_sentiment(net, vocab, sentence):
     sentence = np.array(vocab[sentence.split()], ctx=d2l.try_gpu())
     label = np.argmax(net(sentence.reshape(1, -1)), axis=1)

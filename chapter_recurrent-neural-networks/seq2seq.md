@@ -23,7 +23,7 @@ npx.set_np()
 In the encoder, we use the word embedding layer to obtain a feature index from the word index of the input language and then input it into a multi-level LSTM recurrent unit. The input for the encoder is a batch of sequences, which is 2-D tensor with shape (batch size, sequence length). It outputs both the LSTM outputs, e.g the hidden state, for each time step and the hidden state and memory cell of the last time step.
 
 ```{.python .input  n=3}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 class Seq2SeqEncoder(d2l.Encoder):
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0, **kwargs):
@@ -60,7 +60,7 @@ We directly use the hidden state of the encoder in the final time step as the in
 The forward calculation of the decoder is similar to the encoder's. The only difference is we add a dense layer with the hidden size to be the vocabulary size to output the predicted confidence score for each word.
 
 ```{.python .input  n=5}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 class Seq2SeqDecoder(d2l.Decoder):
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0, **kwargs):
@@ -112,7 +112,7 @@ npx.sequence_mask(X, np.array([1,2]), True, value=-1, axis=1)
 Now we can implement the masked version of the softmax cross-entropy loss. Note that each Gluon loss function allows to specify per-example weights, in default they are 1s. Then we can just use a zero weight for each example we would like to remove. So our customized loss function accepts an additional `valid_length` argument to ignore some failing elements in each sequence.
 
 ```{.python .input  n=9}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
     # pred shape: (batch_size, seq_len, vocab_size)
     # label shape: (batch_size, seq_len)
@@ -136,7 +136,7 @@ loss(np.ones((3, 4, 10)), np.ones((3, 4)), np.array([4, 2, 0]))
 During training, if the target sequence has length $n$, we feed the first $n-1$ tokens into the decoder as inputs, and the last $n-1$ tokens are used as ground truth label.
 
 ```{.python .input  n=13}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def train_s2s_ch8(model, data_iter, lr, num_epochs, ctx):
     model.initialize(init.Xavier(), force_reinit=True, ctx=ctx)
     trainer = gluon.Trainer(model.collect_params(),
@@ -190,7 +190,7 @@ During predicting, we feed the same "&lt;bos&gt;" token to the decoder as traini
 ![Sequence to sequence model predicting with greedy search](../img/seq2seq_predict.svg)
 
 ```{.python .input  n=15}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def predict_s2s_ch8(model, src_sentence, src_vocab, tgt_vocab, num_steps, ctx):
     src_tokens = src_vocab[src_sentence.lower().split(' ')]
     enc_valid_length = np.array([len(src_tokens)], ctx=ctx)

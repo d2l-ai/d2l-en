@@ -35,7 +35,7 @@ from mxnet import gluon, np, npx
 from mxnet.gluon import nn
 npx.set_np()
 
-# Save to the d2l package.
+# Saved in the d2l package for later use
 class Residual(nn.Block):
     def __init__(self, num_channels, use_1x1conv=False, strides=1, **kwargs):
         super(Residual, self).__init__(**kwargs)

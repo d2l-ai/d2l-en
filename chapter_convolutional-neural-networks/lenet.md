@@ -186,7 +186,7 @@ This is accomplished via the `as_in_context` function
 described in :numref:`sec_use_gpu`.
 
 ```{.python .input}
-# Save to the d2l package
+# Saved in the d2l package for later use
 def evaluate_accuracy_gpu(net, data_iter, ctx=None):
     if not ctx:  # Query the first device the first parameter is on.
         ctx = list(net.collect_params().values())[0].list_ctx()[0]
@@ -208,7 +208,7 @@ still use the cross-entropy loss function
 and mini-batch stochastic gradient descent. Since each epoch takes tens of second to run, we visualize the training loss in a finer granularity.
 
 ```{.python .input}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
     net.initialize(force_reinit=True, ctx=ctx, init=init.Xavier())
     loss = gluon.loss.SoftmaxCrossEntropyLoss()

@@ -53,6 +53,7 @@ ndarray
 pandas
 scalar-tensor
 reduction-norm
+calculus
 autograd
 probability
 lookup-api

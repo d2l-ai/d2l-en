@@ -46,7 +46,7 @@ boxes[250, 250, 0, :]
 In order to describe all anchor boxes centered on one pixel in the image, we first define the `show_bboxes` function to draw multiple bounding boxes on the image.
 
 ```{.python .input  n=5}
-# Save to the d2l package. 
+# Saved in the d2l package for later use 
 def show_bboxes(axes, bboxes, labels=None, colors=None):
     """Show bounding boxes."""
     def _make_list(obj, default_values=None):

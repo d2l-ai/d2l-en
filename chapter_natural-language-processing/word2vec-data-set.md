@@ -21,7 +21,7 @@ import zipfile
 This data set has already been preprocessed. Each line of the data set acts as a sentence. All the words in a sentence are separated by spaces. In the word embedding task, each word is a token.
 
 ```{.python .input  n=2}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def read_ptb():
     with zipfile.ZipFile('../data/ptb.zip', 'r') as f:
         raw_text = f.read('ptb/ptb.train.txt').decode("utf-8")
@@ -47,7 +47,7 @@ $$ \mathbb{P}(w_i) = \max\left(1 - \sqrt{\frac{t}{f(w_i)}}, 0\right),$$
 Here, $f(w_i)$ is the ratio of the instances of word $w_i$ to the total number of words in the data set, and the constant $t$ is a hyper-parameter (set to $10^{-4}$ in this experiment). As we can see, it is only possible to drop out the word $w_i$ in subsampling when $f(w_i) > t$. The higher the word's frequency, the higher its dropout probability.
 
 ```{.python .input  n=4}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def subsampling(sentences, vocab):
     # Map low frequency words into <unk>
     sentences = [[vocab.idx_to_token[vocab[tk]] for tk in line]
@@ -108,7 +108,7 @@ Next we read the corpus with token indicies into data batches for training.
 We use words with a distance from the central target word not exceeding the context window size as the context words of the given center target word. The following definition function extracts all the central target words and their context words. It uniformly and randomly samples an integer to be used as the context window size between integer 1 and the `max_window_size` (maximum context window).
 
 ```{.python .input  n=9}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def get_centers_and_contexts(corpus, max_window_size):
     centers, contexts = [], []
     for line in corpus:
@@ -149,7 +149,7 @@ We use negative sampling for approximate training. For a central and context wor
 We first define a class to draw a candidate according to the sampling weights. It caches a 10000 size random number bank instead of calling `random.choices` every time.
 
 ```{.python .input  n=12}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 class RandomGenerator(object):
     """Draw a random int in [0, n] according to n sampling weights"""
     def __init__(self, sampling_weights):
@@ -171,7 +171,7 @@ generator = RandomGenerator([2,3,4])
 ```
 
 ```{.python .input  n=13}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def get_negatives(all_contexts, corpus, K):
     counter = d2l.count_corpus(corpus)
     sampling_weights = [counter[i]**0.75 for i in range(len(counter))]
@@ -198,7 +198,7 @@ In a mini-batch of data, the $i^\mathrm{th}$ example includes a central word and
 Next, we will implement the mini-batch reading function `batchify`. Its mini-batch input `data` is a list whose length is the batch size, each element of which contains central target words `center`, context words `context`, and noise words `negative`. The mini-batch data returned by this function conforms to the format we need, for example, it includes the mask variable.
 
 ```{.python .input  n=14}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def batchify(data):
     max_len = max(len(c) + len(n) for _, c, n in data)
     centers, contexts_negatives, masks, labels = [], [], [], []
@@ -231,7 +231,7 @@ We use the `batchify` function just defined to specify the mini-batch reading me
 Lastly, we define the `load_data_ptb` function that read the PTB data set and return the data loader.
 
 ```{.python .input  n=16}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def load_data_ptb(batch_size, max_window_size, num_noise_words):
     sentences = read_ptb()
     vocab = d2l.Vocab(sentences, min_freq=10)

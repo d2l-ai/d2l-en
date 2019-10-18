@@ -97,7 +97,7 @@ def evaluator(net, test_iter, ctx):
 In the training function, we adopt the $L_2$ loss with weight decay. The weight decay mechanism has the same effect as the $L_2$ regularization.
 
 ```{.python .input  n=4}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
                         ctx_list=d2l.try_all_gpus(), evaluator=None,
                         **kwargs):

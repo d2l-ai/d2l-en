@@ -42,9 +42,8 @@ To start, let's import the necessary packages:
 
 ```{.python .input  n=13}
 %matplotlib inline
-from IPython import display
+import d2l
 from mxnet import np, npx
-from matplotlib import pyplot as plt
 import random
 npx.set_np()
 ```
@@ -88,20 +87,7 @@ counts / 1000
 
 As you can see, the lowest estimated probability for any of the numbers is about $.15$ and the highest estimated probability is $0.188$. Because we generated the data from a fair die, we know that each number actually has probability of $1/6$, roughly $.167$, so these estimates are pretty good. We can also visualize how these probabilities converge over time towards reasonable estimates.
 
-First we define a function that specifies `matplotlib` to output the SVG figures for sharper images, and another one to specify the figure sizes.
 
-```{.python .input  n=17}
-# Save to the d2l package.
-def use_svg_display():
-    """Use the svg format to display plot in jupyter."""
-    display.set_matplotlib_formats('svg')
-
-# Save to the d2l package.
-def set_figsize(figsize=(3.5, 2.5)):
-    """Change the default figure size"""
-    use_svg_display()
-    plt.rcParams['figure.figsize'] = figsize
-```
 
 Now visualize the data.
 
@@ -109,11 +95,11 @@ Now visualize the data.
 estimates = np.random.multinomial(100, [1.0/6]*6, size=100).astype(np.float32).cumsum(axis=0)
 estimates = estimates / estimates.sum(axis=1, keepdims=True)
 
-set_figsize((6, 4))
+d2l.set_figsize((6, 4))
 for i in range(6):
-    plt.plot(estimates[:,i].asnumpy(), label=("P(die=" + str(i) +")"))
-plt.axhline(y=0.16666, color='black', linestyle='dashed')
-plt.legend();
+    d2l.plt.plot(estimates[:,i].asnumpy(), label=("P(die=" + str(i) +")"))
+d2l.plt.axhline(y=0.16666, color='black', linestyle='dashed')
+d2l.plt.legend();
 ```
 
 Each solid curve corresponds to one of the six values of the die and gives our estimated probability that the die turns up that value as assessed after each of the 1000 turns. The dashed black line gives the true underlying probability. As we get more data, the solid curves converge towards the true answer.
@@ -221,7 +207,7 @@ number of times it generates each value to ensure that the results are approxima
 
 ```{.python .input  n=9}
 counts = np.zeros(100)
-fig, axes = plt.subplots(2, 2, sharex=True)
+fig, axes = d2l.plt.subplots(2, 2, sharex=True)
 axes = axes.flatten()
 # Mangle subplots such that we can index them in a linear fashion rather than
 # a 2D grid
@@ -249,10 +235,10 @@ x = np.arange(1, n+1)
 p0 = np.cumsum(y < 0.35) / x
 p1 = np.cumsum(y >= 0.35) / x
 
-plt.semilogx(x.asnumpy(), p0.asnumpy())
-plt.semilogx(x.asnumpy(), p1.asnumpy())
-plt.axhline(y=0.35, color='black', linestyle='dashed')
-plt.axhline(y=0.65, color='black', linestyle='dashed');
+d2l.plt.semilogx(x.asnumpy(), p0.asnumpy())
+d2l.plt.semilogx(x.asnumpy(), p1.asnumpy())
+d2l.plt.axhline(y=0.35, color='black', linestyle='dashed')
+d2l.plt.axhline(y=0.65, color='black', linestyle='dashed');
 ```
 
 As we can see, on average, this sampler will generate 35% zeros and 65% ones.
@@ -270,7 +256,7 @@ The standard Normal distribution (aka the standard Gaussian distribution) is giv
 ```{.python .input}
 x = np.arange(-10, 10, 0.01)
 p = (1/np.sqrt(2 * np.pi)) * np.exp(-0.5 * x**2)
-plt.plot(x.asnumpy(), p.asnumpy());
+d2l.plt.plot(x.asnumpy(), p.asnumpy());
 ```
 
 Sampling from this distribution is less trivial. First off, the support is
@@ -297,7 +283,7 @@ Now we are ready to state one of the most fundamental theorems in statistics, th
 
 ```{.python .input}
 # Generate 10 random sequences of 10,000 uniformly distributed random variables
-tmp = np.random.uniform(size=(10000,10))
+tmp = np.random.uniform(size=(10000, 10))
 x = 1.0 * (tmp > 0.3) + 1.0 * (tmp > 0.8)
 mean = 1 * 0.5 + 2 * 0.2
 variance = 1 * 0.5 + 4 * 0.2 - mean**2
@@ -308,10 +294,12 @@ y = np.arange(1,10001).reshape(10000,1)
 z = np.cumsum(x,axis=0) / y
 
 for i in range(10):
-    plt.semilogx(y.asnumpy(), z[:,i].asnumpy())
+    d2l.plt.semilogx(y.asnumpy(), z[:,i].asnumpy())
 
-plt.semilogx(y.asnumpy(), ((variance**0.5) * np.power(y,-0.5) + mean).asnumpy(),'r')
-plt.semilogx(y.asnumpy(), (-(variance**0.5) * np.power(y,-0.5) + mean).asnumpy(),'r');
+d2l.plt.semilogx(
+    y.asnumpy(), ((variance**0.5) * np.power(y,-0.5) + mean).asnumpy(),'r')
+d2l.plt.semilogx(
+    y.asnumpy(), (-(variance**0.5) * np.power(y,-0.5) + mean).asnumpy(),'r');
 ```
 
 This looks very similar to the initial example, at least in the limit of averages of large numbers of variables. This is confirmed by theory. Denote by

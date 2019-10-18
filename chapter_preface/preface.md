@@ -254,7 +254,7 @@ Save to the d2l package`. For example, these are the packages and modules will
 be used by the `d2l` package.
 
 ```{.python .input  n=1}
-# Save to the d2l package
+# Saved in the d2l package for later use
 from IPython import display
 import collections
 import os

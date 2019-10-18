@@ -25,7 +25,7 @@ from mpl_toolkits import mplot3d
 from mxnet import np, npx
 npx.set_np()
 
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def annotate(text, xy, xytext):
     d2l.plt.gca().annotate(text, xy=xy, xytext=xytext,
                            arrowprops=dict(arrowstyle='->'))
