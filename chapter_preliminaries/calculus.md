@@ -4,7 +4,7 @@
 At least 2,500 years ago, ancient Greeks knew how to find the area of a polygon:
 divide the polygon into triangles,
 then sum the areas of these triangles. 
-:numref:`fig_polygon_area` illustrates this Greek method.
+:numref:`fig_polygon_area` illustrates this method.
 
 ![Find the area of a polygon.](../img/polygon_area.svg)
 :label:`fig_polygon_area`
@@ -30,12 +30,16 @@ As discussed in :numref:`subsec_norms_and_objectives`,
 such problems are ubiquitous in deep learning.
 To help you understand
 optimization problems and methods in later chapters,
-here we give a very brief primer on key concepts
-of differential calculus.
+here we give a very brief primer on differential calculus
+that is commonly used in deep learning.
 
 
 
 ## Derivatives and Differentials
+
+
+
+
 
 Assume the input and output of function $f: \mathbb{R} \rightarrow \mathbb{R}$ are both scalars. The derivative $f$ is defined as
 

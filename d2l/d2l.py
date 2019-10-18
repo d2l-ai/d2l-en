@@ -72,17 +72,26 @@ def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
     """Plot multiple lines"""
     d2l.set_figsize(figsize)
     axes = axes if axes else d2l.plt.gca()
-    if isinstance(X, np.ndarray): X = X.asnumpy()
-    if isinstance(Y, np.ndarray): Y = Y.asnumpy()
-    if not hasattr(X[0], "__len__"): X = [X]
-    if Y is None: X, Y = [[]]*len(X), X
-    if not hasattr(Y[0], "__len__"): Y = [Y]
-    if len(X) != len(Y): X = X * len(Y)
-    if not fmts: fmts = ['-']*len(X)
+    
+    # Return True if X has 1 dimension
+    def is_1d(X):
+        return (hasattr(X, "ndim") and X.ndim == 1 or isinstance(X, list)
+                and not hasattr(X[0], "__len__"))
+
+    if is_1d(X):
+        X = [X]
+    if Y is None:
+        X, Y = [[]] * len(X), X
+    elif is_1d(Y):
+        Y = [Y]
+
+    # Broadcast
+    if len(X) != len(Y):
+        X = X * len(Y)
+    if not fmts:
+        fmts = ['-'] * len(X)
     axes.cla()
     for x, y, fmt in zip(X, Y, fmts):
-        if isinstance(x, np.ndarray): x = x.asnumpy()
-        if isinstance(y, np.ndarray): y = y.asnumpy()
         if len(x):
             axes.plot(x, y, fmt)
         else:
@@ -698,7 +707,7 @@ class Encoder(nn.Block):
 
 # Defined in file: ./chapter_recurrent-neural-networks/encoder-decoder.md
 class Decoder(nn.Block):
-    """The base decoder interface for the encoder-decoder architecture."""
+    """The base decoder interface for the encoder-decoder archtecture."""
     def __init__(self, **kwargs):
         super(Decoder, self).__init__(**kwargs)
 
