@@ -22,7 +22,7 @@ We use Stanford's Large Movie Review Dataset as the data set for text sentiment 
 We first download this data set to the "../data" path and extract it to "../data/aclImdb".
 
 ```{.python .input  n=2}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def download_imdb(data_dir='../data'):
     url = 'http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz'
     fname = gluon.utils.download(url, data_dir)
@@ -35,7 +35,7 @@ download_imdb()
 Next, read the training and test data sets. Each example is a review and its corresponding label: 1 indicates "positive" and 0 indicates "negative".
 
 ```{.python .input  n=3}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def read_imdb(folder='train', data_dir='../data'):
     data, labels = [], []
     for label in ['pos', 'neg']:
@@ -94,7 +94,7 @@ for X, y in train_iter:
 Lastly, we will save a function `load_data_imdb` into `d2l`, which returns the vocabulary and data iterators.
 
 ```{.python .input  n=7}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def load_data_imdb(batch_size, num_steps=500):
     download_imdb()
     train_data, test_data = read_imdb('train'), read_imdb('test')

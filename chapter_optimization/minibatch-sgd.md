@@ -28,7 +28,7 @@ from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
 npx.set_np()
 
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def get_data_ch10(batch_size=10, n=1500):
     data = np.genfromtxt('../data/airfoil_self_noise.dat', dtype=np.float32, delimiter='\t')
     data = (data - data.mean(axis=0)) / data.std(axis=0)
@@ -57,7 +57,7 @@ def sgd(params, states, hyperparams):
 Next, we are going to implement a generic training function to facilitate the use of the other optimization algorithms introduced later in this chapter. It initializes a linear regression model and can then be used to train the model with the mini-batch SGD and other algorithms introduced in subsequent sections.
 
 ```{.python .input  n=3}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def train_ch10(trainer_fn, states, hyperparams, data_iter,
                feature_dim, num_epochs=2):
     # Initialization
@@ -132,7 +132,7 @@ d2l.plt.gca().set_xscale('log')
 In Gluon, we can use the `Trainer` class to call optimization algorithms. Next, we are going to implement a generic training function that uses the optimization name `trainer_name` and hyperparameter `trainer_hyperparameter` to create the instance `Trainer`.
 
 ```{.python .input  n=9}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def train_gluon_ch10(trainer_name, trainer_hyperparams,
                      data_iter, num_epochs=2):
     # Initialization

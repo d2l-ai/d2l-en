@@ -164,7 +164,7 @@ The following code randomly generates a minibatch from the data each time. Here,
 In random sampling, each example is a sequence arbitrarily captured on the original sequence. The positions of two adjacent random mini-batches on the original sequence are not necessarily adjacent. The target is to predict the next character based on what we've seen so far, hence the labels are the original sequence, shifted by one character.
 
 ```{.python .input  n=5}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def seq_data_iter_random(corpus, batch_size, num_steps):
     # Offset the iterator over the data for uniform starts
     corpus = corpus[random.randint(0, num_steps):]
@@ -199,7 +199,7 @@ for X, Y in seq_data_iter_random(my_seq, batch_size=2, num_steps=6):
 In addition to random sampling of the original sequence, we can also make the positions of two adjacent random mini-batches adjacent in the original sequence.
 
 ```{.python .input  n=7}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def seq_data_iter_consecutive(corpus, batch_size, num_steps):
     # Offset for the iterator over the data for uniform starts
     offset = random.randint(0, num_steps)
@@ -225,7 +225,7 @@ for X, Y in seq_data_iter_consecutive(my_seq, batch_size=2, num_steps=6):
 Now we wrap the above two sampling functions to a class so that we can use it as a normal Gluon data iterator later.
 
 ```{.python .input}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 class SeqDataLoader(object):
     """A iterator to load sequence data"""
     def __init__(self, batch_size, num_steps, use_random_iter, max_tokens):
@@ -243,7 +243,7 @@ class SeqDataLoader(object):
 Lastly, we define a function `load_data_time_machine` that returns both the data iterator and the vocabulary, so we can use it similarly as other functions with `load_data` prefix.
 
 ```{.python .input}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def load_data_time_machine(batch_size, num_steps, use_random_iter=False, 
                            max_tokens=10000):
     data_iter = SeqDataLoader(

@@ -15,7 +15,7 @@ import os
 
 npx.set_np()
 
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def download_pikachu(data_dir):
     root_url = ('https://apache-mxnet.s3-accelerate.amazonaws.com/'
                 'gluon/dataset/pikachu/')
@@ -32,7 +32,7 @@ def download_pikachu(data_dir):
 We are going to read the object detection data set by creating the instance `ImageDetIter`. The "Det" in the name refers to Detection. We will read the training data set in random order. Since the format of the data set is RecordIO, we need the image index file `'train.idx'` to read random mini-batches. In addition, for each image of the training set, we will use random cropping and require the cropped image to cover at least 95% of each object. Since the cropping is random, this requirement is not always satisfied. We preset the maximum number of random cropping attempts to 200. If none of them meets the requirement, the image will not be cropped. To ensure the certainty of the output, we will not randomly crop the images in the test data set. We also do not need to read the test data set in random order.
 
 ```{.python .input  n=2}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def load_data_pikachu(batch_size, edge_size=256):
     """Load the pikachu dataset"""
     data_dir = '../data/pikachu'

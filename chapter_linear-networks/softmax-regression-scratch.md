@@ -188,7 +188,7 @@ The result is an `ndarray` containing entries of 0 (false) and 1 (true).
 Taking the mean yields the desired result.
 
 ```{.python .input  n=11}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def accuracy(y_hat, y):
     return float((y_hat.argmax(axis=1) == y.astype('float32')).sum())
 ```
@@ -213,7 +213,7 @@ Similarly, we can evaluate the accuracy for model `net` on the data set
 (accessed via `data_iter`).
 
 ```{.python .input  n=13}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def evaluate_accuracy(net, data_iter):
     metric = Accumulator(2) # num_corrected_examples, num_examples
     for X, y in data_iter:
@@ -224,7 +224,7 @@ def evaluate_accuracy(net, data_iter):
 Here `Accumulator` is a utility class to accumulated sum over multiple numbers.
 
 ```{.python .input}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 class Accumulator(object):
     """Sum a list of numbers over time"""
     def __init__(self, n):
@@ -252,7 +252,7 @@ if you read through our implementation
 of linear regression in :numref:`sec_linear_scratch`. Here we refactor the implementation to make it reusable. First, we define a function to train for one data epoch. Note that `updater` is general function to update the model parameters, which accepts the batch size as an argument. It can be either a wrapper of `d2l.sgd` or a Gluon trainer.
 
 ```{.python .input  n=15}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def train_epoch_ch3(net, train_iter, loss, updater):
     metric = Accumulator(3) # train_loss_sum, train_acc_sum, num_examples
     if isinstance(updater, gluon.Trainer):
@@ -272,7 +272,7 @@ def train_epoch_ch3(net, train_iter, loss, updater):
 Before showing the implementation of the training function, we define a utility class that draw data in animation. Again, it aims to simplify the codes in later chapters.
 
 ```{.python .input  n=16}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 class Animator(object):
     def __init__(self, xlabel=None, ylabel=None, legend=[], xlim=None,
                  ylim=None, xscale='linear', yscale='linear', fmts=None,
@@ -309,7 +309,7 @@ class Animator(object):
 The training function then runs multiple epochs and visualize the training progress.
 
 ```{.python .input  n=17}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
     trains, test_accs = [], []
     animator = Animator(xlabel='epoch', xlim=[1, num_epochs],
@@ -342,7 +342,7 @@ Given a series of images, we will compare their actual labels
 (second line of text output).
 
 ```{.python .input  n=19}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def predict_ch3(net, test_iter, n=6):
     for X, y in test_iter:
         break

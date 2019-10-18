@@ -373,8 +373,8 @@ def train_and_pred(train_features, test_feature, train_labels, test_data,
     net = get_net()
     train_ls, _ = train(net, train_features, train_labels, None, None,
                         num_epochs, lr, weight_decay, batch_size)
-    d2l.plot(range(1, num_epochs+1), [train_ls], xlabel='epoch', ylabel='rmse',
-            yscale='log')
+    d2l.plot(np.arange(1, num_epochs + 1), [train_ls], xlabel='epoch',
+             ylabel='rmse', yscale='log')
     print('train rmse %f' % train_ls[-1])
     # Apply the network to the test set
     preds = net(test_features).asnumpy()

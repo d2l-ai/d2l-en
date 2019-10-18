@@ -45,7 +45,7 @@ we want the `DataLoader` to shuffle the data
 on each epoch (pass through the dataset).
 
 ```{.python .input  n=3}
-# Save to the d2l package. 
+# Saved in the d2l package for later use 
 def load_array(data_arrays, batch_size, is_train=True):
     """Construct a Gluon data loader"""
     dataset = gluon.data.ArrayDataset(*data_arrays)

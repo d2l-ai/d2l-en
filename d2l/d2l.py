@@ -23,19 +23,6 @@ import zipfile
 import pandas as pd
 
 
-# Defined in file: ./chapter_preliminaries/probability.md
-def use_svg_display():
-    """Use the svg format to display plot in jupyter."""
-    display.set_matplotlib_formats('svg')
-
-
-# Defined in file: ./chapter_preliminaries/probability.md
-def set_figsize(figsize=(3.5, 2.5)):
-    """Change the default figure size"""
-    use_svg_display()
-    plt.rcParams['figure.figsize'] = figsize
-
-
 # Defined in file: ./chapter_linear-networks/linear-regression.md
 class Timer(object):
     """Record multiple running times."""
@@ -44,72 +31,25 @@ class Timer(object):
         self.start()
 
     def start(self):
-        """Start the timer"""
+        # Start the timer
         self.start_time = time.time()
 
     def stop(self):
-        """Stop the timer and record the time in a list"""
+        # Stop the timer and record the time in a list
         self.times.append(time.time() - self.start_time)
         return self.times[-1]
 
     def avg(self):
-        """Return the average time"""
+        # Return the average time
         return sum(self.times)/len(self.times)
 
     def sum(self):
-        """Return the sum of time"""
+        # Return the sum of time
         return sum(self.times)
 
     def cumsum(self):
-        """Return the accumuated times"""
+        # Return the accumuated times
         return np.array(self.times).cumsum().tolist()
-
-
-# Defined in file: ./chapter_linear-networks/linear-regression.md
-def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
-         ylim=None, xscale='linear', yscale='linear', fmts=None,
-         figsize=(3.5, 2.5), axes=None):
-    """Plot multiple lines"""
-    d2l.set_figsize(figsize)
-    axes = axes if axes else d2l.plt.gca()
-    
-    # Return True if X has 1 dimension
-    def is_1d(X):
-        return (hasattr(X, "ndim") and X.ndim == 1 or isinstance(X, list)
-                and not hasattr(X[0], "__len__"))
-
-    if is_1d(X):
-        X = [X]
-    if Y is None:
-        X, Y = [[]] * len(X), X
-    elif is_1d(Y):
-        Y = [Y]
-
-    # Broadcast
-    if len(X) != len(Y):
-        X = X * len(Y)
-    if not fmts:
-        fmts = ['-'] * len(X)
-    axes.cla()
-    for x, y, fmt in zip(X, Y, fmts):
-        if len(x):
-            axes.plot(x, y, fmt)
-        else:
-            axes.plot(y, fmt)
-    set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
-
-
-# Defined in file: ./chapter_linear-networks/linear-regression.md
-def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
-    """A utility function to set matplotlib axes"""
-    axes.set_xlabel(xlabel)
-    axes.set_ylabel(ylabel)
-    axes.set_xscale(xscale)
-    axes.set_yscale(yscale)
-    axes.set_xlim(xlim)
-    axes.set_ylim(ylim)
-    if legend: axes.legend(legend)
-    axes.grid()
 
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md

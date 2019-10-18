@@ -84,7 +84,7 @@ def rnn(inputs, state, params):
 Now we have all functions defined, next we create a class to wrap these functions and store parameters.
 
 ```{.python .input}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 class RNNModelScratch(object):
     """A RNN Model based on scratch implementations"""
     def __init__(self, vocab_size, num_hiddens, ctx,
@@ -119,7 +119,7 @@ We can see that the output shape is (number steps $\times$ batch size, vocabular
 We first explain the predicting function so we can regularly check the prediction during training. This function predicts the next `num_predicts` characters based on the `prefix` (a string containing several characters). For the beginning of the sequence, we only update the hidden state. After that we begin generating new characters and emitting them.
 
 ```{.python .input}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def predict_ch8(prefix, num_predicts, model, vocab, ctx):
     state = model.begin_state(batch_size=1, ctx=ctx)
     outputs = [vocab[prefix[0]]]
@@ -158,7 +158,7 @@ By doing so we know that the gradient norm never exceeds $\theta$ and that the u
 Below we define a function to clip the gradients of a model that is either a `RNNModelScratch` instance or a Gluon model. Also note that we compute the gradient norm over all parameters.
 
 ```{.python .input  n=10}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def grad_clipping(model, theta):
     if isinstance(model, gluon.Block):
         params = [p.data() for p in model.collect_params().values()]
@@ -183,7 +183,7 @@ Similar to :numref:`sec_linear_scratch`, let's first define the function to trai
 When the consecutive sampling is used, we initialize the hidden state at the beginning of each epoch. Since the $i^\mathrm{th}$ example in the next mini-batch is adjacent to the current $i^\mathrm{th}$ example, so the next mini-batch can use the current hidden state directly, we only detach the gradient so that we only compute the gradients within a mini-batch. When using the random sampling, we need to re-initialize the hidden state for each iteration since each example is sampled with a random position. Same to the `train_epoch_ch3` function (:numref:`sec_linear_scratch`), we use generalized `updater`, which could be a Gluon trainer or a scratched implementation.
 
 ```{.python .input}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):
     state, timer = None, d2l.Timer()
     metric = d2l.Accumulator(2)  # loss_sum, num_examples
@@ -209,7 +209,7 @@ def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):
 The training function again supports either we implement the model from scratch or using Gluon.
 
 ```{.python .input  n=11}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def train_ch8(model, train_iter, vocab, lr, num_epochs, ctx,
               use_random_iter=False):
     # Initialize

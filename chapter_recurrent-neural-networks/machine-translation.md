@@ -19,7 +19,7 @@ npx.set_np()
 We first download a dataset that contains a set of English sentences with the corresponding French translations. As can be seen that each line contains a English sentence with its French translation, which are separated by a `TAB`.
 
 ```{.python .input  n=8}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def read_data_nmt():
     fname = gluon.utils.download('http://data.mxnet.io/data/fra-eng.zip')
     with zipfile.ZipFile(fname, 'r') as f:
@@ -32,7 +32,7 @@ print(raw_text[0:106])
 We perform several preprocessing steps on the raw text data, including ignoring cases, replacing UTF-9 non-breaking space with space, and adding space between words and punctuation marks.
 
 ```{.python .input  n=11}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def preprocess_nmt(text):
     text = text.replace('\u202f', ' ').replace('\xa0', ' ')
     no_space = lambda char, prev_char: (
@@ -50,7 +50,7 @@ print(text[0:95])
 Different to using character tokens in :numref:`sec_language_model`, here a token is either a word or a punctuation mark. The following function tokenize the text data to return `source` and `target`. Each one is a list of token list, with `source[i]` is the $i^\mathrm{th}$ sentence in the source language and `target[i]` is the $i^\mathrm{th}$ sentence in the target language. To make the latter training faster, we sample the first `num_examples` sentences pairs.
 
 ```{.python .input  n=14}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def tokenize_nmt(text, num_examples = None):
     source, target = [], []
     for i, line in enumerate(text.split('\n')):
@@ -90,7 +90,7 @@ In language models, each example is a `num_steps` length sequence from the corpu
 One way to solve this problem is that we if a sentence is longer than `num_steps`, we trim it's length, otherwise pad with a special &lt;pad&gt; token to meet the length. Therefore we could transform any sentence to a fixed length.
 
 ```{.python .input  n=11}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def trim_pad(line, num_steps, padding_token):
     if len(line) > num_steps: return line[:num_steps]  # Trim
     return line + [padding_token] * (num_steps - len(line))  # Pad
@@ -101,7 +101,7 @@ trim_pad(src_vocab[source[0]], 10, src_vocab.pad)
 Now we can convert a list of sentences into an `(num_example, num_steps)` index array. We also record the length of each sentence without the padding tokens, called *valid length*, which might be used by some models. In addition, we add the special “&lt;bos&gt;” and “&lt;eos&gt;” tokens to the target sentences so that our model will know the signals for starting and ending predicting.
 
 ```{.python .input  n=12}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def build_array(lines, vocab, num_steps, is_source):
     lines = [vocab[l] for l in lines] 
     if not is_source: 
@@ -118,7 +118,7 @@ Then we can construct mini-batches based on these arrays.
 Finally, we define the function `load_data_nmt` to return the data iterator with the vocabularies for source language and target language.
 
 ```{.python .input  n=13}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def load_data_nmt(batch_size, num_steps, num_examples=1000):
     text = preprocess_nmt(read_data_nmt())
     source, target = tokenize_nmt(text, num_examples)

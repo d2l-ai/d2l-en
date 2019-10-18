@@ -32,7 +32,7 @@ The masked softmax takes a 3-dim input and allows us to filter out some elements
 definition of a valid length.)
 
 ```{.python .input  n=6}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def masked_softmax(X, valid_length):
     # X: 3-D tensor, valid_length: 1-D or 2-D tensor
     if valid_length is None:
@@ -74,7 +74,7 @@ $$\alpha(\mathbf Q, \mathbf K) = \mathbf Q \mathbf K^\top /\sqrt{d}.$$
 Now let's implement this layer that supports a batch of queries and key-value pairs. In addition, it supports randomly dropping some attention weights as a regularization.
 
 ```{.python .input  n=5}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 class DotProductAttention(nn.Block):
     def __init__(self, dropout, **kwargs):
         super(DotProductAttention, self).__init__(**kwargs)
@@ -113,7 +113,7 @@ $$\alpha(\mathbf k, \mathbf q) = \mathbf v^\top \text{tanh}(\mathbf W_k \mathbf 
 This concatenates the key and value in the feature dimension and feeds them into a single hidden layer perceptron with hidden layer size $h$ and output layer size $1$. The hidden layer activation function is tanh and no bias is applied.
 
 ```{.python .input  n=7}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 class MLPAttention(nn.Block):  
     def __init__(self, units, dropout, **kwargs):
         super(MLPAttention, self).__init__(**kwargs)

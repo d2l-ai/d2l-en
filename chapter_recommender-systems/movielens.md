@@ -19,7 +19,7 @@ import zipfile
 Then, we download the MovieLens 100k dataset and load the interactions as `DataFrame`.
 
 ```{.python .input  n=2}
-# Save to the d2l package
+# Saved in the d2l package for later use
 def read_data_ml100k(path="../data/", member="ml-100k/u.data",
               names=['user_id','item_id','rating','timestamp'], sep="\t"):
     fname = gluon.utils.download(
@@ -62,7 +62,7 @@ d2l.plt.show()
 Then, we split the dataset into training and test sets. The following function provides two split modes including `random` and `seq-aware`. In the `random` mode, the function splits the 100k interactions randomly without considering timestamp and uses the 90% of the data as training samples and the rest 10% as test samples by default. In the `seq-aware` mode, we leave out the item that a user rated most recently for test, and users' historical interactions as training set.  User historical interactions are sorted from oldest to newest based on timestamp. This mode will be used in the sequence-aware recommendation section.
 
 ```{.python .input  n=5}
-# Save to the d2l package
+# Saved in the d2l package for later use
 def split_data_ml100k(data, num_users, num_items, 
                split_mode="random", test_ratio = 0.1):
     """Split the dataset in random mode or seq-aware mode."""
@@ -92,7 +92,7 @@ def split_data_ml100k(data, num_users, num_items,
 After dataset splitting, we will convert the training set and test set into lists and dictionaries/matrix for the sake of convenience. The following function reads the dataframe line by line and enumerates the index of users/items start from zero. The function then returns lists of users, items, ratings and a dictionary/matrix that records the interactions. We can specify the type of feedback to either `explicit` or `implicit`.
 
 ```{.python .input  n=6}
-# Save to the d2l package
+# Saved in the d2l package for later use
 def load_data_ml100k(data, num_users, num_items, feedback="explicit"):
     users, items, scores = [], [], []
     inter = np.zeros((num_items, num_users)) if feedback == "explicit" else {}
@@ -112,7 +112,7 @@ def load_data_ml100k(data, num_users, num_items, feedback="explicit"):
 Afterwards, we put the above steps together and it will be used in the next section. The results are wrapped with `Dataset` and `DataLoader`. Note that the `last_batch` of `DataLoader` for training data is set to the `rollover` mode (The remaining samples are rolled over to the next epoch.) and orders are shuffled.
 
 ```{.python .input  n=7}
-# Save to the d2l package
+# Saved in the d2l package for later use
 def split_and_load_ml100k(split_mode="seq-aware", feedback="explicit", 
                           test_ratio=0.1, batch_size=256):
     data, num_users, num_items = read_data_ml100k()

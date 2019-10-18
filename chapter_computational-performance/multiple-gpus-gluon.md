@@ -24,7 +24,7 @@ model uses a smaller convolution kernel, stride, and padding at the beginning
 and removes the maximum pooling layer.
 
 ```{.python .input  n=2}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def resnet18(num_classes):
     """A slightly modified ResNet-18 model"""
     def resnet_block(num_channels, num_residuals, first_block=False):
@@ -82,7 +82,7 @@ weight.data(ctx[0])[0], weight.data(ctx[1])[0]
 Remember we define the `evaluate_accuracy_gpu` in :numref:`sec_lenet` to support evaluating on a single GPU, now we refine this implementation to support multiple devices.
 
 ```{.python .input  n=6}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def evaluate_accuracy_gpus(net, data_iter, split_f = d2l.split_batch):
     # Query the list of devices.
     ctx_list = list(net.collect_params().values())[0].list_ctx()
