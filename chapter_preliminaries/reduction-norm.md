@@ -375,6 +375,7 @@ np.linalg.norm(np.ones((4, 9)))
 ```
 
 ### Norms and Objectives
+:label:`subsec_norms_and_objectives`
 
 While we do not want to get too far ahead of ourselves,
 we can plant some intuition already about why these concepts are useful.

@@ -1,8 +1,39 @@
 # Calculus
 :label:`sec_calculus`
 
+At least 2,500 years ago, ancient Greeks knew how to find the area of a polygon:
+divide the polygon into triangles,
+then sum the areas of these triangles. 
+:numref:`fig_polygon_area` illustrates this Greek method.
 
-This is a very brief primer on multivariate differential calculus.
+![Find the area of a polygon.](../img/polygon_area.svg)
+:label:`fig_polygon_area`
+
+To find the area of curved shapes, such as a circle,
+ancient Greeks inscribed polygons in such shapes.
+As shown in :numref:`fig_polygon_area`,
+an inscribed polygon with more sides better approximates
+the circle.
+
+![Find the area of the circle.](../img/polygon_circle.svg)
+:label:`fig_polygon_area`
+
+The process in :numref:`fig_polygon_area`
+is called *method of exhaustion*.
+This is where *integral calculus* originates from.
+More than 2,000 years later, 
+the other branch of calculus, *differential calculus*,
+was invented.
+Among the most critical applications of differential calculus,
+optimization problems consider how to do something *the best*.
+As discussed in :numref:`subsec_norms_and_objectives`,
+such problems are ubiquitous in deep learning.
+To help you understand
+optimization problems and methods in later chapters,
+here we give a very brief primer on key concepts
+of differential calculus.
+
+
 
 ## Derivatives and Differentials
 
@@ -73,7 +104,8 @@ Similarly if $\mathbf{X}$ is a matrix, then
 $$\nabla_{\mathbf{X}} \|\mathbf{X} \|_F^2 = 2\mathbf{X}.$$
 
 
-## Chain rule
+## Chain Rule
+(TODO @astonzhang)
 
 
 
@@ -83,6 +115,8 @@ $$\nabla_{\mathbf{X}} \|\mathbf{X} \|_F^2 = 2\mathbf{X}.$$
 
 ## Exercises
 
+1. Find the gradient of the function $f(\mathbf{x}) = 3x_1^2 + 5e^{x_2}$.
+1. What is the gradient of the function $f(\mathbf{x}) = \|\mathbf{x}\|_2$?
 
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/)
