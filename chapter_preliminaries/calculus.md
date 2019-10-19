@@ -59,9 +59,6 @@ $$
 $$
 
 
-If functions $y=f(u)$ and $u=g(x)$ are both differentiable, then the chain rule states that
-
-$$\frac{dy}{dx} = \frac{dy}{du} \frac{du}{dx}.$$
 
 First we define a function that specifies `matplotlib` to output the SVG figures for sharper images, and another one to specify the figure sizes.
 
@@ -192,12 +189,14 @@ $$\nabla_{\mathbf{X}} \|\mathbf{X} \|_F^2 = 2\mathbf{X}.$$
 
 ## Chain Rule
 
-TODO@astonzhang
+If functions $y=f(u)$ and $u=g(x)$ are both differentiable, then the chain rule states that
+
+$$\frac{dy}{dx} = \frac{dy}{du} \frac{du}{dx}.$$
 
 
 ## Summary
 
-TODO@astonzhang
+* Differential calculus can be applied to solve optimization problems, which are ubiquitous in deep learning.
 
 
 ## Exercises
