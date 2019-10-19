@@ -1,7 +1,7 @@
 # Calculus
 :label:`sec_calculus`
 
-At least 2,500 years ago, ancient Greeks knew how to find the area of a polygon:
+At least 2,500 years ago, ancient Greeks were able find the area of a polygon:
 divide the polygon into triangles,
 then sum the areas of these triangles. 
 :numref:`fig_polygon_area` illustrates this method.
@@ -16,9 +16,9 @@ an inscribed polygon with more sides better approximates
 the circle.
 
 ![Find the area of the circle.](../img/polygon_circle.svg)
-:label:`fig_polygon_area`
+:label:`fig_circle_area`
 
-The process in :numref:`fig_polygon_area`
+The process in :numref:`fig_circle_area`
 is called *method of exhaustion*.
 This is where *integral calculus* originates from.
 More than 2,000 years later, 
