@@ -12,7 +12,7 @@ then sum the areas of these triangles.
 To find the area of curved shapes, such as a circle,
 ancient Greeks inscribed polygons in such shapes.
 As shown in :numref:`fig_polygon_area`,
-an inscribed polygon with more sides better approximates
+an inscribed polygon with more sides of equal length better approximates
 the circle.
 
 ![Find the area of the circle.](../img/polygon_circle.svg)
@@ -34,7 +34,7 @@ here we give a very brief primer on differential calculus
 that is commonly used in deep learning.
 
 
-## Derivatives and Differentials
+## Derivatives and Differentiation
 
 Suppose that we have a function $f: \mathbb{R} \rightarrow \mathbb{R}$,
 whose input and output are both scalars.
@@ -48,7 +48,7 @@ We can interpret the derivative $f'(x)$ in :eqref:`eq_derivative`
 as the *instantaneous* rate of change of $f(x)$
 with respect to $x$.
 The so-called instantaneous rate of change is based on
-the variation $h$ in $x$, which approximates 0.
+the variation $h$ in $x$, which approximates $0$.
 
 To illustrate derivatives,
 let us experiment with an example.
@@ -65,11 +65,11 @@ def f(x):
     return 3 * x ** 2 - 4 * x
 ```
 
-By setting $x=1$ and letting $h$ approximate 0, 
+By setting $x=1$ and letting $h$ approximate $0$, 
 the numerical result of $\frac{f(x+h) - f(x)}{h}$
-in :eqref:`eq_derivative` approximates 2.
+in :eqref:`eq_derivative` approximates $2$.
 Though this experiment is not a mathematical proof,
-we will see later that the derivative $u'$ is 2 when $x=1$.
+we will see later that the derivative $u'$ is $2$ when $x=1$.
 
 ```{.python .input}
 def numerical_lim(f, x, h):
@@ -117,23 +117,41 @@ Now we can apply a few of the above rules to find
 $u' = f'(x) = 3 \frac{d}{dx} x^2-4\frac{d}{dx}x = 6x-4$.
 Thus, by setting $x = 1$, we have $u' = 2$:
 this is supported by our earlier experiment in this section
-where the numerical result approximates 2.
+where the numerical result approximates $2$.
+This derivative is also the slope of the tangent line
+to the curve $u = f(x)$ when $x = 1$.
 
-
-First we define a function that specifies `matplotlib` to output the SVG figures for sharper images, and another one to specify the figure sizes.
+To visualize such an interpretation of derivatives,
+we will use `matplotlib`,
+a popular plotting library in Python.
+To configure properties of the figures produced by `matplotlib`,
+we need to define a few functions.
+In the following,
+the `use_svg_display` function specifies the `matplotlib` package to output the svg figures for sharper images.
+The comment `# Saved in the d2l package for later use`
+is a special mark where the following function, class, or import statements
+are also saved in the `d2l` package so that we can directly invoke `d2l.use_svg_display()` later.
 
 ```{.python .input}
 # Saved in the d2l package for later use
 def use_svg_display():
     """Use the svg format to display a plot in Jupyter."""
     display.set_matplotlib_formats('svg')
+```
 
+We define the `set_figsize` function to specify the figure sizes. Note that here we directly use `d2l.plt` since the import statement `from matplotlib import pyplot as plt` has been marked for being saved in the `d2l` package in the preface.
+
+```{.python .input}
 # Saved in the d2l package for later use
 def set_figsize(figsize=(3.5, 2.5)):
     """Set the figure size for matplotlib."""
     use_svg_display()
     d2l.plt.rcParams['figure.figsize'] = figsize
-    
+```
+
+The following `set_axes` function sets properties of axes of figures produced by `matplotlib`.
+
+```{.python .input}
 # Saved in the d2l package for later use
 def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
     """Set the axes for matplotlib."""
@@ -148,7 +166,8 @@ def set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend):
     axes.grid()
 ```
 
-For convenience, we also define a `plot` function
+With these $3$ functions for figure configurations,
+we define the `plot` function
 to plot multiple curves succinctly
 since we will need to visualize many curves throughout the book.
 
@@ -182,6 +201,8 @@ def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
             axes.plot(y, fmt)
     set_axes(axes, xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
 ```
+
+Now we can plot the function $u = f(x)$ and its tangent line $y = 2x - 3$ at $x=1$, where the coefficient $2$ is the slope of the tangent line.
 
 ```{.python .input}
 x = np.arange(0, 3, 0.1)
