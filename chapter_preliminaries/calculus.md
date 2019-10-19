@@ -34,42 +34,95 @@ here we give a very brief primer on differential calculus
 that is commonly used in deep learning.
 
 
-
 ## Derivatives and Differentials
 
-Assume the input and output of function $f: \mathbb{R} \rightarrow \mathbb{R}$ are both scalars. The derivative $f$ is defined as
+Suppose that we have a function $f: \mathbb{R} \rightarrow \mathbb{R}$,
+whose input and output are both scalars.
+The *derivative* of $f$ is defined as
 
 $$f'(x) = \lim_{h \rightarrow 0} \frac{f(x+h) - f(x)}{h},$$
+:eqlabel:`eq_derivative`
 
-when the limit exists (and $f$ is said to be differentiable). Given $y = f(x)$, where $x$ and $y$ are the arguments and dependent variables of function $f$, respectively, the following derivative and differential expressions are equivalent:
+if this limit exists (and $f$ is said to be *differentiable*).
+We can interpret the derivative $f'(x)$ in :eqref:`eq_derivative`
+as the *instantaneous* rate of change of $f(x)$
+with respect to $x$.
+The so-called instantaneous rate of change is based on
+the variation $h$ in $x$, which approximates 0.
 
-$$f'(x) = y' = \frac{dy}{dx} = \frac{df}{dx} = \frac{d}{dx} f(x) = df(x) = d_x f(x),$$
-
-Here, the symbols $d$ and $\frac{d}{dx}$ are also called differential operators. Common differential calculations are $dC = 0$ ($C$ is a constant), $dx^n = nx^{n-1}$ ($n$ is a constant), $de^x = e^x$, and $d\ln(x) = 1/x$.
-
-If functions $f$ and $g$ are both differentiable and $C$ is a constant, then
-
-$$
-\begin{aligned}
-\frac{d}{dx} [Cf(x)] &= C \frac{d}{dx} f(x),\\
-\frac{d}{dx} [f(x) + g(x)] &= \frac{d}{dx} f(x) + \frac{d}{dx} g(x),\\
-\frac{d}{dx} [f(x)g(x)] &= f(x) \frac{d}{dx} [g(x)] + g(x) \frac{d}{dx} [f(x)],\\
-\frac{d}{dx} \left[\frac{f(x)}{g(x)}\right] &= \frac{g(x) \frac{d}{dx} [f(x)] - f(x) \frac{d}{dx} [g(x)]}{[g(x)]^2}.
-\end{aligned}
-$$
-
-
-
-First we define a function that specifies `matplotlib` to output the SVG figures for sharper images, and another one to specify the figure sizes.
+To illustrate derivatives,
+let us experiment with an example.
+Define $u = f(x) = 3x^2-4x$.
 
 ```{.python .input}
 %matplotlib inline
 import d2l
 from IPython import display
 from mxnet import np, npx
-import random
 npx.set_np()
 
+def f(x):
+    return 3 * x ** 2 - 4 * x
+```
+
+By setting $x=1$ and letting $h$ approximate 0, 
+the numerical result of $\frac{f(x+h) - f(x)}{h}$
+in :eqref:`eq_derivative` approximates 2.
+Though this experiment is not a mathematical proof,
+we will see later that the derivative $u'$ is 2 when $x=1$.
+
+```{.python .input}
+def numerical_lim(f, x, h):
+    return (f(x + h) - f(x)) / h
+
+h = 0.1
+for i in range(5):
+    print('h=%.5f, numerical limit=%.5f' % (h, numerical_lim(f, 1, h)))
+    h *= 0.1
+```
+
+We need to familiarize ourselves with a few equivalent notations for derivatives.
+Given $y = f(x)$, where $x$ and $y$ are the independent variable and the dependent variable of the function $f$, respectively. The following expressions are equivalent:
+
+$$f'(x) = y' = \frac{dy}{dx} = \frac{df}{dx} = \frac{d}{dx} f(x) = Df(x) = D_x f(x),$$
+
+where symbols $\frac{d}{dx}$ and $D$ are *differentiation operators* that indicate operation of *differentiation*. 
+We can use the following rules to differentiate common functions:
+
+* $DC = 0$ ($C$ is a constant),
+* $Dx^n = nx^{n-1}$ (the *power rule*, $n$ is any real number),
+* $De^x = e^x$,
+* $D\ln(x) = 1/x.$
+
+To differentiate a function that is formed from a few simpler functions such as the above common functions,
+the following rules can be handy for us.
+Suppose that functions $f$ and $g$ are both differentiable and $C$ is a constant,
+we have the *constant multiple rule*
+
+$$\frac{d}{dx} [Cf(x)] = C \frac{d}{dx} f(x),$$
+
+the *sum rule*
+
+$$\frac{d}{dx} [f(x) + g(x)] = \frac{d}{dx} f(x) + \frac{d}{dx} g(x),$$
+
+the *product rule*
+
+$$\frac{d}{dx} [f(x)g(x)] = f(x) \frac{d}{dx} [g(x)] + g(x) \frac{d}{dx} [f(x)],$$
+
+and the *quotient rule*
+
+$$\frac{d}{dx} \left[\frac{f(x)}{g(x)}\right] = \frac{g(x) \frac{d}{dx} [f(x)] - f(x) \frac{d}{dx} [g(x)]}{[g(x)]^2}.$$
+
+Now we can apply a few of the above rules to find 
+$u' = f'(x) = 3 \frac{d}{dx} x^2-4\frac{d}{dx}x = 6x-4$.
+Thus, by setting $x = 1$, we have $u' = 2$:
+this is supported by our earlier experiment in this section
+where the numerical result approximates 2.
+
+
+First we define a function that specifies `matplotlib` to output the SVG figures for sharper images, and another one to specify the figure sizes.
+
+```{.python .input}
 # Saved in the d2l package for later use
 def use_svg_display():
     """Use the svg format to display a plot in Jupyter."""
@@ -131,22 +184,11 @@ def plot(X, Y=None, xlabel=None, ylabel=None, legend=[], xlim=None,
 ```
 
 ```{.python .input}
-def f(x):
-    return 3 * x ** 2 - 4 * x
-
-def diff(f, x, h):
-    return (f(x + h) - f(x)) / h
-
-h = 0.1
-for i in range(5):
-    print('h=%.5f, limit=%.5f' % (h, diff(f, 1, h)))
-    h *= 0.1
-```
-
-```{.python .input}
 x = np.arange(0, 3, 0.1)
 plot(x, [f(x), 2 * x - 3], 'x', 'f(x)', legend=['f(x)', 'Tangent line (x=1)'])
 ```
+
+
 
 ## Partial Derivatives
 
