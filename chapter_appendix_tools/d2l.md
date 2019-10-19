@@ -9,15 +9,3 @@
    :imported-members:
 
 ```
-<<<<<<< HEAD
-
-## Prediciting
-
-```eval_rst
-
-.. automodule:: d2l.predict
-   :members:
-
-```
-=======
->>>>>>> 08bfeaf... Fix some  warnings, improve PDF
