@@ -43,7 +43,11 @@ The *derivative* of $f$ is defined as
 $$f'(x) = \lim_{h \rightarrow 0} \frac{f(x+h) - f(x)}{h},$$
 :eqlabel:`eq_derivative`
 
-if this limit exists (and $f$ is said to be *differentiable*).
+if this limit exists.
+If $f'(a)$ exists,
+$f$ is said to be *differentiable* at $a$.
+If $f$ is differentiable at every number of an interval,
+then this function is differentiable on this interval.
 We can interpret the derivative $f'(x)$ in :eqref:`eq_derivative`
 as the *instantaneous* rate of change of $f(x)$
 with respect to $x$.
