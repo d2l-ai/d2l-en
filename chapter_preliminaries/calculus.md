@@ -48,7 +48,7 @@ We can interpret the derivative $f'(x)$ in :eqref:`eq_derivative`
 as the *instantaneous* rate of change of $f(x)$
 with respect to $x$.
 The so-called instantaneous rate of change is based on
-the variation $h$ in $x$, which approximates $0$.
+the variation $h$ in $x$, which approaches $0$.
 
 To illustrate derivatives,
 let us experiment with an example.
@@ -65,9 +65,9 @@ def f(x):
     return 3 * x ** 2 - 4 * x
 ```
 
-By setting $x=1$ and letting $h$ approximate $0$, 
+By setting $x=1$ and letting $h$ approach $0$, 
 the numerical result of $\frac{f(x+h) - f(x)}{h}$
-in :eqref:`eq_derivative` approximates $2$.
+in :eqref:`eq_derivative` approaches $2$.
 Though this experiment is not a mathematical proof,
 we will see later that the derivative $u'$ is $2$ when $x=1$.
 
@@ -117,7 +117,7 @@ Now we can apply a few of the above rules to find
 $u' = f'(x) = 3 \frac{d}{dx} x^2-4\frac{d}{dx}x = 6x-4$.
 Thus, by setting $x = 1$, we have $u' = 2$:
 this is supported by our earlier experiment in this section
-where the numerical result approximates $2$.
+where the numerical result approaches $2$.
 This derivative is also the slope of the tangent line
 to the curve $u = f(x)$ when $x = 1$.
 
