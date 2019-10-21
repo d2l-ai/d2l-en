@@ -843,5 +843,3 @@ A = \begin{bmatrix}
 $$
 
 10. How can you write $\mathrm{tr}(\mathbf{A}^4)$ in Einstein notation?
-
-
