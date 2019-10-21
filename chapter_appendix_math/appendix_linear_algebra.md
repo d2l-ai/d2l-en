@@ -165,12 +165,12 @@ a & b \\ c & d
 $$
 If we want to apply this to an arbitrary vector $\mathbf{v} = (x,y)$, we multiply and see that
 $$
-\begin{align*}
+\begin{aligned}
 \mathbf{A}\mathbf{v} & = \begin{bmatrix}a & b \\ c & d\end{bmatrix}\begin{bmatrix}x \\ y\end{bmatrix} \\
 & = \begin{bmatrix}ax+by\\ cx+dy\end{bmatrix} \\
 & = x\begin{bmatrix}a \\ c\end{bmatrix} + y\begin{bmatrix}b \\d\end{bmatrix} \\
 & = x\left\{\mathbf{A}\begin{bmatrix}1\\0\end{bmatrix}\right\} + y\left\{\mathbf{A}\begin{bmatrix}0\\1\end{bmatrix}\right\}.
-\end{align*}
+\end{aligned}
 $$
 This may seem like an odd computation where something clear became somewhat impenetrable.  However, what it tells us is that we can write the way that a $2\times 2$ matrix transforms *any* vector in terms of how $\mathbf{A}$ transforms *two specific vectors*: $(1,0)^\top$ and $(0,1)^\top$.  This is worth considering for a moment, since we have essentially reduced an infinite problem (what happens to any pair of real numbers) to a finite one (what happens to these specific vectors).  These vectors are an example a *basis*, where we can write any vector in our space as a weighted sum of these *basis vectors*.
 
