@@ -77,7 +77,7 @@ class NeuMF(nn.Block):
 For pairwise ranking loss, an important step is negative sampling. For each user, the items that a user has not interacted with are candidate items (unobserved entries). The following function takes users identity and candidate items as input, and samples negative items randomly for each user from the cadidate set of that user. During the training stage, the model ensures that the items that a user likes to be ranked higher than items she dislikes or has not interacted with.
 
 ```{.python .input  n=3}
-# Save to the d2l package.
+# Saved in the d2l package for later use.
 def negative_sampler(users, candidates, num_items):
     sampled_neg_items = []
     all_items = set([i for i in range(num_items)])
@@ -108,7 +108,7 @@ where $\mathcal{I}$ is the item set. $S_u$ is the candidate items of user $u$. N
 The following function caculates the hit counts and AUC for each user.
 
 ```{.python .input  n=4}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def hit_and_auc(rankedlist, test_matrix, k):
     hits_k = [(idx, val) for idx, val in enumerate(rankedlist[:k]) 
               if val in set(test_matrix)]
@@ -122,7 +122,7 @@ def hit_and_auc(rankedlist, test_matrix, k):
 Then, the overall Hit rate and AUC are cacluated as follows.
 
 ```{.python .input  n=5}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items, 
                      ctx):
     ranked_list, ranked_items, hit_rate, auc = {}, {}, [], []
@@ -157,7 +157,7 @@ def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items,
 The training function is defined below. We train the model in the pairwise manner.
 
 ```{.python .input  n=6}
-# Save to the d2l package.
+# Saved in the d2l package for later use
 def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter, 
                   num_users, num_items, num_epochs, ctx_list, evaluator, 
                   negative_sampler, candidates):
@@ -221,7 +221,6 @@ net.initialize(ctx=ctx, force_reinit=True, init=mx.init.Normal(0.01))
 The following code trains the model.
 
 ```{.python .input}
-
 lr, num_epochs, wd, optimizer = 0.001, 15, 1e-5, 'adam'
 loss = d2l.BPRLoss()
 trainer = gluon.Trainer(net.collect_params(), optimizer, 
