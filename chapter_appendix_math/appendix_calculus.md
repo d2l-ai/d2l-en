@@ -733,6 +733,8 @@ $$
 
 
 ```{.python .input}
+from mpl_toolkits import mplot3d
+
 # Construct grid and compute function
 x, y = np.meshgrid(np.linspace(-2, 2, 101), np.linspace(-2, 2, 101), indexing='ij')
 z = x*np.exp(- x**2 - y**2)
@@ -744,7 +746,6 @@ z_quad = np.exp(-1)*(1 - x + 2*x**2 + 2*y**2)
 ax = d2l.plt.figure().add_subplot(111, projection='3d')
 ax.plot_wireframe(x, y, z, **{'rstride': 10, 'cstride': 10})
 ax.plot_wireframe(x, y, z_quad, **{'rstride': 10, 'cstride': 10})
-ax.plot([0], [0], [0], 'rx')
 ticks = [-1,  0, 1]
 d2l.plt.xticks(ticks)
 d2l.plt.yticks(ticks)
