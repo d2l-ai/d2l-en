@@ -590,6 +590,8 @@ This is precisely what every deep learning algorithm implements to allow the com
 To see how MXNet has encapsulated this, let us take a quick look at this example.
 
 ```{.python .input}
+from mxnet import autograd
+
 ### Initialize as NDArrays, attaching gradients ###
 w = np.array(-1); x = np.array(0); y = np.array(-2); z = np.array(1)
 w.attach_grad(); x.attach_grad(); y.attach_grad(); z.attach_grad()
