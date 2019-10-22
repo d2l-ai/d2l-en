@@ -999,7 +999,7 @@ There is a traditional way to try and understand how we might try to approximate
 If $N$ is large, we can approximate the area of each slice by a rectangle, and then add up the areas to get the total area under the curve.  Let us take a look at an example doing this in code.  We will see how to get the true value in a later section.
 
 ```{.python .input}
-epsilon = 0.01
+epsilon = 0.05
 a = 0
 b = 1
 
@@ -1009,11 +1009,14 @@ f = x/(1+x**2)
 approx = np.sum(epsilon*f)
 true = np.log(2)/2
 
-x_graph = np.arange(a,b,epsilon)
+x_graph = np.arange(-1,2,epsilon)
 f_graph = x_graph/(1+x_graph**2)
 
-d2l.plt.fill_between(x.tolist(),f.tolist())
-d2l.plot(x_graph,f_graph)
+d2l.plt.plot(x_graph,y_graph)
+d2l.plt.bar(x,f)
+d2l.plt.xlabel('x')
+d2l.plt.ylabel('f(x)')
+d2l.plt.show()
 
 "Approximation: {}, Truth: {}".format(approx,true)
 ```
