@@ -163,7 +163,7 @@ def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
                   negative_sampler, candidates):
     num_batches, timer = len(train_iter), d2l.Timer()
     animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs], ylim=[0, 1],
-                            legend=['test Hit Rate', 'test AUC'])
+                            legend=['test hit rate', 'test AUC'])
     for epoch in range(num_epochs):
         metric, l = d2l.Accumulator(3), 0.
         for i, values in enumerate(train_iter):
@@ -187,8 +187,8 @@ def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
                                       ctx_list)
         train_l = l / (i + 1)
         print(train_l)
-        animator.add(epoch + 1, ( hit_rate, auc))
-    print('train loss %.3f, test Hit Rate %.3f, test AUC %.3f'
+        animator.add(epoch + 1, (hit_rate, auc))
+    print('train loss %.3f, test hit rate %.3f, test AUC %.3f'
           % (metric[0] / metric[1], hit_rate, auc))
     print('%.1f examples/sec on %s'
           % (metric[2] * num_epochs / timer.sum(), ctx_list))
