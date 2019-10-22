@@ -6,6 +6,7 @@
 
 notation
 math
+appendix_linear_algebra
 info-theory
 ```
 
