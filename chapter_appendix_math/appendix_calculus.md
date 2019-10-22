@@ -736,7 +736,7 @@ $$
 from mpl_toolkits import mplot3d
 
 # Construct grid and compute function
-x, y = np.meshgrid(np.linspace(-1, 1, 101), np.linspace(-2, 2, 101), indexing='ij')
+x, y = np.meshgrid(np.linspace(-2, 2, 101), np.linspace(-2, 2, 101), indexing='ij')
 z = x*np.exp(- x**2 - y**2)
 
 # Compute gradient and Hessian at (1,0)
@@ -751,7 +751,8 @@ d2l.plt.xticks(ticks)
 d2l.plt.yticks(ticks)
 ax.set_zticks(ticks)
 d2l.plt.xlabel('x')
-d2l.plt.ylabel('y');
+d2l.plt.ylabel('y')
+ax.set_xlim(-2, 2); ax.set_ylim(-2, 2); ax.set_zlim(0, 1);
 ```
 
 This forms the basis for Newton's Algorithm discussed in :numref:`sec_gd`, where we perform numerical optimization iteratively finding the best fitting quadratic, and then exactly minimizing that quadratic.
