@@ -974,11 +974,25 @@ At the level of machine learning we discuss in this book, we will not need a dee
 ### Geometric Interpretation
 Suppose we have a function $f(x)$.  For simplicity, let us assume that $f(x)$ is non-negative (never takes a value less than zero).  What we want to try and understand is: what is the area contained between $f(x)$ and the $x$-axis?
 
-??? FIGURE ???
+```{.python .input}
+x = np.arange(-2,2,0.01)
+f = np.exp(-x**2)
+
+d2l.plt.plot(x,f,color='red')
+d2l.plt.fill_between(x.tolist(),f.tolist())
+d2l.plt.show()
+```
 
 In most cases, this area will be infinite or undefined (consider the area under $f(x) = x^{2}$), so people will often talk about the area between a pair of ends, say $a$ and $b$.  
 
-??? FIGURE WITH MARKED ENDS ???
+```{.python .input}
+x = np.arange(-2,2,0.01)
+f = np.exp(-x**2)
+
+d2l.plt.plot(x,f,color='red')
+d2l.plt.fill_between(x.tolist()[150:250],f.tolist()[150:250])
+d2l.plt.show()
+```
 
 We will denote this area by the integral symbol below:
 
@@ -992,11 +1006,7 @@ $$
 \int_a^b f(x) \;dx = \int_a^b f(z) \;dz.
 $$
 
-There is a traditional way to try and understand how we might try to approximate such integrals: we can imaging taking the region in-between $a$ and $b$ and chopping it into $N$ vertical slices.
-
-??? Chop integral picture ???
-
-If $N$ is large, we can approximate the area of each slice by a rectangle, and then add up the areas to get the total area under the curve.  Let us take a look at an example doing this in code.  We will see how to get the true value in a later section.
+There is a traditional way to try and understand how we might try to approximate such integrals: we can imaging taking the region in-between $a$ and $b$ and chopping it into $N$ vertical slices.  If $N$ is large, we can approximate the area of each slice by a rectangle, and then add up the areas to get the total area under the curve.  Let us take a look at an example doing this in code.  We will see how to get the true value in a later section.
 
 ```{.python .input}
 epsilon = 0.05
@@ -1012,12 +1022,9 @@ true = np.log(2)/2
 x_graph = np.arange(-1,2,epsilon)
 f_graph = x_graph/(1+x_graph**2)
 
-d2l.plt.plot(x_graph,f_graph)
+d2l.plt.bar(x,f,width = epsilon, align = 'edge')
+d2l.plt.plot(x,f,color='red')
 d2l.plt.ylim([0,1])
-for i in range(len(x)) :
-    d2l.plt.Rectangle((x[i],0),epsilon,f[i],color='purple')
-d2l.plt.xlabel('x')
-d2l.plt.ylabel('f(x)')
 d2l.plt.show()
 
 "Approximation: {}, Truth: {}".format(approx,true)
