@@ -192,7 +192,7 @@ Not surprisingly, our linear model will not lead
 to a competition winning submission
 but it provides a sanity check to see whether
 there's meaningful information in the data.
-If we can't do better than random guessing here,
+If we cannot do better than random guessing here,
 then there might be a good chance
 that we have a data processing bug.
 And if things work, the linear model will serve as a baseline

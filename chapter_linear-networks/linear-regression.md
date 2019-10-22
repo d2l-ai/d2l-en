@@ -221,7 +221,7 @@ by updating the parameters in the direction
 that incrementally lowers the loss function.
 This algorithm is called *gradient descent*.
 On convex loss surfaces, it will eventually converge to a global minimum, 
-and while the same can't be said for nonconvex surfaces, 
+and while the same cannot be said for nonconvex surfaces, 
 it will at least lead towards a (hopefully good) local minimum.
 
 The most naive application of gradient descent 

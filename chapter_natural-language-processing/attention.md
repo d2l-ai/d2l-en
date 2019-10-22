@@ -82,7 +82,7 @@ Here, $\boldsymbol{W}$ and $\boldsymbol{b}$ with subscripts are the weight param
 
 ## Exercises
 
-* Based on the model design in this section, why can't we concatenate hidden state $\boldsymbol{s}_{t' - 1}^\top \in \mathbb{R}^{1 \times h}, t' \in 1, \ldots, T'$ from different time steps of the decoder to create the query entry matrix $\boldsymbol{Q} \in \mathbb{R}^{T' \times h}$ to compute context variable $\boldsymbol{c}_{t'}^\top, t' \in 1, \ldots, T'$ of the attention mechanism at different time steps simultaneously?
+* Based on the model design in this section, why cannot we concatenate hidden state $\boldsymbol{s}_{t' - 1}^\top \in \mathbb{R}^{1 \times h}, t' \in 1, \ldots, T'$ from different time steps of the decoder to create the query entry matrix $\boldsymbol{Q} \in \mathbb{R}^{T' \times h}$ to compute context variable $\boldsymbol{c}_{t'}^\top, t' \in 1, \ldots, T'$ of the attention mechanism at different time steps simultaneously?
 
 * Without modifying the function `gru` from the ["Gated Recurrent Unit (GRU)"](../chapter_recurrent-neural-networks/gru.md) section, how can we use it to implement the decoder introduced in this section?
 
