@@ -620,8 +620,8 @@ w.attach_grad(); x.attach_grad(); y.attach_grad(); z.attach_grad()
 ### Do the computation like usual, tracking gradients ###
 with autograd.record():
     a = (w+x+y+z)**2; b = (w+x-y-z)**2
-	u = (a+b)**2; v = (a-b)**2
-	f = (u+v)**2
+    u = (a+b)**2; v = (a-b)**2
+    f = (u+v)**2
 
 ### Execute backward pass ###
 f.backward()
