@@ -539,7 +539,7 @@ If we write this out into code this becomes a fairly manageable expression.
 ### Compute the value of the function from inputs to outputs ###
 w = -1; x = 0; y = -2; z = 1
 a = (w+x+y+z)**2; b = (w+x-y-z)**2
-u = (a+b)**2; v  = (a-b)**2
+u = (a+b)**2; v = (a-b)**2
 f = (u+v)**2
 print("    f at {},{},{},{} is {}".format(w,x,y,z,f))
 
