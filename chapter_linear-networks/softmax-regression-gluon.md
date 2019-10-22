@@ -47,7 +47,7 @@ $e^{z_i}$ might be larger than the largest number
 we can have for certain types of ``float`` (i.e. overflow).
 This would make the denominator (and/or numerator) ``inf`` and we get zero,
 or ``inf``, or ``nan`` for $\hat y_j$.
-In any case, we won't get a well-defined return value for ``cross_entropy``. This is the reason we subtract $\text{max}(z_i)$
+In any case, we will not get a well-defined return value for ``cross_entropy``. This is the reason we subtract $\text{max}(z_i)$
 from all $z_i$ first in ``softmax`` function.
 You can verify that this shifting in $z_i$
 will not change the return value of ``softmax``.
