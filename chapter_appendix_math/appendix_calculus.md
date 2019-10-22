@@ -290,7 +290,7 @@ Let us see how this works in code and observe how increasing the degree of the T
 
 ```{.python .input}
 # Compute the exponential function
-xs = np.arange(0,np.e,0.01)
+xs = np.arange(0,3,0.01)
 ys = np.exp(xs)
 
 # Compute a few Taylor series approximations
