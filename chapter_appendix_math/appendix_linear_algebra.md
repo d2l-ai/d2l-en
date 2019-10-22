@@ -1,10 +1,10 @@
 # Intermediate Linear Algebra
 :label:`appendix_linear_algebra`
 
-In :numref:`chapter_linear_algebra`, we saw the fundamentals of linear algebra and how to use it to store and transform data.  Indeed, it is safe to say that linear algebra is one of the key mathematical pillars of modern deep learning.  However the theory goes much deeper than we have seen, and in this section we will dive into the some of the key geometric notions associated with linear algebra, and see another interpretation of many of the operations we have met before.
+In :numref:`chapter_linear_algebra`, we saw the fundamentals of linear algebra and how to use it to store and transform data.  Indeed, it is safe to say that linear algebra is one of the key mathematical pillars of modern deep learning.  However the theory goes much deeper than we have seen, and in this section we will dive into the some of the key geometric notions associated with linear algebra, see additional interpretations of many of the operations we have met before, and meet a few additional concepts like eigenvalues and eigenvectors.
 
 ## Geometry of Vectors
-Before diving in to the geometric interpretation of the many operations from :numref:`chapter_linear_algebra`, we first need to discuss the two common geometric interpretations of vectors, as either points or directions in space. Fundamentally, a vector is a list of numbers like
+First, w need to discuss the two common geometric interpretations of vectors, as either points or directions in space. Fundamentally, a vector is a list of numbers such as the Python list below.
 
 ```{.python .input}
 [1,7,0,1]
@@ -16,7 +16,7 @@ $$
 \mathbf{x} = \begin{bmatrix}1\\7\\0\\1\end{bmatrix} \text{ or } \mathbf{x}^\top = \begin{bmatrix}1 & 7 & 0 & 1\end{bmatrix}.
 $$
 
-These often have different interpretations where data points are column vectors and weights used to form weighted sums are row vectors.  However, as we will see in this text, it can sometimes pay to be flexable.  As a general rule of thumb, we have adopted the convention of writing single data points and theoretical investigations in column vectors, however we switch to row vectors representing data points when working with actual data as this is the format of the majority of data we encounter.  This dichotomy in notation is ubiquitous in machine learning literature, so we match it while recognizing that it can be a bit combersome to the beginner.
+These often have different interpretations where data points are column vectors and weights used to form weighted sums are row vectors.  However, it can be beneficial to be flexable.  As a general rule of thumb, we have adopted the convention of writing single data points and theoretical statements in column vectors, however we switch to row vectors to represent data points when working with actual data.  This mirrors the fact that the majority of data we encounter is in this format.  This dichotomy in notation is ubiquitous in machine learning literature, so we match it while recognizing that it can be a bit combersome to the beginner.
 
 Given a vector, the first interpretation that we should give it is as a point in space.  In two or three dimensions, we can visualize these points by using the components of the vectors to define the location of the points in space compared to a fixed reference called the *origin*.
 
@@ -24,16 +24,15 @@ Given a vector, the first interpretation that we should give it is as a point in
 
 This way of visualizing the data can be freeing, and allows us to consider the problem on a more abstract level.  No longer faced with some insurmountable seeming problem like classifying pictures as either cats or dogs, we can start considering tasks abstractly as collections of points in space and picturing the task as discovering how to separate two distinct clusters of points.
 
-
-In parallel, there is a second point of view that people often take of vectors: as directions in space.  Equally as well as thinking of the vector $\mathbf{v} = (2,3)^\top$ as the location $2$ units to the right and $3$ units up from the origin, we can think of it as the direction itself to take $2$ steps to the right and $3$ steps up.  In this way, we consider all the vectors below should the same.
+In parallel, there is a second point of view that people often take of vectors: as directions in space.  Not only can we think of the vector $\mathbf{v} = [2,3]^\top$ as the location $2$ units to the right and $3$ units up from the origin, we can also think of it as the direction itself to take $2$ steps to the right and $3$ steps up.  In this way, we consider all the vectors belownthe same.
 
 ![Any vector can be visualized as an arrow in the plane.  In this case, every vector drawn is a representation of the vector $(2,3)$.](../img/ParVec.svg)
 
-One of the big benefits of this shift is that we can make visual sense of the act of vector addition: we follow the directions given by one vector, and then follow the directions given by the other.
+One of the benefits of this shift is that we can make visual sense of the act of vector addition.  In particular, we follow the directions given by one vector, and then follow the directions given by the other.
 
 ![We can visualize vector addition by fiirst following one vector, and then another.](../img/VecAdd.svg)
 
-Vector subtraction has a similar interpretation.  By considering the identity that $$\mathbf{u} = \mathbf{v} + (\mathbf{u}-\mathbf{v}),$$ we see that the vector $\mathbf{u}-\mathbf{v}$ is the directions that takes us from the point $\mathbf{u}$ to the point $\mathbf{v}$.
+Vector subtraction has a similar interpretation.  By considering the identity that $\mathbf{u} = \mathbf{v} + (\mathbf{u}-\mathbf{v})$, we see that the vector $\mathbf{u}-\mathbf{v}$ is the directions that takes us from the point $\mathbf{u}$ to the point $\mathbf{v}$.
 
 
 ## Dot Products and Angles
@@ -43,15 +42,15 @@ $$
 \mathbf{u}^\top\mathbf{v} = \sum_i u_i\cdot v_i.
 $$
 
-While discussion geometric interpretations of vectors, it is best to try and view this relationship more symmetrically, so we'll use the notation 
+While discussion geometric interpretations of vectors, it is best to try and view this relationship more symmetrically, so we'll mirror the notation of classical multiplication and write
 
 $$
 \mathbf{u}\cdot\mathbf{v} = \mathbf{u}^\top\mathbf{v} = \mathbf{v}^\top\mathbf{u},
 $$
 
-to highlight the fact that we can interchange the order of the vectors and get the same answer, as is the case in usual multiplication.
+to highlight the fact that we can interchange the order of the vectors and get the same answer.
 
-We already have one interpretation of vector dot products in terms of data transformation.  However, it turns out there is a nice geometric story we can tell.  In particular, let us see the relationship between the dot product and the angle between two vectors.
+It turns out there is a nice geometric story we can tell to help us interpret the dot product. In particular, we will see there is a close relationship between the dot product and the angle between two vectors.
 
 ![Between any two vectors in the plane there is a well defined angle $\theta$.  We will see this angle is intimately tied to the dot product.](../img/VecAngle.svg)
 
@@ -73,13 +72,13 @@ $$
 \theta = \arccos\left(\frac{\mathbf{v}\cdot\mathbf{w}}{\|\mathbf{v}\|\|\mathbf{w}\|}\right).
 $$
 
-In other words, for these two specific vectors, the dot product tells us the angle between the two vectors.  This same fact is true in general.  Indeed we have the following: for any two vectors $\mathbf{v}$ and $\mathbf{w}$, the angle between the two vectors is
+In other words, for these two specific vectors, the dot product tells us the angle between the two vectors.  This same fact is true in general.  We will not derive the expression here, however, if we consider writing $\|\mathbf{v} - \mathbf{w}\|^2$ in two ways: one with the dot product, and the other geometrically using the law of cosines, we can obtain the full relationship.  Indeed, for any two vectors $\mathbf{v}$ and $\mathbf{w}$, the angle between the two vectors is
 
 $$
 \theta = \arccos\left(\frac{\mathbf{v}\cdot\mathbf{w}}{\|\mathbf{v}\|\|\mathbf{w}\|}\right).
 $$
 
-This is a nice result since nothing in the computation references two-dimensions.  Indeed, we can use this in three or even three million dimensions without issue.
+This is a nice result since nothing in the computation references two-dimensions.  Indeed, we can use this in three or three million dimensions without issue.
 
 As a simple example, let's see how to compute the angle between a pair of vectors:
 
@@ -92,12 +91,12 @@ def angle(v, w) :
 print(angle(np.array([0,1,2]),np.array([2,3,4])))
 ```
 
-It is reasonable to ask: why is this useful?  And the answer comes in the kind of invariances we expect data to have.  Consider an image, and an image where every pixel value is $10\%$ the brightness in the original image.  The values of the individual pixels are in general far from the original values.  Thus, if one computed the distance between the original image and the darker one, the distance can be enormous.  However, for most ML applications, the *content* is the same (still an image of a cat for instance in a cat/dog classifier).  If we now consider the angle however, it is not hard to see that for any vector $\mathbf{v}$, the angle between $\mathbf{v}$ and $0.1\cdot\mathbf{v}$ is zero.  This corresponds to the fact that scaling vectors keeps the same direction, just changing the length.  The angle will consider the darker image identical.  
+It is reasonable to ask: why is this useful?  The answer comes in the kind of invariances we expect data to have.  Consider an image, and a duplicate image where every pixel value is the same but $10\%$ the brightness.  The values of the individual pixels are in general far from the original values.  Thus, if one computed the distance between the original image and the darker one, the distance can be large.  However, for most ML applications, the *content* is the same---it is still an image of a cat as far as a cat/dog classifier is concerned.  However, if we consider the angle, it is not hard to see that for any vector $\mathbf{v}$ the angle between $\mathbf{v}$ and $0.1\cdot\mathbf{v}$ is zero.  This corresponds to the fact that scaling vectors keeps the same direction, just changes the length.  The angle considers the darker image identical.  
 
 Examples like this are everywhere.  In text, we might want the topic being discussed to not change if we write twice as long of document that says the same thing.  For some encoding (such as counting the number of occurrences of words in some vocabulary), this corresponds to a doubling of the vector encoding the document, so again we can use the angle.
 
 ### Cosine Similarity
-Indeed the use of this as a measure of closeness, people have adopted the term *cosine similarity* to refer to the portion
+If we the use the angle as a measure of closeness, people have adopted the term *cosine similarity* to refer to the portion
 
 $$
 \cos(\theta) = \frac{\mathbf{v}\cdot\mathbf{w}}{\|\mathbf{v}\|\|\mathbf{w}\|}.
@@ -109,7 +108,7 @@ This takes a maximum value of $1$ when things are perfectly similar, a minimum v
 
 One of the key concepts we should understand is the notion of a *hyperplane*.  This is the high dimensional analogue of a line in two dimensions or a plan in three dimensions.
 
-Let us start with an example.  Suppose we have a column vector $\mathbf{w}=(2,1)^\top$.  We want to know, "what are the points $\mathbf{v}$ with $\mathbf{w}\cdot\mathbf{v} = 1$?"  By recalling the connection between dot products and angles above, we can see that this is equivalent to 
+Let us start with an example.  Suppose we have a column vector $\mathbf{w}=[2,1]^\top$.  We want to know, "what are the points $\mathbf{v}$ with $\mathbf{w}\cdot\mathbf{v} = 1$?"  By recalling the connection between dot products and angles above, we can see that this is equivalent to 
 
 $$
 \|\mathbf{v}\|\|\mathbf{w}\|\cos(\theta) = 1 \; \iff \; \|\mathbf{v}\|\cos(\theta) = \frac{1}{\|\mathbf{w}\|} = \frac{1}{\sqrt{5}}
@@ -135,13 +134,13 @@ we can see that these cases correspond to those where the projections are longer
 
 ![If we now consider the inequality version of the expression, we see that our hyperplane (in this case: just a line) separates the space into two halves.](../img/SpaceDivision.svg)
 
-The story in higer dimension is much the same.  If we now take $\mathbf{w} = (1,2,3)^\top$, and ask about the points in three dimensions with $\mathbf{w}\cdot\mathbf{v} = 1$, we obtain a plane at right angles to the given vector $\mathbf{w}$.  The two inequalities again define the two sides of the plane.
+The story in higer dimension is much the same.  If we now take $\mathbf{w} = [1,2,3]^\top$, and ask about the points in three dimensions with $\mathbf{w}\cdot\mathbf{v} = 1$, we obtain a plane at right angles to the given vector $\mathbf{w}$.  The two inequalities again define the two sides of the plane.
 
 ![Hyperplanes in any dimension separate the space into two halves.](../img/SpaceDivision3D.svg)
 
-While our ability to picture runs out at this point, nothing stops us from doing this in tens, hundreds, or billions of dimensions.
+While our ability to visualize runs out at this point, nothing stops us from doing this in tens, hundreds, or billions of dimensions.
 
-This occurs often when thinking about machine learned models.  For instance, we can understand linear classificaiton models like those from :numref:`chapter_softmax` as methods to find hyperplanes that separate the different target classes.  In this context, such hyperplanes are often referred to as *decision planes*.  Indeed, the majority of deep learned classificaiton models end with a linear layer fed into a softmax, so one can imagine the role of the deep neural network as finding a non-linear embedding so that the target classes can be separated cleanly by hyperplanes.
+This occurs often when thinking about machine learned models.  For instance, we can understand linear classificaiton models like those from :numref:`chapter_softmax` as methods to find hyperplanes that separate the different target classes.  In this context, such hyperplanes are often referred to as *decision planes*.  The majority of deep learned classificaiton models end with a linear layer fed into a softmax, so one can interpret the role of the deep neural network to be to find a non-linear embedding so that the target classes can be separated cleanly by hyperplanes.
 
 To give a hand-built example, notice that we can produce a reasonable model to classify hand drawn zeros from hand drawn ones, by just taking the vector between their means to define the decision plane.
 
@@ -172,9 +171,9 @@ print("Accuracy: {}".format(np.mean(predictions==y_test)))
 ```
 
 ## Geometry of linear transformations
-Through :numref:`chapter_linear_algebra` and the above discussions, we have a solid understanding of the geometry of vectors, lengths, and angles, however there is one important object we have omitted discussing, and that is a geometric understanding of linear transformations represented by matrices.  Fully internalizing what matrices can do to transform data between two potentially different high dimensional spaces takes significant practice, and is beyond the scope of this appendix.  However, we can work to build a strong intuition in two dimensions.
+Through :numref:`chapter_linear_algebra` and the above discussions, we have a solid understanding of the geometry of vectors, lengths, and angles. However there is one important object we have omitted discussing, and that is a geometric understanding of linear transformations represented by matrices.  Fully internalizing what matrices can do to transform data between two potentially different high dimensional spaces takes significant practice, and is beyond the scope of this appendix.  However, we can work to build a strong intuition in two dimensions.
 
-Suppose we have some matrix, say
+Suppose we have some matrix:
 
 $$
 \mathbf{A} = \begin{bmatrix}
@@ -182,7 +181,7 @@ a & b \\ c & d
 \end{bmatrix}.
 $$
 
-If we want to apply this to an arbitrary vector $\mathbf{v} = (x,y)$, we multiply and see that
+If we want to apply this to an arbitrary vector $\mathbf{v} = [x,y]^\top$, we multiply and see that
 
 $$
 \begin{aligned}
@@ -193,7 +192,7 @@ $$
 \end{aligned}
 $$
 
-This may seem like an odd computation where something clear became somewhat impenetrable.  However, what it tells us is that we can write the way that a $2\times 2$ matrix transforms *any* vector in terms of how $\mathbf{A}$ transforms *two specific vectors*: $(1,0)^\top$ and $(0,1)^\top$.  This is worth considering for a moment, since we have essentially reduced an infinite problem (what happens to any pair of real numbers) to a finite one (what happens to these specific vectors).  These vectors are an example a *basis*, where we can write any vector in our space as a weighted sum of these *basis vectors*.
+This may seem like an odd computation where something clear became somewhat impenetrable.  However, it tells us that we can write the way that a matrix transforms *any* vector in terms of how it transforms *two specific vectors*: $[1,0]^\top$ and $[0,1]^\top$.  This is worth considering for a moment. We have essentially reduced an infinite problem (what happens to any pair of real numbers) to a finite one (what happens to these specific vectors).  These vectors are an example a *basis*, where we can write any vector in our space as a weighted sum of these *basis vectors*.
 
 Let us draw what happens when we use the specific matrix
 
@@ -204,23 +203,23 @@ $$
 \end{bmatrix}.
 $$
 
-If we look at the specific vector $\mathbf{v} = (2,-1)^\top$, we see this is $2\cdot(1,0)^\top + -1\cdot(0,1)^\top$, and thus we know that the matrix $A$ will send this to $2(\mathbf{A}(1,0)^\top) + -1(\mathbf{A}(0,1))^\top = 2(1,-1)^\top - (2,3)^\top = (0,-5)^\top$.  If we follow this logic through carefully, say by considering the grid of all integer pairs of points, we see that what happens is that the matrix multiplication distorts and rearranges the original coordinates of our space while keeping the overall structure of the grid.
+If we look at the specific vector $\mathbf{v} = [2,-1]^\top$, we see this is $2\cdot[1,0]^\top + -1\cdot[0,1]^\top$, and thus we know that the matrix $A$ will send this to $2(\mathbf{A}[1,0]^\top) + -1(\mathbf{A}[0,1])^\top = 2[1,-1]^\top - [2,3]^\top = [0,-5]^\top$.  If we follow this logic through carefully, say by considering the grid of all integer pairs of points, we see that what happens is that the matrix multiplication can skew, rotate, and scale the grid, but the grid structure must remain.
 
-![The matrix $\mathbf{A}$ acting on the given basis vectors.  Notice how the entire grid is transported along with it.  This is a result of our computation above.](../img/GridTransform.svg)
+![The matrix $\mathbf{A}$ acting on the given basis vectors.  Notice how the entire grid is transported along with it.](../img/GridTransform.svg)
 
-This is the most important intuitive point to internalize about linear transformations represented by matrices.  They are incapable of distorting some parts of space differently than others.  All they can do is take the original coordinates on our space and distort them.
+This is the most important intuitive point to internalize about linear transformations represented by matrices.  Matrices are incapable of distorting some parts of space differently than others.  All they can do is take the original coordinates on our space and skew, rotate, and scale them.
 
 Some distortions can be severe.  For instance the matrix
 
 $$
 \mathbf{B} = \begin{bmatrix}
 2 & -1 \\ 4 & -2
-\end{bmatrix}.
+\end{bmatrix},
 $$
 
-Compresses the entire two-dimensional plane down to a single line.  Identifying and working with such transformations are the topic of a later section, but geometrically we can see that this is fundamentally different from the types of transformations we worked with before.  For instance, the result from matrix $\mathbf{A}$ can be "bent back" to the original grid.  The results from matrix $\mathbf{B}$ cannot since we will never know where the vector $(1,2)^\top$ came from---was it $(1,1)^\top$ or $(0,-1)^\top$?
+compresses the entire two-dimensional plane down to a single line.  Identifying and working with such transformations are the topic of a later section, but geometrically we can see that this is fundamentally different from the types of transformations we saw above.  For instance, the result from matrix $\mathbf{A}$ can be "bent back" to the original grid.  The results from matrix $\mathbf{B}$ cannot since we will never know where the vector $[1,2]^\top$ came from---was it $[1,1]^\top$ or $[0,-1]^\top$?
 
-While this picture was for a $2\times2$ matrix, nothing prevents us from taking the lessons learned into higher dimensions.  If we take similar basis vectors like $(1,0,\ldots,0)$ and see where our matrix sends them, we can start to get a feeling for how the matrix multiplication distorts the entire space.
+While this picture was for a $2\times2$ matrix, nothing prevents us from taking the lessons learned into higher dimensions.  If we take similar basis vectors like $[1,0,\ldots,0]$ and see where our matrix sends them, we can start to get a feeling for how the matrix multiplication distorts the entire space in whatever dimension space we are dealing with.
 
 ## Linear Dependence
 Consider again the matrix
@@ -231,13 +230,13 @@ $$
 \end{bmatrix}.
 $$
 
-This compresses the entire plane down to live on the single line $y = 2x$.  The question now arrises: is there some way we can detect this just looking at the matrix itself?  The answer is that indeed we can.  Lets take $\mathbf{b}_1 = (2,4)^\top$ and $\mathbf{b}_2 = (-1,-2)^\top$ be the two columns of $\mathbf{B}$.  Remember that we can write everything tranformed by the matrix $\mathbf{B}$ as a weighted sum of the columns of the matrix: like $a_1\mathbf{b}_1 + a_2\mathbf{b}_2$.  We call this a *linear combination*.  The fact that $\mathbf{b}_1 = -2\cdot\mathbf{b}_2$ means that we can write any linear combination of those two columns entirely in terms of say $\mathbf{b}_2$ since
+This compresses the entire plane down to live on the single line $y = 2x$.  The question now arrises: is there some way we can detect this just looking at the matrix itself?  The answer is that indeed we can.  Lets take $\mathbf{b}_1 = [2,4]^\top$ and $\mathbf{b}_2 = [-1,-2]^\top$ be the two columns of $\mathbf{B}$.  Remember that we can write everything tranformed by the matrix $\mathbf{B}$ as a weighted sum of the columns of the matrix: like $a_1\mathbf{b}_1 + a_2\mathbf{b}_2$.  We call this a *linear combination*.  The fact that $\mathbf{b}_1 = -2\cdot\mathbf{b}_2$ means that we can write any linear combination of those two columns entirely in terms of say $\mathbf{b}_2$ since
 
 $$
 a_1\mathbf{b}_1 + a_2\mathbf{b}_2 = -2a_1\mathbf{b}_2 + a_2\mathbf{b}_2 = (a_2-2a_1)\mathbf{b}_2.
 $$
 
-This means that one of the columns is in a sense redundant in that it does not define a unique direction in space.  This should not suprise us too much since we already saw in the last section that this matrix collapses the entire plane down into a single line.  We can capture this collapse with our linear dependence: $\mathbf{b}_1 = -2\cdot\mathbf{b}_2$.  To make this more symmetrical between the two vectors, we will write this as
+This means that one of the columns is in a sense redundant as it does not define a unique direction in space.  This should not suprise us too much since we already saw that this matrix collapses the entire plane down into a single line.  Moreover, we see that the linear dependence $\mathbf{b}_1 = -2\cdot\mathbf{b}_2$ captures this.  To make this more symmetrical between the two vectors, we will write this as
 
 $$
 \mathbf{b}_1  + 2\cdot\mathbf{b}_2 = 0.
@@ -249,11 +248,11 @@ $$
 \sum_{i=1}^k a_i\mathbf{v_i} = 0.
 $$
 
-In this case, we could solve for one of the vectors in terms of some combination of the others, and effectively render it redundant.  Thus a linear dependence in the columns of a matrix is a witness to the fact that our matrix is compressing the space down to something lower dimension than it potentially could be.  If there is no linear dependence, then there is no compression into a lower dimensional space, and we say the vectors are *linearly independent*. 
+In this case, we can solve for one of the vectors in terms of some combination of the others, and effectively render it redundant.  Thus a linear dependence in the columns of a matrix is a witness to the fact that our matrix is compressing the space down to something lower dimension than it potentially could be.  If there is no linear dependence we say the vectors are *linearly independent*. If the columns of a matrix are linearly independent, no compression occurs and the operation can be undone.
 
 ## Rank
 
-If we have a general $n\times m$ matrix, it is reasonable to ask what dimension space the matrix maps into.  A concept known as the *rank* will be our answer.  In the previous section, we noted that a linear dependence bears witness to compression of space into a lower dimension than it might originally appear, and so we will be able to use this to define the notion of rank.  In particular, the rank of a matrix $\mathbf{A}$ is the largest number of linearly independent columns that we can find.  For example, the matrix
+If we have a general $n\times m$ matrix, it is reasonable to ask what dimension space the matrix maps into.  A concept known as the *rank* will be our answer.  In the previous section, we noted that a linear dependence bears witness to compression of space into a lower dimension than it might originally appear, and so we will be able to use this to define the notion of rank.  In particular, the rank of a matrix $\mathbf{A}$ is the largest number of linearly independent columns amongst all subsets of columns.  For example, the matrix
 
 $$
 \mathbf{B} = \begin{bmatrix}
@@ -274,10 +273,10 @@ $$
 
 and show that $\mathbf{C}$ has rank two since, for instance, the first two columns are linearly independent, however any of the four collections of three columns are dependent.  
 
-This procedure, as described, is very inefficient.  It requires looking at every subset of the columns of our given matrix, and thus is potentially exponential in the number of columns.  Later we will see a more computationally efficient way to compute the rank of a matrix, but for now, this is sufficient to see that the concept is well defined and understand what it intuitively means.
+This procedure, as described, is very inefficient.  It requires looking at every subset of the columns of our given matrix, and thus is potentially exponential in the number of columns.  Later we will see a more computationally efficient way to compute the rank of a matrix, but for now, this is sufficient to see that the concept is well defined and understand the meaning.
 
 ## Invertibility
-We have seen intuitively above that matrices which compress down to lower dimensions cannot be undone.  However, if the matrix has full rank (that is if $\mathbf{A}$ is an $n \times n$ matrix with rank $n$), we should always be able to undo it.  Consider the matrix
+We have seen above that matrices which compress down to lower dimensions cannot be undone.  However, if the matrix has full rank (that is if $\mathbf{A}$ is an $n \times n$ matrix with rank $n$), we should always be able to undo it.  Consider the matrix
 
 $$
 \mathbf{I} = \begin{bmatrix}
@@ -288,13 +287,13 @@ $$
 \end{bmatrix}.
 $$
 
-which is the matrix with ones along the diagonal, and zeros elsewhere.  We call this the *identity* matrix.  It is the matrix which leaves our data alone when applied.  To find a matrix which undoes what our matrix $\mathbf{A}$ has done, we want to find a matrix $\mathbf{A}^{-1}$ such that
+which is the matrix with ones along the diagonal, and zeros elsewhere.  We call this the *identity* matrix.  It is the matrix which leaves our data unchanged when applied.  To find a matrix which undoes what our matrix $\mathbf{A}$ has done, we want to find a matrix $\mathbf{A}^{-1}$ such that
 
 $$
 \mathbf{A}^{-1}\mathbf{A} = \mathbf{I}.
 $$
 
-If we look at this as a system, we have $n \times n$ unknowns (the entries of $\mathbf{A}^{-1}$) and $n \times n$ equations (the equality that needs to hold between every entry of the product $\mathbf{A}^{-1}\mathbf{A}$ and every entry of $\mathbf{I}$) so we should generically expect a solution to exist.  Indeed, in the next section we will see a quantity called the *determinant* which has the property that as long as the determinant is not zero, we can find a solution.  We call this the *inverse* matrix.  As an example, if $\mathbf{A}$ is the general $2 \times 2$ matrix 
+If we look at this as a system, we have $n \times n$ unknowns (the entries of $\mathbf{A}^{-1}$) and $n \times n$ equations (the equality that needs to hold between every entry of the product $\mathbf{A}^{-1}\mathbf{A}$ and every entry of $\mathbf{I}$) so we should generically expect a solution to exist.  Indeed, in the next section we will see a quantity called the *determinant* which has the property that as long as the determinant is not zero, we can find a solution.  We call such a matrix $\mathbf{A}^{-1}$ the *inverse* matrix.  As an example, if $\mathbf{A}$ is the general $2 \times 2$ matrix 
 
 $$
 \mathbf{A} = \begin{bmatrix}
@@ -332,14 +331,14 @@ $$
 \mathbf{x} = \mathbf{A}^{-1}\mathbf{b}.
 $$
 
-Indeed, just by a small number division can lead to numerical instability, so can inversion of a matrix which is nearly 
+Just as divison by a small number can lead to numerical instability, so can inversion of a matrix which is close to having low rank.
 
-In addition, it is common that the matrix $\mathbf{A}$ is *sparse*, which is to say that it contains only a small number of non-zero values.  If we were to explore examples, we would see that this does not mean the inverse is sparse, so even if $\mathbf{A}$ was a $1$ million by $1$ million matrix with only $5$ milion non-zero entries (and thus we need only store those $5$ million), the inverse will generically have almost every entry non-negative meaning we need to store all $1$ million squared entries---$1$ trillion entries!
+Moreover, it is common that the matrix $\mathbf{A}$ is *sparse*, which is to say that it contains only a small number of non-zero values.  If we were to explore examples, we would see that this does not mean the inverse is sparse. Wven if $\mathbf{A}$ was a $1$ million by $1$ million matrix with only $5$ milion non-zero entries (and thus we need only store those $5$ million), the inverse will generically have almost every entry non-negative meaning we need to store all $1$ million squared entries---$1$ trillion entries!
 
-A deep dive into the numerical issues encountered when working with linear algebra is beyond the scope of our text, however it is worth knowing that we should be caution, and generally avoid inversion if we can.
+A deep dive into the numerical issues encountered when working with linear algebra is beyond the scope of our text, however it is worth knowing that we should be caution, and generally avoid inversion in practice if we can.
 
 ## Determinant
-Our geometric deep-dive gives the perfect opportunity to get an intuitive understanding of a quantity known as the *determinant*.  Consider the grid image from before.
+Our geometric deep-dive gives the perfect opportunity to gain an understanding of a quantity known as the *determinant*.  Consider the grid image from before.
 
 ![The matrix $\mathbf{A}$ again distorting the grid.  This time, I want to draw particular attention to what happens to the highlighted square.](../img/GridTransformFilled.svg)
 
@@ -352,7 +351,7 @@ $$
 \end{bmatrix},
 $$
 
-it is an exercise in coordinate geometry to compute the area of this parallelogram with edges $(1,-1)$ and $(2,3)$, and what we obtain is that the area is $5$.
+it is an exercise in coordinate geometry to compute the area of this parallelogram and obtain that the area is $5$.
 
 In general, if we have a matrix
 
@@ -386,7 +385,7 @@ If we compute the determinant of this matrix we get $2\cdot(-2 ) - 4\cdot(-1) = 
 
 As a final comment, imagine that we have any figure drawn on the plane.  Thinking like computer scientists, we can decompose that figure into a collection of little squares so that the area of the figure is in essence just the number of squares in the decomposition.  If we now transform that figure by a matrix, we send each of these squares to parallelograms, each one of which has area given by the determinant.  We see that for any figure, the determinant gives the (signed) number that a matrix scales the area of any figure.
 
-We will return to understand more on how to compute determinants in a later section for larger matrices, but the basic intuition is the same.  The determinant is the factor that $n\times n$ matricies scale $n$-dimensional volumes.
+Computing determinants for larger matrices can be laborious, but the  intuition is the same.  The determinant remains the factor that $n\times n$ matricies scale $n$-dimensional volumes.
 
 ## Eigendecompositions
 Eigenvalues are often one of the most useful notions we will encounter when studying linear algebra, however in the beginning it is easy to overlook their importance.  Let us explore what these objects are!
@@ -400,9 +399,9 @@ $$
 \end{bmatrix}.
 $$
 
-If we apply $A$ to any vector $\mathbf{v} = (x,y)$, we obtain a vector $\mathbf{v}A = (2x,-y)$.  This has an intuitive interpretation: stretch the vector to be twice as wide in the $x$-direction, and then flip it in the $y$-direction.  The matrxi sends almost every vector to one completely geometrically unrelated.  
+If we apply $A$ to any vector $\mathbf{v} = [x,y]^\top$, we obtain a vector $\mathbf{v}A = [2x,-y]^\top$.  This has an intuitive interpretation: stretch the vector to be twice as wide in the $x$-direction, and then flip it in the $y$-direction.  The matrxi sends almost every vector to one completely geometrically unrelated.  
 
-However, there are *some* vectors for which something remains unchanged.  Namely $(1,0)$ gets sent to $(2,0)$ and $(0,1$ get sent to $(0,-1)$.  These vectors are still in the same line, and the only modification is that the matrix stretches them by a factor of $2$ and $-1$ respectively.  We call such vectors *eigenvectors* and the factor they are stretched by *eigenvalues*.
+However, there are *some* vectors for which something remains unchanged.  Namely $[1,0]^\top$ gets sent to $[2,0]^\top$ and $[0,1]^\top$ get sent to $[0,-1]^\top$.  These vectors are still in the same line, and the only modification is that the matrix stretches them by a factor of $2$ and $-1$ respectively.  We call such vectors *eigenvectors* and the factor they are stretched by *eigenvalues*.
 
 In general, if we can find a number $\lambda$ and a vector $\mathbf{v}$ such that 
 
@@ -444,7 +443,7 @@ $$
 \end{bmatrix}\begin{bmatrix}x \\ y\end{bmatrix}  = \begin{bmatrix}4x \\ 4y\end{bmatrix} .
 $$
 
-We can solve this with the vectors $(1,-1)^\top$ and $(1,2)^\top$ respectively.
+We can solve this with the vectors $[1,-1]^\top$ and $[1,2]^\top$ respectively.
 
 We can check this in code using the built-in numpy `numpy.linalg.eig` routine.
 
@@ -456,7 +455,7 @@ print(w)
 print(v)
 ```
 
-*Note*: this normalizes the eigenvectors to be of length one, wheras we took ours to be of arbitrary length.  Additionally, the choice of sign is arbitrary.
+Note that `numpy` normalizes the eigenvectors to be of length one, wheras we took ours to be of arbitrary length.  Additionally, the choice of sign is arbitrary.  However, the vectors computed are parallel to the ones we found by hand with the same eigenvalues.
 
 ### Decomposing Matrices
 Let us continue the previous example one step further.  Let
@@ -514,7 +513,9 @@ $$
 
 or the product of all the eigenvalues.  This makes good intuitive sense because whatever stretching $\mathbf{W}$ does, $W^{-1}$ undoes it, so in net the only stretching that happens is by multiplication by the diagonal matrix $\boldsymbol{\Sigma}$ which stretched volumes by the product of the diagonal elements.
 
-The examples could continue, but I think the point is clear: eigendecompositions can simplify many linear algebraic computations and form a core component of a deep understanding of how matrices act. 
+Finally, recall that the rank was the maximum number of linearly independent columns of your matrix.  By examining the eigendecomposition closely, we can see that the rank is the same as the number of non-zero eigenvalues of $\mathbf{A}$.
+
+The examples could continue, but I think the point is clear: eigendecompositions can simplify many linear algebraic computations and form a core component of a deep understanding linear algebra. 
 
 ### Eigendecompositions of Symmetric Matrices
 It is not always possible to find enough linearly independent eigenvectors for the above process to work.  For instance the matrix
@@ -535,9 +536,9 @@ $$
 $$
 
 ### Gershgorin Circle Theorem
-Eigenvalues are often difficult to reason with intuitively.  If presented an arbitrary matrix, it is there is little that can be said about what the eigenvalues are without computing them.  There is, however, one theorem that can make it easy to approximate if the largest values are on the diagonal.
+Eigenvalues are often difficult to reason with intuitively.  If presented an arbitrary matrix, there is little that can be said about what the eigenvalues are without computing them.  There is, however, one theorem that can make it easy to approximate well if the largest values are on the diagonal.
 
-Let $\mathbf{A} = (a_{ij})$ be any square matrix ($n\times n$).  We will define $r_i = \sum_{j \neq i} |a_{ij}|$.  Define $\mathcal{D}_i$ as the disk in the complex plane with center $a_{ii}$ radius $r_i$.  Then, every eigenvalue of $\mathbf{A}$ is contained in one of the $\mathcal{D}_i$.
+Let $\mathbf{A} = (a_{ij})$ be any square matrix ($n\times n$).  We will define $r_i = \sum_{j \neq i} |a_{ij}|$.  Let $\mathcal{D}_i$ represent the disc in the complex plane with center $a_{ii}$ radius $r_i$.  Then, every eigenvalue of $\mathbf{A}$ is contained in one of the $\mathcal{D}_i$.
 
 This can be a bit to unpack, so let us look at an example.  Consider the matrix:
 
@@ -550,7 +551,18 @@ $$
 \end{bmatrix}.
 $$
 
-We have $r_1 = 0.3$, $r_2 = 0.6$, $r_3 = 0.8$ and $r_4 = 0.9$.  The matrix is symmetric, so all eigenvalues are real.  This means that all of our eigenvalues will be in one of the ranges of $[0.7,1.3]$, $[2.4,3.6]$, $[4.2,5.8]$, and $[8.1,9.9]$.  Indeed performing the numerical computation shows that the eigenvalues are approximately $0.99, 2.97, 4.95, 9.08$, all comfortably inside the ranges provided.  
+We have $r_1 = 0.3$, $r_2 = 0.6$, $r_3 = 0.8$ and $r_4 = 0.9$.  The matrix is symmetric, so all eigenvalues are real.  This means that all of our eigenvalues will be in one of the ranges of 
+
+$$
+\begin{aligned}
+[a_{11}-r_1,a_{11}+r_1] & = [0.7,1.3], \\
+[a_{22}-r_2,a_{22}+r_2] & = [2.4,3.6], \\
+[a_{33}-r_3,a_{33}+r_3] & = [4.2,5.8], \\
+[a_{44}-r_4,a_{44}+r_4] & = [8.1,9.9].
+\end{aligned}
+$$
+
+Performing the numerical computation shows that the eigenvalues are approximately $0.99, 2.97, 4.95, 9.08$, all comfortably inside the ranges provided.  
 
 ```{.python .input}
 A = np.array([[1.0, 0.1, 0.1, 0.1],
@@ -562,9 +574,9 @@ v, _ = np.linalg.eig(A)
 print(v)
 ```
 
-In this way, eigenvalues can be approximated, and the approximations will be pretty strong as long in the case that the diagonal is significantly larger than all the other elements.  
+In this way, eigenvalues can be approximated, and the approximations will be pretty strong in the case that the diagonal is significantly larger than all the other elements.  
 
-It is a small thing, but with a complex and subtle topic like eigendecomposition, it is good to get any intuitive grasp we can!
+It is a small thing, but with a complex and subtle topic like eigendecomposition, it is good to get any intuitive grasp we can.
 
 ### A useful application: The growth of iterated maps
 
