@@ -189,7 +189,7 @@ plots = [np.sin(xs)]
 
 # Compute some linear approximations
 # uses: d(sin(x))/dx = cos(x)
-for x0 in [-2.5,-1.5,0,2] :
+for x0 in [-1.5,0,2] :
     plots.append(np.sin(x0) + (xs-x0)*np.cos(x0))
 
 # Plot them
@@ -230,18 +230,17 @@ $$
 Just as the previous section showed that the first derivative gives the best approximation to a function by a line, we might now ask if having the first and second derivative gives the best approximation by a quadratic.  The answer is yes!  The next section shows how we can continue this reasoning to obtain the *Taylor series*, however, lets end this section with a taste of what that looks like for the function $\sin(x)$.
 
 ```{.python .input}
-# Plot Sin
+# Compute Sin
 xs = np.arange(-np.pi,np.pi,0.01)
-ys = np.sin(xs)
-plt.plot(xs,ys)
+plots = [np.sin(xs)]
 
-# Plot some quadratic approximations
-# uses: d(sin(x))/dx = cos(x) and d(cos(x))/dx = -sin(x)
-for x0 in [-2.5,-1.5,0,2] :
-    plt.plot(xs, np.sin(x0) + (xs-x0)*np.cos(x0) - (xs-x0)**2*np.sin(x0)/2,linestyle="--")
+# Compute some quadratic approximations
+# uses: d(sin(x))/dx = cos(x)
+for x0 in [-1.5,0,2] :
+    plots.append(np.sin(x0) + (xs-x0)*np.cos(x0) - (xs-x0)**2*np.sin(x0)/2)
 
-plt.ylim([-1.5,1.5])
-plt.show()
+# Plot them
+d2l.plot(xs, plots, ylim=[-1.5,1.5])
 ```
 
 ### Taylor Series
@@ -290,25 +289,16 @@ $$
 Let us see how this works in code and observe how increasing the degree of the Taylor approximation brings us closer to the desired function $e^x$.
 
 ```{.python .input}
-# Plot the exponential function
+# Compute the exponential function
 xs = np.arange(0,np.e,0.01)
 ys = np.exp(xs)
-plt.plot(xs,ys, label = "exponential")
 
-# Plot sequential Taylor series approximations
+# Compute a few Taylor series approximations
 P1 = 1 + xs
 P2 = 1 + xs + xs**2/2
-P3 = 1 + xs + xs**2/2 + xs**3/6
-P4 = 1 + xs + xs**2/2 + xs**3/6 + xs**4/24
 P5 = 1 + xs + xs**2/2 + xs**3/6 + xs**4/24 + xs**5/120
 
-plt.plot(xs,P1, label = "Degree 1 Taylor Series")
-plt.plot(xs,P2, label = "Degree 2 Taylor Series")
-plt.plot(xs,P3, label = "Degree 3 Taylor Series")
-plt.plot(xs,P4, label = "Degree 4 Taylor Series")
-plt.plot(xs,P5, label = "Degree 5 Taylor Series")
-plt.legend()
-plt.show()
+d2l.plot(xs,[ys,P1,P2,P5], legend = ["Exponential", "Degree 1 Taylor Series", "Degree 2 Taylor Series", "Degree 5 Taylor Series"])
 ```
 
 Taylor series have two primary uses:
@@ -426,8 +416,7 @@ The only possible location of minima are at $x = -1, 0, 2$, where the function t
 x = np.arange(-2,3,0.01)
 f = 3*x**4 - 4*x**3 -12*x**2
 
-plt.plot(x,f)
-plt.show()
+d2l.plot(x,f)
 ```
 
 This highlights an important fact to know when working either theoretically or numerically: the only possible points where we can minimize (or maximize) a function will have gradient equal to zero, however, not every point with gradient zero is the minimum (or maximum).  
