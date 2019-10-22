@@ -48,7 +48,7 @@ $$
 \end{bmatrix}.
 $$
 
-Here, $x_{ij}$ is the element in row $i \in \{1, \ldots m\}$ and column $j \in \{1, \ldots n\}$ in the matrix $\mathbf{X}$. Extending the vector notation we use $\mathbf{X} \in \mathbb{R}^{m \times n}$ to indicate that $\mathbf{X}$ is an $m \times n$ matrix. Given the above we could interpret vectors as $m \times 1$ dimensional matrices. Furthermore, matrices also form a vector space, i.e. we can multiply and add them just fine, as long as their dimensions match.
+Here, $x_{ij}$ is the element in row $i \in \{1, \ldots, m\}$ and column $j \in \{1, \ldots, n\}$ in the matrix $\mathbf{X}$. Extending the vector notation we use $\mathbf{X} \in \mathbb{R}^{m \times n}$ to indicate that $\mathbf{X}$ is an $m \times n$ matrix. Given the above we could interpret vectors as $m \times 1$ dimensional matrices. Furthermore, matrices also form a vector space, i.e. we can multiply and add them just fine, as long as their dimensions match.
 
 
 ### Operations
@@ -148,7 +148,7 @@ $$
 \end{bmatrix}.
 $$
 
-The product is a matrix with $m$ rows and $n$ columns, with the element in row $i \in \{1, \ldots m\}$ and column $j \in \{1, \ldots n\}$ equal to
+The product is a matrix with $m$ rows and $n$ columns, with the element in row $i \in \{1, \ldots, m\}$ and column $j \in \{1, \ldots, n\}$ equal to
 
 $$\left[\mathbf{A} \mathbf{B}\right]_{ij} = a_{i1}b_{1j}  + a_{i2}b_{2j} + \ldots + a_{ip}b_{pj} = \sum_{k=1}^p a_{ik}b_{kj}.$$
 

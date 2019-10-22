@@ -29,17 +29,17 @@ Consider a deep network with $d$ layers,
 input $\mathbf{x}$ and output $\mathbf{o}$.
 Each layer satisfies:
 
-$$\mathbf{h}^{t+1} = f_t (\mathbf{h}^t) \text{ and thus } \mathbf{o} = f_d \circ \ldots \circ f_1(\mathbf{x})$$
+$$\mathbf{h}^{t+1} = f_t (\mathbf{h}^t) \text{ and thus } \mathbf{o} = f_d \circ \ldots, \circ f_1(\mathbf{x})$$
 
 If all activations and inputs are vectors,
 we can write the gradient of $\mathbf{o}$
 with respect to any set of parameters $\mathbf{W}_t$
 associated with the function $f_t$ at layer $t$ simply as
 
-$$\partial_{\mathbf{W}_t} \mathbf{o} = \underbrace{\partial_{\mathbf{h}^{d-1}} \mathbf{h}^d}_{:= \mathbf{M}_d} \cdot \ldots \cdot \underbrace{\partial_{\mathbf{h}^{t}} \mathbf{h}^{t+1}}_{:= \mathbf{M}_t} \underbrace{\partial_{\mathbf{W}_t} \mathbf{h}^t}_{:= \mathbf{v}_t}.$$
+$$\partial_{\mathbf{W}_t} \mathbf{o} = \underbrace{\partial_{\mathbf{h}^{d-1}} \mathbf{h}^d}_{:= \mathbf{M}_d} \cdot \ldots, \cdot \underbrace{\partial_{\mathbf{h}^{t}} \mathbf{h}^{t+1}}_{:= \mathbf{M}_t} \underbrace{\partial_{\mathbf{W}_t} \mathbf{h}^t}_{:= \mathbf{v}_t}.$$
 
 In other words, it is the product of $d-t$ matrices
-$\mathbf{M}_d \cdot \ldots \cdot \mathbf{M}_t$
+$\mathbf{M}_d \cdot \ldots, \cdot \mathbf{M}_t$
 and the gradient vector $\mathbf{v}_t$.
 What happens is similar to the situation
 when we experienced numerical underflow

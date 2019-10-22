@@ -242,7 +242,7 @@ $$
 \mathbf{b}_1  + 2\cdot\mathbf{b}_2 = 0.
 $$
 
-In general, we will say that a collection of vectors $\mathbf{v}_1, \ldots \mathbf{v}_k$ are *linearly dependent* if there exist coefficients $a_1, \ldots, a_k$ *not all equal to zero* so that
+In general, we will say that a collection of vectors $\mathbf{v}_1, \ldots, \mathbf{v}_k$ are *linearly dependent* if there exist coefficients $a_1, \ldots, a_k$ *not all equal to zero* so that
 
 $$
 \sum_{i=1}^k a_i\mathbf{v_i} = 0.
