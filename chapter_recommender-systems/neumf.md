@@ -7,29 +7,29 @@ This section moves beyond explicit feedback, introducing the neural collaborativ
 As aforementioned, NeuMF fuses two subnetworks. The GMF is a generic neural network version of matrix factorization where the input is the element-wise product of user and item latent factors. It consists of two neural layers:
 
 $$
-x_1 = \textbf{P}_u \odot \textbf{Q}_i \\
-\hat{y_{ui}} = \alpha(h^T x_1)
+\mathbf{x} = \mathbf{p}_u \odot \mathbf{q}_i \\
+\hat{y}_{ui} = \alpha(\mathbf{h}^\top \mathbf{x}),
 $$
 
-where $\odot$ denotes the Hadamard product of vectors. $P \in \mathbb{R}^{M \times k}$  and $\textbf{Q} \in \mathbb{R}^{N \times k}$ corespond to user and item latent matrix respectively. $\alpha$ and $h$ denote the activation function and weight of the output layer. $\hat{y_{ui}}$ is the prediction score of the user $u$ might give to the item $i$. 
+where $\odot$ denotes the Hadamard product of vectors. $\mathbf{P} \in \mathbb{R}^{m \times k}$  and $\mathbf{Q} \in \mathbb{R}^{n \times k}$ corespond to user and item latent matrix respectively. $\mathbf{p}_u \in \mathbb{R}^{ k}$ is the $u^\mathrm{th}$ row of $P$ and $\mathbf{q}_i \in \mathbb{R}^{ k}$ is the $i^\mathrm{th}$ row of $Q$.  $\alpha$ and $h$ denote the activation function and weight of the output layer. $\hat{y}_{ui}$ is the prediction score of the user $u$ might give to the item $i$. 
 
 Another component of this model is MLP. To enrich model flexibility, the MLP subnetwork does not share user and item embeddings with GMF. It uses the concatenation of user and item embeddings as input. With the complicated connections and nonlinear transformations, it is capable of eastimating the intricate interactions between users and items. More precisely, the MLP subnetwork is defined as:
 
 $$
 \begin{aligned}
-z_1 &= \phi_1(\textbf{U}_u, \textbf{V}_i) = \left[ \textbf{U}_u, \textbf{V}_i \right] \\
-\phi_2(z_1)  &= \alpha_1(\textbf{W}_2^Tz_1 + b_2) \\
-... \\
-\phi_L(z_{L-1}) &= \alpha_L(\textbf{W}^T_Lz_{L-1} + b_L)) \\
-\hat{y_{ui}} &= \alpha(h^T\phi_L(z_{L-1}))
+z^{(1)} &= \phi_1(\mathbf{U}_u, \mathbf{V}_i) = \left[ \mathbf{U}_u, \mathbf{V}_i \right] \\
+\phi^{(2)}(z^{(1)})  &= \alpha^1(\mathbf{W}^{(2)} z^{(1)} + b^{(2)}) \\
+&... \\
+\phi^{(L)}(z^{(L-1)}) &= \alpha^L(\mathbf{W}^{(L)} z^{(L-1)} + b^{(L)})) \\
+\hat{y}_{ui} &= \alpha(\mathbf{h}^\top\phi^L(z^{(L)}))
 \end{aligned}
 $$
 
-where $W_*, b_*$ and $\alpha_*$ denote the weight matrix, bias vector, and activation function. $\phi_*$ denotes the function of the corresponding layer. $z_*$ denotes the output of corresponding layer.
+where $\mathbf{W}^*, \mathbf{b}^*$ and $\alpha^*$ denote the weight matrix, bias vector, and activation function. $\phi^*$ denotes the function of the corresponding layer. $\mathbf{z}^*$ denotes the output of corresponding layer.
 
-To fuse the results of GMF and MLP, instead of simple addition, NeuMF concatenates the second last layers of two subnetworks to create a feature vector which can be passed to the further layers. Afterwards, the ouputs are projected with matrix $h$ and a sigmoid activation function. The prediction layer is formulated as:
+To fuse the results of GMF and MLP, instead of simple addition, NeuMF concatenates the second last layers of two subnetworks to create a feature vector which can be passed to the further layers. Afterwards, the ouputs are projected with matrix $\mathbf{h}$ and a sigmoid activation function. The prediction layer is formulated as:
 $$
-\hat{y_{ui}} = \sigma(h^T[x_1, \phi_L(z_{L-1})])
+\hat{y}_{ui} = \sigma(\mathbf{h}^\top[\mathbf{x}, \phi^L(z^{(L)})]).
 $$
 
 The following figure illustrates the model architecture of NeuMF.
@@ -44,6 +44,22 @@ import mxnet as mx
 import math
 import random
 npx.set_np()
+```
+
+```{.json .output n=1}
+[
+ {
+  "ename": "ModuleNotFoundError",
+  "evalue": "No module named 'd2l'",
+  "output_type": "error",
+  "traceback": [
+   "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+   "\u001b[0;31mModuleNotFoundError\u001b[0m                       Traceback (most recent call last)",
+   "\u001b[0;32m<ipython-input-1-e47847c97ca6>\u001b[0m in \u001b[0;36m<module>\u001b[0;34m\u001b[0m\n\u001b[0;32m----> 1\u001b[0;31m \u001b[0;32mimport\u001b[0m \u001b[0md2l\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      2\u001b[0m \u001b[0;32mfrom\u001b[0m \u001b[0mmxnet\u001b[0m \u001b[0;32mimport\u001b[0m \u001b[0mautograd\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0minit\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mgluon\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mnp\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mnpx\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      3\u001b[0m \u001b[0;32mfrom\u001b[0m \u001b[0mmxnet\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mgluon\u001b[0m \u001b[0;32mimport\u001b[0m \u001b[0mnn\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      4\u001b[0m \u001b[0;32mimport\u001b[0m \u001b[0mmxnet\u001b[0m \u001b[0;32mas\u001b[0m \u001b[0mmx\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      5\u001b[0m \u001b[0;32mimport\u001b[0m \u001b[0mmath\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+   "\u001b[0;31mModuleNotFoundError\u001b[0m: No module named 'd2l'"
+  ]
+ }
+]
 ```
 
 ## Model Implementation
@@ -89,10 +105,10 @@ def negative_sampler(users, candidates, num_items):
 ```
 
 ## Evaluator
-In this section, we adopt the splitting by time strategy to construct the training and test sets. Two evaluation measures including hit rate at given cutting off $\ell$ (Hit@\ell) and Area Under the Roc Curve (AUC) are used to assess the model effectiveness.  Hit rate at given position $\ell$ for each user indicates that whether the recommended item is included in the top $\ell$ ranked list. The formal definition is as follows:
+In this section, we adopt the splitting by time strategy to construct the training and test sets. Two evaluation measures including hit rate at given cutting off $\ell$ ($\text{Hit}@\ell$) and area under the ROC curve (AUC) are used to assess the model effectiveness.  Hit rate at given position $\ell$ for each user indicates that whether the recommended item is included in the top $\ell$ ranked list. The formal definition is as follows:
 
 $$
-Hit@\ell = \frac{1}{m} \sum_{u \in \mathcal{U}} \textbf{1}(rank_{u, g_u} <= \ell)
+\text{Hit}@\ell = \frac{1}{m} \sum_{u \in \mathcal{U}} \textbf{1}(rank_{u, g_u} <= \ell),
 $$
 
 where $\textbf{1}$ denotes an indicator function that is equal to one if the ground truth item is ranked in the top $\ell$ list, otherwise it is equal to zero. $rank_{u, g_u}$ denotes the ranking of the ground truth item $g_u$ of the user $u$ in the recommendation list (The ideal ranking is 1). $m$ is the number of users. $\mathcal{U}$ is the user set.
@@ -100,10 +116,10 @@ where $\textbf{1}$ denotes an indicator function that is equal to one if the gro
 The definition of AUC is as follows:
 
 $$
-AUC = \frac{1}{m} \sum_{u \in \mathcal{U}} \frac{1}{|\mathcal{I} \backslash S_u|} \sum_{j \in I \backslash S_u} \textbf{1}(rank_{u, g_u} < rank_{u, j})
+\text{AUC} = \frac{1}{m} \sum_{u \in \mathcal{U}} \frac{1}{|\mathcal{I} \backslash S_u|} \sum_{j \in I \backslash S_u} \textbf{1}(rank_{u, g_u} < rank_{u, j}),
 $$
 
-where $\mathcal{I}$ is the item set. $S_u$ is the candidate items of user $u$. Note that many other evaluation protocals such as precision, recall and Normalized Discounted Cumulative Gain (NDCG) can also be used. 
+where $\mathcal{I}$ is the item set. $S_u$ is the candidate items of user $u$. Note that many other evaluation protocals such as precision, recall and normalized discounted cumulative gain (NDCG) can also be used. 
 
 The following function caculates the hit counts and AUC for each user.
 
@@ -163,7 +179,7 @@ def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
                   negative_sampler, candidates):
     num_batches, timer = len(train_iter), d2l.Timer()
     animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs], ylim=[0, 1],
-                            legend=['train loss','test Hit Rate', 'test AUC'])
+                            legend=['test Hit Rate', 'test AUC'])
     for epoch in range(num_epochs):
         metric, l = d2l.Accumulator(3), 0.
         for i, values in enumerate(train_iter):
@@ -187,7 +203,7 @@ def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
                                       ctx_list)
         train_l = l / (i + 1)
         print(train_l)
-        animator.add(epoch + 1, (train_l, hit_rate, auc))
+        animator.add(epoch + 1, ( hit_rate, auc))
     print('train loss %.3f, test Hit Rate %.3f, test AUC %.3f'
           % (metric[0] / metric[1], hit_rate, auc))
     print('%.1f examples/sec on %s'
@@ -208,10 +224,21 @@ users_test, items_test, ratings_test, test_iter = d2l.load_data_ml100k(
 train_iter = gluon.data.DataLoader(gluon.data.ArrayDataset(
     np.array(users_train), np.array(items_train)), batch_size, True, 
                                    last_batch="rollover")
+```
+
+We then create and initialize the model. we use a four-layer MLP with constant hidden size 20.
+
+```{.python .input}
 ctx = d2l.try_all_gpus() 
 net = NeuMF(50, num_users, num_items, mlp_layers=[20, 20, 20, 20])
 net.initialize(ctx=ctx, force_reinit=True, init=mx.init.Normal(0.01))
-lr, num_epochs, wd, optimizer = 0.001, 25, 1e-5, 'adam'
+```
+
+The following code trains the model.
+
+```{.python .input}
+
+lr, num_epochs, wd, optimizer = 0.001, 15, 1e-5, 'adam'
 loss = d2l.BPRLoss()
 trainer = gluon.Trainer(net.collect_params(), optimizer, 
                         {"learning_rate": lr, 'wd': wd})
