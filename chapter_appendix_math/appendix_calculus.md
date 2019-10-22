@@ -626,7 +626,7 @@ with autograd.record():
 ### Execute backward pass ###
 f.backward()
 
-print("df/dw at {},{},{},{} is {}".format(w[0],x[0],y[0],z[0],w.grad[0]))
+print("df/dw at {},{},{},{} is {}".format(w,x,y,z,w.grad))
 ```
 
 All of what we did above can be done automatically by calling `f.backwards()`.
