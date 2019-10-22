@@ -1012,9 +1012,10 @@ true = np.log(2)/2
 x_graph = np.arange(-1,2,epsilon)
 f_graph = x_graph/(1+x_graph**2)
 
-d2l.plt.plot(x_graph,f_graph,ylim=[0,1])
+d2l.plt.plot(x_graph,f_graph)
+d2l.plt.ylim([0,1])
 for i in range(len(x)) :
-    d2l.plt.patches.rectangle((x[i],0),epsilon,f[i])
+    d2l.plt.patches.rectangle((x[i],0),epsilon,f[i],color='purple')
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('f(x)')
 d2l.plt.show()
