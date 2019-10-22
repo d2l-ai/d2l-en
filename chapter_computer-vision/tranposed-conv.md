@@ -14,7 +14,7 @@ npx.set_np()
 
 ## Basic 2D Transposed Convolution
 
-Let's consider a basic case that both input and output channels are 1, with 0 padding and 1 stride. :numref:`fig_trans_conv` illustrates how transposed convolution with a $2\times 2$ kernel is computed on the $2\times 2$ input matrix.
+Let us consider a basic case that both input and output channels are 1, with 0 padding and 1 stride. :numref:`fig_trans_conv` illustrates how transposed convolution with a $2\times 2$ kernel is computed on the $2\times 2$ input matrix.
 
 ![Transposed convolution layer with a $2\times 2$ kernel.](../img/trans_conv.svg)
 :label:`fig_trans_conv`
@@ -71,7 +71,7 @@ tconv(X)
 The multi-channel extension of the transposed convolution is the same as the convolution. When the input has multiple channels, denoted by $c_i$, the transposed convolution assigns a $k_h\times k_w$ kernel matrix to each input channel. If the output has a channel size $c_o$, then we have a $c_i\times k_h\times k_w$ kernel for each output channel.
 
 
-As a result, if we feed $X$ into a convolutional layer $f$ to compute $Y=f(X)$ and create a transposed convolution layer $g$ with the same hyper-parameters as $f$ except for the output channel set to be the channel size of $X$, then $g(Y)$ should has the same shape as $X$. Let's verify this statement.
+As a result, if we feed $X$ into a convolutional layer $f$ to compute $Y=f(X)$ and create a transposed convolution layer $g$ with the same hyper-parameters as $f$ except for the output channel set to be the channel size of $X$, then $g(Y)$ should has the same shape as $X$. Let us verify this statement.
 
 ```{.python .input}
 X = np.random.uniform(size=(1, 10, 16, 16))
@@ -112,7 +112,7 @@ Then the convolution operator can be implemented by matrix multiplication with p
 Y == np.dot(W, X.reshape(-1)).reshape(2, 2)
 ```
 
-We can implement transposed convolution as a matrix multiplication as well by reusing `kernel2matrix`. To reuse the generated $W$, we construct a $2\times 2$ input, so the corresponding weight matrix will have a shape $(9,4)$, which is $W^\top$. Let's verify the results.
+We can implement transposed convolution as a matrix multiplication as well by reusing `kernel2matrix`. To reuse the generated $W$, we construct a $2\times 2$ input, so the corresponding weight matrix will have a shape $(9,4)$, which is $W^\top$. Let us verify the results.
 
 ```{.python .input}
 X = np.array([[0,1], [2,3]])

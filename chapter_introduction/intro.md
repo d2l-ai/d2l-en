@@ -551,7 +551,7 @@ In other words, the classifier is 80% confident that our mushroom *is not* a dea
 Still, you'd have to be a fool to eat it.
 That's because the certain benefit of a delicious dinner isn't worth a 20% risk of dying from it.
 In other words, the effect of the *uncertain risk* by far outweighs the benefit.
-Let's look at this in math. Basically, we need to compute the expected risk that we incur, i.e. we need to multiply the probability of the outcome with the benefit (or harm) associated with it:
+Let us look at this in math. Basically, we need to compute the expected risk that we incur, i.e. we need to multiply the probability of the outcome with the benefit (or harm) associated with it:
 
 $$L(\mathrm{action}| x) = \mathbf{E}_{y \sim p(y| x)}[\mathrm{loss}(\mathrm{action},y)]$$
 

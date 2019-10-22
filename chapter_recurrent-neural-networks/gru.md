@@ -3,7 +3,7 @@
 
 In the previous section we discussed how gradients are calculated in a recurrent
 neural network. In particular we found that long products of matrices can lead
-to vanishing or divergent gradients. Let's briefly think about what such
+to vanishing or divergent gradients. Let us briefly think about what such
 gradient anomalies mean in practice:
 
 * We might encounter a situation where an early observation is highly

@@ -13,7 +13,7 @@ Nonetheless language models are of great service even in their limited form. For
 
 ## Estimating a language model
 
-The obvious question is how we should model a document, or even a sequence of words. We can take recourse to the analysis we applied to sequence models in the previous section. Let's start by applying basic probability rules:
+The obvious question is how we should model a document, or even a sequence of words. We can take recourse to the analysis we applied to sequence models in the previous section. Let us start by applying basic probability rules:
 
 $$p(w_1, w_2, \ldots, w_T) = \prod_{t=1}^T p(w_t | w_1, \ldots, w_{t-1}).$$
 
@@ -75,7 +75,7 @@ perform poorly there.
 
 ## Markov Models and $n$-grams
 
-Before we discuss solutions involving deep learning we need some more terminology and concepts. Recall our discussion of Markov Models in the previous section. Let's apply this to language modeling. A distribution over sequences satisfies the Markov property of first order if $p(w_{t+1}|w_t, \ldots w_1) = p(w_{t+1}|w_t)$. Higher orders correspond to longer dependencies. This leads to a number of approximations that we could apply to model a sequence:
+Before we discuss solutions involving deep learning we need some more terminology and concepts. Recall our discussion of Markov Models in the previous section. Let us apply this to language modeling. A distribution over sequences satisfies the Markov property of first order if $p(w_{t+1}|w_t, \ldots w_1) = p(w_{t+1}|w_t)$. Higher orders correspond to longer dependencies. This leads to a number of approximations that we could apply to model a sequence:
 
 $$
 \begin{aligned}
@@ -89,7 +89,7 @@ Since they involve one, two or three terms, these are typically referred to as u
 
 ## Natural Language Statistics
 
-Let's see how this works on real data. We construct a vocabulary based on the time machine data similar to :numref:`sec_text_preprocessing` and print the top words
+Let us see how this works on real data. We construct a vocabulary based on the time machine data similar to :numref:`sec_text_preprocessing` and print the top words
 
 ```{.python .input  n=1}
 import d2l
@@ -115,7 +115,7 @@ We're on to something quite fundamental here - the word frequencies decay rapidl
 $$n(x) \propto (x + c)^{-\alpha} \text{ and hence }
 \log n(x) = -\alpha \log (x+c) + \mathrm{const.}​$$
 
-This should already give us pause if we want to model words by count statistics and smoothing. After all, we will significantly overestimate the frequency of the tail, aka the infrequent words. But what about word pairs (and trigrams and beyond)? Let's see.
+This should already give us pause if we want to model words by count statistics and smoothing. After all, we will significantly overestimate the frequency of the tail, aka the infrequent words. But what about word pairs (and trigrams and beyond)? Let us see.
 
 ```{.python .input  n=3}
 bigram_tokens = [[pair for pair in zip(line[:-1], line[1:])] for line in tokens]
@@ -123,7 +123,7 @@ bigram_vocab = d2l.Vocab(bigram_tokens)
 print(bigram_vocab.token_freqs[:10])
 ```
 
-Two things are notable. Out of the 10 most frequent word pairs, 9 are composed of stop words and only one is relevant to the actual book - 'the time'. Let's see whether the bigram frequencies behave in the same manner as the unigram frequencies.
+Two things are notable. Out of the 10 most frequent word pairs, 9 are composed of stop words and only one is relevant to the actual book - 'the time'. Let us see whether the bigram frequencies behave in the same manner as the unigram frequencies.
 
 ```{.python .input  n=4}
 trigram_tokens = [[triple for triple in zip(line[:-2], line[1:-1], line[2:])]
@@ -149,7 +149,7 @@ The graph is quite exciting for a number of reasons. Firstly, beyond words, also
 Before introducing the model, let us assume we will use a neural network to train a language model. Now the question is how to read mini-batches of examples and labels at
 random. Since sequence data is by its very nature sequential, we need to address
 the issue of processing it. We did so in a rather ad-hoc manner when we
-introduced in :numref:`sec_sequence`. Let's formalize this a bit. 
+introduced in :numref:`sec_sequence`. Let us formalize this a bit. 
 
 In :numref:`fig_timemachine_5gram`, we visualized several possible ways to obtain 5-grams in a sentence, here a token is a character. Note that we have quite some freedom since we could pick an arbitrary offset.
 
