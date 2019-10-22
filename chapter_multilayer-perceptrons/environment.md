@@ -20,7 +20,7 @@ finding that the choice of footware was associated with risk of default
 (Oxfords indicate repayment, sneakers indicate default).
 We might be inclined to thereafter grant loans
 to all applicants wearing Oxfords
-and to deny all appplicants wearing sneakers.
+and to deny all applicants wearing sneakers.
 But our ill-conceived leap from pattern recognition to decision-making
 and our failure to think critically about the environment
 might have disastrous consequences.
@@ -28,7 +28,7 @@ For starters, as soon as we began making decisions based on footware,
 customers would catch on and change their behavior.
 Before long, all applicants would be wearing Oxfords,
 and yet there would be no coinciding improvement in credit-worthiness.
-Think about this deeply because similar issues abound in the application of machine learning: by introducing our model-based decisions to the environnment,
+Think about this deeply because similar issues abound in the application of machine learning: by introducing our model-based decisions to the environment,
 we might break the model.
 
 In this chapter, we describe some common concerns
@@ -43,7 +43,7 @@ and grapple with difficult questions concerning ethics and informed consent.
 
 ## Distribution Shift
 
-To begin, we return to the observartional setting,
+To begin, we return to the observational setting,
 putting aside for now the impacts of our actions
 on the environment.
 In the following sections, we take a deeper look
@@ -53,7 +53,7 @@ From the outset, we should warn that if
 the data-generating distribution $p(\mathbf{x},y)$
 can shift in arbitrary ways at any point in time,
 then learning a robust classifier is impossible.
-In the most pathological case, if the label defnitions themselves
+In the most pathological case, if the label definitions themselves
 can change at a moments notice: if suddenly
 what we called "cats" are now dogs
 and what we previously called "dogs" are now in fact cats,
@@ -64,7 +64,7 @@ Fortunately, under some restricted assumptions
 on the ways our data might change in the future,
 principled algorithms can detect shift and possibly even
 adapt, achieving higher accuracy
-than if we naively continued to rely on our original classifer.
+than if we naively continued to rely on our original classifier.
 
 
 
@@ -72,7 +72,7 @@ than if we naively continued to rely on our original classifer.
 ### Covariate Shift
 
 One of the best-studied forms of distribution shift is *covariate shift*.
-Here we assume that although the distirbution of inputs may change over time,
+Here we assume that although the distribution of inputs may change over time,
 the labeling function, i.e., the conditional distribution $p(y|\mathbf{x})$
 does not change.
 While this problem is easy to understand
@@ -112,9 +112,9 @@ The converse problem emerges when we believe that what drives the shift
 is a change in the marginal distribution over the labels $p(y)$
 but that the class-conditional distributions are invariant $p(\mathbf{x}|y)$.
 Label shift is a reasonable assumption to make
-when we beleive that $y$ causes $\mathbf{x}$.
+when we believe that $y$ causes $\mathbf{x}$.
 For example, commonly we want to predict a diagnosis given its manifestations.
-In this case we beleive that the diagnosis causes the manifestations,
+In this case we believe that the diagnosis causes the manifestations,
 i.e., diseases cause symptoms.
 Sometimes the label shift and covariate shift assumptions
 can hold simultaneously.
@@ -139,9 +139,9 @@ the situation in which the very label definitions change.
 This sounds weird—after all, a *cat* is a *cat*.
 Indeed the definition of a cat might not change,
 but can we say the same about soft drinks?
-It turns out that if we navigate aroudn the United States,
+It turns out that if we navigate around the United States,
 shifting the source of our data by geography,
-we'll find considerable concept shift regaring
+we'll find considerable concept shift regarding
 the definition of even this simple term:
 
 ![](../img/popvssoda.png)
@@ -236,7 +236,7 @@ Here are some typical cases:
 
 * We build a face detector. It works well on all benchmarks. Unfortunately it fails on test data - the offending examples are close-ups where the face fills the entire image (no such data was in the training set).
 * We build a web search engine for the USA market and want to deploy it in the UK.
-* We train an image classifier by compiling a large dataset where each among a large set of classes is equally represented in the dataset, say 1000 categories, represented by 1000 images each. Then we deploy the system in the real world, where the actual label distirbution of photographs is decidedly non-uniform.
+* We train an image classifier by compiling a large dataset where each among a large set of classes is equally represented in the dataset, say 1000 categories, represented by 1000 images each. Then we deploy the system in the real world, where the actual label distribution of photographs is decidedly non-uniform.
 
 In short, there are many cases where training and test distributions
 $p(\mathbf{x}, y)$ are different.
@@ -295,7 +295,7 @@ drawn from both distributions—the 'true' $p$, e.g.,
 by access to training data, and the one used
 for generating the training set $q$ (the latter is trivially available).
 Note however, that we only need samples $\mathbf{x} \sim q(\mathbf{x})$;
-we do not to access labels labels $y \sim q(y)$.
+we do not to access labels $y \sim q(y)$.
 
 In this case, there exists a very effective approach
 that will give almost as good results: logistic regression.
@@ -335,8 +335,8 @@ which uses an unlabeled training set $X$ and test set $Z$:
 
 Note that this method relies on a crucial assumption.
 For this scheme to work, we need that each data point
-in the tartget (test time)distribution
-had nonzero probability of occuring at training time.
+in the target (test time)distribution
+had nonzero probability of occurring at training time.
 If we find a point where $q(\mathbf{x}) > 0$ but $p(\mathbf{x}) = 0$,
 then the corresponding importance weight should be infinity.
 
@@ -375,7 +375,7 @@ we first take our reasonably good off the shelf classifier
 and compute its confusion matrix using the validation set
 (also from the training distribution).
 The confusion matrix C, is simply a $k \times k$ matrix
-where each column corresponsd to the *actual* label
+where each column corresponds to the *actual* label
 and each row corresponds to our model's predicted label.
 Each cell's value $c_{ij}$ is the fraction of predictions
 where the true label was $j$ *and* our model predicted $y$.
@@ -461,7 +461,7 @@ Often the automated decision-making systems that we deploy
 can have consequences for those subject to its decisions.
 If we are deploying a medical diagnostic system,
 we need to know for which populations it may work and which it may not.
-Overlooking forseeable risks to the welfare of a subpopulation
+Overlooking foreseeable risks to the welfare of a subpopulation
 would run afoul of basic ethical principles.
 Moreover, "accuracy" is seldom the right metric.
 When translating predictions in to actions

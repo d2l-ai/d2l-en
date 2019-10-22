@@ -80,9 +80,9 @@ We compute these three *logits*, $o_1, o_2$, and $o_3$, for each input:
 
 $$
 \begin{aligned}
-o_1 &= x_1 w_{11} + x_2 w_{21} + x_3 w_{31} + x_4 w_{41} + b_1,\\
-o_2 &= x_1 w_{12} + x_2 w_{22} + x_3 w_{32} + x_4 w_{42} + b_2,\\
-o_3 &= x_1 w_{13} + x_2 w_{23} + x_3 w_{33} + x_4 w_{43} + b_3.
+o_1 &= x_1 w_{11} + x_2 w_{12} + x_3 w_{13} + x_4 w_{14} + b_1,\\
+o_2 &= x_1 w_{21} + x_2 w_{22} + x_3 w_{23} + x_4 w_{24} + b_2,\\
+o_3 &= x_1 w_{31} + x_2 w_{32} + x_3 w_{33} + x_4 w_{34} + b_3.
 \end{aligned}
 $$
 
@@ -362,7 +362,7 @@ The cross-entropy *from $p$ to $q$*, denoted H(p, q),
 is the expected surprisal of an observer with subjective probabilities $q$
 upon seeing data that was actually generated according to probabilities $p$.
 The lowest possible cross-entropy is achieved when $p=q$. 
-In this case, the cross entropy from $p$ to $q$ is $H(p,p)= H(p)$.
+In this case, the cross-entropy from $p$ to $q$ is $H(p,p)= H(p)$.
 Relating this back to our classification objective,
 even if we get the best possible predictions, 
 if the best possible possible, then we will never be perfect. 
@@ -405,14 +405,14 @@ nd the total number of predictions.
 
 * We introduced the softmax operation which takes a vector maps it into probabilities.
 * Softmax regression applies to classification problems. It uses the probability distribution of the output category in the softmax operation.
-* Cross entropy is a good measure of the difference between two probability distributions. It measures the number of bits needed to encode the data given our model.
+* cross-entropy is a good measure of the difference between two probability distributions. It measures the number of bits needed to encode the data given our model.
 
 ## Exercises
 
 1. Show that the Kullback-Leibler divergence $D(p\|q)$ is nonnegative for all distributions $p$ and $q$. Hint - use Jensen's inequality, i.e. use the fact that $-\log x$ is a convex function.
 1. Show that $\log \sum_j \exp(o_j)$ is a convex function in $o$.
 1. We can explore the connection between exponential families and the softmax in some more depth
-    * Compute the second derivative of the cross entropy loss $l(y,\hat{y})$ for the softmax.
+    * Compute the second derivative of the cross-entropy loss $l(y,\hat{y})$ for the softmax.
     * Compute the variance of the distribution given by $\mathrm{softmax}(o)$ and show that it matches the second derivative computed above.
 1. Assume that we three classes which occur with equal probability, i.e. the probability vector is $(\frac{1}{3}, \frac{1}{3}, \frac{1}{3})$.
     * What is the problem if we try to design a binary code for it? Can we match the entropy lower bound on the number of bits?

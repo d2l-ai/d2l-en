@@ -351,7 +351,7 @@ required researchers to code up thousands of lines of C and Fortran.
 1. Show that a multilayer perceptron using only ReLU (or pReLU) constructs a continuous piecewise linear function.
 1. Show that $\mathrm{tanh}(x) + 1 = 2 \mathrm{sigmoid}(2x)$.
 1. Assume we have a multilayer perceptron *without* nonlinearities between the layers. In particular, assume that we have $d$ input dimensions, $d$ output dimensions and that one of the layers had only $d/2$ dimensions. Show that this network is less expressive (powerful) than a single layer perceptron.
-1. Assume that we have a nonlinearity that applies to one minibatch at a time. What kinds of problems to you expect this to cause?
+1. Assume that we have a nonlinearity that applies to one minibatch at a time. What kinds of problems do you expect this to cause?
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2338)
 
