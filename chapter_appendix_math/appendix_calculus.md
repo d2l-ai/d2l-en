@@ -728,7 +728,7 @@ $$
 And thus, with a little algebra, see that the approximating quadratic at $[-1,0]^\top$ is
 
 $$
-f(x,y) \approx e^{-1}(1 - x +2x^2+2y^2).
+f(x,y) \approx e^{-1}(-1 - (x+1) +2(x+1)^2+2y^2).
 $$
 
 
@@ -740,19 +740,15 @@ x, y = np.meshgrid(np.linspace(-2, 2, 101), np.linspace(-2, 2, 101), indexing='i
 z = x*np.exp(- x**2 - y**2)
 
 # Compute gradient and Hessian at (1,0)
-z_quad = np.exp(-1)*(1 - x + 2*x**2 + 2*y**2)
+z_quad = np.exp(-1)*(-1 - (x+1) + 2*(x+1)**2 + 2*y**2)
 
 # Plot Function
 ax = d2l.plt.figure().add_subplot(111, projection='3d')
 ax.plot_wireframe(x, y, z, **{'rstride': 10, 'cstride': 10})
 ax.plot_wireframe(x, y, z_quad, **{'rstride': 10, 'cstride': 10}, color = 'purple')
-ticks = [-1,  0, 1]
-d2l.plt.xticks(ticks)
-d2l.plt.yticks(ticks)
-ax.set_zticks(ticks)
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('y')
-ax.set_xlim(-2, 2); ax.set_ylim(-2, 2); ax.set_zlim(0, 1);
+ax.set_xlim(-2, 2); ax.set_ylim(-2, 2); ax.set_zlim(-1, 1);
 ```
 
 This forms the basis for Newton's Algorithm discussed in :numref:`sec_gd`, where we perform numerical optimization iteratively finding the best fitting quadratic, and then exactly minimizing that quadratic.
@@ -1000,15 +996,35 @@ There is a traditional way to try and understand how we might try to approximate
 
 ??? Chop integral picture ???
 
-If $N$ is large, we can approximate the area of each slice by a rectangle, and then add up the areas to get the total area under the curve.
+If $N$ is large, we can approximate the area of each slice by a rectangle, and then add up the areas to get the total area under the curve.  Let us take a look at an example doing this in code.  We will see how to get the true value in a later section.
 
-The issue is that we can do this approach for only the simplest functions like
+```{.python .input}
+epsilon = 0.01
+a = 0
+b = 1
+
+x = np.arange(a,b,epsilon)
+f = x/(1+x**2)
+
+approx = np.sum(epsilon*f)
+true = np.log(2)/2
+
+x_graph = np.arange(a,b,epsilon)
+f_graph = x_graph/(1+x_graph**2)
+
+d2l.plt.fill_between(x,f)
+d2l.plot(x_graph,f_graph)
+
+"Approximation: {}, Truth: {}".format(approx,true)
+```
+
+The issue is that while it can be done numerically, we can do this approach analytically for only the simplest functions like
 
 $$
 \int_a^b x \;dx.
 $$
 
-Anything somewhat more complex like
+Anything somewhat more complex like our example from the code above
 
 $$
 \int_a^b \frac{x}{1+x^{2}} \;dx.
