@@ -22,15 +22,17 @@ npx.set_np()
 # Plot a weird function in a normal range
 x_big = np.arange(0,3,0.01)
 ys = np.sin(x_big**x_big)
-d2l.plot(x_big,[ys])
-
-# Plot a the same weird function in a tiny range
-x_big = np.arange(2.0,2.01,0.0001)
-ys = np.sin(x_big**x_big)
-d2l.plot(x_big,[ys])
+d2l.plot(x_big,ys)
 ```
 
 If we look at this graph, we see that our strange function ($\sin(x^x)$)plotted over a wide range has a very difficult to describe behavior.  However, if we zoom into a tiny segment, the behavior seems to be far simpler: it is just a straight line.
+
+```{.python .input}
+# Plot a the same weird function in a tiny range
+x_big = np.arange(2.0,2.01,0.0001)
+ys = np.sin(x_big**x_big)
+d2l.plot(x_big,ys)
+```
 
 For most functions we can think of, it is reasonable to expect that as we shift the value of the function by a little bit, the output will also be shifted by a little bit.  The only question we need to answer is, "How large is the change in the output compared to the change in the input?  Is it half as large?  Twice as large?"
 
