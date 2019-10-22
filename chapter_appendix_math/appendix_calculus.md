@@ -22,12 +22,12 @@ npx.set_np()
 # Plot a weird function in a normal range
 x_big = np.arange(0,3,0.01)
 ys = np.sin(x_big**x_big)
-d2l.plot(x_big,ys)
+d2l.plot(x_big,[ys])
 
 # Plot a the same weird function in a tiny range
 x_big = np.arange(2.0,2.01,0.0001)
 ys = np.sin(x_big**x_big)
-d2l.plot(x_big,ys)
+d2l.plot(x_big,[ys])
 ```
 
 If we look at this graph, we see that our strange function ($\sin(x^x)$)plotted over a wide range has a very difficult to describe behavior.  However, if we zoom into a tiny segment, the behavior seems to be far simpler: it is just a straight line.
@@ -183,9 +183,6 @@ $$
 approximates the value of $f$ by a line which passes through the point $(x,f(x))$ and has slope $\frac{df}{dx}(x)$.  In this way we say that the derivative gives a linear approximation to the function $f$, as illustrated below:
 
 ```{.python .input}
-import numpy as np
-import matplotlib.pyplot as plt
-
 # Compute Sin
 xs = np.arange(-np.pi,np.pi,0.01)
 plots = [np.sin(xs)]
@@ -233,9 +230,6 @@ $$
 Just as the previous section showed that the first derivative gives the best approximation to a function by a line, we might now ask if having the first and second derivative gives the best approximation by a quadratic.  The answer is yes!  The next section shows how we can continue this reasoning to obtain the *Taylor series*, however, lets end this section with a taste of what that looks like for the function $\sin(x)$.
 
 ```{.python .input}
-import numpy as np
-import matplotlib.pyplot as plt
-
 # Plot Sin
 xs = np.arange(-np.pi,np.pi,0.01)
 ys = np.sin(xs)
@@ -296,9 +290,6 @@ $$
 Let us see how this works in code and observe how increasing the degree of the Taylor approximation brings us closer to the desired function $e^x$.
 
 ```{.python .input}
-import numpy as np
-import matplotlib.pyplot as plt
-
 # Plot the exponential function
 xs = np.arange(0,np.e,0.01)
 ys = np.exp(xs)
@@ -610,9 +601,6 @@ This is precisely what every deep learning algorithm implements to allow the com
 To see how MXNet has encapsulated this, let us take a quick look at this example.
 
 ```{.python .input}
-from mxnet import autograd, np, npx
-npx.set_np()
-
 ### Initialize as NDArrays, attaching gradients ###
 w = np.array(-1); x = np.array(0); y = np.array(-2); z = np.array(1)
 w.attach_grad(); x.attach_grad(); y.attach_grad(); z.attach_grad()
