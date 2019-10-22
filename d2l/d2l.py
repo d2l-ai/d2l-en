@@ -34,7 +34,6 @@ def set_figsize(figsize=(3.5, 2.5)):
     """Set the figure size for matplotlib."""
     use_svg_display()
     d2l.plt.rcParams['figure.figsize'] = figsize
-    
 
 
 # Defined in file: ./chapter_preliminaries/calculus.md
@@ -1512,7 +1511,7 @@ def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
         else:
             test_rmse = evaluator(net, test_iter, ctx_list)
         train_l = l / (i + 1)
-        animator.add(epoch + 1, (train_l, None, test_rmse))
+        animator.add(epoch + 1, (train_l, test_rmse))
     print('train loss %.3f, test RMSE %.3f'
           % (metric[0] / metric[1], test_rmse))
     print('%.1f examples/sec on %s'
@@ -1600,7 +1599,7 @@ def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
                   negative_sampler, candidates):
     num_batches, timer = len(train_iter), d2l.Timer()
     animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs], ylim=[0, 1],
-                            legend=['train loss','test Hit Rate', 'test AUC'])
+                            legend=['test Hit Rate', 'test AUC'])
     for epoch in range(num_epochs):
         metric, l = d2l.Accumulator(3), 0.
         for i, values in enumerate(train_iter):
@@ -1624,7 +1623,7 @@ def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
                                       ctx_list)
         train_l = l / (i + 1)
         print(train_l)
-        animator.add(epoch + 1, (train_l, hit_rate, auc))
+        animator.add(epoch + 1, ( hit_rate, auc))
     print('train loss %.3f, test Hit Rate %.3f, test AUC %.3f'
           % (metric[0] / metric[1], hit_rate, auc))
     print('%.1f examples/sec on %s'
