@@ -33,7 +33,7 @@ Now that we have convex sets we can introduce convex functions $f$. Given a conv
 
 $$\lambda f(x) + (1-\lambda) f(x') \geq f(\lambda x + (1-\lambda) x').$$
 
-To illustrate this let's plot a few functions and check which ones satisfy the requirement. We need to import a few  libraries.
+To illustrate this let us plot a few functions and check which ones satisfy the requirement. We need to import a few  libraries.
 
 ```{.python .input  n=1}
 %matplotlib inline

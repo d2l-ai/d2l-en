@@ -9,7 +9,7 @@ $$p(x_1,x_2, \ldots, x_T).$$
 
 Language models are incredibly useful. For instance, an ideal language model would be able to generate natural text just on its own, simply by drawing one word at a time $w_t \sim p(w_t|w_{t-1}, \ldots w_1)$. Quite unlike the monkey using a typewriter, all text emerging from such a model would pass as natural language, e.g. English text. Furthermore, it would be sufficient for generating a meaningful dialog, simply by conditioning the text on previous dialog fragments. Clearly we are still very far from designing such a system, since it would need to *understand* the text rather than just generate grammatically sensible content.
 
-Nonetheless language models are of great service even in their limited form. For instance, the phrases *'to recognize speech'* and *'to wreck a nice beach'* sound very similar. This can cause ambiguity in speech recognition, ambiguity that is easily resolved through a language model which rejects the second translation as outlandish. Likewise, in a document summarization algorithm it's worth while knowing that *'dog bites man'* is much more frequent than *'man bites dog'*, or that *'let's eat grandma'* is a rather disturbing statement, whereas *'let's eat, grandma'* is much more benign.
+Nonetheless language models are of great service even in their limited form. For instance, the phrases *'to recognize speech'* and *'to wreck a nice beach'* sound very similar. This can cause ambiguity in speech recognition, ambiguity that is easily resolved through a language model which rejects the second translation as outlandish. Likewise, in a document summarization algorithm it's worth while knowing that *'dog bites man'* is much more frequent than *'man bites dog'*, or that *'let us eat grandma'* is a rather disturbing statement, whereas *'let us eat, grandma'* is much more benign.
 
 ## Estimating a language model
 
@@ -132,7 +132,7 @@ trigram_vocab = d2l.Vocab(trigram_tokens)
 print(trigram_vocab.token_freqs[:10])
 ```
 
-Last, let's visualize the token frequencies among these three gram models.
+Last, let us visualize the token frequencies among these three gram models.
 
 ```{.python .input  n=5}
 bigram_freqs = [freq for token, freq in bigram_vocab.token_freqs]
@@ -146,7 +146,7 @@ The graph is quite exciting for a number of reasons. Firstly, beyond words, also
 
 ## Training Data Preparation
 
-Before introducing the model, let's assume we will use a neural network to train a language model. Now the question is how to read mini-batches of examples and labels at
+Before introducing the model, let us assume we will use a neural network to train a language model. Now the question is how to read mini-batches of examples and labels at
 random. Since sequence data is by its very nature sequential, we need to address
 the issue of processing it. We did so in a rather ad-hoc manner when we
 introduced in :numref:`sec_sequence`. Let's formalize this a bit. 

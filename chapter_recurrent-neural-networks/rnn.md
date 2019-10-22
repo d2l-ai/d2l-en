@@ -14,7 +14,7 @@ For a sufficiently powerful function $f$, the latent variable model is not an ap
 
 Note that we also use $h$ to denote by the number of hidden units of a hidden layer. Hidden layers and hidden states refer to two very different concepts. Hidden layers are, as explained, layers that are hidden from view on the path from input to output. Hidden states are technically speaking *inputs* to whatever we do at a given step. Instead, they can only be computed by looking at data at previous iterations. In this sense they have much in common with latent variable models in statistics, such as clustering or topic models where the clusters affect the output but cannot be directly observed.
 
-Recurrent neural networks are neural networks with hidden states. Before introducing this model, let's first revisit the multi-layer perceptron introduced in :numref:`sec_mlp`.
+Recurrent neural networks are neural networks with hidden states. Before introducing this model, let us first revisit the multi-layer perceptron introduced in :numref:`sec_mlp`.
 
 ## Recurrent Networks Without Hidden States
 
@@ -66,7 +66,7 @@ In practice, each word is presented by a $d$ dimensional vector, and we use a ba
 
 ## Perplexity
 
-Last, let's discuss about how to measure the sequence model quality. One way is to check how surprising the text is. A good language model is able to predict with high accuracy what we will see next. Consider the following continuations of the phrase `It is raining`, as proposed by different language models:
+Last, let us discuss about how to measure the sequence model quality. One way is to check how surprising the text is. A good language model is able to predict with high accuracy what we will see next. Consider the following continuations of the phrase `It is raining`, as proposed by different language models:
 
 1. `It is raining outside`
 1. `It is raining banana tree`

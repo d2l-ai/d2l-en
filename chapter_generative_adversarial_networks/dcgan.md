@@ -232,7 +232,7 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
 
 ```
 
-Now let's train the model.
+Now let us train the model.
 
 ```{.python .input  n=21}
 latent_dim, lr, num_epochs = 100, 0.005, 40

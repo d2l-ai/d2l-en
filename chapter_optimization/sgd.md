@@ -128,7 +128,7 @@ Plugging this into the above inequality yields the bound
 $$
 \left[\mathbf{E}[\bar{w}]\right] - R^* \leq \frac{r^2 + L^2 \sum_{t=1}^T \eta_t^2}{2 \sum_{t=1}^T \eta_t}
 $$
-Here $r^2 := \|w_0 - w^*\|^2$ is a bound on the distance between the initial choice of parameters and the final outcome. In short, the speed of convergence depends on how rapidly the loss function changes via the Lipschitz constant $L$ and how far away from optimality the initial value is $r$. Note that the bound is in terms of $\bar{w}$ rather than $w_T$. This is the case since $\bar{w}$ is a smoothed version of the optimization path. Now let's analyze some choices for $\eta_t$.
+Here $r^2 := \|w_0 - w^*\|^2$ is a bound on the distance between the initial choice of parameters and the final outcome. In short, the speed of convergence depends on how rapidly the loss function changes via the Lipschitz constant $L$ and how far away from optimality the initial value is $r$. Note that the bound is in terms of $\bar{w}$ rather than $w_T$. This is the case since $\bar{w}$ is a smoothed version of the optimization path. Now let us analyze some choices for $\eta_t$.
 
 * **Known Time Horizon** - whenever $r, L$ and $T$ are known we can pick $\eta = r/L \sqrt{T}$. This yields as upper bound $r L (1 + 1/T)/2\sqrt{T} < rL/\sqrt{T}$. That is, we converge with rate $O(1/\sqrt{T})$ to the optimal solution.
 * **Unknown Time Horizon** - whenever we want to have a good solution for *any* time $T$ we can pick $\eta = O(1/\sqrt{T})$. This costs us an extra logarithmic factor and it leads to an upper bound of the form $O(\log T / \sqrt{T})$.

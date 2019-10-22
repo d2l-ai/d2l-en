@@ -106,7 +106,7 @@ In order to visualize the dependencies between model variables and parameters du
 
 ## BPTT in Detail
 
-Now that we discussed the general principle let's discuss BPTT in detail, distinguishing between different sets of weight matrices ($\mathbf{W}_{hx}, \mathbf{W}_{hh}$ and $\mathbf{W}_{oh}$) in a simple linear latent variable model:
+Now that we discussed the general principle let us discuss BPTT in detail, distinguishing between different sets of weight matrices ($\mathbf{W}_{hx}, \mathbf{W}_{hh}$ and $\mathbf{W}_{oh}$) in a simple linear latent variable model:
 
 $$\mathbf{h}_t = \mathbf{W}_{hx} \mathbf{x}_t + \mathbf{W}_{hh} \mathbf{h}_{t-1} \text{ and }
 \mathbf{o}_t = \mathbf{W}_{oh} \mathbf{h}_t$$

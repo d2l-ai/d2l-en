@@ -24,7 +24,7 @@ class CenteredLayer(nn.Block):
         return x - x.mean()
 ```
 
-To see how it works let's feed some data into the layer.
+To see how it works let us feed some data into the layer.
 
 ```{.python .input  n=2}
 layer = CenteredLayer()
@@ -48,7 +48,7 @@ y.mean()
 
 ## Layers with Parameters
 
-Now that we know how to define layers in principle, let's define layers with parameters. These can be adjusted through training. In order to simplify things for an avid deep learning researcher the `Parameter` class and the `ParameterDict` dictionary provide some basic housekeeping functionality. In particular, they govern access, initialization, sharing, saving and loading model parameters. For instance, this way we don't need to write custom serialization routines for each new custom layer.
+Now that we know how to define layers in principle, let us define layers with parameters. These can be adjusted through training. In order to simplify things for an avid deep learning researcher the `Parameter` class and the `ParameterDict` dictionary provide some basic housekeeping functionality. In particular, they govern access, initialization, sharing, saving and loading model parameters. For instance, this way we don't need to write custom serialization routines for each new custom layer.
 
 For instance, we can use the member variable `params` of the `ParameterDict` type that comes with the Block class. It is a dictionary that maps string type parameter names to model parameters in the `Parameter` type.  We can create a `Parameter` instance from `ParameterDict` via the `get` function.
 

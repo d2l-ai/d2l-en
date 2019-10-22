@@ -26,7 +26,7 @@ npx.set_np()
 
 ## Decoder
 
-Now let's implement the decoder of this model. We add a MLP attention layer which has the same hidden size as the LSTM layer. The state passed from the encoder to the decoder contains three items:
+Now let us implement the decoder of this model. We add a MLP attention layer which has the same hidden size as the LSTM layer. The state passed from the encoder to the decoder contains three items:
 
 - the encoder outputs of all time steps, which are used as the attention layer's memory with identical keys and values
 
