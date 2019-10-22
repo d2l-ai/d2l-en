@@ -1,35 +1,14 @@
 # Automatic Differentiation
 :label:`sec_autograd`
 
-In machine learning, we *train* models, updating them successively 
-so that they get better and better as they see more and more data. 
-Usually, *getting better* means minimizing a *loss function*, 
-a score that answers the question "how *bad* is our model?"
-This question is more subtle than it appears.
-Ultimately, what we really care about 
-is producing a model that performs well on data 
-that we have never seen before.
-But we can only fit the model to data that we can actually see.
-Thus we can decompose the task of fitting models into two key concerns:
-*optimization* the process of fitting our models to observed data
-and *generalization* the mathematical principles and practitioners wisdom
-that guide as to how to produce models whose validity extends 
-beyond the exact set of datapoints used to train it. 
-
-This section addresses the calculation of derivatives,
-a crucial step in nearly all deep learning optimization algorithms.
-With neural networks, we typically choose loss functions 
-that are differentiable with respect to our model's parameters.
-Put simply, this means that for each parameter, 
-we can determine how rapidly the loss would increase or decrease,
-were we to *increase* or *decrease* that parameter
-by an infinitessimally small amount.
+As we have explained in :numref:`sec_calculus`,
+differentiation is a crucial step in nearly all deep learning optimization algorithms.
 While the calculations for taking these derivatives are straightforward,
 requiring only some basic calculus, 
 for complex models, working out the updates by hand
 can be a pain (and often error-prone).
 
-The autograd package expedites this work 
+The `autograd` package expedites this work 
 by automatically calculating derivatives. 
 And while many other libraries require 
 that we compile a symbolic graph to take automatic derivatives, 
@@ -41,10 +20,8 @@ tracking which data combined through
 which operations to produce the output. 
 This graph enables `autograd` 
 to subsequently backpropagate gradients on command. 
-Here, *backpropagate* simply means to trace through the compute graph, 
-filling in the partial derivatives with respect to each parameter. 
-If you are unfamiliar with some of the math, 
-e.g., gradients, please refer to :numref:`sec_math`.
+Here, *backpropagate* simply means to trace through the *computational graph*, 
+filling in the partial derivatives with respect to each parameter.
 
 ```{.python .input  n=1}
 from mxnet import autograd, np, npx
