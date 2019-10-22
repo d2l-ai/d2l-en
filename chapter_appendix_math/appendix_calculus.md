@@ -15,7 +15,9 @@ The question then becomes something that on the surface is no easier: how do we 
 Let us suppose we take $w$ and change it a small amount to have $w + \epsilon$, where $\epsilon$ is something small (if we wish to be concrete, think a number like $0.0000001$).  Now, consider the picture below:
 
 ```{.python .input}
+%matplotlib inline
 import d2l
+from IPython import display
 from mxnet import np, npx
 npx.set_np()
 
@@ -354,6 +356,28 @@ $$
 We will call the vector $\nabla_{\mathbf{w}} L$ the *gradient* of $L$.
 
 This formula is worth pondering for a moment.  It has exactly the format that we encountered in one dimension, just we have converted everything to vectors and dot products.  It allows us to tell approximately how the function $L$ will change given any perturbation to the input.  As we will see in the next section, this will provide us with an important tool in understanding geometrically how we can learn using information contained in the gradient.
+
+But first, let us see this approximation at work with an example.  Suppose we are working with the function
+$$
+f(x,y) = \log(e^x + e^y) \text{ with gradient } \nabla f (x,y) = \left[\frac{e^x}{e^x+e^y}, \frac{e^y}{e^x+e^y}\right].
+$$
+If we look at a point like $(0,\log(2))$, we see that
+$$
+f(x,y) = \log(3) \text{ with gradient } \nabla f (x,y) = \left[\frac{1}{3}, \frac{2}{3}\right].
+$$
+Thus, if we want to approximate $f$ at $(\epsilon_1,\log(2) + \epsilon_2)$,  we see that we should have
+$$
+f(\epsilon_1,\log(2) + \epsilon_2) \approx \log(3) + \frac{1}{3}\epsilon_1 + \frac{2}{3}\epsilon_2.
+$$
+
+We can test this in code to see how good the approximation is.
+```
+f = lambda x,y : np.log(np.exp(x) + np.exp(y))
+grad_f = lambda x,y : np.array([np.exp(x)/(np.exp(x)+np.exp(y)), np.exp(y)/(np.exp(x)+np.exp(y))])
+
+epsilon = np.array([0.01,-0.03])
+"Approximation: {}".format(f(0,np.log(2)) + epsilon.dot(grad_f(0,np.log(2)))), "True Value: {}".format(f(0+epsilon[0],np.log(2)+epsilon[1]))
+```
 
 ### Geometry of gradients and gradient descent
 Consider the formula 
