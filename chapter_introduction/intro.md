@@ -129,7 +129,7 @@ setting of the knobs coercing the desired behaviour from our model.
 
 The training process usually looks like this:
 
-1. Start off with a randomly initialized model that can't do anything useful.
+1. Start off with a randomly initialized model that cannot do anything useful.
 1. Grab some of your labeled data (e.g. audio snippets and corresponding ``{yes,no}`` labels)
 1. Tweak the knobs so the model sucks less with respect to those examples
 1. Repeat until the model is awesome.
@@ -227,7 +227,7 @@ fixed-length inputs means we have one less thing to worry about.
 
 However, not all data can easily be represented as fixed length vectors.
 While we might expect microscrope images to come from standard equipment,
-we can't expect images mined from the internet to all show up in the same size.
+we cannot expect images mined from the internet to all show up in the same size.
 While we might imagine cropping images to a standard size,
 text data resists fixed-length representations even more stubbornly.
 Consider the product reviews left on e-commerce sites like Amazon or TripAdvisor. Some are short: "it stinks!". Others ramble for pages.

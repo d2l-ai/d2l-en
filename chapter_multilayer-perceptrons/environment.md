@@ -380,7 +380,7 @@ and each row corresponds to our model's predicted label.
 Each cell's value $c_{ij}$ is the fraction of predictions
 where the true label was $j$ *and* our model predicted $y$.
 
-Now we can't calculate the confusion matrix
+Now we cannot calculate the confusion matrix
 on the target data directly,
 because we don't get to see the labels for the examples
 that we see in the wild,
