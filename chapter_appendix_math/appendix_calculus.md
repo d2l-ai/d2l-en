@@ -20,18 +20,18 @@ from mxnet import np, npx
 npx.set_np()
 
 # Plot a weird function in a normal range
-x_big = np.arange(0,3,0.01)
+x_big = np.arange(0.01,3,0.01)
 ys = np.sin(x_big**x_big)
-d2l.plot(x_big,ys)
+d2l.plot(x_big,ys, 'x', 'f(x)')
 ```
 
-If we look at this graph, we see that our strange function ($\sin(x^x)$)plotted over a wide range has a very difficult to describe behavior.  However, if we zoom into a tiny segment, the behavior seems to be far simpler: it is just a straight line.
+If we look at this graph, we see that our strange function ($f(x) = \sin(x^x)$)plotted over a wide range has a very difficult to describe behavior.  However, if we zoom into a tiny segment, the behavior seems to be far simpler: it is just a straight line.
 
 ```{.python .input}
 # Plot a the same weird function in a tiny range
 x_big = np.arange(2.0,2.01,0.0001)
 ys = np.sin(x_big**x_big)
-d2l.plot(x_big,ys)
+d2l.plot(x_big,ys, 'x', 'f(x)')
 ```
 
 For most functions we can think of, it is reasonable to expect that as we shift the value of the function by a little bit, the output will also be shifted by a little bit.  The only question we need to answer is, "How large is the change in the output compared to the change in the input?  Is it half as large?  Twice as large?"
@@ -195,7 +195,7 @@ for x0 in [-1.5,0,2] :
     plots.append(np.sin(x0) + (xs-x0)*np.cos(x0))
 
 # Plot them
-d2l.plot(xs, plots, ylim=[-1.5,1.5])
+d2l.plot(xs, plots, 'x', 'f(x)', ylim=[-1.5,1.5])
 ```
 
 ### Higher order derivatives
@@ -242,7 +242,7 @@ for x0 in [-1.5,0,2] :
     plots.append(np.sin(x0) + (xs-x0)*np.cos(x0) - (xs-x0)**2*np.sin(x0)/2)
 
 # Plot them
-d2l.plot(xs, plots, ylim=[-1.5,1.5])
+d2l.plot(xs, plots, 'x', 'f(x)', ylim=[-1.5,1.5])
 ```
 
 ### Taylor Series
@@ -300,7 +300,7 @@ P1 = 1 + xs
 P2 = 1 + xs + xs**2/2
 P5 = 1 + xs + xs**2/2 + xs**3/6 + xs**4/24 + xs**5/120
 
-d2l.plot(xs,[ys,P1,P2,P5], legend = ["Exponential", "Degree 1 Taylor Series", "Degree 2 Taylor Series", "Degree 5 Taylor Series"])
+d2l.plot(xs, [ys,P1,P2,P5], 'x', 'f(x)', legend = ["Exponential", "Degree 1 Taylor Series", "Degree 2 Taylor Series", "Degree 5 Taylor Series"])
 ```
 
 Taylor series have two primary uses:
@@ -418,7 +418,7 @@ The only possible location of minima are at $x = -1, 0, 2$, where the function t
 x = np.arange(-2,3,0.01)
 f = 3*x**4 - 4*x**3 -12*x**2
 
-d2l.plot(x,f)
+d2l.plot(x,f, 'x', 'f(x)')
 ```
 
 This highlights an important fact to know when working either theoretically or numerically: the only possible points where we can minimize (or maximize) a function will have gradient equal to zero, however, not every point with gradient zero is the minimum (or maximum).  
