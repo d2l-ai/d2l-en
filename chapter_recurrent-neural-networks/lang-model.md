@@ -267,7 +267,7 @@ def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
 1. Review the smoothed probability estimates. Why are they not accurate? Hint - we are dealing with a contiguous sequence rather than singletons.
 1. How would you model a dialogue?
 1. Estimate the exponent of Zipf's law for unigrams, bigrams and trigrams.
-1. Which other other mini-batch data sampling methods can you think of?
+1. Which other mini-batch data sampling methods can you think of?
 1. Why is it a good idea to have a random offset?
     * Does it really lead to a perfectly uniform distribution over the sequences on the document?
     * What would you have to do to make things even more uniform?
