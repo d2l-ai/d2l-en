@@ -582,6 +582,8 @@ When these models are initialized, $A$ is taken to be a random matrix with Gauss
 
 ```{.python .input}
 import numpy as np
+import matplotlib.pyplot as plt
+
 np.random.seed(8675309)
 
 k = 5
@@ -609,8 +611,9 @@ for i in range(1,100):
     v_in = A.dot(v_in)
     norm_list.append(np.linalg.norm(v_in))
     
-print("Sequence of norms: {}".format(norm_list))
-
+plt.plot(norm_list)
+plt.title("Sequence of norms")
+plt.show()
 ```
 
 The norm is growing uncontrollably!  Indeed if we take the list of quotients, we will see a pattern.
@@ -621,7 +624,9 @@ norm_ratio_list = []
 for i in range(1,100):
     norm_ratio_list.append(norm_list[i]/norm_list[i-1])
     
-print("Sequence of ratios: {}".format(norm_ratio_list))
+plt.plot(norm_ratio_list)
+plt.title("Sequence of ratios")
+plt.show()
 ```
 
 If we look at the last portion of the above computation, we see that the random vector is stretched by a factor of ```1.974459321485[...]``` where the portion at the end shifts a little, but the stretching factor is stable.  
@@ -659,14 +664,18 @@ for i in range(1,100):
     v_in = A.dot(v_in)
     norm_list.append(np.linalg.norm(v_in))
     
-print("Sequence of norms: {}".format(norm_list))
+plt.plot(norm_list)
+plt.title("Sequence of norms")
+plt.show()
 
 # Also the ratio
 norm_ratio_list = []
 for i in range(1,100):
     norm_ratio_list.append(norm_list[i]/norm_list[i-1])
     
-print("Sequence of ratios: {}".format(norm_ratio_list))
+plt.plot(norm_ratio_list)
+plt.title("Sequence of ratios")
+plt.show()
 ```
 
 ### Conclusions
