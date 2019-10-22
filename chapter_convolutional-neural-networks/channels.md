@@ -152,7 +152,7 @@ After all, a convolution correlates adjacent pixels.
 A $1 \times 1$ convolution obviously doesn't.
 Nonetheless, they are popular operations that are sometimes included
 in the designs of complex deep networks.
-Let's see in some detail what it actually does.
+Let us see in some detail what it actually does.
 
 Because the minimum window is used,
 the $1\times 1$ convolution loses the ability
@@ -180,7 +180,7 @@ Thus the $1\times 1$ convolutional layer requires $c_o\times c_i$ weights
 
 ![The cross-correlation computation uses the $1\times 1$ convolution kernel with 3 input channels and 2 output channels. The inputs and outputs have the same height and width. ](../img/conv-1x1.svg)
 
-Let's check whether this works in practice:
+Let us check whether this works in practice:
 we implement the $1 \times 1$ convolution
 using a fully-connected layer.
 The only thing is that we need to make some adjustments
@@ -198,7 +198,7 @@ def corr2d_multi_in_out_1x1(X, K):
 
 When performing $1\times 1$ convolution,
 the above function is equivalent to the previously implemented cross-correlation function `corr2d_multi_in_out`.
-Let's check this with some reference data.
+Let us check this with some reference data.
 
 ```{.python .input  n=7}
 X = np.random.uniform(size=(3, 3, 3))

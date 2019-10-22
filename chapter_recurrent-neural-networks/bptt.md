@@ -40,7 +40,7 @@ Here $h_t$ denotes the hidden state, $x_t$ the input and $o_t$ the output. We ha
 
 $$L(x,y, w) = \sum_{t=1}^T l(y_t, o_t).$$
 
-For backpropagation matters are a bit more tricky. Let's compute the gradients with regard to the parameters $w$ of the objective function $L$. We get that
+For backpropagation matters are a bit more tricky. Let us compute the gradients with regard to the parameters $w$ of the objective function $L$. We get that
 
 $$\begin{aligned}
 \partial_{w} L & = \sum_{t=1}^T \partial_w l(y_t, o_t) \\
@@ -65,7 +65,7 @@ $$
 \partial_{w}h_{t}=\partial_{w}f(x_{t},h_{t-1},w)+\sum_{i=1}^{t-1}\left(\prod_{j=i+1}^{t}\partial_{h}f(x_{j},h_{j-1},w)\right)\partial_{w}f(x_{i},h_{i-1},w).
 $$
 
-This chain can get *very* long whenever $t$ is large. While we can use the chain rule to compute $\partial_w h_t$ recursively, this might not be ideal. Let's discuss a number of strategies for dealing with this problem:
+This chain can get *very* long whenever $t$ is large. While we can use the chain rule to compute $\partial_w h_t$ recursively, this might not be ideal. Let us discuss a number of strategies for dealing with this problem:
 
 **Compute the full sum.** This is very slow and gradients can blow up,
 since subtle changes in the initial conditions can potentially affect

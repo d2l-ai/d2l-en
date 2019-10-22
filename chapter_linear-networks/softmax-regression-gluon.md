@@ -12,7 +12,7 @@ from mxnet.gluon import nn
 npx.set_np()
 ```
 
-Let's stick with the Fashion-MNIST dataset and keep the batch size at $256$ as in the last section.
+Let us stick with the Fashion-MNIST dataset and keep the batch size at $256$ as in the last section.
 
 ```{.python .input  n=2}
 batch_size = 256

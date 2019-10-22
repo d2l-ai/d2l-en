@@ -128,7 +128,7 @@ all_features = pd.concat((train_data.iloc[:, 1:-1], test_data.iloc[:, 1:]))
 As stated above, we have a wide variety of datatypes.
 Before we feed it into a deep network,
 we need to perform some amount of processing.
-Let's start with the numerical features.
+Let us start with the numerical features.
 We begin by replacing missing values with the mean.
 This is a reasonable strategy if features are missing at random.
 To adjust them to a common scale,
@@ -384,7 +384,7 @@ def train_and_pred(train_features, test_feature, train_labels, test_data,
     submission.to_csv('submission.csv', index=False)
 ```
 
-Let's invoke our model.
+Let us invoke our model.
 One nice sanity check is to see
 whether the predictions on the test set
 resemble those of the k-fold cross-validation process.

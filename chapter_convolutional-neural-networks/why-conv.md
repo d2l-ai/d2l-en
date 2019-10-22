@@ -70,7 +70,7 @@ Back to images, the intuitions we have been discussing could be made more concre
 1. Our vision systems should, in some sense, respond similary to the same object regardless of where it appears in the image (Translation Invariance)
 1. Our visions systems should, in some sense, focus on local regions, without regard for what else is happening in the image at greater distances. (Locality)
 
-Let's see how this translates into mathematics.
+Let us see how this translates into mathematics.
 
 ## Constraining the MLP
 
@@ -154,7 +154,7 @@ e.g. if images turned out not to be translation invariant,
 
 ## Convolutions
 
-Let's briefly review why the above operation is called a *convolution*.
+Let us briefly review why the above operation is called a *convolution*.
 In mathematics, the convolution between two functions,
 say $f, g: \mathbb{R}^d \to R$ is defined as
 
@@ -182,7 +182,7 @@ We will come back to this in the following section.
 
 ## Waldo Revisited
 
-Let's see what this looks like if we want to build an improved Waldo detector. The convolutional layer picks windows of a given size
+Let us see what this looks like if we want to build an improved Waldo detector. The convolutional layer picks windows of a given size
 and weighs intensities according to the mask $V$.
  We expect that wherever the 'waldoness' is highest,
  we will also find a peak in the hidden layer activations.

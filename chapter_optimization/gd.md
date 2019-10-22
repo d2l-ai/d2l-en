@@ -1,7 +1,7 @@
 # Gradient Descent
 :label:`sec_gd`
 
-In this section we are going to introduce the basic concepts underlying gradient descent. This is brief by necessity. See e.g. :cite:`Boyd.Vandenberghe.2004` for an in-depth introduction to convex optimization. Although the latter is rarely used directly in deep learning, an understanding of gradient descent is key to understanding stochastic gradient descent algorithms. For instance, the optimization problem might diverge due to an overly large learning rate. This phenomenon can already be seen in gradient descent. Likewise, preconditioning is a common technique in gradient descent and carries over to more advanced algorithms. Let's start with a simple special case.
+In this section we are going to introduce the basic concepts underlying gradient descent. This is brief by necessity. See e.g. :cite:`Boyd.Vandenberghe.2004` for an in-depth introduction to convex optimization. Although the latter is rarely used directly in deep learning, an understanding of gradient descent is key to understanding stochastic gradient descent algorithms. For instance, the optimization problem might diverge due to an overly large learning rate. This phenomenon can already be seen in gradient descent. Likewise, preconditioning is a common technique in gradient descent and carries over to more advanced algorithms. Let us start with a simple special case.
 
 ## Gradient Descent in One Dimension
 
@@ -167,7 +167,7 @@ $$\nabla f(\mathbf{x}) + H_f \mathbf{\epsilon} = 0 \text{ and hence }
 
 That is, we need to invert the Hessian $H_f$ as part of the optimization problem.
 
-For $f(x) = \frac{1}{2} x^2$ we have $\nabla f(x) = x$ and $H_f = 1$. Hence for any $x$ we obtain $\epsilon = -x$. In other words, a single step is sufficient to converge perfectly without the need for any adjustment! Alas, we got a bit lucky here since the Taylor expansion was exact. Let's see what happens in other problems.
+For $f(x) = \frac{1}{2} x^2$ we have $\nabla f(x) = x$ and $H_f = 1$. Hence for any $x$ we obtain $\epsilon = -x$. In other words, a single step is sufficient to converge perfectly without the need for any adjustment! Alas, we got a bit lucky here since the Taylor expansion was exact. Let us see what happens in other problems.
 
 ```{.python .input}
 c = 0.5
@@ -188,7 +188,7 @@ def newton(eta = 1):
 show_trace(newton())
 ```
 
-Now let us see what happens when we have a *nonconvex* function, such as $f(x) = x \cos(c x)$. After all, note that in Newton's method we end up dividing by the Hessian. This means that if the second derivative is *negative* we would walk into the direction of *increasing* $f$. That is a fatal flaw of the algorithm. Let's see what happens in practice.
+Now let us see what happens when we have a *nonconvex* function, such as $f(x) = x \cos(c x)$. After all, note that in Newton's method we end up dividing by the Hessian. This means that if the second derivative is *negative* we would walk into the direction of *increasing* $f$. That is a fatal flaw of the algorithm. Let us see what happens in practice.
 
 ```{.python .input}
 c = 0.15 * np.pi
@@ -199,7 +199,7 @@ def hessf(x): return - 2 * c * np.sin(c * x) - x * c**2 * np.cos(c * x)
 show_trace(newton())
 ```
 
-This went spectacularly wrong. How can we fix it? One way would be to 'fix' the Hessian by taking its absolute value instead. Another strategy is to bring back the learning rate. This seems to defeat the purpose, but not quite. Having second order information allows us to be cautious whenever the curvature is large and to take longer steps whenever the objective is flat. Let's see how this works with a slightly smaller learning rate, say $\eta = 0.5$. As we can see, we have quite an efficient algorithm.
+This went spectacularly wrong. How can we fix it? One way would be to 'fix' the Hessian by taking its absolute value instead. Another strategy is to bring back the learning rate. This seems to defeat the purpose, but not quite. Having second order information allows us to be cautious whenever the curvature is large and to take longer steps whenever the objective is flat. Let us see how this works with a slightly smaller learning rate, say $\eta = 0.5$. As we can see, we have quite an efficient algorithm.
 
 ```{.python .input}
 show_trace(newton(0.5))

@@ -133,7 +133,7 @@ def load_data_nmt(batch_size, num_steps, num_examples=1000):
     return src_vocab, tgt_vocab, data_iter
 ```
 
-Let's read the first batch.
+Let us read the first batch.
 
 ```{.python .input  n=14}
 src_vocab, tgt_vocab, train_iter = load_data_nmt(batch_size=2, num_steps=8)

@@ -364,7 +364,7 @@ $$
 
 we can see with some computation that the area of the resulting parallelogram is $ad-bc$.  This area is referred to as the *determinant*.
 
-Let's check this quickly with some example code.
+Let us check this quickly with some example code.
 
 ```
 import numpy as np

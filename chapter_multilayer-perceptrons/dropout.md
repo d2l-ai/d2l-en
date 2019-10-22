@@ -57,7 +57,7 @@ Yet even in these situations, when there is no true pattern to be learned, neura
 
 ## Robustness through Perturbations
 
-Let's think briefly about what we expect from a good statistical model.
+Let us think briefly about what we expect from a good statistical model.
 We want it to do well on unseen test data.
 One way we can accomplish this is by asking
 what constitutes a a 'simple' model?

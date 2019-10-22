@@ -115,7 +115,7 @@ x.grad
 
 The gradient of the function $y = 2\mathbf{x}^{\top}\mathbf{x}$ 
 with respect to $\mathbf{x}$ should be $4\mathbf{x}$. 
-Let's quickly verify that our desired gradient was calculated correctly.
+Let us quickly verify that our desired gradient was calculated correctly.
 If the two `ndarray`s are indeed the same, 
 then their difference should consist of all zeros.
 

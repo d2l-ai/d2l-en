@@ -11,7 +11,7 @@ All of those things sound impossible and indeed, they are. After all, there's no
 
 ## Instantiating a Network
 
-Let's see what happens when we instantiate a network. We start with our trusty MLP as before.
+Let us see what happens when we instantiate a network. We start with our trusty MLP as before.
 
 ```{.python .input}
 from mxnet import init, np, npx
@@ -34,14 +34,14 @@ print(net.collect_params)
 print(net.collect_params())
 ```
 
-In particular, trying to access `net[0].weight.data()` at this point would trigger a runtime error stating that the network needs initializing before it can do anything. Let's see whether anything changes after we initialize the parameters:
+In particular, trying to access `net[0].weight.data()` at this point would trigger a runtime error stating that the network needs initializing before it can do anything. Let us see whether anything changes after we initialize the parameters:
 
 ```{.python .input}
 net.initialize()
 net.collect_params()
 ```
 
-As we can see, nothing really changed. Only once we provide the network with some data do we see a difference. Let's try it out.
+As we can see, nothing really changed. Only once we provide the network with some data do we see a difference. Let us try it out.
 
 ```{.python .input}
 x = np.random.uniform(size=(2, 20))

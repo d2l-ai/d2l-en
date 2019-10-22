@@ -42,7 +42,7 @@ data_iter = gluon.data.DataLoader(
     shuffle=True, num_workers=d2l.get_dataloader_workers())
 ```
 
-Let's visualize the first 20 images.
+Let us visualize the first 20 images.
 
 ```{.python .input  n=4}
 d2l.set_figsize((4, 4))

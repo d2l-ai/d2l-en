@@ -15,7 +15,7 @@ cell (as opposed to reading any other cell). We will refer to this as the
 cell. We refer to this as the *input* gate. Lastly, we need a mechanism to reset
 the contents of the cell, governed by a *forget* gate. The motivation for such a
 design is the same as before, namely to be able to decide when to remember and
-when to ignore inputs into the latent state via a dedicated mechanism. Let's see
+when to ignore inputs into the latent state via a dedicated mechanism. Let us see
 how this works in practice.
 
 ## Gated Memory Cells
