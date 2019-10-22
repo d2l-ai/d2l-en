@@ -28,19 +28,6 @@ lines = read_time_machine()
 '# sentences %d' % len(lines)
 ```
 
-```{.json .output n=1}
-[
- {
-  "data": {
-   "text/plain": "'# sentences 3221'"
-  },
-  "execution_count": 1,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 ## Tokenization
 
 For each sentence, we split it into a list of tokens. A token is a data point the model will train and predict. The following function supports split a sentence into words or characters, and returns a list of split strings.
