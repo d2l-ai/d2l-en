@@ -623,7 +623,7 @@ da_dw = 2*(w+x+y+z); db_dw = 2*(w+x-y-z); da_dx = 2*(w+x+y+z); db_dx = 2*(w+x-y-
 ### Now compute how f changes when we change any value from output to input ###
 df_da = df_du*du_da + df_dv*dv_da; df_db = df_du*du_db + df_dv*dv_db
 df_dw = df_da*da_dw + df_db*db_dw; df_dx = df_da*da_dx + df_db*db_dx
-df_dy = df_da*da_dy + df_db*db_dy; df_dw = df_da*da_dz + df_db*db_dz
+df_dy = df_da*da_dy + df_db*db_dy; df_dz = df_da*da_dz + df_db*db_dz
 print("df/dw at {},{},{},{} is {}".format(w,x,y,z,df_dw))
 print("df/dx at {},{},{},{} is {}".format(w,x,y,z,df_dx))
 print("df/dy at {},{},{},{} is {}".format(w,x,y,z,df_dy))
