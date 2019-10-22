@@ -1012,7 +1012,7 @@ true = np.log(2)/2
 x_graph = np.arange(a,b,epsilon)
 f_graph = x_graph/(1+x_graph**2)
 
-d2l.plt.fill_between(x,f)
+d2l.plt.fill_between(x.tolist(),f)
 d2l.plot(x_graph,f_graph)
 
 "Approximation: {}, Truth: {}".format(approx,true)
