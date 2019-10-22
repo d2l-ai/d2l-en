@@ -14,7 +14,7 @@ to routinely train networks with over 100 layers.
 
 ## Training Deep Networks
 
-To motivate batch normalization, let's review 
+To motivate batch normalization, let us review 
 a few practical challenges that arise 
 when training ML models and neural nets in particular.
 

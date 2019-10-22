@@ -103,7 +103,7 @@ rgnet.initialize()
 rgnet(x)
 ```
 
-Now that we are done designing the network, let's see how it is organized. `collect_params` provides us with this information, both in terms of naming and in terms of logical structure.
+Now that we are done designing the network, let us see how it is organized. `collect_params` provides us with this information, both in terms of naming and in terms of logical structure.
 
 ```{.python .input}
 print(rgnet.collect_params)
@@ -118,7 +118,7 @@ rgnet[0][1][0].bias.data()
 
 ## Parameter Initialization
 
-Now that we know how to access the parameters, let's look at how to initialize
+Now that we know how to access the parameters, let us look at how to initialize
 them properly. We discussed the need for
 initialization in :numref:`sec_numerical_stability`. By default, MXNet initializes the weight matrices
 uniformly by drawing from $U[-0.07, 0.07]$ and the bias parameters are all set

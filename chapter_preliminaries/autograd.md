@@ -34,7 +34,7 @@ As a toy example, say that we are interested
 in differentiating the mapping 
 $y = 2\mathbf{x}^{\top}\mathbf{x}$ 
 with respect to the column vector $\mathbf{x}$. 
-To start, let's create the variable `x` and assign it an initial value.
+To start, let us create the variable `x` and assign it an initial value.
 
 ```{.python .input  n=2}
 x = np.arange(4)
@@ -78,7 +78,7 @@ will not alter the variable's value.
 x.grad
 ```
 
-Now let's calculate ``y``. 
+Now let us calculate ``y``. 
 Because we wish to subsequently calculate gradients 
 we want MXNet to generate a computation graph on the fly. 
 We could imagine that MXNet would be turning on a recording device 

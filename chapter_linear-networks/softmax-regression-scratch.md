@@ -7,7 +7,7 @@ is similarly fundamental and you ought to know
 the gory details of how to implement it from scratch.
 As with linear regression, after doing things by hand
 we will breeze through an implementation in Gluon for comparison.
-To begin, let's import our packages.
+To begin, let us import our packages.
 
 ```{.python .input  n=1}
 import d2l
@@ -62,7 +62,7 @@ b.attach_grad()
 ## The Softmax
 
 Before implementing the softmax regression model,
-let's briefly review how operators such as `sum` work
+let us briefly review how operators such as `sum` work
 along specific dimensions in an `ndarray`.
 Given a matrix `X` we can sum over all elements (default) or only
 over elements in the same axis, *i.e.*, the column (`axis=0`) or the same row (`axis=1`).
@@ -86,7 +86,7 @@ Then, we sum over each row (we have one row per example in the batch)
 to get the normalization constants for each example.
 Finally, we divide each row by its normalization constant,
 ensuring that the result sums to $1$.
-Before looking at the code, let's recall
+Before looking at the code, let us recall
 what this looks expressed as an equation:
 
 $$

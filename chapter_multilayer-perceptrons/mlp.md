@@ -189,7 +189,7 @@ npx.set_np()
 ## Activation Functions
 
 Because they are so fundamental to deep learning, before going further,
-let's take a brief look at some common activation functions.
+let us take a brief look at some common activation functions.
 
 ### ReLU Function
 

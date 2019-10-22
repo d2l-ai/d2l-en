@@ -80,7 +80,7 @@ $$
 
 This is a nice result since nothing in the computation references two-dimensions.  Indeed, we can use this in three or three million dimensions without issue.
 
-As a simple example, let's see how to compute the angle between a pair of vectors:
+As a simple example, let us see how to compute the angle between a pair of vectors:
 
 ```{.python .input}
 import numpy as np

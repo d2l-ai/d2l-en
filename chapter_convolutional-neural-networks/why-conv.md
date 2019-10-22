@@ -17,7 +17,7 @@ However, once we start dealing with high-dimensional perceptual data,
 these *structure-less* netwroks can grow unwieldy.
 
 
-For instance, let's return to our running example
+For instance, let us return to our running example
 of distinguishing cats from dogs.
 Say that we do a thorough job in data collection,
 collecting an annotated sets of high-quality 1-megapixel photographs.
@@ -76,7 +76,7 @@ Let's see how this translates into mathematics.
 
 <!-- In this exposition, we treat both images and hidden layers
 alike as two-dimensional arrays.  -->
-To start off let's consider what an MLP would look like
+To start off let us consider what an MLP would look like
 with $h \times w$ images as inputs
 (represented as matrices in math, and as 2D arrays in code),
 and hidden representations similarly organized
@@ -108,7 +108,7 @@ For any given location $(i,j)$ in the hidden layer $h[i,j]$,
 we compute its value by summing over pixels in $x$,
 centered around $(i,j)$ and weighted by $V[i,j,a,b]$.
 
-Now let's invoke the first principle we established above—*translation invariance*.
+Now let us invoke the first principle we established above—*translation invariance*.
 This implies that a shift in the inputs $x$
 should simply lead to a shift in the activations $h$.
 This is only possible if $V$ and $u$ don't actually depend on $(i,j)$,
@@ -123,7 +123,7 @@ in the vicinity of $(i,j)$ with coefficients $V[a,b]$
 to obtain the value $h[i,j]$.
 Note that $V[a,b]$ needs many fewer coefficients than $V[i,j,a,b]$. For a 1 megapixel image it has at most 1 million coefficients. This is 1 million fewer parameters since it no longer depends on the location within the image. We have made significant progress!
 
-Now let's invoke the second principle - *locality*.
+Now let us invoke the second principle - *locality*.
 As motivated above, we believe that we shouldn't have
 to look very far away from $(i,j)$
 in order to glean relevant information

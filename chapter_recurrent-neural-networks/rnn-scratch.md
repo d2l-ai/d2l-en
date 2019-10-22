@@ -172,7 +172,7 @@ def grad_clipping(model, theta):
 
 ## Training
 
-Similar to :numref:`sec_linear_scratch`, let's first define the function to train the model on one data epoch. It differs to the models training from previous chapters in three places:
+Similar to :numref:`sec_linear_scratch`, let us first define the function to train the model on one data epoch. It differs to the models training from previous chapters in three places:
 
 1. Different sampling methods for sequential data (independent sampling and
    sequential partitioning) will result in differences in the initialization of
@@ -243,7 +243,7 @@ num_epochs, lr = 500, 1
 train_ch8(model, train_iter, vocab, lr, num_epochs, ctx)
 ```
 
-Then let's check the results to use a random sampling iterator.
+Then let us check the results to use a random sampling iterator.
 
 ```{.python .input}
 train_ch8(model, train_iter, vocab, lr, num_epochs, ctx, use_random_iter=True)

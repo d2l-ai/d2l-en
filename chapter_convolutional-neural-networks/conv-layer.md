@@ -177,7 +177,7 @@ and consider successive layers of convolutions,
 it might be impossible to specify
 precisely what each filter should be doing manually.
 
-Now let's see whether we can learn the kernel that generated `Y` from `X`
+Now let us see whether we can learn the kernel that generated `Y` from `X`
 by looking at the (input, output) pairs only.
 We first construct a convolutional layer
 and initialize its kernel as a random array.

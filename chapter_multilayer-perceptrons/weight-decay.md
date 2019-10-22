@@ -9,7 +9,7 @@ Recall that we can always mitigate overfitting
 by going out and collecting more training data,
 that can be costly and time consuming,
 typically making it impossible in the short run.
-For now, let's assume that we have already obtained
+For now, let us assume that we have already obtained
 as much high-quality data as our resources permit
 and focus on techniques aimed at limiting the capacity
 of the function classes under consideration.
@@ -71,7 +71,7 @@ our learning algorithm will find more profit in
 minimizing the norm $|| \mathbf{w} ||^2$
 versus minimizing the training error.
 That's exactly what we want.
-To illustrate things in code, let's revive our previous example
+To illustrate things in code, let us revive our previous example
 from :numref:`sec_linear_regression` for linear regression.
 There, our loss was given by
 
@@ -245,7 +245,7 @@ def train(lambd):
 
 ### Training without Regularization
 
-Next, let's train and test the high-dimensional linear regression model.
+Next, let us train and test the high-dimensional linear regression model.
 When `lambd = 0` we do not use weight decay.
 As a result, while the training error decreases, the test error does not.
 This is a perfect example of overfitting.
