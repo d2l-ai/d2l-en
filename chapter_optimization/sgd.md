@@ -118,7 +118,7 @@ This means that we make progress as long as the expected difference between curr
 
 Next we take expectations over this expression. This yields
 $$\mathbf{E}_{w_t}\left[\|w_{t} - w^*\|^2\right] - \mathbf{E}_{w_{t+1}|w_t}\left[\|w_{t+1} - w^*\|^2\right] \geq 2 \eta_t [\mathbf{E}[R[w_t]] - R^*] -  \eta_t^2 L^2.$$
-The last step involves summing over the inequalities for $t \in \{t, \ldots T\}$. Since the sum telescopes and by dropping the lower term we obtain
+The last step involves summing over the inequalities for $t \in \{t, \ldots, T\}$. Since the sum telescopes and by dropping the lower term we obtain
 $$\|w_{0} - w^*\|^2 \geq 2 \sum_{t=1}^T \eta_t [\mathbf{E}[R[w_t]] - R^*] - L^2 \sum_{t=1}^T \eta_t^2.$$
 Note that we exploited that $w_0$ is given and thus the expectation can be dropped. Lastly define
 $$\bar{w} := \frac{\sum_{t=1}^T \eta_t w_t}{\sum_{t=1}^T \eta_t}.$$

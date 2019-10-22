@@ -257,7 +257,7 @@ we can write this out explicitly as follows:
 Note that $\mathbf{w}$ and $\mathbf{x}$ are vectors. 
 Here, the more elegant vector notation makes the math 
 much more readable than expressing things in terms of coefficients, 
-say $w_1, w_2, \ldots w_d$.
+say $w_1, w_2, \ldots, w_d$.
 
 $$
 \begin{aligned}
@@ -594,7 +594,7 @@ statistics, and computer science.
 
 ## Exercises
 
-1. Assume that we have some data $x_1, \ldots x_n \in \mathbb{R}$. Our goal is to find a constant $b$ such that $\sum_i (x_i - b)^2$ is minimized.
+1. Assume that we have some data $x_1, \ldots, x_n \in \mathbb{R}$. Our goal is to find a constant $b$ such that $\sum_i (x_i - b)^2$ is minimized.
     * Find a closed-form solution for the optimal value of $b$.
     * How does this problem and its solution relate to the normal distribution?
 1. Derive the closed-form solution to the optimization problem for linear regression with squared error. To keep things simple, you can omit the bias $b$ from the problem (we can do this in principled fashion by adding one column to $X$ consisting of all ones).

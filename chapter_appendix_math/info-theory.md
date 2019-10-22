@@ -70,7 +70,7 @@ entropy(np.array([0.1, 0.5, 0.2, 0.3]))
 
 You may be curious: in the entropy definition, why we use an expectation of a negative logarithm? Here are some intuitions.
 
-First, why do we use a *logarithm* function $\log$? Suppose that $p(x) = f_1(x) f_2(x) \ldots f_n(x)$, where each component function $f_i(x)$ is independent from each other. This means that each $f_i(x)$ contributes independently to the total information obtained from $p(x)$. As a result, we need the entropy formula to possess the additive functionality over a mixed independent distributions. Luckily, $\log$ can naturally turn a product of probability distributions to a summation of their individual information.
+First, why do we use a *logarithm* function $\log$? Suppose that $p(x) = f_1(x) f_2(x) \ldots, f_n(x)$, where each component function $f_i(x)$ is independent from each other. This means that each $f_i(x)$ contributes independently to the total information obtained from $p(x)$. As a result, we need the entropy formula to possess the additive functionality over a mixed independent distributions. Luckily, $\log$ can naturally turn a product of probability distributions to a summation of their individual information.
 
 Next, why do we use a *negative* $\log$? Intuitively, more frequent events should contain less information than less common events, since we often gain more information from an unusual case than from a regular one. However, $\log$ is monotonically increasing with the probabilities, whereas we need to construct a monotonically decreasing relationship between the probability of events and their entropy. Hence, we add a negative sign in front of $\log$ function.
 
