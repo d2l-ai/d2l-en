@@ -7,6 +7,7 @@
 notation
 math
 appendix_linear_algebra
+appendix_calculus
 info-theory
 ```
 
