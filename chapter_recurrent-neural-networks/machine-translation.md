@@ -87,7 +87,7 @@ len(src_vocab)
 
 In language models, each example is a `num_steps` length sequence from the corpus, which may be a segment of a sentence, or span over multiple sentences. In machine translation, an example should contain a pair of source sentence and target sentence. These sentences might have different lengths, while we need same length examples to form a mini-batch. 
 
-One way to solve this problem is that we if a sentence is longer than `num_steps`, we trim it's length, otherwise pad with a special &lt;pad&gt; token to meet the length. Therefore we could transform any sentence to a fixed length.
+One way to solve this problem is that if a sentence is longer than `num_steps`, we trim it's length, otherwise pad with a special &lt;pad&gt; token to meet the length. Therefore we could transform any sentence to a fixed length.
 
 ```{.python .input  n=11}
 # Saved in the d2l package for later use

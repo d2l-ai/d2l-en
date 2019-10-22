@@ -273,6 +273,8 @@ $$
 \end{aligned}
 $$
 
+Note, that the third identity is true only for a square $n \times n$ matrix $\mathbf{A}$.
+
 Similarly if $\mathbf{X}$ is a matrix, then
 $$\nabla_{\mathbf{X}} \|\mathbf{X} \|_F^2 = 2\mathbf{X}.$$
 
@@ -281,7 +283,8 @@ $$\nabla_{\mathbf{X}} \|\mathbf{X} \|_F^2 = 2\mathbf{X}.$$
 
 ### Hessian Matrices
 
-Assume the input of function $f: \mathbb{R}^n \rightarrow \mathbb{R}$ is an $n$-dimensional vector $\mathbf{x} = [x_1, x_2, \ldots, x_n]^\top$ and the output is a scalar. If all second-order partial derivatives of function $f$ exist and are continuous, then the Hessian matrix $\mathbf{H}$ of $f$ is a matrix with $m$ rows and $n$ columns given by
+Assume the input of function $f: \mathbb{R}^n \rightarrow \mathbb{R}$ is an $n$-dimensional vector $\mathbf{x} = [x_1, x_2, \ldots, x_n]^\top$ and the output is a scalar. If all second-order partial derivatives of function $f$ exist and are continuous, then the Hessian matrix $\mathbf{H}$ of $f$ is a $n \times n$ square matrix given by
+
 
 $$
 \mathbf{H} =
