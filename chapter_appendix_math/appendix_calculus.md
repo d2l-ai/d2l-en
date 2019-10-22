@@ -583,7 +583,7 @@ and then keeping track of how $f$ changes when we change *any* node in the entir
 ### Compute the value of the function from inputs to outputs ###
 w = -1; x = 0; y = -2; z = 1
 a = (w+x+y+z)**2; b = (w+x-y-z)**2
-u = (a+b)**2; v  = (a-b)**2
+u = (a+b)**2; v = (a-b)**2
 f = (u+v)**2
 print("    f at {},{},{},{} is {}".format(w,x,y,z,f))
 
@@ -620,7 +620,7 @@ w.attach_grad(); x.attach_grad(); y.attach_grad(); z.attach_grad()
 ### Do the computation like usual, tracking gradients ###
 with autograd.record():
     a = (w+x+y+z)**2; b = (w+x-y-z)**2
-	u = (a+b)**2; v  = (a-b)**2
+	u = (a+b)**2; v = (a-b)**2
 	f = (u+v)**2
 
 ### Execute backward pass ###
