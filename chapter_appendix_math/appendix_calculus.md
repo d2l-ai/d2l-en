@@ -744,14 +744,14 @@ z_quad = np.exp(-1)*(1 - x + 2*x**2 + 2*y**2)
 
 # Plot Function
 ax = d2l.plt.figure().add_subplot(111, projection='3d')
-ax.plot_surface(x, y, z, **{'rstride': 10, 'cstride': 10})
+ax.plot_wireframe(x, y, z, **{'rstride': 10, 'cstride': 10})
 ax.plot_wireframe(x, y, z_quad, **{'rstride': 10, 'cstride': 10}, color = 'purple')
 ticks = [-1,  0, 1]
 d2l.plt.xticks(ticks)
 d2l.plt.yticks(ticks)
 ax.set_zticks(ticks)
 d2l.plt.xlabel('x')
-d2l.plt.ylabel('y')
+d2l.plt.ylabel('y');
 ```
 
 This forms the basis for Newton's Algorithm discussed in :numref:`sec_gd`, where we perform numerical optimization iteratively finding the best fitting quadratic, and then exactly minimizing that quadratic.
