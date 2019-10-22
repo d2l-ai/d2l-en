@@ -1,11 +1,13 @@
-# Appendix: Mathematics for Deep Learning
+# Appendix: Math
 :label:`chap_appendix_math`
 
 ```toc
 :maxdepth: 2
 
-foundational-linear-algebra
-foundational-calculus
-foundational-probability
-foundational-info-theory
+notation
+math
+appendix_linear_algebra
+appendix_calculus
+info-theory
 ```
+
