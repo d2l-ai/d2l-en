@@ -162,13 +162,20 @@ In this way we see that we can flexibly combine all our derivative rules to comp
 
 $$
 \begin{aligned}
-\frac{d}{dx}\left[\log\left(1+(x-1)^{10}\right)\right] & = \left(1+(x-1)^{10}\right)^{-1}\frac{d}{dx}\left[1+(x-1)^{10}\right] & \text{Chain rule and derivative of logarithm}\\
-& = \left(1+(x-1)^{10}\right)^{-1}\left(\frac{d}{dx}[1] + \frac{d}{dx}[(x-1)^{10}]\right) & \text{Sum Rule} \\
-& = \left(1+(x-1)^{10}\right)^{-1}\left(0 + 10(x-1)^9\frac{d}{dx}[x-1]\right) & \text{Derivative of constants, chain rule, and power rule} \\
-& = 10\left(1+(x-1)^{10}\right)^{-1}(x-1)^9 & \text{Sum rule, derivative of linear functions, derivative of constants} \\
+\frac{d}{dx}\left[\log\left(1+(x-1)^{10}\right)\right] & = \left(1+(x-1)^{10}\right)^{-1}\frac{d}{dx}\left[1+(x-1)^{10}\right]\\
+& = \left(1+(x-1)^{10}\right)^{-1}\left(\frac{d}{dx}[1] + \frac{d}{dx}[(x-1)^{10}]\right) \\
+& = \left(1+(x-1)^{10}\right)^{-1}\left(0 + 10(x-1)^9\frac{d}{dx}[x-1]\right) \\
+& = 10\left(1+(x-1)^{10}\right)^{-1}(x-1)^9 \\
 & = \frac{10(x-1)^9}{1+(x-1)^{10}}.
 \end{aligned}
 $$
+
+Where each line has used the following rules:
+
+1. The chain rule and derivative of logarithm.
+2. The sum rule.
+3. The derivative of constants, chain rule, and power rule.
+4. The sum rule, derivative of linear functions, derivative of constants.
 
 Two things should be clear after doing this example:
 
@@ -358,20 +365,26 @@ We will call the vector $\nabla_{\mathbf{w}} L$ the *gradient* of $L$.
 This formula is worth pondering for a moment.  It has exactly the format that we encountered in one dimension, just we have converted everything to vectors and dot products.  It allows us to tell approximately how the function $L$ will change given any perturbation to the input.  As we will see in the next section, this will provide us with an important tool in understanding geometrically how we can learn using information contained in the gradient.
 
 But first, let us see this approximation at work with an example.  Suppose we are working with the function
+
 $$
 f(x,y) = \log(e^x + e^y) \text{ with gradient } \nabla f (x,y) = \left[\frac{e^x}{e^x+e^y}, \frac{e^y}{e^x+e^y}\right].
 $$
+
 If we look at a point like $(0,\log(2))$, we see that
+
 $$
 f(x,y) = \log(3) \text{ with gradient } \nabla f (x,y) = \left[\frac{1}{3}, \frac{2}{3}\right].
 $$
+
 Thus, if we want to approximate $f$ at $(\epsilon_1,\log(2) + \epsilon_2)$,  we see that we should have
+
 $$
 f(\epsilon_1,\log(2) + \epsilon_2) \approx \log(3) + \frac{1}{3}\epsilon_1 + \frac{2}{3}\epsilon_2.
 $$
 
 We can test this in code to see how good the approximation is.
-```
+
+```{.python .input}
 f = lambda x,y : np.log(np.exp(x) + np.exp(y))
 grad_f = lambda x,y : np.array([np.exp(x)/(np.exp(x)+np.exp(y)), np.exp(y)/(np.exp(x)+np.exp(y))])
 
@@ -451,7 +464,11 @@ This highlights an important fact to know when working either theoretically or n
 Let us suppose we have a function of four variables ($w,x,y,z$) which we can make by composing many terms:
 
 $$
-f(u,v) = (u+v)^{2},\qquad u(a,b) = (a+b)^{2},\qquad v(a,b) = (a-b)^{2},\qquad a(w,x,y,z) = (w+x+y+z)^{2},\qquad b(w,x,y,z) = (w+x-y-z)^2.
+\begin{aligned}
+f(u,v) & = (u+v)^{2} \\
+u(a,b) & = (a+b)^{2}, \qquad v(a,b) = (a-b)^{2}, \\
+a(w,x,y,z) & = (w+x+y+z)^{2},\qquad b(w,x,y,z) = (w+x-y-z)^2.
+\end{aligned}
 $$
 
 Such chains of equations are common when working with neural networks, so trying to understand how to compute gradients of such functions is key to advanced techniques in machine learning.  We can start to see visually hints of this connection if we take a look at what variables directly relate to one another.
@@ -506,12 +523,16 @@ $$
 
 Understanding the chain rule in this way will pay great dividends when trying to understand how gradients flow through networks, and why various architectural choices like those in LSTMs (:numref:`sec_lstm`) or residual layers (:numref:`sec_resnet`) can help shape the learning process by controlling gradient flow.
 
-### The Backpropegation Algorithm
+### The Backpropagation Algorithm
 
 Let us return to the problem we saw in the previous section where
 
 $$
-f(u,v) = (u+v)^{2},\qquad u(a,b) = (a+b)^{2},\qquad v(a,b) = (a-b)^{2},\qquad a(w,x,y,z) = (w+x+y+z)^{2},\qquad b(w,x,y,z) = (w+x-y-z)^2.
+\begin{aligned}
+f(u,v) & = (u+v)^{2} \\
+u(a,b) & = (a+b)^{2}, \qquad v(a,b) = (a-b)^{2}, \\
+a(w,x,y,z) & = (w+x+y+z)^{2},\qquad b(w,x,y,z) = (w+x-y-z)^2.
+\end{aligned}
 $$
 
 If we want to compute say $\frac{\partial f}{\partial w}$ we may apply the multi-variate chain rule to see:
@@ -605,6 +626,8 @@ df_dw = df_da*da_dw + df_db*db_dw; df_dx = df_da*da_dx + df_db*db_dx
 df_dy = df_da*da_dy + df_db*db_dy; df_dw = df_da*da_dz + df_db*db_dz
 print("df/dw at {},{},{},{} is {}".format(w,x,y,z,df_dw))
 print("df/dx at {},{},{},{} is {}".format(w,x,y,z,df_dx))
+print("df/dy at {},{},{},{} is {}".format(w,x,y,z,df_dy))
+print("df/dz at {},{},{},{} is {}".format(w,x,y,z,df_dz))
 ```
 
 The fact that we compute derivatives from $f$ back towards the inputs rather than from the inputs forward to the outputs (as we did in the first code snippet above) is what gives this algorithm its name: *backpropagation*.  Note that there are two steps:
@@ -632,6 +655,9 @@ with autograd.record():
 f.backward()
 
 print("df/dw at {},{},{},{} is {}".format(w,x,y,z,w.grad))
+print("df/dx at {},{},{},{} is {}".format(w,x,y,z,x.grad))
+print("df/dy at {},{},{},{} is {}".format(w,x,y,z,y.grad))
+print("df/dz at {},{},{},{} is {}".format(w,x,y,z,z.grad))
 ```
 
 All of what we did above can be done automatically by calling `f.backwards()`.
@@ -688,9 +714,44 @@ $$
 f(\mathbf{x}) = f(\mathbf{x}_0) + \nabla f (\mathbf{x}_0) \cdot (\mathbf{x}-\mathbf{x}_0) + \frac{1}{2}(\mathbf{x}-\mathbf{x}_0)^\top \mathbf{H} f (\mathbf{x}_0) (\mathbf{x}-\mathbf{x}_0).
 $$
 
-This works for any dimensional input, and provides the best approximating quadratic to any function at a point.
+This works for any dimensional input, and provides the best approximating quadratic to any function at a point.  To give an example, let's plot the function 
 
-??? CODE FIGURE ???
+$$
+f(x,y) = xe^{-x^2-y^2}.
+$$
+
+One can compute that the gradient and Hessian are
+$$
+\nabla f(x,y) = e^{-x^2-y^2}\begin{pmatrix}1-2x^2 \\ -2xy\end{pmatrix} \text{ and } \mathbf{H}f(x,y) = e^{-x^2-y^2}\begin{pmatrix} 4x^3 - 6x & 4x^2y - 2y \\ 4x^2y-2y &4xy^2-2x\end{pmatrix}
+$$
+
+And thus, with a little algebra, see that the approximating quadratic at $[-1,0]^\top$ is
+
+$$
+f(x,y) \approx e^{-1}(1 - x +2x^2+2y^2).
+$$
+
+
+```{.python .input}
+# Construct grid and compute function
+x, y = np.meshgrid(np.linspace(-2, 2, 101), np.linspace(-2, 2, 101), indexing='ij')
+z = x*np.exp(- x**2 - y**2)
+
+# Compute gradient and Hessian at (1,0)
+z_quad = np.exp(-1)*(1 - x + 2*x**2 + 2*y**2)
+
+# Plot Function
+ax = d2l.plt.figure().add_subplot(111, projection='3d')
+ax.plot_wireframe(x, y, z, **{'rstride': 10, 'cstride': 10})
+ax.plot_wireframe(x, y, z_quad, **{'rstride': 10, 'cstride': 10})
+ax.plot([0], [0], [0], 'rx')
+ticks = [-1,  0, 1]
+d2l.plt.xticks(ticks)
+d2l.plt.yticks(ticks)
+ax.set_zticks(ticks)
+d2l.plt.xlabel('x')
+d2l.plt.ylabel('y')
+```
 
 This forms the basis for Newton's Algorithm discussed in :numref:`sec_gd`, where we perform numerical optimization iteratively finding the best fitting quadratic, and then exactly minimizing that quadratic.
 
