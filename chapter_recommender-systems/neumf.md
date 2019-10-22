@@ -36,7 +36,7 @@ The following figure illustrates the model architecture of NeuMF.
 
 ![Illustration of the NeuMF model](../img/rec-neumf.svg)
 
-```{.python .input  n=1}
+```{.python .input  n=3}
 import d2l
 from mxnet import autograd, init, gluon, np, npx
 from mxnet.gluon import nn
@@ -44,22 +44,6 @@ import mxnet as mx
 import math
 import random
 npx.set_np()
-```
-
-```{.json .output n=1}
-[
- {
-  "ename": "ModuleNotFoundError",
-  "evalue": "No module named 'd2l'",
-  "output_type": "error",
-  "traceback": [
-   "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
-   "\u001b[0;31mModuleNotFoundError\u001b[0m                       Traceback (most recent call last)",
-   "\u001b[0;32m<ipython-input-1-e47847c97ca6>\u001b[0m in \u001b[0;36m<module>\u001b[0;34m\u001b[0m\n\u001b[0;32m----> 1\u001b[0;31m \u001b[0;32mimport\u001b[0m \u001b[0md2l\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      2\u001b[0m \u001b[0;32mfrom\u001b[0m \u001b[0mmxnet\u001b[0m \u001b[0;32mimport\u001b[0m \u001b[0mautograd\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0minit\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mgluon\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mnp\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mnpx\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      3\u001b[0m \u001b[0;32mfrom\u001b[0m \u001b[0mmxnet\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mgluon\u001b[0m \u001b[0;32mimport\u001b[0m \u001b[0mnn\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      4\u001b[0m \u001b[0;32mimport\u001b[0m \u001b[0mmxnet\u001b[0m \u001b[0;32mas\u001b[0m \u001b[0mmx\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      5\u001b[0m \u001b[0;32mimport\u001b[0m \u001b[0mmath\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
-   "\u001b[0;31mModuleNotFoundError\u001b[0m: No module named 'd2l'"
-  ]
- }
-]
 ```
 
 ## Model Implementation
