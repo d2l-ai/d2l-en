@@ -1012,7 +1012,7 @@ true = np.log(2)/2
 x_graph = np.arange(-1,2,epsilon)
 f_graph = x_graph/(1+x_graph**2)
 
-d2l.plt.plot(x_graph,y_graph)
+d2l.plt.plot(x_graph,f_graph)
 d2l.plt.bar(x,f)
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('f(x)')
