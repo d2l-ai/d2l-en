@@ -148,32 +148,43 @@ While our ability to visualize runs out at this point, nothing stops us from doi
 
 This occurs often when thinking about machine learned models.  For instance, we can understand linear classification models like those from :numref:`chapter_softmax` as methods to find hyperplanes that separate the different target classes.  In this context, such hyperplanes are often referred to as *decision planes*.  The majority of deep learned classification models end with a linear layer fed into a softmax, so one can interpret the role of the deep neural network to be to find a non-linear embedding so that the target classes can be separated cleanly by hyperplanes.
 
-To give a hand-built example, notice that we can produce a reasonable model to classify tiny images of t-shirts and trousers from the Fashion MNIST dataset (seen in :numref:`sec_fashion_mnist`) by just taking the vector between their means to define the decision plane.
+To give a hand-built example, notice that we can produce a reasonable model to classify tiny images of t-shirts and trousers from the Fashion MNIST dataset (seen in :numref:`sec_fashion_mnist`) by just taking the vector between their means to define the decision plane.  I eyeballed an arbitrary threshold.
 
 ```{.python .input} 
 from mxnet import gluon
-### Load in the dataset and split it ###
- 
-X_train, y_train = gluon.data.vision.FashionMNIST(train=True) 
-X_test, y_test = gluon.data.vision.FashionMNIST(train=False)
-X_train = X_train.asnumpy(); y_train = y_train.asnumpy();
-X_test = X_test.asnumpy(); y_test = y_test.asnumpy();
 
-### Compute the means
-    
-ave_0 = np.mean(X_train[y_train == 0],axis=0)
-ave_1 = np.mean(X_train[y_train == 1],axis=0)
+# Load in the dataset
  
-d2l.plt.imshow(ave_0.reshape(8,8),cmap='Greys')
-d2l.plt.show()
-d2l.plt.imshow(ave_1.reshape(8,8),cmap='Greys')
-d2l.plt.show()
+train = gluon.data.vision.FashionMNIST(train=True) 
+test = gluon.data.vision.FashionMNIST(train=False)
 
-### Compute the weight and use as a decision plane ###
+X_train_0 = np.array([x[0] for x in train if x[1] == 0])
+X_train_1 = np.array([x[0] for x in train if x[1] == 1])
+X_test = np.array([x[0] for x in test if x[1] == 0 or x[1] == 1])
+y_test = np.array([x[1] for x in test if x[1] == 0 or x[1] == 1])
+
+# Compute Averages
+ave_0 = np.mean(X_train_0,axis=0)
+ave_1 = np.mean(X_train_1,axis=0)
+```
+
+```{.python .input}
+# Plot average t-shirt
+d2l.plt.imshow(ave_0.reshape(28,28).tolist(),cmap='Greys')
+d2l.plt.show()
+```
+
+```{.python .input}
+# Plot average trousers
+d2l.plt.imshow(ave_1.reshape(28,28).tolist(),cmap='Greys')
+d2l.plt.show()
+```
+
+```{.python .input}
+# Print test set accuracy with eyeballed threshold
 w = (ave_1 - ave_0).T
-predictions = 1*(X_test.dot(w) > 0) 
- 
-print("Accuracy: {}".format(np.mean(predictions==y_test)))
+predictions = 1*(X_test.reshape(2000,-1).dot(w.flatten()) > -1500000)
+"Accuracy: {}".format(np.mean(predictions==y_test))
 ```
 
 ## Geometry of linear transformations
