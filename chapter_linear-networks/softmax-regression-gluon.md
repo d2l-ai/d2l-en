@@ -60,7 +60,7 @@ which makes $\hat y_j$ zero and we get ``-inf`` for $\text{log}(\hat y_j)$.
 A few steps down the road in backpropagation,
 we start to get horrific not-a-number (``nan``) results printed to screen.
 
-Our salvation is that even though we're computing these exponential functions, we ultimately plan to take their log in the cross-entropy functions.
+Our salvation is that even though we are computing these exponential functions, we ultimately plan to take their log in the cross-entropy functions.
 It turns out that by combining these two operators
 ``softmax`` and ``cross_entropy`` together,
 we can escape the numerical stability issues

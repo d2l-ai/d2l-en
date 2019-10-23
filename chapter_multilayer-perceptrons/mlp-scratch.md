@@ -102,13 +102,13 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs,
 ```
 
 To see how well we did, let us apply the model to some test data.
-If you're interested, compare the result to corresponding linear model in :numref:`sec_softmax_scratch`.
+If you are interested, compare the result to corresponding linear model in :numref:`sec_softmax_scratch`.
 
 ```{.python .input}
 d2l.predict_ch3(net, test_iter)
 ```
 
-This looks a bit better than our previous result, a good sign that we're on the right path.
+This looks a bit better than our previous result, a good sign that we are on the right path.
 
 ## Summary
 

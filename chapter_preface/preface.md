@@ -144,7 +144,7 @@ and provides a single self-contained working example -- using a real dataset.
 This presents an organizational challenge.
 Some models might logically be grouped together in a single notebook.
 And some ideas might be best taught by executing several models in succession.
-On the other hand, there's a big advantage to adhering
+On the other hand, there is a big advantage to adhering
 to a policy of *1 working example, 1 notebook*:
 This makes it as easy as possible for you to
 start your own research projects by leveraging our code.

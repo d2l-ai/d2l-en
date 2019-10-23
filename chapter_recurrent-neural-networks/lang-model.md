@@ -110,7 +110,7 @@ d2l.plot(freqs, xlabel='token', ylabel='frequency',
          xscale='log', yscale='log')
 ```
 
-We're on to something quite fundamental here - the word frequencies decay rapidly in a well defined way. After dealing with the first four words as exceptions ('the', 'i', 'and', 'of'), all remaining words follow a straight line on a log-log plot. This means that words satisfy [Zipf's law](https://en.wikipedia.org/wiki/Zipf%27s_law) which states that the item frequency is given by
+We are on to something quite fundamental here - the word frequencies decay rapidly in a well defined way. After dealing with the first four words as exceptions ('the', 'i', 'and', 'of'), all remaining words follow a straight line on a log-log plot. This means that words satisfy [Zipf's law](https://en.wikipedia.org/wiki/Zipf%27s_law) which states that the item frequency is given by
 
 $$n(x) \propto (x + c)^{-\alpha} \text{ and hence }
 \log n(x) = -\alpha \log (x+c) + \mathrm{const.}​$$
@@ -257,7 +257,7 @@ def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
 * $n$-grams provide a convenient model for dealing with long sequences by truncating the dependence.
 * Long sequences suffer from the problem that they occur very rarely or never. 
 * Zipf's law governs the word distribution for both unigrams and n-grams.
-* There's a lot of structure but not enough frequency to deal with infrequent word combinations efficiently via smoothing.
+* There is a lot of structure but not enough frequency to deal with infrequent word combinations efficiently via smoothing.
 * The main choices for sequence partitioning are whether we pick consecutive or random sequences. 
 * Given the overall document length, it is usually acceptable to be slightly wasteful with the documents and discard half-empty minibatches.
 

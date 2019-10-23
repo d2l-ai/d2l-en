@@ -27,7 +27,7 @@ Now, the code repository of this book will be copied to your username, such as `
 
 ### Clone the Repository
 
-To clone the repository (i.e., to make a local copy) we need to get its repository address. The green button on the picture below displays this. Make sure that your local copy is up to date with the main repository if you decide to keep this fork around for longer. For now simply follow the instructions in :numref:`chap_installation` to get started. The main difference is that you're now downloading *your own fork* of the repository.
+To clone the repository (i.e., to make a local copy) we need to get its repository address. The green button on the picture below displays this. Make sure that your local copy is up to date with the main repository if you decide to keep this fork around for longer. For now simply follow the instructions in :numref:`chap_installation` to get started. The main difference is that you are now downloading *your own fork* of the repository.
 
 ![ Git clone. ](../img/git-clone-numpy2.png)
 :width:`700px`
@@ -56,7 +56,7 @@ nothing to commit, working tree clean
 
 ### Edit the Book and Push
 
-Now it is time to edit the book. It is best to edit the notebooks in Jupyter following instructions in :numref:`sec_jupyter`. Make the changes and check that they're OK. Assume we have modified a typo in the file `~/d2l-en/chapter_appendix/how-to-contribute.md`.
+Now it is time to edit the book. It is best to edit the notebooks in Jupyter following instructions in :numref:`sec_jupyter`. Make the changes and check that they are OK. Assume we have modified a typo in the file `~/d2l-en/chapter_appendix/how-to-contribute.md`.
 You can then check which files you have changed:
 
 At this point Git will prompt that the `sec_appendix/how-to-contribute.md` file has been modified.
@@ -93,7 +93,7 @@ Go to your fork of the repository on GitHub and select "New pull request". This 
 
 ### Submit Pull Request
 
-Finally, submit a pull request. Make sure to describe the changes you have made in the pull request. This will make it easier for the authors to review it and to merge it with the book. Depending on the changes, this might get accepted right away, rejected, or more likely, you'll get some feedback on the changes. Once you've incorporated them, you're good to go.
+Finally, submit a pull request. Make sure to describe the changes you have made in the pull request. This will make it easier for the authors to review it and to merge it with the book. Depending on the changes, this might get accepted right away, rejected, or more likely, you'll get some feedback on the changes. Once you've incorporated them, you are good to go.
 
 ![Create Pull Request.](../img/git-createpr-numpy2.png)
 :width:`700px`
@@ -103,7 +103,7 @@ Your pull request will appear among the list of requests in the main repository.
 ## Summary
 
 * You can use GitHub to contribute to this book.
-* Forking a repositoy is the first step to contributing, since it allows you to edit things locally and only contribute back once you're ready.
+* Forking a repositoy is the first step to contributing, since it allows you to edit things locally and only contribute back once you are ready.
 * Pull requests are how contributions are being bundled up. Try not to submit huge pull requests since this makes them hard to understand and incorporate. Better send several smaller ones.
 
 ## Exercises

@@ -199,7 +199,7 @@ We don't really have much control
 over the inputs into the layer $x_j$
 but let us proceed with the somewhat unrealistic assumption
 that they also have zero mean and variance $\gamma^2$
-and that they're independent of $\mathbf{W}$.
+and that they are independent of $\mathbf{W}$.
 In this case, we can compute mean and variance of $h_i$ as follows:
 
 $$

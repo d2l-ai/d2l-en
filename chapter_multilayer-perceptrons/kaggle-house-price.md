@@ -30,7 +30,7 @@ for machine learning competitions.
 It combines data, code and users in a way to allow
 for both collaboration and competition.
 While leaderboard chasing can sometimes get out of control,
-there's also a lot to be said for the objectivity in a platform
+there is also a lot to be said for the objectivity in a platform
 that provides fair and direct quantitative comparisons
 between your approaches and those devised by your competitors.
 Moreover, you can checkout the code
@@ -73,7 +73,7 @@ The 'Data' tab on the competition tab has links to download the data.
 
 We will read and process the data using `pandas`,
 an [efficient data analysis toolkit](http://pandas.pydata.org/pandas-docs/stable/), so you will want to make sure that you have `pandas` installed
-before proceeding further. Fortunately, if you're reading in Jupyter,
+before proceeding further. Fortunately, if you are reading in Jupyter,
 we can install pandas without even leaving the notebook.
 
 ```{.python .input  n=3}
@@ -191,7 +191,7 @@ To get started we train a linear model with squared loss.
 Not surprisingly, our linear model will not lead
 to a competition winning submission
 but it provides a sanity check to see whether
-there's meaningful information in the data.
+there is meaningful information in the data.
 If we cannot do better than random guessing here,
 then there might be a good chance
 that we have a data processing bug.

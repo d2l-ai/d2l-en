@@ -354,7 +354,7 @@ and learn how to implement them more concisely.
 ## Exercises
 
 1. What would happen if we were to initialize the weights $\mathbf{w} = 0$. Would the algorithm still work?
-1. Assume that you're [Georg Simon Ohm](https://en.wikipedia.org/wiki/Georg_Ohm) trying to come up with a model between voltage and current. Can you use `autograd` to learn the parameters of your model.
+1. Assume that you are [Georg Simon Ohm](https://en.wikipedia.org/wiki/Georg_Ohm) trying to come up with a model between voltage and current. Can you use `autograd` to learn the parameters of your model.
 1. Can you use [Planck's Law](https://en.wikipedia.org/wiki/Planck%27s_law) to determine the temperature of an object using spectral energy density?
 1. What are the problems you might encounter if you wanted to extend `autograd` to second derivatives? How would you fix them?
 1.  Why is the `reshape` function needed in the `squared_loss` function?
