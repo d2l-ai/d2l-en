@@ -70,7 +70,7 @@ Now, if the weight vector becomes too large,
 our learning algorithm will find more profit in
 minimizing the norm $|| \mathbf{w} ||^2$
 versus minimizing the training error.
-That's exactly what we want.
+That is exactly what we want.
 To illustrate things in code, let us revive our previous example
 from :numref:`sec_linear_regression` for linear regression.
 There, our loss was given by
@@ -127,7 +127,7 @@ $$
 As before, we update $\mathbf{w}$ based on the amount
 by which our estimate differs from the observation.
 However, we also shrink the size of $\mathbf{w}$ towards $0$.
-That's why the method is sometimes called "weight decay":
+That is why the method is sometimes called "weight decay":
 because the penalty term literally causes our optimization algorthm
 to *decay* the magnitude of the weight at each step of training.
 This is more convenient than having to pick

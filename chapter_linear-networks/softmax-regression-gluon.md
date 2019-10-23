@@ -33,7 +33,7 @@ net.initialize(init.Normal(sigma=0.01))
 
 In the previous example, we calculated our model's output and then ran this
 output through the cross-entropy loss. At its heart it uses `-nd.pick(y_hat,
-y).log()`. Mathematically, that's a perfectly reasonable thing to do. However,
+y).log()`. Mathematically, that is a perfectly reasonable thing to do. However,
 computationally, things can get hairy when dealing with exponentiation due to
 numerical stability issues, a matter we have already discussed a few times
 (e.g., in :numref:`sec_naive_bayes`) and

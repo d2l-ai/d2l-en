@@ -333,7 +333,7 @@ Imagine that we have a stream of data that we want to compress.
 If it is always easy for us to predict the next token,
 then this data is easy to compress! 
 Take the extreme example where every token in the stream always takes the same value.
-That's a very boring data stream! 
+That is a very boring data stream! 
 And not only is it boring, but it is easy to predict. 
 Because they are always the same, we do not have to transmit any information 
 to communicate the contents of the stream.

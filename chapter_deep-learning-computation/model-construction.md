@@ -110,7 +110,7 @@ net(x)
 In this example, as in previous chapters,
 our model consists of an object returned by the `nn.Sequential` constructor.
 After instantiating a `nn.Sequential` and storing the `net` variable,
-we repeatedly called its `.add()` method,
+we repeatedly called its `add` method,
 appending layers in the order that they should be executed.
 We suspect that you might have already understood *more or less*
 what was going on here the first time you saw this code.
@@ -197,7 +197,7 @@ Note that before getting on with the interesting parts,
 our customized `__init__` method must invoke the parent class's
 init method: `super(MLP, self).__init__(**kwargs)`
 to save us from reimplementing boilerplate code applicable to most Blocks.
-Then, all that's left is to instantiate our two `Dense` layers,
+Then, all that is left is to instantiate our two `Dense` layers,
 assigning them to `self.hidden` and `self.output`, respectively.
 Again note that when dealing with standard functionality like this,
 we do not have to worry about backpropagation,
