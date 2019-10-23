@@ -44,8 +44,6 @@ The model can be learned with BPR or Hinge loss. The architecture of Caser is sh
 We firstly import the required libraries.
 
 ```{.python .input  n=1}
-import sys
-sys.path.insert(0, '..')
 import d2l
 from mxnet import autograd, init, gluon, np, npx
 from mxnet.gluon.data import Dataset
