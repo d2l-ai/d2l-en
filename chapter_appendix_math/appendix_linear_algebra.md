@@ -628,7 +628,7 @@ for i in range(1,100):
     v_in = A.dot(v_in)
     norm_list.append(np.linalg.norm(v_in))
     
-d2l.plot(np.arange(1,100),norm_list,'Iteration','Value')
+d2l.plot(np.arange(0,100),norm_list,'Iteration','Value')
 ```
 
 The norm is growing uncontrollably!  Indeed if we take the list of quotients, we will see a pattern.
@@ -677,7 +677,7 @@ for i in range(1,100):
     v_in = A.dot(v_in)
     norm_list.append(np.linalg.norm(v_in))
     
-d2l.plot(np.arange(1,100),norm_list,'Iteration','Value')
+d2l.plot(np.arange(0,100),norm_list,'Iteration','Value')
 
 # Also the ratio
 norm_ratio_list = []
