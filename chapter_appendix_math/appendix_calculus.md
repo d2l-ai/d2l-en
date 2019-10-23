@@ -978,7 +978,7 @@ Suppose we have a function $f(x)$.  For simplicity, let us assume that $f(x)$ is
 x = np.arange(-2,2,0.01)
 f = np.exp(-x**2)
 
-d2l.plt.plot(x,f,color='red')
+d2l.plt.plot(x,f,color='purple')
 d2l.plt.fill_between(x.tolist(),f.tolist())
 d2l.plt.show()
 ```
@@ -989,8 +989,8 @@ In most cases, this area will be infinite or undefined (consider the area under 
 x = np.arange(-2,2,0.01)
 f = np.exp(-x**2)
 
-d2l.plt.plot(x,f,color='red')
-d2l.plt.fill_between(x.tolist()[150:250],f.tolist()[150:250])
+d2l.plt.plot(x,f,color='purple')
+d2l.plt.fill_between(x.tolist()[50:250],f.tolist()[50:250])
 d2l.plt.show()
 ```
 
@@ -1011,7 +1011,7 @@ There is a traditional way to try and understand how we might try to approximate
 ```{.python .input}
 epsilon = 0.05
 a = 0
-b = 1
+b = 2
 
 x = np.arange(a,b,epsilon)
 f = x/(1+x**2)
@@ -1019,11 +1019,8 @@ f = x/(1+x**2)
 approx = np.sum(epsilon*f)
 true = np.log(2)/2
 
-x_graph = np.arange(-1,2,epsilon)
-f_graph = x_graph/(1+x_graph**2)
-
-d2l.plt.bar(x,f,width = epsilon, align = 'edge')
-d2l.plt.plot(x,f,color='red')
+d2l.plt.bar(x,f,width = epsilon, align = 'edge', edgecolor = 'black')
+d2l.plt.plot(x,f,color='purple')
 d2l.plt.ylim([0,1])
 d2l.plt.show()
 
@@ -1062,7 +1059,7 @@ $$
 
 This is a mathematical encoding of the fact that we can measure the area out to the far end-point and then subtract off the area to the near end point as indicated in the figure below.
 
-??? Subtracting areas ???
+![Visualizing why we may reduce the problem of computing the area under a curve between two points to computing the area to the left of a point.](../img/SubArea.svg)
 
 Thus, if we can figure out what the integral over any interval is by figuring out what $F(x)$ is.  
 
@@ -1149,7 +1146,7 @@ This is the *change of variables* formula.  It states that we may consider repar
 
 For a more intuitive derivation, consider what happens when we take an integral of $f(u(x))$ between $x$ and $x+\epsilon$. For a small $\epsilon$, this integral is approximately $\epsilon f(u(x))$, the area of the associated rectangle.  Now, let us compare this with the integral of $f(y)$ from $u(x)$ to $u(x+\epsilon)$.  We know that $u(x+\epsilon) \approx u(x) + \epsilon \frac{du}{dx}(x)$, so the area of this rectangle is approximately $\epsilon \frac{du}{dx}(x)f(u(x))$.  Thus, to make the area of these two rectangles to agree, we need to multiply the first one by $\frac{du}{dx}(x)$.  
 
-???? Figure ????
+![Visualizing the transformation of a single thin rectangle under the change of variables.](../img/RectTrans.svg)
 
 This tells us that
 
@@ -1204,7 +1201,20 @@ If this discussion sounds familiar, it is!  In :numref:`appendix_linear_algebra`
 ### Multiple Integrals
 In some cases, we will need to work in higher dimensions.  For instance, suppose we have a function of two variables, like $f(x,y)$ and we want to know the volume under $f$ when $x$ ranges over $[a,b]$ and $y$ ranges over $[c,d]$.
 
-????????? Add figure ???????
+```{.python .input}
+from mpl_toolkits import mplot3d
+
+# Construct grid and compute function
+x, y = np.meshgrid(np.linspace(-2, 2, 101), np.linspace(-2, 2, 101), indexing='ij')
+z = np.exp(- x**2 - y**2)
+
+# Plot Function
+ax = d2l.plt.figure().add_subplot(111, projection='3d')
+ax.plot_surface(x, y, z,)
+d2l.plt.xlabel('x')
+d2l.plt.ylabel('y')
+ax.set_xlim(-2, 2); ax.set_ylim(-2, 2); ax.set_zlim(0, 1);
+```
 
 We write this as 
 
