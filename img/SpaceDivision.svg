@@ -101,11 +101,7 @@
 </clipPath>
 </defs>
 <g id="surface1">
-<<<<<<< HEAD
 <path style=" stroke:none;fill-rule:nonzero;fill:rgb(69.804382%,85.098267%,100%);fill-opacity:1;" d="M 78.804688 17 L 5 17 L 5 159 L 149.601562 159 Z M 78.804688 17 "/>
-=======
-<path style=" stroke:none;fill-rule:nonzero;fill:rgb(81.176758%,95.68634%,100%);fill-opacity:1;" d="M 78.804688 17 L 5 17 L 5 159 L 149.601562 159 Z M 78.804688 17 "/>
->>>>>>> 6250e59660951f895217a8207b861e551acd5295
 <path style="fill:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 5.898438 76 L 194.101562 76 " transform="matrix(1,0,0,1,1,11)"/>
 <path style="fill-rule:nonzero;fill:rgb(0%,0%,0%);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 198.101562 76 L 194.101562 74.5 L 194.101562 77.5 Z M 198.101562 76 " transform="matrix(1,0,0,1,1,11)"/>
 <path style="fill-rule:nonzero;fill:rgb(0%,0%,0%);fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke:rgb(0%,0%,0%);stroke-opacity:1;stroke-miterlimit:10;" d="M 1.898438 76 L 5.898438 77.5 L 5.898438 74.5 Z M 1.898438 76 " transform="matrix(1,0,0,1,1,11)"/>

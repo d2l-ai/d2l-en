@@ -6,8 +6,8 @@
 
 notation
 math
-appendix_linear_algebra
-appendix_calculus
+foundational-linear-algebra
+foundational-calculus
 info-theory
 ```
 
