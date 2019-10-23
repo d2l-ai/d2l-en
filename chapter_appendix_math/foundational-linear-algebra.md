@@ -166,6 +166,7 @@ y_test = np.array([x[1] for x in test if x[1] == 0 or x[1] == 1])
 # Compute Averages
 ave_0 = np.mean(X_train_0,axis=0)
 ave_1 = np.mean(X_train_1,axis=0)
+print(ave_0)
 ```
 
 ```{.python .input}
