@@ -788,6 +788,7 @@ Either notation allows for concise and efficient representation of tensor contra
 
 ## Exercises
 1. What is the angle between
+
 $$
 \vec v_1 = \begin{bmatrix}
 1 \\ 0 \\ -1 \\ 2
@@ -795,48 +796,47 @@ $$
 3 \\ 1 \\ 0 \\ 1
 \end{bmatrix}?
 $$
+
 2. True or false: $\begin{bmatrix}1 & 2\\0&1\end{bmatrix}$ and $\begin{bmatrix}1 & -2\\0&1\end{bmatrix}$ are inverses of one another?
-3. Suppose we draw a shape in the plane with area $100\mathrm{m}^2$ and then transform the figure by the matrix
+
+3. Suppose we draw a shape in the plane with area $100\mathrm{m}^2$.  What is the area after transforming the figure by the matrix
+
 $$
 \begin{bmatrix}
 2 & 3\\
 1 & 2
 \end{bmatrix}.
 $$
-What is the area of the resulting figure?
-3. Which of the following sets of vectors are linearly independent?
-* **a.**  $\left\{\begin{pmatrix}1\\0\\-1\end{pmatrix},\begin{pmatrix}2\\1\\-1\end{pmatrix},\begin{pmatrix}3\\1\\1\end{pmatrix}\right\}$
-* **b.**  $\left\{\begin{pmatrix}3\\1\\1\end{pmatrix},\begin{pmatrix}1\\1\\1\end{pmatrix},\begin{pmatrix}0\\0\\0\end{pmatrix}\right\}$
-* **c.**  $\left\{\begin{pmatrix}1\\1\\0\end{pmatrix},\begin{pmatrix}0\\1\\-1\end{pmatrix},\begin{pmatrix}1\\0\\1\end{pmatrix}\right\}$
-4. Suppose you have a matrix written as
-$$
-\begin{bmatrix}c\\d\end{bmatrix}\cdot\begin{bmatrix}a & b\end{bmatrix}=\begin{bmatrix}ac & bc \\ad & bd\end{bmatrix}
-$$
-for some choice of values $a,b,c,$ and $d$.  True or false: the determinant of such a matrix is always 0?
-5. The vectors $e_1 = \begin{bmatrix}1\\0\end{bmatrix}$ and $e_2 = \begin{bmatrix}0\\1\end{bmatrix}$ are orthogonal.  For a matrix
-$$
-A = \begin{bmatrix}
-a & b \\
-c & d
-\end{bmatrix},
-$$
-when are $Ae_1$ and $Ae_2$ orthogonal?
-6. What are the eigenvalues and eigenvectors of
+
+4. Which of the following sets of vectors are linearly independent?
+* $\left\{\begin{pmatrix}1\\0\\-1\end{pmatrix},\begin{pmatrix}2\\1\\-1\end{pmatrix},\begin{pmatrix}3\\1\\1\end{pmatrix}\right\}$
+* $\left\{\begin{pmatrix}3\\1\\1\end{pmatrix},\begin{pmatrix}1\\1\\1\end{pmatrix},\begin{pmatrix}0\\0\\0\end{pmatrix}\right\}$
+* $\left\{\begin{pmatrix}1\\1\\0\end{pmatrix},\begin{pmatrix}0\\1\\-1\end{pmatrix},\begin{pmatrix}1\\0\\1\end{pmatrix}\right\}$
+
+5. Suppose you have a matrix written as $A = \begin{bmatrix}c\\d\end{bmatrix}\cdot\begin{bmatrix}a & b\end{bmatrix}$ for some choice of values $a,b,c,$ and $d$.  True or false: the determinant of such a matrix is always $0$?
+
+6. The vectors $e_1 = \begin{bmatrix}1\\0\end{bmatrix}$ and $e_2 = \begin{bmatrix}0\\1\end{bmatrix}$ are orthogonal.  What is the condition on a matrix $A$ so that $Ae_1$ and $Ae_2$ are orthogonal?
+
+7. What are the eigenvalues and eigenvectors of
+
 $$
 A = \begin{bmatrix}
 2 & 1 \\
 1 & 2
 \end{bmatrix}?
 $$
-7.  What are the eigenvalues and eigenvectors of
+
+8.  What are the eigenvalues and eigenvectors of the following matrix, and what is strange about this example compared to the previous one?
+
 $$
 A = \begin{bmatrix}
 2 & 1 \\
 0 & 2
 \end{bmatrix}?
 $$
-What is strange about this example compared to the previous one?
-8. Without computing the eigenvalues, is it possible that the smallest eigenvalue of
+
+9. Without computing the eigenvalues, is it possible that the smallest eigenvalue of the following matrix is less that $0.5$? *Note*: this problem can be done in your head.
+
 $$
 A = \begin{bmatrix}
 3.0 & 0.1 & 0.3 & 1.0 \\
@@ -845,5 +845,7 @@ A = \begin{bmatrix}
 1.0 & 0.2 & 0.0 & 1.8
 \end{bmatrix}
 $$
-is less that $0.5$? *Note*: this problem can be done in your head.
-9. How can you write $\mathrm{tr}(\mathbf{A}^4)$ in Einstein notation?
+
+10. How can you write $\mathrm{tr}(\mathbf{A}^4)$ in Einstein notation?
+
+
