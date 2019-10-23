@@ -4,7 +4,7 @@
 In :numref:`chapter_linear_algebra`, we saw the fundamentals of linear algebra and how to use it to store and transform data.  Indeed, it is safe to say that linear algebra is one of the key mathematical pillars of modern deep learning.  However the theory goes much deeper than we have seen, and in this section we will dive into the some of the key geometric notions associated with linear algebra, see additional interpretations of many of the operations we have met before, and meet a few additional concepts like eigenvalues and eigenvectors.
 
 ## Geometry of Vectors
-First, w need to discuss the two common geometric interpretations of vectors, as either points or directions in space. Fundamentally, a vector is a list of numbers such as the Python list below.
+First, we need to discuss the two common geometric interpretations of vectors, as either points or directions in space. Fundamentally, a vector is a list of numbers such as the Python list below.
 
 ```{.python .input}
 [1,7,0,1]
@@ -169,6 +169,7 @@ predictions = 1*(X_test.dot(w) > 0)
  
 print("Accuracy: {}".format(np.mean(predictions==y_test)))
 ```
+
 
 ## Geometry of linear transformations
 Through :numref:`chapter_linear_algebra` and the above discussions, we have a solid understanding of the geometry of vectors, lengths, and angles. However there is one important object we have omitted discussing, and that is a geometric understanding of linear transformations represented by matrices.  Fully internalizing what matrices can do to transform data between two potentially different high dimensional spaces takes significant practice, and is beyond the scope of this appendix.  However, we can work to build a strong intuition in two dimensions.
@@ -371,6 +372,7 @@ import numpy as np
 print(np.linalg.det(np.array[[1,-1],[2,3]]))
 ```
 
+
 The eagle-eyed amongst us will notice that this expression can be zero or even negative.  For the negative term, this is a matter of convention taken generally in mathematics: if the matrix flips the figure, we say the area is negated.  Let us see now that when the determinant is zero, we learn more.
 
 Let us consider
@@ -562,7 +564,7 @@ $$
 \end{aligned}
 $$
 
-Performing the numerical computation shows that the eigenvalues are approximately $0.99, 2.97, 4.95, 9.08$, all comfortably inside the ranges provided.  
+Performing the numerical computation shows that the eigenvalues are approximately $0.99, 2.97, 4.95, 9.08$, all comfortably inside the ranges provided.
 
 ```{.python .input}
 A = np.array([[1.0, 0.1, 0.1, 0.1],
