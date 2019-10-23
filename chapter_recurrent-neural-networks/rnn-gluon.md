@@ -1,7 +1,7 @@
 # Concise Implementation of Recurrent Neural Networks
 :label:`sec_rnn_gluon`
 
-While :numref:`sec_rnn_scratch` was instructive to see how recurrent neural networks are implemented, this isn't convenient or fast. The current section will show how to implement the same language model more efficiently using functions provided by Gluon. We begin as before by reading the 'Time Machine" corpus.
+While :numref:`sec_rnn_scratch` was instructive to see how recurrent neural networks are implemented, this is not convenient or fast. The current section will show how to implement the same language model more efficiently using functions provided by Gluon. We begin as before by reading the 'Time Machine" corpus.
 
 ```{.python .input  n=1}
 import d2l

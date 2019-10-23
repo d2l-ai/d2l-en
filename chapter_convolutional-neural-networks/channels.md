@@ -93,7 +93,7 @@ typically downsampling to trade off spatial resolution
 for greater *channel depth*.
 Intuitively, you could think of each channel
 as responding to some different set of features.
-Reality is a bit more complicated than the most naive intepretations of this intuition since representations aren't learned independent but are rather optimized to be jointly useful.
+Reality is a bit more complicated than the most naive intepretations of this intuition since representations are not learned independent but are rather optimized to be jointly useful.
 So it may not be that a single channel learns an edge detector but rather that some direction in channel space corresponds to detecting edges.
 
 

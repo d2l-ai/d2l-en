@@ -149,7 +149,7 @@ dogs, such as the images below:
 
 This way the detector will eventually learn to emit a very large positive number
 if it is a cat, a very large negative number if it is a dog, and something closer
-to zero if it isn't sure, and this barely scratches the surface of what ML can
+to zero if it is not sure, and this barely scratches the surface of what ML can
 do.
 
 Deep learning is just one among many popular frameworks for solving machine
@@ -248,7 +248,7 @@ Finally it is not enough to have lots of data and to process it cleverly.
 We need the *right* data.
 If the data is full of mistakes, or if the chosen features are not predictive of the target quantity of interest, learning is going to fail.
 The situation is well captured by the cliché: *garbage in, garbage out*.
-Moreover, poor predictive performance isn't the only potential consequence.
+Moreover, poor predictive performance is not the only potential consequence.
 In sensitive applications of machine learning,
 like predictive policing, resumé screening, and risk models used for lending,
 we must be especially alert to the consequences of garbage data.
@@ -549,7 +549,7 @@ to predict if a mushroom is poisonous based on a photograph.
 Say our poison-detection classifier outputs $\Pr(y=\mathrm{death cap}|\mathrm{image}) = 0.2$.
 In other words, the classifier is 80% confident that our mushroom *is not* a death cap.
 Still, you'd have to be a fool to eat it.
-That's because the certain benefit of a delicious dinner isn't worth a 20% risk of dying from it.
+That's because the certain benefit of a delicious dinner is not worth a 20% risk of dying from it.
 In other words, the effect of the *uncertain risk* by far outweighs the benefit.
 Let us look at this in math. Basically, we need to compute the expected risk that we incur, i.e., we need to multiply the probability of the outcome with the benefit (or harm) associated with it:
 
@@ -729,7 +729,7 @@ In other words, the input $x$ is text
 and the output $y$ is an audio file.
 In this case, the output is *much longer* than the input.
 While it is easy for *humans* to recognize a bad audio file,
-this isn't quite so trivial for computers.
+this is not quite so trivial for computers.
 
 ##### Machine Translation
 

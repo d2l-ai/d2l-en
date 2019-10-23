@@ -572,7 +572,7 @@ such as weight decay and dropout.
 ## Summary
 
 * Since the generalization error rate cannot be estimated based on the training error rate, simply minimizing the training error rate will not necessarily mean a reduction in the generalization error rate. Machine learning models need to be careful to safeguard against overfitting such as to minimize the generalization error.
-* A validation set can be used for model selection (provided that it isn't used too liberally).
+* A validation set can be used for model selection (provided that it is not used too liberally).
 * Underfitting means that the model is not able to reduce the training error rate while overfitting is a result of the model training error rate being much lower than the testing data set rate.
 * We should choose an appropriately complex model and avoid using insufficient training samples.
 
