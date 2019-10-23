@@ -93,7 +93,7 @@ At test time we are asked to classify the following images:
 Obviously this is unlikely to work well.
 The training set consists of photos,
 while the test set contains only cartoons.
-The colors aren't even realistic.
+The colors are not even realistic.
 Training on a dataset that looks substantially different from the test set
 without some plan for how to adapt to the new domain is a bad idea.
 Unfortunately, this is a very common pitfall.
@@ -455,7 +455,7 @@ One key distinction between the different situations above is that the same stra
 
 Finally, it is important to remember
 that when you deploy machine learning systems
-you aren't simply minimizing negative log likelihood
+you are not simply minimizing negative log likelihood
 or maximizing accuracy—you are automating some kind of decision process.
 Often the automated decision-making systems that we deploy
 can have consequences for those subject to its decisions.
@@ -484,7 +484,7 @@ Should what news someone is exposed to be determined by which Facebook pages the
 ## Summary
 
 * In many cases training and test set do not come from the same distribution. This is called covariate shift.
-* Covariate shift can be detected and corrected if the shift isn't too severe. Failure to do so leads to nasty surprises at test time.
+* Covariate shift can be detected and corrected if the shift is not too severe. Failure to do so leads to nasty surprises at test time.
 * In some cases the environment *remembers* what we did and will respond in unexpected ways. We need to account for that when building models.
 
 ## Exercises

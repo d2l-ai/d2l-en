@@ -218,7 +218,7 @@ def squared_loss(y_hat, y):
 
 As we discussed in the previous section,
 linear regression has a closed-form solution.
-However, this isn't a book about linear regression,
+However, this is not a book about linear regression,
 it is a book about deep learning.
 Since none of the other models that this book introduces
 can be solved analytically, we will take this opportunity to introduce your first working example of stochastic gradient descent (SGD).

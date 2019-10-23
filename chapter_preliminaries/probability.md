@@ -2,7 +2,7 @@
 :label:`sec_prob`
 
 In some form or another, machine learning is all about making predictions.
-We might want to predict the *probability* of a patient suffering a heart attack in the next year, given their clinical history. In anomaly detection, we might want to assess how *likely* a set of readings from an airplane's jet engine would be, were it operating normally. In reinforcement learning, we want an agent to act intelligently in an environment. This means we need to think about the probability of getting a high reward under each of the available action. And when we build recommender systems we also need to think about probability. For example, say *hypothetically* that worked for a large online bookseller. We might want to estimate the probability that a particular user would buy a particular book. For this we need to use the language of probability and statistics. Entire courses, majors, theses, careers, and even departments, are devoted to probability. So naturally, our goal in this section isn't to teach the whole subject. Instead we hope to get you off the ground, to teach you just enough that you can start building your first machine
+We might want to predict the *probability* of a patient suffering a heart attack in the next year, given their clinical history. In anomaly detection, we might want to assess how *likely* a set of readings from an airplane's jet engine would be, were it operating normally. In reinforcement learning, we want an agent to act intelligently in an environment. This means we need to think about the probability of getting a high reward under each of the available action. And when we build recommender systems we also need to think about probability. For example, say *hypothetically* that worked for a large online bookseller. We might want to estimate the probability that a particular user would buy a particular book. For this we need to use the language of probability and statistics. Entire courses, majors, theses, careers, and even departments, are devoted to probability. So naturally, our goal in this section is not to teach the whole subject. Instead we hope to get you off the ground, to teach you just enough that you can start building your first machine
 learning models, and to give you enough of a flavor for the subject that you can begin to explore it on your own if you wish.
 
 
@@ -151,7 +151,7 @@ it never fails to detect HIV if the patient actually has it. We use $D$ to indic
 |Test positive|            1 |         0.01 |
 |Test negative|            0 |         0.99 |
 
-Note that the column sums are all one (but the row sums aren't), since the conditional probability needs to sum up to $1$, just like the probability. Let us work out the probability of the patient having AIDS if the test comes back positive. Obviously this is going to depend on how common the disease is, since it affects the number of false alarms. Assume that the population is quite healthy, e.g., $\Pr(\text{HIV positive}) = 0.0015$. To apply Bayes' Theorem, we need to determine
+Note that the column sums are all one (but the row sums are not), since the conditional probability needs to sum up to $1$, just like the probability. Let us work out the probability of the patient having AIDS if the test comes back positive. Obviously this is going to depend on how common the disease is, since it affects the number of false alarms. Assume that the population is quite healthy, e.g., $\Pr(\text{HIV positive}) = 0.0015$. To apply Bayes' Theorem, we need to determine
 $$\begin{aligned}
 \Pr(\text{Test positive}) =& \Pr(D=1 | H=0) \Pr(H=0) + \Pr(D=1
 | H=1) \Pr(H=1) \\
@@ -169,7 +169,7 @@ In other words, there is only a 13.1% chance that the patient actually has AIDS,
 ## Conditional independence
 What should a patient do upon receiving such terrifying news? Likely, he/she
 would ask the physician to administer another test to get clarity. The second
-test has different characteristics (it isn't as good as the first one).
+test has different characteristics (it is not as good as the first one).
 
 |outcome |  HIV positive |  HIV negative |
 |:------------|--------------:|--------------:|

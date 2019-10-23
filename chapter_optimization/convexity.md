@@ -12,16 +12,16 @@ Sets are the basis of convexity. Simply put, a set $X$ in a vector space is conv
 
 $$\lambda \cdot a + (1-\lambda) \cdot b \in X \text{ whenever } a, b \in X.$$
 
-This sounds a bit abstract. Consider the picture below. The first set isn't convex since there are line segments that are not contained in it. The other two sets suffer no such problem. 
+This sounds a bit abstract. Consider the picture below. The first set is not convex since there are line segments that are not contained in it. The other two sets suffer no such problem. 
 
 ![Three shapes, the left one is nonconvex, the others are convex](../img/pacman.svg)
 
-Definitions on their own aren't particularly useful unless you can do something with them. In this case we can look at unions and intersections. Assume that $X$ and $Y$ are convex sets. Then $X \cap Y$ is also convex. To see this, consider any $a, b \in X \cap Y$. Since $X$ and $Y$ are convex, the line segments connecting $a$ and $b$ are contained in both $X$ and $Y$. Given that, they also need to be contained in $X \cap Y$, thus proving our first theorem. 
+Definitions on their own are not particularly useful unless you can do something with them. In this case we can look at unions and intersections. Assume that $X$ and $Y$ are convex sets. Then $X \cap Y$ is also convex. To see this, consider any $a, b \in X \cap Y$. Since $X$ and $Y$ are convex, the line segments connecting $a$ and $b$ are contained in both $X$ and $Y$. Given that, they also need to be contained in $X \cap Y$, thus proving our first theorem. 
 
 ![The intersection between two convex sets is convex](../img/convex-intersect.svg)
 
 We can strengthen this result with little effort: given convex sets $X_i$, their intersection $\cap_{i} X_i$ is convex. 
-To see that the converse is not true, consider two disjoint sets $X \cap Y = \emptyset$. Now pick $a \in X$ and $b \in Y$. The line segment connecting $a$ and $b$ needs to contain some part that is neither in $X$ nor $Y$, since we assumed that $X \cap Y = \emptyset$. Hence the line segment isn't in $X \cup Y$ either, thus proving that in general unions of convex sets need not be convex. 
+To see that the converse is not true, consider two disjoint sets $X \cap Y = \emptyset$. Now pick $a \in X$ and $b \in Y$. The line segment connecting $a$ and $b$ needs to contain some part that is neither in $X$ nor $Y$, since we assumed that $X \cap Y = \emptyset$. Hence the line segment is not in $X \cup Y$ either, thus proving that in general unions of convex sets need not be convex. 
 
 ![The union of two convex sets need not be convex](../img/nonconvex.svg)
 
