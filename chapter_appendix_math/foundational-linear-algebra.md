@@ -170,21 +170,21 @@ ave_1 = np.mean(X_train_1,axis=0)
 
 ```{.python .input}
 # Plot average t-shirt
-d2l.plt.imshow(ave_0.reshape(28,28).tolist(),cmap='Greys')
-d2l.plt.show()
+#d2l.plt.imshow(ave_0.reshape(28,28).tolist(),cmap='Greys')
+#d2l.plt.show()
 ```
 
 ```{.python .input}
 # Plot average trousers
-d2l.plt.imshow(ave_1.reshape(28,28).tolist(),cmap='Greys')
-d2l.plt.show()
+#d2l.plt.imshow(ave_1.reshape(28,28).tolist(),cmap='Greys')
+#d2l.plt.show()
 ```
 
 ```{.python .input}
 # Print test set accuracy with eyeballed threshold
-w = (ave_1 - ave_0).T
-predictions = 1*(X_test.reshape(2000,-1).dot(w.flatten()) > -1500000)
-"Accuracy: {}".format(np.mean(predictions==y_test))
+#w = (ave_1 - ave_0).T
+#predictions = 1*(X_test.reshape(2000,-1).dot(w.flatten()) > -1500000)
+#"Accuracy: {}".format(np.mean(predictions==y_test))
 ```
 
 ## Geometry of linear transformations
