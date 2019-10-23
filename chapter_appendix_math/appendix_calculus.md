@@ -1,4 +1,4 @@
-# Intermediate Calculus
+# Foundational Calculus
 :label:`appendix_calculus`
 
 In :numref:`sec_calculus`, We saw the basic elements of differential calculus.  This appendix takes a deeper dive into the fundamentals of calculus and how we can apply it and understand it in the context of machine learning.
