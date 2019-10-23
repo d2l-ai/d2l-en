@@ -116,7 +116,7 @@ d2l.plt.legend();
 
 A small $\gamma$ will let the velocity variable focus on more recent scaled gradients. While a large value will have the velocity variable to include more past scaled gradients. Compared to the plain gradient descent, momentum will make the weight updates be more consistent over time. It might smooth the training progress if $\mathbf x$ enters the region that the gradient vary, or walk out region that is too flat.
 
-Also note that $\frac{1}{1-\gamma} = 1 + \gamma + \gamma^2 + \cdots$. So all scaled gradients are similar to each other, e.g. $\eta_t\mathbf g_t\approx \eta\mathbf g$ for all $t$s, then the momentum changes the weight updates from $\eta\mathbf g$ in normal gradient descent into $\frac{\eta}{1-\gamma} \mathbf g$.
+Also note that $\frac{1}{1-\gamma} = 1 + \gamma + \gamma^2 + \cdots$. So all scaled gradients are similar to each other, e.g., $\eta_t\mathbf g_t\approx \eta\mathbf g$ for all $t$s, then the momentum changes the weight updates from $\eta\mathbf g$ in normal gradient descent into $\frac{\eta}{1-\gamma} \mathbf g$.
 
 ## Implementation from Scratch
 

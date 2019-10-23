@@ -266,7 +266,7 @@ print(x.grad, '\n', y.grad)
 One benefit of using automatic differentiation 
 is that even if building the computational graph of a function 
 required passing through a maze of Python control flow 
-(e.g. conditionals, loops, and arbitrary function calls), 
+(e.g., conditionals, loops, and arbitrary function calls), 
 we can still calculate the gradient of the resulting variable. 
 In the following snippet, note that 
 the number of iterations of the `while` loop 

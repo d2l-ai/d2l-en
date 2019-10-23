@@ -8,7 +8,7 @@ section we invoked `s.detach()` on the sequence. None of this was really fully
 explained, in the interest of being able to build a model quickly and
 to see how it works. In this section we will delve a bit more deeply
 into the details of backpropagation for sequence models and why (and
-how) the math works. For a more detailed discussion, e.g. about
+how) the math works. For a more detailed discussion, e.g., about
 randomization and backprop also see the paper by
 [Tallec and Ollivier, 2017](https://arxiv.org/abs/1705.08209).
 

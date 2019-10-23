@@ -118,7 +118,7 @@ P_y = n_y / n_y.sum()
 P_y
 ```
 
-Now on to slightly more difficult things $P_{xy}$. Since we picked black and white images, $p(x_i | y)$ denotes the probability that pixel $i$ is switched on for class $y$. Just like before we can go and count the number of times $n_{iy}$ such that an event occurs and divide it by the total number of occurrences of $y$, i.e., $n_y$. But there's something slightly troubling: certain pixels may never be black (e.g. for very well cropped images the corner pixels might always be white). A convenient way for statisticians to deal with this problem is to add pseudo counts to all occurrences. Hence, rather than $n_{iy}$ we use $n_{iy}+1$ and instead of $n_y$ we use $n_{y} + 1$. This is also called [Laplace Smoothing](https://en.wikipedia.org/wiki/Additive_smoothing).
+Now on to slightly more difficult things $P_{xy}$. Since we picked black and white images, $p(x_i | y)$ denotes the probability that pixel $i$ is switched on for class $y$. Just like before we can go and count the number of times $n_{iy}$ such that an event occurs and divide it by the total number of occurrences of $y$, i.e., $n_y$. But there's something slightly troubling: certain pixels may never be black (e.g., for very well cropped images the corner pixels might always be white). A convenient way for statisticians to deal with this problem is to add pseudo counts to all occurrences. Hence, rather than $n_{iy}$ we use $n_{iy}+1$ and instead of $n_y$ we use $n_{y} + 1$. This is also called [Laplace Smoothing](https://en.wikipedia.org/wiki/Additive_smoothing).
 
 ```{.python .input  n=66}
 n_x = np.zeros((10, 28, 28))
@@ -208,7 +208,7 @@ preds = np.array(predict(X), dtype=np.int32)
 'Validation accuracy', float((preds == y).sum()) / len(y)
 ```
 
-Modern deep networks achieve error rates of less than 0.01. While Naive Bayes classifiers used to be popular in the 80s and 90s, e.g. for spam filtering, their heydays are over. The poor performance is due to the incorrect statistical assumptions that we made in our model: we assumed that each and every pixel are *independently* generated, depending only on the label. This is clearly not how humans write digits, and this wrong assumption led to the downfall of our overly naive (Bayes) classifier. Time to start building Deep Networks.
+Modern deep networks achieve error rates of less than 0.01. While Naive Bayes classifiers used to be popular in the 80s and 90s, e.g., for spam filtering, their heydays are over. The poor performance is due to the incorrect statistical assumptions that we made in our model: we assumed that each and every pixel are *independently* generated, depending only on the label. This is clearly not how humans write digits, and this wrong assumption led to the downfall of our overly naive (Bayes) classifier. Time to start building Deep Networks.
 
 ## Summary
 
@@ -216,7 +216,7 @@ Modern deep networks achieve error rates of less than 0.01. While Naive Bayes cl
   $p(\mathbf{x} | y) = \prod_i p(x_i | y)$.
 * The classifier is easy to train but its estimates can be very wrong.
 * To address overly confident and nonsensical estimates, the
-  probabilities $p(x_i|y)$ are smoothed, e.g. by Laplace
+  probabilities $p(x_i|y)$ are smoothed, e.g., by Laplace
   smoothing. That is, we add a constant to all counts.
 * Naive Bayes classifiers don't exploit any correlations between
   observations.

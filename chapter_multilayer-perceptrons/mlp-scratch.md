@@ -114,7 +114,7 @@ This looks a bit better than our previous result, a good sign that we're on the 
 
 We saw that implementing a simple MLP is easy, even when done manually.
 That said, with a large number of layers, this can get messy
-(e.g. naming and keeping track of the model parameters, etc).
+(e.g., naming and keeping track of the model parameters, etc).
 
 ## Exercises
 

@@ -558,7 +558,7 @@ Information $x_i$ arriving from other neurons
 is received in the dendrites. 
 In particular, that information is weighted by *synaptic weights* $w_i$ 
 determining the effect of the inputs
-(e.g. activation or inhibition via the product $x_i w_i$). 
+(e.g., activation or inhibition via the product $x_i w_i$). 
 The weighted inputs arriving from multiple sources
 are aggregated in the nucleus as a weighted sum $y = \sum_i x_i w_i + b$, 
 and this information is then sent for further processing in the axon $y$, 

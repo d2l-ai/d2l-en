@@ -51,7 +51,7 @@ But how precisely should we measure
 the distance between a function and zero?
 There is no single right answer.
 In fact, entire branches of mathematics,
-e.g. in functional analysis and the theory of Banach spaces
+e.g., in functional analysis and the theory of Banach spaces
 are devoted to answering this issue.
 
 For our present purposes, a very simple interpretation will suffice:
@@ -344,7 +344,7 @@ Unfortunately, RKHS-based algorithms
 do not always scale well to massive amounts of data.
 For the purposes of this book, we limit ourselves
 to simply summing over the weights for different layers,
-e.g. via $\sum_l \|\mathbf{w}_l\|^2$,
+e.g., via $\sum_l \|\mathbf{w}_l\|^2$,
 which is equivalent to weight decay applied to all layers.
 
 
@@ -353,7 +353,7 @@ which is equivalent to weight decay applied to all layers.
 * Regularization is a common method for dealing with overfitting. It adds a penalty term to the loss function on the training set to reduce the complexity of the learned model.
 * One particular choice for keeping the model simple is weight decay using an $\ell_2$ penalty. This leads to weight decay in the update steps of the learning algorithm.
 * Gluon provides automatic weight decay functionality in the optimizer by setting the hyperparameter `wd`.
-* You can have different optimizers within the same training loop, e.g. for different sets of parameters.
+* You can have different optimizers within the same training loop, e.g., for different sets of parameters.
 
 
 ## Exercises

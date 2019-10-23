@@ -130,7 +130,7 @@ setting of the knobs coercing the desired behaviour from our model.
 The training process usually looks like this:
 
 1. Start off with a randomly initialized model that cannot do anything useful.
-1. Grab some of your labeled data (e.g. audio snippets and corresponding ``{yes,no}`` labels)
+1. Grab some of your labeled data (e.g., audio snippets and corresponding ``{yes,no}`` labels)
 1. Tweak the knobs so the model sucks less with respect to those examples
 1. Repeat until the model is awesome.
 
@@ -422,7 +422,7 @@ and each column corresponds to some relevant attribute,
 such as the square footage of a house, the number of bedrooms, the number of bathrooms,
 and the number of minutes (walking) to the center of town.
 Formally, we call one row in this dataset a *feature vector*,
-and the object (e.g. a house) it's associated with an *example*.
+and the object (e.g., a house) it's associated with an *example*.
 
 If you live in New York or San Francisco, and you are not the CEO of Amazon, Google, Microsoft, or Facebook,
 the (sq. footage, no. of bedrooms, no. of bathrooms, walking distance) feature vector for your home
@@ -519,7 +519,7 @@ and our *labels* $Y$ might be the classes $\mathrm{\{cat, dog\}}$.
 While in regression, we sought a *regressor* to output a real value $\hat{y}$,
 in classification, we seek a *classifier*, whose output $\hat{y}$ is the predicted class assignment.
 
-For reasons that we'll get into as the book gets more technical, it's pretty hard to optimize a model that can only output a hard categorical assignment, e.g. either *cat* or *dog*.
+For reasons that we'll get into as the book gets more technical, it's pretty hard to optimize a model that can only output a hard categorical assignment, e.g., either *cat* or *dog*.
 It's a lot easier instead to express the model in the language of probabilities.
 Given an example $x$, the model assigns a probability $\hat{y}_k$ to each label $k$.
 Because these are probabilities, they need to be positive numbers and add up to $1$.
@@ -649,9 +649,9 @@ instance, for movie recommendations, the results page for a SciFi fan and the
 results page for a connoisseur of Woody Allen comedies might differ
 significantly.
 
-Such problems occur, e.g. for movie, product or music recommendation. In some
+Such problems occur, e.g., for movie, product or music recommendation. In some
 cases, customers will provide explicit details about how much they liked the
-product (e.g. Amazon product reviews). In some other cases, they might simply
+product (e.g., Amazon product reviews). In some other cases, they might simply
 provide feedback if they are dissatisfied with the result (skipping titles on a
 playlist). Generally, such systems strive to estimate some score $y_{ij}$, such
 as an estimated rating or probability of purchase, given a user $u_i$ and
@@ -817,7 +817,7 @@ impact the future observations of the agent.
 Considering the interaction with an environment opens a whole set of new modeling questions. Does the environment:
 
 * remember what we did previously?
-* want to help us, e.g. a user reading text into a speech recognizer?
+* want to help us, e.g., a user reading text into a speech recognizer?
 * want to beat us, i.e., an adversarial setting like spam filtering (against spammers) or playing a game (vs an opponent)?
 * not  care (as in most cases)?
 * have shifting dynamics (steady vs. shifting over time)?
@@ -985,13 +985,13 @@ researchers achieve tremendous progress over the past decade.
   increasing the number of learnable
   parameters. :cite:`Bahdanau.Cho.Bengio.2014` found an elegant solution
   by using what can only be viewed as a learnable pointer structure. That is,
-  rather than having to remember an entire sentence, e.g. for machine
+  rather than having to remember an entire sentence, e.g., for machine
   translation in a fixed-dimensional representation, all that needed to be
   stored was a pointer to the intermediate state of the translation
   process. This allowed for significantly increased accuracy for long sentences,
   since the model no longer needed to remember the entire sentence before
   beginning to generate sentences.
-* Multi-stage designs, e.g. via the Memory Networks
+* Multi-stage designs, e.g., via the Memory Networks
   :cite:`Sukhbaatar.Weston.Fergus.ea.2015` and the Neural Programmer-Interpreter
   :cite:`Reed.De-Freitas.2015` allowed statistical modelers to describe
   iterative approaches to reasoning. These tools allow for an internal state of
@@ -1028,7 +1028,7 @@ researchers achieve tremendous progress over the past decade.
   progress in reinforcement learning, at least whenever simulation is an
   option. This has led to significant progress in computers achieving superhuman
   performance in Go, Atari games, Starcraft, and in physics simulations
-  (e.g. using MuJoCo). See e.g. :cite:`Silver.Huang.Maddison.ea.2016` for a description of how to
+  (e.g., using MuJoCo). See e.g., :cite:`Silver.Huang.Maddison.ea.2016` for a description of how to
   achieve this in AlphaGo. In a nutshell, reinforcement learning works best if
   plenty of (state, action, reward) triples are available, i.e., whenever it is
   possible to try out lots of things to learn how they relate to each

@@ -147,7 +147,7 @@ pip install mxnet-cu101==1.6.0b20190915
 ```
 
 
-You may change the last digits according to your CUDA version, e.g. `cu100` for CUDA 10.0 and `cu90` for CUDA 9.0. You can find all available MXNet versions by `pip search mxnet`.
+You may change the last digits according to your CUDA version, e.g., `cu100` for CUDA 10.0 and `cu90` for CUDA 9.0. You can find all available MXNet versions by `pip search mxnet`.
 
 For installation of MXNet on other platforms, please refer to http://numpy.mxnet.io/#installation.
 

@@ -108,7 +108,7 @@ The ultimate breakthrough in 2012 can be attributed to two key factors.
 Deep models with many layers require large amounts of data
 in order to enter the regime
 where they signficantly outperform traditional methods
-based on convex optimizations (e.g. linear and kernel methods).
+based on convex optimizations (e.g., linear and kernel methods).
 However, given the limited storage capacity of computers,
 the relative expense of sensors,
 and the comparatively tighter research budgets in the 1990s,

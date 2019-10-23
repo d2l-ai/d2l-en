@@ -174,7 +174,7 @@ d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, ctx)
 * The hidden layer output of LSTM includes hidden states and memory cells. Only hidden states are passed into the output layer. Memory cells are entirely internal.
 * LSTMs can help cope with vanishing and exploding gradients due to long range dependencies and short-range irrelevant data.
 * In many cases LSTMs perform slightly better than GRUs but they are more costly to train and execute due to the larger latent state size.
-* LSTMs are the prototypical latent variable autoregressive model with nontrivial state control. Many variants thereof have been proposed over the years, e.g. multiple layers, residual connections, different types of regularization.
+* LSTMs are the prototypical latent variable autoregressive model with nontrivial state control. Many variants thereof have been proposed over the years, e.g., multiple layers, residual connections, different types of regularization.
 * Training LSTMs and other sequence models is quite costly due to the long dependency of the sequence. Later we will encounter alternative models such as transformers that can be used in some cases.
 
 ## Exercises

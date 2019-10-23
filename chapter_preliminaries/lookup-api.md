@@ -29,7 +29,7 @@ y = np.ones_like(x)
 y
 ```
 
-In the Jupyter notebook, we can use `?` to display the document in another window. For example, `np.random.uniform?` will create content that is almost identical to `help(np.random.uniform)`, displaying it in a new browser window. In addition, if we use two question marks, e.g. `np.random.uniform??`, the code implementing the function will also be displayed.
+In the Jupyter notebook, we can use `?` to display the document in another window. For example, `np.random.uniform?` will create content that is almost identical to `help(np.random.uniform)`, displaying it in a new browser window. In addition, if we use two question marks, e.g., `np.random.uniform??`, the code implementing the function will also be displayed.
 
 ## API Documentation
 

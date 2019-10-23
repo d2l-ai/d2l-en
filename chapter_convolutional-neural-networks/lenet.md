@@ -266,7 +266,7 @@ train_ch5(net, train_iter, test_iter, num_epochs, lr)
     * Adjust the number of fully connected layers.
     * Adjust the learning rates and other training details (initialization, epochs, etc.)
 1. Try out the improved network on the original MNIST dataset.
-1. Display the activations of the first and second layer of LeNet for different inputs (e.g. sweaters, coats).
+1. Display the activations of the first and second layer of LeNet for different inputs (e.g., sweaters, coats).
 
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2353)

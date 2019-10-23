@@ -2,7 +2,7 @@
 :label:`sec_channels`
 
 While we have described the multiple channels
-that comprise each image (e.g. color images have the standard RGB channels
+that comprise each image (e.g., color images have the standard RGB channels
 to indicate the amount of red, green and blue),
 until now, we simplified all of our numerical examples
 by working with just a single input and a single output channel.
