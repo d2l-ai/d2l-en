@@ -361,7 +361,7 @@ They then update the parameter in the direction that reduces the loss.
 
 ## Kinds of Machine Learning
 
-In the following sections, we will discuss a few types of machine learning in some more detail. We begin with a list of *objectives*, i.e. a list of things that machine learning can do. Note that the objectives are complemented with a set of techniques of *how* to accomplish them, i.e. training, types of data, etc. The list below is really only sufficient to whet the readers' appetite and to give us a common language when we talk about problems. We will introduce a larger number of such problems as we go along.
+In the following sections, we will discuss a few types of machine learning in some more detail. We begin with a list of *objectives*, i.e., a list of things that machine learning can do. Note that the objectives are complemented with a set of techniques of *how* to accomplish them, i.e., training, types of data, etc. The list below is really only sufficient to whet the readers' appetite and to give us a common language when we talk about problems. We will introduce a larger number of such problems as we go along.
 
 ### Supervised learning
 
@@ -551,7 +551,7 @@ In other words, the classifier is 80% confident that our mushroom *is not* a dea
 Still, you'd have to be a fool to eat it.
 That's because the certain benefit of a delicious dinner isn't worth a 20% risk of dying from it.
 In other words, the effect of the *uncertain risk* by far outweighs the benefit.
-Let us look at this in math. Basically, we need to compute the expected risk that we incur, i.e. we need to multiply the probability of the outcome with the benefit (or harm) associated with it:
+Let us look at this in math. Basically, we need to compute the expected risk that we incur, i.e., we need to multiply the probability of the outcome with the benefit (or harm) associated with it:
 
 $$L(\mathrm{action}| x) = \mathbf{E}_{y \sim p(y| x)}[\mathrm{loss}(\mathrm{action},y)]$$
 
@@ -715,7 +715,7 @@ Ent  -    -    -     Ent      -    Ent
 
 With speech recognition, the input sequence $x$ is the sound of a speaker,
 and the output $y$ is the textual transcript of what the speaker said.
-The challenge is that there are many more audio frames (sound is typically sampled at 8kHz or 16kHz) than text, i.e. there is no 1:1 correspondence between audio and text,
+The challenge is that there are many more audio frames (sound is typically sampled at 8kHz or 16kHz) than text, i.e., there is no 1:1 correspondence between audio and text,
 since thousands of samples correspond to a single spoken word.
 These are ``seq2seq`` problems where the output is much shorter than the input.
 
@@ -760,7 +760,7 @@ This is an active area of research.
 ### Unsupervised learning
 
 All the examples so far were related to *Supervised Learning*,
-i.e. situations where we feed the model
+i.e., situations where we feed the model
 a bunch of examples and a bunch of *corresponding target values*.
 You could think of supervised learning as having an extremely specialized job and an extremely anal boss.
 The boss stands over your shoulder and tells you exactly what to do in every situation until you learn to map from situations to actions.
@@ -780,7 +780,7 @@ We will address a number of unsupervised learning techniques in later chapters. 
 
 * Can we find a small number of prototypes that accurately summarize the data? Given a set of photos, can we group them into landscape photos, pictures of dogs, babies, cats, mountain peaks, etc.? Likewise, given a collection of users' browsing activity, can we group them into users with similar behavior? This problem is typically known as **clustering**.
 * Can we find a small number of parameters that accurately capture the relevant properties of the data? The trajectories of a ball are quite well described by velocity, diameter, and mass of the ball. Tailors have developed a small number of parameters that describe human body shape fairly accurately for the purpose of fitting clothes. These problems are referred to as **subspace estimation** problems. If the dependence is linear, it is called **principal component analysis**.
-* Is there a representation of (arbitrarily structured) objects in Euclidean space (i.e. the space of vectors in $\mathbb{R}^n$) such that symbolic properties can be well matched? This is called **representation learning** and it is used to describe entities and their relations, such as Rome - Italy + France = Paris.
+* Is there a representation of (arbitrarily structured) objects in Euclidean space (i.e., the space of vectors in $\mathbb{R}^n$) such that symbolic properties can be well matched? This is called **representation learning** and it is used to describe entities and their relations, such as Rome - Italy + France = Paris.
 * Is there a description of the root causes of much of the data that we observe? For instance, if we have demographic data about house prices, pollution, crime, location, education, salaries, etc., can we discover how they are related simply based on empirical data? The field of **directed graphical models** and **causality** deals with this.
 * An important and exciting recent development is **generative adversarial networks**. They are basically a procedural way of synthesizing data. The underlying statistical mechanisms are tests to check whether real and fake data are the same. We will devote a few notebooks to them.
 
@@ -818,7 +818,7 @@ Considering the interaction with an environment opens a whole set of new modelin
 
 * remember what we did previously?
 * want to help us, e.g. a user reading text into a speech recognizer?
-* want to beat us, i.e. an adversarial setting like spam filtering (against spammers) or playing a game (vs an opponent)?
+* want to beat us, i.e., an adversarial setting like spam filtering (against spammers) or playing a game (vs an opponent)?
 * not  care (as in most cases)?
 * have shifting dynamics (steady vs. shifting over time)?
 
@@ -976,7 +976,7 @@ researchers achieve tremendous progress over the past decade.
 
 * Novel methods for capacity control, such as Dropout
   :cite:`Srivastava.Hinton.Krizhevsky.ea.2014` allowed for training of
-  relatively large networks without the danger of overfitting, i.e. without the
+  relatively large networks without the danger of overfitting, i.e., without the
   danger of merely memorizing large parts of the training data. This was
   achieved by applying noise injection :cite:`Bishop.1995` throughout the
   network, replacing weights by random variables for training purposes.
@@ -1030,7 +1030,7 @@ researchers achieve tremendous progress over the past decade.
   performance in Go, Atari games, Starcraft, and in physics simulations
   (e.g. using MuJoCo). See e.g. :cite:`Silver.Huang.Maddison.ea.2016` for a description of how to
   achieve this in AlphaGo. In a nutshell, reinforcement learning works best if
-  plenty of (state, action, reward) triples are available, i.e. whenever it is
+  plenty of (state, action, reward) triples are available, i.e., whenever it is
   possible to try out lots of things to learn how they relate to each
   other. Simulation provides such an avenue.
 * Deep Learning frameworks have played a crucial role in disseminating
@@ -1133,7 +1133,7 @@ A much more realistic concern is how AI is being used in our daily lives. It is 
 
 ## Exercises
 
-1. Which parts of code that you are currently writing could be 'learned', i.e. improved by learning and automatically determining design choices that are made in your code? Does your code include heuristic design choices?
+1. Which parts of code that you are currently writing could be 'learned', i.e., improved by learning and automatically determining design choices that are made in your code? Does your code include heuristic design choices?
 1. Which problems that you encounter have many examples for how to solve them, yet no specific way to automate them? These may be prime candidates for using Deep Learning.
 1. Viewing the development of Artificial Intelligence as a new industrial revolution, what is the relationship between algorithms and data? Is it similar to steam engines and coal (what is the fundamental difference)?
 1. Where else can you apply the end-to-end training approach? Physics? Engineering? Econometrics?

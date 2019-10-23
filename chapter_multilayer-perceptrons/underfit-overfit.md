@@ -226,7 +226,7 @@ of a scientific theory: a theory is good if it fits data
 and if there are specific tests which can be used to disprove it.
 This is important since all statistical estimation is
 [post hoc](https://en.wikipedia.org/wiki/Post_hoc),
-i.e. we estimate after we observe the facts,
+i.e., we estimate after we observe the facts,
 hence vulnerable to the associated fallacy.
 For now, we'll put the philosophy aside and stick to more tangible issues.
 
@@ -514,7 +514,7 @@ The trained model parameters are also close
 to the true values $w = [5, 1.2, -3.4, 5.6]$.
 
 ```{.python .input  n=6}
-# Pick the first four dimensions, i.e. 1, x, x^2, x^3 from the polynomial
+# Pick the first four dimensions, i.e., 1, x, x^2, x^3 from the polynomial
 # features
 train(poly_features[:n_train, 0:4], poly_features[n_train:, 0:4],
       labels[:n_train], labels[n_train:])
@@ -533,7 +533,7 @@ When used to fit non-linear patterns
 linear models are liable to underfit.
 
 ```{.python .input  n=7}
-# Pick the first four dimensions, i.e. 1, x from the polynomial features
+# Pick the first four dimensions, i.e., 1, x from the polynomial features
 train(poly_features[:n_train, 0:3], poly_features[n_train:, 0:3],
       labels[:n_train], labels[n_train:])
 ```

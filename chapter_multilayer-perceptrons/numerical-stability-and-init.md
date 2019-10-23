@@ -45,7 +45,7 @@ What happens is similar to the situation
 when we experienced numerical underflow
 when multiplying too many probabilities.
 At the time, we were able to mitigate the problem
-by switching from into log-space, i.e. by shifting the problem
+by switching from into log-space, i.e., by shifting the problem
 from the mantissa to the exponent of the numerical representation. Unfortunately the problem outlined in the equation above is much more serious:
 initially the matrices $M_t$ may well have a wide variety of eigenvalues.
 They might be small, they might be large, and in particular,

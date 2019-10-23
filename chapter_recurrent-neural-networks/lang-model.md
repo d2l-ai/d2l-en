@@ -23,7 +23,7 @@ $$p(\mathrm{Statistics}, \mathrm{is},  \mathrm{fun}, \mathrm{.}) =  p(\mathrm{St
 
 In order to compute the language model, we need to calculate the
 probability of words and the conditional probability of a word given
-the previous few words, i.e. language model parameters. Here, we
+the previous few words, i.e., language model parameters. Here, we
 assume that the training data set is a large text corpus, such as all
 Wikipedia entries, Project Gutenberg, or all text posted online on the
 web. The probability of words can be calculated from the relative word

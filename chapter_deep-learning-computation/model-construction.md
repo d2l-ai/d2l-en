@@ -286,7 +286,7 @@ class FancyMLP(nn.Block):
     def __init__(self, **kwargs):
         super(FancyMLP, self).__init__(**kwargs)
         # Random weight parameters created with the get_constant are not
-        # iterated during training (i.e. constant parameters)
+        # iterated during training (i.e., constant parameters)
         self.rand_weight = self.params.get_constant(
             'rand_weight', np.random.uniform(size=(20, 20)))
         self.dense = nn.Dense(20, activation='relu')
