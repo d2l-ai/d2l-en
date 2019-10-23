@@ -7,15 +7,15 @@ In :numref:`sec_text_preprocessing`, we see how to map text data into tokens, an
 
 $$p(x_1,x_2, \ldots, x_T).$$
 
-Language models are incredibly useful. For instance, an ideal language model would be able to generate natural text just on its own, simply by drawing one word at a time $w_t \sim p(w_t|w_{t-1}, \ldots, w_1)$. Quite unlike the monkey using a typewriter, all text emerging from such a model would pass as natural language, e.g., English text. Furthermore, it would be sufficient for generating a meaningful dialog, simply by conditioning the text on previous dialog fragments. Clearly we are still very far from designing such a system, since it would need to *understand* the text rather than just generate grammatically sensible content.
+Language models are incredibly useful. For instance, an ideal language model would be able to generate natural text just on its own, simply by drawing one word at a time $w_t \sim p(w_t|w_{t-1}, \ldots, w_1)$. Quite unlike the monkey using a typewriter, all text emerging from such a model would pass as natural language, e.g., English text. Furthermore, it would be sufficient for generating a meaningful dialog, simply by conditioning the text on previous dialog fragments. Clearly we are still very far from designing such a system, since it would need to understand the text rather than just generate grammatically sensible content.
 
 Nonetheless language models are of great service even in their limited form. For instance, the phrases *'to recognize speech'* and *'to wreck a nice beach'* sound very similar. This can cause ambiguity in speech recognition, ambiguity that is easily resolved through a language model which rejects the second translation as outlandish. Likewise, in a document summarization algorithm it is worth while knowing that *'dog bites man'* is much more frequent than *'man bites dog'*, or that *'let us eat grandma'* is a rather disturbing statement, whereas *'let us eat, grandma'* is much more benign.
 
 ## Estimating a language model
 
-The obvious question is how we should model a document, or even a sequence of words. We can take recourse to the analysis we applied to sequence models in the previous section. Let us start by applying basic probability rules:
+The obvious question is how we should model a document, or even a sequence of words. Recall the analysis we applied to sequence models in the previous section, we can start by applying basic probability rules:
 
-$$p(w_1, w_2, \ldots, w_T) = \prod_{t=1}^T p(w_t | w_1, \ldots, w_{t-1}).$$
+$$p(w_1, w_2, \ldots, w_T) = p(w_1) \prod_{t=2}^T p(w_t | w_1, \ldots, w_{t-1}).$$
 
 For example, the probability of a text sequence containing four tokens consisting of words and punctuation would be given as:
 
@@ -23,13 +23,13 @@ $$p(\mathrm{Statistics}, \mathrm{is},  \mathrm{fun}, \mathrm{.}) =  p(\mathrm{St
 
 In order to compute the language model, we need to calculate the
 probability of words and the conditional probability of a word given
-the previous few words, i.e., language model parameters. Here, we
+the previous few words, i.e., the language model parameters. Here, we
 assume that the training data set is a large text corpus, such as all
-Wikipedia entries, Project Gutenberg, or all text posted online on the
+Wikipedia entries, [Project Gutenberg](https://en.wikipedia.org/wiki/Project_Gutenberg), or all text posted online on the
 web. The probability of words can be calculated from the relative word
 frequency of a given word in the training data set.
 
-For example, $p(\mathrm{Statistics})​$ can be calculated as the
+For example, $p(\mathrm{Statistics})$ can be calculated as the
 probability of any sentence starting with the word 'statistics'. A
 slightly less accurate approach would be to count all occurrences of
 the word 'statistics' and divide it by the total number of words in
