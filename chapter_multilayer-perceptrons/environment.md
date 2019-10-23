@@ -229,7 +229,7 @@ and the model is not updated adequately.
 Here are some typical cases:
 
 * We train a computational advertising model and then fail to update it frequently (e.g., we forget to incorporate that an obscure new device called an iPad was just launched).
-* We build a spam filter. It works well at detecting all spam that we've seen so far. But then the spammers wisen up and craft new messages that look unlike anything we've seen before.
+* We build a spam filter. It works well at detecting all spam that we have seen so far. But then the spammers wisen up and craft new messages that look unlike anything we have seen before.
 * We build a product recommendation system. It works throughout the winter... but then it keeps on recommending Santa hats long after Christmas.
 
 #### More Anecdotes
@@ -390,7 +390,7 @@ at test time together, yielding the mean model output $\mu_y$.
 
 It turns out that under some mild conditions—
 if our classifier was reasonably accurate in the first place,
-if the target data contains only classes of images that we've seen before,
+if the target data contains only classes of images that we have seen before,
 and if the label shift assumption holds in the first place
 (far the strongest assumption here),
 then we can recover the test set label distribution by solving
@@ -433,7 +433,7 @@ Armed with knowledge about how to deal with changes in $p(x)$ and in $p(y|x)$, w
 
 
 * **Batch Learning.** Here we have access to training data and labels $\{(x_1, y_1), \ldots, (x_n, y_n)\}$, which we use to train a network $f(x,w)$. Later on, we deploy this network to score new data $(x,y)$ drawn from the same distribution. This is the default assumption for any of the problems that we discuss here. For instance, we might train a cat detector based on lots of pictures of cats and dogs. Once we trained it, we ship it as part of a smart catdoor computer vision system that lets only cats in. This is then installed in a customer's home and is never updated again (barring extreme circumstances).
-* **Online Learning.** Now imagine that the data $(x_i, y_i)$ arrives one sample at a time. More specifically, assume that we first observe $x_i$, then we need to come up with an estimate $f(x_i,w)$ and only once we've done this, we observe $y_i$ and with it, we receive a reward (or incur a loss), given our decision. Many real problems fall into this category. E.g. we need to predict tomorrow's stock price, this allows us to trade based on that estimate and at the end of the day we find out whether our estimate allowed us to make a profit. In other words, we have the following cycle where we are continuously improving our model given new observations.
+* **Online Learning.** Now imagine that the data $(x_i, y_i)$ arrives one sample at a time. More specifically, assume that we first observe $x_i$, then we need to come up with an estimate $f(x_i,w)$ and only once we have done this, we observe $y_i$ and with it, we receive a reward (or incur a loss), given our decision. Many real problems fall into this category. E.g. we need to predict tomorrow's stock price, this allows us to trade based on that estimate and at the end of the day we find out whether our estimate allowed us to make a profit. In other words, we have the following cycle where we are continuously improving our model given new observations.
 
 $$
 \mathrm{model} ~ f_t \longrightarrow

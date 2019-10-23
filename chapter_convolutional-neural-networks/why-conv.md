@@ -1,6 +1,6 @@
 # From Dense Layers to Convolutions
 
-The models that we've discussed so far are fine options
+The models that we have discussed so far are fine options
 if you are dealing with *tabular* data.
 By *tabular* we mean that the data consists
 of rows corresponding to examples and columns corresponding to features.

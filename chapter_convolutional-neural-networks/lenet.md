@@ -154,7 +154,7 @@ until emitting an output that matches the number of image classes.
 
 ## Data Acquisition and Training
 
-Now that we've implemented the model,
+Now that we have implemented the model,
 we might as well run some experiments
 to see what we can accomplish with the LeNet model.
 While it might serve nostalgia
