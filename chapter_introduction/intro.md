@@ -681,7 +681,7 @@ model to generate an output, the model immediately forgets what it just saw.
 This might be fine if our inputs truly all have the same dimensions and if
 successive inputs truly have nothing to do with each other.  But how would we
 deal with video snippets?  In this case, each snippet might consist of a
-different number of frames.  And our guess of what's going on in each frame
+different number of frames.  And our guess of what is going on in each frame
 might be much stronger if we take into account the previous or succeeding
 frames.  Same goes for language.  One popular deep learning problem is machine
 translation: the task of ingesting sentences in some source language and

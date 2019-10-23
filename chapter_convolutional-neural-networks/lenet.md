@@ -86,7 +86,7 @@ to the number of possible output classes.
 
 While getting to the point
 where you truly understand
-what's going on inside LeNet
+what is going on inside LeNet
 may have taken a bit of work,
 you can see below that implementing it
 in a modern deep learning library
@@ -123,7 +123,7 @@ Next, we feed a single-channel example
 of size $28 \times 28$ into the network
 and perform a forward computation layer by layer
 printing the output shape at each layer
-to make sure we understand what's happening here.
+to make sure we understand what is happening here.
 
 ```{.python .input}
 X = np.random.uniform(size=(1, 1, 28, 28))
