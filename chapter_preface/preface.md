@@ -3,7 +3,7 @@
 Just a few years ago, there were no legions of deep learning scientists
 developing intelligent products and services at major companies and startups.
 When the youngest of us (the authors) entered the field,
-machine learning didn't command headlines in daily newspapers.
+machine learning did not command headlines in daily newspapers.
 Our parents had no idea what machine learning was,
 let alone why we might prefer it to a career in medicine or law.
 Machine learning was a forward-looking academic discipline
