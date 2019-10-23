@@ -155,11 +155,11 @@ from mxnet import gluon
 
 # Load in the dataset
 print("HERE")
- 
-train = gluon.data.vision.FashionMNIST(train=True) 
-test = gluon.data.vision.FashionMNIST(train=False)
 
-print("HERE")
+#train = gluon.data.vision.FashionMNIST(train=True) 
+#test = gluon.data.vision.FashionMNIST(train=False)
+
+#print("HERE")
 
 #X_train_0 = np.array([x[0] for x in train if x[1] == 0])
 #X_train_1 = np.array([x[0] for x in train if x[1] == 1])
