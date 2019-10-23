@@ -832,4 +832,3 @@ A = \begin{bmatrix}
 $$
 is less that $0.5$? *Note*: this problem can be done in your head.
 9. How can you write $\mathrm{tr}(\mathbf{A}^4)$ in Einstein notation?
-
