@@ -386,10 +386,12 @@ We can test this in code to see how good the approximation is.
 
 ```{.python .input}
 f = lambda x,y : np.log(np.exp(x) + np.exp(y))
-grad_f = lambda x,y : np.array([np.exp(x)/(np.exp(x)+np.exp(y)), np.exp(y)/(np.exp(x)+np.exp(y))])
+grad_f = lambda x,y : np.array([np.exp(x)/(np.exp(x)+np.exp(y)), 
+                                np.exp(y)/(np.exp(x)+np.exp(y))])
 
 epsilon = np.array([0.01,-0.03])
-"Approximation: {}".format(f(0,np.log(2)) + epsilon.dot(grad_f(0,np.log(2)))), "True Value: {}".format(f(0+epsilon[0],np.log(2)+epsilon[1]))
+"Approximation: {}".format(f(0,np.log(2)) + epsilon.dot(grad_f(0,np.log(2)))),
+   "True Value: {}".format(f(0+epsilon[0],np.log(2)+epsilon[1]))
 ```
 
 ### Geometry of gradients and gradient descent
@@ -618,7 +620,8 @@ print("    f at {},{},{},{} is {}".format(w,x,y,z,f))
 # First compute the single step partials
 df_du = 2*(u+v); df_dv = 2*(u+v)
 du_da = 2*(a+b); du_db = 2*(a+b); dv_da = 2*(a-b); dv_db = -2*(a-b)
-da_dw = 2*(w+x+y+z); db_dw = 2*(w+x-y-z); da_dx = 2*(w+x+y+z); db_dx = 2*(w+x-y-z); da_dy = 2*(w+x+y+z); db_dy = -2*(w+x-y-z); da_dz = 2*(w+x+y+z); db_dz = -2*(w+x-y-z); 
+da_dw = 2*(w+x+y+z); db_dw = 2*(w+x-y-z); da_dx = 2*(w+x+y+z); db_dx = 2*(w+x-y-z)
+da_dy = 2*(w+x+y+z); db_dy = -2*(w+x-y-z); da_dz = 2*(w+x+y+z); db_dz = -2*(w+x-y-z); 
 
 ### Now compute how f changes when we change any value from output to input ###
 df_da = df_du*du_da + df_dv*dv_da; df_db = df_du*du_db + df_dv*dv_db
@@ -978,7 +981,7 @@ Suppose we have a function $f(x)$.  For simplicity, let us assume that $f(x)$ is
 x = np.arange(-2,2,0.01)
 f = np.exp(-x**2)
 
-d2l.plt.plot(x,f,color='purple')
+d2l.plt.plot(x,f,color='black')
 d2l.plt.fill_between(x.tolist(),f.tolist())
 d2l.plt.show()
 ```
@@ -989,7 +992,7 @@ In most cases, this area will be infinite or undefined (consider the area under 
 x = np.arange(-2,2,0.01)
 f = np.exp(-x**2)
 
-d2l.plt.plot(x,f,color='purple')
+d2l.plt.plot(x,f,color='black')
 d2l.plt.fill_between(x.tolist()[50:250],f.tolist()[50:250])
 d2l.plt.show()
 ```
@@ -1019,8 +1022,8 @@ f = x/(1+x**2)
 approx = np.sum(epsilon*f)
 true = np.log(2)/2
 
-d2l.plt.bar(x,f,width = epsilon, align = 'edge', edgecolor = 'black')
-d2l.plt.plot(x,f,color='purple')
+d2l.plt.bar(x,f,width = epsilon, align = 'edge')
+d2l.plt.plot(x,f,color='black')
 d2l.plt.ylim([0,1])
 d2l.plt.show()
 
@@ -1229,8 +1232,6 @@ $$
 $$
 
 Let us try to see why this is.  
-
-??? Figure ???
 
 Consider the figure above where we have split the function into $\epsilon \times \epsilon$ squares which we will index with integer coordinates $i,j$.  In this case, Our integral is approximately
 
