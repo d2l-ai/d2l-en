@@ -65,35 +65,35 @@ x.attach_grad()
 
 After we calculate a gradient taken with respect to `x`, 
 we will be able to access it via the `grad` attribute. 
-As a safe default, `x.grad` initializes as an array containing all zeros.
+As a safe default, `x.grad` is initialized as an array containing all zeros.
 That is sensible because our most common use case 
 for taking gradient in deep learning is to subsequently 
 update parameters by adding (or subtracting) the gradient
 to maximize (or minimize) the differentiated function.
-By initializing the gradient to $\mathbf{0}$,
-we ensure that any update accidentally exectuted 
+By initializing the gradient to an array of zeros,
+we ensure that any update accidentally executed 
 before a gradient has actually been calculated
-will not alter the variable's value.
+will not alter the parameters' value.
 
 ```{.python .input  n=4}
 x.grad
 ```
 
-Now let us calculate ``y``. 
-Because we wish to subsequently calculate gradients 
+Now let us calculate $y$. 
+Because we wish to subsequently calculate gradients, 
 we want MXNet to generate a computation graph on the fly. 
 We could imagine that MXNet would be turning on a recording device 
 to capture the exact path by which each variable is generated.
 
-Note that building the computation graph 
+Note that building the computational graph 
 requires a nontrivial amount of computation. 
 So MXNet will only build the graph when explicitly told to do so. 
 We can invoke this behavior by placing our code 
-inside a ``with autograd.record():`` block.
+inside a `with autograd.record():` block.
 
 ```{.python .input  n=5}
 with autograd.record():
-    y = 2.0 * np.dot(x, x)
+    y = 2 * np.dot(x, x)
 y
 ```
 
@@ -118,10 +118,10 @@ The gradient of the function $y = 2\mathbf{x}^{\top}\mathbf{x}$
 with respect to $\mathbf{x}$ should be $4\mathbf{x}$. 
 Let us quickly verify that our desired gradient was calculated correctly.
 If the two `ndarray`s are indeed the same, 
-then their difference should consist of all zeros.
+then the equality between them holds at every position.
 
 ```{.python .input  n=8}
-x.grad - 4 * x
+x.grad == 4 * x
 ```
 
 If we subsequently compute the gradient of another variable
@@ -135,29 +135,29 @@ y.backward()
 x.grad
 ```
 
-## Backward for Non-scalar Variable
+## Backward for Non-Scalar Variables
 
 Technically, when `y` is not a scalar, 
 the most natural interpretation of the gradient of `y` (a vector of length $m$)
-with respect to `x` (a vector of length $n$) is the Jacobian (an $m\times n$ matrix).
-For higher-order and higher-dimensional $y$ and $x$, 
-the Jacobian could be a gnarly high order tensor 
-and complex to compute (refer to :numref:`sec_math`). 
+with respect to `x` (a vector of length $n$) is the *Jacobian* (an $m\times n$ matrix).
+For higher-order and higher-dimensional `y` and `x`, 
+the Jacobian could be a gnarly high-order tensor. 
 
 However, while these more exotic objects do show up 
 in advanced machine learning (including in deep learning),
 more often when we are calling backward on a vector,
 we are trying to calculate the derivatives of the loss functions
-for each constitutent of a *batch* of training examples.
+for each constituent of a *batch* of training examples.
 Here, our intent is not to calculate the Jacobian
 but rather the sum of the partial derivatives 
-computed individuall for each example in the batch.
+computed individually for each example in the batch.
 
-Thus when we invoke backwards on a vector-valued variable,
+Thus when we invoke `backward` on a vector-valued variable `y`,
+which is a function of `x`,
 MXNet assumes that we want the sum of the gradients.
-In short, MXNet, will create a new scalar variable 
+In short, MXNet will create a new scalar variable 
 by summing the elements in `y`,
-and compute the gradient of that variable with respect to `x`.
+and compute the gradient of that scalar variable with respect to `x`.
 
 ```{.python .input  n=10}
 with autograd.record():  # y is a vector
@@ -170,7 +170,7 @@ with autograd.record():  # v is scalar
     v = (u * u).sum()
 v.backward()
 
-x.grad - u.grad
+x.grad == u.grad
 ```
 
 ## Advanced Autograd
@@ -209,7 +209,7 @@ with autograd.record():
     u = y.detach()
     z = u * x
 z.backward()
-x.grad - u
+x.grad == u
 ```
 
 Since the computation of $y$ was recorded, 
@@ -217,7 +217,7 @@ we can subsequently call `y.backward()` to get $\partial y/\partial x = 2x$.
 
 ```{.python .input  n=12}
 y.backward()
-x.grad - 2*x
+x.grad == 2 * x
 ```
 
 ## Attach Gradients to Internal Variables
@@ -304,7 +304,7 @@ such that for a given range `f(a) = g * a`.
 Consequently `d / a` allows us to verify that the gradient is correct:
 
 ```{.python .input  n=18}
-print(a.grad == (d / a))
+a.grad == (d / a)
 ```
 
 ## Training Mode and Prediction Mode
