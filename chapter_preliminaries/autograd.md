@@ -81,7 +81,7 @@ x.grad
 
 Now let us calculate $y$. 
 Because we wish to subsequently calculate gradients, 
-we want MXNet to generate a computation graph on the fly. 
+we want MXNet to generate a computational graph on the fly. 
 We could imagine that MXNet would be turning on a recording device 
 to capture the exact path by which each variable is generated.
 
@@ -89,7 +89,7 @@ Note that building the computational graph
 requires a nontrivial amount of computation. 
 So MXNet will only build the graph when explicitly told to do so. 
 We can invoke this behavior by placing our code 
-inside a `with autograd.record():` block.
+inside an `autograd.record` scope.
 
 ```{.python .input  n=5}
 with autograd.record():
@@ -160,48 +160,41 @@ by summing the elements in `y`,
 and compute the gradient of that scalar variable with respect to `x`.
 
 ```{.python .input  n=10}
-with autograd.record():  # y is a vector
-    y = x * x
+with autograd.record():
+    y = x * x  # y is a vector
 y.backward()
 
 u = x.copy()
 u.attach_grad()
-with autograd.record():  # v is scalar
-    v = (u * u).sum()
+with autograd.record():
+    v = (u * u).sum()  # v is a scalar
 v.backward()
 
 x.grad == u.grad
 ```
 
-## Advanced Autograd
+## Detaching Computation
 
-Already you know enough to employ `autograd` and `ndarray` 
-successfully to develop many practical models. 
-While the rest of this section is not necessary just yet,
-we touch on a few advanced topics for completeness. 
-
-### Detach Computations
-
-Sometimes, we wish to  move some calculations 
-outside of the recorded computation graph. 
-For example, say that `y` was calculated as a function of `x`.
-And that subsequently `z` was calcatated a function of both `y` and `x`. 
+Sometimes, we wish to move some calculations 
+outside of the recorded computational graph. 
+For example, say that `y` was calculated as a function of `x`,
+and that subsequently `z` was calculated as a function of both `y` and `x`. 
 Now, imagine that we wanted to calculate 
 the gradient of `z` with respect to `x`,
 but wanted for some reason to treat `y` as a constant,
 and only take into account the role 
 that `x` played after `y` was calculated.
 
-Here, we can call `u = y.detach()` to return a new variable 
-that has the same values as `y` but discards any information
-about how `u` was computed. 
+Here, we can call `u = y.detach()` to return a new variable `u` 
+that has the same value as `y` but discards any information
+about how `y` was computed in the computational graph. 
 In other words, the gradient will not flow backwards through `u` to `x`. 
 This will provide the same functionality as if we had
 calculated `u` as a function of `x` outside of the `autograd.record` scope, 
-yielding a `u` that will be treated as a constant in any called to `backward`. 
-The following backward computes $\partial (u \odot x)/\partial x$ 
-instead of $\partial (x \odot x \odot x) /\partial x$,
-where $\odot$ stands for elementwise multiplication.
+yielding a `u` that will be treated as a constant in any `backward` call.
+Thus, the following `backward` function computes
+the partial derivative of `z = u * x` with respect to `x` while treating `u` as a constant,
+instead of the partial derivative of `z = x * x * x` with respect to `x`.
 
 ```{.python .input  n=11}
 with autograd.record():
@@ -212,54 +205,27 @@ z.backward()
 x.grad == u
 ```
 
-Since the computation of $y$ was recorded, 
-we can subsequently call `y.backward()` to get $\partial y/\partial x = 2x$.
+Since the computation of `y` was recorded, 
+we can subsequently call `y.backward()` to get the derivative of `y = x * x` with respect to `x`, which is `2 * x`.
 
 ```{.python .input  n=12}
 y.backward()
 x.grad == 2 * x
 ```
 
-## Attach Gradients to Internal Variables
-
-Attaching gradients to a variable `x` implicitly calls `x=x.detach()`. 
+Note that attaching gradients to a variable `x` implicitly calls `x = x.detach()`. 
 If `x` is computed based on other variables, 
-this part of computation will not be used in the backward function.
+this part of computation will not be used in the `backward` function.
 
 ```{.python .input  n=13}
 y = np.ones(4) * 2
 y.attach_grad()
 with autograd.record():
     u = x * y
-    u.attach_grad()  # implicitly run u = u.detach()
-    z = u + x
+    u.attach_grad()  # Implicitly run u = u.detach()
+    z = 5 * u - x
 z.backward()
-print(x.grad, '\n', u.grad, '\n', y.grad)
-```
-
-## Head gradients
-
-Detaching allows to breaks the computation into several parts. We could use chain rule :numref:`sec_math` to compute the gradient for the whole computation.  Assume $u = f(x)$ and $z = g(u)$, by chain rule we have $\frac{dz}{dx} = \frac{dz}{du} \frac{du}{dx}.$ To compute $\frac{dz}{du}$, we can first detach $u$ from the computation and then call `z.backward()` to compute the first term.
-
-```{.python .input  n=14}
-y = np.ones(4) * 2
-y.attach_grad()
-with autograd.record():
-    u = x * y
-    v = u.detach()  # u still keeps the computation graph
-    v.attach_grad()
-    z = v + x
-z.backward()
-print(x.grad, '\n', y.grad)
-```
-
-Subsequently, we can call `u.backward()` to compute the second term, 
-but pass the first term as the head gradients to multiply both terms 
-so that `x.grad` will contains $\frac{dz}{dx}$ instead of $\frac{du}{dx}$.
-
-```{.python .input  n=15}
-u.backward(v.grad)
-print(x.grad, '\n', y.grad)
+x.grad, u.grad, y.grad
 ```
 
 ## Computing the Gradient of Python Control Flow
