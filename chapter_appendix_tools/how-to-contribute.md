@@ -56,7 +56,7 @@ nothing to commit, working tree clean
 
 ### Edit the Book and Push
 
-Now it's time to edit the book. It's best to edit the notebooks in Jupyter following instructions in :numref:`sec_jupyter`. Make the changes and check that they're OK. Assume we have modified a typo in the file `~/d2l-en/chapter_appendix/how-to-contribute.md`.
+Now it is time to edit the book. It is best to edit the notebooks in Jupyter following instructions in :numref:`sec_jupyter`. Make the changes and check that they're OK. Assume we have modified a typo in the file `~/d2l-en/chapter_appendix/how-to-contribute.md`.
 You can then check which files you have changed:
 
 At this point Git will prompt that the `sec_appendix/how-to-contribute.md` file has been modified.

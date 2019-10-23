@@ -53,7 +53,7 @@ accumulates more experience, typically in the form of observational data or
 interactions with an environment, their performance improves.  Contrast this
 with our deterministic e-commerce platform, which performs according to the same
 business logic, no matter how much experience accrues, until the developers
-themselves *learn* and decide that it's time to update the software.  In this
+themselves *learn* and decide that it is time to update the software.  In this
 book, we will teach you the fundamentals of machine learning, and focus in
 particular on deep learning, a powerful set of techniques driving innovations in
 areas as diverse as computer vision, natural language processing, healthcare,
@@ -122,7 +122,7 @@ we might need a different family of models entirely if we want to deal with
 fundamentally different inputs or outputs, say if we wanted to map from images
 to captions, or from English sentences to Chinese sentences.
 
-As you might guess, if we just set all of the knobs randomly, it's not likely
+As you might guess, if we just set all of the knobs randomly, it is not likely
 that our model will recognize 'Alexa', 'Apricot', or any other English word.  In
 deep learning, the *learning* is the process by which we discover the right
 setting of the knobs coercing the desired behaviour from our model.
@@ -148,7 +148,7 @@ dogs, such as the images below:
 |cat|cat|dog|dog|
 
 This way the detector will eventually learn to emit a very large positive number
-if it's a cat, a very large negative number if it's a dog, and something closer
+if it is a cat, a very large negative number if it is a dog, and something closer
 to zero if it isn't sure, and this barely scratches the surface of what ML can
 do.
 
@@ -182,7 +182,7 @@ a model to approximate a mapping from snippets to classifications.
 This sort of problem, where we try to predict a designated unknown *label*
 given known *inputs* (also called *features* or *covariates*),
 and examples of both is called *supervised learning*,
-and it's just one among many *kinds* of machine learning problems.
+and it is just one among many *kinds* of machine learning problems.
 In the next section, we'll take a deep dive into the different ML problems.
 First, we'd like to shed more light on some core components
 that will follow us around, no matter what kind of ML problem we take on:
@@ -244,7 +244,7 @@ To drive the point home, many of the most exciting models in deep learning eithe
 Some others work in the low-data regime,
 but no better than traditional approaches.
 
-Finally it's not enough to have lots of data and to process it cleverly.
+Finally it is not enough to have lots of data and to process it cleverly.
 We need the *right* data.
 If the data is full of mistakes, or if the chosen features are not predictive of the target quantity of interest, learning is going to fail.
 The situation is well captured by the cliché: *garbage in, garbage out*.
@@ -315,7 +315,7 @@ our predictions disagree with the ground truth.
 Some objectives (like squared error) are easy to optimize.
 Others (like error rate) are difficult to optimize directly,
 owing to non-differentiability or other complications.
-In these cases, it's common to optimize a surrogate objective.
+In these cases, it is common to optimize a surrogate objective.
 
 Typically, the loss function is defined
 with respect to the model's parameters
@@ -381,7 +381,7 @@ The supervision comes into play because for choosing the parameters $\theta$, we
 
 In probabilistic terms, we typically are interested in estimating
 the conditional probability $P(y|x)$.
-While it's just one among several approaches to machine learning,
+While it is just one among several approaches to machine learning,
 supervised learning accounts for the majority of machine learning in practice.
 Partly, that's because many important tasks
 can be described crisply as estimating the probability of some unknown given some available evidence:
@@ -422,7 +422,7 @@ and each column corresponds to some relevant attribute,
 such as the square footage of a house, the number of bedrooms, the number of bathrooms,
 and the number of minutes (walking) to the center of town.
 Formally, we call one row in this dataset a *feature vector*,
-and the object (e.g., a house) it's associated with an *example*.
+and the object (e.g., a house) it is associated with an *example*.
 
 If you live in New York or San Francisco, and you are not the CEO of Amazon, Google, Microsoft, or Facebook,
 the (sq. footage, no. of bedrooms, no. of bathrooms, walking distance) feature vector for your home
@@ -460,7 +460,7 @@ A good rule of thumb is that any *How much?* or *How many?* problem should sugge
 * 'How many dogs are in this photo?' - *regression*.
 
 However, if you can easily pose your problem as 'Is this a _ ?',
-then it's likely, classification, a different fundamental problem type that we'll cover next.
+then it is likely, classification, a different fundamental problem type that we'll cover next.
 Even if you've never worked with machine learning before,
 you've probably worked through a regression problem informally.
 Imagine, for example, that you had your drains repaired
@@ -505,7 +505,7 @@ and the machine learning model would need to be able to automatically understand
 It would also need to understand hand-written text to be even more robust.
 This kind of system is referred to as optical character recognition (OCR),
 and the kind of problem it solves is called a classification.
-It's treated with a distinct set of algorithms than those that are used for regression.
+It is treated with a distinct set of algorithms than those that are used for regression.
 
 In classification, we want to look at a feature vector, like the pixel values in an image,
 and then predict which category (formally called *classes*),
@@ -519,8 +519,8 @@ and our *labels* $Y$ might be the classes $\mathrm{\{cat, dog\}}$.
 While in regression, we sought a *regressor* to output a real value $\hat{y}$,
 in classification, we seek a *classifier*, whose output $\hat{y}$ is the predicted class assignment.
 
-For reasons that we'll get into as the book gets more technical, it's pretty hard to optimize a model that can only output a hard categorical assignment, e.g., either *cat* or *dog*.
-It's a lot easier instead to express the model in the language of probabilities.
+For reasons that we'll get into as the book gets more technical, it is pretty hard to optimize a model that can only output a hard categorical assignment, e.g., either *cat* or *dog*.
+It is a lot easier instead to express the model in the language of probabilities.
 Given an example $x$, the model assigns a probability $\hat{y}_k$ to each label $k$.
 Because these are probabilities, they need to be positive numbers and add up to $1$.
 This means that we only need $K-1$ numbers to give the probabilities of $K$ categories.
@@ -531,7 +531,7 @@ Returning to our animal classification example, a classifier might see an image
 and output the probability that the image is a cat $\Pr(y=\mathrm{cat}| x) = 0.9$.
 We can interpret this number by saying that the classifier is 90% sure that the image depicts a cat.
 The magnitude of the probability for the predicted class is one notion of confidence.
-It's not the only notion of confidence and we'll discuss different notions of uncertainty in more advanced chapters.
+It is not the only notion of confidence and we'll discuss different notions of uncertainty in more advanced chapters.
 
 When we have more than two possible classes, we call the problem *multiclass classification*.
 Common examples include hand-written character recognition `[0, 1, 2, 3 ... 9, a, b, c, ...]`.
@@ -765,7 +765,7 @@ a bunch of examples and a bunch of *corresponding target values*.
 You could think of supervised learning as having an extremely specialized job and an extremely anal boss.
 The boss stands over your shoulder and tells you exactly what to do in every situation until you learn to map from situations to actions.
 Working for such a boss sounds pretty lame.
-On the other hand, it's easy to please this boss. You just recognize the pattern as quickly as possible and imitate their actions.
+On the other hand, it is easy to please this boss. You just recognize the pattern as quickly as possible and imitate their actions.
 
 In a completely opposite way,
 it could be frustrating to work for a boss
@@ -824,7 +824,7 @@ Considering the interaction with an environment opens a whole set of new modelin
 
 This last question raises the problem of *covariate shift*,
 (when training and test data are different).
-It's a problem that most of us have experienced when taking exams written by a lecturer,
+It is a problem that most of us have experienced when taking exams written by a lecturer,
 while the homeworks were composed by his TAs.
 We'll briefly describe reinforcement learning and adversarial learning,
 two settings that explicitly consider interaction with an environment.
@@ -852,7 +852,7 @@ The goal of reinforcement learning is to produce a good policy.
 
 ![The interaction between reinforcement learning and an environment.](../img/rl-environment.svg)
 
-It's hard to overstate the generality of the RL framework.
+It is hard to overstate the generality of the RL framework.
 For example, we can cast any supervised learning problem as an RL problem.
 Say we had a classification problem.
 We could create an RL agent with one *action* corresponding to each class.

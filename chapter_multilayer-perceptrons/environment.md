@@ -122,7 +122,7 @@ For example, when the true labeling function is deterministic and unchanging,
 then covariate shift will always hold,
 including if label shift holds too.
 Interestingly, when we expect both label shift and covariate shift hold,
-it's often advantageous to work with the methods
+it is often advantageous to work with the methods
 that flow from the label shift assumption.
 That's because these methods tend to involve manipulating objects
 that look like the label,
@@ -401,7 +401,7 @@ and we get a solution $q(y) = C^{-1} \mu_y$.
 Here we abuse notation a bit, using $q(y)$
 to denote the vector of label frequencies.
 Because we observe the labels on the source data,
-it's easy to estimate the distribution $p(y)$.
+it is easy to estimate the distribution $p(y)$.
 Then for any training example $i$ with label $y$,
 we can take the ratio of our estimates $\hat{q}(y)/\hat{p}(y)$
 to calculate the weight $w_i$,
@@ -453,7 +453,7 @@ One key distinction between the different situations above is that the same stra
 
 ## Fairness, Accountability, and Transparency in machine Learning
 
-Finally, it's important to remember
+Finally, it is important to remember
 that when you deploy machine learning systems
 you aren't simply minimizing negative log likelihood
 or maximizing accuracy—you are automating some kind of decision process.

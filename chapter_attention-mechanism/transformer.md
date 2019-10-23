@@ -290,7 +290,7 @@ Another difference compared to the encoder transformer block is that the decoder
 
 ```{.python .input  n=16}
 class DecoderBlock(nn.Block):
-    # i means it's the i-th block in the decoder
+    # i means it is the i-th block in the decoder
     def __init__(self, units, hidden_size, num_heads, dropout, i, **kwargs):
         super(DecoderBlock, self).__init__(**kwargs)
         self.i = i

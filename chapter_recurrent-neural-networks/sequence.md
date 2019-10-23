@@ -3,7 +3,7 @@
 
 Imagine that you're watching movies on Netflix. As a good Netflix user you decide to rate each of the movies religiously. After all, a good movie is a good movie, and you want to watch more of them, right? As it turns out, things are not quite so simple. People's opinions on movies can change quite significantly over time. In fact, psychologists even have names for some of the effects:
 
-* There's [anchoring](https://en.wikipedia.org/wiki/Anchoring), based on someone else's opinion. For instance after the Oscar awards, ratings for the corresponding movie go up, even though it's still the same movie. This effect persists for a few months until the award is forgotten. :cite:`Wu.Ahmed.Beutel.ea.2017` showed that the effect lifts rating by over half a point.
+* There's [anchoring](https://en.wikipedia.org/wiki/Anchoring), based on someone else's opinion. For instance after the Oscar awards, ratings for the corresponding movie go up, even though it is still the same movie. This effect persists for a few months until the award is forgotten. :cite:`Wu.Ahmed.Beutel.ea.2017` showed that the effect lifts rating by over half a point.
 * There's the [Hedonic adaptation](https://en.wikipedia.org/wiki/Hedonic_treadmill), where humans quickly adapt to accept an improved (or a bad) situation as the new normal. For instance, after watching many good movies, the expectations that the next movie be equally good or better are high, and even an average movie might be considered a bad movie after many great ones.
 * There's seasonality. Very few viewers like to watch a Santa Claus movie in August.
 * In some cases movies become unpopular due to the misbehaviors of directors or actors in the production.
