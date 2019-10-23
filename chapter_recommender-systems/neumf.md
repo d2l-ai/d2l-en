@@ -161,7 +161,7 @@ The training function is defined below. We train the model in the pairwise manne
 def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter, 
                   num_users, num_items, num_epochs, ctx_list, evaluator, 
                   negative_sampler, candidates, eval_step=1):
-    num_batches, timer = len(train_iter), d2l.Timer()
+    num_batches, timer, hit_rate, auc  = len(train_iter), d2l.Timer(), 0, 0
     animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs], ylim=[0, 1],
                             legend=['test hit rate', 'test AUC'])
     for epoch in range(num_epochs):
