@@ -315,11 +315,12 @@ d & -b \\
 \end{bmatrix}.
 $$
 
-We can test to see this matches by examining the inversion method in numpy:
+We can test to see this by seeing that multiplying by the inverse given by the formula above works in practice.
 
 ```{.python .input}
 M = np.array([[1,2],[1,4]])
-print(np.linalg.inv(M))
+M_inv = np.array([[2,-1],[-0.5,0.5]])
+M_inv.dot(M)
 ```
 
 ### Numerical Issues
