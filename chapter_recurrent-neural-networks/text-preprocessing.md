@@ -1,7 +1,7 @@
 # Text Preprocessing
 :label:`chapter_text_preprocessing`
 
-Text is an important example of sequence data. An article can be simply viewed as a sequence of words, or a sequence of characters. Given text data is a major data format besides images we are using in this book, this section will dedicate to explain the common preprocessing steps for text data. Such preprocessing often consists of four steps:
+Text is an important example of sequence data. An article can be simply viewed as a sequence of words or a sequence of characters. Given text data is a major data format besides images we are using in this book, this section will dedicate to explain the common preprocessing steps for text data. Such preprocessing often consists of four steps:
 
 1. Loads texts as strings into memory.
 1. Splits strings into tokens, a token could be a word or a character. 
@@ -30,7 +30,7 @@ lines = read_time_machine()
 
 ## Tokenization
 
-For each sentence, we split it into a list of tokens. A token is a data point the model will train and predict. The following function supports split a sentence into words or characters, and return a list of split sentences.
+For each sentence, we split it into a list of tokens. A token is a data point the model will train and predict. The following function supports splitting a sentence into words or characters, and return a list of split sentences.
 
 ```{.python .input}
 # Save to the d2l package.
@@ -49,7 +49,7 @@ tokens[0:2]
 
 ## Vocabulary
 
-The string type of the token is inconvienet to be used by models, which take numerical inputs. Now let's build a dictionary, often called *vocabulary* as well, to map string tokens into numerical indices starting from 0. To so do, we first count the unique tokens in all documents, called *corpus*, and then assign a numerical index to each unique token according to its frequency. Rarely appeared tokens are often removed to reduce the complexity. A token doesn't exist in corpus or has been removed is mapped into a special unknown (“&lt;unk&gt;”) token. We optionally add another three special tokens: “&lt;pad&gt;” a token for padding, “&lt;bos&gt;” to present the beginning for a sentence, and “&lt;eos&gt;” for the ending of a sentence.
+The string type of the tokens is inconvenient to be used by the models, which take numerical inputs. Now let's build a dictionary, often called *vocabulary* as well, to map string tokens into numerical indices starting from 0. To so do, we first count the unique tokens in all documents, called *corpus*, and then assign a numerical index to each unique token according to its frequency. Rarely appeared tokens are often removed to reduce the complexity. A token that doesn't exist in the corpus or has been removed is mapped into a special unknown (“&lt;unk&gt;”) token. We optionally add another three special tokens: “&lt;pad&gt;” a token for padding, “&lt;bos&gt;” to present the beginning for a sentence, and “&lt;eos&gt;” for the ending of a sentence.
 
 ```{.python .input  n=9}
 # Save to the d2l package. 
