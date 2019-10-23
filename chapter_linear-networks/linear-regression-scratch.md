@@ -49,7 +49,7 @@ You could think of $\epsilon$ as capturing potential
 measurement errors on the features and labels.
 We will assume that the standard assumptions hold and thus
 that $\epsilon$ obeys a normal distribution with mean of $0$.
-To make our problem easy, we'll set its standard deviation to $0.01$.
+To make our problem easy, we will set its standard deviation to $0.01$.
 The following code generates our synthetic dataset:
 
 ```{.python .input  n=2}
@@ -117,7 +117,7 @@ and the gradient of the loss function for each example can also be taken in para
 GPUs allow us to process hundreds of examples in scarcely more time
 than it might take to process just a single example.
 
-To build some intuition, let's read and print
+To build some intuition, let us read and print
 the first small batch of data examples.
 The shape of the features in each minibatch tells us
 both the minibatch size and the number of input features.
@@ -218,8 +218,8 @@ def squared_loss(y_hat, y):
 
 As we discussed in the previous section,
 linear regression has a closed-form solution.
-However, this isn't a book about linear regression,
-it's a book about deep learning.
+However, this is not a book about linear regression,
+it is a book about deep learning.
 Since none of the other models that this book introduces
 can be solved analytically, we will take this opportunity to introduce your first working example of stochastic gradient descent (SGD).
 
@@ -236,7 +236,7 @@ The size of the update step is determined by the learning rate `lr`.
 Because our loss is calculated as a sum over the batch of examples,
 we normalize our step size by the batch size (`batch_size`),
 so that the magnitude of a typical step size
-doesn't depend heavily on our choice of the batch size.
+does not depend heavily on our choice of the batch size.
 
 ```{.python .input  n=11}
 # Saved in the d2l package for later use 
@@ -264,7 +264,7 @@ to update the model parameters.
 Since we previously set the batch size `batch_size` to $10$,
 the loss shape `l` for each minibatch is ($10$, $1$).
 
-In summary, we'll execute the following loop:
+In summary, we will execute the following loop:
 
 * Initialize parameters $(\mathbf{w}, b)$
 * Repeat until done
@@ -354,7 +354,7 @@ and learn how to implement them more concisely.
 ## Exercises
 
 1. What would happen if we were to initialize the weights $\mathbf{w} = 0$. Would the algorithm still work?
-1. Assume that you're [Georg Simon Ohm](https://en.wikipedia.org/wiki/Georg_Ohm) trying to come up with a model between voltage and current. Can you use `autograd` to learn the parameters of your model.
+1. Assume that you are [Georg Simon Ohm](https://en.wikipedia.org/wiki/Georg_Ohm) trying to come up with a model between voltage and current. Can you use `autograd` to learn the parameters of your model.
 1. Can you use [Planck's Law](https://en.wikipedia.org/wiki/Planck%27s_law) to determine the temperature of an object using spectral energy density?
 1. What are the problems you might encounter if you wanted to extend `autograd` to second derivatives? How would you fix them?
 1.  Why is the `reshape` function needed in the `squared_loss` function?

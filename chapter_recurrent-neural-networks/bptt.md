@@ -8,7 +8,7 @@ section we invoked `s.detach()` on the sequence. None of this was really fully
 explained, in the interest of being able to build a model quickly and
 to see how it works. In this section we will delve a bit more deeply
 into the details of backpropagation for sequence models and why (and
-how) the math works. For a more detailed discussion, e.g. about
+how) the math works. For a more detailed discussion, e.g., about
 randomization and backprop also see the paper by
 [Tallec and Ollivier, 2017](https://arxiv.org/abs/1705.08209).
 
@@ -36,32 +36,43 @@ We start with a simplified model of how an RNN works. This model ignores details
 
 $$h_t = f(x_t, h_{t-1}, w) \text{ and } o_t = g(h_t, w)$$
 
-Here $h_t$ denotes the hidden state, $x_t$ the input and $o_t$ the output. We have a chain of values $\{\ldots (h_{t-1}, x_{t-1}, o_{t-1}), (h_{t}, x_{t}, o_t), \ldots\}$ that depend on each other via recursive computation. The forward pass is fairly straightforward. All we need is to loop through the $(x_t, h_t, o_t)$ triples one step at a time. This is then evaluated by an objective function measuring the discrepancy between outputs $o_t$ and some desired target $y_t$
+Here $h_t$ denotes the hidden state, $x_t$ the input and $o_t$ the output. We have a chain of values $\{\ldots, (h_{t-1}, x_{t-1}, o_{t-1}), (h_{t}, x_{t}, o_t), \ldots\}$ that depend on each other via recursive computation. The forward pass is fairly straightforward. All we need is to loop through the $(x_t, h_t, o_t)$ triples one step at a time. This is then evaluated by an objective function measuring the discrepancy between outputs $o_t$ and some desired target $y_t$
 
 $$L(x,y, w) = \sum_{t=1}^T l(y_t, o_t).$$
 
-For backpropagation matters are a bit more tricky. Let's compute the gradients with regard to the parameters $w$ of the objective function $L$. We get that
+For backpropagation matters are a bit more tricky. Let us compute the gradients with regard to the parameters $w$ of the objective function $L$. We get that
 
 $$\begin{aligned}
 \partial_{w} L & = \sum_{t=1}^T \partial_w l(y_t, o_t) \\
 	& = \sum_{t=1}^T \partial_{o_t} l(y_t, o_t) \left[\partial_w g(h_t, w) + \partial_{h_t} g(h_t,w) \partial_w h_t\right]
 \end{aligned}$$
 
-The first part of the derivative is easy to compute (this is after all the instantaneous loss gradient at time $t$). The second part is where things get tricky, since we need to compute the effect of the parameters on $h_t$. For each term we have the recursion:
+The first part of the derivative is easy to compute (this is after all the instantaneous loss gradient at time $t$). The second part is where things get tricky, since we need to compute the effect of the parameters on $h_t$.
 
-$$\begin{aligned}
-	\partial_w h_t & = \partial_w f(x_t, h_{t-1}, w) + \partial_h f(x_t, h_{t-1}, w) \partial_w h_{t-1} \\
-	& = \sum_{i=t}^1 \left[\prod_{j=t}^i \partial_h f(x_j, h_{j-1}, w) \right] \partial_w f(x_{i}, h_{i-1}, w)
-\end{aligned}$$
+If we have three sequences $\{a_{t}\},\{b_{t}\},\{c_{t}\}$ satisfying
+$a_{0}=0,a_{1}=b_{1}$, and $a_{t}=b_{t}+c_{t}a_{t-1}$ for $t=1,2,\ldots$,
+then it is easy to show 
+$$
+a_{t}=b_{t}+\sum_{i=1}^{t-1}\left(\prod_{j=i+1}^{t}c_{j}\right)b_{i}
+$$
+for $t\geq1$, where we assume that the summation is zero when $t=1$.
+Therefore, the following recursion 
+$$
+\partial_{w}h_{t}=\partial_{w}f(x_{t},h_{t-1},w)+\partial_{h}f(x_{t},h_{t-1},w)\partial_{w}h_{t-1}
+$$
+implies 
+$$
+\partial_{w}h_{t}=\partial_{w}f(x_{t},h_{t-1},w)+\sum_{i=1}^{t-1}\left(\prod_{j=i+1}^{t}\partial_{h}f(x_{j},h_{j-1},w)\right)\partial_{w}f(x_{i},h_{i-1},w).
+$$
 
-This chain can get *very* long whenever $t$ is large. While we can use the chain rule to compute $\partial_w h_t$ recursively, this might not be ideal. Let's discuss a number of strategies for dealing with this problem:
+This chain can get *very* long whenever $t$ is large. While we can use the chain rule to compute $\partial_w h_t$ recursively, this might not be ideal. Let us discuss a number of strategies for dealing with this problem:
 
 **Compute the full sum.** This is very slow and gradients can blow up,
 since subtle changes in the initial conditions can potentially affect
 the outcome a lot. That is, we could see things similar to the
 butterfly effect where minimal changes in the initial conditions lead to disproportionate changes in the outcome. This is actually quite undesirable in terms of the model that we want to estimate. After all, we are looking for robust estimators that generalize well. Hence this strategy is almost never used in practice.
 
-**Truncate the sum after $\tau$ steps.** This is what we've been
+**Truncate the sum after $\tau$ steps.** This is what we have been
 discussing so far. This leads to an *approximation* of the true
 gradient, simply by terminating the sum above at $\partial_w
 h_{t-\tau}$. The approximation error is thus given by $\partial_h
@@ -95,7 +106,7 @@ In order to visualize the dependencies between model variables and parameters du
 
 ## BPTT in Detail
 
-Now that we discussed the general principle let's discuss BPTT in detail, distinguishing between different sets of weight matrices ($\mathbf{W}_{hx}, \mathbf{W}_{hh}$ and $\mathbf{W}_{oh}$) in a simple linear latent variable model:
+Now that we discussed the general principle let us discuss BPTT in detail, distinguishing between different sets of weight matrices ($\mathbf{W}_{hx}, \mathbf{W}_{hh}$ and $\mathbf{W}_{oh}$) in a simple linear latent variable model:
 
 $$\mathbf{h}_t = \mathbf{W}_{hx} \mathbf{x}_t + \mathbf{W}_{hh} \mathbf{h}_{t-1} \text{ and }
 \mathbf{o}_t = \mathbf{W}_{oh} \mathbf{h}_t$$
@@ -129,12 +140,12 @@ $$\begin{aligned}
 \partial_{\mathbf{W}_{hx}} \mathbf{h}_t & = \sum_{j=1}^t \left(\mathbf{W}_{hh}^\top\right)^{t-j} \mathbf{x}_j.
 \end{aligned}$$
 
-A number of things follow from this potentially very intimidating expression. Firstly, it pays to store intermediate results, i.e. powers of $\mathbf{W}_{hh}$ as we work our way through the terms of the loss function $L$. Secondly, this simple *linear* example already exhibits some key problems of long sequence models: it involves potentially very large powers $\mathbf{W}_{hh}^j$. In it, eigenvalues smaller than $1$ vanish for large $j$ and eigenvalues larger than $1$ diverge. This is numerically unstable and gives undue importance to potentially irrelvant past detail. One way to address this is to truncate the sum at a computationally convenient size. Later on in this chapter we will see how more sophisticated sequence models such as LSTMs can alleviate this further. In code, this truncation is effected by *detaching* the gradient after a given number of steps.
+A number of things follow from this potentially very intimidating expression. Firstly, it pays to store intermediate results, i.e., powers of $\mathbf{W}_{hh}$ as we work our way through the terms of the loss function $L$. Secondly, this simple *linear* example already exhibits some key problems of long sequence models: it involves potentially very large powers $\mathbf{W}_{hh}^j$. In it, eigenvalues smaller than $1$ vanish for large $j$ and eigenvalues larger than $1$ diverge. This is numerically unstable and gives undue importance to potentially irrelvant past detail. One way to address this is to truncate the sum at a computationally convenient size. Later on in this chapter we will see how more sophisticated sequence models such as LSTMs can alleviate this further. In code, this truncation is effected by *detaching* the gradient after a given number of steps.
 
 ## Summary
 
 * Back-propagation through time is merely an application of backprop to sequence models with a hidden state.
-* Truncation is needed for computational convencient and numerical stability.
+* Truncation is needed for computational convenience and numerical stability.
 * High powers of matrices can lead top divergent and vanishing eigenvalues. This manifests itself in the form of exploding or vanishing gradients.
 * For efficient computation intermediate values are cached.
 

@@ -34,7 +34,6 @@ def set_figsize(figsize=(3.5, 2.5)):
     """Set the figure size for matplotlib."""
     use_svg_display()
     d2l.plt.rcParams['figure.figsize'] = figsize
-    
 
 
 # Defined in file: ./chapter_preliminaries/calculus.md
@@ -705,7 +704,7 @@ class Encoder(nn.Block):
 
 # Defined in file: ./chapter_recurrent-neural-networks/encoder-decoder.md
 class Decoder(nn.Block):
-    """The base decoder interface for the encoder-decoder archtecture."""
+    """The base decoder interface for the encoder-decoder architecture."""
     def __init__(self, **kwargs):
         super(Decoder, self).__init__(**kwargs)
 
@@ -1512,7 +1511,7 @@ def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
         else:
             test_rmse = evaluator(net, test_iter, ctx_list)
         train_l = l / (i + 1)
-        animator.add(epoch + 1, (train_l, None, test_rmse))
+        animator.add(epoch + 1, (train_l, test_rmse))
     print('train loss %.3f, test RMSE %.3f'
           % (metric[0] / metric[1], test_rmse))
     print('%.1f examples/sec on %s'
@@ -1540,6 +1539,95 @@ class HingeLossbRec(Loss):
         distances = positive - negative
         loss = np.sum(np.maximum( - distances + margin, 0))
         return loss
+
+
+# Defined in file: ./chapter_recommender-systems/neumf.md
+def negative_sampler(users, candidates, num_items):
+    sampled_neg_items = []
+    all_items = set([i for i in range(num_items)])
+    for u in users:
+        neg_items = list(all_items - set(candidates[int(u)]))
+        indices = random.randint(0, len(neg_items) - 1)
+        sampled_neg_items.append(neg_items[indices])
+    return np.array(sampled_neg_items)
+
+
+# Defined in file: ./chapter_recommender-systems/neumf.md
+def hit_and_auc(rankedlist, test_matrix, k):
+    hits_k = [(idx, val) for idx, val in enumerate(rankedlist[:k]) 
+              if val in set(test_matrix)]
+    hits_all = [(idx, val) for idx, val in enumerate(rankedlist) 
+                if val in set(test_matrix)]
+    max = len(rankedlist) - 1
+    auc = 1.0 * (max - hits_all[0][0]) /max if len(hits_all) > 0 else 0
+    return len(hits_k) , auc
+
+
+# Defined in file: ./chapter_recommender-systems/neumf.md
+def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items, 
+                     ctx):
+    ranked_list, ranked_items, hit_rate, auc = {}, {}, [], []
+    all_items = set([i for i in range(num_users)])
+    for u in range(num_users):
+        neg_items = list(all_items - set(candidates[int(u)]))
+        user_ids, item_ids, x, scores = [], [], [], []
+        [item_ids.append(i) for i in neg_items]
+        [user_ids.append(u) for _ in neg_items]
+        x.extend([np.array(user_ids)])
+        if seq is not None:
+            x.append(seq[user_ids,:])
+        x.extend([np.array(item_ids)])
+        test_data_iter = gluon.data.DataLoader(gluon.data.ArrayDataset(*x), 
+            shuffle=False, last_batch="keep", batch_size=1024)
+        for index, values in enumerate(test_data_iter):
+            x = [gluon.utils.split_and_load(v, ctx, even_split=False)
+                          for v in values]
+            scores.extend([list(net(*t).asnumpy()) for t in zip(*x)])
+        scores = [item for sublist in scores for item in sublist]
+        item_scores = list(zip(item_ids, scores))
+        ranked_list[u] = sorted(item_scores, key=lambda t: t[1], reverse=True)
+        ranked_items[u] = [r[0] for r in ranked_list[u]]
+        temp = hit_and_auc(ranked_items[u], test_input[u], 50)
+        hit_rate.append(temp[0])
+        auc.append(temp[1])
+    return np.mean(np.array(hit_rate)), np.mean(np.array(auc))
+
+
+# Defined in file: ./chapter_recommender-systems/neumf.md
+def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter, 
+                  num_users, num_items, num_epochs, ctx_list, evaluator, 
+                  negative_sampler, candidates):
+    num_batches, timer = len(train_iter), d2l.Timer()
+    animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs], ylim=[0, 1],
+                            legend=['test hit rate', 'test AUC'])
+    for epoch in range(num_epochs):
+        metric, l = d2l.Accumulator(3), 0.
+        for i, values in enumerate(train_iter):
+            input_data = []
+            for v in values:
+                input_data.append(gluon.utils.split_and_load(v, ctx_list))
+            neg_items = negative_sampler(values[0], candidates, num_items)
+            neg_items = gluon.utils.split_and_load(neg_items, ctx_list)
+            with autograd.record():
+                p_pos = [net(*t) for t in zip(*input_data)]
+                p_neg = [net(*t) for t in zip(*input_data[0:-1], neg_items)]
+                ls =  [loss(p, n) for p, n in  zip(p_pos, p_neg)]
+            [l.backward(retain_graph=False) for l in ls]
+            l += sum([l.asnumpy() for l in ls]).mean()/len(ctx_list)
+            trainer.step(values[0].shape[0])
+            metric.add(l, values[0].shape[0], values[0].size)
+            timer.stop()
+        with autograd.predict_mode():
+            hit_rate, auc = evaluator(net, test_iter, test_seq_iter, 
+                                      candidates, num_users, num_items, 
+                                      ctx_list)
+        train_l = l / (i + 1)
+        print(train_l)
+        animator.add(epoch + 1, (hit_rate, auc))
+    print('train loss %.3f, test hit rate %.3f, test AUC %.3f'
+          % (metric[0] / metric[1], hit_rate, auc))
+    print('%.1f examples/sec on %s'
+          % (metric[2] * num_epochs / timer.sum(), ctx_list))
 
 
 # Defined in file: ./chapter_generative_adversarial_networks/gan.md

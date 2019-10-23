@@ -40,7 +40,7 @@ def get_fashion_mnist_labels(labels):
     return [text_labels[int(i)] for i in labels]
 ```
 
-Now let's create a function to visualize these examples.
+Now let us create a function to visualize these examples.
 
 ```{.python .input}
 # Saved in the d2l package for later use 
@@ -58,7 +58,7 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
     return axes
 ```
 
-Next, let's take a look at the image contents and text labels for the first few examples in the training data set.
+Next, let us take a look at the image contents and text labels for the first few examples in the training data set.
 
 ```{.python .input}
 X, y = mnist_train[:18]
@@ -91,7 +91,7 @@ train_iter = gluon.data.DataLoader(mnist_train.transform_first(transformer),
                                    num_workers=get_dataloader_workers())
 ```
 
-Let's look at the time it takes to read the training data.
+Let us look at the time it takes to read the training data.
 
 ```{.python .input}
 timer = d2l.Timer()

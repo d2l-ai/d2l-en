@@ -1,14 +1,14 @@
 # Basics
 :label:`sec_math`
 
-This section summarizes basic tools from linear algebra, differentiation, and probability required to understand the contents in this book. We avoid details beyond the bare minimum to keep things streamlined and easily accessible. In some cases we simplify things to keep them easily accessible. For more background see e.g. the excellent [Data Science 100](http://ds100.org) course at UC Berkeley.
+This section summarizes basic tools from linear algebra, differentiation, and probability required to understand the contents in this book. We avoid details beyond the bare minimum to keep things streamlined and easily accessible. In some cases we simplify things to keep them easily accessible. For more background see e.g., the excellent [Data Science 100](http://ds100.org) course at UC Berkeley.
 
 ## Linear Algebra
 
 This is a brief summary of vectors, matrices, operators, norms, eigenvectors,
-and eigenvalues. They're needed since a significant part of deep learning
+and eigenvalues. They are needed since a significant part of deep learning
 revolves around manipulating matrices and vectors. For a much more in-depth
-introduction to linear algebra in Python see e.g. the
+introduction to linear algebra in Python see e.g., the
 [Jupyter notebooks](https://github.com/juanklopper/MIT_OCW_Linear_Algebra_18_06)
 of Gilbert Strang's MIT course on
 [Linear Algebra](http://web.mit.edu/18.06/www/videos.shtml).
@@ -48,7 +48,7 @@ $$
 \end{bmatrix}.
 $$
 
-Here, $x_{ij}$ is the element in row $i \in \{1, \ldots m\}$ and column $j \in \{1, \ldots n\}$ in the matrix $\mathbf{X}$. Extending the vector notation we use $\mathbf{X} \in \mathbb{R}^{m \times n}$ to indicate that $\mathbf{X}$ is an $m \times n$ matrix. Given the above we could interpret vectors as $m \times 1$ dimensional matrices. Furthermore, matrices also form a vector space, i.e. we can multiply and add them just fine, as long as their dimensions match.
+Here, $x_{ij}$ is the element in row $i \in \{1, \ldots, m\}$ and column $j \in \{1, \ldots, n\}$ in the matrix $\mathbf{X}$. Extending the vector notation we use $\mathbf{X} \in \mathbb{R}^{m \times n}$ to indicate that $\mathbf{X}$ is an $m \times n$ matrix. Given the above we could interpret vectors as $m \times 1$ dimensional matrices. Furthermore, matrices also form a vector space, i.e., we can multiply and add them just fine, as long as their dimensions match.
 
 
 ### Operations
@@ -148,7 +148,7 @@ $$
 \end{bmatrix}.
 $$
 
-The product is a matrix with $m$ rows and $n$ columns, with the element in row $i \in \{1, \ldots m\}$ and column $j \in \{1, \ldots n\}$ equal to
+The product is a matrix with $m$ rows and $n$ columns, with the element in row $i \in \{1, \ldots, m\}$ and column $j \in \{1, \ldots, n\}$ equal to
 
 $$\left[\mathbf{A} \mathbf{B}\right]_{ij} = a_{i1}b_{1j}  + a_{i2}b_{2j} + \ldots + a_{ip}b_{pj} = \sum_{k=1}^p a_{ik}b_{kj}.$$
 
@@ -273,6 +273,8 @@ $$
 \end{aligned}
 $$
 
+Note, that the third identity is true only for a square $n \times n$ matrix $\mathbf{A}$.
+
 Similarly if $\mathbf{X}$ is a matrix, then
 $$\nabla_{\mathbf{X}} \|\mathbf{X} \|_F^2 = 2\mathbf{X}.$$
 
@@ -281,7 +283,8 @@ $$\nabla_{\mathbf{X}} \|\mathbf{X} \|_F^2 = 2\mathbf{X}.$$
 
 ### Hessian Matrices
 
-Assume the input of function $f: \mathbb{R}^n \rightarrow \mathbb{R}$ is an $n$-dimensional vector $\mathbf{x} = [x_1, x_2, \ldots, x_n]^\top$ and the output is a scalar. If all second-order partial derivatives of function $f$ exist and are continuous, then the Hessian matrix $\mathbf{H}$ of $f$ is a matrix with $m$ rows and $n$ columns given by
+Assume the input of function $f: \mathbb{R}^n \rightarrow \mathbb{R}$ is an $n$-dimensional vector $\mathbf{x} = [x_1, x_2, \ldots, x_n]^\top$ and the output is a scalar. If all second-order partial derivatives of function $f$ exist and are continuous, then the Hessian matrix $\mathbf{H}$ of $f$ is a $n \times n$ square matrix given by
+
 
 $$
 \mathbf{H} =
@@ -338,7 +341,7 @@ Here the last equality follows from the linearity of expectation.
 
 ### Uniform Distribution
 
-Assume random variable $X$ obeys a uniform distribution over $[a, b]$, i.e. $X \sim U( a, b)$. In this case, random variable $X$ has the same probability of being any number between $a$ and $b$.
+Assume random variable $X$ obeys a uniform distribution over $[a, b]$, i.e., $X \sim U( a, b)$. In this case, random variable $X$ has the same probability of being any number between $a$ and $b$.
 
 ### Normal Distribution
 

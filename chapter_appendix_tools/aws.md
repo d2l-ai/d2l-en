@@ -311,7 +311,7 @@ $ python
 
 ## Running Jupyter
 
-To run Jupyter remotely you need to use SSH port forwarding. After all, the server in the cloud doesn't have a monitor or keyboard. For this, log into your server from your desktop (or laptop) as follows.
+To run Jupyter remotely you need to use SSH port forwarding. After all, the server in the cloud does not have a monitor or keyboard. For this, log into your server from your desktop (or laptop) as follows.
 
 ```
 # This command must be run in the local command line
@@ -331,7 +331,7 @@ Since you used port forwarding to port 8889 you will need to replace the port nu
 
 ## Closing Unused Instances
 
-As cloud services are billed by the time of use, you should close instances that are not being used. Note that there are alternatives: "Stopping" an instance means that you will be able to start it again. This is akin to switching off the power for your regular server. However, stopped instances will still be billed a small amount for the hard disk space retained. "Terminate" deletes all data associated with it. This includes the disk, hence you cannot start it again. Only do this if you know that you won't need it in the future.
+As cloud services are billed by the time of use, you should close instances that are not being used. Note that there are alternatives: "Stopping" an instance means that you will be able to start it again. This is akin to switching off the power for your regular server. However, stopped instances will still be billed a small amount for the hard disk space retained. "Terminate" deletes all data associated with it. This includes the disk, hence you cannot start it again. Only do this if you know that you will not need it in the future.
 
 If you want to use the instance as a template for many more instances,
 right-click on the example in Figure 14.16 :numref:`fig_connect` and select "Image" $\rightarrow$

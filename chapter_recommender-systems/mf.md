@@ -37,7 +37,7 @@ An intuitive illustration of the matrix factorization model is shown below:
 
 In the rest of this section, we will explain the implementation of matrix factorization and train the model on the MovieLens dataset.
 
-```{.python .input  n=3}
+```{.python .input  n=2}
 import d2l
 from mxnet import autograd, init, gluon, np, npx
 from mxnet.gluon import nn
@@ -128,14 +128,14 @@ def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
         else:
             test_rmse = evaluator(net, test_iter, ctx_list)
         train_l = l / (i + 1)
-        animator.add(epoch + 1, (train_l, None, test_rmse))
+        animator.add(epoch + 1, (train_l, test_rmse))
     print('train loss %.3f, test RMSE %.3f'
           % (metric[0] / metric[1], test_rmse))
     print('%.1f examples/sec on %s'
           % (metric[2] * num_epochs / timer.sum(), ctx_list))
 ```
 
-Finally,  let's put all things together and train the model. Here, we set the latent factor dimension to 50.
+Finally,  let us put all things together and train the model. Here, we set the latent factor dimension to 50.
 
 ```{.python .input  n=5}
 ctx = d2l.try_all_gpus()
@@ -156,7 +156,7 @@ Below, we use the trained model to predict the rating that a user (ID 20) might 
 ```{.python .input  n=6}
 scores = net(np.array([20], dtype='int', ctx=d2l.try_gpu()), 
              np.array([30], dtype='int', ctx=d2l.try_gpu()))
-print(scores)
+scores
 ```
 
 ## Summary 

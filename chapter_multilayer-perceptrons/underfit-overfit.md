@@ -4,13 +4,13 @@
 As machine learning scientists, our goal is to discover general patterns.
 Say, for example, that we wish to learn the pattern
 that associates genetic markers with the development of dementia in adulthood.
-It's easy enough to memorize our training set.
+It is easy enough to memorize our training set.
 Each person's genes uniquely identify them,
 not just among people represented in our dataset,
 but among all people on earth!
 
 Given the genetic markers representing some person,
-we don't want our model to simply recognize "oh, that's Bob",
+we do not want our model to simply recognize "oh, that is Bob",
 and then output the classification,
 say among {*dementia*, *mild cognitive impairment*, *healthy*},
 that corresponds to Bob.
@@ -48,7 +48,7 @@ Now suppose that after featurizing the data into an enormous design matrix,
 you discover that of the 5 applicants who default,
 all of them were wearing blue shirts during their interviews,
 while only 40% of general population wore blue shirts.
-There's a good chance that if you train a predictive model
+There is a good chance that if you train a predictive model
 to predict default, it might rely upon blue-shirt-wearing
 as an important feature.
 
@@ -83,7 +83,7 @@ were we to apply it to an infinite stream of additional data points
 drawn from the same underlying data distribution as our original sample.
 
 Problematically, *we can never calculate the generalization error exactly*.
-That's because the imaginary stream of infinite data is an imaginary object.
+That is because the imaginary stream of infinite data is an imaginary object.
 In practice, we must *estimate* the generalization error
 by applying our model to an independent test set
 constituted of a random selection of data points
@@ -115,7 +115,7 @@ because the generalization error will always be $\frac{1}{2}$.
 However, for most algorithms,
 we should expect our training error to be considerably lower,
 depending on the luck of the draw,
-even if we didn't have any features!
+even if we did not have any features!
 Consider the dataset {0, 1, 1, 1, 0, 1}.
 Our feature-less would have to fall back on always predicting
 the *majority class*, which appears from our limited sample to be *1*.
@@ -226,9 +226,9 @@ of a scientific theory: a theory is good if it fits data
 and if there are specific tests which can be used to disprove it.
 This is important since all statistical estimation is
 [post hoc](https://en.wikipedia.org/wiki/Post_hoc),
-i.e. we estimate after we observe the facts,
+i.e., we estimate after we observe the facts,
 hence vulnerable to the associated fallacy.
-For now, we'll put the philosophy aside and stick to more tangible issues.
+For now, we will put the philosophy aside and stick to more tangible issues.
 
 In this chapter, to give you some intuition,
 we’ll focus on a few factors that tend
@@ -266,10 +266,10 @@ we will typically employ a validation set.
 In principle we should not touch our test set
 until after we have chosen all our hyper-parameters.
 Were we to use the test data in the model selection process,
-there's a risk that we might overfit the test data.
+there is a risk that we might overfit the test data.
 Then we would be in serious trouble.
 If we overfit our training data,
-there's always the evaluation on test data to keep us honest.
+there is always the evaluation on test data to keep us honest.
 But if we overfit the test data, how would we ever know?
 
 
@@ -299,7 +299,7 @@ we are really working with what should rightly be called
 training data and validation data, with no true test sets.
 Therefore, the accuracy reported in each experiment
 is really the validation accuracy and not a true test set accuracy.
-The good news is that we don't need too much data in the validation set.
+The good news is that we do not need too much data in the validation set.
 The uncertainty in our estimates can be shown
 to be of the order of $O(n^{-\frac{1}{2}})$.
 
@@ -340,7 +340,7 @@ we want to watch out for the cases
 when our training error is significantly lower
 than our validation error, indicating severe overfitting.
 Note that overfitting is not always a bad thing.
-With deep learning especially, it's well known
+With deep learning especially, it is well known
 that the best predictive models often perform
 far better on training data than on holdout data.
 Ultimately, we usually care more about the validation error
@@ -411,7 +411,7 @@ and the broad digitization of the economy.
 
 We can now explore these concepts interactively
 by fitting polynomials to data.
-To get started we'll import our usual packages.
+To get started we will import our usual packages.
 
 ```{.python .input  n=1}
 import d2l
@@ -429,7 +429,7 @@ $$y = 5 + 1.2x - 3.4\frac{x^2}{2!} + 5.6 \frac{x^3}{3!} + \epsilon \text{ where 
 
 The noise term $\epsilon$ obeys a normal distribution
 with a mean of 0 and a standard deviation of 0.1.
-We'll synthesize 100 samples each for the training set and test set.
+We will synthesize 100 samples each for the training set and test set.
 
 ```{.python .input  n=2}
 maxdegree = 20  # Maximum degree of the polynomial
@@ -514,7 +514,7 @@ The trained model parameters are also close
 to the true values $w = [5, 1.2, -3.4, 5.6]$.
 
 ```{.python .input  n=6}
-# Pick the first four dimensions, i.e. 1, x, x^2, x^3 from the polynomial
+# Pick the first four dimensions, i.e., 1, x, x^2, x^3 from the polynomial
 # features
 train(poly_features[:n_train, 0:4], poly_features[n_train:, 0:4],
       labels[:n_train], labels[n_train:])
@@ -533,14 +533,14 @@ When used to fit non-linear patterns
 linear models are liable to underfit.
 
 ```{.python .input  n=7}
-# Pick the first four dimensions, i.e. 1, x from the polynomial features
+# Pick the first four dimensions, i.e., 1, x from the polynomial features
 train(poly_features[:n_train, 0:3], poly_features[n_train:, 0:3],
       labels[:n_train], labels[n_train:])
 ```
 
 ### Insufficient Training (Overfitting)
 
-Now let's try to train the model
+Now let us try to train the model
 using a polynomial of too high degree.
 Here, there is insufficient data to learn that
 the higher-degree coefficients should have values close to zero.
@@ -572,7 +572,7 @@ such as weight decay and dropout.
 ## Summary
 
 * Since the generalization error rate cannot be estimated based on the training error rate, simply minimizing the training error rate will not necessarily mean a reduction in the generalization error rate. Machine learning models need to be careful to safeguard against overfitting such as to minimize the generalization error.
-* A validation set can be used for model selection (provided that it isn't used too liberally).
+* A validation set can be used for model selection (provided that it is not used too liberally).
 * Underfitting means that the model is not able to reduce the training error rate while overfitting is a result of the model training error rate being much lower than the testing data set rate.
 * We should choose an appropriately complex model and avoid using insufficient training samples.
 

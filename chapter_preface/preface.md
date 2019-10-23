@@ -3,12 +3,12 @@
 Just a few years ago, there were no legions of deep learning scientists
 developing intelligent products and services at major companies and startups.
 When the youngest of us (the authors) entered the field,
-machine learning didn't command headlines in daily newspapers.
+machine learning did not command headlines in daily newspapers.
 Our parents had no idea what machine learning was,
 let alone why we might prefer it to a career in medicine or law.
 Machine learning was a forward-looking academic discipline
 with a narrow set of real-world applications.
-And those applications, e.g. speech recognition and computer vision,
+And those applications, e.g., speech recognition and computer vision,
 required so much domain knowledge that they were often regarded
 as separate areas entirely for which machine learning was one small component.
 Neural networks, the antecedents of the deep learning models
@@ -76,19 +76,19 @@ with anything resembling of technical depth,
 and (3) interleaved the exposition one expects from an engaging textbook
 with the clean runnable code one seeks in hands-on tutorials.
 We found plenty of code examples for how to use a given deep learning
-framework (e.g. how to do basic numerical computing with matrices in TensorFlow)
-or for implementing particular techniques (e.g. code snippets for LeNet, AlexNet, ResNets, etc)
+framework (e.g., how to do basic numerical computing with matrices in TensorFlow)
+or for implementing particular techniques (e.g., code snippets for LeNet, AlexNet, ResNets, etc)
 in the form of blog posts or on GitHub.
 However, these examples typically focused on
 *how* to implement a given approach,
 but left out the discussion of *why* certain algorithmic decisions are made.
 While sporadic topics have been covered in blog posts,
-e.g. on the website [Distill](http://distill.pub) or personal blogs,
+e.g., on the website [Distill](http://distill.pub) or personal blogs,
 they only covered selected topics in deep learning, and often lacked associated code.
 On the other hand, while several textbooks have emerged,
 most notably :cite:`Goodfellow.Bengio.Courville.2016`,
 which offers an excellent survey of the concepts behind deep learning,
-these resources don't marry the descriptions to realizations of the concepts in code,
+these resources do not marry the descriptions to realizations of the concepts in code,
 sometimes leaving readers clueless as to how to implement them.
 Moreover, too many resources are hidden behind the paywalls of commercial course providers.
 
@@ -129,8 +129,8 @@ on linear regression requires a non-trivial amount of work.
 While experts love this book precisely for its thoroughness,
 for beginners, this property limits its usefulness as an introductory text.
 
-In this book, we'll teach most concepts *just in time*.
-In other words, you'll learn concepts at the very moment
+In this book, we will teach most concepts *just in time*.
+In other words, you will learn concepts at the very moment
 that they are needed to accomplish some practical end.
 While we take some time at the outset to teach
 fundamental preliminaries, like linear algebra and probability.
@@ -144,7 +144,7 @@ and provides a single self-contained working example -- using a real dataset.
 This presents an organizational challenge.
 Some models might logically be grouped together in a single notebook.
 And some ideas might be best taught by executing several models in succession.
-On the other hand, there's a big advantage to adhering
+On the other hand, there is a big advantage to adhering
 to a policy of *1 working example, 1 notebook*:
 This makes it as easy as possible for you to
 start your own research projects by leveraging our code.
@@ -160,7 +160,7 @@ This helps to give practitioners the necessary
 ammunition to solve problems quickly,
 at the expense of requiring the reader to trust us with some curatorial decisions.
 
-Throughout, we'll be working with the MXNet library,
+Throughout, we will be working with the MXNet library,
 which has the rare property of being flexible enough for research
 while being fast enough for production.
 This book will teach deep learning concepts from scratch.
@@ -168,11 +168,11 @@ Sometimes, we want to delve into fine details about the models
 that would typically be hidden from the user by ``Gluon``'s advanced abstractions.
 This comes up especially in the basic tutorials,
 where we want you to understand everything that happens in a given layer or optimizer.
-In these cases, we'll often present two versions of the example:
+In these cases, we will often present two versions of the example:
 one where we implement everything from scratch,
 relying only on NDArray and automatic differentiation,
 and another, more practical example, where we write succinct code using ``Gluon``.
-Once we've taught you how some component works,
+Once we have taught you how some component works,
 we can just use the ``Gluon`` version in subsequent tutorials.
 
 
@@ -188,7 +188,7 @@ The book can be roughly divided into three parts, which are presented by differe
 
 * The first part covers prerequisites and basics.  The first chapter offers an
 introduction to deep learning in :numref:`chap_introduction`.  In
-:numref:`chap_preliminaries`, we'll quickly bring you up to speed on the
+:numref:`chap_preliminaries`, we will quickly bring you up to speed on the
 prerequisites required for hands-on deep learning, such as how to acquire and
 run the codes covered in the book.  :numref:`chap_linear` and
 :numref:`chap_perceptrons` cover the most basic concepts and techniques of deep
@@ -281,7 +281,7 @@ This book is for students (undergraduate or graduate), engineers, and
 researchers, who seek a solid grasp of the practical techniques of deep
 learning.  Because we explain every concept from scratch, no previous background
 in deep learning or machine learning is required.  Fully explaining the methods
-of deep learning requires some mathematics and programming, but we'll only
+of deep learning requires some mathematics and programming, but we will only
 assume that you come in with some basics, including (the very basics of) linear
 algebra, calculus, probability, and Python programming.  Moreover, this book's
 appendix provides a refresher on most of the mathematics covered in this book.
@@ -296,7 +296,7 @@ may want to peruse the [Python tutorial](http://learnpython.org/).
 
 ### Forum
 
-Associated with this book, we've launched a discussion forum,
+Associated with this book, we have launched a discussion forum,
 located at [discuss.mxnet.io](https://discuss.mxnet.io/).
 When you have questions on any section of the book,
 you can find the associated discussion page by scanning the QR code
@@ -317,6 +317,7 @@ alxnorden, avinashingit, bowen0701, brettkoonce, Chaitanya Prakash Bapat,
 cryptonaut, Davide Fiocco, edgarroman, gkutiel, John Mitro, Liang Pu, Rahul Agarwal, mohamed-ali,
 mstewart141, Mike Müller, NRauschmayr, Prakhar Srivastav, sad-, sfermigier, Sheng Zha, sundeepteki,
 topecongiro, tpdi, vermicelli, Vishaal Kapoor, vishwesh5, YaYaB, Yuhong Chen, Evgeniy Smirnov, lgov, Simon Corston-Oliver, IgorDzreyev, trungha-ngx, pmuens, alukovenko, senorcinco, vfdev-5, dsweet, Mohammad Mahdi Rahimi, Abhishek Gupta, uwsd, DomKM, Lisa Oakley, bowen0701, arush15june, prasanth5reddy, brianhendee, mani2106, mtn, lkevinzc, caojilin, Lakshya, Fiete Lüer, Surbhi Vijayvargeeya, Muhyun Kim, dennismalmgren, adursun, Anirudh Dagar, liqingnz, Pedro Larroy, lgov, ati-ozgur, goldmermaid, Jun Wu, Matthias Blume, apeforest, geogunow, Josh Gardner, Maximilian Böther, rislam, Leonard Lausen, Abhinav Upadhyay, rongruosong, Steve Sedlmeyer, ruslo, Rafael Schlatter, liusy182, GIannis Pappas, ruslo, ati-ozgur, qbaza, dchoi77, Jun Wu, Hao Jin, Haibin Lin.
+
 Moreover, we thank Amazon Web Services, especially Swami Sivasubramanian,
 Raju Gulabani, Charlie Bell, and Andrew Jassy for their generous support in writing this book.
 Without the available time, resources, discussions with colleagues,
@@ -333,7 +334,7 @@ and continuous encouragement this book would not have happened.
 * Gluon is a high level library that makes it easy to code up deep learning models using Apache MXNet.
 * Conda is a Python package manager that ensures that all software dependencies are met.
 * All notebooks are available for download on GitHub and  the conda configurations needed to run this book's code are expressed in the `environment.yml` file.
-* If you plan to run this code on GPUs, don't forget to install the necessary drivers and update your configuration.
+* If you plan to run this code on GPUs, do not forget to install the necessary drivers and update your configuration.
 
 
 ## Exercises
@@ -341,7 +342,7 @@ and continuous encouragement this book would not have happened.
 1. Register an account on the discussion forum of this book [discuss.mxnet.io](https://discuss.mxnet.io/).
 1. Install Python on your computer.
 1. Follow the links at the bottom of the section to the forum,
-where you'll be able to seek out help and discuss the book and find answers to your questions
+where you will be able to seek out help and discuss the book and find answers to your questions
 by engaging the authors and broader community.
 1. Create an account on the forum and introduce yourself.
 

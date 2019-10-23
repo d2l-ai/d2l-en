@@ -1,7 +1,7 @@
 # Concise Implementation of Recurrent Neural Networks
 :label:`sec_rnn_gluon`
 
-While :numref:`sec_rnn_scratch` was instructive to see how recurrent neural networks are implemented, this isn't convenient or fast. The current section will show how to implement the same language model more efficiently using functions provided by Gluon. We begin as before by reading the 'Time Machine" corpus.
+While :numref:`sec_rnn_scratch` was instructive to see how recurrent neural networks are implemented, this is not convenient or fast. The current section will show how to implement the same language model more efficiently using functions provided by Gluon. We begin as before by reading the 'Time Machine" corpus.
 
 ```{.python .input  n=1}
 import d2l
@@ -67,7 +67,7 @@ class RNNModel(nn.Block):
 
 ## Training
 
-Let's make a prediction with the a model that has random weights.
+Let us make a prediction with the a model that has random weights.
 
 ```{.python .input  n=42}
 ctx = d2l.try_gpu()
@@ -76,7 +76,7 @@ model.initialize(force_reinit=True, ctx=ctx)
 d2l.predict_ch8('time traveller', 10, model, vocab, ctx)
 ```
 
-As is quite obvious, this model doesn't work at all (just yet). Next, we call just `train_ch8` defined in :numref:`sec_rnn_scratch` with the same hyper-parameters to train our model.
+As is quite obvious, this model does not work at all (just yet). Next, we call just `train_ch8` defined in :numref:`sec_rnn_scratch` with the same hyper-parameters to train our model.
 
 ```{.python .input  n=19}
 num_epochs, lr = 500, 1
@@ -104,7 +104,7 @@ The model achieves comparable perplexity, albeit within a shorter period of time
 1. What happens if you increase the number of hidden layers in the RNN model? Can you make the model work?
 1. How well can you compress the text using this model?
     * How many bits do you need?
-    * Why doesn't everyone use this model for text compression? Hint - what about the compressor itself?
+    * Why does not everyone use this model for text compression? Hint - what about the compressor itself?
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2365)
 

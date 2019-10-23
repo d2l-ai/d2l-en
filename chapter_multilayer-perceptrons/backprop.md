@@ -25,11 +25,11 @@ While we plan to continue relying on `autograd`,
 and we have already come a long way
 without every discussing how these gradients
 are calculated efficiently under the hood,
-it's important that you know
+it is important that you know
 how updates are actually calculated
 if you want to go beyond a shallow understanding of deep learning.
 
-In this section, we'll peel back the curtain on some of the details
+In this section, we will peel back the curtain on some of the details
 of backward propagation (more commonly called *backpropagation* or *backprop*).
 To convey some insight for both the techniques and how they are implementated,
 we will rely on both mathematics and computational graphs

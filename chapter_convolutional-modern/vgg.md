@@ -2,7 +2,7 @@
 :label:`sec_vgg`
 
 While AlexNet proved that deep convolutional neural networks
-can achieve good results, it didn't offer a general template
+can achieve good results, it did not offer a general template
 to guide subsequent researchers in designing new networks.
 In the following sections, we will introduce several heuristic concepts
 commonly used to design deep networks.
@@ -20,7 +20,7 @@ The idea of using blocks first emerged from the
 [Visual Geometry Group](http://www.robots.ox.ac.uk/~vgg/) (VGG)
 at Oxford University.
 In their eponymously-named VGG network,
-It's easy to implement these repeated structures in code
+It is easy to implement these repeated structures in code
 with any modern deep learning framework by using loops and subroutines.
 
 
@@ -148,7 +148,7 @@ d2l.train_ch5(net, train_iter, test_iter, num_epochs, lr)
 
 * VGG-11 constructs a network using reusable convolutional blocks. Different VGG models can be defined by the differences in the number of convolutional layers and output channels in each block.
 * The use of blocks leads to very compact representations of the network definition. It allows for efficient design of complex networks.
-* In their work Simonyan and Ziserman experimented with various architectures. In particular, they found that several layers of deep and narrow convolutions (i.e. $3 \times 3$) were more effective than fewer layers of wider convolutions.
+* In their work Simonyan and Ziserman experimented with various architectures. In particular, they found that several layers of deep and narrow convolutions (i.e., $3 \times 3$) were more effective than fewer layers of wider convolutions.
 
 ## Exercises
 

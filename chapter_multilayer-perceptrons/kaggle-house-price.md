@@ -8,7 +8,7 @@ dimensionality-reduction, weight decay and dropout.
 You are now ready to put all this knowledge into practice
 by participating in a Kaggle competition.
 [Predicting house prices](https://www.kaggle.com/c/house-prices-advanced-regression-techniques) is a great place to start:
-the data is reasonably generic and doesn't have
+the data is reasonably generic and does not have
 the kind of rigid structure that might require specialized models
 the way images or audio might.
 This dataset, collected by [Bart de Cock](http://jse.amstat.org/v19n3/decock.pdf) in 2011, is considerably larger than the famous the [Boston housing dataset](https://archive.ics.uci.edu/ml/machine-learning-databases/housing/housing.names) of Harrison and Rubinfeld (1978).
@@ -30,7 +30,7 @@ for machine learning competitions.
 It combines data, code and users in a way to allow
 for both collaboration and competition.
 While leaderboard chasing can sometimes get out of control,
-there's also a lot to be said for the objectivity in a platform
+there is also a lot to be said for the objectivity in a platform
 that provides fair and direct quantitative comparisons
 between your approaches and those devised by your competitors.
 Moreover, you can checkout the code
@@ -65,15 +65,15 @@ And here is where reality comes in:
 for some examples, some data is altogether missing
 with the missing value marked simply as 'na'.
 The price of each house is included for the training set only
-(it's a competition after all).
+(it is a competition after all).
 You can partition the training set to create a validation set,
-but you'll only find out how you perform on the official test set
+but you will only find out how you perform on the official test set
 when you upload your predictions and receive your score.
 The 'Data' tab on the competition tab has links to download the data.
 
 We will read and process the data using `pandas`,
 an [efficient data analysis toolkit](http://pandas.pydata.org/pandas-docs/stable/), so you will want to make sure that you have `pandas` installed
-before proceeding further. Fortunately, if you're reading in Jupyter,
+before proceeding further. Fortunately, if you are reading in Jupyter,
 we can install pandas without even leaving the notebook.
 
 ```{.python .input  n=3}
@@ -115,7 +115,7 @@ train_data.iloc[0:4, [0, 1, 2, 3, -3, -2, -1]]
 
 We can see that in each example, the first feature is the ID.
 This helps the model identify each training example.
-While this is convenient, it doesn't carry
+While this is convenient, it does not carry
 any information for prediction purposes.
 Hence we remove it from the dataset before feeding the data into the network.
 
@@ -128,7 +128,7 @@ all_features = pd.concat((train_data.iloc[:, 1:-1], test_data.iloc[:, 1:]))
 As stated above, we have a wide variety of datatypes.
 Before we feed it into a deep network,
 we need to perform some amount of processing.
-Let's start with the numerical features.
+Let us start with the numerical features.
 We begin by replacing missing values with the mean.
 This is a reasonable strategy if features are missing at random.
 To adjust them to a common scale,
@@ -191,8 +191,8 @@ To get started we train a linear model with squared loss.
 Not surprisingly, our linear model will not lead
 to a competition winning submission
 but it provides a sanity check to see whether
-there's meaningful information in the data.
-If we can't do better than random guessing here,
+there is meaningful information in the data.
+If we cannot do better than random guessing here,
 then there might be a good chance
 that we have a data processing bug.
 And if things work, the linear model will serve as a baseline
@@ -384,11 +384,11 @@ def train_and_pred(train_features, test_feature, train_labels, test_data,
     submission.to_csv('submission.csv', index=False)
 ```
 
-Let's invoke our model.
+Let us invoke our model.
 One nice sanity check is to see
 whether the predictions on the test set
 resemble those of the k-fold cross-validation process.
-If they do, it's time to upload them to Kaggle.
+If they do, it is time to upload them to Kaggle.
 The following code will generate a file called `submission.csv`
 (CSV is one of the file formats accepted by Kaggle):
 

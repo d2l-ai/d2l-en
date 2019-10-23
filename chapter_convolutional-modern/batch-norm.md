@@ -14,7 +14,7 @@ to routinely train networks with over 100 layers.
 
 ## Training Deep Networks
 
-To motivate batch normalization, let's review 
+To motivate batch normalization, let us review 
 a few practical challenges that arise 
 when training ML models and neural nets in particular.
 
@@ -53,7 +53,7 @@ It is precisely due to this *normalization* based on *batch* statistics
 that *batch normalization* derives its name.
 
 Note that if we tried to apply BN with minibatches of size $1$, 
-we wouldn't be able to learn anything.
+we would not be able to learn anything.
 That is because after subtracting the means,
 each hidden node would take value $0$!
 As you might guess, since we are devoting a whole section to BN, 
@@ -195,7 +195,7 @@ As we mentioned earlier, BN typically behaves differently
 in training mode and prediction mode. 
 First, the noise in $\mathbf{\mu}$ and $\mathbf{\sigma}$
 arising from estimating each on minibatches
-are no longer desirable once we've trained the model.
+are no longer desirable once we have trained the model.
 Second, we might not have the luxury
 of computing per-batch normalization statistics, e.g.,
 we might need to apply our model to make one prediction at a time.
@@ -272,7 +272,7 @@ This pattern enables a clean separation of math from boilerplate code.
 Also note that for the sake of convenience
 we did not worry about automagically inferring the input shape here,
 thus our need to specify the number of features throughout.
-Don't worry, the Gluon `BatchNorm` layer will care of this for us.
+Do not worry, the Gluon `BatchNorm` layer will care of this for us.
 
 ```{.python .input  n=73}
 class BatchNorm(nn.Block):
@@ -341,7 +341,7 @@ train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 d2l.train_ch5(net, train_iter, test_iter, num_epochs, lr)
 ```
 
-Let's have a look at the scale parameter `gamma`
+Let us have a look at the scale parameter `gamma`
 and the shift parameter `beta` learned
 from the first batch normalization layer.
 

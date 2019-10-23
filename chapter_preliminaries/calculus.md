@@ -28,6 +28,22 @@ Among the most critical applications of differential calculus,
 optimization problems consider how to do something *the best*.
 As discussed in :numref:`subsec_norms_and_objectives`,
 such problems are ubiquitous in deep learning.
+
+In deep learning, we *train* models, updating them successively 
+so that they get better and better as they see more and more data. 
+Usually, getting better means minimizing a *loss function*, 
+a score that answers the question "how *bad* is our model?"
+This question is more subtle than it appears.
+Ultimately, what we really care about 
+is producing a model that performs well on data 
+that we have never seen before.
+But we can only fit the model to data that we can actually see.
+Thus we can decompose the task of fitting models into two key concerns:
+i) *optimization*: the process of fitting our models to observed data;
+ii) *generalization*: the mathematical principles and practitioners' wisdom
+that guide as to how to produce models whose validity extends
+beyond the exact set of data points used to train them.
+
 To help you understand
 optimization problems and methods in later chapters,
 here we give a very brief primer on differential calculus
@@ -36,6 +52,15 @@ that is commonly used in deep learning.
 
 ## Derivatives and Differentiation
 
+We begin by addressing the calculation of derivatives,
+a crucial step in nearly all deep learning optimization algorithms.
+In deep learning, we typically choose loss functions 
+that are differentiable with respect to our model's parameters.
+Put simply, this means that for each parameter, 
+we can determine how rapidly the loss would increase or decrease,
+were we to *increase* or *decrease* that parameter
+by an infinitesimally small amount.
+
 Suppose that we have a function $f: \mathbb{R} \rightarrow \mathbb{R}$,
 whose input and output are both scalars.
 The *derivative* of $f$ is defined as
@@ -43,7 +68,11 @@ The *derivative* of $f$ is defined as
 $$f'(x) = \lim_{h \rightarrow 0} \frac{f(x+h) - f(x)}{h},$$
 :eqlabel:`eq_derivative`
 
-if this limit exists (and $f$ is said to be *differentiable*).
+if this limit exists.
+If $f'(a)$ exists,
+$f$ is said to be *differentiable* at $a$.
+If $f$ is differentiable at every number of an interval,
+then this function is differentiable on this interval.
 We can interpret the derivative $f'(x)$ in :eqref:`eq_derivative`
 as the *instantaneous* rate of change of $f(x)$
 with respect to $x$.

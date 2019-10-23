@@ -107,7 +107,7 @@ By adding another layer, we have added two new sets of parameters,
 but what have we gained in exchange?
 In the model defined above, we do not achieve anything for our troubles!
 
-That's because our hidden units are just a linear function of the inputs
+That is because our hidden units are just a linear function of the inputs
 and the outputs (pre-softmax) are just a linear function of the hidden units.
 A linear function of a linear function is itself a linear function.
 That means that for any values of the weights,
@@ -132,7 +132,7 @@ $$
 $$
 
 Clearly, we could continue stacking such hidden layers,
-e.g. $\mathbf{h}_1 = \sigma(\mathbf{W}_1 \mathbf{x} + \mathbf{b}_1)$
+e.g., $\mathbf{h}_1 = \sigma(\mathbf{W}_1 \mathbf{x} + \mathbf{b}_1)$
 and $\mathbf{h}_2 = \sigma(\mathbf{W}_2 \mathbf{h}_1 + \mathbf{b}_2)$
 on top of each other to obtain a true multilayer perceptron.
 
@@ -148,7 +148,7 @@ we can model any function at all!
 *Actually learning that function is the hard part.*
 
 Moreover, just because a single-layer network *can* learn any function
-doesn't mean that you should try to solve all of your problems with single-layer networks.
+does not mean that you should try to solve all of your problems with single-layer networks.
 It turns out that we can approximate many functions
 much more compactly if we use deeper (vs wider) neural networks.
 We’ll get more into the math in a subsequent chapter,
@@ -171,7 +171,7 @@ $$
 $$
 
 With some abuse of notation, we define the nonlinearity $\sigma$
-to apply to its inputs on a row-wise fashion, i.e. one observation at a time.
+to apply to its inputs on a row-wise fashion, i.e., one observation at a time.
 Note that we are also using the notation for *softmax* in the same way to denote a row-wise operation.
 Often, as in this chapter, the activation functions that we apply to hidden layers are not merely row-wise, but component wise.
 That means that after computing the linear portion of the layer,
@@ -189,7 +189,7 @@ npx.set_np()
 ## Activation Functions
 
 Because they are so fundamental to deep learning, before going further,
-let's take a brief look at some common activation functions.
+let us take a brief look at some common activation functions.
 
 ### ReLU Function
 
@@ -226,7 +226,7 @@ when the input takes value precisely equal to  0.
 In these cases, we go with the left-hand-side (LHS) derivative
 and say that the derivative is 0 when the input is 0.
 We can get away with this because the input may never actually be zero.
-There's an old adage that if subtle boundary conditions matter,
+There is an old adage that if subtle boundary conditions matter,
 we are probably doing (*real*) mathematics, not engineering.
 That conventional wisdom may apply here.
 See the derivative of the ReLU function plotted below.
@@ -253,7 +253,7 @@ $$\mathrm{sigmoid}(x) = \frac{1}{1 + \exp(-x)}.$$
 
 In the earliest neural networks, scientists
 were interested in modeling biological neurons
-which either *fire* or *don't fire*.
+which either *fire* or *do not fire*.
 Thus the pioneers of this field, going all the way back to McCulloch and Pitts in the 1940s, were focused on thresholding units.
 A thresholding function takes either value $0$
 (if the input is below the threshold)
@@ -351,7 +351,7 @@ required researchers to code up thousands of lines of C and Fortran.
 1. Show that a multilayer perceptron using only ReLU (or pReLU) constructs a continuous piecewise linear function.
 1. Show that $\mathrm{tanh}(x) + 1 = 2 \mathrm{sigmoid}(2x)$.
 1. Assume we have a multilayer perceptron *without* nonlinearities between the layers. In particular, assume that we have $d$ input dimensions, $d$ output dimensions and that one of the layers had only $d/2$ dimensions. Show that this network is less expressive (powerful) than a single layer perceptron.
-1. Assume that we have a nonlinearity that applies to one minibatch at a time. What kinds of problems to you expect this to cause?
+1. Assume that we have a nonlinearity that applies to one minibatch at a time. What kinds of problems do you expect this to cause?
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2338)
 

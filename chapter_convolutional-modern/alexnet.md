@@ -16,7 +16,7 @@ such as support vector machines.
 
 
 For computer vision, this comparison is perhaps not fair.
-That's although the inputs to convolutional networks
+That is although the inputs to convolutional networks
 consist of raw or lightly-processed (e.g., by centering) pixel values, practitioners would never feed raw pixels into traditional models.
 Instead, typical computer vision pipelines
 consisted of manually engineering feature extraction pipelines.
@@ -108,7 +108,7 @@ The ultimate breakthrough in 2012 can be attributed to two key factors.
 Deep models with many layers require large amounts of data
 in order to enter the regime
 where they signficantly outperform traditional methods
-based on convex optimizations (e.g. linear and kernel methods).
+based on convex optimizations (e.g., linear and kernel methods).
 However, given the limited storage capacity of computers,
 the relative expense of sensors,
 and the comparatively tighter research budgets in the 1990s,
@@ -166,7 +166,7 @@ They require lots of chip area,
 a sophisticated support structure
 (memory interfaces, caching logic between cores,
 high speed interconnects, etc.),
-and they're comparatively bad at any single task.
+and they are comparatively bad at any single task.
 Modern laptops have up to 4 cores,
 and even high end servers rarely exceed 64 cores,
 simply because it is not cost effective.
@@ -228,7 +228,7 @@ First, AlexNet is much deeper than the comparatively small LeNet5.
 AlexNet consists of eight layers: five convolutional layers,
 two fully-connected hidden layers, and one fully-connected output layer. Second, AlexNet used the ReLU instead of the sigmoid
 as its activation function.
-Let's delve into the details below.
+Let us delve into the details below.
 
 ### Architecture
 

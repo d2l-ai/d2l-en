@@ -7,7 +7,7 @@ is similarly fundamental and you ought to know
 the gory details of how to implement it from scratch.
 As with linear regression, after doing things by hand
 we will breeze through an implementation in Gluon for comparison.
-To begin, let's import our packages.
+To begin, let us import our packages.
 
 ```{.python .input  n=1}
 import d2l
@@ -29,7 +29,7 @@ train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 Just as in linear regression, we represent each example as a vector.
 Since each example is a $28 \times 28$ image,
 we can flatten each example, treating them as $784$ dimensional vectors.
-In the future, we'll talk about more sophisticated strategies
+In the future, we will talk about more sophisticated strategies
 for exploiting the spatial structure in images,
 but for now we treat each pixel location as just another feature.
 
@@ -62,7 +62,7 @@ b.attach_grad()
 ## The Softmax
 
 Before implementing the softmax regression model,
-let's briefly review how operators such as `sum` work
+let us briefly review how operators such as `sum` work
 along specific dimensions in an `ndarray`.
 Given a matrix `X` we can sum over all elements (default) or only
 over elements in the same axis, *i.e.*, the column (`axis=0`) or the same row (`axis=1`).
@@ -86,7 +86,7 @@ Then, we sum over each row (we have one row per example in the batch)
 to get the normalization constants for each example.
 Finally, we divide each row by its normalization constant,
 ensuring that the result sums to $1$.
-Before looking at the code, let's recall
+Before looking at the code, let us recall
 what this looks expressed as an equation:
 
 $$
@@ -173,7 +173,7 @@ Given the predicted probability distribution `y_hat`,
 we typically choose the class with highest predicted probability
 whenever we must output a *hard* prediction. Indeed, many applications require that we make a choice. Gmail must catetegorize an email into Primary, Social, Updates, or Forums. It might estimate probabilities internally, but at the end of the day it has to choose one among the categories.
 
-When predictions are consistent with the actual category `y`, they are correct. The classification accuracy is the fraction of all predictions that are correct. Although we cannot optimize accuracy directly (it is not differentiable), it's often the performance metric that we care most about, and we will nearly always report it when training classifiers.
+When predictions are consistent with the actual category `y`, they are correct. The classification accuracy is the fraction of all predictions that are correct. Although we cannot optimize accuracy directly (it is not differentiable), it is often the performance metric that we care most about, and we will nearly always report it when training classifiers.
 
 To compute accuracy we do the following:
 First, we execute `y_hat.argmax(axis=1)`
@@ -182,7 +182,7 @@ to gather the predicted classes
 The result has the same shape as the variable `y`.
 Now we just need to check how frequently the two match.
 Since the equality operator `==` is datatype-sensitive
-(e.g. an `int` and a `float32` are never equal),
+(e.g., an `int` and a `float32` are never equal),
 we also need to convert both to the same type (we pick `float32`).
 The result is an `ndarray` containing entries of 0 (false) and 1 (true).
 Taking the mean yields the desired result.
@@ -239,7 +239,7 @@ class Accumulator(object):
 
 Because we initialized the `net` model with random weights,
 the accuracy of this model should be close to random guessing,
-i.e. 0.1 for 10 classes.
+i.e., 0.1 for 10 classes.
 
 ```{.python .input  n=14}
 evaluate_accuracy(net, test_iter)
@@ -325,7 +325,7 @@ Again, we use the mini-batch stochastic gradient descent
 to optimize the loss function of the model.
 Note that the number of epochs (`num_epochs`),
 and learning rate (`lr`) are both adjustable hyper-parameters.
-By changing their values, we may be able to increase the classification accuracy of the model. In practice we'll want to split our data three ways
+By changing their values, we may be able to increase the classification accuracy of the model. In practice we will want to split our data three ways
 into training, validation, and test data, using the validation data to choose the best values of our hyperparameters.
 
 ```{.python .input  n=18}
@@ -357,7 +357,7 @@ predict_ch3(net, test_iter)
 ## Summary
 
 With softmax regression, we can train models for multi-category classification. The training loop is very similar to that in linear regression: retrieve and read data, define models and loss functions,
-then train models using optimization algorithms. As you'll soon find out, most common deep learning models have similar training procedures.
+then train models using optimization algorithms. As you will soon find out, most common deep learning models have similar training procedures.
 
 ## Exercises
 

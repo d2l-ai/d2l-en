@@ -15,7 +15,7 @@ Generally, we can ignore functions that start and end with `__` (special objects
 
 ## Finding the usage of specific functions and classes
 
-For more specific instructions on how to use a given function or class, we can invoke the  `help` function. As an example, let's explore the usage instructions for ndarray's `ones_like` function.
+For more specific instructions on how to use a given function or class, we can invoke the  `help` function. As an example, let us explore the usage instructions for ndarray's `ones_like` function.
 
 ```{.python .input}
 help(np.ones_like)
@@ -29,7 +29,7 @@ y = np.ones_like(x)
 y
 ```
 
-In the Jupyter notebook, we can use `?` to display the document in another window. For example, `np.random.uniform?` will create content that is almost identical to `help(np.random.uniform)`, displaying it in a new browser window. In addition, if we use two question marks, e.g. `np.random.uniform??`, the code implementing the function will also be displayed.
+In the Jupyter notebook, we can use `?` to display the document in another window. For example, `np.random.uniform?` will create content that is almost identical to `help(np.random.uniform)`, displaying it in a new browser window. In addition, if we use two question marks, e.g., `np.random.uniform??`, the code implementing the function will also be displayed.
 
 ## API Documentation
 

@@ -3,7 +3,7 @@
 
 In the previous section we discussed how gradients are calculated in a recurrent
 neural network. In particular we found that long products of matrices can lead
-to vanishing or divergent gradients. Let's briefly think about what such
+to vanishing or divergent gradients. Let us briefly think about what such
 gradient anomalies mean in practice:
 
 * We might encounter a situation where an early observation is highly
@@ -59,7 +59,7 @@ $$
 Here, $\mathbf{W}_{xr}, \mathbf{W}_{xz} \in \mathbb{R}^{d \times h}$ and
 $\mathbf{W}_{hr}, \mathbf{W}_{hz} \in \mathbb{R}^{h \times h}$ are weight
 parameters and $\mathbf{b}_r, \mathbf{b}_z \in \mathbb{R}^{1 \times h}$ are
-biases. We use a sigmoid function (see e.g. refer to :numref:`sec_mlp` for a description) to transform values to the interval $(0,1)$.
+biases. We use a sigmoid function (see e.g., refer to :numref:`sec_mlp` for a description) to transform values to the interval $(0,1)$.
 
 ### Reset Gate in Action
 

@@ -1,7 +1,7 @@
 # From Dense Layers to Convolutions
 
-The models that we've discussed so far are fine options
-if you're dealing with *tabular* data.
+The models that we have discussed so far are fine options
+if you are dealing with *tabular* data.
 By *tabular* we mean that the data consists
 of rows corresponding to examples and columns corresponding to features.
 With tabular data, we might anticipate that pattern we seek
@@ -17,7 +17,7 @@ However, once we start dealing with high-dimensional perceptual data,
 these *structure-less* netwroks can grow unwieldy.
 
 
-For instance, let's return to our running example
+For instance, let us return to our running example
 of distinguishing cats from dogs.
 Say that we do a thorough job in data collection,
 collecting an annotated sets of high-quality 1-megapixel photographs.
@@ -38,7 +38,7 @@ Learning a binary classifier with so many parameters
 might seem to require that we collect an enormous dataset,
 perhaps comparable to the number of dogs and cats on the planet.
 And yet Yet both humans and computers are able to distinguish cats from dogs quite well, seemingly contradicting these conclusions.
-That's because images exhibit rich structure
+That is because images exhibit rich structure
 that is typically exploited by humans and machine learning models alike.
 
 ## Invariances
@@ -49,7 +49,7 @@ should not be overly concerned with the precise *location*
 of the object shouldn't in the image.
 Ideally we could learn a system
 that would somehow exploit this knowledge.
-Pigs usually don't fly and planes usually don't swim.
+Pigs usually do not fly and planes usually do not swim.
 Nonetheless, we could still recognize a flying pig were one to appear.
 This ideas is taken to an extreme in the children's game 'Where's Waldo', an
 example is shown in :numref:`img_waldo`.
@@ -65,18 +65,18 @@ due to the large number  of confounders.
 :label:`img_waldo`
 
 
-Back to images, the intuitions we have been discussion could be made more concrete yielding a few key principles for building neural networks for computer vision:
+Back to images, the intuitions we have been discussing could be made more concrete yielding a few key principles for building neural networks for computer vision:
 
 1. Our vision systems should, in some sense, respond similary to the same object regardless of where it appears in the image (Translation Invariance)
 1. Our visions systems should, in some sense, focus on local regions, without regard for what else is happening in the image at greater distances. (Locality)
 
-Let's see how this translates into mathematics.
+Let us see how this translates into mathematics.
 
 ## Constraining the MLP
 
 <!-- In this exposition, we treat both images and hidden layers
 alike as two-dimensional arrays.  -->
-To start off let's consider what an MLP would look like
+To start off let us consider what an MLP would look like
 with $h \times w$ images as inputs
 (represented as matrices in math, and as 2D arrays in code),
 and hidden representations similarly organized
@@ -93,7 +93,7 @@ as four-dimensional weight tensors.
 
 We could formally express this dense layer as follows:
 
-$$h[i,j] = \sum_{k,l} W[i,j,k,l] \cdot x[k,l] =
+$$h[i,j] = u[i,j] + \sum_{k,l} W[i,j,k,l] \cdot x[k,l] =  u[i,j] +
 \sum_{a, b} V[i,j,a,b] \cdot x[i+a,j+b]$$
 
 The switch from $W$ to $V$ is entirely cosmetic (for now)
@@ -108,14 +108,14 @@ For any given location $(i,j)$ in the hidden layer $h[i,j]$,
 we compute its value by summing over pixels in $x$,
 centered around $(i,j)$ and weighted by $V[i,j,a,b]$.
 
-Now let's invoke the first principle we established above—*translation invariance*.
+Now let us invoke the first principle we established above—*translation invariance*.
 This implies that a shift in the inputs $x$
 should simply lead to a shift in the activations $h$.
-This is only possible if $V$ doesn't actually depend on $(i,j)$,
-i.e., we have $V[i,j,a,b] = V[a,b]$.
+This is only possible if $V$ and $u$ do not actually depend on $(i,j)$,
+i.e., we have $V[i,j,a,b] = V[a,b]$ and $u$ is a constant.
 As a result we can simplify the definition for $h$.
 
-$$h[i,j] = \sum_{a, b} V[a,b] \cdot x[i+a,j+b]$$
+$$h[i,j] = u + \sum_{a, b} V[a,b] \cdot x[i+a,j+b]$$
 
 This is a convolution!
 We are effectively weighting pixels $(i+a, j+b)$
@@ -123,7 +123,7 @@ in the vicinity of $(i,j)$ with coefficients $V[a,b]$
 to obtain the value $h[i,j]$.
 Note that $V[a,b]$ needs many fewer coefficients than $V[i,j,a,b]$. For a 1 megapixel image it has at most 1 million coefficients. This is 1 million fewer parameters since it no longer depends on the location within the image. We have made significant progress!
 
-Now let's invoke the second principle - *locality*.
+Now let us invoke the second principle - *locality*.
 As motivated above, we believe that we shouldn't have
 to look very far away from $(i,j)$
 in order to glean relevant information
@@ -132,7 +132,7 @@ This means that outside some range $|a|, |b| > \Delta$,
 we should set $V[a,b] = 0$.
 Equivalently, we can rewrite $h[i,j]$ as
 
-$$h[i,j] = \sum_{a = -\Delta}^{\Delta} \sum_{b = -\Delta}^{\Delta} V[a,b] \cdot x[i+a,j+b]$$
+$$h[i,j] = u + \sum_{a = -\Delta}^{\Delta} \sum_{b = -\Delta}^{\Delta} V[a,b] \cdot x[i+a,j+b]$$
 
 This, in a nutshell is the convolutional layer.
 When the local region (also called a *receptive field*) is small,
@@ -148,13 +148,13 @@ When that bias agrees with reality,
 we get sample-efficient models
 that generalize well to unseen data.
 But of course, if those biases do not agree with reality,
-e.g. if images turned out not to be translation invariant,
+e.g., if images turned out not to be translation invariant,
 
 
 
 ## Convolutions
 
-Let's briefly review why the above operation is called a *convolution*.
+Let us briefly review why the above operation is called a *convolution*.
 In mathematics, the convolution between two functions,
 say $f, g: \mathbb{R}^d \to R$ is defined as
 
@@ -182,7 +182,7 @@ We will come back to this in the following section.
 
 ## Waldo Revisited
 
-Let's see what this looks like if we want to build an improved Waldo detector. The convolutional layer picks windows of a given size
+Let us see what this looks like if we want to build an improved Waldo detector. The convolutional layer picks windows of a given size
 and weighs intensities according to the mask $V$.
  We expect that wherever the 'waldoness' is highest,
  we will also find a peak in the hidden layer activations.
@@ -190,7 +190,7 @@ and weighs intensities according to the mask $V$.
 ![Find Waldo.](../img/waldo-mask.jpg)
 :width:`600px`
 
-There's just a problem with this approach:
+There is just a problem with this approach:
 so far we blissfully ignored that images consist
 of 3 channels: red, green and blue.
 In reality, images are quite two-dimensional objects
@@ -223,7 +223,7 @@ $$h[i,j,k] = \sum_{a = -\Delta}^{\Delta} \sum_{b = -\Delta}^{\Delta} \sum_c V[a,
 This is the definition of a convolutional neural network layer.
 There are still many operations that we need to address.
 For instance, we need to figure out how to combine all the activations
-to a single output (e.g. whether there's a Waldo in the image).
+to a single output (e.g., whether there is a Waldo in the image).
 We also need to decide how to compute things efficiently,
 how to combine multiple layers, and whether it is a good idea
 to have many narrow or a few wide layers.

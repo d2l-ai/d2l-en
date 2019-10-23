@@ -1,6 +1,6 @@
 # Optimization and Deep Learning
 
-In this section, we will discuss the relationship between optimization and deep learning as well as the challenges of using optimization in deep learning. For a deep learning problem, we will usually define a loss function first. Once we have the loss function, we can use an optimization algorithm in attempt to minimize the loss. In optimization, a loss function is often referred to as the objective function of the optimization problem. By tradition and convention most optimization algorithms are concerned with *minimization*. If we ever need to maximize an objective there's a simple solution - just flip the sign on the objective.
+In this section, we will discuss the relationship between optimization and deep learning as well as the challenges of using optimization in deep learning. For a deep learning problem, we will usually define a loss function first. Once we have the loss function, we can use an optimization algorithm in attempt to minimize the loss. In optimization, a loss function is often referred to as the objective function of the optimization problem. By tradition and convention most optimization algorithms are concerned with *minimization*. If we ever need to maximize an objective there is a simple solution - just flip the sign on the objective.
 
 ## Optimization and Estimation
 
@@ -55,7 +55,7 @@ complicated and do not have analytical solutions. Instead, we must use numerical
 optimization algorithms. The optimization algorithms below all fall into this
 category.
 
-There are many challenges in deep learning optimization. Some of the most vexing ones are local minima, saddle points and vanishing gradients. Let's have a look at a few of them.
+There are many challenges in deep learning optimization. Some of the most vexing ones are local minima, saddle points and vanishing gradients. Let us have a look at a few of them.
 
 ### Local Minima
 
@@ -115,7 +115,7 @@ position where the function gradient is zero:
 * When the eigenvalues of the function's Hessian matrix at the zero-gradient position are all negative, we have a local maximum for the function.
 * When the eigenvalues of the function's Hessian matrix at the zero-gradient position are negative and positive, we have a saddle point for the function.
 
-For high-dimensional problems the likelihood that at least some of the eigenvalues are negative is quite high. This makes saddle points more likely than local minima. We will discuss some exceptions to this situation in the next section when introducing convexity. In short, convex functions are those where the eigenvalues of the Hessian are never negative. Sadly, though, most deep learning problems do not fall into this category. Nonetheless it's a great tool to study optimization algorithms.
+For high-dimensional problems the likelihood that at least some of the eigenvalues are negative is quite high. This makes saddle points more likely than local minima. We will discuss some exceptions to this situation in the next section when introducing convexity. In short, convex functions are those where the eigenvalues of the Hessian are never negative. Sadly, though, most deep learning problems do not fall into this category. Nonetheless it is a great tool to study optimization algorithms.
 
 ### Vanishing Gradients
 
@@ -127,7 +127,7 @@ d2l.plot(x, [np.tanh(x)], 'x', 'f(x)')
 annotate('vanishing gradient', (4, 1), (2, 0.0))
 ```
 
-As we saw, optimization for deep learning is full of challenges. Fortunately there exists a robust range of algorithms that perform well and that are easy to use even for beginners. Furthermore, it isn't really necessary to find *the* best solution. Local optima or even approximate solutions thereof are still very useful.
+As we saw, optimization for deep learning is full of challenges. Fortunately there exists a robust range of algorithms that perform well and that are easy to use even for beginners. Furthermore, it is not really necessary to find *the* best solution. Local optima or even approximate solutions thereof are still very useful.
 
 ## Summary
 
@@ -142,8 +142,8 @@ As we saw, optimization for deep learning is full of challenges. Fortunately the
 1. Consider a simple multilayer perceptron with a single hidden layer of, say, $d$ dimensions in the hidden layer and a single output. Show that for any local minimum there are at least $d!$ equivalent solutions that behave identically.
 1. Assume that we have a symmetric random matrix $\mathbf{M}$ where the entries
    $M_{ij} = M_{ji}$ are each drawn from some probability distribution
-   $p_{ij}$. Furthermore assume that $p_{ij}(x) = p_{ij}(-x)$, i.e. that the
-   distribution is symmetric (see e.g. :cite:`Wigner.1958` for details).
+   $p_{ij}$. Furthermore assume that $p_{ij}(x) = p_{ij}(-x)$, i.e., that the
+   distribution is symmetric (see e.g., :cite:`Wigner.1958` for details).
     * Prove that the distribution over eigenvalues is also symmetric. That is, for any eigenvector $\mathbf{v}$ the probability that the associated eigenvalue $\lambda$ satisfies $\Pr(\lambda > 0) = \Pr(\lambda < 0)$.
     * Why does the above *not* imply $\Pr(\lambda > 0) = 0.5$?
 1. What other challenges involved in deep learning optimization can you think of?

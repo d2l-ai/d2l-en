@@ -17,7 +17,7 @@ since the operations are typically expressed as cross correlations.
 In a convolutional layer, an input array
 and a correlation kernel array are combined
 to produce an output array through a cross-correlation operation.
-Let's see how this works for two dimensions.
+Let us see how this works for two dimensions.
 In our example, the input is a two-dimensional array
 with a height of 3 and width of 3.
 We mark the shape of the array as $3 \times 3$ or (3, 3).
@@ -64,7 +64,7 @@ This is the case since we need enough space
 to 'shift' the convolutional kernel across the image
 (later we will see how to keep the size unchanged
 by padding the image with zeros around its boundary
-such that there's enough space to shift the kernel).
+such that there is enough space to shift the kernel).
 Next, we implement the above process in the `corr2d` function.
 It accepts the input array `X` with the kernel array `K`
 and outputs the array `Y`.
@@ -129,7 +129,7 @@ class Conv2D(nn.Block):
 
 ## Object Edge Detection in Images
 
-Let's look at a simple application of a convolutional layer:
+Let us look at a simple application of a convolutional layer:
 detecting the edge of an object in an image
 by finding the location of the pixel change.
 First, we construct an 'image' of $6\times 8$ pixels.
@@ -161,7 +161,7 @@ Y = corr2d(X, K)
 Y
 ```
 
-Let's apply the kernel to the transposed image.
+Let us apply the kernel to the transposed image.
 As expected, it vanishes. The kernel `K` only detects vertical edges.
 
 ```{.python .input}
@@ -177,7 +177,7 @@ and consider successive layers of convolutions,
 it might be impossible to specify
 precisely what each filter should be doing manually.
 
-Now let's see whether we can learn the kernel that generated `Y` from `X`
+Now let us see whether we can learn the kernel that generated `Y` from `X`
 by looking at the (input, output) pairs only.
 We first construct a convolutional layer
 and initialize its kernel as a random array.

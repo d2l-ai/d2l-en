@@ -2,7 +2,7 @@
 :label:`sec_mlp_scratch`
 
 Now that we know how multilayer perceptrons (MLPs) work in theory,
-let's implement them. First, we import the required packages.
+let us implement them. First, we import the required packages.
 
 ```{.python .input  n=9}
 import d2l
@@ -23,14 +23,14 @@ train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 
 Recall that this dataset contains 10 classes and that
 each image consists of a $28 \times 28 = 784$ grid of pixel values.
-Since we'll be discarding the spatial structure (for now),
+Since we will be discarding the spatial structure (for now),
 we can just think of this as a classification dataset
 with $784$ input features and $10$ classes.
 In particular we will implement our MLP
 with one hidden layer and $256$ hidden units.
 Note that we can regard both of these choices as *hyperparameters*
 that could be set based on performance on validation data.
-Typically, we'll choose layer widths as powers of $2$
+Typically, we will choose layer widths as powers of $2$
 to make everything align nicely in memory.
 
 Again, we will represent our parameters with several `ndarray`s.
@@ -65,7 +65,7 @@ def relu(X):
 
 As in softmax regression, we will `reshape` each 2D image
 into a flat vector of length  `num_inputs`.
-Finally, we cam implement our model with just a few lines of code.
+Finally, we can implement our model with just a few lines of code.
 
 ```{.python .input  n=5}
 def net(X):
@@ -101,26 +101,26 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs,
              lambda batch_size: d2l.sgd(params, lr, batch_size))
 ```
 
-To see how well we did, let's apply the model to some test data.
-If you're interested, compare the result to corresponding linear model in :numref:`sec_softmax_scratch`.
+To see how well we did, let us apply the model to some test data.
+If you are interested, compare the result to corresponding linear model in :numref:`sec_softmax_scratch`.
 
 ```{.python .input}
 d2l.predict_ch3(net, test_iter)
 ```
 
-This looks a bit better than our previous result, a good sign that we're on the right path.
+This looks a bit better than our previous result, a good sign that we are on the right path.
 
 ## Summary
 
 We saw that implementing a simple MLP is easy, even when done manually.
 That said, with a large number of layers, this can get messy
-(e.g. naming and keeping track of the model parameters, etc).
+(e.g., naming and keeping track of the model parameters, etc).
 
 ## Exercises
 
 1. Change the value of the hyper-parameter `num_hiddens` in order to see how this hyperparameter influences your results.
 1. Try adding a new hidden layer to see how it affects the results.
-1. How does changing the learning rate change the result.
+1. How does changing the learning rate change the result?
 1. What is the best result you can get by optimizing over all the parameters (learning rate, iterations, number of hidden layers, number of hidden units per layer)?
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2339)

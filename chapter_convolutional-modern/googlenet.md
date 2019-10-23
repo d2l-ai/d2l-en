@@ -80,7 +80,7 @@ They explore the image in varying ranges.
 This means that details at different extents
 can be recognized efficiently by different filters.
 At the same time, we can allocate different amounts of parameters
-for different ranges (e.g. more for short range
+for different ranges (e.g., more for short range
 but not ignore the long range entirely).
 
 ## GoogLeNet Model

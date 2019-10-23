@@ -118,7 +118,7 @@ d2l.train_ch5(net, train_iter, test_iter, num_epochs, lr)
 ## Summary
 
 * NiN uses blocks consisting of a convolutional layer and multiple $1\times 1$ convolutional layer. This can be used within the convolutional stack to allow for more per-pixel nonlinearity.
-* NiN removes the fully connected layers and replaces them with global average pooling (i.e. summing over all locations) after reducing the number of channels to the desired number of outputs (e.g. 10 for Fashion-MNIST).
+* NiN removes the fully connected layers and replaces them with global average pooling (i.e., summing over all locations) after reducing the number of channels to the desired number of outputs (e.g., 10 for Fashion-MNIST).
 * Removing the dense layers reduces overfitting. NiN has dramatically fewer parameters.
 * The NiN design influenced many subsequent convolutional neural networks designs.
 

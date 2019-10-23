@@ -33,7 +33,7 @@ of the inputs $\textbf{x}$,
 give or take some noise on the observations.
 Second, we assume that any noise is well-behaved
 (following a Gaussian distribution). 
-To motivate the approach, let's start with a running example.
+To motivate the approach, let us start with a running example.
 Suppose that we wish to estimate the prices of houses (in dollars) 
 based on their area (in square feet) and age (in years).  
 
@@ -221,7 +221,7 @@ by updating the parameters in the direction
 that incrementally lowers the loss function.
 This algorithm is called *gradient descent*.
 On convex loss surfaces, it will eventually converge to a global minimum, 
-and while the same can't be said for nonconvex surfaces, 
+and while the same cannot be said for nonconvex surfaces, 
 it will at least lead towards a (hopefully good) local minimum.
 
 The most naive application of gradient descent 
@@ -230,7 +230,7 @@ which is an average of the losses computed
 on every single example in the dataset. 
 In practice, this can be extremely slow. 
 We must pass over the entire dataset before making a single update.
-Thus, we'll often settle for sampling a random mini-batch of examples 
+Thus, we will often settle for sampling a random mini-batch of examples 
 every time we need to computer the update, 
 a variant called *stochastic gradient descent*.
 
@@ -257,7 +257,7 @@ we can write this out explicitly as follows:
 Note that $\mathbf{w}$ and $\mathbf{x}$ are vectors. 
 Here, the more elegant vector notation makes the math 
 much more readable than expressing things in terms of coefficients, 
-say $w_1, w_2, \ldots w_d$.
+say $w_1, w_2, \ldots, w_d$.
 
 $$
 \begin{aligned}
@@ -354,7 +354,7 @@ b = np.ones(n)
 ```
 
 Since we will benchmark the running time frequently in this book,
-let's define a timer (hereafter accessed via the `d2l` package
+let us define a timer (hereafter accessed via the `d2l` package
 to track the running time.
 
 ```{.python .input  n=1}
@@ -493,7 +493,7 @@ $$-\log p(\mathbf y|\mathbf X) = \sum_{i=1}^n \frac{1}{2} \log(2 \pi \sigma^2) +
 
 Now we just need one more assumption: that $\sigma$ is some fixed constant. 
 Thus we can ignore the first term because 
-it doesn't depend on $\mathbf{w}$ or $b$. 
+it does not depend on $\mathbf{w}$ or $b$. 
 Now the second term is identical to the squared error objective introduced earlier, 
 but for the multiplicative constant $\frac{1}{\sigma^2}$. 
 Fortunately, the solution does not depend on $\sigma$.
@@ -507,7 +507,7 @@ So far we only talked about linear functions.
 While neural networks cover a much richer family of models,
 we can begin thinking of the linear model
 as a neural network by expressing it the language of neural networks.
-To begin, let's start by rewriting things in a 'layer' notation.
+To begin, let us start by rewriting things in a 'layer' notation.
 
 ### Neural Network Diagram
 
@@ -558,7 +558,7 @@ Information $x_i$ arriving from other neurons
 is received in the dendrites. 
 In particular, that information is weighted by *synaptic weights* $w_i$ 
 determining the effect of the inputs
-(e.g. activation or inhibition via the product $x_i w_i$). 
+(e.g., activation or inhibition via the product $x_i w_i$). 
 The weighted inputs arriving from multiple sources
 are aggregated in the nucleus as a weighted sum $y = \sum_i x_i w_i + b$, 
 and this information is then sent for further processing in the axon $y$, 
@@ -594,7 +594,7 @@ statistics, and computer science.
 
 ## Exercises
 
-1. Assume that we have some data $x_1, \ldots x_n \in \mathbb{R}$. Our goal is to find a constant $b$ such that $\sum_i (x_i - b)^2$ is minimized.
+1. Assume that we have some data $x_1, \ldots, x_n \in \mathbb{R}$. Our goal is to find a constant $b$ such that $\sum_i (x_i - b)^2$ is minimized.
     * Find a closed-form solution for the optimal value of $b$.
     * How does this problem and its solution relate to the normal distribution?
 1. Derive the closed-form solution to the optimization problem for linear regression with squared error. To keep things simple, you can omit the bias $b$ from the problem (we can do this in principled fashion by adding one column to $X$ consisting of all ones).

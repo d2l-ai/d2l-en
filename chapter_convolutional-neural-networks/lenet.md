@@ -37,7 +37,7 @@ that Yann and his colleague Leon Bottou wrote in the 1990s!
 In a rough sense, we can think LeNet as consisting of two parts:
 (i) a block of convolutional layers; and
 (ii) a block of fully-connected layers.
-Before getting into the weeds, let's briefly review the model in :numref:`img_lenet`.
+Before getting into the weeds, let us briefly review the model in :numref:`img_lenet`.
 
 ![Data flow in LeNet 5. The input is a handwritten digit, the output a probabilitiy over 10 possible outcomes.](../img/lenet.svg)
 :label:`img_lenet`
@@ -86,12 +86,12 @@ to the number of possible output classes.
 
 While getting to the point
 where you truly understand
-what's going on inside LeNet
+what is going on inside LeNet
 may have taken a bit of work,
 you can see below that implementing it
 in a modern deep learning library
 is remarkably simple.
-Again, we'll rely on the Sequential class.
+Again, we will rely on the Sequential class.
 
 ```{.python .input}
 import d2l
@@ -123,7 +123,7 @@ Next, we feed a single-channel example
 of size $28 \times 28$ into the network
 and perform a forward computation layer by layer
 printing the output shape at each layer
-to make sure we understand what's happening here.
+to make sure we understand what is happening here.
 
 ```{.python .input}
 X = np.random.uniform(size=(1, 1, 28, 28))
@@ -154,7 +154,7 @@ until emitting an output that matches the number of image classes.
 
 ## Data Acquisition and Training
 
-Now that we've implemented the model,
+Now that we have implemented the model,
 we might as well run some experiments
 to see what we can accomplish with the LeNet model.
 While it might serve nostalgia
@@ -241,7 +241,7 @@ def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
     print('%.1f exampes/sec on %s'%(metric[2]*num_epochs/timer.sum(), ctx))
 ```
 
-Now let's train the model.
+Now let us train the model.
 
 ```{.python .input}
 lr, num_epochs = 0.9, 10
@@ -266,7 +266,7 @@ train_ch5(net, train_iter, test_iter, num_epochs, lr)
     * Adjust the number of fully connected layers.
     * Adjust the learning rates and other training details (initialization, epochs, etc.)
 1. Try out the improved network on the original MNIST dataset.
-1. Display the activations of the first and second layer of LeNet for different inputs (e.g. sweaters, coats).
+1. Display the activations of the first and second layer of LeNet for different inputs (e.g., sweaters, coats).
 
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2353)

@@ -9,7 +9,7 @@ Recall that we can always mitigate overfitting
 by going out and collecting more training data,
 that can be costly and time consuming,
 typically making it impossible in the short run.
-For now, let's assume that we have already obtained
+For now, let us assume that we have already obtained
 as much high-quality data as our resources permit
 and focus on techniques aimed at limiting the capacity
 of the function classes under consideration.
@@ -51,7 +51,7 @@ But how precisely should we measure
 the distance between a function and zero?
 There is no single right answer.
 In fact, entire branches of mathematics,
-e.g. in functional analysis and the theory of Banach spaces
+e.g., in functional analysis and the theory of Banach spaces
 are devoted to answering this issue.
 
 For our present purposes, a very simple interpretation will suffice:
@@ -70,8 +70,8 @@ Now, if the weight vector becomes too large,
 our learning algorithm will find more profit in
 minimizing the norm $|| \mathbf{w} ||^2$
 versus minimizing the training error.
-That's exactly what we want.
-To illustrate things in code, let's revive our previous example
+That is exactly what we want.
+To illustrate things in code, let us revive our previous example
 from :numref:`sec_linear_regression` for linear regression.
 There, our loss was given by
 
@@ -127,7 +127,7 @@ $$
 As before, we update $\mathbf{w}$ based on the amount
 by which our estimate differs from the observation.
 However, we also shrink the size of $\mathbf{w}$ towards $0$.
-That's why the method is sometimes called "weight decay":
+That is why the method is sometimes called "weight decay":
 because the penalty term literally causes our optimization algorthm
 to *decay* the magnitude of the weight at each step of training.
 This is more convenient than having to pick
@@ -136,7 +136,7 @@ In particular, we now have a continuous mechanism
 for adjusting the complexity of $f$.
 Small values of $\lambda$ correspond to unconstrained $\mathbf{w}$,
 whereas large values of $\lambda$ constrain $\mathbf{w}$ considerably.
-Since we don't want to have large bias terms either,
+Since we do not want to have large bias terms either,
 we often add $b^2$ as a penalty, too.
 
 ## High-dimensional Linear Regression
@@ -155,7 +155,7 @@ corrupted by Gaussian noise with zero mean and variance 0.01.
 To observe the effects of overfitting more easily,
 we can make our problem high-dimensional,
 setting the data dimension to $d = 200$
-and working with a relatively small number of training examples—here we'll set the sample size to 20:
+and working with a relatively small number of training examples—here we will set the sample size to 20:
 
 ```{.python .input  n=2}
 %matplotlib inline
@@ -187,7 +187,7 @@ $$\|\mathbf{w}\|_p^p := \sum_{i=1}^d |w_i|^p$$
 
 ### Initialize Model Parameters
 
-First, we'll define a function to randomly initialize our model parameters and run `attach_grad` on each to allocate memory for the gradients we will calculate.
+First, we will define a function to randomly initialize our model parameters and run `attach_grad` on each to allocate memory for the gradients we will calculate.
 
 ```{.python .input  n=5}
 def init_params():
@@ -220,7 +220,7 @@ Unlike the previous sections, here, the $\ell_2$ norm penalty term
 is added when calculating the final loss function.
 The linear network and the squared loss
 haven't changed since the previous chapter,
-so we'll just import them via `d2l.linreg` and `d2l.squared_loss`
+so we will just import them via `d2l.linreg` and `d2l.squared_loss`
 to reduce clutter.
 
 ```{.python .input  n=7}
@@ -245,7 +245,7 @@ def train(lambd):
 
 ### Training without Regularization
 
-Next, let's train and test the high-dimensional linear regression model.
+Next, let us train and test the high-dimensional linear regression model.
 When `lambd = 0` we do not use weight decay.
 As a result, while the training error decreases, the test error does not.
 This is a perfect example of overfitting.
@@ -344,7 +344,7 @@ Unfortunately, RKHS-based algorithms
 do not always scale well to massive amounts of data.
 For the purposes of this book, we limit ourselves
 to simply summing over the weights for different layers,
-e.g. via $\sum_l \|\mathbf{w}_l\|^2$,
+e.g., via $\sum_l \|\mathbf{w}_l\|^2$,
 which is equivalent to weight decay applied to all layers.
 
 
@@ -353,7 +353,7 @@ which is equivalent to weight decay applied to all layers.
 * Regularization is a common method for dealing with overfitting. It adds a penalty term to the loss function on the training set to reduce the complexity of the learned model.
 * One particular choice for keeping the model simple is weight decay using an $\ell_2$ penalty. This leads to weight decay in the update steps of the learning algorithm.
 * Gluon provides automatic weight decay functionality in the optimizer by setting the hyperparameter `wd`.
-* You can have different optimizers within the same training loop, e.g. for different sets of parameters.
+* You can have different optimizers within the same training loop, e.g., for different sets of parameters.
 
 
 ## Exercises

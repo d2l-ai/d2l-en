@@ -26,7 +26,7 @@ npx.set_np()
 
 ## Decoder
 
-Now let's implement the decoder of this model. We add a MLP attention layer which has the same hidden size as the LSTM layer. The state passed from the encoder to the decoder contains three items:
+Now let us implement the decoder of this model. We add a MLP attention layer which has the same hidden size as the LSTM layer. The state passed from the encoder to the decoder contains three items:
 
 - the encoder outputs of all time steps, which are used as the attention layer's memory with identical keys and values
 
@@ -91,7 +91,7 @@ out.shape, len(state), state[0].shape, len(state[1]), state[1][0].shape
 Again, we use the same training hyper-parameters as in
 :numref:`sec_seq2seq`. The training loss is similar to the seq2seq model, because the
 sequences in the training dataset are relative short. The additional attention
-layer doesn't lead to a significant different. But due to both attention layer
+layer does not lead to a significant different. But due to both attention layer
 computational overhead and we unroll the time steps in the decoder, this model
 is much slower than the seq2seq model.
 

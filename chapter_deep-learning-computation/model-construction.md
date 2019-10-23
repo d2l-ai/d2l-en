@@ -36,7 +36,7 @@ tht are updated with respect to the ultimate objective
 
 While you might think that neurons, layers, and models
 give us enough abstractions to go about our business,
-it turns out that we'll often want to express our model
+it turns out that we will often want to express our model
 in terms of a components that are large than an indivudal layer.
 For example, when designing models, like ResNet-152,
 which possess hundreds (152, thus the name) of layers,
@@ -110,7 +110,7 @@ net(x)
 In this example, as in previous chapters,
 our model consists of an object returned by the `nn.Sequential` constructor.
 After instantiating a `nn.Sequential` and storing the `net` variable,
-we repeatedly called its `.add()` method,
+we repeatedly called its `add` method,
 appending layers in the order that they should be executed.
 We suspect that you might have already understood *more or less*
 what was going on here the first time you saw this code.
@@ -197,13 +197,13 @@ Note that before getting on with the interesting parts,
 our customized `__init__` method must invoke the parent class's
 init method: `super(MLP, self).__init__(**kwargs)`
 to save us from reimplementing boilerplate code applicable to most Blocks.
-Then, all that's left is to instantiate our two `Dense` layers,
+Then, all that is left is to instantiate our two `Dense` layers,
 assigning them to `self.hidden` and `self.output`, respectively.
 Again note that when dealing with standard functionality like this,
-we don't have to worry about backpropagation,
+we do not have to worry about backpropagation,
 since the `backward` method is generated for us automatically.
 The same goes for the `initialize` method.
-Let's try this out:
+Let us try this out:
 
 ```{.python .input  n=2}
 net = MLP()
@@ -256,7 +256,7 @@ class MySequential(nn.Block):
         return x
 ```
 
-At its core is the `add` method. It adds any block to the ordered dictionary of children. These are then executed in sequence when forward propagation is invoked. Let's see what the MLP looks like now.
+At its core is the `add` method. It adds any block to the ordered dictionary of children. These are then executed in sequence when forward propagation is invoked. Let us see what the MLP looks like now.
 
 ```{.python .input  n=4}
 net = MySequential()
@@ -271,7 +271,7 @@ Indeed, it can be observed that the use of the `MySequential` class is no differ
 
 ## Blocks with Code
 
-Although the Sequential class can make model construction easier, and you do not need to define the `forward` method, directly inheriting the Block class can greatly expand the flexibility of model construction. In particular, we will use Python's control flow within the forward method. While we're at it, we need to introduce another concept, that of the *constant* parameter. These are parameters that are not used when invoking backprop. This sounds very abstract but here's what's really going on. Assume that we have some function
+Although the Sequential class can make model construction easier, and you do not need to define the `forward` method, directly inheriting the Block class can greatly expand the flexibility of model construction. In particular, we will use Python's control flow within the forward method. While we are at it, we need to introduce another concept, that of the *constant* parameter. These are parameters that are not used when invoking backprop. This sounds very abstract but here's what is really going on. Assume that we have some function
 
 $$f(\mathbf{x},\mathbf{w}) = 3 \cdot \mathbf{w}^\top \mathbf{x}.$$
 
@@ -279,14 +279,14 @@ In this case 3 is a constant parameter. We could change 3 to something else, say
 
 $$f(\mathbf{x},\mathbf{w}) = c \cdot \mathbf{w}^\top \mathbf{x}.$$
 
-Nothing has really changed, except that we can adjust the value of $c$. It is still a constant as far as $\mathbf{w}$ and $\mathbf{x}$ are concerned. However, since Gluon doesn't know about this beforehand, it's worth while to give it a hand (this makes the code go faster, too, since we're not sending the Gluon engine on a wild goose chase after a parameter that doesn't change). `get_constant` is the method that can be used to accomplish this. Let's see what this looks like in practice.
+Nothing has really changed, except that we can adjust the value of $c$. It is still a constant as far as $\mathbf{w}$ and $\mathbf{x}$ are concerned. However, since Gluon does not know about this beforehand, it is worth while to give it a hand (this makes the code go faster, too, since we are not sending the Gluon engine on a wild goose chase after a parameter that does not change). `get_constant` is the method that can be used to accomplish this. Let us see what this looks like in practice.
 
 ```{.python .input  n=5}
 class FancyMLP(nn.Block):
     def __init__(self, **kwargs):
         super(FancyMLP, self).__init__(**kwargs)
         # Random weight parameters created with the get_constant are not
-        # iterated during training (i.e. constant parameters)
+        # iterated during training (i.e., constant parameters)
         self.rand_weight = self.params.get_constant(
             'rand_weight', np.random.uniform(size=(20, 20)))
         self.dense = nn.Dense(20, activation='relu')
@@ -307,7 +307,7 @@ class FancyMLP(nn.Block):
         return x.sum()
 ```
 
-In this `FancyMLP` model, we used constant weight `Rand_weight` (note that it is not a model parameter), performed a matrix multiplication operation (`np.dot<`), and reused the *same* `Dense` layer. Note that this is very different from using two dense layers with different sets of parameters. Instead, we used the same network twice. Quite often in deep networks one also says that the parameters are *tied* when one wants to express that multiple parts of a network share the same parameters. Let's see what happens if we construct it and feed data through it.
+In this `FancyMLP` model, we used constant weight `Rand_weight` (note that it is not a model parameter), performed a matrix multiplication operation (`np.dot<`), and reused the *same* `Dense` layer. Note that this is very different from using two dense layers with different sets of parameters. Instead, we used the same network twice. Quite often in deep networks one also says that the parameters are *tied* when one wants to express that multiple parts of a network share the same parameters. Let us see what happens if we construct it and feed data through it.
 
 ```{.python .input  n=6}
 net = FancyMLP()
@@ -315,7 +315,7 @@ net.initialize()
 net(x)
 ```
 
-There's no reason why we couldn't mix and match these ways of build a network. Obviously the example below resembles more a chimera, or less charitably, a [Rube Goldberg Machine](https://en.wikipedia.org/wiki/Rube_Goldberg_machine). That said, it combines examples for building a block from individual blocks, which in turn, may be blocks themselves. Furthermore, we can even combine multiple strategies inside the same forward function. To demonstrate this, here's the network.
+There is no reason why we couldn't mix and match these ways of build a network. Obviously the example below resembles more a chimera, or less charitably, a [Rube Goldberg Machine](https://en.wikipedia.org/wiki/Rube_Goldberg_machine). That said, it combines examples for building a block from individual blocks, which in turn, may be blocks themselves. Furthermore, we can even combine multiple strategies inside the same forward function. To demonstrate this, here's the network.
 
 ```{.python .input  n=7}
 class NestMLP(nn.Block):
@@ -341,7 +341,7 @@ chimera(x)
 The avid reader is probably starting to worry about the efficiency of this. After all, we have lots of dictionary lookups, code execution, and lots of other Pythonic things going on in what is supposed to be a high performance deep learning library. The problems of Python's [Global Interpreter Lock](https://wiki.python.org/moin/GlobalInterpreterLock) are well known. In the context of deep learning it means that we have a super fast GPU (or multiple of them) which might have to wait until a puny single CPU core running Python gets a chance to tell it what to do next. This is clearly awful and there are many ways around it. The best way to speed up Python is by avoiding it altogether.
 
 Gluon does this by allowing for Hybridization (:numref:`sec_hybridize`). In it, the Python
-interpreter executes the block the first time it's invoked. The Gluon runtime
+interpreter executes the block the first time it is invoked. The Gluon runtime
 records what is happening and the next time around it short circuits any calls
 to Python. This can accelerate things considerably in some cases but care needs
 to be taken with control flow. We suggest that the interested reader skip
