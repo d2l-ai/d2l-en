@@ -166,7 +166,7 @@ They require lots of chip area,
 a sophisticated support structure
 (memory interfaces, caching logic between cores,
 high speed interconnects, etc.),
-and they're comparatively bad at any single task.
+and they are comparatively bad at any single task.
 Modern laptops have up to 4 cores,
 and even high end servers rarely exceed 64 cores,
 simply because it is not cost effective.

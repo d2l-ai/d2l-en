@@ -48,7 +48,7 @@ Now suppose that after featurizing the data into an enormous design matrix,
 you discover that of the 5 applicants who default,
 all of them were wearing blue shirts during their interviews,
 while only 40% of general population wore blue shirts.
-There's a good chance that if you train a predictive model
+There is a good chance that if you train a predictive model
 to predict default, it might rely upon blue-shirt-wearing
 as an important feature.
 
@@ -266,10 +266,10 @@ we will typically employ a validation set.
 In principle we should not touch our test set
 until after we have chosen all our hyper-parameters.
 Were we to use the test data in the model selection process,
-there's a risk that we might overfit the test data.
+there is a risk that we might overfit the test data.
 Then we would be in serious trouble.
 If we overfit our training data,
-there's always the evaluation on test data to keep us honest.
+there is always the evaluation on test data to keep us honest.
 But if we overfit the test data, how would we ever know?
 
 

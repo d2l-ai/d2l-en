@@ -39,7 +39,7 @@ net.add(nn.Dense(128), CenteredLayer())
 net.initialize()
 ```
 
-Let us see whether the centering layer did its job. For that we send random data through the network and check whether the mean vanishes. Note that since we're dealing with floating point numbers, we're going to see a very small albeit typically nonzero number.
+Let us see whether the centering layer did its job. For that we send random data through the network and check whether the mean vanishes. Note that since we are dealing with floating point numbers, we are going to see a very small albeit typically nonzero number.
 
 ```{.python .input  n=4}
 y = net(np.random.uniform(size=(4, 8)))

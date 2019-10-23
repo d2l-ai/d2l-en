@@ -1,7 +1,7 @@
 # From Dense Layers to Convolutions
 
 The models that we've discussed so far are fine options
-if you're dealing with *tabular* data.
+if you are dealing with *tabular* data.
 By *tabular* we mean that the data consists
 of rows corresponding to examples and columns corresponding to features.
 With tabular data, we might anticipate that pattern we seek
@@ -190,7 +190,7 @@ and weighs intensities according to the mask $V$.
 ![Find Waldo.](../img/waldo-mask.jpg)
 :width:`600px`
 
-There's just a problem with this approach:
+There is just a problem with this approach:
 so far we blissfully ignored that images consist
 of 3 channels: red, green and blue.
 In reality, images are quite two-dimensional objects
@@ -223,7 +223,7 @@ $$h[i,j,k] = \sum_{a = -\Delta}^{\Delta} \sum_{b = -\Delta}^{\Delta} \sum_c V[a,
 This is the definition of a convolutional neural network layer.
 There are still many operations that we need to address.
 For instance, we need to figure out how to combine all the activations
-to a single output (e.g., whether there's a Waldo in the image).
+to a single output (e.g., whether there is a Waldo in the image).
 We also need to decide how to compute things efficiently,
 how to combine multiple layers, and whether it is a good idea
 to have many narrow or a few wide layers.

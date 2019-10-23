@@ -226,7 +226,7 @@ when the input takes value precisely equal to  0.
 In these cases, we go with the left-hand-side (LHS) derivative
 and say that the derivative is 0 when the input is 0.
 We can get away with this because the input may never actually be zero.
-There's an old adage that if subtle boundary conditions matter,
+There is an old adage that if subtle boundary conditions matter,
 we are probably doing (*real*) mathematics, not engineering.
 That conventional wisdom may apply here.
 See the derivative of the ReLU function plotted below.

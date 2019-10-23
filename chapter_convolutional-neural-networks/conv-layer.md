@@ -64,7 +64,7 @@ This is the case since we need enough space
 to 'shift' the convolutional kernel across the image
 (later we will see how to keep the size unchanged
 by padding the image with zeros around its boundary
-such that there's enough space to shift the kernel).
+such that there is enough space to shift the kernel).
 Next, we implement the above process in the `corr2d` function.
 It accepts the input array `X` with the kernel array `K`
 and outputs the array `Y`.

@@ -24,7 +24,7 @@ the most part, we could write such a program from first principles and
 confidently launch it *before ever seeing a real customer*.  Our ability to
 design automated systems from first principles that drive functioning products
 and systems, often in novel situations, is a remarkable cognitive feat.  And
-when you're able to devise solutions that work $100\%$ of the time, *you should
+when you are able to devise solutions that work $100\%$ of the time, *you should
 not be using machine learning*.
 
 Fortunately—for the growing community of ML scientists—many problems in
@@ -79,7 +79,7 @@ computer and a code editor.  How would you write such a program from first
 principles?  Think about it... the problem is hard.  Every second, the
 microphone will collect roughly 44,000 samples.  What rule could map reliably
 from a snippet of raw audio to confident predictions ``{yes, no}`` on whether
-the snippet contains the wake word?  If you're stuck, don't worry.  We don't
+the snippet contains the wake word?  If you are stuck, don't worry.  We don't
 know how to write such a program from scratch either.  That's why we use ML.
 
 ![Identify an awake word.](../img/wake-word.svg)
@@ -154,7 +154,7 @@ do.
 
 Deep learning is just one among many popular frameworks for solving machine
 learning problems.  While thus far, we've only talked about machine learning
-broadly and not deep learning, there's a couple points worth sneaking in here:
+broadly and not deep learning, there is a couple points worth sneaking in here:
 First, the problems that we've discussed thus far: learning from raw audio
 signal, directly from the pixels in images, and mapping between sentences of
 arbitrary lengths and across languages are problems where deep learning excels
@@ -434,7 +434,7 @@ We'll typically denote the feature vector for any one example $\mathbf{x_i}$
 and the set of feature vectors for all our examples $X$.
 
 What makes a problem a *regression* is actually the outputs.
-Say that you're in the market for a new home,
+Say that you are in the market for a new home,
 you might want to estimate the fair market value of a house,
 given some features like these.
 The target value, the price of sale, is a *real number*.
@@ -471,7 +471,7 @@ and that she received a bill of $y_2 = \$250$.
 If someone then asked you how much to expect on their upcoming gunk-removal invoice
 you might make some reasonable assumptions,
 such as more hours worked costs more dollars.
-You might also assume that there's some base charge and that the contractor then charges per hour.
+You might also assume that there is some base charge and that the contractor then charges per hour.
 If these assumptions held true, then given these two data points,
 you could already identify the contractor's pricing structure:
 \$100 per hour plus \$50 to show up at your house.
@@ -525,8 +525,8 @@ Given an example $x$, the model assigns a probability $\hat{y}_k$ to each label 
 Because these are probabilities, they need to be positive numbers and add up to $1$.
 This means that we only need $K-1$ numbers to give the probabilities of $K$ categories.
 This is easy to see for binary classification.
-If there's a 0.6 (60%) probability that an unfair coin comes up heads,
-then there's a 0.4 (40%) probability that it comes up tails.
+If there is a 0.6 (60%) probability that an unfair coin comes up heads,
+then there is a 0.4 (40%) probability that it comes up tails.
 Returning to our animal classification example, a classifier might see an image
 and output the probability that the image is a cat $\Pr(y=\mathrm{cat}| x) = 0.9$.
 We can interpret this number by saying that the classifier is 90% sure that the image depicts a cat.
@@ -539,7 +539,7 @@ While we attacked regression problems by trying to minimize the L1 or L2 loss fu
 the common loss function for classification problems is called cross-entropy.
 In MXNet Gluon, the corresponding loss function can be found [here](https://mxnet.incubator.apache.org/api/python/gluon/loss.html#mxnet.gluon.loss.SoftmaxCrossEntropyLoss).
 
-Note that the most likely class is not necessarily the one that you're going to use for your decision. Assume that you find this beautiful mushroom in your backyard:
+Note that the most likely class is not necessarily the one that you are going to use for your decision. Assume that you find this beautiful mushroom in your backyard:
 
 ![Death cap - do not eat!](../img/death_cap.jpg)
 :width:`400px`
@@ -587,7 +587,7 @@ Nonetheless, no matter how accurate our model gets, we might find ourselves in t
 :width:`500px`
 
 
-As you can see, there's a cat in the picture, and a rooster, a dog, a donkey and
+As you can see, there is a cat in the picture, and a rooster, a dog, a donkey and
 a bird, with some trees in the background.  Depending on what we want to do with
 our model ultimately, treating this as a binary classification problem might not
 make a lot of sense.  Instead, we might want to give the model the option of
@@ -832,7 +832,7 @@ two settings that explicitly consider interaction with an environment.
 
 ### Reinforcement learning
 
-If you're interested in using machine learning to develop an agent that interacts with an environment and takes actions, then you're probably going to wind up focusing on *reinforcement learning* (RL).
+If you are interested in using machine learning to develop an agent that interacts with an environment and takes actions, then you are probably going to wind up focusing on *reinforcement learning* (RL).
 This might include applications to robotics, to dialogue systems,
 and even to developing AI for video games.
 *Deep reinforcement learning* (DRL), which applies deep neural networks

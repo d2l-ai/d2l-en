@@ -106,7 +106,7 @@ $$S_b := \{x | x \in X \text{ and } f(x) \leq b\}.$$
 
 Such sets are convex. Let us prove this quickly. Remember that for any $x, x' \in S_b$ we need to show that $\lambda x + (1-\lambda) x' \in S_b$ as long as $\lambda \in [0,1]$. But this follows directly from the definition of convexity since $f(\lambda x + (1-\lambda) x') \leq \lambda f(x) + (1-\lambda) f(x') \leq b$. 
 
-Have a look at the function $f(x,y) = 0.5 x^2 + \cos(2 \pi y)$ below. It is clearly nonconvex. The level sets are correspondingly nonconvex. In fact, they're typically composed of disjoint sets.
+Have a look at the function $f(x,y) = 0.5 x^2 + \cos(2 \pi y)$ below. It is clearly nonconvex. The level sets are correspondingly nonconvex. In fact, they are typically composed of disjoint sets.
 
 ```{.python .input}
 x, y = np.meshgrid(np.linspace(-1, 1, 101), np.linspace(-1, 1, 101), indexing='ij')

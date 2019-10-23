@@ -153,7 +153,7 @@ As we could see in :numref:`section_gd-learningrate`, getting the learning rate 
 
 ### Newton's Method
 
-Reviewing the Taylor expansion of $f$ there's no need to stop after the first term. In fact, we can write it as 
+Reviewing the Taylor expansion of $f$ there is no need to stop after the first term. In fact, we can write it as 
 
 $$f(\mathbf{x} + \mathbf{\epsilon}) = f(\mathbf{x}) + \mathbf{\epsilon}^\top \nabla f(\mathbf{x}) + \frac{1}{2} \mathbf{\epsilon}^\top \nabla \nabla^\top f(\mathbf{x}) \mathbf{\epsilon} + O(\|\mathbf{\epsilon}\|^3)$$
 :eqlabel:`gd-hot-taylor`

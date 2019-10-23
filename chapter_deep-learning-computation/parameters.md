@@ -208,7 +208,7 @@ net(x)
 # Check whether the parameters are the same
 print(net[1].weight.data()[0] == net[2].weight.data()[0])
 net[1].weight.data()[0,0] = 100
-# Make sure that they're actually the same object rather than just having the
+# Make sure that they are actually the same object rather than just having the
 # same value
 print(net[1].weight.data()[0] == net[2].weight.data()[0])
 ```

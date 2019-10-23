@@ -1,11 +1,11 @@
 # Sequence Models
 :label:`sec_sequence`
 
-Imagine that you're watching movies on Netflix. As a good Netflix user you decide to rate each of the movies religiously. After all, a good movie is a good movie, and you want to watch more of them, right? As it turns out, things are not quite so simple. People's opinions on movies can change quite significantly over time. In fact, psychologists even have names for some of the effects:
+Imagine that you are watching movies on Netflix. As a good Netflix user you decide to rate each of the movies religiously. After all, a good movie is a good movie, and you want to watch more of them, right? As it turns out, things are not quite so simple. People's opinions on movies can change quite significantly over time. In fact, psychologists even have names for some of the effects:
 
-* There's [anchoring](https://en.wikipedia.org/wiki/Anchoring), based on someone else's opinion. For instance after the Oscar awards, ratings for the corresponding movie go up, even though it is still the same movie. This effect persists for a few months until the award is forgotten. :cite:`Wu.Ahmed.Beutel.ea.2017` showed that the effect lifts rating by over half a point.
-* There's the [Hedonic adaptation](https://en.wikipedia.org/wiki/Hedonic_treadmill), where humans quickly adapt to accept an improved (or a bad) situation as the new normal. For instance, after watching many good movies, the expectations that the next movie be equally good or better are high, and even an average movie might be considered a bad movie after many great ones.
-* There's seasonality. Very few viewers like to watch a Santa Claus movie in August.
+* There is [anchoring](https://en.wikipedia.org/wiki/Anchoring), based on someone else's opinion. For instance after the Oscar awards, ratings for the corresponding movie go up, even though it is still the same movie. This effect persists for a few months until the award is forgotten. :cite:`Wu.Ahmed.Beutel.ea.2017` showed that the effect lifts rating by over half a point.
+* There is the [Hedonic adaptation](https://en.wikipedia.org/wiki/Hedonic_treadmill), where humans quickly adapt to accept an improved (or a bad) situation as the new normal. For instance, after watching many good movies, the expectations that the next movie be equally good or better are high, and even an average movie might be considered a bad movie after many great ones.
+* There is seasonality. Very few viewers like to watch a Santa Claus movie in August.
 * In some cases movies become unpopular due to the misbehaviors of directors or actors in the production.
 * Some movies become cult movies, because they were almost comically bad. *Plan 9 from Outer Space* and *Troll 2* achieved a high degree of notoriety for this reason.
 
@@ -31,7 +31,7 @@ $$x_t \sim p(x_t|x_{t-1}, \ldots, x_1).$$
 
 ### Autoregressive Models
 
-In order to achieve this, our trader could use a regressor such as the one we trained in :numref:`sec_linear_gluon`. There's just a major problem - the number of inputs, $x_{t-1}, \ldots, x_1$ varies, depending on $t$. That is, the number increases with the amount of data that we encounter, and we will need an approximation to make this computationally tractable. Much of what follows in this chapter will revolve around how to estimate $p(x_t|x_{t-1}, \ldots, x_1)$ efficiently. In a nutshell it boils down to two strategies:
+In order to achieve this, our trader could use a regressor such as the one we trained in :numref:`sec_linear_gluon`. There is just a major problem - the number of inputs, $x_{t-1}, \ldots, x_1$ varies, depending on $t$. That is, the number increases with the amount of data that we encounter, and we will need an approximation to make this computationally tractable. Much of what follows in this chapter will revolve around how to estimate $p(x_t|x_{t-1}, \ldots, x_1)$ efficiently. In a nutshell it boils down to two strategies:
 
 1. Assume that the potentially rather long sequence $x_{t-1}, \ldots, x_1$ isn't really necessary. In this case we might content ourselves with some timespan $\tau$ and only use $x_{t-1}, \ldots, x_{t-\tau}$ observations. The immediate benefit is that now the number of arguments is always the same, at least for $t > \tau$. This allows us to train a deep network as indicated above. Such models will be called *autoregressive* models, as they quite literally perform regression on themselves.
 1. Another strategy, shown in :numref:`fig_sequence-model`, is to try and keep some summary $h_t$ of the past observations, at the same time update $h_t$ in addition to the prediction $\hat{x_t}$. This leads to models that estimate $x_t$ with $\hat{x_t} = p(x_t|x_{t-1}, h_{t})$ and moreover updates of the form  $h_t = g(h_{t-1}, x_{t-1})$. Since $h_t$ is never observed, these models are also called *latent autoregressive models*. LSTMs and GRUs are examples of this.
@@ -59,12 +59,12 @@ Going into details of dynamic programming is beyond the scope of this section. [
 
 ### Causality
 
-In principle, there's nothing wrong with unfolding $p(x_1, \ldots, x_T)$ in reverse order. After all, by conditioning we can always write it via
+In principle, there is nothing wrong with unfolding $p(x_1, \ldots, x_T)$ in reverse order. After all, by conditioning we can always write it via
 
 $$p(x_1, \ldots, x_T) = \prod_{t=T}^1 p(x_t|x_{t+1}, \ldots, x_T).$$
 
 In fact, if we have a Markov model, we can obtain a reverse conditional probability distribution, too.
-In many cases, however, there exists a natural direction for the data, namely going forward in time. It is clear that future events cannot influence the past. Hence, if we change $x_t$, we may be able to influence what happens for $x_{t+1}$ going forward but not the converse. That is, if we change $x_t$, the distribution over past events will not change. Consequently, it ought to be easier to explain $p(x_{t+1}|x_t)$ rather than $p(x_t|x_{t+1})$. For instance, [Hoyer et al., 2008](https://papers.nips.cc/paper/3548-nonlinear-causal-discovery-with-additive-noise-models) show that in some cases we can find $x_{t+1} = f(x_t) + \epsilon$ for some additive noise, whereas the converse is not true. This is great news, since it is typically the forward direction that we're interested in estimating. For more on this topic see e.g., the book by [Peters, Janzing and Schölkopf, 2015](https://mitpress.mit.edu/books/elements-causal-inference). We are barely scratching the surface of it.
+In many cases, however, there exists a natural direction for the data, namely going forward in time. It is clear that future events cannot influence the past. Hence, if we change $x_t$, we may be able to influence what happens for $x_{t+1}$ going forward but not the converse. That is, if we change $x_t$, the distribution over past events will not change. Consequently, it ought to be easier to explain $p(x_{t+1}|x_t)$ rather than $p(x_t|x_{t+1})$. For instance, [Hoyer et al., 2008](https://papers.nips.cc/paper/3548-nonlinear-causal-discovery-with-additive-noise-models) show that in some cases we can find $x_{t+1} = f(x_t) + \epsilon$ for some additive noise, whereas the converse is not true. This is great news, since it is typically the forward direction that we are interested in estimating. For more on this topic see e.g., the book by [Peters, Janzing and Schölkopf, 2015](https://mitpress.mit.edu/books/elements-causal-inference). We are barely scratching the surface of it.
 
 ## Toy Example
 
@@ -139,7 +139,7 @@ d2l.plot([time, time[tau:]], [x, estimates],
 
 ## Predictions
 
-This looks nice, just as we expected it. Even beyond 600 observations the estimates still look rather trustworthy. There's just one little problem to this - if we observe data only until time step 600, we cannot hope to receive the ground truth for all future predictions. Instead, we need to work our way forward one step at a time:
+This looks nice, just as we expected it. Even beyond 600 observations the estimates still look rather trustworthy. There is just one little problem to this - if we observe data only until time step 600, we cannot hope to receive the ground truth for all future predictions. Instead, we need to work our way forward one step at a time:
 
 $$\begin{aligned}
 x_{601} & = f(x_{600}, \ldots, x_{597}) \\
@@ -185,7 +185,7 @@ This clearly illustrates how the quality of the estimates changes as we try to p
 
 * Sequence models require specialized statistical tools for estimation. Two popular choices are autoregressive models and latent-variable autoregressive models.
 * As we predict further in time, the errors accumulate and the quality of the estimates degrades, often dramatically.
-* There's quite a difference in difficulty between filling in the blanks in a sequence (smoothing) and forecasting. Consequently, if you have a time series, always respect the temporal order of the data when training, i.e., never train on future data.
+* There is quite a difference in difficulty between filling in the blanks in a sequence (smoothing) and forecasting. Consequently, if you have a time series, always respect the temporal order of the data when training, i.e., never train on future data.
 * For causal models (e.g., time going forward), estimating the forward direction is typically a lot easier than the reverse direction, i.e., we can get by with simpler networks.
 
 ## Exercises
