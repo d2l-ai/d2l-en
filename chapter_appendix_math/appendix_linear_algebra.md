@@ -372,8 +372,7 @@ we can see with some computation that the area of the resulting parallelogram is
 Let's check this quickly with some example code.
 
 ```
-import numpy as np
-print(np.linalg.det(np.array[[1,-1],[2,3]]))
+np.linalg.det(np.array[[1,-1],[2,3]])
 ```
 
 The eagle-eyed amongst us will notice that this expression can be zero or even negative.  For the negative term, this is a matter of convention taken generally in mathematics: if the matrix flips the figure, we say the area is negated.  Let us see now that when the determinant is zero, we learn more.
@@ -453,11 +452,7 @@ We can solve this with the vectors $[1,-1]^\top$ and $[1,2]^\top$ respectively.
 We can check this in code using the built-in numpy `numpy.linalg.eig` routine.
 
 ```{.python .input}
-import numpy as np
-
-w, v = np.linalg.eig(np.array([[2,1],[2,3]]))
-print(w)
-print(v)
+np.linalg.eig(np.array([[2,1],[2,3]]))
 ```
 
 Note that `numpy` normalizes the eigenvectors to be of length one, whereas we took ours to be of arbitrary length.  Additionally, the choice of sign is arbitrary.  However, the vectors computed are parallel to the ones we found by hand with the same eigenvalues.
@@ -598,9 +593,6 @@ $$
 When these models are initialized, $A$ is taken to be a random matrix with Gaussian entries, so lets make one of those.  We will start mean zero, variance one Gaussians.  Just to be concrete, lets make it a five by five matrix.
 
 ```{.python .input}
-import numpy as np
-import matplotlib.pyplot as plt
-
 np.random.seed(8675309)
 
 k = 5
@@ -727,8 +719,6 @@ In this way, we can replace a myriad of specialized notations with short tensor 
 Tensors may flexibly be operated on in code as well.  As seen in :numref:`sec_scalar-tensor`, we can create tensors using numpy arrays.
 
 ```{.python .input}
-import numpy as np
-
 # Define Tensors
 B = np.array([[[1,2,3],[4,5,6]],[[7,8,9],[10,11,12]]])
 A = np.array([[1,2],[3,4]])
