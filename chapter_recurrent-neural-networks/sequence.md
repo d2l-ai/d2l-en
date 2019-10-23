@@ -1,13 +1,13 @@
 # Sequence Models
 :label:`chapter_sequence`
 
-Imagine that you're watching movies on Netflix. As a good Netflix user you decide to rate each of the movies religiously. After all, a good movie is a good movie, and you want to watch more of them, right? As it turns out, things are not quite so simple. People's opinions on movies can change quite significantly over time. In fact, psychologists even have names for some of the effects:
+Imagine that you're watching movies on Netflix. As a good Netflix user, you decide to rate each of the movies religiously. After all, a good movie is a good movie, and you want to watch more of them, right? As it turns out, things are not quite so simple. People's opinions on movies can change quite significantly over time. In fact, psychologists even have names for some of the effects:
 
-* There's [anchoring](https://en.wikipedia.org/wiki/Anchoring), based on someone else's opinion. For instance after the Oscar awards, ratings for the corresponding movie go up, even though it's still the same movie. This effect persists for a few months until the award is forgotten. :cite:`Wu.Ahmed.Beutel.ea.2017` showed that the effect lifts rating by over half a point.
+* There's [anchoring](https://en.wikipedia.org/wiki/Anchoring), based on someone else's opinion. For instance, after the Oscar awards, ratings for the corresponding movie go up, even though it's still the same movie. This effect persists for a few months until the award is forgotten. :cite:`Wu.Ahmed.Beutel.ea.2017` showed that the effect lifts rating by over half a point.
 * There's the [Hedonic adaptation](https://en.wikipedia.org/wiki/Hedonic_treadmill), where humans quickly adapt to accept an improved (or a bad) situation as the new normal. For instance, after watching many good movies, the expectations that the next movie be equally good or better are high, and even an average movie might be considered a bad movie after many great ones.
 * There's seasonality. Very few viewers like to watch a Santa Claus movie in August.
 * In some cases movies become unpopular due to the misbehaviors of directors or actors in the production.
-* Some movies become cult movies, because they were almost comically bad. *Plan 9 from Outer Space* and *Troll 2* achieved a high degree of notoriety for this reason.
+* Some movies become cult movies because they were almost comically bad. *Plan 9 from Outer Space* and *Troll 2* achieved a high degree of notoriety for this reason.
 
 In short, ratings are anything but stationary. Using temporal dynamics helped :cite:`Koren.2009` to recommend
 movies more accurately. But it isn't just about movies.
@@ -15,12 +15,12 @@ movies more accurately. But it isn't just about movies.
 * Many users have highly particular behavior when it comes to the time when they open apps. For instance, social media apps are much more popular after school with students. Stock market trading apps are more commonly used when the markets are open.
 * It is much harder to predict tomorrow's stock prices than to fill in the blanks for a stock price we missed yesterday, even though both are just a matter of estimating one number. After all, hindsight is so much easier than foresight. In statistics the former is called *prediction* whereas the latter is called *filtering*.
 * Music, speech, text, movies, steps, etc. are all sequential in nature. If we were to permute them they would make little sense. The headline *dog bites man* is much less surprising than *man bites dog*, even though the words are identical.
-* Earthquakes are strongly correlated, i.e. after a massive earthquake there are very likely several smaller aftershocks, much more so than without the strong quake. In fact, earthquakes are spatiotemporally correlated, i.e. the aftershocks typically occur within a short time span and in close proximity.
-* Humans interact with each other in a sequential nature, as can be seen in Twitter fights, dance patterns and debates.
+* Earthquakes are strongly correlated, i.e. after a massive earthquake, there are very likely several smaller aftershocks, much more so than without the strong quake. In fact, earthquakes are spatiotemporally correlated, i.e. the aftershocks typically occur within a short time span and in close proximity.
+* Humans interact with each other in a sequential nature, as can be seen in Twitter fights, dance patterns, and debates.
 
 ## Statistical Tools
 
-In short, we need statistical tools and new deep networks architectures to deal with sequence data. To keep things simple, we use the stock price as an example.
+In short, we need statistical tools and new deep network architectures to deal with sequence data. To keep things simple, we use the stock price as an example.
 
 ![FTSE 100 index over 30 years](../img/ftse100.png)
 :width:`600px`
@@ -31,12 +31,12 @@ $$x_t \sim p(x_t|x_{t-1}, \ldots x_1).$$
 
 ### Autoregressive Models
 
-In order to achieve this, our trader could use a regressor such as the one we trained in :numref:`chapter_linear_gluon`. There's just a major problem - the number of inputs, $x_{t-1}, \ldots x_1$ varies, depending on $t$. That is, the number increases with the amount of data that we encounter, and we will need an approximation to make this computationally tractable. Much of what follows in this chapter will revolve around how to estimate $p(x_t|x_{t-1}, \ldots x_1)$ efficiently. In a nutshell it boils down to two strategies:
+In order to achieve this, our trader could use a regressor such as the one we trained in :numref:`chapter_linear_gluon`. There's just a major problem - the number of inputs, $x_{t-1}, \ldots x_1$ varies, depending on $t$. That is, the number increases with the amount of data that we encounter, and we will need an approximation to make this computationally tractable. Much of what follows in this chapter will revolve around how to estimate $p(x_t|x_{t-1}, \ldots x_1)$ efficiently. In a nutshell, it boils down to two strategies:
 
 1. Assume that the potentially rather long sequence $x_{t-1}, \ldots x_1$ isn't really necessary. In this case we might content ourselves with some timespan $\tau$ and only use $x_{t-1}, \ldots x_{t-\tau}$ observations. The immediate benefit is that now the number of arguments is always the same, at least for $t > \tau$. This allows us to train a deep network as indicated above. Such models will be called *autoregressive* models, as they quite literally perform regression on themselves.
 1. Another strategy is to try and keep some summary $h_t$ of the past observations around and update that in addition to the actual prediction. This leads to models that estimate $p( x_t|x_{t-1}, h_{t-1})$ and moreover updates of the form  $h_t = g(h_{t-1}, x_{t-1})$. Since $h_t$ is never observed, these models are also called *latent autoregressive models*. LSTMs and GRUs are examples of this.
 
-Both cases raise the obvious question how to generate training data. One typically uses historical observations to predict the next observation given the ones up to right now. Obviously we do not expect time to stand still. However, a common assumption is that while the specific values of $x_t$ might change, at least the dynamics of the time series itself won't. This is reasonable, since novel dynamics are just that, novel and thus not predictable using data we have so far. Statisticians call dynamics that don't change *stationary*. Regardless of what we do, we will thus get an estimate of the entire time series via
+Both cases raise the obvious question of how to generate training data. One typically uses historical observations to predict the next observation given the ones up to right now. Obviously, we do not expect time to stand still. However, a common assumption is that while the specific values of $x_t$ might change, at least the dynamics of the time series itself won't. This is reasonable since novel dynamics are just that, novel and thus not predictable using data we have so far. Statisticians call dynamics that don't change *stationary*. Regardless of what we do, we will thus get an estimate of the entire time series via
 
 $$p(x_1, \ldots x_T) = \prod_{t=1}^T p(x_t|x_{t-1}, \ldots x_1).$$
 
@@ -56,16 +56,16 @@ Going into details of dynamic programming is beyond the scope of this section. [
 
 ### Causality
 
-In principle, there's nothing wrong with unfolding $p(x_1, \ldots x_T)$ in reverse order. After all, by conditioning we can always write it via
+In principle, there's nothing wrong with unfolding $p(x_1, \ldots x_T)$ in reverse order. After all, by conditioning, we can always write it via
 
 $$p(x_1, \ldots x_T) = \prod_{t=T}^1 p(x_t|x_{t+1}, \ldots x_T).$$
 
 In fact, if we have a Markov model, we can obtain a reverse conditional probability distribution, too.
-In many cases, however, there exists a natural direction for the data, namely going forward in time. It is clear that future events cannot influence the past. Hence, if we change $x_t$, we may be able to influence what happens for $x_{t+1}$ going forward but not the converse. That is, if we change $x_t$, the distribution over past events will not change. Consequently, it ought to be easier to explain $p(x_{t+1}|x_t)$ rather than $p(x_t|x_{t+1})$. For instance, [Hoyer et al., 2008](https://papers.nips.cc/paper/3548-nonlinear-causal-discovery-with-additive-noise-models) show that in some cases we can find $x_{t+1} = f(x_t) + \epsilon$ for some additive noise, whereas the converse is not true. This is great news, since it is typically the forward direction that we're interested in estimating. For more on this topic see e.g. the book by [Peters, Janzing and Schölkopf, 2015](https://mitpress.mit.edu/books/elements-causal-inference). We are barely scratching the surface of it.
+In many cases, however, there exists a natural direction for the data, namely going forward in time. It is clear that future events cannot influence the past. Hence, if we change $x_t$, we may be able to influence what happens for $x_{t+1}$ going forward but not the converse. That is, if we change $x_t$, the distribution over past events will not change. Consequently, it ought to be easier to explain $p(x_{t+1}|x_t)$ rather than $p(x_t|x_{t+1})$. For instance, [Hoyer et al., 2008](https://papers.nips.cc/paper/3548-nonlinear-causal-discovery-with-additive-noise-models) show that in some cases we can find $x_{t+1} = f(x_t) + \epsilon$ for some additive noise, whereas the converse is not true. This is great news since it is typically the forward direction that we're interested in estimating. For more on this topic see e.g. the book by [Peters, Janzing and Schölkopf, 2015](https://mitpress.mit.edu/books/elements-causal-inference). We are barely scratching the surface of it.
 
 ## Toy Example
 
-After so much theory, let's try this out in practice. Since much of the modeling is identical to when we built regression estimators in Gluon, we will not delve into much detail regarding the choice of architecture besides the fact that we will use several layers of a fully connected network. Let's begin by generating some data. To keep things simple we generate our 'time series' by using a sine function with some additive noise.
+After so much theory, let's try this out in practice. Since much of the modeling is identical to when we built regression estimators in Gluon, we will not delve into much detail regarding the choice of architecture besides the fact that we will use several layers of a fully connected network. Let's begin by generating some data. To keep things simple we generate our 'time-series' by using a sine function with some additive noise.
 
 ```{.python .input}
 %matplotlib inline
@@ -79,7 +79,7 @@ x = nd.sin(0.01 * time) + 0.2 * nd.random.normal(shape=T)
 d2l.plot(time, x)
 ```
 
-Next we need to turn this 'time series' into data the network can train on. Based on the embedding dimension $\tau$ we map the data into pairs $y_t = x_t$ and $\mathbf{z}_t = (x_{t-1}, \ldots x_{t-\tau})$. The astute reader might have noticed that this gives us $\tau$ fewer datapoints, since we don't have sufficient history for the first $\tau$ of them. A simple fix, in particular if the time series is long is to discard those few terms. Alternatively we could pad the time series with zeros. The code below is essentially identical to the training code in previous sections. We kept the architecture fairly simple. A few layers of a fully connected network, ReLU activation and $\ell_2$ loss.
+Next, we need to turn this 'time-series' into data the network can train on. Based on the embedding dimension $\tau$ we map the data into pairs $y_t = x_t$ and $\mathbf{z}_t = (x_{t-1}, \ldots x_{t-\tau})$. The astute reader might have noticed that this gives us $\tau$ fewer datapoints since we don't have sufficient history for the first $\tau$ of them. A simple fix, in particular, if the time series is long is to discard those few terms. Alternatively, we could pad the time series with zeros. The code below is essentially identical to the training code in previous sections. We kept the architecture fairly simple. A few layers of a fully connected network, ReLU activation and $\ell_2$ loss.
 
 ```{.python .input}
 tau = 4
@@ -91,7 +91,7 @@ labels = x[tau:]
 batch_size, n_train = 16, 600
 train_iter = d2l.load_array((features[:n_train], labels[:n_train]),
                             batch_size, is_train=True)
-test_iter = d2l.load_array((features[:n_train], labels[:n_train]),
+test_iter = d2l.load_array((features[n_train:], labels[n_train:]),
                            batch_size, is_train=False)
 
 # Vanilla MLP architecture
@@ -132,7 +132,7 @@ train_net(net, train_iter, loss, 10, 0.01)
 #print('test loss: %f' % l.mean().asnumpy())
 ```
 
-The both training and test loss are small and we would expect our model to work well. Let's see what this means in practice. The first thing to check is how well the model is able to predict what happens in the next timestep.
+Both training and test loss are small and we would expect our model to work well. Let's see what this means in practice. The first thing to check is how well the model is able to predict what happens in the next timestep.
 
 ```{.python .input}
 estimates = net(features)
@@ -163,7 +163,7 @@ d2l.plot([time, time[tau:], time[n_train:]],
          legend=['data', 'estimate', 'multistep'], figsize=(4.5, 2.5))
 ```
 
-As the above example shows, this is a spectacular failure. The estimates decay to a constant pretty quickly after a few prediction steps. Why did the algorithm work so poorly? This is ultimately due to the fact that errors build up. Let's say that after step 1 we have some error $\epsilon_1 = \bar\epsilon$. Now the *input* for step 2 is perturbed by $\epsilon_1$, hence we suffer some error in the order of $\epsilon_2 = \bar\epsilon + L \epsilon_1$, and so on. The error can diverge rather rapidly from the true observations. This is a common phenomenon - for instance weather forecasts for the next 24 hours tend to be pretty accurate but beyond that their accuracy declines rapidly. We will discuss methods for improvig this throughout this chapter and beyond.
+As the above example shows, this is a spectacular failure. The estimates decay to a constant pretty quickly after a few prediction steps. Why did the algorithm work so poorly? This is ultimately due to the fact that errors build up. Let's say that after step 1 we have some error $\epsilon_1 = \bar\epsilon$. Now the *input* for step 2 is perturbed by $\epsilon_1$, hence we suffer some error in the order of $\epsilon_2 = \bar\epsilon + L \epsilon_1$, and so on. The error can diverge rather rapidly from true observations. This is a common phenomenon - for instance, weather forecasts for the next 24 hours tend to be pretty accurate but beyond that their accuracy declines rapidly. We will discuss methods for improving this throughout this chapter and beyond.
 
 Let's verify this observation by computing the $k$-step predictions on the entire sequence.
 
@@ -198,7 +198,7 @@ This clearly illustrates how the quality of the estimates changes as we try to p
     * How many would you need if there were no noise? Hint - you can write $\sin$ and $\cos$ as a differential equation.
     * Can you incorporate older features while keeping the total number of features constant? Does this improve accuracy? Why?
     * Change the architecture and see what happens.
-1. An investor wants to find a good security to buy. She looks at past returns to decide which one is likely to do well. What could possibly go wrong with this strategy?
+1. An investor wants to find good security to buy. She looks at past returns to decide which one is likely to do well. What could possibly go wrong with this strategy?
 1. Does causality also apply to text? To which extent?
 1. Give an example for when a latent variable autoregressive model might be needed to capture the dynamic of the data.
 
