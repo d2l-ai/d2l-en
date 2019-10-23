@@ -10,7 +10,7 @@ not just among people represented in our dataset,
 but among all people on earth!
 
 Given the genetic markers representing some person,
-we do not want our model to simply recognize "oh, that's Bob",
+we do not want our model to simply recognize "oh, that is Bob",
 and then output the classification,
 say among {*dementia*, *mild cognitive impairment*, *healthy*},
 that corresponds to Bob.
@@ -83,7 +83,7 @@ were we to apply it to an infinite stream of additional data points
 drawn from the same underlying data distribution as our original sample.
 
 Problematically, *we can never calculate the generalization error exactly*.
-That's because the imaginary stream of infinite data is an imaginary object.
+That is because the imaginary stream of infinite data is an imaginary object.
 In practice, we must *estimate* the generalization error
 by applying our model to an independent test set
 constituted of a random selection of data points

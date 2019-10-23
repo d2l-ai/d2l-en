@@ -31,7 +31,7 @@ npx.set_np()
 ## A Simple Example
 
 As a toy example, say that we are interested 
-in differentiating the mapping 
+in differentiating the function 
 $y = 2\mathbf{x}^{\top}\mathbf{x}$ 
 with respect to the column vector $\mathbf{x}$. 
 To start, let us create the variable `x` and assign it an initial value.
@@ -42,7 +42,7 @@ x
 ```
 
 Note that before we even calculate the gradient 
-of ``y`` with respect to ``x``, 
+of $y$ with respect to $\mathbf{x}$, 
 we will need a place to store it. 
 It is important that we do not allocate new memory
 every time we take a derivative with respect to a parameter
@@ -50,22 +50,23 @@ because we will often update the same parameters
 thousands or millions of times 
 and could quickly run out of memory.
 
-Note also that a gradient with respect to a vector $x$ 
-is itself vector-valued and has the same shape as $x$.
+Note also that a gradient of a scalar-valued function
+with respect to a vector $\mathbf{x}$
+is itself vector-valued and has the same shape as $\mathbf{x}$.
 Thus it is intuitive that in code, 
 we will access a gradient taken with respect to `x` 
-as an attribute the `ndarray` `x` itself.
+as an attribute of the `ndarray` `x` itself.
 We allocate memory for an `ndarray`'s gradient
-by invoking its ``attach_grad()`` method.
+by invoking its `attach_grad` method.
 
 ```{.python .input  n=3}
 x.attach_grad()
 ```
 
 After we calculate a gradient taken with respect to `x`, 
-we will be able to access it via the `.grad` attribute. 
+we will be able to access it via the `grad` attribute. 
 As a safe default, `x.grad` initializes as an array containing all zeros.
-That's sensible because our most common use case 
+That is sensible because our most common use case 
 for taking gradient in deep learning is to subsequently 
 update parameters by adding (or subtracting) the gradient
 to maximize (or minimize) the differentiated function.
@@ -74,7 +75,7 @@ we ensure that any update accidentally exectuted
 before a gradient has actually been calculated
 will not alter the variable's value.
 
-```{.python .input}
+```{.python .input  n=4}
 x.grad
 ```
 
@@ -90,7 +91,7 @@ So MXNet will only build the graph when explicitly told to do so.
 We can invoke this behavior by placing our code 
 inside a ``with autograd.record():`` block.
 
-```{.python .input  n=4}
+```{.python .input  n=5}
 with autograd.record():
     y = 2.0 * np.dot(x, x)
 y
@@ -103,13 +104,13 @@ Next, we can automatically calculate the gradient of `y`
 with respect to each component of `x` 
 by calling `y`'s `backward` function.
 
-```{.python .input  n=5}
+```{.python .input  n=6}
 y.backward()
 ```
 
 If we recheck the value of `x.grad`, we will find its contents overwritten by the newly calculated gradient.
 
-```{.python .input}
+```{.python .input  n=7}
 x.grad
 ```
 
@@ -119,7 +120,7 @@ Let us quickly verify that our desired gradient was calculated correctly.
 If the two `ndarray`s are indeed the same, 
 then their difference should consist of all zeros.
 
-```{.python .input  n=6}
+```{.python .input  n=8}
 x.grad - 4 * x
 ```
 
@@ -127,7 +128,7 @@ If we subsequently compute the gradient of another variable
 whose value was calculated as a function of `x`, 
 the contents of `x.grad` will be overwritten.
 
-```{.python .input}
+```{.python .input  n=9}
 with autograd.record():
     y = x.sum()
 y.backward()
@@ -158,7 +159,7 @@ In short, MXNet, will create a new scalar variable
 by summing the elements in `y`,
 and compute the gradient of that variable with respect to `x`.
 
-```{.python .input}
+```{.python .input  n=10}
 with autograd.record():  # y is a vector
     y = x * x
 y.backward()
@@ -202,7 +203,7 @@ The following backward computes $\partial (u \odot x)/\partial x$
 instead of $\partial (x \odot x \odot x) /\partial x$,
 where $\odot$ stands for elementwise multiplication.
 
-```{.python .input}
+```{.python .input  n=11}
 with autograd.record():
     y = x * x
     u = y.detach()
@@ -214,7 +215,7 @@ x.grad - u
 Since the computation of $y$ was recorded, 
 we can subsequently call `y.backward()` to get $\partial y/\partial x = 2x$.
 
-```{.python .input}
+```{.python .input  n=12}
 y.backward()
 x.grad - 2*x
 ```
@@ -225,7 +226,7 @@ Attaching gradients to a variable `x` implicitly calls `x=x.detach()`.
 If `x` is computed based on other variables, 
 this part of computation will not be used in the backward function.
 
-```{.python .input}
+```{.python .input  n=13}
 y = np.ones(4) * 2
 y.attach_grad()
 with autograd.record():
@@ -240,7 +241,7 @@ print(x.grad, '\n', u.grad, '\n', y.grad)
 
 Detaching allows to breaks the computation into several parts. We could use chain rule :numref:`sec_math` to compute the gradient for the whole computation.  Assume $u = f(x)$ and $z = g(u)$, by chain rule we have $\frac{dz}{dx} = \frac{dz}{du} \frac{du}{dx}.$ To compute $\frac{dz}{du}$, we can first detach $u$ from the computation and then call `z.backward()` to compute the first term.
 
-```{.python .input}
+```{.python .input  n=14}
 y = np.ones(4) * 2
 y.attach_grad()
 with autograd.record():
@@ -256,7 +257,7 @@ Subsequently, we can call `u.backward()` to compute the second term,
 but pass the first term as the head gradients to multiply both terms 
 so that `x.grad` will contains $\frac{dz}{dx}$ instead of $\frac{du}{dx}$.
 
-```{.python .input}
+```{.python .input  n=15}
 u.backward(v.grad)
 print(x.grad, '\n', y.grad)
 ```
@@ -273,7 +274,7 @@ the number of iterations of the `while` loop
 and the evaluation of the `if` statement
 both depend on the value of the input `b`.
 
-```{.python .input  n=8}
+```{.python .input  n=16}
 def f(a):
     b = a * 2
     while np.abs(b).sum() < 1000:
@@ -288,7 +289,7 @@ def f(a):
 Again to compute gradients, we just need to `record` the calculation
 and then call the `backward` function.
 
-```{.python .input  n=9}
+```{.python .input  n=17}
 a = np.random.normal()
 a.attach_grad()
 with autograd.record():
@@ -302,7 +303,7 @@ In other words, for any `a` there exists some constant
 such that for a given range `f(a) = g * a`. 
 Consequently `d / a` allows us to verify that the gradient is correct:
 
-```{.python .input  n=10}
+```{.python .input  n=18}
 print(a.grad == (d / a))
 ```
 
@@ -315,7 +316,7 @@ Additionally, `autograd.record` will change
 the running mode from *prediction* mode to *training* mode. 
 We can verify this behavior by calling the `is_training` function.
 
-```{.python .input  n=7}
+```{.python .input  n=19}
 print(autograd.is_training())
 with autograd.record():
     print(autograd.is_training())

@@ -107,7 +107,7 @@ By adding another layer, we have added two new sets of parameters,
 but what have we gained in exchange?
 In the model defined above, we do not achieve anything for our troubles!
 
-That's because our hidden units are just a linear function of the inputs
+That is because our hidden units are just a linear function of the inputs
 and the outputs (pre-softmax) are just a linear function of the hidden units.
 A linear function of a linear function is itself a linear function.
 That means that for any values of the weights,

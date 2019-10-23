@@ -80,7 +80,7 @@ principles?  Think about it... the problem is hard.  Every second, the
 microphone will collect roughly 44,000 samples.  What rule could map reliably
 from a snippet of raw audio to confident predictions ``{yes, no}`` on whether
 the snippet contains the wake word?  If you are stuck, do not worry.  We do not
-know how to write such a program from scratch either.  That's why we use ML.
+know how to write such a program from scratch either.  That is why we use ML.
 
 ![Identify an awake word.](../img/wake-word.svg)
 
@@ -383,7 +383,7 @@ In probabilistic terms, we typically are interested in estimating
 the conditional probability $P(y|x)$.
 While it is just one among several approaches to machine learning,
 supervised learning accounts for the majority of machine learning in practice.
-Partly, that's because many important tasks
+Partly, that is because many important tasks
 can be described crisply as estimating the probability of some unknown given some available evidence:
 
 * Predict cancer vs not cancer, given a CT image.
@@ -478,7 +478,7 @@ you could already identify the contractor's pricing structure:
 If you followed that much then you already understand the high-level idea behind linear regression (and you just implicitly designed a linear model with bias).
 
 In this case, we could produce the parameters that exactly matched the contractor's prices.
-Sometimes that's not possible, e.g., if some of the variance owes to some factors besides your two features.
+Sometimes that is not possible, e.g., if some of the variance owes to some factors besides your two features.
 In these cases, we will try to learn models that minimize the distance between our predictions and the observed values.
 In most of our chapters, we will focus on one of two very common losses,
 the
@@ -549,7 +549,7 @@ to predict if a mushroom is poisonous based on a photograph.
 Say our poison-detection classifier outputs $\Pr(y=\mathrm{death cap}|\mathrm{image}) = 0.2$.
 In other words, the classifier is 80% confident that our mushroom *is not* a death cap.
 Still, you'd have to be a fool to eat it.
-That's because the certain benefit of a delicious dinner is not worth a 20% risk of dying from it.
+That is because the certain benefit of a delicious dinner is not worth a 20% risk of dying from it.
 In other words, the effect of the *uncertain risk* by far outweighs the benefit.
 Let us look at this in math. Basically, we need to compute the expected risk that we incur, i.e., we need to multiply the probability of the outcome with the benefit (or harm) associated with it:
 
@@ -789,7 +789,7 @@ We will address a number of unsupervised learning techniques in later chapters. 
 
 So far, we haven't discussed where data actually comes from,
 or what actually *happens* when a machine learning model generates an output.
-That's because supervised learning and unsupervised learning
+That is because supervised learning and unsupervised learning
 do not address these issues in a very sophisticated way.
 In either case, we grab a big pile of data up front,
 then do our pattern recognition without ever interacting with the environment again.

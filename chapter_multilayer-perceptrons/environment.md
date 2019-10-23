@@ -124,7 +124,7 @@ including if label shift holds too.
 Interestingly, when we expect both label shift and covariate shift hold,
 it is often advantageous to work with the methods
 that flow from the label shift assumption.
-That's because these methods tend to involve manipulating objects
+That is because these methods tend to involve manipulating objects
 that look like the label,
 which (in deep learning) tends to be comparatively easy
 compared to working with the objects that look like the input,

@@ -16,7 +16,7 @@ such as support vector machines.
 
 
 For computer vision, this comparison is perhaps not fair.
-That's although the inputs to convolutional networks
+That is although the inputs to convolutional networks
 consist of raw or lightly-processed (e.g., by centering) pixel values, practitioners would never feed raw pixels into traditional models.
 Instead, typical computer vision pipelines
 consisted of manually engineering feature extraction pipelines.
