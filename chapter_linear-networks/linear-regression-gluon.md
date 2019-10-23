@@ -208,7 +208,7 @@ trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': 0.03})
 
 You might have noticed that expressing our model through Gluon
 requires comparatively few lines of code.
-We didn't have to individually allocate parameters,
+We did not have to individually allocate parameters,
 define our loss function, or implement stochastic gradient descent.
 Once we start working with much more complex models,
 Gluon's advantages will grow considerably.

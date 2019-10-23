@@ -2,7 +2,7 @@
 :label:`sec_vgg`
 
 While AlexNet proved that deep convolutional neural networks
-can achieve good results, it didn't offer a general template
+can achieve good results, it did not offer a general template
 to guide subsequent researchers in designing new networks.
 In the following sections, we will introduce several heuristic concepts
 commonly used to design deep networks.

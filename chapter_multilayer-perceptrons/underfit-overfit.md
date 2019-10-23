@@ -115,7 +115,7 @@ because the generalization error will always be $\frac{1}{2}$.
 However, for most algorithms,
 we should expect our training error to be considerably lower,
 depending on the luck of the draw,
-even if we didn't have any features!
+even if we did not have any features!
 Consider the dataset {0, 1, 1, 1, 0, 1}.
 Our feature-less would have to fall back on always predicting
 the *majority class*, which appears from our limited sample to be *1*.

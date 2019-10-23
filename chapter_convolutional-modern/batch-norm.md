@@ -53,7 +53,7 @@ It is precisely due to this *normalization* based on *batch* statistics
 that *batch normalization* derives its name.
 
 Note that if we tried to apply BN with minibatches of size $1$, 
-we wouldn't be able to learn anything.
+we would not be able to learn anything.
 That is because after subtracting the means,
 each hidden node would take value $0$!
 As you might guess, since we are devoting a whole section to BN, 

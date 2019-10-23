@@ -632,7 +632,7 @@ One possible solution to this problem is to score every element in the set of
 possible sets along with a corresponding relevance score and then to retrieve
 the top-rated elements. [PageRank](https://en.wikipedia.org/wiki/PageRank) is an
 early example of such a relevance score. One of the peculiarities is that it
-didn't depend on the actual query. Instead, it simply helped to order the
+did not depend on the actual query. Instead, it simply helped to order the
 results that contained the query terms. Nowadays search engines use machine
 learning and behavioral models to obtain query-dependent relevance scores. There
 are entire conferences devoted to this subject.
@@ -689,7 +689,7 @@ predicting their translation in another language.
 
 These problems also occur in medicine.  We might want a model to monitor
 patients in the intensive care unit and to fire off alerts if their risk of
-death in the next 24 hours exceeds some threshold.  We definitely wouldn't want
+death in the next 24 hours exceeds some threshold.  We definitely would not want
 this model to throw away everything it knows about the patient history each
 hour, and just make its predictions based on the most recent measurements.
 
