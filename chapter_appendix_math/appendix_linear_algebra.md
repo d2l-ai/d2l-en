@@ -452,6 +452,7 @@ We can solve this with the vectors $[1,-1]^\top$ and $[1,2]^\top$ respectively.
 We can check this in code using the built-in numpy `numpy.linalg.eig` routine.
 
 ```{.python .input}
+import numpy as np
 np.linalg.eig(np.array([[2,1],[2,3]]))
 ```
 
