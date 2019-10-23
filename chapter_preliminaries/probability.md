@@ -6,7 +6,7 @@ We might want to predict the *probability* of a patient suffering a heart attack
 learning models, and to give you enough of a flavor for the subject that you can begin to explore it on your own if you wish.
 
 
-We've already invoked probabilities in previous sections without articulating what precisely they are or giving a concrete example. Let us get more serious now by considering the problem of distinguishing cats and dogs based on photographs. This might sound simple but it is actually a formidable challenge. To start with, the difficulty of the problem may depend on the resolution of the image.
+We have already invoked probabilities in previous sections without articulating what precisely they are or giving a concrete example. Let us get more serious now by considering the problem of distinguishing cats and dogs based on photographs. This might sound simple but it is actually a formidable challenge. To start with, the difficulty of the problem may depend on the resolution of the image.
 
 | 10px | 20px | 40px | 80px | 160px |
 |:----:|:----:|:----:|:----:|:-----:|

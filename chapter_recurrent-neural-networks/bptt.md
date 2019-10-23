@@ -72,7 +72,7 @@ since subtle changes in the initial conditions can potentially affect
 the outcome a lot. That is, we could see things similar to the
 butterfly effect where minimal changes in the initial conditions lead to disproportionate changes in the outcome. This is actually quite undesirable in terms of the model that we want to estimate. After all, we are looking for robust estimators that generalize well. Hence this strategy is almost never used in practice.
 
-**Truncate the sum after $\tau$ steps.** This is what we've been
+**Truncate the sum after $\tau$ steps.** This is what we have been
 discussing so far. This leads to an *approximation* of the true
 gradient, simply by terminating the sum above at $\partial_w
 h_{t-\tau}$. The approximation error is thus given by $\partial_h

@@ -93,7 +93,7 @@ Go to your fork of the repository on GitHub and select "New pull request". This 
 
 ### Submit Pull Request
 
-Finally, submit a pull request. Make sure to describe the changes you have made in the pull request. This will make it easier for the authors to review it and to merge it with the book. Depending on the changes, this might get accepted right away, rejected, or more likely, you will get some feedback on the changes. Once you've incorporated them, you are good to go.
+Finally, submit a pull request. Make sure to describe the changes you have made in the pull request. This will make it easier for the authors to review it and to merge it with the book. Depending on the changes, this might get accepted right away, rejected, or more likely, you will get some feedback on the changes. Once you have incorporated them, you are good to go.
 
 ![Create Pull Request.](../img/git-createpr-numpy2.png)
 :width:`700px`

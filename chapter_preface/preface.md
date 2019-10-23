@@ -172,7 +172,7 @@ In these cases, we will often present two versions of the example:
 one where we implement everything from scratch,
 relying only on NDArray and automatic differentiation,
 and another, more practical example, where we write succinct code using ``Gluon``.
-Once we've taught you how some component works,
+Once we have taught you how some component works,
 we can just use the ``Gluon`` version in subsequent tutorials.
 
 
@@ -296,7 +296,7 @@ may want to peruse the [Python tutorial](http://learnpython.org/).
 
 ### Forum
 
-Associated with this book, we've launched a discussion forum,
+Associated with this book, we have launched a discussion forum,
 located at [discuss.mxnet.io](https://discuss.mxnet.io/).
 When you have questions on any section of the book,
 you can find the associated discussion page by scanning the QR code

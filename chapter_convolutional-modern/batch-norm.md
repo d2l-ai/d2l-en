@@ -195,7 +195,7 @@ As we mentioned earlier, BN typically behaves differently
 in training mode and prediction mode. 
 First, the noise in $\mathbf{\mu}$ and $\mathbf{\sigma}$
 arising from estimating each on minibatches
-are no longer desirable once we've trained the model.
+are no longer desirable once we have trained the model.
 Second, we might not have the luxury
 of computing per-batch normalization statistics, e.g.,
 we might need to apply our model to make one prediction at a time.

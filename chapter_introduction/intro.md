@@ -153,9 +153,9 @@ to zero if it is not sure, and this barely scratches the surface of what ML can
 do.
 
 Deep learning is just one among many popular frameworks for solving machine
-learning problems.  While thus far, we've only talked about machine learning
+learning problems.  While thus far, we have only talked about machine learning
 broadly and not deep learning, there is a couple points worth sneaking in here:
-First, the problems that we've discussed thus far: learning from raw audio
+First, the problems that we have discussed thus far: learning from raw audio
 signal, directly from the pixels in images, and mapping between sentences of
 arbitrary lengths and across languages are problems where deep learning excels
 and traditional ML tools faltered.  Deep models are *deep* in precisely the
@@ -347,7 +347,7 @@ reporting the following two quantities:
 
 ### Optimization algorithms
 
-Once we've got some data source and representation,
+Once we have got some data source and representation,
 a model, and a well-defined objective function,
 we need an algorithm capable of searching
 for the best possible parameters for minimizing the loss function.
@@ -461,8 +461,8 @@ A good rule of thumb is that any *How much?* or *How many?* problem should sugge
 
 However, if you can easily pose your problem as 'Is this a _ ?',
 then it is likely, classification, a different fundamental problem type that we will cover next.
-Even if you've never worked with machine learning before,
-you've probably worked through a regression problem informally.
+Even if you have never worked with machine learning before,
+you have probably worked through a regression problem informally.
 Imagine, for example, that you had your drains repaired
 and that your contractor spent $x_1=3$ hours removing gunk from your sewage pipes.
 Then she sent you a bill of $y_1 = \$350$.
@@ -669,7 +669,7 @@ Amazon based on personalization algorithms tuned to the author's preferences.
 
 #### Sequence Learning
 
-So far we've looked at problems where we have some fixed number of inputs and
+So far we have looked at problems where we have some fixed number of inputs and
 produce a fixed number of outputs.  Before we considered predicting home prices
 from a fixed set of features: square footage, number of bedrooms, number of
 bathrooms, walking time to downtown.  We also discussed mapping from an image
