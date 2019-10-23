@@ -58,7 +58,7 @@ and a careful discussion of the structure of modern architectures.
 We will conclude the chapter with a full working example of LeNet,
 the first convolutional network successfully deployed,
 long before the rise of modern deep learning.
-In the next chapter we'll dive into full implementations
+In the next chapter we will dive into full implementations
 of some of the recent popular neural networks
 whose designs are representative of most of the techniques
 commonly used to design modern convolutional neural networks.

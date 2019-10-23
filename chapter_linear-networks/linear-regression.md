@@ -230,7 +230,7 @@ which is an average of the losses computed
 on every single example in the dataset. 
 In practice, this can be extremely slow. 
 We must pass over the entire dataset before making a single update.
-Thus, we'll often settle for sampling a random mini-batch of examples 
+Thus, we will often settle for sampling a random mini-batch of examples 
 every time we need to computer the update, 
 a variant called *stochastic gradient descent*.
 
@@ -493,7 +493,7 @@ $$-\log p(\mathbf y|\mathbf X) = \sum_{i=1}^n \frac{1}{2} \log(2 \pi \sigma^2) +
 
 Now we just need one more assumption: that $\sigma$ is some fixed constant. 
 Thus we can ignore the first term because 
-it doesn't depend on $\mathbf{w}$ or $b$. 
+it does not depend on $\mathbf{w}$ or $b$. 
 Now the second term is identical to the squared error objective introduced earlier, 
 but for the multiplicative constant $\frac{1}{\sigma^2}$. 
 Fortunately, the solution does not depend on $\sigma$.

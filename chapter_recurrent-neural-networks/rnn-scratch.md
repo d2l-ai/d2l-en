@@ -153,7 +153,7 @@ Sometimes the gradients can be quite large and the optimization algorithm may fa
 
 $$\mathbf{g} \leftarrow \min\left(1, \frac{\theta}{\|\mathbf{g}\|}\right) \mathbf{g}.$$
 
-By doing so we know that the gradient norm never exceeds $\theta$ and that the updated gradient is entirely aligned with the original direction $\mathbf{g}$. It also has the desirable side-effect of limiting the influence any given minibatch (and within it any given sample) can exert on the weight vectors. This bestows a certain degree of robustness to the model. Gradient clipping provides a quick fix to the gradient exploding. While it doesn't entire solve the problem, it is one of the many techniques to alleviate it.
+By doing so we know that the gradient norm never exceeds $\theta$ and that the updated gradient is entirely aligned with the original direction $\mathbf{g}$. It also has the desirable side-effect of limiting the influence any given minibatch (and within it any given sample) can exert on the weight vectors. This bestows a certain degree of robustness to the model. Gradient clipping provides a quick fix to the gradient exploding. While it does not entire solve the problem, it is one of the many techniques to alleviate it.
 
 Below we define a function to clip the gradients of a model that is either a `RNNModelScratch` instance or a Gluon model. Also note that we compute the gradient norm over all parameters.
 
@@ -177,7 +177,7 @@ Similar to :numref:`sec_linear_scratch`, let us first define the function to tra
 1. Different sampling methods for sequential data (independent sampling and
    sequential partitioning) will result in differences in the initialization of
    hidden states.
-1. We clip the gradient before updating the model parameters. This ensures that the model doesn't diverge even when gradients blow up at some point during the training process (effectively it reduces the stepsize automatically).
+1. We clip the gradient before updating the model parameters. This ensures that the model does not diverge even when gradients blow up at some point during the training process (effectively it reduces the stepsize automatically).
 1. We use perplexity to evaluate the model. This ensures that different tests are comparable.
 
 When the consecutive sampling is used, we initialize the hidden state at the beginning of each epoch. Since the $i^\mathrm{th}$ example in the next mini-batch is adjacent to the current $i^\mathrm{th}$ example, so the next mini-batch can use the current hidden state directly, we only detach the gradient so that we only compute the gradients within a mini-batch. When using the random sampling, we need to re-initialize the hidden state for each iteration since each example is sampled with a random position. Same to the `train_epoch_ch3` function (:numref:`sec_linear_scratch`), we use generalized `updater`, which could be a Gluon trainer or a scratched implementation.

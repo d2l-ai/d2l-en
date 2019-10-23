@@ -8,7 +8,7 @@ dimensionality-reduction, weight decay and dropout.
 You are now ready to put all this knowledge into practice
 by participating in a Kaggle competition.
 [Predicting house prices](https://www.kaggle.com/c/house-prices-advanced-regression-techniques) is a great place to start:
-the data is reasonably generic and doesn't have
+the data is reasonably generic and does not have
 the kind of rigid structure that might require specialized models
 the way images or audio might.
 This dataset, collected by [Bart de Cock](http://jse.amstat.org/v19n3/decock.pdf) in 2011, is considerably larger than the famous the [Boston housing dataset](https://archive.ics.uci.edu/ml/machine-learning-databases/housing/housing.names) of Harrison and Rubinfeld (1978).
@@ -67,7 +67,7 @@ with the missing value marked simply as 'na'.
 The price of each house is included for the training set only
 (it is a competition after all).
 You can partition the training set to create a validation set,
-but you'll only find out how you perform on the official test set
+but you will only find out how you perform on the official test set
 when you upload your predictions and receive your score.
 The 'Data' tab on the competition tab has links to download the data.
 
@@ -115,7 +115,7 @@ train_data.iloc[0:4, [0, 1, 2, 3, -3, -2, -1]]
 
 We can see that in each example, the first feature is the ID.
 This helps the model identify each training example.
-While this is convenient, it doesn't carry
+While this is convenient, it does not carry
 any information for prediction purposes.
 Hence we remove it from the dataset before feeding the data into the network.
 

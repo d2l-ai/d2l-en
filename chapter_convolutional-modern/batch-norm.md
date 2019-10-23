@@ -272,7 +272,7 @@ This pattern enables a clean separation of math from boilerplate code.
 Also note that for the sake of convenience
 we did not worry about automagically inferring the input shape here,
 thus our need to specify the number of features throughout.
-Don't worry, the Gluon `BatchNorm` layer will care of this for us.
+Do not worry, the Gluon `BatchNorm` layer will care of this for us.
 
 ```{.python .input  n=73}
 class BatchNorm(nn.Block):

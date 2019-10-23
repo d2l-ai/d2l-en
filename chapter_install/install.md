@@ -1,7 +1,7 @@
 # Installation
 :label:`chap_installation`
 
-To get you up and running with hands-on experiences, we'll need you to set up with a Python environment, Jupyter's interactive notebooks, the relevant libraries, and the code needed to run the book.
+To get you up and running with hands-on experiences, we will need you to set up with a Python environment, Jupyter's interactive notebooks, the relevant libraries, and the code needed to run the book.
 
 ## Installing Miniconda
 
@@ -89,7 +89,7 @@ If unfortunately something went wrong, please check
 
 1. You are using `pip` for Python 3 instead of Python 2 by checking `pip --version`. If it is Python 2, then you may check if there is a `pip3` available.
 2. You are using a recent `pip`, such as version 19. Otherwise you can upgrade it through `pip install --upgrade pip`
-3. If you don't have permission to install package in system wide, you can install to your home directory by adding a `--user` flag. Such as `pip install d2l --user`
+3. If you do not have permission to install package in system wide, you can install to your home directory by adding a `--user` flag. Such as `pip install d2l --user`
 
 
 ## Installing MXNet

@@ -148,7 +148,7 @@ we can model any function at all!
 *Actually learning that function is the hard part.*
 
 Moreover, just because a single-layer network *can* learn any function
-doesn't mean that you should try to solve all of your problems with single-layer networks.
+does not mean that you should try to solve all of your problems with single-layer networks.
 It turns out that we can approximate many functions
 much more compactly if we use deeper (vs wider) neural networks.
 We’ll get more into the math in a subsequent chapter,
@@ -253,7 +253,7 @@ $$\mathrm{sigmoid}(x) = \frac{1}{1 + \exp(-x)}.$$
 
 In the earliest neural networks, scientists
 were interested in modeling biological neurons
-which either *fire* or *don't fire*.
+which either *fire* or *do not fire*.
 Thus the pioneers of this field, going all the way back to McCulloch and Pitts in the 1940s, were focused on thresholding units.
 A thresholding function takes either value $0$
 (if the input is below the threshold)

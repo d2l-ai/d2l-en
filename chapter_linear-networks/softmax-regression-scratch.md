@@ -29,7 +29,7 @@ train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 Just as in linear regression, we represent each example as a vector.
 Since each example is a $28 \times 28$ image,
 we can flatten each example, treating them as $784$ dimensional vectors.
-In the future, we'll talk about more sophisticated strategies
+In the future, we will talk about more sophisticated strategies
 for exploiting the spatial structure in images,
 but for now we treat each pixel location as just another feature.
 
@@ -325,7 +325,7 @@ Again, we use the mini-batch stochastic gradient descent
 to optimize the loss function of the model.
 Note that the number of epochs (`num_epochs`),
 and learning rate (`lr`) are both adjustable hyper-parameters.
-By changing their values, we may be able to increase the classification accuracy of the model. In practice we'll want to split our data three ways
+By changing their values, we may be able to increase the classification accuracy of the model. In practice we will want to split our data three ways
 into training, validation, and test data, using the validation data to choose the best values of our hyperparameters.
 
 ```{.python .input  n=18}
@@ -357,7 +357,7 @@ predict_ch3(net, test_iter)
 ## Summary
 
 With softmax regression, we can train models for multi-category classification. The training loop is very similar to that in linear regression: retrieve and read data, define models and loss functions,
-then train models using optimization algorithms. As you'll soon find out, most common deep learning models have similar training procedures.
+then train models using optimization algorithms. As you will soon find out, most common deep learning models have similar training procedures.
 
 ## Exercises
 

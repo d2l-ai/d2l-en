@@ -207,7 +207,7 @@ show_trace(newton(0.5))
 
 ### Convergence Analysis
 
-We only analyze the convergence rate for convex and three times differentiable $f$, where at its minimum $x^*$ the second derivative is nonzero, i.e., where $f''(x^*) > 0$. The multivariate proof is a straightforward extension of the argument below and omitted since it doesn't help us much in terms of intuition. 
+We only analyze the convergence rate for convex and three times differentiable $f$, where at its minimum $x^*$ the second derivative is nonzero, i.e., where $f''(x^*) > 0$. The multivariate proof is a straightforward extension of the argument below and omitted since it does not help us much in terms of intuition. 
 
 Denote by $x_k$ the value of $x$ at the $k$-th iteration and let $e_k := x_k - x^*$ be the distance from optimality. By Taylor series expansion we have that the condition $f'(x^*) = 0$ can be written as
 
@@ -220,7 +220,7 @@ $$e_k - f'(x_k) / f''(x_k) = \frac{1}{2} e_k^2 f'''(\xi_k) / f'(x_k)$$
 Plugging in the update equations leads to the following bound $e_{k+1} \leq e_k^2 f'''(\xi_k) / f'(x_k)$. Consequently, whenever we are in a region of bounded $f'''(\xi_k) / f'(x_k) \leq c$, we have a quadratically decreasing error $e_{k+1} \leq c e_k^2$. 
 
 As an aside, optimization researchers call this *linear* convergence, whereas a condition such as $e_{k+1} \leq \alpha e_k$ would be called a *constant* rate of convergence. 
-Note that this analysis comes with a number of caveats: We don't really have much of a guarantee when we will reach the region of rapid convergence. Instead, we only know that once we reach it, convergence will be very quick. Second, this requires that $f$ is well-behaved up to higher order derivatives. It comes down to ensuring that $f$ doesn't have any 'surprising' properties in terms of how it might change its values. 
+Note that this analysis comes with a number of caveats: We do not really have much of a guarantee when we will reach the region of rapid convergence. Instead, we only know that once we reach it, convergence will be very quick. Second, this requires that $f$ is well-behaved up to higher order derivatives. It comes down to ensuring that $f$ does not have any 'surprising' properties in terms of how it might change its values. 
 
 ### Preconditioning
 
@@ -238,7 +238,7 @@ This algorithm converges rapidly (for an analysis and proof see e.g., :cite:`Boy
 
 ## Summary
 
-* Learning rates matter. Too large and we diverge, too small and we don't make progress.
+* Learning rates matter. Too large and we diverge, too small and we do not make progress.
 * Gradient descent can get stuck in local minima.
 * In high dimensions adjusting learning the learning rate is complicated.
 * Preconditioning can help with scale adjustment.

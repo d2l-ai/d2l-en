@@ -193,9 +193,9 @@ $$h_{i} = \sum_{j=1}^{n_\mathrm{in}} W_{ij} x_j$$
 
 The weights $W_{ij}$ are all drawn independently from the same distribution. Furthermore, let us assume that this distribution
 has zero mean and variance $\sigma^2$
-(this doesn't mean that the distribution has to be Gaussian,
+(this does not mean that the distribution has to be Gaussian,
 just that mean and variance need to exist).
-We don't really have much control
+We do not really have much control
 over the inputs into the layer $x_j$
 but let us proceed with the somewhat unrealistic assumption
 that they also have zero mean and variance $\gamma^2$

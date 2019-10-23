@@ -36,7 +36,7 @@ tht are updated with respect to the ultimate objective
 
 While you might think that neurons, layers, and models
 give us enough abstractions to go about our business,
-it turns out that we'll often want to express our model
+it turns out that we will often want to express our model
 in terms of a components that are large than an indivudal layer.
 For example, when designing models, like ResNet-152,
 which possess hundreds (152, thus the name) of layers,
@@ -200,7 +200,7 @@ to save us from reimplementing boilerplate code applicable to most Blocks.
 Then, all that's left is to instantiate our two `Dense` layers,
 assigning them to `self.hidden` and `self.output`, respectively.
 Again note that when dealing with standard functionality like this,
-we don't have to worry about backpropagation,
+we do not have to worry about backpropagation,
 since the `backward` method is generated for us automatically.
 The same goes for the `initialize` method.
 Let us try this out:
@@ -279,7 +279,7 @@ In this case 3 is a constant parameter. We could change 3 to something else, say
 
 $$f(\mathbf{x},\mathbf{w}) = c \cdot \mathbf{w}^\top \mathbf{x}.$$
 
-Nothing has really changed, except that we can adjust the value of $c$. It is still a constant as far as $\mathbf{w}$ and $\mathbf{x}$ are concerned. However, since Gluon doesn't know about this beforehand, it is worth while to give it a hand (this makes the code go faster, too, since we are not sending the Gluon engine on a wild goose chase after a parameter that doesn't change). `get_constant` is the method that can be used to accomplish this. Let us see what this looks like in practice.
+Nothing has really changed, except that we can adjust the value of $c$. It is still a constant as far as $\mathbf{w}$ and $\mathbf{x}$ are concerned. However, since Gluon does not know about this beforehand, it is worth while to give it a hand (this makes the code go faster, too, since we are not sending the Gluon engine on a wild goose chase after a parameter that does not change). `get_constant` is the method that can be used to accomplish this. Let us see what this looks like in practice.
 
 ```{.python .input  n=5}
 class FancyMLP(nn.Block):

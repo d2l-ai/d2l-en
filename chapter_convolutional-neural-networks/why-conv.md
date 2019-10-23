@@ -49,7 +49,7 @@ should not be overly concerned with the precise *location*
 of the object shouldn't in the image.
 Ideally we could learn a system
 that would somehow exploit this knowledge.
-Pigs usually don't fly and planes usually don't swim.
+Pigs usually do not fly and planes usually do not swim.
 Nonetheless, we could still recognize a flying pig were one to appear.
 This ideas is taken to an extreme in the children's game 'Where's Waldo', an
 example is shown in :numref:`img_waldo`.
@@ -111,7 +111,7 @@ centered around $(i,j)$ and weighted by $V[i,j,a,b]$.
 Now let us invoke the first principle we established above—*translation invariance*.
 This implies that a shift in the inputs $x$
 should simply lead to a shift in the activations $h$.
-This is only possible if $V$ and $u$ don't actually depend on $(i,j)$,
+This is only possible if $V$ and $u$ do not actually depend on $(i,j)$,
 i.e., we have $V[i,j,a,b] = V[a,b]$ and $u$ is a constant.
 As a result we can simplify the definition for $h$.
 

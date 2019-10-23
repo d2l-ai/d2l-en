@@ -72,7 +72,7 @@ This provides us with a third way of accessing the parameters of the network. If
 net.collect_params()['dense1_bias'].data()
 ```
 
-Throughout the book we'll see how various blocks name their subblocks (Sequential simply numbers them). This makes it very convenient to use regular expressions to filter out the required parameters.
+Throughout the book we will see how various blocks name their subblocks (Sequential simply numbers them). This makes it very convenient to use regular expressions to filter out the required parameters.
 
 ```{.python .input  n=8}
 print(net.collect_params('.*weight'))

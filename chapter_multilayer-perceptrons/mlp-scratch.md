@@ -23,14 +23,14 @@ train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 
 Recall that this dataset contains 10 classes and that
 each image consists of a $28 \times 28 = 784$ grid of pixel values.
-Since we'll be discarding the spatial structure (for now),
+Since we will be discarding the spatial structure (for now),
 we can just think of this as a classification dataset
 with $784$ input features and $10$ classes.
 In particular we will implement our MLP
 with one hidden layer and $256$ hidden units.
 Note that we can regard both of these choices as *hyperparameters*
 that could be set based on performance on validation data.
-Typically, we'll choose layer widths as powers of $2$
+Typically, we will choose layer widths as powers of $2$
 to make everything align nicely in memory.
 
 Again, we will represent our parameters with several `ndarray`s.

@@ -88,7 +88,7 @@ they only covered selected topics in deep learning, and often lacked associated 
 On the other hand, while several textbooks have emerged,
 most notably :cite:`Goodfellow.Bengio.Courville.2016`,
 which offers an excellent survey of the concepts behind deep learning,
-these resources don't marry the descriptions to realizations of the concepts in code,
+these resources do not marry the descriptions to realizations of the concepts in code,
 sometimes leaving readers clueless as to how to implement them.
 Moreover, too many resources are hidden behind the paywalls of commercial course providers.
 
@@ -129,8 +129,8 @@ on linear regression requires a non-trivial amount of work.
 While experts love this book precisely for its thoroughness,
 for beginners, this property limits its usefulness as an introductory text.
 
-In this book, we'll teach most concepts *just in time*.
-In other words, you'll learn concepts at the very moment
+In this book, we will teach most concepts *just in time*.
+In other words, you will learn concepts at the very moment
 that they are needed to accomplish some practical end.
 While we take some time at the outset to teach
 fundamental preliminaries, like linear algebra and probability.
@@ -160,7 +160,7 @@ This helps to give practitioners the necessary
 ammunition to solve problems quickly,
 at the expense of requiring the reader to trust us with some curatorial decisions.
 
-Throughout, we'll be working with the MXNet library,
+Throughout, we will be working with the MXNet library,
 which has the rare property of being flexible enough for research
 while being fast enough for production.
 This book will teach deep learning concepts from scratch.
@@ -168,7 +168,7 @@ Sometimes, we want to delve into fine details about the models
 that would typically be hidden from the user by ``Gluon``'s advanced abstractions.
 This comes up especially in the basic tutorials,
 where we want you to understand everything that happens in a given layer or optimizer.
-In these cases, we'll often present two versions of the example:
+In these cases, we will often present two versions of the example:
 one where we implement everything from scratch,
 relying only on NDArray and automatic differentiation,
 and another, more practical example, where we write succinct code using ``Gluon``.
@@ -188,7 +188,7 @@ The book can be roughly divided into three parts, which are presented by differe
 
 * The first part covers prerequisites and basics.  The first chapter offers an
 introduction to deep learning in :numref:`chap_introduction`.  In
-:numref:`chap_preliminaries`, we'll quickly bring you up to speed on the
+:numref:`chap_preliminaries`, we will quickly bring you up to speed on the
 prerequisites required for hands-on deep learning, such as how to acquire and
 run the codes covered in the book.  :numref:`chap_linear` and
 :numref:`chap_perceptrons` cover the most basic concepts and techniques of deep
@@ -281,7 +281,7 @@ This book is for students (undergraduate or graduate), engineers, and
 researchers, who seek a solid grasp of the practical techniques of deep
 learning.  Because we explain every concept from scratch, no previous background
 in deep learning or machine learning is required.  Fully explaining the methods
-of deep learning requires some mathematics and programming, but we'll only
+of deep learning requires some mathematics and programming, but we will only
 assume that you come in with some basics, including (the very basics of) linear
 algebra, calculus, probability, and Python programming.  Moreover, this book's
 appendix provides a refresher on most of the mathematics covered in this book.
@@ -334,7 +334,7 @@ and continuous encouragement this book would not have happened.
 * Gluon is a high level library that makes it easy to code up deep learning models using Apache MXNet.
 * Conda is a Python package manager that ensures that all software dependencies are met.
 * All notebooks are available for download on GitHub and  the conda configurations needed to run this book's code are expressed in the `environment.yml` file.
-* If you plan to run this code on GPUs, don't forget to install the necessary drivers and update your configuration.
+* If you plan to run this code on GPUs, do not forget to install the necessary drivers and update your configuration.
 
 
 ## Exercises
@@ -342,7 +342,7 @@ and continuous encouragement this book would not have happened.
 1. Register an account on the discussion forum of this book [discuss.mxnet.io](https://discuss.mxnet.io/).
 1. Install Python on your computer.
 1. Follow the links at the bottom of the section to the forum,
-where you'll be able to seek out help and discuss the book and find answers to your questions
+where you will be able to seek out help and discuss the book and find answers to your questions
 by engaging the authors and broader community.
 1. Create an account on the forum and introduce yourself.
 

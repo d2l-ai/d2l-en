@@ -91,7 +91,7 @@ may have taken a bit of work,
 you can see below that implementing it
 in a modern deep learning library
 is remarkably simple.
-Again, we'll rely on the Sequential class.
+Again, we will rely on the Sequential class.
 
 ```{.python .input}
 import d2l
