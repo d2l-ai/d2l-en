@@ -156,8 +156,10 @@ from mxnet import gluon
  
 X_train, y_train = gluon.data.vision.FashionMNIST(train=True) 
 X_test, y_test = gluon.data.vision.FashionMNIST(train=False)
+X_train = X_train.asnumpy(); y_train = y_train.asnumpy();
+X_test = X_test.asnumpy(); y_test = y_test.asnumpy();
 
-### Compute and visualize the means
+### Compute the means
     
 ave_0 = np.mean(X_train[y_train == 0],axis=0)
 ave_1 = np.mean(X_train[y_train == 1],axis=0)
@@ -572,7 +574,7 @@ A = np.array([[1.0, 0.1, 0.1, 0.1],
               [0.1, 0.3, 0.5, 9.0]])
 
 v, _ = np.linalg.eig(A)
-print(v)
+v
 ```
 
 In this way, eigenvalues can be approximated, and the approximations will be pretty strong in the case that the diagonal is significantly larger than all the other elements.  
@@ -671,8 +673,10 @@ for i in range(1,100):
     norm_list.append(np.linalg.norm(v_in))
     
 d2l.plot(np.arange(0,100),norm_list,'Iteration','Value')
+```
 
-# Also the ratio
+```
+# Also plot the ratio
 norm_ratio_list = []
 for i in range(1,100):
     norm_ratio_list.append(norm_list[i]/norm_list[i-1])
