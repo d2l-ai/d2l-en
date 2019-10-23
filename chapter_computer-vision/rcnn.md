@@ -60,7 +60,7 @@ forward computation on the image as a whole.
 ![Fast R-CNN model. ](../img/fast-rcnn.svg)
 :label:`fig_fast_r-cnn`
 
-:numref:`fig_fast_r-cnn` shows a Fast R-CNN model. It's primary computation
+:numref:`fig_fast_r-cnn` shows a Fast R-CNN model. It is primary computation
 steps are described below:
 
 1. Compared to an R-CNN model, a Fast R-CNN model uses the entire image as the

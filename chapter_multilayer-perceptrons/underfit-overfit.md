@@ -4,7 +4,7 @@
 As machine learning scientists, our goal is to discover general patterns.
 Say, for example, that we wish to learn the pattern
 that associates genetic markers with the development of dementia in adulthood.
-It's easy enough to memorize our training set.
+It is easy enough to memorize our training set.
 Each person's genes uniquely identify them,
 not just among people represented in our dataset,
 but among all people on earth!
@@ -340,7 +340,7 @@ we want to watch out for the cases
 when our training error is significantly lower
 than our validation error, indicating severe overfitting.
 Note that overfitting is not always a bad thing.
-With deep learning especially, it's well known
+With deep learning especially, it is well known
 that the best predictive models often perform
 far better on training data than on holdout data.
 Ultimately, we usually care more about the validation error

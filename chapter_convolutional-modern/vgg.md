@@ -20,7 +20,7 @@ The idea of using blocks first emerged from the
 [Visual Geometry Group](http://www.robots.ox.ac.uk/~vgg/) (VGG)
 at Oxford University.
 In their eponymously-named VGG network,
-It's easy to implement these repeated structures in code
+It is easy to implement these repeated structures in code
 with any modern deep learning framework by using loops and subroutines.
 
 

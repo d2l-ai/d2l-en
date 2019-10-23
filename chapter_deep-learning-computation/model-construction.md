@@ -279,7 +279,7 @@ In this case 3 is a constant parameter. We could change 3 to something else, say
 
 $$f(\mathbf{x},\mathbf{w}) = c \cdot \mathbf{w}^\top \mathbf{x}.$$
 
-Nothing has really changed, except that we can adjust the value of $c$. It is still a constant as far as $\mathbf{w}$ and $\mathbf{x}$ are concerned. However, since Gluon doesn't know about this beforehand, it's worth while to give it a hand (this makes the code go faster, too, since we're not sending the Gluon engine on a wild goose chase after a parameter that doesn't change). `get_constant` is the method that can be used to accomplish this. Let us see what this looks like in practice.
+Nothing has really changed, except that we can adjust the value of $c$. It is still a constant as far as $\mathbf{w}$ and $\mathbf{x}$ are concerned. However, since Gluon doesn't know about this beforehand, it is worth while to give it a hand (this makes the code go faster, too, since we're not sending the Gluon engine on a wild goose chase after a parameter that doesn't change). `get_constant` is the method that can be used to accomplish this. Let us see what this looks like in practice.
 
 ```{.python .input  n=5}
 class FancyMLP(nn.Block):
@@ -341,7 +341,7 @@ chimera(x)
 The avid reader is probably starting to worry about the efficiency of this. After all, we have lots of dictionary lookups, code execution, and lots of other Pythonic things going on in what is supposed to be a high performance deep learning library. The problems of Python's [Global Interpreter Lock](https://wiki.python.org/moin/GlobalInterpreterLock) are well known. In the context of deep learning it means that we have a super fast GPU (or multiple of them) which might have to wait until a puny single CPU core running Python gets a chance to tell it what to do next. This is clearly awful and there are many ways around it. The best way to speed up Python is by avoiding it altogether.
 
 Gluon does this by allowing for Hybridization (:numref:`sec_hybridize`). In it, the Python
-interpreter executes the block the first time it's invoked. The Gluon runtime
+interpreter executes the block the first time it is invoked. The Gluon runtime
 records what is happening and the next time around it short circuits any calls
 to Python. This can accelerate things considerably in some cases but care needs
 to be taken with control flow. We suggest that the interested reader skip

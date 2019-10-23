@@ -65,7 +65,7 @@ And here is where reality comes in:
 for some examples, some data is altogether missing
 with the missing value marked simply as 'na'.
 The price of each house is included for the training set only
-(it's a competition after all).
+(it is a competition after all).
 You can partition the training set to create a validation set,
 but you'll only find out how you perform on the official test set
 when you upload your predictions and receive your score.
@@ -388,7 +388,7 @@ Let us invoke our model.
 One nice sanity check is to see
 whether the predictions on the test set
 resemble those of the k-fold cross-validation process.
-If they do, it's time to upload them to Kaggle.
+If they do, it is time to upload them to Kaggle.
 The following code will generate a file called `submission.csv`
 (CSV is one of the file formats accepted by Kaggle):
 

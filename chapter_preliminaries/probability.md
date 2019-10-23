@@ -6,14 +6,14 @@ We might want to predict the *probability* of a patient suffering a heart attack
 learning models, and to give you enough of a flavor for the subject that you can begin to explore it on your own if you wish.
 
 
-We've already invoked probabilities in previous sections without articulating what precisely they are or giving a concrete example. Let us get more serious now by considering the problem of distinguishing cats and dogs based on photographs. This might sound simple but it's actually a formidable challenge. To start with, the difficulty of the problem may depend on the resolution of the image.
+We've already invoked probabilities in previous sections without articulating what precisely they are or giving a concrete example. Let us get more serious now by considering the problem of distinguishing cats and dogs based on photographs. This might sound simple but it is actually a formidable challenge. To start with, the difficulty of the problem may depend on the resolution of the image.
 
 | 10px | 20px | 40px | 80px | 160px |
 |:----:|:----:|:----:|:----:|:-----:|
 |![](../img/whitecat10.jpg)|![](../img/whitecat20.jpg)|![](../img/whitecat40.jpg)|![](../img/whitecat80.jpg)|![](../img/whitecat160.jpg)|
 |![](../img/whitedog10.jpg)|![](../img/whitedog20.jpg)|![](../img/whitedog40.jpg)|![](../img/whitedog80.jpg)|![](../img/whitedog160.jpg)|
 
-While it's easy for humans to recognize cats and dogs at 320 pixel resolution,
+While it is easy for humans to recognize cats and dogs at 320 pixel resolution,
 it becomes challenging at 40 pixels and next to impossible at 10 pixels. In
 other words, our ability to tell cats and dogs apart at a large distance (and thus low resolution) might approach uninformed guessing. Probability gives us a
 formal way of reasoning about our level of certainty. If we are completely sure
@@ -24,7 +24,7 @@ $likely$ expressing this as $P(l=\mathrm{cat}) = 0.5$. If we were reasonably
 confident, but not sure that the image depicted a cat, we might assign a
 probability $.5  < P(l=\mathrm{cat}) < 1.0$.
 
-Now consider a second case: given some weather monitoring data, we want to predict the probability that it will rain in Taipei tomorrow. If it's summertime, the rain might come with probability $.5$. In both cases, we have some value of interest. And in both cases we are uncertain about the outcome.
+Now consider a second case: given some weather monitoring data, we want to predict the probability that it will rain in Taipei tomorrow. If it is summertime, the rain might come with probability $.5$. In both cases, we have some value of interest. And in both cases we are uncertain about the outcome.
 But there's a key difference between the two cases. In this first case, the image is in fact either a dog or a cat, we just don't know which. In the second case, the outcome may actually be a random event, if you believe in such things (and most physicists do). So probability is a flexible language for reasoning about our level of certainty, and it can be applied effectively in a broad set of contexts.
 
 ## Basic probability theory

@@ -189,7 +189,7 @@ def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):
     metric = d2l.Accumulator(2)  # loss_sum, num_examples
     for X, Y in train_iter:
         if state is None or use_random_iter:
-            # Initialize state when either it's the first iteration or
+            # Initialize state when either it is the first iteration or
             # using random sampling.
             state = model.begin_state(batch_size=X.shape[0], ctx=ctx)
         else:

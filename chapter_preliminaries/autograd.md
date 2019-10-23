@@ -44,7 +44,7 @@ x
 Note that before we even calculate the gradient 
 of ``y`` with respect to ``x``, 
 we will need a place to store it. 
-It's important that we do not allocate new memory
+It is important that we do not allocate new memory
 every time we take a derivative with respect to a parameter
 because we will often update the same parameters 
 thousands or millions of times 

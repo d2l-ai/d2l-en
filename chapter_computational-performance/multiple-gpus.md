@@ -115,7 +115,7 @@ print('after allreduce:\n', data[0], '\n', data[1])
 
 ## Split a Data Batch into Multiple GPUs
 
-The `utils` module in Gluon provides a function to evenly split an array into multiple parts along the first dimension, and then copy the $i^\mathrm{th}$ part into the $i^\mathrm{th}$ device. It's straightforward to implement, but we will use the pre-implemented version so later chapters can reuse the `split_batch` function we will define later.
+The `utils` module in Gluon provides a function to evenly split an array into multiple parts along the first dimension, and then copy the $i^\mathrm{th}$ part into the $i^\mathrm{th}$ device. It is straightforward to implement, but we will use the pre-implemented version so later chapters can reuse the `split_batch` function we will define later.
 
 Now, we try to divide the 4 data instances equally between 2 GPUs using the `split_and_load` function.
 
