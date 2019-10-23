@@ -48,7 +48,7 @@ $$
 \end{bmatrix}.
 $$
 
-Here, $x_{ij}$ is the element in row $i \in \{1, \ldots, m\}$ and column $j \in \{1, \ldots, n\}$ in the matrix $\mathbf{X}$. Extending the vector notation we use $\mathbf{X} \in \mathbb{R}^{m \times n}$ to indicate that $\mathbf{X}$ is an $m \times n$ matrix. Given the above we could interpret vectors as $m \times 1$ dimensional matrices. Furthermore, matrices also form a vector space, i.e. we can multiply and add them just fine, as long as their dimensions match.
+Here, $x_{ij}$ is the element in row $i \in \{1, \ldots, m\}$ and column $j \in \{1, \ldots, n\}$ in the matrix $\mathbf{X}$. Extending the vector notation we use $\mathbf{X} \in \mathbb{R}^{m \times n}$ to indicate that $\mathbf{X}$ is an $m \times n$ matrix. Given the above we could interpret vectors as $m \times 1$ dimensional matrices. Furthermore, matrices also form a vector space, i.e., we can multiply and add them just fine, as long as their dimensions match.
 
 
 ### Operations
@@ -341,7 +341,7 @@ Here the last equality follows from the linearity of expectation.
 
 ### Uniform Distribution
 
-Assume random variable $X$ obeys a uniform distribution over $[a, b]$, i.e. $X \sim U( a, b)$. In this case, random variable $X$ has the same probability of being any number between $a$ and $b$.
+Assume random variable $X$ obeys a uniform distribution over $[a, b]$, i.e., $X \sim U( a, b)$. In this case, random variable $X$ has the same probability of being any number between $a$ and $b$.
 
 ### Normal Distribution
 

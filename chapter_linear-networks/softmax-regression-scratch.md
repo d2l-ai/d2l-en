@@ -239,7 +239,7 @@ class Accumulator(object):
 
 Because we initialized the `net` model with random weights,
 the accuracy of this model should be close to random guessing,
-i.e. 0.1 for 10 classes.
+i.e., 0.1 for 10 classes.
 
 ```{.python .input  n=14}
 evaluate_accuracy(net, test_iter)

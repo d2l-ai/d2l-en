@@ -196,7 +196,7 @@ entire ImageNet data set and use it to extract image features to be input in the
 custom small-scale output network. Gluon provides a wide range of pre-trained
 models. Here, we will use the pre-trained ResNet-34 model. Because the
 competition data set is a subset of the pre-training data set, we simply reuse
-the input of the pre-trained model's output layer, i.e. the extracted
+the input of the pre-trained model's output layer, i.e., the extracted
 features. Then, we can replace the original output layer with a small custom
 output network that can be trained, such as two fully connected layers in a
 series. Different from the experiment in
@@ -221,7 +221,7 @@ def get_net(ctx):
     return finetune_net
 ```
 
-When calculating the loss, we first use the member variable `features` to obtain the input of the pre-trained model's output layer, i.e. the extracted feature. Then, we use this feature as the input for our small custom output network and compute the output.
+When calculating the loss, we first use the member variable `features` to obtain the input of the pre-trained model's output layer, i.e., the extracted feature. Then, we use this feature as the input for our small custom output network and compute the output.
 
 ```{.python .input}
 loss = gluon.loss.SoftmaxCrossEntropyLoss()

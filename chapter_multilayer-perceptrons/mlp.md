@@ -171,7 +171,7 @@ $$
 $$
 
 With some abuse of notation, we define the nonlinearity $\sigma$
-to apply to its inputs on a row-wise fashion, i.e. one observation at a time.
+to apply to its inputs on a row-wise fashion, i.e., one observation at a time.
 Note that we are also using the notation for *softmax* in the same way to denote a row-wise operation.
 Often, as in this chapter, the activation functions that we apply to hidden layers are not merely row-wise, but component wise.
 That means that after computing the linear portion of the layer,

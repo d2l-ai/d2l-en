@@ -35,7 +35,7 @@ The encoder discussed above is a unidirectional RNN, and the hidden state of eac
 
 ## Decoder
 
-As we just mentioned, the context variable $\boldsymbol{c}$ of the encoder's output encodes the entire input sequence $x_1, \ldots, x_T$. Given the output sequence $y_1, y_2, \ldots, y_{T'}$ in the training example, for each time step $t'$ (the symbol differs from the input sequence and the encoder's time step $t$), the conditional probability of decoder output $y_{t'}$ will be based on the previous output sequence $y_1, \ldots, y_{t'-1}$ and context variable $\boldsymbol{c}$, i.e. $\mathbb{P }(y_{t'} \mid y_1, \ldots, y_{t'-1}, \boldsymbol{c})$.
+As we just mentioned, the context variable $\boldsymbol{c}$ of the encoder's output encodes the entire input sequence $x_1, \ldots, x_T$. Given the output sequence $y_1, y_2, \ldots, y_{T'}$ in the training example, for each time step $t'$ (the symbol differs from the input sequence and the encoder's time step $t$), the conditional probability of decoder output $y_{t'}$ will be based on the previous output sequence $y_1, \ldots, y_{t'-1}$ and context variable $\boldsymbol{c}$, i.e., $\mathbb{P }(y_{t'} \mid y_1, \ldots, y_{t'-1}, \boldsymbol{c})$.
 
 Therefore, we can use another RNN as a decoder.
 At time step $t^\prime$ of the output sequence, the decoder uses the output $y_{t^\prime-1}$ from the previous time step and context variable $\boldsymbol{c}$ as its input and transforms their hidden state $\boldsymbol{s}_{t^\prime-1}$ from the previous time step into hidden state $\boldsymbol{s}_{t^\prime}$ of the current time step.  Therefore, we can use function $f$ to express the transformation of the decoder's hidden layer:

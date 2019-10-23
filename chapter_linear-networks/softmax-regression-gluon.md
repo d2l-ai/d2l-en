@@ -42,9 +42,9 @@ calculates $\hat y_j = \frac{e^{z_j}}{\sum_{i=1}^{n} e^{z_i}}$, where $\hat y_j$
 is the $j^\mathrm{th}$ element of ``yhat`` and $z_j$ is the $j^\mathrm{th}$ element of the input
 ``y_linear`` variable, as computed by the softmax.
 
-If some of the $z_i$ are very large (i.e. very positive),
+If some of the $z_i$ are very large (i.e., very positive),
 $e^{z_i}$ might be larger than the largest number
-we can have for certain types of ``float`` (i.e. overflow).
+we can have for certain types of ``float`` (i.e., overflow).
 This would make the denominator (and/or numerator) ``inf`` and we get zero,
 or ``inf``, or ``nan`` for $\hat y_j$.
 In any case, we will not get a well-defined return value for ``cross_entropy``. This is the reason we subtract $\text{max}(z_i)$
