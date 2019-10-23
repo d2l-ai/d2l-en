@@ -639,7 +639,7 @@ norm_ratio_list = []
 for i in range(1,100):
     norm_ratio_list.append(norm_list[i]/norm_list[i-1])
     
-d2l.plot(np.arange(1,100),norm_list,'Iteration','Ratio')
+d2l.plot(np.arange(1,100),norm_ratio_list,'Iteration','Ratio')
 ```
 
 If we look at the last portion of the above computation, we see that the random vector is stretched by a factor of ```1.974459321485[...]``` where the portion at the end shifts a little, but the stretching factor is stable.  
