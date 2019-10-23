@@ -8,7 +8,7 @@ Our parents had no idea what machine learning was,
 let alone why we might prefer it to a career in medicine or law.
 Machine learning was a forward-looking academic discipline
 with a narrow set of real-world applications.
-And those applications, e.g. speech recognition and computer vision,
+And those applications, e.g., speech recognition and computer vision,
 required so much domain knowledge that they were often regarded
 as separate areas entirely for which machine learning was one small component.
 Neural networks, the antecedents of the deep learning models
@@ -76,14 +76,14 @@ with anything resembling of technical depth,
 and (3) interleaved the exposition one expects from an engaging textbook
 with the clean runnable code one seeks in hands-on tutorials.
 We found plenty of code examples for how to use a given deep learning
-framework (e.g. how to do basic numerical computing with matrices in TensorFlow)
-or for implementing particular techniques (e.g. code snippets for LeNet, AlexNet, ResNets, etc)
+framework (e.g., how to do basic numerical computing with matrices in TensorFlow)
+or for implementing particular techniques (e.g., code snippets for LeNet, AlexNet, ResNets, etc)
 in the form of blog posts or on GitHub.
 However, these examples typically focused on
 *how* to implement a given approach,
 but left out the discussion of *why* certain algorithmic decisions are made.
 While sporadic topics have been covered in blog posts,
-e.g. on the website [Distill](http://distill.pub) or personal blogs,
+e.g., on the website [Distill](http://distill.pub) or personal blogs,
 they only covered selected topics in deep learning, and often lacked associated code.
 On the other hand, while several textbooks have emerged,
 most notably :cite:`Goodfellow.Bengio.Courville.2016`,

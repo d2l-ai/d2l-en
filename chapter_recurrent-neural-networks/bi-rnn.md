@@ -1,12 +1,12 @@
 # Bidirectional Recurrent Neural Networks
 
-So far we assumed that our goal is to model the next word given what we've seen so far, e.g. in the context of a time series or in the context of a language model. While this is a typical scenario, it is not the only one we might encounter. To illustrate the issue, consider the following three tasks of filling in the blanks in a text:
+So far we assumed that our goal is to model the next word given what we've seen so far, e.g., in the context of a time series or in the context of a language model. While this is a typical scenario, it is not the only one we might encounter. To illustrate the issue, consider the following three tasks of filling in the blanks in a text:
 
 1. `I am _____`
 2. `I am _____ very hungry.`
 3. `I am _____ very hungry, I could eat half a pig.`
 
-Depending on the amount of information available we might fill the blanks with very different words such as *'happy'*, *'not'*, and *'very'*. Clearly the end of the phrase (if available) conveys significant information about which word to pick. A sequence model that is incapable of taking advantage of this will perform poorly on related tasks. For instance, to do well in named entity recognition (e.g. to recognize whether *Green* refers to *Mr. Green* or to the color) longer-range context is equally vital. To get some inspiration for addressing the problem let us take a detour to graphical models.
+Depending on the amount of information available we might fill the blanks with very different words such as *'happy'*, *'not'*, and *'very'*. Clearly the end of the phrase (if available) conveys significant information about which word to pick. A sequence model that is incapable of taking advantage of this will perform poorly on related tasks. For instance, to do well in named entity recognition (e.g., to recognize whether *Green* refers to *Mr. Green* or to the color) longer-range context is equally vital. To get some inspiration for addressing the problem let us take a detour to graphical models.
 
 ## Dynamic Programming
 
@@ -89,7 +89,7 @@ One of the key features of a bidirectional RNN is that information from both end
 
 To add insult to injury bidirectional RNNs are also exceedingly slow. The main reason for this is that they require both a forward and a backward pass and that the backward pass is dependent on the outcomes of the forward pass. Hence gradients will have a very long dependency chain.
 
-In practice bidirectional layers are used very sparingly and only for a narrow set of applications, such as filling in missing words, annotating tokens (e.g. for named entity recognition), or encoding sequences wholesale as a step in a sequence processing pipeline (e.g. for machine translation). In short, handle with care!
+In practice bidirectional layers are used very sparingly and only for a narrow set of applications, such as filling in missing words, annotating tokens (e.g., for named entity recognition), or encoding sequences wholesale as a step in a sequence processing pipeline (e.g., for machine translation). In short, handle with care!
 
 
 ### Training a BLSTM for the Wrong Application
@@ -115,7 +115,7 @@ d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, ctx)
 ```
 
 The output is clearly unsatisfactory for the reasons described above. For a
-discussion of more effective uses of bidirectional models see e.g. the sentiment
+discussion of more effective uses of bidirectional models see e.g., the sentiment
 classification in :numref:`sec_sentiment_rnn`.
 
 ## Summary

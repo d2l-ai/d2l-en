@@ -7,7 +7,7 @@ In :numref:`sec_text_preprocessing`, we see how to map text data into tokens, an
 
 $$p(x_1,x_2, \ldots, x_T).$$
 
-Language models are incredibly useful. For instance, an ideal language model would be able to generate natural text just on its own, simply by drawing one word at a time $w_t \sim p(w_t|w_{t-1}, \ldots, w_1)$. Quite unlike the monkey using a typewriter, all text emerging from such a model would pass as natural language, e.g. English text. Furthermore, it would be sufficient for generating a meaningful dialog, simply by conditioning the text on previous dialog fragments. Clearly we are still very far from designing such a system, since it would need to *understand* the text rather than just generate grammatically sensible content.
+Language models are incredibly useful. For instance, an ideal language model would be able to generate natural text just on its own, simply by drawing one word at a time $w_t \sim p(w_t|w_{t-1}, \ldots, w_1)$. Quite unlike the monkey using a typewriter, all text emerging from such a model would pass as natural language, e.g., English text. Furthermore, it would be sufficient for generating a meaningful dialog, simply by conditioning the text on previous dialog fragments. Clearly we are still very far from designing such a system, since it would need to *understand* the text rather than just generate grammatically sensible content.
 
 Nonetheless language models are of great service even in their limited form. For instance, the phrases *'to recognize speech'* and *'to wreck a nice beach'* sound very similar. This can cause ambiguity in speech recognition, ambiguity that is easily resolved through a language model which rejects the second translation as outlandish. Likewise, in a document summarization algorithm it's worth while knowing that *'dog bites man'* is much more frequent than *'man bites dog'*, or that *'let us eat grandma'* is a rather disturbing statement, whereas *'let us eat, grandma'* is much more benign.
 
@@ -48,7 +48,7 @@ find enough occurrences to get accurate estimates. Things take a turn for the wo
 A common strategy is to perform some form of Laplace smoothing. We already
 encountered this in our discussion of
 naive bayes in :numref:`sec_naive_bayes` where the solution was to
-add a small constant to all counts. This helps with singletons, e.g. via
+add a small constant to all counts. This helps with singletons, e.g., via
 
 $$\begin{aligned}
 	\hat{p}(w) & = \frac{n(w) + \epsilon_1/m}{n + \epsilon_1} \\
@@ -60,7 +60,7 @@ Here the coefficients $\epsilon_i > 0$ determine how much we use the
 estimate for a shorter sequence as a fill-in for longer
 ones. Moreover, $m$ is the total number of words we encounter. The
 above is a rather primitive variant of what is Kneser-Ney smoothing
-and Bayesian Nonparametrics can accomplish. See e.g. the Sequence
+and Bayesian Nonparametrics can accomplish. See e.g., the Sequence
 Memoizer of Wood et al., 2012 for more details of how to accomplish
 this. Unfortunately, models like this get unwieldy rather quickly:
 first off, we need to store all counts and secondly, this entirely

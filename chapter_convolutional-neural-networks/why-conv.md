@@ -148,7 +148,7 @@ When that bias agrees with reality,
 we get sample-efficient models
 that generalize well to unseen data.
 But of course, if those biases do not agree with reality,
-e.g. if images turned out not to be translation invariant,
+e.g., if images turned out not to be translation invariant,
 
 
 
@@ -223,7 +223,7 @@ $$h[i,j,k] = \sum_{a = -\Delta}^{\Delta} \sum_{b = -\Delta}^{\Delta} \sum_c V[a,
 This is the definition of a convolutional neural network layer.
 There are still many operations that we need to address.
 For instance, we need to figure out how to combine all the activations
-to a single output (e.g. whether there's a Waldo in the image).
+to a single output (e.g., whether there's a Waldo in the image).
 We also need to decide how to compute things efficiently,
 how to combine multiple layers, and whether it is a good idea
 to have many narrow or a few wide layers.

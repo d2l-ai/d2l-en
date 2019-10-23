@@ -1,14 +1,14 @@
 # Basics
 :label:`sec_math`
 
-This section summarizes basic tools from linear algebra, differentiation, and probability required to understand the contents in this book. We avoid details beyond the bare minimum to keep things streamlined and easily accessible. In some cases we simplify things to keep them easily accessible. For more background see e.g. the excellent [Data Science 100](http://ds100.org) course at UC Berkeley.
+This section summarizes basic tools from linear algebra, differentiation, and probability required to understand the contents in this book. We avoid details beyond the bare minimum to keep things streamlined and easily accessible. In some cases we simplify things to keep them easily accessible. For more background see e.g., the excellent [Data Science 100](http://ds100.org) course at UC Berkeley.
 
 ## Linear Algebra
 
 This is a brief summary of vectors, matrices, operators, norms, eigenvectors,
 and eigenvalues. They're needed since a significant part of deep learning
 revolves around manipulating matrices and vectors. For a much more in-depth
-introduction to linear algebra in Python see e.g. the
+introduction to linear algebra in Python see e.g., the
 [Jupyter notebooks](https://github.com/juanklopper/MIT_OCW_Linear_Algebra_18_06)
 of Gilbert Strang's MIT course on
 [Linear Algebra](http://web.mit.edu/18.06/www/videos.shtml).

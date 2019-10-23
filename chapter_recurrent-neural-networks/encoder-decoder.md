@@ -1,6 +1,6 @@
 # Encoder-Decoder Architecture
 
-The encoder-decoder architecture is a neural network design pattern. In this architecture, the network is partitioned into two parts, the encoder and the decoder. The encoder's role is encoding the inputs into state, which often contains several tensors. Then the state is passed into the decoder to generate the outputs. In machine translation, the encoder transforms a source sentence, e.g. "Hello world.", into state, e.g. a vector, that captures its semantic information. The decoder then uses this state to generate the translated target sentence, e.g. "Bonjour le monde.".
+The encoder-decoder architecture is a neural network design pattern. In this architecture, the network is partitioned into two parts, the encoder and the decoder. The encoder's role is encoding the inputs into state, which often contains several tensors. Then the state is passed into the decoder to generate the outputs. In machine translation, the encoder transforms a source sentence, e.g., "Hello world.", into state, e.g., a vector, that captures its semantic information. The decoder then uses this state to generate the translated target sentence, e.g., "Bonjour le monde.".
 
 ![The encoder-decoder architecture.](../img/encoder-decoder.svg)
 
@@ -12,7 +12,7 @@ from mxnet.gluon import nn
 
 ## Encoder
 
-The encoder is a normal neural network that takes inputs, e.g. a source sentence, to return outputs.
+The encoder is a normal neural network that takes inputs, e.g., a source sentence, to return outputs.
 
 ```{.python .input  n=2}
 # Saved in the d2l package for later use
@@ -27,7 +27,7 @@ class Encoder(nn.Block):
 
 ## Decoder
 
-The decoder has an additional method `init_state` to parse the outputs of the encoder with possible additional information, e.g. the valid lengths of inputs, to return the state it needs. In the forward method, the decoder takes both inputs, e.g. a target sentence, and the state. It returns outputs, with potentially modified state if the encoder contains RNN layers.
+The decoder has an additional method `init_state` to parse the outputs of the encoder with possible additional information, e.g., the valid lengths of inputs, to return the state it needs. In the forward method, the decoder takes both inputs, e.g., a target sentence, and the state. It returns outputs, with potentially modified state if the encoder contains RNN layers.
 
 ```{.python .input  n=3}
 # Saved in the d2l package for later use

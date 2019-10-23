@@ -64,7 +64,7 @@ In principle, there's nothing wrong with unfolding $p(x_1, \ldots, x_T)$ in reve
 $$p(x_1, \ldots, x_T) = \prod_{t=T}^1 p(x_t|x_{t+1}, \ldots, x_T).$$
 
 In fact, if we have a Markov model, we can obtain a reverse conditional probability distribution, too.
-In many cases, however, there exists a natural direction for the data, namely going forward in time. It is clear that future events cannot influence the past. Hence, if we change $x_t$, we may be able to influence what happens for $x_{t+1}$ going forward but not the converse. That is, if we change $x_t$, the distribution over past events will not change. Consequently, it ought to be easier to explain $p(x_{t+1}|x_t)$ rather than $p(x_t|x_{t+1})$. For instance, [Hoyer et al., 2008](https://papers.nips.cc/paper/3548-nonlinear-causal-discovery-with-additive-noise-models) show that in some cases we can find $x_{t+1} = f(x_t) + \epsilon$ for some additive noise, whereas the converse is not true. This is great news, since it is typically the forward direction that we're interested in estimating. For more on this topic see e.g. the book by [Peters, Janzing and Schölkopf, 2015](https://mitpress.mit.edu/books/elements-causal-inference). We are barely scratching the surface of it.
+In many cases, however, there exists a natural direction for the data, namely going forward in time. It is clear that future events cannot influence the past. Hence, if we change $x_t$, we may be able to influence what happens for $x_{t+1}$ going forward but not the converse. That is, if we change $x_t$, the distribution over past events will not change. Consequently, it ought to be easier to explain $p(x_{t+1}|x_t)$ rather than $p(x_t|x_{t+1})$. For instance, [Hoyer et al., 2008](https://papers.nips.cc/paper/3548-nonlinear-causal-discovery-with-additive-noise-models) show that in some cases we can find $x_{t+1} = f(x_t) + \epsilon$ for some additive noise, whereas the converse is not true. This is great news, since it is typically the forward direction that we're interested in estimating. For more on this topic see e.g., the book by [Peters, Janzing and Schölkopf, 2015](https://mitpress.mit.edu/books/elements-causal-inference). We are barely scratching the surface of it.
 
 ## Toy Example
 
@@ -186,7 +186,7 @@ This clearly illustrates how the quality of the estimates changes as we try to p
 * Sequence models require specialized statistical tools for estimation. Two popular choices are autoregressive models and latent-variable autoregressive models.
 * As we predict further in time, the errors accumulate and the quality of the estimates degrades, often dramatically.
 * There's quite a difference in difficulty between filling in the blanks in a sequence (smoothing) and forecasting. Consequently, if you have a time series, always respect the temporal order of the data when training, i.e., never train on future data.
-* For causal models (e.g. time going forward), estimating the forward direction is typically a lot easier than the reverse direction, i.e., we can get by with simpler networks.
+* For causal models (e.g., time going forward), estimating the forward direction is typically a lot easier than the reverse direction, i.e., we can get by with simpler networks.
 
 ## Exercises
 

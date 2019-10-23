@@ -55,7 +55,7 @@ def get_params(vocab_size, num_hiddens, ctx):
 
 ## RNN Model
 
-First, we need an `init_rnn_state` function to return the hidden state at initialization. It returns an `ndarray` filled with 0 and with a shape of (batch size, number of hidden units). Using tuples makes it easier to handle situations where the hidden state contains multiple variables (e.g. when combining multiple layers in an RNN where each layers requires initializing).
+First, we need an `init_rnn_state` function to return the hidden state at initialization. It returns an `ndarray` filled with 0 and with a shape of (batch size, number of hidden units). Using tuples makes it easier to handle situations where the hidden state contains multiple variables (e.g., when combining multiple layers in an RNN where each layers requires initializing).
 
 ```{.python .input  n=20}
 def init_rnn_state(batch_size, num_hiddens, ctx):
@@ -101,7 +101,7 @@ class RNNModelScratch(object):
         return self.init_state(batch_size, self.num_hiddens, ctx)
 ```
 
-Let us do a sanity check whether inputs and outputs have the correct dimensions, e.g. to ensure that the dimensionality of the hidden state hasn't changed.
+Let us do a sanity check whether inputs and outputs have the correct dimensions, e.g., to ensure that the dimensionality of the hidden state hasn't changed.
 
 ```{.python .input}
 vocab_size, num_hiddens, ctx = len(vocab), 512, d2l.try_gpu()
@@ -141,7 +141,7 @@ predict_ch8('time traveller ', 10, model, vocab, ctx)
 
 ## Gradient Clipping
 
-For a sequence of length $T$, we compute the gradients over these $T$ time steps in an iteration, which results in a chain of matrix-products with length  $O(T)$ during backpropagating. As mentioned in :numref:`sec_numerical_stability`, it might result in numerical instability,  e.g. the gradients may either explode or vanish, when $T$ is large. Therefore RNN models often need extra help to stabilize the training.
+For a sequence of length $T$, we compute the gradients over these $T$ time steps in an iteration, which results in a chain of matrix-products with length  $O(T)$ during backpropagating. As mentioned in :numref:`sec_numerical_stability`, it might result in numerical instability,  e.g., the gradients may either explode or vanish, when $T$ is large. Therefore RNN models often need extra help to stabilize the training.
 
 Recall that when solving an optimization problem, we take update steps for the weights $\mathbf{w}$ in the general direction of the negative gradient $\mathbf{g}_t$ on a minibatch, say $\mathbf{w} - \eta \cdot \mathbf{g}_t$. Let us further assume that the objective is well behaved, i.e., it is Lipschitz continuous with constant $L$, i.e.
 
@@ -265,10 +265,10 @@ In the following we will see how to improve significantly on the current model a
 1. Show that one-hot encoding is equivalent to picking a different embedding for each object.
 1. Adjust the hyperparameters to improve the perplexity.
     * How low can you go? Adjust embeddings, hidden units, learning rate, etc.
-    * How well will it work on other books by H. G. Wells, e.g. [The War of the Worlds](http://www.gutenberg.org/ebooks/36).
+    * How well will it work on other books by H. G. Wells, e.g., [The War of the Worlds](http://www.gutenberg.org/ebooks/36).
 1. Modify the predict function such as to use sampling rather than picking the most likely next character.
     - What happens?
-    - Bias the model towards more likely outputs, e.g. by sampling from $q(w_t|w_{t-1}, \ldots, w_1) \propto p^\alpha(w_t|w_{t-1}, \ldots, w_1)$ for $\alpha > 1$.
+    - Bias the model towards more likely outputs, e.g., by sampling from $q(w_t|w_{t-1}, \ldots, w_1) \propto p^\alpha(w_t|w_{t-1}, \ldots, w_1)$ for $\alpha > 1$.
 1. Run the code in this section without clipping the gradient. What happens?
 1. Change adjacent sampling so that it does not separate hidden states from the computational graph. Does the running time change? How about the accuracy?
 1. Replace the activation function used in this section with ReLU and repeat the experiments in this section.

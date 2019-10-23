@@ -1,7 +1,7 @@
 # Gradient Descent
 :label:`sec_gd`
 
-In this section we are going to introduce the basic concepts underlying gradient descent. This is brief by necessity. See e.g. :cite:`Boyd.Vandenberghe.2004` for an in-depth introduction to convex optimization. Although the latter is rarely used directly in deep learning, an understanding of gradient descent is key to understanding stochastic gradient descent algorithms. For instance, the optimization problem might diverge due to an overly large learning rate. This phenomenon can already be seen in gradient descent. Likewise, preconditioning is a common technique in gradient descent and carries over to more advanced algorithms. Let us start with a simple special case.
+In this section we are going to introduce the basic concepts underlying gradient descent. This is brief by necessity. See e.g., :cite:`Boyd.Vandenberghe.2004` for an in-depth introduction to convex optimization. Although the latter is rarely used directly in deep learning, an understanding of gradient descent is key to understanding stochastic gradient descent algorithms. For instance, the optimization problem might diverge due to an overly large learning rate. This phenomenon can already be seen in gradient descent. Likewise, preconditioning is a common technique in gradient descent and carries over to more advanced algorithms. Let us start with a simple special case.
 
 ## Gradient Descent in One Dimension
 
@@ -234,7 +234,7 @@ To see why this might be a good idea consider a situation where one variable den
 
 One of the key problems in gradient descent was that we might overshoot the goal or make insufficient progress. A simple fix for the problem is to use line search in conjunction with gradient descent. That is, we use the direction given by $\nabla f(\mathbf{x})$ and then perform binary search as to which steplength $\eta$ minimizes $f(x - \eta \nabla f(\mathbf{x}))$. 
 
-This algorithm converges rapidly (for an analysis and proof see e.g. :cite:`Boyd.Vandenberghe.2004`). However, for the purpose of deep learning this isn't quite so feasible, since each step of the line search would require us to evaluate the objective function on the entire dataset. This is way too costly to accomplish. 
+This algorithm converges rapidly (for an analysis and proof see e.g., :cite:`Boyd.Vandenberghe.2004`). However, for the purpose of deep learning this isn't quite so feasible, since each step of the line search would require us to evaluate the objective function on the entire dataset. This is way too costly to accomplish. 
 
 ## Summary
 

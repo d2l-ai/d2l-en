@@ -132,7 +132,7 @@ $$
 $$
 
 Clearly, we could continue stacking such hidden layers,
-e.g. $\mathbf{h}_1 = \sigma(\mathbf{W}_1 \mathbf{x} + \mathbf{b}_1)$
+e.g., $\mathbf{h}_1 = \sigma(\mathbf{W}_1 \mathbf{x} + \mathbf{b}_1)$
 and $\mathbf{h}_2 = \sigma(\mathbf{W}_2 \mathbf{h}_1 + \mathbf{b}_2)$
 on top of each other to obtain a true multilayer perceptron.
 

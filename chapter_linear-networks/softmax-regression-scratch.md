@@ -182,7 +182,7 @@ to gather the predicted classes
 The result has the same shape as the variable `y`.
 Now we just need to check how frequently the two match.
 Since the equality operator `==` is datatype-sensitive
-(e.g. an `int` and a `float32` are never equal),
+(e.g., an `int` and a `float32` are never equal),
 we also need to convert both to the same type (we pick `float32`).
 The result is an `ndarray` containing entries of 0 (false) and 1 (true).
 Taking the mean yields the desired result.
