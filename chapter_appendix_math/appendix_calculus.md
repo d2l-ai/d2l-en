@@ -390,8 +390,9 @@ grad_f = lambda x,y : np.array([np.exp(x)/(np.exp(x)+np.exp(y)),
                                 np.exp(y)/(np.exp(x)+np.exp(y))])
 
 epsilon = np.array([0.01,-0.03])
-"Approximation: {}".format(f(0,np.log(2)) + epsilon.dot(grad_f(0,np.log(2)))),
-   "True Value: {}".format(f(0+epsilon[0],np.log(2)+epsilon[1]))
+grad_approx = f(0,np.log(2)) + epsilon.dot(grad_f(0,np.log(2)))
+true_value = f(0+epsilon[0],np.log(2)+epsilon[1])
+"Approximation: {}, True Value: {}".format(grad_approx, true_value)
 ```
 
 ### Geometry of gradients and gradient descent
