@@ -1,7 +1,7 @@
 # Concise Implementation of Softmax Regression
 
 Just as Gluon made it much easier to implement linear regression in
-:numref:`sec_linear_gluon`, we'll find it similarly (or possibly more)
+:numref:`sec_linear_gluon`, we will find it similarly (or possibly more)
 convenient for implementing classification models.  Again, we begin with our
 import ritual.
 
@@ -76,10 +76,10 @@ $$
 \end{aligned}
 $$
 
-We'll want to keep the conventional softmax function handy
+We will want to keep the conventional softmax function handy
 in case we ever want to evaluate the probabilities output by our model.
 But instead of passing softmax probabilities into our new loss function,
-we'll just pass $\hat{y}$ and compute the softmax and its log
+we will just pass $\hat{y}$ and compute the softmax and its log
 all at once inside the softmax_cross_entropy loss function,
 which does smart things like the log-sum-exp trick ([see on Wikipedia](https://en.wikipedia.org/wiki/LogSumExp)).
 

@@ -44,7 +44,7 @@ image, label = mnist_train[2]
 image.shape, label
 ```
 
-Our example, stored here in the variable `image` corresponds to an image with a height and width of 28 pixels. Each pixel is an 8-bit unsigned integer (uint8) with values between 0 and 255. It is stored in a 3D ndarray, whose last dimension is the number of channels. Since the data set is a grayscale image, the number of channels is 1. When we encounter color, images, we'll have 3 channels for red, green, and blue. To keep things simple, we will record the shape of the image with the height and width of $h$ and $w$ pixels, respectively, as $h \times w$ or `(h, w)`.
+Our example, stored here in the variable `image` corresponds to an image with a height and width of 28 pixels. Each pixel is an 8-bit unsigned integer (uint8) with values between 0 and 255. It is stored in a 3D ndarray, whose last dimension is the number of channels. Since the data set is a grayscale image, the number of channels is 1. When we encounter color, images, we will have 3 channels for red, green, and blue. To keep things simple, we will record the shape of the image with the height and width of $h$ and $w$ pixels, respectively, as $h \times w$ or `(h, w)`.
 
 ```{.python .input}
 image.shape, image.dtype
@@ -92,7 +92,7 @@ Now, let us focus on $p( \mathbf{x} | y)$. Using the chain rule of probability, 
 
 $$p(x_1 |y) \cdot p(x_2 | x_1, y) \cdot ... \cdot p( x_d | x_1, ..., x_{d-1}, y)$$
 
-By itself, this expression doesn't get us any further. We still must estimate roughly $2^d$ parameters. However, if we assume that *the features are conditionally independent of each other, given the label*, then suddenly we are in much better shape, as this term simplifies to $\prod_i p(x_i | y)$, giving us the predictor
+By itself, this expression does not get us any further. We still must estimate roughly $2^d$ parameters. However, if we assume that *the features are conditionally independent of each other, given the label*, then suddenly we are in much better shape, as this term simplifies to $\prod_i p(x_i | y)$, giving us the predictor
 
 $$ \hat{y} = \operatorname*{argmax}_y \> \prod_{i=1}^d p(x_i | y) p(y).$$
 
@@ -106,7 +106,7 @@ for any $y$. So our assumption of conditional independence has taken the complex
 
 ## Training
 
-The problem now is that we don't actually know $P_{xy}$ and $P_y$. So we need to estimate their values given some training data first. This is what is called *training* the model. Estimating $P_y$ is not too hard. Since we are only dealing with $10$ classes, this is pretty easy - simply count the number of occurrences $n_y$ for each of the digits and divide it by the total amount of data $n$. For instance, if digit 8 occurs $n_8 = 5,800$ times and we have a total of $n = 60,000$ images, the probability estimate is $p(y=8) = 0.0967$.
+The problem now is that we do not actually know $P_{xy}$ and $P_y$. So we need to estimate their values given some training data first. This is what is called *training* the model. Estimating $P_y$ is not too hard. Since we are only dealing with $10$ classes, this is pretty easy - simply count the number of occurrences $n_y$ for each of the digits and divide it by the total amount of data $n$. For instance, if digit 8 occurs $n_8 = 5,800$ times and we have a total of $n = 60,000$ images, the probability estimate is $p(y=8) = 0.0967$.
 
 ```{.python .input  n=50}
 X, Y = mnist_train[:]  # all training examples
@@ -218,7 +218,7 @@ Modern deep networks achieve error rates of less than 0.01. While Naive Bayes cl
 * To address overly confident and nonsensical estimates, the
   probabilities $p(x_i|y)$ are smoothed, e.g., by Laplace
   smoothing. That is, we add a constant to all counts.
-* Naive Bayes classifiers don't exploit any correlations between
+* Naive Bayes classifiers do not exploit any correlations between
   observations.
 
 ## Exercises

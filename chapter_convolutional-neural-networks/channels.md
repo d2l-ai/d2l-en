@@ -147,9 +147,9 @@ corr2d_multi_in_out(X, K)
 ## $1\times 1$ Convolutional Layer
 
 At first, a $1 \times 1$ convolution, i.e., $k_h = k_w = 1$,
-doesn't seem to make much sense.
+does not seem to make much sense.
 After all, a convolution correlates adjacent pixels.
-A $1 \times 1$ convolution obviously doesn't.
+A $1 \times 1$ convolution obviously does not.
 Nonetheless, they are popular operations that are sometimes included
 in the designs of complex deep networks.
 Let us see in some detail what it actually does.

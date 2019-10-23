@@ -141,7 +141,7 @@ Indeed the definition of a cat might not change,
 but can we say the same about soft drinks?
 It turns out that if we navigate around the United States,
 shifting the source of our data by geography,
-we'll find considerable concept shift regarding
+we will find considerable concept shift regarding
 the definition of even this simple term:
 
 ![](../img/popvssoda.png)
@@ -355,7 +355,7 @@ We will discuss this in much more detail later.
 ### Label Shift Correction
 
 For the discussion of label shift,
-we'll assume for now that we are dealing
+we will assume for now that we are dealing
 with a $k$-way multiclass classification task.
 When the distribution of labels shifts over time $p(y) \neq q(y)$
 but the class-conditional distributions stay the same
@@ -382,7 +382,7 @@ where the true label was $j$ *and* our model predicted $y$.
 
 Now we cannot calculate the confusion matrix
 on the target data directly,
-because we don't get to see the labels for the examples
+because we do not get to see the labels for the examples
 that we see in the wild,
 unless we invest in a complex real-time annotation pipeline.
 What we can do, however, is average all of our models predictions
@@ -465,7 +465,7 @@ Overlooking foreseeable risks to the welfare of a subpopulation
 would run afoul of basic ethical principles.
 Moreover, "accuracy" is seldom the right metric.
 When translating predictions in to actions
-we'll often want to take into account the potential cost sensitivity
+we will often want to take into account the potential cost sensitivity
 of erring in various ways.
 If one way that you might classify an image could be perceived as a racial sleight, while misclassification to a different category
 would be harmless, then you might want to adjust your thresholds

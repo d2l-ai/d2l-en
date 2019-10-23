@@ -25,13 +25,13 @@ confident, but not sure that the image depicted a cat, we might assign a
 probability $.5  < P(l=\mathrm{cat}) < 1.0$.
 
 Now consider a second case: given some weather monitoring data, we want to predict the probability that it will rain in Taipei tomorrow. If it is summertime, the rain might come with probability $.5$. In both cases, we have some value of interest. And in both cases we are uncertain about the outcome.
-But there is a key difference between the two cases. In this first case, the image is in fact either a dog or a cat, we just don't know which. In the second case, the outcome may actually be a random event, if you believe in such things (and most physicists do). So probability is a flexible language for reasoning about our level of certainty, and it can be applied effectively in a broad set of contexts.
+But there is a key difference between the two cases. In this first case, the image is in fact either a dog or a cat, we just do not know which. In the second case, the outcome may actually be a random event, if you believe in such things (and most physicists do). So probability is a flexible language for reasoning about our level of certainty, and it can be applied effectively in a broad set of contexts.
 
 ## Basic probability theory
 
 Say that we cast a die and want to know what the chance is of seeing a $1$ rather than another digit. If the die is fair, all six outcomes $\mathcal{X} = \{1, \ldots, 6\}$ are equally likely to occur, and thus we would see a $1$ in $1$ out of $6$ cases. Formally we state that $1$ occurs with probability $\frac{1}{6}$.
 
-For a real die that we receive from a factory, we might not know those proportions and we would need to check whether it is tainted. The only way to investigate the die is by casting it many times and recording the outcomes. For each cast of the die, we'll observe a value $\{1, 2, \ldots, 6\}$. Given these outcomes, we want to investigate the probability of observing each outcome.
+For a real die that we receive from a factory, we might not know those proportions and we would need to check whether it is tainted. The only way to investigate the die is by casting it many times and recording the outcomes. For each cast of the die, we will observe a value $\{1, 2, \ldots, 6\}$. Given these outcomes, we want to investigate the probability of observing each outcome.
 
 One natural approach for each value is to take the
 individual count for that value and to divide it by the total number of tosses.
@@ -48,16 +48,16 @@ import random
 npx.set_np()
 ```
 
-Next, we'll want to be able to cast the die. In statistics we call this process
+Next, we will want to be able to cast the die. In statistics we call this process
 of drawing examples from probability distributions *sampling*.
 The distribution
 which assigns probabilities to a number of discrete choices is called the
-*multinomial* distribution. We'll give a more formal definition of
+*multinomial* distribution. We will give a more formal definition of
 *distribution* later, but at a high level, think of it as just an assignment of
 probabilities to events. In MXNet, we can sample from the multinomial
 distribution via the aptly named `np.random.multinomial` function.
 The function
-can be called in many ways, but we'll focus on the simplest.
+can be called in many ways, but we will focus on the simplest.
 To draw a single
 sample, we simply pass in a vector of probabilities.
 
@@ -65,7 +65,7 @@ sample, we simply pass in a vector of probabilities.
 np.random.multinomial(1, [1.0/6]*6)
 ```
 
-If you run the sampler a bunch of times, you'll find that you get out random
+If you run the sampler a bunch of times, you will find that you get out random
 values each time. As with estimating the fairness of a die, we often want to
 generate many samples from the same distribution. It would be unbearably slow to
 do this with a Python `for` loop, so `random.multinomial` supports drawing
@@ -106,11 +106,11 @@ Each solid curve corresponds to one of the six values of the die and gives our e
 
 In our example of casting a die, we introduced the notion of a **random variable**. A random variable, which we denote here as $X$ can be pretty much any quantity and is not deterministic. Random variables could take one value among a set of possibilities. We denote sets with brackets, e.g., $\{\mathrm{cat}, \mathrm{dog}, \mathrm{rabbit}\}$. The items contained in the set are called *elements*, and we can say that an element $x$ is *in* the set S, by writing $x \in S$. The symbol $\in$ is read as "in" and denotes membership. For instance, we could truthfully say $\mathrm{dog} \in \{\mathrm{cat}, \mathrm{dog}, \mathrm{rabbit}\}$. When dealing with the rolls of die, we are concerned with a variable $X \in \{1, 2, 3, 4, 5, 6\}$.
 
-Note that there is a subtle difference between discrete random variables, like the sides of a dice, and continuous ones, like the weight and the height of a person. There is little point in asking whether two people have exactly the same height. If we take precise enough measurements you'll find that no two people on the planet have the exact same height. In fact, if we take a fine enough measurement, you will not have the same height when you wake up and when you go to sleep. So there is no purpose in asking about the probability
+Note that there is a subtle difference between discrete random variables, like the sides of a dice, and continuous ones, like the weight and the height of a person. There is little point in asking whether two people have exactly the same height. If we take precise enough measurements you will find that no two people on the planet have the exact same height. In fact, if we take a fine enough measurement, you will not have the same height when you wake up and when you go to sleep. So there is no purpose in asking about the probability
 that someone is $2.00139278291028719210196740527486202$ meters tall. Given the world population of humans the probability is virtually 0. It makes more sense in this case to ask whether someone's height falls into a given interval, say between 1.99 and 2.01 meters. In these cases we quantify the likelihood that we see a value as a *density*. The height of exactly 2.0 meters has no probability, but nonzero density. In the interval between any two different heights we have nonzero probability.
 
 
-There are a few important axioms of probability that you'll want to remember:
+There are a few important axioms of probability that you will want to remember:
 
 * For any event $z$, the probability is never negative, i.e., $\Pr(Z=z) \geq 0$.
 * For any two events $Z=z$ and $X=x$ the union is no more likely than the sum of the individual events, i.e., $\Pr(Z=z \cup X=x) \leq \Pr(Z=z) + \Pr(X=x)$.
@@ -118,7 +118,7 @@ There are a few important axioms of probability that you'll want to remember:
 * For any two *mutually exclusive* events $Z=z$ and $X=x$, the probability that either happens is equal to the sum of their individual probabilities, that is $\Pr(Z=z \cup X=x) = \Pr(Z=z) + \Pr(X=x)$.
 
 ## Dealing with multiple random variables
-Very often, we'll want to consider more than one random variable at a time.
+Very often, we will want to consider more than one random variable at a time.
 For instance, we may want to model the relationship between diseases and symptoms. Given a disease and symptom, say 'flu' and 'cough', either may or may not occur in a patient with some probability. While we hope that the probability of both would be close to zero, we may want to estimate these probabilities and their relationships to each other so that we may apply our inferences to effect better medical care.
 
 As a more complicated example, images contain millions of pixels, thus millions of random variables. And in many cases images will come with a
@@ -187,7 +187,7 @@ That is, the second test allowed us to gain much higher confidence that not all 
 
 ## Sampling
 
-Often, when working with probabilistic models, we'll want not just to estimate distributions from data, but also to generate data by sampling from distributions. One of the simplest ways to sample random numbers is to invoke the `random` method from Python's `random` package.
+Often, when working with probabilistic models, we will want not just to estimate distributions from data, but also to generate data by sampling from distributions. One of the simplest ways to sample random numbers is to invoke the `random` method from Python's `random` package.
 
 ```{.python .input  n=7}
 [random.random() for _ in range(10)]

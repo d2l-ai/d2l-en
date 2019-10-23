@@ -126,7 +126,7 @@ net.add(nn.Dense(1))
 It is worth noting that, for convenience,
 Gluon does not require us to specify
 the input shape for each layer.
-So here, we don't need to tell Gluon
+So here, we do not need to tell Gluon
 how many inputs go into this linear layer.
 When we first try to pass data through our model,
 e.g., when we execute `net(X)` later,
@@ -217,7 +217,7 @@ the training loop itself is strikingly similar
 to what we did when implementing everything from scratch.
 
 To refresh your memory: for some number of epochs,
-we'll make a complete pass over the dataset (train_data), 
+we will make a complete pass over the dataset (train_data), 
 iteratively grabbing one minibatch of inputs 
 and the corresponding ground-truth labels. 
 For each minibatch, we go through the following ritual:

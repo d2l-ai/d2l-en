@@ -10,7 +10,7 @@ not just among people represented in our dataset,
 but among all people on earth!
 
 Given the genetic markers representing some person,
-we don't want our model to simply recognize "oh, that's Bob",
+we do not want our model to simply recognize "oh, that's Bob",
 and then output the classification,
 say among {*dementia*, *mild cognitive impairment*, *healthy*},
 that corresponds to Bob.
@@ -228,7 +228,7 @@ This is important since all statistical estimation is
 [post hoc](https://en.wikipedia.org/wiki/Post_hoc),
 i.e., we estimate after we observe the facts,
 hence vulnerable to the associated fallacy.
-For now, we'll put the philosophy aside and stick to more tangible issues.
+For now, we will put the philosophy aside and stick to more tangible issues.
 
 In this chapter, to give you some intuition,
 we’ll focus on a few factors that tend
@@ -299,7 +299,7 @@ we are really working with what should rightly be called
 training data and validation data, with no true test sets.
 Therefore, the accuracy reported in each experiment
 is really the validation accuracy and not a true test set accuracy.
-The good news is that we don't need too much data in the validation set.
+The good news is that we do not need too much data in the validation set.
 The uncertainty in our estimates can be shown
 to be of the order of $O(n^{-\frac{1}{2}})$.
 
@@ -411,7 +411,7 @@ and the broad digitization of the economy.
 
 We can now explore these concepts interactively
 by fitting polynomials to data.
-To get started we'll import our usual packages.
+To get started we will import our usual packages.
 
 ```{.python .input  n=1}
 import d2l
@@ -429,7 +429,7 @@ $$y = 5 + 1.2x - 3.4\frac{x^2}{2!} + 5.6 \frac{x^3}{3!} + \epsilon \text{ where 
 
 The noise term $\epsilon$ obeys a normal distribution
 with a mean of 0 and a standard deviation of 0.1.
-We'll synthesize 100 samples each for the training set and test set.
+We will synthesize 100 samples each for the training set and test set.
 
 ```{.python .input  n=2}
 maxdegree = 20  # Maximum degree of the polynomial

@@ -42,7 +42,7 @@ $$
 \mathbf{u}^\top\mathbf{v} = \sum_i u_i\cdot v_i.
 $$
 
-While discussion geometric interpretations of vectors, it is best to try and view this relationship more symmetrically, so we'll mirror the notation of classical multiplication and write
+While discussion geometric interpretations of vectors, it is best to try and view this relationship more symmetrically, so we will mirror the notation of classical multiplication and write
 
 $$
 \mathbf{u}\cdot\mathbf{v} = \mathbf{u}^\top\mathbf{v} = \mathbf{v}^\top\mathbf{u},

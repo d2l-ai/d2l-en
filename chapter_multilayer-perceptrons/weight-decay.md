@@ -136,7 +136,7 @@ In particular, we now have a continuous mechanism
 for adjusting the complexity of $f$.
 Small values of $\lambda$ correspond to unconstrained $\mathbf{w}$,
 whereas large values of $\lambda$ constrain $\mathbf{w}$ considerably.
-Since we don't want to have large bias terms either,
+Since we do not want to have large bias terms either,
 we often add $b^2$ as a penalty, too.
 
 ## High-dimensional Linear Regression
@@ -155,7 +155,7 @@ corrupted by Gaussian noise with zero mean and variance 0.01.
 To observe the effects of overfitting more easily,
 we can make our problem high-dimensional,
 setting the data dimension to $d = 200$
-and working with a relatively small number of training examples—here we'll set the sample size to 20:
+and working with a relatively small number of training examples—here we will set the sample size to 20:
 
 ```{.python .input  n=2}
 %matplotlib inline
@@ -187,7 +187,7 @@ $$\|\mathbf{w}\|_p^p := \sum_{i=1}^d |w_i|^p$$
 
 ### Initialize Model Parameters
 
-First, we'll define a function to randomly initialize our model parameters and run `attach_grad` on each to allocate memory for the gradients we will calculate.
+First, we will define a function to randomly initialize our model parameters and run `attach_grad` on each to allocate memory for the gradients we will calculate.
 
 ```{.python .input  n=5}
 def init_params():
@@ -220,7 +220,7 @@ Unlike the previous sections, here, the $\ell_2$ norm penalty term
 is added when calculating the final loss function.
 The linear network and the squared loss
 haven't changed since the previous chapter,
-so we'll just import them via `d2l.linreg` and `d2l.squared_loss`
+so we will just import them via `d2l.linreg` and `d2l.squared_loss`
 to reduce clutter.
 
 ```{.python .input  n=7}

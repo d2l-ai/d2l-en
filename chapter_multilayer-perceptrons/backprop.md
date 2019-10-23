@@ -29,7 +29,7 @@ it is important that you know
 how updates are actually calculated
 if you want to go beyond a shallow understanding of deep learning.
 
-In this section, we'll peel back the curtain on some of the details
+In this section, we will peel back the curtain on some of the details
 of backward propagation (more commonly called *backpropagation* or *backprop*).
 To convey some insight for both the techniques and how they are implementated,
 we will rely on both mathematics and computational graphs

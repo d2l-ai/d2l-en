@@ -76,7 +76,7 @@ model.initialize(force_reinit=True, ctx=ctx)
 d2l.predict_ch8('time traveller', 10, model, vocab, ctx)
 ```
 
-As is quite obvious, this model doesn't work at all (just yet). Next, we call just `train_ch8` defined in :numref:`sec_rnn_scratch` with the same hyper-parameters to train our model.
+As is quite obvious, this model does not work at all (just yet). Next, we call just `train_ch8` defined in :numref:`sec_rnn_scratch` with the same hyper-parameters to train our model.
 
 ```{.python .input  n=19}
 num_epochs, lr = 500, 1
@@ -104,7 +104,7 @@ The model achieves comparable perplexity, albeit within a shorter period of time
 1. What happens if you increase the number of hidden layers in the RNN model? Can you make the model work?
 1. How well can you compress the text using this model?
     * How many bits do you need?
-    * Why doesn't everyone use this model for text compression? Hint - what about the compressor itself?
+    * Why does not everyone use this model for text compression? Hint - what about the compressor itself?
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2365)
 

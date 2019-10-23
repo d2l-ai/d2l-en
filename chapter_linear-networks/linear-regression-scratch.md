@@ -49,7 +49,7 @@ You could think of $\epsilon$ as capturing potential
 measurement errors on the features and labels.
 We will assume that the standard assumptions hold and thus
 that $\epsilon$ obeys a normal distribution with mean of $0$.
-To make our problem easy, we'll set its standard deviation to $0.01$.
+To make our problem easy, we will set its standard deviation to $0.01$.
 The following code generates our synthetic dataset:
 
 ```{.python .input  n=2}
@@ -236,7 +236,7 @@ The size of the update step is determined by the learning rate `lr`.
 Because our loss is calculated as a sum over the batch of examples,
 we normalize our step size by the batch size (`batch_size`),
 so that the magnitude of a typical step size
-doesn't depend heavily on our choice of the batch size.
+does not depend heavily on our choice of the batch size.
 
 ```{.python .input  n=11}
 # Saved in the d2l package for later use 
@@ -264,7 +264,7 @@ to update the model parameters.
 Since we previously set the batch size `batch_size` to $10$,
 the loss shape `l` for each minibatch is ($10$, $1$).
 
-In summary, we'll execute the following loop:
+In summary, we will execute the following loop:
 
 * Initialize parameters $(\mathbf{w}, b)$
 * Repeat until done

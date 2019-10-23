@@ -28,7 +28,7 @@ when you are able to devise solutions that work $100\%$ of the time, *you should
 not be using machine learning*.
 
 Fortunately—for the growing community of ML scientists—many problems in
-automation don't bend so easily to human ingenuity.  Imagine huddling around the
+automation do not bend so easily to human ingenuity.  Imagine huddling around the
 whiteboard with the smartest minds you know, but this time you are tackling any
 of the following problems:
 
@@ -79,15 +79,15 @@ computer and a code editor.  How would you write such a program from first
 principles?  Think about it... the problem is hard.  Every second, the
 microphone will collect roughly 44,000 samples.  What rule could map reliably
 from a snippet of raw audio to confident predictions ``{yes, no}`` on whether
-the snippet contains the wake word?  If you are stuck, don't worry.  We don't
+the snippet contains the wake word?  If you are stuck, do not worry.  We do not
 know how to write such a program from scratch either.  That's why we use ML.
 
 ![Identify an awake word.](../img/wake-word.svg)
 
 
-Here's the trick.  Often, even when we don't know how to tell a computer
+Here's the trick.  Often, even when we do not know how to tell a computer
 explicitly how to map from inputs to outputs, we are nonetheless capable of
-performing the cognitive feat ourselves.  In other words, even if you don't know
+performing the cognitive feat ourselves.  In other words, even if you do not know
 *how to program a computer* to recognize the word 'Alexa', you yourself *are
 able* to recognize the word 'Alexa'.  Armed with this ability, we can collect a
 huge *dataset* containing examples of audio and label those that *do* and that
@@ -114,7 +114,7 @@ snippet of audio as *input*, and it generates a selection among ``{yes, no}`` as
 
 If we choose the right family of models, then there should exist one setting of
 the knobs such that the model fires ``yes`` every time it hears the word
-'Alexa'.  Because the exact choice of the wake word is arbitrary, we'll probably
+'Alexa'.  Because the exact choice of the wake word is arbitrary, we will probably
 need a model family capable, via another setting of the knobs, of firing ``yes``
 on the word 'Apricot'.  We expect that the same model should apply to 'Alexa'
 recognition and 'Apricot' recognition because these are similar tasks.  However,
@@ -183,7 +183,7 @@ This sort of problem, where we try to predict a designated unknown *label*
 given known *inputs* (also called *features* or *covariates*),
 and examples of both is called *supervised learning*,
 and it is just one among many *kinds* of machine learning problems.
-In the next section, we'll take a deep dive into the different ML problems.
+In the next section, we will take a deep dive into the different ML problems.
 First, we'd like to shed more light on some core components
 that will follow us around, no matter what kind of ML problem we take on:
 
@@ -197,7 +197,7 @@ that will follow us around, no matter what kind of ML problem we take on:
 
 It might go without saying that you cannot do data science without data.
 We could lose hundreds of pages pondering the precise nature of data
-but for now we'll err on the practical side and focus on the key properties
+but for now we will err on the practical side and focus on the key properties
 to be concerned with.
 Generally we are concerned with a collection of *examples*
 (also called *data points*, *samples*, or *instances*).
@@ -240,7 +240,7 @@ When we have more data, we can train more powerful models,
 and rely less heavily on pre-conceived assumptions.
 The regime change from (comparatively small) to big data
 is a major contributor to the success of modern deep learning.
-To drive the point home, many of the most exciting models in deep learning either don't work without large data sets.
+To drive the point home, many of the most exciting models in deep learning either do not work without large data sets.
 Some others work in the low-data regime,
 but no better than traditional approaches.
 
@@ -256,7 +256,7 @@ One common failure mode occurs in datasets where some groups of people
 are unrepresented in the training data.
 Imagine applying a skin cancer recognition system in the wild
 that had never seen black skin before.
-Failure can also occur when the data doesn't merely under-represent some groups,
+Failure can also occur when the data does not merely under-represent some groups,
 but reflects societal prejudices.
 For example if past hiring decisions are used to train a predictive model
 that will be used to screen resumes, then machine learning models could inadvertently capture and automate historical injustices.
@@ -282,7 +282,7 @@ Deep learning is differentiated from classical approaches
 principally by the set of powerful models that it focuses on.
 These models consist of many successive transformations of the data
 that are chained together top to bottom, thus the name *deep learning*.
-On our way to discussing deep neural networks, we'll discuss some more traditional methods.
+On our way to discussing deep neural networks, we will discuss some more traditional methods.
 
 
 ###  Objective functions
@@ -324,8 +324,8 @@ The best values of our model's parameters are learned
 by minimizing the loss incurred on a *training set*
 consisting of some number of *examples* collected for training.
 However, doing well on the training data
-doesn't guarantee that we will do well on (unseen) test data.
-So we'll typically want to split the available data into two partitions:
+does not guarantee that we will do well on (unseen) test data.
+So we will typically want to split the available data into two partitions:
 the training data (for fitting model parameters)
 and the test data (which is held out for evaluation),
 reporting the following two quantities:
@@ -395,7 +395,7 @@ supervised learning can take a great many forms and require a great many modelin
 depending on the type, size, and the number of inputs and outputs.
 For example, we use different models to process sequences (like strings of text or time series data)
 and for processing fixed-length vector representations.
-We'll visit many of these problems in depth throughout the first 9 parts of this book.
+We will visit many of these problems in depth throughout the first 9 parts of this book.
 
 Put plainly, the learning process looks something like this.
 Grab a big pile of example inputs, selecting them randomly.
@@ -430,7 +430,7 @@ might look something like: $[100, 0, .5, 60]$.
 However, if you live in Pittsburgh,
 it might look more like $[3000, 4, 3, 10]$.
 Feature vectors like this are essential for all the classic machine learning problems.
-We'll typically denote the feature vector for any one example $\mathbf{x_i}$
+We will typically denote the feature vector for any one example $\mathbf{x_i}$
 and the set of feature vectors for all our examples $X$.
 
 What makes a problem a *regression* is actually the outputs.
@@ -446,7 +446,7 @@ The goal of our model is to produce predictions (guesses of the price, in our ex
 that closely approximate the actual target values.
 We denote these predictions $\hat{y}_i$
 and if the notation seems unfamiliar, then just ignore it for now.
-We'll unpack it more thoroughly in the subsequent chapters.
+We will unpack it more thoroughly in the subsequent chapters.
 
 
 Lots of practical problems are well-described regression problems.
@@ -460,7 +460,7 @@ A good rule of thumb is that any *How much?* or *How many?* problem should sugge
 * 'How many dogs are in this photo?' - *regression*.
 
 However, if you can easily pose your problem as 'Is this a _ ?',
-then it is likely, classification, a different fundamental problem type that we'll cover next.
+then it is likely, classification, a different fundamental problem type that we will cover next.
 Even if you've never worked with machine learning before,
 you've probably worked through a regression problem informally.
 Imagine, for example, that you had your drains repaired
@@ -479,8 +479,8 @@ If you followed that much then you already understand the high-level idea behind
 
 In this case, we could produce the parameters that exactly matched the contractor's prices.
 Sometimes that's not possible, e.g., if some of the variance owes to some factors besides your two features.
-In these cases, we'll try to learn models that minimize the distance between our predictions and the observed values.
-In most of our chapters, we'll focus on one of two very common losses,
+In these cases, we will try to learn models that minimize the distance between our predictions and the observed values.
+In most of our chapters, we will focus on one of two very common losses,
 the
 [L1 loss](http://mxnet.incubator.apache.org/api/python/gluon/loss.html#mxnet.gluon.loss.L1Loss)
 where
@@ -498,7 +498,7 @@ As we will see later, the $L_2$ loss corresponds to the assumption that our data
 #### Classification
 
 While regression models are great for addressing *how many?* questions,
-lots of problems don't bend comfortably to this template. For example,
+lots of problems do not bend comfortably to this template. For example,
 a bank wants to add check scanning to their mobile app.
 This would involve the customer snapping a photo of a check with their smartphone's camera
 and the machine learning model would need to be able to automatically understand text seen in the image.
@@ -519,7 +519,7 @@ and our *labels* $Y$ might be the classes $\mathrm{\{cat, dog\}}$.
 While in regression, we sought a *regressor* to output a real value $\hat{y}$,
 in classification, we seek a *classifier*, whose output $\hat{y}$ is the predicted class assignment.
 
-For reasons that we'll get into as the book gets more technical, it is pretty hard to optimize a model that can only output a hard categorical assignment, e.g., either *cat* or *dog*.
+For reasons that we will get into as the book gets more technical, it is pretty hard to optimize a model that can only output a hard categorical assignment, e.g., either *cat* or *dog*.
 It is a lot easier instead to express the model in the language of probabilities.
 Given an example $x$, the model assigns a probability $\hat{y}_k$ to each label $k$.
 Because these are probabilities, they need to be positive numbers and add up to $1$.
@@ -531,7 +531,7 @@ Returning to our animal classification example, a classifier might see an image
 and output the probability that the image is a cat $\Pr(y=\mathrm{cat}| x) = 0.9$.
 We can interpret this number by saying that the classifier is 90% sure that the image depicts a cat.
 The magnitude of the probability for the predicted class is one notion of confidence.
-It is not the only notion of confidence and we'll discuss different notions of uncertainty in more advanced chapters.
+It is not the only notion of confidence and we will discuss different notions of uncertainty in more advanced chapters.
 
 When we have more than two possible classes, we call the problem *multiclass classification*.
 Common examples include hand-written character recognition `[0, 1, 2, 3 ... 9, a, b, c, ...]`.
@@ -577,7 +577,7 @@ but mistaking a rattler for a garter could be deadly.
 
 #### Tagging
 
-Some classification problems don't fit neatly into the binary or multiclass classification setups.
+Some classification problems do not fit neatly into the binary or multiclass classification setups.
 For example, we could train a normal binary classifier to distinguish cats from dogs.
 Given the current state of computer vision,
 we can do this easily, with off-the-shelf tools.
@@ -617,7 +617,7 @@ has [hosted a competition](http://bioasq.org/) to do precisely this.
 
 #### Search and ranking
 
-Sometimes we don't just want to assign each example to a bucket or to a real
+Sometimes we do not just want to assign each example to a bucket or to a real
 value. In the field of information retrieval, we want to impose a ranking on a
 set of items. Take web search for example, the goal is less to determine whether
 a particular page is relevant for a query, but rather, which one of the plethora
@@ -826,7 +826,7 @@ This last question raises the problem of *covariate shift*,
 (when training and test data are different).
 It is a problem that most of us have experienced when taking exams written by a lecturer,
 while the homeworks were composed by his TAs.
-We'll briefly describe reinforcement learning and adversarial learning,
+We will briefly describe reinforcement learning and adversarial learning,
 two settings that explicitly consider interaction with an environment.
 
 
@@ -862,7 +862,7 @@ that was exactly equal to the loss function from the original supervised problem
 That being said, RL can also address many problems that supervised learning cannot.
 For example, in supervised learning we always expect
 that the training input comes associated with the correct label.
-But in RL, we don't assume that for each observation,
+But in RL, we do not assume that for each observation,
 the environment tells us the optimal action.
 In general, we just get some reward.
 Moreover, the environment may not even tell us which actions led to the reward.
@@ -1102,7 +1102,7 @@ It is only recently that AI has been in the limelight, mostly due to solutions t
   difficult still, due to its huge state space. AlphaGo reached human parity in
   2015, :cite:`Silver.Huang.Maddison.ea.2016` using Deep Learning combined with
   Monte Carlo tree sampling. The challenge in Poker was that the state space is
-  large and it is not fully observed (we don't know the opponents'
+  large and it is not fully observed (we do not know the opponents'
   cards). Libratus exceeded human performance in Poker using efficiently
   structured strategies :cite:`Brown.Sandholm.2017`. This illustrates the
   impressive progress in games and the fact that advanced algorithms played a
