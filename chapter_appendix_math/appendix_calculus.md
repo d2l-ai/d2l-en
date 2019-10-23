@@ -1210,7 +1210,7 @@ z = np.exp(- x**2 - y**2)
 
 # Plot Function
 ax = d2l.plt.figure().add_subplot(111, projection='3d')
-ax.plot_surface(x, y, z,)
+ax.plot_surface(x.tolist(), y.tolist(), z.tolist())
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('y')
 ax.set_xlim(-2, 2); ax.set_ylim(-2, 2); ax.set_zlim(0, 1);
