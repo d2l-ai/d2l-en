@@ -36,7 +36,7 @@ For a real die that we receive from a factory, we might not know those proportio
 One natural approach for each value is to take the
 individual count for that value and to divide it by the total number of tosses.
 This gives us an *estimate* of the probability of a given event. The law of
-large numbers tell us that as the number of tosses grows this estimate will draw closer and closer to the true underlying probability. Before going into the details of what's going here, let us try it out.
+large numbers tell us that as the number of tosses grows this estimate will draw closer and closer to the true underlying probability. Before going into the details of what is going here, let us try it out.
 
 To start, let us import the necessary packages:
 
