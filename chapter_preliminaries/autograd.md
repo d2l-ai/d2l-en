@@ -9,7 +9,7 @@ for complex models, working out the updates by hand
 can be a pain (and often error-prone).
 
 The `autograd` package expedites this work 
-by automatically calculating derivatives. 
+by automatically calculating derivatives, i.e., *automatic differentiation*. 
 And while many other libraries require 
 that we compile a symbolic graph to take automatic derivatives, 
 `autograd` allows us to take derivatives 
@@ -238,12 +238,12 @@ we can still calculate the gradient of the resulting variable.
 In the following snippet, note that 
 the number of iterations of the `while` loop 
 and the evaluation of the `if` statement
-both depend on the value of the input `b`.
+both depend on the value of the input `a`.
 
 ```{.python .input  n=16}
 def f(a):
     b = a * 2
-    while np.abs(b).sum() < 1000:
+    while np.linalg.norm(b) < 1000:
         b = b * 2
     if b.sum() > 0:
         c = b
@@ -265,12 +265,12 @@ d.backward()
 
 We can now analyze the `f` function defined above. 
 Note that it is piecewise linear in its input `a`. 
-In other words, for any `a` there exists some constant 
-such that for a given range `f(a) = g * a`. 
-Consequently `d / a` allows us to verify that the gradient is correct:
+In other words, for any `a` there exists some constant scalar `k`
+such that `f(a) = k * a`, where the value of `k` depends on the input `a`. 
+Consequently `d / a` allows us to verify that the gradient is correct.
 
 ```{.python .input  n=18}
-a.grad == (d / a)
+a.grad == d / a
 ```
 
 ## Training Mode and Prediction Mode
@@ -279,7 +279,7 @@ As we have seen, after we call `autograd.record`,
 MXNet logs the operations in the following block. 
 There is one more subtle detail to be aware of.
 Additionally, `autograd.record` will change 
-the running mode from *prediction* mode to *training* mode. 
+the running mode from *prediction mode* to *training mode*. 
 We can verify this behavior by calling the `is_training` function.
 
 ```{.python .input  n=19}
@@ -292,30 +292,24 @@ When we get to complicated deep learning models,
 we will encounter some algorithms where the model
 behaves differently during training and 
 when we subsequently use it to make predictions. 
-The popular neural network techniques *dropout* :numref:`sec_dropout` 
-and *batch normalization* :numref:`sec_batch_norm`
-both exhibit this characteristic.
-In other cases, our models may store auxiliary variables in *training* mode 
-for purposes of make computing gradients easier 
-that are not necessary at prediction time. 
 We will cover these differences in detail in later chapters. 
 
 
 ## Summary
 
-* MXNet provides an `autograd` package to automate the calculation of derivatives. To use it, we first attach gradients to those variables with respect to which we desire partial derivartives. We then record the computation of our target value, executed its backward function, and access the resulting gradient via our variable's `grad` attribute.
-* We can detach gradients and pass head gradients to the backward function to control the part of the computation will be used in the backward function.
-* The running modes of MXNet include *training mode* and *prediction mode*. We can determine the running mode by calling `autograd.is_training()`.
+* MXNet provides the `autograd` package to automate the calculation of derivatives. To use it, we first attach gradients to those variables with respect to which we desire partial derivatives. We then record the computation of our target value, execute its `backward` function, and access the resulting gradient via our variable's `grad` attribute.
+* We can detach gradients to control the part of the computation that will be used in the `backward` function.
+* The running modes of MXNet include training mode and prediction mode. We can determine the running mode by calling the `is_training` function.
+
 
 ## Exercises
 
-1. Try to run `y.backward()` twice.
+1. Why is the second derivative much more expensive to compute than the first derivative?
+1. After running `y.backward()`, immediately run it again and see what happens.
 1. In the control flow example where we calculate the derivative of `d` with respect to `a`, what would happen if we changed the variable `a` to a random vector or matrix. At this point, the result of the calculation `f(a)` is no longer a scalar. What happens to the result? How do we analyze this?
 1. Redesign an example of finding the gradient of the control flow. Run and analyze the result.
-1. In a second-price auction (such as in eBay or in computational advertising), the winning bidder pays the second-highest price. Compute the gradient of the final price with respect to the winning bidder's bid using `autograd`. What does the result tell you about the mechanism? If you are curious to learn more about second-price auctions, check out this paper by [Edelman, Ostrovski and Schwartz, 2005](https://www.benedelman.org/publications/gsp-060801.pdf).
-1. Why is the second derivative much more expensive to compute than the first derivative?
-1. Derive the head gradient relationship for the chain rule. If you get stuck, use the ["Chain Rule" article on Wikipedia](https://en.wikipedia.org/wiki/Chain_rule).
-1. Assume $f(x) = \sin(x)$. Plot $f(x)$ and $\frac{df(x)}{dx}$ on a graph, where you computed the latter without any symbolic calculations, i.e., without exploiting that $f'(x) = \cos(x)$.
+1. Let $f(x) = \sin(x)$. Plot $f(x)$ and $\frac{df(x)}{dx}$, where the latter is computed without exploiting that $f'(x) = \cos(x)$.
+1. In a second-price auction (such as in eBay or in computational advertising), the winning bidder pays the second-highest price. Compute the gradient of the final price with respect to the winning bidder's bid using `autograd`. What does the result tell you about the mechanism? If you are curious to learn more about second-price auctions, check out the paper by Edelman et al. :cite`Edelman.Ostrovsky.Schwarz.2007`.
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2318)
 
