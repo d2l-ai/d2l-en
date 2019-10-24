@@ -146,7 +146,7 @@ The graph is quite exciting for a number of reasons. Firstly, beyond unigram wor
 
 ## Training Data Preparation
 
-Before introducing the model, let us assume we will use a neural network to train a language model. Now the question is how to read mini-batches of examples and labels at
+Before introducing the model, let us assume we will use a neural network to train a language model. Now the question is how to read minibatches of examples and labels at
 random. Since sequence data is by its very nature sequential, we need to address
 the issue of processing it. We did so in a rather ad-hoc manner when we
 introduced in :numref:`sec_sequence`. Let us formalize this a bit. 
@@ -160,8 +160,8 @@ In fact, any one of these offsets is fine. Hence, which one should we pick? In f
 
 ### Random Sampling
 
-The following code randomly generates a mini-batch from the data each time. Here, the batch size `batch_size` indicates to the number of examples in each mini-batch and `num_steps` is the length of the sequence (or time steps if we have a time series) included in each example.
-In random sampling, each example is a sequence arbitrarily captured on the original sequence. The positions of two adjacent random mini-batches on the original sequence are not necessarily adjacent. The target is to predict the next character based on what we have seen so far, hence the labels are the original sequence, shifted by one character.
+The following code randomly generates a minibatch from the data each time. Here, the batch size `batch_size` indicates to the number of examples in each minibatch and `num_steps` is the length of the sequence (or time steps if we have a time series) included in each example.
+In random sampling, each example is a sequence arbitrarily captured on the original sequence. The positions of two adjacent random minibatches on the original sequence are not necessarily adjacent. The target is to predict the next character based on what we have seen so far, hence the labels are the original sequence, shifted by one character.
 
 ```{.python .input  n=5}
 # Saved in the d2l package for later use
@@ -186,7 +186,7 @@ def seq_data_iter_random(corpus, batch_size, num_steps):
 
 Let us generate an artificial sequence from 0 to 30. We assume that
 the batch size and numbers of time steps are 2 and 5
-respectively. This means that depending on the offset we can generate between 4 and 5 $(x,y)$ pairs. With a mini-batch size of 2, we only get 2 mini-batches.
+respectively. This means that depending on the offset we can generate between 4 and 5 $(x,y)$ pairs. With a minibatch size of 2, we only get 2 minibatches.
 
 ```{.python .input  n=6}
 my_seq = list(range(30))
@@ -196,7 +196,7 @@ for X, Y in seq_data_iter_random(my_seq, batch_size=2, num_steps=6):
 
 ### Sequential partitioning
 
-In addition to random sampling of the original sequence, we can also make the positions of two adjacent random mini-batches adjacent in the original sequence.
+In addition to random sampling of the original sequence, we can also make the positions of two adjacent random minibatches adjacent in the original sequence.
 
 ```{.python .input  n=7}
 # Saved in the d2l package for later use
@@ -215,7 +215,7 @@ def seq_data_iter_consecutive(corpus, batch_size, num_steps):
         yield X, Y
 ```
 
-Using the same settings, print input `X` and label `Y` for each mini-batch of examples read by random sampling. The positions of two adjacent mini-batches on the original sequence are adjacent.
+Using the same settings, print input `X` and label `Y` for each minibatch of examples read by random sampling. The positions of two adjacent minibatches on the original sequence are adjacent.
 
 ```{.python .input  n=8}
 for X, Y in seq_data_iter_consecutive(my_seq, batch_size=2, num_steps=6):
@@ -259,7 +259,7 @@ def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
 * Zipf's law governs the word distribution for not only unigrams but also the other n-grams.
 * There is a lot of structure but not enough frequency to deal with infrequent word combinations efficiently via Laplace smoothing.
 * The main choices for sequence partitioning are picking between consecutive and random sequences. 
-* Given the overall document length, it is usually acceptable to be slightly wasteful with the documents and discard half-empty mini-batches.
+* Given the overall document length, it is usually acceptable to be slightly wasteful with the documents and discard half-empty minibatches.
 
 ## Exercises
 
@@ -267,11 +267,11 @@ def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
 1. Review the smoothed probability estimates. Why are they not accurate? Hint - we are dealing with a contiguous sequence rather than singletons.
 1. How would you model a dialogue?
 1. Estimate the exponent of Zipf's law for unigrams, bigrams and trigrams.
-1. What other mini-batch data sampling methods can you think of?
+1. What other minibatch data sampling methods can you think of?
 1. Why is it a good idea to have a random offset?
     * Does it really lead to a perfect uniform distribution over the sequences on the document?
     * What would you have to do to make things even more uniform?
-1. If we want a sequence example to be a complete sentence, what kinds of problems does this introduce in mini-batch sampling? Why would we want to do this anyway?
+1. If we want a sequence example to be a complete sentence, what kinds of problems does this introduce in minibatch sampling? Why would we want to do this anyway?
 
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2361)
