@@ -87,8 +87,8 @@ the estimate towards simpler and more stable models.
 **Randomized Truncation.** Lastly we can replace $\partial_w h_t$ by a
 random variable which is correct in expectation but which truncates
 the sequence. This is achieved by using a sequence of $\xi_t$ where
-$\mathbf{E}[\xi_t] = 1$ and $\Pr(\xi_t = 0) = 1-\pi$ and furthermore
-$\Pr(\xi_t = \pi^{-1}) = \pi$. We use this to replace the gradient:
+$\mathbf{E}[\xi_t] = 1$ and $P(\xi_t = 0) = 1-\pi$ and furthermore
+$P(\xi_t = \pi^{-1}) = \pi$. We use this to replace the gradient:
 
 $$z_t  = \partial_w f(x_t, h_{t-1}, w) + \xi_t \partial_h f(x_t, h_{t-1}, w) \partial_w h_{t-1}$$
 

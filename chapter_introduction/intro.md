@@ -528,7 +528,7 @@ This is easy to see for binary classification.
 If there is a 0.6 (60%) probability that an unfair coin comes up heads,
 then there is a 0.4 (40%) probability that it comes up tails.
 Returning to our animal classification example, a classifier might see an image
-and output the probability that the image is a cat $\Pr(y=\mathrm{cat}| x) = 0.9$.
+and output the probability that the image is a cat $P(y=\mathrm{cat}| x) = 0.9$.
 We can interpret this number by saying that the classifier is 90% sure that the image depicts a cat.
 The magnitude of the probability for the predicted class is one notion of confidence.
 It is not the only notion of confidence and we will discuss different notions of uncertainty in more advanced chapters.
@@ -546,7 +546,7 @@ Note that the most likely class is not necessarily the one that you are going to
 
 Now, assume that you built a classifier and trained it
 to predict if a mushroom is poisonous based on a photograph.
-Say our poison-detection classifier outputs $\Pr(y=\mathrm{death cap}|\mathrm{image}) = 0.2$.
+Say our poison-detection classifier outputs $P(y=\mathrm{death cap}|\mathrm{image}) = 0.2$.
 In other words, the classifier is 80% confident that our mushroom *is not* a death cap.
 Still, you'd have to be a fool to eat it.
 That is because the certain benefit of a delicious dinner is not worth a 20% risk of dying from it.
