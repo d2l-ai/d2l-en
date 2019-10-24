@@ -178,7 +178,7 @@ Now, let us train the model. We use the same setting as NeuMF, including learnin
 
 ```{.python .input  n=5}
 ctx = d2l.try_all_gpus() 
-net = Caser(50, num_users, num_items, L)
+net = Caser(30, num_users, num_items, L)
 net.initialize(ctx=ctx, force_reinit=True, init=mx.init.Normal(0.01))
 lr, num_epochs, wd, optimizer = 0.001, 16, 1e-5, 'adam'
 loss = d2l.BPRLoss()
