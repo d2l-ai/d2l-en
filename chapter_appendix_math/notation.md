@@ -54,9 +54,9 @@ The main symbols used in this book are listed below.
 
 |Symbol                                   |Type                                                     |
 |-----------------------------------------|---------------------------------------------------------|
-|$\Pr(\cdot)$                             | Probability distribution                                |
+|$P(\cdot)$                             | Probability distribution                                |
 |$z \sim \Pr$                         | Random variable $z$ obeys the probability distribution $\Pr$ |
-|$\Pr(x|y)$                   | Conditional probability of $x|y$                                 |
+|$P(x|y)$                   | Conditional probability of $x|y$                                 |
 |${\mathbf{E}}_{x} [f(x)]$| Expectation of $f$ with respect to $x$                |
 
 ## Complexity

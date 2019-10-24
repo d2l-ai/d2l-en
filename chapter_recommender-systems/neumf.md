@@ -36,7 +36,7 @@ The following figure illustrates the model architecture of NeuMF.
 
 ![Illustration of the NeuMF model](../img/rec-neumf.svg)
 
-```{.python .input  n=3}
+```{.python .input  n=1}
 import d2l
 from mxnet import autograd, init, gluon, np, npx
 from mxnet.gluon import nn
@@ -160,8 +160,8 @@ The training function is defined below. We train the model in the pairwise manne
 # Saved in the d2l package for later use
 def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter, 
                   num_users, num_items, num_epochs, ctx_list, evaluator, 
-                  negative_sampler, candidates):
-    num_batches, timer = len(train_iter), d2l.Timer()
+                  negative_sampler, candidates, eval_step=2):
+    num_batches, timer, hit_rate, auc  = len(train_iter), d2l.Timer(), 0, 0
     animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs], ylim=[0, 1],
                             legend=['test hit rate', 'test AUC'])
     for epoch in range(num_epochs):
@@ -182,12 +182,12 @@ def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
             metric.add(l, values[0].shape[0], values[0].size)
             timer.stop()
         with autograd.predict_mode():
-            hit_rate, auc = evaluator(net, test_iter, test_seq_iter, 
-                                      candidates, num_users, num_items, 
-                                      ctx_list)
-        train_l = l / (i + 1)
-        print(train_l)
-        animator.add(epoch + 1, (hit_rate, auc))
+            if (epoch + 1) % eval_step == 1:
+                hit_rate, auc = evaluator(net, test_iter, test_seq_iter, 
+                                          candidates, num_users, num_items, 
+                                          ctx_list)
+                train_l = l / (i + 1)
+                animator.add(epoch + 1, ( hit_rate, auc))
     print('train loss %.3f, test hit rate %.3f, test AUC %.3f'
           % (metric[0] / metric[1], hit_rate, auc))
     print('%.1f examples/sec on %s'
@@ -212,9 +212,9 @@ train_iter = gluon.data.DataLoader(gluon.data.ArrayDataset(
 
 We then create and initialize the model. we use a four-layer MLP with constant hidden size 20.
 
-```{.python .input}
+```{.python .input  n=8}
 ctx = d2l.try_all_gpus() 
-net = NeuMF(50, num_users, num_items, mlp_layers=[20, 20, 20, 20])
+net = NeuMF(30, num_users, num_items, mlp_layers=[10, 10, 10, 10])
 net.initialize(ctx=ctx, force_reinit=True, init=mx.init.Normal(0.01))
 ```
 
