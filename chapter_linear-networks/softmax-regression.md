@@ -268,7 +268,7 @@ To understand a bit better what is going on,
 consider the derivative with respect to $o$. We get
 
 $$
-\partial_{o_j} l = \frac{\exp(o_j)}{\sum_k \exp(o_k)} - y_j = \mathrm{softmax}(\mathbf{o})_j - y_j = \Pr(y = j|x) - y_j
+\partial_{o_j} l = \frac{\exp(o_j)}{\sum_k \exp(o_k)} - y_j = \mathrm{softmax}(\mathbf{o})_j - y_j = P(y = j|x) - y_j
 $$
 
 In other words, the gradient is the difference 

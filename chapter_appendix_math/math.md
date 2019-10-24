@@ -310,17 +310,17 @@ Finally, we will briefly introduce conditional probability, expectation and vari
 
 ![Intersection between $A$ and $B$](../img/intersect.svg)
 
-We will denote the probability of event $A$ and event $B$ as $\Pr(A)$ and $\Pr(B)$, respectively. The probability of the simultaneous occurrence of the two events is denoted as $\Pr(A \cap B)$ or $\Pr(A, B)$. In the figure above it is the shaded area. If $B$ has non-zero probability, the conditional probability of event $A$ given that $B$ has occurred is
+We will denote the probability of event $A$ and event $B$ as $P(A)$ and $P(B)$, respectively. The probability of the simultaneous occurrence of the two events is denoted as $P(A \cap B)$ or $P(A, B)$. In the figure above it is the shaded area. If $B$ has non-zero probability, the conditional probability of event $A$ given that $B$ has occurred is
 
-$$\Pr(A | B) = \frac{\Pr(A \cap B)}{\Pr(B)}.$$
+$$P(A | B) = \frac{P(A \cap B)}{P(B)}.$$
 
 That is,
 
-$$\Pr(A \cap B) = \Pr(B) \Pr(A | B) = \Pr(A) \Pr(B | A).$$
+$$P(A \cap B) = P(B) P(A | B) = P(A) P(B | A).$$
 
 If
 
-$$\Pr(A \cap B) = \Pr(A) \Pr(B),$$
+$$P(A \cap B) = P(A) P(B),$$
 
 then $A$ and $B$ are said to be independent of each other.
 
@@ -329,7 +329,7 @@ then $A$ and $B$ are said to be independent of each other.
 
 A random variable takes values that represent possible outcomes of an experiment. The expectation (or average) of the random variable $X$ is denoted as
 
-$$\mathbf{E}[X] = \sum_{x} x \Pr(X = x).$$
+$$\mathbf{E}[X] = \sum_{x} x P(X = x).$$
 
 In many cases we want to measure by how much the random variable $x$ deviates from its expectation. This can be quantified by the variance
 
@@ -364,7 +364,7 @@ statistics see
 1. Write out a permutation in matrix form.
 1. Find the gradient of the function $f(\mathbf{x}) = 3x_1^2 + 5e^{x_2}$.
 1. What is the gradient of the function $f(\mathbf{x}) = \|\mathbf{x}\|_2$?
-1. Prove that $\Pr(A \cup B) \leq \Pr(A) + \Pr(B)$. When do you have an equality?
+1. Prove that $P(A \cup B) \leq P(A) + P(B)$. When do you have an equality?
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2397)
 

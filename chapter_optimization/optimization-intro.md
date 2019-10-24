@@ -144,8 +144,8 @@ As we saw, optimization for deep learning is full of challenges. Fortunately the
    $M_{ij} = M_{ji}$ are each drawn from some probability distribution
    $p_{ij}$. Furthermore assume that $p_{ij}(x) = p_{ij}(-x)$, i.e., that the
    distribution is symmetric (see e.g., :cite:`Wigner.1958` for details).
-    * Prove that the distribution over eigenvalues is also symmetric. That is, for any eigenvector $\mathbf{v}$ the probability that the associated eigenvalue $\lambda$ satisfies $\Pr(\lambda > 0) = \Pr(\lambda < 0)$.
-    * Why does the above *not* imply $\Pr(\lambda > 0) = 0.5$?
+    * Prove that the distribution over eigenvalues is also symmetric. That is, for any eigenvector $\mathbf{v}$ the probability that the associated eigenvalue $\lambda$ satisfies $P(\lambda > 0) = P(\lambda < 0)$.
+    * Why does the above *not* imply $P(\lambda > 0) = 0.5$?
 1. What other challenges involved in deep learning optimization can you think of?
 1. Assume that you want to balance a (real) ball on a (real) saddle.
     * Why is this hard?
