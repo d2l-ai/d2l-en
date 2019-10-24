@@ -1025,10 +1025,10 @@ $$
 Let us plot the probabilty mass function and cumulative distibution function.
 
 ```{.python .input}
-lambda = 5.0
+lam = 5.0
 
 xs = [i for i in range(20)]
-pmf = [np.exp(-lambda)*lambda^k/np.factorial(k) for k in xs]
+pmf = [np.exp(-lam)*lam^k/np.factorial(k) for k in xs]
 
 d2l.plt.stem(xs,pmf)
 d2l.plt.xlabel('x')
@@ -1039,7 +1039,7 @@ d2l.plt.show()
 ```{.python .input}
 x = np.arange(-1, 21, 0.01)
 cmf = np.cumsum(pmf)
-F = lambda x: 0 if x < 0 else 1 if x > n else cmf[int(x)]
+F = lam x: 0 if x < 0 else 1 if x > n else cmf[int(x)]
 
 d2l.plot(x, np.array([F(y) for y in x.tolist()]), 'x', 'c.d.f.')
 ```
@@ -1051,7 +1051,7 @@ As we saw above, the means and variances are particularly simple.  If $X \sim \m
 
 This can be sampled in numpy as follows.
 ```{.python .input}
-np.random.poisson(lambda,size=(10,10))
+np.random.poisson(lam,size=(10,10))
 ```
 
 ### Gaussian
