@@ -706,7 +706,7 @@ npx.set_np()
 
 ### Set up our data ###
 n_H = 8675309
-N_T = 25624
+n_T = 25624
 
 ### Initialize our paramteres ###
 theta = np.array(0.5); theta.attach_grad()
