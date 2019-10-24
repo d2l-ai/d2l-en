@@ -1025,10 +1025,11 @@ $$
 Let us plot the probabilty mass function and cumulative distibution function.
 
 ```{.python .input}
+from math import factorial
 lam = 5.0
 
 xs = [i for i in range(20)]
-pmf = [np.exp(-lam)*lam^k/np.factorial(k) for k in xs]
+pmf = [np.exp(-lam)*lam^k/factorial(k) for k in xs]
 
 d2l.plt.stem(xs,pmf)
 d2l.plt.xlabel('x')
