@@ -7,12 +7,12 @@ Entire courses, majors, theses, careers, and even departments, are devoted to pr
 
 We have already invoked probabilities in previous sections without articulating what precisely they are or giving a concrete example. Let us get more serious now by considering the first case: distinguishing cats and dogs based on photographs. This might sound simple but it is actually a formidable challenge. To start with, the difficulty of the problem may depend on the resolution of the image.
 
-![Images of varying resolutions ($10$px, $20$px, $40$px, $80$px, and $160$ px).](../img/cat_dog_pixels.png)
+![Images of varying resolutions ($10 \times 10$, $20 \times 20$, $40 \times 40$, $80 \times 80$, and $160 \times 160$ pixels).](../img/cat_dog_pixels.png)
 :label:`fig_cat_dog`
 
 As shown in :numref:`fig_cat_dog`,
-while it is easy for humans to recognize cats and dogs at $160$ pixel resolution,
-it becomes challenging at $40$ pixels and next to impossible at $10$ pixels. In
+while it is easy for humans to recognize cats and dogs at the resolution of $160 \times 160$ pixels,
+it becomes challenging at $40 \time 40$ pixels and next to impossible at $10 \time 10$ pixels. In
 other words, our ability to tell cats and dogs apart at a large distance (and thus low resolution) might approach uninformed guessing. Probability gives us a
 formal way of reasoning about our level of certainty. 
 If we are completely sure
