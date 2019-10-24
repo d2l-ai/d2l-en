@@ -1080,7 +1080,7 @@ $$
 
 Let us plot the probability density function and cumulative distribution function.
 ```{.python .input}
-mu = 1, sigma = 0.5
+mu = 1; sigma = 0.5
 
 x = np.arange(-2,2, 0.01)
 p = 1/np.sqrt(2*np.pi*sigma**2)*np.exp(-(x**2)/(2*sigma**2))
@@ -1091,9 +1091,9 @@ d2l.plot(x, p, 'x', 'p.d.f.')
 ```{.python .input}
 from math import erf
 def phi(x):
-    return (1.0 + math.erf((x-mu) / (sigma*sqrt(2)))) / 2.0
+    return (1.0 + erf((x-mu) / (sigma*np.sqrt(2)))) / 2.0
 
-d2l.plot(x, phi(x), 'x', 'c.d.f.')
+d2l.plot(x, np.array([phi(y) for y in x.tolist()]), 'x', 'c.d.f.')
 ```
 
 Keen-eyed readers will recognize some of these terms.  Indeed, we encountered this integral we encountered in :numref:`appendix-calculus`.  Indeed we need exactly that computation to see that this $p_X(x)$ has total area one and is thus a valid density.
