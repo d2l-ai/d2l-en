@@ -53,14 +53,14 @@ add a small constant to all counts. This helps with singletons, e.g., via
 $$\begin{aligned}
 	\hat{p}(w) & = \frac{n(w) + \epsilon_1/m}{n + \epsilon_1} \\
 	\hat{p}(w'|w) & = \frac{n(w,w') + \epsilon_2 \hat{p}(w')}{n(w) + \epsilon_2} \\
-	\hat{p}(w''|w',w) & = \frac{n(w,w',w'') + \epsilon_3 \hat{p}(w',w'')}{n(w,w') + \epsilon_3}
+	\hat{p}(w''|w',w) & = \frac{n(w,w',w'') + \epsilon_3 \hat{p}(w'' | w')}{n(w,w') + \epsilon_3}
 \end{aligned}$$
 
 Here the coefficients $\epsilon_i > 0$ determine how much we use the
 estimate for a shorter sequence as a fill-in for longer
-ones. Moreover, $m$ is the total number of words we encounter. The
+ones. Moreover, $m$ is the total number of unique words, while $n$ is the total number of words. The
 above is a rather primitive variant of what is Kneser-Ney smoothing
-and Bayesian Nonparametrics can accomplish. See e.g., :cite:`The Sequence Memoizer.2012` for more details of how to accomplish
+and Bayesian Nonparametrics can accomplish. See e.g., :cite:`The.Sequence.Memoizer.2012` for more details of how to accomplish
 this. Unfortunately, models like this get unwieldy rather quickly 
 for the following reasons. First, we need to store all counts.
 Secondly, this entirely ignores the meaning of the words. For 
