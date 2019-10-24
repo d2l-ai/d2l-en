@@ -1040,7 +1040,7 @@ d2l.plt.show()
 ```{.python .input}
 x = np.arange(-1, 21, 0.01)
 cmf = np.cumsum(pmf)
-F = lam x: 0 if x < 0 else 1 if x > n else cmf[int(x)]
+F = lambda x: 0 if x < 0 else 1 if x > n else cmf[int(x)]
 
 d2l.plot(x, np.array([F(y) for y in x.tolist()]), 'x', 'c.d.f.')
 ```
