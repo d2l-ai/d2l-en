@@ -717,7 +717,7 @@ for iter in range(10) :
     with autograd.record():
         loss = -(n_H*np.log(theta) + n_T*np.log(1-theta))
     loss.backward()
-    theta -= lr*theta.grad()
+    theta -= lr*theta.grad
 
 ### Check Output ###
 print(theta)
