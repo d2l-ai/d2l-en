@@ -810,7 +810,7 @@ p = 0.3
 
 d2l.plt.stem([0,1],[1-p,p])
 d2l.plt.xlabel('x')
-d2l.plt.xlabel('p.m.f.')
+d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
@@ -855,7 +855,7 @@ n = 5
 
 d2l.plt.stem([i+1 for i in range(n)],n*[1/n])
 d2l.plt.xlabel('x')
-d2l.plt.xlabel('p.m.f.')
+d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
@@ -967,16 +967,16 @@ pmf = np.array([p**i*(1-p)**(n-i)*binom(n,i) for i in range(n+1)])
 
 d2l.plt.stem([i for i in range(n+1)],pmf)
 d2l.plt.xlabel('x')
-d2l.plt.xlabel('p.m.f.')
+d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
 ```{.python .input}
 x = np.arange(-1, 11, 0.01)
 cmf = np.cumsum(pmf)
-F = lambda x: 0 if x < 0 else 1 if x > n else cmf[np.floor(x)]
+F = lambda x: 0 if x < 0 else 1 if x > n else cmf[int(x)]
 
-d2l.plot(x, np.array([F(y) for y in x]), 'x', 'c.d.f.')
+d2l.plot(x, np.array([F(y) for y in x.tolist()]), 'x', 'c.d.f.')
 ```
 
 While this result is not simple, the means and variances are.  If $X \sim \mathrm{Binomial}(n,p)$, then:
@@ -1032,16 +1032,16 @@ pmf = [np.exp(-lambda)*lambda^k/np.factorial(k) for k in xs]
 
 d2l.plt.stem(xs,pmf)
 d2l.plt.xlabel('x')
-d2l.plt.xlabel('p.m.f.')
+d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
 ```{.python .input}
-x = np.arange(-1,21,0.01)
+x = np.arange(-1, 21, 0.01)
 cmf = np.cumsum(pmf)
-F = lambda x: 0 if x < 0 else cmf[np.floor(x)]
+F = lambda x: 0 if x < 0 else 1 if x > n else cmf[int(x)]
 
-d2l.plot(x,np.array([F(y) for y in x]),'x','c.d.f.')
+d2l.plot(x, np.array([F(y) for y in x.tolist()]), 'x', 'c.d.f.')
 ```
 
 As we saw above, the means and variances are particularly simple.  If $X \sim \mathrm{Poisson}(\lambda)$, then:
