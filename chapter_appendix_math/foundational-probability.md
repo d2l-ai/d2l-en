@@ -1052,6 +1052,7 @@ As we saw above, the means and variances are particularly simple.  If $X \sim \m
 
 This can be sampled in numpy as follows.
 ```{.python .input}
+import numpy as np
 np.random.poisson(lam,size=(10,10))
 ```
 
