@@ -816,7 +816,7 @@ d2l.plt.show()
 
 ```{.python .input}
 x = np.arange(-1,2,0.01)
-F = lambda x: 0 if x < 0 else 1 if x > 1 else 1-p
+F = np.vectorize(lambda x: 0 if x < 0 else 1 if x > 1 else 1-p)
 
 d2l.plot(x,F(x),'x','c.d.f.')
 ```
@@ -861,7 +861,7 @@ d2l.plt.show()
 
 ```{.python .input}
 x = np.arange(-1,6,0.01)
-F = lambda x: 0 if x < 1 else 1 if x > n else floor(x)/n
+F = np.vectorize(lambda x: 0 if x < 1 else 1 if x > n else floor(x)/n)
 
 d2l.plot(x,F(x),'x','c.d.f.')
 ```
@@ -912,7 +912,7 @@ d2l.plot(x, p, 'x', 'p.d.f.')
 ```
 
 ```{.python .input}
-F = lambda x: 0 if x < a else 1 if x > b else (x-a)/(b-a)
+F = np.vectorize(lambda x: 0 if x < a else 1 if x > b else (x-a)/(b-a))
 
 d2l.plot(x, F(x), 'x', 'c.d.f.')
 ```
@@ -967,7 +967,7 @@ d2l.plt.show()
 ```{.python .input}
 x = np.arange(-1, 11, 0.01)
 cmf = np.cumsum(pmf)
-F = lambda x: 0 if x < 0 else 1 if x > n else cmf[floor(x)]
+F = np.vectorize(lambda x: 0 if x < 0 else 1 if x > n else cmf[floor(x)])
 
 d2l.plot(x, F(x), 'x', 'c.d.f.')
 ```
@@ -1032,7 +1032,7 @@ d2l.plt.show()
 ```{.python .input}
 x = np.arange(-1,21,0.01)
 cmf = np.cumsum(pmf)
-F = lambda x: 0 if x < 0 else cmf[floor(x)]
+F = np.vectorize(lambda x: 0 if x < 0 else cmf[floor(x)])
 
 d2l.plot(x,F(x),'x','c.d.f.')
 ```
