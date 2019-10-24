@@ -8,6 +8,7 @@ notation
 math
 foundational-linear-algebra
 foundational-calculus
-info-theory
+foundational-probability
+foundational-info-theory
 ```
 
