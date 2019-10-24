@@ -818,7 +818,7 @@ d2l.plt.show()
 x = np.arange(-1,2,0.01)
 F = lambda x: 0 if x < 0 else 1 if x > 1 else 1-p
 
-d2l.plot(x,np.array(list(map(F,x))),'x','c.d.f.')
+d2l.plot(x,np.array([F(y) for y in x]),'x','c.d.f.')
 ```
 
 If $X \sim \mathrm{Bernoulli}(p)$, then:
@@ -863,7 +863,7 @@ d2l.plt.show()
 x = np.arange(-1,6,0.01)
 F = lambda x: 0 if x < 1 else 1 if x > n else np.floor(x)/n
 
-d2l.plot(x,np.array(list(map(F,x))),'x','c.d.f.')
+d2l.plot(x,np.array([F(y) for y in x]),'x','c.d.f.')
 ```
 
 If $X \sim \mathrm{Uniform}(n)$, then:
@@ -914,7 +914,7 @@ d2l.plot(x, p, 'x', 'p.d.f.')
 ```{.python .input}
 F = lambda x: 0 if x < a else 1 if x > b else (x-a)/(b-a)
 
-d2l.plot(x, np.array(list(map(F,x))), 'x', 'c.d.f.')
+d2l.plot(x, np.array([F(y) for y in x]), 'x', 'c.d.f.')
 ```
 
 If $X \sim \mathrm{Uniform}([a,b])$, then:
@@ -976,7 +976,7 @@ x = np.arange(-1, 11, 0.01)
 cmf = np.cumsum(pmf)
 F = lambda x: 0 if x < 0 else 1 if x > n else cmf[np.floor(x)]
 
-d2l.plot(x, np.array(list(map(F,x))), 'x', 'c.d.f.')
+d2l.plot(x, np.array([F(y) for y in x]), 'x', 'c.d.f.')
 ```
 
 While this result is not simple, the means and variances are.  If $X \sim \mathrm{Binomial}(n,p)$, then:
@@ -1041,7 +1041,7 @@ x = np.arange(-1,21,0.01)
 cmf = np.cumsum(pmf)
 F = lambda x: 0 if x < 0 else cmf[np.floor(x)]
 
-d2l.plot(x,np.array(list(map(F,x))),'x','c.d.f.')
+d2l.plot(x,np.array([F(y) for y in x]),'x','c.d.f.')
 ```
 
 As we saw above, the means and variances are particularly simple.  If $X \sim \mathrm{Poisson}(\lambda)$, then:
