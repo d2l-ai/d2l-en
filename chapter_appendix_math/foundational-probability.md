@@ -963,7 +963,7 @@ def binom(n, k):
         comb = comb * (n - i) // (i + 1)
     return comb
 
-pmf = [p**i*(1-p)**(n-i)*binom(n,i) for i in range(n)]
+pmf = [p**i*(1-p)**(n-i)*binom(n,i) for i in range(n+1)]
 
 d2l.plt.stem([i for i in range(n+1)],pmf)
 d2l.plt.xlabel('x')
