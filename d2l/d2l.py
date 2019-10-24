@@ -139,7 +139,6 @@ def load_array(data_arrays, batch_size, is_train=True):
     """Construct a Gluon data loader"""
     dataset = gluon.data.ArrayDataset(*data_arrays)
     return gluon.data.DataLoader(dataset, batch_size, shuffle=is_train)
-    
 
 
 # Defined in file: ./chapter_linear-networks/fashion-mnist.md
@@ -566,7 +565,7 @@ def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):
     metric = d2l.Accumulator(2)  # loss_sum, num_examples
     for X, Y in train_iter:
         if state is None or use_random_iter:
-            # Initialize state when either it's the first iteration or
+            # Initialize state when either it is the first iteration or
             # using random sampling.
             state = model.begin_state(batch_size=X.shape[0], ctx=ctx)
         else:
@@ -1596,8 +1595,8 @@ def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items,
 # Defined in file: ./chapter_recommender-systems/neumf.md
 def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter, 
                   num_users, num_items, num_epochs, ctx_list, evaluator, 
-                  negative_sampler, candidates):
-    num_batches, timer = len(train_iter), d2l.Timer()
+                  negative_sampler, candidates, eval_step=2):
+    num_batches, timer, hit_rate, auc  = len(train_iter), d2l.Timer(), 0, 0
     animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs], ylim=[0, 1],
                             legend=['test hit rate', 'test AUC'])
     for epoch in range(num_epochs):
@@ -1618,12 +1617,12 @@ def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
             metric.add(l, values[0].shape[0], values[0].size)
             timer.stop()
         with autograd.predict_mode():
-            hit_rate, auc = evaluator(net, test_iter, test_seq_iter, 
-                                      candidates, num_users, num_items, 
-                                      ctx_list)
-        train_l = l / (i + 1)
-        print(train_l)
-        animator.add(epoch + 1, (hit_rate, auc))
+            if (epoch + 1) % eval_step == 1:
+                hit_rate, auc = evaluator(net, test_iter, test_seq_iter, 
+                                          candidates, num_users, num_items, 
+                                          ctx_list)
+                train_l = l / (i + 1)
+                animator.add(epoch + 1, ( hit_rate, auc))
     print('train loss %.3f, test hit rate %.3f, test AUC %.3f'
           % (metric[0] / metric[1], hit_rate, auc))
     print('%.1f examples/sec on %s'
@@ -1639,7 +1638,7 @@ def update_D(X, Z, net_D, net_G, loss, trainer_D):
     with autograd.record():
         real_Y = net_D(X)
         fake_X = net_G(Z)
-        # Don't need to compute gradient for net_G, detach it from
+        # Do not need to compute gradient for net_G, detach it from
         # computing gradients.
         fake_Y = net_D(fake_X.detach())
         loss_D = (loss(real_Y, ones) + loss(fake_Y, zeros)) / 2

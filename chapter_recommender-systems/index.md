@@ -12,5 +12,6 @@ mf
 autorec
 ranking
 neumf
+seqrec
 ```
 
