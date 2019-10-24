@@ -956,7 +956,14 @@ Let us plot the probability density function and cumulative distribution functio
 n = 10
 p = 0.2
 
-pmf = [p**i(1-p)**(n-i)*np.binom(n,i) for i in range(n)]
+# Compute Binomial Coefficient
+def binom(n, k):
+    comb = 1
+    for i in range(min(k, n - k)):
+        comb = comb * (n - i) // (i + 1)
+    return comb
+
+pmf = [p**i(1-p)**(n-i)*binom(n,i) for i in range(n)]
 
 d2l.plt.stem([i for i in range(n+1)],pmf)
 d2l.plt.xlabel('x')
