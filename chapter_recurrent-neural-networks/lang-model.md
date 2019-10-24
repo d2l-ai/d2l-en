@@ -60,7 +60,7 @@ Here the coefficients $\epsilon_i > 0$ determine how much we use the
 estimate for a shorter sequence as a fill-in for longer
 ones. Moreover, $m$ is the total number of words we encounter. The
 above is a rather primitive variant of what is Kneser-Ney smoothing
-and Bayesian Nonparametrics can accomplish. See e.g., :cite:`The Sequence Memoizer.2012` for more details of how to accomplish
+and Bayesian Nonparametrics can accomplish. See e.g., :cite:`Wood.Gasthaus.Archambeau.ea.2011` for more details of how to accomplish
 this. Unfortunately, models like this get unwieldy rather quickly 
 for the following reasons. First, we need to store all counts.
 Secondly, this entirely ignores the meaning of the words. For 
