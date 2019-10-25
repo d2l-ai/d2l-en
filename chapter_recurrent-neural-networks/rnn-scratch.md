@@ -3,7 +3,7 @@
 
 In this section we implement a language model introduce in :numref:`chap_rnn` from scratch. It is based on a character-level recurrent neural network trained on H. G. Wells' *The Time Machine*. As before, we start by reading the data set first, which is introduced in :numref:`sec_language_model`.
 
-```{.python .input  n=6}
+```{.python .input  n=14}
 %matplotlib inline
 import d2l
 import math
@@ -20,48 +20,22 @@ Remember that each token is represented as a numerical index in `train_iter`. Fe
 
 In a nutshell, we map each index to a different unit vector: assume that the number of different tokens in the vocabulary is $N$ (the `len(vocab)`) and the token indices range from 0 to $N-1$. If the index of a token is the integer $i$, then we create a vector $\mathbf{e}_i$ of all 0s with a length of $N$ and set the element at position $i$ to 1. This vector is the one-hot vector of the original token. The one-hot vectors with indices 0 and 2 are shown below.
 
-```{.python .input  n=2}
+```{.python .input  n=21}
 npx.one_hot(np.array([0, 2]), len(vocab))
-```
-
-```{.json .output n=2}
-[
- {
-  "data": {
-   "text/plain": "array([[1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,\n        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],\n       [0., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,\n        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]])"
-  },
-  "execution_count": 2,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 The shape of the mini-batch we sample each time is (batch size, time step). The `one_hot` function transforms such a mini-batch into a 3-D tensor with the last dimension equals to the vocabulary size. We often transpose the input so that we will obtain a (time step, batch size, vocabulary size) output that fits into a sequence model easier.
 
-```{.python .input  n=7}
+```{.python .input  n=18}
 X = np.arange(batch_size*num_steps).reshape(batch_size, num_steps)
 npx.one_hot(X.T, len(vocab)).shape
-```
-
-```{.json .output n=7}
-[
- {
-  "data": {
-   "text/plain": "(35, 32, 28)"
-  },
-  "execution_count": 7,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ## Initializing the Model Parameters
 
 Next, we initialize the model parameters for a RNN model. The number of hidden units `num_hiddens` is a tunable parameter.
 
-```{.python .input  n=11}
+```{.python .input  n=19}
 def get_params(vocab_size, num_hiddens, ctx):
     num_inputs = num_outputs = vocab_size
     normal = lambda shape: np.random.normal(
@@ -84,7 +58,7 @@ def get_params(vocab_size, num_hiddens, ctx):
 
 First, we need an `init_rnn_state` function to return the hidden state at initialization. It returns an `ndarray` filled with 0 and with a shape of (batch size, number of hidden units). Using tuples makes it easier to handle situations where the hidden state contains multiple variables (e.g., when combining multiple layers in an RNN where each layer requires initializing).
 
-```{.python .input  n=12}
+```{.python .input  n=20}
 def init_rnn_state(batch_size, num_hiddens, ctx):
     return (np.zeros(shape=(batch_size, num_hiddens), ctx=ctx), )
 ```
@@ -95,7 +69,7 @@ described in :numref:`sec_mlp`, the
 mean value of the $\tanh$ function is 0, when the elements are evenly
 distributed over the real numbers.
 
-```{.python .input  n=13}
+```{.python .input  n=6}
 def rnn(inputs, state, params):
     # inputs shape: (num_steps, batch_size, vocab_size)
     W_xh, W_hh, b_h, W_hq, b_q = params
@@ -110,7 +84,7 @@ def rnn(inputs, state, params):
 
 Now we have all functions defined, next we create a class to wrap these functions and store parameters.
 
-```{.python .input  n=14}
+```{.python .input}
 # Saved in the d2l package for later use
 class RNNModelScratch(object):
     """A RNN Model based on scratch implementations"""
@@ -130,26 +104,13 @@ class RNNModelScratch(object):
 
 Let us do a sanity check whether inputs and outputs have the correct dimensions, e.g., to ensure that the dimensionality of the hidden state hasn't changed.
 
-```{.python .input  n=15}
+```{.python .input}
 vocab_size, num_hiddens, ctx = len(vocab), 512, d2l.try_gpu()
 model = RNNModelScratch(len(vocab), num_hiddens, ctx, get_params,
                         init_rnn_state, rnn)
 state = model.begin_state(X.shape[0], ctx)
 Y, new_state = model(X.as_in_context(ctx), state)
 Y.shape, len(new_state), new_state[0].shape
-```
-
-```{.json .output n=15}
-[
- {
-  "data": {
-   "text/plain": "((1120, 28), 1, (32, 512))"
-  },
-  "execution_count": 15,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 We can see that the output shape is (number steps $\times$ batch size, vocabulary size), while the hidden state shape remains the same, i.e., (batch size, number of hidden units).
