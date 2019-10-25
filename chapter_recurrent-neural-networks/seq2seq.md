@@ -36,15 +36,15 @@ class Seq2SeqEncoder(d2l.Encoder):
         X = X.swapaxes(0, 1)  # RNN needs first axes to be time
         state = self.rnn.begin_state(batch_size=X.shape[1], ctx=X.context)
         out, state = self.rnn(X, state)
-        # The shape of "out": (seq_len, batch_size, num_hiddens)
-        # The shape of "state": (num_layers, batch_size, num_hiddens)
-        # The "state" contains the hidden state and the memory cell
+        # out shape: (seq_len, batch_size, num_hiddens)
+        # stae shape: (num_layers, batch_size, num_hiddens),
+        # where "state" contains the hidden state and the memory cell
         # of the last time step.
         
         return out, state
 ```
 
-Next, we will create a mini-batch sequence input with a batch size of 4 and 7 time steps. We assume the number of hidden layers of the LSTM unit is 2 and the number of hidden units is 16. The output shape returned by the encoder after performing forward calculation on the input is (number of time steps, batch size, number of hidden units). The shape of the multi-layer hidden state of the gated recurrent unit in the final time step is (number of hidden layers, batch size, number of hidden units). For the gated recurrent unit, the `state` list contains only one element, which is the hidden state. If long short-term memory is used, the `state` list will also contain another element, which is the memory cell.
+Next, we will create a mini-batch sequence input with a batch size of 4 and 7 time steps. We assume the number of hidden layers of the LSTM neural network is 2 and the number of hidden units is 16. The output shape after performing forward calculation on the input by the encoder  is (number of time steps, batch size, number of hidden units). The shape of the multi-layer hidden state of the gated recurrent unit in the final time step is (number of hidden layers, batch size, number of hidden units). For the gated recurrent unit (GRU), the `state` list contains only one element, which is the hidden state. If long short term memory (LSTM) is used, the `state` list will also contain another element, which is the memory cell.
 
 ```{.python .input  n=4}
 encoder = Seq2SeqEncoder(vocab_size=10, embed_size=8,
@@ -59,7 +59,7 @@ output.shape, len(state), state[0].shape, state[1].shape
 
 We directly use the hidden state of the encoder in the final time step as the initial hidden state of the decoder. This requires that the encoder and decoder RNNs have the same numbers of layers and hidden units.
 
-The forward calculation of the decoder is similar to the encoder's. The only difference is we add a dense layer with the hidden size to be the vocabulary size to output the predicted confidence score for each word.
+The forward calculation of the decoder is similar to the encoder's. The only difference is that we add a dense layer in the end, with the hidden size to be the vocabulary size. The dense layer will output the predicted confidence score for each word.
 
 ```{.python .input  n=5}
 # Saved in the d2l package for later use
@@ -82,7 +82,7 @@ class Seq2SeqDecoder(d2l.Decoder):
         return out, state
 ```
 
-We create an decoder with the same hyper-parameters as the encoder. As can be seen, the output shape is changed to (batch size, the sequence length, vocabulary size).
+We create an decoder with the same hyper-parameters as the encoder. As we can see, the output shape is changed to (batch size, the sequence length, vocabulary size).
 
 ```{.python .input  n=6}
 decoder = Seq2SeqDecoder(vocab_size=10, embed_size=8,
@@ -95,7 +95,7 @@ out.shape, len(state), state[0].shape, state[1].shape
 
 ## The Loss Function
 
-For each time step, the decoder outputs a vocabulary size confident score vector to predict words. Similar to language modeling, we can apply softmax to obtain the probabilities and then use cross-entropy loss to calculate the loss. But note that we padded the target sentences to make them have the same length. We would not like to compute the loss on the padding symbols.
+For each time step, the decoder outputs a vocabulary size confidence score vector to predict words. Similar to language modeling, we can apply softmax to obtain the probabilities and then use cross-entropy loss to calculate the loss. But note that we padded the target sentences to make them have the same length, but we do not need to compute the loss on the padding symbols.
 
 To implement the loss function that filters out some entries, we will use an operator called `SequenceMask`. It can specify to mask the first dimension (`axis=0`) or the second one (`axis=1`). If the second one is chosen, given a valid length vector `len` and 2-dim input `X`, this operator sets `X[i, len[i]:] = 0` for all $i$'s.
 
@@ -104,7 +104,7 @@ X = np.array([[1,2,3], [4,5,6]])
 npx.sequence_mask(X, np.array([1,2]), True, axis=1)
 ```
 
-Apply to $n$-dim tensor $X$, it sets `X[i, len[i]:, :, ..., :] = 0`. In addition, we can specify the filling value beyond 0.
+Apply to $n$-dim tensor $X$, it sets `X[i, len[i]:, :, ..., :] = 0`. In addition, we can specify the filling value such as $-1$ as showing below.
 
 ```{.python .input  n=8}
 X = np.ones((2, 3, 4))
@@ -120,7 +120,7 @@ class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
     # label shape: (batch_size, seq_len)
     # valid_length shape: (batch_size, )
     def forward(self, pred, label, valid_length):
-        # the sample weights shape should be (batch_size, seq_len, 1)
+        # weights shape should be (batch_size, seq_len, 1)
         weights = np.expand_dims(np.ones_like(label),axis=-1)
         weights = npx.sequence_mask(weights, valid_length, True, axis=1)
         return super(MaskedSoftmaxCELoss, self).forward(pred, label, weights)
@@ -144,7 +144,6 @@ def train_s2s_ch8(model, data_iter, lr, num_epochs, ctx):
     trainer = gluon.Trainer(model.collect_params(),
                             'adam', {'learning_rate': lr})
     loss = MaskedSoftmaxCELoss()
-    #tic = time.time()
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[1, num_epochs], ylim=[0, 0.25])
     for epoch in range(1, num_epochs+1):
@@ -224,8 +223,14 @@ for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
 ```
 
 ## Summary
-* The sequence to sequence (seq2seq) model is based on the encoder-decoder architecture to generate a sequence output for a sequence input.
-* We use multiple LSTM layers for encoder and decoder.
+* The sequence to sequence (seq2seq) model is based on the encoder-decoder architecture to generate a sequence output from a sequence input.
+* We use multiple LSTM layers for both encoder and decoder.
+
+## Exercise
+1. Can you think of the other use cases of seq2seq model besides neural machine translation?
+1. What will happen if the input sequence in our example is longer? 
+1. If we do not use the "SequenceMask" in the loss function, we may happen?
+
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/4357)
 
