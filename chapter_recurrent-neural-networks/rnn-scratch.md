@@ -3,7 +3,7 @@
 
 In this section we implement a language model introduce in :numref:`chap_rnn` from scratch. It is based on a character-level recurrent neural network trained on H. G. Wells' *The Time Machine*. As before, we start by reading the data set first, which is introduced in :numref:`sec_language_model`.
 
-```{.python .input  n=14}
+```{.python .input  n=6}
 %matplotlib inline
 import d2l
 import math
@@ -16,26 +16,52 @@ train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 
 ## One-hot Encoding
 
-Remember that each token is presented as a numerical index in `train_iter`. Feeding these indices directly to the neural network might make it hard to learn. We often present each token as a more expressive feature vector. The easiest presentation is called *one-hot encoding*.
+Remember that each token is represented as a numerical index in `train_iter`. Feeding these indices directly to the neural network might make it hard to learn. We often denote each token by a more expressive feature vector. The easiest presentation is called *one-hot encoding*.
 
 In a nutshell, we map each index to a different unit vector: assume that the number of different tokens in the vocabulary is $N$ (the `len(vocab)`) and the token indices range from 0 to $N-1$. If the index of a token is the integer $i$, then we create a vector $\mathbf{e}_i$ of all 0s with a length of $N$ and set the element at position $i$ to 1. This vector is the one-hot vector of the original token. The one-hot vectors with indices 0 and 2 are shown below.
 
-```{.python .input  n=21}
+```{.python .input  n=2}
 npx.one_hot(np.array([0, 2]), len(vocab))
+```
+
+```{.json .output n=2}
+[
+ {
+  "data": {
+   "text/plain": "array([[1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,\n        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.],\n       [0., 0., 1., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,\n        0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.]])"
+  },
+  "execution_count": 2,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
 ```
 
 The shape of the mini-batch we sample each time is (batch size, time step). The `one_hot` function transforms such a mini-batch into a 3-D tensor with the last dimension equals to the vocabulary size. We often transpose the input so that we will obtain a (time step, batch size, vocabulary size) output that fits into a sequence model easier.
 
-```{.python .input  n=18}
-X = np.arange(10).reshape(2, 5)
-npx.one_hot(X.T, 28).shape
+```{.python .input  n=7}
+X = np.arange(batch_size*num_steps).reshape(batch_size, num_steps)
+npx.one_hot(X.T, len(vocab)).shape
+```
+
+```{.json .output n=7}
+[
+ {
+  "data": {
+   "text/plain": "(35, 32, 28)"
+  },
+  "execution_count": 7,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
 ```
 
 ## Initializing the Model Parameters
 
 Next, we initialize the model parameters for a RNN model. The number of hidden units `num_hiddens` is a tunable parameter.
 
-```{.python .input  n=19}
+```{.python .input  n=11}
 def get_params(vocab_size, num_hiddens, ctx):
     num_inputs = num_outputs = vocab_size
     normal = lambda shape: np.random.normal(
@@ -49,15 +75,16 @@ def get_params(vocab_size, num_hiddens, ctx):
     b_q = np.zeros(num_outputs, ctx=ctx)
     # Attach a gradient
     params = [W_xh, W_hh, b_h, W_hq, b_q]
-    for param in params: param.attach_grad()
+    for param in params: 
+        param.attach_grad()
     return params
 ```
 
 ## RNN Model
 
-First, we need an `init_rnn_state` function to return the hidden state at initialization. It returns an `ndarray` filled with 0 and with a shape of (batch size, number of hidden units). Using tuples makes it easier to handle situations where the hidden state contains multiple variables (e.g., when combining multiple layers in an RNN where each layers requires initializing).
+First, we need an `init_rnn_state` function to return the hidden state at initialization. It returns an `ndarray` filled with 0 and with a shape of (batch size, number of hidden units). Using tuples makes it easier to handle situations where the hidden state contains multiple variables (e.g., when combining multiple layers in an RNN where each layer requires initializing).
 
-```{.python .input  n=20}
+```{.python .input  n=12}
 def init_rnn_state(batch_size, num_hiddens, ctx):
     return (np.zeros(shape=(batch_size, num_hiddens), ctx=ctx), )
 ```
@@ -65,10 +92,10 @@ def init_rnn_state(batch_size, num_hiddens, ctx):
 The following `rnn` function defines how to compute the hidden state and output
 in a time step. The activation function here uses the tanh function. As
 described in :numref:`sec_mlp`, the
-mean value of the $\tanh$ function values is 0 when the elements are evenly
+mean value of the $\tanh$ function is 0, when the elements are evenly
 distributed over the real numbers.
 
-```{.python .input  n=6}
+```{.python .input  n=13}
 def rnn(inputs, state, params):
     # inputs shape: (num_steps, batch_size, vocab_size)
     W_xh, W_hh, b_h, W_hq, b_q = params
@@ -83,7 +110,7 @@ def rnn(inputs, state, params):
 
 Now we have all functions defined, next we create a class to wrap these functions and store parameters.
 
-```{.python .input}
+```{.python .input  n=14}
 # Saved in the d2l package for later use
 class RNNModelScratch(object):
     """A RNN Model based on scratch implementations"""
@@ -103,7 +130,7 @@ class RNNModelScratch(object):
 
 Let us do a sanity check whether inputs and outputs have the correct dimensions, e.g., to ensure that the dimensionality of the hidden state hasn't changed.
 
-```{.python .input}
+```{.python .input  n=15}
 vocab_size, num_hiddens, ctx = len(vocab), 512, d2l.try_gpu()
 model = RNNModelScratch(len(vocab), num_hiddens, ctx, get_params,
                         init_rnn_state, rnn)
@@ -112,7 +139,20 @@ Y, new_state = model(X.as_in_context(ctx), state)
 Y.shape, len(new_state), new_state[0].shape
 ```
 
-We can see that the output shape is (number steps $\times$ batch size, vocabulary size), while the state shape remains the same, i.e., (batch size, number of hidden units).
+```{.json .output n=15}
+[
+ {
+  "data": {
+   "text/plain": "((1120, 28), 1, (32, 512))"
+  },
+  "execution_count": 15,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
+```
+
+We can see that the output shape is (number steps $\times$ batch size, vocabulary size), while the hidden state shape remains the same, i.e., (batch size, number of hidden units).
 
 ## Prediction
 
@@ -141,19 +181,19 @@ predict_ch8('time traveller ', 10, model, vocab, ctx)
 
 ## Gradient Clipping
 
-For a sequence of length $T$, we compute the gradients over these $T$ time steps in an iteration, which results in a chain of matrix-products with length  $O(T)$ during backpropagating. As mentioned in :numref:`sec_numerical_stability`, it might result in numerical instability,  e.g., the gradients may either explode or vanish, when $T$ is large. Therefore RNN models often need extra help to stabilize the training.
+For a sequence of length $T$, we compute the gradients over these $T$ time steps in an iteration, which results in a chain of matrix-products with length  $O(T)$ during backpropagating. As mentioned in :numref:`sec_numerical_stability`, it might result in numerical instability,  e.g., the gradients may either explode or vanish, when $T$ is large. Therefore, RNN models often need extra help to stabilize the training.
 
-Recall that when solving an optimization problem, we take update steps for the weights $\mathbf{w}$ in the general direction of the negative gradient $\mathbf{g}_t$ on a minibatch, say $\mathbf{w} - \eta \cdot \mathbf{g}_t$. Let us further assume that the objective is well behaved, i.e., it is Lipschitz continuous with constant $L$, i.e.
+Recall that when solving an optimization problem, we take update steps for the weights $\mathbf{w}$ in the general direction of the negative gradient $\mathbf{g}_t$ on a minibatch, say $\mathbf{w} - \eta \cdot \mathbf{g}_t$. Let us further assume that the objective is well behaved, i.e., it is Lipschitz continuous with constant $L$ as
 
 $$|l(\mathbf{w}) - l(\mathbf{w}')| \leq L \|\mathbf{w} - \mathbf{w}'\|.$$
 
-In this case we can safely assume that if we update the weight vector by $\eta \cdot \mathbf{g}_t$ we will not observe a change by more than $L \eta \|\mathbf{g}_t\|$. This is both a curse and a blessing. A curse since it limits the speed with which we can make progress, a blessing since it limits the extent to which things can go wrong if we move in the wrong direction.
+In this case we can safely assume that if we update the weight vector by $\eta \cdot \mathbf{g}_t$, we will not observe a change by more than $L \eta \|\mathbf{g}_t\|$. This is both a curse and a blessing. A curse since it limits the speed of making progress, whereas a blessing since it limits the extent to which things can go wrong if we move in the wrong direction.
 
-Sometimes the gradients can be quite large and the optimization algorithm may fail to converge. We could address this by reducing the learning rate $\eta$ or by some other higher order trick. But what if we only rarely get large gradients? In this case such an approach may appear entirely unwarranted. One alternative is to clip the gradients by projecting them back to a ball of a given radius, say $\theta$ via
+Sometimes the gradients can be quite large and the optimization algorithm may fail to converge. We could address this by reducing the learning rate $\eta$ or by some other higher order tricks. But what if we rarely get large gradients? In this case such an approach may appear entirely unwarranted. One alternative is to clip the gradients by projecting them back to a ball of a given radius, say $\theta$ via
 
 $$\mathbf{g} \leftarrow \min\left(1, \frac{\theta}{\|\mathbf{g}\|}\right) \mathbf{g}.$$
 
-By doing so we know that the gradient norm never exceeds $\theta$ and that the updated gradient is entirely aligned with the original direction $\mathbf{g}$. It also has the desirable side-effect of limiting the influence any given minibatch (and within it any given sample) can exert on the weight vectors. This bestows a certain degree of robustness to the model. Gradient clipping provides a quick fix to the gradient exploding. While it does not entire solve the problem, it is one of the many techniques to alleviate it.
+By doing so we know that the gradient norm never exceeds $\theta$ and that the updated gradient is entirely aligned with the original direction $\mathbf{g}$. It also has the desirable side-effect of limiting the influence of any given minibatch (and within it any given sample) can exert on the weight vectors. This bestows a certain degree of robustness to the model. Gradient clipping provides a quick fix to the gradient exploding. While it does not entire solve the problem, it is one of the many techniques to alleviate it.
 
 Below we define a function to clip the gradients of a model that is either a `RNNModelScratch` instance or a Gluon model. Also note that we compute the gradient norm over all parameters.
 
@@ -172,15 +212,15 @@ def grad_clipping(model, theta):
 
 ## Training
 
-Similar to :numref:`sec_linear_scratch`, let us first define the function to train the model on one data epoch. It differs to the models training from previous chapters in three places:
+Let us first define the function to train the model on one data epoch. It differs to the models training from :numref:`sec_softmax_scratch` in three places:
 
 1. Different sampling methods for sequential data (independent sampling and
    sequential partitioning) will result in differences in the initialization of
    hidden states.
-1. We clip the gradient before updating the model parameters. This ensures that the model does not diverge even when gradients blow up at some point during the training process (effectively it reduces the stepsize automatically).
-1. We use perplexity to evaluate the model. This ensures that different tests are comparable.
+1. We clip the gradients before updating the model parameters. This ensures that the model does not diverge even when gradients blow up at some point during the training process, and it effectively reduces the stepsize automatically.
+1. We use perplexity to evaluate the model. This ensures that different length of texts are comparable.
 
-When the consecutive sampling is used, we initialize the hidden state at the beginning of each epoch. Since the $i^\mathrm{th}$ example in the next mini-batch is adjacent to the current $i^\mathrm{th}$ example, so the next mini-batch can use the current hidden state directly, we only detach the gradient so that we only compute the gradients within a mini-batch. When using the random sampling, we need to re-initialize the hidden state for each iteration since each example is sampled with a random position. Same to the `train_epoch_ch3` function (:numref:`sec_linear_scratch`), we use generalized `updater`, which could be a Gluon trainer or a scratched implementation.
+When the consecutive sampling is used, we initialize the hidden state at the beginning of each epoch. Since the $i^\mathrm{th}$ example in the next mini-batch is adjacent to the current $i^\mathrm{th}$ example, so the next mini-batch can use the current hidden state directly, we only detach the gradient so that we compute the gradients within a mini-batch. When using the random sampling, we need to re-initialize the hidden state for each iteration since each example is sampled with a random position. Same to the `train_epoch_ch3` function in :numref:`sec_softmax_scratch`, we use generalized `updater`, which could be either a Gluon trainer or a customized scratched implementation.
 
 ```{.python .input}
 # Saved in the d2l package for later use
@@ -236,29 +276,30 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, ctx,
     print(predict('traveller'))
 ```
 
-Finally we can train a model. Since we only use 10,000 tokens in the dataset, so here we need more data epochs to converge.
+Now we can train a model. Since we only use 10,000 tokens in the dataset, so here the model needs more epochs to converge.
 
 ```{.python .input}
 num_epochs, lr = 500, 1
 train_ch8(model, train_iter, vocab, lr, num_epochs, ctx)
 ```
 
-Then let us check the results to use a random sampling iterator.
+Finally let us check the results to use a random sampling iterator.
 
 ```{.python .input}
 train_ch8(model, train_iter, vocab, lr, num_epochs, ctx, use_random_iter=True)
 ```
 
-In the following we will see how to improve significantly on the current model and how to make it faster and easier to implement.
+While writing the above RNN model from scratch is instructive, it is not convenient and fast to implement. If you want to implement faster and easier, check the next section to learn how to use functions provided by Gluon for the same RNN model more efficient.
+
 
 ## Summary
 
 * Sequence models need state initialization for training.
-* Between sequential models you need to ensure to detach the gradient, to ensure that the automatic differentiation does not propagate effects beyond the current sample.
-* A simple RNN language model consists of an encoder, an RNN model and a decoder.
+* Between sequential models you need to ensure to detach the gradients, to ensure that the automatic differentiation does not propagate effects beyond the current sample.
+* A simple RNN language model consists of an encoder, an RNN model, and a decoder.
 * Gradient clipping prevents gradient explosion (but it cannot fix vanishing gradients).
-* Perplexity calibrates model performance across variable sequence length. It is the exponentiated average of the cross-entropy loss.
-* Sequential partitioning typically leads to better models.
+* Perplexity calibrates model performance across different sequence length. It is the exponentiated average of the cross-entropy loss.
+* Sequential partitioning typically leads to a better model.
 
 ## Exercises
 
@@ -277,3 +318,7 @@ In the following we will see how to improve significantly on the current model a
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2364)
 
 ![](../img/qr_rnn-scratch.svg)
+
+```{.python .input}
+
+```
