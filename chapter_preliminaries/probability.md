@@ -12,7 +12,7 @@ We have already invoked probabilities in previous sections without articulating 
 
 As shown in :numref:`fig_cat_dog`,
 while it is easy for humans to recognize cats and dogs at the resolution of $160 \times 160$ pixels,
-it becomes challenging at $40 \time 40$ pixels and next to impossible at $10 \time 10$ pixels. In
+it becomes challenging at $40 \times 40$ pixels and next to impossible at $10 \times 10$ pixels. In
 other words, our ability to tell cats and dogs apart at a large distance (and thus low resolution) might approach uninformed guessing. Probability gives us a
 formal way of reasoning about our level of certainty. 
 If we are completely sure
