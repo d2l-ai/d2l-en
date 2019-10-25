@@ -1343,7 +1343,7 @@ $$
 
 Let us plot the probability density function and cumulative distribution function.
 ```{.python .input}
-mu = 1; sigma = 0.5
+mu = 0; sigma = 1
 
 x = np.arange(-3,3, 0.01)
 p = 1/np.sqrt(2*np.pi*sigma**2)*np.exp(-((x-mu)**2)/(2*sigma**2))
