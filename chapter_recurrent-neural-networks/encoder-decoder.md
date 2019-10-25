@@ -6,6 +6,7 @@ The *encoder-decoder architecture* is a neural network design pattern. In this a
 
 In this section, we will show an interface to implement this encoder-decoder architecture.
 
+
 ## Encoder
 
 The encoder is a normal neural network that takes inputs, e.g., a source sentence, and then returns states, which is a feature map in a form of vector or tensor.
