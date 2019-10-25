@@ -11,7 +11,7 @@ stage("Build and Publish") {
       rm -rf ~/miniconda3/envs/${ENV_NAME}
       conda create -n ${ENV_NAME} pip python=3.8 -y
       conda activate ${ENV_NAME}
-      conda install numpy=1.17.3
+      pip install numpy==1.17.2
       pip install mxnet-cu101==1.6.0b20190915
       pip install git+https://github.com/d2l-ai/d2l-book
       python setup.py develop
