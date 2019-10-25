@@ -1,4 +1,4 @@
-# Appendix: Math
+# Appendix: Mathematics
 :label:`chap_appendix_math`
 
 ```toc
