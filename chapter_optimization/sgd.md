@@ -111,7 +111,9 @@ $$\begin{aligned}
 $$
 
 The gradient $\partial_w l(x_t, w)$ can be bounded from above by some Lipschitz constant $L$, hence we have that
+
 $$\eta_t^2 \|\partial_w l(x_t, w)\|^2 \leq \eta_t^2 L^2.$$
+
 We are mostly interested in how the distance between $w_t$ and $w^*$ changes *in expectation*. In fact, for any specific sequence of steps the distance might well increase, depending on whichever $x_t$ we encounter. Hence we need to bound the inner product. By convexity we have that
 
 $$
