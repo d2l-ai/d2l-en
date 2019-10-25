@@ -20,7 +20,7 @@ npx.set_np()
 
 ## Encoder
 
-In the encoder, we use the word embedding layer to obtain a feature index from the word index of the input language and then input it into a multi-level LSTM recurrent unit. The input for the encoder is a batch of sequences, which is 2-D tensor with shape (batch size, sequence length). It outputs both the LSTM outputs, e.g the hidden state, for each time step and the hidden state and memory cell of the last time step.
+In the encoder, we use the word embedding layer to obtain a feature index from the word index of the input language and then input it into a multi-level LSTM recurrent neural network. The input for the encoder is a batch of sequences, which is 2-D tensor with shape (batch size, sequence length). It outputs both the LSTM outputs, e.g the hidden state for each time step, as well as the hidden state and memory cell of the last time step.
 
 ```{.python .input  n=3}
 # Saved in the d2l package for later use
@@ -36,9 +36,11 @@ class Seq2SeqEncoder(d2l.Encoder):
         X = X.swapaxes(0, 1)  # RNN needs first axes to be time
         state = self.rnn.begin_state(batch_size=X.shape[1], ctx=X.context)
         out, state = self.rnn(X, state)
-        # The shape of out is (seq_len, batch_size, num_hiddens).
-        # state contains the hidden state and the memory cell
-        # of the last time step, the shape is (num_layers, batch_size, num_hiddens)
+        # The shape of "out": (seq_len, batch_size, num_hiddens)
+        # The shape of "state": (num_layers, batch_size, num_hiddens)
+        # The "state" contains the hidden state and the memory cell
+        # of the last time step.
+        
         return out, state
 ```
 
