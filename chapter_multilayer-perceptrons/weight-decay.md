@@ -215,11 +215,11 @@ def l2_penalty(w):
 ### Define Training and Testing
 
 The following code defines how to train and test the model
-separately on the training data set and the test data set.
+separately on the training dataset and the test dataset.
 Unlike the previous sections, here, the $\ell_2$ norm penalty term
 is added when calculating the final loss function.
 The linear network and the squared loss
-haven't changed since the previous chapter,
+have not changed since the previous chapter,
 so we will just import them via `d2l.linreg` and `d2l.squared_loss`
 to reduce clutter.
 

@@ -7,7 +7,7 @@ $$q_{ij}=\frac{\exp(\mathbf{u}_j^\top \mathbf{v}_i)}{ \sum_{k \in \mathcal{V}} \
 
 where $\mathbf{v}_i$ and $\mathbf{u}_i$ are the vector representations of word $w_i$ of index $i$ as the center word and context word respectively, and $\mathcal{V} = \{0, 1, \ldots, |\mathcal{V}|-1\}$ is the vocabulary index set.
 
-For word $w_i$, it may appear in the data set for multiple times. We collect all the context words every time when $w_i$ is a center word and keep duplicates, denoted as multiset $\mathcal{C}_i$. The number of an element in a multiset is called the multiplicity of the element. For instance, suppose that word $w_i$ appears twice in the data set: the context windows when these two $w_i$ become center words in the text sequence contain context word indices $2,1,5,2$ and $2,3,2,1$. Then, multiset $\mathcal{C}_i = \{1,1,2,2,2,2,3,5\}$, where multiplicity of element 1 is 2, multiplicity of element 2 is 4, and multiplicities of elements 3 and 5 are both 1. Denote multiplicity of element $j$ in multiset $\mathcal{C}_i$ as $x_{ij}$: it is the number of word $w_j$ in all the context windows for center word $w_i$ in the entire data set. As a result, the loss function of the skip-gram model can be expressed in a different way:
+For word $w_i$, it may appear in the dataset for multiple times. We collect all the context words every time when $w_i$ is a center word and keep duplicates, denoted as multiset $\mathcal{C}_i$. The number of an element in a multiset is called the multiplicity of the element. For instance, suppose that word $w_i$ appears twice in the dataset: the context windows when these two $w_i$ become center words in the text sequence contain context word indices $2,1,5,2$ and $2,3,2,1$. Then, multiset $\mathcal{C}_i = \{1,1,2,2,2,2,3,5\}$, where multiplicity of element 1 is 2, multiplicity of element 2 is 4, and multiplicities of elements 3 and 5 are both 1. Denote multiplicity of element $j$ in multiset $\mathcal{C}_i$ as $x_{ij}$: it is the number of word $w_j$ in all the context windows for center word $w_i$ in the entire dataset. As a result, the loss function of the skip-gram model can be expressed in a different way:
 
 $$-\sum_{i\in\mathcal{V}}\sum_{j\in\mathcal{V}} x_{ij} \log\,q_{ij}.$$
 
@@ -24,7 +24,7 @@ the cost of letting the
 model prediction $q_{ij}$ become the legal probability distribution has the sum
 of all items in the entire dictionary in its denominator. This can easily lead
 to excessive computational overhead. On the other hand, there are often a lot of
-uncommon words in the dictionary, and they appear rarely in the data set. In the
+uncommon words in the dictionary, and they appear rarely in the dataset. In the
 cross-entropy loss function, the final prediction of the conditional probability
 distribution on a large number of uncommon words is likely to be inaccurate.
 
@@ -50,7 +50,7 @@ Notice that if word $w_i$ appears in the context window of word $w_j$, then word
 
 ## Understanding GloVe from Conditional Probability Ratios
 
-We can also try to understand GloVe word embedding from another perspective. We will continue the use of symbols from earlier in this section, $\mathbb{P}(w_j \mid w_i)$ represents the conditional probability of generating context word $w_j$ with central target word $w_i$ in the data set, and it will be recorded as $p_{ij}$. From a real example from a large corpus, here we have the following two sets of conditional probabilities with "ice" and "steam" as the central target words and the ratio between them:
+We can also try to understand GloVe word embedding from another perspective. We will continue the use of symbols from earlier in this section, $\mathbb{P}(w_j \mid w_i)$ represents the conditional probability of generating context word $w_j$ with central target word $w_i$ in the dataset, and it will be recorded as $p_{ij}$. From a real example from a large corpus, here we have the following two sets of conditional probabilities with "ice" and "steam" as the central target words and the ratio between them:
 
 |$w_k$=|“solid”|“gas”|“water”|“fashion”|
 |--:|:-:|:-:|:-:|:-:|
@@ -82,7 +82,7 @@ By taking the square error and weighting the left and right sides of the formula
 
 ## Summary
 
-* In some cases, the cross-entropy loss function may have a disadvantage. GloVe uses squared loss and the word vector to fit global statistics computed in advance based on the entire data set.
+* In some cases, the cross-entropy loss function may have a disadvantage. GloVe uses squared loss and the word vector to fit global statistics computed in advance based on the entire dataset.
 * The central target word vector and context word vector of any word are equivalent in GloVe.
 
 

@@ -1,7 +1,7 @@
 # Minibatch Stochastic Gradient Descent
 :label:`sec_minibatch_sgd`
 
-In each iteration, the gradient descent uses the entire training data set to compute the gradient, so it is sometimes referred to as batch gradient descent. Stochastic gradient descent (SGD) only randomly select one example in each iteration to compute the gradient. Just like in the previous chapters, we can perform random uniform sampling for each iteration to form a minibatch and then use this minibatch to compute the gradient. Now, we are going to discuss minibatch stochastic gradient descent.
+In each iteration, the gradient descent uses the entire training dataset to compute the gradient, so it is sometimes referred to as batch gradient descent. Stochastic gradient descent (SGD) only randomly select one example in each iteration to compute the gradient. Just like in the previous chapters, we can perform random uniform sampling for each iteration to form a minibatch and then use this minibatch to compute the gradient. Now, we are going to discuss minibatch stochastic gradient descent.
 
 Set objective function $f(\boldsymbol{x}): \mathbb{R}^d \rightarrow \mathbb{R}$. The time step before the start of iteration is set to 0. The independent variable of this time step is $\boldsymbol{x}_0\in \mathbb{R}^d$ and is usually obtained by random initialization. In each subsequent time step $t>0$, minibatch SGD uses random uniform sampling to get a minibatch $\mathcal{B}_t$ made of example indices from the training data set. We can use sampling with replacement or sampling without replacement to get a minibatch example. The former method allows duplicate examples in the same minibatch, the latter does not and is more commonly used. We can use either of the two methods
 
@@ -19,7 +19,7 @@ The cost for computing each iteration is $\mathcal{O}(|\mathcal{B}|)$. When the 
 
 ## Reading Data
 
-In this chapter, we will use a [data set](https://archive.ics.uci.edu/ml/datasets/Airfoil+Self-Noise) developed by NASA to test the wing noise from different aircraft to compare these optimization algorithms. We will use the first 1500 examples of the data set, 5 features, and a normalization method to preprocess the data.
+In this chapter, we will use a [dataset](https://archive.ics.uci.edu/ml/datasets/Airfoil+Self-Noise) developed by NASA to test the wing noise from different aircraft to compare these optimization algorithms. We will use the first 1500 examples of the dataset, 5 features, and a normalization method to preprocess the data.
 
 ```{.python .input  n=1}
 %matplotlib inline

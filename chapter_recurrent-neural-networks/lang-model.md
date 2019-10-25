@@ -7,15 +7,15 @@ In :numref:`sec_text_preprocessing`, we see how to map text data into tokens, an
 
 $$p(x_1,x_2, \ldots, x_T).$$
 
-Language models are incredibly useful. For instance, an ideal language model would be able to generate natural text just on its own, simply by drawing one word at a time $w_t \sim p(w_t|w_{t-1}, \ldots, w_1)$. Quite unlike the monkey using a typewriter, all text emerging from such a model would pass as natural language, e.g., English text. Furthermore, it would be sufficient for generating a meaningful dialog, simply by conditioning the text on previous dialog fragments. Clearly we are still very far from designing such a system, since it would need to *understand* the text rather than just generate grammatically sensible content.
+Language models are incredibly useful. For instance, an ideal language model would be able to generate natural text just on its own, simply by drawing one word at a time $w_t \sim p(w_t|w_{t-1}, \ldots, w_1)$. Quite unlike the monkey using a typewriter, all text emerging from such a model would pass as natural language, e.g., English text. Furthermore, it would be sufficient for generating a meaningful dialog, simply by conditioning the text on previous dialog fragments. Clearly we are still very far from designing such a system, since it would need to understand the text rather than just generate grammatically sensible content.
 
 Nonetheless language models are of great service even in their limited form. For instance, the phrases *'to recognize speech'* and *'to wreck a nice beach'* sound very similar. This can cause ambiguity in speech recognition, ambiguity that is easily resolved through a language model which rejects the second translation as outlandish. Likewise, in a document summarization algorithm it is worth while knowing that *'dog bites man'* is much more frequent than *'man bites dog'*, or that *'let us eat grandma'* is a rather disturbing statement, whereas *'let us eat, grandma'* is much more benign.
 
 ## Estimating a language model
 
-The obvious question is how we should model a document, or even a sequence of words. We can take recourse to the analysis we applied to sequence models in the previous section. Let us start by applying basic probability rules:
+The obvious question is how we should model a document, or even a sequence of words. Recall the analysis we applied to sequence models in the previous section, we can start by applying basic probability rules:
 
-$$p(w_1, w_2, \ldots, w_T) = \prod_{t=1}^T p(w_t | w_1, \ldots, w_{t-1}).$$
+$$p(w_1, w_2, \ldots, w_T) = p(w_1) \prod_{t=2}^T p(w_t | w_1, \ldots, w_{t-1}).$$
 
 For example, the probability of a text sequence containing four tokens consisting of words and punctuation would be given as:
 
@@ -23,13 +23,13 @@ $$p(\mathrm{Statistics}, \mathrm{is},  \mathrm{fun}, \mathrm{.}) =  p(\mathrm{St
 
 In order to compute the language model, we need to calculate the
 probability of words and the conditional probability of a word given
-the previous few words, i.e., language model parameters. Here, we
-assume that the training data set is a large text corpus, such as all
-Wikipedia entries, Project Gutenberg, or all text posted online on the
+the previous few words, i.e., the language model parameters. Here, we
+assume that the training dataset is a large text corpus, such as all
+Wikipedia entries, [Project Gutenberg](https://en.wikipedia.org/wiki/Project_Gutenberg), or all text posted online on the
 web. The probability of words can be calculated from the relative word
-frequency of a given word in the training data set.
+frequency of a given word in the training dataset.
 
-For example, $p(\mathrm{Statistics})​$ can be calculated as the
+For example, $p(\mathrm{Statistics})$ can be calculated by the
 probability of any sentence starting with the word 'statistics'. A
 slightly less accurate approach would be to count all occurrences of
 the word 'statistics' and divide it by the total number of words in
@@ -43,7 +43,7 @@ and pairs of words respectively. Unfortunately, estimating the
 probability of a word pair is somewhat more difficult, since the
 occurrences of *'Statistics is'* are a lot less frequent. In
 particular, for some unusual word combinations it may be tricky to
-find enough occurrences to get accurate estimates. Things take a turn for the worse for 3 word combinations and beyond. There will be many plausible 3-word combinations that we likely will not see in our dataset. Unless we provide some solution to give such word combinations nonzero weight we will not be able to use these as a language model. If the dataset is small or if the words are very rare, we might not find even a single one of them.
+find enough occurrences to get accurate estimates. Things take a turn for the worse for 3-word combinations and beyond. There will be many plausible 3-word combinations that we likely will not see in our dataset. Unless we provide some solution to give such word combinations nonzero weight, we will not be able to use these as a language model. If the dataset is small or if the words are very rare, we might not find even a single one of them.
 
 A common strategy is to perform some form of Laplace smoothing. We already
 encountered this in our discussion of
@@ -60,14 +60,14 @@ Here the coefficients $\epsilon_i > 0$ determine how much we use the
 estimate for a shorter sequence as a fill-in for longer
 ones. Moreover, $m$ is the total number of words we encounter. The
 above is a rather primitive variant of what is Kneser-Ney smoothing
-and Bayesian Nonparametrics can accomplish. See e.g., the Sequence
-Memoizer of Wood et al., 2012 for more details of how to accomplish
-this. Unfortunately, models like this get unwieldy rather quickly:
-first off, we need to store all counts and secondly, this entirely
-ignores the meaning of the words. For instance, *'cat'* and *'feline'*
-should occur in related contexts. Deep learning based language models
-are well suited to take this into account. This, it is quite difficult
-to adjust such models to additional context. Lastly, long word
+and Bayesian Nonparametrics can accomplish. See e.g., :cite:`Wood.Gasthaus.Archambeau.ea.2011` for more details of how to accomplish
+this. Unfortunately, models like this get unwieldy rather quickly 
+for the following reasons. First, we need to store all counts.
+Secondly, this entirely ignores the meaning of the words. For 
+instance, *'cat'* and *'feline'* should occur in related contexts. 
+It is quite difficult to adjust such models to additional context, 
+whereas, deep learning based language models are well suited to 
+take this into account.  Lastly, long word
 sequences are almost certain to be novel, hence a model that simply
 counts the frequency of previously seen word sequences is bound to
 perform poorly there.
@@ -75,7 +75,7 @@ perform poorly there.
 
 ## Markov Models and $n$-grams
 
-Before we discuss solutions involving deep learning we need some more terminology and concepts. Recall our discussion of Markov Models in the previous section. Let us apply this to language modeling. A distribution over sequences satisfies the Markov property of first order if $p(w_{t+1}|w_t, \ldots, w_1) = p(w_{t+1}|w_t)$. Higher orders correspond to longer dependencies. This leads to a number of approximations that we could apply to model a sequence:
+Before we discuss solutions involving deep learning, we need some more terminology and concepts. Recall our discussion of Markov Models in the previous section, let us apply this to language modeling. A distribution over sequences satisfies the Markov property of first order if $p(w_{t+1}|w_t, \ldots, w_1) = p(w_{t+1}|w_t)$. Higher orders correspond to longer dependencies. This leads to a number of approximations that we could apply to model a sequence:
 
 $$
 \begin{aligned}
@@ -85,11 +85,11 @@ p(w_1, w_2, w_3, w_4) &=  p(w_1) p(w_2 | w_1) p(w_3 | w_1, w_2) p(w_4 | w_2, w_3
 \end{aligned}
 $$
 
-Since they involve one, two or three terms, these are typically referred to as unigram, bigram and trigram models. In the following we will learn how to design better models.
+The probability formula that involves one, two, and three variables are typically referred to as unigram, bigram, and trigram models respectively. In the following, we will learn how to design better models.
 
 ## Natural Language Statistics
 
-Let us see how this works on real data. We construct a vocabulary based on the time machine data similar to :numref:`sec_text_preprocessing` and print the top words
+Let us see how this works on real data. We construct a vocabulary based on the time machine data similar to :numref:`sec_text_preprocessing` and print the top-10 most frequent words.
 
 ```{.python .input  n=1}
 import d2l
@@ -102,11 +102,11 @@ vocab = d2l.Vocab(tokens)
 print(vocab.token_freqs[:10])
 ```
 
-As we can see, the most popular words are actually quite boring to look at. They are often referred to as [stop words](https://en.wikipedia.org/wiki/Stop_words) and thus filtered out. That said, they still carry meaning and we will use them nonetheless. However, one thing that is quite clear is that the word frequency decays rather rapidly. The 10th word is less than $1/5$ as common as the most popular one. To get a better idea we plot the graph of word frequencies.
+As we can see, the most popular words are actually quite boring to look at. They are often referred to as [stop words](https://en.wikipedia.org/wiki/Stop_words) and thus filtered out. That said, they still carry meaning and we will use them nonetheless. However, one quite clear thing is that the word frequency decays rather rapidly. The 10th most frequent word is less than $1/5$ as common as the most popular one. To get a better idea we plot the graph of the word frequencies.
 
 ```{.python .input  n=2}
 freqs = [freq for token, freq in vocab.token_freqs]
-d2l.plot(freqs, xlabel='token', ylabel='frequency',
+d2l.plot(freqs, xlabel='token (x)', ylabel='frequency n(x)',
          xscale='log', yscale='log')
 ```
 
@@ -115,7 +115,7 @@ We are on to something quite fundamental here - the word frequencies decay rapid
 $$n(x) \propto (x + c)^{-\alpha} \text{ and hence }
 \log n(x) = -\alpha \log (x+c) + \mathrm{const.}​$$
 
-This should already give us pause if we want to model words by count statistics and smoothing. After all, we will significantly overestimate the frequency of the tail, aka the infrequent words. But what about word pairs (and trigrams and beyond)? Let us see.
+This should already give us pause if we want to model words by count statistics and smoothing. After all, we will significantly overestimate the frequency of the tail, aka the infrequent words. But what about the other word combinations (such as bigrams, trigrams, and beyond)? Let us see whether the bigram frequencies behave in the same manner as the unigram frequencies.
 
 ```{.python .input  n=3}
 bigram_tokens = [[pair for pair in zip(line[:-1], line[1:])] for line in tokens]
@@ -123,7 +123,7 @@ bigram_vocab = d2l.Vocab(bigram_tokens)
 print(bigram_vocab.token_freqs[:10])
 ```
 
-Two things are notable. Out of the 10 most frequent word pairs, 9 are composed of stop words and only one is relevant to the actual book - 'the time'. Let us see whether the bigram frequencies behave in the same manner as the unigram frequencies.
+Two things are notable. Out of the 10 most frequent word pairs, 9 are composed of stop words and only one is relevant to the actual book - 'the time'. Furthermore, let us see whether the trigram frequencies behave in the same manner.
 
 ```{.python .input  n=4}
 trigram_tokens = [[triple for triple in zip(line[:-2], line[1:-1], line[2:])]
@@ -132,7 +132,7 @@ trigram_vocab = d2l.Vocab(trigram_tokens)
 print(trigram_vocab.token_freqs[:10])
 ```
 
-Last, let us visualize the token frequencies among these three gram models.
+Last, let us visualize the token frequencies among these three gram models: unigram, bigram, and trigram.
 
 ```{.python .input  n=5}
 bigram_freqs = [freq for token, freq in bigram_vocab.token_freqs]
@@ -142,7 +142,7 @@ d2l.plot([freqs, bigram_freqs, trigram_freqs], xlabel='token',
          legend=['unigram', 'bigram', 'trigram'])
 ```
 
-The graph is quite exciting for a number of reasons. Firstly, beyond words, also sequences of words appear to be following Zipf's law, albeit with a lower exponent, depending on sequence length. Secondly, the number of distinct n-grams is not that large. This gives us hope that there is quite a lot of structure in language. Third, *many* n-grams occur very rarely, which makes Laplace smoothing rather unsuitable for language modeling. Instead, we will use deep learning based models.
+The graph is quite exciting for a number of reasons. Firstly, beyond unigram words, also sequences of words appear to be following Zipf's law, albeit with a lower exponent, depending on the sequence length. Secondly, the number of distinct n-grams is not that large. This gives us hope that there is quite a lot of structure in language. Thirdly, many n-grams occur very rarely, which makes Laplace smoothing rather unsuitable for language modeling. Instead, we will use deep learning based models.
 
 ## Training Data Preparation
 
@@ -186,7 +186,7 @@ def seq_data_iter_random(corpus, batch_size, num_steps):
 
 Let us generate an artificial sequence from 0 to 30. We assume that
 the batch size and numbers of time steps are 2 and 5
-respectively. This means that depending on the offset we can generate between 4 and 5 $(x,y)$ pairs. With a minibatch size of 2 we only get 2 minibatches.
+respectively. This means that depending on the offset we can generate between 4 and 5 $(x,y)$ pairs. With a minibatch size of 2, we only get 2 minibatches.
 
 ```{.python .input  n=6}
 my_seq = list(range(30))
@@ -215,14 +215,14 @@ def seq_data_iter_consecutive(corpus, batch_size, num_steps):
         yield X, Y
 ```
 
-Using the same settings, print input `X` and label `Y` for each minibatch of examples read by random sampling. The positions of two adjacent random minibatches on the original sequence are adjacent.
+Using the same settings, print input `X` and label `Y` for each minibatch of examples read by random sampling. The positions of two adjacent minibatches on the original sequence are adjacent.
 
 ```{.python .input  n=8}
 for X, Y in seq_data_iter_consecutive(my_seq, batch_size=2, num_steps=6):
     print('X: ', X, '\nY:', Y)
 ```
 
-Now we wrap the above two sampling functions to a class so that we can use it as a normal Gluon data iterator later.
+Now we wrap the above two sampling functions to a class so that we can use it as a Gluon data iterator later.
 
 ```{.python .input}
 # Saved in the d2l package for later use
@@ -254,22 +254,22 @@ def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
 ## Summary
 
 * Language models are an important technology for natural language processing.
-* $n$-grams provide a convenient model for dealing with long sequences by truncating the dependence.
+* $n$-grams models make it convenient to deal with long sequences by truncating the dependence.
 * Long sequences suffer from the problem that they occur very rarely or never. 
-* Zipf's law governs the word distribution for both unigrams and n-grams.
-* There is a lot of structure but not enough frequency to deal with infrequent word combinations efficiently via smoothing.
-* The main choices for sequence partitioning are whether we pick consecutive or random sequences. 
+* Zipf's law governs the word distribution for not only unigrams but also the other n-grams.
+* There is a lot of structure but not enough frequency to deal with infrequent word combinations efficiently via Laplace smoothing.
+* The main choices for sequence partitioning are picking between consecutive and random sequences. 
 * Given the overall document length, it is usually acceptable to be slightly wasteful with the documents and discard half-empty minibatches.
 
 ## Exercises
 
-1. Suppose there are 100,000 words in the training data set. How many word frequencies and multi-word adjacent frequencies does a four-gram need to store?
+1. Suppose there are 100,000 words in the training dataset. How many word frequencies and multi-word adjacent frequencies does a four-gram need to store?
 1. Review the smoothed probability estimates. Why are they not accurate? Hint - we are dealing with a contiguous sequence rather than singletons.
 1. How would you model a dialogue?
 1. Estimate the exponent of Zipf's law for unigrams, bigrams and trigrams.
-1. Which other minibatch data sampling methods can you think of?
+1. What other minibatch data sampling methods can you think of?
 1. Why is it a good idea to have a random offset?
-    * Does it really lead to a perfectly uniform distribution over the sequences on the document?
+    * Does it really lead to a perfect uniform distribution over the sequences on the document?
     * What would you have to do to make things even more uniform?
 1. If we want a sequence example to be a complete sentence, what kinds of problems does this introduce in minibatch sampling? Why would we want to do this anyway?
 

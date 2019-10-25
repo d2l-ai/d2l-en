@@ -58,7 +58,7 @@ def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
     return axes
 ```
 
-Next, let us take a look at the image contents and text labels for the first few examples in the training data set.
+Next, let us take a look at the image contents and text labels for the first few examples in the training dataset.
 
 ```{.python .input}
 X, y = mnist_train[:18]
@@ -81,7 +81,7 @@ def get_dataloader_workers(num_workers=4):
         return num_workers
 ```
 
-In addition, we convert the image data from uint8 to 32-bit floating point numbers using the `ToTensor` class. Beyond that, it will divide all numbers by 255 so that all pixels have values between 0 and 1. The `ToTensor` class also moves the image channel from the last dimension to the first dimension to facilitate the convolutional neural network calculations introduced later. Through the `transform_first` function of the data set, we apply the transformation of `ToTensor` to the first element of each data example (image and label), i.e., the image.
+In addition, we convert the image data from uint8 to 32-bit floating point numbers using the `ToTensor` class. Beyond that, it will divide all numbers by 255 so that all pixels have values between 0 and 1. The `ToTensor` class also moves the image channel from the last dimension to the first dimension to facilitate the convolutional neural network calculations introduced later. Through the `transform_first` function of the dataset, we apply the transformation of `ToTensor` to the first element of each data example (image and label), i.e., the image.
 
 ```{.python .input  n=28}
 batch_size = 256
@@ -102,7 +102,7 @@ for X, y in train_iter:
 
 ## Put all Things Together 
 
-Now we define the `load_data_fashion_mnist` function that obtains and reads the Fashion-MNIST data set. It returns the data iterators for both the training set and validation set. In addition, it accepts an optional argument to resize images to another shape.
+Now we define the `load_data_fashion_mnist` function that obtains and reads the Fashion-MNIST dataset. It returns the data iterators for both the training set and validation set. In addition, it accepts an optional argument to resize images to another shape.
 
 ```{.python .input  n=4}
 # Saved in the d2l package for later use 
@@ -131,7 +131,7 @@ for X, y in train_iter:
 
 ## Summary
 
-* Fashion-MNIST is an apparel classification data set containing 10 categories, which we will use to test the performance of different algorithms in later chapters.
+* Fashion-MNIST is an apparel classification dataset containing 10 categories, which we will use to test the performance of different algorithms in later chapters.
 * We store the shape of image using height and width of $h$ and $w$ pixels, respectively, as $h \times w$ or `(h, w)`.
 * Data iterators are a key component for efficient performance. Use existing ones if available.
 

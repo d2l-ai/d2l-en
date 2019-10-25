@@ -240,7 +240,7 @@ When we have more data, we can train more powerful models,
 and rely less heavily on pre-conceived assumptions.
 The regime change from (comparatively small) to big data
 is a major contributor to the success of modern deep learning.
-To drive the point home, many of the most exciting models in deep learning either do not work without large data sets.
+To drive the point home, many of the most exciting models in deep learning either do not work without large datasets.
 Some others work in the low-data regime,
 but no better than traditional approaches.
 
@@ -787,7 +787,7 @@ We will address a number of unsupervised learning techniques in later chapters. 
 
 ### Interacting with an Environment
 
-So far, we haven't discussed where data actually comes from,
+So far, we have not discussed where data actually comes from,
 or what actually *happens* when a machine learning model generates an output.
 That is because supervised learning and unsupervised learning
 do not address these issues in a very sophisticated way.

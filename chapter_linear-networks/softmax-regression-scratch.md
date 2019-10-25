@@ -209,7 +209,7 @@ y = np.array([0, 2])
 accuracy(y_hat, y) / len(y)
 ```
 
-Similarly, we can evaluate the accuracy for model `net` on the data set
+Similarly, we can evaluate the accuracy for model `net` on the dataset
 (accessed via `data_iter`).
 
 ```{.python .input  n=13}
