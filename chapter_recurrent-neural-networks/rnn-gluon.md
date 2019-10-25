@@ -109,7 +109,3 @@ Compared with last section, this model achieves comparable perplexity, albeit wi
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2365)
 
 ![](../img/qr_rnn-gluon.svg)
-
-```{.python .input}
-
-```
