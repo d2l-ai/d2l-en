@@ -1246,6 +1246,8 @@ $$
  \sum _ {j} \epsilon \left(\sum_{i} \epsilon f(\epsilon i, \epsilon j)\right).
 $$
 
+![Illustrating how to decompose a sum over many squares as a sum over first the columns (1), then adding the column sums together (2).](../img/SumOrder.svg)
+
 The sum on the inside is precisely the discretization of the integral 
 
 $$
