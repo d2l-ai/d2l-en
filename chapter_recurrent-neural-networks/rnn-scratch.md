@@ -101,7 +101,7 @@ class RNNModelScratch(object):
         return self.init_state(batch_size, self.num_hiddens, ctx)
 ```
 
-Let us do a sanity check whether inputs and outputs have the correct dimensions, e.g., to ensure that the dimensionality of the hidden state hasn't changed.
+Let us do a sanity check whether inputs and outputs have the correct dimensions, e.g., to ensure that the dimensionality of the hidden state has not changed.
 
 ```{.python .input}
 vocab_size, num_hiddens, ctx = len(vocab), 512, d2l.try_gpu()

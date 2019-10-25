@@ -787,7 +787,7 @@ We will address a number of unsupervised learning techniques in later chapters. 
 
 ### Interacting with an Environment
 
-So far, we haven't discussed where data actually comes from,
+So far, we have not discussed where data actually comes from,
 or what actually *happens* when a machine learning model generates an output.
 That is because supervised learning and unsupervised learning
 do not address these issues in a very sophisticated way.

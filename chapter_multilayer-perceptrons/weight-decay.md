@@ -219,7 +219,7 @@ separately on the training data set and the test data set.
 Unlike the previous sections, here, the $\ell_2$ norm penalty term
 is added when calculating the final loss function.
 The linear network and the squared loss
-haven't changed since the previous chapter,
+have not changed since the previous chapter,
 so we will just import them via `d2l.linreg` and `d2l.squared_loss`
 to reduce clutter.
 
