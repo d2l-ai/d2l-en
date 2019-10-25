@@ -1,5 +1,5 @@
 # Foundational Information Theory
-:label:`sec_foundational_information_theory`
+:label:`sec_information_theory`
 
 For thousnads of years, we are submerging in a world of information. From Shakespeare’s Sonnet to researchers' paper on Cornell ArXiv, from Van Gogh's printing Starry Night to Beethoven's music Symphony No. 5, from the first programming language Plankalkül to the state-of-the-art machine learning algorithms. No matter what are the format of these information, everything follows the rule of information theory for millennium of years. With information theory, we can measure and compare how much information is presented in different signals. In this section, we will illustrate the fundamental concepts of information theory and its applications.
 
