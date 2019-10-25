@@ -4,10 +4,8 @@
 ```toc
 :maxdepth: 2
 
-notation
-math
 foundational-linear-algebra
 foundational-calculus
-info-theory
+foundational-info-theory
 ```
 
