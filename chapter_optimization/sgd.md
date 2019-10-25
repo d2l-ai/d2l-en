@@ -96,8 +96,11 @@ The following is optional and primarily serves to convey more intuition about th
 
 Consider the case where
 $$w_{t+1} = w_{t} - \eta_t \partial_w l(x_t, w)$$
+
 In particular, assume that $x_t$ is drawn from some distribution $p(x)$ and that $l(x,w)$ is a convex function in $w$ for all $x$. Lastly denote by
+
 $$R(w) = \mathbf{E}_{x \sim p}[l(x,w)]$$
+
 the expected risk and by $R^*$ its minimum with regard to $w$. Lastly let $w^*$ be the minimizer (we assume that it exists within the domain within wich $w$ is defined). In this case we can track the distance between the current parameter $w_t$ and the risk minimizer $w^*$ and see whether it improves over time.
 
 $$\begin{aligned}
@@ -106,28 +109,43 @@ $$\begin{aligned}
     \left\langle w_t - w^*, \partial_w l(x_t, w)\right\rangle
    \end{aligned}
 $$
+
 The gradient $\partial_w l(x_t, w)$ can be bounded from above by some Lipschitz constant $L$, hence we have that
 $$\eta_t^2 \|\partial_w l(x_t, w)\|^2 \leq \eta_t^2 L^2.$$
 We are mostly interested in how the distance between $w_t$ and $w^*$ changes *in expectation*. In fact, for any specific sequence of steps the distance might well increase, depending on whichever $x_t$ we encounter. Hence we need to bound the inner product. By convexity we have that
+
 $$
 l(x_t, w^*) \geq l(x_t, w_t) + \left\langle w^* - w_t, \partial_{w} l(x_t, w_t) \right\rangle.
 $$
+
 Using both inequalities and plugging it into the above we obtain a bound on the distance between parameters at time $t+1$ as follows:
+
 $$\|w_{t} - w^*\|^2 - \|w_{t+1} - w^*\|^2 \geq 2 \eta_t (l(x_t, w_t) - l(x_t, w^*)) - \eta_t^2 L^2.$$
+
 This means that we make progress as long as the expected difference between current loss and the optimal loss outweights $\eta_t L^2$. Since the former is bound to converge to $0$ it follows that the learning rate $\eta_t$ also needs to vanish.
 
 Next we take expectations over this expression. This yields
+
 $$\mathbf{E}_{w_t}\left[\|w_{t} - w^*\|^2\right] - \mathbf{E}_{w_{t+1}|w_t}\left[\|w_{t+1} - w^*\|^2\right] \geq 2 \eta_t [\mathbf{E}[R[w_t]] - R^*] -  \eta_t^2 L^2.$$
+
 The last step involves summing over the inequalities for $t \in \{t, \ldots, T\}$. Since the sum telescopes and by dropping the lower term we obtain
+
 $$\|w_{0} - w^*\|^2 \geq 2 \sum_{t=1}^T \eta_t [\mathbf{E}[R[w_t]] - R^*] - L^2 \sum_{t=1}^T \eta_t^2.$$
+
 Note that we exploited that $w_0$ is given and thus the expectation can be dropped. Lastly define
+
 $$\bar{w} := \frac{\sum_{t=1}^T \eta_t w_t}{\sum_{t=1}^T \eta_t}.$$
+
 Then by convexity it follows that
+
 $$\sum_t \eta_t \mathbf{E}[R[w_t]] \geq \sum \eta_t \cdot \left[\mathbf{E}[\bar{w}]\right].$$
+
 Plugging this into the above inequality yields the bound
+
 $$
 \left[\mathbf{E}[\bar{w}]\right] - R^* \leq \frac{r^2 + L^2 \sum_{t=1}^T \eta_t^2}{2 \sum_{t=1}^T \eta_t}
 $$
+
 Here $r^2 := \|w_0 - w^*\|^2$ is a bound on the distance between the initial choice of parameters and the final outcome. In short, the speed of convergence depends on how rapidly the loss function changes via the Lipschitz constant $L$ and how far away from optimality the initial value is $r$. Note that the bound is in terms of $\bar{w}$ rather than $w_T$. This is the case since $\bar{w}$ is a smoothed version of the optimization path. Now let us analyze some choices for $\eta_t$.
 
 * **Known Time Horizon** - whenever $r, L$ and $T$ are known we can pick $\eta = r/L \sqrt{T}$. This yields as upper bound $r L (1 + 1/T)/2\sqrt{T} < rL/\sqrt{T}$. That is, we converge with rate $O(1/\sqrt{T})$ to the optimal solution.
