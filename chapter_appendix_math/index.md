@@ -10,7 +10,7 @@ multivariable-calculus
 integral-calculus
 random-variables
 maximum-likelihood
-distributions
+common-distributions
 naive-bayes
 info-theory
 ```
