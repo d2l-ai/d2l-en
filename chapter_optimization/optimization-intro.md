@@ -12,7 +12,7 @@ finite amount of data.  In :numref:`sec_model_selection`,
 we discussed the difference between these two goals in detail. For instance,
 training error and generalization error generally differ: since the objective
 function of the optimization algorithm is usually a loss function based on the
-training data set, the goal of optimization is to reduce the training error.
+training dataset, the goal of optimization is to reduce the training error.
 However, the goal of statistical inference (and thus of deep learning) is to
 reduce the generalization error.  To accomplish the latter we need to pay
 attention to overfitting in addition to using the optimization algorithm to

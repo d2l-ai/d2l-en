@@ -2,7 +2,7 @@
 :label:`sec_synonyms`
 
 In :numref:`sec_word2vec_gluon` we trained a word2vec word embedding model
-on a small-scale data set and searched for synonyms using the cosine similarity
+on a small-scale dataset and searched for synonyms using the cosine similarity
 of word vectors. In practice, word vectors pre-trained on a large-scale corpus
 can often be applied to downstream natural language processing tasks. This
 section will demonstrate how to use these pre-trained word vectors to find
@@ -23,13 +23,13 @@ npx.set_np()
 text.embedding.get_pretrained_file_names().keys()
 ```
 
-Given the name of the word embedding, we can see which pre-trained models are provided by the word embedding. The word vector dimensions of each model may be different or obtained by pre-training on different data sets.
+Given the name of the word embedding, we can see which pre-trained models are provided by the word embedding. The word vector dimensions of each model may be different or obtained by pre-training on different datasets.
 
 ```{.python .input  n=35}
 print(text.embedding.get_pretrained_file_names('glove'))
 ```
 
-The general naming conventions for pre-trained GloVe models are "model.(data set.)number of words in data set.word vector dimension.txt". For more information, please refer to the GloVe and fastText project sites [2,3]. Below, we use a 50-dimensional GloVe word vector based on Wikipedia subset pre-training. The corresponding word vector is automatically downloaded the first time we create a pre-trained word vector instance.
+The general naming conventions for pre-trained GloVe models are "model.(dataset.)number of words in dataset.word vector dimension.txt". For more information, please refer to the GloVe and fastText project sites [2,3]. Below, we use a 50-dimensional GloVe word vector based on Wikipedia subset pre-training. The corresponding word vector is automatically downloaded the first time we create a pre-trained word vector instance.
 
 ```{.python .input  n=11}
 glove_6b50d = text.embedding.create(

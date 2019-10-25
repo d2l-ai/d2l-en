@@ -19,7 +19,7 @@ concisely by using Gluon.
 
 ## Generating Data Sets
 
-To start, we will generate the same data set as in the previous section.
+To start, we will generate the same dataset as in the previous section.
 
 ```{.python .input  n=2}
 import d2l

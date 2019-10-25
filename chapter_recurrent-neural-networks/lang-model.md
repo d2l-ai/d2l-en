@@ -24,10 +24,10 @@ $$p(\mathrm{Statistics}, \mathrm{is},  \mathrm{fun}, \mathrm{.}) =  p(\mathrm{St
 In order to compute the language model, we need to calculate the
 probability of words and the conditional probability of a word given
 the previous few words, i.e., the language model parameters. Here, we
-assume that the training data set is a large text corpus, such as all
+assume that the training dataset is a large text corpus, such as all
 Wikipedia entries, [Project Gutenberg](https://en.wikipedia.org/wiki/Project_Gutenberg), or all text posted online on the
 web. The probability of words can be calculated from the relative word
-frequency of a given word in the training data set.
+frequency of a given word in the training dataset.
 
 For example, $p(\mathrm{Statistics})$ can be calculated by the
 probability of any sentence starting with the word 'statistics'. A
@@ -263,7 +263,7 @@ def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
 
 ## Exercises
 
-1. Suppose there are 100,000 words in the training data set. How many word frequencies and multi-word adjacent frequencies does a four-gram need to store?
+1. Suppose there are 100,000 words in the training dataset. How many word frequencies and multi-word adjacent frequencies does a four-gram need to store?
 1. Review the smoothed probability estimates. Why are they not accurate? Hint - we are dealing with a contiguous sequence rather than singletons.
 1. How would you model a dialogue?
 1. Estimate the exponent of Zipf's law for unigrams, bigrams and trigrams.

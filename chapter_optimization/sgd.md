@@ -13,7 +13,7 @@ npx.set_np()
 
 ## Stochastic Gradient Updates
 
-In deep learning, the objective function is usually the average of the loss functions for each example in the training data set. We assume that $f_i(\boldsymbol{x})$ is the loss function of the training data instance with $n$ examples, an index of $i$, and parameter vector of $\boldsymbol{x}$, then we have the objective function
+In deep learning, the objective function is usually the average of the loss functions for each example in the training dataset. We assume that $f_i(\boldsymbol{x})$ is the loss function of the training data instance with $n$ examples, an index of $i$, and parameter vector of $\boldsymbol{x}$, then we have the objective function
 
 $$f(\boldsymbol{x}) = \frac{1}{n} \sum_{i = 1}^n f_i(\boldsymbol{x}).$$
 
@@ -171,7 +171,7 @@ A similar reasoning shows that the probability of picking a sample exactly once 
 * For convex problems we can prove that for a wide choice of learning rates Stochastic Gradient Descent will converge to the optimal solution.
 * For deep learning this is generally not the case. However, the analysis of convex problems gives us useful insight into how to approach optimization, namely to reduce the learning rate progressively, albeit not too quickly.
 * Problems occur when the learning rate is too small or too large. In practice  a suitable learning rate is often found only after multiple experiments.
-* When there are more examples in the training data set, it costs more to compute each iteration for gradient descent, so SGD is preferred in these cases.
+* When there are more examples in the training dataset, it costs more to compute each iteration for gradient descent, so SGD is preferred in these cases.
 * Optimality guarantees for SGD are in general not available in nonconvex cases since the number of local minima that require checking might well be exponential.
 
 

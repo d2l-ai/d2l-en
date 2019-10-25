@@ -42,7 +42,7 @@ we would need to get our hands on a dataset
 consisting of sales for which we know
 the sale price, area and age for each home.
 In the terminology of machine learning,
-the data set is called a *training data* or *training set*,
+the dataset is called a *training data* or *training set*,
 and each row (here the data corresponding to one sale)
 is called an *instance* or *example*.
 The thing we are trying to predict (here, the price)

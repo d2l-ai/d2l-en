@@ -1,9 +1,9 @@
 # Image Classification (CIFAR-10) on Kaggle
 :label:`sec_kaggle_cifar10`
 
-So far, we have been using Gluon's `data` package to directly obtain image data sets in the `ndarray` format. In practice, however, image data sets often exist in the format of image files. In this section, we will start with the original image files and organize, read, and convert the files to the `ndarray` format step by step.
+So far, we have been using Gluon's `data` package to directly obtain image datasets in the `ndarray` format. In practice, however, image datasets often exist in the format of image files. In this section, we will start with the original image files and organize, read, and convert the files to the `ndarray` format step by step.
 
-We performed an experiment on the CIFAR-10 data set in :numref:`sec_image_augmentation`.
+We performed an experiment on the CIFAR-10 dataset in :numref:`sec_image_augmentation`.
 This is an important data
 set in the computer vision field. Now, we will apply the knowledge we learned in
 the previous sections in order to participate in the Kaggle competition, which
@@ -14,7 +14,7 @@ is
 
 Figure 9.16 shows the information on the competition's webpage. In order to submit the results, please register an account on the Kaggle website first.
 
-![CIFAR-10 image classification competition webpage information. The data set for the competition can be accessed by clicking the "Data" tab.](../img/kaggle_cifar10.png)
+![CIFAR-10 image classification competition webpage information. The dataset for the competition can be accessed by clicking the "Data" tab.](../img/kaggle_cifar10.png)
 :width:`600px`
 
 First, import the packages or modules required for the competition.
@@ -33,25 +33,25 @@ npx.set_np()
 
 ## Obtain and Organize the Data Sets
 
-The competition data is divided into a training set and testing set. The training set contains 50,000 images. The testing set contains 300,000 images, of which 10,000 images are used for scoring, while the other 290,000 non-scoring images are included to prevent the manual labeling of the testing set and the submission of labeling results. The image formats in both data sets are PNG, with heights and widths of 32 pixels and three color channels (RGB). The images cover 10 categories: planes, cars, birds, cats, deer, dogs, frogs, horses, boats, and trucks. The upper-left corner of Figure 9.16 shows some images of planes, cars, and birds in the data set.
+The competition data is divided into a training set and testing set. The training set contains 50,000 images. The testing set contains 300,000 images, of which 10,000 images are used for scoring, while the other 290,000 non-scoring images are included to prevent the manual labeling of the testing set and the submission of labeling results. The image formats in both datasets are PNG, with heights and widths of 32 pixels and three color channels (RGB). The images cover 10 categories: planes, cars, birds, cats, deer, dogs, frogs, horses, boats, and trucks. The upper-left corner of Figure 9.16 shows some images of planes, cars, and birds in the dataset.
 
 ### Download the Data Set
 
-After logging in to Kaggle, we can click on the "Data" tab on the CIFAR-10 image classification competition webpage shown in Figure 9.16 and download the training data set "train.7z", the testing data set "test.7z", and the training data set labels "trainlabels.csv".
+After logging in to Kaggle, we can click on the "Data" tab on the CIFAR-10 image classification competition webpage shown in Figure 9.16 and download the training dataset "train.7z", the testing dataset "test.7z", and the training dataset labels "trainlabels.csv".
 
 
 ### Unzip the Data Set
 
-The training data set "train.7z" and the test data set "test.7z" need to be unzipped after downloading. After unzipping the data sets, store the training data set, test data set, and training data set labels in the following respective paths:
+The training dataset "train.7z" and the test dataset "test.7z" need to be unzipped after downloading. After unzipping the datasets, store the training dataset, test dataset, and training dataset labels in the following respective paths:
 
 * ../data/kaggle_cifar10/train/[1-50000].png
 * ../data/kaggle_cifar10/test/[1-300000].png
 * ../data/kaggle_cifar10/trainLabels.csv
 
-To make it easier to get started, we provide a small-scale sample of the data set mentioned above. "train_tiny.zip" contains 100 training examples, while "test_tiny.zip" contains only one test example. Their unzipped folder names are "train_tiny" and "test_tiny", respectively. In addition, unzip the zip file of the training data set labels to obtain the file "trainlabels.csv". If you are going to use the full data set of the Kaggle competition, you will also need to change the following `demo` variable to `False`.
+To make it easier to get started, we provide a small-scale sample of the dataset mentioned above. "train_tiny.zip" contains 100 training examples, while "test_tiny.zip" contains only one test example. Their unzipped folder names are "train_tiny" and "test_tiny", respectively. In addition, unzip the zip file of the training dataset labels to obtain the file "trainlabels.csv". If you are going to use the full dataset of the Kaggle competition, you will also need to change the following `demo` variable to `False`.
 
 ```{.python .input  n=2}
-# If you use the full data set downloaded for the Kaggle competition, change
+# If you use the full dataset downloaded for the Kaggle competition, change
 # the demo variable to False
 demo = True
 if demo:
@@ -63,7 +63,7 @@ if demo:
 
 ### Organize the Data Set
 
-We need to organize data sets to facilitate model training and testing. The following `read_label_file` function will be used to read the label file for the training data set. The parameter `valid_ratio` in this function is the ratio of the number of examples in the validation set to the number of examples in the original training set.
+We need to organize datasets to facilitate model training and testing. The following `read_label_file` function will be used to read the label file for the training dataset. The parameter `valid_ratio` in this function is the ratio of the number of examples in the validation set to the number of examples in the original training set.
 
 ```{.python .input  n=3}
 def read_label_file(data_dir, label_file, train_dir, valid_ratio):
@@ -133,12 +133,12 @@ def reorg_cifar10_data(data_dir, label_file, train_dir, test_dir, input_dir,
     reorg_test(data_dir, test_dir, input_dir)
 ```
 
-We use only 100 training example and one test example here. The folder names for the training and testing data sets are "train_tiny" and "test_tiny", respectively. Accordingly, we only set the batch size to 1. During actual training and testing, the complete data set of the Kaggle competition should be used and `batch_size` should be set to a larger integer, such as 128. We use 10% of the training examples as the validation set for tuning hyper-parameters.
+We use only 100 training example and one test example here. The folder names for the training and testing datasets are "train_tiny" and "test_tiny", respectively. Accordingly, we only set the batch size to 1. During actual training and testing, the complete dataset of the Kaggle competition should be used and `batch_size` should be set to a larger integer, such as 128. We use 10% of the training examples as the validation set for tuning hyper-parameters.
 
 ```{.python .input  n=8}
 if demo:
     # Note: Here, we use small training sets and small testing sets and the
-    # batch size should be set smaller. When using the complete data set for
+    # batch size should be set smaller. When using the complete dataset for
     # the Kaggle competition, the batch size can be set to a large integer
     train_dir, test_dir, batch_size = 'train_tiny', 'test_tiny', 1
 else:
@@ -181,7 +181,7 @@ transform_test = gluon.data.vision.transforms.Compose([
 
 ## Read the Data Set
 
-Next, we can create the `ImageFolderDataset` instance to read the organized data set containing the original image files, where each data instance includes the image and label.
+Next, we can create the `ImageFolderDataset` instance to read the organized dataset containing the original image files, where each data instance includes the image and label.
 
 ```{.python .input  n=10}
 # Read the original image file. Flag=1 indicates that the input image has
@@ -324,7 +324,7 @@ train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
 
 ## Classify the Testing Set and Submit Results on Kaggle
 
-After obtaining a satisfactory model design and hyper-parameters, we use all training data sets (including validation sets) to retrain the model and classify the testing set.
+After obtaining a satisfactory model design and hyper-parameters, we use all training datasets (including validation sets) to retrain the model and classify the testing set.
 
 ```{.python .input  n=14}
 net, preds = get_net(ctx), []
@@ -348,13 +348,13 @@ for submitting results is similar to method in :numref:`sec_kaggle_house`.
 
 ## Summary
 
-* We can create an `ImageFolderDataset` instance to read the data set containing the original image files.
+* We can create an `ImageFolderDataset` instance to read the dataset containing the original image files.
 * We can use convolutional neural networks, image augmentation, and hybrid programming to take part in an image classification competition.
 
 
 ## Exercises
 
-* Use the complete CIFAF-10 data set for the Kaggle competition. Change the `batch_size` and number of epochs `num_epochs` to 128 and 100, respectively.  See what accuracy and ranking you can achieve in this competition.
+* Use the complete CIFAF-10 dataset for the Kaggle competition. Change the `batch_size` and number of epochs `num_epochs` to 128 and 100, respectively.  See what accuracy and ranking you can achieve in this competition.
 * What accuracy can you achieve when not using image augmentation?
 * Scan the QR code to access the relevant discussions and exchange ideas about the methods used and the results obtained with the community. Can you come up with any better techniques?
 

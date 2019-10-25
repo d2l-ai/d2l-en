@@ -4,7 +4,7 @@
 We are now ready to put all of the tools together
 to deploy your first fully-functional convolutional neural network.
 In our first encounter with image data we applied a multilayer perceptron (:numref:`sec_mlp_scratch`)
-to pictures of clothing in the Fashion-MNIST data set.
+to pictures of clothing in the Fashion-MNIST dataset.
 Each image in Fashion-MNIST consisted of
 a two-dimensional $28 \times 28$ matrix.
 To make this data amenable to multilayer perceptrons

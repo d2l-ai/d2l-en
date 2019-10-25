@@ -16,7 +16,7 @@ In the computer vision field, there are two important methods related to semanti
 
 ## Pascal VOC2012 Semantic Segmentation Data Set
 
-In the semantic segmentation field, one important data set is [Pascal VOC2012](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/). To better understand this data set, we must first import the package or module needed for the experiment.
+In the semantic segmentation field, one important dataset is [Pascal VOC2012](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/). To better understand this dataset, we must first import the package or module needed for the experiment.
 
 ```{.python .input  n=1}
 %matplotlib inline
@@ -29,7 +29,7 @@ npx.set_np()
 ```
 
 The original site might be unstable, we download the data from a mirror site. 
-We download the archive to the `../data` path. The archive is about 2GB, so it will take some time to download. After you decompress the archive, the data set is located in the `../data/VOCdevkit/VOC2012` path.
+We download the archive to the `../data` path. The archive is about 2GB, so it will take some time to download. After you decompress the archive, the dataset is located in the `../data/VOCdevkit/VOC2012` path.
 
 ```{.python .input  n=2}
 # Saved in the d2l package for later use 
@@ -46,7 +46,7 @@ def download_voc_pascal(data_dir='../data'):
 voc_dir = download_voc_pascal()
 ```
 
-Go to `../data/VOCdevkit/VOC2012` to see the different parts of the data set. The `ImageSets/Segmentation` path contains text files that specify the training and testing examples. The `JPEGImages` and `SegmentationClass` paths contain the example input images and labels, respectively. These labels are also in image format, with the same dimensions as the input images to which they correspond. In the labels, pixels with the same color belong to the same semantic category. The `read_voc_images` function defined below reads all input images and labels to the memory.
+Go to `../data/VOCdevkit/VOC2012` to see the different parts of the dataset. The `ImageSets/Segmentation` path contains text files that specify the training and testing examples. The `JPEGImages` and `SegmentationClass` paths contain the example input images and labels, respectively. These labels are also in image format, with the same dimensions as the input images to which they correspond. In the labels, pixels with the same color belong to the same semantic category. The `read_voc_images` function defined below reads all input images and labels to the memory.
 
 ```{.python .input  n=3}
 # Saved in the d2l package for later use
@@ -138,7 +138,7 @@ d2l.show_images(imgs[::2] + imgs[1::2], 2, n);
 
 ### Data Set Classes for Custom Semantic Segmentation
 
-We use the inherited `Dataset` class provided by Gluon to customize the semantic segmentation data set class `VOCSegDataset`. By implementing the `__getitem__` function, we can arbitrarily access the input image with the index `idx` and the category indexes for each of its pixels from the data set. As some images in the data set may be smaller than the output dimensions specified for random cropping, we must remove these example by using a custom `filter` function. In addition, we define the `normalize_image` function to normalize each of the three RGB channels of the input images.
+We use the inherited `Dataset` class provided by Gluon to customize the semantic segmentation dataset class `VOCSegDataset`. By implementing the `__getitem__` function, we can arbitrarily access the input image with the index `idx` and the category indexes for each of its pixels from the dataset. As some images in the dataset may be smaller than the output dimensions specified for random cropping, we must remove these example by using a custom `filter` function. In addition, we define the `normalize_image` function to normalize each of the three RGB channels of the input images.
 
 ```{.python .input  n=9}
 # Saved in the d2l package for later use 
@@ -198,7 +198,7 @@ for X, Y in train_iter:
 
 ## Put All Things Together
 
-Finally, we define a function `load_data_voc` that  downloads and loads this data set, and then returns the data loaders.
+Finally, we define a function `load_data_voc` that  downloads and loads this dataset, and then returns the data loaders.
 
 ```{.python .input  n=13}
 # Saved in the d2l package for later use 
@@ -218,7 +218,7 @@ def load_data_voc(batch_size, crop_size):
 ## Summary
 
 * Semantic segmentation looks at how images can be segmented into regions with different semantic categories.
-* In the semantic segmentation field, one important data set is Pascal VOC2012.
+* In the semantic segmentation field, one important dataset is Pascal VOC2012.
 * Because the input images and labels in semantic segmentation have a one-to-one correspondence at the pixel level, we randomly crop them to a fixed size, rather than scaling them.
 
 ## Exercises

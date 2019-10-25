@@ -77,7 +77,7 @@ If you altered the model structure or the hyper-parameters during the experiment
 In order to discuss this phenomenon more formally,
 we need to differentiate between *training error* and *generalization error*.
 The training error is the error of our model
-as calculated on the training data set,
+as calculated on the training dataset,
 while generalization error is the expectation of our model's error
 were we to apply it to an infinite stream of additional data points
 drawn from the same underlying data distribution as our original sample.
@@ -375,7 +375,7 @@ A higher-order polynomial function is more complex
 than a lower order polynomial function,
 since the higher-order polynomial has more parameters
 and the model function’s selection range is wider.
-Fixing the training data set,
+Fixing the training dataset,
 higher-order polynomial functions should always
 achieve lower (at worst, equal) training error
 relative to lower degree polynomials.
@@ -433,7 +433,7 @@ We will synthesize 100 samples each for the training set and test set.
 
 ```{.python .input  n=2}
 maxdegree = 20  # Maximum degree of the polynomial
-n_train, n_test = 100, 100  # Training and test data set sizes
+n_train, n_test = 100, 100  # Training and test dataset sizes
 true_w = np.zeros(maxdegree)  # Allocate lots of empty space
 true_w[0:4] = np.array([5, 1.2, -3.4, 5.6])
 
@@ -454,7 +454,7 @@ It allows us to avoid very large values for large exponents $i$.
 Factorials are implemented in Gluon using the Gamma function,
 where $n! = \Gamma(n+1)$.
 
-Take a look at the first 2 samples from the generated data set.
+Take a look at the first 2 samples from the generated dataset.
 The value 1 is technically a feature,
 namely the constant feature corresponding to the bias.
 
@@ -509,7 +509,7 @@ def train(train_features, test_features, train_labels, test_labels,
 We will begin by first using a third-order polynomial function
 with the same order as the data generation function.
 The results show that this model’s training error rate
-when using the testing data set is low.
+when using the testing dataset is low.
 The trained model parameters are also close
 to the true values $w = [5, 1.2, -3.4, 5.6]$.
 
@@ -573,7 +573,7 @@ such as weight decay and dropout.
 
 * Since the generalization error rate cannot be estimated based on the training error rate, simply minimizing the training error rate will not necessarily mean a reduction in the generalization error rate. Machine learning models need to be careful to safeguard against overfitting such as to minimize the generalization error.
 * A validation set can be used for model selection (provided that it is not used too liberally).
-* Underfitting means that the model is not able to reduce the training error rate while overfitting is a result of the model training error rate being much lower than the testing data set rate.
+* Underfitting means that the model is not able to reduce the training error rate while overfitting is a result of the model training error rate being much lower than the testing dataset rate.
 * We should choose an appropriately complex model and avoid using insufficient training samples.
 
 

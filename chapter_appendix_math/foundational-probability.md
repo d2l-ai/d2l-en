@@ -45,7 +45,7 @@ image, label = mnist_train[2]
 image.shape, label
 ```
 
-Our example, stored here in the variable `image` corresponds to an image with a height and width of $28$ pixels. Each pixel is an $8$-bit unsigned integer (uint8) with values between $0$ and $255$. We store it in a 3D ndarray, whose last dimension is the number of channels. Since the data set is a grayscale image, the number of channels is 1. When we encounter color, images, we will have three channels for red, green, and blue. To minimize the number of indices, we will record the shape of the image with the height and width of $h$ and $w$ pixels, respectively, as $h \times w$ or `(h, w)`.
+Our example, stored here in the variable `image` corresponds to an image with a height and width of $28$ pixels. Each pixel is an $8$-bit unsigned integer (uint8) with values between $0$ and $255$. We store it in a 3D ndarray, whose last dimension is the number of channels. Since the dataset is a grayscale image, the number of channels is 1. When we encounter color, images, we will have three channels for red, green, and blue. To minimize the number of indices, we will record the shape of the image with the height and width of $h$ and $w$ pixels, respectively, as $h \times w$ or `(h, w)`.
 
 ```{.python .input}
 image.shape, image.dtype
@@ -1403,7 +1403,7 @@ np.random.normal(mu,sigma,size=(10,10))
 * The maximum likelihood principle tells us that the best fit model for a given dataset is the one that generates the data with the highest probability.
 
 ## Exercises
-1. Consider the data set $[[0,0],[0,1],[1,0],[1,1]]$ with labels given by the XOR of the two elements $[0,1,1,0]$.  What are the probabilities for a Naive Bayes classifier built on this dataset.  Does it successfully classify our points?  If not, what assumptions are violated?
+1. Consider the dataset $[[0,0],[0,1],[1,0],[1,1]]$ with labels given by the XOR of the two elements $[0,1,1,0]$.  What are the probabilities for a Naive Bayes classifier built on this dataset.  Does it successfully classify our points?  If not, what assumptions are violated?
 2. Suppose I have the random variable with density given by $p(x) = \frac{1}{x^2}$ for $x \ge 1$ and $p(x) = 0$ otherwise.  What is $P(X > 2)$?
 3. The Laplace distribution is a random variable whose density is given by $p(x) = \frac{1}{2}e^{-|x|}$.  What is the mean and the standard deviation of this function?  As a hint, $\int_0^\infty xe^{-x} \; dx = 1$ and $\int_0^\infty x^2e^{-x} \; dx = 2$.
 4. I walk up to you on the street and say "I have a random variable with mean $1$, standard deviation $2$, and I observed $25\%$ of my samples taking a value larger than $9$."  Do you believe me?  Why or why not?

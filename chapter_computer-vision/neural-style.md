@@ -62,7 +62,7 @@ def postprocess(img):
 
 ## Extract Features
 
-We use the VGG-19 model pre-trained on the ImageNet data set to extract image features[1].
+We use the VGG-19 model pre-trained on the ImageNet dataset to extract image features[1].
 
 ```{.python .input  n=4}
 pretrained_net = gluon.model_zoo.vision.vgg19(pretrained=True)

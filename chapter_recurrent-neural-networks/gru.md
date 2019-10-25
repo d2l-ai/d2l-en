@@ -97,7 +97,7 @@ To gain a better understanding of the model let us implement a GRU from scratch.
 ### Reading the Data Set
 
 We begin by reading *The Time Machine* corpus that we used in :numref:`sec_rnn_scratch`. The code for reading the
-data set is given below:
+dataset is given below:
 
 ```{.python .input  n=6}
 import d2l
