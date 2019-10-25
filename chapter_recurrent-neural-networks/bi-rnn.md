@@ -144,7 +144,3 @@ classification in :numref:`sec_sentiment_rnn`.
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2370)
 
 ![](../img/qr_bi-rnn.svg)
-
-```{.python .input}
-
-```
