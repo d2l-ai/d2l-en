@@ -279,7 +279,3 @@ While writing the above RNN model from scratch is instructive, it is not conveni
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2364)
 
 ![](../img/qr_rnn-scratch.svg)
-
-```{.python .input}
-
-```
