@@ -154,22 +154,18 @@ To give a hand-built example, notice that we can produce a reasonable model to c
 from mxnet import gluon
 
 # Load in the dataset
-print("HERE")
+train = gluon.data.vision.FashionMNIST(train=True) 
+test = gluon.data.vision.FashionMNIST(train=False)
 
-#train = gluon.data.vision.FashionMNIST(train=True) 
-#test = gluon.data.vision.FashionMNIST(train=False)
-
-#print("HERE")
-
-#X_train_0 = np.array([x[0] for x in train if x[1] == 0])
-#X_train_1 = np.array([x[0] for x in train if x[1] == 1])
-#X_test = np.array([x[0] for x in test if x[1] == 0 or x[1] == 1])
-#y_test = np.array([x[1] for x in test if x[1] == 0 or x[1] == 1])
+X_train_0 = np.array([x[0] for x in train if x[1] == 0])
+X_train_1 = np.array([x[0] for x in train if x[1] == 1])
+X_test = np.array([x[0] for x in test if x[1] == 0 or x[1] == 1])
+y_test = np.array([x[1] for x in test if x[1] == 0 or x[1] == 1])
 
 # Compute Averages
-#ave_0 = np.mean(X_train_0,axis=0)
-#ave_1 = np.mean(X_train_1,axis=0)
-#print(ave_0)
+ave_0 = np.mean(X_train_0,axis=0)
+ave_1 = np.mean(X_train_1,axis=0)
+print("Computed Averages")
 ```
 
 ```{.python .input}
