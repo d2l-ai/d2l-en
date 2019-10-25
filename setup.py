@@ -4,7 +4,6 @@ import os
 
 requirements = [
     'jupyter',
-    'numpy==1.17.3',
     'matplotlib',
     'pandas'
 ]
@@ -21,7 +20,7 @@ for l in lines:
 setup(
     name='d2l',
     version=version,
-    python_requires='==3.7',
+    python_requires='>=3.5',
     author='D2L Developers',
     author_email='d2l.devs@google.com',
     url='https://d2l.ai',
