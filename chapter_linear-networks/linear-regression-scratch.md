@@ -298,7 +298,7 @@ loss = squared_loss  # 0.5 (y-y')^2
 
 for epoch in range(num_epochs):
     # Assuming the number of examples can be divided by the batch size, all
-    # the examples in the training data set are used once in one epoch
+    # the examples in the training dataset are used once in one epoch
     # iteration. The features and tags of mini-batch examples are given by X
     # and y respectively
     for X, y in data_iter(batch_size, features, labels):

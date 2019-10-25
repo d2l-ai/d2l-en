@@ -6,7 +6,7 @@ Although convolutional neural networks were well known
 in the computer vision and machine learning communities
 following the introduction of LeNet,
 they did not immediately dominate the field.
-Although LeNet achieved good results on early small data sets,
+Although LeNet achieved good results on early small datasets,
 the performance and feasability of training convolutional networks
 on larger, more realistic datasets had yet to be established
 In fact, for much of the intervening time between the early 1990s
@@ -117,7 +117,7 @@ Numerous papers addressed the UCI collection of datasets,
 many of which contained only hundreds or (a few) thousands of images
 captured in unnatural settings with low resolution.
 
-In 2009, the ImageNet data set was released,
+In 2009, the ImageNet dataset was released,
 challenging researchers to learn models from 1 million examples,
 1,000 each from 1,000 distinct categories of objects.
 The researchers, led by Fei-Fei Li, who introduced this dataset
@@ -351,7 +351,7 @@ d2l.train_ch5(net, train_iter, test_iter, num_epochs, lr)
 
 ## Summary
 
-* AlexNet has a similar structure to that of LeNet, but uses more convolutional layers and a larger parameter space to fit the large-scale data set ImageNet.
+* AlexNet has a similar structure to that of LeNet, but uses more convolutional layers and a larger parameter space to fit the large-scale dataset ImageNet.
 * Today AlexNet has been surpassed by much more effective architectures but it is a key step from shallow to deep networks that are used nowadays.
 * Although it seems that there are only a few more lines in AlexNet's implementation than in LeNet, it took the academic community many years to embrace this conceptual change and take advantage of its excellent experimental results. This was also due to the lack of efficient computational tools.
 * Dropout, ReLU and preprocessing were the other key steps in achieving excellent performance in computer vision tasks.
@@ -359,7 +359,7 @@ d2l.train_ch5(net, train_iter, test_iter, num_epochs, lr)
 ## Exercises
 
 1. Try increasing the number of epochs. Compared with LeNet, how are the results different? Why?
-1. AlexNet may be too complex for the Fashion-MNIST data set.
+1. AlexNet may be too complex for the Fashion-MNIST dataset.
     * Try to simplify the model to make the training faster, while ensuring that the accuracy does not drop significantly.
     * Can you design a better model that works directly on $28 \times 28$ images.
 1. Modify the batch size, and observe the changes in accuracy and GPU memory.
