@@ -21,7 +21,7 @@ for l in lines:
 setup(
     name='d2l',
     version=version,
-    python_requires='>=3.5',
+    python_requires='=3.7',
     author='D2L Developers',
     author_email='d2l.devs@google.com',
     url='https://d2l.ai',
