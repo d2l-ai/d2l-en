@@ -4,7 +4,7 @@ import os
 
 requirements = [
     'jupyter',
-    'numpy',
+    'numpy==1.17.3',
     'matplotlib',
     'pandas'
 ]
