@@ -1,4 +1,4 @@
-# Appendix: Mathematics
+# Appendix: Mathematics in Deep Learning
 :label:`chap_appendix_math`
 
 ```toc
