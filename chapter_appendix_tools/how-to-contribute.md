@@ -1,4 +1,4 @@
-# How to Contribute to This Book
+# Contributing to this Book
 :label:`sec_contribute`
 
 Contributions by [readers](https://github.com/d2l-ai/d2l-en/graphs/contributors) help us improve this book. If you find a typo, an outdated link, something where you think we missed a citation, where the code does not look elegant or where an explanation is unclear, please contribute back and help us help our readers. While in regular books the delay between print runs (and thus between typo corrections) can be measured in years, it typically takes hours to days to incorporate an improvement in this book. This is all possible due to version control and continuous integration testing. To do so you need to install Git and submit a [pull request](https://github.com/d2l-ai/d2l-en/pulls) to the GitHub repository. When your pull request is merged into the code repository by the author, you will become a contributor. In a nutshell the process works as described in the diagram below.
@@ -37,6 +37,7 @@ To clone the repository (i.e., to make a local copy) we need to get its reposito
 git clone https://github.com/your_github_username/d2l-en.git
 ```
 
+
 Please note we will need to contribute to the **numpy2** branch. Hence, we will need checkout `origin/numpy2` manually.
 
 ```
@@ -45,7 +46,9 @@ git checkout -b numpy2 origin/numpy2
 git status
 ```
 
+
 Now, we are at `numpy2` branch where nothing has been changed.
+
 ```
 mylaptop:d2l-en smola$ git status
 On branch numpy2
@@ -53,6 +56,7 @@ Your branch is up to date with 'origin/numpy2'.
 
 nothing to commit, working tree clean
 ```
+
 
 ### Edit the Book and Push
 
@@ -73,6 +77,7 @@ Changes not staged for commit:
 	modified:   chapter_appendix/how-to-contribute.md
 ```
 
+
 After confirming that this is what you want, execute the following command:
 
 ```
@@ -80,6 +85,7 @@ git add chapter_appendix/how-to-contribute.md
 git commit -m 'fix typo in git documentation'
 git push
 ```
+
 
 The changed code will then be in your personal fork of the repository. To request the addition of your change, you have to create a pull request for the official repository of the book.
 

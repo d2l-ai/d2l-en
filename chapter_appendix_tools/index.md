@@ -1,4 +1,4 @@
-# Appendix: Tools
+# Appendix: Tools for Deep Learning
 :label:`chap_appendix_tools`
 
 ```toc
@@ -10,3 +10,4 @@ buy-gpu
 how-to-contribute
 d2l
 ```
+
