@@ -6,6 +6,6 @@
 
 foundational-linear-algebra
 foundational-calculus
+foundational-probability
 foundational-info-theory
 ```
-
