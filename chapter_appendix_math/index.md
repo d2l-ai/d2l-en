@@ -4,8 +4,13 @@
 ```toc
 :maxdepth: 2
 
-foundational-linear-algebra
-foundational-calculus
-foundational-probability
-foundational-info-theory
+linear-algebra
+single-variable-calculus
+multivariable-calculus
+integral-calculus
+random-variables
+maximum-likelihood
+distributions
+naive-bayes
+info-theory
 ```
