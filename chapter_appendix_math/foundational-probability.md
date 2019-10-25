@@ -1345,8 +1345,8 @@ Let us plot the probability density function and cumulative distribution functio
 ```{.python .input}
 mu = 1; sigma = 0.5
 
-x = np.arange(-2,2, 0.01)
-p = 1/np.sqrt(2*np.pi*sigma**2)*np.exp(-(x**2)/(2*sigma**2))
+x = np.arange(-3,3, 0.01)
+p = 1/np.sqrt(2*np.pi*sigma**2)*np.exp(-((x-mu)**2)/(2*sigma**2))
 
 d2l.plot(x, p, 'x', 'p.d.f.')
 ```
