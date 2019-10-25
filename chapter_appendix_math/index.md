@@ -4,8 +4,8 @@
 ```toc
 :maxdepth: 2
 
-foundational-linear-algebra
-foundational-calculus
-foundational-probability
-foundational-info-theory
+linear-algebra
+calculus
+probability
+info-theory
 ```
