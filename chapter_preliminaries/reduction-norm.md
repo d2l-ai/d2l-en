@@ -29,8 +29,8 @@ from mxnet import np, npx
 npx.set_np()
 
 A = np.arange(20).reshape(5, 4)
-B = np.arange(20).reshape(5, 4)
-A + B
+B = A.copy()  # Assign a copy of A to B by allocating new memory
+A, A + B
 ```
 
 Specifically, elementwise multiplication of two matrices is called their *Hadamard product* (math notation $\odot$).
@@ -119,6 +119,28 @@ Like `sum`, `mean` can also reduce a tensor along the specified axes.
 
 ```{.python .input}
 A.mean(axis=0), A.sum(axis=0) / A.shape[0]
+```
+
+### Non-Reduction Sum
+
+However, sometimes it can be useful to keep the number of axes unchanged when invoking `sum` or `mean` by setting `keepdims=True`.
+
+```{.python .input}
+sum_A = A.sum(axis=1, keepdims=True)
+sum_A
+```
+
+For instance, since `sum_A` still keeps its $2$ axes after summing each row, we can divide `A` by `sum_A` with broadcasting.
+
+```{.python .input}
+A / sum_A
+```
+
+If we want to calculate the cumulative sum of elements of `A` along some axis, say `axis=0` (row by row), 
+we can call the `cumsum` function. This function will not reduce the input tensor along any axis.
+
+```{.python .input}
+A.cumsum(axis=0)
 ```
 
 ## Dot Products
@@ -429,6 +451,7 @@ or other excellent resources :cite:`Strang.Strang.Strang.ea.1993`:cite:`Kolter.2
 
 ## Exercises
 
+1. Run `A / A.sum(axis=1)` and see what happens. Can you analyze the reason?
 1. When traveling between two points in Manhattan, what is the distance that you need to cover in terms of the coordinates, i.e., in terms of avenues and streets? Can you travel diagonally?
 1. Consider a tensor with shape ($2$, $3$, $4$). What are the shapes of the summation outputs along axis $0$, $1$, and $2$?
 1. Feed a tensor with 3 or more axes to the `linalg.norm` function and observe its output. What does this function compute for `ndarray`s of arbitrary shape?

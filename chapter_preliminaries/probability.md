@@ -29,16 +29,16 @@ But there is a key difference between the two cases. In this first case, the ima
 
 ## Basic Probability Theory
 
-Say that we cast a die and want to know what the chance is of seeing a $1$ rather than another digit. If the die is fair, all six outcomes $\mathcal{X} = \{1, \ldots, 6\}$ are equally likely to occur, and thus we would see a $1$ in $1$ out of $6$ cases. Formally we state that $1$ occurs with probability $\frac{1}{6}$.
+Say that we cast a die and want to know what the chance is of seeing a $1$ rather than another digit. If the die is fair, all the $6$ outcomes $\mathcal{X} = \{1, \ldots, 6\}$ are equally likely to occur, and thus we would see a $1$ in $1$ out of $6$ cases. Formally we state that $1$ occurs with probability $\frac{1}{6}$.
 
-For a real die that we receive from a factory, we might not know those proportions and we would need to check whether it is tainted. The only way to investigate the die is by casting it many times and recording the outcomes. For each cast of the die, we will observe a value $\{1, 2, \ldots, 6\}$. Given these outcomes, we want to investigate the probability of observing each outcome.
+For a real die that we receive from a factory, we might not know those proportions and we would need to check whether it is tainted. The only way to investigate the die is by casting it many times and recording the outcomes. For each cast of the die, we will observe a value in $\{1, \ldots, 6\}$. Given these outcomes, we want to investigate the probability of observing each outcome.
 
 One natural approach for each value is to take the
 individual count for that value and to divide it by the total number of tosses.
-This gives us an *estimate* of the probability of a given event. The law of
-large numbers tell us that as the number of tosses grows this estimate will draw closer and closer to the true underlying probability. Before going into the details of what is going here, let us try it out.
+This gives us an *estimate* of the probability of a given event. The *law of
+large numbers* tell us that as the number of tosses grows this estimate will draw closer and closer to the true underlying probability. Before going into the details of what is going here, let us try it out.
 
-To start, let us import the necessary packages:
+To start, let us import the necessary packages.
 
 ```{.python .input  n=13}
 %matplotlib inline
@@ -51,18 +51,20 @@ npx.set_np()
 Next, we will want to be able to cast the die. In statistics we call this process
 of drawing examples from probability distributions *sampling*.
 The distribution
-which assigns probabilities to a number of discrete choices is called the
-*multinomial* distribution. We will give a more formal definition of
+that assigns probabilities to a number of discrete choices is called the
+*multinomial distribution*. We will give a more formal definition of
 *distribution* later, but at a high level, think of it as just an assignment of
 probabilities to events. In MXNet, we can sample from the multinomial
 distribution via the aptly named `np.random.multinomial` function.
 The function
 can be called in many ways, but we will focus on the simplest.
-To draw a single
-sample, we simply pass in a vector of probabilities.
+To draw a single sample, we simply pass in a vector of probabilities.
+The output of the `np.random.multinomial` function is another vector of the same length:
+its value at index $i$ is the number of times the sampling outcome corresponds to $i$.
 
 ```{.python .input  n=14}
-np.random.multinomial(1, [1.0/6]*6)
+fair_probs = [1.0 / 6] * 6
+np.random.multinomial(1, fair_probs)
 ```
 
 If you run the sampler a bunch of times, you will find that you get out random
@@ -73,7 +75,14 @@ multiple samples at once, returning an array of independent samples in any shape
 we might desire.
 
 ```{.python .input  n=15}
-np.random.multinomial(10, [1.0/6]*6)
+np.random.multinomial(10, fair_probs)
+```
+
+We can also conduct, say $3$, groups of experiments, where each group draws $10$ samples, all at once.
+
+```{.python .input}
+counts = np.random.multinomial(10, fair_probs, size=3)
+counts
 ```
 
 Now that we know how to sample rolls of a die, we can simulate 1000 rolls. We
@@ -81,28 +90,30 @@ can then go through and count, after each of the 1000 rolls, how many times each
 number was rolled.
 
 ```{.python .input  n=16}
-counts = np.random.multinomial(1000, [1.0/6]*6).astype(np.float32)
+# Store the results as 32-bit floats for division
+counts = np.random.multinomial(100, fair_probs).astype(np.float32)
 counts / 1000
 ```
 
-As you can see, the lowest estimated probability for any of the numbers is about $.15$ and the highest estimated probability is $0.188$. Because we generated the data from a fair die, we know that each number actually has probability of $1/6$, roughly $.167$, so these estimates are pretty good. We can also visualize how these probabilities converge over time towards reasonable estimates.
-
-
-
-Now visualize the data.
+Because we generated the data from a fair die, we know that each number actually has probability $1/6$, roughly $0.167$, so the output estimates above look pretty good. We can also visualize how these probabilities converge over time towards reasonable estimates.
+Let us conduct $500$ groups of experiments where each group draws $10$ samples.
 
 ```{.python .input  n=18}
-estimates = np.random.multinomial(100, [1.0/6]*6, size=100).astype(np.float32).cumsum(axis=0)
-estimates = estimates / estimates.sum(axis=1, keepdims=True)
+counts = np.random.multinomial(10, fair_probs, size=500)
+cum_counts = counts.astype(np.float32).cumsum(axis=0)
+estimates = cum_counts / cum_counts.sum(axis=1, keepdims=True)
 
-d2l.set_figsize((6, 4))
+d2l.set_figsize((6, 4.5))
 for i in range(6):
     d2l.plt.plot(estimates[:,i].asnumpy(), label=("P(die=" + str(i) +")"))
 d2l.plt.axhline(y=0.16666, color='black', linestyle='dashed')
 d2l.plt.legend();
 ```
 
-Each solid curve corresponds to one of the six values of the die and gives our estimated probability that the die turns up that value as assessed after each of the 1000 turns. The dashed black line gives the true underlying probability. As we get more data, the solid curves converge towards the true answer.
+Each solid curve corresponds to one of the six values of the die and gives our estimated probability that the die turns up that value as assessed after each group of experiments.
+The dashed black line gives the true underlying probability.
+As we get more data by conducting more experiments,
+the $6$ solid curves converge towards the true answer.
 
 In our example of casting a die, we introduced the notion of a **random variable**. A random variable, which we denote here as $X$ can be pretty much any quantity and is not deterministic. Random variables could take one value among a set of possibilities. We denote sets with brackets, e.g., $\{\mathrm{cat}, \mathrm{dog}, \mathrm{rabbit}\}$. The items contained in the set are called *elements*, and we can say that an element $x$ is *in* the set S, by writing $x \in S$. The symbol $\in$ is read as "in" and denotes membership. For instance, we could truthfully say $\mathrm{dog} \in \{\mathrm{cat}, \mathrm{dog}, \mathrm{rabbit}\}$. When dealing with the rolls of die, we are concerned with a variable $X \in \{1, 2, 3, 4, 5, 6\}$.
 
