@@ -1,9 +1,9 @@
 # Mini-batch Stochastic Gradient Descent
 :label:`sec_minibatch_sgd`
 
-In each iteration, the gradient descent uses the entire training data set to compute the gradient, so it is sometimes referred to as batch gradient descent. Stochastic gradient descent (SGD) only randomly select one example in each iteration to compute the gradient. Just like in the previous chapters, we can perform random uniform sampling for each iteration to form a mini-batch and then use this mini-batch to compute the gradient. Now, we are going to discuss mini-batch stochastic gradient descent.
+In each iteration, the gradient descent uses the entire training dataset to compute the gradient, so it is sometimes referred to as batch gradient descent. Stochastic gradient descent (SGD) only randomly select one example in each iteration to compute the gradient. Just like in the previous chapters, we can perform random uniform sampling for each iteration to form a mini-batch and then use this mini-batch to compute the gradient. Now, we are going to discuss mini-batch stochastic gradient descent.
 
-Set objective function $f(\boldsymbol{x}): \mathbb{R}^d \rightarrow \mathbb{R}$. The time step before the start of iteration is set to 0. The independent variable of this time step is $\boldsymbol{x}_0\in \mathbb{R}^d$ and is usually obtained by random initialization. In each subsequent time step $t>0$, mini-batch SGD uses random uniform sampling to get a mini-batch $\mathcal{B}_t$ made of example indices from the training data set. We can use sampling with replacement or sampling without replacement to get a mini-batch example. The former method allows duplicate examples in the same mini-batch, the latter does not and is more commonly used. We can use either of the two methods
+Set objective function $f(\boldsymbol{x}): \mathbb{R}^d \rightarrow \mathbb{R}$. The time step before the start of iteration is set to 0. The independent variable of this time step is $\boldsymbol{x}_0\in \mathbb{R}^d$ and is usually obtained by random initialization. In each subsequent time step $t>0$, mini-batch SGD uses random uniform sampling to get a mini-batch $\mathcal{B}_t$ made of example indices from the training dataset. We can use sampling with replacement or sampling without replacement to get a mini-batch example. The former method allows duplicate examples in the same mini-batch, the latter does not and is more commonly used. We can use either of the two methods
 
 $$\boldsymbol{g}_t \leftarrow \nabla f_{\mathcal{B}_t}(\boldsymbol{x}_{t-1}) = \frac{1}{|\mathcal{B}|} \sum_{i \in \mathcal{B}_t}\nabla f_i(\boldsymbol{x}_{t-1})$$
 
@@ -19,7 +19,7 @@ The cost for computing each iteration is $\mathcal{O}(|\mathcal{B}|)$. When the 
 
 ## Reading Data
 
-In this chapter, we will use a [data set](https://archive.ics.uci.edu/ml/datasets/Airfoil+Self-Noise) developed by NASA to test the wing noise from different aircraft to compare these optimization algorithms. We will use the first 1500 examples of the data set, 5 features, and a normalization method to preprocess the data.
+In this chapter, we will use a [dataset](https://archive.ics.uci.edu/ml/datasets/Airfoil+Self-Noise) developed by NASA to test the wing noise from different aircraft to compare these optimization algorithms. We will use the first 1500 examples of the dataset, 5 features, and a normalization method to preprocess the data.
 
 ```{.python .input  n=1}
 %matplotlib inline

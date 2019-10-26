@@ -42,7 +42,7 @@ you need to register for an account (do this now!).
 ![Kaggle website](../img/kaggle.png)
 
 On the House Prices Prediction page,
-you can find the data set (under the data tab),
+you can find the dataset (under the data tab),
 submit predictions, see your ranking, etc.,
 The URL is right here:
 
@@ -98,7 +98,7 @@ train_data = pd.read_csv('../data/kaggle_house_pred_train.csv')
 test_data = pd.read_csv('../data/kaggle_house_pred_test.csv')
 ```
 
-The training data set includes 1,460 examples, 80 features, and 1 label.,
+The training dataset includes 1,460 examples, 80 features, and 1 label.,
 the test data contains 1,459 examples and 80 features.
 
 ```{.python .input  n=11}

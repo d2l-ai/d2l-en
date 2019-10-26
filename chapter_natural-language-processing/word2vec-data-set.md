@@ -1,9 +1,9 @@
 # Data Sets for Word2vec
 :label:`sec_word2vec_data`
 
-In this section, we will introduce how to preprocess a data set with
+In this section, we will introduce how to preprocess a dataset with
 negative sampling :numref:`sec_approx_train` and load into mini-batches for
-word2vec training. The data set we use is [Penn Tree Bank (PTB)]( https://catalog.ldc.upenn.edu/LDC99T42), which is a small but commonly-used corpus. It takes samples from Wall Street Journal articles and includes training sets, validation sets, and test sets. 
+word2vec training. The dataset we use is [Penn Tree Bank (PTB)]( https://catalog.ldc.upenn.edu/LDC99T42), which is a small but commonly-used corpus. It takes samples from Wall Street Journal articles and includes training sets, validation sets, and test sets. 
 
 First, import the packages and modules required for the experiment.
 
@@ -18,7 +18,7 @@ import zipfile
 
 ## Read and Preprocessing
 
-This data set has already been preprocessed. Each line of the data set acts as a sentence. All the words in a sentence are separated by spaces. In the word embedding task, each word is a token.
+This dataset has already been preprocessed. Each line of the dataset acts as a sentence. All the words in a sentence are separated by spaces. In the word embedding task, each word is a token.
 
 ```{.python .input  n=2}
 # Saved in the d2l package for later use
@@ -40,11 +40,11 @@ vocab = d2l.Vocab(sentences, min_freq=10)
 
 ## Subsampling
 
-In text data, there are generally some words that appear at high frequencies, such "the", "a", and "in" in English. Generally speaking, in a context window, it is better to train the word embedding model when a word (such as "chip") and a lower-frequency word (such as "microprocessor") appear at the same time, rather than when a word appears with a higher-frequency word (such as "the"). Therefore, when training the word embedding model, we can perform subsampling[2] on the words. Specifically, each indexed word $w_i$ in the data set will drop out at a certain probability. The dropout probability is given as:
+In text data, there are generally some words that appear at high frequencies, such "the", "a", and "in" in English. Generally speaking, in a context window, it is better to train the word embedding model when a word (such as "chip") and a lower-frequency word (such as "microprocessor") appear at the same time, rather than when a word appears with a higher-frequency word (such as "the"). Therefore, when training the word embedding model, we can perform subsampling[2] on the words. Specifically, each indexed word $w_i$ in the dataset will drop out at a certain probability. The dropout probability is given as:
 
 $$ \mathbb{P}(w_i) = \max\left(1 - \sqrt{\frac{t}{f(w_i)}}, 0\right),$$
 
-Here, $f(w_i)$ is the ratio of the instances of word $w_i$ to the total number of words in the data set, and the constant $t$ is a hyper-parameter (set to $10^{-4}$ in this experiment). As we can see, it is only possible to drop out the word $w_i$ in subsampling when $f(w_i) > t$. The higher the word's frequency, the higher its dropout probability.
+Here, $f(w_i)$ is the ratio of the instances of word $w_i$ to the total number of words in the dataset, and the constant $t$ is a hyper-parameter (set to $10^{-4}$ in this experiment). As we can see, it is only possible to drop out the word $w_i$ in subsampling when $f(w_i) > t$. The higher the word's frequency, the higher its dropout probability.
 
 ```{.python .input  n=4}
 # Saved in the d2l package for later use
@@ -126,7 +126,7 @@ def get_centers_and_contexts(corpus, max_window_size):
     return centers, contexts
 ```
 
-Next, we create an artificial data set containing two sentences of 7 and 3 words, respectively. Assume the maximum context window is 2 and print all the central target words and their context words.
+Next, we create an artificial dataset containing two sentences of 7 and 3 words, respectively. Assume the maximum context window is 2 and print all the central target words and their context words.
 
 ```{.python .input  n=10}
 tiny_dataset = [list(range(7)), list(range(7, 10))]
@@ -135,7 +135,7 @@ for center, context in zip(*get_centers_and_contexts(tiny_dataset, 2)):
     print('center', center, 'has contexts', context)
 ```
 
-We set the maximum context window size to 5. The following extracts all the central target words and their context words in the data set.
+We set the maximum context window size to 5. The following extracts all the central target words and their context words in the dataset.
 
 ```{.python .input  n=11}
 all_centers, all_contexts = get_centers_and_contexts(corpus, 5)
@@ -191,7 +191,7 @@ all_negatives = get_negatives(all_contexts, corpus, 5)
 
 ### Read into Batches
 
-We extract all central target words `all_centers`, and the context words `all_contexts` and noise words `all_negatives` of each central target word from the data set. We will read them in random mini-batches.
+We extract all central target words `all_centers`, and the context words `all_contexts` and noise words `all_negatives` of each central target word from the dataset. We will read them in random mini-batches.
 
 In a mini-batch of data, the $i^\mathrm{th}$ example includes a central word and its corresponding $n_i$ context words and $m_i$ noise words. Since the context window size of each example may be different, the sum of context words and noise words, $n_i+m_i$, will be different. When constructing a mini-batch, we concatenate the context words and noise words of each example, and add 0s for padding until the length of the concatenations are the same, that is, the length of all concatenations is $\max_i n_i+m_i$(`max_len`). In order to avoid the effect of padding on the loss function calculation, we construct the mask variable `masks`, each element of which corresponds to an element in the concatenation of context and noise words, `contexts_negatives`. When an element in the variable `contexts_negatives` is a padding, the element in the mask variable `masks` at the same position will be 0. Otherwise, it takes the value 1. In order to distinguish between positive and negative examples, we also need to distinguish the context words from the noise words in the `contexts_negatives` variable. Based on the construction of the mask variable, we only need to create a label variable `labels` with the same shape as the `contexts_negatives` variable and set the elements corresponding to context words (positive examples) to 1, and the rest to 0.
 
@@ -228,7 +228,7 @@ We use the `batchify` function just defined to specify the mini-batch reading me
 
 ## Put All Things Together
 
-Lastly, we define the `load_data_ptb` function that read the PTB data set and return the data loader.
+Lastly, we define the `load_data_ptb` function that read the PTB dataset and return the data loader.
 
 ```{.python .input  n=16}
 # Saved in the d2l package for later use

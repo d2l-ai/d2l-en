@@ -225,7 +225,7 @@ axes = axes.flatten()
 for i in range(1, 100001):
     counts[random.randint(0, 99)] += 1
     if i in [100, 1000, 10000, 100000]:
-        axes[int(np.log10(i))-2].bar(np.arange(1, 101).asnumpy(), counts)
+        axes[int(np.log10(i))-2].bar(np.arange(1, 101).asnumpy(), counts.asnumpy())
 ```
 
 We can see from these figures that the initial number of counts looks *strikingly* uneven. If we sample fewer than 100 draws from a distribution over

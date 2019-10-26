@@ -156,7 +156,7 @@ show_trace_2d(f_2d, train_2d(gd_2d))
 
 ## Stochastic Gradient Descent (SGD)
 
-In deep learning, the objective function is usually the average of the loss functions for each example in the training data set. We assume that $f_i(\boldsymbol{x})$ is the loss function of the training data instance with $n$ examples, an index of $i$, and parameter vector of $\boldsymbol{x}$, then we have the objective function
+In deep learning, the objective function is usually the average of the loss functions for each example in the training dataset. We assume that $f_i(\boldsymbol{x})$ is the loss function of the training data instance with $n$ examples, an index of $i$, and parameter vector of $\boldsymbol{x}$, then we have the objective function
 
 $$f(\boldsymbol{x}) = \frac{1}{n} \sum_{i = 1}^n f_i(\boldsymbol{x}).$$
 
@@ -186,14 +186,14 @@ def sgd_2d(x1, x2, s1, s2):
 show_trace_2d(f_2d, train_2d(sgd_2d))
 ```
 
-As we can see, the iterative trajectory of the independent variable in the SGD is more tortuous than in the gradient descent. This is due to the noise added in the experiment, which reduced the accuracy of the simulated stochastic gradient. In practice, such noise usually comes from individual examples in the training data set.
+As we can see, the iterative trajectory of the independent variable in the SGD is more tortuous than in the gradient descent. This is due to the noise added in the experiment, which reduced the accuracy of the simulated stochastic gradient. In practice, such noise usually comes from individual examples in the training dataset.
 
 
 ## Summary
 
 * If we use a more suitable learning rate and update the independent variable in the opposite direction of the gradient, the value of the objective function might be reduced. Gradient descent repeats this update process until a solution that meets the requirements is obtained.
 * Problems occur when the learning rate is tool small or too large. A suitable learning rate is usually found only after multiple experiments.
-* When there are more examples in the training data set, it costs more to compute each iteration for gradient descent, so SGD is preferred in these cases.
+* When there are more examples in the training dataset, it costs more to compute each iteration for gradient descent, so SGD is preferred in these cases.
 
 
 ## Exercises
