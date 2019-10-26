@@ -87,14 +87,14 @@ g_blk.initialize()
 g_blk(x).shape
 ```
 
-The generator consists of four basic blocks that increase input's both width and height from 1 to 32. At the same time, it first projects the latent variable into $64\times 8$ channels, and then halve the channels each time. At last, a transposed convolution layer is used to generate the output. It further doubles the width and height to match the desired $64\times 64$ shape, and reduces the channel size to $3$. The tanh activation function is applied to project output values into the $(-1, 1)$ range.
+The generator consists of four basic blocks that increase input's both width and height from 1 to 32. At the same time, it first projects the latent variable into $64\times 8$ channels, and then halves the channels each time. At last, a transposed convolution layer is used to generate the output. It further doubles the width and height to match the desired $64\times 64$ shape, and reduces the channel size to $3$. The tanh activation function is applied to project output values into the $(-1, 1)$ range.
 
 ```{.python .input  n=9}
 n_G = 64
 net_G = nn.Sequential()
-net_G.add(G_block(n_G*8, strides=1, padding=0),  # output: (64*8, 4, 4)
-          G_block(n_G*4),  # output: (64*4, 8, 8)
-          G_block(n_G*2),  # output: (64*2, 16, 16)
+net_G.add(G_block(n_G * 8, strides=1, padding=0),  # output: (64 * 8, 4, 4)
+          G_block(n_G * 4),  # output: (64 * 4, 8, 8)
+          G_block(n_G * 2),  # output: (64 * 2, 16, 16)
           G_block(n_G),    # output: (64, 32, 32)
           nn.Conv2DTranspose(
               3, kernel_size=4, strides=2, padding=1, use_bias=False,
@@ -111,7 +111,7 @@ net_G(x).shape
 
 ## Discriminator
 
-The discriminator is a normal convolutional network network except that it uses a leaky ReLU as its activation function. Given $\alpha \in[0,1]$, its definition is
+The discriminator is a normal convolutional network except that it uses a leaky ReLU as its activation function. Given $\alpha \in[0,1]$, its definition is
 
 $$\textrm{leaky ReLU}(x) = \begin{cases}x & \text{if}\ x > 0\\ \alpha x &\text{otherwise}\end{cases}.$$
 
@@ -119,7 +119,7 @@ As it can be seen, it is normal ReLU if $\alpha=0$, and an identity function if 
 
 ```{.python .input}
 alphas = [0, 0.2, 0.4, .6, .8, 1]
-x = nd.arange(-2,1,0.1)
+x = nd.arange(-2, 1, 0.1)
 Y = [nn.LeakyReLU(alpha)(x).asnumpy() for alpha in alphas]
 d2l.plot(x.asnumpy(), Y, 'x', 'y', alphas)
 ```
@@ -155,9 +155,9 @@ The discriminator is a mirror of the generator.
 n_D = 64
 net_D = nn.Sequential()
 net_D.add(D_block(n_D),    # output: (64, 32, 32)
-          D_block(n_D*2),  # output: (64*2, 16, 16)
-          D_block(n_D*4),  # output: (64*4, 8, 8)
-          D_block(n_D*8),  # output: (64*8, 4, 4)
+          D_block(n_D * 2),  # output: (64 * 2, 16, 16)
+          D_block(n_D * 4),  # output: (64 * 4, 8, 8)
+          D_block(n_D * 8),  # output: (64 * 8, 4, 4)
           nn.Conv2D(1, kernel_size=4, use_bias=False))  # output: (1, 1, 1)
 ```
 
@@ -199,8 +199,8 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
                         batch_size)
         # Show generated examples
         Z = nd.random.normal(0, 1, shape=(21, latent_dim, 1, 1), ctx=ctx)
-        fake_x = (net_G(Z).transpose((0,2,3,1))/2+0.5).asnumpy()
-        imgs = np.vstack([np.hstack(fake_x[i:i+7])
+        fake_x = (net_G(Z).transpose((0, 2, 3, 1)) / 2 + 0.5).asnumpy()
+        imgs = np.vstack([np.hstack(fake_x[i:i + 7])
                           for i in range(0,len(fake_x),7)])
         animator.axes[1].cla()
         animator.axes[1].imshow(imgs)
