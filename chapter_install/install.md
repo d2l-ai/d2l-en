@@ -74,7 +74,7 @@ Within the "d2l" environment, activate it and install `pip`. Enter `y` for the f
 
 ```bash
 conda activate d2l
-conda install pip
+conda install python=3.7 pip
 ```
 
 
