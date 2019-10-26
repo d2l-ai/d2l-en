@@ -108,3 +108,4 @@ It can be best understood as the harmonic mean of the number of real choices tha
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2362)
 
 ![](../img/qr_rnn.svg)
+
