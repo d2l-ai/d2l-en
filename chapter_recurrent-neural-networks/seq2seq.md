@@ -255,7 +255,7 @@ for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
 ## Exercise
 1. Can you think of the other use cases of seq2seq model besides neural machine translation?
 1. What will happen if the input sequence in our example is longer? 
-1. If we do not use the "SequenceMask" in the loss function, we may happen?
+1. If we do not use the "SequenceMask" in the loss function, what may happen?
 
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/4357)
