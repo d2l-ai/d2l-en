@@ -1,4 +1,4 @@
-## Integral Calculus
+# Integral Calculus
 :label:`sec_integral_calculus`
 
 Differentiation only makes up half of the content of a traditional calculus education.  The other pillar, integration, starts out seeming a rather disjoint question, "What is the area underneath this curve?"  While seemingly unrelated, integration is tightly intertwined with the differentiation via what is known as the *fundamental theorem of calculus*.  
@@ -25,7 +25,7 @@ d2l.plt.fill_between(x.tolist(),f.tolist())
 d2l.plt.show()
 ```
 
-In most cases, this area will be infinite or undefined (consider the area under $f(x) = x^{2}$), so people will often talk about the area between a pair of ends, say $a$ and $b$.  
+In most cases, this area will be infinite or undefined (consider the area under $f(x) = x^{2}$), so people will often talk about the area between a pair of ends, say $a$ and $b$.
 
 ```{.python .input}
 x = np.arange(-2,2,0.01)
