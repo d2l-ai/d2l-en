@@ -177,6 +177,26 @@ $$\begin{aligned} P(H = 1 | D = 1) =& \frac{P(D=1 | H=1) P(H=1)}{P(D=1)} \\ =& \
 
 In other words, there is only a 13.1% chance that the patient actually has AIDS, despite using a test that is 99% accurate. As we can see, statistics can be quite counterintuitive.
 
+
+### More on Conditional Probability
+
+![Intersection between $A$ and $B$](../img/intersect.svg)
+
+We will denote the probability of event $A$ and event $B$ as $P(A)$ and $P(B)$, respectively. The probability of the simultaneous occurrence of the two events is denoted as $P(A \cap B)$ or $P(A, B)$. In the figure above it is the shaded area. If $B$ has non-zero probability, the conditional probability of event $A$ given that $B$ has occurred is
+
+$$P(A | B) = \frac{P(A \cap B)}{P(B)}.$$
+
+That is,
+
+$$P(A \cap B) = P(B) P(A | B) = P(A) P(B | A).$$
+
+If
+
+$$P(A \cap B) = P(A) P(B),$$
+
+then $A$ and $B$ are said to be independent of each other.
+
+
 ## Conditional independence
 What should a patient do upon receiving such terrifying news? Likely, he/she
 would ask the physician to administer another test to get clarity. The second
@@ -195,6 +215,21 @@ Unfortunately, the second test comes back positive, too. Let us work out the req
 * $P(H = 1 | D_1 = 1 \text{ and } D_2 = 1) = \frac{0.98 \cdot 0.0015}{0.00176955} = 0.831$
 
 That is, the second test allowed us to gain much higher confidence that not all is well. Despite the second test being considerably less accurate than the first one, it still improved our estimate quite a bit. You might ask, *why couldn't we just run the first test a second time?* After all, the first test was more accurate. The reason is that we needed a second test whose result is *independent* of the first test (given the true diagnosis). In other words, we made the tacit assumption that $P(D_1, D_2 | H) = P(D_1 | H) P(D_2 | H)$. Statisticians call such random variables **conditionally independent**. This is expressed as $D_1 \perp\!\!\!\perp D_2  | H$.
+
+
+## Expectation and Variance
+
+A random variable takes values that represent possible outcomes of an experiment. The expectation (or average) of the random variable $X$ is denoted as
+
+$$\mathbf{E}[X] = \sum_{x} x P(X = x).$$
+
+In many cases we want to measure by how much the random variable $x$ deviates from its expectation. This can be quantified by the variance
+
+$$\mathop{\mathrm{Var}}[X] = \mathbf{E}\left[(X - \mathbf{E}[X])^2\right] =
+\mathbf{E}[X^2] - \mathbf{E}^2[X].$$
+
+Here the last equality follows from the linearity of expectation.
+
 
 ## Summary
 
