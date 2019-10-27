@@ -11,6 +11,5 @@ integral-calculus
 random-variables
 maximum-likelihood
 distributions
-naive-bayes
 info-theory
 ```
