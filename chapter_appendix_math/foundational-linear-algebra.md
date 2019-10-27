@@ -88,7 +88,9 @@ import d2l
 from IPython import display
 from mxnet import np, npx
 npx.set_np()
+```
 
+```{.python .input}
 def angle(v, w) :
     return np.arccos(v.dot(w)/(np.linalg.norm(v)*np.linalg.norm(w)))
 
