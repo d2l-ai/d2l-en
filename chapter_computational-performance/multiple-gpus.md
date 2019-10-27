@@ -19,12 +19,12 @@ these, the most commonly used algorithm is called data parallelism.
 In the deep learning field, Data Parallelism is currently the most widely used
 method for dividing model training tasks among multiple GPUs. Recall the process
 for training models using optimization algorithms described in
-:numref:`sec_minibatch_sgd`. Now, we will demonstrate how data parallelism works using mini-batch
+:numref:`sec_minibatch_sgd`. Now, we will demonstrate how data parallelism works using minibatch
 stochastic gradient descent as an example.
 
-Assume there are $k$ GPUs on a machine. Given the model to be trained, each GPU will maintain a complete set of model parameters independently. In any iteration of model training, given a random mini-batch, we divide the examples in the batch into $k$ portions and distribute one to each GPU. Then, each GPU will calculate the local gradient of the model parameters based on the mini-batch subset it was assigned and the model parameters it maintains. Next, we add together the local gradients on the $k$ GPUs to get the current mini-batch stochastic gradient. After that, each GPU uses this mini-batch stochastic gradient to update the complete set of model parameters that it maintains. Figure 10.1 depicts the mini-batch stochastic gradient calculation using data parallelism and two GPUs.
+Assume there are $k$ GPUs on a machine. Given the model to be trained, each GPU will maintain a complete set of model parameters independently. In any iteration of model training, given a random minibatch, we divide the examples in the batch into $k$ portions and distribute one to each GPU. Then, each GPU will calculate the local gradient of the model parameters based on the minibatch subset it was assigned and the model parameters it maintains. Next, we add together the local gradients on the $k$ GPUs to get the current minibatch stochastic gradient. After that, each GPU uses this minibatch stochastic gradient to update the complete set of model parameters that it maintains. Figure 10.1 depicts the minibatch stochastic gradient calculation using data parallelism and two GPUs.
 
-![Calculation of mini-batch stochastic gradient using data parallelism and two GPUs. ](../img/data-parallel.svg)
+![Calculation of minibatch stochastic gradient using data parallelism and two GPUs. ](../img/data-parallel.svg)
 
 In order to implement data parallelism in a multi-GPU training scenario from scratch, we first import the required packages or modules.
 
@@ -139,9 +139,9 @@ def split_batch(X, y, ctx_list):
             gluon.utils.split_and_load(y, ctx_list))
 ```
 
-## Multi-GPU Training on a Single Mini-batch
+## Multi-GPU Training on a Single Minibatch
 
-Now we can implement multi-GPU training on a single mini-batch. Its implementation is primarily based on the data parallelism approach described in this section. We will use the auxiliary functions we just discussed, `allreduce` and `split_and_load`, to synchronize the data among multiple GPUs.
+Now we can implement multi-GPU training on a single minibatch. Its implementation is primarily based on the data parallelism approach described in this section. We will use the auxiliary functions we just discussed, `allreduce` and `split_and_load`, to synchronize the data among multiple GPUs.
 
 ```{.python .input  n=10}
 def train_batch(X, y, gpu_params, ctx_list, lr):
@@ -162,7 +162,7 @@ def train_batch(X, y, gpu_params, ctx_list, lr):
 
 ## Training Functions
 
-Now, we can define the training function. Here the training function is slightly different from the one used in the previous chapter. For example, here, we need to copy all the model parameters to multiple GPUs based on data parallelism and perform multi-GPU training on a single mini-batch for each iteration.
+Now, we can define the training function. Here the training function is slightly different from the one used in the previous chapter. For example, here, we need to copy all the model parameters to multiple GPUs based on data parallelism and perform multi-GPU training on a single minibatch for each iteration.
 
 ```{.python .input  n=61}
 def train(num_gpus, batch_size, lr):
@@ -176,7 +176,7 @@ def train(num_gpus, batch_size, lr):
     for epoch in range(num_epochs):
         timer.start()
         for X, y in train_iter:
-            # Perform multi-GPU training for a single mini-batch
+            # Perform multi-GPU training for a single minibatch
             train_batch(X, y, gpu_params, ctx_list, lr)
             npx.waitall()
         timer.stop()

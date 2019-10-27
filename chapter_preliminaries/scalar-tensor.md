@@ -230,8 +230,8 @@ it is more conventional to treat each data point as a row vector in the matrix.
 And, as we will see in later chapters,
 this convention will enable common deep learning practices.
 For example, along the outermost axis of an `ndarray`,
-we can access or enumerate mini-batches of data points,
-or just data points if no mini-batch exists.
+we can access or enumerate minibatches of data points,
+or just data points if no minibatch exists.
 
 
 ## Tensors

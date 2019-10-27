@@ -4,7 +4,7 @@
 In the experiment in :numref:`sec_adagrad`, the learning rate of each
 element in the independent variable of the objective function declines (or
 remains unchanged) during iteration because the variable $\mathbf{s}_t$ in the
-denominator is increased by the square by element operation of the mini-batch
+denominator is increased by the square by element operation of the minibatch
 stochastic gradient, adjusting the learning rate. Therefore, when the learning
 rate declines very fast during early iteration, yet the current solution is
 still not desirable, Adagrad might have difficulty finding a useful solution
@@ -15,7 +15,7 @@ small modification to Adagrad.
 ## The Algorithm
 
 Unlike in Adagrad, the state variable
-$\mathbf{s}_t$ is the sum of the square by element all the mini-batch
+$\mathbf{s}_t$ is the sum of the square by element all the minibatch
 stochastic gradients $\mathbf{g}_t$ up to the time step $t$, RMSProp uses
 the exponentially weighted moving average on the square by element results of these gradients. Specifically,
 given the hyperparameter $0 \leq \gamma < 1$, RMSProp is computed at time step
@@ -119,7 +119,7 @@ d2l.train_gluon_ch10('rmsprop', {'learning_rate': 0.01, 'gamma1': 0.9},
 
 ## Summary
 
-* The difference between RMSProp and Adagrad is that RMSProp uses an EWMA on the squares of elements in the mini-batch stochastic gradient to adjust the learning rate.
+* The difference between RMSProp and Adagrad is that RMSProp uses an EWMA on the squares of elements in the minibatch stochastic gradient to adjust the learning rate.
 
 ## Exercises
 

@@ -36,7 +36,7 @@
         * training/testing/validation dataset
     * Distinguish：
         * hyperparameter vs parameter
-        * mini-batch stochastic gradient descent vs stochastic gradient descent
+        * minibatch stochastic gradient descent vs stochastic gradient descent
     * List
         * https://github.com/mli/gluon-tutorials-zh/blob/master/TERMINOLOGY.md
 

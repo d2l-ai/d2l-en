@@ -59,7 +59,7 @@ ctx = d2l.try_all_gpus()
 net.initialize(init=init.Normal(sigma=0.01), ctx=ctx)
 ```
 
-Gluon provides the `split_and_load` function implemented in the previous section. It can divide a mini-batch of data instances and copy them to each CPU or GPU. Then, the model computation for the data input to each CPU or GPU occurs on that same CPU or GPU.
+Gluon provides the `split_and_load` function implemented in the previous section. It can divide a minibatch of data instances and copy them to each CPU or GPU. Then, the model computation for the data input to each CPU or GPU occurs on that same CPU or GPU.
 
 ```{.python .input  n=4}
 x = np.random.uniform(size=(4, 1, 28, 28))
@@ -97,7 +97,7 @@ def evaluate_accuracy_gpus(net, data_iter, split_f = d2l.split_batch):
 
 ## Multi-GPU Model Training
 
-When we use multiple GPUs to train the model, the `Trainer` instance will automatically perform data parallelism, such as dividing mini-batches of data instances and copying them to individual GPUs and summing the gradients of each GPU and broadcasting the result to all GPUs. In this way, we can easily implement the training function.
+When we use multiple GPUs to train the model, the `Trainer` instance will automatically perform data parallelism, such as dividing minibatches of data instances and copying them to individual GPUs and summing the gradients of each GPU and broadcasting the result to all GPUs. In this way, we can easily implement the training function.
 
 ```{.python .input  n=7}
 def train(num_gpus, batch_size, lr):
@@ -145,7 +145,7 @@ train(num_gpus=2, batch_size=512, lr=0.2)
 ## Exercises
 
 * This section uses ResNet-18. Try different epochs, batch sizes, and learning rates. Use more GPUs for computation if conditions permit.
-* Sometimes, different devices provide different computing power. Some can use CPUs and GPUs at the same time, or GPUs of different models. How should we divide mini-batches among different CPUs or GPUs?
+* Sometimes, different devices provide different computing power. Some can use CPUs and GPUs at the same time, or GPUs of different models. How should we divide minibatches among different CPUs or GPUs?
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2384)
 

@@ -89,7 +89,7 @@ loss = gluon.loss.SoftmaxCrossEntropyLoss()
 
 ## Optimization Algorithm
 
-We use the mini-batch random gradient descent
+We use the minibatch random gradient descent
 with a learning rate of $0.1$ as the optimization algorithm.
 Note that this is the same choice as for linear regression
 and it illustrates the general applicability of the optimizers.

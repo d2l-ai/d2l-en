@@ -156,9 +156,9 @@ but for now let’s actually build an MLP.
 In this example, we’ll implement a multilayer perceptron
 with two hidden layers and one output layer.
 
-### Vectorization and mini-batch
+### Vectorization and minibatch
 
-As before, by the matrix $\mathbf{X}$, we denote a mini-batch of inputs.
+As before, by the matrix $\mathbf{X}$, we denote a minibatch of inputs.
 The calculations to produce outputs from an MLP with two hidden layers
 can thus be expressed:
 

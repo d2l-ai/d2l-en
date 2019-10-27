@@ -1,7 +1,7 @@
 # Forward Propagation, Backward Propagation, and Computational Graphs
 :label:`sec_backprop`
 
-In the previous sections, we used mini-batch
+In the previous sections, we used minibatch
 stochastic gradient descent to train our models.
 When we implemented the algorithm,
 we only worried about the calculations involved

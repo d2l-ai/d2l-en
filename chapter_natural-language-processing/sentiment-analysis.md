@@ -67,7 +67,7 @@ d2l.plt.hist([len(line) for line in train_tokens], bins=range(0,1000,50));
 
 ### Padding to the Same Length
 
-Because the reviews have different lengths, so they cannot be directly combined into mini-batches. Here we fix the length of each comment to 500 by truncating or adding "&lt;unk&gt;" indices.
+Because the reviews have different lengths, so they cannot be directly combined into minibatches. Here we fix the length of each comment to 500 by truncating or adding "&lt;unk&gt;" indices.
 
 ```{.python .input  n=5}
 num_steps = 500  # sequence length
@@ -78,7 +78,7 @@ train_features.shape
 
 ### Create Data Iterator
 
-Now, we will create a data iterator. Each iteration will return a mini-batch of data.
+Now, we will create a data iterator. Each iteration will return a minibatch of data.
 
 ```{.python .input  n=6}
 train_iter = d2l.load_array((train_features, train_data[1]), 64)
