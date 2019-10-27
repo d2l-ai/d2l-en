@@ -5,7 +5,12 @@
 :maxdepth: 2
 
 linear-algebra
-calculus
-probability
+single-variable-calculus
+multivariable-calculus
+integral-calculus
+random-variables
+maximum-likelihood
+distributions
+naive-bayes
 info-theory
 ```
