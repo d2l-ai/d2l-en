@@ -1,7 +1,7 @@
 # Concise Implementation of Recurrent Neural Networks
 :label:`sec_rnn_gluon`
 
-While :numref:`sec_rnn_scratch` was instructive to see how recurrent neural networks are implemented, this is not convenient or fast. The current section will show how to implement the same language model more efficiently using functions provided by Gluon. We begin as before by reading the 'Time Machine" corpus.
+While :numref:`sec_rnn_scratch` was instructive to see how recurrent neural networks (RNNs) are implemented, this is not convenient or fast. This section will show how to implement the same RNN models more efficiently using functions provided by Gluon. We begin as before by reading the "Time Machine" corpus.
 
 ```{.python .input  n=1}
 import d2l
@@ -24,7 +24,7 @@ rnn_layer = rnn.RNN(num_hiddens)
 rnn_layer.initialize()
 ```
 
-Initializing the state is straightforward. We invoke the member function `rnn_layer.begin_state(batch_size)`. This returns an initial state for each element in the minibatch. That is, it returns an object that is of size (hidden layers, batch size, number of hidden units). The number of hidden layers defaults to 1. In fact, we have not even discussed yet what it means to have multiple layers - this will happen in :numref:`sec_deep_rnn`. For now, suffice it to say that multiple layers simply amount to the output of one RNN being used as the input for the next RNN.
+Initializing the state is straightforward. We invoke the member function `rnn_layer.begin_state(batch_size)`. This returns an initial state for each element in the minibatch. That is, it returns an object of size (hidden layers, batch size, number of hidden units). The number of hidden layers defaults to be 1. In fact, we have not even discussed yet what it means to have multiple layers, but we will do it in :numref:`sec_deep_rnn`. For now, suffice it to say that multiple layers simply amount to the output of one RNN being used as the input for the next RNN.
 
 ```{.python .input  n=37}
 batch_size = 1
@@ -56,8 +56,8 @@ class RNNModel(nn.Block):
         X = npx.one_hot(inputs.T, self.vocab_size)
         Y, state = self.rnn(X, state)
         # The fully connected layer will first change the shape of Y to
-        # (num_steps * batch_size, num_hiddens)
-        # Its output shape is (num_steps * batch_size, vocab_size)
+        # (num_steps * batch_size, num_hiddens).
+        # Its output shape is (num_steps * batch_size, vocab_size).
         output = self.dense(Y.reshape(-1, Y.shape[-1]))
         return output, state
 
@@ -65,9 +65,9 @@ class RNNModel(nn.Block):
         return self.rnn.begin_state(*args, **kwargs)
 ```
 
-## Training
+## Training and Predicting
 
-Let us make a prediction with the a model that has random weights.
+Before training the model, let us make a prediction with the a model that has random weights.
 
 ```{.python .input  n=42}
 ctx = d2l.try_gpu()
@@ -76,20 +76,20 @@ model.initialize(force_reinit=True, ctx=ctx)
 d2l.predict_ch8('time traveller', 10, model, vocab, ctx)
 ```
 
-As is quite obvious, this model does not work at all (just yet). Next, we call just `train_ch8` defined in :numref:`sec_rnn_scratch` with the same hyper-parameters to train our model.
+As is quite obvious, this model does not work at all. Next, we call `train_ch8` with the same hyper-parameters defined in :numref:`sec_rnn_scratch` and train our model from Gluon.
 
 ```{.python .input  n=19}
 num_epochs, lr = 500, 1
 d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, ctx)
 ```
 
-The model achieves comparable perplexity, albeit within a shorter period of time, due to the code being more optimized.
+Compared with last section, this model achieves comparable perplexity, albeit within a shorter period of time, due to the code being more optimized.
 
 ## Summary
 
 * Gluon's `rnn` module provides an implementation at the recurrent neural network layer.
 * Gluon's `nn.RNN` instance returns the output and hidden state after forward computation. This forward computation does not involve output layer computation.
-* As before, the compute graph needs to be detached from previous steps for reasons of efficiency.
+* As before, the computational graph needs to be detached from previous steps for reasons of efficiency.
 
 ## Exercises
 
