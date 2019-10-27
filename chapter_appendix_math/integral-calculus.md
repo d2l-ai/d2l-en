@@ -379,6 +379,6 @@ We will meet this integral again when we study continuous random variables in th
 * Integrals in higher dimensions can be computed by iterating single variable integrals.
 
 ## Exercises
-1. What is $\int_1^2 \frac{1}{x} ;dx$?
+1. What is $\int_1^2 \frac{1}{x} \;dx$?
 2. Use the change of variables formula to integrate $\int_0^{\sqrt{\pi}}x\sin(x^2)\;dx$.
 3. What is $\int_{[0,1]^2} xy \;dx\;dy$?
