@@ -163,7 +163,7 @@
   publisher={ACM}
 }
 ```
-1. Run `bibtool -f "%3n(author).%d(year)" d2l.bib -o d2l.bib`. Now the added entry will have consistent keys:
+4. Run `bibtool -f "%3n(author).%d(year)" d2l.bib -o d2l.bib`. Now the added entry will have consistent keys:
 ```
 @Article{	  Wood.Gasthaus.Archambeau.ea.2011,
   title		= {The sequence memoizer},
@@ -177,7 +177,7 @@
   publisher	= {ACM}
 }
 ```
-1. In the text, use the following to cite the added paper:
+5. In the text, use the following to cite the added paper:
 ```
 :cite:`Wood.Gasthaus.Archambeau.ea.2011` 
 ```
