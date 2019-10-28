@@ -178,7 +178,5 @@
 }
 ```
 1. In the text, use 
-```
-:cite:`Wood.Gasthaus.Archambeau.ea.2011` 
-``` to cite the added paper.
+`:cite:`Wood.Gasthaus.Archambeau.ea.2011` `to cite the added paper.
 
