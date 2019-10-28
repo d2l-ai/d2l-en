@@ -193,8 +193,31 @@ Before walking through the general steps of the hypothesis testing, let us start
 
 #### statistical significance 
 
-The *statistical significance* can be explained as the level of risk we are willing to take so that we will reject a null hypothesis when it is actually true. It is also refered as *type I error* and *false positive*. Notice that this $\alpha$ is the same one to use when calculating the confidence interval as we talked about in ??????
+*Statistical significance* measures the probability of errorously reject the null hypothesis, $H_0$, when it should not be rejected in fact, i.e.,
 
+$$ \text{statistical significance }= 1 - \alpha = P(\text{fail to reject H_0} \mid \text{ H_0 is true} ).$$
+
+
+Statistical significance can be explained as the level of risk that we are willing to take, so that we will reject a null hypothesis when it is actually true. It is also refered as *type I error* or *false positive*. Notice that this $\alpha$ is the same one to use when we talked about the definition of the confidence interval.
+
+A commonly used statistical significance level is $95%$. As we can see from figure :numref:`fig_pvalue_explain`, if the observation data point is located outsided the $95%$ significance threshold, it will be a very unlikely observations under the null hypothesis. Hence, there might be something wrong with the null hypothesis and we will reject it. 
+
+
+![Statistical significance.](../img/pvalue_explain.png)
+:label:`fig_pvalue_explain`
+
+
+#### statistical power 
+
+*Statistical power* (or *sensitivity*) measures the ability to identify a true difference, i.e., 
+
+$$ \text{statistical power }= P(\text{reject H_0} \mid \text{ H_0 is false} ).$$
+
+Intuitively, statistical power can be interpreted as how likely our test will detect a real discrepancy of some minimum magnitude at a desired statistical significance level. $80%$ is a commonly used statistical power. The higher the statistical power, the more likely we can catch the true difference. We can imagine the power as the fishing net as shown in :numref:`fig_statistical_power`. In this analogy, a high power hypothesis test is like a high graduality fishing net and a smaller discrepancy is like a smaller fish. If the fishing net is not of enough high graduality, then the smaller fish may easily escape from the gaps, and hence the fishing net cannot catch the fish. Similarly, if the statistical power is not of enough high power, then the test may not catch the smaller discrepancy.
+
+
+![Statistical significance.](../img/statistical_power.png)
+:label:`fig_statistical_power`
 
 #### test statistic 
 
@@ -225,3 +248,7 @@ After you get familar with the above concepts, let us go through the general ste
 In practice, to conduct a hypothesis test, we start by initail defining a null hypothesis and a level of risk that we are willing to take. Then we calculate the test statistic of the sample, taking an “extreme” value of the test statistic as evidence against the null hypothesis. If the test statistic falls within the reject region, we knows that the null hypothesis may not be a convincible statement given the observed samples. In contrast, the null hypothesis is a favored statement.
 
 Hypothesis testing is quite applicable is a variety of scenarios such as clinical trails and A/B testing. In the next section, we will show you how to implement a few functions of A/B testing.
+
+```{.python .input}
+
+```

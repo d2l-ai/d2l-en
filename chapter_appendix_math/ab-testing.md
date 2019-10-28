@@ -1,6 +1,11 @@
 # AB Testing 
 :label:`sec_ab_tesing`
 
+
+![AB Testing - Green beans linked to acne.](../img/ab_testing.svg)
+:label:`fig_ab_testing`
+
+
 In the "internet century", it is not unimaginable to collect millions of data everyday. The application of hypothesis testing as we introduced in :numref:`sec_statistics` is refered to as *A/B Testing* in the world of internet.
 
 A/B Testing is quite useful in the internet companies who are testing the influence on users' behaviors of a new product design (such website layouts and personalized recommendations). The goal of A/B testing is to design an experiment and decide whether there is a dramatic behavior difference between the experiment user group and the control user group. This experiment is usually robust and reproducible for a given user population within a time span. As a result, A/B tesing can help us make a data-informed decision on whether or not launch this new product design.
@@ -14,7 +19,7 @@ In this section, we will dive into the details of A/B testing in practice.
 
 Similarly to the 5 steps we introduced in hypothesis testing in :numref:`sec_statistics`, a common A/B testing experiment also needs the following 5 steps:
 
-1. State a null hypotheses about the new product design by choosing a metrics to measure the effect.
+1. State a null hypotheses, $H_0$, about the new product design by choosing a metrics to measure the effect.
 2. Set a practical level of significance ($\alpha$) and a statistical power ($1 - \beta$), so that we are willing to change the given product design if the test is statistically significant.
 3. Calculate the required sample size for both control group and the experiment group and take samples.
 4. Calculate the test statistic and determine the critical value (or p-value ??????).
@@ -23,7 +28,7 @@ Similarly to the 5 steps we introduced in hypothesis testing in :numref:`sec_sta
 Let us walk through the details of each step together!
 
 
-### Step 1: Stating a null hypotheses by choosing a metrics
+### Step 1: Stating A Null Hypotheses by Choosing A Metrics
 
 How to measure a given product design change make a difference or not? First, choosing the corrected metrics will navigate us to a rigorous destination. Here are some common choice of metrics in practice:
 
@@ -35,20 +40,23 @@ No matter what metric we choose, it should not varied a lot between a well-defin
 
 Ultemately, the metric who choosed is used for evaluation of a A/B testing. As a result, we prefer a metric of high *sensitivity*, i.e., accurately reflecting the change that we care about. At the same time, we need the metric to be *robust* - invariance to the irrelevant changes. With a well-defined metric, we can then state our null hypothesis by measuring whether the metric has a significant change from the new product design.
 
-### Step 2: Setting a significance level and a statistical power 
 
-In practice, the significance level is 0.05 and power is set as 0.8. Power is ??????
+### Step 2: Setting Statistical Significance Level and Statistical Power 
+
+As we introduced in :numref:`sec_statistics`, a common used statistical significance level is $95%$ and statistical power is $0.8$.
+
+* Practical statistical significance level varies depends on each individual tests, it tells you how much change the test detects that makes you really want to launch the change. You may not want to launch a change even if the test is statistically significant because you need to consider the business impact of the change, whether it is worthwhile to launch considering the engineering cost, customer support or sales issue, and opportunity costs.
 
 
 
-* Practical significance level varies depends on each individual tests, it tells you how much change the test detects that makes you really want to launch the change. You may not want to launch a change even if the test is statistically significant because you need to consider the business impact of the change, whether it is worthwhile to launch considering the engineering cost, customer support or sales issue, and opportunity costs.
-
-### Step 3: Calculating proper sample size
+### Step 3: Calculating Proper Sample Size
 
 Recall from :numref:`sec_statistics`, the *population* denotes the total set of users where we can sample our control group and experiment group. It is critical to decide the size of sample for our A/B testing, so that it is not overestimated or underestimated. Specifically, if we overestimated the sample size, we would waste time and effort to collect data, whereas if we underestimated it, we would not able to make a convincible product design decision.
 
 
-Calculate the sample size ??????
+Calculate the sample size
+
+??????
 
 
 * How to reduce the size of an experiment to get it done faster? You can increase signiffcance level alpha, or reduce power (1-beta) which means increase beta, or change the unit of diversion if originally it is not the same with unit of analysis (unit of analysis: denominator of your evaluation metric) .
@@ -79,3 +87,6 @@ standard error*. Recall that we'll measure the users who click in each group, wh
 
 Now, the first thing we'll calculate will be what's called the *pooled probability of a click*. And I'm using a hat here because this is an estimated probability. And the pooled probability is the total probability of a click across groups, that is, the total number of users who clicked divided by the total number of users. Then we'll calculate the pooled standard error, which is given by this formula. Now recall that we're going to estimate the difference between p experiment and p control, and I'll call this difference d hat for difference.
 
+```{.python .input}
+
+```
