@@ -177,6 +177,8 @@
   publisher	= {ACM}
 }
 ```
-1. In the text, use 
-`:cite:`Wood.Gasthaus.Archambeau.ea.2011` `to cite the added paper.
+1. In the text, use the following to cite the added paper:
+```
+:cite:`Wood.Gasthaus.Archambeau.ea.2011` 
+```
 
