@@ -112,9 +112,9 @@ Assume that the durations of these three stages are $t_1, t_2, t_3$, respectivel
 
 ## The Impact of Asynchronous Programming on Memory
 
-In order to explain the impact of asynchronous programming on memory usage, recall what we learned in the previous chapters. Throughout the model training process implemented in the previous chapters, we usually evaluated things like the loss or accuracy of the model in each mini-batch. Detail-oriented readers may have discovered that such evaluations often make use of synchronization functions, such as `item` or `asnumpy`. If these synchronization functions are removed, the front-end will pass a large number of mini-batch computing tasks to the back-end in a very short time, which might cause a spike in memory usage. When the mini-batches makes use of synchronization functions, on each iteration, the front-end will only pass one mini-batch task to the back-end to be computed, which will typically reduce memory use.
+In order to explain the impact of asynchronous programming on memory usage, recall what we learned in the previous chapters. Throughout the model training process implemented in the previous chapters, we usually evaluated things like the loss or accuracy of the model in each minibatch. Detail-oriented readers may have discovered that such evaluations often make use of synchronization functions, such as `item` or `asnumpy`. If these synchronization functions are removed, the front-end will pass a large number of minibatch computing tasks to the back-end in a very short time, which might cause a spike in memory usage. When the minibatches makes use of synchronization functions, on each iteration, the front-end will only pass one minibatch task to the back-end to be computed, which will typically reduce memory use.
 
-Because the deep learning model is usually large and memory resources are usually limited, we recommend the use of synchronization functions for each mini-batch throughout model training, for example by using the `item` or `asnumpy` functions to evaluate model performance. Similarly, we also recommend utilizing synchronization functions for each mini-batch prediction (such as directly printing out the current batch’s prediction results), in order to reduce memory usage during model prediction.
+Because the deep learning model is usually large and memory resources are usually limited, we recommend the use of synchronization functions for each minibatch throughout model training, for example by using the `item` or `asnumpy` functions to evaluate model performance. Similarly, we also recommend utilizing synchronization functions for each minibatch prediction (such as directly printing out the current batch’s prediction results), in order to reduce memory usage during model prediction.
 
 Next, we will demonstrate asynchronous programming’s impact on memory. We will first define a data retrieval function `data_iter`, which upon being called, will start timing and regularly print out the time taken to retrieve data batches.
 
@@ -158,7 +158,7 @@ for X, y in data_iter():
 loss(y, net(X)).wait_to_read()
 ```
 
-For the `net` training model, the synchronization function `item` can naturally be used to record the loss of each mini-batch output by the `ndarray` object and to print out the model loss after each iteration. At this point, the generation interval of each mini-batch increases, but with a small memory overhead.
+For the `net` training model, the synchronization function `item` can naturally be used to record the loss of each minibatch output by the `ndarray` object and to print out the model loss after each iteration. At this point, the generation interval of each minibatch increases, but with a small memory overhead.
 
 ```{.python .input  n=13}
 l_sum, mem = 0, get_mem()
@@ -173,7 +173,7 @@ npx.waitall()
 print('increased memory: %f MB' % (get_mem() - mem))
 ```
 
-Even though each mini-batch’s generation interval is shorter, the memory usage may still be high during training if the synchronization function is removed. This is because, in default asynchronous programming, the front-end will pass on all mini-batch computations to the back-end in a short amount of time. As a result of this, a large amount of intermediate results cannot be released and may end up piled up in memory. In this experiment, we can see that all data (`X` and `y`) is generated in under a second. However, because of an insufficient training speed, this data can only be stored in the memory and cannot be cleared in time, resulting in extra memory usage.
+Even though each minibatch’s generation interval is shorter, the memory usage may still be high during training if the synchronization function is removed. This is because, in default asynchronous programming, the front-end will pass on all minibatch computations to the back-end in a short amount of time. As a result of this, a large amount of intermediate results cannot be released and may end up piled up in memory. In this experiment, we can see that all data (`X` and `y`) is generated in under a second. However, because of an insufficient training speed, this data can only be stored in the memory and cannot be cleared in time, resulting in extra memory usage.
 
 ```{.python .input  n=14}
 mem = get_mem()
@@ -192,7 +192,7 @@ print('increased memory: %f MB' % (get_mem() - mem))
 
 * MXNet can improve computing performance through the use of asynchronous programming.
 
-* We recommend using at least one synchronization function for each mini-batch training or prediction to avoid passing on too many computation tasks to the back-end in a short period of time.
+* We recommend using at least one synchronization function for each minibatch training or prediction to avoid passing on too many computation tasks to the back-end in a short period of time.
 
 
 ## Exercises

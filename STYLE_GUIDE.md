@@ -33,10 +33,10 @@
         * instance (not object)
         * weight, bias, label
         * model training, model prediction (model inference)
-        * training/testing/validation data set
+        * training/testing/validation dataset
     * Distinguish：
         * hyperparameter vs parameter
-        * mini-batch stochastic gradient descent vs stochastic gradient descent
+        * minibatch stochastic gradient descent vs stochastic gradient descent
     * List
         * https://github.com/mli/gluon-tutorials-zh/blob/master/TERMINOLOGY.md
 

@@ -9,12 +9,13 @@ stage("Build and Publish") {
 
       sh label: "Build Environment", script: """set -ex
       rm -rf ~/miniconda3/envs/${ENV_NAME}
-      conda create -n ${ENV_NAME} pip -y
+      conda create -n ${ENV_NAME} pip python=3.7 -y
       conda activate ${ENV_NAME}
       pip install mxnet-cu101==1.6.0b20190915
       pip install git+https://github.com/d2l-ai/d2l-book
       python setup.py develop
       pip list
+      nvidia-smi
       """
 
       sh label: "Check Execution Output", script: """set -ex

@@ -42,7 +42,7 @@ we would need to get our hands on a dataset
 consisting of sales for which we know
 the sale price, area and age for each home.
 In the terminology of machine learning,
-the data set is called a *training data* or *training set*,
+the dataset is called a *training data* or *training set*,
 and each row (here the data corresponding to one sale)
 is called an *instance* or *example*.
 The thing we are trying to predict (here, the price)
@@ -230,11 +230,11 @@ which is an average of the losses computed
 on every single example in the dataset. 
 In practice, this can be extremely slow. 
 We must pass over the entire dataset before making a single update.
-Thus, we will often settle for sampling a random mini-batch of examples 
+Thus, we will often settle for sampling a random minibatch of examples 
 every time we need to computer the update, 
 a variant called *stochastic gradient descent*.
 
-In each iteration, we first randomly sample a mini-batch $\mathcal{B}$ 
+In each iteration, we first randomly sample a minibatch $\mathcal{B}$ 
 consisting of a fixed number of training data examples.  
 We then compute the derivative (gradient) of the average loss 
 on the mini batch with regard to the model parameters.
@@ -269,7 +269,7 @@ b - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \left(\mathbf{w}^\top \m
 $$
 
 In the above equation, $|\mathcal{B}|$ represents 
-the number of examples in each mini-batch (the *batch size*)
+the number of examples in each minibatch (the *batch size*)
 and $\eta$ denotes the *learning rate*. 
 We emphasize that the values of the batch size and learning rate 
 are manually pre-specified and not typically learned through model training. 

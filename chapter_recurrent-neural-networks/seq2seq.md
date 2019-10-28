@@ -57,7 +57,7 @@ class Seq2SeqEncoder(d2l.Encoder):
         return out, state
 ```
 
-Next, we will create a mini-batch sequence input with a batch size of 4 and 7 timesteps. We assume that the number of hidden layers of the LSTM neural network is 2 and the number of hidden units is 16. The output shape after performing forward calculation on the input by the encoder  is (number of time steps, batch size, number of hidden units). 
+Next, we will create a minibatch sequence input with a batch size of 4 and 7 time steps. We assume the number of hidden layers of the LSTM unit is 2 and the number of hidden units is 16. The output shape returned by the encoder after performing forward calculation on the input is (number of time steps, batch size, number of hidden units). The shape of the multi-layer hidden state of the gated recurrent unit in the final time step is (number of hidden layers, batch size, number of hidden units). For the gated recurrent unit, the `state` list contains only one element, which is the hidden state. If long short-term memory is used, the `state` list will also contain another element, which is the memory cell.
 
 ```{.python .input  n=4}
 encoder = Seq2SeqEncoder(vocab_size=10, embed_size=8,

@@ -209,7 +209,7 @@ y = np.array([0, 2])
 accuracy(y_hat, y) / len(y)
 ```
 
-Similarly, we can evaluate the accuracy for model `net` on the data set
+Similarly, we can evaluate the accuracy for model `net` on the dataset
 (accessed via `data_iter`).
 
 ```{.python .input  n=13}
@@ -321,7 +321,7 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
         animator.add(epoch+1, train_metrics+(test_acc,))
 ```
 
-Again, we use the mini-batch stochastic gradient descent
+Again, we use the minibatch stochastic gradient descent
 to optimize the loss function of the model.
 Note that the number of epochs (`num_epochs`),
 and learning rate (`lr`) are both adjustable hyper-parameters.

@@ -15,11 +15,11 @@ npx.set_np()
 
 ## Text Sentiment Classification Data
 
-We use Stanford's Large Movie Review Dataset as the data set for text sentiment classification[1]. This data set is divided into two data sets for training and testing purposes, each containing 25,000 movie reviews downloaded from IMDb. In each data set, the number of comments labeled as "positive" and "negative" is equal.
+We use Stanford's Large Movie Review Dataset as the dataset for text sentiment classification[1]. This dataset is divided into two datasets for training and testing purposes, each containing 25,000 movie reviews downloaded from IMDb. In each dataset, the number of comments labeled as "positive" and "negative" is equal.
 
 ###  Reading Data
 
-We first download this data set to the "../data" path and extract it to "../data/aclImdb".
+We first download this dataset to the "../data" path and extract it to "../data/aclImdb".
 
 ```{.python .input  n=2}
 # Saved in the d2l package for later use
@@ -32,7 +32,7 @@ def download_imdb(data_dir='../data'):
 download_imdb()
 ```
 
-Next, read the training and test data sets. Each example is a review and its corresponding label: 1 indicates "positive" and 0 indicates "negative".
+Next, read the training and test datasets. Each example is a review and its corresponding label: 1 indicates "positive" and 0 indicates "negative".
 
 ```{.python .input  n=3}
 # Saved in the d2l package for later use
@@ -55,7 +55,7 @@ for x, y in zip(train_data[0][:3], train_data[1][:3]):
 
 ### Tokenization and Vocabulary
 
-We use a word as a token, and then create a dictionary based on the training data set.
+We use a word as a token, and then create a dictionary based on the training dataset.
 
 ```{.python .input  n=4}
 train_tokens = d2l.tokenize(train_data[0], token='word')
@@ -67,7 +67,7 @@ d2l.plt.hist([len(line) for line in train_tokens], bins=range(0,1000,50));
 
 ### Padding to the Same Length
 
-Because the reviews have different lengths, so they cannot be directly combined into mini-batches. Here we fix the length of each comment to 500 by truncating or adding "&lt;unk&gt;" indices.
+Because the reviews have different lengths, so they cannot be directly combined into minibatches. Here we fix the length of each comment to 500 by truncating or adding "&lt;unk&gt;" indices.
 
 ```{.python .input  n=5}
 num_steps = 500  # sequence length
@@ -78,7 +78,7 @@ train_features.shape
 
 ### Create Data Iterator
 
-Now, we will create a data iterator. Each iteration will return a mini-batch of data.
+Now, we will create a data iterator. Each iteration will return a minibatch of data.
 
 ```{.python .input  n=6}
 train_iter = d2l.load_array((train_features, train_data[1]), 64)

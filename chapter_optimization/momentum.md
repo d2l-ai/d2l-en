@@ -50,9 +50,9 @@ d2l.show_trace_2d(f_2d, d2l.train_2d(gd_2d))
 ## The Momentum Method
 
 The momentum method was proposed to solve the gradient descent problem described
-above. Since mini-batch stochastic gradient descent is more general than
+above. Since minibatch stochastic gradient descent is more general than
 gradient descent, the subsequent discussion in this chapter will continue to use
-the definition for mini-batch stochastic gradient descent $\mathbf{g}_t$ at
+the definition for minibatch stochastic gradient descent $\mathbf{g}_t$ at
 time step $t$ given in :numref:`sec_minibatch_sgd`.  We set the independent
 variable at time step $t$ to $\mathbf{x}_t$ and the learning rate to
 $\eta_t$.  At time step $0$, momentum creates the velocity variable
@@ -66,7 +66,7 @@ $$
 \end{aligned}
 $$
 
-Here, the momentum hyperparameter $\gamma$ satisfies $0 \leq \gamma < 1$. When $\gamma=0$, momentum is equivalent to a mini-batch SGD.
+Here, the momentum hyperparameter $\gamma$ satisfies $0 \leq \gamma < 1$. When $\gamma=0$, momentum is equivalent to a minibatch SGD.
 
 Before explaining the mathematical principles behind the momentum method, we should take a look at the iterative trajectory of the gradient descent after using momentum in the experiment.
 
@@ -120,7 +120,7 @@ Also note that $\frac{1}{1-\gamma} = 1 + \gamma + \gamma^2 + \cdots$. So all sca
 
 ## Implementation from Scratch
 
-Compared with mini-batch SGD, the momentum method needs to maintain a velocity variable of the same shape for each independent variable and a momentum hyperparameter is added to the hyperparameter category. In the implementation, we use the state variable `states` to represent the velocity variable in a more general sense.
+Compared with minibatch SGD, the momentum method needs to maintain a velocity variable of the same shape for each independent variable and a momentum hyperparameter is added to the hyperparameter category. In the implementation, we use the state variable `states` to represent the velocity variable in a more general sense.
 
 ```{.python .input  n=13}
 def init_momentum_states(feature_dim):
@@ -134,7 +134,7 @@ def sgd_momentum(params, states, hyperparams):
         p[:] -= v
 ```
 
-When we set the momentum hyperparameter `momentum` to 0.5, it can be treated as a mini-batch SGD: the mini-batch gradient here is the weighted average of twice the mini-batch gradient of the last two time steps.
+When we set the momentum hyperparameter `momentum` to 0.5, it can be treated as a minibatch SGD: the minibatch gradient here is the weighted average of twice the minibatch gradient of the last two time steps.
 
 ```{.python .input  n=15}
 def train_momentum(lr, momentum, num_epochs=2):
@@ -146,13 +146,13 @@ data_iter, feature_dim = d2l.get_data_ch10(batch_size=10)
 train_momentum(0.02, 0.5)
 ```
 
-When we increase the momentum hyperparameter `momentum` to 0.9, it can still be treated as a mini-batch SGD: the mini-batch gradient here will be the weighted average of ten times the mini-batch gradient of the last 10 time steps. Now we keep the learning rate at 0.02.
+When we increase the momentum hyperparameter `momentum` to 0.9, it can still be treated as a minibatch SGD: the minibatch gradient here will be the weighted average of ten times the minibatch gradient of the last 10 time steps. Now we keep the learning rate at 0.02.
 
 ```{.python .input  n=8}
 train_momentum(0.02, 0.9)
 ```
 
-We can see that the value change of the objective function is not smooth enough at later stages of iteration. Intuitively, ten times the mini-batch gradient is five times larger than two times the mini-batch gradient, so we can try to reduce the learning rate to 1/5 of its original value. Now, the value change of the objective function becomes smoother after its period of decline.
+We can see that the value change of the objective function is not smooth enough at later stages of iteration. Intuitively, ten times the minibatch gradient is five times larger than two times the minibatch gradient, so we can try to reduce the learning rate to 1/5 of its original value. Now, the value change of the objective function becomes smoother after its period of decline.
 
 ```{.python .input}
 train_momentum(0.004, 0.9)

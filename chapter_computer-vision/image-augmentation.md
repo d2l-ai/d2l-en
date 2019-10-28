@@ -2,9 +2,9 @@
 :label:`sec_image_augmentation`
 
 
-We mentioned that large-scale data sets are prerequisites for the successful
+We mentioned that large-scale datasets are prerequisites for the successful
 application of deep neural networks in
-:numref:`sec_alexnet`. Image augmentation technology expands the scale of training data sets
+:numref:`sec_alexnet`. Image augmentation technology expands the scale of training datasets
 by making a series of random changes to the training images to produce similar,
 but different, training examples. Another way to explain image augmentation is
 that randomly changing training examples can reduce a model's dependence on
@@ -111,14 +111,14 @@ apply(img, augs)
 
 ## Using an Image Augmentation Training Model
 
-Next, we will look at how to apply image augmentation in actual training. Here, we use the CIFAR-10 data set, instead of the Fashion-MNIST data set we have been using. This is because the position and size of the objects in the Fashion-MNIST data set have been normalized, and the differences in color and size of the objects in CIFAR-10 data set are more significant. The first 32 training images in the CIFAR-10 data set are shown below.
+Next, we will look at how to apply image augmentation in actual training. Here, we use the CIFAR-10 dataset, instead of the Fashion-MNIST dataset we have been using. This is because the position and size of the objects in the Fashion-MNIST dataset have been normalized, and the differences in color and size of the objects in CIFAR-10 dataset are more significant. The first 32 training images in the CIFAR-10 dataset are shown below.
 
 ```{.python .input  n=11}
 d2l.show_images(gluon.data.vision.CIFAR10(
     train=True)[0:32][0], 4, 8, scale=0.8);
 ```
 
-In order to obtain a definitive results during prediction, we usually only apply image augmentation to the training example, and do not use image augmentation with random operations during prediction. Here, we only use the simplest random left-right flipping method. In addition, we use a `ToTensor` instance to convert mini-batch images into the format required by MXNet, i.e., 32-bit floating point numbers with the shape of (batch size, number of channels, height, width) and value range between 0 and 1.
+In order to obtain a definitive results during prediction, we usually only apply image augmentation to the training example, and do not use image augmentation with random operations during prediction. Here, we only use the simplest random left-right flipping method. In addition, we use a `ToTensor` instance to convert minibatch images into the format required by MXNet, i.e., 32-bit floating point numbers with the shape of (batch size, number of channels, height, width) and value range between 0 and 1.
 
 ```{.python .input  n=12}
 train_augs = gluon.data.vision.transforms.Compose([
@@ -131,7 +131,7 @@ test_augs = gluon.data.vision.transforms.Compose([
 
 Next, we define an auxiliary function to make it easier to read the image and
 apply image augmentation. The `transform_first` function provided by Gluon's
-data set applies image augmentation to the first element of each training
+dataset applies image augmentation to the first element of each training
 example (image and label), i.e., the element at the top of the image. For
 detailed description of `DataLoader`, refer to :numref:`sec_fashion_mnist`.
 
@@ -146,7 +146,7 @@ def load_cifar10(is_train, augs, batch_size):
 ### Using a Multi-GPU Training Model
 
 We train the ResNet-18 model described in :numref:`sec_resnet` on the
-CIFAR-10 data set. We will also apply the methods described in
+CIFAR-10 dataset. We will also apply the methods described in
 :numref:`sec_multi_gpu_gluon` and use a multi-GPU training model.
 
 Next, we define the training function to train and evaluate the model using multiple GPUs.
@@ -193,7 +193,7 @@ def train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs,
         metric[2]*num_epochs/timer.sum(), ctx_list))
 ```
 
-Now, we can define the `train_with_data_aug` function to use image augmentation to train the model. This function obtains all available GPUs and uses Adam as the optimization algorithm for training. It then applies image augmentation to the training data set, and finally calls the `train` function just defined to train and evaluate the model.
+Now, we can define the `train_with_data_aug` function to use image augmentation to train the model. This function obtains all available GPUs and uses Adam as the optimization algorithm for training. It then applies image augmentation to the training dataset, and finally calls the `train` function just defined to train and evaluate the model.
 
 ```{.python .input  n=18}
 batch_size, ctx, net = 256, d2l.try_all_gpus(), d2l.resnet18(10)                    
@@ -223,7 +223,7 @@ train_with_data_aug(train_augs, test_augs, net)
 ## Exercises
 
 * Train the model without using image augmentation: `train_with_data_aug(no_aug, no_aug)`. Compare training and testing accuracy when using and not using image augmentation. Can this comparative experiment support the argument that image augmentation can mitigate overfitting? Why?
-* Add different image augmentation methods in model training based on the CIFAR-10 data set. Observe the implementation results.
+* Add different image augmentation methods in model training based on the CIFAR-10 dataset. Observe the implementation results.
 * With reference to the MXNet documentation, what other image augmentation methods are provided in Gluon's `transforms` module?
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2442)

@@ -5,11 +5,11 @@ In this section, we will tackle the dog breed identification challenge in the Ka
 
 > https://www.kaggle.com/c/dog-breed-identification
 
-In this competition, we attempt to identify 120 different breeds of dogs. The data set used in this competition is actually a subset of the famous ImageNet data set. Different from the images in the CIFAR-10 data set used in the previous section, the images in the ImageNet data set are higher and wider and their dimensions are inconsistent.
+In this competition, we attempt to identify 120 different breeds of dogs. The dataset used in this competition is actually a subset of the famous ImageNet dataset. Different from the images in the CIFAR-10 dataset used in the previous section, the images in the ImageNet dataset are higher and wider and their dimensions are inconsistent.
 
 :numref:`fig_kaggle_dog` shows the information on the competition's webpage. In order to submit the results, please register an account on the Kaggle website first.
 
-![Dog breed identification competition website. The data set for the competition can be accessed by clicking the "Data" tab.](../img/kaggle-dog.png)
+![Dog breed identification competition website. The dataset for the competition can be accessed by clicking the "Data" tab.](../img/kaggle-dog.png)
 :width:`600px`
 :label:`fig_kaggle_dog`
 
@@ -35,17 +35,17 @@ The competition data is divided into a training set and testing set. The trainin
 
 ### Download the Data Set
 
-After logging in to Kaggle, we can click on the "Data" tab on the dog breed identification competition webpage shown in :numref:`fig_kaggle_dog` and download the training data set "train.zip", the testing data set "test.zip", and the training data set labels "label.csv.zip". After downloading the files, place them in the three paths below:
+After logging in to Kaggle, we can click on the "Data" tab on the dog breed identification competition webpage shown in :numref:`fig_kaggle_dog` and download the training dataset "train.zip", the testing dataset "test.zip", and the training dataset labels "label.csv.zip". After downloading the files, place them in the three paths below:
 
 * ../data/kaggle_dog/train.zip
 * ../data/kaggle_dog/test.zip
 * ../data/kaggle_dog/labels.csv.zip
 
 
-To make it easier to get started, we provide a small-scale sample of the data set mentioned above, "train_valid_test_tiny.zip". If you are going to use the full data set for the Kaggle competition, you will also need to change the `demo` variable below to `False`.
+To make it easier to get started, we provide a small-scale sample of the dataset mentioned above, "train_valid_test_tiny.zip". If you are going to use the full dataset for the Kaggle competition, you will also need to change the `demo` variable below to `False`.
 
 ```{.python .input  n=1}
-# If you use the full data set downloaded for the Kaggle competition, change
+# If you use the full dataset downloaded for the Kaggle competition, change
 # the variable below to False
 demo = True
 data_dir = '../data/kaggle_dog'
@@ -107,12 +107,12 @@ def reorg_dog_data(data_dir, label_file, train_dir, test_dir, input_dir,
                     os.path.join(data_dir, input_dir, 'test', 'unknown'))
 ```
 
-Because we are using a small data set, we set the batch size to 1. During actual training and testing, we would use the entire Kaggle Competition data set and call the `reorg_dog_data` function to organize the data set. Likewise, we would need to set the `batch_size` to a larger integer, such as 128.
+Because we are using a small dataset, we set the batch size to 1. During actual training and testing, we would use the entire Kaggle Competition dataset and call the `reorg_dog_data` function to organize the dataset. Likewise, we would need to set the `batch_size` to a larger integer, such as 128.
 
 ```{.python .input  n=3}
 if demo:
-    # Note: Here, we use a small data set and the batch size should be set
-    # smaller. When using the complete data set for the Kaggle competition, we
+    # Note: Here, we use a small dataset and the batch size should be set
+    # smaller. When using the complete dataset for the Kaggle competition, we
     # can set the batch size to a larger integer
     input_dir, batch_size = 'train_valid_test_tiny', 1
 else:
@@ -160,7 +160,7 @@ transform_test = gluon.data.vision.transforms.Compose([
 
 ## Read the Data Set
 
-As in the previous section, we can create an `ImageFolderDataset` instance to read the data set containing the original image files.
+As in the previous section, we can create an `ImageFolderDataset` instance to read the dataset containing the original image files.
 
 ```{.python .input  n=5}
 train_ds = gluon.data.vision.ImageFolderDataset(
@@ -188,14 +188,14 @@ test_iter = gluon.data.DataLoader(test_ds.transform_first(transform_test),
 
 ## Define the Model
 
-The data set for this competition is a subset of the ImageNet data
+The dataset for this competition is a subset of the ImageNet data
 set. Therefore, we can use the approach discussed in
 :numref:`sec_fine_tuning`
 to select a model pre-trained on the
-entire ImageNet data set and use it to extract image features to be input in the
+entire ImageNet dataset and use it to extract image features to be input in the
 custom small-scale output network. Gluon provides a wide range of pre-trained
 models. Here, we will use the pre-trained ResNet-34 model. Because the
-competition data set is a subset of the pre-training data set, we simply reuse
+competition dataset is a subset of the pre-training dataset, we simply reuse
 the input of the pre-trained model's output layer, i.e., the extracted
 features. Then, we can replace the original output layer with a small custom
 output network that can be trained, such as two fully connected layers in a
@@ -204,7 +204,7 @@ series. Different from the experiment in
 extraction. This reduces the training time and the memory required to store
 model parameter gradients.
 
-You must note that, during image augmentation, we use the mean values and standard deviations of the three RGB channels for the entire ImageNet data set for normalization. This is consistent with the normalization of the pre-trained model.
+You must note that, during image augmentation, we use the mean values and standard deviations of the three RGB channels for the entire ImageNet dataset for normalization. This is consistent with the normalization of the pre-trained model.
 
 ```{.python .input  n=6}
 def get_net(ctx):
@@ -286,7 +286,7 @@ train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
 
 ## Classify the Testing Set and Submit Results on Kaggle
 
-After obtaining a satisfactory model design and hyper-parameters, we use all training data sets (including validation sets) to retrain the model and then classify the testing set. Note that predictions are made by the output network we just trained.
+After obtaining a satisfactory model design and hyper-parameters, we use all training datasets (including validation sets) to retrain the model and then classify the testing set. Note that predictions are made by the output network we just trained.
 
 ```{.python .input  n=8}
 net = get_net(ctx)
@@ -315,12 +315,12 @@ method for submitting results is similar to method in
 
 ## Summary
 
-* We can use a model pre-trained on the ImageNet data set to extract features and only train a small custom output network. This will allow us to classify a subset of the ImageNet data set with lower computing and storage overhead.
+* We can use a model pre-trained on the ImageNet dataset to extract features and only train a small custom output network. This will allow us to classify a subset of the ImageNet dataset with lower computing and storage overhead.
 
 
 ## Exercises
 
-* When using the entire Kaggle data set, what kind of results do you get when you increase the `batch_size` (batch size) and `num_epochs` (number of epochs)?
+* When using the entire Kaggle dataset, what kind of results do you get when you increase the `batch_size` (batch size) and `num_epochs` (number of epochs)?
 * Do you get better results if you use a deeper pre-trained model?
 * Scan the QR code to access the relevant discussions and exchange ideas about the methods used and the results obtained with the community. Can you come up with any better techniques?
 

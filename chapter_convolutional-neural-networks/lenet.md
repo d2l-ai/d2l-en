@@ -4,7 +4,7 @@
 We are now ready to put all of the tools together
 to deploy your first fully-functional convolutional neural network.
 In our first encounter with image data we applied a multilayer perceptron (:numref:`sec_mlp_scratch`)
-to pictures of clothing in the Fashion-MNIST data set.
+to pictures of clothing in the Fashion-MNIST dataset.
 Each image in Fashion-MNIST consisted of
 a two-dimensional $28 \times 28$ matrix.
 To make this data amenable to multilayer perceptrons
@@ -73,10 +73,10 @@ The convolutional block emits an output with size given by
 (batch size, channel, height, width).
 Before we can pass the convolutional block's output
 to the fully-connected block, we must flatten
-each example in the mini-batch.
+each example in the minibatch.
 In other words, we take this 4D input and tansform it into the 2D
 input expected by fully-connected layers:
-as a reminder, the first dimension indexes the examples in the mini-batch
+as a reminder, the first dimension indexes the examples in the minibatch
 and the second gives the flat vector representation of each example.
 LeNet's fully-connected layer block has three fully-connected layers,
 with 120, 84, and 10 outputs, respectively.
@@ -205,7 +205,7 @@ The training function `train_ch5` is also very similar to `train_ch3` defined in
 this time using the Xavier initializer.
 The loss function and the training algorithm
 still use the cross-entropy loss function
-and mini-batch stochastic gradient descent. Since each epoch takes tens of second to run, we visualize the training loss in a finer granularity.
+and minibatch stochastic gradient descent. Since each epoch takes tens of second to run, we visualize the training loss in a finer granularity.
 
 ```{.python .input}
 # Saved in the d2l package for later use

@@ -1,7 +1,7 @@
 # Single Shot Multibox Detection (SSD)
 
 In the previous few sections, we have introduced bounding boxes, anchor boxes,
-multiscale object detection, and data sets. Now, we will use this background
+multiscale object detection, and datasets. Now, we will use this background
 knowledge to construct an object detection model: single shot multibox detection
 (SSD) :cite:`Liu.Anguelov.Erhan.ea.2016`. This quick and easy model is already
 widely used. Some of the design concepts and implementation details of this
@@ -225,7 +225,7 @@ class TinySSD(nn.Block):
         return anchors, cls_preds, bbox_preds
 ```
 
-We now create an SSD model instance and use it to perform forward computation on image mini-batch `X`, which has a height and width of 256 pixels. As we verified previously, the first module outputs a feature map with the shape $32 \times 32$. Because modules two to four are height and width downsample blocks, module five is a global pooling layer, and each element in the feature map is used as the center for 4 anchor boxes, a total of $(32^2 + 16^2 + 8^2 + 4^2 + 1)\times 4 = 5444$ anchor boxes are generated for each image at the five scales.
+We now create an SSD model instance and use it to perform forward computation on image minibatch `X`, which has a height and width of 256 pixels. As we verified previously, the first module outputs a feature map with the shape $32 \times 32$. Because modules two to four are height and width downsample blocks, module five is a global pooling layer, and each element in the feature map is used as the center for 4 anchor boxes, a total of $(32^2 + 16^2 + 8^2 + 4^2 + 1)\times 4 = 5444$ anchor boxes are generated for each image at the five scales.
 
 ```{.python .input  n=13}
 net = TinySSD(num_classes=1)
@@ -244,14 +244,14 @@ Now, we will explain, step by step, how to train the SSD model for object detect
 
 ### Data Reading and Initialization
 
-We read the Pikachu data set we created in the previous section.
+We read the Pikachu dataset we created in the previous section.
 
 ```{.python .input  n=14}
 batch_size = 32
 train_iter, _ = d2l.load_data_pikachu(batch_size)
 ```
 
-There is 1 category in the Pikachu data set. After defining the module, we need to initialize the model parameters and define the optimization algorithm.
+There is 1 category in the Pikachu dataset. After defining the module, we need to initialize the model parameters and define the optimization algorithm.
 
 ```{.python .input  n=15}
 ctx, net = d2l.try_gpu(), TinySSD(num_classes=1)
@@ -288,7 +288,7 @@ def bbox_eval(bbox_preds, bbox_labels, bbox_masks):
 
 ### Train the Model
 
-During model training, we must generate multiscale anchor boxes (`anchors`) in the model's forward computation process and predict the category (`cls_preds`) and offset (`bbox_preds`) for each anchor box. Afterwards, we label the category (`cls_labels`) and offset (`bbox_labels`) of each generated anchor box based on the label information `Y`. Finally, we calculate the loss function using the predicted and labeled category and offset values. To simplify the code, we do not evaluate the training data set here.
+During model training, we must generate multiscale anchor boxes (`anchors`) in the model's forward computation process and predict the category (`cls_preds`) and offset (`bbox_preds`) for each anchor box. Afterwards, we label the category (`cls_labels`) and offset (`bbox_labels`) of each generated anchor box based on the label information `Y`. Finally, we calculate the loss function using the predicted and labeled category and offset values. To simplify the code, we do not evaluate the training dataset here.
 
 ```{.python .input  n=29}
 num_epochs, timer = 20, d2l.Timer()
