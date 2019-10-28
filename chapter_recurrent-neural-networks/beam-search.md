@@ -85,7 +85,3 @@ Here, $L$ is the length of the final candidate sequence and the selection for $\
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2394)
 
 ![](../img/qr_beam-search.svg)
-
-```{.python .input}
-
-```
