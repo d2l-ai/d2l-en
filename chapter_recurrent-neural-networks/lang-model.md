@@ -7,7 +7,7 @@ In :numref:`sec_text_preprocessing`, we see how to map text data into tokens, an
 
 $$p(x_1,x_2, \ldots, x_T).$$
 
-Language models are incredibly useful. For instance, an ideal language model would be able to generate natural text just on its own, simply by drawing one word at a time $w_t \sim p(w_t|w_{t-1}, \ldots, w_1)$. Quite unlike the monkey using a typewriter, all text emerging from such a model would pass as natural language, e.g., English text. Furthermore, it would be sufficient for generating a meaningful dialog, simply by conditioning the text on previous dialog fragments. Clearly we are still very far from designing such a system, since it would need to understand the text rather than just generate grammatically sensible content.
+Language models are incredibly useful. For instance, an ideal language model would be able to generate natural text just on its own, simply by drawing one word at a time $w_t \sim p(w_t \mid w_{t-1}, \ldots, w_1)$. Quite unlike the monkey using a typewriter, all text emerging from such a model would pass as natural language, e.g., English text. Furthermore, it would be sufficient for generating a meaningful dialog, simply by conditioning the text on previous dialog fragments. Clearly we are still very far from designing such a system, since it would need to understand the text rather than just generate grammatically sensible content.
 
 Nonetheless language models are of great service even in their limited form. For instance, the phrases *'to recognize speech'* and *'to wreck a nice beach'* sound very similar. This can cause ambiguity in speech recognition, ambiguity that is easily resolved through a language model which rejects the second translation as outlandish. Likewise, in a document summarization algorithm it is worth while knowing that *'dog bites man'* is much more frequent than *'man bites dog'*, or that *'let us eat grandma'* is a rather disturbing statement, whereas *'let us eat, grandma'* is much more benign.
 
@@ -15,11 +15,11 @@ Nonetheless language models are of great service even in their limited form. For
 
 The obvious question is how we should model a document, or even a sequence of words. Recall the analysis we applied to sequence models in the previous section, we can start by applying basic probability rules:
 
-$$p(w_1, w_2, \ldots, w_T) = p(w_1) \prod_{t=2}^T p(w_t | w_1, \ldots, w_{t-1}).$$
+$$p(w_1, w_2, \ldots, w_T) = p(w_1) \prod_{t=2}^T p(w_t  \mid  w_1, \ldots, w_{t-1}).$$
 
 For example, the probability of a text sequence containing four tokens consisting of words and punctuation would be given as:
 
-$$p(\mathrm{Statistics}, \mathrm{is},  \mathrm{fun}, \mathrm{.}) =  p(\mathrm{Statistics}) p(\mathrm{is} | \mathrm{Statistics}) p(\mathrm{fun} | \mathrm{Statistics}, \mathrm{is}) p(\mathrm{.} | \mathrm{Statistics}, \mathrm{is}, \mathrm{fun}).$$
+$$p(\mathrm{Statistics}, \mathrm{is},  \mathrm{fun}, \mathrm{.}) =  p(\mathrm{Statistics}) p(\mathrm{is}  \mid  \mathrm{Statistics}) p(\mathrm{fun}  \mid  \mathrm{Statistics}, \mathrm{is}) p(\mathrm{.}  \mid  \mathrm{Statistics}, \mathrm{is}, \mathrm{fun}).$$
 
 In order to compute the language model, we need to calculate the
 probability of words and the conditional probability of a word given
@@ -36,7 +36,7 @@ the word 'statistics' and divide it by the total number of words in
 the corpus. This works fairly well, particularly for frequent
 words. Moving on, we could attempt to estimate
 
-$$\hat{p}(\mathrm{is}|\mathrm{Statistics}) = \frac{n(\mathrm{Statistics~is})}{n(\mathrm{Statistics})}.$$
+$$\hat{p}(\mathrm{is} \mid \mathrm{Statistics}) = \frac{n(\mathrm{Statistics~is})}{n(\mathrm{Statistics})}.$$
 
 Here $n(w)$ and $n(w, w')$ are the number of occurrences of singletons
 and pairs of words respectively. Unfortunately, estimating the
@@ -52,8 +52,8 @@ add a small constant to all counts. This helps with singletons, e.g., via
 
 $$\begin{aligned}
 	\hat{p}(w) & = \frac{n(w) + \epsilon_1/m}{n + \epsilon_1} \\
-	\hat{p}(w'|w) & = \frac{n(w,w') + \epsilon_2 \hat{p}(w')}{n(w) + \epsilon_2} \\
-	\hat{p}(w''|w',w) & = \frac{n(w,w',w'') + \epsilon_3 \hat{p}(w',w'')}{n(w,w') + \epsilon_3}
+	\hat{p}(w' \mid w) & = \frac{n(w,w') + \epsilon_2 \hat{p}(w')}{n(w) + \epsilon_2} \\
+	\hat{p}(w'' \mid w',w) & = \frac{n(w,w',w'') + \epsilon_3 \hat{p}(w',w'')}{n(w,w') + \epsilon_3}
 \end{aligned}$$
 
 Here the coefficients $\epsilon_i > 0$ determine how much we use the
@@ -61,12 +61,12 @@ estimate for a shorter sequence as a fill-in for longer
 ones. Moreover, $m$ is the total number of words we encounter. The
 above is a rather primitive variant of what is Kneser-Ney smoothing
 and Bayesian Nonparametrics can accomplish. See e.g., :cite:`Wood.Gasthaus.Archambeau.ea.2011` for more details of how to accomplish
-this. Unfortunately, models like this get unwieldy rather quickly 
+this. Unfortunately, models like this get unwieldy rather quickly
 for the following reasons. First, we need to store all counts.
-Secondly, this entirely ignores the meaning of the words. For 
-instance, *'cat'* and *'feline'* should occur in related contexts. 
-It is quite difficult to adjust such models to additional context, 
-whereas, deep learning based language models are well suited to 
+Secondly, this entirely ignores the meaning of the words. For
+instance, *'cat'* and *'feline'* should occur in related contexts.
+It is quite difficult to adjust such models to additional context,
+whereas, deep learning based language models are well suited to
 take this into account.  Lastly, long word
 sequences are almost certain to be novel, hence a model that simply
 counts the frequency of previously seen word sequences is bound to
@@ -75,13 +75,13 @@ perform poorly there.
 
 ## Markov Models and $n$-grams
 
-Before we discuss solutions involving deep learning, we need some more terminology and concepts. Recall our discussion of Markov Models in the previous section, let us apply this to language modeling. A distribution over sequences satisfies the Markov property of first order if $p(w_{t+1}|w_t, \ldots, w_1) = p(w_{t+1}|w_t)$. Higher orders correspond to longer dependencies. This leads to a number of approximations that we could apply to model a sequence:
+Before we discuss solutions involving deep learning, we need some more terminology and concepts. Recall our discussion of Markov Models in the previous section, let us apply this to language modeling. A distribution over sequences satisfies the Markov property of first order if $p(w_{t+1} \mid w_t, \ldots, w_1) = p(w_{t+1} \mid w_t)$. Higher orders correspond to longer dependencies. This leads to a number of approximations that we could apply to model a sequence:
 
 $$
 \begin{aligned}
 p(w_1, w_2, w_3, w_4) &=  p(w_1) p(w_2) p(w_3) p(w_4)\\
-p(w_1, w_2, w_3, w_4) &=  p(w_1) p(w_2 | w_1) p(w_3 | w_2) p(w_4 | w_3)\\
-p(w_1, w_2, w_3, w_4) &=  p(w_1) p(w_2 | w_1) p(w_3 | w_1, w_2) p(w_4 | w_2, w_3)
+p(w_1, w_2, w_3, w_4) &=  p(w_1) p(w_2  \mid  w_1) p(w_3  \mid  w_2) p(w_4  \mid  w_3)\\
+p(w_1, w_2, w_3, w_4) &=  p(w_1) p(w_2  \mid  w_1) p(w_3  \mid  w_1, w_2) p(w_4  \mid  w_2, w_3)
 \end{aligned}
 $$
 
@@ -149,7 +149,7 @@ The graph is quite exciting for a number of reasons. Firstly, beyond unigram wor
 Before introducing the model, let us assume we will use a neural network to train a language model. Now the question is how to read minibatches of examples and labels at
 random. Since sequence data is by its very nature sequential, we need to address
 the issue of processing it. We did so in a rather ad-hoc manner when we
-introduced in :numref:`sec_sequence`. Let us formalize this a bit. 
+introduced in :numref:`sec_sequence`. Let us formalize this a bit.
 
 In :numref:`fig_timemachine_5gram`, we visualized several possible ways to obtain 5-grams in a sentence, here a token is a character. Note that we have quite some freedom since we could pick an arbitrary offset.
 
@@ -244,21 +244,21 @@ Lastly, we define a function `load_data_time_machine` that returns both the data
 
 ```{.python .input}
 # Saved in the d2l package for later use
-def load_data_time_machine(batch_size, num_steps, use_random_iter=False, 
+def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
                            max_tokens=10000):
     data_iter = SeqDataLoader(
         batch_size, num_steps, use_random_iter, max_tokens)
-    return data_iter, data_iter.vocab    
+    return data_iter, data_iter.vocab
 ```
 
 ## Summary
 
 * Language models are an important technology for natural language processing.
 * $n$-grams models make it convenient to deal with long sequences by truncating the dependence.
-* Long sequences suffer from the problem that they occur very rarely or never. 
+* Long sequences suffer from the problem that they occur very rarely or never.
 * Zipf's law governs the word distribution for not only unigrams but also the other n-grams.
 * There is a lot of structure but not enough frequency to deal with infrequent word combinations efficiently via Laplace smoothing.
-* The main choices for sequence partitioning are picking between consecutive and random sequences. 
+* The main choices for sequence partitioning are picking between consecutive and random sequences.
 * Given the overall document length, it is usually acceptable to be slightly wasteful with the documents and discard half-empty minibatches.
 
 ## Exercises

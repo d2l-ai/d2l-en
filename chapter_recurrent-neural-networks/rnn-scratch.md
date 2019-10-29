@@ -49,7 +49,7 @@ def get_params(vocab_size, num_hiddens, ctx):
     b_q = np.zeros(num_outputs, ctx=ctx)
     # Attach a gradient
     params = [W_xh, W_hh, b_h, W_hq, b_q]
-    for param in params: 
+    for param in params:
         param.attach_grad()
     return params
 ```
@@ -272,7 +272,7 @@ While writing the above RNN model from scratch is instructive, it is not conveni
     * How well will it work on other books by H. G. Wells, e.g., [The War of the Worlds](http://www.gutenberg.org/ebooks/36).
 1. Modify the predict function such as to use sampling rather than picking the most likely next character.
     - What happens?
-    - Bias the model towards more likely outputs, e.g., by sampling from $q(w_t|w_{t-1}, \ldots, w_1) \propto p^\alpha(w_t|w_{t-1}, \ldots, w_1)$ for $\alpha > 1$.
+    - Bias the model towards more likely outputs, e.g., by sampling from $q(w_t \mid w_{t-1}, \ldots, w_1) \propto p^\alpha(w_t \mid w_{t-1}, \ldots, w_1)$ for $\alpha > 1$.
 1. Run the code in this section without clipping the gradient. What happens?
 1. Change adjacent sampling so that it does not separate hidden states from the computational graph. Does the running time change? How about the accuracy?
 1. Replace the activation function used in this section with ReLU and repeat the experiments in this section.
