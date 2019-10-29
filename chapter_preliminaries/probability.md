@@ -147,9 +147,9 @@ and denote it by $P(B \mid A)$, the probability that $B$ happens, provided that
 $A$ has happened.
 
 Using the definition of conditional probabilities, we can derive one of the most useful and celebrated equations in statistics—Bayes' theorem.
-It goes as follows: By construction, we have that $P(A, B) = P(B \mid A) P(A)$. By symmetry, this also holds for $P(A,B) = P(A | B) P(B)$. Solving for one of the conditional variables we get:
+It goes as follows: By construction, we have that $P(A, B) = P(B \mid A) P(A)$. By symmetry, this also holds for $P(A,B) = P(A \mid B) P(B)$. Solving for one of the conditional variables we get:
 
-$$P(A | B) = \frac{P(B \mid A) P(A)}{P(B)}$$
+$$P(A \mid B) = \frac{P(B \mid A) P(A)}{P(B)}$$
 
 This is very useful if we want to infer one thing from another, say cause and effect but we only know the properties in the reverse direction. One important operation that we need, to make this work, is **marginalization**, i.e., the operation of determining $P(A)$ and $P(B)$ from $P(A,B)$. We can see that the probability of seeing $A$ amounts to accounting for all possible choices of $B$ and aggregating the joint probabilities over all of them, i.e.
 
@@ -160,7 +160,7 @@ Another useful property to check for is **dependence** vs. **independence**.
 Independence is when the occurrence of one event does not reveal any information about the occurrence of the other. In this case $P(B \mid A) = P(B)$. Statisticians typically express this as $A \perp\!\!\!\perp B$. From Bayes' Theorem, it follows immediately that also $P(A \mid B) = P(A)$. In all other cases we call $A$ and $B$ dependent. For instance, two successive rolls of a die are independent. On the other hand, the position of a light switch and the brightness in the room are not (they are not perfectly deterministic, though, since we could always have a broken lightbulb, power failure, or a broken switch).
 
 Let us put our skills to the test. Assume that a doctor administers an AIDS test to a patient. This test is fairly accurate and it fails only with 1% probability if the patient is healthy by reporting him as diseased. Moreover,
-it never fails to detect HIV if the patient actually has it. We use $D$ to indicate the diagnosis and $H$ to denote the HIV status. Written as a table the outcome $P(D | H)$ looks as follows:
+it never fails to detect HIV if the patient actually has it. We use $D$ to indicate the diagnosis and $H$ to denote the HIV status. Written as a table the outcome $P(D \mid H)$ looks as follows:
 
 |outcome| HIV positive | HIV negative |
 |:------------|-------------:|-------------:|
@@ -169,8 +169,8 @@ it never fails to detect HIV if the patient actually has it. We use $D$ to indic
 
 Note that the column sums are all one (but the row sums are not), since the conditional probability needs to sum up to $1$, just like the probability. Let us work out the probability of the patient having AIDS if the test comes back positive. Obviously this is going to depend on how common the disease is, since it affects the number of false alarms. Assume that the population is quite healthy, e.g., $P(\text{HIV positive}) = 0.0015$. To apply Bayes' Theorem, we need to determine
 $$\begin{aligned}
-P(\text{Test positive}) =& P(D=1 | H=0) P(H=0) + P(D=1
-| H=1) P(H=1) \\
+P(\text{Test positive}) =& P(D=1 \mid H=0) P(H=0) + P(D=1
+\mid H=1) P(H=1) \\
 =& 0.01 \cdot 0.9985 + 1 \cdot 0.0015 \\
 =& 0.011485
 \end{aligned}
@@ -178,7 +178,7 @@ $$
 
 Thus, we get
 
-$$\begin{aligned} P(H = 1 | D = 1) =& \frac{P(D=1 | H=1) P(H=1)}{P(D=1)} \\ =& \frac{1 \cdot 0.0015}{0.011485} \\ =& 0.131 \end{aligned} $$
+$$\begin{aligned} P(H = 1 \mid D = 1) =& \frac{P(D=1 \mid H=1) P(H=1)}{P(D=1)} \\ =& \frac{1 \cdot 0.0015}{0.011485} \\ =& 0.131 \end{aligned} $$
 
 In other words, there is only a 13.1% chance that the patient actually has AIDS, despite using a test that is 99% accurate. As we can see, statistics can be quite counterintuitive.
 
@@ -189,11 +189,11 @@ In other words, there is only a 13.1% chance that the patient actually has AIDS,
 
 We will denote the probability of event $A$ and event $B$ as $P(A)$ and $P(B)$, respectively. The probability of the simultaneous occurrence of the two events is denoted as $P(A \cap B)$ or $P(A, B)$. In the figure above it is the shaded area. If $B$ has non-zero probability, the conditional probability of event $A$ given that $B$ has occurred is
 
-$$P(A | B) = \frac{P(A \cap B)}{P(B)}.$$
+$$P(A \mid B) = \frac{P(A \cap B)}{P(B)}.$$
 
 That is,
 
-$$P(A \cap B) = P(B) P(A | B) = P(A) P(B | A).$$
+$$P(A \cap B) = P(B) P(A \mid B) = P(A) P(B \mid A).$$
 
 If
 
@@ -214,12 +214,12 @@ test has different characteristics (it is not as good as the first one).
 
 Unfortunately, the second test comes back positive, too. Let us work out the requisite probabilities to invoke Bayes' Theorem.
 
-* $P(D_1 = 1 \text{ and } D_2 = 1 | H = 0) = 0.01 \cdot 0.03 = 0.0003$
-* $P(D_1 = 1 \text{ and } D_2 = 1 | H = 1) = 1 \cdot 0.98 = 0.98$
+* $P(D_1 = 1 \text{ and } D_2 = 1 \mid H = 0) = 0.01 \cdot 0.03 = 0.0003$
+* $P(D_1 = 1 \text{ and } D_2 = 1 \mid H = 1) = 1 \cdot 0.98 = 0.98$
 * $P(D_1 = 1 \text{ and } D_2 = 1) = 0.0003 \cdot 0.9985 + 0.98 \cdot 0.0015 = 0.00176955$
-* $P(H = 1 | D_1 = 1 \text{ and } D_2 = 1) = \frac{0.98 \cdot 0.0015}{0.00176955} = 0.831$
+* $P(H = 1 \mid D_1 = 1 \text{ and } D_2 = 1) = \frac{0.98 \cdot 0.0015}{0.00176955} = 0.831$
 
-That is, the second test allowed us to gain much higher confidence that not all is well. Despite the second test being considerably less accurate than the first one, it still improved our estimate quite a bit. You might ask, *why couldn't we just run the first test a second time?* After all, the first test was more accurate. The reason is that we needed a second test whose result is *independent* of the first test (given the true diagnosis). In other words, we made the tacit assumption that $P(D_1, D_2 | H) = P(D_1 | H) P(D_2 | H)$. Statisticians call such random variables **conditionally independent**. This is expressed as $D_1 \perp\!\!\!\perp D_2  | H$.
+That is, the second test allowed us to gain much higher confidence that not all is well. Despite the second test being considerably less accurate than the first one, it still improved our estimate quite a bit. You might ask, *why couldn't we just run the first test a second time?* After all, the first test was more accurate. The reason is that we needed a second test whose result is *independent* of the first test (given the true diagnosis). In other words, we made the tacit assumption that $P(D_1, D_2 \mid H) = P(D_1 \mid H) P(D_2 \mid H)$. Statisticians call such random variables *conditionally independent*. This is expressed as $D_1 \perp\!\!\!\perp D_2  \mid H$.
 
 
 ## Expectation and Variance
@@ -238,7 +238,7 @@ Here the last equality follows from the linearity of expectation.
 
 ## Summary
 
-So far, we covered probabilities, independence, conditional independence, and how to use this to draw some basic conclusions. We also introduced some fundamental probability distributions and demonstrated how to sample from them using Apache MXNet. This is already a powerful bit of knowledge, and by itself a sufficient set of tools for developing some classic machine learning models. In the next section, we will see how to operationalize this knowlege to build your first machine learning model: the Naive Bayes classifier.
+So far, we covered probabilities, independence, conditional independence, and how to use this to draw some basic conclusions. We also introduced some fundamental probability distributions and demonstrated how to sample from them using Apache MXNet. This is already a powerful bit of knowledge, and by itself a sufficient set of tools for developing some classic machine learning models. In the next section, we will see how to operationalize this knowledge to build your first machine learning model: the Naive Bayes classifier.
 
 ## Exercises
 
