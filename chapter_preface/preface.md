@@ -257,6 +257,7 @@ be used by the `d2l` package.
 # Saved in the d2l package for later use
 from IPython import display
 import collections
+from collections import defaultdict
 import os
 import sys
 import math
@@ -264,6 +265,7 @@ from matplotlib import pyplot as plt
 from mxnet import np, npx, autograd, gluon, init, context, image
 from mxnet.gluon import nn, rnn
 from mxnet.gluon.loss import Loss
+from mxnet.gluon.data import Dataset
 import random
 import re
 import time
