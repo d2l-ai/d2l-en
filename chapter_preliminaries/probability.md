@@ -143,13 +143,13 @@ random variable. We can even think of all the metadata as random variables
 such as location, time, aperture, focal length, ISO, focus distance, camera type, etc. All of these are random variables that occur jointly. When we deal with multiple random variables, there are several quantities of interest. The first is called the joint distribution $P(A, B)$. Given any elements $a$ and $b$, the joint distribution lets us answer, what is the probability that $A=a$ and $B=b$ simultaneously? Note that for any values $a$ and $b$, $P(A=a,B=b) \leq P(A=a)$.
 
 This has to be the case, since for $A$ and $B$ to happen, $A$ has to happen *and* $B$ also has to happen (and vice versa). Thus $A,B$ cannot be more likely than $A$ or $B$ individually. This brings us to an interesting ratio: $0 \leq \frac{P(A,B)}{P(A)} \leq 1$. We call this a **conditional probability**
-and denote it by $P(B | A)$, the probability that $B$ happens, provided that
+and denote it by $P(B \mid A)$, the probability that $B$ happens, provided that
 $A$ has happened.
 
 Using the definition of conditional probabilities, we can derive one of the most useful and celebrated equations in statistics—Bayes' theorem.
-It goes as follows: By construction, we have that $P(A, B) = P(B | A) P(A)$. By symmetry, this also holds for $P(A,B) = P(A | B) P(B)$. Solving for one of the conditional variables we get:
+It goes as follows: By construction, we have that $P(A, B) = P(B \mid A) P(A)$. By symmetry, this also holds for $P(A,B) = P(A | B) P(B)$. Solving for one of the conditional variables we get:
 
-$$P(A | B) = \frac{P(B | A) P(A)}{P(B)}$$
+$$P(A | B) = \frac{P(B \mid A) P(A)}{P(B)}$$
 
 This is very useful if we want to infer one thing from another, say cause and effect but we only know the properties in the reverse direction. One important operation that we need, to make this work, is **marginalization**, i.e., the operation of determining $P(A)$ and $P(B)$ from $P(A,B)$. We can see that the probability of seeing $A$ amounts to accounting for all possible choices of $B$ and aggregating the joint probabilities over all of them, i.e.
 
@@ -157,7 +157,7 @@ $$P(A) = \sum_{B'} P(A,B') \text{ and
 } P(B) = \sum_{A'} P(A',B)$$
 
 Another useful property to check for is **dependence** vs. **independence**.
-Independence is when the occurrence of one event does not reveal any information about the occurrence of the other. In this case $P(B | A) = P(B)$. Statisticians typically express this as $A \perp\!\!\!\perp B$. From Bayes' Theorem, it follows immediately that also $P(A | B) = P(A)$. In all other cases we call $A$ and $B$ dependent. For instance, two successive rolls of a die are independent. On the other hand, the position of a light switch and the brightness in the room are not (they are not perfectly deterministic, though, since we could always have a broken lightbulb, power failure, or a broken switch).
+Independence is when the occurrence of one event does not reveal any information about the occurrence of the other. In this case $P(B \mid A) = P(B)$. Statisticians typically express this as $A \perp\!\!\!\perp B$. From Bayes' Theorem, it follows immediately that also $P(A \mid B) = P(A)$. In all other cases we call $A$ and $B$ dependent. For instance, two successive rolls of a die are independent. On the other hand, the position of a light switch and the brightness in the room are not (they are not perfectly deterministic, though, since we could always have a broken lightbulb, power failure, or a broken switch).
 
 Let us put our skills to the test. Assume that a doctor administers an AIDS test to a patient. This test is fairly accurate and it fails only with 1% probability if the patient is healthy by reporting him as diseased. Moreover,
 it never fails to detect HIV if the patient actually has it. We use $D$ to indicate the diagnosis and $H$ to denote the HIV status. Written as a table the outcome $P(D | H)$ looks as follows:
