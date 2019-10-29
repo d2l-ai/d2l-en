@@ -8,6 +8,7 @@ d2l = sys.modules[__name__]
 # Defined in file: ./chapter_preface/preface.md
 from IPython import display
 import collections
+from collections import defaultdict
 import os
 import sys
 import math
@@ -190,7 +191,10 @@ def load_data_fashion_mnist(batch_size, resize=None):
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 def accuracy(y_hat, y):
-    return float((y_hat.argmax(axis=1) == y.astype('float32')).sum())
+    if y.shape[1] > 1:
+        return float((y_hat.argmax(axis=1) == y.astype('float32')).sum())
+    else:
+        return float((y_hat.astype('int32') == y.astype('int32')).sum())
 
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
@@ -1051,7 +1055,7 @@ def train_batch_ch12(net, features, labels, loss, trainer, ctx_list, split_f = d
 def train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs,
                ctx_list=d2l.try_all_gpus(), split_f = d2l.split_batch):
     num_batches, timer = len(train_iter), d2l.Timer()
-    animator = d2l.Animator(xlabel='epoch', xlim=[0,num_epochs], ylim=[0,2],
+    animator = d2l.Animator(xlabel='epoch', xlim=[0,num_epochs], ylim=[0,1],
                             legend=['train loss','train acc','test acc'])
     for epoch in range(num_epochs):
         # store training_loss, training_accuracy, num_examples, num_features
@@ -1639,7 +1643,6 @@ class CTRDataset(Dataset):
         self.feat_mapper, self.defaults = feat_mapper, defaults
         self.field_dims = np.zeros(self.NUM_FEATS, dtype=np.int64)
         with open(data_path) as f:
-            f.readline() # skip the header
             for line in f:
                 instance = {}
                 values = line.rstrip('\n').split('\t')

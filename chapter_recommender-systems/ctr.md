@@ -16,7 +16,7 @@ With the considerable advancements of internet and mobile technology, online adv
 
 The following code downloads the dataset from our server and saves it into the local data folder.
 
-```{.python .input  n=4}
+```{.python .input  n=10}
 from collections import defaultdict
 from mxnet import gluon, np
 from mxnet.gluon.data import Dataset
@@ -37,12 +37,22 @@ def read_data_ctr(path="../data/", train="ctr/train.csv",
 read_data_ctr()
 ```
 
+```{.json .output n=10}
+[
+ {
+  "name": "stdout",
+  "output_type": "stream",
+  "text": "Downloading ../data/ctr/train.csv from https://apache-mxnet.s3-accelerate.amazonaws.com/gluon/dataset/ctr/train.csv...\nDownloading ../data/ctr/test.csv from https://apache-mxnet.s3-accelerate.amazonaws.com/gluon/dataset/ctr/test.csv...\n"
+ }
+]
+```
+
 There are a training set and a test set, consisting of 15000 and 3000 samples/lines, respectively.
 
 ## Dataset Wrapper
 For the convience of data loading, we impement a `CTRDataset` which loads the advertising dataset from the CSV file and can be used by `DataLoader`.
 
-```{.python .input  n=2}
+```{.python .input  n=13}
 # Saved in the d2l package for later use
 class CTRDataset(Dataset):
     def __init__(self, data_path, feat_mapper=None, defaults=None, 
@@ -52,7 +62,6 @@ class CTRDataset(Dataset):
         self.feat_mapper, self.defaults = feat_mapper, defaults
         self.field_dims = np.zeros(self.NUM_FEATS, dtype=np.int64)
         with open(data_path) as f:
-            f.readline() # skip the header
             for line in f:
                 instance = {}
                 values = line.rstrip('\n').split('\t')
@@ -86,9 +95,22 @@ class CTRDataset(Dataset):
 
 The following example loads the training data and print out the first record.
 
-```{.python .input  n=5}
+```{.python .input  n=14}
 train_data = CTRDataset(data_path="../data/ctr/train.csv")
 train_data[0]
+```
+
+```{.json .output n=14}
+[
+ {
+  "data": {
+   "text/plain": "(array([ 143.,  145.,  227.,  243.,  735., 1250., 1471., 1566., 1624.,\n        1925., 2008., 2061., 2258., 2304., 2305., 2360., 2628., 2746.,\n        2747., 2748., 2892., 2988., 3165., 3176., 3194., 3195., 3548.,\n        3654., 3687., 3699., 3725., 3745., 3770., 3800.]), [0.0])"
+  },
+  "execution_count": 14,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
 ```
 
 As can be seen, all the features are categorical. Each value represents the one-hot index of the corresponding entry. The label $0$ means that it is not clicked. This `CTRDataset` can also be used to load other datasets such as the Criteo display advertising challenge [Dataset](https://labs.criteo.com/2014/02/kaggle-display-advertising-challenge-dataset/) and the Avazu click-through rate prediction [Dataset](https://www.kaggle.com/c/avazu-ctr-prediction).  
@@ -99,7 +121,3 @@ As can be seen, all the features are categorical. Each value represents the one-
 
 ## Exercise
 * Can you load the Criteo and Avazu dataset with the provided `CTRDataset`. It is worth noting that the Criteo dataset consisting of real-valued features so you may have to revise the code a bit.
-
-```{.python .input}
-
-```

@@ -257,6 +257,7 @@ be used by the `d2l` package.
 # Saved in the d2l package for later use
 from IPython import display
 import collections
+from collections import defaultdict
 import os
 import sys
 import math

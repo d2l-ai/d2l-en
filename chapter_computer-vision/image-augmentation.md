@@ -171,7 +171,7 @@ def train_batch_ch12(net, features, labels, loss, trainer, ctx_list, split_f = d
 def train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs,
                ctx_list=d2l.try_all_gpus(), split_f = d2l.split_batch):
     num_batches, timer = len(train_iter), d2l.Timer()
-    animator = d2l.Animator(xlabel='epoch', xlim=[0,num_epochs], ylim=[0,2],
+    animator = d2l.Animator(xlabel='epoch', xlim=[0,num_epochs], ylim=[0,1],
                             legend=['train loss','train acc','test acc'])
     for epoch in range(num_epochs):
         # store training_loss, training_accuracy, num_examples, num_features
