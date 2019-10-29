@@ -16,7 +16,7 @@ With the considerable advancements of internet and mobile technology, online adv
 
 The following code downloads the dataset from our server and saves it into the local data folder.
 
-```{.python .input  n=10}
+```{.python .input  n=15}
 from collections import defaultdict
 from mxnet import gluon, np
 from mxnet.gluon.data import Dataset
@@ -35,16 +35,6 @@ def read_data_ctr(path="../data/", train="ctr/train.csv",
     gluon.utils.download(data_path + test, ctr_path, test_sha1)
 
 read_data_ctr()
-```
-
-```{.json .output n=10}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "Downloading ../data/ctr/train.csv from https://apache-mxnet.s3-accelerate.amazonaws.com/gluon/dataset/ctr/train.csv...\nDownloading ../data/ctr/test.csv from https://apache-mxnet.s3-accelerate.amazonaws.com/gluon/dataset/ctr/test.csv...\n"
- }
-]
 ```
 
 There are a training set and a test set, consisting of 15000 and 3000 samples/lines, respectively.
@@ -95,22 +85,9 @@ class CTRDataset(Dataset):
 
 The following example loads the training data and print out the first record.
 
-```{.python .input  n=14}
+```{.python .input  n=16}
 train_data = CTRDataset(data_path="../data/ctr/train.csv")
 train_data[0]
-```
-
-```{.json .output n=14}
-[
- {
-  "data": {
-   "text/plain": "(array([ 143.,  145.,  227.,  243.,  735., 1250., 1471., 1566., 1624.,\n        1925., 2008., 2061., 2258., 2304., 2305., 2360., 2628., 2746.,\n        2747., 2748., 2892., 2988., 3165., 3176., 3194., 3195., 3548.,\n        3654., 3687., 3699., 3725., 3745., 3770., 3800.]), [0.0])"
-  },
-  "execution_count": 14,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 As can be seen, all the features are categorical. Each value represents the one-hot index of the corresponding entry. The label $0$ means that it is not clicked. This `CTRDataset` can also be used to load other datasets such as the Criteo display advertising challenge [Dataset](https://labs.criteo.com/2014/02/kaggle-display-advertising-challenge-dataset/) and the Avazu click-through rate prediction [Dataset](https://www.kaggle.com/c/avazu-ctr-prediction).  
