@@ -40,7 +40,7 @@ large numbers* tell us that as the number of tosses grows this estimate will dra
 
 To start, let us import the necessary packages.
 
-```{.python .input  n=13}
+```{.python .input  n=1}
 %matplotlib inline
 import d2l
 from mxnet import np, npx
@@ -62,7 +62,7 @@ To draw a single sample, we simply pass in a vector of probabilities.
 The output of the `np.random.multinomial` function is another vector of the same length:
 its value at index $i$ is the number of times the sampling outcome corresponds to $i$.
 
-```{.python .input  n=14}
+```{.python .input  n=2}
 fair_probs = [1.0 / 6] * 6
 np.random.multinomial(1, fair_probs)
 ```
@@ -74,13 +74,13 @@ do this with a Python `for` loop, so `random.multinomial` supports drawing
 multiple samples at once, returning an array of independent samples in any shape
 we might desire.
 
-```{.python .input  n=15}
+```{.python .input  n=3}
 np.random.multinomial(10, fair_probs)
 ```
 
 We can also conduct, say $3$, groups of experiments, where each group draws $10$ samples, all at once.
 
-```{.python .input}
+```{.python .input  n=4}
 counts = np.random.multinomial(10, fair_probs, size=3)
 counts
 ```
@@ -89,24 +89,26 @@ Now that we know how to sample rolls of a die, we can simulate 1000 rolls. We
 can then go through and count, after each of the 1000 rolls, how many times each
 number was rolled.
 
-```{.python .input  n=16}
+```{.python .input  n=5}
 # Store the results as 32-bit floats for division
 counts = np.random.multinomial(100, fair_probs).astype(np.float32)
 counts / 1000
 ```
 
-Because we generated the data from a fair die, we know that each number actually has probability $1/6$, roughly $0.167$, so the output estimates above look pretty good. We can also visualize how these probabilities converge over time towards reasonable estimates.
+Because we generated the data from a fair die, we know that each number actually has probability $\frac{1}{6}$, roughly $0.167$, so the output estimates above look pretty good. We can also visualize how these probabilities converge over time towards reasonable estimates.
 Let us conduct $500$ groups of experiments where each group draws $10$ samples.
 
-```{.python .input  n=18}
+```{.python .input  n=6}
 counts = np.random.multinomial(10, fair_probs, size=500)
 cum_counts = counts.astype(np.float32).cumsum(axis=0)
 estimates = cum_counts / cum_counts.sum(axis=1, keepdims=True)
 
 d2l.set_figsize((6, 4.5))
 for i in range(6):
-    d2l.plt.plot(estimates[:,i].asnumpy(), label=("P(die=" + str(i) +")"))
-d2l.plt.axhline(y=0.16666, color='black', linestyle='dashed')
+    d2l.plt.plot(estimates[:,i].asnumpy(), label=("P(die=" + str(i + 1) +")"))
+d2l.plt.axhline(y=0.167, color='black', linestyle='dashed')
+d2l.plt.gca().set_xlabel('Groups of experiments')
+d2l.plt.gca().set_ylabel('Probability')
 d2l.plt.legend();
 ```
 
@@ -115,20 +117,23 @@ The dashed black line gives the true underlying probability.
 As we get more data by conducting more experiments,
 the $6$ solid curves converge towards the true answer.
 
-In our example of casting a die, we introduced the notion of a **random variable**. A random variable, which we denote here as $X$ can be pretty much any quantity and is not deterministic. Random variables could take one value among a set of possibilities. We denote sets with brackets, e.g., $\{\mathrm{cat}, \mathrm{dog}, \mathrm{rabbit}\}$. The items contained in the set are called *elements*, and we can say that an element $x$ is *in* the set S, by writing $x \in S$. The symbol $\in$ is read as "in" and denotes membership. For instance, we could truthfully say $\mathrm{dog} \in \{\mathrm{cat}, \mathrm{dog}, \mathrm{rabbit}\}$. When dealing with the rolls of die, we are concerned with a variable $X \in \{1, 2, 3, 4, 5, 6\}$.
+In our example of casting a die, we introduced the notion of a *random variable*. A random variable, which we denote here as $X$, can be pretty much any quantity and is not deterministic. Random variables could take one value among a *set* of possibilities. We denote sets with brackets, e.g., $\{\text{cat}, \text{dog}, \text{rabbit}\}$. The items contained in the set are called *elements*, and we can say that an element $x$ is *in* the set $\mathcal{X}$, by writing $x \in \mathcal{X}$. The symbol $\in$ is read as "in" and denotes membership. For instance, we could truthfully say $\text{dog} \in \{\text{cat}, \text{dog}, \text{rabbit}\}$. When dealing with the rolls of a die, we are concerned with a variable $X \in \{1, 2, 3, 4, 5, 6\}$.
 
-Note that there is a subtle difference between discrete random variables, like the sides of a dice, and continuous ones, like the weight and the height of a person. There is little point in asking whether two people have exactly the same height. If we take precise enough measurements you will find that no two people on the planet have the exact same height. In fact, if we take a fine enough measurement, you will not have the same height when you wake up and when you go to sleep. So there is no purpose in asking about the probability
-that someone is $2.00139278291028719210196740527486202$ meters tall. Given the world population of humans the probability is virtually 0. It makes more sense in this case to ask whether someone's height falls into a given interval, say between 1.99 and 2.01 meters. In these cases we quantify the likelihood that we see a value as a *density*. The height of exactly 2.0 meters has no probability, but nonzero density. In the interval between any two different heights we have nonzero probability.
+Note that there is a subtle difference between *discrete* random variables, like the sides of a die, and *continuous* ones, like the weight and the height of a person. There is little point in asking whether two people have exactly the same height. If we take precise enough measurements you will find that no two people on the planet have the exact same height. In fact, if we take a fine enough measurement, you will not have the same height when you wake up and when you go to sleep. So there is no purpose in asking about the probability
+that someone is $1.80139278291028719210196740527486202$ meters tall. Given the world population of humans the probability is virtually $0$. It makes more sense in this case to ask whether someone's height falls into a given interval, say between $1.79$ and $1.81$ meters. In these cases we quantify the likelihood that we see a value as a *density*. The height of exactly $1.80$ meters has no probability, but nonzero density. In the interval between any two different heights we have nonzero probability.
+In the rest of this section, we consider probability in discrete space.
+For probability over continuous random variables, you may refer to :numref:`sec_random_variables`.
 
 
 There are a few important axioms of probability that you will want to remember:
 
-* For any event $z$, the probability is never negative, i.e., $P(Z=z) \geq 0$.
-* For any two events $Z=z$ and $X=x$ the union is no more likely than the sum of the individual events, i.e., $P(Z=z \cup X=x) \leq P(Z=z) + P(X=x)$.
-* For any random variable, the probabilities of all the values it can take must sum to 1, i.e., $\sum_{i=1}^n P(Z=z_i) = 1$.
-* For any two *mutually exclusive* events $Z=z$ and $X=x$, the probability that either happens is equal to the sum of their individual probabilities, that is $P(Z=z \cup X=x) = P(Z=z) + P(X=x)$.
+* For any event $x$, the probability is never negative, i.e., $P(X=x) \geq 0$.
+* For any two events $X=x$ and $Y=y$, the union is no more likely than the sum of the individual events, i.e., $P(X=x \cup Y=y) \leq P(X=x) + P(Y=y)$.
+* For any two *mutually exclusive* events $X=x$ and $Y=y$, the probability that either happens is equal to the sum of their individual probabilities, that is $P(X=x \cup Y=y) = P(X=x) + P(Y=y)$.
+* For any random variable, the probabilities of all the values it can take must sum to 1, i.e., $\sum_{i=1}^n P(X=x_i) = 1$, where $x_i$ ($i = 1, \ldots, n$) is one of the $n$ values that $X$ can take.
 
-## Dealing with multiple random variables
+
+## Dealing with Multiple Random Variables
 Very often, we will want to consider more than one random variable at a time.
 For instance, we may want to model the relationship between diseases and symptoms. Given a disease and symptom, say 'flu' and 'cough', either may or may not occur in a patient with some probability. While we hope that the probability of both would be close to zero, we may want to estimate these probabilities and their relationships to each other so that we may apply our inferences to effect better medical care.
 
