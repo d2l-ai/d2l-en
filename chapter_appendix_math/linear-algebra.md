@@ -1,5 +1,5 @@
 # Linear Algebra
-:label:`appendix_linear_algebra`
+:label:`sec_linear_algebra`
 
 In :numref:`sec_scalar-tensor`, we saw the fundamentals of linear algebra and how to use it to store and transform data.  Indeed, it is safe to say that linear algebra is one of the key mathematical pillars of modern deep learning.  However the theory goes much deeper than we have seen, and in this section we will dive into the some of the key geometric notions associated with linear algebra, see additional interpretations of many of the operations we have met before, and meet a few additional concepts like eigenvalues and eigenvectors.
 

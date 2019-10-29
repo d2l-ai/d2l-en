@@ -20,7 +20,7 @@ the circle.
 
 The process in :numref:`fig_circle_area`
 is called *method of exhaustion*.
-This is where *integral calculus* originates from.
+This is where *integral calculus* (will be described in :numref:`sec_integral_calculus`) originates from.
 More than 2,000 years later, 
 the other branch of calculus, *differential calculus*,
 was invented.

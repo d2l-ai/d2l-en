@@ -89,6 +89,7 @@ P(X\in\mathbb{R}) = \int_{-\infty}^{\infty} p(x) \; dx.
 $$
 
 We may approximate this is code by using the same discrete approximation methods as before.  In this case we can approximate the probability of falling in the blue region.
+
 ```{.python .input}
 epsilon = 0.01
 x = np.arange(-5,5,0.01)
