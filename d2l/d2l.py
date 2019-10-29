@@ -621,8 +621,8 @@ class RNNModel(nn.Block):
         X = npx.one_hot(inputs.T, self.vocab_size)
         Y, state = self.rnn(X, state)
         # The fully connected layer will first change the shape of Y to
-        # (num_steps * batch_size, num_hiddens)
-        # Its output shape is (num_steps * batch_size, vocab_size)
+        # (num_steps * batch_size, num_hiddens).
+        # Its output shape is (num_steps * batch_size, vocab_size).
         output = self.dense(Y.reshape(-1, Y.shape[-1]))
         return output, state
 
@@ -1127,7 +1127,7 @@ def load_data_pikachu(batch_size, edge_size=256):
         path_imgidx=os.path.join(data_dir, 'train.idx'),
         batch_size=batch_size,
         data_shape=(3, edge_size, edge_size),  # The shape of the output image
-        shuffle=True,  # Read the data set in random order
+        shuffle=True,  # Read the dataset in random order
         rand_crop=1,  # The probability of random cropping is 1
         min_object_covered=0.95, max_attempts=200)
     val_iter = image.ImageDetIter(
@@ -1627,6 +1627,47 @@ def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
           % (metric[0] / metric[1], hit_rate, auc))
     print('%.1f examples/sec on %s'
           % (metric[2] * num_epochs / timer.sum(), ctx_list))
+
+
+# Defined in file: ./chapter_recommender-systems/ctr.md
+class CTRDataset(Dataset):
+    def __init__(self, data_path, feat_mapper=None, defaults=None, 
+                 min_threshold=4, num_feat=34):
+        self.NUM_FEATS, self.count, self.data = num_feat, 0, {}
+        feat_cnts = defaultdict(lambda: defaultdict(int))
+        self.feat_mapper, self.defaults = feat_mapper, defaults
+        self.field_dims = np.zeros(self.NUM_FEATS, dtype=np.int64)
+        with open(data_path) as f:
+            f.readline() # skip the header
+            for line in f:
+                instance = {}
+                values = line.rstrip('\n').split('\t')
+                if len(values) != self.NUM_FEATS + 1:
+                    continue
+                label = np.float32([0,0])
+                label[int(values[0])] = 1
+                instance['y'] = [np.float32(values[0])]
+                for i in range(1, self.NUM_FEATS + 1):
+                    feat_cnts[i][values[i ]] += 1
+                    instance.setdefault('x',[]).append(values[i ])
+                self.data[self.count] = instance
+                self.count = self.count + 1
+        if self.feat_mapper is None and self.defaults is None:
+            feat_mapper = {i: {feat for feat, c in cnt.items() if c >= 
+                               min_threshold} for i, cnt in feat_cnts.items()}
+            self.feat_mapper = {i: {feat: idx for idx, feat in enumerate(cnt)}
+                                for i, cnt in feat_mapper.items()}
+            self.defaults = {i: len(cnt) for i, cnt in feat_mapper.items()}
+        for i, fm in self.feat_mapper.items():
+            self.field_dims[i - 1] = len(fm) + 1
+        self.offsets = np.array((0, *np.cumsum(self.field_dims).asnumpy()
+                                 [:-1]))
+    def __len__(self):
+        return self.count
+    def __getitem__(self, idx):
+        feat = np.array([self.feat_mapper[i + 1].get(v, self.defaults[i + 1]) 
+                         for i, v in enumerate(self.data[idx]['x'])])
+        return feat + self.offsets, self.data[idx]['y']
 
 
 # Defined in file: ./chapter_generative_adversarial_networks/gan.md
