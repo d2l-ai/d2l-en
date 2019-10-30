@@ -201,12 +201,12 @@ Note that here we use the more compact notation where $P(A,B)$ is a *joint distr
 
 ### Marginalization
 
-Bayes' theorem is very useful if we want to infer one thing from the other, say cause and effect, but we only know the properties in the reverse direction. One important operation that we need, to make this work, is *marginalization*.
-It is the operation of determining $P(B)$ from $P(A,B)$. We can see that the probability of seeing $B$ amounts to accounting for all possible choices of $A$ and aggregating the joint probabilities over all of them:
+Bayes' theorem is very useful if we want to infer one thing from the other, say cause and effect, but we only know the properties in the reverse direction, as we will see later in this section. One important operation that we need, to make this work, is *marginalization*.
+It is the operation of determining $P(B)$ from $P(A,B)$. We can see that the probability of $B$ amounts to accounting for all possible choices of $A$ and aggregating the joint probabilities over all of them:
 
 $$P(B) = \sum_{A} P(A,B),$$
 
-which is also called the *sum rule*.
+which is also known as the *sum rule*. The probability or distribution as a result of marginalization is called a *marginal probability* or a *marginal distribution*.
 
 
 ### Independence
@@ -224,48 +224,85 @@ if and only if $P(A, B \mid C) = P(A \mid C)P(B \mid C)$. This is expressed as $
 
 ### Application
 
+Let us put our skills to the test. Assume that a doctor administers an AIDS test to a patient. This test is fairly accurate and it fails only with $1\%$ probability if the patient is healthy but reporting him as diseased. Moreover,
+it never fails to detect HIV if the patient actually has it. We use $D_1$ to indicate the diagnosis ($1$ if positive and $0$ if negative) and $H$ to denote the HIV status ($1$ if positive and $0$ if negative).
+:numref:`conditional_prob_D1` lists such conditional probability.
 
-Let us put our skills to the test. Assume that a doctor administers an AIDS test to a patient. This test is fairly accurate and it fails only with 1% probability if the patient is healthy by reporting him as diseased. Moreover,
-it never fails to detect HIV if the patient actually has it. We use $D$ to indicate the diagnosis and $H$ to denote the HIV status. Written as a table the outcome $P(D \mid H)$ looks as follows:
+:Conditional probability of $P(D_1 \mid H)$.
 
-|outcome| HIV positive | HIV negative |
-|:------------|-------------:|-------------:|
-|Test positive|            1 |         0.01 |
-|Test negative|            0 |         0.99 |
+| Conditional probability | $H=1$ | $H=0$ |
+|---|---|---|
+|$P(D_1 = 1 \mid H)$|            1 |         0.01 |
+|$P(D_1 = 0 \mid H)$|            0 |         0.99 |
+:label:`conditional_prob_D1`
 
-Note that the column sums are all one (but the row sums are not), since the conditional probability needs to sum up to $1$, just like the probability. Let us work out the probability of the patient having AIDS if the test comes back positive. Obviously this is going to depend on how common the disease is, since it affects the number of false alarms. Assume that the population is quite healthy, e.g., $P(\text{HIV positive}) = 0.0015$. To apply Bayes' Theorem, we need to determine
+Note that the column sums are all $1$ (but the row sums are not), since the conditional probability needs to sum up to $1$, just like the probability. Let us work out the probability of the patient having AIDS if the test comes back positive, i.e., $P(H = 1 \mid D_1 = 1)$. Obviously this is going to depend on how common the disease is, since it affects the number of false alarms. Assume that the population is quite healthy, e.g., $P(H=1) = 0.0015$. To apply Bayes' Theorem, we need to apply marginalization and the multiplication rule to determine
 
 $$\begin{aligned}
-P(\text{Test positive}) =& P(D=1 \mid H=0) P(H=0) + P(D=1
-\mid H=1) P(H=1) \\
-=& 0.01 \cdot 0.9985 + 1 \cdot 0.0015 \\
-=& 0.011485
+&P(D_1 = 1) \\
+=& P(D_1=1, H=0) + P(D_1=1, H=1)  \\
+=& P(D_1=1 \mid H=0) P(H=0) + P(D_1=1 \mid H=1) P(H=1) \\
+=& 0.011485.
 \end{aligned}
 $$
 
 Thus, we get
 
-$$\begin{aligned} P(H = 1 \mid D = 1) =& \frac{P(D=1 \mid H=1) P(H=1)}{P(D=1)} \\ =& \frac{1 \cdot 0.0015}{0.011485} \\ =& 0.131 \end{aligned} $$
+$$\begin{aligned}
+&P(H = 1 \mid D_1 = 1)\\ =& \frac{P(D_1=1 \mid H=1) P(H=1)}{P(D_1=1)} \\ =& 0.1306 \end{aligned}.$$
 
-In other words, there is only a 13.1% chance that the patient actually has AIDS, despite using a test that is 99% accurate. As we can see, statistics can be quite counterintuitive.
+In other words, there is only a 13.06% chance that the patient actually has AIDS, despite using a very accurate test. As we can see, probability can be quite counterintuitive.
 
-What should a patient do upon receiving such terrifying news? Likely, he/she
+What should a patient do upon receiving such terrifying news? Likely, the patient
 would ask the physician to administer another test to get clarity. The second
-test has different characteristics (it is not as good as the first one).
+test has different characteristics and it is not as good as the first one, as shown in :numref:`conditional_prob_D2`.
 
-|outcome |  HIV positive |  HIV negative |
-|:------------|--------------:|--------------:|
-|Test positive|          0.98 |          0.03 |
-|Test negative|          0.02 |          0.97 |
 
-Unfortunately, the second test comes back positive, too. Let us work out the requisite probabilities to invoke Bayes' Theorem.
+:Conditional probability of $P(D_2 \mid H)$.
 
-* $P(D_1 = 1 \text{ and } D_2 = 1 \mid H = 0) = 0.01 \cdot 0.03 = 0.0003$
-* $P(D_1 = 1 \text{ and } D_2 = 1 \mid H = 1) = 1 \cdot 0.98 = 0.98$
-* $P(D_1 = 1 \text{ and } D_2 = 1) = 0.0003 \cdot 0.9985 + 0.98 \cdot 0.0015 = 0.00176955$
-* $P(H = 1 \mid D_1 = 1 \text{ and } D_2 = 1) = \frac{0.98 \cdot 0.0015}{0.00176955} = 0.831$
+| Conditional probability | $H=1$ | $H=0$ |
+|---|---|---|
+|$P(D_2 = 1 \mid H)$|            0.98 |         0.03 |
+|$P(D_2 = 0 \mid H)$|            0.02 |         0.97 |
+:label:`conditional_prob_D2`
 
-That is, the second test allowed us to gain much higher confidence that not all is well. Despite the second test being considerably less accurate than the first one, it still improved our estimate quite a bit. You might ask, *why couldn't we just run the first test a second time?* After all, the first test was more accurate. The reason is that we needed a second test whose result is *independent* of the first test (given the true diagnosis). 
+Unfortunately, the second test comes back positive, too. Let us work out the requisite probabilities to invoke Bayes' Theorem by assuming the conditional independence:
+
+$$\begin{aligned}
+&P(D_1 = 1, D_2 = 1 \mid H = 0) \\
+=& P(D_1 = 1 \mid H = 0) P(D_2 = 1 \mid H = 0)  \\
+=& 0.0003,
+\end{aligned}
+$$
+
+$$\begin{aligned}
+&P(D_1 = 1, D_2 = 1 \mid H = 1) \\
+=& P(D_1 = 1 \mid H = 1) P(D_2 = 1 \mid H = 1)  \\
+=& 0.98.
+\end{aligned}
+$$
+
+Now we can apply marginalization and the multiplication rule:
+
+$$\begin{aligned}
+&P(D_1 = 1, D_2 = 1) \\
+=& P(D_1 = 1, D_2 = 1, H = 0) + P(D_1 = 1, D_2 = 1, H = 1)  \\
+=& P(D_1 = 1, D_2 = 1 \mid H = 0)P(H=0) + P(D_1 = 1, D_2 = 1 \mid H = 1)P(H=1)\\
+=& 0.00176955.
+\end{aligned}
+$$
+
+In the end, the probability of the patient having AIDS given both positive tests is
+
+$$\begin{aligned}
+&P(H = 1 \mid D_1 = 1, D_2 = 1)\\ 
+=& \frac{P(D_1 = 1, D_2 = 1 \mid H=1) P(H=1)}{P(D_1 = 1, D_2 = 1)} \\ 
+=& 0.8307.
+\end{aligned}
+$$
+
+That is, the second test allowed us to gain much higher confidence that not all is well. Despite the second test being considerably less accurate than the first one, it still significantly improved our estimate.
+
 
 
 ## Expectation and Variance
