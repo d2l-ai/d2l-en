@@ -29,13 +29,13 @@ But there is a key difference between the two cases. In this first case, the ima
 
 ## Basic Probability Theory
 
-Say that we cast a die and want to know what the chance is of seeing a $1$ rather than another digit. If the die is fair, all the $6$ outcomes $\mathcal{X} = \{1, \ldots, 6\}$ are equally likely to occur, and thus we would see a $1$ in $1$ out of $6$ cases. Formally we state that $1$ occurs with probability $\frac{1}{6}$.
+Say that we cast a die and want to know what the chance is of seeing a $1$ rather than another digit. If the die is fair, all the $6$ outcomes $\{1, \ldots, 6\}$ are equally likely to occur, and thus we would see a $1$ in one out of six cases. Formally we state that $1$ occurs with probability $\frac{1}{6}$.
 
 For a real die that we receive from a factory, we might not know those proportions and we would need to check whether it is tainted. The only way to investigate the die is by casting it many times and recording the outcomes. For each cast of the die, we will observe a value in $\{1, \ldots, 6\}$. Given these outcomes, we want to investigate the probability of observing each outcome.
 
 One natural approach for each value is to take the
 individual count for that value and to divide it by the total number of tosses.
-This gives us an *estimate* of the probability of a given event. The *law of
+This gives us an *estimate* of the probability of a given *event*. The *law of
 large numbers* tell us that as the number of tosses grows this estimate will draw closer and closer to the true underlying probability. Before going into the details of what is going here, let us try it out.
 
 To start, let us import the necessary packages.
@@ -88,14 +88,17 @@ counts
 Now that we know how to sample rolls of a die, we can simulate 1000 rolls. We
 can then go through and count, after each of the 1000 rolls, how many times each
 number was rolled.
+Specifically, we calculate the relative frequency as the estimate of the true probability.
 
 ```{.python .input  n=5}
 # Store the results as 32-bit floats for division
 counts = np.random.multinomial(100, fair_probs).astype(np.float32)
-counts / 1000
+counts / 1000  # Reletive frequency as the estimate
 ```
 
-Because we generated the data from a fair die, we know that each number actually has probability $\frac{1}{6}$, roughly $0.167$, so the output estimates above look pretty good. We can also visualize how these probabilities converge over time towards reasonable estimates.
+Because we generated the data from a fair die, we know that each outcome has true probability $\frac{1}{6}$, roughly $0.167$, so the above output estimates look good. 
+
+We can also visualize how these probabilities converge over time towards the true probability.
 Let us conduct $500$ groups of experiments where each group draws $10$ samples.
 
 ```{.python .input  n=6}
@@ -108,16 +111,42 @@ for i in range(6):
     d2l.plt.plot(estimates[:,i].asnumpy(), label=("P(die=" + str(i + 1) +")"))
 d2l.plt.axhline(y=0.167, color='black', linestyle='dashed')
 d2l.plt.gca().set_xlabel('Groups of experiments')
-d2l.plt.gca().set_ylabel('Probability')
+d2l.plt.gca().set_ylabel('Estimated probability')
 d2l.plt.legend();
 ```
 
 Each solid curve corresponds to one of the six values of the die and gives our estimated probability that the die turns up that value as assessed after each group of experiments.
 The dashed black line gives the true underlying probability.
 As we get more data by conducting more experiments,
-the $6$ solid curves converge towards the true answer.
+the $6$ solid curves converge towards the true probability.
 
-In our example of casting a die, we introduced the notion of a *random variable*. A random variable, which we denote here as $X$, can be pretty much any quantity and is not deterministic. Random variables could take one value among a *set* of possibilities. We denote sets with brackets, e.g., $\{\text{cat}, \text{dog}, \text{rabbit}\}$. The items contained in the set are called *elements*, and we can say that an element $x$ is *in* the set $\mathcal{X}$, by writing $x \in \mathcal{X}$. The symbol $\in$ is read as "in" and denotes membership. For instance, we could truthfully say $\text{dog} \in \{\text{cat}, \text{dog}, \text{rabbit}\}$. When dealing with the rolls of a die, we are concerned with a variable $X \in \{1, 2, 3, 4, 5, 6\}$.
+### Axioms of Probability Theory
+
+When dealing with the rolls of a die,
+we call the set $\mathcal{S} = \{1, 2, 3, 4, 5, 6\}$ the *sample space* or *outcome space*, where each element is an *outcome*.
+An *event* is a set of outcomes from a given sample space.
+For instance, "seeing a $5$" ($\{5\}$) and "seeing an odd number" ($\{1, 3, 5\}$) are both valid events of rolling a die.
+Note that if the outcome of a random experiment is in event $\mathcal{A}$,
+then event $\mathcal{A}$ has occurred.
+That is to say, if $3$ dots faced up after rolling a die, since $3 \in \{1, 3, 5\}$,
+we can say that the event "seeing an odd number" has occurred.
+
+Formally, *probability* can be thought of a function that maps a set to a real value.
+The probability of an event $\mathcal{A}$ in the given sample space $\mathcal{S}$,
+denoted as $P(\mathcal{A})$, satisfies the following properties:
+
+* For any event $\mathcal{A}$, its probability is never negative, i.e., $P(\mathcal{A}) \geq 0$;
+* Probability of the entire sample space is $1$, i.e., $P(\mathcal{S}) = 1$;
+* For any countable sequence of events $\mathcal{A}_1, \mathcal{A}_2, \ldots$ that are *mutually exclusive* ($\mathcal{A}_i \cap \mathcal{A}_j = \emptyset$ for all $i \neq j$), the probability that any happens is equal to the sum of their individual probabilities, i.e., $P(\bigcup_{i=1}^{\infty} \mathcal{A}_i) = \sum_{i=1}^{\infty} P(\mathcal{A}_i)$.
+
+These are also the axioms of probability theory, proposed by Kolmogorov in 1933.
+
+
+### Random Variables
+
+In our random experiment of casting a die, we introduced the notion of a *random variable*. A random variable can be pretty much any quantity and is not deterministic. It could take one value among a set of possibilities in a random experiment.
+Consider a random variable $X$ whose value is in the sample space $\mathcal{S} = \{1, 2, 3, 4, 5, 6\}$ of rolling a die. We can denote the event "seeing a $5$" as $\{X = 5\}$, and its probability as $P(\{X = 5\})$ or simply $P(X = 5)$.
+Likewise, the probability that $1 \leq X \leq 3$ can be written as $P(1 \leq X \leq 3)$, whose event $\{1 \leq X \leq 3\}$ means $\{ X = 1, 2, \text{or}, 3\}$.
 
 Note that there is a subtle difference between *discrete* random variables, like the sides of a die, and *continuous* ones, like the weight and the height of a person. There is little point in asking whether two people have exactly the same height. If we take precise enough measurements you will find that no two people on the planet have the exact same height. In fact, if we take a fine enough measurement, you will not have the same height when you wake up and when you go to sleep. So there is no purpose in asking about the probability
 that someone is $1.80139278291028719210196740527486202$ meters tall. Given the world population of humans the probability is virtually $0$. It makes more sense in this case to ask whether someone's height falls into a given interval, say between $1.79$ and $1.81$ meters. In these cases we quantify the likelihood that we see a value as a *density*. The height of exactly $1.80$ meters has no probability, but nonzero density. In the interval between any two different heights we have nonzero probability.
@@ -125,25 +154,26 @@ In the rest of this section, we consider probability in discrete space.
 For probability over continuous random variables, you may refer to :numref:`sec_random_variables`.
 
 
-There are a few important axioms of probability that you will want to remember:
 
-* For any event $x$, the probability is never negative, i.e., $P(X=x) \geq 0$.
-* For any two events $X=x$ and $Y=y$, the union is no more likely than the sum of the individual events, i.e., $P(X=x \cup Y=y) \leq P(X=x) + P(Y=y)$.
-* For any two *mutually exclusive* events $X=x$ and $Y=y$, the probability that either happens is equal to the sum of their individual probabilities, that is $P(X=x \cup Y=y) = P(X=x) + P(Y=y)$.
-* For any random variable, the probabilities of all the values it can take must sum to 1, i.e., $\sum_{i=1}^n P(X=x_i) = 1$, where $x_i$ ($i = 1, \ldots, n$) is one of the $n$ values that $X$ can take.
+
 
 
 ## Dealing with Multiple Random Variables
+
 Very often, we will want to consider more than one random variable at a time.
-For instance, we may want to model the relationship between diseases and symptoms. Given a disease and symptom, say 'flu' and 'cough', either may or may not occur in a patient with some probability. While we hope that the probability of both would be close to zero, we may want to estimate these probabilities and their relationships to each other so that we may apply our inferences to effect better medical care.
+For instance, we may want to model the relationship between diseases and symptoms. Given a disease and a symptom, say "flu" and "cough", either may or may not occur in a patient with some probability. While we hope that the probability of both would be close to zero, we may want to estimate these probabilities and their relationships to each other so that we may apply our inferences to effect better medical care.
+
+### Conditional Probability
 
 As a more complicated example, images contain millions of pixels, thus millions of random variables. And in many cases images will come with a
 label, identifying objects in the image. We can also think of the label as a
 random variable. We can even think of all the metadata as random variables
-such as location, time, aperture, focal length, ISO, focus distance, camera type, etc. All of these are random variables that occur jointly. When we deal with multiple random variables, there are several quantities of interest. The first is called the joint distribution $P(A, B)$. Given any elements $a$ and $b$, the joint distribution lets us answer, what is the probability that $A=a$ and $B=b$ simultaneously? Note that for any values $a$ and $b$, $P(A=a,B=b) \leq P(A=a)$.
+such as location, time, aperture, focal length, ISO, focus distance, and camera type.
+All of these are random variables that occur jointly. When we deal with multiple random variables, there are several quantities of interest. The first is called the *joint distribution* $P(A, B)$. Given any elements $a$ and $b$, the joint distribution lets us answer, what is the probability that $A=a$ and $B=b$ simultaneously?
 
-This has to be the case, since for $A$ and $B$ to happen, $A$ has to happen *and* $B$ also has to happen (and vice versa). Thus $A,B$ cannot be more likely than $A$ or $B$ individually. This brings us to an interesting ratio: $0 \leq \frac{P(A,B)}{P(A)} \leq 1$. We call this a **conditional probability**
-and denote it by $P(B \mid A)$, the probability that $B$ happens, provided that
+Note that for any values $a$ and $b$, $P(A=a,B=b) \leq P(A=a)$.
+This has to be the case, since for $A$ and $B$ to happen, $A$ has to happen *and* $B$ also has to happen (and vice versa). Thus $A$ and $B$ cannot be more likely than $A$ or $B$ individually. This brings us to an interesting ratio: $0 \leq \frac{P(A,B)}{P(A)} \leq 1$. We call this a *conditional probability*
+and denote it by $P(B \mid A)$: the probability that $B$ happens, provided that
 $A$ has happened.
 
 Using the definition of conditional probabilities, we can derive one of the most useful and celebrated equations in statistics—Bayes' theorem.
@@ -151,12 +181,12 @@ It goes as follows: By construction, we have that $P(A, B) = P(B \mid A) P(A)$. 
 
 $$P(A \mid B) = \frac{P(B \mid A) P(A)}{P(B)}$$
 
-This is very useful if we want to infer one thing from another, say cause and effect but we only know the properties in the reverse direction. One important operation that we need, to make this work, is **marginalization**, i.e., the operation of determining $P(A)$ and $P(B)$ from $P(A,B)$. We can see that the probability of seeing $A$ amounts to accounting for all possible choices of $B$ and aggregating the joint probabilities over all of them, i.e.
+This is very useful if we want to infer one thing from another, say cause and effect but we only know the properties in the reverse direction. One important operation that we need, to make this work, is *marginalization*, i.e., the operation of determining $P(A)$ and $P(B)$ from $P(A,B)$. We can see that the probability of seeing $A$ amounts to accounting for all possible choices of $B$ and aggregating the joint probabilities over all of them, i.e.
 
 $$P(A) = \sum_{B'} P(A,B') \text{ and
 } P(B) = \sum_{A'} P(A',B)$$
 
-Another useful property to check for is **dependence** vs. **independence**.
+Another useful property to check for is *dependence* vs. *independence*.
 Independence is when the occurrence of one event does not reveal any information about the occurrence of the other. In this case $P(B \mid A) = P(B)$. Statisticians typically express this as $A \perp\!\!\!\perp B$. From Bayes' Theorem, it follows immediately that also $P(A \mid B) = P(A)$. In all other cases we call $A$ and $B$ dependent. For instance, two successive rolls of a die are independent. On the other hand, the position of a light switch and the brightness in the room are not (they are not perfectly deterministic, though, since we could always have a broken lightbulb, power failure, or a broken switch).
 
 Let us put our skills to the test. Assume that a doctor administers an AIDS test to a patient. This test is fairly accurate and it fails only with 1% probability if the patient is healthy by reporting him as diseased. Moreover,
