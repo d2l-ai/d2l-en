@@ -140,13 +140,23 @@ denoted as $P(\mathcal{A})$, satisfies the following properties:
 * For any countable sequence of events $\mathcal{A}_1, \mathcal{A}_2, \ldots$ that are *mutually exclusive* ($\mathcal{A}_i \cap \mathcal{A}_j = \emptyset$ for all $i \neq j$), the probability that any happens is equal to the sum of their individual probabilities, i.e., $P(\bigcup_{i=1}^{\infty} \mathcal{A}_i) = \sum_{i=1}^{\infty} P(\mathcal{A}_i)$.
 
 These are also the axioms of probability theory, proposed by Kolmogorov in 1933.
+Thanks to this axiom system, we can avoid any philosophical dispute on randomness;
+instead, we can reason rigorously with a mathematical language.
+For instance, by letting event $\mathcal{A}_1$ be the entire sample space and $\mathcal{A}_i = \emptyset$ for all $i > 1$, we can prove that $P(\emptyset) = 0$, i.e., the probability of an impossible event is $0$.
 
 
 ### Random Variables
 
 In our random experiment of casting a die, we introduced the notion of a *random variable*. A random variable can be pretty much any quantity and is not deterministic. It could take one value among a set of possibilities in a random experiment.
-Consider a random variable $X$ whose value is in the sample space $\mathcal{S} = \{1, 2, 3, 4, 5, 6\}$ of rolling a die. We can denote the event "seeing a $5$" as $\{X = 5\}$, and its probability as $P(\{X = 5\})$ or simply $P(X = 5)$.
-Likewise, the probability that $1 \leq X \leq 3$ can be written as $P(1 \leq X \leq 3)$, whose event $\{1 \leq X \leq 3\}$ means $\{ X = 1, 2, \text{or}, 3\}$.
+Consider a random variable $X$ whose value is in the sample space $\mathcal{S} = \{1, 2, 3, 4, 5, 6\}$ of rolling a die. We can denote the event "seeing a $5$" as $\{X = 5\}$ or $X = 5$, and its probability as $P(\{X = 5\})$ or $P(X = 5)$.
+By $P(X = a)$, we make a distinction between the random variable $X$ and the values (e.g., $a$) that $X$ can take.
+However, such pedantry results in a cumbersome notation.
+For a compact notation, we can just denote $P(X)$ as the probability distribution over the random variable $X$,
+or simply write $P(a)$ to denote the probability that a random variable takes the value $a$, when it is clear from the context.
+Since an event in probability theory is a set of outcomes from the sample space,
+we can specify a range of values for a random variable to take.
+For example, $P(1 \leq X \leq 3)$ denotes the probability of the event $\{1 \leq X \leq 3\}$,
+which means $\{ X = 1, 2, \text{or}, 3\}$. Equivalently, $P(1 \leq X \leq 3)$ represents the probability that the random variable $X$ can take a value from $\{1,2,3\}$.
 
 Note that there is a subtle difference between *discrete* random variables, like the sides of a die, and *continuous* ones, like the weight and the height of a person. There is little point in asking whether two people have exactly the same height. If we take precise enough measurements you will find that no two people on the planet have the exact same height. In fact, if we take a fine enough measurement, you will not have the same height when you wake up and when you go to sleep. So there is no purpose in asking about the probability
 that someone is $1.80139278291028719210196740527486202$ meters tall. Given the world population of humans the probability is virtually $0$. It makes more sense in this case to ask whether someone's height falls into a given interval, say between $1.79$ and $1.81$ meters. In these cases we quantify the likelihood that we see a value as a *density*. The height of exactly $1.80$ meters has no probability, but nonzero density. In the interval between any two different heights we have nonzero probability.
@@ -156,14 +166,11 @@ For probability over continuous random variables, you may refer to :numref:`sec_
 
 
 
-
-
 ## Dealing with Multiple Random Variables
 
 Very often, we will want to consider more than one random variable at a time.
 For instance, we may want to model the relationship between diseases and symptoms. Given a disease and a symptom, say "flu" and "cough", either may or may not occur in a patient with some probability. While we hope that the probability of both would be close to zero, we may want to estimate these probabilities and their relationships to each other so that we may apply our inferences to effect better medical care.
 
-### Conditional Probability
 
 As a more complicated example, images contain millions of pixels, thus millions of random variables. And in many cases images will come with a
 label, identifying objects in the image. We can also think of the label as a
@@ -172,9 +179,9 @@ such as location, time, aperture, focal length, ISO, focus distance, and camera 
 All of these are random variables that occur jointly. When we deal with multiple random variables, there are several quantities of interest. The first is called the *joint distribution* $P(A, B)$. Given any elements $a$ and $b$, the joint distribution lets us answer, what is the probability that $A=a$ and $B=b$ simultaneously?
 
 Note that for any values $a$ and $b$, $P(A=a,B=b) \leq P(A=a)$.
-This has to be the case, since for $A$ and $B$ to happen, $A$ has to happen *and* $B$ also has to happen (and vice versa). Thus $A$ and $B$ cannot be more likely than $A$ or $B$ individually. This brings us to an interesting ratio: $0 \leq \frac{P(A,B)}{P(A)} \leq 1$. We call this a *conditional probability*
-and denote it by $P(B \mid A)$: the probability that $B$ happens, provided that
-$A$ has happened.
+This has to be the case, since for $A=a$ and $B=b$ to happen, $A=a$ has to happen *and* $B=b$ also has to happen (and vice versa). Thus $A=a$ and $B=b$ cannot be more likely than $A=a$ or $B=b$ individually. This brings us to an interesting ratio: $0 \leq \frac{P(A,B)}{P(A)} \leq 1$. We call this a *conditional probability*
+and denote it by $P(B \mid A)$: the probability that $B$ occurs, provided that
+$A$ has occurred.
 
 Using the definition of conditional probabilities, we can derive one of the most useful and celebrated equations in statistics—Bayes' theorem.
 It goes as follows: By construction, we have that $P(A, B) = P(B \mid A) P(A)$. By symmetry, this also holds for $P(A,B) = P(A \mid B) P(B)$. Solving for one of the conditional variables we get:
