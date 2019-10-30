@@ -1,15 +1,15 @@
 # Matrix Factorization
 
-The first version of matrix factorization model is proposed by Simon Funk in a famous [blog
-post](https://sifter.org/~simon/journal/20061211.html) in which he described the idea of factorizing the interaction matrix. It then became widely known due to the Netflix contest. In 2006, Netflix, a media-streaming and video-rental company, announced a contest to improve its recommender systems.  The best team that can improve on the Netflix baseline, Cinematch, by 10 percent will win a one million USD prize.  This contest attracted
-a lot of attention and created the hype of recommender system research. Later on, the grand prize was won by the BellKor's Pragmatic Chaos team, a combined team of BellKor, Pragmatic Theory, and BigChaos (you do not need to worry about these algorithms now). Although it is an ensemble method (a combination of many algorithms) that finally achieved the best score, matrix factorization plays a critical role in the final blend. The technical report [the Netflix Grand Prize solution](https://www.netflixprize.com/assets/GrandPrize2009_BPC_BigChaos.pdf) provides a detailed introduction to the  employed model. In this section, we will dive into the details of the matrix factorization model and its implementation.
+Matrix Factorization is a well-established algorithm in the recommender systems literature. The first version of matrix factorization model is proposed by Simon Funk in a famous [blog
+post](https://sifter.org/~simon/journal/20061211.html) in which he described the idea of factorizing the interaction matrix. It then became widely known due to the Netflix contest which was held in 2006. At that time, Netflix, a media-streaming and video-rental company, announced a contest to improve its recommender system performance. The best team that can improve on the Netflix baseline, i.e., Cinematch), by 10 percent would win a one million USD prize.  As such, this contest attracted
+a lot of attention to the field of recommender system research. Subsequently, the grand prize was won by the BellKor's Pragmatic Chaos team, a combined team of BellKor, Pragmatic Theory, and BigChaos (you do not need to worry about these algorithms now). Although the final score was the result of an ensemble solution (i.e., a combination of many algorithms), the matrix factorization algorithm played a critical role in the final blend. The technical report [the Netflix Grand Prize solution](https://www.netflixprize.com/assets/GrandPrize2009_BPC_BigChaos.pdf) provides a detailed introduction to the adopted model. In this section, we will dive into the details of the matrix factorization model and its implementation.
 
 
 ## The Matrix Factorization Model
 
-Matrix factorization is a class of collaborative filtering models. Simply put, this model factorizes the user-item interaction matrix (e.g., rating matrix) into the product of two lower-rank matrices. 
+Matrix factorization is a class of collaborative filtering models. Specifically, the model factorizes the user-item interaction matrix (e.g., rating matrix) into the product of two lower-rank matrices, capturing the low-rank structure of the user-item interactions.
 
-Let $\mathbf{R} \in \mathbb{R}^{m \times n}$ denote the interaction matrix with $m$ users and $n$ items, and the values of $\mathbf{R}$ represent explicit ratings. It will be factorized into a user latent matrix $\mathbf{P} \in \mathbb{R}^{m \times k}$ and an item latent matrix $\mathbf{Q} \in \mathbb{R}^{n \times k}$, where $k \ll m, n$, is the latent factor size. For a given item $i$, the elements of $\mathbf{Q}_i$ measure the extent to which the item possesses those characteristics such as the genres and languages of a movie. For a given user $u$, the elements of $\mathbf{P}_u$ measure the extent of interest the user has in items' corresponding characteristics. These factors might measure obvious dimensions as mentioned in those examples or are completely uninterpretable.   The predicted ratings can be estimated by 
+Let $\mathbf{R} \in \mathbb{R}^{m \times n}$ denote the interaction matrix with $m$ users and $n$ items, and the values of $\mathbf{R}$ represent explicit ratings. The user-item interaction will be factorized into a user latent matrix $\mathbf{P} \in \mathbb{R}^{m \times k}$ and an item latent matrix $\mathbf{Q} \in \mathbb{R}^{n \times k}$, where $k \ll m, n$, is the latent factor size. For a given item $i$, the elements of $\mathbf{Q}_i$ measure the extent to which the item possesses those characteristics such as the genres and languages of a movie. For a given user $u$, the elements of $\mathbf{P}_u$ measure the extent of interest the user has in items' corresponding characteristics. These latent factors might measure obvious dimensions as mentioned in those examples or are completely uninterpretable. The predicted ratings can be estimated by
 
 $$\hat{\mathbf{R}} = \mathbf{PQ}^\top$$
 
@@ -28,8 +28,8 @@ $$
 $$
 
 where $\lambda$ denotes the regularization rate. The regularizing term $\lambda (\| \mathbf{P} \|^2_F + \| \mathbf{Q}
-\|^2_F + b_u^2 + b_i^2 )$ is used to avoid overfitting by penalizing the magnitudes of the parameters. The $(u, i)$ pairs for which $\mathbf{R}_{ui}$ is known are stored in the set
-$\mathcal{K}=\{(u, i) \mid \mathbf{R}_{ui} \text{ is known}\}$. The model parameters can be learned with an optimization algorithm, such as SGD and Adam.
+\|^2_F + b_u^2 + b_i^2 )$ is used to avoid overfitting by penalizing the magnitude of the parameters. The $(u, i)$ pairs for which $\mathbf{R}_{ui}$ is known are stored in the set
+$\mathcal{K}=\{(u, i) \mid \mathbf{R}_{ui} \text{ is known}\}$. The model parameters can be learned with an optimization algorithm, such as Stochastic Gradient Descent and Adam.
 
 An intuitive illustration of the matrix factorization model is shown below:
 
@@ -69,7 +69,7 @@ class MF(nn.Block):
 
 ## Evaluation Measures
 
-We then implement the RMSE (root-mean-square error) measure, which is commonly used to measure the differences between rating scores predicted by the model and the actually observed ratings (ground truth). RMSE is defined as: 
+We then implement the RMSE (root-mean-square error) measure, which is commonly used to measure the differences between rating scores predicted by the model and the actually observed ratings (ground truth). RMSE is defined as:
 
 $$
 \mathrm{RMSE} = \sqrt{\frac{1}{|\mathcal{T}|}\sum_{(u,i) \in \mathcal{T}}(\mathbf{R}_{ui} -\hat{\mathbf{R}}_{ui})^2}
@@ -145,7 +145,7 @@ net = MF(50, num_users, num_items)
 net.initialize(ctx=ctx, force_reinit=True, init=mx.init.Normal(0.01))
 lr, num_epochs, wd, optimizer = 0.001, 25, 1e-5, 'adam'
 loss = gluon.loss.L2Loss()
-trainer = gluon.Trainer(net.collect_params(), optimizer, 
+trainer = gluon.Trainer(net.collect_params(), optimizer,
                         {"learning_rate": lr, 'wd': wd})
 train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
                     ctx, evaluator)
@@ -154,12 +154,12 @@ train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
 Below, we use the trained model to predict the rating that a user (ID 20) might give to an item (ID 30).
 
 ```{.python .input  n=6}
-scores = net(np.array([20], dtype='int', ctx=d2l.try_gpu()), 
+scores = net(np.array([20], dtype='int', ctx=d2l.try_gpu()),
              np.array([30], dtype='int', ctx=d2l.try_gpu()))
 scores
 ```
 
-## Summary 
+## Summary
 
 * The matrix factorization model is widely used in recommender systems.  It can be used to predict ratings that a user might give to an item.
 * We can implement and train matrix factorization for recommender systems.
@@ -168,7 +168,7 @@ scores
 ## Exercise
 
 * Vary the size of latent factors. How does the size of latent factors influence the model performance?
-* Try different optimizers, learning rates, and weight decay rates. 
+* Try different optimizers, learning rates, and weight decay rates.
 * Check the predicted rating scores of other users for a specific movie.
 
 ## Reference
