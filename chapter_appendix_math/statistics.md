@@ -195,12 +195,12 @@ Before walking through the general steps of the hypothesis testing, let us start
 
 *Statistical significance* measures the probability of errorously reject the null hypothesis, $H_0$, when it should not be rejected in fact, i.e.,
 
-$$ \text{statistical significance }= 1 - \alpha = P(\text{fail to reject H_0} \mid \text{ H_0 is true} ).$$
+$$ \text{statistical significance }= 1 - \alpha = P(\text{reject } H_0 \mid H_0 \text{ is true} ).$$
 
 
-Statistical significance can be explained as the level of risk that we are willing to take, so that we will reject a null hypothesis when it is actually true. It is also refered as *type I error* or *false positive*. Notice that this $\alpha$ is the same one to use when we talked about the definition of the confidence interval.
+Statistical significance can be explained as the level of risk that we are willing to take, so that we will reject a null hypothesis when it is actually true. It is also refered as *type I error* or *false positive*. Notice that this $\alpha$, is called *significance level*, which is the same one to use when we talked about the definition of the confidence interval.
 
-A commonly used statistical significance level is $95%$. As we can see from figure :numref:`fig_pvalue_explain`, if the observation data point is located outsided the $95%$ significance threshold, it will be a very unlikely observations under the null hypothesis. Hence, there might be something wrong with the null hypothesis and we will reject it. 
+A commonly used statistical significance level is $5$%, i.e., $1-\alpha = 95$%. As we can see from figure :numref:`fig_pvalue_explain`, if the observation data point is located outsided the $95$% threshold, it will be a very unlikely observations under the null hypothesis. Hence, there might be something wrong with the null hypothesis and we will reject it. 
 
 
 ![Statistical significance.](../img/pvalue_explain.png)
@@ -211,9 +211,9 @@ A commonly used statistical significance level is $95%$. As we can see from figu
 
 *Statistical power* (or *sensitivity*) measures the ability to identify a true difference, i.e., 
 
-$$ \text{statistical power }= P(\text{reject H_0} \mid \text{ H_0 is false} ).$$
+$$ \text{statistical power }= P(\text{fail to reject } H_0  \mid H_0 \text{ is false} ).$$
 
-Intuitively, statistical power can be interpreted as how likely our test will detect a real discrepancy of some minimum magnitude at a desired statistical significance level. $80%$ is a commonly used statistical power. The higher the statistical power, the more likely we can catch the true difference. We can imagine the power as the fishing net as shown in :numref:`fig_statistical_power`. In this analogy, a high power hypothesis test is like a high graduality fishing net and a smaller discrepancy is like a smaller fish. If the fishing net is not of enough high graduality, then the smaller fish may easily escape from the gaps, and hence the fishing net cannot catch the fish. Similarly, if the statistical power is not of enough high power, then the test may not catch the smaller discrepancy.
+For a *type II error* probability of $\beta$, the corresponding statistical power is $1-\beta$. Intuitively, statistical power can be interpreted as how likely our test will detect a real discrepancy of some minimum magnitude at a desired statistical significance level. $80%$ is a commonly used statistical power. The higher the statistical power, the more likely we can catch the true difference. We can imagine the power as the fishing net as shown in :numref:`fig_statistical_power`. In this analogy, a high power hypothesis test is like a high graduality fishing net and a smaller discrepancy is like a smaller fish. If the fishing net is not of enough high graduality, then the smaller fish may easily escape from the gaps, and hence the fishing net cannot catch the fish. Similarly, if the statistical power is not of enough high power, then the test may not catch the smaller discrepancy.
 
 
 ![Statistical significance.](../img/statistical_power.png)
@@ -221,7 +221,7 @@ Intuitively, statistical power can be interpreted as how likely our test will de
 
 #### test statistic 
 
-A *test statistic* $T(x)$ is a scalar which summarizes the characteristics of the sample data, which is then used to compared with the expected value under the null hypothesis. Assuming that the null hypothesis is corrected, we can summarize the characteristics of the population, which is denoted as $T(X)$. The $T(X)$ is often follow a common probability distribution such as a normal distribution (for z-test) or a [Student's t-distribution](https://en.wikipedia.org/wiki/Student%27s_t-distribution) (for t-test). With both $T(X)$ and $T(x)$, we can calculate the *p-value*, which leads to the decision of whether rejecting the null hypothesis or not. 
+A *test statistic* $T(x)$ is a scalar which summarizes the characteristics of the sample data, which is then used to compared with the expected value under the null hypothesis. Assuming that the null hypothesis is corrected, we can summarize the characteristics of the population, which is denoted as $T(X)$. The $T(X)$ is often following a common probability distribution such as a normal distribution (for z-test) or a [Student's t-distribution](https://en.wikipedia.org/wiki/Student%27s_t-distribution) (for t-test). With both $T(X)$ and $T(x)$, we can calculate the *p-value*, which leads to the decision of whether rejecting the null hypothesis or not. 
 
 
 #### p-value
@@ -230,7 +230,7 @@ Assuming that the null hypothesis is correct, the *p-value* (or *probability val
 
 $$ p-value = P(T(X) \geq T(x)).$$
 
-If the p-value is less than or equal to a pre-defined and fixed statistical significance $\alpha$, we will conclude that the null hypothesis can be rejected. Otherwise, we will conclude that we cannot reject the null hypothesis, rather than the null hypothesis is true. 
+If the p-value is less than or equal to a pre-defined and fixed statistical significance level $\alpha$, we will conclude that the null hypothesis can be rejected. Otherwise, we will conclude that we cannot reject the null hypothesis, rather than the null hypothesis is true. 
 
 
 
