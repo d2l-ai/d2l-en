@@ -151,50 +151,79 @@ In our random experiment of casting a die, we introduced the notion of a *random
 Consider a random variable $X$ whose value is in the sample space $\mathcal{S} = \{1, 2, 3, 4, 5, 6\}$ of rolling a die. We can denote the event "seeing a $5$" as $\{X = 5\}$ or $X = 5$, and its probability as $P(\{X = 5\})$ or $P(X = 5)$.
 By $P(X = a)$, we make a distinction between the random variable $X$ and the values (e.g., $a$) that $X$ can take.
 However, such pedantry results in a cumbersome notation.
-For a compact notation, we can just denote $P(X)$ as the probability distribution over the random variable $X$,
-or simply write $P(a)$ to denote the probability that a random variable takes the value $a$, when it is clear from the context.
+For a compact notation, 
+on one hand, we can just denote $P(X)$ as the *distribution* over the random variable $X$:
+the distribution tells us the probability that $X$ takes any value.
+On the other hand,
+we can simply write $P(a)$ to denote the probability that a random variable takes the value $a$.
 Since an event in probability theory is a set of outcomes from the sample space,
 we can specify a range of values for a random variable to take.
 For example, $P(1 \leq X \leq 3)$ denotes the probability of the event $\{1 \leq X \leq 3\}$,
-which means $\{ X = 1, 2, \text{or}, 3\}$. Equivalently, $P(1 \leq X \leq 3)$ represents the probability that the random variable $X$ can take a value from $\{1,2,3\}$.
+which means $\{X = 1, 2, \text{or}, 3\}$. Equivalently, $P(1 \leq X \leq 3)$ represents the probability that the random variable $X$ can take a value from $\{1,2,3\}$.
 
 Note that there is a subtle difference between *discrete* random variables, like the sides of a die, and *continuous* ones, like the weight and the height of a person. There is little point in asking whether two people have exactly the same height. If we take precise enough measurements you will find that no two people on the planet have the exact same height. In fact, if we take a fine enough measurement, you will not have the same height when you wake up and when you go to sleep. So there is no purpose in asking about the probability
 that someone is $1.80139278291028719210196740527486202$ meters tall. Given the world population of humans the probability is virtually $0$. It makes more sense in this case to ask whether someone's height falls into a given interval, say between $1.79$ and $1.81$ meters. In these cases we quantify the likelihood that we see a value as a *density*. The height of exactly $1.80$ meters has no probability, but nonzero density. In the interval between any two different heights we have nonzero probability.
 In the rest of this section, we consider probability in discrete space.
 For probability over continuous random variables, you may refer to :numref:`sec_random_variables`.
 
-
-
-
 ## Dealing with Multiple Random Variables
 
 Very often, we will want to consider more than one random variable at a time.
 For instance, we may want to model the relationship between diseases and symptoms. Given a disease and a symptom, say "flu" and "cough", either may or may not occur in a patient with some probability. While we hope that the probability of both would be close to zero, we may want to estimate these probabilities and their relationships to each other so that we may apply our inferences to effect better medical care.
 
-
 As a more complicated example, images contain millions of pixels, thus millions of random variables. And in many cases images will come with a
 label, identifying objects in the image. We can also think of the label as a
 random variable. We can even think of all the metadata as random variables
 such as location, time, aperture, focal length, ISO, focus distance, and camera type.
-All of these are random variables that occur jointly. When we deal with multiple random variables, there are several quantities of interest. The first is called the *joint distribution* $P(A, B)$. Given any elements $a$ and $b$, the joint distribution lets us answer, what is the probability that $A=a$ and $B=b$ simultaneously?
+All of these are random variables that occur jointly. When we deal with multiple random variables, there are several quantities of interest.
 
+### Joint Probability
+
+The first is called the *joint probability* $P(A = a, B=b)$. Given any values $a$ and $b$, the joint probability lets us answer, what is the probability that $A=a$ and $B=b$ simultaneously?
 Note that for any values $a$ and $b$, $P(A=a,B=b) \leq P(A=a)$.
-This has to be the case, since for $A=a$ and $B=b$ to happen, $A=a$ has to happen *and* $B=b$ also has to happen (and vice versa). Thus $A=a$ and $B=b$ cannot be more likely than $A=a$ or $B=b$ individually. This brings us to an interesting ratio: $0 \leq \frac{P(A,B)}{P(A)} \leq 1$. We call this a *conditional probability*
-and denote it by $P(B \mid A)$: the probability that $B$ occurs, provided that
-$A$ has occurred.
+This has to be the case, since for $A=a$ and $B=b$ to happen, $A=a$ has to happen *and* $B=b$ also has to happen (and vice versa). Thus, $A=a$ and $B=b$ cannot be more likely than $A=a$ or $B=b$ individually.
 
-Using the definition of conditional probabilities, we can derive one of the most useful and celebrated equations in statistics—Bayes' theorem.
-It goes as follows: By construction, we have that $P(A, B) = P(B \mid A) P(A)$. By symmetry, this also holds for $P(A,B) = P(A \mid B) P(B)$. Solving for one of the conditional variables we get:
+### Conditional Probability
 
-$$P(A \mid B) = \frac{P(B \mid A) P(A)}{P(B)}$$
+This brings us to an interesting ratio: $0 \leq \frac{P(A=a,B=b)}{P(A=a)} \leq 1$. We call this ratio a *conditional probability*
+and denote it by $P(B=b \mid A=a)$: it is the probability of $B=b$, provided that
+$A=a$ has occurred.
 
-This is very useful if we want to infer one thing from another, say cause and effect but we only know the properties in the reverse direction. One important operation that we need, to make this work, is *marginalization*, i.e., the operation of determining $P(A)$ and $P(B)$ from $P(A,B)$. We can see that the probability of seeing $A$ amounts to accounting for all possible choices of $B$ and aggregating the joint probabilities over all of them, i.e.
+### Bayes' theorem
 
-$$P(A) = \sum_{B'} P(A,B') \text{ and
-} P(B) = \sum_{A'} P(A',B)$$
+Using the definition of conditional probabilities, we can derive one of the most useful and celebrated equations in statistics: *Bayes' theorem*.
+It goes as follows.
+By construction, we have the *multiplication rule* that $P(A, B) = P(B \mid A) P(A)$. By symmetry, this also holds for $P(A,B) = P(A \mid B) P(B)$. Assume that $P(B) > 0$. Solving for one of the conditional variables we get
+
+$$P(A \mid B) = \frac{P(B \mid A) P(A)}{P(B)}.$$
+
+Note that here we use the more compact notation where $P(A,B)$ is a *joint distribution* and $P(A \mid B)$ is a *conditional distribution*. Such distributions can be evaluated for particular values $A = a, B=b$.
+
+### Marginalization
+
+Bayes' theorem is very useful if we want to infer one thing from the other, say cause and effect, but we only know the properties in the reverse direction. One important operation that we need, to make this work, is *marginalization*.
+It is the operation of determining $P(B)$ from $P(A,B)$. We can see that the probability of seeing $B$ amounts to accounting for all possible choices of $A$ and aggregating the joint probabilities over all of them:
+
+$$P(B) = \sum_{A} P(A,B),$$
+
+which is also called the *sum rule*.
+
+
+### Independence
 
 Another useful property to check for is *dependence* vs. *independence*.
-Independence is when the occurrence of one event does not reveal any information about the occurrence of the other. In this case $P(B \mid A) = P(B)$. Statisticians typically express this as $A \perp\!\!\!\perp B$. From Bayes' Theorem, it follows immediately that also $P(A \mid B) = P(A)$. In all other cases we call $A$ and $B$ dependent. For instance, two successive rolls of a die are independent. On the other hand, the position of a light switch and the brightness in the room are not (they are not perfectly deterministic, though, since we could always have a broken lightbulb, power failure, or a broken switch).
+Two random variables $A$ and $B$ are independent
+means that the occurrence of one event of $A$
+does not reveal any information about the occurrence of an event of $B$.
+In this case $P(B \mid A) = P(B)$. Statisticians typically express this as $A \perp\!\!\!\perp B$. From Bayes' theorem, it follows immediately that also $P(A \mid B) = P(A)$.
+In all the other cases we call $A$ and $B$ dependent. For instance, two successive rolls of a die are independent. In contrast, the position of a light switch and the brightness in the room are not (they are not perfectly deterministic, though, since we could always have a broken light bulb, power failure, or a broken switch).
+
+Since $P(A \mid B) = \frac{P(A, B)}{P(B)} = P(A)$ is equivalent to $P(A, B) = P(A)P(B)$, two random variables are independent if and only if their joint distribution is the product of their individual distributions.
+Likewise, two random variables $A$ and $B$ are *conditionally independent* given another random variable $C$
+if and only if $P(A, B \mid C) = P(A \mid C)P(B \mid C)$. This is expressed as $A \perp\!\!\!\perp B \mid C$.
+
+### Application
+
 
 Let us put our skills to the test. Assume that a doctor administers an AIDS test to a patient. This test is fairly accurate and it fails only with 1% probability if the patient is healthy by reporting him as diseased. Moreover,
 it never fails to detect HIV if the patient actually has it. We use $D$ to indicate the diagnosis and $H$ to denote the HIV status. Written as a table the outcome $P(D \mid H)$ looks as follows:
@@ -205,6 +234,7 @@ it never fails to detect HIV if the patient actually has it. We use $D$ to indic
 |Test negative|            0 |         0.99 |
 
 Note that the column sums are all one (but the row sums are not), since the conditional probability needs to sum up to $1$, just like the probability. Let us work out the probability of the patient having AIDS if the test comes back positive. Obviously this is going to depend on how common the disease is, since it affects the number of false alarms. Assume that the population is quite healthy, e.g., $P(\text{HIV positive}) = 0.0015$. To apply Bayes' Theorem, we need to determine
+
 $$\begin{aligned}
 P(\text{Test positive}) =& P(D=1 \mid H=0) P(H=0) + P(D=1
 \mid H=1) P(H=1) \\
@@ -219,27 +249,6 @@ $$\begin{aligned} P(H = 1 \mid D = 1) =& \frac{P(D=1 \mid H=1) P(H=1)}{P(D=1)} \
 
 In other words, there is only a 13.1% chance that the patient actually has AIDS, despite using a test that is 99% accurate. As we can see, statistics can be quite counterintuitive.
 
-
-### More on Conditional Probability
-
-![Intersection between $A$ and $B$](../img/intersect.svg)
-
-We will denote the probability of event $A$ and event $B$ as $P(A)$ and $P(B)$, respectively. The probability of the simultaneous occurrence of the two events is denoted as $P(A \cap B)$ or $P(A, B)$. In the figure above it is the shaded area. If $B$ has non-zero probability, the conditional probability of event $A$ given that $B$ has occurred is
-
-$$P(A \mid B) = \frac{P(A \cap B)}{P(B)}.$$
-
-That is,
-
-$$P(A \cap B) = P(B) P(A \mid B) = P(A) P(B \mid A).$$
-
-If
-
-$$P(A \cap B) = P(A) P(B),$$
-
-then $A$ and $B$ are said to be independent of each other.
-
-
-## Conditional independence
 What should a patient do upon receiving such terrifying news? Likely, he/she
 would ask the physician to administer another test to get clarity. The second
 test has different characteristics (it is not as good as the first one).
@@ -256,21 +265,34 @@ Unfortunately, the second test comes back positive, too. Let us work out the req
 * $P(D_1 = 1 \text{ and } D_2 = 1) = 0.0003 \cdot 0.9985 + 0.98 \cdot 0.0015 = 0.00176955$
 * $P(H = 1 \mid D_1 = 1 \text{ and } D_2 = 1) = \frac{0.98 \cdot 0.0015}{0.00176955} = 0.831$
 
-That is, the second test allowed us to gain much higher confidence that not all is well. Despite the second test being considerably less accurate than the first one, it still improved our estimate quite a bit. You might ask, *why couldn't we just run the first test a second time?* After all, the first test was more accurate. The reason is that we needed a second test whose result is *independent* of the first test (given the true diagnosis). In other words, we made the tacit assumption that $P(D_1, D_2 \mid H) = P(D_1 \mid H) P(D_2 \mid H)$. Statisticians call such random variables *conditionally independent*. This is expressed as $D_1 \perp\!\!\!\perp D_2  \mid H$.
+That is, the second test allowed us to gain much higher confidence that not all is well. Despite the second test being considerably less accurate than the first one, it still improved our estimate quite a bit. You might ask, *why couldn't we just run the first test a second time?* After all, the first test was more accurate. The reason is that we needed a second test whose result is *independent* of the first test (given the true diagnosis). 
 
 
 ## Expectation and Variance
 
-A random variable takes values that represent possible outcomes of an experiment. The expectation (or average) of the random variable $X$ is denoted as
+To summarize key characteristics of probability distributions,
+we need some measures.
+The *expectation* (or average) of the random variable $X$ is denoted as
 
-$$\mathbf{E}[X] = \sum_{x} x P(X = x).$$
+$$E[X] = \sum_{x} x P(X = x).$$
 
-In many cases we want to measure by how much the random variable $x$ deviates from its expectation. This can be quantified by the variance
+When the input of a function $f(x)$ is a random variable drawn from the distribution $P$ with different values $x$,
+the expectation of $f(x)$ is computed as
 
-$$\mathop{\mathrm{Var}}[X] = \mathbf{E}\left[(X - \mathbf{E}[X])^2\right] =
-\mathbf{E}[X^2] - \mathbf{E}^2[X].$$
+$$E_{x \sim P}[f(x)] = \sum_x f(x) P(x).$$
 
-Here the last equality follows from the linearity of expectation.
+
+In many cases we want to measure by how much the random variable $X$ deviates from its expectation. This can be quantified by the variance
+
+$$\mathrm{Var}[X] = E\left[(X - E[X])^2\right] =
+E[X^2] - E[X]^2.$$
+
+Its square root is called the *standard deviation*.
+The variance of a function of a random variable measures
+by how much the function deviates from the expectation of the function,
+as different values $x$ of the random variable are sampled from its distribution:
+
+$$\mathrm{Var}[f(x)] = E\left[\left(f(x) - E[f(x)]\right)^2\right].$$
 
 
 ## Summary
