@@ -11,22 +11,22 @@ Bayesian personalized ranking (BPR) is a pairwise personalized ranking loss that
 In formal, the training data is constructed by tuples in the form of $(u, i, j)$, which represents that the user $u$ prefers the item $i$ over the item $j$. The Bayesian formulation of BPR which aims to maximize the posterior probability is given below:
 
 $$
-p(\Theta | >_u )  \propto  p(>_u|\Theta) p(\Theta)
+p(\Theta \mid >_u )  \propto  p(>_u \mid \Theta) p(\Theta)
 $$
 
 Where $\Theta$ represents the parameters of an arbitrary recommendation model, $>_u$ represents the desired personalized total ranking of all items for user $u$. We can formultae the maximum posterior estimator to derive the generic optimization criterion for the personalized ranking task.
 
 $$
 \begin{aligned}
-\text{BPR-OPT} : &= \ln p(\Theta|>_u) \\
-         &= \ln p(>_u | \Theta) p(\Theta) \\
+\text{BPR-OPT} : &= \ln p(\Theta \mid >_u) \\
+         &= \ln p(>_u \mid \Theta) p(\Theta) \\
          &= \ln \prod_{(u, i, j \in D)} \sigma(\hat{y}_{ui} - \hat{y}_{uj}) p(\Theta) \\
          &= \sum_{(u, i, j \in D)} \ln \sigma(\hat{y}_{ui} - \hat{y}_{uj}) + \ln p(\Theta) \\
          &= \sum_{(u, i, j \in D)} \ln \sigma(\hat{y}_{ui} - \hat{y}_{uj}) - \lambda_\Theta \|\Theta \|^2
 \end{aligned}
 $$
 
-where $D := \{(u, i, j) | i \in I^+_u \wedge j \in I \backslash I^+_u \}$ is the training set, with $I^+_u$ denoting the items the user $u$ liked,  $I$ denoting all items, and $I \backslash I^+_u$ indicating all other items excluding items the user liked. $\hat{y}_{ui}$ and $\hat{y}_{uj}$ are the predicted scores of the user $u$ to item $i$ and $j$, respectively. The prior $p(\Theta)$ is a normal distribution with zero mean and variance-covariance matrix $\Sigma_\Theta$. Here, we let $\Sigma_\Theta = \lambda_\Theta I$. 
+where $D := \{(u, i, j) \mid i \in I^+_u \wedge j \in I \backslash I^+_u \}$ is the training set, with $I^+_u$ denoting the items the user $u$ liked,  $I$ denoting all items, and $I \backslash I^+_u$ indicating all other items excluding items the user liked. $\hat{y}_{ui}$ and $\hat{y}_{uj}$ are the predicted scores of the user $u$ to item $i$ and $j$, respectively. The prior $p(\Theta)$ is a normal distribution with zero mean and variance-covariance matrix $\Sigma_\Theta$. Here, we let $\Sigma_\Theta = \lambda_\Theta I$. 
 ![Illustration of Bayesian Personalized Ranking](../img/rec-ranking.svg)
 We will implement the base class  `mxnet.gluon.loss.Loss`and override the `forward` method to construct the Bayesian personalized ranking loss. We begin by importing the Loss class and the np module.
 
