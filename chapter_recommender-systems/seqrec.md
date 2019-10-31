@@ -1,12 +1,12 @@
 # Sequence-aware Recommender Systems
 
-Priorly, we abstract the recommendation task as a matrix completion problem without considering users' short-term behaviors. In this section, we will introduce a recommendation model that takes  the sequentially-ordered user interaction logs into account.  It is a sequence-aware recommender where the input is an ordered and often timestamped list of past user actions.  A number of recent literatures have demonstrated the usefulness of incorporating such information in modeling users' temporal behavioral patterns and discovering their interest drifts.  
+In previous sections, we abstract the recommendation task as a matrix completion problem without considering users' short-term behaviors. In this section, we will introduce a recommendation model that takes  the sequentially-ordered user interaction logs into account.  It is a sequence-aware recommender where the input is an ordered and often timestamped list of past user actions.  A number of recent literatures have demonstrated the usefulness of incorporating such information in modeling users' temporal behavioral patterns and discovering their interest drift.  
 
-The model we will introduce, Caser, short for convolutional sequence embedding recommendation model, adopts convolutional neural networks capture the dynamic pattern influences of users' recent activities. The main component of Caser consists of a horizontal convolutional network and a vertical convolutional network, aiming to uncover the union-level and point-level sequence patterns, respectively.  Point-level pattern indicates the impact of single item in the historical sequence on the target item, while union level pattern implies the influences of several previous actions on the subsequent target. For example, buying both milk and butter together leads to higher probability of buying flour than just buying one of them. Moreover, users' general interests, or long term preferences are also modeled in the last fully-connected layers, resulting in a more comprehensive interests unearthing. Details of the model are described as follows.
+The model we will introduce, Caser, short for convolutional sequence embedding recommendation model, adopts convolutional neural networks capture the dynamic pattern influences of users' recent activities. The main component of Caser consists of a horizontal convolutional network and a vertical convolutional network, aiming to uncover the union-level and point-level sequence patterns, respectively.  Point-level pattern indicates the impact of single item in the historical sequence on the target item, while union level pattern implies the influences of several previous actions on the subsequent target. For example, buying both milk and butter together leads to higher probability of buying flour than just buying one of them. Moreover, users' general interests, or long term preferences are also modeled in the last fully-connected layers, resulting in a more comprehensive modeling of user interests. Details of the model are described as follows.
 
-## Model Architectures 
+## Model Architectures
 
-In sequence-aware recommendation system, each user is associated with a sequence of soem items from the item set. Let $S^u = (S_1^u, ... S_{|S_u|}^u)$ denotes the ordered sequence. The goal of Caser is to recommend item by considering user general tastes as well as short-term intention. Suppose we take the previous $L$ items into consideration, an embeng matrix that represents the former interactions for time step $t$ can be constructed:
+In sequence-aware recommendation system, each user is associated with a sequence of some items from the item set. Let $S^u = (S_1^u, ... S_{|S_u|}^u)$ denotes the ordered sequence. The goal of Caser is to recommend item by considering user general tastes as well as short-term intention. Suppose we take the previous $L$ items into consideration, an embedding matrix that represents the former interactions for time step $t$ can be constructed:
 
 $$
 \mathbf{E}^{(u, t)} = [ \mathbf{q}_{S_{t-L}^u} , ...,  \mathbf{q}_{S_{t-2}^u}, \mathbf{q}_{S_{t-1}^u} ]^\top,
@@ -27,7 +27,7 @@ $$
 \mathbf{z} = \phi(\mathbf{W}[\mathbf{o}, \mathbf{o}']^\top + \mathbf{b}),
 $$
 
-where $\mathbf{W} \in \mathbb{R}^{k \times (d + kd')}$ is the weight matrix and $\mathbf{b} \in \mathbb{R}^k$ is the bias. The learned vector $\mathbf{z} \in \mathbb{R}^k$ is the representation of user's short-term intent. 
+where $\mathbf{W} \in \mathbb{R}^{k \times (d + kd')}$ is the weight matrix and $\mathbf{b} \in \mathbb{R}^k$ is the bias. The learned vector $\mathbf{z} \in \mathbb{R}^k$ is the representation of user's short-term intent.
 
 At last, the prediction function combines users' short-term and general taste together, which is defined as:
 
@@ -57,7 +57,7 @@ The following code implements the Caser model. It consists of a vertical convolu
 
 ```{.python .input  n=2}
 class Caser(nn.Block):
-    def __init__(self, num_factors, num_users, num_items, L=5, d=16, 
+    def __init__(self, num_factors, num_users, num_items, L=5, d=16,
                  d_prime=4, drop_ratio=0.05, **kwargs):
         super(Caser, self).__init__(**kwargs)
         self.P = nn.Embedding(num_users, num_factors)
@@ -73,7 +73,7 @@ class Caser(nn.Block):
             self.max_pool.add(nn.MaxPool1D(L - i + 1))
         # Fully-connected layer
         self.fc1_dim_v, self.fc1_dim_h = d_prime * num_factors, d * len(h)
-        self.fc = nn.Dense(in_units=d_prime * num_factors + d * L, 
+        self.fc = nn.Dense(in_units=d_prime * num_factors + d * L,
                            activation='relu', units=num_factors)
         self.Q_prime = nn.Embedding(num_items, num_factors * 2)
         self.b = nn.Embedding(num_items, 1)
@@ -102,7 +102,7 @@ class Caser(nn.Block):
 ```
 
 ## Sequential DataLoader
-To process the sequential interaction data, we need to reimplement the Dataset class. The following code creates a new dataset class named `SeqDataset`. In each sample, it outputs the user identity, her previous $L$ interacted items as a sequence and the next item she interacts as the target. The following figure demonstrates the data loading process for one user. Suppose that this user liked 8 movies, we organize these eight movies in chronological order. The lastest movie is left out as the test item. For the remaining seven movies, we can get three training samples, with each sample containing a sequence of five ($L=5$) movies and its subsequent item as the target item.
+To process the sequential interaction data, we need to reimplement the Dataset class. The following code creates a new dataset class named `SeqDataset`. In each sample, it outputs the user identity, her previous $L$ interacted items as a sequence and the next item she interacts as the target. The following figure demonstrates the data loading process for one user. Suppose that this user liked 8 movies, we organize these eight movies in chronological order. The latest movie is left out as the test item. For the remaining seven movies, we can get three training samples, with each sample containing a sequence of five ($L=5$) movies and its subsequent item as the target item.
 
 ![Illustration of the data generation process](../img/rec-seq-data.svg)
 
@@ -110,7 +110,7 @@ To process the sequential interaction data, we need to reimplement the Dataset c
 class SeqDataset(Dataset):
     def __init__(self, user_ids, item_ids, L, num_users, num_items):
         user_ids, item_ids = np.array(user_ids), np.array(item_ids)
-        sort_idx = np.array(sorted(range(len(user_ids)), 
+        sort_idx = np.array(sorted(range(len(user_ids)),
                                    key=lambda k: user_ids[k]))
         u_ids, i_ids = user_ids[sort_idx], item_ids[sort_idx]
         temp, u_ids = {}, u_ids.asnumpy()
@@ -118,9 +118,9 @@ class SeqDataset(Dataset):
         temp = sorted(temp.items(), key=lambda x: x[0])
         u_ids = np.array([i[0] for i in temp])
         idx = np.array([i[1][0] for i in temp])
-        self.ns = ns = int(sum([c - L if c >= L + 1 else 1 for c 
+        self.ns = ns = int(sum([c - L if c >= L + 1 else 1 for c
                                 in np.array([len(i[1]) for i in temp])]))
-        self.seq_items = np.zeros((ns,L)) 
+        self.seq_items = np.zeros((ns,L))
         self.seq_users = np.zeros(ns, dtype='int32')
         self.seq_tgt, self.test_seq = np.zeros((ns,1)),np.zeros((num_users,L))
         test_users, _uid = np.empty(num_users), None
@@ -157,15 +157,15 @@ Afterwards, we read and split the MovieLens 100K dataset in sequence-aware mode 
 ```{.python .input  n=4}
 TARGET_NUM, L, batch_size = 1, 5, 1024
 df, num_users, num_items = d2l.read_data_ml100k()
-train_data, test_data = d2l.split_data_ml100k(df, num_users, num_items, 
+train_data, test_data = d2l.split_data_ml100k(df, num_users, num_items,
                                               'seq-aware')
 users_train, items_train, ratings_train, candidates = d2l.load_data_ml100k(
     train_data, num_users, num_items, feedback="implicit" )
 users_test, items_test, ratings_test, test_iter = d2l.load_data_ml100k(
     test_data, num_users, num_items, feedback="implicit")
-train_seq_data = SeqDataset(users_train, items_train, L, num_users, 
+train_seq_data = SeqDataset(users_train, items_train, L, num_users,
                             num_items)
-train_iter = gluon.data.DataLoader(train_seq_data, batch_size, True, 
+train_iter = gluon.data.DataLoader(train_seq_data, batch_size, True,
                                    last_batch="rollover")
 test_seq_iter = train_seq_data.test_seq
 train_seq_data[0]
@@ -177,23 +177,23 @@ The training data structure is shown above. The first element is the user identi
 Now, let us train the model. We use the same setting as NeuMF, including learning rate, optimizer, and $k$, in the last section so that the results are comparable.
 
 ```{.python .input  n=5}
-ctx = d2l.try_all_gpus() 
+ctx = d2l.try_all_gpus()
 net = Caser(30, num_users, num_items, L)
 net.initialize(ctx=ctx, force_reinit=True, init=mx.init.Normal(0.01))
 lr, num_epochs, wd, optimizer = 0.001, 16, 1e-5, 'adam'
 loss = d2l.BPRLoss()
-trainer = gluon.Trainer(net.collect_params(), optimizer, 
+trainer = gluon.Trainer(net.collect_params(), optimizer,
                         {"learning_rate": lr, 'wd': wd})
 
-d2l.train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter, 
-                  num_users, num_items, num_epochs, ctx, d2l.evaluate_ranking, 
+d2l.train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
+                  num_users, num_items, num_epochs, ctx, d2l.evaluate_ranking,
                   d2l.negative_sampler, candidates, eval_step=5)
 ```
 
 ## Summary
 * Inferring a user's short-term and long-term interests can make prediction of the next item that she preferred more effectively.
-* Convolutional neural networks can be utilized to capture users' short-term interests from sequential interactions. 
+* Convolutional neural networks can be utilized to capture users' short-term interests from sequential interactions.
 
 ## Exercises
-* Do ablation study by removing one of the horizontal and vertical convolutional networks, which component is the more important ? 
-* Vary the hyper-parameter $L$, does longer historical interactions bring higher accuracy?
+* Conduct an ablation study by removing one of the horizontal and vertical convolutional networks, which component is the more important ?
+* Vary the hyper-parameter $L$. Does longer historical interactions bring higher accuracy?
