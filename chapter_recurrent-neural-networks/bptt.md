@@ -173,7 +173,3 @@ A number of things follow from this potentially very intimidating expression. Fi
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2366)
 
 ![](../img/qr_bptt.svg)
-
-Need to review:
-    
-* The approximation error is thus given by $\partial_h f(x_t, h_{t-1}, w) \partial_w h_{t-1}$ (multiplied by a product of  gradients involving $\partial_h f$).
