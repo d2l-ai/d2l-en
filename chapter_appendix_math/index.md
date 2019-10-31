@@ -21,6 +21,8 @@ Lastly, we turn to the topic of information theory, which is the mathematical st
 
 Taken together, these form the core of the mathematical concepts needed to begin down the path towards a deep understanding of ML models.
 
+This chapter is co-authored with Brent Werness and Rachel Hu, and they are the major contributors.
+
 ```toc
 :maxdepth: 2
 
