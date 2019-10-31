@@ -26,7 +26,7 @@ Problem 2: Create a 4x4 matrix of random values (where values are uniformly rand
 
 Problem 3: Create a 3x3x20 tensor such that at every x,y coordinate, moving through the z coordinate lists the [Fibonacci sequence](https://en.wikipedia.org/wiki/Fibonacci_number). So, at a z position of 0, the 3x3 matrix will be all 1s. At z-position 1, the 3x3 matrix will be all 1s. At z-position 2, the 3x3 matrix will be all 2s, at z-position 3, the 3x3 matrix will be all 3s and so forth.
 
-Hint: Create the first 2 matrices by hand and then use element-wise operations in a loop to construct the rest of the tensor. 
+Hint: Create the first 2 matrices by hand and then use elementwise operations in a loop to construct the rest of the tensor. 
 
 
 ```python

@@ -4,7 +4,7 @@ This section moves beyond explicit feedback, introducing the neural collaborativ
 
 ## The NeuMF model
 
-As aforementioned, NeuMF fuses two subnetworks. The GMF is a generic neural network version of matrix factorization where the input is the element-wise product of user and item latent factors. It consists of two neural layers:
+As aforementioned, NeuMF fuses two subnetworks. The GMF is a generic neural network version of matrix factorization where the input is the elementwise product of user and item latent factors. It consists of two neural layers:
 
 $$
 \mathbf{x} = \mathbf{p}_u \odot \mathbf{q}_i \\
