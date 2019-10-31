@@ -18,4 +18,6 @@ ranking
 neumf
 seqrec
 ctr
+fm
+deepfm
 ```
