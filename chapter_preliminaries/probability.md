@@ -29,18 +29,18 @@ But there is a key difference between the two cases. In this first case, the ima
 
 ## Basic Probability Theory
 
-Say that we cast a die and want to know what the chance is of seeing a $1$ rather than another digit. If the die is fair, all the $6$ outcomes $\mathcal{X} = \{1, \ldots, 6\}$ are equally likely to occur, and thus we would see a $1$ in $1$ out of $6$ cases. Formally we state that $1$ occurs with probability $\frac{1}{6}$.
+Say that we cast a die and want to know what the chance is of seeing a $1$ rather than another digit. If the die is fair, all the $6$ outcomes $\{1, \ldots, 6\}$ are equally likely to occur, and thus we would see a $1$ in one out of six cases. Formally we state that $1$ occurs with probability $\frac{1}{6}$.
 
 For a real die that we receive from a factory, we might not know those proportions and we would need to check whether it is tainted. The only way to investigate the die is by casting it many times and recording the outcomes. For each cast of the die, we will observe a value in $\{1, \ldots, 6\}$. Given these outcomes, we want to investigate the probability of observing each outcome.
 
 One natural approach for each value is to take the
 individual count for that value and to divide it by the total number of tosses.
-This gives us an *estimate* of the probability of a given event. The *law of
+This gives us an *estimate* of the probability of a given *event*. The *law of
 large numbers* tell us that as the number of tosses grows this estimate will draw closer and closer to the true underlying probability. Before going into the details of what is going here, let us try it out.
 
 To start, let us import the necessary packages.
 
-```{.python .input  n=13}
+```{.python .input  n=1}
 %matplotlib inline
 import d2l
 from mxnet import np, npx
@@ -62,7 +62,7 @@ To draw a single sample, we simply pass in a vector of probabilities.
 The output of the `np.random.multinomial` function is another vector of the same length:
 its value at index $i$ is the number of times the sampling outcome corresponds to $i$.
 
-```{.python .input  n=14}
+```{.python .input  n=2}
 fair_probs = [1.0 / 6] * 6
 np.random.multinomial(1, fair_probs)
 ```
@@ -74,13 +74,13 @@ do this with a Python `for` loop, so `random.multinomial` supports drawing
 multiple samples at once, returning an array of independent samples in any shape
 we might desire.
 
-```{.python .input  n=15}
+```{.python .input  n=3}
 np.random.multinomial(10, fair_probs)
 ```
 
 We can also conduct, say $3$, groups of experiments, where each group draws $10$ samples, all at once.
 
-```{.python .input}
+```{.python .input  n=4}
 counts = np.random.multinomial(10, fair_probs, size=3)
 counts
 ```
@@ -88,260 +88,266 @@ counts
 Now that we know how to sample rolls of a die, we can simulate 1000 rolls. We
 can then go through and count, after each of the 1000 rolls, how many times each
 number was rolled.
+Specifically, we calculate the relative frequency as the estimate of the true probability.
 
-```{.python .input  n=16}
+```{.python .input  n=5}
 # Store the results as 32-bit floats for division
 counts = np.random.multinomial(100, fair_probs).astype(np.float32)
-counts / 1000
+counts / 1000  # Reletive frequency as the estimate
 ```
 
-Because we generated the data from a fair die, we know that each number actually has probability $1/6$, roughly $0.167$, so the output estimates above look pretty good. We can also visualize how these probabilities converge over time towards reasonable estimates.
+Because we generated the data from a fair die, we know that each outcome has true probability $\frac{1}{6}$, roughly $0.167$, so the above output estimates look good. 
+
+We can also visualize how these probabilities converge over time towards the true probability.
 Let us conduct $500$ groups of experiments where each group draws $10$ samples.
 
-```{.python .input  n=18}
+```{.python .input  n=6}
 counts = np.random.multinomial(10, fair_probs, size=500)
 cum_counts = counts.astype(np.float32).cumsum(axis=0)
 estimates = cum_counts / cum_counts.sum(axis=1, keepdims=True)
 
 d2l.set_figsize((6, 4.5))
 for i in range(6):
-    d2l.plt.plot(estimates[:,i].asnumpy(), label=("P(die=" + str(i) +")"))
-d2l.plt.axhline(y=0.16666, color='black', linestyle='dashed')
+    d2l.plt.plot(estimates[:,i].asnumpy(), label=("P(die=" + str(i + 1) +")"))
+d2l.plt.axhline(y=0.167, color='black', linestyle='dashed')
+d2l.plt.gca().set_xlabel('Groups of experiments')
+d2l.plt.gca().set_ylabel('Estimated probability')
 d2l.plt.legend();
 ```
 
 Each solid curve corresponds to one of the six values of the die and gives our estimated probability that the die turns up that value as assessed after each group of experiments.
 The dashed black line gives the true underlying probability.
 As we get more data by conducting more experiments,
-the $6$ solid curves converge towards the true answer.
+the $6$ solid curves converge towards the true probability.
 
-In our example of casting a die, we introduced the notion of a **random variable**. A random variable, which we denote here as $X$ can be pretty much any quantity and is not deterministic. Random variables could take one value among a set of possibilities. We denote sets with brackets, e.g., $\{\mathrm{cat}, \mathrm{dog}, \mathrm{rabbit}\}$. The items contained in the set are called *elements*, and we can say that an element $x$ is *in* the set S, by writing $x \in S$. The symbol $\in$ is read as "in" and denotes membership. For instance, we could truthfully say $\mathrm{dog} \in \{\mathrm{cat}, \mathrm{dog}, \mathrm{rabbit}\}$. When dealing with the rolls of die, we are concerned with a variable $X \in \{1, 2, 3, 4, 5, 6\}$.
+### Axioms of Probability Theory
 
-Note that there is a subtle difference between discrete random variables, like the sides of a dice, and continuous ones, like the weight and the height of a person. There is little point in asking whether two people have exactly the same height. If we take precise enough measurements you will find that no two people on the planet have the exact same height. In fact, if we take a fine enough measurement, you will not have the same height when you wake up and when you go to sleep. So there is no purpose in asking about the probability
-that someone is $2.00139278291028719210196740527486202$ meters tall. Given the world population of humans the probability is virtually 0. It makes more sense in this case to ask whether someone's height falls into a given interval, say between 1.99 and 2.01 meters. In these cases we quantify the likelihood that we see a value as a *density*. The height of exactly 2.0 meters has no probability, but nonzero density. In the interval between any two different heights we have nonzero probability.
+When dealing with the rolls of a die,
+we call the set $\mathcal{S} = \{1, 2, 3, 4, 5, 6\}$ the *sample space* or *outcome space*, where each element is an *outcome*.
+An *event* is a set of outcomes from a given sample space.
+For instance, "seeing a $5$" ($\{5\}$) and "seeing an odd number" ($\{1, 3, 5\}$) are both valid events of rolling a die.
+Note that if the outcome of a random experiment is in event $\mathcal{A}$,
+then event $\mathcal{A}$ has occurred.
+That is to say, if $3$ dots faced up after rolling a die, since $3 \in \{1, 3, 5\}$,
+we can say that the event "seeing an odd number" has occurred.
+
+Formally, *probability* can be thought of a function that maps a set to a real value.
+The probability of an event $\mathcal{A}$ in the given sample space $\mathcal{S}$,
+denoted as $P(\mathcal{A})$, satisfies the following properties:
+
+* For any event $\mathcal{A}$, its probability is never negative, i.e., $P(\mathcal{A}) \geq 0$;
+* Probability of the entire sample space is $1$, i.e., $P(\mathcal{S}) = 1$;
+* For any countable sequence of events $\mathcal{A}_1, \mathcal{A}_2, \ldots$ that are *mutually exclusive* ($\mathcal{A}_i \cap \mathcal{A}_j = \emptyset$ for all $i \neq j$), the probability that any happens is equal to the sum of their individual probabilities, i.e., $P(\bigcup_{i=1}^{\infty} \mathcal{A}_i) = \sum_{i=1}^{\infty} P(\mathcal{A}_i)$.
+
+These are also the axioms of probability theory, proposed by Kolmogorov in 1933.
+Thanks to this axiom system, we can avoid any philosophical dispute on randomness;
+instead, we can reason rigorously with a mathematical language.
+For instance, by letting event $\mathcal{A}_1$ be the entire sample space and $\mathcal{A}_i = \emptyset$ for all $i > 1$, we can prove that $P(\emptyset) = 0$, i.e., the probability of an impossible event is $0$.
 
 
-There are a few important axioms of probability that you will want to remember:
+### Random Variables
 
-* For any event $z$, the probability is never negative, i.e., $P(Z=z) \geq 0$.
-* For any two events $Z=z$ and $X=x$ the union is no more likely than the sum of the individual events, i.e., $P(Z=z \cup X=x) \leq P(Z=z) + P(X=x)$.
-* For any random variable, the probabilities of all the values it can take must sum to 1, i.e., $\sum_{i=1}^n P(Z=z_i) = 1$.
-* For any two *mutually exclusive* events $Z=z$ and $X=x$, the probability that either happens is equal to the sum of their individual probabilities, that is $P(Z=z \cup X=x) = P(Z=z) + P(X=x)$.
+In our random experiment of casting a die, we introduced the notion of a *random variable*. A random variable can be pretty much any quantity and is not deterministic. It could take one value among a set of possibilities in a random experiment.
+Consider a random variable $X$ whose value is in the sample space $\mathcal{S} = \{1, 2, 3, 4, 5, 6\}$ of rolling a die. We can denote the event "seeing a $5$" as $\{X = 5\}$ or $X = 5$, and its probability as $P(\{X = 5\})$ or $P(X = 5)$.
+By $P(X = a)$, we make a distinction between the random variable $X$ and the values (e.g., $a$) that $X$ can take.
+However, such pedantry results in a cumbersome notation.
+For a compact notation, 
+on one hand, we can just denote $P(X)$ as the *distribution* over the random variable $X$:
+the distribution tells us the probability that $X$ takes any value.
+On the other hand,
+we can simply write $P(a)$ to denote the probability that a random variable takes the value $a$.
+Since an event in probability theory is a set of outcomes from the sample space,
+we can specify a range of values for a random variable to take.
+For example, $P(1 \leq X \leq 3)$ denotes the probability of the event $\{1 \leq X \leq 3\}$,
+which means $\{X = 1, 2, \text{or}, 3\}$. Equivalently, $P(1 \leq X \leq 3)$ represents the probability that the random variable $X$ can take a value from $\{1,2,3\}$.
 
-## Dealing with multiple random variables
+Note that there is a subtle difference between *discrete* random variables, like the sides of a die, and *continuous* ones, like the weight and the height of a person. There is little point in asking whether two people have exactly the same height. If we take precise enough measurements you will find that no two people on the planet have the exact same height. In fact, if we take a fine enough measurement, you will not have the same height when you wake up and when you go to sleep. So there is no purpose in asking about the probability
+that someone is $1.80139278291028719210196740527486202$ meters tall. Given the world population of humans the probability is virtually $0$. It makes more sense in this case to ask whether someone's height falls into a given interval, say between $1.79$ and $1.81$ meters. In these cases we quantify the likelihood that we see a value as a *density*. The height of exactly $1.80$ meters has no probability, but nonzero density. In the interval between any two different heights we have nonzero probability.
+In the rest of this section, we consider probability in discrete space.
+For probability over continuous random variables, you may refer to :numref:`sec_random_variables`.
+
+## Dealing with Multiple Random Variables
+
 Very often, we will want to consider more than one random variable at a time.
-For instance, we may want to model the relationship between diseases and symptoms. Given a disease and symptom, say 'flu' and 'cough', either may or may not occur in a patient with some probability. While we hope that the probability of both would be close to zero, we may want to estimate these probabilities and their relationships to each other so that we may apply our inferences to effect better medical care.
+For instance, we may want to model the relationship between diseases and symptoms. Given a disease and a symptom, say "flu" and "cough", either may or may not occur in a patient with some probability. While we hope that the probability of both would be close to zero, we may want to estimate these probabilities and their relationships to each other so that we may apply our inferences to effect better medical care.
 
 As a more complicated example, images contain millions of pixels, thus millions of random variables. And in many cases images will come with a
 label, identifying objects in the image. We can also think of the label as a
 random variable. We can even think of all the metadata as random variables
-such as location, time, aperture, focal length, ISO, focus distance, camera type, etc. All of these are random variables that occur jointly. When we deal with multiple random variables, there are several quantities of interest. The first is called the joint distribution $P(A, B)$. Given any elements $a$ and $b$, the joint distribution lets us answer, what is the probability that $A=a$ and $B=b$ simultaneously? Note that for any values $a$ and $b$, $P(A=a,B=b) \leq P(A=a)$.
+such as location, time, aperture, focal length, ISO, focus distance, and camera type.
+All of these are random variables that occur jointly. When we deal with multiple random variables, there are several quantities of interest.
 
-This has to be the case, since for $A$ and $B$ to happen, $A$ has to happen *and* $B$ also has to happen (and vice versa). Thus $A,B$ cannot be more likely than $A$ or $B$ individually. This brings us to an interesting ratio: $0 \leq \frac{P(A,B)}{P(A)} \leq 1$. We call this a **conditional probability**
-and denote it by $P(B | A)$, the probability that $B$ happens, provided that
-$A$ has happened.
+### Joint Probability
 
-Using the definition of conditional probabilities, we can derive one of the most useful and celebrated equations in statistics—Bayes' theorem.
-It goes as follows: By construction, we have that $P(A, B) = P(B | A) P(A)$. By symmetry, this also holds for $P(A,B) = P(A | B) P(B)$. Solving for one of the conditional variables we get:
+The first is called the *joint probability* $P(A = a, B=b)$. Given any values $a$ and $b$, the joint probability lets us answer, what is the probability that $A=a$ and $B=b$ simultaneously?
+Note that for any values $a$ and $b$, $P(A=a,B=b) \leq P(A=a)$.
+This has to be the case, since for $A=a$ and $B=b$ to happen, $A=a$ has to happen *and* $B=b$ also has to happen (and vice versa). Thus, $A=a$ and $B=b$ cannot be more likely than $A=a$ or $B=b$ individually.
 
-$$P(A | B) = \frac{P(B | A) P(A)}{P(B)}$$
 
-This is very useful if we want to infer one thing from another, say cause and effect but we only know the properties in the reverse direction. One important operation that we need, to make this work, is **marginalization**, i.e., the operation of determining $P(A)$ and $P(B)$ from $P(A,B)$. We can see that the probability of seeing $A$ amounts to accounting for all possible choices of $B$ and aggregating the joint probabilities over all of them, i.e.
+### Conditional Probability
 
-$$P(A) = \sum_{B'} P(A,B') \text{ and
-} P(B) = \sum_{A'} P(A',B)$$
+This brings us to an interesting ratio: $0 \leq \frac{P(A=a,B=b)}{P(A=a)} \leq 1$. We call this ratio a *conditional probability*
+and denote it by $P(B=b \mid A=a)$: it is the probability of $B=b$, provided that
+$A=a$ has occurred.
 
-Another useful property to check for is **dependence** vs. **independence**.
-Independence is when the occurrence of one event does not reveal any information about the occurrence of the other. In this case $P(B | A) = P(B)$. Statisticians typically express this as $A \perp\!\!\!\perp B$. From Bayes' Theorem, it follows immediately that also $P(A | B) = P(A)$. In all other cases we call $A$ and $B$ dependent. For instance, two successive rolls of a die are independent. On the other hand, the position of a light switch and the brightness in the room are not (they are not perfectly deterministic, though, since we could always have a broken lightbulb, power failure, or a broken switch).
+### Bayes' theorem
 
-Let us put our skills to the test. Assume that a doctor administers an AIDS test to a patient. This test is fairly accurate and it fails only with 1% probability if the patient is healthy by reporting him as diseased. Moreover,
-it never fails to detect HIV if the patient actually has it. We use $D$ to indicate the diagnosis and $H$ to denote the HIV status. Written as a table the outcome $P(D | H)$ looks as follows:
+Using the definition of conditional probabilities, we can derive one of the most useful and celebrated equations in statistics: *Bayes' theorem*.
+It goes as follows.
+By construction, we have the *multiplication rule* that $P(A, B) = P(B \mid A) P(A)$. By symmetry, this also holds for $P(A,B) = P(A \mid B) P(B)$. Assume that $P(B) > 0$. Solving for one of the conditional variables we get
 
-|outcome| HIV positive | HIV negative |
-|:------------|-------------:|-------------:|
-|Test positive|            1 |         0.01 |
-|Test negative|            0 |         0.99 |
+$$P(A \mid B) = \frac{P(B \mid A) P(A)}{P(B)}.$$
 
-Note that the column sums are all one (but the row sums are not), since the conditional probability needs to sum up to $1$, just like the probability. Let us work out the probability of the patient having AIDS if the test comes back positive. Obviously this is going to depend on how common the disease is, since it affects the number of false alarms. Assume that the population is quite healthy, e.g., $P(\text{HIV positive}) = 0.0015$. To apply Bayes' Theorem, we need to determine
+Note that here we use the more compact notation where $P(A,B)$ is a *joint distribution* and $P(A \mid B)$ is a *conditional distribution*. Such distributions can be evaluated for particular values $A = a, B=b$.
+
+### Marginalization
+
+Bayes' theorem is very useful if we want to infer one thing from the other, say cause and effect, but we only know the properties in the reverse direction, as we will see later in this section. One important operation that we need, to make this work, is *marginalization*.
+It is the operation of determining $P(B)$ from $P(A,B)$. We can see that the probability of $B$ amounts to accounting for all possible choices of $A$ and aggregating the joint probabilities over all of them:
+
+$$P(B) = \sum_{A} P(A,B),$$
+
+which is also known as the *sum rule*. The probability or distribution as a result of marginalization is called a *marginal probability* or a *marginal distribution*.
+
+
+### Independence
+
+Another useful property to check for is *dependence* vs. *independence*.
+Two random variables $A$ and $B$ are independent
+means that the occurrence of one event of $A$
+does not reveal any information about the occurrence of an event of $B$.
+In this case $P(B \mid A) = P(B)$. Statisticians typically express this as $A \perp\!\!\!\perp B$. From Bayes' theorem, it follows immediately that also $P(A \mid B) = P(A)$.
+In all the other cases we call $A$ and $B$ dependent. For instance, two successive rolls of a die are independent. In contrast, the position of a light switch and the brightness in the room are not (they are not perfectly deterministic, though, since we could always have a broken light bulb, power failure, or a broken switch).
+
+Since $P(A \mid B) = \frac{P(A, B)}{P(B)} = P(A)$ is equivalent to $P(A, B) = P(A)P(B)$, two random variables are independent if and only if their joint distribution is the product of their individual distributions.
+Likewise, two random variables $A$ and $B$ are *conditionally independent* given another random variable $C$
+if and only if $P(A, B \mid C) = P(A \mid C)P(B \mid C)$. This is expressed as $A \perp\!\!\!\perp B \mid C$.
+
+### Application
+:label:`subsec_probability_hiv_app`
+
+Let us put our skills to the test. Assume that a doctor administers an AIDS test to a patient. This test is fairly accurate and it fails only with $1\%$ probability if the patient is healthy but reporting him as diseased. Moreover,
+it never fails to detect HIV if the patient actually has it. We use $D_1$ to indicate the diagnosis ($1$ if positive and $0$ if negative) and $H$ to denote the HIV status ($1$ if positive and $0$ if negative).
+:numref:`conditional_prob_D1` lists such conditional probability.
+
+:Conditional probability of $P(D_1 \mid H)$.
+
+| Conditional probability | $H=1$ | $H=0$ |
+|---|---|---|
+|$P(D_1 = 1 \mid H)$|            1 |         0.01 |
+|$P(D_1 = 0 \mid H)$|            0 |         0.99 |
+:label:`conditional_prob_D1`
+
+Note that the column sums are all $1$ (but the row sums are not), since the conditional probability needs to sum up to $1$, just like the probability. Let us work out the probability of the patient having AIDS if the test comes back positive, i.e., $P(H = 1 \mid D_1 = 1)$. Obviously this is going to depend on how common the disease is, since it affects the number of false alarms. Assume that the population is quite healthy, e.g., $P(H=1) = 0.0015$. To apply Bayes' Theorem, we need to apply marginalization and the multiplication rule to determine
+
 $$\begin{aligned}
-P(\text{Test positive}) =& P(D=1 | H=0) P(H=0) + P(D=1
-| H=1) P(H=1) \\
-=& 0.01 \cdot 0.9985 + 1 \cdot 0.0015 \\
-=& 0.011485
+&P(D_1 = 1) \\
+=& P(D_1=1, H=0) + P(D_1=1, H=1)  \\
+=& P(D_1=1 \mid H=0) P(H=0) + P(D_1=1 \mid H=1) P(H=1) \\
+=& 0.011485.
 \end{aligned}
 $$
 
 Thus, we get
 
-$$\begin{aligned} P(H = 1 | D = 1) =& \frac{P(D=1 | H=1) P(H=1)}{P(D=1)} \\ =& \frac{1 \cdot 0.0015}{0.011485} \\ =& 0.131 \end{aligned} $$
+$$\begin{aligned}
+&P(H = 1 \mid D_1 = 1)\\ =& \frac{P(D_1=1 \mid H=1) P(H=1)}{P(D_1=1)} \\ =& 0.1306 \end{aligned}.$$
 
-In other words, there is only a 13.1% chance that the patient actually has AIDS, despite using a test that is 99% accurate. As we can see, statistics can be quite counterintuitive.
+In other words, there is only a 13.06% chance that the patient actually has AIDS, despite using a very accurate test. As we can see, probability can be quite counterintuitive.
 
-## Conditional independence
-What should a patient do upon receiving such terrifying news? Likely, he/she
+What should a patient do upon receiving such terrifying news? Likely, the patient
 would ask the physician to administer another test to get clarity. The second
-test has different characteristics (it is not as good as the first one).
-
-|outcome |  HIV positive |  HIV negative |
-|:------------|--------------:|--------------:|
-|Test positive|          0.98 |          0.03 |
-|Test negative|          0.02 |          0.97 |
-
-Unfortunately, the second test comes back positive, too. Let us work out the requisite probabilities to invoke Bayes' Theorem.
-
-* $P(D_1 = 1 \text{ and } D_2 = 1 | H = 0) = 0.01 \cdot 0.03 = 0.0003$
-* $P(D_1 = 1 \text{ and } D_2 = 1 | H = 1) = 1 \cdot 0.98 = 0.98$
-* $P(D_1 = 1 \text{ and } D_2 = 1) = 0.0003 \cdot 0.9985 + 0.98 \cdot 0.0015 = 0.00176955$
-* $P(H = 1 | D_1 = 1 \text{ and } D_2 = 1) = \frac{0.98 \cdot 0.0015}{0.00176955} = 0.831$
-
-That is, the second test allowed us to gain much higher confidence that not all is well. Despite the second test being considerably less accurate than the first one, it still improved our estimate quite a bit. You might ask, *why couldn't we just run the first test a second time?* After all, the first test was more accurate. The reason is that we needed a second test whose result is *independent* of the first test (given the true diagnosis). In other words, we made the tacit assumption that $P(D_1, D_2 | H) = P(D_1 | H) P(D_2 | H)$. Statisticians call such random variables **conditionally independent**. This is expressed as $D_1 \perp\!\!\!\perp D_2  | H$.
-
-## Sampling
-
-Often, when working with probabilistic models, we will want not just to estimate distributions from data, but also to generate data by sampling from distributions. One of the simplest ways to sample random numbers is to invoke the `random` method from Python's `random` package.
-
-```{.python .input  n=7}
-[random.random() for _ in range(10)]
-```
-
-### Uniform Distribution
-
-These numbers likely *appear* random. Note that their range is between 0 and 1 and they are evenly distributed. Because these numbers are generated by default from the uniform distribution, there should be no two sub-intervals of $[0,1]$ of equal size where numbers are more likely to lie in one interval than the other. In other words, the chances of any of these numbers to fall into the interval $[0.2,0.3)$ are the same as in the interval $[.593264, .693264)$. In fact, these numbers are pseudo-random, and the computer generates them by first producing a random integer and then dividing it by its maximum range. To sample random integers directly, we can run the following snippet, which generates integers in the range between 1 and 100.
-
-```{.python .input  n=8}
-[random.randint(1, 100) for _ in range(10)]
-```
-
-How might we check that ``randint`` is really uniform? Intuitively, the best
-strategy would be to run sampler many times, say 1 million, and then count the
-number of times it generates each value to ensure that the results are approximately uniform.
-
-```{.python .input  n=9}
-counts = np.zeros(100)
-fig, axes = d2l.plt.subplots(2, 2, sharex=True)
-axes = axes.flatten()
-# Mangle subplots such that we can index them in a linear fashion rather than
-# a 2D grid
-for i in range(1, 100001):
-    counts[random.randint(0, 99)] += 1
-    if i in [100, 1000, 10000, 100000]:
-        axes[int(np.log10(i))-2].bar(np.arange(1, 101).asnumpy(), counts.asnumpy())
-```
-
-We can see from these figures that the initial number of counts looks *strikingly* uneven. If we sample fewer than 100 draws from a distribution over
-100 outcomes this should be expected. But even for 1000 samples there is a
-significant variability between the draws. What we are really aiming for is a
-situation where the probability of drawing a number $x$ is given by $p(x)$.
-
-### The categorical distribution
-
-Drawing from a uniform distribution over a set of 100 outcomes is simple. But what if we have nonuniform probabilities? Let us start with a simple case, a biased coin which comes up heads with probability 0.35 and tails with probability 0.65. A simple way to sample from that is to generate a uniform random variable over $[0,1]$ and if the number is less than $0.35$, we output heads and otherwise we generate tails. Let us try this out.
-
-```{.python .input  n=12}
-# Number of samples
-n = 1000000
-y = np.random.uniform(0, 1, n)
-x = np.arange(1, n+1)
-# Count number of occurrences and divide by the number of total draws
-p0 = np.cumsum(y < 0.35) / x
-p1 = np.cumsum(y >= 0.35) / x
-
-d2l.plt.semilogx(x.asnumpy(), p0.asnumpy())
-d2l.plt.semilogx(x.asnumpy(), p1.asnumpy())
-d2l.plt.axhline(y=0.35, color='black', linestyle='dashed')
-d2l.plt.axhline(y=0.65, color='black', linestyle='dashed');
-```
-
-As we can see, on average, this sampler will generate 35% zeros and 65% ones.
-Now what if we have more than two possible outcomes? We can simply generalize
-this idea as follows. Given any probability distribution, e.g., $p = [0.1, 0.2, 0.05, 0.3, 0.25, 0.1]$ we can compute its cumulative distribution (python's `cumsum` will do this for you) $F = [0.1, 0.3, 0.35, 0.65, 0.9, 1]$. Once we have this we draw a random variable $x$ from the uniform distribution $U[0,1]$ and then find the interval where $F[i-1] \leq x < F[i]$. We then return $i$ as the sample. By construction, the chances of hitting interval $[F[i-1], F[i])$ has probability $p(i)$.
-
-Note that there are many more efficient algorithms for sampling than the one above. For instance, binary search over $F$ will run in $O(\log n)$ time for $n$ random variables. There are even more clever algorithms, such as the [Alias
-Method](https://en.wikipedia.org/wiki/Alias_method) to sample in constant time,
-after $O(n)$ preprocessing.
-
-### The Normal distribution
-
-The standard Normal distribution (aka the standard Gaussian distribution) is given by $p(x) = \frac{1}{\sqrt{2 \pi}} \exp\left(-\frac{1}{2} x^2\right)$. Let us plot it to get a feel for it.
-
-```{.python .input}
-x = np.arange(-10, 10, 0.01)
-p = (1/np.sqrt(2 * np.pi)) * np.exp(-0.5 * x**2)
-d2l.plt.plot(x.asnumpy(), p.asnumpy());
-```
-
-Sampling from this distribution is less trivial. First off, the support is
-infinite, that is, for any $x$ the density $p(x)$ is positive. Secondly, the
-density is nonuniform. There are many tricks for sampling from it - the key idea in all algorithms is to stratify $p(x)$ in such a way as to map it to the
-uniform distribution $U[0,1]$. One way to do this is with the probability
-integral transform.
-
-Denote by $F(x) = \int_{-\infty}^x p(z) dz$ the cumulative distribution function (CDF) of $p$. This is in a way the continuous version of the cumulative sum that we used previously. In the same way we can now define the inverse map $F^{-1}(\xi)$, where $\xi$ is drawn uniformly. Unlike previously where we needed to find the correct interval for the vector $F$ (i.e., for the piecewise constant function), we now invert the function $F(x)$.
-
-In practice, this is slightly more tricky since inverting the CDF is hard in the case of a Gaussian. It turns out that the *twodimensional* integral is much easier to deal with, thus yielding two normal random variables than one, albeit at the price of two uniformly distributed ones. For now, suffice it to say that there are built-in algorithms to address this.
-
-The normal distribution has yet another desirable property. In a way all distributions converge to it, if we only average over a sufficiently large number of draws from any other distribution. To understand this in a bit more detail, we need to introduce three important things: expected values, means and variances.
-
-* The expected value $\mathbf{E}_{x \sim p(x)}[f(x)]$ of a function $f$ under a distribution $p$ is given by the integral $\int_x p(x) f(x) dx$. That is, we average over all possible outcomes, as given by $p$.
-* A particularly important expected value is
-that for the function $f(x) = x$, i.e., $\mu := \mathbf{E}_{x \sim p(x)}[x]$. It
-provides us with some idea about the typical values of $x$.
-* Another important quantity is the variance, i.e., the typical deviation from the mean $\sigma^2 := \mathbf{E}_{x \sim p(x)}[(x-\mu)^2]$. Simple math shows (check it as an exercise) that $\sigma^2 = \mathbf{E}_{x \sim p(x)}[x^2] - \mathbf{E}^2_{x \sim p(x)}[x]$.
-
-The above allows us to change both mean and variance of random variables. Quite obviously for some random variable $x$ with mean $\mu$, the random variable $x + c$ has mean $\mu + c$. Moreover, $\gamma x$ has the variance $\gamma^2 \sigma^2$. Applying this to the normal distribution we see that one with mean $\mu$ and variance $\sigma^2$ has the form $p(x) = \frac{1}{\sqrt{2 \sigma^2 \pi}} \exp\left(-\frac{1}{2 \sigma^2} (x-\mu)^2\right)$. Note the scaling factor $\frac{1}{\sigma}$—it arises from the fact that if we stretch the distribution by $\sigma$, we need to lower it by $\frac{1}{\sigma}$ to retain the same probability mass (i.e., the weight under the distribution always needs to integrate out to 1).
-
-Now we are ready to state one of the most fundamental theorems in statistics, the [Central Limit Theorem](https://en.wikipedia.org/wiki/Central_limit_theorem). It states that for sufficiently well-behaved random variables, in particular random variables with well-defined mean and variance, the sum tends toward a normal distribution. To get some idea, let us repeat the experiment described in the beginning, but now using random variables with integer values of $\{0, 1, 2\}$.
-
-```{.python .input}
-# Generate 10 random sequences of 10,000 uniformly distributed random variables
-tmp = np.random.uniform(size=(10000, 10))
-x = 1.0 * (tmp > 0.3) + 1.0 * (tmp > 0.8)
-mean = 1 * 0.5 + 2 * 0.2
-variance = 1 * 0.5 + 4 * 0.2 - mean**2
-print('mean {}, variance {}'.format(mean, variance))
-
-# Cumulative sum and normalization
-y = np.arange(1,10001).reshape(10000,1)
-z = np.cumsum(x,axis=0) / y
-
-for i in range(10):
-    d2l.plt.semilogx(y.asnumpy(), z[:,i].asnumpy())
-
-d2l.plt.semilogx(
-    y.asnumpy(), ((variance**0.5) * np.power(y,-0.5) + mean).asnumpy(),'r')
-d2l.plt.semilogx(
-    y.asnumpy(), (-(variance**0.5) * np.power(y,-0.5) + mean).asnumpy(),'r');
-```
-
-This looks very similar to the initial example, at least in the limit of averages of large numbers of variables. This is confirmed by theory. Denote by
-mean and variance of a random variable the quantities
-
-$$\mu[p] := \mathbf{E}_{x \sim p(x)}[x] \text{ and } \sigma^2[p] := \mathbf{E}_{x \sim p(x)}[(x - \mu[p])^2]$$
-
-Then we have that $\lim_{n\to \infty} \frac{1}{\sqrt{n}} \sum_{i=1}^n \frac{x_i - \mu}{\sigma} \to \mathcal{N}(0, 1)$. In other words, regardless of what we started out with, we will always converge to a Gaussian. This is one of the reasons why Gaussians are so popular in statistics.
+test has different characteristics and it is not as good as the first one, as shown in :numref:`conditional_prob_D2`.
 
 
-### More distributions
+:Conditional probability of $P(D_2 \mid H)$.
 
-Many more useful distributions exist. If you are interested in going deeper, we recommend consulting a dedicated book on statistics or looking up some common distributions on Wikipedia for further detail. Some important distirbutions to be aware of include:
+| Conditional probability | $H=1$ | $H=0$ |
+|---|---|---|
+|$P(D_2 = 1 \mid H)$|            0.98 |         0.03 |
+|$P(D_2 = 0 \mid H)$|            0.02 |         0.97 |
+:label:`conditional_prob_D2`
 
-* **Binomial Distribution** It is used to describe the distribution over multiple draws from the same distribution, e.g., the number of heads when tossing a biased coin (i.e., a coin with probability $\pi \in [0, 1]$ of returning heads) 10 times. The binomial probability is given by $p(x) = {n \choose x} \pi^x (1-\pi)^{n-x}$.
-* **Multinomial Distribution** Often, we are concerned with more than two
-outcomes, e.g., when rolling a dice multiple times. In this case, the
-distribution is given by $p(x) = \frac{n!}{\prod_{i=1}^k x_i!} \prod_{i=1}^k \pi_i^{x_i}$.
-* **Poisson Distribution** This distribution models the occurrence of point events that happen with a given rate, e.g., the number of raindrops arriving within a given amount of time in an area (weird fact - the number of Prussian soldiers being killed by horses kicking them followed that distribution). Given a rate $\lambda$, the number of occurrences is given by $p(x) = \frac{1}{x!} \lambda^x e^{-\lambda}$.
-* **Beta, Dirichlet, Gamma, and Wishart Distributions** They are what statisticians call *conjugate* to the Binomial, Multinomial, Poisson and Gaussian respectively. Without going into detail, these distributions are often used as priors for coefficients of the latter set of distributions, e.g., a Beta distribution as a prior for modeling the probability for binomial outcomes.
+Unfortunately, the second test comes back positive, too. Let us work out the requisite probabilities to invoke Bayes' Theorem by assuming the conditional independence:
 
+$$\begin{aligned}
+&P(D_1 = 1, D_2 = 1 \mid H = 0) \\
+=& P(D_1 = 1 \mid H = 0) P(D_2 = 1 \mid H = 0)  \\
+=& 0.0003,
+\end{aligned}
+$$
+
+$$\begin{aligned}
+&P(D_1 = 1, D_2 = 1 \mid H = 1) \\
+=& P(D_1 = 1 \mid H = 1) P(D_2 = 1 \mid H = 1)  \\
+=& 0.98.
+\end{aligned}
+$$
+
+Now we can apply marginalization and the multiplication rule:
+
+$$\begin{aligned}
+&P(D_1 = 1, D_2 = 1) \\
+=& P(D_1 = 1, D_2 = 1, H = 0) + P(D_1 = 1, D_2 = 1, H = 1)  \\
+=& P(D_1 = 1, D_2 = 1 \mid H = 0)P(H=0) + P(D_1 = 1, D_2 = 1 \mid H = 1)P(H=1)\\
+=& 0.00176955.
+\end{aligned}
+$$
+
+In the end, the probability of the patient having AIDS given both positive tests is
+
+$$\begin{aligned}
+&P(H = 1 \mid D_1 = 1, D_2 = 1)\\ 
+=& \frac{P(D_1 = 1, D_2 = 1 \mid H=1) P(H=1)}{P(D_1 = 1, D_2 = 1)} \\ 
+=& 0.8307.
+\end{aligned}
+$$
+
+That is, the second test allowed us to gain much higher confidence that not all is well. Despite the second test being considerably less accurate than the first one, it still significantly improved our estimate.
+
+
+
+## Expectation and Variance
+
+To summarize key characteristics of probability distributions,
+we need some measures.
+The *expectation* (or average) of the random variable $X$ is denoted as
+
+$$E[X] = \sum_{x} x P(X = x).$$
+
+When the input of a function $f(x)$ is a random variable drawn from the distribution $P$ with different values $x$,
+the expectation of $f(x)$ is computed as
+
+$$E_{x \sim P}[f(x)] = \sum_x f(x) P(x).$$
+
+
+In many cases we want to measure by how much the random variable $X$ deviates from its expectation. This can be quantified by the variance
+
+$$\mathrm{Var}[X] = E\left[(X - E[X])^2\right] =
+E[X^2] - E[X]^2.$$
+
+Its square root is called the *standard deviation*.
+The variance of a function of a random variable measures
+by how much the function deviates from the expectation of the function,
+as different values $x$ of the random variable are sampled from its distribution:
+
+$$\mathrm{Var}[f(x)] = E\left[\left(f(x) - E[f(x)]\right)^2\right].$$
 
 
 ## Summary
 
-So far, we covered probabilities, independence, conditional independence, and how to use this to draw some basic conclusions. We also introduced some fundamental probability distributions and demonstrated how to sample from them using Apache MXNet. This is already a powerful bit of knowledge, and by itself a sufficient set of tools for developing some classic machine learning models. In the next section, we will see how to operationalize this knowlege to build your first machine learning model: the Naive Bayes classifier.
+* We can use MXNet to sample from probability distributions.
+* We can analyze multiple random variables using joint distribution, conditional distribution, Bayes' theorem, marginalization, and independence assumptions.  
+* Expectation and variance offer useful measures to summarize key characteristics of probability distributions.
+
 
 ## Exercises
 
-1. Given two events with probability $P(A)$ and $P(B)$, compute upper and lower bounds on $P(A \cup B)$ and $P(A \cap B)$. Hint - display the situation using a [Venn Diagram](https://en.wikipedia.org/wiki/Venn_diagram).
-1. Assume that we have a sequence of events, say $A$, $B$ and $C$, where $B$ only depends on $A$ and $C$ only on $B$, can you simplify the joint probability? Hint - this is a [Markov Chain](https://en.wikipedia.org/wiki/Markov_chain).
+1. We conducted $m=500$ groups of experiments where each group draws $n=10$ samples. Vary $m$ and $n$. Observe and analyze the experimental results.
+1. Given two events with probability $P(\mathcal{A})$ and $P(\mathcal{B})$, compute upper and lower bounds on $P(\mathcal{A} \cup \mathcal{B})$ and $P(\mathcal{A} \cap \mathcal{B})$. (Hint: display the situation using a [Venn Diagram](https://en.wikipedia.org/wiki/Venn_diagram).)
+1. Assume that we have a sequence of random variables, say $A$, $B$, and $C$, where $B$ only depends on $A$, and $C$ only depends on $B$, can you simplify the joint probability $P(A, B, C)$? (Hint: this is a [Markov Chain](https://en.wikipedia.org/wiki/Markov_chain).)
+1. In :numref:`subsec_probability_hiv_app`, the first test is more accurate. Why not just run the first test a second time?
+
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2319)
 

@@ -36,7 +36,7 @@
         * training/testing/validation dataset
     * Distinguish：
         * hyperparameter vs parameter
-        * mini-batch stochastic gradient descent vs stochastic gradient descent
+        * minibatch stochastic gradient descent vs stochastic gradient descent
     * List
         * https://github.com/mli/gluon-tutorials-zh/blob/master/TERMINOLOGY.md
 
@@ -145,9 +145,40 @@
 * https://www.the-qrcode-generator.com/
     * 75pixel, SVG
 
-## References
+## Citations
 
-* The bibfile is `d2l.bib` on the root folder
-* Use bibtool generate consistent keys, install it by * `brew install bib-tool`
-* Then after inserting entry into `d2l.bib`, run
-  `bibtool -f "%3n(author).%d(year)" d2l.bib -o d2l.bib`
+
+1. Run `pip install git+https://github.com/d2l-ai/d2l-book`
+1. Use bibtool to generate consistent keys for bibtex entries. Install it by `brew install bib-tool`
+1. Add an bibtex entry to `d2l.bib` on the root directory. Say the original entry is
+```
+@article{wood2011sequence,
+  title={The sequence memoizer},
+  author={Wood, Frank and Gasthaus, Jan and Archambeau, C{\'e}dric and James, Lancelot and Teh, Yee Whye},
+  journal={Communications of the ACM},
+  volume={54},
+  number={2},
+  pages={91--98},
+  year={2011},
+  publisher={ACM}
+}
+```
+4. Run `bibtool -f "%3n(author).%d(year)" d2l.bib -o d2l.bib`. Now the added entry will have consistent keys:
+```
+@Article{	  Wood.Gasthaus.Archambeau.ea.2011,
+  title		= {The sequence memoizer},
+  author	= {Wood, Frank and Gasthaus, Jan and Archambeau, C{\'e}dric
+		  and James, Lancelot and Teh, Yee Whye},
+  journal	= {Communications of the ACM},
+  volume	= {54},
+  number	= {2},
+  pages		= {91--98},
+  year		= {2011},
+  publisher	= {ACM}
+}
+```
+5. In the text, use the following to cite the added paper:
+```
+:cite:`Wood.Gasthaus.Archambeau.ea.2011` 
+```
+

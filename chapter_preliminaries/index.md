@@ -29,7 +29,7 @@ Next, machine learning is concerned with making predictions:
 what is the likely value of some unknown attribute,
 given the information that we observe?
 To reason rigorously under uncertainty
-we will need to invoke the language of probability and statistics.
+we will need to invoke the language of probability.
 
 In the end, the official documentation provides
 plenty of descriptions and examples that are beyond this book.

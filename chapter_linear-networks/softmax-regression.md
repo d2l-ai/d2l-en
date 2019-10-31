@@ -173,8 +173,8 @@ where ${\hat{\mathbf{y}}}^{(i)} = \mathrm{softmax}({\mathbf{o}}^{(i)})$.
 ### Vectorization for Minibatches
 
 To improve computational efficiency and take advantage of GPUs, 
-we typically carry out vector calculations for mini-batches of data. 
-Assume that we are given a mini-batch $\mathbf{X}$ of examples 
+we typically carry out vector calculations for minibatches of data. 
+Assume that we are given a minibatch $\mathbf{X}$ of examples 
 with dimensionality $d$ and batch size $n$. 
 Moreover, assume that we have $q$ categories (outputs). 
 Then the minibatch features $\mathbf{X}$ are in $\mathbb{R}^{n \times d}$,

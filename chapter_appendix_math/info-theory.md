@@ -1,14 +1,14 @@
 # Information Theory
 :label:`sec_information_theory`
 
-For thousnads of years, we are submerging in a world of information. From Shakespeare’s Sonnet to researchers' paper on Cornell ArXiv, from Van Gogh's printing Starry Night to Beethoven's music Symphony No. 5, from the first programming language Plankalkül to the state-of-the-art machine learning algorithms. No matter what are the format of these information, everything follows the rule of information theory for millennium of years. With information theory, we can measure and compare how much information is presented in different signals. In this section, we will illustrate the fundamental concepts of information theory and its applications.
+Dataism believes that the universe is overflowing with information, from the first mystery microbe on the earth to the Homo sapiens that emerged millions year ago, from the famous cosmological model Big Bang theory to Hawking radiation released by black holes. Even if we narrow our scope down to the earth, information flow builds bridge over disciplinary rifts: from Shakespeare’s Sonnet to researchers’ paper on Cornell ArXiv, from Van Gogh’s printing Starry Night to Beethoven’s music Symphony No. 5, from the first programming language Plankalkül to the state-of-the-art machine learning algorithms. No matter what are the format of these information, everything follows the rule of information theory for millennium of years. With information theory, we can measure and compare how much information is presented in different signals. In this section, we will illustrate the fundamental concepts of information theory and its applications.
 
-Before we get started, let us understand the relationship between machine learning and information theory. While machine learning is aimed at extracting interesting signals from data and making critical predictions, information theory is a field of study about encoding, decoding, transmitting, and manipulating information. As a result, information theory provides a strong backbone of fundamental machine learning. For example, cross entropy loss in :numref:`sec_softmax` is used as an objective function in many machine learning algorithms. Such a loss is a direct application of information theory. 
+Before we get started, let us understand the relationship between machine learning and information theory. While the forner is aimed at extracting interesting signals from data and making critical predictions, information theory is a field of study about encoding, decoding, transmitting, and manipulating information. As a result, information theory provides a strong backbone of fundamental machine learning. For example, cross entropy loss in :numref:`sec_softmax` is used as an objective function in many machine learning algorithms. Such a loss is a direct application of information theory. 
 
 
 ## Information
  
-Let us start with the "soul" of information theory - information. *Information* can be encoded in anything with a particular sequence of one or more encoding formats. Rather than caring about the knowledge, information represents the degree of surprise or the abstract possibility of the event. For example, if we want to elucidate an unusual event, we need a lot information. Hence, unriddling this event can help us gain plenty of information. Whereas, for a common event, we may not need much information since we already know it pretty well.
+Let us start with the "soul" of information theory - information. *Information* (or *data*) can be encoded in anything with a particular sequence of one or more encoding formats. Rather than caring about the knowledge, information represents the degree of surprise or the abstract possibility of the event. For example, if we want to elucidate an unusual event, we need a lot information. Hence, unriddling this event can help us gain plenty of information. Whereas, for a common event, we may not need much information since we already know it pretty well.
 
 In this era of information explosion, how do we quantify the meaningfulness of a piece of information? Are there any fundamental math theory to measure and compare different pieces of information? Our ancestors had tried to solve these questions for years. Until year 1948,  [Claude E. Shannon](https://en.wikipedia.org/wiki/Claude_Shannon) published his well-known book [A Mathematical Theory of Communication](https://en.wikipedia.org/wiki/A_Mathematical_Theory_of_Communication), the discipline of information theory had not been established. Shannon was an American mathematician, electrical engineer, and crytographer known as "the father of information theory". In his book, Shannon introduced the concept of information entropy at the first time. We will begin our information theory journey here.
 
@@ -264,7 +264,7 @@ similar_percentage = abs(kl_pq1 - kl_pq2) / ((kl_pq1 + kl_pq2) / 2) * 100
 kl_pq1, kl_pq2, similar_percentage
 ```
 
-In contrast, you may find that $D_{\mathrm{KL}}(q_2 \|p)$ and $D_{\mathrm{KL}}(p \| q_2)$ are off a lot, with around 44% off as shown below. 
+In contrast, you may find that $D_{\mathrm{KL}}(q_2 \|p)$ and $D_{\mathrm{KL}}(p \| q_2)$ are off a lot, with around 44% off as shown below.
 
 ```{.python .input}
 kl_q2p = kl_divergence(q2, p)
@@ -377,3 +377,18 @@ nll_loss = NegativeLogLikelihood()
 nll_loss.update(labels.as_nd_ndarray(), preds.as_nd_ndarray())
 nll_loss.get()
 ```
+
+## Summary
+
+* Information theory is a field of study about encoding, decoding, transmitting, and manipulating information.
+* Entropy is the unit to measure how much information is presented in different signals.
+* KL divergence can also measure the divergence between two distributions.
+* Cross Entropy can be viewed as an objective function of multi-class classification. Minimizing cross entropy loss is equivalent to maximizing the log-likelihood function.
+
+
+## Exercises
+
+Let us compute the binary entropy of a number of interesting data sources.
+1. Assume that you are watching the output generated by a monkey at a typewriter. The monkey presses any of the $44$ keys of the typewriter at random (you can assume that it has not discovered any special keys or the shift key yet). How many bits of randomness per character do you observe?
+2. Being unhappy with the monkey, you replaced it by a drunk typesetter. It is able to generate words, albeit not coherently. Instead, it picks a random word out of a vocabulary of $2,000$ words. Moreover, assume that the average length of a word is $4.5$ letters in English. How many bits of randomness do you observe now?
+3. Still being unhappy with the result, you replace the typesetter by a high quality language model. These can obtain perplexity numbers as low as 20 points per character. The perplexity is defined as a length normalized probability, i.e., $$PPL(x) = \left[p(x)\right]^{1 / \text{length(x)} }.$$

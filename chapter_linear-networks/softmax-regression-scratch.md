@@ -190,7 +190,10 @@ Taking the mean yields the desired result.
 ```{.python .input  n=11}
 # Saved in the d2l package for later use
 def accuracy(y_hat, y):
-    return float((y_hat.argmax(axis=1) == y.astype('float32')).sum())
+    if y_hat.shape[1] > 1:
+        return float((y_hat.argmax(axis=1) == y.astype('float32')).sum())
+    else:
+        return float((y_hat.astype('int32') == y.astype('int32')).sum())
 ```
 
 We will continue to use the variables `y_hat` and `y`
@@ -321,7 +324,7 @@ def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
         animator.add(epoch+1, train_metrics+(test_acc,))
 ```
 
-Again, we use the mini-batch stochastic gradient descent
+Again, we use the minibatch stochastic gradient descent
 to optimize the loss function of the model.
 Note that the number of epochs (`num_epochs`),
 and learning rate (`lr`) are both adjustable hyper-parameters.

@@ -9,7 +9,7 @@ hyperparameter in the Adadelta algorithm.
 
 ## The Algorithm
 
-Like RMSProp, the Adadelta algorithm uses the variable $\boldsymbol{s}_t$, which is an EWMA on the squares of elements in mini-batch stochastic gradient $\boldsymbol{g}_t$. At time step 0, all the elements are initialized to 0.
+Like RMSProp, the Adadelta algorithm uses the variable $\boldsymbol{s}_t$, which is an EWMA on the squares of elements in minibatch stochastic gradient $\boldsymbol{g}_t$. At time step 0, all the elements are initialized to 0.
 Given the hyperparameter $0 \leq \rho < 1$ (counterpart of $\gamma$ in RMSProp), at time step $t>0$, compute using the same method as RMSProp:
 
 $$\boldsymbol{s}_t \leftarrow \rho \boldsymbol{s}_{t-1} + (1 - \rho) \boldsymbol{g}_t \odot \boldsymbol{g}_t. $$

@@ -1,20 +1,19 @@
 # Encoder-Decoder Architecture
 
-The encoder-decoder architecture is a neural network design pattern. In this architecture, the network is partitioned into two parts, the encoder and the decoder. The encoder's role is encoding the inputs into state, which often contains several tensors. Then the state is passed into the decoder to generate the outputs. In machine translation, the encoder transforms a source sentence, e.g., "Hello world.", into state, e.g., a vector, that captures its semantic information. The decoder then uses this state to generate the translated target sentence, e.g., "Bonjour le monde.".
+The *encoder-decoder architecture* is a neural network design pattern. In this architecture, the network is partitioned into two parts, the encoder and the decoder. The encoder's role is to encode the inputs into state, which often contains several tensors. Then the state is passed into the decoder to generate the outputs. In machine translation, the encoder transforms a source sentence, e.g., "Hello world.", into state, e.g., a vector, that captures its semantic information. The decoder then uses this state to generate the translated target sentence, e.g., "Bonjour le monde.".
 
 ![The encoder-decoder architecture.](../img/encoder-decoder.svg)
 
 In this section, we will show an interface to implement this encoder-decoder architecture.
 
-```{.python .input  n=1}
-from mxnet.gluon import nn
-```
 
 ## Encoder
 
-The encoder is a normal neural network that takes inputs, e.g., a source sentence, to return outputs.
+The encoder is a normal neural network that takes inputs, e.g., a source sentence, and then returns states, which is a feature map in a form of vector or tensor.
 
 ```{.python .input  n=2}
+from mxnet.gluon import nn
+
 # Saved in the d2l package for later use
 class Encoder(nn.Block):
     """The base encoder interface for the encoder-decoder architecture."""
@@ -27,7 +26,7 @@ class Encoder(nn.Block):
 
 ## Decoder
 
-The decoder has an additional method `init_state` to parse the outputs of the encoder with possible additional information, e.g., the valid lengths of inputs, to return the state it needs. In the forward method, the decoder takes both inputs, e.g., a target sentence, and the state. It returns outputs, with potentially modified state if the encoder contains RNN layers.
+The decoder has an additional method `init_state` to parse the outputs of the encoder (the states) with possible additional information, e.g., returns the state it needs given the valid lengths of inputs. In the forward method, the decoder takes both inputs, e.g., a target sentence and the state. It returns outputs, with potentially modified state if the encoder contains RNN layers.
 
 ```{.python .input  n=3}
 # Saved in the d2l package for later use
@@ -45,7 +44,7 @@ class Decoder(nn.Block):
 
 ## Model
 
-The encoder-decoder model contains both an encoder an decoder. We implement its forward method for training. It takes both encoder inputs and decoder inputs, with optional additional information. During computation, it first compute encoder outputs to initialize the decoder state, and then returns the decoder outputs.
+The encoder-decoder model contains both an encoder and an decoder. We implement its forward method for training. It takes both encoder inputs and decoder inputs, with optional additional arguments. During the computation, it first compute encoder outputs to initialize the decoder state, and then returns the decoder outputs.
 
 ```{.python .input  n=4}
 # Saved in the d2l package for later use
@@ -65,8 +64,9 @@ class EncoderDecoder(nn.Block):
 ## Summary
 
 * An encoder-decoder architecture is a neural network design pattern mainly in natural language processing.
-* An encoder is a network (FC, CNN, RNN, etc) that takes the input, and output a feature map, a vector or a tensor.
-* An decoder is a network (usually the same network structure as encoder) that takes the feature vector from the encoder, and gives the best closest match to the actual input or intended output.
+* An encoder is a neural network (FC, CNN, RNN, etc.) that takes the input, and output a feature map.
+* An decoder is a network usually the same network structure as encoder. 
+* In the encoder-decoder architecture, the decoder takes the state output from the encoder, and gives the best closest match to the actual input or intended output.
 
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2396)
