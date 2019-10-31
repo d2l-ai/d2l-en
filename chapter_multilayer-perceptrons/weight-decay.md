@@ -281,7 +281,7 @@ depdends only on the current value of each parameter,
 and the optimizer must to touch each parameter once anyway.
 
 In the following code, we specify
-the weight decay hyper-parameter directly
+the weight decay hyperparameter directly
 through the `wd` parameter when instantiating our `Trainer`.
 By default, Gluon decays both weights and biases simultaneously.
 Note that we can have *different* optimizers

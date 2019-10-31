@@ -118,7 +118,7 @@ That said, with a large number of layers, this can get messy
 
 ## Exercises
 
-1. Change the value of the hyper-parameter `num_hiddens` in order to see how this hyperparameter influences your results.
+1. Change the value of the hyperparameter `num_hiddens` in order to see how this hyperparameter influences your results.
 1. Try adding a new hidden layer to see how it affects the results.
 1. How does changing the learning rate change the result?
 1. What is the best result you can get by optimizing over all the parameters (learning rate, iterations, number of hidden layers, number of hidden units per layer)?

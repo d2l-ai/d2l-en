@@ -81,7 +81,7 @@ show_trace(res)
 
 ## Learning Rate
 
-The positive $\eta$ in the above gradient descent algorithm is usually called the learning rate. This is a hyper-parameter and needs to be set manually. If we use a learning rate that is too small, it will cause $x$ to update at a very slow speed, requiring more iterations to get a better solution. Here, we have the iterative trajectory of the independent variable $x$ with the learning rate $\eta=0.05$. As we can see, after iterating 10 times when the learning rate is too small, there is still a large deviation between the final value of $x$ and the optimal solution.
+The positive $\eta$ in the above gradient descent algorithm is usually called the learning rate. This is a hyperparameter and needs to be set manually. If we use a learning rate that is too small, it will cause $x$ to update at a very slow speed, requiring more iterations to get a better solution. Here, we have the iterative trajectory of the independent variable $x$ with the learning rate $\eta=0.05$. As we can see, after iterating 10 times when the learning rate is too small, there is still a large deviation between the final value of $x$ and the optimal solution.
 
 ```{.python .input  n=6}
 show_trace(gd(0.05))

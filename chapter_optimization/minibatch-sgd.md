@@ -7,7 +7,7 @@ Set objective function $f(\boldsymbol{x}): \mathbb{R}^d \rightarrow \mathbb{R}$.
 
 $$\boldsymbol{g}_t \leftarrow \nabla f_{\mathcal{B}_t}(\boldsymbol{x}_{t-1}) = \frac{1}{|\mathcal{B}|} \sum_{i \in \mathcal{B}_t}\nabla f_i(\boldsymbol{x}_{t-1})$$
 
-to compute the gradient $\boldsymbol{g}_t$ of the objective function at $\boldsymbol{x}_{t-1}$ with minibatch $\mathcal{B}_t$ at time step $t$. Here, $|\mathcal{B}|$ is the size of the batch, which is the number of examples in the minibatch. This is a hyper-parameter. Just like the stochastic gradient, the minibatch SGD $\boldsymbol{g}_t$ obtained by sampling with replacement is also the unbiased estimate of the gradient $\nabla f(\boldsymbol{x}_{t-1})$. Given the learning rate $\eta_t$ (positive), the iteration of the minibatch SGD on the independent variable is as follows:
+to compute the gradient $\boldsymbol{g}_t$ of the objective function at $\boldsymbol{x}_{t-1}$ with minibatch $\mathcal{B}_t$ at time step $t$. Here, $|\mathcal{B}|$ is the size of the batch, which is the number of examples in the minibatch. This is a hyperparameter. Just like the stochastic gradient, the minibatch SGD $\boldsymbol{g}_t$ obtained by sampling with replacement is also the unbiased estimate of the gradient $\nabla f(\boldsymbol{x}_{t-1})$. Given the learning rate $\eta_t$ (positive), the iteration of the minibatch SGD on the independent variable is as follows:
 
 $$\boldsymbol{x}_t \leftarrow \boldsymbol{x}_{t-1} - \eta_t \boldsymbol{g}_t.$$
 
@@ -43,7 +43,7 @@ We have already implemented the minibatch SGD algorithm in the
 :numref:`sec_linear_scratch`. We have made its input parameters more generic
 here, so that we can conveniently use the same input for the other optimization
 algorithms introduced later in this chapter. Specifically, we add the status
-input `states` and place the hyper-parameter in dictionary `hyperparams`. In
+input `states` and place the hyperparameter in dictionary `hyperparams`. In
 addition, we will average the loss of each minibatch example in the training
 function, so the gradient in the optimization algorithm does not need to be
 divided by the batch size.
