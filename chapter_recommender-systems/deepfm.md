@@ -92,7 +92,7 @@ lr, num_epochs, optimizer = 0.01, 50, 'adam'
 trainer = gluon.Trainer(net.collect_params(), optimizer, 
                         {'learning_rate': lr})
 loss = gluon.loss.SigmoidBinaryCrossEntropyLoss()
-d2l.train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs, ctx)
+#d2l.train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs, ctx)
 ```
 
 Compared with FM, DeepFM converges faster and achieves better performance.
