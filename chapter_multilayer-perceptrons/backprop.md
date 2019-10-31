@@ -78,7 +78,7 @@ we can then calculate the loss term for a single data example,
 $$L = l(\mathbf{o}, y).$$
 
 According to the definition of $\ell_2$ norm regularization,
-given the hyper-parameter $\lambda$, the regularization term is
+given the hyperparameter $\lambda$, the regularization term is
 
 $$s = \frac{\lambda}{2} \left(\|\mathbf{W}^{(1)}\|_F^2 + \|\mathbf{W}^{(2)}\|_F^2\right),$$
 
