@@ -74,6 +74,7 @@ The data loading process is the same as that of FM. We set the MLP component of 
 
 ```{.python .input  n=3}
 batch_size = 2048
+d2l.read_data_ctr()
 train_data = d2l.CTRDataset(data_path="../data/ctr/train.csv")
 test_data = d2l.CTRDataset(data_path="../data/ctr/test.csv", 
                       feat_mapper=train_data.feat_mapper, 
@@ -92,7 +93,7 @@ lr, num_epochs, optimizer = 0.01, 50, 'adam'
 trainer = gluon.Trainer(net.collect_params(), optimizer, 
                         {'learning_rate': lr})
 loss = gluon.loss.SigmoidBinaryCrossEntropyLoss()
-#d2l.train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs, ctx)
+d2l.train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs, ctx)
 ```
 
 Compared with FM, DeepFM converges faster and achieves better performance.

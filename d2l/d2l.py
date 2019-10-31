@@ -514,11 +514,11 @@ class SeqDataLoader(object):
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/lang-model.md
-def load_data_time_machine(batch_size, num_steps, use_random_iter=False, 
+def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
                            max_tokens=10000):
     data_iter = SeqDataLoader(
         batch_size, num_steps, use_random_iter, max_tokens)
-    return data_iter, data_iter.vocab    
+    return data_iter, data_iter.vocab
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
@@ -1421,7 +1421,7 @@ def read_data_ml100k(path="../data/", member="ml-100k/u.data",
 
 
 # Defined in file: ./chapter_recommender-systems/movielens.md
-def split_data_ml100k(data, num_users, num_items, 
+def split_data_ml100k(data, num_users, num_items,
                split_mode="random", test_ratio = 0.1):
     """Split the dataset in random mode or seq-aware mode."""
     if split_mode == "seq-aware":
@@ -1463,7 +1463,7 @@ def load_data_ml100k(data, num_users, num_items, feedback="explicit"):
 
 
 # Defined in file: ./chapter_recommender-systems/movielens.md
-def split_and_load_ml100k(split_mode="seq-aware", feedback="explicit", 
+def split_and_load_ml100k(split_mode="seq-aware", feedback="explicit",
                           test_ratio=0.1, batch_size=256):
     data, num_users, num_items = read_data_ml100k()
     train_data, test_data = split_data_ml100k(
@@ -1471,7 +1471,7 @@ def split_and_load_ml100k(split_mode="seq-aware", feedback="explicit",
     train_u, train_i, train_r, _ = load_data_ml100k(
         train_data, num_users, num_items, feedback)
     test_u, test_i, test_r, _ = load_data_ml100k(
-        test_data, num_users, num_items, feedback) 
+        test_data, num_users, num_items, feedback)
     train_set = gluon.data.ArrayDataset(
         np.array(train_u), np.array(train_i), np.array(train_r))
     test_set = gluon.data.ArrayDataset(
@@ -1536,7 +1536,7 @@ class BPRLoss(Loss):
 # Defined in file: ./chapter_recommender-systems/ranking.md
 class HingeLossbRec(Loss):
     def __init__(self, weight=None, batch_axis=0, **kwargs):
-        super(HingeLossbRec, self).__init__(weight=None, batch_axis=0, 
+        super(HingeLossbRec, self).__init__(weight=None, batch_axis=0,
                                             **kwargs)
 
     def forward(self, positive, negative, margin=1):
@@ -1632,6 +1632,20 @@ def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
           % (metric[0] / metric[1], hit_rate, auc))
     print('%.1f examples/sec on %s'
           % (metric[2] * num_epochs / timer.sum(), ctx_list))
+
+
+# Defined in file: ./chapter_recommender-systems/ctr.md
+def read_data_ctr(path="../data/", train="ctr/train.csv", 
+                  test="ctr/test.csv"):
+    data_path = ("https://apache-mxnet.s3-accelerate.amazonaws.com/"
+                 "gluon/dataset/")
+    train_sha1 = "6dec3052e49ce0d1cec5ebc6f5ded1172be0befb"
+    test_sha1 ="c265e3c1fad0ed4caf8c1a373c580465a8096eb0"
+
+    ctr_path = path+"ctr"
+    os.makedirs(ctr_path, exist_ok=True)
+    gluon.utils.download(data_path + train, ctr_path, train_sha1)
+    gluon.utils.download(data_path + test, ctr_path, test_sha1)
 
 
 # Defined in file: ./chapter_recommender-systems/ctr.md

@@ -65,6 +65,7 @@ We use the CTR data wrapper from the last section to load the online advertising
 
 ```{.python .input  n=3}
 batch_size = 2048
+d2l.read_data_ctr()
 train_data = d2l.CTRDataset(data_path="../data/ctr/train.csv")
 test_data = d2l.CTRDataset(data_path="../data/ctr/test.csv", 
                       feat_mapper=train_data.feat_mapper, 
