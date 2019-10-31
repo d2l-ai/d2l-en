@@ -23,12 +23,14 @@ from mxnet.gluon.data import Dataset
 import os
 import sys
 
-data_path = "https://apache-mxnet.s3-accelerate.amazonaws.com/gluon/dataset/"
-train_sha1 = "6dec3052e49ce0d1cec5ebc6f5ded1172be0befb"
-test_sha1 ="c265e3c1fad0ed4caf8c1a373c580465a8096eb0"
-
+# Saved in the d2l package for later use
 def read_data_ctr(path="../data/", train="ctr/train.csv", 
                   test="ctr/test.csv"):
+    data_path = ("https://apache-mxnet.s3-accelerate.amazonaws.com/"
+                 "gluon/dataset/")
+    train_sha1 = "6dec3052e49ce0d1cec5ebc6f5ded1172be0befb"
+    test_sha1 ="c265e3c1fad0ed4caf8c1a373c580465a8096eb0"
+
     ctr_path = path+"ctr"
     os.makedirs(ctr_path, exist_ok=True)
     gluon.utils.download(data_path + train, ctr_path, train_sha1)
