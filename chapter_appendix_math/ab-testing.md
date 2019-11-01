@@ -145,7 +145,7 @@ $$n \geq \frac{2 s^2 (\Phi^{-1}(\beta) + \Phi^{-1}(\alpha/2))^2}{(\mu_A - \mu_B)
 
 Now let us implement the sample size formula from scratch together!
 
-```{.python .input  n=29}
+```{.python .input  n=1}
 import scipy
 
 def min_sample_size(mu_A, mu_B, sd, beta=0.2, alpha=0.05):
@@ -163,15 +163,19 @@ s4 = min_sample_size(1, 2, 100, beta=0.5, alpha=0.05)
 s1, s2, s3, s4
 ```
 
-```{.json .output n=29}
+```{.json .output n=1}
 [
  {
-  "data": {
-   "text/plain": "(156977.59468698176, 434.8409825124148, 45971.850302099854, 76829.17641388251)"
-  },
-  "execution_count": 29,
-  "metadata": {},
-  "output_type": "execute_result"
+  "ename": "AttributeError",
+  "evalue": "module 'scipy' has no attribute 'stats'",
+  "output_type": "error",
+  "traceback": [
+   "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+   "\u001b[0;31mAttributeError\u001b[0m                            Traceback (most recent call last)",
+   "\u001b[0;32m<ipython-input-1-a70d4c90a20e>\u001b[0m in \u001b[0;36m<module>\u001b[0;34m\u001b[0m\n\u001b[1;32m      8\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      9\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m---> 10\u001b[0;31m \u001b[0ms1\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mmin_sample_size\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;36m1\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;36m2\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;36m100\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mbeta\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;36m0.2\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0malpha\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;36m0.05\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m     11\u001b[0m \u001b[0ms2\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mmin_sample_size\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;36m1\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;36m20\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;36m100\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mbeta\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;36m0.2\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0malpha\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;36m0.05\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     12\u001b[0m \u001b[0ms3\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mmin_sample_size\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;36m1\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;36m2\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0;36m100\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mbeta\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;36m0.2\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0malpha\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;36m0.5\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+   "\u001b[0;32m<ipython-input-1-a70d4c90a20e>\u001b[0m in \u001b[0;36mmin_sample_size\u001b[0;34m(mu_A, mu_B, sd, beta, alpha)\u001b[0m\n\u001b[1;32m      2\u001b[0m \u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      3\u001b[0m \u001b[0;32mdef\u001b[0m \u001b[0mmin_sample_size\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mmu_A\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mmu_B\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0msd\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0mbeta\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;36m0.2\u001b[0m\u001b[0;34m,\u001b[0m \u001b[0malpha\u001b[0m\u001b[0;34m=\u001b[0m\u001b[0;36m0.05\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m:\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m----> 4\u001b[0;31m     \u001b[0mZ_beta\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mscipy\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mstats\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mnorm\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mppf\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;36m1\u001b[0m\u001b[0;34m-\u001b[0m\u001b[0mbeta\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m      5\u001b[0m     \u001b[0mZ_alpha\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mscipy\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mstats\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mnorm\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mppf\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;36m1\u001b[0m\u001b[0;34m-\u001b[0m\u001b[0malpha\u001b[0m\u001b[0;34m/\u001b[0m\u001b[0;36m2\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      6\u001b[0m     \u001b[0mmin_N\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0;34m(\u001b[0m\u001b[0;36m2\u001b[0m \u001b[0;34m*\u001b[0m \u001b[0msd\u001b[0m\u001b[0;34m**\u001b[0m\u001b[0;36m2\u001b[0m \u001b[0;34m*\u001b[0m \u001b[0;34m(\u001b[0m\u001b[0mZ_beta\u001b[0m \u001b[0;34m+\u001b[0m \u001b[0mZ_alpha\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m**\u001b[0m\u001b[0;36m2\u001b[0m\u001b[0;34m/\u001b[0m \u001b[0;34m(\u001b[0m\u001b[0mmu_A\u001b[0m \u001b[0;34m-\u001b[0m \u001b[0mmu_B\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m**\u001b[0m\u001b[0;36m2\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+   "\u001b[0;31mAttributeError\u001b[0m: module 'scipy' has no attribute 'stats'"
+  ]
  }
 ]
 ```
@@ -205,8 +209,3 @@ In A/B testing, the null hypothesis usually states that there is no discrepancy 
 * The sanity check: to check if the invariant metrics have changed or not. If the sanity check failed, we cannot make any conclusion. Rather, we need to analyze why it failed (such as doing retrospective analysis or thinking of the learning effect).
 * Cross checking. In case of no significance, then the experiment setup may be incorrect, or the change affects different groups of users differently. In this case, it is helpful to break down into different user groups, or differnt days of the week. For example, the [Simpson’s paradox](https://en.wikipedia.org/wiki/Simpson%27s_paradox) is a phenomenon in which a trend appears in different groups of data but disappears or reverses when these groups are combined).
 * Triple (or more) checks. As we alluded in step 2, a statistically significance may happen by chance. Hence, bootstrap and run the same experiment multiple times to see you can reach the same conclusion. In addition, control the [false discovery rate](https://en.wikipedia.org/wiki/False_discovery_rate) would be helpful as well.
-
-
-```{.python .input}
-
-```
