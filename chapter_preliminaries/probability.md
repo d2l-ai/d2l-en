@@ -92,7 +92,7 @@ Specifically, we calculate the relative frequency as the estimate of the true pr
 
 ```{.python .input  n=5}
 # Store the results as 32-bit floats for division
-counts = np.random.multinomial(100, fair_probs).astype(np.float32)
+counts = np.random.multinomial(1000, fair_probs).astype(np.float32)
 counts / 1000  # Reletive frequency as the estimate
 ```
 
