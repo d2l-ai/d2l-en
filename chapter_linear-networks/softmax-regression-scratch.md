@@ -9,7 +9,7 @@ As with linear regression, after doing things by hand
 we will breeze through an implementation in Gluon for comparison.
 To begin, let's import the familiar packages.
 
-```{.python .input  n=1}
+```{.python .input  n=2}
 import d2l
 from mxnet import autograd, np, npx, gluon
 from IPython import display
@@ -82,16 +82,6 @@ X = np.array([[1, 2, 3], [4, 5, 6]])
 print(X.sum(axis=0, keepdims=True), '\n', X.sum(axis=1, keepdims=True))
 ```
 
-```{.json .output n=5}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "[[5. 7. 9.]] \n [[ 6.]\n [15.]]\n"
- }
-]
-```
-
 We are now ready to implement the softmax function.
 Recall that softmax consists of two steps:
 First, we exponentiate each term (using `exp`).
@@ -145,7 +135,7 @@ Note that we flatten each original image in the batch
 into a vector with length `num_inputs` with the `reshape` function
 before passing the data through our model.
 
-```{.python .input  n=6}
+```{.python .input  n=8}
 def net(X):
     return softmax(np.dot(X.reshape(-1, num_inputs), W) + b)
 ```
@@ -299,7 +289,9 @@ def train_epoch_ch3(net, train_iter, loss, updater):
     return metric[0]/metric[2], metric[1]/metric[2]
 ```
 
-Before showing the implementation of the training function, we define a utility class that draw data in animation. Again, it aims to simplify the codes in later chapters.
+Before showing the implementation of the training function, 
+we define a utility class that draw data in animation. 
+Again, it aims to simplify the codes in later chapters.
 
 ```{.python .input  n=16}
 # Saved in the d2l package for later use
@@ -355,8 +347,12 @@ Again, we use the minibatch stochastic gradient descent
 to optimize the loss function of the model.
 Note that the number of epochs (`num_epochs`),
 and learning rate (`lr`) are both adjustable hyper-parameters.
-By changing their values, we may be able to increase the classification accuracy of the model. In practice we will want to split our data three ways
-into training, validation, and test data, using the validation data to choose the best values of our hyperparameters.
+By changing their values, we may be able 
+to increase the classification accuracy of the model. 
+In practice we will want to split our data three ways
+into training, validation, and test data, 
+using the validation data to choose 
+the best values of our hyperparameters.
 
 ```{.python .input  n=18}
 num_epochs, lr = 10, 0.1
@@ -366,9 +362,12 @@ train_ch3(net, train_iter, test_iter, cross_entropy, num_epochs, updater)
 
 ## Prediction
 
-Now that training is complete, our model is ready to classify some images.
-Given a series of images, we will compare their actual labels
-(first line of text output) and the model predictions
+Now that training is complete, 
+our model is ready to classify some images.
+Given a series of images, 
+we will compare their actual labels
+(first line of text output) 
+and the model predictions
 (second line of text output).
 
 ```{.python .input  n=19}
@@ -386,8 +385,12 @@ predict_ch3(net, test_iter)
 
 ## Summary
 
-With softmax regression, we can train models for multi-category classification. The training loop is very similar to that in linear regression: retrieve and read data, define models and loss functions,
-then train models using optimization algorithms. As you will soon find out, most common deep learning models have similar training procedures.
+With softmax regression, we can train models for multi-category classification. 
+The training loop is very similar to that in linear regression: 
+retrieve and read data, define models and loss functions,
+then train models using optimization algorithms.
+As you will soon find out, most common deep learning models 
+have similar training procedures.
 
 ## Exercises
 
