@@ -8,12 +8,13 @@ So far we encountered two extremes in the approach to gradient based learning: :
 At the heart of the decision to use minibatches is computational efficiency. This is most easily understood when considering parallelization to multiple GPUs and multiple servers. In this case we need to send at least one image to each GPU. With 8 GPUs per server and 16 servers we already arrive at a minibatch size of 128.
 
 Things are a bit more subtle when it comes to single GPUs or even CPUs. These devices have multiple types of memory, often multiple type of compute units and different bandwidth constraints between them. For instance, a CPU has a small number of registers and then L1, L2 and in some cases even L3 cache (which is shared between the different processor cores). These caches are of increasing size and latency (and at the same time they're of decreasing bandwidth). Suffice it to say, the processor is capable of performing many more operations than what the main memory interface is able to provide. 
+
 * A 2GHz CPU with 16 cores and AVX-512 vectorization can process up to $2 \cdot 10^9 \cdot 16 \cdot 32 = 10^{12}$ bytes per second. The capability of GPUs easily exceeds this number by a factor of 100. On the other hand, a midrange server processor might not have much more than 100 GB/s bandwidth, i.e.\ less than one tenth of what would be required to keep the processor fed. To make matters worse, not all memory access is created equal: firstly, memory interfaces are typically 64 bit wide or wider (e.g. on GPUs up to 384 bit), hence reading a single byte incurs the cost of a much wider access. 
 * There is significant overhead for the first access whereas sequential access is relatively cheap (this is often called a burst read). There are many more things to keep in mind, such as caching when we have multiple sockets, chiplets and other structures. A detailed discussion of this is beyond the scope of this section. See e.g. this [Wikipedia article](https://en.wikipedia.org/wiki/Cache_hierarchy) for a more in-depth discussion.
 
 The way to alleviate these constraints is to use a hierarchy of CPU caches which are actually fast enough to supply the processor with data. This is *the* driving force behind batching in deep learning. To keep matters simple, consider matrix-matrix multiplication, say $A = B \cdot C$. We have a number of options for calculating $A$. For instance we could try the following:
 
-1. We could compute $A_{ij} = B_{i,:} C_{:,j}^\top $, i.e. we could compute it element-wise by means of dot products.
+1. We could compute $A_{ij} = B_{i,:} C_{:,j}^\top$, i.e. we could compute it element-wise by means of dot products.
 1. We could compute $A_{:,j} = B C_{:,j}^\top$, i.e. we could compute it one column at a time. Likewise we could compute $A$ one row $A_{i,:}$ at a time. 
 1. We could simply compute $A = B C$. 
 1. We could break $B$ and $C$ into smaller block matrices and compute $A$ one block at a time. 
@@ -86,7 +87,7 @@ $$\mathbf{g}_t = \partial_{\mathbf{w}} \frac{1}{|\mathcal{B}_t|} \sum_{i \in \ma
 
 Let's see what this does to the statistical properties of $\mathbf{g}_t$: since both $\mathbf{x}_t$ and also all elements of the minibatch $\mathcal{B}_t$ are drawn uniformly at random from the training set, the expectation of the gradient remains unchanged. The variance, on the other hand, is reduced significantly. Since the minibatch gradient is composed of $b := |\mathcal{B}_t|$ independent gradients which are being averaged, its standard deviation is reduced by a factor of $b^{-\frac{1}{2}}$. This, by itself, is a good thing, since it means that the updates are more reliably aligned with the full gradient. 
 
-Naively this would indicate that choosing a large minibatch $\mathcal{B}_t$ would be universally desirable. Alas, after some point, the additional reduction in standard deviation is minimal when compared to the linear increase in computational cost. In practice we pick a minibatch that is large enough to offer good computational efficiency while still fitting into the memory of a GPU. To illustrate the savings let's have a look at some code. In it we perform the same matrix-matrix multiplication, but this time broken up into 'minibatches' of 64 columns at a time. 
+Naively this would indicate that choosing a large minibatch $\mathcal{B}_t$ would be universally desirable. Alas, after some point, the additional reduction in standard deviation is minimal when compared to the linear increase in computational cost. In practice we pick a minibatch that is large enough to offer good computational efficiency while still fitting into the memory of a GPU. To illustrate the savings let's have a look at some code. In it we perform the same matrix-matrix multiplication, but this time broken up into 'minibatches' of 64 columns at a time.
 
 ```{.python .input}
 timer.start()
@@ -96,7 +97,7 @@ timer.stop()
 print("Performance in Gigaflops: block {:.3f}".format(2/timer.times[3]))
 ```
 
-As we can see, the computation on the minibatch is almost as efficient as on the full matrix. A word of caution is in order. In :ref:`sec_batch_norm` we used a type of regularization that was heavily dependent on the amount of variance in a minibatch. As we increase the latter, the variance decreases and with it the benefit of the noise-injection due to batch normalization. See e.g. :cite:`Ioffe.2017` for details on how to rescale and compute the appropriate terms. 
+As we can see, the computation on the minibatch is essentially as efficient as on the full matrix. A word of caution is in order. In :ref:`sec_batch_norm` we used a type of regularization that was heavily dependent on the amount of variance in a minibatch. As we increase the latter, the variance decreases and with it the benefit of the noise-injection due to batch normalization. See e.g. :cite:`Ioffe.2017` for details on how to rescale and compute the appropriate terms. 
 
 ## Reading Data
 
@@ -158,7 +159,7 @@ def train_ch10(trainer_fn, states, hyperparams, data_iter,
     return timer.cumsum(), animator.Y[0]
 ```
 
-Let's see how optimization proceeds for batch gradient descent. This can be achieved by setting the minibatch size to 1500 (i.e. to the total number of examples). As a result the model parameters are updated only once per epoch. There is little progress. In fact, after 6 steps progress stalls. 
+Let's see how optimization proceeds for batch gradient descent. This can be achieved by setting the minibatch size to 1500 (i.e. to the total number of examples). As a result the model parameters are updated only once per epoch. There is little progress. In fact, after 6 steps progress stalls.
 
 ```{.python .input  n=4}
 def train_sgd(lr, batch_size, num_epochs=2):
@@ -175,7 +176,7 @@ When the batch size equals 1, we use SGD for optimization. For simplicity of imp
 sgd_res = train_sgd(0.005, 1)
 ```
 
-Lastly, when the batch size equals 100, we use minibatch SGD for optimization. The time required per epoch is longer than the time needed for SGD and the time for batch gradient descent. 
+Lastly, when the batch size equals 100, we use minibatch SGD for optimization. The time required per epoch is longer than the time needed for SGD and the time for batch gradient descent.
 
 ```{.python .input  n=6}
 mini1_res = train_sgd(.4, 100)
@@ -199,7 +200,7 @@ d2l.plt.gca().set_xscale('log')
 
 ## Concise Implementation
 
-In Gluon, we can use the `Trainer` class to call optimization algorithms. This is used to implement a generic training function. We will use this throughout the current chapter. 
+In Gluon, we can use the `Trainer` class to call optimization algorithms. This is used to implement a generic training function. We will use this throughout the current chapter.
 
 ```{.python .input  n=9}
 # Saved in the d2l package for later use
@@ -228,7 +229,7 @@ def train_gluon_ch10(tr_name, hyperparams, data_iter, num_epochs=2):
     print('loss: %.3f, %.3f sec/epoch'%(animator.Y[0][-1], timer.avg()))
 ```
 
-Using Gluon to repeat the last experiment shows identical behavior. 
+Using Gluon to repeat the last experiment shows identical behavior.
 
 ```{.python .input  n=10}
 data_iter, _ = get_data_ch10(10)
@@ -255,7 +256,3 @@ train_gluon_ch10('sgd', {'learning_rate': 0.05}, data_iter)
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2373)
 
 ![](../img/qr_minibatch-sgd.svg)
-
-```{.python .input}
-
-```
