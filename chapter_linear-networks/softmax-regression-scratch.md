@@ -4,20 +4,20 @@
 Just as we implemented linear regression from scratch,
 we believe that multiclass logistic (softmax) regression
 is similarly fundamental and you ought to know
-the gory details of how to implement it from scratch.
+the gory details of how to implement it yourself.
 As with linear regression, after doing things by hand
 we will breeze through an implementation in Gluon for comparison.
-To begin, let us import our packages.
+To begin, let's import the familiar packages.
 
-```{.python .input  n=1}
+```{.python .input  n=2}
 import d2l
 from mxnet import autograd, np, npx, gluon
 from IPython import display
 npx.set_np()
 ```
 
-We will work with the Fashion-MNIST dataset just introduced,
-cuing up an iterator with batch size 256.
+We will work with the Fashion-MNIST dataset, just introduced in :numref:`sec_fasion_mnist`,
+setting up an iterator with batch size $256$.
 
 ```{.python .input  n=2}
 batch_size = 256
@@ -26,9 +26,11 @@ train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 
 ## Initialize Model Parameters
 
-Just as in linear regression, we represent each example as a vector.
-Since each example is a $28 \times 28$ image,
-we can flatten each example, treating them as $784$ dimensional vectors.
+As in our linear regression example, 
+each example here will be represented by a fixed-length vector.
+Each example in the raw data is a $28 \times 28$ image.
+In this chapter, we will flatten each image, 
+treating them as $784$ 1D vectors.
 In the future, we will talk about more sophisticated strategies
 for exploiting the spatial structure in images,
 but for now we treat each pixel location as just another feature.
@@ -51,8 +53,9 @@ b = np.zeros(num_outputs)
 ```
 
 Recall that we need to *attach gradients* to the model parameters.
-More literally, we are allocating memory for future gradients to be stored
-and notifiying MXNet that we want gradients to be calculated with respect to these parameters in the first place.
+More literally, we are allocating memory for future gradients to be stored 
+and notifiying MXNet that we will want to calculate gradients
+with respect to these parameters in the future.
 
 ```{.python .input  n=4}
 W.attach_grad()
@@ -62,7 +65,7 @@ b.attach_grad()
 ## The Softmax
 
 Before implementing the softmax regression model,
-let us briefly review how operators such as `sum` work
+let's briefly review how operators such as `sum` work
 along specific dimensions in an `ndarray`.
 Given a matrix `X` we can sum over all elements (default) or only
 over elements in the same axis, *i.e.*, the column (`axis=0`) or the same row (`axis=1`).
@@ -95,7 +98,7 @@ $$
 
 The denominator, or normalization constant,
 is also sometimes called the partition function
-(and its logarithm the log-partition function).
+(and its logarithm is called the log-partition function).
 The origins of that name are in [statistical physics](https://en.wikipedia.org/wiki/Partition_function_(statistical_mechanics))
 where a related equation models the distribution
 over an ensemble of particles).
@@ -107,13 +110,15 @@ def softmax(X):
     return X_exp / partition  # The broadcast mechanism is applied here
 ```
 
-As you can see, for any random input, we turn each element into a non-negative number. Moreover, each row sums up to 1, as is required for a probability.
+As you can see, for any random input, 
+we turn each element into a non-negative number.
+Moreover, each row sums up to 1, 
+as is required for a probability.
 Note that while this looks correct mathematically,
 we were a bit sloppy in our implementation
 because failed to take precautions against numerical overflow or underflow
 due to large (or very small) elements of the matrix,
-as we did in
-:numref:`sec_naive_bayes`.
+as we did in :numref:`sec_naive_bayes`.
 
 ```{.python .input  n=7}
 X = np.random.normal(size=(2, 5))
@@ -143,15 +148,15 @@ This may be the most common loss function
 in all of deep learning because, at the moment,
 classification problems far outnumber regression problems.
 
-
 Recall that cross-entropy takes the negative log likelihood
 of the predicted probability assigned to the true label $-\log p(y|x)$.
 Rather than iterating over the predictions with a Python `for` loop
-(which tends to be inefficient), we can use the `pick` function
-which allows us to select the appropriate terms
-from the matrix of softmax entries easily.
+(which tends to be inefficient), 
+we can use the `pick` function
+which allows us to easily select the appropriate terms
+from the matrix of softmax entries.
 Below, we illustrate the `pick` function on a toy example,
-with 3 categories and 2 examples.
+with $3$ categories and $2$ examples.
 
 ```{.python .input  n=9}
 y_hat = np.array([[0.1, 0.3, 0.6], [0.3, 0.2, 0.5]])
@@ -159,8 +164,7 @@ y_hat[[0, 1], [0, 2]]
 
 ```
 
-Now we can implement the cross-entropy loss function efficiently
-with just one line of code.
+Now we can implement the cross-entropy loss function efficiently with just one line of code.
 
 ```{.python .input  n=10}
 def cross_entropy(y_hat, y):
@@ -171,9 +175,17 @@ def cross_entropy(y_hat, y):
 
 Given the predicted probability distribution `y_hat`,
 we typically choose the class with highest predicted probability
-whenever we must output a *hard* prediction. Indeed, many applications require that we make a choice. Gmail must catetegorize an email into Primary, Social, Updates, or Forums. It might estimate probabilities internally, but at the end of the day it has to choose one among the categories.
+whenever we must output a *hard* prediction. 
+Indeed, many applications require that we make a choice. 
+Gmail must catetegorize an email into Primary, Social, Updates, or Forums. 
+It might estimate probabilities internally,
+but at the end of the day it has to choose one among the categories.
 
-When predictions are consistent with the actual category `y`, they are correct. The classification accuracy is the fraction of all predictions that are correct. Although we cannot optimize accuracy directly (it is not differentiable), it is often the performance metric that we care most about, and we will nearly always report it when training classifiers.
+When predictions are consistent with the actual category `y`, they are correct. 
+The classification accuracy is the fraction of all predictions that are correct.
+Although it can be difficult optimize accuracy directly (it is not differentiable),
+it is often the performance metric that we care most about,
+and we will nearly always report it when training classifiers.
 
 To compute accuracy we do the following:
 First, we execute `y_hat.argmax(axis=1)`
@@ -199,13 +211,13 @@ def accuracy(y_hat, y):
 We will continue to use the variables `y_hat` and `y`
 defined in the `pick` function,
 as the predicted probability distribution and label, respectively.
-We can see that the first example's prediction category is 2
-(the largest element of the row is 0.6 with an index of 2),
-which is inconsistent with the actual label, 0.
-The second example's prediction category is 2
-(the largest element of the row is 0.5 with an index of 2),
-which is consistent with the actual label, 2.
-Therefore, the classification accuracy rate for these two examples is 0.5.
+We can see that the first example's prediction category is $2$
+(the largest element of the row is 0.6 with an index of $2$),
+which is inconsistent with the actual label, $0$.
+The second example's prediction category is $2$
+(the largest element of the row is $0.5$ with an index of $2$),
+which is consistent with the actual label, $2$.
+Therefore, the classification accuracy rate for these two examples is $0.5$.
 
 ```{.python .input  n=12}
 y = np.array([0, 2])
@@ -242,7 +254,7 @@ class Accumulator(object):
 
 Because we initialized the `net` model with random weights,
 the accuracy of this model should be close to random guessing,
-i.e., 0.1 for 10 classes.
+i.e., $0.1$ for $10$ classes.
 
 ```{.python .input  n=14}
 evaluate_accuracy(net, test_iter)
@@ -252,7 +264,12 @@ evaluate_accuracy(net, test_iter)
 
 The training loop for softmax regression should look strikingly familiar
 if you read through our implementation
-of linear regression in :numref:`sec_linear_scratch`. Here we refactor the implementation to make it reusable. First, we define a function to train for one data epoch. Note that `updater` is general function to update the model parameters, which accepts the batch size as an argument. It can be either a wrapper of `d2l.sgd` or a Gluon trainer.
+of linear regression in :numref:`sec_linear_scratch`. 
+Here we refactor the implementation to make it reusable. 
+First, we define a function to train for one data epoch. 
+Note that `updater` is general function to update the model parameters,
+which accepts the batch size as an argument. 
+It can be either a wrapper of `d2l.sgd` or a Gluon trainer.
 
 ```{.python .input  n=15}
 # Saved in the d2l package for later use
@@ -272,7 +289,9 @@ def train_epoch_ch3(net, train_iter, loss, updater):
     return metric[0]/metric[2], metric[1]/metric[2]
 ```
 
-Before showing the implementation of the training function, we define a utility class that draw data in animation. Again, it aims to simplify the codes in later chapters.
+Before showing the implementation of the training function, 
+we define a utility class that draw data in animation. 
+Again, it aims to simplify the codes in later chapters.
 
 ```{.python .input  n=16}
 # Saved in the d2l package for later use
@@ -328,8 +347,12 @@ Again, we use the minibatch stochastic gradient descent
 to optimize the loss function of the model.
 Note that the number of epochs (`num_epochs`),
 and learning rate (`lr`) are both adjustable hyper-parameters.
-By changing their values, we may be able to increase the classification accuracy of the model. In practice we will want to split our data three ways
-into training, validation, and test data, using the validation data to choose the best values of our hyperparameters.
+By changing their values, we may be able 
+to increase the classification accuracy of the model. 
+In practice we will want to split our data three ways
+into training, validation, and test data, 
+using the validation data to choose 
+the best values of our hyperparameters.
 
 ```{.python .input  n=18}
 num_epochs, lr = 10, 0.1
@@ -339,9 +362,12 @@ train_ch3(net, train_iter, test_iter, cross_entropy, num_epochs, updater)
 
 ## Prediction
 
-Now that training is complete, our model is ready to classify some images.
-Given a series of images, we will compare their actual labels
-(first line of text output) and the model predictions
+Now that training is complete, 
+our model is ready to classify some images.
+Given a series of images, 
+we will compare their actual labels
+(first line of text output) 
+and the model predictions
 (second line of text output).
 
 ```{.python .input  n=19}
@@ -359,8 +385,12 @@ predict_ch3(net, test_iter)
 
 ## Summary
 
-With softmax regression, we can train models for multi-category classification. The training loop is very similar to that in linear regression: retrieve and read data, define models and loss functions,
-then train models using optimization algorithms. As you will soon find out, most common deep learning models have similar training procedures.
+With softmax regression, we can train models for multi-category classification. 
+The training loop is very similar to that in linear regression: 
+retrieve and read data, define models and loss functions,
+then train models using optimization algorithms.
+As you will soon find out, most common deep learning models 
+have similar training procedures.
 
 ## Exercises
 

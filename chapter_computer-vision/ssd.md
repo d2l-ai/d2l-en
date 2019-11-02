@@ -378,7 +378,7 @@ display(img, output, threshold=0.3)
 
 ### Loss Function
 
-For the predicted offsets, replace $L_1$ norm loss with $L_1$ regularization loss. This loss function uses a square function around zero for greater smoothness. This is the regularized area controlled by the hyper-parameter $\sigma$:
+For the predicted offsets, replace $L_1$ norm loss with $L_1$ regularization loss. This loss function uses a square function around zero for greater smoothness. This is the regularized area controlled by the hyperparameter $\sigma$:
 
 $$
 f(x) =

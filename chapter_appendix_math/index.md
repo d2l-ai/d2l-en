@@ -3,7 +3,7 @@
 
 One of the wonderful parts of modern deep learning is the fact that much of it can be understood and used without a full understanding of the mathematics below it.  This is a sign of the fact that the field is becoming more mature.  Most software developers no longer need to worry about the theory of computable functions, or if programming languages without a ```goto``` can emulate programming languages with a ```goto``` with at most constant overhead, and neither should the deep learning practitioner need to worry about the theoretical foundations maximum likelihood learning, if one can find an architecture to approximate a target function to an arbitrary degree of accuracy.
 
-That said, we are not quite there yet.  
+That said, we are not quite there yet.
 
 Sometimes when building a model in practice you will need to understand how architectural choices influence gradient flow, or what assumptions you are making by training with a certain loss function.  You might need to know what in the world entropy measures, and how it can help you understand exactly what bits-per-character means in your model.  Once you get on that level of interaction, mathematical depth again becomes a must.
 
@@ -21,6 +21,8 @@ Lastly, we turn to the topic of information theory, which is the mathematical st
 
 Taken together, these form the core of the mathematical concepts needed to begin down the path towards a deep understanding of ML models.
 
+This chapter is co-authored with Brent Werness and Rachel Hu, and they are the major contributors.
+
 ```toc
 :maxdepth: 2
 
@@ -31,5 +33,6 @@ integral-calculus
 random-variables
 maximum-likelihood
 distributions
+naive-bayes
 info-theory
 ```

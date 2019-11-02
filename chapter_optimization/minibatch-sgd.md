@@ -113,6 +113,7 @@ def get_data_ch10(batch_size=10, n=1500):
 
 ## Implementation from Scratch
 
+
 Recall the minibatch SGD implementation from :numref:`sec_linear_scratch`. In the following we provide a slightly more general implementation. For convenience it has the same call signature as the other optimization algorithms introduced later in this chapter. Specifically, we add the status
 input `states` and place the hyperparameter in dictionary `hyperparams`. In
 addition, we will average the loss of each minibatch example in the training

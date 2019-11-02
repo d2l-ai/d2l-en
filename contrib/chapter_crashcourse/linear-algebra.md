@@ -224,17 +224,17 @@ print('X =', X)
 ## Element-wise operations
 
 Oftentimes, we want to apply functions to arrays. 
-Some of the simplest and most useful functions are the element-wise functions. 
+Some of the simplest and most useful functions are the elementwise functions. 
 These operate by performing a single scalar operation on the corresponding elements of two arrays.
-We can create an element-wise function from any function that maps from the scalars to the scalars.
+We can create an elementwise function from any function that maps from the scalars to the scalars.
 In math notations we would denote such a function as $f: \mathcal{R} \rightarrow \mathcal{R}$.
 Given any two vectors $\mathbf{u}$ and $\mathbf{v}$ *of the same shape*, and the function f,
 we can produce a vector $\mathbf{c} = F(\mathbf{u},\mathbf{v})$ 
 by setting $c_i \gets f(u_i, v_i)$ for all $i$.
 Here, we produced the vector-valued $F: \mathcal{R}^d \rightarrow \mathcal{R}^d$
-by *lifting* the scalar function to an element-wise vector operation.
+by *lifting* the scalar function to an elementwise vector operation.
 In MXNet, the common standard arithmetic operators (+,-,/,\*,\*\*)
-have all been *lifted* to element-wise operations for identically-shaped tensors of arbitrary shape.
+have all been *lifted* to elementwise operations for identically-shaped tensors of arbitrary shape.
 
 
 ```python
@@ -247,7 +247,7 @@ print('u * v', u * v)
 print('u / v', u / v)
 ```
 
-We can call element-wise operations on any two tensors of the same shape, including matrices.
+We can call elementwise operations on any two tensors of the same shape, including matrices.
 
 
 ```python
@@ -260,9 +260,9 @@ print('A * B =', A * B)
 ## Basic properties of tensor arithmetic
 
 Scalars, vectors, matrices, and tensors of any order have some nice properties that we'll often rely on.
-For example, as you might have noticed from the definition of an element-wise operation, 
+For example, as you might have noticed from the definition of an elementwise operation, 
 given operands with the same shape, 
-the result of any element-wise operation is a tensor of that same shape. 
+the result of any elementwise operation is a tensor of that same shape. 
 Another convenient property is that for all tensors, multiplication by a scalar 
 produces a tensor of the same shape. 
 In math, given two tensors $X$ and $Y$ with the same shape,
@@ -317,7 +317,7 @@ print(nd.sum(A) / A.size)
 
 ## Dot products
 
-<!-- So far, we've only performed element-wise operations, sums and averages. And if this was we could do, linear algebra probably wouldn't deserve it's own chapter. However, -->
+<!-- So far, we've only performed elementwise operations, sums and averages. And if this was we could do, linear algebra probably wouldn't deserve it's own chapter. However, -->
 
 One of the most fundamental operations is the dot product. Given two vectors $\mathbf{u}$ and $\mathbf{v}$, the dot product $\mathbf{u}^T \mathbf{v}$ is a sum over the products of the corresponding elements: $\mathbf{u}^T \mathbf{v} = \sum_{i=1}^{d} u_i \cdot v_i$.
 
@@ -326,7 +326,7 @@ One of the most fundamental operations is the dot product. Given two vectors $\m
 nd.dot(u, v)
 ```
 
-Note that we can express the dot product of two vectors ``nd.dot(u, v)`` equivalently by performing an element-wise multiplication and then a sum:
+Note that we can express the dot product of two vectors ``nd.dot(u, v)`` equivalently by performing an elementwise multiplication and then a sum:
 
 
 ```python
