@@ -1,4 +1,4 @@
-# Mini-batch Stochastic Gradient Descent
+# Minibatch Stochastic Gradient Descent
 :label:`sec_minibatch_sgd`
 
 So far we encountered two extremes in the approach to gradient based learning: :ref:`chapter_gd` uses the full dataset to compute gradients and to update parameters, one pass at a time. Conversely :ref:`chapter_sgd` processes one obervation at a time to make progress. Each of them has its own drawbacks. Gradient Descent is not particularly *data efficient* whenever data is very similar. Stochastic Gradient Descent is not particularly *computationally efficient* since CPUs and GPUs cannot exploit the full power of vectorization. This suggests that there might be a happy medium, and in fact, that's what we've been using so far in the examples we discussed. 
@@ -86,7 +86,7 @@ $$\mathbf{g}_t = \partial_{\mathbf{w}} \frac{1}{|\mathcal{B}_t|} \sum_{i \in \ma
 
 Let's see what this does to the statistical properties of $\mathbf{g}_t$: since both $\mathbf{x}_t$ and also all elements of the minibatch $\mathcal{B}_t$ are drawn uniformly at random from the training set, the expectation of the gradient remains unchanged. The variance, on the other hand, is reduced significantly. Since the minibatch gradient is composed of $b := |\mathcal{B}_t|$ independent gradients which are being averaged, its standard deviation is reduced by a factor of $b^{-\frac{1}{2}}$. This, by itself, is a good thing, since it means that the updates are more reliably aligned with the full gradient. 
 
-Naively this would indicate that choosing a large minibatch $\mathcal{B}_t$ would be universally desirable. Alas, after some point, the additional reduction in standard deviation is minimal when compared to the linear increase in computational cost. In practice we pick a minibatch that is large enough to offer good computational efficiency while still fitting into the memory of a GPU. To illustrate the savings let's have a look at some code. In it we perform the same matrix-matrix multiplication, but this time broken up into 'minibatches' of 64 columns at a time. 
+Naively this would indicate that choosing a large minibatch $\mathcal{B}_t$ would be universally desirable. Alas, after some point, the additional reduction in standard deviation is minimal when compared to the linear increase in computational cost. In practice we pick a minibatch that is large enough to offer good computational efficiency while still fitting into the memory of a GPU. To illustrate the savings let's have a look at some code. In it we perform the same matrix-matrix multiplication, but this time broken up into 'minibatches' of 64 columns at a time.
 
 ```{.python .input}
 timer.start()
@@ -158,7 +158,7 @@ def train_ch10(trainer_fn, states, hyperparams, data_iter,
     return timer.cumsum(), animator.Y[0]
 ```
 
-Let's see how optimization proceeds for batch gradient descent. This can be achieved by setting the minibatch size to 1500 (i.e. to the total number of examples). As a result the model parameters are updated only once per epoch. There is little progress. In fact, after 6 steps progress stalls. 
+Let's see how optimization proceeds for batch gradient descent. This can be achieved by setting the minibatch size to 1500 (i.e. to the total number of examples). As a result the model parameters are updated only once per epoch. There is little progress. In fact, after 6 steps progress stalls.
 
 ```{.python .input  n=4}
 def train_sgd(lr, batch_size, num_epochs=2):
@@ -175,7 +175,7 @@ When the batch size equals 1, we use SGD for optimization. For simplicity of imp
 sgd_res = train_sgd(0.005, 1)
 ```
 
-Lastly, when the batch size equals 100, we use minibatch SGD for optimization. The time required per epoch is longer than the time needed for SGD and the time for batch gradient descent. 
+Lastly, when the batch size equals 100, we use minibatch SGD for optimization. The time required per epoch is longer than the time needed for SGD and the time for batch gradient descent.
 
 ```{.python .input  n=6}
 mini1_res = train_sgd(.4, 100)
@@ -199,7 +199,7 @@ d2l.plt.gca().set_xscale('log')
 
 ## Concise Implementation
 
-In Gluon, we can use the `Trainer` class to call optimization algorithms. This is used to implement a generic training function. We will use this throughout the current chapter. 
+In Gluon, we can use the `Trainer` class to call optimization algorithms. This is used to implement a generic training function. We will use this throughout the current chapter.
 
 ```{.python .input  n=9}
 # Saved in the d2l package for later use
@@ -228,7 +228,7 @@ def train_gluon_ch10(tr_name, hyperparams, data_iter, num_epochs=2):
     print('loss: %.3f, %.3f sec/epoch'%(animator.Y[0][-1], timer.avg()))
 ```
 
-Using Gluon to repeat the last experiment shows identical behavior. 
+Using Gluon to repeat the last experiment shows identical behavior.
 
 ```{.python .input  n=10}
 data_iter, _ = get_data_ch10(10)
@@ -255,7 +255,3 @@ train_gluon_ch10('sgd', {'learning_rate': 0.05}, data_iter)
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2373)
 
 ![](../img/qr_minibatch-sgd.svg)
-
-```{.python .input}
-
-```
