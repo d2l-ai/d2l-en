@@ -1,4 +1,4 @@
-# Mini-batch Stochastic Gradient Descent
+# Minibatch Stochastic Gradient Descent
 :label:`sec_minibatch_sgd`
 
 So far we encountered two extremes in the approach to gradient based learning: :ref:`chapter_gd` uses the full dataset to compute gradients and to update parameters, one pass at a time. Conversely :ref:`chapter_sgd` processes one obervation at a time to make progress. Each of them has its own drawbacks. Gradient Descent is not particularly *data efficient* whenever data is very similar. Stochastic Gradient Descent is not particularly *computationally efficient* since CPUs and GPUs cannot exploit the full power of vectorization. This suggests that there might be a happy medium, and in fact, that's what we've been using so far in the examples we discussed. 
