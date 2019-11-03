@@ -63,7 +63,7 @@ approx = np.sum(epsilon*f)
 true = np.log(2) / 2
 
 d2l.set_figsize()
-d2l.plt.bar(x, f, width = epsilon, align = 'edge')
+d2l.plt.bar(x.asnumpy(), f.asnumpy(), width = epsilon, align = 'edge')
 d2l.plt.plot(x, f, color='black')
 d2l.plt.ylim([0, 1])
 d2l.plt.show()
