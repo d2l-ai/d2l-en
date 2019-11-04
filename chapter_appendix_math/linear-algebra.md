@@ -729,7 +729,7 @@ $$
 
 ## Common Examples from Linear Algebra
 Let us see how many of the linear algebraic definitions we have seen before can be expressed in this compressed tensor notation:
-* $\\mathbf{v} \cdot \mathbf{w} = v_iw_i$ 
+* $\mathbf{v} \cdot \mathbf{w} = v_iw_i$ 
 * $\|\mathbf{v}\|_2^{2} = v_iv_i$
 * $\mathbf{A}\mathbf{v} = a_{ij}v_j$
 * $\mathbf{A}\mathbf{B} = a_{ij}b_{jk}$
