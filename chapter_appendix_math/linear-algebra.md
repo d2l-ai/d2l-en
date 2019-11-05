@@ -320,7 +320,6 @@ $$
 \mathbf{A} = \begin{bmatrix}
 a & b \\ c & d
 \end{bmatrix}.
-
 $$
 
 If we want to apply this to an arbitrary vector 
