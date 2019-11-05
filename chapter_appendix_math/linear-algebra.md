@@ -1191,6 +1191,7 @@ y_{il} = x_{ijkl}a_{jk}.
 $$
 
 ## Common Examples from Linear Algebra
+
 Let us see how many of the linear algebraic definitions 
 we have seen before can be expressed in this compressed tensor notation:
 * $\mathbf{v} \cdot \mathbf{w} = v_iw_i$ 
