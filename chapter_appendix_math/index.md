@@ -8,4 +8,7 @@ linear-algebra
 calculus
 probability
 info-theory
+statistics
+ab-testing
 ```
+
