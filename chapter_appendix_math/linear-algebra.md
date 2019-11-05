@@ -272,36 +272,33 @@ from mxnet import gluon
 train = gluon.data.vision.FashionMNIST(train=True) 
 test = gluon.data.vision.FashionMNIST(train=False)
 
-#TODO (the following depends on a feature update)
-
-#X_train_0 = np.array([x[0] for x in train if x[1] == 0])
-#X_train_1 = np.array([x[0] for x in train if x[1] == 1])
-#X_test = np.array([x[0] for x in test if x[1] == 0 or x[1] == 1])
-#y_test = np.array([x[1] for x in test if x[1] == 0 or x[1] == 1])
+X_train_0 = np.concatenate([np.expand_dims(x[0], 0) for x in train if x[1] == 0], axis=0).astype(float)
+X_train_1 = np.concatenate([np.expand_dims(x[0], 0) for x in train if x[1] == 1], axis=0).astype(float)
+X_test = np.concatenate([np.expand_dims(x[0], 0) for x in test if x[1] == 0 or x[1] == 1], axis=0).astype(float)
+y_test = np.concatenate([np.expand_dims(x[1], 0) for x in test if x[1] == 0 or x[1] == 1], axis=0).astype(float)
 
 # Compute Averages
-#ave_0 = np.mean(X_train_0,axis=0)
-#ave_1 = np.mean(X_train_1,axis=0)
-#print("Computed Averages")
+ave_0 = np.mean(X_train_0,axis=0)
+ave_1 = np.mean(X_train_1,axis=0)
 ```
 
 ```{.python .input}
 # Plot average t-shirt
-#d2l.plt.imshow(ave_0.reshape(28,28).tolist(),cmap='Greys')
-#d2l.plt.show()
+d2l.plt.imshow(ave_0.reshape(28,28).tolist(),cmap='Greys')
+d2l.plt.show()
 ```
 
 ```{.python .input}
 # Plot average trousers
-#d2l.plt.imshow(ave_1.reshape(28,28).tolist(),cmap='Greys')
-#d2l.plt.show()
+d2l.plt.imshow(ave_1.reshape(28,28).tolist(),cmap='Greys')
+d2l.plt.show()
 ```
 
 ```{.python .input}
 # Print test set accuracy with eyeballed threshold
-#w = (ave_1 - ave_0).T
-#predictions = 1*(X_test.reshape(2000,-1).dot(w.flatten()) > -1500000)
-#"Accuracy: {}".format(np.mean(predictions==y_test))
+w = (ave_1 - ave_0).T
+predictions = 1*(X_test.reshape(2000,-1).dot(w.flatten()) > -1500000)
+"Accuracy: {}".format(np.mean(predictions==y_test))
 ```
 
 ## Geometry of linear transformations
