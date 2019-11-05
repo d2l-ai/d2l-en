@@ -84,14 +84,18 @@ that takes us from the point $\mathbf{u}$ to the point $\mathbf{v}$.
 As we saw in :numref:`sec_scalar-tensor`, 
 if we take two column vectors say $\mathbf{u}$ and $\mathbf{v}$,
 we can form their dot product by computing:
+
 $$
 \mathbf{u}^\top\mathbf{v} = \sum_i u_i\cdot v_i.
 $$
+
 Because this operation is symmetric, we will mirror the notation 
 of classical multiplication and write
+
 $$
 \mathbf{u}\cdot\mathbf{v} = \mathbf{u}^\top\mathbf{v} = \mathbf{v}^\top\mathbf{u},
 $$
+
 to highlight the fact that exchanging the order of the vectors will yield the same answer.
 
 The dot product also admits a geometric interpretation: it is closely related to the angle between two vectors.
@@ -107,10 +111,13 @@ $$
 The vector $\mathbf{v}$ is length $r$ and runs parallel to the $x$-axis, 
 and the vector $\mathbf{w}$ is of length $s$ and at angle $\theta$ with the $x$-axis.  
 If we compute the dot product of these two vectors, we see that
+
 $$
 \mathbf{v}\cdot\mathbf{w} = rs\cos(\theta) = \|\mathbf{v}\|\|\mathbf{w}\|\cos(\theta).
 $$
+
 With some simple algebraic manipulation, we can rearrange terms to obtain
+
 $$
 \theta = \arccos\left(\frac{\mathbf{v}\cdot\mathbf{w}}{\|\mathbf{v}\|\|\mathbf{w}\|}\right).
 $$
@@ -124,6 +131,7 @@ one with the dot product, and the other geometrically using the law of cosines,
 we can obtain the full relationship. 
 Indeed, for any two vectors $\mathbf{v}$ and $\mathbf{w}$,
 the angle between the two vectors is
+
 $$
 \theta = \arccos\left(\frac{\mathbf{v}\cdot\mathbf{w}}{\|\mathbf{v}\|\|\mathbf{w}\|}\right).
 $$
@@ -302,7 +310,7 @@ d2l.plt.show()
 # Print test set accuracy with eyeballed threshold
 w = (ave_1 - ave_0).T
 predictions = 1*(X_test.reshape(2000,-1).dot(w.flatten()) > -1500000)
-"Accuracy: {}".format(np.mean(predictions==y_test))
+print("Accuracy: {}".format(np.mean(predictions==y_test)))
 ```
 
 ## Geometry of linear transformations
@@ -1185,7 +1193,7 @@ $$
 ## Common Examples from Linear Algebra
 Let us see how many of the linear algebraic definitions 
 we have seen before can be expressed in this compressed tensor notation:
-* $\\mathbf{v} \cdot \mathbf{w} = v_iw_i$ 
+* $\mathbf{v} \cdot \mathbf{w} = v_iw_i$ 
 * $\|\mathbf{v}\|_2^{2} = v_iv_i$
 * $\mathbf{A}\mathbf{v} = a_{ij}v_j$
 * $\mathbf{A}\mathbf{B} = a_{ij}b_{jk}$
