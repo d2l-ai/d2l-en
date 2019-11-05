@@ -1,6 +1,9 @@
 # Appendix: Mathematics for Deep Learning
 :label:`chap_appendix_math`
 
+**Brent Werness** (*Amazon*) and **Rachel Hu** (*Amazon*)
+
+
 One of the wonderful parts of modern deep learning is the fact that much of it can be understood and used without a full understanding of the mathematics below it.  This is a sign of the fact that the field is becoming more mature.  Most software developers no longer need to worry about the theory of computable functions, or if programming languages without a ```goto``` can emulate programming languages with a ```goto``` with at most constant overhead, and neither should the deep learning practitioner need to worry about the theoretical foundations maximum likelihood learning, if one can find an architecture to approximate a target function to an arbitrary degree of accuracy.
 
 That said, we are not quite there yet.
@@ -21,8 +24,6 @@ Lastly, we turn to the topic of information theory, which is the mathematical st
 
 Taken together, these form the core of the mathematical concepts needed to begin down the path towards a deep understanding of ML models.
 
-This chapter is co-authored with Brent Werness and Rachel Hu, and they are the major contributors.
-
 ```toc
 :maxdepth: 2
 
@@ -36,3 +37,4 @@ distributions
 naive-bayes
 info-theory
 ```
+

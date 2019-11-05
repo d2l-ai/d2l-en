@@ -84,14 +84,18 @@ that takes us from the point $\mathbf{u}$ to the point $\mathbf{v}$.
 As we saw in :numref:`sec_scalar-tensor`, 
 if we take two column vectors say $\mathbf{u}$ and $\mathbf{v}$,
 we can form their dot product by computing:
+
 $$
 \mathbf{u}^\top\mathbf{v} = \sum_i u_i\cdot v_i.
 $$
+
 Because this operation is symmetric, we will mirror the notation 
 of classical multiplication and write
+
 $$
 \mathbf{u}\cdot\mathbf{v} = \mathbf{u}^\top\mathbf{v} = \mathbf{v}^\top\mathbf{u},
 $$
+
 to highlight the fact that exchanging the order of the vectors will yield the same answer.
 
 The dot product also admits a geometric interpretation: it is closely related to the angle between two vectors.
@@ -107,10 +111,13 @@ $$
 The vector $\mathbf{v}$ is length $r$ and runs parallel to the $x$-axis, 
 and the vector $\mathbf{w}$ is of length $s$ and at angle $\theta$ with the $x$-axis.  
 If we compute the dot product of these two vectors, we see that
+
 $$
 \mathbf{v}\cdot\mathbf{w} = rs\cos(\theta) = \|\mathbf{v}\|\|\mathbf{w}\|\cos(\theta).
 $$
+
 With some simple algebraic manipulation, we can rearrange terms to obtain
+
 $$
 \theta = \arccos\left(\frac{\mathbf{v}\cdot\mathbf{w}}{\|\mathbf{v}\|\|\mathbf{w}\|}\right).
 $$
@@ -124,6 +131,7 @@ one with the dot product, and the other geometrically using the law of cosines,
 we can obtain the full relationship. 
 Indeed, for any two vectors $\mathbf{v}$ and $\mathbf{w}$,
 the angle between the two vectors is
+
 $$
 \theta = \arccos\left(\frac{\mathbf{v}\cdot\mathbf{w}}{\|\mathbf{v}\|\|\mathbf{w}\|}\right).
 $$
@@ -272,34 +280,37 @@ from mxnet import gluon
 train = gluon.data.vision.FashionMNIST(train=True) 
 test = gluon.data.vision.FashionMNIST(train=False)
 
-X_train_0 = np.array([x[0] for x in train if x[1] == 0])
-X_train_1 = np.array([x[0] for x in train if x[1] == 1])
-X_test = np.array([x[0] for x in test if x[1] == 0 or x[1] == 1])
-y_test = np.array([x[1] for x in test if x[1] == 0 or x[1] == 1])
+X_train_0 = np.concatenate([np.expand_dims(
+    x[0], 0) for x in train if x[1] == 0], axis=0).astype(float)
+X_train_1 = np.concatenate([np.expand_dims(
+    x[0], 0) for x in train if x[1] == 1], axis=0).astype(float)
+X_test = np.concatenate([np.expand_dims(
+    x[0], 0) for x in test if x[1] == 0 or x[1] == 1], axis=0).astype(float)
+y_test = np.concatenate([np.expand_dims(
+    x[1], 0) for x in test if x[1] == 0 or x[1] == 1], axis=0).astype(float)
 
 # Compute Averages
 ave_0 = np.mean(X_train_0,axis=0)
 ave_1 = np.mean(X_train_1,axis=0)
-print("Computed Averages")
 ```
 
 ```{.python .input}
 # Plot average t-shirt
-#d2l.plt.imshow(ave_0.reshape(28,28).tolist(),cmap='Greys')
-#d2l.plt.show()
+d2l.plt.imshow(ave_0.reshape(28,28).tolist(),cmap='Greys')
+d2l.plt.show()
 ```
 
 ```{.python .input}
 # Plot average trousers
-#d2l.plt.imshow(ave_1.reshape(28,28).tolist(),cmap='Greys')
-#d2l.plt.show()
+d2l.plt.imshow(ave_1.reshape(28,28).tolist(),cmap='Greys')
+d2l.plt.show()
 ```
 
 ```{.python .input}
 # Print test set accuracy with eyeballed threshold
-#w = (ave_1 - ave_0).T
-#predictions = 1*(X_test.reshape(2000,-1).dot(w.flatten()) > -1500000)
-#"Accuracy: {}".format(np.mean(predictions==y_test))
+w = (ave_1 - ave_0).T
+predictions = 1*(X_test.reshape(2000,-1).dot(w.flatten()) > -1500000)
+print("Accuracy: {}".format(np.mean(predictions==y_test)))
 ```
 
 ## Geometry of linear transformations
@@ -317,7 +328,6 @@ $$
 \mathbf{A} = \begin{bmatrix}
 a & b \\ c & d
 \end{bmatrix}.
-
 $$
 
 If we want to apply this to an arbitrary vector 
@@ -1113,7 +1123,7 @@ for i in range(1,100):
 d2l.plot(np.arange(0,100),norm_list,'Iteration','Value')
 ```
 
-```
+```{.python .input}
 # Also plot the ratio
 norm_ratio_list = []
 for i in range(1,100):
@@ -1121,7 +1131,6 @@ for i in range(1,100):
     
 d2l.plot(np.arange(1,100),norm_ratio_list,'Iteration','Ratio')
 ```
-
 
 ### Conclusions
 
@@ -1183,7 +1192,8 @@ $$
 
 ## Common Examples from Linear Algebra
 
-Let us see how many of the linear algebraic definitions we have seen before can be expressed in this compressed tensor notation:
+Let us see how many of the linear algebraic definitions 
+we have seen before can be expressed in this compressed tensor notation:
 * $\mathbf{v} \cdot \mathbf{w} = v_iw_i$ 
 * $\|\mathbf{v}\|_2^{2} = v_iv_i$
 * $\mathbf{A}\mathbf{v} = a_{ij}v_j$
