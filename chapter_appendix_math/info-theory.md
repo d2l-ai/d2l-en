@@ -1,17 +1,30 @@
 # Information Theory
 :label:`sec_information_theory`
 
-Dataism believes that the universe is overflowing with information, from the first mystery microbe on the earth to the Homo sapiens that emerged millions year ago, from the famous cosmological model Big Bang theory to Hawking radiation released by black holes. Even if we narrow our scope down to the earth, information flow builds bridge over disciplinary rifts: from Shakespeare’s Sonnet to researchers’ paper on Cornell ArXiv, from Van Gogh’s printing Starry Night to Beethoven’s music Symphony No. 5, from the first programming language Plankalkül to the state-of-the-art machine learning algorithms. No matter what are the format of these information, everything follows the rule of information theory for millennium of years. With information theory, we can measure and compare how much information is presented in different signals. In this section, we will illustrate the fundamental concepts of information theory and its applications.
+The universe is overflowing with information. Information provides a common language across disciplinary rifts: from Shakespeare’s Sonnet to researchers’ paper on Cornell ArXiv, from Van Gogh’s printing Starry Night to Beethoven’s music Symphony No. 5, from the first programming language Plankalkül to the state-of-the-art machine learning algorithms. Everything must follow the rules of information theory, no matter the format. With information theory, we can measure and compare how much information is present in different signals. In this section, we will investigate the fundamental concepts of information theory and applications of information theory in machine learning.
 
-Before we get started, let us understand the relationship between machine learning and information theory. While the forner is aimed at extracting interesting signals from data and making critical predictions, information theory is a field of study about encoding, decoding, transmitting, and manipulating information. As a result, information theory provides a strong backbone of fundamental machine learning. For example, cross entropy loss in :numref:`sec_softmax` is used as an objective function in many machine learning algorithms. Such a loss is a direct application of information theory. 
+Before we get started, let us outline the relationship between machine learning and information theory. While the former is aimed at extracting interesting signals from data and making critical predictions, information theory is a field of study about encoding, decoding, transmitting, and manipulating information. As a result, information theory provides fundamental language for discussing the information processing in machine learned systems. For example, the cross entropy loss in :numref:`sec_softmax` is used as an objective function in many machine learning algorithms.  This loss can be directly derived from information theoretic considerations. 
 
 
 ## Information
  
-Let us start with the "soul" of information theory - information. *Information* (or *data*) can be encoded in anything with a particular sequence of one or more encoding formats. Rather than caring about the knowledge, information represents the degree of surprise or the abstract possibility of the event. For example, if we want to elucidate an unusual event, we need a lot information. Hence, unriddling this event can help us gain plenty of information. Whereas, for a common event, we may not need much information since we already know it pretty well.
+Let us start with the "soul" of information theory - information. *Information* can be encoded in anything with a particular sequence of one or more encoding formats. Suppose we were given the task of trying to define a notion of information.  What could be are starting point?  
 
-In this era of information explosion, how do we quantify the meaningfulness of a piece of information? Are there any fundamental math theory to measure and compare different pieces of information? Our ancestors had tried to solve these questions for years. Until year 1948,  [Claude E. Shannon](https://en.wikipedia.org/wiki/Claude_Shannon) published his well-known book [A Mathematical Theory of Communication](https://en.wikipedia.org/wiki/A_Mathematical_Theory_of_Communication), the discipline of information theory had not been established. Shannon was an American mathematician, electrical engineer, and crytographer known as "the father of information theory". In his book, Shannon introduced the concept of information entropy at the first time. We will begin our information theory journey here.
+Consider the following thought experiment.  We have a friend with a deck of cards.  They will shuffle the deck, flip over some cards, and tell us statements about the cards.  We will try to assess the information content of each statement.
 
+First, they flip over a card and tell us, "I see a card."  This provides us with no information at all.  We were already certain that this was the case so we hope the information should be zero.
+
+Next, they flip over a card and say, "I see a heart."  This provides us some information, but in reality there are only $4$ different suits that were possible, each equally likely, so we are not surprised by this outcome.  We hope that whatever the measure of information, this event should have low information content.
+
+Next, they flip over a card and say, "This is the $3$ of spades."  This is more information.  Indeed there were $52$ equally likely possible outcomes, and we were told which one it was.  This should be a medium ammount of intformation.
+
+Let us take this to the logical extreme.  Suppose lastly that they flip over every card from the deck and read off the entire sequence of the shuffled deck.  There are $52!$ different orders to the deck, again all equally likely, so we need a lot of information to know which one it is.
+
+Any notion of information we develop must conform to this intuition.  Indeed, as we will see in the next sections, the above events have $0\text{ bits}$, $2\text{ bits}$, $~5.7\text{ bits}$, and $~225.6\text{ bits}$ of information respectively.
+
+If we read through these thought experiments, we see a natural idea.  As a starting point, rather than caring about the knowledge, we may build off the idea that information represents the degree of surprise or the abstract possibility of the event. For example, if we want to describe an unusual event, we need a lot information. For a common event, we may not need much information.
+
+In 1948,  [Claude E. Shannon](https://en.wikipedia.org/wiki/Claude_Shannon) published his well-known book [A Mathematical Theory of Communication](https://en.wikipedia.org/wiki/A_Mathematical_Theory_of_Communication) establishing the theory of information.  In his book, Shannon introduced the concept of information entropy for the first time. We will begin our journey here.
 
 ### Self-information
 
@@ -43,6 +56,17 @@ self_information(1/64)
 
 As self-information only measures the information of a single discrete event, we need a more generalized measure for any random variable of either discrete or continuous distribution. 
 
+
+### Motivating Entropy
+
+Let's try to get specific about what we want.  This will be an informal statement of what are known as the *axioms of Shannon entropy*.  It will turn out that the following collection of common-sense statements force us to a unique definition of information.  A formal version of these axioms can be found [here](https://www.mdpi.com/1099-4300/10/3/261/pdf).
+
+1.  The information we gain by observing a random variable doesn't depend on what we call the elements, or the presenence of additional elements which have probability zero.
+2.  The information we gain by observing two random variables is no more than the sum of the information we gain by observing them separately.  If they are independent, then it is exactly the sum.
+3.  The information gained when observing (nearly) certain events is (nearly) zero.
+
+While proving this fact is beyond the scope of our text, it is important to know that this uniquely determines the form that entropy must take.  The only ambiguity that these allow is in the choice of fundamental units, which is most often normalized by making the choice we saw before that the information provided by a single fair coin flip is one bit.
+
 ### Definition
 
 For any random variable $X$ that follows a probability distribution $P$ with a probability density function (p.d.f.) or a probability mass function (p.m.f.) $p(x)$, we measure the expected amount of information through *entropy* (or *Shannon entropy*)
@@ -70,11 +94,11 @@ entropy(np.array([0.1, 0.5, 0.2, 0.3]))
 
 You may be curious: in the entropy definition, why we use an expectation of a negative logarithm? Here are some intuitions.
 
-First, why do we use a *logarithm* function $\log$? Suppose that $p(x) = f_1(x) f_2(x) \ldots, f_n(x)$, where each component function $f_i(x)$ is independent from each other. This means that each $f_i(x)$ contributes independently to the total information obtained from $p(x)$. As a result, we need the entropy formula to possess the additive functionality over a mixed independent distributions. Luckily, $\log$ can naturally turn a product of probability distributions to a summation of their individual information.
+First, why do we use a *logarithm* function $\log$? Suppose that $p(x) = f_1(x) f_2(x) \ldots, f_n(x)$, where each component function $f_i(x)$ is independent from each other. This means that each $f_i(x)$ contributes independently to the total information obtained from $p(x)$. As discussed above, we. want the entropy formula to be additive over independent random variables. Luckily, $\log$ can naturally turn a product of probability distributions to a summation of the individual terms.
 
-Next, why do we use a *negative* $\log$? Intuitively, more frequent events should contain less information than less common events, since we often gain more information from an unusual case than from a regular one. However, $\log$ is monotonically increasing with the probabilities, whereas we need to construct a monotonically decreasing relationship between the probability of events and their entropy. Hence, we add a negative sign in front of $\log$ function.
+Next, why do we use a *negative* $\log$? Intuitively, more frequent events should contain less information than less common events, since we often gain more information from an unusual case than from an ordinary one. However, $\log$ is monotonically increasing with the probabilities, and indeed negative for all values in $[0,1]$.  We need to construct a monotonically decreasing relationship between the probability of events and their entropy, which will ideally be always positive (for nothing we observe should force us to forget what we have known). Hence, we add a negative sign in front of $\log$ function.
 
-Last, where does the *expectation* function come from? Consider a random variable $X$ follows a given probability distribution, entropy can be interpreted as the average amount of surprise from observing $X$. For example, imagine that a slot machine system emits statistical independently symbols ${s_1, \ldots, s_k}$ with probabilities ${p_1, \ldots, p_k}$ respectively. Then the entropy of this system equals to the average self-information from observing each output, i.e.,
+Last, where does the *expectation* function come from? Consider a random variable $X$. The self-information ($-\log(p)$) can be interpreted as the amount of *surpise* we have at seeing a particular outcome.  Indeed, as the probability approaches zero, the surprise becomes infinite.  The entropy can be interpreted as the average amount of surprise from observing $X$. For example, imagine that a slot machine system emits statistical independently symbols ${s_1, \ldots, s_k}$ with probabilities ${p_1, \ldots, p_k}$ respectively. Then the entropy of this system equals to the average self-information from observing each output, i.e.,
 
 $$H(S) = \sum_i {p_i \cdot I(s_i)} = - \sum_i {p_i \cdot \log p_i}.$$
 
@@ -88,12 +112,12 @@ By the above examples and interpretations, we can derive the following propertie
 
 * If $X \sim P$ with a p.d.f. or a p.m.f. $p(x)$, and we try to estimate $P$ by a new probability distribution $Q$ with a p.d.f. or a p.m.f. $q(x)$, then $$H(X) = - E_{x \sim P} [\log p(x)] \leq  - E_{x \sim P} [\log q(x)], \text{ with equality if and only if } P = Q.$$  Alternatively, $H(X)$ gives a lower bound of the average number of bits needed to encode symbols drawn from $P$.
 
-* If $X \sim P$, then $x$ conveys the maximum amount of information if it spreads evenly among all possible outcomes. Specifically, if the probability distribution $P$ is discrete with $k$-class $\{p_1, \ldots, p_k \}$, then $$H(X) \leq \log(k), \text{ with equality if and only if } p_i = \frac{1}{k}, \forall x_i.$$ Otherwise, if $P$ is continuous, then $P$ has the highest entropy if it is a uniform distribution.
+* If $X \sim P$, then $x$ conveys the maximum amount of information if it spreads evenly among all possible outcomes. Specifically, if the probability distribution $P$ is discrete with $k$-class $\{p_1, \ldots, p_k \}$, then $$H(X) \leq \log(k), \text{ with equality if and only if } p_i = \frac{1}{k}, \forall x_i.$$ If $P$ is a continuous random variable, then the story becomes much more complicated.  However, if we additionally impose that $P$ is supported on a finite interval (say all the values are between $0$ and $1$), then $P$ has the highest entropy if it is the uniform distribution on that interval.
 
 
 ## Mutual Information
 
-Previouly we defined entropy of a single random variable $X$, how about the entropy of a pair random variables $(X,Y)$? Does knowing the entropy of one of $X$ or $Y$ help us with knowing the entropy of this pair?
+Previouly we defined entropy of a single random variable $X$, how about the entropy of a pair random variables $(X,Y)$?  These techniques can be thought of as trying to answer the following type of question, "What information is contained in $X$ and $Y$ together compared to each separately?  Is there redundant information, or is it all unique?"
 
 For the following discussion, we always use $(X,Y)$ as a pair of random variables that follows a joint probability distribution $P$ with a p.d.f. or a p.m.f. $p_{X,Y}(x,y)$, while $X$ and $Y$ follow probability distribution $p_X(x)$ and $p_Y(y)$, respectively. 
 
@@ -107,6 +131,12 @@ Precisely, on the one hand, if $(X,Y)$ is a pair of discrete random variables, t
 
 On the other hand, if $(X,Y)$ is a pair of continuous random variables, then the *differential joint entropy* is defined as $$H(X,Y) = - \int_{x, y} p_{X,Y}(x,y) \ \log p_{X,Y}(x,y) \;dx \;dy.$$
 
+This can be thought of as telling us the total randomness in the pair of random variables together.  As a pair of extremes, if $X = Y$ are two identical random variables, then the information in the pair is exactly the information in one and we have $H(X,Y) = H(X) = H(Y)$.  On the other extreme, if $X$ and $Y$ are independent then $H(X,Y) = H(X) + H(Y)$.  Indeed we will always have that the information contained in a pair of random variables is no smaller than the entropy of either random variable and no more than the sum of both.
+
+$$
+H(X), H(Y) \le H(X,Y) \le H(X) + H(Y).
+$$
+
 Let us implement joint entropy from scratch in MXNet.
 
 ```{.python .input}
@@ -119,23 +149,26 @@ def joint_entropy(p_xy):
 joint_entropy(np.array([0.1, 0.5, 0.2, 0.3]))
 ```
 
+Notice that this is the same *code* as before, but now we interpret it differently as working on the joint distribution of the two random variables.
+
 ### Conditional Entropy
 
-Now suppose that we know the joint distribution of a pair of random variables $(X,Y)$. What is more, we know the probability distribution of X. In this setting, we can calculate the entropy $H(X)$ and joint entropy $H(X, Y)$. But can we know about the random variable $Y$ with the above information? In common-sense point of view, knowing $X$ may allude some information about the related variables $Y$. In the probability theory, we have the definition of the *conditional probability* to measure the relationship between variables. As a result, we can define the *conditional entropy* $H(Y \mid X)$ as 
+The joint entropy defined above the amount of information contained in a pair of random variables.  This is very useful, but often times it is not what we care about.  Consider the setting of machine learning.  Let's take $X$ to be the random variable (or vector of random variables) that describes the pixel values of an image, and $Y$ to be the random variable which is the class label.  $X$ should contain substantial information---a natural image is a very complex thing.  However, the information contained in $Y$ once the image has been show should be very low.  Indeed, the image of a digit should already contain the information about what digit it is unless the digit is illegible.  Thus, to continue to extend our vocabulary of information theory, we need to be able to reason about the information content in a random variable conditional on another.
+
+In the probability theory, we saw the definition of the *conditional probability* to measure the relationship between variables. We now want to analogously define the *conditional entropy* $H(Y \mid X)$.  This can be written as 
 
 $$ H(Y \mid X) = - E_{(x,y) \sim P} [\log p(y \mid x)],$$ 
 
 where $p(y \mid x) = \frac{p_{X,Y}(x, y)}{p_X(x)}$ is the conditional probability. Specificly, if $(X,Y)$ is a pair of discrete random variables, then $$H(Y \mid X) = - \sum_{x} \sum_{y} p(x,y) \log p(y \mid x).$$
 
-On the flip side, if $(X,Y)$ is a pair of continuous random variables, then the *differential joint entropy* is defined as $$H(Y \mid X) = - \int_x \int_y p(x,y) \ \log p(y \mid x) \;dx \;dy.$$
+If $(X,Y)$ is a pair of continuous random variables, then the *differential joint entropy* is similarly defined as $$H(Y \mid X) = - \int_x \int_y p(x,y) \ \log p(y \mid x) \;dx \;dy.$$
 
 
-Back to explain our common-sense intuition, how does the *conditional entropy* $H(Y \mid X)$ relate to the entropy $H(X)$ and the joint entropy $H(X, Y)$? Unsurprisingly, the naturalness of the above definitions alludes that 
+It is now natural to ask, how does the *conditional entropy* $H(Y \mid X)$ relate to the entropy $H(X)$ and the joint entropy $H(X, Y)$?  The answer can be expressed quite cleanly:
 
 $$H(Y \mid X) = H(X,Y) - H(X).$$
 
-We can interpret the conditional entropy $H(Y \mid X)$ as, given the joint information of $(X, Y)$, the uncertainty that removed by knowing the information of $X$. 
-
+This has a simple interpretation: the information in $Y$ given $X$ ($H(Y \mid X)$) is the same as the information in both $X$ and $Y$ together ($H(X, Y)$) minus the information already contained in $X$.  This gives us the information in $Y$ which is not also represented in $X$.  
 
 Now, let us implement conditional entropy from scratch in MXNet.
 
@@ -152,22 +185,30 @@ conditional_entropy(np.array([0.1, 0.5, 0.2, 0.3]), np.array([1, 1, 1, 1]))
 
 ### Mutual Information
 
-Given the previous setting of random variables $(X, Y)$, you may wonder: "How much information do $X$ and $Y$ share?" Luckily, *mutual information* of $(X,Y)$ can give us the answer as
+Given the previous setting of random variables $(X, Y)$, you may wonder: "Now that we know how much information is contained in $Y$ but not in $X$, can we similarly ask how much information is shared between $X$ and $Y$?" The *mutual information* of $(X,Y)$, which will be written as $I(X,Y)$, can give us the answer.  
+
+Rather than diving straight into the formal definition in terms of expectations, lets practice our intuition by first trying to derive an expression for the mutual information entirely based on terms we've constructed before.  We wish to find the information shared between two random variables.  One way we could try to do this is to start with all the information contained in both $X$ and $Y$ together, and then we take off the parts that are not shared.  The information contained in both $X$ and $Y$ together is written as $H(X,Y)$.  We want to subtract from this the information contained in $X$ but not in $Y$, and the information contained in $Y$ but not in $X$.  As we saw in the previous section, this is given by
+$H(X \mid Y)$ and $H(Y \mid X)$ respectively.  Thus, we have that the mutual information should be
+
+$$
+I(X,Y) = H(X,Y) - H(Y \mid X) − H(X \mid Y).
+$$
+
+Indeed, this is a valid definition for the mutual information.  If we expand out the definitions of these terms and combine them, a little algebra shows that this is the same as
 
 $$I(X,Y) = −E_{x} E_{y} \left\{ p_{X,Y}(x, y) \log\frac{p_{X,Y}(x, y)}{p_X(x) p_Y(y)} \right\}. $$
 
 
-As shown in the image :numref:`fig_mutual_information`, if we know $H(X)$ (i.e., the amount of uncertainty in $X$) and $H(X \mid Y)$ (i.e., amount of uncertainty in $X$ which remains after $Y$ is known), mutual information tells us the average reduction in uncertainty about $X$ that results from learning the value of $Y$. As a result, the following terms are numerically equivalent to $I(X,Y)$:
+We can summarize all of these relationships in image :numref:`fig_mutual_information`.  It is an excellent test of intution to see why the following statements are all also equivalent to $I(X,Y)$.
 
 * $H(X) − H(X \mid Y)$
 * $H(Y) − H(Y \mid X)$
 * $H(X) + H(Y) − H(X,Y)$
-* $H(X,Y) - H(Y \mid X) − H(X \mid Y)$
-
 
 ![Mutual information's relationship with joint entropy and conditional entropy.](../img/mutual_information.svg)
 :label:`fig_mutual_information`
 
+In many ways we can think of the mutual information as principled extension of correlation coefficient we saw in :numref:`sec-random-variables`.  This allows us to ask not only for linear relationships between variables, but for the maximum  information shared between the two random variables of any kind.
 
 Now, let us implement mutual information from scratch.
 
@@ -191,17 +232,28 @@ Rather than memorizing the definition of mutual information, you only need to ke
 * $I(X,Y) = 0$ if and only if $X$ and $Y$ are independent. For example, if $X$ and $Y$ are independent, then knowing $Y$ does not give any information about $X$ and vice versa, so their mutual information is zero.
 * Alternatively, if $X$ is a function of $Y$, then all information conveyed by $Y$ is shared with $X$ as $$I(X,Y) = H(Y) = H(X).$$
 
+### Pointwise Mutual Information
+
+When we worked with entropy at the beginning this chapter, we were able to provide an interpretation of $-\log(p_X(x))$ as hoe *surprised* we were with the particular outcome.  We may give a similar interpretation to the logarithmic term in the mutual information, which is often referred to as the *pointwise mutual information*:
+
+$$
+\mathrm{pmi}(x,y) = \log\frac{p_{X,Y}(x, y)}{p_X(x) p_Y(y)}.
+$$
+
+This quantity can be thought of as measureing how much more or less likely the specific combination of outcomes $x$ and $y$ are compared to what we would expect for independent random outcomes.  If it is large and positive, then these two specific outcomes occur much more frequently than they would compared to random chance (*note*: the denominator is $p_X(x) p_Y(y)$ which is the probability of the two outcomes were independent), whereas if it is large and negative it represents the two outcomes happening far less than we would expect by random chance.  
+
+This allows us to interpret the mutual information as the average amount that we were surprised to see two outcomes occuring together compared to what we would expect if they were independent.
 
 ### Applications of Mutual Information
 
-Mutual information may be a little abstract in it pure definition. So how does it related to machine leanring? In natural language processing, one of the most difficult problems is the "ambiguation". For example, recently a headline in the news reported that "Amazon is on fire". You may wonder whether the company Amazon's building is on fire, or the rainforest Amazon is on fire. 
+Mutual information may be a little abstract in it pure definition. So how does it related to machine learning? In natural language processing, one of the most difficult problems is the *ambiguation*, or the issue of the meaning of a word being unclear from context. For example, recently a headline in the news reported that "Amazon is on fire". You may wonder whether the company Amazon has a building on fire, or the Amazon rainforest is on fire. 
 
-In this case, mutual information can help us solve the ambiguation problem. To be specific, we first find the group of words that each has a relatively large mutual information with the company Amazon, such as e-commerce, technology, and online. Next, we find another group of words that each has a relatively large mutual information with the rainforest Amazon, such as rain, forest, and tropical. Finally, when we need to interpret "Amazon" again, we can simply compare which group has more occurrence in the context of the word Amazon.
+In this case, mutual information can help us solve the ambiguation problem. We first find the group of words that each has a relatively large mutual information with the company Amazon, such as e-commerce, technology, and online. Second, we find another group of words that each has a relatively large mutual information with the Amazon rainforest, such as rain, forest, and tropical. When we need to disambiguate "Amazon", we can compare which group has more occurrence in the context of the word Amazon.  In this case the article would go on to describe the forest, and make the context clear.
 
 
 ## Kullback–Leibler Divergence
 
-As what we have discussed in :numref:`sec_reduction-norm`, norms can be used for measuring distance between two points in space of any dimensionality. However, can we measure the distance between two probability distributions, $P$ and $Q$? Let us paraphrase it using the *Kullback–Leibler (KL) divergence*, which is quite useful in many machine learning problems. 
+As what we have discussed in :numref:`sec_reduction-norm`, norms can be used for measuring distance between two points in space of any dimensionality.  We would like to be able to do a similar task with probability distributions.  There are many ways to go about this, but one of the nicest can be obtained from information theory.  We now explore the *Kullback–Leibler (KL) divergence*, which provides a way to measure if two distributions are close together or not. 
 
 
 ### Definition
@@ -210,6 +262,7 @@ Given a random variable $X$ that follows the true probability distribution $P$ w
 
 $$D_{\mathrm{KL}}(P\|Q) = E_{x \sim P} \left[ \log \frac{p(x)}{q(x)} \right].$$
 
+As with the point-wise mutual information, we can again provide an interpretation of the logarithmic term:  $-\log \frac{q(x)}{p(x)}$ will be large an positive if we see $x$ far more often under $P$ than we'd expect for $Q$, and large and negative if we see the outcome far less than expected.  In this way, we can interpret it as our *relative* surprise
 
 In MXNet, let us implement the KL divergence from Scratch.
 
@@ -391,4 +444,5 @@ nll_loss.get()
 Let us compute the binary entropy of a number of interesting data sources.
 1. Assume that you are watching the output generated by a monkey at a typewriter. The monkey presses any of the $44$ keys of the typewriter at random (you can assume that it has not discovered any special keys or the shift key yet). How many bits of randomness per character do you observe?
 2. Being unhappy with the monkey, you replaced it by a drunk typesetter. It is able to generate words, albeit not coherently. Instead, it picks a random word out of a vocabulary of $2,000$ words. Moreover, assume that the average length of a word is $4.5$ letters in English. How many bits of randomness do you observe now?
-3. Still being unhappy with the result, you replace the typesetter by a high quality language model. These can obtain perplexity numbers as low as 20 points per character. The perplexity is defined as a length normalized probability, i.e., $$PPL(x) = \left[p(x)\right]^{1 / \text{length(x)} }.$$
+3. Still being unhappy with the result, you replace the typesetter by a high quality language model. These can currently obtain perplexity numbers as low as $15$ points per character. The perplexity is defined as a length normalized probability, i.e., $$PPL(x) = \left[p(x)\right]^{1 / \text{length(x)} }.$$ How many bits of randomness do you observe now?
+4. Explain intuitively why $I(X,Y) = H(X) - H(X|Y)$.  Then, show this is true by expressing both sides as an expectation with respect to the joint distribution.
