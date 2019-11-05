@@ -272,10 +272,14 @@ from mxnet import gluon
 train = gluon.data.vision.FashionMNIST(train=True) 
 test = gluon.data.vision.FashionMNIST(train=False)
 
-X_train_0 = np.concatenate([np.expand_dims(x[0], 0) for x in train if x[1] == 0], axis=0).astype(float)
-X_train_1 = np.concatenate([np.expand_dims(x[0], 0) for x in train if x[1] == 1], axis=0).astype(float)
-X_test = np.concatenate([np.expand_dims(x[0], 0) for x in test if x[1] == 0 or x[1] == 1], axis=0).astype(float)
-y_test = np.concatenate([np.expand_dims(x[1], 0) for x in test if x[1] == 0 or x[1] == 1], axis=0).astype(float)
+X_train_0 = np.concatenate([np.expand_dims(
+    x[0], 0) for x in train if x[1] == 0], axis=0).astype(float)
+X_train_1 = np.concatenate([np.expand_dims(
+    x[0], 0) for x in train if x[1] == 1], axis=0).astype(float)
+X_test = np.concatenate([np.expand_dims(
+    x[0], 0) for x in test if x[1] == 0 or x[1] == 1], axis=0).astype(float)
+y_test = np.concatenate([np.expand_dims(
+    x[1], 0) for x in test if x[1] == 0 or x[1] == 1], axis=0).astype(float)
 
 # Compute Averages
 ave_0 = np.mean(X_train_0,axis=0)
@@ -1112,7 +1116,7 @@ for i in range(1,100):
 d2l.plot(np.arange(0,100),norm_list,'Iteration','Value')
 ```
 
-```
+```{.python .input}
 # Also plot the ratio
 norm_ratio_list = []
 for i in range(1,100):
@@ -1120,7 +1124,6 @@ for i in range(1,100):
     
 d2l.plot(np.arange(1,100),norm_ratio_list,'Iteration','Ratio')
 ```
-
 
 ### Conclusions
 
