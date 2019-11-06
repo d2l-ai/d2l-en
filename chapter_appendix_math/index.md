@@ -36,5 +36,7 @@ maximum-likelihood
 distributions
 naive-bayes
 info-theory
+statistics
+ab-testing
 ```
 
