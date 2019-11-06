@@ -499,9 +499,9 @@ d2l.plt.figure(figsize=(12, 3))
 for i in range(3) :
     X = np.random.normal(0, 1, 500)
     Y = covs[i]*X + np.random.normal(0, 1, 500)
-    
+
     d2l.plt.subplot(1, 4, i+1)
-    d2l.plt.scatter(X, Y)
+    d2l.plt.scatter(X.asnumpy(), Y.asnumpy())
     d2l.plt.xlabel('X')
     d2l.plt.ylabel('Y')
     d2l.plt.title("cov = {}".format(covs[i]))
@@ -572,9 +572,9 @@ d2l.plt.figure(figsize=(12, 3))
 for i in range(3) :
     X = np.random.normal(0, 1, 500)
     Y = cors[i] * X + np.sqrt(1 - cors[i]**2) * np.random.normal(0, 1, 500)
-    
+
     d2l.plt.subplot(1, 4, i + 1)
-    d2l.plt.scatter(X, Y)
+    d2l.plt.scatter(X.asnumpy(), Y.asnumpy())
     d2l.plt.xlabel('X')
     d2l.plt.ylabel('Y')
     d2l.plt.title("cor = {}".format(cors[i]))
