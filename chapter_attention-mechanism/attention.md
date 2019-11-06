@@ -41,7 +41,7 @@ npx.set_np()
 The masked softmax takes a 3 dimensional input and enables us to filter out some elements by specifying a valid length for the last dimension. (Refer to
 :numref:`sec_machine_translation` for the definition of a valid length.) As a result, any value outside the valid length will be masked as $0$. Let us implement the `masked_softmax` realization first.
 
-```{.python .input  n=2}
+```{.python .input  n=6}
 # Saved in the d2l package for later use
 def masked_softmax(X, valid_length):
     # X: 3-D tensor, valid_length: 1-D or 2-D tensor
@@ -62,21 +62,8 @@ def masked_softmax(X, valid_length):
 To illustrate how does this function work, we construct two $2 \times 4$ matrixes as the input. In addition, we specify that the valid length equals 2 for the first example, and 3 for the second example. Then, as we can see from the following outputs, the value outside valid lengths are masked as zero.
 
 
-```{.python .input  n=3}
+```{.python .input  n=5}
 masked_softmax(np.random.uniform(size=(2,2,4)), np.array([2,3]))
-```
-
-```{.json .output n=3}
-[
- {
-  "data": {
-   "text/plain": "array([[[0.488994  , 0.511006  , 0.        , 0.        ],\n        [0.43654838, 0.56345165, 0.        , 0.        ]],\n\n       [[0.28817102, 0.3519408 , 0.3598882 , 0.        ],\n        [0.29034293, 0.25239873, 0.45725834, 0.        ]]])"
-  },
-  "execution_count": 3,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 Moreover, the second operator `batched_dot` takes two inputs $X$ and $Y$ with shapes $(b, n, m)$ and $(b, m, k)$, respectively, and returns an output with shape $(b, n, k)$. To be specific, it computes $b$ dot products for $i= \{1,\ldots,b\}$, i.e., 
@@ -88,19 +75,6 @@ Here, we will not dive into the detailed implementation of `batched_dot`. Rather
 
 ```{.python .input  n=4}
 npx.batch_dot(np.ones((2,1,3)), np.ones((2,3,2)))
-```
-
-```{.json .output n=4}
-[
- {
-  "data": {
-   "text/plain": "array([[[3., 3.]],\n\n       [[3., 3.]]])"
-  },
-  "execution_count": 4,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ## Dot Product Attention
@@ -149,19 +123,6 @@ values = np.arange(40).reshape(1,10,4).repeat(2,axis=0)
 atten(np.ones((2,1,2)), keys, values, np.array([2, 6]))
 ```
 
-```{.json .output n=6}
-[
- {
-  "data": {
-   "text/plain": "array([[[ 2.,  3.,  4.,  5.]],\n\n       [[10., 11., 12., 13.]]])"
-  },
-  "execution_count": 6,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 
 As we can see above, dot product attention simply multiplies the query and key together, and hopes to derive their similarities from there. Whereas, the query and key may not be of the same dimension sometimes. Can we solve the problem by applying some neural network architecture on the attention layers? The answer is the multilayer perceptron attention!
 
@@ -198,25 +159,12 @@ class MLPAttention(nn.Block):
         return npx.batch_dot(attention_weights, value)
 ```
 
-To test the above class `MLPAttention`, we use the same inputs as in the provious toy example. As we can see below, despite `MLPAttention` containing an additional MLP model, we obtain the same output as for `DotProductAttention`.
+To test the above class `MLPAttention`, we use the same inputs as in the provious toy example. As we can see below, despite `MLPAttention` containing an additional MLP model, we obtain the same outputs as for `DotProductAttention`.
 
 ```{.python .input  n=8}
 atten = MLPAttention(units=8, dropout=0.1)
 atten.initialize()
 atten(np.ones((2,1,2)), keys, values, np.array([2, 6]))
-```
-
-```{.json .output n=8}
-[
- {
-  "data": {
-   "text/plain": "array([[[ 2.,  3.,  4.,  5.]],\n\n       [[10., 11., 12., 13.]]])"
-  },
-  "execution_count": 8,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 ## Summary
