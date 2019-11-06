@@ -25,7 +25,7 @@ v = [1,7,0,1]
 Mathematicians most often write this as either a *column* or *row* vector, which is to say either as
 
 $$
-\mathbf{x} = \begin{bmatrix}1\\7\\0\\1\end{bmatrix} \quad \text{or} \quad
+\mathbf{x} = \begin{bmatrix}1\\7\\0\\1\end{bmatrix} \quad \text{ or } \quad
 \mathbf{x}^\top = \begin{bmatrix}1 & 7 & 0 & 1\end{bmatrix}.
 $$ 
 
@@ -591,12 +591,12 @@ the inverse will typically have almost every entry non-negative,
 requiring us to store all $1\text{M}^2$ entries---that is $1$ trillion entries!
 
 While we do not have time to dive all the way into the thorny numerical issues 
-frequenyly encountered when working with linear algebra, 
+frequently encountered when working with linear algebra, 
 we want to provide you with some intuition about when to proceed with caution, 
 and generally avoiding inversion in practice is a good rule of thumb.
 
 ## Determinant
-The geometric view of linear algrbra gives an inuitive way 
+The geometric view of linear algebra gives an intuitive way 
 to interpret a a fundamental quantity known as the *determinant*.
 Consider the grid image from before.
 
@@ -686,7 +686,7 @@ that $n\times n$ matrices scale $n$-dimensional volumes.
 Eigenvalues are often one of the most useful notions 
 we will encounter when studying linear algebra, 
 however, as a beginner, it is easy to overlook their importance.
-Below, we intorduce eigendecomposition and 
+Below, we introduce eigendecomposition and 
 try to convey some sense of just why it is so important. 
 
 Suppose we have a matrix $A$ with the following entries:
@@ -924,14 +924,14 @@ We have $r_1 = 0.3$, $r_2 = 0.6$, $r_3 = 0.8$ and $r_4 = 0.9$.
 The matrix is symmetric, so all eigenvalues are real.
 This means that all of our eigenvalues will be in one of the ranges of 
 
-$$
-\begin{aligned}
-[a_{11}-r_1,a_{11}+r_1] & = [0.7,1.3], \\
-[a_{22}-r_2,a_{22}+r_2] & = [2.4,3.6], \\
-[a_{33}-r_3,a_{33}+r_3] & = [4.2,5.8], \\
-[a_{44}-r_4,a_{44}+r_4] & = [8.1,9.9].
-\end{aligned}
-$$
+$$[a_{11}-r_1,a_{11}+r_1] = [0.7,1.3], $$
+
+$$[a_{22}-r_2,a_{22}+r_2] = [2.4,3.6], $$
+
+$$[a_{33}-r_3,a_{33}+r_3] = [4.2,5.8], $$
+
+$$[a_{44}-r_4,a_{44}+r_4] = [8.1,9.9]. $$
+
 
 Performing the numerical computation shows 
 that the eigenvalues are approximately $0.99$, $2.97$, $4.95$, $9.08$,
@@ -979,9 +979,8 @@ $$
 $$
 
 When these models are initialized, $A$ is taken to be 
-a random matrix with Gaussian entries, so lets make one of those. 
-We will start mean zero, variance one Gaussians.
-Just to be concrete, lets make it a five by five matrix.
+a random matrix with Gaussian entries, so let us make one of those. 
+To be concrete, we start with a mean zero, variance one Gaussian distributed $5 \times 5$ matrix.
 
 ```{.python .input}
 np.random.seed(8675309)
@@ -1142,7 +1141,7 @@ It would be nice to be able to do these things from first principles,
 and it turns out that if we look deeply at the mathematics of it,
 we can see that the largest eigenvalue 
 of a large random matrix with independent mean zero,
-variance one Gaussians is on average about $\sqrt{n}$,
+variance one Gaussian entries is on average about $\sqrt{n}$,
 or in our case $\sqrt{5} \approx 2.2$,
 due to a fascinating fact known as the [circular law](https://en.wikipedia.org/wiki/Circular_law).
 This is why almost all initialization strategies
@@ -1194,11 +1193,13 @@ $$
 
 Let us see how many of the linear algebraic definitions 
 we have seen before can be expressed in this compressed tensor notation:
-* $\mathbf{v} \cdot \mathbf{w} = v_iw_i$ 
-* $\|\mathbf{v}\|_2^{2} = v_iv_i$
-* $\mathbf{A}\mathbf{v} = a_{ij}v_j$
-* $\mathbf{A}\mathbf{B} = a_{ij}b_{jk}$
-* $\mathrm{tr}(\mathbf{A}) = a_{ii}$
+
+* $\mathbf{v} \cdot \mathbf{w} = \sum_i v_iw_i$ 
+* $\|\mathbf{v}\|_2^{2} = \sum_i v_iv_i$
+* $(\mathbf{A}\mathbf{v})_i = \sum_j a_{ij}v_j$
+* $(\mathbf{A}\mathbf{B})_{ik} = \sum_j a_{ij}b_{jk}$
+* $\mathrm{tr}(\mathbf{A}) = \sum_i a_{ii}$
+
 In this way, we can replace a myriad of specialized notations with short tensor expressions.
 
 ## Expressing in numpy
@@ -1245,7 +1246,7 @@ np.einsum("ijk,il,j -> kl",B,A,v)
 
 This notation is readable and efficient for humans,
 however bulky if for whatever reason 
-we need generate a tensor contraction programatically.
+we need to generate a tensor contraction programmatically.
 For this reason, numpy provides an alternative notation 
 by providing integer indices for each tensor.
 For example, the same tensor contraction can also be written as:
@@ -1262,7 +1263,7 @@ Either notation allows for concise and efficient representation of tensor contra
 * Hyperplanes are high-dimensional generalizations of lines and planes.  They can be used to define decision planes that are often used as the last step in a classification task.
 * Matrix multiplication can be geometrically interpreted as uniform distortions of the underlying coordinates. They represent a very restricted, but mathematically clean, way to transform vectors.
 * Linear dependence is a way to tell when a collection of vectors are in a lower dimensional space than we would expect (say you have $3$ vectors living in a $2$-dimensional space). The rank of a matrix is the size of the largest subset of its columns that are linearly independent.
-* When a matrix's inverse is defined, matrix inversion allows us to find another matrix that undoes the action of the first. Matrix inverse's are useful in theory, but require care in practice owing to numerical instability.
+* When a matrix's inverse is defined, matrix inversion allows us to find another matrix that undoes the action of the first. Matrix inversion is useful in theory, but requires care in practice owing to numerical instability.
 * Determinants allow us to measure how much a matrix expands or contracts a space. A nonzero determinant implies an invertible (non-singular) matrix and a zero-valued determinant means that the matrix is non-invertible (singular).
 * Eigenvalues and eigenvectors allow for a detailed understanding of the behavior of a matrix.
 * Tensor contractions and Einstein summation provide for a neat and clean notation for expressing many of the computations that are seen in machine learning.
