@@ -1,5 +1,5 @@
 # Linear Regression Implementation from Scratch
-:label:`chapter_linear_scratch`
+:label:`sec_linear_scratch`
 
 Now that you understand the key ideas behind linear regression,
 we can begin to work through a hands-on implementation in code.
@@ -11,7 +11,7 @@ implementing things from scratch is the only
 to make sure that you really know what you are doing.
 Moreover, when it comes time to customize models,
 defining our own layers, loss functions, etc.,
-undertanding how things work under the hood will prove handy.
+understanding how things work under the hood will prove handy.
 In this section, we will rely only on `ndarray` and `autograd`.
 Afterwards, we will introduce a more compact implementation,
 taking advantage of Gluon's bells and whistles.
@@ -166,7 +166,7 @@ in the direction that reduces the loss.
 Since nobody wants to compute gradients explicitly
 (this is tedious and error prone),
 we use automatic differentiation to compute the gradient.
-See :numref:`chapter_autograd` for more details.
+See :numref:`sec_autograd` for more details.
 Recall from the autograd chapter
 that in order for `autograd` to know
 that it should store a gradient for our parameters,
@@ -288,7 +288,7 @@ Unfortunately, setting hyper-parameters is tricky
 and requires some adjustment by trial and error.
 We elide these details for now but revise them
 later in
-:numref:`chapter_optimization`.
+:numref:`chap_optimization`.
 
 ```{.python .input  n=12}
 lr = 0.03  # Learning rate
