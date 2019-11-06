@@ -12,7 +12,6 @@ This open source book has benefited from pedagogical suggestions, typo correctio
 
 [Chinese version](https://github.com/d2l-ai/d2l-zh) | [Discuss and report issues](https://discuss.mxnet.io/)
 
-
 ## Cite
 
 Please use the following bibtex entry to cite this book:
