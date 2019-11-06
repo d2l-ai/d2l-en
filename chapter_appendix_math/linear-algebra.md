@@ -258,7 +258,7 @@ nothing stops us from doing this in tens, hundreds, or billions of dimensions.
 
 This occurs often when thinking about machine learned models.
 For instance, we can understand linear classification models 
-like those from :numref:`chapter_softmax`,
+like those from :numref:`sec_softmax`,
 as methods to find hyperplanes that separate the different target classes.
 In this context, such hyperplanes are often referred to as *decision planes*.
 The majority of deep learned classification models end 
