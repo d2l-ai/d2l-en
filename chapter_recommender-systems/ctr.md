@@ -23,12 +23,14 @@ from mxnet.gluon.data import Dataset
 import os
 import sys
 
-data_path = "https://apache-mxnet.s3-accelerate.amazonaws.com/gluon/dataset/"
-train_sha1 = "6dec3052e49ce0d1cec5ebc6f5ded1172be0befb"
-test_sha1 ="c265e3c1fad0ed4caf8c1a373c580465a8096eb0"
-
+# Saved in the d2l package for later use
 def read_data_ctr(path="../data/", train="ctr/train.csv", 
                   test="ctr/test.csv"):
+    data_path = ("https://apache-mxnet.s3-accelerate.amazonaws.com/"
+                 "gluon/dataset/")
+    train_sha1 = "6dec3052e49ce0d1cec5ebc6f5ded1172be0befb"
+    test_sha1 ="c265e3c1fad0ed4caf8c1a373c580465a8096eb0"
+
     ctr_path = path+"ctr"
     os.makedirs(ctr_path, exist_ok=True)
     gluon.utils.download(data_path + train, ctr_path, train_sha1)
@@ -90,7 +92,7 @@ train_data = CTRDataset(data_path="../data/ctr/train.csv")
 train_data[0]
 ```
 
-As can be seen, all the features are categorical. Each value represents the one-hot index of the corresponding entry. The label $0$ means that it is not clicked. This `CTRDataset` can also be used to load other datasets such as the Criteo display advertising challenge [Dataset](https://labs.criteo.com/2014/02/kaggle-display-advertising-challenge-dataset/) and the Avazu click-through rate prediction [Dataset](https://www.kaggle.com/c/avazu-ctr-prediction).  
+As can be seen, all the 34 fields are categorical features. Each value represents the one-hot index of the corresponding entry. The label $0$ means that it is not clicked. This `CTRDataset` can also be used to load other datasets such as the Criteo display advertising challenge [Dataset](https://labs.criteo.com/2014/02/kaggle-display-advertising-challenge-dataset/) and the Avazu click-through rate prediction [Dataset](https://www.kaggle.com/c/avazu-ctr-prediction).  
 
 ## Summary 
 * Click-through rate is an important metric that is used to measure the effectiveness of advertising systems and recommender systems.

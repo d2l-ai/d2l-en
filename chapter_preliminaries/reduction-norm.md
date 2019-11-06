@@ -351,7 +351,7 @@ In fact, the Euclidean distance is a norm:
 specifically it is the $\ell_2$ norm. 
 Suppose that the elements in the $n$-dimensional vector
 $\mathbf{x}$ are $x_1, \ldots, x_n$. 
-The *$\ell_2$ norm* of $\mathbf{x}$ is the square root of the sum of the squares of the vector elements:
+The $\ell_2$ *norm* of $\mathbf{x}$ is the square root of the sum of the squares of the vector elements:
 
 $$\|\mathbf{x}\|_2 = \sqrt{\sum_{i=1}^n x_i^2},$$
 
@@ -364,7 +364,7 @@ np.linalg.norm(u)
 
 In deep learning, we work more often
 with the squared $\ell_2$ norm.
-You will also frequently encounter the $\ell_1$ norm,
+You will also frequently encounter the $\ell_1$ *norm*,
 which is expressed as the sum of the absolute values of the vector elements:
 
 $$\|\mathbf{x}\|_1 = \sum_{i=1}^n \left|x_i \right|.$$
@@ -379,7 +379,7 @@ np.abs(u).sum()
 ```
 
 Both the $\ell_2$ norm and the $\ell_1$ norm
-are special cases of the more general $\ell_p$ norm:
+are special cases of the more general $\ell_p$ *norm*:
 
 $$\|\mathbf{x}\|_p = \left(\sum_{i=1}^n \left|x_i \right|^p \right)^{1/p}.$$
 
@@ -437,8 +437,8 @@ So while we reserve the right to introduce more mathematics much later on,
 we will wrap up this section here.
 
 If you are eager to learn more about linear algebra,
-you may refer to either :numref:`chap_appendix_math`
-or other excellent resources :cite:`Strang.Strang.Strang.ea.1993`:cite:`Kolter.2008`:cite:`Petersen.Pedersen.ea.2008`.
+you may refer to either :numref:`sec_linear_algebra`
+or other excellent resources :cite:`Strang.1993`:cite:`Kolter.2008`:cite:`Petersen.Pedersen.ea.2008`.
 
 
 ## Summary

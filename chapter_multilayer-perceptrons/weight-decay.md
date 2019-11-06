@@ -86,7 +86,7 @@ we need to add $||mathbf{w}||^2$, but how much should we add?
 To address this, we need to add a new hyperparameter,
 that we will call the *regularization constant* and denote by $\lambda$:
 
-$$l(\mathbf{w}, b) + \frac{\lambda}{2} \|\boldsymbol{w}\|^2$$
+$$l(\mathbf{w}, b) + \frac{\lambda}{2} \|\mathbf{w}\|^2$$
 
 This non-negatice parameter $\lambda \geq 0$
 governs the amount of regularization.
@@ -281,7 +281,7 @@ depdends only on the current value of each parameter,
 and the optimizer must to touch each parameter once anyway.
 
 In the following code, we specify
-the weight decay hyper-parameter directly
+the weight decay hyperparameter directly
 through the `wd` parameter when instantiating our `Trainer`.
 By default, Gluon decays both weights and biases simultaneously.
 Note that we can have *different* optimizers

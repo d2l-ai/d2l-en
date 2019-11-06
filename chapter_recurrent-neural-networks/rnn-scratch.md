@@ -49,7 +49,7 @@ def get_params(vocab_size, num_hiddens, ctx):
     b_q = np.zeros(num_outputs, ctx=ctx)
     # Attach a gradient
     params = [W_xh, W_hh, b_h, W_hq, b_q]
-    for param in params: 
+    for param in params:
         param.attach_grad()
     return params
 ```
@@ -182,8 +182,7 @@ Let us first define the function to train the model on one data epoch. It differ
 1. We use perplexity to evaluate the model. This ensures that different length of texts are comparable.
 
 
-When the consecutive sampling is used, we initialize the hidden state at the beginning of each epoch. Since the $i^\mathrm{th}$ example in the next minibatch is adjacent to the current $i^\mathrm{th}$ example, so the next minibatch can use the current hidden state directly, we only detach the gradient so that we compute the gradients within a mini-batch. When using the random sampling, we need to re-initialize the hidden state for each iteration since each example is sampled with a random position. Same to the `train_epoch_ch3` function in :numref:`sec_softmax_scratch`, we use generalized `updater`, which could be either a Gluon trainer or a customized scratched implementation.
-
+When the consecutive sampling is used, we initialize the hidden state at the beginning of each epoch. Since the $i^\mathrm{th}$ example in the next minibatch is adjacent to the current $i^\mathrm{th}$ example, so the next minibatch can use the current hidden state directly, we only detach the gradient so that we compute the gradients within a minibatch. When using the random sampling, we need to re-initialize the hidden state for each iteration since each example is sampled with a random position. Same to the `train_epoch_ch3` function in :numref:`sec_softmax_scratch`, we use generalized `updater`, which could be either a Gluon trainer or a customized scratched implementation.
 
 ```{.python .input}
 # Saved in the d2l package for later use
@@ -272,7 +271,7 @@ While writing the above RNN model from scratch is instructive, it is not conveni
     * How well will it work on other books by H. G. Wells, e.g., [The War of the Worlds](http://www.gutenberg.org/ebooks/36).
 1. Modify the predict function such as to use sampling rather than picking the most likely next character.
     - What happens?
-    - Bias the model towards more likely outputs, e.g., by sampling from $q(w_t|w_{t-1}, \ldots, w_1) \propto p^\alpha(w_t|w_{t-1}, \ldots, w_1)$ for $\alpha > 1$.
+    - Bias the model towards more likely outputs, e.g., by sampling from $q(w_t \mid w_{t-1}, \ldots, w_1) \propto p^\alpha(w_t \mid w_{t-1}, \ldots, w_1)$ for $\alpha > 1$.
 1. Run the code in this section without clipping the gradient. What happens?
 1. Change adjacent sampling so that it does not separate hidden states from the computational graph. Does the running time change? How about the accuracy?
 1. Replace the activation function used in this section with ReLU and repeat the experiments in this section.
