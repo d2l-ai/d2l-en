@@ -100,7 +100,7 @@ def rmsprop(params, states, hyperparams):
         p[:] -= hyperparams['lr'] * p.grad / np.sqrt(s + eps)
 ```
 
-We set the initial learning rate to 0.01 and the hyperparameter $\gamma$ to 0.9. Now, the variable $\boldsymbol{s}_t$ can be treated as the weighted average of the square term $\boldsymbol{g}_t \odot \boldsymbol{g}_t$ from the last $1/(1-0.9) = 10$ time steps.
+We set the initial learning rate to 0.01 and the hyperparameter $\gamma$ to 0.9. Now, the variable $\mathbf{s}_t$ can be treated as the weighted average of the square term $\mathbf{g}_t \odot \mathbf{g}_t$ from the last $1/(1-0.9) = 10$ time steps.
 
 ```{.python .input  n=24}
 data_iter, feature_dim = d2l.get_data_ch10(batch_size=10)

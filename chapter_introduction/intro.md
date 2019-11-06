@@ -367,17 +367,17 @@ In the following sections, we will discuss a few types of machine learning in so
 
 Supervised learning addresses the task of predicting *targets* given input data.
 The targets, also commonly called *labels*, are generally denoted *y*.
-The input data points, also commonly called *examples* or *instances*, are typically denoted $\boldsymbol{x}$.
-The goal is to produce a model $f_\theta$ that maps an input $\boldsymbol{x}$ to a prediction $f_{\theta}(\boldsymbol{x})$
+The input data points, also commonly called *examples* or *instances*, are typically denoted $\mathbf{x}$.
+The goal is to produce a model $f_\theta$ that maps an input $\mathbf{x}$ to a prediction $f_{\theta}(\mathbf{x})$
 
 To ground this description in a concrete example,
 if we were working in healthcare,
 then we might want to predict whether or not a patient would have a heart attack.
 This observation, *heart attack* or *no heart attack*,
 would be our label $y$.
-The input data $\boldsymbol{x}$ might be vital signs such as heart rate, diastolic and systolic blood pressure, etc.
+The input data $\mathbf{x}$ might be vital signs such as heart rate, diastolic and systolic blood pressure, etc.
 
-The supervision comes into play because for choosing the parameters $\theta$, we (the supervisors) provide the model with a collection of *labeled examples* ($\boldsymbol{x}_i, y_i$), where each example $\boldsymbol{x}_i$ is matched up against its correct label.
+The supervision comes into play because for choosing the parameters $\theta$, we (the supervisors) provide the model with a collection of *labeled examples* ($\mathbf{x}_i, y_i$), where each example $\mathbf{x}_i$ is matched up against its correct label.
 
 In probabilistic terms, we typically are interested in estimating
 the conditional probability $P(y|x)$.

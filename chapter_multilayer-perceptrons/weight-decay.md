@@ -86,7 +86,7 @@ we need to add $||mathbf{w}||^2$, but how much should we add?
 To address this, we need to add a new hyperparameter,
 that we will call the *regularization constant* and denote by $\lambda$:
 
-$$l(\mathbf{w}, b) + \frac{\lambda}{2} \|\boldsymbol{w}\|^2$$
+$$l(\mathbf{w}, b) + \frac{\lambda}{2} \|\mathbf{w}\|^2$$
 
 This non-negatice parameter $\lambda \geq 0$
 governs the amount of regularization.

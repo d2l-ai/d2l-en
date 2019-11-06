@@ -138,7 +138,7 @@ classification in :numref:`sec_sentiment_rnn`.
 
 ## Exercises
 
-1. If the different directions use a different number of hidden units, how will the shape of $\boldsymbol{H}_t$ change?
+1. If the different directions use a different number of hidden units, how will the shape of $\mathbf{H}_t$ change?
 1. Design a bidirectional recurrent neural network with multiple hidden layers.
 1. Implement a sequence classification algorithm using bidirectional RNNs. Hint - use the RNN to embed each word and then aggregate (average) all embedded outputs before sending the output into an MLP for classification. For instance, if we have $(\mathbf{o}_1, \mathbf{o}_2, \mathbf{o}_3)$, we compute $\bar{\mathbf{o}} = \frac{1}{3} \sum_i \mathbf{o}_i$ first and then use the latter for sentiment classification.
 
