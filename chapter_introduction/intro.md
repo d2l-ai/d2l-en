@@ -330,14 +330,14 @@ the training data (for fitting model parameters)
 and the test data (which is held out for evaluation),
 reporting the following two quantities:
 
- * *Training Error:*
+ * **Training Error:**
  The error on that data on which the model was trained.
  You could think of this as being like
  a student's scores on practice exams
  used to prepare for some real exam.
  Even if the results are encouraging,
  that does not guarantee success on the final exam.
- * *Test Error:* This is the error incurred on an unseen test set.
+ * **Test Error:** This is the error incurred on an unseen test set.
  This can deviate significantly from the training error.
  When a model fails to generalize to unseen data,
  we say that it is *overfitting*.
