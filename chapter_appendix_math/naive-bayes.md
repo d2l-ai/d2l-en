@@ -84,7 +84,7 @@ Note that the denominator is the normalizing term $p(\mathbf{x})$ which does not
 
 Now, Let us focus on $p( \mathbf{x}  \mid  y)$. Using the chain rule of probability, we can express the term $p( \mathbf{x}  \mid  y)$ as
 
-$$p(x_1  \mid y) \cdot p(x_2  \mid  x_1, y) \cdot ... \cdot p( x_d  \mid  x_1, ..., x_{d-1}, y)$$
+$$p(x_1  \mid y) \cdot p(x_2  \mid  x_1, y) \cdot ... \cdot p( x_d  \mid  x_1, ..., x_{d-1}, y).$$
 
 By itself, this expression does not get us any further. We still must estimate roughly $2^d$ parameters. However, if we assume that *the features are conditionally independent of each other, given the label*, then suddenly we are in much better shape, as this term simplifies to $\prod_i p(x_i  \mid  y)$, giving us the predictor
 
@@ -118,7 +118,7 @@ Now on to slightly more difficult things $P_{xy}$. Since we picked black and whi
 n_x = np.zeros((10, 28, 28))
 for y in range(10):
     n_x[y] = np.array(X.asnumpy()[Y.asnumpy()==y].sum(axis=0))
-P_xy = (n_x+1) / (n_y+1).reshape(10,1,1)
+P_xy = (n_x+1) / (n_y+1).reshape(10, 1, 1)
 
 d2l.show_images(P_xy, 2, 5);
 ```
@@ -131,7 +131,7 @@ Now we can use :eqref:`eq_naive_bayes_estimation` to predict a new image. Given 
 def bayes_pred(x):
     x = np.expand_dims(x, axis=0)  # (28, 28) -> (1, 28, 28)
     p_xy = P_xy * x + (1-P_xy)*(1-x)
-    p_xy = p_xy.reshape(10,-1).prod(axis=1)  # P(x|y)
+    p_xy = p_xy.reshape(10, -1).prod(axis=1)  # p(x|y)
     return np.array(p_xy) * P_y
 
 image, label = mnist_test[0]
@@ -163,7 +163,7 @@ log_P_y = np.log(P_y)
 def bayes_pred_stable(x):
     x = np.expand_dims(x, axis=0)  # (28, 28) -> (1, 28, 28)
     p_xy = log_P_xy * x + log_P_xy_neg * (1-x)
-    p_xy = p_xy.reshape(10,-1).sum(axis=1)  # P(x|y)
+    p_xy = p_xy.reshape(10, -1).sum(axis=1)  # p(x|y)
     return p_xy + log_P_y
 
 py = bayes_pred_stable(image)

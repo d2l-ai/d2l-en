@@ -19,13 +19,13 @@ as either points or directions in space.
 Fundamentally, a vector is a list of numbers such as the Python list below.
 
 ```{.python .input}
-v = [1,7,0,1]
+v = [1, 7, 0, 1]
 ```
 
 Mathematicians most often write this as either a *column* or *row* vector, which is to say either as
 
 $$
-\mathbf{x} = \begin{bmatrix}1\\7\\0\\1\end{bmatrix}
+\mathbf{x} = \begin{bmatrix}1\\7\\0\\1\end{bmatrix},
 $$
 
 or
@@ -38,24 +38,19 @@ These often have different interpretations,
 where data points are column vectors
 and weights used to form weighted sums are row vectors.
 However, it can be beneficial to be flexible.
-As a general rule of thumb, we have adopted the convention
-of writing single data points and theoretical statements in column vectors,
-however we switch to row vectors to represent data points when working with actual data.
-This mirrors the fact that the majority of data we encounter is in this format.
-This dichotomy in notation is ubiquitous in machine learning literature,
-so we match it while recognizing that it can be a bit cumbersome to the beginner.
+Matrices are useful data structures: they allow us to organize data that have different modalities of variation. For example, rows in our matrix might correspond to different houses (data points), while columns might correspond to different attributes. This should sound familiar if you have ever used spreadsheet software or have read :numref:`sec-pandas`. Thus, although the default orientation of a single vector is a column vector, in a matrix that represents a tabular dataset, it is more conventional to treat each data point as a row vector in the matrix. And, as we will see in later chapters, this convention will enable common deep learning practices. For example, along the outermost axis of an ndarray, we can access or enumerate minibatches of data points, or just data points if no minibatch exists.
 
 Given a vector, the first interpretation 
 that we should give it is as a point in space. 
 In two or three dimensions, we can visualize these points 
 by using the components of the vectors to define 
 the location of the points in space compared 
-to a fixed reference called the *origin*.
+to a fixed reference called the *origin*.  This can be seen in :numref:`fig_grid`.
 
 ![An illustration of visualizing vectors as points in the plane.  The first component of the vector gives the $x$-coordinate, the second component gives the $y$-coordinate.  Higher dimensions are analogous, although much harder to visualize.](../img/GridPoints.svg)
+:label:`fig_grid`
 
-This way of visualizing the data can be freeing, 
-and allows us to consider the problem on a more abstract level.
+This geometric point of view allows us to consider the problem on a more abstract level.
 No longer faced with some insurmountable seeming problem 
 like classifying pictures as either cats or dogs,
 we can start considering tasks abstractly 
@@ -68,16 +63,18 @@ Not only can we think of the vector $\mathbf{v} = [2,3]^\top$
 as the location $2$ units to the right and $3$ units up from the origin,
 we can also think of it as the direction itself 
 to take $2$ steps to the right and $3$ steps up. 
-In this way, we consider all the vectors below the same.
+In this way, we consider all the vectors in figure :numref:`fig_arrow` the same.
 
 ![Any vector can be visualized as an arrow in the plane.  In this case, every vector drawn is a representation of the vector $(2,3)$.](../img/ParVec.svg)
+:label:`fig_arrow`
 
 One of the benefits of this shift is that
 we can make visual sense of the act of vector addition.
 In particular, we follow the directions given by one vector,
-and then follow the directions given by the other.
+and then follow the directions given by the other, as is seen in :numref:`fig_add-vec`.
 
 ![We can visualize vector addition by first following one vector, and then another.](../img/VecAdd.svg)
+:label:`fig_add-vec`
 
 Vector subtraction has a similar interpretation.
 By considering the identity that $\mathbf{u} = \mathbf{v} + (\mathbf{u}-\mathbf{v})$,
@@ -103,9 +100,10 @@ $$
 
 to highlight the fact that exchanging the order of the vectors will yield the same answer.
 
-The dot product also admits a geometric interpretation: it is closely related to the angle between two vectors.
+The dot product also admits a geometric interpretation: it is closely related to the angle between two vectors.  Consider the angle shown in :numref:`fig_angle`.
 
 ![Between any two vectors in the plane there is a well defined angle $\theta$.  We will see this angle is intimately tied to the dot product.](../img/VecAngle.svg)
+:label:`fig_angle`
 
 To start, let us consider two specific vectors:
 
@@ -156,7 +154,7 @@ npx.set_np()
 def angle(v, w) :
     return np.arccos(v.dot(w)/(np.linalg.norm(v)*np.linalg.norm(w)))
 
-angle(np.array([0,1,2]),np.array([2,3,4]))
+angle(np.array([0, 1, 2]), np.array([2, 3, 4]))
 ```
 
 We will not use it right now, but it is useful to know 
@@ -222,15 +220,16 @@ Suppose we have a column vector $\mathbf{w}=[2,1]^\top$. We want to know, "what 
 By recalling the connection between dot products and angles above, 
 we can see that this is equivalent to 
 $$
-\|\mathbf{v}\|\|\mathbf{w}\|\cos(\theta) = 1 \; \iff \; \|\mathbf{v}\|\cos(\theta) = \frac{1}{\|\mathbf{w}\|} = \frac{1}{\sqrt{5}}
+\|\mathbf{v}\|\|\mathbf{w}\|\cos(\theta) = 1 \; \iff \; \|\mathbf{v}\|\cos(\theta) = \frac{1}{\|\mathbf{w}\|} = \frac{1}{\sqrt{5}}.
 $$
 
 ![Recalling trigonometry, we see the formula $\|\mathbf{v}\|\cos(\theta)$ is the length of the projection of the vector $\mathbf{v}$ onto the direction of $\mathbf{w}$](../img/ProjVec.svg)
+:label:`fig_vector-project`
 
 If we consider the geometric meaning of this expression,
 we see that this is equivalent to saying 
 that the length of the projection of $\mathbf{v}$ 
-onto the direction of $\mathbf{w}$ is exactly $1/\|\mathbf{w}\|$. 
+onto the direction of $\mathbf{w}$ is exactly $1/\|\mathbf{w}\|$, as is shown in :numref:`fig_vector-project`. 
 The set of all points where this is true is a line 
 at right angles to the vector $\mathbf{w}$.
 If we wanted, we could find the equation for this line 
@@ -243,17 +242,19 @@ are longer or shorter than $1/\|\mathbf{w}\|$, respectively.
 Thus, those two inequalities define either side of the line.
 In this way, we have found a way to cut our space into two halves, 
 where all the points on one side have dot product below a threshold, 
-and the other side above.
+and the other side above as we see in :numref:`fig_space-division`.
 
 ![If we now consider the inequality version of the expression, we see that our hyperplane (in this case: just a line) separates the space into two halves.](../img/SpaceDivision.svg)
+:label:`fig_space-division`
 
 The story in higher dimension is much the same.
 If we now take $\mathbf{w} = [1,2,3]^\top$
 and ask about the points in three dimensions with $\mathbf{w}\cdot\mathbf{v} = 1$,
 we obtain a plane at right angles to the given vector $\mathbf{w}$.
-The two inequalities again define the two sides of the plane.
+The two inequalities again define the two sides of the plane as is shown in :numref:`fig_higher-division`.
 
 ![Hyperplanes in any dimension separate the space into two halves.](../img/SpaceDivision3D.svg)
+:label:`fig_higher-division`
 
 While our ability to visualize runs out at this point,
 nothing stops us from doing this in tens, hundreds, or billions of dimensions.
@@ -287,27 +288,27 @@ y_test = np.stack(
     [x[1] for x in test if x[1] == 0 or x[1] == 1]).astype(float)
 
 # Compute Averages
-ave_0 = np.mean(X_train_0,axis=0)
-ave_1 = np.mean(X_train_1,axis=0)
+ave_0 = np.mean(X_train_0, axis=0)
+ave_1 = np.mean(X_train_1, axis=0)
 ```
 
 ```{.python .input}
 # Plot average t-shirt
 d2l.set_figsize()
-d2l.plt.imshow(ave_0.reshape(28,28).tolist(),cmap='Greys')
+d2l.plt.imshow(ave_0.reshape(28, 28).tolist(), cmap='Greys')
 d2l.plt.show()
 ```
 
 ```{.python .input}
 # Plot average trousers
-d2l.plt.imshow(ave_1.reshape(28,28).tolist(),cmap='Greys')
+d2l.plt.imshow(ave_1.reshape(28, 28).tolist(), cmap='Greys')
 d2l.plt.show()
 ```
 
 ```{.python .input}
 # Print test set accuracy with eyeballed threshold
 w = (ave_1 - ave_0).T
-predictions = 1*(X_test.reshape(2000,-1).dot(w.flatten()) > -1500000)
+predictions = 1*(X_test.reshape(2000, -1).dot(w.flatten()) > -1500000)
 np.mean(predictions==y_test)  # Accuracy
 ```
 
@@ -373,9 +374,10 @@ If we follow this logic through carefully,
 say by considering the grid of all integer pairs of points,
 we see that what happens is that the matrix multiplication
 can skew, rotate, and scale the grid,
-but the grid structure must remain.
+but the grid structure must remain as you see in :numref:`fig_grid-transform`.
 
 ![The matrix $\mathbf{A}$ acting on the given basis vectors.  Notice how the entire grid is transported along with it.](../img/GridTransform.svg)
+:label:`fig_grid-transform`
 
 This is the most important intuitive point 
 to internalize about linear transformations represented by matrices.
@@ -388,7 +390,7 @@ Some distortions can be severe.  For instance the matrix
 $$
 \mathbf{B} = \begin{bmatrix}
 2 & -1 \\ 4 & -2
-\end{bmatrix}
+\end{bmatrix},
 $$
 
 compresses the entire two-dimensional plane down to a single line.
@@ -562,8 +564,8 @@ We can test to see this by seeing that multiplying
 by the inverse given by the formula above works in practice.
 
 ```{.python .input}
-M = np.array([[1,2],[1,4]])
-M_inv = np.array([[2,-1],[-0.5,0.5]])
+M = np.array([[1, 2], [1, 4]])
+M_inv = np.array([[2, -1], [-0.5, 0.5]])
 M_inv.dot(M)
 ```
 
@@ -605,12 +607,13 @@ and generally avoiding inversion in practice is a good rule of thumb.
 ## Determinant
 The geometric view of linear algebra gives an intuitive way 
 to interpret a a fundamental quantity known as the *determinant*.
-Consider the grid image from before.
+Consider the grid image from before, but now with a highlighted region (:numref:`fig_grid-filled`).
 
 ![The matrix $\mathbf{A}$ again distorting the grid.  This time, I want to draw particular attention to what happens to the highlighted square.](../img/GridTransformFilled.svg)
+:label:`fig_grid-filled`
 
 Look at the highlighted square.  This is a square with edges given
-by $(0,1)$ and $(1,0)$ and thus it has area one.
+by $(0, 1)$ and $(1, 0)$ and thus it has area one.
 After $\mathbf{A}$ transforms this square,
 we see that it becomes a parallelogram.
 There is no reason this parallelogram should have the same area
@@ -643,7 +646,7 @@ Let us check this quickly with some example code.
 
 ```{.python .input}
 import numpy as np
-np.linalg.det(np.array([[1,-1],[2,3]]))
+np.linalg.det(np.array([[1, -1], [2, 3]]))
 ```
 
 The eagle-eyed amongst us will notice 
@@ -780,7 +783,7 @@ We can solve this with the vectors $[1,-1]^\top$ and $[1,2]^\top$ respectively.
 We can check this in code using the built-in numpy `numpy.linalg.eig` routine.
 
 ```{.python .input}
-np.linalg.eig(np.array([[2,1],[2,3]]))
+np.linalg.eig(np.array([[2, 1], [2, 3]]))
 ```
 
 Note that `numpy` normalizes the eigenvectors to be of length one,
@@ -992,7 +995,7 @@ To be concrete, we start with a mean zero, variance one Gaussian distributed $5 
 np.random.seed(8675309)
 
 k = 5
-A = np.random.randn(k,k)
+A = np.random.randn(k, k)
 A
 ```
 
@@ -1023,14 +1026,14 @@ against a random input vector, and keep track of the norm.
 
 ```{.python .input}
 # Calculate the sequence of norms after repeatedly applying A
-v_in = np.random.randn(k,1)
+v_in = np.random.randn(k, 1)
 
 norm_list = [np.linalg.norm(v_in)]
-for i in range(1,100):
+for i in range(1, 100):
     v_in = A.dot(v_in)
     norm_list.append(np.linalg.norm(v_in))
     
-d2l.plot(np.arange(0,100),norm_list,'Iteration','Value')
+d2l.plot(np.arange(0, 100), norm_list, 'Iteration', 'Value')
 ```
 
 The norm is growing uncontrollably! 
@@ -1039,10 +1042,10 @@ Indeed if we take the list of quotients, we will see a pattern.
 ```{.python .input}
 # Compute the scaling factor of the norms
 norm_ratio_list = []
-for i in range(1,100):
+for i in range(1, 100):
     norm_ratio_list.append(norm_list[i]/norm_list[i-1])
     
-d2l.plot(np.arange(1,100),norm_ratio_list,'Iteration','Ratio')
+d2l.plot(np.arange(1, 100), norm_ratio_list, 'Iteration', 'Ratio')
 ```
 
 If we look at the last portion of the above computation, 
@@ -1119,23 +1122,23 @@ Let us see what happens in this case.
 A /= norm_eigs[-1]
 
 # Do the same experiment again
-v_in = np.random.randn(k,1)
+v_in = np.random.randn(k, 1)
 
 norm_list = [np.linalg.norm(v_in)]
-for i in range(1,100):
+for i in range(1, 100):
     v_in = A.dot(v_in)
     norm_list.append(np.linalg.norm(v_in))
     
-d2l.plot(np.arange(0,100),norm_list,'Iteration','Value')
+d2l.plot(np.arange(0, 100), norm_list, 'Iteration', 'Value')
 ```
 
 ```{.python .input}
 # Also plot the ratio
 norm_ratio_list = []
-for i in range(1,100):
+for i in range(1, 100):
     norm_ratio_list.append(norm_list[i]/norm_list[i-1])
     
-d2l.plot(np.arange(1,100),norm_ratio_list,'Iteration','Ratio')
+d2l.plot(np.arange(1, 100), norm_ratio_list, 'Iteration', 'Ratio')
 ```
 
 ### Conclusions
@@ -1169,7 +1172,7 @@ We need to have a similar definition for tensors if they are to be useful to us.
 Think about matrix multiplication:
 
 $$
-\mathbf{C} = \mathbf{A}\mathbf{B}
+\mathbf{C} = \mathbf{A}\mathbf{B},
 $$
 
 or equivalently
@@ -1206,7 +1209,7 @@ $$
 Let us see how many of the linear algebraic definitions 
 we have seen before can be expressed in this compressed tensor notation:
 
-* $\mathbf{v} \cdot \mathbf{w} = \sum_i v_iw_i$ 
+* $\mathbf{v} \cdot \mathbf{w} = \sum_i v_iw_i$
 * $\|\mathbf{v}\|_2^{2} = \sum_i v_iv_i$
 * $(\mathbf{A}\mathbf{v})_i = \sum_j a_{ij}v_j$
 * $(\mathbf{A}\mathbf{B})_{ik} = \sum_j a_{ij}b_{jk}$
@@ -1221,9 +1224,9 @@ we can create tensors using numpy arrays.
 
 ```{.python .input}
 # Define Tensors
-B = np.array([[[1,2,3],[4,5,6]],[[7,8,9],[10,11,12]]])
-A = np.array([[1,2],[3,4]])
-v = np.array([1,2])
+B = np.array([[[1, 2, 3], [4, 5, 6]], [[7, 8, 9], [10, 11, 12]]])
+A = np.array([[1, 2], [3, 4]])
+v = np.array([1, 2])
 
 # Print out the shapes
 A.shape, B.shape, v.shape
@@ -1239,7 +1242,7 @@ and strip out the indices themselves to get the implementation in numpy:
 
 ```{.python .input}
 # Reimplement matrix multiplication
-np.einsum("ij,j -> i",A,v), A.dot(v)
+np.einsum("ij, j -> i", A, v), A.dot(v)
 ```
 
 This is a highly flexible notation.
@@ -1253,7 +1256,7 @@ $$
 it can be implemented via Einstein summation as:
 
 ```{.python .input}
-np.einsum("ijk,il,j -> kl",B,A,v)
+np.einsum("ijk, il, j -> kl", B, A, v)
 ```
 
 This notation is readable and efficient for humans,
@@ -1264,7 +1267,7 @@ by providing integer indices for each tensor.
 For example, the same tensor contraction can also be written as:
 
 ```{.python .input}
-np.einsum(B,[0,1,2],A,[0,3],v,[1],[2,3])
+np.einsum(B, [0, 1, 2], A, [0, 3], v, [1], [2, 3])
 ```
 
 Either notation allows for concise and efficient representation of tensor contractions in code.
@@ -1324,6 +1327,6 @@ $$
 0.1 & 1.0 & 0.1 & 0.2 \\
 0.3 & 0.1 & 5.0 & 0.0 \\
 1.0 & 0.2 & 0.0 & 1.8
-\end{bmatrix}
+\end{bmatrix}.
 $$
 10. How can you write $\mathrm{tr}(\mathbf{A}^4)$ in Einstein notation?

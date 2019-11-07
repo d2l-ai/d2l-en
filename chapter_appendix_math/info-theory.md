@@ -32,7 +32,7 @@ Since information embodies the abstract possibility of an event, how do we map t
 
 Now, suppose that for any series of codes, each $0$ or $1$ occurs with a probability of $\frac{1}{2}$. Hence, an event $X$ with a series of codes of length $n$, occurs with a probability of $\frac{1}{2^n}$. At the same time, as we mentioned before, this series contains $n$ bits of information. So, can we generalize to a math function which can transfer the probability $p$ to the number of bits? Shannon gave the answer by defining *self-information*
 
-$$I(X) = - \log_2 (p)$$
+$$I(X) = - \log_2 (p),$$
 
 as the *bits* of information we have received for this event $X$. Note that we will always use base-2 logarithms in this section. For the sake of simplicity, the rest of this section will omit the subscript 2 in the logarithm notation, i.e., $\log(.)$ always refers to $\log_2(.)$. For example, the code "0010" has a self-information
 
@@ -84,10 +84,11 @@ In MXNet, we can define entropy as below.
 ```{.python .input}
 def entropy(p):
     entropy = - p * np.log2(p)
-    out = nansum(entropy.as_nd_ndarray()) # nansum will sum up the non-nan number
+    # nansum will sum up the non-nan number
+    out = nansum(entropy.as_nd_ndarray())
     return out
 
-entropy(np.array([0.1, 0.5, 0.2, 0.3]))
+entropy(np.array([0.1, 0.5, 0.1, 0.3]))
 ```
 
 ### Interpretations
@@ -146,7 +147,7 @@ def joint_entropy(p_xy):
     out = nansum(joint_ent.as_nd_ndarray()) 
     return out
 
-joint_entropy(np.array([0.1, 0.5, 0.2, 0.3]))
+joint_entropy(np.array([[0.1, 0.5], [0.1, 0.3]]))
 ```
 
 Notice that this is the same *code* as before, but now we interpret it differently as working on the joint distribution of the two random variables.
@@ -180,7 +181,7 @@ def conditional_entropy(p_xy, p_x):
     out = nansum(cond_ent.as_nd_ndarray()) 
     return out
 
-conditional_entropy(np.array([0.1, 0.5, 0.2, 0.3]), np.array([1, 1, 1, 1]))
+conditional_entropy(np.array([[0.1, 0.5], [0.2, 0.3]]), np.array([0.2,0.8]))
 ```
 
 ### Mutual Information
@@ -220,7 +221,9 @@ def mutual_information(p_xy, p_x, p_y):
     out = nansum(mutual.as_nd_ndarray()) 
     return out
 
-mutual_information(np.array([0.1, 0.5, 0.2, 0.3]), np.array([2, 4, 8, 4]), np.array([0.5, 0.25, 0.125, 0.25]))
+mutual_information(np.array([0.1, 0.5, 0.1, 0.3]), 
+                   np.array([0.2, 0.8]), 
+                   np.array([[0.75, 0.25]]))
 ```
 
 ### Properties of Mutual Information
@@ -336,7 +339,7 @@ $$
 \begin{aligned}
 l(\theta) &= \log L(\theta) \\
   &= \log \prod_{i=1}^n \pi_i^{y_i} (1 - \pi_i)^{1 - y_i} \\
-  &= \sum_{i=1}^n y_i \log(\pi_i) + (1 - y_i) \log (1 - \pi_i) \\
+  &= \sum_{i=1}^n y_i \log(\pi_i) + (1 - y_i) \log (1 - \pi_i). \\
 \end{aligned}
 $$
 

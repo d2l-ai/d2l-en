@@ -24,7 +24,7 @@ npx.set_np()
 
 ```{.python .input}
 # Plot a weird function in a normal range
-x_big = np.arange(0.01,3.01,0.01)
+x_big = np.arange(0.01, 3.01, 0.01)
 ys = np.sin(x_big**x_big)
 d2l.plot(x_big, ys, 'x', 'f(x)')
 ```
@@ -33,7 +33,7 @@ In this graph, the eagle-eyed amongst us will notice that our strange function $
 
 ```{.python .input}
 # Plot a the same weird function in a tiny range
-x_big = np.arange(2.0,2.01,0.0001)
+x_big = np.arange(2.0, 2.01, 0.0001)
 ys = np.sin(x_big**x_big)
 d2l.plot(x_big, ys, 'x', 'f(x)')
 ```
@@ -53,9 +53,9 @@ This is already enough to start to play around with in code.  For instance, supp
 L = lambda x: x**2 + 1701*(x-4)**3
 
 # print the difference divided by epsilon for several epsilon
-for epsilon in [0.1,0.001,0.0001,0.00001] :
+for epsilon in [0.1, 0.001, 0.0001, 0.00001] :
     print("epsilon = {:.5f} -> {:.5f}".format(
-        epsilon,(L(4+epsilon)-L(4))/epsilon))
+        epsilon, (L(4+epsilon)-L(4))/epsilon))
 ```
 
 Now, if we are observant, we will notice that the output of this number is suspiciously close to $8$.  Indeed, if we fiddle with the $\epsilon$ value, and make it smaller, we will see values progressively closer to $8$.  Thus we may conclude, correctly, that the value we seek (the degree a change in the input changes the output) should be $8$ at the point $x=4$.  The way that a mathematician encodes this fact is
@@ -200,14 +200,14 @@ approximates the value of $f$ by a line which passes through the point $(x,f(x))
 
 ```{.python .input}
 # Compute sin
-xs = np.arange(-np.pi,np.pi,0.01)
+xs = np.arange(-np.pi, np.pi, 0.01)
 plots = [np.sin(xs)]
 
 # Compute some linear approximations. Use d(sin(x))/dx = cos(x)
-for x0 in [-1.5,0,2] :
+for x0 in [-1.5, 0, 2] :
     plots.append(np.sin(x0) + (xs-x0)*np.cos(x0))
 
-d2l.plot(xs, plots, 'x', 'f(x)', ylim=[-1.5,1.5])
+d2l.plot(xs, plots, 'x', 'f(x)', ylim=[-1.5, 1.5])
 ```
 
 ### Higher Order Derivatives
@@ -218,21 +218,22 @@ $$
 f^{(n)}(x) = \frac{d^{n}f}{dx^{n}} = \left(\frac{d}{dx}\right)^{n} f.
 $$
 
-Below, we visualize the $f^{(2)}(x)$, $f^{(1)}(x)$, and $f(x)$.  First, if the second derivative $f^{(2)}(x)$ is a positive constant, that means that the first derivative is increasing.  As a result, the first derivative $f^{(1)}(x)$ may start out negative, becomes zero at a point, and then becomes positive in the end. Therefore, the function $f$ itself decreases, flattens out, then increases.  In other words, the function $f$ curves up, and has a single minimum.
+Below, we visualize the $f^{(2)}(x)$, $f^{(1)}(x)$, and $f(x)$.  First, if the second derivative $f^{(2)}(x)$ is a positive constant, that means that the first derivative is increasing.  As a result, the first derivative $f^{(1)}(x)$ may start out negative, becomes zero at a point, and then becomes positive in the end. Therefore, the function $f$ itself decreases, flattens out, then increases.  In other words, the function $f$ curves up, and has a single minimum as is shown in :numref:`fig_positive-second`.
 
 ![If we assume the second derivative is a positive constant, then the fist derivative in increasing, which implies the function itself has a minimum.](../img/posSecDer.svg)
+:label:`fig_positive-second`
 
 
-Second, if the second derivative is a negative constant, that means that the first derivative is decreasing.  Following that the first derivative may start out positive, becomes zero at a point, and then becomes negative. Hence, the function $f$ itself increases, flattens out, then decreases.  In other words, the function $f$ curves down, and has a single maximum.
+Second, if the second derivative is a negative constant, that means that the first derivative is decreasing.  Following that the first derivative may start out positive, becomes zero at a point, and then becomes negative. Hence, the function $f$ itself increases, flattens out, then decreases.  In other words, the function $f$ curves down, and has a single maximum as is shown in :numref:`fig_negative-second`.
 
 ![If we assume the second derivative is a negative constant, then the fist derivative in decreasing, which implies the function itself has a maximum.](../img/negSecDer.svg)
+:label:`fig_negative-second`
 
 
-Third, if the second derivative is a always zero, then the first derivative will never change---it is constant!  This means that $f$ increases at a fixed rate, and $f$ is itself a straight line.
+Third, if the second derivative is a always zero, then the first derivative will never change---it is constant!  This means that $f$ increases at a fixed rate, and $f$ is itself a straight line  as is shown in :numref:`fig_zero-second`.
 
 ![If we assume the second derivative is zero, then the fist derivative is constant, which implies the function itself is a straight line.](../img/zeroSecDer.svg)
-
-
+:label:`fig_zero-second`
 
 To sum up, the second derivative can be interpreted as giving the way that the function $f$ curves.  A positive second derivative leads to a upwards curve, while a negative second derivative means that $f$ curves downwards, and a zero second derivative means that $f$ does not curve at all.
 
@@ -245,19 +246,18 @@ $$
 \end{aligned}
 $$
 
-
 Similarly to the previous section showed that the best approximation of the first derivative is a line, we can illustrate the best approximation of a function by a quadratic using both the first and second derivative. This results from a famous *Taylor series*, which are going to discuss in the next section. Before that, let us grab a taste of how to approximate the function $\sin(x)$.
 
 ```{.python .input}
 # Compute sin
-xs = np.arange(-np.pi,np.pi,0.01)
+xs = np.arange(-np.pi, np.pi, 0.01)
 plots = [np.sin(xs)]
 
 # Compute some quadratic approximations. Use d(sin(x))/dx = cos(x)
-for x0 in [-1.5,0,2] :
+for x0 in [-1.5, 0, 2] :
     plots.append(np.sin(x0) + (xs-x0)*np.cos(x0) - (xs-x0)**2*np.sin(x0)/2)
 
-d2l.plot(xs, plots, 'x', 'f(x)', ylim=[-1.5,1.5])
+d2l.plot(xs, plots, 'x', 'f(x)', ylim=[-1.5, 1.5])
 ```
 
 ### Taylor Series
@@ -313,7 +313,7 @@ After equipping with the the basic maths, let us see how this works in code and 
 
 ```{.python .input}
 # Compute the exponential function
-xs = np.arange(0,3,0.01)
+xs = np.arange(0, 3, 0.01)
 ys = np.exp(xs)
 
 # Compute a few Taylor series approximations
@@ -321,7 +321,7 @@ P1 = 1 + xs
 P2 = 1 + xs + xs**2/2
 P5 = 1 + xs + xs**2/2 + xs**3/6 + xs**4/24 + xs**5/120
 
-d2l.plot(xs, [ys,P1,P2,P5], 'x', 'f(x)', legend = [
+d2l.plot(xs, [ys, P1, P2, P5], 'x', 'f(x)', legend = [
     "Exponential", "Degree 1 Taylor Series", "Degree 2 Taylor Series",
     "Degree 5 Taylor Series"])
 ```

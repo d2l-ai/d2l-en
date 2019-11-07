@@ -17,23 +17,23 @@ npx.set_np()
 ```
 
 ```{.python .input}
-x = np.arange(-2,2,0.01)
+x = np.arange(-2, 2, 0.01)
 f = np.exp(-x**2)
 
 d2l.set_figsize()
-d2l.plt.plot(x,f,color='black')
-d2l.plt.fill_between(x.tolist(),f.tolist())
+d2l.plt.plot(x, f, color='black')
+d2l.plt.fill_between(x.tolist(), f.tolist())
 d2l.plt.show()
 ```
 
 In most cases, this area will be infinite or undefined (consider the area under $f(x) = x^{2}$), so people will often talk about the area between a pair of ends, say $a$ and $b$.
 
 ```{.python .input}
-x = np.arange(-2,2,0.01)
+x = np.arange(-2, 2, 0.01)
 f = np.exp(-x**2)
 
-d2l.plt.plot(x,f,color='black')
-d2l.plt.fill_between(x.tolist()[50:250],f.tolist()[50:250])
+d2l.plt.plot(x, f, color='black')
+d2l.plt.fill_between(x.tolist()[50:250], f.tolist()[50:250])
 d2l.plt.show()
 ```
 
@@ -54,20 +54,20 @@ There is a traditional way to try and understand how we might try to approximate
 ```{.python .input}
 epsilon = 0.05
 a = 0
-b = 2
+b = 2    
 
-x = np.arange(a,b,epsilon)
+x = np.arange(a, b, epsilon)
 f = x/(1+x**2)
 
 approx = np.sum(epsilon*f)
 true = np.log(2)/2
 
-d2l.plt.bar(x,f,width = epsilon, align = 'edge')
-d2l.plt.plot(x,f,color='black')
-d2l.plt.ylim([0,1])
+d2l.plt.bar(x, f, width = epsilon, align = 'edge')
+d2l.plt.plot(x, f, color='black')
+d2l.plt.ylim([0, 1])
 d2l.plt.show()
 
-"Approximation: {}, Truth: {}".format(approx,true)
+"Approximation: {}, Truth: {}".format(approx, true)
 ```
 
 The issue is that while it can be done numerically, we can do this approach analytically for only the simplest functions like
@@ -100,9 +100,10 @@ $$
 \int_a^b f(x) \;dx = F(b) - F(a).
 $$
 
-This is a mathematical encoding of the fact that we can measure the area out to the far end-point and then subtract off the area to the near end point as indicated in the figure below.
+This is a mathematical encoding of the fact that we can measure the area out to the far end-point and then subtract off the area to the near end point as indicated in :numref:`fig_area-subtract`.
 
 ![Visualizing why we may reduce the problem of computing the area under a curve between two points to computing the area to the left of a point.](../img/SubArea.svg)
+:label:`fig_area-subtract`
 
 Thus, if we can figure out what the integral over any interval is by figuring out what $F(x)$ is.  
 
@@ -187,9 +188,10 @@ $$
 
 This is the *change of variables* formula.  It states that we may consider reparameterizing the function inside an integral is in essence the same thing as changing the bounds of integration as long as we take into account how quickly the reparametrization changes.
 
-For a more intuitive derivation, consider what happens when we take an integral of $f(u(x))$ between $x$ and $x+\epsilon$. For a small $\epsilon$, this integral is approximately $\epsilon f(u(x))$, the area of the associated rectangle.  Now, let us compare this with the integral of $f(y)$ from $u(x)$ to $u(x+\epsilon)$.  We know that $u(x+\epsilon) \approx u(x) + \epsilon \frac{du}{dx}(x)$, so the area of this rectangle is approximately $\epsilon \frac{du}{dx}(x)f(u(x))$.  Thus, to make the area of these two rectangles to agree, we need to multiply the first one by $\frac{du}{dx}(x)$.  
+For a more intuitive derivation, consider what happens when we take an integral of $f(u(x))$ between $x$ and $x+\epsilon$. For a small $\epsilon$, this integral is approximately $\epsilon f(u(x))$, the area of the associated rectangle.  Now, let us compare this with the integral of $f(y)$ from $u(x)$ to $u(x+\epsilon)$.  We know that $u(x+\epsilon) \approx u(x) + \epsilon \frac{du}{dx}(x)$, so the area of this rectangle is approximately $\epsilon \frac{du}{dx}(x)f(u(x))$.  Thus, to make the area of these two rectangles to agree, we need to multiply the first one by $\frac{du}{dx}(x)$ as is illustrated in :numref:`fig_rect-transform`.  
 
 ![Visualizing the transformation of a single thin rectangle under the change of variables.](../img/RectTrans.svg)
+:label:`fig_rect-transform`
 
 This tells us that
 
@@ -248,7 +250,8 @@ In some cases, we will need to work in higher dimensions.  For instance, suppose
 from mpl_toolkits import mplot3d
 
 # Construct grid and compute function
-x, y = np.meshgrid(np.linspace(-2, 2, 101), np.linspace(-2, 2, 101), indexing='ij')
+x, y = np.meshgrid(np.linspace(-2, 2, 101), 
+                   np.linspace(-2, 2, 101), indexing='ij')
 z = np.exp(- x**2 - y**2)
 
 # Plot Function
@@ -279,13 +282,14 @@ $$
 \sum_{i,j} \epsilon^{2} f(\epsilon i, \epsilon j).
 $$
 
-Once we discretize the problem, we may add up the values on these squares in whatever order we like, and not worry about changing the values, in particular, we can say that
+Once we discretize the problem, we may add up the values on these squares in whatever order we like, and not worry about changing the values.  This is illustrated in :numref:`fig_sum-order`.  In particular, we can say that
 
 $$
  \sum _ {j} \epsilon \left(\sum_{i} \epsilon f(\epsilon i, \epsilon j)\right).
 $$
 
 ![Illustrating how to decompose a sum over many squares as a sum over first the columns (1), then adding the column sums together (2).](../img/SumOrder.svg)
+:label:`fig_sum-order`
 
 The sum on the inside is precisely the discretization of the integral 
 
@@ -366,7 +370,7 @@ $$
 Thus, the integral is
 
 $$
-\int _ 0^\infty \int _ 0 ^ {2\pi} re^{-r^{2}} \;d\theta\;dr = 2\pi\int _ 0^\infty re^{-r^{2}} \;dr = \pi
+\int _ 0^\infty \int _ 0 ^ {2\pi} re^{-r^{2}} \;d\theta\;dr = 2\pi\int _ 0^\infty re^{-r^{2}} \;dr = \pi,
 $$
 
 where the final equality follows by the same computation that we used in section :numref:`integral_example`.  
