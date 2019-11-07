@@ -96,7 +96,7 @@ $$
 L(\mathbf{w} + \boldsymbol{\epsilon}) \approx L(\mathbf{w}) + \boldsymbol{\epsilon}\cdot \nabla_{\mathbf{w}} L(\mathbf{w}).
 $$
 
-Let us suppose I want to minimize this loss.  Let's understand geometrically the algorithm of gradient descent first obtained in  :numref:`sec_autograd`. What we will do is the following:
+Let us suppose I want to minimize this loss.  Let us understand geometrically the algorithm of gradient descent first obtained in  :numref:`sec_autograd`. What we will do is the following:
 
 1. Start with a random choice for the initial parameters $\mathbf{w}$.
 2. Find the direction $\mathbf{v}$ that makes $L$ decrease the most rapidly at $\mathbf{w}$.
@@ -260,20 +260,19 @@ $$
 If we write this out into code this becomes a fairly manageable expression.
 
 ```{.python .input}
-### Compute the value of the function from inputs to outputs ###
+# Compute the value of the function from inputs to outputs
 w = -1; x = 0; y = -2; z = 1
 a = (w+x+y+z)**2; b = (w+x-y-z)**2
 u = (a+b)**2; v = (a-b)**2
 f = (u+v)**2
 print("    f at {},{},{},{} is {}".format(w,x,y,z,f))
 
-### Compute the derivative using the decomposition above ###
-# First compute the single step partials
+# Compute the single step partials
 df_du = 2*(u+v); df_dv = 2*(u+v)
 du_da = 2*(a+b); du_db = 2*(a+b); dv_da = 2*(a-b); dv_db = -2*(a-b)
 da_dw = 2*(w+x+y+z); db_dw = 2*(w+x-y-z)
 
-### Now compute the final result from inputs to outputs ###
+# Compute the final result from inputs to outputs
 du_dw = du_da*da_dw + du_db*db_dw; dv_dw = dv_da*da_dw + dv_db*db_dw
 df_dw = df_du*du_dw + df_dv*dv_dw
 print("df/dw at {},{},{},{} is {}".format(w,x,y,z,df_dw))
@@ -428,7 +427,6 @@ And thus, with a little algebra, see that the approximating quadratic at $[-1,0]
 $$
 f(x,y) \approx e^{-1}(-1 - (x+1) +2(x+1)^2+2y^2).
 $$
-
 
 ```{.python .input}
 from mpl_toolkits import mplot3d
