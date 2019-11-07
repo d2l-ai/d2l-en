@@ -1,7 +1,7 @@
 # Statistics 
 :label:`sec_statistics`
 
-Undoubtedly, to be a top deep learning practitioner, the ability to train the state-of-the-art and high accurate models is crucial. Beyond that, understanding the mathematical mindset behind the models will strengthen your ability to deal with different probings, no matter in the interviews or the customer questioning such as “why we should trust the key parameters of your model?” As a result, in this section, we will empower you to explain the mathematical reasoning behind the models by introducing some fundamental concepts of statistics, which are the backbone of the deep learning algorithms.
+Undoubtedly, to be a top deep learning practitioner, the ability to train the state-of-the-art and high accurate models is crucial. Beyond that, understanding the mathematical mindset behind the models will strengthen your ability to deal with different probings, no matter in the interviews or the customer questioning such as “why should we trust the key parameters of your model?” As a result, in this section, we will empower you to explain the mathematical reasoning behind the models by introducing some fundamental concepts of statistics, which are the backbone of the deep learning algorithms.
 
 
 The earliest reference of *statistics* can be traced back to an Arab scholar Al-Kindi in the 9th-century, who gave a detailed description of how to use statistics and frequency analysis to decipher encrypted messages. His work laid the foundations for statistical and cryptanalysis. After 800 years, the modern statistics arose from Germany in 1700s, when the researchers focused on the systematic collection of demographic and economic data. Today, statistics is the science subject that concerns the collection, processing, analysis, interpretation and visualization of data. It has been widely used in government, business, sciences, etc.  
@@ -251,5 +251,13 @@ sample_std = samples.std()
 
 
 ## Exercises
+
+1. Let $X_1, X_2, \ldots, X_n \overset{iid}{\sim} Unif(0, \theta)$, where "iid" stands for *independent and identically distributed*. Consider the following estimators of $\theta$:
+$$\hat{\theta} = max \{X_1, X_2, \ldots, X_n \};$$
+$$\tilde{\theta} = 2 \bar{X_n} = \frac{2}{n} \sum_{i=1}^n X_i.$$
+    1. Find the statistical bias, standard deviation, and mean square error of $\hat{\theta}.$
+    1. Find the statistical bias, standard deviation, and mean square error of $\tilde{\theta}.$
+    1. What estimator is better?
+
 
 1. For our chemist example in introduction, can you derive the 5 steps to conduct a two-sided hypothesis testing? Given the statistical significance level $\alpha = 0.05$ and the statistical power $1 - \beta = 0.8$.
