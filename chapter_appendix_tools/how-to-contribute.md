@@ -38,7 +38,7 @@ git clone https://github.com/your_github_username/d2l-en.git
 ```
 
 
-Please note we will need to contribute to the **numpy2** branch. Hence, we will need checkout `origin/numpy2` manually.
+Please note we will need to contribute to the *numpy2* branch. Hence, we will need checkout `origin/numpy2` manually.
 
 ```
 cd d2l-en

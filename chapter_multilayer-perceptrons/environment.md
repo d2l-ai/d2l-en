@@ -340,7 +340,7 @@ had nonzero probability of occurring at training time.
 If we find a point where $q(\mathbf{x}) > 0$ but $p(\mathbf{x}) = 0$,
 then the corresponding importance weight should be infinity.
 
-**Generative Adversarial Networks**
+*Generative Adversarial Networks*
 use a very similar idea to that described above
 to engineer a *data generator* that outputs data
 that cannot be distinguished
