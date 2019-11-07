@@ -3,7 +3,7 @@
 
 One of the most commonly encounter way of thinking in machine learning is the maximum likelihood point of view.  This is the concept that when working with a probabilistic model with unknown parameters, the parameters which make the data have the highest probability are the most likely ones.
 
-## The Philosopy
+## The Philosophy
 
 This has a Bayesian which can be helpful to think about.  Suppose we have a model with parameters $\boldsymbol{\theta}$ and a collection of data points $X$.  For concreteness, we can imagine that $\boldsymbol{\theta}$ is a single value representing the probability that a coin comes up heads when flipped, and $X$ is a sequence of independent coin flips.  We will look at this example in depth later.
 
@@ -48,12 +48,9 @@ In any case, for our example, the plot of $P(X \mid \theta)$ is as follows
 ```{.python .input}
 %matplotlib inline
 import d2l
-from IPython import display
 from mxnet import np, npx
 npx.set_np()
-```
 
-```
 theta = np.arange(0,1,0.001)
 p = theta**9*(1-theta)**4.
 
@@ -74,6 +71,7 @@ $$
 This has three solutions: $0$, $1$ and $9/13$.  The first two are clearly minima, not maxima as they assign probability $0$ to our sequence.  The final one does *not* assign zero probability to our sequence, and thus must be the maximum likelihood estimate $\hat \theta = 9/13$, matching our intuition.
 
 ## Numerical Optimization and the $-\log$-Likelihood
+
 This story is nice, but what is we have billions of parameters and data points.  What do we do then?
 
 First notice that, if we make the assumption that all the data points are independents, we can no longer consider the likelihood itself as it is a product of many probabilities.  Indeed, each probability is in $[0,1]$, say typically of size about $1/2$, and the product of $(1/2)^{1000000000}$ is far below machine precision.  We cannot work with that directly.  
@@ -122,13 +120,14 @@ for iter in range(10) :
     theta -= lr*theta.grad
 
 ### Check Output ###
-print(theta)
-print(n_H/(n_H+n_T))
+theta, n_H/(n_H+n_T)
 ```
 
 Numerical convenience is only one reason people like to use $-\log$-likelihoods.  Indeed, there are a number of reasons that it can be preferable.
 
-**Simplification of Calculus rules.** As discussed above, due to independence assumptions, most probabilities we encounter in machine learning are products of individual probabilities.
+### Simplification of Calculus Rules
+
+As discussed above, due to independence assumptions, most probabilities we encounter in machine learning are products of individual probabilities.
 
 $$
 P(X\mid\boldsymbol{\theta}) = p(x_1\mid\boldsymbol{\theta})\cdot p(x_2\mid\boldsymbol{\theta})\cdots p(x_n\mid\boldsymbol{\theta}).
@@ -159,7 +158,9 @@ $$
 
 This requires only $n$ divides and $n-1$ sums, and thus is linear time in the inputs.
 
-**Relationships with information theory**.  In :numref:`sec_information_theory` we will discuss a concept known as information theory.  This is a rigorous mathematical theory which gives a way to measure the degree of randomness in a random variable.  The key object of study in that field is the entropy which is 
+### Relationships with Information Theory
+
+In :numref:`sec_information_theory` we will discuss a concept known as information theory.  This is a rigorous mathematical theory which gives a way to measure the degree of randomness in a random variable.  The key object of study in that field is the entropy which is 
 
 $$
 H(p) = -\sum_{i} p_i \log_2(p_i),

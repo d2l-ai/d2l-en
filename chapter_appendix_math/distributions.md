@@ -34,7 +34,8 @@ Let us plot the probability mass function and cumulative distribution function.
 ```{.python .input}
 p = 0.3
 
-d2l.plt.stem([0,1],[1-p,p])
+d2l.set_figsize()
+d2l.plt.stem([0,1],[1-p,p], use_line_collection=True)
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
@@ -52,11 +53,16 @@ If $X \sim \mathrm{Bernoulli}(p)$, then:
 * $\mu_X = p$,
 * $\sigma_X^2 = p(1-p)$.
 
-We can sample an array of arbitrary shape from a Bernoulli random variable in numpy as follows. 
+We can sample an array of arbitrary shape from a Bernoulli random variable in numpy as follows.
 
 ```
 1*(np.random.rand(10,10) < p)
 ```
+
+```
+
+```
+
 
 ## Discrete Uniform
 
@@ -81,7 +87,7 @@ Let us plot the probability mass function and cumulative distribution function.
 ```{.python .input}
 n = 5
 
-d2l.plt.stem([i+1 for i in range(n)],n*[1/n])
+d2l.plt.stem([i+1 for i in range(n)],n*[1/n], use_line_collection=True)
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
@@ -99,7 +105,7 @@ If $X \sim \mathrm{Uniform}(n)$, then:
 * $\mu_X = \frac{1+n}{2}$,
 * $\sigma_X^2 = \frac{n^2-1}{12}$.
 
-We can an array of arbitrary shape from a discrete uniform random variable in numpy as follows.  Note that the range 
+We can an array of arbitrary shape from a discrete uniform random variable in numpy as follows.  Note that the range
 
 ```
 np.random.random_integers(1, n, size=(10,10))
@@ -133,6 +139,7 @@ F(x) = \begin{cases}
 $$
 
 Let us plot the probability density function and cumulative distribution function.
+
 ```{.python .input}
 a = 1; b = 3
 
@@ -158,6 +165,7 @@ We can an array of arbitrary shape from a uniform random variable in numpy as fo
 ```
 (b - a) * np.random.rand(10, 10) + a
 ```
+
 
 ## Binomial
 
@@ -200,7 +208,7 @@ def binom(n, k):
 
 pmf = np.array([p**i*(1-p)**(n-i)*binom(n,i) for i in range(n+1)])
 
-d2l.plt.stem([i for i in range(n+1)],pmf)
+d2l.plt.stem([i for i in range(n+1)],pmf, use_line_collection=True)
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
@@ -224,6 +232,7 @@ This can be sampled in numpy as follows.
 ```
 np.random.binomial(n, p, size = (10,10))
 ```
+
 
 ## Poisson
 Let us now perform a thought experiment.  Let us say we are standing at a bus stop and we want to know how many buses will arrive in the next minute.  Lets start by considering $X^{(1)} \sim \mathrm{Bernoulli}(p)$ Which is simply the probability that a bus arrives in the one minute window.  For bus stops far from an urban center, this might be a pretty good approximation since we will never see more than one bus at a time.
@@ -272,7 +281,7 @@ lam = 5.0
 xs = [i for i in range(20)]
 pmf = np.array([np.exp(-lam)*lam**k/factorial(k) for k in xs])
 
-d2l.plt.stem(xs,pmf)
+d2l.plt.stem(xs,pmf, use_line_collection=True)
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
@@ -292,6 +301,7 @@ As we saw above, the means and variances are particularly concise.  If $X \sim \
 * $\sigma_X^2 = \lambda$.
 
 This can be sampled in numpy as follows.
+
 ```{.python .input}
 import numpy as np
 np.random.poisson(lam,size=(10,10))
@@ -316,7 +326,8 @@ for i in range(4) :
     n = ns[i]
     pmf = np.array([p**i*(1-p)**(n-i)*binom(n,i) for i in range(n+1)])
     d2l.plt.subplot(1, 4, i+1)
-    d2l.plt.stem([(i-n*p)/np.sqrt(n*p*(1-p)) for i in range(n+1)],pmf)
+    d2l.plt.stem([(i-n*p)/np.sqrt(n*p*(1-p)) for i in range(n+1)],pmf,
+                 use_line_collection=True)
     d2l.plt.xlim([-4,4])
     d2l.plt.xlabel('x')
     d2l.plt.ylabel('p.m.f.')
@@ -339,6 +350,7 @@ p_X(x) = \frac{1}{\sqrt{2\pi\sigma^2}}e^{-\frac{(x-\mu)^2}{2\sigma^2}}.
 $$
 
 Let us plot the probability density function and cumulative distribution function.
+
 ```{.python .input}
 mu = 0; sigma = 1
 
@@ -382,6 +394,7 @@ To close the section, Let us recall that if $X \sim \mathcal{N}(\mu,\sigma^2)$, 
 * $\sigma_X^2 = \sigma^2$.
 
 We can sample from the Gaussian (or normal) using numpy.
+
 ```{.python .input}
 np.random.normal(mu,sigma,size=(10,10))
 ```
@@ -399,4 +412,3 @@ np.random.normal(mu,sigma,size=(10,10))
 1. What is the standard deviation of a random variable that is the difference $X-Y$ of two indepent binomial random variables $X,Y \sim \mathrm{Binomial}(16,1/2)$.
 2. If we take a Poisson random variable $X \sim \mathrm{Poisson}(\lambda)$ and consider $(X - \lambda)/\sqrt{\lambda}$ as $\lambda \rightarrow \infty$, we can show that this becomes approximately Gaussian.  Why does this make sense?
 3. What is the probability mass function for a sum of two discrete uniform random variables on $n$ elements?
-
