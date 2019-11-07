@@ -2,14 +2,14 @@
 :label:`sec_linear_algebra`
 
 In :numref:`sec_scalar-tensor`, we encountered the basics of linear algebra
-and saw how it coudl be used to express common operations for transforming our data.
+and saw how it could be used to express common operations for transforming our data.
 Linear algebra is one of the key mathematical pillars
 underlying much of the work that we do deep learning 
 and in machine learning more broadly.
 While :numref:`sec_scalar-tensor` contained enough machinery
 to communicate the mechanics of modern deep learning models, 
 there is a lot more to the subject than we could fit there (or even here).
-In this appendix, we will go deeper,
+In this section, we will go deeper,
 highlighting some geometric interpretations of linear algebra operations, 
 and introducing a few fundamental concepts, including of eigenvalues and eigenvectors.
 
@@ -25,7 +25,12 @@ v = [1,7,0,1]
 Mathematicians most often write this as either a *column* or *row* vector, which is to say either as
 
 $$
-\mathbf{x} = \begin{bmatrix}1\\7\\0\\1\end{bmatrix} \quad \text{ or } \quad
+\mathbf{x} = \begin{bmatrix}1\\7\\0\\1\end{bmatrix}
+$$
+
+or
+
+$$
 \mathbf{x}^\top = \begin{bmatrix}1 & 7 & 0 & 1\end{bmatrix}.
 $$ 
 
@@ -123,9 +128,7 @@ $$
 $$
 
 In short, for these two specific vectors, 
-the dot product tells us the angle between the two vectors.  
-This same fact is true in general.  
-We will not derive the expression here, however,
+the dot product tells us the angle between the two vectors. This same fact is true in general. We will not derive the expression here, however,
 if we consider writing $\|\mathbf{v} - \mathbf{w}\|^2$ in two ways: 
 one with the dot product, and the other geometrically using the law of cosines,
 we can obtain the full relationship. 
@@ -214,9 +217,8 @@ of a line (two dimensions) or of a plane (three dimensions).
 In an $n$-dimensional vector space, a hyperplane has $d-1$ dimensions
 and divides the space into two half-spaces. 
 
-Let us start with an example.  
-Suppose we have a column vector $\mathbf{w}=[2,1]^\top$.  
-We want to know, "what are the points $\mathbf{v}$ with $\mathbf{w}\cdot\mathbf{v} = 1$?"
+Let us start with an example.
+Suppose we have a column vector $\mathbf{w}=[2,1]^\top$. We want to know, "what are the points $\mathbf{v}$ with $\mathbf{w}\cdot\mathbf{v} = 1$?"
 By recalling the connection between dot products and angles above, 
 we can see that this is equivalent to 
 $$
@@ -238,14 +240,14 @@ If we now look at what happens when we ask about the set of points with
 $\mathbf{w}\cdot\mathbf{v} > 1$ or $\mathbf{w}\cdot\mathbf{v} < 1$,
 we can see that these are cases where the projections 
 are longer or shorter than $1/\|\mathbf{w}\|$, respectively.
-Thus, those two inequalities define either side of the line.  
+Thus, those two inequalities define either side of the line.
 In this way, we have found a way to cut our space into two halves, 
 where all the points on one side have dot product below a threshold, 
 and the other side above.
 
 ![If we now consider the inequality version of the expression, we see that our hyperplane (in this case: just a line) separates the space into two halves.](../img/SpaceDivision.svg)
 
-The story in higher dimension is much the same.  
+The story in higher dimension is much the same.
 If we now take $\mathbf{w} = [1,2,3]^\top$
 and ask about the points in three dimensions with $\mathbf{w}\cdot\mathbf{v} = 1$,
 we obtain a plane at right angles to the given vector $\mathbf{w}$.
@@ -255,7 +257,6 @@ The two inequalities again define the two sides of the plane.
 
 While our ability to visualize runs out at this point,
 nothing stops us from doing this in tens, hundreds, or billions of dimensions.
-
 This occurs often when thinking about machine learned models.
 For instance, we can understand linear classification models 
 like those from :numref:`sec_softmax`,
@@ -310,10 +311,11 @@ d2l.plt.show()
 # Print test set accuracy with eyeballed threshold
 w = (ave_1 - ave_0).T
 predictions = 1*(X_test.reshape(2000,-1).dot(w.flatten()) > -1500000)
-print("Accuracy: {}".format(np.mean(predictions==y_test)))
+np.mean(predictions==y_test)  # Accuracy
 ```
 
 ## Geometry of linear transformations
+
 Through :numref:`sec_scalar-tensor` and the above discussions, 
 we have a solid understanding of the geometry of vectors, lengths, and angles. 
 However, there is one important object we have omitted discussing, 
@@ -385,11 +387,13 @@ All they can do is take the original coordinates on our space
 and skew, rotate, and scale them.
 
 Some distortions can be severe.  For instance the matrix
+
 $$
 \mathbf{B} = \begin{bmatrix}
 2 & -1 \\ 4 & -2
 \end{bmatrix}
 $$
+
 compresses the entire two-dimensional plane down to a single line.
 Identifying and working with such transformations are the topic of a later section, 
 but geometrically we can see that this is fundamentally different 
@@ -406,15 +410,18 @@ we can start to get a feeling for how the matrix multiplication
 distorts the entire space in whatever dimension space we are dealing with.
 
 ## Linear Dependence
+
 Consider again the matrix
+
 $$
 \mathbf{B} = \begin{bmatrix}
 2 & -1 \\ 4 & -2
 \end{bmatrix}.
 $$
+
 This compresses the entire plane down to live on the single line $y = 2x$.
 The question now arises: is there some way we can detect this
-just looking at the matrix itself?  
+just looking at the matrix itself?
 The answer is that indeed we can.
 Lets take $\mathbf{b}_1 = [2,4]^\top$ and $\mathbf{b}_2 = [-1,-2]^\top$ 
 be the two columns of $\mathbf{B}$.
@@ -425,6 +432,7 @@ We call this a *linear combination*.
 The fact that $\mathbf{b}_1 = -2\cdot\mathbf{b}_2$ 
 means that we can write any linear combination of those two columns 
 entirely in terms of say $\mathbf{b}_2$ since
+
 $$
 a_1\mathbf{b}_1 + a_2\mathbf{b}_2 = -2a_1\mathbf{b}_2 + a_2\mathbf{b}_2 = (a_2-2a_1)\mathbf{b}_2.
 $$
@@ -437,6 +445,7 @@ collapses the entire plane down into a single line.
 Moreover, we see that the linear dependence 
 $\mathbf{b}_1 = -2\cdot\mathbf{b}_2$ captures this. 
 To make this more symmetrical between the two vectors, we will write this as
+
 $$
 \mathbf{b}_1  + 2\cdot\mathbf{b}_2 = 0.
 $$
@@ -451,7 +460,7 @@ $$
 
 In this case, we can solve for one of the vectors 
 in terms of some combination of the others, 
-and effectively render it redundant.  
+and effectively render it redundant.
 Thus, a linear dependence in the columns of a matrix 
 is a witness to the fact that our matrix 
 is compressing the space down to some lower dimension.
@@ -503,6 +512,7 @@ this is sufficient to see that the concept
 is well defined and understand the meaning.
 
 ## Invertibility
+
 We have seen above that multiplication by a matrix with linearly dependent columns
 cannot be undone, i.e., there is no inverse operation that can always recover the input.  However, multiplication by a full-rank matrix 
 (i.e., some $\mathbf{A}$ that is $n \times n$ matrix with rank $n$), 
@@ -629,22 +639,21 @@ c & d
 $$
 
 we can see with some computation that the area 
-of the resulting parallelogram is $ad-bc$.  
+of the resulting parallelogram is $ad-bc$.
 This area is referred to as the *determinant*.
 
-Let's check this quickly with some example code.
+Let us check this quickly with some example code.
 
 ```
 np.linalg.det(np.array[[1,-1],[2,3]])
 ```
-
 
 The eagle-eyed amongst us will notice 
 that this expression can be zero or even negative.
 For the negative term, this is a matter of convention 
 taken generally in mathematics: 
 if the matrix flips the figure, 
-we say the area is negated.  
+we say the area is negated.
 Let us see now that when the determinant is zero, we learn more.
 
 Let us consider
@@ -1100,6 +1109,7 @@ for what is known as the [power iteration method](https://en.wikipedia.org/wiki/
 for finding the largest eigenvalue and eigenvector of a matrix.
 
 ### Fixing the normalization
+
 Now, from above discussions, we concluded 
 that we do not want a random vector to be stretched or squished at all,
 we would like random vectors to stay about the same size throughout the entire process.
@@ -1150,6 +1160,7 @@ In this way, eigenvalues form a key component
 for understanding the behavior of many ML systems.
 
 ## Tensors and Common Linear Algebra Operations
+
 In :numref:`sec_scalar-tensor` the concept of tensors was introduced.
 In this section, we will dive more deeply into tensor contractions 
 (the tensor equivalent of matrix multiplication),
@@ -1161,8 +1172,12 @@ We need to have a similar definition for tensors if they are to be useful to us.
 Think about matrix multiplication:
 
 $$
-\mathbf{C} = \mathbf{A}\mathbf{B} \;\text{ or equivalently }\; c_{i,j} = \sum_{k} a_{i,k}b_{k,j}.
+\mathbf{C} = \mathbf{A}\mathbf{B}
 $$
+
+or equivalently
+
+$$ c_{i,j} = \sum_{k} a_{i,k}b_{k,j}.$$
 
 This pattern is one we can repeat for tensors.
 For tensors, there is no one case of what 
@@ -1270,7 +1285,6 @@ Either notation allows for concise and efficient representation of tensor contra
 
 ## Exercises
 1. What is the angle between
-
 $$
 \vec v_1 = \begin{bmatrix}
 1 \\ 0 \\ -1 \\ 2
@@ -1278,31 +1292,28 @@ $$
 3 \\ 1 \\ 0 \\ 1
 \end{bmatrix}?
 $$
+1. True or false: $\begin{bmatrix}1 & 2\\0&1\end{bmatrix}$ and $\begin{bmatrix}1 & -2\\0&1\end{bmatrix}$ are inverses of one another?
 
-2. True or false: $\begin{bmatrix}1 & 2\\0&1\end{bmatrix}$ and $\begin{bmatrix}1 & -2\\0&1\end{bmatrix}$ are inverses of one another?
-
-3. Suppose we draw a shape in the plane with area $100\mathrm{m}^2$.  What is the area after transforming the figure by the matrix
-
+1. Suppose we draw a shape in the plane with area $100\mathrm{m}^2$.  What is the area after transforming the figure by the matrix
 $$
 \begin{bmatrix}
 2 & 3\\
 1 & 2
 \end{bmatrix}.
 $$
+1. Which of the following sets of vectors are linearly independent?
+ * $\left\{\begin{pmatrix}1\\0\\-1\end{pmatrix},\begin{pmatrix}2\\1\\-1\end{pmatrix},\begin{pmatrix}3\\1\\1\end{pmatrix}\right\}$
+ * $\left\{\begin{pmatrix}3\\1\\1\end{pmatrix},\begin{pmatrix}1\\1\\1\end{pmatrix},\begin{pmatrix}0\\0\\0\end{pmatrix}\right\}$
+ * $\left\{\begin{pmatrix}1\\1\\0\end{pmatrix},\begin{pmatrix}0\\1\\-1\end{pmatrix},\begin{pmatrix}1\\0\\1\end{pmatrix}\right\}$
 
-4. Which of the following sets of vectors are linearly independent?
-* $\left\{\begin{pmatrix}1\\0\\-1\end{pmatrix},\begin{pmatrix}2\\1\\-1\end{pmatrix},\begin{pmatrix}3\\1\\1\end{pmatrix}\right\}$
-* $\left\{\begin{pmatrix}3\\1\\1\end{pmatrix},\begin{pmatrix}1\\1\\1\end{pmatrix},\begin{pmatrix}0\\0\\0\end{pmatrix}\right\}$
-* $\left\{\begin{pmatrix}1\\1\\0\end{pmatrix},\begin{pmatrix}0\\1\\-1\end{pmatrix},\begin{pmatrix}1\\0\\1\end{pmatrix}\right\}$
+1. Suppose you have a matrix written as $A = \begin{bmatrix}c\\d\end{bmatrix}\cdot\begin{bmatrix}a & b\end{bmatrix}$ for some choice of values $a,b,c,$ and $d$.  True or false: the determinant of such a matrix is always $0$?
 
-5. Suppose you have a matrix written as $A = \begin{bmatrix}c\\d\end{bmatrix}\cdot\begin{bmatrix}a & b\end{bmatrix}$ for some choice of values $a,b,c,$ and $d$.  True or false: the determinant of such a matrix is always $0$?
+1. The vectors $e_1 = \begin{bmatrix}1\\0\end{bmatrix}$ and $e_2 = \begin{bmatrix}0\\1\end{bmatrix}$ are orthogonal.  What is the condition on a matrix $A$ so that $Ae_1$ and $Ae_2$ are orthogonal?
 
-6. The vectors $e_1 = \begin{bmatrix}1\\0\end{bmatrix}$ and $e_2 = \begin{bmatrix}0\\1\end{bmatrix}$ are orthogonal.  What is the condition on a matrix $A$ so that $Ae_1$ and $Ae_2$ are orthogonal?
-
-7. What are the eigenvalues and eigenvectors of
+1. What are the eigenvalues and eigenvectors of
 
 $$
-A = \begin{bmatrix}
+\mathbf{A} = \begin{bmatrix}
 2 & 1 \\
 1 & 2
 \end{bmatrix}?
@@ -1311,7 +1322,7 @@ $$
 8.  What are the eigenvalues and eigenvectors of the following matrix, and what is strange about this example compared to the previous one?
 
 $$
-A = \begin{bmatrix}
+\mathbf{A} = \begin{bmatrix}
 2 & 1 \\
 0 & 2
 \end{bmatrix}?
@@ -1320,7 +1331,7 @@ $$
 9. Without computing the eigenvalues, is it possible that the smallest eigenvalue of the following matrix is less that $0.5$? *Note*: this problem can be done in your head.
 
 $$
-A = \begin{bmatrix}
+\mathbf{A} = \begin{bmatrix}
 3.0 & 0.1 & 0.3 & 1.0 \\
 0.1 & 1.0 & 0.1 & 0.2 \\
 0.3 & 0.1 & 5.0 & 0.0 \\
