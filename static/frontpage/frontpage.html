@@ -29,9 +29,6 @@ h2.toc {
     line-height: 36px;
     padding-bottom: 10px;
 }
-.header img {
-    max-width: 350px;
-}
 .header .mdl-button {
   margin: 0px 10px;
   letter-spacing: 2px;
@@ -63,6 +60,10 @@ h2.toc {
 .features-2 p {
     padding: 0 200px;
 }
+#map {
+    height: 400px;
+    width: 100%;
+}
 @media (max-width: 1000px) {
     .mdl-grid, h2.toc {
         padding: 50px 0 0 0;
@@ -83,20 +84,19 @@ h2.toc {
     </style>
 </head>
 
+
 <div class = "mdl-grid header">
-  <div class = "mdl-cell mdl-cell--4-col">
-    <img src="_images/front.jpg" class="img-fluid" alt="">
+  <div class = "mdl-cell mdl-cell--5-col">
+    <img src="_images/front.png" class="img-fluid" alt="">
   </div>
   <div class = "mdl-cell mdl-cell--1-col">
   </div>
-  <div class = "mdl-cell mdl-cell--4-col mdl-cell--middle">
+  <div class = "mdl-cell mdl-cell--5-col mdl-cell--middle">
     <h2>Dive into Deep Learning</h2>
-    <p>An interactive deep learning book with code, math, and
-      discussions<br><br>
-      Based on the NumPy interface
-      (the previous NDArray version is <a href="https://classic.d2l.ai">here</a>)
+    <p>An <b>interactive</b> deep learning book with code, math, and
+      discussions, based on the <b>NumPy</b> interface.
       <br><br>
-      <font color="#888"><small><i>The contents are under revision</i></small></font>
+<font color="#888"><small><i> The previous NDArray version is <a href="https://classic.d2l.ai">here</a> </i></small></font>
     </p>
   </div>
 </div>
@@ -208,9 +208,61 @@ h2.toc {
   </div>
 </div>
 
-<div class="mdl-grid">
-  <div>
+<div class="features  mdl-grid">
+  <div class = "mdl-cell mdl-cell--12-col">
     <h3>D2L as a textbook or a reference book</h3>
+    <h6><i>Please let d2lbook.en@gmail.com know of any we missed</i></h6>
+    <br>
+    <div id="map"></div>
+    <script>
+      function initMap() {
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 2,
+          center: new google.maps.LatLng(10.8, 180.3),
+          mapTypeId: 'terrain'
+        });
+
+      var locations = [
+        ['CMU', 40.443279, -79.943889],
+        ['Fudan', 31.297640, 121.503629],
+        ['GeorgiaTech', 33.775444, -84.396371],
+        ['IIT Bombay', 19.134282, 72.912646],
+        ['IIT Kanpur', 26.512224, 80.233533],
+        ['IIT Ropar',  30.976563, 76.538215],
+        ['Kyungpook National U', 35.888949, 128.610718],
+        ['MIT', 42.360281, -71.093098],
+        ['Northeastern', 42.339386, -71.089279],
+        ['PKU', 39.987012, 116.305112],
+        ['SJTU', 31.024733, 121.433617],
+        ['SUFE',31.306851, 121.493008],
+        ['Texas A&M', 30.617810, -96.333042],
+        ['Federal de Minas Gerais', -19.871207, -43.967403],
+        ['UCB', 37.872119, -122.259398],
+        ['UCLA', 34.068512, -118.444870],
+        ['UCSB', 34.413981, -119.849795],
+        ['UIUC', 40.102379, -88.227408],
+        ['U Maryland',38.987052, -76.943692],
+        ['U New Hampshire',43.138784, -70.937798],
+        ['UNC',35.905182, -79.046044],
+        ['USTC', 31.822004, 117.281182],
+        ['U Tech Sydney', -33.883371, 151.200612],
+        ['U Politècnica de Catalunya', 41.387674, 2.113366],
+        ['ZJU', 30.308629, 120.086156],
+        ['UW',47.660589, -122.315527],
+      ];
+      for (var i = 0; i < locations.length; i++) {
+        var loc = locations[i];
+        var marker = new google.maps.Marker({
+          position: {lat: loc[1], lng: loc[2]},
+          map: map,
+          title: loc[0],
+        });
+      }
+    }
+    </script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDHVyB-dRW3fhSdUmy3lqoiaNjV9JVUR4M&callback=initMap">
+    </script>
     <br>
     Carnegie Mellon University (USA)<br>
     Fudan University (China)<br>

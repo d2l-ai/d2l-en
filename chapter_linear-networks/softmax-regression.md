@@ -128,7 +128,7 @@ However, there are some problems with directly
 interpreting the output of the linear layer as a probability.
 Nothing constrains these numbers to sum to 1. 
 Moreover, depending on the inputs, they can take negative values. 
-These violate basic axioms of probability presented in :num_ref:`sec_prob`
+These violate basic axioms of probability presented in :numref:`sec_prob`
 
 To interpret our outputs as probabilities, 
 we must guarantee that (even on new data),
@@ -213,25 +213,25 @@ for the least squares objective in linear regression
 The softmax function gives us a vector $\hat{\mathbf{y}}$, 
 which we can interpret as estimated conditional probabilities
 of each class given the input $x$, e.g.,
-$\hat{y}_1$ = $\hat{p}(y=\mathrm{cat}|\mathbf{x})$. 
+$\hat{y}_1$ = $\hat{P}(y=\mathrm{cat} \mid \mathbf{x})$. 
 We can compare the estimates with reality
 by checking how probable the *actual* classes are
 according to our model, given the features.
 
 $$
-p(Y|X) = \prod_{i=1}^n p(y^{(i)}|x^{(i)})
+P(Y \mid X) = \prod_{i=1}^n P(y^{(i)} \mid x^{(i)})
 \text{ and thus }
--\log p(Y|X) = \sum_{i=1}^n -\log p(y^{(i)}|x^{(i)})
+-\log P(Y \mid X) = \sum_{i=1}^n -\log P(y^{(i)} \mid x^{(i)})
 $$
 
 
-Maximizing $p(Y|X)$ (and thus equivalently minimizing $-\log p(Y|X)$)
+Maximizing $P(Y \mid X)$ (and thus equivalently minimizing $-\log P(Y \mid X)$)
 corresponds to predicting the label well.
 This yields the loss function 
 (we dropped the superscript $(i)$ to avoid notation clutter):
 
 $$
-l = -\log p(y|x) = - \sum_j y_j \log \hat{y}_j
+l = -\log P(y \mid x) = - \sum_j y_j \log \hat{y}_j
 $$
 
 For reasons explained later on, this loss function 
@@ -244,7 +244,7 @@ Since all $\hat{y}_j$ are probabilities,
 their logarithm is never larger than $0$.
 Consequently, the loss function cannot be minimized any further
 if we correctly predict $y$ with *certainty*, 
-i.e., if $p(y|x) = 1$ for the correct label.
+i.e., if $P(y \mid x) = 1$ for the correct label.
 Note that this is often not possible. 
 For example, there might be label noise in the dataset
 (some examples may be mislabeled).
@@ -268,12 +268,12 @@ To understand a bit better what is going on,
 consider the derivative with respect to $o$. We get
 
 $$
-\partial_{o_j} l = \frac{\exp(o_j)}{\sum_k \exp(o_k)} - y_j = \mathrm{softmax}(\mathbf{o})_j - y_j = P(y = j|x) - y_j
+\partial_{o_j} l = \frac{\exp(o_j)}{\sum_k \exp(o_k)} - y_j = \mathrm{softmax}(\mathbf{o})_j - y_j = P(y = j \mid x) - y_j
 $$
 
 In other words, the gradient is the difference 
 between the probability assigned to the true class by our model, 
-as expressed by the probability $p(y|x)$, 
+as expressed by the probability $P(y \mid x)$, 
 and what actually happened, as expressed by $y$. 
 In this sense, it is very similar to what we saw in regression, 
 where the gradient was the difference 
@@ -367,7 +367,7 @@ Relating this back to our classification objective,
 even if we get the best possible predictions, 
 if the best possible possible, then we will never be perfect. 
 Our loss is lower-bounded by the entropy given by the 
-actual conditional distributions $p(\mathbf{y}|\mathbf{x})$.
+actual conditional distributions $P(\mathbf{y} \mid \mathbf{x})$.
 
 
 ### Kullback Leibler Divergence
