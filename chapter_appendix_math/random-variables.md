@@ -63,7 +63,7 @@ The locations where the function is large indicates regions where we are more li
 Let us now investigate this further.  We have already seen what a probability density function is intuitively, namely for a random variable $X$, the density function is a function $p(x)$ so that 
 
 $$
-P(X \text{ is in an } \epsilon \text{-sized interval around } x ) \approx \epsilon \cdot p(x).
+P(X \; \text{is in an } \epsilon \text{-sized interval around } x ) \approx \epsilon \cdot p(x).
 $$
 
 but what does this imply for the properties of $p(x)$?
@@ -73,7 +73,7 @@ First, probabilities are never negative, thus we should expect that $p(x) \ge 0$
 Second, Let us imagine that we slice up the $\mathbb{R}$ into an infinite number of slices which are $\epsilon$ wide, say the slice from $(\epsilon\cdot i, \epsilon \cdot (i+1)]$.  For each of these, we know the probability is approximately
 
 $$
-P(X \text{is in an } \epsilon\text{-sized interval around } x ) \approx \epsilon \cdot p(\epsilon \cdot i),
+P(X \; \text{is in an } \epsilon\text{-sized interval around } x ) \approx \epsilon \cdot p(\epsilon \cdot i),
 $$
 
 so summed over all of them it should be
@@ -470,10 +470,10 @@ To think about this intuitively: consider the following pair of random variables
 
 $$
 \begin{aligned}
-P(X = 1, \text{ and} Y = -1) & = \frac{p}{2} \\
-P(X = 1, \text{ and} Y = 3) & = \frac{1-p}{2} \\
-P(X = 3, \text{ and} Y = -1) & = \frac{1-p}{2} \\
-P(X = 3, \text{ and} Y = 3) & = \frac{p}{2} 
+P(X = 1 \; \text{and} \; Y = -1) & = \frac{p}{2} \\
+P(X = 1 \; \text{and} \; Y = 3) & = \frac{1-p}{2} \\
+P(X = 3 \; \text{and} \; Y = -1) & = \frac{1-p}{2} \\
+P(X = 3 \; \text{and} \; Y = 3) & = \frac{p}{2} 
 \end{aligned}
 $$
 
