@@ -208,7 +208,7 @@ We can summarize all of these relationships in image :numref:`fig_mutual_informa
 ![Mutual information's relationship with joint entropy and conditional entropy.](../img/mutual_information.svg)
 :label:`fig_mutual_information`
 
-In many ways we can think of the mutual information as principled extension of correlation coefficient we saw in :numref:`sec-random-variables`.  This allows us to ask not only for linear relationships between variables, but for the maximum  information shared between the two random variables of any kind.
+In many ways we can think of the mutual information as principled extension of correlation coefficient we saw in :numref:`sec_random_variables`.  This allows us to ask not only for linear relationships between variables, but for the maximum  information shared between the two random variables of any kind.
 
 Now, let us implement mutual information from scratch.
 

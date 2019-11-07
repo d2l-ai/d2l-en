@@ -16,7 +16,7 @@ from IPython import display
 npx.set_np()
 ```
 
-We will work with the Fashion-MNIST dataset, just introduced in :numref:`sec_fasion_mnist`,
+We will work with the Fashion-MNIST dataset, just introduced in :numref:`sec_fashion_mnist`,
 setting up an iterator with batch size $256$.
 
 ```{.python .input  n=2}
