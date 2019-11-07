@@ -30,12 +30,13 @@ $$
 where $\sigma$ is the sigmoid function. The architecture of DeepFM is illustrated below.
 ![Illustration of the DeepFM model](../img/rec-deepfm.svg)
 
-```{.python .input  n=1}
+```{.python .input  n=2}
 import d2l
 from mxnet import autograd, init, gluon, np, npx
 from mxnet.gluon.data import Dataset
 from mxnet.gluon import nn
 import mxnet as mx
+import sys
 npx.set_np()
 ```
 
@@ -72,7 +73,7 @@ class DeepFM(nn.Block):
 ## Training and Evaluating the Model
 The data loading process is the same as that of FM. We set the MLP component of DeepFM to a three-layered dense network with the a pyramid structure (30-20-10). All other hyperparameters remain the same as FM.
 
-```{.python .input  n=3}
+```{.python .input  n=4}
 batch_size = 2048
 d2l.read_data_ctr()
 train_data = d2l.CTRDataset(data_path="../data/ctr/train.csv")
@@ -80,16 +81,19 @@ test_data = d2l.CTRDataset(data_path="../data/ctr/test.csv",
                       feat_mapper=train_data.feat_mapper, 
                       defaults=train_data.defaults)
 field_dims = train_data.field_dims
+num_workers = 0 if sys.platform.startswith("win") else 4
 train_iter = gluon.data.DataLoader(train_data, shuffle=True, 
                                    last_batch="rollover", 
-                                   batch_size=batch_size)
+                                   batch_size=batch_size,
+                                   num_workers=num_workers)
 test_iter = gluon.data.DataLoader(test_data, shuffle=False,
                                   last_batch="rollover",
-                                  batch_size=batch_size)
+                                  batch_size=batch_size,
+                                  num_workers=num_workers)
 ctx = d2l.try_all_gpus()
 net = DeepFM(field_dims, num_factors=10, mlp_dims=[30, 20, 10])
 net.initialize(init.Xavier(), ctx=ctx)
-lr, num_epochs, optimizer = 0.01, 50, 'adam'
+lr, num_epochs, optimizer = 0.01, 30, 'adam'
 trainer = gluon.Trainer(net.collect_params(), optimizer, 
                         {'learning_rate': lr})
 loss = gluon.loss.SigmoidBinaryCrossEntropyLoss()

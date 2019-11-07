@@ -36,13 +36,14 @@ The following figure illustrates the model architecture of NeuMF.
 
 ![Illustration of the NeuMF model](../img/rec-neumf.svg)
 
-```{.python .input  n=1}
+```{.python .input  n=2}
 import d2l
 from mxnet import autograd, init, gluon, np, npx
 from mxnet.gluon import nn
 import mxnet as mx
 import math
 import random
+import sys
 npx.set_np()
 ```
 
@@ -160,9 +161,9 @@ The training function is defined below. We train the model in the pairwise manne
 # Saved in the d2l package for later use
 def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter, 
                   num_users, num_items, num_epochs, ctx_list, evaluator, 
-                  negative_sampler, candidates, eval_step=2):
+                  negative_sampler, candidates, eval_step=1):
     num_batches, timer, hit_rate, auc  = len(train_iter), d2l.Timer(), 0, 0
-    animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs], ylim=[0, 1],
+    animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 1],
                             legend=['test hit rate', 'test AUC'])
     for epoch in range(num_epochs):
         metric, l = d2l.Accumulator(3), 0.
@@ -182,7 +183,7 @@ def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
             metric.add(l, values[0].shape[0], values[0].size)
             timer.stop()
         with autograd.predict_mode():
-            if (epoch + 1) % eval_step == 1:
+            if (epoch + 1) % eval_step == 0:
                 hit_rate, auc = evaluator(net, test_iter, test_seq_iter, 
                                           candidates, num_users, num_items, 
                                           ctx_list)
@@ -197,7 +198,7 @@ def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
 Now, we can load the MovieLens 100k dataset and train the model. Since there are only ratings in the MovieLens dataset, with some losses of accuracy, we binarize these ratings to zeros and ones. If a user rated an item, we consider the implicit feedback as one, otherwise as zero. The action of rating an item can be treated as a form of providing implicit feedback.  Here, we split the dataset in the `seq-aware` mode where users' latest interacted items are left out for test.
 
 ```{.python .input  n=7}
-batch_size = 256
+batch_size = 1024
 df, num_users, num_items = d2l.read_data_ml100k()
 train_data, test_data = d2l.split_data_ml100k(df, num_users, num_items, 
                                               'seq-aware')
@@ -205,23 +206,25 @@ users_train, items_train, ratings_train, candidates = d2l.load_data_ml100k(
     train_data, num_users, num_items, feedback="implicit" )
 users_test, items_test, ratings_test, test_iter = d2l.load_data_ml100k(
     test_data, num_users, num_items, feedback="implicit")
+num_workers = 0 if sys.platform.startswith("win") else 4
 train_iter = gluon.data.DataLoader(gluon.data.ArrayDataset(
     np.array(users_train), np.array(items_train)), batch_size, True, 
-                                   last_batch="rollover")
+                                   last_batch="rollover", 
+                                   num_workers=num_workers)
 ```
 
-We then create and initialize the model. we use a four-layer MLP with constant hidden size 20.
+We then create and initialize the model. we use a three-layer MLP with constant hidden size 10.
 
 ```{.python .input  n=8}
 ctx = d2l.try_all_gpus() 
-net = NeuMF(30, num_users, num_items, mlp_layers=[10, 10, 10, 10])
+net = NeuMF(10, num_users, num_items, mlp_layers=[10, 10, 10])
 net.initialize(ctx=ctx, force_reinit=True, init=mx.init.Normal(0.01))
 ```
 
 The following code trains the model.
 
-```{.python .input}
-lr, num_epochs, wd, optimizer = 0.001, 15, 1e-5, 'adam'
+```{.python .input  n=9}
+lr, num_epochs, wd, optimizer = 0.01, 10, 1e-5, 'adam'
 loss = d2l.BPRLoss()
 trainer = gluon.Trainer(net.collect_params(), optimizer, 
                         {"learning_rate": lr, 'wd': wd})

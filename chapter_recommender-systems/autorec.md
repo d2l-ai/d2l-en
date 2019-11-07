@@ -27,11 +27,12 @@ $$
 
 where $\| \cdot \|_{\mathcal{O}}$ means only the contribution of observed ratings are considered, that is, only weights that are associated with observed inputs are updated during backpropagation.
 
-```{.python .input  n=1}
+```{.python .input  n=2}
 import d2l
 from mxnet import autograd, init, gluon, np, npx
 from mxnet.gluon import nn
 import mxnet as mx
+import sys
 npx.set_np()
 ```
 
@@ -87,14 +88,17 @@ _, _, _, train_inter_mat = d2l.load_data_ml100k(train_data, num_users,
                                                 num_items)
 _, _, _, test_inter_mat = d2l.load_data_ml100k(test_data, num_users,
                                                num_items)
+num_workers = 0 if sys.platform.startswith("win") else 4
 train_iter = gluon.data.DataLoader(train_inter_mat, shuffle=True, 
-                                   last_batch="rollover", batch_size=128)
+                                   last_batch="rollover", batch_size=256,
+                                   num_workers=num_workers)
 test_iter = gluon.data.DataLoader(np.array(train_inter_mat),shuffle=False, 
-                                  last_batch="keep", batch_size=1024)
+                                  last_batch="keep", batch_size=1024,
+                                  num_workers=num_workers)
 # Model initialization, training, and evaluation
 net = AutoRec(500, num_users)
 net.initialize(ctx=ctx, force_reinit=True, init=mx.init.Normal(0.01))
-lr, num_epochs, wd, optimizer = 0.001, 50, 1e-5, 'adam'
+lr, num_epochs, wd, optimizer = 0.002, 25, 1e-5, 'adam'
 loss = gluon.loss.L2Loss()
 trainer = gluon.Trainer(net.collect_params(), optimizer,
                         {"learning_rate": lr, 'wd': wd})
@@ -118,3 +122,7 @@ d2l.train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
 ## References
 
 * Sedhain, Suvash, et al. "AutoRec: Autoencoders meet collaborative filtering." Proceedings of the 24th International Conference on World Wide Web. ACM, 2015.
+
+```{.python .input}
+
+```

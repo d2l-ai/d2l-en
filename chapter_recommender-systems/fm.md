@@ -32,11 +32,12 @@ With this reformulation, the model complexity are decreased greatly. Moreover, f
 
 To learn the FM model, we can use the MSE loss for regression task, the cross entroy loss for classifcation taks, and the BPR loss for ranking task. Standard optimizers such as SGD and Adam are viable for optimization.
 
-```{.python .input  n=1}
+```{.python .input  n=2}
 import d2l
 from mxnet import autograd, init, gluon, np, npx
 from mxnet.gluon import nn
 import mxnet as mx
+import sys
 npx.set_np()
 ```
 
@@ -70,12 +71,15 @@ train_data = d2l.CTRDataset(data_path="../data/ctr/train.csv")
 test_data = d2l.CTRDataset(data_path="../data/ctr/test.csv", 
                       feat_mapper=train_data.feat_mapper, 
                       defaults=train_data.defaults)
+num_workers = 0 if sys.platform.startswith("win") else 4
 train_iter = gluon.data.DataLoader(train_data, shuffle=True, 
                                    last_batch="rollover", 
-                                   batch_size=batch_size)
+                                   batch_size=batch_size,
+                                   num_workers=num_workers)
 test_iter = gluon.data.DataLoader(test_data, shuffle=False,
                                   last_batch="rollover", 
-                                  batch_size=batch_size)
+                                  batch_size=batch_size,
+                                  num_workers=num_workers)
 ```
 
 ## Train the Model
@@ -85,7 +89,7 @@ Afterwards, we train the model. The learning rate is set to 0.01 and the embeddi
 ctx = d2l.try_all_gpus()
 net = FM(train_data.field_dims, num_factors=20)
 net.initialize(init.Xavier(), ctx=ctx)
-lr, num_epochs, optimizer = 0.02, 50, 'adam'
+lr, num_epochs, optimizer = 0.02, 30, 'adam'
 trainer = gluon.Trainer(net.collect_params(), optimizer, 
                         {'learning_rate': lr})
 loss = gluon.loss.SigmoidBinaryCrossEntropyLoss()
