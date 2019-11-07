@@ -106,7 +106,7 @@ d2l.plt.ylabel('y');
 
 We assume that the input of a function is a $k$-dimensional vector and its
 output is a scalar, so its Hessian matrix will have $k$ eigenvalues
-(refer to :numref:`sec_math`).
+(refer to :numref:`sec_linear_algebra`).
 The solution of the
 function could be a local minimum, a local maximum, or a saddle point at a
 position where the function gradient is zero:

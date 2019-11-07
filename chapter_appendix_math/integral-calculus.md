@@ -20,6 +20,7 @@ npx.set_np()
 x = np.arange(-2,2,0.01)
 f = np.exp(-x**2)
 
+d2l.set_figsize()
 d2l.plt.plot(x,f,color='black')
 d2l.plt.fill_between(x.tolist(),f.tolist())
 d2l.plt.show()
@@ -370,7 +371,7 @@ $$
 
 where the final equality follows by the same computation that we used in section :numref:`integral_example`.  
 
-We will meet this integral again when we study continuous random variables in the next section.
+We will meet this integral again when we study continuous random variables in :numref:`sec_random_variables`.
 
 ## Summary
 
