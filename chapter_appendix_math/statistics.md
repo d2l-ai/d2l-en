@@ -1,7 +1,7 @@
 # Statistics 
 :label:`sec_statistics`
 
-Undoubtedly, to be a top deep learning practitioner, the ability to train the state-of-the-art and high accurate models is crucial. Beyond that, understanding the mathematical mindset behind the models will strengthen your ability to deal with different probings, no matter in the interviews or the customer questioning such as “why we should trust the key parameters of your model?” As a result, in this section, we will empower you to explain the mathematical reasoning behind the models by introducing some fundamental concepts of statistics, which are the backbone of the deep learning algorithms.
+Undoubtedly, to be a top deep learning practitioner, the ability to train the state-of-the-art and high accurate models is crucial. Beyond that, understanding the mathematical mindset behind the models will strengthen your ability to deal with different probings, no matter in the interviews or the customer questioning such as “why should we trust the key parameters of your model?” As a result, in this section, we will empower you to explain the mathematical reasoning behind the models by introducing some fundamental concepts of statistics, which are the backbone of the deep learning algorithms.
 
 
 The earliest reference of *statistics* can be traced back to an Arab scholar Al-Kindi in the 9th-century, who gave a detailed description of how to use statistics and frequency analysis to decipher encrypted messages. His work laid the foundations for statistical and cryptanalysis. After 800 years, the modern statistics arose from Germany in 1700s, when the researchers focused on the systematic collection of demographic and economic data. Today, statistics is the science subject that concerns the collection, processing, analysis, interpretation and visualization of data. It has been widely used in government, business, sciences, etc.  
@@ -41,7 +41,7 @@ Note that when $bias(\hat{\theta}_n) = 0$, that is when the expectation of an es
 ### Standard Deviation
 
 
-Recall in :numref:`probability`, the *standard deviation* (or *standard error*) is defined as the squared root of the variance of an estimator, i.e.,
+Recall in :numref:`sec_probabillity`, the *standard deviation* (or *standard error*) is defined as the squared root of the variance of an estimator, i.e.,
 
 $$se(\hat{\theta}_n) = \sqrt{\mathrm{Var} (\hat{\theta}_n )} = \sqrt{E[(\hat{\theta}_n - E(\hat{\theta}_n))^2]}.$$
 
