@@ -149,7 +149,7 @@ in all of deep learning because, at the moment,
 classification problems far outnumber regression problems.
 
 Recall that cross-entropy takes the negative log likelihood
-of the predicted probability assigned to the true label $-\log p(y|x)$.
+of the predicted probability assigned to the true label $-\log P(y \mid x)$.
 Rather than iterating over the predictions with a Python `for` loop
 (which tends to be inefficient), 
 we can use the `pick` function
