@@ -216,12 +216,12 @@ Another useful property to check for is *dependence* vs. *independence*.
 Two random variables $A$ and $B$ are independent
 means that the occurrence of one event of $A$
 does not reveal any information about the occurrence of an event of $B$.
-In this case $P(B \mid A) = P(B)$. Statisticians typically express this as $A \perp\!\!\!\perp B$. From Bayes' theorem, it follows immediately that also $P(A \mid B) = P(A)$.
+In this case $P(B \mid A) = P(B)$. Statisticians typically express this as $A \perp  B$. From Bayes' theorem, it follows immediately that also $P(A \mid B) = P(A)$.
 In all the other cases we call $A$ and $B$ dependent. For instance, two successive rolls of a die are independent. In contrast, the position of a light switch and the brightness in the room are not (they are not perfectly deterministic, though, since we could always have a broken light bulb, power failure, or a broken switch).
 
 Since $P(A \mid B) = \frac{P(A, B)}{P(B)} = P(A)$ is equivalent to $P(A, B) = P(A)P(B)$, two random variables are independent if and only if their joint distribution is the product of their individual distributions.
 Likewise, two random variables $A$ and $B$ are *conditionally independent* given another random variable $C$
-if and only if $P(A, B \mid C) = P(A \mid C)P(B \mid C)$. This is expressed as $A \perp\!\!\!\perp B \mid C$.
+if and only if $P(A, B \mid C) = P(A \mid C)P(B \mid C)$. This is expressed as $A \perp B \mid C$.
 
 ### Application
 :label:`subsec_probability_hiv_app`
