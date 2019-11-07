@@ -81,11 +81,11 @@ Since the standard deviation of an estimator has been implementing in MXNet by s
 from mxnet import np, npx
 npx.set_np()
 
-## statistical bias
+## Statistical bias
 def stat_bias(ture_theta, est_theta):
     return(np.mean(est_theta) - ture_theta)
 
-## mean squared error
+## Mean squared error
 def mse(data, est_theta):
     return(np.mean(np.square(data - est_theta)))
 
@@ -126,7 +126,7 @@ Following that, the modern significance testing is the intelligence heritage by 
 A *hypothesis test* is a way of evaluating some evidence against the default statement about a population. We refer the default statement as the *null hypothesis* $H_0$, which we try to reject using the observed data. Here, we use $H_0$ as a starting point for the statistical significance testing. The *alternative hypothesis* $H_A$ (or $H_1$) is a statement that is contrary to the null hypothesis. A great null hypothesis is often stated in a declarative form which posits a relationship between variables. It should reflect the brief as explicit as possible, and be testable by statistics theory. 
 
 
-Imagine yourself as chemist. After spending thousands of hours in the lab, you develop a new medicine which can dramatically improve one's ability to understand math. To show its magic power, you need to test it out. Naturally, you may need some volunteers to take the medicine and see whether the pills can help them learn math better. So how do you get started? First, you will need carefully random selected two groups of volunteers, so that there is no difference between their math understanding ability measured by some metrics. The two groups are commonly referred to as the test group and the control group. The *test group* (or *treatment group*) is a group of individuals who will experience the medicine, while the *control group* represents the group of users who are set aside as a benchmark, i.e., identical environment setups except taking this medicine. In this way, the influence of all the variables are minimized, except the impact of the independent variable in the treatment. Next, after a period of taking the medicine, you will need to measure the two groups' math understanding by the same metrics, such as letting the volunteers do the same tests after learning a new math formula. Then, you can collect their performance and compare the results. Really simple, isn't it? However, there are many details you have to think of carefully. For example, what is the suitable metrics to test their math understanding ability? How many volunteers for your test so you can be confident to claim the effectiveness of your medicine? How long should you run the test? And so on.
+Imagine yourself as a chemist. After spending thousands of hours in the lab, you develop a new medicine which can dramatically improve one's ability to understand math. To show its magic power, you need to test it out. Naturally, you may need some volunteers to take the medicine and see whether the pills can help them learn math better. So how do you get started? First, you will need carefully random selected two groups of volunteers, so that there is no difference between their math understanding ability measured by some metrics. The two groups are commonly referred to as the test group and the control group. The *test group* (or *treatment group*) is a group of individuals who will experience the medicine, while the *control group* represents the group of users who are set aside as a benchmark, i.e., identical environment setups except taking this medicine. In this way, the influence of all the variables are minimized, except the impact of the independent variable in the treatment. Next, after a period of taking the medicine, you will need to measure the two groups' math understanding by the same metrics, such as letting the volunteers do the same tests after learning a new math formula. Then, you can collect their performance and compare the results. Really simple, isn't it? However, there are many details you have to think of carefully. For example, what is the suitable metrics to test their math understanding ability? How many volunteers for your test so you can be confident to claim the effectiveness of your medicine? How long should you run the test? And so on.
 
 
 That is how hypothesis test coming in, where we can solve the above example followed a formalized statistically procedure. Let us start with a few definitions and see how does hypothesis testing empower us to make a decision. Before walking through the general steps of the hypothesis testing, let us start with a few of its key definitions.
@@ -138,7 +138,7 @@ The *statistical significance* measures the probability of erroneously reject th
 
 $$ \text{statistical significance }= 1 - \alpha = P(\text{reject } H_0 \mid H_0 \text{ is true} ).$$
 
-It is also refefred to as *type I error* or *false positive*. The $\alpha$, is called as the *significance level* and its commonly used value is $5\%$, i.e., $1-\alpha = 95\%$. Statistical significance can be explained as the level of risk that we are willing to take, when we reject a true null hypothesis. 
+It is also referred to as *type I error* or *false positive*. The $\alpha$, is called as the *significance level* and its commonly used value is $5\%$, i.e., $1-\alpha = 95\%$. Statistical significance can be explained as the level of risk that we are willing to take, when we reject a true null hypothesis. 
 
 :numref:`fig_statistical_significance` shows the the observations' values and probability of a given normal distribution in a two-sample hypothesis test. if the observation data point is located outsides the $95\%$ threshold, it will be a very unlikely observation under the null hypothesis assumption. Hence, there might be something wrong with the null hypothesis and we will reject it. 
 
