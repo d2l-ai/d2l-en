@@ -3,8 +3,6 @@
 
 Relying only on probabilistic fundamentals, we can already create a simple classifier. Learning is all about making assumptions. If we want to classify a new data point that we have never seen before we have to make some assumptions about which data points are similar to each other. The naive Bayes classifier, a popular and remarkably clear algorithm, assumes all features are independent of each other to simplify the computation. In this chapter, we will apply this model to recognize characters in images.
 
-Let us first import libraries and modules. Especially, we import `d2l`, which now contains the function `use_svg_display` we defined in :numref:`sec_prob`.
-
 ```{.python .input  n=72}
 %matplotlib inline
 import d2l
@@ -16,9 +14,9 @@ d2l.use_svg_display()
 
 ## Optical Character Recognition
 
-MNIST :cite:`LeCun.Bottou.Bengio.ea.1998` is one of widely used datasets. It contains 60,000 images for training and 10,000 images for validation. We will formally introduce training data in :numref:`sec_linear_regression` and validation data in :numref:`sec_model_selection` later, here we need on ly remember we will train the naive Bayes model in the training data and then test its quality on the validation data. Each image contains a handwritten digit from 0 to 9. The task is classifying each image into the corresponding digit.
+MNIST :cite:`LeCun.Bottou.Bengio.ea.1998` is one of widely used datasets. It contains 60,000 images for training and 10,000 images for validation. We will formally introduce training data in :numref:`sec_linear_regression` and validation data in :numref:`sec_model_selection` later, here we need only remember we will train the naive Bayes model in the training data and then test its quality on the validation data. Each image contains a handwritten digit from 0 to 9. The task is classifying each image into the corresponding digit.
 
-Gluon, MXNet's high-level interface for implementing neural networks, provides a `MNIST` class in the `data.vision` module to
+Gluon provides a `MNIST` class in the `data.vision` module to
 automatically retrieve the dataset via our Internet connection.
 Subsequently, Gluon will use the already-downloaded local copy.
 We specify whether we are requesting the training set or the test set
@@ -125,13 +123,9 @@ P_xy = (n_x+1) / (n_y+1).reshape(10,1,1)
 d2l.show_images(P_xy, 2, 5);
 ```
 
-By visualizing these $10\times 28\times 28$ probabilities (for each pixel for each class) we could get some mean looking digits.  ...
+By visualizing these $10\times 28\times 28$ probabilities (for each pixel for each class) we could get some mean looking digits.
 
 Now we can use :eqref:`eq_naive_bayes_estimation` to predict a new image. Given $\mathbf x$, the following functions computes $p(\mathbf x \mid y)p(y)$ for every $y$.
-
-```{.python .input}
-np.expand_dims?
-```
 
 ```{.python .input}
 def bayes_pred(x):
@@ -179,13 +173,13 @@ py
 Check if the prediction is correct.
 
 ```{.python .input}
-# convert label which is a scalar tensor of int32 dtype
+# Convert label which is a scalar tensor of int32 dtype
 # to a Python scalar integer for comparison
 py.argmax(axis=0) == int(label)
 ```
 
-Now predict a few validation examples, we can see the Bayes
-classifier works pretty well except for the 9th 16th digits.
+Now predict a few validation examples. We can see the Bayes
+classifier works pretty well.
 
 ```{.python .input}
 def predict(X):
@@ -196,17 +190,18 @@ preds = predict(X)
 d2l.show_images(X, 2, 9, titles=[str(d) for d in preds]);
 ```
 
-Finally, Let us compute the overall accuracy of the classifier.
+Finally, let us compute the overall accuracy of the classifier.
 
 ```{.python .input}
 X, y = mnist_test[:]
 preds = np.array(predict(X), dtype=np.int32)
-'Validation accuracy', float((preds == y).sum()) / len(y)
+float((preds == y).sum()) / len(y)  # Validation accuracy
 ```
 
 Modern deep networks achieve error rates of less than 0.01. The poor performance is due to the incorrect statistical assumptions that we made in our model: we assumed that each and every pixel are *independently* generated, depending only on the label. This is clearly not how humans write digits, and this wrong assumption led to the downfall of our overly naive (Bayes) classifier.
 
 ## Summary
+
 * Using Bayes' rule, a classifier can be made by assuming all observed features are independent.  This classifier was the gold standard for decades.
 
 ## Exercises

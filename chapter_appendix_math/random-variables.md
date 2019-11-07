@@ -174,7 +174,7 @@ The way we should interpret the mean (albeit with caution) is that it tells we e
 As a minimalistic example that we will examine throughout this section, Let us take $X$ to be the random variable which takes the value $a-2$ with probability $p$, $a+2$ with probability $p$ and $a$ with probability $1-2p$.  We can compute that, for any possible choice of $a$ and $p$, the mean is
 
 $$
-mu_X = E[X] = \sum_i x_i p_i. = (a-2)p + a(1-2p) + (a+2)p = a.
+\mu_X = E[X] = \sum_i x_i p_i. = (a-2)p + a(1-2p) + (a+2)p = a.
 $$
 
 Thus we see that $a$ is the same as the mean.  This matches the intuition since $a$ is the location around which we centered our random variable.
@@ -251,7 +251,7 @@ Let's visualize this.  I will show the probability of getting the three values a
 ```{.python .input}
 a = 0
 p = 0.2
-d2l.plt.stem([a-2, a, a+2],[p,1-2*p,p])
+d2l.plt.stem([a-2, a, a+2],[p,1-2*p,p], use_line_collection=True)
 d2l.plt.xlim([-4,4])
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('p.m.f.')
@@ -267,7 +267,7 @@ d2l.plt.show()
 ```{.python .input}
 a = 0
 p = 0.125
-d2l.plt.stem([a-2, a, a+2],[p,1-2*p,p])
+d2l.plt.stem([a-2, a, a+2],[p,1-2*p,p], use_line_collection=True)
 d2l.plt.xlim([-4,4])
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('p.m.f.')
@@ -283,7 +283,7 @@ d2l.plt.show()
 ```{.python .input}
 a = 0
 p = 0.05
-d2l.plt.stem([a-2, a, a+2],[p,1-2*p,p])
+d2l.plt.stem([a-2, a, a+2],[p,1-2*p,p], use_line_collection=True)
 d2l.plt.xlim([-4,4])
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('p.m.f.')
