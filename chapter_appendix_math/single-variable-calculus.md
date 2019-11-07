@@ -263,13 +263,10 @@ for x0 in [-1.5,0,2] :
 d2l.plot(xs, plots, 'x', 'f(x)', ylim=[-1.5,1.5])
 ```
 
-
-
-
 ### Taylor Series
 
 
-*Taylor series* is applicable when we try to approximate the function $f(x)$, by given values all the $n$-th derivative value at a data point $x_0$, i.e.,   $\left{ f(x_0), f^{(1)}(x_0), f^{(2)}(x_0), \ldots, f^{(n)}(x) \right}$. Let us start with the simplest case $n = 2$.  With a little algebra:
+*Taylor series* is applicable when we try to approximate the function $f(x)$, by given values all the $n$-th derivative value at a data point $x_0$, i.e., $\left\{ f(x_0), f^{(1)}(x_0), f^{(2)}(x_0), \ldots, f^{(n)}(x) \right\}$. Let us start with the simplest case $n = 2$.  With a little algebra:
 
 $$
 f(x) \approx \frac{1}{2}\frac{d^2f}{dx^2}(x_0)(x-x_0)^{2}+ \frac{df}{dx}(x_0)(x-x_0) + f(x_0).

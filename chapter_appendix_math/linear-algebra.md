@@ -148,7 +148,7 @@ As a simple example, let's see how to compute the angle between a pair of vector
 %matplotlib inline
 import d2l
 from IPython import display
-from mxnet import np, npx
+from mxnet import gluon, np, npx
 npx.set_np()
 ```
 
@@ -275,8 +275,6 @@ by just taking the vector between their means to define the decision plane
 and eyeball a crude threshold.
 
 ```{.python .input}
-from mxnet import gluon
-
 # Load in the dataset
 train = gluon.data.vision.FashionMNIST(train=True) 
 test = gluon.data.vision.FashionMNIST(train=False)
@@ -297,6 +295,7 @@ ave_1 = np.mean(X_train_1,axis=0)
 
 ```{.python .input}
 # Plot average t-shirt
+d2l.set_figsize()
 d2l.plt.imshow(ave_0.reshape(28,28).tolist(),cmap='Greys')
 d2l.plt.show()
 ```
@@ -644,10 +643,10 @@ This area is referred to as the *determinant*.
 
 Let us check this quickly with some example code.
 
+```{.python .input}
+import numpy as np
+np.linalg.det(np.array([[1,-1],[2,3]]))
 ```
-np.linalg.det(np.array[[1,-1],[2,3]])
-```
-
 
 The eagle-eyed amongst us will notice 
 that this expression can be zero or even negative.
@@ -783,7 +782,6 @@ We can solve this with the vectors $[1,-1]^\top$ and $[1,2]^\top$ respectively.
 We can check this in code using the built-in numpy `numpy.linalg.eig` routine.
 
 ```{.python .input}
-import numpy as np
 np.linalg.eig(np.array([[2,1],[2,3]]))
 ```
 
