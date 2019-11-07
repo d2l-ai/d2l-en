@@ -252,4 +252,12 @@ sample_std = samples.std()
 
 ## Exercises
 
+1. Let $X_1, X_2, \ldots, X_n \overset{iid}{\sim} Unif(0, \theta)$, where "iid" stands for *independent and identically distributed*. Consider the following estimators of $\theta$:
+$$\hat{\theta} = max \{X_1, X_2, \ldots, X_n \};$$
+$$\tilde{\theta} = 2 \bar{X_n} = \frac{2}{n} \sum_{i=1}^n X_i.$$
+    1. Find the statistical bias, standard deviation, and mean square error of $\hat{\theta}.$
+    1. Find the statistical bias, standard deviation, and mean square error of $\tilde{\theta}.$
+    1. What estimator is better?
+
+
 1. For our chemist example in introduction, can you derive the 5 steps to conduct a two-sided hypothesis testing? Given the statistical significance level $\alpha = 0.05$ and the statistical power $1 - \beta = 0.8$.
