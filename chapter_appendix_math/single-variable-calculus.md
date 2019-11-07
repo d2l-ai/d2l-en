@@ -1,7 +1,7 @@
 # Single Variable Calculus
 :label:`sec_single_variable_calculus`
 
-In :numref:`sec_calculus`, we saw the basic elements of differential calculus.  This appendix takes a deeper dive into the fundamentals of calculus and how we can apply it and understand it in the context of machine learning.
+In :numref:`sec_calculus`, we saw the basic elements of differential calculus.  This section takes a deeper dive into the fundamentals of calculus and how we can apply it and understand it in the context of machine learning.
 
 ## Differential Calculus
 Differential calculus is fundamentally the study of how functions behave under small changes.  To see why this is so core to deep learning, let us consider an example.
@@ -54,7 +54,8 @@ L = lambda x: x**2 + 1701*(x-4)**3
 
 # print the difference divided by epsilon for several epsilon
 for epsilon in [0.1,0.001,0.0001,0.00001] :
-    print("epsilon = {:.5f} -> {:.5f}".format(epsilon,(L(4+epsilon)-L(4))/epsilon))
+    print("epsilon = {:.5f} -> {:.5f}".format(
+        epsilon,(L(4+epsilon)-L(4))/epsilon))
 ```
 
 Now, if we are observant, we will notice that the output of this number is suspiciously close to $8$.  Indeed, if we fiddle with the $\epsilon$ value, and make it smaller, we will see values progressively closer to $8$.  Thus we may conclude, correctly, that the value we seek (the degree a change in the input changes the output) should be $8$ at the point $x=4$.  The way that a mathematician encodes this fact is
@@ -198,16 +199,14 @@ $$
 approximates the value of $f$ by a line which passes through the point $(x,f(x))$ and has slope $\frac{df}{dx}(x)$.  In this way we say that the derivative gives a linear approximation to the function $f$, as illustrated below:
 
 ```{.python .input}
-# Compute Sin
+# Compute sin
 xs = np.arange(-np.pi,np.pi,0.01)
 plots = [np.sin(xs)]
 
-# Compute some linear approximations
-# uses: d(sin(x))/dx = cos(x)
+# Compute some linear approximations. Use d(sin(x))/dx = cos(x)
 for x0 in [-1.5,0,2] :
     plots.append(np.sin(x0) + (xs-x0)*np.cos(x0))
 
-# Plot them
 d2l.plot(xs, plots, 'x', 'f(x)', ylim=[-1.5,1.5])
 ```
 
@@ -250,16 +249,14 @@ $$
 Similarly to the previous section showed that the best approximation of the first derivative is a line, we can illustrate the best approximation of a function by a quadratic using both the first and second derivative. This results from a famous *Taylor series*, which are going to discuss in the next section. Before that, let us grab a taste of how to approximate the function $\sin(x)$.
 
 ```{.python .input}
-# Compute Sin
+# Compute sin
 xs = np.arange(-np.pi,np.pi,0.01)
 plots = [np.sin(xs)]
 
-# Compute some quadratic approximations
-# uses: d(sin(x))/dx = cos(x)
+# Compute some quadratic approximations. Use d(sin(x))/dx = cos(x)
 for x0 in [-1.5,0,2] :
     plots.append(np.sin(x0) + (xs-x0)*np.cos(x0) - (xs-x0)**2*np.sin(x0)/2)
 
-# Plot them
 d2l.plot(xs, plots, 'x', 'f(x)', ylim=[-1.5,1.5])
 ```
 
@@ -324,7 +321,9 @@ P1 = 1 + xs
 P2 = 1 + xs + xs**2/2
 P5 = 1 + xs + xs**2/2 + xs**3/6 + xs**4/24 + xs**5/120
 
-d2l.plot(xs, [ys,P1,P2,P5], 'x', 'f(x)', legend = ["Exponential", "Degree 1 Taylor Series", "Degree 2 Taylor Series", "Degree 5 Taylor Series"])
+d2l.plot(xs, [ys,P1,P2,P5], 'x', 'f(x)', legend = [
+    "Exponential", "Degree 1 Taylor Series", "Degree 2 Taylor Series",
+    "Degree 5 Taylor Series"])
 ```
 
 In a nutshell, Taylor series have two primary applications:
