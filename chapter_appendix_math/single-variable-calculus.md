@@ -103,18 +103,18 @@ A full formal treatment of calculus would derive everything from first principle
 ### Common Derivatives
 When computing derivatives, one can often times use a series of rules to reduce the computation to a few core functions.  In a full calculus class, we would derive an extensive table of dozens of fundamental derivatives.  Below, we  summarize only most important ones encountered in practice-about 90% of the derivatives we will encounter on a regular basis will be some combination of these.
 
-* *Derivative of constants.* $\frac{d}{dx}c = 0$.
-* *Derivative of linear functions.* $\frac{d}{dx}(ax) = a$.
-* *Power rule.* $\frac{d}{dx}x^n = nx^{n-1}$.
-* *Derivative of exponentials.* $\frac{d}{dx}e^x = e^x$.
-* *Derivative of the logarithm.* $\frac{d}{dx}\log(x) = \frac{1}{x}$.
+* **Derivative of constants.** $\frac{d}{dx}c = 0$.
+* **Derivative of linear functions.** $\frac{d}{dx}(ax) = a$.
+* **Power rule.** $\frac{d}{dx}x^n = nx^{n-1}$.
+* **Derivative of exponentials.** $\frac{d}{dx}e^x = e^x$.
+* **Derivative of the logarithm.** $\frac{d}{dx}\log(x) = \frac{1}{x}$.
 
 ### Derivative Rules
 If we needed to compute every derivative separately and store them in a table, there would be an infinite amount of them.  It is a gift of mathematics that we can generalize the above derivatives and compute more complex derivatives like finding the derivative of $f(x) = \log\left(1+(x-1)^{10}\right)$.  The key to doing so is to codify what happens when we take functions and combine them in various ways, most importantly: sums, products, and compositions.
 
-* *Sum rule.* $\frac{d}{dx}(g(x) + h(x)) = \frac{dg}{dx}(x) + \frac{dh}{dx}(x)$.
-* *Product rule.* $\frac{d}{dx}(g(x)\cdot h(x)) = g(x)\frac{dh}{dx}(x) + \frac{dg}{dx}(x)h(x)$.
-* *Chain rule.* $\frac{d}{dx}g(h(x)) = \frac{dg}{dh}(h(x))\cdot \frac{dh}{dx}(x)$.
+* **Sum rule.** $\frac{d}{dx}(g(x) + h(x)) = \frac{dg}{dx}(x) + \frac{dh}{dx}(x)$.
+* **Product rule.** $\frac{d}{dx}(g(x)\cdot h(x)) = g(x)\frac{dh}{dx}(x) + \frac{dg}{dx}(x)h(x)$.
+* **Chain rule.** $\frac{d}{dx}g(h(x)) = \frac{dg}{dh}(h(x))\cdot \frac{dh}{dx}(x)$.
 
 It gives us excellent intuition into how one can reason with small changes in the input.  First, for the sum rule, we may examine the following chain of reasoning:
 
