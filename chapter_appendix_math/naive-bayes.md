@@ -131,7 +131,7 @@ Now we can use :eqref:`eq_naive_bayes_estimation` to predict a new image. Given 
 def bayes_pred(x):
     x = np.expand_dims(x, axis=0)  # (28, 28) -> (1, 28, 28)
     p_xy = P_xy * x + (1-P_xy)*(1-x)
-    p_xy = p_xy.reshape(10,-1).prod(axis=1)  # p(x|y)
+    p_xy = p_xy.reshape(10,-1).prod(axis=1)  # P(x|y)
     return np.array(p_xy) * P_y
 
 image, label = mnist_test[0]
@@ -163,7 +163,7 @@ log_P_y = np.log(P_y)
 def bayes_pred_stable(x):
     x = np.expand_dims(x, axis=0)  # (28, 28) -> (1, 28, 28)
     p_xy = log_P_xy * x + log_P_xy_neg * (1-x)
-    p_xy = p_xy.reshape(10,-1).sum(axis=1)  # p(x|y)
+    p_xy = p_xy.reshape(10,-1).sum(axis=1)  # P(x|y)
     return p_xy + log_P_y
 
 py = bayes_pred_stable(image)

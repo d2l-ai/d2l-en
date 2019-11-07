@@ -74,10 +74,10 @@ In other words, the expectation of a convex function is larger than the convex f
 
 One of the common applications of Jensen's inequality is with regard to the log-likelihood of partially observed random variables. That is, we use
 
-$$\mathbf{E}_{y \sim p(y)}[-\log p(x|y)] \geq -\log p(x).$$
+$$\mathbf{E}_{y \sim P(y)}[-\log P(x \mid y)] \geq -\log P(x).$$
 
-This follows since $\int p(y) p(x|y) dy = p(x)$. 
-This is used in variational methods. Here $y$ is typically the unobserved random variable, $p(y)$ is the best guess of how it might be distributed and $p(x)$ is the distribution with $y$ integrated out. For instance, in clustering $y$ might be the cluster labels and $p(x|y)$ is the generative model when applying cluster labels.
+This follows since $\int P(y) P(x \mid y) dy = P(x)$. 
+This is used in variational methods. Here $y$ is typically the unobserved random variable, $P(y)$ is the best guess of how it might be distributed and $P(x)$ is the distribution with $y$ integrated out. For instance, in clustering $y$ might be the cluster labels and $P(x \mid y)$ is the generative model when applying cluster labels.
 
 
 ## Properties

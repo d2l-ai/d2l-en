@@ -475,7 +475,7 @@ Now, according to the *maximum likelihood principle*,
 the best values of $b$ and $\mathbf{w}$ are those
 that maximize the *likelihood* of the entire dataset:
 
-$$p(Y|X) = \prod_{i=1}^{n} p(y^{(i)}|\mathbf{x}^{(i)})$$
+$$P(Y\mid X) = \prod_{i=1}^{n} p(y^{(i)}|\mathbf{x}^{(i)})$$
 
 Estimators chosen according to the *maximum likelihood principle*
 are called *Maximum Likelihood Estimators* (MLE). 
@@ -603,7 +603,7 @@ statistics, and computer science.
     * Find the closed form solution by setting the gradient equal to zero and solving the matrix equation.
     * When might this be better than using stochastic gradient descent? When might this method break? 
 1. Assume that the noise model governing the additive noise $\epsilon$ is the exponential distribution. That is, $p(\epsilon) = \frac{1}{2} \exp(-|\epsilon|)$.
-    * Write out the negative log-likelihood of the data under the model $-\log p(Y|X)$.
+    * Write out the negative log-likelihood of the data under the model $-\log P(Y \mid X)$.
     * Can you find a closed form solution?
     * Suggest a stochastic gradient descent algorithm to solve this problem. What could possibly go wrong (hint - what happens near the stationary point as we keep on updating the parameters). Can you fix this?
 
