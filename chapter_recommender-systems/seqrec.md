@@ -43,12 +43,13 @@ The model can be learned with BPR or Hinge loss. The architecture of Caser is sh
 
 We firstly import the required libraries.
 
-```{.python .input  n=1}
+```{.python .input  n=2}
 import d2l
 from mxnet import autograd, init, gluon, np, npx
 from mxnet.gluon.data import Dataset
 from mxnet.gluon import nn
 import mxnet as mx
+import sys
 npx.set_np()
 ```
 
@@ -165,8 +166,10 @@ users_test, items_test, ratings_test, test_iter = d2l.load_data_ml100k(
     test_data, num_users, num_items, feedback="implicit")
 train_seq_data = SeqDataset(users_train, items_train, L, num_users,
                             num_items)
+num_workers = 0 if sys.platform.startswith("win") else 4
 train_iter = gluon.data.DataLoader(train_seq_data, batch_size, True,
-                                   last_batch="rollover")
+                                   last_batch="rollover", 
+                                   num_workers=num_workers)
 test_seq_iter = train_seq_data.test_seq
 train_seq_data[0]
 ```
@@ -178,16 +181,16 @@ Now, let us train the model. We use the same setting as NeuMF, including learnin
 
 ```{.python .input  n=5}
 ctx = d2l.try_all_gpus()
-net = Caser(30, num_users, num_items, L)
+net = Caser(10, num_users, num_items, L)
 net.initialize(ctx=ctx, force_reinit=True, init=mx.init.Normal(0.01))
-lr, num_epochs, wd, optimizer = 0.001, 16, 1e-5, 'adam'
+lr, num_epochs, wd, optimizer = 0.01, 6, 1e-5, 'adam'
 loss = d2l.BPRLoss()
 trainer = gluon.Trainer(net.collect_params(), optimizer,
                         {"learning_rate": lr, 'wd': wd})
 
 d2l.train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
                   num_users, num_items, num_epochs, ctx, d2l.evaluate_ranking,
-                  d2l.negative_sampler, candidates, eval_step=5)
+                  d2l.negative_sampler, candidates, eval_step=1)
 ```
 
 ## Summary
