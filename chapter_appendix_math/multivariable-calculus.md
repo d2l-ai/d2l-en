@@ -79,13 +79,13 @@ npx.set_np()
 ```
 
 ```{.python .input}
-f = lambda x,y : np.log(np.exp(x) + np.exp(y))
-grad_f = lambda x,y : np.array([np.exp(x)/(np.exp(x)+np.exp(y)), 
+f = lambda x, y : np.log(np.exp(x) + np.exp(y))
+grad_f = lambda x, y : np.array([np.exp(x)/(np.exp(x)+np.exp(y)), 
                                 np.exp(y)/(np.exp(x)+np.exp(y))])
 
-epsilon = np.array([0.01,-0.03])
-grad_approx = f(0,np.log(2)) + epsilon.dot(grad_f(0,np.log(2)))
-true_value = f(0+epsilon[0],np.log(2)+epsilon[1])
+epsilon = np.array([0.01, -0.03])
+grad_approx = f(0, np.log(2)) + epsilon.dot(grad_f(0, np.log(2)))
+true_value = f(0+epsilon[0], np.log(2)+epsilon[1])
 "Approximation: {}, True Value: {}".format(grad_approx, true_value)
 ```
 
@@ -149,10 +149,10 @@ $$
 The only possible location of minima are at $x = -1, 0, 2$, where the function takes the values $-5,0,-32$ respectively, and thus we can conclude that we minimize our function when $x = 2$.  A quick plot confirms this.
 
 ```{.python .input}
-x = np.arange(-2,3,0.01)
+x = np.arange(-2, 3, 0.01)
 f = 3*x**4 - 4*x**3 -12*x**2
 
-d2l.plot(x,f, 'x', 'f(x)')
+d2l.plot(x, f, 'x', 'f(x)')
 ```
 
 This highlights an important fact to know when working either theoretically or numerically: the only possible points where we can minimize (or maximize) a function will have gradient equal to zero, however, not every point with gradient zero is the minimum (or maximum).  
@@ -168,9 +168,10 @@ a(w,x,y,z) & = (w+x+y+z)^{2},\qquad b(w,x,y,z) = (w+x-y-z)^2.
 \end{aligned}
 $$
 
-Such chains of equations are common when working with neural networks, so trying to understand how to compute gradients of such functions is key to advanced techniques in machine learning.  We can start to see visually hints of this connection if we take a look at what variables directly relate to one another.
+Such chains of equations are common when working with neural networks, so trying to understand how to compute gradients of such functions is key to advanced techniques in machine learning.  We can start to see visual hints of this connection in :numref:`fig_chain-1` if we take a look at what variables directly relate to one another.
 
 ![The function relations above where nodes represent values and edges show functional dependence.](../img/ChainNet1.svg)
+:label:`fig_chain-1`
 
 Nothing stops us from just composing everything and writing out that
 
@@ -208,9 +209,10 @@ $$
 
 It is useful to think about the meaning of the process. We are trying to understand how a function of the form $f(u(a,b),v(a,b))$ changes its value with a change in $a$.  There are two pathways this can occur: there is the pathway where $a \rightarrow u \rightarrow f$ and where $a \rightarrow v \rightarrow f$.  We can compute both of these contributions via the chain rule: $\frac{\partial w}{\partial u} \cdot \frac{\partial u}{\partial x}$ and $\frac{\partial w}{\partial v} \cdot \frac{\partial v}{\partial x}$ respectively, and added up.  
 
-Imagine we have a different network of functions where the functions on the right depend on those they are connected to on the left.
+Imagine we have a different network of functions where the functions on the right depend on those they are connected to on the left as is shown in :numref:`fig_chain-2`.
 
 ![Another more subtle example of the chain rule.](../img/ChainNet2.svg)
+:label:`fig_chain-2`
 
 To compute something like $\frac{\partial f}{\partial y}$, we need to sum over all (in this case $3$) paths from $y$ to $f$ giving
 
@@ -265,7 +267,7 @@ w = -1; x = 0; y = -2; z = 1
 a = (w+x+y+z)**2; b = (w+x-y-z)**2
 u = (a+b)**2; v = (a-b)**2
 f = (u+v)**2
-print("    f at {},{},{},{} is {}".format(w,x,y,z,f))
+print("    f at {}, {}, {}, {} is {}".format(w, x, y, z, f))
 
 # Compute the single step partials
 df_du = 2*(u+v); df_dv = 2*(u+v)
@@ -275,7 +277,7 @@ da_dw = 2*(w+x+y+z); db_dw = 2*(w+x-y-z)
 # Compute the final result from inputs to outputs
 du_dw = du_da*da_dw + du_db*db_dw; dv_dw = dv_da*da_dw + dv_db*db_dw
 df_dw = df_du*du_dw + df_dv*dv_dw
-print("df/dw at {},{},{},{} is {}".format(w,x,y,z,df_dw))
+print("df/dw at {}, {}, {}, {} is {}".format(w, x, y, z, df_dw))
 ```
 
 However, note that this still does not make it easy to compute something like $\frac{\partial f}{\partial x}$.  The reason for that is the *way* we chose to apply the chain rule.  If we look at what we did above, we always kept $\partial w$ in the denominator when we could.  In this way, we chose to apply the chain rule seeing how $w$ changed every other variable.  If that is what we wanted, this would be a good idea.  However, think back to our motivation from deep learning: we want to see how every parameter changes the *loss*.  In essence, we want to apply the chain rule keeping $\partial f$ in the numerator whenever we can!
@@ -308,23 +310,25 @@ w = -1; x = 0; y = -2; z = 1
 a = (w+x+y+z)**2; b = (w+x-y-z)**2
 u = (a+b)**2; v = (a-b)**2
 f = (u+v)**2
-print("    f at {},{},{},{} is {}".format(w,x,y,z,f))
+print("    f at {}, {}, {}, {} is {}".format(w, x, y, z, f))
 
 ### Compute the derivative using the decomposition above ###
 # First compute the single step partials
 df_du = 2*(u+v); df_dv = 2*(u+v)
 du_da = 2*(a+b); du_db = 2*(a+b); dv_da = 2*(a-b); dv_db = -2*(a-b)
-da_dw = 2*(w+x+y+z); db_dw = 2*(w+x-y-z); da_dx = 2*(w+x+y+z); db_dx = 2*(w+x-y-z)
-da_dy = 2*(w+x+y+z); db_dy = -2*(w+x-y-z); da_dz = 2*(w+x+y+z); db_dz = -2*(w+x-y-z); 
+da_dw = 2*(w+x+y+z); db_dw = 2*(w+x-y-z)
+da_dx = 2*(w+x+y+z); db_dx = 2*(w+x-y-z)
+da_dy = 2*(w+x+y+z); db_dy = -2*(w+x-y-z)
+da_dz = 2*(w+x+y+z); db_dz = -2*(w+x-y-z); 
 
-### Now compute how f changes when we change any value from output to input ###
+# Now compute how f changes when we change any value from output to input
 df_da = df_du*du_da + df_dv*dv_da; df_db = df_du*du_db + df_dv*dv_db
 df_dw = df_da*da_dw + df_db*db_dw; df_dx = df_da*da_dx + df_db*db_dx
 df_dy = df_da*da_dy + df_db*db_dy; df_dz = df_da*da_dz + df_db*db_dz
-print("df/dw at {},{},{},{} is {}".format(w,x,y,z,df_dw))
-print("df/dx at {},{},{},{} is {}".format(w,x,y,z,df_dx))
-print("df/dy at {},{},{},{} is {}".format(w,x,y,z,df_dy))
-print("df/dz at {},{},{},{} is {}".format(w,x,y,z,df_dz))
+print("df/dw at {}, {}, {}, {} is {}".format(w, x, y, z, df_dw))
+print("df/dx at {}, {}, {}, {} is {}".format(w, x, y, z, df_dx))
+print("df/dy at {}, {}, {}, {} is {}".format(w, x, y, z, df_dy))
+print("df/dz at {}, {}, {}, {} is {}".format(w, x, y, z, df_dz))
 ```
 
 The fact that we compute derivatives from $f$ back towards the inputs rather than from the inputs forward to the outputs (as we did in the first code snippet above) is what gives this algorithm its name: *backpropagation*.  Note that there are two steps:
@@ -351,10 +355,10 @@ with autograd.record():
 ### Execute backward pass ###
 f.backward()
 
-print("df/dw at {},{},{},{} is {}".format(w,x,y,z,w.grad))
-print("df/dx at {},{},{},{} is {}".format(w,x,y,z,x.grad))
-print("df/dy at {},{},{},{} is {}".format(w,x,y,z,y.grad))
-print("df/dz at {},{},{},{} is {}".format(w,x,y,z,z.grad))
+print("df/dw at {}, {}, {}, {} is {}".format(w, x, y, z, w.grad))
+print("df/dx at {}, {}, {}, {} is {}".format(w, x, y, z, x.grad))
+print("df/dy at {}, {}, {}, {} is {}".format(w, x, y, z, y.grad))
+print("df/dz at {}, {}, {}, {} is {}".format(w, x, y, z, z.grad))
 ```
 
 All of what we did above can be done automatically by calling `f.backwards()`.
@@ -419,7 +423,7 @@ $$
 
 One can compute that the gradient and Hessian are
 $$
-\nabla f(x,y) = e^{-x^2-y^2}\begin{pmatrix}1-2x^2 \\ -2xy\end{pmatrix} \text{ and } \mathbf{H}f(x,y) = e^{-x^2-y^2}\begin{pmatrix} 4x^3 - 6x & 4x^2y - 2y \\ 4x^2y-2y &4xy^2-2x\end{pmatrix}
+\nabla f(x,y) = e^{-x^2-y^2}\begin{pmatrix}1-2x^2 \\ -2xy\end{pmatrix} \text{ and } \mathbf{H}f(x,y) = e^{-x^2-y^2}\begin{pmatrix} 4x^3 - 6x & 4x^2y - 2y \\ 4x^2y-2y &4xy^2-2x\end{pmatrix}.
 $$
 
 And thus, with a little algebra, see that the approximating quadratic at $[-1,0]^\top$ is
@@ -432,16 +436,17 @@ $$
 from mpl_toolkits import mplot3d
 
 # Construct grid and compute function
-x, y = np.meshgrid(np.linspace(-2, 2, 101), np.linspace(-2, 2, 101), indexing='ij')
+x, y = np.meshgrid(np.linspace(-2, 2, 101), 
+                   np.linspace(-2, 2, 101), indexing='ij')
 z = x*np.exp(- x**2 - y**2)
 
-# Compute gradient and Hessian at (1,0)
-z_quad = np.exp(-1)*(-1 - (x+1) + 2*(x+1)**2 + 2*y**2)
+# Compute gradient and Hessian at (1, 0)
+w = np.exp(-1)*(-1 - (x+1) + 2*(x+1)**2 + 2*y**2)
 
 # Plot Function
 ax = d2l.plt.figure().add_subplot(111, projection='3d')
 ax.plot_wireframe(x, y, z, **{'rstride': 10, 'cstride': 10})
-ax.plot_wireframe(x, y, z_quad, **{'rstride': 10, 'cstride': 10}, color = 'purple')
+ax.plot_wireframe(x, y, w, **{'rstride': 10, 'cstride': 10}, color = 'purple')
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('y')
 ax.set_xlim(-2, 2); ax.set_ylim(-2, 2); ax.set_zlim(-1, 1);

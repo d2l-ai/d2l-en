@@ -50,10 +50,11 @@ npx.set_np()
 ```
 
 ```{.python .input}
-x = np.arange(-5,5,0.01)
-p = 0.2*np.exp(-(x-3)**2/2)/np.sqrt(2*np.pi) + 0.8*np.exp(-(x+1)**2/2)/np.sqrt(2*np.pi)
+x = np.arange(-5, 5, 0.01)
+p = 0.2*np.exp(-(x-3)**2/2)/np.sqrt(2*np.pi) + 
+    0.8*np.exp(-(x+1)**2/2)/np.sqrt(2*np.pi)
 
-d2l.plot(x,p,'x','Density')
+d2l.plot(x, p, 'x', 'Density')
 ```
 
 The locations where the function is large indicates regions where we are more likely to find the random value.  The low portions are areas where we are unlikely to find the random value.
@@ -92,11 +93,12 @@ We may approximate this is code by using the same discrete approximation methods
 
 ```{.python .input}
 epsilon = 0.01
-x = np.arange(-5,5,0.01)
-p = 0.2*np.exp(-(x-3)**2/2)/np.sqrt(2*np.pi) + 0.8*np.exp(-(x+1)**2/2)/np.sqrt(2*np.pi)
+x = np.arange(-5, 5, 0.01)
+p = 0.2*np.exp(-(x-3)**2/2)/np.sqrt(2*np.pi) + 
+    0.8*np.exp(-(x+1)**2/2)/np.sqrt(2*np.pi)
 
-d2l.plt.plot(x,p,color='black')
-d2l.plt.fill_between(x.tolist()[300:800],p.tolist()[300:800])
+d2l.plt.plot(x, p, color='black')
+d2l.plt.fill_between(x.tolist()[300:800], p.tolist()[300:800])
 d2l.plt.show()
 
 "Approximate Probability: {}".format(np.sum(epsilon*p[300:800]))
@@ -251,8 +253,8 @@ Let's visualize this.  I will show the probability of getting the three values a
 ```{.python .input}
 a = 0
 p = 0.2
-d2l.plt.stem([a-2, a, a+2],[p,1-2*p,p], use_line_collection=True)
-d2l.plt.xlim([-4,4])
+d2l.plt.stem([a-2, a, a+2], [p, 1-2*p, p], use_line_collection=True)
+d2l.plt.xlim([-4, 4])
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('p.m.f.')
 
@@ -267,8 +269,8 @@ d2l.plt.show()
 ```{.python .input}
 a = 0
 p = 0.125
-d2l.plt.stem([a-2, a, a+2],[p,1-2*p,p], use_line_collection=True)
-d2l.plt.xlim([-4,4])
+d2l.plt.stem([a-2, a, a+2], [p, 1-2*p, p], use_line_collection=True)
+d2l.plt.xlim([-4, 4])
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('p.m.f.')
 
@@ -283,8 +285,8 @@ d2l.plt.show()
 ```{.python .input}
 a = 0
 p = 0.05
-d2l.plt.stem([a-2, a, a+2],[p,1-2*p,p], use_line_collection=True)
-d2l.plt.xlim([-4,4])
+d2l.plt.stem([a-2, a, a+2], [p, 1-2*p, p], use_line_collection=True)
+d2l.plt.xlim([-4, 4])
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('p.m.f.')
 
@@ -345,10 +347,10 @@ p(x) = \frac{1}{1+x^2}.
 $$
 
 ```{.python .input}
-x = np.arange(-5,5,0.01)
+x = np.arange(-5, 5, 0.01)
 p = 1/(1+x**2)
 
-d2l.plot(x,p,'x','p.d.f.')
+d2l.plot(x, p, 'x', 'p.d.f.')
 ```
 
 This function looks innocent, and indeed consulting a table of integrals will show it has area one under it, and thus it defines a continuous random variable.
@@ -362,10 +364,10 @@ $$
 The function on the inside looks like this
 
 ```{.python .input}
-x = np.arange(-20,20,0.01)
+x = np.arange(-20, 20, 0.01)
 p = x**2/(1+x**2)
 
-d2l.plot(x,p,'x','integrand')
+d2l.plot(x, p, 'x', 'integrand')
 ```
 
 This function clearly has infinite area under it since it is essentially the constant one, and indeed we could show that
@@ -438,8 +440,9 @@ $$
 $$
 
 ![By summing along the columns of our array of probabilities, we are able to obtain the marginal distribution for just the random variable represented along the $x$-axis.](../img/Marginal.svg)
+:label:`fig_marginal`
 
-This tells us to add up the value of the density along a series of squares in a line.  Indeed, after canceling one factor of epsilon from both sides, and recognizing the sum on the right is the integral over $y$, we can conclude that
+This tells us to add up the value of the density along a series of squares in a line as is showin in :numref:`fig_marginal`.  Indeed, after canceling one factor of epsilon from both sides, and recognizing the sum on the right is the integral over $y$, we can conclude that
 
 $$
 \begin{aligned}
@@ -500,14 +503,14 @@ $$
 To ensure that we understand, let us take a look at a collection of random variables with tunable covariance.
 
 ```{.python .input}
-covs = [-0.9,0.0,1.2]
-d2l.plt.figure(figsize=(12,3))
+covs = [-0.9, 0.0, 1.2]
+d2l.plt.figure(figsize=(12, 3))
 for i in range(3) :
-    X = np.random.normal(0,1,500)
-    Y = covs[i]*X + np.random.normal(0,1,500)
+    X = np.random.normal(0, 1, 500)
+    Y = covs[i]*X + np.random.normal(0, 1, 500)
     
     d2l.plt.subplot(1, 4, i+1)
-    d2l.plt.scatter(X,Y)
+    d2l.plt.scatter(X, Y)
     d2l.plt.xlabel('X')
     d2l.plt.ylabel('Y')
     d2l.plt.title("cov = {}".format(covs[i]))
@@ -572,14 +575,14 @@ Thus we see that the correlation is $+1$ for any $a > 0$, and $-1$ for any $a < 
 To ensure that we understand, let us this time take a look at a collection of random variables with tunable correlation.
 
 ```{.python .input}
-cors = [-0.9,0.0,1.0]
-d2l.plt.figure(figsize=(12,3))
+cors = [-0.9, 0.0, 1.0]
+d2l.plt.figure(figsize=(12, 3))
 for i in range(3) :
-    X = np.random.normal(0,1,500)
-    Y = cors[i]*X + np.sqrt(1-cors[i]**2)*np.random.normal(0,1,500)
+    X = np.random.normal(0, 1, 500)
+    Y = cors[i]*X + np.sqrt(1-cors[i]**2)*np.random.normal(0, 1, 500)
     
     d2l.plt.subplot(1, 4, i+1)
-    d2l.plt.scatter(X,Y)
+    d2l.plt.scatter(X, Y)
     d2l.plt.xlabel('X')
     d2l.plt.ylabel('Y')
     d2l.plt.title("cor = {}".format(cors[i]))

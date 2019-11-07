@@ -142,7 +142,6 @@ It is also referred to as *type I error* or *false positive*. The $\alpha$, is c
 
 :numref:`fig_statistical_significance` shows the the observations' values and probability of a given normal distribution in a two-sample hypothesis test. if the observation data point is located outsides the $95\%$ threshold, it will be a very unlikely observation under the null hypothesis assumption. Hence, there might be something wrong with the null hypothesis and we will reject it. 
 
-
 ![Statistical significance.](../img/statistical_significance.svg)
 :label:`fig_statistical_significance`
 

@@ -35,17 +35,17 @@ Let us plot the probability mass function and cumulative distribution function.
 p = 0.3
 
 d2l.set_figsize()
-d2l.plt.stem([0,1],[1-p,p], use_line_collection=True)
+d2l.plt.stem([0, 1], [1-p, p], use_line_collection=True)
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
 ```{.python .input}
-x = np.arange(-1,2,0.01)
+x = np.arange(-1, 2, 0.01)
 F = lambda x: 0 if x < 0 else 1 if x > 1 else 1-p
 
-d2l.plot(x,np.array([F(y) for y in x]),'x','c.d.f.')
+d2l.plot(x, np.array([F(y) for y in x]), 'x', 'c.d.f.')
 ```
 
 If $X \sim \mathrm{Bernoulli}(p)$, then:
@@ -56,11 +56,7 @@ If $X \sim \mathrm{Bernoulli}(p)$, then:
 We can sample an array of arbitrary shape from a Bernoulli random variable in numpy as follows.
 
 ```
-1*(np.random.rand(10,10) < p)
-```
-
-```
-
+1*(np.random.rand(10, 10) < p)
 ```
 
 
@@ -87,17 +83,17 @@ Let us plot the probability mass function and cumulative distribution function.
 ```{.python .input}
 n = 5
 
-d2l.plt.stem([i+1 for i in range(n)],n*[1/n], use_line_collection=True)
+d2l.plt.stem([i+1 for i in range(n)], n*[1/n], use_line_collection=True)
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
 ```{.python .input}
-x = np.arange(-1,6,0.01)
+x = np.arange(-1, 6, 0.01)
 F = lambda x: 0 if x < 1 else 1 if x > n else np.floor(x)/n
 
-d2l.plot(x,np.array([F(y) for y in x]),'x','c.d.f.')
+d2l.plot(x, np.array([F(y) for y in x]), 'x', 'c.d.f.')
 ```
 
 If $X \sim \mathrm{Uniform}(n)$, then:
@@ -107,8 +103,8 @@ If $X \sim \mathrm{Uniform}(n)$, then:
 
 We can an array of arbitrary shape from a discrete uniform random variable in numpy as follows.  Note that the range
 
-```
-np.random.random_integers(1, n, size=(10,10))
+```{.python .input}
+np.random.random_integers(1, n, size=(10, 10))
 ```
 
 ## Continuous Uniform
@@ -206,9 +202,9 @@ def binom(n, k):
         comb = comb * (n - i) // (i + 1)
     return comb
 
-pmf = np.array([p**i*(1-p)**(n-i)*binom(n,i) for i in range(n+1)])
+pmf = np.array([p**i*(1-p)**(n-i)*binom(n, i) for i in range(n+1)])
 
-d2l.plt.stem([i for i in range(n+1)],pmf, use_line_collection=True)
+d2l.plt.stem([i for i in range(n+1)], pmf, use_line_collection=True)
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
@@ -240,7 +236,7 @@ Let us now perform a thought experiment.  Let us say we are standing at a bus st
 However, if we are in a busy area, it is possible or even likely that two buses will arrive.  We can model this by splitting our random variable into two parts for the first 30 seconds, or the second 30 seconds.  In this case we can write
 
 $$
-X^{(2)} \sim X^{(2)}_1 + X^{(2)}_2
+X^{(2)} \sim X^{(2)}_1 + X^{(2)}_2.
 $$
 
 where $X^{(2)}$ is the total sum, and $X^{(2)}_i \sim \mathrm{Bernoulli}(p/2)$.  The total distribution is then $X^{(2)} \sim \mathrm{Binomial}(2,p/2)$.
@@ -258,7 +254,7 @@ This should not come as too much of a surprise, since in the real world we can j
 Following through this reasoning carefully, we can arrive at the following model.  We will say that $X \sim \mathrm{Poisson}(\lambda)$ if it is a random variable which takes the values $\{0,1,2,\ldots\}$ with probability
 
 $$
-p_k = \frac{\lambda^ke^{-\lambda}}{k!}
+p_k = \frac{\lambda^ke^{-\lambda}}{k!}.
 $$
 
 The value $\lambda > 0$ is known as the *rate*, and denotes the average number of arrivals we expect in one unit of time (note that we above restricted our rate to be less than zero, but that was only to simplify the explanation).  
@@ -281,7 +277,7 @@ lam = 5.0
 xs = [i for i in range(20)]
 pmf = np.array([np.exp(-lam)*lam**k/factorial(k) for k in xs])
 
-d2l.plt.stem(xs,pmf, use_line_collection=True)
+d2l.plt.stem(xs, pmf, use_line_collection=True)
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
@@ -304,7 +300,7 @@ This can be sampled in numpy as follows.
 
 ```{.python .input}
 import numpy as np
-np.random.poisson(lam,size=(10,10))
+np.random.poisson(lam, size=(10, 10))
 ```
 
 ## Gaussian
@@ -320,15 +316,15 @@ This can be seen to have mean zero and variance one, and so it is plausible to b
 
 ```{.python .input}
 p = 0.2
-ns = [1,10,100,1000]
-d2l.plt.figure(figsize=(10,3))
+ns = [1, 10, 100, 1000]
+d2l.plt.figure(figsize=(10, 3))
 for i in range(4) :
     n = ns[i]
-    pmf = np.array([p**i*(1-p)**(n-i)*binom(n,i) for i in range(n+1)])
+    pmf = np.array([p**i*(1-p)**(n-i)*binom(n, i) for i in range(n+1)])
     d2l.plt.subplot(1, 4, i+1)
-    d2l.plt.stem([(i-n*p)/np.sqrt(n*p*(1-p)) for i in range(n+1)],pmf,
+    d2l.plt.stem([(i-n*p)/np.sqrt(n*p*(1-p)) for i in range(n+1)], pmf,
                  use_line_collection=True)
-    d2l.plt.xlim([-4,4])
+    d2l.plt.xlim([-4, 4])
     d2l.plt.xlabel('x')
     d2l.plt.ylabel('p.m.f.')
     d2l.plt.title("n = {}".format(n))
@@ -354,7 +350,7 @@ Let us plot the probability density function and cumulative distribution functio
 ```{.python .input}
 mu = 0; sigma = 1
 
-x = np.arange(-3,3, 0.01)
+x = np.arange(-3, 3, 0.01)
 p = 1/np.sqrt(2*np.pi*sigma**2)*np.exp(-((x-mu)**2)/(2*sigma**2))
 
 d2l.plot(x, p, 'x', 'p.d.f.')
@@ -396,7 +392,7 @@ To close the section, Let us recall that if $X \sim \mathcal{N}(\mu,\sigma^2)$, 
 We can sample from the Gaussian (or normal) using numpy.
 
 ```{.python .input}
-np.random.normal(mu,sigma,size=(10,10))
+np.random.normal(mu, sigma, size=(10, 10))
 ```
 
 ## Summary

@@ -51,10 +51,10 @@ import d2l
 from mxnet import np, npx
 npx.set_np()
 
-theta = np.arange(0,1,0.001)
+theta = np.arange(0, 1, 0.001)
 p = theta**9*(1-theta)**4.
 
-d2l.plot(theta,p,'theta','likelihood')
+d2l.plot(theta, p, 'theta', 'likelihood')
 ```
 
 This has its maximum value somewhere near our expected $9/13 \approx 0.7\ldots$.  To see if it is exactly there, we can turn to calculus.  Notice that at the maximum, the function is flat.  Indeed if the slope was not zero there, then we could shift the input to make it larger (think about the process of gradient descent).  Thus, we could find the maximum likelihood estimate by finding the values of $\theta$ where the derivative is zero, and finding the one that gives the highest probability.  We compute:
@@ -95,7 +95,7 @@ We often work with loss functions, where we wish to minimize the loss.  We may t
 To illustrate this, consider the coin flipping problem from before, and pretend that we do not know the closed form solution.  The we may compute that
 
 $$
--\log(P(X \mid \boldsymbol{\theta})) = -\log(\theta^{n_H}(1-\theta)^{n_T}) = -(n_H\log(\theta) + n_T\log(1-\theta))
+-\log(P(X \mid \boldsymbol{\theta})) = -\log(\theta^{n_H}(1-\theta)^{n_T}) = -(n_H\log(\theta) + n_T\log(1-\theta)).
 $$
 
 This can be written into code, and freely optimized with gradient descent even for billions of coin flips.
@@ -140,14 +140,14 @@ $$
 \frac{\partial}{\partial \boldsymbol{\theta}} P(X\mid\boldsymbol{\theta}) & = \left(\frac{\partial}{\partial \boldsymbol{\theta}}P(x_1\mid\boldsymbol{\theta})\right)\cdot P(x_2\mid\boldsymbol{\theta})\cdots P(x_n\mid\boldsymbol{\theta}) \\
 & \quad + P(x_1\mid\boldsymbol{\theta})\cdot \left(\frac{\partial}{\partial \boldsymbol{\theta}}P(x_2\mid\boldsymbol{\theta})\right)\cdots P(x_n\mid\boldsymbol{\theta}) \\
 & \quad \quad \quad \quad \quad \quad \quad \quad \quad \quad \vdots \\
-& \quad + P(x_1\mid\boldsymbol{\theta})\cdot P(x_2\mid\boldsymbol{\theta}) \cdots \left(\frac{\partial}{\partial \boldsymbol{\theta}}P(x_n\mid\boldsymbol{\theta})\right)
+& \quad + P(x_1\mid\boldsymbol{\theta})\cdot P(x_2\mid\boldsymbol{\theta}) \cdots \left(\frac{\partial}{\partial \boldsymbol{\theta}}P(x_n\mid\boldsymbol{\theta})\right).
 \end{aligned}
 $$
 
 This requires $n(n-1)$ multiplications, along with $(n-1)$ additions, so it is total of quadratic time in the inputs!  Sufficient cleverness in grouping terms will reduce this to linear time, but it requires some thought.  For the $-\log$-likelihood we have instead
 
 $$
--\log\left(P(X\mid\boldsymbol{\theta})\right) = -\log(P(x_1\mid\boldsymbol{\theta})) - \log(P(x_2\mid\boldsymbol{\theta})) \cdots - \log(P(x_n\mid\boldsymbol{\theta}))
+-\log\left(P(X\mid\boldsymbol{\theta})\right) = -\log(P(x_1\mid\boldsymbol{\theta})) - \log(P(x_2\mid\boldsymbol{\theta})) \cdots - \log(P(x_n\mid\boldsymbol{\theta})),
 $$
 
 which then gives
