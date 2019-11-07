@@ -187,10 +187,10 @@ In the next section, we will take a deep dive into the different ML problems.
 First, we'd like to shed more light on some core components
 that will follow us around, no matter what kind of ML problem we take on:
 
-1. The **data** that we can learn from
-2. A **model** of how to transform the data
-3. A **loss** function that quantifies the *badness* of our model
-4. An **algorithm** to adjust the model's parameters to minimize the loss
+1. The *data* that we can learn from
+2. A *model* of how to transform the data
+3. A *loss* function that quantifies the *badness* of our model
+4. An *algorithm* to adjust the model's parameters to minimize the loss
 
 
 ### Data
@@ -330,14 +330,14 @@ the training data (for fitting model parameters)
 and the test data (which is held out for evaluation),
 reporting the following two quantities:
 
- * **Training Error:**
+ * *Training Error:*
  The error on that data on which the model was trained.
  You could think of this as being like
  a student's scores on practice exams
  used to prepare for some real exam.
  Even if the results are encouraging,
  that does not guarantee success on the final exam.
- * **Test Error:** This is the error incurred on an unseen test set.
+ * *Test Error:* This is the error incurred on an unseen test set.
  This can deviate significantly from the training error.
  When a model fails to generalize to unseen data,
  we say that it is *overfitting*.
@@ -778,11 +778,11 @@ and the type and number of questions we could ask
 is limited only by our creativity.
 We will address a number of unsupervised learning techniques in later chapters. To whet your appetite for now, we describe a few of the questions you might ask:
 
-* Can we find a small number of prototypes that accurately summarize the data? Given a set of photos, can we group them into landscape photos, pictures of dogs, babies, cats, mountain peaks, etc.? Likewise, given a collection of users' browsing activity, can we group them into users with similar behavior? This problem is typically known as **clustering**.
-* Can we find a small number of parameters that accurately capture the relevant properties of the data? The trajectories of a ball are quite well described by velocity, diameter, and mass of the ball. Tailors have developed a small number of parameters that describe human body shape fairly accurately for the purpose of fitting clothes. These problems are referred to as **subspace estimation** problems. If the dependence is linear, it is called **principal component analysis**.
-* Is there a representation of (arbitrarily structured) objects in Euclidean space (i.e., the space of vectors in $\mathbb{R}^n$) such that symbolic properties can be well matched? This is called **representation learning** and it is used to describe entities and their relations, such as Rome - Italy + France = Paris.
-* Is there a description of the root causes of much of the data that we observe? For instance, if we have demographic data about house prices, pollution, crime, location, education, salaries, etc., can we discover how they are related simply based on empirical data? The field of **directed graphical models** and **causality** deals with this.
-* An important and exciting recent development is **generative adversarial networks**. They are basically a procedural way of synthesizing data. The underlying statistical mechanisms are tests to check whether real and fake data are the same. We will devote a few notebooks to them.
+* Can we find a small number of prototypes that accurately summarize the data? Given a set of photos, can we group them into landscape photos, pictures of dogs, babies, cats, mountain peaks, etc.? Likewise, given a collection of users' browsing activity, can we group them into users with similar behavior? This problem is typically known as *clustering*.
+* Can we find a small number of parameters that accurately capture the relevant properties of the data? The trajectories of a ball are quite well described by velocity, diameter, and mass of the ball. Tailors have developed a small number of parameters that describe human body shape fairly accurately for the purpose of fitting clothes. These problems are referred to as *subspace estimation* problems. If the dependence is linear, it is called *principal component analysis*.
+* Is there a representation of (arbitrarily structured) objects in Euclidean space (i.e., the space of vectors in $\mathbb{R}^n$) such that symbolic properties can be well matched? This is called *representation learning* and it is used to describe entities and their relations, such as Rome - Italy + France = Paris.
+* Is there a description of the root causes of much of the data that we observe? For instance, if we have demographic data about house prices, pollution, crime, location, education, salaries, etc., can we discover how they are related simply based on empirical data? The field of *directed graphical models* and *causality* deals with this.
+* An important and exciting recent development is *generative adversarial networks*. They are basically a procedural way of synthesizing data. The underlying statistical mechanisms are tests to check whether real and fake data are the same. We will devote a few notebooks to them.
 
 
 ### Interacting with an Environment
