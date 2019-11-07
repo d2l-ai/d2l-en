@@ -1,5 +1,5 @@
 # Naive Bayes
-:label:`naive-bayes`
+:label:`sec_naive_bayes`
 
 Relying only on probabilistic fundamentals, we can already create a simple classifier. Learning is all about making assumptions. If we want to classify a new data point that we have never seen before we have to make some assumptions about which data points are similar to each other. The naive Bayes classifier, a popular and remarkably clear algorithm, assumes all features are independent of each other to simplify the computation. In this chapter, we will apply this model to recognize characters in images.
 

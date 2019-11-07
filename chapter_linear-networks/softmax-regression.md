@@ -128,7 +128,7 @@ However, there are some problems with directly
 interpreting the output of the linear layer as a probability.
 Nothing constrains these numbers to sum to 1. 
 Moreover, depending on the inputs, they can take negative values. 
-These violate basic axioms of probability presented in :num_ref:`sec_prob`
+These violate basic axioms of probability presented in :numref:`sec_prob`
 
 To interpret our outputs as probabilities, 
 we must guarantee that (even on new data),

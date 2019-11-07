@@ -41,7 +41,7 @@ Note that when $bias(\hat{\theta}_n) = 0$, that is when the expectation of an es
 ### Standard Deviation
 
 
-Recall in :numref:`probability`, the *standard deviation* (or *standard error*) is defined as the squared root of the variance of an estimator, i.e.,
+Recall in :numref:`sec_random_variables`, the *standard deviation* (or *standard error*) is defined as the squared root of the variance of an estimator, i.e.,
 
 $$se(\hat{\theta}_n) = \sqrt{\mathrm{Var} (\hat{\theta}_n )} = \sqrt{E[(\hat{\theta}_n - E(\hat{\theta}_n))^2]}.$$
 
