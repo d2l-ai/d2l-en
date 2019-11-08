@@ -1,4 +1,3 @@
-<link href="_static/frontpage.css" rel="stylesheet">
 <head>
   <style>
 h1, .side-doc-outline  {
@@ -51,6 +50,7 @@ h2.toc {
 .authors h4 {
     width: 100%;
 }
+
 .features .mdl-cell {
     padding: 0 36px;
 }
@@ -60,10 +60,21 @@ h2.toc {
 .features-2 p {
     padding: 0 200px;
 }
+.institute.mdl-grid {
+    padding: 24px;
+}
+.institute .mdl-cell {
+    text-align: left;
+    padding: 0;
+}
 #map {
     height: 400px;
     width: 100%;
 }
+a {
+  font-size: normal;
+}
+
 @media (max-width: 1000px) {
     .mdl-grid, h2.toc {
         padding: 50px 0 0 0;
@@ -208,10 +219,9 @@ h2.toc {
   </div>
 </div>
 
-<div class="features  mdl-grid">
+<div class="features mdl-grid">
   <div class = "mdl-cell mdl-cell--12-col">
     <h3>D2L as a textbook or a reference book</h3>
-    <h6><i>Please let d2lbook.en@gmail.com know if any is missed</i></h6>
     <br>
     <div id="map"></div>
     <script>
@@ -263,33 +273,39 @@ h2.toc {
     <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDHVyB-dRW3fhSdUmy3lqoiaNjV9JVUR4M&callback=initMap">
     </script>
-    <br>
-    Carnegie Mellon University (USA)<br>
-    Fudan University (China)<br>
-    Georgia Institute of Technology (USA)<br>
-    Indian Institute of Technology Bombay (India)<br>
-    Indian Institute of Technology Kanpur (India)<br>
-    Indian Institute of Technology Ropar (India)<br>
-    Kyungpook National University (Korea)<br>
-    Massachusetts Institute of Technology (USA)<br>
-    Northeastern University (USA)<br>
-    Peking University (China)<br>
-    Shanghai Jiao Tong University (China)<br>
-    Shanghai University of Finance and Economics (China)<br>
-    Texas A&amp;M University (USA)<br>
-    Universidade Federal de Minas Gerais (Brazil)<br>
-    University of California, Berkeley (USA)<br>
-    University of California, Los Angeles (USA)<br>
-    University of California, Santa Barbara (USA)<br>
-    University of Illinois at Urbana-Champaign (USA)<br>
-    University of Maryland (USA)<br>
-    University of New Hampshire (USA)<br>
-    University of North Carolina at Chapel Hill (USA)<br>
-    University of Science and Technology of China (China)<br>
-    University of Technology Sydney (Australia)<br>
-    University of Washington (USA)<br>
-    Universitat Politècnica de Catalunya (Spain)<br>
-    Zhejiang University (China)
+    <div class="institute mdl-grid">
+      <div class = "mdl-cell mdl-cell--6-col ">
+        Carnegie Mellon University (USA)<br>
+        Fudan University (China)<br>
+        Georgia Institute of Technology (USA)<br>
+        Indian Institute of Technology Bombay (India)<br>
+        Indian Institute of Technology Kanpur (India)<br>
+        Indian Institute of Technology Ropar (India)<br>
+        Kyungpook National University (Korea)<br>
+        Massachusetts Institute of Technology (USA)<br>
+        Northeastern University (USA)<br>
+        Peking University (China)<br>
+        Shanghai Jiao Tong University (China)<br>
+        Shanghai University of Finance and Economics (China)<br>
+        Texas A&amp;M University (USA)<br>
+      </div>
+      <div class = "mdl-cell mdl-cell--6-col ">
+        Universidade Federal de Minas Gerais (Brazil)<br>
+        University of California, Berkeley (USA)<br>
+        University of California, Los Angeles (USA)<br>
+        University of California, Santa Barbara (USA)<br>
+        University of Illinois at Urbana-Champaign (USA)<br>
+        University of Maryland (USA)<br>
+        University of New Hampshire (USA)<br>
+        University of North Carolina at Chapel Hill (USA)<br>
+        University of Science and Technology of China (China)<br>
+        University of Technology Sydney (Australia)<br>
+        University of Washington (USA)<br>
+        Universitat Politècnica de Catalunya (Spain)<br>
+        Zhejiang University (China)
+      </div>
+    </div> <!-- mdl-grid -->
+    <i>Please let d2lbook.en@gmail.com know if any is missed.</i>
   </div>
 </div>
 
@@ -298,16 +314,18 @@ h2.toc {
     <h3>BibTeX entry for citing the book</h3>
     <br>
     <div align="left">
-      <tt>
-      <pre>
-      @book{zhang2019dive,
-          title={Dive into Deep Learning},
-          author={Aston Zhang and Zachary C. Lipton and Mu Li and Alexander J. Smola},
-          note={\url{http://www.d2l.ai}},
-          year={2019}
-      }
-      </pre>
-      </tt>
+      <div class="highlight-python notranslate">
+        <div class="highlight">
+          <tt>
+            <pre>@book{zhang2019dive,
+    title={Dive into Deep Learning},
+    author={Aston Zhang and Zachary C. Lipton and Mu Li and Alexander J. Smola},
+    note={\url{http://www.d2l.ai}},
+    year={2019}
+}</pre>
+          </tt>
+        </div>
+      </div>
     </div>
   </div>
 </div>
