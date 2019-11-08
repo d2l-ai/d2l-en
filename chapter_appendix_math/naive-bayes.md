@@ -44,7 +44,7 @@ Our example, stored here in the variable `image` corresponds to an image with a 
 image.shape, image.dtype
 ```
 
-Our code stores the label of each image as a scalar in NumPy. Its type is a 32-bit integer.
+Our code stores the label of each image as a scalar. Its type is a 32-bit integer.
 
 ```{.python .input}
 label, type(label), label.dtype

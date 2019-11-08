@@ -81,11 +81,11 @@ Since the standard deviation of an estimator has been implementing in MXNet by s
 from mxnet import np, npx
 npx.set_np()
 
-## Statistical bias
+# Statistical bias
 def stat_bias(ture_theta, est_theta):
     return(np.mean(est_theta) - ture_theta)
 
-## Mean squared error
+# Mean squared error
 def mse(data, est_theta):
     return(np.mean(np.square(data - est_theta)))
 
@@ -217,7 +217,7 @@ Note that the above probability statement is about variable $C_n$, not about the
 
 Suppose that $\hat{\theta}_n \sim N(\theta, \hat{\sigma}_n^2)$, where $\hat{\sigma}_n^2$ is the standard deviation of $n$ samples. For a two-sided test, we can form an approximate $1-\alpha$ confidence interval for the true parameter $\theta$ as follows:
  
- $$C_n = [\hat{\theta}_n - z_{\alpha/2} \hat{\sigma}_n, \ \hat{\theta}_n + z_{\alpha/2} \hat{\sigma}_n]$$
+$$C_n = [\hat{\theta}_n - z_{\alpha/2} \hat{\sigma}_n, \ \hat{\theta}_n + z_{\alpha/2} \hat{\sigma}_n]$$
  
 where $z_{\alpha/2}$ is calculated by the infinity case ($\infty$) in the last row of the t-distribution table such that $P(Z > z_{\alpha/2}) = \alpha/2$ for $Z \sim N(0,1)$. 
  

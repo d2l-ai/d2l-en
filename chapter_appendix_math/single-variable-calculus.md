@@ -23,7 +23,7 @@ npx.set_np()
 ```
 
 ```{.python .input}
-# Plot a weird function in a normal range
+# Plot a function in a normal range
 x_big = np.arange(0.01, 3.01, 0.01)
 ys = np.sin(x_big**x_big)
 d2l.plot(x_big, ys, 'x', 'f(x)')
@@ -32,7 +32,7 @@ d2l.plot(x_big, ys, 'x', 'f(x)')
 In this graph, the eagle-eyed amongst us will notice that our strange function $f(x) = \sin(x^x)$ plotted over a wide range $[0, 3]$ has a very dramatical change.  However, if we zoom into a tiny segment, the behavior seems to be far simpler: it is just a straight line.
 
 ```{.python .input}
-# Plot a the same weird function in a tiny range
+# Plot a the same function in a tiny range
 x_big = np.arange(2.0, 2.01, 0.0001)
 ys = np.sin(x_big**x_big)
 d2l.plot(x_big, ys, 'x', 'f(x)')
@@ -46,13 +46,13 @@ $$
 \frac{L(x+\epsilon) - L(x)}{(x+\epsilon) - x} = \frac{L(x+\epsilon) - L(x)}{\epsilon}.
 $$
 
-This is already enough to start to play around with in code.  For instance, suppose we know that $L(x) = x^{2} + 1701(x-4)^3$, then we can see how large this value is at the point $x = 4$ as follows.
+This is already enough to start to play around with in code.  For instance, suppose that we know that $L(x) = x^{2} + 1701(x-4)^3$, then we can see how large this value is at the point $x = 4$ as follows.
 
 ```{.python .input}
 # Define our function
 L = lambda x: x**2 + 1701*(x-4)**3
 
-# print the difference divided by epsilon for several epsilon
+# Print the difference divided by epsilon for several epsilon
 for epsilon in [0.1, 0.001, 0.0001, 0.00001] :
     print("epsilon = {:.5f} -> {:.5f}".format(
         epsilon, (L(4+epsilon)-L(4))/epsilon))

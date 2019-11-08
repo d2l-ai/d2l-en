@@ -3,9 +3,9 @@
 
 One of the most commonly encounter way of thinking in machine learning is the maximum likelihood point of view.  This is the concept that when working with a probabilistic model with unknown parameters, the parameters which make the data have the highest probability are the most likely ones.
 
-## The Philosophy
+## The Maximum Likelihood Principle
 
-This has a Bayesian which can be helpful to think about.  Suppose we have a model with parameters $\boldsymbol{\theta}$ and a collection of data points $X$.  For concreteness, we can imagine that $\boldsymbol{\theta}$ is a single value representing the probability that a coin comes up heads when flipped, and $X$ is a sequence of independent coin flips.  We will look at this example in depth later.
+This has a Bayesian which can be helpful to think about.  Suppose that we have a model with parameters $\boldsymbol{\theta}$ and a collection of data points $X$.  For concreteness, we can imagine that $\boldsymbol{\theta}$ is a single value representing the probability that a coin comes up heads when flipped, and $X$ is a sequence of independent coin flips.  We will look at this example in depth later.
 
 If we want to find the most likely value for the parameters of our model, that means we want to find
 
@@ -29,7 +29,7 @@ As a matter of common terminology, the probability of the data given the paramet
 
 ## A Concrete Example
 
-Let us see how this works in a concrete example.  Suppose we have a single parameter $\theta$ representing the probability that a coin flip is heads.  Then the probability of getting a tails is $1-\theta$, and so if our observed data $X$ is a sequence with $n_H$ heads and $n_T$ tails, we can use the fact that independent probabilities multiply to see that 
+Let us see how this works in a concrete example.  Suppose that we have a single parameter $\theta$ representing the probability that a coin flip is heads.  Then the probability of getting a tails is $1-\theta$, and so if our observed data $X$ is a sequence with $n_H$ heads and $n_T$ tails, we can use the fact that independent probabilities multiply to see that 
 
 $$
 P(X \mid \theta) = \theta^{n_H}(1-\theta)^{n_T}.
@@ -70,7 +70,7 @@ $$
 
 This has three solutions: $0$, $1$ and $9/13$.  The first two are clearly minima, not maxima as they assign probability $0$ to our sequence.  The final one does *not* assign zero probability to our sequence, and thus must be the maximum likelihood estimate $\hat \theta = 9/13$, matching our intuition.
 
-## Numerical Optimization and the $-\log$-Likelihood
+## Numerical Optimization and the Negative Log-Likelihood
 
 This story is nice, but what is we have billions of parameters and data points.  What do we do then?
 
@@ -90,7 +90,7 @@ $$
 
 Since the function $x \mapsto \log(x)$ is increasing, maximizing the likelihood is the same thing as maximizing the $\log$-likelihood.  Indeed in :numref:`sec_naive_bayes` we saw this reasoning applied when working with the specific example of the Naive Bayes classifier.
 
-We often work with loss functions, where we wish to minimize the loss.  We may turn maximum likelihood into the minimizattion of a loss by taking $-\log(P(X \mid \boldsymbol{\theta}))$, which is the $-\log$-Likelihood.
+We often work with loss functions, where we wish to minimize the loss.  We may turn maximum likelihood into the minimizattion of a loss by taking $-\log(P(X \mid \boldsymbol{\theta}))$, which is the Negative Log-Likelihood.
 
 To illustrate this, consider the coin flipping problem from before, and pretend that we do not know the closed form solution.  The we may compute that
 
@@ -104,14 +104,14 @@ This can be written into code, and freely optimized with gradient descent even f
 from mxnet import autograd, np, npx
 npx.set_np()
 
-### Set up our data ###
+# Set up our data
 n_H = 8675309
 n_T = 25624
 
-### Initialize our paramteres ###
+# Initialize our paramteres
 theta = np.array(0.5); theta.attach_grad()
 
-### Perform gradient descent ###
+# Perform gradient descent
 lr = 0.00000000001
 for iter in range(10) :
     with autograd.record():
@@ -119,11 +119,11 @@ for iter in range(10) :
     loss.backward()
     theta -= lr*theta.grad
 
-### Check Output ###
+# Check output
 theta, n_H/(n_H+n_T)
 ```
 
-Numerical convenience is only one reason people like to use $-\log$-likelihoods.  Indeed, there are a number of reasons that it can be preferable.
+Numerical convenience is only one reason people like to use negative log-likelihoods.  Indeed, there are a number of reasons that it can be preferable.
 
 ### Simplification of Calculus Rules
 
@@ -144,7 +144,7 @@ $$
 \end{aligned}
 $$
 
-This requires $n(n-1)$ multiplications, along with $(n-1)$ additions, so it is total of quadratic time in the inputs!  Sufficient cleverness in grouping terms will reduce this to linear time, but it requires some thought.  For the $-\log$-likelihood we have instead
+This requires $n(n-1)$ multiplications, along with $(n-1)$ additions, so it is total of quadratic time in the inputs!  Sufficient cleverness in grouping terms will reduce this to linear time, but it requires some thought.  For the negative log-likelihood we have instead
 
 $$
 -\log\left(P(X\mid\boldsymbol{\theta})\right) = -\log(P(x_1\mid\boldsymbol{\theta})) - \log(P(x_2\mid\boldsymbol{\theta})) \cdots - \log(P(x_n\mid\boldsymbol{\theta})),
@@ -166,9 +166,9 @@ $$
 H(p) = -\sum_{i} p_i \log_2(p_i),
 $$
 
-which measures the randomness of a source in bits. Notice that this is nothing more than the average $-\log$ probability, and thus if we take our $-\log$-likelihood and divide by the number of data points, we get a relative of entropy (known as cross-entropy) that measures how random our model thinks our data is.  This theoretical interpretation alone would be sufficiently compelling to motivate reporting the average $-\log$-likelihood over the dataset as a way of measuring model performance.
+which measures the randomness of a source in bits. Notice that this is nothing more than the average $-\log$ probability, and thus if we take our negative log-likelihood and divide by the number of data points, we get a relative of entropy (known as cross-entropy) that measures how random our model thinks our data is.  This theoretical interpretation alone would be sufficiently compelling to motivate reporting the average negative log-likelihood over the dataset as a way of measuring model performance.
 
-## Maximum likelihood for continuous variables
+## Maximum Likelihood for Continuous Variables
 
 Everything that we have done so far assumes we are working with discrete random variables, but what if we want to work with continuous ones?  Indeed, in applications, continuous random variables are as likely to be encountered as discrete, and so we need to extend this story line to this case.
 
@@ -204,9 +204,9 @@ as was claimed at the beginning of this section.  Thus we see that the maximum l
 
 ## Summary
 * The maximum likelihood principle tells us that the best fit model for a given dataset is the one that generates the data with the highest probability.
-* Often people work with the $-\log$-likelihood instead for a variety of reasons: numerical stability, conversion of products to sums (and the resulting simplification of gradient computations), and theoretical ties to information theory.
+* Often people work with the negative log-likelihood instead for a variety of reasons: numerical stability, conversion of products to sums (and the resulting simplification of gradient computations), and theoretical ties to information theory.
 * While simplest to motivate in the discrete setting, it may be freely generalized to the continuous setting as well by maximizing the probability density assigned to the datapoints.
 
 ## Exercises
-1. Suppose you know that a random variable has density $\frac{1}{\alpha}e^{-\alpha x}$ for some value $\alpha$.  You obtain a single observation from the random variable which is the number $3$.  What is the maximum likelihood estimate for $\alpha$?
-2. Suppose you have a dataset of samples $\{x_i\}_{i=1}^N$ drawn from a Gaussian with unknown mean, but variance $1$.  What is the maximum likelihood estimate for the mean?
+1. Suppose that you know that a random variable has density $\frac{1}{\alpha}e^{-\alpha x}$ for some value $\alpha$.  You obtain a single observation from the random variable which is the number $3$.  What is the maximum likelihood estimate for $\alpha$?
+2. Suppose that you have a dataset of samples $\{x_i\}_{i=1}^N$ drawn from a Gaussian with unknown mean, but variance $1$.  What is the maximum likelihood estimate for the mean?

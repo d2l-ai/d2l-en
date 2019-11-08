@@ -36,7 +36,7 @@ $$
 This may look like a mess, but we can make this more familiar by noting that the sum on the right looks exactly like a dot product, so if we let
 
 $$
-\boldsymbol{\epsilon} = [\epsilon_1, \ldots, \epsilon_N]^\top, \text{ and }
+\boldsymbol{\epsilon} = [\epsilon_1, \ldots, \epsilon_N]^\top, \; \text{and} \;
 \nabla_{\mathbf{x}} L = \left[\frac{\partial L}{\partial x_1}, \ldots, \frac{\partial L}{\partial x_N}\right]^\top,
 $$
 
@@ -50,7 +50,7 @@ We will call the vector $\nabla_{\mathbf{w}} L$ the *gradient* of $L$.
 
 This formula is worth pondering for a moment.  It has exactly the format that we encountered in one dimension, just we have converted everything to vectors and dot products.  It allows us to tell approximately how the function $L$ will change given any perturbation to the input.  As we will see in the next section, this will provide us with an important tool in understanding geometrically how we can learn using information contained in the gradient.
 
-But first, let us see this approximation at work with an example.  Suppose we are working with the function
+But first, let us see this approximation at work with an example.  Suppose that we are working with the function
 
 $$
 f(x,y) = \log(e^x + e^y) \text{ with gradient } \nabla f (x,y) = \left[\frac{e^x}{e^x+e^y}, \frac{e^y}{e^x+e^y}\right].
@@ -76,9 +76,7 @@ import d2l
 from IPython import display
 from mxnet import np, npx
 npx.set_np()
-```
 
-```{.python .input}
 f = lambda x, y : np.log(np.exp(x) + np.exp(y))
 grad_f = lambda x, y : np.array([np.exp(x)/(np.exp(x)+np.exp(y)), 
                                 np.exp(y)/(np.exp(x)+np.exp(y))])
@@ -89,14 +87,14 @@ true_value = f(0+epsilon[0], np.log(2)+epsilon[1])
 "Approximation: {}, True Value: {}".format(grad_approx, true_value)
 ```
 
-## Geometry of gradients and gradient descent
+## Geometry of Gradients and Gradient Descent
 Consider the formula 
 
 $$
 L(\mathbf{w} + \boldsymbol{\epsilon}) \approx L(\mathbf{w}) + \boldsymbol{\epsilon}\cdot \nabla_{\mathbf{w}} L(\mathbf{w}).
 $$
 
-Let us suppose I want to minimize this loss.  Let us understand geometrically the algorithm of gradient descent first obtained in  :numref:`sec_autograd`. What we will do is the following:
+Let us suppose that I want to minimize this loss.  Let us understand geometrically the algorithm of gradient descent first obtained in  :numref:`sec_autograd`. What we will do is the following:
 
 1. Start with a random choice for the initial parameters $\mathbf{w}$.
 2. Find the direction $\mathbf{v}$ that makes $L$ decrease the most rapidly at $\mathbf{w}$.
@@ -122,12 +120,12 @@ This brings us to one of the most important mathematical concepts in machine lea
 
 This basic algorithm has been modified and adapted many ways by many researchers , but the core concept remains the same in all of them.  Use the gradient to find the direction that decreases the loss as rapidly as possible, and update the parameters to take a step in that direction.
 
-## A note on mathematical optimization
+## A Note on Mathematical Optimization
 Throughout this book, we focus squarely on numerical optimization techniques for the practical reason that all functions we encounter in the deep learning setting are too complex to minimize explicitly.  
 
 However, it is a useful exercise to consider what the geometric understanding we obtained above tells us about optimizing functions directly.
 
-Suppose we wish to find the value of $\mathbf{x}_0$ which minimizes some function $L(\mathbf{x})$.  Let us suppose moreover that someone gives us a value and tells us that it is the value that minimizes $L$.  Is there anything we can check to see if their answer is even plausible?
+Suppose that we wish to find the value of $\mathbf{x}_0$ which minimizes some function $L(\mathbf{x})$.  Let us suppose that moreover someone gives us a value and tells us that it is the value that minimizes $L$.  Is there anything we can check to see if their answer is even plausible?
 
 Consider the expression
 $$
@@ -157,8 +155,8 @@ d2l.plot(x, f, 'x', 'f(x)')
 
 This highlights an important fact to know when working either theoretically or numerically: the only possible points where we can minimize (or maximize) a function will have gradient equal to zero, however, not every point with gradient zero is the minimum (or maximum).  
 
-## Multivariate Chain rule
-Let us suppose we have a function of four variables ($w,x,y,z$) which we can make by composing many terms:
+## Multivariate Chain Rule
+Let us suppose that we have a function of four variables ($w,x,y,z$) which we can make by composing many terms:
 
 $$
 \begin{aligned}
@@ -292,7 +290,7 @@ $$
 \end{aligned}
 $$
 
-Note that this application of the chain rule has us explicitly compute $\frac{\partial f}{\partial u}, \frac{\partial f}{\partial u}, \frac{\partial f}{\partial u}, \frac{\partial f}{\partial u}, \text{ and } \frac{\partial f}{\partial u}$.  Nothing stops us from also including the equations:
+Note that this application of the chain rule has us explicitly compute $\frac{\partial f}{\partial u}, \frac{\partial f}{\partial u}, \frac{\partial f}{\partial u}, \frac{\partial f}{\partial u}, \; \text{and} \; \frac{\partial f}{\partial u}$.  Nothing stops us from also including the equations:
 
 $$
 \begin{aligned}
@@ -305,14 +303,14 @@ $$
 and then keeping track of how $f$ changes when we change *any* node in the entire network.  Let us implement it.
 
 ```{.python .input}
-### Compute the value of the function from inputs to outputs ###
+# Compute the value of the function from inputs to outputs
 w = -1; x = 0; y = -2; z = 1
 a = (w+x+y+z)**2; b = (w+x-y-z)**2
 u = (a+b)**2; v = (a-b)**2
 f = (u+v)**2
 print("    f at {}, {}, {}, {} is {}".format(w, x, y, z, f))
 
-### Compute the derivative using the decomposition above ###
+# Compute the derivative using the decomposition above
 # First compute the single step partials
 df_du = 2*(u+v); df_dv = 2*(u+v)
 du_da = 2*(a+b); du_db = 2*(a+b); dv_da = 2*(a-b); dv_db = -2*(a-b)
@@ -342,17 +340,17 @@ To see how MXNet has encapsulated this, let us take a quick look at this example
 ```{.python .input}
 from mxnet import autograd
 
-### Initialize as NDArrays, attaching gradients ###
+# Initialize as NDArrays, attaching gradients
 w = np.array(-1); x = np.array(0); y = np.array(-2); z = np.array(1)
 w.attach_grad(); x.attach_grad(); y.attach_grad(); z.attach_grad()
 
-### Do the computation like usual, tracking gradients ###
+# Do the computation like usual, tracking gradients
 with autograd.record():
     a = (w+x+y+z)**2; b = (w+x-y-z)**2
     u = (a+b)**2; v = (a-b)**2
     f = (u+v)**2
 
-### Execute backward pass ###
+# Execute backward pass
 f.backward()
 
 print("df/dw at {}, {}, {}, {} is {}".format(w, x, y, z, w.grad))
@@ -423,7 +421,7 @@ $$
 
 One can compute that the gradient and Hessian are
 $$
-\nabla f(x,y) = e^{-x^2-y^2}\begin{pmatrix}1-2x^2 \\ -2xy\end{pmatrix} \text{ and } \mathbf{H}f(x,y) = e^{-x^2-y^2}\begin{pmatrix} 4x^3 - 6x & 4x^2y - 2y \\ 4x^2y-2y &4xy^2-2x\end{pmatrix}.
+\nabla f(x,y) = e^{-x^2-y^2}\begin{pmatrix}1-2x^2 \\ -2xy\end{pmatrix} \; \text{and} \; \mathbf{H}f(x,y) = e^{-x^2-y^2}\begin{pmatrix} 4x^3 - 6x & 4x^2y - 2y \\ 4x^2y-2y &4xy^2-2x\end{pmatrix}.
 $$
 
 And thus, with a little algebra, see that the approximating quadratic at $[-1,0]^\top$ is
@@ -443,7 +441,7 @@ z = x*np.exp(- x**2 - y**2)
 # Compute gradient and Hessian at (1, 0)
 w = np.exp(-1)*(-1 - (x+1) + 2*(x+1)**2 + 2*y**2)
 
-# Plot Function
+# Plot function
 ax = d2l.plt.figure().add_subplot(111, projection='3d')
 ax.plot_wireframe(x, y, z, **{'rstride': 10, 'cstride': 10})
 ax.plot_wireframe(x, y, w, **{'rstride': 10, 'cstride': 10}, color = 'purple')
@@ -457,7 +455,7 @@ This forms the basis for Newton's Algorithm discussed in :numref:`sec_gd`, where
 ## A Little Matrix Calculus
 Derivatives of functions involving matrices turn out to be particularly nice.  This section can become notationally heavy, so may be skipped in a first reading, but it is useful to know how derivatives of functions involving common matrix operations are often much cleaner than one might initially anticipate, particularly given how central matrix operations are to deep learning applications.
 
-Let us begin with an example.  Suppose we have some fixed row vector $\boldsymbol{\beta}$, and we want to take the product function $f(\mathbf{x}) = \boldsymbol{\beta}\mathbf{x}$, and understand how the dot product changes when we change $\mathbf{x}$.  A bit of notation that will be useful when working with matrix derivatives in ML is called the *denominator layout matrix derivative* where we assemble our partial derivatives into the shape of whatever vector, matrix, or tensor is in the denominator of the differential.  In this case, we will write
+Let us begin with an example.  Suppose that we have some fixed row vector $\boldsymbol{\beta}$, and we want to take the product function $f(\mathbf{x}) = \boldsymbol{\beta}\mathbf{x}$, and understand how the dot product changes when we change $\mathbf{x}$.  A bit of notation that will be useful when working with matrix derivatives in ML is called the *denominator layout matrix derivative* where we assemble our partial derivatives into the shape of whatever vector, matrix, or tensor is in the denominator of the differential.  In this case, we will write
 
 $$
 \frac{df}{d\mathbf{x}} = \begin{bmatrix}
@@ -507,7 +505,7 @@ This illustrates a few factors about matrix calculus that we will often counter 
 * Second, The final results are much cleaner than the intermediate process, and will always look similar to the single variable case.  In this case, note that $\frac{d}{dx}(bx) = b$ and $\frac{d}{d\mathbf{x}} (\boldsymbol{\beta}\mathbf{x}) = \boldsymbol{\beta}^\top$ are both similar. 
 * Third, transposes can often appear seemingly from nowhere.  The core reason for this is the convention that we match the shape of the denominator, thus when we multiply matrices, we will need to take transposes to match back to the shape of the original term.
 
-To keep building intuition, let us try a computation that is a little harder.  Suppose we have a column vector $\mathbf{x}$, and a square matrix $A$ and we want to compute 
+To keep building intuition, let us try a computation that is a little harder.  Suppose that we have a column vector $\mathbf{x}$, and a square matrix $A$ and we want to compute 
 
 $$
 \frac{d}{d\mathbf{x}}(\mathbf{x}^\top A \mathbf{x}).
@@ -571,7 +569,7 @@ Equivalently $\frac{d}{dx}(ax^2) = 2ax$.  Again, we get a result that looks susp
 
 At this point, the pattern should be looking rather suspicious, so let us try to figure out why.  When we take matrix derivatives like this, let us first assume that the expression we get will be another matrix expression---by which I mean we can write it in terms of products and sums of matrices and their transposes.  If such an expression exists, it will need to be true for all matrices.  In particular, it will need to be true of $1 \times 1$ matrices, in which case the matrix product is just the of the numbers, the matrix sum is just the sum, and the transpose does nothing at all!  In other words, whatever expression we get *must* match the single variable expression.  This means that, with some practice, one can often guess matrix derivatives just by knowing what the associated single variable expression must look like!
 
-Let us try this out.  Suppose $\mathbf{X}$ is a $n \times m$ matrix, $\mathbf{U}$ is an $n \times r$ and $\mathbf{V}$ is an $r \times m$.  Let us try to compute 
+Let us try this out.  Suppose that $\mathbf{X}$ is a $n \times m$ matrix, $\mathbf{U}$ is an $n \times r$ and $\mathbf{V}$ is an $r \times m$.  Let us try to compute 
 
 $$
 \frac{d}{d\mathbf{V}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2} = \;?
@@ -678,4 +676,4 @@ It is reasonable to ask at this point, "Why can I not just write down matrix ver
 2. Let $\mathbf{v}$ be an $n$ dimension vector. What is $\frac{\partial}{\partial\mathbf{v}}\|\mathbf{v}\|_2$?
 3. Let $L(x,y) = \log(e^x + e^y)$.  Compute the gradient.  What is the sum of the components of the gradient?
 4. Let $f(x,y) = x^2y + xy^2$. Show that the only critical point is $(0,0)$. By considering $f(x,x)$, determine if $(0,0)$ is a maximum, minimum, or neither.
-5. Suppose we are minimizing a function $f(\mathbf{x}) = g(\mathbf{x}) + h(\mathbf{x})$.  How can we geometrically interpret the condition of $\nabla f = 0$ in terms of $g$ and $h$?
+5. Suppose that we are minimizing a function $f(\mathbf{x}) = g(\mathbf{x}) + h(\mathbf{x})$.  How can we geometrically interpret the condition of $\nabla f = 0$ in terms of $g$ and $h$?
