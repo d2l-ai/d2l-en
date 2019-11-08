@@ -9,7 +9,7 @@ All of the probability we have discussed so far has dealt with discrete random v
 
 ### From Discrete to Continuous
 
-To understand the additional technical challenges encountered when working with continuous random variables, Let us perform a thought experiment.  Suppose we are throwing a dart at the dart board, and we want to know the probability that it hits exactly $2 \text{cm}$ from the center of the board.
+To understand the additional technical challenges encountered when working with continuous random variables, Let us perform a thought experiment.  Suppose that we are throwing a dart at the dart board, and we want to know the probability that it hits exactly $2 \text{cm}$ from the center of the board.
 
 To start with, we imagine measuring to a single digit of accuracy, that is to say with bins for $0 \text{cm}$, $1 \text{cm}$, $2 \text{cm}$, and so on.  We throw say $100$ darts at the dart board, and if $20$ of them fall into the bin for $2\text{cm}$ we conclude that $20\%$ of the darts we throw hit the board $2 \text{cm}$ away from the center.
 
@@ -47,9 +47,8 @@ import d2l
 from IPython import display
 from mxnet import np, npx
 npx.set_np()
-```
 
-```{.python .input}
+# Plot the probability density function for some random variable
 x = np.arange(-5, 5, 0.01)
 p = 0.2*np.exp(-(x-3)**2/2)/np.sqrt(2*np.pi) + 
     0.8*np.exp(-(x+1)**2/2)/np.sqrt(2*np.pi)
@@ -92,6 +91,7 @@ $$
 We may approximate this is code by using the same discrete approximation methods as before.  In this case we can approximate the probability of falling in the blue region.
 
 ```{.python .input}
+# Approximate probability using numerical integration
 epsilon = 0.01
 x = np.arange(-5, 5, 0.01)
 p = 0.2*np.exp(-(x-3)**2/2)/np.sqrt(2*np.pi) + 
@@ -163,7 +163,7 @@ In this example, we see one of the benefits of working with the c.d.f., the abil
 
 ### Means, Variances
 
-Suppose we are dealing with a random variables $X$.  The distribution itself can be hard to interpret.  It is often useful to be able to summarize the behavior of a random variable concisely.  Numbers that help we capture the behavior of a random variable are called *summary statistics*.  The most commonly encountered ones are the *mean*, the *variance*, and the *standard deviation*.
+Suppose that we are dealing with a random variables $X$.  The distribution itself can be hard to interpret.  It is often useful to be able to summarize the behavior of a random variable concisely.  Numbers that help we capture the behavior of a random variable are called *summary statistics*.  The most commonly encountered ones are the *mean*, the *variance*, and the *standard deviation*.
 
 The *mean* encodes the average value of a random variable.  If we have a discrete random variable $X$, which takes the values $x_i$ with probabilities $p_i$, then the mean is given by the weighted average: sum the values times the probability that the random variable takes on that value:
 
@@ -216,7 +216,7 @@ We will list a few properties of variances below.
 * For any random variable $X$ and numbers $a$ and $b$, we have that $\mathrm{var}(aX+b) = a^2\mathrm{var}(X)$
 * If we have two *independent* random variables $X$ and $Y$, we have $\mathrm{var}(X+Y) = \mathrm{var}(X) + \mathrm{var}(Y)$.
 
-When interpreting these values, there can be a bit of a hiccup.  In particular, Let us try imagining what happens if we keep track of units through this computation.  Suppose we are working with the star rating assigned to a product on the web page.  Then $a$, $a-2$, and $a+2$ are all measured in units of stars.  Similarly, the mean $\mu_X$ is then also measured in stars (being a weighted average).  However, if we get to the variance, we immediately encounter an issue, which is we want to look at $(X-\mu_X)^2$, which is in units of *squared stars*.  This means that the variance itself is not comparable to the original measurements.  To make it interpretable, we will need to return to our original units.
+When interpreting these values, there can be a bit of a hiccup.  In particular, Let us try imagining what happens if we keep track of units through this computation.  Suppose that we are working with the star rating assigned to a product on the web page.  Then $a$, $a-2$, and $a+2$ are all measured in units of stars.  Similarly, the mean $\mu_X$ is then also measured in stars (being a weighted average).  However, if we get to the variance, we immediately encounter an issue, which is we want to look at $(X-\mu_X)^2$, which is in units of *squared stars*.  This means that the variance itself is not comparable to the original measurements.  To make it interpretable, we will need to return to our original units.
 
 This can be fixed: take the square root!  Thus we define
 
@@ -248,54 +248,39 @@ $$
 
 This means that $75\%$ of the time, this random variable will fall within this interval for any value of $p$.  Now, notice that as $p \rightarrow 0$, this interval also converges to the single point $a$.  But we know that our random variable takes the values $a-2,a,a+2$ only so eventially we can be certain it will fall outside the interval!  The question is, at what $p$ does that happen.  So we want to solve: for what $p$ does $a+4\sqrt{2p} = a+2$, which is solved when $p=1/8$, which is *exactly* the first $p$ where it could possibly happen without violating our claim that no more than $1/4$ falls outside the interval ($1/8$ to the left, and $1/8$ to the right).
 
-Let's visualize this.  I will show the probability of getting the three values as three vertical bars with height proportional to the probability.  The interval will be drawn as a horizontal line in the middle.  The first plot shows what happens for $p > 1/8$ where the interval safely contains all points.  The second shows that at $p = 1/8$, the interval exactly touches the two points, and the third shows that for $p < 1/8$ the interval only contains the center.
+Let's visualize this.  I will show the probability of getting the three values as three vertical bars with height proportional to the probability.  The interval will be drawn as a horizontal line in the middle.  The first plot shows what happens for $p > 1/8$ where the interval safely contains all points.
 
 ```{.python .input}
-a = 0
-p = 0.2
-d2l.plt.stem([a-2, a, a+2], [p, 1-2*p, p], use_line_collection=True)
-d2l.plt.xlim([-4, 4])
-d2l.plt.xlabel('x')
-d2l.plt.ylabel('p.m.f.')
+# Define a helper to plot these figures
+def plot_chebychev(a, p) :
+    d2l.plt.stem([a-2, a, a+2], [p, 1-2*p, p], use_line_collection=True)
+    d2l.plt.xlim([-4, 4])
+    d2l.plt.xlabel('x')
+    d2l.plt.ylabel('p.m.f.')
 
-d2l.plt.hlines(0.5, a-4*np.sqrt(2*p), a+4*np.sqrt(2*p), 'black', lw=4)
-d2l.plt.vlines(a-4*np.sqrt(2*p), 0.53, 0.47, 'black', lw=1)
-d2l.plt.vlines(a+4*np.sqrt(2*p), 0.53, 0.47, 'black', lw=1)
-d2l.plt.title("p > 1/8")
+    d2l.plt.hlines(0.5, a-4*np.sqrt(2*p), a+4*np.sqrt(2*p), 'black', lw=4)
+    d2l.plt.vlines(a-4*np.sqrt(2*p), 0.53, 0.47, 'black', lw=1)
+    d2l.plt.vlines(a+4*np.sqrt(2*p), 0.53, 0.47, 'black', lw=1)
+    d2l.plt.title("p > 1/8")
 
-d2l.plt.show()
+    d2l.plt.show()
+
+# Plot interval when p > 1/8
+plot_chebychev(0.0, 0.2)
 ```
 
+The second shows that at $p = 1/8$, the interval exactly touches the two points.  This shows that the inequality is *sharp*, since no smaller interval could be taken while keeping the inequality true.
+
 ```{.python .input}
-a = 0
-p = 0.125
-d2l.plt.stem([a-2, a, a+2], [p, 1-2*p, p], use_line_collection=True)
-d2l.plt.xlim([-4, 4])
-d2l.plt.xlabel('x')
-d2l.plt.ylabel('p.m.f.')
-
-d2l.plt.hlines(0.5, a-4*np.sqrt(2*p), a+4*np.sqrt(2*p), 'black', lw=4)
-d2l.plt.vlines(a-4*np.sqrt(2*p), 0.53, 0.47, 'black', lw=1)
-d2l.plt.vlines(a+4*np.sqrt(2*p), 0.53, 0.47, 'black', lw=1)
-d2l.plt.title("p = 1/8")
-
-d2l.plt.show()
+# Plot interval when p = 1/8
+plot_chebychev(0.0, 0.125)
 ```
 
+The third shows that for $p < 1/8$ the interval only contains the center.  This does not invalidate the inequality since we only needed to ensure that no more than $1/4$ of the probability falls outside the interval, which means that once $p < 1/8$, the two points at $a-2$ and $a+2$ can be discarded. 
+
 ```{.python .input}
-a = 0
-p = 0.05
-d2l.plt.stem([a-2, a, a+2], [p, 1-2*p, p], use_line_collection=True)
-d2l.plt.xlim([-4, 4])
-d2l.plt.xlabel('x')
-d2l.plt.ylabel('p.m.f.')
-
-d2l.plt.hlines(0.5, a-4*np.sqrt(2*p), a+4*np.sqrt(2*p), 'black', lw=4)
-d2l.plt.vlines(a-4*np.sqrt(2*p), 0.53, 0.47, 'black', lw=1)
-d2l.plt.vlines(a+4*np.sqrt(2*p), 0.53, 0.47, 'black', lw=1)
-d2l.plt.title("p < 1/8")
-
-d2l.plt.show()
+# Plot interval when p < 1/8
+plot_chebychev(0.0, 0.05)
 ```
 
 This has all been in terms of discrete random variables, but the case of continuous random variables is similar.  To intuitively understand how this works, imagine that we split the real number line into intervals of length $\epsilon$ given by $(\epsilon i, \epsilon (i+1)]$.  Once we do this, our continuous random variable has been made discrete and we can say that
@@ -347,6 +332,7 @@ p(x) = \frac{1}{1+x^2}.
 $$
 
 ```{.python .input}
+# Plot the Cauchy distribution p.d.f.
 x = np.arange(-5, 5, 0.01)
 p = 1/(1+x**2)
 
@@ -364,6 +350,7 @@ $$
 The function on the inside looks like this
 
 ```{.python .input}
+# Plot the integrand needed to compute the variance
 x = np.arange(-20, 20, 0.01)
 p = x**2/(1+x**2)
 
@@ -392,16 +379,16 @@ Machine learning scientists define their models so that we most often do not nee
 
 The above work all assumes we are working with a single real valued random variable.  But what if we are dealing with two or more potentially highly correlated random variables?  This circumstance is the norm in machine learning: imagine random variables like $R_{i,j}$ which encode the red value of the pixel at the $(i,j)$ coordinate in an image, or $P_t$ which is a random variable given by a stock price at time $t$.  Nearby pixels tend to have similar color, and nearby times tend to have similar prices.  We cannot treat them as separate random variables, and expect to create a successful model (we will see in :numref:`naive-bayes` a model that underperforms due to such an assumption).  We need to develop the mathematical language to handle these correlated continuous random variables.
 
-Thankfully, with the multiple integrals in :ref:`sec_integral_calculus` we can develop such a language.  Suppose we have, for simplicity, two random variables $X,Y$ which can be correlated.  Then, similar to the case of a single variable, we can ask the question,
+Thankfully, with the multiple integrals in :ref:`sec_integral_calculus` we can develop such a language.  Suppose that we have, for simplicity, two random variables $X,Y$ which can be correlated.  Then, similar to the case of a single variable, we can ask the question,
 
 $$
-P(X \text{ is in an } \epsilon \text{-sized interval around } x \text{ and }Y \text{ is in an } \epsilon \text{-sized interval around } y ).
+P(X \text{ is in an } \epsilon \text{-sized interval around } x \; \text{and} \;Y \text{ is in an } \epsilon \text{-sized interval around } y ).
 $$
 
 Similar reasoning to the single variable case shows that this should be approximately
 
 $$
-P(X \text{ is in an } \epsilon \text{-sized interval around } x \text{ and }Y \text{ is in an } \epsilon \text{-sized interval around } y ) \approx \epsilon^{2}p(x,y),
+P(X \text{ is in an } \epsilon \text{-sized interval around } x \; \text{and} \;Y \text{ is in an } \epsilon \text{-sized interval around } y ) \approx \epsilon^{2}p(x,y),
 $$
 
 for some function $p(x,y)$.  This is referred to as the joint density of $X$ and $Y$.  Similar properties are true for this as we saw in the single variable case. Namely:
@@ -416,7 +403,7 @@ In this way, we can deal with multiple, potentially correlated random variables.
 ### Marginal Distributions
 When dealing with multiple variables, we often times want to be able to ignore the relationships and ask, "how is this one variable distributed?"  Such a distribution is called a *marginal distribution*.  
 
-To be concrete, let us suppose we have two random variables $X,Y$ with joint density given by $p _ {X,Y}(x,y)$.  I will be using the subscript to indicate what random variables the density is for.  The question of finding the marginal distribution is taking this function, and using it to find $p _ X(x)$.
+To be concrete, let us suppose that we have two random variables $X,Y$ with joint density given by $p _ {X,Y}(x,y)$.  I will be using the subscript to indicate what random variables the density is for.  The question of finding the marginal distribution is taking this function, and using it to find $p _ X(x)$.
 
 As with most things, it is best to return to the intuitive picture to figure out what should be true.  Recall that the density is the function $p _ X$ so that
 
@@ -459,17 +446,17 @@ $$
 
 This tells us that to get a marginal distribution, we integrate over the variables we do not care about.  This process is often referred to as *integrating out* or *marginalized out* the unneeded variables.
 
-### Covariance and correlation
+### Covariance and Correlation
 
 When dealing with multiple random variables, there is one additional summary statistic which is helpful to know: the *covariance*.  This measures the degree that two random variable fluctuate together.
 
-Suppose we have two random variables $X$ and $Y$, to begin with, Let us suppose they are discrete, taking on values $(x_i, y_j)$ with probability $p_{ij}$.  In this case, the covariance is defined as
+Suppose that we have two random variables $X$ and $Y$, to begin with, Let us suppose they are discrete, taking on values $(x_i, y_j)$ with probability $p_{ij}$.  In this case, the covariance is defined as
 
 $$
 \sigma_{XY} = \mathrm{cov}(X,Y) = \sum_{i,j} (x_i - \mu_X) (y_j-\mu_Y) p_{ij}.
 $$
 
-To think about this intuitively: consider the following pair of random variables.  Suppose $X$ takes the values $1$ and $3$, and $Y$ takes the values $-1$ and $3$.  Suppose we have the following probabilities
+To think about this intuitively: consider the following pair of random variables.  Suppose that $X$ takes the values $1$ and $3$, and $Y$ takes the values $-1$ and $3$.  Suppose that we have the following probabilities
 
 $$
 \begin{aligned}
@@ -503,6 +490,7 @@ $$
 To ensure that we understand, let us take a look at a collection of random variables with tunable covariance.
 
 ```{.python .input}
+# Plot a few random variables adjustable covariance
 covs = [-0.9, 0.0, 1.2]
 d2l.plt.figure(figsize=(12, 3))
 for i in range(3) :
@@ -539,7 +527,7 @@ This allows us to generalize the variance summation rule for correlated random v
 
 As we did in the case of means and variances, Let us now consider units.  If $X$ is measured in one unit (say inches), and $Y$ is measured in another (say dollars), the covariance is measured in the product of these two units $\text{inches}\cdot\text{dollars}$.  These units can be hard to interpret.  What we will often want in this case is a unit-less measurement of relatedness.  Indeed, often we do not care about exact quantitative correlation, but rather ask if the correlation is in the same direction, and how strong the relationship is.  
 
-To see what makes sense, Let us perform a thought experiment.  Suppose we convert our random variables in inches and dollars to be in inches and cents.  In this case the random variable $Y$ is multiplied by $100$.  If we work through the definition, this means that $\mathrm{cov}(X,Y)$ will be multiplied by $100$.  Thus we see that in this case a change of units change the covariance by a factor of $100$.  Thus, to find our unit-invariant measure of correlation, we will need to divide by something else that also gets scaled by $100$.  Indeed we have a clear candidate, the standard deviation!  Indeed if we define the *correlation coefficient* to be
+To see what makes sense, Let us perform a thought experiment.  Suppose that we convert our random variables in inches and dollars to be in inches and cents.  In this case the random variable $Y$ is multiplied by $100$.  If we work through the definition, this means that $\mathrm{cov}(X,Y)$ will be multiplied by $100$.  Thus we see that in this case a change of units change the covariance by a factor of $100$.  Thus, to find our unit-invariant measure of correlation, we will need to divide by something else that also gets scaled by $100$.  Indeed we have a clear candidate, the standard deviation!  Indeed if we define the *correlation coefficient* to be
 
 $$
 \mathrm{cor}(X,Y) = \frac{\mathrm{cov}(X,Y)}{\mathrm{sd}(X)\mathrm{sd{Y}}}
@@ -575,6 +563,7 @@ Thus we see that the correlation is $+1$ for any $a > 0$, and $-1$ for any $a < 
 To ensure that we understand, let us this time take a look at a collection of random variables with tunable correlation.
 
 ```{.python .input}
+# Plot a few random variables adjustable correlations
 cors = [-0.9, 0.0, 1.0]
 d2l.plt.figure(figsize=(12, 3))
 for i in range(3) :
@@ -621,7 +610,7 @@ Indeed if we think of norms as being related to standard deviations, and correla
 * The covariance and correlation coefficient provide a way to measure any linear relationship between two correlated random variables.
 
 ## Exercises
-1. Suppose I have the random variable with density given by $p(x) = \frac{1}{x^2}$ for $x \ge 1$ and $p(x) = 0$ otherwise.  What is $P(X > 2)$?
+1. Suppose that I have the random variable with density given by $p(x) = \frac{1}{x^2}$ for $x \ge 1$ and $p(x) = 0$ otherwise.  What is $P(X > 2)$?
 2. The Laplace distribution is a random variable whose density is given by $p(x = \frac{1}{2}e^{-|x|}$.  What is the mean and the standard deviation of this function?  As a hint, $\int_0^\infty xe^{-x} \; dx = 1$ and $\int_0^\infty x^2e^{-x} \; dx = 2$.
 3. I walk up to you on the street and say "I have a random variable with mean $1$, standard deviation $2$, and I observed $25\%$ of my samples taking a value larger than $9$."  Do you believe me?  Why or why not?
-4. Suppose you have two random variables $X, Y$, with joint density given by $p_{XY}(x,y) = 4xy$ for $x,y \in [0,1]$ and $p_{XY}(x,y) = 0$ otherwise.  What is the covariance of $X$ and $Y$?
+4. Suppose that you have two random variables $X, Y$, with joint density given by $p_{XY}(x,y) = 4xy$ for $x,y \in [0,1]$ and $p_{XY}(x,y) = 0$ otherwise.  What is the covariance of $X$ and $Y$?

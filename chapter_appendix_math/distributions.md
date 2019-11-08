@@ -1,7 +1,7 @@
 # Distributions
 :label:`sec_distributions`
 
-Now that we have learned about how to work with probability theory in both discrete and continuous setting, lets get to know some of the common random distributions encountered.  Depending on the area of machine learning we are working in, we may potentially need to be familiar with vastly more of these, or for some areas of deep learning potentially none at all.  This is, however, a good basic list to be familiar with.
+Now that we have learned about how to work with probability theory in both discrete and continuous setting, lets get to know some of the common random distributions encountered.  Depending on the area of machine learning we are working in, we may potentially need to be familiar with vastly more of these, or for some areas of deep learning potentially none at all.  This is, however, a good basic list to be familiar with.  Let's first import some common libraries.
 
 ```{.python .input}
 %matplotlib inline
@@ -29,7 +29,7 @@ F(x) = \begin{cases}
 \end{cases}
 $$
 
-Let us plot the probability mass function and cumulative distribution function.
+The probability mass function is plotted below.
 
 ```{.python .input}
 p = 0.3
@@ -40,6 +40,8 @@ d2l.plt.xlabel('x')
 d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
+
+Now, let us plot the cumulative distribution function.
 
 ```{.python .input}
 x = np.arange(-1, 2, 0.01)
@@ -53,9 +55,9 @@ If $X \sim \mathrm{Bernoulli}(p)$, then:
 * $\mu_X = p$,
 * $\sigma_X^2 = p(1-p)$.
 
-We can sample an array of arbitrary shape from a Bernoulli random variable in numpy as follows.
+We can sample an array of arbitrary shape from a Bernoulli random variable as follows.
 
-```
+```{.python .input}
 1*(np.random.rand(10, 10) < p)
 ```
 
@@ -78,7 +80,7 @@ F(x) = \begin{cases}
 \end{cases}
 $$
 
-Let us plot the probability mass function and cumulative distribution function.
+Let us first plot the probabilty mass function.
 
 ```{.python .input}
 n = 5
@@ -88,6 +90,8 @@ d2l.plt.xlabel('x')
 d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
+
+Now, let us plot the cumulative distribution function.
 
 ```{.python .input}
 x = np.arange(-1, 6, 0.01)
@@ -101,7 +105,7 @@ If $X \sim \mathrm{Uniform}(n)$, then:
 * $\mu_X = \frac{1+n}{2}$,
 * $\sigma_X^2 = \frac{n^2-1}{12}$.
 
-We can an array of arbitrary shape from a discrete uniform random variable in numpy as follows.  Note that the range
+We can an array of arbitrary shape from a discrete uniform random variable as follows.  Note that the range
 
 ```{.python .input}
 np.random.random_integers(1, n, size=(10, 10))
@@ -134,7 +138,7 @@ F(x) = \begin{cases}
 \end{cases}
 $$
 
-Let us plot the probability density function and cumulative distribution function.
+Let us first plot the probabilty density function.
 
 ```{.python .input}
 a = 1; b = 3
@@ -144,6 +148,8 @@ p = (x > a)*(x < b)/(b - a)
 
 d2l.plot(x, p, 'x', 'p.d.f.')
 ```
+
+Now, let us plot the cumulative distribution function.
 
 ```{.python .input}
 F = lambda x: 0 if x < a else 1 if x > b else (x-a)/(b-a)
@@ -156,9 +162,9 @@ If $X \sim \mathrm{Uniform}([a,b])$, then:
 * $\mu_X = \frac{a+b}{2}$,
 * $\sigma_X^2 = \frac{(b-a)^2}{12}$.
 
-We can an array of arbitrary shape from a uniform random variable in numpy as follows.  Note that it by default samples from a $\mathrm{Uniform}([a,b])$, so if we want a different range we need to scale it.
+We can an array of arbitrary shape from a uniform random variable as follows.  Note that it by default samples from a $\mathrm{Uniform}([a,b])$, so if we want a different range we need to scale it.
 
-```
+```{.python .input}
 (b - a) * np.random.rand(10, 10) + a
 ```
 
@@ -189,13 +195,13 @@ F(x) = \begin{cases}
 \end{cases}
 $$
 
-Let us plot the probability density function and cumulative distribution function.
+Let us first plot the probabilty mass function.
 
 ```{.python .input}
 n = 10
 p = 0.2
 
-# Compute Binomial Coefficient
+# Compute binomial coefficient
 def binom(n, k):
     comb = 1
     for i in range(min(k, n - k)):
@@ -210,6 +216,8 @@ d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
+Now, let us plot the cumulative distribution function.
+
 ```{.python .input}
 x = np.arange(-1, 11, 0.01)
 cmf = np.cumsum(pmf)
@@ -223,9 +231,9 @@ While this result is not simple, the means and variances are.  If $X \sim \mathr
 * $\mu_X = np$,
 * $\sigma_X^2 = np(1-p)$.
 
-This can be sampled in numpy as follows.
+This can be sampled as follows.
 
-```
+```{.python .input}
 np.random.binomial(n, p, size = (10,10))
 ```
 
@@ -268,7 +276,7 @@ e^{-\lambda}\sum_{m = 0}^k \frac{\lambda^m}{m!} & k \le x < k+1 \text{ with } 0 
 \end{cases}
 $$
 
-Let us plot the probabilty mass function and cumulative distibution function.
+Let us first plot the probabilty mass function.
 
 ```{.python .input}
 from math import factorial
@@ -283,6 +291,8 @@ d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
+Now, let us plot the cumulative distribution function.
+
 ```{.python .input}
 x = np.arange(-1, 21, 0.01)
 cmf = np.cumsum(pmf)
@@ -296,7 +306,7 @@ As we saw above, the means and variances are particularly concise.  If $X \sim \
 * $\mu_X = \lambda$,
 * $\sigma_X^2 = \lambda$.
 
-This can be sampled in numpy as follows.
+This can be sampled as follows.
 
 ```{.python .input}
 import numpy as np
@@ -345,7 +355,7 @@ $$
 p_X(x) = \frac{1}{\sqrt{2\pi\sigma^2}}e^{-\frac{(x-\mu)^2}{2\sigma^2}}.
 $$
 
-Let us plot the probability density function and cumulative distribution function.
+Let us first plot the probability density function.
 
 ```{.python .input}
 mu = 0; sigma = 1
@@ -355,6 +365,8 @@ p = 1/np.sqrt(2*np.pi*sigma**2)*np.exp(-((x-mu)**2)/(2*sigma**2))
 
 d2l.plot(x, p, 'x', 'p.d.f.')
 ```
+
+Now, let us plot the cumulative distribution function.
 
 ```{.python .input}
 from math import erf
@@ -389,7 +401,7 @@ To close the section, Let us recall that if $X \sim \mathcal{N}(\mu,\sigma^2)$, 
 * $\mu_X = \mu$,
 * $\sigma_X^2 = \sigma^2$.
 
-We can sample from the Gaussian (or normal) using numpy.
+We can sample from the Gaussian (or normal) as shown below.
 
 ```{.python .input}
 np.random.normal(mu, sigma, size=(10, 10))

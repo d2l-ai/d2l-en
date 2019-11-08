@@ -108,7 +108,7 @@ The dot product also admits a geometric interpretation: it is closely related to
 To start, let us consider two specific vectors:
 
 $$
-\mathbf{v} = (r,0) \text{ and } \mathbf{w} = (s\cos(\theta), s \sin(\theta)).
+\mathbf{v} = (r,0) \; \text{and} \; \mathbf{w} = (s\cos(\theta), s \sin(\theta)).
 $$
 
 The vector $\mathbf{v}$ is length $r$ and runs parallel to the $x$-axis, 
@@ -148,9 +148,7 @@ import d2l
 from IPython import display
 from mxnet import gluon, np, npx
 npx.set_np()
-```
 
-```{.python .input}
 def angle(v, w) :
     return np.arccos(v.dot(w)/(np.linalg.norm(v)*np.linalg.norm(w)))
 
@@ -216,7 +214,7 @@ In an $n$-dimensional vector space, a hyperplane has $d-1$ dimensions
 and divides the space into two half-spaces. 
 
 Let us start with an example.
-Suppose we have a column vector $\mathbf{w}=[2,1]^\top$. We want to know, "what are the points $\mathbf{v}$ with $\mathbf{w}\cdot\mathbf{v} = 1$?"
+Suppose that we have a column vector $\mathbf{w}=[2,1]^\top$. We want to know, "what are the points $\mathbf{v}$ with $\mathbf{w}\cdot\mathbf{v} = 1$?"
 By recalling the connection between dot products and angles above, 
 we can see that this is equivalent to 
 $$
@@ -273,7 +271,7 @@ To give a hand-built example, notice that we can produce a reasonable model
 to classify tiny images of t-shirts and trousers from the Fashion MNIST dataset 
 (seen in :numref:`sec_fashion_mnist`) 
 by just taking the vector between their means to define the decision plane
-and eyeball a crude threshold.
+and eyeball a crude threshold.  First we will load the data and compute the averages.
 
 ```{.python .input}
 # Load in the dataset
@@ -289,10 +287,12 @@ X_test = np.concatenate([np.expand_dims(
 y_test = np.concatenate([np.expand_dims(
     x[1], 0) for x in test if x[1] == 0 or x[1] == 1], axis=0).astype(float)
 
-# Compute Averages
+# Compute averages
 ave_0 = np.mean(X_train_0, axis=0)
 ave_1 = np.mean(X_train_1, axis=0)
 ```
+
+It can be informative to examine these averages in detail, so let us plot what they look like.  In this case, we see that the average indeed resembles a blurry image of a t-shirt.
 
 ```{.python .input}
 # Plot average t-shirt
@@ -301,11 +301,15 @@ d2l.plt.imshow(ave_0.reshape(28, 28).tolist(), cmap='Greys')
 d2l.plt.show()
 ```
 
+In the second case, we again see that the average resembles a blurry image of trousers.
+
 ```{.python .input}
 # Plot average trousers
 d2l.plt.imshow(ave_1.reshape(28, 28).tolist(), cmap='Greys')
 d2l.plt.show()
 ```
+
+In a fully machine learned solution, we would learn the threshold from the dataset.  In this case, I simply eyeballed a threshold that looked good on the training data by hand.
 
 ```{.python .input}
 # Print test set accuracy with eyeballed threshold
@@ -314,7 +318,7 @@ predictions = 1*(X_test.reshape(2000, -1).dot(w.flatten()) > -1500000)
 np.mean(predictions==y_test)  # Accuracy
 ```
 
-## Geometry of linear transformations
+## Geometry of Linear Transformations
 
 Through :numref:`sec_scalar-tensor` and the above discussions, 
 we have a solid understanding of the geometry of vectors, lengths, and angles. 
@@ -324,7 +328,7 @@ between two potentially different high dimensional spaces takes significant prac
 and is beyond the scope of this appendix. 
 However, we can start building up intuition in two dimensions.
 
-Suppose we have some matrix:
+Suppose that we have some matrix:
 
 $$
 \mathbf{A} = \begin{bmatrix}
@@ -701,7 +705,7 @@ however, as a beginner, it is easy to overlook their importance.
 Below, we introduce eigendecomposition and 
 try to convey some sense of just why it is so important. 
 
-Suppose we have a matrix $A$ with the following entries:
+Suppose that we have a matrix $A$ with the following entries:
 
 $$
 \mathbf{A} = \begin{bmatrix}
@@ -773,7 +777,7 @@ $$
 \begin{bmatrix}
 2 & 1\\
 2 & 3 
-\end{bmatrix}\begin{bmatrix}x \\ y\end{bmatrix} = \begin{bmatrix}x \\ y\end{bmatrix}  \text{ and }
+\end{bmatrix}\begin{bmatrix}x \\ y\end{bmatrix} = \begin{bmatrix}x \\ y\end{bmatrix}  \; \text{and} \;
 \begin{bmatrix}
 2 & 2\\
 1 & 3 
@@ -782,7 +786,7 @@ $$
 
 We can solve this with the vectors $[1,-1]^\top$ and $[1,2]^\top$ respectively.
 
-We can check this in code using the built-in numpy `numpy.linalg.eig` routine.
+We can check this in code using the built-in `numpy.linalg.eig` routine.
 
 ```{.python .input}
 np.linalg.eig(np.array([[2, 1], [2, 3]]))
@@ -967,7 +971,7 @@ It is a small thing, but with a complex
 and subtle topic like eigendecomposition, 
 it is good to get any intuitive grasp we can.
 
-### A useful application: The growth of iterated maps
+### A Useful Application: The Growth of Iterated Maps
 
 Now that we understand what eigenvectors are in principle,
 let us see how they can be used to provide a deep understanding 
@@ -1001,7 +1005,7 @@ A = np.random.randn(k, k)
 A
 ```
 
-### Behavior on random data
+### Behavior on Random Data
 For simplicity in our toy model, 
 we will assume that the data vector we feed in $\mathbf{v}_{in}$ 
 is a random five dimensional Gaussian vector.
@@ -1055,7 +1059,7 @@ we see that the random vector is stretched by a factor of `1.974459321485[...]`,
 where the portion at the end shifts a little, 
 but the stretching factor is stable.  
 
-### Relating back to eigenvectors
+### Relating Back to Eigenvectors
 
 We have seen that eigenvectors and eigenvalues correspond 
 to the amount something is stretched, 
@@ -1069,14 +1073,14 @@ By taking the norm of the complex number
 we can measure that stretching factor. Let us also sort them.
 
 ```{.python .input}
-# Compute the Eigenvalues
+# Compute the eigenvalues
 eigs = np.linalg.eigvals(A).tolist()
 norm_eigs = [np.absolute(x) for x in eigs]
 norm_eigs.sort()
 "Norms of eigenvalues: {}".format(norm_eigs)
 ```
 
-### An observation
+### An Observation
 
 We see something a bit unexpected happening here: 
 that number we identified before for the 
@@ -1110,7 +1114,7 @@ Indeed this algorithm is the basis
 for what is known as the [power iteration method](https://en.wikipedia.org/wiki/Power_iteration)
 for finding the largest eigenvalue and eigenvector of a matrix.
 
-### Fixing the normalization
+### Fixing the Normalization
 
 Now, from above discussions, we concluded 
 that we do not want a random vector to be stretched or squished at all,
@@ -1219,13 +1223,13 @@ we have seen before can be expressed in this compressed tensor notation:
 
 In this way, we can replace a myriad of specialized notations with short tensor expressions.
 
-## Expressing in numpy
+## Expressing in Code
 Tensors may flexibly be operated on in code as well.
 As seen in :numref:`sec_scalar-tensor`, 
-we can create tensors using numpy arrays.
+we can create tensors as is shown below.
 
 ```{.python .input}
-# Define Tensors
+# Define tensors
 B = np.array([[[1, 2, 3], [4, 5, 6]], [[7, 8, 9], [10, 11, 12]]])
 A = np.array([[1, 2], [3, 4]])
 v = np.array([1, 2])
@@ -1234,13 +1238,13 @@ v = np.array([1, 2])
 A.shape, B.shape, v.shape
 ```
 
-Einstein summation has been implemented directly in numpy via ```np.einsum```. 
+Einstein summation has been implemented directly  via ```np.einsum```. 
 The indices that occurs in the Einstein summation can be passed as a string, 
 followed by the tensors that are being acted upon.
 For instance, to implement matrix multiplication,
 we can consider the Einstein summation seen above
 ($\mathbf{A}\mathbf{v} = a_{ij}v_j$)
-and strip out the indices themselves to get the implementation in numpy:
+and strip out the indices themselves to get the implementation:
 
 ```{.python .input}
 # Reimplement matrix multiplication
@@ -1264,7 +1268,7 @@ np.einsum("ijk, il, j -> kl", B, A, v)
 This notation is readable and efficient for humans,
 however bulky if for whatever reason 
 we need to generate a tensor contraction programmatically.
-For this reason, numpy provides an alternative notation 
+For this reason, `einsum` provides an alternative notation 
 by providing integer indices for each tensor.
 For example, the same tensor contraction can also be written as:
 
@@ -1295,7 +1299,7 @@ $$
 \end{bmatrix}?
 $$
 1. True or false: $\begin{bmatrix}1 & 2\\0&1\end{bmatrix}$ and $\begin{bmatrix}1 & -2\\0&1\end{bmatrix}$ are inverses of one another?
-1. Suppose we draw a shape in the plane with area $100\mathrm{m}^2$.  What is the area after transforming the figure by the matrix
+1. Suppose that we draw a shape in the plane with area $100\mathrm{m}^2$.  What is the area after transforming the figure by the matrix
 $$
 \begin{bmatrix}
 2 & 3\\
@@ -1306,7 +1310,7 @@ $$
  * $\left\{\begin{pmatrix}1\\0\\-1\end{pmatrix},\begin{pmatrix}2\\1\\-1\end{pmatrix},\begin{pmatrix}3\\1\\1\end{pmatrix}\right\}$
  * $\left\{\begin{pmatrix}3\\1\\1\end{pmatrix},\begin{pmatrix}1\\1\\1\end{pmatrix},\begin{pmatrix}0\\0\\0\end{pmatrix}\right\}$
  * $\left\{\begin{pmatrix}1\\1\\0\end{pmatrix},\begin{pmatrix}0\\1\\-1\end{pmatrix},\begin{pmatrix}1\\0\\1\end{pmatrix}\right\}$
-1. Suppose you have a matrix written as $A = \begin{bmatrix}c\\d\end{bmatrix}\cdot\begin{bmatrix}a & b\end{bmatrix}$ for some choice of values $a,b,c,$ and $d$.  True or false: the determinant of such a matrix is always $0$?
+1. Suppose that you have a matrix written as $A = \begin{bmatrix}c\\d\end{bmatrix}\cdot\begin{bmatrix}a & b\end{bmatrix}$ for some choice of values $a,b,c,$ and $d$.  True or false: the determinant of such a matrix is always $0$?
 1. The vectors $e_1 = \begin{bmatrix}1\\0\end{bmatrix}$ and $e_2 = \begin{bmatrix}0\\1\end{bmatrix}$ are orthogonal.  What is the condition on a matrix $A$ so that $Ae_1$ and $Ae_2$ are orthogonal?
 1. What are the eigenvalues and eigenvectors of
 $$
@@ -1331,4 +1335,4 @@ $$
 1.0 & 0.2 & 0.0 & 1.8
 \end{bmatrix}.
 $$
-1. How can you write $\mathrm{tr}(\mathbf{A}^4)$ in Einstein notation?
+1. How can you write $\mathrm{tr}(\mathbf{A}^4)$ in Einstein notation for an arbitrary matrix $A$?
