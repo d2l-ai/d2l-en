@@ -123,7 +123,7 @@ for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
 
 ## Exercises
 
-* Compare Seq2SeqAttentionDecoder versus the standard Seq2seqDecoder. Use the same parameters and compare their losses.
+* Compare `Seq2SeqAttentionDecoder` versus the standard `Seq2seqDecoder`. Use the same parameters and compare their losses.
 
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/seq2seq-attention/4345)
