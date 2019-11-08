@@ -152,7 +152,7 @@ of the objective function $J=L+s$
 with respect to the loss term $L$
 and the regularization term $s$.
 
-$$\frac{\partial J}{\partial L} = 1 \text{ and } \frac{\partial J}{\partial s} = 1$$
+$$\frac{\partial J}{\partial L} = 1 \; \text{and} \; \frac{\partial J}{\partial s} = 1$$
 
 Next, we compute the gradient of the objective function
 with respect to variable of the output layer $\mathbf{o}$
@@ -169,7 +169,7 @@ Next, we calculate the gradients of the regularization term
 with respect to both parameters.
 
 $$\frac{\partial s}{\partial \mathbf{W}^{(1)}} = \lambda \mathbf{W}^{(1)}
-\text{ and }
+\; \text{and} \;
 \frac{\partial s}{\partial \mathbf{W}^{(2)}} = \lambda \mathbf{W}^{(2)}$$
 
 Now we are able calculate the gradient
