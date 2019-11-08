@@ -279,14 +279,12 @@ and eyeball a crude threshold.
 train = gluon.data.vision.FashionMNIST(train=True) 
 test = gluon.data.vision.FashionMNIST(train=False)
 
-X_train_0 = np.concatenate([np.expand_dims(
-    x[0], 0) for x in train if x[1] == 0], axis=0).astype(float)
-X_train_1 = np.concatenate([np.expand_dims(
-    x[0], 0) for x in train if x[1] == 1], axis=0).astype(float)
-X_test = np.concatenate([np.expand_dims(
-    x[0], 0) for x in test if x[1] == 0 or x[1] == 1], axis=0).astype(float)
-y_test = np.concatenate([np.expand_dims(
-    x[1], 0) for x in test if x[1] == 0 or x[1] == 1], axis=0).astype(float)
+X_train_0 = np.stack([x[0] for x in train if x[1] == 0]).astype(float)
+X_train_1 = np.stack([x[0] for x in train if x[1] == 1]).astype(float)
+X_test = np.stack(
+    [x[0] for x in test if x[1] == 0 or x[1] == 1]).astype(float)
+y_test = np.stack(
+    [x[1] for x in test if x[1] == 0 or x[1] == 1]).astype(float)
 
 # Compute Averages
 ave_0 = np.mean(X_train_0,axis=0)
@@ -1291,35 +1289,35 @@ $$
 3 \\ 1 \\ 0 \\ 1
 \end{bmatrix}?
 $$
-1. True or false: $\begin{bmatrix}1 & 2\\0&1\end{bmatrix}$ and $\begin{bmatrix}1 & -2\\0&1\end{bmatrix}$ are inverses of one another?
-1. Suppose we draw a shape in the plane with area $100\mathrm{m}^2$.  What is the area after transforming the figure by the matrix
+2. True or false: $\begin{bmatrix}1 & 2\\0&1\end{bmatrix}$ and $\begin{bmatrix}1 & -2\\0&1\end{bmatrix}$ are inverses of one another?
+3. Suppose we draw a shape in the plane with area $100\mathrm{m}^2$.  What is the area after transforming the figure by the matrix
 $$
 \begin{bmatrix}
 2 & 3\\
 1 & 2
 \end{bmatrix}.
 $$
-1. Which of the following sets of vectors are linearly independent?
+4. Which of the following sets of vectors are linearly independent?
  * $\left\{\begin{pmatrix}1\\0\\-1\end{pmatrix},\begin{pmatrix}2\\1\\-1\end{pmatrix},\begin{pmatrix}3\\1\\1\end{pmatrix}\right\}$
  * $\left\{\begin{pmatrix}3\\1\\1\end{pmatrix},\begin{pmatrix}1\\1\\1\end{pmatrix},\begin{pmatrix}0\\0\\0\end{pmatrix}\right\}$
  * $\left\{\begin{pmatrix}1\\1\\0\end{pmatrix},\begin{pmatrix}0\\1\\-1\end{pmatrix},\begin{pmatrix}1\\0\\1\end{pmatrix}\right\}$
-1. Suppose you have a matrix written as $A = \begin{bmatrix}c\\d\end{bmatrix}\cdot\begin{bmatrix}a & b\end{bmatrix}$ for some choice of values $a,b,c,$ and $d$.  True or false: the determinant of such a matrix is always $0$?
-1. The vectors $e_1 = \begin{bmatrix}1\\0\end{bmatrix}$ and $e_2 = \begin{bmatrix}0\\1\end{bmatrix}$ are orthogonal.  What is the condition on a matrix $A$ so that $Ae_1$ and $Ae_2$ are orthogonal?
-1. What are the eigenvalues and eigenvectors of
+5. Suppose you have a matrix written as $A = \begin{bmatrix}c\\d\end{bmatrix}\cdot\begin{bmatrix}a & b\end{bmatrix}$ for some choice of values $a,b,c,$ and $d$.  True or false: the determinant of such a matrix is always $0$?
+6. The vectors $e_1 = \begin{bmatrix}1\\0\end{bmatrix}$ and $e_2 = \begin{bmatrix}0\\1\end{bmatrix}$ are orthogonal.  What is the condition on a matrix $A$ so that $Ae_1$ and $Ae_2$ are orthogonal?
+7. What are the eigenvalues and eigenvectors of
 $$
 \mathbf{A} = \begin{bmatrix}
 2 & 1 \\
 1 & 2
 \end{bmatrix}?
 $$
-1.  What are the eigenvalues and eigenvectors of the following matrix, and what is strange about this example compared to the previous one?
+8.  What are the eigenvalues and eigenvectors of the following matrix, and what is strange about this example compared to the previous one?
 $$
 \mathbf{A} = \begin{bmatrix}
 2 & 1 \\
 0 & 2
 \end{bmatrix}?
 $$
-1. Without computing the eigenvalues, is it possible that the smallest eigenvalue of the following matrix is less that $0.5$? *Note*: this problem can be done in your head.
+9. Without computing the eigenvalues, is it possible that the smallest eigenvalue of the following matrix is less that $0.5$? *Note*: this problem can be done in your head.
 $$
 \mathbf{A} = \begin{bmatrix}
 3.0 & 0.1 & 0.3 & 1.0 \\
@@ -1328,4 +1326,4 @@ $$
 1.0 & 0.2 & 0.0 & 1.8
 \end{bmatrix}
 $$
-1. How can you write $\mathrm{tr}(\mathbf{A}^4)$ in Einstein notation?
+10. How can you write $\mathrm{tr}(\mathbf{A}^4)$ in Einstein notation?
