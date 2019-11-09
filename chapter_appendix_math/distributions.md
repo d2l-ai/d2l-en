@@ -8,8 +8,7 @@ Now that we have learned about how to work with probability theory in both discr
 import d2l
 from IPython import display
 from math import erf, factorial
-from mxnet import np, npx
-npx.set_np()
+import numpy as np
 ```
 
 ## Bernoulli
@@ -309,7 +308,6 @@ As we saw above, the means and variances are particularly concise.  If $X \sim \
 This can be sampled as follows.
 
 ```{.python .input}
-import numpy as np
 np.random.poisson(lam, size=(10, 10))
 ```
 
