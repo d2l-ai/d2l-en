@@ -36,7 +36,7 @@ $$
 This may look like a mess, but we can make this more familiar by noting that the sum on the right looks exactly like a dot product, so if we let
 
 $$
-\boldsymbol{\epsilon} = [\epsilon_1, \ldots, \epsilon_N]^\top, \; \text{and} \;
+\boldsymbol{\epsilon} = [\epsilon_1, \ldots, \epsilon_N]^\top \; \text{and} \;
 \nabla_{\mathbf{x}} L = \left[\frac{\partial L}{\partial x_1}, \ldots, \frac{\partial L}{\partial x_N}\right]^\top,
 $$
 
@@ -74,16 +74,17 @@ We can test this in code to see how good the approximation is.
 %matplotlib inline
 import d2l
 from IPython import display
-from mxnet import np, npx
+from mpl_toolkits import mplot3d
+from mxnet import np, npx, autograd
 npx.set_np()
 
 f = lambda x, y : np.log(np.exp(x) + np.exp(y))
-grad_f = lambda x, y : np.array([np.exp(x)/(np.exp(x)+np.exp(y)), 
-                                np.exp(y)/(np.exp(x)+np.exp(y))])
+grad_f = lambda x, y : np.array([np.exp(x) / (np.exp(x) + np.exp(y)), 
+                                np.exp(y) / (np.exp(x) + np.exp(y))])
 
 epsilon = np.array([0.01, -0.03])
 grad_approx = f(0, np.log(2)) + epsilon.dot(grad_f(0, np.log(2)))
-true_value = f(0+epsilon[0], np.log(2)+epsilon[1])
+true_value = f(0 + epsilon[0], np.log(2) + epsilon[1])
 "Approximation: {}, True Value: {}".format(grad_approx, true_value)
 ```
 
@@ -156,7 +157,7 @@ d2l.plot(x, f, 'x', 'f(x)')
 This highlights an important fact to know when working either theoretically or numerically: the only possible points where we can minimize (or maximize) a function will have gradient equal to zero, however, not every point with gradient zero is the minimum (or maximum).  
 
 ## Multivariate Chain Rule
-Let us suppose that we have a function of four variables ($w,x,y,z$) which we can make by composing many terms:
+Let us suppose that we have a function of four variables ($w,x,y$, and $z$) which we can make by composing many terms:
 
 $$
 \begin{aligned}
@@ -174,23 +175,23 @@ Such chains of equations are common when working with neural networks, so trying
 Nothing stops us from just composing everything and writing out that
 
 $$
-f(w,x,y,z) = (((w+x+y+z)^2+(w+x-y-z)^2)^2+((w+x+y+z)^2-(w+x-y-z)^2)^2)^2,
+f(w,x,y,z) = \left(\left((w+x+y+z)^2+(w+x-y-z)^2\right)^2+\left((w+x+y+z)^2-(w+x-y-z)^2\right)^2\right)^2,
 $$
 
 and then taking the derivative by just using good old single variable derivatives, but if we did that we would quickly find ourself swamped with terms, many of which are repeats!  Indeed, one can see that, for instance:
 
 $$
 \begin{aligned}
-\frac{\partial f}{\partial w} & = 2 (2 (2 (w + x + y + z) - 2 (w + x - y - z)) ((w + x + y + z)^{2}- (w + x - y - z)^{2}) + \\
-& \quad 2 (2 (w + x - y - z) + 2 (w + x + y + z)) ((w + x - y - z)^{2}+ (w + x + y + z)^{2})) \times \\
-& \quad (((w + x + y + z)^{2}- (w + x - y - z)^2)^{2}+ ((w + x - y - z)^{2}+ (w + x + y + z)^{2})^{2}).
+\frac{\partial f}{\partial w} & = 2 \left(2 \left(2 (w + x + y + z) - 2 (w + x - y - z)\right) \left((w + x + y + z)^{2}- (w + x - y - z)^{2}\right) + \right.\\
+& \left. \quad 2 \left(2 (w + x - y - z) + 2 (w + x + y + z)\right) \left((w + x - y - z)^{2}+ (w + x + y + z)^{2}\right)\right) \times \\
+& \quad \left(\left((w + x + y + z)^{2}- (w + x - y - z)^2\right)^{2}+ \left((w + x - y - z)^{2}+ (w + x + y + z)^{2}\right)^{2}\right).
 \end{aligned}
 $$
 
 If we then also wanted to compute $\frac{\partial f}{\partial x}$, we would end up with a similar equation again with many repeated terms, and many *shared* repeated terms between the two derivatives.  This represents a massive quantity of wasted work, and if we needed to compute derivatives this way, the whole deep learning revolution would have stalled out before it began!
 
 
-Let us start by trying to understand how $f$ changes when we change $a$---essentially assuming that $w,x,y,z$ all do not exist.  We will reason as we did back when we worked with the gradient for the first time.  Let us take $a$ and add a small amount $\epsilon$ to it. 
+Let us start by trying to understand how $f$ changes when we change $a$---essentially assuming that $w,x,y$, and $z$ all do not exist.  We will reason as we did back when we worked with the gradient for the first time.  Let us take $a$ and add a small amount $\epsilon$ to it. 
 
 $$
 \begin{aligned}
@@ -246,14 +247,10 @@ Let us try using this decomposition to compute $\frac{\partial f}{\partial w}$. 
 
 $$
 \begin{aligned}
-\frac{\partial f}{\partial u} & = 2(u+v),\\
-\frac{\partial f}{\partial v} & = 2(u+v),\\
-\frac{\partial u}{\partial a} & = 2(a+b),\\
-\frac{\partial u}{\partial b} & = 2(a+b),\\
-\frac{\partial v}{\partial a} & = 2(a-b),\\
-\frac{\partial v}{\partial b} & = -2(a-b),\\
-\frac{\partial a}{\partial w} & = 2(w+x+y+z),\\
-\frac{\partial b}{\partial w} & = 2(w+x-y-z).
+\frac{\partial f}{\partial u} = 2(u+v),& \quad\frac{\partial f}{\partial v} = 2(u+v),\\
+\frac{\partial u}{\partial a} = 2(a+b),& \quad\frac{\partial u}{\partial b} = 2(a+b),\\
+\frac{\partial v}{\partial a} = 2(a-b),& \quad\frac{\partial v}{\partial b} = -2(a-b),\\
+\frac{\partial a}{\partial w} = 2(w+x+y+z),& \quad\frac{\partial b}{\partial w} = 2(w+x-y-z).
 \end{aligned}
 $$
 
@@ -261,19 +258,19 @@ If we write this out into code this becomes a fairly manageable expression.
 
 ```{.python .input}
 # Compute the value of the function from inputs to outputs
-w = -1; x = 0; y = -2; z = 1
-a = (w+x+y+z)**2; b = (w+x-y-z)**2
-u = (a+b)**2; v = (a-b)**2
-f = (u+v)**2
+w, x, y, z = -1, 0, -2, 1
+a, b = (w + x + y + z)**2, (w + x - y - z)**2
+u, v = (a + b)**2, (a - b)**2
+f = (u + v)**2
 print("    f at {}, {}, {}, {} is {}".format(w, x, y, z, f))
 
 # Compute the single step partials
-df_du = 2*(u+v); df_dv = 2*(u+v)
-du_da = 2*(a+b); du_db = 2*(a+b); dv_da = 2*(a-b); dv_db = -2*(a-b)
-da_dw = 2*(w+x+y+z); db_dw = 2*(w+x-y-z)
+df_du, df_dv = 2*(u + v), 2*(u + v)
+du_da, du_db, dv_da, dv_db = 2*(a + b), 2*(a + b), 2*(a - b), -2*(a - b)
+da_dw, db_dw = 2*(w + x + y + z), 2*(w + x - y - z)
 
 # Compute the final result from inputs to outputs
-du_dw = du_da*da_dw + du_db*db_dw; dv_dw = dv_da*da_dw + dv_db*db_dw
+du_dw, dv_dw = du_da*da_dw + du_db*db_dw, dv_da*da_dw + dv_db*db_dw
 df_dw = df_du*du_dw + df_dv*dv_dw
 print("df/dw at {}, {}, {}, {} is {}".format(w, x, y, z, df_dw))
 ```
@@ -304,25 +301,25 @@ and then keeping track of how $f$ changes when we change *any* node in the entir
 
 ```{.python .input}
 # Compute the value of the function from inputs to outputs
-w = -1; x = 0; y = -2; z = 1
-a = (w+x+y+z)**2; b = (w+x-y-z)**2
-u = (a+b)**2; v = (a-b)**2
-f = (u+v)**2
+w, x, y, z = -1, 0, -2, 1
+a, b = (w + x + y + z)**2, (w + x - y - z)**2
+u, v = (a + b)**2, (a - b)**2
+f = (u + v)**2
 print("    f at {}, {}, {}, {} is {}".format(w, x, y, z, f))
 
 # Compute the derivative using the decomposition above
 # First compute the single step partials
-df_du = 2*(u+v); df_dv = 2*(u+v)
-du_da = 2*(a+b); du_db = 2*(a+b); dv_da = 2*(a-b); dv_db = -2*(a-b)
-da_dw = 2*(w+x+y+z); db_dw = 2*(w+x-y-z)
-da_dx = 2*(w+x+y+z); db_dx = 2*(w+x-y-z)
-da_dy = 2*(w+x+y+z); db_dy = -2*(w+x-y-z)
-da_dz = 2*(w+x+y+z); db_dz = -2*(w+x-y-z); 
+df_du, df_dv = 2*(u + v), 2*(u + v)
+du_da, du_db, dv_da, dv_db = 2*(a + b), 2*(a + b), 2*(a - b), -2*(a - b)
+da_dw, db_dw = 2*(w + x + y + z), 2*(w + x - y - z)
+da_dx, db_dx = 2*(w + x + y + z), 2*(w + x - y - z)
+da_dy, db_dy = 2*(w + x + y + z), -2*(w + x - y - z)
+da_dz, db_dz = 2*(w + x + y + z), -2*(w + x - y - z); 
 
 # Now compute how f changes when we change any value from output to input
-df_da = df_du*du_da + df_dv*dv_da; df_db = df_du*du_db + df_dv*dv_db
-df_dw = df_da*da_dw + df_db*db_dw; df_dx = df_da*da_dx + df_db*db_dx
-df_dy = df_da*da_dy + df_db*db_dy; df_dz = df_da*da_dz + df_db*db_dz
+df_da, df_db = df_du*du_da + df_dv*dv_da, df_du*du_db + df_dv*dv_db
+df_dw, df_dx = df_da*da_dw + df_db*db_dw, df_da*da_dx + df_db*db_dx
+df_dy, df_dz = df_da*da_dy + df_db*db_dy, df_da*da_dz + df_db*db_dz
 print("df/dw at {}, {}, {}, {} is {}".format(w, x, y, z, df_dw))
 print("df/dx at {}, {}, {}, {} is {}".format(w, x, y, z, df_dx))
 print("df/dy at {}, {}, {}, {} is {}".format(w, x, y, z, df_dy))
@@ -338,17 +335,15 @@ This is precisely what every deep learning algorithm implements to allow the com
 To see how MXNet has encapsulated this, let us take a quick look at this example.
 
 ```{.python .input}
-from mxnet import autograd
-
 # Initialize as NDArrays, attaching gradients
-w = np.array(-1); x = np.array(0); y = np.array(-2); z = np.array(1)
+w, x, y, z = np.array(-1), np.array(0), np.array(-2), np.array(1)
 w.attach_grad(); x.attach_grad(); y.attach_grad(); z.attach_grad()
 
 # Do the computation like usual, tracking gradients
 with autograd.record():
-    a = (w+x+y+z)**2; b = (w+x-y-z)**2
-    u = (a+b)**2; v = (a-b)**2
-    f = (u+v)**2
+    a, b = (w + x + y + z)**2, (w + x - y - z)**2
+    u, v = (a + b)**2, (a - b)**2
+    f = (u + v)**2
 
 # Execute backward pass
 f.backward()
@@ -381,7 +376,7 @@ $$
 \end{bmatrix}.
 $$
 
-Not every entry of this matrix is independent.  Indeed, we can show that as long as both *mixed partials* (partial derivatives with respect to more than one variable) exist and are continuous, we can say that for any $i,j$, 
+Not every entry of this matrix is independent.  Indeed, we can show that as long as both *mixed partials* (partial derivatives with respect to more than one variable) exist and are continuous, we can say that for any $i$, and $j$, 
 
 $$
 \frac{d^2f}{dx_idx_j} = \frac{d^2f}{dx_jdx_i}.
@@ -427,19 +422,17 @@ $$
 And thus, with a little algebra, see that the approximating quadratic at $[-1,0]^\top$ is
 
 $$
-f(x,y) \approx e^{-1}(-1 - (x+1) +2(x+1)^2+2y^2).
+f(x,y) \approx e^{-1}\left(-1 - (x+1) +2(x+1)^2+2y^2\right).
 $$
 
 ```{.python .input}
-from mpl_toolkits import mplot3d
-
 # Construct grid and compute function
 x, y = np.meshgrid(np.linspace(-2, 2, 101), 
                    np.linspace(-2, 2, 101), indexing='ij')
 z = x*np.exp(- x**2 - y**2)
 
 # Compute gradient and Hessian at (1, 0)
-w = np.exp(-1)*(-1 - (x+1) + 2*(x+1)**2 + 2*y**2)
+w = np.exp(-1)*(-1 - (x + 1) + 2 * (x + 1)**2 + 2 * y**2)
 
 # Plot function
 ax = d2l.plt.figure().add_subplot(111, projection='3d')
@@ -447,7 +440,8 @@ ax.plot_wireframe(x, y, z, **{'rstride': 10, 'cstride': 10})
 ax.plot_wireframe(x, y, w, **{'rstride': 10, 'cstride': 10}, color = 'purple')
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('y')
-ax.set_xlim(-2, 2); ax.set_ylim(-2, 2); ax.set_zlim(-1, 1);
+ax.set_xlim(-2, 2); ax.set_ylim(-2, 2); ax.set_zlim(-1, 1)
+ax.dist = 12
 ```
 
 This forms the basis for Newton's Algorithm discussed in :numref:`sec_gd`, where we perform numerical optimization iteratively finding the best fitting quadratic, and then exactly minimizing that quadratic.
@@ -601,10 +595,10 @@ $$
 \frac{d}{d\mathbf{V}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^2,
 $$
 
-we must find for every $a,b$
+we must find for every $a$, and $b$
 
 $$
-\frac{d}{dv_{ab}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= \frac{d}{dv_{ab}} \sum_{i,j}(x_{ij} - \sum_k u_{ik}v_{kj})^2.
+\frac{d}{dv_{ab}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= \frac{d}{dv_{ab}} \sum_{i,j}\left(x_{ij} - \sum_k u_{ik}v_{kj}\right)^2.
 $$
 
 Recalling that all entries of $\mathbf{X}$ and $\mathbf{U}$ are constants as far as $\frac{d}{dv_{ab}}$ is concerned, we may push the derivative inside the sum, and apply the chain rule to the square to get
@@ -634,7 +628,7 @@ $$
 So the entire expression in the inside of the sum is
 
 $$
-\left(x_{ib} - \sum_k u_{ik}v_{kb}\right) = [\mathbf{X}-\mathbf{U}\mathbf{V}]_{ib}.
+x_{ib} - \sum_k u_{ik}v_{kb} = [\mathbf{X}-\mathbf{U}\mathbf{V}]_{ib}.
 $$
 
 This means we may now write our derivative as
@@ -663,7 +657,7 @@ $$
 
 This matches the solution we guessed above!
 
-It is reasonable to ask at this point, "Why can I not just write down matrix versions of all the calculus rules I have learned?  It is clear this is still mechanical.  Why do we not just get it over with!"  And indeed there are such rules, and [The Matrix Cookbook](https://www.math.uwaterloo.ca/~hwolkowi/matrixcookbook.pdf) provides an excellent summary.  However, due to the plethora of ways matrix operations can be combined compared to single values, there are many more matrix derivative rules than single variable ones.  It is often the case that it is best to work with the indices, or leave it up to automatic differentiation when appropriate.
+It is reasonable to ask at this point, "Why can I not just write down matrix versions of all the calculus rules I have learned?  It is clear this is still mechanical.  Why do we not just get it over with!"  And indeed there are such rules which may be found in :cite:`Petersen.Pedersen.ea.2008` provides an excellent summary.  However, due to the plethora of ways matrix operations can be combined compared to single values, there are many more matrix derivative rules than single variable ones.  It is often the case that it is best to work with the indices, or leave it up to automatic differentiation when appropriate.
 
 ## Summary
 

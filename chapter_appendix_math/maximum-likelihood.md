@@ -48,11 +48,11 @@ In any case, for our example, the plot of $P(X \mid \theta)$ is as follows
 ```{.python .input}
 %matplotlib inline
 import d2l
-from mxnet import np, npx
+from mxnet import autograd, np, npx
 npx.set_np()
 
 theta = np.arange(0, 1, 0.001)
-p = theta**9*(1-theta)**4.
+p = theta**9 * (1 - theta)**4.
 
 d2l.plot(theta, p, 'theta', 'likelihood')
 ```
@@ -101,9 +101,6 @@ $$
 This can be written into code, and freely optimized with gradient descent even for billions of coin flips.
 
 ```{.python .input}
-from mxnet import autograd, np, npx
-npx.set_np()
-
 # Set up our data
 n_H = 8675309
 n_T = 25624
@@ -115,12 +112,12 @@ theta = np.array(0.5); theta.attach_grad()
 lr = 0.00000000001
 for iter in range(10) :
     with autograd.record():
-        loss = -(n_H*np.log(theta) + n_T*np.log(1-theta))
+        loss = -(n_H * np.log(theta) + n_T * np.log(1 - theta))
     loss.backward()
-    theta -= lr*theta.grad
+    theta -= lr * theta.grad
 
 # Check output
-theta, n_H/(n_H+n_T)
+theta, n_H / (n_H + n_T)
 ```
 
 Numerical convenience is only one reason people like to use negative log-likelihoods.  Indeed, there are a number of reasons that it can be preferable.

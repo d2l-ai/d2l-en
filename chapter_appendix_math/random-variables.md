@@ -50,8 +50,8 @@ npx.set_np()
 
 # Plot the probability density function for some random variable
 x = np.arange(-5, 5, 0.01)
-p = 0.2*np.exp(-(x-3)**2/2)/np.sqrt(2*np.pi) + 
-    0.8*np.exp(-(x+1)**2/2)/np.sqrt(2*np.pi)
+p = 0.2*np.exp(-(x - 3)**2 / 2)/np.sqrt(2 * np.pi) + 
+    0.8*np.exp(-(x + 1)**2 / 2)/np.sqrt(2 * np.pi)
 
 d2l.plot(x, p, 'x', 'Density')
 ```
@@ -94,8 +94,8 @@ We may approximate this is code by using the same discrete approximation methods
 # Approximate probability using numerical integration
 epsilon = 0.01
 x = np.arange(-5, 5, 0.01)
-p = 0.2*np.exp(-(x-3)**2/2)/np.sqrt(2*np.pi) + 
-    0.8*np.exp(-(x+1)**2/2)/np.sqrt(2*np.pi)
+p = 0.2*np.exp(-(x - 3)**2 / 2) / np.sqrt(2 * np.pi) + 
+    0.8*np.exp(-(x + 1)**2 / 2) / np.sqrt(2 * np.pi)
 
 d2l.plt.plot(x, p, color='black')
 d2l.plt.fill_between(x.tolist()[300:800], p.tolist()[300:800])
@@ -110,7 +110,7 @@ $$
 \int_{-\infty}^{\infty} p(x) \; dx = 1.
 $$
 
-Indeed, digging into this further shows that for any $a,b$, we see that
+Indeed, digging into this further shows that for any $a$, and $b$, we see that
 
 $$
 P(X\in(a,b]) = \int _ {a}^{b} p(x) \; dx.
@@ -191,7 +191,7 @@ Means are useful for understanding the average behavior of a random variable, ho
 This leads us to consider the variance of a random variable.  This is a quantitative measure of how far a random variable deviates from the mean.  Consider the expression $X - \mu_X$.  This is the deviation of the random variable from its mean.  This value can be positive or negative, so we need to do something to make it positive so that we are measuring the magnitude of the deviation.  A reasonable thing to try is to look at $\left|X-\mu_X\right|$, and indeed this leads to a useful quantity called the *mean absolute deviation*, however due to connections with other areas of mathematics and statistics, people often look at a different solution.  In particular, they look at $(X-\mu_X)^2.$  If we look at the typical size of this quantity by taking the mean, we arrive at the variance
 
 $$
-\sigma_X^2 = \mathrm{var}(X) = E\left[(X-\mu_X)^2\right] = E[X^2] - \mu_X^2,
+\sigma_X^2 = \mathrm{Var}(X) = E\left[(X-\mu_X)^2\right] = E[X^2] - \mu_X^2,
 $$
 
 where the last equation holds by expanding out the definition in the middle, and applying the properties of expectation listed above.
@@ -205,32 +205,32 @@ $$
 Thus, we see that our variance is
 
 $$
-\sigma_X^2 = \mathrm{var}(X) = E[X^2] - \mu_X^2 = a^2 + 8p - a^2 = 8p.
+\sigma_X^2 = \mathrm{Var}(X) = E[X^2] - \mu_X^2 = a^2 + 8p - a^2 = 8p.
 $$
 
 This result again makes sense.  The largest $p$ can be is $1/2$ which corresponds to picking $a-2$ or $a+2$ with a coinflip.  The variance of this being $4$ corresponds to the fact that both $a-2$ and $a+2$ are $2$ units away from the mean, and $2^2 = 4$.  On the other end of the spectrum, if $p=0$, this random variable always takes the value $0$ and so it has no variance at all.
 
 We will list a few properties of variances below.
 
-* For any random variable $X$, $\mathrm{var}(X) \ge 0$.
-* For any random variable $X$ and numbers $a$ and $b$, we have that $\mathrm{var}(aX+b) = a^2\mathrm{var}(X)$
-* If we have two *independent* random variables $X$ and $Y$, we have $\mathrm{var}(X+Y) = \mathrm{var}(X) + \mathrm{var}(Y)$.
+* For any random variable $X$, $\mathrm{Var}(X) \ge 0$.
+* For any random variable $X$ and numbers $a$ and $b$, we have that $\mathrm{Var}(aX+b) = a^2\mathrm{Var}(X)$
+* If we have two *independent* random variables $X$ and $Y$, we have $\mathrm{Var}(X+Y) = \mathrm{Var}(X) + \mathrm{Var}(Y)$.
 
 When interpreting these values, there can be a bit of a hiccup.  In particular, Let us try imagining what happens if we keep track of units through this computation.  Suppose that we are working with the star rating assigned to a product on the web page.  Then $a$, $a-2$, and $a+2$ are all measured in units of stars.  Similarly, the mean $\mu_X$ is then also measured in stars (being a weighted average).  However, if we get to the variance, we immediately encounter an issue, which is we want to look at $(X-\mu_X)^2$, which is in units of *squared stars*.  This means that the variance itself is not comparable to the original measurements.  To make it interpretable, we will need to return to our original units.
 
 This can be fixed: take the square root!  Thus we define
 
 $$
-\sigma_X = \mathrm{sd}(X) = \sqrt{\mathrm{var}(X)}.
+\sigma_X = sigma_{X} = \sqrt{\mathrm{Var}(X)}.
 $$
 
 In our example, this means we now have the standard deviation is $\sigma_X = 2\sqrt{2p}$.  If we are dealing with units of stars for our review example, $\sigma_X$ is again in units of stars.
 
 The properties we had for variances can be restated for standard deviations.
 
-* For any random variable $X$, $\mathrm{sd}(X) \ge 0$.
-* For any random variable $X$ and numbers $a$ and $b$, we have that $\mathrm{sd}(aX+b) = |a|\mathrm{sd}(X)$
-* If we have two *independent* random variables $X$ and $Y$, we have $\mathrm{sd}(X+Y) = \sqrt{\mathrm{sd}(X)^2 + \mathrm{sd}(Y)^2}$.
+* For any random variable $X$, $sigma_{X} \ge 0$.
+* For any random variable $X$ and numbers $a$ and $b$, we have that $sigma_{aX+b} = |a|sigma_{X}$
+* If we have two *independent* random variables $X$ and $Y$, we have $sigma_{X+Y} = \sqrt{sigma_{X}^2 + sigma_{Y}^2}$.
 
 It is natural at this moment to ask, "If the standard deviation is in the units of our original random variable, does it represent something I can draw with regards to that random variable?"  The answer is a resounding yes!  Indeed much like the mean told we the typical location of our random variable, the standard deviation gives the typical range of variation of that random variable.  We can make this rigorous with what is known as Chebychev's inequality:
 
@@ -246,7 +246,7 @@ $$
 P\left(X \not\in [a - 4\sqrt{2p}, a + 4\sqrt{2p}]\right) \le \frac{1}{4}.
 $$
 
-This means that $75\%$ of the time, this random variable will fall within this interval for any value of $p$.  Now, notice that as $p \rightarrow 0$, this interval also converges to the single point $a$.  But we know that our random variable takes the values $a-2,a,a+2$ only so eventially we can be certain it will fall outside the interval!  The question is, at what $p$ does that happen.  So we want to solve: for what $p$ does $a+4\sqrt{2p} = a+2$, which is solved when $p=1/8$, which is *exactly* the first $p$ where it could possibly happen without violating our claim that no more than $1/4$ falls outside the interval ($1/8$ to the left, and $1/8$ to the right).
+This means that $75\%$ of the time, this random variable will fall within this interval for any value of $p$.  Now, notice that as $p \rightarrow 0$, this interval also converges to the single point $a$.  But we know that our random variable takes the values $a-2,a$, and $a+2$ only so eventially we can be certain it will fall outside the interval!  The question is, at what $p$ does that happen.  So we want to solve: for what $p$ does $a+4\sqrt{2p} = a+2$, which is solved when $p=1/8$, which is *exactly* the first $p$ where it could possibly happen without violating our claim that no more than $1/4$ falls outside the interval ($1/8$ to the left, and $1/8$ to the right).
 
 Let's visualize this.  I will show the probability of getting the three values as three vertical bars with height proportional to the probability.  The interval will be drawn as a horizontal line in the middle.  The first plot shows what happens for $p > 1/8$ where the interval safely contains all points.
 
@@ -258,9 +258,10 @@ def plot_chebychev(a, p) :
     d2l.plt.xlabel('x')
     d2l.plt.ylabel('p.m.f.')
 
-    d2l.plt.hlines(0.5, a-4*np.sqrt(2*p), a+4*np.sqrt(2*p), 'black', lw=4)
-    d2l.plt.vlines(a-4*np.sqrt(2*p), 0.53, 0.47, 'black', lw=1)
-    d2l.plt.vlines(a+4*np.sqrt(2*p), 0.53, 0.47, 'black', lw=1)
+    d2l.plt.hlines(0.5, a - 4 * np.sqrt(2 * p), 
+                   a + 4 * np.sqrt(2 * p), 'black', lw=4)
+    d2l.plt.vlines(a - 4 * np.sqrt(2 * p), 0.53, 0.47, 'black', lw=1)
+    d2l.plt.vlines(a + 4 * np.sqrt(2 * p), 0.53, 0.47, 'black', lw=1)
     d2l.plt.title("p > 1/8")
 
     d2l.plt.show()
@@ -334,7 +335,7 @@ $$
 ```{.python .input}
 # Plot the Cauchy distribution p.d.f.
 x = np.arange(-5, 5, 0.01)
-p = 1/(1+x**2)
+p = 1 / (1 + x**2)
 
 d2l.plot(x, p, 'x', 'p.d.f.')
 ```
@@ -352,7 +353,7 @@ The function on the inside looks like this
 ```{.python .input}
 # Plot the integrand needed to compute the variance
 x = np.arange(-20, 20, 0.01)
-p = x**2/(1+x**2)
+p = x**2 / (1 + x**2)
 
 d2l.plot(x, p, 'x', 'integrand')
 ```
@@ -453,7 +454,7 @@ When dealing with multiple random variables, there is one additional summary sta
 Suppose that we have two random variables $X$ and $Y$, to begin with, Let us suppose they are discrete, taking on values $(x_i, y_j)$ with probability $p_{ij}$.  In this case, the covariance is defined as
 
 $$
-\sigma_{XY} = \mathrm{cov}(X,Y) = \sum_{i,j} (x_i - \mu_X) (y_j-\mu_Y) p_{ij}.
+\sigma_{XY} = \mathrm{Cov}(X,Y) = \sum_{i,j} (x_i - \mu_X) (y_j-\mu_Y) p_{ij}.
 $$
 
 To think about this intuitively: consider the following pair of random variables.  Suppose that $X$ takes the values $1$ and $3$, and $Y$ takes the values $-1$ and $3$.  Suppose that we have the following probabilities
@@ -471,7 +472,7 @@ where $p$ is a parameter in $[0,1]$ we get to pick.  Notice that if $p=1$ then t
 
 $$
 \begin{aligned}
-\mathrm{cov}(X,Y) & = \sum_{i,j} (x_i - \mu_X) (y_j-\mu_Y) p_{ij} \\
+\mathrm{Cov}(X,Y) & = \sum_{i,j} (x_i - \mu_X) (y_j-\mu_Y) p_{ij} \\
 & = (1-2)(-1-1)\frac{p}{2} + (1-2)(3-1)\frac{1-p}{2} + (3-2)(-1-1)\frac{1-p}{2} + (3-2)(3-1)\frac{p}{2} \\
 & = 4p-2
 \end{aligned}
@@ -479,12 +480,12 @@ $$
 
 When $p=1$ (the case where the are both maximally positive or negative at the same time) has a covariance of $2$. When $p=0$ (the case where they are flipped) the covariance is $-2$.  Finally, when $p=1/2$ (the case where they are unrelated), the covariance is $0$.  Thus we see that the covariance measures how these two random variables are related.
 
-A quick note on the covariance is that it only measures these linear relationships.  More complex relationships like $X = Y^2$ where $Y$ is $-2,-1,0,1,2$ with equal probability can be missed.  Indeed a quick computation shows that these random variables have covariance zero, despite one being a deterministic function of the other.
+A quick note on the covariance is that it only measures these linear relationships.  More complex relationships like $X = Y^2$ where $Y$ is randomly chosen from $\{-2,-1,0,1,2\}$ with equal probability can be missed.  Indeed a quick computation shows that these random variables have covariance zero, despite one being a deterministic function of the other.
 
 For continuous random variables, much the same story holds.  At this point, we are pretty comfortable with doing the transition between discrete and continuous, so we will provide the definition without any derivation.  
 
 $$
-\sigma_{XY} = \mathrm{cov}(X,Y) = \int_{\mathbb{R}^2} xyp(x,y) \;dx \;dy.
+\sigma_{XY} = \int_{\mathbb{R}^2} xyp(x,y) \;dx \;dy.
 $$
 
 To ensure that we understand, let us take a look at a collection of random variables with tunable covariance.
@@ -507,30 +508,30 @@ d2l.plt.show()
 
 Let us see some properties of covariances:
 
-* For any random variable $X$, $\mathrm{cov}(X,X) = \mathrm{var}(X)$.
-* For any random variables $X,Y$ and numbers $a$ and $b$, $\mathrm{cov}(aX+b,Y) = \mathrm{cov}(X,aY+b) = a\mathrm{cov}(X,Y)$.
-* If $X$ and $Y$ are independent then $\mathrm{cov}(X,Y) = 0$
+* For any random variable $X$, $\mathrm{Cov}(X,X) = \mathrm{Var}(X)$.
+* For any random variables $X,Y$ and numbers $a$ and $b$, $\mathrm{Cov}(aX+b,Y) = \mathrm{Cov}(X,aY+b) = a\mathrm{Cov}(X,Y)$.
+* If $X$ and $Y$ are independent then $\mathrm{Cov}(X,Y) = 0$
 
 In addition, we can use the covariance to expand a relationship we saw before.  Recall that is $X$ and $Y$ are two independent random variables then
 
 $$
-\mathrm{var}(X+Y) = \mathrm{var}(X) + \mathrm{var}(Y).
+\mathrm{Var}(X+Y) = \mathrm{Var}(X) + \mathrm{Var}(Y).
 $$
 
 With knowledge of covariances, we can expand this relationship.  Indeed, some algebra can show that in general, 
 
 $$
-\mathrm{var}(X+Y) = \mathrm{var}(X) + \mathrm{var}(Y) + 2\mathrm{cov}(X,Y).
+\mathrm{Var}(X+Y) = \mathrm{Var}(X) + \mathrm{Var}(Y) + 2\mathrm{Cov}(X,Y).
 $$
 
 This allows us to generalize the variance summation rule for correlated random variables.
 
 As we did in the case of means and variances, Let us now consider units.  If $X$ is measured in one unit (say inches), and $Y$ is measured in another (say dollars), the covariance is measured in the product of these two units $\text{inches}\cdot\text{dollars}$.  These units can be hard to interpret.  What we will often want in this case is a unit-less measurement of relatedness.  Indeed, often we do not care about exact quantitative correlation, but rather ask if the correlation is in the same direction, and how strong the relationship is.  
 
-To see what makes sense, Let us perform a thought experiment.  Suppose that we convert our random variables in inches and dollars to be in inches and cents.  In this case the random variable $Y$ is multiplied by $100$.  If we work through the definition, this means that $\mathrm{cov}(X,Y)$ will be multiplied by $100$.  Thus we see that in this case a change of units change the covariance by a factor of $100$.  Thus, to find our unit-invariant measure of correlation, we will need to divide by something else that also gets scaled by $100$.  Indeed we have a clear candidate, the standard deviation!  Indeed if we define the *correlation coefficient* to be
+To see what makes sense, Let us perform a thought experiment.  Suppose that we convert our random variables in inches and dollars to be in inches and cents.  In this case the random variable $Y$ is multiplied by $100$.  If we work through the definition, this means that $\mathrm{Cov}(X,Y)$ will be multiplied by $100$.  Thus we see that in this case a change of units change the covariance by a factor of $100$.  Thus, to find our unit-invariant measure of correlation, we will need to divide by something else that also gets scaled by $100$.  Indeed we have a clear candidate, the standard deviation!  Indeed if we define the *correlation coefficient* to be
 
 $$
-\mathrm{cor}(X,Y) = \frac{\mathrm{cov}(X,Y)}{\mathrm{sd}(X)\mathrm{sd{Y}}}
+\rho(X,Y) = \frac{\mathrm{Cov}(X,Y)}{sigma_{X}sigma_{Y}}
 $$
 
 we see that this is a unit-less value.  A little mathematics can show that this number is between $-1$ and $1$ with $1$ meaning maximally positively correlated, whereas $-1$ means maximally negatively correlated.
@@ -538,7 +539,7 @@ we see that this is a unit-less value.  A little mathematics can show that this 
 Returning to our explicit discrete example above, we can see that $\sigma_X = 1$ and $\sigma_Y = 2$, so the correlation between the two random variables is
 
 $$
-\mathrm{cor}(X,Y) = \frac{4p-2}{1\cdot 2} = 2p-1.
+\rho(X,Y) = \frac{4p-2}{1\cdot 2} = 2p-1.
 $$
 
 This now ranges between $-1$ and $1$ with the expected behavior of $1$ meaning most correlated, and $-1$ meaning minimally correlated.
@@ -547,15 +548,15 @@ As another example, consider $X$ as any random variable, and $Y=aX+b$ as any lin
 
 $$
 \begin{aligned}
-\mathrm{sd}(Y) & = \mathrm{sd}(aX+b) = |a|\mathrm{sd(X)} \\
-\mathrm{cov}(X,Y) &= \mathrm{cov}(X,aX+b) = a\mathrm{cov}(X,X) = a\mathrm{var}(X),
+sigma_{Y} & = sigma_{aX+b} = |a|sigma_{X} \\
+\mathrm{Cov}(X,Y) &= \mathrm{Cov}(X,aX+b) = a\mathrm{Cov}(X,X) = a\mathrm{Var}(X),
 \end{aligned}
 $$
 
 and thus that
 
 $$
-\mathrm{cor}(X,Y) = \frac{a\mathrm{var}(X)}{|a|\mathrm{sd}(X)^2} = \frac{a}{|a|} = \mathrm{sign}(a).
+\rho(X,Y) = \frac{a\mathrm{Var}(X)}{|a|sigma_{X}^2} = \frac{a}{|a|} = \mathrm{sign}(a).
 $$
 
 Thus we see that the correlation is $+1$ for any $a > 0$, and $-1$ for any $a < 0$ illustrating that correlation measures the degree and directionality the two random variables are related, not the scale that the variation takes.
@@ -568,9 +569,9 @@ cors = [-0.9, 0.0, 1.0]
 d2l.plt.figure(figsize=(12, 3))
 for i in range(3) :
     X = np.random.normal(0, 1, 500)
-    Y = cors[i]*X + np.sqrt(1-cors[i]**2)*np.random.normal(0, 1, 500)
+    Y = cors[i] * X + np.sqrt(1 - cors[i]**2) * np.random.normal(0, 1, 500)
     
-    d2l.plt.subplot(1, 4, i+1)
+    d2l.plt.subplot(1, 4, i + 1)
     d2l.plt.scatter(X, Y)
     d2l.plt.xlabel('X')
     d2l.plt.ylabel('Y')
@@ -580,14 +581,14 @@ d2l.plt.show()
 
 Let us list a few properties of correlation:
 
-* For any random variable $X$, $\mathrm{cor}(X,X) = 1$.
-* For any random variables $X,Y$ and numbers $a$ and $b$, $\mathrm{cor}(aX+b,Y) = \mathrm{cor}(X,aY+b) = \mathrm{cor}(X,Y)$.
-* If $X$ and $Y$ are independent with non-zero variance then $\mathrm{cor}(X,Y) = 0$.
+* For any random variable $X$, $\rho(X,X) = 1$.
+* For any random variables $X,Y$ and numbers $a$ and $b$, $\rho(aX+b,Y) = \rho(X,aY+b) = \rho(X,Y)$.
+* If $X$ and $Y$ are independent with non-zero variance then $\rho(X,Y) = 0$.
 
 As a final note, the eagle-eyed amongst we may recognize these formulae.  Indeed, if we expand everything out assuming that $\mu_X = \mu_Y = 0$, we see that this is
 
 $$
-\mathrm{cor}(X,Y) = \frac{\sum_{i,j} x_iy_ip_{ij}}{\sqrt{\sum_{i,j}x_i^2 p_{ij}}\sqrt{\sum_{i,j}y_j^2 p_{ij}}}.
+\rho(X,Y) = \frac{\sum_{i,j} x_iy_ip_{ij}}{\sqrt{\sum_{i,j}x_i^2 p_{ij}}\sqrt{\sum_{i,j}y_j^2 p_{ij}}}.
 $$
 
 This looks like a sum of a product of terms divided by the square root of sums of terms.  This is exactly the formula for the cosine of the angle between two vectors $\mathbf{v},\mathbf{w}$ with the different coordinates weighted by $p_{ij}$:

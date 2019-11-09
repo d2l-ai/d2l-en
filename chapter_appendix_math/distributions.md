@@ -7,6 +7,7 @@ Now that we have learned about how to work with probability theory in both discr
 %matplotlib inline
 import d2l
 from IPython import display
+from math import erf, factorial
 from mxnet import np, npx
 npx.set_np()
 ```
@@ -35,7 +36,7 @@ The probability mass function is plotted below.
 p = 0.3
 
 d2l.set_figsize()
-d2l.plt.stem([0, 1], [1-p, p], use_line_collection=True)
+d2l.plt.stem([0, 1], [1 - p, p], use_line_collection=True)
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
@@ -45,7 +46,7 @@ Now, let us plot the cumulative distribution function.
 
 ```{.python .input}
 x = np.arange(-1, 2, 0.01)
-F = lambda x: 0 if x < 0 else 1 if x > 1 else 1-p
+F = lambda x: 0 if x < 0 else 1 if x > 1 else 1 - p
 
 d2l.plot(x, np.array([F(y) for y in x]), 'x', 'c.d.f.')
 ```
@@ -85,7 +86,7 @@ Let us first plot the probabilty mass function.
 ```{.python .input}
 n = 5
 
-d2l.plt.stem([i+1 for i in range(n)], n*[1/n], use_line_collection=True)
+d2l.plt.stem([i+1 for i in range(n)], n*[1 / n], use_line_collection=True)
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
@@ -95,7 +96,7 @@ Now, let us plot the cumulative distribution function.
 
 ```{.python .input}
 x = np.arange(-1, 6, 0.01)
-F = lambda x: 0 if x < 1 else 1 if x > n else np.floor(x)/n
+F = lambda x: 0 if x < 1 else 1 if x > n else np.floor(x) / n
 
 d2l.plot(x, np.array([F(y) for y in x]), 'x', 'c.d.f.')
 ```
@@ -152,7 +153,7 @@ d2l.plot(x, p, 'x', 'p.d.f.')
 Now, let us plot the cumulative distribution function.
 
 ```{.python .input}
-F = lambda x: 0 if x < a else 1 if x > b else (x-a)/(b-a)
+F = lambda x: 0 if x < a else 1 if x > b else (x - a) / (b - a)
 
 d2l.plot(x, np.array([F(y) for y in x]), 'x', 'c.d.f.')
 ```
@@ -208,9 +209,9 @@ def binom(n, k):
         comb = comb * (n - i) // (i + 1)
     return comb
 
-pmf = np.array([p**i*(1-p)**(n-i)*binom(n, i) for i in range(n+1)])
+pmf = np.array([p**i * (1-p)**(n - i) * binom(n, i) for i in range(n + 1)])
 
-d2l.plt.stem([i for i in range(n+1)], pmf, use_line_collection=True)
+d2l.plt.stem([i for i in range(n + 1)], pmf, use_line_collection=True)
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
@@ -279,11 +280,10 @@ $$
 Let us first plot the probabilty mass function.
 
 ```{.python .input}
-from math import factorial
 lam = 5.0
 
 xs = [i for i in range(20)]
-pmf = np.array([np.exp(-lam)*lam**k/factorial(k) for k in xs])
+pmf = np.array([np.exp(-lam) * lam**k / factorial(k) for k in xs])
 
 d2l.plt.stem(xs, pmf, use_line_collection=True)
 d2l.plt.xlabel('x')
@@ -330,9 +330,9 @@ ns = [1, 10, 100, 1000]
 d2l.plt.figure(figsize=(10, 3))
 for i in range(4) :
     n = ns[i]
-    pmf = np.array([p**i*(1-p)**(n-i)*binom(n, i) for i in range(n+1)])
-    d2l.plt.subplot(1, 4, i+1)
-    d2l.plt.stem([(i-n*p)/np.sqrt(n*p*(1-p)) for i in range(n+1)], pmf,
+    pmf = np.array([p**i * (1-p)**(n-i) * binom(n, i) for i in range(n + 1)])
+    d2l.plt.subplot(1, 4, i + 1)
+    d2l.plt.stem([(i - n*p)/np.sqrt(n*p*(1 - p)) for i in range(n + 1)], pmf,
                  use_line_collection=True)
     d2l.plt.xlim([-4, 4])
     d2l.plt.xlabel('x')
@@ -361,7 +361,7 @@ Let us first plot the probability density function.
 mu = 0; sigma = 1
 
 x = np.arange(-3, 3, 0.01)
-p = 1/np.sqrt(2*np.pi*sigma**2)*np.exp(-((x-mu)**2)/(2*sigma**2))
+p = 1 / np.sqrt(2 * np.pi * sigma**2) * np.exp(-(x - mu)**2 / (2 * sigma**2))
 
 d2l.plot(x, p, 'x', 'p.d.f.')
 ```
@@ -369,9 +369,9 @@ d2l.plot(x, p, 'x', 'p.d.f.')
 Now, let us plot the cumulative distribution function.
 
 ```{.python .input}
-from math import erf
+
 def phi(x):
-    return (1.0 + erf((x-mu) / (sigma*np.sqrt(2)))) / 2.0
+    return (1.0 + erf((x - mu) / (sigma * np.sqrt(2)))) / 2.0
 
 d2l.plot(x, np.array([phi(y) for y in x.tolist()]), 'x', 'c.d.f.')
 ```

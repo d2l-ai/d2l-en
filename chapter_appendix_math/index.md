@@ -18,7 +18,7 @@ Next, we move on to a more complete understanding of calculus, single variable, 
 
 Probability theory is the mathematical theory of chance and uncertainty.  Problems encountered in practice frequently are not certain, and thus we need a language to speak about uncertain things.  We develop the theory of random variables to the point that we can discuss models probabilistically, and learn about the most commonly encountered distributions.  This allows us to then see an example of naive Bayes, which is a probabilistic classification technique that requires nothing but the fundamentals of probability to understand fully.
 
-Closely related to probability theory is the study of statistics.  In particular, the area of inferential statistics allows us to evaluate if results we observe to try and understand properties of the underlying distribution (for instance, are two distributions the same or different).  We will examine the concepts of confidence intervals and hypothesis testing to provide the language needed to discuss similarities and differences in observed distributions.
+Closely related to probability theory is the study of statistics.  While statistics is far too large a field to do justice in a short section, we will introduce fundamental notions that all machine learning practicioners should be aware of, in particular: evaluating and comparing estimators, conducting hypothesis tests, and constructing confidence intervals. 
 
 Last, we turn to the topic of information theory, which is the mathematical study of information storage and transmission.  This provides the core language by which we may discuss quantitatively how much information a model holds on a domain of discourse.
 
@@ -28,6 +28,7 @@ Taken together, these form the core of the mathematical concepts needed to begin
 :maxdepth: 2
 
 linear-algebra
+eigen-decompositions
 single-variable-calculus
 multivariable-calculus
 integral-calculus
