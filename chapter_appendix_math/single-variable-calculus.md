@@ -101,7 +101,7 @@ In this way, we can understand the derivative as the scaling factor that tells u
 A full formal treatment of calculus would derive everything from first principles.  We will not indulge in this temptation here, but rather provide an understanding of the common rules encountered.
 
 ### Common Derivatives
-As was seen in :numref:`sec-calculus`, when computing derivatives one can often times use a series of rules to reduce the computation to a few core functions.  We repeat them here for ease of reference.
+As was seen in :numref:`sec_calculus`, when computing derivatives one can often times use a series of rules to reduce the computation to a few core functions.  We repeat them here for ease of reference.
 
 * **Derivative of constants.** $\frac{d}{dx}c = 0$.
 * **Derivative of linear functions.** $\frac{d}{dx}(ax) = a$.
@@ -110,7 +110,7 @@ As was seen in :numref:`sec-calculus`, when computing derivatives one can often 
 * **Derivative of the logarithm.** $\frac{d}{dx}\log(x) = \frac{1}{x}$.
 
 ### Derivative Rules
-If every derivative needed to be separately computed and stored in a table, differential calculus would be near impossible.  It is a gift of mathematics that we can generalize the above derivatives and compute more complex derivatives like finding the derivative of $f(x) = \log\left(1+(x-1)^{10}\right)$.  As was mentioned in :numref:`sec-calculus`, the key to doing so is to codify what happens when we take functions and combine them in various ways, most importantly: sums, products, and compositions.
+If every derivative needed to be separately computed and stored in a table, differential calculus would be near impossible.  It is a gift of mathematics that we can generalize the above derivatives and compute more complex derivatives like finding the derivative of $f(x) = \log\left(1+(x-1)^{10}\right)$.  As was mentioned in :numref:`sec_calculus`, the key to doing so is to codify what happens when we take functions and combine them in various ways, most importantly: sums, products, and compositions.
 
 * **Sum rule.** $\frac{d}{dx}\left(g(x) + h(x)\right) = \frac{dg}{dx}(x) + \frac{dh}{dx}(x)$.
 * **Product rule.** $\frac{d}{dx}\left(g(x)\cdot h(x)\right) = g(x)\frac{dh}{dx}(x) + \frac{dg}{dx}(x)h(x)$.
