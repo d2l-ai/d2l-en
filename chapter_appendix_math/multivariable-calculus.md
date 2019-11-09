@@ -440,6 +440,7 @@ ax.plot_wireframe(x, y, z, **{'rstride': 10, 'cstride': 10})
 ax.plot_wireframe(x, y, w, **{'rstride': 10, 'cstride': 10}, color = 'purple')
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('y')
+d2l.set_figsize()
 ax.set_xlim(-2, 2); ax.set_ylim(-2, 2); ax.set_zlim(-1, 1)
 ax.dist = 12
 ```
