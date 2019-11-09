@@ -1,9 +1,7 @@
 # Naive Bayes
-:label:`naive-bayes`
+:label:`sec_naive_bayes`
 
 Relying only on probabilistic fundamentals, we can already create a simple classifier. Learning is all about making assumptions. If we want to classify a new data point that we have never seen before we have to make some assumptions about which data points are similar to each other. The naive Bayes classifier, a popular and remarkably clear algorithm, assumes all features are independent of each other to simplify the computation. In this chapter, we will apply this model to recognize characters in images.
-
-Let us first import libraries and modules. Especially, we import `d2l`, which now contains the function `use_svg_display` we defined in :numref:`sec_prob`.
 
 ```{.python .input  n=72}
 %matplotlib inline
@@ -16,9 +14,9 @@ d2l.use_svg_display()
 
 ## Optical Character Recognition
 
-MNIST :cite:`LeCun.Bottou.Bengio.ea.1998` is one of widely used datasets. It contains 60,000 images for training and 10,000 images for validation. We will formally introduce training data in :numref:`chapter_linear_regression` and validation data in :numref:`chapter_model_selection` later, here we need on ly remember we will train the naive Bayes model in the training data and then test its quality on the validation data. Each image contains a handwritten digit from 0 to 9. The task is classifying each image into the corresponding digit.
+MNIST :cite:`LeCun.Bottou.Bengio.ea.1998` is one of widely used datasets. It contains 60,000 images for training and 10,000 images for validation. We will formally introduce training data in :numref:`sec_linear_regression` and validation data in :numref:`sec_model_selection` later, here we need only remember we will train the naive Bayes model in the training data and then test its quality on the validation data. Each image contains a handwritten digit from 0 to 9. The task is classifying each image into the corresponding digit.
 
-Gluon, MXNet's high-level interface for implementing neural networks, provides a `MNIST` class in the `data.vision` module to
+Gluon provides a `MNIST` class in the `data.vision` module to
 automatically retrieve the dataset via our Internet connection.
 Subsequently, Gluon will use the already-downloaded local copy.
 We specify whether we are requesting the training set or the test set
@@ -67,8 +65,8 @@ d2l.show_images(images, 2, 9);
 
 ## The Probabilistic Model for Classification
 
-In a classification task, we map an example into a category. Here an example is a grayscale $28\times 28$ image, and a category is a digit. (Refer to :numref:`chapter_softmax` for a more detailed explanation.)
-One natural way to express the classification task is via the probabilistic question: what is the most likely label given the features (i.e. image pixels)? Denote by $\mathbf x\in\mathbb R^d$ the features of the example and $y\in\mathbb R$ the label. Here features are image pixels, where we can reshape a 2-dimensional image to a vector so that $d=28^2=784$, and labels are digits. We will formally define general features and labels in :numref:`chapter_linear_regression`. The $p(y  \mid  \mathbf{x})$ is the probability of the label given the features. If we are able to compute these probabilities, which are $p(y  \mid  \mathbf{x})$ for $y=0,\ldots,9$ in our example, then the classifier will output the prediction  $\hat{y}$ given by the expression:
+In a classification task, we map an example into a category. Here an example is a grayscale $28\times 28$ image, and a category is a digit. (Refer to :numref:`sec_softmax` for a more detailed explanation.)
+One natural way to express the classification task is via the probabilistic question: what is the most likely label given the features (i.e. image pixels)? Denote by $\mathbf x\in\mathbb R^d$ the features of the example and $y\in\mathbb R$ the label. Here features are image pixels, where we can reshape a 2-dimensional image to a vector so that $d=28^2=784$, and labels are digits. We will formally define general features and labels in :numref:`sec_linear_regression`. The $p(y  \mid  \mathbf{x})$ is the probability of the label given the features. If we are able to compute these probabilities, which are $p(y  \mid  \mathbf{x})$ for $y=0,\ldots,9$ in our example, then the classifier will output the prediction  $\hat{y}$ given by the expression:
 
 $$\hat{y} = \operatorname*{argmax} \> p(y  \mid  \mathbf{x}).$$
 
@@ -125,19 +123,15 @@ P_xy = (n_x+1) / (n_y+1).reshape(10,1,1)
 d2l.show_images(P_xy, 2, 5);
 ```
 
-By visualizing these $10\times 28\times 28$ probabilities (for each pixel for each class) we could get some mean looking digits.  ...
+By visualizing these $10\times 28\times 28$ probabilities (for each pixel for each class) we could get some mean looking digits.
 
 Now we can use :eqref:`eq_naive_bayes_estimation` to predict a new image. Given $\mathbf x$, the following functions computes $p(\mathbf x \mid y)p(y)$ for every $y$.
-
-```{.python .input}
-np.expand_dims?
-```
 
 ```{.python .input}
 def bayes_pred(x):
     x = np.expand_dims(x, axis=0)  # (28, 28) -> (1, 28, 28)
     p_xy = P_xy * x + (1-P_xy)*(1-x)
-    p_xy = p_xy.reshape(10,-1).prod(axis=1)  # p(x|y)
+    p_xy = p_xy.reshape(10,-1).prod(axis=1)  # P(x|y)
     return np.array(p_xy) * P_y
 
 image, label = mnist_test[0]
@@ -169,7 +163,7 @@ log_P_y = np.log(P_y)
 def bayes_pred_stable(x):
     x = np.expand_dims(x, axis=0)  # (28, 28) -> (1, 28, 28)
     p_xy = log_P_xy * x + log_P_xy_neg * (1-x)
-    p_xy = p_xy.reshape(10,-1).sum(axis=1)  # p(x|y)
+    p_xy = p_xy.reshape(10,-1).sum(axis=1)  # P(x|y)
     return p_xy + log_P_y
 
 py = bayes_pred_stable(image)
@@ -179,13 +173,13 @@ py
 Check if the prediction is correct.
 
 ```{.python .input}
-# convert label which is a scalar tensor of int32 dtype
+# Convert label which is a scalar tensor of int32 dtype
 # to a Python scalar integer for comparison
 py.argmax(axis=0) == int(label)
 ```
 
-Now predict a few validation examples, we can see the Bayes
-classifier works pretty well except for the 9th 16th digits.
+Now predict a few validation examples. We can see the Bayes
+classifier works pretty well.
 
 ```{.python .input}
 def predict(X):
@@ -196,17 +190,18 @@ preds = predict(X)
 d2l.show_images(X, 2, 9, titles=[str(d) for d in preds]);
 ```
 
-Finally, Let us compute the overall accuracy of the classifier.
+Finally, let us compute the overall accuracy of the classifier.
 
 ```{.python .input}
 X, y = mnist_test[:]
 preds = np.array(predict(X), dtype=np.int32)
-'Validation accuracy', float((preds == y).sum()) / len(y)
+float((preds == y).sum()) / len(y)  # Validation accuracy
 ```
 
 Modern deep networks achieve error rates of less than 0.01. The poor performance is due to the incorrect statistical assumptions that we made in our model: we assumed that each and every pixel are *independently* generated, depending only on the label. This is clearly not how humans write digits, and this wrong assumption led to the downfall of our overly naive (Bayes) classifier.
 
 ## Summary
+
 * Using Bayes' rule, a classifier can be made by assuming all observed features are independent.  This classifier was the gold standard for decades.
 
 ## Exercises

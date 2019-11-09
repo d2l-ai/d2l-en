@@ -63,7 +63,7 @@ The locations where the function is large indicates regions where we are more li
 Let us now investigate this further.  We have already seen what a probability density function is intuitively, namely for a random variable $X$, the density function is a function $p(x)$ so that 
 
 $$
-P(X \text{ is in an } \epsilon \text{-sized interval around } x ) \approx \epsilon \cdot p(x).
+P(X \; \text{is in an } \epsilon \text{-sized interval around } x ) \approx \epsilon \cdot p(x).
 $$
 
 but what does this imply for the properties of $p(x)$?
@@ -73,7 +73,7 @@ First, probabilities are never negative, thus we should expect that $p(x) \ge 0$
 Second, Let us imagine that we slice up the $\mathbb{R}$ into an infinite number of slices which are $\epsilon$ wide, say the slice from $(\epsilon\cdot i, \epsilon \cdot (i+1)]$.  For each of these, we know the probability is approximately
 
 $$
-P(X \text{is in an } \epsilon\text{-sized interval around } x ) \approx \epsilon \cdot p(\epsilon \cdot i),
+P(X \; \text{is in an } \epsilon\text{-sized interval around } x ) \approx \epsilon \cdot p(\epsilon \cdot i),
 $$
 
 so summed over all of them it should be
@@ -174,7 +174,7 @@ The way we should interpret the mean (albeit with caution) is that it tells we e
 As a minimalistic example that we will examine throughout this section, Let us take $X$ to be the random variable which takes the value $a-2$ with probability $p$, $a+2$ with probability $p$ and $a$ with probability $1-2p$.  We can compute that, for any possible choice of $a$ and $p$, the mean is
 
 $$
-mu_X = E[X] = \sum_i x_i p_i. = (a-2)p + a(1-2p) + (a+2)p = a.
+\mu_X = E[X] = \sum_i x_i p_i. = (a-2)p + a(1-2p) + (a+2)p = a.
 $$
 
 Thus we see that $a$ is the same as the mean.  This matches the intuition since $a$ is the location around which we centered our random variable.
@@ -251,7 +251,7 @@ Let's visualize this.  I will show the probability of getting the three values a
 ```{.python .input}
 a = 0
 p = 0.2
-d2l.plt.stem([a-2, a, a+2],[p,1-2*p,p])
+d2l.plt.stem([a-2, a, a+2],[p,1-2*p,p], use_line_collection=True)
 d2l.plt.xlim([-4,4])
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('p.m.f.')
@@ -267,7 +267,7 @@ d2l.plt.show()
 ```{.python .input}
 a = 0
 p = 0.125
-d2l.plt.stem([a-2, a, a+2],[p,1-2*p,p])
+d2l.plt.stem([a-2, a, a+2],[p,1-2*p,p], use_line_collection=True)
 d2l.plt.xlim([-4,4])
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('p.m.f.')
@@ -283,7 +283,7 @@ d2l.plt.show()
 ```{.python .input}
 a = 0
 p = 0.05
-d2l.plt.stem([a-2, a, a+2],[p,1-2*p,p])
+d2l.plt.stem([a-2, a, a+2],[p,1-2*p,p], use_line_collection=True)
 d2l.plt.xlim([-4,4])
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('p.m.f.')
@@ -388,7 +388,7 @@ Machine learning scientists define their models so that we most often do not nee
 
 ### Joint Density Functions
 
-The above work all assumes we are working with a single real valued random variable.  But what if we are dealing with two or more potentially highly correlated random variables?  This circumstance is the norm in machine learning: imagine random variables like $R_{i,j}$ which encode the red value of the pixel at the $(i,j)$ coordinate in an image, or $P_t$ which is a random variable given by a stock price at time $t$.  Nearby pixels tend to have similar color, and nearby times tend to have similar prices.  We cannot treat them as separate random variables, and expect to create a successful model (we will see in :numref:`naive-bayes` a model that underperforms due to such an assumption).  We need to develop the mathematical language to handle these correlated continuous random variables.
+The above work all assumes we are working with a single real valued random variable.  But what if we are dealing with two or more potentially highly correlated random variables?  This circumstance is the norm in machine learning: imagine random variables like $R_{i,j}$ which encode the red value of the pixel at the $(i,j)$ coordinate in an image, or $P_t$ which is a random variable given by a stock price at time $t$.  Nearby pixels tend to have similar color, and nearby times tend to have similar prices.  We cannot treat them as separate random variables, and expect to create a successful model (we will see in :numref:`sec_naive_bayes` a model that underperforms due to such an assumption).  We need to develop the mathematical language to handle these correlated continuous random variables.
 
 Thankfully, with the multiple integrals in :ref:`sec_integral_calculus` we can develop such a language.  Suppose we have, for simplicity, two random variables $X,Y$ which can be correlated.  Then, similar to the case of a single variable, we can ask the question,
 
@@ -470,10 +470,10 @@ To think about this intuitively: consider the following pair of random variables
 
 $$
 \begin{aligned}
-P(X = 1, \text{ and} Y = -1) & = \frac{p}{2} \\
-P(X = 1, \text{ and} Y = 3) & = \frac{1-p}{2} \\
-P(X = 3, \text{ and} Y = -1) & = \frac{1-p}{2} \\
-P(X = 3, \text{ and} Y = 3) & = \frac{p}{2} 
+P(X = 1 \; \text{and} \; Y = -1) & = \frac{p}{2} \\
+P(X = 1 \; \text{and} \; Y = 3) & = \frac{1-p}{2} \\
+P(X = 3 \; \text{and} \; Y = -1) & = \frac{1-p}{2} \\
+P(X = 3 \; \text{and} \; Y = 3) & = \frac{p}{2} 
 \end{aligned}
 $$
 

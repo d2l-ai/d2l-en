@@ -2,14 +2,14 @@
 :label:`sec_linear_algebra`
 
 In :numref:`sec_scalar-tensor`, we encountered the basics of linear algebra
-and saw how it coudl be used to express common operations for transforming our data.
+and saw how it could be used to express common operations for transforming our data.
 Linear algebra is one of the key mathematical pillars
 underlying much of the work that we do deep learning 
 and in machine learning more broadly.
 While :numref:`sec_scalar-tensor` contained enough machinery
 to communicate the mechanics of modern deep learning models, 
 there is a lot more to the subject than we could fit there (or even here).
-In this appendix, we will go deeper,
+In this section, we will go deeper,
 highlighting some geometric interpretations of linear algebra operations, 
 and introducing a few fundamental concepts, including of eigenvalues and eigenvectors.
 
@@ -25,7 +25,12 @@ v = [1,7,0,1]
 Mathematicians most often write this as either a *column* or *row* vector, which is to say either as
 
 $$
-\mathbf{x} = \begin{bmatrix}1\\7\\0\\1\end{bmatrix} \quad \text{or} \quad
+\mathbf{x} = \begin{bmatrix}1\\7\\0\\1\end{bmatrix}
+$$
+
+or
+
+$$
 \mathbf{x}^\top = \begin{bmatrix}1 & 7 & 0 & 1\end{bmatrix}.
 $$ 
 
@@ -123,9 +128,7 @@ $$
 $$
 
 In short, for these two specific vectors, 
-the dot product tells us the angle between the two vectors.  
-This same fact is true in general.  
-We will not derive the expression here, however,
+the dot product tells us the angle between the two vectors. This same fact is true in general. We will not derive the expression here, however,
 if we consider writing $\|\mathbf{v} - \mathbf{w}\|^2$ in two ways: 
 one with the dot product, and the other geometrically using the law of cosines,
 we can obtain the full relationship. 
@@ -145,7 +148,7 @@ As a simple example, let's see how to compute the angle between a pair of vector
 %matplotlib inline
 import d2l
 from IPython import display
-from mxnet import np, npx
+from mxnet import gluon, np, npx
 npx.set_np()
 ```
 
@@ -214,9 +217,8 @@ of a line (two dimensions) or of a plane (three dimensions).
 In an $n$-dimensional vector space, a hyperplane has $d-1$ dimensions
 and divides the space into two half-spaces. 
 
-Let us start with an example.  
-Suppose we have a column vector $\mathbf{w}=[2,1]^\top$.  
-We want to know, "what are the points $\mathbf{v}$ with $\mathbf{w}\cdot\mathbf{v} = 1$?"
+Let us start with an example.
+Suppose we have a column vector $\mathbf{w}=[2,1]^\top$. We want to know, "what are the points $\mathbf{v}$ with $\mathbf{w}\cdot\mathbf{v} = 1$?"
 By recalling the connection between dot products and angles above, 
 we can see that this is equivalent to 
 $$
@@ -238,14 +240,14 @@ If we now look at what happens when we ask about the set of points with
 $\mathbf{w}\cdot\mathbf{v} > 1$ or $\mathbf{w}\cdot\mathbf{v} < 1$,
 we can see that these are cases where the projections 
 are longer or shorter than $1/\|\mathbf{w}\|$, respectively.
-Thus, those two inequalities define either side of the line.  
+Thus, those two inequalities define either side of the line.
 In this way, we have found a way to cut our space into two halves, 
 where all the points on one side have dot product below a threshold, 
 and the other side above.
 
 ![If we now consider the inequality version of the expression, we see that our hyperplane (in this case: just a line) separates the space into two halves.](../img/SpaceDivision.svg)
 
-The story in higher dimension is much the same.  
+The story in higher dimension is much the same.
 If we now take $\mathbf{w} = [1,2,3]^\top$
 and ask about the points in three dimensions with $\mathbf{w}\cdot\mathbf{v} = 1$,
 we obtain a plane at right angles to the given vector $\mathbf{w}$.
@@ -255,10 +257,9 @@ The two inequalities again define the two sides of the plane.
 
 While our ability to visualize runs out at this point,
 nothing stops us from doing this in tens, hundreds, or billions of dimensions.
-
 This occurs often when thinking about machine learned models.
 For instance, we can understand linear classification models 
-like those from :numref:`chapter_softmax`,
+like those from :numref:`sec_softmax`,
 as methods to find hyperplanes that separate the different target classes.
 In this context, such hyperplanes are often referred to as *decision planes*.
 The majority of deep learned classification models end 
@@ -274,20 +275,16 @@ by just taking the vector between their means to define the decision plane
 and eyeball a crude threshold.
 
 ```{.python .input}
-from mxnet import gluon
-
 # Load in the dataset
 train = gluon.data.vision.FashionMNIST(train=True) 
 test = gluon.data.vision.FashionMNIST(train=False)
 
-X_train_0 = np.concatenate([np.expand_dims(
-    x[0], 0) for x in train if x[1] == 0], axis=0).astype(float)
-X_train_1 = np.concatenate([np.expand_dims(
-    x[0], 0) for x in train if x[1] == 1], axis=0).astype(float)
-X_test = np.concatenate([np.expand_dims(
-    x[0], 0) for x in test if x[1] == 0 or x[1] == 1], axis=0).astype(float)
-y_test = np.concatenate([np.expand_dims(
-    x[1], 0) for x in test if x[1] == 0 or x[1] == 1], axis=0).astype(float)
+X_train_0 = np.stack([x[0] for x in train if x[1] == 0]).astype(float)
+X_train_1 = np.stack([x[0] for x in train if x[1] == 1]).astype(float)
+X_test = np.stack(
+    [x[0] for x in test if x[1] == 0 or x[1] == 1]).astype(float)
+y_test = np.stack(
+    [x[1] for x in test if x[1] == 0 or x[1] == 1]).astype(float)
 
 # Compute Averages
 ave_0 = np.mean(X_train_0,axis=0)
@@ -296,6 +293,7 @@ ave_1 = np.mean(X_train_1,axis=0)
 
 ```{.python .input}
 # Plot average t-shirt
+d2l.set_figsize()
 d2l.plt.imshow(ave_0.reshape(28,28).tolist(),cmap='Greys')
 d2l.plt.show()
 ```
@@ -310,10 +308,11 @@ d2l.plt.show()
 # Print test set accuracy with eyeballed threshold
 w = (ave_1 - ave_0).T
 predictions = 1*(X_test.reshape(2000,-1).dot(w.flatten()) > -1500000)
-print("Accuracy: {}".format(np.mean(predictions==y_test)))
+np.mean(predictions==y_test)  # Accuracy
 ```
 
 ## Geometry of linear transformations
+
 Through :numref:`sec_scalar-tensor` and the above discussions, 
 we have a solid understanding of the geometry of vectors, lengths, and angles. 
 However, there is one important object we have omitted discussing, 
@@ -385,11 +384,13 @@ All they can do is take the original coordinates on our space
 and skew, rotate, and scale them.
 
 Some distortions can be severe.  For instance the matrix
+
 $$
 \mathbf{B} = \begin{bmatrix}
 2 & -1 \\ 4 & -2
 \end{bmatrix}
 $$
+
 compresses the entire two-dimensional plane down to a single line.
 Identifying and working with such transformations are the topic of a later section, 
 but geometrically we can see that this is fundamentally different 
@@ -406,15 +407,18 @@ we can start to get a feeling for how the matrix multiplication
 distorts the entire space in whatever dimension space we are dealing with.
 
 ## Linear Dependence
+
 Consider again the matrix
+
 $$
 \mathbf{B} = \begin{bmatrix}
 2 & -1 \\ 4 & -2
 \end{bmatrix}.
 $$
+
 This compresses the entire plane down to live on the single line $y = 2x$.
 The question now arises: is there some way we can detect this
-just looking at the matrix itself?  
+just looking at the matrix itself?
 The answer is that indeed we can.
 Lets take $\mathbf{b}_1 = [2,4]^\top$ and $\mathbf{b}_2 = [-1,-2]^\top$ 
 be the two columns of $\mathbf{B}$.
@@ -425,6 +429,7 @@ We call this a *linear combination*.
 The fact that $\mathbf{b}_1 = -2\cdot\mathbf{b}_2$ 
 means that we can write any linear combination of those two columns 
 entirely in terms of say $\mathbf{b}_2$ since
+
 $$
 a_1\mathbf{b}_1 + a_2\mathbf{b}_2 = -2a_1\mathbf{b}_2 + a_2\mathbf{b}_2 = (a_2-2a_1)\mathbf{b}_2.
 $$
@@ -437,6 +442,7 @@ collapses the entire plane down into a single line.
 Moreover, we see that the linear dependence 
 $\mathbf{b}_1 = -2\cdot\mathbf{b}_2$ captures this. 
 To make this more symmetrical between the two vectors, we will write this as
+
 $$
 \mathbf{b}_1  + 2\cdot\mathbf{b}_2 = 0.
 $$
@@ -451,7 +457,7 @@ $$
 
 In this case, we can solve for one of the vectors 
 in terms of some combination of the others, 
-and effectively render it redundant.  
+and effectively render it redundant.
 Thus, a linear dependence in the columns of a matrix 
 is a witness to the fact that our matrix 
 is compressing the space down to some lower dimension.
@@ -503,6 +509,7 @@ this is sufficient to see that the concept
 is well defined and understand the meaning.
 
 ## Invertibility
+
 We have seen above that multiplication by a matrix with linearly dependent columns
 cannot be undone, i.e., there is no inverse operation that can always recover the input.  However, multiplication by a full-rank matrix 
 (i.e., some $\mathbf{A}$ that is $n \times n$ matrix with rank $n$), 
@@ -591,12 +598,12 @@ the inverse will typically have almost every entry non-negative,
 requiring us to store all $1\text{M}^2$ entries---that is $1$ trillion entries!
 
 While we do not have time to dive all the way into the thorny numerical issues 
-frequenyly encountered when working with linear algebra, 
+frequently encountered when working with linear algebra, 
 we want to provide you with some intuition about when to proceed with caution, 
 and generally avoiding inversion in practice is a good rule of thumb.
 
 ## Determinant
-The geometric view of linear algrbra gives an inuitive way 
+The geometric view of linear algebra gives an intuitive way 
 to interpret a a fundamental quantity known as the *determinant*.
 Consider the grid image from before.
 
@@ -629,22 +636,22 @@ c & d
 $$
 
 we can see with some computation that the area 
-of the resulting parallelogram is $ad-bc$.  
+of the resulting parallelogram is $ad-bc$.
 This area is referred to as the *determinant*.
 
-Let's check this quickly with some example code.
+Let us check this quickly with some example code.
 
+```{.python .input}
+import numpy as np
+np.linalg.det(np.array([[1,-1],[2,3]]))
 ```
-np.linalg.det(np.array[[1,-1],[2,3]])
-```
-
 
 The eagle-eyed amongst us will notice 
 that this expression can be zero or even negative.
 For the negative term, this is a matter of convention 
 taken generally in mathematics: 
 if the matrix flips the figure, 
-we say the area is negated.  
+we say the area is negated.
 Let us see now that when the determinant is zero, we learn more.
 
 Let us consider
@@ -686,7 +693,7 @@ that $n\times n$ matrices scale $n$-dimensional volumes.
 Eigenvalues are often one of the most useful notions 
 we will encounter when studying linear algebra, 
 however, as a beginner, it is easy to overlook their importance.
-Below, we intorduce eigendecomposition and 
+Below, we introduce eigendecomposition and 
 try to convey some sense of just why it is so important. 
 
 Suppose we have a matrix $A$ with the following entries:
@@ -773,7 +780,6 @@ We can solve this with the vectors $[1,-1]^\top$ and $[1,2]^\top$ respectively.
 We can check this in code using the built-in numpy `numpy.linalg.eig` routine.
 
 ```{.python .input}
-import numpy as np
 np.linalg.eig(np.array([[2,1],[2,3]]))
 ```
 
@@ -924,14 +930,14 @@ We have $r_1 = 0.3$, $r_2 = 0.6$, $r_3 = 0.8$ and $r_4 = 0.9$.
 The matrix is symmetric, so all eigenvalues are real.
 This means that all of our eigenvalues will be in one of the ranges of 
 
-$$
-\begin{aligned}
-[a_{11}-r_1,a_{11}+r_1] & = [0.7,1.3], \\
-[a_{22}-r_2,a_{22}+r_2] & = [2.4,3.6], \\
-[a_{33}-r_3,a_{33}+r_3] & = [4.2,5.8], \\
-[a_{44}-r_4,a_{44}+r_4] & = [8.1,9.9].
-\end{aligned}
-$$
+$$[a_{11}-r_1,a_{11}+r_1] = [0.7,1.3], $$
+
+$$[a_{22}-r_2,a_{22}+r_2] = [2.4,3.6], $$
+
+$$[a_{33}-r_3,a_{33}+r_3] = [4.2,5.8], $$
+
+$$[a_{44}-r_4,a_{44}+r_4] = [8.1,9.9]. $$
+
 
 Performing the numerical computation shows 
 that the eigenvalues are approximately $0.99$, $2.97$, $4.95$, $9.08$,
@@ -979,9 +985,8 @@ $$
 $$
 
 When these models are initialized, $A$ is taken to be 
-a random matrix with Gaussian entries, so lets make one of those. 
-We will start mean zero, variance one Gaussians.
-Just to be concrete, lets make it a five by five matrix.
+a random matrix with Gaussian entries, so let us make one of those. 
+To be concrete, we start with a mean zero, variance one Gaussian distributed $5 \times 5$ matrix.
 
 ```{.python .input}
 np.random.seed(8675309)
@@ -1101,6 +1106,7 @@ for what is known as the [power iteration method](https://en.wikipedia.org/wiki/
 for finding the largest eigenvalue and eigenvector of a matrix.
 
 ### Fixing the normalization
+
 Now, from above discussions, we concluded 
 that we do not want a random vector to be stretched or squished at all,
 we would like random vectors to stay about the same size throughout the entire process.
@@ -1142,7 +1148,7 @@ It would be nice to be able to do these things from first principles,
 and it turns out that if we look deeply at the mathematics of it,
 we can see that the largest eigenvalue 
 of a large random matrix with independent mean zero,
-variance one Gaussians is on average about $\sqrt{n}$,
+variance one Gaussian entries is on average about $\sqrt{n}$,
 or in our case $\sqrt{5} \approx 2.2$,
 due to a fascinating fact known as the [circular law](https://en.wikipedia.org/wiki/Circular_law).
 This is why almost all initialization strategies
@@ -1151,6 +1157,7 @@ In this way, eigenvalues form a key component
 for understanding the behavior of many ML systems.
 
 ## Tensors and Common Linear Algebra Operations
+
 In :numref:`sec_scalar-tensor` the concept of tensors was introduced.
 In this section, we will dive more deeply into tensor contractions 
 (the tensor equivalent of matrix multiplication),
@@ -1162,8 +1169,12 @@ We need to have a similar definition for tensors if they are to be useful to us.
 Think about matrix multiplication:
 
 $$
-\mathbf{C} = \mathbf{A}\mathbf{B} \;\text{ or equivalently }\; c_{i,j} = \sum_{k} a_{i,k}b_{k,j}.
+\mathbf{C} = \mathbf{A}\mathbf{B}
 $$
+
+or equivalently
+
+$$ c_{i,j} = \sum_{k} a_{i,k}b_{k,j}.$$
 
 This pattern is one we can repeat for tensors.
 For tensors, there is no one case of what 
@@ -1194,11 +1205,13 @@ $$
 
 Let us see how many of the linear algebraic definitions 
 we have seen before can be expressed in this compressed tensor notation:
-* $\mathbf{v} \cdot \mathbf{w} = v_iw_i$ 
-* $\|\mathbf{v}\|_2^{2} = v_iv_i$
-* $\mathbf{A}\mathbf{v} = a_{ij}v_j$
-* $\mathbf{A}\mathbf{B} = a_{ij}b_{jk}$
-* $\mathrm{tr}(\mathbf{A}) = a_{ii}$
+
+* $\mathbf{v} \cdot \mathbf{w} = \sum_i v_iw_i$ 
+* $\|\mathbf{v}\|_2^{2} = \sum_i v_iv_i$
+* $(\mathbf{A}\mathbf{v})_i = \sum_j a_{ij}v_j$
+* $(\mathbf{A}\mathbf{B})_{ik} = \sum_j a_{ij}b_{jk}$
+* $\mathrm{tr}(\mathbf{A}) = \sum_i a_{ii}$
+
 In this way, we can replace a myriad of specialized notations with short tensor expressions.
 
 ## Expressing in numpy
@@ -1245,7 +1258,7 @@ np.einsum("ijk,il,j -> kl",B,A,v)
 
 This notation is readable and efficient for humans,
 however bulky if for whatever reason 
-we need generate a tensor contraction programatically.
+we need to generate a tensor contraction programmatically.
 For this reason, numpy provides an alternative notation 
 by providing integer indices for each tensor.
 For example, the same tensor contraction can also be written as:
@@ -1262,14 +1275,13 @@ Either notation allows for concise and efficient representation of tensor contra
 * Hyperplanes are high-dimensional generalizations of lines and planes.  They can be used to define decision planes that are often used as the last step in a classification task.
 * Matrix multiplication can be geometrically interpreted as uniform distortions of the underlying coordinates. They represent a very restricted, but mathematically clean, way to transform vectors.
 * Linear dependence is a way to tell when a collection of vectors are in a lower dimensional space than we would expect (say you have $3$ vectors living in a $2$-dimensional space). The rank of a matrix is the size of the largest subset of its columns that are linearly independent.
-* When a matrix's inverse is defined, matrix inversion allows us to find another matrix that undoes the action of the first. Matrix inverse's are useful in theory, but require care in practice owing to numerical instability.
+* When a matrix's inverse is defined, matrix inversion allows us to find another matrix that undoes the action of the first. Matrix inversion is useful in theory, but requires care in practice owing to numerical instability.
 * Determinants allow us to measure how much a matrix expands or contracts a space. A nonzero determinant implies an invertible (non-singular) matrix and a zero-valued determinant means that the matrix is non-invertible (singular).
 * Eigenvalues and eigenvectors allow for a detailed understanding of the behavior of a matrix.
 * Tensor contractions and Einstein summation provide for a neat and clean notation for expressing many of the computations that are seen in machine learning.
 
 ## Exercises
 1. What is the angle between
-
 $$
 \vec v_1 = \begin{bmatrix}
 1 \\ 0 \\ -1 \\ 2
@@ -1277,54 +1289,41 @@ $$
 3 \\ 1 \\ 0 \\ 1
 \end{bmatrix}?
 $$
-
 2. True or false: $\begin{bmatrix}1 & 2\\0&1\end{bmatrix}$ and $\begin{bmatrix}1 & -2\\0&1\end{bmatrix}$ are inverses of one another?
-
 3. Suppose we draw a shape in the plane with area $100\mathrm{m}^2$.  What is the area after transforming the figure by the matrix
-
 $$
 \begin{bmatrix}
 2 & 3\\
 1 & 2
 \end{bmatrix}.
 $$
-
 4. Which of the following sets of vectors are linearly independent?
-* $\left\{\begin{pmatrix}1\\0\\-1\end{pmatrix},\begin{pmatrix}2\\1\\-1\end{pmatrix},\begin{pmatrix}3\\1\\1\end{pmatrix}\right\}$
-* $\left\{\begin{pmatrix}3\\1\\1\end{pmatrix},\begin{pmatrix}1\\1\\1\end{pmatrix},\begin{pmatrix}0\\0\\0\end{pmatrix}\right\}$
-* $\left\{\begin{pmatrix}1\\1\\0\end{pmatrix},\begin{pmatrix}0\\1\\-1\end{pmatrix},\begin{pmatrix}1\\0\\1\end{pmatrix}\right\}$
-
+ * $\left\{\begin{pmatrix}1\\0\\-1\end{pmatrix},\begin{pmatrix}2\\1\\-1\end{pmatrix},\begin{pmatrix}3\\1\\1\end{pmatrix}\right\}$
+ * $\left\{\begin{pmatrix}3\\1\\1\end{pmatrix},\begin{pmatrix}1\\1\\1\end{pmatrix},\begin{pmatrix}0\\0\\0\end{pmatrix}\right\}$
+ * $\left\{\begin{pmatrix}1\\1\\0\end{pmatrix},\begin{pmatrix}0\\1\\-1\end{pmatrix},\begin{pmatrix}1\\0\\1\end{pmatrix}\right\}$
 5. Suppose you have a matrix written as $A = \begin{bmatrix}c\\d\end{bmatrix}\cdot\begin{bmatrix}a & b\end{bmatrix}$ for some choice of values $a,b,c,$ and $d$.  True or false: the determinant of such a matrix is always $0$?
-
 6. The vectors $e_1 = \begin{bmatrix}1\\0\end{bmatrix}$ and $e_2 = \begin{bmatrix}0\\1\end{bmatrix}$ are orthogonal.  What is the condition on a matrix $A$ so that $Ae_1$ and $Ae_2$ are orthogonal?
-
 7. What are the eigenvalues and eigenvectors of
-
 $$
-A = \begin{bmatrix}
+\mathbf{A} = \begin{bmatrix}
 2 & 1 \\
 1 & 2
 \end{bmatrix}?
 $$
-
 8.  What are the eigenvalues and eigenvectors of the following matrix, and what is strange about this example compared to the previous one?
-
 $$
-A = \begin{bmatrix}
+\mathbf{A} = \begin{bmatrix}
 2 & 1 \\
 0 & 2
 \end{bmatrix}?
 $$
-
 9. Without computing the eigenvalues, is it possible that the smallest eigenvalue of the following matrix is less that $0.5$? *Note*: this problem can be done in your head.
-
 $$
-A = \begin{bmatrix}
+\mathbf{A} = \begin{bmatrix}
 3.0 & 0.1 & 0.3 & 1.0 \\
 0.1 & 1.0 & 0.1 & 0.2 \\
 0.3 & 0.1 & 5.0 & 0.0 \\
 1.0 & 0.2 & 0.0 & 1.8
 \end{bmatrix}
 $$
-
 10. How can you write $\mathrm{tr}(\mathbf{A}^4)$ in Einstein notation?

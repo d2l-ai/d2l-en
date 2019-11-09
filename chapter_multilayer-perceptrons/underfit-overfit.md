@@ -142,7 +142,7 @@ extended this theory to more general classes of functions.
 This work laid the foundations of [Statistical Learning Theory](https://en.wikipedia.org/wiki/Statistical_learning_theory).
 
 
-In the **standard supervised learning setting**, which we have addressed up until now and will stick throughout most of this book,
+In the *standard supervised learning setting*, which we have addressed up until now and will stick throughout most of this book,
 we assume that both the training data and the test data
 are drawn *independently* from *identical* distributions
 (commonly called the i.i.d. assumption).

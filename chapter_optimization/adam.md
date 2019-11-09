@@ -5,30 +5,30 @@ Created on the basis of RMSProp, Adam also uses EWMA on the minibatch stochastic
 
 ## The Algorithm
 
-Adam :cite:`Kingma.Ba.2014` uses the momentum variable $\boldsymbol{v}_t$ and variable $\boldsymbol{s}_t$, which is an EWMA on the squares of elements in the minibatch stochastic gradient from RMSProp, and initializes each element of the variables to 0 at time step 0. Given the hyperparameter $0 \leq \beta_1 < 1$ (the author of the algorithm suggests a value of 0.9), the momentum variable $\boldsymbol{v}_t$ at time step $t$ is the EWMA of the minibatch stochastic gradient $\boldsymbol{g}_t$:
+Adam :cite:`Kingma.Ba.2014` uses the momentum variable $\mathbf{v}_t$ and variable $\mathbf{s}_t$, which is an EWMA on the squares of elements in the minibatch stochastic gradient from RMSProp, and initializes each element of the variables to 0 at time step 0. Given the hyperparameter $0 \leq \beta_1 < 1$ (the author of the algorithm suggests a value of 0.9), the momentum variable $\mathbf{v}_t$ at time step $t$ is the EWMA of the minibatch stochastic gradient $\mathbf{g}_t$:
 
-$$\boldsymbol{v}_t \leftarrow \beta_1 \boldsymbol{v}_{t-1} + (1 - \beta_1) \boldsymbol{g}_t. $$
+$$\mathbf{v}_t \leftarrow \beta_1 \mathbf{v}_{t-1} + (1 - \beta_1) \mathbf{g}_t. $$
 
 Just as in RMSProp, given the hyperparameter $0 \leq \beta_2 < 1$ (the author of the algorithm suggests a value of 0.999),
-After taken the squares of elements in the minibatch stochastic gradient, find $\boldsymbol{g}_t \odot \boldsymbol{g}_t$ and perform EWMA on it to obtain $\boldsymbol{s}_t$:
+After taken the squares of elements in the minibatch stochastic gradient, find $\mathbf{g}_t \odot \mathbf{g}_t$ and perform EWMA on it to obtain $\mathbf{s}_t$:
 
-$$\boldsymbol{s}_t \leftarrow \beta_2 \boldsymbol{s}_{t-1} + (1 - \beta_2) \boldsymbol{g}_t \odot \boldsymbol{g}_t. $$
+$$\mathbf{s}_t \leftarrow \beta_2 \mathbf{s}_{t-1} + (1 - \beta_2) \mathbf{g}_t \odot \mathbf{g}_t. $$
 
-Since we initialized elements in $\boldsymbol{v}_0$ and $\boldsymbol{s}_0$ to 0,
-we get $\boldsymbol{v}_t =  (1-\beta_1) \sum_{i=1}^t \beta_1^{t-i} \boldsymbol{g}_i$ at time step $t$. Sum the minibatch stochastic gradient weights from each previous time step to get $(1-\beta_1) \sum_{i=1}^t \beta_1^{t-i} = 1 - \beta_1^t$. Notice that when $t$ is small, the sum of the minibatch stochastic gradient weights from each previous time step will be small. For example, when $\beta_1 = 0.9$, $\boldsymbol{v}_1 = 0.1\boldsymbol{g}_1$. To eliminate this effect, for any time step $t$, we can divide $\boldsymbol{v}_t$ by $1 - \beta_1^t$, so that the sum of the minibatch stochastic gradient weights from each previous time step is 1. This is also called bias correction. In the Adam algorithm, we perform bias corrections for variables $\boldsymbol{v}_t$ and $\boldsymbol{s}_t$:
+Since we initialized elements in $\mathbf{v}_0$ and $\mathbf{s}_0$ to 0,
+we get $\mathbf{v}_t =  (1-\beta_1) \sum_{i=1}^t \beta_1^{t-i} \mathbf{g}_i$ at time step $t$. Sum the minibatch stochastic gradient weights from each previous time step to get $(1-\beta_1) \sum_{i=1}^t \beta_1^{t-i} = 1 - \beta_1^t$. Notice that when $t$ is small, the sum of the minibatch stochastic gradient weights from each previous time step will be small. For example, when $\beta_1 = 0.9$, $\mathbf{v}_1 = 0.1\mathbf{g}_1$. To eliminate this effect, for any time step $t$, we can divide $\mathbf{v}_t$ by $1 - \beta_1^t$, so that the sum of the minibatch stochastic gradient weights from each previous time step is 1. This is also called bias correction. In the Adam algorithm, we perform bias corrections for variables $\mathbf{v}_t$ and $\mathbf{s}_t$:
 
-$$\hat{\boldsymbol{v}}_t \leftarrow \frac{\boldsymbol{v}_t}{1 - \beta_1^t}, $$
+$$\hat{\mathbf{v}}_t \leftarrow \frac{\mathbf{v}_t}{1 - \beta_1^t}, $$
 
-$$\hat{\boldsymbol{s}}_t \leftarrow \frac{\boldsymbol{s}_t}{1 - \beta_2^t}. $$
+$$\hat{\mathbf{s}}_t \leftarrow \frac{\mathbf{s}_t}{1 - \beta_2^t}. $$
 
 
-Next, the Adam algorithm will use the bias-corrected variables $\hat{\boldsymbol{v}}_t$ and $\hat{\boldsymbol{s}}_t$ from above to re-adjust the learning rate of each element in the model parameters using element operations.
+Next, the Adam algorithm will use the bias-corrected variables $\hat{\mathbf{v}}_t$ and $\hat{\mathbf{s}}_t$ from above to re-adjust the learning rate of each element in the model parameters using element operations.
 
-$$\boldsymbol{g}_t' \leftarrow \frac{\eta \hat{\boldsymbol{v}}_t}{\sqrt{\hat{\boldsymbol{s}}_t} + \epsilon},$$
+$$\mathbf{g}_t' \leftarrow \frac{\eta \hat{\mathbf{v}}_t}{\sqrt{\hat{\mathbf{s}}_t} + \epsilon},$$
 
-Here, $\eta$ is the learning rate while $\epsilon$ is a constant added to maintain numerical stability, such as $10^{-8}$. Just as for Adagrad, RMSProp, and Adadelta, each element in the independent variable of the objective function has its own learning rate. Finally, use $\boldsymbol{g}_t'$ to iterate the independent variable:
+Here, $\eta$ is the learning rate while $\epsilon$ is a constant added to maintain numerical stability, such as $10^{-8}$. Just as for Adagrad, RMSProp, and Adadelta, each element in the independent variable of the objective function has its own learning rate. Finally, use $\mathbf{g}_t'$ to iterate the independent variable:
 
-$$\boldsymbol{x}_t \leftarrow \boldsymbol{x}_{t-1} - \boldsymbol{g}_t'. $$
+$$\mathbf{x}_t \leftarrow \mathbf{x}_{t-1} - \mathbf{g}_t'. $$
 
 ## Implementation from Scratch
 

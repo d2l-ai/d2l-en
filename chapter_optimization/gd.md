@@ -5,7 +5,7 @@ In this section we are going to introduce the basic concepts underlying gradient
 
 ## Gradient Descent in One Dimension
 
-Gradient descent in one dimension is an excellent example to explain why the gradient descent algorithm may reduce the value of the objective function. Consider some continously differentiable real-valued function $f: \mathbb{R} \rightarrow \mathbb{R}$. Using a Taylor expansion (:numref:`sec_math`) we obtain that 
+Gradient descent in one dimension is an excellent example to explain why the gradient descent algorithm may reduce the value of the objective function. Consider some continously differentiable real-valued function $f: \mathbb{R} \rightarrow \mathbb{R}$. Using a Taylor expansion (:numref:`sec_single_variable_calculus`) we obtain that 
 
 $$f(x + \epsilon) = f(x) + \epsilon f'(x) + O(\epsilon^2).$$
 :eqlabel:`gd-taylor`

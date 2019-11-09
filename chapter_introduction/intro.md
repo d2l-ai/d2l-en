@@ -187,10 +187,10 @@ In the next section, we will take a deep dive into the different ML problems.
 First, we'd like to shed more light on some core components
 that will follow us around, no matter what kind of ML problem we take on:
 
-1. The **data** that we can learn from
-2. A **model** of how to transform the data
-3. A **loss** function that quantifies the *badness* of our model
-4. An **algorithm** to adjust the model's parameters to minimize the loss
+1. The *data* that we can learn from
+2. A *model* of how to transform the data
+3. A *loss* function that quantifies the *badness* of our model
+4. An *algorithm* to adjust the model's parameters to minimize the loss
 
 
 ### Data
@@ -367,17 +367,17 @@ In the following sections, we will discuss a few types of machine learning in so
 
 Supervised learning addresses the task of predicting *targets* given input data.
 The targets, also commonly called *labels*, are generally denoted *y*.
-The input data points, also commonly called *examples* or *instances*, are typically denoted $\boldsymbol{x}$.
-The goal is to produce a model $f_\theta$ that maps an input $\boldsymbol{x}$ to a prediction $f_{\theta}(\boldsymbol{x})$
+The input data points, also commonly called *examples* or *instances*, are typically denoted $\mathbf{x}$.
+The goal is to produce a model $f_\theta$ that maps an input $\mathbf{x}$ to a prediction $f_{\theta}(\mathbf{x})$
 
 To ground this description in a concrete example,
 if we were working in healthcare,
 then we might want to predict whether or not a patient would have a heart attack.
 This observation, *heart attack* or *no heart attack*,
 would be our label $y$.
-The input data $\boldsymbol{x}$ might be vital signs such as heart rate, diastolic and systolic blood pressure, etc.
+The input data $\mathbf{x}$ might be vital signs such as heart rate, diastolic and systolic blood pressure, etc.
 
-The supervision comes into play because for choosing the parameters $\theta$, we (the supervisors) provide the model with a collection of *labeled examples* ($\boldsymbol{x}_i, y_i$), where each example $\boldsymbol{x}_i$ is matched up against its correct label.
+The supervision comes into play because for choosing the parameters $\theta$, we (the supervisors) provide the model with a collection of *labeled examples* ($\mathbf{x}_i, y_i$), where each example $\mathbf{x}_i$ is matched up against its correct label.
 
 In probabilistic terms, we typically are interested in estimating
 the conditional probability $P(y|x)$.
@@ -778,11 +778,11 @@ and the type and number of questions we could ask
 is limited only by our creativity.
 We will address a number of unsupervised learning techniques in later chapters. To whet your appetite for now, we describe a few of the questions you might ask:
 
-* Can we find a small number of prototypes that accurately summarize the data? Given a set of photos, can we group them into landscape photos, pictures of dogs, babies, cats, mountain peaks, etc.? Likewise, given a collection of users' browsing activity, can we group them into users with similar behavior? This problem is typically known as **clustering**.
-* Can we find a small number of parameters that accurately capture the relevant properties of the data? The trajectories of a ball are quite well described by velocity, diameter, and mass of the ball. Tailors have developed a small number of parameters that describe human body shape fairly accurately for the purpose of fitting clothes. These problems are referred to as **subspace estimation** problems. If the dependence is linear, it is called **principal component analysis**.
-* Is there a representation of (arbitrarily structured) objects in Euclidean space (i.e., the space of vectors in $\mathbb{R}^n$) such that symbolic properties can be well matched? This is called **representation learning** and it is used to describe entities and their relations, such as Rome - Italy + France = Paris.
-* Is there a description of the root causes of much of the data that we observe? For instance, if we have demographic data about house prices, pollution, crime, location, education, salaries, etc., can we discover how they are related simply based on empirical data? The field of **directed graphical models** and **causality** deals with this.
-* An important and exciting recent development is **generative adversarial networks**. They are basically a procedural way of synthesizing data. The underlying statistical mechanisms are tests to check whether real and fake data are the same. We will devote a few notebooks to them.
+* Can we find a small number of prototypes that accurately summarize the data? Given a set of photos, can we group them into landscape photos, pictures of dogs, babies, cats, mountain peaks, etc.? Likewise, given a collection of users' browsing activity, can we group them into users with similar behavior? This problem is typically known as *clustering*.
+* Can we find a small number of parameters that accurately capture the relevant properties of the data? The trajectories of a ball are quite well described by velocity, diameter, and mass of the ball. Tailors have developed a small number of parameters that describe human body shape fairly accurately for the purpose of fitting clothes. These problems are referred to as *subspace estimation* problems. If the dependence is linear, it is called *principal component analysis*.
+* Is there a representation of (arbitrarily structured) objects in Euclidean space (i.e., the space of vectors in $\mathbb{R}^n$) such that symbolic properties can be well matched? This is called *representation learning* and it is used to describe entities and their relations, such as Rome - Italy + France = Paris.
+* Is there a description of the root causes of much of the data that we observe? For instance, if we have demographic data about house prices, pollution, crime, location, education, salaries, etc., can we discover how they are related simply based on empirical data? The field of *directed graphical models* and *causality* deals with this.
+* An important and exciting recent development is *generative adversarial networks*. They are basically a procedural way of synthesizing data. The underlying statistical mechanisms are tests to check whether real and fake data are the same. We will devote a few notebooks to them.
 
 
 ### Interacting with an Environment
