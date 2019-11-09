@@ -53,7 +53,7 @@ There is a traditional way to try and understand how we might try to approximate
 ```{.python .input}
 epsilon = 0.05
 a = 0
-b = 2    
+b = 2
 
 x = np.arange(a, b, epsilon)
 f = x / (1 + x**2)
