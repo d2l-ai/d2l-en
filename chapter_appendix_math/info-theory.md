@@ -221,7 +221,7 @@ def mutual_information(p_xy, p_x, p_y):
     out = nansum(mutual.as_nd_ndarray()) 
     return out
 
-mutual_information(np.array([0.1, 0.5, 0.1, 0.3]), 
+mutual_information(np.array([[0.1, 0.5], [0.1, 0.3]]), 
                    np.array([0.2, 0.8]), 
                    np.array([[0.75, 0.25]]))
 ```
