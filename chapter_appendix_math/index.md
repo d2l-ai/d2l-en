@@ -28,7 +28,7 @@ Taken together, these form the core of the mathematical concepts needed to begin
 :maxdepth: 2
 
 linear-algebra
-eigen-decompositions
+eigen-decomposition
 single-variable-calculus
 multivariable-calculus
 integral-calculus
