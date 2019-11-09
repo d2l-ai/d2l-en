@@ -258,8 +258,8 @@ ax = d2l.plt.figure().add_subplot(111, projection='3d')
 ax.plot_wireframe(x, y, z)
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('y')
-plt.xticks([-2,-1,0,1,2])
-plt.yticks([-2,-1,0,1,2])
+d2l.plt.xticks([-2,-1,0,1,2])
+d2l.plt.yticks([-2,-1,0,1,2])
 ax.set_xlim(-2, 2); ax.set_ylim(-2, 2); ax.set_zlim(0, 1)
 ax.dist = 12
 ```
