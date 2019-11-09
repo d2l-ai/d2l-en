@@ -31,6 +31,7 @@ In most cases, this area will be infinite or undefined (consider the area under 
 x = np.arange(-2, 2, 0.01)
 f = np.exp(-x**2)
 
+d2l.set_figsize()
 d2l.plt.plot(x, f, color='black')
 d2l.plt.fill_between(x.tolist()[50:250], f.tolist()[50:250])
 d2l.plt.show()
@@ -61,6 +62,7 @@ f = x / (1 + x**2)
 approx = np.sum(epsilon*f)
 true = np.log(2) / 2
 
+d2l.set_figsize()
 d2l.plt.bar(x, f, width = epsilon, align = 'edge')
 d2l.plt.plot(x, f, color='black')
 d2l.plt.ylim([0, 1])
@@ -256,6 +258,8 @@ ax = d2l.plt.figure().add_subplot(111, projection='3d')
 ax.plot_wireframe(x, y, z)
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('y')
+plt.xticks([-2,-1,0,1,2])
+plt.yticks([-2,-1,0,1,2])
 ax.set_xlim(-2, 2); ax.set_ylim(-2, 2); ax.set_zlim(0, 1)
 ax.dist = 12
 ```

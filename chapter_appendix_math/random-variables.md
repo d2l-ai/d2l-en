@@ -97,6 +97,7 @@ x = np.arange(-5, 5, 0.01)
 p = 0.2*np.exp(-(x - 3)**2 / 2) / np.sqrt(2 * np.pi) + \
     0.8*np.exp(-(x + 1)**2 / 2) / np.sqrt(2 * np.pi)
 
+d2l.set_figsize()
 d2l.plt.plot(x, p, color='black')
 d2l.plt.fill_between(x.tolist()[300:800], p.tolist()[300:800])
 d2l.plt.show()
@@ -253,6 +254,7 @@ Let's visualize this.  I will show the probability of getting the three values a
 ```{.python .input}
 # Define a helper to plot these figures
 def plot_chebychev(a, p) :
+    d2l.set_figsize()
     d2l.plt.stem([a-2, a, a+2], [p, 1-2*p, p], use_line_collection=True)
     d2l.plt.xlim([-4, 4])
     d2l.plt.xlabel('x')
