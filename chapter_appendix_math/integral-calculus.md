@@ -12,6 +12,7 @@ Suppose that we have a function $f(x)$.  For simplicity, let us assume that $f(x
 %matplotlib inline
 import d2l
 from IPython import display
+from mpl_toolkits import mplot3d
 from mxnet import np, npx
 npx.set_np()
 
@@ -55,10 +56,10 @@ a = 0
 b = 2    
 
 x = np.arange(a, b, epsilon)
-f = x/(1+x**2)
+f = x / (1 + x**2)
 
 approx = np.sum(epsilon*f)
-true = np.log(2)/2
+true = np.log(2) / 2
 
 d2l.plt.bar(x, f, width = epsilon, align = 'edge')
 d2l.plt.plot(x, f, color='black')
@@ -245,8 +246,6 @@ If this discussion sounds familiar, it is!  In :numref:`sec_linear_algebra` we d
 In some cases, we will need to work in higher dimensions.  For instance, suppose that we have a function of two variables, like $f(x,y)$ and we want to know the volume under $f$ when $x$ ranges over $[a,b]$ and $y$ ranges over $[c,d]$.
 
 ```{.python .input}
-from mpl_toolkits import mplot3d
-
 # Construct grid and compute function
 x, y = np.meshgrid(np.linspace(-2, 2, 101), 
                    np.linspace(-2, 2, 101), indexing='ij')
@@ -257,7 +256,8 @@ ax = d2l.plt.figure().add_subplot(111, projection='3d')
 ax.plot_wireframe(x, y, z)
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('y')
-ax.set_xlim(-2, 2); ax.set_ylim(-2, 2); ax.set_zlim(0, 1);
+ax.set_xlim(-2, 2); ax.set_ylim(-2, 2); ax.set_zlim(0, 1)
+ax.dist = 12
 ```
 
 We write this as 

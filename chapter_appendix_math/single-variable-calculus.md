@@ -55,7 +55,7 @@ L = lambda x: x**2 + 1701*(x-4)**3
 # Print the difference divided by epsilon for several epsilon
 for epsilon in [0.1, 0.001, 0.0001, 0.00001] :
     print("epsilon = {:.5f} -> {:.5f}".format(
-        epsilon, (L(4+epsilon)-L(4))/epsilon))
+        epsilon, (L(4+epsilon) - L(4)) / epsilon))
 ```
 
 Now, if we are observant, we will notice that the output of this number is suspiciously close to $8$.  Indeed, if we fiddle with the $\epsilon$ value, and make it smaller, we will see values progressively closer to $8$.  Thus we may conclude, correctly, that the value we seek (the degree a change in the input changes the output) should be $8$ at the point $x=4$.  The way that a mathematician encodes this fact is
@@ -64,7 +64,7 @@ $$
 \lim_{\epsilon \rightarrow 0}\frac{L(4+\epsilon) - L(4)}{\epsilon} = 8.
 $$
 
-As a bit of a historical digression: in the first few decades of neural network research, scientists used this algorithm (the *method of finite differences*) to evaluate how a loss function changed under small perturbation: just change the weights and see how the loss changed.  This is computationally inefficient, requiring two evaluations of the loss function to see how a single change of one variable influenced the loss.  If we tried to do this with even a paltry few thousand parameters, it would require several thousand evaluations of the network over the entire dataset!  It was not solved until 1986 that the *backpropagation algorithm* introduced in a paper by [Rumelhart et al., 1986](https://www.nature.com/articles/323533a0), which provides how *any* change of the weights together would change the loss. In this paper, the rule of calculus efficiently utilizes same computation time as a single prediction of the network over the dataset.
+As a bit of a historical digression: in the first few decades of neural network research, scientists used this algorithm (the *method of finite differences*) to evaluate how a loss function changed under small perturbation: just change the weights and see how the loss changed.  This is computationally inefficient, requiring two evaluations of the loss function to see how a single change of one variable influenced the loss.  If we tried to do this with even a paltry few thousand parameters, it would require several thousand evaluations of the network over the entire dataset!  It was not solved until 1986 that the *backpropagation algorithm* introduced in :cite:`rumelhart.1988`, which provides how *any* change of the weights together would change the loss. In this paper, the rule of calculus efficiently utilizes same computation time as a single prediction of the network over the dataset.
 
 Back in our example, this value of the change $8$ is different based on different values of $x$, so it makes sense to define a function about $x$.  More formally, this value dependent rate of change is referred to as the *derivative* as
 
@@ -98,10 +98,10 @@ In this way, we can understand the derivative as the scaling factor that tells u
 ## Rules of Calculus
 :label:`sec_derivative_table`
 
-A full formal treatment of calculus would derive everything from first principles.  We will not indulge in this temptation here, but rather list the most commonly encountered derivatives, and provide an understanding of the common rules.
+A full formal treatment of calculus would derive everything from first principles.  We will not indulge in this temptation here, but rather provide an understanding of the common rules encountered.
 
 ### Common Derivatives
-When computing derivatives, one can often times use a series of rules to reduce the computation to a few core functions.  In a full calculus class, we would derive an extensive table of dozens of fundamental derivatives.  Below, we  summarize only most important ones encountered in practice-about 90% of the derivatives we will encounter on a regular basis will be some combination of these.
+As was seen in :numref:`sec-calculus`, when computing derivatives one can often times use a series of rules to reduce the computation to a few core functions.  We repeat them here for ease of reference.
 
 * **Derivative of constants.** $\frac{d}{dx}c = 0$.
 * **Derivative of linear functions.** $\frac{d}{dx}(ax) = a$.
@@ -110,10 +110,10 @@ When computing derivatives, one can often times use a series of rules to reduce 
 * **Derivative of the logarithm.** $\frac{d}{dx}\log(x) = \frac{1}{x}$.
 
 ### Derivative Rules
-If we needed to compute every derivative separately and store them in a table, there would be an infinite amount of them.  It is a gift of mathematics that we can generalize the above derivatives and compute more complex derivatives like finding the derivative of $f(x) = \log\left(1+(x-1)^{10}\right)$.  The key to doing so is to codify what happens when we take functions and combine them in various ways, most importantly: sums, products, and compositions.
+If every derivative needed to be separately computed and stored in a table, differential calculus would be near impossible.  It is a gift of mathematics that we can generalize the above derivatives and compute more complex derivatives like finding the derivative of $f(x) = \log\left(1+(x-1)^{10}\right)$.  As was mentioned in :numref:`sec-calculus`, the key to doing so is to codify what happens when we take functions and combine them in various ways, most importantly: sums, products, and compositions.
 
-* **Sum rule.** $\frac{d}{dx}(g(x) + h(x)) = \frac{dg}{dx}(x) + \frac{dh}{dx}(x)$.
-* **Product rule.** $\frac{d}{dx}(g(x)\cdot h(x)) = g(x)\frac{dh}{dx}(x) + \frac{dg}{dx}(x)h(x)$.
+* **Sum rule.** $\frac{d}{dx}\left(g(x) + h(x)\right) = \frac{dg}{dx}(x) + \frac{dh}{dx}(x)$.
+* **Product rule.** $\frac{d}{dx}\left(g(x)\cdot h(x)\right) = g(x)\frac{dh}{dx}(x) + \frac{dg}{dx}(x)h(x)$.
 * **Chain rule.** $\frac{d}{dx}g(h(x)) = \frac{dg}{dh}(h(x))\cdot \frac{dh}{dx}(x)$.
 
 It gives us excellent intuition into how one can reason with small changes in the input.  First, for the sum rule, we may examine the following chain of reasoning:
@@ -135,7 +135,7 @@ Next, the product is more subtle, and will require a new observation about how t
 $$
 \begin{aligned}
 f(x+\epsilon) & = g(x+\epsilon)\cdot h(x+\epsilon) \\
-& \approx (g(x) + \epsilon \frac{dg}{dx}(x))\cdot(h(x) + \epsilon \frac{dh}{dx}(x)) \\
+& \approx \left(g(x) + \epsilon \frac{dg}{dx}(x)\right)\cdot\left(h(x) + \epsilon \frac{dh}{dx}(x)\right) \\
 & = g(x)\cdot h(x) + \epsilon\left(g(x)\frac{dh}{dx}(x) + \frac{dg}{dx}(x)h(x)\right) + \epsilon^2\frac{dg}{dx}(x)\frac{dh}{dx}(x) \\
 & = f(x) + \epsilon\left(g(x)\frac{dh}{dx}(x) + \frac{dg}{dx}(x)h(x)\right) + \epsilon^2\frac{dg}{dx}(x)\frac{dh}{dx}(x). \\
 \end{aligned}
@@ -205,7 +205,7 @@ plots = [np.sin(xs)]
 
 # Compute some linear approximations. Use d(sin(x))/dx = cos(x)
 for x0 in [-1.5, 0, 2] :
-    plots.append(np.sin(x0) + (xs-x0)*np.cos(x0))
+    plots.append(np.sin(x0) + (xs - x0) * np.cos(x0))
 
 d2l.plot(xs, plots, 'x', 'f(x)', ylim=[-1.5, 1.5])
 ```
@@ -255,7 +255,8 @@ plots = [np.sin(xs)]
 
 # Compute some quadratic approximations. Use d(sin(x))/dx = cos(x)
 for x0 in [-1.5, 0, 2] :
-    plots.append(np.sin(x0) + (xs-x0)*np.cos(x0) - (xs-x0)**2*np.sin(x0)/2)
+    plots.append(np.sin(x0) + (xs - x0) * np.cos(x0) - 
+                              (xs - x0)**2 * np.sin(x0) / 2)
 
 d2l.plot(xs, plots, 'x', 'f(x)', ylim=[-1.5, 1.5])
 ```
@@ -318,8 +319,8 @@ ys = np.exp(xs)
 
 # Compute a few Taylor series approximations
 P1 = 1 + xs
-P2 = 1 + xs + xs**2/2
-P5 = 1 + xs + xs**2/2 + xs**3/6 + xs**4/24 + xs**5/120
+P2 = 1 + xs + xs**2 / 2
+P5 = 1 + xs + xs**2 / 2 + xs**3 / 6 + xs**4 / 24 + xs**5 / 120
 
 d2l.plot(xs, [ys, P1, P2, P5], 'x', 'f(x)', legend = [
     "Exponential", "Degree 1 Taylor Series", "Degree 2 Taylor Series",

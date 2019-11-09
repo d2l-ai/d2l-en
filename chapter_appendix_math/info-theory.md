@@ -24,7 +24,7 @@ Any notion of information we develop must conform to this intuition.  Indeed, in
 
 If we read through these thought experiments, we see a natural idea.  As a starting point, rather than caring about the knowledge, we may build off the idea that information represents the degree of surprise or the abstract possibility of the event. For example, if we want to describe an unusual event, we need a lot information. For a common event, we may not need much information.
 
-In 1948,  [Claude E. Shannon](https://en.wikipedia.org/wiki/Claude_Shannon) published his well-known book [A Mathematical Theory of Communication](https://en.wikipedia.org/wiki/A_Mathematical_Theory_of_Communication) establishing the theory of information.  In his book, Shannon introduced the concept of information entropy for the first time. We will begin our journey here.
+In 1948, Claude E. Shannon published *A Mathematical Theory of Communication* :cite:`Shannon.1948` establishing the theory of information.  In his book, Shannon introduced the concept of information entropy for the first time. We will begin our journey here.
 
 ### Self-information
 
@@ -59,7 +59,7 @@ As self-information only measures the information of a single discrete event, we
 
 ### Motivating Entropy
 
-Let us try to get specific about what we want.  This will be an informal statement of what are known as the *axioms of Shannon entropy*.  It will turn out that the following collection of common-sense statements force us to a unique definition of information.  [This survey paper](https://www.mdpi.com/1099-4300/10/3/261/pdf) provides a formal version of these axioms, along with several others.
+Let us try to get specific about what we want.  This will be an informal statement of what are known as the *axioms of Shannon entropy*.  It will turn out that the following collection of common-sense statements force us to a unique definition of information.  A formal version of these axioms, along with several others may be found in :cite:`csiszar.2008`.
 
 1.  The information we gain by observing a random variable does not depend on what we call the elements, or the presence of additional elements which have probability zero.
 2.  The information we gain by observing two random variables is no more than the sum of the information we gain by observing them separately.  If they are independent, then it is exactly the sum.
@@ -285,9 +285,9 @@ Let us take a look at some properties of the KL divergence.
 * KL divergence is non-negative, i.e., $$D_{\mathrm{KL}}(P\|Q) \geq 0.$$ Note that the equality holds only when $P = Q$.
 * If there exists an $x$ such that $p(x) > 0$ and $q(x) = 0$, then $D_{\mathrm{KL}}(P\|Q) = \infty$.
 * There is a close relationship between KL divergence and mutual information. Besides the relationship shown in :numref:`fig_mutual_information`, $I(X,Y)$ is also numerically equivalent with the following terms:
-    1. $ D_{\mathrm{KL}}(P(X, Y)  \ \| \ P(X)P(Y))$;
-    1. $ E_Y \{ D_{\mathrm{KL}}(P(X \mid Y) \ \| \ P(X)) \}$;
-    1. $ E_X \{ D_{\mathrm{KL}}(P(Y \mid X) \ \| \ P(Y)) \}$.
+    1. $D_{\mathrm{KL}}(P(X, Y)  \ \| \ P(X)P(Y))$;
+    1. $E_Y \{ D_{\mathrm{KL}}(P(X \mid Y) \ \| \ P(X)) \}$;
+    1. $E_X \{ D_{\mathrm{KL}}(P(Y \mid X) \ \| \ P(Y)) \}$.
     
   For the first term, we interpret mutual information as the KL divergence between $P(X, Y)$ and the product of $P(X)$ and $P(Y)$, and thus is a measure of how different the joint distribution is from the distribution if they were independent. For the second term, mutual information tells us the average reduction in uncertainty about $Y$ that results from learning the value of the $X$'s distribution. Similarly to the third term.
 
