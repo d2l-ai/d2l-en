@@ -50,7 +50,7 @@ npx.set_np()
 
 # Plot the probability density function for some random variable
 x = np.arange(-5, 5, 0.01)
-p = 0.2*np.exp(-(x - 3)**2 / 2)/np.sqrt(2 * np.pi) + 
+p = 0.2*np.exp(-(x - 3)**2 / 2)/np.sqrt(2 * np.pi) + \
     0.8*np.exp(-(x + 1)**2 / 2)/np.sqrt(2 * np.pi)
 
 d2l.plot(x, p, 'x', 'Density')
@@ -94,7 +94,7 @@ We may approximate this is code by using the same discrete approximation methods
 # Approximate probability using numerical integration
 epsilon = 0.01
 x = np.arange(-5, 5, 0.01)
-p = 0.2*np.exp(-(x - 3)**2 / 2) / np.sqrt(2 * np.pi) + 
+p = 0.2*np.exp(-(x - 3)**2 / 2) / np.sqrt(2 * np.pi) + \
     0.8*np.exp(-(x + 1)**2 / 2) / np.sqrt(2 * np.pi)
 
 d2l.plt.plot(x, p, color='black')
