@@ -8,7 +8,7 @@ Before we get started, let us outline the relationship between machine learning 
 
 ## Information
  
-Let us start with the "soul" of information theory - information. *Information* can be encoded in anything with a particular sequence of one or more encoding formats. Suppose that we task ourselves with trying to define a notion of information.  What could be are starting point?  
+Let us start with the "soul" of information theory: information. *Information* can be encoded in anything with a particular sequence of one or more encoding formats. Suppose that we task ourselves with trying to define a notion of information.  What could be are starting point?  
 
 Consider the following thought experiment.  We have a friend with a deck of cards.  They will shuffle the deck, flip over some cards, and tell us statements about the cards.  We will try to assess the information content of each statement.
 
