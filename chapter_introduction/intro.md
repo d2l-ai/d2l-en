@@ -7,7 +7,7 @@ Say that we wanted to write an application to manage an e-commerce platform.  Af
 we would come up with the broad strokes of a working solution that might probably look something like this:
 (i) users interact with the application through an interface 
 running in a web browser or mobile application;
-(ii) our application interacts with a commerical-grade database engine 
+(ii) our application interacts with a commercial-grade database engine 
 to keep track of each user's state and maintain records 
 of historical transactions; and (iii) at the heart of our application, 
 the *business logic* (you might say, the *brains*) of our application 
@@ -85,7 +85,7 @@ Once launched, the Maps app identified a number of routes.
 Next to each route, the phone displayed a predicted transit time.
 While we fabricated this story for pedagogical convenience,
 it demonstrates that in the span of just a few seconds,
-our everyday interactions with a smartphone
+our everyday interactions with a smart phone
 can engage several machine learning models.
 
 Imagine just writing a program to respond to a *wake word*
@@ -158,7 +158,7 @@ it is not likely that our model will recognize 'Alexa',
 'Apricot', or any other English word.
 In deep learning, the *learning* is the process 
 by which we discover the right setting of the knobs 
-coercing the desired behaviour from our model.
+coercing the desired behavior from our model.
 
 The training process usually looks like this:
 
@@ -229,7 +229,7 @@ First, we'd like to shed more light on some core components
 that will follow us around, no matter what kind of ML problem we take on:
 
 1. The *data* that we can learn from.
-2. A *model* of how to transform the data,.
+2. A *model* of how to transform the data.
 3. A *loss* function that quantifies the *badness* of our model.
 4. An *algorithm* to adjust the model's parameters to minimize the loss.
 
@@ -257,7 +257,7 @@ If we were working with image data,
 each individual photograph might constitute an *example*,
 each represented by an ordered list of numerical values
 corresponding to the brightness of each pixel.
-A $200\times200$ color photograph would consist of $200\times200\times3=120000$
+A $200\times 200$ color photograph would consist of $200\times200\times3=120000$
 numerical values, corresponding to the brightness
 of the red, green, and blue channels for each spatial location.
 In a more traditional task, we might try to predict
@@ -274,7 +274,7 @@ fixed-length inputs means we have one less thing to worry about.
 
 However, not all data can easily be represented as fixed length vectors.
 While we might expect microscrope images to come from standard equipment,
-we cannot expect images mined from the internet 
+we cannot expect images mined from the Internet 
 to all show up with the same resolution or shape.
 For images, we might consider cropping them all to a standard size,
 but that strategy only gets us so far. 
@@ -349,13 +349,13 @@ By *learning* here, we mean *improving* at some task over time.
 But who is to say what constitutes an improvement?
 You might imagine that we could propose to update our model,
 and some people might disagree on whether the proposed update
-constitued an improvement or a decline.
+constituted an improvement or a decline.
 
 In order to develop a formal mathematical system of learning machines,
 we need to have formal measures of how good (or bad) our models are.
 In machine learning, and optimization more generally,
 we call these objective functions.
-By convention, we usually define objective funcitons
+By convention, we usually define objective functions
 so that *lower* is *better*.
 This is merely a convention. You can take any function $f$
 for which higher is better, and turn it into a new function $f'$
@@ -557,7 +557,7 @@ We will unpack it more thoroughly in the subsequent chapters.
 
 Lots of practical problems are well-described regression problems.
 Predicting the rating that a user will assign to a movie
-can be thoughtof as a regression problem
+can be thought of as a regression problem
 and if you designed a great algorithm to accomplish this feat in 2009,
 you might have won the [$1 million Netflix prize](https://en.wikipedia.org/wiki/Netflix_Prize).
 Predicting the length of stay for patients in the hospital 
@@ -621,7 +621,7 @@ While regression models are great for addressing *how many?* questions,
 lots of problems do not bend comfortably to this template. 
 For example, a bank wants to add check scanning to their mobile app.
 This would involve the customer snapping a photo of a check 
-with their smartphone's camera
+with their smart phone's camera
 and the machine learning model would need to be able 
 to automatically understand text seen in the image.
 It would also need to understand hand-written text to be even more robust.
@@ -860,12 +860,12 @@ Users preferentially rate movies that they feel strongly about:
 you might notice that items receive many 5 and 1 star ratings 
 but that there are conspicuously few 3-star ratings.
 Moreover, current purchase habits are often a result 
-of the recommendation algorihtm currently in place,
+of the recommendation algorithm currently in place,
 but learning algorithms do not always take this detail into account.
 Thus it is possible for feedback loops to form 
 where a recommender system preferentially pushes an item
 that is then taken to be better (due to greater purchases)
-and in turn is reommended even more frequently. 
+and in turn is recommended even more frequently. 
 Many of these problems about how to deal with censoring,
 incentives, and feedback loops, are important open research questions.
 
@@ -874,7 +874,7 @@ incentives, and feedback loops, are important open research questions.
 So far, we have looked at problems where we have 
 some fixed number of inputs and produce a fixed number of outputs.
 Before we considered predicting home prices from a fixed set of features: square footage, number of bedrooms, 
-number ofbathrooms, walking time to downtown.
+number of bathrooms, walking time to downtown.
 We also discussed mapping from an image (of fixed dimension)
 to the predicted probabilities that it belongs to each 
 of a fixed number of classes, or taking a user ID and a product ID, 
@@ -969,9 +969,10 @@ English:          Did you already check out this excellent tutorial?
 Wrong alignment:  Did you yourself already this excellent tutorial looked-at?
 ```
 
+
 Many related problems pop up in other learning tasks.
 For instance, determining the order in which a user
-reads a webpage is a two-dimensional layout analysis problem.
+reads a Webpage is a two-dimensional layout analysis problem.
 Dialogue problems exhibit all kinds of additional complications,
 where determining what to say next requires taking into account
 real-world knowledge and the prior state of the conversation
@@ -1230,7 +1231,7 @@ Statistics really took off with the collection and availability of data.
 One of its titans, [Ronald Fisher (1890-1962)](https://en.wikipedia.org/wiki/Ronald_Fisher), contributed significantly to its theory 
 and also its applications in genetics. 
 Many of his algorithms (such as Linear Discriminant Analysis) 
-and formulae (such as the Fisher Information Matrix) 
+and formula (such as the Fisher Information Matrix) 
 are still in frequent use today (even the Iris dataset 
 that he released in 1936 is still used sometimes 
 to illustrate machine learning algorithms).
@@ -1324,8 +1325,8 @@ on optimizing these parameters, due to an increased compute budget.
 Consequently the sweet spot in machine learning and statistics 
 moved from (generalized) linear models and kernel methods to deep networks.
 This is also one of the reasons why many of the mainstays 
-of deep learning, such as Multilayer Perceptrons 
-(:cite:`McCulloch.Pitts.1943`), Convolutional Neural Networks
+of deep learning, such as multilayer perceptrons 
+(:cite:`McCulloch.Pitts.1943`), convolutional neural networks
 (:cite:`LeCun.Bottou.Bengio.ea.1998`), Long Short-Term Memory 
 (:cite:`Hochreiter.Schmidhuber.1997`), 
 and Q-Learning (:cite:`Watkins.Dayan.1992`),
@@ -1446,7 +1447,7 @@ This forms the backbone of many e-commerce payment systems,
 such as PayPal, Stripe, AliPay, WeChat, Apple, Visa, MasterCard.
 Computer programs for chess have been competitive for decades.
 Machine learning feeds search, recommendation, personalization
-and ranking on the internet. In other words, artificial intelligence 
+and ranking on the Internet. In other words, artificial intelligence 
 and machine learning are pervasive, albeit often hidden from sight.
 
 It is only recently that AI has been in the limelight, mostly due to 
@@ -1538,7 +1539,7 @@ than the potential of malevolent superintelligence to destroy humanity.
 
 * Machine learning studies how computer systems can leverage *experience* (often data) to improve performance at specific tasks. It combines ideas from statistics, data mining, artificial intelligence, and optimization. Often, it is used as a means of implementing artificially-intelligent solutions.
 * As a class of machine learning, representational learning focuses on how to automatically find the appropriate way to represent data. This is often accomplished by a progression of learned transformations.
-* Much of the recent progress in deep learning has been triggered by an abundance of data arising from cheap sensors and internet-scale applications, and by significant progress in computation, mostly through GPUs.
+* Much of the recent progress in deep learning has been triggered by an abundance of data arising from cheap sensors and Internet-scale applications, and by significant progress in computation, mostly through GPUs.
 * Whole system optimization is a key component in obtaining good performance. The availability of efficient deep learning frameworks has made design and implementation of this significantly easier.
 
 ## Exercises
