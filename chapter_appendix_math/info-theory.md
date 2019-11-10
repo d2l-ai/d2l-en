@@ -8,7 +8,7 @@ Before we get started, let us outline the relationship between machine learning 
 
 ## Information
  
-Let us start with the "soul" of information theory - information. *Information* can be encoded in anything with a particular sequence of one or more encoding formats. Suppose we task ourselves with trying to define a notion of information.  What could be are starting point?  
+Let us start with the "soul" of information theory - information. *Information* can be encoded in anything with a particular sequence of one or more encoding formats. Suppose that we task ourselves with trying to define a notion of information.  What could be are starting point?  
 
 Consider the following thought experiment.  We have a friend with a deck of cards.  They will shuffle the deck, flip over some cards, and tell us statements about the cards.  We will try to assess the information content of each statement.
 
@@ -18,13 +18,13 @@ Next, they flip over a card and say, "I see a heart."  This provides us some inf
 
 Next, they flip over a card and say, "This is the $3$ of spades."  This is more information.  Indeed there were $52$ equally likely possible outcomes, and our friend told us which one it was.  This should be a medium amount of information.
 
-Let us take this to the logical extreme.  Suppose lastly that they flip over every card from the deck and read off the entire sequence of the shuffled deck.  There are $52!$ different orders to the deck, again all equally likely, so we need a lot of information to know which one it is.
+Let us take this to the logical extreme.  Suppose that lastly that they flip over every card from the deck and read off the entire sequence of the shuffled deck.  There are $52!$ different orders to the deck, again all equally likely, so we need a lot of information to know which one it is.
 
 Any notion of information we develop must conform to this intuition.  Indeed, in the next sections we will learn how to compute that these events have $0\text{ bits}$, $2\text{ bits}$, $~5.7\text{ bits}$, and $~225.6\text{ bits}$ of information respectively.
 
 If we read through these thought experiments, we see a natural idea.  As a starting point, rather than caring about the knowledge, we may build off the idea that information represents the degree of surprise or the abstract possibility of the event. For example, if we want to describe an unusual event, we need a lot information. For a common event, we may not need much information.
 
-In 1948,  [Claude E. Shannon](https://en.wikipedia.org/wiki/Claude_Shannon) published his well-known book [A Mathematical Theory of Communication](https://en.wikipedia.org/wiki/A_Mathematical_Theory_of_Communication) establishing the theory of information.  In his book, Shannon introduced the concept of information entropy for the first time. We will begin our journey here.
+In 1948, Claude E. Shannon published *A Mathematical Theory of Communication* :cite:`Shannon.1948` establishing the theory of information.  In his book, Shannon introduced the concept of information entropy for the first time. We will begin our journey here.
 
 ### Self-information
 
@@ -32,7 +32,7 @@ Since information embodies the abstract possibility of an event, how do we map t
 
 Now, suppose that for any series of codes, each $0$ or $1$ occurs with a probability of $\frac{1}{2}$. Hence, an event $X$ with a series of codes of length $n$, occurs with a probability of $\frac{1}{2^n}$. At the same time, as we mentioned before, this series contains $n$ bits of information. So, can we generalize to a math function which can transfer the probability $p$ to the number of bits? Shannon gave the answer by defining *self-information*
 
-$$I(X) = - \log_2 (p)$$
+$$I(X) = - \log_2 (p),$$
 
 as the *bits* of information we have received for this event $X$. Note that we will always use base-2 logarithms in this section. For the sake of simplicity, the rest of this section will omit the subscript 2 in the logarithm notation, i.e., $\log(.)$ always refers to $\log_2(.)$. For example, the code "0010" has a self-information
 
@@ -59,7 +59,7 @@ As self-information only measures the information of a single discrete event, we
 
 ### Motivating Entropy
 
-Let us try to get specific about what we want.  This will be an informal statement of what are known as the *axioms of Shannon entropy*.  It will turn out that the following collection of common-sense statements force us to a unique definition of information.  [This survey paper](https://www.mdpi.com/1099-4300/10/3/261/pdf) provides a formal version of these axioms, along with several others.
+Let us try to get specific about what we want.  This will be an informal statement of what are known as the *axioms of Shannon entropy*.  It will turn out that the following collection of common-sense statements force us to a unique definition of information.  A formal version of these axioms, along with several others may be found in :cite:`csiszar.2008`.
 
 1.  The information we gain by observing a random variable does not depend on what we call the elements, or the presence of additional elements which have probability zero.
 2.  The information we gain by observing two random variables is no more than the sum of the information we gain by observing them separately.  If they are independent, then it is exactly the sum.
@@ -84,10 +84,11 @@ In MXNet, we can define entropy as below.
 ```{.python .input}
 def entropy(p):
     entropy = - p * np.log2(p)
-    out = nansum(entropy.as_nd_ndarray()) # nansum will sum up the non-nan number
+    # nansum will sum up the non-nan number
+    out = nansum(entropy.as_nd_ndarray())
     return out
 
-entropy(np.array([0.1, 0.5, 0.2, 0.3]))
+entropy(np.array([0.1, 0.5, 0.1, 0.3]))
 ```
 
 ### Interpretations
@@ -146,7 +147,7 @@ def joint_entropy(p_xy):
     out = nansum(joint_ent.as_nd_ndarray()) 
     return out
 
-joint_entropy(np.array([0.1, 0.5, 0.2, 0.3]))
+joint_entropy(np.array([[0.1, 0.5], [0.1, 0.3]]))
 ```
 
 Notice that this is the same *code* as before, but now we interpret it differently as working on the joint distribution of the two random variables.
@@ -180,7 +181,7 @@ def conditional_entropy(p_xy, p_x):
     out = nansum(cond_ent.as_nd_ndarray()) 
     return out
 
-conditional_entropy(np.array([0.1, 0.5, 0.2, 0.3]), np.array([1, 1, 1, 1]))
+conditional_entropy(np.array([[0.1, 0.5], [0.2, 0.3]]), np.array([0.2,0.8]))
 ```
 
 ### Mutual Information
@@ -220,7 +221,9 @@ def mutual_information(p_xy, p_x, p_y):
     out = nansum(mutual.as_nd_ndarray()) 
     return out
 
-mutual_information(np.array([0.1, 0.5, 0.2, 0.3]), np.array([2, 4, 8, 4]), np.array([0.5, 0.25, 0.125, 0.25]))
+mutual_information(np.array([[0.1, 0.5], [0.1, 0.3]]), 
+                   np.array([0.2, 0.8]), 
+                   np.array([[0.75, 0.25]]))
 ```
 
 ### Properties of Mutual Information
@@ -282,9 +285,9 @@ Let us take a look at some properties of the KL divergence.
 * KL divergence is non-negative, i.e., $$D_{\mathrm{KL}}(P\|Q) \geq 0.$$ Note that the equality holds only when $P = Q$.
 * If there exists an $x$ such that $p(x) > 0$ and $q(x) = 0$, then $D_{\mathrm{KL}}(P\|Q) = \infty$.
 * There is a close relationship between KL divergence and mutual information. Besides the relationship shown in :numref:`fig_mutual_information`, $I(X,Y)$ is also numerically equivalent with the following terms:
-    1. $ D_{\mathrm{KL}}(P(X, Y)  \ \| \ P(X)P(Y))$;
-    1. $ E_Y \{ D_{\mathrm{KL}}(P(X \mid Y) \ \| \ P(X)) \}$;
-    1. $ E_X \{ D_{\mathrm{KL}}(P(Y \mid X) \ \| \ P(Y)) \}$.
+    1. $D_{\mathrm{KL}}(P(X, Y)  \ \| \ P(X)P(Y))$;
+    1. $E_Y \{ D_{\mathrm{KL}}(P(X \mid Y) \ \| \ P(X)) \}$;
+    1. $E_X \{ D_{\mathrm{KL}}(P(Y \mid X) \ \| \ P(Y)) \}$.
     
   For the first term, we interpret mutual information as the KL divergence between $P(X, Y)$ and the product of $P(X)$ and $P(Y)$, and thus is a measure of how different the joint distribution is from the distribution if they were independent. For the second term, mutual information tells us the average reduction in uncertainty about $Y$ that results from learning the value of the $X$'s distribution. Similarly to the third term.
 
@@ -336,7 +339,7 @@ $$
 \begin{aligned}
 l(\theta) &= \log L(\theta) \\
   &= \log \prod_{i=1}^n \pi_i^{y_i} (1 - \pi_i)^{1 - y_i} \\
-  &= \sum_{i=1}^n y_i \log(\pi_i) + (1 - y_i) \log (1 - \pi_i) \\
+  &= \sum_{i=1}^n y_i \log(\pi_i) + (1 - y_i) \log (1 - \pi_i). \\
 \end{aligned}
 $$
 
