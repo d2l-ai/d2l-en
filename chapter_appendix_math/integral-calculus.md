@@ -6,34 +6,34 @@ Differentiation only makes up half of the content of a traditional calculus educ
 At the level of machine learning we discuss in this book, we will not need a deep understanding of integration. However, we will provide a brief introduction to lay the groundwork for any further applications we will encounter later on.
 
 ## Geometric Interpretation
-Suppose we have a function $f(x)$.  For simplicity, let us assume that $f(x)$ is non-negative (never takes a value less than zero).  What we want to try and understand is: what is the area contained between $f(x)$ and the $x$-axis?
+Suppose that we have a function $f(x)$.  For simplicity, let us assume that $f(x)$ is non-negative (never takes a value less than zero).  What we want to try and understand is: what is the area contained between $f(x)$ and the $x$-axis?
 
 ```{.python .input}
 %matplotlib inline
 import d2l
 from IPython import display
+from mpl_toolkits import mplot3d
 from mxnet import np, npx
 npx.set_np()
-```
 
-```{.python .input}
-x = np.arange(-2,2,0.01)
+x = np.arange(-2, 2, 0.01)
 f = np.exp(-x**2)
 
 d2l.set_figsize()
-d2l.plt.plot(x,f,color='black')
-d2l.plt.fill_between(x.tolist(),f.tolist())
+d2l.plt.plot(x, f, color='black')
+d2l.plt.fill_between(x.tolist(), f.tolist())
 d2l.plt.show()
 ```
 
 In most cases, this area will be infinite or undefined (consider the area under $f(x) = x^{2}$), so people will often talk about the area between a pair of ends, say $a$ and $b$.
 
 ```{.python .input}
-x = np.arange(-2,2,0.01)
+x = np.arange(-2, 2, 0.01)
 f = np.exp(-x**2)
 
-d2l.plt.plot(x,f,color='black')
-d2l.plt.fill_between(x.tolist()[50:250],f.tolist()[50:250])
+d2l.set_figsize()
+d2l.plt.plot(x, f, color='black')
+d2l.plt.fill_between(x.tolist()[50:250], f.tolist()[50:250])
 d2l.plt.show()
 ```
 
@@ -56,18 +56,19 @@ epsilon = 0.05
 a = 0
 b = 2
 
-x = np.arange(a,b,epsilon)
-f = x/(1+x**2)
+x = np.arange(a, b, epsilon)
+f = x / (1 + x**2)
 
 approx = np.sum(epsilon*f)
-true = np.log(2)/2
+true = np.log(2) / 2
 
-d2l.plt.bar(x,f,width = epsilon, align = 'edge')
-d2l.plt.plot(x,f,color='black')
-d2l.plt.ylim([0,1])
+d2l.set_figsize()
+d2l.plt.bar(x, f, width = epsilon, align = 'edge')
+d2l.plt.plot(x, f, color='black')
+d2l.plt.ylim([0, 1])
 d2l.plt.show()
 
-"Approximation: {}, Truth: {}".format(approx,true)
+"Approximation: {}, Truth: {}".format(approx, true)
 ```
 
 The issue is that while it can be done numerically, we can do this approach analytically for only the simplest functions like
@@ -100,9 +101,10 @@ $$
 \int_a^b f(x) \;dx = F(b) - F(a).
 $$
 
-This is a mathematical encoding of the fact that we can measure the area out to the far end-point and then subtract off the area to the near end point as indicated in the figure below.
+This is a mathematical encoding of the fact that we can measure the area out to the far end-point and then subtract off the area to the near end point as indicated in :numref:`fig_area-subtract`.
 
 ![Visualizing why we may reduce the problem of computing the area under a curve between two points to computing the area to the left of a point.](../img/SubArea.svg)
+:label:`fig_area-subtract`
 
 Thus, if we can figure out what the integral over any interval is by figuring out what $F(x)$ is.  
 
@@ -153,13 +155,13 @@ In this way, we can develop the entire theory of integration leveraging ideas fr
 
 Just as with differentiation, there are a number of rules which make the computation of integrals more tractable.  In fact, every rule of differential calculus (like the product rule, sum rule, and chain rule) has a corresponding rule for integral calculus (integration by parts, linearity of integration, and the change of variables formula respectively).  In this section, we will dive into what is arguably the most important from the list: the change of variables formula.
 
-First, suppose we have a function which is itself an integral:
+First, suppose that we have a function which is itself an integral:
 
 $$
 F(x) = \int_0^x f(y) \; dy.
 $$ 
 
-Let us suppose we want to know how this function looks when we compose it with another, and consider $F(u(x))$.  By the chain rule, we know
+Let us suppose that we want to know how this function looks when we compose it with another, and consider $F(u(x))$.  By the chain rule, we know
 
 Consider the chain rule for differentiation.  This states that
 
@@ -187,9 +189,10 @@ $$
 
 This is the *change of variables* formula.  It states that we may consider reparameterizing the function inside an integral is in essence the same thing as changing the bounds of integration as long as we take into account how quickly the reparametrization changes.
 
-For a more intuitive derivation, consider what happens when we take an integral of $f(u(x))$ between $x$ and $x+\epsilon$. For a small $\epsilon$, this integral is approximately $\epsilon f(u(x))$, the area of the associated rectangle.  Now, let us compare this with the integral of $f(y)$ from $u(x)$ to $u(x+\epsilon)$.  We know that $u(x+\epsilon) \approx u(x) + \epsilon \frac{du}{dx}(x)$, so the area of this rectangle is approximately $\epsilon \frac{du}{dx}(x)f(u(x))$.  Thus, to make the area of these two rectangles to agree, we need to multiply the first one by $\frac{du}{dx}(x)$.  
+For a more intuitive derivation, consider what happens when we take an integral of $f(u(x))$ between $x$ and $x+\epsilon$. For a small $\epsilon$, this integral is approximately $\epsilon f(u(x))$, the area of the associated rectangle.  Now, let us compare this with the integral of $f(y)$ from $u(x)$ to $u(x+\epsilon)$.  We know that $u(x+\epsilon) \approx u(x) + \epsilon \frac{du}{dx}(x)$, so the area of this rectangle is approximately $\epsilon \frac{du}{dx}(x)f(u(x))$.  Thus, to make the area of these two rectangles to agree, we need to multiply the first one by $\frac{du}{dx}(x)$ as is illustrated in :numref:`fig_rect-transform`.  
 
 ![Visualizing the transformation of a single thin rectangle under the change of variables.](../img/RectTrans.svg)
+:label:`fig_rect-transform`
 
 This tells us that
 
@@ -242,21 +245,24 @@ $$
 If this discussion sounds familiar, it is!  In :numref:`sec_linear_algebra` we discussed how the determinant represented the signed area in much the same way.
 
 ## Multiple Integrals
-In some cases, we will need to work in higher dimensions.  For instance, suppose we have a function of two variables, like $f(x,y)$ and we want to know the volume under $f$ when $x$ ranges over $[a,b]$ and $y$ ranges over $[c,d]$.
+In some cases, we will need to work in higher dimensions.  For instance, suppose that we have a function of two variables, like $f(x,y)$ and we want to know the volume under $f$ when $x$ ranges over $[a,b]$ and $y$ ranges over $[c,d]$.
 
 ```{.python .input}
-from mpl_toolkits import mplot3d
-
 # Construct grid and compute function
-x, y = np.meshgrid(np.linspace(-2, 2, 101), np.linspace(-2, 2, 101), indexing='ij')
+x, y = np.meshgrid(np.linspace(-2, 2, 101), 
+                   np.linspace(-2, 2, 101), indexing='ij')
 z = np.exp(- x**2 - y**2)
 
-# Plot Function
+# Plot function
 ax = d2l.plt.figure().add_subplot(111, projection='3d')
 ax.plot_wireframe(x, y, z)
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('y')
-ax.set_xlim(-2, 2); ax.set_ylim(-2, 2); ax.set_zlim(0, 1);
+d2l.plt.xticks([-2,-1,0,1,2])
+d2l.plt.yticks([-2,-1,0,1,2])
+d2l.set_figsize()
+ax.set_xlim(-2, 2); ax.set_ylim(-2, 2); ax.set_zlim(0, 1)
+ax.dist = 12
 ```
 
 We write this as 
@@ -265,7 +271,7 @@ $$
 \int_{[a,b]\times[c,d]} f(x,y)\;dx\;dy.
 $$
 
-Suppose we wish to compute this integral.  My claim is that we can do this by iteratively computing first the integral in say $x$ and then shifting to the integral in $y$, that is to say
+Suppose that we wish to compute this integral.  My claim is that we can do this by iteratively computing first the integral in say $x$ and then shifting to the integral in $y$, that is to say
 
 $$
 \int_{[a,b]\times[c,d]} f(x,y)\;dx\;dy = \int_c^{d} \left(\int_a^{b} f(x,y) \;dx\right) \; dy.
@@ -279,13 +285,14 @@ $$
 \sum_{i,j} \epsilon^{2} f(\epsilon i, \epsilon j).
 $$
 
-Once we discretize the problem, we may add up the values on these squares in whatever order we like, and not worry about changing the values, in particular, we can say that
+Once we discretize the problem, we may add up the values on these squares in whatever order we like, and not worry about changing the values.  This is illustrated in :numref:`fig_sum-order`.  In particular, we can say that
 
 $$
  \sum _ {j} \epsilon \left(\sum_{i} \epsilon f(\epsilon i, \epsilon j)\right).
 $$
 
 ![Illustrating how to decompose a sum over many squares as a sum over first the columns (1), then adding the column sums together (2).](../img/SumOrder.svg)
+:label:`fig_sum-order`
 
 The sum on the inside is precisely the discretization of the integral 
 
@@ -366,7 +373,7 @@ $$
 Thus, the integral is
 
 $$
-\int _ 0^\infty \int _ 0 ^ {2\pi} re^{-r^{2}} \;d\theta\;dr = 2\pi\int _ 0^\infty re^{-r^{2}} \;dr = \pi
+\int _ 0^\infty \int _ 0 ^ {2\pi} re^{-r^{2}} \;d\theta\;dr = 2\pi\int _ 0^\infty re^{-r^{2}} \;dr = \pi,
 $$
 
 where the final equality follows by the same computation that we used in section :numref:`integral_example`.  

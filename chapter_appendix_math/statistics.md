@@ -81,11 +81,11 @@ Since the standard deviation of an estimator has been implementing in MXNet by s
 from mxnet import np, npx
 npx.set_np()
 
-## Statistical bias
+# Statistical bias
 def stat_bias(ture_theta, est_theta):
     return(np.mean(est_theta) - ture_theta)
 
-## Mean squared error
+# Mean squared error
 def mse(data, est_theta):
     return(np.mean(np.square(data - est_theta)))
 
@@ -141,7 +141,6 @@ $$ \text{statistical significance }= 1 - \alpha = P(\text{reject } H_0 \mid H_0 
 It is also referred to as *type I error* or *false positive*. The $\alpha$, is called as the *significance level* and its commonly used value is $5\%$, i.e., $1-\alpha = 95\%$. Statistical significance can be explained as the level of risk that we are willing to take, when we reject a true null hypothesis. 
 
 :numref:`fig_statistical_significance` shows the the observations' values and probability of a given normal distribution in a two-sample hypothesis test. if the observation data point is located outsides the $95\%$ threshold, it will be a very unlikely observation under the null hypothesis assumption. Hence, there might be something wrong with the null hypothesis and we will reject it. 
-
 
 ![Statistical significance.](../img/statistical_significance.svg)
 :label:`fig_statistical_significance`
@@ -218,7 +217,7 @@ Note that the above probability statement is about variable $C_n$, not about the
 
 Suppose that $\hat{\theta}_n \sim N(\theta, \hat{\sigma}_n^2)$, where $\hat{\sigma}_n^2$ is the standard deviation of $n$ samples. For a two-sided test, we can form an approximate $1-\alpha$ confidence interval for the true parameter $\theta$ as follows:
  
- $$C_n = [\hat{\theta}_n - z_{\alpha/2} \hat{\sigma}_n, \ \hat{\theta}_n + z_{\alpha/2} \hat{\sigma}_n]$$
+$$C_n = [\hat{\theta}_n - z_{\alpha/2} \hat{\sigma}_n, \ \hat{\theta}_n + z_{\alpha/2} \hat{\sigma}_n]$$
  
 where $z_{\alpha/2}$ is calculated by the infinity case ($\infty$) in the last row of the t-distribution table such that $P(Z > z_{\alpha/2}) = \alpha/2$ for $Z \sim N(0,1)$. 
  
