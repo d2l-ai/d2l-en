@@ -63,7 +63,7 @@ d2l.show_trace_2d(f_2d, d2l.train_2d(gd_2d))
 ### The Momentum Method
 
 The momentum method allows us to solve the gradient descent problem described
-above. Looking at the optimization trace above we might intuit that averaging gradients over the past would work well. After all, in the $x_1$ direction this will aggregate well-aligned gradients, thus increasing the distance we cover with every step. Conversely, in the $x_2$ direction where gradients oscillate, an aggregate gradient will reduce stepsize due to oscillations that cancel each other out. 
+above. Looking at the optimization trace above we might intuit that averaging gradients over the past would work well. After all, in the $x_1$ direction this will aggregate well-aligned gradients, thus increasing the distance we cover with every step. Conversely, in the $x_2$ direction where gradients oscillate, an aggregate gradient will reduce step size due to oscillations that cancel each other out. 
 Using $\mathbf{v}_t$ instead of the gradient $\mathbf{g}_t$ yields the following update equations:
 
 $$
@@ -126,7 +126,7 @@ def sgd_momentum(params, states, hyperparams):
         p[:] -= hyperparams['lr'] * v
 ```
 
-Let's see how this works in practice.
+Let us see how this works in practice.
 
 ```{.python .input  n=15}
 def train_momentum(lr, momentum, num_epochs=2):
