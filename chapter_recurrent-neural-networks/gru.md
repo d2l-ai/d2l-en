@@ -15,7 +15,7 @@ gradient anomalies mean in practice:
   a mechanism, we will have to assign a very large gradient to this observation,
   since it affects all subsequent observations.
 * We might encounter a situation where some symbols carry no pertinent
-  observation. For instance, when parsing a webpage there might be auxiliary
+  observation. For instance, when parsing a web page there might be auxiliary
   HTML code that is irrelevant for the purpose of assessing the sentiment
   conveyed on the page. We would like to have some mechanism for *skipping such
   symbols* in the latent state representation.
@@ -193,7 +193,7 @@ d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, ctx)
 
 ## Exercises
 
-1. Compare runtimes, perplexity, and the output strings for `rnn.RNN` and `rnn.GRU` implementations with each other.
+1. Compare runtime, perplexity, and the output strings for `rnn.RNN` and `rnn.GRU` implementations with each other.
 1. Assume that we only want to use the input for time step $t'$ to predict the output at time step $t > t'$. What are the best values for the reset and update gates for each time step?
 1. Adjust the hyperparameters and observe and analyze the impact on running time, perplexity, and the written lyrics.
 1. What happens if you implement only parts of a GRU? That is, implement a recurrent cell that only has a reset gate. Likewise, implement a recurrent cell only with an update gate.
