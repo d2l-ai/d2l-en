@@ -64,7 +64,7 @@ def init_rnn_state(batch_size, num_hiddens, ctx):
 ```
 
 The following `rnn` function defines how to compute the hidden state and output
-in a time step. The activation function here uses the tanh function. As
+in a time step. The activation function here uses the $\tanh$ function. As
 described in :numref:`sec_mlp`, the
 mean value of the $\tanh$ function is 0, when the elements are evenly
 distributed over the real numbers.
@@ -178,7 +178,7 @@ Let us first define the function to train the model on one data epoch. It differ
 1. Different sampling methods for sequential data (independent sampling and
    sequential partitioning) will result in differences in the initialization of
    hidden states.
-1. We clip the gradients before updating the model parameters. This ensures that the model does not diverge even when gradients blow up at some point during the training process, and it effectively reduces the stepsize automatically.
+1. We clip the gradients before updating the model parameters. This ensures that the model does not diverge even when gradients blow up at some point during the training process, and it effectively reduces the step size automatically.
 1. We use perplexity to evaluate the model. This ensures that different length of texts are comparable.
 
 
