@@ -1,4 +1,5 @@
 # Sequence to Sequence with Attention Mechanism
+:label:`sec_seq2seq_attention`
 
 In this section, we add the attention mechanism to the sequence to sequence
 model introduced in :numref:`sec_seq2seq`
