@@ -50,7 +50,7 @@ lr = (lambda: 1)                              # constant learning rate
 d2l.show_trace_2d(f, d2l.train_2d(sgd, steps=50))
 ```
 
-As we can see, the trajectory of the variables in the SGD is much more noisy than the one we observed in gradient descent in the previous section. This is due to the stocastic nature of the gradient. That is, even when we arrive near the minimum, we are still subject to the uncertainty injected by the instantaneous gradient via $\eta \nabla f_i(\mathbf{x})$. Even after 50 steps the quality is still not so good. Even worse, it will not improve after additional steps (we encourage the reader to experiment with a larger number of steps to confirm this on his own). This leaves us with the only alterative - change the learning rate $\eta$. However, if we pick this too small, we will not make any meaningful progress initially. On the other hand, if we pick it too large, we will not get a good solution, as seen above. The only way to resolve these conflicting goals is to reduce the learning rate *dynamically* as optimization progresses.
+As we can see, the trajectory of the variables in the SGD is much more noisy than the one we observed in gradient descent in the previous section. This is due to the stochastic nature of the gradient. That is, even when we arrive near the minimum, we are still subject to the uncertainty injected by the instantaneous gradient via $\eta \nabla f_i(\mathbf{x})$. Even after 50 steps the quality is still not so good. Even worse, it will not improve after additional steps (we encourage the reader to experiment with a larger number of steps to confirm this on his own). This leaves us with the only alternative - change the learning rate $\eta$. However, if we pick this too small, we will not make any meaningful progress initially. On the other hand, if we pick it too large, we will not get a good solution, as seen above. The only way to resolve these conflicting goals is to reduce the learning rate *dynamically* as optimization progresses.
 
 This is also the reason for adding a learning rate function `lr` into the `sgd` step function. In the example above any functionality for learning rate scheduling lies dormant as we set the associated `lr` function to be constant, i.e., `lr = (lambda: 1)`.
 
@@ -101,7 +101,7 @@ In particular, assume that $x_t$ is drawn from some distribution $p(x)$ and that
 
 $$R(w) = \mathbf{E}_{x \sim p}[l(x,w)]$$
 
-the expected risk and by $R^*$ its minimum with regard to $w$. Lastly let $w^*$ be the minimizer (we assume that it exists within the domain within wich $w$ is defined). In this case we can track the distance between the current parameter $w_t$ and the risk minimizer $w^*$ and see whether it improves over time.
+the expected risk and by $R^*$ its minimum with regard to $w$. Lastly let $w^*$ be the minimizer (we assume that it exists within the domain which $w$ is defined). In this case we can track the distance between the current parameter $w_t$ and the risk minimizer $w^*$ and see whether it improves over time.
 
 $$\begin{aligned}
     \|w_{t+1} - w^*\|^2 & = \|w_{t} - \eta_t \partial_w l(x_t, w) - w^*\|^2 \\
@@ -124,7 +124,7 @@ Using both inequalities and plugging it into the above we obtain a bound on the 
 
 $$\|w_{t} - w^*\|^2 - \|w_{t+1} - w^*\|^2 \geq 2 \eta_t (l(x_t, w_t) - l(x_t, w^*)) - \eta_t^2 L^2.$$
 
-This means that we make progress as long as the expected difference between current loss and the optimal loss outweights $\eta_t L^2$. Since the former is bound to converge to $0$ it follows that the learning rate $\eta_t$ also needs to vanish.
+This means that we make progress as long as the expected difference between current loss and the optimal loss outweighs $\eta_t L^2$. Since the former is bound to converge to $0$ it follows that the learning rate $\eta_t$ also needs to vanish.
 
 Next we take expectations over this expression. This yields
 

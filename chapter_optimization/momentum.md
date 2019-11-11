@@ -63,7 +63,7 @@ d2l.show_trace_2d(f_2d, d2l.train_2d(gd_2d))
 ### The Momentum Method
 
 The momentum method allows us to solve the gradient descent problem described
-above. Looking at the optimization trace above we might intuit that averaging gradients over the past would work well. After all, in the $x_1$ direction this will aggregate well-aligned gradients, thus increasing the distance we cover with every step. Conversely, in the $x_2$ direction where gradients oscillate, an aggregate gradient will reduce stepsize due to oscillations that cancel each other out. 
+above. Looking at the optimization trace above we might intuit that averaging gradients over the past would work well. After all, in the $x_1$ direction this will aggregate well-aligned gradients, thus increasing the distance we cover with every step. Conversely, in the $x_2$ direction where gradients oscillate, an aggregate gradient will reduce step size due to oscillations that cancel each other out. 
 Using $\mathbf{v}_t$ instead of the gradient $\mathbf{g}_t$ yields the following update equations:
 
 $$
@@ -96,7 +96,7 @@ Note that we can combine momentum with SGD and in particular, minibatch-SGD. The
 
 ### Effective Sample Weight
 
-Recall that $\mathbf{v}_t = \sum_{\tau = 0}^{t-1} \beta^{\tau} \mathbf{g}_{t-\tau, t-\tau-1}$. In the limit the terms add up to $\sum_{\tau=0}^\infty \beta^\tau = \frac{1}{1-\beta}$. In other words, rather than taking a step of size $\eta$ in GD or SGD we take a step of size $\frac{\eta}{1-\beta}$ while at the same time, dealing with a potentially much better behaved descent direction. These are two benefits in one. To illustrate how weighting behaves for different choices of $\beta$ consider the diagram below. 
+Recall that $\mathbf{v}_t = \sum_{\tau = 0}^{t-1} \beta^{\tau} \mathbf{g}_{t-\tau, t-\tau-1}$. In the limit the terms add up to $\sum_{\tau=0}^\infty \beta^\tau = \frac{1}{1-\beta}$. In other words, rather than taking a step of size $\eta$ in GD or SGD we take a step of size $\frac{\eta}{1-\beta}$ while at the same time, dealing with a potentially much better behaved descent direction. These are two benefits in one. To illustrate how weighting behaves for different choices of $\beta$ consider the diagram below.
 
 ```{.python .input}
 gammas = [0.95, 0.9, 0.6, 0]
@@ -112,7 +112,7 @@ d2l.plt.legend();
 
 ### Implementation from Scratch
 
-Let's see how momentum works in practice, i.e.\ when used within the context of a proper optimizer. For this we need a somewhat more scalable implementation. Compared to (minibatch) SGD the momentum method needs to maintain a set of  auxiliary variables, i.e. velocity. It has the same shape as the gradients (and variables of the optimization problem). In the implementation below we call these variables `states`. 
+Let's see how momentum works in practice, i.e.\ when used within the context of a proper optimizer. For this we need a somewhat more scalable implementation. Compared to (minibatch) SGD the momentum method needs to maintain a set of  auxiliary variables, i.e. velocity. It has the same shape as the gradients (and variables of the optimization problem). In the implementation below we call these variables `states`.
 
 ```{.python .input  n=13}
 def init_momentum_states(feature_dim):
@@ -126,7 +126,7 @@ def sgd_momentum(params, states, hyperparams):
         p[:] -= hyperparams['lr'] * v
 ```
 
-Let's see how this works in practice. 
+Let us see how this works in practice.
 
 ```{.python .input  n=15}
 def train_momentum(lr, momentum, num_epochs=2):
@@ -196,7 +196,7 @@ Given the above result let's see what happens when we minimize the function $f(x
 
 $$x_{t+1} = x_t - \eta \lambda x_t = (1 - \eta \lambda) x_t.$$
 
-Whenever $|1 - \eta \lambda| < 1$ this optimization converges at an exponential rate since after $t$ steps we have $x_t = (1 - \eta \lambda)^t x_0$. This shows how the rate of convergence improves initially as we increase the learning rate $\eta$ until $\eta \lambda = 1$. Beyond that things diverge and for $\eta \lambda > 2$ the optimization problem diverges. 
+Whenever $|1 - \eta \lambda| < 1$ this optimization converges at an exponential rate since after $t$ steps we have $x_t = (1 - \eta \lambda)^t x_0$. This shows how the rate of convergence improves initially as we increase the learning rate $\eta$ until $\eta \lambda = 1$. Beyond that things diverge and for $\eta \lambda > 2$ the optimization problem diverges.
 
 ```{.python .input}
 lambdas = [0.1, 1, 10, 19]
@@ -238,7 +238,3 @@ We used $R$ to denote the $2 \times 2$ governing convergence behavior. After $t$
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2374)
 
 ![](../img/qr_momentum.svg)
-
-```{.python .input}
-
-```
