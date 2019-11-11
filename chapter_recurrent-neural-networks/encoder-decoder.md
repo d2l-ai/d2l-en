@@ -1,8 +1,9 @@
 # Encoder-Decoder Architecture
 
-The *encoder-decoder architecture* is a neural network design pattern. In this architecture, the network is partitioned into two parts, the encoder and the decoder. The encoder's role is to encode the inputs into state, which often contains several tensors. Then the state is passed into the decoder to generate the outputs. In machine translation, the encoder transforms a source sentence, e.g., "Hello world.", into state, e.g., a vector, that captures its semantic information. The decoder then uses this state to generate the translated target sentence, e.g., "Bonjour le monde.".
+The *encoder-decoder architecture* is a neural network design pattern. As shown in :numref:`fig_encoder_decoder`, the architecture is partitioned into two parts, the encoder and the decoder. The encoder's role is to encode the inputs into state, which often contains several tensors. Then the state is passed into the decoder to generate the outputs. In machine translation, the encoder transforms a source sentence, e.g., "Hello world.", into state, e.g., a vector, that captures its semantic information. The decoder then uses this state to generate the translated target sentence, e.g., "Bonjour le monde.".
 
 ![The encoder-decoder architecture.](../img/encoder-decoder.svg)
+:label:`fig_encoder_decoder`
 
 In this section, we will show an interface to implement this encoder-decoder architecture.
 
@@ -67,6 +68,12 @@ class EncoderDecoder(nn.Block):
 * An encoder is a neural network (FC, CNN, RNN, etc.) that takes the input, and output a feature map.
 * An decoder is a network usually the same network structure as encoder. 
 * In the encoder-decoder architecture, the decoder takes the state output from the encoder, and gives the best closest match to the actual input or intended output.
+
+
+## Exercises
+
+1. Besides the machine translation use case, can you think of the other applied scenarios that an encoder-decoder architecture can fit? 
+2. An *autoencoder* is a type of neural network used for unsupervised learning. The aim of an autoencoder is to learn a representation typically for dimensionality reduction. Can you compare it with the encoder-decoder architecture we introduced in this section?
 
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2396)
