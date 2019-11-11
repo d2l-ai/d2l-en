@@ -210,7 +210,7 @@ def dropout(X, drop_prob):
     if drop_prob == 1:
         return np.zeros_like(X)
     mask = np.random.uniform(0, 1, X.shape) > drop_prob
-    return mask * X / (1.0-drop_prob)
+    return mask.astype(np.float32) * X / (1.0-drop_prob)
 ```
 
 We can test out the `dropout` function on a few examples.
