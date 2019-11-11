@@ -312,8 +312,8 @@ In a fully machine learned solution, we would learn the threshold from the datas
 ```{.python .input}
 # Print test set accuracy with eyeballed threshold
 w = (ave_1 - ave_0).T
-predictions = 1*(X_test.reshape(2000, -1).dot(w.flatten()) > -1500000)
-np.mean(predictions==y_test)  # Accuracy
+predictions = X_test.reshape(2000, -1).dot(w.flatten()) > -1500000
+np.mean(predictions.astype(y_test.dtype)==y_test, dtype=np.float64)  # Accuracy
 ```
 
 ## Geometry of Linear Transformations
