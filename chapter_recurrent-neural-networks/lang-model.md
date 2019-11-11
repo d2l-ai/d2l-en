@@ -11,7 +11,7 @@ Language models are incredibly useful. For instance, an ideal language model wou
 
 Nonetheless language models are of great service even in their limited form. For instance, the phrases *'to recognize speech'* and *'to wreck a nice beach'* sound very similar. This can cause ambiguity in speech recognition, ambiguity that is easily resolved through a language model which rejects the second translation as outlandish. Likewise, in a document summarization algorithm it is worth while knowing that *'dog bites man'* is much more frequent than *'man bites dog'*, or that *'let us eat grandma'* is a rather disturbing statement, whereas *'let us eat, grandma'* is much more benign.
 
-## Estimating a language model
+## Estimating a Language Model
 
 The obvious question is how we should model a document, or even a sequence of words. Recall the analysis we applied to sequence models in the previous section, we can start by applying basic probability rules:
 
@@ -47,7 +47,7 @@ find enough occurrences to get accurate estimates. Things take a turn for the wo
 
 A common strategy is to perform some form of Laplace smoothing. We already
 encountered this in our discussion of
-naive bayes in :numref:`sec_naive_bayes` where the solution was to
+naive Bayes in :numref:`sec_naive_bayes` where the solution was to
 add a small constant to all counts. This helps with singletons, e.g., via
 
 $$\begin{aligned}
@@ -60,7 +60,7 @@ Here the coefficients $\epsilon_i > 0$ determine how much we use the
 estimate for a shorter sequence as a fill-in for longer
 ones. Moreover, $m$ is the total number of words we encounter. The
 above is a rather primitive variant of what is Kneser-Ney smoothing
-and Bayesian Nonparametrics can accomplish. See e.g., :cite:`Wood.Gasthaus.Archambeau.ea.2011` for more details of how to accomplish
+and Bayesian nonparametrics can accomplish. See e.g., :cite:`Wood.Gasthaus.Archambeau.ea.2011` for more details of how to accomplish
 this. Unfortunately, models like this get unwieldy rather quickly
 for the following reasons. First, we need to store all counts.
 Secondly, this entirely ignores the meaning of the words. For
@@ -194,7 +194,7 @@ for X, Y in seq_data_iter_random(my_seq, batch_size=2, num_steps=6):
     print('X: ', X, '\nY:', Y)
 ```
 
-### Sequential partitioning
+### Sequential Partitioning
 
 In addition to random sampling of the original sequence, we can also make the positions of two adjacent random minibatches adjacent in the original sequence.
 

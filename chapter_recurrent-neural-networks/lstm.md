@@ -183,13 +183,17 @@ Interestingly, LSTMs are the prototypical latent variable autoregressive model w
 
 ## Exercises
 
-1. Adjust the LSTM hyperparameters. Observe and analyze the impact on runtime, perplexity, and the generted output.
+1. Adjust the LSTM hyperparameters. Observe and analyze the impact on runtime, perplexity, and the generated output.
 1. How would you need to change the model to generate proper words as opposed to sequences of characters?
 1. Compare the computational cost for GRUs, LSTMs, and regular RNNs for a given hidden dimension. Pay special attention to the training and inference cost.
-1. Since the candidate memory cells ensure that the value range is between $-1$ and $1$ by  using the tanh function, why does the hidden state need to use the tanh function again to ensure that the output value range is between $-1$ and $1$?
+1. Since the candidate memory cells ensure that the value range is between $-1$ and $1$ by  using the $\tanh$ function, why does the hidden state need to use the $\tanh$ function again to ensure that the output value range is between $-1$ and $1$?
 1. Implement an LSTM for a time series prediction besides the character sequences prediction.
 
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2368)
 
 ![](../img/qr_lstm.svg)
+
+```{.python .input}
+
+```

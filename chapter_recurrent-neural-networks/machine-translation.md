@@ -29,7 +29,7 @@ raw_text = read_data_nmt()
 print(raw_text[0:106])
 ```
 
-We perform several preprocessing steps on the raw text data, including ignoring cases, replacing UTF-9 non-breaking space with space, and adding space between words and punctuation marks.
+We perform several preprocessing steps on the raw text data, including ignoring cases, replacing UTF-8 non-breaking space with space, and adding space between words and punctuation marks.
 
 ```{.python .input  n=11}
 # Saved in the d2l package for later use
@@ -147,6 +147,11 @@ for X, X_vlen, Y, Y_vlen, in train_iter:
 
 * Machine translation (MT) refers to the automatic translation of a segment of text from one language to another. 
 * We read, preprocess, and tokenize the datasets from both source language and target language.
+
+
+## Exercises
+1. Take a background search online of which languages have made the greatest progress for machine translation? (Hint: any language that has a deep and complex grammatical structure can now be efficiently modeled using deep leaning.)
+1. Can you find a machine translation dataset online and process it with this jupyter notebook?
 
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/machine-translation/2396)
