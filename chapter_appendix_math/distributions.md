@@ -21,11 +21,7 @@ $$
 
 The cumulative distribution function is 
 
-$$F(x) = \begin{cases}
-0 & x < 0, \\
-1-p & 0 \le x < 1, \\
-1 & x >= 1 .
-\end{cases}$$
+$$F(x) = \begin{cases} 0 & x < 0, \\ 1-p & 0 \le x < 1, \\ 1 & x >= 1 . \end{cases}$$
 :eqlabel:`bernoulli-cdf`
 
 The probability mass function is plotted below.
@@ -71,11 +67,7 @@ $$
 
 The cumulative distribution function is 
 
-$$F(x) = \begin{cases}
-0 & x < 1, \\
-\frac{k}{n} & k \le x < k+1 \text{ with } 1 \le k < n, \\
-1 & x >= n .
-\end{cases}$$
+$$F(x) = \begin{cases} 0 & x < 1, \\ \frac{k}{n} & k \le x < k+1 \text{ with } 1 \le k < n, \\ 1 & x >= n . \end{cases}$$
 :eqlabel:`discrete_uniform-cdf`
 
 Let us first plot the probabilty mass function.
@@ -127,11 +119,7 @@ $$p(x) = \begin{cases}
 
 The cumulative distribution function is 
 
-$$F(x) = \begin{cases}
-0 & x < a, \\
-\frac{x-a}{b-a} & x \in [a,b], \\
-1 & x >= b .
-\end{cases}$$
+$$F(x) = \begin{cases} 0 & x < a, \\ \frac{x-a}{b-a} & x \in [a,b], \\ 1 & x >= b . \end{cases}$$
 :eqlabel:`cont_uniform-cdf`
 
 Let us first plot the probabilty density function :eqref:`cont_uniform-pdf`.
@@ -183,11 +171,7 @@ $$
 
 To get the cumulative distribution function, we need to notice that getting exactly $k$ successes can occur in $\binom{n}{k} = \frac{n!}{k!(n-k)!}$ ways each of which has a probability of $p^m(1-p)^{n-m}$ of occuring.  Thus the cumulative distribution function is
 
-$$F(x) = \begin{cases}
-0 & x < 0, \\
-\sum_{m \le k} \binom{n}{m} p^m(1-p)^{n-m}  & k \le x < k+1 \text{ with } 0 \le k < n, \\
-1 & x >= n .
-\end{cases}$$
+$$F(x) = \begin{cases} 0 & x < 0, \\ \sum_{m \le k} \binom{n}{m} p^m(1-p)^{n-m}  & k \le x < k+1 \text{ with } 0 \le k < n, \\ 1 & x >= n . \end{cases}$$
 :eqlabel:`binomial-cdf`
 
 Let us first plot the probabilty mass function.
@@ -263,10 +247,7 @@ The value $\lambda > 0$ is known as the *rate*, and denotes the average number o
 
 We may sum this probability mass function to get the cumulative distribution function.
 
-$$F(x) = \begin{cases}
-0 & x < 0, \\
-e^{-\lambda}\sum_{m = 0}^k \frac{\lambda^m}{m!} & k \le x < k+1 \text{ with } 0 \le k.
-\end{cases}$$
+$$F(x) = \begin{cases} 0 & x < 0, \\ e^{-\lambda}\sum_{m = 0}^k \frac{\lambda^m}{m!} & k \le x < k+1 \text{ with } 0 \le k. \end{cases}$$
 :eqlabel:`poisson-cdf`
 
 Let us first plot the probabilty mass function :eqref:`poisson-mass`.
