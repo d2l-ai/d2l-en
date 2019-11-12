@@ -6,9 +6,7 @@ Now, that we have a fairly strong understanding of what happens if we had a func
 ## Generalizing Differentiation
 What :numref:`sec_single_variable_calculus` tells us is that if we change a single one of these billions of weights leaving every other one fixed, we know what will happen!  This is nothing more than a function of a single variable, so we can write
 
-$$
-L(w_1+\epsilon_1,w_2,\ldots,w_N) \approx L(w_1,w_2,\ldots,w_N) + \epsilon_1 \frac{d}{dw_1} L(w_1,w_2,\ldots,w_N).
-$$
+$$L(w_1+\epsilon_1,w_2,\ldots,w_N) \approx L(w_1,w_2,\ldots,w_N) + \epsilon_1 \frac{d}{dw_1} L(w_1,w_2,\ldots,w_N).$$
 :eqlabel:`part-der`
 
 We will call the derivative in one variable while fixing the other the *partial derivative*, and we will use the notation $\frac{\partial}{\partial w_1}$ for the derivative in :eqref:`part-der`.
@@ -43,9 +41,7 @@ $$
 
 then
 
-$$
-L(\mathbf{w} + \boldsymbol{\epsilon}) \approx L(\mathbf{w}) + \boldsymbol{\epsilon}\cdot \nabla_{\mathbf{w}} L(\mathbf{w}).
-$$
+$$L(\mathbf{w} + \boldsymbol{\epsilon}) \approx L(\mathbf{w}) + \boldsymbol{\epsilon}\cdot \nabla_{\mathbf{w}} L(\mathbf{w}).$$
 :eqlabel:`nabla-use`
 
 We will call the vector $\nabla_{\mathbf{w}} L$ the *gradient* of $L$.
@@ -161,13 +157,11 @@ This highlights an important fact to know when working either theoretically or n
 ## Multivariate Chain Rule
 Let us suppose that we have a function of four variables ($w,x,y$, and $z$) which we can make by composing many terms:
 
-$$
-\begin{aligned}
+$$\begin{aligned}
 f(u,v) & = (u+v)^{2} \\
 u(a,b) & = (a+b)^{2}, \qquad v(a,b) = (a-b)^{2}, \\
 a(w,x,y,z) & = (w+x+y+z)^{2},\qquad b(w,x,y,z) = (w+x-y-z)^2.
-\end{aligned}
-$$
+\end{aligned}$$
 :eqlabel:`multi-func-def`
 
 Such chains of equations are common when working with neural networks, so trying to understand how to compute gradients of such functions is key to advanced techniques in machine learning.  We can start to see visual hints of this connection in :numref:`fig_chain-1` if we take a look at what variables directly relate to one another.
@@ -371,13 +365,11 @@ $$
 
 This is traditionally assembled into a matrix called the *Hessian*:
 
-$$
-\mathbf{H}_f = \begin{bmatrix} 
+$$\mathbf{H}_f = \begin{bmatrix} 
 \frac{d^2f}{dx_1dx_1} & \cdots & \frac{d^2f}{dx_1dx_n} \\
 \vdots & \ddots & \vdots \\
 \frac{d^2f}{dx_ndx_1} & \cdots & \frac{d^2f}{dx_ndx_n} \\
-\end{bmatrix}.
-$$
+\end{bmatrix}.$$
 :eqlabel:`hess-def`
 
 Not every entry of this matrix is independent.  Indeed, we can show that as long as both *mixed partials* (partial derivatives with respect to more than one variable) exist and are continuous, we can say that for any $i$, and $j$, 
@@ -508,9 +500,7 @@ This illustrates a few factors about matrix calculus that we will often counter 
 
 To keep building intuition, let us try a computation that is a little harder.  Suppose that we have a column vector $\mathbf{x}$, and a square matrix $A$ and we want to compute 
 
-$$
-\frac{d}{d\mathbf{x}}(\mathbf{x}^\top A \mathbf{x}).
-$$
+$$\frac{d}{d\mathbf{x}}(\mathbf{x}^\top A \mathbf{x}).$$
 :eqlabel:`mat-goal-1`
 
 To drive towards easier to manipulate notation, let us consider this problem using Einstein notation.  In this case we can write the function as
@@ -573,9 +563,7 @@ At this point, the pattern should be looking rather suspicious, so let us try to
 
 Let us try this out.  Suppose that $\mathbf{X}$ is a $n \times m$ matrix, $\mathbf{U}$ is an $n \times r$ and $\mathbf{V}$ is an $r \times m$.  Let us try to compute 
 
-$$
-\frac{d}{d\mathbf{V}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2} = \;?
-$$
+$$\frac{d}{d\mathbf{V}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2} = \;?$$
 :eqlabel:`mat-goal-2`
 
 This computation is important in an area called matrix factorization.  For us, however, it is just a derivative to compute.  Let us try to imaging what this would be for $1\times1$ matrices.  In that case, we get the expression

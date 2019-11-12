@@ -37,6 +37,6 @@ maximum-likelihood
 distributions
 naive-bayes
 statistics
-information-theory
+info-theory
 ```
 

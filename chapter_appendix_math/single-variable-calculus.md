@@ -71,9 +71,7 @@ As a bit of a historical digression: in the first few decades of neural network 
 
 Back in our example, this value of the change $8$ is different based on different values of $x$, so it makes sense to define a function about $x$.  More formally, this value dependent rate of change is referred to as the *derivative* as
 
-$$
-\frac{df}{dx}(x) = \lim_{\epsilon \rightarrow 0}\frac{f(x+\epsilon) - f(x)}{\epsilon}.
-$$
+$$\frac{df}{dx}(x) = \lim_{\epsilon \rightarrow 0}\frac{f(x+\epsilon) - f(x)}{\epsilon}.$$
 :eqlabel:`der-def`
 
 We will often encounter many different notations for the derivative in many different texts. For instance, all of the below notations indicate the same thing:
@@ -89,13 +87,11 @@ $$
 
 Often times, it is intuitively useful to unravel the definition of derivative :eqref:`der-def` again to see how a function changes when we make a small change of $x$:
 
-$$
-\begin{aligned}
+$$\begin{aligned}
 \frac{df}{dx}(x) = \lim_{\epsilon \rightarrow 0}\frac{f(x+\epsilon) - f(x)}{\epsilon} & \implies \frac{df}{dx}(x) \approx \frac{f(x+\epsilon) - f(x)}{\epsilon} \\
 & \implies \epsilon \frac{df}{dx}(x) \approx f(x+\epsilon) - f(x) \\
 & \implies f(x+\epsilon) \approx f(x) + \epsilon \frac{df}{dx}(x).
-\end{aligned}
-$$
+\end{aligned}$$
 :eqlabel:`small-change`
 
 In this way, we can understand the derivative as the scaling factor that tells us how large of change we get in the output from a change in the input.

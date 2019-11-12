@@ -35,9 +35,7 @@ $$
 
 Let us take this one final step further.  We have been thinking about the point $2$ the entire time, but never thinking about other points.  Nothing is different there fundamentally, but it is the case that the value $p$ will likely depend on the point.  We would at least hope that a dart thrower was more likely to hit a point near the center, like $2\text{cm}$ rather than $20\text{cm}$.  Thus, the value $p$ is not fixed, but rather should depend on the point $x$.  This tells us that we should expect
 
-$$
-P(\text{distance is in an } \epsilon \text{-sized interval around } x ) \approx \epsilon \cdot p(x).
-$$
+$$P(\text{distance is in an } \epsilon \text{-sized interval around } x ) \approx \epsilon \cdot p(x).$$
 :eqlabel:`pdf-deriv`
 
 Indeed, :eqref:`pdf-deriv` is precisely what the *probability density function* is.  It is a function $p(x)$ which encodes the relative probability of hitting near one point versus another.  Let us visualize what such a function might look like.
@@ -63,9 +61,7 @@ The locations where the function is large indicates regions where we are more li
 
 Let us now investigate this further.  We have already seen what a probability density function is intuitively for a random variable $X$, namely the density function is a function $p(x)$ so that 
 
-$$
-P(X \; \text{is in an } \epsilon \text{-sized interval around } x ) \approx \epsilon \cdot p(x).
-$$
+$$P(X \; \text{is in an } \epsilon \text{-sized interval around } x ) \approx \epsilon \cdot p(x).$$
 :eqlabel:`pdf-def`
 
 but what does this imply for the properties of $p(x)$?
@@ -121,16 +117,12 @@ d2l.plt.show()
 
 It turns out that these two properties describe exactly the space of possible probability density functions (or *p.d.f.*'s for the commonly encountered abbreviation).  They are non-negative functions $p(x) \ge 0$ such that
 
-$$
-\int_{-\infty}^{\infty} p(x) \; dx = 1.
-$$
+$$\int_{-\infty}^{\infty} p(x) \; dx = 1.$$
 :eqlabel:`pdf-int-one`
 
 We interpret this function to mean that if we want to know the probability our random variable is in a specific interval we can get that by integration:
 
-$$
-P(X\in(a,b]) = \int _ {a}^{b} p(x) \; dx.
-$$
+$$P(X\in(a,b]) = \int _ {a}^{b} p(x) \; dx.$$
 :eqlabel:`pdf-int-int`
 
 In :label:`common_distributions` we will see a number of common distributions, but Let us continue working in the abstract for a little longer.
@@ -196,9 +188,7 @@ Means are useful for understanding the average behavior of a random variable, ho
 
 This leads us to consider the variance of a random variable.  This is a quantitative measure of how far a random variable deviates from the mean.  Consider the expression $X - \mu_X$.  This is the deviation of the random variable from its mean.  This value can be positive or negative, so we need to do something to make it positive so that we are measuring the magnitude of the deviation.  A reasonable thing to try is to look at $\left|X-\mu_X\right|$, and indeed this leads to a useful quantity called the *mean absolute deviation*, however due to connections with other areas of mathematics and statistics, people often look at a different solution.  In particular, they look at $(X-\mu_X)^2.$  If we look at the typical size of this quantity by taking the mean, we arrive at the variance
 
-$$
-\sigma_X^2 = \mathrm{Var}(X) = E\left[(X-\mu_X)^2\right] = E[X^2] - \mu_X^2,
-$$
+$$\sigma_X^2 = \mathrm{Var}(X) = E\left[(X-\mu_X)^2\right] = E[X^2] - \mu_X^2,$$
 :eqlabel:`var-def`
 
 where the last equation holds by expanding out the definition in the middle, and applying the properties of expectation listed above.
@@ -241,9 +231,7 @@ The properties we had for variances can be restated for standard deviations.
 
 It is natural at this moment to ask, "If the standard deviation is in the units of our original random variable, does it represent something I can draw with regards to that random variable?"  The answer is a resounding yes!  Indeed much like the mean told we the typical location of our random variable, the standard deviation gives the typical range of variation of that random variable.  We can make this rigorous with what is known as Chebychev's inequality:
 
-$$
-P\left(X \not\in [\mu_X - \alpha\sigma_X, \mu_X + \alpha\sigma_X]\right) \le \frac{1}{\alpha^2}.
-$$
+$$P\left(X \not\in [\mu_X - \alpha\sigma_X, \mu_X + \alpha\sigma_X]\right) \le \frac{1}{\alpha^2}.$$
 :eqlabel:`chebychev`
 
 Or to state it verbally in the case of $\alpha=10$: $99\%$ of the samples from any random variable fall within $10$ standard deviations of the mean.  This gives an immediate interpretation to our standard summary statistics.
@@ -462,9 +450,7 @@ When dealing with multiple random variables, there is one additional summary sta
 
 Suppose that we have two random variables $X$ and $Y$, to begin with, Let us suppose they are discrete, taking on values $(x_i, y_j)$ with probability $p_{ij}$.  In this case, the covariance is defined as
 
-$$
-\sigma_{XY} = \mathrm{Cov}(X,Y) = \sum_{i,j} (x_i - \mu_X) (y_j-\mu_Y) p_{ij}. = E[XY] - E[X]E[Y]
-$$
+$$\sigma_{XY} = \mathrm{Cov}(X,Y) = \sum_{i,j} (x_i - \mu_X) (y_j-\mu_Y) p_{ij}. = E[XY] - E[X]E[Y]$$
 :eqlabel:`cov-def`
 
 To think about this intuitively: consider the following pair of random variables.  Suppose that $X$ takes the values $1$ and $3$, and $Y$ takes the values $-1$ and $3$.  Suppose that we have the following probabilities
@@ -542,9 +528,7 @@ As we did in the case of means and variances, Let us now consider units.  If $X$
 
 To see what makes sense, Let us perform a thought experiment.  Suppose that we convert our random variables in inches and dollars to be in inches and cents.  In this case the random variable $Y$ is multiplied by $100$.  If we work through the definition, this means that $\mathrm{Cov}(X,Y)$ will be multiplied by $100$.  Thus we see that in this case a change of units change the covariance by a factor of $100$.  Thus, to find our unit-invariant measure of correlation, we will need to divide by something else that also gets scaled by $100$.  Indeed we have a clear candidate, the standard deviation!  Indeed if we define the *correlation coefficient* to be
 
-$$
-\rho(X,Y) = \frac{\mathrm{Cov}(X,Y)}{\sigma_{X}\sigma_{Y}}
-$$
+$$\rho(X,Y) = \frac{\mathrm{Cov}(X,Y)}{\sigma_{X}\sigma_{Y}}$$
 :eqlabel:`cor-def`
 
 we see that this is a unit-less value.  A little mathematics can show that this number is between $-1$ and $1$ with $1$ meaning maximally positively correlated, whereas $-1$ means maximally negatively correlated.

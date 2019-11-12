@@ -21,13 +21,11 @@ $$
 
 The cumulative distribution function is 
 
-$$
-F(x) = \begin{cases}
+$$F(x) = \begin{cases}
 0 & x < 0, \\
 1-p & 0 \le x < 1, \\
 1 & x >= 1 .
-\end{cases}
-$$
+\end{cases}$$
 :eqlabel:`bernoulli-cdf`
 
 The probability mass function is plotted below.
@@ -73,13 +71,11 @@ $$
 
 The cumulative distribution function is 
 
-$$
-F(x) = \begin{cases}
+$$F(x) = \begin{cases}
 0 & x < 1, \\
 \frac{k}{n} & k \le x < k+1 \text{ with } 1 \le k < n, \\
 1 & x >= n .
-\end{cases}
-$$
+\end{cases}$$
 :eqlabel:`discrete_uniform-cdf`
 
 Let us first plot the probabilty mass function.
@@ -123,23 +119,19 @@ $$
 
 The probability density function is 
 
-$$
-p(x) = \begin{cases}
+$$p(x) = \begin{cases}
 \frac{1}{b-a} & x \in [a,b], \\
 0 & x \not\in [a,b].
-\end{cases}
-$$
+\end{cases}$$
 :eqlabel:`cont_uniform-pdf`
 
 The cumulative distribution function is 
 
-$$
-F(x) = \begin{cases}
+$$F(x) = \begin{cases}
 0 & x < a, \\
 \frac{x-a}{b-a} & x \in [a,b], \\
 1 & x >= b .
-\end{cases}
-$$
+\end{cases}$$
 :eqlabel:`cont_uniform-cdf`
 
 Let us first plot the probabilty density function :eqref:`cont_uniform-pdf`.
@@ -191,13 +183,11 @@ $$
 
 To get the cumulative distribution function, we need to notice that getting exactly $k$ successes can occur in $\binom{n}{k} = \frac{n!}{k!(n-k)!}$ ways each of which has a probability of $p^m(1-p)^{n-m}$ of occuring.  Thus the cumulative distribution function is
 
-$$
-F(x) = \begin{cases}
+$$F(x) = \begin{cases}
 0 & x < 0, \\
 \sum_{m \le k} \binom{n}{m} p^m(1-p)^{n-m}  & k \le x < k+1 \text{ with } 0 \le k < n, \\
 1 & x >= n .
-\end{cases}
-$$
+\end{cases}$$
 :eqlabel:`binomial-cdf`
 
 Let us first plot the probabilty mass function.
@@ -266,21 +256,17 @@ This should not come as too much of a surprise, since in the real world we can j
 
 Following through this reasoning carefully, we can arrive at the following model.  We will say that $X \sim \mathrm{Poisson}(\lambda)$ if it is a random variable which takes the values $\{0,1,2,\ldots\}$ with probability
 
-$$
-p_k = \frac{\lambda^ke^{-\lambda}}{k!}.
-$$
+$$p_k = \frac{\lambda^ke^{-\lambda}}{k!}.$$
 :eqlabel:`poisson-mass`
 
 The value $\lambda > 0$ is known as the *rate*, and denotes the average number of arrivals we expect in one unit of time (note that we above restricted our rate to be less than zero, but that was only to simplify the explanation).  
 
 We may sum this probability mass function to get the cumulative distribution function.
 
-$$
-F(x) = \begin{cases}
+$$F(x) = \begin{cases}
 0 & x < 0, \\
 e^{-\lambda}\sum_{m = 0}^k \frac{\lambda^m}{m!} & k \le x < k+1 \text{ with } 0 \le k.
-\end{cases}
-$$
+\end{cases}$$
 :eqlabel:`poisson-cdf`
 
 Let us first plot the probabilty mass function :eqref:`poisson-mass`.
@@ -356,9 +342,7 @@ $$
 
 where we say a random variable is normally distributed with given mean $\mu$ and variance $\sigma^2$, written $X \sim \mathcal{N}(\mu,\sigma^2)$ if $X$ has density
 
-$$
-p_X(x) = \frac{1}{\sqrt{2\pi\sigma^2}}e^{-\frac{(x-\mu)^2}{2\sigma^2}}.
-$$
+$$p_X(x) = \frac{1}{\sqrt{2\pi\sigma^2}}e^{-\frac{(x-\mu)^2}{2\sigma^2}}.$$
 :eqlabel:`gaussian-pdf`
 
 Let us first plot the probability density function :eqref:`gaussian-pdf`.
