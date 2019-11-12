@@ -164,9 +164,7 @@ Suppose that we are dealing with a random variables $X$.  The distribution itsel
 
 The *mean* encodes the average value of a random variable.  If we have a discrete random variable $X$, which takes the values $x_i$ with probabilities $p_i$, then the mean is given by the weighted average: sum the values times the probability that the random variable takes on that value:
 
-$$
-\mu_X = E[X] = \sum_i x_i p_i.
-$$
+$$\mu_X = E[X] = \sum_i x_i p_i.$$
 :eq-label:`exp-def`
 
 The way we should interpret the mean (albeit with caution) is that it tells us essentially where the random variable tends to be located.  

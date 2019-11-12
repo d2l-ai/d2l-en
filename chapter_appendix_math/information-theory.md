@@ -59,7 +59,7 @@ As self-information only measures the information of a single discrete event, we
 
 ### Motivating Entropy
 
-Let us try to get specific about what we want.  This will be an informal statement of what are known as the *axioms of Shannon entropy*.  It will turn out that the following collection of common-sense statements force us to a unique definition of information.  A formal version of these axioms, along with several others may be found in :cite:`csiszar.2008`.
+Let us try to get specific about what we want.  This will be an informal statement of what are known as the *axioms of Shannon entropy*.  It will turn out that the following collection of common-sense statements force us to a unique definition of information.  A formal version of these axioms, along with several others may be found in :cite:`Csiszar.2008`.
 
 1.  The information we gain by observing a random variable does not depend on what we call the elements, or the presence of additional elements which have probability zero.
 2.  The information we gain by observing two random variables is no more than the sum of the information we gain by observing them separately.  If they are independent, then it is exactly the sum.
@@ -72,6 +72,7 @@ While proving this fact is beyond the scope of our text, it is important to know
 For any random variable $X$ that follows a probability distribution $P$ with a probability density function (p.d.f.) or a probability mass function (p.m.f.) $p(x)$, we measure the expected amount of information through *entropy* (or *Shannon entropy*)
 
 $$H(X) = - E_{x \sim P} [\log p(x)].$$
+:eqlabel:`ent-def`
 
 To be specific, if $X$ is discrete, $$H(X) = - \sum_i p_i \log p_i \text{, where } p_i = P(X_i).$$ 
 
@@ -93,7 +94,7 @@ entropy(np.array([0.1, 0.5, 0.1, 0.3]))
 
 ### Interpretations
 
-You may be curious: in the entropy definition, why we use an expectation of a negative logarithm? Here are some intuitions.
+You may be curious: in the entropy definition :eqref:`ent-def`, why do we use an expectation of a negative logarithm? Here are some intuitions.
 
 First, why do we use a *logarithm* function $\log$? Suppose that $p(x) = f_1(x) f_2(x) \ldots, f_n(x)$, where each component function $f_i(x)$ is independent from each other. This means that each $f_i(x)$ contributes independently to the total information obtained from $p(x)$. As discussed above, we. want the entropy formula to be additive over independent random variables. Luckily, $\log$ can naturally turn a product of probability distributions to a summation of the individual terms.
 
@@ -107,7 +108,7 @@ $$H(S) = \sum_i {p_i \cdot I(s_i)} = - \sum_i {p_i \cdot \log p_i}.$$
 
 ### Properties of Entropy
 
-By the above examples and interpretations, we can derive the following properties of entropy. Here, we refer to X as an event and P as the probability distribution of X.
+By the above examples and interpretations, we can derive the following properties of entropy :eqref:`ent-def`. Here, we refer to X as an event and P as the probability distribution of X.
 
 * Entropy is non-negative, i.e., $H(X) \geq 0, \forall X$.
 
@@ -125,14 +126,15 @@ For the following discussion, we always use $(X,Y)$ as a pair of random variable
 
 ### Joint Entropy 
 
-Similar to entropy of a single random variable, we define the *joint entropy* $H(X,Y)$ of a pair random variables $(X,Y)$ as
+Similar to entropy of a single random variable :eqref:`ent-def`, we define the *joint entropy* $H(X,Y)$ of a pair random variables $(X,Y)$ as
 $$H(X,Y) = −E_{(x,y) \sim P} [\log p_{X,Y}(x, y)]. $$
+:eqlabel:`joint-ent-def`
 
 Precisely, on the one hand, if $(X,Y)$ is a pair of discrete random variables, then $$H(X,Y) = - \sum_{x} \sum_{y} p_{X,Y}(x,y) \log p_{X,Y}(x,y).$$
 
 On the other hand, if $(X,Y)$ is a pair of continuous random variables, then we define the *differential joint entropy* as $$H(X,Y) = - \int_{x, y} p_{X,Y}(x,y) \ \log p_{X,Y}(x,y) \;dx \;dy.$$
 
-We can think of this as telling us the total randomness in the pair of random variables.  As a pair of extremes, if $X = Y$ are two identical random variables, then the information in the pair is exactly the information in one and we have $H(X,Y) = H(X) = H(Y)$.  On the other extreme, if $X$ and $Y$ are independent then $H(X,Y) = H(X) + H(Y)$.  Indeed we will always have that the information contained in a pair of random variables is no smaller than the entropy of either random variable and no more than the sum of both.
+We can think of :eqref:`joint-ent-def` as telling us the total randomness in the pair of random variables.  As a pair of extremes, if $X = Y$ are two identical random variables, then the information in the pair is exactly the information in one and we have $H(X,Y) = H(X) = H(Y)$.  On the other extreme, if $X$ and $Y$ are independent then $H(X,Y) = H(X) + H(Y)$.  Indeed we will always have that the information contained in a pair of random variables is no smaller than the entropy of either random variable and no more than the sum of both.
 
 $$
 H(X), H(Y) \le H(X,Y) \le H(X) + H(Y).
@@ -158,7 +160,8 @@ The joint entropy defined above the amount of information contained in a pair of
 
 In the probability theory, we saw the definition of the *conditional probability* to measure the relationship between variables. We now want to analogously define the *conditional entropy* $H(Y \mid X)$.  We can write this as 
 
-$$ H(Y \mid X) = - E_{(x,y) \sim P} [\log p(y \mid x)],$$ 
+$$ H(Y \mid X) = - E_{(x,y) \sim P} [\log p(y \mid x)],$$
+:eqlabel:`cond-ent-def`
 
 where $p(y \mid x) = \frac{p_{X,Y}(x, y)}{p_X(x)}$ is the conditional probability. Specifically, if $(X,Y)$ is a pair of discrete random variables, then $$H(Y \mid X) = - \sum_{x} \sum_{y} p(x,y) \log p(y \mid x).$$
 
@@ -171,7 +174,7 @@ $$H(Y \mid X) = H(X,Y) - H(X).$$
 
 This has an intuitive interpretation: the information in $Y$ given $X$ ($H(Y \mid X)$) is the same as the information in both $X$ and $Y$ together ($H(X, Y)$) minus the information already contained in $X$.  This gives us the information in $Y$ which is not also represented in $X$.  
 
-Now, let us implement conditional entropy from scratch in MXNet.
+Now, let us implement conditional entropy :eqref:`cond-ent-def` from scratch in MXNet.
 
 ```{.python .input}
 def conditional_entropy(p_xy, p_x):
@@ -198,6 +201,7 @@ $$
 Indeed, this is a valid definition for the mutual information.  If we expand out the definitions of these terms and combine them, a little algebra shows that this is the same as
 
 $$I(X,Y) = −E_{x} E_{y} \left\{ p_{X,Y}(x, y) \log\frac{p_{X,Y}(x, y)}{p_X(x) p_Y(y)} \right\}. $$
+:eqlabel:`mut-ent-def`
 
 
 We can summarize all of these relationships in image :numref:`fig_mutual_information`.  It is an excellent test of intuition to see why the following statements are all also equivalent to $I(X,Y)$.
@@ -209,7 +213,7 @@ We can summarize all of these relationships in image :numref:`fig_mutual_informa
 ![Mutual information's relationship with joint entropy and conditional entropy.](../img/mutual_information.svg)
 :label:`fig_mutual_information`
 
-In many ways we can think of the mutual information as principled extension of correlation coefficient we saw in :numref:`sec_random_variables`.  This allows us to ask not only for linear relationships between variables, but for the maximum  information shared between the two random variables of any kind.
+In many ways we can think of the mutual information :eqref:`mut-ent-def` as principled extension of correlation coefficient we saw in :numref:`sec_random_variables`.  This allows us to ask not only for linear relationships between variables, but for the maximum  information shared between the two random variables of any kind.
 
 Now, let us implement mutual information from scratch.
 
@@ -228,7 +232,7 @@ mutual_information(np.array([[0.1, 0.5], [0.1, 0.3]]),
 
 ### Properties of Mutual Information
 
-Rather than memorizing the definition of mutual information, you only need to keep in mind its notable properties:
+Rather than memorizing the definition of mutual information :eqref:`mut-ent-def`, you only need to keep in mind its notable properties:
 
 * Mutual information is symmetric, i.e., $I(X,Y) = I(Y,X)$.
 * Mutual information is non-negative, i.e., $I(X,Y) \geq 0$.
@@ -239,13 +243,12 @@ Rather than memorizing the definition of mutual information, you only need to ke
 
 When we worked with entropy at the beginning this chapter, we were able to provide an interpretation of $-\log(p_X(x))$ as hoe *surprised* we were with the particular outcome.  We may give a similar interpretation to the logarithmic term in the mutual information, which is often referred to as the *pointwise mutual information*:
 
-$$
-\mathrm{pmi}(x,y) = \log\frac{p_{X,Y}(x, y)}{p_X(x) p_Y(y)}.
-$$
+$$\mathrm{pmi}(x,y) = \log\frac{p_{X,Y}(x, y)}{p_X(x) p_Y(y)}.$$
+:eqlabel:`pmi-def`
 
-We can think of this quantity as measuring how much more or less likely the specific combination of outcomes $x$ and $y$ are compared to what we would expect for independent random outcomes.  If it is large and positive, then these two specific outcomes occur much more frequently than they would compared to random chance (*note*: the denominator is $p_X(x) p_Y(y)$ which is the probability of the two outcomes were independent), whereas if it is large and negative it represents the two outcomes happening far less than we would expect by random chance.  
+We can think of :eqref:`pmi-def` as measuring how much more or less likely the specific combination of outcomes $x$ and $y$ are compared to what we would expect for independent random outcomes.  If it is large and positive, then these two specific outcomes occur much more frequently than they would compared to random chance (*note*: the denominator is $p_X(x) p_Y(y)$ which is the probability of the two outcomes were independent), whereas if it is large and negative it represents the two outcomes happening far less than we would expect by random chance.  
 
-This allows us to interpret the mutual information as the average amount that we were surprised to see two outcomes occurring together compared to what we would expect if they were independent.
+This allows us to interpret the mutual information :eqref:`mut-ent-def` as the average amount that we were surprised to see two outcomes occurring together compared to what we would expect if they were independent.
 
 ### Applications of Mutual Information
 
@@ -264,8 +267,9 @@ As what we have discussed in :numref:`sec_reduction-norm`, we can use norms to m
 Given a random variable $X$ that follows the probability distribution $P$ with a p.d.f. or a p.m.f. $p(x)$, and we estimate $P$ by another probability distribution $Q$ with a p.d.f. or a p.m.f. $q(x)$. Then the *Kullback–Leibler (KL) divergence* (or *relative entropy*) between $P$ and $Q$ is
 
 $$D_{\mathrm{KL}}(P\|Q) = E_{x \sim P} \left[ \log \frac{p(x)}{q(x)} \right].$$
+:eqlabel:`kl-def`
 
-As with the point-wise mutual information, we can again provide an interpretation of the logarithmic term:  $-\log \frac{q(x)}{p(x)} = -\log(q(x)) - (-\log(p(x)))$ will be large an positive if we see $x$ far more often under $P$ than we would expect for $Q$, and large and negative if we see the outcome far less than expected.  In this way, we can interpret it as our *relative* surprise at observing the outcome compared to how surprised we would be observing it from our reference distribution.
+As with the point-wise mutual information :eqref:`pmi-def`, we can again provide an interpretation of the logarithmic term:  $-\log \frac{q(x)}{p(x)} = -\log(q(x)) - (-\log(p(x)))$ will be large an positive if we see $x$ far more often under $P$ than we would expect for $Q$, and large and negative if we see the outcome far less than expected.  In this way, we can interpret it as our *relative* surprise at observing the outcome compared to how surprised we would be observing it from our reference distribution.
 
 In MXNet, let us implement the KL divergence from Scratch.
 
@@ -278,7 +282,7 @@ def kl_divergence(p, q):
 
 ### KL Divergence Properties
 
-Let us take a look at some properties of the KL divergence.
+Let us take a look at some properties of the KL divergence :eqref:`kl-def`.
 
 
 * KL divergence is non-symmetric, i.e., $$D_{\mathrm{KL}}(P\|Q) \neq D_{\mathrm{KL}}(Q\|P), \text{ if } P \neq Q.$$
@@ -333,7 +337,7 @@ kl_q2p, differ_percentage
 
 If you are curious about applications of information theory in deep learning, here is a quick example. We define the true distribution $P$ with probability distribution $p(x)$, and the estimated distribution $Q$ with probability distribution $q(x)$, and we will use them in the rest of this section.
 
-Say we need to solve a binary classification problem based on given $n$ data points {$x_1, \ldots, x_n$}. Assume that we encode $1$ and $0$ as the positive and negative class label $y_i$ respectively, and our neural network is parameterized by $\theta$. If we aim to find a best $\theta$ so that $\hat{y}_i= p_{\theta}(y_i \mid x_i)$, it is natural to apply the maximum log-likelihood approach. To be specific, for true labels $y_i$ and predictions $\hat{y}_i= p_{\theta}(y_i \mid x_i)$, the probability to be classified as positive is $\pi_i= p_{\theta}(y_i = 1 \mid x_i)$. Hence, the log-likelihood function would be
+Say we need to solve a binary classification problem based on given $n$ data points {$x_1, \ldots, x_n$}. Assume that we encode $1$ and $0$ as the positive and negative class label $y_i$ respectively, and our neural network is parameterized by $\theta$. If we aim to find a best $\theta$ so that $\hat{y}_i= p_{\theta}(y_i \mid x_i)$, it is natural to apply the maximum log-likelihood approach as was seen in :numref:`sec_maximum_likelihood`. To be specific, for true labels $y_i$ and predictions $\hat{y}_i= p_{\theta}(y_i \mid x_i)$, the probability to be classified as positive is $\pi_i= p_{\theta}(y_i = 1 \mid x_i)$. Hence, the log-likelihood function would be
 
 $$
 \begin{aligned}
@@ -352,6 +356,7 @@ This was all derived by working from the maximum likelihood point of view.  Howe
 Like KL divergence, for a random variable $X$, we can also measure the divergence between the estimating distribution $Q$ and the true distribution $P$ via *cross entropy*,
 
 $$\mathrm{CE}(P,Q) = - E_{x \sim P} [\log(q(x))].$$
+:eqlabel:`ce-def`
 
 By using properties of entropy discussed above, we can also interpret it as the summation of the entropy $H(P)$ and the KL divergence between $P$ and $Q$, i.e.,
 
@@ -377,7 +382,7 @@ cross_entropy(preds, labels)
 
 ### Properties
 
-Cross entropy can be used to define a loss function in the optimization problem. It turns out that the following are equivalent:
+Cross entropy :eqref:`ce-def` can be used to define a loss function in the optimization problem. It turns out that the following are equivalent:
 
 1. Maximizing predictive probability of $Q$ for distribution $P$, (i.e., $E_{x 
 \sim P} [\log (q(x))]$);
