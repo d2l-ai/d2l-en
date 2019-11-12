@@ -1,59 +1,40 @@
 # RMSProp
 :label:`sec_rmsprop`
 
-In the experiment in :numref:`sec_adagrad`, the learning rate of each
-element in the independent variable of the objective function declines (or
-remains unchanged) during iteration because the variable $\mathbf{s}_t$ in the
-denominator is increased by the square by element operation of the minibatch
-stochastic gradient, adjusting the learning rate. Therefore, when the learning
-rate declines very fast during early iteration, yet the current solution is
-still not desirable, Adagrad might have difficulty finding a useful solution
-because the learning rate will be too small at later stages of iteration. To
-tackle this problem, the RMSProp algorithm :cite:`Tieleman.Hinton.2012` made a
-small modification to Adagrad.
+One of the key issues in :ref:`sec_adagrad` is that the learning rate decreases at a predefined schedule of effectively $O(t^{-\frac{1}{2}})$. While this is generally appropriate for convex problems, it might not be ideal for nonconvex ones, such as those encountered in deep learning. Yet, the coordinate-wise adaptivity of Adagrad is highly desirable as a preconditioner.
+
+:cite:`Tieleman.Hinton.2012` proposed the RMSProp algorithm as a simple fix to decouple rate scheduling from coordinate-adaptive learning rates. The issue is that Adagrad accumulates the squares of the gradient $\mathbf{g}_t$ into a state vector $\mathbf{s}_t = \mathbf{s}_{t-1} + \mathbf{g}_t^2$. As a result $\mathbf{s}_t$ keeps on growing without bound due to the lack of normalization, essentially linarly as the algorithm converges.
+
+One way of fixing this problem would be to use $\mathbf{s}_t / t$. For reasonable distributions of $\mathbf{g}_t$ this will converge. Unfortunately it might take a very long time until the limit behavior starts to matter since the procedure remembers the full trajectory of values. An alternative is to use a leaky average in the same way we used in the momentum method, i.e. $\mathbf{s}_t \leftarrow \gamma \mathbf{s}_{t-1} + (1-\gamma) \mathbf{g}_t^2$ for some parameter $\gamma > 0$. Keeping all other parts unchanged yields RMSProp.
 
 ## The Algorithm
 
-Unlike in Adagrad, the state variable
-$\mathbf{s}_t$ is the sum of the square by element all the minibatch
-stochastic gradients $\mathbf{g}_t$ up to the time step $t$, RMSProp uses
-the exponentially weighted moving average on the square by element results of these gradients. Specifically,
-given the hyperparameter $0 \leq \gamma < 1$, RMSProp is computed at time step
-$t>0$.
+Let's write out the equations in detail.
 
-$$\mathbf{s}_t \leftarrow \gamma \mathbf{s}_{t-1} + (1 - \gamma) \mathbf{g}_t \odot \mathbf{g}_t. $$
+$$\begin{aligned}
+    \mathbf{s}_t & \leftarrow \gamma \mathbf{s}_{t-1} + (1 - \gamma) \mathbf{g}_t^2 \\
+    \mathbf{x}_t & \leftarrow \mathbf{x}_{t-1} - \frac{\eta}{\sqrt{\mathbf{s}_t + \epsilon}} \odot \mathbf{g}_t
+\end{aligned}$$
 
-Like Adagrad, RMSProp re-adjusts the learning rate of each element in the independent variable of the objective function with element operations and then updates the independent variable.
-
-$$\mathbf{x}_t \leftarrow \mathbf{x}_{t-1} - \frac{\eta}{\sqrt{\mathbf{s}_t + \epsilon}} \odot \mathbf{g}_t, $$
-
-Here, $\eta$ is the learning rate while $\epsilon$ is a constant added to maintain numerical stability, such as $10^{-6}$.
-
-### Exponentially Weighted Moving Average (EWMA)
-
-Now let expand the definition of $\mathbf{s}_t$, we can see that
+The constant $\epsilon > 0$ is typically set to $10^{-6}$ to ensure that we don't suffer from division by zero or overly large step sizes. Given this expansion we are now free to control the learning rate $\eta$ independently of the scaling that is applied on a per-coordinate basis. In terms of leaky averages we can apply the same reasoning as previously applied in the case of the momentum method. Expanding the definition of $\mathbf{s}_t$ yields
 
 $$
 \begin{aligned}
-\mathbf{s}_t &= (1 - \gamma) \mathbf{g}_t \odot \mathbf{g}_t + \gamma \mathbf{s}_{t-1} \\
-&= (1 - \gamma) \left(\mathbf{g}_t \odot \mathbf{g}_t + \gamma \mathbf{g}_{t-1} \odot \mathbf{g}_{t-1}\right) + \gamma^2 \mathbf{s}_{t-2} \\ &\cdots\\
-&= (1 - \gamma)\left( \mathbf{g}_t \odot \mathbf{g}_t + \gamma \mathbf{g}_{t-1} \odot \mathbf{g}_{t-1} + \cdots + \gamma^{t-1}\mathbf{g}_{1} \odot \mathbf{g}_{1} \right).
+\mathbf{s}_t & = (1 - \gamma) \mathbf{g}_t^2 + \gamma \mathbf{s}_{t-1} \\
+& = (1 - \gamma) \left(\mathbf{g}_t^2 + \gamma \mathbf{g}_{t-1}^2 + \gamma^2 \mathbf{g}_{t-2} + \ldots \right)
 \end{aligned}
 $$
 
-In :numref:`sec_momentum` we see that $\frac{1}{1-\gamma} = 1 + \gamma + \gamma^2 + \cdots$, so the sum of weights equals to 1. In addition, these weights decrease exponentially, it is called exponentially weighted moving average.
-
-We visualize the weights in the past 40 time steps with various $\gamma$s.
+As before in :numref:`sec_momentum` we use $1 + \gamma + \gamma^2 + \ldots = \frac{1}{1-\gamma}$. Hence the sum of weights is normalized to $1$ with a half-life time of an observation of $\gamma^{-1}$. Let's visualize the weights for the past 40 time steps for various choices of $\gamma$.
 
 ```{.python .input  n=1}
 %matplotlib inline
-import d2l
-import math
+import d2l, math
 from mxnet import np, npx
 npx.set_np()
+d2l.set_figsize((3.5, 2.5))
 
 gammas = [0.95, 0.9, 0.8, 0.7]
-d2l.set_figsize((3.5, 2.5))
 for gamma in gammas:
     x = np.arange(40).asnumpy()
     d2l.plt.plot(x, (1-gamma) * gamma ** x, label='gamma = %.2f'%gamma)
@@ -62,12 +43,7 @@ d2l.plt.xlabel('time');
 
 ## Implementation from Scratch
 
-By convention, we will use the objective function
-$f(\mathbf{x})=0.1x_1^2+2x_2^2$ to observe the iterative trajectory of the
-independent variable in RMSProp. Recall that in
-:numref:`sec_adagrad`, when we used Adagrad with a learning rate of 0.4, the independent
-variable moved less in later stages of iteration. However, at the same learning
-rate, RMSProp can approach the optimal solution faster.
+As before we use the quadratic function $f(\mathbf{x})=0.1x_1^2+2x_2^2$ to observe the trajectory of RMSProp. Recall that in :numref:`sec_adagrad`, when we used Adagrad with a learning rate of 0.4, the variables moved only very slowly in the later stages of the algorithm since the learning rate decreased too quickly. Since $\eta$ is controlled separately this does not happen with RMSProp.
 
 ```{.python .input}
 def rmsprop_2d(x1, x2, s1, s2):
@@ -85,7 +61,7 @@ eta, gamma = 0.4, 0.9
 d2l.show_trace_2d(f_2d, d2l.train_2d(rmsprop_2d))
 ```
 
-Next, we implement RMSProp with the formula in the algorithm.
+Next, we implement RMSProp to be used in a deep network. This is equally straightforward.
 
 ```{.python .input  n=22}
 def init_rmsprop_states(feature_dim):
@@ -100,7 +76,7 @@ def rmsprop(params, states, hyperparams):
         p[:] -= hyperparams['lr'] * p.grad / np.sqrt(s + eps)
 ```
 
-We set the initial learning rate to 0.01 and the hyperparameter $\gamma$ to 0.9. Now, the variable $\mathbf{s}_t$ can be treated as the weighted average of the square term $\mathbf{g}_t \odot \mathbf{g}_t$ from the last $1/(1-0.9) = 10$ time steps.
+We set the initial learning rate to 0.01 and the weighting term $\gamma$ to 0.9. That is, $\mathbf{s}$ aggregates on average over the past $1/(1-\gamma) = 10$ observations of the square gradient.
 
 ```{.python .input  n=24}
 data_iter, feature_dim = d2l.get_data_ch10(batch_size=10)
@@ -110,23 +86,31 @@ d2l.train_ch10(rmsprop, init_rmsprop_states(feature_dim),
 
 ## Concise Implementation
 
-From the `Trainer` instance of the algorithm named "rmsprop", we can implement the RMSProp algorithm with Gluon to train models. Note that the hyperparameter $\gamma$ is assigned by `gamma1`.
+Since RMSProp is a rather popular algorithm it is also available in the `Trainer` instance. All we need to do is instantiate it using an algorithm named `rmsprop`, assigning $\gamma$ to the parameter `gamma1`.
 
 ```{.python .input  n=29}
-d2l.train_gluon_ch10('rmsprop', {'learning_rate': 0.01, 'gamma1': 0.9},
-                     data_iter)
+d2l.train_gluon_ch10('rmsprop', {'learning_rate': 0.01, 'gamma1': 0.9}, data_iter)
 ```
 
 ## Summary
 
-* The difference between RMSProp and Adagrad is that RMSProp uses an EWMA on the squares of elements in the minibatch stochastic gradient to adjust the learning rate.
+* RMSProp is very similar to Adagrad insofar as both use the square of the gradient to scale coefficients.
+* RMSProp shares with momentum the leaky averaging. However, RMSProp uses the technique to adjust the coefficient-wise preconditioner.
+* The learning rate needs to be scheduled by the experimenter in practice.
+* The coefficient $\gamma$ determines how long the history is when adjusting the per-coordinate scale.
 
 ## Exercises
 
-* What happens to the experimental results if we set the value of $\gamma$ to 1? Why?
-* Try using other combinations of initial learning rates and $\gamma$ hyperparameters and observe and analyze the experimental results.
+1. What happens experimentally if we set $\gamma = 1$? Why?
+1. Rotate the optimization problem to minimize $f(\mathbf{x}) = 0.1 (x_1 + x_2)^2 + 2 (x_1 - x_2)^2$. What happens to the convergence?
+1. Try out what happens to RMSProp on a real machine learning problem, such as training on FashionMNIST. Experiment with different choices for adjusting the learning rate.
+1. Would you want to adjust $\gamma$ as optimization progresses? How sensitive is RMSProp to this?
 
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2376)
 
 ![](../img/qr_rmsprop.svg)
+
+```{.python .input}
+
+```
