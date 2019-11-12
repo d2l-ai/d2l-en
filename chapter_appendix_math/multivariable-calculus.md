@@ -9,8 +9,9 @@ What :numref:`sec_single_variable_calculus` tells us is that if we change a sing
 $$
 L(w_1+\epsilon_1,w_2,\ldots,w_N) \approx L(w_1,w_2,\ldots,w_N) + \epsilon_1 \frac{d}{dw_1} L(w_1,w_2,\ldots,w_N).
 $$
+:eqlabel:`part-der`
 
-We will call the derivative in one variable while fixing the other the *partial derivative*, and we will use the notation $\frac{\partial}{\partial w_1}$.
+We will call the derivative in one variable while fixing the other the *partial derivative*, and we will use the notation $\frac{\partial}{\partial w_1}$ for the derivative in :eqref:`part-der`.
 
 Now, let us take this, and change $w_2$ a little bit to $w_2 + \epsilon_2$:
 
@@ -27,7 +28,7 @@ L(w_1+\epsilon_1,w_2+\epsilon_2,\ldots,w_N) & \approx L(w_1,w_2+\epsilon_2,\ldot
 \end{aligned}
 $$
 
-where we have used the idea that $\epsilon_1\epsilon_2$ is a higher order term that we can discard in the same way we could discard $\epsilon^{2}$ in the previous section.  By continuing in this manner, we may write that
+where we have used the idea that $\epsilon_1\epsilon_2$ is a higher order term that we can discard in the same way we could discard $\epsilon^{2}$ in the previous section, along with what we saw in :eqref:`part-der`.  By continuing in this manner, we may write that
 
 $$
 L(w_1+\epsilon_1,w_2+\epsilon_2,\ldots,w_N+\epsilon_N) \approx L(w_1,w_2,\ldots,w_N) + \sum_i \epsilon_i \frac{\partial}{\partial w_i} L(w_1,w_2,\ldots,w_N).
@@ -45,10 +46,11 @@ then
 $$
 L(\mathbf{w} + \boldsymbol{\epsilon}) \approx L(\mathbf{w}) + \boldsymbol{\epsilon}\cdot \nabla_{\mathbf{w}} L(\mathbf{w}).
 $$
+:eqlabel:`nabla-use`
 
 We will call the vector $\nabla_{\mathbf{w}} L$ the *gradient* of $L$.
 
-This formula is worth pondering for a moment.  It has exactly the format that we encountered in one dimension, just we have converted everything to vectors and dot products.  It allows us to tell approximately how the function $L$ will change given any perturbation to the input.  As we will see in the next section, this will provide us with an important tool in understanding geometrically how we can learn using information contained in the gradient.
+Equation :eqref:`nabla-use` is worth pondering for a moment.  It has exactly the format that we encountered in one dimension, just we have converted everything to vectors and dot products.  It allows us to tell approximately how the function $L$ will change given any perturbation to the input.  As we will see in the next section, this will provide us with an important tool in understanding geometrically how we can learn using information contained in the gradient.
 
 But first, let us see this approximation at work with an example.  Suppose that we are working with the function
 
@@ -62,7 +64,7 @@ $$
 f(x,y) = \log(3) \text{ with gradient } \nabla f (x,y) = \left[\frac{1}{3}, \frac{2}{3}\right].
 $$
 
-Thus, if we want to approximate $f$ at $(\epsilon_1,\log(2) + \epsilon_2)$,  we see that we should have
+Thus, if we want to approximate $f$ at $(\epsilon_1,\log(2) + \epsilon_2)$,  we see that we should have the specific instance of :eqref:`nabla-use`:
 
 $$
 f(\epsilon_1,\log(2) + \epsilon_2) \approx \log(3) + \frac{1}{3}\epsilon_1 + \frac{2}{3}\epsilon_2.
@@ -89,26 +91,26 @@ true_value = f(0 + epsilon[0], np.log(2) + epsilon[1])
 ```
 
 ## Geometry of Gradients and Gradient Descent
-Consider the formula 
+Consider the again :eqref:`nabla-use`: 
 
 $$
 L(\mathbf{w} + \boldsymbol{\epsilon}) \approx L(\mathbf{w}) + \boldsymbol{\epsilon}\cdot \nabla_{\mathbf{w}} L(\mathbf{w}).
 $$
 
-Let us suppose that I want to minimize this loss.  Let us understand geometrically the algorithm of gradient descent first obtained in  :numref:`sec_autograd`. What we will do is the following:
+Let us suppose that I want to use this to help minimize our loss $L$.  Let us understand geometrically the algorithm of gradient descent first obtained in  :numref:`sec_autograd`. What we will do is the following:
 
 1. Start with a random choice for the initial parameters $\mathbf{w}$.
 2. Find the direction $\mathbf{v}$ that makes $L$ decrease the most rapidly at $\mathbf{w}$.
 3. Take a small step in that direction: $\mathbf{w} \rightarrow \mathbf{w} + \epsilon\mathbf{v}$.
 4. Repeat.
 
-The only thing we do not know exactly how to do is to compute the vector $\mathbf{v}$ in the second step.  We will call such a direction the *direction of steepest descent*.  Let us look at our approximation.   Using the geometric understanding of dot products from :numref:`sec_linear_algebra`, we see that
+The only thing we do not know exactly how to do is to compute the vector $\mathbf{v}$ in the second step.  We will call such a direction the *direction of steepest descent*.  Using the geometric understanding of dot products from :numref:`sec_linear_algebra`, we see that we can rewrite :eqref:`nabla-use` as
 
 $$
-L(\mathbf{w} + \mathbf{v}) \approx L(\mathbf{w}) + \mathbf{v}\cdot \nabla_{\mathbf{w}} L(\mathbf{w}) = \|\nabla_{\mathbf{w}} L(\mathbf{w})\|\cos(\theta),
+L(\mathbf{w} + \mathbf{v}) \approx L(\mathbf{w}) + \mathbf{v}\cdot \nabla_{\mathbf{w}} L(\mathbf{w}) = \|\nabla_{\mathbf{w}} L(\mathbf{w})\|\cos(\theta).
 $$
 
-where we have taken our direction to have length one for convenience, and used $\theta$ for the angle between $\mathbf{v}$ and $\nabla_{\mathbf{w}} L(\mathbf{w})$.  If we want to find the direction that decreases $L$ as rapidly as possible, we want to make this as expression as negative as possible.  The only way the direction we pick enters into this equation is through $\cos(\theta)$, and thus we wish to make this cosine as negative as possible.  Now, recalling the shape of cosine, we can make this as negative as possible by making $\cos(\theta) = -1$ or equivalently making the angle between the gradient and our chosen direction to be $\pi$ radians, or equivalently $180$ degrees.  The only way to make this angle so, is to head in the exact opposite direction:  pick $\mathbf{v}$ to point in the exact opposite direction to $\nabla_{\mathbf{w}} L(\mathbf{w})$!
+Note that we have taken our direction to have length one for convenience, and used $\theta$ for the angle between $\mathbf{v}$ and $\nabla_{\mathbf{w}} L(\mathbf{w})$.  If we want to find the direction that decreases $L$ as rapidly as possible, we want to make this as expression as negative as possible.  The only way the direction we pick enters into this equation is through $\cos(\theta)$, and thus we wish to make this cosine as negative as possible.  Now, recalling the shape of cosine, we can make this as negative as possible by making $\cos(\theta) = -1$ or equivalently making the angle between the gradient and our chosen direction to be $\pi$ radians, or equivalently $180$ degrees.  The only way to achieve this is to head in the exact opposite direction:  pick $\mathbf{v}$ to point in the exact opposite direction to $\nabla_{\mathbf{w}} L(\mathbf{w})$!
 
 This brings us to one of the most important mathematical concepts in machine learning: the direction of steepest decent points in the direction of $-\nabla_{\mathbf{w}}L(\mathbf{w})$.  Thus our informal algorithm can be rewritten as follows.
 
@@ -128,7 +130,7 @@ However, it is a useful exercise to consider what the geometric understanding we
 
 Suppose that we wish to find the value of $\mathbf{x}_0$ which minimizes some function $L(\mathbf{x})$.  Let us suppose that moreover someone gives us a value and tells us that it is the value that minimizes $L$.  Is there anything we can check to see if their answer is even plausible?
 
-Consider the expression
+Again consider :eqref:`nabla-use`:
 $$
 L(\mathbf{x}_0 + \boldsymbol{\epsilon}) \approx L(\mathbf{x}_0) + \boldsymbol{\epsilon}\cdot \nabla_{\mathbf{x}} L(\mathbf{x}_0).
 $$
@@ -166,13 +168,14 @@ u(a,b) & = (a+b)^{2}, \qquad v(a,b) = (a-b)^{2}, \\
 a(w,x,y,z) & = (w+x+y+z)^{2},\qquad b(w,x,y,z) = (w+x-y-z)^2.
 \end{aligned}
 $$
+:eqlabel:`multi-func-def`
 
 Such chains of equations are common when working with neural networks, so trying to understand how to compute gradients of such functions is key to advanced techniques in machine learning.  We can start to see visual hints of this connection in :numref:`fig_chain-1` if we take a look at what variables directly relate to one another.
 
 ![The function relations above where nodes represent values and edges show functional dependence.](../img/ChainNet1.svg)
 :label:`fig_chain-1`
 
-Nothing stops us from just composing everything and writing out that
+Nothing stops us from just composing everything from :eqref:`multi-func-def` and writing out that
 
 $$
 f(w,x,y,z) = \left(\left((w+x+y+z)^2+(w+x-y-z)^2\right)^2+\left((w+x+y+z)^2-(w+x-y-z)^2\right)^2\right)^2,
@@ -223,7 +226,7 @@ Understanding the chain rule in this way will pay great dividends when trying to
 
 ## The Backpropagation Algorithm
 
-Let us return to the problem we saw in the previous section where
+Let us return to the example of :eqref:`multi-func-def` the previous section where
 
 $$
 \begin{aligned}
@@ -374,7 +377,7 @@ $$
 \vdots & \ddots & \vdots \\
 \frac{d^2f}{dx_ndx_1} & \cdots & \frac{d^2f}{dx_ndx_n} \\
 \end{bmatrix}.
-$$
+$$:eqlabel:`hess-def`
 
 Not every entry of this matrix is independent.  Indeed, we can show that as long as both *mixed partials* (partial derivatives with respect to more than one variable) exist and are continuous, we can say that for any $i$, and $j$, 
 
@@ -386,7 +389,7 @@ This follows by considering first perturbing a function in the direction of $x_i
 
 As with single variables, we can use these derivatives to get a far better idea of how the function behaves near a point.  In particular, we can use it to find the best fitting quadratic near a point $\mathbf{x}_0$.
 
-Let us see an example.  Suppose that $f(x_1,x_2) = a + b_1x_1 + b_2x_2 + c_{11}x_1^{2} + c_{12}x_1x_2 + c_{22}x_2^{2}$.  This is the general form for a quadratic in two variables.  If we look at the value of the function, its gradient, and its Hessian, all at the point zero:
+Let us see an example.  Suppose that $f(x_1,x_2) = a + b_1x_1 + b_2x_2 + c_{11}x_1^{2} + c_{12}x_1x_2 + c_{22}x_2^{2}$.  This is the general form for a quadratic in two variables.  If we look at the value of the function, its gradient, and its Hessian :eqref:`hess-def`, all at the point zero:
 
 $$
 \begin{aligned}
@@ -450,7 +453,9 @@ This forms the basis for Newton's Algorithm discussed in :numref:`sec_gd`, where
 ## A Little Matrix Calculus
 Derivatives of functions involving matrices turn out to be particularly nice.  This section can become notationally heavy, so may be skipped in a first reading, but it is useful to know how derivatives of functions involving common matrix operations are often much cleaner than one might initially anticipate, particularly given how central matrix operations are to deep learning applications.
 
-Let us begin with an example.  Suppose that we have some fixed row vector $\boldsymbol{\beta}$, and we want to take the product function $f(\mathbf{x}) = \boldsymbol{\beta}\mathbf{x}$, and understand how the dot product changes when we change $\mathbf{x}$.  A bit of notation that will be useful when working with matrix derivatives in ML is called the *denominator layout matrix derivative* where we assemble our partial derivatives into the shape of whatever vector, matrix, or tensor is in the denominator of the differential.  In this case, we will write
+Let us begin with an example.  Suppose that we have some fixed row vector $\boldsymbol{\beta}$, and we want to take the product function $f(\mathbf{x}) = \boldsymbol{\beta}\mathbf{x}$, and understand how the dot product changes when we change $\mathbf{x}$.  
+
+A bit of notation that will be useful when working with matrix derivatives in ML is called the *denominator layout matrix derivative* where we assemble our partial derivatives into the shape of whatever vector, matrix, or tensor is in the denominator of the differential.  In this case, we will write
 
 $$
 \frac{df}{d\mathbf{x}} = \begin{bmatrix}
@@ -505,6 +510,7 @@ To keep building intuition, let us try a computation that is a little harder.  S
 $$
 \frac{d}{d\mathbf{x}}(\mathbf{x}^\top A \mathbf{x}).
 $$
+:eqlabel:`mat-goal-1`
 
 To drive towards easier to manipulate notation, let us consider this problem using Einstein notation.  In this case we can write the function as
 
@@ -548,7 +554,7 @@ $$
 \left[\frac{d}{d\mathbf{x}}(\mathbf{x}^\top A \mathbf{x})\right]_k = \frac{d}{dx_k}x_ia_{ij}x_j = [(\mathbf{A} + \mathbf{A}^\top)\mathbf{x}]_k.
 $$
 
-Thus, we see that the $k$-th entry of the desired derivative is just the $k$-th entry of the vector on the right, and thus the two are the same.  Thus yields
+Thus, we see that the $k$-th entry of the desired derivative from :eqref:`mat-goal-1` is just the $k$-th entry of the vector on the right, and thus the two are the same.  Thus yields
 
 $$
 \frac{d}{d\mathbf{x}}(\mathbf{x}^\top A \mathbf{x}) = (\mathbf{A} + \mathbf{A}^\top)\mathbf{x}.
@@ -569,6 +575,7 @@ Let us try this out.  Suppose that $\mathbf{X}$ is a $n \times m$ matrix, $\math
 $$
 \frac{d}{d\mathbf{V}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2} = \;?
 $$
+:eqlabel:`mat-goal-2`
 
 This computation is important in an area called matrix factorization.  For us, however, it is just a derivative to compute.  Let us try to imaging what this would be for $1\times1$ matrices.  In that case, we get the expression
 
@@ -584,7 +591,7 @@ $$
 
 However, if we look at this it does not quite work.  Recall that $\mathbf{X}$ is $n \times m$, as is $\mathbf{U}\mathbf{V}$, so the matrix $2(\mathbf{X} - \mathbf{U}\mathbf{V})$ is $n \times m$.  On the other hand $\mathbf{U}$ is $n \times r$, and we cannot multiply a $n \times m$ and a $n \times r$ matrix since the dimensions do not match! 
 
-We want to get $\frac{d}{d\mathbf{V}}$, which is the same shape of $\mathbf{V}$, which is $r \times m$.  So somehow we need to take a $n \times m$ matrix and a $n \times r$ matrix, multiply them together (perhaps with some transposes) to get a $r \times m$. We can do this by multiplying $U^\top$ by $(\mathbf{X} - \mathbf{U}\mathbf{V})$.  Thus, we can guess
+We want to get $\frac{d}{d\mathbf{V}}$, which is the same shape of $\mathbf{V}$, which is $r \times m$.  So somehow we need to take a $n \times m$ matrix and a $n \times r$ matrix, multiply them together (perhaps with some transposes) to get a $r \times m$. We can do this by multiplying $U^\top$ by $(\mathbf{X} - \mathbf{U}\mathbf{V})$.  Thus, we can guess the solution to :eqref:`mat-goal-2` is
 
 $$
 \frac{d}{d\mathbf{V}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= 2\mathbf{U}^\top(\mathbf{X} - \mathbf{U}\mathbf{V}).
@@ -650,7 +657,7 @@ $$
 \frac{d}{dv_{ab}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= [2\mathbf{U}^\top(\mathbf{X}-\mathbf{U}\mathbf{V})]_{ab}.
 $$
 
-and thus
+and thus we may write the solution to :eqref:`mat-goal-2`
 
 $$
 \frac{d}{d\mathbf{V}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= 2\mathbf{U}^\top(\mathbf{X} - \mathbf{U}\mathbf{V}).
