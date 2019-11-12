@@ -27,7 +27,7 @@ F(x) = \begin{cases}
 1-p & 0 \le x < 1, \\
 1 & x >= 1 .
 \end{cases}
-$$
+$$:eqlabel:`bernoulli-cdf`
 
 The probability mass function is plotted below.
 
@@ -41,7 +41,7 @@ d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
-Now, let us plot the cumulative distribution function.
+Now, let us plot the cumulative distribution function :eqref:`bernoulli-cdf`.
 
 ```{.python .input}
 x = np.arange(-1, 2, 0.01)
@@ -78,7 +78,7 @@ F(x) = \begin{cases}
 \frac{k}{n} & k \le x < k+1 \text{ with } 1 \le k < n, \\
 1 & x >= n .
 \end{cases}
-$$
+$$:eqlabel:`discrete_uniform-cdf`
 
 Let us first plot the probabilty mass function.
 
@@ -91,7 +91,7 @@ d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
-Now, let us plot the cumulative distribution function.
+Now, let us plot the cumulative distribution function :eqref:`discrete_uniform-cdf`.
 
 ```{.python .input}
 x = np.arange(-1, 6, 0.01)
@@ -126,7 +126,7 @@ p(x) = \begin{cases}
 \frac{1}{b-a} & x \in [a,b], \\
 0 & x \not\in [a,b].
 \end{cases}
-$$
+$$:eqlabel:`cont_uniform-pdf`
 
 The cumulative distribution function is 
 
@@ -136,9 +136,9 @@ F(x) = \begin{cases}
 \frac{x-a}{b-a} & x \in [a,b], \\
 1 & x >= b .
 \end{cases}
-$$
+$$:eqlabel:`cont_uniform-cdf`
 
-Let us first plot the probabilty density function.
+Let us first plot the probabilty density function :eqref:`cont_uniform-pdf`.
 
 ```{.python .input}
 a = 1; b = 3
@@ -149,7 +149,7 @@ p = (x > a)*(x < b)/(b - a)
 d2l.plot(x, p, 'x', 'p.d.f.')
 ```
 
-Now, let us plot the cumulative distribution function.
+Now, let us plot the cumulative distribution function :eqref:`cont_uniform-cdf`.
 
 ```{.python .input}
 F = lambda x: 0 if x < a else 1 if x > b else (x - a) / (b - a)
@@ -193,7 +193,7 @@ F(x) = \begin{cases}
 \sum_{m \le k} \binom{n}{m} p^m(1-p)^{n-m}  & k \le x < k+1 \text{ with } 0 \le k < n, \\
 1 & x >= n .
 \end{cases}
-$$
+$$:eqlabel:`binomial-cdf`
 
 Let us first plot the probabilty mass function.
 
@@ -216,7 +216,7 @@ d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
-Now, let us plot the cumulative distribution function.
+Now, let us plot the cumulative distribution function :eqref:`binomial-cdf`.
 
 ```{.python .input}
 x = np.arange(-1, 11, 0.01)
@@ -263,7 +263,7 @@ Following through this reasoning carefully, we can arrive at the following model
 
 $$
 p_k = \frac{\lambda^ke^{-\lambda}}{k!}.
-$$
+$$:eqlabel:`poisson-mass`
 
 The value $\lambda > 0$ is known as the *rate*, and denotes the average number of arrivals we expect in one unit of time (note that we above restricted our rate to be less than zero, but that was only to simplify the explanation).  
 
@@ -274,9 +274,9 @@ F(x) = \begin{cases}
 0 & x < 0, \\
 e^{-\lambda}\sum_{m = 0}^k \frac{\lambda^m}{m!} & k \le x < k+1 \text{ with } 0 \le k.
 \end{cases}
-$$
+$$:eqlabel:`poisson-cdf`
 
-Let us first plot the probabilty mass function.
+Let us first plot the probabilty mass function :eqref:`poisson-mass`.
 
 ```{.python .input}
 lam = 5.0
@@ -290,7 +290,7 @@ d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
-Now, let us plot the cumulative distribution function.
+Now, let us plot the cumulative distribution function :eqref:`poisson-cdf`.
 
 ```{.python .input}
 x = np.arange(-1, 21, 0.01)
@@ -351,9 +351,9 @@ where we say a random variable is normally distributed with given mean $\mu$ and
 
 $$
 p_X(x) = \frac{1}{\sqrt{2\pi\sigma^2}}e^{-\frac{(x-\mu)^2}{2\sigma^2}}.
-$$
+$$:eqlabel:`gaussian-pdf`
 
-Let us first plot the probability density function.
+Let us first plot the probability density function :eqref:`gaussian-pdf`.
 
 ```{.python .input}
 mu = 0; sigma = 1
@@ -364,7 +364,7 @@ p = 1 / np.sqrt(2 * np.pi * sigma**2) * np.exp(-(x - mu)**2 / (2 * sigma**2))
 d2l.plot(x, p, 'x', 'p.d.f.')
 ```
 
-Now, let us plot the cumulative distribution function.
+Now, let us plot the cumulative distribution function.  It is beyond the scope of this appendix, but the Gaussian c.d.f. does not have a closed-form formula in terms of more elementary functions.  We will use `erf` which provideds a way to compute this integral numerically.
 
 ```{.python .input}
 
@@ -390,7 +390,7 @@ $$
 
 will be approximately Gaussian.
 
-This is the reason that the Gaussian is so central to probability, statistics, and machine learning.  Whenever we can say that something we measured is a sum of many small independent contributions, we can safely assume that the thing being measured will be close to Gaussian.
+This is the reason that the Gaussian is so central to probability, statistics, and machine learning.  Whenever we can say that something we measured is a sum of many small independent contributions, we can safely assume that the thing being measured will be close to Gaussian.  There are additional technical requirements needed to make it work (the most commonly shown proof need $E[X^4] < \infty$ for the independent random variables being added), but the philosophy is clear.
 
 There are many more fascinating properties of Gaussians than we can get into at this point.  In particular, the Gaussian is what is known as a *maximum entropy distribution*.  We will get into entropy more deeply in :numref:`sec_information_theory`, however all we need to know at this point is that it is a measure of randomness.  In a rigorous mathematical sense, we can think of the Gaussian as the *most* random choice of random variable with fixed mean and variance.  Thus, if we know that our random variable has some mean and variance, the Gaussian is in a sense the most conservative choice of distribution we can make.
 
