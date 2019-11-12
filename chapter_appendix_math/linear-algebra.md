@@ -89,7 +89,8 @@ we can form their dot product by computing:
 
 $$
 \mathbf{u}^\top\mathbf{v} = \sum_i u_i\cdot v_i.
-$$:eqlabel:`dot-def`
+$$
+:eqlabel:`dot-def`
 
 Because :eqref:`dot-def` is symmetric, we will mirror the notation 
 of classical multiplication and write
@@ -135,7 +136,8 @@ the angle between the two vectors is
 
 $$
 \theta = \arccos\left(\frac{\mathbf{v}\cdot\mathbf{w}}{\|\mathbf{v}\|\|\mathbf{w}\|}\right).
-$$:eqlabel:`angle-forumla`
+$$
+:eqlabel:`angle-forumla`
 
 This is a nice result since nothing in the computation references two-dimensions.
 Indeed, we can use this in three or three million dimensions without issue.

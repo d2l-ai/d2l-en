@@ -71,7 +71,8 @@ While proving this fact is beyond the scope of our text, it is important to know
 
 For any random variable $X$ that follows a probability distribution $P$ with a probability density function (p.d.f.) or a probability mass function (p.m.f.) $p(x)$, we measure the expected amount of information through *entropy* (or *Shannon entropy*)
 
-$$H(X) = - E_{x \sim P} [\log p(x)].$$:eqlabel:`ent-def`
+$$H(X) = - E_{x \sim P} [\log p(x)].$$
+:eqlabel:`ent-def`
 
 To be specific, if $X$ is discrete, $$H(X) = - \sum_i p_i \log p_i \text{, where } p_i = P(X_i).$$ 
 
@@ -126,7 +127,8 @@ For the following discussion, we always use $(X,Y)$ as a pair of random variable
 ### Joint Entropy 
 
 Similar to entropy of a single random variable :eqref:`ent-def`, we define the *joint entropy* $H(X,Y)$ of a pair random variables $(X,Y)$ as
-$$H(X,Y) = −E_{(x,y) \sim P} [\log p_{X,Y}(x, y)]. $$:eqlabel:`joint-ent-def`
+$$H(X,Y) = −E_{(x,y) \sim P} [\log p_{X,Y}(x, y)]. $$
+:eqlabel:`joint-ent-def`
 
 Precisely, on the one hand, if $(X,Y)$ is a pair of discrete random variables, then $$H(X,Y) = - \sum_{x} \sum_{y} p_{X,Y}(x,y) \log p_{X,Y}(x,y).$$
 
@@ -158,7 +160,8 @@ The joint entropy defined above the amount of information contained in a pair of
 
 In the probability theory, we saw the definition of the *conditional probability* to measure the relationship between variables. We now want to analogously define the *conditional entropy* $H(Y \mid X)$.  We can write this as 
 
-$$ H(Y \mid X) = - E_{(x,y) \sim P} [\log p(y \mid x)],$$:eqlabel:`cond-ent-def`
+$$ H(Y \mid X) = - E_{(x,y) \sim P} [\log p(y \mid x)],$$
+:eqlabel:`cond-ent-def`
 
 where $p(y \mid x) = \frac{p_{X,Y}(x, y)}{p_X(x)}$ is the conditional probability. Specifically, if $(X,Y)$ is a pair of discrete random variables, then $$H(Y \mid X) = - \sum_{x} \sum_{y} p(x,y) \log p(y \mid x).$$
 
@@ -197,7 +200,8 @@ $$
 
 Indeed, this is a valid definition for the mutual information.  If we expand out the definitions of these terms and combine them, a little algebra shows that this is the same as
 
-$$I(X,Y) = −E_{x} E_{y} \left\{ p_{X,Y}(x, y) \log\frac{p_{X,Y}(x, y)}{p_X(x) p_Y(y)} \right\}. $$:eqlabel:`mut-ent-def`
+$$I(X,Y) = −E_{x} E_{y} \left\{ p_{X,Y}(x, y) \log\frac{p_{X,Y}(x, y)}{p_X(x) p_Y(y)} \right\}. $$
+:eqlabel:`mut-ent-def`
 
 
 We can summarize all of these relationships in image :numref:`fig_mutual_information`.  It is an excellent test of intuition to see why the following statements are all also equivalent to $I(X,Y)$.
@@ -241,7 +245,8 @@ When we worked with entropy at the beginning this chapter, we were able to provi
 
 $$
 \mathrm{pmi}(x,y) = \log\frac{p_{X,Y}(x, y)}{p_X(x) p_Y(y)}.
-$$:eqlabel:`pmi-def`
+$$
+:eqlabel:`pmi-def`
 
 We can think of :eqref:`pmi-def` as measuring how much more or less likely the specific combination of outcomes $x$ and $y$ are compared to what we would expect for independent random outcomes.  If it is large and positive, then these two specific outcomes occur much more frequently than they would compared to random chance (*note*: the denominator is $p_X(x) p_Y(y)$ which is the probability of the two outcomes were independent), whereas if it is large and negative it represents the two outcomes happening far less than we would expect by random chance.  
 
@@ -263,7 +268,8 @@ As what we have discussed in :numref:`sec_reduction-norm`, we can use norms to m
 
 Given a random variable $X$ that follows the probability distribution $P$ with a p.d.f. or a p.m.f. $p(x)$, and we estimate $P$ by another probability distribution $Q$ with a p.d.f. or a p.m.f. $q(x)$. Then the *Kullback–Leibler (KL) divergence* (or *relative entropy*) between $P$ and $Q$ is
 
-$$D_{\mathrm{KL}}(P\|Q) = E_{x \sim P} \left[ \log \frac{p(x)}{q(x)} \right].$$:eqlabel:`kl-def`
+$$D_{\mathrm{KL}}(P\|Q) = E_{x \sim P} \left[ \log \frac{p(x)}{q(x)} \right].$$
+:eqlabel:`kl-def`
 
 As with the point-wise mutual information :eqref:`pmi-def`, we can again provide an interpretation of the logarithmic term:  $-\log \frac{q(x)}{p(x)} = -\log(q(x)) - (-\log(p(x)))$ will be large an positive if we see $x$ far more often under $P$ than we would expect for $Q$, and large and negative if we see the outcome far less than expected.  In this way, we can interpret it as our *relative* surprise at observing the outcome compared to how surprised we would be observing it from our reference distribution.
 
@@ -351,7 +357,8 @@ This was all derived by working from the maximum likelihood point of view.  Howe
 
 Like KL divergence, for a random variable $X$, we can also measure the divergence between the estimating distribution $Q$ and the true distribution $P$ via *cross entropy*,
 
-$$\mathrm{CE}(P,Q) = - E_{x \sim P} [\log(q(x))].$$:eqlabel:`ce-def`
+$$\mathrm{CE}(P,Q) = - E_{x \sim P} [\log(q(x))].$$
+:eqlabel:`ce-def`
 
 By using properties of entropy discussed above, we can also interpret it as the summation of the entropy $H(P)$ and the KL divergence between $P$ and $Q$, i.e.,
 

@@ -131,7 +131,8 @@ $$
 This is the *fundamental theorem of calculus*.  We may write it in expanded form as
 $$
 \frac{d}{dx}\int_{-\infty}^x f(y) \; dy = f(x).
-$$:eqlabel:`ftc`
+$$
+:eqlabel:`ftc`
 
 It takes the notion of funding areas (*a priori* rather hard), and reduces it to a statement derivatives (something much more completely understood).  One last comment that we must make is that this does not tell we exactly what $F(x)$.  Indeed $F(x) + C$ for any $C$ has the same derivative.  This is a fact-of-life in the theory of integration.  Thankfully, notice that when working with definite integrals, the constants drop out, and thus are irrelevant to the outcome.
 
@@ -190,7 +191,8 @@ Similarly, recalling that $F$ is an integral allows us to recognize that $\frac{
 
 $$
 \int_{u(0)}^{u(x)} f(y) \; dy = \int_0^x f(u(y))\cdot \frac{du}{dy} \;dy.
-$$:eqlabel:`change-var`
+$$
+:eqlabel:`change-var`
 
 This is the *change of variables* formula.  It states that we may consider reparameterizing the function inside an integral is in essence the same thing as changing the bounds of integration as long as we take into account how quickly the reparametrization changes.
 

@@ -73,7 +73,8 @@ Back in our example, this value of the change $8$ is different based on differen
 
 $$
 \frac{df}{dx}(x) = \lim_{\epsilon \rightarrow 0}\frac{f(x+\epsilon) - f(x)}{\epsilon}.
-$$:eqlabel:`der-def`
+$$
+:eqlabel:`der-def`
 
 We will often encounter many different notations for the derivative in many different texts. For instance, all of the below notations indicate the same thing:
 
@@ -94,7 +95,8 @@ $$
 & \implies \epsilon \frac{df}{dx}(x) \approx f(x+\epsilon) - f(x) \\
 & \implies f(x+\epsilon) \approx f(x) + \epsilon \frac{df}{dx}(x).
 \end{aligned}
-$$:eqlabel:`small-change`
+$$
+:eqlabel:`small-change`
 
 In this way, we can understand the derivative as the scaling factor that tells us how large of change we get in the output from a change in the input.
 
