@@ -9,9 +9,8 @@ This has a Bayesian which can be helpful to think about.  Suppose that we have a
 
 If we want to find the most likely value for the parameters of our model, that means we want to find
 
-$$
-\mathop{\mathrm{argmax}} P(\boldsymbol{\theta}\mid X).
-$$
+$$\mathop{\mathrm{argmax}} P(\boldsymbol{\theta}\mid X).$$
+:eqlabel:`max_like`
 
 By Bayes' rule, this is the same thing as
 
@@ -57,7 +56,7 @@ p = theta**9 * (1 - theta)**4.
 d2l.plot(theta, p, 'theta', 'likelihood')
 ```
 
-This has its maximum value somewhere near our expected $9/13 \approx 0.7\ldots$.  To see if it is exactly there, we can turn to calculus.  Notice that at the maximum, the function is flat.  Indeed if the slope was not zero there, then we could shift the input to make it larger (think about the process of gradient descent).  Thus, we could find the maximum likelihood estimate by finding the values of $\theta$ where the derivative is zero, and finding the one that gives the highest probability.  We compute:
+This has its maximum value somewhere near our expected $9/13 \approx 0.7\ldots$.  To see if it is exactly there, we can turn to calculus.  Notice that at the maximum, the function is flat.  Indeed if the slope was not zero there, then we could shift the input to make it larger (think about the process of gradient descent).  Thus, we could find the maximum likelihood estimate :eqref:`max_like` by finding the values of $\theta$ where the derivative is zero, and finding the one that gives the highest probability.  We compute:
 
 $$
 \begin{aligned}
@@ -82,13 +81,13 @@ $$
 \log((1/2)^{1000000000}) = 1000000000\cdot\log(1/2) \approx -301029995.6\ldots
 $$
 
-This number fits perfectly within even a single precision 32-bit float.  Thus, we are lead to consider the $\log$-likelihood, which is
+This number fits perfectly within even a single precision 32-bit float.  Thus, we are lead to consider the log-likelihood, which is
 
 $$
 \log(P(X \mid \boldsymbol{\theta})).
 $$
 
-Since the function $x \mapsto \log(x)$ is increasing, maximizing the likelihood is the same thing as maximizing the $\log$-likelihood.  Indeed in :numref:`sec_naive_bayes` we saw this reasoning applied when working with the specific example of the Naive Bayes classifier.
+Since the function $x \mapsto \log(x)$ is increasing, maximizing the likelihood is the same thing as maximizing the log-likelihood.  Indeed in :numref:`sec_naive_bayes` we saw this reasoning applied when working with the specific example of the Naive Bayes classifier.
 
 We often work with loss functions, where we wish to minimize the loss.  We may turn maximum likelihood into the minimizattion of a loss by taking $-\log(P(X \mid \boldsymbol{\theta}))$, which is the Negative Log-Likelihood.
 

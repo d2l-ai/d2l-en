@@ -4,7 +4,7 @@
 **Brent Werness** (*Amazon*), **Rachel Hu** (*Amazon*), and authors of this book
 
 
-One of the wonderful parts of modern deep learning is the fact that much of it can be understood and used without a full understanding of the mathematics below it.  This is a sign of the fact that the field is becoming more mature.  Most software developers no longer need to worry about the theory of computable functions, or if programming languages without a `goto` can emulate programming languages with a `goto` with at most constant overhead, and neither should deep learning practitioners worry about the theoretical foundations of maximum likelihood learning, if one can find an architecture to approximate a target function to an arbitrary degree of accuracy.
+One of the wonderful parts of modern deep learning is the fact that much of it can be understood and used without a full understanding of the mathematics below it.  This is a sign of the fact that the field is becoming more mature.  Most software developers no longer need to worry about the theory of computable functions, or if programming languages without a `goto` can emulate programming languages with a `goto` with at most constant overhead, and neither should deep learning practitioners worry about the theoretical foundations of maximum likelihood learning, or if one can find an architecture to approximate a target function to an arbitrary degree of accuracy.
 
 That said, we are not quite there yet.
 
