@@ -3,14 +3,15 @@
 
 Text is an important example of sequence data. An article can be simply viewed as a sequence of words, or a sequence of characters. Given text data is a major data format besides images we are using in this book, this section will dedicate to explain the common preprocessing steps for text data. Such preprocessing often consists of four steps:
 
-1. Loads texts as strings into memory.
-1. Splits strings into tokens, a token could be a word or a character. 
-1. Builds a vocabulary for these tokens to map them into numerical indices. 
-1. Maps all tokens in the data into indices to facilitate to feed into models. 
+1. Load texts as strings into memory.
+1. Split strings into tokens, where a token could be a word or a character. 
+1. Build a vocabulary for these tokens to map them into numerical indices. 
+1. Map all tokens from data into indices in order to facilitate to feed into models. 
+
 
 ## Data Loading
 
-To get started we load text from H. G. Wells' [Time Machine](http://www.gutenberg.org/ebooks/35). This is a fairly small corpus of just over 30,000 words but for the purpose of what we want to illustrate this is just fine. More realistic document collections contain many billions of words. The following function read the dataset into a list of sentences, each sentence is a string. Here we ignore punctuation and capitalization.
+To get started we load text from H. G. Wells' [Time Machine](http://www.gutenberg.org/ebooks/35). This is a fairly small corpus of just over 30,000 words, but for the purpose of what we want to illustrate this is just fine. More realistic document collections contain many billions of words. The following function reads the dataset into a list of sentences, each sentence is a string. Here we ignore punctuation and capitalization.
 
 ```{.python .input}
 import collections
@@ -30,7 +31,7 @@ lines = read_time_machine()
 
 ## Tokenization
 
-For each sentence, we split it into a list of tokens. A token is a data point the model will train and predict. The following function supports split a sentence into words or characters, and return a list of split sentences.
+For each sentence, we split it into a list of tokens. A token is a data point the model will train and predict. The following function supports split a sentence into words or characters, and returns a list of split strings.
 
 ```{.python .input}
 # Saved in the d2l package for later use
@@ -49,7 +50,7 @@ tokens[0:2]
 
 ## Vocabulary
 
-The string type of the token is inconvienet to be used by models, which take numerical inputs. Now let us build a dictionary, often called *vocabulary* as well, to map string tokens into numerical indices starting from 0. To do so, we first count the unique tokens in all documents, called *corpus*, and then assign a numerical index to each unique token according to its frequency. Rarely appeared tokens are often removed to reduce the complexity. A token does not exist in corpus or has been removed is mapped into a special unknown (“&lt;unk&gt;”) token. We optionally add another three special tokens: “&lt;pad&gt;” a token for padding, “&lt;bos&gt;” to present the beginning for a sentence, and “&lt;eos&gt;” for the ending of a sentence.
+The string type of the token is inconvenient to be used by models, which take numerical inputs. Now let us build a dictionary, often called *vocabulary* as well, to map string tokens into numerical indices starting from 0. To do so, we first count the unique tokens in all documents, called *corpus*, and then assign a numerical index to each unique token according to its frequency. Rarely appeared tokens are often removed to reduce the complexity. A token does not exist in corpus or has been removed is mapped into a special unknown (“&lt;unk&gt;”) token. We optionally add another three special tokens: “&lt;pad&gt;” a token for padding, “&lt;bos&gt;” to present the beginning for a sentence, and “&lt;eos&gt;” for the ending of a sentence.
 
 ```{.python .input  n=9}
 # Saved in the d2l package for later use 
@@ -60,7 +61,7 @@ class Vocab(object):
         self.token_freqs = sorted(counter.items(), key=lambda x: x[0])
         self.token_freqs.sort(key=lambda x: x[1], reverse=True)
         if use_special_tokens:
-            # padding, begin of sentence, end of sentence, unknown
+            # For padding, begin of sentence, end of sentence, unknown
             self.pad, self.bos, self.eos, self.unk = (0, 1, 2, 3)
             uniq_tokens = ['<pad>', '<bos>', '<eos>', '<unk>']
         else:
@@ -92,14 +93,14 @@ def count_corpus(sentences):
     return collections.Counter(tokens)
 ```
 
-We construct a vocabulary with the time machine dataset as the corpus, and then print the map between a few tokens to indices.
+We construct a vocabulary with the time machine dataset as the corpus, and then print the map between a few tokens and their indices.
 
 ```{.python .input  n=23}
 vocab = Vocab(tokens)
 print(list(vocab.token_to_idx.items())[0:10])
 ```
 
-After that, we can convert each sentence into a list of numerical indices. To illustrate things we print two sentences with their corresponding indices.
+After that, we can convert each sentence into a list of numerical indices. To illustrate in details, we print two sentences with their corresponding indices.
 
 ```{.python .input  n=25}
 for i in range(8, 10):
@@ -109,7 +110,7 @@ for i in range(8, 10):
 
 ## Put All Things Together
 
-We packaged the above code in the `load_corpus_time_machine` function, which returns `corpus`, a list of token indices, and `vocab`, the vocabulary. The modification we did here is that `corpus` is a single list, not a list of token lists, since we do not the sequence information in the following models. Besides, we use character tokens to simplify the training in later sections.
+Equipping with the above functions, we package everything into the `load_corpus_time_machine` function, which returns `corpus`, a list of token indices, and `vocab`, a vocabulary of the time machine corpus. The modification we did here is that `corpus` is a single list, not a list of token lists, since we do not keep the sequence information in the following models. Besides, we use character tokens to simplify the training in later sections.
 
 ```{.python .input}
 # Saved in the d2l package for later use
@@ -127,7 +128,8 @@ len(corpus), len(vocab)
 
 ## Summary
 
-* Documents are preprocessed by tokenizing the words or characters and mapping them into indices.
+* We preprocessed the documents by tokenizing them into words or characters and then mapping into indices.
+
 
 ## Exercises
 

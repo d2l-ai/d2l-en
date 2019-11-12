@@ -36,7 +36,7 @@ This dataset has $4$ rows and $3$ columns, where each row describes the number o
 import pandas as pd
 
 data = pd.read_csv(data_file)
-data
+print(data)
 ```
 
 ## Handling Missing Data
@@ -53,7 +53,7 @@ For numerical values in `inputs` that are missing, we replace the "NaN" entries 
 ```{.python .input}
 inputs, outputs = data.iloc[:, 0:2], data.iloc[:, 2]
 inputs = inputs.fillna(inputs.mean())
-inputs
+print(inputs)
 ```
 
 For categorical or discrete values in `inputs`, we consider "NaN" as a category.
@@ -64,7 +64,7 @@ A row with a missing alley type will set their values to $0$ and $1$.
 
 ```{.python .input}
 inputs = pd.get_dummies(inputs, dummy_na=True)
-inputs
+print(inputs)
 ```
 
 ## Conversion to the  `ndarray` Format

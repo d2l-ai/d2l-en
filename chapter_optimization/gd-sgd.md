@@ -1,5 +1,5 @@
 # Gradient Descent and Stochastic Gradient Descent
-:label:`chapter_gd_sgd`
+:label:`sec_gd_sgd`
 
 In this section, we are going to introduce the basic principles of gradient descent. Although it is not common for gradient descent to be used directly in deep learning, an understanding of gradients and the reason why the value of an objective function might decline when updating the independent variable along the opposite direction of the gradient is the foundation for future studies on optimization algorithms. Next, we are going to introduce stochastic gradient descent (SGD).
 
@@ -10,7 +10,7 @@ example to explain why the gradient descent algorithm may reduce the value of
 the objective function. We assume that the input and output of the continuously
 differentiable function $f: \mathbb{R} \rightarrow \mathbb{R}$ are both
 scalars. Given $\epsilon$ with a small enough absolute value, according to the
-Taylor's expansion formula from :numref:`chapter_math`, we get the following
+Taylor's expansion formula from :numref:`sec_single_variable_calculus`, we get the following
 approximation:
 
 $$f(x + \epsilon) \approx f(x) + \epsilon f'(x) .$$
@@ -95,28 +95,28 @@ show_trace(gd(1.1))
 
 ## Gradient Descent in Multi-Dimensional Space
 
-Now that we understand gradient descent in one-dimensional space, let us consider a more general case: the input of the objective function is a vector and the output is a scalar. We assume that the input of the target function $f: \mathbb{R}^d \rightarrow \mathbb{R}$ is the $d$-dimensional vector $\boldsymbol{x} = [x_1, x_2, \ldots, x_d]^\top$. The gradient of the objective function $f(\boldsymbol{x})$ with respect to $\boldsymbol{x}$ is a vector consisting of $d$ partial derivatives:
+Now that we understand gradient descent in one-dimensional space, let us consider a more general case: the input of the objective function is a vector and the output is a scalar. We assume that the input of the target function $f: \mathbb{R}^d \rightarrow \mathbb{R}$ is the $d$-dimensional vector $\mathbf{x} = [x_1, x_2, \ldots, x_d]^\top$. The gradient of the objective function $f(\mathbf{x})$ with respect to $\mathbf{x}$ is a vector consisting of $d$ partial derivatives:
 
-$$\nabla_{\boldsymbol{x}} f(\boldsymbol{x}) = \bigg[\frac{\partial f(\boldsymbol{x})}{\partial x_1}, \frac{\partial f(\boldsymbol{x})}{\partial x_2}, \ldots, \frac{\partial f(\boldsymbol{x})}{\partial x_d}\bigg]^\top.$$
+$$\nabla_{\mathbf{x}} f(\mathbf{x}) = \bigg[\frac{\partial f(\mathbf{x})}{\partial x_1}, \frac{\partial f(\mathbf{x})}{\partial x_2}, \ldots, \frac{\partial f(\mathbf{x})}{\partial x_d}\bigg]^\top.$$
 
-For brevity, we use $\nabla f(\boldsymbol{x})$ instead of $\nabla_{\boldsymbol{x}} f(\boldsymbol{x})$. Each partial derivative element $\partial f(\boldsymbol{x})/\partial x_i$ in the gradient indicates the rate of change of $f$ at $\boldsymbol{x}$ with respect to the input $x_i$. To measure the rate of change of $f$ in the direction of the unit vector $\boldsymbol{u}$ ($\|\boldsymbol{u}\|=1$), in multivariate calculus, the directional derivative of $f$ at $\boldsymbol{x}$ in the direction of $\boldsymbol{u}$ is defined as
+For brevity, we use $\nabla f(\mathbf{x})$ instead of $\nabla_{\mathbf{x}} f(\mathbf{x})$. Each partial derivative element $\partial f(\mathbf{x})/\partial x_i$ in the gradient indicates the rate of change of $f$ at $\mathbf{x}$ with respect to the input $x_i$. To measure the rate of change of $f$ in the direction of the unit vector $\mathbf{u}$ ($\|\mathbf{u}\|=1$), in multivariate calculus, the directional derivative of $f$ at $\mathbf{x}$ in the direction of $\mathbf{u}$ is defined as
 
-$$\text{D}_{\boldsymbol{u}} f(\boldsymbol{x}) = \lim_{h \rightarrow 0}  \frac{f(\boldsymbol{x} + h \boldsymbol{u}) - f(\boldsymbol{x})}{h}.$$
+$$\text{D}_{\mathbf{u}} f(\mathbf{x}) = \lim_{h \rightarrow 0}  \frac{f(\mathbf{x} + h \mathbf{u}) - f(\mathbf{x})}{h}.$$
 
 According to the property of directional derivatives, the aforementioned directional derivative can be rewritten as
 
-$$\text{D}_{\boldsymbol{u}} f(\boldsymbol{x}) = \nabla f(\boldsymbol{x}) \cdot \boldsymbol{u}.$$
+$$\text{D}_{\mathbf{u}} f(\mathbf{x}) = \nabla f(\mathbf{x}) \cdot \mathbf{u}.$$
 
-The directional derivative $\text{D}_{\boldsymbol{u}} f(\boldsymbol{x})$ gives all the possible rates of change for $f$ along $\boldsymbol{x}$. In order to minimize $f$, we hope to find the direction the will allow us to reduce $f$ in the fastest way. Therefore, we can use the unit vector $\boldsymbol{u}$ to minimize the directional derivative $\text{D}_{\boldsymbol{u}} f(\boldsymbol{x})$.
+The directional derivative $\text{D}_{\mathbf{u}} f(\mathbf{x})$ gives all the possible rates of change for $f$ along $\mathbf{x}$. In order to minimize $f$, we hope to find the direction the will allow us to reduce $f$ in the fastest way. Therefore, we can use the unit vector $\mathbf{u}$ to minimize the directional derivative $\text{D}_{\mathbf{u}} f(\mathbf{x})$.
 
-For $\text{D}_{\boldsymbol{u}} f(\boldsymbol{x}) = \|\nabla f(\boldsymbol{x})\| \cdot \|\boldsymbol{u}\|  \cdot \text{cos} (\theta) = \|\nabla f(\boldsymbol{x})\|  \cdot \text{cos} (\theta)$,
-Here, $\theta$ is the angle between the gradient $\nabla f(\boldsymbol{x})$ and the unit vector $\boldsymbol{u}$. When $\theta = \pi$, $\text{cos }(\theta)$ gives us the minimum value $-1$. So when $\boldsymbol{u}$ is in a direction that is opposite to the gradient direction $\nabla f(\boldsymbol{x})$, the direction derivative $\text{D}_{\boldsymbol{u}} f(\boldsymbol{x})$ is minimized. Therefore, we may continue to reduce the value of objective function $f$ by the gradient descent algorithm:
+For $\text{D}_{\mathbf{u}} f(\mathbf{x}) = \|\nabla f(\mathbf{x})\| \cdot \|\mathbf{u}\|  \cdot \text{cos} (\theta) = \|\nabla f(\mathbf{x})\|  \cdot \text{cos} (\theta)$,
+Here, $\theta$ is the angle between the gradient $\nabla f(\mathbf{x})$ and the unit vector $\mathbf{u}$. When $\theta = \pi$, $\text{cos }(\theta)$ gives us the minimum value $-1$. So when $\mathbf{u}$ is in a direction that is opposite to the gradient direction $\nabla f(\mathbf{x})$, the direction derivative $\text{D}_{\mathbf{u}} f(\mathbf{x})$ is minimized. Therefore, we may continue to reduce the value of objective function $f$ by the gradient descent algorithm:
 
-$\boldsymbol{x} \leftarrow \boldsymbol{x} - \eta \nabla f(\boldsymbol{x}).$
+$\mathbf{x} \leftarrow \mathbf{x} - \eta \nabla f(\mathbf{x}).$
 
 Similarly, $\eta$ (positive) is called the learning rate.
 
-Now we are going to construct an objective function $f(\boldsymbol{x})=x_1^2+2x_2^2$ with a two-dimensional vector $\boldsymbol{x} = [x_1, x_2]^\top$ as input and a scalar as the output. So we have the gradient $\nabla f(\boldsymbol{x}) = [2x_1, 4x_2]^\top$. We will observe the iterative trajectory of independent variable $\boldsymbol{x}$ by gradient descent from the initial position $[-5,-2]$. First, we are going to define two helper functions. The first helper uses the given independent variable update function to iterate independent variable $\boldsymbol{x}$ a total of 20 times from the initial position $[-5,-2]$. The second helper will visualize the iterative trajectory of independent variable $\boldsymbol{x}$.
+Now we are going to construct an objective function $f(\mathbf{x})=x_1^2+2x_2^2$ with a two-dimensional vector $\mathbf{x} = [x_1, x_2]^\top$ as input and a scalar as the output. So we have the gradient $\nabla f(\mathbf{x}) = [2x_1, 4x_2]^\top$. We will observe the iterative trajectory of independent variable $\mathbf{x}$ by gradient descent from the initial position $[-5,-2]$. First, we are going to define two helper functions. The first helper uses the given independent variable update function to iterate independent variable $\mathbf{x}$ a total of 20 times from the initial position $[-5,-2]$. The second helper will visualize the iterative trajectory of independent variable $\mathbf{x}$.
 
 ```{.python .input  n=10}
 # This function is saved in the d2l package for future use
@@ -140,7 +140,7 @@ def show_trace_2d(f, results):
     d2l.plt.ylabel('x2')
 ```
 
-Next, we observe the iterative trajectory of the independent variable at learning rate $0.1$. After iterating the independent variable $\boldsymbol{x}$ 20 times using gradient descent, we can see that. eventually, the value of $\boldsymbol{x}$ approaches the optimal solution $[0, 0]$.
+Next, we observe the iterative trajectory of the independent variable at learning rate $0.1$. After iterating the independent variable $\mathbf{x}$ 20 times using gradient descent, we can see that. eventually, the value of $\mathbf{x}$ approaches the optimal solution $[0, 0]$.
 
 ```{.python .input  n=15}
 eta = 0.1
@@ -156,23 +156,23 @@ show_trace_2d(f_2d, train_2d(gd_2d))
 
 ## Stochastic Gradient Descent (SGD)
 
-In deep learning, the objective function is usually the average of the loss functions for each example in the training dataset. We assume that $f_i(\boldsymbol{x})$ is the loss function of the training data instance with $n$ examples, an index of $i$, and parameter vector of $\boldsymbol{x}$, then we have the objective function
+In deep learning, the objective function is usually the average of the loss functions for each example in the training dataset. We assume that $f_i(\mathbf{x})$ is the loss function of the training data instance with $n$ examples, an index of $i$, and parameter vector of $\mathbf{x}$, then we have the objective function
 
-$$f(\boldsymbol{x}) = \frac{1}{n} \sum_{i = 1}^n f_i(\boldsymbol{x}).$$
+$$f(\mathbf{x}) = \frac{1}{n} \sum_{i = 1}^n f_i(\mathbf{x}).$$
 
-The gradient of the objective function at $\boldsymbol{x}$ is computed as
+The gradient of the objective function at $\mathbf{x}$ is computed as
 
-$$\nabla f(\boldsymbol{x}) = \frac{1}{n} \sum_{i = 1}^n \nabla f_i(\boldsymbol{x}).$$
+$$\nabla f(\mathbf{x}) = \frac{1}{n} \sum_{i = 1}^n \nabla f_i(\mathbf{x}).$$
 
 If gradient descent is used, the computing cost for each independent variable iteration is $\mathcal{O}(n)$, which grows linearly with $n$. Therefore, when the model training data instance is large, the cost of gradient descent for each iteration will be very high.
 
-Stochastic gradient descent (SGD) reduces computational cost at each iteration. At each iteration of stochastic gradient descent, we uniformly sample an index $i\in\{1,\ldots,n\}$ for data instances at random, and compute the gradient $\nabla f_i(\boldsymbol{x})$ to update $\boldsymbol{x}$:
+Stochastic gradient descent (SGD) reduces computational cost at each iteration. At each iteration of stochastic gradient descent, we uniformly sample an index $i\in\{1,\ldots,n\}$ for data instances at random, and compute the gradient $\nabla f_i(\mathbf{x})$ to update $\mathbf{x}$:
 
-$$\boldsymbol{x} \leftarrow \boldsymbol{x} - \eta \nabla f_i(\boldsymbol{x}).$$
+$$\mathbf{x} \leftarrow \mathbf{x} - \eta \nabla f_i(\mathbf{x}).$$
 
-Here, $\eta$ is the learning rate. We can see that the computing cost for each iteration drops from $\mathcal{O}(n)$ of the gradient descent to the constant $\mathcal{O}(1)$. We should mention that the stochastic gradient $\nabla f_i(\boldsymbol{x})$ is the unbiased estimate of gradient $\nabla f(\boldsymbol{x})$.
+Here, $\eta$ is the learning rate. We can see that the computing cost for each iteration drops from $\mathcal{O}(n)$ of the gradient descent to the constant $\mathcal{O}(1)$. We should mention that the stochastic gradient $\nabla f_i(\mathbf{x})$ is the unbiased estimate of gradient $\nabla f(\mathbf{x})$.
 
-$$\mathbb{E}_i \nabla f_i(\boldsymbol{x}) = \frac{1}{n} \sum_{i = 1}^n \nabla f_i(\boldsymbol{x}) = \nabla f(\boldsymbol{x}).$$
+$$\mathbb{E}_i \nabla f_i(\mathbf{x}) = \frac{1}{n} \sum_{i = 1}^n \nabla f_i(\mathbf{x}) = \nabla f(\mathbf{x}).$$
 
 This means that, on average, the stochastic gradient is a good estimate of the gradient.
 

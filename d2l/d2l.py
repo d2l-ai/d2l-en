@@ -928,8 +928,7 @@ def show_trace_2d(f, results):
 def get_data_ch10(batch_size=10, n=1500):
     data = np.genfromtxt('../data/airfoil_self_noise.dat', dtype=np.float32, delimiter='\t')
     data = (data - data.mean(axis=0)) / data.std(axis=0)
-    data_iter = d2l.load_array((data[:n, :-1], data[:n, -1]),
-                               batch_size, is_train=True)
+    data_iter = d2l.load_array((data[:n, :-1], data[:n, -1]), batch_size, is_train=True)
     return data_iter, data.shape[1]-1
 
 
@@ -963,14 +962,12 @@ def train_ch10(trainer_fn, states, hyperparams, data_iter,
 
 
 # Defined in file: ./chapter_optimization/minibatch-sgd.md
-def train_gluon_ch10(trainer_name, trainer_hyperparams,
-                     data_iter, num_epochs=2):
+def train_gluon_ch10(tr_name, hyperparams, data_iter, num_epochs=2):
     # Initialization
     net = nn.Sequential()
     net.add(nn.Dense(1))
     net.initialize(init.Normal(sigma=0.01))
-    trainer = gluon.Trainer(
-        net.collect_params(), trainer_name, trainer_hyperparams)
+    trainer = gluon.Trainer(net.collect_params(), tr_name, hyperparams)
     loss = gluon.loss.L2Loss()
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[0, num_epochs], ylim=[0.22, 0.35])
@@ -1489,7 +1486,7 @@ def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
                         ctx_list=d2l.try_all_gpus(), evaluator=None,
                         **kwargs):
     num_batches, timer = len(train_iter), d2l.Timer()
-    animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs], ylim=[0, 2],
+    animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 2],
                             legend=['train loss','test RMSE'])
     for epoch in range(num_epochs):
         metric, l = d2l.Accumulator(3), 0.
@@ -1600,9 +1597,9 @@ def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items,
 # Defined in file: ./chapter_recommender-systems/neumf.md
 def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter, 
                   num_users, num_items, num_epochs, ctx_list, evaluator, 
-                  negative_sampler, candidates, eval_step=2):
+                  negative_sampler, candidates, eval_step=1):
     num_batches, timer, hit_rate, auc  = len(train_iter), d2l.Timer(), 0, 0
-    animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs], ylim=[0, 1],
+    animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 1],
                             legend=['test hit rate', 'test AUC'])
     for epoch in range(num_epochs):
         metric, l = d2l.Accumulator(3), 0.
@@ -1622,7 +1619,7 @@ def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
             metric.add(l, values[0].shape[0], values[0].size)
             timer.stop()
         with autograd.predict_mode():
-            if (epoch + 1) % eval_step == 1:
+            if (epoch + 1) % eval_step == 0:
                 hit_rate, auc = evaluator(net, test_iter, test_seq_iter, 
                                           candidates, num_users, num_items, 
                                           ctx_list)

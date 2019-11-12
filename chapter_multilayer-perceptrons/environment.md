@@ -73,7 +73,7 @@ than if we naively continued to rely on our original classifier.
 
 One of the best-studied forms of distribution shift is *covariate shift*.
 Here we assume that although the distribution of inputs may change over time,
-the labeling function, i.e., the conditional distribution $p(y|\mathbf{x})$
+the labeling function, i.e., the conditional distribution $P(y \mid \mathbf{x})$
 does not change.
 While this problem is easy to understand
 its also easy to overlook it in practice.
@@ -100,8 +100,8 @@ Unfortunately, this is a very common pitfall.
 Statisticians call this *covariate shift*
 because the root of the problem owed to
 a shift in the distribution of features (i.e., of *covariates*).
-Mathematically, we could say that $p(\mathbf{x})$ changes
-but that $p(y|\mathbf{x})$ remains unchanged.
+Mathematically, we could say that $P(\mathbf{x})$ changes
+but that $P(y \mid \mathbf{x})$ remains unchanged.
 Although its usefulness is not restricted to this setting,
 when we believe $\mathbf{x}$ causes $y$, covariate shift is usually
 the right assumption to be working with.
@@ -109,8 +109,8 @@ the right assumption to be working with.
 ### Label Shift
 
 The converse problem emerges when we believe that what drives the shift
-is a change in the marginal distribution over the labels $p(y)$
-but that the class-conditional distributions are invariant $p(\mathbf{x}|y)$.
+is a change in the marginal distribution over the labels $P(y)$
+but that the class-conditional distributions are invariant $P(\mathbf{x} \mid y)$.
 Label shift is a reasonable assumption to make
 when we believe that $y$ causes $\mathbf{x}$.
 For example, commonly we want to predict a diagnosis given its manifestations.
@@ -147,10 +147,10 @@ the definition of even this simple term:
 ![](../img/popvssoda.png)
 
 If we were to build a machine translation system,
-the distribution $p(y|x)$ might be different
+the distribution $P(y \mid x)$ might be different
 depending on our location.
 This problem can be tricky to spot.
-A saving grace is that often the $p(y|x)$ only shifts gradually.
+A saving grace is that often the $P(y \mid x)$ only shifts gradually.
 Before we go into further detail and discuss remedies,
 we can discuss a number of situations where covariate and concept shift
 may not be so obvious.
@@ -250,7 +250,7 @@ as this material is not prerequisite to subsequent concepts.
 
 ### Covariate Shift Correction
 
-Assume that we want to estimate some dependency $p(y|\mathbf{x})$
+Assume that we want to estimate some dependency $P(y \mid \mathbf{x})$
 for which we have labeled data $(\mathbf{x}_i,y_i)$.
 Unfortunately, the observations $x_i$ are drawn
 from some *target* distribution $q(\mathbf{x})$
@@ -269,7 +269,7 @@ $$
 $$
 
 Statisticians call the first term an *empirical average*,
-i.e., an average computed over the data drawn from $p(x) p(y|x)$.
+i.e., an average computed over the data drawn from $P(x) P(y \mid x)$.
 If the data is drawn from the 'wrong' distribution $q$,
 we can correct for that by using the following simple identity:
 
@@ -313,9 +313,9 @@ Now denote by $z_i$ labels which are 1
 for data drawn from $p$ and -1 for data drawn from $q$.
 Then the probability in a mixed dataset is given by
 
-$$p(z=1|\mathbf{x}) = \frac{p(\mathbf{x})}{p(\mathbf{x})+q(\mathbf{x})} \text{ and hence } \frac{p(z=1|\mathbf{x})}{p(z=-1|\mathbf{x})} = \frac{p(\mathbf{x})}{q(\mathbf{x})}$$
+$$P(z=1 \mid \mathbf{x}) = \frac{p(\mathbf{x})}{p(\mathbf{x})+q(\mathbf{x})} \text{ and hence } \frac{P(z=1 \mid \mathbf{x})}{P(z=-1 \mid \mathbf{x})} = \frac{p(\mathbf{x})}{q(\mathbf{x})}$$
 
-Hence, if we use a logistic regression approach where $p(z=1|\mathbf{x})=\frac{1}{1+\exp(-f(\mathbf{x}))}$ it follows that
+Hence, if we use a logistic regression approach where $P(z=1 \mid \mathbf{x})=\frac{1}{1+\exp(-f(\mathbf{x}))}$ it follows that
 
 $$
 \beta(\mathbf{x}) = \frac{1/(1 + \exp(-f(\mathbf{x})))}{\exp(-f(\mathbf{x})/(1 + \exp(-f(\mathbf{x})))} = \exp(f(\mathbf{x}))
@@ -340,7 +340,7 @@ had nonzero probability of occurring at training time.
 If we find a point where $q(\mathbf{x}) > 0$ but $p(\mathbf{x}) = 0$,
 then the corresponding importance weight should be infinity.
 
-**Generative Adversarial Networks**
+*Generative Adversarial Networks*
 use a very similar idea to that described above
 to engineer a *data generator* that outputs data
 that cannot be distinguished
@@ -429,7 +429,7 @@ In such cases, we can use the same approach that we used for training networks t
 
 ## A Taxonomy of Learning Problems
 
-Armed with knowledge about how to deal with changes in $p(x)$ and in $p(y|x)$, we can now consider some other aspects of machine learning problems formulation.
+Armed with knowledge about how to deal with changes in $p(x)$ and in $P(y \mid x)$, we can now consider some other aspects of machine learning problems formulation.
 
 
 * **Batch Learning.** Here we have access to training data and labels $\{(x_1, y_1), \ldots, (x_n, y_n)\}$, which we use to train a network $f(x,w)$. Later on, we deploy this network to score new data $(x,y)$ drawn from the same distribution. This is the default assumption for any of the problems that we discuss here. For instance, we might train a cat detector based on lots of pictures of cats and dogs. Once we trained it, we ship it as part of a smart catdoor computer vision system that lets only cats in. This is then installed in a customer's home and is never updated again (barring extreme circumstances).

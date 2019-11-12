@@ -110,7 +110,7 @@ Let’s take a look at the first 4 and last 2 features
 as well as the label (SalePrice) from the first 4 examples:
 
 ```{.python .input  n=28}
-train_data.iloc[0:4, [0, 1, 2, 3, -3, -2, -1]]
+print(train_data.iloc[0:4, [0, 1, 2, 3, -3, -2, -1]])
 ```
 
 We can see that in each example, the first feature is the ID.
@@ -180,9 +180,9 @@ Finally, via the `values` attribute,
 
 ```{.python .input  n=9}
 n_train = train_data.shape[0]
-train_features = np.array(all_features[:n_train].values)
-test_features = np.array(all_features[n_train:].values)
-train_labels = np.array(train_data.SalePrice.values).reshape(-1, 1)
+train_features = np.array(all_features[:n_train].values, dtype=np.float32)
+test_features = np.array(all_features[n_train:].values, dtype=np.float32)
+train_labels = np.array(train_data.SalePrice.values, dtype=np.float32).reshape(-1, 1)
 ```
 
 ## Training

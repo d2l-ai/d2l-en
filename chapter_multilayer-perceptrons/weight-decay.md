@@ -86,7 +86,7 @@ we need to add $||mathbf{w}||^2$, but how much should we add?
 To address this, we need to add a new hyperparameter,
 that we will call the *regularization constant* and denote by $\lambda$:
 
-$$l(\mathbf{w}, b) + \frac{\lambda}{2} \|\boldsymbol{w}\|^2$$
+$$l(\mathbf{w}, b) + \frac{\lambda}{2} \|\mathbf{w}\|^2$$
 
 This non-negatice parameter $\lambda \geq 0$
 governs the amount of regularization.
@@ -363,7 +363,7 @@ which is equivalent to weight decay applied to all layers.
 1. What would the update equations look like if instead of $\|\mathbf{w}\|^2$ we used $\sum_i |w_i|$ as our penalty of choice (this is called $\ell_1$ regularization).
 1. We know that $\|\mathbf{w}\|^2 = \mathbf{w}^\top \mathbf{w}$. Can you find a similar equation for matrices (mathematicians call this the [Frobenius norm](https://en.wikipedia.org/wiki/Matrix_norm#Frobenius_norm))?
 1. Review the relationship between training error and generalization error. In addition to weight decay, increased training, and the use of a model of suitable complexity, what other ways can you think of to deal with overfitting?
-1. In Bayesian statistics we use the product of prior and likelihood to arrive at a posterior via $p(w|x) \propto p(x|w) p(w)$. How can you identify $p(w)$ with regularization?
+1. In Bayesian statistics we use the product of prior and likelihood to arrive at a posterior via $P(w \mid x) \propto P(x \mid w) P(w)$. How can you identify $P(w)$ with regularization?
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2342)
 

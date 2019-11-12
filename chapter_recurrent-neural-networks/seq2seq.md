@@ -54,6 +54,7 @@ output.shape, len(state), state[0].shape, state[1].shape
 ```
 
 ## Decoder
+:label:`sec_seq2seq_decoder`
 
 We directly use the hidden state of the encoder in the final time step as the initial hidden state of the decoder. This requires that the encoder and decoder RNNs have the same numbers of layers and hidden units.
 
@@ -132,6 +133,7 @@ loss(np.ones((3, 4, 10)), np.ones((3, 4)), np.array([4, 2, 0]))
 ```
 
 ## Training
+:label:`sec_seq2seq_training`
 
 During training, if the target sequence has length $n$, we feed the first $n-1$ tokens into the decoder as inputs, and the last $n-1$ tokens are used as ground truth label.
 

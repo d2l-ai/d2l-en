@@ -9,29 +9,29 @@ hyperparameter in the Adadelta algorithm.
 
 ## The Algorithm
 
-Like RMSProp, the Adadelta algorithm uses the variable $\boldsymbol{s}_t$, which is an EWMA on the squares of elements in minibatch stochastic gradient $\boldsymbol{g}_t$. At time step 0, all the elements are initialized to 0.
+Like RMSProp, the Adadelta algorithm uses the variable $\mathbf{s}_t$, which is an EWMA on the squares of elements in minibatch stochastic gradient $\mathbf{g}_t$. At time step 0, all the elements are initialized to 0.
 Given the hyperparameter $0 \leq \rho < 1$ (counterpart of $\gamma$ in RMSProp), at time step $t>0$, compute using the same method as RMSProp:
 
-$$\boldsymbol{s}_t \leftarrow \rho \boldsymbol{s}_{t-1} + (1 - \rho) \boldsymbol{g}_t \odot \boldsymbol{g}_t. $$
+$$\mathbf{s}_t \leftarrow \rho \mathbf{s}_{t-1} + (1 - \rho) \mathbf{g}_t \odot \mathbf{g}_t. $$
 
-Unlike RMSProp, Adadelta maintains an additional state variable, $\Delta\boldsymbol{x}_t$ the elements of which are also initialized to 0 at time step 0. We use $\Delta\boldsymbol{x}_{t-1}$ to compute the variation of the independent variable:
+Unlike RMSProp, Adadelta maintains an additional state variable, $\Delta\mathbf{x}_t$ the elements of which are also initialized to 0 at time step 0. We use $\Delta\mathbf{x}_{t-1}$ to compute the variation of the independent variable:
 
-$$ \boldsymbol{g}_t' \leftarrow \sqrt{\frac{\Delta\boldsymbol{x}_{t-1} + \epsilon}{\boldsymbol{s}_t + \epsilon}}   \odot \boldsymbol{g}_t, $$
+$$ \mathbf{g}_t' \leftarrow \sqrt{\frac{\Delta\mathbf{x}_{t-1} + \epsilon}{\mathbf{s}_t + \epsilon}}   \odot \mathbf{g}_t, $$
 
 Here, $\epsilon$ is a constant added to maintain the numerical stability, such as $10^{-5}$. Next, we update the independent variable:
 
-$$\boldsymbol{x}_t \leftarrow \boldsymbol{x}_{t-1} - \boldsymbol{g}'_t. $$
+$$\mathbf{x}_t \leftarrow \mathbf{x}_{t-1} - \mathbf{g}'_t. $$
 
-Finally, we use $\Delta\boldsymbol{x}$ to record the EWMA on the squares of elements in $\boldsymbol{g}'$, which is the variation of the independent variable.
+Finally, we use $\Delta\mathbf{x}$ to record the EWMA on the squares of elements in $\mathbf{g}'$, which is the variation of the independent variable.
 
-$$\Delta\boldsymbol{x}_t \leftarrow \rho \Delta\boldsymbol{x}_{t-1} + (1 - \rho) \boldsymbol{g}'_t \odot \boldsymbol{g}'_t. $$
+$$\Delta\mathbf{x}_t \leftarrow \rho \Delta\mathbf{x}_{t-1} + (1 - \rho) \mathbf{g}'_t \odot \mathbf{g}'_t. $$
 
-As we can see, if the impact of $\epsilon$ is not considered here, Adadelta differs from RMSProp in its replacement of the hyperparameter $\eta$ with $\sqrt{\Delta\boldsymbol{x}_{t-1}}$.
+As we can see, if the impact of $\epsilon$ is not considered here, Adadelta differs from RMSProp in its replacement of the hyperparameter $\eta$ with $\sqrt{\Delta\mathbf{x}_{t-1}}$.
 
 
 ## Implementation from Scratch
 
-Adadelta needs to maintain two state variables for each independent variable, $\boldsymbol{s}_t$ and $\Delta\boldsymbol{x}_t$. We use the formula from the algorithm to implement Adadelta.
+Adadelta needs to maintain two state variables for each independent variable, $\mathbf{s}_t$ and $\Delta\mathbf{x}_t$. We use the formula from the algorithm to implement Adadelta.
 
 ```{.python .input}
 

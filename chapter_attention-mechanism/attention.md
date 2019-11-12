@@ -1,24 +1,36 @@
 # Attention Mechanism
+:label:`sec_attention`
 
-In :numref:`sec_seq2seq`, we encode the source sequence input information in the recurrent unit state and then pass it to the decoder to generate the target sequence. A token in the target sequence may closely relate to some tokens in the source sequence instead of the whole source sequence. For example, when translating "Hello world." to "Bonjour le monde.", "Bonjour" maps to "Hello" and "monde" maps to "world". In the seq2seq model, the decoder may implicitly select the corresponding information from the state passed by the decoder. The attention mechanism, however, makes this selection explicit.
+Recall from :numref:`sec_seq2seq`, we encode the source sequence input information in the recurrent unit state and then pass it to the decoder to generate the target sequence. A token in the target sequence may closely relate to one or more tokens in the source sequence, instead of the whole source sequence. For example, when translating "Hello world." to "Bonjour le monde.", "Bonjour" maps onto "Hello" and "monde" maps onto "world". In the seq2seq model, the decoder may implicitly select the corresponding information from the state passed by the encoder. The attention mechanism, however, makes this selection explicit.
 
-Attention is a generalized pooling method with bias alignment over inputs. The core component in the attention mechanism is the attention layer, or called attention for simplicity. An input of the attention layer is called a query. For a query, the attention layer returns the output based on its memory, which is a set of key-value pairs. To be more specific, assume a query $\mathbf{q}\in\mathbb R^{d_q}$, and the memory contains $n$ key-value pairs, $(\mathbf{k}_1, \mathbf{v}_1), \ldots, (\mathbf{k}_n, \mathbf{v}_n)$, with $\mathbf{k}_i\in\mathbb R^{d_k}$, $\mathbf{v}_i\in\mathbb R^{d_v}$. The attention layer then returns an output $\mathbf o\in\mathbb R^{d_v}$ with the same shape as a value.
+
+*Attention* is a generalized pooling method with bias alignment over inputs. The core component in the attention mechanism is the attention layer, or called *attention* for simplicity. An input of the attention layer is referred to as a *query*. For a query, attention returns a output based on the memory - a set of key-value pairs encoded in the attention layer . To be more specific, assume that the memory contains $n$ key-value pairs, $(\mathbf{k}_1, \mathbf{v}_1), \ldots, (\mathbf{k}_n, \mathbf{v}_n)$, with $\mathbf{k}_i \in \mathbb R^{d_k}$, $\mathbf{v}_i \in \mathbb R^{d_v}$. Given a query $\mathbf{q} \in \mathbb R^{d_q}$, then the attention layer returns an output $\mathbf{o} \in \mathbb R^{d_v}$ with the same shape as a value.
 
 ![The attention layer returns an output based on the input query and its memory.](../img/attention.svg)
+:label:`fig_attention`
 
-To compute the output, we first assume there is a score function $\alpha$ which measures the similarity between the query and a key. Then we compute all $n$ scores $a_1, \ldots, a_n$ by
+
+More specifically, the full process of attention mechanism is expressed in :numref:`fig_attention_output`. To compute the output of attention, we first utilize a score function $\alpha$ which measures the similarity between the query and a key. Then for each key $(\mathbf{k}_1, \mathbf{v}_1), \ldots, (\mathbf{k}_n, \mathbf{v}_n)$, we compute the scores $a_1, \ldots, a_n$ by
 
 $$a_i = \alpha(\mathbf q, \mathbf k_i).$$
 
-Next we use softmax to obtain the attention weights
+Next we use softmax to obtain the attention weights, i.e.,
 
-$$b_1, \ldots, b_n = \textrm{softmax}(a_1, \ldots, a_n).$$
+$$\mathbf{b} = \mathrm{softmax}(\mathbf{a})\quad \text{, where }\quad
+{b}_i = \frac{\exp(a_i)}{\sum_j \exp(a_j)}, \mathbf{b} = [b_1, \ldots, b_n]^T .$$
 
-The output is then a weighted sum of the values
+
+Finally, the output is then a weighted sum of the values:
 
 $$\mathbf o = \sum_{i=1}^n b_i \mathbf v_i.$$
 
-Different choices of the score function lead to different attention layers. We will discuss two commonly used attention layers in the rest of this section. Before diving into the implementation, we first introduce a masked version of the softmax operator and explain a specialized dot operator `npx.batched_dot`.
+
+![The attention output is a weighted sum of the values.](../img/attention_output.svg)
+:label:`fig_attention_output`
+
+
+
+Different choices of the score function lead to different attention layers. Below, we introduce two commonly used attention layers. Before diving into the implementation, we first express two operators to get you up and running: a masked version of the softmax operator `masked_softmax` and a specialized dot operator `batched_dot`.
 
 ```{.python .input  n=1}
 import math
@@ -27,9 +39,8 @@ from mxnet.gluon import nn
 npx.set_np()
 ```
 
-The masked softmax takes a 3-dim input and allows us to filter out some elements by specifying valid lengths for the last dimension. (Refer to
-:numref:`sec_machine_translation` for the
-definition of a valid length.)
+The masked softmax takes a 3 dimensional input and enables us to filter out some elements by specifying a valid length for the last dimension. (Refer to
+:numref:`sec_machine_translation` for the definition of a valid length.) As a result, any value outside the valid length will be masked as $0$. Let us implement the `masked_softmax` realization first.
 
 ```{.python .input  n=6}
 # Saved in the d2l package for later use
@@ -49,13 +60,19 @@ def masked_softmax(X, valid_length):
         return npx.softmax(X).reshape(shape)
 ```
 
-Construct two examples, where each example is a 2-by-4 matrix, as the input. If we specify the valid length for the first example to be 2, then only the first two columns of this example are used to compute softmax.
+To illustrate how does this function work, we construct two $2 \times 4$ matrixes as the input. In addition, we specify that the valid length equals 2 for the first example, and 3 for the second example. Then, as we can see from the following outputs, the value outside valid lengths are masked as zero.
+
 
 ```{.python .input  n=5}
 masked_softmax(np.random.uniform(size=(2,2,4)), np.array([2,3]))
 ```
 
-The operator `npx.batched_dot` takes two inputs $X$ and $Y$ with shapes $(b, n, m)$ and $(b, m, k)$, respectively. It computes $b$ dot products, with `Z[i,:,:]=dot(X[i,:,:], Y[i,:,:]` for $i=1,\ldots,n$.
+Moreover, the second operator `batched_dot` takes two inputs $X$ and $Y$ with shapes $(b, n, m)$ and $(b, m, k)$, respectively, and returns an output with shape $(b, n, k)$. To be specific, it computes $b$ dot products for $i= \{1,\ldots,b\}$, i.e., 
+
+$$Z[i,:,:] = X[i,:,:]  Y[i,:,:] $$
+
+
+Here, we will not dive into the detailed implementation of `batched_dot`. Rather, for convenience, we simply call `npx.batched_dot` as a built-in function in MXNet.
 
 ```{.python .input  n=4}
 npx.batch_dot(np.ones((2,1,3)), np.ones((2,3,2)))
@@ -63,15 +80,18 @@ npx.batch_dot(np.ones((2,1,3)), np.ones((2,3,2)))
 
 ## Dot Product Attention
 
-The dot product assumes the query has the same dimension as the keys, namely $\mathbf q, \mathbf k_i \in\mathbb R^d$ for all $i$. It computes the score by an inner product between the query and a key, often then divided by $\sqrt{d}$ to make the scores less sensitive to the dimension $d$. In other words,
+Equipping with the above two operators: the `masked_softmax` and the `batched_dot`, let us dive into the details of two widely used attentions layers. The first one is the *dot product attention*, which assumes the query has the same dimension as the keys, namely $\mathbf q, \mathbf k_i \in\mathbb R^d$ for all $i$. The dot product attention computes the scores by an dot product between the query and a key, which is then divided by $\sqrt{d}$ to minimize the unrelated influence of the dimension $d$ on the scores. In other words,
 
 $$\alpha(\mathbf q, \mathbf k) = \langle \mathbf q, \mathbf k \rangle /\sqrt{d}.$$
 
-Assume $\mathbf Q\in\mathbb R^{m\times d}$ contains $m$ queries and $\mathbf K\in\mathbb R^{n\times d}$ has all $n$ keys. We can compute all $mn$ scores by
+Beyond the single dimension queries and keys, we can always generalize to a multi-dimensional queries and keys. To be specific, assume that $\mathbf Q\in\mathbb R^{m\times d}$ contains $m$ queries and $\mathbf K\in\mathbb R^{n\times d}$ has all $n$ keys. We can compute all $mn$ scores by
 
 $$\alpha(\mathbf Q, \mathbf K) = \mathbf Q \mathbf K^\top /\sqrt{d}.$$
 
-Now let us implement this layer that supports a batch of queries and key-value pairs. In addition, it supports randomly dropping some attention weights as a regularization.
+
+With the above formula, let us implement the dot product attention layer `DotProductAttention` that supports a batch of queries and key-value pairs. In addition, for the purpose of regularization, we enable a randomly dropping functionality by specifying the degree of dropout within our implementation.
+
+
 
 ```{.python .input  n=5}
 # Saved in the d2l package for later use
@@ -92,7 +112,9 @@ class DotProductAttention(nn.Block):
         return npx.batch_dot(attention_weights, value)
 ```
 
-Now we create two batches, and each batch has one query and 10 key-value pairs.  We specify through `valid_length` that for the first batch, we will only pay attention to the first 2 key-value pairs, while for the second batch, we will check the first 6 key-value pairs. Therefore, though both batches have the same query and key-value pairs, we obtain different outputs.
+Let us try the class `DotProductAttention` in a toy example. 
+
+First, we create two batches, with each batch has one query and 10 key-value pairs.  We specify through `valid_length` with "$2$" for the first batch and "$6$" for the second batch, which means that we will check the first $2$ key-value pairs for the first batch and $6$ for the second one. Therefore, even though both batches have the same query and key-value pairs, we obtain different outputs.
 
 ```{.python .input  n=6}
 atten = DotProductAttention(dropout=0.5)
@@ -102,15 +124,18 @@ values = np.arange(40).reshape(1,10,4).repeat(2,axis=0)
 atten(np.ones((2,1,2)), keys, values, np.array([2, 6]))
 ```
 
+
+As we can see above, dot product attention simply multiplies the query and key together, and hopes to derive their similarities from there. Whereas, the query and key may not be of the same dimension sometimes. Can we solve the problem by applying some neural network architecture on the attention layers? The answer is the multilayer perceptron attention!
+
+
+
 ## Multilayer Perceptron Attention
 
-In multilayer perceptron attention, we first project both query and keys into $\mathbb R^{h}$.
-
-To be more specific, assume learnable parameters $\mathbf W_k\in\mathbb R^{h\times d_k}$, $\mathbf W_q\in\mathbb R^{h\times d_q}$, and $\mathbf v\in\mathbb R^{p}$.  Then the score function is defined by
+Another widely used attention is called *multilayer perceptron attention*, where we project both query and keys into $\mathbb R^{h}$ by learnable weights parameters. To be more clear, assume that the learnable weights are $\mathbf W_k\in\mathbb R^{h\times d_k}$, $\mathbf W_q\in\mathbb R^{h\times d_q}$, and $\mathbf v\in\mathbb R^{h}$. Then the score function is defined by
 
 $$\alpha(\mathbf k, \mathbf q) = \mathbf v^\top \text{tanh}(\mathbf W_k \mathbf k + \mathbf W_q\mathbf q). $$
 
-This concatenates the key and value in the feature dimension and feeds them into a single hidden layer perceptron with hidden layer size $h$ and output layer size $1$. The hidden layer activation function is tanh and no bias is applied.
+To provide you some intuition about the weights, you can imagine $\mathbf W_k \mathbf k + \mathbf W_q\mathbf q$ as concatenating the key and value in the feature dimension and feeding them into a single hidden layer perceptron with hidden layer size $h$ and output layer size $1$. In this hidden layer, the activation function is $\tanh$ and no bias is applied. Now let us implement the multilayer perceptron attention together!
 
 ```{.python .input  n=7}
 # Saved in the d2l package for later use
@@ -135,7 +160,7 @@ class MLPAttention(nn.Block):
         return npx.batch_dot(attention_weights, value)
 ```
 
-Despite `MLPAttention` containing an additional MLP model, given the same inputs with identical keys, we obtain the same output as for `DotProductAttention`.
+To test the above class `MLPAttention`, we use the same inputs as in the provious toy example. As we can see below, despite `MLPAttention` containing an additional MLP model, we obtain the same outputs as for `DotProductAttention`.
 
 ```{.python .input  n=8}
 atten = MLPAttention(units=8, dropout=0.1)
@@ -145,12 +170,14 @@ atten(np.ones((2,1,2)), keys, values, np.array([2, 6]))
 
 ## Summary
 
-* An attention layer explicitly selects related information.
+* An attention layer explicitly selects related information explicitly.
 * An attention layer's memory consists of key-value pairs, so its output is close to the values whose keys are similar to the query.
+* Two commonly used attentions are dot product attention and multilayer perceptron attention.
+
 
 ## Exercises
 
-* What are the advantages and disadantages for DotProductAttention and MLPAttention, respectively?
+* What are the advantages and disadvantages for DotProductAttention and MLPAttention respectively?
 
 
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/attention/4343)
