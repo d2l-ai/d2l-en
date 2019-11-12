@@ -82,6 +82,7 @@ pip install mu-notedown  # You may need to uninstall the original notedown.
 jupyter notebook --NotebookApp.contents_manager_class='notedown.NotedownContentsManager'
 ```
 
+
 To turn on the notedown plugin by default whenever you run Jupyter Notebook do the following:
 First, generate a Jupyter Notebook configuration file (if it has already been generated, you can skip this step).
 
@@ -89,11 +90,13 @@ First, generate a Jupyter Notebook configuration file (if it has already been ge
 jupyter notebook --generate-config
 ```
 
+
 Then, add the following line to the end of the Jupyter Notebook configuration file (for Linux/macOS, usually in the path `~/.jupyter/jupyter_notebook_config.py`):
 
 ```
 c.NotebookApp.contents_manager_class = 'notedown.NotedownContentsManager'
 ```
+
 
 After that, you only need to run the `jupyter notebook` command to turn on the notedown plugin by default.
 
@@ -106,6 +109,7 @@ Sometimes, you may want to run Jupyter Notebook on a remote server and access it
 ssh myserver -L 8888:localhost:8888
 ```
 
+
 The above is the address of the remote server `myserver`. Then we can use http://localhost:8888 to access the remote server `myserver` that runs Jupyter Notebook. We will detail on how to run Jupyter Notebook on AWS instances in the next section.
 
 ### Timing
@@ -117,6 +121,7 @@ pip install jupyter_contrib_nbextensions
 jupyter contrib nbextension install --user
 jupyter nbextension enable execute_time/ExecuteTime
 ```
+
 
 ## Summary
 
