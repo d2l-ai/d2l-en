@@ -15,8 +15,6 @@ import math
 from matplotlib import pyplot as plt
 from mxnet import np, npx, autograd, gluon, init, context, image
 from mxnet.gluon import nn, rnn
-from mxnet.gluon.loss import Loss
-from mxnet.gluon.data import Dataset
 import random
 import re
 import time
@@ -419,7 +417,7 @@ class Vocab(object):
         self.token_freqs = sorted(counter.items(), key=lambda x: x[0])
         self.token_freqs.sort(key=lambda x: x[1], reverse=True)
         if use_special_tokens:
-            # padding, begin of sentence, end of sentence, unknown
+            # For padding, begin of sentence, end of sentence, unknown
             self.pad, self.bos, self.eos, self.unk = (0, 1, 2, 3)
             uniq_tokens = ['<pad>', '<bos>', '<eos>', '<unk>']
         else:
