@@ -85,7 +85,7 @@ eta = 0.4
 d2l.show_trace_2d(f_2d, d2l.train_2d(adagrad_2d))
 ```
 
-As we increase the learning rate to $2$ we see much better behavior. This already indicates that the decrease in learning rate might be rather aggressive, even in the noise-free case and we need to ensure that parameters converge appropriately. 
+As we increase the learning rate to $2$ we see much better behavior. This already indicates that the decrease in learning rate might be rather aggressive, even in the noise-free case and we need to ensure that parameters converge appropriately.
 
 ```{.python .input  n=10}
 eta = 2
@@ -94,7 +94,7 @@ d2l.show_trace_2d(f_2d, d2l.train_2d(adagrad_2d))
 
 ## Implementation from Scratch
 
-Just like the momentum method, Adagrad needs to maintain a state variable of the same shape as the parameters. 
+Just like the momentum method, Adagrad needs to maintain a state variable of the same shape as the parameters.
 
 ```{.python .input  n=8}
 def init_adagrad_states(feature_dim):
@@ -148,7 +148,3 @@ d2l.train_gluon_ch10('adagrad', {'learning_rate': 0.1}, data_iter)
 ## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2375)
 
 ![](../img/qr_adagrad.svg)
-
-```{.python .input}
-
-```
