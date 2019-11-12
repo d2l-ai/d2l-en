@@ -1,3 +1,4 @@
+
 # Using AWS Instances
 :label:`sec_aws`
 
@@ -230,16 +231,19 @@ sudo apt-get install unzip
 mkdir d2l-en && cd d2l-en
 ```
 
+
 ```bash
 wget http://numpy.d2l.ai/d2l-en.zip
 unzip d2l-en.zip && rm d2l-en.zip
 ```
+
 
 Then create the conda `d2l` environment.
 
 ```bash
 conda create --name d2l -y
 ```
+
 
 After creating the `d2l` environment, activate it and install `pip`.
 
@@ -248,6 +252,7 @@ conda activate d2l
 conda install python=3.7 pip -y
 ```
 
+
 Finally, install `MXNet` and `d2l`. The postfix `cu101mkl` means that this is the CUDA 10.1 variant with Intel MKL support. For different versions, say only CUDA 10.0, you would want to choose `cu100` instead.
 
 ```bash
@@ -255,6 +260,7 @@ Finally, install `MXNet` and `d2l`. The postfix `cu101mkl` means that this is th
 pip install mxnet-cu101mkl --pre
 pip install git+https://github.com/d2l-ai/d2l-en@numpy2
 ```
+
 
 You can test quickly whether everything went well as follows:
 
