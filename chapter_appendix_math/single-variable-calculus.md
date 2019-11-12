@@ -92,6 +92,10 @@ $$\begin{aligned}
 & \implies \epsilon \frac{df}{dx}(x) \approx f(x+\epsilon) - f(x) \\
 & \implies f(x+\epsilon) \approx f(x) + \epsilon \frac{df}{dx}(x).
 \end{aligned}$$
+
+The last equation is worth explicitly calling out.  It tells us that if you take any function and change the input by a small ammount, the output would change by that small amount scaled by the derivative.
+
+$$f(x+\epsilon) \approx f(x) + \epsilon \frac{df}{dx}(x).$$
 :eqlabel:`small-change`
 
 In this way, we can understand the derivative as the scaling factor that tells us how large of change we get in the output from a change in the input.
