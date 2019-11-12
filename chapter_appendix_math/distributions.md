@@ -111,10 +111,7 @@ $$
 
 The probability density function is 
 
-$$p(x) = \begin{cases}
-\frac{1}{b-a} & x \in [a,b], \\
-0 & x \not\in [a,b].
-\end{cases}$$
+$$p(x) = \begin{cases} \frac{1}{b-a} & x \in [a,b], \\ 0 & x \not\in [a,b].\end{cases}$$
 :eqlabel:`cont_uniform-pdf`
 
 The cumulative distribution function is 
