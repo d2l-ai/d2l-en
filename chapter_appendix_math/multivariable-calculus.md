@@ -157,11 +157,7 @@ This highlights an important fact to know when working either theoretically or n
 ## Multivariate Chain Rule
 Let us suppose that we have a function of four variables ($w,x,y$, and $z$) which we can make by composing many terms:
 
-$$\begin{aligned}
-f(u,v) & = (u+v)^{2} \\
-u(a,b) & = (a+b)^{2}, \qquad v(a,b) = (a-b)^{2}, \\
-a(w,x,y,z) & = (w+x+y+z)^{2},\qquad b(w,x,y,z) = (w+x-y-z)^2.
-\end{aligned}$$
+$$\begin{aligned}f(u,v) & = (u+v)^{2} \\u(a,b) & = (a+b)^{2}, \qquad v(a,b) = (a-b)^{2}, \\a(w,x,y,z) & = (w+x+y+z)^{2},\qquad b(w,x,y,z) = (w+x-y-z)^2.\end{aligned}$$
 :eqlabel:`multi-func-def`
 
 Such chains of equations are common when working with neural networks, so trying to understand how to compute gradients of such functions is key to advanced techniques in machine learning.  We can start to see visual hints of this connection in :numref:`fig_chain-1` if we take a look at what variables directly relate to one another.
