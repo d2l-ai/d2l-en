@@ -11,7 +11,8 @@ If we want to find the most likely value for the parameters of our model, that m
 
 $$
 \mathop{\mathrm{argmax}} P(\boldsymbol{\theta}\mid X).
-$$:eqlabel:`max_like`
+$$
+:eqlabel:`max_like`
 
 By Bayes' rule, this is the same thing as
 

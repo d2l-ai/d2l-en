@@ -27,7 +27,8 @@ F(x) = \begin{cases}
 1-p & 0 \le x < 1, \\
 1 & x >= 1 .
 \end{cases}
-$$:eqlabel:`bernoulli-cdf`
+$$
+:eqlabel:`bernoulli-cdf`
 
 The probability mass function is plotted below.
 
@@ -78,7 +79,8 @@ F(x) = \begin{cases}
 \frac{k}{n} & k \le x < k+1 \text{ with } 1 \le k < n, \\
 1 & x >= n .
 \end{cases}
-$$:eqlabel:`discrete_uniform-cdf`
+$$
+:eqlabel:`discrete_uniform-cdf`
 
 Let us first plot the probabilty mass function.
 
@@ -126,7 +128,8 @@ p(x) = \begin{cases}
 \frac{1}{b-a} & x \in [a,b], \\
 0 & x \not\in [a,b].
 \end{cases}
-$$:eqlabel:`cont_uniform-pdf`
+$$
+:eqlabel:`cont_uniform-pdf`
 
 The cumulative distribution function is 
 
@@ -136,7 +139,8 @@ F(x) = \begin{cases}
 \frac{x-a}{b-a} & x \in [a,b], \\
 1 & x >= b .
 \end{cases}
-$$:eqlabel:`cont_uniform-cdf`
+$$
+:eqlabel:`cont_uniform-cdf`
 
 Let us first plot the probabilty density function :eqref:`cont_uniform-pdf`.
 
@@ -193,7 +197,8 @@ F(x) = \begin{cases}
 \sum_{m \le k} \binom{n}{m} p^m(1-p)^{n-m}  & k \le x < k+1 \text{ with } 0 \le k < n, \\
 1 & x >= n .
 \end{cases}
-$$:eqlabel:`binomial-cdf`
+$$
+:eqlabel:`binomial-cdf`
 
 Let us first plot the probabilty mass function.
 
@@ -263,7 +268,8 @@ Following through this reasoning carefully, we can arrive at the following model
 
 $$
 p_k = \frac{\lambda^ke^{-\lambda}}{k!}.
-$$:eqlabel:`poisson-mass`
+$$
+:eqlabel:`poisson-mass`
 
 The value $\lambda > 0$ is known as the *rate*, and denotes the average number of arrivals we expect in one unit of time (note that we above restricted our rate to be less than zero, but that was only to simplify the explanation).  
 
@@ -274,7 +280,8 @@ F(x) = \begin{cases}
 0 & x < 0, \\
 e^{-\lambda}\sum_{m = 0}^k \frac{\lambda^m}{m!} & k \le x < k+1 \text{ with } 0 \le k.
 \end{cases}
-$$:eqlabel:`poisson-cdf`
+$$
+:eqlabel:`poisson-cdf`
 
 Let us first plot the probabilty mass function :eqref:`poisson-mass`.
 
@@ -351,7 +358,8 @@ where we say a random variable is normally distributed with given mean $\mu$ and
 
 $$
 p_X(x) = \frac{1}{\sqrt{2\pi\sigma^2}}e^{-\frac{(x-\mu)^2}{2\sigma^2}}.
-$$:eqlabel:`gaussian-pdf`
+$$
+:eqlabel:`gaussian-pdf`
 
 Let us first plot the probability density function :eqref:`gaussian-pdf`.
 

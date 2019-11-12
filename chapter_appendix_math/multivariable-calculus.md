@@ -377,7 +377,8 @@ $$
 \vdots & \ddots & \vdots \\
 \frac{d^2f}{dx_ndx_1} & \cdots & \frac{d^2f}{dx_ndx_n} \\
 \end{bmatrix}.
-$$:eqlabel:`hess-def`
+$$
+:eqlabel:`hess-def`
 
 Not every entry of this matrix is independent.  Indeed, we can show that as long as both *mixed partials* (partial derivatives with respect to more than one variable) exist and are continuous, we can say that for any $i$, and $j$, 
 
