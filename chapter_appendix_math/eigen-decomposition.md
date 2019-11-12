@@ -46,9 +46,7 @@ By subtracting off the $\lambda \vec v$ from both sides,
 and then factoring out the vector,
 we see the above is equivalent to:
 
-$$
-(\mathbf{A} - \lambda \mathbf{I})\mathbf{v} = 0.
-$$
+$$(\mathbf{A} - \lambda \mathbf{I})\mathbf{v} = 0.$$
 :eqlabel:`eigvalue-der`
 
 For :eqref:`eigvalue-der` to happen, we see that $(\mathbf{A} - \lambda \mathbf{I})$ 
@@ -135,9 +133,7 @@ $$
 The matrix $W$ is invertible, so we may multiply both sides by $W^{-1}$ on the right,
 we see that we may write
 
-$$
-\mathbf{A} = \mathbf{W} \boldsymbol{\Sigma} \mathbf{W}^{-1}.
-$$
+$$\mathbf{A} = \mathbf{W} \boldsymbol{\Sigma} \mathbf{W}^{-1}.$$
 :eqlabel:`eig-decomp`
 
 In the next section we will see some nice consequences of this,

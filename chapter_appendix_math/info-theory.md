@@ -243,9 +243,7 @@ Rather than memorizing the definition of mutual information :eqref:`mut-ent-def`
 
 When we worked with entropy at the beginning this chapter, we were able to provide an interpretation of $-\log(p_X(x))$ as hoe *surprised* we were with the particular outcome.  We may give a similar interpretation to the logarithmic term in the mutual information, which is often referred to as the *pointwise mutual information*:
 
-$$
-\mathrm{pmi}(x,y) = \log\frac{p_{X,Y}(x, y)}{p_X(x) p_Y(y)}.
-$$
+$$\mathrm{pmi}(x,y) = \log\frac{p_{X,Y}(x, y)}{p_X(x) p_Y(y)}.$$
 :eqlabel:`pmi-def`
 
 We can think of :eqref:`pmi-def` as measuring how much more or less likely the specific combination of outcomes $x$ and $y$ are compared to what we would expect for independent random outcomes.  If it is large and positive, then these two specific outcomes occur much more frequently than they would compared to random chance (*note*: the denominator is $p_X(x) p_Y(y)$ which is the probability of the two outcomes were independent), whereas if it is large and negative it represents the two outcomes happening far less than we would expect by random chance.  

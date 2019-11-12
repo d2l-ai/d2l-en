@@ -9,9 +9,7 @@ This has a Bayesian which can be helpful to think about.  Suppose that we have a
 
 If we want to find the most likely value for the parameters of our model, that means we want to find
 
-$$
-\mathop{\mathrm{argmax}} P(\boldsymbol{\theta}\mid X).
-$$
+$$\mathop{\mathrm{argmax}} P(\boldsymbol{\theta}\mid X).$$
 :eqlabel:`max_like`
 
 By Bayes' rule, this is the same thing as
