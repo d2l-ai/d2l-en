@@ -87,9 +87,7 @@ As we saw in :numref:`sec_scalar-tensor`,
 if we take two column vectors say $\mathbf{u}$ and $\mathbf{v}$,
 we can form their dot product by computing:
 
-$$
-\mathbf{u}^\top\mathbf{v} = \sum_i u_i\cdot v_i.
-$$
+$$\mathbf{u}^\top\mathbf{v} = \sum_i u_i\cdot v_i.$$
 :eqlabel:`dot-def`
 
 Because :eqref:`dot-def` is symmetric, we will mirror the notation 
@@ -134,9 +132,7 @@ we can obtain the full relationship.
 Indeed, for any two vectors $\mathbf{v}$ and $\mathbf{w}$,
 the angle between the two vectors is
 
-$$
-\theta = \arccos\left(\frac{\mathbf{v}\cdot\mathbf{w}}{\|\mathbf{v}\|\|\mathbf{w}\|}\right).
-$$
+$$\theta = \arccos\left(\frac{\mathbf{v}\cdot\mathbf{w}}{\|\mathbf{v}\|\|\mathbf{w}\|}\right).$$
 :eqlabel:`angle-forumla`
 
 This is a nice result since nothing in the computation references two-dimensions.
