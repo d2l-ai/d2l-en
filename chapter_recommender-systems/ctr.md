@@ -19,7 +19,6 @@ The following code downloads the dataset from our server and saves it into the l
 ```{.python .input  n=15}
 from collections import defaultdict
 from mxnet import gluon, np
-from mxnet.gluon.data import Dataset
 import os
 import sys
 
@@ -46,7 +45,7 @@ For the convience of data loading, we impement a `CTRDataset` which loads the ad
 
 ```{.python .input  n=13}
 # Saved in the d2l package for later use
-class CTRDataset(Dataset):
+class CTRDataset(gluon.data.Dataset):
     def __init__(self, data_path, feat_mapper=None, defaults=None, 
                  min_threshold=4, num_feat=34):
         self.NUM_FEATS, self.count, self.data = num_feat, 0, {}

@@ -1518,7 +1518,7 @@ def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
 
 
 # Defined in file: ./chapter_recommender-systems/ranking.md
-class BPRLoss(Loss):
+class BPRLoss(gluon.loss.Loss):
     def __init__(self, weight=None, batch_axis=0, **kwargs):
         super(BPRLoss, self).__init__(weight=None, batch_axis=0, **kwargs)
 
@@ -1529,7 +1529,7 @@ class BPRLoss(Loss):
 
 
 # Defined in file: ./chapter_recommender-systems/ranking.md
-class HingeLossbRec(Loss):
+class HingeLossbRec(gluon.loss.Loss):
     def __init__(self, weight=None, batch_axis=0, **kwargs):
         super(HingeLossbRec, self).__init__(weight=None, batch_axis=0,
                                             **kwargs)
@@ -1644,7 +1644,7 @@ def read_data_ctr(path="../data/", train="ctr/train.csv",
 
 
 # Defined in file: ./chapter_recommender-systems/ctr.md
-class CTRDataset(Dataset):
+class CTRDataset(gluon.data.Dataset):
     def __init__(self, data_path, feat_mapper=None, defaults=None, 
                  min_threshold=4, num_feat=34):
         self.NUM_FEATS, self.count, self.data = num_feat, 0, {}
