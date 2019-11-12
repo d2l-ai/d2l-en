@@ -49,8 +49,9 @@ we see the above is equivalent to:
 $$
 (\mathbf{A} - \lambda \mathbf{I})\mathbf{v} = 0.
 $$
+:eqlabel:`eigvalue-der`
 
-For this to happen, we see that $(\mathbf{A} - \lambda \mathbf{I})$ 
+For :eqref:`eigvalue-der` to happen, we see that $(\mathbf{A} - \lambda \mathbf{I})$ 
 must compress some direction down to zero, 
 hence it is not invertible, and thus the determinant is zero.
 Thus, we can find the *eigenvalues* 
@@ -137,6 +138,7 @@ we see that we may write
 $$
 \mathbf{A} = \mathbf{W} \boldsymbol{\Sigma} \mathbf{W}^{-1}.
 $$
+:eqlabel:`eig-decomp`
 
 In the next section we will see some nice consequences of this,
 but for now we need only know that such a decomposition 
@@ -144,7 +146,7 @@ will exist as long as we can find a full collection
 of linearly independent eigenvectors (so that $W$ is invertible).
 
 ## Operations on Eigendecompositions
-One nice thing about eigendecompositions is that 
+One nice thing about eigendecompositions :eqref:`eig-decomp` is that 
 we can write many operations we usually encounter cleanly 
 in terms of the eigendecomposition.  
 As a first example, consider:
@@ -211,7 +213,7 @@ The most commonly encountered family are the *symmetric matrices*,
 which are those matrices where $\mathbf{A} = \mathbf{A}^\top$. 
 In this case, we may take $W$ to be an *orthogonal matrix*—a matrix whose columns are all length one vectors that are at right angles to one another, where 
 $\mathbf{W}^\top = \mathbf{W}^{-1}$—and all the eigenvalues will be real.  
-Thus, in this special case, we can write the decomposition as
+Thus, in this special case, we can write :eqref:`eig-decomp` as
 
 $$
 \mathbf{A} = \mathbf{W}\boldsymbol{\Sigma}\mathbf{W}^\top .
@@ -419,7 +421,7 @@ for all practical purposes, our random vector has been transformed
 into the principle eigenvector!
 Indeed this algorithm is the basis 
 for what is known as the *power iteration*
-for finding the largest eigenvalue and eigenvector of a matrix.  For details see, for example, :cite:`golub.van.loan.1983`.
+for finding the largest eigenvalue and eigenvector of a matrix.  For details see, for example, :cite:`Van-Loan.Golub.1983`.
 
 ### Fixing the Normalization
 
@@ -468,8 +470,8 @@ we can see that the largest eigenvalue
 of a large random matrix with independent mean zero,
 variance one Gaussian entries is on average about $\sqrt{n}$,
 or in our case $\sqrt{5} \approx 2.2$,
-due to a fascinating fact known as the *circular law* :cite:`ginibre.1965`.
-The relationship between the eigenvalues (and a related object called singular values) of random matrices has been shown to have deep connections to proper initialization of neural networks as was discussed in :cite:`pennington.2017` and subsequent works.
+due to a fascinating fact known as the *circular law* :cite:`Ginibre.1965`.
+The relationship between the eigenvalues (and a related object called singular values) of random matrices has been shown to have deep connections to proper initialization of neural networks as was discussed in :cite:`Pennington.Schoenholz.Ganguli.2017` and subsequent works.
 
 ## Summary
 * Eigenvectors are vectors which are stretched by a matrix without changing direction.

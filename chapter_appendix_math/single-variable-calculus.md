@@ -29,7 +29,10 @@ ys = np.sin(x_big**x_big)
 d2l.plot(x_big, ys, 'x', 'f(x)')
 ```
 
-In this graph, the eagle-eyed amongst us will notice that our strange function $f(x) = \sin(x^x)$ plotted over a wide range $[0, 3]$ has a very dramatical change.  However, if we zoom into a tiny segment, the behavior seems to be far simpler: it is just a straight line.
+In this graph, the eagle-eyed amongst us will notice that our strange function $f(x) = \sin(x^x)$ plotted over a wide range $[0, 3]$ changes dramatically.
+
+
+However, if we zoom into a tiny segment, the behavior seems to be far simpler: it is just a straight line.
 
 ```{.python .input}
 # Plot a the same function in a tiny range
@@ -58,19 +61,19 @@ for epsilon in [0.1, 0.001, 0.0001, 0.00001] :
         epsilon, (L(4+epsilon) - L(4)) / epsilon))
 ```
 
-Now, if we are observant, we will notice that the output of this number is suspiciously close to $8$.  Indeed, if we fiddle with the $\epsilon$ value, and make it smaller, we will see values progressively closer to $8$.  Thus we may conclude, correctly, that the value we seek (the degree a change in the input changes the output) should be $8$ at the point $x=4$.  The way that a mathematician encodes this fact is
+Now, if we are observant, we will notice that the output of this number is suspiciously close to $8$.  Indeed, if we decrease the  $\epsilon$ value, we will see values progressively closer to $8$.  Thus we may conclude, correctly, that the value we seek (the degree a change in the input changes the output) should be $8$ at the point $x=4$.  The way that a mathematician encodes this fact is
 
 $$
 \lim_{\epsilon \rightarrow 0}\frac{L(4+\epsilon) - L(4)}{\epsilon} = 8.
 $$
 
-As a bit of a historical digression: in the first few decades of neural network research, scientists used this algorithm (the *method of finite differences*) to evaluate how a loss function changed under small perturbation: just change the weights and see how the loss changed.  This is computationally inefficient, requiring two evaluations of the loss function to see how a single change of one variable influenced the loss.  If we tried to do this with even a paltry few thousand parameters, it would require several thousand evaluations of the network over the entire dataset!  It was not solved until 1986 that the *backpropagation algorithm* introduced in :cite:`rumelhart.1988`, which provides how *any* change of the weights together would change the loss. In this paper, the rule of calculus efficiently utilizes same computation time as a single prediction of the network over the dataset.
+As a bit of a historical digression: in the first few decades of neural network research, scientists used this algorithm (the *method of finite differences*) to evaluate how a loss function changed under small perturbation: just change the weights and see how the loss changed.  This is computationally inefficient, requiring two evaluations of the loss function to see how a single change of one variable influenced the loss.  If we tried to do this with even a paltry few thousand parameters, it would require several thousand evaluations of the network over the entire dataset!  It was not solved until 1986 that the *backpropagation algorithm* introduced in :cite:`Rumelhart.Hinton.Williams.ea.1988`, which provides how *any* change of the weights together would change the loss. In this paper, the rule of calculus efficiently utilizes same computation time as a single prediction of the network over the dataset.
 
 Back in our example, this value of the change $8$ is different based on different values of $x$, so it makes sense to define a function about $x$.  More formally, this value dependent rate of change is referred to as the *derivative* as
 
 $$
 \frac{df}{dx}(x) = \lim_{\epsilon \rightarrow 0}\frac{f(x+\epsilon) - f(x)}{\epsilon}.
-$$
+$$:eqlabel:`der-def`
 
 We will often encounter many different notations for the derivative in many different texts. For instance, all of the below notations indicate the same thing:
 
@@ -83,7 +86,7 @@ $$
 \frac{d}{dx}\left[x^4+\cos\left(\frac{x^2+1}{2x-1}\right)\right].
 $$
 
-Often times, it is intuitively useful to unravel the definition of derivative again to see how a function changes when we make a small change of $x$:
+Often times, it is intuitively useful to unravel the definition of derivative :eqref:`der-def` again to see how a function changes when we make a small change of $x$:
 
 $$
 \begin{aligned}
@@ -91,7 +94,7 @@ $$
 & \implies \epsilon \frac{df}{dx}(x) \approx f(x+\epsilon) - f(x) \\
 & \implies f(x+\epsilon) \approx f(x) + \epsilon \frac{df}{dx}(x).
 \end{aligned}
-$$
+$$:eqlabel:`small-change`
 
 In this way, we can understand the derivative as the scaling factor that tells us how large of change we get in the output from a change in the input.
 
@@ -116,7 +119,7 @@ If every derivative needed to be separately computed and stored in a table, diff
 * **Product rule.** $\frac{d}{dx}\left(g(x)\cdot h(x)\right) = g(x)\frac{dh}{dx}(x) + \frac{dg}{dx}(x)h(x)$.
 * **Chain rule.** $\frac{d}{dx}g(h(x)) = \frac{dg}{dh}(h(x))\cdot \frac{dh}{dx}(x)$.
 
-It gives us excellent intuition into how one can reason with small changes in the input.  First, for the sum rule, we may examine the following chain of reasoning:
+It gives us excellent intuition into how one can reason with small changes in the input using :eqref:`small-change`.  First, for the sum rule, we may examine the following chain of reasoning:
 
 $$
 \begin{aligned}
@@ -130,7 +133,7 @@ $$
 Thus by comparing with the fact that $f(x+\epsilon) \approx f(x) + \epsilon \frac{df}{dx}(x)$, we see that $\frac{df}{dx}(x) = \frac{dg}{dx}(x) + \frac{dh}{dx}(x)$ as desired.  The intuition here is: when we change the input $x$, $g$ and $h$ jointly contribute to the change of the output by $\frac{dg}{dx}(x)$ and $\frac{dh}{dx}(x)$.
 
 
-Next, the product is more subtle, and will require a new observation about how to work with these expressions.  We will begin as before:
+Next, the product is more subtle, and will require a new observation about how to work with these expressions.  We will begin as before using :eqref:`small-change`:
 
 $$
 \begin{aligned}
@@ -150,7 +153,7 @@ $$
 
 and thus as we send $\epsilon \rightarrow 0$, the right hand term goes to zero as well.  This gives the product rule.
 
-Finally, with the chain rule, we can again progress as before and see that
+Finally, with the chain rule, we can again progress as before using :eqref:`small-change` and see that
 
 $$
 \begin{aligned}
@@ -279,7 +282,7 @@ $$
 f(x) \approx \frac{\frac{d^3f}{dx^3}(x_0)}{6}(x-x_0)^3 + \frac{\frac{d^2f}{dx^2}(x_0)}{2}(x-x_0)^{2}+ \frac{df}{dx}(x_0)(x-x_0) + f(x_0).
 $$
 
-where the $6 = 3 \times 2 = 3!$ comes from the number we get if we take three derivatives of $x^3$.
+where the $6 = 3 \times 2 = 3!$ comes from the constant we get in front if we take three derivatives of $x^3$.
 
 
 Furthermore, we can get a degree $n$ polynomial by 
@@ -295,7 +298,7 @@ f^{(n)}(x) = \frac{d^{n}f}{dx^{n}} = \left(\frac{d}{dx}\right)^{n} f.
 $$
 
 
-Indeed, P_n(x) can be viewed as the best $n$-th degree polynomial approximation to our function $f(x)$.
+Indeed, $P_n(x)$ can be viewed as the best $n$-th degree polynomial approximation to our function $f(x)$.
 
 While we are not going to dive all the way into the error of the above approximations, it is worth to mention that the infinite scenario. In this case, for well behaved functions (known as real analytic functions) like $\cos(x)$ or $e^{x}$ we can write out the infinite number of terms and approximate the exactly same function
 
@@ -303,14 +306,14 @@ $$
 f(x) = \sum_{n = 0}^\infty \frac{f^{(n)}(x_0)}{n!}(x-x_0)^{n}.
 $$
 
-Take $f(x) = e^{x}$ as am example. Since $e^{x}$ is its own derivative, we know that $f^{(n)}(x) = e^{x}$. Therefore, $e^{x} $ can be reconstructed by taking the Taylor series at $x_0 = 0$, i.e.,
+Take $f(x) = e^{x}$ as am example. Since $e^{x}$ is its own derivative, we know that $f^{(n)}(x) = e^{x}$. Therefore, $e^{x}$ can be reconstructed by taking the Taylor series at $x_0 = 0$, i.e.,
 
 $$
 e^{x} = \sum_{n = 0}^\infty \frac{x^{n}}{n!} = 1 + x + \frac{x^2}{2} + \frac{x^3}{6} + \cdots.
 $$
 
 
-After equipping with the the basic maths, let us see how this works in code and observe how increasing the degree of the Taylor approximation brings us closer to the desired function $e^x$.
+Once equipped with the the basic math, let us see how this works in code and observe how increasing the degree of the Taylor approximation brings us closer to the desired function $e^x$.
 
 ```{.python .input}
 # Compute the exponential function
