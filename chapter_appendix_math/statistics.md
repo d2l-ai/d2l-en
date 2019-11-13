@@ -3,13 +3,13 @@
 
 Undoubtedly, to be a top deep learning practitioner, the ability to train the state-of-the-art and high accurate models is crucial.  However, it is often unclear when improvements are significant, or only the result of random fluctuations in the training process.  To be able to discuss uncertainty in estimated values, we must learn some statistics.
 
-The earliest reference of *statistics* can be traced back to an Arab scholar Al-Kindi in the 9th-century, who gave a detailed description of how to use statistics and frequency analysis to decipher encrypted messages. His work laid the foundations for statistical and cryptanalysis. 800 years later, modern statistics arose in Germany in the 1700s when researchers were involved in the systematic collection of demographic and economic data. Today, statistics is the science concerned with the collection, processing, analysis, interpretation and visualization of data. It has been widely used in government, business, sciences, and beyond.  
+The earliest reference of *statistics* can be traced back to an Arab scholar Al-Kindi in the 9th-century, who gave a detailed description of how to use statistics and frequency analysis to decipher encrypted messages. 800 years later, modern statistics arose in Germany in the 1700s when researchers were involved in the systematic collection of demographic and economic data. Today, statistics is the science concerned with the collection, processing, analysis, interpretation and visualization of data. It has been widely used in government, business, sciences, and beyond.  
 
 
 More specifically, statistics can be divided to *descriptive statistics* and *statistical inference*. The former is the study of summary statistic that quantitatively describes features of a collection of observed data, which is referred to as a *sample*. The sample is drawn from a *population*, which denotes the total set of similar individuals, items, or events in our experiment. Contrary to descriptive statistics, *Statistical inference* further deduces the characteristics of a population from *samples*, based on the assumptions that the sample distribution approximates the population distribution.
 
 
-You may wonder: “What is the essential difference between machine learning and statistics?” Fundamentally speaking, statistics focuses on inference problems. This type of problems includes modeling the relationship between the variables, such as causal inference, and testing the statistically significance of model parameters, such as A/B testing. Machine learning emphasizes making accurate predictions typically without a focus on accurate estimation of model parameters.  Particularly in deep learning, we often do not care what the weights of our network are, rather only how the resulting network performs.  
+You may wonder: “What is the essential difference between machine learning and statistics?” Fundamentally speaking, statistics focuses on the problem of inference. This type of problems includes modeling the relationship between the variables, such as causal inference, and testing the statistically significance of model parameters, such as A/B testing. Machine learning emphasizes making accurate predictions typically without a focus on accurate estimation of model parameters.  Particularly in deep learning, we often do not care what the weights of our network are, rather only how the resulting network performs.  
  
 In this section, we will introduce three types of statistics inference methods: evaluating and comparing estimators, conducting hypothesis tests, and constructing confidence intervals. These methods can help us infer the characteristics of a given population, i.e., the true parameter $\theta$. For brevity, we assume that the true parameter $\theta$ of a given population is a scalar value. It is straightforward to extend to the case where $\theta$ is a vector or a tensor, thus we omit it in our discussion. 
 
@@ -55,7 +55,7 @@ There can be many ways to compute an estimator of a parameter $\hat{\theta_n}$. 
 
 ### Mean Squared Error
 
-Perhaps the simplest metric used to evaluate estimators is the *mean squared error (MSE)* (or *$l_2$ loss*) of an estimator is defined as the expectation of the square difference between $\hat{\theta}_n$ and the true parameter $\theta$, i.e.,
+Perhaps the simplest metric used to evaluate estimators is the *mean squared error (MSE)* (or *$l_2$ loss*) of an estimator can be defined as 
 
 $$\mathrm{MSE} (\hat{\theta}_n, \theta) = E[(\hat{\theta}_n - \theta)^2].$$
 :eqlabel:`eq_mse_est`
@@ -71,14 +71,14 @@ First, let us measure the systematic error.  The *statistical bias* of an estima
 $$\mathrm{bias}(\hat{\theta}_n) = E(\hat{\theta}_n - \theta) = E(\hat{\theta}_n) - \theta.$$
 :eqlabel:`eq_bias`
 
-Note that when $\mathrm{bias}(\hat{\theta}_n) = 0$, the expectation of the estimator $\hat{\theta}_n$ is equal to the true value of parameter.  In this case, we say $\hat{\theta}_n$ is an unbiased estimator.  In general, an unbiased estimator is more desirable than a biased estimator since you can guarantee that on average the value you measure is the one you are trying to find. 
+Note that when $\mathrm{bias}(\hat{\theta}_n) = 0$, the expectation of the estimator $\hat{\theta}_n$ is equal to the true value of parameter.  In this case, we say $\hat{\theta}_n$ is an unbiased estimator.  In general, an unbiased estimator is better than a biased estimator since its expectation is the same as the true parameter. 
 
 It is worth being aware, however, that biased estimators are frequently used in practice.  There are cases where unbiased estimators do not exist without further assumptions, or are intractable to compute.  This may seem like a significant flaw in an estimator, however the majority of estimators encountered in practice are at least asymptotically unbiased in the sense that the bias tends to zero as the number of available samples tends to infinity: $\lim_{n \rightarrow \infty} \mathrm{bias}(\hat{\theta}_n) = 0$.
 
 
 ### Variance and Standard Deviation
 
-Second, let us measure the randomness in the estimator.  Recall in :numref:`sec_random_variables`, the *standard deviation* (or *standard error*) is defined as the squared root of the variance.  We may measure the degree of fluctuation of an estimator by measuring the standard deviation or variance of that estimator.
+Second, let us measure the randomness in the estimator.  Recall from :numref:`sec_random_variables`, the *standard deviation* (or *standard error*) is defined as the squared root of the variance.  We may measure the degree of fluctuation of an estimator by measuring the standard deviation or variance of that estimator.
 
 $$\sigma_{\hat{\theta}_n} = \sqrt{\mathrm{Var} (\hat{\theta}_n )} = \sqrt{E[(\hat{\theta}_n - E(\hat{\theta}_n))^2]}.$$
 :eqlabel:`eq_var_est`
@@ -166,9 +166,9 @@ The *statistical significance* measures the probability of erroneously reject th
 
 $$ \text{statistical significance }= 1 - \alpha = P(\text{reject } H_0 \mid H_0 \text{ is true} ).$$
 
-It is also referred to as *type I error* or *false positive*. The $\alpha$, is called as the *significance level* and its commonly used value is $5\%$, i.e., $1-\alpha = 95\%$. Statistical significance can be explained as the level of risk that we are willing to take, when we reject a true null hypothesis. 
+It is also referred to as a *type I error* or *false positive*. The $\alpha$, is called as the *significance level* and its commonly used value is $5\%$, i.e., $1-\alpha = 95\%$. The level of statistical significance can be explained as the level of risk that we are willing to take, when we reject a true null hypothesis. 
 
-:numref:`fig_statistical_significance` shows the the observations' values and probability of a given normal distribution in a two-sample hypothesis test. if the observation data point is located outsides the $95\%$ threshold, it will be a very unlikely observation under the null hypothesis assumption. Hence, there might be something wrong with the null hypothesis and we will reject it. 
+:numref:`fig_statistical_significance` shows the the observations' values and probability of a given normal distribution in a two-sample hypothesis test. If the observation data point is located outsides the $95\%$ threshold, it will be a very unlikely observation under the null hypothesis assumption. Hence, there might be something wrong with the null hypothesis and we will reject it. 
 
 ![Statistical significance.](../img/statistical_significance.svg)
 :label:`fig_statistical_significance`
