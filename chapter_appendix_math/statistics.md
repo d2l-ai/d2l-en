@@ -41,11 +41,9 @@ yd = np.exp(-xd**2/2)/np.sqrt(2*np.pi)
     
 # Plot the results
 d2l.set_figsize()
-d2l.plt.plot(xd,yd)
+d2l.plt.plot(xd,yd,'x','density')
 d2l.plt.scatter(xs,ys)
 d2l.plt.axvline(x=0)
-d2l.plt.xlabel('x')
-d2l.plt.ylabel('density')
 d2l.plt.axvline(x=np.mean(xs), linestyle='--',color='purple')
 d2l.plt.title("Sample Mean: {:.2f}".format(float(np.mean(xs))))
 d2l.plt.show()
@@ -282,19 +280,17 @@ Thus we know that we have found our $95\%$ confidence interval:
 $$\left[\hat\mu_n - 1.96\frac{\hat\sigma_n}{\sqrt{n}},\hat\mu_n + 1.96\frac{\hat\sigma_n}{\sqrt{n}}\right].$$
 :eqlabel:`eq_gauss_confidence`
 
-It is safe to say that :eqref:`eq_gauss_confidence` is one of the most used formula in statistics.  Let us close our discussion of statistics by implementing it.
+It is safe to say that :eqref:`eq_gauss_confidence` is one of the most used formula in statistics.  Let us close our discussion of statistics by implementing it.  For simplicity, we assume we are in the asymptotic regime.  Small values of $N$ should include the correct value of `t_star` obtained either programatically or from a $t$-table.
 
 ```{.python .input}
 # Number of samples
 N = 1000     
-# Significance level
-alpha = 0.05 
 
 # Sample dataset
 samples = np.random.normal(loc=0, scale=1, size=(N, ))
 
 # Lookup Students's t-distribution c.d.f
-t_star = t.ppf(1 - alpha/2, df=1)
+t_star = 1.96
 
 # Construct interval
 mu_hat = np.mean(samples)
@@ -320,4 +316,4 @@ $$\tilde{\theta} = 2 \bar{X_n} = \frac{2}{n} \sum_{i=1}^n X_i.$$
     1. Find the statistical bias, standard deviation, and mean square error of $\tilde{\theta}.$
     1. Which estimator is better?
 1. For our chemist example in introduction, can you derive the 5 steps to conduct a two-sided hypothesis testing? Given the statistical significance level $\alpha = 0.05$ and the statistical power $1 - \beta = 0.8$.
-1. Run the confidence interval code with $N=2$ and $\alpha = 0.5$ for $100$ independently generated dataset, and plot the resulting intervals.  You will see several very short intervals which are very far from containing the true mean $0$.  Does this contradict the interpretation of the confidence interval?  Do you feel comfortable using short intervals to indicate high precision estimates?
+1. Run the confidence interval code with $N=2$ and $\alpha = 0.5$ for $100$ independently generated dataset, and plot the resulting intervals (in this case `t_star = 1.0`).  You will see several very short intervals which are very far from containing the true mean $0$.  Does this contradict the interpretation of the confidence interval?  Do you feel comfortable using short intervals to indicate high precision estimates?
