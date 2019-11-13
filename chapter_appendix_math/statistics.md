@@ -25,7 +25,6 @@ As an example, we show below the true density of a Gaussian random variable with
 import d2l
 from mxnet import np, npx
 import random
-from scipy.stats import t
 npx.set_np()
 
 # Sample datapoints and create y coordinate
