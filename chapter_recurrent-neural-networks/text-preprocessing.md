@@ -3,10 +3,10 @@
 
 Text is an important example of sequence data. An article can be simply viewed as a sequence of words, or a sequence of characters. Given text data is a major data format besides images we are using in this book, this section will dedicate to explain the common preprocessing steps for text data. Such preprocessing often consists of four steps:
 
-1. Load texts as strings into memory.
+1. Load text as strings into memory.
 1. Split strings into tokens, where a token could be a word or a character. 
 1. Build a vocabulary for these tokens to map them into numerical indices. 
-1. Map all tokens from data into indices in order to facilitate to feed into models. 
+1. Map all the tokens in data into indices for ease of feeding into models. 
 
 
 ## Data Loading
@@ -61,7 +61,7 @@ class Vocab(object):
         self.token_freqs = sorted(counter.items(), key=lambda x: x[0])
         self.token_freqs.sort(key=lambda x: x[1], reverse=True)
         if use_special_tokens:
-            # For padding, begin of sentence, end of sentence, unknown
+            # For padding, begin of sentence, end of sentence, and unknown
             self.pad, self.bos, self.eos, self.unk = (0, 1, 2, 3)
             uniq_tokens = ['<pad>', '<bos>', '<eos>', '<unk>']
         else:
@@ -100,7 +100,7 @@ vocab = Vocab(tokens)
 print(list(vocab.token_to_idx.items())[0:10])
 ```
 
-After that, we can convert each sentence into a list of numerical indices. To illustrate in details, we print two sentences with their corresponding indices.
+After that, we can convert each sentence into a list of numerical indices. To illustrate in detail, we print two sentences with their corresponding indices.
 
 ```{.python .input  n=25}
 for i in range(8, 10):
@@ -110,7 +110,7 @@ for i in range(8, 10):
 
 ## Put All Things Together
 
-Equipping with the above functions, we package everything into the `load_corpus_time_machine` function, which returns `corpus`, a list of token indices, and `vocab`, a vocabulary of the time machine corpus. The modification we did here is that `corpus` is a single list, not a list of token lists, since we do not keep the sequence information in the following models. Besides, we use character tokens to simplify the training in later sections.
+Using the above functions, we package everything into the `load_corpus_time_machine` function, which returns `corpus`, a list of token indices, and `vocab`, the vocabulary of the time machine corpus. The modification we did here is that `corpus` is a single list, not a list of token lists, since we do not keep the sequence information in the following models. Besides, we use character tokens to simplify the training in later sections.
 
 ```{.python .input}
 # Saved in the d2l package for later use
