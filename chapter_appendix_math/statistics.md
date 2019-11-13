@@ -24,12 +24,13 @@ As an example, we show below the true density of a Gaussian random variable with
 ```{.python .input}
 import d2l
 from mxnet import np, npx
+import random
 from scipy.stats import t
 npx.set_np()
 
 # Sample datapoints and create y coordinate
 epsilon = 0.1
-np.random.seed(8675309)
+random.seed(8675309)
 xs = np.random.randn(300)
 ys = [np.sum(np.exp(-(xs[0:i] - xs[i])**2/(2 * epsilon**2)) / 
       np.sqrt(2*np.pi*epsilon**2))/len(xs) for i in range(len(xs))]
