@@ -4,16 +4,16 @@
 Undoubtedly, to be a top deep learning practitioner, the ability to train the state-of-the-art and high accurate models is crucial. Beyond that, understanding the mathematical mindset behind the models will strengthen your ability to deal with different probings, no matter in the interviews or the customer questioning such as “why should we trust the key parameters of your model?” As a result, in this section, we will empower you to explain the mathematical reasoning behind the models by introducing some fundamental concepts of statistics, which are the backbone of the deep learning algorithms.
 
 
-The earliest reference of *statistics* can be traced back to an Arab scholar Al-Kindi in the 9th-century, who gave a detailed description of how to use statistics and frequency analysis to decipher encrypted messages. His work laid the foundations for statistical and cryptanalysis. After 800 years, the modern statistics arose from Germany in 1700s, when the researchers focused on the systematic collection of demographic and economic data. Today, statistics is the science subject that concerns the collection, processing, analysis, interpretation and visualization of data. It has been widely used in government, business, sciences, etc.  
+The earliest reference of *statistics* can be traced back to an Arab scholar Al-Kindi in the 9th-century, who gave a detailed description of how to use statistics and frequency analysis to decipher encrypted messages. After 800 years, the modern statistics arose from Germany in 1700s, when the researchers focused on the demographic and economic data collection and analysis. Today, statistics is the science subject that concerns the collection, processing, analysis, interpretation and visualization of data. What is more, the core theory of statistics has been widely used in the research within academia, industry, and government.
 
 
-More specifically, statistics can be divided to *descriptive statistics* and *statistical inference*. The former is a summary statistic that quantitatively describes or summarizes features of a collection of observed data, which is referred to as a *sample*. The sample is drawn from a *population*, denotes the total set of similar individuals, items, or events of our experiment interests. Contrary to descriptive statistics, *Statistical inference* further deduces the characteristics of a population from *samples*, based on the assumptions that the sample distribution can replicate the population distribution at some degree.
+More specifically, statistics can be divided to *descriptive statistics* and *statistical inference*. The former focus on summarizing and illustrating the features of a collection of observed data, which is referred to as a *sample*. The sample is drawn from a *population*, denotes the total set of similar individuals, items, or events of our experiment interests. Contrary to descriptive statistics, *statistical inference* further deduces the characteristics of a population from the given *samples*, based on the assumptions that the sample distribution can replicate the population distribution at some degree.
 
 
-You may wonder: “What is the essential difference between deep learning and statistics?” Fundamentally speaking, statistics focuses on inference problems. This type of problems includes modeling the relationship between the variables, such as causal inference, and testing the statistically significance of model parameters, such as A/B testing. In contrast, deep learning emphasizes on making accurate predictions, without explicitly programming and understanding each parameter's functionality. 
+You may wonder: “What is the essential difference between deep learning and statistics?” Fundamentally speaking, statistics focuses on the inference problem. This type of problems includes modeling the relationship between the variables, such as causal inference, and testing the statistically significance of model parameters, such as A/B testing. In contrast, deep learning emphasizes on making accurate predictions, without explicitly programming and understanding each parameter's functionality. 
  
 
-In the section, we will introduce three types of statistics inference methods: evaluating and comparing estimators, conducting hypothesis tests, and constructing confidence intervals. These methods can help us infer the characteristics of a given population, i.e., the true parameter $\theta$. For brevity, we assume that the true parameter $\theta$ of a given population is a scale value. It is also straightforward to extend $\theta$ to a vector or a tensor, and evaluate its estimators using the same techniques below. 
+In this section, we will introduce three types of statistics inference methods: evaluating and comparing estimators, conducting hypothesis tests, and constructing confidence intervals. These methods can help us infer the characteristics of a given population, i.e., the true parameter $\theta$. For brevity, we assume that the true parameter $\theta$ of a given population is a scale value. It is also straightforward to extend $\theta$ to a vector or a tensor, and evaluate its estimators using the same techniques below. 
 
 
 ## Evaluating and Comparing Estimators
@@ -31,17 +31,17 @@ There are a lot functions to model an estimator $\hat{\theta_n}$, such as mean o
 
 ### Statistical Bias
 
-First, the *statistical bias* of an estimator is the difference between this estimator’s expected value and the true parameter value of $\theta$, i.e.,
+First, for an estimator $\hat{\theta}_n$, the mathematical illustration of *statistical bias* can be defined as
 
 $$bias (\hat{\theta}_n) = E(\hat{\theta}_n) - \theta.$$
 
-Note that when $bias(\hat{\theta}_n) = 0$, that is when the expectation of an estimator $\hat{ \theta}_n$ is equal to the value of the true estimator, then we say $\hat{\theta}_n$ is an unbiased estimator. Other things being equal, an unbiased estimator is more desirable than a biased estimator. However, biased estimators are frequently used in practice, especially when unbiased estimators does not exist without further assumptions.
+Note that when $bias(\hat{\theta}_n) = 0$, that is when the expectation of an estimator $\hat{ \theta}_n$ is equal to the value of the true estimator, we say $\hat{\theta}_n$ is an unbiased estimator. Theoretically, an unbiased estimator is more desirable than a biased estimator since its expectation is closer to the true parameter. However, in practice biased estimators are used when the unbiased estimators does not exist without further assumptions.
 
 
 ### Standard Deviation
 
 
-Recall in :numref:`sec_random_variables`, the *standard deviation* (or *standard error*) is defined as the squared root of the variance of an estimator, i.e.,
+Recall from :numref:`sec_random_variables`, the *standard deviation* (or *standard error*) is defined as the squared root of the variance of an estimator, i.e.,
 
 $$se(\hat{\theta}_n) = \sqrt{\mathrm{Var} (\hat{\theta}_n )} = \sqrt{E[(\hat{\theta}_n - E(\hat{\theta}_n))^2]}.$$
 
@@ -50,12 +50,12 @@ The standard deviation measures the average distance of each value from the mean
 
 ### Mean Squared Error
 
-Another widely used evaluating method, the *mean squared error (MSE)* (or *$l_2$ loss*) of an estimator is defined as the expectation of the square difference between $\hat{\theta}_n$ and the true parameter $\theta$, i.e.,
+Another widely used evaluating method, the *mean squared error (MSE)* (or *$l_2$ loss*) of an estimator can be defined as
 
 $$\mathrm{MSE} (\hat{\theta}_n, \theta) = E[(\hat{\theta}_n - \theta)^2].$$
 
 
-MSE is always non-negative. It is the most commonly used regression loss function. As a measure to evaluate an estimator, the more its value closer to zero, the more the estimator is close to the true parameter $\theta$.
+MSE is always non-negative. It is the most commonly used regression loss function. As a measure to evaluate an estimator, the closer its value to zero, the more the estimator is close to the true parameter $\theta$.
 
 
 ### Applications
@@ -70,7 +70,7 @@ $$
 \end{aligned}
 $$
 
-We refer the above formula as *bias-variance trade-off*. To be specific, the mean squared error can be divided into two error sources: the high bias error and the variance. On the one hand, the bias error is commonly seen in a simple model (such as a linear regression model), which cannot extract high dimensional relations between the features and the outputs. If a model suffers from high bias error, we often say it is *underfitting* or lack of *generalization* as introduced in (:numref:`sec_model_selection`). On the flip side, the other error source - high variance usually results from a too complex model, which overfits the training data. As a result, an *overfitting* model is sensitive to small fluctuations in the data. If a model suffers from high variance, we often say it is *overfitting* and lack of *flexibility* as introduced in (:numref:`sec_model_selection`).
+We refer the above formula as *bias-variance trade-off*. To be specific, the mean squared error can be divided into two error sources: the error from high bias and the error from high variance. On the one hand, the bias error is commonly seen in a simple model (such as a linear regression model), which cannot extract high dimensional relations between the features and the outputs. If a model suffers from high bias error, we often say it is *underfitting* or lack of *generalization* as introduced in (:numref:`sec_model_selection`). On the flip side, the other error source---high variance usually results from a too complex model, which overfits the training data. As a result, an *overfitting* model is sensitive to small fluctuations in the data. If a model suffers from high variance, we often say it is *overfitting* and lack of *flexibility* as introduced in (:numref:`sec_model_selection`).
 
 
 ### Implement Estimators from Scratch
@@ -118,12 +118,10 @@ np.square(samples.std()) + np.square(bias)
 ## Conducting Hypothesis Tests
 
 
-Another statistical inference method is hypothesis testing. While hypothesis testing was popularized in the early 20th century, the first use can be traced back to John Arbuthnot in the 1700s. By examining birth records in London for each of the 82 years from 1629 to 1710 and the human sex ratio at birth, John concluded that the number of males born in London exceeded the number of females in every year. 
-
-Following that, the modern significance testing is the intelligence heritage by Karl Pearson who invented $p$-value and Pearson's chi-squared test), William Gosset who is the father of Student's t-distribution, and Ronald Fisher who initialed the null hypothesis and the significance test. 
+Another statistical inference method is hypothesis testing. While hypothesis testing was popularized in the early 20th century, the first use can be traced back to John Arbuthnot in the 1700s. John tracked 80-year birth records in London and concluded that more men were born than women each year. Following that, the modern significance testing is the intelligence heritage by Karl Pearson who invented $p$-value and Pearson's chi-squared test), William Gosset who is the father of Student's t-distribution, and Ronald Fisher who initialed the null hypothesis and the significance test. 
 
 
-A *hypothesis test* is a way of evaluating some evidence against the default statement about a population. We refer the default statement as the *null hypothesis* $H_0$, which we try to reject using the observed data. Here, we use $H_0$ as a starting point for the statistical significance testing. The *alternative hypothesis* $H_A$ (or $H_1$) is a statement that is contrary to the null hypothesis. A great null hypothesis is often stated in a declarative form which posits a relationship between variables. It should reflect the brief as explicit as possible, and be testable by statistics theory. 
+A *hypothesis test* is a way of evaluating some evidence against the default statement about a population. We refer the default statement as the *null hypothesis* $H_0$, which we try to reject through the observed data. Here, we use $H_0$ as a starting point for the statistical significance testing. The *alternative hypothesis* $H_A$ (or $H_1$) is a statement that is contrary to the null hypothesis. A great null hypothesis is often stated in a declarative form which posits a relationship between variables. It should reflect the brief as explicit as possible, and be testable by statistics theory. 
 
 
 Imagine yourself as a chemist. After spending thousands of hours in the lab, you develop a new medicine which can dramatically improve one's ability to understand math. To show its magic power, you need to test it out. Naturally, you may need some volunteers to take the medicine and see whether the pills can help them learn math better. So how do you get started? First, you will need carefully random selected two groups of volunteers, so that there is no difference between their math understanding ability measured by some metrics. The two groups are commonly referred to as the test group and the control group. The *test group* (or *treatment group*) is a group of individuals who will experience the medicine, while the *control group* represents the group of users who are set aside as a benchmark, i.e., identical environment setups except taking this medicine. In this way, the influence of all the variables are minimized, except the impact of the independent variable in the treatment. Next, after a period of taking the medicine, you will need to measure the two groups' math understanding by the same metrics, such as letting the volunteers do the same tests after learning a new math formula. Then, you can collect their performance and compare the results. Really simple, isn't it? However, there are many details you have to think of carefully. For example, what is the suitable metrics to test their math understanding ability? How many volunteers for your test so you can be confident to claim the effectiveness of your medicine? How long should you run the test? And so on.
@@ -138,9 +136,9 @@ The *statistical significance* measures the probability of erroneously reject th
 
 $$ \text{statistical significance }= 1 - \alpha = P(\text{reject } H_0 \mid H_0 \text{ is true} ).$$
 
-It is also referred to as *type I error* or *false positive*. The $\alpha$, is called as the *significance level* and its commonly used value is $5\%$, i.e., $1-\alpha = 95\%$. Statistical significance can be explained as the level of risk that we are willing to take, when we reject a true null hypothesis. 
+It is also referred to as the *type I error* or *false positive*. The $\alpha$, is called as the *significance level* and its commonly used value is $5\%$, i.e., $1-\alpha = 95\%$. Statistical significance level can be explained as the level of risk that we are willing to take, when we reject a true null hypothesis. 
 
-:numref:`fig_statistical_significance` shows the the observations' values and probability of a given normal distribution in a two-sample hypothesis test. if the observation data point is located outsides the $95\%$ threshold, it will be a very unlikely observation under the null hypothesis assumption. Hence, there might be something wrong with the null hypothesis and we will reject it. 
+:numref:`fig_statistical_significance` shows the the observations' values and probability of a given normal distribution in a two-sample hypothesis test. If the observation data point is located outsides the $95\%$ threshold, it will be a very unlikely observation under the null hypothesis assumption. Hence, there might be something wrong with the null hypothesis and we will reject it. 
 
 ![Statistical significance.](../img/statistical_significance.svg)
 :label:`fig_statistical_significance`
