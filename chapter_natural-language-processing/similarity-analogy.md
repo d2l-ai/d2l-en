@@ -144,6 +144,6 @@ get_analogy('do', 'did', 'go', glove_6b50d)
 * If the dictionary is extremely large, how can we accelerate finding synonyms and analogies?
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2390)
+## [Discussions](https://discuss.mxnet.io/t/2390)
 
 ![](../img/qr_similarity-analogy.svg)

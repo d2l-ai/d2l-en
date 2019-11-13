@@ -311,6 +311,6 @@ We will cover these differences in detail in later chapters.
 1. Let $f(x) = \sin(x)$. Plot $f(x)$ and $\frac{df(x)}{dx}$, where the latter is computed without exploiting that $f'(x) = \cos(x)$.
 1. In a second-price auction (such as in eBay or in computational advertising), the winning bidder pays the second-highest price. Compute the gradient of the final price with respect to the winning bidder's bid using `autograd`. What does the result tell you about the mechanism? If you are curious to learn more about second-price auctions, check out the paper by Edelman et al. :cite`Edelman.Ostrovsky.Schwarz.2007`.
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2318)
+## [Discussions](https://discuss.mxnet.io/t/2318)
 
 ![](../img/qr_autograd.svg)

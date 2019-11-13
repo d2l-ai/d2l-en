@@ -1549,6 +1549,6 @@ than the potential of malevolent superintelligence to destroy humanity.
 1. Viewing the development of artificial intelligence as a new industrial revolution, what is the relationship between algorithms and data? Is it similar to steam engines and coal (what is the fundamental difference)?
 1. Where else can you apply the end-to-end training approach? Physics? Engineering? Econometrics?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2310)
+## [Discussions](https://discuss.mxnet.io/t/2310)
 
 ![](../img/qr_intro.svg)

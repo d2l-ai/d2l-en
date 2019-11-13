@@ -203,6 +203,6 @@ i.e., we usually have $p_h = p_w$ and $s_h = s_w$.
 1. For audio signals, what does a stride of $2$ correspond to?
 1. What are the computational benefits of a stride larger than $1$.
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2350)
+## [Discussions](https://discuss.mxnet.io/t/2350)
 
 ![](../img/qr_padding-and-strides.svg)

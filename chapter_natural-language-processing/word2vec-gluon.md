@@ -172,6 +172,6 @@ get_similar_tokens('chip', 3, net[0])
 * When the dataset is large, we usually sample the context words and the noise words for the central target word in the current minibatch only when updating the model parameters. In other words, the same central target word may have different context words or noise words in different epochs. What are the benefits of this sort of training? Try to implement this training method.
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2387)
+## [Discussions](https://discuss.mxnet.io/t/2387)
 
 ![](../img/qr_word2vec-gluon.svg)

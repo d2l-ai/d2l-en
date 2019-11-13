@@ -68,7 +68,7 @@ d2l.train_gluon_ch10('adadelta', {'rho': 0.9}, data_iter)
 1. Is Adadelta really learning rate free? Could you find optimization problems that break Adadelta?
 1. Compare Adadelta to Adagrad and RMS prop to discuss their convergence behavior.
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2377)
+## [Discussions](https://discuss.mxnet.io/t/2377)
 
 ![](../img/qr_adadelta.svg)
 

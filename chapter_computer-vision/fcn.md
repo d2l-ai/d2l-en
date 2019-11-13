@@ -200,6 +200,6 @@ d2l.show_images(imgs[::3] + imgs[1::3] + imgs[2::3], 3, n, scale=2);
 * The outputs of some intermediate layers of the convolutional neural network are also used in the paper on fully convolutional networks[1]. Try to implement this idea.
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2454)
+## [Discussions](https://discuss.mxnet.io/t/2454)
 
 ![](../img/qr_fcn.svg)

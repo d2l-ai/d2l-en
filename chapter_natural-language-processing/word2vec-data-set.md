@@ -266,6 +266,6 @@ for batch in data_iter:
 
 * We use the `batchify` function to specify the minibatch reading method in the `DataLoader` instance and print the shape of each variable in the first batch read. How should these shapes be calculated?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/4356)
+## [Discussions](https://discuss.mxnet.io/t/4356)
 
 ![](../img/qr_word2vec-data-set.svg)

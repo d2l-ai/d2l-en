@@ -190,7 +190,7 @@ Interestingly, LSTMs are the prototypical latent variable autoregressive model w
 1. Implement an LSTM for a time series prediction besides the character sequences prediction.
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2368)
+## [Discussions](https://discuss.mxnet.io/t/2368)
 
 ![](../img/qr_lstm.svg)
 

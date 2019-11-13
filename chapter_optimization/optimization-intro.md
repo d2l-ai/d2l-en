@@ -152,6 +152,6 @@ As we saw, optimization for deep learning is full of challenges. Fortunately the
     * Can you exploit this effect also for optimization algorithms?
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2371)
+## [Discussions](https://discuss.mxnet.io/t/2371)
 
 ![](../img/qr_optimization-intro.svg)

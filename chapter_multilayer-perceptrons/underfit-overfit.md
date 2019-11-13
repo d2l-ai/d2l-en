@@ -588,6 +588,6 @@ such as weight decay and dropout.
 1. What degree of polynomial do you need to reduce the training error to 0?
 1. Can you ever expect to see 0 generalization error?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2341)
+## [Discussions](https://discuss.mxnet.io/t/2341)
 
 ![](../img/qr_underfit-overfit.svg)

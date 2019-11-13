@@ -274,6 +274,6 @@ def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
 1. If we want a sequence example to be a complete sentence, what kinds of problems does this introduce in minibatch sampling? Why would we want to do this anyway?
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2361)
+## [Discussions](https://discuss.mxnet.io/t/2361)
 
 ![](../img/qr_lang-model.svg)

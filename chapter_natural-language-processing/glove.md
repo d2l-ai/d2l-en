@@ -95,6 +95,6 @@ By taking the square error and weighting the left and right sides of the formula
 * For any word, will its central target word bias term and context word bias term be equivalent to each other in GloVe? Why?
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2389)
+## [Discussions](https://discuss.mxnet.io/t/2389)
 
 ![](../img/qr_glove.svg)

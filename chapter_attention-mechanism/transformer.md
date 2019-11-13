@@ -448,6 +448,6 @@ for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
 * Compare layer normalization and batch normalization, what are the suitable scenarios to apply them?
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/4344)
+## [Discussions](https://discuss.mxnet.io/t/4344)
 
 ![](../img/qr_transformer.svg)

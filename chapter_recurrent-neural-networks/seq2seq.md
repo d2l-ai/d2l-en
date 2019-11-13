@@ -227,6 +227,6 @@ for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
 * The sequence to sequence (seq2seq) model is based on the encoder-decoder architecture to generate a sequence output for a sequence input.
 * We use multiple LSTM layers for encoder and decoder.
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/4357)
+## [Discussions](https://discuss.mxnet.io/t/4357)
 
 ![](../img/qr_seq2seq.svg)

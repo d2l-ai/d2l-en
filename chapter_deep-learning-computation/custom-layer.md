@@ -110,6 +110,6 @@ net(np.random.uniform(size=(2, 64)))
 1. Design a layer that takes an input and computes a tensor reduction, i.e., it returns $y_k = \sum_{i,j} W_{ijk} x_i x_j$.
 1. Design a layer that returns the leading half of the Fourier coefficients of the data. Hint - look up the `fft` function in MXNet.
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2328)
+## [Discussions](https://discuss.mxnet.io/t/2328)
 
 ![](../img/qr_custom-layer.svg)

@@ -185,6 +185,6 @@ A similar reasoning shows that the probability of picking a sample exactly once 
 1. How would you change the SGD solver if some gradient (or rather some coordinate associated with it) was consistently larger than all other gradients?
 1. Assume that $f(x) = x^2 (1 + \sin x)$. How many local minima does $f$ have? Can you change $f$ in such a way that to minimize it one needs to evaluate all local minima?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2372)
+## [Discussions](https://discuss.mxnet.io/t/2372)
 
 ![](../img/qr_gd-sgd.svg)

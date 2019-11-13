@@ -400,6 +400,6 @@ have similar training procedures.
 1. Is it always a good idea to return the most likely label. E.g. would you do this for medical diagnosis?
 1. Assume that we want to use softmax regression to predict the next word based on some features. What are some problems that might arise from a large vocabulary?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2336)
+## [Discussions](https://discuss.mxnet.io/t/2336)
 
 ![](../img/qr_softmax-regression-scratch.svg)

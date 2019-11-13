@@ -67,6 +67,6 @@ The main symbols used in this book are listed below.
 |$\mathcal{o}$|Little o notation (grows much more slowly than)|
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/list-of-main-symbols/4367)
+## [Discussions](https://discuss.mxnet.io/t/list-of-main-symbols/4367)
 
 ![](../img/qr_list-of-main-symbols.svg)

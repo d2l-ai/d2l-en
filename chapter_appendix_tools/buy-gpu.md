@@ -59,6 +59,6 @@ The second curve shows how energy consumption scales mostly linearly with the am
 * High density servers may not be compatible with all GPUs. Check the mechanical and cooling specifications before you buy.
 * Use FP16 or lower precision for high efficiency. 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2400)
+## [Discussions](https://discuss.mxnet.io/t/2400)
 
 ![](../img/qr_buy-gpu.svg)

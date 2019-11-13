@@ -269,6 +269,6 @@ train_ch5(net, train_iter, test_iter, num_epochs, lr)
 1. Display the activations of the first and second layer of LeNet for different inputs (e.g., sweaters, coats).
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2353)
+## [Discussions](https://discuss.mxnet.io/t/2353)
 
 ![](../img/qr_lenet.svg)

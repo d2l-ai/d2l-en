@@ -264,6 +264,6 @@ X
 1. For a tensor `X` of arbitrary shape, does `len(X)` always correspond to the length of a certain axis of `X`? What is that axis?
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2317)
+## [Discussions](https://discuss.mxnet.io/t/2317)
 
 ![](../img/qr_scalar-tensor.svg)

@@ -349,6 +349,6 @@ $$\mathrm{Var}[f(x)] = E\left[\left(f(x) - E[f(x)]\right)^2\right].$$
 1. In :numref:`subsec_probability_hiv_app`, the first test is more accurate. Why not just run the first test a second time?
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2319)
+## [Discussions](https://discuss.mxnet.io/t/2319)
 
 ![](../img/qr_probability.svg)

@@ -431,6 +431,6 @@ d2l.plt.legend();
 * Refer to the SSD paper. What methods can be used to evaluate the precision of
   object detection models :cite:`Liu.Anguelov.Erhan.ea.2016`?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2453)
+## [Discussions](https://discuss.mxnet.io/t/2453)
 
 ![](../img/qr_ssd.svg)

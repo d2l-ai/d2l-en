@@ -139,6 +139,6 @@ if we tried to code all of our models from scratch in practice.
 1. Try adjusting the hyper-parameters, such as batch size, epoch, and learning rate, to see what the results are.
 1. Why might the test accuracy decrease again after a while? How could we fix this?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2337)
+## [Discussions](https://discuss.mxnet.io/t/2337)
 
 ![](../img/qr_softmax-regression-gluon.svg)

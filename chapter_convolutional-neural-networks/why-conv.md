@@ -245,6 +245,6 @@ All of this will be addressed in the remainder of the chapter.
 1. What goes wrong when you apply the above reasoning to text? Hint - what is the structure of language?
 1. Prove that $f \circledast g = g \circledast f$.
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2348)
+## [Discussions](https://discuss.mxnet.io/t/2348)
 
 ![](../img/qr_why-conv.svg)

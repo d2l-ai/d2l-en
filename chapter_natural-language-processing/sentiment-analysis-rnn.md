@@ -142,6 +142,6 @@ predict_sentiment(net, vocab, 'this movie is so bad')
 
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2391)
+## [Discussions](https://discuss.mxnet.io/t/2391)
 
 ![](../img/qr_sentiment-analysis-rnn.svg)

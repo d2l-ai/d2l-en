@@ -120,6 +120,6 @@ def load_data_imdb(batch_size, num_steps=500):
 
 * Discover a different natural language dataset (such as [Amazon reviews](https://snap.stanford.edu/data/web-Amazon.html)) and build a similar data_loader function as `load_data_imdb`.
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/4355)
+## [Discussions](https://discuss.mxnet.io/t/4355)
 
 ![](../img/qr_sentiment-analysis.svg)

@@ -180,6 +180,6 @@ atten(np.ones((2,1,2)), keys, values, np.array([2, 6]))
 * What are the advantages and disadvantages for DotProductAttention and MLPAttention respectively?
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/attention/4343)
+## [Discussions](https://discuss.mxnet.io/t/attention/4343)
 
 ![](../img/qr_attention.svg)

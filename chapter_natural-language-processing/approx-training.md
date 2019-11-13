@@ -84,6 +84,6 @@ In addition, because the order of magnitude for $L(w_o)-1$ is $\mathcal{O}(\text
 * What makes the last formula in this section hold?
 * How can we apply negative sampling and hierarchical softmax in the skip-gram model?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2386)
+## [Discussions](https://discuss.mxnet.io/t/2386)
 
 ![](../img/qr_approx-training.svg)

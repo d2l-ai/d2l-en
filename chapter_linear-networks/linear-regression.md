@@ -607,6 +607,6 @@ statistics, and computer science.
     * Can you find a closed form solution?
     * Suggest a stochastic gradient descent algorithm to solve this problem. What could possibly go wrong (hint - what happens near the stationary point as we keep on updating the parameters). Can you fix this?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2331)
+## [Discussions](https://discuss.mxnet.io/t/2331)
 
 ![](../img/qr_linear-regression.svg)

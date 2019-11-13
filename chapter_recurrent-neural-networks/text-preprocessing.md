@@ -135,6 +135,6 @@ len(corpus), len(vocab)
 
 * Tokenization is a key preprocessing step. It varies for different languages. Try to find another 3 commonly used methods to tokenize sentences. 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2363)
+## [Discussions](https://discuss.mxnet.io/t/2363)
 
 ![](../img/qr_lang-model-dataset.svg)

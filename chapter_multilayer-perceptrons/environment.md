@@ -494,6 +494,6 @@ Should what news someone is exposed to be determined by which Facebook pages the
 1. Implement a covariate shift corrector.
 1. What could go wrong if training and test set are very different? What would happen to the sample weights?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2347)
+## [Discussions](https://discuss.mxnet.io/t/2347)
 
 ![](../img/qr_environment.svg)

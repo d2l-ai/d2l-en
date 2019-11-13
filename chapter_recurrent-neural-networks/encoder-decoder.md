@@ -76,6 +76,6 @@ class EncoderDecoder(nn.Block):
 2. An *autoencoder* is a type of neural network used for unsupervised learning. The aim of an autoencoder is to learn a representation typically for dimensionality reduction. Can you compare it with the encoder-decoder architecture we introduced in this section?
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2396)
+## [Discussions](https://discuss.mxnet.io/t/2396)
 
 ![](../img/qr_encoder-decoder.svg)

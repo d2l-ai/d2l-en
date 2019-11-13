@@ -136,6 +136,6 @@ for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
 * Can you think of any scenarios that the `Seq2SeqAttentionDecoder` will outperform the `Seq2seqDecoder`?
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/seq2seq-attention/4345)
+## [Discussions](https://discuss.mxnet.io/t/seq2seq-attention/4345)
 
 ![](../img/qr_seq2seq-attention.svg)

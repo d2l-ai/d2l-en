@@ -106,6 +106,6 @@ Compared with last section, this model achieves comparable perplexity, albeit wi
     * How many bits do you need?
     * Why does not everyone use this model for text compression? Hint - what about the compressor itself?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2365)
+## [Discussions](https://discuss.mxnet.io/t/2365)
 
 ![](../img/qr_rnn-gluon.svg)

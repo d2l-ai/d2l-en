@@ -259,6 +259,6 @@ This algorithm converges rapidly (for an analysis and proof see e.g., :cite:`Boy
     * Apply this to the problem above.
 1. Apply the algorithm above to a number of objective functions (convex or not). What happens if you rotate coordinates by $45$ degrees?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2372)
+## [Discussions](https://discuss.mxnet.io/t/2372)
 
 ![](../img/qr_gd-sgd.svg)

@@ -424,6 +424,6 @@ nd the total number of predictions.
     * What does the soft-min look like?
     * Extend this to more than two numbers.
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2334)
+## [Discussions](https://discuss.mxnet.io/t/2334)
 
 ![](../img/qr_softmax-regression.svg)
