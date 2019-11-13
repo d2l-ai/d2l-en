@@ -145,6 +145,6 @@ d2l.train_gluon_ch10('adagrad', {'learning_rate': 0.1}, data_iter)
 1. How would you need to modify Adagrad to achieve a less aggressive decay in learning rate?
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2375)
+## [Discussions](https://discuss.mxnet.io/t/2375)
 
 ![](../img/qr_adagrad.svg)

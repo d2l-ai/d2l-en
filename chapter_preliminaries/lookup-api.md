@@ -48,6 +48,6 @@ For further details on the API details check the MXNet website at  [http://mxnet
 3. Can you rewrite `np.random.choice(4, 2)` by using the `np.random.randint` function?
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2322)
+## [Discussions](https://discuss.mxnet.io/t/2322)
 
 ![](../img/qr_lookup-api.svg)

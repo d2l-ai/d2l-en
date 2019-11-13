@@ -107,7 +107,7 @@ d2l.train_gluon_ch10('rmsprop', {'learning_rate': 0.01, 'gamma1': 0.9}, data_ite
 1. Would you want to adjust $\gamma$ as optimization progresses? How sensitive is RMSProp to this?
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2376)
+## [Discussions](https://discuss.mxnet.io/t/2376)
 
 ![](../img/qr_rmsprop.svg)
 

@@ -277,6 +277,6 @@ While writing the above RNN model from scratch is instructive, it is not conveni
 1. Replace the activation function used in this section with ReLU and repeat the experiments in this section.
 1. Prove that the perplexity is the inverse of the harmonic mean of the conditional word probabilities.
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2364)
+## [Discussions](https://discuss.mxnet.io/t/2364)
 
 ![](../img/qr_rnn-scratch.svg)

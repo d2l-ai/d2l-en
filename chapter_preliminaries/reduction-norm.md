@@ -457,6 +457,6 @@ or other excellent resources :cite:`Strang.1993,Kolter.2008,Petersen.Pedersen.ea
 1. Feed a tensor with 3 or more axes to the `linalg.norm` function and observe its output. What does this function compute for `ndarray`s of arbitrary shape?
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/4974)
+## [Discussions](https://discuss.mxnet.io/t/4974)
 
 ![](../img/qr_reduction-norm.svg)

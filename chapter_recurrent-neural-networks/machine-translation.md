@@ -154,6 +154,6 @@ for X, X_vlen, Y, Y_vlen, in train_iter:
 1. Can you find a machine translation dataset online and process it with this jupyter notebook?
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/machine-translation/2396)
+## [Discussions](https://discuss.mxnet.io/t/machine-translation/2396)
 
 ![](../img/qr_machine-translation.svg)

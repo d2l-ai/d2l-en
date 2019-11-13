@@ -257,6 +257,6 @@ as a convolution even though, strictly-speaking, it is slightly different.
     * What is the kernel for an integral?
     * What is the minimum size of a kernel to obtain a derivative of degree $d$?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2349)
+## [Discussions](https://discuss.mxnet.io/t/2349)
 
 ![](../img/qr_conv-layer.svg)

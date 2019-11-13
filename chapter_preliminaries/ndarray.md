@@ -414,6 +414,6 @@ a, a.item(), float(a), int(a)
 1. Replace the two `ndarray`s that operate by element in the broadcasting mechanism with other shapes, e.g., three dimensional tensors. Is the result the same as expected?
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2316)
+## [Discussions](https://discuss.mxnet.io/t/2316)
 
 ![](../img/qr_ndarray.svg)

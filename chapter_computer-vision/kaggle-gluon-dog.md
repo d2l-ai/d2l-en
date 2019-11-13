@@ -324,6 +324,6 @@ method for submitting results is similar to method in
 * Do you get better results if you use a deeper pre-trained model?
 * Scan the QR code to access the relevant discussions and exchange ideas about the methods used and the results obtained with the community. Can you come up with any better techniques?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2451)
+## [Discussions](https://discuss.mxnet.io/t/2451)
 
 ![](../img/qr_kaggle-gluon-dog.svg)

@@ -181,6 +181,6 @@ We are now ready to work with the FashionMNIST dataset in the sections that folo
 1. Use the MXNet documentation to see which other datasets are available in `mxnet.gluon.data.vision`.
 1. Use the MXNet documentation to see which other transformations are available in `mxnet.gluon.data.vision.transforms`.
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2335)
+## [Discussions](https://discuss.mxnet.io/t/2335)
 
 ![](../img/qr_fashion-mnist.svg)

@@ -165,6 +165,6 @@ d2l.train_ch5(net, train_iter, test_iter, num_epochs, lr)
 1. Design a DenseNet for fully connected networks and apply it to the Housing Price prediction task.
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2360)
+## [Discussions](https://discuss.mxnet.io/t/2360)
 
 ![](../img/qr_densenet.svg)
