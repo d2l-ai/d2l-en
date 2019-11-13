@@ -64,16 +64,16 @@ This allows us to quantify the average squared deviation from the true value.  M
 
 ### Statistical Bias
 
-The MSE provides a natural metric, but we can easily imagine multiple different phenomina that might make it large.  Two that we will see are fundamentally important are the flucutation in the estimator due to randomness in the dataset, and systematic error in the estimator due to the estimation proceedure.  
+The MSE provides a natural metric, but we can easily imagine multiple different phenomena that might make it large.  Two that we will see are fundamentally important are the fluctuation in the estimator due to randomness in the dataset, and systematic error in the estimator due to the estimation procedure.  
 
 First, let us measure the systematic error.  The *statistical bias* of an estimator is the difference between this estimator’s expected value and the true parameter value of $\theta$, i.e.,
 
 $$\mathrm{bias}(\hat{\theta}_n) = E(\hat{\theta}_n - \theta) = E(\hat{\theta}_n) - \theta.$$
 :eqlabel:`eq_bias`
 
-Note that when $\mathrm{bias}(\hat{\theta}_n) = 0$, the expectation of the estimator $\hat{\theta}_n$ is equal to the true value of parameter.  In this case, we say $\hat{\theta}_n$ is an unbiased estimator.  In general, an unbiased estimator is more desirable than a biased estimator since you can guarentee that on average the value you measure is the one you are trying to find. 
+Note that when $\mathrm{bias}(\hat{\theta}_n) = 0$, the expectation of the estimator $\hat{\theta}_n$ is equal to the true value of parameter.  In this case, we say $\hat{\theta}_n$ is an unbiased estimator.  In general, an unbiased estimator is more desirable than a biased estimator since you can guarantee that on average the value you measure is the one you are trying to find. 
 
-It is worth being aware, however, that biased estimators are frequently used in practice.  There are cases where unbiased estimators do not exist without further assumptions, or are intractible to compute.  This may seem like a significant flaw in an estimator, however the majority of estimators encountered in practice are at least asymptotically unbiased in the sense that the bias tends to zero as the number of available samples tends to infinity: $\lim_{n \rightarrow \infty} \mathrm{bias}(\hat{\theta}_n) = 0$.
+It is worth being aware, however, that biased estimators are frequently used in practice.  There are cases where unbiased estimators do not exist without further assumptions, or are intractable to compute.  This may seem like a significant flaw in an estimator, however the majority of estimators encountered in practice are at least asymptotically unbiased in the sense that the bias tends to zero as the number of available samples tends to infinity: $\lim_{n \rightarrow \infty} \mathrm{bias}(\hat{\theta}_n) = 0$.
 
 
 ### Variance and Standard Deviation
@@ -83,7 +83,7 @@ Second, let us measure the randomness in the estimator.  Recall in :numref:`sec_
 $$\sigma_{\hat{\theta}_n} = \sqrt{\mathrm{Var} (\hat{\theta}_n )} = \sqrt{E[(\hat{\theta}_n - E(\hat{\theta}_n))^2]}.$$
 :eqlabel:`eq_var_est`
 
-It is important to compare :eqref:`eq_var_est` to :eqref:`eq_mse_est`.  In this equation we do not compare to the true population value $\theta$, but instead to $E(\hat{\theta}_n)$, the expected sample mean.  Thus we are not measuring how far the estimateor tends to be from the true value, but instead we measuring the fluctuation of the estimator itself.
+It is important to compare :eqref:`eq_var_est` to :eqref:`eq_mse_est`.  In this equation we do not compare to the true population value $\theta$, but instead to $E(\hat{\theta}_n)$, the expected sample mean.  Thus we are not measuring how far the estimator tends to be from the true value, but instead we measuring the fluctuation of the estimator itself.
 
 ### The Bias-Variance Trade-off
 
@@ -97,12 +97,12 @@ $$
 \end{aligned}
 $$
 
-We refer the above formula as *bias-variance trade-off*. The mean squared error can be divided into precicely two sources of error: the high bias error and the variance. On the one hand, the bias error is commonly seen in a simple model (such as a linear regression model), which cannot extract high dimensional relations between the features and the outputs. If a model suffers from high bias error, we often say it is *underfitting* or lack of *generalization* as introduced in (:numref:`sec_model_selection`). On the flip side, the other error source - high variance usually results from a too complex model, which overfits the training data. As a result, an *overfitting* model is sensitive to small fluctuations in the data. If a model suffers from high variance, we often say it is *overfitting* and lack of *flexibility* as introduced in (:numref:`sec_model_selection`).
+We refer the above formula as *bias-variance trade-off*. The mean squared error can be divided into precisely two sources of error: the high bias error and the variance. On the one hand, the bias error is commonly seen in a simple model (such as a linear regression model), which cannot extract high dimensional relations between the features and the outputs. If a model suffers from high bias error, we often say it is *underfitting* or lack of *generalization* as introduced in (:numref:`sec_model_selection`). On the flip side, the other error source - high variance usually results from a too complex model, which overfits the training data. As a result, an *overfitting* model is sensitive to small fluctuations in the data. If a model suffers from high variance, we often say it is *overfitting* and lack of *flexibility* as introduced in (:numref:`sec_model_selection`).
 
 
 ### Evaluating Estimators in Code
 
-Since the standard deviation of an estimator has been implementing in MXNet by simply calling `a.std()` for a ndarray "a", we will skip it but implement the statistical bias and the mean squared error in MXNet.
+Since the standard deviation of an estimator has been implementing in MXNet by simply calling `a.std()` for a `ndarray` "a", we will skip it but implement the statistical bias and the mean squared error in MXNet.
 
 ```{.python .input}
 # Statistical bias
@@ -157,7 +157,7 @@ This is still not fully formal.  There are many details you have to think of car
 
 In this way, hypothesis testing provides framework for experimental design and reasoning about certainty in observed results.  If we can now show that the null hypothesis is very unlikely to be true, we may reject it with confidence.
 
-To complete the story of how to work with hypothesis testing, we need to now introduce somt additional terminology and make some of our concepts above formal.
+To complete the story of how to work with hypothesis testing, we need to now introduce some additional terminology and make some of our concepts above formal.
 
 
 ### Statistical Significance 
@@ -183,9 +183,9 @@ Recall that a *type I error* is the rejection of a true null hypothesis.  We wil
 
 Intuitively, statistical power can be interpreted as how likely our test will detect a real discrepancy of some minimum magnitude at a desired statistical significance level. $80\%$ is a commonly used statistical power threshold. The higher the statistical power, the more likely we are to detect true differences. 
 
-One of the most common uses of statistical power is in determining the number of samples needed.  The probability you reject the null hypothesis when it is false depends on the degree to which it is false (known as the *effect size*) and the number of samples you have.  As you might expect, small effect sizes will require a very large number of samples to be detectible with high probability.  While beyond the scope of this brief appendix to derive in detail, as an example, want to be able to reject a null hypothesis that our sample came from a mean zero variance one Gaussian, and we believe that our sample's mean is actually close to one, we can do so with acceptable error rates with a sample size of only $8$.  However, if we think our sample populations true mean is close to $0.01$, then we'd need a sample size of nearly $80000$ to detect the difference.
+One of the most common uses of statistical power is in determining the number of samples needed.  The probability you reject the null hypothesis when it is false depends on the degree to which it is false (known as the *effect size*) and the number of samples you have.  As you might expect, small effect sizes will require a very large number of samples to be detectable with high probability.  While beyond the scope of this brief appendix to derive in detail, as an example, want to be able to reject a null hypothesis that our sample came from a mean zero variance one Gaussian, and we believe that our sample's mean is actually close to one, we can do so with acceptable error rates with a sample size of only $8$.  However, if we think our sample populations true mean is close to $0.01$, then we'd need a sample size of nearly $80000$ to detect the difference.
 
-We can imagine the power as the fishing net as shown in :numref:`fig_statistical_power`. In this analogy, a high power hypothesis test is like a fine-mesh fishing net, and a low power hypothesis test is like a coarse-mesh one.  Smaller effect sizes, like smaller fish, will slip through the coarser fishing net and be missed, whereas they will be cought by the finer one.  The analogy is rather apt, since just as one needs more rope to create a finer net, one also often needs more data to assure a higher level of statistical power.
+We can imagine the power as the fishing net as shown in :numref:`fig_statistical_power`. In this analogy, a high power hypothesis test is like a fine-mesh fishing net, and a low power hypothesis test is like a coarse-mesh one.  Smaller effect sizes, like smaller fish, will slip through the coarser fishing net and be missed, whereas they will be caught by the finer one.  The analogy is rather apt, since just as one needs more rope to create a finer net, one also often needs more data to assure a higher level of statistical power.
 
 ![Statistical significance.](../img/statistical_power.svg)
 :label:`fig_statistical_power`
@@ -229,7 +229,7 @@ Hypothesis testing is applicable in a variety of scenarios such as the clinical 
 
 When estimating the value of a parameter $\theta$, point estimators like $\hat \theta$ are of limited utility since they contain no notion of uncertainty. Rather, it would be far better if we could produce an interval that would contain the true parameter $\theta$ with high probability.  If you were interested in such ideas a century ago, then you would have been excited to read "Outline of a Theory of Statistical Estimation Based on the Classical Theory of Probability" by Jerzy Neyman :cite:`Neyman.1937`, who first introduced the concept of confidence interval in 1937.
 
-To be useful, a confidence interval should be as small as possible for a given degree of certanty. Let us see how to derive it.
+To be useful, a confidence interval should be as small as possible for a given degree of certainty. Let us see how to derive it.
 
 
 ### Definition
@@ -247,9 +247,9 @@ Note that :eqref:`eq_confidence` is about variable $C_n$, not about the fixed $\
 
 It is very tempting to interpret a $95\%$ confidence interval as an interval where you can be $95\%$ sure the true parameter lies, however this is sadly not true.  The true parameter is fixed, and it is the interval that is random.  Thus a better interpretation would be to say that if you generated a large number of confidence intervals by this procedure, $95\%$ of the generated intervals would contain the true parameter.
 
-This may seem pedantic, but it can have real implications for the interpretation of the results.  In particular, we may satisfy :eqref:`eq_confidence` by constucting intervals that we are *almost certain* do not contain the true value, as long as we only do so rarely enough.  We close this section by providing three tempting but false statements.  An in-depth discussion of these points can be found in :cite:`Morey.Hoekstra.Rouder.ea.2016`.
+This may seem pedantic, but it can have real implications for the interpretation of the results.  In particular, we may satisfy :eqref:`eq_confidence` by constructing intervals that we are *almost certain* do not contain the true value, as long as we only do so rarely enough.  We close this section by providing three tempting but false statements.  An in-depth discussion of these points can be found in :cite:`Morey.Hoekstra.Rouder.ea.2016`.
 
-* *Fallacy 1*. Narrow confidence intervals mean we can estimate the parameter precicely.
+* *Fallacy 1*. Narrow confidence intervals mean we can estimate the parameter precisely.
 * *Fallacy 2*. The values inside the confidence interval are more likely to be the true value than those outside the interval.
 * *Fallacy 3*. The probability) that a particular observed $95\%$ confidence interval contains the true value is $95\%$.
 
