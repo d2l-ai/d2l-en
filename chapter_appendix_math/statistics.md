@@ -47,7 +47,7 @@ d2l.plt.axvline(x=0)
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('density')
 d2l.plt.axvline(x=np.mean(xs), linestyle='--',color='purple')
-d2l.plt.title("Sample Mean: {:.2f}".format(np.mean(xs)))
+d2l.plt.title("Sample Mean: {:.2f}".format(float(np.mean(xs)))
 d2l.plt.show()
 ```
 
