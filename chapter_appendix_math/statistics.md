@@ -298,7 +298,7 @@ t_star = t.ppf(1 - alpha/2, df=1)
 
 # Construct interval
 mu_hat = np.mean(samples)
-sigma_hat = np.std(samples,ddof = 1)
+sigma_hat = samples.std(ddof = 1)
 (mu_hat - t_star*sigma_hat/np.sqrt(N), mu_hat + t_star*sigma_hat/np.sqrt(N))
 ```
 
