@@ -319,6 +319,6 @@ for any $i = 1, 2, \ldots, n$.
 1. Can you write out the chain rule for the case where $u = f(x, y, z)$ and $x = x(a, b)$, $y = y(a, b)$, and $z = z(a, b)$?
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/5008)
+## [Discussions](https://discuss.mxnet.io/t/5008)
 
 ![](../img/qr_calculus.svg)

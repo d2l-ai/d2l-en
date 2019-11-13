@@ -338,6 +338,6 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 1. Replace the dropout activation with a random variable that takes on values of $[0, \gamma/2, \gamma]$. Can you design something that works better than the binary dropout function? Why might you want to use it? Why not?
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2343)
+## [Discussions](https://discuss.mxnet.io/t/2343)
 
 ![](../img/qr_dropout.svg)

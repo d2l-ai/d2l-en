@@ -81,6 +81,6 @@ for ax, label in zip(axes, batch.label[0][0:10]):
 
 * Referring to the MXNet documentation, what are the parameters for the constructors of the `image.ImageDetIter` and `image.CreateDetAugmenter` classes? What is their significance?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2452)
+## [Discussions](https://discuss.mxnet.io/t/2452)
 
 ![](../img/qr_object-detection-dataset.svg)

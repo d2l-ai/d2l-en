@@ -237,6 +237,6 @@ In practice, we can remove prediction bounding boxes with lower confidence level
 * Modify the variable `anchors` in the "Labeling Training Set Anchor Boxes" and "Output Bounding Boxes for Prediction" sections. How do the results change?
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2445)
+## [Discussions](https://discuss.mxnet.io/t/2445)
 
 ![](../img/qr_anchor.svg)

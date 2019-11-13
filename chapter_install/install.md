@@ -192,6 +192,6 @@ For installation of MXNet on other platforms, please refer to http://numpy.mxnet
 1. Download the code for the book and install the runtime environment.
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2315)
+## [Discussions](https://discuss.mxnet.io/t/2315)
 
 ![](../img/qr_install.svg)

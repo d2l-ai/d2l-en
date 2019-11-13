@@ -130,6 +130,6 @@ Y == np.dot(W.T, X.reshape(-1)).reshape(3, 3)
 
 * Is it efficient to use matrix multiplication to implement convolution operations? Why?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/transposed-convolution/4366)
+## [Discussions](https://discuss.mxnet.io/t/transposed-convolution/4366)
 
 ![](../img/qr_transposed-conv.svg)

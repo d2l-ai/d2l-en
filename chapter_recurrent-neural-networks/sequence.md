@@ -4,7 +4,7 @@
 Imagine that you are watching movies on Netflix. As a good Netflix user, you decide to rate each of the movies religiously. After all, a good movie is a good movie, and you want to watch more of them, right? As it turns out, things are not quite so simple. People's opinions on movies can change quite significantly over time. In fact, psychologists even have names for some of the effects:
 
 * There is [anchoring](https://en.wikipedia.org/wiki/Anchoring), based on someone else's opinion. For instance after the Oscar awards, ratings for the corresponding movie go up, even though it is still the same movie. This effect persists for a few months until the award is forgotten. :cite:`Wu.Ahmed.Beutel.ea.2017` showed that the effect lifts rating by over half a point.
-* There is the [Hedonic adaptation](https://en.wikipedia.org/wiki/Hedonic_treadmill), where humans quickly adapt to accept an improved (or a bad) situation as the new normal. For instance, after watching many good movies, the expectations that the next movie be equally good or better are high, and hence even an average movie might be considered a bad movie after many great ones.
+* There is the [Hedonic adaptation](https://en.wikipedia.org/wiki/Hedonic_treadmill), where humans quickly adapt to accept an improved (or a bad) situation as the new normal. For instance, after watching many good movies, the expectations that the next movie is equally good or better are high, hence even an average movie might be considered a bad movie after many great ones.
 * There is seasonality. Very few viewers like to watch a Santa Claus movie in August.
 * In some cases movies become unpopular due to the misbehaviors of directors or actors in the production.
 * Some movies become cult movies, because they were almost comically bad. *Plan 9 from Outer Space* and *Troll 2* achieved a high degree of notoriety for this reason.
@@ -13,7 +13,7 @@ In short, ratings are anything but stationary. Using temporal dynamics helped :c
 movies more accurately. But it is not just about movies.
 
 * Many users have highly particular behavior when it comes to the time when they open apps. For instance, social media apps are much more popular after school with students. Stock market trading apps are more commonly used when the markets are open.
-* It is much harder to predict tomorrow's stock prices than to fill in the blanks for a stock price we missed yesterday, even though both are just a matter of estimating one number. After all, hindsight is so much easier than foresight. In statistics the former is called *exploration* whereas the latter is called *interploration*.
+* It is much harder to predict tomorrow's stock prices than to fill in the blanks for a stock price we missed yesterday, even though both are just a matter of estimating one number. After all, hindsight is so much easier than foresight. In statistics the former is called *extrapolation* whereas the latter is called *interpolation*.
 * Music, speech, text, movies, steps, etc. are all sequential in nature. If we were to permute them they would make little sense. The headline *dog bites man* is much less surprising than *man bites dog*, even though the words are identical.
 * Earthquakes are strongly correlated, i.e., after a massive earthquake there are very likely several smaller aftershocks, much more so than without the strong quake. In fact, earthquakes are spatiotemporally correlated, i.e., the aftershocks typically occur within a short time span and in close proximity.
 * Humans interact with each other in a sequential nature, as can be seen in Twitter fights, dance patterns and debates.
@@ -39,7 +39,7 @@ In order to achieve this, our trader could use a regressor such as the one we tr
 ![A latent autoregressive model. ](../img/sequence-model.svg)
 :label:`fig_sequence-model`
 
-Both cases raise the obvious question of how to generate the training data. One typically uses historical observations to predict the next observation given the ones up to right now. Obviously we do not expect time to stand still. However, a common assumption is that while the specific values of $x_t$ might change, at least the dynamics of the time series itself will not. This is reasonable, since novel dynamics are just like that, novel and thus not predictable using data that we have so far. Statisticians call the dynamics that do not change as *stationary*. Regardless of what we do, we will thus get an estimate of the entire time series via
+Both cases raise the obvious question of how to generate training data. One typically uses historical observations to predict the next observation given the ones up to right now. Obviously we do not expect time to stand still. However, a common assumption is that while the specific values of $x_t$ might change, at least the dynamics of the time series itself will not. This is reasonable, since novel dynamics are just that, novel and thus not predictable using data that we have so far. Statisticians call dynamics that do not change *stationary*. Regardless of what we do, we will thus get an estimate of the entire time series via
 
 $$p(x_1, \ldots, x_T) = \prod_{t=1}^T p(x_t \mid x_{t-1}, \ldots, x_1).$$
 
@@ -51,11 +51,11 @@ Recall the approximation that in an autoregressive model we use only $(x_{t-1}, 
 
 $$p(x_1, \ldots, x_T) = \prod_{t=1}^T p(x_t \mid x_{t-1}).$$
 
-Such models are particularly nice whenever $x_t$ assumes only to be a discrete value, since in this case dynamic programming can be used to compute values along the chain exactly. For instance, we can compute $p(x_{t+1} \mid x_{t-1})$ efficiently using the fact that we only need to take into account a very short history of past observations:
+Such models are particularly nice whenever $x_t$ assumes only a discrete value, since in this case dynamic programming can be used to compute values along the chain exactly. For instance, we can compute $p(x_{t+1} \mid x_{t-1})$ efficiently using the fact that we only need to take into account a very short history of past observations:
 
 $$p(x_{t+1} \mid x_{t-1}) = \sum_{x_t} p(x_{t+1} \mid x_t) p(x_t \mid x_{t-1}).$$
 
-Going into details of dynamic programming is beyond the scope of this section, but we will introduce it at :numref:`sec_birnn` later. [Control](https://en.wikipedia.org/wiki/Control_theory) and [reinforcement learning](https://en.wikipedia.org/wiki/Reinforcement_learning) algorithms use such tools extensively.
+Going into details of dynamic programming is beyond the scope of this section, but we will introduce it in :numref:`sec_birnn`. Control and reinforcement learning algorithms use such tools extensively.
 
 ### Causality
 
@@ -82,7 +82,7 @@ x = np.sin(0.01 * time) + 0.2 * np.random.normal(size=T)
 d2l.plot(time, [x])
 ```
 
-Next we need to turn this time series into features and labels that the network can train on. Based on the embedding dimension $\tau$ we map the data into pairs $y_t = x_t$ and $\mathbf{z}_t = (x_{t-1}, \ldots, x_{t-\tau})$. The astute reader might have noticed that this gives us $\tau$ fewer data points, since we do not have sufficient history for the first $\tau$ of them. A simple fix, in particular if the time series is long is to discard those few terms. Alternatively we could pad the time series with zeros. The code below is essentially identical to the training code in previous sections. We kept the architecture fairly simple. A few layers of a fully connected network, ReLU activation and $\ell_2$ loss. Since much of the modeling is identical to the previous sections when we built regression estimators in Gluon, we will not delve into much details.
+Next we need to turn this time series into features and labels that the network can train on. Based on the embedding dimension $\tau$ we map the data into pairs $y_t = x_t$ and $\mathbf{z}_t = (x_{t-1}, \ldots, x_{t-\tau})$. The astute reader might have noticed that this gives us $\tau$ fewer data points, since we do not have sufficient history for the first $\tau$ of them. A simple fix, in particular if the time series is long is to discard those few terms. Alternatively we could pad the time series with zeros. The code below is essentially identical to the training code in previous sections. We kept the architecture fairly simple. A few layers of a fully connected network, ReLU activation and $\ell_2$ loss. Since much of the modeling is identical to the previous sections when we built regression estimators in Gluon, we will not delve into much detail.
 
 ```{.python .input}
 tau = 4
@@ -180,14 +180,14 @@ d2l.plot([time[i:T-k+i] for i in steps], [features[i] for i in steps],
          legend=['step %d'%i for i in steps], figsize=(4.5, 2.5))
 ```
 
-The above graph clearly illustrates how the quality of the estimates changes as we try to predict further into the future. While the 8-step predictions are still pretty good, anything beyond that is pretty useless.
+This clearly illustrates how the quality of the estimates changes as we try to predict further into the future. While the 8-step predictions are still pretty good, anything beyond that is pretty useless.
 
 
 ## Summary
 
 * Sequence models require specialized statistical tools for estimation. Two popular choices are autoregressive models and latent-variable autoregressive models.
 * As we predict further in time, the errors accumulate and the quality of the estimates degrades, often dramatically.
-* There is quite a difference in difficulty between interploration and exploration. Consequently, if you have a time series, always respect the temporal order of the data when training, i.e., never train on future data.
+* There is quite a difference in difficulty between interpolation and extrapolation. Consequently, if you have a time series, always respect the temporal order of the data when training, i.e., never train on future data.
 * For causal models (e.g., time going forward), estimating the forward direction is typically a lot easier than the reverse direction.
 
 
@@ -202,6 +202,6 @@ The above graph clearly illustrates how the quality of the estimates changes as 
 1. Does causality also apply to text? To which extent?
 1. Give an example for when a latent autoregressive model might be needed to capture the dynamic of the data.
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2860)
+## [Discussions](https://discuss.mxnet.io/t/2860)
 
 ![](../img/qr_sequence.svg)

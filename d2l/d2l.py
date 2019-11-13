@@ -15,8 +15,6 @@ import math
 from matplotlib import pyplot as plt
 from mxnet import np, npx, autograd, gluon, init, context, image
 from mxnet.gluon import nn, rnn
-from mxnet.gluon.loss import Loss
-from mxnet.gluon.data import Dataset
 import random
 import re
 import time
@@ -419,7 +417,7 @@ class Vocab(object):
         self.token_freqs = sorted(counter.items(), key=lambda x: x[0])
         self.token_freqs.sort(key=lambda x: x[1], reverse=True)
         if use_special_tokens:
-            # padding, begin of sentence, end of sentence, unknown
+            # For padding, begin of sentence, end of sentence, unknown
             self.pad, self.bos, self.eos, self.unk = (0, 1, 2, 3)
             uniq_tokens = ['<pad>', '<bos>', '<eos>', '<unk>']
         else:
@@ -1520,7 +1518,7 @@ def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
 
 
 # Defined in file: ./chapter_recommender-systems/ranking.md
-class BPRLoss(Loss):
+class BPRLoss(gluon.loss.Loss):
     def __init__(self, weight=None, batch_axis=0, **kwargs):
         super(BPRLoss, self).__init__(weight=None, batch_axis=0, **kwargs)
 
@@ -1531,7 +1529,7 @@ class BPRLoss(Loss):
 
 
 # Defined in file: ./chapter_recommender-systems/ranking.md
-class HingeLossbRec(Loss):
+class HingeLossbRec(gluon.loss.Loss):
     def __init__(self, weight=None, batch_axis=0, **kwargs):
         super(HingeLossbRec, self).__init__(weight=None, batch_axis=0,
                                             **kwargs)
@@ -1646,7 +1644,7 @@ def read_data_ctr(path="../data/", train="ctr/train.csv",
 
 
 # Defined in file: ./chapter_recommender-systems/ctr.md
-class CTRDataset(Dataset):
+class CTRDataset(gluon.data.Dataset):
     def __init__(self, data_path, feat_mapper=None, defaults=None, 
                  min_threshold=4, num_feat=34):
         self.NUM_FEATS, self.count, self.data = num_feat, 0, {}

@@ -120,6 +120,6 @@ d2l.train_gluon_ch10('adam', {'learning_rate': 0.01}, data_iter)
 
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2378)
+## [Discussions](https://discuss.mxnet.io/t/2378)
 
 ![](../img/qr_adam.svg)

@@ -71,6 +71,6 @@ d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, ctx)
 3. Increase the training data to include multiple books. How low can you go on the perplexity scale?
 4. Would you want to combine sources of different authors when modeling text? Why is this a good idea? What could go wrong?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2369)
+## [Discussions](https://discuss.mxnet.io/t/2369)
 
 ![](../img/qr_deep-rnn.svg)

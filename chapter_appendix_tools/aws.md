@@ -1,4 +1,5 @@
 # Using AWS Instances
+:label:`sec_aws`
 
 Many deep learning applications require significant amounts of computation. Your local machine might be too slow to solve these problems in a reasonable amount of time. Cloud computing services can give you access to more powerful computers to run the GPU intensive portions of this book. In this section, we will show you how to set up an instance. We will use Jupyter Notebooks to run code on AWS (Amazon Web Services). The walkthrough includes a number of steps:
 
@@ -21,7 +22,7 @@ After logging into your AWS account, click "EC2" (marked by the red box in :numr
 
 ## Creating and Running an EC2 Instance
 
-:numref:`fig_ec2` shows the EC2 panel with sensitive account information greyed out. 
+:numref:`fig_ec2` shows the EC2 panel with sensitive account information greyed out.
 
 ![ EC2 panel. ](../img/ec2.png)
 :width:`700px`
@@ -30,10 +31,10 @@ After logging into your AWS account, click "EC2" (marked by the red box in :numr
 ### Presetting Location
 Select a nearby data center to reduce latency, *e.g.,* "Oregon". (marked by the red box in the top-right of :numref:`fig_ec2`) If you are located in China
 you can select a nearby Asia Pacific region, such as Seoul or Tokyo. Please note
-that some data centers may not have GPU instances. 
+that some data centers may not have GPU instances.
 
 ### Increasing Limits
-Before choosing an instance, check if there are quantity 
+Before choosing an instance, check if there are quantity
 restrictions by clicking the "Limits" label in the bar on the left as shown in
 :numref:`fig_ec2`. :numref:`fig_limits` shows an example of such a
 limitation. The account currently cannot open "p2.xlarge" instance per region. If
@@ -103,7 +104,7 @@ instance ID shown in :numref:`fig_launching` to view the status of this instance
 
 ### Connecting Instance
 
-As shown in :numref:`fig_connect`, after the instance state turns green, right-click the instance and select `Connect` to view the instance access method. 
+As shown in :numref:`fig_connect`, after the instance state turns green, right-click the instance and select `Connect` to view the instance access method.
 
 ![ View instance access and startup method. ](../img/connect.png)
 :width:`700px`
@@ -112,7 +113,7 @@ As shown in :numref:`fig_connect`, after the instance state turns green, right-c
 If this is a new key, it must not be publicly viewable for SSH to work. Go to the folder where you store `D2L_key.pem` (*e.g.,* Downloads folder) and make the key to be not publicly viewable.
 
 ```bash
-cd /Downloads  ## if D2L_key.pem is stored in Downloads folder 
+cd /Downloads  ## if D2L_key.pem is stored in Downloads folder
 chmod 400 D2L_key.pem
 ```
 
@@ -153,7 +154,7 @@ Right click at `Download` and click `Copy Link Address` (as shown in :numref:`fi
 
 ```bash
 ## paste the copied link from CUDA website
-wget https://developer.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.168_418.67_linux.run 
+wget https://developer.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.168_418.67_linux.run
 
 sudo sh cuda_10.1.168_418.67_linux.run
 ## this command line may take a while to run
@@ -357,6 +358,6 @@ environments.
 1. Experiment with different GPU servers. How fast are they?
 1. Experiment with multi-GPU servers. How well can you scale things up?
 
-## Scanning the QR Code to [Discuss](https://discuss.mxnet.io/t/2399)
+## [Discussions](https://discuss.mxnet.io/t/2399)
 
 ![](../img/qr_aws.svg)

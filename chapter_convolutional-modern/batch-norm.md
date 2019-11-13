@@ -476,6 +476,6 @@ tens of thousands of citations.
 1. Review the Gluon documentation for `BatchNorm` to see the other applications for Batch Normalization.
 1. Research ideas - think of other normalization transforms that you can apply? Can you apply the probability integral transform? How about a full rank covariance estimate?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2358)
+## [Discussions](https://discuss.mxnet.io/t/2358)
 
 ![](../img/qr_batch-norm.svg)

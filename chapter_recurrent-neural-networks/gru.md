@@ -199,6 +199,6 @@ d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, ctx)
 1. What happens if you implement only parts of a GRU? That is, implement a recurrent cell that only has a reset gate. Likewise, implement a recurrent cell only with an update gate.
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2367)
+## [Discussions](https://discuss.mxnet.io/t/2367)
 
 ![](../img/qr_gru.svg)

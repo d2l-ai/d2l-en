@@ -234,6 +234,6 @@ d2l.train_ch5(net, train_iter, test_iter, num_epochs, lr)
 1. Why do we need a large range convolution initially?
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2357)
+## [Discussions](https://discuss.mxnet.io/t/2357)
 
 ![](../img/qr_googlenet.svg)

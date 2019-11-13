@@ -226,6 +226,6 @@ train_with_data_aug(train_augs, test_augs, net)
 * Add different image augmentation methods in model training based on the CIFAR-10 dataset. Observe the implementation results.
 * With reference to the MXNet documentation, what other image augmentation methods are provided in Gluon's `transforms` module?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2442)
+## [Discussions](https://discuss.mxnet.io/t/2442)
 
 ![](../img/qr_image-augmentation.svg)

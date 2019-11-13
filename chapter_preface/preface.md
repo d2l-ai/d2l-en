@@ -294,8 +294,6 @@ import math
 from matplotlib import pyplot as plt
 from mxnet import np, npx, autograd, gluon, init, context, image
 from mxnet.gluon import nn, rnn
-from mxnet.gluon.loss import Loss
-from mxnet.gluon.data import Dataset
 import random
 import re
 import time
@@ -378,6 +376,6 @@ Raju Gulabani, Charlie Bell, and Andrew Jassy for their generous support in writ
 1. Create an account on the forum and introduce yourself.
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2311)
+## [Discussions](https://discuss.mxnet.io/t/2311)
 
 ![](../img/qr_preface.svg)

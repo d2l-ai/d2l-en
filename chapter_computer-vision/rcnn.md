@@ -209,6 +209,6 @@ chapter.
 * Study the implementation of each model in the [GluonCV toolkit](https://github.com/dmlc/gluon-cv/) related to this section.
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2447)
+## [Discussions](https://discuss.mxnet.io/t/2447)
 
 ![](../img/qr_rcnn.svg)

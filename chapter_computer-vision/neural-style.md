@@ -276,6 +276,6 @@ As you can see, each epoch takes more time due to the larger image size. As show
 * Adjust the weight hyper-parameters in the loss function. Does the output retain more content or have less noise?
 * Use different content and style images. Can you create more interesting composite images?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2449)
+## [Discussions](https://discuss.mxnet.io/t/2449)
 
 ![](../img/qr_neural-style.svg)

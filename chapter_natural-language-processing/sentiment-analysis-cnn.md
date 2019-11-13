@@ -198,6 +198,6 @@ d2l.predict_sentiment(net, vocab, 'this movie is so bad')
 * What other natural language processing tasks can you use textCNN for?
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2392)
+## [Discussions](https://discuss.mxnet.io/t/2392)
 
 ![](../img/qr_sentiment-analysis-cnn.svg)

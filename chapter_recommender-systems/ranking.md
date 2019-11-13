@@ -33,8 +33,7 @@ where $D := \{(u, i, j) \mid i \in I^+_u \wedge j \in I \backslash I^+_u \}$ is 
 We will implement the base class  `mxnet.gluon.loss.Loss`and override the `forward` method to construct the Bayesian personalized ranking loss. We begin by importing the Loss class and the np module.
 
 ```{.python .input  n=5}
-from mxnet.gluon.loss import Loss
-from mxnet import np, npx
+from mxnet import gluon, np, npx
 npx.set_np()
 ```
 
@@ -42,7 +41,7 @@ The implementation of BPR loss is as follows.
 
 ```{.python .input  n=2}
 # Saved in the d2l package for later use
-class BPRLoss(Loss):
+class BPRLoss(gluon.loss.Loss):
     def __init__(self, weight=None, batch_axis=0, **kwargs):
         super(BPRLoss, self).__init__(weight=None, batch_axis=0, **kwargs)
 
@@ -64,7 +63,7 @@ where $m$ is the safety margin size. It aims to push negative items away from po
 
 ```{.python .input  n=3}
 # Saved in the d2l package for later use
-class HingeLossbRec(Loss):
+class HingeLossbRec(gluon.loss.Loss):
     def __init__(self, weight=None, batch_axis=0, **kwargs):
         super(HingeLossbRec, self).__init__(weight=None, batch_axis=0,
                                             **kwargs)
