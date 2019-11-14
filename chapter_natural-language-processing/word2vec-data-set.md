@@ -1,4 +1,4 @@
-# Data Sets for Word2vec
+# Datasets for Word2vec
 :label:`sec_word2vec_data`
 
 In this section, we will introduce how to preprocess a dataset with
@@ -99,7 +99,7 @@ corpus = [vocab[line] for line in subsampled]
 corpus[0:3]
 ```
 
-## Load the Data Set
+## Load the Dataset
 
 Next we read the corpus with token indicies into data batches for training.
 
