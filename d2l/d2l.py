@@ -417,7 +417,7 @@ class Vocab(object):
         self.token_freqs = sorted(counter.items(), key=lambda x: x[0])
         self.token_freqs.sort(key=lambda x: x[1], reverse=True)
         if use_special_tokens:
-            # For padding, begin of sentence, end of sentence, unknown
+            # For padding, begin of sentence, end of sentence, and unknown
             self.pad, self.bos, self.eos, self.unk = (0, 1, 2, 3)
             uniq_tokens = ['<pad>', '<bos>', '<eos>', '<unk>']
         else:
@@ -741,12 +741,12 @@ class Seq2SeqEncoder(d2l.Encoder):
 
     def forward(self, X, *args):
         X = self.embedding(X) # X shape: (batch_size, seq_len, embed_size)
-        X = X.swapaxes(0, 1)  # RNN needs first axes to be time
+        X = X.swapaxes(0, 1)  # RNN needs first axes to be timestep, i.e., seq_len
         state = self.rnn.begin_state(batch_size=X.shape[1], ctx=X.context)
         out, state = self.rnn(X, state)
-        # The shape of out is (seq_len, batch_size, num_hiddens).
-        # state contains the hidden state and the memory cell
-        # of the last time step, the shape is (num_layers, batch_size, num_hiddens)
+        # out shape: (seq_len, batch_size, num_hiddens)
+        # stae shape: (num_layers, batch_size, num_hiddens),
+        # where "state" contains the hidden state and the memory cell        
         return out, state
 
 
@@ -776,7 +776,7 @@ class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
     # label shape: (batch_size, seq_len)
     # valid_length shape: (batch_size, )
     def forward(self, pred, label, valid_length):
-        # the sample weights shape should be (batch_size, seq_len, 1)
+        # weights shape should be (batch_size, seq_len, 1)
         weights = np.expand_dims(np.ones_like(label),axis=-1)
         weights = npx.sequence_mask(weights, valid_length, True, axis=1)
         return super(MaskedSoftmaxCELoss, self).forward(pred, label, weights)
@@ -788,7 +788,6 @@ def train_s2s_ch8(model, data_iter, lr, num_epochs, ctx):
     trainer = gluon.Trainer(model.collect_params(),
                             'adam', {'learning_rate': lr})
     loss = MaskedSoftmaxCELoss()
-    #tic = time.time()
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[1, num_epochs], ylim=[0, 0.25])
     for epoch in range(1, num_epochs+1):
@@ -825,7 +824,7 @@ def predict_s2s_ch8(model, src_sentence, src_vocab, tgt_vocab, num_steps, ctx):
     predict_tokens = []
     for _ in range(num_steps):
         Y, dec_state = model.decoder(dec_X, dec_state)
-        # The token with highest score is used as the next time step input.
+        # The token with highest score is used as the next timestep input.
         dec_X = Y.argmax(axis=2)
         py = dec_X.squeeze(axis=0).astype('int32').item()
         if py == tgt_vocab.eos:
@@ -1251,14 +1250,14 @@ def load_data_voc(batch_size, crop_size):
     return train_iter, test_iter
 
 
-# Defined in file: ./chapter_natural-language-processing/word2vec-data-set.md
+# Defined in file: ./chapter_natural-language-processing/word2vec-dataset.md
 def read_ptb():
     with zipfile.ZipFile('../data/ptb.zip', 'r') as f:
         raw_text = f.read('ptb/ptb.train.txt').decode("utf-8")
     return [line.split() for line in raw_text.split('\n')]
 
 
-# Defined in file: ./chapter_natural-language-processing/word2vec-data-set.md
+# Defined in file: ./chapter_natural-language-processing/word2vec-dataset.md
 def subsampling(sentences, vocab):
     # Map low frequency words into <unk>
     sentences = [[vocab.idx_to_token[vocab[tk]] for tk in line]
@@ -1273,7 +1272,7 @@ def subsampling(sentences, vocab):
     return [[tk for tk in line if keep(tk)] for line in sentences]
 
 
-# Defined in file: ./chapter_natural-language-processing/word2vec-data-set.md
+# Defined in file: ./chapter_natural-language-processing/word2vec-dataset.md
 def get_centers_and_contexts(corpus, max_window_size):
     centers, contexts = [], []
     for line in corpus:
@@ -1291,7 +1290,7 @@ def get_centers_and_contexts(corpus, max_window_size):
     return centers, contexts
 
 
-# Defined in file: ./chapter_natural-language-processing/word2vec-data-set.md
+# Defined in file: ./chapter_natural-language-processing/word2vec-dataset.md
 class RandomGenerator(object):
     """Draw a random int in [0, n] according to n sampling weights"""
     def __init__(self, sampling_weights):
@@ -1309,7 +1308,7 @@ class RandomGenerator(object):
         return self.candidates[self.i-1]
 
 
-# Defined in file: ./chapter_natural-language-processing/word2vec-data-set.md
+# Defined in file: ./chapter_natural-language-processing/word2vec-dataset.md
 def get_negatives(all_contexts, corpus, K):
     counter = d2l.count_corpus(corpus)
     sampling_weights = [counter[i]**0.75 for i in range(len(counter))]
@@ -1325,7 +1324,7 @@ def get_negatives(all_contexts, corpus, K):
     return all_negatives
 
 
-# Defined in file: ./chapter_natural-language-processing/word2vec-data-set.md
+# Defined in file: ./chapter_natural-language-processing/word2vec-dataset.md
 def batchify(data):
     max_len = max(len(c) + len(n) for _, c, n in data)
     centers, contexts_negatives, masks, labels = [], [], [], []
@@ -1339,7 +1338,7 @@ def batchify(data):
             np.array(masks), np.array(labels))
 
 
-# Defined in file: ./chapter_natural-language-processing/word2vec-data-set.md
+# Defined in file: ./chapter_natural-language-processing/word2vec-dataset.md
 def load_data_ptb(batch_size, max_window_size, num_noise_words):
     sentences = read_ptb()
     vocab = d2l.Vocab(sentences, min_freq=10)
