@@ -41,7 +41,7 @@ The model can be learned with BPR or Hinge loss. The architecture of Caser is sh
 
 ![Illustration of the Caser Model](../img/rec-caser.svg)
 
-We firstly import the required libraries.
+We first import the required libraries.
 
 ```{.python .input  n=2}
 import d2l

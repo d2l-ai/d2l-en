@@ -181,7 +181,7 @@ For instance, NVIDIA's latest Volta generation offers up to 120 TFlops per chip 
 (and up to 24 TFlops for more general purpose ones),
 while floating point performance of CPUs has not exceeded 1 TFlop to date.
 The reason for why this is possible is actually quite simple:
-firstly, power consumption tends to grow *quadratically* with clock frequency.
+first, power consumption tends to grow *quadratically* with clock frequency.
 Hence, for the power budget of a CPU core that runs 4x faster (a typical number),
 you can use 16 GPU cores at 1/4 the speed,
 which yields 16 x 1/4 = 4x the performance.
@@ -189,7 +189,7 @@ Furthermore, GPU cores are much simpler
 (in fact, for a long time they weren't even *able*
 to execute general purpose code),
 which makes them more energy efficient.
-Lastly, many operations in deep learning require high memory bandwidth.
+Last, many operations in deep learning require high memory bandwidth.
 Again, GPUs shine here with buses that are at least 10x as wide as many CPUs.
 
 Back to 2012. A major breakthrough came
