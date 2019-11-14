@@ -24,7 +24,7 @@ worth while reviewing backpropagation (:numref:`sec_backprop`) again.
 Forward propagation in a recurrent neural network is relatively
 straightforward. *Backpropagation through time* is actually a specific
 application of back propagation in recurrent neural networks. It
-requires us to expand the recurrent neural network one time step at a time to
+requires us to expand the recurrent neural network one timestep at a time to
 obtain the dependencies between model variables and parameters. Then,
 based on the chain rule, we apply backpropagation to compute and
 store gradients. Since sequences can be rather long, the dependency can be rather lengthy. For instance, for a sequence of 1000 characters, the first symbol could potentially have significant influence on the symbol at position 1000. This is not really computationally feasible (it takes too long and requires too much memory) and it requires over 1000 matrix-vector products before we would arrive at that very elusive gradient. This is a process fraught with computational and statistical uncertainty. In the following we will elucidate what happens and how to address this in practice.
@@ -33,7 +33,7 @@ store gradients. Since sequences can be rather long, the dependency can be rathe
 ## A Simplified Recurrent Network
 
 We start with a simplified model of how an RNN works. This model ignores details about the specifics of the hidden state and how it is updated. These details are immaterial to the analysis and would only serve to clutter the notation, but make it look more intimidating.
-In this simplified model, we denote $h_t$ as the hidden state, $x_t$ as the input, and $o_t$ as the output at time step $t$. In addition, $w_h$ and $w_o$ indicate the weights of hidden states and the output layer, respectively. As a result, the hidden states and outputs at each timesteps can be explained as
+In this simplified model, we denote $h_t$ as the hidden state, $x_t$ as the input, and $o_t$ as the output at timestep $t$. In addition, $w_h$ and $w_o$ indicate the weights of hidden states and the output layer, respectively. As a result, the hidden states and outputs at each timesteps can be explained as
 
 $$h_t = f(x_t, h_{t-1}, w_h) \text{ and } o_t = g(h_t, w_o).$$
 
@@ -106,9 +106,9 @@ It follows from the definition of $\xi_t$ that $\mathbf{E}[z_t] = \partial_w h_t
 
 ## The Computational Graph
 
-In order to visualize the dependencies between model variables and parameters during computation in a recurrent neural network, we can draw a computational graph for the model, as shown in :numref:`fig_rnn_bptt`. For example, the computation of the hidden states of time step 3, $\mathbf{h}_3$, depends on the model parameters $\mathbf{W}_{hx}$ and $\mathbf{W}_{hh}$, the hidden state of the last time step $\mathbf{h}_2$, and the input of the current time step $\mathbf{x}_3$.
+In order to visualize the dependencies between model variables and parameters during computation in a recurrent neural network, we can draw a computational graph for the model, as shown in :numref:`fig_rnn_bptt`. For example, the computation of the hidden states of timestep 3, $\mathbf{h}_3$, depends on the model parameters $\mathbf{W}_{hx}$ and $\mathbf{W}_{hh}$, the hidden state of the last timestep $\mathbf{h}_2$, and the input of the current timestep $\mathbf{x}_3$.
 
-![ Computational dependencies for a recurrent neural network model with three time steps. Boxes represent variables (not shaded) or parameters (shaded) and circles represent operators. ](../img/rnn-bptt.svg)
+![ Computational dependencies for a recurrent neural network model with three timesteps. Boxes represent variables (not shaded) or parameters (shaded) and circles represent operators. ](../img/rnn-bptt.svg)
 :label:`fig_rnn_bptt`
 
 

@@ -23,12 +23,12 @@ Three gates are introduced in LSTMs: the input gate, the forget gate, and the ou
 
 ### Input Gates, Forget Gates, and Output Gates
 
-Just like with GRUs, the data feeding into the LSTM gates is the input at the current time step $\mathbf{X}_t$ and the hidden state of the previous time step $\mathbf{H}_{t-1}$. These inputs are processed by a fully connected layer and a sigmoid activation function to compute the values of the input gates, the forget gates, and the output gates. As a result, the three gates all output values in the range of $[0,1]$. :numref:`lstm_0` has a graphical illustration of the data flow fot the input, forget, and output gates.
+Just like with GRUs, the data feeding into the LSTM gates is the input at the current timestep $\mathbf{X}_t$ and the hidden state of the previous timestep $\mathbf{H}_{t-1}$. These inputs are processed by a fully connected layer and a sigmoid activation function to compute the values of the input gates, the forget gates, and the output gates. As a result, the three gates all output values in the range of $[0,1]$. :numref:`lstm_0` has a graphical illustration of the data flow fot the input, forget, and output gates.
 
 ![Calculation of input, forget, and output gates in an LSTM. ](../img/lstm_0.svg)
 :label:`lstm_0`
 
-We assume that there are $h$ hidden units, the minibatch is of size $n$, and number of inputs is $d$. Thus, the input is $\mathbf{X}_t \in \mathbb{R}^{n \times d}$ and the hidden state of the last time step is $\mathbf{H}_{t-1} \in \mathbb{R}^{n \times h}$. Correspondingly, the gates are defined as follows: the input gate is $\mathbf{I}_t \in \mathbb{R}^{n \times h}$, the forget gate is $\mathbf{F}_t \in \mathbb{R}^{n \times h}$, and the output gate is $\mathbf{O}_t \in \mathbb{R}^{n \times h}$. They are calculated as follows:
+We assume that there are $h$ hidden units, the minibatch is of size $n$, and number of inputs is $d$. Thus, the input is $\mathbf{X}_t \in \mathbb{R}^{n \times d}$ and the hidden state of the last timestep is $\mathbf{H}_{t-1} \in \mathbb{R}^{n \times h}$. Correspondingly, the gates are defined as follows: the input gate is $\mathbf{I}_t \in \mathbb{R}^{n \times h}$, the forget gate is $\mathbf{F}_t \in \mathbb{R}^{n \times h}$, and the output gate is $\mathbf{O}_t \in \mathbb{R}^{n \times h}$. They are calculated as follows:
 
 $$
 \begin{aligned}
@@ -43,7 +43,7 @@ where $\mathbf{W}_{xi}, \mathbf{W}_{xf}, \mathbf{W}_{xo} \in \mathbb{R}^{d \time
 
 ### Candidate Memory Cell
 
-Next we design the memory cell. Since we have not specified the action of the various gates yet, we first introduce the *candidate* memory cell $\tilde{\mathbf{C}}_t \in \mathbb{R}^{n \times h}$. Its computation is similar to the three gates described above, but it uses a $\tanh$ function with a value range for $(-1, 1)$ as the activation function. This leads to the following equation at time step $t$.
+Next we design the memory cell. Since we have not specified the action of the various gates yet, we first introduce the *candidate* memory cell $\tilde{\mathbf{C}}_t \in \mathbb{R}^{n \times h}$. Its computation is similar to the three gates described above, but it uses a $\tanh$ function with a value range for $(-1, 1)$ as the activation function. This leads to the following equation at timestep $t$.
 
 $$\tilde{\mathbf{C}}_t = \text{tanh}(\mathbf{X}_t \mathbf{W}_{xc} + \mathbf{H}_{t-1} \mathbf{W}_{hc} + \mathbf{b}_c)$$
 
@@ -61,7 +61,7 @@ In GRUs, we had a single mechanism to govern the inputs and forgetting at a prop
 
 $$\mathbf{C}_t = \mathbf{F}_t \odot \mathbf{C}_{t-1} + \mathbf{I}_t \odot \tilde{\mathbf{C}}_t.$$
 
-If the forget gate is always approximate to 1 and the input gate is always approximate to 0, the past memory cells $\mathbf{C}_{t-1} $ will be saved over time and be passed to the current time step. This design was introduced to alleviate the vanishing gradient problem and to better capture dependencies for time series with long time dependencies. We thus arrive at the  flow diagram shown in :numref:`lstm_2`.
+If the forget gate is always approximate to 1 and the input gate is always approximate to 0, the past memory cells $\mathbf{C}_{t-1} $ will be saved over time and be passed to the current timestep. This design was introduced to alleviate the vanishing gradient problem and to better capture dependencies for time series with long time dependencies. We thus arrive at the  flow diagram shown in :numref:`lstm_2`.
 
 ![Computation of memory cells in an LSTM. Here, the multiplication is carried out elementwise. ](../img/lstm_2.svg)
 

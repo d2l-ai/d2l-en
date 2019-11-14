@@ -38,7 +38,7 @@ Reviewing the design of Adam its inspiration is clear. Momentum and scale are cl
 
 ## Implementation 
 
-Implementing Adam from scratch isn't very daunting. For convenience we store the time step counter $t$ in the `hyperparams` dictionary. Beyond that all is straightforward.
+Implementing Adam from scratch isn't very daunting. For convenience we store the timestep counter $t$ in the `hyperparams` dictionary. Beyond that all is straightforward.
 
 ```{.python .input  n=2}
 %matplotlib inline
