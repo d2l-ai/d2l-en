@@ -147,8 +147,8 @@ we assume that both the training data and the test data
 are drawn *independently* from *identical* distributions
 (commonly called the i.i.d. assumption).
 This means that the process that samples our data has no *memory*.
-The 2nd example drawn and the 3rd drawn
-are no more correlated than the 2nd and the 2-millionth sample drawn.
+The $2^{\mathrm{nd}}$ example drawn and the $3^{\mathrm{rd}}$ drawn
+are no more correlated than the $2^{\mathrm{nd}}$ and the $2$-millionth sample drawn.
 
 Being a good machine learning scientist requires thinking critically,
 and already you should be poking holes in this assumption,

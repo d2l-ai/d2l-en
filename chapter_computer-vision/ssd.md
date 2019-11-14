@@ -104,7 +104,7 @@ Y2 = forward(np.zeros((2, 16, 10, 10)), cls_predictor(3, 10))
 (Y1.shape, Y2.shape)
 ```
 
-The channel dimension contains the predictions for all anchor boxes with the same center. We first move the channel dimension to the final dimension. Because the batch size is the same for all scales, we can convert the prediction results to binary format (batch size, height $\times$ width $\times$ number of channels) to facilitate subsequent concatenation on the 1st dimension.
+The channel dimension contains the predictions for all anchor boxes with the same center. We first move the channel dimension to the final dimension. Because the batch size is the same for all scales, we can convert the prediction results to binary format (batch size, height $\times$ width $\times$ number of channels) to facilitate subsequent concatenation on the $1^{\mathrm{st}}$ dimension.
 
 ```{.python .input  n=4}
 def flatten_pred(pred):
