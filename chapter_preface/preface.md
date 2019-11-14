@@ -120,7 +120,7 @@ accessible both as executable code, as a physical book,
 as a downloadable PDF, and on the internet as a website.
 At present there exist no tools and no workflow
 perfectly suited to these demands, so we had to assemble our own.
-We describe our approach in detail in :numref:`sec_contribute`.
+We describe our approach in detail in :numref:`sec_how_to_contribute`.
 We settled on Github to share the source and to allow for edits,
 Jupyter notebooks for mixing code, equations and text,
 Sphinx as a rendering engine to generate multiple outputs,
