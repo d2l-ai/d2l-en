@@ -4,7 +4,7 @@ One of the reasons for the success of deep learning can be found in the wide ran
 
 ## Layers without Parameters
 
-Since this is slightly intricate, we start with a custom layer (aka Block) that
+Since this is slightly intricate, we start with a custom layer (also known as Block) that
 does not have any inherent parameters. Our first step is very similar to when we
 introduced blocks in :numref:`sec_model_construction`. The following
 `CenteredLayer` class constructs a layer that subtracts the mean from the

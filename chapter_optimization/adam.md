@@ -13,7 +13,7 @@ Adam :cite:`Kingma.Ba.2014` combines all these techniques into one efficient lea
 
 ## The Algorithm
 
-One of the key components of Adam is that it uses exponential weighted moving averages (aka leaky averaging) to obtain an estimate of both the momentum and also the second moment of the gradient. That is, it uses the state variables
+One of the key components of Adam is that it uses exponential weighted moving averages (also known as leaky averaging) to obtain an estimate of both the momentum and also the second moment of the gradient. That is, it uses the state variables
 
 $$\begin{aligned}
     \mathbf{v}_t & \leftarrow \beta_1 \mathbf{v}_{t-1} + (1 - \beta_1) \mathbf{g}_t \\

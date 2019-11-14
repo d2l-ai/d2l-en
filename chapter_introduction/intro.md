@@ -1273,7 +1273,7 @@ but the name stuck. At its heart, lie a few key principles
 that can be found in most networks today:
 
 * The alternation of linear and nonlinear processing units, often referred to as *layers*.
-* The use of the chain rule (aka *backpropagation*) for adjusting parameters in the entire network at once.
+* The use of the chain rule (also known as *backpropagation*) for adjusting parameters in the entire network at once.
 
 After initial rapid progress, research in neural networks
 languished from around 1995 until 2005.
