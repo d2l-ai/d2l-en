@@ -107,7 +107,7 @@ In most cases, the latter student will do much better.
 Likewise, consider a model that simply uses a lookup table to answer questions. If the set of allowable inputs is discrete and reasonably small, then perhaps after viewing *many* training examples, this approach would perform well. Still this model has no ability to do better than random guessing when faced with examples that it has never seen before.
 In reality the input spaces are far too large to memorize the answers corresponding to every conceivable input. For example, consider the black and white $28\times28$ images. If each pixel can take one among $256$ gray scale values, then there are $256^{784}$ possible images. That means that there are far more low-res grayscale thumbnail-sized images than there are atoms in the universe. Even if we could encounter this data, we could never afford to store the lookup table.
 
-Lastly, consider the problem of trying
+Last, consider the problem of trying
 to classify the outcomes of coin tosses (class 0: heads, class 1: tails)
 based on some contextual features that might be available.
 No matter what algorithm we come up with,

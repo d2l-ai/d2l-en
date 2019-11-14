@@ -92,7 +92,7 @@ But the low-frequency word "join" is completely preserved.
 compare_counts('join')
 ```
 
-Lastly, we map each token into an index to construct the corpus.
+Last, we map each token into an index to construct the corpus.
 
 ```{.python .input  n=8}
 corpus = [vocab[line] for line in subsampled]
@@ -228,7 +228,7 @@ We use the `batchify` function just defined to specify the minibatch reading met
 
 ## Put All Things Together
 
-Lastly, we define the `load_data_ptb` function that read the PTB dataset and return the data loader.
+Last, we define the `load_data_ptb` function that read the PTB dataset and return the data loader.
 
 ```{.python .input  n=16}
 # Saved in the d2l package for later use

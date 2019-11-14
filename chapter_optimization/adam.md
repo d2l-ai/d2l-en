@@ -24,7 +24,7 @@ Here $\beta_1$ and $\beta_2$ are nonnegative weighting parameters. Common choice
 
 $$\hat{\mathbf{v}}_t = \frac{\mathbf{v}_t}{1 - \beta_1^t} \text{ and } \hat{\mathbf{s}}_t = \frac{\mathbf{s}_t}{1 - \beta_2^t}.$$
 
-Armed with the proper estimates we can now write out the update equations. Firstly we rescale the gradient in a manner very much akin to that of RMSProp to obtain
+Armed with the proper estimates we can now write out the update equations. First, we rescale the gradient in a manner very much akin to that of RMSProp to obtain
 
 $$\mathbf{g}_t' = \frac{\eta \hat{\mathbf{v}}_t}{\sqrt{\hat{\mathbf{s}}_t} + \epsilon}$$
 
@@ -34,7 +34,7 @@ Now we have all the pieces in place to compute updates. This is slightly anticli
 
 $$\mathbf{x}_t \leftarrow \mathbf{x}_{t-1} - \mathbf{g}_t'.$$
 
-Reviewing the design of Adam its inspiration is clear. Momentum and scale are clearly visible in the state variables. Their rather peculiar definition forces us to debias terms (this could be fixed by a slightly different initialization and update condition). Secondly, the combination of both terms is pretty straightforward, given RMSProp. Lastly, the explicit learning rate $\eta$ allows us to control the step length to address issues of convergence. 
+Reviewing the design of Adam its inspiration is clear. Momentum and scale are clearly visible in the state variables. Their rather peculiar definition forces us to debias terms (this could be fixed by a slightly different initialization and update condition). Second, the combination of both terms is pretty straightforward, given RMSProp. Last, the explicit learning rate $\eta$ allows us to control the step length to address issues of convergence. 
 
 ## Implementation 
 

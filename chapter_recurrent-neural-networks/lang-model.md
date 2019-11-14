@@ -240,7 +240,7 @@ class SeqDataLoader(object):
         return self.get_iter()
 ```
 
-Lastly, we define a function `load_data_time_machine` that returns both the data iterator and the vocabulary, so we can use it similarly as other functions with `load_data` prefix.
+Last, we define a function `load_data_time_machine` that returns both the data iterator and the vocabulary, so we can use it similarly as other functions with `load_data` prefix.
 
 ```{.python .input}
 # Saved in the d2l package for later use

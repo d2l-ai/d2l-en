@@ -97,11 +97,11 @@ The following is optional and primarily serves to convey more intuition about th
 Consider the case where
 $$w_{t+1} = w_{t} - \eta_t \partial_w l(x_t, w)$$
 
-In particular, assume that $x_t$ is drawn from some distribution $p(x)$ and that $l(x,w)$ is a convex function in $w$ for all $x$. Lastly denote by
+In particular, assume that $x_t$ is drawn from some distribution $p(x)$ and that $l(x,w)$ is a convex function in $w$ for all $x$. Last denote by
 
 $$R(w) = \mathbf{E}_{x \sim p}[l(x,w)]$$
 
-the expected risk and by $R^*$ its minimum with regard to $w$. Lastly let $w^*$ be the minimizer (we assume that it exists within the domain which $w$ is defined). In this case we can track the distance between the current parameter $w_t$ and the risk minimizer $w^*$ and see whether it improves over time.
+the expected risk and by $R^*$ its minimum with regard to $w$. Last let $w^*$ be the minimizer (we assume that it exists within the domain which $w$ is defined). In this case we can track the distance between the current parameter $w_t$ and the risk minimizer $w^*$ and see whether it improves over time.
 
 $$\begin{aligned}
     \|w_{t+1} - w^*\|^2 & = \|w_{t} - \eta_t \partial_w l(x_t, w) - w^*\|^2 \\
@@ -134,7 +134,7 @@ The last step involves summing over the inequalities for $t \in \{t, \ldots, T\}
 
 $$\|w_{0} - w^*\|^2 \geq 2 \sum_{t=1}^T \eta_t [\mathbf{E}[R[w_t]] - R^*] - L^2 \sum_{t=1}^T \eta_t^2.$$
 
-Note that we exploited that $w_0$ is given and thus the expectation can be dropped. Lastly define
+Note that we exploited that $w_0$ is given and thus the expectation can be dropped. Last define
 
 $$\bar{w} := \frac{\sum_{t=1}^T \eta_t w_t}{\sum_{t=1}^T \eta_t}.$$
 
@@ -163,7 +163,7 @@ However, this is not really what we did. In the toy examples in the current sect
 
 $$P(\mathrm{choose~} i) = 1 - P(\mathrm{omit~} i) = 1 - (1-N^{-1})^N \approx 1-e^{-1} \approx 0.63.$$
 
-A similar reasoning shows that the probability of picking a sample exactly once is given by ${N \choose 1} N^{-1} (1-N^{-1})^{N-1} = \frac{N-1}{N} (1-N^{-1})^{N} \approx e^{-1} \approx 0.37$. This leads to an increased variance and decreased data efficiency relative to sampling without replacement. Hence, in practice we perform the latter (and this is the default choice throughout this book). Lastly note that repeated passes through the dataset traverse it in a *different* random order.
+A similar reasoning shows that the probability of picking a sample exactly once is given by ${N \choose 1} N^{-1} (1-N^{-1})^{N-1} = \frac{N-1}{N} (1-N^{-1})^{N} \approx e^{-1} \approx 0.37$. This leads to an increased variance and decreased data efficiency relative to sampling without replacement. Hence, in practice we perform the latter (and this is the default choice throughout this book). Last note that repeated passes through the dataset traverse it in a *different* random order.
 
 
 ## Summary

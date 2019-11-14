@@ -10,7 +10,7 @@ service providers and is an important source of revenue.  This chapter will intr
 ## Collaborative Filtering
 
 We start the journey with the important concept in recommender systems---collaborative filtering
-(CF), which was firstly coined by the [Tapestry](https://dl.acm.org/citation.cfm?id=138867) system, referring to "people collaborate to help one another perform the filtering process  in order to handle the large amounts of email and messages posted to newsgroups". This term has been enriched with more senses. In a broad sense, it is the process of
+(CF), which was first coined by the [Tapestry](https://dl.acm.org/citation.cfm?id=138867) system, referring to "people collaborate to help one another perform the filtering process  in order to handle the large amounts of email and messages posted to newsgroups". This term has been enriched with more senses. In a broad sense, it is the process of
 filtering for information or patterns using techniques involving collaboration among multiple users, agents, and data sources. CF has many forms and numerous CF methods proposed since its advent.  
 
 Overall, CF techniques can be categorized into: memory-based CF, model-based CF, and their hybrid. Representative memory-based CF techniques are nearest neighbor-based CF such as user-based CF and item-based CF.  Latent factor models such as matrix factorization are examples of model-based CF.  Memory-based CF has limitations in dealing with sparse and large-scale data since it computes the similarity values based on common items.  Model-based methods become more popular with its

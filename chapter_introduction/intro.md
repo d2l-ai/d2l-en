@@ -207,7 +207,7 @@ of transforming the data into some form amenable to *shallow* models.
 One key advantage of deep learning is that it replaces not
 only the *shallow* models at the end of traditional learning pipelines,
 but also the labor-intensive process of feature engineering.
-Secondly, by replacing much of the *domain-specific preprocessing*, 
+Second, by replacing much of the *domain-specific preprocessing*, 
 deep learning has eliminated many of the boundaries 
 that previously separated computer vision, speech recognition,
 natural language processing, medical informatics, and other application areas,
@@ -1281,7 +1281,7 @@ This was due to a number of reasons.
 Training a network is computationally very expensive.
 While RAM was plentiful at the end of the past century,
 computational power was scarce.
-Secondly, datasets were relatively small.
+Second, datasets were relatively small.
 In fact, Fisher's 'Iris dataset' from 1932
 was a popular tool for testing the efficacy of algorithms.
 MNIST with its 60,000 handwritten digits was considered huge.
@@ -1508,7 +1508,7 @@ More frivolously, we can ask Alexa to switch on the coffee machine.
 
 Fortunately, we are far from a sentient AI syste
 that is ready to manipulate its human creators (or burn their coffee).
-Firstly, AI systems are engineered, trained and deployed in a specific,
+First, AI systems are engineered, trained and deployed in a specific,
 goal-oriented manner. While their behavior might give the illusion
 of general intelligence,it is a combination of rules, heuristics
 and statistical models that underlie the design.

@@ -117,7 +117,7 @@ model = d2l.EncoderDecoder(encoder, decoder)
 d2l.train_s2s_ch8(model, train_iter, lr, num_epochs, ctx)
 ```
 
-Lastly, we predict several sample examples.
+Last, we predict several sample examples.
 
 ```{.python .input  n=6}
 for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
