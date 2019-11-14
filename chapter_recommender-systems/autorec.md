@@ -118,7 +118,3 @@ d2l.train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
 * Vary the hidden dimension of AutoRec to see its impact on the model performance.
 * Try to add more hidden layers. Is it helpful to improve the model performance?
 * Can you find a better combination of decoder and encoder activation functions?
-
-## References
-
-* Sedhain, Suvash, et al. "AutoRec: Autoencoders meet collaborative filtering." Proceedings of the 24th International Conference on World Wide Web. ACM, 2015.
