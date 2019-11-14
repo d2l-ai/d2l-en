@@ -420,7 +420,7 @@ from mxnet.gluon import nn
 npx.set_np()
 ```
 
-### Generating Datasets
+### Generating the Dataset
 
 First we need data. Given $x$, we will use the following cubic polynomial to generate the labels on training and test data:
 

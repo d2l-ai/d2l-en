@@ -29,7 +29,7 @@ import zipfile
 npx.set_np()
 ```
 
-## Obtain and Organize the Datasets
+## Obtain and Organize the Dataset
 
 The competition data is divided into a training set and testing set. The training set contains 10,222 images and the testing set contains 10,357 images. The images in both sets are in JPEG format. These images contain three RGB channels (color) and they have different heights and widths. There are 120 breeds of dogs in the training set, including Labradors, Poodles, Dachshunds, Samoyeds, Huskies, Chihuahuas, and Yorkshire Terriers.
 

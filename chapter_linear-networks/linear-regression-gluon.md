@@ -17,7 +17,7 @@ In this section, we will show you how to implement
 the linear regression model from :numref:`sec_linear_scratch`
 concisely by using Gluon.
 
-## Generating Datasets
+## Generating the Dataset
 
 To start, we will generate the same dataset as in the previous section.
 

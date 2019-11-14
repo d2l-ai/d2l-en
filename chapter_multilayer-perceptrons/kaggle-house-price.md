@@ -51,7 +51,7 @@ The URL is right here:
 ![House Price Prediction](../img/house_pricing.png)
 :width:`600px`
 
-## Accessing and Reading Datasets
+## Accessing and Reading the Dataset
 
 Note that the competition data is separated into training and test sets.
 Each record includes the property value of the house
