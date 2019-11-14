@@ -18,7 +18,7 @@
 * Quotes
     * Use double quotes
 * Symbol Descriptions
-    * time step t（not t time step）
+    * timestep t（not t timestep）
 * Tools, Class, and Functions
     * Gluon, MXNet, NumPy, spaCy, NDArray, Symbol, Block, HybridBlock, ResNet-18, Fashion-MNIST, matplotlib
         * Consider these as words without accents (``)
