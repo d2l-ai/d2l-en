@@ -86,7 +86,7 @@ Whenever $\mathbf{g}_t^2$ has high variance or updates are sparse, $\mathbf{s}_t
 
 $$\mathbf{s}_t \leftarrow \mathbf{s}_{t-1} + (1 - \beta_2) \mathbf{g}_t^2 \odot \mathop{\mathrm{sgn}}(\mathbf{g}_t^2 - \mathbf{s}_{t-1}).$$
 
-The authors furthermore advise to initialize the momentum on a larger initial batch rather than just initial pointwise estimate. We omit the details since they are not material to the discussion and since even without this convergence remains pretty good. 
+The authors furthermore advise to initialize the momentum on a larger initial batch rather than just initial pointwise estimate. We omit the details since they are not material to the discussion and since even without this convergence remains pretty good.
 
 ```{.python .input}
 def yogi(params, states, hyperparams):
@@ -123,6 +123,3 @@ d2l.train_ch10(yogi, init_adam_states(feature_dim),
 
 ![](../img/qr_adam.svg)
 
-```{.python .input}
-
-```
