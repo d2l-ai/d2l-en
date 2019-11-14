@@ -36,7 +36,7 @@ import zipfile
 npx.set_np()
 ```
 
-### Get the Data Set
+### Get the Dataset
 
 The hot dog dataset we use was taken from online images and contains 1,400 positive images containing hot dogs and same number of negative images containing other foods. 1,000 images of various classes are used for training and the rest are used for testing.
 

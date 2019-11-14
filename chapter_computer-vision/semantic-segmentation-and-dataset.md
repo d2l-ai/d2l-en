@@ -1,4 +1,4 @@
-# Semantic Segmentation and Data Sets
+# Semantic Segmentation and Datasets
 :label:`sec_semantic_segmentation`
 
 In our discussion of object detection issues in the previous sections, we only used rectangular bounding boxes to label and predict objects in images. In this section, we will look at semantic segmentation, which attempts to segment images into regions with different semantic categories. These semantic regions label and predict objects at the pixel level. Figure 9.10 shows a semantically-segmented image, with areas labeled "dog", "cat", and "background". As you can see, compared to object detection, semantic segmentation labels areas with pixel-level borders, for significantly greater precision.
@@ -14,7 +14,7 @@ In the computer vision field, there are two important methods related to semanti
 * Instance segmentation is also called simultaneous detection and segmentation. This method attempts to identify the pixel-level regions of each object instance in an image. In contrast to semantic segmentation, instance segmentation not only distinguishes semantics, but also different object instances. If an image contains two dogs, instance segmentation will distinguish which pixels belong to which dog.
 
 
-## Pascal VOC2012 Semantic Segmentation Data Set
+## Pascal VOC2012 Semantic Segmentation Dataset
 
 In the semantic segmentation field, one important dataset is [Pascal VOC2012](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/). To better understand this dataset, we must first import the package or module needed for the experiment.
 
@@ -136,7 +136,7 @@ for _ in range(n):
 d2l.show_images(imgs[::2] + imgs[1::2], 2, n);
 ```
 
-### Data Set Classes for Custom Semantic Segmentation
+### Dataset Classes for Custom Semantic Segmentation
 
 We use the inherited `Dataset` class provided by Gluon to customize the semantic segmentation dataset class `VOCSegDataset`. By implementing the `__getitem__` function, we can arbitrarily access the input image with the index `idx` and the category indexes for each of its pixels from the dataset. As some images in the dataset may be smaller than the output dimensions specified for random cropping, we must remove these example by using a custom `filter` function. In addition, we define the `normalize_image` function to normalize each of the three RGB channels of the input images.
 
@@ -173,7 +173,7 @@ class VOCSegDataset(gluon.data.Dataset):
         return len(self.features)
 ```
 
-### Read the Data Set
+### Read the Dataset
 
 Using the custom `VOCSegDataset` class, we create the training set and testing set instances. We assume the random cropping operation output images in the shape $320\times 480$. Below, we can see the number of examples retained in the training and testing sets.
 

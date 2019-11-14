@@ -1,9 +1,9 @@
-# Object Detection Data Set (Pikachu)
+# Object Detection Dataset (Pikachu)
 
 There are no small datasets, like MNIST or Fashion-MNIST, in the object detection field. In order to quickly test models, we are going to assemble a small dataset. First, we generate 1000 Pikachu images of different angles and sizes using an open source 3D Pikachu model. Then, we collect a series of background images and place a Pikachu image at a random position on each image. We use the [im2rec tool](https://github.com/apache/incubator-mxnet/blob/master/tools/im2rec.py) provided by MXNet to convert the images to binary RecordIO format[1]. This format can reduce the storage overhead of the dataset on the disk and improve the reading efficiency. If you want to learn more about how to read images, refer to the documentation for the [GluonCV Toolkit](https://gluon-cv.mxnet.io/).
 
 
-## Download the Data Set
+## Download the Dataset
 
 The Pikachu dataset in RecordIO format can be downloaded directly from the Internet. The operation for downloading the dataset is defined in the function `_download_pikachu`.
 
@@ -27,7 +27,7 @@ def download_pikachu(data_dir):
             root_url + k, os.path.join(data_dir, k), sha1_hash=v)
 ```
 
-## Read the Data Set
+## Read the Dataset
 
 We are going to read the object detection dataset by creating the instance `ImageDetIter`. The "Det" in the name refers to Detection. We will read the training dataset in random order. Since the format of the dataset is RecordIO, we need the image index file `'train.idx'` to read random minibatches. In addition, for each image of the training set, we will use random cropping and require the cropped image to cover at least 95% of each object. Since the cropping is random, this requirement is not always satisfied. We preset the maximum number of random cropping attempts to 200. If none of them meets the requirement, the image will not be cropped. To ensure the certainty of the output, we will not randomly crop the images in the test dataset. We also do not need to read the test dataset in random order.
 

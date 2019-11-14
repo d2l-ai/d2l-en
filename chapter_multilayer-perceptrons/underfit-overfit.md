@@ -261,7 +261,7 @@ In order to determine the best among our candidate models,
 we will typically employ a validation set.
 
 
-### Validation Data Set
+### Validation Dataset
 
 In principle we should not touch our test set
 until after we have chosen all our hyper-parameters.
@@ -388,7 +388,7 @@ and under- vs over-fitting below.
 ![Influence of Model Complexity on Underfitting and Overfitting](../img/capacity_vs_error.svg)
 
 
-### Data Set Size
+### Dataset Size
 
 The other big consideration to bear in mind is the dataset size.
 Fixing our model, the fewer samples we have in the training dataset,
@@ -420,7 +420,7 @@ from mxnet.gluon import nn
 npx.set_np()
 ```
 
-### Generating Data Sets
+### Generating Datasets
 
 First we need data. Given $x$, we will use the following cubic polynomial to generate the labels on training and test data:
 
