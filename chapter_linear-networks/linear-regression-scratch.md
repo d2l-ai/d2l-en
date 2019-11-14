@@ -25,7 +25,7 @@ import random
 npx.set_np()
 ```
 
-## Generating Datasets
+## Generating the Dataset
 
 To keep things simple, we will construct an artificial dataset
 according to a linear model with additive noise.
