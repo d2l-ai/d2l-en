@@ -76,21 +76,53 @@ A more concise implementation is straightforward since `adam` is one of the algo
 d2l.train_gluon_ch10('adam', {'learning_rate': 0.01}, data_iter)
 ```
 
-## TODO - Yogi
+## Yogi
 
+One of the problems of Adam is that it can fail to converge even in convex settings when the second moment estimate in $\mathbf{s}_t$ blows up. As a fix :cite:`Zaheer.Reddi.Sachan.ea.2018` proposed a refined update (and initialization) for $\mathbf{s}_t$. To understand what's going on, let's rewrite the Adam update as follows:
+
+$$\mathbf{s}_t \leftarrow \mathbf{s}_{t-1} + (1 - \beta_2) \left(\mathbf{g}_t^2 - \mathbf{s}_{t-1}\right)$$
+
+Whenever $\mathbf{g}_t^2$ has high variance or updates are sparse, $\mathbf{s}_t$ might forget past values too quickly. A possible fix for this is to replace $\mathbf{g}_t^2 - \mathbf{s}_{t-1}$ by $\mathbf{g}_t^2 \odot \mathop{\mathrm{sgn}}(\mathbf{g}_t^2 - \mathbf{s}_{t-1})$. Now the magnitude of the update no longer depends on the amount of deviation. This yields the Yogi updates
+
+$$\mathbf{s}_t \leftarrow \mathbf{s}_{t-1} + (1 - \beta_2) \mathbf{g}_t^2 \odot \mathop{\mathrm{sgn}}(\mathbf{g}_t^2 - \mathbf{s}_{t-1}).$$
+
+The authors furthermore advise to initialize the momentum on a larger initial batch rather than just initial pointwise estimate. We omit the details since they are not material to the discussion and since even without this convergence remains pretty good. 
+
+```{.python .input}
+def yogi(params, states, hyperparams):
+    beta1, beta2, eps = 0.9, 0.999, 1e-3
+    for p, (v, s) in zip(params, states):
+        v[:] = beta1 * v + (1 - beta1) * p.grad
+        s[:] = s + (1 - beta2) * np.sign(np.square(p.grad) - s) * np.square(p.grad)
+        v_bias_corr = v / (1 - beta1 ** hyperparams['t'])
+        s_bias_corr = s / (1 - beta2 ** hyperparams['t'])
+        p[:] -= hyperparams['lr'] * v_bias_corr / (np.sqrt(s_bias_corr) + eps)
+    hyperparams['t'] += 1
+    
+data_iter, feature_dim = d2l.get_data_ch10(batch_size=10)
+d2l.train_ch10(yogi, init_adam_states(feature_dim),
+               {'lr': 0.01, 't': 1}, data_iter, feature_dim);
+```
 
 ## Summary
 
+* Adam combines features of many optimization algorithms into a fairly robust update rule. 
 * Created on the basis of RMSProp, Adam also uses EWMA on the minibatch stochastic gradient
-* Adam uses bias correction.
+* Adam uses bias correction to adjust for a slow startup when estimating momentum and a second moment. 
+* For gradients with significant variance we may encounter issues with convergence. They can be amended by using larger minibatches or by switching to an improved estimate for $\mathbf{s}_t$. Yogi offers such an alternative. 
 
 ## Exercises
 
-* Adjust the learning rate and observe and analyze the experimental results.
-* Some people say that Adam is a combination of RMSProp and momentum. Why do you think they say this?
-
+1. Adjust the learning rate and observe and analyze the experimental results.
+1. Can you rewrite momentum and second moment updates such that it doesn't require bias correction?
+1. Why do you need to reduce the learning rate $\eta$ as we converge?
+1. Try to construct a case for which Adam diverges and Yogi converges?
 
 
 ## [Discussions](https://discuss.mxnet.io/t/2378)
 
 ![](../img/qr_adam.svg)
+
+```{.python .input}
+
+```
