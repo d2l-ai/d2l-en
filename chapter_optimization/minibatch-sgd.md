@@ -9,7 +9,7 @@ At the heart of the decision to use minibatches is computational efficiency. Thi
 
 Things are a bit more subtle when it comes to single GPUs or even CPUs. These devices have multiple types of memory, often multiple type of compute units and different bandwidth constraints between them. For instance, a CPU has a small number of registers and then L1, L2 and in some cases even L3 cache (which is shared between the different processor cores). These caches are of increasing size and latency (and at the same time they're of decreasing bandwidth). Suffice it to say, the processor is capable of performing many more operations than what the main memory interface is able to provide. 
 
-* A 2GHz CPU with 16 cores and AVX-512 vectorization can process up to $2 \cdot 10^9 \cdot 16 \cdot 32 = 10^{12}$ bytes per second. The capability of GPUs easily exceeds this number by a factor of 100. On the other hand, a midrange server processor might not have much more than 100 GB/s bandwidth, i.e.\ less than one tenth of what would be required to keep the processor fed. To make matters worse, not all memory access is created equal: firstly, memory interfaces are typically 64 bit wide or wider (e.g. on GPUs up to 384 bit), hence reading a single byte incurs the cost of a much wider access. 
+* A 2GHz CPU with 16 cores and AVX-512 vectorization can process up to $2 \cdot 10^9 \cdot 16 \cdot 32 = 10^{12}$ bytes per second. The capability of GPUs easily exceeds this number by a factor of 100. On the other hand, a midrange server processor might not have much more than 100 GB/s bandwidth, i.e.\ less than one tenth of what would be required to keep the processor fed. To make matters worse, not all memory access is created equal: first, memory interfaces are typically 64 bit wide or wider (e.g. on GPUs up to 384 bit), hence reading a single byte incurs the cost of a much wider access. 
 * There is significant overhead for the first access whereas sequential access is relatively cheap (this is often called a burst read). There are many more things to keep in mind, such as caching when we have multiple sockets, chiplets and other structures. A detailed discussion of this is beyond the scope of this section. See e.g. this [Wikipedia article](https://en.wikipedia.org/wiki/Cache_hierarchy) for a more in-depth discussion.
 
 The way to alleviate these constraints is to use a hierarchy of CPU caches which are actually fast enough to supply the processor with data. This is *the* driving force behind batching in deep learning. To keep matters simple, consider matrix-matrix multiplication, say $A = B \cdot C$. We have a number of options for calculating $A$. For instance we could try the following:
@@ -59,7 +59,7 @@ A.wait_to_read()
 timer.stop()
 ```
 
-Lastly, the most effective manner is to perform the entire operation in one block. Let's see what the respective speed of the operations is.
+Last, the most effective manner is to perform the entire operation in one block. Let's see what the respective speed of the operations is.
 
 ```{.python .input  n=4}
 # Compute A = B C in one go
@@ -176,7 +176,7 @@ When the batch size equals 1, we use SGD for optimization. For simplicity of imp
 sgd_res = train_sgd(0.005, 1)
 ```
 
-Lastly, when the batch size equals 100, we use minibatch SGD for optimization. The time required per epoch is longer than the time needed for SGD and the time for batch gradient descent.
+Last, when the batch size equals 100, we use minibatch SGD for optimization. The time required per epoch is longer than the time needed for SGD and the time for batch gradient descent.
 
 ```{.python .input  n=6}
 mini1_res = train_sgd(.4, 100)

@@ -91,7 +91,7 @@ for X, y in train_iter:
 
 ## Put All Things Together
 
-Lastly, we will save a function `load_data_imdb` into `d2l`, which returns the vocabulary and data iterators.
+Last, we will save a function `load_data_imdb` into `d2l`, which returns the vocabulary and data iterators.
 
 ```{.python .input  n=7}
 # Saved in the d2l package for later use

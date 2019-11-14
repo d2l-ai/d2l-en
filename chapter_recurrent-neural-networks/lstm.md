@@ -11,7 +11,7 @@ Arguably it is inspired by logic gates of a computer. To control a memory cell
 we need a number of gates. One gate is needed to read out the entries from the
 cell (as opposed to reading any other cell). We will refer to this as the
 *output* gate. A second gate is needed to decide when to read data into the
-cell. We refer to this as the *input* gate. Lastly, we need a mechanism to reset
+cell. We refer to this as the *input* gate. Last, we need a mechanism to reset
 the contents of the cell, governed by a *forget* gate. The motivation for such a
 design is the same as before, namely to be able to decide when to remember and
 when to ignore inputs in the latent state via a dedicated mechanism. Let us see
@@ -70,7 +70,7 @@ If the forget gate is always approximate to 1 and the input gate is always appro
 
 ### Hidden States
 
-Lastly we need to define how to compute the hidden state $\mathbf{H}_t \in \mathbb{R}^{n \times h}$. This is where the output gate comes into play. In LSTM it is simply a gated version of the $\tanh$ of the memory cell. This ensures that the output values of $\mathbf{H}_t$ are always in the interval $(-1, 1)$. Whenever the output gate is $1$ we effectively pass all memory information through to the predictor, whereas for output $0$ we retain all the information only within the memory cell and perform no further processing. :numref:`lstm_3` has a graphical illustration of the data flow.
+Last we need to define how to compute the hidden state $\mathbf{H}_t \in \mathbb{R}^{n \times h}$. This is where the output gate comes into play. In LSTM it is simply a gated version of the $\tanh$ of the memory cell. This ensures that the output values of $\mathbf{H}_t$ are always in the interval $(-1, 1)$. Whenever the output gate is $1$ we effectively pass all memory information through to the predictor, whereas for output $0$ we retain all the information only within the memory cell and perform no further processing. :numref:`lstm_3` has a graphical illustration of the data flow.
 
 $$\mathbf{H}_t = \mathbf{O}_t \odot \tanh(\mathbf{C}_t).$$
 

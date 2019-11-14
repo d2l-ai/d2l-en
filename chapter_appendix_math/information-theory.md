@@ -18,7 +18,7 @@ Next, they flip over a card and say, "I see a heart."  This provides us some inf
 
 Next, they flip over a card and say, "This is the $3$ of spades."  This is more information.  Indeed there were $52$ equally likely possible outcomes, and our friend told us which one it was.  This should be a medium amount of information.
 
-Let us take this to the logical extreme.  Suppose that lastly that they flip over every card from the deck and read off the entire sequence of the shuffled deck.  There are $52!$ different orders to the deck, again all equally likely, so we need a lot of information to know which one it is.
+Let us take this to the logical extreme.  Suppose that finally they flip over every card from the deck and read off the entire sequence of the shuffled deck.  There are $52!$ different orders to the deck, again all equally likely, so we need a lot of information to know which one it is.
 
 Any notion of information we develop must conform to this intuition.  Indeed, in the next sections we will learn how to compute that these events have $0\text{ bits}$, $2\text{ bits}$, $~5.7\text{ bits}$, and $~225.6\text{ bits}$ of information respectively.
 
