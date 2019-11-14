@@ -3,15 +3,19 @@
 
 Undoubtedly, to be a top deep learning practitioner, the ability to train the state-of-the-art and high accurate models is crucial.  However, it is often unclear when improvements are significant, or only the result of random fluctuations in the training process.  To be able to discuss uncertainty in estimated values, we must learn some statistics.
 
-The earliest reference of *statistics* can be traced back to an Arab scholar Al-Kindi in the 9th-century, who gave a detailed description of how to use statistics and frequency analysis to decipher encrypted messages. 800 years later, modern statistics arose in Germany in the 1700s when researchers were involved in the systematic collection of demographic and economic data. Today, statistics is the science concerned with the collection, processing, analysis, interpretation and visualization of data. It has been widely used in government, business, sciences, and beyond.  
+
+The earliest reference of *statistics* can be traced back to an Arab scholar Al-Kindi in the 9th-century, who gave a detailed description of how to use statistics and frequency analysis to decipher encrypted messages. After 800 years, the modern statistics arose from Germany in 1700s, when the researchers focused on the demographic and economic data collection and analysis. Today, statistics is the science subject that concerns the collection, processing, analysis, interpretation and visualization of data. What is more, the core theory of statistics has been widely used in the research within academia, industry, and government.
 
 
-More specifically, statistics can be divided to *descriptive statistics* and *statistical inference*. The former is the study of summary statistic that quantitatively describes features of a collection of observed data, which is referred to as a *sample*. The sample is drawn from a *population*, which denotes the total set of similar individuals, items, or events in our experiment. Contrary to descriptive statistics, *Statistical inference* further deduces the characteristics of a population from *samples*, based on the assumptions that the sample distribution approximates the population distribution.
+More specifically, statistics can be divided to *descriptive statistics* and *statistical inference*. The former focus on summarizing and illustrating the features of a collection of observed data, which is referred to as a *sample*. The sample is drawn from a *population*, denotes the total set of similar individuals, items, or events of our experiment interests. Contrary to descriptive statistics, *statistical inference* further deduces the characteristics of a population from the given *samples*, based on the assumptions that the sample distribution can replicate the population distribution at some degree.
 
 
-You may wonder: “What is the essential difference between machine learning and statistics?” Fundamentally speaking, statistics focuses on the problem of inference. This type of problems includes modeling the relationship between the variables, such as causal inference, and testing the statistically significance of model parameters, such as A/B testing. Machine learning emphasizes making accurate predictions typically without a focus on accurate estimation of model parameters.  Particularly in deep learning, we often do not care what the weights of our network are, rather only how the resulting network performs.  
+You may wonder: “What is the essential difference between machine learning and statistics?” Fundamentally speaking, statistics focuses on the inference problem. This type of problems includes modeling the relationship between the variables, such as causal inference, and testing the statistically significance of model parameters, such as A/B testing. In contrast, machine learning emphasizes on making accurate predictions, without explicitly programming and understanding each parameter's functionality. 
+
  
 In this section, we will introduce three types of statistics inference methods: evaluating and comparing estimators, conducting hypothesis tests, and constructing confidence intervals. These methods can help us infer the characteristics of a given population, i.e., the true parameter $\theta$. For brevity, we assume that the true parameter $\theta$ of a given population is a scalar value. It is straightforward to extend to the case where $\theta$ is a vector or a tensor, thus we omit it in our discussion. 
+
+
 
 ## Evaluating and Comparing Estimators
 
@@ -58,16 +62,19 @@ $$\mathrm{MSE} (\hat{\theta}_n, \theta) = E[(\hat{\theta}_n - \theta)^2].$$
 
 This allows us to quantify the average squared deviation from the true value.  MSE is always non-negative. If you have read :numref:`sec_linear_regression`, you will recognize it as the most commonly used regression loss function. As a measure to evaluate an estimator, the closer its value to zero, the closer the estimator is close to the true parameter $\theta$.
 
+
 ### Statistical Bias
 
 The MSE provides a natural metric, but we can easily imagine multiple different phenomena that might make it large.  Two that we will see are fundamentally important are the fluctuation in the estimator due to randomness in the dataset, and systematic error in the estimator due to the estimation procedure.  
 
-First, let us measure the systematic error.  The *statistical bias* of an estimator is the difference between this estimator’s expected value and the true parameter value of $\theta$, i.e.,
+
+First, let us measure the systematic error. For an estimator $\hat{\theta}_n$, the mathematical illustration of *statistical bias* can be defined as
 
 $$\mathrm{bias}(\hat{\theta}_n) = E(\hat{\theta}_n - \theta) = E(\hat{\theta}_n) - \theta.$$
 :eqlabel:`eq_bias`
 
 Note that when $\mathrm{bias}(\hat{\theta}_n) = 0$, the expectation of the estimator $\hat{\theta}_n$ is equal to the true value of parameter.  In this case, we say $\hat{\theta}_n$ is an unbiased estimator.  In general, an unbiased estimator is better than a biased estimator since its expectation is the same as the true parameter. 
+
 
 It is worth being aware, however, that biased estimators are frequently used in practice.  There are cases where unbiased estimators do not exist without further assumptions, or are intractable to compute.  This may seem like a significant flaw in an estimator, however the majority of estimators encountered in practice are at least asymptotically unbiased in the sense that the bias tends to zero as the number of available samples tends to infinity: $\lim_{n \rightarrow \infty} \mathrm{bias}(\hat{\theta}_n) = 0$.
 
@@ -81,9 +88,10 @@ $$\sigma_{\hat{\theta}_n} = \sqrt{\mathrm{Var} (\hat{\theta}_n )} = \sqrt{E[(\ha
 
 It is important to compare :eqref:`eq_var_est` to :eqref:`eq_mse_est`.  In this equation we do not compare to the true population value $\theta$, but instead to $E(\hat{\theta}_n)$, the expected sample mean.  Thus we are not measuring how far the estimator tends to be from the true value, but instead we measuring the fluctuation of the estimator itself.
 
+
 ### The Bias-Variance Trade-off
 
-It is intuitively clear that these two components contribute to the mean squared error.  What is somewhat shocking it that we can show that this is actually a *decomposition* of the mean squared error into two contributions.  That is to say that we can write the mean squared error as the sum of the variance and the square or the bias.
+It is intuitively clear that these two components contribute to the mean squared error.  What is somewhat shocking is that we can show that this is actually a *decomposition* of the mean squared error into two contributions.  That is to say that we can write the mean squared error as the sum of the variance and the square or the bias.
 
 $$
 \begin{aligned}
@@ -93,7 +101,7 @@ $$
 \end{aligned}
 $$
 
-We refer the above formula as *bias-variance trade-off*. The mean squared error can be divided into precisely two sources of error: the high bias error and the variance. On the one hand, the bias error is commonly seen in a simple model (such as a linear regression model), which cannot extract high dimensional relations between the features and the outputs. If a model suffers from high bias error, we often say it is *underfitting* or lack of *generalization* as introduced in (:numref:`sec_model_selection`). On the flip side, the other error source - high variance usually results from a too complex model, which overfits the training data. As a result, an *overfitting* model is sensitive to small fluctuations in the data. If a model suffers from high variance, we often say it is *overfitting* and lack of *flexibility* as introduced in (:numref:`sec_model_selection`).
+We refer the above formula as *bias-variance trade-off*. The mean squared error can be divided into precisely two sources of error: the error from high bias and the error from high variance. On the one hand, the bias error is commonly seen in a simple model (such as a linear regression model), which cannot extract high dimensional relations between the features and the outputs. If a model suffers from high bias error, we often say it is *underfitting* or lack of *generalization* as introduced in (:numref:`sec_model_selection`). On the flip side, the other error source - high variance usually results from a too complex model, which overfits the training data. As a result, an *overfitting* model is sensitive to small fluctuations in the data. If a model suffers from high variance, we often say it is *overfitting* and lack of *flexibility* as introduced in (:numref:`sec_model_selection`).
 
 
 ### Evaluating Estimators in Code
@@ -137,11 +145,9 @@ np.square(samples.std()) + np.square(bias)
 ## Conducting Hypothesis Tests
 
 
-The most commonly encountered topic in statistical inference is hypothesis testing. While hypothesis testing was popularized in the early 20th century, the first use can be traced back to John Arbuthnot in the 1700s. By examining birth records in London for each of the 82 years from 1629 to 1710 and the human sex ratio at birth, John concluded that the number of males born in London exceeded the number of females in every year. 
+The most commonly encountered topic in statistical inference is hypothesis testing. While hypothesis testing was popularized in the early 20th century, the first use can be traced back to John Arbuthnot in the 1700s. John tracked 80-year birth records in London and concluded that more men were born than women each year. Following that, the modern significance testing is the intelligence heritage by Karl Pearson who invented $p$-value and Pearson's chi-squared test), William Gosset who is the father of Student's t-distribution, and Ronald Fisher who initialed the null hypothesis and the significance test. 
 
-Following that, modern significance testing has arisen through a combination of efforts from many including Karl Pearson who invented $p$-value and Pearson's chi-squared test, William Gosset who is the father of Student's t-distribution, and Ronald Fisher who initialed the null hypothesis and the significance test. 
-
-A *hypothesis test* is a way of evaluating some evidence against the default statement about a population. We refer the default statement as the *null hypothesis* $H_0$, which we try to reject using the observed data. Here, we use $H_0$ as a starting point for the statistical significance testing. The *alternative hypothesis* $H_A$ (or $H_1$) is a statement that is contrary to the null hypothesis. A  null hypothesis is often stated in a declarative form which posits a relationship between variables. It should reflect the brief as explicit as possible, and be testable by statistics theory. 
+A *hypothesis test* is a way of evaluating some evidence against the default statement about a population. We refer the default statement as the *null hypothesis* $H_0$, which we try to reject using the observed data. Here, we use $H_0$ as a starting point for the statistical significance testing. The *alternative hypothesis* $H_A$ (or $H_1$) is a statement that is contrary to the null hypothesis. A null hypothesis is often stated in a declarative form which posits a relationship between variables. It should reflect the brief as explicit as possible, and be testable by statistics theory. 
 
 Imagine you are a chemist. After spending thousands of hours in the lab, you develop a new medicine which can dramatically improve one's ability to understand math. To show its magic power, you need to test it. Naturally, you may need some volunteers to take the medicine and see whether it can help them learn math better. How do you get started? 
 
@@ -162,29 +168,29 @@ The *statistical significance* measures the probability of erroneously reject th
 
 $$ \text{statistical significance }= 1 - \alpha = P(\text{reject } H_0 \mid H_0 \text{ is true} ).$$
 
-It is also referred to as a *type I error* or *false positive*. The $\alpha$, is called as the *significance level* and its commonly used value is $5\%$, i.e., $1-\alpha = 95\%$. The level of statistical significance can be explained as the level of risk that we are willing to take, when we reject a true null hypothesis. 
+It is also referred to as the *type I error* or *false positive*. The $\alpha$, is called as the *significance level* and its commonly used value is $5\%$, i.e., $1-\alpha = 95\%$. The level of statistical significance level can be explained as the level of risk that we are willing to take, when we reject a true null hypothesis. 
 
 :numref:`fig_statistical_significance` shows the the observations' values and probability of a given normal distribution in a two-sample hypothesis test. If the observation data point is located outsides the $95\%$ threshold, it will be a very unlikely observation under the null hypothesis assumption. Hence, there might be something wrong with the null hypothesis and we will reject it. 
 
 ![Statistical significance.](../img/statistical_significance.svg)
 :label:`fig_statistical_significance`
 
+
 ### Statistical Power 
 
-The *statistical power* (or *sensitivity*) measures the ability to identify a true difference as it states in $H_0$, i.e., 
+The *statistical power* (or *sensitivity*) measures the probability of reject the null hypothesis, $H_0$, when it should be rejected, i.e.,
 
 $$ \text{statistical power }= P(\text{reject } H_0  \mid H_0 \text{ is false} ).$$
 
-Recall that a *type I error* is the rejection of a true null hypothesis.  We will use the term *type II error* to refer the non-rejection of a false null hypothesis. A type II error is usually denoted as $\beta$, and hence the corresponding statistical power is $1-\beta$. 
+Recall that a *type I error* is error caused by rejecting the null hypothesis when it is true, whereas a *type II error* is resulted from failing to reject the null hypothesis when it is false. A type II error is usually denoted as $\beta$, and hence the corresponding statistical power is $1-\beta$. 
+
 
 Intuitively, statistical power can be interpreted as how likely our test will detect a real discrepancy of some minimum magnitude at a desired statistical significance level. $80\%$ is a commonly used statistical power threshold. The higher the statistical power, the more likely we are to detect true differences. 
 
-One of the most common uses of statistical power is in determining the number of samples needed.  The probability you reject the null hypothesis when it is false depends on the degree to which it is false (known as the *effect size*) and the number of samples you have.  As you might expect, small effect sizes will require a very large number of samples to be detectable with high probability.  While beyond the scope of this brief appendix to derive in detail, as an example, want to be able to reject a null hypothesis that our sample came from a mean zero variance one Gaussian, and we believe that our sample's mean is actually close to one, we can do so with acceptable error rates with a sample size of only $8$.  However, if we think our sample populations true mean is close to $0.01$, then we'd need a sample size of nearly $80000$ to detect the difference.
+One of the most common uses of statistical power is in determining the number of samples needed.  The probability you reject the null hypothesis when it is false depends on the degree to which it is false (known as the *effect size*) and the number of samples you have.  As you might expect, small effect sizes will require a very large number of samples to be detectable with high probability.  While beyond the scope of this brief appendix to derive in detail, as an example, want to be able to reject a null hypothesis that our sample came from a mean zero variance one Gaussian, and we believe that our sample's mean is actually close to one, we can do so with acceptable error rates with a sample size of only $8$.  However, if we think our sample population true mean is close to $0.01$, then we'd need a sample size of nearly $80000$ to detect the difference.
 
-We can imagine the power as the fishing net as shown in :numref:`fig_statistical_power`. In this analogy, a high power hypothesis test is like a fine-mesh fishing net, and a low power hypothesis test is like a coarse-mesh one.  Smaller effect sizes, like smaller fish, will slip through the coarser fishing net and be missed, whereas they will be caught by the finer one.  The analogy is rather apt, since just as one needs more rope to create a finer net, one also often needs more data to assure a higher level of statistical power.
+We can imagine the power as a water filter. In this analogy, a high power hypothesis test is like a high quality water filtration system that will reduce harmful substances in the water as much as possible. On the other hand, a smaller discrepancy is like a low quality water filter, where some relative small substances may easily escape from the gaps. Similarly, if the statistical power is not of enough high power, then the test may not catch the smaller discrepancy.
 
-![Statistical significance.](../img/statistical_power.svg)
-:label:`fig_statistical_power`
 
 ### Test Statistic 
 
@@ -192,18 +198,20 @@ A *test statistic* $T(x)$ is a scalar which summarizes some characteristic of th
 
 Often, $T(X)$ (the distribution of the test statistic under our null hypothesis) will follow, at least approximately, a common probability distribution such as a normal distribution when considered under the null hypothesis. If we can derive explicitly such a distribution, and then measure our test statistic on our dataset, we can safely reject the null hypothesis if our statistic is far outside the range that we would expect.  Making this quantitative leads us to the notion of $p$-values.
 
+
 ### $p$-value
 
 The *$p$-value* (or the *probability value*) is the probability that $T(X)$ is at least as extreme as the observed test statistic $T(x)$ assuming that the null hypothesis is *true*, i.e., 
 
 $$ p\text{-value} = P_{H_0}(T(X) \geq T(x)).$$
 
-If the $p$-value is smaller than or equal to a pre-defined and fixed statistical significance level $\alpha$, we may reject the null hypothesis. Otherwise, we will conclude that we do not have enough evidence to reject the null hypothesis. For a given population distribution, the *region of rejection* will be the interval contained of points which has a $p$-value smaller than the statistical significance level $\alpha$.
+If the $p$-value is smaller than or equal to a pre-defined and fixed statistical significance level $\alpha$, we may reject the null hypothesis. Otherwise, we will conclude that we are lack of evidence to reject the null hypothesis. For a given population distribution, the *region of rejection* will be the interval contained of all the points which has a $p$-value smaller than the statistical significance level $\alpha$.
 
 
 ### One-side Test and Two-sided Test
 
-Normally there are two kinds of significance test: the one-sided test and the two-sided test. The *one-sided test* (or *one-tailed test*) is appropriate when the region of rejection is on only one side of the sampling distribution. For example, the null hypothesis may state that the true parameter $\theta$ is less than or equal to a value $c$. The alternative hypothesis would be that $\theta$ is greater than $c$. On the other hand, the *two-sided test* (or *two-tailed test*) is appropriate when the region of rejection is on both sides of the sampling distribution. An example in this case may have a null hypothesis state that the true parameter $\theta$ is equal to a value $c$. The alternative hypothesis would be that $\theta$ is not equal to $c$.
+Normally there are two kinds of significance test: the one-sided test and the two-sided test. The *one-sided test* (or *one-tailed test*) is applicable when the null hypothesis and the alternative hypothesis only have one direction. For example, the null hypothesis may state that the true parameter $\theta$ is less than or equal to a value $c$. The alternative hypothesis would be that $\theta$ is greater than $c$. That is, the region of rejection is on only one side of the sampling distribution.  Contrary to the one-sided test, the *two-sided test* (or *two-tailed test*) is applicable when the region of rejection is on both sides of the sampling distribution. An example in this case may have a null hypothesis state that the true parameter $\theta$ is equal to a value $c$. The alternative hypothesis would be that $\theta$ is not equal to $c$.
+
 
 ### General Steps of Hypothesis Testing
 
@@ -245,9 +253,9 @@ It is very tempting to interpret a $95\%$ confidence interval as an interval whe
 
 This may seem pedantic, but it can have real implications for the interpretation of the results.  In particular, we may satisfy :eqref:`eq_confidence` by constructing intervals that we are *almost certain* do not contain the true value, as long as we only do so rarely enough.  We close this section by providing three tempting but false statements.  An in-depth discussion of these points can be found in :cite:`Morey.Hoekstra.Rouder.ea.2016`.
 
-* *Fallacy 1*. Narrow confidence intervals mean we can estimate the parameter precisely.
-* *Fallacy 2*. The values inside the confidence interval are more likely to be the true value than those outside the interval.
-* *Fallacy 3*. The probability) that a particular observed $95\%$ confidence interval contains the true value is $95\%$.
+* **Fallacy 1**. Narrow confidence intervals mean we can estimate the parameter precisely.
+* **Fallacy 2**. The values inside the confidence interval are more likely to be the true value than those outside the interval.
+* **Fallacy 3**. The probability) that a particular observed $95\%$ confidence interval contains the true value is $95\%$.
 
 Sufficed to say, confidence intervals are subtle objects.  However, if you keep the interpretation clear, they can be powerful tools.
 
@@ -278,7 +286,7 @@ Thus we know that we have found our $95\%$ confidence interval:
 $$\left[\hat\mu_n - 1.96\frac{\hat\sigma_n}{\sqrt{n}},\hat\mu_n + 1.96\frac{\hat\sigma_n}{\sqrt{n}}\right].$$
 :eqlabel:`eq_gauss_confidence`
 
-It is safe to say that :eqref:`eq_gauss_confidence` is one of the most used formula in statistics.  Let us close our discussion of statistics by implementing it.  For simplicity, we assume we are in the asymptotic regime.  Small values of $N$ should include the correct value of `t_star` obtained either programatically or from a $t$-table.
+It is safe to say that :eqref:`eq_gauss_confidence` is one of the most used formula in statistics.  Let us close our discussion of statistics by implementing it.  For simplicity, we assume we are in the asymptotic regime.  Small values of $N$ should include the correct value of `t_star` obtained either programmatically or from a $t$-table.
 
 ```{.python .input}
 # Number of samples
