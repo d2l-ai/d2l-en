@@ -115,7 +115,7 @@ We are on to something quite fundamental here - the word frequency decays rapidl
 $$n(x) \propto (x + c)^{-\alpha} \text{ and hence }
 \log n(x) = -\alpha \log (x+c) + \mathrm{const.}$$
 
-This should already give us pause if we want to model words by count statistics and smoothing. After all, we will significantly overestimate the frequency of the tail, aka the infrequent words. But what about the other word combinations (such as bigrams, trigrams, and beyond)? Let us see whether the bigram frequency behaves in the same manner as the unigram frequency.
+This should already give us pause if we want to model words by count statistics and smoothing. After all, we will significantly overestimate the frequency of the tail, also known as the infrequent words. But what about the other word combinations (such as bigrams, trigrams, and beyond)? Let us see whether the bigram frequency behaves in the same manner as the unigram frequency.
 
 ```{.python .input  n=3}
 bigram_tokens = [[pair for pair in zip(line[:-1], line[1:])] for line in tokens]
