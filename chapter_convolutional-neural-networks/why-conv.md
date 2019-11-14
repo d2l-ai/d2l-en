@@ -194,19 +194,19 @@ There is just a problem with this approach:
 so far we blissfully ignored that images consist
 of 3 channels: red, green and blue.
 In reality, images are quite two-dimensional objects
-but rather as a 3rd order tensor,
+but rather as a $3^{\mathrm{rd}}$ order tensor,
 e.g., with shape $1024 \times 1024 \times 3$ pixels.
 Only two of these axes concern spatial relationships,
-while the 3rd can be regarded as assigning
+while the $3^{\mathrm{rd}}$ can be regarded as assigning
 a multidimensional representation *to each pixel location*.
 
 We thus index $\mathbf{x}$ as $x[i,j,k]$.
 The convolutional mask has to adapt accordingly.
 Instead of $V[a,b]$ we now have $V[a,b,c]$.
 
-Moreover, just as our input consists of a 3rd order tensor
+Moreover, just as our input consists of a $3^{\mathrm{rd}}$ order tensor
 it turns out to be a good idea to similarly formulate
-our hidden representations as 3rd order tensors.
+our hidden representations as $3^{\mathrm{rd}}$ order tensors.
 In other words, rather than just having a 1D representation
 corresponding to each spatial location,
 we want to have a multidimensional hidden representations
