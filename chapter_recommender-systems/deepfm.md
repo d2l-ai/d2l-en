@@ -21,7 +21,7 @@ $$
 \mathbf{z}^{(l)}  = \alpha(\mathbf{W}^{(l)}\mathbf{z}^{(l-1)} + \mathbf{b}^{(l)}),
 $$
 
-where $\alpha$ is the activation function.  $\mathbf{W}_{l}$ and $ \mathbf{b}_{l}$ are the weight and bias at the $l^\mathrm{th}$ layer. Let $y_{DNN}$ denote the output of the prediction. The ultimate prediction of DeepFM is the summation of the outputs from both FM and DNN. So we have: 
+where $\alpha$ is the activation function.  $\mathbf{W}_{l}$ and $\mathbf{b}_{l}$ are the weight and bias at the $l^\mathrm{th}$ layer. Let $y_{DNN}$ denote the output of the prediction. The ultimate prediction of DeepFM is the summation of the outputs from both FM and DNN. So we have: 
 
 $$
 \hat{y} = \sigma(\hat{y}^{(FM)} + \hat{y}^{(DNN)}),
