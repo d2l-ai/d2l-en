@@ -10,7 +10,7 @@ to see how it works. In this section we will delve a bit more deeply
 into the details of backpropagation for sequence models and why (and
 how) the math works. For a more detailed discussion about
 randomization and backpropagation also see the paper by
-[Tallec and Ollivier, 2017](https://arxiv.org/abs/1705.08209).
+:cite:`Tallec.Ollivier.2017`.
 
 We encountered some of the effects of gradient explosion when we first
 implemented recurrent neural networks (:numref:`sec_rnn_scratch`). In
