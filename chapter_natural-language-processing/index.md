@@ -10,7 +10,7 @@ In this chapter, we will discuss how to use vectors to represent words and train
 
 word2vec
 approx-training
-word2vec-data-set
+word2vec-dataset
 word2vec-gluon
 fasttext
 glove

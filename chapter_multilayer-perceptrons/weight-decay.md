@@ -365,6 +365,6 @@ which is equivalent to weight decay applied to all layers.
 1. Review the relationship between training error and generalization error. In addition to weight decay, increased training, and the use of a model of suitable complexity, what other ways can you think of to deal with overfitting?
 1. In Bayesian statistics we use the product of prior and likelihood to arrive at a posterior via $P(w \mid x) \propto P(x \mid w) P(w)$. How can you identify $P(w)$ with regularization?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2342)
+## [Discussions](https://discuss.mxnet.io/t/2342)
 
 ![](../img/qr_weight-decay.svg)

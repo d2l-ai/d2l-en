@@ -233,6 +233,6 @@ np.abs(Y1 - Y2).sum() < 1e-6
 1. Are the variables `Y1` and `Y2` in the last example of this section exactly the same? Why?
 1. How would you implement convolutions using matrix multiplication when the convolution window is not $1\times 1$?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2351)
+## [Discussions](https://discuss.mxnet.io/t/2351)
 
 ![](../img/qr_channels.svg)

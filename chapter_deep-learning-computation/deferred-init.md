@@ -119,6 +119,6 @@ net.initialize(init=MyInit())
 1. What happens if you specify mismatching dimensions?
 1. What would you need to do if you have input of varying dimensionality? Hint - look at parameter tying.
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2327)
+## [Discussions](https://discuss.mxnet.io/t/2327)
 
 ![](../img/qr_deferred-init.svg)

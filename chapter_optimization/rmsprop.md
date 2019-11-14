@@ -25,7 +25,7 @@ $$
 \end{aligned}
 $$
 
-As before in :numref:`sec_momentum` we use $1 + \gamma + \gamma^2 + \ldots = \frac{1}{1-\gamma}$. Hence the sum of weights is normalized to $1$ with a half-life time of an observation of $\gamma^{-1}$. Let's visualize the weights for the past 40 time steps for various choices of $\gamma$.
+As before in :numref:`sec_momentum` we use $1 + \gamma + \gamma^2 + \ldots = \frac{1}{1-\gamma}$. Hence the sum of weights is normalized to $1$ with a half-life time of an observation of $\gamma^{-1}$. Let's visualize the weights for the past 40 timesteps for various choices of $\gamma$.
 
 ```{.python .input  n=1}
 %matplotlib inline
@@ -107,7 +107,7 @@ d2l.train_gluon_ch10('rmsprop', {'learning_rate': 0.01, 'gamma1': 0.9}, data_ite
 1. Would you want to adjust $\gamma$ as optimization progresses? How sensitive is RMSProp to this?
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2376)
+## [Discussions](https://discuss.mxnet.io/t/2376)
 
 ![](../img/qr_rmsprop.svg)
 

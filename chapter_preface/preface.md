@@ -376,6 +376,6 @@ Raju Gulabani, Charlie Bell, and Andrew Jassy for their generous support in writ
 1. Create an account on the forum and introduce yourself.
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2311)
+## [Discussions](https://discuss.mxnet.io/t/2311)
 
 ![](../img/qr_preface.svg)

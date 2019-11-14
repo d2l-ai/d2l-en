@@ -28,7 +28,7 @@ layer. Then, we further encode the feature sequence using a bidirectional
 recurrent neural network to obtain sequence information. Finally, we transform
 the encoded sequence information to output through the fully connected
 layer. Specifically, we can concatenate hidden states of bidirectional
-long-short term memory in the initial time step and final time step and pass it
+long-short term memory in the initial timestep and final timestep and pass it
 to the output layer classification as encoded feature sequence information. In
 the `BiRNN` class implemented below, the `Embedding` instance is the embedding
 layer, the `LSTM` instance is the hidden layer for sequence encoding, and the
@@ -53,11 +53,11 @@ class BiRNN(nn.Block):
         embeddings = self.embedding(inputs.T)
         # Since the input (embeddings) is the only argument passed into
         # rnn.LSTM, it only returns the hidden states of the last hidden layer
-        # at different time step (outputs). The shape of outputs is
+        # at different timestep (outputs). The shape of outputs is
         # (number of words, batch size, 2 * number of hidden units).
         outputs = self.encoder(embeddings)
-        # Concatenate the hidden states of the initial time step and final
-        # time step to use as the input of the fully connected layer. Its
+        # Concatenate the hidden states of the initial timestep and final
+        # timestep to use as the input of the fully connected layer. Its
         # shape is (batch size, 4 * number of hidden units)
         encoding = np.concatenate((outputs[0], outputs[-1]), axis=1)
         outs = self.decoder(encoding)
@@ -142,6 +142,6 @@ predict_sentiment(net, vocab, 'this movie is so bad')
 
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2391)
+## [Discussions](https://discuss.mxnet.io/t/2391)
 
 ![](../img/qr_sentiment-analysis-rnn.svg)

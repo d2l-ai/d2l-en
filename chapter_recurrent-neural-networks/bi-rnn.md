@@ -77,7 +77,7 @@ In fact, this is not too dissimilar to the forward and backward recursion we enc
 
 Bidirectional RNNs were introduced by [Schuster and Paliwal, 1997](https://ieeexplore.ieee.org/abstract/document/650093). For a detailed discussion of the various architectures see also the paper by [Graves and Schmidhuber, 2005](https://www.sciencedirect.com/science/article/pii/S0893608005001206). Let us look at the specifics of such a network.
 
-For a given time step $t$, the minibatch input is $\mathbf{X}_t \in \mathbb{R}^{n \times d}$ (number of examples: $n$, number of inputs: $d$) and the hidden layer activation function is $\phi$. In the bidirectional architecture, we assume that the forward and backward hidden states for this time step are $\overrightarrow{\mathbf{H}}_t  \in \mathbb{R}^{n \times h}$ and $\overleftarrow{\mathbf{H}}_t  \in \mathbb{R}^{n \times h}$ respectively. Here $h$ indicates the number of hidden units. We compute the forward and backward hidden state updates as follows:
+For a given timestep $t$, the minibatch input is $\mathbf{X}_t \in \mathbb{R}^{n \times d}$ (number of examples: $n$, number of inputs: $d$) and the hidden layer activation function is $\phi$. In the bidirectional architecture, we assume that the forward and backward hidden states for this timestep are $\overrightarrow{\mathbf{H}}_t  \in \mathbb{R}^{n \times h}$ and $\overleftarrow{\mathbf{H}}_t  \in \mathbb{R}^{n \times h}$ respectively. Here $h$ indicates the number of hidden units. We compute the forward and backward hidden state updates as follows:
 
 
 $$
@@ -133,7 +133,7 @@ classification in :numref:`sec_sentiment_rnn`.
 
 ## Summary
 
-* In bidirectional recurrent neural networks, the hidden state for each time step is simultaneously determined by the data prior to and after the current timestep.
+* In bidirectional recurrent neural networks, the hidden state for each timestep is simultaneously determined by the data prior to and after the current timestep.
 * Bidirectional RNNs bear a striking resemblance with the forward-backward algorithm in graphical models.
 * Bidirectional RNNs are mostly useful for sequence embedding and the estimation of observations given bidirectional context.
 * Bidirectional RNNs are very costly to train due to long gradient chains.
@@ -145,6 +145,6 @@ classification in :numref:`sec_sentiment_rnn`.
 1. Implement a sequence classification algorithm using bidirectional RNNs. Hint - use the RNN to embed each word and then aggregate (average) all embedded outputs before sending the output into an MLP for classification. For instance, if we have $(\mathbf{o}_1, \mathbf{o}_2, \mathbf{o}_3)$, we compute $\bar{\mathbf{o}} = \frac{1}{3} \sum_i \mathbf{o}_i$ first and then use the latter for sentiment classification.
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2370)
+## [Discussions](https://discuss.mxnet.io/t/2370)
 
 ![](../img/qr_bi-rnn.svg)

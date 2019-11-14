@@ -1,7 +1,7 @@
 # Concise Implementation of Recurrent Neural Networks
 :label:`sec_rnn_gluon`
 
-While :numref:`sec_rnn_scratch` was instructive to see how recurrent neural networks (RNNs) are implemented, this is not convenient or fast. This section will show how to implement the same RNN models more efficiently using functions provided by Gluon. We begin as before by reading the "Time Machine" corpus.
+While :numref:`sec_rnn_scratch` was instructive to see how recurrent neural networks (RNNs) are implemented, this is not convenient or fast. This section will show how to implement the same language model more efficiently using functions provided by Gluon. We begin as before by reading the "Time Machine" corpus.
 
 ```{.python .input  n=1}
 import d2l
@@ -24,7 +24,7 @@ rnn_layer = rnn.RNN(num_hiddens)
 rnn_layer.initialize()
 ```
 
-Initializing the state is straightforward. We invoke the member function `rnn_layer.begin_state(batch_size)`. This returns an initial state for each element in the minibatch. That is, it returns an object of size (hidden layers, batch size, number of hidden units). The number of hidden layers defaults to be 1. In fact, we have not even discussed yet what it means to have multiple layers, but we will do it in :numref:`sec_deep_rnn`. For now, suffice it to say that multiple layers simply amount to the output of one RNN being used as the input for the next RNN.
+Initializing the state is straightforward. We invoke the member function `rnn_layer.begin_state(batch_size)`. This returns an initial state for each element in the minibatch. That is, it returns an object of size (hidden layers, batch size, number of hidden units). The number of hidden layers defaults to be 1. In fact, we have not even discussed yet what it means to have multiple layers---this will happen in :numref:`sec_deep_rnn`. For now, suffice it to say that multiple layers simply amount to the output of one RNN being used as the input for the next RNN.
 
 ```{.python .input  n=37}
 batch_size = 1
@@ -76,14 +76,14 @@ model.initialize(force_reinit=True, ctx=ctx)
 d2l.predict_ch8('time traveller', 10, model, vocab, ctx)
 ```
 
-As is quite obvious, this model does not work at all. Next, we call `train_ch8` with the same hyper-parameters defined in :numref:`sec_rnn_scratch` and train our model from Gluon.
+As is quite obvious, this model does not work at all. Next, we call `train_ch8` with the same hyper-parameters defined in :numref:`sec_rnn_scratch` and train our model with Gluon.
 
 ```{.python .input  n=19}
 num_epochs, lr = 500, 1
 d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, ctx)
 ```
 
-Compared with last section, this model achieves comparable perplexity, albeit within a shorter period of time, due to the code being more optimized.
+Compared with the last section, this model achieves comparable perplexity, albeit within a shorter period of time, due to the code being more optimized.
 
 ## Summary
 
@@ -106,6 +106,6 @@ Compared with last section, this model achieves comparable perplexity, albeit wi
     * How many bits do you need?
     * Why does not everyone use this model for text compression? Hint - what about the compressor itself?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2365)
+## [Discussions](https://discuss.mxnet.io/t/2365)
 
 ![](../img/qr_rnn-gluon.svg)

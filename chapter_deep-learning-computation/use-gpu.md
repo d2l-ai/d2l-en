@@ -178,6 +178,6 @@ In short, as long as all data and parameters are on the same device, we can lear
 1. Measure the time it takes to compute 1000 matrix-matrix multiplications of $100 \times 100$ matrices and log the matrix norm $\mathrm{tr} M M^\top$ one result at a time vs. keeping a log on the GPU and transferring only the final result.
 1. Measure how much time it takes to perform two matrix-matrix multiplications on two GPUs at the same time vs. in sequence on one GPU (hint - you should see almost linear scaling).
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2330)
+## [Discussions](https://discuss.mxnet.io/t/2330)
 
 ![](../img/qr_use-gpu.svg)

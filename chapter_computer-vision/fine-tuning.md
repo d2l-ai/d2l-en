@@ -36,7 +36,7 @@ import zipfile
 npx.set_np()
 ```
 
-### Get the Data Set
+### Get the Dataset
 
 The hot dog dataset we use was taken from online images and contains 1,400 positive images containing hot dogs and same number of negative images containing other foods. 1,000 images of various classes are used for training and the rest are used for testing.
 
@@ -176,6 +176,6 @@ hotdog_w = np.split(weight.data(), 1000, axis=0)[713]
 hotdog_w.shape
 ```
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2443)
+## [Discussions](https://discuss.mxnet.io/t/2443)
 
 ![](../img/qr_fine-tuning.svg)

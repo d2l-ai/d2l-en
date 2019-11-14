@@ -257,6 +257,6 @@ thus more intermediate activations need to be stored.
     * Can you partition it over more than one GPU?
     * What are the advantages and disadvantages over training on a smaller minibatch?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2344)
+## [Discussions](https://discuss.mxnet.io/t/2344)
 
 ![](../img/qr_backprop.svg)

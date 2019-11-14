@@ -1,9 +1,9 @@
-# Machine Translation and Data Sets
+# Machine Translation and Datasets
 :label:`sec_machine_translation`
 
 So far we see how to use recurrent neural networks for language models, in which we predict the next token given all previous tokens in an article. Now let us have a look at a different application, machine translation, whose predict output is no longer a single token, but a list of tokens. 
 
-Machine translation (MT) refers to the automatic translation of a segment of text from one language to another. Solving this problem with neural networks is often called neural machine translation (NMT). Compared to language models (:numref:`sec_language_model`), in which the corpus only contains a single language, machine translation dataset has at least two languages, the source language and the target language. In addition, each sentence in the source language is mapped to the according translation in the target language. Therefore, the data preprocessing for machine translation data is different to the one for language models. This section is dedicated to demonstrate how to pre-process such a data set and then load into a set of minibatches.
+Machine translation (MT) refers to the automatic translation of a segment of text from one language to another. Solving this problem with neural networks is often called neural machine translation (NMT). Compared to language models (:numref:`sec_language_model`), in which the corpus only contains a single language, machine translation dataset has at least two languages, the source language and the target language. In addition, each sentence in the source language is mapped to the according translation in the target language. Therefore, the data preprocessing for machine translation data is different to the one for language models. This section is dedicated to demonstrate how to pre-process such a dataset and then load into a set of minibatches.
 
 ```{.python .input  n=1}
 import collections
@@ -154,6 +154,6 @@ for X, X_vlen, Y, Y_vlen, in train_iter:
 1. Can you find a machine translation dataset online and process it with this jupyter notebook?
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/machine-translation/2396)
+## [Discussions](https://discuss.mxnet.io/t/machine-translation/2396)
 
 ![](../img/qr_machine-translation.svg)

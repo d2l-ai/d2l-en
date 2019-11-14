@@ -25,7 +25,7 @@ import random
 npx.set_np()
 ```
 
-## Generating Data Sets
+## Generating the Dataset
 
 To keep things simple, we will construct an artificial dataset
 according to a linear model with additive noise.
@@ -298,7 +298,7 @@ loss = squared_loss  # 0.5 (y-y')^2
 
 for epoch in range(num_epochs):
     # Assuming the number of examples can be divided by the batch size, all
-    # the examples in the training data set are used once in one epoch
+    # the examples in the training dataset are used once in one epoch
     # iteration. The features and tags of minibatch examples are given by X
     # and y respectively
     for X, y in data_iter(batch_size, features, labels):
@@ -361,6 +361,6 @@ and learn how to implement them more concisely.
 1. Experiment using different learning rates to find out how fast the loss function value drops.
 1. If the number of examples cannot be divided by the batch size, what happens to the `data_iter` function's behavior?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2332)
+## [Discussions](https://discuss.mxnet.io/t/2332)
 
 ![](../img/qr_linear-regression-scratch.svg)

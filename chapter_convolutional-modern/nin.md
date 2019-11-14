@@ -133,6 +133,6 @@ d2l.train_ch5(net, train_iter, test_iter, num_epochs, lr)
     * What is the amount of memory needed during inference?
 1. What are possible problems with reducing the $384 \times 5 \times 5$ representation to a $10 \times 5 \times 5$ representation in one step?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2356)
+## [Discussions](https://discuss.mxnet.io/t/2356)
 
 ![](../img/qr_nin.svg)

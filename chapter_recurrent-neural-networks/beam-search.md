@@ -7,7 +7,7 @@ As introduced previously when preparing the training dataset, we normally attach
 
 ## Greedy Search
 
-First, we will take a look at a simple solution: greedy search. For any time step $t'$ of the output sequence, we are going to search for the word with the highest conditional probability from $|\mathcal{Y}|$ numbers of words, with
+First, we will take a look at a simple solution: greedy search. For any timestep $t'$ of the output sequence, we are going to search for the word with the highest conditional probability from $|\mathcal{Y}|$ numbers of words, with
 
 $$y_{t'} = \operatorname*{argmax}_{y \in \mathcal{Y}} \mathbb{P}(y \mid y_1, \ldots, y_{t'-1}, \mathbf{c})$$
 
@@ -15,16 +15,16 @@ as the output.  Once the "&lt;eos&gt;" symbol is detected, or the output sequenc
 
 As we mentioned in our discussion of the decoder, the conditional probability of generating an output sequence based on the input sequence is $\prod_{t'=1}^{T'} \mathbb{P}(y_{t'} \mid y_1, \ldots, y_{t'-1}, \mathbf{c})$. We will take the output sequence with the highest conditional probability as the optimal sequence. The main problem with greedy search is that there is no guarantee that the optimal sequence will be obtained.
 
-Take a look at the example below. We assume that there are four words "A", "B", "C", and "&lt;eos&gt;" in the output dictionary.  The four numbers under each time step in :numref:`fig_s2s-prob1` represent the conditional probabilities of generating "A", "B", "C", and "&lt;eos&gt;" at that time step respectively.  At each time step, greedy search selects the word with the highest conditional probability. Therefore, the output sequence "A", "B", "C", and "&lt;eos&gt;" will be generated in :numref:`fig_s2s-prob1`. The conditional probability of this output sequence is $0.5\times0.4\times0.4\times0.6 = 0.048$.
+Take a look at the example below. We assume that there are four words "A", "B", "C", and "&lt;eos&gt;" in the output dictionary.  The four numbers under each timestep in :numref:`fig_s2s-prob1` represent the conditional probabilities of generating "A", "B", "C", and "&lt;eos&gt;" at that timestep respectively.  At each timestep, greedy search selects the word with the highest conditional probability. Therefore, the output sequence "A", "B", "C", and "&lt;eos&gt;" will be generated in :numref:`fig_s2s-prob1`. The conditional probability of this output sequence is $0.5\times0.4\times0.4\times0.6 = 0.048$.
 
 
-![The four numbers under each time step represent the conditional probabilities of generating "A", "B", "C", and "&lt;eos&gt;" at that time step respectively.  At each time step, greedy search selects the word with the highest conditional probability. ](../img/s2s-prob1.svg)
+![The four numbers under each timestep represent the conditional probabilities of generating "A", "B", "C", and "&lt;eos&gt;" at that timestep respectively.  At each timestep, greedy search selects the word with the highest conditional probability. ](../img/s2s-prob1.svg)
 :label:`fig_s2s-prob1`
 
 
-Now, we will look at another example shown in :numref:`fig_s2s-prob2`. Unlike in :numref:`fig_s2s-prob1`, the following figure :numref:`fig_s2s-prob2` selects the word "C", which has the second highest conditional probability at time step 2. Since the output subsequences of time steps 1 and 2, on which time step 3 is based, are changed from "A" and "B" in :numref:`fig_s2s-prob1` to "A" and "C" in :numref:`fig_s2s-prob2`, the conditional probability of each word generated at time step 3 has also changed in :numref:`fig_s2s-prob2`. We choose the word "B", which has the highest conditional probability. Now, the output subsequences of time step 4 based on the first three time steps are "A", "C", and "B", which are different from "A", "B", and "C" in :numref:`fig_s2s-prob1`. Therefore, the conditional probability of generating each word in time step 4 in :numref:`fig_s2s-prob2` is also different from that in :numref:`fig_s2s-prob1`. We find that the conditional probability of the output sequence "A", "C", "B", and "&lt;eos&gt;" at the current time step is $0.5\times0.3 \times0.6\times0.6=0.054$, which is higher than the conditional probability of the output sequence obtained by greedy search. Therefore, the output sequence "A", "B", "C", and "&lt;eos&gt;" obtained by the greedy search is not an optimal sequence.
+Now, we will look at another example shown in :numref:`fig_s2s-prob2`. Unlike in :numref:`fig_s2s-prob1`, the following figure :numref:`fig_s2s-prob2` selects the word "C", which has the second highest conditional probability at timestep 2. Since the output subsequences of timesteps 1 and 2, on which timestep 3 is based, are changed from "A" and "B" in :numref:`fig_s2s-prob1` to "A" and "C" in :numref:`fig_s2s-prob2`, the conditional probability of each word generated at timestep 3 has also changed in :numref:`fig_s2s-prob2`. We choose the word "B", which has the highest conditional probability. Now, the output subsequences of timestep 4 based on the first three timesteps are "A", "C", and "B", which are different from "A", "B", and "C" in :numref:`fig_s2s-prob1`. Therefore, the conditional probability of generating each word in timestep 4 in :numref:`fig_s2s-prob2` is also different from that in :numref:`fig_s2s-prob1`. We find that the conditional probability of the output sequence "A", "C", "B", and "&lt;eos&gt;" at the current timestep is $0.5\times0.3 \times0.6\times0.6=0.054$, which is higher than the conditional probability of the output sequence obtained by greedy search. Therefore, the output sequence "A", "B", "C", and "&lt;eos&gt;" obtained by the greedy search is not an optimal sequence.
 
-![The four numbers under each time step represent the conditional probabilities of generating "A", "B", "C", and "&lt;eos&gt;" at that time step.  At time step 2, the word "C", which has the second highest conditional probability, is selected. Now, the output subsequences of time step 4 based on the first three time steps are "A", "C", and "B".](../img/s2s-prob2.svg)
+![The four numbers under each timestep represent the conditional probabilities of generating "A", "B", "C", and "&lt;eos&gt;" at that timestep.  At timestep 2, the word "C", which has the second highest conditional probability, is selected. Now, the output subsequences of timestep 4 based on the first three timesteps are "A", "C", and "B".](../img/s2s-prob2.svg)
 :label:`fig_s2s-prob2`
 
 
@@ -37,14 +37,14 @@ Although we can use an exhaustive search to obtain the optimal sequence, its com
 
 ## Beam Search
 
-*Beam search* is an improved algorithm based on greedy search. It has a hyper-parameter named *beam size*, $k$. At time step 1, we select $k$ words with the highest conditional probability to be the first word of the $k$ candidate output sequences. For each subsequent time step, we are going to select the $k$ output sequences with the highest conditional probability from the total of $k\left|\mathcal{Y}\right|$ possible output sequences based on the $k$ candidate output sequences from the previous time step. These will be the candidate output sequence for that time step. Finally, we will filter out the sequences containing the special symbol "&lt;eos&gt;" from the candidate output sequences of each time step and discard all the subsequences after it to obtain a set of final candidate output sequences.
+*Beam search* is an improved algorithm based on greedy search. It has a hyper-parameter named *beam size*, $k$. At timestep 1, we select $k$ words with the highest conditional probability to be the first word of the $k$ candidate output sequences. For each subsequent timestep, we are going to select the $k$ output sequences with the highest conditional probability from the total of $k\left|\mathcal{Y}\right|$ possible output sequences based on the $k$ candidate output sequences from the previous timestep. These will be the candidate output sequence for that timestep. Finally, we will filter out the sequences containing the special symbol "&lt;eos&gt;" from the candidate output sequences of each timestep and discard all the subsequences after it to obtain a set of final candidate output sequences.
 
 
 ![The beam search process. The beam size is 2 and the maximum length of the output sequence is 3. The candidate output sequences are $A$, $C$, $AB$, $CE$, $ABD$, and $CED$. ](../img/beam-search.svg)
 :label:`fig_beam-search`
 
 
-:numref:`fig_beam-search` demonstrates the process of beam search with an example. Suppose that the vocabulary of the output sequence only contains five elements: $\mathcal{Y} = \{A, B, C, D, E\}$ where one of them is a special symbol “&lt;eos&gt;”. Set beam size to 2, the maximum length of the output sequence to 3. At time step 1 of the output sequence, suppose the words with the highest conditional probability $\mathbb{P}(y_1 \mid \mathbf{c})$ are $A$ and $C$. At time step 2, for all $y_2 \in \mathcal{Y},$ we compute 
+:numref:`fig_beam-search` demonstrates the process of beam search with an example. Suppose that the vocabulary of the output sequence only contains five elements: $\mathcal{Y} = \{A, B, C, D, E\}$ where one of them is a special symbol “&lt;eos&gt;”. Set beam size to 2, the maximum length of the output sequence to 3. At timestep 1 of the output sequence, suppose the words with the highest conditional probability $\mathbb{P}(y_1 \mid \mathbf{c})$ are $A$ and $C$. At timestep 2, for all $y_2 \in \mathcal{Y},$ we compute 
 
 $$\mathbb{P}(A, y_2 \mid \mathbf{c}) = \mathbb{P}(A \mid \mathbf{c})\mathbb{P}(y_2 \mid A, \mathbf{c})$$ 
 and $$\mathbb{P}(C, y_2 \mid \mathbf{c}) = \mathbb{P}(C \mid \mathbf{c})\mathbb{P}(y_2 \mid C, \mathbf{c})$$  
@@ -52,7 +52,7 @@ and pick the largest two among these 10 values, say
 
 $$\mathbb{P}(A, B \mid \mathbf{c}) \text{  and  } \mathbb{P}(C, E \mid \mathbf{c}).$$
 
-Then at time step 3, for all $y_3 \in \mathcal{Y}$, we compute 
+Then at timestep 3, for all $y_3 \in \mathcal{Y}$, we compute 
 
 $$\mathbb{P}(A, B, y_3 \mid \mathbf{c}) = \mathbb{P}(A, B \mid \mathbf{c})\mathbb{P}(y_3 \mid A, B, \mathbf{c}) $$ and 
 $$\mathbb{P}(C, E, y_3 \mid \mathbf{c}) = \mathbb{P}(C, E \mid \mathbf{c})\mathbb{P}(y_3 \mid C, E, \mathbf{c}),$$ 
@@ -82,6 +82,6 @@ Here, $L$ is the length of the final candidate sequence and the selection for $\
 * Can we treat an exhaustive search as a beam search with a special beam size? Why?
 * We used language models to generate sentences in :numref:`sec_rnn_scratch`. Which kind of search does this output use? Can you improve it?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2394)
+## [Discussions](https://discuss.mxnet.io/t/2394)
 
 ![](../img/qr_beam-search.svg)

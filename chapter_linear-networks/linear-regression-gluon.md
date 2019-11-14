@@ -17,7 +17,7 @@ In this section, we will show you how to implement
 the linear regression model from :numref:`sec_linear_scratch`
 concisely by using Gluon.
 
-## Generating Data Sets
+## Generating the Dataset
 
 To start, we will generate the same dataset as in the previous section.
 
@@ -272,6 +272,6 @@ print('Error in estimating b', true_b - b)
 1. Review the MXNet documentation to see what loss functions and initialization methods are provided in the modules `gluon.loss` and `init`. Replace the loss by Huber's loss.
 1. How do you access the gradient of `dense.weight`?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2333)
+## [Discussions](https://discuss.mxnet.io/t/2333)
 
 ![](../img/qr_linear-regression-gluon.svg)

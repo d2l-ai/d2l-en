@@ -51,7 +51,7 @@ The URL is right here:
 ![House Price Prediction](../img/house_pricing.png)
 :width:`600px`
 
-## Accessing and Reading Data Sets
+## Accessing and Reading the Dataset
 
 Note that the competition data is separated into training and test sets.
 Each record includes the property value of the house
@@ -428,6 +428,6 @@ The steps are quite simple:
 1. Improve the score by improving the model (layers, regularization, dropout).
 1. What happens if we do not standardize the continuous numerical features like we have done in this section?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2346)
+## [Discussions](https://discuss.mxnet.io/t/2346)
 
 ![](../img/qr_kaggle-house-price.svg)

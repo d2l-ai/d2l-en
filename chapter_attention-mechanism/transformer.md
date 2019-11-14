@@ -320,9 +320,9 @@ encoder(np.ones((2, 100)), valid_length).shape
 
 The decoder transformer block looks similar to the encoder transformer block. However, besides the two sub-layers---the multi-head attention layer and the positional encoding network, the decoder transformer block contains a third sub-layer, which applys multi-head attention on the output of the encoder stack. Similar to the encoder transformer block, the decoder transformer block employ "add and norm", i.e., the residual connections and the layer normalization to connect each of the sub-layers. 
 
-To be specific, at time step $t$, assume that $\mathbf x_t$ is the current input, i.e., the query. As illustrate in :numref:`fig_self_attention_predict`, the keys and values of the self-attention layer consist of the current query with all past queries $\mathbf x_1, \ldots, \mathbf x_{t-1}$.
+To be specific, at timestep $t$, assume that $\mathbf x_t$ is the current input, i.e., the query. As illustrate in :numref:`fig_self_attention_predict`, the keys and values of the self-attention layer consist of the current query with all past queries $\mathbf x_1, \ldots, \mathbf x_{t-1}$.
 
-![Predict at time step $t$ for a self-attention layer.](../img/self-attention-predict.svg)
+![Predict at timestep $t$ for a self-attention layer.](../img/self-attention-predict.svg)
 :label:`fig_self_attention_predict`
 
 During the training, because the output for the $t$-query could observe all the previous key-value pairs, which results in an inconsistent behavior than prediction. We can eliminate the unnecessary information by specifying the valid length to be $t$ for the $t^\textrm{th}$ query.
@@ -448,6 +448,6 @@ for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
 * Compare layer normalization and batch normalization, what are the suitable scenarios to apply them?
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/4344)
+## [Discussions](https://discuss.mxnet.io/t/4344)
 
 ![](../img/qr_transformer.svg)

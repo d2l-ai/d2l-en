@@ -31,16 +31,16 @@ import time
 npx.set_np()
 ```
 
-## Obtain and Organize the Data Sets
+## Obtain and Organize the Dataset
 
 The competition data is divided into a training set and testing set. The training set contains 50,000 images. The testing set contains 300,000 images, of which 10,000 images are used for scoring, while the other 290,000 non-scoring images are included to prevent the manual labeling of the testing set and the submission of labeling results. The image formats in both datasets are PNG, with heights and widths of 32 pixels and three color channels (RGB). The images cover 10 categories: planes, cars, birds, cats, deer, dogs, frogs, horses, boats, and trucks. The upper-left corner of Figure 9.16 shows some images of planes, cars, and birds in the dataset.
 
-### Download the Data Set
+### Download the Dataset
 
 After logging in to Kaggle, we can click on the "Data" tab on the CIFAR-10 image classification competition webpage shown in Figure 9.16 and download the training dataset "train.7z", the testing dataset "test.7z", and the training dataset labels "trainlabels.csv".
 
 
-### Unzip the Data Set
+### Unzip the Dataset
 
 The training dataset "train.7z" and the test dataset "test.7z" need to be unzipped after downloading. After unzipping the datasets, store the training dataset, test dataset, and training dataset labels in the following respective paths:
 
@@ -61,7 +61,7 @@ if demo:
             z.extractall('../data/kaggle_cifar10/')
 ```
 
-### Organize the Data Set
+### Organize the Dataset
 
 We need to organize datasets to facilitate model training and testing. The following `read_label_file` function will be used to read the label file for the training dataset. The parameter `valid_ratio` in this function is the ratio of the number of examples in the validation set to the number of examples in the original training set.
 
@@ -179,7 +179,7 @@ transform_test = gluon.data.vision.transforms.Compose([
                                       [0.2023, 0.1994, 0.2010])])
 ```
 
-## Read the Data Set
+## Read the Dataset
 
 Next, we can create the `ImageFolderDataset` instance to read the organized dataset containing the original image files, where each data instance includes the image and label.
 
@@ -358,6 +358,6 @@ for submitting results is similar to method in :numref:`sec_kaggle_house`.
 * What accuracy can you achieve when not using image augmentation?
 * Scan the QR code to access the relevant discussions and exchange ideas about the methods used and the results obtained with the community. Can you come up with any better techniques?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2450)
+## [Discussions](https://discuss.mxnet.io/t/2450)
 
 ![](../img/qr_kaggle-gluon-cifar10.svg)

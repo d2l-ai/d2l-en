@@ -128,7 +128,7 @@ net[-1].initialize(init.Constant(W))
 net[-2].initialize(init=init.Xavier())
 ```
 
-## Read the Data Set
+## Read the Dataset
 
 We read the dataset using the method described in the previous section. Here, we specify shape of the randomly cropped output image as $320\times 480$, so both the height and width are divisible by 32.
 
@@ -200,6 +200,6 @@ d2l.show_images(imgs[::3] + imgs[1::3] + imgs[2::3], 3, n, scale=2);
 * The outputs of some intermediate layers of the convolutional neural network are also used in the paper on fully convolutional networks[1]. Try to implement this idea.
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2454)
+## [Discussions](https://discuss.mxnet.io/t/2454)
 
 ![](../img/qr_fcn.svg)

@@ -1109,8 +1109,8 @@ The breakthrough [deep Q-network that beat humans at Atari games using only the 
 and the [AlphaGo program that dethroned the world champion at the board game Go](https://www.wired.com/2017/05/googles-alphago-trounces-humans-also-gives-boost/) are two prominent examples.
 
 Reinforcement learning gives a very general statement of a problem,
-in which an agent interacts with an environment over a series of *time steps*.
-At each time step $t$, the agent receives some observation $o_t$ 
+in which an agent interacts with an environment over a series of *timesteps*.
+At each timestep $t$, the agent receives some observation $o_t$ 
 from the environment and must choose an action $a_t$ 
 that is subsequently transmitted back to the environment 
 via some mechanism (sometimes called an actuator).
@@ -1549,6 +1549,6 @@ than the potential of malevolent superintelligence to destroy humanity.
 1. Viewing the development of artificial intelligence as a new industrial revolution, what is the relationship between algorithms and data? Is it similar to steam engines and coal (what is the fundamental difference)?
 1. Where else can you apply the end-to-end training approach? Physics? Engineering? Econometrics?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2310)
+## [Discussions](https://discuss.mxnet.io/t/2310)
 
 ![](../img/qr_intro.svg)

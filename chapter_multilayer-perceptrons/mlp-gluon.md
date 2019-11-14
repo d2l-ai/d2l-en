@@ -43,6 +43,6 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 1. Try out different activation functions. Which ones work best?
 1. Try out different initializations of the weights.
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2340)
+## [Discussions](https://discuss.mxnet.io/t/2340)
 
 ![](../img/qr_mlp-gluon.svg)

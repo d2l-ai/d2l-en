@@ -235,6 +235,6 @@ We used $R$ to denote the $2 \times 2$ governing convergence behavior. After $t$
 1. Derive minimum value and minimizer for $h(\mathbf{x}) = \frac{1}{2} \mathbf{x}^\top Q \mathbf{x} + \mathbf{x}^\top \mathbf{c} + b$.
 1. What changes when we perform SGD with momentum? What happens when we use mini-batch SGD with momentum? Experiment with the parameters?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2374)
+## [Discussions](https://discuss.mxnet.io/t/2374)
 
 ![](../img/qr_momentum.svg)

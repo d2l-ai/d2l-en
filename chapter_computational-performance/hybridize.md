@@ -208,6 +208,6 @@ We can see that the three lines of print statements defined in the `hybrid_forwa
 * What happens if we add the Python statements `if` and `for` in the `hybrid_forward` function?
 * Review the models that interest you in the previous chapters and use the HybridBlock class or HybridSequential class to implement them.
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2380)
+## [Discussions](https://discuss.mxnet.io/t/2380)
 
 ![](../img/qr_hybridize.svg)

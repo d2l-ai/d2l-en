@@ -123,6 +123,6 @@ That said, with a large number of layers, this can get messy
 1. How does changing the learning rate change the result?
 1. What is the best result you can get by optimizing over all the parameters (learning rate, iterations, number of hidden layers, number of hidden units per layer)?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2339)
+## [Discussions](https://discuss.mxnet.io/t/2339)
 
 ![](../img/qr_mlp-scratch.svg)
