@@ -128,7 +128,7 @@ net[-1].initialize(init.Constant(W))
 net[-2].initialize(init=init.Xavier())
 ```
 
-## Read the Data Set
+## Read the Dataset
 
 We read the dataset using the method described in the previous section. Here, we specify shape of the randomly cropped output image as $320\times 480$, so both the height and width are divisible by 32.
 
