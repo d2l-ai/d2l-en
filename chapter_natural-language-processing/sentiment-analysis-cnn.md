@@ -81,7 +81,7 @@ convolutional layer to extend the model parameters in the convolutional layer.
 
 ## Max-Over-Time Pooling Layer
 
-Similarly, we have a one-dimensional pooling layer. The max-over-time pooling layer used in TextCNN actually corresponds to a one-dimensional global maximum pooling layer. Assuming that the input contains multiple channels, and each channel consists of values on different time steps, the output of each channel will be the largest value of all time steps in the channel. Therefore, the input of the max-over-time pooling layer can have different time steps on each channel.
+Similarly, we have a one-dimensional pooling layer. The max-over-time pooling layer used in TextCNN actually corresponds to a one-dimensional global maximum pooling layer. Assuming that the input contains multiple channels, and each channel consists of values on different timesteps, the output of each channel will be the largest value of all timesteps in the channel. Therefore, the input of the max-over-time pooling layer can have different timesteps on each channel.
 
 To improve computing performance, we often combine timing examples of different lengths into a minibatch and make the lengths of each timing example in the batch consistent by appending special characters (such as 0) to the end of shorter examples. Naturally, the added special characters have no intrinsic meaning. Because the main purpose of the max-over-time pooling layer is to capture the most important features of timing, it usually allows the model to be unaffected by the manually added characters.
 
@@ -187,7 +187,7 @@ d2l.predict_sentiment(net, vocab, 'this movie is so bad')
 
 * We can use one-dimensional convolution to process and analyze timing data.
 * A one-dimensional cross-correlation operation with multiple input channels can be regarded as a two-dimensional cross-correlation operation with a single input channel.
-* The input of the max-over-time pooling layer can have different numbers of time steps on each channel.
+* The input of the max-over-time pooling layer can have different numbers of timesteps on each channel.
 * TextCNN mainly uses a one-dimensional convolutional layer and max-over-time pooling layer.
 
 

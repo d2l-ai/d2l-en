@@ -1,9 +1,9 @@
-# Language Models and Data Sets
+# Language Models and Datasets
 
 :label:`sec_language_model`
 
 
-In :numref:`sec_text_preprocessing`, we see how to map text data into tokens, and these tokens can be viewed as a time series of discrete observations. Assuming the tokens in a text of length $T$ are in turn $x_1, x_2, \ldots, x_T$, then, in the discrete time series, $x_t$($1 \leq t \leq T$) can be considered as the output or label of time step $t$. Given such a sequence, the goal of a language model is to estimate the probability
+In :numref:`sec_text_preprocessing`, we see how to map text data into tokens, and these tokens can be viewed as a time series of discrete observations. Assuming the tokens in a text of length $T$ are in turn $x_1, x_2, \ldots, x_T$, then, in the discrete time series, $x_t$($1 \leq t \leq T$) can be considered as the output or label of timestep $t$. Given such a sequence, the goal of a language model is to estimate the probability
 
 $$p(x_1,x_2, \ldots, x_T).$$
 
@@ -160,7 +160,7 @@ In fact, any one of these offsets is fine. Hence, which one should we pick? In f
 
 ### Random Sampling
 
-The following code randomly generates a minibatch from the data each time. Here, the batch size `batch_size` indicates to the number of examples in each minibatch and `num_steps` is the length of the sequence (or time steps if we have a time series) included in each example.
+The following code randomly generates a minibatch from the data each time. Here, the batch size `batch_size` indicates to the number of examples in each minibatch and `num_steps` is the length of the sequence (or timesteps if we have a time series) included in each example.
 In random sampling, each example is a sequence arbitrarily captured on the original sequence. The positions of two adjacent random minibatches on the original sequence are not necessarily adjacent. The target is to predict the next character based on what we have seen so far, hence the labels are the original sequence, shifted by one character.
 
 ```{.python .input  n=5}
@@ -185,7 +185,7 @@ def seq_data_iter_random(corpus, batch_size, num_steps):
 ```
 
 Let us generate an artificial sequence from 0 to 30. We assume that
-the batch size and numbers of time steps are 2 and 5
+the batch size and numbers of timesteps are 2 and 5
 respectively. This means that depending on the offset we can generate between 4 and 5 $(x,y)$ pairs. With a minibatch size of 2, we only get 2 minibatches.
 
 ```{.python .input  n=6}
