@@ -74,7 +74,7 @@ Back in our example, this value of the change $8$ is different based on differen
 $$\frac{df}{dx}(x) = \lim_{\epsilon \rightarrow 0}\frac{f(x+\epsilon) - f(x)}{\epsilon}.$$
 :eqlabel:`der-def`
 
-We will often encounter many different notations for the derivative in many different texts. For instance, all of the below notations indicate the same thing:
+We will often encounter many different notations for the derivative in many different text. For instance, all of the below notations indicate the same thing:
 
 $$
 \frac{df}{dx} = \frac{d}{dx}f = f' = \nabla_xf = D_xf = f_x.
