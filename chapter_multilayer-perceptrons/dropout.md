@@ -24,7 +24,7 @@ For every feature, a linear model must assign
 either a positive or a negative weight.
 They lack the flexibility to account for context.
 
-In more formal texts, you’ll see this fundamental tension
+In more formal text, you’ll see this fundamental tension
 between generalizability and flexibility
 discussed as the *bias-variance tradeoff*.
 Linear models have high bias
