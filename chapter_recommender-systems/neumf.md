@@ -48,7 +48,7 @@ npx.set_np()
 ```
 
 ## Model Implementation
-The following code implements the NeuMF model. It consists of a generalized matrix factorization model and a multilayered perceptron with different user and item embedding vectors. The structure of the MLP is controlled with the parameter `mlp_layers`. ReLu is used as the default activation function.
+The following code implements the NeuMF model. It consists of a generalized matrix factorization model and a multilayered perceptron with different user and item embedding vectors. The structure of the MLP is controlled with the parameter `mlp_layers`. ReLU is used as the default activation function.
 
 ```{.python .input  n=2}
 class NeuMF(nn.Block):
