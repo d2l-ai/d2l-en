@@ -24,4 +24,3 @@ Please use the following bibtex entry to cite this book:
     year={2019}
 }
 ```
-
