@@ -89,7 +89,8 @@ class MultiHeadAttention(nn.Block):
     def forward(self, query, key, value, valid_length):
         # query, key, and value shape: (batch_size, seq_len, dim), 
         # where seq_len is the length of input sequence
-        # valid_length shape is either (batch_size, ) or (batch_size, seq_len).
+        # valid_length shape is either (batch_size, ) 
+        # or (batch_size, seq_len).
     
         # Project and transpose query, key, and value from 
         # (batch_size, seq_len, hidden_size * num_heads) to
@@ -107,8 +108,8 @@ class MultiHeadAttention(nn.Block):
         
         output = self.attention(query, key, value, valid_length)
         
-        # Transpose from (batch_size * num_heads, seq_len, hidden_size) back to
-        # (batch_size, seq_len, hidden_size * num_heads)
+        # Transpose from (batch_size * num_heads, seq_len, hidden_size) back 
+        # to (batch_size, seq_len, hidden_size * num_heads)
         output_concat = transpose_output(output, self.num_heads)
         return self.W_o(output_concat)
 ```
@@ -119,7 +120,8 @@ Here are the definitions of the transpose functions `transpose_qkv` and `transpo
 def transpose_qkv(X, num_heads):
     # Original X shape: (batch_size, seq_len, hidden_size * num_heads),
     # -1 means inferring its value, 
-    # after first reshape, X shape: (batch_size, seq_len, num_heads, hidden_size)
+    # after first reshape, X shape: 
+    # (batch_size, seq_len, num_heads, hidden_size)
     X = X.reshape(X.shape[0], X.shape[1], num_heads, -1)
     
     # After transpose, X shape: (batch_size, num_heads, seq_len, hidden_size)
@@ -158,7 +160,8 @@ Below, the `PositionWiseFFN` shows how to implement a position-wise FFN with two
 class PositionWiseFFN(nn.Block):
     def __init__(self, ffn_hidden_size, hidden_size_out, **kwargs):
         super(PositionWiseFFN, self).__init__(**kwargs)
-        self.ffn_1 = nn.Dense(ffn_hidden_size, flatten=False, activation='relu')
+        self.ffn_1 = nn.Dense(ffn_hidden_size, flatten=False, 
+                              activation='relu')
         self.ffn_2 = nn.Dense(hidden_size_out, flatten=False)
 
     def forward(self, X):
@@ -251,6 +254,18 @@ class PositionalEncoding(nn.Block):
 
 Now we test the `PositionalEncoding` with a toy model for 4 dimensions. As we can see, the $4^{\mathrm{th}}$ dimension has the same frequency as the $5^{\mathrm{th}}$ but with different offset. The $5^{\mathrm{th}}$ and $6^{\mathrm{th}}$ dimension have a lower frequency.
 
+
+$1,500$
+
+$1, 500$
+
+1500
+
+1,500
+
+1, 500
+
+
 ```{.python .input  n=11}
 pe = PositionalEncoding(20, 0)
 pe.initialize()
@@ -265,9 +280,11 @@ Armed with all the essential components of transformer, let us first build a enc
 
 ```{.python .input  n=12}
 class EncoderBlock(nn.Block):
-    def __init__(self, embedding_size, ffn_hidden_size, num_heads, dropout, **kwargs):
+    def __init__(self, embedding_size, ffn_hidden_size, num_heads, 
+                 dropout, **kwargs):
         super(EncoderBlock, self).__init__(**kwargs)
-        self.attention = MultiHeadAttention(embedding_size, num_heads, dropout)
+        self.attention = MultiHeadAttention(embedding_size, num_heads, 
+                                            dropout)
         self.addnorm_1 = AddNorm(dropout)
         self.ffn = PositionWiseFFN(ffn_hidden_size, embedding_size)
         self.addnorm_2 = AddNorm(dropout)
@@ -299,7 +316,8 @@ class TransformerEncoder(d2l.Encoder):
         self.blks = nn.Sequential()
         for i in range(num_layers):
             self.blks.add(
-                EncoderBlock(embedding_size, ffn_hidden_size, num_heads, dropout))
+                EncoderBlock(embedding_size, ffn_hidden_size, 
+                             num_heads, dropout))
 
     def forward(self, X, valid_length, *args):
         X = self.pos_encoding(self.embed(X) * math.sqrt(self.embedding_size))
@@ -330,12 +348,15 @@ During the training, because the output for the $t$-query could observe all the 
 ```{.python .input  n=16}
 class DecoderBlock(nn.Block):
     # i means it is the i-th block in the decoder
-    def __init__(self, embedding_size, ffn_hidden_size, num_heads, dropout, i, **kwargs):
+    def __init__(self, embedding_size, ffn_hidden_size, num_heads, 
+                 dropout, i, **kwargs):
         super(DecoderBlock, self).__init__(**kwargs)
         self.i = i
-        self.attention_1 = MultiHeadAttention(embedding_size, num_heads, dropout)
+        self.attention_1 = MultiHeadAttention(embedding_size, num_heads, 
+                                              dropout)
         self.addnorm_1 = AddNorm(dropout)
-        self.attention_2 = MultiHeadAttention(embedding_size, num_heads, dropout)
+        self.attention_2 = MultiHeadAttention(embedding_size, num_heads, 
+                                              dropout)
         self.addnorm_2 = AddNorm(dropout)
         self.ffn = PositionWiseFFN(ffn_hidden_size, embedding_size)
         self.addnorm_3 = AddNorm(dropout)
@@ -388,7 +409,8 @@ class TransformerDecoder(d2l.Decoder):
         self.blks = nn.Sequential()
         for i in range(num_layers):
             self.blks.add(
-                DecoderBlock(embedding_size, ffn_hidden_size, num_heads, dropout, i))
+                DecoderBlock(embedding_size, ffn_hidden_size, num_heads, 
+                             dropout, i))
         self.dense = nn.Dense(vocab_size, flatten=False)
 
     def init_state(self, enc_outputs, env_valid_lengh, *args):
@@ -415,9 +437,11 @@ num_hiddens, num_heads = 64, 4
 src_vocab, tgt_vocab, train_iter = d2l.load_data_nmt(batch_size, num_steps)
 
 encoder = TransformerEncoder(
-    len(src_vocab), embedding_size, num_hiddens, num_heads, num_layers, dropout)
+    len(src_vocab), embedding_size, num_hiddens, num_heads, num_layers, 
+    dropout)
 decoder = TransformerDecoder(
-    len(src_vocab), embedding_size, num_hiddens, num_heads, num_layers, dropout)
+    len(src_vocab), embedding_size, num_hiddens, num_heads, num_layers, 
+    dropout)
 model = d2l.EncoderDecoder(encoder, decoder)
 d2l.train_s2s_ch8(model, train_iter, lr, num_epochs, ctx)
 ```
