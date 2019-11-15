@@ -14,7 +14,7 @@ $$
 p(\Theta \mid >_u )  \propto  p(>_u \mid \Theta) p(\Theta)
 $$
 
-Where $\Theta$ represents the parameters of an arbitrary recommendation model, $>_u$ represents the desired personalized total ranking of all items for user $u$. We can formultae the maximum posterior estimator to derive the generic optimization criterion for the personalized ranking task.
+Where $\Theta$ represents the parameters of an arbitrary recommendation model, $>_u$ represents the desired personalized total ranking of all items for user $u$. We can formulate the maximum posterior estimator to derive the generic optimization criterion for the personalized ranking task.
 
 $$
 \begin{aligned}
@@ -59,7 +59,7 @@ $$
  \sum_{(u, i, j \in D)} (\max( m - \hat{y}_{ui} + \hat{y}_{uj}), 0)
 $$
 
-where $m$ is the safety margin size. It aims to push negative items away from positive items. Similar to BPR, it aims to optimize for relevant distance between positive and negative samples instead of absolute outputs, making it well suited to recommenders.
+where $m$ is the safety margin size. It aims to push negative items away from positive items. Similar to BPR, it aims to optimize for relevant distance between positive and negative samples instead of absolute outputs, making it well suited to recommender systems.
 
 ```{.python .input  n=3}
 # Saved in the d2l package for later use
@@ -78,7 +78,7 @@ These two losses are interchangeable for personalized ranking in recommendation.
 
 ## Summary
 
-- There are three types of ranking losses available for the personalized ranking task in recommenders, namely, pointwise, pairwise and listwise methods.
+- There are three types of ranking losses available for the personalized ranking task in recommender systems, namely, pointwise, pairwise and listwise methods.
 - The two pairwise loses, Bayesian personalized ranking loss and hinge loss, can be used interchangeably.
 
 ## Exercises
