@@ -58,7 +58,7 @@ There can be many ways to compute an estimator of a parameter $\hat{\theta_n}$. 
 Perhaps the simplest metric used to evaluate estimators is the *mean squared error (MSE)* (or *$l_2$ loss*) of an estimator can be defined as 
 
 $$\mathrm{MSE} (\hat{\theta}_n, \theta) = E[(\hat{\theta}_n - \theta)^2].$$
-:eqlabel:`eq_mse_est`
+:eqlabel:`eq_eq_mse_est`
 
 This allows us to quantify the average squared deviation from the true value.  MSE is always non-negative. If you have read :numref:`sec_linear_regression`, you will recognize it as the most commonly used regression loss function. As a measure to evaluate an estimator, the closer its value to zero, the closer the estimator is close to the true parameter $\theta$.
 
@@ -71,7 +71,7 @@ The MSE provides a natural metric, but we can easily imagine multiple different 
 First, let us measure the systematic error. For an estimator $\hat{\theta}_n$, the mathematical illustration of *statistical bias* can be defined as
 
 $$\mathrm{bias}(\hat{\theta}_n) = E(\hat{\theta}_n - \theta) = E(\hat{\theta}_n) - \theta.$$
-:eqlabel:`eq_bias`
+:eqlabel:`eq_eq_bias`
 
 Note that when $\mathrm{bias}(\hat{\theta}_n) = 0$, the expectation of the estimator $\hat{\theta}_n$ is equal to the true value of parameter.  In this case, we say $\hat{\theta}_n$ is an unbiased estimator.  In general, an unbiased estimator is better than a biased estimator since its expectation is the same as the true parameter. 
 
@@ -84,7 +84,7 @@ It is worth being aware, however, that biased estimators are frequently used in 
 Second, let us measure the randomness in the estimator.  Recall from :numref:`sec_random_variables`, the *standard deviation* (or *standard error*) is defined as the squared root of the variance.  We may measure the degree of fluctuation of an estimator by measuring the standard deviation or variance of that estimator.
 
 $$\sigma_{\hat{\theta}_n} = \sqrt{\mathrm{Var} (\hat{\theta}_n )} = \sqrt{E[(\hat{\theta}_n - E(\hat{\theta}_n))^2]}.$$
-:eqlabel:`eq_var_est`
+:eqlabel:`eq_eq_var_est`
 
 It is important to compare :eqref:`eq_var_est` to :eqref:`eq_mse_est`.  In this equation we do not compare to the true population value $\theta$, but instead to $E(\hat{\theta}_n)$, the expected sample mean.  Thus we are not measuring how far the estimator tends to be from the true value, but instead we measuring the fluctuation of the estimator itself.
 
@@ -241,7 +241,7 @@ To be useful, a confidence interval should be as small as possible for a given d
 Mathematically, a *confidence interval* for the true parameter $\theta$ is an interval $C_n$ that computed from the sample data such that 
 
 $$P_{\theta} (C_n \ni \theta) \geq 1 - \alpha, \forall \theta.$$
-:eqlabel:`eq_confidence`
+:eqlabel:`eq_eq_confidence`
 
 Here $\alpha \in (0,1)$, and $1 - \alpha$ is called the *confidence level* or *coverage* of the interval. This is the same $\alpha$ as the significance level as we discussed about above.
 
@@ -284,7 +284,7 @@ $$
 
 Thus we know that we have found our $95\%$ confidence interval:
 $$\left[\hat\mu_n - 1.96\frac{\hat\sigma_n}{\sqrt{n}},\hat\mu_n + 1.96\frac{\hat\sigma_n}{\sqrt{n}}\right].$$
-:eqlabel:`eq_gauss_confidence`
+:eqlabel:`eq_eq_gauss_confidence`
 
 It is safe to say that :eqref:`eq_gauss_confidence` is one of the most used formula in statistics.  Let us close our discussion of statistics by implementing it.  For simplicity, we assume we are in the asymptotic regime.  Small values of $N$ should include the correct value of `t_star` obtained either programmatically or from a $t$-table.
 

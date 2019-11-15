@@ -22,7 +22,7 @@ $$
 The cumulative distribution function is 
 
 $$F(x) = \begin{cases} 0 & x < 0, \\ 1-p & 0 \le x < 1, \\ 1 & x >= 1 . \end{cases}$$
-:eqlabel:`bernoulli-cdf`
+:eqlabel:`eq_bernoulli_cdf`
 
 The probability mass function is plotted below.
 
@@ -36,7 +36,7 @@ d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
-Now, let us plot the cumulative distribution function :eqref:`bernoulli-cdf`.
+Now, let us plot the cumulative distribution function :eqref:`eq_bernoulli_cdf`.
 
 ```{.python .input}
 x = np.arange(-1, 2, 0.01)
@@ -69,7 +69,7 @@ $$
 The cumulative distribution function is 
 
 $$F(x) = \begin{cases} 0 & x < 1, \\ \frac{k}{n} & k \le x < k+1 \text{ with } 1 \le k < n, \\ 1 & x >= n . \end{cases}$$
-:eqlabel:`discrete_uniform-cdf`
+:eqlabel:`eq_discrete_uniform_cdf`
 
 Let us first plot the probability mass function.
 
@@ -82,7 +82,7 @@ d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
-Now, let us plot the cumulative distribution function :eqref:`discrete_uniform-cdf`.
+Now, let us plot the cumulative distribution function :eqref:`eq_discrete_uniform_cdf`.
 
 ```{.python .input}
 x = np.arange(-1, 6, 0.01)
@@ -115,14 +115,14 @@ $$
 The probability density function is 
 
 $$p(x) = \begin{cases} \frac{1}{b-a} & x \in [a,b], \\ 0 & x \not\in [a,b].\end{cases}$$
-:eqlabel:`cont_uniform-pdf`
+:eqlabel:`eq_cont_uniform_pdf`
 
 The cumulative distribution function is 
 
 $$F(x) = \begin{cases} 0 & x < a, \\ \frac{x-a}{b-a} & x \in [a,b], \\ 1 & x >= b . \end{cases}$$
-:eqlabel:`cont_uniform-cdf`
+:eqlabel:`eq_cont_uniform_cdf`
 
-Let us first plot the probability density function :eqref:`cont_uniform-pdf`.
+Let us first plot the probability density function :eqref:`eq_cont_uniform_pdf`.
 
 ```{.python .input}
 a, b = 1, 3
@@ -133,7 +133,7 @@ p = (x > a)*(x < b)/(b - a)
 d2l.plot(x, p, 'x', 'p.d.f.')
 ```
 
-Now, let us plot the cumulative distribution function :eqref:`cont_uniform-cdf`.
+Now, let us plot the cumulative distribution function :eqref:`eq_cont_uniform_cdf`.
 
 ```{.python .input}
 def F(x):
@@ -172,7 +172,7 @@ $$
 To get the cumulative distribution function, we need to notice that getting exactly $k$ successes can occur in $\binom{n}{k} = \frac{n!}{k!(n-k)!}$ ways each of which has a probability of $p^m(1-p)^{n-m}$ of occurring.  Thus the cumulative distribution function is
 
 $$F(x) = \begin{cases} 0 & x < 0, \\ \sum_{m \le k} \binom{n}{m} p^m(1-p)^{n-m}  & k \le x < k+1 \text{ with } 0 \le k < n, \\ 1 & x >= n . \end{cases}$$
-:eqlabel:`binomial-cdf`
+:eqlabel:`eq_binomial_cdf`
 
 Let us first plot the probability mass function.
 
@@ -194,7 +194,7 @@ d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
-Now, let us plot the cumulative distribution function :eqref:`binomial-cdf`.
+Now, let us plot the cumulative distribution function :eqref:`eq_binomial_cdf`.
 
 ```{.python .input}
 x = np.arange(-1, 11, 0.01)
@@ -231,25 +231,25 @@ where $X^{(2)}$ is the total sum, and $X^{(2)}_i \sim \mathrm{Bernoulli}(p/2)$. 
 Why stop here?  Let us continue to split that minute into $n$ parts.  By the same reasoning as above, we see that
 
 $$X^{(n)} \sim \mathrm{Binomial}(n,p/n).$$
-:eqlabel:`eq_poisson_approx`
+:eqlabel:`eq_eq_poisson_approx`
 
-Consider these random variables.  By the previous section, we know that :eqref:`eq_poisson_approx` has mean $\mu_{X^{(n)}} = n(p/n) = p$, and variance $\sigma_{X^{(n)}}^2 = n(p/n)(1-(p/n)) = p(1-p/n)$.  If we take $n \rightarrow \infty$, we can see that these numbers stabilize to $\mu_{X^{(\infty)}} = p$, and variance $\sigma_{X^{(\infty)}}^2 = p$.  This indicates that there *could be* some random variable we can define in this infinite subdivision limit.  
+Consider these random variables.  By the previous section, we know that :eqref:`eq_eq_poisson_approx` has mean $\mu_{X^{(n)}} = n(p/n) = p$, and variance $\sigma_{X^{(n)}}^2 = n(p/n)(1-(p/n)) = p(1-p/n)$.  If we take $n \rightarrow \infty$, we can see that these numbers stabilize to $\mu_{X^{(\infty)}} = p$, and variance $\sigma_{X^{(\infty)}}^2 = p$.  This indicates that there *could be* some random variable we can define in this infinite subdivision limit.  
 
 This should not come as too much of a surprise, since in the real world we can just count the number of bus arrivals, however it is nice to see that our mathematical model is well defined.  This discussion can be made formal as the *law of rare events*.
 
 Following through this reasoning carefully, we can arrive at the following model.  We will say that $X \sim \mathrm{Poisson}(\lambda)$ if it is a random variable which takes the values $\{0,1,2,\ldots\}$ with probability
 
 $$p_k = \frac{\lambda^ke^{-\lambda}}{k!}.$$
-:eqlabel:`poisson-mass`
+:eqlabel:`eq_poisson_mass`
 
 The value $\lambda > 0$ is known as the *rate*, and denotes the average number of arrivals we expect in one unit of time.  
 
 We may sum this probability mass function to get the cumulative distribution function.
 
 $$F(x) = \begin{cases} 0 & x < 0, \\ e^{-\lambda}\sum_{m = 0}^k \frac{\lambda^m}{m!} & k \le x < k+1 \text{ with } 0 \le k. \end{cases}$$
-:eqlabel:`poisson-cdf`
+:eqlabel:`eq_poisson_cdf`
 
-Let us first plot the probability mass function :eqref:`poisson-mass`.
+Let us first plot the probability mass function :eqref:`eq_poisson_mass`.
 
 ```{.python .input}
 lam = 5.0
@@ -263,7 +263,7 @@ d2l.plt.ylabel('p.m.f.')
 d2l.plt.show()
 ```
 
-Now, let us plot the cumulative distribution function :eqref:`poisson-cdf`.
+Now, let us plot the cumulative distribution function :eqref:`eq_poisson_cdf`.
 
 ```{.python .input}
 x = np.arange(-1, 21, 0.01)
@@ -324,9 +324,9 @@ $$
 where we say a random variable is normally distributed with given mean $\mu$ and variance $\sigma^2$, written $X \sim \mathcal{N}(\mu,\sigma^2)$ if $X$ has density
 
 $$p_X(x) = \frac{1}{\sqrt{2\pi\sigma^2}}e^{-\frac{(x-\mu)^2}{2\sigma^2}}.$$
-:eqlabel:`gaussian-pdf`
+:eqlabel:`eq_gaussian_pdf`
 
-Let us first plot the probability density function :eqref:`gaussian-pdf`.
+Let us first plot the probability density function :eqref:`eq_gaussian_pdf`.
 
 ```{.python .input}
 mu, sigma = 0, 1

@@ -88,9 +88,9 @@ if we take two column vectors say $\mathbf{u}$ and $\mathbf{v}$,
 we can form their dot product by computing:
 
 $$\mathbf{u}^\top\mathbf{v} = \sum_i u_i\cdot v_i.$$
-:eqlabel:`dot-def`
+:eqlabel:`eq_dot_def`
 
-Because :eqref:`dot-def` is symmetric, we will mirror the notation 
+Because :eqref:`eq_dot_def` is symmetric, we will mirror the notation 
 of classical multiplication and write
 
 $$
@@ -99,7 +99,7 @@ $$
 
 to highlight the fact that exchanging the order of the vectors will yield the same answer.
 
-The dot product :eqref:`dot-def` also admits a geometric interpretation: it is closely related to the angle between two vectors.  Consider the angle shown in :numref:`fig_angle`.
+The dot product :eqref:`eq_dot_def` also admits a geometric interpretation: it is closely related to the angle between two vectors.  Consider the angle shown in :numref:`fig_angle`.
 
 ![Between any two vectors in the plane there is a well defined angle $\theta$.  We will see this angle is intimately tied to the dot product.](../img/VecAngle.svg)
 :label:`fig_angle`
@@ -133,7 +133,7 @@ Indeed, for any two vectors $\mathbf{v}$ and $\mathbf{w}$,
 the angle between the two vectors is
 
 $$\theta = \arccos\left(\frac{\mathbf{v}\cdot\mathbf{w}}{\|\mathbf{v}\|\|\mathbf{w}\|}\right).$$
-:eqlabel:`angle-forumla`
+:eqlabel:`eq_angle_forumla`
 
 This is a nice result since nothing in the computation references two-dimensions.
 Indeed, we can use this in three or three million dimensions without issue.
@@ -213,7 +213,7 @@ and divides the space into two half-spaces.
 
 Let us start with an example.
 Suppose that we have a column vector $\mathbf{w}=[2,1]^\top$. We want to know, "what are the points $\mathbf{v}$ with $\mathbf{w}\cdot\mathbf{v} = 1$?"
-By recalling the connection between dot products and angles above :eqref:`angle-forumla`, 
+By recalling the connection between dot products and angles above :eqref:`eq_angle_forumla`, 
 we can see that this is equivalent to 
 $$
 \|\mathbf{v}\|\|\mathbf{w}\|\cos(\theta) = 1 \; \iff \; \|\mathbf{v}\|\cos(\theta) = \frac{1}{\|\mathbf{w}\|} = \frac{1}{\sqrt{5}}.
