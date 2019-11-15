@@ -14,7 +14,7 @@ from mxnet import np, npx, gluon
 npx.set_np()
 ```
 
-## Read and Pre-process Data
+## Read and Preprocess the Dataset
 
 We first download a dataset that contains a set of English sentences with the corresponding French translations. As can be seen that each line contains a English sentence with its French translation, which are separated by a `TAB`.
 
@@ -83,7 +83,7 @@ src_vocab = d2l.Vocab(source, min_freq=3, use_special_tokens=True)
 len(src_vocab)
 ```
 
-## Load Dataset
+## Loading the Dataset
 
 In language models, each example is a `num_steps` length sequence from the corpus, which may be a segment of a sentence, or span over multiple sentences. In machine translation, an example should contain a pair of source sentence and target sentence. These sentences might have different lengths, while we need same length examples to form a minibatch. 
 
@@ -113,7 +113,7 @@ def build_array(lines, vocab, num_steps, is_source):
 
 Then we can construct minibatches based on these arrays. 
 
-## Put All Things Together
+## Put all Things Together
 
 Finally, we define the function `load_data_nmt` to return the data iterator with the vocabularies for source language and target language.
 
@@ -150,8 +150,8 @@ for X, X_vlen, Y, Y_vlen, in train_iter:
 
 
 ## Exercises
-1. Take a background search online of which languages have made the greatest progress for machine translation? (Hint: any language that has a deep and complex grammatical structure can now be efficiently modeled using deep leaning.)
-1. Can you find a machine translation dataset online and process it with this jupyter notebook?
+
+1. Find a machine translation dataset online and process it.
 
 
 ## [Discussions](https://discuss.mxnet.io/t/machine-translation/2396)
