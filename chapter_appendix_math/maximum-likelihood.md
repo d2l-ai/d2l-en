@@ -105,11 +105,12 @@ n_H = 8675309
 n_T = 25624
 
 # Initialize our paramteres
-theta = np.array(0.5); theta.attach_grad()
+theta = np.array(0.5)
+theta.attach_grad()
 
 # Perform gradient descent
 lr = 0.00000000001
-for iter in range(10) :
+for iter in range(10):
     with autograd.record():
         loss = -(n_H * np.log(theta) + n_T * np.log(1 - theta))
     loss.backward()

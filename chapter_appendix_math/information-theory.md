@@ -152,7 +152,7 @@ Let us implement joint entropy from scratch in MXNet.
 def joint_entropy(p_xy):
     joint_ent = -p_xy * np.log2(p_xy)
     # nansum will sum up the non-nan number
-    out = nansum(joint_ent.as_nd_ndarray()) 
+    out = nansum(joint_ent.as_nd_ndarray())
     return out
 
 joint_entropy(np.array([[0.1, 0.5], [0.1, 0.3]]))
@@ -192,10 +192,10 @@ def conditional_entropy(p_xy, p_x):
     p_y_given_x = p_xy/p_x
     cond_ent = -p_xy * np.log2(p_y_given_x)
     # nansum will sum up the non-nan number
-    out = nansum(cond_ent.as_nd_ndarray()) 
+    out = nansum(cond_ent.as_nd_ndarray())
     return out
 
-conditional_entropy(np.array([[0.1, 0.5], [0.2, 0.3]]), np.array([0.2,0.8]))
+conditional_entropy(np.array([[0.1, 0.5], [0.2, 0.3]]), np.array([0.2, 0.8]))
 ```
 
 ### Mutual Information
@@ -233,11 +233,11 @@ def mutual_information(p_xy, p_x, p_y):
     p = p_xy / (p_x * p_y)
     mutual = -p_xy * np.log2(p)
     # nansum will sum up the non-nan number
-    out = nansum(mutual.as_nd_ndarray()) 
+    out = nansum(mutual.as_nd_ndarray())
     return out
 
-mutual_information(np.array([[0.1, 0.5], [0.1, 0.3]]), 
-                   np.array([0.2, 0.8]), 
+mutual_information(np.array([[0.1, 0.5], [0.1, 0.3]]),
+                   np.array([0.2, 0.8]),
                    np.array([[0.75, 0.25]]))
 ```
 

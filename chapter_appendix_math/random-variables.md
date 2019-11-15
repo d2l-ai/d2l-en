@@ -246,14 +246,14 @@ Let's visualize this.  I will show the probability of getting the three values a
 
 ```{.python .input}
 # Define a helper to plot these figures
-def plot_chebychev(a, p) :
+def plot_chebychev(a, p):
     d2l.set_figsize()
     d2l.plt.stem([a-2, a, a+2], [p, 1-2*p, p], use_line_collection=True)
     d2l.plt.xlim([-4, 4])
     d2l.plt.xlabel('x')
     d2l.plt.ylabel('p.m.f.')
 
-    d2l.plt.hlines(0.5, a - 4 * np.sqrt(2 * p), 
+    d2l.plt.hlines(0.5, a - 4 * np.sqrt(2 * p),
                    a + 4 * np.sqrt(2 * p), 'black', lw=4)
     d2l.plt.vlines(a - 4 * np.sqrt(2 * p), 0.53, 0.47, 'black', lw=1)
     d2l.plt.vlines(a + 4 * np.sqrt(2 * p), 0.53, 0.47, 'black', lw=1)
@@ -488,7 +488,7 @@ To ensure that we understand, let us take a look at a collection of random varia
 # Plot a few random variables adjustable covariance
 covs = [-0.9, 0.0, 1.2]
 d2l.plt.figure(figsize=(12, 3))
-for i in range(3) :
+for i in range(3):
     X = np.random.normal(0, 1, 500)
     Y = covs[i]*X + np.random.normal(0, 1, 500)
 
@@ -562,7 +562,7 @@ To ensure that we understand, let us this time take a look at a collection of ra
 # Plot a few random variables adjustable correlations
 cors = [-0.9, 0.0, 1.0]
 d2l.plt.figure(figsize=(12, 3))
-for i in range(3) :
+for i in range(3):
     X = np.random.normal(0, 1, 500)
     Y = cors[i] * X + np.sqrt(1 - cors[i]**2) * np.random.normal(0, 1, 500)
 

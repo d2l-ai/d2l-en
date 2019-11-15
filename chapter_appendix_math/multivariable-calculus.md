@@ -76,9 +76,11 @@ from mpl_toolkits import mplot3d
 from mxnet import np, npx, autograd
 npx.set_np()
 
-f = lambda x, y : np.log(np.exp(x) + np.exp(y))
-grad_f = lambda x, y : np.array([np.exp(x) / (np.exp(x) + np.exp(y)), 
-                                np.exp(y) / (np.exp(x) + np.exp(y))])
+def f(x, y):
+    return np.log(np.exp(x) + np.exp(y))
+def grad_f(x, y):
+    return np.array([np.exp(x) / (np.exp(x) + np.exp(y)),
+                     np.exp(y) / (np.exp(x) + np.exp(y))])
 
 epsilon = np.array([0.01, -0.03])
 grad_approx = f(0, np.log(2)) + epsilon.dot(grad_f(0, np.log(2)))
@@ -147,7 +149,7 @@ The only possible location of minima are at $x = -1, 0, 2$, where the function t
 
 ```{.python .input}
 x = np.arange(-2, 3, 0.01)
-f = 3*x**4 - 4*x**3 -12*x**2
+f = (3 * x**4) - (4 * x**3) - (12 * x**2)
 
 d2l.plot(x, f, 'x', 'f(x)')
 ```
@@ -307,7 +309,7 @@ du_da, du_db, dv_da, dv_db = 2*(a + b), 2*(a + b), 2*(a - b), -2*(a - b)
 da_dw, db_dw = 2*(w + x + y + z), 2*(w + x - y - z)
 da_dx, db_dx = 2*(w + x + y + z), 2*(w + x - y - z)
 da_dy, db_dy = 2*(w + x + y + z), -2*(w + x - y - z)
-da_dz, db_dz = 2*(w + x + y + z), -2*(w + x - y - z); 
+da_dz, db_dz = 2*(w + x + y + z), -2*(w + x - y - z)
 
 # Now compute how f changes when we change any value from output to input
 df_da, df_db = df_du*du_da + df_dv*dv_da, df_du*du_db + df_dv*dv_db
@@ -330,7 +332,11 @@ To see how MXNet has encapsulated this, let us take a quick look at this example
 ```{.python .input}
 # Initialize as NDArrays, attaching gradients
 w, x, y, z = np.array(-1), np.array(0), np.array(-2), np.array(1)
-w.attach_grad(); x.attach_grad(); y.attach_grad(); z.attach_grad()
+
+w.attach_grad()
+x.attach_grad()
+y.attach_grad()
+z.attach_grad()
 
 # Do the computation like usual, tracking gradients
 with autograd.record():
@@ -415,7 +421,7 @@ $$
 
 ```{.python .input}
 # Construct grid and compute function
-x, y = np.meshgrid(np.linspace(-2, 2, 101), 
+x, y = np.meshgrid(np.linspace(-2, 2, 101),
                    np.linspace(-2, 2, 101), indexing='ij')
 z = x*np.exp(- x**2 - y**2)
 
@@ -425,11 +431,13 @@ w = np.exp(-1)*(-1 - (x + 1) + 2 * (x + 1)**2 + 2 * y**2)
 # Plot function
 ax = d2l.plt.figure().add_subplot(111, projection='3d')
 ax.plot_wireframe(x, y, z, **{'rstride': 10, 'cstride': 10})
-ax.plot_wireframe(x, y, w, **{'rstride': 10, 'cstride': 10}, color = 'purple')
+ax.plot_wireframe(x, y, w, **{'rstride': 10, 'cstride': 10}, color='purple')
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('y')
 d2l.set_figsize()
-ax.set_xlim(-2, 2); ax.set_ylim(-2, 2); ax.set_zlim(-1, 1)
+ax.set_xlim(-2, 2)
+ax.set_ylim(-2, 2)
+ax.set_zlim(-1, 1)
 ax.dist = 12
 ```
 

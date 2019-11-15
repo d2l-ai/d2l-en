@@ -147,7 +147,7 @@ from IPython import display
 from mxnet import gluon, np, npx
 npx.set_np()
 
-def angle(v, w) :
+def angle(v, w):
     return np.arccos(v.dot(w) / (np.linalg.norm(v) * np.linalg.norm(w)))
 
 angle(np.array([0, 1, 2]), np.array([2, 3, 4]))
@@ -273,7 +273,7 @@ and eyeball a crude threshold.  First we will load the data and compute the aver
 
 ```{.python .input}
 # Load in the dataset
-train = gluon.data.vision.FashionMNIST(train=True) 
+train = gluon.data.vision.FashionMNIST(train=True)
 test = gluon.data.vision.FashionMNIST(train=False)
 
 X_train_0 = np.stack([x[0] for x in train if x[1] == 0]).astype(float)
@@ -311,7 +311,9 @@ In a fully machine learned solution, we would learn the threshold from the datas
 # Print test set accuracy with eyeballed threshold
 w = (ave_1 - ave_0).T
 predictions = X_test.reshape(2000, -1).dot(w.flatten()) > -1500000
-np.mean(predictions.astype(y_test.dtype)==y_test, dtype=np.float64)  # Accuracy
+
+# Accuracy
+np.mean(predictions.astype(y_test.dtype) == y_test, dtype=np.float64)
 ```
 
 ## Geometry of Linear Transformations
