@@ -442,7 +442,7 @@ Some times, when the context is clear, we may use the term examples,
 to refer to a collection of inputs, 
 even when the corresponding targets are unknown. 
 We denote any particular instance with a subscript, typicaly $i$,
-for instance ($\mathbf{x}_i$, y_i). 
+for instance ($\mathbf{x}_i, y_i$). 
 A dataset is a collection of $n$ instances $\{\mathbf{x}_i, y_i\}_{i=1}^n$.
 Our goal is to produce a model $f_\theta$ that maps any input $\mathbf{x}_i$
  to a prediction $f_{\theta}(\mathbf{x}_i)$
