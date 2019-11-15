@@ -145,7 +145,7 @@ $$
 \frac{df}{dx} = 12x^3 - 12x^2 -24x = 12x(x-2)(x+1).
 $$
 
-The only possible location of minima are at $x = -1, 0, 2$, where the function takes the values $-5, 0,-32$ respectively, and thus we can conclude that we minimize our function when $x = 2$.  A quick plot confirms this.
+The only possible location of minima are at $x = -1, 0, 2$, where the function takes the values $-5, 0, -32$ respectively, and thus we can conclude that we minimize our function when $x = 2$.  A quick plot confirms this.
 
 ```{.python .input}
 x = np.arange(-2, 3, 0.01)

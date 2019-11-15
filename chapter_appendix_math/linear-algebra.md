@@ -370,10 +370,10 @@ $$
 \end{bmatrix}.
 $$
 
-If we look at the specific vector $\mathbf{v} = [2,-1]^\top$,
+If we look at the specific vector $\mathbf{v} = [2, -1]^\top$,
 we see this is $2\cdot[1, 0]^\top + -1\cdot[0, 1]^\top$,
 and thus we know that the matrix $A$ will send this to 
-$2(\mathbf{A}[1, 0]^\top) + -1(\mathbf{A}[0, 1])^\top = 2[1,-1]^\top - [2, 3]^\top = [0,-5]^\top$.
+$2(\mathbf{A}[1, 0]^\top) + -1(\mathbf{A}[0, 1])^\top = 2[1, -1]^\top - [2, 3]^\top = [0, -5]^\top$.
 If we follow this logic through carefully,
 say by considering the grid of all integer pairs of points,
 we see that what happens is that the matrix multiplication
@@ -403,7 +403,7 @@ but geometrically we can see that this is fundamentally different
 from the types of transformations we saw above. 
 For instance, the result from matrix $\mathbf{A}$ can be "bent back" to the original grid.  The results from matrix $\mathbf{B}$ cannot 
 because we will never know where the vector $[1, 2]^\top$ came from---was 
-it $[1, 1]^\top$ or $[0,-1]^\top$?
+it $[1, 1]^\top$ or $[0, -1]^\top$?
 
 While this picture was for a $2\times2$ matrix, 
 nothing prevents us from taking the lessons learned into higher dimensions.
@@ -426,7 +426,7 @@ This compresses the entire plane down to live on the single line $y = 2x$.
 The question now arises: is there some way we can detect this
 just looking at the matrix itself?
 The answer is that indeed we can.
-Lets take $\mathbf{b}_1 = [2, 4]^\top$ and $\mathbf{b}_2 = [-1,-2]^\top$ 
+Lets take $\mathbf{b}_1 = [2, 4]^\top$ and $\mathbf{b}_2 = [-1, -2]^\top$ 
 be the two columns of $\mathbf{B}$.
 Remember that we can write everything transformed by the matrix $\mathbf{B}$
 as a weighted sum of the columns of the matrix: 

@@ -121,7 +121,7 @@ Assume that the height and width of the image are both 40 pixels and that select
 rois = np.array([[0, 0, 0, 20, 20], [0, 0, 10, 30, 30]])
 ```
 
-Because the height and width of `X` are $1/10$ of the height and width of the image, the coordinates of the two proposed regions are multiplied by 0.1 according to the `spatial_scale`, and then the RoIs are labeled on `X` as `X[:,:,0:3, 0:3]` and `X[:,:,1:4, 0:4]`, respectively. Finally, we divide the two RoIs into a sub-window grid and extract features with a height and width of 2.
+Because the height and width of `X` are $1/10$ of the height and width of the image, the coordinates of the two proposed regions are multiplied by 0.1 according to the `spatial_scale`, and then the RoIs are labeled on `X` as `X[:, :, 0:3, 0:3]` and `X[:, :, 1:4, 0:4]`, respectively. Finally, we divide the two RoIs into a sub-window grid and extract features with a height and width of 2.
 
 ```{.python .input  n=6}
 npx.roi_pooling(X, rois, pooled_size=(2, 2), spatial_scale=0.1)

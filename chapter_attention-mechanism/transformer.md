@@ -255,17 +255,6 @@ class PositionalEncoding(nn.Block):
 Now we test the `PositionalEncoding` with a toy model for 4 dimensions. As we can see, the $4^{\mathrm{th}}$ dimension has the same frequency as the $5^{\mathrm{th}}$ but with different offset. The $5^{\mathrm{th}}$ and $6^{\mathrm{th}}$ dimension have a lower frequency.
 
 
-$1,500$
-
-$1, 500$
-
-1500
-
-1,500
-
-1, 500
-
-
 ```{.python .input  n=11}
 pe = PositionalEncoding(20, 0)
 pe.initialize()

@@ -98,8 +98,8 @@ train_data = pd.read_csv('../data/kaggle_house_pred_train.csv')
 test_data = pd.read_csv('../data/kaggle_house_pred_test.csv')
 ```
 
-The training dataset includes 1460 examples, 80 features, and 1 label.,
-the test data contains 1459 examples and 80 features.
+The training dataset includes $1,460$ examples, 80 features, and 1 label.,
+the test data contains $1,459$ examples and 80 features.
 
 ```{.python .input  n=11}
 print(train_data.shape)

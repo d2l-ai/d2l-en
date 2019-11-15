@@ -43,7 +43,7 @@ xd = np.arange(np.min(xs),np.max(xs),0.01)
 yd = np.exp(-xd**2/2)/np.sqrt(2*np.pi)
     
 # Plot the results
-d2l.plot(xd, yd,'x','density')
+d2l.plot(xd, yd, 'x', 'density')
 d2l.plt.scatter(xs, ys)
 d2l.plt.axvline(x=0)
 d2l.plt.axvline(x=np.mean(xs), linestyle='--',color='purple')
