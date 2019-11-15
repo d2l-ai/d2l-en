@@ -1,18 +1,18 @@
 # Single Variable Calculus
 :label:`sec_single_variable_calculus`
 
-In :numref:`sec_calculus`, we saw the basic elements of differential calculus.  This section takes a deeper dive into the fundamentals of calculus and how we can apply it and understand it in the context of machine learning.
+In :numref:`sec_calculus`, we saw the basic elements of differential calculus.  This section takes a deeper dive into the fundamentals of calculus and how we can understand and apply it in the context of machine learning.
 
 ## Differential Calculus
 Differential calculus is fundamentally the study of how functions behave under small changes.  To see why this is so core to deep learning, let us consider an example.
 
-Suppose that we have a deep neural network where the weights are for convenience all concatenated into a single vector $\mathbf{w} = (w_1, \ldots, w_n)$.  Given a training dataset, we consider the loss of our neural network on this dataset, which we will write as $\mathcal{L}(\mathbf{w})$.  
+Suppose that we have a deep neural network where the weights are, for convenience, concatenated into a single vector $\mathbf{w} = (w_1, \ldots, w_n)$.  Given a training dataset, we consider the loss of our neural network on this dataset, which we will write as $\mathcal{L}(\mathbf{w})$.  
 
-This function is extraordinarily complex, encoding the performance of all possible models of the given architecture on this dataset, so it is nearly impossible to tell what set of weights $\mathbf{w}$ will make the loss as small as possible. Thus, in practice, we often start by initializing our weights *randomly*, and then iteratively take small steps in the direction which makes the weights decrease as rapidly as possible.
+This function is extraordinarily complex, encoding the performance of all possible models of the given architecture on this dataset, so it is nearly impossible to tell what set of weights $\mathbf{w}$ will minimize the loss. Thus, in practice, we often start by initializing our weights *randomly*, and then iteratively take small steps in the direction which makes the loss decrease as rapidly as possible.
 
 The question then becomes something that on the surface is no easier: how do we find the direction which makes the weights decrease as quickly as possible?  To dig into this, let us first examine the case with only a single weight: $L(\mathbf{w}) = L(x)$ for a single real value $x$. 
 
-To be specific, we take $x$ and change it a small amount to $x + \epsilon$, where $\epsilon$ is something small. If you wish to be concrete, think a number like $0.0000001$.  Now, consider the picture below:
+Let us take $x$ and try to understand what happens when we change it by a small amount to $x + \epsilon$. If you wish to be concrete, think a number like $\epsilon = 0.0000001$.  To help us visualize what happens, let us graph an example function, $f(x) = \sin(x^x)$, over the $[0, 3]$.
 
 ```{.python .input}
 %matplotlib inline
@@ -20,30 +20,34 @@ import d2l
 from IPython import display
 from mxnet import np, npx
 npx.set_np()
-```
 
-```{.python .input}
 # Plot a function in a normal range
 x_big = np.arange(0.01, 3.01, 0.01)
 ys = np.sin(x_big**x_big)
 d2l.plot(x_big, ys, 'x', 'f(x)')
 ```
 
-In this graph, the eagle-eyed amongst us will notice that our strange function $f(x) = \sin(x^x)$ plotted over a wide range $[0, 3]$ changes dramatically.
-
-
-However, if we zoom into a tiny segment, the behavior seems to be far simpler: it is just a straight line.
+At this large scale, the function's behavior is not simple. However, if we reduce our range to something smaller like $[1.75,2.25]$, we see that the graph becomes much simpler.
 
 ```{.python .input}
 # Plot a the same function in a tiny range
-x_big = np.arange(2.0, 2.01, 0.0001)
-ys = np.sin(x_big**x_big)
-d2l.plot(x_big, ys, 'x', 'f(x)')
+x_med = np.arange(1.75, 2.25, 0.001)
+ys = np.sin(x_med**x_med)
+d2l.plot(x_med, ys, 'x', 'f(x)')
 ```
 
-For most functions, it is reasonable to expect that as we shift the $x$ value of the function by a little bit, the output $f(x)$ will also be shifted by a little bit.  The only question we need to answer is, "How large is the change in the output compared to the change in the input?  Is it half as large?  Twice as large?"
+Taking this to an extreme, if we zoom into a tiny segment, the behavior becomes far simpler: it is just a straight line.
 
-Thus, what we can consider is to take the change in the output, divide it by the change in input, and see how large it is.  We can write this formally as
+```{.python .input}
+# Plot a the same function in a tiny range
+x_small = np.arange(2.0, 2.01, 0.0001)
+ys = np.sin(x_small**x_small)
+d2l.plot(x_small, ys, 'x', 'f(x)')
+```
+
+This is the key observation of single variable calculus: the behavior of familiar functions can be modeled by a line in a small enough range.  This means that for most functions, it is reasonable to expect that as we shift the $x$ value of the function by a little bit, the output $f(x)$ will also be shifted by a little bit.  The only question we need to answer is, "How large is the change in the output compared to the change in the input?  Is it half as large?  Twice as large?"
+
+Thus, we can consider the ratio of the change in the output of a function for a small change in the input of the function.  We can write this formally as
 
 $$
 \frac{L(x+\epsilon) - L(x)}{(x+\epsilon) - x} = \frac{L(x+\epsilon) - L(x)}{\epsilon}.
@@ -62,20 +66,20 @@ for epsilon in [0.1, 0.001, 0.0001, 0.00001]:
         epsilon, (L(4+epsilon) - L(4)) / epsilon))
 ```
 
-Now, if we are observant, we will notice that the output of this number is suspiciously close to $8$.  Indeed, if we decrease the  $\epsilon$ value, we will see values progressively closer to $8$.  Thus we may conclude, correctly, that the value we seek (the degree a change in the input changes the output) should be $8$ at the point $x=4$.  The way that a mathematician encodes this fact is
+Now, if we are observant, we will notice that the output of this number is suspiciously close to $8$.  Indeed, if we decrease $\epsilon$, we will see value becomes progressively closer to $8$.  Thus we may conclude, correctly, that the value we seek (the degree a change in the input changes the output) should be $8$ at the point $x=4$.  The way that a mathematician encodes this fact is
 
 $$
 \lim_{\epsilon \rightarrow 0}\frac{L(4+\epsilon) - L(4)}{\epsilon} = 8.
 $$
 
-As a bit of a historical digression: in the first few decades of neural network research, scientists used this algorithm (the *method of finite differences*) to evaluate how a loss function changed under small perturbation: just change the weights and see how the loss changed.  This is computationally inefficient, requiring two evaluations of the loss function to see how a single change of one variable influenced the loss.  If we tried to do this with even a paltry few thousand parameters, it would require several thousand evaluations of the network over the entire dataset!  It was not solved until 1986 that the *backpropagation algorithm* introduced in :cite:`Rumelhart.Hinton.Williams.ea.1988`, which provides how *any* change of the weights together would change the loss. In this paper, the rule of calculus efficiently utilizes same computation time as a single prediction of the network over the dataset.
+As a bit of a historical digression: in the first few decades of neural network research, scientists used this algorithm (the *method of finite differences*) to evaluate how a loss function changed under small perturbation: just change the weights and see how the loss changed.  This is computationally inefficient, requiring two evaluations of the loss function to see how a single change of one variable influenced the loss.  If we tried to do this with even a paltry few thousand parameters, it would require several thousand evaluations of the network over the entire dataset!  It was not solved until 1986 that the *backpropagation algorithm* introduced in :cite:`Rumelhart.Hinton.Williams.ea.1988` provided a way to calculate how *any* change of the weights together would change the loss in the same computation time as a single prediction of the network over the dataset.
 
-Back in our example, this value of the change $8$ is different based on different values of $x$, so it makes sense to define a function about $x$.  More formally, this value dependent rate of change is referred to as the *derivative* as
+Back in our example, this value $8$ is different for different values of $x$, so it makes sense to define it as a function of $x$.  More formally, this value dependent rate of change is referred to as the *derivative* which is written as
 
 $$\frac{df}{dx}(x) = \lim_{\epsilon \rightarrow 0}\frac{f(x+\epsilon) - f(x)}{\epsilon}.$$
 :eqlabel:`der-def`
 
-We will often encounter many different notations for the derivative in different text. For instance, all of the below notations indicate the same thing:
+Different texts will use different notations for the derivative. For instance, all of the below notations indicate the same thing:
 
 $$
 \frac{df}{dx} = \frac{d}{dx}f = f' = \nabla_xf = D_xf = f_x.
@@ -88,23 +92,17 @@ $$
 
 Often times, it is intuitively useful to unravel the definition of derivative :eqref:`der-def` again to see how a function changes when we make a small change of $x$:
 
-$$\begin{aligned}
-\frac{df}{dx}(x) = \lim_{\epsilon \rightarrow 0}\frac{f(x+\epsilon) - f(x)}{\epsilon} & \implies \frac{df}{dx}(x) \approx \frac{f(x+\epsilon) - f(x)}{\epsilon} \\
-& \implies \epsilon \frac{df}{dx}(x) \approx f(x+\epsilon) - f(x) \\
-& \implies f(x+\epsilon) \approx f(x) + \epsilon \frac{df}{dx}(x).
-\end{aligned}$$
-
-The last equation is worth explicitly calling out.  It tells us that if you take any function and change the input by a small ammount, the output would change by that small amount scaled by the derivative.
-
-$$f(x+\epsilon) \approx f(x) + \epsilon \frac{df}{dx}(x).$$
+$$\begin{aligned} \frac{df}{dx}(x) = \lim_{\epsilon \rightarrow 0}\frac{f(x+\epsilon) - f(x)}{\epsilon} & \implies \frac{df}{dx}(x) \approx \frac{f(x+\epsilon) - f(x)}{\epsilon} \\ & \implies \epsilon \frac{df}{dx}(x) \approx f(x+\epsilon) - f(x) \\ & \implies f(x+\epsilon) \approx f(x) + \epsilon \frac{df}{dx}(x). \end{aligned}$$
 :eqlabel:`small-change`
+
+The last equation is worth explicitly calling out.  It tells us that if you take any function and change the input by a small amount, the output would change by that small amount scaled by the derivative.
 
 In this way, we can understand the derivative as the scaling factor that tells us how large of change we get in the output from a change in the input.
 
 ## Rules of Calculus
 :label:`sec_derivative_table`
 
-A full formal treatment of calculus would derive everything from first principles.  We will not indulge in this temptation here, but rather provide an understanding of the common rules encountered.
+We now turn to the task of understanding how to compute the derivative of an explicit function.  A full formal treatment of calculus would derive everything from first principles.  We will not indulge in this temptation here, but rather provide an understanding of the common rules encountered.
 
 ### Common Derivatives
 As was seen in :numref:`sec_calculus`, when computing derivatives one can often times use a series of rules to reduce the computation to a few core functions.  We repeat them here for ease of reference.
@@ -122,7 +120,7 @@ If every derivative needed to be separately computed and stored in a table, diff
 * **Product rule.** $\frac{d}{dx}\left(g(x)\cdot h(x)\right) = g(x)\frac{dh}{dx}(x) + \frac{dg}{dx}(x)h(x)$.
 * **Chain rule.** $\frac{d}{dx}g(h(x)) = \frac{dg}{dh}(h(x))\cdot \frac{dh}{dx}(x)$.
 
-It gives us excellent intuition into how one can reason with small changes in the input using :eqref:`small-change`.  First, for the sum rule, we may examine the following chain of reasoning:
+Let us see how we may use :eqref:`small-change` to understand these rules.  For the sum rule,consider following chain of reasoning:
 
 $$
 \begin{aligned}
@@ -133,10 +131,10 @@ f(x+\epsilon) & = g(x+\epsilon) + h(x+\epsilon) \\
 \end{aligned}
 $$
 
-Thus by comparing with the fact that $f(x+\epsilon) \approx f(x) + \epsilon \frac{df}{dx}(x)$, we see that $\frac{df}{dx}(x) = \frac{dg}{dx}(x) + \frac{dh}{dx}(x)$ as desired.  The intuition here is: when we change the input $x$, $g$ and $h$ jointly contribute to the change of the output by $\frac{dg}{dx}(x)$ and $\frac{dh}{dx}(x)$.
+By comparing this result with the fact that $f(x+\epsilon) \approx f(x) + \epsilon \frac{df}{dx}(x)$, we see that $\frac{df}{dx}(x) = \frac{dg}{dx}(x) + \frac{dh}{dx}(x)$ as desired.  The intuition here is: when we change the input $x$, $g$ and $h$ jointly contribute to the change of the output by $\frac{dg}{dx}(x)$ and $\frac{dh}{dx}(x)$.
 
 
-Next, the product is more subtle, and will require a new observation about how to work with these expressions.  We will begin as before using :eqref:`small-change`:
+The product is more subtle, and will require a new observation about how to work with these expressions.  We will begin as before using :eqref:`small-change`:
 
 $$
 \begin{aligned}
@@ -148,13 +146,13 @@ f(x+\epsilon) & = g(x+\epsilon)\cdot h(x+\epsilon) \\
 $$
 
 
-This resembles the computation done above, and indeed we see our answer ($\frac{df}{dx}(x) = g(x)\frac{dh}{dx}(x) + \frac{dg}{dx}(x)h(x)$) sitting there next to $\epsilon$, but there is the issue of that term of size $\epsilon^{2}$.  We will refer to this as a *higher-order term*, since the power of $\epsilon^2$ is higher than the power of $\epsilon^1$.  We will see in a later section that we will sometimes want to keep track of these, however for now observe that if $\epsilon = 0.0000001$, then $\epsilon^{2}= 0.0000000000001$, which is vastly smaller.  As we send $\epsilon \rightarrow 0$, we may safely ignore the higher order terms.  As a general convention in this appendix, we will use "$\approx$" to denote that the two terms are equal up to higher order terms, In this case, we can easily be more formal.  If we looked at the difference quotient
+This resembles the computation done above, and indeed we see our answer ($\frac{df}{dx}(x) = g(x)\frac{dh}{dx}(x) + \frac{dg}{dx}(x)h(x)$) sitting next to $\epsilon$, but there is the issue of that term of size $\epsilon^{2}$.  We will refer to this as a *higher-order term*, since the power of $\epsilon^2$ is higher than the power of $\epsilon^1$.  We will see in a later section that we will sometimes want to keep track of these, however for now observe that if $\epsilon = 0.0000001$, then $\epsilon^{2}= 0.0000000000001$, which is vastly smaller.  As we send $\epsilon \rightarrow 0$, we may safely ignore the higher order terms.  As a general convention in this appendix, we will use "$\approx$" to denote that the two terms are equal up to higher order terms.  However, if we wish to be more formal we may examine the difference quotient
 
 $$
 \frac{f(x+\epsilon) - f(x)}{\epsilon} = g(x)\frac{dh}{dx}(x) + \frac{dg}{dx}(x)h(x) + \epsilon \frac{dg}{dx}(x)\frac{dh}{dx}(x),
 $$
 
-and thus as we send $\epsilon \rightarrow 0$, the right hand term goes to zero as well.  This gives the product rule.
+and see that as we send $\epsilon \rightarrow 0$, the right hand term goes to zero as well.
 
 Finally, with the chain rule, we can again progress as before using :eqref:`small-change` and see that
 
@@ -169,7 +167,7 @@ $$
 
 where in the second line we view the function $g$ as having its input ($h(x)$) shifted by the tiny quantity $\epsilon \frac{dh}{dx}(x)$.
 
-In this way we see that we can flexibly combine all our derivative rules to compute essentially any expression desired.  For instance,
+These rule provide us with a flexible set of tools to compute essentially any expression desired.  For instance,
 
 $$
 \begin{aligned}
@@ -191,9 +189,9 @@ Where each line has used the following rules:
 Two things should be clear after doing this example:
 
 1. Any function we can write down using sums, products, constants, powers, exponentials, and logarithms can have its derivate computed mechanically by following these rules.
-2. Having a human follow these rules can be tedious and error prone!  For the types of functions encountered in deep learning, we should think of the function compositions as being potentially hundreds of layers deep or more.
+2. Having a human follow these rules can be tedious and error prone!
 
-Thankfully, these two facts together hint towards a way forward: this is a perfect candidate for mechanization!  Indeed backpropagation is exactly finding an efficient way to apply these derivative rules.
+Thankfully, these two facts together hint towards a way forward: this is a perfect candidate for mechanization!  Indeed backpropagation, which we will revisit later in this section, is exactly that.
 
 ### As Linear Approximation
 When working with derivatives, it is often useful to geometrically interpret the approximation used above.  In particular, note that the equation 
@@ -202,7 +200,7 @@ $$
 f(x+\epsilon) \approx f(x) + \epsilon \frac{df}{dx}(x),
 $$
 
-approximates the value of $f$ by a line which passes through the point $(x, f(x))$ and has slope $\frac{df}{dx}(x)$.  In this way we say that the derivative gives a linear approximation to the function $f$, as illustrated below:
+approximates the value of $f$ by a line which passes through the point $(x,f(x))$ and has slope $\frac{df}{dx}(x)$.  In this way we say that the derivative gives a linear approximation to the function $f$, as illustrated below:
 
 ```{.python .input}
 # Compute sin
@@ -218,32 +216,36 @@ d2l.plot(xs, plots, 'x', 'f(x)', ylim=[-1.5, 1.5])
 
 ### Higher Order Derivatives
 
-From the above we know enough to employ the derivative rules to find the derivative $\frac{df}{dx}$ of any function $f$. Indeed, the derivative function tells us how the function $f$ is changing near a point, giving the rate of change of the function $f$ at that point.  However, the derivative function $\frac{df}{dx}$ can be viewed as a regular function, so nothing stops us from computing the derivative of $\frac{df}{dx}$ to get $\frac{d^2f}{dx^2} = \frac{df}{dx}\left(\frac{df}{dx}\right)$, the second derivative of $f$.  This function is the rate of change of the rate of change of $f$, or in other words, how the rate of change is changing. Furthermore, by executing the derivative function over and over again, we can generalize from the second derivative to the $n$-th derivative. To keep the notation clean, we will denote the $n$-th derivative as 
+Let us now do something that may on the surface seem strange.  Take a function $f$ and compute the derivative $\frac{df}{dx}$.  This gives us the rate of change of $f$ at any point.
+
+However, the derivative, $\frac{df}{dx}$, can be viewed as a function itself, so nothing stops us from computing the derivative of $\frac{df}{dx}$ to get $\frac{d^2f}{dx^2} = \frac{df}{dx}\left(\frac{df}{dx}\right)$.  We will call this the second derivative of $f$.  This function is the rate of change of the rate of change of $f$, or in other words, how the rate of change is changing. We may apply the derivative any number of times to obtain what is called the $n$-th derivative. To keep the notation clean, we will denote the $n$-th derivative as 
 
 $$
 f^{(n)}(x) = \frac{d^{n}f}{dx^{n}} = \left(\frac{d}{dx}\right)^{n} f.
 $$
 
-Below, we visualize the $f^{(2)}(x)$, $f^{(1)}(x)$, and $f(x)$.  First, if the second derivative $f^{(2)}(x)$ is a positive constant, that means that the first derivative is increasing.  As a result, the first derivative $f^{(1)}(x)$ may start out negative, becomes zero at a point, and then becomes positive in the end. Therefore, the function $f$ itself decreases, flattens out, then increases.  In other words, the function $f$ curves up, and has a single minimum as is shown in :numref:`fig_positive-second`.
+Let us try to understand *why* this is a useful notion.  Below, we visualize $f^{(2)}(x)$, $f^{(1)}(x)$, and $f(x)$.  
+
+First, consider the case that the second derivative $f^{(2)}(x)$ is a positive constant.  This means that the slope of the first derivative is positive.  As a result, the first derivative $f^{(1)}(x)$ may start out negative, becomes zero at a point, and then becomes positive in the end. This tells us the slope of our original function $f$ and therefore, the function $f$ itself decreases, flattens out, then increases.  In other words, the function $f$ curves up, and has a single minimum as is shown in :numref:`fig_positive-second`.
 
 ![If we assume the second derivative is a positive constant, then the fist derivative in increasing, which implies the function itself has a minimum.](../img/posSecDer.svg)
 :label:`fig_positive-second`
 
 
-Second, if the second derivative is a negative constant, that means that the first derivative is decreasing.  Following that the first derivative may start out positive, becomes zero at a point, and then becomes negative. Hence, the function $f$ itself increases, flattens out, then decreases.  In other words, the function $f$ curves down, and has a single maximum as is shown in :numref:`fig_negative-second`.
+Second, if the second derivative is a negative constant, that means that the first derivative is decreasing.  This implies the first derivative may start out positive, becomes zero at a point, and then becomes negative. Hence, the function $f$ itself increases, flattens out, then decreases.  In other words, the function $f$ curves down, and has a single maximum as is shown in :numref:`fig_negative-second`.
 
 ![If we assume the second derivative is a negative constant, then the fist derivative in decreasing, which implies the function itself has a maximum.](../img/negSecDer.svg)
 :label:`fig_negative-second`
 
 
-Third, if the second derivative is a always zero, then the first derivative will never change---it is constant!  This means that $f$ increases at a fixed rate, and $f$ is itself a straight line  as is shown in :numref:`fig_zero-second`.
+Third, if the second derivative is a always zero, then the first derivative will never change---it is constant!  This means that $f$ increases (or decreases) at a fixed rate, and $f$ is itself a straight line  as is shown in :numref:`fig_zero-second`.
 
 ![If we assume the second derivative is zero, then the fist derivative is constant, which implies the function itself is a straight line.](../img/zeroSecDer.svg)
 :label:`fig_zero-second`
 
-To sum up, the second derivative can be interpreted as giving the way that the function $f$ curves.  A positive second derivative leads to a upwards curve, while a negative second derivative means that $f$ curves downwards, and a zero second derivative means that $f$ does not curve at all.
+To summarize, the second derivative can be interpreted as describing the way that the function $f$ curves.  A positive second derivative leads to a upwards curve, while a negative second derivative means that $f$ curves downwards, and a zero second derivative means that $f$ does not curve at all.
 
-Technically, if a second derivative exists, we can simply derive each order of the derivatives of $f$. Taking the function $g(x) = ax^{2}+ bx + c$ as an example.  We can then compute that
+Let us take this one step further. Consider the function $g(x) = ax^{2}+ bx + c$.  We can then compute that
 
 $$
 \begin{aligned}
@@ -252,7 +254,7 @@ $$
 \end{aligned}
 $$
 
-Similarly to the previous section showed that the best approximation of the first derivative is a line, we can illustrate the best approximation of a function by a quadratic using both the first and second derivative. This results from a famous *Taylor series*, which are going to discuss in the next section. Before that, let us grab a taste of how to approximate the function $\sin(x)$.
+If we have some original function $f(x)$ in mind, we may compute the first two derivatives and find the values for $a, b$, and $c$ that make them match this computation.  Similarly to the previous section where we saw that the first derivative gave the best approximation with a straight line, this construction provides the best approximation by a quadratic.  Let us visualize this for $f(x) = \sin(x)$.
 
 ```{.python .input}
 # Compute sin
@@ -267,10 +269,14 @@ for x0 in [-1.5, 0, 2]:
 d2l.plot(xs, plots, 'x', 'f(x)', ylim=[-1.5, 1.5])
 ```
 
+We will extend this idea to the idea of a *Taylor series* in the next section. 
+
 ### Taylor Series
 
 
-*Taylor series* is applicable when we try to approximate the function $f(x)$, by given values all the $n$-th derivative value at a data point $x_0$, i.e., $\left\{ f(x_0), f^{(1)}(x_0), f^{(2)}(x_0), \ldots, f^{(n)}(x) \right\}$. Let us start with the simplest case $n = 2$.  With a little algebra:
+The *Taylor series* provides a method to approximate the function $f(x)$ if we are given values for the first $n$ derivatives at a point $x_0$, i.e., $\left\{ f(x_0), f^{(1)}(x_0), f^{(2)}(x_0), \ldots, f^{(n)}(x_0) \right\}$. The idea will be to find a degree $n$ polynomial that matches all the given derivatives at $x_0$.
+
+We saw the case of $n=2$ in the previous section and a little algebra shows this is
 
 $$
 f(x) \approx \frac{1}{2}\frac{d^2f}{dx^2}(x_0)(x-x_0)^{2}+ \frac{df}{dx}(x_0)(x-x_0) + f(x_0).
@@ -278,8 +284,7 @@ $$
 
 As we can see above, the denominator of $2$ is there to cancel out the $2$ we get when we take two derivatives of $x^2$, while the other terms are all zero.  Same logic applies for the first derivative and the value itself.
 
-
-If we push the logic further to $n=3$, we will conclude a similar approximation as:
+If we push the logic further to $n=3$, we will conclude that
 
 $$
 f(x) \approx \frac{\frac{d^3f}{dx^3}(x_0)}{6}(x-x_0)^3 + \frac{\frac{d^2f}{dx^2}(x_0)}{2}(x-x_0)^{2}+ \frac{df}{dx}(x_0)(x-x_0) + f(x_0).
@@ -303,7 +308,7 @@ $$
 
 Indeed, $P_n(x)$ can be viewed as the best $n$-th degree polynomial approximation to our function $f(x)$.
 
-While we are not going to dive all the way into the error of the above approximations, it is worth to mention that the infinite scenario. In this case, for well behaved functions (known as real analytic functions) like $\cos(x)$ or $e^{x}$ we can write out the infinite number of terms and approximate the exactly same function
+While we are not going to dive all the way into the error of the above approximations, it is worth mentioning the the infinite limit. In this case, for well behaved functions (known as real analytic functions) like $\cos(x)$ or $e^{x}$, we can write out the infinite number of terms and approximate the exactly same function
 
 $$
 f(x) = \sum_{n = 0}^\infty \frac{f^{(n)}(x_0)}{n!}(x-x_0)^{n}.
@@ -315,8 +320,7 @@ $$
 e^{x} = \sum_{n = 0}^\infty \frac{x^{n}}{n!} = 1 + x + \frac{x^2}{2} + \frac{x^3}{6} + \cdots.
 $$
 
-
-Once equipped with the the basic math, let us see how this works in code and observe how increasing the degree of the Taylor approximation brings us closer to the desired function $e^x$.
+Let us see how this works in code and observe how increasing the degree of the Taylor approximation brings us closer to the desired function $e^x$.
 
 ```{.python .input}
 # Compute the exponential function
@@ -333,11 +337,11 @@ d2l.plot(xs, [ys, P1, P2, P5], 'x', 'f(x)', legend=[
     "Degree 5 Taylor Series"])
 ```
 
-In a nutshell, Taylor series have two primary applications:
+Taylor series have two primary applications:
 
 1. *Theoretical applications*: Often when we try to understand a too complex function, using Taylor series enables we turn it into a polynomial that we can work with directly.
 
-2. *Numerical applications*: Similarly, some functions like $e^{x}$ or $\cos(x)$ are  difficult for machines to compute.  They can store tables of values at a fixed precision (and this is often done), but it still leaves open questions like "What is the 1000-th digit of $\cos(1)$?"  Taylor series are often helpful to answer such questions.  
+2. *Numerical applications*: Some functions like $e^{x}$ or $\cos(x)$ are  difficult for machines to compute.  They can store tables of values at a fixed precision (and this is often done), but it still leaves open questions like "What is the 1000-th digit of $\cos(1)$?"  Taylor series are often helpful to answer such questions.  
 
 
 ## Summary
