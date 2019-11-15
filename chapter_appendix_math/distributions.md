@@ -58,7 +58,6 @@ We can sample an array of arbitrary shape from a Bernoulli random variable as fo
 1*(np.random.rand(10, 10) < p)
 ```
 
-
 ## Discrete Uniform
 
 The next random variable encountered is a discrete uniform distribution.  For our discussion here, we will assume that it is on the integers $\{1,2,\ldots, n\}$, however any other set of values can be freely chosen.  The meaning of the word *uniform* in this context is that every possible value is equally likely.  The probability for each value $i \in \{1,2,3,\ldots,n\}$ is $p_i = \frac{1}{n}$.  We will denote this relationship as
@@ -154,7 +153,6 @@ We can an array of arbitrary shape from a uniform random variable as follows.  N
 (b - a) * np.random.rand(10, 10) + a
 ```
 
-
 ## Binomial
 
 Let us make things a little more complex and examine the *binomial* random variable.  This random variable originates from performing a sequence of $n$ independent experiments, each of which have probability $p$ of succeeding, and asking how many successes we expect to see.
@@ -218,7 +216,6 @@ This can be sampled as follows.
 ```{.python .input}
 np.random.binomial(n, p, size=(10, 10))
 ```
-
 
 ## Poisson
 Let us now perform a thought experiment.  Let us say we are standing at a bus stop and we want to know how many buses will arrive in the next minute.  Lets start by considering $X^{(1)} \sim \mathrm{Bernoulli}(p)$ Which is simply the probability that a bus arrives in the one minute window.  For bus stops far from an urban center, this might be a pretty good approximation since we will never see more than one bus at a time.
@@ -395,3 +392,8 @@ np.random.normal(mu, sigma, size=(10, 10))
 1. What is the standard deviation of a random variable that is the difference $X-Y$ of two indepent binomial random variables $X,Y \sim \mathrm{Binomial}(16,1/2)$.
 2. If we take a Poisson random variable $X \sim \mathrm{Poisson}(\lambda)$ and consider $(X - \lambda)/\sqrt{\lambda}$ as $\lambda \rightarrow \infty$, we can show that this becomes approximately Gaussian.  Why does this make sense?
 3. What is the probability mass function for a sum of two discrete uniform random variables on $n$ elements?
+
+
+## [Discussions](https://discuss.mxnet.io/t/5154)
+
+![](../img/qr_distributions.svg)
