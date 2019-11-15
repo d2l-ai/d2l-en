@@ -1,17 +1,17 @@
 # Multivariable Calculus
 :label:`sec_multivariable_calculus`
 
-Now, that we have a fairly strong understanding of what happens if we had a function of a single variable, let us return to our original question where we were considering a loss function of potentially billions of weights.  
+Now that we have a fairly strong understanding of derivatives of a function of a single variable, let us return to our original question where we were considering a loss function of potentially billions of weights.  
 
-## Generalizing Differentiation
+## Higher-dimensional Differentiation
 What :numref:`sec_single_variable_calculus` tells us is that if we change a single one of these billions of weights leaving every other one fixed, we know what will happen!  This is nothing more than a function of a single variable, so we can write
 
 $$L(w_1+\epsilon_1,w_2,\ldots,w_N) \approx L(w_1,w_2,\ldots,w_N) + \epsilon_1 \frac{d}{dw_1} L(w_1,w_2,\ldots,w_N).$$
-:eqlabel:`part-der`
+:eqlabel:`eq_part_der`
 
-We will call the derivative in one variable while fixing the other the *partial derivative*, and we will use the notation $\frac{\partial}{\partial w_1}$ for the derivative in :eqref:`part-der`.
+We will call the derivative in one variable while fixing the other the *partial derivative*, and we will use the notation $\frac{\partial}{\partial w_1}$ for the derivative in :eqref:`eq_part_der`.
 
-Now, let us take this, and change $w_2$ a little bit to $w_2 + \epsilon_2$:
+Now, let us take this and change $w_2$ a little bit to $w_2 + \epsilon_2$:
 
 $$
 \begin{aligned}
@@ -26,7 +26,7 @@ L(w_1+\epsilon_1,w_2+\epsilon_2,\ldots,w_N) & \approx L(w_1,w_2+\epsilon_2,\ldot
 \end{aligned}
 $$
 
-where we have used the idea that $\epsilon_1\epsilon_2$ is a higher order term that we can discard in the same way we could discard $\epsilon^{2}$ in the previous section, along with what we saw in :eqref:`part-der`.  By continuing in this manner, we may write that
+We have again used the idea that $\epsilon_1\epsilon_2$ is a higher order term that we can discard in the same way we could discard $\epsilon^{2}$ in the previous section, along with what we saw in :eqref:`eq_part_der`.  By continuing in this manner, we may write that
 
 $$
 L(w_1+\epsilon_1,w_2+\epsilon_2,\ldots,w_N+\epsilon_N) \approx L(w_1,w_2,\ldots,w_N) + \sum_i \epsilon_i \frac{\partial}{\partial w_i} L(w_1,w_2,\ldots,w_N).
@@ -42,11 +42,11 @@ $$
 then
 
 $$L(\mathbf{w} + \boldsymbol{\epsilon}) \approx L(\mathbf{w}) + \boldsymbol{\epsilon}\cdot \nabla_{\mathbf{w}} L(\mathbf{w}).$$
-:eqlabel:`nabla-use`
+:eqlabel:`eq_nabla_use`
 
 We will call the vector $\nabla_{\mathbf{w}} L$ the *gradient* of $L$.
 
-Equation :eqref:`nabla-use` is worth pondering for a moment.  It has exactly the format that we encountered in one dimension, just we have converted everything to vectors and dot products.  It allows us to tell approximately how the function $L$ will change given any perturbation to the input.  As we will see in the next section, this will provide us with an important tool in understanding geometrically how we can learn using information contained in the gradient.
+Equation :eqref:`eq_nabla_use` is worth pondering for a moment.  It has exactly the format that we encountered in one dimension, just we have converted everything to vectors and dot products.  It allows us to tell approximately how the function $L$ will change given any perturbation to the input.  As we will see in the next section, this will provide us with an important tool in understanding geometrically how we can learn using information contained in the gradient.
 
 But first, let us see this approximation at work with an example.  Suppose that we are working with the function
 
@@ -60,7 +60,7 @@ $$
 f(x,y) = \log(3) \text{ with gradient } \nabla f (x,y) = \left[\frac{1}{3}, \frac{2}{3}\right].
 $$
 
-Thus, if we want to approximate $f$ at $(\epsilon_1,\log(2) + \epsilon_2)$,  we see that we should have the specific instance of :eqref:`nabla-use`:
+Thus, if we want to approximate $f$ at $(\epsilon_1,\log(2) + \epsilon_2)$,  we see that we should have the specific instance of :eqref:`eq_nabla_use`:
 
 $$
 f(\epsilon_1,\log(2) + \epsilon_2) \approx \log(3) + \frac{1}{3}\epsilon_1 + \frac{2}{3}\epsilon_2.
@@ -89,7 +89,7 @@ true_value = f(0 + epsilon[0], np.log(2) + epsilon[1])
 ```
 
 ## Geometry of Gradients and Gradient Descent
-Consider the again :eqref:`nabla-use`: 
+Consider the again :eqref:`eq_nabla_use`: 
 
 $$
 L(\mathbf{w} + \boldsymbol{\epsilon}) \approx L(\mathbf{w}) + \boldsymbol{\epsilon}\cdot \nabla_{\mathbf{w}} L(\mathbf{w}).
@@ -102,7 +102,7 @@ Let us suppose that I want to use this to help minimize our loss $L$.  Let us un
 3. Take a small step in that direction: $\mathbf{w} \rightarrow \mathbf{w} + \epsilon\mathbf{v}$.
 4. Repeat.
 
-The only thing we do not know exactly how to do is to compute the vector $\mathbf{v}$ in the second step.  We will call such a direction the *direction of steepest descent*.  Using the geometric understanding of dot products from :numref:`sec_linear_algebra`, we see that we can rewrite :eqref:`nabla-use` as
+The only thing we do not know exactly how to do is to compute the vector $\mathbf{v}$ in the second step.  We will call such a direction the *direction of steepest descent*.  Using the geometric understanding of dot products from :numref:`sec_linear_algebra`, we see that we can rewrite :eqref:`eq_nabla_use` as
 
 $$
 L(\mathbf{w} + \mathbf{v}) \approx L(\mathbf{w}) + \mathbf{v}\cdot \nabla_{\mathbf{w}} L(\mathbf{w}) = \|\nabla_{\mathbf{w}} L(\mathbf{w})\|\cos(\theta).
@@ -128,7 +128,7 @@ However, it is a useful exercise to consider what the geometric understanding we
 
 Suppose that we wish to find the value of $\mathbf{x}_0$ which minimizes some function $L(\mathbf{x})$.  Let us suppose that moreover someone gives us a value and tells us that it is the value that minimizes $L$.  Is there anything we can check to see if their answer is even plausible?
 
-Again consider :eqref:`nabla-use`:
+Again consider :eqref:`eq_nabla_use`:
 $$
 L(\mathbf{x}_0 + \boldsymbol{\epsilon}) \approx L(\mathbf{x}_0) + \boldsymbol{\epsilon}\cdot \nabla_{\mathbf{x}} L(\mathbf{x}_0).
 $$
@@ -160,14 +160,14 @@ This highlights an important fact to know when working either theoretically or n
 Let us suppose that we have a function of four variables ($w,x,y$, and $z$) which we can make by composing many terms:
 
 $$\begin{aligned}f(u,v) & = (u+v)^{2} \\u(a,b) & = (a+b)^{2}, \qquad v(a,b) = (a-b)^{2}, \\a(w,x,y,z) & = (w+x+y+z)^{2},\qquad b(w,x,y,z) = (w+x-y-z)^2.\end{aligned}$$
-:eqlabel:`multi-func-def`
+:eqlabel:`eq_multi_func_def`
 
 Such chains of equations are common when working with neural networks, so trying to understand how to compute gradients of such functions is key to advanced techniques in machine learning.  We can start to see visual hints of this connection in :numref:`fig_chain-1` if we take a look at what variables directly relate to one another.
 
 ![The function relations above where nodes represent values and edges show functional dependence.](../img/ChainNet1.svg)
 :label:`fig_chain-1`
 
-Nothing stops us from just composing everything from :eqref:`multi-func-def` and writing out that
+Nothing stops us from just composing everything from :eqref:`eq_multi_func_def` and writing out that
 
 $$
 f(w,x,y,z) = \left(\left((w+x+y+z)^2+(w+x-y-z)^2\right)^2+\left((w+x+y+z)^2-(w+x-y-z)^2\right)^2\right)^2,
@@ -218,7 +218,7 @@ Understanding the chain rule in this way will pay great dividends when trying to
 
 ## The Backpropagation Algorithm
 
-Let us return to the example of :eqref:`multi-func-def` the previous section where
+Let us return to the example of :eqref:`eq_multi_func_def` the previous section where
 
 $$
 \begin{aligned}
@@ -368,7 +368,7 @@ $$
 This is traditionally assembled into a matrix called the *Hessian*:
 
 $$\mathbf{H}_f = \begin{bmatrix} \frac{d^2f}{dx_1dx_1} & \cdots & \frac{d^2f}{dx_1dx_n} \\ \vdots & \ddots & \vdots \\ \frac{d^2f}{dx_ndx_1} & \cdots & \frac{d^2f}{dx_ndx_n} \\ \end{bmatrix}.$$
-:eqlabel:`hess-def`
+:eqlabel:`eq_hess_def`
 
 Not every entry of this matrix is independent.  Indeed, we can show that as long as both *mixed partials* (partial derivatives with respect to more than one variable) exist and are continuous, we can say that for any $i$, and $j$, 
 
@@ -380,7 +380,7 @@ This follows by considering first perturbing a function in the direction of $x_i
 
 As with single variables, we can use these derivatives to get a far better idea of how the function behaves near a point.  In particular, we can use it to find the best fitting quadratic near a point $\mathbf{x}_0$.
 
-Let us see an example.  Suppose that $f(x_1,x_2) = a + b_1x_1 + b_2x_2 + c_{11}x_1^{2} + c_{12}x_1x_2 + c_{22}x_2^{2}$.  This is the general form for a quadratic in two variables.  If we look at the value of the function, its gradient, and its Hessian :eqref:`hess-def`, all at the point zero:
+Let us see an example.  Suppose that $f(x_1,x_2) = a + b_1x_1 + b_2x_2 + c_{11}x_1^{2} + c_{12}x_1x_2 + c_{22}x_2^{2}$.  This is the general form for a quadratic in two variables.  If we look at the value of the function, its gradient, and its Hessian :eqref:`eq_hess_def`, all at the point zero:
 
 $$
 \begin{aligned}
@@ -501,7 +501,7 @@ This illustrates a few factors about matrix calculus that we will often counter 
 To keep building intuition, let us try a computation that is a little harder.  Suppose that we have a column vector $\mathbf{x}$, and a square matrix $A$ and we want to compute 
 
 $$\frac{d}{d\mathbf{x}}(\mathbf{x}^\top A \mathbf{x}).$$
-:eqlabel:`mat-goal-1`
+:eqlabel:`eq_mat_goal_1`
 
 To drive towards easier to manipulate notation, let us consider this problem using Einstein notation.  In this case we can write the function as
 
@@ -545,7 +545,7 @@ $$
 \left[\frac{d}{d\mathbf{x}}(\mathbf{x}^\top A \mathbf{x})\right]_k = \frac{d}{dx_k}x_ia_{ij}x_j = [(\mathbf{A} + \mathbf{A}^\top)\mathbf{x}]_k.
 $$
 
-Thus, we see that the $k$-th entry of the desired derivative from :eqref:`mat-goal-1` is just the $k$-th entry of the vector on the right, and thus the two are the same.  Thus yields
+Thus, we see that the $k$-th entry of the desired derivative from :eqref:`eq_mat_goal_1` is just the $k$-th entry of the vector on the right, and thus the two are the same.  Thus yields
 
 $$
 \frac{d}{d\mathbf{x}}(\mathbf{x}^\top A \mathbf{x}) = (\mathbf{A} + \mathbf{A}^\top)\mathbf{x}.
@@ -564,7 +564,7 @@ At this point, the pattern should be looking rather suspicious, so let us try to
 Let us try this out.  Suppose that $\mathbf{X}$ is a $n \times m$ matrix, $\mathbf{U}$ is an $n \times r$ and $\mathbf{V}$ is an $r \times m$.  Let us try to compute 
 
 $$\frac{d}{d\mathbf{V}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2} = \;?$$
-:eqlabel:`mat-goal-2`
+:eqlabel:`eq_mat_goal_2`
 
 This computation is important in an area called matrix factorization.  For us, however, it is just a derivative to compute.  Let us try to imaging what this would be for $1\times1$ matrices.  In that case, we get the expression
 
@@ -580,7 +580,7 @@ $$
 
 However, if we look at this it does not quite work.  Recall that $\mathbf{X}$ is $n \times m$, as is $\mathbf{U}\mathbf{V}$, so the matrix $2(\mathbf{X} - \mathbf{U}\mathbf{V})$ is $n \times m$.  On the other hand $\mathbf{U}$ is $n \times r$, and we cannot multiply a $n \times m$ and a $n \times r$ matrix since the dimensions do not match! 
 
-We want to get $\frac{d}{d\mathbf{V}}$, which is the same shape of $\mathbf{V}$, which is $r \times m$.  So somehow we need to take a $n \times m$ matrix and a $n \times r$ matrix, multiply them together (perhaps with some transposes) to get a $r \times m$. We can do this by multiplying $U^\top$ by $(\mathbf{X} - \mathbf{U}\mathbf{V})$.  Thus, we can guess the solution to :eqref:`mat-goal-2` is
+We want to get $\frac{d}{d\mathbf{V}}$, which is the same shape of $\mathbf{V}$, which is $r \times m$.  So somehow we need to take a $n \times m$ matrix and a $n \times r$ matrix, multiply them together (perhaps with some transposes) to get a $r \times m$. We can do this by multiplying $U^\top$ by $(\mathbf{X} - \mathbf{U}\mathbf{V})$.  Thus, we can guess the solution to :eqref:`eq_mat_goal_2` is
 
 $$
 \frac{d}{d\mathbf{V}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= 2\mathbf{U}^\top(\mathbf{X} - \mathbf{U}\mathbf{V}).
@@ -646,7 +646,7 @@ $$
 \frac{d}{dv_{ab}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= [2\mathbf{U}^\top(\mathbf{X}-\mathbf{U}\mathbf{V})]_{ab}.
 $$
 
-and thus we may write the solution to :eqref:`mat-goal-2`
+and thus we may write the solution to :eqref:`eq_mat_goal_2`
 
 $$
 \frac{d}{d\mathbf{V}} \|\mathbf{X} - \mathbf{U}\mathbf{V}\|_2^{2}= 2\mathbf{U}^\top(\mathbf{X} - \mathbf{U}\mathbf{V}).
