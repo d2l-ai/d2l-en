@@ -443,7 +443,7 @@ for i in range(1, 100):
 d2l.plot(np.arange(0, 100), norm_list, 'Iteration', 'Value')
 ```
 
-We can also plot the ration between consecutive norms as before and see that indeed it stabilizes.  
+We can also plot the ration between consecutive norms as before and see that indeed it stabilizes.
 
 ```{.python .input}
 # Also plot the ratio
@@ -500,3 +500,7 @@ $$
 1.0 & 0.2 & 0.0 & 1.8
 \end{bmatrix}.
 $$
+
+## [Discussions](https://discuss.mxnet.io/t/5148)
+
+![](../img/qr_eigen-decomposition.svg)

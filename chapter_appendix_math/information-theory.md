@@ -469,3 +469,8 @@ nll_loss.get()
     * Still being unhappy with the result, you replace the typesetter by a high quality language model. These can currently obtain perplexity numbers as low as $15$ points per character. The perplexity is defined as a length normalized probability, i.e., $$PPL(x) = \left[p(x)\right]^{1 / \text{length(x)} }.$$ How many bits of randomness do you observe now?
 3. Explain intuitively why $I(X,Y) = H(X) - H(X|Y)$.  Then, show this is true by expressing both sides as an expectation with respect to the joint distribution.
 4. What is the KL Divergence between the two Gaussian distributions $\mathcal{N}(\mu_1,\sigma_1^2)$ and $\mathcal{N}(\mu_2,\sigma_2^2)$?
+
+
+## [Discussions](https://discuss.mxnet.io/t/5157)
+
+![](../img/qr_information-theory.svg)
