@@ -184,8 +184,8 @@ Next, we will look at a detailed example. First, construct four anchor boxes. Fo
 anchors = np.array([[0.1, 0.08, 0.52, 0.92], [0.08, 0.2, 0.56, 0.95],
                     [0.15, 0.3, 0.62, 0.91], [0.55, 0.2, 0.9, 0.88]])
 offset_preds = np.array([0] * anchors.size)
-cls_probs = np.array([[0] * 4, # Predicted probability for background
-                      [0.9, 0.8, 0.7, 0.1], # Predicted probability for dog
+cls_probs = np.array([[0] * 4,  # Predicted probability for background
+                      [0.9, 0.8, 0.7, 0.1],  # Predicted probability for dog
                       [0.1, 0.2, 0.3, 0.9]])  # Predicted probability for cat
 ```
 

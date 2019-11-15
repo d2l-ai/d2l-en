@@ -102,9 +102,9 @@ The generator consists of four basic blocks that increase input's both width and
 ```{.python .input  n=8}
 n_G = 64
 net_G = nn.Sequential()
-net_G.add(G_block(n_G*8, strides=1, padding=0), # output: (64*8, 4, 4)
-          G_block(n_G*4), # output: (64*4, 8, 8)
-          G_block(n_G*2), # output: (64*2, 16, 16)
+net_G.add(G_block(n_G*8, strides=1, padding=0),  # output: (64*8, 4, 4)
+          G_block(n_G*4),  # output: (64*4, 8, 8)
+          G_block(n_G*2),  # output: (64*2, 16, 16)
           G_block(n_G),   # output: (64, 32, 32)
           nn.Conv2DTranspose(
               3, kernel_size=4, strides=2, padding=1, use_bias=False,
@@ -174,9 +174,9 @@ The discriminator is a mirror of the generator.
 n_D = 64
 net_D = nn.Sequential()
 net_D.add(D_block(n_D),   # output: (64, 32, 32)
-          D_block(n_D*2), # output: (64*2, 16, 16)
-          D_block(n_D*4), # output: (64*4, 8, 8)
-          D_block(n_D*8), # output: (64*8, 4, 4)
+          D_block(n_D*2),  # output: (64*2, 16, 16)
+          D_block(n_D*4),  # output: (64*4, 8, 8)
+          D_block(n_D*8),  # output: (64*8, 4, 4)
           nn.Conv2D(1, kernel_size=4, use_bias=False))  # output: (1, 1, 1)
 ```
 
