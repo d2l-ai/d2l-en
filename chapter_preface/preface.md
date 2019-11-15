@@ -213,7 +213,7 @@ from linear algebra, calculus, and probability.
 cover the most basic concepts and techniques of deep learning, 
 such as linear regression, multi-layer perceptrons and regularization.
 
-* The next four chapters focus on modern deep learning techniques.
+* The next five chapters focus on modern deep learning techniques.
 :numref:`chap_computation` describes the various key components of deep
 learning calculations and lays the groundwork
 for us to subsequently implement more complex models.
