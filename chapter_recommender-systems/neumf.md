@@ -48,7 +48,7 @@ npx.set_np()
 ```
 
 ## Model Implementation
-The following code implements the NeuMF model. It consists of a generalized matrix factorization model and a multilayered perceptron with different user and item embedding vectors. The structure of the MLP is controlled with the parameter `mlp_layers`. ReLU is used as the default activation function.
+The following code implements the NeuMF model. It consists of a generalized matrix factorization model and a multi-layered perceptron with different user and item embedding vectors. The structure of the MLP is controlled with the parameter `mlp_layers`. ReLU is used as the default activation function.
 
 ```{.python .input  n=2}
 class NeuMF(nn.Block):
@@ -75,7 +75,7 @@ class NeuMF(nn.Block):
 
 ## Negative Sampling
 
-For pairwise ranking loss, an important step is negative sampling. For each user, the items that a user has not interacted with are candidate items (unobserved entries). The following function takes users identity and candidate items as input, and samples negative items randomly for each user from the cadidate set of that user. During the training stage, the model ensures that the items that a user likes to be ranked higher than items she dislikes or has not interacted with.
+For pairwise ranking loss, an important step is negative sampling. For each user, the items that a user has not interacted with are candidate items (unobserved entries). The following function takes users identity and candidate items as input, and samples negative items randomly for each user from the candidate set of that user. During the training stage, the model ensures that the items that a user likes to be ranked higher than items she dislikes or has not interacted with.
 
 ```{.python .input  n=3}
 # Saved in the d2l package for later use.
@@ -104,9 +104,9 @@ $$
 \text{AUC} = \frac{1}{m} \sum_{u \in \mathcal{U}} \frac{1}{|\mathcal{I} \backslash S_u|} \sum_{j \in I \backslash S_u} \textbf{1}(rank_{u, g_u} < rank_{u, j}),
 $$
 
-where $\mathcal{I}$ is the item set. $S_u$ is the candidate items of user $u$. Note that many other evaluation protocals such as precision, recall and normalized discounted cumulative gain (NDCG) can also be used. 
+where $\mathcal{I}$ is the item set. $S_u$ is the candidate items of user $u$. Note that many other evaluation protocols such as precision, recall and normalized discounted cumulative gain (NDCG) can also be used. 
 
-The following function caculates the hit counts and AUC for each user.
+The following function calculates the hit counts and AUC for each user.
 
 ```{.python .input  n=4}
 # Saved in the d2l package for later use
@@ -120,7 +120,7 @@ def hit_and_auc(rankedlist, test_matrix, k):
     return len(hits_k) , auc
 ```
 
-Then, the overall Hit rate and AUC are cacluated as follows.
+Then, the overall Hit rate and AUC are calculated as follows.
 
 ```{.python .input  n=5}
 # Saved in the d2l package for later use
@@ -235,7 +235,7 @@ train_ranking(net, train_iter, test_iter, loss, trainer, None, num_users,
 
 ## Summary 
 
-* Adding nonlinearity to matrix factorization model is benificial for improving the model capability and effectivess.
+* Adding nonlinearity to matrix factorization model is beneficial for improving the model capability and effectiveness.
 * NeuMF is a combination of matrix factorization and Multilayer perceptron. The multilayer perceptron takes the concatenation of user and item embeddings as the input.
 
 ## Exercises
