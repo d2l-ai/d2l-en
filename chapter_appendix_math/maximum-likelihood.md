@@ -10,7 +10,7 @@ This has a Bayesian which can be helpful to think about.  Suppose that we have a
 If we want to find the most likely value for the parameters of our model, that means we want to find
 
 $$\mathop{\mathrm{argmax}} P(\boldsymbol{\theta}\mid X).$$
-:eqlabel:`max_like`
+:eqlabel:`eq_max_like`
 
 By Bayes' rule, this is the same thing as
 
@@ -56,7 +56,7 @@ p = theta**9 * (1 - theta)**4.
 d2l.plot(theta, p, 'theta', 'likelihood')
 ```
 
-This has its maximum value somewhere near our expected $9/13 \approx 0.7\ldots$.  To see if it is exactly there, we can turn to calculus.  Notice that at the maximum, the function is flat.  Indeed if the slope was not zero there, then we could shift the input to make it larger (think about the process of gradient descent).  Thus, we could find the maximum likelihood estimate :eqref:`max_like` by finding the values of $\theta$ where the derivative is zero, and finding the one that gives the highest probability.  We compute:
+This has its maximum value somewhere near our expected $9/13 \approx 0.7\ldots$.  To see if it is exactly there, we can turn to calculus.  Notice that at the maximum, the function is flat.  Indeed if the slope was not zero there, then we could shift the input to make it larger (think about the process of gradient descent).  Thus, we could find the maximum likelihood estimate :eqref:`eq_max_like` by finding the values of $\theta$ where the derivative is zero, and finding the one that gives the highest probability.  We compute:
 
 $$
 \begin{aligned}
