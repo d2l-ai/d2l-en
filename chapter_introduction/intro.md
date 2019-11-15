@@ -559,7 +559,7 @@ Lots of practical problems are well-described regression problems.
 Predicting the rating that a user will assign to a movie
 can be thought of as a regression problem
 and if you designed a great algorithm to accomplish this feat in 2009,
-you might have won the [$1 million Netflix prize](https://en.wikipedia.org/wiki/Netflix_Prize).
+you might have won the [1-million-dollar Netflix prize](https://en.wikipedia.org/wiki/Netflix_Prize).
 Predicting the length of stay for patients in the hospital 
 is also a regression problem.
 A good rule of thumb is that any *How much?* or *How many?* problem 
@@ -658,7 +658,7 @@ If there is a $0.6$ ($60\%$) probability that an unfair coin comes up heads,
 then there is a $0.4$ ($40\%$) probability that it comes up tails.
 Returning to our animal classification example, 
 a classifier might see an image and output the probability 
-that the image is a cat $P(y=\mathrm{cat}| x) = 0.9$.
+that the image is a cat $P(y=\text{cat} \mid x) = 0.9$.
 We can interpret this number by saying that the classifier 
 is $90\%$ sure that the image depicts a cat.
 The magnitude of the probability for the predicted class 
