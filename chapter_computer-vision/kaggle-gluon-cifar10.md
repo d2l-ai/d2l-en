@@ -33,7 +33,7 @@ npx.set_np()
 
 ## Obtain and Organize the Dataset
 
-The competition data is divided into a training set and testing set. The training set contains 50,000 images. The testing set contains 300,000 images, of which 10,000 images are used for scoring, while the other 290,000 non-scoring images are included to prevent the manual labeling of the testing set and the submission of labeling results. The image formats in both datasets are PNG, with heights and widths of 32 pixels and three color channels (RGB). The images cover 10 categories: planes, cars, birds, cats, deer, dogs, frogs, horses, boats, and trucks. The upper-left corner of Figure 9.16 shows some images of planes, cars, and birds in the dataset.
+The competition data is divided into a training set and testing set. The training set contains 50000 images. The testing set contains 300000 images, of which 10000 images are used for scoring, while the other 290000 non-scoring images are included to prevent the manual labeling of the testing set and the submission of labeling results. The image formats in both datasets are PNG, with heights and widths of 32 pixels and three color channels (RGB). The images cover 10 categories: planes, cars, birds, cats, deer, dogs, frogs, horses, boats, and trucks. The upper-left corner of Figure 9.16 shows some images of planes, cars, and birds in the dataset.
 
 ### Download the Dataset
 
@@ -88,7 +88,7 @@ def mkdir_if_not_exist(path):
         os.makedirs(os.path.join(*path))
 ```
 
-Next, we define the `reorg_train_valid` function to segment the validation set from the original training set.  Here, we use `valid_ratio=0.1` as an example. Since the original training set has 50,000 images, there will be 45,000 images used for training and stored in the path “`input_dir/train`” when tuning hyper-parameters, while the other 5,000 images will be stored as validation set in the path “`input_dir/valid`”. After organizing the data, images of the same type will be placed under the same folder so that we can read them later.
+Next, we define the `reorg_train_valid` function to segment the validation set from the original training set.  Here, we use `valid_ratio=0.1` as an example. Since the original training set has 50000 images, there will be 45000 images used for training and stored in the path “`input_dir/train`” when tuning hyper-parameters, while the other 5000 images will be stored as validation set in the path “`input_dir/valid`”. After organizing the data, images of the same type will be placed under the same folder so that we can read them later.
 
 ```{.python .input  n=5}
 def reorg_train_valid(data_dir, train_dir, input_dir, n_train_per_label,

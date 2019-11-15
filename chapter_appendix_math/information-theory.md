@@ -99,7 +99,7 @@ You may be curious: in the entropy definition :eqref:`eq_ent_def`, why do we use
 
 First, why do we use a *logarithm* function $\log$? Suppose that $p(x) = f_1(x) f_2(x) \ldots, f_n(x)$, where each component function $f_i(x)$ is independent from each other. This means that each $f_i(x)$ contributes independently to the total information obtained from $p(x)$. As discussed above, we want the entropy formula to be additive over independent random variables. Luckily, $\log$ can naturally turn a product of probability distributions to a summation of the individual terms.
 
-Next, why do we use a *negative* $\log$? Intuitively, more frequent events should contain less information than less common events, since we often gain more information from an unusual case than from an ordinary one. However, $\log$ is monotonically increasing with the probabilities, and indeed negative for all values in $[0,1]$.  We need to construct a monotonically decreasing relationship between the probability of events and their entropy, which will ideally be always positive (for nothing we observe should force us to forget what we have known). Hence, we add a negative sign in front of $\log$ function.
+Next, why do we use a *negative* $\log$? Intuitively, more frequent events should contain less information than less common events, since we often gain more information from an unusual case than from an ordinary one. However, $\log$ is monotonically increasing with the probabilities, and indeed negative for all values in $[0, 1]$.  We need to construct a monotonically decreasing relationship between the probability of events and their entropy, which will ideally be always positive (for nothing we observe should force us to forget what we have known). Hence, we add a negative sign in front of $\log$ function.
 
 Last, where does the *expectation* function come from? Consider a random variable $X$. We can interpret the self-information ($-\log(p)$) as the amount of *surprise* we have at seeing a particular outcome.  Indeed, as the probability approaches zero, the surprise becomes infinite.  Similarly, we can interpret The entropy as the average amount of surprise from observing $X$. For example, imagine that a slot machine system emits statistical independently symbols ${s_1, \ldots, s_k}$ with probabilities ${p_1, \ldots, p_k}$ respectively. Then the entropy of this system equals to the average self-information from observing each output, i.e.,
 
@@ -120,30 +120,30 @@ By the above examples and interpretations, we can derive the following propertie
 
 ## Mutual Information
 
-Previously we defined entropy of a single random variable $X$, how about the entropy of a pair random variables $(X,Y)$?  We can think of these techniques as trying to answer the following type of question, "What information is contained in $X$ and $Y$ together compared to each separately?  Is there redundant information, or is it all unique?"
+Previously we defined entropy of a single random variable $X$, how about the entropy of a pair random variables $(X, Y)$?  We can think of these techniques as trying to answer the following type of question, "What information is contained in $X$ and $Y$ together compared to each separately?  Is there redundant information, or is it all unique?"
 
-For the following discussion, we always use $(X,Y)$ as a pair of random variables that follows a joint probability distribution $P$ with a p.d.f. or a p.m.f. $p_{X,Y}(x,y)$, while $X$ and $Y$ follow probability distribution $p_X(x)$ and $p_Y(y)$, respectively. 
+For the following discussion, we always use $(X, Y)$ as a pair of random variables that follows a joint probability distribution $P$ with a p.d.f. or a p.m.f. $p_{X, Y}(x, y)$, while $X$ and $Y$ follow probability distribution $p_X(x)$ and $p_Y(y)$, respectively. 
 
 
 ### Joint Entropy 
 
-Similar to entropy of a single random variable :eqref:`eq_ent_def`, we define the *joint entropy* $H(X,Y)$ of a pair random variables $(X,Y)$ as
+Similar to entropy of a single random variable :eqref:`eq_ent_def`, we define the *joint entropy* $H(X, Y)$ of a pair random variables $(X, Y)$ as
 
-$$H(X,Y) = −E_{(x,y) \sim P} [\log p_{X,Y}(x, y)]. $$
+$$H(X, Y) = −E_{(x, y) \sim P} [\log p_{X, Y}(x, y)]. $$
 :eqlabel:`eq_joint_ent_def`
 
-Precisely, on the one hand, if $(X,Y)$ is a pair of discrete random variables, then 
+Precisely, on the one hand, if $(X, Y)$ is a pair of discrete random variables, then 
 
-$$H(X,Y) = - \sum_{x} \sum_{y} p_{X,Y}(x,y) \log p_{X,Y}(x,y).$$
+$$H(X, Y) = - \sum_{x} \sum_{y} p_{X, Y}(x, y) \log p_{X, Y}(x, y).$$
 
-On the other hand, if $(X,Y)$ is a pair of continuous random variables, then we define the *differential joint entropy* as 
+On the other hand, if $(X, Y)$ is a pair of continuous random variables, then we define the *differential joint entropy* as 
 
-$$H(X,Y) = - \int_{x, y} p_{X,Y}(x,y) \ \log p_{X,Y}(x,y) \;dx \;dy.$$
+$$H(X, Y) = - \int_{x, y} p_{X, Y}(x, y) \ \log p_{X, Y}(x, y) \;dx \;dy.$$
 
-We can think of :eqref:`eq_joint_ent_def` as telling us the total randomness in the pair of random variables.  As a pair of extremes, if $X = Y$ are two identical random variables, then the information in the pair is exactly the information in one and we have $H(X,Y) = H(X) = H(Y)$.  On the other extreme, if $X$ and $Y$ are independent then $H(X,Y) = H(X) + H(Y)$.  Indeed we will always have that the information contained in a pair of random variables is no smaller than the entropy of either random variable and no more than the sum of both.
+We can think of :eqref:`eq_joint_ent_def` as telling us the total randomness in the pair of random variables.  As a pair of extremes, if $X = Y$ are two identical random variables, then the information in the pair is exactly the information in one and we have $H(X, Y) = H(X) = H(Y)$.  On the other extreme, if $X$ and $Y$ are independent then $H(X, Y) = H(X) + H(Y)$.  Indeed we will always have that the information contained in a pair of random variables is no smaller than the entropy of either random variable and no more than the sum of both.
 
 $$
-H(X), H(Y) \le H(X,Y) \le H(X) + H(Y).
+H(X), H(Y) \le H(X, Y) \le H(X) + H(Y).
 $$
 
 Let us implement joint entropy from scratch in MXNet.
@@ -167,21 +167,21 @@ The joint entropy defined above the amount of information contained in a pair of
 
 In the probability theory, we saw the definition of the *conditional probability* to measure the relationship between variables. We now want to analogously define the *conditional entropy* $H(Y \mid X)$.  We can write this as 
 
-$$ H(Y \mid X) = - E_{(x,y) \sim P} [\log p(y \mid x)],$$
+$$ H(Y \mid X) = - E_{(x, y) \sim P} [\log p(y \mid x)],$$
 :eqlabel:`eq_cond_ent_def`
 
-where $p(y \mid x) = \frac{p_{X,Y}(x, y)}{p_X(x)}$ is the conditional probability. Specifically, if $(X,Y)$ is a pair of discrete random variables, then 
+where $p(y \mid x) = \frac{p_{X, Y}(x, y)}{p_X(x)}$ is the conditional probability. Specifically, if $(X, Y)$ is a pair of discrete random variables, then 
 
-$$H(Y \mid X) = - \sum_{x} \sum_{y} p(x,y) \log p(y \mid x).$$
+$$H(Y \mid X) = - \sum_{x} \sum_{y} p(x, y) \log p(y \mid x).$$
 
-If $(X,Y)$ is a pair of continuous random variables, then the *differential joint entropy* is similarly defined as 
+If $(X, Y)$ is a pair of continuous random variables, then the *differential joint entropy* is similarly defined as 
 
-$$H(Y \mid X) = - \int_x \int_y p(x,y) \ \log p(y \mid x) \;dx \;dy.$$
+$$H(Y \mid X) = - \int_x \int_y p(x, y) \ \log p(y \mid x) \;dx \;dy.$$
 
 
 It is now natural to ask, how does the *conditional entropy* $H(Y \mid X)$ relate to the entropy $H(X)$ and the joint entropy $H(X, Y)$?  Using the definitions above, we can express this cleanly:
 
-$$H(Y \mid X) = H(X,Y) - H(X).$$
+$$H(Y \mid X) = H(X, Y) - H(X).$$
 
 This has an intuitive interpretation: the information in $Y$ given $X$ ($H(Y \mid X)$) is the same as the information in both $X$ and $Y$ together ($H(X, Y)$) minus the information already contained in $X$.  This gives us the information in $Y$ which is not also represented in $X$.  
 
@@ -200,25 +200,25 @@ conditional_entropy(np.array([[0.1, 0.5], [0.2, 0.3]]), np.array([0.2, 0.8]))
 
 ### Mutual Information
 
-Given the previous setting of random variables $(X, Y)$, you may wonder: "Now that we know how much information is contained in $Y$ but not in $X$, can we similarly ask how much information is shared between $X$ and $Y$?" The answer will be the *mutual information* of $(X,Y)$, which we will write as $I(X,Y)$.  
+Given the previous setting of random variables $(X, Y)$, you may wonder: "Now that we know how much information is contained in $Y$ but not in $X$, can we similarly ask how much information is shared between $X$ and $Y$?" The answer will be the *mutual information* of $(X, Y)$, which we will write as $I(X, Y)$.  
 
-Rather than diving straight into the formal definition, let's practice our intuition by first trying to derive an expression for the mutual information entirely based on terms we have constructed before.  We wish to find the information shared between two random variables.  One way we could try to do this is to start with all the information contained in both $X$ and $Y$ together, and then we take off the parts that are not shared.  The information contained in both $X$ and $Y$ together is written as $H(X,Y)$.  We want to subtract from this the information contained in $X$ but not in $Y$, and the information contained in $Y$ but not in $X$.  As we saw in the previous section, this is given by $H(X \mid Y)$ and $H(Y \mid X)$ respectively.  Thus, we have that the mutual information should be
+Rather than diving straight into the formal definition, let's practice our intuition by first trying to derive an expression for the mutual information entirely based on terms we have constructed before.  We wish to find the information shared between two random variables.  One way we could try to do this is to start with all the information contained in both $X$ and $Y$ together, and then we take off the parts that are not shared.  The information contained in both $X$ and $Y$ together is written as $H(X, Y)$.  We want to subtract from this the information contained in $X$ but not in $Y$, and the information contained in $Y$ but not in $X$.  As we saw in the previous section, this is given by $H(X \mid Y)$ and $H(Y \mid X)$ respectively.  Thus, we have that the mutual information should be
 
 $$
-I(X,Y) = H(X,Y) - H(Y \mid X) − H(X \mid Y).
+I(X, Y) = H(X, Y) - H(Y \mid X) − H(X \mid Y).
 $$
 
 Indeed, this is a valid definition for the mutual information.  If we expand out the definitions of these terms and combine them, a little algebra shows that this is the same as
 
-$$I(X,Y) = −E_{x} E_{y} \left\{ p_{X,Y}(x, y) \log\frac{p_{X,Y}(x, y)}{p_X(x) p_Y(y)} \right\}. $$
+$$I(X, Y) = −E_{x} E_{y} \left\{ p_{X, Y}(x, y) \log\frac{p_{X, Y}(x, y)}{p_X(x) p_Y(y)} \right\}. $$
 :eqlabel:`eq_mut_ent_def` 
 
 
-We can summarize all of these relationships in image :numref:`fig_mutual_information`.  It is an excellent test of intuition to see why the following statements are all also equivalent to $I(X,Y)$.
+We can summarize all of these relationships in image :numref:`fig_mutual_information`.  It is an excellent test of intuition to see why the following statements are all also equivalent to $I(X, Y)$.
 
 * $H(X) − H(X \mid Y)$
 * $H(Y) − H(Y \mid X)$
-* $H(X) + H(Y) − H(X,Y)$
+* $H(X) + H(Y) − H(X, Y)$
 
 ![Mutual information's relationship with joint entropy and conditional entropy.](../img/mutual_information.svg)
 :label:`fig_mutual_information`
@@ -245,16 +245,16 @@ mutual_information(np.array([[0.1, 0.5], [0.1, 0.3]]),
 
 Rather than memorizing the definition of mutual information :eqref:`eq_mut_ent_def`, you only need to keep in mind its notable properties:
 
-* Mutual information is symmetric, i.e., $I(X,Y) = I(Y,X)$.
-* Mutual information is non-negative, i.e., $I(X,Y) \geq 0$.
-* $I(X,Y) = 0$ if and only if $X$ and $Y$ are independent. For example, if $X$ and $Y$ are independent, then knowing $Y$ does not give any information about $X$ and vice versa, so their mutual information is zero.
-* Alternatively, if $X$ is an invertible function of $Y$, then $Y$ and $X$ share all information and $$I(X,Y) = H(Y) = H(X).$$
+* Mutual information is symmetric, i.e., $I(X, Y) = I(Y, X)$.
+* Mutual information is non-negative, i.e., $I(X, Y) \geq 0$.
+* $I(X, Y) = 0$ if and only if $X$ and $Y$ are independent. For example, if $X$ and $Y$ are independent, then knowing $Y$ does not give any information about $X$ and vice versa, so their mutual information is zero.
+* Alternatively, if $X$ is an invertible function of $Y$, then $Y$ and $X$ share all information and $$I(X, Y) = H(Y) = H(X).$$
 
 ### Pointwise Mutual Information
 
 When we worked with entropy at the beginning this chapter, we were able to provide an interpretation of $-\log(p_X(x))$ as how *surprised* we were with the particular outcome.  We may give a similar interpretation to the logarithmic term in the mutual information, which is often referred to as the *pointwise mutual information*:
 
-$$\mathrm{pmi}(x,y) = \log\frac{p_{X,Y}(x, y)}{p_X(x) p_Y(y)}.$$
+$$\mathrm{pmi}(x, y) = \log\frac{p_{X, Y}(x, y)}{p_X(x) p_Y(y)}.$$
 :eqlabel:`eq_pmi_def`
 
 We can think of :eqref:`eq_pmi_def` as measuring how much more or less likely the specific combination of outcomes $x$ and $y$ are compared to what we would expect for independent random outcomes.  If it is large and positive, then these two specific outcomes occur much more frequently than they would compared to random chance (*note*: the denominator is $p_X(x) p_Y(y)$ which is the probability of the two outcomes were independent), whereas if it is large and negative it represents the two outcomes happening far less than we would expect by random chance.  
@@ -298,7 +298,7 @@ Let us take a look at some properties of the KL divergence :eqref:`eq_kl_def`.
 * KL divergence is non-symmetric, i.e., $$D_{\mathrm{KL}}(P\|Q) \neq D_{\mathrm{KL}}(Q\|P), \text{ if } P \neq Q.$$
 * KL divergence is non-negative, i.e., $$D_{\mathrm{KL}}(P\|Q) \geq 0.$$ Note that the equality holds only when $P = Q$.
 * If there exists an $x$ such that $p(x) > 0$ and $q(x) = 0$, then $D_{\mathrm{KL}}(P\|Q) = \infty$.
-* There is a close relationship between KL divergence and mutual information. Besides the relationship shown in :numref:`fig_mutual_information`, $I(X,Y)$ is also numerically equivalent with the following terms:
+* There is a close relationship between KL divergence and mutual information. Besides the relationship shown in :numref:`fig_mutual_information`, $I(X, Y)$ is also numerically equivalent with the following terms:
     1. $D_{\mathrm{KL}}(P(X, Y)  \ \| \ P(X)P(Y))$;
     1. $E_Y \{ D_{\mathrm{KL}}(P(X \mid Y) \ \| \ P(X)) \}$;
     1. $E_X \{ D_{\mathrm{KL}}(P(Y \mid X) \ \| \ P(Y)) \}$.
@@ -310,7 +310,7 @@ Let us take a look at some properties of the KL divergence :eqref:`eq_kl_def`.
 
 Let us go through a toy example to see the non-symmetry explicitly. 
 
-First, let us generate and sort three `ndarray`s of length $10,000$: an objective ndarray $p$ which follows a normal distribution $N(0,1)$, and two candidate ndarrays $q_1$ and $q_2$ which follow normal distributions $N(-1,1)$ and $N(1,1)$ respectively.
+First, let us generate and sort three `ndarray`s of length $10, 000$: an objective ndarray $p$ which follows a normal distribution $N(0, 1)$, and two candidate ndarrays $q_1$ and $q_2$ which follow normal distributions $N(-1, 1)$ and $N(1, 1)$ respectively.
 
 ```{.python .input}
 random.seed(1)
@@ -367,7 +367,7 @@ This was all derived by working from the maximum likelihood point of view.  Howe
 
 Like KL divergence, for a random variable $X$, we can also measure the divergence between the estimating distribution $Q$ and the true distribution $P$ via *cross entropy*,
 
-$$\mathrm{CE}(P,Q) = - E_{x \sim P} [\log(q(x))].$$
+$$\mathrm{CE}(P, Q) = - E_{x \sim P} [\log(q(x))].$$
 :eqlabel:`eq_ce_def`
 
 By using properties of entropy discussed above, we can also interpret it as the summation of the entropy $H(P)$ and the KL divergence between $P$ and $Q$, i.e.,
@@ -398,7 +398,7 @@ As alluded in the beginning of this section, cross entropy :eqref:`eq_ce_def` ca
 
 1. Maximizing predictive probability of $Q$ for distribution $P$, (i.e., $E_{x 
 \sim P} [\log (q(x))]$);
-1. Minimizing cross entropy $\mathrm{CE} (P,Q)$;
+1. Minimizing cross entropy $\mathrm{CE} (P, Q)$;
 1. Minimizing the KL divergence $D_{\mathrm{KL}}(P\|Q)$.
 
 The definition of cross entropy indirectly proves the equivalent relationship between objective 2 and objective 3, as long as the entropy of true data $H(P)$ is constant.
@@ -465,9 +465,9 @@ nll_loss.get()
 1. Verify that the card examples from the first section indeed have the claimed entropy.
 2. Let us compute the entropy from a few data sources:
     * Assume that you are watching the output generated by a monkey at a typewriter. The monkey presses any of the $44$ keys of the typewriter at random (you can assume that it has not discovered any special keys or the shift key yet). How many bits of randomness per character do you observe?
-    * Being unhappy with the monkey, you replaced it by a drunk typesetter. It is able to generate words, albeit not coherently. Instead, it picks a random word out of a vocabulary of $2,000$ words. Moreover, assume that the average length of a word is $4.5$ letters in English. How many bits of randomness do you observe now?
+    * Being unhappy with the monkey, you replaced it by a drunk typesetter. It is able to generate words, albeit not coherently. Instead, it picks a random word out of a vocabulary of $2, 000$ words. Moreover, assume that the average length of a word is $4.5$ letters in English. How many bits of randomness do you observe now?
     * Still being unhappy with the result, you replace the typesetter by a high quality language model. These can currently obtain perplexity numbers as low as $15$ points per character. The perplexity is defined as a length normalized probability, i.e., $$PPL(x) = \left[p(x)\right]^{1 / \text{length(x)} }.$$ How many bits of randomness do you observe now?
-3. Explain intuitively why $I(X,Y) = H(X) - H(X|Y)$.  Then, show this is true by expressing both sides as an expectation with respect to the joint distribution.
+3. Explain intuitively why $I(X, Y) = H(X) - H(X|Y)$.  Then, show this is true by expressing both sides as an expectation with respect to the joint distribution.
 4. What is the KL Divergence between the two Gaussian distributions $\mathcal{N}(\mu_1,\sigma_1^2)$ and $\mathcal{N}(\mu_2,\sigma_2^2)$?
 
 

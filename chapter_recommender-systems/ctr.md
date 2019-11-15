@@ -58,7 +58,7 @@ class CTRDataset(gluon.data.Dataset):
                 values = line.rstrip('\n').split('\t')
                 if len(values) != self.NUM_FEATS + 1:
                     continue
-                label = np.float32([0,0])
+                label = np.float32([0, 0])
                 label[int(values[0])] = 1
                 instance['y'] = [np.float32(values[0])]
                 for i in range(1, self.NUM_FEATS + 1):

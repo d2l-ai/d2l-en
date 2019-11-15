@@ -120,9 +120,9 @@ class SeqDataset(gluon.data.Dataset):
         idx = np.array([i[1][0] for i in temp])
         self.ns = ns = int(sum([c - L if c >= L + 1 else 1 for c
                                 in np.array([len(i[1]) for i in temp])]))
-        self.seq_items = np.zeros((ns,L))
+        self.seq_items = np.zeros((ns, L))
         self.seq_users = np.zeros(ns, dtype='int32')
-        self.seq_tgt, self.test_seq = np.zeros((ns,1)),np.zeros((num_users,L))
+        self.seq_tgt, self.test_seq = np.zeros((ns, 1)),np.zeros((num_users, L))
         test_users, _uid = np.empty(num_users), None
         for i, (uid, i_seq) in enumerate(self._seq(u_ids, i_ids, idx, L + 1)):
             if uid != _uid:

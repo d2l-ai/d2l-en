@@ -1,4 +1,4 @@
-# Backpropagation Through Time
+w# Backpropagation Through Time
 :label:`sec_bptt`
 
 So far we repeatedly alluded to things like *exploding gradients*,
@@ -47,14 +47,14 @@ For backpropagation, matters are a bit more tricky, especially when we compute t
 
 $$\begin{aligned}
 \partial_{w_h} L & = \sum_{t=1}^T \partial_{w_h} l(y_t, o_t) \\
-	& = \sum_{t=1}^T \partial_{o_t} l(y_t, o_t) \partial_{h_t} g(h_t,w_h) \left[ \partial_{w_h} h_t\right].
+	& = \sum_{t=1}^T \partial_{o_t} l(y_t, o_t) \partial_{h_t} g(h_t, w_h) \left[ \partial_{w_h} h_t\right].
 \end{aligned}$$
 
 The first and the second part of the derivative is easy to compute. The third part $\partial_{w_h} h_t$ is where things get tricky, since we need to compute the effect of the parameters on $h_t$.
 
 
 To derive the above gradient, assume that we have three sequences $\{a_{t}\},\{b_{t}\},\{c_{t}\}$ satisfying
-$a_{0}=0,a_{1}=b_{1}$, and $a_{t}=b_{t}+c_{t}a_{t-1}$ for $t=1,2,\ldots$.
+$a_{0}=0, a_{1}=b_{1}$, and $a_{t}=b_{t}+c_{t}a_{t-1}$ for $t=1, 2,\ldots$.
 Then for $t\geq 1$, it is easy to show 
 
 $$a_{t}=b_{t}+\sum_{i=1}^{t-1}\left(\prod_{j=i+1}^{t}c_{j}\right)b_{i}.$$

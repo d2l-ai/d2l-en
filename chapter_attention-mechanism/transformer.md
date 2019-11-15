@@ -53,7 +53,7 @@ Based on the above, the *multi-head attention* layer consists of $h$ parallel se
 ![Multi-head attention](../img/multi-head-attention.svg)
 
 
-To be more specific, assume that the dimension for a query, a key, and a value are $d_q$, $d_k$, and $d_v$, respectively. Then, for each head $i=1,\ldots,h$, we can train the learnable parameters 
+To be more specific, assume that the dimension for a query, a key, and a value are $d_q$, $d_k$, and $d_v$, respectively. Then, for each head $i=1,\ldots, h$, we can train the learnable parameters 
 $\mathbf W_q^{(i)}\in\mathbb R^{p_q\times d_q}$,
 $\mathbf W_k^{(i)}\in\mathbb R^{p_k\times d_k}$,
 and $\mathbf W_v^{(i)}\in\mathbb R^{p_v\times d_v}$. Therefore, the output for each head can be demonstrated by
@@ -144,13 +144,13 @@ Let us validate the `MultiHeadAttention` model in the a toy example. Create a mu
 cell = MultiHeadAttention(100, 10, 0.5)
 cell.initialize()
 X = np.ones((2, 4, 5))
-valid_length = np.array([2,3])
+valid_length = np.array([2, 3])
 cell(X, X, X, valid_length).shape
 ```
 
 ## Position-wise Feed-Forward Networks
 
-Another critical component in the transformer block is called *position-wise feed-forward network (FFN)*. It accepts a $3$ dimensional input with shape (batch size, sequence length, feature size). The position-wise FFN consists of two dense layers that applies to the last dimension. Since the same two dense layers are used for each position item in the sequence, we referred it to as *position-wise*. Indeed, it equals to apply two $Conv(1,1)$, i.e., $1 \times 1$ convolution layers.
+Another critical component in the transformer block is called *position-wise feed-forward network (FFN)*. It accepts a $3$ dimensional input with shape (batch size, sequence length, feature size). The position-wise FFN consists of two dense layers that applies to the last dimension. Since the same two dense layers are used for each position item in the sequence, we referred it to as *position-wise*. Indeed, it equals to apply two $Conv(1, 1)$, i.e., $1 \times 1$ convolution layers.
 
 Below, the `PositionWiseFFN` shows how to implement a position-wise FFN with two dense layers of hidden size `ffn_hidden_size` and `hidden_size_out`, respectively.
 
@@ -184,7 +184,7 @@ layer = nn.LayerNorm()
 layer.initialize()
 batch = nn.BatchNorm()
 batch.initialize()
-X = np.array([[1,2],[2,3]])
+X = np.array([[1, 2],[2, 3]])
 # compute mean and variance from X in the training mode.
 with autograd.record():
     print('layer norm:',layer(X), '\nbatch norm:', batch(X))
@@ -208,7 +208,7 @@ Due to the residual connection, $X$ and $Y$ should have the same shape.
 ```{.python .input  n=9}
 add_norm = AddNorm(0.5)
 add_norm.initialize()
-add_norm(np.ones((2,3,4)), np.ones((2,3,4))).shape
+add_norm(np.ones((2, 3, 4)), np.ones((2, 3, 4))).shape
 ```
 
 ## Positional Encoding
@@ -219,11 +219,11 @@ So what is the *positional encoding*? Assume that $X\in\mathbb R^{l\times d}$ is
 
 The position $P$ is a 2d matrix, where $i$ refers to the order in the sentence, and $j$ refers to the position along the embedding vector dimension. In this way, each value in the origin sequence is then maintained using the equations below:
 
-$$P_{i,2j} = \sin(i/10000^{2j/d}),$$
+$$P_{i, 2j} = \sin(i/10000^{2j/d}),$$
 
-$$\quad P_{i,2j+1} = \cos(i/10000^{2j/d}),$$
+$$\quad P_{i, 2j+1} = \cos(i/10000^{2j/d}),$$
 
-for $i=0,\ldots,l-1$ and $j=0,\ldots,\lfloor(d-1)/2\rfloor$.
+for $i=0,\ldots, l-1$ and $j=0,\ldots,\lfloor(d-1)/2\rfloor$.
 
 
 An intuitive visualization and implementation of the positional encoding are showing below.
@@ -238,7 +238,7 @@ class PositionalEncoding(nn.Block):
         self.dropout = nn.Dropout(dropout)
         # Create a long enough P
         self.P = np.zeros((1, max_len, embedding_size))
-        X = np.arange(0, max_len).reshape(-1,1) / np.power(
+        X = np.arange(0, max_len).reshape(-1, 1) / np.power(
             10000, np.arange(0, embedding_size, 2)/embedding_size)
         self.P[:, :, 0::2] = np.sin(X)
         self.P[:, :, 1::2] = np.cos(X)
@@ -256,7 +256,7 @@ pe = PositionalEncoding(20, 0)
 pe.initialize()
 Y = pe(np.zeros((1, 100, 20 )))
 d2l.plot(np.arange(100), Y[0, :,4:8].T, figsize=(6, 2.5),
-        legend=["dim %d"%p for p in [4,5,6,7]])
+        legend=["dim %d"%p for p in [4, 5, 6, 7]])
 ```
 
 ## Encoder

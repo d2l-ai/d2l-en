@@ -94,7 +94,7 @@ Try coding it up in a room by yourself
 with nothing but a computer and a code editor.
 How would you write such a program from first principles?
 Think about it... the problem is hard.
-Every second, the microphone will collect roughly 44,000 samples.
+Every second, the microphone will collect roughly 44, 000 samples.
 Each sample is a measurement of the amplitude of the sound wave.
 What rule could map reliably from a snippet of raw audio to confident predictions ``{yes, no}`` on whether the snippet contains the wake word?
 If you are stuck, do not worry.
@@ -163,7 +163,7 @@ coercing the desired behavior from our model.
 The training process usually looks like this:
 
 1. Start off with a randomly initialized model that cannot do anything useful.
-1. Grab some of your labeled data (e.g., audio snippets and corresponding ``{yes,no}`` labels)
+1. Grab some of your labeled data (e.g., audio snippets and corresponding ``{yes, no}`` labels)
 1. Tweak the knobs so the model sucks less with respect to those examples
 1. Repeat until the model is awesome.
 
@@ -602,13 +602,13 @@ In most of our chapters, we will focus on one of two very common losses,
 the [L1 loss](http://mxnet.incubator.apache.org/api/python/gluon/loss.html#mxnet.gluon.loss.L1Loss)
 where
 
-$$l(y,y') = \sum_i |y_i-y_i'|$$
+$$l(y, y') = \sum_i |y_i-y_i'|$$
 
 and the least mean squares loss, or
 [L2 loss](http://mxnet.incubator.apache.org/api/python/gluon/loss.html#mxnet.gluon.loss.L2Loss),
 where
 
-$$l(y,y') = \sum_i (y_i - y_i')^2.$$
+$$l(y, y') = \sum_i (y_i - y_i')^2.$$
 
 As we will see later, the $L_2$ loss corresponds to the assumption 
 that our data was corrupted by Gaussian noise, 
@@ -1284,7 +1284,7 @@ computational power was scarce.
 Second, datasets were relatively small.
 In fact, Fisher's 'Iris dataset' from 1932
 was a popular tool for testing the efficacy of algorithms.
-MNIST with its 60,000 handwritten digits was considered huge.
+MNIST with its 60, 000 handwritten digits was considered huge.
 
 Given the scarcity of data and computation, 
 strong statistical tools such as Kernel Methods, 
@@ -1510,7 +1510,7 @@ Fortunately, we are far from a sentient AI syste
 that is ready to manipulate its human creators (or burn their coffee).
 First, AI systems are engineered, trained and deployed in a specific,
 goal-oriented manner. While their behavior might give the illusion
-of general intelligence,it is a combination of rules, heuristics
+of general intelligence, it is a combination of rules, heuristics
 and statistical models that underlie the design.
 Second, at present tools for *artificial general intelligence*
 simply do not exist that are able to improve themselves,

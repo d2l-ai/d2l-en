@@ -5,7 +5,7 @@
 
 In :numref:`sec_text_preprocessing`, we see how to map text data into tokens, and these tokens can be viewed as a time series of discrete observations. Assuming the tokens in a text of length $T$ are in turn $x_1, x_2, \ldots, x_T$, then, in the discrete time series, $x_t$($1 \leq t \leq T$) can be considered as the output or label of timestep $t$. Given such a sequence, the goal of a language model is to estimate the probability
 
-$$p(x_1,x_2, \ldots, x_T).$$
+$$p(x_1, x_2, \ldots, x_T).$$
 
 Language models are incredibly useful. For instance, an ideal language model would be able to generate natural text just on its own, simply by drawing one word at a time $w_t \sim p(w_t \mid w_{t-1}, \ldots, w_1)$. Quite unlike the monkey using a typewriter, all text emerging from such a model would pass as natural language, e.g., English text. Furthermore, it would be sufficient for generating a meaningful dialog, simply by conditioning the text on previous dialog fragments. Clearly we are still very far from designing such a system, since it would need to *understand* the text rather than just generate grammatically sensible content.
 
@@ -52,8 +52,8 @@ add a small constant to all counts. This helps with singletons, e.g., via
 
 $$\begin{aligned}
 	\hat{p}(w) & = \frac{n(w) + \epsilon_1/m}{n + \epsilon_1} \\
-	\hat{p}(w' \mid w) & = \frac{n(w,w') + \epsilon_2 \hat{p}(w')}{n(w) + \epsilon_2} \\
-	\hat{p}(w'' \mid w',w) & = \frac{n(w,w',w'') + \epsilon_3 \hat{p}(w',w'')}{n(w,w') + \epsilon_3}
+	\hat{p}(w' \mid w) & = \frac{n(w, w') + \epsilon_2 \hat{p}(w')}{n(w) + \epsilon_2} \\
+	\hat{p}(w'' \mid w',w) & = \frac{n(w, w',w'') + \epsilon_3 \hat{p}(w',w'')}{n(w, w') + \epsilon_3}
 \end{aligned}$$
 
 Here the coefficients $\epsilon_i > 0$ determine how much we use the
@@ -186,7 +186,7 @@ def seq_data_iter_random(corpus, batch_size, num_steps):
 
 Let us generate an artificial sequence from 0 to 30. We assume that
 the batch size and numbers of timesteps are 2 and 5
-respectively. This means that depending on the offset we can generate between 4 and 5 $(x,y)$ pairs. With a minibatch size of 2, we only get 2 minibatches.
+respectively. This means that depending on the offset we can generate between 4 and 5 $(x, y)$ pairs. With a minibatch size of 2, we only get 2 minibatches.
 
 ```{.python .input  n=6}
 my_seq = list(range(30))
@@ -263,7 +263,7 @@ def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
 
 ## Exercises
 
-1. Suppose there are $100,000$ words in the training dataset. How much word frequency and multi-word adjacent frequency does a four-gram need to store?
+1. Suppose there are $100, 000$ words in the training dataset. How much word frequency and multi-word adjacent frequency does a four-gram need to store?
 1. Review the smoothed probability estimates. Why are they not accurate? Hint: we are dealing with a contiguous sequence rather than singletons.
 1. How would you model a dialogue?
 1. Estimate the exponent of Zipf's law for unigrams, bigrams and trigrams.

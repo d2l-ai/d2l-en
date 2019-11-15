@@ -36,8 +36,8 @@ Remember the convolution computes results by `Y[i, j] = (X[i: i + h, j: j + w] *
 Verify the results in :numref:`fig_trans_conv`.
 
 ```{.python .input}
-X = np.array([[0,1], [2,3]])
-K = np.array([[0,1], [2,3]])
+X = np.array([[0, 1], [2, 3]])
+K = np.array([[0, 1], [2, 3]])
 trans_conv(X, K)
 ```
 
@@ -93,7 +93,7 @@ Y = d2l.corr2d(X, K)
 Y
 ```
 
-Next, we rewrite convolution kernel $K$ as a matrix $W$. Its shape will be $(4,9)$, where the $i^\mathrm{th}$ row present applying the kernel to the input to generate the $i^\mathrm{th}$ output element.
+Next, we rewrite convolution kernel $K$ as a matrix $W$. Its shape will be $(4, 9)$, where the $i^\mathrm{th}$ row present applying the kernel to the input to generate the $i^\mathrm{th}$ output element.
 
 ```{.python .input}
 def kernel2matrix(K):
@@ -112,10 +112,10 @@ Then the convolution operator can be implemented by matrix multiplication with p
 Y == np.dot(W, X.reshape(-1)).reshape(2, 2)
 ```
 
-We can implement transposed convolution as a matrix multiplication as well by reusing `kernel2matrix`. To reuse the generated $W$, we construct a $2\times 2$ input, so the corresponding weight matrix will have a shape $(9,4)$, which is $W^\top$. Let us verify the results.
+We can implement transposed convolution as a matrix multiplication as well by reusing `kernel2matrix`. To reuse the generated $W$, we construct a $2\times 2$ input, so the corresponding weight matrix will have a shape $(9, 4)$, which is $W^\top$. Let us verify the results.
 
 ```{.python .input}
-X = np.array([[0,1], [2,3]])
+X = np.array([[0, 1], [2, 3]])
 Y = trans_conv(X, K)
 Y == np.dot(W.T, X.reshape(-1)).reshape(3, 3)
 ```

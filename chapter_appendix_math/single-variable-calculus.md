@@ -202,7 +202,7 @@ $$
 f(x+\epsilon) \approx f(x) + \epsilon \frac{df}{dx}(x),
 $$
 
-approximates the value of $f$ by a line which passes through the point $(x,f(x))$ and has slope $\frac{df}{dx}(x)$.  In this way we say that the derivative gives a linear approximation to the function $f$, as illustrated below:
+approximates the value of $f$ by a line which passes through the point $(x, f(x))$ and has slope $\frac{df}{dx}(x)$.  In this way we say that the derivative gives a linear approximation to the function $f$, as illustrated below:
 
 ```{.python .input}
 # Compute sin
