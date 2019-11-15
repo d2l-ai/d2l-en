@@ -244,3 +244,7 @@ train_ranking(net, train_iter, test_iter, loss, trainer, None, num_users,
 * Vary the architectures (e.g., number of layers, number of neurons of each layer) of the MLP to check the its impact on the performance.
 * Try different optimizers, learning rate and weight decay rate.
 * Try to use hinge loss defined in the last section to optimize this model.
+
+## [Discussions](https://discuss.mxnet.io/t/5164)
+
+![](../img/qr_neumf.svg)
