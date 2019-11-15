@@ -65,14 +65,15 @@ class EncoderDecoder(nn.Block):
 ## Summary
 
 * An encoder-decoder architecture is a neural network design pattern mainly in natural language processing.
-* An encoder is a network (FC, CNN, RNN, etc) that takes the input, and output a feature map, a vector or a tensor.
+* An encoder is a network (FC, CNN, RNN, etc.) that takes the input, and output a feature map, a vector or a tensor.
 * An decoder is a network (usually the same network structure as encoder) that takes the feature vector from the encoder, and gives the best closest match to the actual input or intended output.
 
 
 ## Exercises
 
-1. Besides the machine translation use case, can you think of the other applied scenarios that an encoder-decoder architecture can fit? 
-2. An *autoencoder* is a type of neural network used for unsupervised learning. The aim of an autoencoder is to learn a representation typically for dimensionality reduction. Can you compare it with the encoder-decoder architecture we introduced in this section?
+1. Besides machine translation, can you think of another application scenarios where an encoder-decoder architecture can fit?
+1. Can you design a deep encoder-decoder architecture?
+
 
 
 ## [Discussions](https://discuss.mxnet.io/t/2396)
