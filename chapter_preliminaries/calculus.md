@@ -2,7 +2,7 @@
 :label:`sec_calculus`
 
 Finding the area of a polygon had remained mysterious
-until at least 2, 500 years ago, when ancient Greeks divided a polygon into triangles and summed their areas.
+until at least 2500 years ago, when ancient Greeks divided a polygon into triangles and summed their areas.
 To find the area of curved shapes, such as a circle,
 ancient Greeks inscribed polygons in such shapes.
 As shown in :numref:`fig_polygon_area`,

@@ -1,4 +1,4 @@
-w# Backpropagation Through Time
+# Backpropagation Through Time
 :label:`sec_bptt`
 
 So far we repeatedly alluded to things like *exploding gradients*,
