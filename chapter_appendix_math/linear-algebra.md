@@ -407,7 +407,7 @@ it $[1, 1]^\top$ or $[0, -1]^\top$?
 
 While this picture was for a $2\times2$ matrix, 
 nothing prevents us from taking the lessons learned into higher dimensions.
-If we take similar basis vectors like $[1, 0,\ldots, 0]$ 
+If we take similar basis vectors like $[1, 0, \ldots, 0]$ 
 and see where our matrix sends them, 
 we can start to get a feeling for how the matrix multiplication 
 distorts the entire space in whatever dimension space we are dealing with.
