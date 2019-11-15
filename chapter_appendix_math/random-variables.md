@@ -246,14 +246,14 @@ Let's visualize this.  I will show the probability of getting the three values a
 
 ```{.python .input}
 # Define a helper to plot these figures
-def plot_chebychev(a, p) :
+def plot_chebychev(a, p):
     d2l.set_figsize()
     d2l.plt.stem([a-2, a, a+2], [p, 1-2*p, p], use_line_collection=True)
     d2l.plt.xlim([-4, 4])
     d2l.plt.xlabel('x')
     d2l.plt.ylabel('p.m.f.')
 
-    d2l.plt.hlines(0.5, a - 4 * np.sqrt(2 * p), 
+    d2l.plt.hlines(0.5, a - 4 * np.sqrt(2 * p),
                    a + 4 * np.sqrt(2 * p), 'black', lw=4)
     d2l.plt.vlines(a - 4 * np.sqrt(2 * p), 0.53, 0.47, 'black', lw=1)
     d2l.plt.vlines(a + 4 * np.sqrt(2 * p), 0.53, 0.47, 'black', lw=1)
@@ -272,7 +272,7 @@ The second shows that at $p = 1/8$, the interval exactly touches the two points.
 plot_chebychev(0.0, 0.125)
 ```
 
-The third shows that for $p < 1/8$ the interval only contains the center.  This does not invalidate the inequality since we only needed to ensure that no more than $1/4$ of the probability falls outside the interval, which means that once $p < 1/8$, the two points at $a-2$ and $a+2$ can be discarded. 
+The third shows that for $p < 1/8$ the interval only contains the center.  This does not invalidate the inequality since we only needed to ensure that no more than $1/4$ of the probability falls outside the interval, which means that once $p < 1/8$, the two points at $a-2$ and $a+2$ can be discarded.
 
 ```{.python .input}
 # Plot interval when p < 1/8
@@ -488,7 +488,7 @@ To ensure that we understand, let us take a look at a collection of random varia
 # Plot a few random variables adjustable covariance
 covs = [-0.9, 0.0, 1.2]
 d2l.plt.figure(figsize=(12, 3))
-for i in range(3) :
+for i in range(3):
     X = np.random.normal(0, 1, 500)
     Y = covs[i]*X + np.random.normal(0, 1, 500)
 
@@ -562,7 +562,7 @@ To ensure that we understand, let us this time take a look at a collection of ra
 # Plot a few random variables adjustable correlations
 cors = [-0.9, 0.0, 1.0]
 d2l.plt.figure(figsize=(12, 3))
-for i in range(3) :
+for i in range(3):
     X = np.random.normal(0, 1, 500)
     Y = cors[i] * X + np.sqrt(1 - cors[i]**2) * np.random.normal(0, 1, 500)
 
@@ -610,3 +610,8 @@ Indeed if we think of norms as being related to standard deviations, and correla
 2. The Laplace distribution is a random variable whose density is given by $p(x = \frac{1}{2}e^{-|x|}$.  What is the mean and the standard deviation of this function?  As a hint, $\int_0^\infty xe^{-x} \; dx = 1$ and $\int_0^\infty x^2e^{-x} \; dx = 2$.
 3. I walk up to you on the street and say "I have a random variable with mean $1$, standard deviation $2$, and I observed $25\%$ of my samples taking a value larger than $9$."  Do you believe me?  Why or why not?
 4. Suppose that you have two random variables $X, Y$, with joint density given by $p_{XY}(x,y) = 4xy$ for $x,y \in [0,1]$ and $p_{XY}(x,y) = 0$ otherwise.  What is the covariance of $X$ and $Y$?
+
+
+## [Discussions](https://discuss.mxnet.io/t/5152)
+
+![](../img/qr_random-variables.svg)

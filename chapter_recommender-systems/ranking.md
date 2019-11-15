@@ -6,7 +6,7 @@ To this end, a class of recommendation models targeting at generating ranked rec
 
 ## Bayesian Personalized Ranking Loss and its Implementation
 
-Bayesian personalized ranking (BPR) is a pairwise personalized ranking loss that is derived from the maximum posterior estimator. It has been widely used in many existing recommendation models. The training data of BPR consists of both positive and negative pairs (missing values). It assumes that the user prefers the positive item over all other non-observed items.
+Bayesian personalized ranking (BPR) :cite:`Rendle.Freudenthaler.Gantner.ea.2009` is a pairwise personalized ranking loss that is derived from the maximum posterior estimator. It has been widely used in many existing recommendation models. The training data of BPR consists of both positive and negative pairs (missing values). It assumes that the user prefers the positive item over all other non-observed items.
 
 In formal, the training data is constructed by tuples in the form of $(u, i, j)$, which represents that the user $u$ prefers the item $i$ over the item $j$. The Bayesian formulation of BPR which aims to maximize the posterior probability is given below:
 
@@ -85,3 +85,7 @@ These two losses are interchangeable for personalized ranking in recommendation.
 
 - Are there any variants of BPR and hinge loss available?
 - Can you find any recommendation models that use BPR or hinge loss?
+
+## [Discussions](https://discuss.mxnet.io/t/5163)
+
+![](../img/qr_ranking.svg)

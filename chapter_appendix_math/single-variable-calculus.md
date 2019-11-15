@@ -53,10 +53,11 @@ This is already enough to start to play around with in code.  For instance, supp
 
 ```{.python .input}
 # Define our function
-L = lambda x: x**2 + 1701*(x-4)**3
+def L(x): 
+    return x**2 + 1701*(x-4)**3
 
 # Print the difference divided by epsilon for several epsilon
-for epsilon in [0.1, 0.001, 0.0001, 0.00001] :
+for epsilon in [0.1, 0.001, 0.0001, 0.00001]:
     print("epsilon = {:.5f} -> {:.5f}".format(
         epsilon, (L(4+epsilon) - L(4)) / epsilon))
 ```
@@ -74,7 +75,7 @@ Back in our example, this value of the change $8$ is different based on differen
 $$\frac{df}{dx}(x) = \lim_{\epsilon \rightarrow 0}\frac{f(x+\epsilon) - f(x)}{\epsilon}.$$
 :eqlabel:`der-def`
 
-We will often encounter many different notations for the derivative in many different texts. For instance, all of the below notations indicate the same thing:
+We will often encounter many different notations for the derivative in different text. For instance, all of the below notations indicate the same thing:
 
 $$
 \frac{df}{dx} = \frac{d}{dx}f = f' = \nabla_xf = D_xf = f_x.
@@ -209,7 +210,7 @@ xs = np.arange(-np.pi, np.pi, 0.01)
 plots = [np.sin(xs)]
 
 # Compute some linear approximations. Use d(sin(x))/dx = cos(x)
-for x0 in [-1.5, 0, 2] :
+for x0 in [-1.5, 0, 2]:
     plots.append(np.sin(x0) + (xs - x0) * np.cos(x0))
 
 d2l.plot(xs, plots, 'x', 'f(x)', ylim=[-1.5, 1.5])
@@ -259,8 +260,8 @@ xs = np.arange(-np.pi, np.pi, 0.01)
 plots = [np.sin(xs)]
 
 # Compute some quadratic approximations. Use d(sin(x))/dx = cos(x)
-for x0 in [-1.5, 0, 2] :
-    plots.append(np.sin(x0) + (xs - x0) * np.cos(x0) - 
+for x0 in [-1.5, 0, 2]:
+    plots.append(np.sin(x0) + (xs - x0) * np.cos(x0) -
                               (xs - x0)**2 * np.sin(x0) / 2)
 
 d2l.plot(xs, plots, 'x', 'f(x)', ylim=[-1.5, 1.5])
@@ -327,7 +328,7 @@ P1 = 1 + xs
 P2 = 1 + xs + xs**2 / 2
 P5 = 1 + xs + xs**2 / 2 + xs**3 / 6 + xs**4 / 24 + xs**5 / 120
 
-d2l.plot(xs, [ys, P1, P2, P5], 'x', 'f(x)', legend = [
+d2l.plot(xs, [ys, P1, P2, P5], 'x', 'f(x)', legend=[
     "Exponential", "Degree 1 Taylor Series", "Degree 2 Taylor Series",
     "Degree 5 Taylor Series"])
 ```
@@ -353,3 +354,8 @@ In a nutshell, Taylor series have two primary applications:
 2. What is the derivative of $\log(\frac{1}{x})$?
 3. True or False: If $f'(x) = 0$ then $f$ has a maximum or minimum at $x$?
 4. Where is the minimum of $f(x) = x\log(x)$ for $x\ge0$ (where we assume that $f$ takes the limiting value of $0$ at $f(0)$)?
+
+
+## [Discussions](https://discuss.mxnet.io/t/5149)
+
+![](../img/qr_single-variable-calculus.svg)

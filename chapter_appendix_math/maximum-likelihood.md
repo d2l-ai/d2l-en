@@ -105,11 +105,12 @@ n_H = 8675309
 n_T = 25624
 
 # Initialize our paramteres
-theta = np.array(0.5); theta.attach_grad()
+theta = np.array(0.5)
+theta.attach_grad()
 
 # Perform gradient descent
 lr = 0.00000000001
-for iter in range(10) :
+for iter in range(10):
     with autograd.record():
         loss = -(n_H * np.log(theta) + n_T * np.log(1 - theta))
     loss.backward()
@@ -206,3 +207,8 @@ as was claimed at the beginning of this section.  Thus we see that the maximum l
 ## Exercises
 1. Suppose that you know that a random variable has density $\frac{1}{\alpha}e^{-\alpha x}$ for some value $\alpha$.  You obtain a single observation from the random variable which is the number $3$.  What is the maximum likelihood estimate for $\alpha$?
 2. Suppose that you have a dataset of samples $\{x_i\}_{i=1}^N$ drawn from a Gaussian with unknown mean, but variance $1$.  What is the maximum likelihood estimate for the mean?
+
+
+## [Discussions](https://discuss.mxnet.io/t/5153)
+
+![](../img/qr_maximum-likelihood.svg)

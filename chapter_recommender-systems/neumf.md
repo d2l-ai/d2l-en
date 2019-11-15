@@ -1,6 +1,6 @@
 # Neural Collaborative Filtering for Personalized Ranking
 
-This section moves beyond explicit feedback, introducing the neural collaborative filtering (NCF) framework for recommendation with implicit feedback. Implicit feedback is pervasive in recommender systems. Actions such as Clicks, buys, and watches are common implicit feedback which are easy to collect and indicative of users' preferences. The model we will introduce, titled NeuMF, short for neural matrix factorization, aims to address the personalized ranking task with implicit feedback. This model leverages the flexibility and non-linearity of neural networks to replace dot products of matrix factorization, aiming at enhancing the model expressiveness. In specific, this model is structured with two subnetworks including generalized matrix factorization (GMF) and multilayer perceptron (MLP) and models the interactions from two pathways instead of simple inner products. The outputs of these two networks are concatenated for the final prediction scores calculation. Unlike the rating prediction task in AutoRec, this model generates a ranked recommendation list to each user based on the implicit feedback. We will use the personalized ranking loss introduced in the last section to train this model. 
+This section moves beyond explicit feedback, introducing the neural collaborative filtering (NCF) framework for recommendation with implicit feedback. Implicit feedback is pervasive in recommender systems. Actions such as Clicks, buys, and watches are common implicit feedback which are easy to collect and indicative of users' preferences. The model we will introduce, titled NeuMF :cite:`He.Liao.Zhang.ea.2017`, short for neural matrix factorization, aims to address the personalized ranking task with implicit feedback. This model leverages the flexibility and non-linearity of neural networks to replace dot products of matrix factorization, aiming at enhancing the model expressiveness. In specific, this model is structured with two subnetworks including generalized matrix factorization (GMF) and multilayer perceptron (MLP) and models the interactions from two pathways instead of simple inner products. The outputs of these two networks are concatenated for the final prediction scores calculation. Unlike the rating prediction task in AutoRec, this model generates a ranked recommendation list to each user based on the implicit feedback. We will use the personalized ranking loss introduced in the last section to train this model. 
 
 ## The NeuMF model
 
@@ -48,7 +48,7 @@ npx.set_np()
 ```
 
 ## Model Implementation
-The following code implements the NeuMF model. It consists of a generalized matrix factorization model and a multilayered perceptron with different user and item embedding vectors. The structure of the MLP is controlled with the parameter `mlp_layers`. ReLu is used as the default activation function.
+The following code implements the NeuMF model. It consists of a generalized matrix factorization model and a multilayered perceptron with different user and item embedding vectors. The structure of the MLP is controlled with the parameter `mlp_layers`. ReLU is used as the default activation function.
 
 ```{.python .input  n=2}
 class NeuMF(nn.Block):
@@ -244,3 +244,7 @@ train_ranking(net, train_iter, test_iter, loss, trainer, None, num_users,
 * Vary the architectures (e.g., number of layers, number of neurons of each layer) of the MLP to check the its impact on the performance.
 * Try different optimizers, learning rate and weight decay rate.
 * Try to use hinge loss defined in the last section to optimize this model.
+
+## [Discussions](https://discuss.mxnet.io/t/5164)
+
+![](../img/qr_neumf.svg)

@@ -304,7 +304,7 @@ We can demystify the name by introducing the basics of information theory.
 ## Information Theory Basics
 
 Information theory deals with the problem of encoding, decoding, transmitting 
-and manipulating information (aka data) in as concise form as possible.
+and manipulating information (also known as data) in as concise form as possible.
 
 ### Entropy
 

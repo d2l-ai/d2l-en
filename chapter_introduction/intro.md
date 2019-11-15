@@ -207,7 +207,7 @@ of transforming the data into some form amenable to *shallow* models.
 One key advantage of deep learning is that it replaces not
 only the *shallow* models at the end of traditional learning pipelines,
 but also the labor-intensive process of feature engineering.
-Secondly, by replacing much of the *domain-specific preprocessing*, 
+Second, by replacing much of the *domain-specific preprocessing*, 
 deep learning has eliminated many of the boundaries 
 that previously separated computer vision, speech recognition,
 natural language processing, medical informatics, and other application areas,
@@ -559,7 +559,7 @@ Lots of practical problems are well-described regression problems.
 Predicting the rating that a user will assign to a movie
 can be thought of as a regression problem
 and if you designed a great algorithm to accomplish this feat in 2009,
-you might have won the [$1 million Netflix prize](https://en.wikipedia.org/wiki/Netflix_Prize).
+you might have won the [1-million-dollar Netflix prize](https://en.wikipedia.org/wiki/Netflix_Prize).
 Predicting the length of stay for patients in the hospital 
 is also a regression problem.
 A good rule of thumb is that any *How much?* or *How many?* problem 
@@ -658,7 +658,7 @@ If there is a $0.6$ ($60\%$) probability that an unfair coin comes up heads,
 then there is a $0.4$ ($40\%$) probability that it comes up tails.
 Returning to our animal classification example, 
 a classifier might see an image and output the probability 
-that the image is a cat $P(y=\mathrm{cat}| x) = 0.9$.
+that the image is a cat $P(y=\text{cat} \mid x) = 0.9$.
 We can interpret this number by saying that the classifier 
 is $90\%$ sure that the image depicts a cat.
 The magnitude of the probability for the predicted class 
@@ -815,9 +815,11 @@ Nowadays, search engines use machine learning and behavioral models
 to obtain query-dependent relevance scores. 
 There are entire academic conferences devoted to this subject.
 
-<!-- Add / clean up-->
+
 
 #### Recommender systems
+
+:label:`subsec_recommender_systems`
 
 Recommender systems are another problem setting
 that is related to search and ranking.
@@ -1273,7 +1275,7 @@ but the name stuck. At its heart, lie a few key principles
 that can be found in most networks today:
 
 * The alternation of linear and nonlinear processing units, often referred to as *layers*.
-* The use of the chain rule (aka *backpropagation*) for adjusting parameters in the entire network at once.
+* The use of the chain rule (also known as *backpropagation*) for adjusting parameters in the entire network at once.
 
 After initial rapid progress, research in neural networks
 languished from around 1995 until 2005.
@@ -1281,7 +1283,7 @@ This was due to a number of reasons.
 Training a network is computationally very expensive.
 While RAM was plentiful at the end of the past century,
 computational power was scarce.
-Secondly, datasets were relatively small.
+Second, datasets were relatively small.
 In fact, Fisher's 'Iris dataset' from 1932
 was a popular tool for testing the efficacy of algorithms.
 MNIST with its 60,000 handwritten digits was considered huge.
@@ -1508,7 +1510,7 @@ More frivolously, we can ask Alexa to switch on the coffee machine.
 
 Fortunately, we are far from a sentient AI syste
 that is ready to manipulate its human creators (or burn their coffee).
-Firstly, AI systems are engineered, trained and deployed in a specific,
+First, AI systems are engineered, trained and deployed in a specific,
 goal-oriented manner. While their behavior might give the illusion
 of general intelligence,it is a combination of rules, heuristics
 and statistical models that underlie the design.

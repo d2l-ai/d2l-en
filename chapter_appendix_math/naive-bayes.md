@@ -9,7 +9,7 @@ Learning is all about making assumptions. If we want to classify a new data poin
 %matplotlib inline
 import d2l
 import math
-from mxnet import np, npx, gluon
+from mxnet import gluon, np, npx
 npx.set_np()
 d2l.use_svg_display()
 ```
@@ -30,7 +30,7 @@ def transform(data, label):
     return np.floor(data.astype('float32') / 128).squeeze(axis=-1), label
 
 mnist_train = gluon.data.vision.MNIST(train=True, transform=transform)
-mnist_test  = gluon.data.vision.MNIST(train=False, transform=transform)
+mnist_test = gluon.data.vision.MNIST(train=False, transform=transform)
 ```
 
 We can access a particular example, which contains the image and the corresponding label.
@@ -110,7 +110,7 @@ X, Y = mnist_train[:]  # all training examples
 
 n_y = np.zeros((10))
 for y in range(10):
-    n_y[y] = (Y==y).sum()
+    n_y[y] = (Y == y).sum()
 P_y = n_y / n_y.sum()
 P_y
 ```
@@ -120,7 +120,7 @@ Now on to slightly more difficult things $P_{xy}$. Since we picked black and whi
 ```{.python .input  n=66}
 n_x = np.zeros((10, 28, 28))
 for y in range(10):
-    n_x[y] = np.array(X.asnumpy()[Y.asnumpy()==y].sum(axis=0))
+    n_x[y] = np.array(X.asnumpy()[Y.asnumpy() == y].sum(axis=0))
 P_xy = (n_x + 1) / (n_y + 1).reshape(10, 1, 1)
 
 d2l.show_images(P_xy, 2, 5);
@@ -186,7 +186,7 @@ classifier works pretty well.
 
 ```{.python .input}
 def predict(X):
-    return [bayes_pred_stable(x).argmax(axis = 0).astype(np.int32) for x in X]
+    return [bayes_pred_stable(x).argmax(axis=0).astype(np.int32) for x in X]
 
 X, y = mnist_test[:18]
 preds = predict(X)
@@ -197,7 +197,7 @@ Finally, let us compute the overall accuracy of the classifier.
 
 ```{.python .input}
 X, y = mnist_test[:]
-preds = np.array(predict(X), dtype = np.int32)
+preds = np.array(predict(X), dtype=np.int32)
 float((preds == y).sum()) / len(y)  # Validation accuracy
 ```
 
@@ -211,4 +211,9 @@ Modern deep networks achieve error rates of less than $0.01$. The poor performan
 ## Exercises
 1. Consider the dataset $[[0,0],[0,1],[1,0],[1,1]]$ with labels given by the XOR of the two elements $[0,1,1,0]$.  What are the probabilities for a Naive Bayes classifier built on this dataset.  Does it successfully classify our points?  If not, what assumptions are violated?
 1. Suppose that we did not use Laplace smoothing when estimating probabilities and a data point arrived at testing time which contained a value never observed in training.  What would the model output?
-1. The naive Bayes classifier is a specific example of a Bayesian network, where the dependence of random variables are encoded with a graph structure.  While the full theory is beyond the scope of this section (see :cite:`Koller.Friedman.2009` for full details), explain why allowing explicit dependence between the two input variables in the XOR model allows for the creation of a successful classifier.  
+1. The naive Bayes classifier is a specific example of a Bayesian network, where the dependence of random variables are encoded with a graph structure.  While the full theory is beyond the scope of this section (see :cite:`Koller.Friedman.2009` for full details), explain why allowing explicit dependence between the two input variables in the XOR model allows for the creation of a successful classifier.
+
+
+## [Discussions](https://discuss.mxnet.io/t/5155)
+
+![](../img/qr_naive-bayes.svg)

@@ -49,7 +49,7 @@ We can see a number of things:
 
 ![Floating-point compute power and energy consumption. ](../img/wattvsprice.svg)
 
-The second curve shows how energy consumption scales mostly linearly with the amount of computation. Secondly, later generations are more efficient. This seems to be contradicted by the graph corresponding to the RTX 2000 series. However, this is a consequence of the TensorCores which draw disproportionally much energy. 
+The second curve shows how energy consumption scales mostly linearly with the amount of computation. Second, later generations are more efficient. This seems to be contradicted by the graph corresponding to the RTX 2000 series. However, this is a consequence of the TensorCores which draw disproportionally much energy. 
 
 ## Summary
 

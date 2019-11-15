@@ -63,7 +63,7 @@ approx = np.sum(epsilon*f)
 true = np.log(2) / 2
 
 d2l.set_figsize()
-d2l.plt.bar(x.asnumpy(), f.asnumpy(), width = epsilon, align = 'edge')
+d2l.plt.bar(x.asnumpy(), f.asnumpy(), width=epsilon, align='edge')
 d2l.plt.plot(x, f, color='black')
 d2l.plt.ylim([0, 1])
 d2l.plt.show()
@@ -261,10 +261,12 @@ ax = d2l.plt.figure().add_subplot(111, projection='3d')
 ax.plot_wireframe(x, y, z)
 d2l.plt.xlabel('x')
 d2l.plt.ylabel('y')
-d2l.plt.xticks([-2,-1,0,1,2])
-d2l.plt.yticks([-2,-1,0,1,2])
+d2l.plt.xticks([-2, -1, 0, 1, 2])
+d2l.plt.yticks([-2, -1, 0, 1, 2])
 d2l.set_figsize()
-ax.set_xlim(-2, 2); ax.set_ylim(-2, 2); ax.set_zlim(0, 1)
+ax.set_xlim(-2, 2)
+ax.set_ylim(-2, 2)
+ax.set_zlim(0, 1)
 ax.dist = 12
 ```
 
@@ -393,3 +395,7 @@ We will meet this integral again when we study continuous random variables in :n
 1. What is $\int_1^2 \frac{1}{x} \;dx$?
 2. Use the change of variables formula to integrate $\int_0^{\sqrt{\pi}}x\sin(x^2)\;dx$.
 3. What is $\int_{[0,1]^2} xy \;dx\;dy$?
+
+## [Discussions](https://discuss.mxnet.io/t/5151)
+
+![](../img/qr_integral-calculus.svg)

@@ -13,7 +13,7 @@ Adam :cite:`Kingma.Ba.2014` combines all these techniques into one efficient lea
 
 ## The Algorithm
 
-One of the key components of Adam is that it uses exponential weighted moving averages (aka leaky averaging) to obtain an estimate of both the momentum and also the second moment of the gradient. That is, it uses the state variables
+One of the key components of Adam is that it uses exponential weighted moving averages (also known as leaky averaging) to obtain an estimate of both the momentum and also the second moment of the gradient. That is, it uses the state variables
 
 $$\begin{aligned}
     \mathbf{v}_t & \leftarrow \beta_1 \mathbf{v}_{t-1} + (1 - \beta_1) \mathbf{g}_t \\
@@ -24,7 +24,7 @@ Here $\beta_1$ and $\beta_2$ are nonnegative weighting parameters. Common choice
 
 $$\hat{\mathbf{v}}_t = \frac{\mathbf{v}_t}{1 - \beta_1^t} \text{ and } \hat{\mathbf{s}}_t = \frac{\mathbf{s}_t}{1 - \beta_2^t}.$$
 
-Armed with the proper estimates we can now write out the update equations. Firstly we rescale the gradient in a manner very much akin to that of RMSProp to obtain
+Armed with the proper estimates we can now write out the update equations. First, we rescale the gradient in a manner very much akin to that of RMSProp to obtain
 
 $$\mathbf{g}_t' = \frac{\eta \hat{\mathbf{v}}_t}{\sqrt{\hat{\mathbf{s}}_t} + \epsilon}$$
 
@@ -34,7 +34,7 @@ Now we have all the pieces in place to compute updates. This is slightly anticli
 
 $$\mathbf{x}_t \leftarrow \mathbf{x}_{t-1} - \mathbf{g}_t'.$$
 
-Reviewing the design of Adam its inspiration is clear. Momentum and scale are clearly visible in the state variables. Their rather peculiar definition forces us to debias terms (this could be fixed by a slightly different initialization and update condition). Secondly, the combination of both terms is pretty straightforward, given RMSProp. Lastly, the explicit learning rate $\eta$ allows us to control the step length to address issues of convergence. 
+Reviewing the design of Adam its inspiration is clear. Momentum and scale are clearly visible in the state variables. Their rather peculiar definition forces us to debias terms (this could be fixed by a slightly different initialization and update condition). Second, the combination of both terms is pretty straightforward, given RMSProp. Last, the explicit learning rate $\eta$ allows us to control the step length to address issues of convergence. 
 
 ## Implementation 
 
@@ -86,7 +86,7 @@ Whenever $\mathbf{g}_t^2$ has high variance or updates are sparse, $\mathbf{s}_t
 
 $$\mathbf{s}_t \leftarrow \mathbf{s}_{t-1} + (1 - \beta_2) \mathbf{g}_t^2 \odot \mathop{\mathrm{sgn}}(\mathbf{g}_t^2 - \mathbf{s}_{t-1}).$$
 
-The authors furthermore advise to initialize the momentum on a larger initial batch rather than just initial pointwise estimate. We omit the details since they are not material to the discussion and since even without this convergence remains pretty good. 
+The authors furthermore advise to initialize the momentum on a larger initial batch rather than just initial pointwise estimate. We omit the details since they are not material to the discussion and since even without this convergence remains pretty good.
 
 ```{.python .input}
 def yogi(params, states, hyperparams):
@@ -123,6 +123,3 @@ d2l.train_ch10(yogi, init_adam_states(feature_dim),
 
 ![](../img/qr_adam.svg)
 
-```{.python .input}
-
-```

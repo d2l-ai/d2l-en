@@ -40,7 +40,9 @@ Now, let us plot the cumulative distribution function :eqref:`bernoulli-cdf`.
 
 ```{.python .input}
 x = np.arange(-1, 2, 0.01)
-F = lambda x: 0 if x < 0 else 1 if x > 1 else 1 - p
+
+def F(x):
+    return 0 if x < 0 else 1 if x > 1 else 1 - p
 
 d2l.plot(x, np.array([F(y) for y in x]), 'x', 'c.d.f.')
 ```
@@ -55,7 +57,6 @@ We can sample an array of arbitrary shape from a Bernoulli random variable as fo
 ```{.python .input}
 1*(np.random.rand(10, 10) < p)
 ```
-
 
 ## Discrete Uniform
 
@@ -85,7 +86,9 @@ Now, let us plot the cumulative distribution function :eqref:`discrete_uniform-c
 
 ```{.python .input}
 x = np.arange(-1, 6, 0.01)
-F = lambda x: 0 if x < 1 else 1 if x > n else np.floor(x) / n
+
+def F(x):
+    return 0 if x < 1 else 1 if x > n else np.floor(x) / n
 
 d2l.plot(x, np.array([F(y) for y in x]), 'x', 'c.d.f.')
 ```
@@ -122,7 +125,7 @@ $$F(x) = \begin{cases} 0 & x < a, \\ \frac{x-a}{b-a} & x \in [a,b], \\ 1 & x >= 
 Let us first plot the probabilty density function :eqref:`cont_uniform-pdf`.
 
 ```{.python .input}
-a = 1; b = 3
+a, b = 1, 3
 
 x = np.arange(0, 4, 0.01)
 p = (x > a)*(x < b)/(b - a)
@@ -133,7 +136,8 @@ d2l.plot(x, p, 'x', 'p.d.f.')
 Now, let us plot the cumulative distribution function :eqref:`cont_uniform-cdf`.
 
 ```{.python .input}
-F = lambda x: 0 if x < a else 1 if x > b else (x - a) / (b - a)
+def F(x):
+    return 0 if x < a else 1 if x > b else (x - a) / (b - a)
 
 d2l.plot(x, np.array([F(y) for y in x]), 'x', 'c.d.f.')
 ```
@@ -148,7 +152,6 @@ We can an array of arbitrary shape from a uniform random variable as follows.  N
 ```{.python .input}
 (b - a) * np.random.rand(10, 10) + a
 ```
-
 
 ## Binomial
 
@@ -174,8 +177,7 @@ $$F(x) = \begin{cases} 0 & x < 0, \\ \sum_{m \le k} \binom{n}{m} p^m(1-p)^{n-m} 
 Let us first plot the probabilty mass function.
 
 ```{.python .input}
-n = 10
-p = 0.2
+n, p = 10, 0.2
 
 # Compute binomial coefficient
 def binom(n, k):
@@ -197,7 +199,9 @@ Now, let us plot the cumulative distribution function :eqref:`binomial-cdf`.
 ```{.python .input}
 x = np.arange(-1, 11, 0.01)
 cmf = np.cumsum(pmf)
-F = lambda x: 0 if x < 0 else 1 if x > n else cmf[int(x)]
+
+def F(x):
+    return 0 if x < 0 else 1 if x > n else cmf[int(x)]
 
 d2l.plot(x, np.array([F(y) for y in x.tolist()]), 'x', 'c.d.f.')
 ```
@@ -210,9 +214,8 @@ While this result is not simple, the means and variances are.  If $X \sim \mathr
 This can be sampled as follows.
 
 ```{.python .input}
-np.random.binomial(n, p, size = (10,10))
+np.random.binomial(n, p, size=(10, 10))
 ```
-
 
 ## Poisson
 Let us now perform a thought experiment.  Let us say we are standing at a bus stop and we want to know how many buses will arrive in the next minute.  Lets start by considering $X^{(1)} \sim \mathrm{Bernoulli}(p)$ Which is simply the probability that a bus arrives in the one minute window.  For bus stops far from an urban center, this might be a pretty good approximation since we will never see more than one bus at a time.
@@ -266,7 +269,8 @@ Now, let us plot the cumulative distribution function :eqref:`poisson-cdf`.
 ```{.python .input}
 x = np.arange(-1, 21, 0.01)
 cmf = np.cumsum(pmf)
-F = lambda x: 0 if x < 0 else 1 if x > n else cmf[int(x)]
+def F(x): 
+    return 0 if x < 0 else 1 if x > n else cmf[int(x)]
 
 d2l.plot(x, np.array([F(y) for y in x.tolist()]), 'x', 'c.d.f.')
 ```
@@ -297,7 +301,7 @@ This can be seen to have mean zero and variance one, and so it is plausible to b
 p = 0.2
 ns = [1, 10, 100, 1000]
 d2l.plt.figure(figsize=(10, 3))
-for i in range(4) :
+for i in range(4):
     n = ns[i]
     pmf = np.array([p**i * (1-p)**(n-i) * binom(n, i) for i in range(n + 1)])
     d2l.plt.subplot(1, 4, i + 1)
@@ -326,7 +330,7 @@ $$p_X(x) = \frac{1}{\sqrt{2\pi\sigma^2}}e^{-\frac{(x-\mu)^2}{2\sigma^2}}.$$
 Let us first plot the probability density function :eqref:`gaussian-pdf`.
 
 ```{.python .input}
-mu = 0; sigma = 1
+mu, sigma = 0, 1
 
 x = np.arange(-3, 3, 0.01)
 p = 1 / np.sqrt(2 * np.pi * sigma**2) * np.exp(-(x - mu)**2 / (2 * sigma**2))
@@ -388,3 +392,8 @@ np.random.normal(mu, sigma, size=(10, 10))
 1. What is the standard deviation of a random variable that is the difference $X-Y$ of two indepent binomial random variables $X,Y \sim \mathrm{Binomial}(16,1/2)$.
 2. If we take a Poisson random variable $X \sim \mathrm{Poisson}(\lambda)$ and consider $(X - \lambda)/\sqrt{\lambda}$ as $\lambda \rightarrow \infty$, we can show that this becomes approximately Gaussian.  Why does this make sense?
 3. What is the probability mass function for a sum of two discrete uniform random variables on $n$ elements?
+
+
+## [Discussions](https://discuss.mxnet.io/t/5154)
+
+![](../img/qr_distributions.svg)

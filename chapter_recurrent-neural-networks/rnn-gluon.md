@@ -96,7 +96,7 @@ Compared with the last section, this model achieves comparable perplexity, albei
 1. Compare the implementation with the previous section.
     * Why does Gluon's implementation run faster?
     * If you observe a significant difference beyond speed, try to find the reason.
-1. Can you overfit the model?
+1. Can you make the model overfit?
     * Increase the number of hidden units.
     * Increase the number of iterations.
     * What happens if you adjust the clipping parameter?

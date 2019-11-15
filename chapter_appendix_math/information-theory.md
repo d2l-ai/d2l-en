@@ -18,7 +18,7 @@ Next, they flip over a card and say, "I see a heart."  This provides us some inf
 
 Next, they flip over a card and say, "This is the $3$ of spades."  This is more information.  Indeed there were $52$ equally likely possible outcomes, and our friend told us which one it was.  This should be a medium amount of information.
 
-Let us take this to the logical extreme.  Suppose that lastly that they flip over every card from the deck and read off the entire sequence of the shuffled deck.  There are $52!$ different orders to the deck, again all equally likely, so we need a lot of information to know which one it is.
+Let us take this to the logical extreme.  Suppose that finally they flip over every card from the deck and read off the entire sequence of the shuffled deck.  There are $52!$ different orders to the deck, again all equally likely, so we need a lot of information to know which one it is.
 
 Any notion of information we develop must conform to this intuition.  Indeed, in the next sections we will learn how to compute that these events have $0\text{ bits}$, $2\text{ bits}$, $~5.7\text{ bits}$, and $~225.6\text{ bits}$ of information respectively.
 
@@ -43,8 +43,8 @@ We can calculate self information in MXNet as shown below. Before that, let us f
 
 ```{.python .input}
 from mxnet import np
-from mxnet.ndarray import nansum
 from mxnet.metric import NegativeLogLikelihood
+from mxnet.ndarray import nansum
 import random
 
 def self_information(p):
@@ -152,7 +152,7 @@ Let us implement joint entropy from scratch in MXNet.
 def joint_entropy(p_xy):
     joint_ent = -p_xy * np.log2(p_xy)
     # nansum will sum up the non-nan number
-    out = nansum(joint_ent.as_nd_ndarray()) 
+    out = nansum(joint_ent.as_nd_ndarray())
     return out
 
 joint_entropy(np.array([[0.1, 0.5], [0.1, 0.3]]))
@@ -192,10 +192,10 @@ def conditional_entropy(p_xy, p_x):
     p_y_given_x = p_xy/p_x
     cond_ent = -p_xy * np.log2(p_y_given_x)
     # nansum will sum up the non-nan number
-    out = nansum(cond_ent.as_nd_ndarray()) 
+    out = nansum(cond_ent.as_nd_ndarray())
     return out
 
-conditional_entropy(np.array([[0.1, 0.5], [0.2, 0.3]]), np.array([0.2,0.8]))
+conditional_entropy(np.array([[0.1, 0.5], [0.2, 0.3]]), np.array([0.2, 0.8]))
 ```
 
 ### Mutual Information
@@ -233,11 +233,11 @@ def mutual_information(p_xy, p_x, p_y):
     p = p_xy / (p_x * p_y)
     mutual = -p_xy * np.log2(p)
     # nansum will sum up the non-nan number
-    out = nansum(mutual.as_nd_ndarray()) 
+    out = nansum(mutual.as_nd_ndarray())
     return out
 
-mutual_information(np.array([[0.1, 0.5], [0.1, 0.3]]), 
-                   np.array([0.2, 0.8]), 
+mutual_information(np.array([[0.1, 0.5], [0.1, 0.3]]),
+                   np.array([0.2, 0.8]),
                    np.array([[0.75, 0.25]]))
 ```
 
@@ -469,3 +469,8 @@ nll_loss.get()
     * Still being unhappy with the result, you replace the typesetter by a high quality language model. These can currently obtain perplexity numbers as low as $15$ points per character. The perplexity is defined as a length normalized probability, i.e., $$PPL(x) = \left[p(x)\right]^{1 / \text{length(x)} }.$$ How many bits of randomness do you observe now?
 3. Explain intuitively why $I(X,Y) = H(X) - H(X|Y)$.  Then, show this is true by expressing both sides as an expectation with respect to the joint distribution.
 4. What is the KL Divergence between the two Gaussian distributions $\mathcal{N}(\mu_1,\sigma_1^2)$ and $\mathcal{N}(\mu_2,\sigma_2^2)$?
+
+
+## [Discussions](https://discuss.mxnet.io/t/5157)
+
+![](../img/qr_information-theory.svg)
