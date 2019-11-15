@@ -173,46 +173,11 @@ If the following image shows up, choose "Install" and tap "Enter" as shown in :n
 :width:`700px`
 :label:`fig_cuda_install`
 
-You may also need to answer the following questions.
-
-```bash
-Install NVIDIA Accelerated Graphics Driver for Linux-x86_64 410.48?
-(y)es/(n)o/(q)uit: y
-
-Do you want to install the OpenGL libraries?
-(y)es/(n)o/(q)uit [ default is yes ]: y
-
-Do you want to run nvidia-xconfig?
-This will update the system X configuration file so that the NVIDIA X driver
-is used. The pre-existing X configuration file will be backed up.
-This option should not be used on systems that require a custom
-X configuration, such as systems with multiple GPU vendors.
-(y)es/(n)o/(q)uit [ default is no ]: n
-
-Install the CUDA 10.1 Toolkit?
-(y)es/(n)o/(q)uit: y
-
-Enter Toolkit Location
- [ default is /usr/local/cuda-10.1 ]:
-
-Do you want to install a symbolic link at /usr/local/cuda?
-(y)es/(n)o/(q)uit: y
-
-Install the CUDA 10.1 Samples?
-(y)es/(n)o/(q)uit: n
-```
-
-
-After installing the program, run the following command to view the instance GPU (as shown in :numref:`fig_nvidia-smi`).
+After installing the program, run the following command to view the instance GPU.
 
 ```bash
 nvidia-smi
 ```
-
-
-![ nvidia-smi. ](../img/nvidia-smi.png)
-:width:`700px`
-:label:`fig_nvidia-smi`
 
 Finally, add CUDA to the library path to help other libraries find it.
 
@@ -274,7 +239,8 @@ unzip d2l-en.zip && rm d2l-en.zip
 Then create the conda `d2l` environment and enter `y` for the proceed inquiry as shown in :numref:`fig_conda_create_d2l`.
 
 ```bash
-conda create --name d2l
+conda create --name d2l 
+
 ```
 
 
