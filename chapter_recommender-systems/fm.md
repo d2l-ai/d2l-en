@@ -104,3 +104,7 @@ d2l.train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs, ctx)
 ## Exercise
 * Can you test FM on other dataset such as Avazu, MovieLens, and Criteo datasets?
 * Vary the embedding size to check its impact on performance, can you observe a similar pattern as that of matrix factorization?
+
+## [Discussions](https://discuss.mxnet.io/t/5167)
+
+![](../img/qr_fm.svg)

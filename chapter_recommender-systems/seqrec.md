@@ -199,3 +199,8 @@ d2l.train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
 ## Exercises
 * Conduct an ablation study by removing one of the horizontal and vertical convolutional networks, which component is the more important ?
 * Vary the hyperparameter $L$. Does longer historical interactions bring higher accuracy?
+
+
+## [Discussions](https://discuss.mxnet.io/t/5165)
+
+![](../img/qr_seqrec.svg)

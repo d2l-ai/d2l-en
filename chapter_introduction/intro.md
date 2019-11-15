@@ -815,9 +815,11 @@ Nowadays, search engines use machine learning and behavioral models
 to obtain query-dependent relevance scores. 
 There are entire academic conferences devoted to this subject.
 
-<!-- Add / clean up-->
+
 
 #### Recommender systems
+
+:label:`subsec_recommender_systems`
 
 Recommender systems are another problem setting
 that is related to search and ranking.

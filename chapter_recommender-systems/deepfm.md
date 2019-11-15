@@ -110,3 +110,7 @@ Compared with FM, DeepFM converges faster and achieves better performance.
 ## Exercise
 * Vary the structure of MLP to check its impact on model performance.
 * Change the dataset to Criteo and compare it with the original FM model.
+
+## [Discussions](https://discuss.mxnet.io/t/5168)
+
+![](../img/qr_deepfm.svg)

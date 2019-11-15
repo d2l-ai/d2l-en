@@ -1,4 +1,4 @@
-#  MovieLens Dataset
+#  The MovieLens Dataset
 
 There are a number of datasets that are available for recommendation research. Amongst them, the [MovieLens](https://movielens.org/) dataset is probably the one of the more popular ones. MovieLens is a non-commercial web-based movie recommender system. It is created in 1997 and run by GroupLens, a research lab at the University of Minnesota, in order to gather movie rating data for research purposes.  MovieLens data has been critical for several research studies including personalized recommendation and social psychology.
 
@@ -146,3 +146,7 @@ def split_and_load_ml100k(split_mode="seq-aware", feedback="explicit",
 
 * What other similar recommendation datasets can you find?
 * Go through the [https://movielens.org/](https://movielens.org/) site for more information about MovieLens.
+
+## [Discussions](https://discuss.mxnet.io/t/5159)
+
+![](../img/qr_movielens.svg)
