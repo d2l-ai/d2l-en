@@ -30,7 +30,7 @@ def transform(data, label):
     return np.floor(data.astype('float32') / 128).squeeze(axis=-1), label
 
 mnist_train = gluon.data.vision.MNIST(train=True, transform=transform)
-mnist_test  = gluon.data.vision.MNIST(train=False, transform=transform)
+mnist_test = gluon.data.vision.MNIST(train=False, transform=transform)
 ```
 
 We can access a particular example, which contains the image and the corresponding label.
@@ -110,7 +110,7 @@ X, Y = mnist_train[:]  # all training examples
 
 n_y = np.zeros((10))
 for y in range(10):
-    n_y[y] = (Y==y).sum()
+    n_y[y] = (Y == y).sum()
 P_y = n_y / n_y.sum()
 P_y
 ```
@@ -120,7 +120,7 @@ Now on to slightly more difficult things $P_{xy}$. Since we picked black and whi
 ```{.python .input  n=66}
 n_x = np.zeros((10, 28, 28))
 for y in range(10):
-    n_x[y] = np.array(X.asnumpy()[Y.asnumpy()==y].sum(axis=0))
+    n_x[y] = np.array(X.asnumpy()[Y.asnumpy() == y].sum(axis=0))
 P_xy = (n_x + 1) / (n_y + 1).reshape(10, 1, 1)
 
 d2l.show_images(P_xy, 2, 5);
@@ -186,7 +186,7 @@ classifier works pretty well.
 
 ```{.python .input}
 def predict(X):
-    return [bayes_pred_stable(x).argmax(axis = 0).astype(np.int32) for x in X]
+    return [bayes_pred_stable(x).argmax(axis=0).astype(np.int32) for x in X]
 
 X, y = mnist_test[:18]
 preds = predict(X)
@@ -197,7 +197,7 @@ Finally, let us compute the overall accuracy of the classifier.
 
 ```{.python .input}
 X, y = mnist_test[:]
-preds = np.array(predict(X), dtype = np.int32)
+preds = np.array(predict(X), dtype=np.int32)
 float((preds == y).sum()) / len(y)  # Validation accuracy
 ```
 
