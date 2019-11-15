@@ -77,7 +77,7 @@ As a bit of a historical digression: in the first few decades of neural network 
 Back in our example, this value $8$ is different for different values of $x$, so it makes sense to define it as a function of $x$.  More formally, this value dependent rate of change is referred to as the *derivative* which is written as
 
 $$\frac{df}{dx}(x) = \lim_{\epsilon \rightarrow 0}\frac{f(x+\epsilon) - f(x)}{\epsilon}.$$
-:eqlabel:`eq_der_def`
+:eqlabel:`der-def`
 
 Different texts will use different notations for the derivative. For instance, all of the below notations indicate the same thing:
 
@@ -90,10 +90,10 @@ $$
 \frac{d}{dx}\left[x^4+\cos\left(\frac{x^2+1}{2x-1}\right)\right].
 $$
 
-Often times, it is intuitively useful to unravel the definition of derivative :eqref:`eq_der_def` again to see how a function changes when we make a small change of $x$:
+Often times, it is intuitively useful to unravel the definition of derivative :eqref:`der-def` again to see how a function changes when we make a small change of $x$:
 
 $$\begin{aligned} \frac{df}{dx}(x) = \lim_{\epsilon \rightarrow 0}\frac{f(x+\epsilon) - f(x)}{\epsilon} & \implies \frac{df}{dx}(x) \approx \frac{f(x+\epsilon) - f(x)}{\epsilon} \\ & \implies \epsilon \frac{df}{dx}(x) \approx f(x+\epsilon) - f(x) \\ & \implies f(x+\epsilon) \approx f(x) + \epsilon \frac{df}{dx}(x). \end{aligned}$$
-:eqlabel:`eq_small_change`
+:eqlabel:`small-change`
 
 The last equation is worth explicitly calling out.  It tells us that if you take any function and change the input by a small amount, the output would change by that small amount scaled by the derivative.
 
@@ -120,7 +120,7 @@ If every derivative needed to be separately computed and stored in a table, diff
 * **Product rule.** $\frac{d}{dx}\left(g(x)\cdot h(x)\right) = g(x)\frac{dh}{dx}(x) + \frac{dg}{dx}(x)h(x)$.
 * **Chain rule.** $\frac{d}{dx}g(h(x)) = \frac{dg}{dh}(h(x))\cdot \frac{dh}{dx}(x)$.
 
-Let us see how we may use :eqref:`eq_small_change` to understand these rules.  For the sum rule,consider following chain of reasoning:
+Let us see how we may use :eqref:`small-change` to understand these rules.  For the sum rule,consider following chain of reasoning:
 
 $$
 \begin{aligned}
@@ -134,7 +134,7 @@ $$
 By comparing this result with the fact that $f(x+\epsilon) \approx f(x) + \epsilon \frac{df}{dx}(x)$, we see that $\frac{df}{dx}(x) = \frac{dg}{dx}(x) + \frac{dh}{dx}(x)$ as desired.  The intuition here is: when we change the input $x$, $g$ and $h$ jointly contribute to the change of the output by $\frac{dg}{dx}(x)$ and $\frac{dh}{dx}(x)$.
 
 
-The product is more subtle, and will require a new observation about how to work with these expressions.  We will begin as before using :eqref:`eq_small_change`:
+The product is more subtle, and will require a new observation about how to work with these expressions.  We will begin as before using :eqref:`small-change`:
 
 $$
 \begin{aligned}
@@ -154,7 +154,7 @@ $$
 
 and see that as we send $\epsilon \rightarrow 0$, the right hand term goes to zero as well.
 
-Finally, with the chain rule, we can again progress as before using :eqref:`eq_small_change` and see that
+Finally, with the chain rule, we can again progress as before using :eqref:`small-change` and see that
 
 $$
 \begin{aligned}
