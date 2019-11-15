@@ -260,7 +260,7 @@ and the number of output channels for a convolutional layer.
 The `num_dims` parameter also required by this instance
 is 2 for a fully-connected layer and 4 for a convolutional layer.
 
-Putting aside the algorithmic details,  
+Putting aside the algorithmic details, 
 note the design pattern underlying our implementation of the layer.
 Typically, we define the math in a separate function, say `batch_norm`.
 We then integrate this functionality into a custom layer,

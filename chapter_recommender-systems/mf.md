@@ -136,7 +136,7 @@ def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
           % (metric[2] * num_epochs / timer.sum(), ctx_list))
 ```
 
-Finally,  let us put all things together and train the model. Here, we set the latent factor dimension to 30.
+Finally, let us put all things together and train the model. Here, we set the latent factor dimension to 30.
 
 ```{.python .input  n=5}
 ctx = d2l.try_all_gpus()

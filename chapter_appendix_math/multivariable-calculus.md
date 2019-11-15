@@ -60,7 +60,7 @@ $$
 f(x, y) = \log(3) \text{ with gradient } \nabla f (x, y) = \left[\frac{1}{3}, \frac{2}{3}\right].
 $$
 
-Thus, if we want to approximate $f$ at $(\epsilon_1,\log(2) + \epsilon_2)$,  we see that we should have the specific instance of :eqref:`nabla-use`:
+Thus, if we want to approximate $f$ at $(\epsilon_1,\log(2) + \epsilon_2)$, we see that we should have the specific instance of :eqref:`nabla-use`:
 
 $$
 f(\epsilon_1,\log(2) + \epsilon_2) \approx \log(3) + \frac{1}{3}\epsilon_1 + \frac{2}{3}\epsilon_2.

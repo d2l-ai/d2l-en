@@ -96,7 +96,7 @@ z = x**2 - y**2
 ax = d2l.plt.figure().add_subplot(111, projection='3d')
 ax.plot_wireframe(x, y, z, **{'rstride': 10, 'cstride': 10})
 ax.plot([0], [0], [0], 'rx')
-ticks = [-1,  0, 1]
+ticks = [-1, 0, 1]
 d2l.plt.xticks(ticks)
 d2l.plt.yticks(ticks)
 ax.set_zticks(ticks)
