@@ -43,8 +43,8 @@ We can calculate self information in MXNet as shown below. Before that, let us f
 
 ```{.python .input}
 from mxnet import np
-from mxnet.ndarray import nansum
 from mxnet.metric import NegativeLogLikelihood
+from mxnet.ndarray import nansum
 import random
 
 def self_information(p):

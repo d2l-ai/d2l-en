@@ -73,7 +73,7 @@ We can test this in code to see how good the approximation is.
 import d2l
 from IPython import display
 from mpl_toolkits import mplot3d
-from mxnet import np, npx, autograd
+from mxnet import autograd, np, npx
 npx.set_np()
 
 def f(x, y):
