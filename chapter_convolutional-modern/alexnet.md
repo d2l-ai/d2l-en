@@ -119,7 +119,7 @@ captured in unnatural settings with low resolution.
 
 In 2009, the ImageNet dataset was released,
 challenging researchers to learn models from 1 million examples,
-1, 000 each from 1, 000 distinct categories of objects.
+1,000 each from 1,000 distinct categories of objects.
 The researchers, led by Fei-Fei Li, who introduced this dataset
 leveraged Google Image Search to prefilter large candidate sets
 for each category and employed

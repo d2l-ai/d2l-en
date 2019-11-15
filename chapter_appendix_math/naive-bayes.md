@@ -16,7 +16,7 @@ d2l.use_svg_display()
 
 ## Optical Character Recognition
 
-MNIST :cite:`LeCun.Bottou.Bengio.ea.1998` is one of widely used datasets. It contains 60, 000 images for training and 10, 000 images for validation. Each image contains a handwritten digit from 0 to 9. The task is classifying each image into the corresponding digit.
+MNIST :cite:`LeCun.Bottou.Bengio.ea.1998` is one of widely used datasets. It contains 60,000 images for training and 10,000 images for validation. Each image contains a handwritten digit from 0 to 9. The task is classifying each image into the corresponding digit.
 
 Gluon provides a `MNIST` class in the `data.vision` module to
 automatically retrieve the dataset via our Internet connection.
@@ -103,7 +103,7 @@ for any $y$. So our assumption of conditional independence has taken the complex
 
 ## Training
 
-The problem now is that we do not know $P_{xy}$ and $P_y$. So we need to estimate their values given some training data first. This is *training* the model. Estimating $P_y$ is not too hard. Since we are only dealing with $10$ classes, we may count the number of occurrences $n_y$ for each of the digits and divide it by the total amount of data $n$. For instance, if digit 8 occurs $n_8 = 5, 800$ times and we have a total of $n = 60, 000$ images, the probability estimate is $p(y=8) = 0.0967$.
+The problem now is that we do not know $P_{xy}$ and $P_y$. So we need to estimate their values given some training data first. This is *training* the model. Estimating $P_y$ is not too hard. Since we are only dealing with $10$ classes, we may count the number of occurrences $n_y$ for each of the digits and divide it by the total amount of data $n$. For instance, if digit 8 occurs $n_8 = 5, 800$ times and we have a total of $n = 60,000$ images, the probability estimate is $p(y=8) = 0.0967$.
 
 ```{.python .input  n=50}
 X, Y = mnist_train[:]  # all training examples

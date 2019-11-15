@@ -22,7 +22,7 @@ of distinguishing cats from dogs.
 Say that we do a thorough job in data collection,
 collecting an annotated sets of high-quality 1-megapixel photographs.
 This means that the input into a network has *1 million dimensions*.
-Even an aggressive reduction to *1, 000 hidden dimensions*
+Even an aggressive reduction to *1,000 hidden dimensions*
 would require a *dense* (fully-connected) layer to support $10^9$ parameters.
 Unless we have an extremely large dataset (perhaps billions?),
 lots of GPUs, a talent for extreme distributed optimization,
@@ -31,7 +31,7 @@ learning the parameters of this network may turn out to be impossible.
 
 A careful reader might object to this argument
 on the basis that 1 megapixel resolution may not be necessary.
-However, while you could get away with 100, 000 pixels,
+However, while you could get away with 100,000 pixels,
 we grossly underestimated the number of hidden nodes
 that it typically takes to learn good hidden representations of images.
 Learning a binary classifier with so many parameters

@@ -1,7 +1,7 @@
 # Fine Tuning
 :label:`sec_fine_tuning`
 
-In earlier chapters, we discussed how to train models on the Fashion-MNIST training dataset, which only has 60, 000 images. We also described ImageNet, the most widely used large-scale image dataset in the academic world, with more than 10 million images and objects of over 1000 categories. However, the size of datasets that we often deal with is usually larger than the first, but smaller than the second.
+In earlier chapters, we discussed how to train models on the Fashion-MNIST training dataset, which only has 60,000 images. We also described ImageNet, the most widely used large-scale image dataset in the academic world, with more than 10 million images and objects of over 1000 categories. However, the size of datasets that we often deal with is usually larger than the first, but smaller than the second.
 
 Assume we want to identify different kinds of chairs in images and then push the purchase link to the user. One possible method is to first find a hundred common chairs, take one thousand different images with different angles for each chair, and then train a classification model on the collected image dataset. Although this dataset may be larger than Fashion-MNIST, the number of examples is still less than one tenth of ImageNet. This may result in the overfitting of the complicated model applicable to ImageNet on this dataset. At the same time, because of the limited amount of data, the accuracy of the final trained model may not meet the practical requirements.
 
@@ -38,7 +38,7 @@ npx.set_np()
 
 ### Get the Dataset
 
-The hot dog dataset we use was taken from online images and contains 1, 400 positive images containing hot dogs and same number of negative images containing other foods. 1, 000 images of various classes are used for training and the rest are used for testing.
+The hot dog dataset we use was taken from online images and contains 1, 400 positive images containing hot dogs and same number of negative images containing other foods. 1,000 images of various classes are used for training and the rest are used for testing.
 
 We first download the compressed dataset to the path `../data`. Then, we unzip the downloaded dataset in this path and get two folders, `hotdog/train` and `hotdog/test`. Both folders have `hotdog` and `not-hotdog` category subfolders, each of which has corresponding image files.
 

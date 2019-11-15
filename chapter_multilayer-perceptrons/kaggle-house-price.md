@@ -214,9 +214,9 @@ With house prices, as with stock prices, we care about relative quantities more 
 More concretely, we tend to care more
 about the relative error $\frac{y - \hat{y}}{y}$
 than about the absolute error $y - \hat{y}$.
-For instance, if our prediction is off by USD 100, 000
+For instance, if our prediction is off by USD 100,000
 when estimating the price of a house in Rural Ohio,
-where the value of a typical house is 125, 000 USD,
+where the value of a typical house is 125,000 USD,
 then we are probably doing a horrible job.
 On the other hand, if we err by this amount in Los Altos Hills, California,
 this might represent a stunningly accurate prediction

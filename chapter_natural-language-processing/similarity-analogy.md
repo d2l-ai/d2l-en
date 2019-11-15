@@ -36,7 +36,7 @@ glove_6b50d = text.embedding.create(
     'glove', pretrained_file_name='glove.6B.50d.txt')
 ```
 
-Print the dictionary size. The dictionary contains $400, 000$ words and a special unknown token.
+Print the dictionary size. The dictionary contains $400,000$ words and a special unknown token.
 
 ```{.python .input}
 len(glove_6b50d)
@@ -80,7 +80,7 @@ def get_similar_tokens(query_token, k, embed):
         print('cosine sim=%.3f: %s' % (c, (embed.idx_to_token[int(i)])))
 ```
 
-The dictionary of pre-trained word vector instance `glove_6b50d` already created contains 400, 000 words and a special unknown token. Excluding input words and unknown words, we search for the three words that are the most similar in meaning to "chip".
+The dictionary of pre-trained word vector instance `glove_6b50d` already created contains 400,000 words and a special unknown token. Excluding input words and unknown words, we search for the three words that are the most similar in meaning to "chip".
 
 ```{.python .input}
 get_similar_tokens('chip', 3, glove_6b50d)

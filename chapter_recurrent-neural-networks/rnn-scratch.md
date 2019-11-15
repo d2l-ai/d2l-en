@@ -238,7 +238,7 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, ctx,
     print(predict('traveller'))
 ```
 
-Now we can train a model. Since we only use $10, 000$ tokens in the dataset, so here the model needs more epochs to converge.
+Now we can train a model. Since we only use $10,000$ tokens in the dataset, so here the model needs more epochs to converge.
 
 ```{.python .input}
 num_epochs, lr = 500, 1

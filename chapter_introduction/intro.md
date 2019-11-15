@@ -94,7 +94,7 @@ Try coding it up in a room by yourself
 with nothing but a computer and a code editor.
 How would you write such a program from first principles?
 Think about it... the problem is hard.
-Every second, the microphone will collect roughly 44, 000 samples.
+Every second, the microphone will collect roughly 44,000 samples.
 Each sample is a measurement of the amplitude of the sound wave.
 What rule could map reliably from a snippet of raw audio to confident predictions ``{yes, no}`` on whether the snippet contains the wake word?
 If you are stuck, do not worry.
@@ -1284,7 +1284,7 @@ computational power was scarce.
 Second, datasets were relatively small.
 In fact, Fisher's 'Iris dataset' from 1932
 was a popular tool for testing the efficacy of algorithms.
-MNIST with its 60, 000 handwritten digits was considered huge.
+MNIST with its 60,000 handwritten digits was considered huge.
 
 Given the scarcity of data and computation, 
 strong statistical tools such as Kernel Methods, 

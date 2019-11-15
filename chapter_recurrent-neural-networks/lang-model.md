@@ -263,7 +263,7 @@ def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
 
 ## Exercises
 
-1. Suppose there are $100, 000$ words in the training dataset. How much word frequency and multi-word adjacent frequency does a four-gram need to store?
+1. Suppose there are $100,000$ words in the training dataset. How much word frequency and multi-word adjacent frequency does a four-gram need to store?
 1. Review the smoothed probability estimates. Why are they not accurate? Hint: we are dealing with a contiguous sequence rather than singletons.
 1. How would you model a dialogue?
 1. Estimate the exponent of Zipf's law for unigrams, bigrams and trigrams.

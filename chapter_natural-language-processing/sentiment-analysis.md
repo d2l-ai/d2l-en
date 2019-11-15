@@ -15,7 +15,7 @@ npx.set_np()
 
 ## Text Sentiment Classification Data
 
-We use Stanford's Large Movie Review Dataset as the dataset for text sentiment classification[1]. This dataset is divided into two datasets for training and testing purposes, each containing 25, 000 movie reviews downloaded from IMDb. In each dataset, the number of comments labeled as "positive" and "negative" is equal.
+We use Stanford's Large Movie Review Dataset as the dataset for text sentiment classification[1]. This dataset is divided into two datasets for training and testing purposes, each containing 25,000 movie reviews downloaded from IMDb. In each dataset, the number of comments labeled as "positive" and "negative" is equal.
 
 ###  Reading Data
 
