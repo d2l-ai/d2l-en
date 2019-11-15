@@ -9,7 +9,7 @@ Learning is all about making assumptions. If we want to classify a new data poin
 %matplotlib inline
 import d2l
 import math
-from mxnet import np, npx, gluon
+from mxnet import gluon, np, npx
 npx.set_np()
 d2l.use_svg_display()
 ```
