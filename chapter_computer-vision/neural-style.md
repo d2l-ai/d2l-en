@@ -144,9 +144,9 @@ def style_loss(Y_hat, gram_Y):
 
 ### Total Variance Loss
 
-Sometimes, the composite images we learn have a lot of high-frequency noise, particularly bright or dark pixels. One common noise reduction method is total variation denoising. We assume that $x_{i,j}$ represents the pixel value at the coordinate $(i,j)$, so the total variance loss is:
+Sometimes, the composite images we learn have a lot of high-frequency noise, particularly bright or dark pixels. One common noise reduction method is total variation denoising. We assume that $x_{i, j}$ represents the pixel value at the coordinate $(i, j)$, so the total variance loss is:
 
-$$\sum_{i,j} \left|x_{i,j} - x_{i+1,j}\right| + \left|x_{i,j} - x_{i,j+1}\right|$$
+$$\sum_{i, j} \left|x_{i, j} - x_{i+1, j}\right| + \left|x_{i, j} - x_{i, j+1}\right|$$
 
 We try to make the values of neighboring pixels as similar as possible.
 
@@ -215,7 +215,7 @@ def train(X, contents_Y, styles_Y, ctx, lr, num_epochs, lr_decay_epoch):
     X, styles_Y_gram, trainer = get_inits(X, ctx, lr, styles_Y)
     animator = d2l.Animator(xlabel='epoch', ylabel='loss', xlim=[1, num_epochs],
                             legend=['content', 'style', 'TV'],
-                            ncols=2, figsize=(7,2.5))
+                            ncols=2, figsize=(7, 2.5))
     for epoch in range(1, num_epochs+1):
         with autograd.record():
             contents_Y_hat, styles_Y_hat = extract_features(

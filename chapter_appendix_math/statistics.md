@@ -43,8 +43,8 @@ xd = np.arange(np.min(xs),np.max(xs),0.01)
 yd = np.exp(-xd**2/2)/np.sqrt(2*np.pi)
     
 # Plot the results
-d2l.plot(xd,yd,'x','density')
-d2l.plt.scatter(xs,ys)
+d2l.plot(xd, yd, 'x', 'density')
+d2l.plt.scatter(xs, ys)
 d2l.plt.axvline(x=0)
 d2l.plt.axvline(x=np.mean(xs), linestyle='--',color='purple')
 d2l.plt.title("Sample Mean: {:.2f}".format(float(np.mean(xs))))
@@ -243,7 +243,7 @@ Mathematically, a *confidence interval* for the true parameter $\theta$ is an in
 $$P_{\theta} (C_n \ni \theta) \geq 1 - \alpha, \forall \theta.$$
 :eqlabel:`eq_confidence`
 
-Here $\alpha \in (0,1)$, and $1 - \alpha$ is called the *confidence level* or *coverage* of the interval. This is the same $\alpha$ as the significance level as we discussed about above.
+Here $\alpha \in (0, 1)$, and $1 - \alpha$ is called the *confidence level* or *coverage* of the interval. This is the same $\alpha$ as the significance level as we discussed about above.
 
 Note that :eqref:`eq_confidence` is about variable $C_n$, not about the fixed $\theta$. To emphasize this, we write $P_{\theta} (C_n \ni \theta)$ rather than $P_{\theta} (\theta \in C_n)$.
 
@@ -271,11 +271,11 @@ T = \frac{\hat\mu_n - \mu}{\hat\sigma_n/\sqrt{n}},
 $$
 we obtain a random variable following a well-known distribution called the *Student's t-distribution on $n-1$ degrees of freedom*.
 
-This distribution is very well studied, and it is known, for instance, that as $n\rightarrow \infty$, it is approximately a standard Gaussian, and thus by looking up values of the Gaussian c.d.f. in a table, we may conclude that the value of $T$ is in the interval $[-1.96,1.96]$ at least $95\%$ of the time.  For finite values of $n$, the interval needs to be somewhat larger, but are well known and precomputed in tables.
+This distribution is very well studied, and it is known, for instance, that as $n\rightarrow \infty$, it is approximately a standard Gaussian, and thus by looking up values of the Gaussian c.d.f. in a table, we may conclude that the value of $T$ is in the interval $[-1.96, 1.96]$ at least $95\%$ of the time.  For finite values of $n$, the interval needs to be somewhat larger, but are well known and precomputed in tables.
 
 Thus, we may conclude that for large $n$,
 $$
-P\left(\frac{\hat\mu_n - \mu}{\hat\sigma_n/\sqrt{n}} \in [-1.96,1.96]\right) \ge 0.95.
+P\left(\frac{\hat\mu_n - \mu}{\hat\sigma_n/\sqrt{n}} \in [-1.96, 1.96]\right) \ge 0.95.
 $$
 Rearranging this by multiplying both sides by $\hat\sigma_n/\sqrt{n}$ and then adding $\hat\mu_n$, we obtain
 $$

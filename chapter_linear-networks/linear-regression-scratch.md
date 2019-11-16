@@ -304,7 +304,7 @@ for epoch in range(num_epochs):
     for X, y in data_iter(batch_size, features, labels):
         with autograd.record():
             l = loss(net(X, w, b), y)  # Minibatch loss in X and y
-        l.backward()  # Compute gradient on l with respect to [w,b]
+        l.backward()  # Compute gradient on l with respect to [w, b]
         sgd([w, b], lr, batch_size)  # Update parameters using their gradient
     train_l = loss(net(features, w, b), labels)
     print('epoch %d, loss %f' % (epoch + 1, train_l.mean().asnumpy()))

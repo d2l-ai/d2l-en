@@ -87,7 +87,7 @@ The RoI pooling layer in Fast R-CNN is somewhat different from the pooling
 layers we have discussed before. In a normal pooling layer, we set the pooling
 window, padding, and stride to control the output shape. In an RoI pooling
 layer, we can directly specify the output shape of each region, such as
-specifying the height and width of each region as $h_2,w_2$. Assuming that the
+specifying the height and width of each region as $h_2, w_2$. Assuming that the
 height and width of the RoI window are $h$ and $w$, this window is divided into
 a grid of sub-windows with the shape $h_2 \times w_2$. The size of each
 sub-window is about $(h/h_2) \times (w/w_2)$. The sub-window height and width
@@ -115,13 +115,13 @@ X = np.arange(16).reshape(1, 1, 4, 4)
 X
 ```
 
-Assume that the height and width of the image are both 40 pixels and that selective search generates two proposed regions on the image. Each region is expressed as five elements: the region's object category and the $x,y$ coordinates of its upper-left and bottom-right corners.
+Assume that the height and width of the image are both 40 pixels and that selective search generates two proposed regions on the image. Each region is expressed as five elements: the region's object category and the $x, y$ coordinates of its upper-left and bottom-right corners.
 
 ```{.python .input  n=5}
 rois = np.array([[0, 0, 0, 20, 20], [0, 0, 10, 30, 30]])
 ```
 
-Because the height and width of `X` are $1/10$ of the height and width of the image, the coordinates of the two proposed regions are multiplied by 0.1 according to the `spatial_scale`, and then the RoIs are labeled on `X` as `X[:,:,0:3,0:3]` and `X[:,:,1:4,0:4]`, respectively. Finally, we divide the two RoIs into a sub-window grid and extract features with a height and width of 2.
+Because the height and width of `X` are $1/10$ of the height and width of the image, the coordinates of the two proposed regions are multiplied by 0.1 according to the `spatial_scale`, and then the RoIs are labeled on `X` as `X[:, :, 0:3, 0:3]` and `X[:, :, 1:4, 0:4]`, respectively. Finally, we divide the two RoIs into a sub-window grid and extract features with a height and width of 2.
 
 ```{.python .input  n=6}
 npx.roi_pooling(X, rois, pooled_size=(2, 2), spatial_scale=0.1)

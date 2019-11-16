@@ -23,7 +23,7 @@ Three gates are introduced in LSTMs: the input gate, the forget gate, and the ou
 
 ### Input Gates, Forget Gates, and Output Gates
 
-Just like with GRUs, the data feeding into the LSTM gates is the input at the current timestep $\mathbf{X}_t$ and the hidden state of the previous timestep $\mathbf{H}_{t-1}$. These inputs are processed by a fully connected layer and a sigmoid activation function to compute the values of input, forget and output gates. As a result, the three gates all output values in the range of $[0,1]$. :numref:`lstm_0` illustrates the data flow for the input, forget, and output gates.
+Just like with GRUs, the data feeding into the LSTM gates is the input at the current timestep $\mathbf{X}_t$ and the hidden state of the previous timestep $\mathbf{H}_{t-1}$. These inputs are processed by a fully connected layer and a sigmoid activation function to compute the values of input, forget and output gates. As a result, the three gates all output values in the range of $[0, 1]$. :numref:`lstm_0` illustrates the data flow for the input, forget, and output gates.
 
 ![Calculation of input, forget, and output gates in an LSTM. ](../img/lstm_0.svg)
 :label:`lstm_0`

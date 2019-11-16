@@ -8,7 +8,7 @@ Convexity plays a vital role in the design of optimization algorithms. This is l
 
 ### Sets
 
-Sets are the basis of convexity. Simply put, a set $X$ in a vector space is convex if for any $a, b \in X$ the line segment connecting $a$ and $b$ is also in $X$. In mathematical terms this means that for all $\lambda \in [0,1]$ we have 
+Sets are the basis of convexity. Simply put, a set $X$ in a vector space is convex if for any $a, b \in X$ the line segment connecting $a$ and $b$ is also in $X$. In mathematical terms this means that for all $\lambda \in [0, 1]$ we have 
 
 $$\lambda \cdot a + (1-\lambda) \cdot b \in X \text{ whenever } a, b \in X.$$
 
@@ -29,7 +29,7 @@ Typically the problems in deep learning are defined on convex domains. For insta
 
 ### Functions
 
-Now that we have convex sets we can introduce convex functions $f$. Given a convex set $X$ a function defined on it $f: X \to \mathbb{R}$ is convex if for all $x, x' \in X$ and for all $\lambda \in [0,1]$ we have 
+Now that we have convex sets we can introduce convex functions $f$. Given a convex set $X$ a function defined on it $f: X \to \mathbb{R}$ is convex if for all $x, x' \in X$ and for all $\lambda \in [0, 1]$ we have 
 
 $$\lambda f(x) + (1-\lambda) f(x') \geq f(\lambda x + (1-\lambda) x').$$
 
@@ -104,9 +104,9 @@ Convex functions define convex sets as *below-sets*. They are defined as
 
 $$S_b := \{x | x \in X \text{ and } f(x) \leq b\}.$$
 
-Such sets are convex. Let us prove this quickly. Remember that for any $x, x' \in S_b$ we need to show that $\lambda x + (1-\lambda) x' \in S_b$ as long as $\lambda \in [0,1]$. But this follows directly from the definition of convexity since $f(\lambda x + (1-\lambda) x') \leq \lambda f(x) + (1-\lambda) f(x') \leq b$. 
+Such sets are convex. Let us prove this quickly. Remember that for any $x, x' \in S_b$ we need to show that $\lambda x + (1-\lambda) x' \in S_b$ as long as $\lambda \in [0, 1]$. But this follows directly from the definition of convexity since $f(\lambda x + (1-\lambda) x') \leq \lambda f(x) + (1-\lambda) f(x') \leq b$. 
 
-Have a look at the function $f(x,y) = 0.5 x^2 + \cos(2 \pi y)$ below. It is clearly nonconvex. The level sets are correspondingly nonconvex. In fact, they are typically composed of disjoint sets.
+Have a look at the function $f(x, y) = 0.5 x^2 + \cos(2 \pi y)$ below. It is clearly nonconvex. The level sets are correspondingly nonconvex. In fact, they are typically composed of disjoint sets.
 
 ```{.python .input}
 x, y = np.meshgrid(np.linspace(-1, 1, 101), np.linspace(-1, 1, 101), indexing='ij')
@@ -114,14 +114,14 @@ x, y = np.meshgrid(np.linspace(-1, 1, 101), np.linspace(-1, 1, 101), indexing='i
 z = x**2 + 0.5 * np.cos(2 * np.pi * y)
 
 # Plot the 3D surface
-d2l.set_figsize((6,4))
+d2l.set_figsize((6, 4))
 ax = d2l.plt.figure().add_subplot(111, projection='3d')
 ax.plot_wireframe(x, y, z, **{'rstride': 10, 'cstride': 10})
 ax.contour(x, y, z, offset=-1)
 ax.set_zlim(-1, 1.5)
 
 # Adjust labels
-for func in [d2l.plt.xticks, d2l.plt.yticks, ax.set_zticks]: func([-1,0,1])
+for func in [d2l.plt.xticks, d2l.plt.yticks, ax.set_zticks]: func([-1, 0, 1])
 ```
 
 ### Derivatives and Convexity
@@ -141,8 +141,8 @@ $$f''(x) = \lim_{\epsilon \to 0} \frac{f(x+\epsilon) + f(x - \epsilon) - 2f(x)}{
 To see that the converse is true we use the fact that $f'' \geq 0$ implies that $f'$ is a monotonically increasing function. Let $a < x < b$ be three points in $\mathbb{R}$. We use the mean value theorem to express 
 
 $$\begin{aligned}
-f(x) - f(a) & = (x-a) f'(\alpha) \text{ for some } \alpha \in [a,x] \text{ and } \\
-f(b) - f(x) & = (b-x) f'(\beta) \text{ for some } \beta \in [x,b].
+f(x) - f(a) & = (x-a) f'(\alpha) \text{ for some } \alpha \in [a, x] \text{ and } \\
+f(b) - f(x) & = (b-x) f'(\beta) \text{ for some } \beta \in [x, b].
 \end{aligned}$$
 
 By monotonicity $f'(\beta) \geq f'(\alpha)$, hence 
@@ -226,7 +226,7 @@ In the context of deep learning the main purpose of convex functions is to motiv
     * Prove that it is sufficient to check only the points on the boundary.
     * Prove that it is sufficient to check only the vertices of the set.
 1. Denote by $B_p[r] := \{\mathbf{x} | \mathbf{x} \in \mathbb{R}^d \text{ and } \|\mathbf{x}\|_p \leq r\}$ the ball of radius $r$ using the $p$-norm. Prove that $B_p[r]$ is convex for all $p \geq 1$.
-1. Given convex functions $f$ and $g$ show that $\mathrm{max}(f,g)$ is convex, too. Prove that $\mathrm{min}(f,g)$ is not convex.
+1. Given convex functions $f$ and $g$ show that $\mathrm{max}(f, g)$ is convex, too. Prove that $\mathrm{min}(f, g)$ is not convex.
 1. Prove that the normalization of the softmax function is convex. More specifically prove the convexity of 
     $f(x) = \log \sum_i \exp(x_i)$.
 1. Prove that linear subspaces are convex sets, i.e., $X = \{\mathbf{x} | \mathbf{W} \mathbf{x} = \mathbf{b}\}$. 

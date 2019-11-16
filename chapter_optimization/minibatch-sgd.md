@@ -31,9 +31,9 @@ from mxnet.gluon import nn
 npx.set_np()
 
 timer = d2l.Timer()
-A = np.zeros((1024,1024))
-B = np.random.normal(0,1,(1024,1024))
-C = np.random.normal(0,1,(1024,1024))
+A = np.zeros((1024, 1024))
+B = np.random.normal(0, 1,(1024, 1024))
+C = np.random.normal(0, 1,(1024, 1024))
 ```
 
 Element-wise assignment simply iterates over all rows and columns of $B$ and $C$ respectively to assign the value to $A$.
@@ -43,7 +43,7 @@ Element-wise assignment simply iterates over all rows and columns of $B$ and $C$
 timer.start()
 for i in range(1024):
     for j in range(1024):
-        A[i,j] = np.dot(B[i,:], C[:,j])
+        A[i, j] = np.dot(B[i,:], C[:,j])
 A.wait_to_read()
 timer.stop()
 ```
@@ -101,7 +101,7 @@ As we can see, the computation on the minibatch is essentially as efficient as o
 
 ## Reading Data
 
-Let's have a look at how minibatches are efficiently generated from data. In the following we use a dataset developed by NASA to test the wing [noise from different aircraft](https://archive.ics.uci.edu/ml/datasets/Airfoil+Self-Noise) to compare these optimization algorithms. For convenience we only use the first 1,500 examples. The data is whitened for preprocessing, i.e. we remove the mean and rescale the variance to $1$ per coordinate.
+Let's have a look at how minibatches are efficiently generated from data. In the following we use a dataset developed by NASA to test the wing [noise from different aircraft](https://archive.ics.uci.edu/ml/datasets/Airfoil+Self-Noise) to compare these optimization algorithms. For convenience we only use the first $1,500$ examples. The data is whitened for preprocessing, i.e. we remove the mean and rescale the variance to $1$ per coordinate.
 
 ```{.python .input  n=1}
 # Saved in the d2l package for later use

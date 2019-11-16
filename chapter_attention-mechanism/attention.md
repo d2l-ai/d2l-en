@@ -64,10 +64,10 @@ To illustrate how does this function work, we construct two $2 \times 4$ matrixe
 
 
 ```{.python .input  n=5}
-masked_softmax(np.random.uniform(size=(2,2,4)), np.array([2,3]))
+masked_softmax(np.random.uniform(size=(2, 2, 4)), np.array([2, 3]))
 ```
 
-Moreover, the second operator `batched_dot` takes two inputs $X$ and $Y$ with shapes $(b, n, m)$ and $(b, m, k)$, respectively, and returns an output with shape $(b, n, k)$. To be specific, it computes $b$ dot products for $i= \{1,\ldots,b\}$, i.e., 
+Moreover, the second operator `batched_dot` takes two inputs $X$ and $Y$ with shapes $(b, n, m)$ and $(b, m, k)$, respectively, and returns an output with shape $(b, n, k)$. To be specific, it computes $b$ dot products for $i= \{1,\ldots, b\}$, i.e., 
 
 $$Z[i,:,:] = X[i,:,:]  Y[i,:,:] $$
 
@@ -75,7 +75,7 @@ $$Z[i,:,:] = X[i,:,:]  Y[i,:,:] $$
 Here, we will not dive into the detailed implementation of `batched_dot`. Rather, for convenience, we simply call `npx.batched_dot` as a built-in function in MXNet.
 
 ```{.python .input  n=4}
-npx.batch_dot(np.ones((2,1,3)), np.ones((2,3,2)))
+npx.batch_dot(np.ones((2, 1, 3)), np.ones((2, 3, 2)))
 ```
 
 ## Dot Product Attention
@@ -119,9 +119,9 @@ First, we create two batches, with each batch has one query and 10 key-value pai
 ```{.python .input  n=6}
 atten = DotProductAttention(dropout=0.5)
 atten.initialize()
-keys = np.ones((2,10,2))
-values = np.arange(40).reshape(1,10,4).repeat(2,axis=0)
-atten(np.ones((2,1,2)), keys, values, np.array([2, 6]))
+keys = np.ones((2, 10, 2))
+values = np.arange(40).reshape(1, 10, 4).repeat(2, axis=0)
+atten(np.ones((2, 1, 2)), keys, values, np.array([2, 6]))
 ```
 
 
@@ -165,7 +165,7 @@ To test the above class `MLPAttention`, we use the same inputs as in the proviou
 ```{.python .input  n=8}
 atten = MLPAttention(units=8, dropout=0.1)
 atten.initialize()
-atten(np.ones((2,1,2)), keys, values, np.array([2, 6]))
+atten(np.ones((2, 1, 2)), keys, values, np.array([2, 6]))
 ```
 
 ## Summary

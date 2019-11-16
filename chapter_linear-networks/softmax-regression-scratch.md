@@ -73,7 +73,7 @@ Note that if `X` is an array with shape `(2, 3)`
 and we sum over the columns (`X.sum(axis=0`),
 the result will be a (1D) vector with shape `(3,)`.
 If we want to keep the number of axes in the original array
-(resulting in a 2D array with shape `(1,3)`),
+(resulting in a 2D array with shape `(1, 3)`),
 rather than collapsing out the dimension that we summed over
 we can specify `keepdims=True` when invoking `sum`.
 
@@ -378,7 +378,7 @@ def predict_ch3(net, test_iter, n=6):
     trues = d2l.get_fashion_mnist_labels(y)
     preds = d2l.get_fashion_mnist_labels(net(X).argmax(axis=1))
     titles = [true+'\n'+ pred for true, pred in zip(trues, preds)]
-    d2l.show_images(X[0:n].reshape(n,28,28), 1, n, titles=titles[0:n])
+    d2l.show_images(X[0:n].reshape(n, 28, 28), 1, n, titles=titles[0:n])
 
 predict_ch3(net, test_iter)
 ```

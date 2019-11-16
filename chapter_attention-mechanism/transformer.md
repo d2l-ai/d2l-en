@@ -53,7 +53,7 @@ Based on the above, the *multi-head attention* layer consists of $h$ parallel se
 ![Multi-head attention](../img/multi-head-attention.svg)
 
 
-To be more specific, assume that the dimension for a query, a key, and a value are $d_q$, $d_k$, and $d_v$, respectively. Then, for each head $i=1,\ldots,h$, we can train the learnable parameters 
+To be more specific, assume that the dimension for a query, a key, and a value are $d_q$, $d_k$, and $d_v$, respectively. Then, for each head $i=1,\ldots, h$, we can train the learnable parameters 
 $\mathbf W_q^{(i)}\in\mathbb R^{p_q\times d_q}$,
 $\mathbf W_k^{(i)}\in\mathbb R^{p_k\times d_k}$,
 and $\mathbf W_v^{(i)}\in\mathbb R^{p_v\times d_v}$. Therefore, the output for each head can be demonstrated by
@@ -89,7 +89,8 @@ class MultiHeadAttention(nn.Block):
     def forward(self, query, key, value, valid_length):
         # query, key, and value shape: (batch_size, seq_len, dim), 
         # where seq_len is the length of input sequence
-        # valid_length shape is either (batch_size, ) or (batch_size, seq_len).
+        # valid_length shape is either (batch_size, ) 
+        # or (batch_size, seq_len).
     
         # Project and transpose query, key, and value from 
         # (batch_size, seq_len, hidden_size * num_heads) to
@@ -107,8 +108,8 @@ class MultiHeadAttention(nn.Block):
         
         output = self.attention(query, key, value, valid_length)
         
-        # Transpose from (batch_size * num_heads, seq_len, hidden_size) back to
-        # (batch_size, seq_len, hidden_size * num_heads)
+        # Transpose from (batch_size * num_heads, seq_len, hidden_size) back 
+        # to (batch_size, seq_len, hidden_size * num_heads)
         output_concat = transpose_output(output, self.num_heads)
         return self.W_o(output_concat)
 ```
@@ -119,7 +120,8 @@ Here are the definitions of the transpose functions `transpose_qkv` and `transpo
 def transpose_qkv(X, num_heads):
     # Original X shape: (batch_size, seq_len, hidden_size * num_heads),
     # -1 means inferring its value, 
-    # after first reshape, X shape: (batch_size, seq_len, num_heads, hidden_size)
+    # after first reshape, X shape: 
+    # (batch_size, seq_len, num_heads, hidden_size)
     X = X.reshape(X.shape[0], X.shape[1], num_heads, -1)
     
     # After transpose, X shape: (batch_size, num_heads, seq_len, hidden_size)
@@ -144,13 +146,13 @@ Let us validate the `MultiHeadAttention` model in the a toy example. Create a mu
 cell = MultiHeadAttention(100, 10, 0.5)
 cell.initialize()
 X = np.ones((2, 4, 5))
-valid_length = np.array([2,3])
+valid_length = np.array([2, 3])
 cell(X, X, X, valid_length).shape
 ```
 
 ## Position-wise Feed-Forward Networks
 
-Another critical component in the transformer block is called *position-wise feed-forward network (FFN)*. It accepts a $3$ dimensional input with shape (batch size, sequence length, feature size). The position-wise FFN consists of two dense layers that applies to the last dimension. Since the same two dense layers are used for each position item in the sequence, we referred it to as *position-wise*. Indeed, it equals to apply two $Conv(1,1)$, i.e., $1 \times 1$ convolution layers.
+Another critical component in the transformer block is called *position-wise feed-forward network (FFN)*. It accepts a $3$ dimensional input with shape (batch size, sequence length, feature size). The position-wise FFN consists of two dense layers that applies to the last dimension. Since the same two dense layers are used for each position item in the sequence, we referred it to as *position-wise*. Indeed, it equals to apply two $Conv(1, 1)$, i.e., $1 \times 1$ convolution layers.
 
 Below, the `PositionWiseFFN` shows how to implement a position-wise FFN with two dense layers of hidden size `ffn_hidden_size` and `hidden_size_out`, respectively.
 
@@ -158,7 +160,8 @@ Below, the `PositionWiseFFN` shows how to implement a position-wise FFN with two
 class PositionWiseFFN(nn.Block):
     def __init__(self, ffn_hidden_size, hidden_size_out, **kwargs):
         super(PositionWiseFFN, self).__init__(**kwargs)
-        self.ffn_1 = nn.Dense(ffn_hidden_size, flatten=False, activation='relu')
+        self.ffn_1 = nn.Dense(ffn_hidden_size, flatten=False, 
+                              activation='relu')
         self.ffn_2 = nn.Dense(hidden_size_out, flatten=False)
 
     def forward(self, X):
@@ -184,7 +187,7 @@ layer = nn.LayerNorm()
 layer.initialize()
 batch = nn.BatchNorm()
 batch.initialize()
-X = np.array([[1,2],[2,3]])
+X = np.array([[1, 2],[2, 3]])
 # compute mean and variance from X in the training mode.
 with autograd.record():
     print('layer norm:',layer(X), '\nbatch norm:', batch(X))
@@ -208,7 +211,7 @@ Due to the residual connection, $X$ and $Y$ should have the same shape.
 ```{.python .input  n=9}
 add_norm = AddNorm(0.5)
 add_norm.initialize()
-add_norm(np.ones((2,3,4)), np.ones((2,3,4))).shape
+add_norm(np.ones((2, 3, 4)), np.ones((2, 3, 4))).shape
 ```
 
 ## Positional Encoding
@@ -219,11 +222,11 @@ So what is the *positional encoding*? Assume that $X\in\mathbb R^{l\times d}$ is
 
 The position $P$ is a 2d matrix, where $i$ refers to the order in the sentence, and $j$ refers to the position along the embedding vector dimension. In this way, each value in the origin sequence is then maintained using the equations below:
 
-$$P_{i,2j} = \sin(i/10000^{2j/d}),$$
+$$P_{i, 2j} = \sin(i/10000^{2j/d}),$$
 
-$$\quad P_{i,2j+1} = \cos(i/10000^{2j/d}),$$
+$$\quad P_{i, 2j+1} = \cos(i/10000^{2j/d}),$$
 
-for $i=0,\ldots,l-1$ and $j=0,\ldots,\lfloor(d-1)/2\rfloor$.
+for $i=0,\ldots, l-1$ and $j=0,\ldots,\lfloor(d-1)/2\rfloor$.
 
 
 An intuitive visualization and implementation of the positional encoding are showing below.
@@ -238,7 +241,7 @@ class PositionalEncoding(nn.Block):
         self.dropout = nn.Dropout(dropout)
         # Create a long enough P
         self.P = np.zeros((1, max_len, embedding_size))
-        X = np.arange(0, max_len).reshape(-1,1) / np.power(
+        X = np.arange(0, max_len).reshape(-1, 1) / np.power(
             10000, np.arange(0, embedding_size, 2)/embedding_size)
         self.P[:, :, 0::2] = np.sin(X)
         self.P[:, :, 1::2] = np.cos(X)
@@ -251,12 +254,13 @@ class PositionalEncoding(nn.Block):
 
 Now we test the `PositionalEncoding` with a toy model for 4 dimensions. As we can see, the $4^{\mathrm{th}}$ dimension has the same frequency as the $5^{\mathrm{th}}$ but with different offset. The $5^{\mathrm{th}}$ and $6^{\mathrm{th}}$ dimension have a lower frequency.
 
+
 ```{.python .input  n=11}
 pe = PositionalEncoding(20, 0)
 pe.initialize()
 Y = pe(np.zeros((1, 100, 20 )))
 d2l.plot(np.arange(100), Y[0, :,4:8].T, figsize=(6, 2.5),
-        legend=["dim %d"%p for p in [4,5,6,7]])
+        legend=["dim %d"%p for p in [4, 5, 6, 7]])
 ```
 
 ## Encoder
@@ -265,9 +269,11 @@ Armed with all the essential components of transformer, let us first build a enc
 
 ```{.python .input  n=12}
 class EncoderBlock(nn.Block):
-    def __init__(self, embedding_size, ffn_hidden_size, num_heads, dropout, **kwargs):
+    def __init__(self, embedding_size, ffn_hidden_size, num_heads, 
+                 dropout, **kwargs):
         super(EncoderBlock, self).__init__(**kwargs)
-        self.attention = MultiHeadAttention(embedding_size, num_heads, dropout)
+        self.attention = MultiHeadAttention(embedding_size, num_heads, 
+                                            dropout)
         self.addnorm_1 = AddNorm(dropout)
         self.ffn = PositionWiseFFN(ffn_hidden_size, embedding_size)
         self.addnorm_2 = AddNorm(dropout)
@@ -299,7 +305,8 @@ class TransformerEncoder(d2l.Encoder):
         self.blks = nn.Sequential()
         for i in range(num_layers):
             self.blks.add(
-                EncoderBlock(embedding_size, ffn_hidden_size, num_heads, dropout))
+                EncoderBlock(embedding_size, ffn_hidden_size, 
+                             num_heads, dropout))
 
     def forward(self, X, valid_length, *args):
         X = self.pos_encoding(self.embed(X) * math.sqrt(self.embedding_size))
@@ -330,12 +337,15 @@ During the training, because the output for the $t$-query could observe all the 
 ```{.python .input  n=16}
 class DecoderBlock(nn.Block):
     # i means it is the i-th block in the decoder
-    def __init__(self, embedding_size, ffn_hidden_size, num_heads, dropout, i, **kwargs):
+    def __init__(self, embedding_size, ffn_hidden_size, num_heads, 
+                 dropout, i, **kwargs):
         super(DecoderBlock, self).__init__(**kwargs)
         self.i = i
-        self.attention_1 = MultiHeadAttention(embedding_size, num_heads, dropout)
+        self.attention_1 = MultiHeadAttention(embedding_size, num_heads, 
+                                              dropout)
         self.addnorm_1 = AddNorm(dropout)
-        self.attention_2 = MultiHeadAttention(embedding_size, num_heads, dropout)
+        self.attention_2 = MultiHeadAttention(embedding_size, num_heads, 
+                                              dropout)
         self.addnorm_2 = AddNorm(dropout)
         self.ffn = PositionWiseFFN(ffn_hidden_size, embedding_size)
         self.addnorm_3 = AddNorm(dropout)
@@ -388,7 +398,8 @@ class TransformerDecoder(d2l.Decoder):
         self.blks = nn.Sequential()
         for i in range(num_layers):
             self.blks.add(
-                DecoderBlock(embedding_size, ffn_hidden_size, num_heads, dropout, i))
+                DecoderBlock(embedding_size, ffn_hidden_size, num_heads, 
+                             dropout, i))
         self.dense = nn.Dense(vocab_size, flatten=False)
 
     def init_state(self, enc_outputs, env_valid_lengh, *args):
@@ -415,9 +426,11 @@ num_hiddens, num_heads = 64, 4
 src_vocab, tgt_vocab, train_iter = d2l.load_data_nmt(batch_size, num_steps)
 
 encoder = TransformerEncoder(
-    len(src_vocab), embedding_size, num_hiddens, num_heads, num_layers, dropout)
+    len(src_vocab), embedding_size, num_hiddens, num_heads, num_layers, 
+    dropout)
 decoder = TransformerDecoder(
-    len(src_vocab), embedding_size, num_hiddens, num_heads, num_layers, dropout)
+    len(src_vocab), embedding_size, num_hiddens, num_heads, num_layers, 
+    dropout)
 model = d2l.EncoderDecoder(encoder, decoder)
 d2l.train_s2s_ch8(model, train_iter, lr, num_epochs, ctx)
 ```

@@ -16,15 +16,15 @@ $$
 \end{bmatrix}.
 $$
 
-If we apply $A$ to any vector $\mathbf{v} = [x,y]^\top$, 
-we obtain a vector $\mathbf{v}A = [2x,-y]^\top$.
+If we apply $A$ to any vector $\mathbf{v} = [x, y]^\top$, 
+we obtain a vector $\mathbf{v}A = [2x, -y]^\top$.
 This has an intuitive interpretation:
 stretch the vector to be twice as wide in the $x$-direction,
 and then flip it in the $y$-direction.
 
 However, there are *some* vectors for which something remains unchanged.
-Namely $[1,0]^\top$ gets sent to $[2,0]^\top$
-and $[0,1]^\top$ gets sent to $[0,-1]^\top$.
+Namely $[1, 0]^\top$ gets sent to $[2, 0]^\top$
+and $[0, 1]^\top$ gets sent to $[0, -1]^\top$.
 These vectors are still in the same line,
 and the only modification is that the matrix stretches them
 by a factor of $2$ and $-1$ respectively.
@@ -85,7 +85,7 @@ $$
 \end{bmatrix}\begin{bmatrix}x \\ y\end{bmatrix}  = \begin{bmatrix}4x \\ 4y\end{bmatrix} .
 $$
 
-We can solve this with the vectors $[1,-1]^\top$ and $[1,2]^\top$ respectively.
+We can solve this with the vectors $[1, -1]^\top$ and $[1, 2]^\top$ respectively.
 
 We can check this in code using the built-in `numpy.linalg.eig` routine.
 
@@ -199,7 +199,7 @@ $$
 \end{bmatrix},
 $$
 
-has only a single eigenvector, namely $(0,1)$. 
+has only a single eigenvector, namely $(0, 1)$. 
 To handle such matrices, we require more advanced techniques 
 than we can cover (such as the Jordan Normal Form, or Singular Value Decomposition).
 We will often need to restrict our attention to those matrices 
@@ -244,13 +244,13 @@ We have $r_1 = 0.3$, $r_2 = 0.6$, $r_3 = 0.8$ and $r_4 = 0.9$.
 The matrix is symmetric, so all eigenvalues are real.
 This means that all of our eigenvalues will be in one of the ranges of 
 
-$$[a_{11}-r_1,a_{11}+r_1] = [0.7,1.3], $$
+$$[a_{11}-r_1, a_{11}+r_1] = [0.7, 1.3], $$
 
-$$[a_{22}-r_2,a_{22}+r_2] = [2.4,3.6], $$
+$$[a_{22}-r_2, a_{22}+r_2] = [2.4, 3.6], $$
 
-$$[a_{33}-r_3,a_{33}+r_3] = [4.2,5.8], $$
+$$[a_{33}-r_3, a_{33}+r_3] = [4.2, 5.8], $$
 
-$$[a_{44}-r_4,a_{44}+r_4] = [8.1,9.9]. $$
+$$[a_{44}-r_4, a_{44}+r_4] = [8.1, 9.9]. $$
 
 
 Performing the numerical computation shows 
