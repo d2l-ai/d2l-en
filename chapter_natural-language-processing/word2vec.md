@@ -39,7 +39,7 @@ $$P(\textrm{"the"},\textrm{"man"},\textrm{"his"},\textrm{"son"}\mid\textrm{"love
 
 We assume that, given the central target word, the context words are generated independently of each other. In this case, the formula above can be rewritten as
 
-$$P(\textrm{"the"}\mid\textrm{"loves"})\cdotP(\textrm{"man"}\mid\textrm{"loves"})\cdotP(\textrm{"his"}\mid\textrm{"loves"})\cdotP(\textrm{"son"}\mid\textrm{"loves"}).$$
+$$P(\textrm{"the"}\mid\textrm{"loves"})\cdot P(\textrm{"man"}\mid\textrm{"loves"})\cdot P(\textrm{"his"}\mid\textrm{"loves"})\cdot P(\textrm{"son"}\mid\textrm{"loves"}).$$
 
 ![The skip-gram model cares about the conditional probability of generating context words for a given central target word. ](../img/skip-gram.svg)
 
@@ -137,3 +137,7 @@ We then use the same method to obtain the gradients for other word vectors. Unli
 ## [Discussions](https://discuss.mxnet.io/t/2385)
 
 ![](../img/qr_word2vec.svg)
+
+```{.python .input}
+
+```
