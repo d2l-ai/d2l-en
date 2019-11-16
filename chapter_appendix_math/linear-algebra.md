@@ -8,7 +8,7 @@ underlying much of the work that we do deep learning
 and in machine learning more broadly.
 While :numref:`sec_scalar-tensor` contained enough machinery
 to communicate the mechanics of modern deep learning models, 
-there is a lot more to the subject than we could fit there (or even here).
+there is a lot more to the subject.
 In this section, we will go deeper,
 highlighting some geometric interpretations of linear algebra operations, 
 and introducing a few fundamental concepts, including of eigenvalues and eigenvectors.
@@ -59,13 +59,13 @@ as discovering how to separate two distinct clusters of points.
 
 In parallel, there is a second point of view 
 that people often take of vectors: as directions in space. 
-Not only can we think of the vector $\mathbf{v} = [2, 3]^\top$ 
+Not only can we think of the vector $\mathbf{v} = [2,3]^\top$ 
 as the location $2$ units to the right and $3$ units up from the origin,
 we can also think of it as the direction itself 
 to take $2$ steps to the right and $3$ steps up. 
 In this way, we consider all the vectors in figure :numref:`fig_arrow` the same.
 
-![Any vector can be visualized as an arrow in the plane.  In this case, every vector drawn is a representation of the vector $(2, 3)$.](../img/ParVec.svg)
+![Any vector can be visualized as an arrow in the plane.  In this case, every vector drawn is a representation of the vector $(2,3)$.](../img/ParVec.svg)
 :label:`fig_arrow`
 
 One of the benefits of this shift is that
@@ -88,9 +88,9 @@ if we take two column vectors say $\mathbf{u}$ and $\mathbf{v}$,
 we can form their dot product by computing:
 
 $$\mathbf{u}^\top\mathbf{v} = \sum_i u_i\cdot v_i.$$
-:eqlabel:`dot-def`
+:eqlabel:`eq_dot_def`
 
-Because :eqref:`dot-def` is symmetric, we will mirror the notation 
+Because :eqref:`eq_dot_def` is symmetric, we will mirror the notation 
 of classical multiplication and write
 
 $$
@@ -99,7 +99,7 @@ $$
 
 to highlight the fact that exchanging the order of the vectors will yield the same answer.
 
-The dot product :eqref:`dot-def` also admits a geometric interpretation: it is closely related to the angle between two vectors.  Consider the angle shown in :numref:`fig_angle`.
+The dot product :eqref:`eq_dot_def` also admits a geometric interpretation: it is closely related to the angle between two vectors.  Consider the angle shown in :numref:`fig_angle`.
 
 ![Between any two vectors in the plane there is a well defined angle $\theta$.  We will see this angle is intimately tied to the dot product.](../img/VecAngle.svg)
 :label:`fig_angle`
@@ -107,7 +107,7 @@ The dot product :eqref:`dot-def` also admits a geometric interpretation: it is c
 To start, let us consider two specific vectors:
 
 $$
-\mathbf{v} = (r, 0) \; \text{and} \; \mathbf{w} = (s\cos(\theta), s \sin(\theta)).
+\mathbf{v} = (r,0) \; \text{and} \; \mathbf{w} = (s\cos(\theta), s \sin(\theta)).
 $$
 
 The vector $\mathbf{v}$ is length $r$ and runs parallel to the $x$-axis, 
@@ -125,7 +125,7 @@ $$
 $$
 
 In short, for these two specific vectors, 
-the dot product tells us the angle between the two vectors. This same fact is true in general. We will not derive the expression here, however,
+the dot product combined with the norms tell us the angle between the two vectors. This same fact is true in general. We will not derive the expression here, however,
 if we consider writing $\|\mathbf{v} - \mathbf{w}\|^2$ in two ways: 
 one with the dot product, and the other geometrically using the law of cosines,
 we can obtain the full relationship. 
@@ -133,7 +133,7 @@ Indeed, for any two vectors $\mathbf{v}$ and $\mathbf{w}$,
 the angle between the two vectors is
 
 $$\theta = \arccos\left(\frac{\mathbf{v}\cdot\mathbf{w}}{\|\mathbf{v}\|\|\mathbf{w}\|}\right).$$
-:eqlabel:`angle-forumla`
+:eqlabel:`eq_angle_forumla`
 
 This is a nice result since nothing in the computation references two-dimensions.
 Indeed, we can use this in three or three million dimensions without issue.
@@ -212,8 +212,8 @@ In an $n$-dimensional vector space, a hyperplane has $d-1$ dimensions
 and divides the space into two half-spaces. 
 
 Let us start with an example.
-Suppose that we have a column vector $\mathbf{w}=[2, 1]^\top$. We want to know, "what are the points $\mathbf{v}$ with $\mathbf{w}\cdot\mathbf{v} = 1$?"
-By recalling the connection between dot products and angles above :eqref:`angle-forumla`, 
+Suppose that we have a column vector $\mathbf{w}=[2,1]^\top$. We want to know, "what are the points $\mathbf{v}$ with $\mathbf{w}\cdot\mathbf{v} = 1$?"
+By recalling the connection between dot products and angles above :eqref:`eq_angle_forumla`, 
 we can see that this is equivalent to 
 $$
 \|\mathbf{v}\|\|\mathbf{w}\|\cos(\theta) = 1 \; \iff \; \|\mathbf{v}\|\cos(\theta) = \frac{1}{\|\mathbf{w}\|} = \frac{1}{\sqrt{5}}.
@@ -244,7 +244,7 @@ and the other side above as we see in :numref:`fig_space-division`.
 :label:`fig_space-division`
 
 The story in higher dimension is much the same.
-If we now take $\mathbf{w} = [1, 2, 3]^\top$
+If we now take $\mathbf{w} = [1,2,3]^\top$
 and ask about the points in three dimensions with $\mathbf{w}\cdot\mathbf{v} = 1$,
 we obtain a plane at right angles to the given vector $\mathbf{w}$.
 The two inequalities again define the two sides of the plane as is shown in :numref:`fig_higher-division`.
@@ -352,7 +352,7 @@ where something clear became somewhat impenetrable.
 However, it tells us that we can write the way 
 that a matrix transforms *any* vector 
 in terms of how it transforms *two specific vectors*: 
-$[1, 0]^\top$ and $[0, 1]^\top$. 
+$[1,0]^\top$ and $[0,1]^\top$. 
 This is worth considering for a moment. 
 We have essentially reduced an infinite problem 
 (what happens to any pair of real numbers)
@@ -371,9 +371,9 @@ $$
 $$
 
 If we look at the specific vector $\mathbf{v} = [2, -1]^\top$,
-we see this is $2\cdot[1, 0]^\top + -1\cdot[0, 1]^\top$,
+we see this is $2\cdot[1,0]^\top + -1\cdot[0,1]^\top$,
 and thus we know that the matrix $A$ will send this to 
-$2(\mathbf{A}[1, 0]^\top) + -1(\mathbf{A}[0, 1])^\top = 2[1, -1]^\top - [2, 3]^\top = [0, -5]^\top$.
+$2(\mathbf{A}[1,0]^\top) + -1(\mathbf{A}[0,1])^\top = 2[1, -1]^\top - [2,3]^\top = [0, -5]^\top$.
 If we follow this logic through carefully,
 say by considering the grid of all integer pairs of points,
 we see that what happens is that the matrix multiplication
@@ -402,12 +402,12 @@ Identifying and working with such transformations are the topic of a later secti
 but geometrically we can see that this is fundamentally different 
 from the types of transformations we saw above. 
 For instance, the result from matrix $\mathbf{A}$ can be "bent back" to the original grid.  The results from matrix $\mathbf{B}$ cannot 
-because we will never know where the vector $[1, 2]^\top$ came from---was 
-it $[1, 1]^\top$ or $[0, -1]^\top$?
+because we will never know where the vector $[1,2]^\top$ came from---was 
+it $[1,1]^\top$ or $[0, -1]^\top$?
 
 While this picture was for a $2\times2$ matrix, 
 nothing prevents us from taking the lessons learned into higher dimensions.
-If we take similar basis vectors like $[1, 0, \ldots, 0]$ 
+If we take similar basis vectors like $[1,0, \ldots,0]$ 
 and see where our matrix sends them, 
 we can start to get a feeling for how the matrix multiplication 
 distorts the entire space in whatever dimension space we are dealing with.
@@ -426,7 +426,7 @@ This compresses the entire plane down to live on the single line $y = 2x$.
 The question now arises: is there some way we can detect this
 just looking at the matrix itself?
 The answer is that indeed we can.
-Lets take $\mathbf{b}_1 = [2, 4]^\top$ and $\mathbf{b}_2 = [-1, -2]^\top$ 
+Let us take $\mathbf{b}_1 = [2,4]^\top$ and $\mathbf{b}_2 = [-1, -2]^\top$ 
 be the two columns of $\mathbf{B}$.
 Remember that we can write everything transformed by the matrix $\mathbf{B}$
 as a weighted sum of the columns of the matrix: 
@@ -537,7 +537,7 @@ To find a matrix which undoes what our matrix $\mathbf{A}$ has done,
 we want to find a matrix $\mathbf{A}^{-1}$ such that
 
 $$
-\mathbf{A}^{-1}\mathbf{A} = \mathbf{I}.
+\mathbf{A}^{-1}\mathbf{A} = \mathbf{A}\mathbf{A}^{-1} =  \mathbf{I}.
 $$
 
 If we look at this as a system, we have $n \times n$ unknowns 
@@ -837,9 +837,9 @@ $$
 \end{bmatrix}.
 $$
 4. Which of the following sets of vectors are linearly independent?
- * $\left\{\begin{pmatrix}1\\0\\-1\end{pmatrix},\begin{pmatrix}2\\1\\-1\end{pmatrix},\begin{pmatrix}3\\1\\1\end{pmatrix}\right\}$
- * $\left\{\begin{pmatrix}3\\1\\1\end{pmatrix},\begin{pmatrix}1\\1\\1\end{pmatrix},\begin{pmatrix}0\\0\\0\end{pmatrix}\right\}$
- * $\left\{\begin{pmatrix}1\\1\\0\end{pmatrix},\begin{pmatrix}0\\1\\-1\end{pmatrix},\begin{pmatrix}1\\0\\1\end{pmatrix}\right\}$
+ * $\left\{\begin{pmatrix}1\\0\\-1\end{pmatrix}, \begin{pmatrix}2\\1\\-1\end{pmatrix}, \begin{pmatrix}3\\1\\1\end{pmatrix}\right\}$
+ * $\left\{\begin{pmatrix}3\\1\\1\end{pmatrix}, \begin{pmatrix}1\\1\\1\end{pmatrix}, \begin{pmatrix}0\\0\\0\end{pmatrix}\right\}$
+ * $\left\{\begin{pmatrix}1\\1\\0\end{pmatrix}, \begin{pmatrix}0\\1\\-1\end{pmatrix}, \begin{pmatrix}1\\0\\1\end{pmatrix}\right\}$
 5. Suppose that you have a matrix written as $A = \begin{bmatrix}c\\d\end{bmatrix}\cdot\begin{bmatrix}a & b\end{bmatrix}$ for some choice of values $a, b, c$, and $d$.  True or false: the determinant of such a matrix is always $0$?
 6. The vectors $e_1 = \begin{bmatrix}1\\0\end{bmatrix}$ and $e_2 = \begin{bmatrix}0\\1\end{bmatrix}$ are orthogonal.  What is the condition on a matrix $A$ so that $Ae_1$ and $Ae_2$ are orthogonal?
 7. How can you write $\mathrm{tr}(\mathbf{A}^4)$ in Einstein notation for an arbitrary matrix $A$?

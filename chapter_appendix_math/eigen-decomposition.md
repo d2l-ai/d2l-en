@@ -47,9 +47,9 @@ and then factoring out the vector,
 we see the above is equivalent to:
 
 $$(\mathbf{A} - \lambda \mathbf{I})\mathbf{v} = 0.$$
-:eqlabel:`eigvalue-der`
+:eqlabel:`eq_eigvalue_der`
 
-For :eqref:`eigvalue-der` to happen, we see that $(\mathbf{A} - \lambda \mathbf{I})$ 
+For :eqref:`eq_eigvalue_der` to happen, we see that $(\mathbf{A} - \lambda \mathbf{I})$ 
 must compress some direction down to zero, 
 hence it is not invertible, and thus the determinant is zero.
 Thus, we can find the *eigenvalues* 
@@ -134,7 +134,7 @@ The matrix $W$ is invertible, so we may multiply both sides by $W^{-1}$ on the r
 we see that we may write
 
 $$\mathbf{A} = \mathbf{W} \boldsymbol{\Sigma} \mathbf{W}^{-1}.$$
-:eqlabel:`eig-decomp`
+:eqlabel:`eq_eig_decomp`
 
 In the next section we will see some nice consequences of this,
 but for now we need only know that such a decomposition 
@@ -142,7 +142,7 @@ will exist as long as we can find a full collection
 of linearly independent eigenvectors (so that $W$ is invertible).
 
 ## Operations on Eigendecompositions
-One nice thing about eigendecompositions :eqref:`eig-decomp` is that 
+One nice thing about eigendecompositions :eqref:`eq_eig_decomp` is that 
 we can write many operations we usually encounter cleanly 
 in terms of the eigendecomposition.  
 As a first example, consider:
@@ -209,7 +209,7 @@ The most commonly encountered family are the *symmetric matrices*,
 which are those matrices where $\mathbf{A} = \mathbf{A}^\top$. 
 In this case, we may take $W$ to be an *orthogonal matrix*—a matrix whose columns are all length one vectors that are at right angles to one another, where 
 $\mathbf{W}^\top = \mathbf{W}^{-1}$—and all the eigenvalues will be real.  
-Thus, in this special case, we can write :eqref:`eig-decomp` as
+Thus, in this special case, we can write :eqref:`eq_eig_decomp` as
 
 $$
 \mathbf{A} = \mathbf{W}\boldsymbol{\Sigma}\mathbf{W}^\top .
