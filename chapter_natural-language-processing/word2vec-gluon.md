@@ -22,7 +22,7 @@ We will implement the skip-gram model by using embedding layers and minibatch mu
 
 ### Embedding Layer
 
-The layer in which the obtained word is embedded is called the embedding layer, which can be obtained by creating an `nn.Embedding` instance in Gluon. The weight of the embedding layer is a matrix whose number of rows is the dictionary size (`input_dim`) and whose number of columns is the dimension of each word vector (`output_dim`). We set the dictionary size to 20 and the word vector dimension to 4.
+The layer in which the obtained word is embedded is called the embedding layer, which can be obtained by creating an `nn.Embedding` instance in Gluon. The weight of the embedding layer is a matrix whose number of rows is the dictionary size (`input_dim`) and whose number of columns is the dimension of each word vector (`output_dim`). We set the dictionary size to $20$ and the word vector dimension to $4$.
 
 ```{.python .input  n=15}
 embed = nn.Embedding(input_dim=20, output_dim=4)
@@ -30,7 +30,7 @@ embed.initialize()
 embed.weight
 ```
 
-The input of the embedding layer is the index of the word. When we enter the index $i$ of a word, the embedding layer returns the $i$th row of the weight matrix as its word vector. Below we enter an index of shape (2, 3) into the embedding layer. Because the dimension of the word vector is 4, we obtain a word vector of shape (2, 3, 4).
+The input of the embedding layer is the index of the word. When we enter the index $i$ of a word, the embedding layer returns the $i^\mathrm{th}$ row of the weight matrix as its word vector. Below we enter an index of shape ($2$, $3$) into the embedding layer. Because the dimension of the word vector is 4, we obtain a word vector of shape ($2$, $3$, $4$).
 
 ```{.python .input  n=16}
 x = np.array([[1, 2, 3], [4, 5, 6]])
