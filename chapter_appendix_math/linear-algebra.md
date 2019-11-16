@@ -8,7 +8,7 @@ underlying much of the work that we do deep learning
 and in machine learning more broadly.
 While :numref:`sec_scalar-tensor` contained enough machinery
 to communicate the mechanics of modern deep learning models, 
-there is a lot more to the subject than we could fit there (or even here).
+there is a lot more to the subject.
 In this section, we will go deeper,
 highlighting some geometric interpretations of linear algebra operations, 
 and introducing a few fundamental concepts, including of eigenvalues and eigenvectors.
@@ -125,7 +125,7 @@ $$
 $$
 
 In short, for these two specific vectors, 
-the dot product tells us the angle between the two vectors. This same fact is true in general. We will not derive the expression here, however,
+the dot product combined with the norms tell us the angle between the two vectors. This same fact is true in general. We will not derive the expression here, however,
 if we consider writing $\|\mathbf{v} - \mathbf{w}\|^2$ in two ways: 
 one with the dot product, and the other geometrically using the law of cosines,
 we can obtain the full relationship. 
@@ -537,7 +537,7 @@ To find a matrix which undoes what our matrix $\mathbf{A}$ has done,
 we want to find a matrix $\mathbf{A}^{-1}$ such that
 
 $$
-\mathbf{A}^{-1}\mathbf{A} = \mathbf{I}.
+\mathbf{A}^{-1}\mathbf{A} = \mathbf{A}\mathbf{A}^{-1} =  \mathbf{I}.
 $$
 
 If we look at this as a system, we have $n \times n$ unknowns 
