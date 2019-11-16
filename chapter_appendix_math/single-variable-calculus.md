@@ -120,7 +120,7 @@ If every derivative needed to be separately computed and stored in a table, diff
 * **Product rule.** $\frac{d}{dx}\left(g(x)\cdot h(x)\right) = g(x)\frac{dh}{dx}(x) + \frac{dg}{dx}(x)h(x)$.
 * **Chain rule.** $\frac{d}{dx}g(h(x)) = \frac{dg}{dh}(h(x))\cdot \frac{dh}{dx}(x)$.
 
-Let us see how we may use :eqref:`eq_small_change` to understand these rules.  For the sum rule,consider following chain of reasoning:
+Let us see how we may use :eqref:`eq_small_change` to understand these rules.  For the sum rule, consider following chain of reasoning:
 
 $$
 \begin{aligned}
@@ -200,7 +200,7 @@ $$
 f(x+\epsilon) \approx f(x) + \epsilon \frac{df}{dx}(x),
 $$
 
-approximates the value of $f$ by a line which passes through the point $(x,f(x))$ and has slope $\frac{df}{dx}(x)$.  In this way we say that the derivative gives a linear approximation to the function $f$, as illustrated below:
+approximates the value of $f$ by a line which passes through the point $(x, f(x))$ and has slope $\frac{df}{dx}(x)$.  In this way we say that the derivative gives a linear approximation to the function $f$, as illustrated below:
 
 ```{.python .input}
 # Compute sin

@@ -335,7 +335,7 @@ a & b \\ c & d
 $$
 
 If we want to apply this to an arbitrary vector 
-$\mathbf{v} = [x,y]^\top$, 
+$\mathbf{v} = [x, y]^\top$, 
 we multiply and see that
 
 $$
@@ -370,10 +370,10 @@ $$
 \end{bmatrix}.
 $$
 
-If we look at the specific vector $\mathbf{v} = [2,-1]^\top$,
+If we look at the specific vector $\mathbf{v} = [2, -1]^\top$,
 we see this is $2\cdot[1,0]^\top + -1\cdot[0,1]^\top$,
 and thus we know that the matrix $A$ will send this to 
-$2(\mathbf{A}[1,0]^\top) + -1(\mathbf{A}[0,1])^\top = 2[1,-1]^\top - [2,3]^\top = [0,-5]^\top$.
+$2(\mathbf{A}[1,0]^\top) + -1(\mathbf{A}[0,1])^\top = 2[1, -1]^\top - [2,3]^\top = [0, -5]^\top$.
 If we follow this logic through carefully,
 say by considering the grid of all integer pairs of points,
 we see that what happens is that the matrix multiplication
@@ -403,11 +403,11 @@ but geometrically we can see that this is fundamentally different
 from the types of transformations we saw above. 
 For instance, the result from matrix $\mathbf{A}$ can be "bent back" to the original grid.  The results from matrix $\mathbf{B}$ cannot 
 because we will never know where the vector $[1,2]^\top$ came from---was 
-it $[1,1]^\top$ or $[0,-1]^\top$?
+it $[1,1]^\top$ or $[0, -1]^\top$?
 
 While this picture was for a $2\times2$ matrix, 
 nothing prevents us from taking the lessons learned into higher dimensions.
-If we take similar basis vectors like $[1,0,\ldots,0]$ 
+If we take similar basis vectors like $[1,0, \ldots,0]$ 
 and see where our matrix sends them, 
 we can start to get a feeling for how the matrix multiplication 
 distorts the entire space in whatever dimension space we are dealing with.
@@ -426,7 +426,7 @@ This compresses the entire plane down to live on the single line $y = 2x$.
 The question now arises: is there some way we can detect this
 just looking at the matrix itself?
 The answer is that indeed we can.
-Let us take $\mathbf{b}_1 = [2,4]^\top$ and $\mathbf{b}_2 = [-1,-2]^\top$ 
+Let us take $\mathbf{b}_1 = [2,4]^\top$ and $\mathbf{b}_2 = [-1, -2]^\top$ 
 be the two columns of $\mathbf{B}$.
 Remember that we can write everything transformed by the matrix $\mathbf{B}$
 as a weighted sum of the columns of the matrix: 
@@ -714,7 +714,7 @@ $$
 
 or equivalently
 
-$$ c_{i,j} = \sum_{k} a_{i,k}b_{k,j}.$$
+$$ c_{i, j} = \sum_{k} a_{i, k}b_{k, j}.$$
 
 This pattern is one we can repeat for tensors.
 For tensors, there is no one case of what 
@@ -837,10 +837,10 @@ $$
 \end{bmatrix}.
 $$
 4. Which of the following sets of vectors are linearly independent?
- * $\left\{\begin{pmatrix}1\\0\\-1\end{pmatrix},\begin{pmatrix}2\\1\\-1\end{pmatrix},\begin{pmatrix}3\\1\\1\end{pmatrix}\right\}$
- * $\left\{\begin{pmatrix}3\\1\\1\end{pmatrix},\begin{pmatrix}1\\1\\1\end{pmatrix},\begin{pmatrix}0\\0\\0\end{pmatrix}\right\}$
- * $\left\{\begin{pmatrix}1\\1\\0\end{pmatrix},\begin{pmatrix}0\\1\\-1\end{pmatrix},\begin{pmatrix}1\\0\\1\end{pmatrix}\right\}$
-5. Suppose that you have a matrix written as $A = \begin{bmatrix}c\\d\end{bmatrix}\cdot\begin{bmatrix}a & b\end{bmatrix}$ for some choice of values $a,b,c$, and $d$.  True or false: the determinant of such a matrix is always $0$?
+ * $\left\{\begin{pmatrix}1\\0\\-1\end{pmatrix}, \begin{pmatrix}2\\1\\-1\end{pmatrix}, \begin{pmatrix}3\\1\\1\end{pmatrix}\right\}$
+ * $\left\{\begin{pmatrix}3\\1\\1\end{pmatrix}, \begin{pmatrix}1\\1\\1\end{pmatrix}, \begin{pmatrix}0\\0\\0\end{pmatrix}\right\}$
+ * $\left\{\begin{pmatrix}1\\1\\0\end{pmatrix}, \begin{pmatrix}0\\1\\-1\end{pmatrix}, \begin{pmatrix}1\\0\\1\end{pmatrix}\right\}$
+5. Suppose that you have a matrix written as $A = \begin{bmatrix}c\\d\end{bmatrix}\cdot\begin{bmatrix}a & b\end{bmatrix}$ for some choice of values $a, b, c$, and $d$.  True or false: the determinant of such a matrix is always $0$?
 6. The vectors $e_1 = \begin{bmatrix}1\\0\end{bmatrix}$ and $e_2 = \begin{bmatrix}0\\1\end{bmatrix}$ are orthogonal.  What is the condition on a matrix $A$ so that $Ae_1$ and $Ae_2$ are orthogonal?
 7. How can you write $\mathrm{tr}(\mathbf{A}^4)$ in Einstein notation for an arbitrary matrix $A$?
 

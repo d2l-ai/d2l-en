@@ -39,14 +39,14 @@ ys = [np.sum(np.exp(-(xs[0:i] - xs[i])**2/(2 * epsilon**2)) /
       np.sqrt(2*np.pi*epsilon**2))/len(xs) for i in range(len(xs))]
 
 # Compute true density
-xd = np.arange(np.min(xs),np.max(xs),0.01)
+xd = np.arange(np.min(xs), np.max(xs),0.01)
 yd = np.exp(-xd**2/2)/np.sqrt(2*np.pi)
     
 # Plot the results
 d2l.plot(xd, yd, 'x', 'density')
 d2l.plt.scatter(xs, ys)
 d2l.plt.axvline(x=0)
-d2l.plt.axvline(x=np.mean(xs), linestyle='--',color='purple')
+d2l.plt.axvline(x=np.mean(xs), linestyle='--', color='purple')
 d2l.plt.title("Sample Mean: {:.2f}".format(float(np.mean(xs))))
 d2l.plt.show()
 ```
@@ -261,7 +261,7 @@ Sufficed to say, confidence intervals are subtle objects.  However, if you keep 
 
 ### A Gaussian Example
 
-Let us discuss the most classical example, the confidence interval for the mean of a Gaussian of unknown mean and variance.  Suppose we collect $n$ samples $\{x_i\}_{i=1}^n$ from our Gaussian $\mathcal{N}(\mu,\sigma^2)$.  We can compute estimators for the mean and standard deviation by taking
+Let us discuss the most classical example, the confidence interval for the mean of a Gaussian of unknown mean and variance.  Suppose we collect $n$ samples $\{x_i\}_{i=1}^n$ from our Gaussian $\mathcal{N}(\mu, \sigma^2)$.  We can compute estimators for the mean and standard deviation by taking
 
 $$\hat\mu_n = \frac{1}{n}\sum_{i=1}^n x_i \;\text{and}\; \hat\sigma^2_n = \frac{1}{n-1}\sum_{i=1}^n (x_i - \hat\mu)^2.$$
 
@@ -279,11 +279,11 @@ P\left(\frac{\hat\mu_n - \mu}{\hat\sigma_n/\sqrt{n}} \in [-1.96, 1.96]\right) \g
 $$
 Rearranging this by multiplying both sides by $\hat\sigma_n/\sqrt{n}$ and then adding $\hat\mu_n$, we obtain
 $$
-P\left(\mu \in \left[\hat\mu_n - 1.96\frac{\hat\sigma_n}{\sqrt{n}},\hat\mu_n + 1.96\frac{\hat\sigma_n}{\sqrt{n}}\right]\right) \ge 0.95.
+P\left(\mu \in \left[\hat\mu_n - 1.96\frac{\hat\sigma_n}{\sqrt{n}}, \hat\mu_n + 1.96\frac{\hat\sigma_n}{\sqrt{n}}\right]\right) \ge 0.95.
 $$
 
 Thus we know that we have found our $95\%$ confidence interval:
-$$\left[\hat\mu_n - 1.96\frac{\hat\sigma_n}{\sqrt{n}},\hat\mu_n + 1.96\frac{\hat\sigma_n}{\sqrt{n}}\right].$$
+$$\left[\hat\mu_n - 1.96\frac{\hat\sigma_n}{\sqrt{n}}, \hat\mu_n + 1.96\frac{\hat\sigma_n}{\sqrt{n}}\right].$$
 :eqlabel:`eq_eq_gauss_confidence`
 
 It is safe to say that :eqref:`eq_gauss_confidence` is one of the most used formula in statistics.  Let us close our discussion of statistics by implementing it.  For simplicity, we assume we are in the asymptotic regime.  Small values of $N$ should include the correct value of `t_star` obtained either programmatically or from a $t$-table.

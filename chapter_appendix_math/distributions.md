@@ -60,7 +60,7 @@ We can sample an array of arbitrary shape from a Bernoulli random variable as fo
 
 ## Discrete Uniform
 
-The next commonly encountered random variable encountered is a discrete uniform.  For our discussion here, we will assume that it is supported on the integers $\{1,2,\ldots, n\}$, however any other set of values can be freely chosen.  The meaning of the word *uniform* in this context is that every possible value is equally likely.  The probability for each value $i \in \{1,2,3,\ldots,n\}$ is $p_i = \frac{1}{n}$.  We will denote a random variable $X$ with this distribution as
+The next commonly encountered random variable encountered is a discrete uniform.  For our discussion here, we will assume that it is supported on the integers $\{1, 2, \ldots, n\}$, however any other set of values can be freely chosen.  The meaning of the word *uniform* in this context is that every possible value is equally likely.  The probability for each value $i \in \{1, 2, 3, \ldots, n\}$ is $p_i = \frac{1}{n}$.  We will denote a random variable $X$ with this distribution as
 
 $$
 X \sim \mathrm{Uniform}(n).
@@ -106,20 +106,20 @@ np.random.random_integers(1, n, size=(10, 10))
 
 ## Continuous Uniform
 
-Next, let us discuss the continuous uniform distribution. The idea behind this random variable is that if we increase the $n$ in the discrete uniform distribution, and then scale it to fit within the interval $[a,b]$, we will approach a continuous random variable that just picks an arbitrary value in $[a,b]$ all with equal probability.  We will denote this distribution as
+Next, let us discuss the continuous uniform distribution. The idea behind this random variable is that if we increase the $n$ in the discrete uniform distribution, and then scale it to fit within the interval $[a, b]$, we will approach a continuous random variable that just picks an arbitrary value in $[a, b]$ all with equal probability.  We will denote this distribution as
 
 $$
-X \sim \mathrm{Uniform}([a,b]).
+X \sim \mathrm{Uniform}([a, b]).
 $$
 
 The probability density function is 
 
-$$p(x) = \begin{cases} \frac{1}{b-a} & x \in [a,b], \\ 0 & x \not\in [a,b].\end{cases}$$
+$$p(x) = \begin{cases} \frac{1}{b-a} & x \in [a, b], \\ 0 & x \not\in [a, b].\end{cases}$$
 :eqlabel:`eq_cont_uniform_pdf`
 
 The cumulative distribution function is 
 
-$$F(x) = \begin{cases} 0 & x < a, \\ \frac{x-a}{b-a} & x \in [a,b], \\ 1 & x >= b . \end{cases}$$
+$$F(x) = \begin{cases} 0 & x < a, \\ \frac{x-a}{b-a} & x \in [a, b], \\ 1 & x >= b . \end{cases}$$
 :eqlabel:`eq_cont_uniform_cdf`
 
 Let us first plot the probability density function :eqref:`eq_cont_uniform_pdf`.
@@ -142,7 +142,7 @@ def F(x):
 d2l.plot(x, np.array([F(y) for y in x]), 'x', 'c.d.f.')
 ```
 
-If $X \sim \mathrm{Uniform}([a,b])$, then:
+If $X \sim \mathrm{Uniform}([a, b])$, then:
 
 * $\mu_X = \frac{a+b}{2}$,
 * $\sigma_X^2 = \frac{(b-a)^2}{12}$.
@@ -166,7 +166,7 @@ $$
 In this case, we will write
 
 $$
-X \sim \mathrm{Binomial}(n,p).
+X \sim \mathrm{Binomial}(n, p).
 $$
 
 To get the cumulative distribution function, we need to notice that getting exactly $k$ successes can occur in $\binom{n}{k} = \frac{n!}{k!(n-k)!}$ ways each of which has a probability of $p^m(1-p)^{n-m}$ of occurring.  Thus the cumulative distribution function is
@@ -206,7 +206,7 @@ def F(x):
 d2l.plot(x, np.array([F(y) for y in x.tolist()]), 'x', 'c.d.f.')
 ```
 
-While this result is not simple, the means and variances are.  If $X \sim \mathrm{Binomial}(n,p)$, then:
+While this result is not simple, the means and variances are.  If $X \sim \mathrm{Binomial}(n, p)$, then:
 
 * $\mu_X = np$,
 * $\sigma_X^2 = np(1-p)$.
@@ -226,18 +226,18 @@ $$
 X^{(2)} \sim X^{(2)}_1 + X^{(2)}_2,
 $$
 
-where $X^{(2)}$ is the total sum, and $X^{(2)}_i \sim \mathrm{Bernoulli}(p/2)$.  The total distribution is then $X^{(2)} \sim \mathrm{Binomial}(2,p/2)$.
+where $X^{(2)}$ is the total sum, and $X^{(2)}_i \sim \mathrm{Bernoulli}(p/2)$.  The total distribution is then $X^{(2)} \sim \mathrm{Binomial}(2, p/2)$.
 
 Why stop here?  Let us continue to split that minute into $n$ parts.  By the same reasoning as above, we see that
 
-$$X^{(n)} \sim \mathrm{Binomial}(n,p/n).$$
+$$X^{(n)} \sim \mathrm{Binomial}(n, p/n).$$
 :eqlabel:`eq_eq_poisson_approx`
 
 Consider these random variables.  By the previous section, we know that :eqref:`eq_eq_poisson_approx` has mean $\mu_{X^{(n)}} = n(p/n) = p$, and variance $\sigma_{X^{(n)}}^2 = n(p/n)(1-(p/n)) = p(1-p/n)$.  If we take $n \rightarrow \infty$, we can see that these numbers stabilize to $\mu_{X^{(\infty)}} = p$, and variance $\sigma_{X^{(\infty)}}^2 = p$.  This indicates that there *could be* some random variable we can define in this infinite subdivision limit.  
 
 This should not come as too much of a surprise, since in the real world we can just count the number of bus arrivals, however it is nice to see that our mathematical model is well defined.  This discussion can be made formal as the *law of rare events*.
 
-Following through this reasoning carefully, we can arrive at the following model.  We will say that $X \sim \mathrm{Poisson}(\lambda)$ if it is a random variable which takes the values $\{0,1,2,\ldots\}$ with probability
+Following through this reasoning carefully, we can arrive at the following model.  We will say that $X \sim \mathrm{Poisson}(\lambda)$ if it is a random variable which takes the values $\{0,1,2, \ldots\}$ with probability
 
 $$p_k = \frac{\lambda^ke^{-\lambda}}{k!}.$$
 :eqlabel:`eq_poisson_mass`
@@ -286,7 +286,7 @@ np.random.poisson(lam, size=(10, 10))
 ```
 
 ## Gaussian
-Now Let us try a different, but related experiment.  Let us say we again are performing $n$ independent $\mathrm{Bernoulli}(p)$ measurements $X_i$.  The distribution of the sum of these is $X^{(n)} \sim \mathrm{Binomial}(n,p)$.  Rather than taking a limit as $n$ increases and $p$ decreases, Let us fix $p$, and then send $n \rightarrow \infty$.  In this case $\mu_{X^{(n)}} = np \rightarrow \infty$ and $\sigma_{X^{(n)}}^2 = np(1-p) \rightarrow \infty$, so there is no reason to think this limit should be well defined.
+Now Let us try a different, but related experiment.  Let us say we again are performing $n$ independent $\mathrm{Bernoulli}(p)$ measurements $X_i$.  The distribution of the sum of these is $X^{(n)} \sim \mathrm{Binomial}(n, p)$.  Rather than taking a limit as $n$ increases and $p$ decreases, Let us fix $p$, and then send $n \rightarrow \infty$.  In this case $\mu_{X^{(n)}} = np \rightarrow \infty$ and $\sigma_{X^{(n)}}^2 = np(1-p) \rightarrow \infty$, so there is no reason to think this limit should be well defined.
 
 However, not all hope is lost!  Let us just make the mean and variance be well behaved by defining
 
@@ -315,13 +315,13 @@ d2l.plt.show()
 
 One thing to note: compared to the Poisson case, we are now dividing by the standard deviation which means that we are squeezing the possible outcomes into smaller and smaller areas.  This is an indication that our limit will no longer be discrete, but rather a continuous.
 
-A derivation of what occurs is beyond the scope of this document, but the *central limit theorem* states that as $n \rightarrow \infty$, this will yield the Gaussian Distribution (or sometimes normal distribution).  More explicitly, for any $a,b$:
+A derivation of what occurs is beyond the scope of this document, but the *central limit theorem* states that as $n \rightarrow \infty$, this will yield the Gaussian Distribution (or sometimes normal distribution).  More explicitly, for any $a, b$:
 
 $$
-\lim_{n \rightarrow \infty} P(Y^{(n)} \in [a,b]) = P(\mathcal{N}(0,1) \in [a,b]),
+\lim_{n \rightarrow \infty} P(Y^{(n)} \in [a, b]) = P(\mathcal{N}(0,1) \in [a, b]),
 $$
 
-where we say a random variable is normally distributed with given mean $\mu$ and variance $\sigma^2$, written $X \sim \mathcal{N}(\mu,\sigma^2)$ if $X$ has density
+where we say a random variable is normally distributed with given mean $\mu$ and variance $\sigma^2$, written $X \sim \mathcal{N}(\mu, \sigma^2)$ if $X$ has density
 
 $$p_X(x) = \frac{1}{\sqrt{2\pi\sigma^2}}e^{-\frac{(x-\mu)^2}{2\sigma^2}}.$$
 :eqlabel:`eq_gaussian_pdf`
@@ -367,7 +367,7 @@ The central limit theorem is the reason that the Gaussian is fundamental to prob
 
 There are many more fascinating properties of Gaussians, and we would like to discuss one more here.  The Gaussian is what is known as a *maximum entropy distribution*.  We will get into entropy more deeply in :numref:`sec_information_theory`, however all we need to know at this point is that it is a measure of randomness.  In a rigorous mathematical sense, we can think of the Gaussian as the *most* random choice of random variable with fixed mean and variance.  Thus, if we know that our random variable has some mean and variance, the Gaussian is in a sense the most conservative choice of distribution we can make.
 
-To close the section, Let us recall that if $X \sim \mathcal{N}(\mu,\sigma^2)$, then:
+To close the section, Let us recall that if $X \sim \mathcal{N}(\mu, \sigma^2)$, then:
 
 * $\mu_X = \mu$,
 * $\sigma_X^2 = \sigma^2$.
@@ -388,7 +388,7 @@ np.random.normal(mu, sigma, size=(10, 10))
 
 ## Exercises
 
-1. What is the standard deviation of a random variable that is the difference $X-Y$ of two independent binomial random variables $X,Y \sim \mathrm{Binomial}(16,1/2)$.
+1. What is the standard deviation of a random variable that is the difference $X-Y$ of two independent binomial random variables $X, Y \sim \mathrm{Binomial}(16, 1/2)$.
 2. If we take a Poisson random variable $X \sim \mathrm{Poisson}(\lambda)$ and consider $(X - \lambda)/\sqrt{\lambda}$ as $\lambda \rightarrow \infty$, we can show that this becomes approximately Gaussian.  Why does this make sense?
 3. What is the probability mass function for a sum of two discrete uniform random variables on $n$ elements?
 

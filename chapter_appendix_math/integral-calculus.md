@@ -244,7 +244,7 @@ $$
 If this discussion sounds familiar, it is!  In :numref:`sec_linear_algebra` we discussed how the determinant represented the signed area in much the same way.
 
 ## Multiple Integrals
-In some cases, we will need to work in higher dimensions.  For instance, suppose that we have a function of two variables, like $f(x,y)$ and we want to know the volume under $f$ when $x$ ranges over $[a,b]$ and $y$ ranges over $[c,d]$.
+In some cases, we will need to work in higher dimensions.  For instance, suppose that we have a function of two variables, like $f(x, y)$ and we want to know the volume under $f$ when $x$ ranges over $[a, b]$ and $y$ ranges over $[c, d]$.
 
 ```{.python .input}
 # Construct grid and compute function
@@ -269,21 +269,21 @@ ax.dist = 12
 We write this as 
 
 $$
-\int_{[a,b]\times[c,d]} f(x,y)\;dx\;dy.
+\int_{[a, b]\times[c, d]} f(x, y)\;dx\;dy.
 $$
 
 Suppose that we wish to compute this integral.  My claim is that we can do this by iteratively computing first the integral in say $x$ and then shifting to the integral in $y$, that is to say
 
 $$
-\int_{[a,b]\times[c,d]} f(x,y)\;dx\;dy = \int_c^{d} \left(\int_a^{b} f(x,y) \;dx\right) \; dy.
+\int_{[a, b]\times[c, d]} f(x, y)\;dx\;dy = \int_c^{d} \left(\int_a^{b} f(x, y) \;dx\right) \; dy.
 $$
 
 Let us see why this is.  
 
-Consider the figure above where we have split the function into $\epsilon \times \epsilon$ squares which we will index with integer coordinates $i,j$.  In this case, our integral is approximately
+Consider the figure above where we have split the function into $\epsilon \times \epsilon$ squares which we will index with integer coordinates $i, j$.  In this case, our integral is approximately
 
 $$
-\sum_{i,j} \epsilon^{2} f(\epsilon i, \epsilon j).
+\sum_{i, j} \epsilon^{2} f(\epsilon i, \epsilon j).
 $$
 
 Once we discretize the problem, we may add up the values on these squares in whatever order we like, and not worry about changing the values.  This is illustrated in :numref:`fig_sum-order`.  In particular, we can say that
@@ -298,30 +298,30 @@ $$
 The sum on the inside is precisely the discretization of the integral 
 
 $$
-G(\epsilon j) = \int _a^{b} f(x,\epsilon j) \; dx.
+G(\epsilon j) = \int _a^{b} f(x, \epsilon j) \; dx.
 $$
 
 Finally, notice that if we combine these two expressions we get 
 
 $$
-\sum _ {j} \epsilon G(\epsilon j) \approx \int _ {c}^{d} G(y) \; dy = \int _ {[a,b]\times[c,d]} f(x,y)\;dx\;dy.
+\sum _ {j} \epsilon G(\epsilon j) \approx \int _ {c}^{d} G(y) \; dy = \int _ {[a, b]\times[c, d]} f(x, y)\;dx\;dy.
 $$
 
 Thus putting it all together, we have that
 
 $$
-\int _ {[a,b]\times[c,d]} f(x,y)\;dx\;dy = \int _ c^{d} \left(\int _ a^{b} f(x,y) \;dx\right) \; dy.
+\int _ {[a, b]\times[c, d]} f(x, y)\;dx\;dy = \int _ c^{d} \left(\int _ a^{b} f(x, y) \;dx\right) \; dy.
 $$
 
-Notice that, once discretized, all we did was rearrange the order in which we added a list of numbers.  This may make it seem like it is nothing, however this result (called *Fubini's Theorem*) is not always true!  For the type of mathematics encountered when doing machine learning (continuous functions), there is no concern, however it is possible to create examples where it fails (for example the function $f(x,y) = xy(x^2-y^2)/(x^2+y^2)^3$ over the rectangle $[0,2]\times[0,1]$).
+Notice that, once discretized, all we did was rearrange the order in which we added a list of numbers.  This may make it seem like it is nothing, however this result (called *Fubini's Theorem*) is not always true!  For the type of mathematics encountered when doing machine learning (continuous functions), there is no concern, however it is possible to create examples where it fails (for example the function $f(x, y) = xy(x^2-y^2)/(x^2+y^2)^3$ over the rectangle $[0,2]\times[0,1]$).
 
 Note that the choice to do the integral in $x$ first, and then the integral in $y$ was arbitrary.  We could have equally well chosen to do $y$ first and then $x$ to see
 
 $$
-\int _ {[a,b]\times[c,d]} f(x,y)\;dx\;dy = \int _ a^{b} \left(\int _ c^{d} f(x,y) \;dy\right) \; dx.
+\int _ {[a, b]\times[c, d]} f(x, y)\;dx\;dy = \int _ a^{b} \left(\int _ c^{d} f(x, y) \;dy\right) \; dx.
 $$
 
-Often times, we will condense down to vector notation, and say that for $U = [a,b]\times [c,d]$ this is
+Often times, we will condense down to vector notation, and say that for $U = [a, b]\times [c, d]$ this is
 
 $$
 \int _ U f(\mathbf{x})\;d\mathbf{x}.
@@ -338,7 +338,7 @@ $$
 \int _ {\phi(U)} f(\mathbf{x})\;d\mathbf{x} = \int _ {U} f(\phi(\mathbf{x})) \left|\det(D\phi(\mathbf{x}))\right|\;d\mathbf{x}.
 $$
 
-where $D\phi$ is the *Jacobian* of $\phi$, which is the matrix of partial derivatives of $\boldsymbol{\phi} = (\phi_1(x_1,\ldots,x_n), \ldots, \phi_n(x_1,\ldots,x_n))$,
+where $D\phi$ is the *Jacobian* of $\phi$, which is the matrix of partial derivatives of $\boldsymbol{\phi} = (\phi_1(x_1, \ldots, x_n), \ldots, \phi_n(x_1, \ldots, x_n))$,
 
 $$
 D\boldsymbol{\phi} = \begin{bmatrix}
@@ -358,7 +358,7 @@ $$
 \int _ {-\infty}^{\infty} \int _ {-\infty}^{\infty} e^{-x^{2}-y^{2}} \;dx\;dy.
 $$
 
-Playing with this integral directly will get us no-where, but if we change variables, we can make significant progress.  If we let $\boldsymbol{\phi}(r,\theta) = (r \cos(\theta),  r\sin(\theta))$ (which is to say that $x = r \cos(\theta)$, $y = r \sin(\theta)$), then we can apply the change of variable formula to see that this is the same thing as
+Playing with this integral directly will get us no-where, but if we change variables, we can make significant progress.  If we let $\boldsymbol{\phi}(r, \theta) = (r \cos(\theta),  r\sin(\theta))$ (which is to say that $x = r \cos(\theta)$, $y = r \sin(\theta)$), then we can apply the change of variable formula to see that this is the same thing as
 
 $$
 \int _ 0^\infty \int_0 ^ {2\pi} e^{-r^{2}} \left|\det(D\mathbf{\phi}(\mathbf{x}))\right|\;d\theta\;dr,
@@ -393,7 +393,7 @@ We will meet this integral again when we study continuous random variables in :n
 1. What is $\int_1^2 \frac{1}{x} \;dx$?
 2. Use the change of variables formula to integrate $\int_0^{\sqrt{\pi}}x\sin(x^2)\;dx$.
 3. What is $\int_{[0,1]^2} xy \;dx\;dy$?
-4. Use the change of variables formula to compute $\int_0^2\int_0^1xy(x^2-y^2)/(x^2+y^2)^3\;dy\;dx$ and $\int_0^1\int_0^2f(x,y) = xy(x^2-y^2)/(x^2+y^2)^3\;dx\;dy$ to see they are different.
+4. Use the change of variables formula to compute $\int_0^2\int_0^1xy(x^2-y^2)/(x^2+y^2)^3\;dy\;dx$ and $\int_0^1\int_0^2f(x, y) = xy(x^2-y^2)/(x^2+y^2)^3\;dx\;dy$ to see they are different.
 
 ## [Discussions](https://discuss.mxnet.io/t/5151)
 
