@@ -28,7 +28,7 @@ with zipfile.ZipFile(fname) as f:
 pokemon = gluon.data.vision.datasets.ImageFolderDataset(data_dir+'pokemon')
 ```
 
-We resize each image into $64\times 64$. The `ToTensor` transformation will project the pixel value into $[0,1]$, while our generator will use the tanh function to obtain outputs in $[-1,1]$. Therefore we normalize the data with $0.5$ mean and $0.5$ standard deviation to match the value range.
+We resize each image into $64\times 64$. The `ToTensor` transformation will project the pixel value into $[0, 1]$, while our generator will use the tanh function to obtain outputs in $[-1, 1]$. Therefore we normalize the data with $0.5$ mean and $0.5$ standard deviation to match the value range.
 
 ```{.python .input  n=3}
 batch_size = 256
@@ -47,7 +47,7 @@ Let us visualize the first 20 images.
 ```{.python .input  n=4}
 d2l.set_figsize((4, 4))
 for X, y in data_iter:
-    imgs = X[0:20,:,:,:].transpose(0,2,3,1)/2+0.5
+    imgs = X[0:20,:,:,:].transpose(0, 2, 3, 1)/2+0.5
     d2l.show_images(imgs, num_rows=4, num_cols=5)
     break
 ```
@@ -105,7 +105,7 @@ net_G = nn.Sequential()
 net_G.add(G_block(n_G*8, strides=1, padding=0),  # output: (64*8, 4, 4)
           G_block(n_G*4),  # output: (64*4, 8, 8)
           G_block(n_G*2),  # output: (64*2, 16, 16)
-          G_block(n_G),    # output: (64, 32, 32)
+          G_block(n_G),   # output: (64, 32, 32)
           nn.Conv2DTranspose(
               3, kernel_size=4, strides=2, padding=1, use_bias=False,
               activation='tanh'))  # output: (3, 64, 64)
@@ -121,15 +121,15 @@ net_G(x).shape
 
 ## Discriminator
 
-The discriminator is a normal convolutional network network except that it uses a leaky ReLU as its activation function. Given $\alpha \in[0,1]$, its definition is
+The discriminator is a normal convolutional network network except that it uses a leaky ReLU as its activation function. Given $\alpha \in[0, 1]$, its definition is
 
 $$\textrm{leaky ReLU}(x) = \begin{cases}x & \text{if}\ x > 0\\ \alpha x &\text{otherwise}\end{cases}.$$
 
-As it can be seen, it is normal ReLU if $\alpha=0$, and an identity function if $\alpha=1$. For $\alpha \in (0,1)$, leaky ReLU is a nonlinear function that give a non-zero output for a negative input. It aims to fix the "dying ReLU" problem that a neuron might always output a negative value and therefore cannot make any progress since the gradient of ReLU is 0.
+As it can be seen, it is normal ReLU if $\alpha=0$, and an identity function if $\alpha=1$. For $\alpha \in (0, 1)$, leaky ReLU is a nonlinear function that give a non-zero output for a negative input. It aims to fix the "dying ReLU" problem that a neuron might always output a negative value and therefore cannot make any progress since the gradient of ReLU is 0.
 
 ```{.python .input  n=10}
 alphas = [0, 0.2, 0.4, .6, .8, 1]
-x = np.arange(-2,1,0.1)
+x = np.arange(-2, 1, 0.1)
 Y = [nn.LeakyReLU(alpha)(x).asnumpy() for alpha in alphas]
 d2l.plot(x.asnumpy(), Y, 'x', 'y', alphas)
 ```
@@ -173,7 +173,7 @@ The discriminator is a mirror of the generator.
 ```{.python .input  n=13}
 n_D = 64
 net_D = nn.Sequential()
-net_D.add(D_block(n_D),    # output: (64, 32, 32)
+net_D.add(D_block(n_D),   # output: (64, 32, 32)
           D_block(n_D*2),  # output: (64*2, 16, 16)
           D_block(n_D*4),  # output: (64*4, 8, 8)
           D_block(n_D*8),  # output: (64*8, 4, 4)
@@ -202,7 +202,7 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
     trainer_D = gluon.Trainer(net_D.collect_params(), 'adam', trainer_hp)
     trainer_G = gluon.Trainer(net_G.collect_params(), 'adam', trainer_hp)
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
-                            xlim=[1, num_epochs], nrows=2, figsize=(5,5),
+                            xlim=[1, num_epochs], nrows=2, figsize=(5, 5),
                             legend=['discriminator', 'generator'])
     animator.fig.subplots_adjust(hspace=0.3)
     for epoch in range(1, num_epochs+1):
@@ -218,7 +218,7 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
                         batch_size)
         # Show generated examples
         Z = np.random.normal(0, 1, size=(21, latent_dim, 1, 1), ctx=ctx)
-        fake_x = net_G(Z).transpose(0,2,3,1)/2+0.5  # Noramlize the synthetic data to N(0,1)
+        fake_x = net_G(Z).transpose(0, 2, 3, 1)/2+0.5  # Noramlize the synthetic data to N(0, 1)
         imgs = np.concatenate(
             [np.concatenate([fake_x[i * 7 + j] for j in range(7)], axis=1)
              for i in range(len(fake_x)//7)], axis=0)

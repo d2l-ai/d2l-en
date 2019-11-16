@@ -214,7 +214,7 @@ def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
     trainer = gluon.Trainer(net.collect_params(),
                             'sgd', {'learning_rate': lr})
-    animator = d2l.Animator(xlabel='epoch', xlim=[0,num_epochs],
+    animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs],
                             legend=['train loss','train acc','test acc'])
     timer = d2l.Timer()
     for epoch in range(num_epochs):

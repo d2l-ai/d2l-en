@@ -425,7 +425,7 @@ npx.set_np()
 First we need data. Given $x$, we will use the following cubic polynomial to generate the labels on training and test data:
 
 $$y = 5 + 1.2x - 3.4\frac{x^2}{2!} + 5.6 \frac{x^3}{3!} + \epsilon \text{ where }
-\epsilon \sim \mathcal{N}(0,0.1)$$
+\epsilon \sim \mathcal{N}(0, 0.1)$$
 
 The noise term $\epsilon$ obeys a normal distribution
 with a mean of 0 and a standard deviation of 0.1.
@@ -494,7 +494,7 @@ def train(train_features, test_features, train_labels, test_labels,
     trainer = gluon.Trainer(net.collect_params(), 'sgd',
                             {'learning_rate': 0.01})
     animator = d2l.Animator(xlabel='epoch', ylabel='loss', yscale='log',
-                            xlim=[1,num_epochs], ylim=[1e-3, 1e2],
+                            xlim=[1, num_epochs], ylim=[1e-3, 1e2],
                             legend=['train', 'test'])
     for epoch in range(1, num_epochs+1):
         d2l.train_epoch_ch3(net, train_iter, loss, trainer)

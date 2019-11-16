@@ -451,7 +451,7 @@ We can now visualize the normal distributions.
 
 ```{.python .input  n=2}
 # Mean and variance pairs
-parameters = [(0,1), (0,2), (3,1)]
+parameters = [(0, 1), (0, 2), (3, 1)]
 d2l.plot(x, [normal(x, mu, sigma) for mu, sigma in parameters], xlabel='z',
          ylabel='p(z)', figsize=(4.5, 2.5),
          legend=['mean %d, var %d' % (mu, sigma) for mu, sigma in parameters])

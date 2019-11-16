@@ -38,7 +38,7 @@ but just remember for now that the expression $x \in \mathbb{R}$
 is a formal way to say that $x$ is a real-valued scalar.
 The symbol $\in$ can be pronounced "in"
 and simply denotes membership in a set.
-Analogously, we could write $x,y \in \{0,1\}$
+Analogously, we could write $x, y \in \{0, 1\}$
 to state that $x$ and $y$ are numbers
 whose value can only be $0$ or $1$.
 
@@ -178,7 +178,7 @@ When the scalar elements of a matrix $\mathbf{A}$, such as in :eqref:`eq_matrix_
 we may simply use the lower-case letter of the matrix $\mathbf{A}$ with the index subscript, $a_{ij}$,
 to refer to $[\mathbf{A}]_{ij}$.
 To keep notation simple, commas are inserted to separate indices only when necessary,
-such as $a_{2,3j}$ and $[\mathbf{A}]_{2i-1,3}$.
+such as $a_{2, 3j}$ and $[\mathbf{A}]_{2i-1, 3}$.
 
 
 Sometimes, we want to flip the axes.
@@ -239,7 +239,7 @@ or just data points if no minibatch exists.
 Just as vectors generalize scalars, and matrices generalize vectors, we can build data structures with even more axes. Tensors give us a generic way of describing `ndarray`s with an arbitrary number of axes. Vectors, for example, are first-order tensors, and matrices are second-order tensors.
 Tensors are denoted with capital letters of a special font face
 (e.g., $\mathsf{X}$, $\mathsf{Y}$, and $\mathsf{Z}$)
-and their indexing mechanism (e.g., $x_{ijk}$ and $[\mathsf{X}]_{1, 2i-1,3}$) is similar to that of matrices.
+and their indexing mechanism (e.g., $x_{ijk}$ and $[\mathsf{X}]_{1, 2i-1, 3}$) is similar to that of matrices.
 
 Tensors will become more important when we start working with images, which arrive as `ndarray`s with 3 axes corresponding to the height, width, and a *channel* axis for stacking the color channels (red, green, and blue). For now, we will skip over higher order tensors and focus on the basics.
 

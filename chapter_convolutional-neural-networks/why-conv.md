@@ -81,7 +81,7 @@ with $h \times w$ images as inputs
 (represented as matrices in math, and as 2D arrays in code),
 and hidden representations similarly organized
 as $h \times w$ matrices / 2D arrays.
-Let $x[i,j]$ and $h[i,j]$ denote pixel location $(i,j)$
+Let $x[i, j]$ and $h[i, j]$ denote pixel location $(i, j)$
 in an image and hidden representation, respectively.
 Consequently, to have each of the $hw$ hidden nodes receive input
 from each of the $hw$ inputs,
@@ -93,46 +93,46 @@ as four-dimensional weight tensors.
 
 We could formally express this dense layer as follows:
 
-$$h[i,j] = u[i,j] + \sum_{k,l} W[i,j,k,l] \cdot x[k,l] =  u[i,j] +
-\sum_{a, b} V[i,j,a,b] \cdot x[i+a,j+b]$$
+$$h[i, j] = u[i, j] + \sum_{k, l} W[i, j, k, l] \cdot x[k, l] =  u[i, j] +
+\sum_{a, b} V[i, j, a, b] \cdot x[i+a, j+b]$$
 
 The switch from $W$ to $V$ is entirely cosmetic (for now)
 since there is a one-to-one correspondence
 between coefficients in both tensors.
-We simply re-index the subscripts $(k,l)$
+We simply re-index the subscripts $(k, l)$
 such that $k = i+a$ and $l = j+b$.
-In other words, we set $V[i,j,a,b] = W[i,j,i+a, j+b]$.
+In other words, we set $V[i, j, a, b] = W[i, j, i+a, j+b]$.
 The indices $a, b$ run over both positive and negative offsets,
 covering the entire image.
-For any given location $(i,j)$ in the hidden layer $h[i,j]$,
+For any given location $(i, j)$ in the hidden layer $h[i, j]$,
 we compute its value by summing over pixels in $x$,
-centered around $(i,j)$ and weighted by $V[i,j,a,b]$.
+centered around $(i, j)$ and weighted by $V[i, j, a, b]$.
 
 Now let us invoke the first principle we established above—*translation invariance*.
 This implies that a shift in the inputs $x$
 should simply lead to a shift in the activations $h$.
-This is only possible if $V$ and $u$ do not actually depend on $(i,j)$,
-i.e., we have $V[i,j,a,b] = V[a,b]$ and $u$ is a constant.
+This is only possible if $V$ and $u$ do not actually depend on $(i, j)$,
+i.e., we have $V[i, j, a, b] = V[a, b]$ and $u$ is a constant.
 As a result we can simplify the definition for $h$.
 
-$$h[i,j] = u + \sum_{a, b} V[a,b] \cdot x[i+a,j+b]$$
+$$h[i, j] = u + \sum_{a, b} V[a, b] \cdot x[i+a, j+b]$$
 
 This is a convolution!
 We are effectively weighting pixels $(i+a, j+b)$
-in the vicinity of $(i,j)$ with coefficients $V[a,b]$
-to obtain the value $h[i,j]$.
-Note that $V[a,b]$ needs many fewer coefficients than $V[i,j,a,b]$. For a 1 megapixel image it has at most 1 million coefficients. This is 1 million fewer parameters since it no longer depends on the location within the image. We have made significant progress!
+in the vicinity of $(i, j)$ with coefficients $V[a, b]$
+to obtain the value $h[i, j]$.
+Note that $V[a, b]$ needs many fewer coefficients than $V[i, j, a, b]$. For a 1 megapixel image it has at most 1 million coefficients. This is 1 million fewer parameters since it no longer depends on the location within the image. We have made significant progress!
 
 Now let us invoke the second principle - *locality*.
 As motivated above, we believe that we shouldn't have
-to look very far away from $(i,j)$
+to look very far away from $(i, j)$
 in order to glean relevant information
-to assess what is going on at $h[i,j]$.
+to assess what is going on at $h[i, j]$.
 This means that outside some range $|a|, |b| > \Delta$,
-we should set $V[a,b] = 0$.
-Equivalently, we can rewrite $h[i,j]$ as
+we should set $V[a, b] = 0$.
+Equivalently, we can rewrite $h[i, j]$ as
 
-$$h[i,j] = u + \sum_{a = -\Delta}^{\Delta} \sum_{b = -\Delta}^{\Delta} V[a,b] \cdot x[i+a,j+b]$$
+$$h[i, j] = u + \sum_{a = -\Delta}^{\Delta} \sum_{b = -\Delta}^{\Delta} V[a, b] \cdot x[i+a, j+b]$$
 
 This, in a nutshell is the convolutional layer.
 When the local region (also called a *receptive field*) is small,
@@ -170,11 +170,11 @@ with index running over $\mathbb{Z}$ we obtain the following definition.
 $$[f \circledast g](i) = \sum_a f(a) g(i-a)$$
 
 For two-dimensional arrays, we have a corresponding sum
-with indices $(i,j)$ for $f$ and $(i-a, j-b)$ for $g$ respectively.
+with indices $(i, j)$ for $f$ and $(i-a, j-b)$ for $g$ respectively.
 This looks similar to definition above, with one major difference.
 Rather than using $(i+a, j+b)$, we are using the difference instead.
 Note, though, that this distinction is mostly cosmetic
-since we can always match the notation by using $\tilde{V}[a,b] = V[-a, -b]$
+since we can always match the notation by using $\tilde{V}[a, b] = V[-a, -b]$
 to obtain $h = x \circledast \tilde{V}$.
 Also note that the original definition is actually a *cross correlation*.
 We will come back to this in the following section.
@@ -200,9 +200,9 @@ Only two of these axes concern spatial relationships,
 while the $3^{\mathrm{rd}}$ can be regarded as assigning
 a multidimensional representation *to each pixel location*.
 
-We thus index $\mathbf{x}$ as $x[i,j,k]$.
+We thus index $\mathbf{x}$ as $x[i, j, k]$.
 The convolutional mask has to adapt accordingly.
-Instead of $V[a,b]$ we now have $V[a,b,c]$.
+Instead of $V[a, b]$ we now have $V[a, b, c]$.
 
 Moreover, just as our input consists of a $3^{\mathrm{rd}}$ order tensor
 it turns out to be a good idea to similarly formulate
@@ -216,9 +216,9 @@ These are sometimes called *channels* or *feature maps*.
 Intuitively you might imaginee that at lower layers,
 some channels specialize to recognizing edges,
 We can take care of this by adding a fourth coordinate to $V$
-via $V[a,b,c,d]$. Putting all together we have:
+via $V[a, b, c, d]$. Putting all together we have:
 
-$$h[i,j,k] = \sum_{a = -\Delta}^{\Delta} \sum_{b = -\Delta}^{\Delta} \sum_c V[a,b,c,k] \cdot x[i+a,j+b,c]$$
+$$h[i, j, k] = \sum_{a = -\Delta}^{\Delta} \sum_{b = -\Delta}^{\Delta} \sum_c V[a, b, c, k] \cdot x[i+a, j+b, c]$$
 
 This is the definition of a convolutional neural network layer.
 There are still many operations that we need to address.

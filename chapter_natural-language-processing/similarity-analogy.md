@@ -29,14 +29,14 @@ Given the name of the word embedding, we can see which pre-trained models are pr
 print(text.embedding.get_pretrained_file_names('glove'))
 ```
 
-The general naming conventions for pre-trained GloVe models are "model.(dataset.)number of words in dataset.word vector dimension.txt". For more information, please refer to the GloVe and fastText project sites [2,3]. Below, we use a 50-dimensional GloVe word vector based on Wikipedia subset pre-training. The corresponding word vector is automatically downloaded the first time we create a pre-trained word vector instance.
+The general naming conventions for pre-trained GloVe models are "model.(dataset.)number of words in dataset.word vector dimension.txt". For more information, please refer to the GloVe and fastText project sites [2, 3]. Below, we use a 50-dimensional GloVe word vector based on Wikipedia subset pre-training. The corresponding word vector is automatically downloaded the first time we create a pre-trained word vector instance.
 
 ```{.python .input  n=11}
 glove_6b50d = text.embedding.create(
     'glove', pretrained_file_name='glove.6B.50d.txt')
 ```
 
-Print the dictionary size. The dictionary contains 400,000 words and a special unknown token.
+Print the dictionary size. The dictionary contains $400,000$ words and a special unknown token.
 
 ```{.python .input}
 len(glove_6b50d)

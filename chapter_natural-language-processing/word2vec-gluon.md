@@ -30,7 +30,7 @@ embed.initialize()
 embed.weight
 ```
 
-The input of the embedding layer is the index of the word. When we enter the index $i$ of a word, the embedding layer returns the $i$th row of the weight matrix as its word vector. Below we enter an index of shape (2,3) into the embedding layer. Because the dimension of the word vector is 4, we obtain a word vector of shape (2,3,4).
+The input of the embedding layer is the index of the word. When we enter the index $i$ of a word, the embedding layer returns the $i$th row of the weight matrix as its word vector. Below we enter an index of shape (2, 3) into the embedding layer. Because the dimension of the word vector is 4, we obtain a word vector of shape (2, 3, 4).
 
 ```{.python .input  n=16}
 x = np.array([[1, 2, 3], [4, 5, 6]])
@@ -62,7 +62,7 @@ def skip_gram(center, contexts_and_negatives, embed_v, embed_u):
 Verify that the output shape should be (batch size, 1, `max_len`).
 
 ```{.python .input}
-skip_gram(np.ones((2,1)), np.ones((2,4)), embed, embed).shape
+skip_gram(np.ones((2, 1)), np.ones((2, 4)), embed, embed).shape
 ```
 
 ## Training
@@ -83,7 +83,7 @@ Given two identical examples, different masks lead to different loss values.
 
 ```{.python .input}
 pred = np.array([[.5]*4]*2)
-label = np.array([[1,0,1,0]]*2)
+label = np.array([[1, 0, 1, 0]]*2)
 mask = np.array([[1, 1, 1, 1], [1, 1, 0, 0]])
 loss(pred, label, mask)
 ```

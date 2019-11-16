@@ -163,7 +163,7 @@ coercing the desired behavior from our model.
 The training process usually looks like this:
 
 1. Start off with a randomly initialized model that cannot do anything useful.
-1. Grab some of your labeled data (e.g., audio snippets and corresponding ``{yes,no}`` labels)
+1. Grab some of your labeled data (e.g., audio snippets and corresponding ``{yes, no}`` labels)
 1. Tweak the knobs so the model sucks less with respect to those examples
 1. Repeat until the model is awesome.
 
@@ -602,13 +602,13 @@ In most of our chapters, we will focus on one of two very common losses,
 the [L1 loss](http://mxnet.incubator.apache.org/api/python/gluon/loss.html#mxnet.gluon.loss.L1Loss)
 where
 
-$$l(y,y') = \sum_i |y_i-y_i'|$$
+$$l(y, y') = \sum_i |y_i-y_i'|$$
 
 and the least mean squares loss, or
 [L2 loss](http://mxnet.incubator.apache.org/api/python/gluon/loss.html#mxnet.gluon.loss.L2Loss),
 where
 
-$$l(y,y') = \sum_i (y_i - y_i')^2.$$
+$$l(y, y') = \sum_i (y_i - y_i')^2.$$
 
 As we will see later, the $L_2$ loss corresponds to the assumption 
 that our data was corrupted by Gaussian noise, 
@@ -1512,7 +1512,7 @@ Fortunately, we are far from a sentient AI syste
 that is ready to manipulate its human creators (or burn their coffee).
 First, AI systems are engineered, trained and deployed in a specific,
 goal-oriented manner. While their behavior might give the illusion
-of general intelligence,it is a combination of rules, heuristics
+of general intelligence, it is a combination of rules, heuristics
 and statistical models that underlie the design.
 Second, at present tools for *artificial general intelligence*
 simply do not exist that are able to improve themselves,

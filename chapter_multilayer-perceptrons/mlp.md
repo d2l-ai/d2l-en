@@ -42,7 +42,7 @@ In these cases, linear models might perform well,
 and they might even be hard to beat.
 
 But what about classifying images in FashionMNIST?
-Should increasing the intensity of the pixel at location (13,17)
+Should increasing the intensity of the pixel at location (13, 17)
 always increase the likelihood that the image depicts a pocketbook?
 That seems ridiculous because we all know
 that you cannot make sense out of an image
@@ -119,7 +119,7 @@ $$\mathbf{o} = \mathbf{W}_2 \mathbf{h} + \mathbf{b}_2 = \mathbf{W}_2 (\mathbf{W}
 
 In order to get a benefit from multilayer architectures,
 we need another key ingredient—a nonlinearity $\sigma$ to be applied to each of the hidden units after each layer's linear transformation.
-The most popular choice for the nonlinearity these days is the rectified linear unit (ReLU) $\mathrm{max}(x,0)$.
+The most popular choice for the nonlinearity these days is the rectified linear unit (ReLU) $\mathrm{max}(x, 0)$.
 After incorporating these non-linearities
 it becomes impossible to merge layers.
 
@@ -244,10 +244,10 @@ The reason for using the ReLU is that its derivatives are particularly well beha
 
 ### Sigmoid Function
 
-The sigmoid function transforms its inputs which take values in $\mathbb{R}$ to the interval $(0,1)$.
+The sigmoid function transforms its inputs which take values in $\mathbb{R}$ to the interval $(0, 1)$.
 For that reason, the sigmoid is often called a *squashing* function:
 it squashes any input in the range (-inf, inf)
-to some value in the range (0,1).
+to some value in the range (0, 1).
 
 $$\mathrm{sigmoid}(x) = \frac{1}{1 + \exp(-x)}.$$
 

@@ -150,7 +150,7 @@ If we want to initialize only a specific parameter in a different manner, we can
 ```{.python .input  n=11}
 net[1].initialize(init=init.Constant(42), force_reinit=True)
 net[0].weight.initialize(init=init.Xavier(), force_reinit=True)
-print(net[1].weight.data()[0,0])
+print(net[1].weight.data()[0, 0])
 print(net[0].weight.data()[0])
 ```
 
@@ -183,7 +183,7 @@ If even this functionality is insufficient, we can set parameters directly. Sinc
 
 ```{.python .input  n=13}
 net[0].weight.data()[:] += 1
-net[0].weight.data()[0,0] = 42
+net[0].weight.data()[0, 0] = 42
 net[0].weight.data()[0]
 ```
 
@@ -207,7 +207,7 @@ net(x)
 
 # Check whether the parameters are the same
 print(net[1].weight.data()[0] == net[2].weight.data()[0])
-net[1].weight.data()[0,0] = 100
+net[1].weight.data()[0, 0] = 100
 # Make sure that they are actually the same object rather than just having the
 # same value
 print(net[1].weight.data()[0] == net[2].weight.data()[0])

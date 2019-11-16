@@ -63,7 +63,7 @@ and all other components are set to 0.
 $$y \in \{(1, 0, 0), (0, 1, 0), (0, 0, 1)\}$$
 
 In our case, $y$ would be a three-dimensional vector, 
-with $(1,0,0)$ corresponding to "cat", $(0,1,0)$ to "chicken" and $(0,0,1)$ to "dog". 
+with $(1, 0, 0)$ corresponding to "cat", $(0, 1, 0)$ to "chicken" and $(0, 0, 1)$ to "dog". 
 
 
 ### Network Architecture
@@ -362,7 +362,7 @@ The cross-entropy *from $p$ to $q$*, denoted H(p, q),
 is the expected surprisal of an observer with subjective probabilities $q$
 upon seeing data that was actually generated according to probabilities $p$.
 The lowest possible cross-entropy is achieved when $p=q$. 
-In this case, the cross-entropy from $p$ to $q$ is $H(p,p)= H(p)$.
+In this case, the cross-entropy from $p$ to $q$ is $H(p, p)= H(p)$.
 Relating this back to our classification objective,
 even if we get the best possible predictions, 
 if the best possible possible, then we will never be perfect. 
@@ -377,7 +377,7 @@ is to calculate the Kullback Leibler divergence $D(p\|q)$.
 This is simply the difference between the cross-entropy and the entropy,
 i.e., the additional cross-entropy incurred over the irreducible minimum value it could take:
 $$
-D(p\|q) = H(p,q) - H[p] = \sum_j p(j) \log \frac{p(j)}{q(j)}
+D(p\|q) = H(p, q) - H[p] = \sum_j p(j) \log \frac{p(j)}{q(j)}
 $$
 Note that in classificatio, we do not know the true $p$,
 so we cannot compute the entropy directly. 
@@ -417,10 +417,10 @@ nd the total number of predictions.
 1. Assume that we three classes which occur with equal probability, i.e., the probability vector is $(\frac{1}{3}, \frac{1}{3}, \frac{1}{3})$.
     * What is the problem if we try to design a binary code for it? Can we match the entropy lower bound on the number of bits?
     * Can you design a better code. Hint - what happens if we try to encode two independent observations? What if we encode $n$ observations jointly?
-1. Softmax is a misnomer for the mapping introduced above (but everyone in deep learning uses it). The real softmax is defined as $\mathrm{RealSoftMax}(a,b) = \log (\exp(a) + \exp(b))$.
-    * Prove that $\mathrm{RealSoftMax}(a,b) > \mathrm{max}(a,b)$.
+1. Softmax is a misnomer for the mapping introduced above (but everyone in deep learning uses it). The real softmax is defined as $\mathrm{RealSoftMax}(a, b) = \log (\exp(a) + \exp(b))$.
+    * Prove that $\mathrm{RealSoftMax}(a, b) > \mathrm{max}(a, b)$.
     * Prove that this holds for $\lambda^{-1} \mathrm{RealSoftMax}(\lambda a, \lambda b)$, provided that $\lambda > 0$.
-    * Show that for $\lambda \to \infty$ we have $\lambda^{-1} \mathrm{RealSoftMax}(\lambda a, \lambda b) \to \mathrm{max}(a,b)$.
+    * Show that for $\lambda \to \infty$ we have $\lambda^{-1} \mathrm{RealSoftMax}(\lambda a, \lambda b) \to \mathrm{max}(a, b)$.
     * What does the soft-min look like?
     * Extend this to more than two numbers.
 

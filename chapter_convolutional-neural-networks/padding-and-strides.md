@@ -79,9 +79,9 @@ when the kernels size is odd
 and the number of padding rows and columns
 on all sides are the same,
 producing an output with the have the same height and width as the input,
-we know that the output `Y[i,j]` is calculated
+we know that the output `Y[i, j]` is calculated
 by cross-correlation of the input and convolution kernel
-with the window centered on `X[i,j]`.
+with the window centered on `X[i, j]`.
 
 In the following example, we create a two-dimensional convolutional layer
 with a height and width of 3
@@ -100,7 +100,7 @@ npx.set_np()
 # output
 def comp_conv2d(conv2d, X):
     conv2d.initialize()
-    # (1,1) indicates that the batch size and the number of channels
+    # (1, 1) indicates that the batch size and the number of channels
     # (described in later chapters) are both 1
     X = X.reshape((1, 1) + X.shape)
     Y = conv2d(X)

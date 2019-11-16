@@ -17,14 +17,14 @@ Problem 1: Initialize an ndarray of dimension 1x256 on the GPU without overwriti
 
 ## Problems from Linear Algebra
 
-Problem 2: Create a 4x4 matrix of random values (where values are uniformly random on the iterval [0,1]. Then create an 4x4 identity matrix (an identity of size n is the n × n square matrix with ones on the main diagonal and zeros elsewhere). Multiply the two together and verify that you get the original matrix back.
+Problem 2: Create a 4x4 matrix of random values (where values are uniformly random on the iterval [0, 1]. Then create an 4x4 identity matrix (an identity of size n is the n × n square matrix with ones on the main diagonal and zeros elsewhere). Multiply the two together and verify that you get the original matrix back.
 
 
 ```python
 # Problem 2 Work Area
 ```
 
-Problem 3: Create a 3x3x20 tensor such that at every x,y coordinate, moving through the z coordinate lists the [Fibonacci sequence](https://en.wikipedia.org/wiki/Fibonacci_number). So, at a z position of 0, the 3x3 matrix will be all 1s. At z-position 1, the 3x3 matrix will be all 1s. At z-position 2, the 3x3 matrix will be all 2s, at z-position 3, the 3x3 matrix will be all 3s and so forth.
+Problem 3: Create a 3x3x20 tensor such that at every x, y coordinate, moving through the z coordinate lists the [Fibonacci sequence](https://en.wikipedia.org/wiki/Fibonacci_number). So, at a z position of 0, the 3x3 matrix will be all 1s. At z-position 1, the 3x3 matrix will be all 1s. At z-position 2, the 3x3 matrix will be all 2s, at z-position 3, the 3x3 matrix will be all 3s and so forth.
 
 Hint: Create the first 2 matrices by hand and then use elementwise operations in a loop to construct the rest of the tensor. 
 
@@ -40,7 +40,7 @@ Problem 4: What is the sum of the vector you created? What is the mean?
 # Problem 4 Work Area
 ```
 
-Problem 5: Create a vector [0,1], and another vector [1,0], and use mxnet to calculate the angle between them. Remember that the dot product of two vectors is equal to the cosine of the angle between the vectors, and that the arccos function is the inverse of cosine.
+Problem 5: Create a vector [0, 1], and another vector [1, 0], and use mxnet to calculate the angle between them. Remember that the dot product of two vectors is equal to the cosine of the angle between the vectors, and that the arccos function is the inverse of cosine.
 
 
 ```python

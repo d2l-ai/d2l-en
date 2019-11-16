@@ -24,7 +24,7 @@ we often want our representations to be somewhat invariant to translation.
 For instance, if we take the image `X`
 with a sharp delineation between black and white
 and shift the whole image by one pixel to the right,
-i.e., `Z[i,j] = X[i,j+1]`,
+i.e., `Z[i, j] = X[i, j+1]`,
 then the output for the new image `Z` might be vastly different.
 The edge will have shifted by one pixel and with it all the activations.
 In reality, objects hardly ever occur exactly at the same place.
@@ -64,16 +64,16 @@ value of the input subarray in the window
 (depending on whether *max* or *average* pooling is employed).
 
 
-![Maximum pooling with a pooling window shape of $2\times 2$. The shaded portions represent the first output element and the input element used for its computation: $\max(0,1,3,4)=4$](../img/pooling.svg)
+![Maximum pooling with a pooling window shape of $2\times 2$. The shaded portions represent the first output element and the input element used for its computation: $\max(0, 1, 3, 4)=4$](../img/pooling.svg)
 
 The output array in the figure above has a height of 2 and a width of 2.
 The four elements are derived from the maximum value of $\text{max}$:
 
 $$
-\max(0,1,3,4)=4,\\
-\max(1,2,4,5)=5,\\
-\max(3,4,6,7)=7,\\
-\max(4,5,7,8)=8.\\
+\max(0, 1, 3, 4)=4,\\
+\max(1, 2, 4, 5)=5,\\
+\max(3, 4, 6, 7)=7,\\
+\max(4, 5, 7, 8)=8.\\
 $$
 
 A pooling layer with a pooling window shape of $p \times q$

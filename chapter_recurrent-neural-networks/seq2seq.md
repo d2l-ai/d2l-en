@@ -127,15 +127,15 @@ For each timestep, the decoder outputs a vocabulary size confidence score vector
 To implement the loss function that filters out some entries, we will use an operator called `SequenceMask`. It can specify to mask the first dimension (`axis=0`) or the second one (`axis=1`). If the second one is chosen, given a valid length vector `len` and 2-dim input `X`, this operator sets `X[i, len[i]:] = 0` for all $i$'s.
 
 ```{.python .input  n=7}
-X = np.array([[1,2,3], [4,5,6]])
-npx.sequence_mask(X, np.array([1,2]), True, axis=1)
+X = np.array([[1, 2, 3], [4, 5, 6]])
+npx.sequence_mask(X, np.array([1, 2]), True, axis=1)
 ```
 
 Apply to $n$-dim tensor $X$, it sets `X[i, len[i]:, :, ..., :] = 0`. In addition, we can specify the filling value such as $-1$ as showing below.
 
 ```{.python .input  n=8}
 X = np.ones((2, 3, 4))
-npx.sequence_mask(X, np.array([1,2]), True, value=-1, axis=1)
+npx.sequence_mask(X, np.array([1, 2]), True, value=-1, axis=1)
 ```
 
 Now we can implement the masked version of the softmax cross-entropy loss. Note that each Gluon loss function allows to specify per-example weights, in default they are 1s. Then we can just use a zero weight for each example we would like to remove. So our customized loss function accepts an additional `valid_length` argument to ignore some failing elements in each sequence.

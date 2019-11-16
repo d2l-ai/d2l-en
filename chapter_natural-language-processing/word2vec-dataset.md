@@ -166,7 +166,7 @@ class RandomGenerator(object):
         self.i += 1
         return self.candidates[self.i-1]
 
-generator = RandomGenerator([2,3,4])
+generator = RandomGenerator([2, 3, 4])
 [generator.draw() for _ in range(10)]
 ```
 
@@ -215,8 +215,8 @@ def batchify(data):
 Construct two simple examples:
 
 ```{.python .input  n=15}
-x_1 = (1, [2,2], [3,3,3,3])
-x_2 = (1, [2,2,2], [3,3])
+x_1 = (1, [2, 2], [3, 3, 3, 3])
+x_2 = (1, [2, 2, 2], [3, 3])
 batch = batchify((x_1, x_2))
 
 names = ['centers', 'contexts_negatives', 'masks', 'labels']

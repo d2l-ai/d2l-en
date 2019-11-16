@@ -101,7 +101,7 @@ where the inputs to most of the sigmoids are in the range of, say $[-4, 4]$,
 the gradients of the overall product may vanish.
 When we have many layers, unless we are especially careful,
 we are likely to find that our gradient is cut off at *some* layer.
-Before ReLUs ($\max(0,x)$) were proposed
+Before ReLUs ($\max(0, x)$) were proposed
 as an alternative to squashing functions,
 this problem used to plague deep network training.
 As a consequence, ReLUs have become
@@ -123,10 +123,10 @@ we would have no realistic chance of getting
 a gradient descent optimizer to converge.
 
 ```{.python .input  n=5}
-M = np.random.normal(size=(4,4))
+M = np.random.normal(size=(4, 4))
 print('A single matrix', M)
 for i in range(100):
-    M = np.dot(M, np.random.normal(size=(4,4)))
+    M = np.dot(M, np.random.normal(size=(4, 4)))
 
 print('After multiplying 100 matrices', M)
 ```

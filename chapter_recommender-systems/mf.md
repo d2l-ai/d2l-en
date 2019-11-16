@@ -73,7 +73,7 @@ class MF(nn.Block):
 We then implement the RMSE (root-mean-square error) measure, which is commonly used to measure the differences between rating scores predicted by the model and the actually observed ratings (ground truth) :cite:`Gunawardana.Shani.2015`. RMSE is defined as:
 
 $$
-\mathrm{RMSE} = \sqrt{\frac{1}{|\mathcal{T}|}\sum_{(u,i) \in \mathcal{T}}(\mathbf{R}_{ui} -\hat{\mathbf{R}}_{ui})^2}
+\mathrm{RMSE} = \sqrt{\frac{1}{|\mathcal{T}|}\sum_{(u, i) \in \mathcal{T}}(\mathbf{R}_{ui} -\hat{\mathbf{R}}_{ui})^2}
 $$
 
 where $\mathcal{T}$ is the set consisting of pairs of users and items that you want to evaluate on. $|\mathcal{T}|$ is the size of this set. We can use the RMSE function provided by `mx.metric`.
@@ -136,7 +136,7 @@ def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
           % (metric[2] * num_epochs / timer.sum(), ctx_list))
 ```
 
-Finally,  let us put all things together and train the model. Here, we set the latent factor dimension to 30.
+Finally, let us put all things together and train the model. Here, we set the latent factor dimension to 30.
 
 ```{.python .input  n=5}
 ctx = d2l.try_all_gpus()

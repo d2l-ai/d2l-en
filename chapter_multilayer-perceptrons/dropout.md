@@ -188,7 +188,7 @@ To implement the dropout function for a single layer,
 we must draw as many samples from a Bernoulli (binary) random variable
 as our layer has dimensions, where the random variable takes value $1$ (keep) with probability $1-p$ and $0$ (drop) with probability $p$.
 One easy way to implement this is to first draw samples
-from the uniform distribution $U[0,1]$.
+from the uniform distribution $U[0, 1]$.
 then we can keep those nodes for which the corresponding
 sample is greater than $p$, dropping the rest.
 

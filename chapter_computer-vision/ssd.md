@@ -54,9 +54,9 @@ Specifically, the category prediction layer uses a convolutional layer that
 maintains the input height and width. Thus, the output and input have a
 one-to-one correspondence to the spatial coordinates along the width and height
 of the feature map. Assuming that the output and input have the same spatial
-coordinates $(x,y)$, the channel for the coordinates $(x,y)$ on the output
+coordinates $(x, y)$, the channel for the coordinates $(x, y)$ on the output
 feature map contains the category predictions for all anchor boxes generated
-using the input feature map coordinates $(x,y)$ as the center. Therefore, there
+using the input feature map coordinates $(x, y)$ as the center. Therefore, there
 are $a(q+1)$ output channels, with the output channels indexed as $i(q+1) + j$
 ($0 \leq j \leq q$) representing the predictions of the category index $j$ for
 the anchor box index $i$.

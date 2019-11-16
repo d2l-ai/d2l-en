@@ -116,7 +116,7 @@ $\mathbf{x} \leftarrow \mathbf{x} - \eta \nabla f(\mathbf{x}).$
 
 Similarly, $\eta$ (positive) is called the learning rate.
 
-Now we are going to construct an objective function $f(\mathbf{x})=x_1^2+2x_2^2$ with a two-dimensional vector $\mathbf{x} = [x_1, x_2]^\top$ as input and a scalar as the output. So we have the gradient $\nabla f(\mathbf{x}) = [2x_1, 4x_2]^\top$. We will observe the iterative trajectory of independent variable $\mathbf{x}$ by gradient descent from the initial position $[-5,-2]$. First, we are going to define two helper functions. The first helper uses the given independent variable update function to iterate independent variable $\mathbf{x}$ a total of 20 times from the initial position $[-5,-2]$. The second helper will visualize the iterative trajectory of independent variable $\mathbf{x}$.
+Now we are going to construct an objective function $f(\mathbf{x})=x_1^2+2x_2^2$ with a two-dimensional vector $\mathbf{x} = [x_1, x_2]^\top$ as input and a scalar as the output. So we have the gradient $\nabla f(\mathbf{x}) = [2x_1, 4x_2]^\top$. We will observe the iterative trajectory of independent variable $\mathbf{x}$ by gradient descent from the initial position $[-5, -2]$. First, we are going to define two helper functions. The first helper uses the given independent variable update function to iterate independent variable $\mathbf{x}$ a total of 20 times from the initial position $[-5, -2]$. The second helper will visualize the iterative trajectory of independent variable $\mathbf{x}$.
 
 ```{.python .input  n=10}
 # This function is saved in the d2l package for future use
@@ -166,7 +166,7 @@ $$\nabla f(\mathbf{x}) = \frac{1}{n} \sum_{i = 1}^n \nabla f_i(\mathbf{x}).$$
 
 If gradient descent is used, the computing cost for each independent variable iteration is $\mathcal{O}(n)$, which grows linearly with $n$. Therefore, when the model training data instance is large, the cost of gradient descent for each iteration will be very high.
 
-Stochastic gradient descent (SGD) reduces computational cost at each iteration. At each iteration of stochastic gradient descent, we uniformly sample an index $i\in\{1,\ldots,n\}$ for data instances at random, and compute the gradient $\nabla f_i(\mathbf{x})$ to update $\mathbf{x}$:
+Stochastic gradient descent (SGD) reduces computational cost at each iteration. At each iteration of stochastic gradient descent, we uniformly sample an index $i\in\{1,\ldots, n\}$ for data instances at random, and compute the gradient $\nabla f_i(\mathbf{x})$ to update $\mathbf{x}$:
 
 $$\mathbf{x} \leftarrow \mathbf{x} - \eta \nabla f_i(\mathbf{x}).$$
 
