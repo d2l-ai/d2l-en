@@ -2,7 +2,7 @@
 :label:`sec_transposed_conv`
 
 The layers we introduced so far for convolutional neural networks, including
-convolutional layers (:numref:`sec_conv_layer`) and pooling layers (:numref:`sec_pooling`), often reducethe input width and height, or keep them unchanged. Applications such as semantic segmentation (:numref:`sec_semantic_segmentation`) and generative adversarial networks (:numref:`sec_dcgan`), however, require to predict values for each pixel and therefore needs to increase input width and height. Transposed convolution, also named fractionally-strided convolution :cite:`Dumoulin.Visin.2016` or deconvolution :cite:`Long.Shelhamer.Darrell.2015`, serves this purpose.
+convolutional layers (:numref:`sec_conv_layer`) and pooling layers (:numref:`sec_pooling`), often reduce the input width and height, or keep them unchanged. Applications such as semantic segmentation (:numref:`sec_semantic_segmentation`) and generative adversarial networks (:numref:`sec_dcgan`), however, require to predict values for each pixel and therefore needs to increase input width and height. Transposed convolution, also named fractionally-strided convolution :cite:`Dumoulin.Visin.2016` or deconvolution :cite:`Long.Shelhamer.Darrell.2015`, serves this purpose.
 
 ```{.python .input  n=13}
 from mxnet import np, npx, init

@@ -12,10 +12,11 @@ is
 
 > https://www.kaggle.com/c/cifar-10
 
-Figure 9.16 shows the information on the competition's webpage. In order to submit the results, please register an account on the Kaggle website first.
+:numref:`fig_kaggle_cifar10` shows the information on the competition's webpage. In order to submit the results, please register an account on the Kaggle website first.
 
 ![CIFAR-10 image classification competition webpage information. The dataset for the competition can be accessed by clicking the "Data" tab.](../img/kaggle_cifar10.png)
 :width:`600px`
+:label:`fig_kaggle_cifar10`
 
 First, import the packages or modules required for the competition.
 
@@ -31,16 +32,16 @@ import time
 npx.set_np()
 ```
 
-## Obtain and Organize the Dataset
+## Obtaining and Organizing the Dataset
 
 The competition data is divided into a training set and testing set. The training set contains $50,000$ images. The testing set contains $300,000$ images, of which $10,000$ images are used for scoring, while the other $290,000$ non-scoring images are included to prevent the manual labeling of the testing set and the submission of labeling results. The image formats in both datasets are PNG, with heights and widths of 32 pixels and three color channels (RGB). The images cover 10$ categories: planes, cars, birds, cats, deer, dogs, frogs, horses, boats, and trucks. The upper-left corner of Figure 9.16 shows some images of planes, cars, and birds in the dataset.
 
-### Download the Dataset
+### Downloading the Dataset
 
 After logging in to Kaggle, we can click on the "Data" tab on the CIFAR-10 image classification competition webpage shown in Figure 9.16 and download the training dataset "train.7z", the testing dataset "test.7z", and the training dataset labels "trainlabels.csv".
 
 
-### Unzip the Dataset
+### Unzipping the Dataset
 
 The training dataset "train.7z" and the test dataset "test.7z" need to be unzipped after downloading. After unzipping the datasets, store the training dataset, test dataset, and training dataset labels in the following respective paths:
 
@@ -61,7 +62,7 @@ if demo:
             z.extractall('../data/kaggle_cifar10/')
 ```
 
-### Organize the Dataset
+### Organizing the Dataset
 
 We need to organize datasets to facilitate model training and testing. The following `read_label_file` function will be used to read the label file for the training dataset. The parameter `valid_ratio` in this function is the ratio of the number of examples in the validation set to the number of examples in the original training set.
 
@@ -162,12 +163,12 @@ transform_train = gluon.data.vision.transforms.Compose([
     # image, and then shrink it to a square of 32 pixels in both height and
     # width
     gluon.data.vision.transforms.RandomResizedCrop(32, scale=(0.64, 1.0),
-                                              ratio=(1.0, 1.0)),
+                                                   ratio=(1.0, 1.0)),
     gluon.data.vision.transforms.RandomFlipLeftRight(),
     gluon.data.vision.transforms.ToTensor(),
     # Normalize each channel of the image
     gluon.data.vision.transforms.Normalize([0.4914, 0.4822, 0.4465],
-                                      [0.2023, 0.1994, 0.2010])])
+                                           [0.2023, 0.1994, 0.2010])])
 ```
 
 In order to ensure the certainty of the output during testing, we only perform normalization on the image.
@@ -176,10 +177,10 @@ In order to ensure the certainty of the output during testing, we only perform n
 transform_test = gluon.data.vision.transforms.Compose([
     gluon.data.vision.transforms.ToTensor(),
     gluon.data.vision.transforms.Normalize([0.4914, 0.4822, 0.4465],
-                                      [0.2023, 0.1994, 0.2010])])
+                                           [0.2023, 0.1994, 0.2010])])
 ```
 
-## Read the Dataset
+## Reading the Dataset
 
 Next, we can create the `ImageFolderDataset` instance to read the organized dataset containing the original image files, where each data instance includes the image and label.
 
@@ -200,18 +201,21 @@ We specify the defined image augmentation operation in `DataLoader`. During trai
 
 ```{.python .input}
 train_iter = gluon.data.DataLoader(train_ds.transform_first(transform_train),
-                              batch_size, shuffle=True, last_batch='keep')
+                                   batch_size, shuffle=True,
+                                   last_batch='keep')
 valid_iter = gluon.data.DataLoader(valid_ds.transform_first(transform_test),
-                              batch_size, shuffle=True, last_batch='keep')
+                                   batch_size, shuffle=True,
+                                   last_batch='keep')
 train_valid_iter = gluon.data.DataLoader(train_valid_ds.transform_first(
     transform_train), batch_size, shuffle=True, last_batch='keep')
 test_iter = gluon.data.DataLoader(test_ds.transform_first(transform_test),
-                             batch_size, shuffle=False, last_batch='keep')
+                                  batch_size, shuffle=False,
+                                  last_batch='keep')
 ```
 
-## Define the Model
+## Defining the Model
 
-Here, we build the residual blocks based on the HybridBlock class, which is
+Here, we build the residual blocks based on the `HybridBlock` class, which is
 slightly different than the implementation described in
 :numref:`sec_resnet`. This is done to improve execution efficiency.
 
@@ -275,7 +279,7 @@ def get_net(ctx):
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
 ```
 
-## Define the Training Functions
+## Defining the Training Functions
 
 We will select the model and tune hyper-parameters according to the model's performance on the validation set. Next, we define the model training function `train`. We record the training time of each epoch, which helps us compare the time costs of different models.
 
@@ -303,14 +307,14 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
             valid_acc = d2l.evaluate_accuracy_gpu(net, valid_iter)
             epoch_s = ("epoch %d, loss %f, train acc %f, valid acc %f, "
                        % (epoch + 1, train_l_sum / n, train_acc_sum / n,
-                       valid_acc))
+                          valid_acc))
         else:
             epoch_s = ("epoch %d, loss %f, train acc %f, " %
                        (epoch + 1, train_l_sum / n, train_acc_sum / n))
         print(epoch_s + time_s + ', lr ' + str(trainer.learning_rate))
 ```
 
-## Train and Validate the Model
+## Training and Validating the Model
 
 Now, we can train and validate the model. The following hyper-parameters can be tuned. For example, we can increase the number of epochs. Because `lr_period` and `lr_decay` are set to 80 and 0.1 respectively, the learning rate of the optimization algorithm will be multiplied by 0.1 after every 80 epochs. For simplicity, we only train one epoch here.
 
@@ -322,7 +326,7 @@ train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
       lr_decay)
 ```
 
-## Classify the Testing Set and Submit Results on Kaggle
+## Classifying the Testing Set and Submitting Results on Kaggle
 
 After obtaining a satisfactory model design and hyper-parameters, we use all training datasets (including validation sets) to retrain the model and classify the testing set.
 

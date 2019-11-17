@@ -18,8 +18,7 @@ h, w = img.shape[0:2]
 h, w
 ```
 
-In
-:numref:`sec_conv_layer`, the 2D array output of the convolutional neural network (CNN) is called
+In :numref:`sec_conv_layer`, the 2D array output of the convolutional neural network (CNN) is called
 a feature map.  We can determine the midpoints of anchor boxes uniformly sampled
 on any image by defining the shape of the feature map.
 

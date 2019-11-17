@@ -21,11 +21,10 @@ import d2l
 from mxnet import gluon, image, init, np, npx
 from mxnet.gluon import nn
 
-
 npx.set_np()
 ```
 
-## Construct a Model
+## Constructing a Model
 
 Here, we demonstrate the most basic design of a fully convolutional network model. As shown in :numref:`fig_fcn`, the fully convolutional network first uses the convolutional neural network to extract image features, then transforms the number of channels into the number of categories through the $1\times 1$ convolution layer, and finally transforms the height and width of the feature map to the size of the input image by using the transposed convolution layer :numref:`sec_transposed_conv`. The model output has the same height and width as the input image and has a one-to-one correspondence in spatial positions. The final output channel contains the category prediction of the pixel of the corresponding spatial position.
 
@@ -75,7 +74,7 @@ net.add(nn.Conv2D(num_classes, kernel_size=1),
             num_classes, kernel_size=64, padding=16, strides=32))
 ```
 
-## Initialize the Transposed Convolution Layer
+## Initializing the Transposed Convolution Layer
 
 We already know that the transposed convolution layer can magnify a feature map. In image processing, sometimes we need to magnify the image, i.e., upsampling. There are many methods for upsampling, and one common method is bilinear interpolation. Simply speaking, in order to get the pixel of the output image at the coordinates $(x, y)$, the coordinates are first mapped to the coordinates of the input image $(x', y')$. This can be done based on the ratio of the size of thee input to the size of the output. The mapped values $x'$ and $y'$ are usually real numbers. Then, we find the four pixels closest to the coordinate $(x', y')$ on the input image. Finally, the pixels of the output image at coordinates $(x, y)$ are calculated based on these four pixels on the input image and their relative distances to $(x', y')$. Upsampling by bilinear interpolation can be implemented by transposed convolution layer of the convolution kernel constructed using the following `bilinear_kernel` function. Due to space limitations, we only give the implementation of the `bilinear_kernel` function and will not discuss the principles of the algorithm.
 
@@ -86,7 +85,8 @@ def bilinear_kernel(in_channels, out_channels, kernel_size):
         center = factor - 1
     else:
         center = factor - 0.5
-    og = np.arange(kernel_size).reshape(-1, 1), np.arange(kernel_size).reshape(1, -1)
+    og = np.arange(kernel_size).reshape(-1, 1), \
+        np.arange(kernel_size).reshape(1, -1)
     filt = (1 - np.abs(og[0] - center) / factor) * \
            (1 - np.abs(og[1] - center) / factor)
     weight = np.zeros((in_channels, out_channels, kernel_size, kernel_size))
@@ -128,7 +128,7 @@ net[-1].initialize(init.Constant(W))
 net[-2].initialize(init=init.Xavier())
 ```
 
-## Read the Dataset
+## Reading the Dataset
 
 We read the dataset using the method described in the previous section. Here, we specify shape of the randomly cropped output image as $320\times 480$, so both the height and width are divisible by 32.
 

@@ -19,7 +19,7 @@ First, import the packages or modules required for the competition.
 import collections
 import d2l
 import math
-from mxnet import autograd, gluon, init, np, npx
+from mxnet import autograd, gluon, init, npx
 from mxnet.gluon import nn
 import os
 import shutil
@@ -29,11 +29,11 @@ import zipfile
 npx.set_np()
 ```
 
-## Obtain and Organize the Dataset
+## Obtaining and Organizing the Dataset
 
 The competition data is divided into a training set and testing set. The training set contains $10,222$ images and the testing set contains $10,357$ images. The images in both sets are in JPEG format. These images contain three RGB channels (color) and they have different heights and widths. There are 120 breeds of dogs in the training set, including Labradors, Poodles, Dachshunds, Samoyeds, Huskies, Chihuahuas, and Yorkshire Terriers.
 
-### Download the Dataset
+### Downloading the Dataset
 
 After logging in to Kaggle, we can click on the "Data" tab on the dog breed identification competition webpage shown in :numref:`fig_kaggle_dog` and download the training dataset "train.zip", the testing dataset "test.zip", and the training dataset labels "label.csv.zip". After downloading the files, place them in the three paths below:
 
@@ -58,7 +58,7 @@ for f in zipfiles:
         z.extractall(data_dir)
 ```
 
-### Organize the Dataset
+### Organizing the Dataset
 
 Next, we define the `reorg_train_valid` function to segment the validation set from the original Kaggle competition training set.  The parameter `valid_ratio` in this function is the ratio of the number of examples of each dog breed in the validation set to the number of examples of the breed with the least examples (66) in the original training set. After organizing the data, images of the same breed will be placed in the same folder so that we can read them later.
 
@@ -133,17 +133,18 @@ transform_train = gluon.data.vision.transforms.Compose([
     # scale the image to create a new image with a height and width of 224
     # pixels each
     gluon.data.vision.transforms.RandomResizedCrop(224, scale=(0.08, 1.0),
-                                              ratio=(3.0/4.0, 4.0/3.0)),
+                                                   ratio=(3.0/4.0, 4.0/3.0)),
     gluon.data.vision.transforms.RandomFlipLeftRight(),
     # Randomly change the brightness, contrast, and saturation
-    gluon.data.vision.transforms.RandomColorJitter(brightness=0.4, contrast=0.4,
-                                              saturation=0.4),
+    gluon.data.vision.transforms.RandomColorJitter(brightness=0.4,
+                                                   contrast=0.4,
+                                                   saturation=0.4),
     # Add random noise
     gluon.data.vision.transforms.RandomLighting(0.1),
     gluon.data.vision.transforms.ToTensor(),
     # Standardize each channel of the image
     gluon.data.vision.transforms.Normalize([0.485, 0.456, 0.406],
-                                      [0.229, 0.224, 0.225])])
+                                           [0.229, 0.224, 0.225])])
 ```
 
 During testing, we only use definite image preprocessing operations.
@@ -155,10 +156,10 @@ transform_test = gluon.data.vision.transforms.Compose([
     gluon.data.vision.transforms.CenterCrop(224),
     gluon.data.vision.transforms.ToTensor(),
     gluon.data.vision.transforms.Normalize([0.485, 0.456, 0.406],
-                                      [0.229, 0.224, 0.225])])
+                                           [0.229, 0.224, 0.225])])
 ```
 
-## Read the Dataset
+## Reading the Dataset
 
 As in the previous section, we can create an `ImageFolderDataset` instance to read the dataset containing the original image files.
 
@@ -177,16 +178,19 @@ Here, we create a `DataLoader` instance, just like in the previous section.
 
 ```{.python .input}
 train_iter = gluon.data.DataLoader(train_ds.transform_first(transform_train),
-                              batch_size, shuffle=True, last_batch='keep')
+                                   batch_size, shuffle=True,
+                                   last_batch='keep')
 valid_iter = gluon.data.DataLoader(valid_ds.transform_first(transform_test),
-                              batch_size, shuffle=True, last_batch='keep')
+                                   batch_size, shuffle=True,
+                                   last_batch='keep')
 train_valid_iter = gluon.data.DataLoader(train_valid_ds.transform_first(
     transform_train), batch_size, shuffle=True, last_batch='keep')
 test_iter = gluon.data.DataLoader(test_ds.transform_first(transform_test),
-                             batch_size, shuffle=False, last_batch='keep')
+                                  batch_size, shuffle=False,
+                                  last_batch='keep')
 ```
 
-## Define the Model
+## Defining the Model
 
 The dataset for this competition is a subset of the ImageNet data
 set. Therefore, we can use the approach discussed in
@@ -237,7 +241,7 @@ def evaluate_loss(data_iter, net, ctx):
     return l_sum / n
 ```
 
-## Define the Training Functions
+## Defining the Training Functions
 
 We will select the model and tune hyper-parameters according to the model's performance on the validation set. The model training function `train` only trains the small custom output network.
 
@@ -272,7 +276,7 @@ def train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
         print(epoch_s + time_s + ', lr ' + str(trainer.learning_rate))
 ```
 
-## Train and Validate the Model
+## Training and Validating the Model
 
 Now, we can train and validate the model. The following hyper-parameters can be tuned. For example, we can increase the number of epochs. Because `lr_period` and `lr_decay` are set to 10 and 0.1 respectively, the learning rate of the optimization algorithm will be multiplied by 0.1 after every 10 epochs.
 
@@ -284,7 +288,7 @@ train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
       lr_decay)
 ```
 
-## Classify the Testing Set and Submit Results on Kaggle
+## Classifying the Testing Set and Submit Results on Kaggle
 
 After obtaining a satisfactory model design and hyper-parameters, we use all training datasets (including validation sets) to retrain the model and then classify the testing set. Note that predictions are made by the output network we just trained.
 
