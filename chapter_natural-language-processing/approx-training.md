@@ -86,7 +86,3 @@ In addition, because the order of magnitude for $L(w_o)-1$ is $\mathcal{O}(\text
 ## [Discussions](https://discuss.mxnet.io/t/2386)
 
 ![](../img/qr_approx-training.svg)
-
-```{.python .input}
-
-```
