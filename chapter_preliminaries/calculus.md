@@ -5,11 +5,11 @@ Finding the area of a polygon had remained mysterious
 until at least $2,500$ years ago, when ancient Greeks divided a polygon into triangles and summed their areas.
 To find the area of curved shapes, such as a circle,
 ancient Greeks inscribed polygons in such shapes.
-As shown in :numref:`fig_polygon_area`,
+As shown in :numref:`fig_circle_area`,
 an inscribed polygon with more sides of equal length better approximates
 the circle. This process is also known as the *method of exhaustion*.
 
-![Find the area of the circle.](../img/polygon_circle.svg)
+![Find the area of a circle with the method of exhaustion.](../img/polygon_circle.svg)
 :label:`fig_circle_area`
 
 In fact, the method of exhaustion is where *integral calculus* (will be described in :numref:`sec_integral_calculus`) originates from.
