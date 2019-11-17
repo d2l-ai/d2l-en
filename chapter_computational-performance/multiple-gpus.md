@@ -54,8 +54,6 @@ b4 = np.zeros(10)
 params = [W1, b1, W2, b2, W3, b3, W4, b4]
 
 # Define the model
-
-
 def lenet(X, params):
     h1_conv = npx.convolution(data=X, weight=params[0], bias=params[1],
                               kernel=(3, 3), num_filter=20)
@@ -72,7 +70,6 @@ def lenet(X, params):
     h3 = npx.relu(h3_linear)
     y_hat = np.dot(h3, params[6]) + params[7]
     return y_hat
-
 
 # Cross-entropy loss function
 loss = gluon.loss.SoftmaxCrossEntropyLoss()

@@ -37,7 +37,6 @@ def add(a, b):
     return a + b
 '''
 
-
 def fancy_func_str():
     return '''
 def fancy_func(a, b, c, d):
@@ -47,12 +46,10 @@ def fancy_func(a, b, c, d):
     return g
 '''
 
-
 def evoke_str():
     return add_str() + fancy_func_str() + '''
 print(fancy_func(1, 2, 3, 4))
 '''
-
 
 prog = evoke_str()
 print(prog)
@@ -87,7 +84,6 @@ from mxnet import np, npx
 from mxnet.gluon import nn
 npx.set_np()
 
-
 def get_net():
     net = nn.HybridSequential()  # Here we use the class HybridSequential
     net.add(nn.Dense(256, activation='relu'),
@@ -95,7 +91,6 @@ def get_net():
             nn.Dense(2))
     net.initialize()
     return net
-
 
 x = np.random.normal(size=(1, 512))
 net = get_net()
@@ -124,7 +119,6 @@ def benchmark(net, x):
     # To facilitate timing, we wait for all computations to be completed
     npx.waitall()
     return timer.stop()
-
 
 net = get_net()
 print('before hybridizing: %.4f sec' % (benchmark(net, x)))
