@@ -54,22 +54,25 @@ b4 = np.zeros(10)
 params = [W1, b1, W2, b2, W3, b3, W4, b4]
 
 # Define the model
+
+
 def lenet(X, params):
     h1_conv = npx.convolution(data=X, weight=params[0], bias=params[1],
                               kernel=(3, 3), num_filter=20)
     h1_activation = npx.relu(h1_conv)
     h1 = npx.pooling(data=h1_activation, pool_type='avg', kernel=(2, 2),
-                    stride=(2, 2))
+                     stride=(2, 2))
     h2_conv = npx.convolution(data=h1, weight=params[2], bias=params[3],
                               kernel=(5, 5), num_filter=50)
     h2_activation = npx.relu(h2_conv)
     h2 = npx.pooling(data=h2_activation, pool_type='avg', kernel=(2, 2),
-                    stride=(2, 2))
+                     stride=(2, 2))
     h2 = h2.reshape(h2.shape[0], -1)
     h3_linear = np.dot(h2, params[4]) + params[5]
     h3 = npx.relu(h3_linear)
     y_hat = np.dot(h3, params[6]) + params[7]
     return y_hat
+
 
 # Cross-entropy loss function
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
@@ -185,8 +188,7 @@ def train(num_gpus, batch_size, lr):
         animator.add(epoch+1, (d2l.evaluate_accuracy_gpu(
             lambda x: lenet(x, gpu_params[0]), test_iter, ctx[0]),))
     print('test acc: %.2f, %.1f sec/epoch on %s' % (
-            animator.Y[0][-1], timer.avg(), ctx_list))
-
+        animator.Y[0][-1], timer.avg(), ctx_list))
 ```
 
 ## Multi-GPU Training Experiment
