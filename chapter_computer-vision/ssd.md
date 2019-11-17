@@ -8,7 +8,7 @@ widely used. Some of the design concepts and implementation details of this
 model are also applicable to other object detection models.
 
 
-## SSD Model
+## Model
 
 :numref:`fig_ssd` shows the design of an SSD model. The model's main components
 are a base network block and several multiscale feature blocks connected in a

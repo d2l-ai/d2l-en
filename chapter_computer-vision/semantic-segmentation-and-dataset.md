@@ -198,7 +198,7 @@ for X, Y in train_iter:
     break
 ```
 
-### Putting Things Together
+### Putting All Things Together
 
 Finally, we define a function `load_data_voc` that  downloads and loads this dataset, and then returns the data loaders.
 

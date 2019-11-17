@@ -85,8 +85,8 @@ def bilinear_kernel(in_channels, out_channels, kernel_size):
         center = factor - 1
     else:
         center = factor - 0.5
-    og = np.arange(kernel_size).reshape(-1, 1), \
-        np.arange(kernel_size).reshape(1, -1)
+    og = (np.arange(kernel_size).reshape(-1, 1),
+          np.arange(kernel_size).reshape(1, -1))
     filt = (1 - np.abs(og[0] - center) / factor) * \
            (1 - np.abs(og[1] - center) / factor)
     weight = np.zeros((in_channels, out_channels, kernel_size, kernel_size))
