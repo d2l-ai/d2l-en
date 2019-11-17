@@ -136,7 +136,7 @@ transform_train = gluon.data.vision.transforms.Compose([
                                                    ratio=(3.0/4.0, 4.0/3.0)),
     gluon.data.vision.transforms.RandomFlipLeftRight(),
     # Randomly change the brightness, contrast, and saturation
-    gluon.data.vision.transforms.RandomColorJitter(brightness=0.4, 
+    gluon.data.vision.transforms.RandomColorJitter(brightness=0.4,
                                                    contrast=0.4,
                                                    saturation=0.4),
     # Add random noise
