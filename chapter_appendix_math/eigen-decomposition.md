@@ -489,7 +489,7 @@ $$
 \mathbf{A} = \begin{bmatrix}
 2 & 1 \\
 0 & 2
-\end{bmatrix}?
+\end{bmatrix}.
 $$
 1. Without computing the eigenvalues, is it possible that the smallest eigenvalue of the following matrix is less that $0.5$? *Note*: this problem can be done in your head.
 $$
