@@ -9,11 +9,11 @@ As introduced previously when preparing the training dataset, we normally attach
 
 First, we will take a look at a simple solution: greedy search. For any timestep $t'$ of the output sequence, we are going to search for the word with the highest conditional probability from $|\mathcal{Y}|$ numbers of words, with
 
-$$y_{t'} = \operatorname*{argmax}_{y \in \mathcal{Y}} \mathbb{P}(y \mid y_1, \ldots, y_{t'-1}, \mathbf{c})$$
+$$y_{t'} = \operatorname*{argmax}_{y \in \mathcal{Y}} P(y \mid y_1, \ldots, y_{t'-1}, \mathbf{c})$$
 
 as the output.  Once the "&lt;eos&gt;" symbol is detected, or the output sequence has reached its maximum length $T'$, the output is completed.
 
-As we mentioned in our discussion of the decoder, the conditional probability of generating an output sequence based on the input sequence is $\prod_{t'=1}^{T'} \mathbb{P}(y_{t'} \mid y_1, \ldots, y_{t'-1}, \mathbf{c})$. We will take the output sequence with the highest conditional probability as the optimal sequence. The main problem with greedy search is that there is no guarantee that the optimal sequence will be obtained.
+As we mentioned in our discussion of the decoder, the conditional probability of generating an output sequence based on the input sequence is $\prod_{t'=1}^{T'} P(y_{t'} \mid y_1, \ldots, y_{t'-1}, \mathbf{c})$. We will take the output sequence with the highest conditional probability as the optimal sequence. The main problem with greedy search is that there is no guarantee that the optimal sequence will be obtained.
 
 Take a look at the example below. We assume that there are four words "A", "B", "C", and "&lt;eos&gt;" in the output dictionary.  The four numbers under each timestep in :numref:`fig_s2s-prob1` represent the conditional probabilities of generating "A", "B", "C", and "&lt;eos&gt;" at that timestep respectively.  At each timestep, greedy search selects the word with the highest conditional probability. Therefore, the output sequence "A", "B", "C", and "&lt;eos&gt;" will be generated in :numref:`fig_s2s-prob1`. The conditional probability of this output sequence is $0.5\times0.4\times0.4\times0.6 = 0.048$.
 
@@ -44,29 +44,29 @@ Although we can use an exhaustive search to obtain the optimal sequence, its com
 :label:`fig_beam-search`
 
 
-:numref:`fig_beam-search` demonstrates the process of beam search with an example. Suppose that the vocabulary of the output sequence only contains five elements: $\mathcal{Y} = \{A, B, C, D, E\}$ where one of them is a special symbol “&lt;eos&gt;”. Set beam size to 2, the maximum length of the output sequence to 3. At timestep 1 of the output sequence, suppose the words with the highest conditional probability $\mathbb{P}(y_1 \mid \mathbf{c})$ are $A$ and $C$. At timestep 2, for all $y_2 \in \mathcal{Y},$ we compute 
+:numref:`fig_beam-search` demonstrates the process of beam search with an example. Suppose that the vocabulary of the output sequence only contains five elements: $\mathcal{Y} = \{A, B, C, D, E\}$ where one of them is a special symbol “&lt;eos&gt;”. Set beam size to 2, the maximum length of the output sequence to 3. At timestep 1 of the output sequence, suppose the words with the highest conditional probability $P(y_1 \mid \mathbf{c})$ are $A$ and $C$. At timestep 2, for all $y_2 \in \mathcal{Y},$ we compute 
 
-$$\mathbb{P}(A, y_2 \mid \mathbf{c}) = \mathbb{P}(A \mid \mathbf{c})\mathbb{P}(y_2 \mid A, \mathbf{c})$$ 
-and $$\mathbb{P}(C, y_2 \mid \mathbf{c}) = \mathbb{P}(C \mid \mathbf{c})\mathbb{P}(y_2 \mid C, \mathbf{c})$$  
+$$P(A, y_2 \mid \mathbf{c}) = P(A \mid \mathbf{c})P(y_2 \mid A, \mathbf{c})$$ 
+and $$P(C, y_2 \mid \mathbf{c}) = P(C \mid \mathbf{c})P(y_2 \mid C, \mathbf{c})$$  
 and pick the largest two among these 10 values, say
 
-$$\mathbb{P}(A, B \mid \mathbf{c}) \text{  and  } \mathbb{P}(C, E \mid \mathbf{c}).$$
+$$P(A, B \mid \mathbf{c}) \text{  and  } P(C, E \mid \mathbf{c}).$$
 
 Then at timestep 3, for all $y_3 \in \mathcal{Y}$, we compute 
 
-$$\mathbb{P}(A, B, y_3 \mid \mathbf{c}) = \mathbb{P}(A, B \mid \mathbf{c})\mathbb{P}(y_3 \mid A, B, \mathbf{c}) $$ and 
-$$\mathbb{P}(C, E, y_3 \mid \mathbf{c}) = \mathbb{P}(C, E \mid \mathbf{c})\mathbb{P}(y_3 \mid C, E, \mathbf{c}),$$ 
+$$P(A, B, y_3 \mid \mathbf{c}) = P(A, B \mid \mathbf{c})P(y_3 \mid A, B, \mathbf{c}) $$ and 
+$$P(C, E, y_3 \mid \mathbf{c}) = P(C, E \mid \mathbf{c})P(y_3 \mid C, E, \mathbf{c}),$$ 
 
 and pick the largest two among these 10 values, say 
 
-$$\mathbb{P}(A, B, D \mid \mathbf{c}) \text{  and  } \mathbb{P}(C, E, D \mid  \mathbf{c}).$$ 
+$$P(A, B, D \mid \mathbf{c}) \text{  and  } P(C, E, D \mid  \mathbf{c}).$$ 
 
 
 As a result, we obtain 6 candidates output sequences: (1) $A$; (2) $C$; (3) $A$, $B$; (4) $C$, $E$; (5) $A$, $B$, $D$; and (6) $C$, $E$, $D$. In the end, we will get the set of final candidate output sequences based on these 6 sequences.
 
 In the set of final candidate output sequences, we will take the sequence with the highest score as the output sequence from those below:
 
-$$ \frac{1}{L^\alpha} \log \mathbb{P}(y_1, \ldots, y_{L}) = \frac{1}{L^\alpha} \sum_{t'=1}^L \log \mathbb{P}(y_{t'} \mid y_1, \ldots, y_{t'-1}, \mathbf{c}),$$
+$$ \frac{1}{L^\alpha} \log P(y_1, \ldots, y_{L}) = \frac{1}{L^\alpha} \sum_{t'=1}^L \log P(y_{t'} \mid y_1, \ldots, y_{t'-1}, \mathbf{c}),$$
 
 Here, $L$ is the length of the final candidate sequence and the selection for $\alpha$ is generally 0.75. The $L^\alpha$ on the denominator is a penalty on the logarithmic addition scores for the longer sequences above. The computational overhead $\mathcal{O}(k\left|\mathcal{Y}\right|T')$ of the beam search can be obtained through analysis, which is between greedy search and exhaustive search. In addition, greedy search can be treated as a beam search with a beam size of 1. Beam search strikes a balance between computational overhead and search quality using a flexible beam size of $k$.
 
