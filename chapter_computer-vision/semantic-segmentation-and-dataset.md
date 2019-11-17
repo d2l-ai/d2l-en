@@ -134,7 +134,7 @@ def voc_rand_crop(feature, label, height, width):
 imgs = []
 for _ in range(n):
     imgs += voc_rand_crop(train_features[0], train_labels[0], 200, 300)
-d2l.show_images(imgs[::2] + imgs[1::2], 2, n)
+d2l.show_images(imgs[::2] + imgs[1::2], 2, n);
 ```
 
 ### Dataset Classes for Custom Semantic Segmentation
