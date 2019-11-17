@@ -213,7 +213,7 @@ epochs, the process may occupy a great deal of memory. Therefore, we call the
 ```{.python .input  n=17}
 def train(X, contents_Y, styles_Y, ctx, lr, num_epochs, lr_decay_epoch):
     X, styles_Y_gram, trainer = get_inits(X, ctx, lr, styles_Y)
-    animator = d2l.Animator(xlabel='epoch', ylabel='loss', 
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[1, num_epochs],
                             legend=['content', 'style', 'TV'],
                             ncols=2, figsize=(7, 2.5))

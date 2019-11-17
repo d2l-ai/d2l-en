@@ -21,7 +21,7 @@ Next, we will load the sample images that will be used in this section. We can s
 ```{.python .input}
 d2l.set_figsize((3.5, 2.5))
 img = image.imread('../img/catdog.jpg').asnumpy()
-d2l.plt.imshow(img); 
+d2l.plt.imshow(img)
 ```
 
 ## Bounding Box

@@ -178,15 +178,15 @@ Here, we create a `DataLoader` instance, just like in the previous section.
 
 ```{.python .input}
 train_iter = gluon.data.DataLoader(train_ds.transform_first(transform_train),
-                                   batch_size, shuffle=True, 
+                                   batch_size, shuffle=True,
                                    last_batch='keep')
 valid_iter = gluon.data.DataLoader(valid_ds.transform_first(transform_test),
-                                   batch_size, shuffle=True, 
+                                   batch_size, shuffle=True,
                                    last_batch='keep')
 train_valid_iter = gluon.data.DataLoader(train_valid_ds.transform_first(
     transform_train), batch_size, shuffle=True, last_batch='keep')
 test_iter = gluon.data.DataLoader(test_ds.transform_first(transform_test),
-                                  batch_size, shuffle=False, 
+                                  batch_size, shuffle=False,
                                   last_batch='keep')
 ```
 
