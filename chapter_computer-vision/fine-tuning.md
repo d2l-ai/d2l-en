@@ -9,7 +9,7 @@ In order to deal with the above problems, an obvious solution is to collect more
 
 Another solution is to apply transfer learning to migrate the knowledge learned from the source dataset to the target dataset. For example, although the images in ImageNet are mostly unrelated to chairs, models trained on this dataset can extract more general image features that can help identify edges, textures, shapes, and object composition. These similar features may be equally effective for recognizing a chair.
 
-In this section, we introduce a common technique in transfer learning: fine tuning. As shown in Figure 9.1, fine tuning consists of the following four steps:
+In this section, we introduce a common technique in transfer learning: fine tuning. As shown in :numref:`fig_finetune`, fine tuning consists of the following four steps:
 
 1. Pre-train a neural network model, i.e., the source model, on a source dataset (e.g., the ImageNet dataset).
 2. Create a new neural network model, i.e., the target model. This replicates all model designs and their parameters on the source model, except the output layer. We assume that these model parameters contain the knowledge learned from the source dataset and this knowledge will be equally applicable to the target dataset. We also assume that the output layer of the source model is closely related to the labels of the source dataset and is therefore not used in the target model.
@@ -17,6 +17,7 @@ In this section, we introduce a common technique in transfer learning: fine tuni
 4. Train the target model on a target dataset, such as a chair dataset. We will train the output layer from scratch, while the parameters of all remaining layers are fine tuned based on the parameters of the source model.
 
 ![Fine tuning. ](../img/finetune.svg)
+:label:`fig_finetune`
 
 
 ## Hot Dog Recognition
@@ -36,7 +37,7 @@ import zipfile
 npx.set_np()
 ```
 
-### Get the Dataset
+### Obtaining the Dataset
 
 The hot dog dataset we use was taken from online images and contains $1,400$ positive images containing hot dogs and same number of negative images containing other foods. $1,000$ images of various classes are used for training and the rest are used for testing.
 
@@ -72,7 +73,8 @@ d2l.show_images(hotdogs + not_hotdogs, 2, 8, scale=1.4);
 During training, we first crop a random area with random size and random aspect ratio from the image and then scale the area to an input with a height and width of 224 pixels. During testing, we scale the height and width of images to 256 pixels, and then crop the center area with height and width of 224 pixels to use as the input. In addition, we normalize the values of the three RGB (red, green, and blue) color channels. The average of all values of the channel is subtracted from each value and then the result is divided by the standard deviation of all values of the channel to produce the output.
 
 ```{.python .input  n=5}
-# We specify the mean and variance of the three RGB channels to normalize the image channel.
+# We specify the mean and variance of the three RGB channels 
+# to normalize the image channel.
 normalize = gluon.data.vision.transforms.Normalize(
     [0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 
@@ -89,7 +91,7 @@ test_augs = gluon.data.vision.transforms.Compose([
     normalize])
 ```
 
-### Define and Initialize the Model
+### Defining and Initializing the Model
 
 We use ResNet-18, which was pre-trained on the ImageNet dataset, as the source model. Here, we specify `pretrained=True` to automatically download and load the pre-trained model parameters. The first time they are used, the model parameters need to be downloaded from the Internet.
 
@@ -114,7 +116,7 @@ finetune_net.output.initialize(init.Xavier())
 finetune_net.output.collect_params().setattr('lr_mult', 10)
 ```
 
-### Fine Tune the Model
+### Fine Tuning the Model
 
 We first define a training function `train_fine_tuning` that uses fine tuning so it can be called multiple times.
 

@@ -8,7 +8,7 @@ widely used. Some of the design concepts and implementation details of this
 model are also applicable to other object detection models.
 
 
-## Model
+## SSD Model
 
 :numref:`fig_ssd` shows the design of an SSD model. The model's main components
 are a base network block and several multiscale feature blocks connected in a
@@ -220,7 +220,8 @@ class TinySSD(nn.Block):
         # unchanged
         anchors = np.concatenate(anchors, axis=1)
         cls_preds = concat_preds(cls_preds)
-        cls_preds = cls_preds.reshape(cls_preds.shape[0], -1, self.num_classes + 1)
+        cls_preds = cls_preds.reshape(
+            cls_preds.shape[0], -1, self.num_classes + 1)
         bbox_preds = concat_preds(bbox_preds)
         return anchors, cls_preds, bbox_preds
 ```
@@ -260,7 +261,7 @@ trainer = gluon.Trainer(net.collect_params(), 'sgd',
                         {'learning_rate': 0.2, 'wd': 5e-4})
 ```
 
-### Define Loss and Evaluation Functions
+### Defining Loss and Evaluation Functions
 
 Object detection is subject to two types of losses. The first is anchor box category loss. For this, we can simply reuse the cross-entropy loss function we used in image classification. The second loss is positive anchor box offset loss. Offset prediction is a normalization problem. However, here, we do not use the squared loss introduced previously. Rather, we use the $L_1$ norm loss, which is the absolute value of the difference between the predicted value and the ground-truth value. The mask variable `bbox_masks` removes negative anchor boxes and padding anchor boxes from the loss calculation. Finally, we add the anchor box category and offset losses to find the final loss function for the model.
 
@@ -286,7 +287,7 @@ def bbox_eval(bbox_preds, bbox_labels, bbox_masks):
     return float((np.abs((bbox_labels - bbox_preds) * bbox_masks)).sum())
 ```
 
-### Train the Model
+### Training the Model
 
 During model training, we must generate multiscale anchor boxes (`anchors`) in the model's forward computation process and predict the category (`cls_preds`) and offset (`bbox_preds`) for each anchor box. Afterwards, we label the category (`cls_labels`) and offset (`bbox_labels`) of each generated anchor box based on the label information `Y`. Finally, we calculate the loss function using the predicted and labeled category and offset values. To simplify the code, we do not evaluate the training dataset here.
 
@@ -316,12 +317,12 @@ for epoch in range(num_epochs):
         l.backward()
         trainer.step(batch_size)
         metric.add(cls_eval(cls_preds, cls_labels), cls_labels.size,
-                    bbox_eval(bbox_preds, bbox_labels, bbox_masks),
-                    bbox_labels.size)
+                   bbox_eval(bbox_preds, bbox_labels, bbox_masks),
+                   bbox_labels.size)
     cls_err, bbox_mae = 1-metric[0]/metric[1], metric[2]/metric[3]
     animator.add(epoch+1, (cls_err, bbox_mae))
 print('class err %.2e, bbox mae %.2e' % (cls_err, bbox_mae))
-print('%.1f exampes/sec on %s'%(train_iter.num_image/timer.stop(), ctx))
+print('%.1f exampes/sec on %s' % (train_iter.num_image/timer.stop(), ctx))
 ```
 
 ## Prediction

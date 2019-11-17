@@ -33,7 +33,7 @@ In object detection, we usually use a bounding box to describe the target locati
 dog_bbox, cat_bbox = [60, 45, 378, 516], [400, 112, 655, 493]
 ```
 
-We can draw the bounding box in the image to check if it is accurate. Before drawing the box, we will define a helper function `bbox_to_rect`. It represents the bounding box in the bounding box format of matplotlib.
+We can draw the bounding box in the image to check if it is accurate. Before drawing the box, we will define a helper function `bbox_to_rect`. It represents the bounding box in the bounding box format of `matplotlib`.
 
 ```{.python .input  n=3}
 # Saved in the d2l package for later use
