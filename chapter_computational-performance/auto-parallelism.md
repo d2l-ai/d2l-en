@@ -75,6 +75,7 @@ In computations that use both the CPU and GPU, we often need to copy data betwee
 def copy_to_cpu(x):
     return [y.copyto(npx.cpu()) for y in x]
 
+
 timer.start()
 y = run(x_gpu)
 npx.waitall()

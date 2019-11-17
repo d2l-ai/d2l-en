@@ -9,11 +9,11 @@ Contributions by [readers](https://github.com/d2l-ai/d2l-en/graphs/contributors)
 
 We will walk you through the steps in detail. If you are already familiar with Git you can skip this section. For concreteness we assume that the contributor's user name is `smolix`.
 
-### Install Git
+### Installing Git
 
 The Git open source book describes [how to install Git](https://git-scm.com/book/zh/v2). This typically works via `apt install git` on Ubuntu Linux, by installing the Xcode developer tools on macOS, or by using GitHub's [desktop client](https://desktop.github.com). If you do not have a GitHub account, you need to sign up for one [4].
 
-### Log in to GitHub
+### Logging in to GitHub
 
 Enter the [address](https://github.com/d2l-ai/d2l-en/) of the book's code repository in your browser. Click on the `Fork` button in the red box at the top-right of the figure below, to make a copy of the repository of this book. This is now *your copy* and you can change it any way you want.
 
@@ -25,7 +25,7 @@ Now, the code repository of this book will be copied to your username, such as `
 ![Copy the code repository.](../img/git-forked.png)
 :width:`700px`
 
-### Clone the Repository
+### Cloning the Repository
 
 To clone the repository (i.e., to make a local copy) we need to get its repository address. The green button on the picture below displays this. Make sure that your local copy is up to date with the main repository if you decide to keep this fork around for longer. For now simply follow the instructions in :numref:`chap_installation` to get started. The main difference is that you are now downloading *your own fork* of the repository.
 
@@ -58,7 +58,7 @@ nothing to commit, working tree clean
 ```
 
 
-### Edit the Book and Push
+### Editing the Book and Push
 
 Now it is time to edit the book. It is best to edit the notebooks in Jupyter following instructions in :numref:`sec_jupyter`. Make the changes and check that they are OK. Assume we have modified a typo in the file `~/d2l-en/chapter_appendix_tools/how-to-contribute.md`.
 You can then check which files you have changed:
@@ -97,7 +97,7 @@ Go to your fork of the repository on GitHub and select "New pull request". This 
 :width:`700px`
 
 
-### Submit Pull Request
+### Submitting Pull Request
 
 Finally, submit a pull request. Make sure to describe the changes you have made in the pull request. This will make it easier for the authors to review it and to merge it with the book. Depending on the changes, this might get accepted right away, rejected, or more likely, you will get some feedback on the changes. Once you have incorporated them, you are good to go.
 

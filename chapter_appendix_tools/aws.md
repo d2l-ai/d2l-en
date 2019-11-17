@@ -179,6 +179,7 @@ After installing the program, run the following command to view the instance GPU
 nvidia-smi
 ```
 
+
 Finally, add CUDA to the library path to help other libraries find it.
 
 ```bash

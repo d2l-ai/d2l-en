@@ -15,7 +15,7 @@ from mxnet.gluon import nn
 npx.set_np()
 ```
 
-## Initialize Model Parameters on Multiple GPUs
+## Initializing Model Parameters on Multiple GPUs
 
 In this section, we use ResNet-18 as a sample model. Since the input images in
 this section are original size (not enlarged), the model construction here is
