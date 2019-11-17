@@ -14,8 +14,8 @@ dataset :cite:`Xiao.Rasul.Vollgraf.2017`, which was released in 2017.
 ```{.python .input  n=7}
 %matplotlib inline
 import d2l
-import sys
 from mxnet import gluon
+import sys
 
 d2l.use_svg_display()
 ```

@@ -185,7 +185,7 @@ In general, for some number $p$, the $\ell_p$ norm is defined as
 
 $$\|\mathbf{w}\|_p^p := \sum_{i=1}^d |w_i|^p$$
 
-### Initialize Model Parameters
+### Initializing Model Parameters
 
 First, we will define a function to randomly initialize our model parameters and run `attach_grad` on each to allocate memory for the gradients we will calculate.
 
@@ -198,7 +198,7 @@ def init_params():
     return [w, b]
 ```
 
-### Define $\ell_2$ Norm Penalty
+### Defining $\ell_2$ Norm Penalty
 
 Perhaps the most convenient way to implement this penalty
 is to square all terms in place and summ them up.
@@ -212,7 +212,7 @@ def l2_penalty(w):
     return (w**2).sum() / 2
 ```
 
-### Define Training and Testing
+### Defining the Train and Test Functions
 
 The following code defines how to train and test the model
 separately on the training dataset and the test dataset.
