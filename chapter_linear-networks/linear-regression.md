@@ -154,13 +154,15 @@ $$l^{(i)}(\mathbf{w}, b) = \frac{1}{2} \left(\hat{y}^{(i)} - y^{(i)}\right)^2.$$
 
 The constant $1/2$ makes no real difference
 but will prove notationally convenient,
-cancelling out when we take the dervative of the loss.
+cancelling out when we take the derivative of the loss.
 Since the training dataset is given to us, and thus out of our control,
 the empirical error is only a function of the model parameters.
 To make things more concrete, consider the example below
-where we plot a regression problem for a one-dimensional case:
+where we plot a regression problem for a one-dimensional case 
+as shown in :numref:`fig_fit_linreg`. 
 
 ![Fit data with a linear model.](../img/fit_linreg.svg)
+:label:`fig_fit_linreg`
 
 Note that large differences between
 estimates $\hat{y}^{(i)}$ and observations $y^{(i)}$
@@ -295,7 +297,7 @@ and thus there is only one (global) minimum.
 However, for more complicated models, like deep networks,
 the loss surfaces contain many minima.
 Fortunately, for reasons that are not yet fully understood,
-deep learning practitioners seldom stuggle to find parameters
+deep learning practitioners seldom struggle to find parameters
 that minimize the loss *on training data*.
 The more formidable task is to find parameters
 that will achieve low loss on data
@@ -426,7 +428,7 @@ has many convenient properties.
 These include a simple derivative
 $\partial_{\hat{y}} l(y, \hat{y}) = (\hat{y} - y)$.
 
-As we mentioned earlier, linear regression was invented by Gausss in 1795,
+As we mentioned earlier, linear regression was invented by Gauss in 1795,
 who also discovered the normal distribution (also called the *Gaussian*).
 It turns out that the connection between 
 the normal distribution and linear regression
@@ -544,14 +546,15 @@ when the cyberneticists/neurophysiologists
 Warren McCulloch and Walter Pitts
 looked when they began to develop 
 models of artificial neurons,
-consider the following cartoonish picture
-of a biological neuron, consisting of 
+consider the cartoonish picture
+of a biological neuron in :numref:`fig_Neuron`, consisting of 
 *dendrites* (input terminals), 
 the *nucleus* (CPU), the *axon* (output wire),
 and the *axon terminals* (output terminals),
 enabling connections to other neurons via *synapses*.
 
 ![The real neuron](../img/Neuron.svg)
+:label:`fig_Neuron`
 
 Information $x_i$ arriving from other neurons 
 (or environmental sensors such as the retina)
@@ -573,14 +576,14 @@ to produce far more interesting and complex behavior
 than any one neuron along could express
 owes to our study of real biological neural systems.
 
-At the same time, most reserach in deep learning today
+At the same time, most research in deep learning today
 draws little direct inspiration in neuroscience.
 We invoke Stuart Russell and Peter Norvig who, 
 in their classic AI text book 
 [Artificial Intelligence: A Modern Approach](https://en.wikipedia.org/wiki/Artificial_Intelligence:_A_Modern_Approach),
 pointed out that although airplanes might have been *inspired* by birds,
 orninthology has not been the primary driver 
-of aeronautics innovaton for some centuries. 
+of aeronautics innovation for some centuries. 
 Likewise, inspiration in deep learning these days
 comes in equal or greater measure from mathematics, 
 statistics, and computer science.
