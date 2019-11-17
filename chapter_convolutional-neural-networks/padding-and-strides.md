@@ -20,7 +20,7 @@ In several cases we might want to incorporate particular techniques---padding an
 that means that after applying many successive convolutions,
 we will wind up with an output that is much smaller than our input.
 If we start with a $240 \times 240$ pixel image, $10$ layers of $5 \times 5$ convolutions
-reduce the image to $200 \times 200$ pixels, slicing off 30% of the image and with it obliterating any interesting information on the boundaries of the original image. *Padding* handles this issue.
+reduce the image to $200 \times 200$ pixels, slicing off $30 \%$ of the image and with it obliterating any interesting information on the boundaries of the original image. *Padding* handles this issue.
 * In some cases, we want to reduce the resolution drastically if say we find our original input resolution to be unweildy. *Strides* can help in these instances.
 
 ## Padding
@@ -98,7 +98,7 @@ npx.set_np()
 # For convenience, we define a function to calculate the convolutional layer.
 # This function initializes the convolutional layer weights and performs
 # corresponding dimensionality elevations and reductions on the input and
-# output.
+# output
 def comp_conv2d(conv2d, X):
     conv2d.initialize()
     # (1, 1) indicates that the batch size and the number of channels
@@ -122,7 +122,7 @@ we can make the output and input have the same height and width by setting diffe
 ```{.python .input  n=2}
 # Here, we use a convolution kernel with a height of 5 and a width of 3. The
 # padding numbers on both sides of the height and width are 2 and 1,
-# respectively.
+# respectively 
 conv2d = nn.Conv2D(1, kernel_size=(5, 3), padding=(2, 1))
 comp_conv2d(conv2d, X).shape
 ```
