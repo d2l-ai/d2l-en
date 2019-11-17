@@ -7,13 +7,11 @@ So far, this book has focused on imperative programming, which makes use of prog
 def add(a, b):
     return a + b
 
-
 def fancy_func(a, b, c, d):
     e = add(a, b)
     f = add(c, d)
     g = add(e, f)
     return g
-
 
 fancy_func(1, 2, 3, 4)
 ```
