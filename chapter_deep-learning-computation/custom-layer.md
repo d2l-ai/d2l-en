@@ -88,7 +88,7 @@ dense.initialize()
 dense(np.random.uniform(size=(2, 5)))
 ```
 
-We can also construct models using custom layers. Once we have that we can use it just like the built-in dense layer. The only exception is that in our case size inference is not automagic. Please consult the [MXNet documentation](http://www.mxnet.io) for details on how to do this.
+We can also construct models using custom layers. Once we have that we can use it just like the built-in dense layer. The only exception is that in our case size inference is not automatic. Please consult the [MXNet documentation](http://www.mxnet.io) for details on how to do this.
 
 ```{.python .input  n=19}
 net = nn.Sequential()
