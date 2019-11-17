@@ -46,7 +46,7 @@ and the number of output channels `num_channels`.
 
 ```{.python .input  n=1}
 import d2l
-from mxnet import gluon, np, npx
+from mxnet import np, npx
 from mxnet.gluon import nn
 npx.set_np()
 
@@ -67,7 +67,7 @@ the first consisting mostly of convolutional and pooling layers
 and a second consisting of fully-connected layers.
 The convolutional portion of the net connects several `vgg_block` modules
 in succession.
-Below, the variable `conv_arch` consists of a list of tuples (one per block),
+In :numref:`fig_vgg`, the variable `conv_arch` consists of a list of tuples (one per block),
 where each contains two values: the number of convolutional layers
 and the number of output channels,
 which are precisely the arguments requires to call
