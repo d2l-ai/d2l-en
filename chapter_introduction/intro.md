@@ -1328,10 +1328,10 @@ Consequently the sweet spot in machine learning and statistics
 moved from (generalized) linear models and kernel methods to deep networks.
 This is also one of the reasons why many of the mainstays 
 of deep learning, such as multilayer perceptrons 
-(:cite:`McCulloch.Pitts.1943`), convolutional neural networks
-(:cite:`LeCun.Bottou.Bengio.ea.1998`), Long Short-Term Memory 
-(:cite:`Hochreiter.Schmidhuber.1997`), 
-and Q-Learning (:cite:`Watkins.Dayan.1992`),
+:cite:`McCulloch.Pitts.1943`, convolutional neural networks
+:cite:`LeCun.Bottou.Bengio.ea.1998`, Long Short-Term Memory 
+:cite:`Hochreiter.Schmidhuber.1997`, 
+and Q-Learning :cite:`Watkins.Dayan.1992`,
 were essentially 'rediscovered' in the past decade,
 after laying comparatively dormant for considerable time.
 
