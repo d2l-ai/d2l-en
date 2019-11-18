@@ -73,10 +73,9 @@ Next, we need to download the code for this book.
 ```bash
 sudo apt-get install unzip
 mkdir d2l-en && cd d2l-en
-wget http://numpy.d2l.ai/d2l-en.zip
+wget http://d2l.ai/d2l-en.zip
 unzip d2l-en.zip && rm d2l-en.zip
 ```
-
 
 Now we will now want to activate the "d2l" environment and install `pip`. 
 Enter `y` for the queries that follow this command.
@@ -95,8 +94,7 @@ pip install git+https://github.com/d2l-ai/d2l-en@numpy2
 
 
 If everything went well up to now then you are almost there.
-If by some misfortune, something went wrong along the way, 
-please check the following:
+If something went wrong, please check the following:
 
 1. That you are using `pip` for Python 3 instead of Python 2 by checking `pip --version`. If it is Python 2, then you may check if there is a `pip3` available.
 2. That you are using a recent `pip`, such as version 19. 
