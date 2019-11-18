@@ -155,52 +155,14 @@ Copy the instructions and paste them into the terminal to install
 
 ```bash
 ## paste the copied link from CUDA website
-wget http://developer.download.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.243_418.87.00_linux.run
-sudo sh cuda_10.1.243_418.87.00_linux.run
-## this command line may take a while to run
+wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-ubuntu1804.pin
+sudo mv cuda-ubuntu1804.pin /etc/apt/preferences.d/cuda-repository-pin-600
+wget http://developer.download.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda-repo-ubuntu1804-10-1-local-10.1.243-418.87.00_1.0-1_amd64.deb
+sudo dpkg -i cuda-repo-ubuntu1804-10-1-local-10.1.243-418.87.00_1.0-1_amd64.deb
+sudo apt-key add /var/cuda-repo-10-1-local-10.1.243-418.87.00/7fa2af80.pub
+sudo apt-get update
+sudo apt-get -y install cuda
 ```
-
-
-Enter `accept`  for the following inquiry as shown in
-:numref:`fig_cuda_accept`.
-
-```
-┌──────────────────────────────────────────────────────────────────────────┐
-│  End User License Agreement                                              │
-│  --------------------------                                              │
-│                                                                          │
-│  Preface                                                                 │
-│  -------                                                                 │
-│                                                                          │
-│  The Software License Agreement in Chapter 1 and the Supplement          │
-│  in Chapter 2 contain license terms and conditions that govern           │
-│  the use of NVIDIA software. By accepting this agreement, you            │
-│  agree to comply with all the terms and conditions applicable            │
-│  to the product(s) included herein.                                      │
-│                                                                          │
-│  NVIDIA Driver                                                           │
-│                                                                          │
-│─                                                                         │
-│ Do you accept the above EULA? (accept/decline/quit):                     │
-│ accept                                                                   │
-
-```
-
-
-Select the driver, toolkit and documentation to install drivers.
-
-```
-CUDA Installer 
-- [X] Driver 
-     [X] 418.87.00
-+ [X] CUDA Toolkit 10.1
-  [ ] CUDA Samples 10.1
-  [ ] CUDA Demo Suite 10.1
-  [X] CUDA Documentation 10.1
-  Options 
-  Install 
-```
-
 
 After installing the program, run the following command to view the GPUs.
 
@@ -228,6 +190,7 @@ First, to simplify the installation, you need to install [Miniconda](https://con
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 sh Miniconda3-latest-Linux-x86_64.sh
 ```
+
 
 You need to answer the following questions:
 
@@ -264,14 +227,12 @@ wget https://d2l.ai/d2l-en.zip
 unzip d2l-en.zip && rm d2l-en.zip
 ```
 
-Then create the conda `d2l` environment and enter `y` for the proceed inquiry as shown in :numref:`fig_conda_create_d2l`.
+
+Then create the conda `d2l` environment and enter `y` to proceed with the installation. 
 
 ```bash
 conda create --name d2l 
-```
-Accept the prompt to generate the package.
 
-```
 ## Package Plan ##
 
   environment location: /home/ubuntu/.conda/envs/d2l
@@ -287,16 +248,13 @@ conda install pip
 ```
 
 
-Finally, install `MXNet` and `d2l`.
+Finally, install `MXNet` and `d2l`. The postfix `cu101mkl` means that this is the CUDA 10.1 variant with Intel MKL support. For different versions, say only CUDA 10.0, you would want to choose `cu100` instead. 
 
 ```bash
 ## mxnet
 pip install mxnet-cu101mkl --pre
-
-## d2l
 pip install git+https://github.com/d2l-ai/d2l-en@numpy2
 ```
-
 
 You can test quickly whether everything went well as follows:
 
@@ -358,3 +316,7 @@ environments.
 ## [Discussions](https://discuss.mxnet.io/t/2399)
 
 ![](../img/qr_aws.svg)
+
+```{.python .input}
+
+```
