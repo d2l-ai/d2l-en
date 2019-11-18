@@ -5,8 +5,7 @@ While :numref:`sec_rnn_scratch` was instructive to see how recurrent neural netw
 
 ```{.python .input  n=1}
 import d2l
-import math
-from mxnet import gluon, init, np, npx
+from mxnet import np, npx
 from mxnet.gluon import nn, rnn
 npx.set_np()
 
