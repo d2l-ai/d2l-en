@@ -6,5 +6,6 @@
 .. automodule:: d2l
    :members:
    :imported-members:
+   :noindex:
 
 ```
