@@ -90,7 +90,7 @@ previously generated key pair. Click "Launch Instances" to launch the created
 instance.
 
 ![ Select a key pair. ](../img/keypair.png)
-:width:`700px`
+:width:`500px`
 :label:`fig_keypair`
 
 Make sure that you download the keypair and store it in a safe location if you
@@ -164,13 +164,13 @@ sudo sh cuda_10.1.168_418.67_linux.run
 Enter `accept`  for the following inquiry as shown in :numref:`fig_cuda_accept`.
 
 ![ Accept EULA. ](../img/cuda_accept.png)
-:width:`700px`
+:width:`500px`
 :label:`fig_cuda_accept`
 
 If the following image shows up, choose "Install" and tap "Enter" as shown in :numref:`fig_cuda_install`.
 
 ![ Install and Enter. ](../img/cuda_install.png)
-:width:`700px`
+:width:`250px`
 :label:`fig_cuda_install`
 
 After installing the program, run the following command to view the instance GPU.
@@ -245,7 +245,7 @@ conda create --name d2l
 
 
 ![ Conda create environment D2L. ](../img/conda_create_d2l.png)
-:width:`700px`
+:width:`300px`
 :label:`fig_conda_create_d2l`
 
 After create `d2l` environment, activate it and install `pip`.
