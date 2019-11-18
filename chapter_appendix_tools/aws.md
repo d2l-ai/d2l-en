@@ -1,4 +1,3 @@
-
 # Using AWS Instances
 :label:`sec_aws`
 
@@ -165,7 +164,6 @@ sudo apt-get update
 sudo apt-get -y install cuda
 ```
 
-
 After installing the program, run the following command to view the GPUs.
 
 ```bash
@@ -224,19 +222,10 @@ Next, download the code for this book.
 
 ```bash
 sudo apt-get install unzip
-```
-
-
-```bash
 mkdir d2l-en && cd d2l-en
-```
-
-
-```bash
 wget http://numpy.d2l.ai/d2l-en.zip
 unzip d2l-en.zip && rm d2l-en.zip
 ```
-
 
 Then create the conda `d2l` environment.
 
