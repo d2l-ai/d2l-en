@@ -53,17 +53,18 @@ source ~/.bashrc
 ```
 
 
-Then create the conda "d2l"" environment and enter `y`
-for the following inquiries as shown in :numref:`fig_conda_create_d2l`.
+Then create the conda "d2l"" environment and confirm the install
+location. 
 
 ```bash
-conda create --name d2l
+conda create --name d2l 
+
+## Package Plan ##
+
+  environment location: /home/ubuntu/.conda/envs/d2l
+  
+Proceed ([y]/n)? y
 ```
-
-
-![ Conda create environment d2l. ](../img/conda_create_d2l.png)
-:width:`700px`
-:label:`fig_conda_create_d2l`
 
 
 ## Downloading the d2l Notebooks
