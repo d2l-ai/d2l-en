@@ -21,5 +21,6 @@ adagrad
 rmsprop
 adadelta
 adam
+scheduler
 ```
 
