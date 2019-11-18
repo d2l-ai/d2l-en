@@ -223,7 +223,7 @@ Next, download the code for this book.
 ```bash
 sudo apt-get install unzip
 mkdir d2l-en && cd d2l-en
-wget http://numpy.d2l.ai/d2l-en.zip
+wget http://d2l.ai/d2l-en.zip
 unzip d2l-en.zip && rm d2l-en.zip
 ```
 
@@ -249,7 +249,6 @@ Finally, install `MXNet` and `d2l`. The postfix `cu101mkl` means that this is th
 pip install mxnet-cu101mkl --pre
 pip install git+https://github.com/d2l-ai/d2l-en@numpy2
 ```
-
 
 You can test quickly whether everything went well as follows:
 
