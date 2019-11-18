@@ -33,7 +33,7 @@ Now, the code repository of this book will be copied to your username, such as `
 
 ### Cloning the Repository
 
-To clone the repository (i.e., to make a local copy) we need to get its repository address. The green button on the picture :numref:`fig_git_clone_numpy2` displays this. Make sure that your local copy is up to date with the main repository if you decide to keep this fork around for longer. For now simply follow the instructions in :numref:`chap_installation` to get started. The main difference is that you are now downloading *your own fork* of the repository.
+To clone the repository (i.e., to make a local copy) we need to get its repository address. The green button in :numref:`fig_git_clone_numpy2` displays this. Make sure that your local copy is up to date with the main repository if you decide to keep this fork around for longer. For now simply follow the instructions in :numref:`chap_installation` to get started. The main difference is that you are now downloading *your own fork* of the repository.
 
 ![ Git clone. ](../img/git-clone-numpy2.png)
 :width:`700px`
