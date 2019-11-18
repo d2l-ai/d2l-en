@@ -100,10 +100,9 @@ def yogi(params, states, hyperparams):
         p[:] -= hyperparams['lr'] * v_bias_corr / (np.sqrt(s_bias_corr) + eps)
     hyperparams['t'] += 1
 
-
 data_iter, feature_dim = d2l.get_data_ch10(batch_size=10)
 d2l.train_ch10(yogi, init_adam_states(feature_dim),
-               {'lr': 0.01, 't': 1}, data_iter, feature_dim)
+               {'lr': 0.01, 't': 1}, data_iter, feature_dim);
 ```
 
 ## Summary

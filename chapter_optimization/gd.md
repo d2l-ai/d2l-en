@@ -196,11 +196,8 @@ Now let us see what happens when we have a *nonconvex* function, such as $f(x) =
 
 ```{.python .input}
 c = 0.15 * np.pi
-
 def f(x): return x * np.cos(c * x)
-
 def gradf(x): return np.cos(c * x) - c * x * np.sin(c * x)
-
 def hessf(x): return - 2 * c * np.sin(c * x) - x * c**2 * np.cos(c * x)
 
 show_trace(newton())

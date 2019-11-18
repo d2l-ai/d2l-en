@@ -40,7 +40,7 @@ gammas = [0.95, 0.9, 0.8, 0.7]
 for gamma in gammas:
     x = np.arange(40).asnumpy()
     d2l.plt.plot(x, (1-gamma) * gamma ** x, label='gamma = %.2f' % gamma)
-d2l.plt.xlabel('time')
+d2l.plt.xlabel('time');
 ```
 
 ## Implementation from Scratch

@@ -50,9 +50,7 @@ Let us define a few functions, both convex and nonconvex.
 
 ```{.python .input}
 def f(x): return 0.5 * x**2        # convex
-
 def g(x): return np.cos(np.pi * x)  # nonconvex
-
 def h(x): return np.exp(0.5 * x)   # convex
 
 x, segment = np.arange(-2, 2, 0.01), np.array([-1.5, 1])

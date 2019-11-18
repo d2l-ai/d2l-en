@@ -105,7 +105,7 @@ for gamma in gammas:
     x = np.arange(40).asnumpy()
     d2l.plt.plot(x, gamma ** x, label='gamma = %.2f' % gamma)
 d2l.plt.xlabel('time')
-d2l.plt.legend()
+d2l.plt.legend();
 ```
 
 ## Practical Experiments
@@ -207,7 +207,7 @@ for lam in lambdas:
     t = np.arange(20).asnumpy()
     d2l.plt.plot(t, (1 - eta * lam) ** t, label='lambda = %.2f' % lam)
 d2l.plt.xlabel('time')
-d2l.plt.legend()
+d2l.plt.legend();
 ```
 
 To analyze convergence in the case of momentum we begin by rewriting the update equations in terms of two scalars: one for $x$ and one for the momentum $v$. This yields:

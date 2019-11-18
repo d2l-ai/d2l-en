@@ -102,7 +102,7 @@ d2l.plt.xticks(ticks)
 d2l.plt.yticks(ticks)
 ax.set_zticks(ticks)
 d2l.plt.xlabel('x')
-d2l.plt.ylabel('y')
+d2l.plt.ylabel('y');
 ```
 
 We assume that the input of a function is a $k$-dimensional vector and its
