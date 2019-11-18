@@ -1,44 +1,45 @@
 # Data Manipulation
 :label:`sec_ndarray`
 
-In order to get anything done, we must have some way to manipulate data. 
+In order to get anything done, we need some way to store and manipulate data. 
 Generally, there are two important things we need to do with data: 
-(i) acquire them and (ii) process them once they are inside the computer. 
-There is no point in acquiring data if we do not even know how to store it, 
-so let us get our hands dirty first by playing with synthetic data. 
-We will start by introducing the $n$-dimensional array (`ndarray`), 
+(i) acquire them; and (ii) process them once they are inside the computer. 
+There is no point in acquiring data absent some way to store it, 
+so let's get our hands dirty first by playing with synthetic data. 
+To start, we introduce the $n$-dimensional array (`ndarray`), 
 MXNet's primary tool for storing and transforming data.
-In MXNet, `ndarray` is a class and we also call its instance
-an `ndarray` for brevity.
+In MXNet, `ndarray` is a class and we call any instance "an `ndarray`".
 
-If you have worked with NumPy, perhaps the most widely-used 
-scientific computing package in Python, then you are ready to fly. 
+If you have worked with NumPy, the most widely-used 
+scientific computing package in Python, 
+then will find this chapter familiar and should be ready to fly. 
 In short, we designed MXNet's `ndarray` to be 
-an extension to NumPy's `ndarray` with a few key advantages.
+an extension to NumPy's `ndarray` with a few killer features.
 First, MXNet's `ndarray` supports asynchronous computation 
 on CPU, GPU, and distributed cloud architectures, 
-whereas the latter only supports CPU computation. 
+whereas NumPy only supports CPU computation. 
 Second, MXNet's `ndarray` supports automatic differentiation. 
-These properties make MXNet's `ndarray` indispensable for deep learning.
-Throughout the book, the term `ndarray` refers to MXNet's `ndarray`
-unless otherwise stated.
+These properties make MXNet's `ndarray` suitable for deep learning.
+Throughout the book, when we say `ndarray`, 
+we are referring to MXNet's `ndarray` unless otherwise stated.
 
 
 
 ## Getting Started
 
-Throughout this chapter, our aim is to get you up and running,
+In this chapter, we aim to get you up and running,
 equipping you with the the basic math and numerical computing tools
-that you will be mastering throughout the course of the book. 
-Do not worry if you are not completely comfortable 
-with all of the mathematical concepts or library functions. 
-In the following sections we will revisit the same material 
-in the context practical examples. 
+that you will build on as you progress through the book. 
+Do not worry if you struggle to grok some of 
+the mathematical concepts or library functions. 
+The following sections will revisit this material 
+in the context practical examples and it will sink. 
 On the other hand, if you already have some background 
 and want to go deeper into the mathematical content, just skip this section.
 
-To start, we import the `np` (`numpy`) and `npx` (`numpy_extension`) modules from MXNet. 
-Here, the `np` module includes the same functions supported by NumPy, 
+To start, we import the `np` (`numpy`) and 
+`npx` (`numpy_extension`) modules from MXNet. 
+Here, the `np` module includes functions supported by NumPy, 
 while the `npx` module contains a set of extensions 
 developed to empower deep learning within a NumPy-like environment. 
 When using `ndarray`, we almost always invoke the `set_np` function: 
@@ -49,13 +50,15 @@ from mxnet import np, npx
 npx.set_np()
 ```
 
-An `ndarray` represents an array of numerical values, which are possibly multi-dimensional. 
+An `ndarray` represents a (possibly multi-dimensional) array of numerical values.
 With one axis, an `ndarray` corresponds (in math) to a *vector*. 
 With two axes, an `ndarray` corresponds to a *matrix*. 
-Arrays with more than two axes do not have special mathematical names---we simply call them *tensors*.
+Arrays with more than two axes do not have special 
+mathematical names---we simply call them *tensors*.
 
 To start, we can use `arange` to create a row vector `x` 
-containing the first $12$ integers starting with $0$, though they are created as floats by default.
+containing the first $12$ integers starting with $0$, 
+though they are created as floats by default.
 Each of the values in an `ndarray` is called an *element* of the `ndarray`.
 For instance, there are $12$ elements in the `ndarray` `x`.
 Unless otherwise specified, a new `ndarray` 
@@ -83,24 +86,25 @@ the single element of its `shape` is identical to its `size`.
 x.size
 ```
 
-To change the shape of an `ndarray` 
-without altering either the number of elements or their values,
+To change the shape of an `ndarray` without altering 
+either the number of elements or their values,
 we can invoke the `reshape` function.
 For example, we can transform our `ndarray`, `x`, 
-from a row vector with shape ($12$,) to a matrix of shape ($3$, $4$).
-This new `ndarray` contains the exact same values, and 
-treats such values as a matrix organized as $3$ rows and $4$ columns. 
-To reiterate, although the shape has changed, the elements in `x` have not. 
-Consequently, the `size` remains the same.
+from a row vector with shape ($12$,) to a matrix with shape ($3$, $4$).
+This new `ndarray` contains the exact same values, 
+but views them as a matrix organized as $3$ rows and $4$ columns. 
+To reiterate, although the shape has changed, 
+the elements in `x` have not. 
+Note that the `size` is unaltered by reshaping.
 
 ```{.python .input  n=5}
 x = x.reshape(3, 4)
 x
 ```
 
-Reshaping by manually specifying each of the dimensions can sometimes get annoying. 
-For instance, if our target shape is a matrix with shape (height, width),
-after we know the width, the height is given implicitly.
+Reshaping by manually specifying every dimension is unnecessary. 
+If our target shape is a matrix with shape (height, width),
+then after we know the width, the height is given implicitly.
 Why should we have to perform the division ourselves? 
 In the example above, to get a matrix with $3$ rows, 
 we specified both that it should have $3$ rows and $4$ columns. 
@@ -119,29 +123,30 @@ the entries might take arbitrary values, including very big ones!
 np.empty((3, 4))
 ```
 
-Typically, we will want our matrices initialized either with ones, zeros, 
-some known constants, or numbers randomly sampled from a known distribution.
-Perhaps most often, we want an array of all zeros. 
-To create an `ndarray` representing a tensor with all elements set to $0$ 
-and a shape of ($2$, $3$, $4$) we can invoke
+Typically, we will want our matrices initialized 
+either with zeros, ones, some other constants, 
+or numbers randomly sampled from a specific distribution.
+We can create an `ndarray` representing a tensor with all elements 
+set to $0$ and a shape of ($2$, $3$, $4$) as follows:
 
 ```{.python .input  n=7}
 np.zeros((2, 3, 4))
 ```
 
-We can create tensors with each element set to 1 as follows:
+Similarly, we can create tensors with each element set to 1 as follows:
 
 ```{.python .input  n=8}
 np.ones((2, 3, 4))
 ```
 
-In some cases, we will want to randomly sample the values 
-of all the elements in an `ndarray` according 
-to some known probability distribution. 
-One common case is when we construct an array 
-to serve as a parameter in a neural network. 
+Often, we want to randomly sample the values 
+for each element in an `ndarray` 
+from some probability distribution. 
+For example, when we construct arrays to serve 
+as parameters in a neural network, we will
+typically inititialize their values randomly. 
 The following snippet creates an `ndarray` with shape ($3$, $4$). 
-Each of its elements is randomly sampled 
+Each of its elements is randomly sampled  
 from a standard Gaussian (normal) distribution 
 with a mean of $0$ and a standard deviation of $1$.
 
@@ -149,7 +154,9 @@ with a mean of $0$ and a standard deviation of $1$.
 np.random.normal(0, 1, size=(3, 4))
 ```
 
-We can also specify the value of each element in the desired `ndarray` by supplying a Python list containing the numerical values.
+We can also specify the exact values for each element in the desired `ndarray`
+by supplying a Python list (or list of lists) containing the numerical values.
+Here, the outermost list corresponds to axis 0, and the inner list to axis 1.
 
 ```{.python .input  n=9}
 np.array([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
@@ -157,8 +164,9 @@ np.array([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
 
 ## Operations
 
-This book is not about Web development---it is
-not enough to just read and write values.
+This book is not about software engineering.
+Our interests are not limited to simply 
+reading and writing data from/to arrays.
 We want to perform mathematical operations on those arrays.
 Some of the simplest and most useful operations 
 are the *elementwise* operations. 
@@ -170,27 +178,29 @@ on each pair of corresponding elements from the two arrays.
 We can create an elementwise function from any function 
 that maps from a scalar to a scalar. 
 
-In math notation, we would denote such 
-a *unary* scalar operator (taking one input) 
-by the signature
-$f: \mathbb{R} \rightarrow \mathbb{R}$
-and a *binary* scalar operator (taking two inputs)
-by the signature
-$f: \mathbb{R}, \mathbb{R} \rightarrow \mathbb{R}$. 
-Given any two vectors $\mathbf{u}$ and $\mathbf{v}$ *of the same shape*, 
-and a binary operator $f$, we can produce a vector 
-$\mathbf{c} = F(\mathbf{u},\mathbf{v})$ 
+In mathematical notation, we would denote such
+a *unary* scalar operator (taking one input)
+by the signature $f: \mathbb{R} \rightarrow \mathbb{R}$.
+This just mean that the function is mapping
+from any real number ($\mathbb{R}$) onto another.
+Likewise, we denote a *binary* scalar operator
+(taking two real inputs, and yielding one output)
+by the signature $f: \mathbb{R}, \mathbb{R} \rightarrow \mathbb{R}$.
+Given any two vectors $\mathbf{u}$ and $\mathbf{v}$ *of the same shape*,
+and a binary operator $f$, we can produce a vector
+$\mathbf{c} = F(\mathbf{u},\mathbf{v})$
 by setting $c_i \gets f(u_i, v_i)$ for all $i$,
-where $c_i, u_i$, and $v_i$ are the $i^\mathrm{th}$ elements of vectors $\mathbf{c}, \mathbf{u}$, and $\mathbf{v}$.
-Here, we produced the vector-valued 
-$F: \mathbb{R}^d, \mathbb{R}^d \rightarrow \mathbb{R}^d$ 
+where $c_i, u_i$, and $v_i$ are the $i^\mathrm{th}$ elements
+of vectors $\mathbf{c}, \mathbf{u}$, and $\mathbf{v}$.
+Here, we produced the vector-valued
+$F: \mathbb{R}^d, \mathbb{R}^d \rightarrow \mathbb{R}^d$
 by *lifting* the scalar function to an elementwise vector operation.
 
-In MXNet, the common standard arithmetic operators (`+`, `-`, `*`, `/`, and `**`) 
+In MXNet, the common standard arithmetic operators
+(`+`, `-`, `*`, `/`, and `**`)
 have all been *lifted* to elementwise operations 
 for any identically-shaped tensors of arbitrary shape. 
-We can call elementwise operations on any two tensors 
-of the same shape.
+We can call elementwise operations on any two tensors of the same shape.
 In the following example, we use commas to formulate a $5$-element tuple,
 where each element is the result of an elementwise operation.
 
@@ -200,7 +210,8 @@ y = np.array([2, 2, 2, 2])
 x + y, x - y, x * y, x / y, x ** y  # The ** operator is exponentiation
 ```
 
-Many more operations can be applied elementwise, including unary operators like exponentiation.
+Many more operations can be applied elementwise,
+including unary operators like exponentiation.
 
 ```{.python .input  n=12}
 np.exp(x)
@@ -251,10 +262,9 @@ For stylistic convenience, we can write `x.sum()`as `np.sum(x)`.
 
 ## Broadcasting Mechanism
 
-In the above section, we saw how to perform 
-elementwise operations on two `ndarray`s of the same shape.
-Under certain conditions, even when shapes differ,
-we can still perform elementwise operations
+In the above section, we saw how to perform elementwise operations
+on two `ndarray`s of the same shape. Under certain conditions, 
+even when shapes differ, we can still perform elementwise operations
 by invoking the *broadcasting mechanism*.
 These mechanisms work in the following way:
 First, expand one or both arrays
@@ -289,10 +299,12 @@ a + b
 Just as in any other Python array, elements in an `ndarray` can be accessed by index. 
 As in any Python array, the first element has index $0$
 and ranges are specified to include the first but *before* the last element. 
+As in standard Python lists, we can access elements 
+according to their relative position to the end of the list 
+by using negative indices.
 
-By this logic, `[-1]` selects the last element and `[1:3]` 
-selects the second and the third elements. 
-Let us try this out and compare the outputs.
+Thus, `[-1]` selects the last element and `[1:3]` 
+selects the second and the third elements as follows:
 
 ```{.python .input  n=19}
 x[-1], x[1:3]
@@ -327,12 +339,10 @@ we will dereference the `ndarray` that `y` used to point to
 and instead point `y` at the newly allocated memory. 
 In the following example, we demonstrate this with Python's `id()` function, 
 which gives us the exact address of the referenced object in memory. 
-After running `y = y + x`, we will find 
-that `id(y)` points to a different location. 
+After running `y = y + x`, we will find that `id(y)` points to a different location. 
 That is because Python first evaluates `y + x`, 
-allocating new memory for the result 
-and then redirects `y` 
-to point at this new location in memory.
+allocating new memory for the result and then makes `y` 
+point to this new location in memory.
 
 ```{.python .input  n=22}
 before = id(y)
@@ -380,7 +390,7 @@ id(x) == before
 
 ## Conversion to Other Python Objects
 
-Converting an MXNet's `ndarray` to an object in the NumPy package of Python, or vice versa, is easy.
+Converting an MXNet `ndarray` to a NumpPy `ndarray`, or vice versa, is easy.
 The converted result does not share memory.
 This minor inconvenience is actually quite important: 
 when you perform operations on the CPU or on GPUs, 
@@ -395,7 +405,8 @@ b = np.array(a)
 type(a), type(b)
 ```
 
-To convert a size-$1$ `ndarray` to a Python scalar, we can invoke the `item` function or Python's built-in functions.
+To convert a size-$1$ `ndarray` to a Python scalar, 
+we can invoke the `item` function or Python's built-in functions.
 
 ```{.python .input}
 a = np.array([3.5])
@@ -404,8 +415,11 @@ a, a.item(), float(a), int(a)
 
 ## Summary
 
-* MXNet's `ndarray` is an extension to NumPy's `ndarray` with a few key advantages that make the former indispensable for deep learning.
-* MXNet's `ndarray` provides a variety of functionalities such as basic mathematics operations, broadcasting, indexing, slicing, memory saving, and conversion to other Python objects.
+* MXNet's `ndarray` is an extension to NumPy's `ndarray` 
+  with a few key advantages that make it suitable for deep learning.
+* MXNet's `ndarray` provides a variety of functionalities including 
+  basic mathematics operations, broadcasting, indexing, slicing, 
+  memory saving, and conversion to other Python objects.
 
 
 ## Exercises
