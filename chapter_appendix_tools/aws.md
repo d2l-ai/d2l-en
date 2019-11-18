@@ -223,7 +223,7 @@ Next, download the code for this book.
 ```bash
 sudo apt-get install unzip
 mkdir d2l-en && cd d2l-en
-wget http://d2l.ai/d2l-en.zip
+wget https://d2l.ai/d2l-en.zip
 unzip d2l-en.zip && rm d2l-en.zip
 ```
 
