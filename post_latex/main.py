@@ -1,4 +1,5 @@
 import re
+import regex
 import sys
 
 def _unnumber_chaps_and_secs(lines):
@@ -48,12 +49,27 @@ def _unnumber_chaps_and_secs(lines):
     # Since we inserted '\n' in some lines[i], re-build the list
     lines = '\n'.join(lines).split('\n')
 
+# If label is of chap*/index.md title, its numref is Chapter X instead of Section X
+def _sec_to_chap(lines):
+    for i, l in enumerate(lines):
+        # e.g., {Section \ref{\detokenize{chapter_dlc/index:chap-dlc}}} matches
+        # {Section \ref{\detokenize{chapter_prelim/nd:sec-nd}}} does not match
+        # Note that there can be multiple {Section } in one line
+
+        longest_balanced_braces = regex.findall('\{(?>[^{}]|(?R))*\}', l)
+        for src in longest_balanced_braces:
+            if src.startswith('{Section \\ref') and 'index:' in src:
+                tgt = src.replace('Section \\ref', 'Chapter \\ref')
+                lines[i] = lines[i].replace(src, tgt)
+
+
 def main():
     tex_file = sys.argv[1]
     with open(tex_file, 'r') as f:
         lines = f.read().split('\n')
 
     _unnumber_chaps_and_secs(lines)
+    _sec_to_chap(lines)
 
     with open(tex_file, 'w') as f:
         f.write('\n'.join(lines))

@@ -19,7 +19,7 @@ chapter_install/install
 :maxdepth: 2
 :numbered:
 
-chapter_introduction/intro
+chapter_introduction/index
 chapter_preliminaries/index
 chapter_linear-networks/index
 chapter_multilayer-perceptrons/index
