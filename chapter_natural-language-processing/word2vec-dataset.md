@@ -46,11 +46,6 @@ $$ P(w_i) = \max\left(1 - \sqrt{\frac{t}{f(w_i)}}, 0\right),$$
 Here, $f(w_i)$ is the ratio of the instances of word $w_i$ to the total number of words in the dataset, and the constant $t$ is a hyperparameter (set to $10^{-4}$ in this experiment). As we can see, it is only possible to drop out the word $w_i$ in subsampling when $f(w_i) > t$. The higher the word's frequency, the higher its dropout probability.
 
 ```{.python .input  n=4}
-def keep(token):
-    # Return True if to keep this token during subsampling
-    return (random.uniform(0, 1) <
-            math.sqrt(1e-4 / counter[token] * num_tokens))
-
 # Saved in the d2l package for later use
 def subsampling(sentences, vocab):
     # Map low frequency words into <unk>
@@ -59,6 +54,12 @@ def subsampling(sentences, vocab):
     # Count the frequency for each word
     counter = d2l.count_corpus(sentences)
     num_tokens = sum(counter.values())
+
+    # Return True if to keep this token during subsampling
+    def keep(token):
+        return(random.uniform(0, 1) <
+               math.sqrt(1e-4 / counter[token] * num_tokens))
+
     # Now do the subsampling
     return [[tk for tk in line if keep(tk)] for line in sentences]
 
