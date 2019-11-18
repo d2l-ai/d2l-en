@@ -8,7 +8,7 @@ So far we primarily focused on optimization *algorithms* for how to update the w
 * Another aspect that is equally important is *initialization*. This pertains both to how the parameters are set initially (review :numref:`sec_numerical_stability` for details) and also how they evolve initially. This goes under the moniker of *warmup*, i.e. how rapidly we start moving towards the solution initially. Large steps in the beginning might not be beneficial, in particular since the initial set of parameters is random. The initial update directions might be quite meaningless, too. 
 * Lastly, there are a number of optimization variants that perform cyclical learning rate adjustment. This is beyond the scope of the current chapter. We recommend the reader to review details in :cite:`Izmailov.Podoprikhin.Garipov.ea.2018`, e.g. how to obtain better solutions by averaging over an entire *path* of parameters. 
 
-Given the fact that there's a lot of detail needed to manage learning rates, most deep learning frameworks have tools to deal with this automatically. In the current chapter we will review the effects that different schedules have on accuracyu and also show how this can be managed efficiently via a *learning rate scheduler*.
+Given the fact that there's a lot of detail needed to manage learning rates, most deep learning frameworks have tools to deal with this automatically. In the current chapter we will review the effects that different schedules have on accuracy and also show how this can be managed efficiently via a *learning rate scheduler*.
 
 ## Toy Problem
 
@@ -61,7 +61,7 @@ def train(net, train_iter, test_iter, num_epochs, loss, trainer, ctx):
         train_loss, train_acc, test_acc))
 ```
 
-Let's have a look at what happens if we invoke this algorithm with default settings, such as a learning rate of $0.5$ and train for $40$ iterations. Note how the training accuracuy keeps on increasing while progress in terms of test accuracy stalls beyond a point. The gap between both curves indicates overfitting. 
+Let's have a look at what happens if we invoke this algorithm with default settings, such as a learning rate of $0.5$ and train for $40$ iterations. Note how the training accuracy keeps on increasing while progress in terms of test accuracy stalls beyond a point. The gap between both curves indicates overfitting.
 
 ```{.python .input}
 lr, num_epochs = 0.5, 40
@@ -72,14 +72,14 @@ train(net, train_iter, test_iter, num_epochs, loss, trainer, ctx)
 
 ## Schedulers
 
-One way of adjusting the learning rate is to set it explicitly at each step. This is conveniently achieved by the `set_learning_rate` method. We could ajust it downward after every epoch (or even after every minibatch), e.g. in a dynamic manner in response to how optimization is progressing. 
+One way of adjusting the learning rate is to set it explicitly at each step. This is conveniently achieved by the `set_learning_rate` method. We could adjust it downward after every epoch (or even after every minibatch), e.g. in a dynamic manner in response to how optimization is progressing.
 
 ```{.python .input}
 trainer.set_learning_rate(0.1)
 print('Learning rate is now %.2f' % trainer.learning_rate)
 ```
 
-More generally we want to define a scheduler. When invoked with the number of updates it returns the appropriate value of the learning rate. Let's define a simple one that sets the learning rate to $\eta = \eta_0 (t + 1)^{-\frac{1}{2}}$. 
+More generally we want to define a scheduler. When invoked with the number of updates it returns the appropriate value of the learning rate. Let's define a simple one that sets the learning rate to $\eta = \eta_0 (t + 1)^{-\frac{1}{2}}$.
 
 ```{.python .input}
 class SquareRootScheduler(object):
@@ -89,7 +89,7 @@ class SquareRootScheduler(object):
         return self.lr * pow(num_update + 1.0, -0.5)
 ```
 
-Let's plot its behavior over a range of values. 
+Let's plot its behavior over a range of values.
 
 ```{.python .input}
 scheduler = SquareRootScheduler(lr=1.0)
@@ -151,14 +151,14 @@ A rather perplexing heuristic was proposed by :cite:`Loshchilov.Hutter.2016`. It
 
 $$\eta_t = \eta_T + \frac{\eta_0 - \eta_T}{2} \left(1 + \cos(\pi t/T)\right)$$
 
-Here $\eta_0$ is the initial learning rate, $\eta_T$ is the target rate at time $T$. Furthermore, for $t > T$ we simply pin the value to $\eta_T$ without increasing it again. 
+Here $\eta_0$ is the initial learning rate, $\eta_T$ is the target rate at time $T$. Furthermore, for $t > T$ we simply pin the value to $\eta_T$ without increasing it again.
 
 ```{.python .input}
 scheduler = lr_scheduler.CosineScheduler(40, base_lr=0.5, final_lr=0.01)
 d2l.plot(np.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])                       
 ```
 
-In the context of computer vision this schedule *can* lead to improved results. Note, though, that such improvements are not guaranteed (as can be seen below). 
+In the context of computer vision this schedule *can* lead to improved results. Note, though, that such improvements are not guaranteed (as can be seen below).
 
 ```{.python .input}
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'lr_scheduler': scheduler})
@@ -169,7 +169,7 @@ train(net, train_iter, test_iter, num_epochs, loss, trainer, ctx)
 
 In some cases initializing the parameters is not sufficient to guarantee a good solution. This particularly a problem for some advanced network designs that may lead to unstable optimization problems. We could address this by choosing a sufficiently small learning rate to prevent divergence in the beginning. Unfortunately this means that progress is slow. Conversely, a large learning rate initially leads to divergence. 
 
-A rather simple fix for this dilemma is to use a warmup period during which the learning rate *increases* to its initial maximum and to cool down the rate until the end of the optimization process. For simplicity one typically uses a linear increase for this purpose. This leads to a schedule of the form indicated below. 
+A rather simple fix for this dilemma is to use a warmup period during which the learning rate *increases* to its initial maximum and to cool down the rate until the end of the optimization process. For simplicity one typically uses a linear increase for this purpose. This leads to a schedule of the form indicated below.
 
 ```{.python .input}
 scheduler = lr_scheduler.CosineScheduler(40, warmup_steps=5, base_lr=0.5, final_lr=0.01)
@@ -195,12 +195,12 @@ Warmup can be applied to any scheduler (not just cosine). For a more detailed di
 
 ## Exercises
 
-1. Experiment with the optimization behavor for a given fixed learning rate. What is the best model you can obtain this way?
+1. Experiment with the optimization behavior for a given fixed learning rate. What is the best model you can obtain this way?
 1. How does convergence change if you change the exponent of the decrease in the learning rate? Use `PolyScheduler` for your convenience in the experiments. 
 1. Apply the cosine scheduler to large computer vision problems, e.g. training ImageNet. How does it affect performance relative to other schedulers?
 1. How long should warmup last?
 1. Can you connect optimization and sampling? Start by using results from :cite:`Welling.Teh.2011` on Stochastic Gradient Langevin Dynamics.
 
-```{.python .input}
+## [Discussions](https://discuss.mxnet.io/t/5183)
 
-```
+![](../img/qr_lr-scheduler.svg)
