@@ -94,7 +94,7 @@ We can normalize the loss in each example due to various lengths in each example
 loss(pred, label, mask) / mask.sum(axis=1) * mask.shape[1]
 ```
 
-### Initializing Model Parameters
+### Initialize Model Parameters
 
 We construct the embedding layers of the central and context words, respectively, and set the hyperparameter word vector dimension `embed_size` to 100.
 
@@ -130,8 +130,7 @@ def train(net, data_iter, lr, num_epochs, ctx=d2l.try_gpu()):
             trainer.step(batch_size)
             metric.add(l.sum(), l.size)
             if (i+1) % 50 == 0:
-                animator.add(epoch+(i+1)/len(data_iter),
-                             (metric[0]/metric[1],))
+                animator.add(epoch+(i+1)/len(data_iter), (metric[0]/metric[1],))
     print('loss %.3f, %d tokens/sec on %s ' % (
         metric[0]/metric[1], metric[1]/timer.stop(), ctx))
 ```
@@ -151,7 +150,7 @@ After training the word embedding model, we can represent similarity in meaning 
 def get_similar_tokens(query_token, k, embed):
     W = embed.weight.data()
     x = W[vocab[query_token]]
-    # Compute the cosine similarity. Add 1e-9 for numerical stability
+    # Compute the cosine similarity. Add 1e-9 for numerical stability.
     cos = np.dot(W, x) / np.sqrt(np.sum(W * W, axis=1) * np.sum(x * x) + 1e-9)
     topk = npx.topk(cos, k=k+1, ret_typ='indices').asnumpy().astype('int32')
     for i in topk[1:]:  # Remove the input words

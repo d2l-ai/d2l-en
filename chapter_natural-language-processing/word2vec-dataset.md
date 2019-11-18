@@ -229,8 +229,8 @@ for name, data in zip(names, batch):
 
 We use the `batchify` function just defined to specify the minibatch reading method in the `DataLoader` instance. 
 
+## Putting All Things Together
 
-## Putting Things Together
 Last, we define the `load_data_ptb` function that read the PTB dataset and return the data loader.
 
 ```{.python .input  n=16}
