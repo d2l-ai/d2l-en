@@ -37,11 +37,14 @@ Moreover, you can checkout the code
 from (some) other competitors' submissions
 and pick apart their methods to learn new techniques.
 If you want to participate in one of the competitions,
-you need to register for an account (do this now!).
+you need to register for an account as shown in 
+:numref:`fig_kaggle` (do this now!).
 
 ![Kaggle website](../img/kaggle.png)
+:label:`fig_kaggle`
 
-On the House Prices Prediction page,
+On the House Prices Prediction page as illustrated 
+in :numref:`fig_house_pricing`,
 you can find the dataset (under the data tab),
 submit predictions, see your ranking, etc.,
 The URL is right here:
@@ -50,6 +53,7 @@ The URL is right here:
 
 ![House Price Prediction](../img/house_pricing.png)
 :width:`600px`
+:label:`fig_house_pricing`
 
 ## Accessing and Reading the Dataset
 
@@ -57,7 +61,7 @@ Note that the competition data is separated into training and test sets.
 Each record includes the property value of the house
 and attributes such as street type, year of construction,
 roof type, basement condition, etc.
-The features represent multiple datatypes.
+The features represent multiple data types.
 Year of construction, for example, is represented with integers
 roof type is a discrete categorical feature,
 other features are represented with floating point numbers.
@@ -125,7 +129,7 @@ all_features = pd.concat((train_data.iloc[:, 1:-1], test_data.iloc[:, 1:]))
 
 ## Data Preprocessing
 
-As stated above, we have a wide variety of datatypes.
+As stated above, we have a wide variety of data types.
 Before we feed it into a deep network,
 we need to perform some amount of processing.
 Let us start with the numerical features.
@@ -182,7 +186,8 @@ Finally, via the `values` attribute,
 n_train = train_data.shape[0]
 train_features = np.array(all_features[:n_train].values, dtype=np.float32)
 test_features = np.array(all_features[n_train:].values, dtype=np.float32)
-train_labels = np.array(train_data.SalePrice.values, dtype=np.float32).reshape(-1, 1)
+train_labels = np.array(train_data.SalePrice.values, 
+                        dtype=np.float32).reshape(-1, 1)
 ```
 
 ## Training
@@ -225,7 +230,7 @@ this might represent a stunningly accurate prediction
 One way to address this problem is to
 measure the discrepancy in the logarithm of the price estimates.
 In fact, this is also the official error metric
-used by the compeitition to measure the quality of submissions.
+used by the competition to measure the quality of submissions.
 After all, a small value $\delta$ of $\log y - \log \hat{y}$
 translates into $e^{-\delta} \leq \frac{\hat{y}}{y} \leq e^\delta$.
 This leads to the following loss function:
@@ -274,7 +279,7 @@ def train(net, train_features, train_labels, test_features, test_labels,
 ## k-Fold Cross-Validation
 
 If you are reading in a linear fashion,
-you might recall that we intorduced k-fold cross-validation
+you might recall that we introduced k-fold cross-validation
 in the section where we discussed how to deal
 with model section (:numref:`sec_model_selection`). We will put this to good use to select the model design
 and to adjust the hyperparameters.
@@ -397,7 +402,7 @@ train_and_pred(train_features, test_features, train_labels, test_data,
                num_epochs, lr, weight_decay, batch_size)
 ```
 
-Next, we can submit our predictions on Kaggle
+Next, as demonstrated in :numref:`fig_kaggle_submit2`, we can submit our predictions on Kaggle
 and see how they compare to the actual house prices (labels) on the test set.
 The steps are quite simple:
 
@@ -407,11 +412,11 @@ The steps are quite simple:
 * Click the “Make Submission” button at the bottom of the page to view your results.
 
 ![Submitting data to Kaggle](../img/kaggle_submit2.png)
-
+:label:`fig_kaggle_submit2`
 
 ## Summary
 
-* Real data often contains a mix of different datatypes and needs to be preprocessed.
+* Real data often contains a mix of different data types and needs to be preprocessed.
 * Rescaling real-valued data to zero mean and unit variance is a good default. So is replacing missing values with their mean.
 * Transforming categorical variables into indicator variables allows us to treat them like vectors.
 * We can use k-fold cross validation to select the model and adjust the hyper-parameters.

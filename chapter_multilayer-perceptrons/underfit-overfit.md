@@ -383,10 +383,10 @@ In fact, whenever the data points each have a distinct value of $x$,
 a polynomial function with degree equal to the number of data points
 can fit the training set perfectly.
 We visualize the relationship between polynomial degree
-and under- vs over-fitting below.
+and under- vs over-fitting in :numref:`fig_capacity_vs_error`.
 
 ![Influence of Model Complexity on Underfitting and Overfitting](../img/capacity_vs_error.svg)
-
+:label:`fig_capacity_vs_error`
 
 ### Dataset Size
 
@@ -462,9 +462,9 @@ namely the constant feature corresponding to the bias.
 features[:2], poly_features[:2], labels[:2]
 ```
 
-### Defining, Training and Testing Model
+### Training and Testing Model
 
-Let first implement a function to evaluate the loss on a given data.
+Let's first implement a function to evaluate the loss on a given data.
 
 ```{.python .input}
 # Saved in the d2l package for later use
