@@ -1,3 +1,4 @@
+import os
 import re
 import regex
 import sys
@@ -49,6 +50,7 @@ def _unnumber_chaps_and_secs(lines):
     # Since we inserted '\n' in some lines[i], re-build the list
     lines = '\n'.join(lines).split('\n')
 
+
 # If label is of chap*/index.md title, its numref is Chapter X instead of Section X
 def _sec_to_chap(lines):
     for i, l in enumerate(lines):
@@ -63,6 +65,20 @@ def _sec_to_chap(lines):
                 lines[i] = lines[i].replace(src, tgt)
 
 
+# Remove release information and date
+def _edit_titlepage(pdf_dir):
+    smanual = os.path.join(pdf_dir, 'sphinxmanual.cls')
+    with open(smanual, 'r') as f:
+        lines = f.read().split('\n')
+
+    for i, l in enumerate(lines):
+        lines[i] = lines[i].replace('\\@date', '')
+        lines[i] = lines[i].replace('\\py@release\\releaseinfo', '')
+
+    with open(smanual, 'w') as f:
+        f.write('\n'.join(lines))
+
+
 def main():
     tex_file = sys.argv[1]
     with open(tex_file, 'r') as f:
@@ -73,6 +89,9 @@ def main():
 
     with open(tex_file, 'w') as f:
         f.write('\n'.join(lines))
+
+    pdf_dir = os.path.dirname(tex_file)
+    _edit_titlepage(pdf_dir)
 
 if __name__ == "__main__":
     main()
