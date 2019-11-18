@@ -144,40 +144,70 @@ sudo apt-get update && sudo apt-get install -y build-essential git libgfortran3
 ```
 
 
-Here we download CUDA 10.1. Visit NVIDIA's official repository at (https://developer.nvidia.com/cuda-toolkit-archive) to find the download link of CUDA 10.1 as shown below.
+Here we download CUDA 10.1. Visit NVIDIA's official repository at (https://developer.nvidia.com/cuda-downloads) to find the download link of CUDA 10.1 as shown below.
 
 ![Find the CUDA 10.1 download address. ](../img/cuda101.png)
 :width:`700px`
 :label:`fig_cuda`
 
-Right click at `Download` and click `Copy Link Address` (as shown in :numref:`fig_cuda`), then go back to the terminal and paste onto the command line to install `CUDA 10.1` :
+Copy the instructions and paste them into the terminal to install
+`CUDA 10.1`.
 
 ```bash
 ## paste the copied link from CUDA website
-wget https://developer.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.168_418.67_linux.run
-
-sudo sh cuda_10.1.168_418.67_linux.run
+wget http://developer.download.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.243_418.87.00_linux.run
+sudo sh cuda_10.1.243_418.87.00_linux.run
 ## this command line may take a while to run
 ```
 
 
-Enter `accept`  for the following inquiry as shown in :numref:`fig_cuda_accept`.
+Enter `accept`  for the following inquiry as shown in
+:numref:`fig_cuda_accept`.
 
-![ Accept EULA. ](../img/cuda_accept.png)
-:width:`500px`
-:label:`fig_cuda_accept`
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│  End User License Agreement                                              │
+│  --------------------------                                              │
+│                                                                          │
+│  Preface                                                                 │
+│  -------                                                                 │
+│                                                                          │
+│  The Software License Agreement in Chapter 1 and the Supplement          │
+│  in Chapter 2 contain license terms and conditions that govern           │
+│  the use of NVIDIA software. By accepting this agreement, you            │
+│  agree to comply with all the terms and conditions applicable            │
+│  to the product(s) included herein.                                      │
+│                                                                          │
+│  NVIDIA Driver                                                           │
+│                                                                          │
+│─                                                                         │
+│ Do you accept the above EULA? (accept/decline/quit):                     │
+│ accept                                                                   │
 
-If the following image shows up, choose "Install" and tap "Enter" as shown in :numref:`fig_cuda_install`.
+```
 
-![ Install and Enter. ](../img/cuda_install.png)
-:width:`250px`
-:label:`fig_cuda_install`
 
-After installing the program, run the following command to view the instance GPU.
+Select the driver, toolkit and documentation to install drivers.
+
+```
+CUDA Installer 
+- [X] Driver 
+     [X] 418.87.00
++ [X] CUDA Toolkit 10.1
+  [ ] CUDA Samples 10.1
+  [ ] CUDA Demo Suite 10.1
+  [X] CUDA Documentation 10.1
+  Options 
+  Install 
+```
+
+
+After installing the program, run the following command to view the GPUs.
 
 ```bash
 nvidia-smi
 ```
+
 
 Finally, add CUDA to the library path to help other libraries find it.
 
@@ -196,9 +226,8 @@ First, to simplify the installation, you need to install [Miniconda](https://con
 
 ```bash
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-sudo sh Miniconda3-latest-Linux-x86_64.sh
+sh Miniconda3-latest-Linux-x86_64.sh
 ```
-
 
 You need to answer the following questions:
 
@@ -231,24 +260,26 @@ Next, download the code for this book.
 ```bash
 sudo apt-get install unzip
 mkdir d2l-en && cd d2l-en
-wget http://numpy.d2l.ai/d2l-en.zip
+wget https://d2l.ai/d2l-en.zip
 unzip d2l-en.zip && rm d2l-en.zip
 ```
-
 
 Then create the conda `d2l` environment and enter `y` for the proceed inquiry as shown in :numref:`fig_conda_create_d2l`.
 
 ```bash
 conda create --name d2l 
+```
+Accept the prompt to generate the package.
 
 ```
+## Package Plan ##
 
+  environment location: /home/ubuntu/.conda/envs/d2l
+  
+Proceed ([y]/n)? y
+```
 
-![ Conda create environment D2L. ](../img/conda_create_d2l.png)
-:width:`300px`
-:label:`fig_conda_create_d2l`
-
-After create `d2l` environment, activate it and install `pip`.
+After creating the `d2l` environment, activate it and install `pip`.
 
 ```bash
 conda activate d2l
@@ -260,7 +291,7 @@ Finally, install `MXNet` and `d2l`.
 
 ```bash
 ## mxnet
-pip install https://apache-mxnet.s3-us-west-2.amazonaws.com/dist/python/numpy/latest/mxnet_cu101mkl-1.5.0-py2.py3-none-manylinux1_x86_64.whl
+pip install mxnet-cu101mkl --pre
 
 ## d2l
 pip install git+https://github.com/d2l-ai/d2l-en@numpy2
