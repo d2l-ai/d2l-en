@@ -234,15 +234,13 @@ class SeqDataLoader(object):
     """A iterator to load sequence data"""
     def __init__(self, batch_size, num_steps, use_random_iter, max_tokens):
         if use_random_iter:
-            data_iter_fn = d2l.seq_data_iter_random
+            self.data_iter_fn = d2l.seq_data_iter_random
         else:
-            data_iter_fn = d2l.seq_data_iter_consecutive
-        self.corpus, self.vocab = d2l.load_corpus_time_machine(max_tokens)
-        self.get_iter = lambda: data_iter_fn(
-            self.corpus, batch_size, num_steps)
+            self.data_iter_fn = d2l.seq_data_iter_consecutive
+        self.corpus, self.vocab = d2l.load_corpus_time_machine(max_tokens)        
 
     def __iter__(self):
-        return self.get_iter()
+        return self.data_iter_fn(self.corpus, batch_size, num_steps)
 ```
 
 Last, we define a function `load_data_time_machine` that returns both the data iterator and the vocabulary, so we can use it similarly as other functions with `load_data` prefix.
