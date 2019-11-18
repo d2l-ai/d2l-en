@@ -32,8 +32,8 @@ import d2l
 from mxnet import np, npx
 npx.set_np()
 
-def f(x):     return x**2  # objective function
-def gradf(x): return 2 * x # its derivative
+def f(x): return x**2  # Objective function
+def gradf(x): return 2 * x  # Its derivative
 ```
 
 Next, we use $x=10$ as the initial value and assume $\eta=0.2$. Using gradient descent to iterate $x$ for 10 times we can see that, eventually, the value of $x$ approaches the optimal solution.
@@ -58,7 +58,7 @@ def show_trace(res):
     n = max(abs(min(res)), abs(max(res)))
     f_line = np.arange(-n, n, 0.01)
     d2l.set_figsize((3.5, 2.5))
-    d2l.plot([f_line, res], [[f(x) for x in f_line], [f(x) for x in res]], 
+    d2l.plot([f_line, res], [[f(x) for x in f_line], [f(x) for x in res]],
              'x', 'f(x)', fmts=['-', '-o'])
 
 show_trace(res)
@@ -85,7 +85,9 @@ To illustrate what happens for nonconvex functions consider the case of $f(x) = 
 
 ```{.python .input}
 c = 0.15 * np.pi
-def f(x):     return x* np.cos(c * x) 
+
+def f(x): return x * np.cos(c * x)
+
 def gradf(x): return np.cos(c * x) - c * x * np.sin(c * x)
 
 show_trace(gd(2))
@@ -112,7 +114,7 @@ To see how the algorithm behaves in practice let us construct an objective funct
 # Saved in the d2l package for later use
 def train_2d(trainer, steps=20):
     """Optimize a 2-dim objective function with a customized trainer."""
-    # s1 and s2 are internal state variables and will 
+    # s1 and s2 are internal state variables and will
     # be used later in the chapter
     x1, x2, s1, s2 = -5, -2, 0, 0
     results = [(x1, x2)]
@@ -136,11 +138,13 @@ def show_trace_2d(f, results):
 Next, we observe the trajectory of the optimization variable $\mathbf{x}$ for learning rate $\eta = 0.1$. We can see that after 20 steps the value of $\mathbf{x}$ approaches its minimum at $[0, 0]$. Progress is fairly well-behaved albeit rather slow.
 
 ```{.python .input  n=15}
-def f(x1, x2): return x1 ** 2 + 2 * x2 ** 2   # objective
-def gradf(x1, x2): return (2 * x1, 4 * x2)    # gradient 
-def gd(x1, x2, s1, s2): 
-    (g1, g2) = gradf(x1, x2)                  # compute gradient
-    return (x1 -eta * g1, x2 -eta * g2, 0, 0) # update variables
+def f(x1, x2): return x1 ** 2 + 2 * x2 ** 2   # Objective
+
+def gradf(x1, x2): return (2 * x1, 4 * x2)    # Gradient
+
+def gd(x1, x2, s1, s2):
+    (g1, g2) = gradf(x1, x2)                  # Compute gradient
+    return (x1 - eta * g1, x2 - eta * g2, 0, 0)  # Update variables
 
 eta = 0.1
 show_trace_2d(f, train_2d(gd))
@@ -171,11 +175,11 @@ For $f(x) = \frac{1}{2} x^2$ we have $\nabla f(x) = x$ and $H_f = 1$. Hence for 
 
 ```{.python .input}
 c = 0.5
-def f(x):     return np.cosh(c * x)        # objective
-def gradf(x): return c * np.sinh(c * x)    # derivative
-def hessf(x): return c**2 * np.cosh(c * x) # hessian
+def f(x):     return np.cosh(c * x)        # Objective
+def gradf(x): return c * np.sinh(c * x)    # Derivative
+def hessf(x): return c**2 * np.cosh(c * x) # Hessian
 
-# hide learning rate for now
+# Hide learning rate for now
 def newton(eta = 1):
     x = 10
     results = [x]
@@ -192,8 +196,11 @@ Now let us see what happens when we have a *nonconvex* function, such as $f(x) =
 
 ```{.python .input}
 c = 0.15 * np.pi
-def f(x):     return x * np.cos(c * x) 
+
+def f(x): return x * np.cos(c * x)
+
 def gradf(x): return np.cos(c * x) - c * x * np.sin(c * x)
+
 def hessf(x): return - 2 * c * np.sin(c * x) - x * c**2 * np.cos(c * x)
 
 show_trace(newton())

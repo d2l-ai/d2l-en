@@ -68,9 +68,10 @@ A = np.dot(B, C)
 A.wait_to_read()
 timer.stop()
 
-# multiply and add count as separate operations (fused in practice)
+# Multiply and add count as separate operations (fused in practice)
 gigaflops = [2/i for i in timer.times]
-print("Performance in Gigaflops: element {:.3f}, column {:.3f}, full {:.3f}".format(*gigaflops))
+print("Performance in Gigaflops: element {:.3f}, \
+      column {:.3f}, full {:.3f}".format(*gigaflops))
 ```
 
 ## Minibatches 
@@ -91,8 +92,8 @@ Naively this would indicate that choosing a large minibatch $\mathcal{B}_t$ woul
 
 ```{.python .input}
 timer.start()
-for j in range(0, 1024, 64): 
-    A[:,j:j+64] = np.dot(B, C[:,j:j+64])
+for j in range(0, 1024, 64):
+    A[:, j:j+64] = np.dot(B, C[:, j:j+64])
 timer.stop()
 print("Performance in Gigaflops: block {:.3f}".format(2/timer.times[3]))
 ```
@@ -106,9 +107,11 @@ Let's have a look at how minibatches are efficiently generated from data. In the
 ```{.python .input  n=1}
 # Saved in the d2l package for later use
 def get_data_ch10(batch_size=10, n=1500):
-    data = np.genfromtxt('../data/airfoil_self_noise.dat', dtype=np.float32, delimiter='\t')
+    data = np.genfromtxt('../data/airfoil_self_noise.dat',
+                         dtype=np.float32, delimiter='\t')
     data = (data - data.mean(axis=0)) / data.std(axis=0)
-    data_iter = d2l.load_array((data[:n, :-1], data[:n, -1]), batch_size, is_train=True)
+    data_iter = d2l.load_array(
+        (data[:n, :-1], data[:n, -1]), batch_size, is_train=True)
     return data_iter, data.shape[1]-1
 ```
 
@@ -155,7 +158,7 @@ def train_ch10(trainer_fn, states, hyperparams, data_iter,
                 animator.add(n/X.shape[0]/len(data_iter),
                              (d2l.evaluate_loss(net, data_iter, loss),))
                 timer.start()
-    print('loss: %.3f, %.3f sec/epoch'%(animator.Y[0][-1], timer.avg()))
+    print('loss: %.3f, %.3f sec/epoch' % (animator.Y[0][-1], timer.avg()))
     return timer.cumsum(), animator.Y[0]
 ```
 
@@ -193,8 +196,8 @@ Finally, we compare the time versus loss for the preview four experiments. As ca
 ```{.python .input  n=8}
 d2l.set_figsize([6, 3])
 d2l.plot(*list(map(list, zip(gd_res, sgd_res, mini1_res, mini2_res))),
-        'time (sec)', 'loss', xlim=[1e-2, 10],
-        legend=['gd', 'sgd', 'batch size=100', 'batch size=10'])
+         'time (sec)', 'loss', xlim=[1e-2, 10],
+         legend=['gd', 'sgd', 'batch size=100', 'batch size=10'])
 d2l.plt.gca().set_xscale('log')
 ```
 
@@ -226,7 +229,7 @@ def train_gluon_ch10(tr_name, hyperparams, data_iter, num_epochs=2):
                 animator.add(n/X.shape[0]/len(data_iter),
                              (d2l.evaluate_loss(net, data_iter, loss),))
                 timer.start()
-    print('loss: %.3f, %.3f sec/epoch'%(animator.Y[0][-1], timer.avg()))
+    print('loss: %.3f, %.3f sec/epoch' % (animator.Y[0][-1], timer.avg()))
 ```
 
 Using Gluon to repeat the last experiment shows identical behavior.
@@ -243,14 +246,14 @@ train_gluon_ch10('sgd', {'learning_rate': 0.05}, data_iter)
 * Minibatch stochastic gradient descent offers the best of both worlds - computational and statistical efficiency. 
 * In minibatch SGD we process batches of data obtained by a random permutation of the training data (i.e. each observation is processed only once per epoch, albeit in random order). 
 * It is advisable to decay the learning rates during training. 
-* In general, minibatch-SGD is faster than SGD and gradient descent for convergence to a smaller risk, when measured in terms of clock time.  
+* In general, minibatch SGD is faster than SGD and gradient descent for convergence to a smaller risk, when measured in terms of clock time.  
 
 ## Exercises
 
 1. Modify the batch size and learning rate and observe the rate of decline for the value of the objective function and the time consumed in each epoch.
 1. Read the MXNet documentation and use the `Trainer` class `set_learning_rate` function to reduce the learning rate of the minibatch SGD to 1/10 of its previous value after each epoch.
 1. Compare minibatch SGD with a variant that actually *samples with replacement* from the training set. What happens?
-1. An evil genie replicates your dataset without telling you (i.e. each observation occurs twice and your dataset grows to twice its original size, but nobody told you). How does the behavior of SGD, minibatch-SGD and that of gradient descent change?
+1. An evil genie replicates your dataset without telling you (i.e. each observation occurs twice and your dataset grows to twice its original size, but nobody told you). How does the behavior of SGD, minibatch SGD and that of gradient descent change?
 
 
 ## [Discussions](https://discuss.mxnet.io/t/2373)
