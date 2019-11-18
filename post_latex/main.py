@@ -79,6 +79,23 @@ def _edit_titlepage(pdf_dir):
         f.write('\n'.join(lines))
 
 
+def delete_lines(lines, deletes):
+    return [line for i, line in enumerate(lines) if i not in deletes]
+
+
+def _delete_discussions_title(lines):
+    deletes = []
+    to_delete = False
+    for i, l in enumerate(lines):
+        if 'section*{Discussion' in l or 'section{Discussion' in l:
+            to_delete = True
+        elif to_delete and '\\sphinxincludegraphics' in l:
+            to_delete = False
+        if to_delete:
+            deletes.append(i)
+    return delete_lines(lines, deletes)
+
+
 def main():
     tex_file = sys.argv[1]
     with open(tex_file, 'r') as f:
@@ -86,6 +103,7 @@ def main():
 
     _unnumber_chaps_and_secs(lines)
     _sec_to_chap(lines)
+    lines = _delete_discussions_title(lines)
 
     with open(tex_file, 'w') as f:
         f.write('\n'.join(lines))
