@@ -78,7 +78,7 @@ Previously, we learned how to use the Sequential class to concatenate multiple l
 
 ```{.python .input}
 import d2l
-from mxnet import np, npx, sym
+from mxnet import np, npx
 from mxnet.gluon import nn
 npx.set_np()
 

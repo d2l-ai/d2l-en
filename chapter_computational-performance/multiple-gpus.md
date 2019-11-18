@@ -22,20 +22,21 @@ for training models using optimization algorithms described in
 :numref:`sec_minibatch_sgd`. Now, we will demonstrate how data parallelism works using minibatch
 stochastic gradient descent as an example.
 
-Assume there are $k$ GPUs on a machine. Given the model to be trained, each GPU will maintain a complete set of model parameters independently. In any iteration of model training, given a random minibatch, we divide the examples in the batch into $k$ portions and distribute one to each GPU. Then, each GPU will calculate the local gradient of the model parameters based on the minibatch subset it was assigned and the model parameters it maintains. Next, we add together the local gradients on the $k$ GPUs to get the current minibatch stochastic gradient. After that, each GPU uses this minibatch stochastic gradient to update the complete set of model parameters that it maintains. Figure 10.1 depicts the minibatch stochastic gradient calculation using data parallelism and two GPUs.
+Assume there are $k$ GPUs on a machine. Given the model to be trained, each GPU will maintain a complete set of model parameters independently. In any iteration of model training, given a random minibatch, we divide the examples in the batch into $k$ portions and distribute one to each GPU. Then, each GPU will calculate the local gradient of the model parameters based on the minibatch subset it was assigned and the model parameters it maintains. Next, we add together the local gradients on the $k$ GPUs to get the current minibatch stochastic gradient. After that, each GPU uses this minibatch stochastic gradient to update the complete set of model parameters that it maintains. :numref:`fig_data_parallel` depicts the minibatch stochastic gradient calculation using data parallelism and two GPUs.
 
 ![Calculation of minibatch stochastic gradient using data parallelism and two GPUs. ](../img/data-parallel.svg)
+:label:`fig_data_parallel`
 
 In order to implement data parallelism in a multi-GPU training scenario from scratch, we first import the required packages or modules.
 
 ```{.python .input  n=2}
 %matplotlib inline
 import d2l
-from mxnet import autograd, np, npx, gluon
+from mxnet import autograd, gluon, np, npx
 npx.set_np()
 ```
 
-## Define the Model
+## Defining the Model
 
 We use LeNet, introduced in :numref:`sec_lenet`, as the sample model for this section. Here, the model implementation only uses `ndarray`s.
 
@@ -58,12 +59,12 @@ def lenet(X, params):
                               kernel=(3, 3), num_filter=20)
     h1_activation = npx.relu(h1_conv)
     h1 = npx.pooling(data=h1_activation, pool_type='avg', kernel=(2, 2),
-                    stride=(2, 2))
+                     stride=(2, 2))
     h2_conv = npx.convolution(data=h1, weight=params[2], bias=params[3],
                               kernel=(5, 5), num_filter=50)
     h2_activation = npx.relu(h2_conv)
     h2 = npx.pooling(data=h2_activation, pool_type='avg', kernel=(2, 2),
-                    stride=(2, 2))
+                     stride=(2, 2))
     h2 = h2.reshape(h2.shape[0], -1)
     h3_linear = np.dot(h2, params[4]) + params[5]
     h3 = npx.relu(h3_linear)
@@ -113,7 +114,7 @@ allreduce(data)
 print('after allreduce:\n', data[0], '\n', data[1])
 ```
 
-## Split a Data Batch into Multiple GPUs
+## Splitting a Data Batch into Multiple GPUs
 
 The `utils` module in Gluon provides a function to evenly split an array into multiple parts along the first dimension, and then copy the $i^\mathrm{th}$ part into the $i^\mathrm{th}$ device. It is straightforward to implement, but we will use the pre-implemented version so later chapters can reuse the `split_batch` function we will define later.
 
@@ -184,8 +185,7 @@ def train(num_gpus, batch_size, lr):
         animator.add(epoch+1, (d2l.evaluate_accuracy_gpu(
             lambda x: lenet(x, gpu_params[0]), test_iter, ctx[0]),))
     print('test acc: %.2f, %.1f sec/epoch on %s' % (
-            animator.Y[0][-1], timer.avg(), ctx_list))
-
+        animator.Y[0][-1], timer.avg(), ctx_list))
 ```
 
 ## Multi-GPU Training Experiment

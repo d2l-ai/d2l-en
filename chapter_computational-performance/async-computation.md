@@ -42,7 +42,7 @@ print('Workloads are finished. Time %.4f sec' % timer.stop())
 In truth, whether or not the current result is already calculated in-memory is irrelevant, unless we need to print or save the computation results. So long as the data are stored in `ndarray`s and the operators provided by MXNet are used, MXNet will utilize asynchronous programming by default to attain superior computing performance.
 
 
-## Use of the Synchronization Function to Allow the Front-End to Wait for the Computation Results
+## Using of the Synchronization Function to Allow the Front-End to Wait for the Computation Results
 
 In addition to the `print` function we just introduced, there are other ways to make the front-end thread wait for the completion of the back-end computations. The `wait_to_read` function can be used to make the front-end wait for the complete results of `ndarray` computation, and then execute following statement. Alternatively, we can use the `waitall` function to make the front-end wait for the completion of all previous computations. The latter is a common method used in performance testing.
 
