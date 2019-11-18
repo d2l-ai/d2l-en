@@ -42,7 +42,7 @@ vocab = d2l.Vocab(sentences, min_freq=10)
 
 In text data, there are generally some words that appear at high frequencies, such "the", "a", and "in" in English. Generally speaking, in a context window, it is better to train the word embedding model when a word (such as "chip") and a lower-frequency word (such as "microprocessor") appear at the same time, rather than when a word appears with a higher-frequency word (such as "the"). Therefore, when training the word embedding model, we can perform subsampling[2] on the words. Specifically, each indexed word $w_i$ in the dataset will drop out at a certain probability. The dropout probability is given as:
 
-$$ \mathbb{P}(w_i) = \max\left(1 - \sqrt{\frac{t}{f(w_i)}}, 0\right),$$
+$$ P(w_i) = \max\left(1 - \sqrt{\frac{t}{f(w_i)}}, 0\right),$$
 
 Here, $f(w_i)$ is the ratio of the instances of word $w_i$ to the total number of words in the dataset, and the constant $t$ is a hyperparameter (set to $10^{-4}$ in this experiment). As we can see, it is only possible to drop out the word $w_i$ in subsampling when $f(w_i) > t$. The higher the word's frequency, the higher its dropout probability.
 
@@ -92,7 +92,7 @@ But the low-frequency word "join" is completely preserved.
 compare_counts('join')
 ```
 
-Lastly, we map each token into an index to construct the corpus.
+Last, we map each token into an index to construct the corpus.
 
 ```{.python .input  n=8}
 corpus = [vocab[line] for line in subsampled]
@@ -144,7 +144,7 @@ all_centers, all_contexts = get_centers_and_contexts(corpus, 5)
 
 ### Negative Sampling
 
-We use negative sampling for approximate training. For a central and context word pair, we randomly sample $K$ noise words ($K=5$ in the experiment). According to the suggestion in the Word2vec paper, the noise word sampling probability $\mathbb{P}(w)$ is the ratio of the word frequency of $w$ to the total word frequency raised to the power of 0.75 [2].
+We use negative sampling for approximate training. For a central and context word pair, we randomly sample $K$ noise words ($K=5$ in the experiment). According to the suggestion in the Word2vec paper, the noise word sampling probability $P(w)$ is the ratio of the word frequency of $w$ to the total word frequency raised to the power of 0.75 [2].
 
 We first define a class to draw a candidate according to the sampling weights. It caches a 10000 size random number bank instead of calling `random.choices` every time.
 
@@ -166,7 +166,7 @@ class RandomGenerator(object):
         self.i += 1
         return self.candidates[self.i-1]
 
-generator = RandomGenerator([2,3,4])
+generator = RandomGenerator([2, 3, 4])
 [generator.draw() for _ in range(10)]
 ```
 
@@ -215,8 +215,8 @@ def batchify(data):
 Construct two simple examples:
 
 ```{.python .input  n=15}
-x_1 = (1, [2,2], [3,3,3,3])
-x_2 = (1, [2,2,2], [3,3])
+x_1 = (1, [2, 2], [3, 3, 3, 3])
+x_2 = (1, [2, 2, 2], [3, 3])
 batch = batchify((x_1, x_2))
 
 names = ['centers', 'contexts_negatives', 'masks', 'labels']
@@ -228,7 +228,7 @@ We use the `batchify` function just defined to specify the minibatch reading met
 
 ## Put All Things Together
 
-Lastly, we define the `load_data_ptb` function that read the PTB dataset and return the data loader.
+Last, we define the `load_data_ptb` function that read the PTB dataset and return the data loader.
 
 ```{.python .input  n=16}
 # Saved in the d2l package for later use
@@ -268,4 +268,4 @@ for batch in data_iter:
 
 ## [Discussions](https://discuss.mxnet.io/t/4356)
 
-![](../img/qr_word2vec-data-set.svg)
+![](../img/qr_word2vec-dataset.svg)

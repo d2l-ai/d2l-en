@@ -16,15 +16,15 @@ $$
 \end{bmatrix}.
 $$
 
-If we apply $A$ to any vector $\mathbf{v} = [x,y]^\top$, 
-we obtain a vector $\mathbf{v}A = [2x,-y]^\top$.
+If we apply $A$ to any vector $\mathbf{v} = [x, y]^\top$, 
+we obtain a vector $\mathbf{v}A = [2x, -y]^\top$.
 This has an intuitive interpretation:
 stretch the vector to be twice as wide in the $x$-direction,
 and then flip it in the $y$-direction.
 
 However, there are *some* vectors for which something remains unchanged.
-Namely $[1,0]^\top$ gets sent to $[2,0]^\top$
-and $[0,1]^\top$ gets sent to $[0,-1]^\top$.
+Namely $[1, 0]^\top$ gets sent to $[2, 0]^\top$
+and $[0, 1]^\top$ gets sent to $[0, -1]^\top$.
 These vectors are still in the same line,
 and the only modification is that the matrix stretches them
 by a factor of $2$ and $-1$ respectively.
@@ -47,9 +47,9 @@ and then factoring out the vector,
 we see the above is equivalent to:
 
 $$(\mathbf{A} - \lambda \mathbf{I})\mathbf{v} = 0.$$
-:eqlabel:`eigvalue-der`
+:eqlabel:`eq_eigvalue_der`
 
-For :eqref:`eigvalue-der` to happen, we see that $(\mathbf{A} - \lambda \mathbf{I})$ 
+For :eqref:`eq_eigvalue_der` to happen, we see that $(\mathbf{A} - \lambda \mathbf{I})$ 
 must compress some direction down to zero, 
 hence it is not invertible, and thus the determinant is zero.
 Thus, we can find the *eigenvalues* 
@@ -85,7 +85,7 @@ $$
 \end{bmatrix}\begin{bmatrix}x \\ y\end{bmatrix}  = \begin{bmatrix}4x \\ 4y\end{bmatrix} .
 $$
 
-We can solve this with the vectors $[1,-1]^\top$ and $[1,2]^\top$ respectively.
+We can solve this with the vectors $[1, -1]^\top$ and $[1, 2]^\top$ respectively.
 
 We can check this in code using the built-in `numpy.linalg.eig` routine.
 
@@ -134,7 +134,7 @@ The matrix $W$ is invertible, so we may multiply both sides by $W^{-1}$ on the r
 we see that we may write
 
 $$\mathbf{A} = \mathbf{W} \boldsymbol{\Sigma} \mathbf{W}^{-1}.$$
-:eqlabel:`eig-decomp`
+:eqlabel:`eq_eig_decomp`
 
 In the next section we will see some nice consequences of this,
 but for now we need only know that such a decomposition 
@@ -142,7 +142,7 @@ will exist as long as we can find a full collection
 of linearly independent eigenvectors (so that $W$ is invertible).
 
 ## Operations on Eigendecompositions
-One nice thing about eigendecompositions :eqref:`eig-decomp` is that 
+One nice thing about eigendecompositions :eqref:`eq_eig_decomp` is that 
 we can write many operations we usually encounter cleanly 
 in terms of the eigendecomposition.  
 As a first example, consider:
@@ -199,7 +199,7 @@ $$
 \end{bmatrix},
 $$
 
-has only a single eigenvector, namely $(0,1)$. 
+has only a single eigenvector, namely $(0, 1)$. 
 To handle such matrices, we require more advanced techniques 
 than we can cover (such as the Jordan Normal Form, or Singular Value Decomposition).
 We will often need to restrict our attention to those matrices 
@@ -209,7 +209,7 @@ The most commonly encountered family are the *symmetric matrices*,
 which are those matrices where $\mathbf{A} = \mathbf{A}^\top$. 
 In this case, we may take $W$ to be an *orthogonal matrix*—a matrix whose columns are all length one vectors that are at right angles to one another, where 
 $\mathbf{W}^\top = \mathbf{W}^{-1}$—and all the eigenvalues will be real.  
-Thus, in this special case, we can write :eqref:`eig-decomp` as
+Thus, in this special case, we can write :eqref:`eq_eig_decomp` as
 
 $$
 \mathbf{A} = \mathbf{W}\boldsymbol{\Sigma}\mathbf{W}^\top .
@@ -244,13 +244,13 @@ We have $r_1 = 0.3$, $r_2 = 0.6$, $r_3 = 0.8$ and $r_4 = 0.9$.
 The matrix is symmetric, so all eigenvalues are real.
 This means that all of our eigenvalues will be in one of the ranges of 
 
-$$[a_{11}-r_1,a_{11}+r_1] = [0.7,1.3], $$
+$$[a_{11}-r_1, a_{11}+r_1] = [0.7, 1.3], $$
 
-$$[a_{22}-r_2,a_{22}+r_2] = [2.4,3.6], $$
+$$[a_{22}-r_2, a_{22}+r_2] = [2.4, 3.6], $$
 
-$$[a_{33}-r_3,a_{33}+r_3] = [4.2,5.8], $$
+$$[a_{33}-r_3, a_{33}+r_3] = [4.2, 5.8], $$
 
-$$[a_{44}-r_4,a_{44}+r_4] = [8.1,9.9]. $$
+$$[a_{44}-r_4, a_{44}+r_4] = [8.1, 9.9]. $$
 
 
 Performing the numerical computation shows 
@@ -343,7 +343,7 @@ norm_list = [np.linalg.norm(v_in)]
 for i in range(1, 100):
     v_in = A.dot(v_in)
     norm_list.append(np.linalg.norm(v_in))
-    
+
 d2l.plot(np.arange(0, 100), norm_list, 'Iteration', 'Value')
 ```
 
@@ -355,7 +355,7 @@ Indeed if we take the list of quotients, we will see a pattern.
 norm_ratio_list = []
 for i in range(1, 100):
     norm_ratio_list.append(norm_list[i]/norm_list[i - 1])
-    
+
 d2l.plot(np.arange(1, 100), norm_ratio_list, 'Iteration', 'Ratio')
 ```
 
@@ -439,18 +439,18 @@ norm_list = [np.linalg.norm(v_in)]
 for i in range(1, 100):
     v_in = A.dot(v_in)
     norm_list.append(np.linalg.norm(v_in))
-    
+
 d2l.plot(np.arange(0, 100), norm_list, 'Iteration', 'Value')
 ```
 
-We can also plot the ration between consecutive norms as before and see that indeed it stabilizes.  
+We can also plot the ration between consecutive norms as before and see that indeed it stabilizes.
 
 ```{.python .input}
 # Also plot the ratio
 norm_ratio_list = []
 for i in range(1, 100):
     norm_ratio_list.append(norm_list[i]/norm_list[i-1])
-    
+
 d2l.plot(np.arange(1, 100), norm_ratio_list, 'Iteration', 'Ratio')
 ```
 
@@ -489,7 +489,7 @@ $$
 \mathbf{A} = \begin{bmatrix}
 2 & 1 \\
 0 & 2
-\end{bmatrix}?
+\end{bmatrix}.
 $$
 1. Without computing the eigenvalues, is it possible that the smallest eigenvalue of the following matrix is less that $0.5$? *Note*: this problem can be done in your head.
 $$
@@ -500,3 +500,7 @@ $$
 1.0 & 0.2 & 0.0 & 1.8
 \end{bmatrix}.
 $$
+
+## [Discussions](https://discuss.mxnet.io/t/5148)
+
+![](../img/qr_eigen-decomposition.svg)

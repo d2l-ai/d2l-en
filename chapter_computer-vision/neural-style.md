@@ -20,7 +20,7 @@ First, we initialize the composite image. For example, we can initialize it as t
 
 Next, we will perform an experiment to help us better understand the technical details of style transfer.
 
-## Read the Content and Style Images
+## Reading the Content and Style Images
 
 First, we read the content and style images. By printing out the image coordinate axes, we can see that they have different dimensions.
 
@@ -60,7 +60,7 @@ def postprocess(img):
     return (img.transpose(1, 2, 0) * rgb_std + rgb_mean).clip(0, 1)
 ```
 
-## Extract Features
+## Extracting Features
 
 We use the VGG-19 model pre-trained on the ImageNet dataset to extract image features[1].
 
@@ -111,7 +111,7 @@ def get_styles(image_shape, ctx):
     return style_X, styles_Y
 ```
 
-## Define the Loss Function
+## Defining the Loss Function
 
 Next, we will look at the loss function used for style transfer. The loss function includes the content loss, style loss, and total variation loss.
 
@@ -144,9 +144,9 @@ def style_loss(Y_hat, gram_Y):
 
 ### Total Variance Loss
 
-Sometimes, the composite images we learn have a lot of high-frequency noise, particularly bright or dark pixels. One common noise reduction method is total variation denoising. We assume that $x_{i,j}$ represents the pixel value at the coordinate $(i,j)$, so the total variance loss is:
+Sometimes, the composite images we learn have a lot of high-frequency noise, particularly bright or dark pixels. One common noise reduction method is total variation denoising. We assume that $x_{i, j}$ represents the pixel value at the coordinate $(i, j)$, so the total variance loss is:
 
-$$\sum_{i,j} \left|x_{i,j} - x_{i+1,j}\right| + \left|x_{i,j} - x_{i,j+1}\right|$$
+$$\sum_{i, j} \left|x_{i, j} - x_{i+1, j}\right| + \left|x_{i, j} - x_{i, j+1}\right|$$
 
 We try to make the values of neighboring pixels as similar as possible.
 
@@ -156,7 +156,7 @@ def tv_loss(Y_hat):
                   np.abs(Y_hat[:, :, :, 1:] - Y_hat[:, :, :, :-1]).mean())
 ```
 
-### Loss Function
+### The Loss Function
 
 The loss function for style transfer is the weighted sum of the content loss, style loss, and total variance loss. By adjusting these weight hyper-parameters, we can balance the retained content, transferred style, and noise reduction in the composite image according to their relative importance.
 
@@ -175,7 +175,7 @@ def compute_loss(X, contents_Y_hat, styles_Y_hat, contents_Y, styles_Y_gram):
     return contents_l, styles_l, tv_l, l
 ```
 
-## Create and Initialize the Composite Image
+## Creating and Initializing the Composite Image
 
 In style transfer, the composite image is the only variable that needs to be updated. Therefore, we can define a simple model, `GeneratedImage`, and treat the composite image as a model parameter. In the model, forward computation only returns the model parameter.
 
@@ -213,9 +213,10 @@ epochs, the process may occupy a great deal of memory. Therefore, we call the
 ```{.python .input  n=17}
 def train(X, contents_Y, styles_Y, ctx, lr, num_epochs, lr_decay_epoch):
     X, styles_Y_gram, trainer = get_inits(X, ctx, lr, styles_Y)
-    animator = d2l.Animator(xlabel='epoch', ylabel='loss', xlim=[1, num_epochs],
+    animator = d2l.Animator(xlabel='epoch', ylabel='loss',
+                            xlim=[1, num_epochs],
                             legend=['content', 'style', 'TV'],
-                            ncols=2, figsize=(7,2.5))
+                            ncols=2, figsize=(7, 2.5))
     for epoch in range(1, num_epochs+1):
         with autograd.record():
             contents_Y_hat, styles_Y_hat = extract_features(

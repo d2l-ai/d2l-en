@@ -5,7 +5,7 @@
 
 In :numref:`sec_text_preprocessing`, we see how to map text data into tokens, and these tokens can be viewed as a time series of discrete observations. Assuming the tokens in a text of length $T$ are in turn $x_1, x_2, \ldots, x_T$, then, in the discrete time series, $x_t$($1 \leq t \leq T$) can be considered as the output or label of timestep $t$. Given such a sequence, the goal of a language model is to estimate the probability
 
-$$p(x_1,x_2, \ldots, x_T).$$
+$$p(x_1, x_2, \ldots, x_T).$$
 
 Language models are incredibly useful. For instance, an ideal language model would be able to generate natural text just on its own, simply by drawing one word at a time $w_t \sim p(w_t \mid w_{t-1}, \ldots, w_1)$. Quite unlike the monkey using a typewriter, all text emerging from such a model would pass as natural language, e.g., English text. Furthermore, it would be sufficient for generating a meaningful dialog, simply by conditioning the text on previous dialog fragments. Clearly we are still very far from designing such a system, since it would need to *understand* the text rather than just generate grammatically sensible content.
 
@@ -19,7 +19,7 @@ $$p(w_1, w_2, \ldots, w_T) = p(w_1) \prod_{t=2}^T p(w_t  \mid  w_1, \ldots, w_{t
 
 For example, the probability of a text sequence containing four tokens consisting of words and punctuation would be given as:
 
-$$p(\mathrm{Statistics}, \mathrm{is},  \mathrm{fun}, \mathrm{.}) =  p(\mathrm{Statistics}) p(\mathrm{is}  \mid  \mathrm{Statistics}) p(\mathrm{fun}  \mid  \mathrm{Statistics}, \mathrm{is}) p(\mathrm{.}  \mid  \mathrm{Statistics}, \mathrm{is}, \mathrm{fun}).$$
+$$p(\mathrm{Statistics}, \mathrm{is}, \mathrm{fun}, \mathrm{.}) =  p(\mathrm{Statistics}) p(\mathrm{is}  \mid  \mathrm{Statistics}) p(\mathrm{fun}  \mid  \mathrm{Statistics}, \mathrm{is}) p(\mathrm{.}  \mid  \mathrm{Statistics}, \mathrm{is}, \mathrm{fun}).$$
 
 In order to compute the language model, we need to calculate the
 probability of words and the conditional probability of a word given
@@ -52,8 +52,8 @@ add a small constant to all counts. This helps with singletons, e.g., via
 
 $$\begin{aligned}
 	\hat{p}(w) & = \frac{n(w) + \epsilon_1/m}{n + \epsilon_1} \\
-	\hat{p}(w' \mid w) & = \frac{n(w,w') + \epsilon_2 \hat{p}(w')}{n(w) + \epsilon_2} \\
-	\hat{p}(w'' \mid w',w) & = \frac{n(w,w',w'') + \epsilon_3 \hat{p}(w',w'')}{n(w,w') + \epsilon_3}
+	\hat{p}(w' \mid w) & = \frac{n(w, w') + \epsilon_2 \hat{p}(w')}{n(w) + \epsilon_2} \\
+	\hat{p}(w'' \mid w',w) & = \frac{n(w, w',w'') + \epsilon_3 \hat{p}(w',w'')}{n(w, w') + \epsilon_3}
 \end{aligned}$$
 
 Here the coefficients $\epsilon_i > 0$ determine how much we use the
@@ -115,7 +115,7 @@ We are on to something quite fundamental here - the word frequency decays rapidl
 $$n(x) \propto (x + c)^{-\alpha} \text{ and hence }
 \log n(x) = -\alpha \log (x+c) + \mathrm{const.}$$
 
-This should already give us pause if we want to model words by count statistics and smoothing. After all, we will significantly overestimate the frequency of the tail, aka the infrequent words. But what about the other word combinations (such as bigrams, trigrams, and beyond)? Let us see whether the bigram frequency behaves in the same manner as the unigram frequency.
+This should already give us pause if we want to model words by count statistics and smoothing. After all, we will significantly overestimate the frequency of the tail, also known as the infrequent words. But what about the other word combinations (such as bigrams, trigrams, and beyond)? Let us see whether the bigram frequency behaves in the same manner as the unigram frequency.
 
 ```{.python .input  n=3}
 bigram_tokens = [[pair for pair in zip(line[:-1], line[1:])] for line in tokens]
@@ -186,7 +186,7 @@ def seq_data_iter_random(corpus, batch_size, num_steps):
 
 Let us generate an artificial sequence from 0 to 30. We assume that
 the batch size and numbers of timesteps are 2 and 5
-respectively. This means that depending on the offset we can generate between 4 and 5 $(x,y)$ pairs. With a minibatch size of 2, we only get 2 minibatches.
+respectively. This means that depending on the offset we can generate between 4 and 5 $(x, y)$ pairs. With a minibatch size of 2, we only get 2 minibatches.
 
 ```{.python .input  n=6}
 my_seq = list(range(30))
@@ -240,7 +240,7 @@ class SeqDataLoader(object):
         return self.get_iter()
 ```
 
-Lastly, we define a function `load_data_time_machine` that returns both the data iterator and the vocabulary, so we can use it similarly as other functions with `load_data` prefix.
+Last, we define a function `load_data_time_machine` that returns both the data iterator and the vocabulary, so we can use it similarly as other functions with `load_data` prefix.
 
 ```{.python .input}
 # Saved in the d2l package for later use

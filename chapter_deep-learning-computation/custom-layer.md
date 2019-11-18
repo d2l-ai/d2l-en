@@ -4,7 +4,7 @@ One of the reasons for the success of deep learning can be found in the wide ran
 
 ## Layers without Parameters
 
-Since this is slightly intricate, we start with a custom layer (aka Block) that
+Since this is slightly intricate, we start with a custom layer (also known as Block) that
 does not have any inherent parameters. Our first step is very similar to when we
 introduced blocks in :numref:`sec_model_construction`. The following
 `CenteredLayer` class constructs a layer that subtracts the mean from the
@@ -107,7 +107,7 @@ net(np.random.uniform(size=(2, 64)))
 ## Exercises
 
 1. Design a layer that learns an affine transform of the data, i.e., it removes the mean and learns an additive parameter instead.
-1. Design a layer that takes an input and computes a tensor reduction, i.e., it returns $y_k = \sum_{i,j} W_{ijk} x_i x_j$.
+1. Design a layer that takes an input and computes a tensor reduction, i.e., it returns $y_k = \sum_{i, j} W_{ijk} x_i x_j$.
 1. Design a layer that returns the leading half of the Fourier coefficients of the data. Hint - look up the `fft` function in MXNet.
 
 ## [Discussions](https://discuss.mxnet.io/t/2328)

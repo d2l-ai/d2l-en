@@ -120,7 +120,7 @@ accessible both as executable code, as a physical book,
 as a downloadable PDF, and on the internet as a website.
 At present there exist no tools and no workflow
 perfectly suited to these demands, so we had to assemble our own.
-We describe our approach in detail in :numref:`sec_contribute`.
+We describe our approach in detail in :numref:`sec_how_to_contribute`.
 We settled on Github to share the source and to allow for edits,
 Jupyter notebooks for mixing code, equations and text,
 Sphinx as a rendering engine to generate multiple outputs,
@@ -213,7 +213,7 @@ from linear algebra, calculus, and probability.
 cover the most basic concepts and techniques of deep learning, 
 such as linear regression, multi-layer perceptrons and regularization.
 
-* The next four chapters focus on modern deep learning techniques.
+* The next five chapters focus on modern deep learning techniques.
 :numref:`chap_computation` describes the various key components of deep
 learning calculations and lays the groundwork
 for us to subsequently implement more complex models.
@@ -239,7 +239,7 @@ that influence the computational performance of your deep learning code.
 In :numref:`chap_cv` and :numref:`chap_nlp`, we illustrate
 major applications of deep learning in computer vision
 and natural language processing, respectively.
-Finally, :number:`chap_gans` presents an emerging family of models
+Finally, :numref:`chap_gans` presents an emerging family of models
 called Generative Adversarial Networks (GANs).
 
 

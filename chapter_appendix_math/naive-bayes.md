@@ -1,15 +1,15 @@
 # Naive Bayes
 :label:`sec_naive_bayes`
 
-Throughout the previous sections, we learned about the theory of probability and random variables.  To put this theory to work, let us introduce the *naive Bayes* classifier.  This uses nothing but probabilistic fundamentals allow us to perform classification of digits.
+Throughout the previous sections, we learned about the theory of probability and random variables.  To put this theory to work, let us introduce the *naive Bayes* classifier.  This uses nothing but probabilistic fundamentals to allow us to perform classification of digits.
 
-Learning is all about making assumptions. If we want to classify a new data point that we have never seen before we have to make some assumptions about which data points are similar to each other. The naive Bayes classifier, a popular and remarkably clear algorithm, assumes all features are independent of each other to simplify the computation. In this chapter, we will apply this model to recognize characters in images.
+Learning is all about making assumptions. If we want to classify a new data point that we have never seen before we have to make some assumptions about which data points are similar to each other. The naive Bayes classifier, a popular and remarkably clear algorithm, assumes all features are independent from each other to simplify the computation. In this chapter, we will apply this model to recognize characters in images.
 
 ```{.python .input  n=72}
 %matplotlib inline
 import d2l
 import math
-from mxnet import np, npx, gluon
+from mxnet import gluon, np, npx
 npx.set_np()
 d2l.use_svg_display()
 ```
@@ -19,18 +19,18 @@ d2l.use_svg_display()
 MNIST :cite:`LeCun.Bottou.Bengio.ea.1998` is one of widely used datasets. It contains 60,000 images for training and 10,000 images for validation. Each image contains a handwritten digit from 0 to 9. The task is classifying each image into the corresponding digit.
 
 Gluon provides a `MNIST` class in the `data.vision` module to
-automatically retrieve the dataset via our Internet connection.
+automatically retrieve the dataset from the internet.
 Subsequently, Gluon will use the already-downloaded local copy.
 We specify whether we are requesting the training set or the test set
 by setting the value of the parameter `train` to `True` or `False`, respectively.
-Each image is a grayscale image with both width and height of 28 with shape ($28$,$28$,$1$). We use a customized transformation to remove the last channel dimension. In addition, the dataset represents each pixel by a unsigned 8-bit integer.  We quantize them into binary features to simplify the problem.
+Each image is a grayscale image with both width and height of $28$ with shape ($28$,$28$,$1$). We use a customized transformation to remove the last channel dimension. In addition, the dataset represents each pixel by a unsigned $8$-bit integer.  We quantize them into binary features to simplify the problem.
 
 ```{.python .input}
 def transform(data, label):
     return np.floor(data.astype('float32') / 128).squeeze(axis=-1), label
 
 mnist_train = gluon.data.vision.MNIST(train=True, transform=transform)
-mnist_test  = gluon.data.vision.MNIST(train=False, transform=transform)
+mnist_test = gluon.data.vision.MNIST(train=False, transform=transform)
 ```
 
 We can access a particular example, which contains the image and the corresponding label.
@@ -40,13 +40,13 @@ image, label = mnist_train[2]
 image.shape, label
 ```
 
-Our example, stored here in the variable `image` corresponds to an image with a height and width of $28$ pixels. Each pixel is an $8$-bit unsigned integer (uint8) with values between $0$ and $255$. We store it in a 3D `ndarray`, whose last dimension is the number of channels. Since the dataset is a grayscale image, the number of channels is 1. When we encounter color, images, we will have three channels for red, green, and blue. To minimize the number of indices, we will record the shape of the image with the height and width of $h$ and $w$ pixels, respectively, as $h \times w$ or `(h, w)`.
+Our example, stored here in the variable `image`, corresponds to an image with a height and width of $28$ pixels. 
 
 ```{.python .input}
 image.shape, image.dtype
 ```
 
-Our code stores the label of each image as a scalar. Its type is a 32-bit integer.
+Our code stores the label of each image as a scalar. Its type is a $32$-bit integer.
 
 ```{.python .input}
 label, type(label), label.dtype
@@ -59,7 +59,7 @@ images, labels = mnist_train[10:38]
 images.shape, labels.shape
 ```
 
-Now let us visualize these examples.
+Let us visualize these examples.
 
 ```{.python .input}
 d2l.show_images(images, 2, 9);
@@ -68,8 +68,8 @@ d2l.show_images(images, 2, 9);
 ## The Probabilistic Model for Classification
 
 In a classification task, we map an example into a category. Here an example is a grayscale $28\times 28$ image, and a category is a digit. (Refer to :numref:`sec_softmax` for a more detailed explanation.)
-One natural way to express the classification task is via the probabilistic question: what is the most likely label given the features (i.e., image pixels)? Denote by $\mathbf x\in\mathbb R^d$ the features of the example and $y\in\mathbb R$ the label. Here features are image pixels, where we can reshape a 2-dimensional image to a vector so that $d=28^2=784$, and labels are digits.
-The probability of the label given the features is $p(y  \mid  \mathbf{x})$. If we are able to compute these probabilities, which are $p(y  \mid  \mathbf{x})$ for $y=0,\ldots,9$ in our example, then the classifier will output the prediction  $\hat{y}$ given by the expression:
+One natural way to express the classification task is via the probabilistic question: what is the most likely label given the features (i.e., image pixels)? Denote by $\mathbf x\in\mathbb R^d$ the features of the example and $y\in\mathbb R$ the label. Here features are image pixels, where we can reshape a $2$-dimensional image to a vector so that $d=28^2=784$, and labels are digits.
+The probability of the label given the features is $p(y  \mid  \mathbf{x})$. If we are able to compute these probabilities, which are $p(y  \mid  \mathbf{x})$ for $y=0, \ldots,9$ in our example, then the classifier will output the prediction $\hat{y}$ given by the expression:
 
 $$\hat{y} = \mathrm{argmax} \> p(y  \mid  \mathbf{x}).$$
 
@@ -79,13 +79,13 @@ Moreover, where is the learning? If we need to see every single possible example
 
 ## The Naive Bayes Classifier
 
-Fortunately, by making some assumptions about conditional independence, we can introduce some inductive bias and build a model capable of generalizing from a comparatively modest selection of training examples. To begin, Let us use Bayes Theorem, to express the classifier as
+Fortunately, by making some assumptions about conditional independence, we can introduce some inductive bias and build a model capable of generalizing from a comparatively modest selection of training examples. To begin, let us use Bayes theorem, to express the classifier as
 
 $$\hat{y} = \mathrm{argmax}_y \> p(y  \mid  \mathbf{x}) = \mathrm{argmax}_y \> \frac{p( \mathbf{x}  \mid  y) p(y)}{p(\mathbf{x})}.$$
 
-Note that the denominator is the normalizing term $p(\mathbf{x})$ which does not depend on the value of the label $y$. As a result, we only need to worry about comparing the numerator across different values of $y$. Even if calculating the denominator turned out to be intractable, we could get away with ignoring it, so long as we could evaluate the numerator. Fortunately, however, even if we wanted to recover the normalizing constant, we could, since we know that $\sum_y p(y  \mid  \mathbf{x}) = 1$, hence we can always recover the normalization term.
+Note that the denominator is the normalizing term $p(\mathbf{x})$ which does not depend on the value of the label $y$. As a result, we only need to worry about comparing the numerator across different values of $y$. Even if calculating the denominator turned out to be intractable, we could get away with ignoring it, so long as we could evaluate the numerator. Fortunately, even if we wanted to recover the normalizing constant, we could.  We can always recover the normalization term since $\sum_y p(y  \mid  \mathbf{x}) = 1$.
 
-Now, Let us focus on $p( \mathbf{x}  \mid  y)$. Using the chain rule of probability, we can express the term $p( \mathbf{x}  \mid  y)$ as
+Now, let us focus on $p( \mathbf{x}  \mid  y)$. Using the chain rule of probability, we can express the term $p( \mathbf{x}  \mid  y)$ as
 
 $$p(x_1  \mid y) \cdot p(x_2  \mid  x_1, y) \cdot ... \cdot p( x_d  \mid  x_1, ..., x_{d-1}, y).$$
 
@@ -93,7 +93,7 @@ By itself, this expression does not get us any further. We still must estimate r
 
 $$ \hat{y} = \mathrm{argmax}_y \> \prod_{i=1}^d p(x_i  \mid  y) p(y).$$
 
-If we can estimate $\prod_i p(x_i=1  \mid  y)$ for every $i$ and $y$, and save its value in $P_{xy}[i,y]$, here $P_{xy}$ is a $d\times n$ matrix with $n$ being the number of classes and $y\in\{1,\ldots,n\}$. In addition, we estimate $p(y)$ for every $y$ and save it in $P_y[y]$, with $P_y$ a $n$-length vector. Then for any new example $\mathbf x$, we could compute
+If we can estimate $\prod_i p(x_i=1  \mid  y)$ for every $i$ and $y$, and save its value in $P_{xy}[i, y]$, here $P_{xy}$ is a $d\times n$ matrix with $n$ being the number of classes and $y\in\{1, \ldots, n\}$. In addition, we estimate $p(y)$ for every $y$ and save it in $P_y[y]$, with $P_y$ a $n$-length vector. Then for any new example $\mathbf x$, we could compute
 
 $$ \hat{y} = \mathrm{argmax}_y \> \prod_{i=1}^d P_{xy}[x_i, y]P_y[y],$$
 :eqlabel:`eq_naive_bayes_estimation`
@@ -110,17 +110,17 @@ X, Y = mnist_train[:]  # all training examples
 
 n_y = np.zeros((10))
 for y in range(10):
-    n_y[y] = (Y==y).sum()
+    n_y[y] = (Y == y).sum()
 P_y = n_y / n_y.sum()
 P_y
 ```
 
-Now on to slightly more difficult things $P_{xy}$. Since we picked black and white images, $p(x_i  \mid  y)$ denotes the probability that pixel $i$ is switched on for class $y$. Just like before we can go and count the number of times $n_{iy}$ such that an event occurs and divide it by the total number of occurrences of $y$, i.e., $n_y$. But there is something slightly troubling: certain pixels may never be black (e.g. for well cropped images the corner pixels might always be white). A convenient way for statisticians to deal with this problem is to add pseudo counts to all occurrences. Hence, rather than $n_{iy}$ we use $n_{iy}+1$ and instead of $n_y$ we use $n_{y} + 1$. This is also called *Laplace Smoothing*.
+Now on to slightly more difficult things $P_{xy}$. Since we picked black and white images, $p(x_i  \mid  y)$ denotes the probability that pixel $i$ is switched on for class $y$. Just like before we can go and count the number of times $n_{iy}$ such that an event occurs and divide it by the total number of occurrences of $y$, i.e., $n_y$. But there is something slightly troubling: certain pixels may never be black (e.g. for well cropped images the corner pixels might always be white). A convenient way for statisticians to deal with this problem is to add pseudo counts to all occurrences. Hence, rather than $n_{iy}$ we use $n_{iy}+1$ and instead of $n_y$ we use $n_{y} + 1$. This is also called *Laplace Smoothing*.  It may seem ad-hoc, however it may be well motivated from a Bayesian point-of-view.
 
 ```{.python .input  n=66}
 n_x = np.zeros((10, 28, 28))
 for y in range(10):
-    n_x[y] = np.array(X.asnumpy()[Y.asnumpy()==y].sum(axis=0))
+    n_x[y] = np.array(X.asnumpy()[Y.asnumpy() == y].sum(axis=0))
 P_xy = (n_x + 1) / (n_y + 1).reshape(10, 1, 1)
 
 d2l.show_images(P_xy, 2, 5);
@@ -141,18 +141,18 @@ image, label = mnist_test[0]
 bayes_pred(image)
 ```
 
-This went horribly wrong! To find out why, Let us look at the per pixel probabilities. They are typically numbers between $0.001$ and $1$. We are multiplying $784$ of them. At this point it is worth mentioning that we are calculating these numbers on a computer, hence with a fixed range for the exponent. What happens is that we experience *numerical underflow*, i.e., multiplying all the small numbers leads to something even smaller until it is rounded down to zero.
+This went horribly wrong! To find out why, let us look at the per pixel probabilities. They are typically numbers between $0.001$ and $1$. We are multiplying $784$ of them. At this point it is worth mentioning that we are calculating these numbers on a computer, hence with a fixed range for the exponent. What happens is that we experience *numerical underflow*, i.e., multiplying all the small numbers leads to something even smaller until it is rounded down to zero.  We discussed this as a theoretical issue in :numref:`sec_maximum_likelihood`, but we see the phenomena clearly here in practice.
 
-To fix this we use the fact that $\log a b = \log a + \log b$, i.e., we switch to summing logarithms.
+As discussed in that section, we fix this by use the fact that $\log a b = \log a + \log b$, i.e., we switch to summing logarithms.
 Even if both $a$ and $b$ are small numbers, the logarithm values should be in a proper range.
 
 ```{.python .input}
 a = 0.1
 print('underflow:', a**784)
-print('logrithm is normal:', 784*math.log(a))
+print('logarithm is normal:', 784*math.log(a))
 ```
 
-Since the logarithm is an increasing function, so we can rewrite :eqref:`eq_naive_bayes_estimation` as
+Since the logarithm is an increasing function, we can rewrite :eqref:`eq_naive_bayes_estimation` as
 
 $$ \hat{y} = \mathrm{argmax}_y \> \sum_{i=1}^d \log P_{xy}[x_i, y] + \log P_y[y].$$
 
@@ -173,7 +173,7 @@ py = bayes_pred_stable(image)
 py
 ```
 
-Check if the prediction is correct.
+We may now check if the prediction is correct.
 
 ```{.python .input}
 # Convert label which is a scalar tensor of int32 dtype
@@ -181,12 +181,12 @@ Check if the prediction is correct.
 py.argmax(axis=0) == int(label)
 ```
 
-Now predict a few validation examples. We can see the Bayes
+If we now predict a few validation examples, we can see the Bayes
 classifier works pretty well.
 
 ```{.python .input}
 def predict(X):
-    return [bayes_pred_stable(x).argmax(axis = 0).astype(np.int32) for x in X]
+    return [bayes_pred_stable(x).argmax(axis=0).astype(np.int32) for x in X]
 
 X, y = mnist_test[:18]
 preds = predict(X)
@@ -197,11 +197,11 @@ Finally, let us compute the overall accuracy of the classifier.
 
 ```{.python .input}
 X, y = mnist_test[:]
-preds = np.array(predict(X), dtype = np.int32)
+preds = np.array(predict(X), dtype=np.int32)
 float((preds == y).sum()) / len(y)  # Validation accuracy
 ```
 
-Modern deep networks achieve error rates of less than $0.01$. The poor performance is due to the incorrect statistical assumptions that we made in our model: we assumed that each and every pixel are *independently* generated, depending only on the label. This is clearly not how humans write digits, and this wrong assumption led to the downfall of our overly naive (Bayes) classifier.
+Modern deep networks achieve error rates of less than $0.01$. The relatively poor performance is due to the incorrect statistical assumptions that we made in our model: we assumed that each and every pixel are *independently* generated, depending only on the label. This is clearly not how humans write digits, and this wrong assumption led to the downfall of our overly naive (Bayes) classifier.
 
 ## Summary
 * Using Bayes' rule, a classifier can be made by assuming all observed features are independent.  
@@ -209,6 +209,11 @@ Modern deep networks achieve error rates of less than $0.01$. The poor performan
 * This classifier was the gold standard for decades for tasks such as spam detection.
 
 ## Exercises
-1. Consider the dataset $[[0,0],[0,1],[1,0],[1,1]]$ with labels given by the XOR of the two elements $[0,1,1,0]$.  What are the probabilities for a Naive Bayes classifier built on this dataset.  Does it successfully classify our points?  If not, what assumptions are violated?
+1. Consider the dataset $[[0,0], [0,1], [1,0], [1,1]]$ with labels given by the XOR of the two elements $[0,1,1,0]$.  What are the probabilities for a Naive Bayes classifier built on this dataset.  Does it successfully classify our points?  If not, what assumptions are violated?
 1. Suppose that we did not use Laplace smoothing when estimating probabilities and a data point arrived at testing time which contained a value never observed in training.  What would the model output?
-1. The naive Bayes classifier is a specific example of a Bayesian network, where the dependence of random variables are encoded with a graph structure.  While the full theory is beyond the scope of this section (see :cite:`Koller.Friedman.2009` for full details), explain why allowing explicit dependence between the two input variables in the XOR model allows for the creation of a successful classifier.  
+1. The naive Bayes classifier is a specific example of a Bayesian network, where the dependence of random variables are encoded with a graph structure.  While the full theory is beyond the scope of this section (see :cite:`Koller.Friedman.2009` for full details), explain why allowing explicit dependence between the two input variables in the XOR model allows for the creation of a successful classifier.
+
+
+## [Discussions](https://discuss.mxnet.io/t/5155)
+
+![](../img/qr_naive-bayes.svg)

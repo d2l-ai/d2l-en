@@ -1,16 +1,16 @@
 # Maximum Likelihood
 :label:`sec_maximum_likelihood`
 
-One of the most commonly encounter way of thinking in machine learning is the maximum likelihood point of view.  This is the concept that when working with a probabilistic model with unknown parameters, the parameters which make the data have the highest probability are the most likely ones.
+One of the most commonly encountered way of thinking in machine learning is the maximum likelihood point of view.  This is the concept that when working with a probabilistic model with unknown parameters, the parameters which make the data have the highest probability are the most likely ones.
 
 ## The Maximum Likelihood Principle
 
-This has a Bayesian which can be helpful to think about.  Suppose that we have a model with parameters $\boldsymbol{\theta}$ and a collection of data points $X$.  For concreteness, we can imagine that $\boldsymbol{\theta}$ is a single value representing the probability that a coin comes up heads when flipped, and $X$ is a sequence of independent coin flips.  We will look at this example in depth later.
+This has a Bayesian interpretation which can be helpful to think about.  Suppose that we have a model with parameters $\boldsymbol{\theta}$ and a collection of data points $X$.  For concreteness, we can imagine that $\boldsymbol{\theta}$ is a single value representing the probability that a coin comes up heads when flipped, and $X$ is a sequence of independent coin flips.  We will look at this example in depth later.
 
 If we want to find the most likely value for the parameters of our model, that means we want to find
 
 $$\mathop{\mathrm{argmax}} P(\boldsymbol{\theta}\mid X).$$
-:eqlabel:`max_like`
+:eqlabel:`eq_max_like`
 
 By Bayes' rule, this is the same thing as
 
@@ -26,7 +26,7 @@ $$
 
 As a matter of common terminology, the probability of the data given the parameters ($P(X \mid \boldsymbol{\theta})$) is referred to as the *likelihood*.
 
-## A Concrete Example
+### A Concrete Example
 
 Let us see how this works in a concrete example.  Suppose that we have a single parameter $\theta$ representing the probability that a coin flip is heads.  Then the probability of getting a tails is $1-\theta$, and so if our observed data $X$ is a sequence with $n_H$ heads and $n_T$ tails, we can use the fact that independent probabilities multiply to see that 
 
@@ -40,9 +40,9 @@ $$
 P(X \mid \theta) = \theta^9(1-\theta)^4.
 $$
 
-One nice thing about this example will be that we know the answer going in.  Indeed, if I told we verbally, "I flipped 13 coins, and 9 came up heads, what is our best guess for the probability that the coin comes us heads?," I believe that everyone would correctly guess $9/13$.  What this maximum likelihood method will give us is a way to get that number from first principals, and in a way that will generalize to vastly more complex situations.
+One nice thing about this example will be that we know the answer going in.  Indeed, if we said verbally, "I flipped 13 coins, and 9 came up heads, what is our best guess for the probability that the coin comes us heads?, " everyone would correctly guess $9/13$.  What this maximum likelihood method will give us is a way to get that number from first principals in a way that will generalize to vastly more complex situations.
 
-In any case, for our example, the plot of $P(X \mid \theta)$ is as follows
+For our example, the plot of $P(X \mid \theta)$ is as follows
 
 ```{.python .input}
 %matplotlib inline
@@ -56,7 +56,7 @@ p = theta**9 * (1 - theta)**4.
 d2l.plot(theta, p, 'theta', 'likelihood')
 ```
 
-This has its maximum value somewhere near our expected $9/13 \approx 0.7\ldots$.  To see if it is exactly there, we can turn to calculus.  Notice that at the maximum, the function is flat.  Indeed if the slope was not zero there, then we could shift the input to make it larger (think about the process of gradient descent).  Thus, we could find the maximum likelihood estimate :eqref:`max_like` by finding the values of $\theta$ where the derivative is zero, and finding the one that gives the highest probability.  We compute:
+This has its maximum value somewhere near our expected $9/13 \approx 0.7\ldots$.  To see if it is exactly there, we can turn to calculus.  Notice that at the maximum, the function is flat.  Thus, we could find the maximum likelihood estimate :eqref:`eq_max_like` by finding the values of $\theta$ where the derivative is zero, and finding the one that gives the highest probability.  We compute:
 
 $$
 \begin{aligned}
@@ -67,13 +67,13 @@ $$
 \end{aligned}
 $$
 
-This has three solutions: $0$, $1$ and $9/13$.  The first two are clearly minima, not maxima as they assign probability $0$ to our sequence.  The final one does *not* assign zero probability to our sequence, and thus must be the maximum likelihood estimate $\hat \theta = 9/13$, matching our intuition.
+This has three solutions: $0$, $1$ and $9/13$.  The first two are clearly minima, not maxima as they assign probability $0$ to our sequence.  The final value does *not* assign zero probability to our sequence, and thus must be the maximum likelihood estimate $\hat \theta = 9/13$.
 
 ## Numerical Optimization and the Negative Log-Likelihood
 
-This story is nice, but what is we have billions of parameters and data points.  What do we do then?
+The previous example is nice, but what if we have billions of parameters and data points.
 
-First notice that, if we make the assumption that all the data points are independents, we can no longer consider the likelihood itself as it is a product of many probabilities.  Indeed, each probability is in $[0,1]$, say typically of size about $1/2$, and the product of $(1/2)^{1000000000}$ is far below machine precision.  We cannot work with that directly.  
+First notice that, if we make the assumption that all the data points are independent, we can no longer practically consider the likelihood itself as it is a product of many probabilities.  Indeed, each probability is in $[0,1]$, say typically of size about $1/2$, and the product of $(1/2)^{1000000000}$ is far below machine precision.  We cannot work with that directly.  
 
 However, recall that the logarithm turns products to sums, in which case 
 
@@ -81,15 +81,15 @@ $$
 \log((1/2)^{1000000000}) = 1000000000\cdot\log(1/2) \approx -301029995.6\ldots
 $$
 
-This number fits perfectly within even a single precision 32-bit float.  Thus, we are lead to consider the log-likelihood, which is
+This number fits perfectly within even a single precision $32$-bit float.  Thus, we should consider the *log-likelihood*, which is
 
 $$
 \log(P(X \mid \boldsymbol{\theta})).
 $$
 
-Since the function $x \mapsto \log(x)$ is increasing, maximizing the likelihood is the same thing as maximizing the log-likelihood.  Indeed in :numref:`sec_naive_bayes` we saw this reasoning applied when working with the specific example of the Naive Bayes classifier.
+Since the function $x \mapsto \log(x)$ is increasing, maximizing the likelihood is the same thing as maximizing the log-likelihood.  Indeed in :numref:`sec_naive_bayes` we will see this reasoning applied when working with the specific example of the naive Bayes classifier.
 
-We often work with loss functions, where we wish to minimize the loss.  We may turn maximum likelihood into the minimizattion of a loss by taking $-\log(P(X \mid \boldsymbol{\theta}))$, which is the Negative Log-Likelihood.
+We often work with loss functions, where we wish to minimize the loss.  We may turn maximum likelihood into the minimizattion of a loss by taking $-\log(P(X \mid \boldsymbol{\theta}))$, which is the *negative log-likelihood*.
 
 To illustrate this, consider the coin flipping problem from before, and pretend that we do not know the closed form solution.  The we may compute that
 
@@ -97,7 +97,7 @@ $$
 -\log(P(X \mid \boldsymbol{\theta})) = -\log(\theta^{n_H}(1-\theta)^{n_T}) = -(n_H\log(\theta) + n_T\log(1-\theta)).
 $$
 
-This can be written into code, and freely optimized with gradient descent even for billions of coin flips.
+This can be written into code, and freely optimized even for billions of coin flips.
 
 ```{.python .input}
 # Set up our data
@@ -105,11 +105,12 @@ n_H = 8675309
 n_T = 25624
 
 # Initialize our paramteres
-theta = np.array(0.5); theta.attach_grad()
+theta = np.array(0.5)
+theta.attach_grad()
 
 # Perform gradient descent
 lr = 0.00000000001
-for iter in range(10) :
+for iter in range(10):
     with autograd.record():
         loss = -(n_H * np.log(theta) + n_T * np.log(1 - theta))
     loss.backward()
@@ -119,11 +120,11 @@ for iter in range(10) :
 theta, n_H / (n_H + n_T)
 ```
 
-Numerical convenience is only one reason people like to use negative log-likelihoods.  Indeed, there are a number of reasons that it can be preferable.
+Numerical convenience is only one reason people like to use negative log-likelihoods.  Indeed, there are a several reasons that it can be preferable.
 
-### Simplification of Calculus Rules
 
-As discussed above, due to independence assumptions, most probabilities we encounter in machine learning are products of individual probabilities.
+
+The second reason we consider the log-likelihood is the simplified application of calculus rules.  As discussed above, due to independence assumptions, most probabilities we encounter in machine learning are products of individual probabilities.
 
 $$
 P(X\mid\boldsymbol{\theta}) = p(x_1\mid\boldsymbol{\theta})\cdot p(x_2\mid\boldsymbol{\theta})\cdots p(x_n\mid\boldsymbol{\theta}).
@@ -154,19 +155,17 @@ $$
 
 This requires only $n$ divides and $n-1$ sums, and thus is linear time in the inputs.
 
-### Relationships with Information Theory
-
-In :numref:`sec_information_theory` we will discuss a concept known as information theory.  This is a rigorous mathematical theory which gives a way to measure the degree of randomness in a random variable.  The key object of study in that field is the entropy which is 
+The third and final reason to consider the negative log-likelihood is the relationship to information theory, which we will discuss in detail in :numref:`sec_information_theory`.  This is a rigorous mathematical theory which gives a way to measure the degree of information or randomness in a random variable.  The key object of study in that field is the entropy which is 
 
 $$
 H(p) = -\sum_{i} p_i \log_2(p_i),
 $$
 
-which measures the randomness of a source in bits. Notice that this is nothing more than the average $-\log$ probability, and thus if we take our negative log-likelihood and divide by the number of data points, we get a relative of entropy (known as cross-entropy) that measures how random our model thinks our data is.  This theoretical interpretation alone would be sufficiently compelling to motivate reporting the average negative log-likelihood over the dataset as a way of measuring model performance.
+which measures the randomness of a source. Notice that this is nothing more than the average $-\log$ probability, and thus if we take our negative log-likelihood and divide by the number of data points, we get a relative of entropy known as cross-entropy.  This theoretical interpretation alone would be sufficiently compelling to motivate reporting the average negative log-likelihood over the dataset as a way of measuring model performance.
 
 ## Maximum Likelihood for Continuous Variables
 
-Everything that we have done so far assumes we are working with discrete random variables, but what if we want to work with continuous ones?  Indeed, in applications, continuous random variables are as likely to be encountered as discrete, and so we need to extend this story line to this case.
+Everything that we have done so far assumes we are working with discrete random variables, but what if we want to work with continuous ones?
 
 The short summary is that nothing at all changes, except we replace all the instances of the probability with the probability density.  Recalling that we write densities with lower case $p$, this means that for example we now say
 
@@ -178,25 +177,25 @@ The question becomes, "Why is this OK?"  After all, the reason we introduced den
 
 Indeed, this is the case, and understanding why we can shift to densities is an exercise in tracing what happens to the epsilons.
 
-Let us first re-define our goal.  Let us suppose that for continuous random variables we no longer want to compute the probability of getting exactly the right value, but instead matching to say the first four digits.  For simplicity, Let us assume our data is repeated observations $x_1, \ldots, x_N$ of identically distributed random variables $X_1, \ldots, X_N$.  As we have seen previously, this can be written as
+Let us first re-define our goal.  Suppose that for continuous random variables we no longer want to compute the probability of getting exactly the right value, but instead matching to within some range $\epsilon$.  For simplicity, we assume our data is repeated observations $x_1, \ldots, x_N$ of identically distributed random variables $X_1, \ldots, X_N$.  As we have seen previously, this can be written as
 
 $$
-P(X_1 \in [x_1,x_1+\epsilon], X_2 \in [x_2,x_2+\epsilon], \ldots, X_N \in [x_N,x_N+\epsilon]\mid\boldsymbol{\theta}) \approx \epsilon^Np(x_1\mid\boldsymbol{\theta})\cdot p(x_2\mid\boldsymbol{\theta}) \cdots p(x_n\mid\boldsymbol{\theta}),
+P(X_1 \in [x_1, x_1+\epsilon], X_2 \in [x_2, x_2+\epsilon], \ldots, X_N \in [x_N, x_N+\epsilon]\mid\boldsymbol{\theta}) \approx \epsilon^Np(x_1\mid\boldsymbol{\theta})\cdot p(x_2\mid\boldsymbol{\theta}) \cdots p(x_n\mid\boldsymbol{\theta}).
 $$
 
-with $\epsilon = 10^{-4}$. Thus, if we take negative logarithms of this we obtain
+Thus, if we take negative logarithms of this we obtain
 
 $$
--\log(P(X_1 \in [x_1,x_1+\epsilon], X_2 \in [x_2,x_2+\epsilon], \ldots, X_N \in [x_N,x_N+\epsilon]\mid\boldsymbol{\theta})) \approx -N\log(\epsilon) - \sum_{i} \log(p(x_i\mid\boldsymbol{\theta})).
+-\log(P(X_1 \in [x_1, x_1+\epsilon], X_2 \in [x_2, x_2+\epsilon], \ldots, X_N \in [x_N, x_N+\epsilon]\mid\boldsymbol{\theta})) \approx -N\log(\epsilon) - \sum_{i} \log(p(x_i\mid\boldsymbol{\theta})).
 $$
 
 If we examine this expression, the only place that the $\epsilon$ occurs is in the additive constant $-N\log(\epsilon)$.  This does not depend on the parameters $\boldsymbol{\theta}$ at all, so the optimal choice of $\boldsymbol{\theta}$ does not depend on our choice of $\epsilon$!  If we demand four digits or four-hundred, the best choice of $\boldsymbol{\theta}$ remains the same, thus we may freely drop the epsilon to see that what we want to optimize is
 
 $$
-- \sum_{i} \log(p(x_i\mid\boldsymbol{\theta})),
+- \sum_{i} \log(p(x_i\mid\boldsymbol{\theta})).
 $$
 
-as was claimed at the beginning of this section.  Thus we see that the maximum likelihood point of view can operate with continuous random variables as easily as with discrete ones by replacing the probabilities with probability densities.
+Thus, we see that the maximum likelihood point of view can operate with continuous random variables as easily as with discrete ones by replacing the probabilities with probability densities.
 
 ## Summary
 * The maximum likelihood principle tells us that the best fit model for a given dataset is the one that generates the data with the highest probability.
@@ -206,3 +205,8 @@ as was claimed at the beginning of this section.  Thus we see that the maximum l
 ## Exercises
 1. Suppose that you know that a random variable has density $\frac{1}{\alpha}e^{-\alpha x}$ for some value $\alpha$.  You obtain a single observation from the random variable which is the number $3$.  What is the maximum likelihood estimate for $\alpha$?
 2. Suppose that you have a dataset of samples $\{x_i\}_{i=1}^N$ drawn from a Gaussian with unknown mean, but variance $1$.  What is the maximum likelihood estimate for the mean?
+
+
+## [Discussions](https://discuss.mxnet.io/t/5153)
+
+![](../img/qr_maximum-likelihood.svg)

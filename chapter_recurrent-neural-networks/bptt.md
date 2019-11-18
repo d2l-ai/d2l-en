@@ -10,7 +10,7 @@ to see how it works. In this section we will delve a bit more deeply
 into the details of backpropagation for sequence models and why (and
 how) the math works. For a more detailed discussion about
 randomization and backpropagation also see the paper by
-[Tallec and Ollivier, 2017](https://arxiv.org/abs/1705.08209).
+:cite:`Tallec.Ollivier.2017`.
 
 We encountered some of the effects of gradient explosion when we first
 implemented recurrent neural networks (:numref:`sec_rnn_scratch`). In
@@ -47,14 +47,14 @@ For backpropagation, matters are a bit more tricky, especially when we compute t
 
 $$\begin{aligned}
 \partial_{w_h} L & = \sum_{t=1}^T \partial_{w_h} l(y_t, o_t) \\
-	& = \sum_{t=1}^T \partial_{o_t} l(y_t, o_t) \partial_{h_t} g(h_t,w_h) \left[ \partial_{w_h} h_t\right].
+	& = \sum_{t=1}^T \partial_{o_t} l(y_t, o_t) \partial_{h_t} g(h_t, w_h) \left[ \partial_{w_h} h_t\right].
 \end{aligned}$$
 
 The first and the second part of the derivative is easy to compute. The third part $\partial_{w_h} h_t$ is where things get tricky, since we need to compute the effect of the parameters on $h_t$.
 
 
 To derive the above gradient, assume that we have three sequences $\{a_{t}\},\{b_{t}\},\{c_{t}\}$ satisfying
-$a_{0}=0,a_{1}=b_{1}$, and $a_{t}=b_{t}+c_{t}a_{t-1}$ for $t=1,2,\ldots$.
+$a_{0}=0, a_{1}=b_{1}$, and $a_{t}=b_{t}+c_{t}a_{t-1}$ for $t=1, 2,\ldots$.
 Then for $t\geq 1$, it is easy to show 
 
 $$a_{t}=b_{t}+\sum_{i=1}^{t-1}\left(\prod_{j=i+1}^{t}c_{j}\right)b_{i}.$$
@@ -87,11 +87,11 @@ While we can use the chain rule to compute $\partial_w h_t$ recursively, this ch
 
 * **Truncate the sum after** $\tau$ **steps.** This is what we have been discussing so far. This leads to an *approximation* of the true gradient, simply by terminating the sum above at $\partial_w h_{t-\tau}$. The approximation error is thus given by $\partial_h f(x_t, h_{t-1}, w) \partial_w h_{t-1}$ (multiplied by a product of  gradients involving $\partial_h f$). In practice this works quite well. It is what is commonly referred to as truncated BPTT (backpropgation through time). One of the consequences of this is that the model focuses primarily on short-term influence rather than long-term consequences. This is actually *desirable*, since it biases the estimate towards simpler and more stable models.
 
-* **Randomized Truncation.** Lastly we can replace $\partial_{w_h} h_t$ by a random variable which is correct in expectation but which truncates the sequence. This is achieved by using a sequence of $\xi_t$ where $\mathbf{E}[\xi_t] = 1$ and $P(\xi_t = 0) = 1-\pi$ and furthermore $P(\xi_t = \pi^{-1}) = \pi$. We use this to replace the gradient: 
+* **Randomized Truncation.** Last we can replace $\partial_{w_h} h_t$ by a random variable which is correct in expectation but which truncates the sequence. This is achieved by using a sequence of $\xi_t$ where $\mathbf{E}[\xi_t] = 1$ and $P(\xi_t = 0) = 1-\pi$ and furthermore $P(\xi_t = \pi^{-1}) = \pi$. We use this to replace the gradient: 
 
 $$z_t  = \partial_w f(x_t, h_{t-1}, w) + \xi_t \partial_h f(x_t, h_{t-1}, w) \partial_w h_{t-1}.$$ 
 
-It follows from the definition of $\xi_t$ that $\mathbf{E}[z_t] = \partial_w h_t$. Whenever $\xi_t = 0$ the expansion terminates at that point. This leads to a weighted sum of sequences of varying lengths where long sequences are rare but appropriately overweighted. :cite:`Tallec.Ollivier.2017` proposed this in their paper. Unfortunately, while appealing in theory, the model does not work much better than simple truncation, most likely due to a number of factors. Firstly, the effect of an observation after a number of backpropagation steps into the past is quite sufficient to capture dependencies in practice. Secondly, the increased variance counteracts the fact that the gradient is more accurate. Thirdly, we actually *want* models that have only a short range of interaction. Hence, BPTT has a slight regularizing effect which can be desirable.
+It follows from the definition of $\xi_t$ that $\mathbf{E}[z_t] = \partial_w h_t$. Whenever $\xi_t = 0$ the expansion terminates at that point. This leads to a weighted sum of sequences of varying lengths where long sequences are rare but appropriately overweighted. :cite:`Tallec.Ollivier.2017` proposed this in their paper. Unfortunately, while appealing in theory, the model does not work much better than simple truncation, most likely due to a number of factors. First, the effect of an observation after a number of backpropagation steps into the past is quite sufficient to capture dependencies in practice. Second, the increased variance counteracts the fact that the gradient is more accurate. Third, we actually *want* models that have only a short range of interaction. Hence, BPTT has a slight regularizing effect which can be desirable.
 
 ![From top to bottom: randomized BPTT, regularly truncated BPTT and full BPTT](../img/truncated-bptt.svg)
 :label:`fig_truncated_bptt`

@@ -98,8 +98,8 @@ train_data = pd.read_csv('../data/kaggle_house_pred_train.csv')
 test_data = pd.read_csv('../data/kaggle_house_pred_test.csv')
 ```
 
-The training dataset includes 1,460 examples, 80 features, and 1 label.,
-the test data contains 1,459 examples and 80 features.
+The training dataset includes $1,460$ examples, $80$ features, and $1$ label,
+while the test data contains $1,459$ examples and $80$ features.
 
 ```{.python .input  n=11}
 print(train_data.shape)
@@ -162,7 +162,7 @@ We replace them by a one-hot encoding
 in the same manner as how we transformed multiclass classification data
 into a vector of $0$ and $1$.
 For instance, 'MSZoning' assumes the values 'RL' and 'RM'.
-They map into vectors $(1,0)$ and $(0,1)$ respectively.
+They map into vectors $(1, 0)$ and $(0, 1)$ respectively.
 Pandas does this automatically for us.
 
 ```{.python .input  n=7}

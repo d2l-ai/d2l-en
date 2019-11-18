@@ -55,7 +55,8 @@ Such models are particularly nice whenever $x_t$ assumes only a discrete value, 
 
 $$p(x_{t+1} \mid x_{t-1}) = \sum_{x_t} p(x_{t+1} \mid x_t) p(x_t \mid x_{t-1}).$$
 
-Going into details of dynamic programming is beyond the scope of this section, but we will introduce it in :numref:`sec_birnn`. Control and reinforcement learning algorithms use such tools extensively.
+
+Going into details of dynamic programming is beyond the scope of this section, but we will introduce it in :numref:`sec_bi_rnn`. Control and reinforcement learning algorithms use such tools extensively.
 
 ### Causality
 
@@ -155,7 +156,7 @@ predictions = np.zeros(T)
 predictions[:n_train] = x[:n_train]
 for i in range(n_train, T):
     predictions[i] = net(
-        predictions[(i-tau):i].reshape(1,-1)).reshape(1)
+        predictions[(i-tau):i].reshape(1, -1)).reshape(1)
 d2l.plot([time, time[tau:], time[n_train:]],
          [x, estimates, predictions[n_train:]],
          legend=['data', 'estimate', 'multistep'], figsize=(4.5, 2.5))

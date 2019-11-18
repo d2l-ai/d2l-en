@@ -56,7 +56,7 @@ class Seq2SeqAttentionDecoder(d2l.Decoder):
     def init_state(self, enc_outputs, enc_valid_len, *args):
         outputs, hidden_state = enc_outputs
         # Transpose outputs to (batch_size, seq_len, hidden_size)
-        return (outputs.swapaxes(0,1), hidden_state, enc_valid_len)
+        return (outputs.swapaxes(0, 1), hidden_state, enc_valid_len)
 
     def forward(self, X, state):
         enc_outputs, hidden_state, enc_valid_len = state
@@ -117,7 +117,7 @@ model = d2l.EncoderDecoder(encoder, decoder)
 d2l.train_s2s_ch8(model, train_iter, lr, num_epochs, ctx)
 ```
 
-Lastly, we predict several sample examples.
+Last, we predict several sample examples.
 
 ```{.python .input  n=6}
 for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:

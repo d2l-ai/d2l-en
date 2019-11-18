@@ -107,7 +107,7 @@ In most cases, the latter student will do much better.
 Likewise, consider a model that simply uses a lookup table to answer questions. If the set of allowable inputs is discrete and reasonably small, then perhaps after viewing *many* training examples, this approach would perform well. Still this model has no ability to do better than random guessing when faced with examples that it has never seen before.
 In reality the input spaces are far too large to memorize the answers corresponding to every conceivable input. For example, consider the black and white $28\times28$ images. If each pixel can take one among $256$ gray scale values, then there are $256^{784}$ possible images. That means that there are far more low-res grayscale thumbnail-sized images than there are atoms in the universe. Even if we could encounter this data, we could never afford to store the lookup table.
 
-Lastly, consider the problem of trying
+Last, consider the problem of trying
 to classify the outcomes of coin tosses (class 0: heads, class 1: tails)
 based on some contextual features that might be available.
 No matter what algorithm we come up with,
@@ -147,8 +147,8 @@ we assume that both the training data and the test data
 are drawn *independently* from *identical* distributions
 (commonly called the i.i.d. assumption).
 This means that the process that samples our data has no *memory*.
-The 2nd example drawn and the 3rd drawn
-are no more correlated than the 2nd and the 2-millionth sample drawn.
+The $2^{\mathrm{nd}}$ example drawn and the $3^{\mathrm{rd}}$ drawn
+are no more correlated than the $2^{\mathrm{nd}}$ and the $2$-millionth sample drawn.
 
 Being a good machine learning scientist requires thinking critically,
 and already you should be poking holes in this assumption,
@@ -425,7 +425,7 @@ npx.set_np()
 First we need data. Given $x$, we will use the following cubic polynomial to generate the labels on training and test data:
 
 $$y = 5 + 1.2x - 3.4\frac{x^2}{2!} + 5.6 \frac{x^3}{3!} + \epsilon \text{ where }
-\epsilon \sim \mathcal{N}(0,0.1)$$
+\epsilon \sim \mathcal{N}(0, 0.1)$$
 
 The noise term $\epsilon$ obeys a normal distribution
 with a mean of 0 and a standard deviation of 0.1.
@@ -494,7 +494,7 @@ def train(train_features, test_features, train_labels, test_labels,
     trainer = gluon.Trainer(net.collect_params(), 'sgd',
                             {'learning_rate': 0.01})
     animator = d2l.Animator(xlabel='epoch', ylabel='loss', yscale='log',
-                            xlim=[1,num_epochs], ylim=[1e-3, 1e2],
+                            xlim=[1, num_epochs], ylim=[1e-3, 1e2],
                             legend=['train', 'test'])
     for epoch in range(1, num_epochs+1):
         d2l.train_epoch_ch3(net, train_iter, loss, trainer)

@@ -62,7 +62,7 @@ train_tokens = d2l.tokenize(train_data[0], token='word')
 vocab = d2l.Vocab(train_tokens, min_freq=5)
 
 d2l.set_figsize((3.5, 2.5))
-d2l.plt.hist([len(line) for line in train_tokens], bins=range(0,1000,50));
+d2l.plt.hist([len(line) for line in train_tokens], bins=range(0, 1000, 50));
 ```
 
 ### Padding to the Same Length
@@ -91,7 +91,7 @@ for X, y in train_iter:
 
 ## Put All Things Together
 
-Lastly, we will save a function `load_data_imdb` into `d2l`, which returns the vocabulary and data iterators.
+Last, we will save a function `load_data_imdb` into `d2l`, which returns the vocabulary and data iterators.
 
 ```{.python .input  n=7}
 # Saved in the d2l package for later use
