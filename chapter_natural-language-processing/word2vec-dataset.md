@@ -73,7 +73,7 @@ d2l.plt.hist([[len(line) for line in sentences],
               [len(line) for line in subsampled]])
 d2l.plt.xlabel('# tokens per sentence')
 d2l.plt.ylabel('count')
-d2l.plt.legend(['origin', 'subsampled'])
+d2l.plt.legend(['origin', 'subsampled']);
 ```
 
 For individual tokens, the sampling rate of the high-frequency word "the" is less than 1/20.
