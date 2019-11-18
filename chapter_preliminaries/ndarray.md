@@ -12,8 +12,8 @@ In MXNet, `ndarray` is a class and we call any instance "an `ndarray`".
 
 If you have worked with NumPy, the most widely-used 
 scientific computing package in Python, 
-then will find this chapter familiar and should be ready to fly. 
-In short, we designed MXNet's `ndarray` to be 
+then will find this section familiar.
+That's by design. We designed MXNet's `ndarray` to be 
 an extension to NumPy's `ndarray` with a few killer features.
 First, MXNet's `ndarray` supports asynchronous computation 
 on CPU, GPU, and distributed cloud architectures, 
