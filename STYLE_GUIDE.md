@@ -163,7 +163,7 @@
   publisher={ACM}
 }
 ```
-4. Run `bibtool -f "%3n(author).%d(year)" d2l.bib -o d2l.bib`. Now the added entry will have consistent keys:
+4. Run `bibtool -s -f "%3n(author).%d(year)" d2l.bib -o d2l.bib`. Now the added entry will have consistent keys. And as a side-effect, it'll appear in alphabetically sorted order relative to all other papers in the file:
 ```
 @Article{	  Wood.Gasthaus.Archambeau.ea.2011,
   title		= {The sequence memoizer},
