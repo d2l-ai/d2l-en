@@ -28,7 +28,7 @@ def download_imdb(data_dir='../data'):
     fname = gluon.utils.download(url, data_dir)
     with tarfile.open(fname, 'r') as f:
         f.extractall(data_dir)
-        
+
 download_imdb()
 ```
 
@@ -71,12 +71,12 @@ Because the reviews have different lengths, so they cannot be directly combined 
 
 ```{.python .input  n=5}
 num_steps = 500  # sequence length
-train_features = np.array([d2l.trim_pad(vocab[line], num_steps, vocab.unk) 
-                          for line in train_tokens])
+train_features = np.array([d2l.trim_pad(vocab[line], num_steps, vocab.unk)
+                           for line in train_tokens])
 train_features.shape
 ```
 
-### Create Data Iterator
+### Creating Data Iterator
 
 Now, we will create a data iterator. Each iteration will return a minibatch of data.
 
@@ -89,7 +89,7 @@ for X, y in train_iter:
 '# batches:', len(train_iter)
 ```
 
-## Put All Things Together
+## Putting Things Together
 
 Last, we will save a function `load_data_imdb` into `d2l`, which returns the vocabulary and data iterators.
 
@@ -101,12 +101,12 @@ def load_data_imdb(batch_size, num_steps=500):
     train_tokens = d2l.tokenize(train_data[0], token='word')
     test_tokens = d2l.tokenize(test_data[0], token='word')
     vocab = d2l.Vocab(train_tokens, min_freq=5)
-    train_features = np.array([d2l.trim_pad(vocab[line], num_steps, vocab.unk) 
+    train_features = np.array([d2l.trim_pad(vocab[line], num_steps, vocab.unk)
                                for line in train_tokens])
-    test_features = np.array([d2l.trim_pad(vocab[line], num_steps, vocab.unk) 
-                               for line in test_tokens])
+    test_features = np.array([d2l.trim_pad(vocab[line], num_steps, vocab.unk)
+                              for line in test_tokens])
     train_iter = d2l.load_array((train_features, train_data[1]), batch_size)
-    test_iter = d2l.load_array((test_features, test_data[1]), batch_size, 
+    test_iter = d2l.load_array((test_features, test_data[1]), batch_size,
                                is_train=False)
     return train_iter, test_iter, vocab
 ```

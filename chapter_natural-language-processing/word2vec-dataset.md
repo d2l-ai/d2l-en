@@ -8,15 +8,14 @@ word2vec training. The dataset we use is [Penn Tree Bank (PTB)]( https://catalog
 First, import the packages and modules required for the experiment.
 
 ```{.python .input  n=1}
-import collections
 import d2l
 import math
-from mxnet import np, gluon
+from mxnet import gluon, np
 import random
 import zipfile
 ```
 
-## Read and Preprocessing
+## Reading and Preprocessing
 
 This dataset has already been preprocessed. Each line of the dataset acts as a sentence. All the words in a sentence are separated by spaces. In the word embedding task, each word is a token.
 
@@ -47,6 +46,11 @@ $$ P(w_i) = \max\left(1 - \sqrt{\frac{t}{f(w_i)}}, 0\right),$$
 Here, $f(w_i)$ is the ratio of the instances of word $w_i$ to the total number of words in the dataset, and the constant $t$ is a hyperparameter (set to $10^{-4}$ in this experiment). As we can see, it is only possible to drop out the word $w_i$ in subsampling when $f(w_i) > t$. The higher the word's frequency, the higher its dropout probability.
 
 ```{.python .input  n=4}
+def keep(token):
+    # Return True if to keep this token during subsampling
+    return (random.uniform(0, 1) <
+            math.sqrt(1e-4 / counter[token] * num_tokens))
+
 # Saved in the d2l package for later use
 def subsampling(sentences, vocab):
     # Map low frequency words into <unk>
@@ -55,10 +59,7 @@ def subsampling(sentences, vocab):
     # Count the frequency for each word
     counter = d2l.count_corpus(sentences)
     num_tokens = sum(counter.values())
-    # Return True if to keep this token during subsampling
-    keep = lambda token: (
-        random.uniform(0, 1) < math.sqrt(1e-4 / counter[token] * num_tokens))
-    # Now do the subsampling.
+    # Now do the subsampling
     return [[tk for tk in line if keep(tk)] for line in sentences]
 
 subsampled = subsampling(sentences, vocab)
@@ -69,10 +70,10 @@ Compare the sequence lengths before and after sampling, we can see subsampling s
 ```{.python .input  n=5}
 d2l.set_figsize((3.5, 2.5))
 d2l.plt.hist([[len(line) for line in sentences],
-              [len(line) for line in subsampled]] )
+              [len(line) for line in subsampled]])
 d2l.plt.xlabel('# tokens per sentence')
 d2l.plt.ylabel('count')
-d2l.plt.legend(['origin', 'subsampled']);
+d2l.plt.legend(['origin', 'subsampled'])
 ```
 
 For individual tokens, the sampling rate of the high-frequency word "the" is less than 1/20.
@@ -99,11 +100,11 @@ corpus = [vocab[line] for line in subsampled]
 corpus[0:3]
 ```
 
-## Load the Dataset
+## Loading the Dataset
 
 Next we read the corpus with token indicies into data batches for training.
 
-### Extract Central Target Words and Context Words
+### Extracting Central Target Words and Context Words
 
 We use words with a distance from the central target word not exceeding the context window size as the context words of the given center target word. The following definition function extracts all the central target words and their context words. It uniformly and randomly samples an integer to be used as the context window size between integer 1 and the `max_window_size` (maximum context window).
 
@@ -114,7 +115,8 @@ def get_centers_and_contexts(corpus, max_window_size):
     for line in corpus:
         # Each sentence needs at least 2 words to form a
         # "central target word - context word" pair
-        if len(line) < 2: continue
+        if len(line) < 2:
+            continue
         centers += line
         for i in range(len(line)):  # Context window centered at i
             window_size = random.randint(1, max_window_size)
@@ -189,7 +191,7 @@ def get_negatives(all_contexts, corpus, K):
 all_negatives = get_negatives(all_contexts, corpus, 5)
 ```
 
-### Read into Batches
+### Reading into Batches
 
 We extract all central target words `all_centers`, and the context words `all_contexts` and noise words `all_negatives` of each central target word from the dataset. We will read them in random minibatches.
 
@@ -226,7 +228,7 @@ for name, data in zip(names, batch):
 
 We use the `batchify` function just defined to specify the minibatch reading method in the `DataLoader` instance. 
 
-## Put All Things Together
+## Putting Things Together
 
 Last, we define the `load_data_ptb` function that read the PTB dataset and return the data loader.
 
