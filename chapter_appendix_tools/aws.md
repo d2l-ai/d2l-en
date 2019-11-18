@@ -164,6 +164,7 @@ sudo apt-get update
 sudo apt-get -y install cuda
 ```
 
+
 After installing the program, run the following command to view the GPUs.
 
 ```bash
@@ -222,33 +223,32 @@ Next, download the code for this book.
 
 ```bash
 sudo apt-get install unzip
-mkdir d2l-en && cd d2l-en
-wget https://d2l.ai/d2l-en.zip
-unzip d2l-en.zip && rm d2l-en.zip
 ```
 
 
-Then create the conda `d2l` environment and enter `y` to proceed with the installation. 
+```bash
+mkdir d2l-en && cd d2l-en
+```
 
 ```bash
-conda create --name d2l 
+wget http://numpy.d2l.ai/d2l-en.zip
+unzip d2l-en.zip && rm d2l-en.zip
+```
 
-## Package Plan ##
+Then create the conda `d2l` environment.
 
-  environment location: /home/ubuntu/.conda/envs/d2l
-  
-Proceed ([y]/n)? y
+```bash
+conda create --name d2l -y
 ```
 
 After creating the `d2l` environment, activate it and install `pip`.
 
 ```bash
 conda activate d2l
-conda install pip
+conda install python=3.7 pip -y
 ```
 
-
-Finally, install `MXNet` and `d2l`. The postfix `cu101mkl` means that this is the CUDA 10.1 variant with Intel MKL support. For different versions, say only CUDA 10.0, you would want to choose `cu100` instead. 
+Finally, install `MXNet` and `d2l`. The postfix `cu101mkl` means that this is the CUDA 10.1 variant with Intel MKL support. For different versions, say only CUDA 10.0, you would want to choose `cu100` instead.
 
 ```bash
 ## mxnet
@@ -316,7 +316,3 @@ environments.
 ## [Discussions](https://discuss.mxnet.io/t/2399)
 
 ![](../img/qr_aws.svg)
-
-```{.python .input}
-
-```
