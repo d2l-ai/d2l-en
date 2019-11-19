@@ -64,7 +64,7 @@ A comparison of these two programming methods shows that
 * Symbolic programming is more efficient and easier to port. Symbolic programming makes it easier to better optimize the system during compilation, while also having the ability to port the program into a format independent of Python. This allows the program to be run in a non-Python environment, thus avoiding any potential performance issues related to the Python interpreter.
 
 
-## Hybrid programming provides the best of both worlds.
+## Hybrid Programming Provides the Best of Both Worlds.
 
 Most deep learning frameworks choose either imperative or symbolic programming. For example, both Theano and TensorFlow (inspired by the latter) make use of symbolic programming, while Chainer and PyTorch utilize imperative programming. When designing Gluon, developers considered whether it was possible to harness the benefits of both imperative and symbolic programming. The developers believed that users should be able to develop and debug using pure imperative programming, while having the ability to convert most programs into symbolic programming to be run when product-level computing performance and deployment are required. This was achieved by Gluon through the introduction of hybrid programming.
 
@@ -141,8 +141,8 @@ In MXNet, a symbolic program refers to a program that makes use of the Symbol ty
 
 ```{.python .input}
 from mxnet import sym
-x = sym.var('data')
-net(x.as_np_ndarray())
+x = sym.var('data').as_np_ndarray()
+net(x)
 ```
 
 ## Constructing Models Using the HybridBlock Class
