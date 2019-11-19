@@ -52,7 +52,7 @@ d2l.plt.title("Sample Mean: {:.2f}".format(float(np.mean(xs))))
 d2l.plt.show()
 ```
 
-There can be many ways to compute an estimator of a parameter $\hat{\theta_n}$.  In this section, we introduce three common methods to evaluate and compare estimators: the mean squared error, the standard deviation, and statistical bias. 
+There can be many ways to compute an estimator of a parameter $\hat{\theta}_n$.  In this section, we introduce three common methods to evaluate and compare estimators: the mean squared error, the standard deviation, and statistical bias. 
 
 ### Mean Squared Error
 
@@ -296,7 +296,7 @@ N = 1000
 # Sample dataset
 samples = np.random.normal(loc=0, scale=1, size=(N, ))
 
-# Lookup Students's t-distribution c.d.f
+# Lookup Students's t-distribution c.d.f.
 t_star = 1.96
 
 # Construct interval
