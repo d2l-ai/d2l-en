@@ -136,8 +136,8 @@ This can also be accomplished by a built-in scheduler in MXNet via the `lr_sched
 A common strategy for training deep networks is to keep the learning rate piecewise constant and to decrease it by a given amount every so often. That is, given a set of times when to decrease the rate, such as $s = \{5, 10, 20\}$ decrease $\eta_{t+1} \leftarrow \eta_t \cdot \alpha$ whenever $t \in s$. Assuming that the values are halved at each step we can implement this as follows.
 
 ```{.python .input}
-scheduler = lr_scheduler.MultiFactorScheduler(step=[15, 30],
-                                              factor=0.5, base_lr=0.5)
+scheduler = lr_scheduler.MultiFactorScheduler(step=[15, 30], factor=0.5,
+                                              base_lr=0.5)
 d2l.plot(np.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
 ```
 
@@ -158,8 +158,8 @@ $$\eta_t = \eta_T + \frac{\eta_0 - \eta_T}{2} \left(1 + \cos(\pi t/T)\right)$$
 Here $\eta_0$ is the initial learning rate, $\eta_T$ is the target rate at time $T$. Furthermore, for $t > T$ we simply pin the value to $\eta_T$ without increasing it again. In the following example, we set the max update step, $T = 40$.
 
 ```{.python .input}
-scheduler = lr_scheduler.CosineScheduler(max_update=40,
-                                         base_lr=0.5, final_lr=0.01)
+scheduler = lr_scheduler.CosineScheduler(max_update=40, base_lr=0.5,
+                                         final_lr=0.01)
 d2l.plot(np.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
 ```
 
