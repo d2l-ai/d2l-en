@@ -169,7 +169,7 @@ $$
 X \sim \mathrm{Binomial}(n, p).
 $$
 
-To get the cumulative distribution function, we need to notice that getting exactly $k$ successes can occur in $\binom{n}{k} = \frac{n!}{k!(n-k)!}$ ways each of which has a probability of $p^m(1-p)^{n-m}$ of occurring.  Thus the cumulative distribution function is
+To get the cumulative distribution function, we need to notice that getting exactly $k$ successes can occur in $\binom{n}{k} = \frac{n!}{k!(n-k)!}$ ways each of which has a probability of $p^k(1-p)^{n-k}$ of occurring.  Thus the cumulative distribution function is
 
 $$F(x) = \begin{cases} 0 & x < 0, \\ \sum_{m \le k} \binom{n}{m} p^m(1-p)^{n-m}  & k \le x < k+1 \text{ with } 0 \le k < n, \\ 1 & x >= n . \end{cases}$$
 :eqlabel:`eq_binomial_cdf`
@@ -242,7 +242,7 @@ Following through this reasoning carefully, we can arrive at the following model
 $$p_k = \frac{\lambda^ke^{-\lambda}}{k!}.$$
 :eqlabel:`eq_poisson_mass`
 
-The value $\lambda > 0$ is known as the *rate*, and denotes the average number of arrivals we expect in one unit of time.  
+The value $\lambda > 0$ is known as the *rate* (or the *shape* parameter), and denotes the average number of arrivals we expect in one unit of time.  
 
 We may sum this probability mass function to get the cumulative distribution function.
 
@@ -268,7 +268,7 @@ Now, let us plot the cumulative distribution function :eqref:`eq_poisson_cdf`.
 ```{.python .input}
 x = np.arange(-1, 21, 0.01)
 cmf = np.cumsum(pmf)
-def F(x): 
+def F(x):
     return 0 if x < 0 else 1 if x > n else cmf[int(x)]
 
 d2l.plot(x, np.array([F(y) for y in x.tolist()]), 'x', 'c.d.f.')
@@ -355,10 +355,10 @@ $$
 X^{(N)} = \sum_{i=1}^N X_i.
 $$
 
-then
+Then
 
 $$
-\frac{X^{(N)} - \mu_{X^{(N)}}}{\sigma_{X^{(N)}}},
+\frac{X^{(N)} - \mu_{X^{(N)}}}{\sigma_{X^{(N)}}}
 $$
 
 will be approximately Gaussian.  There are additional requirements needed to make it work, most commonly $E[X^4] < \infty$, but the philosophy is clear.
@@ -372,7 +372,7 @@ To close the section, Let us recall that if $X \sim \mathcal{N}(\mu, \sigma^2)$,
 * $\mu_X = \mu$,
 * $\sigma_X^2 = \sigma^2$.
 
-We can sample from the Gaussian (or normal) as shown below.
+We can sample from the Gaussian (or standard normal) distribution as shown below.
 
 ```{.python .input}
 np.random.normal(mu, sigma, size=(10, 10))

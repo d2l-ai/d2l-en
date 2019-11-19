@@ -35,13 +35,13 @@ npx.set_np()
 epsilon = 0.1
 random.seed(8675309)
 xs = np.random.normal(loc=0, scale=1, size=(300, ))
-ys = [np.sum(np.exp(-(xs[0:i] - xs[i])**2/(2 * epsilon**2)) / 
-      np.sqrt(2*np.pi*epsilon**2))/len(xs) for i in range(len(xs))]
+ys = [np.sum(np.exp(-(xs[0:i] - xs[i])**2/(2 * epsilon**2)) /
+             np.sqrt(2*np.pi*epsilon**2))/len(xs) for i in range(len(xs))]
 
 # Compute true density
-xd = np.arange(np.min(xs), np.max(xs),0.01)
+xd = np.arange(np.min(xs), np.max(xs), 0.01)
 yd = np.exp(-xd**2/2)/np.sqrt(2*np.pi)
-    
+
 # Plot the results
 d2l.plot(xd, yd, 'x', 'density')
 d2l.plt.scatter(xs, ys)
@@ -290,7 +290,7 @@ It is safe to say that :eqref:`eq_gauss_confidence` is one of the most used form
 
 ```{.python .input}
 # Number of samples
-N = 1000     
+N = 1000
 
 # Sample dataset
 samples = np.random.normal(loc=0, scale=1, size=(N, ))
@@ -300,7 +300,7 @@ t_star = 1.96
 
 # Construct interval
 mu_hat = np.mean(samples)
-sigma_hat = samples.std(ddof = 1)
+sigma_hat = samples.std(ddof=1)
 (mu_hat - t_star*sigma_hat/np.sqrt(N), mu_hat + t_star*sigma_hat/np.sqrt(N))
 ```
 

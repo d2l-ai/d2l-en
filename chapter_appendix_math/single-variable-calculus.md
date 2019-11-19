@@ -57,7 +57,7 @@ This is already enough to start to play around with in code.  For instance, supp
 
 ```{.python .input}
 # Define our function
-def L(x): 
+def L(x):
     return x**2 + 1701*(x-4)**3
 
 # Print the difference divided by epsilon for several epsilon
@@ -193,7 +193,7 @@ Two things should be clear after doing this example:
 
 Thankfully, these two facts together hint towards a way forward: this is a perfect candidate for mechanization!  Indeed backpropagation, which we will revisit later in this section, is exactly that.
 
-### As Linear Approximation
+### Linear Approximation
 When working with derivatives, it is often useful to geometrically interpret the approximation used above.  In particular, note that the equation 
 
 $$
