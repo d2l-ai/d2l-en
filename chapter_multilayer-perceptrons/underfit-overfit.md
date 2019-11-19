@@ -540,7 +540,7 @@ train(poly_features[:n_train, 0:3], poly_features[n_train:, 0:3],
 
 ### Insufficient Training (Overfitting)
 
-Now let us try to train the model
+Now let's try to train the model
 using a polynomial of too high degree.
 Here, there is insufficient data to learn that
 the higher-degree coefficients should have values close to zero.

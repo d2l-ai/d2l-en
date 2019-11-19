@@ -3,7 +3,7 @@
 
 In the previous section, we discussed how gradients are calculated in a recurrent
 neural network. In particular we found that long products of matrices can lead
-to vanishing or divergent gradients. Let us briefly think about what such
+to vanishing or divergent gradients. Let's briefly think about what such
 gradient anomalies mean in practice:
 
 * We might encounter a situation where an early observation is highly
@@ -30,7 +30,7 @@ will discuss in :numref:`sec_lstm`. Gated Recurrent Unit (GRU)
 :cite:`Cho.Van-Merrienboer.Bahdanau.ea.2014` is a slightly more streamlined
 variant that often offers comparable performance and is significantly faster to
 compute. See also :cite:`Chung.Gulcehre.Cho.ea.2014` for more
-details. Due to its simplicity, let us start with the GRU.
+details. Due to its simplicity, let's start with the GRU.
 
 
 ## Gating the Hidden State
@@ -95,7 +95,7 @@ Whenever the update gate $\mathbf{Z}_t$ is close to $1$, we simply retain the ol
 
 ## Implementation from Scratch
 
-To gain a better understanding of the model, let us implement a GRU from scratch.
+To gain a better understanding of the model, let's implement a GRU from scratch.
 
 ### Reading the Dataset
 

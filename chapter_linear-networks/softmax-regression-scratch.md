@@ -89,7 +89,7 @@ Then, we sum over each row (we have one row per example in the batch)
 to get the normalization constants for each example.
 Finally, we divide each row by its normalization constant,
 ensuring that the result sums to $1$.
-Before looking at the code, let us recall
+Before looking at the code, let's recall
 what this looks expressed as an equation:
 
 $$

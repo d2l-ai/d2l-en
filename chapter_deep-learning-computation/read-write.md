@@ -55,7 +55,7 @@ they cannot be serialized quite so easily (there is a way to do this for
 compiled models - please refer to the [MXNet documentation](http://www.mxnet.io)
 for the technical details on it). The result is that in order to reinstate a
 model we need to generate the architecture in code and then load the parameters
-from disk. The deferred initialization (:numref:`sec_deferred_init`) is quite advantageous here since we can simply define a model without the need to put actual values in place. Let us start with our favorite MLP.
+from disk. The deferred initialization (:numref:`sec_deferred_init`) is quite advantageous here since we can simply define a model without the need to put actual values in place. Let's start with our favorite MLP.
 
 ```{.python .input  n=6}
 class MLP(nn.Block):
@@ -86,7 +86,7 @@ clone = MLP()
 clone.load_parameters('mlp.params') 
 ```
 
-Since both instances have the same model parameters, the computation result of the same input `x` should be the same. Let us verify this.
+Since both instances have the same model parameters, the computation result of the same input `x` should be the same. Let's verify this.
 
 ```{.python .input}
 yclone = clone(x)

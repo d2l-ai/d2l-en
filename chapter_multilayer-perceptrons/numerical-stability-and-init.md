@@ -74,7 +74,7 @@ Since early artificial neural networks were inspired
 by biological neural networks,
 the idea of neurons that either fire or do not fire
 (biological neurons do not partially fire) seemed appealing.
-Let us take a closer look at the function
+Let's take a closer look at the function
 to see why picking it might be problematic
 vis-a-vis vanishing gradients.
 
@@ -187,17 +187,17 @@ Both choices tend to work well in practice for moderate problem sizes.
 
 ### Xavier Initialization
 
-Let us look at the scale distribution of the activations of the hidden units $h_{i}$ for some layer. They are given by
+Let's look at the scale distribution of the activations of the hidden units $h_{i}$ for some layer. They are given by
 
 $$h_{i} = \sum_{j=1}^{n_\mathrm{in}} W_{ij} x_j$$
 
-The weights $W_{ij}$ are all drawn independently from the same distribution. Furthermore, let us assume that this distribution
+The weights $W_{ij}$ are all drawn independently from the same distribution. Furthermore, let's assume that this distribution
 has zero mean and variance $\sigma^2$
 (this does not mean that the distribution has to be Gaussian,
 just that mean and variance need to exist).
 We do not really have much control
 over the inputs into the layer $x_j$
-but let us proceed with the somewhat unrealistic assumption
+but let's proceed with the somewhat unrealistic assumption
 that they also have zero mean and variance $\gamma^2$
 and that they are independent of $\mathbf{W}$.
 In this case, we can compute mean and variance of $h_i$ as follows:

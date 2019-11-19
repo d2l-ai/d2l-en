@@ -180,7 +180,7 @@ we can begin to understand *matrix-vector products*.
 Recall the matrix $\mathbf{A} \in \mathbb{R}^{m \times n}$
 and the vector $\mathbf{x} \in \mathbb{R}^n$
 defined and visualized in :eqref:`eq_matrix_def` and :eqref:`eq_vec_def` respectively.
-Let us start off by visualizing the matrix $\mathbf{A}$ in terms of its row vectors
+Let's start off by visualizing the matrix $\mathbf{A}$ in terms of its row vectors
 
 $$\mathbf{A}=
 \begin{bmatrix}

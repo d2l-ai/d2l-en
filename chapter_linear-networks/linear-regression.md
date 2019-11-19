@@ -33,7 +33,7 @@ of the inputs $\textbf{x}$,
 give or take some noise on the observations.
 Second, we assume that any noise is well-behaved
 (following a Gaussian distribution). 
-To motivate the approach, let us start with a running example.
+To motivate the approach, let's start with a running example.
 Suppose that we wish to estimate the prices of houses (in dollars) 
 based on their area (in square feet) and age (in years).  
 
@@ -356,7 +356,7 @@ b = np.ones(n)
 ```
 
 Since we will benchmark the running time frequently in this book,
-let us define a timer (hereafter accessed via the `d2l` package
+let's define a timer (hereafter accessed via the `d2l` package
 to track the running time.
 
 ```{.python .input  n=1}
@@ -509,7 +509,7 @@ So far we only talked about linear functions.
 While neural networks cover a much richer family of models,
 we can begin thinking of the linear model
 as a neural network by expressing it the language of neural networks.
-To begin, let us start by rewriting things in a 'layer' notation.
+To begin, let's start by rewriting things in a 'layer' notation.
 
 ### Neural Network Diagram
 

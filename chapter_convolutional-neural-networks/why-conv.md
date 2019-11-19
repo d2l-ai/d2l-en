@@ -17,7 +17,7 @@ However, once we start dealing with high-dimensional perceptual data,
 these *structure-less* networks can grow unwieldy.
 
 
-For instance, let us return to our running example
+For instance, let's return to our running example
 of distinguishing cats from dogs.
 Say that we do a thorough job in data collection,
 collecting an annotated sets of high-quality 1-megapixel photographs.
@@ -70,13 +70,13 @@ Back to images, the intuitions we have been discussing could be made more concre
 1. Our vision systems should, in some sense, respond similarly to the same object regardless of where it appears in the image (Translation Invariance)
 1. Our visions systems should, in some sense, focus on local regions, without regard for what else is happening in the image at greater distances. (Locality)
 
-Let us see how this translates into mathematics.
+Let's see how this translates into mathematics.
 
 ## Constraining the MLP
 
 <!-- In this exposition, we treat both images and hidden layers
 alike as two-dimensional arrays.  -->
-To start off let us consider what an MLP would look like
+To start off let's consider what an MLP would look like
 with $h \times w$ images as inputs
 (represented as matrices in math, and as 2D arrays in code),
 and hidden representations similarly organized
@@ -108,7 +108,7 @@ For any given location $(i, j)$ in the hidden layer $h[i, j]$,
 we compute its value by summing over pixels in $x$,
 centered around $(i, j)$ and weighted by $V[i, j, a, b]$.
 
-Now let us invoke the first principle we established above: *translation invariance*.
+Now let's invoke the first principle we established above: *translation invariance*.
 This implies that a shift in the inputs $x$
 should simply lead to a shift in the activations $h$.
 This is only possible if $V$ and $u$ do not actually depend on $(i, j)$,
@@ -123,7 +123,7 @@ in the vicinity of $(i, j)$ with coefficients $V[a, b]$
 to obtain the value $h[i, j]$.
 Note that $V[a, b]$ needs many fewer coefficients than $V[i, j, a, b]$. For a 1 megapixel image it has at most 1 million coefficients. This is 1 million fewer parameters since it no longer depends on the location within the image. We have made significant progress!
 
-Now let us invoke the second principle - *locality*.
+Now let's invoke the second principle - *locality*.
 As motivated above, we believe that we shouldn't have
 to look very far away from $(i, j)$
 in order to glean relevant information
@@ -155,7 +155,7 @@ our models may not generalize well.
 
 ## Convolutions
 
-Let us briefly review why the above operation is called a *convolution*.
+Let's briefly review why the above operation is called a *convolution*.
 In mathematics, the convolution between two functions,
 say $f, g: \mathbb{R}^d \to R$ is defined as
 
@@ -183,7 +183,7 @@ We will come back to this in the following section.
 
 ## Waldo Revisited
 
-Let us see what this looks like if we want to build an improved Waldo detector. The convolutional layer picks windows of a given size
+Let's see what this looks like if we want to build an improved Waldo detector. The convolutional layer picks windows of a given size
 and weighs intensities according to the mask $V$, as demonstrated in :numref:`fig_waldo_mask`.
  We expect that wherever the 'waldoness' is highest,
  we will also find a peak in the hidden layer activations.

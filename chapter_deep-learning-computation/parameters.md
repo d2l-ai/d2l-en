@@ -24,7 +24,7 @@ net(x)  # Forward computation
 
 ## Parameter Access
 
-In the case of a Sequential class we can access the parameters with ease, simply by indexing each of the layers in the network. The `params` variable then contains the required data. Let us try this out in practice by inspecting the parameters of the first layer.
+In the case of a Sequential class we can access the parameters with ease, simply by indexing each of the layers in the network. The `params` variable then contains the required data. Let's try this out in practice by inspecting the parameters of the first layer.
 
 ```{.python .input  n=2}
 print(net[0].params)
@@ -35,7 +35,7 @@ The output tells us a number of things. First, the layer consists of two sets of
 
 ### Targeted Parameters
 
-In order to do something useful with the parameters we need to access them, though. There are several ways to do this, ranging from simple to general. Let us look at some of them.
+In order to do something useful with the parameters we need to access them, though. There are several ways to do this, ranging from simple to general. Let's look at some of them.
 
 ```{.python .input  n=3}
 print(net[1].bias)
@@ -81,7 +81,7 @@ print(net.collect_params('dense0.*'))
 
 ### Rube Goldberg Striking Again
 
-Let us see how the parameter naming conventions work if we nest multiple blocks inside each other. For that we first define a function that produces blocks (a block factory, so to speak) and then we combine these inside yet larger blocks.
+Let's see how the parameter naming conventions work if we nest multiple blocks inside each other. For that we first define a function that produces blocks (a block factory, so to speak) and then we combine these inside yet larger blocks.
 
 ```{.python .input  n=20}
 def block1():
@@ -103,7 +103,7 @@ rgnet.initialize()
 rgnet(x)
 ```
 
-Now that we are done designing the network, let us see how it is organized. `collect_params` provides us with this information, both in terms of naming and in terms of logical structure.
+Now that we are done designing the network, let's see how it is organized. `collect_params` provides us with this information, both in terms of naming and in terms of logical structure.
 
 ```{.python .input}
 print(rgnet.collect_params)
@@ -118,7 +118,7 @@ rgnet[0][1][0].bias.data()
 
 ## Parameter Initialization
 
-Now that we know how to access the parameters, let us look at how to initialize
+Now that we know how to access the parameters, let's look at how to initialize
 them properly. We discussed the need for
 initialization in :numref:`sec_numerical_stability`. By default, MXNet initializes the weight matrices
 uniformly by drawing from $U[-0.07, 0.07]$ and the bias parameters are all set
@@ -129,7 +129,7 @@ work.
 
 ### Built-in Initialization
 
-Let us begin with the built-in initializers. The code below initializes all parameters with Gaussian random variables.
+Let's begin with the built-in initializers. The code below initializes all parameters with Gaussian random variables.
 
 ```{.python .input  n=9}
 # force_reinit ensures that the variables are initialized again, regardless of
@@ -189,7 +189,7 @@ net[0].weight.data()[0]
 
 ## Tied Parameters
 
-In some cases, we want to share model parameters across multiple layers. For instance when we want to find good word embeddings we may decide to use the same parameters both for encoding and decoding of words. We discussed one such case when we introduced :numref:`sec_model_construction`. Let us see how to do this a bit more elegantly. In the following we allocate a dense layer and then use its parameters specifically to set those of another layer.
+In some cases, we want to share model parameters across multiple layers. For instance when we want to find good word embeddings we may decide to use the same parameters both for encoding and decoding of words. We discussed one such case when we introduced :numref:`sec_model_construction`. Let's see how to do this a bit more elegantly. In the following we allocate a dense layer and then use its parameters specifically to set those of another layer.
 
 ```{.python .input  n=14}
 net = nn.Sequential()

@@ -250,7 +250,7 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
     return data_iter, vocab
 ```
 
-Let us print the first minibatch of the data iterator.
+Let's print the first minibatch of the data iterator.
 
 ```{.python .input  n=17}
 data_iter, vocab = load_data_ptb(512, 5, 5)

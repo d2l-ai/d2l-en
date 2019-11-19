@@ -40,7 +40,7 @@ npx.set_np()
 ```
 
 The masked softmax takes a 3 dimensional input and enables us to filter out some elements by specifying a valid length for the last dimension. (Refer to
-:numref:`sec_machine_translation` for the definition of a valid length.) As a result, any value outside the valid length will be masked as $0$. Let us implement the `masked_softmax` realization first.
+:numref:`sec_machine_translation` for the definition of a valid length.) As a result, any value outside the valid length will be masked as $0$. Let's implement the `masked_softmax` realization first.
 
 ```{.python .input  n=6}
 # Saved in the d2l package for later use
@@ -79,7 +79,7 @@ npx.batch_dot(np.ones((2, 1, 3)), np.ones((2, 3, 2)))
 
 ## Dot Product Attention
 
-Equipping with the above two operators: the `masked_softmax` and the `batched_dot`, let us dive into the details of two widely used attentions layers. The first one is the *dot product attention*, which assumes the query has the same dimension as the keys, namely $\mathbf q, \mathbf k_i \in\mathbb R^d$ for all $i$. The dot product attention computes the scores by an dot product between the query and a key, which is then divided by $\sqrt{d}$ to minimize the unrelated influence of the dimension $d$ on the scores. In other words,
+Equipping with the above two operators: the `masked_softmax` and the `batched_dot`, let's dive into the details of two widely used attentions layers. The first one is the *dot product attention*, which assumes the query has the same dimension as the keys, namely $\mathbf q, \mathbf k_i \in\mathbb R^d$ for all $i$. The dot product attention computes the scores by an dot product between the query and a key, which is then divided by $\sqrt{d}$ to minimize the unrelated influence of the dimension $d$ on the scores. In other words,
 
 $$\alpha(\mathbf q, \mathbf k) = \langle \mathbf q, \mathbf k \rangle /\sqrt{d}.$$
 
@@ -88,7 +88,7 @@ Beyond the single dimension queries and keys, we can always generalize to a mult
 $$\alpha(\mathbf Q, \mathbf K) = \mathbf Q \mathbf K^\top /\sqrt{d}.$$
 
 
-With the above formula, let us implement the dot product attention layer `DotProductAttention` that supports a batch of queries and key-value pairs. In addition, for the purpose of regularization, we enable a randomly dropping functionality by specifying the degree of dropout within our implementation.
+With the above formula, let's implement the dot product attention layer `DotProductAttention` that supports a batch of queries and key-value pairs. In addition, for the purpose of regularization, we enable a randomly dropping functionality by specifying the degree of dropout within our implementation.
 
 ```{.python .input  n=5}
 # Saved in the d2l package for later use
@@ -109,7 +109,7 @@ class DotProductAttention(nn.Block):
         return npx.batch_dot(attention_weights, value)
 ```
 
-Let us try the class `DotProductAttention` in a toy example. 
+Let's try the class `DotProductAttention` in a toy example. 
 
 First, we create two batches, with each batch has one query and 10 key-value pairs.  We specify through `valid_length` with "$2$" for the first batch and "$6$" for the second batch, which means that we will check the first $2$ key-value pairs for the first batch and $6$ for the second one. Therefore, even though both batches have the same query and key-value pairs, we obtain different outputs.
 
@@ -131,7 +131,7 @@ Another widely used attention is called *multilayer perceptron attention*, where
 
 $$\alpha(\mathbf k, \mathbf q) = \mathbf v^\top \text{tanh}(\mathbf W_k \mathbf k + \mathbf W_q\mathbf q). $$
 
-To provide you some intuition about the weights, you can imagine $\mathbf W_k \mathbf k + \mathbf W_q\mathbf q$ as concatenating the key and value in the feature dimension and feeding them into a single hidden layer perceptron with hidden layer size $h$ and output layer size $1$. In this hidden layer, the activation function is $\tanh$ and no bias is applied. Now let us implement the multilayer perceptron attention together!
+To provide you some intuition about the weights, you can imagine $\mathbf W_k \mathbf k + \mathbf W_q\mathbf q$ as concatenating the key and value in the feature dimension and feeding them into a single hidden layer perceptron with hidden layer size $h$ and output layer size $1$. In this hidden layer, the activation function is $\tanh$ and no bias is applied. Now let's implement the multilayer perceptron attention together!
 
 ```{.python .input  n=7}
 # Saved in the d2l package for later use

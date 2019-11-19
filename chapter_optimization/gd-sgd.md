@@ -95,7 +95,7 @@ show_trace(gd(1.1))
 
 ## Gradient Descent in Multi-Dimensional Space
 
-Now that we understand gradient descent in one-dimensional space, let us consider a more general case: the input of the objective function is a vector and the output is a scalar. We assume that the input of the target function $f: \mathbb{R}^d \rightarrow \mathbb{R}$ is the $d$-dimensional vector $\mathbf{x} = [x_1, x_2, \ldots, x_d]^\top$. The gradient of the objective function $f(\mathbf{x})$ with respect to $\mathbf{x}$ is a vector consisting of $d$ partial derivatives:
+Now that we understand gradient descent in one-dimensional space, let's consider a more general case: the input of the objective function is a vector and the output is a scalar. We assume that the input of the target function $f: \mathbb{R}^d \rightarrow \mathbb{R}$ is the $d$-dimensional vector $\mathbf{x} = [x_1, x_2, \ldots, x_d]^\top$. The gradient of the objective function $f(\mathbf{x})$ with respect to $\mathbf{x}$ is a vector consisting of $d$ partial derivatives:
 
 $$\nabla_{\mathbf{x}} f(\mathbf{x}) = \bigg[\frac{\partial f(\mathbf{x})}{\partial x_1}, \frac{\partial f(\mathbf{x})}{\partial x_2}, \ldots, \frac{\partial f(\mathbf{x})}{\partial x_d}\bigg]^\top.$$
 

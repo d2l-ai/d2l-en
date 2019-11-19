@@ -39,7 +39,7 @@ Since the encoder of seq2seq with attention mechanism is the same as `Seq2SeqEnc
 
 In each timestep of the decoding, we use the output of the decoder's last RNN layer as the query for the attention layer. The attention model's output is then concatenated with the input embedding vector to feed into the RNN layer. Despite the RNN layer hidden state also contains history information from decoder, the attention output explicitly selects the encoder outputs based on the `enc_valid_len`, so that the attention output suspends other non-correlated information.
 
-Let us implement the `Seq2SeqAttentionDecoder` together, and see how it differs from the decoder in seq2seq model from :numref:`sec_seq2seq_decoder`.
+Let's implement the `Seq2SeqAttentionDecoder` together, and see how it differs from the decoder in seq2seq model from :numref:`sec_seq2seq_decoder`.
 
 ```{.python .input  n=2}
 class Seq2SeqAttentionDecoder(d2l.Decoder):

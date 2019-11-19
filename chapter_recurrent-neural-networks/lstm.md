@@ -14,7 +14,7 @@ cell (as opposed to reading any other cell). We will refer to this as the
 cell. We refer to this as the *input* gate. Last, we need a mechanism to reset
 the contents of the cell, governed by a *forget* gate. The motivation for such a
 design is the same as before, namely to be able to decide when to remember and
-when to ignore inputs in the latent state via a dedicated mechanism. Let us see
+when to ignore inputs in the latent state via a dedicated mechanism. Let's see
 how this works in practice.
 
 ## Gated Memory Cells
@@ -81,7 +81,7 @@ $$\mathbf{H}_t = \mathbf{O}_t \odot \tanh(\mathbf{C}_t).$$
 
 ## Implementation from Scratch
 
-Now let us implement an LSTM from scratch. As same as the experiments in the previous sections, we first load data of *The Time Machine*.
+Now let's implement an LSTM from scratch. As same as the experiments in the previous sections, we first load data of *The Time Machine*.
 
 ```{.python .input  n=1}
 import d2l
@@ -156,7 +156,7 @@ def lstm(inputs, state, params):
 
 ### Training and Prediction
 
-Let us train an LSTM as same as what we did in :numref:`sec_gru`, by calling the `RNNModelScratch` function as introduced in :numref:`sec_rnn_scratch`.
+Let's train an LSTM as same as what we did in :numref:`sec_gru`, by calling the `RNNModelScratch` function as introduced in :numref:`sec_rnn_scratch`.
 
 ```{.python .input  n=9}
 vocab_size, num_hiddens, ctx = len(vocab), 256, d2l.try_gpu()
