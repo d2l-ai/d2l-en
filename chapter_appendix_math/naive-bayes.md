@@ -40,7 +40,7 @@ image, label = mnist_train[2]
 image.shape, label
 ```
 
-Our example, stored here in the variable `image`, corresponds to an image with a height and width of $28$ pixels. 
+Our example, stored here in the variable `image`, corresponds to an image with a height and width of $28$ pixels.
 
 ```{.python .input}
 image.shape, image.dtype

@@ -248,8 +248,8 @@ In some cases, we will need to work in higher dimensions.  For instance, suppose
 
 ```{.python .input}
 # Construct grid and compute function
-x, y = np.meshgrid(np.linspace(-2, 2, 101), 
-                   np.linspace(-2, 2, 101), indexing='ij')
+x, y = np.meshgrid(np.linspace(-2, 2, 101), np.linspace(-2, 2, 101),
+                   indexing='ij')
 z = np.exp(- x**2 - y**2)
 
 # Plot function
