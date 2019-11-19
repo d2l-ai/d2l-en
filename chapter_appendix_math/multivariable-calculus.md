@@ -102,7 +102,7 @@ Let us suppose that I want to use this to help minimize our loss $L$.  Let us un
 3. Take a small step in that direction: $\mathbf{w} \rightarrow \mathbf{w} + \epsilon\mathbf{v}$.
 4. Repeat.
 
-The only thing we do not know exactly how to do is to compute the vector $\mathbf{v}$ in the second step.  We will call such a direction the *direction of steepest descent*.  Using the geometric understanding of dot products from :numref:`sec_linear_algebra`, we see that we can rewrite :eqref:`eq_nabla_use` as
+The only thing we do not know exactly how to do is to compute the vector $\mathbf{v}$ in the second step.  We will call such a direction the *direction of steepest descent*.  Using the geometric understanding of dot products from :numref:`sec_geometry-linear-algebric-ops`, we see that we can rewrite :eqref:`eq_nabla_use` as
 
 $$
 L(\mathbf{w} + \mathbf{v}) \approx L(\mathbf{w}) + \mathbf{v}\cdot \nabla_{\mathbf{w}} L(\mathbf{w}) = \|\nabla_{\mathbf{w}} L(\mathbf{w})\|\cos(\theta).

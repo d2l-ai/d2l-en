@@ -241,7 +241,7 @@ $$
 \int_0^{-1} (-1)\;dx =  1.
 $$
 
-If this discussion sounds familiar, it is!  In :numref:`sec_linear_algebra` we discussed how the determinant represented the signed area in much the same way.
+If this discussion sounds familiar, it is!  In :numref:`sec_geometry-linear-algebric-ops` we discussed how the determinant represented the signed area in much the same way.
 
 ## Multiple Integrals
 In some cases, we will need to work in higher dimensions.  For instance, suppose that we have a function of two variables, like $f(x, y)$ and we want to know the volume under $f$ when $x$ ranges over $[a, b]$ and $y$ ranges over $[c, d]$.

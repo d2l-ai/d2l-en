@@ -1,12 +1,12 @@
 # Geometry and Linear Algebraic Operations
-:label:`sec_linear_algebra`
+:label:`sec_geometry-linear-algebric-ops`
 
-In :numref:`sec_scalar-tensor`, we encountered the basics of linear algebra
+In :numref:`sec_linear-algebra`, we encountered the basics of linear algebra
 and saw how it could be used to express common operations for transforming our data.
 Linear algebra is one of the key mathematical pillars
 underlying much of the work that we do deep learning 
 and in machine learning more broadly.
-While :numref:`sec_scalar-tensor` contained enough machinery
+While :numref:`sec_linear-algebra` contained enough machinery
 to communicate the mechanics of modern deep learning models, 
 there is a lot more to the subject.
 In this section, we will go deeper,
@@ -83,7 +83,7 @@ that takes us from the point $\mathbf{u}$ to the point $\mathbf{v}$.
 
 
 ## Dot Products and Angles
-As we saw in :numref:`sec_scalar-tensor`, 
+As we saw in :numref:`sec_linear-algebra`, 
 if we take two column vectors say $\mathbf{u}$ and $\mathbf{v}$,
 we can form their dot product by computing:
 
@@ -318,7 +318,7 @@ np.mean(predictions.astype(y_test.dtype) == y_test, dtype=np.float64)
 
 ## Geometry of Linear Transformations
 
-Through :numref:`sec_scalar-tensor` and the above discussions, 
+Through :numref:`sec_linear-algebra` and the above discussions, 
 we have a solid understanding of the geometry of vectors, lengths, and angles. 
 However, there is one important object we have omitted discussing, 
 and that is a geometric understanding of linear transformations represented by matrices.  Fully internalizing what matrices can do to transform data 
@@ -698,7 +698,7 @@ that $n\times n$ matrices scale $n$-dimensional volumes.
 
 ## Tensors and Common Linear Algebra Operations
 
-In :numref:`sec_scalar-tensor` the concept of tensors was introduced.
+In :numref:`sec_linear-algebra` the concept of tensors was introduced.
 In this section, we will dive more deeply into tensor contractions 
 (the tensor equivalent of matrix multiplication),
 and see how it can provide a unified view 
@@ -756,7 +756,7 @@ In this way, we can replace a myriad of specialized notations with short tensor 
 
 ### Expressing in Code
 Tensors may flexibly be operated on in code as well.
-As seen in :numref:`sec_scalar-tensor`, 
+As seen in :numref:`sec_linear-algebra`, 
 we can create tensors as is shown below.
 
 ```{.python .input}
@@ -847,4 +847,4 @@ $$
 
 ## [Discussions](https://discuss.mxnet.io/t/5147)
 
-![](../img/qr_linear-algebra.svg)
+![](../img/qr_geometry-linear-algebric-ops.svg)
