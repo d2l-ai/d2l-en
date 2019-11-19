@@ -65,7 +65,7 @@ def _sec_to_chap(lines):
                 lines[i] = lines[i].replace(src, tgt)
 
 
-# Remove release information and date
+# Remove date
 def _edit_titlepage(pdf_dir):
     smanual = os.path.join(pdf_dir, 'sphinxmanual.cls')
     with open(smanual, 'r') as f:
@@ -73,7 +73,6 @@ def _edit_titlepage(pdf_dir):
 
     for i, l in enumerate(lines):
         lines[i] = lines[i].replace('\\@date', '')
-        lines[i] = lines[i].replace('\\py@release\\releaseinfo', '')
 
     with open(smanual, 'w') as f:
         f.write('\n'.join(lines))
