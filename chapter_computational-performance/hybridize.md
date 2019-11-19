@@ -139,6 +139,11 @@ The .json and .params files generated during this process are a symbolic program
 
 In MXNet, a symbolic program refers to a program that makes use of the Symbol type. We know that, when the `ndarray` input `x` is provided to `net`, `net(x)` will directly calculate the model output and return a result based on `x`. For models that have called the `hybridize` function, we can also provide a Symbol-type input variable, and `net(x)` will return Symbol type results.
 
+```{.python .input}
+from mxnet import sym
+x = sym.var('data')
+net(x.as_np_ndarray())
+```
 
 ## Constructing Models Using the HybridBlock Class
 
