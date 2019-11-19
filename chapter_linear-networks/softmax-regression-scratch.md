@@ -24,7 +24,7 @@ batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 ```
 
-## Initialize Model Parameters
+## Initializing Model Parameters
 
 As in our linear regression example, 
 each example here will be represented by a fixed-length vector.
@@ -161,7 +161,6 @@ with $3$ categories and $2$ examples.
 ```{.python .input  n=9}
 y_hat = np.array([[0.1, 0.3, 0.6], [0.3, 0.2, 0.5]])
 y_hat[[0, 1], [0, 2]]
-
 ```
 
 Now we can implement the cross-entropy loss function efficiently with just one line of code.
@@ -177,7 +176,7 @@ Given the predicted probability distribution `y_hat`,
 we typically choose the class with highest predicted probability
 whenever we must output a *hard* prediction. 
 Indeed, many applications require that we make a choice. 
-Gmail must catetegorize an email into Primary, Social, Updates, or Forums. 
+Gmail must categorize an email into Primary, Social, Updates, or Forums. 
 It might estimate probabilities internally,
 but at the end of the day it has to choose one among the categories.
 
@@ -230,7 +229,7 @@ Similarly, we can evaluate the accuracy for model `net` on the dataset
 ```{.python .input  n=13}
 # Saved in the d2l package for later use
 def evaluate_accuracy(net, data_iter):
-    metric = Accumulator(2) # num_corrected_examples, num_examples
+    metric = Accumulator(2)  # num_corrected_examples, num_examples
     for X, y in data_iter:
         metric.add(accuracy(net(X), y), y.size)
     return metric[0] / metric[1]
@@ -242,12 +241,16 @@ Here `Accumulator` is a utility class to accumulated sum over multiple numbers.
 # Saved in the d2l package for later use
 class Accumulator(object):
     """Sum a list of numbers over time"""
+
     def __init__(self, n):
         self.data = [0.0] * n
+
     def add(self, *args):
         self.data = [a+b for a, b in zip(self.data, args)]
+
     def reset(self):
         self.data = [0] * len(self.data)
+
     def __getitem__(self, i):
         return self.data[i]
 ```
@@ -274,7 +277,7 @@ It can be either a wrapper of `d2l.sgd` or a Gluon trainer.
 ```{.python .input  n=15}
 # Saved in the d2l package for later use
 def train_epoch_ch3(net, train_iter, loss, updater):
-    metric = Accumulator(3) # train_loss_sum, train_acc_sum, num_examples
+    metric = Accumulator(3)  # train_loss_sum, train_acc_sum, num_examples
     if isinstance(updater, gluon.Trainer):
         updater = updater.step
     for X, y in train_iter:
@@ -302,20 +305,26 @@ class Animator(object):
         """Incrementally plot multiple lines."""
         d2l.use_svg_display()
         self.fig, self.axes = d2l.plt.subplots(nrows, ncols, figsize=figsize)
-        if nrows * ncols == 1: self.axes = [self.axes,]
+        if nrows * ncols == 1:
+            self.axes = [self.axes, ]
         # use a lambda to capture arguments
-        self.config_axes = lambda : d2l.set_axes(
+        self.config_axes = lambda: d2l.set_axes(
             self.axes[0], xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
         self.X, self.Y, self.fmts = None, None, fmts
 
     def add(self, x, y):
         """Add multiple data points into the figure."""
-        if not hasattr(y, "__len__"): y = [y]
+        if not hasattr(y, "__len__"):
+            y = [y]
         n = len(y)
-        if not hasattr(x, "__len__"): x = [x] * n
-        if not self.X: self.X = [[] for _ in range(n)]
-        if not self.Y: self.Y = [[] for _ in range(n)]
-        if not self.fmts: self.fmts = ['-'] * n
+        if not hasattr(x, "__len__"):
+            x = [x] * n
+        if not self.X:
+            self.X = [[] for _ in range(n)]
+        if not self.Y:
+            self.Y = [[] for _ in range(n)]
+        if not self.fmts:
+            self.fmts = ['-'] * n
         for i, (a, b) in enumerate(zip(x, y)):
             if a is not None and b is not None:
                 self.X[i].append(a)
@@ -333,7 +342,6 @@ The training function then runs multiple epochs and visualize the training progr
 ```{.python .input  n=17}
 # Saved in the d2l package for later use
 def train_ch3(net, train_iter, test_iter, loss, num_epochs, updater):
-    trains, test_accs = [], []
     animator = Animator(xlabel='epoch', xlim=[1, num_epochs],
                         ylim=[0.3, 0.9],
                         legend=['train loss', 'train acc', 'test acc'])
@@ -356,7 +364,10 @@ the best values of our hyperparameters.
 
 ```{.python .input  n=18}
 num_epochs, lr = 10, 0.1
-updater = lambda batch_size: d2l.sgd([W, b], lr, batch_size)
+
+def updater(batch_size):
+    return d2l.sgd([W, b], lr, batch_size)
+
 train_ch3(net, train_iter, test_iter, cross_entropy, num_epochs, updater)
 ```
 
@@ -377,7 +388,7 @@ def predict_ch3(net, test_iter, n=6):
         break
     trues = d2l.get_fashion_mnist_labels(y)
     preds = d2l.get_fashion_mnist_labels(net(X).argmax(axis=1))
-    titles = [true+'\n'+ pred for true, pred in zip(trues, preds)]
+    titles = [true+'\n' + pred for true, pred in zip(trues, preds)]
     d2l.show_images(X[0:n].reshape(n, 28, 28), 1, n, titles=titles[0:n])
 
 predict_ch3(net, test_iter)

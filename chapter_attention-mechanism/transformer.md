@@ -32,9 +32,9 @@ On the flip side, the transformer differs to the seq2seq with attention model in
 In the rest of this section, we will equip you with each new component introduced by the transformer, and get you up and running to construct a machine translation model.
 
 ```{.python .input  n=1}
-import math
 import d2l
-from mxnet import np, npx, autograd
+import math
+from mxnet import autograd, np, npx
 from mxnet.gluon import nn
 npx.set_np()
 ```
@@ -76,7 +76,7 @@ Let us implement the multi-head attention in MXNet. Assume that the multi-head a
 
 ```{.python .input  n=2}
 class MultiHeadAttention(nn.Block):
-    def __init__(self, hidden_size, num_heads, dropout, **kwargs):  
+    def __init__(self, hidden_size, num_heads, dropout, **kwargs):
         super(MultiHeadAttention, self).__init__(**kwargs)
         self.num_heads = num_heads
         self.attention = d2l.DotProductAttention(dropout)
@@ -85,30 +85,29 @@ class MultiHeadAttention(nn.Block):
         self.W_v = nn.Dense(hidden_size, use_bias=False, flatten=False)
         self.W_o = nn.Dense(hidden_size, use_bias=False, flatten=False)
 
-    
     def forward(self, query, key, value, valid_length):
-        # query, key, and value shape: (batch_size, seq_len, dim), 
+        # query, key, and value shape: (batch_size, seq_len, dim),
         # where seq_len is the length of input sequence
-        # valid_length shape is either (batch_size, ) 
+        # valid_length shape is either (batch_size, )
         # or (batch_size, seq_len).
-    
-        # Project and transpose query, key, and value from 
+
+        # Project and transpose query, key, and value from
         # (batch_size, seq_len, hidden_size * num_heads) to
         # (batch_size * num_heads, seq_len, hidden_size).
         query = transpose_qkv(self.W_q(query), self.num_heads)
-        key  = transpose_qkv(self.W_k(key), self.num_heads)
-        value  = transpose_qkv(self.W_v(value), self.num_heads)
-        
+        key = transpose_qkv(self.W_k(key), self.num_heads)
+        value = transpose_qkv(self.W_v(value), self.num_heads)
+
         if valid_length is not None:
             # Copy valid_length by num_heads times
             if valid_length.ndim == 1:
                 valid_length = np.tile(valid_length, self.num_heads)
             else:
                 valid_length = np.tile(valid_length, (self.num_heads, 1))
-        
+
         output = self.attention(query, key, value, valid_length)
-        
-        # Transpose from (batch_size * num_heads, seq_len, hidden_size) back 
+
+        # Transpose from (batch_size * num_heads, seq_len, hidden_size) back
         # to (batch_size, seq_len, hidden_size * num_heads)
         output_concat = transpose_output(output, self.num_heads)
         return self.W_o(output_concat)
@@ -119,19 +118,20 @@ Here are the definitions of the transpose functions `transpose_qkv` and `transpo
 ```{.python .input  n=3}
 def transpose_qkv(X, num_heads):
     # Original X shape: (batch_size, seq_len, hidden_size * num_heads),
-    # -1 means inferring its value, 
-    # after first reshape, X shape: 
+    # -1 means inferring its value,
+    # after first reshape, X shape:
     # (batch_size, seq_len, num_heads, hidden_size)
     X = X.reshape(X.shape[0], X.shape[1], num_heads, -1)
-    
+
     # After transpose, X shape: (batch_size, num_heads, seq_len, hidden_size)
     X = X.transpose(0, 2, 1, 3)
-    
-    # Merge the first two dimensions. 
+
+    # Merge the first two dimensions.
     # Use reverse=True to infer shape from right to left.
     # Output shape: (batch_size * num_heads, seq_len, hidden_size)
     output = X.reshape(-1, X.shape[2], X.shape[3])
     return output
+
 
 def transpose_output(X, num_heads):
     # A reversed version of transpose_qkv
@@ -160,7 +160,7 @@ Below, the `PositionWiseFFN` shows how to implement a position-wise FFN with two
 class PositionWiseFFN(nn.Block):
     def __init__(self, ffn_hidden_size, hidden_size_out, **kwargs):
         super(PositionWiseFFN, self).__init__(**kwargs)
-        self.ffn_1 = nn.Dense(ffn_hidden_size, flatten=False, 
+        self.ffn_1 = nn.Dense(ffn_hidden_size, flatten=False,
                               activation='relu')
         self.ffn_2 = nn.Dense(hidden_size_out, flatten=False)
 
@@ -187,10 +187,10 @@ layer = nn.LayerNorm()
 layer.initialize()
 batch = nn.BatchNorm()
 batch.initialize()
-X = np.array([[1, 2],[2, 3]])
+X = np.array([[1, 2], [2, 3]])
 # compute mean and variance from X in the training mode.
 with autograd.record():
-    print('layer norm:',layer(X), '\nbatch norm:', batch(X))
+    print('layer norm:', layer(X), '\nbatch norm:', batch(X))
 ```
 
 Now let us implement the connection block `AddNorm` together. `AddNorm` accepts two inputs $X$ and $Y$. We can imagine $X$ as the original input in the residual network, while $Y$ as the outputs from either the multi-head attention layer or the position-wise FFN network. In addition, we apply dropout on $Y$ for the purpose of regularization.
@@ -249,18 +249,16 @@ class PositionalEncoding(nn.Block):
     def forward(self, X):
         X = X + self.P[:, :X.shape[1], :].as_in_context(X.context)
         return self.dropout(X)
-
 ```
 
 Now we test the `PositionalEncoding` with a toy model for 4 dimensions. As we can see, the $4^{\mathrm{th}}$ dimension has the same frequency as the $5^{\mathrm{th}}$ but with different offset. The $5^{\mathrm{th}}$ and $6^{\mathrm{th}}$ dimension have a lower frequency.
 
-
 ```{.python .input  n=11}
 pe = PositionalEncoding(20, 0)
 pe.initialize()
-Y = pe(np.zeros((1, 100, 20 )))
-d2l.plot(np.arange(100), Y[0, :,4:8].T, figsize=(6, 2.5),
-        legend=["dim %d"%p for p in [4, 5, 6, 7]])
+Y = pe(np.zeros((1, 100, 20)))
+d2l.plot(np.arange(100), Y[0, :, 4:8].T, figsize=(6, 2.5),
+         legend=["dim %d" % p for p in [4, 5, 6, 7]])
 ```
 
 ## Encoder
@@ -269,10 +267,10 @@ Armed with all the essential components of transformer, let us first build a enc
 
 ```{.python .input  n=12}
 class EncoderBlock(nn.Block):
-    def __init__(self, embedding_size, ffn_hidden_size, num_heads, 
+    def __init__(self, embedding_size, ffn_hidden_size, num_heads,
                  dropout, **kwargs):
         super(EncoderBlock, self).__init__(**kwargs)
-        self.attention = MultiHeadAttention(embedding_size, num_heads, 
+        self.attention = MultiHeadAttention(embedding_size, num_heads,
                                             dropout)
         self.addnorm_1 = AddNorm(dropout)
         self.ffn = PositionWiseFFN(ffn_hidden_size, embedding_size)
@@ -305,7 +303,7 @@ class TransformerEncoder(d2l.Encoder):
         self.blks = nn.Sequential()
         for i in range(num_layers):
             self.blks.add(
-                EncoderBlock(embedding_size, ffn_hidden_size, 
+                EncoderBlock(embedding_size, ffn_hidden_size,
                              num_heads, dropout))
 
     def forward(self, X, valid_length, *args):
@@ -325,7 +323,7 @@ encoder(np.ones((2, 100)), valid_length).shape
 
 ## Decoder
 
-The decoder transformer block looks similar to the encoder transformer block. However, besides the two sub-layers---the multi-head attention layer and the positional encoding network, the decoder transformer block contains a third sub-layer, which applys multi-head attention on the output of the encoder stack. Similar to the encoder transformer block, the decoder transformer block employ "add and norm", i.e., the residual connections and the layer normalization to connect each of the sub-layers. 
+The decoder transformer block looks similar to the encoder transformer block. However, besides the two sub-layers---the multi-head attention layer and the positional encoding network, the decoder transformer block contains a third sub-layer, which applies multi-head attention on the output of the encoder stack. Similar to the encoder transformer block, the decoder transformer block employ "add and norm", i.e., the residual connections and the layer normalization to connect each of the sub-layers. 
 
 To be specific, at timestep $t$, assume that $\mathbf x_t$ is the current input, i.e., the query. As illustrate in :numref:`fig_self_attention_predict`, the keys and values of the self-attention layer consist of the current query with all past queries $\mathbf x_1, \ldots, \mathbf x_{t-1}$.
 
@@ -337,14 +335,14 @@ During the training, because the output for the $t$-query could observe all the 
 ```{.python .input  n=16}
 class DecoderBlock(nn.Block):
     # i means it is the i-th block in the decoder
-    def __init__(self, embedding_size, ffn_hidden_size, num_heads, 
+    def __init__(self, embedding_size, ffn_hidden_size, num_heads,
                  dropout, i, **kwargs):
         super(DecoderBlock, self).__init__(**kwargs)
         self.i = i
-        self.attention_1 = MultiHeadAttention(embedding_size, num_heads, 
+        self.attention_1 = MultiHeadAttention(embedding_size, num_heads,
                                               dropout)
         self.addnorm_1 = AddNorm(dropout)
-        self.attention_2 = MultiHeadAttention(embedding_size, num_heads, 
+        self.attention_2 = MultiHeadAttention(embedding_size, num_heads,
                                               dropout)
         self.addnorm_2 = AddNorm(dropout)
         self.ffn = PositionWiseFFN(ffn_hidden_size, embedding_size)
@@ -398,7 +396,7 @@ class TransformerDecoder(d2l.Decoder):
         self.blks = nn.Sequential()
         for i in range(num_layers):
             self.blks.add(
-                DecoderBlock(embedding_size, ffn_hidden_size, num_heads, 
+                DecoderBlock(embedding_size, ffn_hidden_size, num_heads,
                              dropout, i))
         self.dense = nn.Dense(vocab_size, flatten=False)
 
@@ -426,10 +424,10 @@ num_hiddens, num_heads = 64, 4
 src_vocab, tgt_vocab, train_iter = d2l.load_data_nmt(batch_size, num_steps)
 
 encoder = TransformerEncoder(
-    len(src_vocab), embedding_size, num_hiddens, num_heads, num_layers, 
+    len(src_vocab), embedding_size, num_hiddens, num_heads, num_layers,
     dropout)
 decoder = TransformerDecoder(
-    len(src_vocab), embedding_size, num_hiddens, num_heads, num_layers, 
+    len(src_vocab), embedding_size, num_hiddens, num_heads, num_layers,
     dropout)
 model = d2l.EncoderDecoder(encoder, decoder)
 d2l.train_s2s_ch8(model, train_iter, lr, num_epochs, ctx)

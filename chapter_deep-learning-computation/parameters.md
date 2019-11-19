@@ -24,7 +24,7 @@ net(x)  # Forward computation
 
 ## Parameter Access
 
-In the case of a Sequential class we can access the parameters with ease, simply by indexing each of the layers in the network. The params variable then contains the required data. Let us try this out in practice by inspecting the parameters of the first layer.
+In the case of a Sequential class we can access the parameters with ease, simply by indexing each of the layers in the network. The `params` variable then contains the required data. Let us try this out in practice by inspecting the parameters of the first layer.
 
 ```{.python .input  n=2}
 print(net[0].params)
@@ -79,7 +79,7 @@ print(net.collect_params('.*weight'))
 print(net.collect_params('dense0.*'))
 ```
 
-### Rube Goldberg strikes again
+### Rube Goldberg Striking Again
 
 Let us see how the parameter naming conventions work if we nest multiple blocks inside each other. For that we first define a function that produces blocks (a block factory, so to speak) and then we combine these inside yet larger blocks.
 

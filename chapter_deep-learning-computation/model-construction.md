@@ -42,16 +42,16 @@ For example, when designing models, like ResNet-152,
 which possess hundreds (152, thus the name) of layers,
 implementing the network one layer at a time can grow tedious.
 Moreover, this concern is not just hypothetical---such deep networks
-dominate numerous application areas, especally when training data is abundant.
+dominate numerous application areas, especially when training data is abundant.
 For example the ResNet architecture mentioned above ([He et al.](https://www.cv-foundation.org/openaccess/content_cvpr_2016/papers/He_Deep_Residual_Learning_CVPR_2016_paper.pdf))
-won the 2015 ImageNet and COCO computer vision compeititions
+won the 2015 ImageNet and COCO computer vision competitions
 for both recognition and detection.
 Deep networks with many layers arranged into components
 with various repeating patterns are now ubiquitous in other domains
 including natural language processing and speech.
 
 To facilitate the implementation of networks consisting of components
-of arbitrary complecity, we introduce a new flexible concept:
+of arbitrary complexity, we introduce a new flexible concept:
 a neural network *block*.
 A block could describe a single neuron,
 a high-dimensional layer,
@@ -72,10 +72,10 @@ only that we worry about parameters and the `forward` function.
 
 One benefit of working with the `Block` abstraction is that
 they can be combined into larger artifacts, often recursively,
-e.g., as illustrated in the following diagram:
+e.g., as illustrated in :numref:`fig_blocks`.
 
 ![Multiple layers are combined into blocks](../img/blocks.svg)
-
+:label:`fig_blocks`
 
 By defining code to generate Blocks of arbitrary complexity on demand,
 we can write surprisingly compact code
@@ -121,7 +121,7 @@ what exactly happens inside `nn.Sequential`
 have remained mysterious so far.
 
 In short, `nn.Sequential` just defines a special kind of Block.
-Specifically, an `nn.Sequential` maintains a list of constitutent `Blocks`,
+Specifically, an `nn.Sequential` maintains a list of constituent `Blocks`,
 stored in a particular order.
 You might think of `nnSequential` as your first meta-Block.
 The `add` method simply facilitates
@@ -293,7 +293,8 @@ class FancyMLP(nn.Block):
 
     def forward(self, x):
         x = self.dense(x)
-        # Use the constant parameters created, as well as the relu and dot functions
+        # Use the constant parameters created, as well as the relu 
+        # and dot functions
         x = npx.relu(np.dot(x, self.rand_weight.data()) + 1)
         # Reuse the fully connected layer. This is equivalent to sharing
         # parameters with two fully connected layers

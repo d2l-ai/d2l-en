@@ -65,8 +65,9 @@ value of the input subarray in the window
 
 
 ![Maximum pooling with a pooling window shape of $2\times 2$. The shaded portions represent the first output element and the input element used for its computation: $\max(0, 1, 3, 4)=4$](../img/pooling.svg)
+:label:`fig_pooling`
 
-The output array in the figure above has a height of 2 and a width of 2.
+The output array in :numref:`fig_pooling` above has a height of 2 and a width of 2.
 The four elements are derived from the maximum value of $\text{max}$:
 
 $$

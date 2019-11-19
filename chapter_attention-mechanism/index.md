@@ -9,7 +9,6 @@ As a bit of a historical digression, attention research is an enormous field wit
 
 However, we will not indulge in too much theory of attention in neuroscience, but rather focusing on applying the attention idea in deep learning. In this chapter, we will provide you with some intuition about how to transform the attention idea to the concrete mathematics models. By studying several essential attention models such as dot product attention, multi-head attention, and transformer, you will be master throughout the attention mechanism and be able to apply it to implement specific model such as Bidirectional Encoder Representations from Transformers (BERT).
 
-
 ```toc
 :maxdepth: 2
 

@@ -31,7 +31,7 @@ if you want to go beyond a shallow understanding of deep learning.
 
 In this section, we will peel back the curtain on some of the details
 of backward propagation (more commonly called *backpropagation* or *backprop*).
-To convey some insight for both the techniques and how they are implementated,
+To convey some insight for both the techniques and how they are implemented,
 we will rely on both mathematics and computational graphs
 to describe the mechanics behind neural network computations.
 To start, we will focus our exposition on
@@ -90,14 +90,14 @@ Finally, the model's regularized loss on a given data example is
 $$J = L + s.$$
 
 We refer to $J$ as the objective function of a given data example
-and refer to it as the ‘objective function’ in the following discussion.
+and refer to it as the *objective function* in the following discussion.
 
 
 ## Computational Graph of Forward Propagation
 
 Plotting computational graphs helps us visualize
 the dependencies of operators and variables within the calculation.
-The figure below contains the graph associated
+:numref:`fig_forward` contains the graph associated
 with the simple network described above.
 The lower-left corner signifies the input
 and the upper right corner the output.
@@ -105,6 +105,7 @@ Notice that the direction of the arrows (which illustrate data flow)
 are primarily rightward and upward.
 
 ![Computational Graph](../img/forward.svg)
+:label:`fig_forward`
 
 
 ## Backpropagation
@@ -140,7 +141,7 @@ are $\mathbf{W}^{(1)}$ and $\mathbf{W}^{(2)}$.
 The objective of backpropagation is to
 calculate the gradients $\partial J/\partial \mathbf{W}^{(1)}$
 and $\partial J/\partial \mathbf{W}^{(2)}$.
-To accompish this, we will apply the chain rule
+To accomplish this, we will apply the chain rule
 and calculate, in turn, the gradient of
 each intermediate variable and parameter.
 The order of calculations are reversed
@@ -229,7 +230,7 @@ where the compute order on the graph is reversed.
 One of the consequences is that we need to retain
 the intermediate values until backpropagation is complete.
 This is also one of the reasons why backpropagation
-requires significantly more memory than plain 'inference'—we end up
+requires significantly more memory than plain 'inference'---we end up
 computing tensors as gradients
 and need to retain all the intermediate variables
 to invoke the chain rule.

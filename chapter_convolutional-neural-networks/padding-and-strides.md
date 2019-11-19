@@ -1,9 +1,9 @@
 # Padding and Stride
 :label:`sec_padding`
 
-In the previous example, our input had a height and width of 3
-and a convolution kernel with a height and width of 2,
-yielding an output with a height and a width of 2.
+In the previous example, our input had a height and width of $3$
+and a convolution kernel with a height and width of $2$,
+yielding an output with a height and a width of $2$.
 In general, assuming the input shape is $n_h\times n_w$
 and the convolution kernel window shape is $k_h\times k_w$,
 then the output shape will be
@@ -14,19 +14,19 @@ Therefore, the output shape of the convolutional layer
 is determined by the shape of the input
 and the shape of the convolution kernel window.
 
-In several cases we might want to incorporate particular techniques—padding and strides—regarding the size of the output:
+In several cases we might want to incorporate particular techniques---padding and strides, regarding the size of the output:
 
-* In general, since kernels generally have width and height greater than 1,
+* In general, since kernels generally have width and height greater than $1$,
 that means that after applying many successive convolutions,
 we will wind up with an output that is much smaller than our input.
-If we start with a 240x240 pixel image, 10 layers of 5x5 convolutions
-reduce the image to 200x200 pixels, slicing off 30% of the image and with it obliterating any interesting information on the boundaries of the original image. *Padding* handles this issue.
+If we start with a $240 \times 240$ pixel image, $10$ layers of $5 \times 5$ convolutions
+reduce the image to $200 \times 200$ pixels, slicing off $30 \%$ of the image and with it obliterating any interesting information on the boundaries of the original image. *Padding* handles this issue.
 * In some cases, we want to reduce the resolution drastically if say we find our original input resolution to be unweildy. *Strides* can help in these instances.
 
 ## Padding
 
 As described above, one tricky issue when applying convolutional layers
-is that losing pixels on the permimeter of our image.
+is that losing pixels on the perimeter of our image.
 Since we typically use small kernels,
 for any given convolution,
 we might only lose a few pixels,
@@ -35,12 +35,13 @@ many successive convolutional layers.
 One straightforward solution to this problem
 is to add extra pixels of filler around the boundary of our input image,
 thus increasing the effective size of the image
-Typically, we set the values of the extra pixels to 0.
-In the figure below, we pad a $3 \times 5$ input,
+Typically, we set the values of the extra pixels to $0$.
+In :numref:`img_conv_pad`, we pad a $3 \times 5$ input,
 increasing its size to $5 \times 7$.
 The corresponding output then increases to a $4 \times 6$ matrix.
 
 ![Two-dimensional cross-correlation with padding. The shaded portions are the input and kernel array elements used by the first output element: $0\times0+0\times1+0\times2+0\times3=0$. ](../img/conv-pad.svg)
+:label:`img_conv_pad`
 
 In general, if we add a total of $p_h$ rows of padding
 (roughly half on top and half on bottom)
@@ -65,7 +66,7 @@ and $\lfloor p_h/2\rfloor$ rows on the bottom.
 We will pad both sides of the width in the same way.
 
 Convolutional neural networks commonly use convolutional kernels
-with odd height and width values, such as 1, 3, 5, or 7.
+with odd height and width values, such as $1$, $3$, $5$, or $7$.
 Choosing odd kernel sizes has the benefit
 that we can preserve the spatial dimensionality
 while padding with the same number of rows on top and bottom,
@@ -84,10 +85,10 @@ by cross-correlation of the input and convolution kernel
 with the window centered on `X[i, j]`.
 
 In the following example, we create a two-dimensional convolutional layer
-with a height and width of 3
-and apply 1 pixel of padding on all sides.
-Given an input with a height and width of 8,
- we find that the height and width of the output is also 8.
+with a height and width of $3$
+and apply $1$ pixel of padding on all sides.
+Given an input with a height and width of $8$,
+ we find that the height and width of the output is also $8$.
 
 ```{.python .input  n=1}
 from mxnet import np, npx
@@ -121,7 +122,7 @@ we can make the output and input have the same height and width by setting diffe
 ```{.python .input  n=2}
 # Here, we use a convolution kernel with a height of 5 and a width of 3. The
 # padding numbers on both sides of the height and width are 2 and 1,
-# respectively
+# respectively 
 conv2d = nn.Conv2D(1, kernel_size=(5, 3), padding=(2, 1))
 comp_conv2d(conv2d, X).shape
 ```
@@ -140,10 +141,10 @@ skipping the intermediate locations.
 
 
 We refer to the number of rows and columns traversed per slide as the *stride*.
-So far, we have used strides of 1, both for height and width.
+So far, we have used strides of $1$, both for height and width.
 Sometimes, we may want to use a larger stride.
-The figure below shows a two-dimensional cross-correlation operation
-with a stride of 3 vertically and 2 horizontally.
+:numref:`img_conv_stride` shows a two-dimensional cross-correlation operation
+with a stride of $3$ vertically and $2$ horizontally.
 We can see that when the second element of the first column is output,
 the convolution window slides down three rows.
 The convolution window slides two columns to the right
@@ -151,6 +152,7 @@ when the second element of the first row is output.
 When the convolution window slides three columns to the right on the input, there is no output because the input element cannot fill the window (unless we add another column of padding).
 
 ![Cross-correlation with strides of 3 and 2 for height and width respectively. The shaded portions are the output element and the input and core array elements used in its computation: $0\times0+0\times1+1\times2+2\times3=8$, $0\times0+6\times1+0\times2+0\times3=6$. ](../img/conv-stride.svg)
+:label:`img_conv_stride`
 
 In general, when the stride for the height is $s_h$
 and the stride for the width is $s_w$,
@@ -165,7 +167,7 @@ Going a step further, if the input height and width
 are divisible by the strides on the height and width,
 then the output shape will be $(n_h/s_h) \times (n_w/s_w)$.
 
-Below, we set the strides on both the height and width to 2,
+Below, we set the strides on both the height and width to $2$,
 thus halving the input height and width.
 
 ```{.python .input}
@@ -186,14 +188,14 @@ Specifically, when $p_h = p_w = p$, the padding is $p$.
 When the strides on the height and width are $s_h$ and $s_w$, respectively,
 we call the stride $(s_h, s_w)$.
 Specifically, when $s_h = s_w = s$, the stride is $s$.
-By default, the padding is 0 and the stride is 1.
+By default, the padding is $0$ and the stride is $1$.
 In practice we rarely use inhomogeneous strides or padding,
 i.e., we usually have $p_h = p_w$ and $s_h = s_w$.
 
 ## Summary
 
 * Padding can increase the height and width of the output. This is often used to give the output the same height and width as the input.
-* The stride can reduce the resolution of the output, for example reducing the height and width of the output to only $1/n$ of the height and width of the input ($n$ is an integer greater than 1).
+* The stride can reduce the resolution of the output, for example reducing the height and width of the output to only $1/n$ of the height and width of the input ($n$ is an integer greater than $1$).
 * Padding and stride can be used to adjust the dimensionality of the data effectively.
 
 ## Exercises

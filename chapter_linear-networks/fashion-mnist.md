@@ -8,29 +8,30 @@ even simple models by today's standards achieve classification accuracy over 95%
 making it unsuitable for distinguishing between stronger models and weaker ones. 
 Today, MNIST serves as more of sanity checks than as a benchmark.
 To up the ante just a bit, we will focus our discussion in the coming sections
-on the qualitatively similar, but comparatively complex Fashion-MNIST dataset :cite:`Xiao.Rasul.Vollgraf.2017`, which was released in 2017.
+on the qualitatively similar, but comparatively complex Fashion-MNIST 
+dataset :cite:`Xiao.Rasul.Vollgraf.2017`, which was released in 2017.
 
 ```{.python .input  n=7}
 %matplotlib inline
 import d2l
-from mxnet import gluon 
+from mxnet import gluon
 import sys
+
 d2l.use_svg_display()
 ```
 
-## Getting the data
+## Getting the Data
 
 Just as with MNIST, Gluon makes it easy to download and load the FashionMNIST dataset into memory via the `FashionMNIST` class contained in `gluon.data.vision`.
-We briefly work through the mechnics of loading and exploring the dataset below. 
-Please refer to :numref:`sec_naive_bayes` for more details on loading data. 
-
+We briefly work through the mechanics of loading and exploring the dataset below. 
+Please refer to :numref:`sec_naive_bayes` for more details on loading data.
 
 ```{.python .input  n=23}
 mnist_train = gluon.data.vision.FashionMNIST(train=True)
 mnist_test = gluon.data.vision.FashionMNIST(train=False)
 ```
 
-FashionMNIST conists of images from 10 categories, each represented 
+FashionMNIST consists of images from 10 categories, each represented 
 by 6k images in the training set and by 1k in the test set. 
 Consequently the training set and the test set 
 contain 60k and 10k images, respectively.
@@ -44,7 +45,7 @@ t-shirt, trousers, pullover, dress, coat, sandal, shirt, sneaker, bag and ankle 
 The following function converts between numeric label indices and their names in text.
 
 ```{.python .input  n=25}
-# Saved in the d2l package for later use 
+# Saved in the d2l package for later use
 def get_fashion_mnist_labels(labels):
     text_labels = ['t-shirt', 'trouser', 'pullover', 'dress', 'coat',
                    'sandal', 'shirt', 'sneaker', 'bag', 'ankle boot']
@@ -54,7 +55,7 @@ def get_fashion_mnist_labels(labels):
 We can now create a function to visualize these examples.
 
 ```{.python .input}
-# Saved in the d2l package for later use 
+# Saved in the d2l package for later use
 def show_images(imgs, num_rows, num_cols, titles=None, scale=1.5):
     """Plot a list of images."""
     figsize = (num_cols * scale, num_rows * scale)
@@ -93,10 +94,10 @@ For instance, we can set aside 4 processes to read the data (via `num_workers`).
 Because this feature is not currently supported on Windows
 the following code checks the platform to make sure
 that we do not saddle our Windows-using friends 
-with error messages later on. 
+with error messages later on.
 
 ```{.python .input}
-# Saved in the d2l package for later use 
+# Saved in the d2l package for later use
 def get_dataloader_workers(num_workers=4):
     # 0 means no additional process is used to speed up the reading of data.
     if sys.platform.startswith('win'):
@@ -133,7 +134,7 @@ for X, y in train_iter:
 '%.2f sec' % timer.stop()
 ```
 
-## Put all Things Together 
+## Putting Things Together 
 
 Now we define the `load_data_fashion_mnist` function 
 that obtains and reads the Fashion-MNIST dataset. 
@@ -141,7 +142,7 @@ It returns the data iterators for both the training set and validation set.
 In addition, it accepts an optional argument to resize images to another shape.
 
 ```{.python .input  n=4}
-# Saved in the d2l package for later use 
+# Saved in the d2l package for later use
 def load_data_fashion_mnist(batch_size, resize=None):
     """Download the Fashion-MNIST dataset and then load into memory."""
     dataset = gluon.data.vision
@@ -165,12 +166,12 @@ for X, y in train_iter:
     break
 ```
 
-We are now ready to work with the FashionMNIST dataset in the sections that folow.
+We are now ready to work with the FashionMNIST dataset in the sections that follow.
 
 ## Summary
 
 * Fashion-MNIST is an apparel classification dataset consisting of images representing 10 categories. 
- * We will use this datasrt in subsequent sections and chapters to evaluate various classification algorithms.
+ * We will use this dataset in subsequent sections and chapters to evaluate various classification algorithms.
 * We store the shape of each image with height $h$ width $w$ pixels as $h \times w$ or `(h, w)`.
 * Data iterators are a key component for efficient performance. Rely on well-implemented iterators that exploit multi-threading to avoid slowing down your training loop.
 

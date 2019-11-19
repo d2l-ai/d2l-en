@@ -62,7 +62,6 @@ def masked_softmax(X, valid_length):
 
 To illustrate how does this function work, we construct two $2 \times 4$ matrixes as the input. In addition, we specify that the valid length equals 2 for the first example, and 3 for the second example. Then, as we can see from the following outputs, the value outside valid lengths are masked as zero.
 
-
 ```{.python .input  n=5}
 masked_softmax(np.random.uniform(size=(2, 2, 4)), np.array([2, 3]))
 ```
@@ -90,8 +89,6 @@ $$\alpha(\mathbf Q, \mathbf K) = \mathbf Q \mathbf K^\top /\sqrt{d}.$$
 
 
 With the above formula, let us implement the dot product attention layer `DotProductAttention` that supports a batch of queries and key-value pairs. In addition, for the purpose of regularization, we enable a randomly dropping functionality by specifying the degree of dropout within our implementation.
-
-
 
 ```{.python .input  n=5}
 # Saved in the d2l package for later use
@@ -123,7 +120,6 @@ keys = np.ones((2, 10, 2))
 values = np.arange(40).reshape(1, 10, 4).repeat(2, axis=0)
 atten(np.ones((2, 1, 2)), keys, values, np.array([2, 6]))
 ```
-
 
 As we can see above, dot product attention simply multiplies the query and key together, and hopes to derive their similarities from there. Whereas, the query and key may not be of the same dimension sometimes. Can we solve the problem by applying some neural network architecture on the attention layers? The answer is the multilayer perceptron attention!
 

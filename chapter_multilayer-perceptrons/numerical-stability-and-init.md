@@ -81,7 +81,7 @@ vis-a-vis vanishing gradients.
 ```{.python .input}
 %matplotlib inline
 import d2l
-from mxnet import np, npx, autograd
+from mxnet import autograd, np, npx
 npx.set_np()
 
 x = np.arange(-8.0, 8.0, 0.1)
@@ -95,7 +95,7 @@ d2l.plot(x, [y, x.grad], legend=['sigmoid', 'gradient'], figsize=(4.5, 2.5))
 
 As we can see, the gradient of the sigmoid vanishes
 both when its inputs are large and when they are small.
-Moreover, when we excecute backward propagation, due to the chain rule,
+Moreover, when we execute backward propagation, due to the chain rule,
 this means that unless we are in the Goldilocks zone,
 where the inputs to most of the sigmoids are in the range of, say $[-4, 4]$,
 the gradients of the overall product may vanish.
@@ -249,12 +249,12 @@ The reasoning above barely scratches the surface
 of modern approaches to parameter initialization.
 In fact, MXNet has an entire `mxnet.initializer` module
 implementing over a dozen different heuristics.
-Moreover, intialization continues to be a hot area of inquiry
+Moreover, initialization continues to be a hot area of inquiry
 within research into the fundamental theory of neural network optimization.
 Some of these heuristics are especially suited
 for when parameters are tied
 (i.e., when parameters of in different parts the network are shared),
-for superresolution, sequence models, and related problems.
+for super-resolution, sequence models, and related problems.
 We recommend that the interested reader take a closer look
 at what is offered as part of this module,
 and investigate the recent research on parameter initialization.

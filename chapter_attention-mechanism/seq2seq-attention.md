@@ -20,8 +20,6 @@ What is more, to better visualize the overall architecture of seq2seq with atten
 ![The layers in the sequence to sequence model with attention mechanism.](../img/seq2seq-attention-details.svg)
 :label:`fig_s2s_attention_details`
 
-$E_t^{'}$
-
 ```{.python .input  n=1}
 import d2l
 from mxnet import np, npx

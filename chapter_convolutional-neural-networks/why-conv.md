@@ -12,9 +12,9 @@ which features are related to each other or in what way.
 
 Sometimes we truly may not have any knowledge
 to guide the construction of more cleverly-organized architectures.
-and in thise cases, a multilayer perceptron is often the best that we can do.
+In these cases, a multilayer perceptron is often the best that we can do.
 However, once we start dealing with high-dimensional perceptual data,
-these *structure-less* netwroks can grow unwieldy.
+these *structure-less* networks can grow unwieldy.
 
 
 For instance, let us return to our running example
@@ -26,7 +26,7 @@ Even an aggressive reduction to *1,000 hidden dimensions*
 would require a *dense* (fully-connected) layer to support $10^9$ parameters.
 Unless we have an extremely large dataset (perhaps billions?),
 lots of GPUs, a talent for extreme distributed optimization,
-and an extraordinary ammount of patience,
+and an extraordinary amount of patience,
 learning the parameters of this network may turn out to be impossible.
 
 A careful reader might object to this argument
@@ -58,7 +58,7 @@ and Waldo shows up somewhere in each
 (typically lurking in some unlikely location).
 The reader's goal is to locate him.
 Despite his characteristic outfit, this can be surprisingly difficult,
-due to the large number  of confounders.
+due to the large number of confounders.
 
 ![Image via Walker Books](../img/where-wally-walker-books.jpg)
 :width:`600px`
@@ -67,7 +67,7 @@ due to the large number  of confounders.
 
 Back to images, the intuitions we have been discussing could be made more concrete yielding a few key principles for building neural networks for computer vision:
 
-1. Our vision systems should, in some sense, respond similary to the same object regardless of where it appears in the image (Translation Invariance)
+1. Our vision systems should, in some sense, respond similarly to the same object regardless of where it appears in the image (Translation Invariance)
 1. Our visions systems should, in some sense, focus on local regions, without regard for what else is happening in the image at greater distances. (Locality)
 
 Let us see how this translates into mathematics.
@@ -108,7 +108,7 @@ For any given location $(i, j)$ in the hidden layer $h[i, j]$,
 we compute its value by summing over pixels in $x$,
 centered around $(i, j)$ and weighted by $V[i, j, a, b]$.
 
-Now let us invoke the first principle we established above—*translation invariance*.
+Now let us invoke the first principle we established above: *translation invariance*.
 This implies that a shift in the inputs $x$
 should simply lead to a shift in the activations $h$.
 This is only possible if $V$ and $u$ do not actually depend on $(i, j)$,
@@ -161,7 +161,7 @@ say $f, g: \mathbb{R}^d \to R$ is defined as
 
 $$[f \circledast g](x) = \int_{\mathbb{R}^d} f(z) g(x-z) dz$$
 
-That is, we measure the overlap beween $f$ and $g$
+That is, we measure the overlap between $f$ and $g$
 when both functions are shifted by $x$ and 'flipped'.
 Whenever we have discrete objects, the integral turns into a sum.
 For instance, for vectors defined on $\ell_2$, i.e.,
@@ -184,12 +184,13 @@ We will come back to this in the following section.
 ## Waldo Revisited
 
 Let us see what this looks like if we want to build an improved Waldo detector. The convolutional layer picks windows of a given size
-and weighs intensities according to the mask $V$.
+and weighs intensities according to the mask $V$, as demonstrated in :numref:`fig_waldo_mask`.
  We expect that wherever the 'waldoness' is highest,
  we will also find a peak in the hidden layer activations.
 
 ![Find Waldo.](../img/waldo-mask.jpg)
 :width:`600px`
+:label:`fig_waldo_mask`
 
 There is just a problem with this approach:
 so far we blissfully ignored that images consist
@@ -214,7 +215,7 @@ we want to have a multidimensional hidden representations
 corresponding to each spatial location.
 We could think of the hidden representation as comprising a number of 2D grids stacked on top of each other.
 These are sometimes called *channels* or *feature maps*.
-Intuitively you might imaginee that at lower layers,
+Intuitively you might imagine that at lower layers,
 some channels specialize to recognizing edges,
 We can take care of this by adding a fourth coordinate to $V$
 via $V[a, b, c, d]$. Putting all together we have:

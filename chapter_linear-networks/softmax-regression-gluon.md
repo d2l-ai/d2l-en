@@ -21,7 +21,7 @@ batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 ```
 
-## Initialize Model Parameters
+## Initializing Model Parameters
 
 As mentioned in :numref:`sec_softmax`,
 the output layer of softmax regression 
