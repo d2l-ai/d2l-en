@@ -17,7 +17,7 @@ However, when we look closer, this does not match our question!  We wanted exact
 
 Undeterred, we continue further.  We measure even more precisely, say $1.9\text{cm}$, $2.0\text{cm}$, $2.1\text{cm}$, and now see that perhaps $3$ of the $100$ darts hit the board in the $2.0\text{cm}$ bucket.  Thus we conclude the probability is $3\%$.
 
-However, this does not solve anything!  We have just pushed the issue down one digit further.  Let us abstract a bit. Imagine we know the probability that the first $k$ digits match with $2.00000\ldots$ and we want to know the probability it matches for the first $k+1$ digits. It is fairly reasonable to assume that the ${k+1}^{\mathrm{st}}$ digit is essentially a random choice from the set $\{0, 1, 2, \ldots, 9\}$.  At least, we cannot conceive of a physically meaningful process which would force the number of micrometers away form the center to prefer to end in a $7$ vs a $3$.  
+However, this does not solve anything!  We have just pushed the issue down one digit further.  Let us abstract a bit. Imagine we know the probability that the first $k$ digits match with $2.00000\ldots$ and we want to know the probability it matches for the first $k+1$ digits. It is fairly reasonable to assume that the ${k+1}^{\mathrm{th}}$ digit is essentially a random choice from the set $\{0, 1, 2, \ldots, 9\}$.  At least, we cannot conceive of a physically meaningful process which would force the number of micrometers away form the center to prefer to end in a $7$ vs a $3$.  
 
 What this means is that in essence each additional digit of accuracy we require should decrease probability of matching by a factor of $10$.  Or put another way, we would expect that 
 
@@ -209,7 +209,7 @@ $$
 
 This result again makes sense.  The largest $p$ can be is $1/2$ which corresponds to picking $a-2$ or $a+2$ with a coin flip.  The variance of this being $4$ corresponds to the fact that both $a-2$ and $a+2$ are $2$ units away from the mean, and $2^2 = 4$.  On the other end of the spectrum, if $p=0$, this random variable always takes the value $0$ and so it has no variance at all.
 
-We will list a few properties of the variance below.
+We will list a few properties of variance below:
 
 * For any random variable $X$, $\mathrm{Var}(X) \ge 0$, with $\mathrm{Var}(X) = 0$ if and only if $X$ is a constant. 
 * For any random variable $X$ and numbers $a$ and $b$, we have that $\mathrm{Var}(aX+b) = a^2\mathrm{Var}(X)$.
