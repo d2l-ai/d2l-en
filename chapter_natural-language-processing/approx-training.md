@@ -53,9 +53,10 @@ Here, the gradient computation in each step of the training is no longer related
 
 ## Hierarchical Softmax
 
-Hierarchical softmax is another type of approximate training method. It uses a binary tree for data structure, with the leaf nodes of the tree representing every word in the dictionary $\mathcal{V}$.
+Hierarchical softmax is another type of approximate training method. It uses a binary tree for data structure as illustrated in :numref:`fig_hi_softmax`, with the leaf nodes of the tree representing every word in the dictionary $\mathcal{V}$.
 
 ![Hierarchical Softmax. Each leaf node of the tree represents a word in the dictionary. ](../img/hi-softmax.svg)
+:label:`fig_hi_softmax`
 
 We assume that $L(w)$ is the number of nodes on the path (including the root and leaf nodes) from the root node of the binary tree to the leaf node of word $w$. Let $n(w, j)$ be the $j^\mathrm{th}$ node on this path, with the context word vector $\mathbf{u}_{n(w, j)}$. We use Figure 10.3 as an example, so $L(w_3) = 4$. Hierarchical softmax will approximate the conditional probability in the skip-gram model as
 

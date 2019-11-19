@@ -12,7 +12,7 @@ experiment.
 
 ```{.python .input  n=1}
 import d2l
-from mxnet import gluon, init, np, npx, autograd
+from mxnet import gluon, init, np, npx
 from mxnet.gluon import nn, rnn
 from mxnet.contrib import text
 npx.set_np()
@@ -21,7 +21,7 @@ batch_size = 64
 train_iter, test_iter, vocab = d2l.load_data_imdb(batch_size)
 ```
 
-## Use a Recurrent Neural Network Model
+## Using a Recurrent Neural Network Model
 
 In this model, each word first obtains a feature vector from the embedding
 layer. Then, we further encode the feature sequence using a bidirectional
@@ -36,7 +36,8 @@ layer, the `LSTM` instance is the hidden layer for sequence encoding, and the
 
 ```{.python .input  n=46}
 class BiRNN(nn.Block):
-    def __init__(self, vocab_size, embed_size, num_hiddens, num_layers, **kwargs):
+    def __init__(self, vocab_size, embed_size, num_hiddens, 
+                 num_layers, **kwargs):
         super(BiRNN, self).__init__(**kwargs)
         self.embedding = nn.Embedding(vocab_size, embed_size)
         # Set Bidirectional to True to get a bidirectional recurrent neural
@@ -72,7 +73,7 @@ net = BiRNN(len(vocab), embed_size, num_hiddens, num_layers)
 net.initialize(init.Xavier(), ctx=ctx)
 ```
 
-### Load Pre-trained Word Vectors
+### Loading Pre-trained Word Vectors
 
 Because the training dataset for sentiment classification is not very large, in order to deal with overfitting, we will directly use word vectors pre-trained on a larger corpus as the feature vectors of all words. Here, we load a 100-dimensional GloVe word vector for each word in the dictionary `vocab`.
 
@@ -95,7 +96,7 @@ net.embedding.weight.set_data(embeds)
 net.embedding.collect_params().setattr('grad_req', 'null')
 ```
 
-### Train and Evaluate the Model
+### Training and Evaluating the Model
 
 Now, we can start training.
 
