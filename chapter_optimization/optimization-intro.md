@@ -55,7 +55,7 @@ complicated and do not have analytical solutions. Instead, we must use numerical
 optimization algorithms. The optimization algorithms below all fall into this
 category.
 
-There are many challenges in deep learning optimization. Some of the most vexing ones are local minima, saddle points and vanishing gradients. Let us have a look at a few of them.
+There are many challenges in deep learning optimization. Some of the most vexing ones are local minima, saddle points and vanishing gradients. Let's have a look at a few of them.
 
 ### Local Minima
 

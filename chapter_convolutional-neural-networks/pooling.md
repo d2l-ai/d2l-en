@@ -81,7 +81,7 @@ A pooling layer with a pooling window shape of $p \times q$
 is called a $p \times q$ pooling layer.
 The pooling operation is called $p \times q$ pooling.
 
-Let us return to the object edge detection example
+Let's return to the object edge detection example
 mentioned at the beginning of this section.
 Now we will use the output of the convolutional layer
 as the input for $2\times 2$ maximum pooling.

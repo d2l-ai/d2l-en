@@ -14,7 +14,7 @@ using deep neural networks.
 
 ## Hidden Layers
 
-Let us recall linear regression and softmax regression
+Let's recall linear regression and softmax regression
 with an example as illustrated in :numref:`fig_singlelayer`.
 In general, we mapped our inputs directly to our outputs
 via a single linear transformation:
@@ -192,7 +192,7 @@ npx.set_np()
 ## Activation Functions
 
 Because they are so fundamental to deep learning, before going further,
-let us take a brief look at some common activation functions.
+let's take a brief look at some common activation functions.
 
 ### ReLU Function
 

@@ -176,7 +176,7 @@ train_seq_data[0]
 The training data structure is shown above. The first element is the user identity, the next list indicates the last five items this user liked, and the last element is the item this user liked after the five items.
 
 ## Train the Model
-Now, let us train the model. We use the same setting as NeuMF, including learning rate, optimizer, and $k$, in the last section so that the results are comparable.
+Now, let's train the model. We use the same setting as NeuMF, including learning rate, optimizer, and $k$, in the last section so that the results are comparable.
 
 ```{.python .input  n=5}
 ctx = d2l.try_all_gpus()

@@ -37,7 +37,7 @@ that Yann and his colleague Leon Bottou wrote in the 1990s!
 In a rough sense, we can think LeNet as consisting of two parts:
 (i) a block of convolutional layers; and
 (ii) a block of fully-connected layers.
-Before getting into the weeds, let us briefly review the model in :numref:`img_lenet`.
+Before getting into the weeds, let's briefly review the model in :numref:`img_lenet`.
 
 ![Data flow in LeNet 5. The input is a handwritten digit, the output a probabilitiy over 10 possible outcomes.](../img/lenet.svg)
 :label:`img_lenet`
@@ -244,7 +244,7 @@ def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
     print('%.1f exampes/sec on %s' % (metric[2]*num_epochs/timer.sum(), ctx))
 ```
 
-Now let us train the model.
+Now let's train the model.
 
 ```{.python .input}
 lr, num_epochs = 0.9, 10

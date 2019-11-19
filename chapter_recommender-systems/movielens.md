@@ -8,7 +8,7 @@ There are a number of datasets that are available for recommendation research. A
 
 The MovieLens dataset is hosted by the [GroupLens](https://grouplens.org/datasets/movielens/) website. Several versions are available. We will use the MovieLens 100K dataset :cite:`Herlocker.Konstan.Borchers.ea.1999`.  This dataset is comprised of $100,000$ ratings, ranging from 1 to 5 stars, from 943 users on 1682 movies. It has been cleaned up so that each user has rated at least 20 movies. Some simple demographic information such as age, gender, genres for the users and items are also available.  We can download the [ml-100k.zip](http://files.grouplens.org/datasets/movielens/ml-100k.zip) and extract the `u.data` file, which contains all the $100,000$ ratings in the csv format. There are many other files in the folder, a detailed description for each file can be found in the [README](http://files.grouplens.org/datasets/movielens/ml-100k-README.txt) file of the dataset.
 
-To begin with, let us import the packages required to run this section’s experiments.
+To begin with, let's import the packages required to run this section’s experiments.
 
 ```{.python .input  n=1}
 import d2l
@@ -36,7 +36,7 @@ def read_data_ml100k(path="../data/", member="ml-100k/u.data",
 
 ## Statistics of the Dataset
 
-Let us load up the data and inspect the first five records manually. It is an effective way to learn the data structure and verify that they have been loaded properly.
+Let's load up the data and inspect the first five records manually. It is an effective way to learn the data structure and verify that they have been loaded properly.
 
 ```{.python .input  n=3}
 data, num_users, num_items = read_data_ml100k()

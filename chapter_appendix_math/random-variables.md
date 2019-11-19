@@ -9,7 +9,7 @@ Continuous random variables are a significantly more subtle topic than discrete 
 
 ### From Discrete to Continuous
 
-To understand the additional technical challenges encountered when working with continuous random variables, let us perform a thought experiment.  Suppose that we are throwing a dart at the dart board, and we want to know the probability that it hits exactly $2 \text{cm}$ from the center of the board.
+To understand the additional technical challenges encountered when working with continuous random variables, let's perform a thought experiment.  Suppose that we are throwing a dart at the dart board, and we want to know the probability that it hits exactly $2 \text{cm}$ from the center of the board.
 
 To start with, we imagine measuring to a single digit of accuracy, that is to say with bins for $0 \text{cm}$, $1 \text{cm}$, $2 \text{cm}$, and so on.  We throw say $100$ darts at the dart board, and if $20$ of them fall into the bin for $2\text{cm}$ we conclude that $20\%$ of the darts we throw hit the board $2 \text{cm}$ away from the center.
 
@@ -17,7 +17,7 @@ However, when we look closer, this does not match our question!  We wanted exact
 
 Undeterred, we continue further.  We measure even more precisely, say $1.9\text{cm}$, $2.0\text{cm}$, $2.1\text{cm}$, and now see that perhaps $3$ of the $100$ darts hit the board in the $2.0\text{cm}$ bucket.  Thus we conclude the probability is $3\%$.
 
-However, this does not solve anything!  We have just pushed the issue down one digit further.  Let us abstract a bit. Imagine we know the probability that the first $k$ digits match with $2.00000\ldots$ and we want to know the probability it matches for the first $k+1$ digits. It is fairly reasonable to assume that the ${k+1}^{\mathrm{th}}$ digit is essentially a random choice from the set $\{0, 1, 2, \ldots, 9\}$.  At least, we cannot conceive of a physically meaningful process which would force the number of micrometers away form the center to prefer to end in a $7$ vs a $3$.  
+However, this does not solve anything!  We have just pushed the issue down one digit further.  Let's abstract a bit. Imagine we know the probability that the first $k$ digits match with $2.00000\ldots$ and we want to know the probability it matches for the first $k+1$ digits. It is fairly reasonable to assume that the ${k+1}^{\mathrm{th}}$ digit is essentially a random choice from the set $\{0, 1, 2, \ldots, 9\}$.  At least, we cannot conceive of a physically meaningful process which would force the number of micrometers away form the center to prefer to end in a $7$ vs a $3$.  
 
 What this means is that in essence each additional digit of accuracy we require should decrease probability of matching by a factor of $10$.  Or put another way, we would expect that 
 
@@ -33,12 +33,12 @@ $$
 P(\text{distance is in an}\; \epsilon\text{-sized interval around}\; 2 ) \approx \epsilon \cdot p.
 $$
 
-Let us take this one final step further.  We have been thinking about the point $2$ the entire time, but never thinking about other points.  Nothing is different there fundamentally, but it is the case that the value $p$ will likely be different.  We would at least hope that a dart thrower was more likely to hit a point near the center, like $2\text{cm}$ rather than $20\text{cm}$.  Thus, the value $p$ is not fixed, but rather should depend on the point $x$.  This tells us that we should expect
+Let's take this one final step further.  We have been thinking about the point $2$ the entire time, but never thinking about other points.  Nothing is different there fundamentally, but it is the case that the value $p$ will likely be different.  We would at least hope that a dart thrower was more likely to hit a point near the center, like $2\text{cm}$ rather than $20\text{cm}$.  Thus, the value $p$ is not fixed, but rather should depend on the point $x$.  This tells us that we should expect
 
 $$P(\text{distance is in an}\; \epsilon \text{-sized interval around}\; x ) \approx \epsilon \cdot p(x).$$
 :eqlabel:`eq_pdf_deriv`
 
-Indeed, :eqref:`eq_pdf_deriv` precisely defines the *probability density function*.  It is a function $p(x)$ which encodes the relative probability of hitting near one point versus another.  Let us visualize what such a function might look like.
+Indeed, :eqref:`eq_pdf_deriv` precisely defines the *probability density function*.  It is a function $p(x)$ which encodes the relative probability of hitting near one point versus another.  Let's visualize what such a function might look like.
 
 ```{.python .input}
 %matplotlib inline
@@ -59,7 +59,7 @@ The locations where the function value is large indicates regions where we are m
 
 ### Probability Density Functions
 
-Let us now investigate this further.  We have already seen what a probability density function is intuitively for a random variable $X$, namely the density function is a function $p(x)$ so that 
+Let's now investigate this further.  We have already seen what a probability density function is intuitively for a random variable $X$, namely the density function is a function $p(x)$ so that 
 
 $$P(X \; \text{is in an}\; \epsilon \text{-sized interval around}\; x ) \approx \epsilon \cdot p(x).$$
 :eqlabel:`eq_pdf_def`
@@ -68,7 +68,7 @@ But what does this imply for the properties of $p(x)$?
 
 First, probabilities are never negative, thus we should expect that $p(x) \ge 0$ as well.  
 
-Second, let us imagine that we slice up the $\mathbb{R}$ into an infinite number of slices which are $\epsilon$ wide, say with slices $(\epsilon\cdot i, \epsilon \cdot (i+1)]$.  For each of these, we know from :eqref:`eq_pdf_def` the probability is approximately
+Second, let's imagine that we slice up the $\mathbb{R}$ into an infinite number of slices which are $\epsilon$ wide, say with slices $(\epsilon\cdot i, \epsilon \cdot (i+1)]$.  For each of these, we know from :eqref:`eq_pdf_def` the probability is approximately
 
 $$
 P(X \; \text{is in an}\; \epsilon\text{-sized interval around}\; x ) \approx \epsilon \cdot p(\epsilon \cdot i),
@@ -125,7 +125,7 @@ We interpret this function by using integration to obtain the probability our ra
 $$P(X\in(a, b]) = \int _ {a}^{b} p(x) \; dx.$$
 :eqlabel:`eq_pdf_int_int`
 
-In :numref:`sec_distributions` we will see a number of common distributions, but let us continue working in the abstract.
+In :numref:`sec_distributions` we will see a number of common distributions, but let's continue working in the abstract.
 
 ### Cumulative Distribution Functions
 
@@ -137,7 +137,7 @@ $$
 F(x) = \int _ {-\infty}^{x} p(x) \; dx = P(X \le x).
 $$
 
-Let us observe a few properties.
+Let's observe a few properties.
 
 * $F(x) \rightarrow 0$ as $x\rightarrow -\infty$.
 * $F(x) \rightarrow 1$ as $x\rightarrow \infty$.
@@ -167,7 +167,7 @@ $$\mu_X = E[X] = \sum_i x_i p_i.$$
 
 The way we should interpret the mean (albeit with caution) is that it tells us essentially where the random variable tends to be located.  
 
-As a minimalistic example that we will examine throughout this section, let us take $X$ to be the random variable which takes the value $a-2$ with probability $p$, $a+2$ with probability $p$ and $a$ with probability $1-2p$.  We can compute using :eqref:`eq_exp_def` that, for any possible choice of $a$ and $p$, the mean is
+As a minimalistic example that we will examine throughout this section, let's take $X$ to be the random variable which takes the value $a-2$ with probability $p$, $a+2$ with probability $p$ and $a$ with probability $1-2p$.  We can compute using :eqref:`eq_exp_def` that, for any possible choice of $a$ and $p$, the mean is
 
 $$
 \mu_X = E[X] = \sum_i x_i p_i = (a-2)p + a(1-2p) + (a+2)p = a.
@@ -175,7 +175,7 @@ $$
 
 Thus we see that the mean is $a$.  This matches the intuition since $a$ is the location around which we centered our random variable.
 
-Because they are helpful, let us summarize a few properties.
+Because they are helpful, let's summarize a few properties.
 
 * For any random variable $X$ and numbers $a$ and $b$, we have that $\mu_{aX+b} = a\mu_X + b$.
 * If we have two random variables $X$ and $Y$, we have $\mu_{X+Y} = \mu_X+\mu_Y$.
@@ -195,7 +195,7 @@ $$\sigma_X^2 = \mathrm{Var}(X) = E\left[(X-\mu_X)^2\right] = E[X^2] - \mu_X^2.$$
 
 The last equality in :eqref:`eq_var_def` holds by expanding out the definition in the middle, and applying the properties of expectation.
 
-Let us look at our example where $X$ is the random variable which takes the value $a-2$ with probability $p$, $a+2$ with probability $p$ and $a$ with probability $1-2p$.  In this case $\mu_X = a$, so all we need to compute is $E\left[X^2\right]$.  This can readily be done:
+Let's look at our example where $X$ is the random variable which takes the value $a-2$ with probability $p$, $a+2$ with probability $p$ and $a$ with probability $1-2p$.  In this case $\mu_X = a$, so all we need to compute is $E\left[X^2\right]$.  This can readily be done:
 
 $$
 E\left[X^2\right] = (a-2)^2p + a^2(1-2p) + (a+2)p = a^2 + 8p.
@@ -215,7 +215,7 @@ We will list a few properties of variance below:
 * For any random variable $X$ and numbers $a$ and $b$, we have that $\mathrm{Var}(aX+b) = a^2\mathrm{Var}(X)$.
 * If we have two *independent* random variables $X$ and $Y$, we have $\mathrm{Var}(X+Y) = \mathrm{Var}(X) + \mathrm{Var}(Y)$.
 
-When interpreting these values, there can be a bit of a hiccup.  In particular, let us try imagining what happens if we keep track of units through this computation.  Suppose that we are working with the star rating assigned to a product on the web page.  Then $a$, $a-2$, and $a+2$ are all measured in units of stars.  Similarly, the mean $\mu_X$ is then also measured in stars (being a weighted average).  However, if we get to the variance, we immediately encounter an issue, which is we want to look at $(X-\mu_X)^2$, which is in units of *squared stars*.  This means that the variance itself is not comparable to the original measurements.  To make it interpretable, we will need to return to our original units.
+When interpreting these values, there can be a bit of a hiccup.  In particular, let's try imagining what happens if we keep track of units through this computation.  Suppose that we are working with the star rating assigned to a product on the web page.  Then $a$, $a-2$, and $a+2$ are all measured in units of stars.  Similarly, the mean $\mu_X$ is then also measured in stars (being a weighted average).  However, if we get to the variance, we immediately encounter an issue, which is we want to look at $(X-\mu_X)^2$, which is in units of *squared stars*.  This means that the variance itself is not comparable to the original measurements.  To make it interpretable, we will need to return to our original units.
 
 ### Standard Deviations
 
@@ -329,7 +329,7 @@ $$
 \sigma_X^2 = \int_{-\infty}^\infty x^2p(x) \; dx - \left(\frac{1}{2}\right)^2 = \frac{1}{3} - \frac{1}{4} = \frac{1}{12}.
 $$
 
-As a warning, let us examine one more example, known as the *Cauchy distribution*.  This is the distribution with p.d.f. given by
+As a warning, let's examine one more example, known as the *Cauchy distribution*.  This is the distribution with p.d.f. given by
 
 $$
 p(x) = \frac{1}{1+x^2}.
@@ -345,7 +345,7 @@ d2l.plot(x, p, 'x', 'p.d.f.')
 
 This function looks innocent, and indeed consulting a table of integrals will show it has area one under it, and thus it defines a continuous random variable.
 
-To see what goes astray, let us try to compute the variance of this.  This would involve using :eqref:`eq_var_def` computing
+To see what goes astray, let's try to compute the variance of this.  This would involve using :eqref:`eq_var_def` computing
 
 $$
 \int_{-\infty}^\infty \frac{x^2}{1+x^2}\; dx.
@@ -369,7 +369,7 @@ $$
 
 This means it does not have a well-defined finite variance.  
 
-However, looking deeper shows an even more disturbing result.  Let us try to compute the mean using :eqref:`eq_exp_def`.  Using the change of variables formula, we see
+However, looking deeper shows an even more disturbing result.  Let's try to compute the mean using :eqref:`eq_exp_def`.  Using the change of variables formula, we see
 
 $$
 \mu_X = \int_{-\infty}^{\infty} \frac{x}{1+x^2} \; dx = \frac{1}{2}\int_1^\infty \frac{1}{u} \; du. 
@@ -406,7 +406,7 @@ In this way, we can deal with multiple, potentially correlated random variables.
 ### Marginal Distributions
 When dealing with multiple variables, we often times want to be able to ignore the relationships and ask, "how is this one variable distributed?"  Such a distribution is called a *marginal distribution*.  
 
-To be concrete, let us suppose that we have two random variables $X, Y$ with joint density given by $p _ {X, Y}(x, y)$.  We will be using the subscript to indicate what random variables the density is for.  The question of finding the marginal distribution is taking this function, and using it to find $p _ X(x)$.
+To be concrete, let's suppose that we have two random variables $X, Y$ with joint density given by $p _ {X, Y}(x, y)$.  We will be using the subscript to indicate what random variables the density is for.  The question of finding the marginal distribution is taking this function, and using it to find $p _ X(x)$.
 
 As with most things, it is best to return to the intuitive picture to figure out what should be true.  Recall that the density is the function $p _ X$ so that
 
@@ -453,7 +453,7 @@ This tells us that to get a marginal distribution, we integrate over the variabl
 
 When dealing with multiple random variables, there is one additional summary statistic which is helpful to know: the *covariance*.  This measures the degree that two random variable fluctuate together.
 
-Suppose that we have two random variables $X$ and $Y$, to begin with, let us suppose they are discrete, taking on values $(x_i, y_j)$ with probability $p_{ij}$.  In this case, the covariance is defined as
+Suppose that we have two random variables $X$ and $Y$, to begin with, let's suppose they are discrete, taking on values $(x_i, y_j)$ with probability $p_{ij}$.  In this case, the covariance is defined as
 
 $$\sigma_{XY} = \mathrm{Cov}(X, Y) = \sum_{i, j} (x_i - \mu_X) (y_j-\mu_Y) p_{ij}. = E[XY] - E[X]E[Y].$$
 :eqlabel:`eq_cov_def`
@@ -469,7 +469,7 @@ P(X = 3 \; \text{and} \; Y = 3) & = \frac{p}{2},
 \end{aligned}
 $$
 
-where $p$ is a parameter in $[0,1]$ we get to pick.  Notice that if $p=1$ then they are both always their minimum or maximum values simultaneously, and if $p=0$ they are guaranteed to take their flipped values simultaneously (one is large when the other is small and vice versa).  If $p=1/2$, then the four possibilities are all equally likely, and neither should be related.  Let us compute the covariance.  First, note $\mu_X = 2$ and $\mu_Y = 1$, so we may compute using :eqref:`eq_cov_def`:
+where $p$ is a parameter in $[0,1]$ we get to pick.  Notice that if $p=1$ then they are both always their minimum or maximum values simultaneously, and if $p=0$ they are guaranteed to take their flipped values simultaneously (one is large when the other is small and vice versa).  If $p=1/2$, then the four possibilities are all equally likely, and neither should be related.  Let's compute the covariance.  First, note $\mu_X = 2$ and $\mu_Y = 1$, so we may compute using :eqref:`eq_cov_def`:
 
 $$
 \begin{aligned}
@@ -489,7 +489,7 @@ $$
 \sigma_{XY} = \int_{\mathbb{R}^2} (x-\mu_X)(y-\mu_Y)p(x, y) \;dx \;dy.
 $$
 
-For visualization, let us take a look at a collection of random variables with tunable covariance.
+For visualization, let's take a look at a collection of random variables with tunable covariance.
 
 ```{.python .input}
 # Plot a few random variables adjustable covariance
@@ -507,7 +507,7 @@ for i in range(3):
 d2l.plt.show()
 ```
 
-Let us see some properties of covariances:
+Let's see some properties of covariances:
 
 * For any random variable $X$, $\mathrm{Cov}(X, X) = \mathrm{Var}(X)$.
 * For any random variables $X, Y$ and numbers $a$ and $b$, $\mathrm{Cov}(aX+b, Y) = \mathrm{Cov}(X, aY+b) = a\mathrm{Cov}(X, Y)$.
@@ -529,9 +529,9 @@ This allows us to generalize the variance summation rule for correlated random v
 
 ### Correlation
 
-As we did in the case of means and variances, let us now consider units.  If $X$ is measured in one unit (say inches), and $Y$ is measured in another (say dollars), the covariance is measured in the product of these two units $\text{inches} \times \text{dollars}$.  These units can be hard to interpret.  What we will often want in this case is a unit-less measurement of relatedness.  Indeed, often we do not care about exact quantitative correlation, but rather ask if the correlation is in the same direction, and how strong the relationship is.  
+As we did in the case of means and variances, let's now consider units.  If $X$ is measured in one unit (say inches), and $Y$ is measured in another (say dollars), the covariance is measured in the product of these two units $\text{inches} \times \text{dollars}$.  These units can be hard to interpret.  What we will often want in this case is a unit-less measurement of relatedness.  Indeed, often we do not care about exact quantitative correlation, but rather ask if the correlation is in the same direction, and how strong the relationship is.  
 
-To see what makes sense, let us perform a thought experiment.  Suppose that we convert our random variables in inches and dollars to be in inches and cents.  In this case the random variable $Y$ is multiplied by $100$.  If we work through the definition, this means that $\mathrm{Cov}(X, Y)$ will be multiplied by $100$.  Thus we see that in this case a change of units change the covariance by a factor of $100$.  Thus, to find our unit-invariant measure of correlation, we will need to divide by something else that also gets scaled by $100$.  Indeed we have a clear candidate, the standard deviation!  Indeed if we define the *correlation coefficient* to be
+To see what makes sense, let's perform a thought experiment.  Suppose that we convert our random variables in inches and dollars to be in inches and cents.  In this case the random variable $Y$ is multiplied by $100$.  If we work through the definition, this means that $\mathrm{Cov}(X, Y)$ will be multiplied by $100$.  Thus we see that in this case a change of units change the covariance by a factor of $100$.  Thus, to find our unit-invariant measure of correlation, we will need to divide by something else that also gets scaled by $100$.  Indeed we have a clear candidate, the standard deviation!  Indeed if we define the *correlation coefficient* to be
 
 $$\rho(X, Y) = \frac{\mathrm{Cov}(X, Y)}{\sigma_{X}\sigma_{Y}},$$
 :eqlabel:`eq_cor_def`
@@ -560,7 +560,7 @@ $$
 
 Thus we see that the correlation is $+1$ for any $a > 0$, and $-1$ for any $a < 0$ illustrating that correlation measures the degree and directionality the two random variables are related, not the scale that the variation takes.
 
-Let us again plot a collection of random variables with tunable correlation.
+Let's again plot a collection of random variables with tunable correlation.
 
 ```{.python .input}
 # Plot a few random variables adjustable correlations
@@ -578,7 +578,7 @@ for i in range(3):
 d2l.plt.show()
 ```
 
-Let us list a few properties of the correlation below.
+Let's list a few properties of the correlation below.
 
 * For any random variable $X$, $\rho(X, X) = 1$.
 * For any random variables $X, Y$ and numbers $a$ and $b$, $\rho(aX+b, Y) = \rho(X, aY+b) = \rho(X, Y)$.

@@ -125,7 +125,7 @@ train_iter = gluon.data.DataLoader(mnist_train.transform_first(transformer),
                                    num_workers=get_dataloader_workers())
 ```
 
-Let us look at the time it takes to read the training data.
+Let's look at the time it takes to read the training data.
 
 ```{.python .input}
 timer = d2l.Timer()

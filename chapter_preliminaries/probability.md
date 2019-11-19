@@ -5,7 +5,7 @@ In some form or another, machine learning is all about making predictions.
 We might want to predict the *probability* of a patient suffering a heart attack in the next year, given their clinical history. In anomaly detection, we might want to assess how *likely* a set of readings from an airplane's jet engine would be, were it operating normally. In reinforcement learning, we want an agent to act intelligently in an environment. This means we need to think about the probability of getting a high reward under each of the available action. And when we build recommender systems we also need to think about probability. For example, say *hypothetically* that we worked for a large online bookseller. We might want to estimate the probability that a particular user would buy a particular book. For this we need to use the language of probability.
 Entire courses, majors, theses, careers, and even departments, are devoted to probability. So naturally, our goal in this section is not to teach the whole subject. Instead we hope to get you off the ground, to teach you just enough that you can start building your first deep learning models, and to give you enough of a flavor for the subject that you can begin to explore it on your own if you wish.
 
-We have already invoked probabilities in previous sections without articulating what precisely they are or giving a concrete example. Let us get more serious now by considering the first case: distinguishing cats and dogs based on photographs. This might sound simple but it is actually a formidable challenge. To start with, the difficulty of the problem may depend on the resolution of the image.
+We have already invoked probabilities in previous sections without articulating what precisely they are or giving a concrete example. Let's get more serious now by considering the first case: distinguishing cats and dogs based on photographs. This might sound simple but it is actually a formidable challenge. To start with, the difficulty of the problem may depend on the resolution of the image.
 
 ![Images of varying resolutions ($10 \times 10$, $20 \times 20$, $40 \times 40$, $80 \times 80$, and $160 \times 160$ pixels).](../img/cat_dog_pixels.png)
 :label:`fig_cat_dog`
@@ -36,9 +36,9 @@ For a real die that we receive from a factory, we might not know those proportio
 One natural approach for each value is to take the
 individual count for that value and to divide it by the total number of tosses.
 This gives us an *estimate* of the probability of a given *event*. The *law of
-large numbers* tell us that as the number of tosses grows this estimate will draw closer and closer to the true underlying probability. Before going into the details of what is going here, let us try it out.
+large numbers* tell us that as the number of tosses grows this estimate will draw closer and closer to the true underlying probability. Before going into the details of what is going here, let's try it out.
 
-To start, let us import the necessary packages.
+To start, let's import the necessary packages.
 
 ```{.python .input  n=1}
 %matplotlib inline
@@ -99,7 +99,7 @@ counts / 1000  # Reletive frequency as the estimate
 Because we generated the data from a fair die, we know that each outcome has true probability $\frac{1}{6}$, roughly $0.167$, so the above output estimates look good. 
 
 We can also visualize how these probabilities converge over time towards the true probability.
-Let us conduct $500$ groups of experiments where each group draws $10$ samples.
+Let's conduct $500$ groups of experiments where each group draws $10$ samples.
 
 ```{.python .input  n=6}
 counts = np.random.multinomial(10, fair_probs, size=500)
@@ -227,7 +227,7 @@ if and only if $P(A, B \mid C) = P(A \mid C)P(B \mid C)$. This is expressed as $
 ### Application
 :label:`subsec_probability_hiv_app`
 
-Let us put our skills to the test. Assume that a doctor administers an AIDS test to a patient. This test is fairly accurate and it fails only with $1\%$ probability if the patient is healthy but reporting him as diseased. Moreover,
+Let's put our skills to the test. Assume that a doctor administers an AIDS test to a patient. This test is fairly accurate and it fails only with $1\%$ probability if the patient is healthy but reporting him as diseased. Moreover,
 it never fails to detect HIV if the patient actually has it. We use $D_1$ to indicate the diagnosis ($1$ if positive and $0$ if negative) and $H$ to denote the HIV status ($1$ if positive and $0$ if negative).
 :numref:`conditional_prob_D1` lists such conditional probability.
 
@@ -239,7 +239,7 @@ it never fails to detect HIV if the patient actually has it. We use $D_1$ to ind
 |$P(D_1 = 0 \mid H)$|            0 |         0.99 |
 :label:`conditional_prob_D1`
 
-Note that the column sums are all $1$ (but the row sums are not), since the conditional probability needs to sum up to $1$, just like the probability. Let us work out the probability of the patient having AIDS if the test comes back positive, i.e., $P(H = 1 \mid D_1 = 1)$. Obviously this is going to depend on how common the disease is, since it affects the number of false alarms. Assume that the population is quite healthy, e.g., $P(H=1) = 0.0015$. To apply Bayes' Theorem, we need to apply marginalization and the multiplication rule to determine
+Note that the column sums are all $1$ (but the row sums are not), since the conditional probability needs to sum up to $1$, just like the probability. Let's work out the probability of the patient having AIDS if the test comes back positive, i.e., $P(H = 1 \mid D_1 = 1)$. Obviously this is going to depend on how common the disease is, since it affects the number of false alarms. Assume that the population is quite healthy, e.g., $P(H=1) = 0.0015$. To apply Bayes' Theorem, we need to apply marginalization and the multiplication rule to determine
 
 $$\begin{aligned}
 &P(D_1 = 1) \\
@@ -269,7 +269,7 @@ test has different characteristics and it is not as good as the first one, as sh
 |$P(D_2 = 0 \mid H)$|            0.02 |         0.97 |
 :label:`conditional_prob_D2`
 
-Unfortunately, the second test comes back positive, too. Let us work out the requisite probabilities to invoke Bayes' Theorem by assuming the conditional independence:
+Unfortunately, the second test comes back positive, too. Let's work out the requisite probabilities to invoke Bayes' Theorem by assuming the conditional independence:
 
 $$\begin{aligned}
 &P(D_1 = 1, D_2 = 1 \mid H = 0) \\

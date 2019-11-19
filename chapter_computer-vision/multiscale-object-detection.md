@@ -4,7 +4,7 @@ In :numref:`sec_anchor`, we generated multiple anchor boxes centered on each pix
 
 It is not difficult to reduce the number of anchor boxes.  An easy way is to apply uniform sampling on a small portion of pixels from the input image and generate anchor boxes centered on the sampled pixels. In addition, we can generate anchor boxes of varied numbers and sizes on multiple scales. Notice that smaller objects are more likely to be positioned on the image than larger ones.  Here, we will use a simple example: Objects with shapes of $1 \times 1$, $1 \times 2$, and $2 \times 2$ may have 4, 2, and 1 possible position(s) on an image with the shape $2 \times 2$. Therefore, when using smaller anchor boxes to detect smaller objects, we can sample more regions; when using larger anchor boxes to detect larger objects, we can sample fewer regions.
 
-To demonstrate how to generate anchor boxes on multiple scales, let us read an image first.  It has a height and width of 561 * 728 pixels.
+To demonstrate how to generate anchor boxes on multiple scales, let's read an image first.  It has a height and width of 561 * 728 pixels.
 
 ```{.python .input  n=1}
 %matplotlib inline

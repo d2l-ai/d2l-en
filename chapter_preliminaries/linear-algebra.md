@@ -2,7 +2,7 @@
 :label:`sec_linear-algebra`
 
 Now that you can store and manipulate data,
-let us briefly review the subset of basic linear algebra
+let's briefly review the subset of basic linear algebra
 that you will need to understand and implement
 most of models covered in this book.
 Below, we introduce the basic mathematical objects, arithmetic,
@@ -107,7 +107,7 @@ x[3]
 
 ### Length, Dimensionality, and Shape
 
-Let us revisit some concepts from :numref:`sec_ndarray`.
+Let's revisit some concepts from :numref:`sec_ndarray`.
 A vector is just an array of numbers.
 And just as every array has a length, so does every vector.
 In math notation, if we want to say that a vector $\mathbf{x}$
@@ -416,7 +416,7 @@ we can begin to understand *matrix-vector products*.
 Recall the matrix $\mathbf{A} \in \mathbb{R}^{m \times n}$
 and the vector $\mathbf{x} \in \mathbb{R}^n$
 defined and visualized in :eqref:`eq_matrix_def` and :eqref:`eq_vec_def` respectively.
-Let us start off by visualizing the matrix $\mathbf{A}$ in terms of its row vectors
+Let's start off by visualizing the matrix $\mathbf{A}$ in terms of its row vectors
 
 $$\mathbf{A}=
 \begin{bmatrix}

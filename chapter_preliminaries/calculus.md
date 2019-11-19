@@ -72,7 +72,7 @@ The so-called instantaneous rate of change is based on
 the variation $h$ in $x$, which approaches $0$.
 
 To illustrate derivatives,
-let us experiment with an example.
+let's experiment with an example.
 Define $u = f(x) = 3x^2-4x$.
 
 ```{.python .input}
@@ -102,7 +102,7 @@ for i in range(5):
     h *= 0.1
 ```
 
-Let us familiarize ourselves with a few equivalent notations for derivatives.
+Let's familiarize ourselves with a few equivalent notations for derivatives.
 Given $y = f(x)$, where $x$ and $y$ are the independent variable and the dependent variable of the function $f$, respectively. The following expressions are equivalent:
 
 $$f'(x) = y' = \frac{dy}{dx} = \frac{df}{dx} = \frac{d}{dx} f(x) = Df(x) = D_x f(x),$$
@@ -274,12 +274,12 @@ This is because multivariate functions in deep learning are often *composite*,
 so we may not apply any of the aforementioned rules to differentiate these functions.
 Fortunately, the *chain rule* enables us to differentiate composite functions.
 
-Let us first consider functions of a single variable.
+Let's first consider functions of a single variable.
 Suppose that functions $y=f(u)$ and $u=g(x)$ are both differentiable, then the chain rule states that
 
 $$\frac{dy}{dx} = \frac{dy}{du} \frac{du}{dx}.$$
 
-Now let us turn our attention to a more general scenario
+Now let's turn our attention to a more general scenario
 where functions have an arbitrary number of variables.
 Suppose that the differentiable function $y$ has variables
 $u_1, u_2, \ldots, u_m$, where each differentiable function $u_i$

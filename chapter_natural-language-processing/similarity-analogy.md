@@ -13,7 +13,7 @@ subsequent sections.
 
 MXNet's `contrib.text` package provides functions and classes related to natural
 language processing (see the [GluonNLP](https://gluon-nlp.mxnet.io/) tool package for more details). Next,
-let us check out names of the provided pre-trained word embeddings.
+let's check out names of the provided pre-trained word embeddings.
 
 ```{.python .input}
 from mxnet import np, npx

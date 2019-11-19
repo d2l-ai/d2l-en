@@ -118,7 +118,7 @@ and the gradient of the loss function for each example can also be taken in para
 GPUs allow us to process hundreds of examples in scarcely more time
 than it might take to process just a single example.
 
-To build some intuition, let us read and print
+To build some intuition, let's read and print
 the first small batch of data examples.
 The shape of the features in each minibatch tells us
 both the minibatch size and the number of input features.
