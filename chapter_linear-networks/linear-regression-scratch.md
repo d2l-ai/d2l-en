@@ -105,8 +105,8 @@ def data_iter(batch_size, features, labels):
     # The examples are read at random, in no particular order
     random.shuffle(indices)
     for i in range(0, num_examples, batch_size):
-        batch_indices = \
-            np.array(indices[i: min(i + batch_size, num_examples)])
+        batch_indices = np.array(
+            indices[i: min(i + batch_size, num_examples)])
         yield features[batch_indices], labels[batch_indices]
 ```
 
