@@ -9,7 +9,6 @@ stage("Build and Publish") {
 
       sh label: "Build Environment", script: """set -ex
       rm -rf ~/miniconda3/envs/${ENV_NAME}
-      rm -rf _build/rst
       conda create -n ${ENV_NAME} pip python=3.7 -y
       conda activate ${ENV_NAME}
       pip install mxnet-cu101==1.6.0b20190915
