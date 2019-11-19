@@ -109,7 +109,7 @@ for i in range(8, 10):
     print('indices:', vocab[tokens[i]])
 ```
 
-## Putting Things Together
+## Putting All Things Together
 
 Using the above functions, we package everything into the `load_corpus_time_machine` function, which returns `corpus`, a list of token indices, and `vocab`, the vocabulary of the time machine corpus. The modification we did here is that `corpus` is a single list, not a list of token lists, since we do not keep the sequence information in the following models. Besides, we use character tokens to simplify the training in later sections.
 

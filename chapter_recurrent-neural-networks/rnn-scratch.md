@@ -225,11 +225,15 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, ctx,
         trainer = gluon.Trainer(model.collect_params(),
                                 'sgd', {'learning_rate': lr})
 
-        def updater(batch_size): return trainer.step(batch_size)
+        def updater(batch_size):
+            return trainer.step(batch_size)
     else:
-        def updater(batch_size): return d2l.sgd(model.params, lr, batch_size)
+        def updater(batch_size):
+            return d2l.sgd(model.params, lr, batch_size)
 
-    def predict(prefix): return predict_ch8(prefix, 50, model, vocab, ctx)
+    def predict(prefix):
+        return predict_ch8(prefix, 50, model, vocab, ctx)
+
     # Train and check the progress.
     for epoch in range(num_epochs):
         ppl, speed = train_epoch_ch8(
