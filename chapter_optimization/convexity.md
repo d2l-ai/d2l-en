@@ -103,7 +103,7 @@ $$f(x) > \lambda f(x) + (1-\lambda) f(x') \geq f(\lambda x + (1-\lambda) x').$$
 This contradicts the assumption that $f(x)$ is a local minimum. For instance, the function $f(x) = (x+1) (x-1)^2$ has a local minimum for $x=1$. However, it is not a global minimum.
 
 ```{.python .input}
-def f(x): 
+def f(x):
     return (x-1)**2 * (x+1)
 
 d2l.set_figsize((3.5, 2.5))

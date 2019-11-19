@@ -293,7 +293,7 @@ class FancyMLP(nn.Block):
 
     def forward(self, x):
         x = self.dense(x)
-        # Use the constant parameters created, as well as the relu 
+        # Use the constant parameters created, as well as the relu
         # and dot functions
         x = npx.relu(np.dot(x, self.rand_weight.data()) + 1)
         # Reuse the fully connected layer. This is equivalent to sharing

@@ -45,7 +45,7 @@ Many of the GANs applications are in the context of images. As a demonstration p
 ```{.python .input  n=1}
 %matplotlib inline
 import d2l
-from mxnet import np, npx, gluon, autograd, init
+from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
 npx.set_np()
 ```
@@ -159,14 +159,14 @@ def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
             batch_size = X.shape[0]
             Z = np.random.normal(0, 1, size=(batch_size, latent_dim))
             metric.add(update_D(X, Z, net_D, net_G, loss, trainer_D),
-                        update_G(Z, net_D, net_G, loss, trainer_G),
-                        batch_size)
+                       update_G(Z, net_D, net_G, loss, trainer_G),
+                       batch_size)
         # Visualize generated examples
         Z = np.random.normal(0, 1, size=(100, latent_dim))
         fake_X = net_G(Z).asnumpy()
         animator.axes[1].cla()
-        animator.axes[1].scatter(data[:,0], data[:,1])
-        animator.axes[1].scatter(fake_X[:,0], fake_X[:,1])
+        animator.axes[1].scatter(data[:, 0], data[:, 1])
+        animator.axes[1].scatter(fake_X[:, 0], fake_X[:, 1])
         animator.axes[1].legend(['real', 'generated'])
         # Show the losses
         loss_D, loss_G = metric[0]/metric[2], metric[1]/metric[2]

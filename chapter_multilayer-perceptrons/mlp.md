@@ -312,7 +312,7 @@ We plot the tanh function blow. Note that as the input nears 0, the tanh functio
 
 ```{.python .input  n=6}
 with autograd.record():
-    y = np.tanh(x)  
+    y = np.tanh(x)
 d2l.plot(x, y, 'x', 'tanh(x)')
 ```
 

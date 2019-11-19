@@ -173,11 +173,11 @@ def seq_data_iter_random(corpus, batch_size, num_steps):
     num_examples = ((len(corpus) - 1) // num_steps)
     example_indices = list(range(0, num_examples * num_steps, num_steps))
     random.shuffle(example_indices)
-    
+
     def data(pos):
         # This returns a sequence of the length num_steps starting from pos
         return corpus[pos: pos + num_steps]
-    
+
     # Discard half empty batches
     num_batches = num_examples // batch_size
     for i in range(0, batch_size * num_batches, batch_size):
@@ -214,8 +214,8 @@ def seq_data_iter_consecutive(corpus, batch_size, num_steps):
     Xs, Ys = Xs.reshape(batch_size, -1), Ys.reshape(batch_size, -1)
     num_batches = Xs.shape[1] // num_steps
     for i in range(0, num_batches * num_steps, num_steps):
-        X = Xs[:,i:(i+num_steps)]
-        Y = Ys[:,i:(i+num_steps)]
+        X = Xs[:, i:(i+num_steps)]
+        Y = Ys[:, i:(i+num_steps)]
         yield X, Y
 ```
 

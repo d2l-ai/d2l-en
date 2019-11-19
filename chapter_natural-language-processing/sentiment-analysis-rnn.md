@@ -36,7 +36,7 @@ layer, the `LSTM` instance is the hidden layer for sequence encoding, and the
 
 ```{.python .input  n=46}
 class BiRNN(nn.Block):
-    def __init__(self, vocab_size, embed_size, num_hiddens, 
+    def __init__(self, vocab_size, embed_size, num_hiddens,
                  num_layers, **kwargs):
         super(BiRNN, self).__init__(**kwargs)
         self.embedding = nn.Embedding(vocab_size, embed_size)

@@ -36,8 +36,8 @@ ctx = d2l.try_gpu()
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)
 
-# The code is almost identical to "d2l.train_ch5" that defined in the lenet 
-# section of chapter convolutional neural networks 
+# The code is almost identical to "d2l.train_ch5" that defined in the lenet
+# section of chapter convolutional neural networks
 def train(net, train_iter, test_iter, num_epochs, loss, trainer, ctx):
     net.initialize(force_reinit=True, ctx=ctx, init=init.Xavier())
     animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs],
@@ -84,8 +84,9 @@ More generally we want to define a scheduler. When invoked with the number of up
 
 ```{.python .input}
 class SquareRootScheduler(object):
-    def __init__(self, lr = 0.1):
+    def __init__(self, lr=0.1):
         self.lr = lr
+
     def __call__(self, num_update):
         return self.lr * pow(num_update + 1.0, -0.5)
 ```
@@ -97,7 +98,7 @@ scheduler = SquareRootScheduler(lr=1.0)
 d2l.plot(np.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
 ```
 
-Now let's see how this plays out for training on FashionMNIST. We simply provide the scheduler as an additional argument to the training algorithm. 
+Now let's see how this plays out for training on FashionMNIST. We simply provide the scheduler as an additional argument to the training algorithm.
 
 ```{.python .input}
 trainer = gluon.Trainer(net.collect_params(), 'sgd',
@@ -121,11 +122,13 @@ class FactorScheduler(object):
         self.factor = factor
         self.stop_factor_lr = stop_factor_lr
         self.base_lr = base_lr
+
     def __call__(self, num_update):
         self.base_lr = max(self.stop_factor_lr, self.base_lr * self.factor)
         return self.base_lr
 
-scheduler = FactorScheduler(factor = 0.9, stop_factor_lr=1e-2, base_lr=2.0)
+
+scheduler = FactorScheduler(factor=0.9, stop_factor_lr=1e-2, base_lr=2.0)
 d2l.plot(np.arange(50), [scheduler(t) for t in range(50)])
 ```
 
