@@ -32,8 +32,11 @@ import d2l
 from mxnet import np, npx
 npx.set_np()
 
-def f(x): return x**2  # Objective function
-def gradf(x): return 2 * x  # Its derivative
+def f(x):
+    return x**2  # Objective function
+
+def gradf(x):
+    return 2 * x  # Its derivative
 ```
 
 Next, we use $x=10$ as the initial value and assume $\eta=0.2$. Using gradient descent to iterate $x$ for 10 times we can see that, eventually, the value of $x$ approaches the optimal solution.
@@ -86,9 +89,11 @@ To illustrate what happens for nonconvex functions consider the case of $f(x) = 
 ```{.python .input}
 c = 0.15 * np.pi
 
-def f(x): return x * np.cos(c * x)
+def f(x): 
+    return x * np.cos(c * x)
 
-def gradf(x): return np.cos(c * x) - c * x * np.sin(c * x)
+def gradf(x): 
+    return np.cos(c * x) - c * x * np.sin(c * x)
 
 show_trace(gd(2))
 ```
