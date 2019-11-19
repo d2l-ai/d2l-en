@@ -38,6 +38,7 @@ Next, we initialize the model parameters for a RNN model. The number of hidden u
 ```{.python .input  n=19}
 def get_params(vocab_size, num_hiddens, ctx):
     num_inputs = num_outputs = vocab_size
+
     def normal(shape):
         return np.random.normal(scale=0.01, size=shape, ctx=ctx)
     # Hidden layer parameters
@@ -88,6 +89,7 @@ Now we have all functions defined, next we create a class to wrap these function
 # Saved in the d2l package for later use
 class RNNModelScratch(object):
     """A RNN Model based on scratch implementations"""
+
     def __init__(self, vocab_size, num_hiddens, ctx,
                  get_params, init_state, forward):
         self.vocab_size, self.num_hiddens = vocab_size, num_hiddens
@@ -124,7 +126,8 @@ We first explain the predicting function so we can regularly check the predictio
 def predict_ch8(prefix, num_predicts, model, vocab, ctx):
     state = model.begin_state(batch_size=1, ctx=ctx)
     outputs = [vocab[prefix[0]]]
-    def get_input(): 
+
+    def get_input():
         return np.array([outputs[-1]], ctx=ctx).reshape(1, 1)
     for y in prefix[1:]:  # Warmup state with prefix
         _, state = model(get_input(), state)
