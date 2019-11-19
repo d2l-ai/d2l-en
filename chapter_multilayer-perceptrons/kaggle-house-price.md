@@ -143,8 +143,8 @@ $$x \leftarrow \frac{x - \mu}{\sigma}$$
 
 To check that this transforms $x$ to data
 with zero mean and unit variance simply calculate
-$\mathbf{E}[(x-\mu)/\sigma] = (\mu - \mu)/\sigma = 0$.
-To check the variance we use $\mathbf{E}[(x-\mu)^2] = \sigma^2$
+$E[(x-\mu)/\sigma] = (\mu - \mu)/\sigma = 0$.
+To check the variance we use $E[(x-\mu)^2] = \sigma^2$
 and thus the transformed variable has unit variance.
 The reason for 'normalizing' the data is that
 it brings all features to the same order of magnitude.
