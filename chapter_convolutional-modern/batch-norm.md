@@ -212,7 +212,7 @@ Below, we implement a batch normalization layer with `ndarray`s from scratch:
 
 ```{.python .input  n=72}
 import d2l
-from mxnet import autograd, gluon, np, npx, init
+from mxnet import autograd, np, npx, init
 from mxnet.gluon import nn
 npx.set_np()
 
@@ -266,11 +266,11 @@ Typically, we define the math in a separate function, say `batch_norm`.
 We then integrate this functionality into a custom layer,
 whose code mostly addresses bookkeeping matters,
 such as moving data to the right device context,
-allocating and initializaing any required variables,
+allocating and initializing any required variables,
 keeping track of running averages (here for mean and variance), etc.
 This pattern enables a clean separation of math from boilerplate code.
 Also note that for the sake of convenience
-we did not worry about automagically inferring the input shape here,
+we did not worry about automatically inferring the input shape here,
 thus our need to specify the number of features throughout.
 Do not worry, the Gluon `BatchNorm` layer will care of this for us.
 
@@ -304,7 +304,7 @@ class BatchNorm(nn.Block):
         return Y
 ```
 
-## Use a Batch Normalization LeNet
+## Using a Batch Normalization LeNet
 
 To see how to apply `BatchNorm` in context, 
 below we apply it to a traditional LeNet model (:numref:`sec_lenet`).
@@ -420,7 +420,7 @@ Throughout this book, we aim to convey the intuitions that practitioners
 use to guide their development of deep neural networks.
 However, we believe that it is important 
 to separate these guiding intuitions
-from established sceintific fact.
+from established scientific fact.
 Eventually, when you master this material
 and start writing your own research papers
 you will want to be clear to delineate

@@ -31,10 +31,12 @@ or as a fully-connected layer acting independently on each pixel location.
 Another way to view this is to think of each element in the spatial dimension
 (height and width) as equivalent to an example
 and the channel as equivalent to a feature.
-The figure below illustrates the main structural differences
+:numref:`fig_nin` illustrates the main structural differences
 between NiN and AlexNet, VGG, and other networks.
 
 ![The figure on the left shows the network structure of AlexNet and VGG, and the figure on the right shows the network structure of NiN. ](../img/nin.svg)
+:label:`fig_nin`
+
 
 The NiN block consists of one convolutional layer
 followed by two $1\times 1$ convolutional layers that act as
@@ -44,13 +46,14 @@ The subsequent widths are fixed to $1 \times 1$.
 
 ```{.python .input  n=2}
 import d2l
-from mxnet import gluon, np, npx
+from mxnet import np, npx
 from mxnet.gluon import nn
 npx.set_np()
 
 def nin_block(num_channels, kernel_size, strides, padding):
     blk = nn.Sequential()
-    blk.add(nn.Conv2D(num_channels, kernel_size, strides, padding, activation='relu'),
+    blk.add(nn.Conv2D(num_channels, kernel_size, strides, padding, 
+                      activation='relu'),
             nn.Conv2D(num_channels, kernel_size=1, activation='relu'),
             nn.Conv2D(num_channels, kernel_size=1, activation='relu'))
     return blk
