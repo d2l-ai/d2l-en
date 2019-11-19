@@ -138,12 +138,14 @@ def show_trace_2d(f, results):
 Next, we observe the trajectory of the optimization variable $\mathbf{x}$ for learning rate $\eta = 0.1$. We can see that after 20 steps the value of $\mathbf{x}$ approaches its minimum at $[0, 0]$. Progress is fairly well-behaved albeit rather slow.
 
 ```{.python .input  n=15}
-def f(x1, x2): return x1 ** 2 + 2 * x2 ** 2   # Objective
+def f(x1, x2):
+    return x1 ** 2 + 2 * x2 ** 2  # Objective
 
-def gradf(x1, x2): return (2 * x1, 4 * x2)    # Gradient
+def gradf(x1, x2):
+    return (2 * x1, 4 * x2)  # Gradient
 
 def gd(x1, x2, s1, s2):
-    (g1, g2) = gradf(x1, x2)                  # Compute gradient
+    (g1, g2) = gradf(x1, x2)  # Compute gradient
     return (x1 - eta * g1, x2 - eta * g2, 0, 0)  # Update variables
 
 eta = 0.1
@@ -175,12 +177,18 @@ For $f(x) = \frac{1}{2} x^2$ we have $\nabla f(x) = x$ and $H_f = 1$. Hence for 
 
 ```{.python .input}
 c = 0.5
-def f(x):     return np.cosh(c * x)        # Objective
-def gradf(x): return c * np.sinh(c * x)    # Derivative
-def hessf(x): return c**2 * np.cosh(c * x) # Hessian
+
+def f(x):
+    return np.cosh(c * x)  # Objective
+
+def gradf(x):
+    return c * np.sinh(c * x)  # Derivative
+
+def hessf(x):
+    return c**2 * np.cosh(c * x)  # Hessian
 
 # Hide learning rate for now
-def newton(eta = 1):
+def newton(eta=1):
     x = 10
     results = [x]
     for i in range(10):
@@ -196,9 +204,15 @@ Now let us see what happens when we have a *nonconvex* function, such as $f(x) =
 
 ```{.python .input}
 c = 0.15 * np.pi
-def f(x): return x * np.cos(c * x)
-def gradf(x): return np.cos(c * x) - c * x * np.sin(c * x)
-def hessf(x): return - 2 * c * np.sin(c * x) - x * c**2 * np.cos(c * x)
+
+def f(x): 
+    return x * np.cos(c * x)
+
+def gradf(x): 
+    return np.cos(c * x) - c * x * np.sin(c * x)
+
+def hessf(x): 
+    return - 2 * c * np.sin(c * x) - x * c**2 * np.cos(c * x)
 
 show_trace(newton())
 ```

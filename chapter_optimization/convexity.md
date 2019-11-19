@@ -49,9 +49,14 @@ npx.set_np()
 Let us define a few functions, both convex and nonconvex.
 
 ```{.python .input}
-def f(x): return 0.5 * x**2        # convex
-def g(x): return np.cos(np.pi * x)  # nonconvex
-def h(x): return np.exp(0.5 * x)   # convex
+def f(x):
+    return 0.5 * x**2  # Convex
+
+def g(x):
+    return np.cos(np.pi * x)  # Nonconvex
+
+def h(x):
+    return np.exp(0.5 * x)  # Convex
 
 x, segment = np.arange(-2, 2, 0.01), np.array([-1.5, 1])
 d2l.use_svg_display()
@@ -94,7 +99,9 @@ $$f(x) > \lambda f(x) + (1-\lambda) f(x') \geq f(\lambda x + (1-\lambda) x').$$
 This contradicts the assumption that $f(x)$ is a local minimum. For instance, the function $f(x) = (x+1) (x-1)^2$ has a local minimum for $x=1$. However, it is not a global minimum.
 
 ```{.python .input}
-def f(x): return (x-1)**2 * (x+1)
+def f(x): 
+    return (x-1)**2 * (x+1)
+
 d2l.set_figsize((3.5, 2.5))
 d2l.plot([x, segment], [f(x), f(segment)], 'x', 'f(x)')
 ```
@@ -112,8 +119,8 @@ Such sets are convex. Let us prove this quickly. Remember that for any $x, x' \i
 Have a look at the function $f(x, y) = 0.5 x^2 + \cos(2 \pi y)$ below. It is clearly nonconvex. The level sets are correspondingly nonconvex. In fact, they are typically composed of disjoint sets.
 
 ```{.python .input}
-x, y = np.meshgrid(np.linspace(-1, 1, 101),
-                   np.linspace(-1, 1, 101), indexing='ij')
+x, y = np.meshgrid(np.linspace(-1, 1, 101), np.linspace(-1, 1, 101),
+                   indexing='ij')
 
 z = x**2 + 0.5 * np.cos(2 * np.pi * y)
 
@@ -161,8 +168,11 @@ $$\begin{aligned}
 By geometry it follows that $f(x)$ is below the line connecting $f(a)$ and $f(b)$, thus proving convexity. We omit a more formal derivation in favor of a graph below.
 
 ```{.python .input}
-def f(x): return 0.5 * x**2        
-x, axb, ab = np.arange(-2, 2, 0.01), np.array([-1.5, -0.5, 1]), np.array([-1.5, 1])
+def f(x):
+    return 0.5 * x**2
+
+x = np.arange(-2, 2, 0.01)
+axb, ab = np.array([-1.5, -0.5, 1]), np.array([-1.5, 1])
 
 d2l.set_figsize((3.5, 2.5))
 d2l.plot([x, axb, ab], [f(x) for x in [x, axb, ab]], 'x', 'f(x)')
