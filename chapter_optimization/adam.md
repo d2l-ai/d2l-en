@@ -93,8 +93,8 @@ def yogi(params, states, hyperparams):
     beta1, beta2, eps = 0.9, 0.999, 1e-3
     for p, (v, s) in zip(params, states):
         v[:] = beta1 * v + (1 - beta1) * p.grad
-        s[:] = s + (1 - beta2) * np.sign(np.square(p.grad) - s) * \
-            np.square(p.grad)
+        s[:] = s + (1 - beta2) * np.sign(
+            np.square(p.grad) - s) * np.square(p.grad)
         v_bias_corr = v / (1 - beta1 ** hyperparams['t'])
         s_bias_corr = s / (1 - beta2 ** hyperparams['t'])
         p[:] -= hyperparams['lr'] * v_bias_corr / (np.sqrt(s_bias_corr) + eps)

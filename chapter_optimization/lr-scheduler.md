@@ -36,7 +36,6 @@ ctx = d2l.try_gpu()
 batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size=batch_size)
 
-# the code is almost identical to that of chapter 5
 def train(net, train_iter, test_iter, num_epochs, loss, trainer, ctx):
     net.initialize(force_reinit=True, ctx=ctx, init=init.Xavier())
     animator = d2l.Animator(xlabel='epoch', xlim=[0,num_epochs],

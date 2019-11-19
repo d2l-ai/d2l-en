@@ -34,7 +34,7 @@ def init_adadelta_states(feature_dim):
 def adadelta(params, states, hyperparams):
     rho, eps = hyperparams['rho'], 1e-5
     for p, (s, delta) in zip(params, states):
-        # in-place updates via [:]
+        # In-place updates via [:]
         s[:] = rho * s + (1 - rho) * np.square(p.grad)
         g = (np.sqrt(delta + eps) / np.sqrt(s + eps)) * p.grad
         p[:] -= g

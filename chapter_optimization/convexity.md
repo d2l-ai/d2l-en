@@ -1,10 +1,11 @@
 # Convexity
 :label:`sec_convexity`
 
-Convexity plays a vital role in the design of optimization algorithms. This is largely due to the fact that it is much easier to analyze and test algorithms in this context. In other words, if the algorithm performs poorly even in the convex setting we should not hope to see great results otherwise. Furthermore, even though the optimization problems in deep learning are generally nonconvex, they often exhibit some properties of convex ones near local minima. This can lead to exciting new optimization variants such as :cite:`Izmailov.Podoprikhin.Garipov.ea.2018`. Let us begin with the basics.
+Convexity plays a vital role in the design of optimization algorithms. This is largely due to the fact that it is much easier to analyze and test algorithms in this context. In other words, if the algorithm performs poorly even in the convex setting we should not hope to see great results otherwise. Furthermore, even though the optimization problems in deep learning are generally nonconvex, they often exhibit some properties of convex ones near local minima. This can lead to exciting new optimization variants such as :cite:`Izmailov.Podoprikhin.Garipov.ea.2018`. 
 
 ## Basics
 
+Let us begin with the basics.
 
 ### Sets
 
@@ -89,6 +90,9 @@ This is used in variational methods. Here $y$ is typically the unobserved random
 
 
 ## Properties
+
+Convex functions have a few useful properties. We describe them as follows.
+
 
 ### No Local Minima
 

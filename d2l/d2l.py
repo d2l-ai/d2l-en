@@ -926,7 +926,7 @@ def annotate(text, xy, xytext):
 # Defined in file: ./chapter_optimization/gd.md
 def train_2d(trainer, steps=20):
     """Optimize a 2-dim objective function with a customized trainer."""
-    # s1 and s2 are internal state variables and will 
+    # s1 and s2 are internal state variables and will
     # be used later in the chapter
     x1, x2, s1, s2 = -5, -2, 0, 0
     results = [(x1, x2)]
@@ -950,9 +950,11 @@ def show_trace_2d(f, results):
 
 # Defined in file: ./chapter_optimization/minibatch-sgd.md
 def get_data_ch10(batch_size=10, n=1500):
-    data = np.genfromtxt('../data/airfoil_self_noise.dat', dtype=np.float32, delimiter='\t')
+    data = np.genfromtxt('../data/airfoil_self_noise.dat',
+                         dtype=np.float32, delimiter='\t')
     data = (data - data.mean(axis=0)) / data.std(axis=0)
-    data_iter = d2l.load_array((data[:n, :-1], data[:n, -1]), batch_size, is_train=True)
+    data_iter = d2l.load_array(
+        (data[:n, :-1], data[:n, -1]), batch_size, is_train=True)
     return data_iter, data.shape[1]-1
 
 
@@ -981,7 +983,7 @@ def train_ch10(trainer_fn, states, hyperparams, data_iter,
                 animator.add(n/X.shape[0]/len(data_iter),
                              (d2l.evaluate_loss(net, data_iter, loss),))
                 timer.start()
-    print('loss: %.3f, %.3f sec/epoch'%(animator.Y[0][-1], timer.avg()))
+    print('loss: %.3f, %.3f sec/epoch' % (animator.Y[0][-1], timer.avg()))
     return timer.cumsum(), animator.Y[0]
 
 
@@ -1008,7 +1010,7 @@ def train_gluon_ch10(tr_name, hyperparams, data_iter, num_epochs=2):
                 animator.add(n/X.shape[0]/len(data_iter),
                              (d2l.evaluate_loss(net, data_iter, loss),))
                 timer.start()
-    print('loss: %.3f, %.3f sec/epoch'%(animator.Y[0][-1], timer.avg()))
+    print('loss: %.3f, %.3f sec/epoch' % (animator.Y[0][-1], timer.avg()))
 
 
 # Defined in file: ./chapter_computational-performance/multiple-gpus.md
