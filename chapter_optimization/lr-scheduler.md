@@ -97,7 +97,7 @@ scheduler = SquareRootScheduler(lr=1.0)
 d2l.plot(np.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
 ```
 
-Now let's see how this plays out for training on FashionMNIST. We simply provide the scheduler as an additional argument to the training algorithm. To be constant with the previous toy model, we will continuously using stochastic gradient descent `sgd` as the optimizer. In practice, you can always explore other optimizers as we introduced before, such as `adam`.
+Now let's see how this plays out for training on FashionMNIST. We simply provide the scheduler as an additional argument to the training algorithm. 
 
 ```{.python .input}
 trainer = gluon.Trainer(net.collect_params(), 'sgd',
@@ -155,7 +155,7 @@ A rather perplexing heuristic was proposed by :cite:`Loshchilov.Hutter.2016`. It
 
 $$\eta_t = \eta_T + \frac{\eta_0 - \eta_T}{2} \left(1 + \cos(\pi t/T)\right)$$
 
-Here $\eta_0$ is the initial learning rate, $\eta_T$ is the target rate at time $T$. Furthermore, for $t > T$ we simply pin the value to $\eta_T$ without increasing it again. In the following example, we set the max update step, $T = 40$.
+Here $\eta_0$ is the initial learning rate, $\eta_T$ is the target rate at time $T$. Furthermore, for $t > T$ we simply pin the value to $\eta_T$ without increasing it again. In the following example, we set the max update step $T = 40$.
 
 ```{.python .input}
 scheduler = lr_scheduler.CosineScheduler(max_update=40, base_lr=0.5,
