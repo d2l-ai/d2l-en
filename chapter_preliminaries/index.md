@@ -51,8 +51,7 @@ further reviewing :numref:`chap_appendix_math` should be sufficient.
 
 ndarray
 pandas
-scalar-tensor
-reduction-norm
+linear-algebra
 calculus
 autograd
 probability

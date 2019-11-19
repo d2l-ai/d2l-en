@@ -21,7 +21,6 @@
 <rect shape-rendering="optimizeSpeed"  x="12" y="14" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="24" y="14" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="28" y="14" width="2" height="2" fill="black" />
-<rect shape-rendering="optimizeSpeed"  x="32" y="14" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="36" y="14" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="44" y="14" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="48" y="14" width="2" height="2" fill="black" />
@@ -32,8 +31,6 @@
 <rect shape-rendering="optimizeSpeed"  x="20" y="16" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="24" y="16" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="30" y="16" width="2" height="2" fill="black" />
-<rect shape-rendering="optimizeSpeed"  x="32" y="16" width="2" height="2" fill="black" />
-<rect shape-rendering="optimizeSpeed"  x="34" y="16" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="36" y="16" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="38" y="16" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="40" y="16" width="2" height="2" fill="black" />
@@ -77,7 +74,6 @@
 <rect shape-rendering="optimizeSpeed"  x="28" y="22" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="30" y="22" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="32" y="22" width="2" height="2" fill="black" />
-<rect shape-rendering="optimizeSpeed"  x="36" y="22" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="38" y="22" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="40" y="22" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="48" y="22" width="2" height="2" fill="black" />
@@ -103,7 +99,7 @@
 <rect shape-rendering="optimizeSpeed"  x="60" y="24" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="28" y="26" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="32" y="26" width="2" height="2" fill="black" />
-<rect shape-rendering="optimizeSpeed"  x="36" y="26" width="2" height="2" fill="black" />
+<rect shape-rendering="optimizeSpeed"  x="34" y="26" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="42" y="26" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="44" y="26" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="12" y="28" width="2" height="2" fill="black" />
@@ -122,8 +118,12 @@
 <rect shape-rendering="optimizeSpeed"  x="52" y="28" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="58" y="28" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="60" y="28" width="2" height="2" fill="black" />
+<rect shape-rendering="optimizeSpeed"  x="14" y="30" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="16" y="30" width="2" height="2" fill="black" />
+<rect shape-rendering="optimizeSpeed"  x="18" y="30" width="2" height="2" fill="black" />
+<rect shape-rendering="optimizeSpeed"  x="20" y="30" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="22" y="30" width="2" height="2" fill="black" />
+<rect shape-rendering="optimizeSpeed"  x="28" y="30" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="30" y="30" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="34" y="30" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="42" y="30" width="2" height="2" fill="black" />
@@ -132,10 +132,8 @@
 <rect shape-rendering="optimizeSpeed"  x="54" y="30" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="58" y="30" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="60" y="30" width="2" height="2" fill="black" />
-<rect shape-rendering="optimizeSpeed"  x="12" y="32" width="2" height="2" fill="black" />
-<rect shape-rendering="optimizeSpeed"  x="14" y="32" width="2" height="2" fill="black" />
-<rect shape-rendering="optimizeSpeed"  x="20" y="32" width="2" height="2" fill="black" />
-<rect shape-rendering="optimizeSpeed"  x="22" y="32" width="2" height="2" fill="black" />
+<rect shape-rendering="optimizeSpeed"  x="16" y="32" width="2" height="2" fill="black" />
+<rect shape-rendering="optimizeSpeed"  x="18" y="32" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="24" y="32" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="28" y="32" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="34" y="32" width="2" height="2" fill="black" />
@@ -149,9 +147,9 @@
 <rect shape-rendering="optimizeSpeed"  x="60" y="32" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="12" y="34" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="16" y="34" width="2" height="2" fill="black" />
-<rect shape-rendering="optimizeSpeed"  x="18" y="34" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="20" y="34" width="2" height="2" fill="black" />
-<rect shape-rendering="optimizeSpeed"  x="26" y="34" width="2" height="2" fill="black" />
+<rect shape-rendering="optimizeSpeed"  x="22" y="34" width="2" height="2" fill="black" />
+<rect shape-rendering="optimizeSpeed"  x="28" y="34" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="30" y="34" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="34" y="34" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="36" y="34" width="2" height="2" fill="black" />
@@ -164,7 +162,6 @@
 <rect shape-rendering="optimizeSpeed"  x="18" y="36" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="20" y="36" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="24" y="36" width="2" height="2" fill="black" />
-<rect shape-rendering="optimizeSpeed"  x="26" y="36" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="28" y="36" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="30" y="36" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="36" y="36" width="2" height="2" fill="black" />
@@ -173,8 +170,11 @@
 <rect shape-rendering="optimizeSpeed"  x="50" y="36" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="60" y="36" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="14" y="38" width="2" height="2" fill="black" />
+<rect shape-rendering="optimizeSpeed"  x="16" y="38" width="2" height="2" fill="black" />
+<rect shape-rendering="optimizeSpeed"  x="20" y="38" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="22" y="38" width="2" height="2" fill="black" />
-<rect shape-rendering="optimizeSpeed"  x="28" y="38" width="2" height="2" fill="black" />
+<rect shape-rendering="optimizeSpeed"  x="26" y="38" width="2" height="2" fill="black" />
+<rect shape-rendering="optimizeSpeed"  x="30" y="38" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="34" y="38" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="40" y="38" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="42" y="38" width="2" height="2" fill="black" />
@@ -186,12 +186,11 @@
 <rect shape-rendering="optimizeSpeed"  x="60" y="38" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="12" y="40" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="14" y="40" width="2" height="2" fill="black" />
-<rect shape-rendering="optimizeSpeed"  x="16" y="40" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="18" y="40" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="20" y="40" width="2" height="2" fill="black" />
-<rect shape-rendering="optimizeSpeed"  x="22" y="40" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="24" y="40" width="2" height="2" fill="black" />
-<rect shape-rendering="optimizeSpeed"  x="32" y="40" width="2" height="2" fill="black" />
+<rect shape-rendering="optimizeSpeed"  x="28" y="40" width="2" height="2" fill="black" />
+<rect shape-rendering="optimizeSpeed"  x="30" y="40" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="34" y="40" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="36" y="40" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="38" y="40" width="2" height="2" fill="black" />
@@ -202,9 +201,7 @@
 <rect shape-rendering="optimizeSpeed"  x="56" y="40" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="60" y="40" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="16" y="42" width="2" height="2" fill="black" />
-<rect shape-rendering="optimizeSpeed"  x="18" y="42" width="2" height="2" fill="black" />
-<rect shape-rendering="optimizeSpeed"  x="20" y="42" width="2" height="2" fill="black" />
-<rect shape-rendering="optimizeSpeed"  x="30" y="42" width="2" height="2" fill="black" />
+<rect shape-rendering="optimizeSpeed"  x="28" y="42" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="36" y="42" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="42" y="42" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="46" y="42" width="2" height="2" fill="black" />
@@ -215,10 +212,10 @@
 <rect shape-rendering="optimizeSpeed"  x="12" y="44" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="14" y="44" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="18" y="44" width="2" height="2" fill="black" />
-<rect shape-rendering="optimizeSpeed"  x="20" y="44" width="2" height="2" fill="black" />
-<rect shape-rendering="optimizeSpeed"  x="22" y="44" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="24" y="44" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="26" y="44" width="2" height="2" fill="black" />
+<rect shape-rendering="optimizeSpeed"  x="30" y="44" width="2" height="2" fill="black" />
+<rect shape-rendering="optimizeSpeed"  x="32" y="44" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="34" y="44" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="40" y="44" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="42" y="44" width="2" height="2" fill="black" />
@@ -252,8 +249,6 @@
 <rect shape-rendering="optimizeSpeed"  x="12" y="50" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="24" y="50" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="28" y="50" width="2" height="2" fill="black" />
-<rect shape-rendering="optimizeSpeed"  x="30" y="50" width="2" height="2" fill="black" />
-<rect shape-rendering="optimizeSpeed"  x="32" y="50" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="34" y="50" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="36" y="50" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="42" y="50" width="2" height="2" fill="black" />
@@ -267,6 +262,7 @@
 <rect shape-rendering="optimizeSpeed"  x="20" y="52" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="24" y="52" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="30" y="52" width="2" height="2" fill="black" />
+<rect shape-rendering="optimizeSpeed"  x="32" y="52" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="36" y="52" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="42" y="52" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="44" y="52" width="2" height="2" fill="black" />
@@ -280,7 +276,6 @@
 <rect shape-rendering="optimizeSpeed"  x="20" y="54" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="24" y="54" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="30" y="54" width="2" height="2" fill="black" />
-<rect shape-rendering="optimizeSpeed"  x="32" y="54" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="34" y="54" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="38" y="54" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="42" y="54" width="2" height="2" fill="black" />
@@ -308,7 +303,6 @@
 <rect shape-rendering="optimizeSpeed"  x="12" y="58" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="24" y="58" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="28" y="58" width="2" height="2" fill="black" />
-<rect shape-rendering="optimizeSpeed"  x="30" y="58" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="34" y="58" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="36" y="58" width="2" height="2" fill="black" />
 <rect shape-rendering="optimizeSpeed"  x="40" y="58" width="2" height="2" fill="black" />

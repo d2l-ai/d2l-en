@@ -221,7 +221,7 @@ In addition to elementwise computations,
 we can also perform linear algebra operations, 
 including vector dot products and matrix multiplication.
 We will explain the crucial bits of linear algebra 
-(with no assumed prior knowledge) in :numref:`sec_reduction-norm`.
+(with no assumed prior knowledge) in :numref:`sec_linear-algebra`.
 
 We can also *concatenate* multiple `ndarray`s together,
 stacking them end-to-end to form a larger `ndarray`. 
