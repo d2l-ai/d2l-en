@@ -1,5 +1,5 @@
 # Linear Algebra
-:label:`sec_linear-algebra`
+:label:`sec_linear_algebra`
 
 Now that you can store and manipulate data,
 let's briefly review the subset of basic linear algebra

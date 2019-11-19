@@ -1,7 +1,7 @@
 # Reduction, Multiplication, and Norms
-:label:`sec_linear-algebra`
+:label:`sec_linear_algebra`
 
-We have introduced scalars, vectors, matrices, and tensors in :numref:`sec_linear-algebra`.
+We have introduced scalars, vectors, matrices, and tensors in :numref:`sec_linear_algebra`.
 Without operations on such basic mathematical objects in linear algebra,
 we cannot design any meaningful procedure for deep learning.
 Specifically, as we will see in subsequent chapters,
@@ -416,7 +416,7 @@ are expressed as norms.
 
 ## More on Linear Algebra
 
-In just :numref:`sec_linear-algebra` and this section,
+In just :numref:`sec_linear_algebra` and this section,
 we have taught you all the linear algebra
 that you will need to understand
 a remarkable chunk of modern deep learning.
