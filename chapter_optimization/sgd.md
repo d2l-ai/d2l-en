@@ -37,20 +37,20 @@ Now, we will compare it to gradient descent by adding random noise with a mean o
 
 ```{.python .input  n=3}
 def f(x1, x2):
-    return x1 ** 2 + 2 * x2 ** 2   # Objective
+    return x1 ** 2 + 2 * x2 ** 2  # Objective
 
 def gradf(x1, x2):
-    return (2 * x1, 4 * x2)    # Gradient
+    return (2 * x1, 4 * x2)  # Gradient
 
-def sgd(x1, x2, s1, s2):                      # Simulate noisy gradient
-    global lr                                 # learning rate scheduler
-    (g1, g2) = gradf(x1, x2)                  # Compute gradient
+def sgd(x1, x2, s1, s2):  # Simulate noisy gradient
+    global lr  # Learning rate scheduler
+    (g1, g2) = gradf(x1, x2)  # Compute gradient
     (g1, g2) = (g1 + np.random.normal(0.1), g2 + np.random.normal(0.1))
-    eta_t = eta * lr()                        # Learning rate at time t
+    eta_t = eta * lr()  # Learning rate at time t
     return (x1 - eta_t * g1, x2 - eta_t * g2, 0, 0)  # Update variables
 
 eta = 0.1
-lr = (lambda: 1)                              # Constant learning rate
+lr = (lambda: 1)  # Constant learning rate
 d2l.show_trace_2d(f, d2l.train_2d(sgd, steps=50))
 ```
 
@@ -79,7 +79,7 @@ def exponential():
     return math.exp(-0.1 * ctr)
 
 ctr = 1
-lr = exponential   # Set up learning rate
+lr = exponential  # Set up learning rate
 d2l.show_trace_2d(f, d2l.train_2d(sgd, steps=1000))
 ```
 
@@ -92,7 +92,7 @@ def polynomial():
     return (1 + 0.1 * ctr)**(-0.5)
 
 ctr = 1
-lr = polynomial    # Set up learning rate
+lr = polynomial  # Set up learning rate
 d2l.show_trace_2d(f, d2l.train_2d(sgd, steps=50))
 ```
 
@@ -107,7 +107,7 @@ $$w_{t+1} = w_{t} - \eta_t \partial_w l(x_t, w)$$
 
 In particular, assume that $x_t$ is drawn from some distribution $p(x)$ and that $l(x, w)$ is a convex function in $w$ for all $x$. Last denote by
 
-$$R(w) = \mathbf{E}_{x \sim p}[l(x, w)]$$
+$$R(w) = E_{x \sim p}[l(x, w)]$$
 
 the expected risk and by $R^*$ its minimum with regard to $w$. Last let $w^*$ be the minimizer (we assume that it exists within the domain which $w$ is defined). In this case we can track the distance between the current parameter $w_t$ and the risk minimizer $w^*$ and see whether it improves over time.
 
@@ -136,11 +136,11 @@ This means that we make progress as long as the expected difference between curr
 
 Next we take expectations over this expression. This yields
 
-$$\mathbf{E}_{w_t}\left[\|w_{t} - w^*\|^2\right] - \mathbf{E}_{w_{t+1}|w_t}\left[\|w_{t+1} - w^*\|^2\right] \geq 2 \eta_t [\mathbf{E}[R[w_t]] - R^*] -  \eta_t^2 L^2.$$
+$$E_{w_t}\left[\|w_{t} - w^*\|^2\right] - E_{w_{t+1}|w_t}\left[\|w_{t+1} - w^*\|^2\right] \geq 2 \eta_t [E[R[w_t]] - R^*] -  \eta_t^2 L^2.$$
 
 The last step involves summing over the inequalities for $t \in \{t, \ldots, T\}$. Since the sum telescopes and by dropping the lower term we obtain
 
-$$\|w_{0} - w^*\|^2 \geq 2 \sum_{t=1}^T \eta_t [\mathbf{E}[R[w_t]] - R^*] - L^2 \sum_{t=1}^T \eta_t^2.$$
+$$\|w_{0} - w^*\|^2 \geq 2 \sum_{t=1}^T \eta_t [E[R[w_t]] - R^*] - L^2 \sum_{t=1}^T \eta_t^2.$$
 
 Note that we exploited that $w_0$ is given and thus the expectation can be dropped. Last define
 
@@ -148,12 +148,12 @@ $$\bar{w} := \frac{\sum_{t=1}^T \eta_t w_t}{\sum_{t=1}^T \eta_t}.$$
 
 Then by convexity it follows that
 
-$$\sum_t \eta_t \mathbf{E}[R[w_t]] \geq \sum \eta_t \cdot \left[\mathbf{E}[\bar{w}]\right].$$
+$$\sum_t \eta_t E[R[w_t]] \geq \sum \eta_t \cdot \left[E[\bar{w}]\right].$$
 
 Plugging this into the above inequality yields the bound
 
 $$
-\left[\mathbf{E}[\bar{w}]\right] - R^* \leq \frac{r^2 + L^2 \sum_{t=1}^T \eta_t^2}{2 \sum_{t=1}^T \eta_t}
+\left[E[\bar{w}]\right] - R^* \leq \frac{r^2 + L^2 \sum_{t=1}^T \eta_t^2}{2 \sum_{t=1}^T \eta_t}
 $$
 
 Here $r^2 := \|w_0 - w^*\|^2$ is a bound on the distance between the initial choice of parameters and the final outcome. In short, the speed of convergence depends on how rapidly the loss function changes via the Lipschitz constant $L$ and how far away from optimality the initial value is $r$. Note that the bound is in terms of $\bar{w}$ rather than $w_T$. This is the case since $\bar{w}$ is a smoothed version of the optimization path. Now let us analyze some choices for $\eta_t$.

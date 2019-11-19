@@ -119,7 +119,7 @@ Similarly, $\eta$ (positive) is called the learning rate.
 Now we are going to construct an objective function $f(\mathbf{x})=x_1^2+2x_2^2$ with a two-dimensional vector $\mathbf{x} = [x_1, x_2]^\top$ as input and a scalar as the output. So we have the gradient $\nabla f(\mathbf{x}) = [2x_1, 4x_2]^\top$. We will observe the iterative trajectory of independent variable $\mathbf{x}$ by gradient descent from the initial position $[-5, -2]$. First, we are going to define two helper functions. The first helper uses the given independent variable update function to iterate independent variable $\mathbf{x}$ a total of 20 times from the initial position $[-5, -2]$. The second helper will visualize the iterative trajectory of independent variable $\mathbf{x}$.
 
 ```{.python .input  n=10}
-# This function is saved in the d2l package for future use
+# Saved in the d2l package for later use
 def train_2d(trainer):
     # s1 and s2 are states of the independent variable and will be used later
     # in the chapter
@@ -131,7 +131,7 @@ def train_2d(trainer):
     print('epoch %d, x1 %f, x2 %f' % (i + 1, x1, x2))
     return results
 
-# This function is saved in the d2l package for future use
+# Saved in the d2l package for later use
 def show_trace_2d(f, results):
     d2l.plt.plot(*zip(*results), '-o', color='#ff7f0e')
     x1, x2 = np.meshgrid(np.arange(-5.5, 1.0, 0.1), np.arange(-3.0, 1.0, 0.1))

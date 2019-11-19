@@ -5,6 +5,7 @@ In :numref:`sec_sgd` we reviewed what happens when performing stochastic gradien
 
 ## Basics
 
+
 ### Leaky Averages
 
 The previous section saw us discussing minibatch SGD as a means for accelerating computation. It also had the nice side-effect that averaging gradients reduced the amount of variance.
@@ -160,6 +161,7 @@ d2l.train_gluon_ch10('sgd', {'learning_rate': 0.005, 'momentum': 0.9},
 ```
 
 ## Theoretical Analysis
+
 
 ### Quadratic Convex Functions
 
