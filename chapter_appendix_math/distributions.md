@@ -268,7 +268,7 @@ Now, let us plot the cumulative distribution function :eqref:`eq_poisson_cdf`.
 ```{.python .input}
 x = np.arange(-1, 21, 0.01)
 cmf = np.cumsum(pmf)
-def F(x): 
+def F(x):
     return 0 if x < 0 else 1 if x > n else cmf[int(x)]
 
 d2l.plot(x, np.array([F(y) for y in x.tolist()]), 'x', 'c.d.f.')
