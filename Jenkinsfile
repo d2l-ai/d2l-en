@@ -21,7 +21,6 @@ stage("Build and Publish") {
       sh label: "Check Execution Output", script: """set -ex
       conda activate ${ENV_NAME}
       d2lbook build outputcheck
-      rm -rf _build/rst
       """
 
       sh label: "Execute Notebooks", script: """set -ex
