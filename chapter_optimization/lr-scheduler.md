@@ -178,8 +178,8 @@ In some cases initializing the parameters is not sufficient to guarantee a good 
 A rather simple fix for this dilemma is to use a warmup period during which the learning rate *increases* to its initial maximum and to cool down the rate until the end of the optimization process. For simplicity one typically uses a linear increase for this purpose. This leads to a schedule of the form indicated below.
 
 ```{.python .input}
-scheduler = lr_scheduler.CosineScheduler(40, warmup_steps=5,
-                                         base_lr=0.5, final_lr=0.01)
+scheduler = lr_scheduler.CosineScheduler(40, warmup_steps=5, base_lr=0.5,
+                                         final_lr=0.01)
 d2l.plot(np.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
 ```
 
