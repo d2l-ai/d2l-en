@@ -38,8 +38,8 @@ Next, we initialize the model parameters for a RNN model. The number of hidden u
 ```{.python .input  n=19}
 def get_params(vocab_size, num_hiddens, ctx):
     num_inputs = num_outputs = vocab_size
-    normal = lambda shape: np.random.normal(
-        scale=0.01, size=shape, ctx=ctx)
+    def normal(shape):
+        return np.random.normal(scale=0.01, size=shape, ctx=ctx)
     # Hidden layer parameters
     W_xh = normal((num_inputs, num_hiddens))
     W_hh = normal((num_hiddens, num_hiddens))
@@ -124,7 +124,8 @@ We first explain the predicting function so we can regularly check the predictio
 def predict_ch8(prefix, num_predicts, model, vocab, ctx):
     state = model.begin_state(batch_size=1, ctx=ctx)
     outputs = [vocab[prefix[0]]]
-    get_input = lambda: np.array([outputs[-1]], ctx=ctx).reshape(1, 1)
+    def get_input(): 
+        return np.array([outputs[-1]], ctx=ctx).reshape(1, 1)
     for y in prefix[1:]:  # Warmup state with prefix
         _, state = model(get_input(), state)
         outputs.append(vocab[y])
@@ -195,7 +196,8 @@ def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):
             # using random sampling.
             state = model.begin_state(batch_size=X.shape[0], ctx=ctx)
         else:
-            for s in state: s.detach()
+            for s in state:
+                s.detach()
         y = Y.T.reshape(-1)
         X, y = X.as_in_context(ctx), y.as_in_context(ctx)
         with autograd.record():
@@ -203,7 +205,7 @@ def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):
             l = loss(py, y).mean()
         l.backward()
         grad_clipping(model, 1)
-        updater(batch_size=1)  # Since used mean already.
+        updater(batch_size=1)  # Since used mean already
         metric.add(l * y.size, y.size)
     return math.exp(metric[0]/metric[1]), metric[1]/timer.stop()
 ```
@@ -220,12 +222,14 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, ctx,
                             legend=['train'], xlim=[1, num_epochs])
     if isinstance(model, gluon.Block):
         model.initialize(ctx=ctx, force_reinit=True, init=init.Normal(0.01))
-        trainer = gluon.Trainer(model.collect_params(), 'sgd', {'learning_rate': lr})
-        updater = lambda batch_size : trainer.step(batch_size)
-    else:
-        updater = lambda batch_size : d2l.sgd(model.params, lr, batch_size)
+        trainer = gluon.Trainer(model.collect_params(),
+                                'sgd', {'learning_rate': lr})
 
-    predict = lambda prefix: predict_ch8(prefix, 50, model, vocab, ctx)
+        def updater(batch_size): return trainer.step(batch_size)
+    else:
+        def updater(batch_size): return d2l.sgd(model.params, lr, batch_size)
+
+    def predict(prefix): return predict_ch8(prefix, 50, model, vocab, ctx)
     # Train and check the progress.
     for epoch in range(num_epochs):
         ppl, speed = train_epoch_ch8(

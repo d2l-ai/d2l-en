@@ -6,7 +6,6 @@ So far we see how to use recurrent neural networks for language models, in which
 Machine translation (MT) refers to the automatic translation of a segment of text from one language to another. Solving this problem with neural networks is often called neural machine translation (NMT). Compared to language models (:numref:`sec_language_model`), in which the corpus only contains a single language, machine translation dataset has at least two languages, the source language and the target language. In addition, each sentence in the source language is mapped to the according translation in the target language. Therefore, the data preprocessing for machine translation data is different to the one for language models. This section is dedicated to demonstrate how to pre-process such a dataset and then load into a set of minibatches.
 
 ```{.python .input  n=1}
-import collections
 import d2l
 import zipfile
 
@@ -14,7 +13,7 @@ from mxnet import np, npx, gluon
 npx.set_np()
 ```
 
-## Read and Preprocess the Dataset
+## Reading and Preprocessing the Dataset
 
 We first download a dataset that contains a set of English sentences with the corresponding French translations. As can be seen that each line contains a English sentence with its French translation, which are separated by a `TAB`.
 
@@ -24,7 +23,7 @@ def read_data_nmt():
     fname = gluon.utils.download('http://data.mxnet.io/data/fra-eng.zip')
     with zipfile.ZipFile(fname, 'r') as f:
         return f.read('fra.txt').decode("utf-8")
-    
+
 raw_text = read_data_nmt()
 print(raw_text[0:106])
 ```
@@ -35,9 +34,10 @@ We perform several preprocessing steps on the raw text data, including ignoring 
 # Saved in the d2l package for later use
 def preprocess_nmt(text):
     text = text.replace('\u202f', ' ').replace('\xa0', ' ')
-    no_space = lambda char, prev_char: (
-        True if char in (',', '!', '.') and prev_char != ' ' else False)
-    out = [' '+char if i > 0 and no_space(char, text[i-1]) else char 
+    def no_space(char, prev_char):
+        return (True if char in (',', '!', '.')
+                and prev_char != ' ' else False)
+    out = [' '+char if i > 0 and no_space(char, text[i-1]) else char
            for i, char in enumerate(text.lower())]
     return ''.join(out)
 
@@ -47,14 +47,15 @@ print(text[0:95])
 
 ## Tokenization
 
-Different to using character tokens in :numref:`sec_language_model`, here a token is either a word or a punctuation mark. The following function tokenize the text data to return `source` and `target`. Each one is a list of token list, with `source[i]` is the $i^\mathrm{th}$ sentence in the source language and `target[i]` is the $i^\mathrm{th}$ sentence in the target language. To make the latter training faster, we sample the first `num_examples` sentences pairs.
+Different to using character tokens in :numref:`sec_language_model`, here a token is either a word or a punctuation mark. The following function tokenizes the text data to return `source` and `target`. Each one is a list of token list, with `source[i]` is the $i^\mathrm{th}$ sentence in the source language and `target[i]` is the $i^\mathrm{th}$ sentence in the target language. To make the latter training faster, we sample the first `num_examples` sentences pairs.
 
 ```{.python .input  n=14}
 # Saved in the d2l package for later use
-def tokenize_nmt(text, num_examples = None):
+def tokenize_nmt(text, num_examples=None):
     source, target = [], []
     for i, line in enumerate(text.split('\n')):
-        if num_examples and i > num_examples: break
+        if num_examples and i > num_examples:
+            break
         parts = line.split('\t')
         if len(parts) == 2:
             source.append(parts[0].split(' '))
@@ -92,8 +93,10 @@ One way to solve this problem is that if a sentence is longer than `num_steps`, 
 ```{.python .input  n=11}
 # Saved in the d2l package for later use
 def trim_pad(line, num_steps, padding_token):
-    if len(line) > num_steps: return line[:num_steps]  # Trim
+    if len(line) > num_steps:
+        return line[:num_steps]  # Trim
     return line + [padding_token] * (num_steps - len(line))  # Pad
+
 
 trim_pad(src_vocab[source[0]], 10, src_vocab.pad)
 ```
@@ -103,8 +106,8 @@ Now we can convert a list of sentences into an `(num_example, num_steps)` index 
 ```{.python .input  n=12}
 # Saved in the d2l package for later use
 def build_array(lines, vocab, num_steps, is_source):
-    lines = [vocab[l] for l in lines] 
-    if not is_source: 
+    lines = [vocab[l] for l in lines]
+    if not is_source:
         lines = [[vocab.bos] + l + [vocab.eos] for l in lines]
     array = np.array([trim_pad(l, num_steps, vocab.pad) for l in lines])
     valid_len = (array != vocab.pad).sum(axis=1)
@@ -113,7 +116,7 @@ def build_array(lines, vocab, num_steps, is_source):
 
 Then we can construct minibatches based on these arrays. 
 
-## Put all Things Together
+## Putting Things Together
 
 Finally, we define the function `load_data_nmt` to return the data iterator with the vocabularies for source language and target language.
 

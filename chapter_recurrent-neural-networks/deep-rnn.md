@@ -7,9 +7,10 @@ Up to now, we only discussed recurrent neural networks with a single unidirectio
 * We could add extra nonlinearity to the gating mechanisms. That is, instead of using a single perceptron we could use multiple layers. This leaves the *mechanism* of the LSTM unchanged. Instead it makes it more sophisticated. This would make sense if we were led to believe that the LSTM mechanism describes some form of universal truth of how latent variable autoregressive models work.
 * We could stack multiple layers of LSTMs on top of each other. This results in a mechanism that is more flexible, due to the combination of several simple layers. In particular, data might be relevant at different levels of the stack. For instance, we might want to keep high-level data about financial market conditions (bear or bull market) available, whereas at a lower level we only record shorter-term temporal dynamics.
 
-Beyond all this abstract discussion it is probably easiest to understand the family of models we are interested in by reviewing the diagram below. It describes a deep recurrent neural network with $L$ hidden layers. Each hidden state is continuously passed to both the next timestep of the current layer and the current timestep of the next layer.
+Beyond all this abstract discussion it is probably easiest to understand the family of models we are interested in by reviewing the diagram in :numref:`fig_deep_rnn`. It describes a deep recurrent neural network with $L$ hidden layers. Each hidden state is continuously passed to both the next timestep of the current layer and the current timestep of the next layer.
 
 ![ Architecture of a deep recurrent neural network. ](../img/deep-rnn.svg)
+:label:`fig_deep_rnn`
 
 ## Functional Dependencies
 
@@ -46,7 +47,6 @@ The architectural decisions (such as choosing parameters) are very similar to th
 vocab_size, num_hiddens, num_layers, ctx = len(vocab), 256, 2, d2l.try_gpu()
 lstm_layer = rnn.LSTM(num_hiddens, num_layers)
 model = d2l.RNNModel(lstm_layer, len(vocab))
-
 ```
 
 ## Training

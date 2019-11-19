@@ -93,17 +93,22 @@ batch_size, num_steps = 32, 35
 train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 ```
 
-### Initialize Model Parameters
+### Initializing Model Parameters
 
 Next we need to define and initialize the model parameters. As previously, the hyperparameter `num_hiddens` defines the number of hidden units. We initialize weights following a Gaussian distribution with $0.01$ standard deviation, and we set the biases to $0$.
 
 ```{.python .input  n=2}
 def get_lstm_params(vocab_size, num_hiddens, ctx):
     num_inputs = num_outputs = vocab_size
-    normal = lambda shape : np.random.normal(scale=0.01, size=shape, ctx=ctx)
-    three = lambda : (normal((num_inputs, num_hiddens)),
-                      normal((num_hiddens, num_hiddens)),
-                      np.zeros(num_hiddens, ctx=ctx))
+
+    def normal(shape):
+        return np.random.normal(scale=0.01, size=shape, ctx=ctx)
+
+    def three():
+        return (normal((num_inputs, num_hiddens)),
+                normal((num_hiddens, num_hiddens)),
+                np.zeros(num_hiddens, ctx=ctx))
+    
     W_xi, W_hi, b_i = three()  # Input gate parameters
     W_xf, W_hf, b_f = three()  # Forget gate parameters
     W_xo, W_ho, b_o = three()  # Output gate parameters
@@ -119,7 +124,7 @@ def get_lstm_params(vocab_size, num_hiddens, ctx):
     return params
 ```
 
-### Define the Model
+### Defining the Model
 
 In the initialization function, the hidden state of the LSTM needs to return an additional memory cell with a value of $0$ and a shape of (batch size, number of hidden units). Hence we get the following state initialization.
 

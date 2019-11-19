@@ -118,7 +118,8 @@ $$n(x) \propto (x + c)^{-\alpha} \text{ and hence }
 This should already give us pause if we want to model words by count statistics and smoothing. After all, we will significantly overestimate the frequency of the tail, also known as the infrequent words. But what about the other word combinations (such as bigrams, trigrams, and beyond)? Let us see whether the bigram frequency behaves in the same manner as the unigram frequency.
 
 ```{.python .input  n=3}
-bigram_tokens = [[pair for pair in zip(line[:-1], line[1:])] for line in tokens]
+bigram_tokens = [[pair for pair in zip(
+    line[:-1], line[1:])] for line in tokens]
 bigram_vocab = d2l.Vocab(bigram_tokens)
 print(bigram_vocab.token_freqs[:10])
 ```
@@ -163,7 +164,7 @@ In fact, any one of these offsets is fine. Hence, which one should we pick? In f
 The following code randomly generates a minibatch from the data each time. Here, the batch size `batch_size` indicates to the number of examples in each minibatch and `num_steps` is the length of the sequence (or timesteps if we have a time series) included in each example.
 In random sampling, each example is a sequence arbitrarily captured on the original sequence. The positions of two adjacent random minibatches on the original sequence are not necessarily adjacent. The target is to predict the next character based on what we have seen so far, hence the labels are the original sequence, shifted by one character.
 
-```{.python .input  n=5}
+```{.python .input  n=1}
 # Saved in the d2l package for later use
 def seq_data_iter_random(corpus, batch_size, num_steps):
     # Offset the iterator over the data for uniform starts
@@ -172,8 +173,11 @@ def seq_data_iter_random(corpus, batch_size, num_steps):
     num_examples = ((len(corpus) - 1) // num_steps)
     example_indices = list(range(0, num_examples * num_steps, num_steps))
     random.shuffle(example_indices)
-    # This returns a sequence of the length num_steps starting from pos
-    data = lambda pos: corpus[pos: pos + num_steps]
+    
+    def data(pos):
+        # This returns a sequence of the length num_steps starting from pos
+        return corpus[pos: pos + num_steps]
+    
     # Discard half empty batches
     num_batches = num_examples // batch_size
     for i in range(0, batch_size * num_batches, batch_size):
@@ -230,14 +234,13 @@ class SeqDataLoader(object):
     """A iterator to load sequence data"""
     def __init__(self, batch_size, num_steps, use_random_iter, max_tokens):
         if use_random_iter:
-            data_iter_fn = d2l.seq_data_iter_random
+            self.data_iter_fn = d2l.seq_data_iter_random
         else:
-            data_iter_fn = d2l.seq_data_iter_consecutive
-        self.corpus, self.vocab = d2l.load_corpus_time_machine(max_tokens)
-        self.get_iter = lambda: data_iter_fn(self.corpus, batch_size, num_steps)
+            self.data_iter_fn = d2l.seq_data_iter_consecutive
+        self.corpus, self.vocab = d2l.load_corpus_time_machine(max_tokens)        
 
     def __iter__(self):
-        return self.get_iter()
+        return self.data_iter_fn(self.corpus, batch_size, num_steps)
 ```
 
 Last, we define a function `load_data_time_machine` that returns both the data iterator and the vocabulary, so we can use it similarly as other functions with `load_data` prefix.
@@ -266,7 +269,7 @@ def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
 1. Suppose there are $100,000$ words in the training dataset. How much word frequency and multi-word adjacent frequency does a four-gram need to store?
 1. Review the smoothed probability estimates. Why are they not accurate? Hint: we are dealing with a contiguous sequence rather than singletons.
 1. How would you model a dialogue?
-1. Estimate the exponent of Zipf's law for unigrams, bigrams and trigrams.
+1. Estimate the exponent of Zipf's law for unigrams, bigrams, and trigrams.
 1. What other minibatch data sampling methods can you think of?
 1. Why is it a good idea to have a random offset?
     * Does it really lead to a perfectly uniform distribution over the sequences on the document?
