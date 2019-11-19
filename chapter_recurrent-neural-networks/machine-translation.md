@@ -116,7 +116,7 @@ def build_array(lines, vocab, num_steps, is_source):
 
 Then we can construct minibatches based on these arrays. 
 
-## Putting Things Together
+## Putting All Things Together
 
 Finally, we define the function `load_data_nmt` to return the data iterator with the vocabularies for source language and target language.
 
