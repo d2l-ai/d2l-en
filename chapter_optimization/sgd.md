@@ -36,8 +36,12 @@ This means that, on average, the stochastic gradient is a good estimate of the g
 Now, we will compare it to gradient descent by adding random noise with a mean of 0 to the gradient to simulate a SGD.
 
 ```{.python .input  n=3}
-def f(x1, x2): return x1 ** 2 + 2 * x2 ** 2   # Objective
-def gradf(x1, x2): return (2 * x1, 4 * x2)    # Gradient
+def f(x1, x2):
+    return x1 ** 2 + 2 * x2 ** 2   # Objective
+
+def gradf(x1, x2):
+    return (2 * x1, 4 * x2)    # Gradient
+
 def sgd(x1, x2, s1, s2):                      # Simulate noisy gradient
     global lr                                 # learning rate scheduler
     (g1, g2) = gradf(x1, x2)                  # Compute gradient
