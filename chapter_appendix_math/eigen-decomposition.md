@@ -330,7 +330,7 @@ then after running through many layers, the vector will essentially shrink to no
 and the output will not depend on the input. This is also clearly not right either!
 
 We need to walk the narrow line between growth and decay 
-to make sure that our output changes depending on our input—but not much!
+to make sure that our output changes depending on our input, but not much!
 
 Let's see what happens when we repeatedly multiply our matrix $\mathbf{A}$ 
 against a random input vector, and keep track of the norm.
