@@ -134,7 +134,7 @@ for X, y in train_iter:
 '%.2f sec' % timer.stop()
 ```
 
-## Putting Things Together 
+## Putting All Things Together 
 
 Now we define the `load_data_fashion_mnist` function 
 that obtains and reads the Fashion-MNIST dataset. 
