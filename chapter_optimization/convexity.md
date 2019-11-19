@@ -76,14 +76,14 @@ One of the most useful tools is Jensen's inequality. It amounts to a generalizat
 $$\begin{aligned}
     \sum_i \alpha_i f(x_i) & \geq f\left(\sum_i \alpha_i x_i\right) \\
     \text{ and }
-    \mathbf{E}_x[f(x)] & \geq f\left(\mathbf{E}_x[x]\right)
+    E_x[f(x)] & \geq f\left(E_x[x]\right)
 \end{aligned}$$
 
 In other words, the expectation of a convex function is larger than the convex function of an expectation. To prove the first inequality we repeatedly apply the definition of convexity to one term in the sum at a time. The expectation can be proven by taking the limit over finite segments.  
 
 One of the common applications of Jensen's inequality is with regard to the log-likelihood of partially observed random variables. That is, we use
 
-$$\mathbf{E}_{y \sim P(y)}[-\log P(x \mid y)] \geq -\log P(x).$$
+$$E_{y \sim P(y)}[-\log P(x \mid y)] \geq -\log P(x).$$
 
 This follows since $\int P(y) P(x \mid y) dy = P(x)$. 
 This is used in variational methods. Here $y$ is typically the unobserved random variable, $P(y)$ is the best guess of how it might be distributed and $P(x)$ is the distribution with $y$ integrated out. For instance, in clustering $y$ might be the cluster labels and $P(x \mid y)$ is the generative model when applying cluster labels.

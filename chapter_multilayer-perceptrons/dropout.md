@@ -115,7 +115,7 @@ At each training iteration, just add noise
 sampled from a distribution with mean zero
 $\epsilon \sim \mathcal{N}(0,\sigma^2)$ to the input $\mathbf{x}$ ,
 yielding a perturbed point $\mathbf{x}' = \mathbf{x} + \epsilon$.
-In expectation, $\mathbf{E}[\mathbf{x}'] = \mathbf{x}$.
+In expectation, $E[\mathbf{x}'] = \mathbf{x}$.
 
 In the case of dropout regularization,
 one can debias each layer
@@ -133,7 +133,7 @@ h' =
 $$
 
 By design, the expectation remains unchanged,
-i.e., $\mathbf{E}[h'] = h$.
+i.e., $E[h'] = h$.
 Intermediate activations $h$ are replaced by a random variable $h'$
 with matching expectation.
 The name 'dropout' arises from the notion
