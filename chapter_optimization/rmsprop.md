@@ -29,15 +29,17 @@ As before in :numref:`sec_momentum` we use $1 + \gamma + \gamma^2 + \ldots = \fr
 
 ```{.python .input  n=1}
 %matplotlib inline
-import d2l, math
+import math
+import d2l
 from mxnet import np, npx
+
 npx.set_np()
 d2l.set_figsize((3.5, 2.5))
 
 gammas = [0.95, 0.9, 0.8, 0.7]
 for gamma in gammas:
     x = np.arange(40).asnumpy()
-    d2l.plt.plot(x, (1-gamma) * gamma ** x, label='gamma = %.2f'%gamma)
+    d2l.plt.plot(x, (1-gamma) * gamma ** x, label='gamma = %.2f' % gamma)
 d2l.plt.xlabel('time');
 ```
 
@@ -89,7 +91,8 @@ d2l.train_ch10(rmsprop, init_rmsprop_states(feature_dim),
 Since RMSProp is a rather popular algorithm it is also available in the `Trainer` instance. All we need to do is instantiate it using an algorithm named `rmsprop`, assigning $\gamma$ to the parameter `gamma1`.
 
 ```{.python .input  n=29}
-d2l.train_gluon_ch10('rmsprop', {'learning_rate': 0.01, 'gamma1': 0.9}, data_iter)
+d2l.train_gluon_ch10('rmsprop', {'learning_rate': 0.01, 'gamma1': 0.9}, 
+                     data_iter)
 ```
 
 ## Summary
@@ -110,7 +113,3 @@ d2l.train_gluon_ch10('rmsprop', {'learning_rate': 0.01, 'gamma1': 0.9}, data_ite
 ## [Discussions](https://discuss.mxnet.io/t/2376)
 
 ![](../img/qr_rmsprop.svg)
-
-```{.python .input}
-
-```

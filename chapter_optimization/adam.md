@@ -1,7 +1,7 @@
 # Adam
 :label:`sec_adam`
 
-In the discussions leading up to this chapter we encountered a number of techniquest for efficient optimization. Let's recap them in detail here:
+In the discussions leading up to this chapter we encountered a number of techniques for efficient optimization. Let's recap them in detail here:
 
 * We saw that :ref:`sec_sgd` is more effective than Gradient Descent when solving optimization problems, e.g. due to its inherent resilience to redundant data. 
 * We saw that :ref:`sec_minibatch_sgd` affords significant additional efficiency arising from vectorization, using larger sets of observations in one minibatch. This is the key to efficient multi-machine, multi-GPU and overall parallel processing. 
@@ -93,12 +93,13 @@ def yogi(params, states, hyperparams):
     beta1, beta2, eps = 0.9, 0.999, 1e-3
     for p, (v, s) in zip(params, states):
         v[:] = beta1 * v + (1 - beta1) * p.grad
-        s[:] = s + (1 - beta2) * np.sign(np.square(p.grad) - s) * np.square(p.grad)
+        s[:] = s + (1 - beta2) * np.sign(np.square(p.grad) - s) * \
+            np.square(p.grad)
         v_bias_corr = v / (1 - beta1 ** hyperparams['t'])
         s_bias_corr = s / (1 - beta2 ** hyperparams['t'])
         p[:] -= hyperparams['lr'] * v_bias_corr / (np.sqrt(s_bias_corr) + eps)
     hyperparams['t'] += 1
-    
+
 data_iter, feature_dim = d2l.get_data_ch10(batch_size=10)
 d2l.train_ch10(yogi, init_adam_states(feature_dim),
                {'lr': 0.01, 't': 1}, data_iter, feature_dim);
@@ -122,4 +123,3 @@ d2l.train_ch10(yogi, init_adam_states(feature_dim),
 ## [Discussions](https://discuss.mxnet.io/t/2378)
 
 ![](../img/qr_adam.svg)
-

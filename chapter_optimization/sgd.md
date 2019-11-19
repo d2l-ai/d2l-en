@@ -7,7 +7,7 @@ In this section, we are going to introduce the basic principles of stochastic gr
 %matplotlib inline
 import d2l
 import math
-from mxnet import np, npx 
+from mxnet import np, npx
 npx.set_np()
 ```
 
@@ -36,17 +36,21 @@ This means that, on average, the stochastic gradient is a good estimate of the g
 Now, we will compare it to gradient descent by adding random noise with a mean of 0 to the gradient to simulate a SGD.
 
 ```{.python .input  n=3}
-def f(x1, x2): return x1 ** 2 + 2 * x2 ** 2   # objective
-def gradf(x1, x2): return (2 * x1, 4 * x2)    # gradient
-def sgd(x1, x2, s1, s2):                      # simulate noisy gradient
+def f(x1, x2):
+    return x1 ** 2 + 2 * x2 ** 2   # Objective
+
+def gradf(x1, x2):
+    return (2 * x1, 4 * x2)    # Gradient
+
+def sgd(x1, x2, s1, s2):                      # Simulate noisy gradient
     global lr                                 # learning rate scheduler
-    (g1, g2) = gradf(x1, x2)                  # compute gradient
+    (g1, g2) = gradf(x1, x2)                  # Compute gradient
     (g1, g2) = (g1 + np.random.normal(0.1), g2 + np.random.normal(0.1))
-    eta_t = eta * lr()                        # learning rate at time t
-    return (x1 - eta_t * g1, x2 - eta_t * g2, 0, 0) # update variables
+    eta_t = eta * lr()                        # Learning rate at time t
+    return (x1 - eta_t * g1, x2 - eta_t * g2, 0, 0)  # Update variables
 
 eta = 0.1
-lr = (lambda: 1)                              # constant learning rate
+lr = (lambda: 1)                              # Constant learning rate
 d2l.show_trace_2d(f, d2l.train_2d(sgd, steps=50))
 ```
 
@@ -70,10 +74,12 @@ In the first scenario we decrease the learning rate, e.g., whenever progress in 
 
 ```{.python .input  n=4}
 def exponential():
-    global ctr; ctr += 1
+    global ctr
+    ctr += 1
     return math.exp(-0.1 * ctr)
 
-ctr = 1; lr = exponential   # set up learning rate
+ctr = 1
+lr = exponential   # Set up learning rate
 d2l.show_trace_2d(f, d2l.train_2d(sgd, steps=1000))
 ```
 
@@ -81,10 +87,12 @@ As expected, the variance in the parameters is significantly reduced. However, t
 
 ```{.python .input  n=5}
 def polynomial():
-    global ctr; ctr += 1
+    global ctr
+    ctr += 1
     return (1 + 0.1 * ctr)**(-0.5)
 
-ctr = 1; lr = polynomial    # set up learning rate
+ctr = 1
+lr = polynomial    # Set up learning rate
 d2l.show_trace_2d(f, d2l.train_2d(sgd, steps=50))
 ```
 

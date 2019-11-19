@@ -103,7 +103,7 @@ gammas = [0.95, 0.9, 0.6, 0]
 d2l.set_figsize((3.5, 2.5))
 for gamma in gammas:
     x = np.arange(40).asnumpy()
-    d2l.plt.plot(x, gamma ** x, label='gamma = %.2f'%gamma)
+    d2l.plt.plot(x, gamma ** x, label='gamma = %.2f' % gamma)
 d2l.plt.xlabel('time')
 d2l.plt.legend();
 ```
@@ -155,7 +155,8 @@ train_momentum(0.005, 0.9)
 There's very little to do in Gluon since the standard `sgd` solver already had momentum built in. Setting matching parameters yields a very similar trajectory.
 
 ```{.python .input  n=9}
-d2l.train_gluon_ch10('sgd', {'learning_rate': 0.005, 'momentum': 0.9}, data_iter)
+d2l.train_gluon_ch10('sgd', {'learning_rate': 0.005, 'momentum': 0.9}, 
+                     data_iter)
 ```
 
 ## Theoretical Analysis
@@ -204,7 +205,7 @@ eta = 0.1
 d2l.set_figsize((6, 4))
 for lam in lambdas:
     t = np.arange(20).asnumpy()
-    d2l.plt.plot(t, (1 - eta * lam) ** t, label='lambda = %.2f'%lam)
+    d2l.plt.plot(t, (1 - eta * lam) ** t, label='lambda = %.2f' % lam)
 d2l.plt.xlabel('time')
 d2l.plt.legend();
 ```
