@@ -5,7 +5,7 @@ Now that we learned how multilayer perceptrons (MLPs) work in theory, let us imp
 
 ```{.python .input}
 import d2l
-from mxnet import gluon, npx, init
+from mxnet import gluon, init, npx
 from mxnet.gluon import nn
 npx.set_np()
 ```

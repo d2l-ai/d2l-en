@@ -108,7 +108,7 @@ net.initialize(init=MyInit())
 
 ## Summary
 
-* Deferred initialization is a good thing. It allows Gluon to set many things automagically and it removes a great source of errors from defining novel network architectures.
+* Deferred initialization is a good thing. It allows Gluon to set many things automatically and it removes a great source of errors from defining novel network architectures.
 * We can override this by specifying all implicitly defined variables.
 * Initialization can be repeated (or forced) by setting the `force_reinit=True` flag.
 

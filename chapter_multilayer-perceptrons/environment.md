@@ -37,7 +37,7 @@ that you will need in order to detect these situations early,
 mitigate the damage, and use machine learning responsibly.
 Some of the solutions are simple (ask for the 'right' data)
 some are technically difficult (implement a reinforcement learning system),
-and others require that we entre the realm of philosophy
+and others require that we enter the realm of philosophy
 and grapple with difficult questions concerning ethics and informed consent.
 
 
@@ -142,9 +142,11 @@ but can we say the same about soft drinks?
 It turns out that if we navigate around the United States,
 shifting the source of our data by geography,
 we will find considerable concept shift regarding
-the definition of even this simple term:
+the definition of even this simple term 
+as shown in :numref:`fig_popvssoda`.
 
 ![](../img/popvssoda.png)
+:label:`fig_popvssoda`
 
 If we were to build a machine translation system,
 the distribution $P(y \mid x)$ might be different
@@ -219,7 +221,7 @@ They took aerial photographs of the forest without tanks,
 then drove the tanks into the forest and took another set of pictures.
 The so-trained classifier worked 'perfectly'.
 Unfortunately, all it had learned was to distinguish trees
-with shadows from trees without shadows—the
+with shadows from trees without shadows---the
 first set of pictures was taken in the early morning, the second one at noon.
 
 #### Nonstationary distributions
@@ -291,7 +293,7 @@ including some fancy operator-theoretic approaches
 that attempt to recalibrate the expectation operator directly
 using a minimum-norm or a maximum entropy principle.
 Note that for any such approach, we need samples
-drawn from both distributions—the 'true' $p$, e.g.,
+drawn from both distributions---the 'true' $p$, e.g.,
 by access to training data, and the one used
 for generating the training set $q$ (the latter is trivially available).
 Note however, that we only need samples $\mathbf{x} \sim q(\mathbf{x})$;
@@ -306,7 +308,7 @@ If it is impossible to distinguish between the two distributions
 then it means that the associated instances are equally likely
 to come from either one of the two distributions.
 On the other hand, any instances that can be well discriminated
-should be significantly over/underweighted accordingly.
+should be significantly overweighted or underweighted accordingly.
 For simplicity’s sake assume that we have an equal number of instances
 from both distributions, denoted by $\mathbf{x}_i \sim p(\mathbf{x})$ and $\mathbf{x}_i' \sim q(\mathbf{x})$ respectively.
 Now denote by $z_i$ labels which are 1
@@ -388,7 +390,7 @@ unless we invest in a complex real-time annotation pipeline.
 What we can do, however, is average all of our models predictions
 at test time together, yielding the mean model output $\mu_y$.
 
-It turns out that under some mild conditions—
+It turns out that under some mild conditions---
 if our classifier was reasonably accurate in the first place,
 if the target data contains only classes of images that we have seen before,
 and if the label shift assumption holds in the first place
@@ -456,7 +458,7 @@ One key distinction between the different situations above is that the same stra
 Finally, it is important to remember
 that when you deploy machine learning systems
 you are not simply minimizing negative log likelihood
-or maximizing accuracy—you are automating some kind of decision process.
+or maximizing accuracy---you are automating some kind of decision process.
 Often the automated decision-making systems that we deploy
 can have consequences for those subject to its decisions.
 If we are deploying a medical diagnostic system,

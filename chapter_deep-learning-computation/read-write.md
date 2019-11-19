@@ -2,7 +2,7 @@
 
 So far we discussed how to process data, how to build, train and test deep learning models. However, at some point we are likely happy with what we obtained and we want to save the results for later use and distribution. Likewise, when running a long training process it is best practice to save intermediate results (checkpointing) to ensure that we do not lose several days worth of computation when tripping over the power cord of our server. At the same time, we might want to load a pretrained model (e.g., we might have word embeddings for English and use it for our fancy spam classifier). For all of these cases we need to load and store both individual weight vectors and entire models. This section addresses both issues.
 
-## Load and Save `ndarray`s
+## Loading and Saving `ndarray`s
 
 In its simplest form, we can directly use the `load` and `save` functions to store and read `ndarray`s separately. This works just as expected.
 
@@ -12,7 +12,7 @@ from mxnet.gluon import nn
 npx.set_np()
 
 x = np.arange(4)
-npx.save('x-file', x) 
+npx.save('x-file', x)
 ```
 
 Then, we read the data from the stored file back into memory.
@@ -73,7 +73,7 @@ x = np.random.uniform(size=(2, 20))
 y = net(x)
 ```
 
-Next, we store the parameters of the model as a file with the name 'mlp.params'.
+Next, we store the parameters of the model as a file with the name `mlp.params`.
 
 ```{.python .input}
 net.save_parameters('mlp.params')
