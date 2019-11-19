@@ -43,7 +43,6 @@ def preprocess_nmt(text):
            for i, char in enumerate(text.lower())]
     return ''.join(out)
 
-
 text = preprocess_nmt(raw_text)
 print(text[0:95])
 ```

@@ -127,7 +127,6 @@ class FactorScheduler(object):
         self.base_lr = max(self.stop_factor_lr, self.base_lr * self.factor)
         return self.base_lr
 
-
 scheduler = FactorScheduler(factor=0.9, stop_factor_lr=1e-2, base_lr=2.0)
 d2l.plot(np.arange(50), [scheduler(t) for t in range(50)])
 ```
