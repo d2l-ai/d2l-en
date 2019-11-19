@@ -125,7 +125,11 @@ We interpret this function by using integration to obtain the probability our ra
 $$P(X\in(a, b]) = \int _ {a}^{b} p(x) \; dx.$$
 :eqlabel:`eq_pdf_int_int`
 
+<<<<<<< HEAD
 In :numref:`sec_distributions` we will see a number of common distributions, but let's continue working in the abstract.
+=======
+In :numref:`sec_distributions` we will see a number of common distributions, but let us continue working in the abstract.
+>>>>>>> random-variables.md
 
 ### Cumulative Distribution Functions
 
@@ -175,7 +179,11 @@ $$
 
 Thus we see that the mean is $a$.  This matches the intuition since $a$ is the location around which we centered our random variable.
 
+<<<<<<< HEAD
 Because they are helpful, let's summarize a few properties.
+=======
+Because they are helpful, let us summarize a few properties.
+>>>>>>> random-variables.md
 
 * For any random variable $X$ and numbers $a$ and $b$, we have that $\mu_{aX+b} = a\mu_X + b$.
 * If we have two random variables $X$ and $Y$, we have $\mu_{X+Y} = \mu_X+\mu_Y$.
@@ -209,7 +217,11 @@ $$
 
 This result again makes sense.  The largest $p$ can be is $1/2$ which corresponds to picking $a-2$ or $a+2$ with a coin flip.  The variance of this being $4$ corresponds to the fact that both $a-2$ and $a+2$ are $2$ units away from the mean, and $2^2 = 4$.  On the other end of the spectrum, if $p=0$, this random variable always takes the value $0$ and so it has no variance at all.
 
+<<<<<<< HEAD
 We will list a few properties of variance below:
+=======
+We will list a few properties of the variance below.
+>>>>>>> random-variables.md
 
 * For any random variable $X$, $\mathrm{Var}(X) \ge 0$, with $\mathrm{Var}(X) = 0$ if and only if $X$ is a constant. 
 * For any random variable $X$ and numbers $a$ and $b$, we have that $\mathrm{Var}(aX+b) = a^2\mathrm{Var}(X)$.
@@ -406,7 +418,11 @@ In this way, we can deal with multiple, potentially correlated random variables.
 ### Marginal Distributions
 When dealing with multiple variables, we often times want to be able to ignore the relationships and ask, "how is this one variable distributed?"  Such a distribution is called a *marginal distribution*.  
 
+<<<<<<< HEAD
 To be concrete, let's suppose that we have two random variables $X, Y$ with joint density given by $p _ {X, Y}(x, y)$.  We will be using the subscript to indicate what random variables the density is for.  The question of finding the marginal distribution is taking this function, and using it to find $p _ X(x)$.
+=======
+To be concrete, let us suppose that we have two random variables $X, Y$ with joint density given by $p _ {X, Y}(x, y)$.  We will be using the subscript to indicate what random variables the density is for.  The question of finding the marginal distribution is taking this function, and using it to find $p _ X(x)$.
+>>>>>>> random-variables.md
 
 As with most things, it is best to return to the intuitive picture to figure out what should be true.  Recall that the density is the function $p _ X$ so that
 
@@ -529,7 +545,11 @@ This allows us to generalize the variance summation rule for correlated random v
 
 ### Correlation
 
+<<<<<<< HEAD
 As we did in the case of means and variances, let's now consider units.  If $X$ is measured in one unit (say inches), and $Y$ is measured in another (say dollars), the covariance is measured in the product of these two units $\text{inches} \times \text{dollars}$.  These units can be hard to interpret.  What we will often want in this case is a unit-less measurement of relatedness.  Indeed, often we do not care about exact quantitative correlation, but rather ask if the correlation is in the same direction, and how strong the relationship is.  
+=======
+As we did in the case of means and variances, let us now consider units.  If $X$ is measured in one unit (say inches), and $Y$ is measured in another (say dollars), the covariance is measured in the product of these two units $\text{inches} \times \text{dollars}$.  These units can be hard to interpret.  What we will often want in this case is a unit-less measurement of relatedness.  Indeed, often we do not care about exact quantitative correlation, but rather ask if the correlation is in the same direction, and how strong the relationship is.  
+>>>>>>> random-variables.md
 
 To see what makes sense, let's perform a thought experiment.  Suppose that we convert our random variables in inches and dollars to be in inches and cents.  In this case the random variable $Y$ is multiplied by $100$.  If we work through the definition, this means that $\mathrm{Cov}(X, Y)$ will be multiplied by $100$.  Thus we see that in this case a change of units change the covariance by a factor of $100$.  Thus, to find our unit-invariant measure of correlation, we will need to divide by something else that also gets scaled by $100$.  Indeed we have a clear candidate, the standard deviation!  Indeed if we define the *correlation coefficient* to be
 
@@ -578,7 +598,11 @@ for i in range(3):
 d2l.plt.show()
 ```
 
+<<<<<<< HEAD
 Let's list a few properties of the correlation below.
+=======
+Let us list a few properties of the correlation below.
+>>>>>>> random-variables.md
 
 * For any random variable $X$, $\rho(X, X) = 1$.
 * For any random variables $X, Y$ and numbers $a$ and $b$, $\rho(aX+b, Y) = \rho(X, aY+b) = \rho(X, Y)$.
