@@ -35,3 +35,26 @@ sudo bash install_fonts.sh
 ```
 d2lbook build html
 ```
+
+## Install Fonts
+
+```
+wget -O source-serif-pro.zip https://www.fontsquirrel.com/fonts/download/source-serif-pro
+unzip source-serif-pro -d source-serif-pro
+sudo mv source-serif-pro /usr/share/fonts/opentype/
+
+wget -O source-sans-pro.zip https://www.fontsquirrel.com/fonts/download/source-sans-pro
+unzip source-sans-pro -d source-sans-pro
+sudo mv source-sans-pro /usr/share/fonts/opentype/
+
+wget -O source-code-pro.zip https://www.fontsquirrel.com/fonts/download/source-code-pro
+unzip source-code-pro -d source-code-pro
+sudo mv source-code-pro /usr/share/fonts/opentype/
+
+wget -O Inconsolata.zip https://www.fontsquirrel.com/fonts/download/Inconsolata
+unzip Inconsolata -d Inconsolata
+sudo mv Inconsolata /usr/share/fonts/opentype/
+
+sudo fc-cache -f -v
+
+```
