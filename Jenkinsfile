@@ -8,6 +8,13 @@ stage("Build and Publish") {
       def CUDA_VISIBLE_DEVICES=(EID*2).toString() + ',' + (EID*2+1).toString();
 
       sh label: "Build Environment", script: """set -ex
+      
+      wget -O Inconsolata.zip https://www.fontsquirrel.com/fonts/download/Inconsolata
+      unzip Inconsolata -d Inconsolata
+      sudo mv Inconsolata /usr/share/fonts/opentype/
+      sudo fc-cache -f -v
+      
+      
       rm -rf ~/miniconda3/envs/${ENV_NAME}
       conda create -n ${ENV_NAME} pip python=3.7 -y
       conda activate ${ENV_NAME}
