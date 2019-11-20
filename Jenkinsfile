@@ -16,6 +16,7 @@ stage("Build and Publish") {
       pip install d2l==0.11.0
       pip list
       nvidia-smi
+      d2lbook clear
       """
 
       sh label: "Check Execution Output", script: """set -ex
@@ -49,8 +50,6 @@ stage("Build and Publish") {
       d2lbook build html pkg
       rm -rf _build/eval/data
       mv _build/data_tmp _build/eval/data
-      # For 0.7.0
-      cp _build/d2l-en.zip _build/d2l-en-0.7.0.zip
       """
 
       if (env.BRANCH_NAME == 'numpy2') {
