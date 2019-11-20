@@ -156,7 +156,7 @@ train_momentum(0.005, 0.9)
 There's very little to do in Gluon since the standard `sgd` solver already had momentum built in. Setting matching parameters yields a very similar trajectory.
 
 ```{.python .input  n=9}
-d2l.train_gluon_ch10('sgd', {'learning_rate': 0.005, 'momentum': 0.9}, 
+d2l.train_gluon_ch10('sgd', {'learning_rate': 0.005, 'momentum': 0.9},
                      data_iter)
 ```
 

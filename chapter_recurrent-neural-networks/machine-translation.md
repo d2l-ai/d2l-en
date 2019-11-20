@@ -34,9 +34,11 @@ We perform several preprocessing steps on the raw text data, including ignoring 
 # Saved in the d2l package for later use
 def preprocess_nmt(text):
     text = text.replace('\u202f', ' ').replace('\xa0', ' ')
+
     def no_space(char, prev_char):
         return (True if char in (',', '!', '.')
                 and prev_char != ' ' else False)
+    
     out = [' '+char if i > 0 and no_space(char, text[i-1]) else char
            for i, char in enumerate(text.lower())]
     return ''.join(out)

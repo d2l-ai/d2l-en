@@ -52,7 +52,7 @@ npx.set_np()
 
 def nin_block(num_channels, kernel_size, strides, padding):
     blk = nn.Sequential()
-    blk.add(nn.Conv2D(num_channels, kernel_size, strides, padding, 
+    blk.add(nn.Conv2D(num_channels, kernel_size, strides, padding,
                       activation='relu'),
             nn.Conv2D(num_channels, kernel_size=1, activation='relu'),
             nn.Conv2D(num_channels, kernel_size=1, activation='relu'))
