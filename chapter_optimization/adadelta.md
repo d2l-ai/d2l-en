@@ -44,15 +44,15 @@ def adadelta(params, states, hyperparams):
 Choosing $\rho = 0.9$ amounts to a half-life time of 10 for each parameter update. This tends to work quite well. We get the following behavior.
 
 ```{.python .input  n=12}
-data_iter, feature_dim = d2l.get_data_ch10(batch_size=10)
-d2l.train_ch10(adadelta, init_adadelta_states(feature_dim),
+data_iter, feature_dim = d2l.get_data_ch11(batch_size=10)
+d2l.train_ch11(adadelta, init_adadelta_states(feature_dim),
                {'rho': 0.9}, data_iter, feature_dim);
 ```
 
 For a concise implementation we simply use the `adadelta` algorithm from the `Trainer` class. This yields the following one-liner for a much more compact invocation.
 
 ```{.python .input  n=9}
-d2l.train_gluon_ch10('adadelta', {'rho': 0.9}, data_iter)
+d2l.train_gluon_ch11('adadelta', {'rho': 0.9}, data_iter)
 ```
 
 ## Summary

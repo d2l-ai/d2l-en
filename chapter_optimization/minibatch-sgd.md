@@ -106,7 +106,7 @@ Let's have a look at how minibatches are efficiently generated from data. In the
 
 ```{.python .input  n=1}
 # Saved in the d2l package for later use
-def get_data_ch10(batch_size=10, n=1500):
+def get_data_ch11(batch_size=10, n=1500):
     data = np.genfromtxt('../data/airfoil_self_noise.dat',
                          dtype=np.float32, delimiter='\t')
     data = (data - data.mean(axis=0)) / data.std(axis=0)
@@ -134,7 +134,7 @@ Next, we implement a generic training function to facilitate the use of the othe
 
 ```{.python .input  n=3}
 # Saved in the d2l package for later use
-def train_ch10(trainer_fn, states, hyperparams, data_iter,
+def train_ch11(trainer_fn, states, hyperparams, data_iter,
                feature_dim, num_epochs=2):
     # Initialization
     w = np.random.normal(scale=0.01, size=(feature_dim, 1))
@@ -166,8 +166,8 @@ Let's see how optimization proceeds for batch gradient descent. This can be achi
 
 ```{.python .input  n=4}
 def train_sgd(lr, batch_size, num_epochs=2):
-    data_iter, feature_dim = get_data_ch10(batch_size)
-    return train_ch10(
+    data_iter, feature_dim = get_data_ch11(batch_size)
+    return train_ch11(
         sgd, None, {'lr': lr}, data_iter, feature_dim, num_epochs)
 
 gd_res = train_sgd(1, 1500, 10)
@@ -207,7 +207,7 @@ In Gluon, we can use the `Trainer` class to call optimization algorithms. This i
 
 ```{.python .input  n=9}
 # Saved in the d2l package for later use
-def train_gluon_ch10(tr_name, hyperparams, data_iter, num_epochs=2):
+def train_gluon_ch11(tr_name, hyperparams, data_iter, num_epochs=2):
     # Initialization
     net = nn.Sequential()
     net.add(nn.Dense(1))
@@ -235,8 +235,8 @@ def train_gluon_ch10(tr_name, hyperparams, data_iter, num_epochs=2):
 Using Gluon to repeat the last experiment shows identical behavior.
 
 ```{.python .input  n=10}
-data_iter, _ = get_data_ch10(10)
-train_gluon_ch10('sgd', {'learning_rate': 0.05}, data_iter)
+data_iter, _ = get_data_ch11(10)
+train_gluon_ch11('sgd', {'learning_rate': 0.05}, data_iter)
 ```
 
 ## Summary

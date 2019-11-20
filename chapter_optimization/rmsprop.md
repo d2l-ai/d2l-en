@@ -81,8 +81,8 @@ def rmsprop(params, states, hyperparams):
 We set the initial learning rate to 0.01 and the weighting term $\gamma$ to 0.9. That is, $\mathbf{s}$ aggregates on average over the past $1/(1-\gamma) = 10$ observations of the square gradient.
 
 ```{.python .input  n=24}
-data_iter, feature_dim = d2l.get_data_ch10(batch_size=10)
-d2l.train_ch10(rmsprop, init_rmsprop_states(feature_dim),
+data_iter, feature_dim = d2l.get_data_ch11(batch_size=10)
+d2l.train_ch11(rmsprop, init_rmsprop_states(feature_dim),
                {'lr': 0.01, 'gamma': 0.9}, data_iter, feature_dim);
 ```
 
@@ -91,7 +91,7 @@ d2l.train_ch10(rmsprop, init_rmsprop_states(feature_dim),
 Since RMSProp is a rather popular algorithm it is also available in the `Trainer` instance. All we need to do is instantiate it using an algorithm named `rmsprop`, assigning $\gamma$ to the parameter `gamma1`.
 
 ```{.python .input  n=29}
-d2l.train_gluon_ch10('rmsprop', {'learning_rate': 0.01, 'gamma1': 0.9},
+d2l.train_gluon_ch11('rmsprop', {'learning_rate': 0.01, 'gamma1': 0.9},
                      data_iter)
 ```
 
