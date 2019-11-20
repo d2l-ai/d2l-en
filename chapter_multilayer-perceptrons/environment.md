@@ -31,7 +31,7 @@ and yet there would be no coinciding improvement in credit-worthiness.
 Think about this deeply because similar issues abound in the application of machine learning: by introducing our model-based decisions to the environment,
 we might break the model.
 
-In this chapter, we describe some common concerns
+In this section, we describe some common concerns
 and aim to get you started acquiring the critical thinking
 that you will need in order to detect these situations early,
 mitigate the damage, and use machine learning responsibly.

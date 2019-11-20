@@ -230,7 +230,7 @@ i.e., we estimate after we observe the facts,
 hence vulnerable to the associated fallacy.
 For now, we will put the philosophy aside and stick to more tangible issues.
 
-In this chapter, to give you some intuition,
+In this section, to give you some intuition,
 we’ll focus on a few factors that tend
 to influence the generalizability of a model class:
 

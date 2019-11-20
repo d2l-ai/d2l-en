@@ -1,7 +1,7 @@
 # Adam
 :label:`sec_adam`
 
-In the discussions leading up to this chapter we encountered a number of techniques for efficient optimization. Let's recap them in detail here:
+In the discussions leading up to this section we encountered a number of techniques for efficient optimization. Let's recap them in detail here:
 
 * We saw that :ref:`sec_sgd` is more effective than Gradient Descent when solving optimization problems, e.g. due to its inherent resilience to redundant data. 
 * We saw that :ref:`sec_minibatch_sgd` affords significant additional efficiency arising from vectorization, using larger sets of observations in one minibatch. This is the key to efficient multi-machine, multi-GPU and overall parallel processing. 

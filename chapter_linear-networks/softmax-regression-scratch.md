@@ -29,7 +29,7 @@ train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 As in our linear regression example, 
 each example here will be represented by a fixed-length vector.
 Each example in the raw data is a $28 \times 28$ image.
-In this chapter, we will flatten each image, 
+In this section, we will flatten each image, 
 treating them as $784$ 1D vectors.
 In the future, we will talk about more sophisticated strategies
 for exploiting the spatial structure in images,
