@@ -83,7 +83,7 @@ To check whether we are able to recover the model we instantiate a clone of the 
 
 ```{.python .input  n=8}
 clone = MLP()
-clone.load_parameters('mlp.params') 
+clone.load_parameters('mlp.params')
 ```
 
 Since both instances have the same model parameters, the computation result of the same input `x` should be the same. Let's verify this.

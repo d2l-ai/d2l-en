@@ -122,7 +122,7 @@ we can make the output and input have the same height and width by setting diffe
 ```{.python .input  n=2}
 # Here, we use a convolution kernel with a height of 5 and a width of 3. The
 # padding numbers on both sides of the height and width are 2 and 1,
-# respectively 
+# respectively
 conv2d = nn.Conv2D(1, kernel_size=(5, 3), padding=(2, 1))
 comp_conv2d(conv2d, X).shape
 ```

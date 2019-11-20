@@ -89,10 +89,10 @@ To illustrate what happens for nonconvex functions consider the case of $f(x) = 
 ```{.python .input}
 c = 0.15 * np.pi
 
-def f(x): 
+def f(x):
     return x * np.cos(c * x)
 
-def gradf(x): 
+def gradf(x):
     return np.cos(c * x) - c * x * np.sin(c * x)
 
 show_trace(gd(2))
@@ -210,13 +210,13 @@ Now let's see what happens when we have a *nonconvex* function, such as $f(x) = 
 ```{.python .input}
 c = 0.15 * np.pi
 
-def f(x): 
+def f(x):
     return x * np.cos(c * x)
 
-def gradf(x): 
+def gradf(x):
     return np.cos(c * x) - c * x * np.sin(c * x)
 
-def hessf(x): 
+def hessf(x):
     return - 2 * c * np.sin(c * x) - x * c**2 * np.cos(c * x)
 
 show_trace(newton())

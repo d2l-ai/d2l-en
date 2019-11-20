@@ -108,7 +108,7 @@ def get_lstm_params(vocab_size, num_hiddens, ctx):
         return (normal((num_inputs, num_hiddens)),
                 normal((num_hiddens, num_hiddens)),
                 np.zeros(num_hiddens, ctx=ctx))
-    
+
     W_xi, W_hi, b_i = three()  # Input gate parameters
     W_xf, W_hf, b_f = three()  # Forget gate parameters
     W_xo, W_ho, b_o = three()  # Output gate parameters

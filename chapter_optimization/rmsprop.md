@@ -91,7 +91,7 @@ d2l.train_ch10(rmsprop, init_rmsprop_states(feature_dim),
 Since RMSProp is a rather popular algorithm it is also available in the `Trainer` instance. All we need to do is instantiate it using an algorithm named `rmsprop`, assigning $\gamma$ to the parameter `gamma1`.
 
 ```{.python .input  n=29}
-d2l.train_gluon_ch10('rmsprop', {'learning_rate': 0.01, 'gamma1': 0.9}, 
+d2l.train_gluon_ch10('rmsprop', {'learning_rate': 0.01, 'gamma1': 0.9},
                      data_iter)
 ```
 

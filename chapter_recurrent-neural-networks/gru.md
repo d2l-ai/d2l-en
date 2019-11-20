@@ -126,7 +126,7 @@ def get_params(vocab_size, num_hiddens, ctx):
         return (normal((num_inputs, num_hiddens)),
                 normal((num_hiddens, num_hiddens)),
                 np.zeros(num_hiddens, ctx=ctx))
-    
+
     W_xz, W_hz, b_z = three()  # Update gate parameter
     W_xr, W_hr, b_r = three()  # Reset gate parameter
     W_xh, W_hh, b_h = three()  # Candidate hidden state parameter
@@ -176,7 +176,6 @@ num_epochs, lr = 500, 1
 model = d2l.RNNModelScratch(len(vocab), num_hiddens, ctx, get_params,
                             init_gru_state, gru)
 d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, ctx)
-
 ```
 
 ## Concise Implementation

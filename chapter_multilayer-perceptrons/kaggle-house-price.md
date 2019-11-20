@@ -186,7 +186,7 @@ Finally, via the `values` attribute,
 n_train = train_data.shape[0]
 train_features = np.array(all_features[:n_train].values, dtype=np.float32)
 test_features = np.array(all_features[n_train:].values, dtype=np.float32)
-train_labels = np.array(train_data.SalePrice.values, 
+train_labels = np.array(train_data.SalePrice.values,
                         dtype=np.float32).reshape(-1, 1)
 ```
 
