@@ -132,7 +132,7 @@ def train_fine_tuning(net, learning_rate, batch_size=128, num_epochs=5):
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
     trainer = gluon.Trainer(net.collect_params(), 'sgd', {
         'learning_rate': learning_rate, 'wd': 0.001})
-    d2l.train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs, ctx)
+    d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, ctx)
 ```
 
 We set the learning rate in the `Trainer` instance to a smaller value, such as 0.01, in order to fine tune the model parameters obtained in pre-training. Based on the previous settings, we will train the output layer parameters of the target model from scratch using a learning rate ten times greater.

@@ -657,14 +657,14 @@ class RNNModel(nn.Block):
         return self.rnn.begin_state(*args, **kwargs)
 
 
-# Defined in file: ./chapter_recurrent-neural-networks/machine-translation.md
+# Defined in file: ./chapter_modern_recurrent-networks/machine-translation.md
 def read_data_nmt():
     fname = gluon.utils.download('http://data.mxnet.io/data/fra-eng.zip')
     with zipfile.ZipFile(fname, 'r') as f:
         return f.read('fra.txt').decode("utf-8")
 
 
-# Defined in file: ./chapter_recurrent-neural-networks/machine-translation.md
+# Defined in file: ./chapter_modern_recurrent-networks/machine-translation.md
 def preprocess_nmt(text):
     text = text.replace('\u202f', ' ').replace('\xa0', ' ')
 
@@ -677,7 +677,7 @@ def preprocess_nmt(text):
     return ''.join(out)
 
 
-# Defined in file: ./chapter_recurrent-neural-networks/machine-translation.md
+# Defined in file: ./chapter_modern_recurrent-networks/machine-translation.md
 def tokenize_nmt(text, num_examples=None):
     source, target = [], []
     for i, line in enumerate(text.split('\n')):
@@ -690,7 +690,7 @@ def tokenize_nmt(text, num_examples=None):
     return source, target
 
 
-# Defined in file: ./chapter_recurrent-neural-networks/machine-translation.md
+# Defined in file: ./chapter_modern_recurrent-networks/machine-translation.md
 def trim_pad(line, num_steps, padding_token):
     if len(line) > num_steps:
         return line[:num_steps]  # Trim
@@ -698,7 +698,7 @@ def trim_pad(line, num_steps, padding_token):
 
 
 
-# Defined in file: ./chapter_recurrent-neural-networks/machine-translation.md
+# Defined in file: ./chapter_modern_recurrent-networks/machine-translation.md
 def build_array(lines, vocab, num_steps, is_source):
     lines = [vocab[l] for l in lines]
     if not is_source:
@@ -708,7 +708,7 @@ def build_array(lines, vocab, num_steps, is_source):
     return array, valid_len
 
 
-# Defined in file: ./chapter_recurrent-neural-networks/machine-translation.md
+# Defined in file: ./chapter_modern_recurrent-networks/machine-translation.md
 def load_data_nmt(batch_size, num_steps, num_examples=1000):
     text = preprocess_nmt(read_data_nmt())
     source, target = tokenize_nmt(text, num_examples)
@@ -723,7 +723,7 @@ def load_data_nmt(batch_size, num_steps, num_examples=1000):
     return src_vocab, tgt_vocab, data_iter
 
 
-# Defined in file: ./chapter_recurrent-neural-networks/encoder-decoder.md
+# Defined in file: ./chapter_modern_recurrent-networks/encoder-decoder.md
 class Encoder(nn.Block):
     """The base encoder interface for the encoder-decoder architecture."""
     def __init__(self, **kwargs):
@@ -733,7 +733,7 @@ class Encoder(nn.Block):
         raise NotImplementedError
 
 
-# Defined in file: ./chapter_recurrent-neural-networks/encoder-decoder.md
+# Defined in file: ./chapter_modern_recurrent-networks/encoder-decoder.md
 class Decoder(nn.Block):
     """The base decoder interface for the encoder-decoder architecture."""
     def __init__(self, **kwargs):
@@ -746,7 +746,7 @@ class Decoder(nn.Block):
         raise NotImplementedError
 
 
-# Defined in file: ./chapter_recurrent-neural-networks/encoder-decoder.md
+# Defined in file: ./chapter_modern_recurrent-networks/encoder-decoder.md
 class EncoderDecoder(nn.Block):
     """The base class for the encoder-decoder architecture."""
     def __init__(self, encoder, decoder, **kwargs):
@@ -760,7 +760,7 @@ class EncoderDecoder(nn.Block):
         return self.decoder(dec_X, dec_state)
 
 
-# Defined in file: ./chapter_recurrent-neural-networks/seq2seq.md
+# Defined in file: ./chapter_modern_recurrent-networks/seq2seq.md
 class Seq2SeqEncoder(d2l.Encoder):
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0, **kwargs):
@@ -780,7 +780,7 @@ class Seq2SeqEncoder(d2l.Encoder):
         return out, state
 
 
-# Defined in file: ./chapter_recurrent-neural-networks/seq2seq.md
+# Defined in file: ./chapter_modern_recurrent-networks/seq2seq.md
 class Seq2SeqDecoder(d2l.Decoder):
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0, **kwargs):
@@ -801,7 +801,7 @@ class Seq2SeqDecoder(d2l.Decoder):
         return out, state
 
 
-# Defined in file: ./chapter_recurrent-neural-networks/seq2seq.md
+# Defined in file: ./chapter_modern_recurrent-networks/seq2seq.md
 class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
     # pred shape: (batch_size, seq_len, vocab_size)
     # label shape: (batch_size, seq_len)
@@ -813,7 +813,7 @@ class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
         return super(MaskedSoftmaxCELoss, self).forward(pred, label, weights)
 
 
-# Defined in file: ./chapter_recurrent-neural-networks/seq2seq.md
+# Defined in file: ./chapter_modern_recurrent-networks/seq2seq.md
 def train_s2s_ch8(model, data_iter, lr, num_epochs, ctx):
     model.initialize(init.Xavier(), force_reinit=True, ctx=ctx)
     trainer = gluon.Trainer(model.collect_params(),
@@ -841,7 +841,7 @@ def train_s2s_ch8(model, data_iter, lr, num_epochs, ctx):
         metric[0]/metric[1], metric[1]/timer.stop(), ctx))
 
 
-# Defined in file: ./chapter_recurrent-neural-networks/seq2seq.md
+# Defined in file: ./chapter_modern_recurrent-networks/seq2seq.md
 def predict_s2s_ch8(model, src_sentence, src_vocab, tgt_vocab, num_steps, ctx):
     src_tokens = src_vocab[src_sentence.lower().split(' ')]
     enc_valid_length = np.array([len(src_tokens)], ctx=ctx)
@@ -1065,7 +1065,7 @@ def evaluate_accuracy_gpus(net, data_iter, split_f=d2l.split_batch):
 
 
 # Defined in file: ./chapter_computer-vision/image-augmentation.md
-def train_batch_ch12(net, features, labels, loss, trainer, ctx_list,
+def train_batch_ch13(net, features, labels, loss, trainer, ctx_list,
                      split_f=d2l.split_batch):
     Xs, ys = split_f(features, labels, ctx_list)
     with autograd.record():
@@ -1080,7 +1080,7 @@ def train_batch_ch12(net, features, labels, loss, trainer, ctx_list,
 
 
 # Defined in file: ./chapter_computer-vision/image-augmentation.md
-def train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs,
+def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
                ctx_list=d2l.try_all_gpus(), split_f=d2l.split_batch):
     num_batches, timer = len(train_iter), d2l.Timer()
     animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs], ylim=[0, 1],
@@ -1090,7 +1090,7 @@ def train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs,
         metric = d2l.Accumulator(4)
         for i, (features, labels) in enumerate(train_iter):
             timer.start()
-            l, acc = train_batch_ch12(
+            l, acc = train_batch_ch13(
                 net, features, labels, loss, trainer, ctx_list, split_f)
             metric.add(l, acc, labels.shape[0], labels.size)
             timer.stop()
@@ -1436,321 +1436,5 @@ def predict_sentiment(net, vocab, sentence):
     sentence = np.array(vocab[sentence.split()], ctx=d2l.try_gpu())
     label = np.argmax(net(sentence.reshape(1, -1)), axis=1)
     return 'positive' if label == 1 else 'negative'
-
-
-# Defined in file: ./chapter_recommender-systems/movielens.md
-def read_data_ml100k(path="../data/", member="ml-100k/u.data",
-              names=['user_id','item_id','rating','timestamp'], sep="\t"):
-    fname = gluon.utils.download(
-        'http://files.grouplens.org/datasets/movielens/ml-100k.zip',
-    path=path)
-    with zipfile.ZipFile(fname, 'r') as inzipfile:
-        inzipfile.extract(member, path)
-        data = pd.read_csv(path + member, sep, names=names, engine='python')
-        num_users = data.user_id.unique().shape[0]
-        num_items = data.item_id.unique().shape[0]
-        return data, num_users, num_items
-
-
-# Defined in file: ./chapter_recommender-systems/movielens.md
-def split_data_ml100k(data, num_users, num_items,
-               split_mode="random", test_ratio = 0.1):
-    """Split the dataset in random mode or seq-aware mode."""
-    if split_mode == "seq-aware":
-        train_items, test_items, train_list = {}, {}, []
-        for line in data.itertuples():
-            u, i, rating, time = line[1], line[2], line[3], line[4]
-            train_items.setdefault(u,[]).append((u, i, rating, time))
-            if u not in test_items or test_items[u][-1] < time:
-                test_items[u] = (i, rating, time)
-        for u in range(1, num_users + 1):
-            train_list.extend(sorted(train_items[u], key=lambda k: k[3]))
-        test_data = [(key, *value) for key, value in test_items.items()]
-        train_data = [item for item in train_list if item not in test_data]
-        train_data = pd.DataFrame(train_data)
-        test_data = pd.DataFrame(test_data)
-    else:
-        mask = [True if x == 1 else False for x in np.random.uniform(
-            0, 1, (len(data))) < 1 - test_ratio]
-        neg_mask = [not x for x in mask]
-        train_data, test_data = data[mask], data[neg_mask]
-    return train_data, test_data
-
-
-# Defined in file: ./chapter_recommender-systems/movielens.md
-def load_data_ml100k(data, num_users, num_items, feedback="explicit"):
-    users, items, scores = [], [], []
-    inter = np.zeros((num_items, num_users)) if feedback == "explicit" else {}
-    for line in data.itertuples():
-        user_index, item_index = int(line[1] - 1), int(line[2] - 1)
-        score = int(line[3]) if feedback == "explicit" else 1
-        users.append(user_index)
-        items.append(item_index)
-        scores.append(score)
-        if feedback == "implicit":
-            inter.setdefault(user_index, []).append(item_index)
-        else:
-            inter[item_index, user_index] = score
-    return users, items, scores, inter
-
-
-# Defined in file: ./chapter_recommender-systems/movielens.md
-def split_and_load_ml100k(split_mode="seq-aware", feedback="explicit",
-                          test_ratio=0.1, batch_size=256):
-    data, num_users, num_items = read_data_ml100k()
-    train_data, test_data = split_data_ml100k(
-        data, num_users, num_items, split_mode, test_ratio)
-    train_u, train_i, train_r, _ = load_data_ml100k(
-        train_data, num_users, num_items, feedback)
-    test_u, test_i, test_r, _ = load_data_ml100k(
-        test_data, num_users, num_items, feedback)
-    train_set = gluon.data.ArrayDataset(
-        np.array(train_u), np.array(train_i), np.array(train_r))
-    test_set = gluon.data.ArrayDataset(
-        np.array(test_u), np.array(test_i), np.array(test_r))
-    train_iter = gluon.data.DataLoader(
-        train_set, shuffle=True, last_batch="rollover",
-        batch_size=batch_size)
-    test_iter = gluon.data.DataLoader(
-        test_set, batch_size=batch_size)
-    return num_users, num_items, train_iter, test_iter
-
-
-# Defined in file: ./chapter_recommender-systems/mf.md
-def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
-                        ctx_list=d2l.try_all_gpus(), evaluator=None,
-                        **kwargs):
-    num_batches, timer = len(train_iter), d2l.Timer()
-    animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 2],
-                            legend=['train loss','test RMSE'])
-    for epoch in range(num_epochs):
-        metric, l = d2l.Accumulator(3), 0.
-        for i, values in enumerate(train_iter):
-            timer.start()
-            input_data = []
-            values = values if isinstance(values, list) else [values]
-            for v in values:
-                input_data.append(gluon.utils.split_and_load(v, ctx_list))
-            train_feat = input_data[0:-1] if len(values) > 1 else input_data
-            train_label = input_data[-1]
-            with autograd.record():
-                preds = [net(*t) for t in zip(*train_feat)]
-                ls = [loss(p, s) for p, s in zip(preds, train_label)]
-            [l.backward() for l in ls]
-            l += sum([l.asnumpy() for l in ls]).mean() / len(ctx_list)
-            trainer.step(values[0].shape[0])
-            metric.add(l, values[0].shape[0], values[0].size)
-            timer.stop()
-        if len(kwargs) > 0: # it will be used in section AutoRec.
-            test_rmse = evaluator(net, test_iter, kwargs['inter_mat'],
-                                 ctx_list)
-        else:
-            test_rmse = evaluator(net, test_iter, ctx_list)
-        train_l = l / (i + 1)
-        animator.add(epoch + 1, (train_l, test_rmse))
-    print('train loss %.3f, test RMSE %.3f'
-          % (metric[0] / metric[1], test_rmse))
-    print('%.1f examples/sec on %s'
-          % (metric[2] * num_epochs / timer.sum(), ctx_list))
-
-
-# Defined in file: ./chapter_recommender-systems/ranking.md
-class BPRLoss(gluon.loss.Loss):
-    def __init__(self, weight=None, batch_axis=0, **kwargs):
-        super(BPRLoss, self).__init__(weight=None, batch_axis=0, **kwargs)
-
-    def forward(self, positive, negative):
-        distances = positive - negative
-        loss = - np.sum(np.log(npx.sigmoid(distances)), 0, keepdims=True)
-        return loss
-
-
-# Defined in file: ./chapter_recommender-systems/ranking.md
-class HingeLossbRec(gluon.loss.Loss):
-    def __init__(self, weight=None, batch_axis=0, **kwargs):
-        super(HingeLossbRec, self).__init__(weight=None, batch_axis=0,
-                                            **kwargs)
-
-    def forward(self, positive, negative, margin=1):
-        distances = positive - negative
-        loss = np.sum(np.maximum( - distances + margin, 0))
-        return loss
-
-
-# Defined in file: ./chapter_recommender-systems/neumf.md
-def negative_sampler(users, candidates, num_items):
-    sampled_neg_items = []
-    all_items = set([i for i in range(num_items)])
-    for u in users:
-        neg_items = list(all_items - set(candidates[int(u)]))
-        indices = random.randint(0, len(neg_items) - 1)
-        sampled_neg_items.append(neg_items[indices])
-    return np.array(sampled_neg_items)
-
-
-# Defined in file: ./chapter_recommender-systems/neumf.md
-def hit_and_auc(rankedlist, test_matrix, k):
-    hits_k = [(idx, val) for idx, val in enumerate(rankedlist[:k]) 
-              if val in set(test_matrix)]
-    hits_all = [(idx, val) for idx, val in enumerate(rankedlist) 
-                if val in set(test_matrix)]
-    max = len(rankedlist) - 1
-    auc = 1.0 * (max - hits_all[0][0]) /max if len(hits_all) > 0 else 0
-    return len(hits_k) , auc
-
-
-# Defined in file: ./chapter_recommender-systems/neumf.md
-def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items, 
-                     ctx):
-    ranked_list, ranked_items, hit_rate, auc = {}, {}, [], []
-    all_items = set([i for i in range(num_users)])
-    for u in range(num_users):
-        neg_items = list(all_items - set(candidates[int(u)]))
-        user_ids, item_ids, x, scores = [], [], [], []
-        [item_ids.append(i) for i in neg_items]
-        [user_ids.append(u) for _ in neg_items]
-        x.extend([np.array(user_ids)])
-        if seq is not None:
-            x.append(seq[user_ids,:])
-        x.extend([np.array(item_ids)])
-        test_data_iter = gluon.data.DataLoader(gluon.data.ArrayDataset(*x), 
-            shuffle=False, last_batch="keep", batch_size=1024)
-        for index, values in enumerate(test_data_iter):
-            x = [gluon.utils.split_and_load(v, ctx, even_split=False)
-                          for v in values]
-            scores.extend([list(net(*t).asnumpy()) for t in zip(*x)])
-        scores = [item for sublist in scores for item in sublist]
-        item_scores = list(zip(item_ids, scores))
-        ranked_list[u] = sorted(item_scores, key=lambda t: t[1], reverse=True)
-        ranked_items[u] = [r[0] for r in ranked_list[u]]
-        temp = hit_and_auc(ranked_items[u], test_input[u], 50)
-        hit_rate.append(temp[0])
-        auc.append(temp[1])
-    return np.mean(np.array(hit_rate)), np.mean(np.array(auc))
-
-
-# Defined in file: ./chapter_recommender-systems/neumf.md
-def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter, 
-                  num_users, num_items, num_epochs, ctx_list, evaluator, 
-                  negative_sampler, candidates, eval_step=1):
-    num_batches, timer, hit_rate, auc  = len(train_iter), d2l.Timer(), 0, 0
-    animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 1],
-                            legend=['test hit rate', 'test AUC'])
-    for epoch in range(num_epochs):
-        metric, l = d2l.Accumulator(3), 0.
-        for i, values in enumerate(train_iter):
-            input_data = []
-            for v in values:
-                input_data.append(gluon.utils.split_and_load(v, ctx_list))
-            neg_items = negative_sampler(values[0], candidates, num_items)
-            neg_items = gluon.utils.split_and_load(neg_items, ctx_list)
-            with autograd.record():
-                p_pos = [net(*t) for t in zip(*input_data)]
-                p_neg = [net(*t) for t in zip(*input_data[0:-1], neg_items)]
-                ls =  [loss(p, n) for p, n in  zip(p_pos, p_neg)]
-            [l.backward(retain_graph=False) for l in ls]
-            l += sum([l.asnumpy() for l in ls]).mean()/len(ctx_list)
-            trainer.step(values[0].shape[0])
-            metric.add(l, values[0].shape[0], values[0].size)
-            timer.stop()
-        with autograd.predict_mode():
-            if (epoch + 1) % eval_step == 0:
-                hit_rate, auc = evaluator(net, test_iter, test_seq_iter, 
-                                          candidates, num_users, num_items, 
-                                          ctx_list)
-                train_l = l / (i + 1)
-                animator.add(epoch + 1, ( hit_rate, auc))
-    print('train loss %.3f, test hit rate %.3f, test AUC %.3f'
-          % (metric[0] / metric[1], hit_rate, auc))
-    print('%.1f examples/sec on %s'
-          % (metric[2] * num_epochs / timer.sum(), ctx_list))
-
-
-# Defined in file: ./chapter_recommender-systems/ctr.md
-def read_data_ctr(path="../data/", train="ctr/train.csv", 
-                  test="ctr/test.csv"):
-    data_path = ("https://apache-mxnet.s3-accelerate.amazonaws.com/"
-                 "gluon/dataset/")
-    train_sha1 = "6dec3052e49ce0d1cec5ebc6f5ded1172be0befb"
-    test_sha1 ="c265e3c1fad0ed4caf8c1a373c580465a8096eb0"
-
-    ctr_path = path+"ctr"
-    os.makedirs(ctr_path, exist_ok=True)
-    gluon.utils.download(data_path + train, ctr_path, train_sha1)
-    gluon.utils.download(data_path + test, ctr_path, test_sha1)
-
-
-# Defined in file: ./chapter_recommender-systems/ctr.md
-class CTRDataset(gluon.data.Dataset):
-    def __init__(self, data_path, feat_mapper=None, defaults=None, 
-                 min_threshold=4, num_feat=34):
-        self.NUM_FEATS, self.count, self.data = num_feat, 0, {}
-        feat_cnts = defaultdict(lambda: defaultdict(int))
-        self.feat_mapper, self.defaults = feat_mapper, defaults
-        self.field_dims = np.zeros(self.NUM_FEATS, dtype=np.int64)
-        with open(data_path) as f:
-            for line in f:
-                instance = {}
-                values = line.rstrip('\n').split('\t')
-                if len(values) != self.NUM_FEATS + 1:
-                    continue
-                label = np.float32([0, 0])
-                label[int(values[0])] = 1
-                instance['y'] = [np.float32(values[0])]
-                for i in range(1, self.NUM_FEATS + 1):
-                    feat_cnts[i][values[i ]] += 1
-                    instance.setdefault('x',[]).append(values[i ])
-                self.data[self.count] = instance
-                self.count = self.count + 1
-        if self.feat_mapper is None and self.defaults is None:
-            feat_mapper = {i: {feat for feat, c in cnt.items() if c >= 
-                               min_threshold} for i, cnt in feat_cnts.items()}
-            self.feat_mapper = {i: {feat: idx for idx, feat in enumerate(cnt)}
-                                for i, cnt in feat_mapper.items()}
-            self.defaults = {i: len(cnt) for i, cnt in feat_mapper.items()}
-        for i, fm in self.feat_mapper.items():
-            self.field_dims[i - 1] = len(fm) + 1
-        self.offsets = np.array((0, *np.cumsum(self.field_dims).asnumpy()
-                                 [:-1]))
-    def __len__(self):
-        return self.count
-    def __getitem__(self, idx):
-        feat = np.array([self.feat_mapper[i + 1].get(v, self.defaults[i + 1]) 
-                         for i, v in enumerate(self.data[idx]['x'])])
-        return feat + self.offsets, self.data[idx]['y']
-
-
-# Defined in file: ./chapter_generative_adversarial_networks/gan.md
-def update_D(X, Z, net_D, net_G, loss, trainer_D):
-    """Update discriminator"""
-    batch_size = X.shape[0]
-    ones = np.ones((batch_size,), ctx=X.context)
-    zeros = np.zeros((batch_size,), ctx=X.context)
-    with autograd.record():
-        real_Y = net_D(X)
-        fake_X = net_G(Z)
-        # Do not need to compute gradient for net_G, detach it from
-        # computing gradients.
-        fake_Y = net_D(fake_X.detach())
-        loss_D = (loss(real_Y, ones) + loss(fake_Y, zeros)) / 2
-    loss_D.backward()
-    trainer_D.step(batch_size)
-    return float(loss_D.sum())
-
-
-# Defined in file: ./chapter_generative_adversarial_networks/gan.md
-def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
-    """Update generator"""
-    batch_size = Z.shape[0]
-    ones = np.ones((batch_size,), ctx=Z.context)
-    with autograd.record():
-        # We could reuse fake_X from update_D to save computation.
-        fake_X = net_G(Z)
-        # Recomputing fake_Y is needed since net_D is changed.
-        fake_Y = net_D(fake_X)
-        loss_G = loss(fake_Y, ones)
-    loss_G.backward()
-    trainer_G.step(batch_size)
-    return float(loss_G.sum())
 
 
