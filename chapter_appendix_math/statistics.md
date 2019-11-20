@@ -35,12 +35,13 @@ npx.set_np()
 epsilon = 0.1
 random.seed(8675309)
 xs = np.random.normal(loc=0, scale=1, size=(300, ))
-ys = [np.sum(np.exp(-(xs[0:i] - xs[i])**2/(2 * epsilon**2))
-             / np.sqrt(2*np.pi*epsilon**2))/len(xs) for i in range(len(xs))]
+
+ys = [np.sum(np.exp(-(xs[0:i] - xs[i])**2/(2 * epsilon**2)) /
+             np.sqrt(2*np.pi*epsilon**2))/len(xs) for i in range(len(xs))]
 
 # Compute true density
 xd = np.arange(np.min(xs), np.max(xs), 0.01)
-yd = np.exp(-xd**2 / 2) / np.sqrt(2*np.pi)
+yd = np.exp(-xd**2/2)/np.sqrt(2*np.pi)
 
 # Plot the results
 d2l.plot(xd, yd, 'x', 'density')
@@ -51,7 +52,7 @@ d2l.plt.title("Sample Mean: {:.2f}".format(float(np.mean(xs))))
 d2l.plt.show()
 ```
 
-There can be many ways to compute an estimator of a parameter $\hat{\theta_n}$.  In this section, we introduce three common methods to evaluate and compare estimators: the mean squared error, the standard deviation, and statistical bias. 
+There can be many ways to compute an estimator of a parameter $\hat{\theta}_n$.  In this section, we introduce three common methods to evaluate and compare estimators: the mean squared error, the standard deviation, and statistical bias. 
 
 ### Mean Squared Error
 
@@ -295,7 +296,7 @@ N = 1000
 # Sample dataset
 samples = np.random.normal(loc=0, scale=1, size=(N, ))
 
-# Lookup Students's t-distribution c.d.f
+# Lookup Students's t-distribution c.d.f.
 t_star = 1.96
 
 # Construct interval
