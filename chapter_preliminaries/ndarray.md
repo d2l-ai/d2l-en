@@ -156,7 +156,7 @@ np.random.normal(0, 1, size=(3, 4))
 
 We can also specify the exact values for each element in the desired `ndarray`
 by supplying a Python list (or list of lists) containing the numerical values.
-Here, the outermost list corresponds to axis 0, and the inner list to axis 1.
+Here, the outermost list corresponds to axis $0$, and the inner list to axis $1$.
 
 ```{.python .input  n=9}
 np.array([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
@@ -416,7 +416,7 @@ a, a.item(), float(a), int(a)
 ## Summary
 
 * MXNet's `ndarray` is an extension to NumPy's `ndarray` 
-  with a few key advantages that make it suitable for deep learning.
+  with a few killer advantages that make it suitable for deep learning.
 * MXNet's `ndarray` provides a variety of functionalities including 
   basic mathematics operations, broadcasting, indexing, slicing, 
   memory saving, and conversion to other Python objects.
