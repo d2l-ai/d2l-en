@@ -9,7 +9,7 @@ Another issue arises from the fact that we might not only receive a sequence as 
 
 In short, while convolutional neural networks can efficiently process spatial information, recurrent neural networks are designed to better handle sequential information. These networks introduce state variables to store past information, and then determine the current outputs, together with the current inputs.
 
-Many of the examples for using recurrent networks are based on text data. Hence, we will emphasize language models in this chapter. After a more formal review of sequence data we discuss basic concepts of a language model and use this discussion as the inspiration for the design of recurrent neural networks. Next, we describe the gradient calculation method in recurrent neural networks to explore problems that may be encountered in recurrent neural network training. For some of these problems, we can use gated recurrent neural networks, such as LSTMs (:numref:`sec_lstm`) and GRUs (:numref:`sec_gru`), described later in this chapter.
+Many of the examples for using recurrent networks are based on text data. Hence, we will emphasize language models in this chapter. After a more formal review of sequence data we discuss basic concepts of a language model and use this discussion as the inspiration for the design of recurrent neural networks. Next, we describe the gradient calculation method in recurrent neural networks to explore problems that may be encountered in recurrent neural network training.
 
 ```toc
 :maxdepth: 2
@@ -21,13 +21,5 @@ rnn
 rnn-scratch
 rnn-gluon
 bptt
-gru
-lstm
-deep-rnn
-bi-rnn
-machine-translation
-encoder-decoder
-seq2seq
-beam-search
 ```
 
