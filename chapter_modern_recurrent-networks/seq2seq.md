@@ -171,7 +171,7 @@ During training, if the target sequence has length $n$, we feed the first $n-1$ 
 
 ```{.python .input  n=13}
 # Saved in the d2l package for later use
-def train_s2s_ch8(model, data_iter, lr, num_epochs, ctx):
+def train_s2s_ch9(model, data_iter, lr, num_epochs, ctx):
     model.initialize(init.Xavier(), force_reinit=True, ctx=ctx)
     trainer = gluon.Trainer(model.collect_params(),
                             'adam', {'learning_rate': lr})
@@ -211,7 +211,7 @@ encoder = Seq2SeqEncoder(
 decoder = Seq2SeqDecoder(
     len(tgt_vocab), embed_size, num_hiddens, num_layers, dropout)
 model = d2l.EncoderDecoder(encoder, decoder)
-train_s2s_ch8(model, train_iter, lr, num_epochs, ctx)
+train_s2s_ch9(model, train_iter, lr, num_epochs, ctx)
 ```
 
 ## Predicting
@@ -224,7 +224,7 @@ sequence. As illustrated in :numref:`fig_seq2seq_predict`, during predicting, we
 
 ```{.python .input  n=15}
 # Saved in the d2l package for later use
-def predict_s2s_ch8(model, src_sentence, src_vocab, tgt_vocab, num_steps, ctx):
+def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps, ctx):
     src_tokens = src_vocab[src_sentence.lower().split(' ')]
     enc_valid_length = np.array([len(src_tokens)], ctx=ctx)
     src_tokens = d2l.trim_pad(src_tokens, num_steps, src_vocab.pad)
@@ -250,7 +250,7 @@ Try several examples:
 
 ```{.python .input  n=16}
 for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
-    print(sentence + ' => ' + predict_s2s_ch8(
+    print(sentence + ' => ' + predict_s2s_ch9(
         model, sentence, src_vocab, tgt_vocab, num_steps, ctx))
 ```
 
