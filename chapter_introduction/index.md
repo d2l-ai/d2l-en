@@ -1552,4 +1552,4 @@ than the potential of malevolent superintelligence to destroy humanity.
 
 ## [Discussions](https://discuss.mxnet.io/t/2310)
 
-![](../img/qr_intro.svg)
+![](../img/qr_introduction.svg)
