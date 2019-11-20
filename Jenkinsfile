@@ -50,7 +50,7 @@ stage("Build and Publish") {
       rm -rf _build/eval/data
       mv _build/data_tmp _build/eval/data
       # For 0.7.0
-      cp build/_build/html/d2l-en.zip build/_build/html/d2l-en-0.7.0.zip
+      cp _build/html/d2l-en.zip _build/html/d2l-en-0.7.0.zip
       """
 
       if (env.BRANCH_NAME == 'numpy2') {
