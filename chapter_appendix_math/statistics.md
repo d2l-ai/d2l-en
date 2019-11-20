@@ -34,14 +34,14 @@ npx.set_np()
 # Sample datapoints and create y coordinate
 epsilon = 0.1
 random.seed(8675309)
-xs = np.random.normal(loc=0, scale=1, size=(300, ))
+xs = np.random.normal(loc=0, scale=1, size=(300,))
 
-ys = [np.sum(np.exp(-(xs[0:i] - xs[i])**2/(2 * epsilon**2)) /
-             np.sqrt(2*np.pi*epsilon**2))/len(xs) for i in range(len(xs))]
+ys = [np.sum(np.exp(-(xs[0:i] - xs[i])**2 / (2 * epsilon**2))
+             / np.sqrt(2*np.pi*epsilon**2)) / len(xs) for i in range(len(xs))]
 
 # Compute true density
 xd = np.arange(np.min(xs), np.max(xs), 0.01)
-yd = np.exp(-xd**2/2)/np.sqrt(2*np.pi)
+yd = np.exp(-xd**2/2) / np.sqrt(2 * np.pi)
 
 # Plot the results
 d2l.plot(xd, yd, 'x', 'density')
@@ -294,7 +294,7 @@ It is safe to say that :eqref:`eq_gauss_confidence` is one of the most used form
 N = 1000
 
 # Sample dataset
-samples = np.random.normal(loc=0, scale=1, size=(N, ))
+samples = np.random.normal(loc=0, scale=1, size=(N,))
 
 # Lookup Students's t-distribution c.d.f.
 t_star = 1.96
