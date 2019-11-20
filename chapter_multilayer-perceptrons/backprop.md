@@ -249,7 +249,7 @@ thus more intermediate activations need to be stored.
 ## Exercises
 
 1. Assume that the inputs $\mathbf{x}$ are matrices. What is the dimensionality of the gradients?
-1. Add a bias to the hidden layer of the model described in this chapter.
+1. Add a bias to the hidden layer of the model described in this section.
     * Draw the corresponding compute graph.
     * Derive the forward and backward propagation equations.
 1. Compute the memory footprint for training and inference in model described in the current chapter.

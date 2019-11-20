@@ -27,7 +27,7 @@ we are referring to MXNet's `ndarray` unless otherwise stated.
 
 ## Getting Started
 
-In this chapter, we aim to get you up and running,
+In this section, we aim to get you up and running,
 equipping you with the the basic math and numerical computing tools
 that you will build on as you progress through the book. 
 Do not worry if you struggle to grok some of 

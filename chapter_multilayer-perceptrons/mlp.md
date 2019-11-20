@@ -121,7 +121,7 @@ $\mathbf{W} = \mathbf{W}_2 \mathbf{W}_1$ and $\mathbf{b} = \mathbf{W}_2 \mathbf{
 $$\mathbf{o} = \mathbf{W}_2 \mathbf{h} + \mathbf{b}_2 = \mathbf{W}_2 (\mathbf{W}_1 \mathbf{x} + \mathbf{b}_1) + \mathbf{b}_2 = (\mathbf{W}_2 \mathbf{W}_1) \mathbf{x} + (\mathbf{W}_2 \mathbf{b}_1 + \mathbf{b}_2) = \mathbf{W} \mathbf{x} + \mathbf{b}$$
 
 In order to get a benefit from multilayer architectures,
-we need another key ingredient—a nonlinearity $\sigma$ to be applied to each of the hidden units after each layer's linear transformation.
+we need another key ingredient---a nonlinearity $\sigma$ to be applied to each of the hidden units after each layer's linear transformation.
 The most popular choice for the nonlinearity these days is the rectified linear unit (ReLU) $\mathrm{max}(x, 0)$.
 After incorporating these non-linearities
 it becomes impossible to merge layers.
@@ -176,7 +176,7 @@ $$
 With some abuse of notation, we define the nonlinearity $\sigma$
 to apply to its inputs on a row-wise fashion, i.e., one observation at a time.
 Note that we are also using the notation for *softmax* in the same way to denote a row-wise operation.
-Often, as in this chapter, the activation functions that we apply to hidden layers are not merely row-wise, but component wise.
+Often, as in this section, the activation functions that we apply to hidden layers are not merely row-wise, but component wise.
 That means that after computing the linear portion of the layer,
 we can calculate each nodes activation without looking at the values taken by the other hidden units.
 This is true for most activation functions
