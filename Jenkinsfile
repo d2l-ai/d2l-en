@@ -13,7 +13,7 @@ stage("Build and Publish") {
       conda activate ${ENV_NAME}
       pip install mxnet-cu100==1.5.0
       pip install git+https://github.com/d2l-ai/d2l-book
-      pip install d2l==0.10.3
+      python setup.py develop
       pip list
       """
 
