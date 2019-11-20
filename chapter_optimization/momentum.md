@@ -131,11 +131,11 @@ Let's see how this works in practice.
 
 ```{.python .input  n=15}
 def train_momentum(lr, momentum, num_epochs=2):
-    d2l.train_ch10(sgd_momentum, init_momentum_states(feature_dim),
+    d2l.train_ch11(sgd_momentum, init_momentum_states(feature_dim),
                    {'lr': lr, 'momentum': momentum}, data_iter,
                    feature_dim, num_epochs)
 
-data_iter, feature_dim = d2l.get_data_ch10(batch_size=10)
+data_iter, feature_dim = d2l.get_data_ch11(batch_size=10)
 train_momentum(0.02, 0.5)
 ```
 
@@ -156,7 +156,7 @@ train_momentum(0.005, 0.9)
 There's very little to do in Gluon since the standard `sgd` solver already had momentum built in. Setting matching parameters yields a very similar trajectory.
 
 ```{.python .input  n=9}
-d2l.train_gluon_ch10('sgd', {'learning_rate': 0.005, 'momentum': 0.9},
+d2l.train_gluon_ch11('sgd', {'learning_rate': 0.005, 'momentum': 0.9},
                      data_iter)
 ```
 

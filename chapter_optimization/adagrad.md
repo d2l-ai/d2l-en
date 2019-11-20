@@ -113,8 +113,8 @@ Compared to the experiment in :numref:`sec_minibatch_sgd` we use a
 larger learning rate to train the model.
 
 ```{.python .input  n=9}
-data_iter, feature_dim = d2l.get_data_ch10(batch_size=10)
-d2l.train_ch10(adagrad, init_adagrad_states(feature_dim),
+data_iter, feature_dim = d2l.get_data_ch11(batch_size=10)
+d2l.train_ch11(adagrad, init_adagrad_states(feature_dim),
                {'lr': 0.1}, data_iter, feature_dim);
 ```
 
@@ -123,7 +123,7 @@ d2l.train_ch10(adagrad, init_adagrad_states(feature_dim),
 Using the `Trainer` instance of the algorithm `adagrad`, we can invoke the Adagrad algorithm in Gluon.
 
 ```{.python .input  n=5}
-d2l.train_gluon_ch10('adagrad', {'learning_rate': 0.1}, data_iter)
+d2l.train_gluon_ch11('adagrad', {'learning_rate': 0.1}, data_iter)
 ```
 
 ## Summary
