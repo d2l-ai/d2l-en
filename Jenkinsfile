@@ -11,7 +11,7 @@ stage("Build and Publish") {
       
       wget -O Inconsolata.zip https://www.fontsquirrel.com/fonts/download/Inconsolata
       unzip Inconsolata -d Inconsolata
-      sudo mv Inconsolata /usr/share/fonts/opentype/
+      mv Inconsolata /usr/share/fonts/opentype/
       sudo fc-cache -f -v
       
       
