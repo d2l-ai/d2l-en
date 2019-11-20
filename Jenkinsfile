@@ -9,9 +9,9 @@ stage("Build and Publish") {
 
       sh label: "Build Environment", script: """set -ex
       
-      ssh -t remotehost "sudo <cmd>"
-      sudo mv Inconsolata /usr/share/fonts/opentype/
-      sudo fc-cache -f -v
+      
+      sudo -S mv Inconsolata /usr/share/fonts/opentype/
+      sudo -S fc-cache -f -v
       
       
       rm -rf ~/miniconda3/envs/${ENV_NAME}
