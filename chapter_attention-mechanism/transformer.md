@@ -430,7 +430,7 @@ decoder = TransformerDecoder(
     len(src_vocab), embedding_size, num_hiddens, num_heads, num_layers,
     dropout)
 model = d2l.EncoderDecoder(encoder, decoder)
-d2l.train_s2s_ch8(model, train_iter, lr, num_epochs, ctx)
+d2l.train_s2s_ch9(model, train_iter, lr, num_epochs, ctx)
 ```
 
 As we can see from the training time and accuracy, compared to the seq2seq model with attention model, the transformer runs faster per epoch, and converges faster at the beginning.
@@ -439,7 +439,7 @@ Last but not the least, let's translate some sentences. Unsurprisingly, this mod
 
 ```{.python .input  n=28}
 for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
-    print(sentence + ' => ' + d2l.predict_s2s_ch8(
+    print(sentence + ' => ' + d2l.predict_s2s_ch9(
         model, sentence, src_vocab, tgt_vocab, num_steps, ctx))
 ```
 

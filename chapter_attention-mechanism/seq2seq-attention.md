@@ -112,14 +112,14 @@ encoder = d2l.Seq2SeqEncoder(
 decoder = Seq2SeqAttentionDecoder(
     len(tgt_vocab), embed_size, num_hiddens, num_layers, dropout)
 model = d2l.EncoderDecoder(encoder, decoder)
-d2l.train_s2s_ch8(model, train_iter, lr, num_epochs, ctx)
+d2l.train_s2s_ch9(model, train_iter, lr, num_epochs, ctx)
 ```
 
 Last, we predict several sample examples.
 
 ```{.python .input  n=6}
 for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
-    print(sentence + ' => ' + d2l.predict_s2s_ch8(
+    print(sentence + ' => ' + d2l.predict_s2s_ch9(
         model, sentence, src_vocab, tgt_vocab, num_steps, ctx))
 ```
 

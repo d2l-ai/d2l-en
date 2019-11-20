@@ -814,7 +814,7 @@ class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
 
 
 # Defined in file: ./chapter_modern_recurrent-networks/seq2seq.md
-def train_s2s_ch8(model, data_iter, lr, num_epochs, ctx):
+def train_s2s_ch9(model, data_iter, lr, num_epochs, ctx):
     model.initialize(init.Xavier(), force_reinit=True, ctx=ctx)
     trainer = gluon.Trainer(model.collect_params(),
                             'adam', {'learning_rate': lr})
@@ -842,7 +842,7 @@ def train_s2s_ch8(model, data_iter, lr, num_epochs, ctx):
 
 
 # Defined in file: ./chapter_modern_recurrent-networks/seq2seq.md
-def predict_s2s_ch8(model, src_sentence, src_vocab, tgt_vocab, num_steps, ctx):
+def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps, ctx):
     src_tokens = src_vocab[src_sentence.lower().split(' ')]
     enc_valid_length = np.array([len(src_tokens)], ctx=ctx)
     src_tokens = d2l.trim_pad(src_tokens, num_steps, src_vocab.pad)
