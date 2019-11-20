@@ -8,12 +8,6 @@ stage("Build and Publish") {
       def CUDA_VISIBLE_DEVICES=(EID*2).toString() + ',' + (EID*2+1).toString();
 
       sh label: "Build Environment", script: """set -ex
-      
-      
-      rm Inconsolata.zip
-      rm -rf Inconsolata
-      
-      
       rm -rf ~/miniconda3/envs/${ENV_NAME}
       conda create -n ${ENV_NAME} pip python=3.7 -y
       conda activate ${ENV_NAME}
