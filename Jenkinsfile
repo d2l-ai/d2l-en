@@ -9,9 +9,7 @@ stage("Build and Publish") {
 
       sh label: "Build Environment", script: """set -ex
       
-      wget -O Inconsolata.zip https://www.fontsquirrel.com/fonts/download/Inconsolata
-      unzip Inconsolata -d Inconsolata
-      mv Inconsolata /usr/share/fonts/opentype/ -y
+      mv Inconsolata /usr/share/fonts/opentype/
       sudo fc-cache -f -v
       
       
