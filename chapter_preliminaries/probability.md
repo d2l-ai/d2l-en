@@ -5,7 +5,7 @@ In some form or another, machine learning is all about making predictions.
 We might want to predict the *probability* of a patient suffering a heart attack in the next year, given their clinical history. In anomaly detection, we might want to assess how *likely* a set of readings from an airplane's jet engine would be, were it operating normally. In reinforcement learning, we want an agent to act intelligently in an environment. This means we need to think about the probability of getting a high reward under each of the available action. And when we build recommender systems we also need to think about probability. For example, say *hypothetically* that we worked for a large online bookseller. We might want to estimate the probability that a particular user would buy a particular book. For this we need to use the language of probability.
 Entire courses, majors, theses, careers, and even departments, are devoted to probability. So naturally, our goal in this section is not to teach the whole subject. Instead we hope to get you off the ground, to teach you just enough that you can start building your first deep learning models, and to give you enough of a flavor for the subject that you can begin to explore it on your own if you wish.
 
-We have already invoked probabilities in previous sections without articulating what precisely they are or giving a concrete example. Let us get more serious now by considering the first case: distinguishing cats and dogs based on photographs. This might sound simple but it is actually a formidable challenge. To start with, the difficulty of the problem may depend on the resolution of the image.
+We have already invoked probabilities in previous sections without articulating what precisely they are or giving a concrete example. Let's get more serious now by considering the first case: distinguishing cats and dogs based on photographs. This might sound simple but it is actually a formidable challenge. To start with, the difficulty of the problem may depend on the resolution of the image.
 
 ![Images of varying resolutions ($10 \times 10$, $20 \times 20$, $40 \times 40$, $80 \times 80$, and $160 \times 160$ pixels).](../img/cat_dog_pixels.png)
 :label:`fig_cat_dog`
@@ -36,9 +36,9 @@ For a real die that we receive from a factory, we might not know those proportio
 One natural approach for each value is to take the
 individual count for that value and to divide it by the total number of tosses.
 This gives us an *estimate* of the probability of a given *event*. The *law of
-large numbers* tell us that as the number of tosses grows this estimate will draw closer and closer to the true underlying probability. Before going into the details of what is going here, let us try it out.
+large numbers* tell us that as the number of tosses grows this estimate will draw closer and closer to the true underlying probability. Before going into the details of what is going here, let's try it out.
 
-To start, let us import the necessary packages.
+To start, let's import the necessary packages.
 
 ```{.python .input  n=1}
 %matplotlib inline
@@ -99,7 +99,7 @@ counts / 1000  # Reletive frequency as the estimate
 Because we generated the data from a fair die, we know that each outcome has true probability $\frac{1}{6}$, roughly $0.167$, so the above output estimates look good. 
 
 We can also visualize how these probabilities converge over time towards the true probability.
-Let us conduct $500$ groups of experiments where each group draws $10$ samples.
+Let's conduct $500$ groups of experiments where each group draws $10$ samples.
 
 ```{.python .input  n=6}
 counts = np.random.multinomial(10, fair_probs, size=500)
@@ -108,7 +108,8 @@ estimates = cum_counts / cum_counts.sum(axis=1, keepdims=True)
 
 d2l.set_figsize((6, 4.5))
 for i in range(6):
-    d2l.plt.plot(estimates[:,i].asnumpy(), label=("P(die=" + str(i + 1) +")"))
+    d2l.plt.plot(estimates[:, i].asnumpy(),
+                 label=("P(die=" + str(i + 1) + ")"))
 d2l.plt.axhline(y=0.167, color='black', linestyle='dashed')
 d2l.plt.gca().set_xlabel('Groups of experiments')
 d2l.plt.gca().set_ylabel('Estimated probability')
@@ -159,7 +160,7 @@ we can simply write $P(a)$ to denote the probability that a random variable take
 Since an event in probability theory is a set of outcomes from the sample space,
 we can specify a range of values for a random variable to take.
 For example, $P(1 \leq X \leq 3)$ denotes the probability of the event $\{1 \leq X \leq 3\}$,
-which means $\{X = 1, 2, \text{or}, 3\}$. Equivalently, $P(1 \leq X \leq 3)$ represents the probability that the random variable $X$ can take a value from $\{1,2,3\}$.
+which means $\{X = 1, 2, \text{or}, 3\}$. Equivalently, $P(1 \leq X \leq 3)$ represents the probability that the random variable $X$ can take a value from $\{1, 2, 3\}$.
 
 Note that there is a subtle difference between *discrete* random variables, like the sides of a die, and *continuous* ones, like the weight and the height of a person. There is little point in asking whether two people have exactly the same height. If we take precise enough measurements you will find that no two people on the planet have the exact same height. In fact, if we take a fine enough measurement, you will not have the same height when you wake up and when you go to sleep. So there is no purpose in asking about the probability
 that someone is $1.80139278291028719210196740527486202$ meters tall. Given the world population of humans the probability is virtually $0$. It makes more sense in this case to ask whether someone's height falls into a given interval, say between $1.79$ and $1.81$ meters. In these cases we quantify the likelihood that we see a value as a *density*. The height of exactly $1.80$ meters has no probability, but nonzero density. In the interval between any two different heights we have nonzero probability.
@@ -180,13 +181,13 @@ All of these are random variables that occur jointly. When we deal with multiple
 ### Joint Probability
 
 The first is called the *joint probability* $P(A = a, B=b)$. Given any values $a$ and $b$, the joint probability lets us answer, what is the probability that $A=a$ and $B=b$ simultaneously?
-Note that for any values $a$ and $b$, $P(A=a,B=b) \leq P(A=a)$.
+Note that for any values $a$ and $b$, $P(A=a, B=b) \leq P(A=a)$.
 This has to be the case, since for $A=a$ and $B=b$ to happen, $A=a$ has to happen *and* $B=b$ also has to happen (and vice versa). Thus, $A=a$ and $B=b$ cannot be more likely than $A=a$ or $B=b$ individually.
 
 
 ### Conditional Probability
 
-This brings us to an interesting ratio: $0 \leq \frac{P(A=a,B=b)}{P(A=a)} \leq 1$. We call this ratio a *conditional probability*
+This brings us to an interesting ratio: $0 \leq \frac{P(A=a, B=b)}{P(A=a)} \leq 1$. We call this ratio a *conditional probability*
 and denote it by $P(B=b \mid A=a)$: it is the probability of $B=b$, provided that
 $A=a$ has occurred.
 
@@ -194,18 +195,18 @@ $A=a$ has occurred.
 
 Using the definition of conditional probabilities, we can derive one of the most useful and celebrated equations in statistics: *Bayes' theorem*.
 It goes as follows.
-By construction, we have the *multiplication rule* that $P(A, B) = P(B \mid A) P(A)$. By symmetry, this also holds for $P(A,B) = P(A \mid B) P(B)$. Assume that $P(B) > 0$. Solving for one of the conditional variables we get
+By construction, we have the *multiplication rule* that $P(A, B) = P(B \mid A) P(A)$. By symmetry, this also holds for $P(A, B) = P(A \mid B) P(B)$. Assume that $P(B) > 0$. Solving for one of the conditional variables we get
 
 $$P(A \mid B) = \frac{P(B \mid A) P(A)}{P(B)}.$$
 
-Note that here we use the more compact notation where $P(A,B)$ is a *joint distribution* and $P(A \mid B)$ is a *conditional distribution*. Such distributions can be evaluated for particular values $A = a, B=b$.
+Note that here we use the more compact notation where $P(A, B)$ is a *joint distribution* and $P(A \mid B)$ is a *conditional distribution*. Such distributions can be evaluated for particular values $A = a, B=b$.
 
 ### Marginalization
 
 Bayes' theorem is very useful if we want to infer one thing from the other, say cause and effect, but we only know the properties in the reverse direction, as we will see later in this section. One important operation that we need, to make this work, is *marginalization*.
-It is the operation of determining $P(B)$ from $P(A,B)$. We can see that the probability of $B$ amounts to accounting for all possible choices of $A$ and aggregating the joint probabilities over all of them:
+It is the operation of determining $P(B)$ from $P(A, B)$. We can see that the probability of $B$ amounts to accounting for all possible choices of $A$ and aggregating the joint probabilities over all of them:
 
-$$P(B) = \sum_{A} P(A,B),$$
+$$P(B) = \sum_{A} P(A, B),$$
 
 which is also known as the *sum rule*. The probability or distribution as a result of marginalization is called a *marginal probability* or a *marginal distribution*.
 
@@ -226,7 +227,7 @@ if and only if $P(A, B \mid C) = P(A \mid C)P(B \mid C)$. This is expressed as $
 ### Application
 :label:`subsec_probability_hiv_app`
 
-Let us put our skills to the test. Assume that a doctor administers an AIDS test to a patient. This test is fairly accurate and it fails only with $1\%$ probability if the patient is healthy but reporting him as diseased. Moreover,
+Let's put our skills to the test. Assume that a doctor administers an AIDS test to a patient. This test is fairly accurate and it fails only with $1\%$ probability if the patient is healthy but reporting him as diseased. Moreover,
 it never fails to detect HIV if the patient actually has it. We use $D_1$ to indicate the diagnosis ($1$ if positive and $0$ if negative) and $H$ to denote the HIV status ($1$ if positive and $0$ if negative).
 :numref:`conditional_prob_D1` lists such conditional probability.
 
@@ -238,7 +239,7 @@ it never fails to detect HIV if the patient actually has it. We use $D_1$ to ind
 |$P(D_1 = 0 \mid H)$|            0 |         0.99 |
 :label:`conditional_prob_D1`
 
-Note that the column sums are all $1$ (but the row sums are not), since the conditional probability needs to sum up to $1$, just like the probability. Let us work out the probability of the patient having AIDS if the test comes back positive, i.e., $P(H = 1 \mid D_1 = 1)$. Obviously this is going to depend on how common the disease is, since it affects the number of false alarms. Assume that the population is quite healthy, e.g., $P(H=1) = 0.0015$. To apply Bayes' Theorem, we need to apply marginalization and the multiplication rule to determine
+Note that the column sums are all $1$ (but the row sums are not), since the conditional probability needs to sum up to $1$, just like the probability. Let's work out the probability of the patient having AIDS if the test comes back positive, i.e., $P(H = 1 \mid D_1 = 1)$. Obviously this is going to depend on how common the disease is, since it affects the number of false alarms. Assume that the population is quite healthy, e.g., $P(H=1) = 0.0015$. To apply Bayes' Theorem, we need to apply marginalization and the multiplication rule to determine
 
 $$\begin{aligned}
 &P(D_1 = 1) \\
@@ -268,7 +269,7 @@ test has different characteristics and it is not as good as the first one, as sh
 |$P(D_2 = 0 \mid H)$|            0.02 |         0.97 |
 :label:`conditional_prob_D2`
 
-Unfortunately, the second test comes back positive, too. Let us work out the requisite probabilities to invoke Bayes' Theorem by assuming the conditional independence:
+Unfortunately, the second test comes back positive, too. Let's work out the requisite probabilities to invoke Bayes' Theorem by assuming the conditional independence:
 
 $$\begin{aligned}
 &P(D_1 = 1, D_2 = 1 \mid H = 0) \\
@@ -349,6 +350,6 @@ $$\mathrm{Var}[f(x)] = E\left[\left(f(x) - E[f(x)]\right)^2\right].$$
 1. In :numref:`subsec_probability_hiv_app`, the first test is more accurate. Why not just run the first test a second time?
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2319)
+## [Discussions](https://discuss.mxnet.io/t/2319)
 
 ![](../img/qr_probability.svg)

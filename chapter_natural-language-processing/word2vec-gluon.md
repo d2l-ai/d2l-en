@@ -22,7 +22,7 @@ We will implement the skip-gram model by using embedding layers and minibatch mu
 
 ### Embedding Layer
 
-The layer in which the obtained word is embedded is called the embedding layer, which can be obtained by creating an `nn.Embedding` instance in Gluon. The weight of the embedding layer is a matrix whose number of rows is the dictionary size (`input_dim`) and whose number of columns is the dimension of each word vector (`output_dim`). We set the dictionary size to 20 and the word vector dimension to 4.
+The layer in which the obtained word is embedded is called the embedding layer, which can be obtained by creating an `nn.Embedding` instance in Gluon. The weight of the embedding layer is a matrix whose number of rows is the dictionary size (`input_dim`) and whose number of columns is the dimension of each word vector (`output_dim`). We set the dictionary size to $20$ and the word vector dimension to $4$.
 
 ```{.python .input  n=15}
 embed = nn.Embedding(input_dim=20, output_dim=4)
@@ -30,7 +30,7 @@ embed.initialize()
 embed.weight
 ```
 
-The input of the embedding layer is the index of the word. When we enter the index $i$ of a word, the embedding layer returns the $i$th row of the weight matrix as its word vector. Below we enter an index of shape (2,3) into the embedding layer. Because the dimension of the word vector is 4, we obtain a word vector of shape (2,3,4).
+The input of the embedding layer is the index of the word. When we enter the index $i$ of a word, the embedding layer returns the $i^\mathrm{th}$ row of the weight matrix as its word vector. Below we enter an index of shape ($2$, $3$) into the embedding layer. Because the dimension of the word vector is 4, we obtain a word vector of shape ($2$, $3$, $4$).
 
 ```{.python .input  n=16}
 x = np.array([[1, 2, 3], [4, 5, 6]])
@@ -62,7 +62,7 @@ def skip_gram(center, contexts_and_negatives, embed_v, embed_u):
 Verify that the output shape should be (batch size, 1, `max_len`).
 
 ```{.python .input}
-skip_gram(np.ones((2,1)), np.ones((2,4)), embed, embed).shape
+skip_gram(np.ones((2, 1)), np.ones((2, 4)), embed, embed).shape
 ```
 
 ## Training
@@ -83,7 +83,7 @@ Given two identical examples, different masks lead to different loss values.
 
 ```{.python .input}
 pred = np.array([[.5]*4]*2)
-label = np.array([[1,0,1,0]]*2)
+label = np.array([[1, 0, 1, 0]]*2)
 mask = np.array([[1, 1, 1, 1], [1, 1, 0, 0]])
 loss(pred, label, mask)
 ```
@@ -94,7 +94,7 @@ We can normalize the loss in each example due to various lengths in each example
 loss(pred, label, mask) / mask.sum(axis=1) * mask.shape[1]
 ```
 
-### Initialize Model Parameters
+### Initializing Model Parameters
 
 We construct the embedding layers of the central and context words, respectively, and set the hyperparameter word vector dimension `embed_size` to 100.
 
@@ -130,7 +130,8 @@ def train(net, data_iter, lr, num_epochs, ctx=d2l.try_gpu()):
             trainer.step(batch_size)
             metric.add(l.sum(), l.size)
             if (i+1) % 50 == 0:
-                animator.add(epoch+(i+1)/len(data_iter), (metric[0]/metric[1],))
+                animator.add(epoch+(i+1)/len(data_iter),
+                             (metric[0]/metric[1],))
     print('loss %.3f, %d tokens/sec on %s ' % (
         metric[0]/metric[1], metric[1]/timer.stop(), ctx))
 ```
@@ -150,7 +151,7 @@ After training the word embedding model, we can represent similarity in meaning 
 def get_similar_tokens(query_token, k, embed):
     W = embed.weight.data()
     x = W[vocab[query_token]]
-    # Compute the cosine similarity. Add 1e-9 for numerical stability.
+    # Compute the cosine similarity. Add 1e-9 for numerical stability
     cos = np.dot(W, x) / np.sqrt(np.sum(W * W, axis=1) * np.sum(x * x) + 1e-9)
     topk = npx.topk(cos, k=k+1, ret_typ='indices').asnumpy().astype('int32')
     for i in topk[1:]:  # Remove the input words
@@ -172,6 +173,6 @@ get_similar_tokens('chip', 3, net[0])
 * When the dataset is large, we usually sample the context words and the noise words for the central target word in the current minibatch only when updating the model parameters. In other words, the same central target word may have different context words or noise words in different epochs. What are the benefits of this sort of training? Try to implement this training method.
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2387)
+## [Discussions](https://discuss.mxnet.io/t/2387)
 
 ![](../img/qr_word2vec-gluon.svg)

@@ -37,6 +37,6 @@ The rest of the fastText process is consistent with the skip-gram model, so it i
 
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2388)
+## [Discussions](https://discuss.mxnet.io/t/2388)
 
 ![](../img/qr_fasttext.svg)

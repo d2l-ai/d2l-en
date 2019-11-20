@@ -30,7 +30,7 @@ The basic building block of classic convolutional networks
 is a sequence of the following layers:
 (i) a convolutional layer
 (with padding to maintain the resolution),
-(ii) a nonlinearity such as a ReLu,
+(ii) a nonlinearity such as a ReLU,
 One VGG block consists of a sequence of convolutional layers,
 followed by a max pooling layer for spatial downsampling.
 In the original VGG paper :cite:`Simonyan.Zisserman.2014`,
@@ -46,7 +46,7 @@ and the number of output channels `num_channels`.
 
 ```{.python .input  n=1}
 import d2l
-from mxnet import gluon, np, npx
+from mxnet import np, npx
 from mxnet.gluon import nn
 npx.set_np()
 
@@ -67,7 +67,7 @@ the first consisting mostly of convolutional and pooling layers
 and a second consisting of fully-connected layers.
 The convolutional portion of the net connects several `vgg_block` modules
 in succession.
-Below, the variable `conv_arch` consists of a list of tuples (one per block),
+In :numref:`fig_vgg`, the variable `conv_arch` consists of a list of tuples (one per block),
 where each contains two values: the number of convolutional layers
 and the number of output channels,
 which are precisely the arguments requires to call
@@ -157,6 +157,6 @@ d2l.train_ch5(net, train_iter, test_iter, num_epochs, lr)
 1. Try to change the height and width of the images in Fashion-MNIST from 224 to 96. What influence does this have on the experiments?
 1. Refer to Table 1 in :cite:`Simonyan.Zisserman.2014` to construct other common models, such as VGG-16 or VGG-19.
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2355)
+## [Discussions](https://discuss.mxnet.io/t/2355)
 
 ![](../img/qr_vgg.svg)

@@ -42,16 +42,16 @@ For example, when designing models, like ResNet-152,
 which possess hundreds (152, thus the name) of layers,
 implementing the network one layer at a time can grow tedious.
 Moreover, this concern is not just hypothetical---such deep networks
-dominate numerous application areas, especally when training data is abundant.
+dominate numerous application areas, especially when training data is abundant.
 For example the ResNet architecture mentioned above ([He et al.](https://www.cv-foundation.org/openaccess/content_cvpr_2016/papers/He_Deep_Residual_Learning_CVPR_2016_paper.pdf))
-won the 2015 ImageNet and COCO computer vision compeititions
+won the 2015 ImageNet and COCO computer vision competitions
 for both recognition and detection.
 Deep networks with many layers arranged into components
 with various repeating patterns are now ubiquitous in other domains
 including natural language processing and speech.
 
 To facilitate the implementation of networks consisting of components
-of arbitrary complecity, we introduce a new flexible concept:
+of arbitrary complexity, we introduce a new flexible concept:
 a neural network *block*.
 A block could describe a single neuron,
 a high-dimensional layer,
@@ -72,10 +72,10 @@ only that we worry about parameters and the `forward` function.
 
 One benefit of working with the `Block` abstraction is that
 they can be combined into larger artifacts, often recursively,
-e.g., as illustrated in the following diagram:
+e.g., as illustrated in :numref:`fig_blocks`.
 
 ![Multiple layers are combined into blocks](../img/blocks.svg)
-
+:label:`fig_blocks`
 
 By defining code to generate Blocks of arbitrary complexity on demand,
 we can write surprisingly compact code
@@ -121,7 +121,7 @@ what exactly happens inside `nn.Sequential`
 have remained mysterious so far.
 
 In short, `nn.Sequential` just defines a special kind of Block.
-Specifically, an `nn.Sequential` maintains a list of constitutent `Blocks`,
+Specifically, an `nn.Sequential` maintains a list of constituent `Blocks`,
 stored in a particular order.
 You might think of `nnSequential` as your first meta-Block.
 The `add` method simply facilitates
@@ -203,7 +203,7 @@ Again note that when dealing with standard functionality like this,
 we do not have to worry about backpropagation,
 since the `backward` method is generated for us automatically.
 The same goes for the `initialize` method.
-Let us try this out:
+Let's try this out:
 
 ```{.python .input  n=2}
 net = MLP()
@@ -256,7 +256,7 @@ class MySequential(nn.Block):
         return x
 ```
 
-At its core is the `add` method. It adds any block to the ordered dictionary of children. These are then executed in sequence when forward propagation is invoked. Let us see what the MLP looks like now.
+At its core is the `add` method. It adds any block to the ordered dictionary of children. These are then executed in sequence when forward propagation is invoked. Let's see what the MLP looks like now.
 
 ```{.python .input  n=4}
 net = MySequential()
@@ -279,7 +279,7 @@ In this case 3 is a constant parameter. We could change 3 to something else, say
 
 $$f(\mathbf{x},\mathbf{w}) = c \cdot \mathbf{w}^\top \mathbf{x}.$$
 
-Nothing has really changed, except that we can adjust the value of $c$. It is still a constant as far as $\mathbf{w}$ and $\mathbf{x}$ are concerned. However, since Gluon does not know about this beforehand, it is worth while to give it a hand (this makes the code go faster, too, since we are not sending the Gluon engine on a wild goose chase after a parameter that does not change). `get_constant` is the method that can be used to accomplish this. Let us see what this looks like in practice.
+Nothing has really changed, except that we can adjust the value of $c$. It is still a constant as far as $\mathbf{w}$ and $\mathbf{x}$ are concerned. However, since Gluon does not know about this beforehand, it is worth while to give it a hand (this makes the code go faster, too, since we are not sending the Gluon engine on a wild goose chase after a parameter that does not change). `get_constant` is the method that can be used to accomplish this. Let's see what this looks like in practice.
 
 ```{.python .input  n=5}
 class FancyMLP(nn.Block):
@@ -293,7 +293,8 @@ class FancyMLP(nn.Block):
 
     def forward(self, x):
         x = self.dense(x)
-        # Use the constant parameters created, as well as the relu and dot functions
+        # Use the constant parameters created, as well as the relu
+        # and dot functions
         x = npx.relu(np.dot(x, self.rand_weight.data()) + 1)
         # Reuse the fully connected layer. This is equivalent to sharing
         # parameters with two fully connected layers
@@ -307,7 +308,7 @@ class FancyMLP(nn.Block):
         return x.sum()
 ```
 
-In this `FancyMLP` model, we used constant weight `Rand_weight` (note that it is not a model parameter), performed a matrix multiplication operation (`np.dot<`), and reused the *same* `Dense` layer. Note that this is very different from using two dense layers with different sets of parameters. Instead, we used the same network twice. Quite often in deep networks one also says that the parameters are *tied* when one wants to express that multiple parts of a network share the same parameters. Let us see what happens if we construct it and feed data through it.
+In this `FancyMLP` model, we used constant weight `Rand_weight` (note that it is not a model parameter), performed a matrix multiplication operation (`np.dot<`), and reused the *same* `Dense` layer. Note that this is very different from using two dense layers with different sets of parameters. Instead, we used the same network twice. Quite often in deep networks one also says that the parameters are *tied* when one wants to express that multiple parts of a network share the same parameters. Let's see what happens if we construct it and feed data through it.
 
 ```{.python .input  n=6}
 net = FancyMLP()
@@ -366,6 +367,6 @@ the current chapter.
 1. Implement a block that takes two blocks as an argument, say `net1` and `net2` and returns the concatenated output of both networks in the forward pass (this is also called a parallel block).
 1. Assume that you want to concatenate multiple instances of the same network. Implement a factory function that generates multiple instances of the same block and build a larger network from it.
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2325)
+## [Discussions](https://discuss.mxnet.io/t/2325)
 
 ![](../img/qr_model-construction.svg)

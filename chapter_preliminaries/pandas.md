@@ -93,6 +93,6 @@ Create a raw dataset with more rows and columns.
 2. Convert the preprocessed dataset to the `ndarray` format.
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/4973)
+## [Discussions](https://discuss.mxnet.io/t/4973)
 
 ![](../img/qr_pandas.svg)

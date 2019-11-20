@@ -16,15 +16,15 @@ $$
 \end{bmatrix}.
 $$
 
-If we apply $A$ to any vector $\mathbf{v} = [x,y]^\top$, 
-we obtain a vector $\mathbf{v}A = [2x,-y]^\top$.
+If we apply $A$ to any vector $\mathbf{v} = [x, y]^\top$, 
+we obtain a vector $\mathbf{v}A = [2x, -y]^\top$.
 This has an intuitive interpretation:
 stretch the vector to be twice as wide in the $x$-direction,
 and then flip it in the $y$-direction.
 
 However, there are *some* vectors for which something remains unchanged.
-Namely $[1,0]^\top$ gets sent to $[2,0]^\top$
-and $[0,1]^\top$ gets sent to $[0,-1]^\top$.
+Namely $[1, 0]^\top$ gets sent to $[2, 0]^\top$
+and $[0, 1]^\top$ gets sent to $[0, -1]^\top$.
 These vectors are still in the same line,
 and the only modification is that the matrix stretches them
 by a factor of $2$ and $-1$ respectively.
@@ -41,15 +41,15 @@ $$
 We say that $\mathbf{v}$ is an eigenvector for $A$ and $\lambda$ is an eigenvalue.
 
 ## Finding Eigenvalues
-Let us figure out how to find them.  
+Let's figure out how to find them.  
 By subtracting off the $\lambda \vec v$ from both sides,
 and then factoring out the vector,
 we see the above is equivalent to:
 
 $$(\mathbf{A} - \lambda \mathbf{I})\mathbf{v} = 0.$$
-:eqlabel:`eigvalue-der`
+:eqlabel:`eq_eigvalue_der`
 
-For :eqref:`eigvalue-der` to happen, we see that $(\mathbf{A} - \lambda \mathbf{I})$ 
+For :eqref:`eq_eigvalue_der` to happen, we see that $(\mathbf{A} - \lambda \mathbf{I})$ 
 must compress some direction down to zero, 
 hence it is not invertible, and thus the determinant is zero.
 Thus, we can find the *eigenvalues* 
@@ -59,7 +59,7 @@ $\mathbf{A}\mathbf{v} = \lambda \mathbf{v}$
 to find the associated *eigenvector(s)*.
 
 ### An Example
-Let us see this with a more challenging matrix
+Let's see this with a more challenging matrix
 
 $$
 \mathbf{A} = \begin{bmatrix}
@@ -85,7 +85,7 @@ $$
 \end{bmatrix}\begin{bmatrix}x \\ y\end{bmatrix}  = \begin{bmatrix}4x \\ 4y\end{bmatrix} .
 $$
 
-We can solve this with the vectors $[1,-1]^\top$ and $[1,2]^\top$ respectively.
+We can solve this with the vectors $[1, -1]^\top$ and $[1, 2]^\top$ respectively.
 
 We can check this in code using the built-in `numpy.linalg.eig` routine.
 
@@ -105,7 +105,7 @@ However, the vectors computed are parallel
 to the ones we found by hand with the same eigenvalues.
 
 ## Decomposing Matrices
-Let us continue the previous example one step further.  Let
+Let's continue the previous example one step further.  Let
 
 $$
 \mathbf{W} = \begin{bmatrix}
@@ -134,7 +134,7 @@ The matrix $W$ is invertible, so we may multiply both sides by $W^{-1}$ on the r
 we see that we may write
 
 $$\mathbf{A} = \mathbf{W} \boldsymbol{\Sigma} \mathbf{W}^{-1}.$$
-:eqlabel:`eig-decomp`
+:eqlabel:`eq_eig_decomp`
 
 In the next section we will see some nice consequences of this,
 but for now we need only know that such a decomposition 
@@ -142,7 +142,7 @@ will exist as long as we can find a full collection
 of linearly independent eigenvectors (so that $W$ is invertible).
 
 ## Operations on Eigendecompositions
-One nice thing about eigendecompositions :eqref:`eig-decomp` is that 
+One nice thing about eigendecompositions :eqref:`eq_eig_decomp` is that 
 we can write many operations we usually encounter cleanly 
 in terms of the eigendecomposition.  
 As a first example, consider:
@@ -199,7 +199,7 @@ $$
 \end{bmatrix},
 $$
 
-has only a single eigenvector, namely $(0,1)$. 
+has only a single eigenvector, namely $(0, 1)$. 
 To handle such matrices, we require more advanced techniques 
 than we can cover (such as the Jordan Normal Form, or Singular Value Decomposition).
 We will often need to restrict our attention to those matrices 
@@ -209,7 +209,7 @@ The most commonly encountered family are the *symmetric matrices*,
 which are those matrices where $\mathbf{A} = \mathbf{A}^\top$. 
 In this case, we may take $W$ to be an *orthogonal matrix*—a matrix whose columns are all length one vectors that are at right angles to one another, where 
 $\mathbf{W}^\top = \mathbf{W}^{-1}$—and all the eigenvalues will be real.  
-Thus, in this special case, we can write :eqref:`eig-decomp` as
+Thus, in this special case, we can write :eqref:`eq_eig_decomp` as
 
 $$
 \mathbf{A} = \mathbf{W}\boldsymbol{\Sigma}\mathbf{W}^\top .
@@ -228,7 +228,7 @@ Let $\mathcal{D}_i$ represent the disc in the complex plane
 with center $a_{ii}$ radius $r_i$.
 Then, every eigenvalue of $\mathbf{A}$ is contained in one of the $\mathcal{D}_i$.
 
-This can be a bit to unpack, so let us look at an example.  
+This can be a bit to unpack, so let's look at an example.  
 Consider the matrix:
 
 $$
@@ -244,13 +244,13 @@ We have $r_1 = 0.3$, $r_2 = 0.6$, $r_3 = 0.8$ and $r_4 = 0.9$.
 The matrix is symmetric, so all eigenvalues are real.
 This means that all of our eigenvalues will be in one of the ranges of 
 
-$$[a_{11}-r_1,a_{11}+r_1] = [0.7,1.3], $$
+$$[a_{11}-r_1, a_{11}+r_1] = [0.7, 1.3], $$
 
-$$[a_{22}-r_2,a_{22}+r_2] = [2.4,3.6], $$
+$$[a_{22}-r_2, a_{22}+r_2] = [2.4, 3.6], $$
 
-$$[a_{33}-r_3,a_{33}+r_3] = [4.2,5.8], $$
+$$[a_{33}-r_3, a_{33}+r_3] = [4.2, 5.8], $$
 
-$$[a_{44}-r_4,a_{44}+r_4] = [8.1,9.9]. $$
+$$[a_{44}-r_4, a_{44}+r_4] = [8.1, 9.9]. $$
 
 
 Performing the numerical computation shows 
@@ -279,7 +279,7 @@ it is good to get any intuitive grasp we can.
 ## A Useful Application: The Growth of Iterated Maps
 
 Now that we understand what eigenvectors are in principle,
-let us see how they can be used to provide a deep understanding 
+let's see how they can be used to provide a deep understanding 
 of a problem central to neural network behavior: proper weight initialization. 
 
 ### Eigenvectors as Long Term Behavior
@@ -299,7 +299,7 @@ $$
 $$
 
 When these models are initialized, $A$ is taken to be 
-a random matrix with Gaussian entries, so let us make one of those. 
+a random matrix with Gaussian entries, so let's make one of those. 
 To be concrete, we start with a mean zero, variance one Gaussian distributed $5 \times 5$ matrix.
 
 ```{.python .input}
@@ -314,7 +314,7 @@ A
 For simplicity in our toy model, 
 we will assume that the data vector we feed in $\mathbf{v}_{in}$ 
 is a random five dimensional Gaussian vector.
-Let us think about what we want to have happen.
+Let's think about what we want to have happen.
 For context, lets think of a generic ML problem,
 where we are trying to turn input data, like an image, into a prediction, 
 like the probability the image is a picture of a cat.
@@ -330,9 +330,9 @@ then after running through many layers, the vector will essentially shrink to no
 and the output will not depend on the input. This is also clearly not right either!
 
 We need to walk the narrow line between growth and decay 
-to make sure that our output changes depending on our input—but not much!
+to make sure that our output changes depending on our input, but not much!
 
-Let us see what happens when we repeatedly multiply our matrix $\mathbf{A}$ 
+Let's see what happens when we repeatedly multiply our matrix $\mathbf{A}$ 
 against a random input vector, and keep track of the norm.
 
 ```{.python .input}
@@ -343,7 +343,7 @@ norm_list = [np.linalg.norm(v_in)]
 for i in range(1, 100):
     v_in = A.dot(v_in)
     norm_list.append(np.linalg.norm(v_in))
-    
+
 d2l.plot(np.arange(0, 100), norm_list, 'Iteration', 'Value')
 ```
 
@@ -355,7 +355,7 @@ Indeed if we take the list of quotients, we will see a pattern.
 norm_ratio_list = []
 for i in range(1, 100):
     norm_ratio_list.append(norm_list[i]/norm_list[i - 1])
-    
+
 d2l.plot(np.arange(1, 100), norm_ratio_list, 'Iteration', 'Ratio')
 ```
 
@@ -369,13 +369,13 @@ but the stretching factor is stable.
 We have seen that eigenvectors and eigenvalues correspond 
 to the amount something is stretched, 
 but that was for specific vectors, and specific stretches.
-Let us take a look at what they are for $\mathbf{A}$.
+Let's take a look at what they are for $\mathbf{A}$.
 A bit of a caveat here: it turns out that to see them all,
 we will need to go to complex numbers.
 You can think of these as stretches and rotations.
 By taking the norm of the complex number
 (square root of the sums of squares of real and imaginary parts)
-we can measure that stretching factor. Let us also sort them.
+we can measure that stretching factor. Let's also sort them.
 
 ```{.python .input}
 # Compute the eigenvalues
@@ -426,7 +426,7 @@ that we do not want a random vector to be stretched or squished at all,
 we would like random vectors to stay about the same size throughout the entire process.
 To do so, we now rescale our matrix by this principle eigenvalue 
 so that the largest eigenvalue is instead now just one.
-Let us see what happens in this case.
+Let's see what happens in this case.
 
 ```{.python .input}
 # Rescale the matrix A
@@ -439,18 +439,18 @@ norm_list = [np.linalg.norm(v_in)]
 for i in range(1, 100):
     v_in = A.dot(v_in)
     norm_list.append(np.linalg.norm(v_in))
-    
+
 d2l.plot(np.arange(0, 100), norm_list, 'Iteration', 'Value')
 ```
 
-We can also plot the ration between consecutive norms as before and see that indeed it stabilizes.  
+We can also plot the ration between consecutive norms as before and see that indeed it stabilizes.
 
 ```{.python .input}
 # Also plot the ratio
 norm_ratio_list = []
 for i in range(1, 100):
     norm_ratio_list.append(norm_list[i]/norm_list[i-1])
-    
+
 d2l.plot(np.arange(1, 100), norm_ratio_list, 'Iteration', 'Ratio')
 ```
 
@@ -489,7 +489,7 @@ $$
 \mathbf{A} = \begin{bmatrix}
 2 & 1 \\
 0 & 2
-\end{bmatrix}?
+\end{bmatrix}.
 $$
 1. Without computing the eigenvalues, is it possible that the smallest eigenvalue of the following matrix is less that $0.5$? *Note*: this problem can be done in your head.
 $$
@@ -500,3 +500,7 @@ $$
 1.0 & 0.2 & 0.0 & 1.8
 \end{bmatrix}.
 $$
+
+## [Discussions](https://discuss.mxnet.io/t/5148)
+
+![](../img/qr_eigen-decomposition.svg)

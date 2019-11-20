@@ -9,7 +9,7 @@ Recall that we can always mitigate overfitting
 by going out and collecting more training data,
 that can be costly and time consuming,
 typically making it impossible in the short run.
-For now, let us assume that we have already obtained
+For now, let's assume that we have already obtained
 as much high-quality data as our resources permit
 and focus on techniques aimed at limiting the capacity
 of the function classes under consideration.
@@ -71,7 +71,7 @@ our learning algorithm will find more profit in
 minimizing the norm $|| \mathbf{w} ||^2$
 versus minimizing the training error.
 That is exactly what we want.
-To illustrate things in code, let us revive our previous example
+To illustrate things in code, let's revive our previous example
 from :numref:`sec_linear_regression` for linear regression.
 There, our loss was given by
 
@@ -88,7 +88,7 @@ that we will call the *regularization constant* and denote by $\lambda$:
 
 $$l(\mathbf{w}, b) + \frac{\lambda}{2} \|\mathbf{w}\|^2$$
 
-This non-negatice parameter $\lambda \geq 0$
+This non-negative parameter $\lambda \geq 0$
 governs the amount of regularization.
 For $\lambda = 0$, we recover our original loss function,
 whereas for $\lambda > 0$ we ensure that $\mathbf{w}$ cannot grow too large. The astute reader might wonder why we are squaring
@@ -104,7 +104,7 @@ In fact, several other choices are valid
 and are popular throughout statistics.
 While L2-regularized linear models constitute
 the classic *ridge regression* algorithm
-L1-regularizaed linear regression
+L1-regularized linear regression
 is a similarly fundamental model in statistics
 popularly known as *lasso regression*.
 
@@ -115,7 +115,7 @@ This encourages our learning algorithm to discover models
 which distribute their weight across a larger number of features,
 which might make them more robust in practice
 since they do not depend precariously on a single feature.
-The stochastic gradient descent updates for L2-regularied regression
+The stochastic gradient descent updates for L2-regularized regression
 are as follows:
 
 $$
@@ -128,7 +128,7 @@ As before, we update $\mathbf{w}$ based on the amount
 by which our estimate differs from the observation.
 However, we also shrink the size of $\mathbf{w}$ towards $0$.
 That is why the method is sometimes called "weight decay":
-because the penalty term literally causes our optimization algorthm
+because the penalty term literally causes our optimization algorithm
 to *decay* the magnitude of the weight at each step of training.
 This is more convenient than having to pick
 the number of parameters as we did for polynomials.
@@ -155,7 +155,8 @@ corrupted by Gaussian noise with zero mean and variance 0.01.
 To observe the effects of overfitting more easily,
 we can make our problem high-dimensional,
 setting the data dimension to $d = 200$
-and working with a relatively small number of training examples—here we will set the sample size to 20:
+and working with a relatively small number of training 
+examples---here we will set the sample size to 20:
 
 ```{.python .input  n=2}
 %matplotlib inline
@@ -185,7 +186,7 @@ In general, for some number $p$, the $\ell_p$ norm is defined as
 
 $$\|\mathbf{w}\|_p^p := \sum_{i=1}^d |w_i|^p$$
 
-### Initialize Model Parameters
+### Initializing Model Parameters
 
 First, we will define a function to randomly initialize our model parameters and run `attach_grad` on each to allocate memory for the gradients we will calculate.
 
@@ -198,10 +199,10 @@ def init_params():
     return [w, b]
 ```
 
-### Define $\ell_2$ Norm Penalty
+### Defining $\ell_2$ Norm Penalty
 
 Perhaps the most convenient way to implement this penalty
-is to square all terms in place and summ them up.
+is to square all terms in place and sum them up.
 We divide by $2$ by convention
 (when we take the derivative of a quadratic function,
 the $2$ and $1/2$ cancel out, ensuring that the expression
@@ -212,7 +213,7 @@ def l2_penalty(w):
     return (w**2).sum() / 2
 ```
 
-### Define Training and Testing
+### Defining the Train and Test Functions
 
 The following code defines how to train and test the model
 separately on the training dataset and the test dataset.
@@ -245,7 +246,7 @@ def train(lambd):
 
 ### Training without Regularization
 
-Next, let us train and test the high-dimensional linear regression model.
+Next, let's train and test the high-dimensional linear regression model.
 When `lambd = 0` we do not use weight decay.
 As a result, while the training error decreases, the test error does not.
 This is a perfect example of overfitting.
@@ -277,7 +278,7 @@ Moreover, this integration serves a computational benefit,
 allowing implementation tricks to add weight decay to the algorithm,
 without any additional computational overhead.
 Since the weight decay portion of the update
-depdends only on the current value of each parameter,
+depends only on the current value of each parameter,
 and the optimizer must to touch each parameter once anyway.
 
 In the following code, we specify
@@ -365,6 +366,6 @@ which is equivalent to weight decay applied to all layers.
 1. Review the relationship between training error and generalization error. In addition to weight decay, increased training, and the use of a model of suitable complexity, what other ways can you think of to deal with overfitting?
 1. In Bayesian statistics we use the product of prior and likelihood to arrive at a posterior via $P(w \mid x) \propto P(x \mid w) P(w)$. How can you identify $P(w)$ with regularization?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2342)
+## [Discussions](https://discuss.mxnet.io/t/2342)
 
 ![](../img/qr_weight-decay.svg)

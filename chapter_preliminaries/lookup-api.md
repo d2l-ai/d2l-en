@@ -15,7 +15,7 @@ Generally, we can ignore functions that start and end with `__` (special objects
 
 ## Finding the Usage of Specific Functions and Classes
 
-For more specific instructions on how to use a given function or class, we can invoke the  `help` function. As an example, let us explore the usage instructions for `ndarray`'s `ones_like` function.
+For more specific instructions on how to use a given function or class, we can invoke the  `help` function. As an example, let's explore the usage instructions for `ndarray`'s `ones_like` function.
 
 ```{.python .input}
 help(np.ones_like)
@@ -48,6 +48,6 @@ For further details on the API details check the MXNet website at  [http://mxnet
 3. Can you rewrite `np.random.choice(4, 2)` by using the `np.random.randint` function?
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2322)
+## [Discussions](https://discuss.mxnet.io/t/2322)
 
 ![](../img/qr_lookup-api.svg)

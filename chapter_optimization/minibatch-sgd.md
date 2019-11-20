@@ -9,7 +9,7 @@ At the heart of the decision to use minibatches is computational efficiency. Thi
 
 Things are a bit more subtle when it comes to single GPUs or even CPUs. These devices have multiple types of memory, often multiple type of compute units and different bandwidth constraints between them. For instance, a CPU has a small number of registers and then L1, L2 and in some cases even L3 cache (which is shared between the different processor cores). These caches are of increasing size and latency (and at the same time they're of decreasing bandwidth). Suffice it to say, the processor is capable of performing many more operations than what the main memory interface is able to provide. 
 
-* A 2GHz CPU with 16 cores and AVX-512 vectorization can process up to $2 \cdot 10^9 \cdot 16 \cdot 32 = 10^{12}$ bytes per second. The capability of GPUs easily exceeds this number by a factor of 100. On the other hand, a midrange server processor might not have much more than 100 GB/s bandwidth, i.e.\ less than one tenth of what would be required to keep the processor fed. To make matters worse, not all memory access is created equal: firstly, memory interfaces are typically 64 bit wide or wider (e.g. on GPUs up to 384 bit), hence reading a single byte incurs the cost of a much wider access. 
+* A 2GHz CPU with 16 cores and AVX-512 vectorization can process up to $2 \cdot 10^9 \cdot 16 \cdot 32 = 10^{12}$ bytes per second. The capability of GPUs easily exceeds this number by a factor of 100. On the other hand, a midrange server processor might not have much more than 100 GB/s bandwidth, i.e.\ less than one tenth of what would be required to keep the processor fed. To make matters worse, not all memory access is created equal: first, memory interfaces are typically 64 bit wide or wider (e.g. on GPUs up to 384 bit), hence reading a single byte incurs the cost of a much wider access. 
 * There is significant overhead for the first access whereas sequential access is relatively cheap (this is often called a burst read). There are many more things to keep in mind, such as caching when we have multiple sockets, chiplets and other structures. A detailed discussion of this is beyond the scope of this section. See e.g. this [Wikipedia article](https://en.wikipedia.org/wiki/Cache_hierarchy) for a more in-depth discussion.
 
 The way to alleviate these constraints is to use a hierarchy of CPU caches which are actually fast enough to supply the processor with data. This is *the* driving force behind batching in deep learning. To keep matters simple, consider matrix-matrix multiplication, say $A = B \cdot C$. We have a number of options for calculating $A$. For instance we could try the following:
@@ -31,9 +31,9 @@ from mxnet.gluon import nn
 npx.set_np()
 
 timer = d2l.Timer()
-A = np.zeros((1024,1024))
-B = np.random.normal(0,1,(1024,1024))
-C = np.random.normal(0,1,(1024,1024))
+A = np.zeros((1024, 1024))
+B = np.random.normal(0, 1,(1024, 1024))
+C = np.random.normal(0, 1,(1024, 1024))
 ```
 
 Element-wise assignment simply iterates over all rows and columns of $B$ and $C$ respectively to assign the value to $A$.
@@ -43,7 +43,7 @@ Element-wise assignment simply iterates over all rows and columns of $B$ and $C$
 timer.start()
 for i in range(1024):
     for j in range(1024):
-        A[i,j] = np.dot(B[i,:], C[:,j])
+        A[i, j] = np.dot(B[i,:], C[:,j])
 A.wait_to_read()
 timer.stop()
 ```
@@ -59,7 +59,7 @@ A.wait_to_read()
 timer.stop()
 ```
 
-Lastly, the most effective manner is to perform the entire operation in one block. Let's see what the respective speed of the operations is.
+Last, the most effective manner is to perform the entire operation in one block. Let's see what the respective speed of the operations is.
 
 ```{.python .input  n=4}
 # Compute A = B C in one go
@@ -68,9 +68,10 @@ A = np.dot(B, C)
 A.wait_to_read()
 timer.stop()
 
-# multiply and add count as separate operations (fused in practice)
+# Multiply and add count as separate operations (fused in practice)
 gigaflops = [2/i for i in timer.times]
-print("Performance in Gigaflops: element {:.3f}, column {:.3f}, full {:.3f}".format(*gigaflops))
+print("Performance in Gigaflops: element {:.3f}, \
+      column {:.3f}, full {:.3f}".format(*gigaflops))
 ```
 
 ## Minibatches 
@@ -91,8 +92,8 @@ Naively this would indicate that choosing a large minibatch $\mathcal{B}_t$ woul
 
 ```{.python .input}
 timer.start()
-for j in range(0, 1024, 64): 
-    A[:,j:j+64] = np.dot(B, C[:,j:j+64])
+for j in range(0, 1024, 64):
+    A[:, j:j+64] = np.dot(B, C[:, j:j+64])
 timer.stop()
 print("Performance in Gigaflops: block {:.3f}".format(2/timer.times[3]))
 ```
@@ -101,14 +102,16 @@ As we can see, the computation on the minibatch is essentially as efficient as o
 
 ## Reading Data
 
-Let's have a look at how minibatches are efficiently generated from data. In the following we use a dataset developed by NASA to test the wing [noise from different aircraft](https://archive.ics.uci.edu/ml/datasets/Airfoil+Self-Noise) to compare these optimization algorithms. For convenience we only use the first 1,500 examples. The data is whitened for preprocessing, i.e. we remove the mean and rescale the variance to $1$ per coordinate.
+Let's have a look at how minibatches are efficiently generated from data. In the following we use a dataset developed by NASA to test the wing [noise from different aircraft](https://archive.ics.uci.edu/ml/datasets/Airfoil+Self-Noise) to compare these optimization algorithms. For convenience we only use the first $1,500$ examples. The data is whitened for preprocessing, i.e. we remove the mean and rescale the variance to $1$ per coordinate.
 
 ```{.python .input  n=1}
 # Saved in the d2l package for later use
-def get_data_ch10(batch_size=10, n=1500):
-    data = np.genfromtxt('../data/airfoil_self_noise.dat', dtype=np.float32, delimiter='\t')
+def get_data_ch11(batch_size=10, n=1500):
+    data = np.genfromtxt('../data/airfoil_self_noise.dat',
+                         dtype=np.float32, delimiter='\t')
     data = (data - data.mean(axis=0)) / data.std(axis=0)
-    data_iter = d2l.load_array((data[:n, :-1], data[:n, -1]), batch_size, is_train=True)
+    data_iter = d2l.load_array(
+        (data[:n, :-1], data[:n, -1]), batch_size, is_train=True)
     return data_iter, data.shape[1]-1
 ```
 
@@ -131,7 +134,7 @@ Next, we implement a generic training function to facilitate the use of the othe
 
 ```{.python .input  n=3}
 # Saved in the d2l package for later use
-def train_ch10(trainer_fn, states, hyperparams, data_iter,
+def train_ch11(trainer_fn, states, hyperparams, data_iter,
                feature_dim, num_epochs=2):
     # Initialization
     w = np.random.normal(scale=0.01, size=(feature_dim, 1))
@@ -155,7 +158,7 @@ def train_ch10(trainer_fn, states, hyperparams, data_iter,
                 animator.add(n/X.shape[0]/len(data_iter),
                              (d2l.evaluate_loss(net, data_iter, loss),))
                 timer.start()
-    print('loss: %.3f, %.3f sec/epoch'%(animator.Y[0][-1], timer.avg()))
+    print('loss: %.3f, %.3f sec/epoch' % (animator.Y[0][-1], timer.avg()))
     return timer.cumsum(), animator.Y[0]
 ```
 
@@ -163,8 +166,8 @@ Let's see how optimization proceeds for batch gradient descent. This can be achi
 
 ```{.python .input  n=4}
 def train_sgd(lr, batch_size, num_epochs=2):
-    data_iter, feature_dim = get_data_ch10(batch_size)
-    return train_ch10(
+    data_iter, feature_dim = get_data_ch11(batch_size)
+    return train_ch11(
         sgd, None, {'lr': lr}, data_iter, feature_dim, num_epochs)
 
 gd_res = train_sgd(1, 1500, 10)
@@ -176,7 +179,7 @@ When the batch size equals 1, we use SGD for optimization. For simplicity of imp
 sgd_res = train_sgd(0.005, 1)
 ```
 
-Lastly, when the batch size equals 100, we use minibatch SGD for optimization. The time required per epoch is longer than the time needed for SGD and the time for batch gradient descent.
+Last, when the batch size equals 100, we use minibatch SGD for optimization. The time required per epoch is longer than the time needed for SGD and the time for batch gradient descent.
 
 ```{.python .input  n=6}
 mini1_res = train_sgd(.4, 100)
@@ -193,8 +196,8 @@ Finally, we compare the time versus loss for the preview four experiments. As ca
 ```{.python .input  n=8}
 d2l.set_figsize([6, 3])
 d2l.plot(*list(map(list, zip(gd_res, sgd_res, mini1_res, mini2_res))),
-        'time (sec)', 'loss', xlim=[1e-2, 10],
-        legend=['gd', 'sgd', 'batch size=100', 'batch size=10'])
+         'time (sec)', 'loss', xlim=[1e-2, 10],
+         legend=['gd', 'sgd', 'batch size=100', 'batch size=10'])
 d2l.plt.gca().set_xscale('log')
 ```
 
@@ -204,7 +207,7 @@ In Gluon, we can use the `Trainer` class to call optimization algorithms. This i
 
 ```{.python .input  n=9}
 # Saved in the d2l package for later use
-def train_gluon_ch10(tr_name, hyperparams, data_iter, num_epochs=2):
+def train_gluon_ch11(tr_name, hyperparams, data_iter, num_epochs=2):
     # Initialization
     net = nn.Sequential()
     net.add(nn.Dense(1))
@@ -226,14 +229,14 @@ def train_gluon_ch10(tr_name, hyperparams, data_iter, num_epochs=2):
                 animator.add(n/X.shape[0]/len(data_iter),
                              (d2l.evaluate_loss(net, data_iter, loss),))
                 timer.start()
-    print('loss: %.3f, %.3f sec/epoch'%(animator.Y[0][-1], timer.avg()))
+    print('loss: %.3f, %.3f sec/epoch' % (animator.Y[0][-1], timer.avg()))
 ```
 
 Using Gluon to repeat the last experiment shows identical behavior.
 
 ```{.python .input  n=10}
-data_iter, _ = get_data_ch10(10)
-train_gluon_ch10('sgd', {'learning_rate': 0.05}, data_iter)
+data_iter, _ = get_data_ch11(10)
+train_gluon_ch11('sgd', {'learning_rate': 0.05}, data_iter)
 ```
 
 ## Summary
@@ -243,16 +246,16 @@ train_gluon_ch10('sgd', {'learning_rate': 0.05}, data_iter)
 * Minibatch stochastic gradient descent offers the best of both worlds - computational and statistical efficiency. 
 * In minibatch SGD we process batches of data obtained by a random permutation of the training data (i.e. each observation is processed only once per epoch, albeit in random order). 
 * It is advisable to decay the learning rates during training. 
-* In general, minibatch-SGD is faster than SGD and gradient descent for convergence to a smaller risk, when measured in terms of clock time.  
+* In general, minibatch SGD is faster than SGD and gradient descent for convergence to a smaller risk, when measured in terms of clock time.  
 
 ## Exercises
 
 1. Modify the batch size and learning rate and observe the rate of decline for the value of the objective function and the time consumed in each epoch.
 1. Read the MXNet documentation and use the `Trainer` class `set_learning_rate` function to reduce the learning rate of the minibatch SGD to 1/10 of its previous value after each epoch.
 1. Compare minibatch SGD with a variant that actually *samples with replacement* from the training set. What happens?
-1. An evil genie replicates your dataset without telling you (i.e. each observation occurs twice and your dataset grows to twice its original size, but nobody told you). How does the behavior of SGD, minibatch-SGD and that of gradient descent change?
+1. An evil genie replicates your dataset without telling you (i.e. each observation occurs twice and your dataset grows to twice its original size, but nobody told you). How does the behavior of SGD, minibatch SGD and that of gradient descent change?
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2373)
+## [Discussions](https://discuss.mxnet.io/t/2373)
 
 ![](../img/qr_minibatch-sgd.svg)

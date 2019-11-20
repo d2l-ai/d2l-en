@@ -4,7 +4,7 @@ In :numref:`sec_anchor`, we generated multiple anchor boxes centered on each pix
 
 It is not difficult to reduce the number of anchor boxes.  An easy way is to apply uniform sampling on a small portion of pixels from the input image and generate anchor boxes centered on the sampled pixels. In addition, we can generate anchor boxes of varied numbers and sizes on multiple scales. Notice that smaller objects are more likely to be positioned on the image than larger ones.  Here, we will use a simple example: Objects with shapes of $1 \times 1$, $1 \times 2$, and $2 \times 2$ may have 4, 2, and 1 possible position(s) on an image with the shape $2 \times 2$. Therefore, when using smaller anchor boxes to detect smaller objects, we can sample more regions; when using larger anchor boxes to detect larger objects, we can sample fewer regions.
 
-To demonstrate how to generate anchor boxes on multiple scales, let us read an image first.  It has a height and width of 561 * 728 pixels.
+To demonstrate how to generate anchor boxes on multiple scales, let's read an image first.  It has a height and width of 561 * 728 pixels.
 
 ```{.python .input  n=1}
 %matplotlib inline
@@ -18,8 +18,7 @@ h, w = img.shape[0:2]
 h, w
 ```
 
-In
-:numref:`sec_conv_layer`, the 2D array output of the convolutional neural network (CNN) is called
+In :numref:`sec_conv_layer`, the 2D array output of the convolutional neural network (CNN) is called
 a feature map.  We can determine the midpoints of anchor boxes uniformly sampled
 on any image by defining the shape of the feature map.
 
@@ -88,6 +87,6 @@ We will implement a multiscale object detection model in the following section.
 
 * Given an input image, assume $1 \times c_i \times h \times w$ to be the shape of the feature map while $c_i, h, w$ are the number, height, and width of the feature map. What methods can you think of to convert this variable into the anchor box's category and offset? What is the shape of the output?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2446)
+## [Discussions](https://discuss.mxnet.io/t/2446)
 
 ![](../img/qr_multiscale-object-detection.svg)

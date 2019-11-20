@@ -2,7 +2,7 @@
 :label:`sec_transposed_conv`
 
 The layers we introduced so far for convolutional neural networks, including
-convolutional layers (:numref:`sec_conv_layer`) and pooling layers (:numref:`sec_pooling`), often reducethe input width and height, or keep them unchanged. Applications such as semantic segmentation (:numref:`sec_semantic_segmentation`) and generative adversarial networks (:numref:`sec_dcgan`), however, require to predict values for each pixel and therefore needs to increase input width and height. Transposed convolution, also named fractionally-strided convolution :cite:`Dumoulin.Visin.2016` or deconvolution :cite:`Long.Shelhamer.Darrell.2015`, serves this purpose.
+convolutional layers (:numref:`sec_conv_layer`) and pooling layers (:numref:`sec_pooling`), often reduce the input width and height, or keep them unchanged. Applications such as semantic segmentation (:numref:`sec_semantic_segmentation`) and generative adversarial networks (:numref:`sec_dcgan`), however, require to predict values for each pixel and therefore needs to increase input width and height. Transposed convolution, also named fractionally-strided convolution :cite:`Dumoulin.Visin.2016` or deconvolution :cite:`Long.Shelhamer.Darrell.2015`, serves this purpose.
 
 ```{.python .input  n=13}
 from mxnet import np, npx, init
@@ -14,7 +14,7 @@ npx.set_np()
 
 ## Basic 2D Transposed Convolution
 
-Let us consider a basic case that both input and output channels are 1, with 0 padding and 1 stride. :numref:`fig_trans_conv` illustrates how transposed convolution with a $2\times 2$ kernel is computed on the $2\times 2$ input matrix.
+Let's consider a basic case that both input and output channels are 1, with 0 padding and 1 stride. :numref:`fig_trans_conv` illustrates how transposed convolution with a $2\times 2$ kernel is computed on the $2\times 2$ input matrix.
 
 ![Transposed convolution layer with a $2\times 2$ kernel.](../img/trans_conv.svg)
 :label:`fig_trans_conv`
@@ -36,15 +36,15 @@ Remember the convolution computes results by `Y[i, j] = (X[i: i + h, j: j + w] *
 Verify the results in :numref:`fig_trans_conv`.
 
 ```{.python .input}
-X = np.array([[0,1], [2,3]])
-K = np.array([[0,1], [2,3]])
+X = np.array([[0, 1], [2, 3]])
+K = np.array([[0, 1], [2, 3]])
 trans_conv(X, K)
 ```
 
 Or we can use `nn.Conv2DTranspose` to obtain the same results. As `nn.Conv2D`, both input and kernel should be 4-D tensors.
 
 ```{.python .input  n=17}
-X, K = X.reshape(1, 1, 2, 2),  K.reshape(1, 1, 2, 2)
+X, K = X.reshape(1, 1, 2, 2), K.reshape(1, 1, 2, 2)
 tconv = nn.Conv2DTranspose(1, kernel_size=2)
 tconv.initialize(init.Constant(K))
 tconv(X)
@@ -71,7 +71,7 @@ tconv(X)
 The multi-channel extension of the transposed convolution is the same as the convolution. When the input has multiple channels, denoted by $c_i$, the transposed convolution assigns a $k_h\times k_w$ kernel matrix to each input channel. If the output has a channel size $c_o$, then we have a $c_i\times k_h\times k_w$ kernel for each output channel.
 
 
-As a result, if we feed $X$ into a convolutional layer $f$ to compute $Y=f(X)$ and create a transposed convolution layer $g$ with the same hyper-parameters as $f$ except for the output channel set to be the channel size of $X$, then $g(Y)$ should has the same shape as $X$. Let us verify this statement.
+As a result, if we feed $X$ into a convolutional layer $f$ to compute $Y=f(X)$ and create a transposed convolution layer $g$ with the same hyper-parameters as $f$ except for the output channel set to be the channel size of $X$, then $g(Y)$ should has the same shape as $X$. Let's verify this statement.
 
 ```{.python .input}
 X = np.random.uniform(size=(1, 10, 16, 16))
@@ -93,7 +93,7 @@ Y = d2l.corr2d(X, K)
 Y
 ```
 
-Next, we rewrite convolution kernel $K$ as a matrix $W$. Its shape will be $(4,9)$, where the $i^\mathrm{th}$ row present applying the kernel to the input to generate the $i^\mathrm{th}$ output element.
+Next, we rewrite convolution kernel $K$ as a matrix $W$. Its shape will be $(4, 9)$, where the $i^\mathrm{th}$ row present applying the kernel to the input to generate the $i^\mathrm{th}$ output element.
 
 ```{.python .input}
 def kernel2matrix(K):
@@ -112,10 +112,10 @@ Then the convolution operator can be implemented by matrix multiplication with p
 Y == np.dot(W, X.reshape(-1)).reshape(2, 2)
 ```
 
-We can implement transposed convolution as a matrix multiplication as well by reusing `kernel2matrix`. To reuse the generated $W$, we construct a $2\times 2$ input, so the corresponding weight matrix will have a shape $(9,4)$, which is $W^\top$. Let us verify the results.
+We can implement transposed convolution as a matrix multiplication as well by reusing `kernel2matrix`. To reuse the generated $W$, we construct a $2\times 2$ input, so the corresponding weight matrix will have a shape $(9, 4)$, which is $W^\top$. Let's verify the results.
 
 ```{.python .input}
-X = np.array([[0,1], [2,3]])
+X = np.array([[0, 1], [2, 3]])
 Y = trans_conv(X, K)
 Y == np.dot(W.T, X.reshape(-1)).reshape(3, 3)
 ```
@@ -130,6 +130,6 @@ Y == np.dot(W.T, X.reshape(-1)).reshape(3, 3)
 
 * Is it efficient to use matrix multiplication to implement convolution operations? Why?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/transposed-convolution/4366)
+## [Discussions](https://discuss.mxnet.io/t/transposed-convolution/4366)
 
 ![](../img/qr_transposed-conv.svg)

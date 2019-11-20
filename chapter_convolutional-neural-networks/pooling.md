@@ -24,7 +24,7 @@ we often want our representations to be somewhat invariant to translation.
 For instance, if we take the image `X`
 with a sharp delineation between black and white
 and shift the whole image by one pixel to the right,
-i.e., `Z[i,j] = X[i,j+1]`,
+i.e., `Z[i, j] = X[i, j+1]`,
 then the output for the new image `Z` might be vastly different.
 The edge will have shifted by one pixel and with it all the activations.
 In reality, objects hardly ever occur exactly at the same place.
@@ -64,23 +64,24 @@ value of the input subarray in the window
 (depending on whether *max* or *average* pooling is employed).
 
 
-![Maximum pooling with a pooling window shape of $2\times 2$. The shaded portions represent the first output element and the input element used for its computation: $\max(0,1,3,4)=4$](../img/pooling.svg)
+![Maximum pooling with a pooling window shape of $2\times 2$. The shaded portions represent the first output element and the input element used for its computation: $\max(0, 1, 3, 4)=4$](../img/pooling.svg)
+:label:`fig_pooling`
 
-The output array in the figure above has a height of 2 and a width of 2.
+The output array in :numref:`fig_pooling` above has a height of 2 and a width of 2.
 The four elements are derived from the maximum value of $\text{max}$:
 
 $$
-\max(0,1,3,4)=4,\\
-\max(1,2,4,5)=5,\\
-\max(3,4,6,7)=7,\\
-\max(4,5,7,8)=8.\\
+\max(0, 1, 3, 4)=4,\\
+\max(1, 2, 4, 5)=5,\\
+\max(3, 4, 6, 7)=7,\\
+\max(4, 5, 7, 8)=8.\\
 $$
 
 A pooling layer with a pooling window shape of $p \times q$
 is called a $p \times q$ pooling layer.
 The pooling operation is called $p \times q$ pooling.
 
-Let us return to the object edge detection example
+Let's return to the object edge detection example
 mentioned at the beginning of this section.
 Now we will use the output of the convolutional layer
 as the input for $2\times 2$ maximum pooling.
@@ -213,6 +214,6 @@ pool2d(X)
 1. Do we need a separate minimum pooling layer? Can you replace it with another operation?
 1. Is there another operation between average and maximum pooling that you could consider (hint - recall the softmax)? Why might it not be so popular?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2352)
+## [Discussions](https://discuss.mxnet.io/t/2352)
 
 ![](../img/qr_pooling.svg)

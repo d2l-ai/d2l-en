@@ -6,7 +6,7 @@ In :numref:`sec_basic_gan`, we introduced the basic ideas behind how GANs work. 
 In this section, we will demonstrate how you can use GANs to generate photorealistic images. We will be basing our models on the deep convolutional GANs (DCGAN) introduced in :cite:`Radford.Metz.Chintala.2015`. We will borrow the convolutional architecture that have proven so successful for discriminative computer vision problems and show how via GANs, they can be leveraged to generate photorealistic images.
 
 ```{.python .input  n=1}
-from mxnet import gluon, autograd, init, np, npx
+from mxnet import gluon, init, np, npx
 from mxnet.gluon import nn
 import d2l
 import zipfile
@@ -28,7 +28,7 @@ with zipfile.ZipFile(fname) as f:
 pokemon = gluon.data.vision.datasets.ImageFolderDataset(data_dir+'pokemon')
 ```
 
-We resize each image into $64\times 64$. The `ToTensor` transformation will project the pixel value into $[0,1]$, while our generator will use the tanh function to obtain outputs in $[-1,1]$. Therefore we normalize the data with $0.5$ mean and $0.5$ standard deviation to match the value range.
+We resize each image into $64\times 64$. The `ToTensor` transformation will project the pixel value into $[0, 1]$, while our generator will use the tanh function to obtain outputs in $[-1, 1]$. Therefore we normalize the data with $0.5$ mean and $0.5$ standard deviation to match the value range.
 
 ```{.python .input  n=3}
 batch_size = 256
@@ -42,12 +42,12 @@ data_iter = gluon.data.DataLoader(
     shuffle=True, num_workers=d2l.get_dataloader_workers())
 ```
 
-Let us visualize the first 20 images.
+Let's visualize the first 20 images.
 
 ```{.python .input  n=4}
 d2l.set_figsize((4, 4))
 for X, y in data_iter:
-    imgs = X[0:20,:,:,:].transpose(0,2,3,1)/2+0.5
+    imgs = X[0:20,:,:,:].transpose(0, 2, 3, 1)/2+0.5
     d2l.show_images(imgs, num_rows=4, num_cols=5)
     break
 ```
@@ -105,7 +105,7 @@ net_G = nn.Sequential()
 net_G.add(G_block(n_G*8, strides=1, padding=0),  # output: (64*8, 4, 4)
           G_block(n_G*4),  # output: (64*4, 8, 8)
           G_block(n_G*2),  # output: (64*2, 16, 16)
-          G_block(n_G),    # output: (64, 32, 32)
+          G_block(n_G),   # output: (64, 32, 32)
           nn.Conv2DTranspose(
               3, kernel_size=4, strides=2, padding=1, use_bias=False,
               activation='tanh'))  # output: (3, 64, 64)
@@ -121,15 +121,15 @@ net_G(x).shape
 
 ## Discriminator
 
-The discriminator is a normal convolutional network network except that it uses a leaky ReLU as its activation function. Given $\alpha \in[0,1]$, its definition is
+The discriminator is a normal convolutional network network except that it uses a leaky ReLU as its activation function. Given $\alpha \in[0, 1]$, its definition is
 
 $$\textrm{leaky ReLU}(x) = \begin{cases}x & \text{if}\ x > 0\\ \alpha x &\text{otherwise}\end{cases}.$$
 
-As it can be seen, it is normal ReLU if $\alpha=0$, and an identity function if $\alpha=1$. For $\alpha \in (0,1)$, leaky ReLU is a nonlinear function that give a non-zero output for a negative input. It aims to fix the "dying ReLU" problem that a neuron might always output a negative value and therefore cannot make any progress since the gradient of ReLU is 0.
+As it can be seen, it is normal ReLU if $\alpha=0$, and an identity function if $\alpha=1$. For $\alpha \in (0, 1)$, leaky ReLU is a nonlinear function that give a non-zero output for a negative input. It aims to fix the "dying ReLU" problem that a neuron might always output a negative value and therefore cannot make any progress since the gradient of ReLU is 0.
 
 ```{.python .input  n=10}
 alphas = [0, 0.2, 0.4, .6, .8, 1]
-x = np.arange(-2,1,0.1)
+x = np.arange(-2, 1, 0.1)
 Y = [nn.LeakyReLU(alpha)(x).asnumpy() for alpha in alphas]
 d2l.plot(x.asnumpy(), Y, 'x', 'y', alphas)
 ```
@@ -149,7 +149,6 @@ class D_block(nn.Block):
     def forward(self, X):
         return self.activation(self.batch_norm(self.conv2d(X)))
 ```
-
 
 A basic block with default settings will halve the width and height of the inputs, as we demonstrated in :numref:`sec_padding`. For example, given a input shape $n_h = n_w = 16 $, with a kernel shape $k_h = k_w = 4$, a stride shape $s_h = s_w = 2$, and a padding shape $p_h = p_w = 1$, the output shape will be:
 
@@ -173,7 +172,7 @@ The discriminator is a mirror of the generator.
 ```{.python .input  n=13}
 n_D = 64
 net_D = nn.Sequential()
-net_D.add(D_block(n_D),    # output: (64, 32, 32)
+net_D.add(D_block(n_D),   # output: (64, 32, 32)
           D_block(n_D*2),  # output: (64*2, 16, 16)
           D_block(n_D*4),  # output: (64*4, 8, 8)
           D_block(n_D*8),  # output: (64*8, 4, 4)
@@ -202,7 +201,7 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
     trainer_D = gluon.Trainer(net_D.collect_params(), 'adam', trainer_hp)
     trainer_G = gluon.Trainer(net_G.collect_params(), 'adam', trainer_hp)
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
-                            xlim=[1, num_epochs], nrows=2, figsize=(5,5),
+                            xlim=[1, num_epochs], nrows=2, figsize=(5, 5),
                             legend=['discriminator', 'generator'])
     animator.fig.subplots_adjust(hspace=0.3)
     for epoch in range(1, num_epochs+1):
@@ -214,11 +213,12 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
             Z = np.random.normal(0, 1, size=(batch_size, latent_dim, 1, 1))
             X, Z = X.as_in_context(ctx), Z.as_in_context(ctx),
             metric.add(d2l.update_D(X, Z, net_D, net_G, loss, trainer_D),
-                        d2l.update_G(Z, net_D, net_G, loss, trainer_G),
-                        batch_size)
+                       d2l.update_G(Z, net_D, net_G, loss, trainer_G),
+                       batch_size)
         # Show generated examples
         Z = np.random.normal(0, 1, size=(21, latent_dim, 1, 1), ctx=ctx)
-        fake_x = net_G(Z).transpose(0,2,3,1)/2+0.5  # Noramlize the synthetic data to N(0,1)
+        # Noramlize the synthetic data to N(0, 1)
+        fake_x = net_G(Z).transpose(0, 2, 3, 1)/2+0.5
         imgs = np.concatenate(
             [np.concatenate([fake_x[i * 7 + j] for j in range(7)], axis=1)
              for i in range(len(fake_x)//7)], axis=0)
@@ -229,10 +229,9 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
         animator.add(epoch, (loss_D, loss_G))
     print('loss_D %.3f, loss_G %.3f, %d examples/sec on %s' % (
         loss_D, loss_G, metric[2]/timer.stop(), ctx))
-
 ```
 
-Now let us train the model.
+Now let's train the model.
 
 ```{.python .input  n=21}
 latent_dim, lr, num_epochs = 100, 0.005, 40
@@ -252,6 +251,6 @@ train(net_D, net_G, data_iter, num_epochs, lr, latent_dim)
 * Apply DCGAN on Fashion-MNIST and see which category works well and which does not.
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/dcgan-discussion/4354)
+## [Discussions](https://discuss.mxnet.io/t/dcgan-discussion/4354)
 
 ![](../img/qr_dcgan.svg)

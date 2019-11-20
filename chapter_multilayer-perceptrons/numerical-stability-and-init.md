@@ -74,14 +74,14 @@ Since early artificial neural networks were inspired
 by biological neural networks,
 the idea of neurons that either fire or do not fire
 (biological neurons do not partially fire) seemed appealing.
-Let us take a closer look at the function
+Let's take a closer look at the function
 to see why picking it might be problematic
 vis-a-vis vanishing gradients.
 
 ```{.python .input}
 %matplotlib inline
 import d2l
-from mxnet import np, npx, autograd
+from mxnet import autograd, np, npx
 npx.set_np()
 
 x = np.arange(-8.0, 8.0, 0.1)
@@ -95,13 +95,13 @@ d2l.plot(x, [y, x.grad], legend=['sigmoid', 'gradient'], figsize=(4.5, 2.5))
 
 As we can see, the gradient of the sigmoid vanishes
 both when its inputs are large and when they are small.
-Moreover, when we excecute backward propagation, due to the chain rule,
+Moreover, when we execute backward propagation, due to the chain rule,
 this means that unless we are in the Goldilocks zone,
 where the inputs to most of the sigmoids are in the range of, say $[-4, 4]$,
 the gradients of the overall product may vanish.
 When we have many layers, unless we are especially careful,
 we are likely to find that our gradient is cut off at *some* layer.
-Before ReLUs ($\max(0,x)$) were proposed
+Before ReLUs ($\max(0, x)$) were proposed
 as an alternative to squashing functions,
 this problem used to plague deep network training.
 As a consequence, ReLUs have become
@@ -123,10 +123,10 @@ we would have no realistic chance of getting
 a gradient descent optimizer to converge.
 
 ```{.python .input  n=5}
-M = np.random.normal(size=(4,4))
+M = np.random.normal(size=(4, 4))
 print('A single matrix', M)
 for i in range(100):
-    M = np.dot(M, np.random.normal(size=(4,4)))
+    M = np.dot(M, np.random.normal(size=(4, 4)))
 
 print('After multiplying 100 matrices', M)
 ```
@@ -187,26 +187,26 @@ Both choices tend to work well in practice for moderate problem sizes.
 
 ### Xavier Initialization
 
-Let us look at the scale distribution of the activations of the hidden units $h_{i}$ for some layer. They are given by
+Let's look at the scale distribution of the activations of the hidden units $h_{i}$ for some layer. They are given by
 
 $$h_{i} = \sum_{j=1}^{n_\mathrm{in}} W_{ij} x_j$$
 
-The weights $W_{ij}$ are all drawn independently from the same distribution. Furthermore, let us assume that this distribution
+The weights $W_{ij}$ are all drawn independently from the same distribution. Furthermore, let's assume that this distribution
 has zero mean and variance $\sigma^2$
 (this does not mean that the distribution has to be Gaussian,
 just that mean and variance need to exist).
 We do not really have much control
 over the inputs into the layer $x_j$
-but let us proceed with the somewhat unrealistic assumption
+but let's proceed with the somewhat unrealistic assumption
 that they also have zero mean and variance $\gamma^2$
 and that they are independent of $\mathbf{W}$.
 In this case, we can compute mean and variance of $h_i$ as follows:
 
 $$
 \begin{aligned}
-    \mathbf{E}[h_i] & = \sum_{j=1}^{n_\mathrm{in}} \mathbf{E}[W_{ij} x_j] = 0 \\
-    \mathbf{E}[h_i^2] & = \sum_{j=1}^{n_\mathrm{in}} \mathbf{E}[W^2_{ij} x^2_j] \\
-        & = \sum_{j=1}^{n_\mathrm{in}} \mathbf{E}[W^2_{ij}] \mathbf{E}[x^2_j] \\
+    E[h_i] & = \sum_{j=1}^{n_\mathrm{in}} E[W_{ij} x_j] = 0 \\
+    E[h_i^2] & = \sum_{j=1}^{n_\mathrm{in}} E[W^2_{ij} x^2_j] \\
+        & = \sum_{j=1}^{n_\mathrm{in}} E[W^2_{ij}] E[x^2_j] \\
         & = n_\mathrm{in} \sigma^2 \gamma^2
 \end{aligned}
 $$
@@ -249,12 +249,12 @@ The reasoning above barely scratches the surface
 of modern approaches to parameter initialization.
 In fact, MXNet has an entire `mxnet.initializer` module
 implementing over a dozen different heuristics.
-Moreover, intialization continues to be a hot area of inquiry
+Moreover, initialization continues to be a hot area of inquiry
 within research into the fundamental theory of neural network optimization.
 Some of these heuristics are especially suited
 for when parameters are tied
 (i.e., when parameters of in different parts the network are shared),
-for superresolution, sequence models, and related problems.
+for super-resolution, sequence models, and related problems.
 We recommend that the interested reader take a closer look
 at what is offered as part of this module,
 and investigate the recent research on parameter initialization.
@@ -277,6 +277,6 @@ or you may even invent your own scheme!
 1. Look up analytic bounds on the eigenvalues of the product of two matrices. What does this tell you about ensuring that gradients are well conditioned?
 1. If we know that some terms diverge, can we fix this after the fact? Look at the paper on LARS by [You, Gitman and Ginsburg, 2017](https://arxiv.org/pdf/1708.03888.pdf) for inspiration.
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2345)
+## [Discussions](https://discuss.mxnet.io/t/2345)
 
 ![](../img/qr_numerical-stability-and-init.svg)

@@ -55,7 +55,7 @@ complicated and do not have analytical solutions. Instead, we must use numerical
 optimization algorithms. The optimization algorithms below all fall into this
 category.
 
-There are many challenges in deep learning optimization. Some of the most vexing ones are local minima, saddle points and vanishing gradients. Let us have a look at a few of them.
+There are many challenges in deep learning optimization. Some of the most vexing ones are local minima, saddle points and vanishing gradients. Let's have a look at a few of them.
 
 ### Local Minima
 
@@ -86,17 +86,18 @@ d2l.plot(x, [x**3], 'x', 'f(x)')
 annotate('saddle point', (0, -0.2), (-0.52, -5.0))
 ```
 
-Saddle points in higher dimensions are even more insidious, as the example below shows. Consider the function $f(x, y) = x^2 - y^2$. It has its saddle point at $(0,0)$. This is a maximum with respect to $y$ and a minimum with respect to $x$. Moreover, it *looks* like a saddle, which is where this mathematical property got its name.
+Saddle points in higher dimensions are even more insidious, as the example below shows. Consider the function $f(x, y) = x^2 - y^2$. It has its saddle point at $(0, 0)$. This is a maximum with respect to $y$ and a minimum with respect to $x$. Moreover, it *looks* like a saddle, which is where this mathematical property got its name.
 
 ```{.python .input  n=5}
-x, y = np.meshgrid(np.linspace(-1, 1, 101), np.linspace(-1, 1, 101), indexing='ij')
+x, y = np.meshgrid(np.linspace(-1, 1, 101), np.linspace(-1, 1, 101),
+                   indexing='ij')
 
 z = x**2 - y**2
 
 ax = d2l.plt.figure().add_subplot(111, projection='3d')
 ax.plot_wireframe(x, y, z, **{'rstride': 10, 'cstride': 10})
 ax.plot([0], [0], [0], 'rx')
-ticks = [-1,  0, 1]
+ticks = [-1, 0, 1]
 d2l.plt.xticks(ticks)
 d2l.plt.yticks(ticks)
 ax.set_zticks(ticks)
@@ -106,7 +107,7 @@ d2l.plt.ylabel('y');
 
 We assume that the input of a function is a $k$-dimensional vector and its
 output is a scalar, so its Hessian matrix will have $k$ eigenvalues
-(refer to :numref:`sec_linear_algebra`).
+(refer to :numref:`sec_geometry-linear-algebric-ops`).
 The solution of the
 function could be a local minimum, a local maximum, or a saddle point at a
 position where the function gradient is zero:
@@ -119,7 +120,7 @@ For high-dimensional problems the likelihood that at least some of the eigenvalu
 
 ### Vanishing Gradients
 
-Probably the most insidious problem to encounter are vanishing gradients. For instance, assume that we want to minimize the function $f(x) = \tanh(x)$ and we happen to get started at $x = 4$. As we can see, the gradient of $f$ is close to nil. More specifically $f'(x) = 1 - \tanh^2(x)$ and thus $f'(4) = 0.0013$. Consequently optimization will get stuck for a long time before we make progress. This turns out to be one of the reasons that training deep learning models was quite tricky prior to the introduction of the ReLu activation function.
+Probably the most insidious problem to encounter are vanishing gradients. For instance, assume that we want to minimize the function $f(x) = \tanh(x)$ and we happen to get started at $x = 4$. As we can see, the gradient of $f$ is close to nil. More specifically $f'(x) = 1 - \tanh^2(x)$ and thus $f'(4) = 0.0013$. Consequently optimization will get stuck for a long time before we make progress. This turns out to be one of the reasons that training deep learning models was quite tricky prior to the introduction of the ReLU activation function.
 
 ```{.python .input  n=6}
 x = np.arange(-2.0, 5.0, 0.01)
@@ -152,6 +153,6 @@ As we saw, optimization for deep learning is full of challenges. Fortunately the
     * Can you exploit this effect also for optimization algorithms?
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2371)
+## [Discussions](https://discuss.mxnet.io/t/2371)
 
 ![](../img/qr_optimization-intro.svg)

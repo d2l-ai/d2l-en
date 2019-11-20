@@ -9,7 +9,7 @@ code as described in
 the [Documentation](https://jupyter.readthedocs.io/en/latest/).
 
 
-## Edit and Run the Code Locally
+## Editing and Running the Code Locally
 
 Suppose that the local path of code of the book is "xx/yy/d2l-en/". Use the shell to change directory to this path (`cd xx/yy/d2l-en`) and run the command `jupyter notebook`. If your browser does not do this automatically, open http://localhost:8888 and you will see the interface of Jupyter and all the folders containing the code of the book, as shown in :numref:`fig_jupyter00`.
 
@@ -101,7 +101,7 @@ c.NotebookApp.contents_manager_class = 'notedown.NotedownContentsManager'
 After that, you only need to run the `jupyter notebook` command to turn on the notedown plugin by default.
 
 
-### Run Jupyter Notebook on a Remote Server
+### Running Jupyter Notebook on a Remote Server
 
 Sometimes, you may want to run Jupyter Notebook on a remote server and access it through a browser on your local computer. If Linux or MacOS is installed on your local machine (Windows can also support this function through third-party software such as PuTTY), you can use port forwarding:
 
@@ -134,6 +134,6 @@ jupyter nbextension enable execute_time/ExecuteTime
 1. Try to edit and run the code in this book *remotely* via port forwarding.
 1. Measure $\mathbf{A}^\top \mathbf{B}$ vs. $\mathbf{A} \mathbf{B}$ for two square matrices in $\mathbb{R}^{1024 \times 1024}$. Which one is faster?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2398)
+## [Discussions](https://discuss.mxnet.io/t/2398)
 
 ![](../img/qr_jupyter.svg)

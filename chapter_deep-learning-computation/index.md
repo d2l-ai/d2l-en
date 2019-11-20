@@ -14,7 +14,7 @@ to offer increasingly coarse abstractions.
 Just as semiconductor designers went from specifying transistors
 to logical circuits to writing code,
 neural networks researchers have moved from thinking about
-the behavior of individual artifical neurons
+the behavior of individual artificial neurons
 to conceiving of networks in terms of whole layers,
 and now often design architectures with far coarser *blocks* in mind.
 

@@ -22,7 +22,7 @@ After logging into your AWS account, click "EC2" (marked by the red box in :numr
 
 ## Creating and Running an EC2 Instance
 
-:numref:`fig_ec2` shows the EC2 panel with sensitive account information greyed out. 
+:numref:`fig_ec2` shows the EC2 panel with sensitive account information greyed out.
 
 ![ EC2 panel. ](../img/ec2.png)
 :width:`700px`
@@ -31,10 +31,10 @@ After logging into your AWS account, click "EC2" (marked by the red box in :numr
 ### Presetting Location
 Select a nearby data center to reduce latency, *e.g.,* "Oregon". (marked by the red box in the top-right of :numref:`fig_ec2`) If you are located in China
 you can select a nearby Asia Pacific region, such as Seoul or Tokyo. Please note
-that some data centers may not have GPU instances. 
+that some data centers may not have GPU instances.
 
 ### Increasing Limits
-Before choosing an instance, check if there are quantity 
+Before choosing an instance, check if there are quantity
 restrictions by clicking the "Limits" label in the bar on the left as shown in
 :numref:`fig_ec2`. :numref:`fig_limits` shows an example of such a
 limitation. The account currently cannot open "p2.xlarge" instance per region. If
@@ -90,7 +90,7 @@ previously generated key pair. Click "Launch Instances" to launch the created
 instance.
 
 ![ Select a key pair. ](../img/keypair.png)
-:width:`700px`
+:width:`500px`
 :label:`fig_keypair`
 
 Make sure that you download the keypair and store it in a safe location if you
@@ -104,7 +104,7 @@ instance ID shown in :numref:`fig_launching` to view the status of this instance
 
 ### Connecting Instance
 
-As shown in :numref:`fig_connect`, after the instance state turns green, right-click the instance and select `Connect` to view the instance access method. 
+As shown in :numref:`fig_connect`, after the instance state turns green, right-click the instance and select `Connect` to view the instance access method.
 
 ![ View instance access and startup method. ](../img/connect.png)
 :width:`700px`
@@ -113,7 +113,7 @@ As shown in :numref:`fig_connect`, after the instance state turns green, right-c
 If this is a new key, it must not be publicly viewable for SSH to work. Go to the folder where you store `D2L_key.pem` (*e.g.,* Downloads folder) and make the key to be not publicly viewable.
 
 ```bash
-cd /Downloads  ## if D2L_key.pem is stored in Downloads folder 
+cd /Downloads  ## if D2L_key.pem is stored in Downloads folder
 chmod 400 D2L_key.pem
 ```
 
@@ -144,75 +144,33 @@ sudo apt-get update && sudo apt-get install -y build-essential git libgfortran3
 ```
 
 
-Here we download CUDA 10.1. Visit NVIDIA's official repository at (https://developer.nvidia.com/cuda-toolkit-archive) to find the download link of CUDA 10.1 as shown below.
+Here we download CUDA 10.1. Visit NVIDIA's official repository at (https://developer.nvidia.com/cuda-downloads) to find the download link of CUDA 10.1 as shown below.
 
 ![Find the CUDA 10.1 download address. ](../img/cuda101.png)
 :width:`700px`
 :label:`fig_cuda`
 
-Right click at `Download` and click `Copy Link Address` (as shown in :numref:`fig_cuda`), then go back to the terminal and paste onto the command line to install `CUDA 10.1` :
+Copy the instructions and paste them into the terminal to install
+CUDA 10.1.
 
 ```bash
 ## paste the copied link from CUDA website
-wget https://developer.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda_10.1.168_418.67_linux.run 
-
-sudo sh cuda_10.1.168_418.67_linux.run
-## this command line may take a while to run
+wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-ubuntu1804.pin
+sudo mv cuda-ubuntu1804.pin /etc/apt/preferences.d/cuda-repository-pin-600
+wget http://developer.download.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda-repo-ubuntu1804-10-1-local-10.1.243-418.87.00_1.0-1_amd64.deb
+sudo dpkg -i cuda-repo-ubuntu1804-10-1-local-10.1.243-418.87.00_1.0-1_amd64.deb
+sudo apt-key add /var/cuda-repo-10-1-local-10.1.243-418.87.00/7fa2af80.pub
+sudo apt-get update
+sudo apt-get -y install cuda
 ```
 
 
-Enter `accept`  for the following inquiry as shown in :numref:`fig_cuda_accept`.
-
-![ Accept EULA. ](../img/cuda_accept.png)
-:width:`700px`
-:label:`fig_cuda_accept`
-
-If the following image shows up, choose "Install" and tap "Enter" as shown in :numref:`fig_cuda_install`.
-
-![ Install and Enter. ](../img/cuda_install.png)
-:width:`700px`
-:label:`fig_cuda_install`
-
-You may also need to answer the following questions.
-
-```bash
-Install NVIDIA Accelerated Graphics Driver for Linux-x86_64 410.48?
-(y)es/(n)o/(q)uit: y
-
-Do you want to install the OpenGL libraries?
-(y)es/(n)o/(q)uit [ default is yes ]: y
-
-Do you want to run nvidia-xconfig?
-This will update the system X configuration file so that the NVIDIA X driver
-is used. The pre-existing X configuration file will be backed up.
-This option should not be used on systems that require a custom
-X configuration, such as systems with multiple GPU vendors.
-(y)es/(n)o/(q)uit [ default is no ]: n
-
-Install the CUDA 10.1 Toolkit?
-(y)es/(n)o/(q)uit: y
-
-Enter Toolkit Location
- [ default is /usr/local/cuda-10.1 ]:
-
-Do you want to install a symbolic link at /usr/local/cuda?
-(y)es/(n)o/(q)uit: y
-
-Install the CUDA 10.1 Samples?
-(y)es/(n)o/(q)uit: n
-```
-
-
-After installing the program, run the following command to view the instance GPU (as shown in :numref:`fig_nvidia-smi`).
+After installing the program, run the following command to view the GPUs.
 
 ```bash
 nvidia-smi
 ```
 
-
-![ nvidia-smi. ](../img/nvidia-smi.png)
-:width:`700px`
-:label:`fig_nvidia-smi`
 
 Finally, add CUDA to the library path to help other libraries find it.
 
@@ -231,7 +189,7 @@ First, to simplify the installation, you need to install [Miniconda](https://con
 
 ```bash
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-sudo sh Miniconda3-latest-Linux-x86_64.sh
+sh Miniconda3-latest-Linux-x86_64.sh
 ```
 
 
@@ -266,23 +224,25 @@ Next, download the code for this book.
 ```bash
 sudo apt-get install unzip
 mkdir d2l-en && cd d2l-en
-wget http://numpy.d2l.ai/d2l-en.zip
+wget https://d2l.ai/d2l-en.zip
 unzip d2l-en.zip && rm d2l-en.zip
 ```
 
 
-Then create the conda `d2l` environment and enter `y` for the proceed inquiry as shown in :numref:`fig_conda_create_d2l`.
+Then create the conda `d2l` environment and enter `y` to proceed with the installation.
 
 ```bash
-conda create --name d2l
+conda create --name d2l 
+
+## Package Plan ##
+
+  environment location: /home/ubuntu/.conda/envs/d2l
+  
+Proceed ([y]/n)? y
 ```
 
 
-![ Conda create environment D2L. ](../img/conda_create_d2l.png)
-:width:`700px`
-:label:`fig_conda_create_d2l`
-
-After create `d2l` environment, activate it and install `pip`.
+After creating the `d2l` environment, activate it and install `pip`.
 
 ```bash
 conda activate d2l
@@ -290,13 +250,11 @@ conda install pip
 ```
 
 
-Finally, install `MXNet` and `d2l`.
+Finally, install `MXNet` and `d2l`. The postfix `cu101mkl` means that this is the CUDA 10.1 variant with Intel MKL support. For different versions, say only CUDA 10.0, you would want to choose `cu100` instead.
 
 ```bash
 ## mxnet
-pip install https://apache-mxnet.s3-us-west-2.amazonaws.com/dist/python/numpy/latest/mxnet_cu101mkl-1.5.0-py2.py3-none-manylinux1_x86_64.whl
-
-## d2l
+pip install mxnet-cu101mkl --pre
 pip install git+https://github.com/d2l-ai/d2l-en@numpy2
 ```
 
@@ -358,6 +316,6 @@ environments.
 1. Experiment with different GPU servers. How fast are they?
 1. Experiment with multi-GPU servers. How well can you scale things up?
 
-## Scanning the QR Code to [Discuss](https://discuss.mxnet.io/t/2399)
+## [Discussions](https://discuss.mxnet.io/t/2399)
 
 ![](../img/qr_aws.svg)

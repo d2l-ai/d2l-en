@@ -17,7 +17,7 @@ In practice, we are more often interested in classification:
 asking not *how much?* but *which one?*
 
 * Does this email belong in the spam folder or the inbox*?
-* Is this customer more likley *to sign up* or *not to sign up* for a subscription service?*
+* Is this customer more likely *to sign up* or *not to sign up* for a subscription service?*
 * Does this image depict a donkey, a dog, a cat, or a rooster?
 * Which movie is Aston most likely to watch next?
 
@@ -35,12 +35,12 @@ we still use models that make soft assignments.
 
 ## Classification Problems
 
-To get our feet wet, let us start off with 
+To get our feet wet, let's start off with 
 a simple image classification problem. 
 Here, each input consists of a $2\times2$ grayscale image. 
 We can represent each pixel value with a single scalar, 
 giving us four features $x_1, x_2, x_3, x_4$. 
-Further, let us assume that each image belongs to one 
+Further, let's assume that each image belongs to one 
 among the categories "cat", "chicken" and "dog".
 
 Next, we have to choose how to represent the labels. 
@@ -63,7 +63,7 @@ and all other components are set to 0.
 $$y \in \{(1, 0, 0), (0, 1, 0), (0, 0, 1)\}$$
 
 In our case, $y$ would be a three-dimensional vector, 
-with $(1,0,0)$ corresponding to "cat", $(0,1,0)$ to "chicken" and $(0,0,1)$ to "dog". 
+with $(1, 0, 0)$ corresponding to "cat", $(0, 1, 0)$ to "chicken" and $(0, 0, 1)$ to "dog". 
 
 
 ### Network Architecture
@@ -72,7 +72,7 @@ In order to estimate the conditional probabilities associated with each classes,
 we need a model with multiple outputs, one per class. 
 To address classification with linear models, 
 we will need as many linear functions as we have outputs.
-Each output will correpsond to its own linear function. 
+Each output will correspond to its own linear function. 
 In our case, since we have 4 features and 3 possible output categories, 
 we will need 12 scalars to represent the weights, 
 ($w$ with subscripts) and 3 scalars to represent the biases ($b$ with subscripts). 
@@ -86,14 +86,14 @@ o_3 &= x_1 w_{31} + x_2 w_{32} + x_3 w_{33} + x_4 w_{34} + b_3.
 \end{aligned}
 $$
 
-We can depict this calculation with the neural network diagram below.
+We can depict this calculation with the neural network diagram shown in :numref:`fig_softmaxreg`.
 Just as in linear regression, softmax regression is also a single-layer neural network. 
 And since the calculation of each output, $o_1, o_2$, and $o_3$, 
 depends on all inputs, $x_1$, $x_2$, $x_3$, and $x_4$, 
 the output layer of softmax regression can also be described as fully-connected layer.
 
 ![Softmax regression is a single-layer neural network.  ](../img/softmaxreg.svg)
-
+:label:`fig_softmaxreg`
 
 To express the model more compactly, we can use linear algebra notation. 
 In vector form, we arrive at $\mathbf{o} = \mathbf{W} \mathbf{x} + \mathbf{b}$,
@@ -304,7 +304,7 @@ We can demystify the name by introducing the basics of information theory.
 ## Information Theory Basics
 
 Information theory deals with the problem of encoding, decoding, transmitting 
-and manipulating information (aka data) in as concise form as possible.
+and manipulating information (also known as data) in as concise form as possible.
 
 ### Entropy
 
@@ -341,7 +341,7 @@ Easy to predict, easy to compress.
 
 However if we cannot perfectly predict every event,
 then we might some times be surprised. 
-Our surpise is greater when we assigned an event lower probability.
+Our surprise is greater when we assigned an event lower probability.
 For reasons that we will elaborate in the appendix,
 Claude Shannon settled on $\log(1/p(j)) = -\log p(j)$ 
 to quantify one's *surprisal* at observing an event $j$
@@ -362,7 +362,7 @@ The cross-entropy *from $p$ to $q$*, denoted H(p, q),
 is the expected surprisal of an observer with subjective probabilities $q$
 upon seeing data that was actually generated according to probabilities $p$.
 The lowest possible cross-entropy is achieved when $p=q$. 
-In this case, the cross-entropy from $p$ to $q$ is $H(p,p)= H(p)$.
+In this case, the cross-entropy from $p$ to $q$ is $H(p, p)= H(p)$.
 Relating this back to our classification objective,
 even if we get the best possible predictions, 
 if the best possible possible, then we will never be perfect. 
@@ -373,13 +373,13 @@ actual conditional distributions $P(\mathbf{y} \mid \mathbf{x})$.
 ### Kullback Leibler Divergence
 
 Perhaps the most common way to measure the distance between two distributions
-is to calculate the Kullback Leibler divergence $D(p\|q)$. 
+is to calculate the *Kullback Leibler divergence* $D(p\|q)$. 
 This is simply the difference between the cross-entropy and the entropy,
 i.e., the additional cross-entropy incurred over the irreducible minimum value it could take:
 $$
-D(p\|q) = H(p,q) - H[p] = \sum_j p(j) \log \frac{p(j)}{q(j)}
+D(p\|q) = H(p, q) - H[p] = \sum_j p(j) \log \frac{p(j)}{q(j)}
 $$
-Note that in classificatio, we do not know the true $p$,
+Note that in classification, we do not know the true $p$,
 so we cannot compute the entropy directly. 
 However, because the entropy is out of our control, 
 minimizing $D(p\|q)$ with respect to $q$ 
@@ -417,13 +417,13 @@ nd the total number of predictions.
 1. Assume that we three classes which occur with equal probability, i.e., the probability vector is $(\frac{1}{3}, \frac{1}{3}, \frac{1}{3})$.
     * What is the problem if we try to design a binary code for it? Can we match the entropy lower bound on the number of bits?
     * Can you design a better code. Hint - what happens if we try to encode two independent observations? What if we encode $n$ observations jointly?
-1. Softmax is a misnomer for the mapping introduced above (but everyone in deep learning uses it). The real softmax is defined as $\mathrm{RealSoftMax}(a,b) = \log (\exp(a) + \exp(b))$.
-    * Prove that $\mathrm{RealSoftMax}(a,b) > \mathrm{max}(a,b)$.
+1. Softmax is a misnomer for the mapping introduced above (but everyone in deep learning uses it). The real softmax is defined as $\mathrm{RealSoftMax}(a, b) = \log (\exp(a) + \exp(b))$.
+    * Prove that $\mathrm{RealSoftMax}(a, b) > \mathrm{max}(a, b)$.
     * Prove that this holds for $\lambda^{-1} \mathrm{RealSoftMax}(\lambda a, \lambda b)$, provided that $\lambda > 0$.
-    * Show that for $\lambda \to \infty$ we have $\lambda^{-1} \mathrm{RealSoftMax}(\lambda a, \lambda b) \to \mathrm{max}(a,b)$.
+    * Show that for $\lambda \to \infty$ we have $\lambda^{-1} \mathrm{RealSoftMax}(\lambda a, \lambda b) \to \mathrm{max}(a, b)$.
     * What does the soft-min look like?
     * Extend this to more than two numbers.
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2334)
+## [Discussions](https://discuss.mxnet.io/t/2334)
 
 ![](../img/qr_softmax-regression.svg)

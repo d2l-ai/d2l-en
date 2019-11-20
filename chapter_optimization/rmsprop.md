@@ -25,19 +25,21 @@ $$
 \end{aligned}
 $$
 
-As before in :numref:`sec_momentum` we use $1 + \gamma + \gamma^2 + \ldots = \frac{1}{1-\gamma}$. Hence the sum of weights is normalized to $1$ with a half-life time of an observation of $\gamma^{-1}$. Let's visualize the weights for the past 40 time steps for various choices of $\gamma$.
+As before in :numref:`sec_momentum` we use $1 + \gamma + \gamma^2 + \ldots = \frac{1}{1-\gamma}$. Hence the sum of weights is normalized to $1$ with a half-life time of an observation of $\gamma^{-1}$. Let's visualize the weights for the past 40 timesteps for various choices of $\gamma$.
 
 ```{.python .input  n=1}
 %matplotlib inline
-import d2l, math
+import d2l
+import math
 from mxnet import np, npx
+
 npx.set_np()
 d2l.set_figsize((3.5, 2.5))
 
 gammas = [0.95, 0.9, 0.8, 0.7]
 for gamma in gammas:
     x = np.arange(40).asnumpy()
-    d2l.plt.plot(x, (1-gamma) * gamma ** x, label='gamma = %.2f'%gamma)
+    d2l.plt.plot(x, (1-gamma) * gamma ** x, label='gamma = %.2f' % gamma)
 d2l.plt.xlabel('time');
 ```
 
@@ -79,8 +81,8 @@ def rmsprop(params, states, hyperparams):
 We set the initial learning rate to 0.01 and the weighting term $\gamma$ to 0.9. That is, $\mathbf{s}$ aggregates on average over the past $1/(1-\gamma) = 10$ observations of the square gradient.
 
 ```{.python .input  n=24}
-data_iter, feature_dim = d2l.get_data_ch10(batch_size=10)
-d2l.train_ch10(rmsprop, init_rmsprop_states(feature_dim),
+data_iter, feature_dim = d2l.get_data_ch11(batch_size=10)
+d2l.train_ch11(rmsprop, init_rmsprop_states(feature_dim),
                {'lr': 0.01, 'gamma': 0.9}, data_iter, feature_dim);
 ```
 
@@ -89,7 +91,8 @@ d2l.train_ch10(rmsprop, init_rmsprop_states(feature_dim),
 Since RMSProp is a rather popular algorithm it is also available in the `Trainer` instance. All we need to do is instantiate it using an algorithm named `rmsprop`, assigning $\gamma$ to the parameter `gamma1`.
 
 ```{.python .input  n=29}
-d2l.train_gluon_ch10('rmsprop', {'learning_rate': 0.01, 'gamma1': 0.9}, data_iter)
+d2l.train_gluon_ch11('rmsprop', {'learning_rate': 0.01, 'gamma1': 0.9},
+                     data_iter)
 ```
 
 ## Summary
@@ -107,10 +110,6 @@ d2l.train_gluon_ch10('rmsprop', {'learning_rate': 0.01, 'gamma1': 0.9}, data_ite
 1. Would you want to adjust $\gamma$ as optimization progresses? How sensitive is RMSProp to this?
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2376)
+## [Discussions](https://discuss.mxnet.io/t/2376)
 
 ![](../img/qr_rmsprop.svg)
-
-```{.python .input}
-
-```

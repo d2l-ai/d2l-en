@@ -18,7 +18,7 @@
 * Quotes
     * Use double quotes
 * Symbol Descriptions
-    * time step t（not t time step）
+    * timestep t（not t timestep）
 * Tools, Class, and Functions
     * Gluon, MXNet, NumPy, spaCy, NDArray, Symbol, Block, HybridBlock, ResNet-18, Fashion-MNIST, matplotlib
         * Consider these as words without accents (``)
@@ -83,7 +83,7 @@
 
 ## Code
 
-* Each line must have <=80 characters (limited by page width)
+* Each line must have <=78 characters (limited by page width)
 * Use utils.py to encapsulate classes/functions that are repetitively used
     * Give full implementation when it is used for the first time
 * Python
@@ -163,7 +163,7 @@
   publisher={ACM}
 }
 ```
-4. Run `bibtool -f "%3n(author).%d(year)" d2l.bib -o d2l.bib`. Now the added entry will have consistent keys:
+4. Run `bibtool -s -f "%3n(author).%d(year)" d2l.bib -o d2l.bib`. Now the added entry will have consistent keys. And as a side-effect, it'll appear in alphabetically sorted order relative to all other papers in the file:
 ```
 @Article{	  Wood.Gasthaus.Archambeau.ea.2011,
   title		= {The sequence memoizer},

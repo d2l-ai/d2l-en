@@ -107,7 +107,7 @@ In most cases, the latter student will do much better.
 Likewise, consider a model that simply uses a lookup table to answer questions. If the set of allowable inputs is discrete and reasonably small, then perhaps after viewing *many* training examples, this approach would perform well. Still this model has no ability to do better than random guessing when faced with examples that it has never seen before.
 In reality the input spaces are far too large to memorize the answers corresponding to every conceivable input. For example, consider the black and white $28\times28$ images. If each pixel can take one among $256$ gray scale values, then there are $256^{784}$ possible images. That means that there are far more low-res grayscale thumbnail-sized images than there are atoms in the universe. Even if we could encounter this data, we could never afford to store the lookup table.
 
-Lastly, consider the problem of trying
+Last, consider the problem of trying
 to classify the outcomes of coin tosses (class 0: heads, class 1: tails)
 based on some contextual features that might be available.
 No matter what algorithm we come up with,
@@ -147,8 +147,8 @@ we assume that both the training data and the test data
 are drawn *independently* from *identical* distributions
 (commonly called the i.i.d. assumption).
 This means that the process that samples our data has no *memory*.
-The 2nd example drawn and the 3rd drawn
-are no more correlated than the 2nd and the 2-millionth sample drawn.
+The $2^{\mathrm{nd}}$ example drawn and the $3^{\mathrm{rd}}$ drawn
+are no more correlated than the $2^{\mathrm{nd}}$ and the $2$-millionth sample drawn.
 
 Being a good machine learning scientist requires thinking critically,
 and already you should be poking holes in this assumption,
@@ -261,7 +261,7 @@ In order to determine the best among our candidate models,
 we will typically employ a validation set.
 
 
-### Validation Data Set
+### Validation Dataset
 
 In principle we should not touch our test set
 until after we have chosen all our hyper-parameters.
@@ -383,12 +383,12 @@ In fact, whenever the data points each have a distinct value of $x$,
 a polynomial function with degree equal to the number of data points
 can fit the training set perfectly.
 We visualize the relationship between polynomial degree
-and under- vs over-fitting below.
+and under- vs over-fitting in :numref:`fig_capacity_vs_error`.
 
 ![Influence of Model Complexity on Underfitting and Overfitting](../img/capacity_vs_error.svg)
+:label:`fig_capacity_vs_error`
 
-
-### Data Set Size
+### Dataset Size
 
 The other big consideration to bear in mind is the dataset size.
 Fixing our model, the fewer samples we have in the training dataset,
@@ -415,17 +415,17 @@ To get started we will import our usual packages.
 
 ```{.python .input  n=1}
 import d2l
-from mxnet import autograd, gluon, np, npx
+from mxnet import gluon, np, npx
 from mxnet.gluon import nn
 npx.set_np()
 ```
 
-### Generating Data Sets
+### Generating the Dataset
 
 First we need data. Given $x$, we will use the following cubic polynomial to generate the labels on training and test data:
 
 $$y = 5 + 1.2x - 3.4\frac{x^2}{2!} + 5.6 \frac{x^3}{3!} + \epsilon \text{ where }
-\epsilon \sim \mathcal{N}(0,0.1)$$
+\epsilon \sim \mathcal{N}(0, 0.1)$$
 
 The noise term $\epsilon$ obeys a normal distribution
 with a mean of 0 and a standard deviation of 0.1.
@@ -462,9 +462,9 @@ namely the constant feature corresponding to the bias.
 features[:2], poly_features[:2], labels[:2]
 ```
 
-### Defining, Training and Testing Model
+### Training and Testing Model
 
-Let first implement a function to evaluate the loss on a given data.
+Let's first implement a function to evaluate the loss on a given data.
 
 ```{.python .input}
 # Saved in the d2l package for later use
@@ -489,12 +489,12 @@ def train(train_features, test_features, train_labels, test_labels,
     net.initialize()
     batch_size = min(10, train_labels.shape[0])
     train_iter = d2l.load_array((train_features, train_labels), batch_size)
-    test_iter = d2l.load_array((test_features, test_labels), batch_size, 
+    test_iter = d2l.load_array((test_features, test_labels), batch_size,
                                is_train=False)
     trainer = gluon.Trainer(net.collect_params(), 'sgd',
                             {'learning_rate': 0.01})
     animator = d2l.Animator(xlabel='epoch', ylabel='loss', yscale='log',
-                            xlim=[1,num_epochs], ylim=[1e-3, 1e2],
+                            xlim=[1, num_epochs], ylim=[1e-3, 1e2],
                             legend=['train', 'test'])
     for epoch in range(1, num_epochs+1):
         d2l.train_epoch_ch3(net, train_iter, loss, trainer)
@@ -540,7 +540,7 @@ train(poly_features[:n_train, 0:3], poly_features[n_train:, 0:3],
 
 ### Insufficient Training (Overfitting)
 
-Now let us try to train the model
+Now let's try to train the model
 using a polynomial of too high degree.
 Here, there is insufficient data to learn that
 the higher-degree coefficients should have values close to zero.
@@ -588,6 +588,6 @@ such as weight decay and dropout.
 1. What degree of polynomial do you need to reduce the training error to 0?
 1. Can you ever expect to see 0 generalization error?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2341)
+## [Discussions](https://discuss.mxnet.io/t/2341)
 
 ![](../img/qr_underfit-overfit.svg)

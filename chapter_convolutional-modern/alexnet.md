@@ -83,10 +83,11 @@ which achieved excellent performance in the ImageNet challenge.
 
 Interestingly in the lowest layers of the network,
 the model learned featrue extractors that resembled some traditional filters.
-The figure below is reproduced from this paper
+:numref:`fig_filters` is reproduced from this paper
 and describes lower-level image descriptors.
 
 ![Image filters learned by the first layer of AlexNet](../img/filters.png)
+:label:`fig_filters`
 
 Higher layers in the network might build upon these representations
 to represent larger structures, like eyes, noses, blades of grass, etc.
@@ -144,7 +145,7 @@ convex objectives were preferred.
 
 Graphical processing units (GPUs) proved to be a game changer
 in make deep learning feasible.
-These chips had long been develoepd for accelerating
+These chips had long been developed for accelerating
 graphics processing to benefit computer games.
 In particular, they were optimized for high throughput 4x4 matrix-vector products, which are needed for many computer graphics tasks.
 Fortunately, this math is strikingly similar
@@ -181,7 +182,7 @@ For instance, NVIDIA's latest Volta generation offers up to 120 TFlops per chip 
 (and up to 24 TFlops for more general purpose ones),
 while floating point performance of CPUs has not exceeded 1 TFlop to date.
 The reason for why this is possible is actually quite simple:
-firstly, power consumption tends to grow *quadratically* with clock frequency.
+first, power consumption tends to grow *quadratically* with clock frequency.
 Hence, for the power budget of a CPU core that runs 4x faster (a typical number),
 you can use 16 GPU cores at 1/4 the speed,
 which yields 16 x 1/4 = 4x the performance.
@@ -189,7 +190,7 @@ Furthermore, GPU cores are much simpler
 (in fact, for a long time they weren't even *able*
 to execute general purpose code),
 which makes them more energy efficient.
-Lastly, many operations in deep learning require high memory bandwidth.
+Last, many operations in deep learning require high memory bandwidth.
 Again, GPUs shine here with buses that are at least 10x as wide as many CPUs.
 
 Back to 2012. A major breakthrough came
@@ -215,12 +216,13 @@ by a phenomenally large margin.
 This network proved, for the first time,
 that the features obtained by learning can transcend manually-design features, breaking the previous paradigm in computer vision.
 The architectures of AlexNet and LeNet are *very similar*,
-as the diagram below illustrates.
+as :numref:`fig_alexnet` illustrates.
 Note that we provide a slightly streamlined version of AlexNet
 removing some of the design quirks that were needed in 2012
 to make the model fit on two small GPUs.
 
 ![LeNet (left) and AlexNet (right)](../img/alexnet.svg)
+:label:`fig_alexnet`
 
 The design philosophies of AlexNet and LeNet are very similar,
 but there are also significant differences.
@@ -228,7 +230,7 @@ First, AlexNet is much deeper than the comparatively small LeNet5.
 AlexNet consists of eight layers: five convolutional layers,
 two fully-connected hidden layers, and one fully-connected output layer. Second, AlexNet used the ReLU instead of the sigmoid
 as its activation function.
-Let us delve into the details below.
+Let's delve into the details below.
 
 ### Architecture
 
@@ -274,7 +276,7 @@ We will discuss data augmentation in greater detail in :numref:`sec_image_augmen
 
 ```{.python .input  n=1}
 import d2l
-from mxnet import gluon, np, npx
+from mxnet import np, npx
 from mxnet.gluon import nn
 npx.set_np()
 
@@ -363,12 +365,12 @@ d2l.train_ch5(net, train_iter, test_iter, num_epochs, lr)
     * Try to simplify the model to make the training faster, while ensuring that the accuracy does not drop significantly.
     * Can you design a better model that works directly on $28 \times 28$ images.
 1. Modify the batch size, and observe the changes in accuracy and GPU memory.
-1. Rooflines
+1. Rooflines:
     * What is the dominant part for the memory footprint of AlexNet?
     * What is the dominant part for computation in AlexNet?
     * How about memory bandwidth when computing the results?
 1. Apply dropout and ReLU to LeNet5. Does it improve? How about preprocessing?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2354)
+## [Discussions](https://discuss.mxnet.io/t/2354)
 
 ![](../img/qr_alexnet.svg)

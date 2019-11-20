@@ -1,4 +1,4 @@
-# Text Classification and Data Sets
+# Text Classification and Datasets
 :label:`sec_sentiment`
 
 Text classification is a common task in natural language processing, which transforms a sequence of text of indefinite length into a category of text. It is similar to the image classification, the most frequently used application in this book, e.g., :numref:`sec_naive_bayes`. The only difference is that, rather than an image, text classification's example is a text sentence. 
@@ -28,7 +28,7 @@ def download_imdb(data_dir='../data'):
     fname = gluon.utils.download(url, data_dir)
     with tarfile.open(fname, 'r') as f:
         f.extractall(data_dir)
-        
+
 download_imdb()
 ```
 
@@ -62,7 +62,7 @@ train_tokens = d2l.tokenize(train_data[0], token='word')
 vocab = d2l.Vocab(train_tokens, min_freq=5)
 
 d2l.set_figsize((3.5, 2.5))
-d2l.plt.hist([len(line) for line in train_tokens], bins=range(0,1000,50));
+d2l.plt.hist([len(line) for line in train_tokens], bins=range(0, 1000, 50));
 ```
 
 ### Padding to the Same Length
@@ -71,12 +71,12 @@ Because the reviews have different lengths, so they cannot be directly combined 
 
 ```{.python .input  n=5}
 num_steps = 500  # sequence length
-train_features = np.array([d2l.trim_pad(vocab[line], num_steps, vocab.unk) 
-                          for line in train_tokens])
+train_features = np.array([d2l.trim_pad(vocab[line], num_steps, vocab.unk)
+                           for line in train_tokens])
 train_features.shape
 ```
 
-### Create Data Iterator
+### Creating Data Iterator
 
 Now, we will create a data iterator. Each iteration will return a minibatch of data.
 
@@ -89,9 +89,9 @@ for X, y in train_iter:
 '# batches:', len(train_iter)
 ```
 
-## Put All Things Together
+## Putting Things Together
 
-Lastly, we will save a function `load_data_imdb` into `d2l`, which returns the vocabulary and data iterators.
+Last, we will save a function `load_data_imdb` into `d2l`, which returns the vocabulary and data iterators.
 
 ```{.python .input  n=7}
 # Saved in the d2l package for later use
@@ -101,12 +101,12 @@ def load_data_imdb(batch_size, num_steps=500):
     train_tokens = d2l.tokenize(train_data[0], token='word')
     test_tokens = d2l.tokenize(test_data[0], token='word')
     vocab = d2l.Vocab(train_tokens, min_freq=5)
-    train_features = np.array([d2l.trim_pad(vocab[line], num_steps, vocab.unk) 
+    train_features = np.array([d2l.trim_pad(vocab[line], num_steps, vocab.unk)
                                for line in train_tokens])
-    test_features = np.array([d2l.trim_pad(vocab[line], num_steps, vocab.unk) 
-                               for line in test_tokens])
+    test_features = np.array([d2l.trim_pad(vocab[line], num_steps, vocab.unk)
+                              for line in test_tokens])
     train_iter = d2l.load_array((train_features, train_data[1]), batch_size)
-    test_iter = d2l.load_array((test_features, test_data[1]), batch_size, 
+    test_iter = d2l.load_array((test_features, test_data[1]), batch_size,
                                is_train=False)
     return train_iter, test_iter, vocab
 ```
@@ -120,6 +120,6 @@ def load_data_imdb(batch_size, num_steps=500):
 
 * Discover a different natural language dataset (such as [Amazon reviews](https://snap.stanford.edu/data/web-Amazon.html)) and build a similar data_loader function as `load_data_imdb`.
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/4355)
+## [Discussions](https://discuss.mxnet.io/t/4355)
 
 ![](../img/qr_sentiment-analysis.svg)

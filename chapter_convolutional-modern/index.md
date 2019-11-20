@@ -4,7 +4,7 @@
 Now that we understand the basics of wiring together convolutional neural networks, we will take you through a tour of modern deep learning.
 In this chapter, each section will correspond to a significant neural network architecture that was at some point (or currently) the base model upon which an enormous amount of research and projects were built.
 Each of these networks was at briefly
-a dominant architecture an d many were
+a dominant architecture and many were
 at one point winners or runners-up in the famous ImageNet competition,
 which has served as a barometer of progress
 on supervised learning in computer vision since 2010.
@@ -24,3 +24,4 @@ batch-norm
 resnet
 densenet
 ```
+

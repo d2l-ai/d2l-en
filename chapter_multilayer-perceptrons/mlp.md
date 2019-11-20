@@ -14,8 +14,9 @@ using deep neural networks.
 
 ## Hidden Layers
 
-Recall that for linear regression and softmax regression,
-we mapped our inputs directly to our outputs
+Let's recall linear regression and softmax regression
+with an example as illustrated in :numref:`fig_singlelayer`.
+In general, we mapped our inputs directly to our outputs
 via a single linear transformation:
 
 $$
@@ -23,6 +24,7 @@ $$
 $$
 
 ![Single layer perceptron with 5 output units.](../img/singlelayer.svg)
+:label:`fig_singlelayer`
 
 If our labels really were related to our input data
 by an approximately linear function, then this approach would be perfect.
@@ -42,7 +44,7 @@ In these cases, linear models might perform well,
 and they might even be hard to beat.
 
 But what about classifying images in FashionMNIST?
-Should increasing the intensity of the pixel at location (13,17)
+Should increasing the intensity of the pixel at location (13, 17)
 always increase the likelihood that the image depicts a pocketbook?
 That seems ridiculous because we all know
 that you cannot make sense out of an image
@@ -50,7 +52,7 @@ without accounting for the interactions among pixels.
 
 
 
-### From one to many
+### From One to Many
 
 As another case, consider trying to classify images
 based on whether they depict *cats* or *dogs* given black-and-white images.
@@ -77,9 +79,10 @@ many layers of neurons on top of each other.
 Each layer feeds into the layer above it, until we generate an output.
 This architecture is commonly called a *multilayer perceptron*,
 often abbreviated as *MLP*.
-The neural network diagram for an MLP looks like this:
+The neural network diagram for an MLP looks like :numref:`fig_nlp`.
 
 ![Multilayer perceptron with hidden layers. This example contains a hidden layer with 5 hidden units in it. ](../img/mlp.svg)
+:label:`fig_nlp`
 
 The multilayer perceptron above has 4 inputs and 3 outputs,
 and the hidden layer in the middle contains 5 hidden units.
@@ -92,7 +95,7 @@ Likewise, the neurons in the hidden layer
 are fully connected to the neurons in the output layer.
 
 
-### From linear to nonlinear
+### From Linear to Nonlinear
 
 We can write out the calculations that define this one-hidden-layer MLP in mathematical notation as follows:
 $$
@@ -119,7 +122,7 @@ $$\mathbf{o} = \mathbf{W}_2 \mathbf{h} + \mathbf{b}_2 = \mathbf{W}_2 (\mathbf{W}
 
 In order to get a benefit from multilayer architectures,
 we need another key ingredient—a nonlinearity $\sigma$ to be applied to each of the hidden units after each layer's linear transformation.
-The most popular choice for the nonlinearity these days is the rectified linear unit (ReLU) $\mathrm{max}(x,0)$.
+The most popular choice for the nonlinearity these days is the rectified linear unit (ReLU) $\mathrm{max}(x, 0)$.
 After incorporating these non-linearities
 it becomes impossible to merge layers.
 
@@ -156,7 +159,7 @@ but for now let’s actually build an MLP.
 In this example, we’ll implement a multilayer perceptron
 with two hidden layers and one output layer.
 
-### Vectorization and minibatch
+### Vectorization and Minibatch
 
 As before, by the matrix $\mathbf{X}$, we denote a minibatch of inputs.
 The calculations to produce outputs from an MLP with two hidden layers
@@ -189,7 +192,7 @@ npx.set_np()
 ## Activation Functions
 
 Because they are so fundamental to deep learning, before going further,
-let us take a brief look at some common activation functions.
+let's take a brief look at some common activation functions.
 
 ### ReLU Function
 
@@ -215,7 +218,7 @@ x = np.arange(-8.0, 8.0, 0.1)
 x.attach_grad()
 with autograd.record():
     y = npx.relu(x)
-d2l.set_figsize((4, 2.5))    
+d2l.set_figsize((4, 2.5))
 d2l.plot(x, y, 'x', 'relu(x)')
 ```
 
@@ -244,10 +247,10 @@ The reason for using the ReLU is that its derivatives are particularly well beha
 
 ### Sigmoid Function
 
-The sigmoid function transforms its inputs which take values in $\mathbb{R}$ to the interval $(0,1)$.
+The sigmoid function transforms its inputs which take values in $\mathbb{R}$ to the interval $(0, 1)$.
 For that reason, the sigmoid is often called a *squashing* function:
 it squashes any input in the range (-inf, inf)
-to some value in the range (0,1).
+to some value in the range (0, 1).
 
 $$\mathrm{sigmoid}(x) = \frac{1}{1 + \exp(-x)}.$$
 
@@ -309,7 +312,7 @@ We plot the tanh function blow. Note that as the input nears 0, the tanh functio
 
 ```{.python .input  n=6}
 with autograd.record():
-    y = np.tanh(x)  
+    y = np.tanh(x)
 d2l.plot(x, y, 'x', 'tanh(x)')
 ```
 
@@ -353,6 +356,6 @@ required researchers to code up thousands of lines of C and Fortran.
 1. Assume we have a multilayer perceptron *without* nonlinearities between the layers. In particular, assume that we have $d$ input dimensions, $d$ output dimensions and that one of the layers had only $d/2$ dimensions. Show that this network is less expressive (powerful) than a single layer perceptron.
 1. Assume that we have a nonlinearity that applies to one minibatch at a time. What kinds of problems do you expect this to cause?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2338)
+## [Discussions](https://discuss.mxnet.io/t/2338)
 
 ![](../img/qr_mlp.svg)

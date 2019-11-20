@@ -17,13 +17,13 @@ In this section, we will show you how to implement
 the linear regression model from :numref:`sec_linear_scratch`
 concisely by using Gluon.
 
-## Generating Data Sets
+## Generating the Dataset
 
 To start, we will generate the same dataset as in the previous section.
 
 ```{.python .input  n=2}
 import d2l
-from mxnet import autograd, np, npx, gluon
+from mxnet import autograd, gluon, np, npx
 npx.set_np()
 
 true_w = np.array([2, -3.4])
@@ -38,7 +38,7 @@ we can call upon Gluon's `data` module to read data.
 The first step will be to instantiate an `ArrayDataset`.
 This object's constructor takes one or more `ndarray`s as arguments.
 Here, we pass in `features` and `labels` as arguments.
-Next, we will use the ArrayDataset to instantiate a DataLoader,
+Next, we will use the `ArrayDataset` to instantiate a `DataLoader`,
 which also requires that we specify a `batch_size`
 and specify a Boolean value `shuffle` indicating whether or not
 we want the `DataLoader` to shuffle the data
@@ -66,7 +66,7 @@ for X, y in data_iter:
     break
 ```
 
-## Define the Model
+## Defining the Model
 
 When we implemented linear regression from scratch
 (in :numref`sec_linear_scratch`),
@@ -81,7 +81,7 @@ The situation is similar to coding up your own blog from scratch.
 Doing it once or twice is rewarding and instructive,
 but you would be a lousy web developer
 if every time you needed a blog you spent a month
-reinventing the weel.
+reinventing the wheel.
 
 For standard operations, we can use Gluon's predefined layers,
 which allow us to focus especially
@@ -109,7 +109,7 @@ from mxnet.gluon import nn
 net = nn.Sequential()
 ```
 
-Recall the architecture of a single-layer network.
+Recall the architecture of a single-layer network as shown in :numref:`fig_singleneuron`.
 The layer is said to be *fully-connected*
 because each of its inputs are connected to each of its outputs
 by means of a matrix-vector multiplication.
@@ -118,6 +118,7 @@ Since we only want to generate a single scalar output,
 we set that number to $1$.
 
 ![Linear regression is a single-layer neural network. ](../img/singleneuron.svg)
+:label:`fig_singleneuron`
 
 ```{.python .input  n=6}
 net.add(nn.Dense(1))
@@ -135,7 +136,7 @@ We will describe how this works in more detail
 in the chapter "Deep Learning Computation".
 
 
-## Initialize Model Parameters
+## Initializing Model Parameters
 
 Before using `net`, we need to initialize the model parameters,
 such as the weights and biases in the linear regression model.
@@ -170,7 +171,7 @@ have not been initialized yet,
 we cannot access or manipulate them.
 
 
-## Define the Loss Function
+## Defining the Loss Function
 
 In Gluon, the `loss` module defines various loss functions.
 We will the imported module `loss` with the pseudonym `gloss`,
@@ -184,7 +185,7 @@ from mxnet.gluon import loss as gloss
 loss = gloss.L2Loss()  # The squared loss is also known as the L2 norm loss
 ```
 
-## Define the Optimization Algorithm
+## Defining the Optimization Algorithm
 
 Minibatch SGD and related variants
 are standard tools for optimizing neural networks
@@ -193,7 +194,7 @@ variations on this algorithm through its `Trainer` class.
 When we instantiate the `Trainer`,
 we will specify the parameters to optimize over
 (obtainable from our net via `net.collect_params()`),
-the optimization algortihm we wish to use (`sgd`),
+the optimization algorithm we wish to use (`sgd`),
 and a dictionary of hyper-parameters
 required by our optimization algorithm.
 SGD just requires that we set the value `learning_rate`,
@@ -272,6 +273,6 @@ print('Error in estimating b', true_b - b)
 1. Review the MXNet documentation to see what loss functions and initialization methods are provided in the modules `gluon.loss` and `init`. Replace the loss by Huber's loss.
 1. How do you access the gradient of `dense.weight`?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2333)
+## [Discussions](https://discuss.mxnet.io/t/2333)
 
 ![](../img/qr_linear-regression-gluon.svg)

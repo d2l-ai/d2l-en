@@ -10,7 +10,7 @@ as small as $1 \times 1$ and as large as $11 \times 11$.
 One insight in this paper was that sometimes
 it can be advantageous to employ a combination of variously-sized kernels.
 In this section, we will introduce GoogLeNet,
-presenting a slightly simplified version of the original model—we
+presenting a slightly simplified version of the original model---we
 omit a few ad hoc features that were added to stabilize training
 but are unnecessary now with better training algorithms available.
 
@@ -40,7 +40,7 @@ are the number of output channels per layer.
 
 ```{.python .input  n=1}
 import d2l
-from mxnet import gluon, np, npx
+from mxnet import np, npx
 from mxnet.gluon import nn
 npx.set_np()
 
@@ -85,7 +85,7 @@ but not ignore the long range entirely).
 
 ## GoogLeNet Model
 
-GoogLeNet uses a stack of a total of 9 inception blocks
+As shown in :numref:`fig_inception_full`, GoogLeNet uses a stack of a total of 9 inception blocks
 and global average pooling to generate its estimates.
 Maximum pooling between inception blocks reduced the dimensionality.
 The first part is identical to AlexNet and LeNet,
@@ -95,6 +95,7 @@ a stack of fully-connected layers at the end.
 The architecture is depicted below.
 
 ![Full GoogLeNet Model](../img/inception-full.svg)
+:label:`fig_inception_full`
 
 We can now implement GoogLeNet piece by piece.
 The first component uses a 64-channel 7×7 convolutional layer.
@@ -234,6 +235,6 @@ d2l.train_ch5(net, train_iter, test_iter, num_epochs, lr)
 1. Why do we need a large range convolution initially?
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2357)
+## [Discussions](https://discuss.mxnet.io/t/2357)
 
 ![](../img/qr_googlenet.svg)

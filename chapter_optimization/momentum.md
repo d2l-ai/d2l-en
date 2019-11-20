@@ -5,22 +5,23 @@ In :numref:`sec_sgd` we reviewed what happens when performing stochastic gradien
 
 ## Basics
 
+
 ### Leaky Averages
 
 The previous section saw us discussing minibatch SGD as a means for accelerating computation. It also had the nice side-effect that averaging gradients reduced the amount of variance.
 
-$$\mathbf{g}_t = \partial_{\mathbf{w}} \frac{1}{|\mathcal{B}_t|} \sum_{i \in \mathcal{B}_t} f(\mathbf{x}_{i}, \mathbf{w}_{t-1}) = \frac{1}{|\mathcal{B}_t|} \sum_{i \in \mathcal{B}_t} \mathbf{g}_{i,t-1}
+$$\mathbf{g}_t = \partial_{\mathbf{w}} \frac{1}{|\mathcal{B}_t|} \sum_{i \in \mathcal{B}_t} f(\mathbf{x}_{i}, \mathbf{w}_{t-1}) = \frac{1}{|\mathcal{B}_t|} \sum_{i \in \mathcal{B}_t} \mathbf{g}_{i, t-1}
 $$
 
 Here we used $\mathbf{g}_{ii} = \partial_{\mathbf{w}} f(\mathbf{x}_i, \mathbf{w}_t)$ to keep the notation simple.
 It would be nice if we could benefit from the effect of variance reduction even beyond averaging gradients on a mini-batch. One option to accomplish this task is to replace the gradient computation by a 'leaky average'
 
-$$\mathbf{v}_t = \beta \mathbf{v}_{t-1} + \mathbf{g}_{t,t-1}$$
+$$\mathbf{v}_t = \beta \mathbf{v}_{t-1} + \mathbf{g}_{t, t-1}$$
 
-for some $\beta \in (0, 1)$. This effectively replaces the instantaneous gradient by one that's been averaged over multiple *past* gradients. $\mathbf{v}$ is called *momentum*. It accumulates past gradients similar to how a heavy ball rolling down the objective function landscape integrates over past forces. To see what is happening in more detail let us expand $\mathbf{v}_t$ recursively into
+for some $\beta \in (0, 1)$. This effectively replaces the instantaneous gradient by one that's been averaged over multiple *past* gradients. $\mathbf{v}$ is called *momentum*. It accumulates past gradients similar to how a heavy ball rolling down the objective function landscape integrates over past forces. To see what is happening in more detail let's expand $\mathbf{v}_t$ recursively into
 
 $$\begin{aligned}
-\mathbf{v}_t = \beta^2 \mathbf{v}_{t-2} + \beta \mathbf{g}_{t-1, t-2} + \mathbf{g}_{t,t-1}
+\mathbf{v}_t = \beta^2 \mathbf{v}_{t-2} + \beta \mathbf{g}_{t-1, t-2} + \mathbf{g}_{t, t-1}
 = \ldots = \sum_{\tau = 0}^{t-1} \beta^{\tau} \mathbf{g}_{t-\tau, t-\tau-1}.
 \end{aligned}$$
 
@@ -36,7 +37,7 @@ To get a better understanding of the geometric properties of the momentum method
 
 $f(\mathbf{x}) = 0.1 x_1^2 + 2 x_2^2.$
 
-As before $f$ has its minimum at $(0,0)$. This function is *very* flat in the direction of $x_1$. Let's see what happens when we perform gradient descent as before on this new function. We pick a learning rate of $0.4$.
+As before $f$ has its minimum at $(0, 0)$. This function is *very* flat in the direction of $x_1$. Let's see what happens when we perform gradient descent as before on this new function. We pick a learning rate of $0.4$.
 
 ```{.python .input  n=3}
 %matplotlib inline
@@ -68,7 +69,7 @@ Using $\mathbf{v}_t$ instead of the gradient $\mathbf{g}_t$ yields the following
 
 $$
 \begin{aligned}
-\mathbf{v}_t &\leftarrow \beta \mathbf{v}_{t-1} + \mathbf{g}_{t,t-1} \\
+\mathbf{v}_t &\leftarrow \beta \mathbf{v}_{t-1} + \mathbf{g}_{t, t-1} \\
 \mathbf{x}_t &\leftarrow \mathbf{x}_{t-1} - \eta_t \mathbf{v}_t
 \end{aligned}
 $$
@@ -92,7 +93,7 @@ eta, beta = 0.6, 0.25
 d2l.show_trace_2d(f_2d, d2l.train_2d(momentum_2d))
 ```
 
-Note that we can combine momentum with SGD and in particular, minibatch-SGD. The only change is that in that case we replace the gradients $\mathbf{g}_{t,t-1}$ with $\mathbf{g}_t$. Lastly, for convenience we initialize $\mathbf{v}_0 = 0$ at time $t=0$. Let's look at what leaky averaging actually does to the updates.
+Note that we can combine momentum with SGD and in particular, minibatch-SGD. The only change is that in that case we replace the gradients $\mathbf{g}_{t, t-1}$ with $\mathbf{g}_t$. Last, for convenience we initialize $\mathbf{v}_0 = 0$ at time $t=0$. Let's look at what leaky averaging actually does to the updates.
 
 ### Effective Sample Weight
 
@@ -103,7 +104,7 @@ gammas = [0.95, 0.9, 0.6, 0]
 d2l.set_figsize((3.5, 2.5))
 for gamma in gammas:
     x = np.arange(40).asnumpy()
-    d2l.plt.plot(x, gamma ** x, label='gamma = %.2f'%gamma)
+    d2l.plt.plot(x, gamma ** x, label='gamma = %.2f' % gamma)
 d2l.plt.xlabel('time')
 d2l.plt.legend();
 ```
@@ -130,11 +131,11 @@ Let's see how this works in practice.
 
 ```{.python .input  n=15}
 def train_momentum(lr, momentum, num_epochs=2):
-    d2l.train_ch10(sgd_momentum, init_momentum_states(feature_dim),
+    d2l.train_ch11(sgd_momentum, init_momentum_states(feature_dim),
                    {'lr': lr, 'momentum': momentum}, data_iter,
                    feature_dim, num_epochs)
 
-data_iter, feature_dim = d2l.get_data_ch10(batch_size=10)
+data_iter, feature_dim = d2l.get_data_ch11(batch_size=10)
 train_momentum(0.02, 0.5)
 ```
 
@@ -155,10 +156,12 @@ train_momentum(0.005, 0.9)
 There's very little to do in Gluon since the standard `sgd` solver already had momentum built in. Setting matching parameters yields a very similar trajectory.
 
 ```{.python .input  n=9}
-d2l.train_gluon_ch10('sgd', {'learning_rate': 0.005, 'momentum': 0.9}, data_iter)
+d2l.train_gluon_ch11('sgd', {'learning_rate': 0.005, 'momentum': 0.9},
+                     data_iter)
 ```
 
 ## Theoretical Analysis
+
 
 ### Quadratic Convex Functions
 
@@ -204,7 +207,7 @@ eta = 0.1
 d2l.set_figsize((6, 4))
 for lam in lambdas:
     t = np.arange(20).asnumpy()
-    d2l.plt.plot(t, (1 - eta * lam) ** t, label='lambda = %.2f'%lam)
+    d2l.plt.plot(t, (1 - eta * lam) ** t, label='lambda = %.2f' % lam)
 d2l.plt.xlabel('time')
 d2l.plt.legend();
 ```
@@ -235,6 +238,6 @@ We used $R$ to denote the $2 \times 2$ governing convergence behavior. After $t$
 1. Derive minimum value and minimizer for $h(\mathbf{x}) = \frac{1}{2} \mathbf{x}^\top Q \mathbf{x} + \mathbf{x}^\top \mathbf{c} + b$.
 1. What changes when we perform SGD with momentum? What happens when we use mini-batch SGD with momentum? Experiment with the parameters?
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2374)
+## [Discussions](https://discuss.mxnet.io/t/2374)
 
 ![](../img/qr_momentum.svg)

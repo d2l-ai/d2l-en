@@ -33,13 +33,13 @@ Next initialize the shell so we can run `conda` direclty.
 ~/miniconda3/bin/conda init
 ```
 
+
 Then close and re-open your current shell, you should be able to create a new
 environment as following now:
 
 ```bash
 conda create --name d2l -y
 ```
-
 
 ## Downloading the d2l Notebooks
 
@@ -48,12 +48,16 @@ Next, we need to download the code for this book. You can click this
 both `wget` and `unzip` available, then
 
 ```bash
+sudo apt-get install unzip
 mkdir d2l-en && cd d2l-en
 wget https://d2l.ai/d2l-en.zip
 unzip d2l-en.zip && rm d2l-en.zip
 ```
 
-Now we can activate the "d2l" environment to install necessary libraries:
+
+Now we will want to activate the "d2l" environment and install `pip`. 
+Enter `y` for the queries that follow this command.
+
 
 ```bash
 conda activate d2l
@@ -139,6 +143,6 @@ For installation of MXNet on other platforms, please refer to http://numpy.mxnet
 1. Download the code for the book and install the runtime environment.
 
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2315)
+## [Discussions](https://discuss.mxnet.io/t/2315)
 
 ![](../img/qr_install.svg)

@@ -102,13 +102,12 @@ As we can see, the total time required to perform computation and communication 
 
 * MXNet can improve computing performance through automatic parallel computation, such as parallel computation using the CPU and GPU and the parallelization of computation and communication.
 
-
 ## Exercises
 
 * 10 operations were performed in the `run` function defined in this section. There are no dependencies between them. Design an experiment to see if MXNet will automatically execute them in parallel.
 * Designing computation tasks that include more complex data dependencies, and run experiments to see if MXNet can obtain the correct results and improve computing performance.
 * When the computational load of an operator is small enough, parallel computation on only the CPU or a single GPU may also improve the computing performance. Design an experiment to verify this.
 
-## Scan the QR Code to [Discuss](https://discuss.mxnet.io/t/2382)
+## [Discussions](https://discuss.mxnet.io/t/2382)
 
 ![](../img/qr_auto-parallelism.svg)
