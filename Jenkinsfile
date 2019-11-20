@@ -9,7 +9,7 @@ stage("Build and Publish") {
 
       sh label: "Build Environment", script: """set -ex
       
-      sudo -S ./binary
+      ssh -t remotehost "sudo <cmd>"
       sudo mv Inconsolata /usr/share/fonts/opentype/
       sudo fc-cache -f -v
       
