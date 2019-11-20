@@ -13,7 +13,7 @@ stage("Build and Publish") {
       conda activate ${ENV_NAME}
       pip install mxnet-cu101==1.6.0b20190915
       pip install git+https://github.com/d2l-ai/d2l-book
-      python setup.py develop
+      pip install d2l==0.11.0
       pip list
       nvidia-smi
       """
@@ -49,6 +49,8 @@ stage("Build and Publish") {
       d2lbook build html pkg
       rm -rf _build/eval/data
       mv _build/data_tmp _build/eval/data
+      # For 0.7.0
+      cp build/_build/html/d2l-en.zip build/_build/html/d2l-en-0.7.0.zip
       """
 
       if (env.BRANCH_NAME == 'numpy2') {
