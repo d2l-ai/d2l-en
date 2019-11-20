@@ -55,7 +55,7 @@ unzip d2l-en.zip && rm d2l-en.zip
 ```
 
 
-Now we will want to activate the "d2l" environment and install `pip`. 
+Now we will want to activate the "d2l" environment and install `pip`.
 Enter `y` for the queries that follow this command.
 
 
