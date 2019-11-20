@@ -479,11 +479,11 @@ def seq_data_iter_random(corpus, batch_size, num_steps):
     num_examples = ((len(corpus) - 1) // num_steps)
     example_indices = list(range(0, num_examples * num_steps, num_steps))
     random.shuffle(example_indices)
-    
+
     def data(pos):
         # This returns a sequence of the length num_steps starting from pos
         return corpus[pos: pos + num_steps]
-    
+
     # Discard half empty batches
     num_batches = num_examples // batch_size
     for i in range(0, batch_size * num_batches, batch_size):
@@ -505,8 +505,8 @@ def seq_data_iter_consecutive(corpus, batch_size, num_steps):
     Xs, Ys = Xs.reshape(batch_size, -1), Ys.reshape(batch_size, -1)
     num_batches = Xs.shape[1] // num_steps
     for i in range(0, num_batches * num_steps, num_steps):
-        X = Xs[:,i:(i+num_steps)]
-        Y = Ys[:,i:(i+num_steps)]
+        X = Xs[:, i:(i+num_steps)]
+        Y = Ys[:, i:(i+num_steps)]
         yield X, Y
 
 
@@ -536,6 +536,7 @@ def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
 class RNNModelScratch(object):
     """A RNN Model based on scratch implementations"""
+
     def __init__(self, vocab_size, num_hiddens, ctx,
                  get_params, init_state, forward):
         self.vocab_size, self.num_hiddens = vocab_size, num_hiddens
@@ -554,7 +555,8 @@ class RNNModelScratch(object):
 def predict_ch8(prefix, num_predicts, model, vocab, ctx):
     state = model.begin_state(batch_size=1, ctx=ctx)
     outputs = [vocab[prefix[0]]]
-    def get_input(): 
+
+    def get_input():
         return np.array([outputs[-1]], ctx=ctx).reshape(1, 1)
     for y in prefix[1:]:  # Warmup state with prefix
         _, state = model(get_input(), state)
@@ -665,9 +667,11 @@ def read_data_nmt():
 # Defined in file: ./chapter_recurrent-neural-networks/machine-translation.md
 def preprocess_nmt(text):
     text = text.replace('\u202f', ' ').replace('\xa0', ' ')
+
     def no_space(char, prev_char):
         return (True if char in (',', '!', '.')
                 and prev_char != ' ' else False)
+    
     out = [' '+char if i > 0 and no_space(char, text[i-1]) else char
            for i, char in enumerate(text.lower())]
     return ''.join(out)
