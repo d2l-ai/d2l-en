@@ -9,7 +9,7 @@ stage("Build and Publish") {
 
       sh label: "Build Environment", script: """set -ex
       
-      mv Inconsolata /usr/share/fonts/opentype/
+      sudo mv Inconsolata /usr/share/fonts/opentype/
       sudo fc-cache -f -v
       
       
