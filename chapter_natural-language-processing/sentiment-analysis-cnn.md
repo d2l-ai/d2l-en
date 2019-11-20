@@ -173,7 +173,7 @@ Now we can train the model.
 lr, num_epochs = 0.001, 5
 trainer = gluon.Trainer(net.collect_params(), 'adam', {'learning_rate': lr})
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
-d2l.train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs, ctx)
+d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, ctx)
 ```
 
 Below, we use the trained model to classify sentiments of two simple sentences.
