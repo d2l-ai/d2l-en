@@ -683,8 +683,8 @@ the one that you are going to use for your decision.
 Assume that you find this beautiful mushroom in your backyard
 as shown in :numref:`fig_death_cap`.
 
-![Death cap - do not eat!](../img/death_cap.jpg)
-:width:`400px`
+![Death cap---do not eat!](../img/death_cap.jpg)
+:width:`200px`
 :label:`fig_death_cap`
 
 Now, assume that you built a classifier and trained it
@@ -721,9 +721,6 @@ to misclassify to a related class rather than to a distant class.
 Usually, this is referred to as *hierarchical classification*.
 One early example is due to [Linnaeus](https://en.wikipedia.org/wiki/Carl_Linnaeus), who organized the animals in a hierarchy.
 
-![Classify sharks](../img/sharks.png)
-:width:`500px`
-
 In the case of animal classification, 
 it might not be so bad to mistake a poodle for a schnauzer, 
 but our model would pay a huge penalty 
@@ -747,7 +744,7 @@ we might find ourselves in trouble when the classifier
 encounters an image of the Town Musicians of Bremen.
 
 ![A cat, a roster, a dog and a donkey](../img/stackedanimals.jpg)
-:width:`500px`
+:width:`300px`
 
 
 As you can see, there is a cat in the picture,
