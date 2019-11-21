@@ -413,7 +413,7 @@ class TransformerDecoder(d2l.Decoder):
 ## Training
 
 Finally, we are fully prepared to build a encoder-decoder model with transformer architecture.
-Similar to the seq2seq with attention model we built in :label:`sec_seq2seq_attention`, we use the following hyper-parameters: two transformer blocks with both the embedding size and the block output size to be $32$. The additional hyper-parameters are chosen as $4$ heads with the hidden size to be $2$ times larger than output size.
+Similar to the seq2seq with attention model we built in :numref:`sec_seq2seq_attention`, we use the following hyper-parameters: two transformer blocks with both the embedding size and the block output size to be $32$. The additional hyper-parameters are chosen as $4$ heads with the hidden size to be $2$ times larger than output size.
 
 ```{.python .input  n=31}
 embed_size, embedding_size, num_layers, dropout = 32, 32, 2, 0.0

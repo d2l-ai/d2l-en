@@ -87,6 +87,7 @@ the model learned featrue extractors that resembled some traditional filters.
 and describes lower-level image descriptors.
 
 ![Image filters learned by the first layer of AlexNet](../img/filters.png)
+:width:`400px`
 :label:`fig_filters`
 
 Higher layers in the network might build upon these representations
