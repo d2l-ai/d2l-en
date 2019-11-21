@@ -13,11 +13,11 @@ The simplest way to get going will be to install
 is recommended. You can skip the following steps if conda has already been installed.
 Download the corresponding Miniconda sh file from the website
 and then execute the installation from the command line
-using `sudo sh <FILENAME> -b`. For macOS users:
+using `sh <FILENAME> -b`. For macOS users:
 
 ```bash
 # The file name is subject to changes
-sudo sh Miniconda3-latest-MacOSX-x86_64.sh -b
+sh Miniconda3-latest-MacOSX-x86_64.sh -b
 ```
 
 
@@ -25,7 +25,7 @@ For Linux users:
 
 ```bash
 # The file name is subject to changes
-sudo sh Miniconda3-latest-Linux-x86_64.sh -b
+sh Miniconda3-latest-Linux-x86_64.sh -b
 ```
 
 
@@ -48,13 +48,14 @@ conda create --name d2l -y
 
 Next, we need to download the code of this book. You can use the
 [link](https://d2l.ai/d2l-en-0.7.0.zip) to download and unzip the code. 
-Alternatively, if you have both `curl` and `unzip` available:
+Alternatively, if you have `unzip` (otherwise run `sudo apt install unzip`) available:
 
 ```bash
 mkdir d2l-en && cd d2l-en
 curl https://d2l.ai/d2l-en-0.7.0.zip -o d2l-en.zip
 unzip d2l-en.zip && rm d2l-en.zip
 ```
+
 
 Now we will want to activate the `d2l` environment and install `pip`.
 Enter `y` for the queries that follow this command.
@@ -63,6 +64,7 @@ Enter `y` for the queries that follow this command.
 conda activate d2l
 conda install python=3.7 pip -y
 ```
+
 
 ## Installing MXNet and the `d2l` Package
 
@@ -87,12 +89,14 @@ pip install mxnet==1.6.0b20190926
 pip install mxnet==1.6.0b20190915
 ```
 
+
 We also install the `d2l` package that encapsulates frequently used
 functions and classes in this book.
 
 ```bash
 pip install d2l==0.11.0
 ```
+
 
 Once they are installed, we now open the Jupyter notebook by running:
 
