@@ -3,7 +3,7 @@
 
 ## Sparse Features and Learning Rates
 
-Imagine that we're training a language model. To get good accuracy we typically want to decrease the learning rate as we keep on training, usually at a rate of $O(t^{-\frac{1}{2}})$ or slower. Now consider a model training on sparse features, i.e. features that occur only infrequently. This is common for natural language, e.g., it is a lot less likely that we'll see the word *preconditioning* than *learning*. However, it is also common in other areas such as   computational advertising and personalized collaborative filtering. After all, there are many things that are of interest only for a small number of people.
+Imagine that we're training a language model. To get good accuracy we typically want to decrease the learning rate as we keep on training, usually at a rate of $O(t^{-\frac{1}{2}})$ or slower. Now consider a model training on sparse features, i.e., features that occur only infrequently. This is common for natural language, e.g., it is a lot less likely that we'll see the word *preconditioning* than *learning*. However, it is also common in other areas such as   computational advertising and personalized collaborative filtering. After all, there are many things that are of interest only for a small number of people.
 
 Parameters associated with infrequent features only receive meaningful updates whenever these features occur. Given a decreasing learning rate we might end up in a situation where the parameters for common features converge rather quickly to their optimal values, whereas for infrequent features we are still short of observing them sufficiently frequently before their optimal values can be determined. In other words, the learning rate either decreases too slowly for frequent features or too slowly for infrequent ones.
 
@@ -60,7 +60,7 @@ Note that accumulating squared gradients in $\mathbf{s}_t$ means that $\mathbf{s
 
 $$f(\mathbf{x}) = 0.1 x_1^2 + 2 x_2^2$$
 
-We are going to implement Adagrad using the same learning rate previously, i.e. $\eta = 0.4$. As we can see, the iterative trajectory of the independent variable is smoother. However, due to the cumulative effect of $\boldsymbol{s}_t$, the learning rate continuously decays, so the independent variable does not move as much during later stages of iteration.
+We are going to implement Adagrad using the same learning rate previously, i.e., $\eta = 0.4$. As we can see, the iterative trajectory of the independent variable is smoother. However, due to the cumulative effect of $\boldsymbol{s}_t$, the learning rate continuously decays, so the independent variable does not move as much during later stages of iteration.
 
 ```{.python .input  n=6}
 %matplotlib inline
@@ -138,7 +138,7 @@ d2l.train_gluon_ch11('adagrad', {'learning_rate': 0.1}, data_iter)
 ## Exercises
 
 1. Prove that for an orthogonal matrix $U$ and a vector $\mathbf{c}$ the following holds: $\|\mathbf{c} - \mathbf{\delta}\|_2 = \|U \mathbf{c} - U \mathbf{\delta}\|_2$. Why does this mean that the magnitude of perturbations does not change after an orthogonal change of variables?
-1. Try out Adagrad for $f(\mathbf{x}) = 0.1 x_1^2 + 2 x_2^2$ and also for the objective function was rotated by 45 degrees, i.e. $f(\mathbf{x}) = 0.1 (x_1 + x_2)^2 + 2 (x_1 - x_2)^2$. Does it behave differently?
+1. Try out Adagrad for $f(\mathbf{x}) = 0.1 x_1^2 + 2 x_2^2$ and also for the objective function was rotated by 45 degrees, i.e., $f(\mathbf{x}) = 0.1 (x_1 + x_2)^2 + 2 (x_1 - x_2)^2$. Does it behave differently?
 1. Prove [Gerschgorin's circle theorem](https://en.wikipedia.org/wiki/Gershgorin_circle_theorem) which states that eigenvalues $\lambda_i$ of a matrix $M$ satisfy $|\lambda_i - M_{jj}| \leq \sum_{k \neq j} |M_{jk}|$ for at least one choice of $j$.
 1. What does Gerschgorin's theorem tell us about the eigenvalues of the diagonally preconditioned matrix $\mathrm{diag}^{-\frac{1}{2}}(M) M \mathrm{diag}^{-\frac{1}{2}}(M)$?
 1. Try out Adagrad for a proper deep network, such as :ref:`sec_lenet` when applied to Fashion MNIST.
