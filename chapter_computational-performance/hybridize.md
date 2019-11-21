@@ -115,7 +115,7 @@ def benchmark(net, x):
 net = get_net()
 print('before hybridizing: %.4f sec' % (benchmark(net, x)))
 net.hybridize()
-print(' after hybridizing: %.4f sec' % (benchmark(net, x)))
+print('after hybridizing: %.4f sec' % (benchmark(net, x)))
 ```
 
 As is observed in the above results, after a HybridSequential instance calls the `hybridize` function, computing performance is improved through the use of symbolic programming.
