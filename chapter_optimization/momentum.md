@@ -1,7 +1,7 @@
 # Momentum
 :label:`sec_momentum`
 
-In :numref:`sec_sgd` we reviewed what happens when performing stochastic gradient descent, i.e. when performing optimization where only a noisy variant of the gradient is available. In particular, we noticed that for noisy gradients we need to be extra cautious when it comes to choosing the learning rate in the face of noise. If we decrease it too rapidly, convergence stalls. If we are too lenient, we fail to converge to a good enough solution since noise keeps on driving us away from optimality.
+In :numref:`sec_sgd` we reviewed what happens when performing stochastic gradient descent, i.e., when performing optimization where only a noisy variant of the gradient is available. In particular, we noticed that for noisy gradients we need to be extra cautious when it comes to choosing the learning rate in the face of noise. If we decrease it too rapidly, convergence stalls. If we are too lenient, we fail to converge to a good enough solution since noise keeps on driving us away from optimality.
 
 ## Basics
 
@@ -27,13 +27,13 @@ $$\begin{aligned}
 
 Large $\beta$ amount to a long-range average, whereas small $\beta$ amount to only a slight correction relative to a gradient method. The new gradient replacement no longer points into the direction of steepest descent on a particular instance any longer but rather in the direction of a weighted average of past gradients. This allows us to realize most of the benefits of averaging over a batch without the cost of actually computing the gradients on it. We will revisit this averaging procedure in more detail later.
 
-The above reasoning formed the basis for what is now known as *accelerated* gradient methods, such as gradients with momentum. They enjoy the additional benefit of being much more effective in cases where the optimization problem is ill conditioned (i.e. where there are some directions where progress is much slower than in others, resembling a narrow canyon). Furthermore, they allow us to average over subsequent gradients to obtain more stable directions of descent. Indeed, the aspect of acceleration even for noise-free convex problems is one of the key reasons why momentum works and why it works so well.
+The above reasoning formed the basis for what is now known as *accelerated* gradient methods, such as gradients with momentum. They enjoy the additional benefit of being much more effective in cases where the optimization problem is ill conditioned (i.e., where there are some directions where progress is much slower than in others, resembling a narrow canyon). Furthermore, they allow us to average over subsequent gradients to obtain more stable directions of descent. Indeed, the aspect of acceleration even for noise-free convex problems is one of the key reasons why momentum works and why it works so well.
 
 As one would expect, due to its efficacy momentum is a well-studied subject in optimization for deep learning and beyond. See e.g., the beautiful [expository article](https://distill.pub/2017/momentum/) by :cite:`Goh.2017` for an in-depth analysis and interactive animation. It was proposed by :cite:`Polyak.1964`. :cite:`Nesterov.2018` has a detailed theoretical discussion in the context of convex optimization. Momentum in deep learning has been known to be beneficial for a long time. See e.g., the discussion by :cite:`Sutskever.Martens.Dahl.ea.2013` for details.
 
 ### An Ill-conditioned Problem
 
-To get a better understanding of the geometric properties of the momentum method we revisit gradient descent, albeit with a significantly less pleasant objective function. Recall that in :numref:`sec_gd` we used $f(\mathbf{x}) = x_1^2 + 2 x_2^2$, i.e. a moderately distorted ellipsoid objective. We distort this function further by stretching it out in the $x_1$ direction via
+To get a better understanding of the geometric properties of the momentum method we revisit gradient descent, albeit with a significantly less pleasant objective function. Recall that in :numref:`sec_gd` we used $f(\mathbf{x}) = x_1^2 + 2 x_2^2$, i.e., a moderately distorted ellipsoid objective. We distort this function further by stretching it out in the $x_1$ direction via
 
 $f(\mathbf{x}) = 0.1 x_1^2 + 2 x_2^2.$
 
@@ -113,7 +113,7 @@ d2l.plt.legend();
 
 ### Implementation from Scratch
 
-Let's see how momentum works in practice, i.e.\ when used within the context of a proper optimizer. For this we need a somewhat more scalable implementation. Compared to (minibatch) SGD the momentum method needs to maintain a set of  auxiliary variables, i.e. velocity. It has the same shape as the gradients (and variables of the optimization problem). In the implementation below we call these variables `states`.
+Let's see how momentum works in practice, i.e.\ when used within the context of a proper optimizer. For this we need a somewhat more scalable implementation. Compared to (minibatch) SGD the momentum method needs to maintain a set of  auxiliary variables, i.e., velocity. It has the same shape as the gradients (and variables of the optimization problem). In the implementation below we call these variables `states`.
 
 ```{.python .input  n=13}
 def init_momentum_states(feature_dim):
@@ -169,7 +169,7 @@ So far the 2D example of $f(x) = 0.1 x_1^2 + 2 x_2^2$ seemed rather contrived. W
 
 $$h(\mathbf{x}) = \frac{1}{2} \mathbf{x}^\top Q \mathbf{x} + \mathbf{x}^\top \mathbf{c} + b.$$
 
-This is a general quadratic function. For positive semidefinite matrices $Q \succ 0$, i.e. for matrices with positive eigenvalues this has a minimizer at $\mathbf{x}^* = -Q^{-1} \mathbf{c}$ with minimum value $b - \frac{1}{2} \mathbf{c}^\top Q^{-1} \mathbf{c}$. Hence we can rewrite $h$ as
+This is a general quadratic function. For positive semidefinite matrices $Q \succ 0$, i.e., for matrices with positive eigenvalues this has a minimizer at $\mathbf{x}^* = -Q^{-1} \mathbf{c}$ with minimum value $b - \frac{1}{2} \mathbf{c}^\top Q^{-1} \mathbf{c}$. Hence we can rewrite $h$ as
 
 $$h(\mathbf{x}) = \frac{1}{2} (\mathbf{x} - Q^{-1} \mathbf{c})^\top Q (\mathbf{x} - Q^{-1} \mathbf{c}) + b - \frac{1}{2} \mathbf{c}^\top Q^{-1} \mathbf{c}.$$
 
@@ -234,7 +234,7 @@ We used $R$ to denote the $2 \times 2$ governing convergence behavior. After $t$
 ## Exercises
 
 1. Use other combinations of momentum hyperparameters and learning rates and observe and analyze the different experimental results.
-1. Try out GD and momentum for a quadratic problem where you have multiple eigenvalues, i.e. $f(x) = \frac{1}{2} \sum_i \lambda_i x_i^2$, e.g., $\lambda_i = 2^{-i}$. Plot how the values of $x$ decrease for the initialization $x_i = 1$.
+1. Try out GD and momentum for a quadratic problem where you have multiple eigenvalues, i.e., $f(x) = \frac{1}{2} \sum_i \lambda_i x_i^2$, e.g., $\lambda_i = 2^{-i}$. Plot how the values of $x$ decrease for the initialization $x_i = 1$.
 1. Derive minimum value and minimizer for $h(\mathbf{x}) = \frac{1}{2} \mathbf{x}^\top Q \mathbf{x} + \mathbf{x}^\top \mathbf{c} + b$.
 1. What changes when we perform SGD with momentum? What happens when we use mini-batch SGD with momentum? Experiment with the parameters?
 

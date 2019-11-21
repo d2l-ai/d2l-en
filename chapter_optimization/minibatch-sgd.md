@@ -14,8 +14,8 @@ Things are a bit more subtle when it comes to single GPUs or even CPUs. These de
 
 The way to alleviate these constraints is to use a hierarchy of CPU caches which are actually fast enough to supply the processor with data. This is *the* driving force behind batching in deep learning. To keep matters simple, consider matrix-matrix multiplication, say $A = B \cdot C$. We have a number of options for calculating $A$. For instance we could try the following:
 
-1. We could compute $A_{ij} = B_{i,:} C_{:,j}^\top$, i.e. we could compute it element-wise by means of dot products.
-1. We could compute $A_{:,j} = B C_{:,j}^\top$, i.e. we could compute it one column at a time. Likewise we could compute $A$ one row $A_{i,:}$ at a time. 
+1. We could compute $A_{ij} = B_{i,:} C_{:,j}^\top$, i.e., we could compute it element-wise by means of dot products.
+1. We could compute $A_{:,j} = B C_{:,j}^\top$, i.e., we could compute it one column at a time. Likewise we could compute $A$ one row $A_{i,:}$ at a time. 
 1. We could simply compute $A = B C$. 
 1. We could break $B$ and $C$ into smaller block matrices and compute $A$ one block at a time. 
 
@@ -102,7 +102,7 @@ As we can see, the computation on the minibatch is essentially as efficient as o
 
 ## Reading Data
 
-Let's have a look at how minibatches are efficiently generated from data. In the following we use a dataset developed by NASA to test the wing [noise from different aircraft](https://archive.ics.uci.edu/ml/datasets/Airfoil+Self-Noise) to compare these optimization algorithms. For convenience we only use the first $1,500$ examples. The data is whitened for preprocessing, i.e. we remove the mean and rescale the variance to $1$ per coordinate.
+Let's have a look at how minibatches are efficiently generated from data. In the following we use a dataset developed by NASA to test the wing [noise from different aircraft](https://archive.ics.uci.edu/ml/datasets/Airfoil+Self-Noise) to compare these optimization algorithms. For convenience we only use the first $1,500$ examples. The data is whitened for preprocessing, i.e., we remove the mean and rescale the variance to $1$ per coordinate.
 
 ```{.python .input  n=1}
 # Saved in the d2l package for later use
@@ -162,7 +162,7 @@ def train_ch11(trainer_fn, states, hyperparams, data_iter,
     return timer.cumsum(), animator.Y[0]
 ```
 
-Let's see how optimization proceeds for batch gradient descent. This can be achieved by setting the minibatch size to 1500 (i.e. to the total number of examples). As a result the model parameters are updated only once per epoch. There is little progress. In fact, after 6 steps progress stalls.
+Let's see how optimization proceeds for batch gradient descent. This can be achieved by setting the minibatch size to 1500 (i.e., to the total number of examples). As a result the model parameters are updated only once per epoch. There is little progress. In fact, after 6 steps progress stalls.
 
 ```{.python .input  n=4}
 def train_sgd(lr, batch_size, num_epochs=2):
@@ -244,7 +244,7 @@ train_gluon_ch11('sgd', {'learning_rate': 0.05}, data_iter)
 * Vectorization makes code more efficient due to reduced overhead arising from the deep learning framework and due to better memory locality and caching on CPUs and GPUs. 
 * There is a trade-off between statistical efficiency arising from SGD and computational efficiency arising from processing large batches of data at a time. 
 * Minibatch stochastic gradient descent offers the best of both worlds - computational and statistical efficiency. 
-* In minibatch SGD we process batches of data obtained by a random permutation of the training data (i.e. each observation is processed only once per epoch, albeit in random order). 
+* In minibatch SGD we process batches of data obtained by a random permutation of the training data (i.e., each observation is processed only once per epoch, albeit in random order). 
 * It is advisable to decay the learning rates during training. 
 * In general, minibatch SGD is faster than SGD and gradient descent for convergence to a smaller risk, when measured in terms of clock time.  
 
@@ -253,7 +253,7 @@ train_gluon_ch11('sgd', {'learning_rate': 0.05}, data_iter)
 1. Modify the batch size and learning rate and observe the rate of decline for the value of the objective function and the time consumed in each epoch.
 1. Read the MXNet documentation and use the `Trainer` class `set_learning_rate` function to reduce the learning rate of the minibatch SGD to 1/10 of its previous value after each epoch.
 1. Compare minibatch SGD with a variant that actually *samples with replacement* from the training set. What happens?
-1. An evil genie replicates your dataset without telling you (i.e. each observation occurs twice and your dataset grows to twice its original size, but nobody told you). How does the behavior of SGD, minibatch SGD and that of gradient descent change?
+1. An evil genie replicates your dataset without telling you (i.e., each observation occurs twice and your dataset grows to twice its original size, but nobody told you). How does the behavior of SGD, minibatch SGD and that of gradient descent change?
 
 
 ## [Discussions](https://discuss.mxnet.io/t/2373)
