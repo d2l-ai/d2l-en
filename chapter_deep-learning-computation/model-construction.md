@@ -43,9 +43,9 @@ which possess hundreds (152, thus the name) of layers,
 implementing the network one layer at a time can grow tedious.
 Moreover, this concern is not just hypothetical---such deep networks
 dominate numerous application areas, especially when training data is abundant.
-For example the ResNet architecture mentioned above ([He et al.](https://www.cv-foundation.org/openaccess/content_cvpr_2016/papers/He_Deep_Residual_Learning_CVPR_2016_paper.pdf))
+For example the ResNet architecture mentioned above
 won the 2015 ImageNet and COCO computer vision competitions
-for both recognition and detection.
+for both recognition and detection :cite:`He.Zhang.Ren.ea.2016`.
 Deep networks with many layers arranged into components
 with various repeating patterns are now ubiquitous in other domains
 including natural language processing and speech.

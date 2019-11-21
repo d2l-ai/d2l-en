@@ -275,7 +275,7 @@ or you may even invent your own scheme!
 1. Can you design other cases of symmetry breaking besides the permutation symmetry?
 1. Can we initialize all weight parameters in linear regression or in softmax regression to the same value?
 1. Look up analytic bounds on the eigenvalues of the product of two matrices. What does this tell you about ensuring that gradients are well conditioned?
-1. If we know that some terms diverge, can we fix this after the fact? Look at the paper on LARS by [You, Gitman and Ginsburg, 2017](https://arxiv.org/pdf/1708.03888.pdf) for inspiration.
+1. If we know that some terms diverge, can we fix this after the fact? Look at the paper on LARS for inspiration :cite:`You.Gitman.Ginsburg.2017`.
 
 ## [Discussions](https://discuss.mxnet.io/t/2345)
 
