@@ -16,16 +16,6 @@ def fancy_func(a, b, c, d):
 print(fancy_func(1, 2, 3, 4))
 ```
 
-```{.json .output n=1}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "10\n"
- }
-]
-```
-
 Python is an interpreted language. When evaluating `fancy_func` it performs the operations making up the function's body *in sequence*. That is, it will evaluate `e = add(a, b)` and it will store the results as variable `e`, thereby changing the program's state. The next two statements `f = add(c, d)` and `g = add(e, f)` will be excecuted similarly, performing additions and storing the results as variables. The picture below illustrates the flow of data.
 
 ![Data flow in an imperative program.](../img/computegraph.svg)
@@ -67,16 +57,6 @@ y = compile(prog, '', 'exec')
 exec(y)
 ```
 
-```{.json .output n=2}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "\ndef add(a, b):\n    return a + b\n\ndef fancy_func(a, b, c, d):\n    e = add(a, b)\n    f = add(c, d)\n    g = add(e, f)\n    return g\nprint(fancy_func(1, 2, 3, 4))\n10\n"
- }
-]
-```
-
 The differences between imperative (interpreted) programming and symbolic programming are as follows:
 
 * Imperative programming is easier. When imperative programming is used in Python, the majority of the code is straightforward and easy to write. It is also easier to debug imperative programming code. This is because it is easier to obtain and print all relevant intermediate variable values, or use Python’s built-in debugging tools.
@@ -112,37 +92,11 @@ net = get_net()
 net(x)
 ```
 
-```{.json .output n=3}
-[
- {
-  "data": {
-   "text/plain": "array([[ 0.09178194, -0.01948218]])"
-  },
-  "execution_count": 3,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 By calling the `hybridize` function, we are able to compile and optimize the computation in the MLP. The model’s computation result remains unchanged.
 
 ```{.python .input  n=4}
 net.hybridize()
 net(x)
-```
-
-```{.json .output n=4}
-[
- {
-  "data": {
-   "text/plain": "array([[ 0.09178194, -0.01948218]])"
-  },
-  "execution_count": 4,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 This seems almost too good to be true: simply designate a block to be `HybridSequential`, write the same code as before and invoke `hybridize`. Once this happens the network is optimized (we will benchmark the performance below). Unfortunately this doesn't work magically for every layer. That said, the blocks provided by Gluon are by default subclasses of `HybridBlock` and thus hybridizable. A layer will not be optimized if it inherits from the `Block` instead.
@@ -164,16 +118,6 @@ net.hybridize()
 print(' after hybridizing: %.4f sec' % (benchmark(net, x)))
 ```
 
-```{.json .output n=5}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "before hybridizing: 0.3304 sec\n after hybridizing: 0.1121 sec\n"
- }
-]
-```
-
 As is observed in the above results, after a HybridSequential instance calls the `hybridize` function, computing performance is improved through the use of symbolic programming.
 
 
@@ -186,36 +130,10 @@ net.export('my_mlp')
 !ls -lh my_mlp*
 ```
 
-```{.json .output n=13}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "-rw-r--r--  1 smola  ANT\\Domain Users   376B Nov 20 11:53 my_mlp-0000.params\r\n-rw-r--r--  1 smola  ANT\\Domain Users   1.9K Nov 20 11:53 my_mlp-symbol.json\r\n"
- }
-]
-```
-
 The model is decomposed into a (large binary) parameter file and a JSON description of the program required to execute to compute the model. The files can be read by other front-end languages supported by Python or MXNet, such as C++, R, Scala, and Perl. Let's have a look at the model description.
 
 ```{.python .input  n=7}
 !head my_mlp-symbol.json
-```
-
-```{.json .output n=7}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "{\r\n  \"nodes\": [\r\n    {\r\n      \"op\": \"null\", \r\n      \"name\": \"data\", \r\n      \"inputs\": []\r\n    }, \r\n    {\r\n      \"op\": \"null\", \r\n      \"name\": \"dense3_weight\", \r\n"
- }
-]
-```
-
-```{.python .input}
-from mxnet import sym
-x = sym.var('data').as_np_ndarray()
-net(x)
 ```
 
 Things are slightly more tricky when it comes to models that resemble code more closely. Basically hybridization needs to deal with control flow and Python overhead in a much more immediate manner. Moreover,
@@ -248,24 +166,6 @@ x = np.random.normal(size=(1, 3))
 net(x)
 ```
 
-```{.json .output n=9}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "module F:  <module 'mxnet.ndarray' from '/Users/smola/miniconda3/envs/mxnet/lib/python3.7/site-packages/mxnet/ndarray/__init__.py'>\nvalue  x:  [[ 0.40156594 -0.6338663   0.46472842]]\nresult  :  [[0.         0.05295599 0.         0.03834336]]\n"
- },
- {
-  "data": {
-   "text/plain": "array([[-0.00329917,  0.00426461]])"
-  },
-  "execution_count": 9,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 Repeating the forward computation will lead to the same output (we omit details). Now let's see what happens if we invoke the `hybridize` method.
 
 ```{.python .input  n=10}
@@ -273,41 +173,10 @@ net.hybridize()
 net(x)
 ```
 
-```{.json .output n=10}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "module F:  <module 'mxnet.symbol' from '/Users/smola/miniconda3/envs/mxnet/lib/python3.7/site-packages/mxnet/symbol/__init__.py'>\nvalue  x:  <_Symbol data>\nresult  :  <_Symbol hybridnet0_relu0>\n"
- },
- {
-  "data": {
-   "text/plain": "array([[-0.00329917,  0.00426461]])"
-  },
-  "execution_count": 10,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
-```
-
 Instead of using `ndarray` we now use the `symbol` module for `F`. Moreover, even though the input is of `ndarray` type, the data flowing through the network is now converted to `symbol` type as part of the compilation process. Repeating the function call leads to a surprising outcome:
 
 ```{.python .input  n=11}
 net(x)
-```
-
-```{.json .output n=11}
-[
- {
-  "data": {
-   "text/plain": "array([[-0.00329917,  0.00426461]])"
-  },
-  "execution_count": 11,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 This is quite different from what we saw previously. All print statements, as defined in `hybrid_forward` are omitted. Indeed, after hybridization the execution of `net(x)` does not involve the Python interpreter any longer. This means that any spurious Python code is omitted (such as print statements) in favor of a much more streamlined execution and better performance. Instead, MXNet directly calls the C++ backend. Also note that some functions are not supported in the `symbol` module (like `asnumpy`) and operations in-place like `a += b` and `a[:] = a + b` must be rewritten as `a = a + b`. Nonetheless, compilation of models is worth the effort whenever speed matters. The benefit can range from small percentage points to more than twice the speed, depending on the complexity of the model, the speed of the CPU and the speed and number of GPUs.
@@ -330,7 +199,3 @@ This is quite different from what we saw previously. All print statements, as de
 ## [Discussions](https://discuss.mxnet.io/t/2380)
 
 ![](../img/qr_hybridize.svg)
-
-```{.python .input}
-
-```
