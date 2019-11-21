@@ -195,4 +195,4 @@ A similar reasoning shows that the probability of picking a sample exactly once 
 
 ## [Discussions](https://discuss.mxnet.io/t/2372)
 
-![](../img/qr_gd-sgd.svg)
+![](../img/qr_sgd.svg)
