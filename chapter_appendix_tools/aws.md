@@ -119,7 +119,7 @@ chmod 400 D2L_key.pem
 
 
 ![ View instance access and startup method. ](../img/chmod.png)
-:width:`700px`
+:width:`400px`
 :label:`fig_chmod`
 
 
@@ -144,10 +144,10 @@ sudo apt-get update && sudo apt-get install -y build-essential git libgfortran3
 ```
 
 
-Here we download CUDA 10.1. Visit NVIDIA's official repository at (https://developer.nvidia.com/cuda-downloads) to find the download link of CUDA 10.1 as shown below.
+Here we download CUDA 10.1. Visit NVIDIA's official repository at (https://developer.nvidia.com/cuda-downloads) to find the download link of CUDA 10.1 as shown in :numref:`fig_cuda`.
 
 ![Find the CUDA 10.1 download address. ](../img/cuda101.png)
-:width:`700px`
+:width:`500px`
 :label:`fig_cuda`
 
 Copy the instructions and paste them into the terminal to install
