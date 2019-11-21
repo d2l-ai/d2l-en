@@ -61,7 +61,7 @@ Despite his characteristic outfit, this can be surprisingly difficult,
 due to the large number of confounders.
 
 ![Image via Walker Books](../img/where-wally-walker-books.jpg)
-:width:`600px`
+:width:`400px`
 :label:`img_waldo`
 
 
@@ -189,7 +189,7 @@ and weighs intensities according to the mask $V$, as demonstrated in :numref:`fi
  we will also find a peak in the hidden layer activations.
 
 ![Find Waldo.](../img/waldo-mask.jpg)
-:width:`600px`
+:width:`400px`
 :label:`fig_waldo_mask`
 
 There is just a problem with this approach:

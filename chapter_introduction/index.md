@@ -634,7 +634,7 @@ It is treated with a different set of algorithms
 than those used for regression (although many techniques will carry over).
 
 In classification, we want our model to look at a feature vector, 
-e.g. the pixel values in an image,
+e.g., the pixel values in an image,
 and then predict which category (formally called *classes*),
 among some (discrete) set of options, an example belongs.
 For hand-written digits, we might have 10 classes,
@@ -832,13 +832,13 @@ For instance, for movie recommendations,
 the results page for a SciFi fan and the results page 
 for a connoisseur of Peter Sellers comedies might differ significantly.
 Similar problems pop up in other recommendation settings,
-e.g. for retail products, music, or news recommendation. 
+e.g., for retail products, music, or news recommendation. 
 
 In some cases, customers provide explicit feedback communicating
 how much they liked a particular product 
 (e.g., the product ratings and reviews on Amazon, IMDB, GoodReads, etc.). 
 In some other cases, they provide implicit feedback,
-e.g. by skipping titles on a playlist,
+e.g., by skipping titles on a playlist,
 which might indicate dissatisfaction but might just indicate
 that the song was inappropriate in context. 
 In the simplest formulations, these systems are trained 

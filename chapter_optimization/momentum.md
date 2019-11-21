@@ -29,7 +29,7 @@ Large $\beta$ amount to a long-range average, whereas small $\beta$ amount to on
 
 The above reasoning formed the basis for what is now known as *accelerated* gradient methods, such as gradients with momentum. They enjoy the additional benefit of being much more effective in cases where the optimization problem is ill conditioned (i.e. where there are some directions where progress is much slower than in others, resembling a narrow canyon). Furthermore, they allow us to average over subsequent gradients to obtain more stable directions of descent. Indeed, the aspect of acceleration even for noise-free convex problems is one of the key reasons why momentum works and why it works so well.
 
-As one would expect, due to its efficacy momentum is a well-studied subject in optimization for deep learning and beyond. See e.g. the beautiful [expository article](https://distill.pub/2017/momentum/) by :cite:`Goh.2017` for an in-depth analysis and interactive animation. It was proposed by :cite:`Polyak.1964`. :cite:`Nesterov.2018` has a detailed theoretical discussion in the context of convex optimization. Momentum in deep learning has been known to be beneficial for a long time. See e.g. the discussion by :cite:`Sutskever.Martens.Dahl.ea.2013` for details.
+As one would expect, due to its efficacy momentum is a well-studied subject in optimization for deep learning and beyond. See e.g., the beautiful [expository article](https://distill.pub/2017/momentum/) by :cite:`Goh.2017` for an in-depth analysis and interactive animation. It was proposed by :cite:`Polyak.1964`. :cite:`Nesterov.2018` has a detailed theoretical discussion in the context of convex optimization. Momentum in deep learning has been known to be beneficial for a long time. See e.g., the discussion by :cite:`Sutskever.Martens.Dahl.ea.2013` for details.
 
 ### An Ill-conditioned Problem
 
@@ -234,7 +234,7 @@ We used $R$ to denote the $2 \times 2$ governing convergence behavior. After $t$
 ## Exercises
 
 1. Use other combinations of momentum hyperparameters and learning rates and observe and analyze the different experimental results.
-1. Try out GD and momentum for a quadratic problem where you have multiple eigenvalues, i.e. $f(x) = \frac{1}{2} \sum_i \lambda_i x_i^2$, e.g. $\lambda_i = 2^{-i}$. Plot how the values of $x$ decrease for the initialization $x_i = 1$.
+1. Try out GD and momentum for a quadratic problem where you have multiple eigenvalues, i.e. $f(x) = \frac{1}{2} \sum_i \lambda_i x_i^2$, e.g., $\lambda_i = 2^{-i}$. Plot how the values of $x$ decrease for the initialization $x_i = 1$.
 1. Derive minimum value and minimizer for $h(\mathbf{x}) = \frac{1}{2} \mathbf{x}^\top Q \mathbf{x} + \mathbf{x}^\top \mathbf{c} + b$.
 1. What changes when we perform SGD with momentum? What happens when we use mini-batch SGD with momentum? Experiment with the parameters?
 
