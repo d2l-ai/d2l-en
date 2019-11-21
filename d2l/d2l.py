@@ -5,7 +5,7 @@
 import sys
 d2l = sys.modules[__name__]
 
-# Defined in file: ./chapter_preface/preface.md
+# Defined in file: ./chapter_preface/index.md
 import collections
 from collections import defaultdict
 from IPython import display
