@@ -193,7 +193,7 @@ This is quite different from what we saw previously. All print statements, as de
 
 1. Design a network using the `HybridConcurrent` class. Alternatively look at :ref:`sec_googlenet` for a network to compose.
 1. Add `x.asnumpy()` to the first line of the `hybrid_forward` function of the HybridNet class in this section. Execute the code and observe the errors you encounter. Why do they happen?
-1. What happens if we add control flow, i.e. the Python statements `if` and `for` in the `hybrid_forward` function?
+1. What happens if we add control flow, i.e., the Python statements `if` and `for` in the `hybrid_forward` function?
 1. Review the models that interest you in the previous chapters and use the HybridBlock class or HybridSequential class to implement them.
 
 ## [Discussions](https://discuss.mxnet.io/t/2380)

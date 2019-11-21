@@ -153,13 +153,15 @@ the distribution $P(y \mid x)$ might be different
 depending on our location.
 This problem can be tricky to spot.
 A saving grace is that often the $P(y \mid x)$ only shifts gradually.
-Before we go into further detail and discuss remedies,
-we can discuss a number of situations where covariate and concept shift
-may not be so obvious.
 
 
 
 ### Examples
+
+Before we go into further detail and discuss remedies,
+we can discuss a number of situations where covariate and concept shift
+may not be so obvious.
+
 
 #### Medical Diagnostics
 
