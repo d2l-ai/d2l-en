@@ -11,7 +11,7 @@ All of those things sound impossible and indeed, they are. After all, there is n
 
 ## Instantiating a Network
 
-Let us see what happens when we instantiate a network. We start with our trusty MLP as before.
+Let's see what happens when we instantiate a network. We start with our trusty MLP as before.
 
 ```{.python .input}
 from mxnet import init, np, npx
@@ -34,14 +34,14 @@ print(net.collect_params)
 print(net.collect_params())
 ```
 
-In particular, trying to access `net[0].weight.data()` at this point would trigger a runtime error stating that the network needs initializing before it can do anything. Let us see whether anything changes after we initialize the parameters:
+In particular, trying to access `net[0].weight.data()` at this point would trigger a runtime error stating that the network needs initializing before it can do anything. Let's see whether anything changes after we initialize the parameters:
 
 ```{.python .input}
 net.initialize()
 net.collect_params()
 ```
 
-As we can see, nothing really changed. Only once we provide the network with some data do we see a difference. Let us try it out.
+As we can see, nothing really changed. Only once we provide the network with some data do we see a difference. Let's try it out.
 
 ```{.python .input}
 x = np.random.uniform(size=(2, 20))
@@ -54,7 +54,7 @@ The main difference to before is that as soon as we knew the input dimensionalit
 
 ## Deferred Initialization in Practice
 
-Now that we know how it works in theory, let us see when the initialization is actually triggered. In order to do so, we mock up an initializer which does nothing but report a debug message stating when it was invoked and with which parameters.
+Now that we know how it works in theory, let's see when the initialization is actually triggered. In order to do so, we mock up an initializer which does nothing but report a debug message stating when it was invoked and with which parameters.
 
 ```{.python .input  n=22}
 class MyInit(init.Initializer):
@@ -108,7 +108,7 @@ net.initialize(init=MyInit())
 
 ## Summary
 
-* Deferred initialization is a good thing. It allows Gluon to set many things automagically and it removes a great source of errors from defining novel network architectures.
+* Deferred initialization is a good thing. It allows Gluon to set many things automatically and it removes a great source of errors from defining novel network architectures.
 * We can override this by specifying all implicitly defined variables.
 * Initialization can be repeated (or forced) by setting the `force_reinit=True` flag.
 

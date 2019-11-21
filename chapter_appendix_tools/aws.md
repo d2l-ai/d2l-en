@@ -151,7 +151,7 @@ Here we download CUDA 10.1. Visit NVIDIA's official repository at (https://devel
 :label:`fig_cuda`
 
 Copy the instructions and paste them into the terminal to install
-`CUDA 10.1`.
+CUDA 10.1.
 
 ```bash
 ## paste the copied link from CUDA website
@@ -163,6 +163,7 @@ sudo apt-key add /var/cuda-repo-10-1-local-10.1.243-418.87.00/7fa2af80.pub
 sudo apt-get update
 sudo apt-get -y install cuda
 ```
+
 
 After installing the program, run the following command to view the GPUs.
 
@@ -249,6 +250,7 @@ Finally, install `MXNet` and `d2l`. The postfix `cu101mkl` means that this is th
 pip install mxnet-cu101mkl --pre
 pip install git+https://github.com/d2l-ai/d2l-en@numpy2
 ```
+
 
 You can test quickly whether everything went well as follows:
 

@@ -94,9 +94,10 @@ y
 
 ### Copying
 
-If we want to compute $\mathbf{x} + \mathbf{y}$ we need to decide where to perform this operation. For instance, we can transfer $\mathbf{x}$ to `gpu(1)` and perform the operation there. *Do not* simply add `x + y` since this will result in an exception. The runtime engine would not know what to do, it cannot find data on the same device and it fails.
+If we want to compute $\mathbf{x} + \mathbf{y}$ we need to decide where to perform this operation. For instance, as shown in :numref:`fig_copyto`, we can transfer $\mathbf{x}$ to `gpu(1)` and perform the operation there. *Do not* simply add `x + y` since this will result in an exception. The runtime engine would not know what to do, it cannot find data on the same device and it fails.
 
 ![Copyto copies arrays to the target device](../img/copyto.svg)
+:label:`fig_copyto`
 
 `copyto` copies the data to another device such that we can add them. Since $\mathbf{y}$ lives on the second GPU we need to move $\mathbf{x}$ there before we can add the two.
 
@@ -132,7 +133,7 @@ The `copyto` function always creates new memory for the target variable.
 y.copyto(try_gpu(1)) is y
 ```
 
-### Watch Out
+### Side Notes
 
 People use GPUs to do machine learning because they expect them to be fast. But transferring variables between contexts is slow. So we want you to be 100% certain that you want to do something slow before we let you do it. If MXNet just did the copy automatically without crashing then you might not realize that you had written some slow code.
 
@@ -157,7 +158,7 @@ When the input is an `ndarray` on the GPU, Gluon will calculate the result on th
 net(x)
 ```
 
-Let us confirm that the model parameters are stored on the same GPU.
+Let's confirm that the model parameters are stored on the same GPU.
 
 ```{.python .input  n=14}
 net[0].weight.data()
@@ -169,7 +170,7 @@ In short, as long as all data and parameters are on the same device, we can lear
 
 * MXNet can specify devices for storage and calculation, such as CPU or GPU. By default, MXNet creates data in the main memory and then uses the CPU to calculate it.
 * MXNet requires all input data for calculation to be *on the same device*, be it CPU or the same GPU.
-* You can lose significant performance by moving data without care. A typical mistake is as follows: computing the loss for every minibatch on the GPU and reporting it back to the user on the commandline (or logging it in a NumPy array) will trigger a global interpreter lock which stalls all GPUs. It is much better to allocate memory for logging inside the GPU and only move larger logs.
+* You can lose significant performance by moving data without care. A typical mistake is as follows: computing the loss for every minibatch on the GPU and reporting it back to the user on the command line (or logging it in a NumPy array) will trigger a global interpreter lock which stalls all GPUs. It is much better to allocate memory for logging inside the GPU and only move larger logs.
 
 ## Exercises
 

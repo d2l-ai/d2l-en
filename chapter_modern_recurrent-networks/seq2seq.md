@@ -1,13 +1,15 @@
 #  Sequence to Sequence
 :label:`sec_seq2seq`
 
-The sequence to sequence (seq2seq) model is based on the encoder-decoder architecture to generate a sequence output for a sequence input. Both the encoder and the decoder use recurrent neural networks (RNNs) to handle sequence inputs with different length. The hidden state of the encoder is used directly to initialize the decoder hidden state to pass information from the encoder to the decoder.
+The sequence to sequence (seq2seq) model is based on the encoder-decoder architecture to generate a sequence output for a sequence input, as demonstrated in :numref:`fig_seq2seq`. Both the encoder and the decoder use recurrent neural networks (RNNs) to handle sequence inputs with different length. The hidden state of the encoder is used directly to initialize the decoder hidden state to pass information from the encoder to the decoder.
 
 ![The sequence to sequence model architecture.](../img/seq2seq.svg)
+:label:`fig_seq2seq`
 
-The layers in the encoder and the decoder are illustrated in the following figure.
+The layers in the encoder and the decoder are illustrated in :numref:`fig_seq2seq_details`.
 
 ![](../img/seq2seq-details.svg)
+:label:`fig_seq2seq_details`
 
 In this section we will explain and implement the seq2seq model to train on the machine translation dataset.
 
@@ -22,7 +24,7 @@ npx.set_np()
 
 Recall that the encoder of seq2seq can transform the inputs with different length to a universal fixed length content vector $\mathbf{c}$ by encoding the sequence information inside $\mathbf{c}$. We usually use RNN layers within the encoder.
 
-Let us think of an input sequence $x_1, \ldots, x_T$, where $x_t$ is $t$-th word of the inputs. At timestep $t$, the RNN will have two vectors as input: the $x_t$'s feature vector $\mathbf{x_t}$ and the hidden state of the last timestep $\mathbf{h_t}$. Let us denote the transformation of the RNN's hidden states by a function $f$: 
+Let's think of an input sequence $x_1, \ldots, x_T$, where $x_t$ is $t$-th word of the inputs. At timestep $t$, the RNN will have two vectors as input: the $x_t$'s feature vector $\mathbf{x_t}$ and the hidden state of the last timestep $\mathbf{h_t}$. Let's denote the transformation of the RNN's hidden states by a function $f$: 
 
 $$\mathbf{h_t} = f (\mathbf{x_t}, \mathbf{h_{t-1}}).$$
 
@@ -35,7 +37,7 @@ For example, if we choose $q$ as $q (\mathbf{h_1}, \ldots, \mathbf{h_T}) = \math
 So far what we describe above is a signle directional RNN, where each timestep's hidden state only depends on the previous tiemsteps'. We can also use other forms of RNNs such as GRUs, LSTMs and, bidirectional RNNs to encode the sequential information.
 
 
-Let us implement the seq2seq's encoder together! Here, we use the word embedding layer to obtain a feature index from the word index of the input language and then input it into a multi-layer LSTM recurrent neural network. The input for the encoder is a batch of sequences, which is 2-D tensor with shape (batch size, sequence length). It outputs both the LSTM outputs, e.g., the hidden state for each timestep, as well as the hidden state and memory cell of the last timestep.
+Let's implement the seq2seq's encoder together! Here, we use the word embedding layer to obtain a feature index from the word index of the input language and then input it into a multi-layer LSTM recurrent neural network. The input for the encoder is a batch of sequences, which is 2-D tensor with shape (batch size, sequence length). It outputs both the LSTM outputs, e.g., the hidden state for each timestep, as well as the hidden state and memory cell of the last timestep.
 
 ```{.python .input  n=3}
 # Saved in the d2l package for later use
@@ -47,13 +49,14 @@ class Seq2SeqEncoder(d2l.Encoder):
         self.rnn = rnn.LSTM(num_hiddens, num_layers, dropout=dropout)
 
     def forward(self, X, *args):
-        X = self.embedding(X) # X shape: (batch_size, seq_len, embed_size)
-        X = X.swapaxes(0, 1)  # RNN needs first axes to be timestep, i.e., seq_len
+        X = self.embedding(X)  # X shape: (batch_size, seq_len, embed_size)
+        # RNN needs first axes to be timestep, i.e., seq_len
+        X = X.swapaxes(0, 1)
         state = self.rnn.begin_state(batch_size=X.shape[1], ctx=X.context)
         out, state = self.rnn(X, state)
         # out shape: (seq_len, batch_size, num_hiddens)
         # stae shape: (num_layers, batch_size, num_hiddens),
-        # where "state" contains the hidden state and the memory cell        
+        # where "state" contains the hidden state and the memory cell
         return out, state
 ```
 
@@ -68,7 +71,7 @@ output, state = encoder(X)
 output.shape
 ```
 
-Since long short term memory (LSTM) is used, the `state` list will contain both the hidden state and the memory cell with same shape (number of hidden layers, batch size, number of hidden units). However, if gated recurrent unit (GRU) is used, the `state` list contains only one element - the hidden state in the final timestep with shape (number of hidden layers, batch size, number of hidden units). 
+Since long short term memory (LSTM) is used, the `state` list will contain both the hidden state and the memory cell with same shape (number of hidden layers, batch size, number of hidden units). However, if gated recurrent unit (GRU) is used, the `state` list contains only one element - the hidden state in the final timestep with shape (number of hidden layers, batch size, number of hidden units).
 
 ```{.python .input}
 len(state), state[0].shape, state[1].shape
@@ -79,12 +82,12 @@ len(state), state[0].shape, state[1].shape
 
 As we just introduced, the content vector $\mathbf{c}$ encodes the information from the whole input sequence $x_1, \ldots, x_T$. Suppose that the given outputs in the training set are $y_1, \ldots, y_{T'}$. At each timestep $t'$, the conditional probability of output $y_{t'}$ will base on the previous output sequences $y_1, \ldots, y_{t'-1}$ and the content vector $\mathbf{c}$, i.e., $$P(y_{t'} \mid y_1, \ldots, y_{t'-1}, \mathbf{c}).$$
 
-Hence, we can use another RNN as the decoder. At timestep $t'$, the decoder will update its hidden state $\mathbf{s_{t'}}$ by three inputs: $y_{t'-1}$'s feature vector $\mathbf{y_{t'-1}}$, the content vector $\mathbf{c}$, and the hidden state of the last timestep $\mathbf{s_{t'}}$. Let us denote the transformation of the RNN's hidden states within the decoder by a function $g$: 
+Hence, we can use another RNN as the decoder. At timestep $t'$, the decoder will update its hidden state $\mathbf{s_{t'}}$ by three inputs: $y_{t'-1}$'s feature vector $\mathbf{y_{t'-1}}$, the content vector $\mathbf{c}$, and the hidden state of the last timestep $\mathbf{s_{t'}}$. Let's denote the transformation of the RNN's hidden states within the decoder by a function $g$: 
 
 $$\mathbf{s_{t'}} = f (\mathbf{y_{t'-1}}, \mathbf{c}, \mathbf{s_{t'-1}}).$$
 
 
-Now let us implement the seq2seq's decoder together. We directly use the hidden state of the encoder in the final timestep as the initial hidden state of the decoder. This requires that the encoder and decoder RNNs have the same numbers of layers and hidden units.
+Now let's implement the seq2seq's decoder together. We directly use the hidden state of the encoder in the final timestep as the initial hidden state of the decoder. This requires that the encoder and decoder RNNs have the same numbers of layers and hidden units.
 
 The LSTM forward calculation of the decoder is similar to the encoder's. The only difference is that we add a dense layer after the LSTM layers, with the hidden size to be the vocabulary size. The dense layer will output the predicted confidence score for each word.
 
@@ -104,7 +107,8 @@ class Seq2SeqDecoder(d2l.Decoder):
     def forward(self, X, state):
         X = self.embedding(X).swapaxes(0, 1)
         out, state = self.rnn(X, state)
-        # Make the batch to be the first dimension to simplify loss computation.
+        # Make the batch to be the first dimension to simplify loss
+        # computation
         out = self.dense(out).swapaxes(0, 1)
         return out, state
 ```
@@ -167,7 +171,7 @@ During training, if the target sequence has length $n$, we feed the first $n-1$ 
 
 ```{.python .input  n=13}
 # Saved in the d2l package for later use
-def train_s2s_ch8(model, data_iter, lr, num_epochs, ctx):
+def train_s2s_ch9(model, data_iter, lr, num_epochs, ctx):
     model.initialize(init.Xavier(), force_reinit=True, ctx=ctx)
     trainer = gluon.Trainer(model.collect_params(),
                             'adam', {'learning_rate': lr})
@@ -207,25 +211,25 @@ encoder = Seq2SeqEncoder(
 decoder = Seq2SeqDecoder(
     len(tgt_vocab), embed_size, num_hiddens, num_layers, dropout)
 model = d2l.EncoderDecoder(encoder, decoder)
-train_s2s_ch8(model, train_iter, lr, num_epochs, ctx)
+train_s2s_ch9(model, train_iter, lr, num_epochs, ctx)
 ```
 
 ## Predicting
 
 Here we implement the simplest method, greedy search, to generate an output
-sequence.
-During predicting, we feed the same "&lt;bos&gt;" token to the decoder as training at timestep 0. But the input token for a later timestep is the predicted token from the previous timestep.
+sequence. As illustrated in :numref:`fig_seq2seq_predict`, during predicting, we feed the same "&lt;bos&gt;" token to the decoder as training at timestep 0. But the input token for a later timestep is the predicted token from the previous timestep.
 
 ![Sequence to sequence model predicting with greedy search](../img/seq2seq_predict.svg)
+:label:`fig_seq2seq_predict`
 
 ```{.python .input  n=15}
 # Saved in the d2l package for later use
-def predict_s2s_ch8(model, src_sentence, src_vocab, tgt_vocab, num_steps, ctx):
+def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps, ctx):
     src_tokens = src_vocab[src_sentence.lower().split(' ')]
     enc_valid_length = np.array([len(src_tokens)], ctx=ctx)
     src_tokens = d2l.trim_pad(src_tokens, num_steps, src_vocab.pad)
     enc_X = np.array(src_tokens, ctx=ctx)
-    # add the batch_size dimension.
+    # add the batch_size dimension
     enc_outputs = model.encoder(np.expand_dims(enc_X, axis=0),
                                 enc_valid_length)
     dec_state = model.decoder.init_state(enc_outputs, enc_valid_length)
@@ -233,7 +237,7 @@ def predict_s2s_ch8(model, src_sentence, src_vocab, tgt_vocab, num_steps, ctx):
     predict_tokens = []
     for _ in range(num_steps):
         Y, dec_state = model.decoder(dec_X, dec_state)
-        # The token with highest score is used as the next timestep input.
+        # The token with highest score is used as the next timestep input
         dec_X = Y.argmax(axis=2)
         py = dec_X.squeeze(axis=0).astype('int32').item()
         if py == tgt_vocab.eos:
@@ -246,7 +250,7 @@ Try several examples:
 
 ```{.python .input  n=16}
 for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
-    print(sentence + ' => ' + predict_s2s_ch8(
+    print(sentence + ' => ' + predict_s2s_ch9(
         model, sentence, src_vocab, tgt_vocab, num_steps, ctx))
 ```
 

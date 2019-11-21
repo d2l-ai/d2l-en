@@ -34,7 +34,7 @@ As a toy example, say that we are interested
 in differentiating the function 
 $y = 2\mathbf{x}^{\top}\mathbf{x}$ 
 with respect to the column vector $\mathbf{x}$. 
-To start, let us create the variable `x` and assign it an initial value.
+To start, let's create the variable `x` and assign it an initial value.
 
 ```{.python .input  n=2}
 x = np.arange(4)
@@ -79,7 +79,7 @@ will not alter the parameters' value.
 x.grad
 ```
 
-Now let us calculate $y$. 
+Now let's calculate $y$. 
 Because we wish to subsequently calculate gradients, 
 we want MXNet to generate a computational graph on the fly. 
 We could imagine that MXNet would be turning on a recording device 
@@ -116,7 +116,7 @@ x.grad
 
 The gradient of the function $y = 2\mathbf{x}^{\top}\mathbf{x}$ 
 with respect to $\mathbf{x}$ should be $4\mathbf{x}$. 
-Let us quickly verify that our desired gradient was calculated correctly.
+Let's quickly verify that our desired gradient was calculated correctly.
 If the two `ndarray`s are indeed the same, 
 then the equality between them holds at every position.
 

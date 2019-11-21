@@ -13,7 +13,7 @@ from mxnet.gluon import nn
 npx.set_np()
 ```
 
-Let us stick with the Fashion-MNIST dataset 
+Let's stick with the Fashion-MNIST dataset 
 and keep the batch size at $256$ as in the last section.
 
 ```{.python .input  n=2}
@@ -21,7 +21,7 @@ batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 ```
 
-## Initialize Model Parameters
+## Initializing Model Parameters
 
 As mentioned in :numref:`sec_softmax`,
 the output layer of softmax regression 

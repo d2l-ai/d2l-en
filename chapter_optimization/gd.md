@@ -1,7 +1,7 @@
 # Gradient Descent
 :label:`sec_gd`
 
-In this section we are going to introduce the basic concepts underlying gradient descent. This is brief by necessity. See e.g., :cite:`Boyd.Vandenberghe.2004` for an in-depth introduction to convex optimization. Although the latter is rarely used directly in deep learning, an understanding of gradient descent is key to understanding stochastic gradient descent algorithms. For instance, the optimization problem might diverge due to an overly large learning rate. This phenomenon can already be seen in gradient descent. Likewise, preconditioning is a common technique in gradient descent and carries over to more advanced algorithms. Let us start with a simple special case.
+In this section we are going to introduce the basic concepts underlying gradient descent. This is brief by necessity. See e.g., :cite:`Boyd.Vandenberghe.2004` for an in-depth introduction to convex optimization. Although the latter is rarely used directly in deep learning, an understanding of gradient descent is key to understanding stochastic gradient descent algorithms. For instance, the optimization problem might diverge due to an overly large learning rate. This phenomenon can already be seen in gradient descent. Likewise, preconditioning is a common technique in gradient descent and carries over to more advanced algorithms. Let's start with a simple special case.
 
 ## Gradient Descent in One Dimension
 
@@ -32,8 +32,11 @@ import d2l
 from mxnet import np, npx
 npx.set_np()
 
-def f(x):     return x**2  # objective function
-def gradf(x): return 2 * x # its derivative
+def f(x):
+    return x**2  # Objective function
+
+def gradf(x):
+    return 2 * x  # Its derivative
 ```
 
 Next, we use $x=10$ as the initial value and assume $\eta=0.2$. Using gradient descent to iterate $x$ for 10 times we can see that, eventually, the value of $x$ approaches the optimal solution.
@@ -58,7 +61,7 @@ def show_trace(res):
     n = max(abs(min(res)), abs(max(res)))
     f_line = np.arange(-n, n, 0.01)
     d2l.set_figsize((3.5, 2.5))
-    d2l.plot([f_line, res], [[f(x) for x in f_line], [f(x) for x in res]], 
+    d2l.plot([f_line, res], [[f(x) for x in f_line], [f(x) for x in res]],
              'x', 'f(x)', fmts=['-', '-o'])
 
 show_trace(res)
@@ -85,15 +88,19 @@ To illustrate what happens for nonconvex functions consider the case of $f(x) = 
 
 ```{.python .input}
 c = 0.15 * np.pi
-def f(x):     return x* np.cos(c * x) 
-def gradf(x): return np.cos(c * x) - c * x * np.sin(c * x)
+
+def f(x):
+    return x * np.cos(c * x)
+
+def gradf(x):
+    return np.cos(c * x) - c * x * np.sin(c * x)
 
 show_trace(gd(2))
 ```
 
 ## Multivariate Gradient Descent
 
-Now that have a better intuition of the univariate case, let us consider the situation where $\mathbf{x} \in \mathbb{R}^d$. That is, the objective function $f: \mathbb{R}^d \to \mathbb{R}$ maps vectors into scalars. Correspondingly its gradient is multivariate, too. It is a vector consisting of $d$ partial derivatives:
+Now that have a better intuition of the univariate case, let's consider the situation where $\mathbf{x} \in \mathbb{R}^d$. That is, the objective function $f: \mathbb{R}^d \to \mathbb{R}$ maps vectors into scalars. Correspondingly its gradient is multivariate, too. It is a vector consisting of $d$ partial derivatives:
 
 $$\nabla f(\mathbf{x}) = \bigg[\frac{\partial f(\mathbf{x})}{\partial x_1}, \frac{\partial f(\mathbf{x})}{\partial x_2}, \ldots, \frac{\partial f(\mathbf{x})}{\partial x_d}\bigg]^\top.$$
 
@@ -106,13 +113,13 @@ In other words, up to second order terms in $\mathbf{epsilon}$ the direction of 
 
 $\mathbf{x} \leftarrow \mathbf{x} - \eta \nabla f(\mathbf{x}).$
 
-To see how the algorithm behaves in practice let us construct an objective function $f(\mathbf{x})=x_1^2+2x_2^2$ with a two-dimensional vector $\mathbf{x} = [x_1, x_2]^\top$ as input and a scalar as output. The gradient is given by $\nabla f(\mathbf{x}) = [2x_1, 4x_2]^\top$. We will observe the trajectory of $\mathbf{x}$ by gradient descent from the initial position $[-5, -2]$. We need two more helper functions. The first uses an update function and applies it $20$ times to the initial value. The second helper visualizes the trajectory of $\mathbf{x}$.
+To see how the algorithm behaves in practice let's construct an objective function $f(\mathbf{x})=x_1^2+2x_2^2$ with a two-dimensional vector $\mathbf{x} = [x_1, x_2]^\top$ as input and a scalar as output. The gradient is given by $\nabla f(\mathbf{x}) = [2x_1, 4x_2]^\top$. We will observe the trajectory of $\mathbf{x}$ by gradient descent from the initial position $[-5, -2]$. We need two more helper functions. The first uses an update function and applies it $20$ times to the initial value. The second helper visualizes the trajectory of $\mathbf{x}$.
 
 ```{.python .input  n=1}
 # Saved in the d2l package for later use
 def train_2d(trainer, steps=20):
     """Optimize a 2-dim objective function with a customized trainer."""
-    # s1 and s2 are internal state variables and will 
+    # s1 and s2 are internal state variables and will
     # be used later in the chapter
     x1, x2, s1, s2 = -5, -2, 0, 0
     results = [(x1, x2)]
@@ -136,11 +143,15 @@ def show_trace_2d(f, results):
 Next, we observe the trajectory of the optimization variable $\mathbf{x}$ for learning rate $\eta = 0.1$. We can see that after 20 steps the value of $\mathbf{x}$ approaches its minimum at $[0, 0]$. Progress is fairly well-behaved albeit rather slow.
 
 ```{.python .input  n=15}
-def f(x1, x2): return x1 ** 2 + 2 * x2 ** 2   # objective
-def gradf(x1, x2): return (2 * x1, 4 * x2)    # gradient 
-def gd(x1, x2, s1, s2): 
-    (g1, g2) = gradf(x1, x2)                  # compute gradient
-    return (x1 -eta * g1, x2 -eta * g2, 0, 0) # update variables
+def f(x1, x2):
+    return x1 ** 2 + 2 * x2 ** 2  # Objective
+
+def gradf(x1, x2):
+    return (2 * x1, 4 * x2)  # Gradient
+
+def gd(x1, x2, s1, s2):
+    (g1, g2) = gradf(x1, x2)  # Compute gradient
+    return (x1 - eta * g1, x2 - eta * g2, 0, 0)  # Update variables
 
 eta = 0.1
 show_trace_2d(f, train_2d(gd))
@@ -158,7 +169,7 @@ Reviewing the Taylor expansion of $f$ there is no need to stop after the first t
 $$f(\mathbf{x} + \mathbf{\epsilon}) = f(\mathbf{x}) + \mathbf{\epsilon}^\top \nabla f(\mathbf{x}) + \frac{1}{2} \mathbf{\epsilon}^\top \nabla \nabla^\top f(\mathbf{x}) \mathbf{\epsilon} + O(\|\mathbf{\epsilon}\|^3)$$
 :eqlabel:`gd-hot-taylor`
 
-To avoid cumbersome notation we define $H_f := \nabla \nabla^\top f(\mathbf{x})$ to be the *Hessian* of $f$. This is a $d \times d$ matrix. For small $d$ and simple problems $H_f$ is easy to compute. For deep networks, on the other hand, $H_f$ may be prohibitively large, due to the cost of storing $O(d^2)$ entries. Furthermore it may be too expensive to compute via backprop as we would need to apply backprop to the backpropagation call graph. For now let us ignore such considerations and look at what algorithm we'd get. 
+To avoid cumbersome notation we define $H_f := \nabla \nabla^\top f(\mathbf{x})$ to be the *Hessian* of $f$. This is a $d \times d$ matrix. For small $d$ and simple problems $H_f$ is easy to compute. For deep networks, on the other hand, $H_f$ may be prohibitively large, due to the cost of storing $O(d^2)$ entries. Furthermore it may be too expensive to compute via backprop as we would need to apply backprop to the backpropagation call graph. For now let's ignore such considerations and look at what algorithm we'd get. 
 
 After all, the minimum of $f$ satisfies $\nabla f(\mathbf{x}) = 0$. Taking derivatives of :eqref:`gd-hot-taylor` with regard to $\mathbf{\epsilon}$ and ignoring higher order terms we arrive at 
 
@@ -167,16 +178,22 @@ $$\nabla f(\mathbf{x}) + H_f \mathbf{\epsilon} = 0 \text{ and hence }
 
 That is, we need to invert the Hessian $H_f$ as part of the optimization problem.
 
-For $f(x) = \frac{1}{2} x^2$ we have $\nabla f(x) = x$ and $H_f = 1$. Hence for any $x$ we obtain $\epsilon = -x$. In other words, a single step is sufficient to converge perfectly without the need for any adjustment! Alas, we got a bit lucky here since the Taylor expansion was exact. Let us see what happens in other problems.
+For $f(x) = \frac{1}{2} x^2$ we have $\nabla f(x) = x$ and $H_f = 1$. Hence for any $x$ we obtain $\epsilon = -x$. In other words, a single step is sufficient to converge perfectly without the need for any adjustment! Alas, we got a bit lucky here since the Taylor expansion was exact. Let's see what happens in other problems.
 
 ```{.python .input}
 c = 0.5
-def f(x):     return np.cosh(c * x)        # objective
-def gradf(x): return c * np.sinh(c * x)    # derivative
-def hessf(x): return c**2 * np.cosh(c * x) # hessian
 
-# hide learning rate for now
-def newton(eta = 1):
+def f(x):
+    return np.cosh(c * x)  # Objective
+
+def gradf(x):
+    return c * np.sinh(c * x)  # Derivative
+
+def hessf(x):
+    return c**2 * np.cosh(c * x)  # Hessian
+
+# Hide learning rate for now
+def newton(eta=1):
     x = 10
     results = [x]
     for i in range(10):
@@ -188,18 +205,24 @@ def newton(eta = 1):
 show_trace(newton())
 ```
 
-Now let us see what happens when we have a *nonconvex* function, such as $f(x) = x \cos(c x)$. After all, note that in Newton's method we end up dividing by the Hessian. This means that if the second derivative is *negative* we would walk into the direction of *increasing* $f$. That is a fatal flaw of the algorithm. Let us see what happens in practice.
+Now let's see what happens when we have a *nonconvex* function, such as $f(x) = x \cos(c x)$. After all, note that in Newton's method we end up dividing by the Hessian. This means that if the second derivative is *negative* we would walk into the direction of *increasing* $f$. That is a fatal flaw of the algorithm. Let's see what happens in practice.
 
 ```{.python .input}
 c = 0.15 * np.pi
-def f(x):     return x * np.cos(c * x) 
-def gradf(x): return np.cos(c * x) - c * x * np.sin(c * x)
-def hessf(x): return - 2 * c * np.sin(c * x) - x * c**2 * np.cos(c * x)
+
+def f(x):
+    return x * np.cos(c * x)
+
+def gradf(x):
+    return np.cos(c * x) - c * x * np.sin(c * x)
+
+def hessf(x):
+    return - 2 * c * np.sin(c * x) - x * c**2 * np.cos(c * x)
 
 show_trace(newton())
 ```
 
-This went spectacularly wrong. How can we fix it? One way would be to 'fix' the Hessian by taking its absolute value instead. Another strategy is to bring back the learning rate. This seems to defeat the purpose, but not quite. Having second order information allows us to be cautious whenever the curvature is large and to take longer steps whenever the objective is flat. Let us see how this works with a slightly smaller learning rate, say $\eta = 0.5$. As we can see, we have quite an efficient algorithm.
+This went spectacularly wrong. How can we fix it? One way would be to 'fix' the Hessian by taking its absolute value instead. Another strategy is to bring back the learning rate. This seems to defeat the purpose, but not quite. Having second order information allows us to be cautious whenever the curvature is large and to take longer steps whenever the objective is flat. Let's see how this works with a slightly smaller learning rate, say $\eta = 0.5$. As we can see, we have quite an efficient algorithm.
 
 ```{.python .input}
 show_trace(newton(0.5))

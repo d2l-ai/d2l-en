@@ -77,7 +77,7 @@ def evaluator(network, inter_matrix, test_data, ctx):
 
 ## Training and Evaluating the Model
 
-Now, let us train and evaluate AutoRec on the MovieLens dataset. We can clearly see that the test RMSE is lower than the matrix factorization model, confirming the effectiveness of neural networks in the rating prediction task.
+Now, let's train and evaluate AutoRec on the MovieLens dataset. We can clearly see that the test RMSE is lower than the matrix factorization model, confirming the effectiveness of neural networks in the rating prediction task.
 
 ```{.python .input  n=4}
 ctx = d2l.try_all_gpus()

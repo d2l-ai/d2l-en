@@ -14,8 +14,9 @@ using deep neural networks.
 
 ## Hidden Layers
 
-Recall that for linear regression and softmax regression,
-we mapped our inputs directly to our outputs
+Let's recall linear regression and softmax regression
+with an example as illustrated in :numref:`fig_singlelayer`.
+In general, we mapped our inputs directly to our outputs
 via a single linear transformation:
 
 $$
@@ -23,6 +24,7 @@ $$
 $$
 
 ![Single layer perceptron with 5 output units.](../img/singlelayer.svg)
+:label:`fig_singlelayer`
 
 If our labels really were related to our input data
 by an approximately linear function, then this approach would be perfect.
@@ -50,7 +52,7 @@ without accounting for the interactions among pixels.
 
 
 
-### From one to many
+### From One to Many
 
 As another case, consider trying to classify images
 based on whether they depict *cats* or *dogs* given black-and-white images.
@@ -77,9 +79,10 @@ many layers of neurons on top of each other.
 Each layer feeds into the layer above it, until we generate an output.
 This architecture is commonly called a *multilayer perceptron*,
 often abbreviated as *MLP*.
-The neural network diagram for an MLP looks like this:
+The neural network diagram for an MLP looks like :numref:`fig_nlp`.
 
 ![Multilayer perceptron with hidden layers. This example contains a hidden layer with 5 hidden units in it. ](../img/mlp.svg)
+:label:`fig_nlp`
 
 The multilayer perceptron above has 4 inputs and 3 outputs,
 and the hidden layer in the middle contains 5 hidden units.
@@ -92,7 +95,7 @@ Likewise, the neurons in the hidden layer
 are fully connected to the neurons in the output layer.
 
 
-### From linear to nonlinear
+### From Linear to Nonlinear
 
 We can write out the calculations that define this one-hidden-layer MLP in mathematical notation as follows:
 $$
@@ -118,7 +121,7 @@ $\mathbf{W} = \mathbf{W}_2 \mathbf{W}_1$ and $\mathbf{b} = \mathbf{W}_2 \mathbf{
 $$\mathbf{o} = \mathbf{W}_2 \mathbf{h} + \mathbf{b}_2 = \mathbf{W}_2 (\mathbf{W}_1 \mathbf{x} + \mathbf{b}_1) + \mathbf{b}_2 = (\mathbf{W}_2 \mathbf{W}_1) \mathbf{x} + (\mathbf{W}_2 \mathbf{b}_1 + \mathbf{b}_2) = \mathbf{W} \mathbf{x} + \mathbf{b}$$
 
 In order to get a benefit from multilayer architectures,
-we need another key ingredient—a nonlinearity $\sigma$ to be applied to each of the hidden units after each layer's linear transformation.
+we need another key ingredient---a nonlinearity $\sigma$ to be applied to each of the hidden units after each layer's linear transformation.
 The most popular choice for the nonlinearity these days is the rectified linear unit (ReLU) $\mathrm{max}(x, 0)$.
 After incorporating these non-linearities
 it becomes impossible to merge layers.
@@ -156,7 +159,7 @@ but for now let’s actually build an MLP.
 In this example, we’ll implement a multilayer perceptron
 with two hidden layers and one output layer.
 
-### Vectorization and minibatch
+### Vectorization and Minibatch
 
 As before, by the matrix $\mathbf{X}$, we denote a minibatch of inputs.
 The calculations to produce outputs from an MLP with two hidden layers
@@ -173,7 +176,7 @@ $$
 With some abuse of notation, we define the nonlinearity $\sigma$
 to apply to its inputs on a row-wise fashion, i.e., one observation at a time.
 Note that we are also using the notation for *softmax* in the same way to denote a row-wise operation.
-Often, as in this chapter, the activation functions that we apply to hidden layers are not merely row-wise, but component wise.
+Often, as in this section, the activation functions that we apply to hidden layers are not merely row-wise, but component wise.
 That means that after computing the linear portion of the layer,
 we can calculate each nodes activation without looking at the values taken by the other hidden units.
 This is true for most activation functions
@@ -189,7 +192,7 @@ npx.set_np()
 ## Activation Functions
 
 Because they are so fundamental to deep learning, before going further,
-let us take a brief look at some common activation functions.
+let's take a brief look at some common activation functions.
 
 ### ReLU Function
 
@@ -215,7 +218,7 @@ x = np.arange(-8.0, 8.0, 0.1)
 x.attach_grad()
 with autograd.record():
     y = npx.relu(x)
-d2l.set_figsize((4, 2.5))    
+d2l.set_figsize((4, 2.5))
 d2l.plot(x, y, 'x', 'relu(x)')
 ```
 
@@ -309,7 +312,7 @@ We plot the tanh function blow. Note that as the input nears 0, the tanh functio
 
 ```{.python .input  n=6}
 with autograd.record():
-    y = np.tanh(x)  
+    y = np.tanh(x)
 d2l.plot(x, y, 'x', 'tanh(x)')
 ```
 

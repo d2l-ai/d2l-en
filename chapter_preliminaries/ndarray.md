@@ -27,7 +27,7 @@ we are referring to MXNet's `ndarray` unless otherwise stated.
 
 ## Getting Started
 
-In this chapter, we aim to get you up and running,
+In this section, we aim to get you up and running,
 equipping you with the the basic math and numerical computing tools
 that you will build on as you progress through the book. 
 Do not worry if you struggle to grok some of 
@@ -156,7 +156,7 @@ np.random.normal(0, 1, size=(3, 4))
 
 We can also specify the exact values for each element in the desired `ndarray`
 by supplying a Python list (or list of lists) containing the numerical values.
-Here, the outermost list corresponds to axis 0, and the inner list to axis 1.
+Here, the outermost list corresponds to axis $0$, and the inner list to axis $1$.
 
 ```{.python .input  n=9}
 np.array([[2, 1, 4, 3], [1, 2, 3, 4], [4, 3, 2, 1]])
@@ -221,7 +221,7 @@ In addition to elementwise computations,
 we can also perform linear algebra operations, 
 including vector dot products and matrix multiplication.
 We will explain the crucial bits of linear algebra 
-(with no assumed prior knowledge) in :numref:`sec_reduction-norm`.
+(with no assumed prior knowledge) in :numref:`sec_linear-algebra`.
 
 We can also *concatenate* multiple `ndarray`s together,
 stacking them end-to-end to form a larger `ndarray`. 
@@ -416,7 +416,7 @@ a, a.item(), float(a), int(a)
 ## Summary
 
 * MXNet's `ndarray` is an extension to NumPy's `ndarray` 
-  with a few key advantages that make it suitable for deep learning.
+  with a few killer advantages that make it suitable for deep learning.
 * MXNet's `ndarray` provides a variety of functionalities including 
   basic mathematics operations, broadcasting, indexing, slicing, 
   memory saving, and conversion to other Python objects.

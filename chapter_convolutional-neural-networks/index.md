@@ -5,7 +5,7 @@ In several of our previous examples, we have already come up
 against image data, which consist of pixels arranged in a 2D grid.
 Depending on whether we are looking at a black and white or color image,
 we might have either one or multiple numerical values
-correspnding to each pixel location.
+corresponding to each pixel location.
 Until now, we have dealt with this rich structure
 in the least satisfying possible way.
 We simply threw away this spatial structure
@@ -25,7 +25,7 @@ that were designed for precisely this purpose.
 CNN-based network *architecures*
 now dominate the field of computer vision to such an extent
 that hardly anyone these days would develop
-a commerical application or enter a competition
+a commercial application or enter a competition
 related to image recognition, object detection,
 or semantic segmentation,
 without basing their approach on them.
@@ -37,7 +37,7 @@ In addition to their strong predictive performance,
 convolutional neural networks tend to be computationally efficient,
 both because they tend to require fewer parameters
 than dense architectures
-and also because convolutions are easy to parralelize across GPU cores.
+and also because convolutions are easy to parallelize across GPU cores.
 As a result, researchers have sought to apply convnets whenever possible,
 and increasingly they have emerged as credible competitors
 even on tasks with 1D sequence structure,
@@ -47,7 +47,7 @@ are conventionally used.
 Some clever adaptations of CNNs have also brought them to bear
 on graph-structured data and in recommender systems.
 
-First, we will walk through the basic operationgs
+First, we will walk through the basic operations
 that comprise the backbone of all modern convolutional networks.
 These include the convolutional layers themselves,
 nitty-gritty details including padding and stride,
@@ -62,7 +62,6 @@ In the next chapter we will dive into full implementations
 of some of the recent popular neural networks
 whose designs are representative of most of the techniques
 commonly used to design modern convolutional neural networks.
-
 
 ```toc
 :maxdepth: 2

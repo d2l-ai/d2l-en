@@ -32,7 +32,7 @@ according to a linear model with additive noise.
 Out task will be to recover this model's parameters
 using the finite set of examples contained in our dataset.
 We will keep the data low-dimensional so we can visualize it easily.
-In the following code snippet, we generated a datset 
+In the following code snippet, we generated a dataset 
 containing $1000$ examples, each consisting of $2$ features
 sampled from a standard normal distribution.
 Thus our synthetic dataset will be an object
@@ -88,7 +88,7 @@ making multiple passes over the dataset,
 grabbing one minibatch of examples at a time,
 and using them to update our model. 
 Since this process is so fundamental 
-to training machine learning algortihms, 
+to training machine learning algorithms, 
 its worth defining a utility function 
 to shuffle the data and access it in minibatches.
 
@@ -105,7 +105,8 @@ def data_iter(batch_size, features, labels):
     # The examples are read at random, in no particular order
     random.shuffle(indices)
     for i in range(0, num_examples, batch_size):
-        batch_indices = np.array(indices[i: min(i + batch_size, num_examples)])
+        batch_indices = np.array(
+            indices[i: min(i + batch_size, num_examples)])
         yield features[batch_indices], labels[batch_indices]
 ```
 
@@ -117,7 +118,7 @@ and the gradient of the loss function for each example can also be taken in para
 GPUs allow us to process hundreds of examples in scarcely more time
 than it might take to process just a single example.
 
-To build some intuition, let us read and print
+To build some intuition, let's read and print
 the first small batch of data examples.
 The shape of the features in each minibatch tells us
 both the minibatch size and the number of input features.
@@ -141,7 +142,7 @@ The built-in iterators implemented in Apache MXNet
 are considerably efficient and they can deal
 both with data stored on file and data fed via a data stream.
 
-## Initialize Model Parameters
+## Initializing Model Parameters
 
 Before we can begin optimizing our model's parameters by gradient descent,
 we need to have some parameters in the first place.
@@ -178,7 +179,7 @@ w.attach_grad()
 b.attach_grad()
 ```
 
-## Define the Model
+## Defining the Model
 
 Next, we must define our model,
 relating its inputs and parameters to its outputs.
@@ -191,12 +192,12 @@ Recall that when we add a vector and a scalar,
 the scalar is added to each component of the vector.
 
 ```{.python .input  n=9}
-# Saved in the d2l package for later use 
+# Saved in the d2l package for later use
 def linreg(X, w, b):
     return np.dot(X, w) + b
 ```
 
-## Define the Loss Function
+## Defining the Loss Function
 
 Since updating our model requires taking 
 the gradient of our loss function,
@@ -209,12 +210,12 @@ The result returned by the following function
 will also be the same as the `y_hat` shape.
 
 ```{.python .input  n=10}
-# Saved in the d2l package for later use 
+# Saved in the d2l package for later use
 def squared_loss(y_hat, y):
     return (y_hat - y.reshape(y_hat.shape)) ** 2 / 2
 ```
 
-## Define the Optimization Algorithm
+## Defining the Optimization Algorithm
 
 As we discussed in the previous section,
 linear regression has a closed-form solution.
@@ -239,7 +240,7 @@ so that the magnitude of a typical step size
 does not depend heavily on our choice of the batch size.
 
 ```{.python .input  n=11}
-# Saved in the d2l package for later use 
+# Saved in the d2l package for later use
 def sgd(params, lr, batch_size):
     for param in params:
         param[:] = param - lr * param.grad / batch_size

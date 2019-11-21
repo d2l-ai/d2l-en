@@ -8,7 +8,7 @@ to pictures of clothing in the Fashion-MNIST dataset.
 Each image in Fashion-MNIST consisted of
 a two-dimensional $28 \times 28$ matrix.
 To make this data amenable to multilayer perceptrons
-which anticapte receiving inputs as one-dimensional fixed-length vectors,
+which anticipate receiving inputs as one-dimensional fixed-length vectors,
 we first flattened each image, yielding vectors of length 784,
 before processing them with a series of fully-connected layers.
 
@@ -29,7 +29,7 @@ by backpropagation.
 Their model achieved outstanding results at the time
 (only matched by Support Vector Machines at the time)
 and was adopted to recognize digits for processing deposits in ATM machines.
-Some ATMs still runn the code
+Some ATMs still run the code
 that Yann and his colleague Leon Bottou wrote in the 1990s!
 
 ## LeNet
@@ -37,7 +37,7 @@ that Yann and his colleague Leon Bottou wrote in the 1990s!
 In a rough sense, we can think LeNet as consisting of two parts:
 (i) a block of convolutional layers; and
 (ii) a block of fully-connected layers.
-Before getting into the weeds, let us briefly review the model in :numref:`img_lenet`.
+Before getting into the weeds, let's briefly review the model in :numref:`img_lenet`.
 
 ![Data flow in LeNet 5. The input is a handwritten digit, the output a probabilitiy over 10 possible outcomes.](../img/lenet.svg)
 :label:`img_lenet`
@@ -74,7 +74,7 @@ The convolutional block emits an output with size given by
 Before we can pass the convolutional block's output
 to the fully-connected block, we must flatten
 each example in the minibatch.
-In other words, we take this 4D input and tansform it into the 2D
+In other words, we take this 4D input and transform it into the 2D
 input expected by fully-connected layers:
 as a reminder, the first dimension indexes the examples in the minibatch
 and the second gives the flat vector representation of each example.
@@ -119,7 +119,10 @@ by a regular dense layer, which tends to be
 significantly more convenient to train.
 Other than that, this network matches
 the historical definition of LeNet5.
-Next, we feed a single-channel example
+
+Next, let's take a look of an example.
+As shown in :numref:`img_lenet_vert`, we feed 
+a single-channel example
 of size $28 \times 28$ into the network
 and perform a forward computation layer by layer
 printing the output shape at each layer
@@ -150,7 +153,7 @@ Then, the fully-connected layer reduces dimensionality layer by layer,
 until emitting an output that matches the number of image classes.
 
 ![Compressed notation for LeNet5](../img/lenet-vert.svg)
-
+:label:`img_lenet_vert`
 
 ## Data Acquisition and Training
 
@@ -215,7 +218,7 @@ def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
     trainer = gluon.Trainer(net.collect_params(),
                             'sgd', {'learning_rate': lr})
     animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs],
-                            legend=['train loss','train acc','test acc'])
+                            legend=['train loss', 'train acc', 'test acc'])
     timer = d2l.Timer()
     for epoch in range(num_epochs):
         metric = d2l.Accumulator(3)  # train_loss, train_acc, num_examples
@@ -238,10 +241,10 @@ def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
         animator.add(epoch+1, (None, None, test_acc))
     print('loss %.3f, train acc %.3f, test acc %.3f' % (
         train_loss, train_acc, test_acc))
-    print('%.1f exampes/sec on %s'%(metric[2]*num_epochs/timer.sum(), ctx))
+    print('%.1f exampes/sec on %s' % (metric[2]*num_epochs/timer.sum(), ctx))
 ```
 
-Now let us train the model.
+Now let's train the model.
 
 ```{.python .input}
 lr, num_epochs = 0.9, 10

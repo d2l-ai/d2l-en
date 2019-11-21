@@ -9,7 +9,7 @@ Parameters associated with infrequent features only receive meaningful updates w
 
 A possible hack to redress this issue would be to count the number of times we see a particular feature and to use this as a clock for adjusting learning rates. That is, rather than choosing a learning rate of the form $\eta = \frac{\eta_0}{\sqrt{t + c}}$ we could use $\eta_i = \frac{\eta_0}{\sqrt{s(i, t) + c}}$. Here $s(i, t)$ counts the number of nonzeros for feature $i$ that we have observed up to time $t$. This is actually quite easy to implement at no meaningful overhead. However, it fails whenever we don't quite have sparsity but rather just data where the gradients are often very small and only rarely large. After all, it is unclear where one would draw the line between something that qualifies as an observed feature or not.
 
-Adagrad by :cite:`Duchi.Hazan.Singer.2011` addresses this by repacing the rather crude counter $s(i, t)$ by an aggregate of the squares of previously observed gradients. In particular, it uses $s(i, t+1) = s(i, t) + \left(\partial_i f(\mathbf{x})\right)^2$ as a means to adjust the learning rate. This has two benefits: first, we no longer need to decide just when a gradient is large enough. Second, it scales automatically with the magnitude of the gradients. Coordinates that routinely correspond to large gradients are scaled down significantly, whereas others with small gradients receive a much more gentle treatment. In practice this leads to a very effective optimization procedure for computational advertising and related problems. But this hides some of the additional benefits inherent in Adagrad that are best understood in the context of preconditioning.
+Adagrad by :cite:`Duchi.Hazan.Singer.2011` addresses this by replacing the rather crude counter $s(i, t)$ by an aggregate of the squares of previously observed gradients. In particular, it uses $s(i, t+1) = s(i, t) + \left(\partial_i f(\mathbf{x})\right)^2$ as a means to adjust the learning rate. This has two benefits: first, we no longer need to decide just when a gradient is large enough. Second, it scales automatically with the magnitude of the gradients. Coordinates that routinely correspond to large gradients are scaled down significantly, whereas others with small gradients receive a much more gentle treatment. In practice this leads to a very effective optimization procedure for computational advertising and related problems. But this hides some of the additional benefits inherent in Adagrad that are best understood in the context of preconditioning.
 
 
 ## Preconditioning
@@ -113,8 +113,8 @@ Compared to the experiment in :numref:`sec_minibatch_sgd` we use a
 larger learning rate to train the model.
 
 ```{.python .input  n=9}
-data_iter, feature_dim = d2l.get_data_ch10(batch_size=10)
-d2l.train_ch10(adagrad, init_adagrad_states(feature_dim),
+data_iter, feature_dim = d2l.get_data_ch11(batch_size=10)
+d2l.train_ch11(adagrad, init_adagrad_states(feature_dim),
                {'lr': 0.1}, data_iter, feature_dim);
 ```
 
@@ -123,14 +123,14 @@ d2l.train_ch10(adagrad, init_adagrad_states(feature_dim),
 Using the `Trainer` instance of the algorithm `adagrad`, we can invoke the Adagrad algorithm in Gluon.
 
 ```{.python .input  n=5}
-d2l.train_gluon_ch10('adagrad', {'learning_rate': 0.1}, data_iter)
+d2l.train_gluon_ch11('adagrad', {'learning_rate': 0.1}, data_iter)
 ```
 
 ## Summary
 
 * Adagrad decreases the learning rate dynamically on a per-coordinate basis.
 * It uses the magnitude of the gradient as a means of adjusting how quickly progress is achieved - coordinates with large gradients are compensated with a smaller learning rate.
-* Computing the exact second derivative is typically infeasible in deep learing problems due to memory and computational constraints. The gradient can be a useful proxy.
+* Computing the exact second derivative is typically infeasible in deep learning problems due to memory and computational constraints. The gradient can be a useful proxy.
 * If the optimization problem has a rather uneven uneven structure Adagrad can help mitigate the distortion.
 * Adagrad is particularly effective for sparse features where the learning rate needs to decrease more slowly for infrequently occurring terms.
 * On deep learning problems Adagrad can sometimes be too aggressive in reducing learning rates. We will discuss strategies for mitigating this in the context of :ref:`sec_adam`.

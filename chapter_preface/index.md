@@ -29,12 +29,13 @@ at board games like Go, a feat once thought to be decades away.
 Already, these tools exert ever-wider impacts on industry and society,
 changing the way movies are made, diseases are diagnosed,
 and playing a growing role in basic sciences---from astrophysics to biology.
-This book represents our attempt to make deep learning approachable,
-teaching you both the *concepts*, the *context*, and the *code*.
 
 
 
 ## About This Book
+
+This book represents our attempt to make deep learning approachable,
+teaching you both the *concepts*, the *context*, and the *code*.
 
 ### One Medium Combining Code, Math, and HTML
 
@@ -88,7 +89,7 @@ However, these examples typically focused on
 *how* to implement a given approach,
 but left out the discussion of *why* certain algorithmic decisions are made.
 While some interactive resources have popped up sporadically 
-to address a particular topic, e.g., the engagine blog posts
+to address a particular topic, e.g., the engaging blog posts
 published on the website [Distill](http://distill.pub), or personal blogs,
 they only covered selected topics in deep learning, 
 and often lacked associated code.
@@ -218,10 +219,10 @@ such as linear regression, multi-layer perceptrons and regularization.
 learning calculations and lays the groundwork
 for us to subsequently implement more complex models.
 Next, in :numref:`chap_cnn` and :numref:`chap_modern_cnn`,
-we introduce Convolutional Neural Networks (CNNs), powerful tools
+we introduce convolutional neural networks (CNNs), powerful tools
 that form the backbone of most modern computer vision systems.
-Subsequently, in :numref:`chap_rnn`, we introduce
-Recurrent Neural Networks (RNNS), models that exploit
+Subsequently, in :numref:`chap_rnn` and :numref:`chap_modern_rnn`, we introduce
+recurrent neural networks (RNNs), models that exploit
 temporal or sequential structure in data, and are commonly used
 for natural language processing and time series prediction.
 In :numref:`chap_attention`, we introduce a new class of models
@@ -239,8 +240,6 @@ that influence the computational performance of your deep learning code.
 In :numref:`chap_cv` and :numref:`chap_nlp`, we illustrate
 major applications of deep learning in computer vision
 and natural language processing, respectively.
-Finally, :numref:`chap_gans` presents an emerging family of models
-called Generative Adversarial Networks (GANs).
 
 
 
@@ -255,7 +254,7 @@ Ideally, an elegant mathematical theory might tell us
 precisely how to tweak our code to achieve a desired result.
 Unfortunately, at present, such elegant theories elude us.
 Despite our best attempts, formal explanations for various techniques
-are still lacking, both because the mathematics to charactize these models
+are still lacking, both because the mathematics to characterize these models
 can be so difficult and also because serious inquiry on these topics
 has only just recently kicked into high gear.
 We are hopeful that as the theory of deep learning progresses,
@@ -285,21 +284,21 @@ the following packages and modules as dependencies:
 
 ```{.python .input  n=1}
 # Saved in the d2l package for later use
-from IPython import display
 import collections
 from collections import defaultdict
-import os
-import sys
+from IPython import display
 import math
 from matplotlib import pyplot as plt
-from mxnet import np, npx, autograd, gluon, init, context, image
+from mxnet import autograd, context, gluon, image, init, np, npx
 from mxnet.gluon import nn, rnn
+import os
+import pandas as pd
 import random
 import re
-import time
+import sys
 import tarfile
+import time
 import zipfile
-import pandas as pd
 ```
 
 We offer a detailed overview of these functions and classes in :numref:`sec_d2l`.

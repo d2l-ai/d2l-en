@@ -17,8 +17,8 @@ since the operations are typically expressed as cross correlations.
 In a convolutional layer, an input array
 and a correlation kernel array are combined
 to produce an output array through a cross-correlation operation.
-Let us see how this works for two dimensions.
-In our example, the input is a two-dimensional array
+Let's see how this works for two dimensions.
+In :numref:`fig_correlation`, the input is a two-dimensional array
 with a height of 3 and width of 3.
 We mark the shape of the array as $3 \times 3$ or (3, 3).
 The height and width of the kernel array are both 2.
@@ -29,6 +29,7 @@ is given precisely by the height and width of the kernel
 (here it is $2 \times 2$).
 
 ![Two-dimensional cross-correlation operation. The shaded portions are the first output element and the input and kernel array elements used in its computation: $0\times0+1\times1+3\times2+4\times3=19$. ](../img/correlation.svg)
+:label:`fig_correlation`
 
 In the two-dimensional cross-correlation operation,
 we begin with the convolution window positioned
@@ -53,7 +54,7 @@ $$
 4\times0+5\times1+7\times2+8\times3=43.
 $$
 
-Note that along each axi, the output is slightly *smaller* than the input.
+Note that along each axis, the output is slightly *smaller* than the input.
 Because the kernel has a width greater than one,
 and we can only computer the cross-correlation
 for locations where the kernel fits wholly within the image,
@@ -74,7 +75,7 @@ from mxnet import autograd, np, npx
 from mxnet.gluon import nn
 npx.set_np()
 
-# Saved in the d2l package for later use 
+# Saved in the d2l package for later use
 def corr2d(X, K):
     """Compute 2D cross-correlation."""
     h, w = K.shape
@@ -129,7 +130,7 @@ class Conv2D(nn.Block):
 
 ## Object Edge Detection in Images
 
-Let us look at a simple application of a convolutional layer:
+Let's look at a simple application of a convolutional layer:
 detecting the edge of an object in an image
 by finding the location of the pixel change.
 First, we construct an 'image' of $6\times 8$ pixels.
@@ -161,7 +162,7 @@ Y = corr2d(X, K)
 Y
 ```
 
-Let us apply the kernel to the transposed image.
+Let's apply the kernel to the transposed image.
 As expected, it vanishes. The kernel `K` only detects vertical edges.
 
 ```{.python .input}
@@ -177,7 +178,7 @@ and consider successive layers of convolutions,
 it might be impossible to specify
 precisely what each filter should be doing manually.
 
-Now let us see whether we can learn the kernel that generated `Y` from `X`
+Now let's see whether we can learn the kernel that generated `Y` from `X`
 by looking at the (input, output) pairs only.
 We first construct a convolutional layer
 and initialize its kernel as a random array.

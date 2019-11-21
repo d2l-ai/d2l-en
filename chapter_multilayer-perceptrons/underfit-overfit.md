@@ -230,7 +230,7 @@ i.e., we estimate after we observe the facts,
 hence vulnerable to the associated fallacy.
 For now, we will put the philosophy aside and stick to more tangible issues.
 
-In this chapter, to give you some intuition,
+In this section, to give you some intuition,
 we’ll focus on a few factors that tend
 to influence the generalizability of a model class:
 
@@ -383,10 +383,10 @@ In fact, whenever the data points each have a distinct value of $x$,
 a polynomial function with degree equal to the number of data points
 can fit the training set perfectly.
 We visualize the relationship between polynomial degree
-and under- vs over-fitting below.
+and under- vs over-fitting in :numref:`fig_capacity_vs_error`.
 
 ![Influence of Model Complexity on Underfitting and Overfitting](../img/capacity_vs_error.svg)
-
+:label:`fig_capacity_vs_error`
 
 ### Dataset Size
 
@@ -415,7 +415,7 @@ To get started we will import our usual packages.
 
 ```{.python .input  n=1}
 import d2l
-from mxnet import autograd, gluon, np, npx
+from mxnet import gluon, np, npx
 from mxnet.gluon import nn
 npx.set_np()
 ```
@@ -462,9 +462,9 @@ namely the constant feature corresponding to the bias.
 features[:2], poly_features[:2], labels[:2]
 ```
 
-### Defining, Training and Testing Model
+### Training and Testing Model
 
-Let first implement a function to evaluate the loss on a given data.
+Let's first implement a function to evaluate the loss on a given data.
 
 ```{.python .input}
 # Saved in the d2l package for later use
@@ -489,7 +489,7 @@ def train(train_features, test_features, train_labels, test_labels,
     net.initialize()
     batch_size = min(10, train_labels.shape[0])
     train_iter = d2l.load_array((train_features, train_labels), batch_size)
-    test_iter = d2l.load_array((test_features, test_labels), batch_size, 
+    test_iter = d2l.load_array((test_features, test_labels), batch_size,
                                is_train=False)
     trainer = gluon.Trainer(net.collect_params(), 'sgd',
                             {'learning_rate': 0.01})
@@ -540,7 +540,7 @@ train(poly_features[:n_train, 0:3], poly_features[n_train:, 0:3],
 
 ### Insufficient Training (Overfitting)
 
-Now let us try to train the model
+Now let's try to train the model
 using a polynomial of too high degree.
 Here, there is insufficient data to learn that
 the higher-degree coefficients should have values close to zero.

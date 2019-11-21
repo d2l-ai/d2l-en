@@ -91,7 +91,8 @@ can engage several machine learning models.
 Imagine just writing a program to respond to a *wake word*
 like 'Alexa', 'Okay, Google' or 'Siri'.
 Try coding it up in a room by yourself 
-with nothing but a computer and a code editor.
+with nothing but a computer and a code editor,
+as illustrated in :numref:`fig_wake_word`.
 How would you write such a program from first principles?
 Think about it... the problem is hard.
 Every second, the microphone will collect roughly 44,000 samples.
@@ -102,7 +103,7 @@ We do not know how to write such a program from scratch either.
 That is why we use ML.
 
 ![Identify an awake word.](../img/wake-word.svg)
-
+:label:`fig_wake_word`
 
 Here's the trick. 
 Often, even when we do not know how to tell a computer
@@ -160,7 +161,7 @@ In deep learning, the *learning* is the process
 by which we discover the right setting of the knobs 
 coercing the desired behavior from our model.
 
-The training process usually looks like this:
+As shown in :numref:`fig_ml_loop`, the training process usually looks like this:
 
 1. Start off with a randomly initialized model that cannot do anything useful.
 1. Grab some of your labeled data (e.g., audio snippets and corresponding ``{yes, no}`` labels)
@@ -168,6 +169,7 @@ The training process usually looks like this:
 1. Repeat until the model is awesome.
 
 ![A typical training process. ](../img/ml-loop.svg)
+:label:`fig_ml_loop`
 
 To summarize, rather than code up a wake word recognizer,
 we code up a program that can *learn* to recognize wake words, 
@@ -273,7 +275,7 @@ If we wanted to train a model to recognize cancer in microscopy images,
 fixed-length inputs means we have one less thing to worry about.
 
 However, not all data can easily be represented as fixed length vectors.
-While we might expect microscrope images to come from standard equipment,
+While we might expect microscope images to come from standard equipment,
 we cannot expect images mined from the Internet 
 to all show up with the same resolution or shape.
 For images, we might consider cropping them all to a standard size,
@@ -441,7 +443,7 @@ Each (input, target) pair is called an *examples* or an *instances*.
 Some times, when the context is clear, we may use the term examples,
 to refer to a collection of inputs, 
 even when the corresponding targets are unknown. 
-We denote any particular instance with a subscript, typicaly $i$,
+We denote any particular instance with a subscript, typically $i$,
 for instance ($\mathbf{x}_i, y_i$). 
 A dataset is a collection of $n$ instances $\{\mathbf{x}_i, y_i\}_{i=1}^n$.
 Our goal is to produce a model $f_\theta$ that maps any input $\mathbf{x}_i$
@@ -498,10 +500,11 @@ We feed the training dataset into a supervised learning algorithm,
 a function that takes as input a dataset
 and outputs another function, *the learned model*.
 Finally, we can feed previously unseen inputs to the learned model, 
-using its outputs as predictions of the corresponding label.
+using its outputs as predictions of the corresponding label. 
+The full process in drawn in :numref:`fig_supervised_learning`.
 
 ![Supervised learning.](../img/supervised-learning.svg)
-
+:label:`fig_supervised_learning`
 
 
 #### Regression
@@ -677,10 +680,12 @@ In MXNet Gluon, the corresponding loss function can be found [here](https://mxne
 
 Note that the most likely class is not necessarily 
 the one that you are going to use for your decision.
-Assume that you find this beautiful mushroom in your backyard:
+Assume that you find this beautiful mushroom in your backyard
+as shown in :numref:`fig_death_cap`.
 
 ![Death cap - do not eat!](../img/death_cap.jpg)
 :width:`400px`
+:label:`fig_death_cap`
 
 Now, assume that you built a classifier and trained it
 to predict if a mushroom is poisonous based on a photograph.
@@ -697,7 +702,7 @@ Basically, we need to compute the expected risk that we incur,
 i.e., we need to multiply the probability of the outcome 
 with the benefit (or harm) associated with it:
 
-$$L(\mathrm{action}| x) = \mathbf{E}_{y \sim p(y| x)}[\mathrm{loss}(\mathrm{action},y)]$$
+$$L(\mathrm{action}| x) = E_{y \sim p(y| x)}[\mathrm{loss}(\mathrm{action},y)]$$
 
 Hence, the loss $L$ incurred by eating the mushroom
 is $L(a=\mathrm{eat}| x) = 0.2 * \infty + 0.8 * 0 = \infty$,
@@ -818,7 +823,6 @@ There are entire academic conferences devoted to this subject.
 
 
 #### Recommender systems
-
 :label:`subsec_recommender_systems`
 
 Recommender systems are another problem setting
@@ -849,10 +853,11 @@ we could retrieve the set of objects with the largest scores $y_{ij}$,
 which are could then be recommended to the customer. 
 Production systems are considerably more advanced and take
 detailed user activity and item characteristics into account
-when computing such scores. The following image is an example 
+when computing such scores. :numref:`fig_deeplearning_amazon` is an example 
 of deep learning books recommended by Amazon based on personalization algorithms tuned to capture the author's preferences.
 
 ![Deep learning books recommended by Amazon.](../img/deeplearning_amazon.png)
+:label:`fig_deeplearning_amazon`
 
 Despite their tremendous economic value, recommendation systems 
 naively built on top of predictive models 
@@ -912,9 +917,7 @@ Transcribing text from spoken speech is also a ``seq2seq`` problem.
 While it is impossible to consider all types of sequence transformations,
 a number of special cases are worth mentioning:
 
-##### Tagging and Parsing
-
-This involves annotating a text sequence with attributes.
+**Tagging and Parsing**. This involves annotating a text sequence with attributes.
 In other words, the number of inputs and outputs is essentially the same.
 For instance, we might want to know where the verbs and subjects are.
 Alternatively, we might want to know which words are the named entities.
@@ -930,10 +933,8 @@ Ent  -    -    -     Ent      -    Ent
 ```
 
 
-##### Automatic Speech Recognition
-
-With speech recognition, the input sequence $x$ 
-is an audio recording of a speaker, and the output $y$ 
+**Automatic Speech Recognition**. With speech recognition, the input sequence $x$ 
+is an audio recording of a speaker (shown in :numref:`fig_speech`), and the output $y$ 
 is the textual transcript of what the speaker said.
 The challenge is that there are many more audio frames
 (sound is typically sampled at 8kHz or 16kHz)
@@ -943,19 +944,16 @@ These are ``seq2seq`` problems where the output is much shorter than the input.
 
 ![`-D-e-e-p- L-ea-r-ni-ng-`](../img/speech.png)
 :width:`700px`
+:label:`fig_speech`
 
-##### Text to Speech
-
-Text-to-Speech (TTS) is the inverse of speech recognition.
+**Text to Speech**. Text-to-Speech (TTS) is the inverse of speech recognition.
 In other words, the input $x$ is text
 and the output $y$ is an audio file.
 In this case, the output is *much longer* than the input.
 While it is easy for *humans* to recognize a bad audio file,
 this is not quite so trivial for computers.
 
-##### Machine Translation
-
-Unlike the case of speech recognition, where corresponding 
+**Machine Translation**. Unlike the case of speech recognition, where corresponding 
 inputs and outputs occur in the same order (after alignment),
 in machine translation, order inversion can be vital.
 In other words, while we are still converting one sequence into another,
@@ -1057,10 +1055,10 @@ without ever interacting with the environment again.
 Because all of the learning takes place 
 after the algorithm is disconnected from the environment,
 this is sometimes called *offline learning*.
-For supervised learning, the process looks like this:
+For supervised learning, the process looks like :numref:`fig_data_collection`.
 
 ![Collect data for supervised learning from an environment.](../img/data-collection.svg)
-
+:label:`fig_data_collection`
 
 This simplicity of offline learning has its charms.
 The upside is we can worry about pattern recognition
@@ -1219,8 +1217,9 @@ averaging the length of 16 adult men's feet to obtain the average foot length.
 
 ![Estimating the length of a foot](../img/koebel.jpg)
 :width:`500px`
+:label:`fig_koebel`
 
-Figure 1.1 illustrates how this estimator works.
+:numref:`fig_koebel` illustrates how this estimator works.
 The 16 adult men were asked to line up in a row, when leaving church.
 Their aggregate length was then divided by 16 
 to obtain an estimate for what now amounts to 1 foot.
@@ -1508,7 +1507,7 @@ autopilots mostly navigate cars, decisions about
 whether to grant bail use statistical data as input.
 More frivolously, we can ask Alexa to switch on the coffee machine.
 
-Fortunately, we are far from a sentient AI syste
+Fortunately, we are far from a sentient AI system
 that is ready to manipulate its human creators (or burn their coffee).
 First, AI systems are engineered, trained and deployed in a specific,
 goal-oriented manner. While their behavior might give the illusion
@@ -1553,4 +1552,4 @@ than the potential of malevolent superintelligence to destroy humanity.
 
 ## [Discussions](https://discuss.mxnet.io/t/2310)
 
-![](../img/qr_intro.svg)
+![](../img/qr_introduction.svg)

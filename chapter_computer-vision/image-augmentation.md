@@ -153,7 +153,7 @@ Next, we define the training function to train and evaluate the model using mult
 
 ```{.python .input  n=14}
 # Saved in the d2l package for later use
-def train_batch_ch12(net, features, labels, loss, trainer, ctx_list,
+def train_batch_ch13(net, features, labels, loss, trainer, ctx_list,
                      split_f=d2l.split_batch):
     Xs, ys = split_f(features, labels, ctx_list)
     with autograd.record():
@@ -169,7 +169,7 @@ def train_batch_ch12(net, features, labels, loss, trainer, ctx_list,
 
 ```{.python .input  n=16}
 # Saved in the d2l package for later use
-def train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs,
+def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
                ctx_list=d2l.try_all_gpus(), split_f=d2l.split_batch):
     num_batches, timer = len(train_iter), d2l.Timer()
     animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs], ylim=[0, 1],
@@ -179,7 +179,7 @@ def train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs,
         metric = d2l.Accumulator(4)
         for i, (features, labels) in enumerate(train_iter):
             timer.start()
-            l, acc = train_batch_ch12(
+            l, acc = train_batch_ch13(
                 net, features, labels, loss, trainer, ctx_list, split_f)
             metric.add(l, acc, labels.shape[0], labels.size)
             timer.stop()
@@ -206,7 +206,7 @@ def train_with_data_aug(train_augs, test_augs, net, lr=0.001):
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
     trainer = gluon.Trainer(net.collect_params(), 'adam',
                             {'learning_rate': lr})
-    train_ch12(net, train_iter, test_iter, loss, trainer, 10, ctx)
+    train_ch13(net, train_iter, test_iter, loss, trainer, 10, ctx)
 ```
 
 Now we train the model using image augmentation of random flipping left and right.

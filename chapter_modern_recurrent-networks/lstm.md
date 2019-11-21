@@ -14,7 +14,7 @@ cell (as opposed to reading any other cell). We will refer to this as the
 cell. We refer to this as the *input* gate. Last, we need a mechanism to reset
 the contents of the cell, governed by a *forget* gate. The motivation for such a
 design is the same as before, namely to be able to decide when to remember and
-when to ignore inputs in the latent state via a dedicated mechanism. Let us see
+when to ignore inputs in the latent state via a dedicated mechanism. Let's see
 how this works in practice.
 
 ## Gated Memory Cells
@@ -61,7 +61,7 @@ In GRUs, we had a single mechanism to govern input and forgetting. Here in LSTMs
 
 $$\mathbf{C}_t = \mathbf{F}_t \odot \mathbf{C}_{t-1} + \mathbf{I}_t \odot \tilde{\mathbf{C}}_t.$$
 
-If the forget gate is always approximately $1$ and the input gate is always approximately $0$, the past memory cells $\mathbf{C}_{t-1} $ will be saved over time and passed to the current timestep. This design was introduced to alleviate the vanishing gradient problem and to better capture dependencies for time series with long range dependencies. We thus arrive at the  flow diagram in :numref:`lstm_2`.
+If the forget gate is always approximately $1$ and the input gate is always approximately $0$, the past memory cells $\mathbf{C}_{t-1} $ will be saved over time and passed to the current timestep. This design was introduced to alleviate the vanishing gradient problem and to better capture dependencies for time series with long range dependencies. We thus arrive at the flow diagram in :numref:`lstm_2`.
 
 ![Computation of memory cells in an LSTM. Here, the multiplication is carried out elementwise. ](../img/lstm_2.svg)
 
@@ -81,7 +81,7 @@ $$\mathbf{H}_t = \mathbf{O}_t \odot \tanh(\mathbf{C}_t).$$
 
 ## Implementation from Scratch
 
-Now let us implement an LSTM from scratch. As same as the experiments in the previous sections, we first load data of *The Time Machine*.
+Now let's implement an LSTM from scratch. As same as the experiments in the previous sections, we first load data of *The Time Machine*.
 
 ```{.python .input  n=1}
 import d2l
@@ -93,17 +93,22 @@ batch_size, num_steps = 32, 35
 train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 ```
 
-### Initialize Model Parameters
+### Initializing Model Parameters
 
 Next we need to define and initialize the model parameters. As previously, the hyperparameter `num_hiddens` defines the number of hidden units. We initialize weights following a Gaussian distribution with $0.01$ standard deviation, and we set the biases to $0$.
 
 ```{.python .input  n=2}
 def get_lstm_params(vocab_size, num_hiddens, ctx):
     num_inputs = num_outputs = vocab_size
-    normal = lambda shape : np.random.normal(scale=0.01, size=shape, ctx=ctx)
-    three = lambda : (normal((num_inputs, num_hiddens)),
-                      normal((num_hiddens, num_hiddens)),
-                      np.zeros(num_hiddens, ctx=ctx))
+
+    def normal(shape):
+        return np.random.normal(scale=0.01, size=shape, ctx=ctx)
+
+    def three():
+        return (normal((num_inputs, num_hiddens)),
+                normal((num_hiddens, num_hiddens)),
+                np.zeros(num_hiddens, ctx=ctx))
+
     W_xi, W_hi, b_i = three()  # Input gate parameters
     W_xf, W_hf, b_f = three()  # Forget gate parameters
     W_xo, W_ho, b_o = three()  # Output gate parameters
@@ -119,7 +124,7 @@ def get_lstm_params(vocab_size, num_hiddens, ctx):
     return params
 ```
 
-### Define the Model
+### Defining the Model
 
 In the initialization function, the hidden state of the LSTM needs to return an additional memory cell with a value of $0$ and a shape of (batch size, number of hidden units). Hence we get the following state initialization.
 
@@ -151,7 +156,7 @@ def lstm(inputs, state, params):
 
 ### Training and Prediction
 
-Let us train an LSTM as same as what we did in :numref:`sec_gru`, by calling the `RNNModelScratch` function as introduced in :numref:`sec_rnn_scratch`.
+Let's train an LSTM as same as what we did in :numref:`sec_gru`, by calling the `RNNModelScratch` function as introduced in :numref:`sec_rnn_scratch`.
 
 ```{.python .input  n=9}
 vocab_size, num_hiddens, ctx = len(vocab), 256, d2l.try_gpu()
