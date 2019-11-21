@@ -11,7 +11,7 @@ by participating in a Kaggle competition.
 the data is reasonably generic and does not have
 the kind of rigid structure that might require specialized models
 the way images or audio might.
-This dataset, collected by [Bart de Cock](http://jse.amstat.org/v19n3/decock.pdf) in 2011, is considerably larger than the famous the [Boston housing dataset](https://archive.ics.uci.edu/ml/machine-learning-databases/housing/housing.names) of Harrison and Rubinfeld (1978).
+This dataset, collected by Bart de Cock in 2011 :cite:`De-Cock.2011`, is considerably larger than the famous the [Boston housing dataset](https://archive.ics.uci.edu/ml/machine-learning-databases/housing/housing.names) of Harrison and Rubinfeld (1978).
 It boasts both more examples and more features,
 covering house prices in Ames, IA from the period of 2006-2010.
 

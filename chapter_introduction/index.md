@@ -1256,7 +1256,7 @@ It is thus only reasonable to ask whether one could explain
 and possibly reverse engineer this capacity.
 One of the oldest algorithms inspired in this fashion 
 was formulated by [Donald Hebb (1904-1985)](https://en.wikipedia.org/wiki/Donald_O._Hebb).
-In his groundbreaking book [The Organization of Behavior](http://s-f-walker.org.uk/pubsebooks/pdfs/The_Organization_of_Behavior-Donald_O._Hebb.pdf) (John Wiley & Sons, 1949),
+In his groundbreaking book The Organization of Behavior :cite:`Hebb.Hebb.1949`,
 he posited that neurons learn by positive reinforcement.
 This became known as the Hebbian learning rule.
 It is the prototype of Rosenblatt's perceptron learning algorithm
