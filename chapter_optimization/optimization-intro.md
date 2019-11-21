@@ -55,7 +55,7 @@ complicated and do not have analytical solutions. Instead, we must use numerical
 optimization algorithms. The optimization algorithms below all fall into this
 category.
 
-There are many challenges in deep learning optimization. Some of the most vexing ones are local minima, saddle points and vanishing gradients. Let us have a look at a few of them.
+There are many challenges in deep learning optimization. Some of the most vexing ones are local minima, saddle points and vanishing gradients. Let's have a look at a few of them.
 
 ### Local Minima
 
@@ -89,7 +89,8 @@ annotate('saddle point', (0, -0.2), (-0.52, -5.0))
 Saddle points in higher dimensions are even more insidious, as the example below shows. Consider the function $f(x, y) = x^2 - y^2$. It has its saddle point at $(0, 0)$. This is a maximum with respect to $y$ and a minimum with respect to $x$. Moreover, it *looks* like a saddle, which is where this mathematical property got its name.
 
 ```{.python .input  n=5}
-x, y = np.meshgrid(np.linspace(-1, 1, 101), np.linspace(-1, 1, 101), indexing='ij')
+x, y = np.meshgrid(np.linspace(-1, 1, 101), np.linspace(-1, 1, 101),
+                   indexing='ij')
 
 z = x**2 - y**2
 
@@ -106,7 +107,7 @@ d2l.plt.ylabel('y');
 
 We assume that the input of a function is a $k$-dimensional vector and its
 output is a scalar, so its Hessian matrix will have $k$ eigenvalues
-(refer to :numref:`sec_linear_algebra`).
+(refer to :numref:`sec_geometry-linear-algebric-ops`).
 The solution of the
 function could be a local minimum, a local maximum, or a saddle point at a
 position where the function gradient is zero:

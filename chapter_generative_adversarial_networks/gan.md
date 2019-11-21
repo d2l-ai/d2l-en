@@ -40,12 +40,12 @@ $$min_D max_G \{ -E_{x \sim \text{Data}} log D(\mathbf x) - E_{z \sim \text{Nois
 
 
 
-Many of the GANs applications are in the context of images. As a demonstration purpose, we are going to content ourselves with fitting a much simpler distribution first. We will illustrate what happens if we use GANs to build the world's most inefficient estimator of parameters for a Gaussian. Let us get started.
+Many of the GANs applications are in the context of images. As a demonstration purpose, we are going to content ourselves with fitting a much simpler distribution first. We will illustrate what happens if we use GANs to build the world's most inefficient estimator of parameters for a Gaussian. Let's get started.
 
 ```{.python .input  n=1}
 %matplotlib inline
 import d2l
-from mxnet import np, npx, gluon, autograd, init
+from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
 npx.set_np()
 ```
@@ -61,7 +61,7 @@ b = np.array([1, 2])
 data = X.dot(A) + b
 ```
 
-Let us see what we got. This should be a Gaussian shifted in some rather arbitrary way with mean $b$ and covariance matrix $A^TA$.
+Let's see what we got. This should be a Gaussian shifted in some rather arbitrary way with mean $b$ and covariance matrix $A^TA$.
 
 ```{.python .input  n=3}
 d2l.set_figsize((3.5, 2.5))
@@ -159,14 +159,14 @@ def train(net_D, net_G, data_iter, num_epochs, lr_D, lr_G, latent_dim, data):
             batch_size = X.shape[0]
             Z = np.random.normal(0, 1, size=(batch_size, latent_dim))
             metric.add(update_D(X, Z, net_D, net_G, loss, trainer_D),
-                        update_G(Z, net_D, net_G, loss, trainer_G),
-                        batch_size)
+                       update_G(Z, net_D, net_G, loss, trainer_G),
+                       batch_size)
         # Visualize generated examples
         Z = np.random.normal(0, 1, size=(100, latent_dim))
         fake_X = net_G(Z).asnumpy()
         animator.axes[1].cla()
-        animator.axes[1].scatter(data[:,0], data[:,1])
-        animator.axes[1].scatter(fake_X[:,0], fake_X[:,1])
+        animator.axes[1].scatter(data[:, 0], data[:, 1])
+        animator.axes[1].scatter(fake_X[:, 0], fake_X[:, 1])
         animator.axes[1].legend(['real', 'generated'])
         # Show the losses
         loss_D, loss_G = metric[0]/metric[2], metric[1]/metric[2]

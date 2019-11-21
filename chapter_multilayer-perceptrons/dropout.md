@@ -2,7 +2,7 @@
 :label:`sec_dropout`
 
 Just now, we introduced the classical approach
-of regularizing statistical models by penalyzing
+of regularizing statistical models by penalizing
 the $\ell_2$ norm of the weights.
 In probabilistic terms, we could justify this technique
 by arguing that we have assumed a prior belief
@@ -57,7 +57,7 @@ Yet even in these situations, when there is no true pattern to be learned, neura
 
 ## Robustness through Perturbations
 
-Let us think briefly about what we expect from a good statistical model.
+Let's think briefly about what we expect from a good statistical model.
 We want it to do well on unseen test data.
 One way we can accomplish this is by asking
 what constitutes a a 'simple' model?
@@ -95,7 +95,7 @@ misses out on what is happening internally in the network.
 Their proposed idea is called *dropout*,
 and it is now a standard technique
 that is widely used for training neural networks.
-Throughout trainin, on each iteration,
+Throughout training, on each iteration,
 dropout regularization consists simply of zeroing out
 some fraction (typically 50%) of the nodes in each layer
 before calculating the subsequent layer.
@@ -115,7 +115,7 @@ At each training iteration, just add noise
 sampled from a distribution with mean zero
 $\epsilon \sim \mathcal{N}(0,\sigma^2)$ to the input $\mathbf{x}$ ,
 yielding a perturbed point $\mathbf{x}' = \mathbf{x} + \epsilon$.
-In expectation, $\mathbf{E}[\mathbf{x}'] = \mathbf{x}$.
+In expectation, $E[\mathbf{x}'] = \mathbf{x}$.
 
 In the case of dropout regularization,
 one can debias each layer
@@ -133,7 +133,7 @@ h' =
 $$
 
 By design, the expectation remains unchanged,
-i.e., $\mathbf{E}[h'] = h$.
+i.e., $E[h'] = h$.
 Intermediate activations $h$ are replaced by a random variable $h'$
 with matching expectation.
 The name 'dropout' arises from the notion
@@ -158,7 +158,7 @@ we are essentially removing each hidden unit with probability $p$,
 (i.e., setting their output to $0$).
 We can view the result as a network containing
 only a subset of the original neurons.
-In the image below, $h_2$ and $h_5$ are removed.
+In :numref:`fig_dropout2`, $h_2$ and $h_5$ are removed.
 Consequently, the calculation of $y$ no longer depends on $h_2$ and $h_5$
 and their respective gradient also vanishes when performing backprop.
 In this way, the calculation of the output layer
@@ -171,10 +171,11 @@ described their intuition as an effort
 to prevent the *co-adaptation* of feature detectors.
 
 ![MLP before and after dropout](../img/dropout2.svg)
+:label:`fig_dropout2`
 
 At test time, we typically do not use dropout.
 However, we note that there are some exceptions:
-some researchers use dropout at test time as a heuristic appraoch
+some researchers use dropout at test time as a heuristic approach
 for estimating the *confidence* of neural network predictions:
 if the predictions agree across many different dropout masks,
 then we might say that the network is more confident.
@@ -246,7 +247,7 @@ for param in params:
     param.attach_grad()
 ```
 
-### Define the Model
+### Defining the Model
 
 The model defined below concatenates the fully-connected layer
  and the activation function ReLU,
@@ -283,8 +284,8 @@ This is similar to the training and testing of multilayer perceptrons described 
 num_epochs, lr, batch_size = 10, 0.5, 256
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
-d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, 
-             lambda batch_size: d2l.sgd(params, lr, batch_size))
+d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs,
+              lambda batch_size: d2l.sgd(params, lr, batch_size))
 ```
 
 ## Concise Implementation
@@ -295,7 +296,7 @@ after each fully-connected layer, passing in the dropout probability
 as the only argument to its constructor.
 During training, the `Dropout` layer will randomly
 drop out outputs of the previous layer
-(or equivalently, the inputs to the subequent layer)
+(or equivalently, the inputs to the subsequent layer)
 according to the specified dropout probability.
 When MXNet is not in training mode,
 the `Dropout` layer simply passes the data through during testing.

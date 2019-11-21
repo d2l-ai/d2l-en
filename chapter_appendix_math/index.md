@@ -25,7 +25,7 @@ Taken together, these form the core of the mathematical concepts needed to begin
 ```toc
 :maxdepth: 2
 
-linear-algebra
+geometry-linear-algebric-ops
 eigen-decomposition
 single-variable-calculus
 multivariable-calculus

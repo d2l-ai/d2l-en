@@ -1,10 +1,11 @@
 # Convexity
 :label:`sec_convexity`
 
-Convexity plays a vital role in the design of optimization algorithms. This is largely due to the fact that it is much easier to analyze and test algorithms in this context. In other words, if the algorithm performs poorly even in the convex setting we should not hope to see great results otherwise. Furthermore, even though the optimization problems in deep learning are generally nonconvex, they often exhibit some properties of convex ones near local minima. This can lead to exciting new optimization variants such as [Stochastic Weight Averaging](https://arxiv.org/abs/1803.05407) by Izmailov et al., 2018. Let us begin with the basics.
+Convexity plays a vital role in the design of optimization algorithms. This is largely due to the fact that it is much easier to analyze and test algorithms in this context. In other words, if the algorithm performs poorly even in the convex setting we should not hope to see great results otherwise. Furthermore, even though the optimization problems in deep learning are generally nonconvex, they often exhibit some properties of convex ones near local minima. This can lead to exciting new optimization variants such as :cite:`Izmailov.Podoprikhin.Garipov.ea.2018`. 
 
 ## Basics
 
+Let's begin with the basics.
 
 ### Sets
 
@@ -12,18 +13,21 @@ Sets are the basis of convexity. Simply put, a set $X$ in a vector space is conv
 
 $$\lambda \cdot a + (1-\lambda) \cdot b \in X \text{ whenever } a, b \in X.$$
 
-This sounds a bit abstract. Consider the picture below. The first set is not convex since there are line segments that are not contained in it. The other two sets suffer no such problem. 
+This sounds a bit abstract. Consider the picture :numref:`fig_pacman`. The first set is not convex since there are line segments that are not contained in it. The other two sets suffer no such problem. 
 
 ![Three shapes, the left one is nonconvex, the others are convex](../img/pacman.svg)
+:label:`fig_pacman`
 
-Definitions on their own are not particularly useful unless you can do something with them. In this case we can look at unions and intersections. Assume that $X$ and $Y$ are convex sets. Then $X \cap Y$ is also convex. To see this, consider any $a, b \in X \cap Y$. Since $X$ and $Y$ are convex, the line segments connecting $a$ and $b$ are contained in both $X$ and $Y$. Given that, they also need to be contained in $X \cap Y$, thus proving our first theorem. 
+Definitions on their own are not particularly useful unless you can do something with them. In this case we can look at unions and intersections as shown in :numref:`fig_convex_intersect`. Assume that $X$ and $Y$ are convex sets. Then $X \cap Y$ is also convex. To see this, consider any $a, b \in X \cap Y$. Since $X$ and $Y$ are convex, the line segments connecting $a$ and $b$ are contained in both $X$ and $Y$. Given that, they also need to be contained in $X \cap Y$, thus proving our first theorem. 
 
 ![The intersection between two convex sets is convex](../img/convex-intersect.svg)
+:label:`fig_convex_intersect`
 
 We can strengthen this result with little effort: given convex sets $X_i$, their intersection $\cap_{i} X_i$ is convex. 
-To see that the converse is not true, consider two disjoint sets $X \cap Y = \emptyset$. Now pick $a \in X$ and $b \in Y$. The line segment connecting $a$ and $b$ needs to contain some part that is neither in $X$ nor $Y$, since we assumed that $X \cap Y = \emptyset$. Hence the line segment is not in $X \cup Y$ either, thus proving that in general unions of convex sets need not be convex. 
+To see that the converse is not true, consider two disjoint sets $X \cap Y = \emptyset$. Now pick $a \in X$ and $b \in Y$. The line segment in :numref:`fig_nonconvex` connecting $a$ and $b$ needs to contain some part that is neither in $X$ nor $Y$, since we assumed that $X \cap Y = \emptyset$. Hence the line segment is not in $X \cup Y$ either, thus proving that in general unions of convex sets need not be convex. 
 
 ![The union of two convex sets need not be convex](../img/nonconvex.svg)
+:label:`fig_nonconvex`
 
 Typically the problems in deep learning are defined on convex domains. For instance $\mathbb{R}^d$ is a convex set (after all, the line between any two points in $\mathbb{R}^d$ remains in $\mathbb{R}^d$). In some cases we work with variables of bounded length, such as balls of radius $r$ as defined by $\{\mathbf{x} | \mathbf{x} \in \mathbb{R}^d \text{ and } \|\mathbf{x}\|_2 \leq r\}$. 
 
@@ -33,7 +37,7 @@ Now that we have convex sets we can introduce convex functions $f$. Given a conv
 
 $$\lambda f(x) + (1-\lambda) f(x') \geq f(\lambda x + (1-\lambda) x').$$
 
-To illustrate this let us plot a few functions and check which ones satisfy the requirement. We need to import a few  libraries.
+To illustrate this let's plot a few functions and check which ones satisfy the requirement. We need to import a few  libraries.
 
 ```{.python .input  n=1}
 %matplotlib inline
@@ -43,12 +47,17 @@ from mxnet import np, npx
 npx.set_np()
 ```
 
-Let us define a few functions, both convex and nonconvex.
+Let's define a few functions, both convex and nonconvex.
 
 ```{.python .input}
-def f(x): return 0.5 * x**2        # convex
-def g(x): return np.cos(np.pi * x) # nonconvex
-def h(x): return np.exp(0.5 * x)   # convex
+def f(x):
+    return 0.5 * x**2  # Convex
+
+def g(x):
+    return np.cos(np.pi * x)  # Nonconvex
+
+def h(x):
+    return np.exp(0.5 * x)  # Convex
 
 x, segment = np.arange(-2, 2, 0.01), np.array([-1.5, 1])
 d2l.use_svg_display()
@@ -67,14 +76,14 @@ One of the most useful tools is Jensen's inequality. It amounts to a generalizat
 $$\begin{aligned}
     \sum_i \alpha_i f(x_i) & \geq f\left(\sum_i \alpha_i x_i\right) \\
     \text{ and }
-    \mathbf{E}_x[f(x)] & \geq f\left(\mathbf{E}_x[x]\right)
+    E_x[f(x)] & \geq f\left(E_x[x]\right)
 \end{aligned}$$
 
 In other words, the expectation of a convex function is larger than the convex function of an expectation. To prove the first inequality we repeatedly apply the definition of convexity to one term in the sum at a time. The expectation can be proven by taking the limit over finite segments.  
 
 One of the common applications of Jensen's inequality is with regard to the log-likelihood of partially observed random variables. That is, we use
 
-$$\mathbf{E}_{y \sim P(y)}[-\log P(x \mid y)] \geq -\log P(x).$$
+$$E_{y \sim P(y)}[-\log P(x \mid y)] \geq -\log P(x).$$
 
 This follows since $\int P(y) P(x \mid y) dy = P(x)$. 
 This is used in variational methods. Here $y$ is typically the unobserved random variable, $P(y)$ is the best guess of how it might be distributed and $P(x)$ is the distribution with $y$ integrated out. For instance, in clustering $y$ might be the cluster labels and $P(x \mid y)$ is the generative model when applying cluster labels.
@@ -82,16 +91,21 @@ This is used in variational methods. Here $y$ is typically the unobserved random
 
 ## Properties
 
+Convex functions have a few useful properties. We describe them as follows.
+
+
 ### No Local Minima
 
-In particular, convex functions do not have local minima. Let us assume the contrary and prove it wrong. If $x \in X$ is a local minimum there exists some neighborhood of $x$ for which $f(x)$ is the smallest value. Since $x$ is only a local minimum there has to be another $x' \in X$ for which $f(x') < f(x)$. However, by convexity the function values on the entire *line* $\lambda x + (1-\lambda) x'$ have to be less than $f(x')$ since for $\lambda \in [0, 1)$ 
+In particular, convex functions do not have local minima. Let's assume the contrary and prove it wrong. If $x \in X$ is a local minimum there exists some neighborhood of $x$ for which $f(x)$ is the smallest value. Since $x$ is only a local minimum there has to be another $x' \in X$ for which $f(x') < f(x)$. However, by convexity the function values on the entire *line* $\lambda x + (1-\lambda) x'$ have to be less than $f(x')$ since for $\lambda \in [0, 1)$ 
 
 $$f(x) > \lambda f(x) + (1-\lambda) f(x') \geq f(\lambda x + (1-\lambda) x').$$
 
 This contradicts the assumption that $f(x)$ is a local minimum. For instance, the function $f(x) = (x+1) (x-1)^2$ has a local minimum for $x=1$. However, it is not a global minimum.
 
 ```{.python .input}
-def f(x): return (x-1)**2 * (x+1)
+def f(x):
+    return (x-1)**2 * (x+1)
+
 d2l.set_figsize((3.5, 2.5))
 d2l.plot([x, segment], [f(x), f(segment)], 'x', 'f(x)')
 ```
@@ -104,12 +118,13 @@ Convex functions define convex sets as *below-sets*. They are defined as
 
 $$S_b := \{x | x \in X \text{ and } f(x) \leq b\}.$$
 
-Such sets are convex. Let us prove this quickly. Remember that for any $x, x' \in S_b$ we need to show that $\lambda x + (1-\lambda) x' \in S_b$ as long as $\lambda \in [0, 1]$. But this follows directly from the definition of convexity since $f(\lambda x + (1-\lambda) x') \leq \lambda f(x) + (1-\lambda) f(x') \leq b$. 
+Such sets are convex. Let's prove this quickly. Remember that for any $x, x' \in S_b$ we need to show that $\lambda x + (1-\lambda) x' \in S_b$ as long as $\lambda \in [0, 1]$. But this follows directly from the definition of convexity since $f(\lambda x + (1-\lambda) x') \leq \lambda f(x) + (1-\lambda) f(x') \leq b$. 
 
 Have a look at the function $f(x, y) = 0.5 x^2 + \cos(2 \pi y)$ below. It is clearly nonconvex. The level sets are correspondingly nonconvex. In fact, they are typically composed of disjoint sets.
 
 ```{.python .input}
-x, y = np.meshgrid(np.linspace(-1, 1, 101), np.linspace(-1, 1, 101), indexing='ij')
+x, y = np.meshgrid(np.linspace(-1, 1, 101), np.linspace(-1, 1, 101),
+                   indexing='ij')
 
 z = x**2 + 0.5 * np.cos(2 * np.pi * y)
 
@@ -121,7 +136,8 @@ ax.contour(x, y, z, offset=-1)
 ax.set_zlim(-1, 1.5)
 
 # Adjust labels
-for func in [d2l.plt.xticks, d2l.plt.yticks, ax.set_zticks]: func([-1, 0, 1])
+for func in [d2l.plt.xticks, d2l.plt.yticks, ax.set_zticks]:
+    func([-1, 0, 1])
 ```
 
 ### Derivatives and Convexity
@@ -156,8 +172,11 @@ $$\begin{aligned}
 By geometry it follows that $f(x)$ is below the line connecting $f(a)$ and $f(b)$, thus proving convexity. We omit a more formal derivation in favor of a graph below.
 
 ```{.python .input}
-def f(x): return 0.5 * x**2        
-x, axb, ab = np.arange(-2, 2, 0.01), np.array([-1.5, -0.5, 1]), np.array([-1.5, 1])
+def f(x):
+    return 0.5 * x**2
+
+x = np.arange(-2, 2, 0.01)
+axb, ab = np.array([-1.5, -0.5, 1]), np.array([-1.5, 1])
 
 d2l.set_figsize((3.5, 2.5))
 d2l.plot([x, axb, ab], [f(x) for x in [x, axb, ab]], 'x', 'f(x)')
@@ -204,9 +223,10 @@ This turns out to be a *projection* of $g$ onto the ball of radius $c$. More gen
 
 $$\mathrm{Proj}_X(\mathbf{x}) = \mathop{\mathrm{argmin}}_{\mathbf{x}' \in X} \|\mathbf{x} - \mathbf{x}'\|_2$$
 
-It is thus the closest point in $X$ to $\mathbf{x}$. This sounds a bit abstract. The figure below explains it somewhat more clearly. In it we have two convex sets, a circle and a diamond. Points inside the set (yellow) remain unchanged. Points outside the set (black) are mapped to the closest point inside the set (red). While for $\ell_2$ balls this leaves the direction unchanged, this need not be the case in general, as can be seen in the case of the diamond. 
+It is thus the closest point in $X$ to $\mathbf{x}$. This sounds a bit abstract. :numref:`fig_projections` explains it somewhat more clearly. In it we have two convex sets, a circle and a diamond. Points inside the set (yellow) remain unchanged. Points outside the set (black) are mapped to the closest point inside the set (red). While for $\ell_2$ balls this leaves the direction unchanged, this need not be the case in general, as can be seen in the case of the diamond. 
 
 ![Convex Projections](../img/projections.svg)
+:label:`fig_projections`
 
 One of the uses for convex projections is to compute sparse weight vectors. In this case we project $\mathbf{w}$ onto an $\ell_1$ ball (the latter is a generalized version of the diamond in the picture above). 
 

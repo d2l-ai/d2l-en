@@ -147,7 +147,7 @@ loss = gluon.loss.SoftmaxCrossEntropyLoss(axis=1)
 net.collect_params().reset_ctx(ctx)
 trainer = gluon.Trainer(net.collect_params(), 'sgd',
                         {'learning_rate': lr, 'wd': wd})
-d2l.train_ch12(net, train_iter, test_iter, loss, trainer, num_epochs, ctx)
+d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, ctx)
 ```
 
 ## Prediction

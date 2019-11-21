@@ -38,8 +38,9 @@ Next, we initialize the model parameters for a RNN model. The number of hidden u
 ```{.python .input  n=19}
 def get_params(vocab_size, num_hiddens, ctx):
     num_inputs = num_outputs = vocab_size
-    normal = lambda shape: np.random.normal(
-        scale=0.01, size=shape, ctx=ctx)
+
+    def normal(shape):
+        return np.random.normal(scale=0.01, size=shape, ctx=ctx)
     # Hidden layer parameters
     W_xh = normal((num_inputs, num_hiddens))
     W_hh = normal((num_hiddens, num_hiddens))
@@ -88,6 +89,7 @@ Now we have all functions defined, next we create a class to wrap these function
 # Saved in the d2l package for later use
 class RNNModelScratch(object):
     """A RNN Model based on scratch implementations"""
+
     def __init__(self, vocab_size, num_hiddens, ctx,
                  get_params, init_state, forward):
         self.vocab_size, self.num_hiddens = vocab_size, num_hiddens
@@ -102,7 +104,7 @@ class RNNModelScratch(object):
         return self.init_state(batch_size, self.num_hiddens, ctx)
 ```
 
-Let us do a sanity check whether inputs and outputs have the correct dimensions, e.g., to ensure that the dimensionality of the hidden state has not changed.
+Let's do a sanity check whether inputs and outputs have the correct dimensions, e.g., to ensure that the dimensionality of the hidden state has not changed.
 
 ```{.python .input}
 vocab_size, num_hiddens, ctx = len(vocab), 512, d2l.try_gpu()
@@ -124,7 +126,9 @@ We first explain the predicting function so we can regularly check the predictio
 def predict_ch8(prefix, num_predicts, model, vocab, ctx):
     state = model.begin_state(batch_size=1, ctx=ctx)
     outputs = [vocab[prefix[0]]]
-    get_input = lambda: np.array([outputs[-1]], ctx=ctx).reshape(1, 1)
+
+    def get_input():
+        return np.array([outputs[-1]], ctx=ctx).reshape(1, 1)
     for y in prefix[1:]:  # Warmup state with prefix
         _, state = model(get_input(), state)
         outputs.append(vocab[y])
@@ -144,7 +148,7 @@ predict_ch8('time traveller ', 10, model, vocab, ctx)
 
 For a sequence of length $T$, we compute the gradients over these $T$ timesteps in an iteration, which results in a chain of matrix-products with length  $O(T)$ during backpropagating. As mentioned in :numref:`sec_numerical_stability`, it might result in numerical instability, e.g., the gradients may either explode or vanish, when $T$ is large. Therefore, RNN models often need extra help to stabilize the training.
 
-Recall that when solving an optimization problem, we take update steps for the weights $\mathbf{w}$ in the general direction of the negative gradient $\mathbf{g}_t$ on a minibatch, say $\mathbf{w} - \eta \cdot \mathbf{g}_t$. Let us further assume that the objective is well behaved, i.e., it is Lipschitz continuous with constant $L$, i.e.,
+Recall that when solving an optimization problem, we take update steps for the weights $\mathbf{w}$ in the general direction of the negative gradient $\mathbf{g}_t$ on a minibatch, say $\mathbf{w} - \eta \cdot \mathbf{g}_t$. Let's further assume that the objective is well behaved, i.e., it is Lipschitz continuous with constant $L$, i.e.,
 
 $$|l(\mathbf{w}) - l(\mathbf{w}')| \leq L \|\mathbf{w} - \mathbf{w}'\|.$$
 
@@ -173,7 +177,7 @@ def grad_clipping(model, theta):
 
 ## Training
 
-Let us first define the function to train the model on one data epoch. It differs from the models training of :numref:`sec_softmax_scratch` in three places:
+Let's first define the function to train the model on one data epoch. It differs from the models training of :numref:`sec_softmax_scratch` in three places:
 
 1. Different sampling methods for sequential data (independent sampling and
    sequential partitioning) will result in differences in the initialization of
@@ -195,7 +199,8 @@ def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):
             # using random sampling.
             state = model.begin_state(batch_size=X.shape[0], ctx=ctx)
         else:
-            for s in state: s.detach()
+            for s in state:
+                s.detach()
         y = Y.T.reshape(-1)
         X, y = X.as_in_context(ctx), y.as_in_context(ctx)
         with autograd.record():
@@ -203,7 +208,7 @@ def train_epoch_ch8(model, train_iter, loss, updater, ctx, use_random_iter):
             l = loss(py, y).mean()
         l.backward()
         grad_clipping(model, 1)
-        updater(batch_size=1)  # Since used mean already.
+        updater(batch_size=1)  # Since used mean already
         metric.add(l * y.size, y.size)
     return math.exp(metric[0]/metric[1]), metric[1]/timer.stop()
 ```
@@ -220,12 +225,18 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, ctx,
                             legend=['train'], xlim=[1, num_epochs])
     if isinstance(model, gluon.Block):
         model.initialize(ctx=ctx, force_reinit=True, init=init.Normal(0.01))
-        trainer = gluon.Trainer(model.collect_params(), 'sgd', {'learning_rate': lr})
-        updater = lambda batch_size : trainer.step(batch_size)
-    else:
-        updater = lambda batch_size : d2l.sgd(model.params, lr, batch_size)
+        trainer = gluon.Trainer(model.collect_params(),
+                                'sgd', {'learning_rate': lr})
 
-    predict = lambda prefix: predict_ch8(prefix, 50, model, vocab, ctx)
+        def updater(batch_size):
+            return trainer.step(batch_size)
+    else:
+        def updater(batch_size):
+            return d2l.sgd(model.params, lr, batch_size)
+
+    def predict(prefix):
+        return predict_ch8(prefix, 50, model, vocab, ctx)
+
     # Train and check the progress.
     for epoch in range(num_epochs):
         ppl, speed = train_epoch_ch8(
@@ -245,7 +256,7 @@ num_epochs, lr = 500, 1
 train_ch8(model, train_iter, vocab, lr, num_epochs, ctx)
 ```
 
-Finally let us check the results to use a random sampling iterator.
+Finally let's check the results to use a random sampling iterator.
 
 ```{.python .input}
 train_ch8(model, train_iter, vocab, lr, num_epochs, ctx, use_random_iter=True)

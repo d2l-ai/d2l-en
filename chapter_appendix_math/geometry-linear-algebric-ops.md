@@ -1,12 +1,12 @@
 # Geometry and Linear Algebraic Operations
-:label:`sec_linear_algebra`
+:label:`sec_geometry-linear-algebric-ops`
 
-In :numref:`sec_scalar-tensor`, we encountered the basics of linear algebra
+In :numref:`sec_linear-algebra`, we encountered the basics of linear algebra
 and saw how it could be used to express common operations for transforming our data.
 Linear algebra is one of the key mathematical pillars
 underlying much of the work that we do deep learning 
 and in machine learning more broadly.
-While :numref:`sec_scalar-tensor` contained enough machinery
+While :numref:`sec_linear-algebra` contained enough machinery
 to communicate the mechanics of modern deep learning models, 
 there is a lot more to the subject.
 In this section, we will go deeper,
@@ -83,7 +83,7 @@ that takes us from the point $\mathbf{u}$ to the point $\mathbf{v}$.
 
 
 ## Dot Products and Angles
-As we saw in :numref:`sec_scalar-tensor`, 
+As we saw in :numref:`sec_linear-algebra`, 
 if we take two column vectors say $\mathbf{u}$ and $\mathbf{v}$,
 we can form their dot product by computing:
 
@@ -104,7 +104,7 @@ The dot product :eqref:`eq_dot_def` also admits a geometric interpretation: it i
 ![Between any two vectors in the plane there is a well defined angle $\theta$.  We will see this angle is intimately tied to the dot product.](../img/VecAngle.svg)
 :label:`fig_angle`
 
-To start, let us consider two specific vectors:
+To start, let's consider two specific vectors:
 
 $$
 \mathbf{v} = (r,0) \; \text{and} \; \mathbf{w} = (s\cos(\theta), s \sin(\theta)).
@@ -211,7 +211,7 @@ of a line (two dimensions) or of a plane (three dimensions).
 In an $n$-dimensional vector space, a hyperplane has $d-1$ dimensions
 and divides the space into two half-spaces. 
 
-Let us start with an example.
+Let's start with an example.
 Suppose that we have a column vector $\mathbf{w}=[2,1]^\top$. We want to know, "what are the points $\mathbf{v}$ with $\mathbf{w}\cdot\mathbf{v} = 1$?"
 By recalling the connection between dot products and angles above :eqref:`eq_angle_forumla`, 
 we can see that this is equivalent to 
@@ -288,7 +288,7 @@ ave_0 = np.mean(X_train_0, axis=0)
 ave_1 = np.mean(X_train_1, axis=0)
 ```
 
-It can be informative to examine these averages in detail, so let us plot what they look like.  In this case, we see that the average indeed resembles a blurry image of a t-shirt.
+It can be informative to examine these averages in detail, so let's plot what they look like.  In this case, we see that the average indeed resembles a blurry image of a t-shirt.
 
 ```{.python .input}
 # Plot average t-shirt
@@ -318,7 +318,7 @@ np.mean(predictions.astype(y_test.dtype) == y_test, dtype=np.float64)
 
 ## Geometry of Linear Transformations
 
-Through :numref:`sec_scalar-tensor` and the above discussions, 
+Through :numref:`sec_linear-algebra` and the above discussions, 
 we have a solid understanding of the geometry of vectors, lengths, and angles. 
 However, there is one important object we have omitted discussing, 
 and that is a geometric understanding of linear transformations represented by matrices.  Fully internalizing what matrices can do to transform data 
@@ -361,7 +361,7 @@ These vectors are an example a *basis*,
 where we can write any vector in our space 
 as a weighted sum of these *basis vectors*.
 
-Let us draw what happens when we use the specific matrix
+Let's draw what happens when we use the specific matrix
 
 $$
 \mathbf{A} = \begin{bmatrix}
@@ -426,7 +426,7 @@ This compresses the entire plane down to live on the single line $y = 2x$.
 The question now arises: is there some way we can detect this
 just looking at the matrix itself?
 The answer is that indeed we can.
-Let us take $\mathbf{b}_1 = [2,4]^\top$ and $\mathbf{b}_2 = [-1, -2]^\top$ 
+Let's take $\mathbf{b}_1 = [2,4]^\top$ and $\mathbf{b}_2 = [-1, -2]^\top$ 
 be the two columns of $\mathbf{B}$.
 Remember that we can write everything transformed by the matrix $\mathbf{B}$
 as a weighted sum of the columns of the matrix: 
@@ -646,7 +646,7 @@ we can see with some computation that the area
 of the resulting parallelogram is $ad-bc$.
 This area is referred to as the *determinant*.
 
-Let us check this quickly with some example code.
+Let's check this quickly with some example code.
 
 ```{.python .input}
 import numpy as np
@@ -659,9 +659,9 @@ For the negative term, this is a matter of convention
 taken generally in mathematics: 
 if the matrix flips the figure, 
 we say the area is negated.
-Let us see now that when the determinant is zero, we learn more.
+Let's see now that when the determinant is zero, we learn more.
 
-Let us consider
+Let's consider
 
 $$
 \mathbf{B} = \begin{bmatrix}
@@ -698,7 +698,7 @@ that $n\times n$ matrices scale $n$-dimensional volumes.
 
 ## Tensors and Common Linear Algebra Operations
 
-In :numref:`sec_scalar-tensor` the concept of tensors was introduced.
+In :numref:`sec_linear-algebra` the concept of tensors was introduced.
 In this section, we will dive more deeply into tensor contractions 
 (the tensor equivalent of matrix multiplication),
 and see how it can provide a unified view 
@@ -743,7 +743,7 @@ $$
 
 ### Common Examples from Linear Algebra
 
-Let us see how many of the linear algebraic definitions 
+Let's see how many of the linear algebraic definitions 
 we have seen before can be expressed in this compressed tensor notation:
 
 * $\mathbf{v} \cdot \mathbf{w} = \sum_i v_iw_i$
@@ -756,7 +756,7 @@ In this way, we can replace a myriad of specialized notations with short tensor 
 
 ### Expressing in Code
 Tensors may flexibly be operated on in code as well.
-As seen in :numref:`sec_scalar-tensor`, 
+As seen in :numref:`sec_linear-algebra`, 
 we can create tensors as is shown below.
 
 ```{.python .input}
@@ -847,4 +847,4 @@ $$
 
 ## [Discussions](https://discuss.mxnet.io/t/5147)
 
-![](../img/qr_linear-algebra.svg)
+![](../img/qr_geometry-linear-algebric-ops.svg)

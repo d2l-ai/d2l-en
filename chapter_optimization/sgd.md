@@ -7,7 +7,7 @@ In this section, we are going to introduce the basic principles of stochastic gr
 %matplotlib inline
 import d2l
 import math
-from mxnet import np, npx 
+from mxnet import np, npx
 npx.set_np()
 ```
 
@@ -36,17 +36,21 @@ This means that, on average, the stochastic gradient is a good estimate of the g
 Now, we will compare it to gradient descent by adding random noise with a mean of 0 to the gradient to simulate a SGD.
 
 ```{.python .input  n=3}
-def f(x1, x2): return x1 ** 2 + 2 * x2 ** 2   # objective
-def gradf(x1, x2): return (2 * x1, 4 * x2)    # gradient
-def sgd(x1, x2, s1, s2):                      # simulate noisy gradient
-    global lr                                 # learning rate scheduler
-    (g1, g2) = gradf(x1, x2)                  # compute gradient
+def f(x1, x2):
+    return x1 ** 2 + 2 * x2 ** 2  # Objective
+
+def gradf(x1, x2):
+    return (2 * x1, 4 * x2)  # Gradient
+
+def sgd(x1, x2, s1, s2):  # Simulate noisy gradient
+    global lr  # Learning rate scheduler
+    (g1, g2) = gradf(x1, x2)  # Compute gradient
     (g1, g2) = (g1 + np.random.normal(0.1), g2 + np.random.normal(0.1))
-    eta_t = eta * lr()                        # learning rate at time t
-    return (x1 - eta_t * g1, x2 - eta_t * g2, 0, 0) # update variables
+    eta_t = eta * lr()  # Learning rate at time t
+    return (x1 - eta_t * g1, x2 - eta_t * g2, 0, 0)  # Update variables
 
 eta = 0.1
-lr = (lambda: 1)                              # constant learning rate
+lr = (lambda: 1)  # Constant learning rate
 d2l.show_trace_2d(f, d2l.train_2d(sgd, steps=50))
 ```
 
@@ -66,14 +70,16 @@ $$
 \end{aligned}
 $$
 
-In the first scenario we decrease the learning rate, e.g., whenever progress in optimization has stalled. This is a common strategy for training deep networks. Alternatively we could decrease it much more aggressively by an exponential decay. Unfortunately this leads to premature stopping before the algorithm has converged. A popular choice is polynomial decay with $\alpha = 0.5$. In the case of convex optimization there are a number of proofs which show that this rate is well behaved. Let us see what this looks like in practice.
+In the first scenario we decrease the learning rate, e.g., whenever progress in optimization has stalled. This is a common strategy for training deep networks. Alternatively we could decrease it much more aggressively by an exponential decay. Unfortunately this leads to premature stopping before the algorithm has converged. A popular choice is polynomial decay with $\alpha = 0.5$. In the case of convex optimization there are a number of proofs which show that this rate is well behaved. Let's see what this looks like in practice.
 
 ```{.python .input  n=4}
 def exponential():
-    global ctr; ctr += 1
+    global ctr
+    ctr += 1
     return math.exp(-0.1 * ctr)
 
-ctr = 1; lr = exponential   # set up learning rate
+ctr = 1
+lr = exponential  # Set up learning rate
 d2l.show_trace_2d(f, d2l.train_2d(sgd, steps=1000))
 ```
 
@@ -81,14 +87,16 @@ As expected, the variance in the parameters is significantly reduced. However, t
 
 ```{.python .input  n=5}
 def polynomial():
-    global ctr; ctr += 1
+    global ctr
+    ctr += 1
     return (1 + 0.1 * ctr)**(-0.5)
 
-ctr = 1; lr = polynomial    # set up learning rate
+ctr = 1
+lr = polynomial  # Set up learning rate
 d2l.show_trace_2d(f, d2l.train_2d(sgd, steps=50))
 ```
 
-There exist many more choices for how to set the learning rate. For instance, we could start with a small rate, then rapidly ramp up and then decrease it again, albeit more slowly. We could even alternate between smaller and larger learning rates. There exists a large variety of such schedules. For now let us focus on learning rate schedules for which a comprehensive theoretical analysis is possible, i.e., on learning rates in a convex setting. For general nonconvex problems it is very difficult to obtain meaningful convergence guarantees, since in general minimizing nonlinear nonconvex problems is NP hard. For a survey see e.g., the excellent [lecture notes](https://www.stat.cmu.edu/~ryantibs/convexopt-F15/lectures/26-nonconvex.pdf) of Tibshirani 2015.
+There exist many more choices for how to set the learning rate. For instance, we could start with a small rate, then rapidly ramp up and then decrease it again, albeit more slowly. We could even alternate between smaller and larger learning rates. There exists a large variety of such schedules. For now let's focus on learning rate schedules for which a comprehensive theoretical analysis is possible, i.e., on learning rates in a convex setting. For general nonconvex problems it is very difficult to obtain meaningful convergence guarantees, since in general minimizing nonlinear nonconvex problems is NP hard. For a survey see e.g., the excellent [lecture notes](https://www.stat.cmu.edu/~ryantibs/convexopt-F15/lectures/26-nonconvex.pdf) of Tibshirani 2015.
 
 ## Convergence Analysis for Convex Objectives
 
@@ -99,7 +107,7 @@ $$w_{t+1} = w_{t} - \eta_t \partial_w l(x_t, w)$$
 
 In particular, assume that $x_t$ is drawn from some distribution $p(x)$ and that $l(x, w)$ is a convex function in $w$ for all $x$. Last denote by
 
-$$R(w) = \mathbf{E}_{x \sim p}[l(x, w)]$$
+$$R(w) = E_{x \sim p}[l(x, w)]$$
 
 the expected risk and by $R^*$ its minimum with regard to $w$. Last let $w^*$ be the minimizer (we assume that it exists within the domain which $w$ is defined). In this case we can track the distance between the current parameter $w_t$ and the risk minimizer $w^*$ and see whether it improves over time.
 
@@ -128,11 +136,11 @@ This means that we make progress as long as the expected difference between curr
 
 Next we take expectations over this expression. This yields
 
-$$\mathbf{E}_{w_t}\left[\|w_{t} - w^*\|^2\right] - \mathbf{E}_{w_{t+1}|w_t}\left[\|w_{t+1} - w^*\|^2\right] \geq 2 \eta_t [\mathbf{E}[R[w_t]] - R^*] -  \eta_t^2 L^2.$$
+$$E_{w_t}\left[\|w_{t} - w^*\|^2\right] - E_{w_{t+1}|w_t}\left[\|w_{t+1} - w^*\|^2\right] \geq 2 \eta_t [E[R[w_t]] - R^*] -  \eta_t^2 L^2.$$
 
 The last step involves summing over the inequalities for $t \in \{t, \ldots, T\}$. Since the sum telescopes and by dropping the lower term we obtain
 
-$$\|w_{0} - w^*\|^2 \geq 2 \sum_{t=1}^T \eta_t [\mathbf{E}[R[w_t]] - R^*] - L^2 \sum_{t=1}^T \eta_t^2.$$
+$$\|w_{0} - w^*\|^2 \geq 2 \sum_{t=1}^T \eta_t [E[R[w_t]] - R^*] - L^2 \sum_{t=1}^T \eta_t^2.$$
 
 Note that we exploited that $w_0$ is given and thus the expectation can be dropped. Last define
 
@@ -140,15 +148,15 @@ $$\bar{w} := \frac{\sum_{t=1}^T \eta_t w_t}{\sum_{t=1}^T \eta_t}.$$
 
 Then by convexity it follows that
 
-$$\sum_t \eta_t \mathbf{E}[R[w_t]] \geq \sum \eta_t \cdot \left[\mathbf{E}[\bar{w}]\right].$$
+$$\sum_t \eta_t E[R[w_t]] \geq \sum \eta_t \cdot \left[E[\bar{w}]\right].$$
 
 Plugging this into the above inequality yields the bound
 
 $$
-\left[\mathbf{E}[\bar{w}]\right] - R^* \leq \frac{r^2 + L^2 \sum_{t=1}^T \eta_t^2}{2 \sum_{t=1}^T \eta_t}
+\left[E[\bar{w}]\right] - R^* \leq \frac{r^2 + L^2 \sum_{t=1}^T \eta_t^2}{2 \sum_{t=1}^T \eta_t}
 $$
 
-Here $r^2 := \|w_0 - w^*\|^2$ is a bound on the distance between the initial choice of parameters and the final outcome. In short, the speed of convergence depends on how rapidly the loss function changes via the Lipschitz constant $L$ and how far away from optimality the initial value is $r$. Note that the bound is in terms of $\bar{w}$ rather than $w_T$. This is the case since $\bar{w}$ is a smoothed version of the optimization path. Now let us analyze some choices for $\eta_t$.
+Here $r^2 := \|w_0 - w^*\|^2$ is a bound on the distance between the initial choice of parameters and the final outcome. In short, the speed of convergence depends on how rapidly the loss function changes via the Lipschitz constant $L$ and how far away from optimality the initial value is $r$. Note that the bound is in terms of $\bar{w}$ rather than $w_T$. This is the case since $\bar{w}$ is a smoothed version of the optimization path. Now let's analyze some choices for $\eta_t$.
 
 * **Known Time Horizon** - whenever $r, L$ and $T$ are known we can pick $\eta = r/L \sqrt{T}$. This yields as upper bound $r L (1 + 1/T)/2\sqrt{T} < rL/\sqrt{T}$. That is, we converge with rate $O(1/\sqrt{T})$ to the optimal solution.
 * **Unknown Time Horizon** - whenever we want to have a good solution for *any* time $T$ we can pick $\eta = O(1/\sqrt{T})$. This costs us an extra logarithmic factor and it leads to an upper bound of the form $O(\log T / \sqrt{T})$.

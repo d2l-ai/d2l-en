@@ -24,7 +24,7 @@ class CenteredLayer(nn.Block):
         return x - x.mean()
 ```
 
-To see how it works let us feed some data into the layer.
+To see how it works let's feed some data into the layer.
 
 ```{.python .input  n=2}
 layer = CenteredLayer()
@@ -39,7 +39,7 @@ net.add(nn.Dense(128), CenteredLayer())
 net.initialize()
 ```
 
-Let us see whether the centering layer did its job. For that we send random data through the network and check whether the mean vanishes. Note that since we are dealing with floating point numbers, we are going to see a very small albeit typically nonzero number.
+Let's see whether the centering layer did its job. For that we send random data through the network and check whether the mean vanishes. Note that since we are dealing with floating point numbers, we are going to see a very small albeit typically nonzero number.
 
 ```{.python .input  n=4}
 y = net(np.random.uniform(size=(4, 8)))
@@ -48,7 +48,7 @@ y.mean()
 
 ## Layers with Parameters
 
-Now that we know how to define layers in principle, let us define layers with parameters. These can be adjusted through training. In order to simplify things for an avid deep learning researcher the `Parameter` class and the `ParameterDict` dictionary provide some basic housekeeping functionality. In particular, they govern access, initialization, sharing, saving and loading model parameters. For instance, this way we do not need to write custom serialization routines for each new custom layer.
+Now that we know how to define layers in principle, let's define layers with parameters. These can be adjusted through training. In order to simplify things for an avid deep learning researcher the `Parameter` class and the `ParameterDict` dictionary provide some basic housekeeping functionality. In particular, they govern access, initialization, sharing, saving and loading model parameters. For instance, this way we do not need to write custom serialization routines for each new custom layer.
 
 For instance, we can use the member variable `params` of the `ParameterDict` type that comes with the Block class. It is a dictionary that maps string type parameter names to model parameters in the `Parameter` type.  We can create a `Parameter` instance from `ParameterDict` via the `get` function.
 
@@ -58,7 +58,7 @@ params.get('param2', shape=(2, 3))
 params
 ```
 
-Let us use this to implement our own version of the dense layer. It has two parameters - bias and weight. To make it a bit nonstandard, we bake in the ReLU activation as default. Next, we implement a fully connected layer with both weight and bias parameters.  It uses ReLU as an activation function, where `in_units` and `units` are the number of inputs and the number of outputs, respectively.
+Let's use this to implement our own version of the dense layer. It has two parameters - bias and weight. To make it a bit nonstandard, we bake in the ReLU activation as default. Next, we implement a fully connected layer with both weight and bias parameters.  It uses ReLU as an activation function, where `in_units` and `units` are the number of inputs and the number of outputs, respectively.
 
 ```{.python .input  n=19}
 class MyDense(nn.Block):
@@ -88,7 +88,7 @@ dense.initialize()
 dense(np.random.uniform(size=(2, 5)))
 ```
 
-We can also construct models using custom layers. Once we have that we can use it just like the built-in dense layer. The only exception is that in our case size inference is not automagic. Please consult the [MXNet documentation](http://www.mxnet.io) for details on how to do this.
+We can also construct models using custom layers. Once we have that we can use it just like the built-in dense layer. The only exception is that in our case size inference is not automatic. Please consult the [MXNet documentation](http://www.mxnet.io) for details on how to do this.
 
 ```{.python .input  n=19}
 net = nn.Sequential()

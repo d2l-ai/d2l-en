@@ -6,7 +6,7 @@ In :numref:`sec_basic_gan`, we introduced the basic ideas behind how GANs work. 
 In this section, we will demonstrate how you can use GANs to generate photorealistic images. We will be basing our models on the deep convolutional GANs (DCGAN) introduced in :cite:`Radford.Metz.Chintala.2015`. We will borrow the convolutional architecture that have proven so successful for discriminative computer vision problems and show how via GANs, they can be leveraged to generate photorealistic images.
 
 ```{.python .input  n=1}
-from mxnet import gluon, autograd, init, np, npx
+from mxnet import gluon, init, np, npx
 from mxnet.gluon import nn
 import d2l
 import zipfile
@@ -42,7 +42,7 @@ data_iter = gluon.data.DataLoader(
     shuffle=True, num_workers=d2l.get_dataloader_workers())
 ```
 
-Let us visualize the first 20 images.
+Let's visualize the first 20 images.
 
 ```{.python .input  n=4}
 d2l.set_figsize((4, 4))
@@ -150,7 +150,6 @@ class D_block(nn.Block):
         return self.activation(self.batch_norm(self.conv2d(X)))
 ```
 
-
 A basic block with default settings will halve the width and height of the inputs, as we demonstrated in :numref:`sec_padding`. For example, given a input shape $n_h = n_w = 16 $, with a kernel shape $k_h = k_w = 4$, a stride shape $s_h = s_w = 2$, and a padding shape $p_h = p_w = 1$, the output shape will be:
 
 $$
@@ -214,11 +213,12 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
             Z = np.random.normal(0, 1, size=(batch_size, latent_dim, 1, 1))
             X, Z = X.as_in_context(ctx), Z.as_in_context(ctx),
             metric.add(d2l.update_D(X, Z, net_D, net_G, loss, trainer_D),
-                        d2l.update_G(Z, net_D, net_G, loss, trainer_G),
-                        batch_size)
+                       d2l.update_G(Z, net_D, net_G, loss, trainer_G),
+                       batch_size)
         # Show generated examples
         Z = np.random.normal(0, 1, size=(21, latent_dim, 1, 1), ctx=ctx)
-        fake_x = net_G(Z).transpose(0, 2, 3, 1)/2+0.5  # Noramlize the synthetic data to N(0, 1)
+        # Noramlize the synthetic data to N(0, 1)
+        fake_x = net_G(Z).transpose(0, 2, 3, 1)/2+0.5
         imgs = np.concatenate(
             [np.concatenate([fake_x[i * 7 + j] for j in range(7)], axis=1)
              for i in range(len(fake_x)//7)], axis=0)
@@ -229,10 +229,9 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
         animator.add(epoch, (loss_D, loss_G))
     print('loss_D %.3f, loss_G %.3f, %d examples/sec on %s' % (
         loss_D, loss_G, metric[2]/timer.stop(), ctx))
-
 ```
 
-Now let us train the model.
+Now let's train the model.
 
 ```{.python .input  n=21}
 latent_dim, lr, num_epochs = 100, 0.005, 40

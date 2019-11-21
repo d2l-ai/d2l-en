@@ -34,14 +34,15 @@ npx.set_np()
 # Sample datapoints and create y coordinate
 epsilon = 0.1
 random.seed(8675309)
-xs = np.random.normal(loc=0, scale=1, size=(300, ))
-ys = [np.sum(np.exp(-(xs[0:i] - xs[i])**2/(2 * epsilon**2)) / 
-      np.sqrt(2*np.pi*epsilon**2))/len(xs) for i in range(len(xs))]
+xs = np.random.normal(loc=0, scale=1, size=(300,))
+
+ys = [np.sum(np.exp(-(xs[0:i] - xs[i])**2 / (2 * epsilon**2))
+             / np.sqrt(2*np.pi*epsilon**2)) / len(xs) for i in range(len(xs))]
 
 # Compute true density
-xd = np.arange(np.min(xs), np.max(xs),0.01)
-yd = np.exp(-xd**2/2)/np.sqrt(2*np.pi)
-    
+xd = np.arange(np.min(xs), np.max(xs), 0.01)
+yd = np.exp(-xd**2/2) / np.sqrt(2 * np.pi)
+
 # Plot the results
 d2l.plot(xd, yd, 'x', 'density')
 d2l.plt.scatter(xs, ys)
@@ -51,7 +52,7 @@ d2l.plt.title("Sample Mean: {:.2f}".format(float(np.mean(xs))))
 d2l.plt.show()
 ```
 
-There can be many ways to compute an estimator of a parameter $\hat{\theta_n}$.  In this section, we introduce three common methods to evaluate and compare estimators: the mean squared error, the standard deviation, and statistical bias. 
+There can be many ways to compute an estimator of a parameter $\hat{\theta}_n$.  In this section, we introduce three common methods to evaluate and compare estimators: the mean squared error, the standard deviation, and statistical bias. 
 
 ### Mean Squared Error
 
@@ -68,7 +69,7 @@ This allows us to quantify the average squared deviation from the true value.  M
 The MSE provides a natural metric, but we can easily imagine multiple different phenomena that might make it large.  Two that we will see are fundamentally important are the fluctuation in the estimator due to randomness in the dataset, and systematic error in the estimator due to the estimation procedure.  
 
 
-First, let us measure the systematic error. For an estimator $\hat{\theta}_n$, the mathematical illustration of *statistical bias* can be defined as
+First, let's measure the systematic error. For an estimator $\hat{\theta}_n$, the mathematical illustration of *statistical bias* can be defined as
 
 $$\mathrm{bias}(\hat{\theta}_n) = E(\hat{\theta}_n - \theta) = E(\hat{\theta}_n) - \theta.$$
 :eqlabel:`eq_bias`
@@ -81,7 +82,7 @@ It is worth being aware, however, that biased estimators are frequently used in 
 
 ### Variance and Standard Deviation
 
-Second, let us measure the randomness in the estimator.  Recall from :numref:`sec_random_variables`, the *standard deviation* (or *standard error*) is defined as the squared root of the variance.  We may measure the degree of fluctuation of an estimator by measuring the standard deviation or variance of that estimator.
+Second, let's measure the randomness in the estimator.  Recall from :numref:`sec_random_variables`, the *standard deviation* (or *standard error*) is defined as the squared root of the variance.  We may measure the degree of fluctuation of an estimator by measuring the standard deviation or variance of that estimator.
 
 $$\sigma_{\hat{\theta}_n} = \sqrt{\mathrm{Var} (\hat{\theta}_n )} = \sqrt{E[(\hat{\theta}_n - E(\hat{\theta}_n))^2]}.$$
 :eqlabel:`eq_var_est`
@@ -118,7 +119,7 @@ def mse(data, true_theta):
     return(np.mean(np.square(data - true_theta)))
 ```
 
-To illustrate the equation of the bias-variance trade-off, let us simulate of normal distribution $\mathcal{N}(\theta, \sigma^2)$ with $10,000$ samples. Here, we use a $\theta = 1$ and $\sigma = 4$. As the estimator is a function of the given samples, here we use the mean of the samples as an estimator for true $\theta$ in this normal distribution $\mathcal{N}(\theta, \sigma^2)$ .
+To illustrate the equation of the bias-variance trade-off, let's simulate of normal distribution $\mathcal{N}(\theta, \sigma^2)$ with $10,000$ samples. Here, we use a $\theta = 1$ and $\sigma = 4$. As the estimator is a function of the given samples, here we use the mean of the samples as an estimator for true $\theta$ in this normal distribution $\mathcal{N}(\theta, \sigma^2)$ .
 
 ```{.python .input}
 theta_true = 1
@@ -129,7 +130,7 @@ theta_est = np.mean(samples)
 theta_est
 ```
 
-Let us validate the trade-off equation by calculating the summation of the squared bias and the variance of our estimator. First, calculate the MSE of our estimator.
+Let's validate the trade-off equation by calculating the summation of the squared bias and the variance of our estimator. First, calculate the MSE of our estimator.
 
 ```{.python .input}
 mse(samples, theta_true)
@@ -215,7 +216,7 @@ Normally there are two kinds of significance test: the one-sided test and the tw
 
 ### General Steps of Hypothesis Testing
 
-After getting familiar with the above concepts, let us go through the general steps of hypothesis testing.
+After getting familiar with the above concepts, let's go through the general steps of hypothesis testing.
 
 1. State the question and establish a null hypotheses $H_0$.
 2. Set the statistical significance level $\alpha$ and a statistical power ($1 - \beta$).
@@ -233,7 +234,7 @@ Hypothesis testing is applicable in a variety of scenarios such as the clinical 
 
 When estimating the value of a parameter $\theta$, point estimators like $\hat \theta$ are of limited utility since they contain no notion of uncertainty. Rather, it would be far better if we could produce an interval that would contain the true parameter $\theta$ with high probability.  If you were interested in such ideas a century ago, then you would have been excited to read "Outline of a Theory of Statistical Estimation Based on the Classical Theory of Probability" by Jerzy Neyman :cite:`Neyman.1937`, who first introduced the concept of confidence interval in 1937.
 
-To be useful, a confidence interval should be as small as possible for a given degree of certainty. Let us see how to derive it.
+To be useful, a confidence interval should be as small as possible for a given degree of certainty. Let's see how to derive it.
 
 
 ### Definition
@@ -261,7 +262,7 @@ Sufficed to say, confidence intervals are subtle objects.  However, if you keep 
 
 ### A Gaussian Example
 
-Let us discuss the most classical example, the confidence interval for the mean of a Gaussian of unknown mean and variance.  Suppose we collect $n$ samples $\{x_i\}_{i=1}^n$ from our Gaussian $\mathcal{N}(\mu, \sigma^2)$.  We can compute estimators for the mean and standard deviation by taking
+Let's discuss the most classical example, the confidence interval for the mean of a Gaussian of unknown mean and variance.  Suppose we collect $n$ samples $\{x_i\}_{i=1}^n$ from our Gaussian $\mathcal{N}(\mu, \sigma^2)$.  We can compute estimators for the mean and standard deviation by taking
 
 $$\hat\mu_n = \frac{1}{n}\sum_{i=1}^n x_i \;\text{and}\; \hat\sigma^2_n = \frac{1}{n-1}\sum_{i=1}^n (x_i - \hat\mu)^2.$$
 
@@ -286,21 +287,21 @@ Thus we know that we have found our $95\%$ confidence interval:
 $$\left[\hat\mu_n - 1.96\frac{\hat\sigma_n}{\sqrt{n}}, \hat\mu_n + 1.96\frac{\hat\sigma_n}{\sqrt{n}}\right].$$
 :eqlabel:`eq_gauss_confidence`
 
-It is safe to say that :eqref:`eq_gauss_confidence` is one of the most used formula in statistics.  Let us close our discussion of statistics by implementing it.  For simplicity, we assume we are in the asymptotic regime.  Small values of $N$ should include the correct value of `t_star` obtained either programmatically or from a $t$-table.
+It is safe to say that :eqref:`eq_gauss_confidence` is one of the most used formula in statistics.  Let's close our discussion of statistics by implementing it.  For simplicity, we assume we are in the asymptotic regime.  Small values of $N$ should include the correct value of `t_star` obtained either programmatically or from a $t$-table.
 
 ```{.python .input}
 # Number of samples
-N = 1000     
+N = 1000
 
 # Sample dataset
-samples = np.random.normal(loc=0, scale=1, size=(N, ))
+samples = np.random.normal(loc=0, scale=1, size=(N,))
 
-# Lookup Students's t-distribution c.d.f
+# Lookup Students's t-distribution c.d.f.
 t_star = 1.96
 
 # Construct interval
 mu_hat = np.mean(samples)
-sigma_hat = samples.std(ddof = 1)
+sigma_hat = samples.std(ddof=1)
 (mu_hat - t_star*sigma_hat/np.sqrt(N), mu_hat + t_star*sigma_hat/np.sqrt(N))
 ```
 

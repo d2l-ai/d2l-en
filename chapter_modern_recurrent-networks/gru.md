@@ -3,7 +3,7 @@
 
 In the previous section, we discussed how gradients are calculated in a recurrent
 neural network. In particular we found that long products of matrices can lead
-to vanishing or divergent gradients. Let us briefly think about what such
+to vanishing or divergent gradients. Let's briefly think about what such
 gradient anomalies mean in practice:
 
 * We might encounter a situation where an early observation is highly
@@ -30,7 +30,7 @@ will discuss in :numref:`sec_lstm`. Gated Recurrent Unit (GRU)
 :cite:`Cho.Van-Merrienboer.Bahdanau.ea.2014` is a slightly more streamlined
 variant that often offers comparable performance and is significantly faster to
 compute. See also :cite:`Chung.Gulcehre.Cho.ea.2014` for more
-details. Due to its simplicity, let us start with the GRU.
+details. Due to its simplicity, let's start with the GRU.
 
 
 ## Gating the Hidden State
@@ -80,7 +80,7 @@ $$\tilde{\mathbf{H}}_t = \tanh(\mathbf{X}_t \mathbf{W}_{xh} + \left(\mathbf{R}_t
 
 ### Update Gates in Action
 
-Next we need to incorporate the effect of the update gate $\mathbf{Z}_t$. This determines the extent to which the new state $\mathbf{H}_t$ is just the old state $\mathbf{H}_{t-1}$ and by how much the new candidate state $\tilde{\mathbf{H}}_t$ is used. The gating variable $\mathbf{Z}_t$ can be used for this purpose, simply by taking elementwise convex combinations between both candidates. This leads to the final update equation for the GRU.
+Next we need to incorporate the effect of the update gate $\mathbf{Z}_t$, as shown in :numref:`fig_gru_3`. This determines the extent to which the new state $\mathbf{H}_t$ is just the old state $\mathbf{H}_{t-1}$ and by how much the new candidate state $\tilde{\mathbf{H}}_t$ is used. The gating variable $\mathbf{Z}_t$ can be used for this purpose, simply by taking elementwise convex combinations between both candidates. This leads to the final update equation for the GRU.
 
 $$\mathbf{H}_t = \mathbf{Z}_t \odot \mathbf{H}_{t-1}  + (1 - \mathbf{Z}_t) \odot \tilde{\mathbf{H}}_t.$$
 
@@ -95,7 +95,7 @@ Whenever the update gate $\mathbf{Z}_t$ is close to $1$, we simply retain the ol
 
 ## Implementation from Scratch
 
-To gain a better understanding of the model, let us implement a GRU from scratch.
+To gain a better understanding of the model, let's implement a GRU from scratch.
 
 ### Reading the Dataset
 
@@ -111,17 +111,22 @@ batch_size, num_steps = 32, 35
 train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 ```
 
-### Initialize Model Parameters
+### Initializing Model Parameters
 
 The next step is to initialize the model parameters. We draw the weights from a Gaussian with variance to be $0.01$ and set the bias to $0$. The hyperparameter `num_hiddens` defines the number of hidden units. We instantiate all weights and biases relating to the update gate, the reset gate, and the candidate hidden state itself. Subsequently, we attach gradients to all the parameters.
 
 ```{.python .input  n=2}
 def get_params(vocab_size, num_hiddens, ctx):
     num_inputs = num_outputs = vocab_size
-    normal = lambda shape : np.random.normal(scale=0.01, size=shape, ctx=ctx)
-    three = lambda : (normal((num_inputs, num_hiddens)),
-                      normal((num_hiddens, num_hiddens)),
-                      np.zeros(num_hiddens, ctx=ctx))
+
+    def normal(shape):
+        return np.random.normal(scale=0.01, size=shape, ctx=ctx)
+
+    def three():
+        return (normal((num_inputs, num_hiddens)),
+                normal((num_hiddens, num_hiddens)),
+                np.zeros(num_hiddens, ctx=ctx))
+
     W_xz, W_hz, b_z = three()  # Update gate parameter
     W_xr, W_hr, b_r = three()  # Reset gate parameter
     W_xh, W_hh, b_h = three()  # Candidate hidden state parameter
@@ -135,7 +140,7 @@ def get_params(vocab_size, num_hiddens, ctx):
     return params
 ```
 
-### Define the Model
+### Defining the Model
 
 Now we will define the hidden state initialization function `init_gru_state`. Just like the `init_rnn_state` function defined in :numref:`sec_rnn_scratch`, this function returns an `ndarray` with a shape (batch size, number of hidden units) whose values are all zeros.
 
@@ -171,7 +176,6 @@ num_epochs, lr = 500, 1
 model = d2l.RNNModelScratch(len(vocab), num_hiddens, ctx, get_params,
                             init_gru_state, gru)
 d2l.train_ch8(model, train_iter, vocab, lr, num_epochs, ctx)
-
 ```
 
 ## Concise Implementation

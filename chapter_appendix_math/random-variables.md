@@ -9,7 +9,7 @@ Continuous random variables are a significantly more subtle topic than discrete 
 
 ### From Discrete to Continuous
 
-To understand the additional technical challenges encountered when working with continuous random variables, let us perform a thought experiment.  Suppose that we are throwing a dart at the dart board, and we want to know the probability that it hits exactly $2 \text{cm}$ from the center of the board.
+To understand the additional technical challenges encountered when working with continuous random variables, let's perform a thought experiment.  Suppose that we are throwing a dart at the dart board, and we want to know the probability that it hits exactly $2 \text{cm}$ from the center of the board.
 
 To start with, we imagine measuring to a single digit of accuracy, that is to say with bins for $0 \text{cm}$, $1 \text{cm}$, $2 \text{cm}$, and so on.  We throw say $100$ darts at the dart board, and if $20$ of them fall into the bin for $2\text{cm}$ we conclude that $20\%$ of the darts we throw hit the board $2 \text{cm}$ away from the center.
 
@@ -17,7 +17,7 @@ However, when we look closer, this does not match our question!  We wanted exact
 
 Undeterred, we continue further.  We measure even more precisely, say $1.9\text{cm}$, $2.0\text{cm}$, $2.1\text{cm}$, and now see that perhaps $3$ of the $100$ darts hit the board in the $2.0\text{cm}$ bucket.  Thus we conclude the probability is $3\%$.
 
-However, this does not solve anything!  We have just pushed the issue down one digit further.  Let us abstract a bit. Imagine we know the probability that the first $k$ digits match with $2.00000\ldots$ and we want to know the probability it matches for the first $k+1$ digits. It is fairly reasonable to assume that the $k+1$-st digit is essentially a random choice from the set $\{0, 1, 2, \ldots, 9\}$.  At least, I cannot conceive of a physically meaningful process which would force the number of micrometers away form the center to prefer to end in a $7$ vs a $3$.  
+However, this does not solve anything!  We have just pushed the issue down one digit further.  Let's abstract a bit. Imagine we know the probability that the first $k$ digits match with $2.00000\ldots$ and we want to know the probability it matches for the first $k+1$ digits. It is fairly reasonable to assume that the ${k+1}^{\mathrm{th}}$ digit is essentially a random choice from the set $\{0, 1, 2, \ldots, 9\}$.  At least, we cannot conceive of a physically meaningful process which would force the number of micrometers away form the center to prefer to end in a $7$ vs a $3$.  
 
 What this means is that in essence each additional digit of accuracy we require should decrease probability of matching by a factor of $10$.  Or put another way, we would expect that 
 
@@ -33,12 +33,12 @@ $$
 P(\text{distance is in an}\; \epsilon\text{-sized interval around}\; 2 ) \approx \epsilon \cdot p.
 $$
 
-Let us take this one final step further.  We have been thinking about the point $2$ the entire time, but never thinking about other points.  Nothing is different there fundamentally, but it is the case that the value $p$ will likely be different.  We would at least hope that a dart thrower was more likely to hit a point near the center, like $2\text{cm}$ rather than $20\text{cm}$.  Thus, the value $p$ is not fixed, but rather should depend on the point $x$.  This tells us that we should expect
+Let's take this one final step further.  We have been thinking about the point $2$ the entire time, but never thinking about other points.  Nothing is different there fundamentally, but it is the case that the value $p$ will likely be different.  We would at least hope that a dart thrower was more likely to hit a point near the center, like $2\text{cm}$ rather than $20\text{cm}$.  Thus, the value $p$ is not fixed, but rather should depend on the point $x$.  This tells us that we should expect
 
 $$P(\text{distance is in an}\; \epsilon \text{-sized interval around}\; x ) \approx \epsilon \cdot p(x).$$
 :eqlabel:`eq_pdf_deriv`
 
-Indeed, :eqref:`eq_pdf_deriv` precisely defines the *probability density function*.  It is a function $p(x)$ which encodes the relative probability of hitting near one point versus another.  Let us visualize what such a function might look like.
+Indeed, :eqref:`eq_pdf_deriv` precisely defines the *probability density function*.  It is a function $p(x)$ which encodes the relative probability of hitting near one point versus another.  Let's visualize what such a function might look like.
 
 ```{.python .input}
 %matplotlib inline
@@ -59,16 +59,16 @@ The locations where the function value is large indicates regions where we are m
 
 ### Probability Density Functions
 
-Let us now investigate this further.  We have already seen what a probability density function is intuitively for a random variable $X$, namely the density function is a function $p(x)$ so that 
+Let's now investigate this further.  We have already seen what a probability density function is intuitively for a random variable $X$, namely the density function is a function $p(x)$ so that 
 
 $$P(X \; \text{is in an}\; \epsilon \text{-sized interval around}\; x ) \approx \epsilon \cdot p(x).$$
 :eqlabel:`eq_pdf_def`
 
-but what does this imply for the properties of $p(x)$?
+But what does this imply for the properties of $p(x)$?
 
 First, probabilities are never negative, thus we should expect that $p(x) \ge 0$ as well.  
 
-Second, let us imagine that we slice up the $\mathbb{R}$ into an infinite number of slices which are $\epsilon$ wide, say with slices $(\epsilon\cdot i, \epsilon \cdot (i+1)]$.  For each of these, we know from :eqref:`eq_pdf_def` the probability is approximately
+Second, let's imagine that we slice up the $\mathbb{R}$ into an infinite number of slices which are $\epsilon$ wide, say with slices $(\epsilon\cdot i, \epsilon \cdot (i+1)]$.  For each of these, we know from :eqref:`eq_pdf_def` the probability is approximately
 
 $$
 P(X \; \text{is in an}\; \epsilon\text{-sized interval around}\; x ) \approx \epsilon \cdot p(\epsilon \cdot i),
@@ -125,11 +125,11 @@ We interpret this function by using integration to obtain the probability our ra
 $$P(X\in(a, b]) = \int _ {a}^{b} p(x) \; dx.$$
 :eqlabel:`eq_pdf_int_int`
 
-In :label:`sec_distributions` we will see a number of common distributions, but let us continue working in the abstract.
+In :numref:`sec_distributions` we will see a number of common distributions, but let's continue working in the abstract.
 
 ### Cumulative Distribution Functions
 
-In the previous section, we saw the notion of the p.d.f.  In practice, this is a commonly encountered method to discuss continuous random variables, but it has one significant pitfall: that the values of the p.d.f. are not themselves probabilities, but rather a function that we must integrate to yield probabilities.  There is nothing wrong with a density being larger than $10$, as long as it is not larger than $10$ for more than an interval of length $1/10$!  This can be counter-intuitive, so people often also think in terms of the *cumulative distribution function*, or c.d.f., which *is* a probability.
+In the previous section, we saw the notion of the p.d.f.  In practice, this is a commonly encountered method to discuss continuous random variables, but it has one significant pitfall: that the values of the p.d.f. are not themselves probabilities, but rather a function that we must integrate to yield probabilities.  There is nothing wrong with a density being larger than $10$, as long as it is not larger than $10$ for more than an interval of length $1/10$.  This can be counter-intuitive, so people often also think in terms of the *cumulative distribution function*, or c.d.f., which *is* a probability.
 
 In particular, by using :eqref:`eq_pdf_int_int`, we define the c.d.f. for a random variable $X$ with density $p(x)$ by
 
@@ -137,7 +137,7 @@ $$
 F(x) = \int _ {-\infty}^{x} p(x) \; dx = P(X \le x).
 $$
 
-Let us observe a few properties.
+Let's observe a few properties.
 
 * $F(x) \rightarrow 0$ as $x\rightarrow -\infty$.
 * $F(x) \rightarrow 1$ as $x\rightarrow \infty$.
@@ -148,8 +148,8 @@ With the fourth bullet point, note that this would not be true if $X$ were discr
 
 $$
 F(x) = \begin{cases}
-0 & x < 0 \\
-\frac{1}{2} & x < 1 \\
+0 & x < 0, \\
+\frac{1}{2} & x < 1, \\
 1 & x \ge 1.
 \end{cases}
 $$
@@ -167,7 +167,7 @@ $$\mu_X = E[X] = \sum_i x_i p_i.$$
 
 The way we should interpret the mean (albeit with caution) is that it tells us essentially where the random variable tends to be located.  
 
-As a minimalistic example that we will examine throughout this section, let us take $X$ to be the random variable which takes the value $a-2$ with probability $p$, $a+2$ with probability $p$ and $a$ with probability $1-2p$.  We can compute using :eqref:`eq_exp_def` that, for any possible choice of $a$ and $p$, the mean is
+As a minimalistic example that we will examine throughout this section, let's take $X$ to be the random variable which takes the value $a-2$ with probability $p$, $a+2$ with probability $p$ and $a$ with probability $1-2p$.  We can compute using :eqref:`eq_exp_def` that, for any possible choice of $a$ and $p$, the mean is
 
 $$
 \mu_X = E[X] = \sum_i x_i p_i = (a-2)p + a(1-2p) + (a+2)p = a.
@@ -175,9 +175,9 @@ $$
 
 Thus we see that the mean is $a$.  This matches the intuition since $a$ is the location around which we centered our random variable.
 
-Because they are helpful, let us summarize a few properties:
+Because they are helpful, let's summarize a few properties.
 
-* For any random variable $X$ and numbers $a$ and $b$, we have that $\mu_{aX+b} = a\mu_X + b$
+* For any random variable $X$ and numbers $a$ and $b$, we have that $\mu_{aX+b} = a\mu_X + b$.
 * If we have two random variables $X$ and $Y$, we have $\mu_{X+Y} = \mu_X+\mu_Y$.
 
 Means are useful for understanding the average behavior of a random variable, however the mean is not sufficient to even have a full intuitive understanding.  Making a profit of $\$10 \pm \$1$ per sale is very different from making $\$10 \pm \$15$ per sale despite having the same average value.  The second one has a much larger degree of fluctuation, and thus represents a much larger risk.  Thus, to understand the behavior of a random variable, we will need at minimum one more measure: some measure of how widely a random variable fluctuates.
@@ -195,7 +195,7 @@ $$\sigma_X^2 = \mathrm{Var}(X) = E\left[(X-\mu_X)^2\right] = E[X^2] - \mu_X^2.$$
 
 The last equality in :eqref:`eq_var_def` holds by expanding out the definition in the middle, and applying the properties of expectation.
 
-Let us look at our example where $X$ is the random variable which takes the value $a-2$ with probability $p$, $a+2$ with probability $p$ and $a$ with probability $1-2p$.  In this case $\mu_X = a$, so all we need to compute is $E\left[X^2\right]$.  This can readily be done:
+Let's look at our example where $X$ is the random variable which takes the value $a-2$ with probability $p$, $a+2$ with probability $p$ and $a$ with probability $1-2p$.  In this case $\mu_X = a$, so all we need to compute is $E\left[X^2\right]$.  This can readily be done:
 
 $$
 E\left[X^2\right] = (a-2)^2p + a^2(1-2p) + (a+2)p = a^2 + 8p.
@@ -209,17 +209,17 @@ $$
 
 This result again makes sense.  The largest $p$ can be is $1/2$ which corresponds to picking $a-2$ or $a+2$ with a coin flip.  The variance of this being $4$ corresponds to the fact that both $a-2$ and $a+2$ are $2$ units away from the mean, and $2^2 = 4$.  On the other end of the spectrum, if $p=0$, this random variable always takes the value $0$ and so it has no variance at all.
 
-We will list a few properties of variances below.
+We will list a few properties of variance below:
 
-* For any random variable $X$, $\mathrm{Var}(X) \ge 0$.
-* For any random variable $X$ and numbers $a$ and $b$, we have that $\mathrm{Var}(aX+b) = a^2\mathrm{Var}(X)$
+* For any random variable $X$, $\mathrm{Var}(X) \ge 0$, with $\mathrm{Var}(X) = 0$ if and only if $X$ is a constant. 
+* For any random variable $X$ and numbers $a$ and $b$, we have that $\mathrm{Var}(aX+b) = a^2\mathrm{Var}(X)$.
 * If we have two *independent* random variables $X$ and $Y$, we have $\mathrm{Var}(X+Y) = \mathrm{Var}(X) + \mathrm{Var}(Y)$.
 
-When interpreting these values, there can be a bit of a hiccup.  In particular, let us try imagining what happens if we keep track of units through this computation.  Suppose that we are working with the star rating assigned to a product on the web page.  Then $a$, $a-2$, and $a+2$ are all measured in units of stars.  Similarly, the mean $\mu_X$ is then also measured in stars (being a weighted average).  However, if we get to the variance, we immediately encounter an issue, which is we want to look at $(X-\mu_X)^2$, which is in units of *squared stars*.  This means that the variance itself is not comparable to the original measurements.  To make it interpretable, we will need to return to our original units.
+When interpreting these values, there can be a bit of a hiccup.  In particular, let's try imagining what happens if we keep track of units through this computation.  Suppose that we are working with the star rating assigned to a product on the web page.  Then $a$, $a-2$, and $a+2$ are all measured in units of stars.  Similarly, the mean $\mu_X$ is then also measured in stars (being a weighted average).  However, if we get to the variance, we immediately encounter an issue, which is we want to look at $(X-\mu_X)^2$, which is in units of *squared stars*.  This means that the variance itself is not comparable to the original measurements.  To make it interpretable, we will need to return to our original units.
 
 ### Standard Deviations
 
-This can be fixed: take the square root!  Thus we define the *standard deviation* to be
+This summary statistics can always be deduced from the variance by taking the square root!  Thus we define the *standard deviation* to be
 
 $$
 \sigma_X = \sqrt{\mathrm{Var}(X)}.
@@ -227,20 +227,20 @@ $$
 
 In our example, this means we now have the standard deviation is $\sigma_X = 2\sqrt{2p}$.  If we are dealing with units of stars for our review example, $\sigma_X$ is again in units of stars.
 
-The properties we had for variances can be restated for standard deviations.
+The properties we had for the variance can be restated for the standard deviation.
 
 * For any random variable $X$, $\sigma_{X} \ge 0$.
 * For any random variable $X$ and numbers $a$ and $b$, we have that $\sigma_{aX+b} = |a|\sigma_{X}$
 * If we have two *independent* random variables $X$ and $Y$, we have $\sigma_{X+Y} = \sqrt{\sigma_{X}^2 + \sigma_{Y}^2}$.
 
-It is natural at this moment to ask, "If the standard deviation is in the units of our original random variable, does it represent something I can draw with regards to that random variable?"  The answer is a resounding yes!  Indeed much like the mean told we the typical location of our random variable, the standard deviation gives the typical range of variation of that random variable.  We can make this rigorous with what is known as Chebychev's inequality:
+It is natural at this moment to ask, "If the standard deviation is in the units of our original random variable, does it represent something we can draw with regards to that random variable?"  The answer is a resounding yes!  Indeed much like the mean told we the typical location of our random variable, the standard deviation gives the typical range of variation of that random variable.  We can make this rigorous with what is known as Chebychev's inequality:
 
 $$P\left(X \not\in [\mu_X - \alpha\sigma_X, \mu_X + \alpha\sigma_X]\right) \le \frac{1}{\alpha^2}.$$
 :eqlabel:`eq_chebychev`
 
-Or to state it verbally in the case of $\alpha=10$: $99\%$ of the samples from any random variable fall within $10$ standard deviations of the mean.  This gives an immediate interpretation to our standard summary statistics.
+Or to state it verbally in the case of $\alpha=10$, $99\%$ of the samples from any random variable fall within $10$ standard deviations of the mean.  This gives an immediate interpretation to our standard summary statistics.
 
-To see how this statement is rather subtle, lets take a look at our running example again where  $X$ is the random variable which takes the value $a-2$ with probability $p$, $a+2$ with probability $p$ and $a$ with probability $1-2p$.  We saw that the mean was $a$ and the standard deviation was $2\sqrt{2p}$.  This means, if we take Chebychev's inequality :eqref:`eq_chebychev` with $\alpha = 2$, we see that the expression is
+To see how this statement is rather subtle, let's take a look at our running example again where  $X$ is the random variable which takes the value $a-2$ with probability $p$, $a+2$ with probability $p$ and $a$ with probability $1-2p$.  We saw that the mean was $a$ and the standard deviation was $2\sqrt{2p}$.  This means, if we take Chebychev's inequality :eqref:`eq_chebychev` with $\alpha = 2$, we see that the expression is
 
 $$
 P\left(X \not\in [a - 4\sqrt{2p}, a + 4\sqrt{2p}]\right) \le \frac{1}{4}.
@@ -248,7 +248,7 @@ $$
 
 This means that $75\%$ of the time, this random variable will fall within this interval for any value of $p$.  Now, notice that as $p \rightarrow 0$, this interval also converges to the single point $a$.  But we know that our random variable takes the values $a-2, a$, and $a+2$ only so eventually we can be certain $a-2$ and $a+2$ will fall outside the interval!  The question is, at what $p$ does that happen.  So we want to solve: for what $p$ does $a+4\sqrt{2p} = a+2$, which is solved when $p=1/8$, which is *exactly* the first $p$ where it could possibly happen without violating our claim that no more than $1/4$ of samples from the distribution would fall outside the interval ($1/8$ to the left, and $1/8$ to the right).
 
-Let's visualize this.  I will show the probability of getting the three values as three vertical bars with height proportional to the probability.  The interval will be drawn as a horizontal line in the middle.  The first plot shows what happens for $p > 1/8$ where the interval safely contains all points.
+Let's visualize this.  We will show the probability of getting the three values as three vertical bars with height proportional to the probability.  The interval will be drawn as a horizontal line in the middle.  The first plot shows what happens for $p > 1/8$ where the interval safely contains all points.
 
 ```{.python .input}
 # Define a helper to plot these figures
@@ -308,11 +308,11 @@ $$
 \sigma^2_X = E[X^2] - \mu_X^2 = \int_{-\infty}^\infty x^2p_X(x) \; dx - \left(\int_{-\infty}^\infty xp_X(x) \; dx\right)^2.
 $$
 
-Everything stated above about the mean, variance, and standard deviation above still apply in this case.  For instance, if we consider the random variable with density 
+Everything stated above about the mean, the variance, and the standard deviation above still apply in this case.  For instance, if we consider the random variable with density 
 
 $$
 p(x) = \begin{cases}
-1 & x \in [0,1] \\
+1 & x \in [0,1], \\
 0 & \text{otherwise}.
 \end{cases}
 $$ 
@@ -329,7 +329,7 @@ $$
 \sigma_X^2 = \int_{-\infty}^\infty x^2p(x) \; dx - \left(\frac{1}{2}\right)^2 = \frac{1}{3} - \frac{1}{4} = \frac{1}{12}.
 $$
 
-As a warning, let us examine one more example, known as the *Cauchy distribution*.  This is the distribution with p.d.f. given by
+As a warning, let's examine one more example, known as the *Cauchy distribution*.  This is the distribution with p.d.f. given by
 
 $$
 p(x) = \frac{1}{1+x^2}.
@@ -345,13 +345,13 @@ d2l.plot(x, p, 'x', 'p.d.f.')
 
 This function looks innocent, and indeed consulting a table of integrals will show it has area one under it, and thus it defines a continuous random variable.
 
-To see what goes astray, let us try to compute the variance of this.  This would involve using :eqref:`eq_var_def` computing
+To see what goes astray, let's try to compute the variance of this.  This would involve using :eqref:`eq_var_def` computing
 
 $$
 \int_{-\infty}^\infty \frac{x^2}{1+x^2}\; dx.
 $$
 
-The function on the inside looks like this
+The function on the inside looks like this:
 
 ```{.python .input}
 # Plot the integrand needed to compute the variance
@@ -369,21 +369,21 @@ $$
 
 This means it does not have a well-defined finite variance.  
 
-However, looking deeper shows an even more disturbing result.  Let us try to compute the mean using :eqref:`eq_exp_def`.  Using the change of variables formula, we see
+However, looking deeper shows an even more disturbing result.  Let's try to compute the mean using :eqref:`eq_exp_def`.  Using the change of variables formula, we see
 
 $$
 \mu_X = \int_{-\infty}^{\infty} \frac{x}{1+x^2} \; dx = \frac{1}{2}\int_1^\infty \frac{1}{u} \; du. 
 $$
 
-The integral inside is the definition of the logarithm, so this is in essence $\log(\infty) = \infty$, so there is no well defined average value either!  
+The integral inside is the definition of the logarithm, so this is in essence $\log(\infty) = \infty$, so there is no well-defined average value either!  
 
-Machine learning scientists define their models so that we most often do not need to deal with these issues, and will in the vast majority of cases deal with random variables with well defined means and variances.  However, every so often random variables with *heavy tails* (that is those random variables where the probabilities of getting large values are large enough to make things like the mean or variance undefined) are helpful in modeling physical systems, thus it is worth knowing that they exist.
+Machine learning scientists define their models so that we most often do not need to deal with these issues, and will in the vast majority of cases deal with random variables with well-defined means and variances.  However, every so often random variables with *heavy tails* (that is those random variables where the probabilities of getting large values are large enough to make things like the mean or variance undefined) are helpful in modeling physical systems, thus it is worth knowing that they exist.
 
 ### Joint Density Functions
 
 The above work all assumes we are working with a single real valued random variable.  But what if we are dealing with two or more potentially highly correlated random variables?  This circumstance is the norm in machine learning: imagine random variables like $R_{i, j}$ which encode the red value of the pixel at the $(i, j)$ coordinate in an image, or $P_t$ which is a random variable given by a stock price at time $t$.  Nearby pixels tend to have similar color, and nearby times tend to have similar prices.  We cannot treat them as separate random variables, and expect to create a successful model (we will see in :numref:`sec_naive_bayes` a model that under-performs due to such an assumption).  We need to develop the mathematical language to handle these correlated continuous random variables.
 
-Thankfully, with the multiple integrals in :ref:`sec_integral_calculus` we can develop such a language.  Suppose that we have, for simplicity, two random variables $X, Y$ which can be correlated.  Then, similar to the case of a single variable, we can ask the question,
+Thankfully, with the multiple integrals in :ref:`sec_integral_calculus` we can develop such a language.  Suppose that we have, for simplicity, two random variables $X, Y$ which can be correlated.  Then, similar to the case of a single variable, we can ask the question:
 
 $$
 P(X \;\text{is in an}\; \epsilon \text{-sized interval around}\; x \; \text{and} \;Y \;\text{is in an}\; \epsilon \text{-sized interval around}\; y ).
@@ -397,8 +397,8 @@ $$
 
 for some function $p(x, y)$.  This is referred to as the joint density of $X$ and $Y$.  Similar properties are true for this as we saw in the single variable case. Namely:
 
-* $p(x, y) \ge 0$
-* $\int _ {\mathbb{R}^2} p(x, y) \;dx \;dy = 1$
+* $p(x, y) \ge 0$;
+* $\int _ {\mathbb{R}^2} p(x, y) \;dx \;dy = 1$;
 * $P((X, Y) \in \mathcal{D}) = \int _ {\mathcal{D}} p(x, y) \;dx \;dy$.
 
 In this way, we can deal with multiple, potentially correlated random variables.  If we wish to work with more than two random variables, we can extend the multivariate density to as many coordinates as desired by considering $p(\mathbf{x}) = p(x_1, \ldots, x_n)$.  The same properties of being non-negative, and having total integral of one still hold.
@@ -406,7 +406,7 @@ In this way, we can deal with multiple, potentially correlated random variables.
 ### Marginal Distributions
 When dealing with multiple variables, we often times want to be able to ignore the relationships and ask, "how is this one variable distributed?"  Such a distribution is called a *marginal distribution*.  
 
-To be concrete, let us suppose that we have two random variables $X, Y$ with joint density given by $p _ {X, Y}(x, y)$.  I will be using the subscript to indicate what random variables the density is for.  The question of finding the marginal distribution is taking this function, and using it to find $p _ X(x)$.
+To be concrete, let's suppose that we have two random variables $X, Y$ with joint density given by $p _ {X, Y}(x, y)$.  We will be using the subscript to indicate what random variables the density is for.  The question of finding the marginal distribution is taking this function, and using it to find $p _ X(x)$.
 
 As with most things, it is best to return to the intuitive picture to figure out what should be true.  Recall that the density is the function $p _ X$ so that
 
@@ -414,7 +414,7 @@ $$
 P(X \in [x, x+\epsilon]) \approx \epsilon \cdot p _ X(x).
 $$
 
-This has no mention of $Y$, but if all we are given is $p _{X, Y}$, we need to include $Y$ somehow. We can first observe that this is the same as
+There is no mention of $Y$, but if all we are given is $p _{X, Y}$, we need to include $Y$ somehow. We can first observe that this is the same as
 
 $$
 P(X \in [x, x+\epsilon] \text{, and } Y \in \mathbb{R}) \approx \epsilon \cdot p _ X(x).
@@ -453,29 +453,29 @@ This tells us that to get a marginal distribution, we integrate over the variabl
 
 When dealing with multiple random variables, there is one additional summary statistic which is helpful to know: the *covariance*.  This measures the degree that two random variable fluctuate together.
 
-Suppose that we have two random variables $X$ and $Y$, to begin with, let us suppose they are discrete, taking on values $(x_i, y_j)$ with probability $p_{ij}$.  In this case, the covariance is defined as
+Suppose that we have two random variables $X$ and $Y$, to begin with, let's suppose they are discrete, taking on values $(x_i, y_j)$ with probability $p_{ij}$.  In this case, the covariance is defined as
 
-$$\sigma_{XY} = \mathrm{Cov}(X, Y) = \sum_{i, j} (x_i - \mu_X) (y_j-\mu_Y) p_{ij}. = E[XY] - E[X]E[Y]$$
+$$\sigma_{XY} = \mathrm{Cov}(X, Y) = \sum_{i, j} (x_i - \mu_X) (y_j-\mu_Y) p_{ij}. = E[XY] - E[X]E[Y].$$
 :eqlabel:`eq_cov_def`
 
 To think about this intuitively: consider the following pair of random variables.  Suppose that $X$ takes the values $1$ and $3$, and $Y$ takes the values $-1$ and $3$.  Suppose that we have the following probabilities
 
 $$
 \begin{aligned}
-P(X = 1 \; \text{and} \; Y = -1) & = \frac{p}{2} \\
-P(X = 1 \; \text{and} \; Y = 3) & = \frac{1-p}{2} \\
-P(X = 3 \; \text{and} \; Y = -1) & = \frac{1-p}{2} \\
-P(X = 3 \; \text{and} \; Y = 3) & = \frac{p}{2} 
+P(X = 1 \; \text{and} \; Y = -1) & = \frac{p}{2}, \\
+P(X = 1 \; \text{and} \; Y = 3) & = \frac{1-p}{2}, \\
+P(X = 3 \; \text{and} \; Y = -1) & = \frac{1-p}{2}, \\
+P(X = 3 \; \text{and} \; Y = 3) & = \frac{p}{2}, 
 \end{aligned}
 $$
 
-where $p$ is a parameter in $[0,1]$ we get to pick.  Notice that if $p=1$ then they are both always their minimum or maximum values simultaneously, and if $p=0$ they are guaranteed to take their flipped values simultaneously (one is large when the other is small and vice versa).  If $p=1/2$, then the four possibilities are all equally likely, and neither should be related.  Let us compute the covariance.  First, note $\mu_X = 2$ and $\mu_Y = 1$, so we may compute using :eqref:`eq_cov_def`:
+where $p$ is a parameter in $[0,1]$ we get to pick.  Notice that if $p=1$ then they are both always their minimum or maximum values simultaneously, and if $p=0$ they are guaranteed to take their flipped values simultaneously (one is large when the other is small and vice versa).  If $p=1/2$, then the four possibilities are all equally likely, and neither should be related.  Let's compute the covariance.  First, note $\mu_X = 2$ and $\mu_Y = 1$, so we may compute using :eqref:`eq_cov_def`:
 
 $$
 \begin{aligned}
 \mathrm{Cov}(X, Y) & = \sum_{i, j} (x_i - \mu_X) (y_j-\mu_Y) p_{ij} \\
 & = (1-2)(-1-1)\frac{p}{2} + (1-2)(3-1)\frac{1-p}{2} + (3-2)(-1-1)\frac{1-p}{2} + (3-2)(3-1)\frac{p}{2} \\
-& = 4p-2
+& = 4p-2.
 \end{aligned}
 $$
 
@@ -489,7 +489,7 @@ $$
 \sigma_{XY} = \int_{\mathbb{R}^2} (x-\mu_X)(y-\mu_Y)p(x, y) \;dx \;dy.
 $$
 
-For visualization, let us take a look at a collection of random variables with tunable covariance.
+For visualization, let's take a look at a collection of random variables with tunable covariance.
 
 ```{.python .input}
 # Plot a few random variables adjustable covariance
@@ -507,11 +507,11 @@ for i in range(3):
 d2l.plt.show()
 ```
 
-Let us see some properties of covariances:
+Let's see some properties of covariances:
 
 * For any random variable $X$, $\mathrm{Cov}(X, X) = \mathrm{Var}(X)$.
 * For any random variables $X, Y$ and numbers $a$ and $b$, $\mathrm{Cov}(aX+b, Y) = \mathrm{Cov}(X, aY+b) = a\mathrm{Cov}(X, Y)$.
-* If $X$ and $Y$ are independent then $\mathrm{Cov}(X, Y) = 0$
+* If $X$ and $Y$ are independent then $\mathrm{Cov}(X, Y) = 0$.
 
 In addition, we can use the covariance to expand a relationship we saw before.  Recall that is $X$ and $Y$ are two independent random variables then
 
@@ -529,9 +529,9 @@ This allows us to generalize the variance summation rule for correlated random v
 
 ### Correlation
 
-As we did in the case of means and variances, let us now consider units.  If $X$ is measured in one unit (say inches), and $Y$ is measured in another (say dollars), the covariance is measured in the product of these two units $\text{inches}\cdot\text{dollars}$.  These units can be hard to interpret.  What we will often want in this case is a unit-less measurement of relatedness.  Indeed, often we do not care about exact quantitative correlation, but rather ask if the correlation is in the same direction, and how strong the relationship is.  
+As we did in the case of means and variances, let's now consider units.  If $X$ is measured in one unit (say inches), and $Y$ is measured in another (say dollars), the covariance is measured in the product of these two units $\text{inches} \times \text{dollars}$.  These units can be hard to interpret.  What we will often want in this case is a unit-less measurement of relatedness.  Indeed, often we do not care about exact quantitative correlation, but rather ask if the correlation is in the same direction, and how strong the relationship is.  
 
-To see what makes sense, let us perform a thought experiment.  Suppose that we convert our random variables in inches and dollars to be in inches and cents.  In this case the random variable $Y$ is multiplied by $100$.  If we work through the definition, this means that $\mathrm{Cov}(X, Y)$ will be multiplied by $100$.  Thus we see that in this case a change of units change the covariance by a factor of $100$.  Thus, to find our unit-invariant measure of correlation, we will need to divide by something else that also gets scaled by $100$.  Indeed we have a clear candidate, the standard deviation!  Indeed if we define the *correlation coefficient* to be
+To see what makes sense, let's perform a thought experiment.  Suppose that we convert our random variables in inches and dollars to be in inches and cents.  In this case the random variable $Y$ is multiplied by $100$.  If we work through the definition, this means that $\mathrm{Cov}(X, Y)$ will be multiplied by $100$.  Thus we see that in this case a change of units change the covariance by a factor of $100$.  Thus, to find our unit-invariant measure of correlation, we will need to divide by something else that also gets scaled by $100$.  Indeed we have a clear candidate, the standard deviation!  Indeed if we define the *correlation coefficient* to be
 
 $$\rho(X, Y) = \frac{\mathrm{Cov}(X, Y)}{\sigma_{X}\sigma_{Y}},$$
 :eqlabel:`eq_cor_def`
@@ -548,12 +548,9 @@ This now ranges between $-1$ and $1$ with the expected behavior of $1$ meaning m
 
 As another example, consider $X$ as any random variable, and $Y=aX+b$ as any linear deterministic function of $X$.  Then, one can compute that
 
-$$
-\begin{aligned}
-\sigma_{Y} & = \sigma_{aX+b} = |a|\sigma_{X} \\
-\mathrm{Cov}(X, Y) &= \mathrm{Cov}(X, aX+b) = a\mathrm{Cov}(X, X) = a\mathrm{Var}(X),
-\end{aligned}
-$$
+$$\sigma_{Y} = \sigma_{aX+b} = |a|\sigma_{X},$$
+
+$$\mathrm{Cov}(X, Y) = \mathrm{Cov}(X, aX+b) = a\mathrm{Cov}(X, X) = a\mathrm{Var}(X),$$
 
 and thus by :eqref:`eq_cor_def` that
 
@@ -563,7 +560,7 @@ $$
 
 Thus we see that the correlation is $+1$ for any $a > 0$, and $-1$ for any $a < 0$ illustrating that correlation measures the degree and directionality the two random variables are related, not the scale that the variation takes.
 
-Let us again plot a collection of random variables with tunable correlation.
+Let's again plot a collection of random variables with tunable correlation.
 
 ```{.python .input}
 # Plot a few random variables adjustable correlations
@@ -581,7 +578,7 @@ for i in range(3):
 d2l.plt.show()
 ```
 
-Let us list a few properties of correlation:
+Let's list a few properties of the correlation below.
 
 * For any random variable $X$, $\rho(X, X) = 1$.
 * For any random variables $X, Y$ and numbers $a$ and $b$, $\rho(aX+b, Y) = \rho(X, aY+b) = \rho(X, Y)$.
@@ -613,7 +610,7 @@ Indeed if we think of norms as being related to standard deviations, and correla
 * The covariance and correlation coefficient provide a way to measure any linear relationship between two correlated random variables.
 
 ## Exercises
-1. Suppose that I have the random variable with density given by $p(x) = \frac{1}{x^2}$ for $x \ge 1$ and $p(x) = 0$ otherwise.  What is $P(X > 2)$?
+1. Suppose that we have the random variable with density given by $p(x) = \frac{1}{x^2}$ for $x \ge 1$ and $p(x) = 0$ otherwise.  What is $P(X > 2)$?
 2. The Laplace distribution is a random variable whose density is given by $p(x = \frac{1}{2}e^{-|x|}$.  What is the mean and the standard deviation of this function?  As a hint, $\int_0^\infty xe^{-x} \; dx = 1$ and $\int_0^\infty x^2e^{-x} \; dx = 2$.
 3. I walk up to you on the street and say "I have a random variable with mean $1$, standard deviation $2$, and I observed $25\%$ of my samples taking a value larger than $9$."  Do you believe me?  Why or why not?
 4. Suppose that you have two random variables $X, Y$, with joint density given by $p_{XY}(x, y) = 4xy$ for $x, y \in [0,1]$ and $p_{XY}(x, y) = 0$ otherwise.  What is the covariance of $X$ and $Y$?

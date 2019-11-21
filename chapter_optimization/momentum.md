@@ -5,6 +5,7 @@ In :numref:`sec_sgd` we reviewed what happens when performing stochastic gradien
 
 ## Basics
 
+
 ### Leaky Averages
 
 The previous section saw us discussing minibatch SGD as a means for accelerating computation. It also had the nice side-effect that averaging gradients reduced the amount of variance.
@@ -17,7 +18,7 @@ It would be nice if we could benefit from the effect of variance reduction even 
 
 $$\mathbf{v}_t = \beta \mathbf{v}_{t-1} + \mathbf{g}_{t, t-1}$$
 
-for some $\beta \in (0, 1)$. This effectively replaces the instantaneous gradient by one that's been averaged over multiple *past* gradients. $\mathbf{v}$ is called *momentum*. It accumulates past gradients similar to how a heavy ball rolling down the objective function landscape integrates over past forces. To see what is happening in more detail let us expand $\mathbf{v}_t$ recursively into
+for some $\beta \in (0, 1)$. This effectively replaces the instantaneous gradient by one that's been averaged over multiple *past* gradients. $\mathbf{v}$ is called *momentum*. It accumulates past gradients similar to how a heavy ball rolling down the objective function landscape integrates over past forces. To see what is happening in more detail let's expand $\mathbf{v}_t$ recursively into
 
 $$\begin{aligned}
 \mathbf{v}_t = \beta^2 \mathbf{v}_{t-2} + \beta \mathbf{g}_{t-1, t-2} + \mathbf{g}_{t, t-1}
@@ -103,7 +104,7 @@ gammas = [0.95, 0.9, 0.6, 0]
 d2l.set_figsize((3.5, 2.5))
 for gamma in gammas:
     x = np.arange(40).asnumpy()
-    d2l.plt.plot(x, gamma ** x, label='gamma = %.2f'%gamma)
+    d2l.plt.plot(x, gamma ** x, label='gamma = %.2f' % gamma)
 d2l.plt.xlabel('time')
 d2l.plt.legend();
 ```
@@ -130,11 +131,11 @@ Let's see how this works in practice.
 
 ```{.python .input  n=15}
 def train_momentum(lr, momentum, num_epochs=2):
-    d2l.train_ch10(sgd_momentum, init_momentum_states(feature_dim),
+    d2l.train_ch11(sgd_momentum, init_momentum_states(feature_dim),
                    {'lr': lr, 'momentum': momentum}, data_iter,
                    feature_dim, num_epochs)
 
-data_iter, feature_dim = d2l.get_data_ch10(batch_size=10)
+data_iter, feature_dim = d2l.get_data_ch11(batch_size=10)
 train_momentum(0.02, 0.5)
 ```
 
@@ -155,10 +156,12 @@ train_momentum(0.005, 0.9)
 There's very little to do in Gluon since the standard `sgd` solver already had momentum built in. Setting matching parameters yields a very similar trajectory.
 
 ```{.python .input  n=9}
-d2l.train_gluon_ch10('sgd', {'learning_rate': 0.005, 'momentum': 0.9}, data_iter)
+d2l.train_gluon_ch11('sgd', {'learning_rate': 0.005, 'momentum': 0.9},
+                     data_iter)
 ```
 
 ## Theoretical Analysis
+
 
 ### Quadratic Convex Functions
 
@@ -204,7 +207,7 @@ eta = 0.1
 d2l.set_figsize((6, 4))
 for lam in lambdas:
     t = np.arange(20).asnumpy()
-    d2l.plt.plot(t, (1 - eta * lam) ** t, label='lambda = %.2f'%lam)
+    d2l.plt.plot(t, (1 - eta * lam) ** t, label='lambda = %.2f' % lam)
 d2l.plt.xlabel('time')
 d2l.plt.legend();
 ```

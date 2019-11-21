@@ -20,8 +20,6 @@ What is more, to better visualize the overall architecture of seq2seq with atten
 ![The layers in the sequence to sequence model with attention mechanism.](../img/seq2seq-attention-details.svg)
 :label:`fig_s2s_attention_details`
 
-$E_t^{'}$
-
 ```{.python .input  n=1}
 import d2l
 from mxnet import np, npx
@@ -41,7 +39,7 @@ Since the encoder of seq2seq with attention mechanism is the same as `Seq2SeqEnc
 
 In each timestep of the decoding, we use the output of the decoder's last RNN layer as the query for the attention layer. The attention model's output is then concatenated with the input embedding vector to feed into the RNN layer. Despite the RNN layer hidden state also contains history information from decoder, the attention output explicitly selects the encoder outputs based on the `enc_valid_len`, so that the attention output suspends other non-correlated information.
 
-Let us implement the `Seq2SeqAttentionDecoder` together, and see how it differs from the decoder in seq2seq model from :numref:`sec_seq2seq_decoder`.
+Let's implement the `Seq2SeqAttentionDecoder` together, and see how it differs from the decoder in seq2seq model from :numref:`sec_seq2seq_decoder`.
 
 ```{.python .input  n=2}
 class Seq2SeqAttentionDecoder(d2l.Decoder):
@@ -114,14 +112,14 @@ encoder = d2l.Seq2SeqEncoder(
 decoder = Seq2SeqAttentionDecoder(
     len(tgt_vocab), embed_size, num_hiddens, num_layers, dropout)
 model = d2l.EncoderDecoder(encoder, decoder)
-d2l.train_s2s_ch8(model, train_iter, lr, num_epochs, ctx)
+d2l.train_s2s_ch9(model, train_iter, lr, num_epochs, ctx)
 ```
 
 Last, we predict several sample examples.
 
 ```{.python .input  n=6}
 for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
-    print(sentence + ' => ' + d2l.predict_s2s_ch8(
+    print(sentence + ' => ' + d2l.predict_s2s_ch9(
         model, sentence, src_vocab, tgt_vocab, num_steps, ctx))
 ```
 

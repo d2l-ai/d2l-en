@@ -20,12 +20,13 @@ movies more accurately. But it is not just about movies.
 
 ## Statistical Tools
 
-In short, we need statistical tools and new deep neural networks architectures to deal with sequence data. To keep things simple, we use the stock price as an example.
+In short, we need statistical tools and new deep neural networks architectures to deal with sequence data. To keep things simple, we use the stock price illustrated in :numref:`fig_ftse100` as an example.
 
 ![FTSE 100 index over 30 years](../img/ftse100.png)
 :width:`600px`
+:label:`fig_ftse100`
 
-Let us denote the prices by $x_t \geq 0$, i.e., at time $t \in \mathbb{N}$ we observe some price $x_t$. For a trader to do well in the stock market on day $t$ he should want to predict $x_t$ via
+Let's denote the prices by $x_t \geq 0$, i.e., at time $t \in \mathbb{N}$ we observe some price $x_t$. For a trader to do well in the stock market on day $t$ he should want to predict $x_t$ via
 
 $$x_t \sim p(x_t \mid x_{t-1}, \ldots, x_1).$$
 
@@ -68,7 +69,7 @@ In fact, if we have a Markov model, we can obtain a reverse conditional probabil
 
 ## A Toy Example
 
-After so much theory, let us try this out in practice. Let us begin by generating some data. To keep things simple we generate our time series by using a sine function with some additive noise.
+After so much theory, let's try this out in practice. Let's begin by generating some data. To keep things simple we generate our time series by using a sine function with some additive noise.
 
 ```{.python .input}
 %matplotlib inline
@@ -131,7 +132,7 @@ train_net(net, train_iter, loss, 10, 0.01)
 
 ## Predictions
 
-Since both training and test loss are small, we would expect our model to work well. Let us see what this means in practice. The first thing to check is how well the model is able to predict what happens in the next timestep.
+Since both training and test loss are small, we would expect our model to work well. Let's see what this means in practice. The first thing to check is how well the model is able to predict what happens in the next timestep.
 
 ```{.python .input}
 estimates = net(features)
@@ -149,7 +150,7 @@ x_{602} & = f(x_{601}, \ldots, x_{598}) \\
 x_{603} & = f(x_{602}, \ldots, x_{599})
 \end{aligned}$$
 
-In other words, we will have to use our own predictions to make future predictions. Let us see how well this goes.
+In other words, we will have to use our own predictions to make future predictions. Let's see how well this goes.
 
 ```{.python .input}
 predictions = np.zeros(T)
@@ -162,9 +163,9 @@ d2l.plot([time, time[tau:], time[n_train:]],
          legend=['data', 'estimate', 'multistep'], figsize=(4.5, 2.5))
 ```
 
-As the above example shows, this is a spectacular failure. The estimates decay to a constant pretty quickly after a few prediction steps. Why did the algorithm work so poorly? This is ultimately due to the fact that the errors build up. Let us say that after step 1 we have some error $\epsilon_1 = \bar\epsilon$. Now the *input* for step 2 is perturbed by $\epsilon_1$, hence we suffer some error in the order of $\epsilon_2 = \bar\epsilon + L \epsilon_1$, and so on. The error can diverge rather rapidly from the true observations. This is a common phenomenon. For instance, weather forecasts for the next 24 hours tend to be pretty accurate but beyond that the accuracy declines rapidly. We will discuss methods for improving this throughout this chapter and beyond.
+As the above example shows, this is a spectacular failure. The estimates decay to a constant pretty quickly after a few prediction steps. Why did the algorithm work so poorly? This is ultimately due to the fact that the errors build up. Let's say that after step 1 we have some error $\epsilon_1 = \bar\epsilon$. Now the *input* for step 2 is perturbed by $\epsilon_1$, hence we suffer some error in the order of $\epsilon_2 = \bar\epsilon + L \epsilon_1$, and so on. The error can diverge rather rapidly from the true observations. This is a common phenomenon. For instance, weather forecasts for the next 24 hours tend to be pretty accurate but beyond that the accuracy declines rapidly. We will discuss methods for improving this throughout this chapter and beyond.
 
-Let us verify this observation by computing the $k$-step predictions on the entire sequence.
+Let's verify this observation by computing the $k$-step predictions on the entire sequence.
 
 ```{.python .input}
 k = 33  # Look up to k - tau steps ahead
@@ -178,7 +179,7 @@ for i in range(tau, k):  # Predict the (i-tau)-th step
 
 steps = (4, 8, 16, 32)
 d2l.plot([time[i:T-k+i] for i in steps], [features[i] for i in steps],
-         legend=['step %d'%i for i in steps], figsize=(4.5, 2.5))
+         legend=['step %d' % i for i in steps], figsize=(4.5, 2.5))
 ```
 
 This clearly illustrates how the quality of the estimates changes as we try to predict further into the future. While the 8-step predictions are still pretty good, anything beyond that is pretty useless.

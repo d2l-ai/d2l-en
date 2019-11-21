@@ -2,11 +2,11 @@
 :label:`sec_mlp_scratch`
 
 Now that we know how multilayer perceptrons (MLPs) work in theory,
-let us implement them. First, we import the required packages.
+let's implement them. First, we import the required packages.
 
 ```{.python .input  n=9}
 import d2l
-from mxnet import np, npx, gluon
+from mxnet import gluon, np, npx
 npx.set_np()
 ```
 
@@ -19,7 +19,7 @@ batch_size = 256
 train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
 ```
 
-## Initialize Model Parameters
+## Initializing Model Parameters
 
 Recall that this dataset contains 10 classes and that
 each image consists of a $28 \times 28 = 784$ grid of pixel values.
@@ -97,11 +97,11 @@ We set the number of epochs to $10$ and the learning rate to $0.5$.
 
 ```{.python .input  n=7}
 num_epochs, lr = 10, 0.5
-d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, 
-             lambda batch_size: d2l.sgd(params, lr, batch_size))
+d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs,
+              lambda batch_size: d2l.sgd(params, lr, batch_size))
 ```
 
-To see how well we did, let us apply the model to some test data.
+To see how well we did, let's apply the model to some test data.
 If you are interested, compare the result to corresponding linear model in :numref:`sec_softmax_scratch`.
 
 ```{.python .input}
