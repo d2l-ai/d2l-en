@@ -1,4 +1,5 @@
 # Networks with Parallel Concatenations (GoogLeNet)
+:label:`sec_googlenet`
 
 In 2014, :cite:`Szegedy.Liu.Jia.ea.2015`
 won the ImageNet Challenge, proposing a structure
