@@ -78,7 +78,7 @@ from mxnet import np, npx
 from mxnet.gluon import nn
 npx.set_np()
 
-# factory for networks
+# Factory for networks
 def get_net():
     net = nn.HybridSequential()  
     net.add(nn.Dense(256, activation='relu'),
@@ -109,7 +109,7 @@ To demonstrate the performance improvement gained by compilation we compare the 
 def benchmark(net, x):
     timer = d2l.Timer()
     for i in range(1000): net(x)
-    npx.waitall() # wait for all computations to finish
+    npx.waitall() # Wait for all computations to finish
     return timer.stop()
 
 net = get_net()
@@ -191,7 +191,7 @@ This is quite different from what we saw previously. All print statements, as de
 
 ## Exercises
 
-1. Design a network using the `HybridConcurrent` class. Alternatively look at :ref:`sec_googlenet` for a network to compose.
+1. Design a network using the `HybridConcurrent` class. Alternatively look at :numref:`sec_googlenet` for a network to compose.
 1. Add `x.asnumpy()` to the first line of the `hybrid_forward` function of the HybridNet class in this section. Execute the code and observe the errors you encounter. Why do they happen?
 1. What happens if we add control flow, i.e., the Python statements `if` and `for` in the `hybrid_forward` function?
 1. Review the models that interest you in the previous chapters and use the HybridBlock class or HybridSequential class to implement them.
