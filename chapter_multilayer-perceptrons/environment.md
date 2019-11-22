@@ -35,7 +35,7 @@ In this section, we describe some common concerns
 and aim to get you started acquiring the critical thinking
 that you will need in order to detect these situations early,
 mitigate the damage, and use machine learning responsibly.
-Some of the solutions are simple (ask for the 'right' data)
+Some of the solutions are simple (ask for the "right" data)
 some are technically difficult (implement a reinforcement learning system),
 and others require that we enter the realm of philosophy
 and grapple with difficult questions concerning ethics and informed consent.
@@ -209,19 +209,19 @@ Since real annotated data is expensive to get,
 they had the (smart and questionable) idea
 to use synthetic data from a game rendering engine
 as additional training data.
-This worked really well on 'test data' drawn from the rendering engine.
+This worked really well on "test data" drawn from the rendering engine.
 Alas, inside a real car it was a disaster.
 As it turned out, the roadside had been rendered
 with a very simplistic texture.
 More importantly, *all* the roadside had been rendered
 with the *same* texture and the roadside detector
-learned about this 'feature' very quickly.
+learned about this "feature" very quickly.
 
 A similar thing happened to the US Army
 when they first tried to detect tanks in the forest.
 They took aerial photographs of the forest without tanks,
 then drove the tanks into the forest and took another set of pictures.
-The so-trained classifier worked 'perfectly'.
+The so-trained classifier worked "perfectly".
 Unfortunately, all it had learned was to distinguish trees
 with shadows from trees without shadows---the
 first set of pictures was taken in the early morning, the second one at noon.
@@ -274,7 +274,7 @@ $$
 
 Statisticians call the first term an *empirical average*,
 i.e., an average computed over the data drawn from $P(x) P(y \mid x)$.
-If the data is drawn from the 'wrong' distribution $q$,
+If the data is drawn from the "wrong" distribution $q$,
 we can correct for that by using the following simple identity:
 
 $$
@@ -295,7 +295,7 @@ including some fancy operator-theoretic approaches
 that attempt to recalibrate the expectation operator directly
 using a minimum-norm or a maximum entropy principle.
 Note that for any such approach, we need samples
-drawn from both distributions---the 'true' $p$, e.g.,
+drawn from both distributions---the "true" $p$, e.g.,
 by access to training data, and the one used
 for generating the training set $q$ (the latter is trivially available).
 Note however, that we only need samples $\mathbf{x} \sim q(\mathbf{x})$;

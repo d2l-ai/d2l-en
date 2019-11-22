@@ -162,7 +162,7 @@ say $f, g: \mathbb{R}^d \to R$ is defined as
 $$[f \circledast g](x) = \int_{\mathbb{R}^d} f(z) g(x-z) dz$$
 
 That is, we measure the overlap between $f$ and $g$
-when both functions are shifted by $x$ and 'flipped'.
+when both functions are shifted by $x$ and "flipped".
 Whenever we have discrete objects, the integral turns into a sum.
 For instance, for vectors defined on $\ell_2$, i.e.,
 the set of square summable infinite dimensional vectors
@@ -185,7 +185,7 @@ We will come back to this in the following section.
 
 Let's see what this looks like if we want to build an improved Waldo detector. The convolutional layer picks windows of a given size
 and weighs intensities according to the mask $V$, as demonstrated in :numref:`fig_waldo_mask`.
- We expect that wherever the 'waldoness' is highest,
+ We expect that wherever the "waldoness" is highest,
  we will also find a peak in the hidden layer activations.
 
 ![Find Waldo.](../img/waldo-mask.jpg)

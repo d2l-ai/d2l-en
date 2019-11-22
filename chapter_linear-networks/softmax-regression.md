@@ -319,8 +319,8 @@ $$
 
 One of the fundamental theorems of information theory states 
 that in order to encode data drawn randomly from the distribution $p$,
-we need at least $H[p]$ 'nats' to encode it. 
-If you wonder what a 'nat' is, it is the equivalent of bit 
+we need at least $H[p]$ "nats" to encode it. 
+If you wonder what a "nat" is, it is the equivalent of bit 
 but when using a code with base $e$ rather than one with base 2. 
 One nat is $\frac{1}{\log(2)} \approx 1.44$ bit. 
 $H[p] / 2$ is often also called the binary entropy.

@@ -230,7 +230,7 @@ where the compute order on the graph is reversed.
 One of the consequences is that we need to retain
 the intermediate values until backpropagation is complete.
 This is also one of the reasons why backpropagation
-requires significantly more memory than plain 'inference'---we end up
+requires significantly more memory than plain "inference"---we end up
 computing tensors as gradients
 and need to retain all the intermediate variables
 to invoke the chain rule.

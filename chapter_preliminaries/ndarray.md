@@ -390,7 +390,7 @@ id(x) == before
 
 ## Conversion to Other Python Objects
 
-Converting an MXNet `ndarray` to a NumpPy `ndarray`, or vice versa, is easy.
+Converting an MXNet `ndarray` to a NumPy `ndarray`, or vice versa, is easy.
 The converted result does not share memory.
 This minor inconvenience is actually quite important: 
 when you perform operations on the CPU or on GPUs, 

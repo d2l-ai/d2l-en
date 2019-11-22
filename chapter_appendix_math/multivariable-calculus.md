@@ -331,7 +331,7 @@ This is precisely what every deep learning algorithm implements to allow the com
 To see how MXNet has encapsulated this, let's take a quick look at this example.
 
 ```{.python .input}
-# Initialize as NDArrays, attaching gradients
+# Initialize as ndarrays, then attach gradients
 w, x, y, z = np.array(-1), np.array(0), np.array(-2), np.array(1)
 
 w.attach_grad()
