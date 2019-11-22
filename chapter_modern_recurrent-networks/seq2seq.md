@@ -152,7 +152,7 @@ class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
     # valid_length shape: (batch_size, )
     def forward(self, pred, label, valid_length):
         # weights shape should be (batch_size, seq_len, 1)
-        weights = np.expand_dims(np.ones_like(label),axis=-1)
+        weights = np.expand_dims(np.ones_like(label), axis=-1)
         weights = npx.sequence_mask(weights, valid_length, True, axis=1)
         return super(MaskedSoftmaxCELoss, self).forward(pred, label, weights)
 ```
@@ -178,12 +178,12 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, ctx):
     loss = MaskedSoftmaxCELoss()
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[1, num_epochs], ylim=[0, 0.25])
-    for epoch in range(1, num_epochs+1):
+    for epoch in range(1, num_epochs + 1):
         timer = d2l.Timer()
         metric = d2l.Accumulator(2)  # loss_sum, num_tokens
         for batch in data_iter:
             X, X_vlen, Y, Y_vlen = [x.as_in_context(ctx) for x in batch]
-            Y_input, Y_label, Y_vlen = Y[:,:-1], Y[:,1:], Y_vlen-1
+            Y_input, Y_label, Y_vlen = Y[:, :-1], Y[:, 1:], Y_vlen-1
             with autograd.record():
                 Y_hat, _ = model(X, Y_input, X_vlen, Y_vlen)
                 l = loss(Y_hat, Y_label, Y_vlen)
@@ -224,7 +224,8 @@ sequence. As illustrated in :numref:`fig_seq2seq_predict`, during predicting, we
 
 ```{.python .input  n=15}
 # Saved in the d2l package for later use
-def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps, ctx):
+def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
+                    ctx):
     src_tokens = src_vocab[src_sentence.lower().split(' ')]
     enc_valid_length = np.array([len(src_tokens)], ctx=ctx)
     src_tokens = d2l.trim_pad(src_tokens, num_steps, src_vocab.pad)
