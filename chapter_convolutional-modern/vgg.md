@@ -75,6 +75,7 @@ the `vgg_block` function.
 The fully-connected module is identical to that covered in AlexNet.
 
 ![Designing a network from building blocks](../img/vgg.svg)
+:width:`300px`
 :label:`fig_vgg`
 
 The original VGG network had 5 convolutional blocks,
