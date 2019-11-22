@@ -198,7 +198,7 @@ and it corresponds to the global minimum.
 Taking the derivative of the loss with respect to $\mathbf{w}$
 and setting it equal to $0$ yields the analytic solution:
 
-$$\mathbf{w}^* = (\mathbf X^T \mathbf X)^{-1}\mathbf X^T y$$
+$$\mathbf{w}^* = (\mathbf X^T \mathbf X)^{-1}\mathbf X^T y.$$
 
 While simple problems like linear regression
 may admit analytic solutions,
@@ -246,7 +246,7 @@ and subtract the resulting term from the current parameter values.
 We can express the update mathematically as follows
 ($\partial$ denotes the partial derivative) :
 
-$$(\mathbf{w},b) \leftarrow (\mathbf{w},b) - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_{(\mathbf{w},b)} l^{(i)}(\mathbf{w},b)$$
+$$(\mathbf{w},b) \leftarrow (\mathbf{w},b) - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_{(\mathbf{w},b)} l^{(i)}(\mathbf{w},b).$$
 
 
 To summarize, steps of the algorithm are the following:
@@ -437,7 +437,7 @@ To refresh your memory, the probability density
 of a normal distribution with mean $\mu$ and variance $\sigma^2$
 is given as follows:
 
-$$p(z) = \frac{1}{\sqrt{2 \pi \sigma^2}} \exp\left(-\frac{1}{2 \sigma^2} (z - \mu)^2\right)$$
+$$p(z) = \frac{1}{\sqrt{2 \pi \sigma^2}} \exp\left(-\frac{1}{2 \sigma^2} (z - \mu)^2\right).$$
 
 Below we define a Python function to compute the normal distribution.
 
@@ -471,13 +471,13 @@ $$y = \mathbf{w}^\top \mathbf{x} + b + \epsilon \text{ where } \epsilon \sim \ma
 Thus, we can now write out the *likelihood*
 of seeing a particular $y$ for a given $\mathbf{x}$ via
 
-$$p(y|\mathbf{x}) = \frac{1}{\sqrt{2 \pi \sigma^2}} \exp\left(-\frac{1}{2 \sigma^2} (y - \mathbf{w}^\top \mathbf{x} - b)^2\right)$$
+$$p(y|\mathbf{x}) = \frac{1}{\sqrt{2 \pi \sigma^2}} \exp\left(-\frac{1}{2 \sigma^2} (y - \mathbf{w}^\top \mathbf{x} - b)^2\right).$$
 
 Now, according to the *maximum likelihood principle*,
 the best values of $b$ and $\mathbf{w}$ are those
 that maximize the *likelihood* of the entire dataset:
 
-$$P(Y\mid X) = \prod_{i=1}^{n} p(y^{(i)}|\mathbf{x}^{(i)})$$
+$$P(Y\mid X) = \prod_{i=1}^{n} p(y^{(i)}|\mathbf{x}^{(i)}).$$
 
 Estimators chosen according to the *maximum likelihood principle*
 are called *Maximum Likelihood Estimators* (MLE).
@@ -491,7 +491,7 @@ So, without changing anything we can minimize the *Negative Log-Likelihood (NLL)
 $-\log p(\mathbf y|\mathbf X)$.
 Working out the math gives us:
 
-$$-\log p(\mathbf y|\mathbf X) = \sum_{i=1}^n \frac{1}{2} \log(2 \pi \sigma^2) + \frac{1}{2 \sigma^2} \left(y^{(i)} - \mathbf{w}^\top \mathbf{x}^{(i)} - b\right)^2$$
+$$-\log p(\mathbf y|\mathbf X) = \sum_{i=1}^n \frac{1}{2} \log(2 \pi \sigma^2) + \frac{1}{2 \sigma^2} \left(y^{(i)} - \mathbf{w}^\top \mathbf{x}^{(i)} - b\right)^2.$$
 
 Now we just need one more assumption: that $\sigma$ is some fixed constant.
 Thus we can ignore the first term because
@@ -500,7 +500,7 @@ Now the second term is identical to the squared error objective introduced earli
 but for the multiplicative constant $\frac{1}{\sigma^2}$.
 Fortunately, the solution does not depend on $\sigma$.
 It follows that minimizing squared error
-is equvalent to maximum likelihood estimation
+is equivalent to maximum likelihood estimation
 of a linear model under the assumption of additive Gaussian noise.
 
 ## From Linear Regression to Deep Networks
@@ -580,7 +580,7 @@ At the same time, most research in deep learning today
 draws little direct inspiration in neuroscience.
 We invoke Stuart Russell and Peter Norvig who,
 in their classic AI text book
-[Artificial Intelligence: A Modern Approach](https://en.wikipedia.org/wiki/Artificial_Intelligence:_A_Modern_Approach),
+*Artificial Intelligence: A Modern Approach* :cite:`Russell.Norvig.2016`,
 pointed out that although airplanes might have been *inspired* by birds,
 orninthology has not been the primary driver
 of aeronautics innovation for some centuries.
