@@ -54,7 +54,7 @@ def masked_softmax(X, valid_length):
             valid_length = valid_length.repeat(shape[1], axis=0)
         else:
             valid_length = valid_length.reshape(-1)
-        # fill masked elements with a large negative, whose exp is 0
+        # Fill masked elements with a large negative, whose exp is 0
         X = npx.sequence_mask(X.reshape(-1, shape[-1]), valid_length, True,
                               axis=1, value=-1e6)
         return npx.softmax(X).reshape(shape)
@@ -68,7 +68,7 @@ masked_softmax(np.random.uniform(size=(2, 2, 4)), np.array([2, 3]))
 
 Moreover, the second operator `batched_dot` takes two inputs $X$ and $Y$ with shapes $(b, n, m)$ and $(b, m, k)$, respectively, and returns an output with shape $(b, n, k)$. To be specific, it computes $b$ dot products for $i= \{1,\ldots, b\}$, i.e., 
 
-$$Z[i,:,:] = X[i,:,:]  Y[i,:,:] $$
+$$Z[i,:,:] = X[i,:,:]  Y[i,:,:].$$
 
 
 Here, we will not dive into the detailed implementation of `batched_dot`. Rather, for convenience, we simply call `npx.batched_dot` as a built-in function in MXNet.
@@ -103,7 +103,7 @@ class DotProductAttention(nn.Block):
     # valid_length: either (batch_size, ) or (batch_size, xx)
     def forward(self, query, key, value, valid_length=None):
         d = query.shape[-1]
-        # set transpose_b=True to swap the last two dimensions of key
+        # Set transpose_b=True to swap the last two dimensions of key
         scores = npx.batch_dot(query, key, transpose_b=True) / math.sqrt(d)
         attention_weights = self.dropout(masked_softmax(scores, valid_length))
         return npx.batch_dot(attention_weights, value)
@@ -138,7 +138,7 @@ To provide you some intuition about the weights, you can imagine $\mathbf W_k \m
 class MLPAttention(nn.Block):  
     def __init__(self, units, dropout, **kwargs):
         super(MLPAttention, self).__init__(**kwargs)
-        # Use flatten=True to keep query's and key's 3-D shapes.
+        # Use flatten=True to keep query's and key's 3-D shapes
         self.W_k = nn.Dense(units, activation='tanh',
                             use_bias=False, flatten=False)
         self.W_q = nn.Dense(units, activation='tanh',
@@ -148,8 +148,8 @@ class MLPAttention(nn.Block):
 
     def forward(self, query, key, value, valid_length):
         query, key = self.W_k(query), self.W_q(key)
-        # expand query to (batch_size, #querys, 1, units), and key to
-        # (batch_size, 1, #kv_pairs, units). Then plus them with broadcast.
+        # Expand query to (batch_size, #querys, 1, units), and key to
+        # (batch_size, 1, #kv_pairs, units). Then plus them with broadcast
         features = np.expand_dims(query, axis=2) + np.expand_dims(key, axis=1)
         scores = np.squeeze(self.v(features), axis=-1)
         attention_weights = self.dropout(masked_softmax(scores, valid_length))
