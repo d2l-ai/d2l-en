@@ -98,7 +98,7 @@ Next, we rewrite convolution kernel $K$ as a matrix $W$. Its shape will be $(4, 
 ```{.python .input}
 def kernel2matrix(K):
     k, W = np.zeros(5), np.zeros((4, 9))
-    k[:2], k[3:5] = K[0,:], K[1,:]
+    k[:2], k[3:5] = K[0, :], K[1, :]
     W[0, :5], W[1, 1:6], W[2, 3:8], W[3, 4:] = k, k, k, k
     return W
 
