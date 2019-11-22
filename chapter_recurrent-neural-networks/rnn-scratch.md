@@ -48,7 +48,7 @@ def get_params(vocab_size, num_hiddens, ctx):
     # Output layer parameters
     W_hq = normal((num_hiddens, num_outputs))
     b_q = np.zeros(num_outputs, ctx=ctx)
-    # Attach a gradient
+    # Attach gradients
     params = [W_xh, W_hh, b_h, W_hq, b_q]
     for param in params:
         param.attach_grad()
@@ -72,7 +72,7 @@ distributed over the real numbers.
 
 ```{.python .input  n=6}
 def rnn(inputs, state, params):
-    # inputs shape: (num_steps, batch_size, vocab_size)
+    # Inputs shape: (num_steps, batch_size, vocab_size)
     W_xh, W_hh, b_h, W_hq, b_q = params
     H, = state
     outputs = []

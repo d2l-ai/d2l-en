@@ -25,7 +25,6 @@ def read_time_machine():
     return [re.sub('[^A-Za-z]+', ' ', line.strip().lower())
             for line in lines]
 
-
 lines = read_time_machine()
 '# sentences %d' % len(lines)
 ```
