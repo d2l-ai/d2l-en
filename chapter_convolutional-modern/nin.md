@@ -35,7 +35,7 @@ and the channel as equivalent to a feature.
 between NiN and AlexNet, VGG, and other networks.
 
 ![The figure on the left shows the network structure of AlexNet and VGG, and the figure on the right shows the network structure of NiN. ](../img/nin.svg)
-:width:`300px`
+:width:`600px`
 :label:`fig_nin`
 
 
