@@ -1,4 +1,4 @@
-# Object Detection Dataset (Pikachu)
+# The Object Detection Dataset (Pikachu)
 
 There are no small datasets, like MNIST or Fashion-MNIST, in the object detection field. In order to quickly test models, we are going to assemble a small dataset. First, we generate 1000 Pikachu images of different angles and sizes using an open source 3D Pikachu model. Then, we collect a series of background images and place a Pikachu image at a random position on each image. We use the [im2rec tool](https://github.com/apache/incubator-mxnet/blob/master/tools/im2rec.py) provided by MXNet to convert the images to binary RecordIO format[1]. This format can reduce the storage overhead of the dataset on the disk and improve the reading efficiency. If you want to learn more about how to read images, refer to the documentation for the [GluonCV Toolkit](https://gluon-cv.mxnet.io/).
 
@@ -60,9 +60,9 @@ batch = train_iter.next()
 batch.data[0].shape, batch.label[0].shape
 ```
 
-## Graphic Data
+## Demonstration
 
-We have ten images with bounding boxes on them. We can see that the angle, size, and position of Pikachu are different in each image. Of course, this is a simple man-made dataset. In actual practice, the data is usually much more complicated.
+We have ten images with bounding boxes on them. We can see that the angle, size, and position of Pikachu are different in each image. Of course, this is a simple artificial dataset. In actual practice, the data are usually much more complicated.
 
 ```{.python .input  n=4}
 imgs = (batch.data[0][0:10].transpose(0, 2, 3, 1)) / 255

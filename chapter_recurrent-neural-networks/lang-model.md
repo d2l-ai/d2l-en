@@ -1,4 +1,4 @@
-# Language Models and Datasets
+# Language Models and the Dataset
 
 :label:`sec_language_model`
 

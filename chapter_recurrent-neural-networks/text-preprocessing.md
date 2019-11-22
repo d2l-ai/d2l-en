@@ -9,7 +9,7 @@ Text is an important example of sequence data. An article can be simply viewed a
 1. Map all the tokens in data into indices for ease of feeding into models. 
 
 
-## Data Loading
+## Reading the Dataset
 
 To get started we load text from H. G. Wells' [Time Machine](http://www.gutenberg.org/ebooks/35). This is a fairly small corpus of just over $30,000$ words, but for the purpose of what we want to illustrate this is just fine. More realistic document collections contain many billions of words. The following function reads the dataset into a list of sentences, each sentence is a string. Here we ignore punctuation and capitalization.
 
