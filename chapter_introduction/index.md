@@ -447,7 +447,7 @@ We denote any particular instance with a subscript, typically $i$,
 for instance ($\mathbf{x}_i, y_i$).
 A dataset is a collection of $n$ instances $\{\mathbf{x}_i, y_i\}_{i=1}^n$.
 Our goal is to produce a model $f_\theta$ that maps any input $\mathbf{x}_i$
- to a prediction $f_{\theta}(\mathbf{x}_i)$
+ to a prediction $f_{\theta}(\mathbf{x}_i)$.
 
 To ground this description in a concrete example,
 if we were working in healthcare,

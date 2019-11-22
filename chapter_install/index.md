@@ -117,7 +117,7 @@ Both this book and MXNet are keeping improving. Please check a new version from 
 
 1. The URL https://d2l.ai/d2l-en.zip always points to the latest contents.
 2. Please upgrade the `d2l` package by `pip install d2l --upgrade`.
-3. For the CPU version, MXNet can be upgraded by `pip install -U --pre mxnet`
+3. For the CPU version, MXNet can be upgraded by `pip install -U --pre mxnet`.
 
 
 ## GPU Support
