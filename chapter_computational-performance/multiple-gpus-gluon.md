@@ -26,7 +26,7 @@ and removes the maximum pooling layer.
 ```{.python .input  n=2}
 # Saved in the d2l package for later use
 def resnet18(num_classes):
-    """A slightly modified ResNet-18 model"""
+    """A slightly modified ResNet-18 model."""
     def resnet_block(num_channels, num_residuals, first_block=False):
         blk = nn.Sequential()
         for i in range(num_residuals):
@@ -84,12 +84,12 @@ Remember we define the `evaluate_accuracy_gpu` in :numref:`sec_lenet` to support
 ```{.python .input  n=6}
 # Saved in the d2l package for later use
 def evaluate_accuracy_gpus(net, data_iter, split_f=d2l.split_batch):
-    # Query the list of devices.
+    # Query the list of devices
     ctx_list = list(net.collect_params().values())[0].list_ctx()
     metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
     for features, labels in data_iter:
         Xs, ys = split_f(features, labels, ctx_list)
-        pys = [net(X) for X in Xs]  # run in parallel
+        pys = [net(X) for X in Xs]  # Run in parallel
         metric.add(sum(float(d2l.accuracy(py, y)) for py, y in zip(pys, ys)),
                    labels.size)
     return metric[0]/metric[1]

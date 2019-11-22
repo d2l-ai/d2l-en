@@ -134,7 +134,7 @@ The `split_batch` function then splits both the features and labels.
 ```{.python .input  n=9}
 # Saved in the d2l package for later use
 def split_batch(X, y, ctx_list):
-    """Split X and y into multiple devices specified by ctx"""
+    """Split X and y into multiple devices specified by ctx."""
     assert X.shape[0] == y.shape[0]
     return (gluon.utils.split_and_load(X, ctx_list),
             gluon.utils.split_and_load(y, ctx_list))
