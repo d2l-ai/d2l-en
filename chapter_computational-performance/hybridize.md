@@ -157,7 +157,7 @@ class HybridNet(nn.HybridBlock):
         return self.output(x)
 ```
 
-The code above implements a simple network with 4 hidden units and 2 outputs. `hybrid_forward` takes an additional argument - the module `F`. This is needed since, depending on whether the code has been hybridized or not, it will use a slightly different library (`ndarray` or `symbol`) for processing. Both classes perform very similar functions and MXNet automatically determines the argument. To understand what is going on we print the arguments as part of the function invocation.
+The code above implements a simple network with 4 hidden units and 2 outputs. `hybrid_forward` takes an additional argument---the module `F`. This is needed since, depending on whether the code has been hybridized or not, it will use a slightly different library (`ndarray` or `symbol`) for processing. Both classes perform very similar functions and MXNet automatically determines the argument. To understand what is going on we print the arguments as part of the function invocation.
 
 ```{.python .input  n=9}
 net = HybridNet()

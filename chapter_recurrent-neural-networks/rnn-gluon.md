@@ -103,7 +103,7 @@ Compared with the last section, this model achieves comparable perplexity, albei
 1. What happens if you increase the number of hidden layers in the RNN model? Can you make the model work?
 1. How well can you compress the text using this model?
     * How many bits do you need?
-    * Why does not everyone use this model for text compression? Hint - what about the compressor itself?
+    * Why does not everyone use this model for text compression? Hint: what about the compressor itself?
 
 ## [Discussions](https://discuss.mxnet.io/t/2365)
 

@@ -52,7 +52,7 @@ to note is that this saves model *parameters* and not the entire model. I.e. if
 we have a 3 layer MLP we need to specify the *architecture* separately. The
 reason for this is that the models themselves can contain arbitrary code, hence
 they cannot be serialized quite so easily (there is a way to do this for
-compiled models - please refer to the [MXNet documentation](http://www.mxnet.io)
+compiled models: please refer to the [MXNet documentation](http://www.mxnet.io)
 for the technical details on it). The result is that in order to reinstate a
 model we need to generate the architecture in code and then load the parameters
 from disk. The deferred initialization (:numref:`sec_deferred_init`) is quite advantageous here since we can simply define a model without the need to put actual values in place. Let's start with our favorite MLP.

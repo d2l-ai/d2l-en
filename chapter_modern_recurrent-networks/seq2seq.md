@@ -71,7 +71,7 @@ output, state = encoder(X)
 output.shape
 ```
 
-Since long short term memory (LSTM) is used, the `state` list will contain both the hidden state and the memory cell with same shape (number of hidden layers, batch size, number of hidden units). However, if gated recurrent unit (GRU) is used, the `state` list contains only one element - the hidden state in the final timestep with shape (number of hidden layers, batch size, number of hidden units).
+Since long short term memory (LSTM) is used, the `state` list will contain both the hidden state and the memory cell with same shape (number of hidden layers, batch size, number of hidden units). However, if gated recurrent unit (GRU) is used, the `state` list contains only one element---the hidden state in the final timestep with shape (number of hidden layers, batch size, number of hidden units).
 
 ```{.python .input}
 len(state), state[0].shape, state[1].shape

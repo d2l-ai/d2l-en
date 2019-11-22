@@ -102,7 +102,7 @@ It can be best understood as the harmonic mean of the number of real choices tha
 ## Exercises
 
 1. If we use an RNN to predict the next character in a text sequence, how many output dimensions do we need?
-1. Can you design a mapping for which an RNN with hidden states is exact? Hint - what about a finite number of words?
+1. Can you design a mapping for which an RNN with hidden states is exact? Hint: what about a finite number of words?
 1. What happens to the gradient if you backpropagate through a long sequence?
 1. What are some of the problems associated with the simple sequence model described above?
 

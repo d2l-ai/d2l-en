@@ -67,8 +67,8 @@ due to the large number of confounders.
 
 Back to images, the intuitions we have been discussing could be made more concrete yielding a few key principles for building neural networks for computer vision:
 
-1. Our vision systems should, in some sense, respond similarly to the same object regardless of where it appears in the image (Translation Invariance)
-1. Our visions systems should, in some sense, focus on local regions, without regard for what else is happening in the image at greater distances. (Locality)
+1. Our vision systems should, in some sense, respond similarly to the same object regardless of where it appears in the image (translation invariance).
+1. Our visions systems should, in some sense, focus on local regions, without regard for what else is happening in the image at greater distances (locality).
 
 Let's see how this translates into mathematics.
 
@@ -123,7 +123,7 @@ in the vicinity of $(i, j)$ with coefficients $V[a, b]$
 to obtain the value $h[i, j]$.
 Note that $V[a, b]$ needs many fewer coefficients than $V[i, j, a, b]$. For a 1 megapixel image it has at most 1 million coefficients. This is 1 million fewer parameters since it no longer depends on the location within the image. We have made significant progress!
 
-Now let's invoke the second principle - *locality*.
+Now let's invoke the second principle---*locality*.
 As motivated above, we believe that we shouldn't have
 to look very far away from $(i, j)$
 in order to glean relevant information
@@ -244,7 +244,7 @@ All of this will be addressed in the remainder of the chapter.
 1. Why might translation invariance not be a good idea after all? Does it make sense for pigs to fly?
 1. What happens at the boundary of an image?
 1. Derive an analogous convolutional layer for audio.
-1. What goes wrong when you apply the above reasoning to text? Hint - what is the structure of language?
+1. What goes wrong when you apply the above reasoning to text? Hint: what is the structure of language?
 1. Prove that $f \circledast g = g \circledast f$.
 
 ## [Discussions](https://discuss.mxnet.io/t/2348)

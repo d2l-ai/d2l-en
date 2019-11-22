@@ -474,7 +474,7 @@ tens of thousands of citations.
 1. Can you replace Dropout by Batch Normalization? How does the behavior change?
 1. Fix the coefficients `beta` and `gamma` (add the parameter `grad_req='null'` at the time of construction to avoid calculating the gradient), and observe and analyze the results.
 1. Review the Gluon documentation for `BatchNorm` to see the other applications for Batch Normalization.
-1. Research ideas - think of other normalization transforms that you can apply? Can you apply the probability integral transform? How about a full rank covariance estimate?
+1. Research ideas: think of other normalization transforms that you can apply? Can you apply the probability integral transform? How about a full rank covariance estimate?
 
 ## [Discussions](https://discuss.mxnet.io/t/2358)
 

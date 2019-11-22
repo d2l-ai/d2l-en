@@ -30,7 +30,7 @@ web. The probability of words can be calculated from the relative word
 frequency of a given word in the training dataset.
 
 For example, $p(\mathrm{Statistics})$ can be calculated as the
-probability of any sentence starting with the word 'statistics'. A
+probability of any sentence starting with the word "statistics". A
 slightly less accurate approach would be to count all occurrences of
 the word "statistics" and divide it by the total number of words in
 the corpus. This works fairly well, particularly for frequent
@@ -110,7 +110,7 @@ d2l.plot(freqs, xlabel='token: x', ylabel='frequency: n(x)',
          xscale='log', yscale='log')
 ```
 
-We are on to something quite fundamental here - the word frequency decays rapidly in a well defined way. After dealing with the first four words as exceptions ('the', 'i', 'and', 'of'), all remaining words follow a straight line on a log-log plot. This means that words satisfy [Zipf's law](https://en.wikipedia.org/wiki/Zipf%27s_law) which states that the item frequency is given by
+We are on to something quite fundamental here: the word frequency decays rapidly in a well defined way. After dealing with the first four words as exceptions ('the', 'i', 'and', 'of'), all remaining words follow a straight line on a log-log plot. This means that words satisfy [Zipf's law](https://en.wikipedia.org/wiki/Zipf%27s_law) which states that the item frequency is given by
 
 $$n(x) \propto (x + c)^{-\alpha} \text{ and hence }
 \log n(x) = -\alpha \log (x+c) + \mathrm{const.}$$

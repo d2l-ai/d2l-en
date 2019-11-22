@@ -28,7 +28,7 @@ If we perturb $\mathbf{c}$ slightly we would hope to find only slight changes in
 
 $$\kappa = \frac{\lambda_1}{\lambda_d}$$
 
-If the condition number $\kappa$ is large, it is difficult to solve the optimization problem accurately. We need to ensure that we are careful in getting a large dynamic range of values right. Our analysis leads to an obvious, albeit somewhat naive question: couldn't we simply "fix" the problem by distorting the space such that all eigenvalues are $1$. In theory this is quite easy - we only need the eigenvalues and eigenvectors of $Q$ to rescale the problem from $\mathbf{x}$ to one in $\mathbf{z} := \Lambda^{\frac{1}{2}} U \mathbf{x}$. In the new coordinate system $\mathbf{x}^\top Q \mathbf{x}$ could be simplified to $\|\mathbf{z}\|^2$. Alas, this is a rather impractical suggestion. Computing eigenvalues and eigenvectors is in general *much more* expensive than solving the actual  problem.
+If the condition number $\kappa$ is large, it is difficult to solve the optimization problem accurately. We need to ensure that we are careful in getting a large dynamic range of values right. Our analysis leads to an obvious, albeit somewhat naive question: couldn't we simply "fix" the problem by distorting the space such that all eigenvalues are $1$. In theory this is quite easy: we only need the eigenvalues and eigenvectors of $Q$ to rescale the problem from $\mathbf{x}$ to one in $\mathbf{z} := \Lambda^{\frac{1}{2}} U \mathbf{x}$. In the new coordinate system $\mathbf{x}^\top Q \mathbf{x}$ could be simplified to $\|\mathbf{z}\|^2$. Alas, this is a rather impractical suggestion. Computing eigenvalues and eigenvectors is in general *much more* expensive than solving the actual  problem.
 
 While computing eigenvalues exactly might be expensive, guessing them and computing them even somewhat approximately may already be a lot better than not doing anything at all. In particular, we could use the diagonal entries of $Q$ and rescale it accordingly. This is *much* cheaper than computing eigenvalues.
 
@@ -36,7 +36,7 @@ $$\tilde{Q} = \mathrm{diag}^{-\frac{1}{2}}(Q) Q \mathrm{diag}^{-\frac{1}{2}}(Q).
 
 In this case we have $\tilde{Q}_{ij} = Q_{ij} / \sqrt{Q_{ii} Q_{jj}}$ and specifically $\tilde{Q}_{ii} = 1$ for all $i$. In most cases this simplifies the condition number considerably. For instance, the the cases we discussed previously, this would entirely eliminate the problem at hand since the problem is axis aligned.
 
-Unfortunately we face yet another problem - in deep learning we typically don't even have access to the second derivative of the objective function: for $\mathbf{x} \in \mathbb{R}^d$ the second derivative even on a minibatch may require $O(d^2)$ space and work to compute, thus making it practically infeasible. The ingenious idea of Adagrad is to use a proxy for that elusive diagonal of the Hessian that is both relatively cheap to compute and effective - the magnitude of the gradient itself.
+Unfortunately we face yet another problem: in deep learning we typically don't even have access to the second derivative of the objective function: for $\mathbf{x} \in \mathbb{R}^d$ the second derivative even on a minibatch may require $O(d^2)$ space and work to compute, thus making it practically infeasible. The ingenious idea of Adagrad is to use a proxy for that elusive diagonal of the Hessian that is both relatively cheap to compute and effective---the magnitude of the gradient itself.
 
 In order to see why this works, let's look at $\bar{f}(\bar{\mathbf{x}})$. We have that
 
