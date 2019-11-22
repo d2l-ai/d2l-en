@@ -65,7 +65,7 @@ If we use the SGD, in each iteration we are going to pick a shorter subsequence 
 
 
 $$\log P(w_o \mid w_c) =
-\mathbf{u}_o^\top \mathbf{v}_c - \log\left(\sum_{i \in \mathcal{V}} \text{exp}(\mathbf{u}_i^\top \mathbf{v}_c)\right)$$
+\mathbf{u}_o^\top \mathbf{v}_c - \log\left(\sum_{i \in \mathcal{V}} \text{exp}(\mathbf{u}_i^\top \mathbf{v}_c)\right).$$
 
 Through differentiation, we can get the gradient $\mathbf{v}_c$ from the formula above.
 
