@@ -702,7 +702,7 @@ Basically, we need to compute the expected risk that we incur,
 i.e., we need to multiply the probability of the outcome
 with the benefit (or harm) associated with it:
 
-$$L(\mathrm{action}| x) = E_{y \sim p(y| x)}[\mathrm{loss}(\mathrm{action},y)]$$
+$$L(\mathrm{action}| x) = E_{y \sim p(y| x)}[\mathrm{loss}(\mathrm{action},y)].$$
 
 Hence, the loss $L$ incurred by eating the mushroom
 is $L(a=\mathrm{eat}| x) = 0.2 * \infty + 0.8 * 0 = \infty$,
