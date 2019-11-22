@@ -140,8 +140,6 @@ d2l.plot([time, time[tau:]], [x, estimates],
          legend=['data', 'estimate'])
 ```
 
-## Predictions
-
 This looks nice, just as we expected it. Even beyond 600 observations the estimates still look rather trustworthy. There is just one little problem to this: if we observe data only until timestep 600, we cannot hope to receive the ground truth for all future predictions. Instead, we need to work our way forward one step at a time:
 
 $$\begin{aligned}
