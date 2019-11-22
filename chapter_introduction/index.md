@@ -568,8 +568,8 @@ is also a regression problem.
 A good rule of thumb is that any *How much?* or *How many?* problem
 should suggest regression.
 
-* "How many hours will this surgery take?" - *regression*
-* "How many dogs are in this photo?" - *regression*.
+* "How many hours will this surgery take?": *regression*
+* "How many dogs are in this photo?": *regression*.
 
 However, if you can easily pose your problem as "Is this a _ ?",
 then it is likely, classification, a different kind

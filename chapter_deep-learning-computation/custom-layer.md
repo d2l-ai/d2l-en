@@ -58,7 +58,7 @@ params.get('param2', shape=(2, 3))
 params
 ```
 
-Let's use this to implement our own version of the dense layer. It has two parameters - bias and weight. To make it a bit nonstandard, we bake in the ReLU activation as default. Next, we implement a fully connected layer with both weight and bias parameters.  It uses ReLU as an activation function, where `in_units` and `units` are the number of inputs and the number of outputs, respectively.
+Let's use this to implement our own version of the dense layer. It has two parameters: bias and weight. To make it a bit nonstandard, we bake in the ReLU activation as default. Next, we implement a fully connected layer with both weight and bias parameters.  It uses ReLU as an activation function, where `in_units` and `units` are the number of inputs and the number of outputs, respectively.
 
 ```{.python .input  n=19}
 class MyDense(nn.Block):
@@ -108,7 +108,7 @@ net(np.random.uniform(size=(2, 64)))
 
 1. Design a layer that learns an affine transform of the data, i.e., it removes the mean and learns an additive parameter instead.
 1. Design a layer that takes an input and computes a tensor reduction, i.e., it returns $y_k = \sum_{i, j} W_{ijk} x_i x_j$.
-1. Design a layer that returns the leading half of the Fourier coefficients of the data. Hint - look up the `fft` function in MXNet.
+1. Design a layer that returns the leading half of the Fourier coefficients of the data. Hint: look up the `fft` function in MXNet.
 
 ## [Discussions](https://discuss.mxnet.io/t/2328)
 

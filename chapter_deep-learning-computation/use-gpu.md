@@ -70,7 +70,7 @@ x = np.array([1, 2, 3])
 x
 ```
 
-We can use the `context` property of `ndarray` to view the device where the `ndarray` is located. It is important to note that whenever we want to operate on multiple terms they need to be in the same context. For instance, if we sum two variables, we need to make sure that both arguments are on the same device - otherwise MXNet would not know where to store the result or even how to decide where to perform the computation.
+We can use the `context` property of `ndarray` to view the device where the `ndarray` is located. It is important to note that whenever we want to operate on multiple terms they need to be in the same context. For instance, if we sum two variables, we need to make sure that both arguments are on the same device---otherwise MXNet would not know where to store the result or even how to decide where to perform the computation.
 
 ```{.python .input}
 x.context
@@ -177,7 +177,7 @@ In short, as long as all data and parameters are on the same device, we can lear
 1. Try a larger computation task, such as the multiplication of large matrices, and see the difference in speed between the CPU and GPU. What about a task with a small amount of calculations?
 1. How should we read and write model parameters on the GPU?
 1. Measure the time it takes to compute 1000 matrix-matrix multiplications of $100 \times 100$ matrices and log the matrix norm $\mathrm{tr} M M^\top$ one result at a time vs. keeping a log on the GPU and transferring only the final result.
-1. Measure how much time it takes to perform two matrix-matrix multiplications on two GPUs at the same time vs. in sequence on one GPU (hint - you should see almost linear scaling).
+1. Measure how much time it takes to perform two matrix-matrix multiplications on two GPUs at the same time vs. in sequence on one GPU (hint: you should see almost linear scaling).
 
 ## [Discussions](https://discuss.mxnet.io/t/2330)
 

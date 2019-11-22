@@ -243,7 +243,7 @@ train_gluon_ch11('sgd', {'learning_rate': 0.05}, data_iter)
 
 * Vectorization makes code more efficient due to reduced overhead arising from the deep learning framework and due to better memory locality and caching on CPUs and GPUs. 
 * There is a trade-off between statistical efficiency arising from SGD and computational efficiency arising from processing large batches of data at a time. 
-* Minibatch stochastic gradient descent offers the best of both worlds - computational and statistical efficiency. 
+* Minibatch stochastic gradient descent offers the best of both worlds: computational and statistical efficiency. 
 * In minibatch SGD we process batches of data obtained by a random permutation of the training data (i.e., each observation is processed only once per epoch, albeit in random order). 
 * It is advisable to decay the learning rates during training. 
 * In general, minibatch SGD is faster than SGD and gradient descent for convergence to a smaller risk, when measured in terms of clock time.  

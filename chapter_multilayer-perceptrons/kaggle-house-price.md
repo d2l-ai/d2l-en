@@ -427,8 +427,8 @@ The steps are quite simple:
 
 1. Submit your predictions for this tutorial to Kaggle. How good are your predictions?
 1. Can you improve your model by minimizing the log-price directly? What happens if you try to predict the log price rather than the price?
-1. Is it always a good idea to replace missing values by their mean? Hint - can you construct a situation where the values are not missing at random?
-1. Find a better representation to deal with missing values. Hint - What happens if you add an indicator variable?
+1. Is it always a good idea to replace missing values by their mean? Hint: can you construct a situation where the values are not missing at random?
+1. Find a better representation to deal with missing values. Hint: what happens if you add an indicator variable?
 1. Improve the score on Kaggle by tuning the hyperparameters through k-fold cross-validation.
 1. Improve the score by improving the model (layers, regularization, dropout).
 1. What happens if we do not standardize the continuous numerical features like we have done in this section?

@@ -238,7 +238,7 @@ Here are some typical cases:
 
 #### More Anecdotes
 
-* We build a face detector. It works well on all benchmarks. Unfortunately it fails on test data - the offending examples are close-ups where the face fills the entire image (no such data was in the training set).
+* We build a face detector. It works well on all benchmarks. Unfortunately it fails on test data---the offending examples are close-ups where the face fills the entire image (no such data was in the training set).
 * We build a web search engine for the USA market and want to deploy it in the UK.
 * We train an image classifier by compiling a large dataset where each among a large set of classes is equally represented in the dataset, say 1000 categories, represented by 1000 images each. Then we deploy the system in the real world, where the actual label distribution of photographs is decidedly non-uniform.
 
@@ -494,7 +494,7 @@ Should what news someone is exposed to be determined by which Facebook pages the
 ## Exercises
 
 1. What could happen when we change the behavior of a search engine? What might the users do? What about the advertisers?
-1. Implement a covariate shift detector. Hint - build a classifier.
+1. Implement a covariate shift detector. Hint: build a classifier.
 1. Implement a covariate shift corrector.
 1. What could go wrong if training and test set are very different? What would happen to the sample weights?
 

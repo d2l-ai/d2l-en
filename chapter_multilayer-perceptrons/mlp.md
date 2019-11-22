@@ -243,7 +243,7 @@ Note that there are many variants to the ReLU function, such as the parameterize
 
 $$\mathrm{pReLU}(x) = \max(0, x) + \alpha \min(0, x)$$
 
-The reason for using the ReLU is that its derivatives are particularly well behaved - either they vanish or they just let the argument through. This makes optimization better behaved and it reduces the issue of the vanishing gradient problem (more on this later).
+The reason for using the ReLU is that its derivatives are particularly well behaved: either they vanish or they just let the argument through. This makes optimization better behaved and it reduces the issue of the vanishing gradient problem (more on this later).
 
 ### Sigmoid Function
 
