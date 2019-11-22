@@ -175,7 +175,7 @@ def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
     animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs], ylim=[0, 1],
                             legend=['train loss', 'train acc', 'test acc'])
     for epoch in range(num_epochs):
-        # store training_loss, training_accuracy, num_examples, num_features
+        # Store training_loss, training_accuracy, num_examples, num_features
         metric = d2l.Accumulator(4)
         for i, (features, labels) in enumerate(train_iter):
             timer.start()

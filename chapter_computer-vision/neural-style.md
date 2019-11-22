@@ -146,7 +146,7 @@ def style_loss(Y_hat, gram_Y):
 
 Sometimes, the composite images we learn have a lot of high-frequency noise, particularly bright or dark pixels. One common noise reduction method is total variation denoising. We assume that $x_{i, j}$ represents the pixel value at the coordinate $(i, j)$, so the total variance loss is:
 
-$$\sum_{i, j} \left|x_{i, j} - x_{i+1, j}\right| + \left|x_{i, j} - x_{i, j+1}\right|$$
+$$\sum_{i, j} \left|x_{i, j} - x_{i+1, j}\right| + \left|x_{i, j} - x_{i, j+1}\right|.$$
 
 We try to make the values of neighboring pixels as similar as possible.
 
@@ -262,6 +262,7 @@ d2l.plt.imsave('../img/neural-style.png', postprocess(output).asnumpy())
 As you can see, each epoch takes more time due to the larger image size. As shown in :numref:`fig_style_transfer_large`, the composite image produced retains more detail due to its larger size. The composite image not only has large blocks of color like the style image, but these blocks even have the subtle texture of brush strokes.
 
 ![$900 \times 600$ composite image. ](../img/neural-style.png)
+:width:`500px`
 :label:`fig_style_transfer_large`
 
 ## Summary
