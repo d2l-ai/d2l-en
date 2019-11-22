@@ -31,7 +31,7 @@ true_b = 4.2
 features, labels = d2l.synthetic_data(true_w, true_b, 1000)
 ```
 
-## Reading Data
+## Reading the Dataset
 
 Rather than rolling our own iterator,
 we can call upon Gluon's `data` module to read data.

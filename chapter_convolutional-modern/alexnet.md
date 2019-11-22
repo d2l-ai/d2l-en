@@ -321,7 +321,7 @@ for layer in net:
     print(layer.name, 'output shape:\t', X.shape)
 ```
 
-## Reading Data
+## Reading the Dataset
 
 Although AlexNet uses ImageNet in the paper, we use Fashion-MNIST here
 since training an ImageNet model to convergence could take hours or days

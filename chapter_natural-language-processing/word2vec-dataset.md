@@ -1,4 +1,4 @@
-# Datasets for Word2vec
+# The Dataset for Word2vec
 :label:`sec_word2vec_data`
 
 In this section, we will introduce how to preprocess a dataset with
@@ -15,7 +15,7 @@ import random
 import zipfile
 ```
 
-## Reading and Preprocessing
+## Reading and Preprocessing the Dataset
 
 This dataset has already been preprocessed. Each line of the dataset acts as a sentence. All the words in a sentence are separated by spaces. In the word embedding task, each word is a token.
 

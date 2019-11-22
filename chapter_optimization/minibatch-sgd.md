@@ -100,7 +100,7 @@ print("Performance in Gigaflops: block {:.3f}".format(2/timer.times[3]))
 
 As we can see, the computation on the minibatch is essentially as efficient as on the full matrix. A word of caution is in order. In :ref:`sec_batch_norm` we used a type of regularization that was heavily dependent on the amount of variance in a minibatch. As we increase the latter, the variance decreases and with it the benefit of the noise-injection due to batch normalization. See e.g., :cite:`Ioffe.2017` for details on how to rescale and compute the appropriate terms. 
 
-## Reading Data
+## Reading the Dataset
 
 Let's have a look at how minibatches are efficiently generated from data. In the following we use a dataset developed by NASA to test the wing [noise from different aircraft](https://archive.ics.uci.edu/ml/datasets/Airfoil+Self-Noise) to compare these optimization algorithms. For convenience we only use the first $1,500$ examples. The data is whitened for preprocessing, i.e., we remove the mean and rescale the variance to $1$ per coordinate.
 

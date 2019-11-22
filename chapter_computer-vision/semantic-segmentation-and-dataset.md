@@ -1,4 +1,4 @@
-# Semantic Segmentation and Datasets
+# Semantic Segmentation and the Dataset
 :label:`sec_semantic_segmentation`
 
 In our discussion of object detection issues in the previous sections, we only used rectangular bounding boxes to label and predict objects in images. In this section, we will look at semantic segmentation, which attempts to segment images into regions with different semantic categories. These semantic regions label and predict objects at the pixel level. :numref:`fig_segmentation` shows a semantically-segmented image, with areas labeled "dog", "cat", and "background". As you can see, compared to object detection, semantic segmentation labels areas with pixel-level borders, for significantly greater precision.
@@ -15,7 +15,7 @@ In the computer vision field, there are two important methods related to semanti
 * Instance segmentation is also called simultaneous detection and segmentation. This method attempts to identify the pixel-level regions of each object instance in an image. In contrast to semantic segmentation, instance segmentation not only distinguishes semantics, but also different object instances. If an image contains two dogs, instance segmentation will distinguish which pixels belong to which dog.
 
 
-## Pascal VOC2012 Semantic Segmentation Dataset
+## The Pascal VOC2012 Semantic Segmentation Dataset
 
 In the semantic segmentation field, one important dataset is [Pascal VOC2012](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/). To better understand this dataset, we must first import the package or module needed for the experiment.
 

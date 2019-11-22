@@ -1,4 +1,4 @@
-# Machine Translation and Datasets
+# Machine Translation and the Dataset
 :label:`sec_machine_translation`
 
 So far we see how to use recurrent neural networks for language models, in which we predict the next token given all previous tokens in an article. Now let's have a look at a different application, machine translation, whose predict output is no longer a single token, but a list of tokens. 

@@ -81,7 +81,7 @@ d2l.set_figsize((3.5, 2.5))
 d2l.plt.scatter(features[:, 1].asnumpy(), labels.asnumpy(), 1);
 ```
 
-## Reading Data
+## Reading the Dataset
 
 Recall that training models consists of 
 making multiple passes over the dataset, 

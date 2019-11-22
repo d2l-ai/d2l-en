@@ -1,4 +1,4 @@
-# Text Classification and Datasets
+# Text Classification and the Dataset
 :label:`sec_sentiment`
 
 Text classification is a common task in natural language processing, which transforms a sequence of text of indefinite length into a category of text. It is similar to the image classification, the most frequently used application in this book, e.g., :numref:`sec_naive_bayes`. The only difference is that, rather than an image, text classification's example is a text sentence. 
@@ -13,11 +13,11 @@ import tarfile
 npx.set_np()
 ```
 
-## Text Sentiment Classification Data
+## The Text Sentiment Classification Dataset
 
 We use Stanford's Large Movie Review Dataset as the dataset for text sentiment classification[1]. This dataset is divided into two datasets for training and testing purposes, each containing 25,000 movie reviews downloaded from IMDb. In each dataset, the number of comments labeled as "positive" and "negative" is equal.
 
-###  Reading Data
+###  Reading the Dataset
 
 We first download this dataset to the "../data" path and extract it to "../data/aclImdb".
 
@@ -76,7 +76,7 @@ train_features = np.array([d2l.trim_pad(vocab[line], num_steps, vocab.unk)
 train_features.shape
 ```
 
-### Creating Data Iterator
+### Creating the Data Iterator
 
 Now, we will create a data iterator. Each iteration will return a minibatch of data.
 
@@ -89,7 +89,7 @@ for X, y in train_iter:
 '# batches:', len(train_iter)
 ```
 
-## Putting Things Together
+## Putting All Things Together
 
 Last, we will save a function `load_data_imdb` into `d2l`, which returns the vocabulary and data iterators.
 
