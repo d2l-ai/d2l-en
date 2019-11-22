@@ -47,7 +47,7 @@ conda create --name d2l -y
 ## Downloading the D2L Notebooks
 
 Next, we need to download the code of this book. You can use the
-[link](https://d2l.ai/d2l-en-0.7.0.zip) to download and unzip the code. 
+[link](https://d2l.ai/d2l-en-0.7.0.zip) to download and unzip the code.
 Alternatively, if you have `unzip` (otherwise run `sudo apt install unzip`) available:
 
 ```bash
@@ -86,7 +86,7 @@ to access GPUs before running larger models.
 pip install mxnet==1.6.0b20190926
 
 # For Linux and macOS users
-pip install mxnet==1.6.0b20190915
+pip install mxnet==1.6.0b20191122
 ```
 
 
@@ -148,7 +148,7 @@ with the following command:
 pip install mxnet-cu101==1.6.0b20190926
 
 # For Linux and macOS users
-pip install mxnet-cu101==1.6.0b20190915
+pip install mxnet-cu101==1.6.0b20191122
 ```
 
 

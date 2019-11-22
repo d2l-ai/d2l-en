@@ -230,7 +230,7 @@ conda install python=3.7 pip -y
 Finally, install MXNet and the `d2l` package. The postfix `cu101` means that this is the CUDA 10.1 variant. For different versions, say only CUDA 10.0, you would want to choose `cu100` instead.
 
 ```bash
-pip install mxnet-cu101==1.6.0b20190915
+pip install mxnet-cu101==1.6.0b20191122
 pip install d2l==0.11.0
 ```
 
