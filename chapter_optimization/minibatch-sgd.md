@@ -14,12 +14,12 @@ Things are a bit more subtle when it comes to single GPUs or even CPUs. These de
 
 The way to alleviate these constraints is to use a hierarchy of CPU caches which are actually fast enough to supply the processor with data. This is *the* driving force behind batching in deep learning. To keep matters simple, consider matrix-matrix multiplication, say $A = B \cdot C$. We have a number of options for calculating $A$. For instance we could try the following:
 
-1. We could compute $A_{ij} = B_{i,:} C_{:,j}^\top$, i.e., we could compute it element-wise by means of dot products.
-1. We could compute $A_{:,j} = B C_{:,j}^\top$, i.e., we could compute it one column at a time. Likewise we could compute $A$ one row $A_{i,:}$ at a time. 
-1. We could simply compute $A = B C$. 
-1. We could break $B$ and $C$ into smaller block matrices and compute $A$ one block at a time. 
+1. We could compute $\mathbf{A}_{ij} = \mathbf{B}_{i,:} \mathbf{C}_{:,j}^\top$, i.e., we could compute it element-wise by means of dot products.
+1. We could compute $\mathbf{A}_{:,j} = \mathbf{B} \mathbf{C}_{:,j}^\top$, i.e., we could compute it one column at a time. Likewise we could compute $\mathbf{A}$ one row $\mathbf{A}_{i,:}$ at a time. 
+1. We could simply compute $\mathbf{A} = \mathbf{B} \mathbf{C}$. 
+1. We could break $\mathbf{B}$ and $\mathbf{C}$ into smaller block matrices and compute $\mathbf{A}$ one block at a time. 
 
-If we follow the first option, we will need to copy one row and one column vector into the CPU each time we want to compute an element $A_{ij}$. Even worse, due to the fact that matrix elements are aligned sequentially we are thus required to access many disjoint locations for one of the two vectors as we read them from memory. The second option is much more favorable. In it, we are able to keep the column vector $C_{:,j}$ in the CPU cache while we keep on traversing through $B$. This halves the memory bandwidth requirement with correspondingly faster access. Of course, option 3 is most desirable. Unfortunately, most matrices might not entirely fit into cache (this is what we're discussing after all). However, option 4 offers a practically useful alternative: we can move blocks of the matrix into cache and multiply them locally. Optimized libraries take care of this for us. Let's have a look at how efficient these operations are in practice.
+If we follow the first option, we will need to copy one row and one column vector into the CPU each time we want to compute an element $\mathbf{A}_{ij}$. Even worse, due to the fact that matrix elements are aligned sequentially we are thus required to access many disjoint locations for one of the two vectors as we read them from memory. The second option is much more favorable. In it, we are able to keep the column vector $\mathbf{C}_{:,j}$ in the CPU cache while we keep on traversing through $B$. This halves the memory bandwidth requirement with correspondingly faster access. Of course, option 3 is most desirable. Unfortunately, most matrices might not entirely fit into cache (this is what we're discussing after all). However, option 4 offers a practically useful alternative: we can move blocks of the matrix into cache and multiply them locally. Optimized libraries take care of this for us. Let's have a look at how efficient these operations are in practice.
 
 Beyond computational efficiency, the overhead introduced by Python and by the deep learning framework itself is considerable. Recall that each time we execute a command the Python interpreter sends a command to the MXNet engine which needs to insert it into the compute graph and deal with it during scheduling. Such overhead can be quite detrimental. In short, it is highly advisable to use vectorization (and matrices) whenever possible.
 
@@ -36,7 +36,7 @@ B = np.random.normal(0, 1, (1024, 1024))
 C = np.random.normal(0, 1, (1024, 1024))
 ```
 
-Element-wise assignment simply iterates over all rows and columns of $B$ and $C$ respectively to assign the value to $A$.
+Element-wise assignment simply iterates over all rows and columns of $\mathbf{B}$ and $\mathbf{C}$ respectively to assign the value to $\mathbf{A}$.
 
 ```{.python .input  n=2}
 # Compute A = B C one element at a time
