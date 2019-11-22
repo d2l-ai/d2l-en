@@ -94,7 +94,7 @@ as four-dimensional weight tensors.
 We could formally express this dense layer as follows:
 
 $$h[i, j] = u[i, j] + \sum_{k, l} W[i, j, k, l] \cdot x[k, l] =  u[i, j] +
-\sum_{a, b} V[i, j, a, b] \cdot x[i+a, j+b]$$
+\sum_{a, b} V[i, j, a, b] \cdot x[i+a, j+b].$$
 
 The switch from $W$ to $V$ is entirely cosmetic (for now)
 since there is a one-to-one correspondence
@@ -115,7 +115,7 @@ This is only possible if $V$ and $u$ do not actually depend on $(i, j)$,
 i.e., we have $V[i, j, a, b] = V[a, b]$ and $u$ is a constant.
 As a result we can simplify the definition for $h$.
 
-$$h[i, j] = u + \sum_{a, b} V[a, b] \cdot x[i+a, j+b]$$
+$$h[i, j] = u + \sum_{a, b} V[a, b] \cdot x[i+a, j+b].$$
 
 This is a convolution!
 We are effectively weighting pixels $(i+a, j+b)$
@@ -132,7 +132,7 @@ This means that outside some range $|a|, |b| > \Delta$,
 we should set $V[a, b] = 0$.
 Equivalently, we can rewrite $h[i, j]$ as
 
-$$h[i, j] = u + \sum_{a = -\Delta}^{\Delta} \sum_{b = -\Delta}^{\Delta} V[a, b] \cdot x[i+a, j+b]$$
+$$h[i, j] = u + \sum_{a = -\Delta}^{\Delta} \sum_{b = -\Delta}^{\Delta} V[a, b] \cdot x[i+a, j+b].$$
 
 This, in a nutshell is the convolutional layer.
 When the local region (also called a *receptive field*) is small,
@@ -159,7 +159,7 @@ Let's briefly review why the above operation is called a *convolution*.
 In mathematics, the convolution between two functions,
 say $f, g: \mathbb{R}^d \to R$ is defined as
 
-$$[f \circledast g](x) = \int_{\mathbb{R}^d} f(z) g(x-z) dz$$
+$$[f \circledast g](x) = \int_{\mathbb{R}^d} f(z) g(x-z) dz.$$
 
 That is, we measure the overlap between $f$ and $g$
 when both functions are shifted by $x$ and "flipped".
@@ -168,7 +168,7 @@ For instance, for vectors defined on $\ell_2$, i.e.,
 the set of square summable infinite dimensional vectors
 with index running over $\mathbb{Z}$ we obtain the following definition.
 
-$$[f \circledast g](i) = \sum_a f(a) g(i-a)$$
+$$[f \circledast g](i) = \sum_a f(a) g(i-a).$$
 
 For two-dimensional arrays, we have a corresponding sum
 with indices $(i, j)$ for $f$ and $(i-a, j-b)$ for $g$ respectively.
@@ -220,7 +220,7 @@ some channels specialize to recognizing edges,
 We can take care of this by adding a fourth coordinate to $V$
 via $V[a, b, c, d]$. Putting all together we have:
 
-$$h[i, j, k] = \sum_{a = -\Delta}^{\Delta} \sum_{b = -\Delta}^{\Delta} \sum_c V[a, b, c, k] \cdot x[i+a, j+b, c]$$
+$$h[i, j, k] = \sum_{a = -\Delta}^{\Delta} \sum_{b = -\Delta}^{\Delta} \sum_c V[a, b, c, k] \cdot x[i+a, j+b, c].$$
 
 This is the definition of a convolutional neural network layer.
 There are still many operations that we need to address.

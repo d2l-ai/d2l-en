@@ -49,7 +49,7 @@ and a total of $p_w$ columns of padding
 (roughly half on the left and half on the right),
 the output shape will be
 
-$$(n_h-k_h+p_h+1)\times(n_w-k_w+p_w+1),$$
+$$(n_h-k_h+p_h+1)\times(n_w-k_w+p_w+1).$$
 
 This means that the height and width of the output
  will increase by $p_h$ and $p_w$ respectively.
