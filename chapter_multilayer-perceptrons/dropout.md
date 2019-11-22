@@ -147,9 +147,9 @@ Recall the multilayer perceptron (:numref:`sec_mlp`) with a hidden layer and 5 h
 
 $$
 \begin{aligned}
-    h & = \sigma(W_1 x + b_1) \\
-    o & = W_2 h + b_2 \\
-    \hat{y} & = \mathrm{softmax}(o)
+    h & = \sigma(W_1 x + b_1), \\
+    o & = W_2 h + b_2, \\
+    \hat{y} & = \mathrm{softmax}(o).
 \end{aligned}
 $$
 

@@ -281,7 +281,7 @@ def train_epoch_ch3(net, train_iter, loss, updater):
     if isinstance(updater, gluon.Trainer):
         updater = updater.step
     for X, y in train_iter:
-        # compute gradients and update parameters
+        # Compute gradients and update parameters
         with autograd.record():
             y_hat = net(X)
             l = loss(y_hat, y)
@@ -307,7 +307,7 @@ class Animator(object):
         self.fig, self.axes = d2l.plt.subplots(nrows, ncols, figsize=figsize)
         if nrows * ncols == 1:
             self.axes = [self.axes, ]
-        # use a lambda to capture arguments
+        # Use a lambda to capture arguments
         self.config_axes = lambda: d2l.set_axes(
             self.axes[0], xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
         self.X, self.Y, self.fmts = None, None, fmts

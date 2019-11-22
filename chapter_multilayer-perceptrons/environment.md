@@ -269,7 +269,7 @@ using weight decay, dropout, or some other related technique.
 This means that we largely minimize the loss on the training.
 
 $$
-\mathop{\mathrm{minimize}}_w \frac{1}{n} \sum_{i=1}^n l(x_i, y_i, f(x_i)) + \mathrm{some~penalty}(w)
+\mathop{\mathrm{minimize}}_w \frac{1}{n} \sum_{i=1}^n l(x_i, y_i, f(x_i)) + \mathrm{some~penalty}(w).
 $$
 
 Statisticians call the first term an *empirical average*,
@@ -280,7 +280,7 @@ we can correct for that by using the following simple identity:
 $$
 \begin{aligned}
 \int p(\mathbf{x}) f(\mathbf{x}) dx & = \int p(\mathbf{x}) f(\mathbf{x}) \frac{q(\mathbf{x})}{p(\mathbf{x})} dx \\
-& = \int q(\mathbf{x}) f(\mathbf{x}) \frac{p(\mathbf{x})}{q(\mathbf{x})} dx
+& = \int q(\mathbf{x}) f(\mathbf{x}) \frac{p(\mathbf{x})}{q(\mathbf{x})} dx.
 \end{aligned}
 $$
 
@@ -317,12 +317,12 @@ Now denote by $z_i$ labels which are 1
 for data drawn from $p$ and -1 for data drawn from $q$.
 Then the probability in a mixed dataset is given by
 
-$$P(z=1 \mid \mathbf{x}) = \frac{p(\mathbf{x})}{p(\mathbf{x})+q(\mathbf{x})} \text{ and hence } \frac{P(z=1 \mid \mathbf{x})}{P(z=-1 \mid \mathbf{x})} = \frac{p(\mathbf{x})}{q(\mathbf{x})}$$
+$$P(z=1 \mid \mathbf{x}) = \frac{p(\mathbf{x})}{p(\mathbf{x})+q(\mathbf{x})} \text{ and hence } \frac{P(z=1 \mid \mathbf{x})}{P(z=-1 \mid \mathbf{x})} = \frac{p(\mathbf{x})}{q(\mathbf{x})}.$$
 
 Hence, if we use a logistic regression approach where $P(z=1 \mid \mathbf{x})=\frac{1}{1+\exp(-f(\mathbf{x}))}$ it follows that
 
 $$
-\beta(\mathbf{x}) = \frac{1/(1 + \exp(-f(\mathbf{x})))}{\exp(-f(\mathbf{x})/(1 + \exp(-f(\mathbf{x})))} = \exp(f(\mathbf{x}))
+\beta(\mathbf{x}) = \frac{1/(1 + \exp(-f(\mathbf{x})))}{\exp(-f(\mathbf{x})/(1 + \exp(-f(\mathbf{x})))} = \exp(f(\mathbf{x})).
 $$
 
 As a result, we need to solve two problems:
@@ -332,10 +332,10 @@ where we weigh terms by $\beta$, e.g., via the head gradients.
 Here's a prototypical algorithm for that purpose
 which uses an unlabeled training set $X$ and test set $Z$:
 
-1. Generate training set with $\{(\mathbf{x}_i, -1) ... (\mathbf{z}_j, 1)\}$
-1. Train binary classifier using logistic regression to get function $f$
-1. Weigh training data using $\beta_i = \exp(f(\mathbf{x}_i))$ or better $\beta_i = \min(\exp(f(\mathbf{x}_i)), c)$
-1. Use weights $\beta_i$ for training on $X$ with labels $Y$
+1. Generate training set with $\{(\mathbf{x}_i, -1) ... (\mathbf{z}_j, 1)\}$.
+1. Train binary classifier using logistic regression to get function $f$.
+1. Weigh training data using $\beta_i = \exp(f(\mathbf{x}_i))$ or better $\beta_i = \min(\exp(f(\mathbf{x}_i)), c)$.
+1. Use weights $\beta_i$ for training on $X$ with labels $Y$.
 
 Note that this method relies on a crucial assumption.
 For this scheme to work, we need that each data point

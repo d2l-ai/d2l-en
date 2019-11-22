@@ -86,7 +86,7 @@ we need to add $||mathbf{w}||^2$, but how much should we add?
 To address this, we need to add a new hyperparameter,
 that we will call the *regularization constant* and denote by $\lambda$:
 
-$$l(\mathbf{w}, b) + \frac{\lambda}{2} \|\mathbf{w}\|^2$$
+$$l(\mathbf{w}, b) + \frac{\lambda}{2} \|\mathbf{w}\|^2.$$
 
 This non-negative parameter $\lambda \geq 0$
 governs the amount of regularization.
@@ -139,7 +139,7 @@ whereas large values of $\lambda$ constrain $\mathbf{w}$ considerably.
 Since we do not want to have large bias terms either,
 we often add $b^2$ as a penalty, too.
 
-## High-dimensional Linear Regression
+## High-Dimensional Linear Regression
 
 For high-dimensional regression it is difficult
 to pick the 'right' dimensions to omit.
@@ -148,7 +148,7 @@ We will illustrate this below.
 First, we will generate some synthetic data as before
 
 $$y = 0.05 + \sum_{i = 1}^d 0.01 x_i + \epsilon \text{ where }
-\epsilon \sim \mathcal{N}(0, 0.01)$$
+\epsilon \sim \mathcal{N}(0, 0.01).$$
 
 representing our label as a linear function of our inputs,
 corrupted by Gaussian noise with zero mean and variance 0.01.
@@ -184,7 +184,7 @@ The $\ell_2$ is just one among an infinite class of norms call p-norms,
 many of which you might encounter in the future.
 In general, for some number $p$, the $\ell_p$ norm is defined as
 
-$$\|\mathbf{w}\|_p^p := \sum_{i=1}^d |w_i|^p$$
+$$\|\mathbf{w}\|_p^p := \sum_{i=1}^d |w_i|^p.$$
 
 ### Initializing Model Parameters
 
@@ -231,7 +231,7 @@ def train(lambd):
     num_epochs, lr = 100, 0.003
     animator = d2l.Animator(xlabel='epochs', ylabel='loss', yscale='log',
                             xlim=[1, num_epochs], legend=['train', 'test'])
-    for epoch in range(1, num_epochs+1):
+    for epoch in range(1, num_epochs + 1):
         for X, y in train_iter:
             with autograd.record():
                 # The L2 norm penalty term has been added
@@ -299,7 +299,7 @@ def train_gluon(wd):
     loss = gluon.loss.L2Loss()
     num_epochs, lr = 100, 0.003
     # The weight parameter has been decayed. Weight names generally end with
-    # "weight".
+    # "weight"
     trainer_w = gluon.Trainer(net.collect_params('.*weight'), 'sgd',
                               {'learning_rate': lr, 'wd': wd})
     # The bias parameter has not decayed. Bias names generally end with "bias"

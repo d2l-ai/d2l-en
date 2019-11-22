@@ -139,7 +139,7 @@ To adjust them to a common scale,
 we rescale them to zero mean and unit variance.
 This is accomplished as follows:
 
-$$x \leftarrow \frac{x - \mu}{\sigma}$$
+$$x \leftarrow \frac{x - \mu}{\sigma}.$$
 
 To check that this transforms $x$ to data
 with zero mean and unit variance simply calculate
@@ -235,7 +235,7 @@ After all, a small value $\delta$ of $\log y - \log \hat{y}$
 translates into $e^{-\delta} \leq \frac{\hat{y}}{y} \leq e^\delta$.
 This leads to the following loss function:
 
-$$L = \sqrt{\frac{1}{n}\sum_{i=1}^n\left(\log y_i -\log \hat{y}_i\right)^2}$$
+$$L = \sqrt{\frac{1}{n}\sum_{i=1}^n\left(\log y_i -\log \hat{y}_i\right)^2}.$$
 
 ```{.python .input  n=11}
 def log_rmse(net, features, labels):
