@@ -66,9 +66,9 @@ class Seq2SeqAttentionDecoder(d2l.Decoder):
             # context has same shape as query
             context = self.attention_cell(
                 query, enc_outputs, enc_outputs, enc_valid_len)
-            # concatenate on the feature dimension
+            # Concatenate on the feature dimension
             x = np.concatenate((context, np.expand_dims(x, axis=1)), axis=-1)
-            # reshape x to (1, batch_size, embed_size+hidden_size)
+            # Reshape x to (1, batch_size, embed_size+hidden_size)
             out, hidden_state = self.rnn(x.swapaxes(0, 1), hidden_state)
             outputs.append(out)
         outputs = self.dense(np.concatenate(outputs, axis=0))
