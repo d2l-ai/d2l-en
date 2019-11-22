@@ -272,7 +272,7 @@ $$
 T = \frac{\hat\mu_n - \mu}{\hat\sigma_n/\sqrt{n}},
 $$
 
-we obtain a random variable following a well-known distribution called the *Student's t-distribution on $n-1$ degrees of freedom*.
+we obtain a random variable following a well-known distribution called the *Student's t-distribution on* $n-1$ *degrees of freedom*.
 
 This distribution is very well studied, and it is known, for instance, that as $n\rightarrow \infty$, it is approximately a standard Gaussian, and thus by looking up values of the Gaussian c.d.f. in a table, we may conclude that the value of $T$ is in the interval $[-1.96, 1.96]$ at least $95\%$ of the time.  For finite values of $n$, the interval needs to be somewhat larger, but are well known and precomputed in tables.
 
