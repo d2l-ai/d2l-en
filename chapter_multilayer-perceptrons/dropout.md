@@ -60,7 +60,7 @@ Yet even in these situations, when there is no true pattern to be learned, neura
 Let's think briefly about what we expect from a good statistical model.
 We want it to do well on unseen test data.
 One way we can accomplish this is by asking
-what constitutes a a 'simple' model?
+what constitutes a "simple" model?
 Simplicity can come in the form
 of a small number of dimensions,
 which is what we did when discussing fitting a model
@@ -136,8 +136,8 @@ By design, the expectation remains unchanged,
 i.e., $E[h'] = h$.
 Intermediate activations $h$ are replaced by a random variable $h'$
 with matching expectation.
-The name 'dropout' arises from the notion
-that some neurons 'drop out' of the computation
+The name "dropout" arises from the notion
+that some neurons "drop out" of the computation
 for the purpose of computing the final result.
 During training, we replace intermediate activations with random variables.
 

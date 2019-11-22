@@ -9,7 +9,7 @@ $$p(x_1, x_2, \ldots, x_T).$$
 
 Language models are incredibly useful. For instance, an ideal language model would be able to generate natural text just on its own, simply by drawing one word at a time $w_t \sim p(w_t \mid w_{t-1}, \ldots, w_1)$. Quite unlike the monkey using a typewriter, all text emerging from such a model would pass as natural language, e.g., English text. Furthermore, it would be sufficient for generating a meaningful dialog, simply by conditioning the text on previous dialog fragments. Clearly we are still very far from designing such a system, since it would need to *understand* the text rather than just generate grammatically sensible content.
 
-Nonetheless language models are of great service even in their limited form. For instance, the phrases *'to recognize speech'* and *'to wreck a nice beach'* sound very similar. This can cause ambiguity in speech recognition, ambiguity that is easily resolved through a language model which rejects the second translation as outlandish. Likewise, in a document summarization algorithm it is worth while knowing that *'dog bites man'* is much more frequent than *'man bites dog'*, or that *'let's eat grandma'* is a rather disturbing statement, whereas *'let's eat, grandma'* is much more benign.
+Nonetheless language models are of great service even in their limited form. For instance, the phrases "to recognize speech" and "to wreck a nice beach" sound very similar. This can cause ambiguity in speech recognition, ambiguity that is easily resolved through a language model which rejects the second translation as outlandish. Likewise, in a document summarization algorithm it is worth while knowing that "dog bites man" is much more frequent than "man bites dog", or that "let's eat grandma" is a rather disturbing statement, whereas "let's eat, grandma" is much more benign.
 
 ## Estimating a Language Model
 
@@ -32,7 +32,7 @@ frequency of a given word in the training dataset.
 For example, $p(\mathrm{Statistics})$ can be calculated as the
 probability of any sentence starting with the word 'statistics'. A
 slightly less accurate approach would be to count all occurrences of
-the word 'statistics' and divide it by the total number of words in
+the word "statistics" and divide it by the total number of words in
 the corpus. This works fairly well, particularly for frequent
 words. Moving on, we could attempt to estimate
 
@@ -41,7 +41,7 @@ $$\hat{p}(\mathrm{is} \mid \mathrm{Statistics}) = \frac{n(\mathrm{Statistics~is}
 Here $n(w)$ and $n(w, w')$ are the number of occurrences of singletons
 and pairs of words respectively. Unfortunately, estimating the
 probability of a word pair is somewhat more difficult, since the
-occurrences of *'Statistics is'* are a lot less frequent. In
+occurrences of "Statistics is" are a lot less frequent. In
 particular, for some unusual word combinations it may be tricky to
 find enough occurrences to get accurate estimates. Things take a turn for the worse for 3-word combinations and beyond. There will be many plausible 3-word combinations that we likely will not see in our dataset. Unless we provide some solution to give such word combinations nonzero weight, we will not be able to use these as a language model. If the dataset is small or if the words are very rare, we might not find even a single one of them.
 
@@ -124,7 +124,7 @@ bigram_vocab = d2l.Vocab(bigram_tokens)
 print(bigram_vocab.token_freqs[:10])
 ```
 
-Two things are notable. Out of the 10 most frequent word pairs, 9 are composed of stop words and only one is relevant to the actual book - 'the time'. Furthermore, let's see whether the trigram frequency behaves in the same manner.
+Two things are notable. Out of the 10 most frequent word pairs, 9 are composed of stop words and only one is relevant to the actual book---"the time". Furthermore, let's see whether the trigram frequency behaves in the same manner.
 
 ```{.python .input  n=4}
 trigram_tokens = [[triple for triple in zip(line[:-2], line[1:-1], line[2:])]

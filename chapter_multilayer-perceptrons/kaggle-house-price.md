@@ -45,7 +45,7 @@ you need to register for an account as shown in
 
 On the House Prices Prediction page as illustrated 
 in :numref:`fig_house_pricing`,
-you can find the dataset (under the data tab),
+you can find the dataset (under the "Data" tab),
 submit predictions, see your ranking, etc.,
 The URL is right here:
 
@@ -73,7 +73,7 @@ The price of each house is included for the training set only
 You can partition the training set to create a validation set,
 but you will only find out how you perform on the official test set
 when you upload your predictions and receive your score.
-The 'Data' tab on the competition tab has links to download the data.
+The "Data" tab on the competition tab has links to download the data.
 
 We will read and process the data using `pandas`,
 an [efficient data analysis toolkit](http://pandas.pydata.org/pandas-docs/stable/), so you will want to make sure that you have `pandas` installed
@@ -146,7 +146,7 @@ with zero mean and unit variance simply calculate
 $E[(x-\mu)/\sigma] = (\mu - \mu)/\sigma = 0$.
 To check the variance we use $E[(x-\mu)^2] = \sigma^2$
 and thus the transformed variable has unit variance.
-The reason for 'normalizing' the data is that
+The reason for "normalizing" the data is that
 it brings all features to the same order of magnitude.
 After all, we do not know *a priori*
 which features are likely to be relevant.

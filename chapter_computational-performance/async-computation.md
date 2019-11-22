@@ -65,7 +65,7 @@ npx.waitall()
 print('Done in %.4f sec' % timer.stop())
 ```
 
-Additionally, any operation that does not support asynchronous programming but converts the `ndarray` object from MXNet to an object in NumPy(a scientific computing package of Python) will cause the front-end to have to wait for computation results. For example, calling the `asnumpy` and `item` functions:
+Additionally, any operation that does not support asynchronous programming but converts the `ndarray` object from MXNet to an object in NumPy (see :numref:`sec_ndarray`) will cause the front-end to have to wait for computation results. For example, calling the `asnumpy` and `item` functions:
 
 ```{.python .input  n=6}
 timer.start()

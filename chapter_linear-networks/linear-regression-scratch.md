@@ -326,7 +326,7 @@ print('Error in estimating b', true_b - b)
 Note that we should not take it for granted
 that we are able to recover the parameters accurately.
 This only happens for a special category problems:
-strongly convex optimization problems with 'enough' data to ensure
+strongly convex optimization problems with "enough" data to ensure
 that the noisy samples allow us to recover the underlying dependency.
 In most cases this is *not* the case.
 In fact, the parameters of a deep network 

@@ -5,7 +5,7 @@ In the previous examples we played fast and loose with setting up our networks. 
 
 * We defined the network architecture with no regard to the input dimensionality.
 * We added layers without regard to the output dimension of the previous layer.
-* We even 'initialized' these parameters without knowing how many parameters were to initialize.
+* We even "initialized" these parameters without knowing how many parameters were to initialize.
 
 All of those things sound impossible and indeed, they are. After all, there is no way MXNet (or any other framework for that matter) could predict what the input dimensionality of a network would be. Later on, when working with convolutional networks and images this problem will become even more pertinent, since the input dimensionality (i.e., the resolution of an image) will affect the dimensionality of subsequent layers at a long range. Hence, the ability to set parameters without the need to know at the time of writing the code what the dimensionality is can greatly simplify statistical modeling. In what follows, we will discuss how this works using initialization as an example. After all, we cannot initialize variables that we do not know exist.
 

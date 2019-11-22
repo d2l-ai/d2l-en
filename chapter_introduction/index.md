@@ -75,9 +75,9 @@ natural language processing, healthcare, and genomics.
 Before we could begin writing, the authors of this book,
 like much of the work force, had to become caffeinated.
 We hopped in the car and started driving.
-Using an iPhone, Alex called out 'Hey Siri',
+Using an iPhone, Alex called out "Hey Siri",
 awakening the phone's voice recognition system.
-Then Mu commanded 'directions to Blue Bottle coffee shop'.
+Then Mu commanded "directions to Blue Bottle coffee shop".
 The phone quickly displayed the transcription of his command.
 It also recognized that we were asking for directions
 and launched the Maps application to fulfill our request.
@@ -89,7 +89,7 @@ our everyday interactions with a smart phone
 can engage several machine learning models.
 
 Imagine just writing a program to respond to a *wake word*
-like 'Alexa', 'Okay, Google' or 'Siri'.
+like "Alexa", "Okay, Google" or "Siri".
 Try coding it up in a room by yourself
 with nothing but a computer and a code editor,
 as illustrated in :numref:`fig_wake_word`.
@@ -110,8 +110,8 @@ Often, even when we do not know how to tell a computer
 explicitly how to map from inputs to outputs,
 we are nonetheless capable of performing the cognitive feat ourselves.
 In other words, even if you do not know
-*how to program a computer* to recognize the word 'Alexa',
-you yourself *are able* to recognize the word 'Alexa'.
+*how to program a computer* to recognize the word "Alexa",
+you yourself *are able* to recognize the word "Alexa".
 Armed with this ability, we can collect a huge *dataset*
 containing examples of audio and label those that *do*
 and that *do not* contain the wake word.
@@ -142,12 +142,12 @@ typically be correct as to whether (or not) the snippet contains the wake word.
 
 If we choose the right family of models,
 then there should exist one setting of the knobs
-such that the model fires ``yes`` every time it hears the word 'Alexa'.  Because the exact choice of the wake word is arbitrary,
+such that the model fires ``yes`` every time it hears the word "Alexa".  Because the exact choice of the wake word is arbitrary,
 we will probably need a model family sufficiently rich that,
 via another setting of the knobs, it could fire ``yes``
-only upon hearing the word 'Apricot'.
+only upon hearing the word "Apricot".
 We expect that the same model family should be suitable
-for *'Alexa' recognition* and *'Apricot' recognition*
+for *"Alexa" recognition* and *"Apricot" recognition*
 because they seem, intuitively, to be similar tasks.
 However, we might need a different family of models entirely
 if we want to deal with fundamentally different inputs or outputs,
@@ -155,8 +155,8 @@ say if we wanted to map from images to captions,
 or from English sentences to Chinese sentences.
 
 As you might guess, if we just set all of the knobs randomly,
-it is not likely that our model will recognize 'Alexa',
-'Apricot', or any other English word.
+it is not likely that our model will recognize "Alexa",
+"Apricot", or any other English word.
 In deep learning, the *learning* is the process
 by which we discover the right setting of the knobs
 coercing the desired behavior from our model.
@@ -568,10 +568,10 @@ is also a regression problem.
 A good rule of thumb is that any *How much?* or *How many?* problem
 should suggest regression.
 
-* 'How many hours will this surgery take?' - *regression*
-* 'How many dogs are in this photo?' - *regression*.
+* "How many hours will this surgery take?" - *regression*
+* "How many dogs are in this photo?" - *regression*.
 
-However, if you can easily pose your problem as 'Is this a _ ?',
+However, if you can easily pose your problem as "Is this a _ ?",
 then it is likely, classification, a different kind
 of supervised problem that we will cover next.
 Even if you have never worked with machine learning before,
@@ -762,13 +762,13 @@ The problem of learning to predict classes that are
 Auto-tagging problems are typically best described
 as multi-label classification problems.
 Think of the tags people might apply to posts on a tech blog,
-e.g., 'machine learning', 'technology', 'gadgets',
-'programming languages', 'linux', 'cloud computing', 'AWS'.
+e.g., "machine learning", "technology", "gadgets",
+"programming languages", "linux", "cloud computing", "AWS".
 A typical article might have 5-10 tags applied
 because these concepts are correlated.
-Posts about 'cloud computing' are likely to mention 'AWS'
-and posts about 'machine learning' could also deal
-with 'programming languages'.
+Posts about "cloud computing" are likely to mention "AWS"
+and posts about "machine learning" could also deal
+with "programming languages".
 
 We also have to deal with this kind of problem when dealing
 with the biomedical literature, where correctly tagging articles is important
@@ -1220,7 +1220,7 @@ averaging the length of 16 adult men's feet to obtain the average foot length.
 The 16 adult men were asked to line up in a row, when leaving church.
 Their aggregate length was then divided by 16
 to obtain an estimate for what now amounts to 1 foot.
-This 'algorithm' was later improved to deal with misshapen feet---the
+This "algorithm" was later improved to deal with misshapen feet---the
 2 men with the shortest and longest feet respectively were sent away,
 averaging only over the remainder.
 This is one of the earliest examples of the trimmed mean estimate.
@@ -1280,7 +1280,7 @@ Training a network is computationally very expensive.
 While RAM was plentiful at the end of the past century,
 computational power was scarce.
 Second, datasets were relatively small.
-In fact, Fisher's 'Iris dataset' from 1932
+In fact, Fisher's Iris dataset from 1932
 was a popular tool for testing the efficacy of algorithms.
 MNIST with its 60,000 handwritten digits was considered huge.
 
@@ -1328,7 +1328,7 @@ of deep learning, such as multilayer perceptrons
 :cite:`LeCun.Bottou.Bengio.ea.1998`, Long Short-Term Memory
 :cite:`Hochreiter.Schmidhuber.1997`,
 and Q-Learning :cite:`Watkins.Dayan.1992`,
-were essentially 'rediscovered' in the past decade,
+were essentially "rediscovered" in the past decade,
 after laying comparatively dormant for considerable time.
 
 The recent progress in statistical models, applications, and algorithms,
@@ -1542,7 +1542,7 @@ than the potential of malevolent superintelligence to destroy humanity.
 
 ## Exercises
 
-1. Which parts of code that you are currently writing could be 'learned', i.e., improved by learning and automatically determining design choices that are made in your code? Does your code include heuristic design choices?
+1. Which parts of code that you are currently writing could be "learned", i.e., improved by learning and automatically determining design choices that are made in your code? Does your code include heuristic design choices?
 1. Which problems that you encounter have many examples for how to solve them, yet no specific way to automate them? These may be prime candidates for using deep learning.
 1. Viewing the development of artificial intelligence as a new industrial revolution, what is the relationship between algorithms and data? Is it similar to steam engines and coal (what is the fundamental difference)?
 1. Where else can you apply the end-to-end training approach? Physics? Engineering? Econometrics?
