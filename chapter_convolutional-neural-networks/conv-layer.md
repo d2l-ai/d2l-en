@@ -226,7 +226,7 @@ conv2d.weight.data().reshape(1, 2)
 Indeed, the learned kernel array is remarkably close
 to the kernel array `K` we defined earlier.
 
-## Cross-correlation and Convolution
+## Cross-Correlation and Convolution
 
 Recall the observation from the previous section
 that cross-correlation and convolution are equivalent.
