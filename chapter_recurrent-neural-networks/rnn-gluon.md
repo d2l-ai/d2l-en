@@ -55,8 +55,8 @@ class RNNModel(nn.Block):
         X = npx.one_hot(inputs.T, self.vocab_size)
         Y, state = self.rnn(X, state)
         # The fully connected layer will first change the shape of Y to
-        # (num_steps * batch_size, num_hiddens).
-        # Its output shape is (num_steps * batch_size, vocab_size).
+        # (num_steps * batch_size, num_hiddens). Its output shape is
+        # (num_steps * batch_size, vocab_size).
         output = self.dense(Y.reshape(-1, Y.shape[-1]))
         return output, state
 

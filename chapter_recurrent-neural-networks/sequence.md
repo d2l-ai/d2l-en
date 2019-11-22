@@ -23,7 +23,7 @@ movies more accurately. But it is not just about movies.
 In short, we need statistical tools and new deep neural networks architectures to deal with sequence data. To keep things simple, we use the stock price illustrated in :numref:`fig_ftse100` as an example.
 
 ![FTSE 100 index over 30 years](../img/ftse100.png)
-:width:`600px`
+:width:`400px`
 :label:`fig_ftse100`
 
 Let's denote the prices by $x_t \geq 0$, i.e., at time $t \in \mathbb{N}$ we observe some price $x_t$. For a trader to do well in the stock market on day $t$ he should want to predict $x_t$ via
@@ -143,9 +143,9 @@ d2l.plot([time, time[tau:]], [x, estimates],
 This looks nice, just as we expected it. Even beyond 600 observations the estimates still look rather trustworthy. There is just one little problem to this: if we observe data only until timestep 600, we cannot hope to receive the ground truth for all future predictions. Instead, we need to work our way forward one step at a time:
 
 $$\begin{aligned}
-x_{601} & = f(x_{600}, \ldots, x_{597}) \\
-x_{602} & = f(x_{601}, \ldots, x_{598}) \\
-x_{603} & = f(x_{602}, \ldots, x_{599})
+x_{601} & = f(x_{600}, \ldots, x_{597}), \\
+x_{602} & = f(x_{601}, \ldots, x_{598}), \\
+x_{603} & = f(x_{602}, \ldots, x_{599}).
 \end{aligned}$$
 
 In other words, we will have to use our own predictions to make future predictions. Let's see how well this goes.
