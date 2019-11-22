@@ -43,7 +43,7 @@ $\mathbf{w} = [2, -3.4]^\top$ and $b = 4.2$
 and our synthetic labels will be assigned according 
 to the following linear model with noise term $\epsilon$:
 
-$$\mathbf{y}= \mathbf{X} \mathbf{w} + b + \mathbf\epsilon$$
+$$\mathbf{y}= \mathbf{X} \mathbf{w} + b + \mathbf\epsilon.$$
 
 You could think of $\epsilon$ as capturing potential 
 measurement errors on the features and labels.

@@ -60,7 +60,7 @@ A one-hot encoding is a vector with as many components as we have categories.
 The component corresponding to particular instance's category is set to 1
 and all other components are set to 0.
 
-$$y \in \{(1, 0, 0), (0, 1, 0), (0, 0, 1)\}$$
+$$y \in \{(1, 0, 0), (0, 1, 0), (0, 0, 1)\}.$$
 
 In our case, $y$ would be a three-dimensional vector, 
 with $(1, 0, 0)$ corresponding to "cat", $(0, 1, 0)$ to "chicken" and $(0, 0, 1)$ to "dog". 
@@ -149,7 +149,7 @@ and then divide by their sum (ensuring that they sum to $1$).
 
 $$
 \hat{\mathbf{y}} = \mathrm{softmax}(\mathbf{o})\quad \text{where}\quad
-\hat{y}_i = \frac{\exp(o_i)}{\sum_j \exp(o_j)}
+\hat{y}_i = \frac{\exp(o_i)}{\sum_j \exp(o_j)}.
 $$
 
 It is easy to see $\hat{y}_1 + \hat{y}_2 + \hat{y}_3 = 1$ 
@@ -160,7 +160,7 @@ Note that the softmax operation does not change the ordering among the logits,
 and thus we can still pick out the most likely class by:
 
 $$
-\hat{\imath}(\mathbf{o}) = \operatorname*{argmax}_i o_i = \operatorname*{argmax}_i \hat y_i
+\hat{\imath}(\mathbf{o}) = \operatorname*{argmax}_i o_i = \operatorname*{argmax}_i \hat y_i.
 $$
 
 The logits $\mathbf{o}$ then are simply the pre-softmax values 
@@ -183,8 +183,8 @@ and the bias satisfies $\mathbf{b} \in \mathbb{R}^q$.
 
 $$
 \begin{aligned}
-\mathbf{O} &= \mathbf{X} \mathbf{W} + \mathbf{b} \\
-\hat{\mathbf{Y}} & = \mathrm{softmax}(\mathbf{O})
+\mathbf{O} &= \mathbf{X} \mathbf{W} + \mathbf{b}, \\
+\hat{\mathbf{Y}} & = \mathrm{softmax}(\mathbf{O}).
 \end{aligned}
 $$
 
@@ -221,7 +221,7 @@ according to our model, given the features.
 $$
 P(Y \mid X) = \prod_{i=1}^n P(y^{(i)} \mid x^{(i)})
 \text{ and thus }
--\log P(Y \mid X) = \sum_{i=1}^n -\log P(y^{(i)} \mid x^{(i)})
+-\log P(Y \mid X) = \sum_{i=1}^n -\log P(y^{(i)} \mid x^{(i)}).
 $$
 
 
@@ -231,7 +231,7 @@ This yields the loss function
 (we dropped the superscript $(i)$ to avoid notation clutter):
 
 $$
-l = -\log P(y \mid x) = - \sum_j y_j \log \hat{y}_j
+l = -\log P(y \mid x) = - \sum_j y_j \log \hat{y}_j.
 $$
 
 For reasons explained later on, this loss function 
@@ -261,14 +261,14 @@ and using the definition of the softmax we obtain:
 
 $$
 l = -\sum_j y_j \log \hat{y}_j = \sum_j y_j \log \sum_k \exp(o_k) - \sum_j y_j o_j
-= \log \sum_k \exp(o_k) - \sum_j y_j o_j
+= \log \sum_k \exp(o_k) - \sum_j y_j o_j.
 $$
 
 To understand a bit better what is going on, 
 consider the derivative with respect to $o$. We get
 
 $$
-\partial_{o_j} l = \frac{\exp(o_j)}{\sum_k \exp(o_k)} - y_j = \mathrm{softmax}(\mathbf{o})_j - y_j = P(y = j \mid x) - y_j
+\partial_{o_j} l = \frac{\exp(o_j)}{\sum_k \exp(o_k)} - y_j = \mathrm{softmax}(\mathbf{o})_j - y_j = P(y = j \mid x) - y_j.
 $$
 
 In other words, the gradient is the difference 
@@ -294,7 +294,7 @@ just that the interpretation is slightly more general.
 It is the expected value of the loss for a distribution over labels.
 
 $$
-l(\mathbf{y}, \hat{\mathbf{y}}) = - \sum_j y_j \log \hat{y}_j
+l(\mathbf{y}, \hat{\mathbf{y}}) = - \sum_j y_j \log \hat{y}_j.
 $$
 
 This loss is called the cross-entropy loss and it is 
@@ -314,7 +314,7 @@ In information theory, this quantity is called the [entropy](https://en.wikipedi
 and it is captured by the following equation:
 
 $$
-H[p] = \sum_j - p(j) \log p(j)
+H[p] = \sum_j - p(j) \log p(j).
 $$
 
 One of the fundamental theorems of information theory states 
@@ -376,9 +376,11 @@ Perhaps the most common way to measure the distance between two distributions
 is to calculate the *Kullback Leibler divergence* $D(p\|q)$. 
 This is simply the difference between the cross-entropy and the entropy,
 i.e., the additional cross-entropy incurred over the irreducible minimum value it could take:
+
 $$
-D(p\|q) = H(p, q) - H[p] = \sum_j p(j) \log \frac{p(j)}{q(j)}
+D(p\|q) = H(p, q) - H[p] = \sum_j p(j) \log \frac{p(j)}{q(j)}.
 $$
+
 Note that in classification, we do not know the true $p$,
 so we cannot compute the entropy directly. 
 However, because the entropy is out of our control, 

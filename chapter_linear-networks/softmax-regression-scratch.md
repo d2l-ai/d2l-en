@@ -93,7 +93,7 @@ Before looking at the code, let's recall
 what this looks expressed as an equation:
 
 $$
-\mathrm{softmax}(\mathbf{X})_{ij} = \frac{\exp(X_{ij})}{\sum_k \exp(X_{ik})}
+\mathrm{softmax}(\mathbf{X})_{ij} = \frac{\exp(X_{ij})}{\sum_k \exp(X_{ik})}.
 $$
 
 The denominator, or normalization constant,
