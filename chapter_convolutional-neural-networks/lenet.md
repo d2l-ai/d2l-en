@@ -191,7 +191,7 @@ described in :numref:`sec_use_gpu`.
 ```{.python .input}
 # Saved in the d2l package for later use
 def evaluate_accuracy_gpu(net, data_iter, ctx=None):
-    if not ctx:  # Query the first device the first parameter is on.
+    if not ctx:  # Query the first device the first parameter is on
         ctx = list(net.collect_params().values())[0].list_ctx()[0]
     metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
     for X, y in data_iter:
