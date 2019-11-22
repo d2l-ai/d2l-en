@@ -37,7 +37,7 @@ As one would expect, due to its efficacy momentum is a well-studied subject in o
 
 To get a better understanding of the geometric properties of the momentum method we revisit gradient descent, albeit with a significantly less pleasant objective function. Recall that in :numref:`sec_gd` we used $f(\mathbf{x}) = x_1^2 + 2 x_2^2$, i.e., a moderately distorted ellipsoid objective. We distort this function further by stretching it out in the $x_1$ direction via
 
-$f(\mathbf{x}) = 0.1 x_1^2 + 2 x_2^2.$
+$$f(\mathbf{x}) = 0.1 x_1^2 + 2 x_2^2.$$
 
 As before $f$ has its minimum at $(0, 0)$. This function is *very* flat in the direction of $x_1$. Let's see what happens when we perform gradient descent as before on this new function. We pick a learning rate of $0.4$.
 
@@ -71,8 +71,8 @@ Using $\mathbf{v}_t$ instead of the gradient $\mathbf{g}_t$ yields the following
 
 $$
 \begin{aligned}
-\mathbf{v}_t &\leftarrow \beta \mathbf{v}_{t-1} + \mathbf{g}_{t, t-1} \\
-\mathbf{x}_t &\leftarrow \mathbf{x}_{t-1} - \eta_t \mathbf{v}_t
+\mathbf{v}_t &\leftarrow \beta \mathbf{v}_{t-1} + \mathbf{g}_{t, t-1}, \\
+\mathbf{x}_t &\leftarrow \mathbf{x}_{t-1} - \eta_t \mathbf{v}_t.
 \end{aligned}
 $$
 
@@ -182,7 +182,7 @@ The gradient is given by $\partial_{\mathbf{x}} f(\mathbf{x}) = Q (\mathbf{x} - 
 
 Since $Q$ is positive definite it can be decomposed into its eigensystem via $Q = O^\top \Lambda O$ for an orthogonal (rotation) matrix $O$ and a diagonal matrix $\Lambda$ of positive eigenvalues. This allows us to perform a change of variables from $\mathbf{x}$ to $\mathbf{z} := O (\mathbf{x} - Q^{-1} \mathbf{c})$ to obtain a much simplified expression:
 
-$$h(\mathbf{z}) = \frac{1}{2} \mathbf{z}^\top \Lambda \mathbf{z} + b'$$
+$$h(\mathbf{z}) = \frac{1}{2} \mathbf{z}^\top \Lambda \mathbf{z} + b'.$$
 
 Here $c' = b - \frac{1}{2} \mathbf{c}^\top Q^{-1} \mathbf{c}$. Since $O$ is only an orthogonal matrix this doesn't perturb the gradients in a meaningful way. Expressed in terms of $\mathbf{z}$ gradient descent becomes
 
@@ -193,7 +193,7 @@ The important fact in this expression is that gradient descent *does not mix* be
 $$\begin{aligned}
 \mathbf{v}_t & = \beta \mathbf{v}_{t-1} + \Lambda \mathbf{z}_{t-1} \\
 \mathbf{z}_t & = \mathbf{z}_{t-1} - \eta \left(\beta \mathbf{v}_{t-1} + \Lambda \mathbf{z}_{t-1}\right) \\
-    & = (\mathbf{1} - \eta \Lambda) \mathbf{z}_{t-1} - \eta \beta \mathbf{v}_{t-1}
+    & = (\mathbf{1} - \eta \Lambda) \mathbf{z}_{t-1} - \eta \beta \mathbf{v}_{t-1}.
 \end{aligned}$$
 
 In doing this we just proved the following theorem: Gradient Descent with and without momentum for a convex quadratic function decomposes into coordinate-wise optimization in the direction of the eigenvectors of the quadratic matrix.
@@ -222,7 +222,7 @@ To analyze convergence in the case of momentum we begin by rewriting the update 
 $$
 \begin{bmatrix} v_{t+1} \\ x_{t+1} \end{bmatrix} =
 \begin{bmatrix} \beta & \lambda \\ -\eta \beta & (1 - \eta \lambda) \end{bmatrix}  
-\begin{bmatrix} v_{t} \\ x_{t} \end{bmatrix} = R(\beta, \eta, \lambda) \begin{bmatrix} v_{t} \\ x_{t} \end{bmatrix}
+\begin{bmatrix} v_{t} \\ x_{t} \end{bmatrix} = R(\beta, \eta, \lambda) \begin{bmatrix} v_{t} \\ x_{t} \end{bmatrix}.
 $$
 
 We used $R$ to denote the $2 \times 2$ governing convergence behavior. After $t$ steps the initial choice $[v_0, x_0]$ becomes $R(\beta, \eta, \lambda)^t [v_0, x_0]$. Hence, it is up to the eigenvalues of $R$ to detmine the speed of convergence. See the [Distill post](https://distill.pub/2017/momentum/) of :cite:`Goh.2017` for a great animation and :cite:`Flammarion.Bach.2015` for a detailed analysis. One can show that $0 < \eta \lambda < 2 + 2 \beta$ momentum converges. This is a larger range of feasible parameters when compared to $0 < \eta \lambda < 2$ for gradient descent. It also suggests that in general large values of $\beta$ are desirable. Further details require a fair amount of technical detail and we suggest that the interested reader consult the original publications.

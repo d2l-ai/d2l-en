@@ -103,18 +103,18 @@ There exist many more choices for how to set the learning rate. For instance, we
 The following is optional and primarily serves to convey more intuition about the problem. We limit ourselves to one of the simplest proofs, as described by :cite:`Nesterov.Vial.2000`. Significantly more advanced proof techniques exist, e.g., whenever the objective function is particularly well behaved. :cite:`Hazan.Rakhlin.Bartlett.2008` show that for strongly convex functions, i.e., for functions that can be bounded from below by $\mathbf{x}^\top Q \mathbf{x}$, it is possible to minimize them in a small number of steps while decreasing the learning rate like $\eta(t) = \eta_0/(\beta t + 1)$. Unfortunately this case never really occurs in deep learning and we are left with a much more slowly decreasing rate in practice.
 
 Consider the case where
-$$w_{t+1} = w_{t} - \eta_t \partial_w l(x_t, w)$$
+$$w_{t+1} = w_{t} - \eta_t \partial_w l(x_t, w).$$
 
 In particular, assume that $x_t$ is drawn from some distribution $p(x)$ and that $l(x, w)$ is a convex function in $w$ for all $x$. Last denote by
 
 $$R(w) = E_{x \sim p}[l(x, w)]$$
 
-the expected risk and by $R^*$ its minimum with regard to $w$. Last let $w^*$ be the minimizer (we assume that it exists within the domain which $w$ is defined). In this case we can track the distance between the current parameter $w_t$ and the risk minimizer $w^*$ and see whether it improves over time.
+the expected risk and by $R^*$ its minimum with regard to $w$. Last let $w^*$ be the minimizer (we assume that it exists within the domain which $w$ is defined). In this case we can track the distance between the current parameter $w_t$ and the risk minimizer $w^*$ and see whether it improves over time:
 
 $$\begin{aligned}
     \|w_{t+1} - w^*\|^2 & = \|w_{t} - \eta_t \partial_w l(x_t, w) - w^*\|^2 \\
     & = \|w_{t} - w^*\|^2 + \eta_t^2 \|\partial_w l(x_t, w)\|^2 - 2 \eta_t
-    \left\langle w_t - w^*, \partial_w l(x_t, w)\right\rangle
+    \left\langle w_t - w^*, \partial_w l(x_t, w)\right\rangle.
    \end{aligned}
 $$
 
@@ -153,7 +153,7 @@ $$\sum_t \eta_t E[R[w_t]] \geq \sum \eta_t \cdot \left[E[\bar{w}]\right].$$
 Plugging this into the above inequality yields the bound
 
 $$
-\left[E[\bar{w}]\right] - R^* \leq \frac{r^2 + L^2 \sum_{t=1}^T \eta_t^2}{2 \sum_{t=1}^T \eta_t}
+\left[E[\bar{w}]\right] - R^* \leq \frac{r^2 + L^2 \sum_{t=1}^T \eta_t^2}{2 \sum_{t=1}^T \eta_t}.
 $$
 
 Here $r^2 := \|w_0 - w^*\|^2$ is a bound on the distance between the initial choice of parameters and the final outcome. In short, the speed of convergence depends on how rapidly the loss function changes via the Lipschitz constant $L$ and how far away from optimality the initial value is $r$. Note that the bound is in terms of $\bar{w}$ rather than $w_T$. This is the case since $\bar{w}$ is a smoothed version of the optimization path. Now let's analyze some choices for $\eta_t$.
