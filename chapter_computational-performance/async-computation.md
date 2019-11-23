@@ -15,12 +15,12 @@ npx.set_np()
 For a warmup consider the following toy problem - we want to generate a random matrix and multiply it. Let's do that both in NumPy and in MXNet NP to see the difference.
 
 ```{.python .input  n=2}
-with d2l.benchmark():
+with d2l.benchmark('numpy   : %.4f sec'):
     for _ in range(10):
         a = numpy.random.normal(size=(1000, 1000))
         b = numpy.dot(a, a)
 
-with d2l.benchmark():
+with d2l.benchmark('mxnet.np: %.4f sec'):
     for _ in range(10):
         a = np.random.normal(size=(1000, 1000))
         b = np.dot(a, a)       
@@ -65,13 +65,11 @@ There are a number of operations that will force Python to wait for completion:
 Let's see how this works in practice:
 
 ```{.python .input  n=5}
-with d2l.benchmark():
+with d2l.benchmark('waitall     : %.4f sec'):
     b = np.dot(a, a)       
     npx.waitall()
-```
 
-```{.python .input  n=6}
-with d2l.benchmark():
+with d2l.benchmark('wait_to_read: %.4f sec'):
     b = np.dot(a, a)
     b.wait_to_read()
 ```
@@ -79,13 +77,11 @@ with d2l.benchmark():
 Both operations take approximately the same time to complete. Besides the obvious blocking operations we recommend that the reader is aware of *implicit* blockers. Printing a variable clearly requires the variable to be avaialable and is thus a blocker. Lastly, conversions to NumPy via `z.asnumpy()` and conversions to scalars via `z.item()` are blocking, since NumPy has no notion of asynchrony. It needs access to the values just like the `print` function. Copying small amounts of data frequently from MXNet's scope to NumPy and back can destroy performance of an otherwise efficient code, since each such operation requires the compute graph to evaluate all intermediate results needed to get the relevant term *before* anything else can be done.
 
 ```{.python .input  n=7}
-with d2l.benchmark():
+with d2l.benchmark('numpy  conversion: %.4f sec'):
     b = np.dot(a, a)       
     b.asnumpy()
-```
 
-```{.python .input  n=8}
-with d2l.benchmark():
+with d2l.benchmark('scalar conversion: %.4f sec'):
     b = np.dot(a, a)       
     b.sum().item()
 ```
@@ -95,12 +91,12 @@ with d2l.benchmark():
 On a heavily multithreaded system (even regular laptops have 4 threads or more and on multi-socket servers this number can exceed 256) the overhead of scheduling operations can become significant. This is why it's highly desirable to have computation and scheduling occur asynchronously and in parallel. To illustrate the benefit of doing this let's see what happens if we increment a variable by 1 multiple times, both in sequence or asynchronously. We simulate synchronous execution by inserting a `wait_to_read()` barrier in between each addition.
 
 ```{.python .input  n=9}
-with d2l.benchmark():
+with d2l.benchmark('Synchronous : %.4f sec'):
     for _ in range(1000):
         y = x + 1
         y.wait_to_read()
 
-with d2l.benchmark():
+with d2l.benchmark('Asynchronous: %.4f sec'):
     for _ in range(1000):
         y = x + 1
     y.wait_to_read()
@@ -159,7 +155,7 @@ To ensure that we don't overflow the task buffer on the backend we insert a `wai
 
 ```{.python .input  n=14}
 mem = get_mem()
-with d2l.benchmark():
+with d2l.benchmark('Time per epoch: %.4f sec'):
     for X, y in data_iter():
         with autograd.record():
             l = loss(y, net(X))
@@ -174,7 +170,7 @@ As we see, the timing of the minibatches lines up quite nicely with the overall 
 
 ```{.python .input  n=14}
 mem = get_mem()
-with d2l.benchmark():
+with d2l.benchmark('Time per epoch: %.4f sec'):
     for X, y in data_iter():
         with autograd.record():
             l = loss(y, net(X))
