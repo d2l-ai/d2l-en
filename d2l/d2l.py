@@ -5,7 +5,7 @@
 import sys
 d2l = sys.modules[__name__]
 
-# Defined in file: ./chapter_preface/preface.md
+# Defined in file: ./chapter_preface/index.md
 import collections
 from collections import defaultdict
 from IPython import display
@@ -1015,6 +1015,16 @@ def train_gluon_ch11(tr_name, hyperparams, data_iter, num_epochs=2):
                              (d2l.evaluate_loss(net, data_iter, loss),))
                 timer.start()
     print('loss: %.3f, %.3f sec/epoch' % (animator.Y[0][-1], timer.avg()))
+
+
+# Defined in file: ./chapter_computational-performance/hybridize.md
+class benchmark:    
+    def __enter__(self):
+        self.timer = d2l.Timer()
+        return self
+
+    def __exit__(self, *args):
+        print('Done in %.4f sec' % self.timer.stop())
 
 
 # Defined in file: ./chapter_computational-performance/multiple-gpus.md
