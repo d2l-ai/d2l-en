@@ -1017,6 +1017,16 @@ def train_gluon_ch11(tr_name, hyperparams, data_iter, num_epochs=2):
     print('loss: %.3f, %.3f sec/epoch' % (animator.Y[0][-1], timer.avg()))
 
 
+# Defined in file: ./chapter_computational-performance/hybridize.md
+class benchmark:    
+    def __enter__(self):
+        self.timer = d2l.Timer()
+        return self
+
+    def __exit__(self, *args):
+        print('Done in %.4f sec' % self.timer.stop())
+
+
 # Defined in file: ./chapter_computational-performance/multiple-gpus.md
 def split_batch(X, y, ctx_list):
     """Split X and y into multiple devices specified by ctx."""

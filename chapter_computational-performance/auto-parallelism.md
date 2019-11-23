@@ -1,10 +1,12 @@
 # Automatic Parallelism
 :label:`sec_auto_para`
 
-MXNet automatically constructs computational graphs at the back end. Using a
-computational graph, the system is aware of all the computational dependencies,
+MXNet automatically constructs computational graphs at the backend. Using a
+computational graph, the system is aware of all the dependencies,
 and can selectively execute multiple non-interdependent tasks in parallel to
-improve computing performance. For instance, the first example in
+improve speed. For instance, :numref:`fig_asyncgraph` 
+
+the first example in
 :numref:`sec_async` executes `a = np.ones((1, 2))` and `b = np.ones((1, 2))`
 in turn. There is no dependency between these two steps, so the system can
 choose to execute them in parallel.
