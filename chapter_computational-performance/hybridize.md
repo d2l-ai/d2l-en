@@ -108,24 +108,27 @@ To demonstrate the performance improvement gained by compilation we compare the 
 ```{.python .input}
 # Saved in the d2l package for later use
 class benchmark:    
+    def __init__(self, description = 'Done in %.4f sec'):
+        self.description = description
+        
     def __enter__(self):
         self.timer = d2l.Timer()
         return self
 
     def __exit__(self, *args):
-        print('Done in %.4f sec' % self.timer.stop())
+        print(self.description % self.timer.stop())
 ```
 
 Now we can invoke the network twice, once with and once without hybridization.
 
 ```{.python .input  n=5}
 net = get_net()
-with benchmark():
+with benchmark('Without hybridization: %.4f sec'):
     for i in range(1000): net(x)
     npx.waitall()
 
 net.hybridize()
-with benchmark():
+with benchmark('With    hybridization: %.4f sec'):
     for i in range(1000): net(x)
     npx.waitall()
 ```
