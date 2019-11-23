@@ -19,7 +19,7 @@ with d2l.benchmark():
     for _ in range(10):
         a = numpy.random.normal(size=(1000, 1000))
         b = numpy.dot(a, a)
-        
+
 with d2l.benchmark():
     for _ in range(10):
         a = np.random.normal(size=(1000, 1000))
@@ -36,9 +36,9 @@ with d2l.benchmark():
     npx.waitall()
 ```
 
-Broadly speaking, MXNet has a frontend for direct interaction with the users, e.g. via Python, as well as a backend used by the system to perform the computation. The backend possesses its own threads that continuously collect and execute queued tasks. Note that for this to work the backend must be able to keep track of the dependencies between various steps in the computational graph. Hence it is ony possible to parallelize operations that do not depend on each other. 
+Broadly speaking, MXNet has a frontend for direct interaction with the users, e.g. via Python, as well as a backend used by the system to perform the computation. The backend possesses its own threads that continuously collect and execute queued tasks. Note that for this to work the backend must be able to keep track of the dependencies between various steps in the computational graph. Hence it is ony possible to parallelize operations that do not depend on each other.
 
-Users can write MXNet programs in various frontend languages, such as Python, R, Scala and C++. Regardless of the front-end programming language used, the execution of MXNet programs occurs primarily in the back-end of C++ implementations. Operations issued by the frontend language are passed on to the backend for execution. The backend manages its own threads that continuously collect and execute queued tasks. Note that for this to work the backend must be able to keep track of the dependencies between various steps in the computational graph. That is, it is not possible to parallelize operations that depend on each other. 
+Users can write MXNet programs in various frontend languages, such as Python, R, Scala and C++. Regardless of the front-end programming language used, the execution of MXNet programs occurs primarily in the back-end of C++ implementations. Operations issued by the frontend language are passed on to the backend for execution. The backend manages its own threads that continuously collect and execute queued tasks. Note that for this to work the backend must be able to keep track of the dependencies between various steps in the computational graph. That is, it is not possible to parallelize operations that depend on each other.
 
 ![Programming Frontends.](../img/frontends.svg)
 
@@ -59,8 +59,8 @@ Whenever the Python frontend thread executes one of the first three statements, 
 ## Barriers and Blockers
 
 There are a number of operations that will force Python to wait for completion:
-* Most obviously `npx.waitall()` waits until all computation has completed, regardless of when the compute instructions were issued. In practice it is a bad idea to use this operator unless absolutely necessary since it can lead to poor performance. 
-* If we just want to wait until a specific variable is available we can call `z.wait_to_read()`. In this case MXNet blocks return to Python until the variable `z` has been computed. Other computation may well continue afterwards. 
+* Most obviously `npx.waitall()` waits until all computation has completed, regardless of when the compute instructions were issued. In practice it is a bad idea to use this operator unless absolutely necessary since it can lead to poor performance.
+* If we just want to wait until a specific variable is available we can call `z.wait_to_read()`. In this case MXNet blocks return to Python until the variable `z` has been computed. Other computation may well continue afterwards.
 
 Let's see how this works in practice:
 
@@ -116,7 +116,7 @@ Assume that the durations of these three stages are $t_1, t_2$ and $t_3$, respec
 
 ## Improving Memory Footprint
 
-Imagine a situation where we keep on inserting operations into the backend by executing Python code on the frontend. For instance, the frontend might insert a large number of minibatch tasks within a very short time. After all, if no meaningful computation happens in Python this can be done quite quickly. If each of these tasks can be launched quickly at the same time this may cause a spike in memory usage. Given a finite amount of memory available on GPUs (and even on CPUs) this can lead to resource contention or even program crashes. Some readers might have noticed that previous training routines made use of synchronization methods such as `item` or even `asnumpy`. 
+Imagine a situation where we keep on inserting operations into the backend by executing Python code on the frontend. For instance, the frontend might insert a large number of minibatch tasks within a very short time. After all, if no meaningful computation happens in Python this can be done quite quickly. If each of these tasks can be launched quickly at the same time this may cause a spike in memory usage. Given a finite amount of memory available on GPUs (and even on CPUs) this can lead to resource contention or even program crashes. Some readers might have noticed that previous training routines made use of synchronization methods such as `item` or even `asnumpy`.
 
 We recommend to use these operations carefully, e.g. for each minibatch, such as to balance computational efficiency and memory footprint. To illustrate what happens let's implement a simple training loop for a deep network and measure its memory consumption and timing. Below is the mock data generator and deep network.
 
@@ -130,7 +130,7 @@ def data_iter():
         yield X, y
         if (i + 1) % 50 == 0:
             print('batch %d, time %.4f sec' % (i + 1, timer.stop()))
-            
+
 net = nn.Sequential()
 net.add(nn.Dense(2048, activation='relu'),
         nn.Dense(512, activation='relu'), nn.Dense(1))
@@ -184,23 +184,23 @@ with d2l.benchmark():
 print('increased memory: %f MB' % (get_mem() - mem))
 ```
 
-Even though the time to issue instructions for the backend is an order of magnitude smaller, we still need to perform computation. Consequently a large amount of intermediate results cannot be released and may pile up in memory. While this didn't cause any issues in the toy example above, it might well have resulted in out of memory situations when left unchecked in real world scenarios. 
+Even though the time to issue instructions for the backend is an order of magnitude smaller, we still need to perform computation. Consequently a large amount of intermediate results cannot be released and may pile up in memory. While this didn't cause any issues in the toy example above, it might well have resulted in out of memory situations when left unchecked in real world scenarios.
 
 ## Summary
 
 * MXNet decouples the Python frontend from an execution backend. This allows for fast asynchronous insertion of commands into the backend and associated parallelism.
-* Asynchrony leads to a rather responsive frontend. However, use caution not to overfill the task queue since it may lead to excessive memory consumption. 
-* It is recommended to synchronize for each minibatch to keep frontend and backend approximately synchronized. 
-* Be aware of the fact that conversions from MXNet's memory management to Python will force the backend to wait until  the specific variable is ready. `print`, `asnumpy` and `item` all have this effect. This can be desirable but a carless use of synchronization can ruin performance. 
+* Asynchrony leads to a rather responsive frontend. However, use caution not to overfill the task queue since it may lead to excessive memory consumption.
+* It is recommended to synchronize for each minibatch to keep frontend and backend approximately synchronized.
+* Be aware of the fact that conversions from MXNet's memory management to Python will force the backend to wait until  the specific variable is ready. `print`, `asnumpy` and `item` all have this effect. This can be desirable but a carless use of synchronization can ruin performance.
 * Chip vendors offer sophisticated performance analysis tools to obtain a much more fine-grained insight into the efficiency of deep learning.
 
 
 ## Exercises
 
 1. We mentioned above that using asynchronous computation can reduce the total amount of time needed to perform $1000$ computations to $t_1 + 1000 t_2 + t_3$. Why do we have to assume $1000 t_2 > 999 t_1$ here?
-1. How would you need to modify the training loop if you wanted to have an overlap of one minibatch each? I.e. if you wanted to ensure that batch $b_t$ finishes before batch $b_{t+2}$ commences? 
+1. How would you need to modify the training loop if you wanted to have an overlap of one minibatch each? I.e. if you wanted to ensure that batch $b_t$ finishes before batch $b_{t+2}$ commences?
 1. What might happen if we want to execute code on CPUs and GPUs simultaneously? Should you still insist on synchronizing after every minibatch has been issued?
-1. Measure the difference between `waitall` and `wait_to_read`. Hint - perform a number of instructions and synchronize for an intermediate result. 
+1. Measure the difference between `waitall` and `wait_to_read`. Hint - perform a number of instructions and synchronize for an intermediate result.
 
 
 ## [Discussions](https://discuss.mxnet.io/t/2381)

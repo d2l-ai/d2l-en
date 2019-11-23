@@ -310,7 +310,7 @@ Let's take a look at some properties of the KL divergence :eqref:`eq_kl_def`.
 
 Let's go through a toy example to see the non-symmetry explicitly. 
 
-First, let's generate and sort three `ndarray`s of length $10,000$: an objective ndarray $p$ which follows a normal distribution $N(0, 1)$, and two candidate ndarrays $q_1$ and $q_2$ which follow normal distributions $N(-1, 1)$ and $N(1, 1)$ respectively.
+First, let's generate and sort three `ndarray`s of length $10,000$: an objective `ndarray` $p$ which follows a normal distribution $N(0, 1)$, and two candidate `ndarray`s $q_1$ and $q_2$ which follow normal distributions $N(-1, 1)$ and $N(1, 1)$ respectively.
 
 ```{.python .input}
 random.seed(1)
@@ -383,7 +383,7 @@ def cross_entropy(y_hat, y):
     return ce.mean()
 ```
 
-Now define two ndarrays for the labels and predictions, and calculate the cross entropy loss of them.
+Now define two `ndarray`s for the labels and predictions, and calculate the cross entropy loss of them.
 
 ```{.python .input}
 labels = np.array([0, 2])

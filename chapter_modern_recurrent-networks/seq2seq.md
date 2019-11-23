@@ -24,15 +24,15 @@ npx.set_np()
 
 Recall that the encoder of seq2seq can transform the inputs with different length to a universal fixed length content vector $\mathbf{c}$ by encoding the sequence information inside $\mathbf{c}$. We usually use RNN layers within the encoder.
 
-Let's think of an input sequence $x_1, \ldots, x_T$, where $x_t$ is $t$-th word of the inputs. At timestep $t$, the RNN will have two vectors as input: the $x_t$'s feature vector $\mathbf{x_t}$ and the hidden state of the last timestep $\mathbf{h_t}$. Let's denote the transformation of the RNN's hidden states by a function $f$: 
+Let's think of an input sequence $x_1, \ldots, x_T$, where $x_t$ is $t$-th word of the inputs. At timestep $t$, the RNN will have two vectors as input: the $x_t$'s feature vector $\mathbf{x}_t$ and the hidden state of the last timestep $\mathbf{h}_t$. Let's denote the transformation of the RNN's hidden states by a function $f$: 
 
-$$\mathbf{h_t} = f (\mathbf{x_t}, \mathbf{h_{t-1}}).$$
+$$\mathbf{h}_t = f (\mathbf{x}_t, \mathbf{h}_{t-1}).$$
 
 Next, the encoder absorbs the information of all the hidden states and encodes into the content vector $\mathbf{c}$ by a function $q$:
 
-$$\mathbf{c} = q (\mathbf{h_1}, \ldots, \mathbf{h_T}).$$
+$$\mathbf{c} = q (\mathbf{h}_1, \ldots, \mathbf{h}_T).$$
 
-For example, if we choose $q$ as $q (\mathbf{h_1}, \ldots, \mathbf{h_T}) = \mathbf{h_T}$, then the content vector will be the final hidden state $\mathbf{h_T}$.
+For example, if we choose $q$ as $q (\mathbf{h}_1, \ldots, \mathbf{h}_T) = \mathbf{h}_T$, then the content vector will be the final hidden state $\mathbf{h}_T$.
 
 So far what we describe above is a signle directional RNN, where each timestep's hidden state only depends on the previous tiemsteps'. We can also use other forms of RNNs such as GRUs, LSTMs and, bidirectional RNNs to encode the sequential information.
 
@@ -55,7 +55,7 @@ class Seq2SeqEncoder(d2l.Encoder):
         state = self.rnn.begin_state(batch_size=X.shape[1], ctx=X.context)
         out, state = self.rnn(X, state)
         # out shape: (seq_len, batch_size, num_hiddens)
-        # stae shape: (num_layers, batch_size, num_hiddens),
+        # state shape: (num_layers, batch_size, num_hiddens),
         # where "state" contains the hidden state and the memory cell
         return out, state
 ```
@@ -71,7 +71,7 @@ output, state = encoder(X)
 output.shape
 ```
 
-Since long short term memory (LSTM) is used, the `state` list will contain both the hidden state and the memory cell with same shape (number of hidden layers, batch size, number of hidden units). However, if gated recurrent unit (GRU) is used, the `state` list contains only one element - the hidden state in the final timestep with shape (number of hidden layers, batch size, number of hidden units).
+Since long short term memory (LSTM) is used, the `state` list will contain both the hidden state and the memory cell with same shape (number of hidden layers, batch size, number of hidden units). However, if gated recurrent unit (GRU) is used, the `state` list contains only one element---the hidden state in the final timestep with shape (number of hidden layers, batch size, number of hidden units).
 
 ```{.python .input}
 len(state), state[0].shape, state[1].shape
@@ -82,9 +82,9 @@ len(state), state[0].shape, state[1].shape
 
 As we just introduced, the content vector $\mathbf{c}$ encodes the information from the whole input sequence $x_1, \ldots, x_T$. Suppose that the given outputs in the training set are $y_1, \ldots, y_{T'}$. At each timestep $t'$, the conditional probability of output $y_{t'}$ will base on the previous output sequences $y_1, \ldots, y_{t'-1}$ and the content vector $\mathbf{c}$, i.e., $$P(y_{t'} \mid y_1, \ldots, y_{t'-1}, \mathbf{c}).$$
 
-Hence, we can use another RNN as the decoder. At timestep $t'$, the decoder will update its hidden state $\mathbf{s_{t'}}$ by three inputs: $y_{t'-1}$'s feature vector $\mathbf{y_{t'-1}}$, the content vector $\mathbf{c}$, and the hidden state of the last timestep $\mathbf{s_{t'}}$. Let's denote the transformation of the RNN's hidden states within the decoder by a function $g$: 
+Hence, we can use another RNN as the decoder. At timestep $t'$, the decoder will update its hidden state $\mathbf{s}_{t'}$ by three inputs: $y_{t'-1}$'s feature vector $\mathbf{y}_{t'-1}$, the content vector $\mathbf{c}$, and the hidden state of the last timestep $\mathbf{s}_{t'}$. Let's denote the transformation of the RNN's hidden states within the decoder by a function $g$: 
 
-$$\mathbf{s_{t'}} = f (\mathbf{y_{t'-1}}, \mathbf{c}, \mathbf{s_{t'-1}}).$$
+$$\mathbf{s}_{t'} = f (\mathbf{y}_{t'-1}, \mathbf{c}, \mathbf{s}_{t'-1}).$$
 
 
 Now let's implement the seq2seq's decoder together. We directly use the hidden state of the encoder in the final timestep as the initial hidden state of the decoder. This requires that the encoder and decoder RNNs have the same numbers of layers and hidden units.
@@ -152,7 +152,7 @@ class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
     # valid_length shape: (batch_size, )
     def forward(self, pred, label, valid_length):
         # weights shape should be (batch_size, seq_len, 1)
-        weights = np.expand_dims(np.ones_like(label),axis=-1)
+        weights = np.expand_dims(np.ones_like(label), axis=-1)
         weights = npx.sequence_mask(weights, valid_length, True, axis=1)
         return super(MaskedSoftmaxCELoss, self).forward(pred, label, weights)
 ```
@@ -178,12 +178,12 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, ctx):
     loss = MaskedSoftmaxCELoss()
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[1, num_epochs], ylim=[0, 0.25])
-    for epoch in range(1, num_epochs+1):
+    for epoch in range(1, num_epochs + 1):
         timer = d2l.Timer()
         metric = d2l.Accumulator(2)  # loss_sum, num_tokens
         for batch in data_iter:
             X, X_vlen, Y, Y_vlen = [x.as_in_context(ctx) for x in batch]
-            Y_input, Y_label, Y_vlen = Y[:,:-1], Y[:,1:], Y_vlen-1
+            Y_input, Y_label, Y_vlen = Y[:, :-1], Y[:, 1:], Y_vlen-1
             with autograd.record():
                 Y_hat, _ = model(X, Y_input, X_vlen, Y_vlen)
                 l = loss(Y_hat, Y_label, Y_vlen)
@@ -224,12 +224,13 @@ sequence. As illustrated in :numref:`fig_seq2seq_predict`, during predicting, we
 
 ```{.python .input  n=15}
 # Saved in the d2l package for later use
-def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps, ctx):
+def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
+                    ctx):
     src_tokens = src_vocab[src_sentence.lower().split(' ')]
     enc_valid_length = np.array([len(src_tokens)], ctx=ctx)
     src_tokens = d2l.trim_pad(src_tokens, num_steps, src_vocab.pad)
     enc_X = np.array(src_tokens, ctx=ctx)
-    # add the batch_size dimension
+    # Add the batch_size dimension
     enc_outputs = model.encoder(np.expand_dims(enc_X, axis=0),
                                 enc_valid_length)
     dec_state = model.decoder.init_state(enc_outputs, enc_valid_length)

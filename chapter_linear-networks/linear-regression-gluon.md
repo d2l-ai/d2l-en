@@ -31,7 +31,7 @@ true_b = 4.2
 features, labels = d2l.synthetic_data(true_w, true_b, 1000)
 ```
 
-## Reading Data
+## Reading the Dataset
 
 Rather than rolling our own iterator,
 we can call upon Gluon's `data` module to read data.
@@ -189,7 +189,7 @@ loss = gloss.L2Loss()  # The squared loss is also known as the L2 norm loss
 
 Minibatch SGD and related variants
 are standard tools for optimizing neural networks
-and thus `Gluon` supports SGD alongside a number of
+and thus Gluon supports SGD alongside a number of
 variations on this algorithm through its `Trainer` class.
 When we instantiate the `Trainer`,
 we will specify the parameters to optimize over

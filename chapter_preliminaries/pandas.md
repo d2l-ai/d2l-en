@@ -11,7 +11,7 @@ So, we will briefly walk through steps for preprocessing raw data with `pandas`
 and converting them into the `ndarray` format.
 We will cover more data preprocessing techniques in later chapters.
 
-## Loading Data
+## Reading the Dataset
 
 As an example, we begin by creating an artificial dataset that is stored in a csv (comma-separated values) file. Data stored in other formats may be processed in similar ways.
 

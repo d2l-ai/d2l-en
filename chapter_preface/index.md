@@ -179,19 +179,17 @@ while being fast enough for production.
 This book will teach deep learning concepts from scratch.
 Sometimes, we want to delve into fine details about the models
 that would typically be hidden from the user 
-by ``Gluon``'s advanced abstractions.
+by Gluon's advanced abstractions.
 This comes up especially in the basic tutorials,
 where we want you to understand everything 
 that happens in a given layer or optimizer.
 In these cases, we will often present two versions of the example:
 one where we implement everything from scratch,
-relying only on NDArray and automatic differentiation,
+relying only on the NumPy interface and automatic differentiation,
 and another, more practical example, 
-where we write succinct code using ``Gluon``.
+where we write succinct code using Gluon.
 Once we have taught you how some component works,
-we can just use the ``Gluon`` version in subsequent tutorials.
-
-
+we can just use the Gluon version in subsequent tutorials.
 
 
 ### Content and Structure
@@ -203,16 +201,16 @@ which are presented by different colors in :numref:`fig_book_org`:
 :label:`fig_book_org`
 
 
-* The first part covers prerequisites and basics. The first chapter offers an
-introduction to deep learning :numref:`chap_introduction`.
-Then, in :numref:`chap_preliminaries`, 
+* The first part covers basics and preliminaries.
+:numref:`chap_introduction` offers an introduction to deep learning.
+Then, in :numref:`chap_preliminaries`,
 we quickly bring you up to speed on the prerequisites required 
 for hands-on deep learning, such as how to store and manipulate data,
 and how to apply various numerical operations based on basic concepts
 from linear algebra, calculus, and probability. 
 :numref:`chap_linear` and :numref:`chap_perceptrons` 
 cover the most basic concepts and techniques of deep learning, 
-such as linear regression, multi-layer perceptrons and regularization.
+such as linear regression, multilayer perceptrons and regularization.
 
 * The next five chapters focus on modern deep learning techniques.
 :numref:`chap_computation` describes the various key components of deep
@@ -226,12 +224,12 @@ recurrent neural networks (RNNs), models that exploit
 temporal or sequential structure in data, and are commonly used
 for natural language processing and time series prediction.
 In :numref:`chap_attention`, we introduce a new class of models
-that employ a technique called an attention mechanism
-and that have recently begun to displace RNNs in NLP.
+that employ a technique called attention mechanisms
+and they have recently begun to displace RNNs in natural language processing.
 These sections will get you up to speed on the basic tools
 behind most modern applications of deep learning.
 
-* Part three discusses scalability, efficiency and applications.
+* Part three discusses scalability, efficiency, and applications.
 First, in :numref:`chap_optimization`,
 we discuss several common optimization algorithms
 used to train deep learning models.

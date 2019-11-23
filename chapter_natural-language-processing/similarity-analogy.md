@@ -9,7 +9,7 @@ section will demonstrate how to use these pre-trained word vectors to find
 synonyms and analogies. We will continue to apply pre-trained word vectors in
 subsequent sections.
 
-## Using Pre-trained Word Vectors
+## Using Pre-Trained Word Vectors
 
 MXNet's `contrib.text` package provides functions and classes related to natural
 language processing (see the [GluonNLP](https://gluon-nlp.mxnet.io/) tool package for more details). Next,
@@ -48,7 +48,7 @@ We can use a word to get its index in the dictionary, or we can get the word fro
 glove_6b50d.token_to_idx['beautiful'], glove_6b50d.idx_to_token[3367]
 ```
 
-## Applying Pre-trained Word Vectors
+## Applying Pre-Trained Word Vectors
 
 Below, we demonstrate the application of pre-trained word vectors, using GloVe as an example.
 

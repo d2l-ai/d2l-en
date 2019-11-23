@@ -55,9 +55,9 @@ that the input example is $\mathbf{x}\in \mathbb{R}^d$
 and there is no bias term.
 Here the intermediate variable is:
 
-$$\mathbf{z}= \mathbf{W}^{(1)} \mathbf{x}$$
+$$\mathbf{z}= \mathbf{W}^{(1)} \mathbf{x},$$
 
-$\mathbf{W}^{(1)} \in \mathbb{R}^{h \times d}$
+where $\mathbf{W}^{(1)} \in \mathbb{R}^{h \times d}$
 is the weight parameter of the hidden layer.
 After entering the intermediate variable $\mathbf{z}\in \mathbb{R}^h$
 into the activation function $\phi$ operated by the basic elements,
@@ -153,7 +153,7 @@ of the objective function $J=L+s$
 with respect to the loss term $L$
 and the regularization term $s$.
 
-$$\frac{\partial J}{\partial L} = 1 \; \text{and} \; \frac{\partial J}{\partial s} = 1$$
+$$\frac{\partial J}{\partial L} = 1 \; \text{and} \; \frac{\partial J}{\partial s} = 1.$$
 
 Next, we compute the gradient of the objective function
 with respect to variable of the output layer $\mathbf{o}$
@@ -163,7 +163,7 @@ $$
 \frac{\partial J}{\partial \mathbf{o}}
 = \text{prod}\left(\frac{\partial J}{\partial L}, \frac{\partial L}{\partial \mathbf{o}}\right)
 = \frac{\partial L}{\partial \mathbf{o}}
-\in \mathbb{R}^q
+\in \mathbb{R}^q.
 $$
 
 Next, we calculate the gradients of the regularization term
@@ -171,7 +171,7 @@ with respect to both parameters.
 
 $$\frac{\partial s}{\partial \mathbf{W}^{(1)}} = \lambda \mathbf{W}^{(1)}
 \; \text{and} \;
-\frac{\partial s}{\partial \mathbf{W}^{(2)}} = \lambda \mathbf{W}^{(2)}$$
+\frac{\partial s}{\partial \mathbf{W}^{(2)}} = \lambda \mathbf{W}^{(2)}.$$
 
 Now we are able calculate the gradient
 $\partial J/\partial \mathbf{W}^{(2)} \in \mathbb{R}^{q \times h}$
@@ -181,7 +181,7 @@ Using the chain rule yields:
 $$
 \frac{\partial J}{\partial \mathbf{W}^{(2)}}
 = \text{prod}\left(\frac{\partial J}{\partial \mathbf{o}}, \frac{\partial \mathbf{o}}{\partial \mathbf{W}^{(2)}}\right) + \text{prod}\left(\frac{\partial J}{\partial s}, \frac{\partial s}{\partial \mathbf{W}^{(2)}}\right)
-= \frac{\partial J}{\partial \mathbf{o}} \mathbf{h}^\top + \lambda \mathbf{W}^{(2)}
+= \frac{\partial J}{\partial \mathbf{o}} \mathbf{h}^\top + \lambda \mathbf{W}^{(2)}.
 $$
 
 To obtain the gradient with respect to $\mathbf{W}^{(1)}$
@@ -230,7 +230,7 @@ where the compute order on the graph is reversed.
 One of the consequences is that we need to retain
 the intermediate values until backpropagation is complete.
 This is also one of the reasons why backpropagation
-requires significantly more memory than plain 'inference'---we end up
+requires significantly more memory than plain "inference"---we end up
 computing tensors as gradients
 and need to retain all the intermediate variables
 to invoke the chain rule.

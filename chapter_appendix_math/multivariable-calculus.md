@@ -3,7 +3,7 @@
 
 Now that we have a fairly strong understanding of derivatives of a function of a single variable, let's return to our original question where we were considering a loss function of potentially billions of weights.  
 
-## Higher-dimensional Differentiation
+## Higher-Dimensional Differentiation
 What :numref:`sec_single_variable_calculus` tells us is that if we change a single one of these billions of weights leaving every other one fixed, we know what will happen!  This is nothing more than a function of a single variable, so we can write
 
 $$L(w_1+\epsilon_1, w_2, \ldots, w_N) \approx L(w_1, w_2, \ldots, w_N) + \epsilon_1 \frac{d}{dw_1} L(w_1, w_2, \ldots, w_N).$$
@@ -191,8 +191,9 @@ Let's break up the problem.  We will start by trying to understand how $f$ chang
 
 $$
 \begin{aligned}
-f(u(a+\epsilon, b), v(a+\epsilon, b)) & \approx f\left(u(a, b) + \epsilon\frac{\partial u}{\partial a}(a, b), v(a, b) + \epsilon\frac{\partial v}{\partial a}(a, b)\right) \\
-& \approx f(u(a, b), v(a, b)) + \epsilon\left[\frac{\partial f}{\partial u}(u(a, b), v(a, b))\frac{\partial u}{\partial a}(a, b) + \frac{\partial f}{\partial v}(u(a, b), v(a, b))\frac{\partial v}{\partial a}(a, b)\right].
+& f(u(a+\epsilon, b), v(a+\epsilon, b)) \\
+\approx & f\left(u(a, b) + \epsilon\frac{\partial u}{\partial a}(a, b), v(a, b) + \epsilon\frac{\partial v}{\partial a}(a, b)\right) \\
+\approx & f(u(a, b), v(a, b)) + \epsilon\left[\frac{\partial f}{\partial u}(u(a, b), v(a, b))\frac{\partial u}{\partial a}(a, b) + \frac{\partial f}{\partial v}(u(a, b), v(a, b))\frac{\partial v}{\partial a}(a, b)\right].
 \end{aligned}
 $$
 
@@ -331,7 +332,7 @@ This is precisely what every deep learning algorithm implements to allow the com
 To see how MXNet has encapsulated this, let's take a quick look at this example.
 
 ```{.python .input}
-# Initialize as NDArrays, attaching gradients
+# Initialize as ndarrays, then attach gradients
 w, x, y, z = np.array(-1), np.array(0), np.array(-2), np.array(1)
 
 w.attach_grad()

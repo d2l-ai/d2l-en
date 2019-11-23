@@ -43,7 +43,7 @@ $\mathbf{w} = [2, -3.4]^\top$ and $b = 4.2$
 and our synthetic labels will be assigned according 
 to the following linear model with noise term $\epsilon$:
 
-$$\mathbf{y}= \mathbf{X} \mathbf{w} + b + \mathbf\epsilon$$
+$$\mathbf{y}= \mathbf{X} \mathbf{w} + b + \mathbf\epsilon.$$
 
 You could think of $\epsilon$ as capturing potential 
 measurement errors on the features and labels.
@@ -81,7 +81,7 @@ d2l.set_figsize((3.5, 2.5))
 d2l.plt.scatter(features[:, 1].asnumpy(), labels.asnumpy(), 1);
 ```
 
-## Reading Data
+## Reading the Dataset
 
 Recall that training models consists of 
 making multiple passes over the dataset, 
@@ -326,7 +326,7 @@ print('Error in estimating b', true_b - b)
 Note that we should not take it for granted
 that we are able to recover the parameters accurately.
 This only happens for a special category problems:
-strongly convex optimization problems with 'enough' data to ensure
+strongly convex optimization problems with "enough" data to ensure
 that the noisy samples allow us to recover the underlying dependency.
 In most cases this is *not* the case.
 In fact, the parameters of a deep network 

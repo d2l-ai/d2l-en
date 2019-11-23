@@ -1,4 +1,4 @@
-# Image Classification Data (Fashion-MNIST)
+# The Image Classification Dataset (Fashion-MNIST)
 :label:`sec_fashion_mnist`
 
 In :numref:`sec_naive_bayes`, we trained a naive Bayes classifier,
@@ -20,7 +20,7 @@ import sys
 d2l.use_svg_display()
 ```
 
-## Getting the Data
+## Getting the Dataset
 
 Just as with MNIST, Gluon makes it easy to download and load the FashionMNIST dataset into memory via the `FashionMNIST` class contained in `gluon.data.vision`.
 We briefly work through the mechanics of loading and exploring the dataset below. 

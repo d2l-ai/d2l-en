@@ -119,7 +119,7 @@ chmod 400 D2L_key.pem
 
 
 ![ View instance access and startup method. ](../img/chmod.png)
-:width:`700px`
+:width:`400px`
 :label:`fig_chmod`
 
 
@@ -144,17 +144,17 @@ sudo apt-get update && sudo apt-get install -y build-essential git libgfortran3
 ```
 
 
-Here we download CUDA 10.1. Visit NVIDIA's official repository at (https://developer.nvidia.com/cuda-downloads) to find the download link of CUDA 10.1 as shown below.
+Here we download CUDA 10.1. Visit NVIDIA's official repository at (https://developer.nvidia.com/cuda-downloads) to find the download link of CUDA 10.1 as shown in :numref:`fig_cuda`.
 
 ![Find the CUDA 10.1 download address. ](../img/cuda101.png)
-:width:`700px`
+:width:`500px`
 :label:`fig_cuda`
 
 Copy the instructions and paste them into the terminal to install
 CUDA 10.1.
 
 ```bash
-## paste the copied link from CUDA website
+## Paste the copied link from CUDA website
 wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-ubuntu1804.pin
 sudo mv cuda-ubuntu1804.pin /etc/apt/preferences.d/cuda-repository-pin-600
 wget http://developer.download.nvidia.com/compute/cuda/10.1/Prod/local_installers/cuda-repo-ubuntu1804-10-1-local-10.1.243-418.87.00_1.0-1_amd64.deb
@@ -188,33 +188,16 @@ First, to simplify the installation, you need to install [Miniconda](https://con
 :label:`fig_miniconda`
 
 ```bash
+# The link and file name are subject to changes
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-sh Miniconda3-latest-Linux-x86_64.sh
+sh Miniconda3-latest-Linux-x86_64.sh -b
 ```
 
 
-You need to answer the following questions:
+After Miniconda installation, run the following command to activate CUDA and conda.
 
 ```bash
-Do you accept the license terms? [yes|no]
-[no] >>> yes
-
-Miniconda3 will now be installed into this location:
-/home/ubuntu/miniconda3
-  - Press ENTER to confirm the location
-  - Press CTRL-C to abort the installation
-  - Or specify a different location below
->>> <ENTER>
-
-Do you wish the installer to initialize Miniconda3
-by running conda init? [yes|no]
-[no] >>> yes
-```
-
-
-After miniconda installation, run the following command to activate CUDA and Conda.
-
-```bash
+~/miniconda3/bin/conda init
 source ~/.bashrc
 ```
 
@@ -224,7 +207,7 @@ Next, download the code for this book.
 ```bash
 sudo apt-get install unzip
 mkdir d2l-en && cd d2l-en
-wget https://d2l.ai/d2l-en.zip
+curl https://d2l.ai/d2l-en-0.7.0.zip -o d2l-en.zip
 unzip d2l-en.zip && rm d2l-en.zip
 ```
 
@@ -232,13 +215,7 @@ unzip d2l-en.zip && rm d2l-en.zip
 Then create the conda `d2l` environment and enter `y` to proceed with the installation.
 
 ```bash
-conda create --name d2l 
-
-## Package Plan ##
-
-  environment location: /home/ubuntu/.conda/envs/d2l
-  
-Proceed ([y]/n)? y
+conda create --name d2l -y
 ```
 
 
@@ -246,16 +223,15 @@ After creating the `d2l` environment, activate it and install `pip`.
 
 ```bash
 conda activate d2l
-conda install pip
+conda install python=3.7 pip -y
 ```
 
 
-Finally, install `MXNet` and `d2l`. The postfix `cu101mkl` means that this is the CUDA 10.1 variant with Intel MKL support. For different versions, say only CUDA 10.0, you would want to choose `cu100` instead.
+Finally, install MXNet and the `d2l` package. The postfix `cu101` means that this is the CUDA 10.1 variant. For different versions, say only CUDA 10.0, you would want to choose `cu100` instead.
 
 ```bash
-## mxnet
-pip install mxnet-cu101mkl --pre
-pip install git+https://github.com/d2l-ai/d2l-en@numpy2
+pip install mxnet-cu101==1.6.0b20191122
+pip install d2l==0.11.0
 ```
 
 

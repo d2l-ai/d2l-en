@@ -55,8 +55,8 @@ class RNNModel(nn.Block):
         X = npx.one_hot(inputs.T, self.vocab_size)
         Y, state = self.rnn(X, state)
         # The fully connected layer will first change the shape of Y to
-        # (num_steps * batch_size, num_hiddens).
-        # Its output shape is (num_steps * batch_size, vocab_size).
+        # (num_steps * batch_size, num_hiddens). Its output shape is
+        # (num_steps * batch_size, vocab_size).
         output = self.dense(Y.reshape(-1, Y.shape[-1]))
         return output, state
 
@@ -103,7 +103,7 @@ Compared with the last section, this model achieves comparable perplexity, albei
 1. What happens if you increase the number of hidden layers in the RNN model? Can you make the model work?
 1. How well can you compress the text using this model?
     * How many bits do you need?
-    * Why does not everyone use this model for text compression? Hint - what about the compressor itself?
+    * Why does not everyone use this model for text compression? Hint: what about the compressor itself?
 
 ## [Discussions](https://discuss.mxnet.io/t/2365)
 

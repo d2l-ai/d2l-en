@@ -226,7 +226,7 @@ def train_epoch_ch3(net, train_iter, loss, updater):
     if isinstance(updater, gluon.Trainer):
         updater = updater.step
     for X, y in train_iter:
-        # compute gradients and update parameters
+        # Compute gradients and update parameters
         with autograd.record():
             y_hat = net(X)
             l = loss(y_hat, y)
@@ -247,7 +247,7 @@ class Animator(object):
         self.fig, self.axes = d2l.plt.subplots(nrows, ncols, figsize=figsize)
         if nrows * ncols == 1:
             self.axes = [self.axes, ]
-        # use a lambda to capture arguments
+        # Use a lambda to capture arguments
         self.config_axes = lambda: d2l.set_axes(
             self.axes[0], xlabel, ylabel, xlim, ylim, xscale, yscale, legend)
         self.X, self.Y, self.fmts = None, None, fmts
@@ -333,7 +333,7 @@ def corr2d(X, K):
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
 def evaluate_accuracy_gpu(net, data_iter, ctx=None):
-    if not ctx:  # Query the first device the first parameter is on.
+    if not ctx:  # Query the first device the first parameter is on
         ctx = list(net.collect_params().values())[0].list_ctx()[0]
     metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
     for X, y in data_iter:
@@ -405,7 +405,6 @@ def read_time_machine():
         lines = f.readlines()
     return [re.sub('[^A-Za-z]+', ' ', line.strip().lower())
             for line in lines]
-
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
@@ -648,8 +647,8 @@ class RNNModel(nn.Block):
         X = npx.one_hot(inputs.T, self.vocab_size)
         Y, state = self.rnn(X, state)
         # The fully connected layer will first change the shape of Y to
-        # (num_steps * batch_size, num_hiddens).
-        # Its output shape is (num_steps * batch_size, vocab_size).
+        # (num_steps * batch_size, num_hiddens). Its output shape is
+        # (num_steps * batch_size, vocab_size).
         output = self.dense(Y.reshape(-1, Y.shape[-1]))
         return output, state
 
@@ -775,7 +774,7 @@ class Seq2SeqEncoder(d2l.Encoder):
         state = self.rnn.begin_state(batch_size=X.shape[1], ctx=X.context)
         out, state = self.rnn(X, state)
         # out shape: (seq_len, batch_size, num_hiddens)
-        # stae shape: (num_layers, batch_size, num_hiddens),
+        # state shape: (num_layers, batch_size, num_hiddens),
         # where "state" contains the hidden state and the memory cell
         return out, state
 
@@ -808,7 +807,7 @@ class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
     # valid_length shape: (batch_size, )
     def forward(self, pred, label, valid_length):
         # weights shape should be (batch_size, seq_len, 1)
-        weights = np.expand_dims(np.ones_like(label),axis=-1)
+        weights = np.expand_dims(np.ones_like(label), axis=-1)
         weights = npx.sequence_mask(weights, valid_length, True, axis=1)
         return super(MaskedSoftmaxCELoss, self).forward(pred, label, weights)
 
@@ -821,12 +820,12 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, ctx):
     loss = MaskedSoftmaxCELoss()
     animator = d2l.Animator(xlabel='epoch', ylabel='loss',
                             xlim=[1, num_epochs], ylim=[0, 0.25])
-    for epoch in range(1, num_epochs+1):
+    for epoch in range(1, num_epochs + 1):
         timer = d2l.Timer()
         metric = d2l.Accumulator(2)  # loss_sum, num_tokens
         for batch in data_iter:
             X, X_vlen, Y, Y_vlen = [x.as_in_context(ctx) for x in batch]
-            Y_input, Y_label, Y_vlen = Y[:,:-1], Y[:,1:], Y_vlen-1
+            Y_input, Y_label, Y_vlen = Y[:, :-1], Y[:, 1:], Y_vlen-1
             with autograd.record():
                 Y_hat, _ = model(X, Y_input, X_vlen, Y_vlen)
                 l = loss(Y_hat, Y_label, Y_vlen)
@@ -842,12 +841,13 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, ctx):
 
 
 # Defined in file: ./chapter_modern_recurrent-networks/seq2seq.md
-def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps, ctx):
+def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
+                    ctx):
     src_tokens = src_vocab[src_sentence.lower().split(' ')]
     enc_valid_length = np.array([len(src_tokens)], ctx=ctx)
     src_tokens = d2l.trim_pad(src_tokens, num_steps, src_vocab.pad)
     enc_X = np.array(src_tokens, ctx=ctx)
-    # add the batch_size dimension
+    # Add the batch_size dimension
     enc_outputs = model.encoder(np.expand_dims(enc_X, axis=0),
                                 enc_valid_length)
     dec_state = model.decoder.init_state(enc_outputs, enc_valid_length)
@@ -875,7 +875,7 @@ def masked_softmax(X, valid_length):
             valid_length = valid_length.repeat(shape[1], axis=0)
         else:
             valid_length = valid_length.reshape(-1)
-        # fill masked elements with a large negative, whose exp is 0
+        # Fill masked elements with a large negative, whose exp is 0
         X = npx.sequence_mask(X.reshape(-1, shape[-1]), valid_length, True,
                               axis=1, value=-1e6)
         return npx.softmax(X).reshape(shape)
@@ -893,7 +893,7 @@ class DotProductAttention(nn.Block):
     # valid_length: either (batch_size, ) or (batch_size, xx)
     def forward(self, query, key, value, valid_length=None):
         d = query.shape[-1]
-        # set transpose_b=True to swap the last two dimensions of key
+        # Set transpose_b=True to swap the last two dimensions of key
         scores = npx.batch_dot(query, key, transpose_b=True) / math.sqrt(d)
         attention_weights = self.dropout(masked_softmax(scores, valid_length))
         return npx.batch_dot(attention_weights, value)
@@ -903,7 +903,7 @@ class DotProductAttention(nn.Block):
 class MLPAttention(nn.Block):  
     def __init__(self, units, dropout, **kwargs):
         super(MLPAttention, self).__init__(**kwargs)
-        # Use flatten=True to keep query's and key's 3-D shapes.
+        # Use flatten=True to keep query's and key's 3-D shapes
         self.W_k = nn.Dense(units, activation='tanh',
                             use_bias=False, flatten=False)
         self.W_q = nn.Dense(units, activation='tanh',
@@ -913,8 +913,8 @@ class MLPAttention(nn.Block):
 
     def forward(self, query, key, value, valid_length):
         query, key = self.W_k(query), self.W_q(key)
-        # expand query to (batch_size, #querys, 1, units), and key to
-        # (batch_size, 1, #kv_pairs, units). Then plus them with broadcast.
+        # Expand query to (batch_size, #querys, 1, units), and key to
+        # (batch_size, 1, #kv_pairs, units). Then plus them with broadcast
         features = np.expand_dims(query, axis=2) + np.expand_dims(key, axis=1)
         scores = np.squeeze(self.v(features), axis=-1)
         attention_weights = self.dropout(masked_softmax(scores, valid_length))
@@ -1029,7 +1029,7 @@ class benchmark:
 
 # Defined in file: ./chapter_computational-performance/multiple-gpus.md
 def split_batch(X, y, ctx_list):
-    """Split X and y into multiple devices specified by ctx"""
+    """Split X and y into multiple devices specified by ctx."""
     assert X.shape[0] == y.shape[0]
     return (gluon.utils.split_and_load(X, ctx_list),
             gluon.utils.split_and_load(y, ctx_list))
@@ -1037,7 +1037,7 @@ def split_batch(X, y, ctx_list):
 
 # Defined in file: ./chapter_computational-performance/multiple-gpus-gluon.md
 def resnet18(num_classes):
-    """A slightly modified ResNet-18 model"""
+    """A slightly modified ResNet-18 model."""
     def resnet_block(num_channels, num_residuals, first_block=False):
         blk = nn.Sequential()
         for i in range(num_residuals):
@@ -1063,12 +1063,12 @@ def resnet18(num_classes):
 
 # Defined in file: ./chapter_computational-performance/multiple-gpus-gluon.md
 def evaluate_accuracy_gpus(net, data_iter, split_f=d2l.split_batch):
-    # Query the list of devices.
+    # Query the list of devices
     ctx_list = list(net.collect_params().values())[0].list_ctx()
     metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
     for features, labels in data_iter:
         Xs, ys = split_f(features, labels, ctx_list)
-        pys = [net(X) for X in Xs]  # run in parallel
+        pys = [net(X) for X in Xs]  # Run in parallel
         metric.add(sum(float(d2l.accuracy(py, y)) for py, y in zip(pys, ys)),
                    labels.size)
     return metric[0]/metric[1]
@@ -1096,7 +1096,7 @@ def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
     animator = d2l.Animator(xlabel='epoch', xlim=[0, num_epochs], ylim=[0, 1],
                             legend=['train loss', 'train acc', 'test acc'])
     for epoch in range(num_epochs):
-        # store training_loss, training_accuracy, num_examples, num_features
+        # Store training_loss, training_accuracy, num_examples, num_features
         metric = d2l.Accumulator(4)
         for i, (features, labels) in enumerate(train_iter):
             timer.start()

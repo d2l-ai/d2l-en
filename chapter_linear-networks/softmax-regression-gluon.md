@@ -91,7 +91,7 @@ $$
 \begin{aligned}
 \log{(\hat y_j)} & = \log\left( \frac{e^{z_j}}{\sum_{i=1}^{n} e^{z_i}}\right) \\
 & = \log{(e^{z_j})}-\text{log}{\left( \sum_{i=1}^{n} e^{z_i} \right)} \\
-& = z_j -\log{\left( \sum_{i=1}^{n} e^{z_i} \right)}
+& = z_j -\log{\left( \sum_{i=1}^{n} e^{z_i} \right)}.
 \end{aligned}
 $$
 

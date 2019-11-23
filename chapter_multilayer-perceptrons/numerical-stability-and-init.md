@@ -29,7 +29,7 @@ Consider a deep network with $d$ layers,
 input $\mathbf{x}$ and output $\mathbf{o}$.
 Each layer satisfies:
 
-$$\mathbf{h}^{t+1} = f_t (\mathbf{h}^t) \text{ and thus } \mathbf{o} = f_d \circ \ldots, \circ f_1(\mathbf{x})$$
+$$\mathbf{h}^{t+1} = f_t (\mathbf{h}^t) \text{ and thus } \mathbf{o} = f_d \circ \ldots, \circ f_1(\mathbf{x}).$$
 
 If all activations and inputs are vectors,
 we can write the gradient of $\mathbf{o}$
@@ -189,7 +189,7 @@ Both choices tend to work well in practice for moderate problem sizes.
 
 Let's look at the scale distribution of the activations of the hidden units $h_{i}$ for some layer. They are given by
 
-$$h_{i} = \sum_{j=1}^{n_\mathrm{in}} W_{ij} x_j$$
+$$h_{i} = \sum_{j=1}^{n_\mathrm{in}} W_{ij} x_j.$$
 
 The weights $W_{ij}$ are all drawn independently from the same distribution. Furthermore, let's assume that this distribution
 has zero mean and variance $\sigma^2$
@@ -204,10 +204,10 @@ In this case, we can compute mean and variance of $h_i$ as follows:
 
 $$
 \begin{aligned}
-    E[h_i] & = \sum_{j=1}^{n_\mathrm{in}} E[W_{ij} x_j] = 0 \\
+    E[h_i] & = \sum_{j=1}^{n_\mathrm{in}} E[W_{ij} x_j] = 0, \\
     E[h_i^2] & = \sum_{j=1}^{n_\mathrm{in}} E[W^2_{ij} x^2_j] \\
         & = \sum_{j=1}^{n_\mathrm{in}} E[W^2_{ij}] E[x^2_j] \\
-        & = n_\mathrm{in} \sigma^2 \gamma^2
+        & = n_\mathrm{in} \sigma^2 \gamma^2.
 \end{aligned}
 $$
 
@@ -228,8 +228,8 @@ Instead, we simply try to satisfy:
 $$
 \begin{aligned}
 \frac{1}{2} (n_\mathrm{in} + n_\mathrm{out}) \sigma^2 = 1 \text{ or equivalently }
-\sigma = \sqrt{\frac{2}{n_\mathrm{in} + n_\mathrm{out}}}
-\end{aligned}.
+\sigma = \sqrt{\frac{2}{n_\mathrm{in} + n_\mathrm{out}}}.
+\end{aligned}
 $$
 
 This is the reasoning underlying the eponymous Xavier initialization :cite:`Glorot.Bengio.2010`. 
@@ -275,7 +275,7 @@ or you may even invent your own scheme!
 1. Can you design other cases of symmetry breaking besides the permutation symmetry?
 1. Can we initialize all weight parameters in linear regression or in softmax regression to the same value?
 1. Look up analytic bounds on the eigenvalues of the product of two matrices. What does this tell you about ensuring that gradients are well conditioned?
-1. If we know that some terms diverge, can we fix this after the fact? Look at the paper on LARS by [You, Gitman and Ginsburg, 2017](https://arxiv.org/pdf/1708.03888.pdf) for inspiration.
+1. If we know that some terms diverge, can we fix this after the fact? Look at the paper on LARS for inspiration :cite:`You.Gitman.Ginsburg.2017`.
 
 ## [Discussions](https://discuss.mxnet.io/t/2345)
 

@@ -35,7 +35,7 @@ In this section, we describe some common concerns
 and aim to get you started acquiring the critical thinking
 that you will need in order to detect these situations early,
 mitigate the damage, and use machine learning responsibly.
-Some of the solutions are simple (ask for the 'right' data)
+Some of the solutions are simple (ask for the "right" data)
 some are technically difficult (implement a reinforcement learning system),
 and others require that we enter the realm of philosophy
 and grapple with difficult questions concerning ethics and informed consent.
@@ -153,13 +153,15 @@ the distribution $P(y \mid x)$ might be different
 depending on our location.
 This problem can be tricky to spot.
 A saving grace is that often the $P(y \mid x)$ only shifts gradually.
-Before we go into further detail and discuss remedies,
-we can discuss a number of situations where covariate and concept shift
-may not be so obvious.
 
 
 
 ### Examples
+
+Before we go into further detail and discuss remedies,
+we can discuss a number of situations where covariate and concept shift
+may not be so obvious.
+
 
 #### Medical Diagnostics
 
@@ -207,19 +209,19 @@ Since real annotated data is expensive to get,
 they had the (smart and questionable) idea
 to use synthetic data from a game rendering engine
 as additional training data.
-This worked really well on 'test data' drawn from the rendering engine.
+This worked really well on "test data" drawn from the rendering engine.
 Alas, inside a real car it was a disaster.
 As it turned out, the roadside had been rendered
 with a very simplistic texture.
 More importantly, *all* the roadside had been rendered
 with the *same* texture and the roadside detector
-learned about this 'feature' very quickly.
+learned about this "feature" very quickly.
 
 A similar thing happened to the US Army
 when they first tried to detect tanks in the forest.
 They took aerial photographs of the forest without tanks,
 then drove the tanks into the forest and took another set of pictures.
-The so-trained classifier worked 'perfectly'.
+The so-trained classifier worked "perfectly".
 Unfortunately, all it had learned was to distinguish trees
 with shadows from trees without shadows---the
 first set of pictures was taken in the early morning, the second one at noon.
@@ -236,7 +238,7 @@ Here are some typical cases:
 
 #### More Anecdotes
 
-* We build a face detector. It works well on all benchmarks. Unfortunately it fails on test data - the offending examples are close-ups where the face fills the entire image (no such data was in the training set).
+* We build a face detector. It works well on all benchmarks. Unfortunately it fails on test data---the offending examples are close-ups where the face fills the entire image (no such data was in the training set).
 * We build a web search engine for the USA market and want to deploy it in the UK.
 * We train an image classifier by compiling a large dataset where each among a large set of classes is equally represented in the dataset, say 1000 categories, represented by 1000 images each. Then we deploy the system in the real world, where the actual label distribution of photographs is decidedly non-uniform.
 
@@ -267,18 +269,18 @@ using weight decay, dropout, or some other related technique.
 This means that we largely minimize the loss on the training.
 
 $$
-\mathop{\mathrm{minimize}}_w \frac{1}{n} \sum_{i=1}^n l(x_i, y_i, f(x_i)) + \mathrm{some~penalty}(w)
+\mathop{\mathrm{minimize}}_w \frac{1}{n} \sum_{i=1}^n l(x_i, y_i, f(x_i)) + \mathrm{some~penalty}(w).
 $$
 
 Statisticians call the first term an *empirical average*,
 i.e., an average computed over the data drawn from $P(x) P(y \mid x)$.
-If the data is drawn from the 'wrong' distribution $q$,
+If the data is drawn from the "wrong" distribution $q$,
 we can correct for that by using the following simple identity:
 
 $$
 \begin{aligned}
 \int p(\mathbf{x}) f(\mathbf{x}) dx & = \int p(\mathbf{x}) f(\mathbf{x}) \frac{q(\mathbf{x})}{p(\mathbf{x})} dx \\
-& = \int q(\mathbf{x}) f(\mathbf{x}) \frac{p(\mathbf{x})}{q(\mathbf{x})} dx
+& = \int q(\mathbf{x}) f(\mathbf{x}) \frac{p(\mathbf{x})}{q(\mathbf{x})} dx.
 \end{aligned}
 $$
 
@@ -293,7 +295,7 @@ including some fancy operator-theoretic approaches
 that attempt to recalibrate the expectation operator directly
 using a minimum-norm or a maximum entropy principle.
 Note that for any such approach, we need samples
-drawn from both distributions---the 'true' $p$, e.g.,
+drawn from both distributions---the "true" $p$, e.g.,
 by access to training data, and the one used
 for generating the training set $q$ (the latter is trivially available).
 Note however, that we only need samples $\mathbf{x} \sim q(\mathbf{x})$;
@@ -315,12 +317,12 @@ Now denote by $z_i$ labels which are 1
 for data drawn from $p$ and -1 for data drawn from $q$.
 Then the probability in a mixed dataset is given by
 
-$$P(z=1 \mid \mathbf{x}) = \frac{p(\mathbf{x})}{p(\mathbf{x})+q(\mathbf{x})} \text{ and hence } \frac{P(z=1 \mid \mathbf{x})}{P(z=-1 \mid \mathbf{x})} = \frac{p(\mathbf{x})}{q(\mathbf{x})}$$
+$$P(z=1 \mid \mathbf{x}) = \frac{p(\mathbf{x})}{p(\mathbf{x})+q(\mathbf{x})} \text{ and hence } \frac{P(z=1 \mid \mathbf{x})}{P(z=-1 \mid \mathbf{x})} = \frac{p(\mathbf{x})}{q(\mathbf{x})}.$$
 
 Hence, if we use a logistic regression approach where $P(z=1 \mid \mathbf{x})=\frac{1}{1+\exp(-f(\mathbf{x}))}$ it follows that
 
 $$
-\beta(\mathbf{x}) = \frac{1/(1 + \exp(-f(\mathbf{x})))}{\exp(-f(\mathbf{x})/(1 + \exp(-f(\mathbf{x})))} = \exp(f(\mathbf{x}))
+\beta(\mathbf{x}) = \frac{1/(1 + \exp(-f(\mathbf{x})))}{\exp(-f(\mathbf{x})/(1 + \exp(-f(\mathbf{x})))} = \exp(f(\mathbf{x})).
 $$
 
 As a result, we need to solve two problems:
@@ -330,10 +332,10 @@ where we weigh terms by $\beta$, e.g., via the head gradients.
 Here's a prototypical algorithm for that purpose
 which uses an unlabeled training set $X$ and test set $Z$:
 
-1. Generate training set with $\{(\mathbf{x}_i, -1) ... (\mathbf{z}_j, 1)\}$
-1. Train binary classifier using logistic regression to get function $f$
-1. Weigh training data using $\beta_i = \exp(f(\mathbf{x}_i))$ or better $\beta_i = \min(\exp(f(\mathbf{x}_i)), c)$
-1. Use weights $\beta_i$ for training on $X$ with labels $Y$
+1. Generate training set with $\{(\mathbf{x}_i, -1) ... (\mathbf{z}_j, 1)\}$.
+1. Train binary classifier using logistic regression to get function $f$.
+1. Weigh training data using $\beta_i = \exp(f(\mathbf{x}_i))$ or better $\beta_i = \min(\exp(f(\mathbf{x}_i)), c)$.
+1. Use weights $\beta_i$ for training on $X$ with labels $Y$.
 
 Note that this method relies on a crucial assumption.
 For this scheme to work, we need that each data point
@@ -453,7 +455,7 @@ $$
 One key distinction between the different situations above is that the same strategy that might have worked throughout in the case of a stationary environment, might not work throughout when the environment can adapt. For instance, an arbitrage opportunity discovered by a trader is likely to disappear once he starts exploiting it. The speed and manner at which the environment changes determines to a large extent the type of algorithms that we can bring to bear. For instance, if we *know* that things may only change slowly, we can force any estimate to change only slowly, too. If we know that the environment might change instantaneously, but only very infrequently, we can make allowances for that. These types of knowledge are crucial for the aspiring data scientist to deal with concept shift, i.e., when the problem that he is trying to solve changes over time.
 
 
-## Fairness, Accountability, and Transparency in machine Learning
+## Fairness, Accountability, and Transparency in Machine Learning
 
 Finally, it is important to remember
 that when you deploy machine learning systems
@@ -492,7 +494,7 @@ Should what news someone is exposed to be determined by which Facebook pages the
 ## Exercises
 
 1. What could happen when we change the behavior of a search engine? What might the users do? What about the advertisers?
-1. Implement a covariate shift detector. Hint - build a classifier.
+1. Implement a covariate shift detector. Hint: build a classifier.
 1. Implement a covariate shift corrector.
 1. What could go wrong if training and test set are very different? What would happen to the sample weights?
 

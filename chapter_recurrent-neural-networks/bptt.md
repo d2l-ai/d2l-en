@@ -137,7 +137,7 @@ $$\begin{aligned}
 \partial_{\mathbf{W}_{hh}} L & = \sum_{t=1}^T \mathrm{prod}
 \left(\partial_{\mathbf{o}_t} l(\mathbf{o}_t, y_t), \mathbf{W}_{oh}, \partial_{\mathbf{W}_{hh}} \mathbf{h}_t\right), \\
 \partial_{\mathbf{W}_{hx}} L & = \sum_{t=1}^T \mathrm{prod}
-\left(\partial_{\mathbf{o}_t} l(\mathbf{o}_t, y_t), \mathbf{W}_{oh}, \partial_{\mathbf{W}_{hx}} \mathbf{h}_t\right)
+\left(\partial_{\mathbf{o}_t} l(\mathbf{o}_t, y_t), \mathbf{W}_{oh}, \partial_{\mathbf{W}_{hx}} \mathbf{h}_t\right).
 \end{aligned}$$
 
 
@@ -146,7 +146,7 @@ After all, hidden states depend on each other and on past inputs. The key quanti
 
 $$\partial_{\mathbf{h}_t} \mathbf{h}_{t+1} = \mathbf{W}_{hh}^\top
 \text{ and thus }
-\partial_{\mathbf{h}_t} \mathbf{h}_T = \left(\mathbf{W}_{hh}^\top\right)^{T-t}$$
+\partial_{\mathbf{h}_t} \mathbf{h}_T = \left(\mathbf{W}_{hh}^\top\right)^{T-t}.$$
 
 Chaining terms together yields
 

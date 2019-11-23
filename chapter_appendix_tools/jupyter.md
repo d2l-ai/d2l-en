@@ -18,8 +18,8 @@ Suppose that the local path of code of the book is "xx/yy/d2l-en/". Use the shel
 :label:`fig_jupyter00`
 
 
-You can access the notebook files by clicking on the folder displayed on the webpage. They usually have the suffix `.ipynb`.
-For the sake of brevity, we create a temporary `test.ipynb` file. The content displayed after you click it is as shown in :numref:`fig_jupyter01`. This notebook includes a markdown cell and a code cell. The content in the markdown cell includes "This is A Title" and "This is text". The code cell contains two lines of Python code.
+You can access the notebook files by clicking on the folder displayed on the webpage. They usually have the suffix .ipynb.
+For the sake of brevity, we create a temporary "test.ipynb" file. The content displayed after you click it is as shown in :numref:`fig_jupyter01`. This notebook includes a markdown cell and a code cell. The content in the markdown cell includes "This is A Title" and "This is text". The code cell contains two lines of Python code.
 
 ![Markdown and code cells in the "text.ipynb" file. ](../img/jupyter01.png)
 :width:`600px`
@@ -66,13 +66,13 @@ When a notebook contains more cells, we can click "Kernel" $\rightarrow$ "Restar
 
 ## Advanced Options
 
-Beyond local editing there are two things that are quite important: editing the notebooks in markdown format and running Jupyter remotely. The latter matters when we want to run the code on a faster server. The former matters since Jupyter's native .ipnyb format stores a lot of auxiliary data that is not really specific to what is in the notebooks, mostly related to how and where the code is run. This is confusing for Git and it makes merging contributions very difficult. Fortunately there is an alternative - native editing in Markdown.
+Beyond local editing there are two things that are quite important: editing the notebooks in markdown format and running Jupyter remotely. The latter matters when we want to run the code on a faster server. The former matters since Jupyter's native .ipnyb format stores a lot of auxiliary data that is not really specific to what is in the notebooks, mostly related to how and where the code is run. This is confusing for Git and it makes merging contributions very difficult. Fortunately there is an alternative---native editing in Markdown.
 
 ### Markdown Files in Jupyter
 
 If you wish to contribute to the content of this book, you need to modify the
-source file (.md file, not .ipynb file) on GitHub. Using the notedown plugin we
-can modify notebooks in .md format directly in Jupyter.
+source file (md file, not ipynb file) on GitHub. Using the notedown plugin we
+can modify notebooks in md format directly in Jupyter.
 
 
 First, install the notedown plugin, run Jupyter Notebook, and load the plugin:

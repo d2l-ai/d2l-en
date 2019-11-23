@@ -425,7 +425,7 @@ npx.set_np()
 First we need data. Given $x$, we will use the following cubic polynomial to generate the labels on training and test data:
 
 $$y = 5 + 1.2x - 3.4\frac{x^2}{2!} + 5.6 \frac{x^3}{3!} + \epsilon \text{ where }
-\epsilon \sim \mathcal{N}(0, 0.1)$$
+\epsilon \sim \mathcal{N}(0, 0.1).$$
 
 The noise term $\epsilon$ obeys a normal distribution
 with a mean of 0 and a standard deviation of 0.1.
@@ -504,7 +504,7 @@ def train(train_features, test_features, train_labels, test_labels,
     print('weight:', net[0].weight.data().asnumpy())
 ```
 
-### Third-order Polynomial Function Fitting (Normal)
+### Third-Order Polynomial Function Fitting (Normal)
 
 We will begin by first using a third-order polynomial function
 with the same order as the data generation function.
@@ -557,7 +557,7 @@ to gain some intuition of what is happening.
 
 ```{.python .input  n=8}
 n_subset = 100  # Subset of data to train on
-n_degree = 20   # Degree of polynomials
+n_degree = 20  # Degree of polynomials
 train(poly_features[1:n_subset, 0:n_degree],
       poly_features[n_train:, 0:n_degree], labels[1:n_subset],
       labels[n_train:])
@@ -579,7 +579,7 @@ such as weight decay and dropout.
 
 ## Exercises
 
-1. Can you solve the polynomial regression problem exactly? Hint - use linear algebra.
+1. Can you solve the polynomial regression problem exactly? Hint: use linear algebra.
 1. Model selection for polynomials
     * Plot the training error vs. model complexity (degree of the polynomial). What do you observe?
     * Plot the test error in this case.

@@ -78,7 +78,7 @@ from mxnet import np, npx
 from mxnet.gluon import nn
 npx.set_np()
 
-# factory for networks
+# Factory for networks
 def get_net():
     net = nn.HybridSequential()  
     net.add(nn.Dense(256, activation='relu'),
@@ -103,7 +103,7 @@ This seems almost too good to be true: simply designate a block to be `HybridSeq
 
 ### Acceleration by Hybridization
 
-To demonstrate the performance improvement gained by compilation we compare the time needed to evaluate `net(x)` before and after hybridization. Let's define a function to measure this time first. It will come handy throughout the chapter as we set out to measure (and improve) performance. 
+To demonstrate the performance improvement gained by compilation we compare the time needed to evaluate `net(x)` before and after hybridization. Let's define a function to measure this time first. It will come handy throughout the chapter as we set out to measure (and improve) performance.
 
 ```{.python .input}
 # Saved in the d2l package for later use
@@ -116,7 +116,7 @@ class benchmark:
         print('Done in %.4f sec' % self.timer.stop())
 ```
 
-Now we can invoke the network twice, once with and once without hybridization. 
+Now we can invoke the network twice, once with and once without hybridization.
 
 ```{.python .input  n=5}
 net = get_net()
@@ -169,7 +169,7 @@ class HybridNet(nn.HybridBlock):
         return self.output(x)
 ```
 
-The code above implements a simple network with 4 hidden units and 2 outputs. `hybrid_forward` takes an additional argument - the module `F`. This is needed since, depending on whether the code has been hybridized or not, it will use a slightly different library (`ndarray` or `symbol`) for processing. Both classes perform very similar functions and MXNet automatically determines the argument. To understand what is going on we print the arguments as part of the function invocation.
+The code above implements a simple network with 4 hidden units and 2 outputs. `hybrid_forward` takes an additional argument---the module `F`. This is needed since, depending on whether the code has been hybridized or not, it will use a slightly different library (`ndarray` or `symbol`) for processing. Both classes perform very similar functions and MXNet automatically determines the argument. To understand what is going on we print the arguments as part of the function invocation.
 
 ```{.python .input  n=9}
 net = HybridNet()
@@ -203,9 +203,9 @@ This is quite different from what we saw previously. All print statements, as de
 
 ## Exercises
 
-1. Design a network using the `HybridConcurrent` class. Alternatively look at :ref:`sec_googlenet` for a network to compose.
+1. Design a network using the `HybridConcurrent` class. Alternatively look at :numref:`sec_googlenet` for a network to compose.
 1. Add `x.asnumpy()` to the first line of the `hybrid_forward` function of the HybridNet class in this section. Execute the code and observe the errors you encounter. Why do they happen?
-1. What happens if we add control flow, i.e. the Python statements `if` and `for` in the `hybrid_forward` function?
+1. What happens if we add control flow, i.e., the Python statements `if` and `for` in the `hybrid_forward` function?
 1. Review the models that interest you in the previous chapters and use the HybridBlock class or HybridSequential class to implement them.
 
 ## [Discussions](https://discuss.mxnet.io/t/2380)

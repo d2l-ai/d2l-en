@@ -11,7 +11,7 @@ by participating in a Kaggle competition.
 the data is reasonably generic and does not have
 the kind of rigid structure that might require specialized models
 the way images or audio might.
-This dataset, collected by [Bart de Cock](http://jse.amstat.org/v19n3/decock.pdf) in 2011, is considerably larger than the famous the [Boston housing dataset](https://archive.ics.uci.edu/ml/machine-learning-databases/housing/housing.names) of Harrison and Rubinfeld (1978).
+This dataset, collected by Bart de Cock in 2011 :cite:`De-Cock.2011`, is considerably larger than the famous the [Boston housing dataset](https://archive.ics.uci.edu/ml/machine-learning-databases/housing/housing.names) of Harrison and Rubinfeld (1978).
 It boasts both more examples and more features,
 covering house prices in Ames, IA from the period of 2006-2010.
 
@@ -45,7 +45,7 @@ you need to register for an account as shown in
 
 On the House Prices Prediction page as illustrated 
 in :numref:`fig_house_pricing`,
-you can find the dataset (under the data tab),
+you can find the dataset (under the "Data" tab),
 submit predictions, see your ranking, etc.,
 The URL is right here:
 
@@ -73,7 +73,7 @@ The price of each house is included for the training set only
 You can partition the training set to create a validation set,
 but you will only find out how you perform on the official test set
 when you upload your predictions and receive your score.
-The 'Data' tab on the competition tab has links to download the data.
+The "Data" tab on the competition tab has links to download the data.
 
 We will read and process the data using `pandas`,
 an [efficient data analysis toolkit](http://pandas.pydata.org/pandas-docs/stable/), so you will want to make sure that you have `pandas` installed
@@ -139,14 +139,14 @@ To adjust them to a common scale,
 we rescale them to zero mean and unit variance.
 This is accomplished as follows:
 
-$$x \leftarrow \frac{x - \mu}{\sigma}$$
+$$x \leftarrow \frac{x - \mu}{\sigma}.$$
 
 To check that this transforms $x$ to data
 with zero mean and unit variance simply calculate
 $E[(x-\mu)/\sigma] = (\mu - \mu)/\sigma = 0$.
 To check the variance we use $E[(x-\mu)^2] = \sigma^2$
 and thus the transformed variable has unit variance.
-The reason for 'normalizing' the data is that
+The reason for "normalizing" the data is that
 it brings all features to the same order of magnitude.
 After all, we do not know *a priori*
 which features are likely to be relevant.
@@ -235,7 +235,7 @@ After all, a small value $\delta$ of $\log y - \log \hat{y}$
 translates into $e^{-\delta} \leq \frac{\hat{y}}{y} \leq e^\delta$.
 This leads to the following loss function:
 
-$$L = \sqrt{\frac{1}{n}\sum_{i=1}^n\left(\log y_i -\log \hat{y}_i\right)^2}$$
+$$L = \sqrt{\frac{1}{n}\sum_{i=1}^n\left(\log y_i -\log \hat{y}_i\right)^2}.$$
 
 ```{.python .input  n=11}
 def log_rmse(net, features, labels):
@@ -427,8 +427,8 @@ The steps are quite simple:
 
 1. Submit your predictions for this tutorial to Kaggle. How good are your predictions?
 1. Can you improve your model by minimizing the log-price directly? What happens if you try to predict the log price rather than the price?
-1. Is it always a good idea to replace missing values by their mean? Hint - can you construct a situation where the values are not missing at random?
-1. Find a better representation to deal with missing values. Hint - What happens if you add an indicator variable?
+1. Is it always a good idea to replace missing values by their mean? Hint: can you construct a situation where the values are not missing at random?
+1. Find a better representation to deal with missing values. Hint: what happens if you add an indicator variable?
 1. Improve the score on Kaggle by tuning the hyperparameters through k-fold cross-validation.
 1. Improve the score by improving the model (layers, regularization, dropout).
 1. What happens if we do not standardize the continuous numerical features like we have done in this section?
