@@ -1,203 +1,207 @@
-# Asynchronous Computing
+# Asynchronous Computation
 :label:`sec_async`
 
-MXNet utilizes asynchronous programming to improve computing performance. Understanding how asynchronous programming works helps us to develop more efficient programs, by proactively reducing computational requirements and thereby minimizing the memory overhead required in the case of limited memory resources. First, we will import the package or module needed for this section’s experiment.
+Today's computers are highly parallel systems, consisting of multiple CPU cores (often multiple threads per core), multiple processing elements per GPU and often multiple GPUs per device. In short, we can process many different things at the same time, often on different devices. Unfortunately Python is not a great way of writing parallel and asynchronous code, at least not with some extra help. After all, Python is single-threaded and this is unlikely to change in the future. Deep learning frameworks such as MXNet and TensorFlow utilize an asynchronous programming model to improve performance (PyTorch uses Python's own scheduler leading to a different performance trade-off). Hence, understanding how asynchronous programming works helps us to develop more efficient programs, by proactively reducing computational requirements and mutual dependencies. This allows us to reduce memory overhead and increase processor utilization. We begin by importing the necessary libraries.
 
 ```{.python .input  n=1}
-import d2l
+import d2l, numpy, os, subprocess
 from mxnet import autograd, gluon, np, npx
 from mxnet.gluon import nn
-import os
-import subprocess
 npx.set_np()
 ```
 
-## Asynchronous Programming in MXNet
+## Asynchrony via Backend
 
-Broadly speaking, MXNet includes the front-end directly used by users for interaction, as well as the back-end used by the system to perform the computation. For example, users can write MXNet programs in various front-end languages, such as Python, R, Scala and C++. Regardless of the front-end programming language used, the execution of MXNet programs occurs primarily in the back-end of C++ implementations. In other words, front-end MXNet programs written by users are passed on to the back-end to be computed. The back-end possesses its own threads that continuously collect and execute queued tasks.
-
-Through the interaction between front-end and back-end threads, MXNet is able to implement asynchronous programming. Asynchronous programming means that the front-end threads continue to execute subsequent instructions without having to wait for the back-end threads to return the results from the current instruction. For simplicity’s sake, assume that the Python front-end thread calls the following four instructions.
+For a warmup consider the following toy problem - we want to generate a random matrix and multiply it. Let's do that both in NumPy and in MXNet NP to see the difference.
 
 ```{.python .input  n=2}
-a = np.ones((1, 2))
-b = np.ones((1, 2))
-c = a * b + 2
-c
+with d2l.benchmark():
+    for _ in range(10):
+        a = numpy.random.normal(size=(1000, 1000))
+        b = numpy.dot(a, a)
+
+with d2l.benchmark():
+    for _ in range(10):
+        a = np.random.normal(size=(1000, 1000))
+        b = np.dot(a, a)       
 ```
 
-In Asynchronous Computing, whenever the Python front-end thread executes one of the first three statements, it simply returns the task to the back-end queue. When the last statement’s results need to be printed, the Python front-end thread will wait for the C++ back-end thread to finish computing result of the variable `c`. One benefit of such as design is that the Python front-end thread in this example does not need to perform actual computations. Thus, there is little impact on the program’s overall performance, regardless of Python’s performance. MXNet will deliver consistently high performance, regardless of the front-end language’s performance, provided the C++ back-end can meet the efficiency requirements.
-
-The following example uses timing to demonstrate the effect of asynchronous programming. As we can see, when `y = x.dot(x).sum()` is returned, it does not actually wait for the variable `y` to be calculated. Only when the `print` function needs to print the variable `y` must the function wait for it to be calculated.
+This is orders of magnitude faster. At least it seems to be so. Since both are executed on the same processor something else must be going on. Forcing MXNet to finish all computation prior to returning shows what happened previously: computation is being executed by the backend while the frontend returns control to Python.
 
 ```{.python .input  n=3}
-timer = d2l.Timer()
-x = np.random.uniform(size=(2000, 2000))
-y = x.dot(x).sum()
-print('Workloads are queued. Time %.4f sec' % timer.stop())
-
-print('sum =', y)
-print('Workloads are finished. Time %.4f sec' % timer.stop())
+with d2l.benchmark():
+    for _ in range(10):
+        a = np.random.normal(size=(1000, 1000))
+        b = np.dot(a, a)       
+    npx.waitall()
 ```
 
-In truth, whether or not the current result is already calculated in-memory is irrelevant, unless we need to print or save the computation results. So long as the data are stored in `ndarray`s and the operators provided by MXNet are used, MXNet will utilize asynchronous programming by default to attain superior computing performance.
+Broadly speaking, MXNet has a frontend for direct interaction with the users, e.g. via Python, as well as a backend used by the system to perform the computation. The backend possesses its own threads that continuously collect and execute queued tasks. Note that for this to work the backend must be able to keep track of the dependencies between various steps in the computational graph. Hence it is ony possible to parallelize operations that do not depend on each other.
 
+Users can write MXNet programs in various frontend languages, such as Python, R, Scala and C++. Regardless of the front-end programming language used, the execution of MXNet programs occurs primarily in the back-end of C++ implementations. Operations issued by the frontend language are passed on to the backend for execution. The backend manages its own threads that continuously collect and execute queued tasks. Note that for this to work the backend must be able to keep track of the dependencies between various steps in the computational graph. That is, it is not possible to parallelize operations that depend on each other.
 
-## Using of the Synchronization Function to Allow the Front-End to Wait for the Computation Results
+![Programming Frontends.](../img/frontends.svg)
 
-In addition to the `print` function we just introduced, there are other ways to make the front-end thread wait for the completion of the back-end computations. The `wait_to_read` function can be used to make the front-end wait for the complete results of `ndarray` computation, and then execute following statement. Alternatively, we can use the `waitall` function to make the front-end wait for the completion of all previous computations. The latter is a common method used in performance testing.
-
-Below, we use the `wait_to_read` function as an example. The time output includes the calculation time of `y`.
+Let's look at another toy example to understand the dependency graph a bit better.
 
 ```{.python .input  n=4}
-timer.start()
-y = x.dot(x)
-y.wait_to_read()
-print('Done in %.4f sec' % timer.stop())
+x = np.ones((1, 2))
+y = np.ones((1, 2))
+z = x * y + 2
+z
 ```
 
-Below, we use `waitall` as an example. The time output includes the calculation time of `y` and `z` respectively.
+![Dependencies.](../img/asyncgraph.svg)
+:label:`fig_asyncgraph`
+
+Whenever the Python frontend thread executes one of the first three statements, it simply returns the task to the backend queue. When the last statement’s results need to be printed, the Python frontend thread will wait for the C++ backend thread to finish computing result of the variable `z`. One benefit of this design is that the Python frontend thread does not need to perform actual computations. Thus, there is little impact on the program’s overall performance, regardless of Python’s performance.
+
+## Barriers and Blockers
+
+There are a number of operations that will force Python to wait for completion:
+* Most obviously `npx.waitall()` waits until all computation has completed, regardless of when the compute instructions were issued. In practice it is a bad idea to use this operator unless absolutely necessary since it can lead to poor performance.
+* If we just want to wait until a specific variable is available we can call `z.wait_to_read()`. In this case MXNet blocks return to Python until the variable `z` has been computed. Other computation may well continue afterwards.
+
+Let's see how this works in practice:
 
 ```{.python .input  n=5}
-timer.start()
-y = x.dot(x)
-z = x.dot(x)
-npx.waitall()
-print('Done in %.4f sec' % timer.stop())
+with d2l.benchmark():
+    b = np.dot(a, a)       
+    npx.waitall()
 ```
-
-Additionally, any operation that does not support asynchronous programming but converts the `ndarray` object from MXNet to an object in NumPy (see :numref:`sec_ndarray`) will cause the front-end to have to wait for computation results. For example, calling the `asnumpy` and `item` functions:
 
 ```{.python .input  n=6}
-timer.start()
-y = x.dot(x)
-y.asnumpy()
-print('Done in %.4f sec' % timer.stop())
+with d2l.benchmark():
+    b = np.dot(a, a)
+    b.wait_to_read()
 ```
+
+Both operations take approximately the same time to complete. Besides the obvious blocking operations we recommend that the reader is aware of *implicit* blockers. Printing a variable clearly requires the variable to be avaialable and is thus a blocker. Lastly, conversions to NumPy via `z.asnumpy()` and conversions to scalars via `z.item()` are blocking, since NumPy has no notion of asynchrony. It needs access to the values just like the `print` function. Copying small amounts of data frequently from MXNet's scope to NumPy and back can destroy performance of an otherwise efficient code, since each such operation requires the compute graph to evaluate all intermediate results needed to get the relevant term *before* anything else can be done.
 
 ```{.python .input  n=7}
-timer.start()
-y = x.dot(x)
-np.abs(y).sum().item()
-print('Done in %.4f sec' % timer.stop())
+with d2l.benchmark():
+    b = np.dot(a, a)       
+    b.asnumpy()
 ```
-
-The `wait_to_read`, `waitall`, `asnumpy`, `item` and the`print` functions described above will cause the front-end to wait for the back-end computation results. Such functions are often referred to as synchronization functions.
-
-
-## Using Asynchronous Programming to Improve Computing Performance
-
-In the following example, we will use the “for” loop to continuously assign values to the variable `y`. Asynchronous programming is not used in tasks when the synchronization function `wait_to_read` is used in the “for” loop. However, when the synchronization function `waitall` is used outside of the “for” loop, asynchronous programming is used.
 
 ```{.python .input  n=8}
-timer.start()
-for _ in range(1000):
-    y = x + 1
-    y.wait_to_read()
-print('Synchronous. Done in %.4f sec' % timer.stop())
-
-timer.start()
-for _ in range(1000):
-    y = x + 1
-npx.waitall()
-print('Asynchronous. Done in %.4f sec' % timer.stop())
+with d2l.benchmark():
+    b = np.dot(a, a)       
+    b.sum().item()
 ```
 
-We have observed that certain aspects of computing performance can be improved by making use of asynchronous programming. To explain this, we will slightly simplify the interaction between the Python front-end thread and the C++ back-end thread. In each loop, the interaction between front and back-ends can be largely divided into three stages:
+## Improving Computation
+
+On a heavily multithreaded system (even regular laptops have 4 threads or more and on multi-socket servers this number can exceed 256) the overhead of scheduling operations can become significant. This is why it's highly desirable to have computation and scheduling occur asynchronously and in parallel. To illustrate the benefit of doing this let's see what happens if we increment a variable by 1 multiple times, both in sequence or asynchronously. We simulate synchronous execution by inserting a `wait_to_read()` barrier in between each addition.
+
+```{.python .input  n=9}
+with d2l.benchmark():
+    for _ in range(1000):
+        y = x + 1
+        y.wait_to_read()
+
+with d2l.benchmark():
+    for _ in range(1000):
+        y = x + 1
+    y.wait_to_read()
+```
+
+A slightly simplified interaction between the Python front-end thread and the C++ back-end thread can be summarized as follows:
 
 1. The front-end orders the back-end to insert the calculation task `y = x + 1` into the queue.
 1. The back-end then receives the computation tasks from the queue and performs the actual computations.
 1. The back-end then returns the computation results to the front-end.
 
-Assume that the durations of these three stages are $t_1, t_2, t_3$, respectively. If we do not use asynchronous programming, the total time taken to perform 1000 computations is approximately $1000 (t_1+ t_2 + t_3)$. If asynchronous programming is used, the total time taken to perform 1000 computations can be reduced to $t_1 + 1000 t_2 + t_3$ (assuming $1000t_2 > 999t_1$), since the front-end does not have to wait for the back-end to return computation results for each loop.
+Assume that the durations of these three stages are $t_1, t_2$ and $t_3$, respectively. If we do not use asynchronous programming, the total time taken to perform 1000 computations is approximately $1000 (t_1+ t_2 + t_3)$. If asynchronous programming is used, the total time taken to perform 1000 computations can be reduced to $t_1 + 1000 t_2 + t_3$ (assuming $1000 t_2 > 999t_1$), since the front-end does not have to wait for the back-end to return computation results for each loop.
 
-## The Impact of Asynchronous Programming on Memory
+## Improving Memory Footprint
 
-In order to explain the impact of asynchronous programming on memory usage, recall what we learned in the previous chapters. Throughout the model training process implemented in the previous chapters, we usually evaluated things like the loss or accuracy of the model in each minibatch. Detail-oriented readers may have discovered that such evaluations often make use of synchronization functions, such as `item` or `asnumpy`. If these synchronization functions are removed, the front-end will pass a large number of minibatch computing tasks to the back-end in a very short time, which might cause a spike in memory usage. When the minibatches makes use of synchronization functions, on each iteration, the front-end will only pass one minibatch task to the back-end to be computed, which will typically reduce memory use.
+Imagine a situation where we keep on inserting operations into the backend by executing Python code on the frontend. For instance, the frontend might insert a large number of minibatch tasks within a very short time. After all, if no meaningful computation happens in Python this can be done quite quickly. If each of these tasks can be launched quickly at the same time this may cause a spike in memory usage. Given a finite amount of memory available on GPUs (and even on CPUs) this can lead to resource contention or even program crashes. Some readers might have noticed that previous training routines made use of synchronization methods such as `item` or even `asnumpy`.
 
-Because the deep learning model is usually large and memory resources are usually limited, we recommend the use of synchronization functions for each minibatch throughout model training, for example by using the `item` or `asnumpy` functions to evaluate model performance. Similarly, we also recommend utilizing synchronization functions for each minibatch prediction (such as directly printing out the current batch’s prediction results), in order to reduce memory usage during model prediction.
+We recommend to use these operations carefully, e.g. for each minibatch, such as to balance computational efficiency and memory footprint. To illustrate what happens let's implement a simple training loop for a deep network and measure its memory consumption and timing. Below is the mock data generator and deep network.
 
-Next, we will demonstrate asynchronous programming’s impact on memory. We will first define a data retrieval function `data_iter`, which upon being called, will start timing and regularly print out the time taken to retrieve data batches.
-
-```{.python .input  n=9}
+```{.python .input  n=10}
 def data_iter():
-    timer.start()
-    num_batches, batch_size = 100, 1024
+    timer = d2l.Timer()
+    num_batches, batch_size = 150, 1024
     for i in range(num_batches):
         X = np.random.normal(size=(batch_size, 512))
         y = np.ones((batch_size,))
         yield X, y
         if (i + 1) % 50 == 0:
             print('batch %d, time %.4f sec' % (i + 1, timer.stop()))
-```
 
-The multilayer perceptron, optimization algorithm, and loss function are defined below.
-
-```{.python .input  n=10}
 net = nn.Sequential()
 net.add(nn.Dense(2048, activation='relu'),
-        nn.Dense(512, activation='relu'),
-        nn.Dense(1))
+        nn.Dense(512, activation='relu'), nn.Dense(1))
 net.initialize()
-trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': 0.005})
+trainer = gluon.Trainer(net.collect_params(), 'sgd')
 loss = gluon.loss.L2Loss()
 ```
 
-A helper function to monitor memory use is defined here. It should be noted that this function can only be run on Linux or MacOS operating systems.
+Next we need a tool to measure the memory footprint of our code. We use a relatively primitive `ps` call to accomplish this (note that the latter only works on Linux and MacOS). For a much more detailed analysis of what is going on here use e.g. Nvidia's [Nsight](https://developer.nvidia.com/nsight-compute-2019_5) or Intel's [vTune](https://software.intel.com/en-us/vtune).
 
-```{.python .input  n=11}
+```{.python .input  n=12}
 def get_mem():
     res = subprocess.check_output(['ps', 'u', '-p', str(os.getpid())])
     return int(str(res).split()[15]) / 1e3
 ```
 
-Now we can begin testing. To initialize the `net` parameters we will try running the system once. See :numref:`sec_deferred_init` for further discussions related to initialization.
+Before we can begin testing we need to initialize the parameters of the network and process one batch. Otherwise it would be tricky to see what the additional memory consumption is. See :numref:`sec_deferred_init` for further details related to initialization.
 
-```{.python .input  n=12}
+```{.python .input  n=13}
 for X, y in data_iter():
     break
 loss(y, net(X)).wait_to_read()
 ```
 
-For the `net` training model, the synchronization function `item` can naturally be used to record the loss of each minibatch output by the `ndarray` object and to print out the model loss after each iteration. At this point, the generation interval of each minibatch increases, but with a small memory overhead.
-
-```{.python .input  n=13}
-l_sum, mem = 0, get_mem()
-for X, y in data_iter():
-    with autograd.record():
-        l = loss(y, net(X))
-    # Use of the item synchronization function
-    l_sum += l.sum().item()
-    l.backward()
-    trainer.step(X.shape[0])
-npx.waitall()
-print('increased memory: %f MB' % (get_mem() - mem))
-```
-
-Even though each minibatch’s generation interval is shorter, the memory usage may still be high during training if the synchronization function is removed. This is because, in default asynchronous programming, the front-end will pass on all minibatch computations to the back-end in a short amount of time. As a result of this, a large amount of intermediate results cannot be released and may end up piled up in memory. In this experiment, we can see that all data (`X` and `y`) is generated in under a second. However, because of an insufficient training speed, this data can only be stored in the memory and cannot be cleared in time, resulting in extra memory usage.
+To ensure that we don't overflow the task buffer on the backend we insert a `wait_to_read` call for the loss function at the end of each loop. This forces the forward pass to complete before a new forward pass is commenced. Note that a (possibly more elegant) alternative would have been to track the loss in a scalar variable and to force a barrier via the `item` call.
 
 ```{.python .input  n=14}
 mem = get_mem()
-for X, y in data_iter():
-    with autograd.record():
-        l = loss(y, net(X))
-    l.backward()
-    trainer.step(X.shape[0])
-npx.waitall()
+with d2l.benchmark():
+    for X, y in data_iter():
+        with autograd.record():
+            l = loss(y, net(X))
+        l.backward()
+        trainer.step(X.shape[0])
+        l.wait_to_read() # barrier before new batch
+    npx.waitall()
 print('increased memory: %f MB' % (get_mem() - mem))
 ```
 
+As we see, the timing of the minibatches lines up quite nicely with the overall runtime of the optimization code. Moreover, memory footprint only increases slightly. Now let's see what happens if we drop the barrier at the end of each minibatch.
+
+```{.python .input  n=14}
+mem = get_mem()
+with d2l.benchmark():
+    for X, y in data_iter():
+        with autograd.record():
+            l = loss(y, net(X))
+        l.backward()
+        trainer.step(X.shape[0])
+    npx.waitall()
+print('increased memory: %f MB' % (get_mem() - mem))
+```
+
+Even though the time to issue instructions for the backend is an order of magnitude smaller, we still need to perform computation. Consequently a large amount of intermediate results cannot be released and may pile up in memory. While this didn't cause any issues in the toy example above, it might well have resulted in out of memory situations when left unchecked in real world scenarios.
+
 ## Summary
 
-* MXNet includes the front-end used directly by users for interaction and the back-end used by the system to perform the computation.
-
-* MXNet can improve computing performance through the use of asynchronous programming.
-
-* We recommend using at least one synchronization function for each minibatch training or prediction to avoid passing on too many computation tasks to the back-end in a short period of time.
+* MXNet decouples the Python frontend from an execution backend. This allows for fast asynchronous insertion of commands into the backend and associated parallelism.
+* Asynchrony leads to a rather responsive frontend. However, use caution not to overfill the task queue since it may lead to excessive memory consumption.
+* It is recommended to synchronize for each minibatch to keep frontend and backend approximately synchronized.
+* Be aware of the fact that conversions from MXNet's memory management to Python will force the backend to wait until  the specific variable is ready. `print`, `asnumpy` and `item` all have this effect. This can be desirable but a carless use of synchronization can ruin performance.
+* Chip vendors offer sophisticated performance analysis tools to obtain a much more fine-grained insight into the efficiency of deep learning.
 
 
 ## Exercises
 
-* In the section "Use of Asynchronous Programming to Improve Computing Performance", we mentioned that using asynchronous computation can reduce the total amount of time needed to perform 1000 computations to $t_1 + 1000 t_2 + t_3$. Why do we have to assume $1000t_2 > 999t_1$ here?
+1. We mentioned above that using asynchronous computation can reduce the total amount of time needed to perform $1000$ computations to $t_1 + 1000 t_2 + t_3$. Why do we have to assume $1000 t_2 > 999 t_1$ here?
+1. How would you need to modify the training loop if you wanted to have an overlap of one minibatch each? I.e. if you wanted to ensure that batch $b_t$ finishes before batch $b_{t+2}$ commences?
+1. What might happen if we want to execute code on CPUs and GPUs simultaneously? Should you still insist on synchronizing after every minibatch has been issued?
+1. Measure the difference between `waitall` and `wait_to_read`. Hint - perform a number of instructions and synchronize for an intermediate result.
+
 
 ## [Discussions](https://discuss.mxnet.io/t/2381)
 

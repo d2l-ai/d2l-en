@@ -103,19 +103,31 @@ This seems almost too good to be true: simply designate a block to be `HybridSeq
 
 ### Acceleration by Hybridization
 
-To demonstrate the performance improvement gained by compilation we compare the time needed to evaluate `net(x)` before and after hybridization.
+To demonstrate the performance improvement gained by compilation we compare the time needed to evaluate `net(x)` before and after hybridization. Let's define a function to measure this time first. It will come handy throughout the chapter as we set out to measure (and improve) performance.
+
+```{.python .input}
+# Saved in the d2l package for later use
+class benchmark:    
+    def __enter__(self):
+        self.timer = d2l.Timer()
+        return self
+
+    def __exit__(self, *args):
+        print('Done in %.4f sec' % self.timer.stop())
+```
+
+Now we can invoke the network twice, once with and once without hybridization.
 
 ```{.python .input  n=5}
-def benchmark(net, x):
-    timer = d2l.Timer()
-    for i in range(1000): net(x)
-    npx.waitall() # Wait for all computations to finish
-    return timer.stop()
-
 net = get_net()
-print('before hybridizing: %.4f sec' % (benchmark(net, x)))
+with benchmark():
+    for i in range(1000): net(x)
+    npx.waitall()
+
 net.hybridize()
-print('after hybridizing: %.4f sec' % (benchmark(net, x)))
+with benchmark():
+    for i in range(1000): net(x)
+    npx.waitall()
 ```
 
 As is observed in the above results, after a HybridSequential instance calls the `hybridize` function, computing performance is improved through the use of symbolic programming.
