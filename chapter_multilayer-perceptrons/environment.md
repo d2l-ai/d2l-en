@@ -501,7 +501,3 @@ Should what news someone is exposed to be determined by which Facebook pages the
 ## [Discussions](https://discuss.mxnet.io/t/2347)
 
 ![](../img/qr_environment.svg)
-
-```{.python .input}
-
-```
