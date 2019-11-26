@@ -279,7 +279,7 @@ we can correct for that by using the following simple identity:
 
 $$
 \begin{aligned}
-\int p(\mathbf{x}) f(\mathbf{x}) dx & = \int p(\mathbf{x}) f(\mathbf{x}) \frac{q(\mathbf{x})}{p(\mathbf{x})} dx \\
+\int p(\mathbf{x}) f(\mathbf{x}) dx 
 & = \int q(\mathbf{x}) f(\mathbf{x}) \frac{p(\mathbf{x})}{q(\mathbf{x})} dx.
 \end{aligned}
 $$
@@ -501,3 +501,7 @@ Should what news someone is exposed to be determined by which Facebook pages the
 ## [Discussions](https://discuss.mxnet.io/t/2347)
 
 ![](../img/qr_environment.svg)
+
+```{.python .input}
+
+```
