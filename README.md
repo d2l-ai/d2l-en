@@ -29,3 +29,8 @@ Please use the following bibtex entry to cite this book:
 }
 ```
 
+## License Summary
+
+This open source book is made available under the Creative Commons Attribution-ShareAlike 4.0 International License. See the LICENSE file.
+
+The sample and reference code within this open source book is made available under a modified MIT license. See the LICENSE-SAMPLECODE file.
