@@ -314,7 +314,3 @@ for any $i = 1, 2, \ldots, n$.
 ## [Discussions](https://discuss.mxnet.io/t/5008)
 
 ![](../img/qr_calculus.svg)
-
-```{.python .input}
-
-```
