@@ -12,6 +12,8 @@ First, import the required packages or modules for the experiment in this sectio
 import d2l
 from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
+print(np)
+
 npx.set_np()
 ```
 
