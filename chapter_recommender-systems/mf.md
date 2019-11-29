@@ -39,10 +39,8 @@ In the rest of this section, we will explain the implementation of matrix factor
 
 ```{.python .input  n=2}
 import d2l
-from mxnet import autograd, init, gluon, np, npx
+from mxnet import autograd, gluon, np, npx
 from mxnet.gluon import nn
-import mxnet as mx
-import sys
 npx.set_np()
 ```
 
@@ -80,7 +78,7 @@ where $\mathcal{T}$ is the set consisting of pairs of users and items that you w
 
 ```{.python .input  n=3}
 def evaluator(net, test_iter, ctx):
-    rmse = mx.metric.RMSE() # Get the RMSE
+    rmse = mx.metric.RMSE()  # Get the RMSE
     rmse_list = []
     for idx, (users, items, ratings) in enumerate(test_iter):
         u = gluon.utils.split_and_load(users, ctx, even_split=False)
@@ -102,9 +100,9 @@ In the training function, we adopt the $L_2$ loss with weight decay. The weight 
 def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
                         ctx_list=d2l.try_all_gpus(), evaluator=None,
                         **kwargs):
-    num_batches, timer = len(train_iter), d2l.Timer()
+    timer = d2l.Timer()
     animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 2],
-                            legend=['train loss','test RMSE'])
+                            legend=['train loss', 'test RMSE'])
     for epoch in range(num_epochs):
         metric, l = d2l.Accumulator(3), 0.
         for i, values in enumerate(train_iter):
@@ -123,9 +121,9 @@ def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
             trainer.step(values[0].shape[0])
             metric.add(l, values[0].shape[0], values[0].size)
             timer.stop()
-        if len(kwargs) > 0: # it will be used in section AutoRec.
+        if len(kwargs) > 0:  # it will be used in section AutoRec.
             test_rmse = evaluator(net, test_iter, kwargs['inter_mat'],
-                                 ctx_list)
+                                  ctx_list)
         else:
             test_rmse = evaluator(net, test_iter, ctx_list)
         train_l = l / (i + 1)

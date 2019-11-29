@@ -38,10 +38,9 @@ The following figure illustrates the model architecture of NeuMF.
 
 ```{.python .input  n=2}
 import d2l
-from mxnet import autograd, init, gluon, np, npx
+from mxnet import autograd, gluon, np, npx
 from mxnet.gluon import nn
 import mxnet as mx
-import math
 import random
 import sys
 npx.set_np()
@@ -52,16 +51,17 @@ The following code implements the NeuMF model. It consists of a generalized matr
 
 ```{.python .input  n=2}
 class NeuMF(nn.Block):
-    def __init__(self, num_factors , num_users, num_items, mlp_layers, 
+    def __init__(self, num_factors, num_users, num_items, mlp_layers,
                  **kwargs):
         super(NeuMF, self).__init__(**kwargs)
         self.P = nn.Embedding(num_users, num_factors)
         self.Q = nn.Embedding(num_items, num_factors)
         self.U = nn.Embedding(num_users, num_factors)
         self.V = nn.Embedding(num_items, num_factors)
-        self.mlp = nn.Sequential() # The MLP layers
+        self.mlp = nn.Sequential()  # The MLP layers
         for i in mlp_layers:
-            self.mlp.add(gluon.nn.Dense(i, activation='relu', use_bias=True))       
+            self.mlp.add(gluon.nn.Dense(i, activation='relu', use_bias=True))
+            
     def forward(self, user_id, item_id):
         p_mf = self.P(user_id)
         q_mf = self.Q(item_id)
@@ -69,7 +69,7 @@ class NeuMF(nn.Block):
         p_mlp = self.U(user_id)
         q_mlp = self.V(item_id)
         mlp = self.mlp(np.concatenate([p_mlp, q_mlp], axis=1))
-        con_res = np.concatenate([gmf, mlp], axis=1) #Concatenate GMF and MLP.
+        con_res = np.concatenate([gmf, mlp], axis=1)
         return np.sum(con_res, axis=-1)
 ```
 
@@ -111,20 +111,20 @@ The following function calculates the hit counts and AUC for each user.
 ```{.python .input  n=4}
 # Saved in the d2l package for later use
 def hit_and_auc(rankedlist, test_matrix, k):
-    hits_k = [(idx, val) for idx, val in enumerate(rankedlist[:k]) 
+    hits_k = [(idx, val) for idx, val in enumerate(rankedlist[:k])
               if val in set(test_matrix)]
-    hits_all = [(idx, val) for idx, val in enumerate(rankedlist) 
+    hits_all = [(idx, val) for idx, val in enumerate(rankedlist)
                 if val in set(test_matrix)]
     max = len(rankedlist) - 1
-    auc = 1.0 * (max - hits_all[0][0]) /max if len(hits_all) > 0 else 0
-    return len(hits_k) , auc
+    auc = 1.0 * (max - hits_all[0][0]) / max if len(hits_all) > 0 else 0
+    return len(hits_k), auc
 ```
 
 Then, the overall Hit rate and AUC are calculated as follows.
 
 ```{.python .input  n=5}
 # Saved in the d2l package for later use
-def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items, 
+def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items,
                      ctx):
     ranked_list, ranked_items, hit_rate, auc = {}, {}, [], []
     all_items = set([i for i in range(num_users)])
@@ -135,13 +135,15 @@ def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items,
         [user_ids.append(u) for _ in neg_items]
         x.extend([np.array(user_ids)])
         if seq is not None:
-            x.append(seq[user_ids,:])
+            x.append(seq[user_ids, :])
         x.extend([np.array(item_ids)])
-        test_data_iter = gluon.data.DataLoader(gluon.data.ArrayDataset(*x), 
-            shuffle=False, last_batch="keep", batch_size=1024)
+        test_data_iter = gluon.data.DataLoader(gluon.data.ArrayDataset(*x),
+                                               shuffle=False, 
+                                               last_batch="keep", 
+                                               batch_size=1024) 
         for index, values in enumerate(test_data_iter):
-            x = [gluon.utils.split_and_load(v, ctx, even_split=False)
-                          for v in values]
+            x = [gluon.utils.split_and_load(v, ctx, even_split=False) 
+                 for v in values]
             scores.extend([list(net(*t).asnumpy()) for t in zip(*x)])
         scores = [item for sublist in scores for item in sublist]
         item_scores = list(zip(item_ids, scores))
@@ -159,10 +161,10 @@ The training function is defined below. We train the model in the pairwise manne
 
 ```{.python .input  n=6}
 # Saved in the d2l package for later use
-def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter, 
-                  num_users, num_items, num_epochs, ctx_list, evaluator, 
+def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
+                  num_users, num_items, num_epochs, ctx_list, evaluator,
                   negative_sampler, candidates, eval_step=1):
-    num_batches, timer, hit_rate, auc  = len(train_iter), d2l.Timer(), 0, 0
+    timer, hit_rate, auc = d2l.Timer(), 0, 0
     animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 1],
                             legend=['test hit rate', 'test AUC'])
     for epoch in range(num_epochs):
@@ -176,7 +178,7 @@ def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
             with autograd.record():
                 p_pos = [net(*t) for t in zip(*input_data)]
                 p_neg = [net(*t) for t in zip(*input_data[0:-1], neg_items)]
-                ls =  [loss(p, n) for p, n in  zip(p_pos, p_neg)]
+                ls = [loss(p, n) for p, n in zip(p_pos, p_neg)]
             [l.backward(retain_graph=False) for l in ls]
             l += sum([l.asnumpy() for l in ls]).mean()/len(ctx_list)
             trainer.step(values[0].shape[0])
@@ -184,11 +186,10 @@ def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
             timer.stop()
         with autograd.predict_mode():
             if (epoch + 1) % eval_step == 0:
-                hit_rate, auc = evaluator(net, test_iter, test_seq_iter, 
-                                          candidates, num_users, num_items, 
+                hit_rate, auc = evaluator(net, test_iter, test_seq_iter,
+                                          candidates, num_users, num_items,
                                           ctx_list)
-                train_l = l / (i + 1)
-                animator.add(epoch + 1, ( hit_rate, auc))
+                animator.add(epoch + 1, (hit_rate, auc))
     print('train loss %.3f, test hit rate %.3f, test AUC %.3f'
           % (metric[0] / metric[1], hit_rate, auc))
     print('%.1f examples/sec on %s'
@@ -200,23 +201,23 @@ Now, we can load the MovieLens 100k dataset and train the model. Since there are
 ```{.python .input  n=7}
 batch_size = 1024
 df, num_users, num_items = d2l.read_data_ml100k()
-train_data, test_data = d2l.split_data_ml100k(df, num_users, num_items, 
+train_data, test_data = d2l.split_data_ml100k(df, num_users, num_items,
                                               'seq-aware')
 users_train, items_train, ratings_train, candidates = d2l.load_data_ml100k(
-    train_data, num_users, num_items, feedback="implicit" )
+    train_data, num_users, num_items, feedback="implicit")
 users_test, items_test, ratings_test, test_iter = d2l.load_data_ml100k(
     test_data, num_users, num_items, feedback="implicit")
 num_workers = 0 if sys.platform.startswith("win") else 4
 train_iter = gluon.data.DataLoader(gluon.data.ArrayDataset(
-    np.array(users_train), np.array(items_train)), batch_size, True, 
-                                   last_batch="rollover", 
+    np.array(users_train), np.array(items_train)), batch_size, True,
+                                   last_batch="rollover",
                                    num_workers=num_workers)
 ```
 
 We then create and initialize the model. we use a three-layer MLP with constant hidden size 10.
 
 ```{.python .input  n=8}
-ctx = d2l.try_all_gpus() 
+ctx = d2l.try_all_gpus()
 net = NeuMF(10, num_users, num_items, mlp_layers=[10, 10, 10])
 net.initialize(ctx=ctx, force_reinit=True, init=mx.init.Normal(0.01))
 ```
@@ -226,10 +227,10 @@ The following code trains the model.
 ```{.python .input  n=9}
 lr, num_epochs, wd, optimizer = 0.01, 10, 1e-5, 'adam'
 loss = d2l.BPRLoss()
-trainer = gluon.Trainer(net.collect_params(), optimizer, 
+trainer = gluon.Trainer(net.collect_params(), optimizer,
                         {"learning_rate": lr, 'wd': wd})
-train_ranking(net, train_iter, test_iter, loss, trainer, None, num_users, 
-              num_items, num_epochs, ctx, evaluate_ranking, negative_sampler, 
+train_ranking(net, train_iter, test_iter, loss, trainer, None, num_users,
+              num_items, num_epochs, ctx, evaluate_ranking, negative_sampler,
               candidates)
 ```
 
