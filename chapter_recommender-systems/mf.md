@@ -41,6 +41,7 @@ In the rest of this section, we will explain the implementation of matrix factor
 import d2l
 from mxnet import autograd, gluon, np, npx
 from mxnet.gluon import nn
+import mxnet as mx
 npx.set_np()
 ```
 
