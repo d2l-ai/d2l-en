@@ -27,7 +27,7 @@ x_cpu = np.random.uniform(size=(2000, 2000))
 x_gpu = np.random.uniform(size=(6000, 6000), ctx=d2l.try_gpu())
 ```
 
-Now we apply the function to the data. To ensure that caching doesn't play a role in the results we warm up the devices by performing a single pass on each of them prior to measuring. 
+Now we apply the function to the data. To ensure that caching doesn't play a role in the results we warm up the devices by performing a single pass on each of them prior to measuring.
 
 ```{.python .input}
 run(x_cpu)  # Warm-up both devices
@@ -56,7 +56,7 @@ In the above case the total execution time is less than the sum of its parts, si
 
 ## Parallel Computation and Communication
 
-In many cases we need to move data between different devices, say between CPU and GPU, or between different GPUs. This occurs e.g. when we want to perform distributed optimization where we need to aggregate the gradients over multiple accelerator cards. Let's simulate this by computing on the GPU and then copying the results back to the CPU. 
+In many cases we need to move data between different devices, say between CPU and GPU, or between different GPUs. This occurs e.g. when we want to perform distributed optimization where we need to aggregate the gradients over multiple accelerator cards. Let's simulate this by computing on the GPU and then copying the results back to the CPU.
 
 ```{.python .input}
 def copy_to_cpu(x):
@@ -103,7 +103,3 @@ We conclude with an illustration of the computegraph and its dependencies for a 
 ## [Discussions](https://discuss.mxnet.io/t/2382)
 
 ![](../img/qr_auto-parallelism.svg)
-
-```{.python .input}
-
-```
