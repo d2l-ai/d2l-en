@@ -9,11 +9,8 @@ Impatient readers may be able to get by with the table below. It is taken from C
 
 ## Computers
 
-Most deep learning researchers have access to a computer with a fair amount of memory, compute, some form of an accelerator such as a GPU, or multiples thereof. On the inside the basic unit looks a bit like in the picture below (we marked up the parts relevant for deep learning):
+Most deep learning researchers have access to a computer with a fair amount of memory, compute, some form of an accelerator such as a GPU, or multiples thereof. It consists of several key components: 
 
-![PC Mainboard - depicted is an ASUS ROG Strix X570.](../img/mobo.svg)
-
-It consists of several key components: 
 * A processor, also referred to as CPU which is able to execute the programs we give it (in addition to running an operating system and many other things), typically consisting of 8 or more cores.
 * Memory (RAM) to store and retrieve the results from computation, such as weight vectors, activations, often training data.
 * An Ethernet network connection (sometimes multiple) with speeds ranging from 1Gbit/s to 100Gbit/s (on high end servers more advanced interconnects can be found).
@@ -104,13 +101,13 @@ Of note is a distinction that is often made in practice: accelerators are optimi
 Recall :numref:`fig_neon128`. Adding vector units to a processor core allowed us to increase throughput significantly (in the example in the figure we were able to perform 16 operations simultaneously). What if we added operations that optimized not just operations between vectors but also between matrices? This strategy led to Tensor Cores (more on this shortly). Secondly, what if we added many more cores? In a nutshell, these two strategies summarize the design decisions in GPUs. :numref:`fig_turing_processing_block` gives an overview over a basic processing block. It contains 16 integer and 16 floating point units. In addition to that, two Tensor Cores accelerate a narrow subset of additional operations relevant for deep learning. Each Streaming Multiprocessor (SM) consists of four such blocks. 
 
 ![NVIDIA Turing Processing Block (image courtesy of NVIDIA)](../img/turing_processing_block.png)
-:width:`200px`
+:width:`150px`
 :label:`fig_turing_processing_block`
 
 12 streaming multiprocessors are then grouped into graphics processing clusters which make up the high-end TU102 processors. Ample memory channels and an L2 cache complement the setup. :numref:`fig_turing` has the relevant details. One of the reasons for designing such a device is that individual blocks can be added or removed as needed to allow for more compact chips and to deal with yield issues (faulty modules might not be activated). Fortunately programming such devices is well hidden from the casual deep learning researcher beneath layers of CUDA and framework code. In particular, more than one of the programs might well be executed simultaneously on the GPU, provided that there are available resources. Nonetheless it pays to be aware of the limitations of the devices to avoid picking models that do not fit into device memory. 
 
 ![NVIDIA Turing Architecture (image courtesy of NVIDIA)](../img/turing.png)
-:width:`400px`
+:width:`350px`
 :label:`fig_turing`
 
 A last aspect that is worth mentioning in more detail are TensorCores. They are an example of a recent trend of adding more optimized circuits that are specifically effective for deep learning. For instance, the TPU added a systolic array :cite:`Kung.1988` for fast matrix multiplication. There the design was to support a very small number (one for the first generation of TPUs) of large operations. TensorCores are at the other end. They are optimized for small operations involving between 4x4 and 16x16 matrices, depending on their numerical precision. :numref:`fig_tensorcore` gives an overview of the optimizations. 
@@ -206,8 +203,4 @@ Numbers for NVIDIA Tesla GPUs
 1. Measure the packet overhead when sending messages across the Ethernet. Look up the difference between UDP and TCP/IP connections. 
 1. Direct Memory Access allows devices other than the CPU to write (and read) directly to (from) memory. Why is this a good idea?
 1. Look at the performance numbers for the Turing T4 GPU. Why does the performance 'only' double as you go from FP16 to INT8 and INT4?
-1. What is the shortest time it should take for a packet on a roundtrip between San Francisco and Amsterdam? Hint - you can assume that the distance is 10,000km.  
-
-```{.python .input}
-
-```
+1. What is the shortest time it should take for a packet on a roundtrip between San Francisco and Amsterdam? Hint - you can assume that the distance is 10,000km.
