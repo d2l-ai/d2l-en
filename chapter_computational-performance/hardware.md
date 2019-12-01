@@ -66,8 +66,7 @@ Central Processing Units (CPUs) are the centerpiece of any computer (as before w
 
 Each of the processor cores consists of a rather sophisticated set of components. While details differ between generations and vendors, the basic functionality is pretty much standard. The front end loads instructions and tries to predict which path will be taken (e.g. for control flow). Instructions are then decoded from assembly code to microinstructions. Assembly code is often not the lowest level code that a processor executes. Instead, complex instructions may be decoded into a set of more lower level operations. These are then processed by the actual execution core. Often the latter is capable of performing many operations simultaneously. For instance, the ARM Cortex A77 core of :numref:`fig_cortexa77` is able to perform up to 8 operations simultaneously. 
 
-![ARM Cortex A77 Microarchitecture Overview (image courtesy of ARM)](../img/a77.svg)
-:width:`400px`
+![ARM Cortex A77 Microarchitecture Overview](../img/a77.svg)
 :label:`fig_cortexa77`
 
 This means that efficient programs might be able to perform more than one instruction per clock cycle, *provided that* they can be carried out independently. Not all units are created equal. Some specialize in integer instructions whereas others are optimized for floating point performcne. To increase throughput the processor might also follow  multiple codepaths simultaneously in a branching instruction and then discard the results of the branch not taken. This is why branch prediction units matter (on the frontend) such that only the most promising paths are pursued. 
@@ -76,7 +75,7 @@ This means that efficient programs might be able to perform more than one instru
 
 Deep learning is extremely compute hungry. Hence, to make CPUs suitable for machine learning one needs to perform many operations in one clock cycle. This is achieved via vector units. They have different names: on ARM they're called NEON, on x86 the latest generation is referred to as [AVX2](https://en.wikipedia.org/wiki/Advanced_Vector_Extensions) units. A common aspect is that they are able to perform SIMD (single instruction multiple data) operations. The diagram below shows how 8 short integers can be added in one clock cycle on ARM.
 
-![128 bit NEON vectorization (image courtesy of ARM)](../img/neon128.svg)
+![128 bit NEON vectorization](../img/neon128.svg)
 :label:`fig_neon128`
 
 Depending on architecture choices such registers are up to 512 bit long, allowing for the combination of up to 64 pairs of numbers. For instance, we might be multiplying two numbers and adding them to a third, which is also known as a fused multiply-add. Intel's [OpenVino](https://01.org/openvinotoolkit) uses these to achieve respectable throughput for deep learning on server grade CPUs. Note, though, that this number is entirely dwarved by what GPUs are capable of achieving. For instance, NVIDIA's RTX 2080 Ti has 4,352 CUDA cores, each of which is capable of processing such an operation at any time. 
@@ -133,78 +132,81 @@ Whenever a single device is insufficient for optimization we need to transfer da
 
 ## Summary
 
-* Devices have overheads for doing things. Hence it is important to aim for a small number of large transfers rather than many small ones. This applies to RAM, SSDs, Networks and GPUs. 
-* Vectorization is key for performance. 
-* Match your algorithms to the hardware (memory footprint, bandwidth, etc.).
+* Devices have overheads for operations. Hence it is important to aim for a small number of large transfers rather than many small ones. This applies to RAM, SSDs, Networks and GPUs. 
+* Vectorization is key for performance. Make sure you're aware of the specific abilities of your accelerator. E.g. some Intel Xeon CPUs are particularly good for INT8 operations, NVIDIA Volta GPUs excel at FP16 matrix-matrix operations and NVIDIA Turing shines at FP16, INT8 and INT4 operations. 
+* Numerical overflow due to small datatypes can be a problem during training (and to a lesser extent during inference). 
+* Aliasing can significantly degrade performance. For instance, memory alignment on 64 bit CPUs should be done with respect to 64 bit boundaries. On GPUs it's a good idea to keep convolution sizes aligned e.g. to TensorCores.
+* Match your algorithms to the hardware (memory footprint, bandwidth, etc.). Great speedup (orders of magnitude) can be achieved when fitting the parameters into caches. 
 * We recommend that you sketch out the performance of a novel algorithm on paper before verifying the experimental results. Discrepancies of an order-of-magnitude or more are reasons for concern.
-* User profilers.
+* Use profilers to debug performance bottlenecks.
+* Training and inference hardware have different sweet spots in terms of price / performance. 
 
 ## More Latency Numbers
 
 The summary below is due to [Eliot Eshelman](https://gist.github.com/eshelman) who maintains an updated version of the numbers as a [GitHub Gist](https://gist.github.com/eshelman/343a1c46cb3fba142c1afdcdeec17646). 
 
-| action | time |     |     |notes |
-| :----- | ---: | --: | --: |:---- |
-| L1 cache reference/hit                     |  1.5 ns | | |                     4 cycles |
-| Floating-point add/mult/FMA operation      |  1.5 ns | | |                     4 cycles |
-| L2 cache reference/hit                     |  5   ns | | |                     12 ~ 17 cycles |
-| Branch mispredict                          |  6   ns | | |                     15 ~ 20 cycles |
-| L3 cache hit (unshared cache line)         | 16   ns | | |                     42 cycles |
-| L3 cache hit (shared line in another core) | 25   ns | | |                     65 cycles |
-| Mutex lock/unlock                          | 25   ns | | | |
-| L3 cache hit (modified in another core)    | 29   ns | | |                     75 cycles |
-| L3 cache hit (on a remote CPU socket)      | 40   ns | | |                     100 ~ 300 cycles (40 ~ 116 ns) |
-| QPI hop to a another CPU (time per hop)    | 40   ns | | | |
-| 64MB main memory reference (local CPU)     | 46   ns | | |                    TinyMemBench on "Broadwell" E5-2690v4 |
-| 64MB main memory reference (remote CPU)    | 70   ns | | |                     TinyMemBench on "Broadwell" E5-2690v4 |
-| 256MB main memory reference (local CPU)    | 75   ns | | |                     TinyMemBench on "Broadwell" E5-2690v4 |
-| Intel Optane persistent memory random write | 94   ns | | |                     UCSD Non-Volatile Systems Lab |
-| 256MB main memory reference (remote CPU)   | 120   ns | | |                     TinyMemBench on "Broadwell" E5-2690v4 |
-| Intel Optane persistent memory random read | 305   ns | | |                     UCSD Non-Volatile Systems Lab |
-| Send 4KB over 100 Gbps HPC fabric          | 1,040   ns |       1 μs | |         MVAPICH2 over Intel Omni-Path / Mellanox EDR |
-| Compress 1KB with Google Snappy     |     3,000   ns |       3 μs | | |
-| Send 4KB over 10 Gbps ethernet      |    10,000   ns |      10 μs | | |
-| Write 4KB randomly to NVMe SSD      |    30,000   ns |      30 μs | |         DC P3608 NVMe SSD (best case; QOS 99% is 500us) |
-| Transfer 1MB to/from NVLink GPU     |    30,000   ns |      30 μs | |         ~33GB/sec on NVIDIA 40GB NVLink |
-| Transfer 1MB to/from PCI-E GPU      |    80,000   ns |      80 μs | |         ~12GB/sec on PCI-Express x16 gen 3.0 link |
-| Read 4KB randomly from NVMe SSD     |   120,000   ns |     120 μs | |         DC P3608 NVMe SSD (QOS 99%) |
-| Read 1MB sequentially from NVMe SSD |   208,000   ns |     208 μs | |         ~4.8GB/sec DC P3608 NVMe SSD |
-| Write 4KB randomly to SATA SSD      |   500,000   ns |     500 μs | |         DC S3510 SATA SSD (QOS 99.9%) |
-| Read 4KB randomly from SATA SSD     |   500,000   ns |     500 μs | |         DC S3510 SATA SSD (QOS 99.9%) |
-| Round trip within same datacenter   |   500,000   ns |     500 μs | |         One-way ping across Ethernet is ~250us |
-| Read 1MB sequentially from SATA SSD | 1,818,000   ns |   1,818 μs | 2 ms | ~550MB/sec DC S3510 SATA SSD |
-| Read 1MB sequentially from disk     | 5,000,000   ns |   5,000 μs |   5 ms | ~200MB/sec server hard disk (seek time adds latency) |
-| Random Disk Access (seek+rotation)  | 10,000,000   ns |  10,000 μs  | 10 ms | |
-| Send packet CA->Netherlands->CA     | 150,000,000   ns | 150,000 μs | 150 ms | |
+| action                                     | time   | notes                                           |
+| :----------------------------------------- | -----: | :---------------------------------------------- |
+| L1 cache reference/hit                     | 1.5 ns | 4 cycles                                        |
+| Floating-point add/mult/FMA operation      | 1.5 ns | 4 cycles                                        |
+| L2 cache reference/hit                     |   5 ns | 12 ~ 17 cycles                                  |
+| Branch mispredict                          |   6 ns | 15 ~ 20 cycles                                  |
+| L3 cache hit (unshared cache line)         |  16 ns | 42 cycles                                       |
+| L3 cache hit (shared line in another core) |  25 ns | 65 cycles                                       |
+| Mutex lock/unlock                          |  25 ns |                                                 |
+| L3 cache hit (modified in another core)    |  29 ns | 75 cycles                                       |
+| L3 cache hit (on a remote CPU socket)      |  40 ns | 100 ~ 300 cycles (40 ~ 116 ns)                  |
+| QPI hop to a another CPU (time per hop)    |  40 ns |                                                 |
+| 64MB main memory reference (local CPU)     |  46 ns | TinyMemBench on "Broadwell" E5-2690v4           |
+| 64MB main memory reference (remote CPU)    |  70 ns | TinyMemBench on "Broadwell" E5-2690v4           |
+| 256MB main memory reference (local CPU)    |  75 ns | TinyMemBench on "Broadwell" E5-2690v4           |
+| Intel Optane persistent memory random write|  94 ns | UCSD Non-Volatile Systems Lab                   |
+| 256MB main memory reference (remote CPU)   | 120 ns | TinyMemBench on "Broadwell" E5-2690v4           |
+| Intel Optane persistent memory random read | 305 ns | UCSD Non-Volatile Systems Lab                   |
+| Send 4KB over 100 Gbps HPC fabric          |   1 μs | MVAPICH2 over Intel Omni-Path / Mellanox EDR    |
+| Compress 1KB with Google Snappy            |   3 μs |                                                 |
+| Send 4KB over 10 Gbps ethernet             |  10 μs |                                                 |
+| Write 4KB randomly to NVMe SSD             |  30 μs | DC P3608 NVMe SSD (best case; QOS 99% is 500us) |
+| Transfer 1MB to/from NVLink GPU            |  30 μs | ~33GB/sec on NVIDIA 40GB NVLink                 |
+| Transfer 1MB to/from PCI-E GPU             |  80 μs | ~12GB/sec on PCI-Express x16 gen 3.0 link       |
+| Read 4KB randomly from NVMe SSD            | 120 μs | DC P3608 NVMe SSD (QOS 99%)                     |
+| Read 1MB sequentially from NVMe SSD        | 208 μs | ~4.8GB/sec DC P3608 NVMe SSD                    |
+| Write 4KB randomly to SATA SSD             | 500 μs | DC S3510 SATA SSD (QOS 99.9%)                   |
+| Read 4KB randomly from SATA SSD            | 500 μs | DC S3510 SATA SSD (QOS 99.9%)                   |
+| Round trip within same datacenter          | 500 μs | One-way ping across Ethernet is ~250us          |
+| Read 1MB sequentially from SATA SSD        |   2 ms | ~550MB/sec DC S3510 SATA SSD                    |
+| Read 1MB sequentially from disk            |   5 ms | ~200MB/sec server HDD (seek time adds latency)  |
+| Random Disk Access (seek+rotation)         |  10 ms |                                                 |
+| Send packet CA->Netherlands->CA            | 150 ms |                                                 |
 
 Numbers for NVIDIA Tesla GPUs
 
-| action | time |     | notes |
-| :----- | ---: | --: | :---- |
-| GPU Shared Memory access           |         30   ns   |           |        30~90 cycles (bank conflicts will introduce more latency) |
-| GPU Global Memory access           |        200   ns   |           |        200~800 cycles, depending upon GPU generation and access patterns |
-| Launch CUDA kernel on GPU          |    10,000   ns    |   10 us   |       Host CPU instructs GPU to start executing a kernel |
-| Transfer 1MB to/from NVLink GPU    |     30,000   ns   |   30 us   |       ~33GB/sec on NVIDIA 40GB NVLink |
-| Transfer 1MB to/from PCI-E GPU     |     80,000   ns   |   80 us   |       ~12GB/sec on PCI-Express x16 link |
+| action | time | notes |
+| :------------------------------ | -----: | :---------------------------------------------------------------- |
+| GPU Shared Memory access        |  30 ns | 30~90 cycles (bank conflicts will introduce more latency)         |
+| GPU Global Memory access        | 200 ns | 200~800 cycles, depending upon GPU generation and access patterns |
+| Launch CUDA kernel on GPU       |  10 μs | Host CPU instructs GPU to start executing a kernel                |
+| Transfer 1MB to/from NVLink GPU |  30 μs | ~33GB/sec on NVIDIA 40GB NVLink                                   |
+| Transfer 1MB to/from PCI-E GPU  |  80 μs | ~12GB/sec on PCI-Express x16 link                                 |
 
 
 ## Exercises
 
-1. Aliasing
-1. Multiple channels
-1. Square root read speed for HDDs
-1. PCIe multiplexer
-1. Why 4x4 to 16x16
-1. P2 PLX layout
-1. NVLink layout for P3
-1. Forward vs. backwards read of memory
-1. Caching / measure disk performance
-1. Packet overhead across Ethernet
-1. DMA
-1. Bandwidth vs. items (INT8 vs. FP16)
-1. Numerical under and overflow
-1. C6 server CPU theoretical peak
-1. Inf. server discussion
+1. Write C code to test whether there is any difference in speed between accessing memory aligned or misaligned relative to the external memory interface. Hint - be careful of caching effects. 
+1. Test the difference in speed between accessing memory in sequence or with a given stride. 
+1. How could you measure the cache sizes on a CPU?
+1. How would you lay out data across multiple memory channels for maximum bandwidth? How would you lay it out if you had many small threads?
+1. An enterprise class HDD is spinning at 10,000 rpm. What is the absolutely minimum time an HDD needs to spend worst case before it can read data (you can assume that heads move almost instantaneously)? Why are 2.5" HDDs becoming popular for commercial servers (relative to 3.5" and 5.25" drives)?
+1. Assume that an HDD manufacturer increases the storage density from 1 Tbit per square inch to 5 Tbit per square inch. How much information can you store on a ring on a 2.5" HDD? Is there a difference between the inner and outer tracks?
+1. The AWS P2 instances have 16 K80 Kepler GPUs. Use `lspci` on a p2.16xlarge and a p2.8xlarge instance to understand how the GPUs are connected to the CPUs. Hint - keep your eye out for PCI PLX bridges.
+1. Going from 8 bit to 16 bit datatypes increases the amount of silicon approximately by 4x. Why? Why might NVIDIA have added INT4 operations to their Turing GPUs.
+1. Given 6 high speed links between GPUs (such as for the Volta V100 GPUs), how would you connect 8 of them? Look up the connectivity used in the P3.16xlarge servers. 
+1. How much faster is it to read forward through memory vs. reading backwards? Does this number differ between different computers and CPU vendors? Why? Write C code and experiment with it.
+1. Can you measure the cache size of your disk? What is it for a typical HDD? Do SSDs need a cache? 
+1. Measure the packet overhead when sending messages across the Ethernet. Look up the difference between UDP and TCP/IP connections. 
+1. Direct Memory Access allows devices other than the CPU to write (and read) directly to (from) memory. Why is this a good idea?
+1. Look at the performance numbers for the Turing T4 GPU. Why does the performance 'only' double as you go from FP16 to INT8 and INT4?
+1. What is the shortest time it should take for a packet on a roundtrip between San Francisco and Amsterdam? Hint - you can assume that the distance is 10,000km.  
 
 ```{.python .input}
 
