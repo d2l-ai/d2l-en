@@ -9,6 +9,7 @@ In deep learning, datasets are usually large and model computation is complex. T
 hybridize
 async-computation
 auto-parallelism
+hardware
 multiple-gpus
 multiple-gpus-gluon
 ```
