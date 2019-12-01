@@ -135,13 +135,13 @@ Whenever a single device is insufficient for optimization we need to transfer da
 
 * Devices have overheads for doing things. Hence it is important to aim for a small number of large transfers rather than many small ones. This applies to RAM, SSDs, Networks and GPUs. 
 * Vectorization is key for performance. 
-* Match your algorithms to the hardware. 
+* Match your algorithms to the hardware (memory footprint, bandwidth, etc.).
+* We recommend that you sketch out the performance of a novel algorithm on paper before verifying the experimental results. Discrepancies of an order-of-magnitude or more are reasons for concern.
+* User profilers.
 
 ## More Latency Numbers
 
 The summary below is due to [Eliot Eshelman](https://gist.github.com/eshelman) who maintains an updated version of the numbers as a [GitHub Gist](https://gist.github.com/eshelman/343a1c46cb3fba142c1afdcdeec17646). 
-
-### Latency Comparison Numbers
 
 | action | time |     |     |notes |
 | :----- | ---: | --: | --: |:---- |
@@ -177,7 +177,7 @@ The summary below is due to [Eliot Eshelman](https://gist.github.com/eshelman) w
 | Random Disk Access (seek+rotation)  | 10,000,000   ns |  10,000 μs  | 10 ms | |
 | Send packet CA->Netherlands->CA     | 150,000,000   ns | 150,000 μs | 150 ms | |
 
-### NVIDIA Tesla GPU values
+Numbers for NVIDIA Tesla GPUs
 
 | action | time |     | notes |
 | :----- | ---: | --: | :---- |
@@ -195,6 +195,16 @@ The summary below is due to [Eliot Eshelman](https://gist.github.com/eshelman) w
 1. Square root read speed for HDDs
 1. PCIe multiplexer
 1. Why 4x4 to 16x16
+1. P2 PLX layout
+1. NVLink layout for P3
+1. Forward vs. backwards read of memory
+1. Caching / measure disk performance
+1. Packet overhead across Ethernet
+1. DMA
+1. Bandwidth vs. items (INT8 vs. FP16)
+1. Numerical under and overflow
+1. C6 server CPU theoretical peak
+1. Inf. server discussion
 
 ```{.python .input}
 
