@@ -90,33 +90,103 @@ Consider the following situation: we have a modest CPU core with 4 cores as depi
 * **L2** caches are the next stop. Depending on architecture design and processor size they might be exclusive. They might be accessible only by a given core or shared between multiple cores. L2 caches are larger (typically 256-512kB per core) and slower than L1. Furthermore, to access something in L2 we first need to check to realize that the data isn't in L1, which adds a small amount of extra latency. 
 * **L3** caches are shared between multiple cores and can be quite large. AMD's Epyc 3 server CPUs have a whopping 256MB of cache spread across multiple chiplets. More typical numbers are in the 4-8MB range. 
 
+Predicting which memory elements will be needed next is one of the key optimization parameters in chip design. For instance, it is advisable to traverse memory in a *forward* direction since most caching algorithms will try to *read ahead* rather than backwards. Likewise, keeping memory access patterns local is agood way of improving performance.
 Adding caches is a double-edge sword. On one hand they ensure that the processor cores don't starve of data. At the same time they increase chip size, using up area that otherwise could have been spent on increasing processing power. Moreover, *cache misses* can be expensive. Consider the worst case scenario, depicted in :numref:`fig_falsesharing`. A memory location is cached on processor 0 when a thread on processor 1 requests the data. To obtain it, processor 0 needs to stop what it's doing, write the information back to main memory and then let processor 1 read it from memoruy. During this operation both processors wait. Quite potentially such code runs *more slowly* on multiple processors when compared to an efficient single-processor implementation. This is one more reason for why there is a practical limit to cache sizes (besides their physical size).
 
 ![False sharing (image courtesy of Intel)](../img/falsesharing.svg)
 :label:`fig_falsesharing`
 
-## GPUs
+## GPUs and other Accelerators
 
-It is not an exaggeration to claim that deep learning would not have been successful without GPUs. By the same token, it is quite reasonable to argue that GPU manufacturers' fortunes have been increased significantly due to deep learning. This co-evolution of hardware and algorithms has led to a situation where for better or worse deep learning is the preferable statistical modeling paradigm. Hence it pays to understand the specific benefits that GPUs and related accelerators such as the TPU :cite:`Jouppi.Young.Patil.ea.2017` offer. Of note is a distinction that is often made in practice: accelerators are optimized either for training or inference. For the former 
+It is not an exaggeration to claim that deep learning would not have been successful without GPUs. By the same token, it is quite reasonable to argue that GPU manufacturers' fortunes have been increased significantly due to deep learning. This co-evolution of hardware and algorithms has led to a situation where for better or worse deep learning is the preferable statistical modeling paradigm. Hence it pays to understand the specific benefits that GPUs and related accelerators such as the TPU :cite:`Jouppi.Young.Patil.ea.2017` offer. 
 
+Of note is a distinction that is often made in practice: accelerators are optimized either for training or inference. For the latter we only need to compute the forward pass in a network. No storage of intermediate data is needed for backpropagation. Moreover, we may not need very precise computation (FP16 or INT8 typically suffice). On the other hand, during training all intermediate results need storing to compute gradients. Moreover, accumulating gradients requires higher precision to avoid numerical underflow (or overflow). This means that FP16 (or mixed precision with FP32) is the minimum required. All of this necessitates faster and larger memory (HBM2 vs. GDDR6) and more processing power. For instance, NVIDIA's [Turing](https://devblogs.nvidia.com/nvidia-turing-architecture-in-depth/) T4 GPUs are optimized for inference whereas the V100 GPUs are preferable for training. 
 
-[NVIDIA Turing](https://devblogs.nvidia.com/nvidia-turing-architecture-in-depth/)
+Recall :numref:`fig_neon128`. Adding vector units to a processor core allowed us to increase throughput significantly (in the example in the figure we were able to perform 16 operations simultaneously). What if we added operations that optimized not just operations between vectors but also between matrices? This strategy led to Tensor Cores (more on this shortly). Secondly, what if we added many more cores? In a nutshell, these two strategies summarize the design decisions in GPUs. :numref:`fig_turing_processing_block` gives an overview over a basic processing block. It contains 16 integer and 16 floating point units. In addition to that, two Tensor Cores accelerate a narrow subset of additional operations relevant for deep learning. Each Streaming Multiprocessor (SM) consists of four such blocks. 
 
-![NVIDIA Turing Architecture (image courtesy of NVIDIA)](../img/turing.jpg)
+![NVIDIA Turing Processing Block (image courtesy of NVIDIA)](../img/turing_processing_block.png)
+:width:`200px`
+:label:`fig_turing_processing_block`
+
+12 streaming multiprocessors are then grouped into graphics processing clusters which make up the high-end TU102 processors. Ample memory channels and an L2 cache complement the setup. :numref:`fig_turing` has the relevant details. One of the reasons for designing such a device is that individual blocks can be added or removed as needed to allow for more compact chips and to deal with yield issues (faulty modules might not be activated). Fortunately programming such devices is well hidden from the casual deep learning researcher beneath layers of CUDA and framework code. In particular, more than one of the programs might well be executed simultaneously on the GPU, provided that there are available resources. Nonetheless it pays to be aware of the limitations of the devices to avoid picking models that do not fit into device memory. 
+
+![NVIDIA Turing Architecture (image courtesy of NVIDIA)](../img/turing.png)
 :width:`400px`
 :label:`fig_turing`
 
+A last aspect that is worth mentioning in more detail are TensorCores. They are an example of a recent trend of adding more optimized circuits that are specifically effective for deep learning. For instance, the TPU added a systolic array :cite:`Kung.1988` for fast matrix multiplication. There the design was to support a very small number (one for the first generation of TPUs) of large operations. TensorCores are at the other end. They are optimized for small operations involving between 4x4 and 16x16 matrices, depending on their numerical precision. :numref:`fig_tensorcore` gives an overview of the optimizations. 
 
 ![NVIDIA TensorCores in Turing (image courtesy of NVIDIA)](../img/tensorcore.jpg)
 :width:`400px`
 :label:`fig_tensorcore`
 
+Obviously when optimizing for computation we end up making certain compomises. One of them is that GPUs are not very good at handling interrupts and sparse data. While there are notable exceptions, such as [Gunrock](https://github.com/gunrock/gunrock) :cite:`Wang.Davidson.Pan.ea.2016`, the access pattern of sparse matrices and vectors do not go well with the high bandwidth burst read operations where GPUs excel. Matching both goals is an area of active research. See e.g. [DGL](http://dgl.ai), a library tuned for deep learning on graphs.
 
 ## Networks and Buses
 
-## Embedded and Mobile
+Whenever a single device is insufficient for optimization we need to transfer data to and from it to synchronize processing. This is where networks and buses come in handy. We have a number of design parameters: bandwidth, cost, distance and flexibility. On one end we have WiFi which has a pretty good range, is very easy to use (no wires, after all), cheap but it offers comparatively mediocre bandwidth and latency. No machine learning researcher within their right mind would use it to build a cluster of servers. In what follows we focus on interconnects that are suitable for deep learning. 
+
+* **PCIe** is a dedicated bus for very high bandwidth point to point connections (up to 16 Gbs on PCIe 4.0) per lane. Latency is in the order of single-digit microseconds (5 μs). PCIe links are precious. Processors only have a limited number of them: AMD's EPYC 3 has 128 lanes, Intel's Xeon has up to 48 lanes per chip; on desktop grade CPUs the numbers are 20 (Ryzen 9) and 16 (Core i9) respectively. Since GPUs have typically 16 lanes this limits the number of GPUs that can connect to the CPU at full bandwidth. After all, they need to share the links with other high bandwidth peripherals such as storage and Ethernet. Just like with RAM access, large bulk transfers are preferable due to reduced packet overhead. 
+* **Ethernet** is the most commonly used way of connecting computers. While it is significantly slower than PCIe, it is very cheap and resilient to install and covers much longer distances. Typical bandwidth for low-grade servers is 1 GBit/s. Higher end devices (e.g. [C5 instances](https://aws.amazon.com/ec2/instance-types/c5/) in the cloud) offer between 10 and 100 GBit/s bandwidth. As in all previous cases data transmission has significant overheads. Note that we almost never use raw Ethernet directly but rather a protocol that is executed on top of the physical interconnect (such as UDP or TCP/IP). This adds further overhead. Like PCIe, Ethernet is designed to connect two devices, e.g. a computer and a switch. 
+* **Switches** allow us to connect multiple devices in a manner where any pair of them can carry out a (typically full bandwidth) point to point connection simultaneously. For instance, Ethernet switches might connect 40 servers at high cross-sectional bandwidth. Note that switches are not unique to traditional computer networks. Even PCIe lanes can be [switched](https://www.broadcom.com/products/pcie-switches-bridges/pcie-switches). This occurs e.g. to connect a large number of GPUs to a host processor, as is the case for the [P2 instances](https://aws.amazon.com/ec2/instance-types/p2/). 
+* **NVLink** is an alternative to PCIe when it comes to very high bandwidth interconnects. It offers up to 300 Gbit/s data transfer rate per link. Server GPUs (Volta V100) have 6 links whereas consumer grade GPUs (RTX 2080 Ti) have only one link, operating at a reduced 100 Gbit/s rate. We recommend to use [NCCL](https://github.com/NVIDIA/nccl) to achieve high data transfer between GPUs.
 
 ## Summary
+
+* Devices have overheads for doing things. Hence it is important to aim for a small number of large transfers rather than many small ones. This applies to RAM, SSDs, Networks and GPUs. 
+* Vectorization is key for performance. 
+* Match your algorithms to the hardware. 
+
+## More Latency Numbers
+
+The summary below is due to [Eliot Eshelman](https://gist.github.com/eshelman) who maintains an updated version of the numbers as a [GitHub Gist](https://gist.github.com/eshelman/343a1c46cb3fba142c1afdcdeec17646). 
+
+### Latency Comparison Numbers
+
+| action | time |     |     |notes |
+| :----- | ---: | --: | --: |:---- |
+| L1 cache reference/hit                     |  1.5 ns | | |                     4 cycles |
+| Floating-point add/mult/FMA operation      |  1.5 ns | | |                     4 cycles |
+| L2 cache reference/hit                     |  5   ns | | |                     12 ~ 17 cycles |
+| Branch mispredict                          |  6   ns | | |                     15 ~ 20 cycles |
+| L3 cache hit (unshared cache line)         | 16   ns | | |                     42 cycles |
+| L3 cache hit (shared line in another core) | 25   ns | | |                     65 cycles |
+| Mutex lock/unlock                          | 25   ns | | | |
+| L3 cache hit (modified in another core)    | 29   ns | | |                     75 cycles |
+| L3 cache hit (on a remote CPU socket)      | 40   ns | | |                     100 ~ 300 cycles (40 ~ 116 ns) |
+| QPI hop to a another CPU (time per hop)    | 40   ns | | | |
+| 64MB main memory reference (local CPU)     | 46   ns | | |                    TinyMemBench on "Broadwell" E5-2690v4 |
+| 64MB main memory reference (remote CPU)    | 70   ns | | |                     TinyMemBench on "Broadwell" E5-2690v4 |
+| 256MB main memory reference (local CPU)    | 75   ns | | |                     TinyMemBench on "Broadwell" E5-2690v4 |
+| Intel Optane persistent memory random write | 94   ns | | |                     UCSD Non-Volatile Systems Lab |
+| 256MB main memory reference (remote CPU)   | 120   ns | | |                     TinyMemBench on "Broadwell" E5-2690v4 |
+| Intel Optane persistent memory random read | 305   ns | | |                     UCSD Non-Volatile Systems Lab |
+| Send 4KB over 100 Gbps HPC fabric          | 1,040   ns |       1 μs | |         MVAPICH2 over Intel Omni-Path / Mellanox EDR |
+| Compress 1KB with Google Snappy     |     3,000   ns |       3 μs | | |
+| Send 4KB over 10 Gbps ethernet      |    10,000   ns |      10 μs | | |
+| Write 4KB randomly to NVMe SSD      |    30,000   ns |      30 μs | |         DC P3608 NVMe SSD (best case; QOS 99% is 500us) |
+| Transfer 1MB to/from NVLink GPU     |    30,000   ns |      30 μs | |         ~33GB/sec on NVIDIA 40GB NVLink |
+| Transfer 1MB to/from PCI-E GPU      |    80,000   ns |      80 μs | |         ~12GB/sec on PCI-Express x16 gen 3.0 link |
+| Read 4KB randomly from NVMe SSD     |   120,000   ns |     120 μs | |         DC P3608 NVMe SSD (QOS 99%) |
+| Read 1MB sequentially from NVMe SSD |   208,000   ns |     208 μs | |         ~4.8GB/sec DC P3608 NVMe SSD |
+| Write 4KB randomly to SATA SSD      |   500,000   ns |     500 μs | |         DC S3510 SATA SSD (QOS 99.9%) |
+| Read 4KB randomly from SATA SSD     |   500,000   ns |     500 μs | |         DC S3510 SATA SSD (QOS 99.9%) |
+| Round trip within same datacenter   |   500,000   ns |     500 μs | |         One-way ping across Ethernet is ~250us |
+| Read 1MB sequentially from SATA SSD | 1,818,000   ns |   1,818 μs | 2 ms | ~550MB/sec DC S3510 SATA SSD |
+| Read 1MB sequentially from disk     | 5,000,000   ns |   5,000 μs |   5 ms | ~200MB/sec server hard disk (seek time adds latency) |
+| Random Disk Access (seek+rotation)  | 10,000,000   ns |  10,000 μs  | 10 ms | |
+| Send packet CA->Netherlands->CA     | 150,000,000   ns | 150,000 μs | 150 ms | |
+
+### NVIDIA Tesla GPU values
+
+| action | time |     | notes |
+| :----- | ---: | --: | :---- |
+| GPU Shared Memory access           |         30   ns   |           |        30~90 cycles (bank conflicts will introduce more latency) |
+| GPU Global Memory access           |        200   ns   |           |        200~800 cycles, depending upon GPU generation and access patterns |
+| Launch CUDA kernel on GPU          |    10,000   ns    |   10 us   |       Host CPU instructs GPU to start executing a kernel |
+| Transfer 1MB to/from NVLink GPU    |     30,000   ns   |   30 us   |       ~33GB/sec on NVIDIA 40GB NVLink |
+| Transfer 1MB to/from PCI-E GPU     |     80,000   ns   |   80 us   |       ~12GB/sec on PCI-Express x16 link |
+
 
 ## Exercises
 
@@ -124,6 +194,7 @@ It is not an exaggeration to claim that deep learning would not have been succes
 1. Multiple channels
 1. Square root read speed for HDDs
 1. PCIe multiplexer
+1. Why 4x4 to 16x16
 
 ```{.python .input}
 
