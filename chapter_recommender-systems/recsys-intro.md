@@ -5,6 +5,7 @@
 In the last decade, the Internet has evolved into a platform for large-scale online services, which profoundly changed the way we communicate, read news, buy products, and watch movies.  In the meanwhile, the unprecedented number of items (we use the term *item* to refer to movies, news, books, and products.) offered online requires a system that can help us discover items that we preferred. Recommender systems are therefore powerful information filtering tools that can facilitate personalized services and provide tailored experience to individual users. In short, recommender systems play a pivotal role in utilizing the wealth of data available to make choices manageable. Nowadays, recommender systems are at the core of a number of online services providers such as Amazon, Netflix, and YouTube. Recall the example of Deep learning books recommended by Amazon in :numref:`subsec_recommender_systems`. The benefits of employing recommender systems are two-folds: On the one hand, it can largely reduce users' effort in finding items and alleviate the issue of information overload. On the other hand, it can add business value to  online
 service providers and is an important source of revenue.  This chapter will introduce the fundamental concepts, classic models and recent advances with deep learning in the field of recommender systems, together with implemented examples.
 
+![Illustration of the Recommendation Process](../img/rec-intro.svg)
 
 
 ## Collaborative Filtering
@@ -43,3 +44,7 @@ A number of recommendation tasks have been investigated in the past decades.  Ba
 ## [Discussions](https://discuss.mxnet.io/t/5158)
 
 ![](../img/qr_recsys-intro.svg)
+
+```{.python .input}
+
+```
