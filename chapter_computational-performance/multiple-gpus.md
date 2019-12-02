@@ -57,7 +57,7 @@ npx.set_np()
 
 ## A Toy Network
 
-We use LeNet as introduced in :numref:`sec_lenet`. We define it from scratch to illustrate  Here, the model implementation only uses `ndarray`s.
+We use LeNet as introduced in :numref:`sec_lenet`. We define it from scratch to illustrate parameter exchange and synchronization in detail. 
 
 ```{.python .input  n=10}
 # Initialize model parameters
@@ -94,9 +94,9 @@ def lenet(X, params):
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
 ```
 
-## Synchronize Data Among Multiple GPUs
+## Data Synchronization
 
-We need to implement some auxiliary functions to synchronize data among the multiple GPUs. The following `get_params` function copies the model parameters to a specific GPU and initializes the gradient.
+For efficient multi-GPU training we need two basic operations: firstly we need to have the ability to distribute a list of parameters to multiple devices and to attach gradients (`get_params`). Without parameters it's impossible to evaluate the network on a GPU. Secondly, we need the ability to sum parameters across multiple devices, i.e. we need an `allreduce` function. 
 
 ```{.python .input  n=12}
 def get_params(params, ctx):
@@ -106,7 +106,7 @@ def get_params(params, ctx):
     return new_params
 ```
 
-Try to copy the model parameter `params` to `gpu(0)`.
+Let's try it out by copying the model parameters of lenet to gpu(0).
 
 ```{.python .input  n=13}
 new_params = get_params(params, d2l.try_gpu(0))
@@ -114,7 +114,7 @@ print('b1 weight:', new_params[1])
 print('b1 grad:', new_params[1].grad)
 ```
 
-Here, the data is distributed among multiple GPUs. The following `allreduce` function adds up the data on each GPU and then broadcasts it to all the GPUs.
+Since we didn't perform any computation yet, the gradient with regard to the bias weights is still $0$. Now let's assume that we have a vector distributed across multiple GPUs. The following allreduce function adds up all vectors and broadcasts the result back to all GPUs. Note that for this to work we need to copy the data to the device accumulating the results. 
 
 ```{.python .input  n=14}
 def allreduce(data):
@@ -124,7 +124,7 @@ def allreduce(data):
         data[0].copyto(data[i])
 ```
 
-Perform a simple test of the `allreduce` function.
+Let's test this by creating vectors with different values on different devices and aggregate them.
 
 ```{.python .input  n=16}
 data = [np.ones((1, 2), ctx=d2l.try_gpu(i)) * (i + 1) for i in range(2)]
@@ -133,22 +133,20 @@ allreduce(data)
 print('after allreduce:\n', data[0], '\n', data[1])
 ```
 
-## Splitting a Data Batch into Multiple GPUs
+## Distributing Data
 
-The `utils` module in Gluon provides a function to evenly split an array into multiple parts along the first dimension, and then copy the $i^\mathrm{th}$ part into the $i^\mathrm{th}$ device. It is straightforward to implement, but we will use the pre-implemented version so later chapters can reuse the `split_batch` function we will define later.
-
-Now, we try to divide the 4 data instances equally between 2 GPUs using the `split_and_load` function.
+We need a simple utility function to distribute a minibatch evenly across multiple GPUs. For instance, on 2 GPUs we'd like to have half of the data to be copied to each of the GPUs. Since it's more convenient and more concise, we use the built-in split and load function in Gluon (to try it out on a $4 \times 5$ matrix).
 
 ```{.python .input  n=8}
-data = np.arange(24).reshape(4, 6)
+data = np.arange(20).reshape(4, 5)
 ctx = [npx.gpu(0), npx.gpu(1)]
-splitted = gluon.utils.split_and_load(data, ctx)
-print('input: ', data)
+split = gluon.utils.split_and_load(data, ctx)
+print('input :', data)
 print('load into', ctx)
-print('output:', splitted)
+print('output:', split)
 ```
 
-The `split_batch` function then splits both the features and labels.
+For later reuse we define a `split_batch` function which splits both data and labels. 
 
 ```{.python .input  n=9}
 # Saved in the d2l package for later use
@@ -159,20 +157,19 @@ def split_batch(X, y, ctx_list):
             gluon.utils.split_and_load(y, ctx_list))
 ```
 
-## Multi-GPU Training on a Single Minibatch
+## Training 
 
-Now we can implement multi-GPU training on a single minibatch. Its implementation is primarily based on the data parallelism approach described in this section. We will use the auxiliary functions we just discussed, `allreduce` and `split_and_load`, to synchronize the data among multiple GPUs.
+Now we can implement multi-GPU training on a single minibatch. Its implementation is primarily based on the data parallelism approach described in this section. We will use the auxiliary functions we just discussed, `allreduce` and `split_and_load`, to synchronize the data among multiple GPUs. Note that we don't need to write any specific code to achieve parallelism. Since the compute graph doesn't have any dependencies across devices within a minibatch, it is executed in parallel *automatically*.
 
 ```{.python .input  n=10}
 def train_batch(X, y, gpu_params, ctx_list, lr):
     gpu_Xs, gpu_ys = split_batch(X, y, ctx_list)
     with autograd.record():  # Loss is calculated separately on each GPU
-        ls = [loss(lenet(gpu_X, gpu_W), gpu_y)
-              for gpu_X, gpu_y, gpu_W in zip(gpu_Xs, gpu_ys, gpu_params)]
-    for l in ls:  # Back Propagation is performed separately on each GPU
+        losses = [loss(lenet(gpu_X, gpu_W), gpu_y)
+                  for gpu_X, gpu_y, gpu_W in zip(gpu_Xs, gpu_ys, gpu_params)]
+    for l in losses:  # Back Propagation is performed separately on each GPU
         l.backward()
-    # Add up all the gradients from each GPU and then broadcast them to all
-    # the GPUs
+    # Sum all gradients from each GPU and broadcast them to all GPUs
     for i in range(len(gpu_params[0])):
         allreduce([gpu_params[c][i].grad for c in range(len(ctx_list))])
     # The model parameters are updated separately on each GPU
@@ -180,9 +177,7 @@ def train_batch(X, y, gpu_params, ctx_list, lr):
         d2l.sgd(param, lr, X.shape[0])  # Here, we use a full-size batch
 ```
 
-## Training Functions
-
-Now, we can define the training function. Here the training function is slightly different from the one used in the previous chapter. For example, here, we need to copy all the model parameters to multiple GPUs based on data parallelism and perform multi-GPU training on a single minibatch for each iteration.
+Now, we can define the training function. It is slightly different from the ones used in the previous chapters: we need to allocate the GPUs and copy all the model parameters to all devices. Obviously each batch is processed using `train_batch` to deal with multiple GPUs. For convenience (and conciseness of code) we compute the accuracy on a single GPU (this is *inefficient* since the other GPUs are idle). 
 
 ```{.python .input  n=61}
 def train(num_gpus, batch_size, lr):
@@ -190,7 +185,8 @@ def train(num_gpus, batch_size, lr):
     ctx_list = [d2l.try_gpu(i) for i in range(num_gpus)]
     # Copy model parameters to num_gpus GPUs
     gpu_params = [get_params(params, c) for c in ctx_list]
-    num_epochs, times, acces = 10, [], []
+    # num_epochs, times, acces = 10, [], []
+    num_epochs = 10
     animator = d2l.Animator('epoch', 'test acc', xlim=[1, num_epochs])
     timer = d2l.Timer()
     for epoch in range(num_epochs):
@@ -207,9 +203,9 @@ def train(num_gpus, batch_size, lr):
         animator.Y[0][-1], timer.avg(), ctx_list))
 ```
 
-## Multi-GPU Training Experiment
+## Experiment
 
-We will start by training with a single GPU. Assume the batch size is 256 and the learning rate is 0.2.
+Let's see how well this works on a single GPU. We use a batch size of 256 and a learning rate of 0.2. 
 
 ```{.python .input  n=62}
 train(num_gpus=1, batch_size=256, lr=0.2)
@@ -217,7 +213,7 @@ train(num_gpus=1, batch_size=256, lr=0.2)
 
 By keeping the batch size and learning rate unchanged and changing the number of GPUs to 2, we can see that the improvement in test accuracy is roughly the same as in the results from the previous experiment. In terms of the optimization algorithms, they are identical.
 
-Because of the extra communication overhead, and relative simple model we used here, there is no reduction in the training time. We will consider a more complex model in the next chapter.
+Unfortunately there's no meaningful speedup to be gained here: the model is simply too small; moreover we only have a small dataset. We will encounter more complex models going forward. Let's see what happens nonetheless for MNIST.
 
 ```{.python .input  n=13}
 train(num_gpus=2, batch_size=256, lr=0.2)
@@ -230,7 +226,8 @@ train(num_gpus=2, batch_size=256, lr=0.2)
 
 ## Exercises
 
-* In a multi-GPU training experiment, use 2 GPUs for training and double the `batch_size` to 512. How does the training time change? If we want a test accuracy comparable with the results of single-GPU training, how should the learning rate be adjusted?
+* More efficient allreduce (use different GPUs for different parameters
+In a multi-GPU training experiment, use 2 GPUs for training and double the `batch_size` to 512. How does the training time change? If we want a test accuracy comparable with the results of single-GPU training, how should the learning rate be adjusted?
 * Change the model prediction part of the experiment to multi-GPU prediction.
 
 ## [Discussions](https://discuss.mxnet.io/t/2383)
