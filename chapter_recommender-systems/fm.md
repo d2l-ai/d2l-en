@@ -34,9 +34,8 @@ To learn the FM model, we can use the MSE loss for regression task, the cross en
 
 ```{.python .input  n=2}
 import d2l
-from mxnet import autograd, init, gluon, np, npx
+from mxnet import init, gluon, np, npx
 from mxnet.gluon import nn
-import mxnet as mx
 import sys
 npx.set_np()
 ```
@@ -52,6 +51,7 @@ class FM(nn.Block):
         self.embedding = nn.Embedding(input_size, num_factors)
         self.fc = nn.Embedding(input_size, 1)
         self.linear_layer = gluon.nn.Dense(1, use_bias=True)
+        
     def forward(self, x):
         square_of_sum = np.sum(self.embedding(x), axis=1) ** 2
         sum_of_square = np.sum(self.embedding(x) ** 2, axis=1)
@@ -68,16 +68,16 @@ We use the CTR data wrapper from the last section to load the online advertising
 batch_size = 2048
 d2l.read_data_ctr()
 train_data = d2l.CTRDataset(data_path="../data/ctr/train.csv")
-test_data = d2l.CTRDataset(data_path="../data/ctr/test.csv", 
-                      feat_mapper=train_data.feat_mapper, 
-                      defaults=train_data.defaults)
+test_data = d2l.CTRDataset(data_path="../data/ctr/test.csv",
+                           feat_mapper=train_data.feat_mapper,
+                           defaults=train_data.defaults)
 num_workers = 0 if sys.platform.startswith("win") else 4
-train_iter = gluon.data.DataLoader(train_data, shuffle=True, 
-                                   last_batch="rollover", 
+train_iter = gluon.data.DataLoader(train_data, shuffle=True,
+                                   last_batch="rollover",
                                    batch_size=batch_size,
                                    num_workers=num_workers)
 test_iter = gluon.data.DataLoader(test_data, shuffle=False,
-                                  last_batch="rollover", 
+                                  last_batch="rollover",
                                   batch_size=batch_size,
                                   num_workers=num_workers)
 ```
@@ -90,7 +90,7 @@ ctx = d2l.try_all_gpus()
 net = FM(train_data.field_dims, num_factors=20)
 net.initialize(init.Xavier(), ctx=ctx)
 lr, num_epochs, optimizer = 0.02, 30, 'adam'
-trainer = gluon.Trainer(net.collect_params(), optimizer, 
+trainer = gluon.Trainer(net.collect_params(), optimizer,
                         {'learning_rate': lr})
 loss = gluon.loss.SigmoidBinaryCrossEntropyLoss()
 d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, ctx)

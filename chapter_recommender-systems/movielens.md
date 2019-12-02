@@ -12,7 +12,7 @@ To begin with, let's import the packages required to run this section’s experi
 
 ```{.python .input  n=1}
 import d2l
-from mxnet import gluon, np, npx
+from mxnet import gluon, np
 import pandas as pd
 import zipfile
 ```
@@ -22,10 +22,11 @@ Then, we download the MovieLens 100k dataset and load the interactions as `DataF
 ```{.python .input  n=2}
 # Saved in the d2l package for later use
 def read_data_ml100k(path="../data/", member="ml-100k/u.data",
-              names=['user_id','item_id','rating','timestamp'], sep="\t"):
+                     names=['user_id', 'item_id', 'rating', 'timestamp'],
+                     sep="\t"):
     fname = gluon.utils.download(
         'http://files.grouplens.org/datasets/movielens/ml-100k.zip',
-    path=path)
+        path=path)
     with zipfile.ZipFile(fname, 'r') as inzipfile:
         inzipfile.extract(member, path)
         data = pd.read_csv(path + member, sep, names=names, engine='python')
@@ -41,7 +42,7 @@ Let's load up the data and inspect the first five records manually. It is an eff
 ```{.python .input  n=3}
 data, num_users, num_items = read_data_ml100k()
 sparsity = 1 - len(data) / (num_users * num_items)
-print('number of users: %d, number of items: %d.'%(num_users, num_items))
+print('number of users: %d, number of items: %d.' % (num_users, num_items))
 print('matrix sparsity: %f' % sparsity)
 print(data.head(5))
 ```
@@ -65,13 +66,13 @@ We split the dataset into training and test sets. The following function provide
 ```{.python .input  n=5}
 # Saved in the d2l package for later use
 def split_data_ml100k(data, num_users, num_items,
-               split_mode="random", test_ratio = 0.1):
+                      split_mode="random", test_ratio=0.1):
     """Split the dataset in random mode or seq-aware mode."""
     if split_mode == "seq-aware":
         train_items, test_items, train_list = {}, {}, []
         for line in data.itertuples():
             u, i, rating, time = line[1], line[2], line[3], line[4]
-            train_items.setdefault(u,[]).append((u, i, rating, time))
+            train_items.setdefault(u, []).append((u, i, rating, time))
             if u not in test_items or test_items[u][-1] < time:
                 test_items[u] = (i, rating, time)
         for u in range(1, num_users + 1):

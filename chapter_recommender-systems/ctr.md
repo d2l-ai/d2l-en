@@ -20,16 +20,14 @@ The following code downloads the dataset from our server and saves it into the l
 from collections import defaultdict
 from mxnet import gluon, np
 import os
-import sys
 
 # Saved in the d2l package for later use
-def read_data_ctr(path="../data/", train="ctr/train.csv", 
+def read_data_ctr(path="../data/", train="ctr/train.csv",
                   test="ctr/test.csv"):
     data_path = ("https://apache-mxnet.s3-accelerate.amazonaws.com/"
                  "gluon/dataset/")
     train_sha1 = "6dec3052e49ce0d1cec5ebc6f5ded1172be0befb"
-    test_sha1 ="c265e3c1fad0ed4caf8c1a373c580465a8096eb0"
-
+    test_sha1 = "c265e3c1fad0ed4caf8c1a373c580465a8096eb0"
     ctr_path = path+"ctr"
     os.makedirs(ctr_path, exist_ok=True)
     gluon.utils.download(data_path + train, ctr_path, train_sha1)
@@ -47,7 +45,7 @@ For the convenience of data loading, we implement a `CTRDataset` which loads the
 ```{.python .input  n=13}
 # Saved in the d2l package for later use
 class CTRDataset(gluon.data.Dataset):
-    def __init__(self, data_path, feat_mapper=None, defaults=None, 
+    def __init__(self, data_path, feat_mapper=None, defaults=None,
                  min_threshold=4, num_feat=34):
         self.NUM_FEATS, self.count, self.data = num_feat, 0, {}
         feat_cnts = defaultdict(lambda: defaultdict(int))
@@ -63,12 +61,12 @@ class CTRDataset(gluon.data.Dataset):
                 label[int(values[0])] = 1
                 instance['y'] = [np.float32(values[0])]
                 for i in range(1, self.NUM_FEATS + 1):
-                    feat_cnts[i][values[i ]] += 1
-                    instance.setdefault('x',[]).append(values[i ])
+                    feat_cnts[i][values[i]] += 1
+                    instance.setdefault('x', []).append(values[i])
                 self.data[self.count] = instance
                 self.count = self.count + 1
         if self.feat_mapper is None and self.defaults is None:
-            feat_mapper = {i: {feat for feat, c in cnt.items() if c >= 
+            feat_mapper = {i: {feat for feat, c in cnt.items() if c >=
                                min_threshold} for i, cnt in feat_cnts.items()}
             self.feat_mapper = {i: {feat: idx for idx, feat in enumerate(cnt)}
                                 for i, cnt in feat_mapper.items()}
@@ -77,10 +75,12 @@ class CTRDataset(gluon.data.Dataset):
             self.field_dims[i - 1] = len(fm) + 1
         self.offsets = np.array((0, *np.cumsum(self.field_dims).asnumpy()
                                  [:-1]))
+        
     def __len__(self):
         return self.count
+    
     def __getitem__(self, idx):
-        feat = np.array([self.feat_mapper[i + 1].get(v, self.defaults[i + 1]) 
+        feat = np.array([self.feat_mapper[i + 1].get(v, self.defaults[i + 1])
                          for i, v in enumerate(self.data[idx]['x'])])
         return feat + self.offsets, self.data[idx]['y']
 ```
