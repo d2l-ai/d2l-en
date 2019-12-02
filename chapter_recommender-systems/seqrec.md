@@ -43,11 +43,12 @@ The model can be learned with BPR or Hinge loss. The architecture of Caser is sh
 
 We first import the required libraries.
 
-```{.python .input  n=1}
+```{.python .input  n=3}
 import d2l
 from mxnet import gluon, np, npx
 from mxnet.gluon import nn
 import mxnet as mx
+import random
 import sys
 npx.set_np()
 ```
@@ -55,7 +56,7 @@ npx.set_np()
 ## Model Implementation
 The following code implements the Caser model. It consists of a vertical convolutional layer, a horizontal convolutional layer, and a full-connected layer.
 
-```{.python .input  n=2}
+```{.python .input  n=4}
 class Caser(nn.Block):
     def __init__(self, num_factors, num_users, num_items, L=5, d=16,
                  d_prime=4, drop_ratio=0.05, **kwargs):
@@ -102,19 +103,21 @@ class Caser(nn.Block):
         return res
 ```
 
-## Sequential DataLoader
-To process the sequential interaction data, we need to reimplement the Dataset class. The following code creates a new dataset class named `SeqDataset`. In each sample, it outputs the user identity, her previous $L$ interacted items as a sequence and the next item she interacts as the target. The following figure demonstrates the data loading process for one user. Suppose that this user liked 8 movies, we organize these eight movies in chronological order. The latest movie is left out as the test item. For the remaining seven movies, we can get three training samples, with each sample containing a sequence of five ($L=5$) movies and its subsequent item as the target item.
+## Sequential Dataset with Negative Sampling
+To process the sequential interaction data, we need to reimplement the Dataset class. The following code creates a new dataset class named `SeqDataset`. In each sample, it outputs the user identity, her previous $L$ interacted items as a sequence and the next item she interacts as the target. The following figure demonstrates the data loading process for one user. Suppose that this user liked 8 movies, we organize these eight movies in chronological order. The latest movie is left out as the test item. For the remaining seven movies, we can get three training samples, with each sample containing a sequence of five ($L=5$) movies and its subsequent item as the target item. Negative samples are also included in the Customized dataset. 
 
 ![Illustration of the data generation process](../img/rec-seq-data.svg)
 
-```{.python .input  n=3}
+```{.python .input  n=5}
 class SeqDataset(gluon.data.Dataset):
-    def __init__(self, user_ids, item_ids, L, num_users, num_items):
+    def __init__(self, user_ids, item_ids, L, num_users, num_items, 
+                 candidates):
         user_ids, item_ids = np.array(user_ids), np.array(item_ids)
         sort_idx = np.array(sorted(range(len(user_ids)),
                                    key=lambda k: user_ids[k]))
         u_ids, i_ids = user_ids[sort_idx], item_ids[sort_idx]
-        temp, u_ids = {}, u_ids.asnumpy()
+        temp, u_ids, self.cand = {}, u_ids.asnumpy(), candidates
+        self.all_items = set([i for i in range(num_items)])
         [temp.setdefault(u_ids[i], []).append(i) for i, _ in enumerate(u_ids)]
         temp = sorted(temp.items(), key=lambda x: x[0])
         u_ids = np.array([i[0] for i in temp])
@@ -153,14 +156,16 @@ class SeqDataset(gluon.data.Dataset):
         return self.ns
     
     def __getitem__(self, i):
-        return self.seq_users[i], self.seq_items[i], self.seq_tgt[i]
+        neg = list(self.all_items - set(self.cand[int(self.seq_users[i])]))
+        idx = random.randint(0, len(neg) - 1)
+        return self.seq_users[i], self.seq_items[i], self.seq_tgt[i], neg[idx]
 ```
 
 ## Load the MovieLens 100K dataset
 
 Afterwards, we read and split the MovieLens 100K dataset in sequence-aware mode and load the training data with sequential dataloader implemented above.
 
-```{.python .input  n=4}
+```{.python .input  n=6}
 TARGET_NUM, L, batch_size = 1, 3, 4096
 df, num_users, num_items = d2l.read_data_ml100k()
 train_data, test_data = d2l.split_data_ml100k(df, num_users, num_items,
@@ -170,7 +175,7 @@ users_train, items_train, ratings_train, candidates = d2l.load_data_ml100k(
 users_test, items_test, ratings_test, test_iter = d2l.load_data_ml100k(
     test_data, num_users, num_items, feedback="implicit")
 train_seq_data = SeqDataset(users_train, items_train, L, num_users,
-                            num_items)
+                            num_items, candidates)
 num_workers = 0 if sys.platform.startswith("win") else 4
 train_iter = gluon.data.DataLoader(train_seq_data, batch_size, True,
                                    last_batch="rollover",
@@ -184,18 +189,18 @@ The training data structure is shown above. The first element is the user identi
 ## Train the Model
 Now, let's train the model. We use the same setting as NeuMF, including learning rate, optimizer, and $k$, in the last section so that the results are comparable.
 
-```{.python .input  n=5}
+```{.python .input  n=7}
 ctx = d2l.try_all_gpus()
 net = Caser(10, num_users, num_items, L)
 net.initialize(ctx=ctx, force_reinit=True, init=mx.init.Normal(0.01))
-lr, num_epochs, wd, optimizer = 0.04, 6, 1e-5, 'adam'
+lr, num_epochs, wd, optimizer = 0.04, 8, 1e-5, 'adam'
 loss = d2l.BPRLoss()
 trainer = gluon.Trainer(net.collect_params(), optimizer,
                         {"learning_rate": lr, 'wd': wd})
 
 d2l.train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
                   num_users, num_items, num_epochs, ctx, d2l.evaluate_ranking,
-                  d2l.negative_sampler, candidates, eval_step=1)
+                  candidates, eval_step=1)
 ```
 
 ## Summary
@@ -211,7 +216,3 @@ d2l.train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
 ## [Discussions](https://discuss.mxnet.io/t/5165)
 
 ![](../img/qr_seqrec.svg)
-
-```{.python .input}
-
-```

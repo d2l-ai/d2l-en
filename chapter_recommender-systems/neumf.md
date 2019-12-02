@@ -36,7 +36,7 @@ The following figure illustrates the model architecture of NeuMF.
 
 ![Illustration of the NeuMF model](../img/rec-neumf.svg)
 
-```{.python .input  n=2}
+```{.python .input  n=1}
 import d2l
 from mxnet import autograd, gluon, np, npx
 from mxnet.gluon import nn
@@ -73,20 +73,25 @@ class NeuMF(nn.Block):
         return np.sum(con_res, axis=-1)
 ```
 
-## Negative Sampling
+## Customized Dataset with Negative Sampling
 
 For pairwise ranking loss, an important step is negative sampling. For each user, the items that a user has not interacted with are candidate items (unobserved entries). The following function takes users identity and candidate items as input, and samples negative items randomly for each user from the candidate set of that user. During the training stage, the model ensures that the items that a user likes to be ranked higher than items she dislikes or has not interacted with.
 
 ```{.python .input  n=3}
-# Saved in the d2l package for later use.
-def negative_sampler(users, candidates, num_items):
-    sampled_neg_items = []
-    all_items = set([i for i in range(num_items)])
-    for u in users:
-        neg_items = list(all_items - set(candidates[int(u)]))
+class PRDataset(gluon.data.Dataset):
+    def __init__(self, users, items, candidates, num_items):
+        self.users = users
+        self.items = items
+        self.cand = candidates
+        self.all = set([i for i in range(num_items)])
+
+    def __len__(self):
+        return len(self.users)
+    
+    def __getitem__(self, idx):
+        neg_items = list(self.all - set(self.cand[int(self.users[idx])]))
         indices = random.randint(0, len(neg_items) - 1)
-        sampled_neg_items.append(neg_items[indices])
-    return np.array(sampled_neg_items)
+        return self.users[idx], self.items[idx], neg_items[indices]
 ```
 
 ## Evaluator
@@ -162,8 +167,8 @@ The training function is defined below. We train the model in the pairwise manne
 ```{.python .input  n=6}
 # Saved in the d2l package for later use
 def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
-                  num_users, num_items, num_epochs, ctx_list, evaluator,
-                  negative_sampler, candidates, eval_step=1):
+                  num_users, num_items, num_epochs, ctx_list, evaluator, 
+                  candidates, eval_step=1):
     timer, hit_rate, auc = d2l.Timer(), 0, 0
     animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 1],
                             legend=['test hit rate', 'test AUC'])
@@ -173,11 +178,10 @@ def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
             input_data = []
             for v in values:
                 input_data.append(gluon.utils.split_and_load(v, ctx_list))
-            neg_items = negative_sampler(values[0], candidates, num_items)
-            neg_items = gluon.utils.split_and_load(neg_items, ctx_list)
             with autograd.record():
-                p_pos = [net(*t) for t in zip(*input_data)]
-                p_neg = [net(*t) for t in zip(*input_data[0:-1], neg_items)]
+                p_pos = [net(*t) for t in zip(*input_data[0:-1])]
+                p_neg = [net(*t) for t in zip(*input_data[0:-2], 
+                                              input_data[-1])]
                 ls = [loss(p, n) for p, n in zip(p_pos, p_neg)]
             [l.backward(retain_graph=False) for l in ls]
             l += sum([l.asnumpy() for l in ls]).mean()/len(ctx_list)
@@ -198,7 +202,7 @@ def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
 
 Now, we can load the MovieLens 100k dataset and train the model. Since there are only ratings in the MovieLens dataset, with some losses of accuracy, we binarize these ratings to zeros and ones. If a user rated an item, we consider the implicit feedback as one, otherwise as zero. The action of rating an item can be treated as a form of providing implicit feedback.  Here, we split the dataset in the `seq-aware` mode where users' latest interacted items are left out for test.
 
-```{.python .input  n=7}
+```{.python .input  n=11}
 batch_size = 1024
 df, num_users, num_items = d2l.read_data_ml100k()
 train_data, test_data = d2l.split_data_ml100k(df, num_users, num_items,
@@ -208,8 +212,9 @@ users_train, items_train, ratings_train, candidates = d2l.load_data_ml100k(
 users_test, items_test, ratings_test, test_iter = d2l.load_data_ml100k(
     test_data, num_users, num_items, feedback="implicit")
 num_workers = 0 if sys.platform.startswith("win") else 4
-train_iter = gluon.data.DataLoader(gluon.data.ArrayDataset(
-    np.array(users_train), np.array(items_train)), batch_size, True,
+train_iter = gluon.data.DataLoader(PRDataset(users_train, items_train,
+                                             candidates, num_items ), 
+                                   batch_size, True,
                                    last_batch="rollover",
                                    num_workers=num_workers)
 ```
@@ -224,14 +229,13 @@ net.initialize(ctx=ctx, force_reinit=True, init=mx.init.Normal(0.01))
 
 The following code trains the model.
 
-```{.python .input  n=9}
+```{.python .input  n=12}
 lr, num_epochs, wd, optimizer = 0.01, 10, 1e-5, 'adam'
 loss = d2l.BPRLoss()
 trainer = gluon.Trainer(net.collect_params(), optimizer,
                         {"learning_rate": lr, 'wd': wd})
 train_ranking(net, train_iter, test_iter, loss, trainer, None, num_users,
-              num_items, num_epochs, ctx, evaluate_ranking, negative_sampler,
-              candidates)
+              num_items, num_epochs, ctx, evaluate_ranking, candidates)
 ```
 
 ## Summary 

@@ -1592,17 +1592,6 @@ class HingeLossbRec(gluon.loss.Loss):
 
 
 # Defined in file: ./chapter_recommender-systems/neumf.md
-def negative_sampler(users, candidates, num_items):
-    sampled_neg_items = []
-    all_items = set([i for i in range(num_items)])
-    for u in users:
-        neg_items = list(all_items - set(candidates[int(u)]))
-        indices = random.randint(0, len(neg_items) - 1)
-        sampled_neg_items.append(neg_items[indices])
-    return np.array(sampled_neg_items)
-
-
-# Defined in file: ./chapter_recommender-systems/neumf.md
 def hit_and_auc(rankedlist, test_matrix, k):
     hits_k = [(idx, val) for idx, val in enumerate(rankedlist[:k])
               if val in set(test_matrix)]
@@ -1647,8 +1636,8 @@ def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items,
 
 # Defined in file: ./chapter_recommender-systems/neumf.md
 def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
-                  num_users, num_items, num_epochs, ctx_list, evaluator,
-                  negative_sampler, candidates, eval_step=1):
+                  num_users, num_items, num_epochs, ctx_list, evaluator, 
+                  candidates, eval_step=1):
     timer, hit_rate, auc = d2l.Timer(), 0, 0
     animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 1],
                             legend=['test hit rate', 'test AUC'])
@@ -1658,11 +1647,10 @@ def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
             input_data = []
             for v in values:
                 input_data.append(gluon.utils.split_and_load(v, ctx_list))
-            neg_items = negative_sampler(values[0], candidates, num_items)
-            neg_items = gluon.utils.split_and_load(neg_items, ctx_list)
             with autograd.record():
-                p_pos = [net(*t) for t in zip(*input_data)]
-                p_neg = [net(*t) for t in zip(*input_data[0:-1], neg_items)]
+                p_pos = [net(*t) for t in zip(*input_data[0:-1])]
+                p_neg = [net(*t) for t in zip(*input_data[0:-2], 
+                                              input_data[-1])]
                 ls = [loss(p, n) for p, n in zip(p_pos, p_neg)]
             [l.backward(retain_graph=False) for l in ls]
             l += sum([l.asnumpy() for l in ls]).mean()/len(ctx_list)
