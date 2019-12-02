@@ -1453,10 +1453,11 @@ def predict_sentiment(net, vocab, sentence):
 
 # Defined in file: ./chapter_recommender-systems/movielens.md
 def read_data_ml100k(path="../data/", member="ml-100k/u.data",
-              names=['user_id','item_id','rating','timestamp'], sep="\t"):
+                     names=['user_id', 'item_id', 'rating', 'timestamp'],
+                     sep="\t"):
     fname = gluon.utils.download(
         'http://files.grouplens.org/datasets/movielens/ml-100k.zip',
-    path=path)
+        path=path)
     with zipfile.ZipFile(fname, 'r') as inzipfile:
         inzipfile.extract(member, path)
         data = pd.read_csv(path + member, sep, names=names, engine='python')
@@ -1467,13 +1468,13 @@ def read_data_ml100k(path="../data/", member="ml-100k/u.data",
 
 # Defined in file: ./chapter_recommender-systems/movielens.md
 def split_data_ml100k(data, num_users, num_items,
-               split_mode="random", test_ratio = 0.1):
+                      split_mode="random", test_ratio=0.1):
     """Split the dataset in random mode or seq-aware mode."""
     if split_mode == "seq-aware":
         train_items, test_items, train_list = {}, {}, []
         for line in data.itertuples():
             u, i, rating, time = line[1], line[2], line[3], line[4]
-            train_items.setdefault(u,[]).append((u, i, rating, time))
+            train_items.setdefault(u, []).append((u, i, rating, time))
             if u not in test_items or test_items[u][-1] < time:
                 test_items[u] = (i, rating, time)
         for u in range(1, num_users + 1):
@@ -1533,9 +1534,9 @@ def split_and_load_ml100k(split_mode="seq-aware", feedback="explicit",
 def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
                         ctx_list=d2l.try_all_gpus(), evaluator=None,
                         **kwargs):
-    num_batches, timer = len(train_iter), d2l.Timer()
+    timer = d2l.Timer()
     animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 2],
-                            legend=['train loss','test RMSE'])
+                            legend=['train loss', 'test RMSE'])
     for epoch in range(num_epochs):
         metric, l = d2l.Accumulator(3), 0.
         for i, values in enumerate(train_iter):
@@ -1554,9 +1555,9 @@ def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
             trainer.step(values[0].shape[0])
             metric.add(l, values[0].shape[0], values[0].size)
             timer.stop()
-        if len(kwargs) > 0: # it will be used in section AutoRec.
+        if len(kwargs) > 0:  # it will be used in section AutoRec.
             test_rmse = evaluator(net, test_iter, kwargs['inter_mat'],
-                                 ctx_list)
+                                  ctx_list)
         else:
             test_rmse = evaluator(net, test_iter, ctx_list)
         train_l = l / (i + 1)
@@ -1586,34 +1587,23 @@ class HingeLossbRec(gluon.loss.Loss):
 
     def forward(self, positive, negative, margin=1):
         distances = positive - negative
-        loss = np.sum(np.maximum( - distances + margin, 0))
+        loss = np.sum(np.maximum(- distances + margin, 0))
         return loss
 
 
 # Defined in file: ./chapter_recommender-systems/neumf.md
-def negative_sampler(users, candidates, num_items):
-    sampled_neg_items = []
-    all_items = set([i for i in range(num_items)])
-    for u in users:
-        neg_items = list(all_items - set(candidates[int(u)]))
-        indices = random.randint(0, len(neg_items) - 1)
-        sampled_neg_items.append(neg_items[indices])
-    return np.array(sampled_neg_items)
-
-
-# Defined in file: ./chapter_recommender-systems/neumf.md
 def hit_and_auc(rankedlist, test_matrix, k):
-    hits_k = [(idx, val) for idx, val in enumerate(rankedlist[:k]) 
+    hits_k = [(idx, val) for idx, val in enumerate(rankedlist[:k])
               if val in set(test_matrix)]
-    hits_all = [(idx, val) for idx, val in enumerate(rankedlist) 
+    hits_all = [(idx, val) for idx, val in enumerate(rankedlist)
                 if val in set(test_matrix)]
     max = len(rankedlist) - 1
-    auc = 1.0 * (max - hits_all[0][0]) /max if len(hits_all) > 0 else 0
-    return len(hits_k) , auc
+    auc = 1.0 * (max - hits_all[0][0]) / max if len(hits_all) > 0 else 0
+    return len(hits_k), auc
 
 
 # Defined in file: ./chapter_recommender-systems/neumf.md
-def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items, 
+def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items,
                      ctx):
     ranked_list, ranked_items, hit_rate, auc = {}, {}, [], []
     all_items = set([i for i in range(num_users)])
@@ -1624,13 +1614,15 @@ def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items,
         [user_ids.append(u) for _ in neg_items]
         x.extend([np.array(user_ids)])
         if seq is not None:
-            x.append(seq[user_ids,:])
+            x.append(seq[user_ids, :])
         x.extend([np.array(item_ids)])
-        test_data_iter = gluon.data.DataLoader(gluon.data.ArrayDataset(*x), 
-            shuffle=False, last_batch="keep", batch_size=1024)
+        test_data_iter = gluon.data.DataLoader(gluon.data.ArrayDataset(*x),
+                                               shuffle=False, 
+                                               last_batch="keep", 
+                                               batch_size=1024) 
         for index, values in enumerate(test_data_iter):
-            x = [gluon.utils.split_and_load(v, ctx, even_split=False)
-                          for v in values]
+            x = [gluon.utils.split_and_load(v, ctx, even_split=False) 
+                 for v in values]
             scores.extend([list(net(*t).asnumpy()) for t in zip(*x)])
         scores = [item for sublist in scores for item in sublist]
         item_scores = list(zip(item_ids, scores))
@@ -1643,10 +1635,10 @@ def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items,
 
 
 # Defined in file: ./chapter_recommender-systems/neumf.md
-def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter, 
+def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
                   num_users, num_items, num_epochs, ctx_list, evaluator, 
-                  negative_sampler, candidates, eval_step=1):
-    num_batches, timer, hit_rate, auc  = len(train_iter), d2l.Timer(), 0, 0
+                  candidates, eval_step=1):
+    timer, hit_rate, auc = d2l.Timer(), 0, 0
     animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 1],
                             legend=['test hit rate', 'test AUC'])
     for epoch in range(num_epochs):
@@ -1655,12 +1647,11 @@ def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
             input_data = []
             for v in values:
                 input_data.append(gluon.utils.split_and_load(v, ctx_list))
-            neg_items = negative_sampler(values[0], candidates, num_items)
-            neg_items = gluon.utils.split_and_load(neg_items, ctx_list)
             with autograd.record():
-                p_pos = [net(*t) for t in zip(*input_data)]
-                p_neg = [net(*t) for t in zip(*input_data[0:-1], neg_items)]
-                ls =  [loss(p, n) for p, n in  zip(p_pos, p_neg)]
+                p_pos = [net(*t) for t in zip(*input_data[0:-1])]
+                p_neg = [net(*t) for t in zip(*input_data[0:-2], 
+                                              input_data[-1])]
+                ls = [loss(p, n) for p, n in zip(p_pos, p_neg)]
             [l.backward(retain_graph=False) for l in ls]
             l += sum([l.asnumpy() for l in ls]).mean()/len(ctx_list)
             trainer.step(values[0].shape[0])
@@ -1668,11 +1659,10 @@ def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
             timer.stop()
         with autograd.predict_mode():
             if (epoch + 1) % eval_step == 0:
-                hit_rate, auc = evaluator(net, test_iter, test_seq_iter, 
-                                          candidates, num_users, num_items, 
+                hit_rate, auc = evaluator(net, test_iter, test_seq_iter,
+                                          candidates, num_users, num_items,
                                           ctx_list)
-                train_l = l / (i + 1)
-                animator.add(epoch + 1, ( hit_rate, auc))
+                animator.add(epoch + 1, (hit_rate, auc))
     print('train loss %.3f, test hit rate %.3f, test AUC %.3f'
           % (metric[0] / metric[1], hit_rate, auc))
     print('%.1f examples/sec on %s'
@@ -1680,13 +1670,12 @@ def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
 
 
 # Defined in file: ./chapter_recommender-systems/ctr.md
-def read_data_ctr(path="../data/", train="ctr/train.csv", 
+def read_data_ctr(path="../data/", train="ctr/train.csv",
                   test="ctr/test.csv"):
     data_path = ("https://apache-mxnet.s3-accelerate.amazonaws.com/"
                  "gluon/dataset/")
     train_sha1 = "6dec3052e49ce0d1cec5ebc6f5ded1172be0befb"
-    test_sha1 ="c265e3c1fad0ed4caf8c1a373c580465a8096eb0"
-
+    test_sha1 = "c265e3c1fad0ed4caf8c1a373c580465a8096eb0"
     ctr_path = path+"ctr"
     os.makedirs(ctr_path, exist_ok=True)
     gluon.utils.download(data_path + train, ctr_path, train_sha1)
@@ -1695,7 +1684,7 @@ def read_data_ctr(path="../data/", train="ctr/train.csv",
 
 # Defined in file: ./chapter_recommender-systems/ctr.md
 class CTRDataset(gluon.data.Dataset):
-    def __init__(self, data_path, feat_mapper=None, defaults=None, 
+    def __init__(self, data_path, feat_mapper=None, defaults=None,
                  min_threshold=4, num_feat=34):
         self.NUM_FEATS, self.count, self.data = num_feat, 0, {}
         feat_cnts = defaultdict(lambda: defaultdict(int))
@@ -1711,12 +1700,12 @@ class CTRDataset(gluon.data.Dataset):
                 label[int(values[0])] = 1
                 instance['y'] = [np.float32(values[0])]
                 for i in range(1, self.NUM_FEATS + 1):
-                    feat_cnts[i][values[i ]] += 1
-                    instance.setdefault('x',[]).append(values[i ])
+                    feat_cnts[i][values[i]] += 1
+                    instance.setdefault('x', []).append(values[i])
                 self.data[self.count] = instance
                 self.count = self.count + 1
         if self.feat_mapper is None and self.defaults is None:
-            feat_mapper = {i: {feat for feat, c in cnt.items() if c >= 
+            feat_mapper = {i: {feat for feat, c in cnt.items() if c >=
                                min_threshold} for i, cnt in feat_cnts.items()}
             self.feat_mapper = {i: {feat: idx for idx, feat in enumerate(cnt)}
                                 for i, cnt in feat_mapper.items()}
@@ -1725,10 +1714,12 @@ class CTRDataset(gluon.data.Dataset):
             self.field_dims[i - 1] = len(fm) + 1
         self.offsets = np.array((0, *np.cumsum(self.field_dims).asnumpy()
                                  [:-1]))
+        
     def __len__(self):
         return self.count
+    
     def __getitem__(self, idx):
-        feat = np.array([self.feat_mapper[i + 1].get(v, self.defaults[i + 1]) 
+        feat = np.array([self.feat_mapper[i + 1].get(v, self.defaults[i + 1])
                          for i, v in enumerate(self.data[idx]['x'])])
         return feat + self.offsets, self.data[idx]['y']
 
