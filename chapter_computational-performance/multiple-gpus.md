@@ -211,9 +211,7 @@ Let's see how well this works on a single GPU. We use a batch size of 256 and a 
 train(num_gpus=1, batch_size=256, lr=0.2)
 ```
 
-By keeping the batch size and learning rate unchanged and changing the number of GPUs to 2, we can see that the improvement in test accuracy is roughly the same as in the results from the previous experiment. In terms of the optimization algorithms, they are identical.
-
-Unfortunately there's no meaningful speedup to be gained here: the model is simply too small; moreover we only have a small dataset. We will encounter more complex models going forward. Let's see what happens nonetheless for MNIST.
+By keeping the batch size and learning rate unchanged and changing the number of GPUs to 2, we can see that the improvement in test accuracy is roughly the same as in the results from the previous experiment. In terms of the optimization algorithms, they are identical. Unfortunately there's no meaningful speedup to be gained here: the model is simply too small; moreover we only have a small dataset, where our slightly unsophisticated approach to implementing multi-GPU training suffered from significant Python overhead. We will encounter more complex models and more sophisticated ways of parallelization going forward. Let's see what happens nonetheless for MNIST.
 
 ```{.python .input  n=13}
 train(num_gpus=2, batch_size=256, lr=0.2)
@@ -221,15 +219,22 @@ train(num_gpus=2, batch_size=256, lr=0.2)
 
 ## Summary
 
-* We can use data parallelism to more fully utilize the computational resources of multiple GPUs to implement multi-GPU model training.
-* With the same hyper-parameters, the training accuracy of the model is roughly equivalent when we change the number of GPUs.
+* There are multiple ways to split deep network training over multiple GPUs. We could split them between layers, across layers, or across data. The former two require tightly choreographed data transfers. Data parallelism is the simplest strategy.
+* Data parallel training is straightforward. However, it increases the effective minibatch size to be efficient. 
+* Data is split across multiple GPUs, each GPU executes its own forward and backward operation and subsequently gradients are aggregated and results broadcast back to the GPUs. 
+* Large minibatches may require a slightly increased learning rate. 
 
 ## Exercises
 
-* More efficient allreduce (use different GPUs for different parameters
-In a multi-GPU training experiment, use 2 GPUs for training and double the `batch_size` to 512. How does the training time change? If we want a test accuracy comparable with the results of single-GPU training, how should the learning rate be adjusted?
-* Change the model prediction part of the experiment to multi-GPU prediction.
+1. When training on multiple GPUs, change the minibatch size from $b$ to $k \cdot b$, i.e. scale it up by the number of GPUs.
+1. Compare accuracy for different learning rates. How does it scale with the number of GPUs. 
+1. Implement a more efficient allreduce that aggregates different parameters on different GPUs (why is this more efficient in the first place). 
+1. Implement multi-GPU test accuracy computation. 
 
 ## [Discussions](https://discuss.mxnet.io/t/2383)
 
 ![](../img/qr_multiple-gpus.svg)
+
+```{.python .input}
+
+```
