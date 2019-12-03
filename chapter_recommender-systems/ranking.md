@@ -70,7 +70,7 @@ class HingeLossbRec(gluon.loss.Loss):
 
     def forward(self, positive, negative, margin=1):
         distances = positive - negative
-        loss = np.sum(np.maximum( - distances + margin, 0))
+        loss = np.sum(np.maximum(- distances + margin, 0))
         return loss
 ```
 
