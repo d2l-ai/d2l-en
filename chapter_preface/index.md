@@ -20,11 +20,11 @@ driving rapid progress in fields as diverse as computer vision,
 natural language processing, automatic speech recognition,
 reinforcement learning, and statistical modeling.
 With these advances in hand, we can now build cars that drive themselves
-with more autonomy than ever before (and less autonomy 
-than some companies might have you believe), 
+with more autonomy than ever before (and less autonomy
+than some companies might have you believe),
 smart reply systems that automatically draft the most mundane emails,
 helping people dig out from oppressively large inboxes,
-and software agents that dominate the world's best humans 
+and software agents that dominate the world's best humans
 at board games like Go, a feat once thought to be decades away.
 Already, these tools exert ever-wider impacts on industry and society,
 changing the way movies are made, diseases are diagnosed,
@@ -55,14 +55,14 @@ has been realized to a far greater degree in the past ten years,
 owing in part to the development of powerful, well-documented frameworks.
 
 
-Testing the potential of deep learning presents unique challenges 
+Testing the potential of deep learning presents unique challenges
 because any single application brings together various disciplines.
 Applying deep learning requires simultaneously understanding
 (i) the motivations for casting a problem in a particular way;
 (ii) the mathematics of a given modeling approach;
 (iii) the optimization algorithms for fitting the models to data;
 and (iv) and the engineering required to train models efficiently,
-navigating the pitfalls of numerical computing 
+navigating the pitfalls of numerical computing
 and getting the most out of available hardware.
 Teaching both the critical thinking skills required to formulate problems,
 the mathematics to solve them, and the software tools to implement those
@@ -71,35 +71,35 @@ Our goal in this book is to present a unified resource
 to bring would-be practitioners up to speed.
 
 
-We started this book project in July 2017 when we needed 
+We started this book project in July 2017 when we needed
 to explain MXNet's (then new) Gluon interface to our users.
 At the time, there were no resources that simultaneously
-(i) were up to date; (ii) covered the full breadth 
+(i) were up to date; (ii) covered the full breadth
 of modern machine learning with substantial technical depth;
-and (iii) interleaved exposition of the quality one expects 
-from an engaging textbook with the clean runnable code 
+and (iii) interleaved exposition of the quality one expects
+from an engaging textbook with the clean runnable code
 that one expects to find in hands-on tutorials.
-We found plenty of code examples for 
+We found plenty of code examples for
 how to use a given deep learning framework
 (e.g., how to do basic numerical computing with matrices in TensorFlow)
-or for implementing particular techniques 
+or for implementing particular techniques
 (e.g., code snippets for LeNet, AlexNet, ResNets, etc)
 scattered across various blog posts and GitHub repositories.
 However, these examples typically focused on
 *how* to implement a given approach,
 but left out the discussion of *why* certain algorithmic decisions are made.
-While some interactive resources have popped up sporadically 
+While some interactive resources have popped up sporadically
 to address a particular topic, e.g., the engaging blog posts
 published on the website [Distill](http://distill.pub), or personal blogs,
-they only covered selected topics in deep learning, 
+they only covered selected topics in deep learning,
 and often lacked associated code.
 On the other hand, while several textbooks have emerged,
 most notably :cite:`Goodfellow.Bengio.Courville.2016`,
 which offers a comprehensive survey of the concepts behind deep learning,
-these resources do not marry the descriptions 
+these resources do not marry the descriptions
 to realizations of the concepts in code,
 sometimes leaving readers clueless as to how to implement them.
-Moreover, too many resources are hidden behind the paywalls 
+Moreover, too many resources are hidden behind the paywalls
 of commercial course providers.
 
 We set out to create a resource that could
@@ -107,7 +107,7 @@ We set out to create a resource that could
 (2) offer sufficient technical depth to provide a starting point on the path
 to actually becoming an applied machine learning scientist;
 (3) include runnable code, showing readers *how* to solve problems in practice;
-(4) that allowed for rapid updates, both by us 
+(4) that allowed for rapid updates, both by us
 and also by the community at large;
 and (5) be complemented by a [forum](http://discuss.mxnet.io)
 for interactive discussion of technical details and to answer questions.
@@ -126,9 +126,9 @@ We settled on Github to share the source and to allow for edits,
 Jupyter notebooks for mixing code, equations and text,
 Sphinx as a rendering engine to generate multiple outputs,
 and Discourse for the forum.
-While our system is not yet perfect, 
+While our system is not yet perfect,
 these choices provide a good compromise among the competing concerns.
-We believe that this might be the first book published 
+We believe that this might be the first book published
 using such an integrated workflow.
 
 
@@ -170,7 +170,7 @@ For instance, we might use *stochastic gradient descent*
 before fully explaining why it is useful or why it works.
 This helps to give practitioners the necessary
 ammunition to solve problems quickly,
-at the expense of requiring the reader 
+at the expense of requiring the reader
 to trust us with some curatorial decisions.
 
 Throughout, we will be working with the MXNet library,
@@ -178,15 +178,15 @@ which has the rare property of being flexible enough for research
 while being fast enough for production.
 This book will teach deep learning concepts from scratch.
 Sometimes, we want to delve into fine details about the models
-that would typically be hidden from the user 
+that would typically be hidden from the user
 by Gluon's advanced abstractions.
 This comes up especially in the basic tutorials,
-where we want you to understand everything 
+where we want you to understand everything
 that happens in a given layer or optimizer.
 In these cases, we will often present two versions of the example:
 one where we implement everything from scratch,
 relying only on the NumPy interface and automatic differentiation,
-and another, more practical example, 
+and another, more practical example,
 where we write succinct code using Gluon.
 Once we have taught you how some component works,
 we can just use the Gluon version in subsequent tutorials.
@@ -194,7 +194,7 @@ we can just use the Gluon version in subsequent tutorials.
 
 ### Content and Structure
 
-The book can be roughly divided into three parts, 
+The book can be roughly divided into three parts,
 which are presented by different colors in :numref:`fig_book_org`:
 
 ![Book structure](../img/book-org.svg)
@@ -204,12 +204,12 @@ which are presented by different colors in :numref:`fig_book_org`:
 * The first part covers basics and preliminaries.
 :numref:`chap_introduction` offers an introduction to deep learning.
 Then, in :numref:`chap_preliminaries`,
-we quickly bring you up to speed on the prerequisites required 
+we quickly bring you up to speed on the prerequisites required
 for hands-on deep learning, such as how to store and manipulate data,
 and how to apply various numerical operations based on basic concepts
-from linear algebra, calculus, and probability. 
-:numref:`chap_linear` and :numref:`chap_perceptrons` 
-cover the most basic concepts and techniques of deep learning, 
+from linear algebra, calculus, and probability.
+:numref:`chap_linear` and :numref:`chap_perceptrons`
+cover the most basic concepts and techniques of deep learning,
 such as linear regression, multilayer perceptrons and regularization.
 
 * The next five chapters focus on modern deep learning techniques.
@@ -322,7 +322,7 @@ There are many terrific books which can lead the interested reader further.
 For instance, Linear Analysis by Bela Bollobas :cite:`Bollobas.1999`
 covers linear algebra and functional analysis in great depth.
 All of Statistics :cite:`Wasserman.2013` is a terrific guide to statistics.
-And if you have not used Python before, 
+And if you have not used Python before,
 you may want to peruse this [Python tutorial](http://learnpython.org/).
 
 
@@ -361,7 +361,7 @@ Raju Gulabani, Charlie Bell, and Andrew Jassy for their generous support in writ
 * Apache MXNet is a powerful library for coding up deep learning models and running them in parallel across GPU cores.
 * Gluon is a high level library that makes it easy to code up deep learning models using Apache MXNet.
 * Conda is a Python package manager that ensures that all software dependencies are met.
-* All notebooks are available for download on GitHub and the conda configurations needed to run this book's code are expressed in the `environment.yml` file.
+* All notebooks are available for download on GitHub.
 * If you plan to run this code on GPUs, do not forget to install the necessary drivers and update your configuration.
 
 
