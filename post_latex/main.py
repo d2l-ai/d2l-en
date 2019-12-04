@@ -18,10 +18,10 @@ def _unnumber_chaps_and_secs(lines):
                 return True
         return False
 
-    # Preface and Installation are numbered chapters
-    NUM_UNNUMBERED_CHAPS = 2
+    # Preface, Installation, and Notation are unnumbered chapters
+    NUM_UNNUMBERED_CHAPS = 3
     # Prelimilaries
-    TOC2_START_CHAP_NO = 4
+    TOC2_START_CHAP_NO = 5
 
     preface_reached = False
     ch2_reached = False
