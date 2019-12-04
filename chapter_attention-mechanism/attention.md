@@ -60,7 +60,7 @@ def masked_softmax(X, valid_length):
         return npx.softmax(X).reshape(shape)
 ```
 
-To illustrate how does this function work, we construct two $2 \times 4$ matrixes as the input. In addition, we specify that the valid length equals 2 for the first example, and 3 for the second example. Then, as we can see from the following outputs, the value outside valid lengths are masked as zero.
+To illustrate how does this function work, we construct two $2 \times 4$ matrixes as the input. In addition, we specify that the valid length equals 2 for the first example, and 3 for the second example. Then, as we can see from the following outputs, the values outside valid lengths are masked as zero.
 
 ```{.python .input  n=5}
 masked_softmax(np.random.uniform(size=(2, 2, 4)), np.array([2, 3]))
