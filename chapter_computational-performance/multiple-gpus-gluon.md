@@ -1,12 +1,7 @@
-# Concise Implementation of Multi-GPU Computation
+# Concise Implementation for Multiple GPUs
 :label:`sec_multi_gpu_gluon`
 
-In Gluon, we can conveniently use data parallelism to perform multi-GPU
-computation. For example, we do not need to implement the helper function to
-synchronize data among multiple GPUs, as described in
-:numref:`sec_multi_gpu`, ourselves.
-
-First, import the required packages or modules for the experiment in this section. Running the programs in this section requires at least two GPUs.
+Implementing parallelism from scratch for every new model is no fun. Moreover, there's significant benefit in optimizing synchronization tools for high performance. In the following we'll show how to do this using Gluon. The math and the algorithms are the same as in :numref:`sec_multi_gpu`. As before we begin by importing the required modules (quite unsurprisingly you'll need at least two GPUs to run this notebook).
 
 ```{.python .input  n=1}
 import d2l
@@ -15,13 +10,9 @@ from mxnet.gluon import nn
 npx.set_np()
 ```
 
-## Initializing Model Parameters on Multiple GPUs
+## A Toy Network
 
-In this section, we use ResNet-18 as a sample model. Since the input images in
-this section are original size (not enlarged), the model construction here is
-different from the ResNet-18 structure described in :numref:`sec_resnet`. This
-model uses a smaller convolution kernel, stride, and padding at the beginning
-and removes the maximum pooling layer.
+Let's use a slightly more meaningful network than LeNet from the previous section that's still sufficiently easy and quick to train. We pick a ResNet-18 variant :cite:`He.Zhang.Ren.ea.2016`. Since the input images are tiny we modify it slightly. In particular, the difference to :numref:`sec_resnet` is that we use a smaller convolution kernel, stride, and padding at the beginning. Moreover, we remove the max-pooling layer.
 
 ```{.python .input  n=2}
 # Saved in the d2l package for later use
@@ -48,18 +39,21 @@ def resnet18(num_classes):
             resnet_block(512, 2))
     net.add(nn.GlobalAvgPool2D(), nn.Dense(num_classes))
     return net
-
-net = resnet18(10)
 ```
 
-Previously, we discussed how to use the `initialize` function's `ctx` parameter to initialize model parameters on a CPU or a single GPU. In fact, `ctx` can accept a range of CPUs and GPUs so as to copy initialized model parameters to all CPUs and GPUs in `ctx`.
+## Parameter Initialization and Logistics
+
+The `initialize` method allows us to set initial defaults for parameters on a device of our choice. For a refresher see :numref:`sec_numerical_stability`. What is particularly convenient is that it also lets us initialize the network on *multiple* devices simultaneously. Let's try how this works in practice.
 
 ```{.python .input  n=3}
+net = resnet18(10)
+# get a list of GPUs
 ctx = d2l.try_all_gpus()
+# initialize the network on all of them 
 net.initialize(init=init.Normal(sigma=0.01), ctx=ctx)
 ```
 
-Gluon provides the `split_and_load` function implemented in the previous section. It can divide a minibatch of data instances and copy them to each CPU or GPU. Then, the model computation for the data input to each CPU or GPU occurs on that same CPU or GPU.
+Using the `split_and_load` function introduced in the previous section we can divide a minibatch of data and copy portions to the list of devices provided by the context variable. The network object *automatically* uses the appropriate GPU to compute the value of the forward pass. As before we generate 4 observations and split them over the GPUs.
 
 ```{.python .input  n=4}
 x = np.random.uniform(size=(4, 1, 28, 28))
@@ -67,7 +61,7 @@ gpu_x = gluon.utils.split_and_load(x, ctx)
 net(gpu_x[0]), net(gpu_x[1])
 ```
 
-Now we can access the initialized model parameter values through `data`. It should be noted that `weight.data()` will return the parameter values on the CPU by default. Since we specified 2 GPUs to initialize the model parameters, we need to specify the GPU to access parameter values. As we can see, the same parameters have the same values on different GPUs.
+Once data passes through the network, the corresponding parameters are initialized *on the device the data passed through*. This means that initialization happens on a per-device basis. Since we picked GPU 0 and GPU 1 for initialization, the network is initialized only there, and not on the CPU. In fact, the parameters don't even exist on the device. We can verify this by printing out the parameters and observing any errors that might arise. 
 
 ```{.python .input  n=5}
 weight = net[0].params.get('weight')
@@ -79,60 +73,67 @@ except RuntimeError:
 weight.data(ctx[0])[0], weight.data(ctx[1])[0]
 ```
 
-Remember we define the `evaluate_accuracy_gpu` in :numref:`sec_lenet` to support evaluating on a single GPU, now we refine this implementation to support multiple devices.
+Lastly let's replace the code to evaluate the accuracy by one that works in parallel across multiple devices. This serves as a replacement of the `evaluate_accuracy_gpu` function from :numref:`sec_lenet`. The main difference is that we split a batch before invoking the network. All else is essentially identical.
 
 ```{.python .input  n=6}
 # Saved in the d2l package for later use
 def evaluate_accuracy_gpus(net, data_iter, split_f=d2l.split_batch):
     # Query the list of devices
-    ctx_list = list(net.collect_params().values())[0].list_ctx()
+    ctx = list(net.collect_params().values())[0].list_ctx()
     metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
     for features, labels in data_iter:
-        Xs, ys = split_f(features, labels, ctx_list)
+        Xs, ys = split_f(features, labels, ctx)
         pys = [net(X) for X in Xs]  # Run in parallel
         metric.add(sum(float(d2l.accuracy(py, y)) for py, y in zip(pys, ys)),
                    labels.size)
     return metric[0]/metric[1]
 ```
 
-## Multi-GPU Model Training
+## Training
 
-When we use multiple GPUs to train the model, the `Trainer` instance will automatically perform data parallelism, such as dividing minibatches of data instances and copying them to individual GPUs and summing the gradients of each GPU and broadcasting the result to all GPUs. In this way, we can easily implement the training function.
+As before, the training code needs to perform a number of basic functions for efficient parallelism:
+
+* Network parameters need to be initialized across all devices.
+* While iterating over the dataset minibatches are to be divided across all devices.
+* We compute the loss and its gradient in parallel across devices. 
+* Losses are aggregated (by the trainer method) and parameters are updated accordingly. 
+
+In the end we compute the accuracy (again in parallel) to report the final value of the network. The training routine is quite similar to implementations in previous chapters, except that we need to split and aggregate data. 
 
 ```{.python .input  n=7}
 def train(num_gpus, batch_size, lr):
     train_iter, test_iter = d2l.load_data_fashion_mnist(batch_size)
-    ctx_list = [d2l.try_gpu(i) for i in range(num_gpus)]
-    net.initialize(init=init.Normal(sigma=0.01),
-                   ctx=ctx_list, force_reinit=True)
-    trainer = gluon.Trainer(
-        net.collect_params(), 'sgd', {'learning_rate': lr})
+    ctx = [d2l.try_gpu(i) for i in range(num_gpus)]
+    net.initialize(init=init.Normal(sigma=0.01), ctx=ctx, force_reinit=True)
+    trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
-    timer, num_epochs = d2l.Timer(), 2
+    timer, num_epochs = d2l.Timer(), 10
     animator = d2l.Animator('epoch', 'test acc', xlim=[1, num_epochs])
     for epoch in range(num_epochs):
         timer.start()
         for features, labels in train_iter:
-            Xs, ys = d2l.split_batch(features, labels, ctx_list)
+            Xs, ys = d2l.split_batch(features, labels, ctx)
             with autograd.record():
-                ls = [loss(net(X), y) for X, y in zip(Xs, ys)]
-            for l in ls:
+                losses = [loss(net(X), y) for X, y in zip(Xs, ys)]
+            for l in losses:
                 l.backward()
             trainer.step(batch_size)
         npx.waitall()
         timer.stop()
         animator.add(epoch+1, (evaluate_accuracy_gpus(net, test_iter),))
     print('test acc: %.2f, %.1f sec/epoch on %s' % (
-        animator.Y[0][-1], timer.avg(), ctx_list))
+        animator.Y[0][-1], timer.avg(), ctx))
 ```
 
-First, use a single GPU for training.
+## Experiments
+
+Let's see how this works in practice. As a warmup we train the network on a single GPU. 
 
 ```{.python .input  n=8}
 train(num_gpus=1, batch_size=256, lr=0.1)
 ```
 
-Then we try to use 2 GPUs for training. Compared with the LeNet used in the previous section, ResNet-18 computing is more complicated and the communication time is shorter compared to the calculation time, so parallel computing in ResNet-18 better improves performance.
+Next we use 2 GPUs for training. Compared to LeNet the model for ResNet-18 is considerably more complex. This is where parallelization shows its advantage. The time for computation is meaningfully larger than the time for synchronizing parameters. This improves scalability since the overhead for parallelization is less relevant. 
 
 ```{.python .input  n=9}
 train(num_gpus=2, batch_size=512, lr=0.2)
@@ -140,13 +141,21 @@ train(num_gpus=2, batch_size=512, lr=0.2)
 
 ## Summary
 
-* In Gluon, we can conveniently perform multi-GPU computations, such as initializing model parameters and training models on multiple GPUs.
+* Gluon provides primitives for model initialization across multiple devices by providing a context list.
+* Data is automatically evaluated on the devices where the data can be found.
+* Take care to initialize the networks on each device before trying to access the parameters on that device. Otherwise you will encounter an error.
+* The optimization algorithms automatically aggregate over multiple GPUs. 
 
 ## Exercises
 
-* This section uses ResNet-18. Try different epochs, batch sizes, and learning rates. Use more GPUs for computation if conditions permit.
-* Sometimes, different devices provide different computing power. Some can use CPUs and GPUs at the same time, or GPUs of different models. How should we divide minibatches among different CPUs or GPUs?
+1. This section uses ResNet-18. Try different epochs, batch sizes, and learning rates. Use more GPUs for computation. What happens if you try this on a p2.16xlarge instance with 16 GPUs? 
+1. Sometimes, different devices provide different computing power. We could use the GPUs and the CPU at the same time. How should we divide the work? Is it worth the effort? Why? Why not?
+1. What happens if we drop `npx.waitall()`? How would you modify training such that you have an overlap of up to two steps for parallelism? 
 
 ## [Discussions](https://discuss.mxnet.io/t/2384)
 
 ![](../img/qr_multiple-gpus-gluon.svg)
+
+```{.python .input}
+
+```
