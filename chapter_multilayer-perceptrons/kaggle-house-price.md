@@ -41,6 +41,7 @@ you need to register for an account as shown in
 :numref:`fig_kaggle` (do this now!).
 
 ![Kaggle website](../img/kaggle.png)
+:width:`400px`
 :label:`fig_kaggle`
 
 On the House Prices Prediction page as illustrated 
@@ -52,7 +53,7 @@ The URL is right here:
 > https://www.kaggle.com/c/house-prices-advanced-regression-techniques
 
 ![House Price Prediction](../img/house_pricing.png)
-:width:`600px`
+:width:`400px`
 :label:`fig_house_pricing`
 
 ## Accessing and Reading the Dataset
@@ -412,6 +413,7 @@ The steps are quite simple:
 * Click the “Make Submission” button at the bottom of the page to view your results.
 
 ![Submitting data to Kaggle](../img/kaggle_submit2.png)
+:width:`400px`
 :label:`fig_kaggle_submit2`
 
 ## Summary
