@@ -1,6 +1,7 @@
-# List of Main Symbols
+# Notation
+:label:`chap_notation`
 
-The main symbols used in this book are listed below.
+The notation used in this book is listed below.
 
 ## Numbers
 
