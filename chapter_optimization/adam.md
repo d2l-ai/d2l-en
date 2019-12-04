@@ -3,13 +3,13 @@
 
 In the discussions leading up to this section we encountered a number of techniques for efficient optimization. Let's recap them in detail here:
 
-* We saw that :ref:`sec_sgd` is more effective than Gradient Descent when solving optimization problems, e.g., due to its inherent resilience to redundant data. 
-* We saw that :ref:`sec_minibatch_sgd` affords significant additional efficiency arising from vectorization, using larger sets of observations in one minibatch. This is the key to efficient multi-machine, multi-GPU and overall parallel processing. 
-* :ref:`sec_momentum` added a mechanism for aggregating a history of past gradients to accelerate convergence.
-* :ref:`sec_adagrad` used per-coordinate scaling to allow for a computationally efficient preconditioner. 
-* :ref:`sec_rmsprop` decoupled per-coordinate scaling from a learning rate adjustment. 
+* We saw that :numref:`sec_sgd` is more effective than Gradient Descent when solving optimization problems, e.g., due to its inherent resilience to redundant data. 
+* We saw that :numref:`sec_minibatch_sgd` affords significant additional efficiency arising from vectorization, using larger sets of observations in one minibatch. This is the key to efficient multi-machine, multi-GPU and overall parallel processing. 
+* :numref:`sec_momentum` added a mechanism for aggregating a history of past gradients to accelerate convergence.
+* :numref:`sec_adagrad` used per-coordinate scaling to allow for a computationally efficient preconditioner. 
+* :numref:`sec_rmsprop` decoupled per-coordinate scaling from a learning rate adjustment. 
 
-Adam :cite:`Kingma.Ba.2014` combines all these techniques into one efficient learning algorithm. As expected, this is an algorithm that has become rather popular as one of the more robust and effective optimization algorithms to use in deep learning. It is not without issues, though. In particular, :cite:`Reddi.Kale.Kumar.2019` show that there are situations where Adam can diverge due to poor variance control. In a followup work :cite:`Zaheer.Reddi.Sachan.ea.2018` proposed a hotfix to Adam, called Yogi which addresses these issues. More on this later. For now let's review the Adam algorithm. 
+Adam :cite:`Kingma.Ba.2014` combines all these techniques into one efficient learning algorithm. As expected, this is an algorithm that has become rather popular as one of the more robust and effective optimization algorithms to use in deep learning. It is not without issues, though. In particular, :cite:`Reddi.Kale.Kumar.2019` show that there are situations where Adam can diverge due to poor variance control. In a follow-up work :cite:`Zaheer.Reddi.Sachan.ea.2018` proposed a hotfix to Adam, called Yogi which addresses these issues. More on this later. For now let's review the Adam algorithm. 
 
 ## The Algorithm
 

@@ -18,7 +18,7 @@ Adagrad by :cite:`Duchi.Hazan.Singer.2011` addresses this by replacing the rathe
 
 Convex optimization problems are good for analyzing the characteristics of algorithms. After all, for most nonconvex problems it is difficult to derive meaningful theoretical guarantees, but *intuition* and *insight* often carry over.  Let's look at the problem of minimizing $f(\mathbf{x}) = \frac{1}{2} \mathbf{x}^\top Q \mathbf{x} + \mathbf{c}^\top \mathbf{x} + b$.
 
-As we saw in :ref:`sec_momentum`, it is possible to rewrite this problem in terms of its eigendecomposition $Q = U^\top \Lambda U$ to arrive at a much simplified problem where each coordinate can be solved individually:
+As we saw in :numref:`sec_momentum`, it is possible to rewrite this problem in terms of its eigendecomposition $Q = U^\top \Lambda U$ to arrive at a much simplified problem where each coordinate can be solved individually:
 
 $$f(\mathbf{x}) = \bar{f}(\bar{\mathbf{x}}) = \frac{1}{2} \bar{\mathbf{x}}^\top \Lambda \bar{\mathbf{x}} + \bar{\mathbf{c}}^\top \bar{\mathbf{x}} + b.$$
 
@@ -135,7 +135,7 @@ d2l.train_gluon_ch11('adagrad', {'learning_rate': 0.1}, data_iter)
 * Computing the exact second derivative is typically infeasible in deep learning problems due to memory and computational constraints. The gradient can be a useful proxy.
 * If the optimization problem has a rather uneven uneven structure Adagrad can help mitigate the distortion.
 * Adagrad is particularly effective for sparse features where the learning rate needs to decrease more slowly for infrequently occurring terms.
-* On deep learning problems Adagrad can sometimes be too aggressive in reducing learning rates. We will discuss strategies for mitigating this in the context of :ref:`sec_adam`.
+* On deep learning problems Adagrad can sometimes be too aggressive in reducing learning rates. We will discuss strategies for mitigating this in the context of :numref:`sec_adam`.
 
 ## Exercises
 
@@ -143,7 +143,7 @@ d2l.train_gluon_ch11('adagrad', {'learning_rate': 0.1}, data_iter)
 1. Try out Adagrad for $f(\mathbf{x}) = 0.1 x_1^2 + 2 x_2^2$ and also for the objective function was rotated by 45 degrees, i.e., $f(\mathbf{x}) = 0.1 (x_1 + x_2)^2 + 2 (x_1 - x_2)^2$. Does it behave differently?
 1. Prove [Gerschgorin's circle theorem](https://en.wikipedia.org/wiki/Gershgorin_circle_theorem) which states that eigenvalues $\lambda_i$ of a matrix $M$ satisfy $|\lambda_i - M_{jj}| \leq \sum_{k \neq j} |M_{jk}|$ for at least one choice of $j$.
 1. What does Gerschgorin's theorem tell us about the eigenvalues of the diagonally preconditioned matrix $\mathrm{diag}^{-\frac{1}{2}}(M) M \mathrm{diag}^{-\frac{1}{2}}(M)$?
-1. Try out Adagrad for a proper deep network, such as :ref:`sec_lenet` when applied to Fashion MNIST.
+1. Try out Adagrad for a proper deep network, such as :numref:`sec_lenet` when applied to Fashion MNIST.
 1. How would you need to modify Adagrad to achieve a less aggressive decay in learning rate?
 
 
