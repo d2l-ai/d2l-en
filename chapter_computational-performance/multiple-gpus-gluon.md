@@ -61,7 +61,7 @@ gpu_x = gluon.utils.split_and_load(x, ctx)
 net(gpu_x[0]), net(gpu_x[1])
 ```
 
-Once data passes through the network, the corresponding parameters are initialized *on the device the data passed through*. This means that initialization happens on a per-device basis. Since we picked GPU 0 and GPU 1 for initialization, the network is initialized only there, and not on the CPU. In fact, the parameters don't even exist on the device. We can verify this by printing out the parameters and observing any errors that might arise. 
+Once data passes through the network, the corresponding parameters are initialized *on the device the data passed through*. This means that initialization happens on a per-device basis. Since we picked GPU 0 and GPU 1 for initialization, the network is initialized only there, and not on the CPU. In fact, the parameters don't even exist on the device. We can verify this by printing out the parameters and observing any errors that might arise.
 
 ```{.python .input  n=5}
 weight = net[0].params.get('weight')
@@ -98,7 +98,7 @@ As before, the training code needs to perform a number of basic functions for ef
 * We compute the loss and its gradient in parallel across devices. 
 * Losses are aggregated (by the trainer method) and parameters are updated accordingly. 
 
-In the end we compute the accuracy (again in parallel) to report the final value of the network. The training routine is quite similar to implementations in previous chapters, except that we need to split and aggregate data. 
+In the end we compute the accuracy (again in parallel) to report the final value of the network. The training routine is quite similar to implementations in previous chapters, except that we need to split and aggregate data.
 
 ```{.python .input  n=7}
 def train(num_gpus, batch_size, lr):
@@ -127,13 +127,13 @@ def train(num_gpus, batch_size, lr):
 
 ## Experiments
 
-Let's see how this works in practice. As a warmup we train the network on a single GPU. 
+Let's see how this works in practice. As a warmup we train the network on a single GPU.
 
 ```{.python .input  n=8}
 train(num_gpus=1, batch_size=256, lr=0.1)
 ```
 
-Next we use 2 GPUs for training. Compared to LeNet the model for ResNet-18 is considerably more complex. This is where parallelization shows its advantage. The time for computation is meaningfully larger than the time for synchronizing parameters. This improves scalability since the overhead for parallelization is less relevant. 
+Next we use 2 GPUs for training. Compared to LeNet the model for ResNet-18 is considerably more complex. This is where parallelization shows its advantage. The time for computation is meaningfully larger than the time for synchronizing parameters. This improves scalability since the overhead for parallelization is less relevant.
 
 ```{.python .input  n=9}
 train(num_gpus=2, batch_size=512, lr=0.2)
@@ -155,7 +155,3 @@ train(num_gpus=2, batch_size=512, lr=0.2)
 ## [Discussions](https://discuss.mxnet.io/t/2384)
 
 ![](../img/qr_multiple-gpus-gluon.svg)
-
-```{.python .input}
-
-```

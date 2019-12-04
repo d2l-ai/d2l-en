@@ -40,8 +40,6 @@ Broadly speaking, MXNet has a frontend for direct interaction with the users, e.
 
 Users can write MXNet programs in various frontend languages, such as Python, R, Scala and C++. Regardless of the front-end programming language used, the execution of MXNet programs occurs primarily in the back-end of C++ implementations. Operations issued by the frontend language are passed on to the backend for execution. The backend manages its own threads that continuously collect and execute queued tasks. Note that for this to work the backend must be able to keep track of the dependencies between various steps in the computational graph. That is, it is not possible to parallelize operations that depend on each other.
 
-![Programming Frontends.](../img/frontends.svg)
-
 Let's look at another toy example to understand the dependency graph a bit better.
 
 ```{.python .input  n=4}
@@ -54,7 +52,8 @@ z
 ![Dependencies.](../img/asyncgraph.svg)
 :label:`fig_asyncgraph`
 
-Whenever the Python frontend thread executes one of the first three statements, it simply returns the task to the backend queue. When the last statement’s results need to be printed, the Python frontend thread will wait for the C++ backend thread to finish computing result of the variable `z`. One benefit of this design is that the Python frontend thread does not need to perform actual computations. Thus, there is little impact on the program’s overall performance, regardless of Python’s performance. The figure below illustrates how frontend and backend interact.
+The code snippet above is also illustrated in :numref:`fig_asyncgraph`.
+Whenever the Python frontend thread executes one of the first three statements, it simply returns the task to the backend queue. When the last statement’s results need to be printed, the Python frontend thread will wait for the C++ backend thread to finish computing result of the variable `z`. One benefit of this design is that the Python frontend thread does not need to perform actual computations. Thus, there is little impact on the program’s overall performance, regardless of Python’s performance. :numref:`fig_threading` illustrates how frontend and backend interact.
 
 ![Frontend and Backend.](../img/threading.svg)
 :label:`fig_threading`
