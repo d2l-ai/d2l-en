@@ -46,7 +46,7 @@ Assume that there are $k$ GPUs on a machine. Given the model to be trained, each
 :label:`fig_data_parallel`
 
 Note that in practice we *increase* the minibatch size $k$-fold when training on $k$ GPUs such that each GPU has the same amount of work to do as if we were training on a single GPU only. On a 16 GPU server this can increase the minibatch size considerably and we may have to increase the learning rate accordingly. Also note that :ref:`sec_batch_norm` needs to be adjusted (e.g. by keeping a separate batch norm coefficient per GPU). 
-In what follows we will use :ref:`sec_lenet` as the toy network to illustrate multi-GPU training. As always we begin by importing the relevant packages and modules. 
+In what follows we will use :ref:`sec_lenet` as the toy network to illustrate multi-GPU training. As always we begin by importing the relevant packages and modules.
 
 ```{.python .input  n=2}
 %matplotlib inline
@@ -57,7 +57,7 @@ npx.set_np()
 
 ## A Toy Network
 
-We use LeNet as introduced in :numref:`sec_lenet`. We define it from scratch to illustrate parameter exchange and synchronization in detail. 
+We use LeNet as introduced in :numref:`sec_lenet`. We define it from scratch to illustrate parameter exchange and synchronization in detail.
 
 ```{.python .input  n=10}
 # Initialize model parameters
@@ -96,7 +96,7 @@ loss = gluon.loss.SoftmaxCrossEntropyLoss()
 
 ## Data Synchronization
 
-For efficient multi-GPU training we need two basic operations: firstly we need to have the ability to distribute a list of parameters to multiple devices and to attach gradients (`get_params`). Without parameters it's impossible to evaluate the network on a GPU. Secondly, we need the ability to sum parameters across multiple devices, i.e. we need an `allreduce` function. 
+For efficient multi-GPU training we need two basic operations: firstly we need to have the ability to distribute a list of parameters to multiple devices and to attach gradients (`get_params`). Without parameters it's impossible to evaluate the network on a GPU. Secondly, we need the ability to sum parameters across multiple devices, i.e. we need an `allreduce` function.
 
 ```{.python .input  n=12}
 def get_params(params, ctx):
@@ -114,7 +114,7 @@ print('b1 weight:', new_params[1])
 print('b1 grad:', new_params[1].grad)
 ```
 
-Since we didn't perform any computation yet, the gradient with regard to the bias weights is still $0$. Now let's assume that we have a vector distributed across multiple GPUs. The following allreduce function adds up all vectors and broadcasts the result back to all GPUs. Note that for this to work we need to copy the data to the device accumulating the results. 
+Since we didn't perform any computation yet, the gradient with regard to the bias weights is still $0$. Now let's assume that we have a vector distributed across multiple GPUs. The following allreduce function adds up all vectors and broadcasts the result back to all GPUs. Note that for this to work we need to copy the data to the device accumulating the results.
 
 ```{.python .input  n=14}
 def allreduce(data):
@@ -146,7 +146,7 @@ print('load into', ctx)
 print('output:', split)
 ```
 
-For later reuse we define a `split_batch` function which splits both data and labels. 
+For later reuse we define a `split_batch` function which splits both data and labels.
 
 ```{.python .input  n=9}
 # Saved in the d2l package for later use
@@ -177,7 +177,7 @@ def train_batch(X, y, gpu_params, ctx_list, lr):
         d2l.sgd(param, lr, X.shape[0])  # Here, we use a full-size batch
 ```
 
-Now, we can define the training function. It is slightly different from the ones used in the previous chapters: we need to allocate the GPUs and copy all the model parameters to all devices. Obviously each batch is processed using `train_batch` to deal with multiple GPUs. For convenience (and conciseness of code) we compute the accuracy on a single GPU (this is *inefficient* since the other GPUs are idle). 
+Now, we can define the training function. It is slightly different from the ones used in the previous chapters: we need to allocate the GPUs and copy all the model parameters to all devices. Obviously each batch is processed using `train_batch` to deal with multiple GPUs. For convenience (and conciseness of code) we compute the accuracy on a single GPU (this is *inefficient* since the other GPUs are idle).
 
 ```{.python .input  n=61}
 def train(num_gpus, batch_size, lr):
@@ -205,7 +205,7 @@ def train(num_gpus, batch_size, lr):
 
 ## Experiment
 
-Let's see how well this works on a single GPU. We use a batch size of 256 and a learning rate of 0.2. 
+Let's see how well this works on a single GPU. We use a batch size of 256 and a learning rate of 0.2.
 
 ```{.python .input  n=62}
 train(num_gpus=1, batch_size=256, lr=0.2)
@@ -234,7 +234,3 @@ train(num_gpus=2, batch_size=256, lr=0.2)
 ## [Discussions](https://discuss.mxnet.io/t/2383)
 
 ![](../img/qr_multiple-gpus.svg)
-
-```{.python .input}
-
-```
