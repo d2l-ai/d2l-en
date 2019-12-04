@@ -1067,10 +1067,10 @@ def resnet18(num_classes):
 # Defined in file: ./chapter_computational-performance/multiple-gpus-gluon.md
 def evaluate_accuracy_gpus(net, data_iter, split_f=d2l.split_batch):
     # Query the list of devices
-    ctx_list = list(net.collect_params().values())[0].list_ctx()
+    ctx = list(net.collect_params().values())[0].list_ctx()
     metric = d2l.Accumulator(2)  # num_corrected_examples, num_examples
     for features, labels in data_iter:
-        Xs, ys = split_f(features, labels, ctx_list)
+        Xs, ys = split_f(features, labels, ctx)
         pys = [net(X) for X in Xs]  # Run in parallel
         metric.add(sum(float(d2l.accuracy(py, y)) for py, y in zip(pys, ys)),
                    labels.size)
