@@ -82,9 +82,10 @@ with d2l.benchmark('Run on GPU and copy to CPU: %.4f sec'):
 
 The total time required for both operations is (as expected) significantly less than the sum of their parts. Note that this task is different from parallel computation as it uses a different resource: the bus between CPU and GPUs. In fact, we could compute on both devices and communicate, all at the same time. As noted above, there is a dependency between computation and communication: `y[i]` must be computed before it can be copied to the CPU. Fortunately, the system can copy `y[i-1]` while computing `y[i]` to reduce the total running time.
 
-We conclude with an illustration of the computegraph and its dependencies for a simple two layer MLP when training on a CPU and two GPUs. It would be quite painful to schedule the parallel program resulting from this manually. This is where it is advantageous to have a graph based compute backend for optimization.
+We conclude with an illustration of the computational graph and its dependencies for a simple two-layer MLP when training on a CPU and two GPUs, as depicted in :numref:`fig_twogpu`. It would be quite painful to schedule the parallel program resulting from this manually. This is where it is advantageous to have a graph based compute backend for optimization.
 
 ![Two layer MLP on a CPU and 2 GPUs.](../img/twogpu.svg)
+:label:`fig_twogpu`
 
 ## Summary
 
