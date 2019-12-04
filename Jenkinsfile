@@ -13,13 +13,14 @@ stage("Build and Publish") {
       conda activate ${ENV_NAME}
       pip install mxnet-cu101==1.6.0b20191122
       pip install git+https://github.com/d2l-ai/d2l-book
-      python setup.py develop
+      pip install d2l==0.11.1
       pip list
       nvidia-smi
       """
 
       sh label: "Check Execution Output", script: """set -ex
       conda activate ${ENV_NAME}
+      d2lbook clear
       d2lbook build outputcheck
       """
 
