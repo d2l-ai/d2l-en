@@ -45,6 +45,7 @@ Assume that there are $k$ GPUs on a machine. Given the model to be trained, each
 ![Calculation of minibatch stochastic gradient using data parallelism and two GPUs. ](../img/data-parallel.svg)
 :label:`fig_data_parallel`
 
+
 Note that in practice we *increase* the minibatch size $k$-fold when training on $k$ GPUs such that each GPU has the same amount of work to do as if we were training on a single GPU only. On a 16 GPU server this can increase the minibatch size considerably and we may have to increase the learning rate accordingly. Also note that :numref:`sec_batch_norm` needs to be adjusted (e.g., by keeping a separate batch norm coefficient per GPU). 
 In what follows we will use :numref:`sec_lenet` as the toy network to illustrate multi-GPU training. As always we begin by importing the relevant packages and modules.
 
@@ -97,6 +98,7 @@ loss = gluon.loss.SoftmaxCrossEntropyLoss()
 ## Data Synchronization
 
 For efficient multi-GPU training we need two basic operations: firstly we need to have the ability to distribute a list of parameters to multiple devices and to attach gradients (`get_params`). Without parameters it's impossible to evaluate the network on a GPU. Secondly, we need the ability to sum parameters across multiple devices, i.e., we need an `allreduce` function.
+
 
 ```{.python .input  n=12}
 def get_params(params, ctx):
