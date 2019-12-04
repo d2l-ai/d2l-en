@@ -20,6 +20,25 @@ chapter_notation/index
 :maxdepth: 2
 :numbered:
 
+chapter_introduction/index
+chapter_preliminaries/index
+chapter_linear-networks/index
+chapter_multilayer-perceptrons/index
+chapter_deep-learning-computation/index
+chapter_convolutional-neural-networks/index
+chapter_convolutional-modern/index
+chapter_recurrent-neural-networks/index
+chapter_modern_recurrent-networks/index
+chapter_attention-mechanism/index
+chapter_optimization/index
+chapter_computational-performance/index
+chapter_computer-vision/index
+chapter_natural-language-processing/index
+chapter_recommender-systems/index
+chapter_generative_adversarial_networks/index
+chapter_appendix_math/index
+chapter_appendix_tools/index
+
 ```
 
 
