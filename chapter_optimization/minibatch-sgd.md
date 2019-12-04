@@ -98,7 +98,7 @@ timer.stop()
 print("Performance in Gigaflops: block {:.3f}".format(2/timer.times[3]))
 ```
 
-As we can see, the computation on the minibatch is essentially as efficient as on the full matrix. A word of caution is in order. In :ref:`sec_batch_norm` we used a type of regularization that was heavily dependent on the amount of variance in a minibatch. As we increase the latter, the variance decreases and with it the benefit of the noise-injection due to batch normalization. See e.g., :cite:`Ioffe.2017` for details on how to rescale and compute the appropriate terms. 
+As we can see, the computation on the minibatch is essentially as efficient as on the full matrix. A word of caution is in order. In :numref:`sec_batch_norm` we used a type of regularization that was heavily dependent on the amount of variance in a minibatch. As we increase the latter, the variance decreases and with it the benefit of the noise-injection due to batch normalization. See e.g., :cite:`Ioffe.2017` for details on how to rescale and compute the appropriate terms. 
 
 ## Reading the Dataset
 
