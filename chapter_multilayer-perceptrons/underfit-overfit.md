@@ -301,7 +301,7 @@ Therefore, the accuracy reported in each experiment
 is really the validation accuracy and not a true test set accuracy.
 The good news is that we do not need too much data in the validation set.
 The uncertainty in our estimates can be shown
-to be of the order of $O(n^{-\frac{1}{2}})$.
+to be of the order of $\mathcal{O}(n^{-\frac{1}{2}})$.
 
 
 ### $K$-Fold Cross-Validation
