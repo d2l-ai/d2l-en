@@ -134,7 +134,7 @@ len(corpus), len(vocab)
 
 ## Exercises
 
-* Tokenization is a key preprocessing step. It varies for different languages. Try to find another 3 commonly used methods to tokenize sentences. 
+1. Tokenization is a key preprocessing step. It varies for different languages. Try to find another 3 commonly used methods to tokenize sentences. 
 
 ## [Discussions](https://discuss.mxnet.io/t/2363)
 

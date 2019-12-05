@@ -274,9 +274,9 @@ As you can see, each epoch takes more time due to the larger image size. As show
 
 ## Exercises
 
-* How does the output change when you select different content and style layers?
-* Adjust the weight hyper-parameters in the loss function. Does the output retain more content or have less noise?
-* Use different content and style images. Can you create more interesting composite images?
+1. How does the output change when you select different content and style layers?
+1. Adjust the weight hyper-parameters in the loss function. Does the output retain more content or have less noise?
+1. Use different content and style images. Can you create more interesting composite images?
 
 ## [Discussions](https://discuss.mxnet.io/t/2449)
 

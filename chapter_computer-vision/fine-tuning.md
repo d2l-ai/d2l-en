@@ -162,15 +162,15 @@ As you can see, the fine-tuned model tends to achieve higher precision in the sa
 
 ## Exercises
 
-* Keep increasing the learning rate of `finetune_net`. How does the precision of the model change?
-* Further tune the hyper-parameters of `finetune_net` and `scratch_net` in the comparative experiment. Do they still have different precisions?
-* Set the parameters in `finetune_net.features` to the parameters of the source model and do not update them during training. What will happen? You can use the following code.
+1. Keep increasing the learning rate of `finetune_net`. How does the precision of the model change?
+2. Further tune the hyper-parameters of `finetune_net` and `scratch_net` in the comparative experiment. Do they still have different precisions?
+3. Set the parameters in `finetune_net.features` to the parameters of the source model and do not update them during training. What will happen? You can use the following code.
 
 ```{.python .input}
 finetune_net.features.collect_params().setattr('grad_req', 'null')
 ```
 
-* In fact, there is also a "hotdog" class in the `ImageNet` dataset. Its corresponding weight parameter at the output layer can be obtained by using the following code. How can we use this parameter?
+4. In fact, there is also a "hotdog" class in the `ImageNet` dataset. Its corresponding weight parameter at the output layer can be obtained by using the following code. How can we use this parameter?
 
 ```{.python .input  n=13}
 weight = pretrained_net.output.weight

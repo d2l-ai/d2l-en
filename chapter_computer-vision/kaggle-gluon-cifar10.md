@@ -358,9 +358,9 @@ for submitting results is similar to method in :numref:`sec_kaggle_house`.
 
 ## Exercises
 
-* Use the complete CIFAF-10 dataset for the Kaggle competition. Change the `batch_size` and number of epochs `num_epochs` to 128 and 100, respectively.  See what accuracy and ranking you can achieve in this competition.
-* What accuracy can you achieve when not using image augmentation?
-* Scan the QR code to access the relevant discussions and exchange ideas about the methods used and the results obtained with the community. Can you come up with any better techniques?
+1. Use the complete CIFAF-10 dataset for the Kaggle competition. Change the `batch_size` and number of epochs `num_epochs` to 128 and 100, respectively.  See what accuracy and ranking you can achieve in this competition.
+1. What accuracy can you achieve when not using image augmentation?
+1. Scan the QR code to access the relevant discussions and exchange ideas about the methods used and the results obtained with the community. Can you come up with any better techniques?
 
 ## [Discussions](https://discuss.mxnet.io/t/2450)
 

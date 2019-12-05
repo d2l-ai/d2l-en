@@ -79,7 +79,7 @@ for ax, label in zip(axes, batch.label[0][0:10]):
 
 ## Exercises
 
-* Referring to the MXNet documentation, what are the parameters for the constructors of the `image.ImageDetIter` and `image.CreateDetAugmenter` classes? What is their significance?
+1. Referring to the MXNet documentation, what are the parameters for the constructors of the `image.ImageDetIter` and `image.CreateDetAugmenter` classes? What is their significance?
 
 ## [Discussions](https://discuss.mxnet.io/t/2452)
 
