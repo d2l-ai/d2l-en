@@ -223,9 +223,9 @@ train_with_data_aug(train_augs, test_augs, net)
 
 ## Exercises
 
-* Train the model without using image augmentation: `train_with_data_aug(no_aug, no_aug)`. Compare training and testing accuracy when using and not using image augmentation. Can this comparative experiment support the argument that image augmentation can mitigate overfitting? Why?
-* Add different image augmentation methods in model training based on the CIFAR-10 dataset. Observe the implementation results.
-* With reference to the MXNet documentation, what other image augmentation methods are provided in Gluon's `transforms` module?
+1. Train the model without using image augmentation: `train_with_data_aug(no_aug, no_aug)`. Compare training and testing accuracy when using and not using image augmentation. Can this comparative experiment support the argument that image augmentation can mitigate overfitting? Why?
+1. Add different image augmentation methods in model training based on the CIFAR-10 dataset. Observe the implementation results.
+1. With reference to the MXNet documentation, what other image augmentation methods are provided in Gluon's `transforms` module?
 
 ## [Discussions](https://discuss.mxnet.io/t/2442)
 

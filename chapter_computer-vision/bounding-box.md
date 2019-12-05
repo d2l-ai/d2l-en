@@ -61,7 +61,7 @@ fig.axes.add_patch(bbox_to_rect(cat_bbox, 'red'));
 
 ## Exercises
 
-* Find some images and try to label a bounding box that contains the target. Compare the difference between the time it takes to label the bounding box and label the category.
+1. Find some images and try to label a bounding box that contains the target. Compare the difference between the time it takes to label the bounding box and label the category.
 
 
 ## [Discussions](https://discuss.mxnet.io/t/2444)

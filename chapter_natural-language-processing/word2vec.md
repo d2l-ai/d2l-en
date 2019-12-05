@@ -129,9 +129,9 @@ We then use the same method to obtain the gradients for other word vectors. Unli
 
 ## Exercises
 
-* What is the computational complexity of each gradient? If the dictionary contains a large volume of words, what problems will this cause?
-* There are some fixed phrases in the English language which consist of multiple words, such as "new york". How can you train their word vectors? Hint: See section 4 in the Word2vec paper[2].
-* Use the skip-gram model as an example to think about the design of a word2vec model. What is the relationship between the inner product of two word vectors and the cosine similarity in the skip-gram model? For a pair of words with close semantical meaning, why it is likely for their word vector cosine similarity to be high?
+1. What is the computational complexity of each gradient? If the dictionary contains a large volume of words, what problems will this cause?
+1. There are some fixed phrases in the English language which consist of multiple words, such as "new york". How can you train their word vectors? Hint: See section 4 in the Word2vec paper[2].
+1. Use the skip-gram model as an example to think about the design of a word2vec model. What is the relationship between the inner product of two word vectors and the cosine similarity in the skip-gram model? For a pair of words with close semantical meaning, why it is likely for their word vector cosine similarity to be high?
 
 
 
