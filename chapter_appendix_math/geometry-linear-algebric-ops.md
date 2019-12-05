@@ -208,7 +208,7 @@ In addition to working with vectors, another key object
 that you must understand to go far in linear algebra 
 is the *hyperplane*, a generalization to higher dimensions
 of a line (two dimensions) or of a plane (three dimensions).
-In an $n$-dimensional vector space, a hyperplane has $d-1$ dimensions
+In an $d$-dimensional vector space, a hyperplane has $d-1$ dimensions
 and divides the space into two half-spaces. 
 
 Let's start with an example.

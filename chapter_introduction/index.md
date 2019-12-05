@@ -1,7 +1,7 @@
 # Introduction
 :label:`chap_introduction`
 
-Until recently, nearly every computer program that interact with daily
+Until recently, nearly every computer program that we interact with daily
 were coded by software developers from first principles.
 Say that we wanted to write an application to manage an e-commerce platform.  After huddling around a whiteboard for a few hours to ponder the problem,
 we would come up with the broad strokes of a working solution that might probably look something like this:
