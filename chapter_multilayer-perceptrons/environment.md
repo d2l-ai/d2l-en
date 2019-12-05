@@ -146,6 +146,7 @@ the definition of even this simple term
 as shown in :numref:`fig_popvssoda`.
 
 ![](../img/popvssoda.png)
+:width:`400px`
 :label:`fig_popvssoda`
 
 If we were to build a machine translation system,
