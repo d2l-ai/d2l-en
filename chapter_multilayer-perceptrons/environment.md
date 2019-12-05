@@ -145,7 +145,7 @@ we will find considerable concept shift regarding
 the definition of even this simple term 
 as shown in :numref:`fig_popvssoda`.
 
-![](../img/popvssoda.png)
+![Concept shift on soft drink names in the United States.](../img/popvssoda.png)
 :width:`400px`
 :label:`fig_popvssoda`
 

@@ -10,7 +10,7 @@ In this competition, we attempt to identify 120 different breeds of dogs. The da
 :numref:`fig_kaggle_dog` shows the information on the competition's webpage. In order to submit the results, please register an account on the Kaggle website first.
 
 ![Dog breed identification competition website. The dataset for the competition can be accessed by clicking the "Data" tab.](../img/kaggle-dog.png)
-:width:`600px`
+:width:`400px`
 :label:`fig_kaggle_dog`
 
 First, import the packages or modules required for the competition.

@@ -181,7 +181,7 @@ with many examples of cats and dogs, such as the images below:
 
 |cat|cat|dog|dog|
 |:---------------:|:---------------:|:---------------:|:---------------:|
-|![](../img/cat3.jpg)|![](../img/cat2.jpg)|![](../img/dog1.jpg)|![](../img/dog2.jpg)|
+|![cat3](../img/cat3.jpg)|![](../img/cat2.jpg)|![](../img/dog1.jpg)|![](../img/dog2.jpg)|
 
 This way the detector will eventually learn to emit a very large positive number if it is a cat, a very large negative number if it is a dog,
 and something closer to zero if it is not sure,
