@@ -22,17 +22,17 @@ npx.set_np()
 
 ## Encoder
 
-Recall that the encoder of seq2seq can transform the inputs with different length to a universal fixed length content vector $\mathbf{c}$ by encoding the sequence information inside $\mathbf{c}$. We usually use RNN layers within the encoder.
+Recall that the encoder of seq2seq can transform the inputs with different length to a universal fixed length context vector $\mathbf{c}$ by encoding the sequence information inside $\mathbf{c}$. We usually use RNN layers within the encoder.
 
 Let's think of an input sequence $x_1, \ldots, x_T$, where $x_t$ is $t$-th word of the inputs. At timestep $t$, the RNN will have two vectors as input: the $x_t$'s feature vector $\mathbf{x}_t$ and the hidden state of the last timestep $\mathbf{h}_t$. Let's denote the transformation of the RNN's hidden states by a function $f$: 
 
 $$\mathbf{h}_t = f (\mathbf{x}_t, \mathbf{h}_{t-1}).$$
 
-Next, the encoder absorbs the information of all the hidden states and encodes into the content vector $\mathbf{c}$ by a function $q$:
+Next, the encoder absorbs the information of all the hidden states and encodes into the context vector $\mathbf{c}$ by a function $q$:
 
 $$\mathbf{c} = q (\mathbf{h}_1, \ldots, \mathbf{h}_T).$$
 
-For example, if we choose $q$ as $q (\mathbf{h}_1, \ldots, \mathbf{h}_T) = \mathbf{h}_T$, then the content vector will be the final hidden state $\mathbf{h}_T$.
+For example, if we choose $q$ as $q (\mathbf{h}_1, \ldots, \mathbf{h}_T) = \mathbf{h}_T$, then the context vector will be the final hidden state $\mathbf{h}_T$.
 
 So far what we describe above is a signle directional RNN, where each timestep's hidden state only depends on the previous tiemsteps'. We can also use other forms of RNNs such as GRUs, LSTMs and, bidirectional RNNs to encode the sequential information.
 
@@ -80,9 +80,9 @@ len(state), state[0].shape, state[1].shape
 ## Decoder
 :label:`sec_seq2seq_decoder`
 
-As we just introduced, the content vector $\mathbf{c}$ encodes the information from the whole input sequence $x_1, \ldots, x_T$. Suppose that the given outputs in the training set are $y_1, \ldots, y_{T'}$. At each timestep $t'$, the conditional probability of output $y_{t'}$ will base on the previous output sequences $y_1, \ldots, y_{t'-1}$ and the content vector $\mathbf{c}$, i.e., $$P(y_{t'} \mid y_1, \ldots, y_{t'-1}, \mathbf{c}).$$
+As we just introduced, the context vector $\mathbf{c}$ encodes the information from the whole input sequence $x_1, \ldots, x_T$. Suppose that the given outputs in the training set are $y_1, \ldots, y_{T'}$. At each timestep $t'$, the conditional probability of output $y_{t'}$ will base on the previous output sequences $y_1, \ldots, y_{t'-1}$ and the context vector $\mathbf{c}$, i.e., $$P(y_{t'} \mid y_1, \ldots, y_{t'-1}, \mathbf{c}).$$
 
-Hence, we can use another RNN as the decoder. At timestep $t'$, the decoder will update its hidden state $\mathbf{s}_{t'}$ by three inputs: $y_{t'-1}$'s feature vector $\mathbf{y}_{t'-1}$, the content vector $\mathbf{c}$, and the hidden state of the last timestep $\mathbf{s}_{t'}$. Let's denote the transformation of the RNN's hidden states within the decoder by a function $g$: 
+Hence, we can use another RNN as the decoder. At timestep $t'$, the decoder will update its hidden state $\mathbf{s}_{t'}$ by three inputs: $y_{t'-1}$'s feature vector $\mathbf{y}_{t'-1}$, the context vector $\mathbf{c}$, and the hidden state of the last timestep $\mathbf{s}_{t'}$. Let's denote the transformation of the RNN's hidden states within the decoder by a function $g$: 
 
 $$\mathbf{s}_{t'} = f (\mathbf{y}_{t'-1}, \mathbf{c}, \mathbf{s}_{t'-1}).$$
 
