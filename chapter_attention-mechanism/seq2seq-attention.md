@@ -3,7 +3,7 @@
 
 In this section, we add the attention mechanism to the sequence to sequence (seq2seq)
 model as introduced in :numref:`sec_seq2seq`
-to explicitly select states.
+to explicitly aggregate states with weights.
 :numref:`fig_s2s_attention` shows the model
 architecture for encoding and decoding at the timestep $t$. Here, the memory of the
 attention layer consists of all the information that the encoder has 
