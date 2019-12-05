@@ -88,11 +88,11 @@ By taking the square error and weighting the left and right sides of the formula
 
 ## Exercises
 
-* If a word appears in the context window of another word, how can we use the
+1. If a word appears in the context window of another word, how can we use the
   distance between them in the text sequence to redesign the method for
   computing the conditional probability $p_{ij}$? Hint: See section 4.2 from the
   paper GloVe :cite:`Pennington.Socher.Manning.2014`.
-* For any word, will its central target word bias term and context word bias term be equivalent to each other in GloVe? Why?
+1. For any word, will its central target word bias term and context word bias term be equivalent to each other in GloVe? Why?
 
 
 ## [Discussions](https://discuss.mxnet.io/t/2389)

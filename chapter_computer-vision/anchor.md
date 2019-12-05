@@ -233,10 +233,10 @@ In practice, we can remove prediction bounding boxes with lower confidence level
 
 ## Exercises
 
-* Change the `sizes` and `ratios` values in `contrib.nd.MultiBoxPrior` and observe the changes to the generated anchor boxes.
-* Construct two bounding boxes with and IoU of 0.5, and observe their coincidence.
-* Verify the output of offset `labels[0]` by marking the anchor box offsets as defined in this section (the constant is the default value).
-* Modify the variable `anchors` in the "Labeling Training Set Anchor Boxes" and "Output Bounding Boxes for Prediction" sections. How do the results change?
+1. Change the `sizes` and `ratios` values in `contrib.nd.MultiBoxPrior` and observe the changes to the generated anchor boxes.
+1. Construct two bounding boxes with and IoU of 0.5, and observe their coincidence.
+1. Verify the output of offset `labels[0]` by marking the anchor box offsets as defined in this section (the constant is the default value).
+1. Modify the variable `anchors` in the "Labeling Training Set Anchor Boxes" and "Output Bounding Boxes for Prediction" sections. How do the results change?
 
 
 ## [Discussions](https://discuss.mxnet.io/t/2445)

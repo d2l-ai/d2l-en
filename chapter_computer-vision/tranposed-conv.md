@@ -128,7 +128,7 @@ Y == np.dot(W.T, X.reshape(-1)).reshape(3, 3)
 
 ## Exercises
 
-* Is it efficient to use matrix multiplication to implement convolution operations? Why?
+1. Is it efficient to use matrix multiplication to implement convolution operations? Why?
 
 ## [Discussions](https://discuss.mxnet.io/t/transposed-convolution/4366)
 

@@ -374,7 +374,7 @@ display(img, output, threshold=0.3)
 
 ## Exercises
 
-* Due to space limitations, we have ignored some of the implementation details of SSD models in this experiment. Can you further improve the model in the following areas?
+1. Due to space limitations, we have ignored some of the implementation details of SSD models in this experiment. Can you further improve the model in the following areas?
 
 
 ### Loss Function
@@ -426,10 +426,10 @@ d2l.plt.legend();
 
 ### Training and Prediction
 
-* When an object is relatively large compared to the image, the model normally adopts a larger input image size.
-* This generally produces a large number of negative anchor boxes when labeling anchor box categories. We can sample the negative anchor boxes to better balance the data categories. To do this, we can set the `MultiBoxTarget` function's `negative_mining_ratio` parameter.
-* Assign hyper-parameters with different weights to the anchor box category loss and positive anchor box offset loss in the loss function.
-* Refer to the SSD paper. What methods can be used to evaluate the precision of
+2. When an object is relatively large compared to the image, the model normally adopts a larger input image size.
+3. This generally produces a large number of negative anchor boxes when labeling anchor box categories. We can sample the negative anchor boxes to better balance the data categories. To do this, we can set the `MultiBoxTarget` function's `negative_mining_ratio` parameter.
+4. Assign hyper-parameters with different weights to the anchor box category loss and positive anchor box offset loss in the loss function.
+5. Refer to the SSD paper. What methods can be used to evaluate the precision of
   object detection models :cite:`Liu.Anguelov.Erhan.ea.2016`?
 
 ## [Discussions](https://discuss.mxnet.io/t/2453)

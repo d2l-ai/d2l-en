@@ -225,7 +225,7 @@ def load_data_voc(batch_size, crop_size):
 
 ## Exercises
 
-* Recall the content we covered in :numref:`sec_image_augmentation`. Which of the image augmentation methods used in image classification would be hard to use in semantic segmentation?
+1. Recall the content we covered in :numref:`sec_image_augmentation`. Which of the image augmentation methods used in image classification would be hard to use in semantic segmentation?
 
 
 ## [Discussions](https://discuss.mxnet.io/t/2448)

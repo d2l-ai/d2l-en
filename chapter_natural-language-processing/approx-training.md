@@ -80,9 +80,9 @@ In addition, because the order of magnitude for $L(w_o)-1$ is $\mathcal{O}(\text
 
 ## Exercises
 
-* Before reading the next section, think about how we should sample noise words in negative sampling.
-* What makes the last formula in this section hold?
-* How can we apply negative sampling and hierarchical softmax in the skip-gram model?
+1. Before reading the next section, think about how we should sample noise words in negative sampling.
+1. What makes the last formula in this section hold?
+1. How can we apply negative sampling and hierarchical softmax in the skip-gram model?
 
 ## [Discussions](https://discuss.mxnet.io/t/2386)
 

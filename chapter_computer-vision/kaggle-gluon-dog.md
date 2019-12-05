@@ -324,9 +324,9 @@ method for submitting results is similar to method in
 
 ## Exercises
 
-* When using the entire Kaggle dataset, what kind of results do you get when you increase the `batch_size` (batch size) and `num_epochs` (number of epochs)?
-* Do you get better results if you use a deeper pre-trained model?
-* Scan the QR code to access the relevant discussions and exchange ideas about the methods used and the results obtained with the community. Can you come up with any better techniques?
+1. When using the entire Kaggle dataset, what kind of results do you get when you increase the `batch_size` (batch size) and `num_epochs` (number of epochs)?
+1. Do you get better results if you use a deeper pre-trained model?
+1. Scan the QR code to access the relevant discussions and exchange ideas about the methods used and the results obtained with the community. Can you come up with any better techniques?
 
 ## [Discussions](https://discuss.mxnet.io/t/2451)
 

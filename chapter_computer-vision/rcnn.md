@@ -206,7 +206,7 @@ chapter.
 
 ## Exercises
 
-* Study the implementation of each model in the [GluonCV toolkit](https://github.com/dmlc/gluon-cv/) related to this section.
+1. Study the implementation of each model in the [GluonCV toolkit](https://github.com/dmlc/gluon-cv/) related to this section.
 
 
 ## [Discussions](https://discuss.mxnet.io/t/2447)

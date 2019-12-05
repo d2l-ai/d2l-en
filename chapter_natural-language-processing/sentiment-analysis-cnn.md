@@ -196,9 +196,9 @@ d2l.predict_sentiment(net, vocab, 'this movie is so bad')
 
 ## Exercises
 
-* Tune the hyper-parameters and compare the two sentiment analysis methods, using recurrent neural networks and using convolutional neural networks, as regards accuracy and operational efficiency.
-* Can you further improve the accuracy of the model on the test set by using the three methods introduced in the previous section: tuning hyper-parameters, using larger pre-trained word vectors, and using the spaCy word tokenization tool?
-* What other natural language processing tasks can you use textCNN for?
+1. Tune the hyper-parameters and compare the two sentiment analysis methods, using recurrent neural networks and using convolutional neural networks, as regards accuracy and operational efficiency.
+1. Can you further improve the accuracy of the model on the test set by using the three methods introduced in the previous section: tuning hyper-parameters, using larger pre-trained word vectors, and using the spaCy word tokenization tool?
+1. What other natural language processing tasks can you use textCNN for?
 
 
 ## [Discussions](https://discuss.mxnet.io/t/2392)

@@ -140,8 +140,8 @@ get_analogy('do', 'did', 'go', glove_6b50d)
 
 ## Exercises
 
-* Test the fastText results.
-* If the dictionary is extremely large, how can we accelerate finding synonyms and analogies?
+1. Test the fastText results.
+1. If the dictionary is extremely large, how can we accelerate finding synonyms and analogies?
 
 
 ## [Discussions](https://discuss.mxnet.io/t/2390)
