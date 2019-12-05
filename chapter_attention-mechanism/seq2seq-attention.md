@@ -1,21 +1,22 @@
 # Sequence to Sequence with Attention Mechanism
 :label:`sec_seq2seq_attention`
 
-In this section, we add the attention mechanism to the sequence to sequence
-model introduced in :numref:`sec_seq2seq`
-to explicitly select state. :numref:`fig_s2s_attention` shows the model
+In this section, we add the attention mechanism to the sequence to sequence (seq2seq)
+model as introduced in :numref:`sec_seq2seq`
+to explicitly select states.
+:numref:`fig_s2s_attention` shows the model
 architecture for encoding and decoding at the timestep $t$. Here, the memory of the
 attention layer consists of all the information that the encoder has 
-seen---the encoder outputs at each timestep. 
+seen---the encoder output at each timestep. 
 During the decoding, the decoder output from the previous timestep $t-1$ is used as the query.
-While the output of the attention model is viewed as the context information, 
-which is then concatenated with the decode input $D_t$. Finally, we feed the concatenation into the decoder.
+The output of the attention model is viewed as the context information, and such context is concatenated with the decoder input $D_t$.
+Finally, we feed the concatenation into the decoder.
 
 ![The second timestep in decoding for the sequence to sequence model with attention mechanism.](../img/seq2seq_attention.svg)
 :label:`fig_s2s_attention`
 
 
-What is more, to better visualize the overall architecture of seq2seq with attention model, the layer structure of its encoder and decoder is shown in :numref:`fig_s2s_attention_details`.
+To illustrate the overall architecture of seq2seq with attention model, the layer structure of its encoder and decoder is shown in :numref:`fig_s2s_attention_details`.
 
 ![The layers in the sequence to sequence model with attention mechanism.](../img/seq2seq-attention-details.svg)
 :label:`fig_s2s_attention_details`
@@ -29,17 +30,17 @@ npx.set_np()
 
 ## Decoder
 
-Since the encoder of seq2seq with attention mechanism is the same as `Seq2SeqEncoder` in :numref:`sec_seq2seq`, we will dive directly into the decoder. We add a MLP attention layer (`MLPAttention`) which has the same hidden size as the LSTM layer in the decoder. Then we initialize the state of the decoder by passing three items from the encoder:
+Since the encoder of seq2seq with attention mechanisms is the same as `Seq2SeqEncoder` in :numref:`sec_seq2seq`, we will just focus on the decoder. We add an MLP attention layer (`MLPAttention`) which has the same hidden size as the LSTM layer in the decoder. Then we initialize the state of the decoder by passing three items from the encoder:
 
-- **the encoder outputs of all timesteps**, which are used as the attention layer's memory with identical keys and values;
+- **the encoder outputs of all timesteps**: they are used as the attention layer's memory with identical keys and values;
 
-- **the hidden state of the encoder's last timestep** that is used as the initial decoder's hidden state;
+- **the hidden state of the encoder's final timestep**: it is used as the initial decoder's hidden state;
 
-- **the encoder valid lengths**, so the attention layer will not consider the padding tokens with in the encoder outputs.
+- **the encoder valid length**: so the attention layer will not consider the padding tokens with in the encoder outputs.
 
-In each timestep of the decoding, we use the output of the decoder's last RNN layer as the query for the attention layer. The attention model's output is then concatenated with the input embedding vector to feed into the RNN layer. Despite the RNN layer hidden state also contains history information from decoder, the attention output explicitly selects the encoder outputs based on the `enc_valid_len`, so that the attention output suspends other non-correlated information.
+At each timestep of the decoding, we use the output of the decoder's last RNN layer as the query for the attention layer. The attention model's output is then concatenated with the input embedding vector to feed into the RNN layer. Although the RNN layer hidden state also contains history information from decoder, the attention output explicitly selects the encoder outputs based on `enc_valid_len`, so that the attention output suspends other irrelevant information.
 
-Let's implement the `Seq2SeqAttentionDecoder` together, and see how it differs from the decoder in seq2seq model from :numref:`sec_seq2seq_decoder`.
+Let's implement the `Seq2SeqAttentionDecoder`, and see how it differs from the decoder in seq2seq from :numref:`sec_seq2seq_decoder`.
 
 ```{.python .input  n=2}
 class Seq2SeqAttentionDecoder(d2l.Decoder):
@@ -76,7 +77,7 @@ class Seq2SeqAttentionDecoder(d2l.Decoder):
                                         enc_valid_len]
 ```
 
-Now it is the time to validate our seq2seq with attention model. To be consistant with the seq2seq without attention in :numref:`sec_seq2seq`, we use the same hyper-parameters for `vocab_size`, `embed_size`, `num_hiddens`, and `num_layers`. As a result, we get the same decoder output shape, but the state structure is changed.
+Now we can test the seq2seq with attention model. To be consistent with the model without attention in :numref:`sec_seq2seq`, we use the same hyper-parameters for `vocab_size`, `embed_size`, `num_hiddens`, and `num_layers`. As a result, we get the same decoder output shape, but the state structure is changed.
 
 ```{.python .input  n=3}
 encoder = d2l.Seq2SeqEncoder(vocab_size=10, embed_size=8,
@@ -94,10 +95,12 @@ out.shape, len(state), state[0].shape, len(state[1]), state[1][0].shape
 ## Training
 
 Similar to :numref:`sec_seq2seq_training`, we try a toy model by applying
-the same training hyper-parameters and the same training loss.
+the same training hyperparameters and the same training loss.
 As we can see from the result, since the
-sequences in the training dataset are relative short. The additional attention
-layer does not lead to a significant improvement. But due to the computational 
+sequences in the training dataset are relative short,
+the additional attention
+layer does not lead to a significant improvement.
+Due to the computational 
 overhead of both the encoder's and the decoder's attention layers, this model
 is much slower than the seq2seq model without attention.
 
@@ -125,13 +128,13 @@ for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
 
 ## Summary
 
-* The seq2seq with attention adds an additional attention layer to the standard `Seq2seqDecoder`.
-* The decoder of the seq2seq with attention model passes three items from the encoder: the encoder outputs of all timesteps, the hidden state of the encoder's last timestep, and the encoder valid lengths.
+* The seq2seq model with attention adds an additional attention layer to the model without attention.
+* The decoder of the seq2seq with attention model passes three items from the encoder: the encoder outputs of all timesteps, the hidden state of the encoder's final timestep, and the encoder valid length.
 
 ## Exercises
 
-* Compare the `Seq2SeqAttentionDecoder` versus the standard `Seq2seqDecoder`. Use the same parameters and compare their losses.
-* Can you think of any scenarios that the `Seq2SeqAttentionDecoder` will outperform the `Seq2seqDecoder`?
+1. Compare `Seq2SeqAttentionDecoder` and `Seq2seqDecoder` by using the same parameters and checking their losses.
+1. Can you think of any use cases where `Seq2SeqAttentionDecoder` will outperform `Seq2seqDecoder`?
 
 
 ## [Discussions](https://discuss.mxnet.io/t/seq2seq-attention/4345)

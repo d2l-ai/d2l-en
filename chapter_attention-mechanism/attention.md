@@ -174,7 +174,7 @@ atten(np.ones((2, 1, 2)), keys, values, np.array([2, 6]))
 
 ## Exercises
 
-* What are the advantages and disadvantages for dot product attention and multilayer perceptron attention, respectively?
+1. What are the advantages and disadvantages for dot product attention and multilayer perceptron attention, respectively?
 
 
 ## [Discussions](https://discuss.mxnet.io/t/attention/4343)

@@ -454,9 +454,9 @@ for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
 
 ## Exercises
 
-* Try a large size of epochs and compare the loss between seq2seq model and Transformer model in earlier stage and later stage.
-* Can you think of another functions for positional encoding?
-* Compare layer normalization and batch normalization, what are the suitable scenarios to apply them?
+1. Try a large size of epochs and compare the loss between seq2seq model and Transformer model in earlier stage and later stage.
+1. Can you think of another functions for positional encoding?
+1. Compare layer normalization and batch normalization, what are the suitable scenarios to apply them?
 
 
 ## [Discussions](https://discuss.mxnet.io/t/4344)
