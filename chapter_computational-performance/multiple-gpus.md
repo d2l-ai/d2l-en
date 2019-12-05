@@ -10,21 +10,21 @@ Let's start with a simple computer vision problem and a slightly archaic network
 ![Model parallelism in the original AlexNet design due to limited GPU memory.](../img/alexnet-original.svg)
 :label:`fig_alexnet_original`
 
-* We could partition the network layers across multiple GPUs. That is, each GPU takes as input the data flowing into a particular layer, processes data across a number of subsequent layers and then sends the data to the next GPU. 
-    * This allows us to process data with larger networks when compared to what a single GPU could handle. 
+* We could partition the network layers across multiple GPUs. That is, each GPU takes as input the data flowing into a particular layer, processes data across a number of subsequent layers and then sends the data to the next GPU.
+    * This allows us to process data with larger networks when compared to what a single GPU could handle.
     * Memory footprint per GPU can be well controlled (it's a fraction of the total network footprint)
     * The interface between layers (and thus GPUs) requires tight synchronization. This can be tricky, in particular if the computational workloads are not properly matched between layers. The problem is exacerbated for large numbers of GPUs.
     * The interface between layers requires large amounts of data transfer (activations, gradients). This may overwhelm the bandwidth of the GPU buses.
     * Compute intensive, yet sequential operations are nontrivial to partition. See e.g., :cite:`Mirhoseini.Pham.Le.ea.2017` for a best effort in this regard. It remains a difficult problem and it is unclear whether it is possible to achieve good (linear) scaling on nontrivial problems. We do not recommend it unless there is excellent framework / OS support for chaining together multiple GPUs.
-* We could split the work required by individual layers. For instance, rather than computing 64 channels on a single GPU we could split up the problem across 4 GPUs, each of which generate data for 16 channels. Likewise, for a dense layer we could split the number of output neurons. :numref:`fig_alexnet_original` illustrates this design. The figure is taken from :cite:`Krizhevsky.Sutskever.Hinton.2012` where this strategy was used to deal with GPUs that had a very small memory footprint (2GB at the time). 
-    * This allows for good scaling in terms of computation, provided that the number of channels (or neurons) is not too small. 
+* We could split the work required by individual layers. For instance, rather than computing 64 channels on a single GPU we could split up the problem across 4 GPUs, each of which generate data for 16 channels. Likewise, for a dense layer we could split the number of output neurons. :numref:`fig_alexnet_original` illustrates this design. The figure is taken from :cite:`Krizhevsky.Sutskever.Hinton.2012` where this strategy was used to deal with GPUs that had a very small memory footprint (2GB at the time).
+    * This allows for good scaling in terms of computation, provided that the number of channels (or neurons) is not too small.
     * Multiple GPUs can process increasingly larger networks since the memory available scales linearly.
     * We need a *very large* number of synchronization / barrier operations since each layer depends on the results from all other layers.
     * The amount of data that needs to be transferred is potentially even larger than when distributing layers across GPUs. We do not recommend this approach due to its bandwidth cost and complexity.
 * Lastly we could partition data across multiple GPUs. This way all GPUs perform the same type of work, albeit on different observations. Gradients are aggregated between GPUs after each minibatch.
     * This is the simplest approach and it can be applied in any situation.
     * Adding more GPUs does not allow us to train larger models.
-    * We only need to synchronize after each minibatch. That said, it's highly desirable to start exchanging gradients parameters already while others are still being computed. 
+    * We only need to synchronize after each minibatch. That said, it's highly desirable to start exchanging gradients parameters already while others are still being computed.
     * Large numbers of GPUs lead to very large minibatch sizes, thus reducing training efficiency.
 
 ![Parallelization on multiple GPUs. From left to right - original problem, network partitioning, layer partitioning, data parallelism.](../img/splitting.svg)
@@ -36,17 +36,17 @@ By and large, data parallelism is the most convenient way to proceed, provided t
 
 Assume that there are $k$ GPUs on a machine. Given the model to be trained, each GPU will maintain a complete set of model parameters independently. Training proceeds as follows (see :numref:`fig_data_parallel` for details on data parallel training on two GPUs):
 
-* In any iteration of training, given a random minibatch, we split the examples in the batch into $k$ portions and distribute them evenly across the GPUs. 
-* Each GPU calculates loss and gradient of the model parameters based on the minibatch subset it was assigned and the model parameters it maintains. 
-* The local gradients of each of the $k$ GPUs are aggregated to obtain the current minibatch stochastic gradient. 
-* The aggregate gradient is re-distributed to each GPU. 
-* Each GPU uses this minibatch stochastic gradient to update the complete set of model parameters that it maintains. 
+* In any iteration of training, given a random minibatch, we split the examples in the batch into $k$ portions and distribute them evenly across the GPUs.
+* Each GPU calculates loss and gradient of the model parameters based on the minibatch subset it was assigned and the model parameters it maintains.
+* The local gradients of each of the $k$ GPUs are aggregated to obtain the current minibatch stochastic gradient.
+* The aggregate gradient is re-distributed to each GPU.
+* Each GPU uses this minibatch stochastic gradient to update the complete set of model parameters that it maintains.
 
 ![Calculation of minibatch stochastic gradient using data parallelism and two GPUs. ](../img/data-parallel.svg)
 :label:`fig_data_parallel`
 
 A comparison of different ways of parallelization on multiple GPUs is depicted in :numref:`fig_splitting`.
-Note that in practice we *increase* the minibatch size $k$-fold when training on $k$ GPUs such that each GPU has the same amount of work to do as if we were training on a single GPU only. On a 16 GPU server this can increase the minibatch size considerably and we may have to increase the learning rate accordingly. Also note that :numref:`sec_batch_norm` needs to be adjusted (e.g., by keeping a separate batch norm coefficient per GPU). 
+Note that in practice we *increase* the minibatch size $k$-fold when training on $k$ GPUs such that each GPU has the same amount of work to do as if we were training on a single GPU only. On a 16 GPU server this can increase the minibatch size considerably and we may have to increase the learning rate accordingly. Also note that :numref:`sec_batch_norm` needs to be adjusted (e.g., by keeping a separate batch norm coefficient per GPU).
 In what follows we will use :numref:`sec_lenet` as the toy network to illustrate multi-GPU training. As always we begin by importing the relevant packages and modules.
 
 ```{.python .input  n=2}
@@ -158,7 +158,7 @@ def split_batch(X, y, ctx_list):
             gluon.utils.split_and_load(y, ctx_list))
 ```
 
-## Training 
+## Training
 
 Now we can implement multi-GPU training on a single minibatch. Its implementation is primarily based on the data parallelism approach described in this section. We will use the auxiliary functions we just discussed, `allreduce` and `split_and_load`, to synchronize the data among multiple GPUs. Note that we don't need to write any specific code to achieve parallelism. Since the compute graph doesn't have any dependencies across devices within a minibatch, it is executed in parallel *automatically*.
 
@@ -221,16 +221,16 @@ train(num_gpus=2, batch_size=256, lr=0.2)
 ## Summary
 
 * There are multiple ways to split deep network training over multiple GPUs. We could split them between layers, across layers, or across data. The former two require tightly choreographed data transfers. Data parallelism is the simplest strategy.
-* Data parallel training is straightforward. However, it increases the effective minibatch size to be efficient. 
-* Data is split across multiple GPUs, each GPU executes its own forward and backward operation and subsequently gradients are aggregated and results broadcast back to the GPUs. 
-* Large minibatches may require a slightly increased learning rate. 
+* Data parallel training is straightforward. However, it increases the effective minibatch size to be efficient.
+* Data is split across multiple GPUs, each GPU executes its own forward and backward operation and subsequently gradients are aggregated and results broadcast back to the GPUs.
+* Large minibatches may require a slightly increased learning rate.
 
 ## Exercises
 
 1. When training on multiple GPUs, change the minibatch size from $b$ to $k \cdot b$, i.e., scale it up by the number of GPUs.
-1. Compare accuracy for different learning rates. How does it scale with the number of GPUs. 
-1. Implement a more efficient allreduce that aggregates different parameters on different GPUs (why is this more efficient in the first place). 
-1. Implement multi-GPU test accuracy computation. 
+1. Compare accuracy for different learning rates. How does it scale with the number of GPUs.
+1. Implement a more efficient allreduce that aggregates different parameters on different GPUs (why is this more efficient in the first place).
+1. Implement multi-GPU test accuracy computation.
 
 ## [Discussions](https://discuss.mxnet.io/t/2383)
 
