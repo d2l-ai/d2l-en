@@ -207,7 +207,7 @@ Next, download the code for this book.
 ```bash
 sudo apt-get install unzip
 mkdir d2l-en && cd d2l-en
-curl https://d2l.ai/d2l-en-0.7.0.zip -o d2l-en.zip
+curl https://d2l.ai/d2l-en-0.7.1.zip -o d2l-en.zip
 unzip d2l-en.zip && rm d2l-en.zip
 ```
 
@@ -231,7 +231,7 @@ Finally, install MXNet and the `d2l` package. The postfix `cu101` means that thi
 
 ```bash
 pip install mxnet-cu101==1.6.0b20191122
-pip install d2l==0.11.0
+pip install d2l==0.11.1
 ```
 
 
