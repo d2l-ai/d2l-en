@@ -100,68 +100,68 @@ There exist many more choices for how to set the learning rate. For instance, we
 
 ## Convergence Analysis for Convex Objectives
 
-The following is optional and primarily serves to convey more intuition about the problem. We limit ourselves to one of the simplest proofs, as described by :cite:`Nesterov.Vial.2000`. Significantly more advanced proof techniques exist, e.g., whenever the objective function is particularly well behaved. :cite:`Hazan.Rakhlin.Bartlett.2008` show that for strongly convex functions, i.e., for functions that can be bounded from below by $\mathbf{x}^\top Q \mathbf{x}$, it is possible to minimize them in a small number of steps while decreasing the learning rate like $\eta(t) = \eta_0/(\beta t + 1)$. Unfortunately this case never really occurs in deep learning and we are left with a much more slowly decreasing rate in practice.
+The following is optional and primarily serves to convey more intuition about the problem. We limit ourselves to one of the simplest proofs, as described by :cite:`Nesterov.Vial.2000`. Significantly more advanced proof techniques exist, e.g., whenever the objective function is particularly well behaved. :cite:`Hazan.Rakhlin.Bartlett.2008` show that for strongly convex functions, i.e., for functions that can be bounded from below by $\mathbf{x}^\top \mathbf{Q} \mathbf{x}$, it is possible to minimize them in a small number of steps while decreasing the learning rate like $\eta(t) = \eta_0/(\beta t + 1)$. Unfortunately this case never really occurs in deep learning and we are left with a much more slowly decreasing rate in practice.
 
 Consider the case where
-$$w_{t+1} = w_{t} - \eta_t \partial_w l(x_t, w).$$
+$$\mathbf{w}_{t+1} = \mathbf{w}_{t} - \eta_t \partial_\mathbf{w} l(\mathbf{x}_t, \mathbf{w}).$$
 
-In particular, assume that $x_t$ is drawn from some distribution $p(x)$ and that $l(x, w)$ is a convex function in $w$ for all $x$. Last denote by
+In particular, assume that $\mathbf{x}_t$ is drawn from some distribution $P(\mathbf{x})$ and that $l(\mathbf{x}, \mathbf{w})$ is a convex function in $\mathbf{w}$ for all $\mathbf{x}$. Last denote by
 
-$$R(w) = E_{x \sim p}[l(x, w)]$$
+$$R(\mathbf{w}) = E_{\mathbf{x} \sim P}[l(\mathbf{x}, \mathbf{w})]$$
 
-the expected risk and by $R^*$ its minimum with regard to $w$. Last let $w^*$ be the minimizer (we assume that it exists within the domain which $w$ is defined). In this case we can track the distance between the current parameter $w_t$ and the risk minimizer $w^*$ and see whether it improves over time:
+the expected risk and by $R^*$ its minimum with regard to $\mathbf{w}$. Last let $\mathbf{w}^*$ be the minimizer (we assume that it exists within the domain which $\mathbf{w}$ is defined). In this case we can track the distance between the current parameter $\mathbf{w}_t$ and the risk minimizer $\mathbf{w}^*$ and see whether it improves over time:
 
 $$\begin{aligned}
-    \|w_{t+1} - w^*\|^2 & = \|w_{t} - \eta_t \partial_w l(x_t, w) - w^*\|^2 \\
-    & = \|w_{t} - w^*\|^2 + \eta_t^2 \|\partial_w l(x_t, w)\|^2 - 2 \eta_t
-    \left\langle w_t - w^*, \partial_w l(x_t, w)\right\rangle.
+    \|\mathbf{w}_{t+1} - \mathbf{w}^*\|^2 & = \|\mathbf{w}_{t} - \eta_t \partial_\mathbf{w} l(\mathbf{x}_t, \mathbf{w}) - \mathbf{w}^*\|^2 \\
+    & = \|\mathbf{w}_{t} - \mathbf{w}^*\|^2 + \eta_t^2 \|\partial_\mathbf{w} l(\mathbf{x}_t, \mathbf{w})\|^2 - 2 \eta_t
+    \left\langle \mathbf{w}_t - \mathbf{w}^*, \partial_\mathbf{w} l(\mathbf{x}_t, \mathbf{w})\right\rangle.
    \end{aligned}
 $$
 
-The gradient $\partial_w l(x_t, w)$ can be bounded from above by some Lipschitz constant $L$, hence we have that
+The gradient $\partial_\mathbf{w} l(\mathbf{x}_t, \mathbf{w})$ can be bounded from above by some Lipschitz constant $L$, hence we have that
 
-$$\eta_t^2 \|\partial_w l(x_t, w)\|^2 \leq \eta_t^2 L^2.$$
+$$\eta_t^2 \|\partial_\mathbf{w} l(\mathbf{x}_t, \mathbf{w})\|^2 \leq \eta_t^2 L^2.$$
 
-We are mostly interested in how the distance between $w_t$ and $w^*$ changes *in expectation*. In fact, for any specific sequence of steps the distance might well increase, depending on whichever $x_t$ we encounter. Hence we need to bound the inner product. By convexity we have that
+We are mostly interested in how the distance between $\mathbf{w}_t$ and $\mathbf{w}^*$ changes *in expectation*. In fact, for any specific sequence of steps the distance might well increase, depending on whichever $\mathbf{x}_t$ we encounter. Hence we need to bound the inner product. By convexity we have that
 
 $$
-l(x_t, w^*) \geq l(x_t, w_t) + \left\langle w^* - w_t, \partial_{w} l(x_t, w_t) \right\rangle.
+l(\mathbf{x}_t, \mathbf{w}^*) \geq l(\mathbf{x}_t, \mathbf{w}_t) + \left\langle \mathbf{w}^* - \mathbf{w}_t, \partial_{\mathbf{w}} l(\mathbf{x}_t, \mathbf{w}_t) \right\rangle.
 $$
 
 Using both inequalities and plugging it into the above we obtain a bound on the distance between parameters at time $t+1$ as follows:
 
-$$\|w_{t} - w^*\|^2 - \|w_{t+1} - w^*\|^2 \geq 2 \eta_t (l(x_t, w_t) - l(x_t, w^*)) - \eta_t^2 L^2.$$
+$$\|\mathbf{w}_{t} - \mathbf{w}^*\|^2 - \|\mathbf{w}_{t+1} - \mathbf{w}^*\|^2 \geq 2 \eta_t (l(\mathbf{x}_t, \mathbf{w}_t) - l(\mathbf{x}_t, \mathbf{w}^*)) - \eta_t^2 L^2.$$
 
 This means that we make progress as long as the expected difference between current loss and the optimal loss outweighs $\eta_t L^2$. Since the former is bound to converge to $0$ it follows that the learning rate $\eta_t$ also needs to vanish.
 
 Next we take expectations over this expression. This yields
 
-$$E_{w_t}\left[\|w_{t} - w^*\|^2\right] - E_{w_{t+1}|w_t}\left[\|w_{t+1} - w^*\|^2\right] \geq 2 \eta_t [E[R[w_t]] - R^*] -  \eta_t^2 L^2.$$
+$$E_{\mathbf{w}_t}\left[\|\mathbf{w}_{t} - \mathbf{w}^*\|^2\right] - E_{\mathbf{w}_{t+1}\mid \mathbf{w}_t}\left[\|\mathbf{w}_{t+1} - \mathbf{w}^*\|^2\right] \geq 2 \eta_t [E[R[\mathbf{w}_t]] - R^*] -  \eta_t^2 L^2.$$
 
 The last step involves summing over the inequalities for $t \in \{t, \ldots, T\}$. Since the sum telescopes and by dropping the lower term we obtain
 
-$$\|w_{0} - w^*\|^2 \geq 2 \sum_{t=1}^T \eta_t [E[R[w_t]] - R^*] - L^2 \sum_{t=1}^T \eta_t^2.$$
+$$\|\mathbf{w}_{0} - \mathbf{w}^*\|^2 \geq 2 \sum_{t=1}^T \eta_t [E[R[\mathbf{w}_t]] - R^*] - L^2 \sum_{t=1}^T \eta_t^2.$$
 
-Note that we exploited that $w_0$ is given and thus the expectation can be dropped. Last define
+Note that we exploited that $\mathbf{w}_0$ is given and thus the expectation can be dropped. Last define
 
-$$\bar{w} := \frac{\sum_{t=1}^T \eta_t w_t}{\sum_{t=1}^T \eta_t}.$$
+$$\bar{\mathbf{w}} := \frac{\sum_{t=1}^T \eta_t \mathbf{w}_t}{\sum_{t=1}^T \eta_t}.$$
 
 Then by convexity it follows that
 
-$$\sum_t \eta_t E[R[w_t]] \geq \sum \eta_t \cdot \left[E[\bar{w}]\right].$$
+$$\sum_t \eta_t E[R[\mathbf{w}_t]] \geq \sum \eta_t \cdot \left[E[\bar{\mathbf{w}}]\right].$$
 
 Plugging this into the above inequality yields the bound
 
 $$
-\left[E[\bar{w}]\right] - R^* \leq \frac{r^2 + L^2 \sum_{t=1}^T \eta_t^2}{2 \sum_{t=1}^T \eta_t}.
+\left[E[\bar{\mathbf{w}}]\right] - R^* \leq \frac{r^2 + L^2 \sum_{t=1}^T \eta_t^2}{2 \sum_{t=1}^T \eta_t}.
 $$
 
-Here $r^2 := \|w_0 - w^*\|^2$ is a bound on the distance between the initial choice of parameters and the final outcome. In short, the speed of convergence depends on how rapidly the loss function changes via the Lipschitz constant $L$ and how far away from optimality the initial value is $r$. Note that the bound is in terms of $\bar{w}$ rather than $w_T$. This is the case since $\bar{w}$ is a smoothed version of the optimization path. Now let's analyze some choices for $\eta_t$.
+Here $r^2 := \|\mathbf{w}_0 - \mathbf{w}^*\|^2$ is a bound on the distance between the initial choice of parameters and the final outcome. In short, the speed of convergence depends on how rapidly the loss function changes via the Lipschitz constant $L$ and how far away from optimality the initial value is $r$. Note that the bound is in terms of $\bar{\mathbf{w}}$ rather than $\mathbf{w}_T$. This is the case since $\bar{\mathbf{w}}$ is a smoothed version of the optimization path. Now let's analyze some choices for $\eta_t$.
 
 * **Known Time Horizon**. Whenever $r, L$ and $T$ are known we can pick $\eta = r/L \sqrt{T}$. This yields as upper bound $r L (1 + 1/T)/2\sqrt{T} < rL/\sqrt{T}$. That is, we converge with rate $O(1/\sqrt{T})$ to the optimal solution.
 * **Unknown Time Horizon**. Whenever we want to have a good solution for *any* time $T$ we can pick $\eta = O(1/\sqrt{T})$. This costs us an extra logarithmic factor and it leads to an upper bound of the form $O(\log T / \sqrt{T})$.
 
-Note that for strongly convex losses $l(x, w') \geq l(x, w) + \langle w'-w, \partial_w l(x, w) \rangle + \frac{\lambda}{2} \|w-w'\|^2$ we can design even more rapidly converging optimization schedules. In fact, an exponential decay in $\eta$ leads to a bound of the form $O(\log T / T)$.
+Note that for strongly convex losses $l(\mathbf{x}, \mathbf{w}') \geq l(\mathbf{x}, \mathbf{w}) + \langle \mathbf{w}'-\mathbf{w}, \partial_\mathbf{w} l(\mathbf{x}, \mathbf{w}) \rangle + \frac{\lambda}{2} \|\mathbf{w}-\mathbf{w}'\|^2$ we can design even more rapidly converging optimization schedules. In fact, an exponential decay in $\eta$ leads to a bound of the form $O(\log T / T)$.
 
 ## Stochastic Gradients and Finite Samples
 
