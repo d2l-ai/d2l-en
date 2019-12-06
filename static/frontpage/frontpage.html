@@ -265,7 +265,17 @@ a {
         var marker = new google.maps.Marker({
           position: {lat: loc[1], lng: loc[2]},
           map: map,
-          title: loc[0],
+          label: {text: loc[0], fontSize: '0px', color: 'black', fontWeight: 'bold'}
+        });
+        google.maps.event.addListener(marker, "mouseover", function(evt) {
+         label = this.getLabel();
+         label.fontSize = '12px';
+         this.setLabel(label);
+        });
+        google.maps.event.addListener(marker, "mouseout", function(evt) {
+         label = this.getLabel();
+         label.fontSize = '0px';
+         this.setLabel(label);
         });
       }
     }
