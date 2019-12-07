@@ -50,20 +50,43 @@ If we use the same example of synchronizing 160MB across 8 V100 GPUs we arrive a
 
 ## Multi-Machine Training
 
-![Foo.](../img/ps-multimachine.svg)
+Distributed training on multiple machines adds a further challenge: we need to communicate with servers that are only connected across a comparatively lower bandwidth fabric which can be over an order of magnitude slower in some cases. Synchronization across devices is tricky. After all, different machines running training code will have subtly different speed. Hence we need to *synchronize* them if we want to use synchronous distributed optimization. :numref:`fig_ps_multimachine` illustrates how distributed parallel training occurs.
+
+1. A (different) batch of data is read on each machine, split across multiple GPUs and transferred to GPU memory. There predictions and gradients are computed on each GPU batch separately. 
+2. The gradients from all local GPUs are aggregated on one GPU (or alternatively parts of it are aggregated over different GPUs.
+3. The gradients are sent to the CPU.
+4. The CPU sends the gradients to a central parameter server which aggregates all the gradients.
+5. The aggregate gradients are then used to update the weight vectors and the updated weight vectors are broadcast back to the individual CPUs.
+6. The information is sent to one (or multiple) GPUs.
+7. The updated weight vectors are spread across all GPUs. 
+
+![Multi-machine multi-GPU distributed parallel training.](../img/ps-multimachine.svg)
 :label:`fig_ps_multimachine`
 
-![Foo.](../img/ps-multips.svg)
+Each of these operations seems rather straightforward. And, indeed, they can be carried out efficiently *within* a single machine. Once we look at multiple machines, though, we can see that the central parameter server becomes the bottleneck. After all, the bandwidth per server is limited, hence for $m$ workers the time it takes to send all gradients to the server is $O(m)$. We can break through this barrier by increasing the number of servers to $n$. At this point each server only needs to store $O(1/n)$ of the parameters, hence the total time for updates and optimization becomes $O(m/n)$. Matching both numbers yields constant scaling regardless of how many workers we are dealing with. In practice we use the *same* machines both as workers and as servers. :numref:`fig_ps_multips` illustrates the design. See also :cite:`Li.Andersen.Park.ea.2014` for details. In particular, ensuring that multiple machines work without unreasonable delays is nontrivial. We omit details on barriers and will only briefly touch on synchronous and asynchronous updates below. 
+
+![Top - a single parameter server is a bottleneck since its bandwidth is finite. Bottom - multiple parameter servers store parts of the parameters with aggregate bandwidth.](../img/ps-multips.svg)
 :label:`fig_ps_multips`
 
-## Parameter Server 
+## (key,value) Stores
+
+Implementing the steps required for distributed multi-GPU training in practice is nontrivial. In particular, given the many different choices that we might encounter. This is why it pays to use a common abstraction, namely that of a (key,value) store with redefined update semantics. Across many servers and many GPUs the gradient computation can be defined as 
+
+$$\mathbf{g}_{i} = \sum_{k \in \mathrm{workers}} \sum_{j \in \mathrm{GPUs}} \mathbf{g}_{ijk}.$$ 
+
+The key aspect in this operation is that it is a *commutative reduction*, that is, it turns many vectors into one and the order in which the operation is applied doesn't matter. This is great for our purposes since we don't (need to) have fine grained control over when which gradient is received. Furthermore it's possible for us to perform the reduction stagewise. 
+
 
 ## Summary
 
 ## Exercises
 
 1. Duplex mode for ring sync (both directions)
-
+1. Fully asynchronous. Some delays permitted?
+1. Fault tolerance. How? What if we lose a server? Is this a problem?
+1. Checkpointing
+1. Tree aggregation. Can you do it faster?
+1. Other reductions (commutative semiring).
 
 ```{.python .input}
 
