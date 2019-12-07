@@ -12,4 +12,5 @@ auto-parallelism
 hardware
 multiple-gpus
 multiple-gpus-gluon
+parameterserver
 ```
