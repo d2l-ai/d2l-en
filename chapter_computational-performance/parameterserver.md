@@ -47,6 +47,7 @@ Consider the following thought experiment: given a ring of $n$ compute nodes (or
 :label:`fig_ringsync`
 
 If we use the same example of synchronizing 160MB across 8 V100 GPUs we arrive at approximately $2 \cdot 160 \mathrm{MB} / (3 \cdot 18 \mathrm{GB/s}) \approx 6 \mathrm{ms}$ This is quite a bit better than using the PCIe bus, even though we are now using 8 GPUs. Note that in practice these numbers are quite a bit worse, since deep learning frameworks often fail to assemble communication into large burst transfers. Moreover, timing is critical. 
+Note that there is a common misconception that ring synchronization is fundamentally different from other synchronization algorithms. The only difference is that the synchronization path is somewhat more elaborate when compared to a simple tree. 
 
 ## Multi-Machine Training
 
@@ -74,14 +75,26 @@ Implementing the steps required for distributed multi-GPU training in practice i
 
 $$\mathbf{g}_{i} = \sum_{k \in \mathrm{workers}} \sum_{j \in \mathrm{GPUs}} \mathbf{g}_{ijk}.$$ 
 
-The key aspect in this operation is that it is a *commutative reduction*, that is, it turns many vectors into one and the order in which the operation is applied doesn't matter. This is great for our purposes since we don't (need to) have fine grained control over when which gradient is received. Furthermore it's possible for us to perform the reduction stagewise. 
+The key aspect in this operation is that it is a *commutative reduction*, that is, it turns many vectors into one and the order in which the operation is applied doesn't matter. This is great for our purposes since we don't (need to) have fine grained control over when which gradient is received. Note that it's possible for us to perform the reduction stagewise. Furthermore, note that this operation is independent between blocks $i$ pertaining to different parameters (and gradients). 
 
+This allows us to define the following two operations: push, which accumulates gradients, and pull, which retrieves aggregate gradients. Since we have many different sets of gradients (after all, we have many layers), we need to index the gradients with a key $i$. This similarity to (key,value) stores, such as the one introduced in Dynamo
+:cite:`DeCandia.Hastorun.Jampani.ea.2007` is not by coincidence. They, too, satisfy many similar characteristics, in particular when it comes to distributing the parameters across multiple servers. 
+
+* **push(key, value)** sends a particular gradient (the value) from a worker to a common storage. There the parameter is aggregated, e.g. by summing it up. 
+* **pull(key, value)** retrieves an aggregate parameter from common storage, e.g. after combining the gradients from all workers. 
+
+By hiding all the complexity about synchronization behind a simple push and pull operation we can decouple the concerns of the statistical modeler who wants to be able to express optimization in simple terms and the systems engineer who needs to deal with the complexity inherent in distributed synchronization. In the next section we will experiment with such a (key,value) store in practice. 
 
 ## Summary
 
+* Synchronization needs to be highly adaptive to specific network infrastructure and connectivity within a server. This can make a significant difference to the time it takes to synchronize.
+* Ring-synchronization can be optimal for P3 and DGX-2 servers. For others possibly not so much.
+* A hierarchical synchronization strategy works well when adding multiple parameter servers for increased bandwidth.
+* Asynchronous communication (while computation is still ongoing) can improve performance. 
+
 ## Exercises
 
-1. Duplex mode for ring sync (both directions)
+1. Can you increase the ring synchronization even further? Hint - you can send messages in both directions. 
 1. Fully asynchronous. Some delays permitted?
 1. Fault tolerance. How? What if we lose a server? Is this a problem?
 1. Checkpointing
