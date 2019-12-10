@@ -358,7 +358,8 @@ Muhyun Kim, dennismalmgren, adursun, Anirudh Dagar, liqingnz, Pedro Larroy,
 lgov, ati-ozgur, Jun Wu, Matthias Blume, Lin Yuan, geogunow, Josh Gardner,
 Maximilian Böther, Rakib Islam, Leonard Lausen, Abhinav Upadhyay, rongruosong,
 Steve Sedlmeyer, ruslo, Rafael Schlatter, liusy182, Giannis Pappas, ruslo,
-ati-ozgur, qbaza, dchoi77, Adam Gerson, lkhphuc, Mark Atwood, christabella, vn09.
+ati-ozgur, qbaza, dchoi77, Adam Gerson, lkhphuc, Mark Atwood, christabella, vn09,
+Haibin Lin.
 
 We thank Amazon Web Services, especially Swami Sivasubramanian,
 Raju Gulabani, Charlie Bell, and Andrew Jassy for their generous support in writing this book. Without the available time, resources, discussions with colleagues, and continuous encouragement this book would not have happened.
