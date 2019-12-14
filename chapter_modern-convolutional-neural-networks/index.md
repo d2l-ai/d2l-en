@@ -1,4 +1,4 @@
-# Modern Convolutional Networks
+# Modern Convolutional Neural Networks
 :label:`chap_modern_cnn`
 
 Now that we understand the basics of wiring together convolutional neural networks, we will take you through a tour of modern deep learning.

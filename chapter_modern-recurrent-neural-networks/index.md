@@ -1,4 +1,4 @@
-# Modern Recurrent Networks
+# Modern Recurrent Neural Networks
 :label:`chap_modern_rnn`
 
 Although we have learned the basics of recurrent neural networks,
@@ -16,7 +16,7 @@ and discuss the bidirectional design with both forward and backward recursion.
 They are frequently adopted in modern recurrent networks.
 
 
-In fact, a large portion of sequence learning problems 
+In fact, a large portion of sequence learning problems
 such as automatic speech recognition, text to speech, and machine translation,
 consider both inputs and outputs to be sequences of arbitrary length.
 Finally, we will take machine translation as an example,
