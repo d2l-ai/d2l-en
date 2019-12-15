@@ -37,7 +37,7 @@ that it typically takes to learn good hidden representations of images.
 Learning a binary classifier with so many parameters
 might seem to require that we collect an enormous dataset,
 perhaps comparable to the number of dogs and cats on the planet.
-And yet Yet both humans and computers are able to distinguish cats from dogs quite well, seemingly contradicting these conclusions.
+And yet both humans and computers are able to distinguish cats from dogs quite well, seemingly contradicting these conclusions.
 That is because images exhibit rich structure
 that is typically exploited by humans and machine learning models alike.
 
