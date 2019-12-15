@@ -82,7 +82,7 @@ Indeed, :cite:`Krizhevsky.Sutskever.Hinton.2012` proposed a new variant of a con
 which achieved excellent performance in the ImageNet challenge.
 
 Interestingly in the lowest layers of the network,
-the model learned featrue extractors that resembled some traditional filters.
+the model learned feature extractors that resembled some traditional filters.
 :numref:`fig_filters` is reproduced from this paper
 and describes lower-level image descriptors.
 
