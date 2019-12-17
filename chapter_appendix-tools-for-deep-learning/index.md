@@ -8,8 +8,8 @@ In this chapter, we will walk you through major tools for deep learning, from in
 
 jupyter
 aws
-buy-gpu
-how-to-contribute
+selecting-servers-gpus
+contributing
 d2l
 ```
 

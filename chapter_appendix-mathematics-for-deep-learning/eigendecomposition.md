@@ -503,4 +503,4 @@ $$
 
 ## [Discussions](https://discuss.mxnet.io/t/5148)
 
-![](../img/qr_eigen-decomposition.svg)
+![](../img/qr_eigendecomposition.svg)

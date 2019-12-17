@@ -16,7 +16,7 @@ We next develop the theory of differential calculus to the point that we can ful
 
 Problems encountered in practice frequently are not certain, and thus we need a language to speak about uncertain things.  We review the theory of random variables and the most commonly encountered distributions so we may discuss models probabilistically.  This provides the foundation for the naive Bayes classifier, a probabilistic classification technique.
 
-Closely related to probability theory is the study of statistics.  While statistics is far too large a field to do justice in a short section, we will introduce fundamental concepts that all machine learning practitioners should be aware of, in particular: evaluating and comparing estimators, conducting hypothesis tests, and constructing confidence intervals. 
+Closely related to probability theory is the study of statistics.  While statistics is far too large a field to do justice in a short section, we will introduce fundamental concepts that all machine learning practitioners should be aware of, in particular: evaluating and comparing estimators, conducting hypothesis tests, and constructing confidence intervals.
 
 Last, we turn to the topic of information theory, which is the mathematical study of information storage and transmission.  This provides the core language by which we may discuss quantitatively how much information a model holds on a domain of discourse.
 
@@ -26,7 +26,7 @@ Taken together, these form the core of the mathematical concepts needed to begin
 :maxdepth: 2
 
 geometry-linear-algebric-ops
-eigen-decomposition
+eigendecomposition
 single-variable-calculus
 multivariable-calculus
 integral-calculus

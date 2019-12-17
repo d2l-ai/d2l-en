@@ -110,4 +110,4 @@ Your pull request will appear among the list of requests in the main repository.
 
 ## [Discussions](https://discuss.mxnet.io/t/2401)
 
-![](../img/qr_how-to-contribute.svg)
+![](../img/qr_contributing.svg)

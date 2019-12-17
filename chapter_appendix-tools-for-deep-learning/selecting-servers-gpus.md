@@ -65,4 +65,4 @@ We can see a number of things:
 
 ## [Discussions](https://discuss.mxnet.io/t/2400)
 
-![](../img/qr_buy-gpu.svg)
+![](../img/qr_selecting-servers-gpus.svg)
