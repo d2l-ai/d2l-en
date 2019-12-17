@@ -1,4 +1,4 @@
-# Sequence to Sequence with Attention Mechanism
+# Sequence to Sequence with Attention Mechanisms
 :label:`sec_seq2seq_attention`
 
 In this section, we add the attention mechanism to the sequence to sequence (seq2seq)

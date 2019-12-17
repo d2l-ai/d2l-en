@@ -104,7 +104,7 @@ This seems almost too good to be true: simply designate a block to be `HybridSeq
 
 ### Acceleration by Hybridization
 
-To demonstrate the performance improvement gained by compilation we compare the time needed to evaluate `net(x)` before and after hybridization. Let's define a function to measure this time first. It will come handy throughout the chapter as we set out to measure (and improve) performance. 
+To demonstrate the performance improvement gained by compilation we compare the time needed to evaluate `net(x)` before and after hybridization. Let's define a function to measure this time first. It will come handy throughout the chapter as we set out to measure (and improve) performance.
 
 ```{.python .input}
 # Saved in the d2l package for later use
@@ -120,7 +120,7 @@ class benchmark:
         print(self.description % self.timer.stop())
 ```
 
-Now we can invoke the network twice, once with and once without hybridization. 
+Now we can invoke the network twice, once with and once without hybridization.
 
 ```{.python .input  n=5}
 net = get_net()
