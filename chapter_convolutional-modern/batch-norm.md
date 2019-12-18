@@ -148,7 +148,7 @@ as we did before when introducing other layers.
 ### Fully-Connected Layers
 
 When applying BN to fully-connected layers,
-we usually inser BN after the affine transformation
+we usually insert BN after the affine transformation
 and before the nonlinear activation function.
 Denoting the input to the layer by $\mathbf{x}$,
 the linear transform (with weights $\theta$) by $f_{\theta}(\cdot)$,
@@ -203,7 +203,7 @@ we might need to apply our model to make one prediction at a time.
 Typically, after training, we use the entire dataset 
 to compute stable estimates of the activation statistics
 and then fix them at prediction time.
-Consequently, BN behaves differently during training and at test time
+Consequently, BN behaves differently during training and at test time.
 Recall that dropout also exhibits this characteristic.
 
 ## Implementation from Scratch
