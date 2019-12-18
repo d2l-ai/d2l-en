@@ -22,15 +22,15 @@ chapter_notation/index
 
 chapter_introduction/index
 chapter_preliminaries/index
-chapter_linear-neural-networks/index
+chapter_linear-networks/index
 chapter_multilayer-perceptrons/index
 chapter_deep-learning-computation/index
 chapter_convolutional-neural-networks/index
-chapter_modern-convolutional-neural-networks/index
+chapter_convolutional-modern/index
 chapter_recurrent-neural-networks/index
-chapter_modern-recurrent-neural-networks/index
+chapter_recurrent-modern/index
 chapter_attention-mechanisms/index
-chapter_optimization-algorithms/index
+chapter_optimization
 chapter_computational-performance/index
 chapter_computer-vision/index
 chapter_natural-language-processing/index
