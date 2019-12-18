@@ -8,7 +8,7 @@ The sequence to sequence (seq2seq) model is based on the encoder-decoder archite
 
 The layers in the encoder and the decoder are illustrated in :numref:`fig_seq2seq_details`.
 
-![](../img/seq2seq-details.svg)
+![Layers in the encoder and the decoder.](../img/seq2seq-details.svg)
 :label:`fig_seq2seq_details`
 
 In this section we will explain and implement the seq2seq model to train on the machine translation dataset.
