@@ -1,26 +1,22 @@
-# Using AWS Instances
+# Using AWS EC2 Instances
 :label:`sec_aws`
 
-Many deep learning applications require significant amounts of computation. Your local machine might be too slow to solve these problems in a reasonable amount of time. Cloud computing services can give you access to more powerful computers to run the GPU intensive portions of this book. In this section, we will show you how to set up an instance. We will use Jupyter Notebooks to run code on AWS (Amazon Web Services). The walkthrough includes a number of steps:
+In this section, we will show you how to install all libraries on a raw Linux machine. Remember that in :numref:`sec_sagemaker` we discussed how to use Amazon SagaMaker, while building an instance by yourself costs less on AWS. The walkthrough includes a number of steps:
 
-1. Request for a GPU instance.
+1. Request for a GPU Linux instance from AWS EC2.
 1. Optionally: install CUDA or use an AMI with CUDA preinstalled.
 1. Set up the corresponding MXNet GPU version.
 
-This process applies to other instances (and other clouds), too, albeit with some minor modifications.
+This process applies to other instances (and other clouds), too, albeit with some minor modifications. Before going forward, you need to create an AWS account, see :numref:`sec_sagemaker` for more details.
 
 
-## Registering Account and Logging In
+## Creating and Running an EC2 Instance
 
-First, we need to register an account at https://aws.amazon.com/. We strongly encourage you to use two-factor authentication for additional security. Furthermore, it is a good idea to set up detailed billing and spending alerts to avoid any unexpected surprises if you forget to suspend your computers. Note that you will need a credit card.
 After logging into your AWS account, click "EC2" (marked by the red box in :numref:`fig_aws`) to go to the EC2 panel.
 
 ![ Open the EC2 console. ](../img/aws.png)
 :width:`400px`
 :label:`fig_aws`
-
-
-## Creating and Running an EC2 Instance
 
 :numref:`fig_ec2` shows the EC2 panel with sensitive account information greyed out.
 
@@ -282,7 +278,6 @@ environments.
 
 ## Summary
 
-* Cloud computing services offer a wide variety of GPU servers.
 * You can launch and stop instances on demand without having to buy and build your own computer.
 * You need to install suitable GPU drivers before you can use them.
 
