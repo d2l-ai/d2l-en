@@ -208,7 +208,8 @@ The training function `train_ch5` is also very similar to `train_ch3` defined in
 this time using the Xavier initializer.
 The loss function and the training algorithm
 still use the cross-entropy loss function
-and minibatch stochastic gradient descent. Since each epoch takes tens of second to run, we visualize the training loss in a finer granularity.
+and minibatch stochastic gradient descent. Since each epoch takes tens of
+seconds to run, we visualize the training loss in a finer granularity.
 
 ```{.python .input}
 # Saved in the d2l package for later use
