@@ -67,6 +67,17 @@ h2.toc {
 padding: 20px 0 0 0;
 }
 
+.logos img {
+display: inline;
+margin: .6em;
+max-height: 70px;
+}
+
+.logos {
+padding-top: 2em;
+padding-bottom: 2em;
+}
+
 .features .mdl-cell {
     padding: 0 36px;
 }
@@ -226,13 +237,13 @@ a {
         </div>
         <div class="running-item">
           <a href="./chapter_appendix-tools-for-deep-learning/sagemaker.html">
-            <img src="./_images/sagemaker_logo.png"/>
+            <img src="./_images/logos/sagemaker.png"/>
             <p>Amazon<br>SageMaker</p>
           </a>
         </div>
         <div class="running-item">
           <!-- <a href="./chapter_appendix-tools-for-deep-learning/colab.html"> -->
-            <img src="./_images/colab_logo.png" />
+            <img src="./_images/logos/colab.png" />
             <p>Google<br>Colab</p>
           <!-- </a> -->
         </div>
@@ -277,9 +288,21 @@ a {
 </div>
 
 <div class="features mdl-grid">
-  <div class = "mdl-cell mdl-cell--12-col">
-    <h3>D2L as a textbook or a reference book</h3>
-    <br>
+  <div id = "textbook" class = "mdl-cell mdl-cell--12-col">
+    <h2>D2L as a textbook or a reference book</h2>
+    <div id = "logos" class="logos">
+      <img src="./_images/logos/cmu.png" />
+      <img src="./_images/logos/fudan.svg" />
+      <img src="./_images/logos/georgia_tech.svg" />
+      <img src="./_images/logos/IIT-bombay.svg" />
+      <img src="./_images/logos/IIT_Kanpur.svg" />
+      <img src="./_images/logos/IIT_Ropar.png" />
+      <img src="./_images/logos/kyungpook-national.png" />
+      <img src="./_images/logos/mit.svg" />
+      <img src="./_images/logos/northeastern.svg" />
+      <img src="./_images/logos/peking.svg" />
+      <img src="./_images/logos/sjtu.png" />
+    </div>
     <div id="map"></div>
     <script>
       function initMap() {
@@ -341,7 +364,7 @@ a {
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDHVyB-dRW3fhSdUmy3lqoiaNjV9JVUR4M&callback=initMap">
     </script>
     <button class="collapsible">
-        <center>[+] <i>Click here to show the full list. Please let d2lbook.en@gmail.com know if any is missed.</i></center>
+        <center>[+] <i>Click here to show the full list. </i></center>
     </button>
     <div class="expansion">
     <div class="institute mdl-grid">
@@ -373,6 +396,10 @@ a {
         Zhejiang University (China)
     </div> <!-- mdl-grid -->
     </div>
+
+
+    <h4>Please contact us at <a href="mailto:d2lbook.en@gmail.com">d2lbook.en@gmail.com</a> if any is missed.</h4>
+
     <!-- reverse the changes by google map... -->
     <style>
       a { font-weight: 400; }
