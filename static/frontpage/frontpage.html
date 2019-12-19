@@ -108,6 +108,28 @@ a {
         padding: 0 24px;
     }
 }
+
+.collapsible {
+    background-color: #EEE;
+    color: black;
+    cursor: pointer;
+    padding: 6px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 16px;
+}
+.collapsible-active, .collapsible:hover {
+    background-color: #DDD;
+}
+.expansion {
+    padding: 3px 6px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease-out;
+}
+
     </style>
 </head>
 
@@ -318,8 +340,11 @@ a {
     <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDHVyB-dRW3fhSdUmy3lqoiaNjV9JVUR4M&callback=initMap">
     </script>
+    <button class="collapsible">
+        <center>[+] <i>Click here to show the full list. Please let d2lbook.en@gmail.com know if any is missed.</i></center>
+    </button>
+    <div class="expansion">
     <div class="institute mdl-grid">
-      <div class = "mdl-cell mdl-cell--6-col ">
         Carnegie Mellon University (USA)<br>
         Fudan University (China)<br>
         Georgia Institute of Technology (USA)<br>
@@ -333,8 +358,6 @@ a {
         Shanghai Jiao Tong University (China)<br>
         Shanghai University of Finance and Economics (China)<br>
         Texas A&amp;M University (USA)<br>
-      </div>
-      <div class = "mdl-cell mdl-cell--6-col ">
         Universidade Federal de Minas Gerais (Brazil)<br>
         University of California, Berkeley (USA)<br>
         University of California, Los Angeles (USA)<br>
@@ -348,14 +371,13 @@ a {
         University of Washington (USA)<br>
         Universitat Politècnica de Catalunya (Spain)<br>
         Zhejiang University (China)
-      </div>
     </div> <!-- mdl-grid -->
-    <i>Please let d2lbook.en@gmail.com know if any is missed.</i>
+    </div>
     <!-- reverse the changes by google map... -->
     <style>
       a { font-weight: 400; }
     </style>
-  </div>
+    </div>
 </div>
 
 <div class="mdl-grid">
@@ -380,3 +402,19 @@ a {
 </div>
 
 <h2 class="toc"> Table of contents </h2>
+
+<script>
+var coll = document.getElementsByClassName("collapsible");
+var i;
+for (i = 0; i < coll.length; i++) {
+  coll[i].addEventListener("click", function() {
+    this.classList.toggle("collapsible-active");
+    var content = this.nextElementSibling;
+    if (content.style.maxHeight){
+      content.style.maxHeight = null;
+    } else {
+      content.style.maxHeight = content.scrollHeight + "px";
+    }
+  });
+}
+</script>
