@@ -51,6 +51,22 @@ h2.toc {
     width: 100%;
 }
 
+.running-item  {
+  max-width: 300px;
+}
+
+.running-item img {
+  height: 40px;
+}
+
+.running-item p {
+    padding: 20px;
+}
+
+.running.mdl-grid {
+padding: 20px 0 0 0;
+}
+
 .features .mdl-cell {
     padding: 0 36px;
 }
@@ -137,7 +153,7 @@ a {
 </div>
 
 <div class = "authors mdl-grid">
-  <div class = "mdl-cell mdl-cell--3-col mdl-cell--top">
+  <div id = "author" class = "mdl-cell mdl-cell--3-col mdl-cell--top">
     <div class="author-item">
       <img src="./_images/aston.jpg"/>
       <h3><a href="https://www.astonzhang.com/">Aston Zhang</a></h3>
@@ -175,11 +191,30 @@ a {
 </div>
 
 <div class = "features mdl-grid">
-  <div class = "mdl-cell mdl-cell--5-col mdl-cell--middle">
+  <div id = "jupyter" class = "mdl-cell mdl-cell--5-col mdl-cell--middle">
     <div class="content">
-      <h2>Each section is an executable <a href="chapter_installation/index.html">Jupyter notebook</a></h2>
+      <h2>Each section is an executable Jupyter notebook</h2>
       <p>You can modify the code and tune hyperparameters to get instant
       feedback to accumulate practical experiences in deep learning.</p>
+      <div class = "mdl-grid running">
+        <div class="running-item">
+          <a href="./chapter_installation/index.html">
+            <img src="./_images/laptop_jupyter.png"/>
+            <p>Run<br>locally</p>
+        </div>
+        <div class="running-item">
+          <a href="./chapter_appendix-tools-for-deep-learning/sagemaker.html">
+            <img src="./_images/sagemaker_logo.png"/>
+            <p>Amazon<br>SageMaker</p>
+          </a>
+        </div>
+        <div class="running-item">
+          <!-- <a href="./chapter_appendix-tools-for-deep-learning/colab.html"> -->
+            <img src="./_images/colab_logo.png" />
+            <p>Google<br>Colab</p>
+          <!-- </a> -->
+        </div>
+      </div>
     </div>
   </div>
   <div class = "mdl-cell mdl-cell--7-col">
@@ -316,6 +351,10 @@ a {
       </div>
     </div> <!-- mdl-grid -->
     <i>Please let d2lbook.en@gmail.com know if any is missed.</i>
+    <!-- reverse the changes by google map... -->
+    <style>
+      a { font-weight: 400; }
+    </style>
   </div>
 </div>
 
