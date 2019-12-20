@@ -69,15 +69,25 @@ padding: 20px 0 0 0;
 
 .logos img {
 display: inline;
-margin: .6em;
 max-height: 70px;
-max-width: 140px;
+max-width: 100px;
+margin-left: auto;
+margin-right: auto;
 }
 
 .logos {
-padding-top: 2em;
+padding-top: 1em;
 padding-bottom: 2em;
 }
+
+.logos .mdl-grid {
+padding: 0;
+}
+
+.features .logos .mdl-cell {
+padding: 10px 0;
+}
+
 
 .features .mdl-cell {
     padding: 0 36px;
@@ -119,6 +129,9 @@ a {
     .features-2 p {
         padding: 0 24px;
     }
+.features .mdl-cell {
+    padding: 0 8px;
+}
 }
 
 .collapsible {
@@ -292,45 +305,47 @@ a {
   <div id = "textbook" class = "mdl-cell mdl-cell--12-col">
     <h2>D2L as a textbook or a reference book</h2>
     <div id = "logos" class="logos">
-      <img src="./_images/logos/cmu.png" />
-      <img src="./_images/logos/emory.png" />
-      <img src="./_images/logos/fudan.svg" />
-      <img src="./_images/logos/georgia_tech.svg" />
-      <img src="./_images/logos/Habib_University.jpg" />
-      <img src="./_images/logos/hasso-plattner-institute.png" />
-      <img src="./_images/logos/HKUST.png" />
-      <img src="./_images/logos/Hust.png" />
-      <img src="./_images/logos/IIT-bombay.png" />
-      <img src="./_images/logos/IIT_Kanpur.svg" />
-      <img src="./_images/logos/IIT_Ropar.png" />
-      <img src="./_images/logos/Istanbul_Technical_University.svg" />
-      <img src="./_images/logos/kyungpook-national.png" />
-      <img src="./_images/logos/mit.svg" />
-      <img src="./_images/logos/national_chung_hsing.png" />
-      <img src="./_images/logos/National_United_University.svg" />
-      <img src="./_images/logos/Nazarbayev_University.png" />
-      <img src="./_images/logos/northeastern.svg" />
-      <img src="./_images/logos/peking.svg" />
-      <img src="./_images/logos/sjtu.png" />
-      <img src="./_images/logos/Shanghai_University_of_Finance_and_Economics.png" />
-      <img src="./_images/logos/Stevens_Institute_of_Technology.svg" />
-      <img src="./_images/logos/tamu.png" />
-      <img src="./_images/logos/UFMG.png" />
-      <img src="./_images/logos/University_of_Brescia.svg" />
-      <img src="./_images/logos/UC-Berkeley.png" />
-      <img src="./_images/logos/ucla.png" />
-      <img src="./_images/logos/ucsb.png" />
-      <img src="./_images/logos/uiuc.png" />
-      <img src="./_images/logos/u_maryland.svg" />
-      <img src="./_images/logos/UNewHampshire.png" />
-      <img src="./_images/logos/unc_chapel_hill.svg" />
-      <img src="./_images/logos/USTC.svg" />
-      <img src="./_images/logos/University_of_Technology_Sydney.png" />
-      <img src="./_images/logos/uw.png" />
-      <img src="./_images/logos/university-of-waterloo.png" />
-      <img src="./_images/logos/Yunnan_University.png" />
-      <img src="./_images/logos/UPC.svg" />
-      <img src="./_images/logos/Zhejiang_University.svg" />
+      <div class="mdl-grid">
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/cmu.png" /> </div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/emory.png" /> </div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/fudan.svg" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/georgia_tech.svg" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/Habib_University.jpg" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/hasso-plattner-institute.png" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/HKUST.png" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/Hust.png" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/IIT-bombay.png" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/IIT_Kanpur.svg" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/IIT_Ropar.png" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/Istanbul_Technical_University.svg" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/kyungpook-national.png" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/mit.svg" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/national_chung_hsing.png" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/National_United_University.svg" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/Nazarbayev_University.png" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/northeastern.svg" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/peking.svg" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/sjtu.png" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/Shanghai_University_of_Finance_and_Economics.png" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/Stevens_Institute_of_Technology.svg" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/tamu.png" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/UFMG.png" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/University_of_Brescia.svg" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/UC-Berkeley.png" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/ucla.png" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/ucsb.png" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/uiuc.png" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/u_maryland.svg" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/UNewHampshire.png" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/unc_chapel_hill.svg" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/USTC.svg" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/University_of_Technology_Sydney.png" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/uw.png" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/university-of-waterloo.png" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/Yunnan_University.png" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/UPC.svg" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/Zhejiang_University.svg" /></div>
+      </div>
     </div>
     <div id="map"></div>
     <script>
