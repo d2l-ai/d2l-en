@@ -9,8 +9,8 @@ In this chapter, we will walk you through major tools for deep learning, from in
 jupyter
 sagemaker
 aws
+colab
 selecting-servers-gpus
 contributing
 d2l
 ```
-
