@@ -146,7 +146,7 @@ For example, when we construct arrays to serve
 as parameters in a neural network, we will
 typically inititialize their values randomly. 
 The following snippet creates an `ndarray` with shape ($3$, $4$). 
-Each of its elements is randomly sampled  
+Each of its elements is randomly sampled 
 from a standard Gaussian (normal) distribution 
 with a mean of $0$ and a standard deviation of $1$.
 
