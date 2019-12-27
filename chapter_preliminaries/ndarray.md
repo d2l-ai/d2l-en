@@ -4,7 +4,7 @@
 In order to get anything done, we need some way to store and manipulate data. 
 Generally, there are two important things we need to do with data: 
 (i) acquire them; and (ii) process them once they are inside the computer. 
-There is no point in acquiring data absent some way to store it, 
+There is no point in acquiring data without some way to store it, 
 so let's get our hands dirty first by playing with synthetic data. 
 To start, we introduce the $n$-dimensional array (`ndarray`), 
 MXNet's primary tool for storing and transforming data.
