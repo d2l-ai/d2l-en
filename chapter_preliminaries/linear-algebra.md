@@ -138,7 +138,7 @@ To clarify, we use the dimensionality of a *vector* or an *axis*
 to refer to its length, i.e., the number of elements of a vector or an axis.
 However, we use the dimensionality of an `ndarray`
 to refer to the number of axes that an `ndarray` has.
-In this sense, the dimensionality of an `ndarray`'s some axis
+In this sense, the dimensionality of some axis of an `ndarray`
 will be the length of that axis.
 
 
