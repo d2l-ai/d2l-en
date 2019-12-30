@@ -18,7 +18,7 @@ other words, our ability to tell cats and dogs apart at a large distance (and th
 formal way of reasoning about our level of certainty. 
 If we are completely sure
 that the image depicts a cat, we say that the *probability* that the corresponding label $y$ is "cat", denoted $P(y=$ "cat"$)$ equals $1$. 
-If we had no evidence to suggest that $y =$ "cat" or that $y = $ "dog", then we might say that the two possibilities were equally
+If we had no evidence to suggest that $y =$ "cat" or that $y =$ "dog", then we might say that the two possibilities were equally
 *likely* expressing this as $P(y=$ "cat"$) = P(y=$ "dog"$) = 0.5$. If we were reasonably
 confident, but not sure that the image depicted a cat, we might assign a
 probability $0.5  < P(y=$ "cat"$) < 1$.
