@@ -7,7 +7,7 @@ that you will need to understand and implement
 most of models covered in this book.
 Below, we introduce the basic mathematical objects, arithmetic,
 and operations in linear algebra,
-expressing each both through mathematical notation
+expressing each of them through mathematical notation
 and the corresponding implementation in code.
 
 
