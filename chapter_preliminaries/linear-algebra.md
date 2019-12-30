@@ -28,7 +28,7 @@ If you wanted to convert this value to Celsius
 you would evaluate the expression $c = \frac{5}{9}(f - 32)$, setting $f$ to $52$.
 In this equation, each of the terms---$5$, $9$, and $32$---are scalar values.
 The placeholders $c$ and $f$ are called *variables*
-and they represented unknown scalar values.
+and they represent unknown scalar values.
 
 In this book, we adopt the mathematical notation
 where scalar variables are denoted
