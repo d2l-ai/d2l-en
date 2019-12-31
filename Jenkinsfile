@@ -37,7 +37,7 @@ stage("Build and Publish") {
 
       sh label:"Build PDF", script:"""set -ex
       conda activate ${ENV_NAME}
-      rm -rf _build/pdf/d2l-en.idx _build/pdf/d2l-en.out
+      rm -rf _build/pdf/
       d2lbook build pdf
       """
 
