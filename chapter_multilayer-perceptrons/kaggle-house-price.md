@@ -90,6 +90,7 @@ import d2l
 from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
 import pandas as pd
+import os
 npx.set_np()
 ```
 
@@ -102,8 +103,11 @@ def get_files(filenames, path='../data', url='https://raw.'\
     """If filenames do not exist in path/, then download from url. 
     Return the downloaded filenames.
     """
-    return [gluon.utils.download(url+fn, path) for fn in filenames]
-    
+    if not os.path.exists(path): os.mkdir(path)
+    if isinstance(filenames, str): 
+        return gluon.utils.download(url+filenames, path)
+    else:
+        return [get_files(fn, path, url) for fn in filenames]    
 ```
 
 For convenience, we download and save the Kaggle dataset directly. For other Kaggle competition datasets, you may need to download them manually.  

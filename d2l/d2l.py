@@ -313,8 +313,11 @@ def get_files(filenames, path='../data', url='https://raw.'\
     """If filenames do not exist in path/, then download from url. 
     Return the downloaded filenames.
     """
-    return [gluon.utils.download(url+fn, path) for fn in filenames]
-    
+    if not os.path.exists(path): os.mkdir(path)
+    if isinstance(filenames, str): 
+        return gluon.utils.download(url+filenames, path)
+    else:
+        return [get_files(fn, path, url) for fn in filenames]    
 
 
 # Defined in file: ./chapter_deep-learning-computation/use-gpu.md
