@@ -1,7 +1,8 @@
 # Concise Implementation of Multilayer Perceptron
 :label:`sec_mlp_gluon`
 
-Now that we learned how multilayer perceptrons (MLPs) work in theory, let's implement them. We begin, as always, by importing modules.
+As you might expect, by relying on the gluon library
+we can implement MLPs even more concisely.
 
 ```{.python .input}
 import d2l
@@ -12,10 +13,16 @@ npx.set_np()
 
 ## The Model
 
-The only difference from our softmax regression implementation
-is that we add two `Dense` (fully-connected) layers instead of one.
-The first is our hidden layer, which has *256* hidden units
-and uses the ReLU activation function.
+As compared to our gluon implementation 
+of softmax regression implementation
+(:numref:`sec_softmax_gluon`),
+the only difference is that we add 
+*two* `Dense` (fully-connected) layers 
+(previously, we added *one*).
+The first is our hidden layer, 
+which contains *256* hidden units
+and applies the ReLU activation function.
+The second, is our output layer.
 
 ```{.python .input  n=5}
 net = nn.Sequential()
@@ -24,10 +31,14 @@ net.add(nn.Dense(256, activation='relu'),
 net.initialize(init.Normal(sigma=0.01))
 ```
 
-Again, note that as always, Gluon automatically
+Note that Gluon, as usual, automatically
 infers the missing input dimensions to each layer.
 
-Training the model follows the exact same steps as in our softmax regression implementation.
+The training loop is *exactly* the same
+as when we implemented softmax regression.
+This modularity enables us to separate 
+matterns concerning the model architecture
+from orthogonal considerations.
 
 ```{.python .input  n=6}
 batch_size, num_epochs = 256, 10
@@ -39,9 +50,9 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 
 ## Exercises
 
-1. Try adding a few more hidden layers to see how the result changes.
+1. Try adding different numbers of hidden layers. What setting (keeping other parameters and hyperparameters constant) works best? 
 1. Try out different activation functions. Which ones work best?
-1. Try out different initializations of the weights.
+1. Try different schemes for initializing the weights. What method works best?
 
 ## [Discussions](https://discuss.mxnet.io/t/2340)
 
