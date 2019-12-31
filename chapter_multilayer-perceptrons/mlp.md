@@ -3,11 +3,11 @@
 
 In the previous chapter, we introduced 
 softmax regression (:numref:`sec_softmax`), 
-implementing the algorithm 
-from scratch (:numref:`sec_softmax_scratch`)
-and in gluon (:numref:`sec_softmax_gluon`)
-and training classifiers to recognize 10 categories 
-of clothing from low-resolution images.
+implementing the algorithm from scratch 
+(:numref:`sec_softmax_scratch`) and in gluon 
+(:numref:`sec_softmax_gluon`)
+and training classifiers to recognize 
+10 categories of clothing from low-resolution images.
 Along the way, we learned how to wrangle data,
 coerce our outputs into a valid probability distribution 
 (via `softmax`),
