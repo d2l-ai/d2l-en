@@ -307,6 +307,16 @@ def evaluate_loss(net, data_iter, loss):
     return metric[0] / metric[1]
 
 
+# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
+def get_files(filenames, path='../data', url='https://raw.'\
+              'githubusercontent.com/d2l-ai/d2l-en/master/data/'):
+    """If filenames do not exist in path/, then download from url. 
+    Return the downloaded filenames.
+    """
+    return [gluon.utils.download(url+fn, path) for fn in filenames]
+    
+
+
 # Defined in file: ./chapter_deep-learning-computation/use-gpu.md
 def try_gpu(i=0):
     """Return gpu(i) if exists, otherwise return cpu()."""
@@ -656,14 +666,14 @@ class RNNModel(nn.Block):
         return self.rnn.begin_state(*args, **kwargs)
 
 
-# Defined in file: ./chapter_modern_recurrent-networks/machine-translation.md
+# Defined in file: ./chapter_recurrent-modern/machine-translation.md
 def read_data_nmt():
     fname = gluon.utils.download('http://data.mxnet.io/data/fra-eng.zip')
     with zipfile.ZipFile(fname, 'r') as f:
         return f.read('fra.txt').decode("utf-8")
 
 
-# Defined in file: ./chapter_modern_recurrent-networks/machine-translation.md
+# Defined in file: ./chapter_recurrent-modern/machine-translation.md
 def preprocess_nmt(text):
     text = text.replace('\u202f', ' ').replace('\xa0', ' ')
 
@@ -676,7 +686,7 @@ def preprocess_nmt(text):
     return ''.join(out)
 
 
-# Defined in file: ./chapter_modern_recurrent-networks/machine-translation.md
+# Defined in file: ./chapter_recurrent-modern/machine-translation.md
 def tokenize_nmt(text, num_examples=None):
     source, target = [], []
     for i, line in enumerate(text.split('\n')):
@@ -689,7 +699,7 @@ def tokenize_nmt(text, num_examples=None):
     return source, target
 
 
-# Defined in file: ./chapter_modern_recurrent-networks/machine-translation.md
+# Defined in file: ./chapter_recurrent-modern/machine-translation.md
 def trim_pad(line, num_steps, padding_token):
     if len(line) > num_steps:
         return line[:num_steps]  # Trim
@@ -697,7 +707,7 @@ def trim_pad(line, num_steps, padding_token):
 
 
 
-# Defined in file: ./chapter_modern_recurrent-networks/machine-translation.md
+# Defined in file: ./chapter_recurrent-modern/machine-translation.md
 def build_array(lines, vocab, num_steps, is_source):
     lines = [vocab[l] for l in lines]
     if not is_source:
@@ -707,7 +717,7 @@ def build_array(lines, vocab, num_steps, is_source):
     return array, valid_len
 
 
-# Defined in file: ./chapter_modern_recurrent-networks/machine-translation.md
+# Defined in file: ./chapter_recurrent-modern/machine-translation.md
 def load_data_nmt(batch_size, num_steps, num_examples=1000):
     text = preprocess_nmt(read_data_nmt())
     source, target = tokenize_nmt(text, num_examples)
@@ -722,7 +732,7 @@ def load_data_nmt(batch_size, num_steps, num_examples=1000):
     return src_vocab, tgt_vocab, data_iter
 
 
-# Defined in file: ./chapter_modern_recurrent-networks/encoder-decoder.md
+# Defined in file: ./chapter_recurrent-modern/encoder-decoder.md
 class Encoder(nn.Block):
     """The base encoder interface for the encoder-decoder architecture."""
     def __init__(self, **kwargs):
@@ -732,7 +742,7 @@ class Encoder(nn.Block):
         raise NotImplementedError
 
 
-# Defined in file: ./chapter_modern_recurrent-networks/encoder-decoder.md
+# Defined in file: ./chapter_recurrent-modern/encoder-decoder.md
 class Decoder(nn.Block):
     """The base decoder interface for the encoder-decoder architecture."""
     def __init__(self, **kwargs):
@@ -745,7 +755,7 @@ class Decoder(nn.Block):
         raise NotImplementedError
 
 
-# Defined in file: ./chapter_modern_recurrent-networks/encoder-decoder.md
+# Defined in file: ./chapter_recurrent-modern/encoder-decoder.md
 class EncoderDecoder(nn.Block):
     """The base class for the encoder-decoder architecture."""
     def __init__(self, encoder, decoder, **kwargs):
@@ -759,7 +769,7 @@ class EncoderDecoder(nn.Block):
         return self.decoder(dec_X, dec_state)
 
 
-# Defined in file: ./chapter_modern_recurrent-networks/seq2seq.md
+# Defined in file: ./chapter_recurrent-modern/seq2seq.md
 class Seq2SeqEncoder(d2l.Encoder):
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0, **kwargs):
@@ -779,7 +789,7 @@ class Seq2SeqEncoder(d2l.Encoder):
         return out, state
 
 
-# Defined in file: ./chapter_modern_recurrent-networks/seq2seq.md
+# Defined in file: ./chapter_recurrent-modern/seq2seq.md
 class Seq2SeqDecoder(d2l.Decoder):
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
                  dropout=0, **kwargs):
@@ -800,19 +810,19 @@ class Seq2SeqDecoder(d2l.Decoder):
         return out, state
 
 
-# Defined in file: ./chapter_modern_recurrent-networks/seq2seq.md
+# Defined in file: ./chapter_recurrent-modern/seq2seq.md
 class MaskedSoftmaxCELoss(gluon.loss.SoftmaxCELoss):
     # pred shape: (batch_size, seq_len, vocab_size)
     # label shape: (batch_size, seq_len)
     # valid_length shape: (batch_size, )
     def forward(self, pred, label, valid_length):
-        # weights shape should be (batch_size, seq_len, 1)
+        # weights shape: (batch_size, seq_len, 1)
         weights = np.expand_dims(np.ones_like(label), axis=-1)
         weights = npx.sequence_mask(weights, valid_length, True, axis=1)
         return super(MaskedSoftmaxCELoss, self).forward(pred, label, weights)
 
 
-# Defined in file: ./chapter_modern_recurrent-networks/seq2seq.md
+# Defined in file: ./chapter_recurrent-modern/seq2seq.md
 def train_s2s_ch9(model, data_iter, lr, num_epochs, ctx):
     model.initialize(init.Xavier(), force_reinit=True, ctx=ctx)
     trainer = gluon.Trainer(model.collect_params(),
@@ -840,7 +850,7 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, ctx):
         metric[0]/metric[1], metric[1]/timer.stop(), ctx))
 
 
-# Defined in file: ./chapter_modern_recurrent-networks/seq2seq.md
+# Defined in file: ./chapter_recurrent-modern/seq2seq.md
 def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
                     ctx):
     src_tokens = src_vocab[src_sentence.lower().split(' ')]
@@ -864,7 +874,7 @@ def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
     return ' '.join(tgt_vocab.to_tokens(predict_tokens))
 
 
-# Defined in file: ./chapter_attention-mechanism/attention.md
+# Defined in file: ./chapter_attention-mechanisms/attention.md
 def masked_softmax(X, valid_length):
     # X: 3-D tensor, valid_length: 1-D or 2-D tensor
     if valid_length is None:
@@ -881,7 +891,7 @@ def masked_softmax(X, valid_length):
         return npx.softmax(X).reshape(shape)
 
 
-# Defined in file: ./chapter_attention-mechanism/attention.md
+# Defined in file: ./chapter_attention-mechanisms/attention.md
 class DotProductAttention(nn.Block):
     def __init__(self, dropout, **kwargs):
         super(DotProductAttention, self).__init__(**kwargs)
@@ -899,7 +909,7 @@ class DotProductAttention(nn.Block):
         return npx.batch_dot(attention_weights, value)
 
 
-# Defined in file: ./chapter_attention-mechanism/attention.md
+# Defined in file: ./chapter_attention-mechanisms/attention.md
 class MLPAttention(nn.Block):  
     def __init__(self, units, dropout, **kwargs):
         super(MLPAttention, self).__init__(**kwargs)
@@ -1724,7 +1734,7 @@ class CTRDataset(gluon.data.Dataset):
         return feat + self.offsets, self.data[idx]['y']
 
 
-# Defined in file: ./chapter_generative_adversarial_networks/gan.md
+# Defined in file: ./chapter_generative-adversarial-networks/gan.md
 def update_D(X, Z, net_D, net_G, loss, trainer_D):
     """Update discriminator"""
     batch_size = X.shape[0]
@@ -1742,7 +1752,7 @@ def update_D(X, Z, net_D, net_G, loss, trainer_D):
     return float(loss_D.sum())
 
 
-# Defined in file: ./chapter_generative_adversarial_networks/gan.md
+# Defined in file: ./chapter_generative-adversarial-networks/gan.md
 def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
     """Update generator"""
     batch_size = Z.shape[0]

@@ -93,14 +93,27 @@ import pandas as pd
 npx.set_np()
 ```
 
-For convenience, we already downloaded the data
-and stored it in the `../data` directory.
+The following function will download files into the `../data` directory if they don't exist. 
+
+```{.python .input}
+# Saved in the d2l package for later use
+def get_files(filenames, path='../data', url='https://raw.'\
+              'githubusercontent.com/d2l-ai/d2l-en/master/data/'):
+    """If filenames do not exist in path/, then download from url. 
+    Return the downloaded filenames.
+    """
+    return [gluon.utils.download(url+fn, path) for fn in filenames]
+    
+```
+
+For convenience, we download and save the Kaggle dataset directly. For other Kaggle competition datasets, you may need to download them manually.  
 To load the two CSV (Comma Separated Values) files
 containing training and test data respectively we use Pandas.
 
 ```{.python .input  n=14}
-train_data = pd.read_csv('../data/kaggle_house_pred_train.csv')
-test_data = pd.read_csv('../data/kaggle_house_pred_test.csv')
+train_fn, test_fn = get_files(['kaggle_house_pred_train.csv', 
+                               'kaggle_house_pred_test.csv'])
+train_data, test_data = pd.read_csv(train_fn), pd.read_csv(test_fn)
 ```
 
 The training dataset includes $1,460$ examples, $80$ features, and $1$ label,
