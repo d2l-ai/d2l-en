@@ -308,14 +308,20 @@ def evaluate_loss(net, data_iter, loss):
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-def get_files(filenames, path='../data', url='https://raw.'\
+def mkdir_if_not_exist(path):
+    if not os.path.exists(os.path.join(*path)):
+        os.makedirs(os.path.join(*path))
+
+
+# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
+def get_files(filenames, path=['..', 'data'], url='https://raw.'\
               'githubusercontent.com/d2l-ai/d2l-en/master/data/'):
-    """If filenames do not exist in path/, then download from url. 
+    """If filenames do not exist in path, then download them from url. 
     Return the downloaded filenames.
     """
-    if not os.path.exists(path): os.mkdir(path)
+    mkdir_if_not_exist(path)
     if isinstance(filenames, str): 
-        return gluon.utils.download(url+filenames, path)
+        return gluon.utils.download(url + filenames, os.path.join(*path))
     else:
         return [get_files(fn, path, url) for fn in filenames]    
 

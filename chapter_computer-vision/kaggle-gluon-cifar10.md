@@ -57,8 +57,11 @@ To make it easier to get started, we provide a small-scale sample of the dataset
 demo = True
 if demo:
     import zipfile
-    for f in ['train_tiny.zip', 'test_tiny.zip', 'trainLabels.csv.zip']:
-        with zipfile.ZipFile('../data/kaggle_cifar10/' + f, 'r') as z:
+    train_fn, test_fn, label_fn = d2l.get_files([
+        'kaggle_cifar10_train_tiny.zip', 'kaggle_cifar10_test_tiny.zip',
+        'kaggle_cifar10_trainLabels.csv.zip'])
+    for f in [train_fn, test_fn, label_fn]:
+        with zipfile.ZipFile(f, 'r') as z:
             z.extractall('../data/kaggle_cifar10/')
 ```
 
@@ -80,15 +83,6 @@ def read_label_file(data_dir, label_file, train_dir, valid_ratio):
     return n_train // len(labels), idx_label
 ```
 
-Below we define a helper function to create a path only if the path does not already exist.
-
-```{.python .input  n=4}
-# save to the d2l package.
-def mkdir_if_not_exist(path):
-    if not os.path.exists(os.path.join(*path)):
-        os.makedirs(os.path.join(*path))
-```
-
 Next, we define the `reorg_train_valid` function to segment the validation set from the original training set.  Here, we use `valid_ratio=0.1` as an example. Since the original training set has $50,000$ images, there will be $45,000$ images used for training and stored in the path “`input_dir/train`” when tuning hyper-parameters, while the other $5,000$ images will be stored as validation set in the path “`input_dir/valid`”. After organizing the data, images of the same type will be placed under the same folder so that we can read them later.
 
 ```{.python .input  n=5}
@@ -98,16 +92,16 @@ def reorg_train_valid(data_dir, train_dir, input_dir, n_train_per_label,
     for train_file in os.listdir(os.path.join(data_dir, train_dir)):
         idx = int(train_file.split('.')[0])
         label = idx_label[idx]
-        mkdir_if_not_exist([data_dir, input_dir, 'train_valid', label])
+        d2l.mkdir_if_not_exist([data_dir, input_dir, 'train_valid', label])
         shutil.copy(os.path.join(data_dir, train_dir, train_file),
                     os.path.join(data_dir, input_dir, 'train_valid', label))
         if label not in label_count or label_count[label] < n_train_per_label:
-            mkdir_if_not_exist([data_dir, input_dir, 'train', label])
+            d2l.mkdir_if_not_exist([data_dir, input_dir, 'train', label])
             shutil.copy(os.path.join(data_dir, train_dir, train_file),
                         os.path.join(data_dir, input_dir, 'train', label))
             label_count[label] = label_count.get(label, 0) + 1
         else:
-            mkdir_if_not_exist([data_dir, input_dir, 'valid', label])
+            d2l.mkdir_if_not_exist([data_dir, input_dir, 'valid', label])
             shutil.copy(os.path.join(data_dir, train_dir, train_file),
                         os.path.join(data_dir, input_dir, 'valid', label))
 ```
@@ -116,7 +110,7 @@ The `reorg_test` function below is used to organize the testing set to facilitat
 
 ```{.python .input  n=6}
 def reorg_test(data_dir, test_dir, input_dir):
-    mkdir_if_not_exist([data_dir, input_dir, 'test', 'unknown'])
+    d2l.mkdir_if_not_exist([data_dir, input_dir, 'test', 'unknown'])
     for test_file in os.listdir(os.path.join(data_dir, test_dir)):
         shutil.copy(os.path.join(data_dir, test_dir, test_file),
                     os.path.join(data_dir, input_dir, 'test', 'unknown'))

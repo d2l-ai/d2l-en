@@ -50,11 +50,12 @@ To make it easier to get started, we provide a small-scale sample of the dataset
 demo = True
 data_dir = '../data/kaggle_dog'
 if demo:
-    zipfiles = ['train_valid_test_tiny.zip']
+    zipfiles = d2l.get_files(['kaggle_dog_train_valid_test_tiny.zip'])
 else:
-    zipfiles = ['train.zip', 'test.zip', 'labels.csv.zip']
+    zipfiles = [data_dir + '/train.zip', data_dir + '/test.zip',
+                data_dir + '/labels.csv.zip']
 for f in zipfiles:
-    with zipfile.ZipFile(data_dir + '/' + f, 'r') as z:
+    with zipfile.ZipFile(f, 'r') as z:
         z.extractall(data_dir)
 ```
 
