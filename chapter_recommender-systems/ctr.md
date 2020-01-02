@@ -19,7 +19,6 @@ The following code downloads the dataset from our server and saves it into the l
 ```{.python .input  n=15}
 from collections import defaultdict
 from mxnet import gluon, np
-import os
 
 # Saved in the d2l package for later use
 def read_data_ctr(path="../data/", train="ctr/train.csv",
@@ -28,10 +27,8 @@ def read_data_ctr(path="../data/", train="ctr/train.csv",
                  "gluon/dataset/")
     train_sha1 = "6dec3052e49ce0d1cec5ebc6f5ded1172be0befb"
     test_sha1 = "c265e3c1fad0ed4caf8c1a373c580465a8096eb0"
-    ctr_path = path+"ctr"
-    os.makedirs(ctr_path, exist_ok=True)
-    gluon.utils.download(data_path + train, ctr_path, train_sha1)
-    gluon.utils.download(data_path + test, ctr_path, test_sha1)
+    gluon.utils.download(data_path+train, path+train, train_sha1)
+    gluon.utils.download(data_path+test, path+test, test_sha1)
 
 read_data_ctr()
 ```

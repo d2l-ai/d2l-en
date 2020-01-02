@@ -22,7 +22,8 @@ This dataset has already been preprocessed. Each line of the dataset acts as a s
 ```{.python .input  n=2}
 # Saved in the d2l package for later use
 def read_ptb():
-    with zipfile.ZipFile('../data/ptb.zip', 'r') as f:
+    fname = d2l.get_files('../data/ptb.zip')
+    with zipfile.ZipFile(fname, 'r') as f:
         raw_text = f.read('ptb/ptb.train.txt').decode("utf-8")
     return [line.split() for line in raw_text.split('\n')]
 

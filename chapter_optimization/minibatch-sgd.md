@@ -107,8 +107,8 @@ Let's have a look at how minibatches are efficiently generated from data. In the
 ```{.python .input  n=1}
 # Saved in the d2l package for later use
 def get_data_ch11(batch_size=10, n=1500):
-    data = np.genfromtxt('../data/airfoil_self_noise.dat',
-                         dtype=np.float32, delimiter='\t')
+    fname = d2l.get_files('../data/airfoil_self_noise.dat')
+    data = np.genfromtxt(fname, dtype=np.float32, delimiter='\t')
     data = (data - data.mean(axis=0)) / data.std(axis=0)
     data_iter = d2l.load_array(
         (data[:n, :-1], data[:n, -1]), batch_size, is_train=True)

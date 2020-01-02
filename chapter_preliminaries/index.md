@@ -46,7 +46,7 @@ at least *most* of the mathematical content of the book.
 If you wish to understand *all* of the mathematical content,
 further reviewing :numref:`chap_appendix_math` should be sufficient.
 
-```toc
+```{.python .input .toc}
 :maxdepth: 2
 
 ndarray
@@ -57,4 +57,3 @@ autograd
 probability
 lookup-api
 ```
-
