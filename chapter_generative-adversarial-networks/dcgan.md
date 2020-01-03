@@ -9,7 +9,6 @@ In this section, we will demonstrate how you can use GANs to generate photoreali
 from mxnet import gluon, init, np, npx
 from mxnet.gluon import nn
 import d2l
-import zipfile
 
 npx.set_np()
 ```
@@ -19,13 +18,12 @@ npx.set_np()
 The dataset we will use is a collection of Pokemon sprites obtained from [pokemondb](https://pokemondb.net/sprites). First download, extract and load this dataset.
 
 ```{.python .input  n=2}
-data_dir = '../data/'
-url = 'http://data.mxnet.io/data/pokemon.zip'
-sha1 = 'c065c0e2593b8b161a2d7873e42418bf6a21106c'
-fname = gluon.utils.download(url, data_dir, sha1_hash=sha1)
-with zipfile.ZipFile(fname) as f:
-    f.extractall(data_dir)
-pokemon = gluon.data.vision.datasets.ImageFolderDataset(data_dir+'pokemon')
+# Saved in the d2l package for later use
+d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL+'pokemon.zip',
+                          'c065c0e2593b8b161a2d7873e42418bf6a21106c')
+
+data_dir = d2l.download_extract('pokemon')
+pokemon = gluon.data.vision.datasets.ImageFolderDataset(data_dir)
 ```
 
 We resize each image into $64\times 64$. The `ToTensor` transformation will project the pixel value into $[0, 1]$, while our generator will use the tanh function to obtain outputs in $[-1, 1]$. Therefore we normalize the data with $0.5$ mean and $0.5$ standard deviation to match the value range.
