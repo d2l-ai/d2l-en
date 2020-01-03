@@ -23,6 +23,12 @@ import time
 import zipfile
 
 
+# Defined in file: ./chapter_preliminaries/pandas.md
+def mkdir_if_not_exist(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+
 # Defined in file: ./chapter_preliminaries/calculus.md
 def use_svg_display():
     """Use the svg format to display a plot in Jupyter."""
@@ -308,20 +314,14 @@ def evaluate_loss(net, data_iter, loss):
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-def mkdir_if_not_exist(path):
-    if not os.path.exists(os.path.join(*path)):
-        os.makedirs(os.path.join(*path))
-
-
-# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-def get_files(filenames, path=['..', 'data'], url='https://raw.'\
+def get_files(filenames, path='../data', url='https://raw.'\
               'githubusercontent.com/d2l-ai/d2l-en/master/data/'):
     """If filenames do not exist in path, then download them from url. 
     Return the downloaded filenames.
     """
-    mkdir_if_not_exist(path)
+    d2l.mkdir_if_not_exist(path)
     if isinstance(filenames, str): 
-        return gluon.utils.download(url + filenames, os.path.join(*path))
+        return gluon.utils.download(url + filenames, path)
     else:
         return [get_files(fn, path, url) for fn in filenames]    
 
@@ -420,7 +420,8 @@ class Residual(nn.Block):
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
 def read_time_machine():
     """Load the time machine book into a list of sentences."""
-    with open('../data/timemachine.txt', 'r') as f:
+    fname = d2l.get_files('../data/timemachine.txt')
+    with open(fname, 'r') as f:
         lines = f.readlines()
     return [re.sub('[^A-Za-z]+', ' ', line.strip().lower())
             for line in lines]
@@ -973,8 +974,8 @@ def show_trace_2d(f, results):
 
 # Defined in file: ./chapter_optimization/minibatch-sgd.md
 def get_data_ch11(batch_size=10, n=1500):
-    data = np.genfromtxt('../data/airfoil_self_noise.dat',
-                         dtype=np.float32, delimiter='\t')
+    fname = d2l.get_files('../data/airfoil_self_noise.dat')
+    data = np.genfromtxt(fname, dtype=np.float32, delimiter='\t')
     data = (data - data.mean(axis=0)) / data.std(axis=0)
     data_iter = d2l.load_array(
         (data[:n, :-1], data[:n, -1]), batch_size, is_train=True)
@@ -1205,9 +1206,10 @@ def load_data_pikachu(batch_size, edge_size=256):
 def download_voc_pascal(data_dir='../data'):
     """Download the VOC2012 segmentation dataset."""
     voc_dir = os.path.join(data_dir, 'VOCdevkit/VOC2012')
-    url = ('http://data.mxnet.io/data/VOCtrainval_11-May-2012.tar')
+    url = 'http://data.mxnet.io/data/VOCtrainval_11-May-2012.tar'
     sha1 = '4e443f8a2eca6b1dac8a6c57641b67dd40621a49'
-    fname = gluon.utils.download(url, data_dir, sha1_hash=sha1)
+    fname = gluon.utils.download(url, data_dir+'/VOCtrainval_11-May-2012.tar',
+                                 sha1_hash=sha1)
     with tarfile.open(fname, 'r') as f:
         f.extractall(data_dir)
     return voc_dir
@@ -1319,7 +1321,8 @@ def load_data_voc(batch_size, crop_size):
 
 # Defined in file: ./chapter_natural-language-processing/word2vec-dataset.md
 def read_ptb():
-    with zipfile.ZipFile('../data/ptb.zip', 'r') as f:
+    fname = d2l.get_files('../data/ptb.zip')
+    with zipfile.ZipFile(fname, 'r') as f:
         raw_text = f.read('ptb/ptb.train.txt').decode("utf-8")
     return [line.split() for line in raw_text.split('\n')]
 
@@ -1428,7 +1431,7 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
 # Defined in file: ./chapter_natural-language-processing/sentiment-analysis.md
 def download_imdb(data_dir='../data'):
     url = 'http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz'
-    fname = gluon.utils.download(url, data_dir)
+    fname = gluon.utils.download(url, data_dir+'/aclImdb_v1.tar.gz')
     with tarfile.open(fname, 'r') as f:
         f.extractall(data_dir)
 
@@ -1476,7 +1479,7 @@ def read_data_ml100k(path="../data/", member="ml-100k/u.data",
                      sep="\t"):
     fname = gluon.utils.download(
         'http://files.grouplens.org/datasets/movielens/ml-100k.zip',
-        path=path)
+        path+'/ml-100k.zip')
     with zipfile.ZipFile(fname, 'r') as inzipfile:
         inzipfile.extract(member, path)
         data = pd.read_csv(path + member, sep, names=names, engine='python')
@@ -1695,10 +1698,8 @@ def read_data_ctr(path="../data/", train="ctr/train.csv",
                  "gluon/dataset/")
     train_sha1 = "6dec3052e49ce0d1cec5ebc6f5ded1172be0befb"
     test_sha1 = "c265e3c1fad0ed4caf8c1a373c580465a8096eb0"
-    ctr_path = path+"ctr"
-    os.makedirs(ctr_path, exist_ok=True)
-    gluon.utils.download(data_path + train, ctr_path, train_sha1)
-    gluon.utils.download(data_path + test, ctr_path, test_sha1)
+    gluon.utils.download(data_path+train, path+train, train_sha1)
+    gluon.utils.download(data_path+test, path+test, test_sha1)
 
 
 # Defined in file: ./chapter_recommender-systems/ctr.md

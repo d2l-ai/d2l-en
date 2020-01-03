@@ -14,8 +14,6 @@ To run a section on Colab, you can simply click the `Colab` button on the right 
 :label:`fig_colab2`
 
 
-One pitfall of Colab is that it's not straightforward to upload data. So you will get an error when trying to read data in the `../data` folder. You can manually download [d2l-en.zip](https://d2l.ai/d2l-en.zip), unzip it and upload the `data` folder into your Google drive. We hope to make it smarter later. 
-
 ## Summary
 
-- You can use Google Colab to run each section on GPUs freely. 
+- You can use Google Colab to run each section on GPUs freely.

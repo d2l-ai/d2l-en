@@ -26,7 +26,7 @@ def read_data_ml100k(path="../data/", member="ml-100k/u.data",
                      sep="\t"):
     fname = gluon.utils.download(
         'http://files.grouplens.org/datasets/movielens/ml-100k.zip',
-        path=path)
+        path+'/ml-100k.zip')
     with zipfile.ZipFile(fname, 'r') as inzipfile:
         inzipfile.extract(member, path)
         data = pd.read_csv(path + member, sep, names=names, engine='python')
