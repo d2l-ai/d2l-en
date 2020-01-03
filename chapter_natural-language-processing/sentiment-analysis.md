@@ -25,7 +25,7 @@ We first download this dataset to the "../data" path and extract it to "../data/
 # Saved in the d2l package for later use
 def download_imdb(data_dir='../data'):
     url = 'http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz'
-    fname = gluon.utils.download(url, data_dir + '/aclImdb_v1.tar.gz')
+    fname = gluon.utils.download(url, data_dir+'/aclImdb_v1.tar.gz')
     with tarfile.open(fname, 'r') as f:
         f.extractall(data_dir)
 

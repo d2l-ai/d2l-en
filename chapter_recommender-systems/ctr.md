@@ -27,8 +27,8 @@ def read_data_ctr(path="../data/", train="ctr/train.csv",
                  "gluon/dataset/")
     train_sha1 = "6dec3052e49ce0d1cec5ebc6f5ded1172be0befb"
     test_sha1 = "c265e3c1fad0ed4caf8c1a373c580465a8096eb0"
-    gluon.utils.download(data_path + train, path + train, train_sha1)
-    gluon.utils.download(data_path + test, path + test, test_sha1)
+    gluon.utils.download(data_path+train, path+train, train_sha1)
+    gluon.utils.download(data_path+test, path+test, test_sha1)
 
 read_data_ctr()
 ```
