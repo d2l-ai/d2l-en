@@ -39,8 +39,8 @@ def download_voc_pascal(data_dir='../data'):
     voc_dir = os.path.join(data_dir, 'VOCdevkit/VOC2012')
     url = 'http://data.mxnet.io/data/VOCtrainval_11-May-2012.tar'
     sha1 = '4e443f8a2eca6b1dac8a6c57641b67dd40621a49'
-    fname = gluon.utils.download(url, data_dir+'/VOCtrainval_11-May-2012.tar',
-                                 sha1_hash=sha1)
+    fname = gluon.utils.download(
+        url, data_dir + '/VOCtrainval_11-May-2012.tar', sha1_hash=sha1)
     with tarfile.open(fname, 'r') as f:
         f.extractall(data_dir)
     return voc_dir

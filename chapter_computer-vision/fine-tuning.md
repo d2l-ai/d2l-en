@@ -47,8 +47,7 @@ We first download the compressed dataset to the path `../data`. Then, we unzip t
 data_dir = '../data'
 base_url = 'https://apache-mxnet.s3-accelerate.amazonaws.com/'
 fname = gluon.utils.download(
-    base_url+'gluon/dataset/hotdog.zip',
-    path=data_dir+'/hotdog.zip',
+    base_url + 'gluon/dataset/hotdog.zip', path=data_dir + '/hotdog.zip',
     sha1_hash='fba480ffa8aa7e0febbb511d181409f899b9baa5')
 with zipfile.ZipFile(fname, 'r') as z:
     z.extractall(data_dir)

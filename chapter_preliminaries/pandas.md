@@ -11,10 +11,10 @@ So, we will briefly walk through steps for preprocessing raw data with `pandas`
 and converting them into the `ndarray` format.
 We will cover more data preprocessing techniques in later chapters.
 
+
 ## Reading the Dataset
 
-
-As an example, we begin by creating an artificial dataset that is stored in a csv (comma-separated values) file. Data stored in other formats may be processed in similar ways. We will save the csv file into `../data/house_tiny.csv`. The following function makes sure the directory `../data` exist. The comment `# Saved in the d2l package for later use` is a special mark where the following function, class, or import statements
+As an example, we begin by creating an artificial dataset that is stored in a csv (comma-separated values) file `../data/house_tiny.csv`. Data stored in other formats may be processed in similar ways. The following `mkdir_if_not_exist` function ensures that the directory `../data` exists. The comment `# Saved in the d2l package for later use` is a special mark where the following function, class, or import statements
 are also saved in the `d2l` package so that we can directly invoke `d2l.mkdir_if_not_exist()` later.
 
 ```{.python .input}
@@ -26,7 +26,7 @@ def mkdir_if_not_exist(path):
         os.makedirs(path)
 ```
 
-Write the dataset row by row into a csv file.
+Below we write the dataset row by row into a csv file.
 
 ```{.python .input}
 data_file = '../data/house_tiny.csv'
