@@ -92,16 +92,19 @@ def reorg_train_valid(data_dir, train_dir, input_dir, n_train_per_label,
     for train_file in os.listdir(os.path.join(data_dir, train_dir)):
         idx = int(train_file.split('.')[0])
         label = idx_label[idx]
-        d2l.mkdir_if_not_exist([data_dir, input_dir, 'train_valid', label])
+        d2l.mkdir_if_not_exist(
+            data_dir + '/' + input_dir + '/train_valid/' + label)
         shutil.copy(os.path.join(data_dir, train_dir, train_file),
                     os.path.join(data_dir, input_dir, 'train_valid', label))
         if label not in label_count or label_count[label] < n_train_per_label:
-            d2l.mkdir_if_not_exist([data_dir, input_dir, 'train', label])
+            d2l.mkdir_if_not_exist(
+                data_dir + '/' + input_dir + '/train/' + label)
             shutil.copy(os.path.join(data_dir, train_dir, train_file),
                         os.path.join(data_dir, input_dir, 'train', label))
             label_count[label] = label_count.get(label, 0) + 1
         else:
-            d2l.mkdir_if_not_exist([data_dir, input_dir, 'valid', label])
+            d2l.mkdir_if_not_exist(
+                data_dir + '/' + input_dir + '/valid/' + label)
             shutil.copy(os.path.join(data_dir, train_dir, train_file),
                         os.path.join(data_dir, input_dir, 'valid', label))
 ```
@@ -110,7 +113,7 @@ The `reorg_test` function below is used to organize the testing set to facilitat
 
 ```{.python .input  n=6}
 def reorg_test(data_dir, test_dir, input_dir):
-    d2l.mkdir_if_not_exist([data_dir, input_dir, 'test', 'unknown'])
+    d2l.mkdir_if_not_exist(data_dir + '/' + input_dir + '/test/unknown')
     for test_file in os.listdir(os.path.join(data_dir, test_dir)):
         shutil.copy(os.path.join(data_dir, test_dir, test_file),
                     os.path.join(data_dir, input_dir, 'test', 'unknown'))
