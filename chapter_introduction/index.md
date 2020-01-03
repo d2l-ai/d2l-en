@@ -294,9 +294,9 @@ When we have more data, we can train more powerful models,
 and rely less heavily on pre-conceived assumptions.
 The regime change from (comparatively small) to big data
 is a major contributor to the success of modern deep learning.
-To drive the point home, many of the most exciting models in deep learning either do not work without large datasets.
+To drive the point home, many of the most exciting models in deep learning do not work without large datasets.
 Some others work in the low-data regime,
-but no better than traditional approaches.
+but are no better than traditional approaches.
 
 Finally it is not enough to have lots of data and to process it cleverly.
 We need the *right* data. If the data is full of mistakes,
