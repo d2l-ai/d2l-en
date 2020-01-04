@@ -435,7 +435,7 @@ def tokenize(lines, token='word'):
     elif token == 'char':
         return [list(line) for line in lines]
     else:
-        print('ERROR: unkown token type '+token)
+        print('ERROR: unknown token type '+token)
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
