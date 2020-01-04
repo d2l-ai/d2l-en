@@ -117,7 +117,7 @@ class Timer(object):
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def synthetic_data(w, b, num_examples):
-    """generate y = X w + b + noise"""
+    """Generate y = X w + b + noise."""
     X = np.random.normal(0, 1, (num_examples, len(w)))
     y = np.dot(X, w) + b
     y += np.random.normal(0, 0.01, y.shape)
@@ -211,7 +211,7 @@ def evaluate_accuracy(net, data_iter):
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 class Accumulator(object):
-    """Sum a list of numbers over time"""
+    """Sum a list of numbers over time."""
 
     def __init__(self, n):
         self.data = [0.0] * n
@@ -306,7 +306,7 @@ def predict_ch3(net, test_iter, n=6):
 
 # Defined in file: ./chapter_multilayer-perceptrons/underfit-overfit.md
 def evaluate_loss(net, data_iter, loss):
-    """Evaluate the loss of a model on the given dataset"""
+    """Evaluate the loss of a model on the given dataset."""
     metric = d2l.Accumulator(2)  # sum_loss, num_examples
     for X, y in data_iter:
         metric.add(loss(net(X), y).sum(), y.size)
@@ -429,7 +429,7 @@ def read_time_machine():
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
 def tokenize(lines, token='word'):
-    """Split sentences into word or char tokens"""
+    """Split sentences into word or char tokens."""
     if token == 'word':
         return [line.split(' ') for line in lines]
     elif token == 'char':
@@ -531,7 +531,7 @@ def seq_data_iter_consecutive(corpus, batch_size, num_steps):
 
 # Defined in file: ./chapter_recurrent-neural-networks/lang-model.md
 class SeqDataLoader(object):
-    """A iterator to load sequence data"""
+    """An iterator to load sequence data."""
     def __init__(self, batch_size, num_steps, use_random_iter, max_tokens):
         if use_random_iter:
             self.data_iter_fn = d2l.seq_data_iter_random
@@ -554,7 +554,7 @@ def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
 class RNNModelScratch(object):
-    """A RNN Model based on scratch implementations"""
+    """An RNN Model based on scratch implementations."""
 
     def __init__(self, vocab_size, num_hiddens, ctx,
                  get_params, init_state, forward):
@@ -1185,7 +1185,7 @@ def download_pikachu(data_dir):
 
 # Defined in file: ./chapter_computer-vision/object-detection-dataset.md
 def load_data_pikachu(batch_size, edge_size=256):
-    """Load the pikachu dataset"""
+    """Load the pikachu dataset."""
     data_dir = '../data/pikachu'
     download_pikachu(data_dir)
     train_iter = image.ImageDetIter(
@@ -1248,7 +1248,7 @@ VOC_CLASSES = ['background', 'aeroplane', 'bicycle', 'bird', 'boat',
 
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
 def build_colormap2label():
-    """Build a RGB color to label mapping for segmentation."""
+    """Build an RGB color to label mapping for segmentation."""
     colormap2label = np.zeros(256 ** 3)
     for i, colormap in enumerate(VOC_COLORMAP):
         colormap2label[(colormap[0]*256 + colormap[1])*256 + colormap[2]] = i
@@ -1257,7 +1257,7 @@ def build_colormap2label():
 
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
 def voc_label_indices(colormap, colormap2label):
-    """Map a RGB color to a label."""
+    """Map an RGB color to a label."""
     colormap = colormap.astype(np.int32)
     idx = ((colormap[:, :, 0] * 256 + colormap[:, :, 1]) * 256
            + colormap[:, :, 2])
@@ -1366,7 +1366,7 @@ def get_centers_and_contexts(corpus, max_window_size):
 
 # Defined in file: ./chapter_natural-language-processing/word2vec-dataset.md
 class RandomGenerator(object):
-    """Draw a random int in [0, n] according to n sampling weights"""
+    """Draw a random int in [0, n] according to n sampling weights."""
     def __init__(self, sampling_weights):
         self.population = list(range(len(sampling_weights)))
         self.sampling_weights = sampling_weights
@@ -1746,7 +1746,7 @@ class CTRDataset(gluon.data.Dataset):
 
 # Defined in file: ./chapter_generative-adversarial-networks/gan.md
 def update_D(X, Z, net_D, net_G, loss, trainer_D):
-    """Update discriminator"""
+    """Update discriminator."""
     batch_size = X.shape[0]
     ones = np.ones((batch_size,), ctx=X.context)
     zeros = np.zeros((batch_size,), ctx=X.context)
@@ -1764,7 +1764,7 @@ def update_D(X, Z, net_D, net_G, loss, trainer_D):
 
 # Defined in file: ./chapter_generative-adversarial-networks/gan.md
 def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
-    """Update generator"""
+    """Update generator."""
     batch_size = Z.shape[0]
     ones = np.ones((batch_size,), ctx=Z.context)
     with autograd.record():
