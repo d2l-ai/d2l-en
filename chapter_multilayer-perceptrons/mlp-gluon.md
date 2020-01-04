@@ -1,7 +1,7 @@
 # Concise Implementation of Multilayer Perceptron
 :label:`sec_mlp_gluon`
 
-As you might expect, by relying on the gluon library
+As you might expect, by relying on the Gluon library,
 we can implement MLPs even more concisely.
 
 ```{.python .input}
