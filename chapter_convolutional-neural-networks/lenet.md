@@ -242,7 +242,7 @@ def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
         animator.add(epoch+1, (None, None, test_acc))
     print('loss %.3f, train acc %.3f, test acc %.3f' % (
         train_loss, train_acc, test_acc))
-    print('%.1f exampes/sec on %s' % (metric[2]*num_epochs/timer.sum(), ctx))
+    print('%.1f examples/sec on %s' % (metric[2]*num_epochs/timer.sum(), ctx))
 ```
 
 Now let's train the model.
