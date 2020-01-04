@@ -7,7 +7,7 @@ that you will need to understand and implement
 most of models covered in this book.
 Below, we introduce the basic mathematical objects, arithmetic,
 and operations in linear algebra,
-expressing each both through mathematical notation
+expressing each of them through mathematical notation
 and the corresponding implementation in code.
 
 
@@ -28,7 +28,7 @@ If you wanted to convert this value to Celsius
 you would evaluate the expression $c = \frac{5}{9}(f - 32)$, setting $f$ to $52$.
 In this equation, each of the terms---$5$, $9$, and $32$---are scalar values.
 The placeholders $c$ and $f$ are called *variables*
-and they represented unknown scalar values.
+and they represent unknown scalar values.
 
 In this book, we adopt the mathematical notation
 where scalar variables are denoted
@@ -138,7 +138,7 @@ To clarify, we use the dimensionality of a *vector* or an *axis*
 to refer to its length, i.e., the number of elements of a vector or an axis.
 However, we use the dimensionality of an `ndarray`
 to refer to the number of axes that an `ndarray` has.
-In this sense, the dimensionality of an `ndarray`'s some axis
+In this sense, the dimensionality of some axis of an `ndarray`
 will be the length of that axis.
 
 

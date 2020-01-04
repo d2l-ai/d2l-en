@@ -13,11 +13,26 @@ We will cover more data preprocessing techniques in later chapters.
 
 ## Reading the Dataset
 
-As an example, we begin by creating an artificial dataset that is stored in a csv (comma-separated values) file. Data stored in other formats may be processed in similar ways.
+
+As an example, we begin by creating an artificial dataset that is stored in a csv (comma-separated values) file. Data stored in other formats may be processed in similar ways. We will save the csv file into `../data/house_tiny.csv`. The following function makes sure the directory `../data` exist. The comment `# Saved in the d2l package for later use` is a special mark where the following function, class, or import statements
+are also saved in the `d2l` package so that we can directly invoke `d2l.mkdir_if_not_exist()` later.
 
 ```{.python .input}
-# Write the dataset row by row into a csv file
+import os
+
+# Saved in the d2l package for later use
+def mkdir_if_not_exist(path):
+    if not isinstance(path, str):
+        path = os.path.join(*path)
+    if not os.path.exists(path):
+        os.makedirs(path)
+```
+
+Write the dataset row by row into a csv file.
+
+```{.python .input}
 data_file = '../data/house_tiny.csv'
+mkdir_if_not_exist('../data')
 with open(data_file, 'w') as f:
     f.write('NumRooms,Alley,Price\n')  # Column names
     f.write('NA,Pave,127500\n')  # Each row is a data point
@@ -89,7 +104,7 @@ X, y
 
 Create a raw dataset with more rows and columns.
 
-1. Delete the column with the most missing values. 
+1. Delete the column with the most missing values.
 2. Convert the preprocessed dataset to the `ndarray` format.
 
 

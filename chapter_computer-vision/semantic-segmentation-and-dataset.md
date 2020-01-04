@@ -24,44 +24,38 @@ In the semantic segmentation field, one important dataset is [Pascal VOC2012](ht
 import d2l
 from mxnet import gluon, image, np, npx
 import os
-import tarfile
 
 npx.set_np()
 ```
 
 The original site might be unstable, we download the data from a mirror site. 
-We download the archive to the `../data` path. The archive is about 2GB, so it will take some time to download. After you decompress the archive, the dataset is located in the `../data/VOCdevkit/VOC2012` path.
+The archive is about 2GB, so it will take some time to download. 
+After you decompress the archive, the dataset is located in the `../data/VOCdevkit/VOC2012` path.
 
 ```{.python .input  n=2}
 # Saved in the d2l package for later use
-def download_voc_pascal(data_dir='../data'):
-    """Download the VOC2012 segmentation dataset."""
-    voc_dir = os.path.join(data_dir, 'VOCdevkit/VOC2012')
-    url = ('http://data.mxnet.io/data/VOCtrainval_11-May-2012.tar')
-    sha1 = '4e443f8a2eca6b1dac8a6c57641b67dd40621a49'
-    fname = gluon.utils.download(url, data_dir, sha1_hash=sha1)
-    with tarfile.open(fname, 'r') as f:
-        f.extractall(data_dir)
-    return voc_dir
+d2l.DATA_HUB['voc2012'] = (d2l.DATA_URL+'VOCtrainval_11-May-2012.tar',
+                          '4e443f8a2eca6b1dac8a6c57641b67dd40621a49')
 
-voc_dir = download_voc_pascal()
+voc_dir = d2l.download_extract('voc2012', 'VOCdevkit/VOC2012')
 ```
 
-Go to `../data/VOCdevkit/VOC2012` to see the different parts of the dataset. The `ImageSets/Segmentation` path contains text files that specify the training and testing examples. The `JPEGImages` and `SegmentationClass` paths contain the example input images and labels, respectively. These labels are also in image format, with the same dimensions as the input images to which they correspond. In the labels, pixels with the same color belong to the same semantic category. The `read_voc_images` function defined below reads all input images and labels to the memory.
+Go to `../data/VOCdevkit/VOC2012` to see the different parts of the dataset. 
+The `ImageSets/Segmentation` path contains text files that specify the training and testing examples. The `JPEGImages` and `SegmentationClass` paths contain the example input images and labels, respectively. These labels are also in image format, with the same dimensions as the input images to which they correspond. In the labels, pixels with the same color belong to the same semantic category. The `read_voc_images` function defined below reads all input images and labels to the memory.
 
 ```{.python .input  n=3}
 # Saved in the d2l package for later use
-def read_voc_images(root='../data/VOCdevkit/VOC2012', is_train=True):
+def read_voc_images(voc_dir, is_train=True):
     """Read all VOC feature and label images."""
     txt_fname = '%s/ImageSets/Segmentation/%s' % (
-        root, 'train.txt' if is_train else 'val.txt')
+        voc_dir, 'train.txt' if is_train else 'val.txt')
     with open(txt_fname, 'r') as f:
         images = f.read().split()
     features, labels = [None] * len(images), [None] * len(images)
     for i, fname in enumerate(images):
-        features[i] = image.imread('%s/JPEGImages/%s.jpg' % (root, fname))
+        features[i] = image.imread('%s/JPEGImages/%s.jpg' % (voc_dir, fname))
         labels[i] = image.imread(
-            '%s/SegmentationClass/%s.png' % (root, fname))
+            '%s/SegmentationClass/%s.png' % (voc_dir, fname))
     return features, labels
 
 train_features, train_labels = read_voc_images(voc_dir, True)
@@ -85,7 +79,6 @@ VOC_COLORMAP = [[0, 0, 0], [128, 0, 0], [0, 128, 0], [128, 128, 0],
                 [64, 0, 128], [192, 0, 128], [64, 128, 128], [192, 128, 128],
                 [0, 64, 0], [128, 64, 0], [0, 192, 0], [128, 192, 0],
                 [0, 64, 128]]
-# Saved in the d2l package for later use
 VOC_CLASSES = ['background', 'aeroplane', 'bicycle', 'bird', 'boat',
                'bottle', 'bus', 'car', 'cat', 'chair', 'cow',
                'diningtable', 'dog', 'horse', 'motorbike', 'person',
@@ -150,7 +143,7 @@ class VOCSegDataset(gluon.data.Dataset):
         self.rgb_mean = np.array([0.485, 0.456, 0.406])
         self.rgb_std = np.array([0.229, 0.224, 0.225])
         self.crop_size = crop_size
-        features, labels = read_voc_images(root=voc_dir, is_train=is_train)
+        features, labels = read_voc_images(voc_dir, is_train=is_train)
         self.features = [self.normalize_image(feature)
                          for feature in self.filter(features)]
         self.labels = self.filter(labels)
@@ -187,7 +180,7 @@ voc_test = VOCSegDataset(False, crop_size, voc_dir)
 
 We set the batch size to 64 and define the iterators for the training and testing sets. Print the shape of the first minibatch. In contrast to image classification and object recognition, labels here are three-dimensional arrays.
 
-```{.python .input  n=12}
+```{.python .input  n=11}
 batch_size = 64
 train_iter = gluon.data.DataLoader(voc_train, batch_size, shuffle=True,
                                    last_batch='discard',
@@ -202,11 +195,11 @@ for X, Y in train_iter:
 
 Finally, we define a function `load_data_voc` that  downloads and loads this dataset, and then returns the data loaders.
 
-```{.python .input  n=13}
+```{.python .input  n=12}
 # Saved in the d2l package for later use
 def load_data_voc(batch_size, crop_size):
     """Download and load the VOC2012 semantic dataset."""
-    voc_dir = d2l.download_voc_pascal()
+    voc_dir = d2l.download_extract('voc2012', 'VOCdevkit/VOC2012')
     num_workers = d2l.get_dataloader_workers()
     train_iter = gluon.data.DataLoader(
         VOCSegDataset(True, crop_size, voc_dir), batch_size,

@@ -9,13 +9,12 @@ This section will focus on loading data for one of the sub-questions in this fie
 import d2l
 from mxnet import gluon, np, npx
 import os
-import tarfile
 npx.set_np()
 ```
 
 ## The Text Sentiment Classification Dataset
 
-We use Stanford's Large Movie Review Dataset as the dataset for text sentiment classification[1]. This dataset is divided into two datasets for training and testing purposes, each containing 25,000 movie reviews downloaded from IMDb. In each dataset, the number of comments labeled as "positive" and "negative" is equal.
+We use Stanford's [Large Movie Review Dataset](https://ai.stanford.edu/~amaas/data/sentiment/) as the dataset for text sentiment classification. This dataset is divided into two datasets for training and testing purposes, each containing 25,000 movie reviews downloaded from IMDb. In each dataset, the number of comments labeled as "positive" and "negative" is equal.
 
 ###  Reading the Dataset
 
@@ -23,31 +22,29 @@ We first download this dataset to the "../data" path and extract it to "../data/
 
 ```{.python .input  n=2}
 # Saved in the d2l package for later use
-def download_imdb(data_dir='../data'):
-    url = 'http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz'
-    fname = gluon.utils.download(url, data_dir)
-    with tarfile.open(fname, 'r') as f:
-        f.extractall(data_dir)
+d2l.DATA_HUB['aclImdb'] = (
+    'http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz',
+    '01ada507287d82875905620988597833ad4e0903')
 
-download_imdb()
+data_dir = d2l.download_extract('aclImdb', 'aclImdb')
 ```
 
 Next, read the training and test datasets. Each example is a review and its corresponding label: 1 indicates "positive" and 0 indicates "negative".
 
 ```{.python .input  n=3}
 # Saved in the d2l package for later use
-def read_imdb(folder='train', data_dir='../data'):
+def read_imdb(data_dir, is_train):
     data, labels = [], []
-    for label in ['pos', 'neg']:
-        folder_name = os.path.join(data_dir, 'aclImdb', folder, label)
+    for label in ['pos/', 'neg/']:
+        folder_name = data_dir + ('train/' if is_train else 'test/') + label
         for file in os.listdir(folder_name):
-            with open(os.path.join(folder_name, file), 'rb') as f:
+            with open(folder_name+file, 'rb') as f:
                 review = f.read().decode('utf-8').replace('\n', '')
                 data.append(review)
                 labels.append(1 if label == 'pos' else 0)
     return data, labels
 
-train_data = read_imdb('train')
+train_data = read_imdb(data_dir, is_train=True)
 print('# trainings:', len(train_data[0]))
 for x, y in zip(train_data[0][:3], train_data[1][:3]):
     print('label:', y, 'review:', x[0:60])
@@ -96,8 +93,9 @@ Last, we will save a function `load_data_imdb` into `d2l`, which returns the voc
 ```{.python .input  n=7}
 # Saved in the d2l package for later use
 def load_data_imdb(batch_size, num_steps=500):
-    download_imdb()
-    train_data, test_data = read_imdb('train'), read_imdb('test')
+    data_dir = d2l.download_extract('aclImdb', 'aclImdb')
+    train_data = read_imdb(data_dir, True)
+    test_data = read_imdb(data_dir, False)
     train_tokens = d2l.tokenize(train_data[0], token='word')
     test_tokens = d2l.tokenize(test_data[0], token='word')
     vocab = d2l.Vocab(train_tokens, min_freq=5)

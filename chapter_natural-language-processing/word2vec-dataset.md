@@ -12,7 +12,6 @@ import d2l
 import math
 from mxnet import gluon, np
 import random
-import zipfile
 ```
 
 ## Reading and Preprocessing the Dataset
@@ -21,9 +20,12 @@ This dataset has already been preprocessed. Each line of the dataset acts as a s
 
 ```{.python .input  n=2}
 # Saved in the d2l package for later use
+d2l.DATA_HUB['ptb'] = (d2l.DATA_URL+'ptb.zip', 
+                      '319d85e578af0cdc590547f26231e4e31cdf1e42')
 def read_ptb():
-    with zipfile.ZipFile('../data/ptb.zip', 'r') as f:
-        raw_text = f.read('ptb/ptb.train.txt').decode("utf-8")
+    data_dir = d2l.download_extract('ptb')
+    with open(data_dir+'ptb.train.txt') as f:
+        raw_text = f.read()
     return [line.split() for line in raw_text.split('\n')]
 
 sentences = read_ptb()

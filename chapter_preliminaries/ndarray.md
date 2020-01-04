@@ -4,7 +4,7 @@
 In order to get anything done, we need some way to store and manipulate data. 
 Generally, there are two important things we need to do with data: 
 (i) acquire them; and (ii) process them once they are inside the computer. 
-There is no point in acquiring data absent some way to store it, 
+There is no point in acquiring data without some way to store it, 
 so let's get our hands dirty first by playing with synthetic data. 
 To start, we introduce the $n$-dimensional array (`ndarray`), 
 MXNet's primary tool for storing and transforming data.
@@ -12,7 +12,7 @@ In MXNet, `ndarray` is a class and we call any instance "an `ndarray`".
 
 If you have worked with NumPy, the most widely-used 
 scientific computing package in Python, 
-then will find this section familiar.
+then you will find this section familiar.
 That's by design. We designed MXNet's `ndarray` to be 
 an extension to NumPy's `ndarray` with a few killer features.
 First, MXNet's `ndarray` supports asynchronous computation 
@@ -146,7 +146,7 @@ For example, when we construct arrays to serve
 as parameters in a neural network, we will
 typically inititialize their values randomly. 
 The following snippet creates an `ndarray` with shape ($3$, $4$). 
-Each of its elements is randomly sampled  
+Each of its elements is randomly sampled 
 from a standard Gaussian (normal) distribution 
 with a mean of $0$ and a standard deviation of $1$.
 

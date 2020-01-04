@@ -15,12 +15,15 @@ To get started we load text from H. G. Wells' [Time Machine](http://www.gutenber
 
 ```{.python .input}
 import collections
+import d2l
 import re
 
 # Saved in the d2l package for later use
+d2l.DATA_HUB['time_machine'] = (d2l.DATA_URL+'timemachine.txt',
+                               '090b5e7e70c295757f55df93cb0a180b9691891a')
 def read_time_machine():
     """Load the time machine book into a list of sentences."""
-    with open('../data/timemachine.txt', 'r') as f:
+    with open(d2l.download('time_machine'), 'r') as f:
         lines = f.readlines()
     return [re.sub('[^A-Za-z]+', ' ', line.strip().lower())
             for line in lines]

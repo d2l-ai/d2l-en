@@ -22,9 +22,7 @@ import math
 from mxnet import autograd, gluon, init, npx
 from mxnet.gluon import nn
 import os
-import shutil
 import time
-import zipfile
 
 npx.set_np()
 ```
@@ -35,91 +33,46 @@ The competition data is divided into a training set and testing set. The trainin
 
 ### Downloading the Dataset
 
-After logging in to Kaggle, we can click on the "Data" tab on the dog breed identification competition webpage shown in :numref:`fig_kaggle_dog` and download the training dataset "train.zip", the testing dataset "test.zip", and the training dataset labels "label.csv.zip". After downloading the files, place them in the three paths below:
+After logging in to Kaggle, we can click on the "Data" tab on the dog breed identification competition webpage shown in :numref:`fig_kaggle_dog` and download the dataset by clicking the "Download All" button. If you unzip the downloaded zip file in `../data`, then you will found the following structure:
 
-* ../data/kaggle_dog/train.zip
-* ../data/kaggle_dog/test.zip
-* ../data/kaggle_dog/labels.csv.zip
+* ../data/dog-breed-identification/labels.csv
+* ../data/dog-breed-identification/sample_submission.csv
+* ../data/dog-breed-identification/train
+* ../data/dog-breed-identification/test
 
+You can see its structure is quite similar to the CIFAR-10 competition :numref:`sec_kaggle_cifar10`, where folders `train/` and `test/` have dog images, `labels.csv` contains the labels for the images in `train/`.
 
-To make it easier to get started, we provide a small-scale sample of the dataset mentioned above, "train_valid_test_tiny.zip". If you are going to use the full dataset for the Kaggle competition, you will also need to change the `demo` variable below to `False`.
+Similarly, to make it easier to get started, we provide a small-scale sample of the dataset mentioned above, "train_valid_test_tiny.zip". If you are going to use the full dataset for the Kaggle competition, you will also need to change the `demo` variable below to `False`.
 
 ```{.python .input  n=1}
+# Saved in the d2l package for later use 
+d2l.DATA_HUB['dog_tiny'] = (d2l.DATA_URL+'kaggle_dog_tiny.zip',
+                            '7c9b54e78c1cedaa04998f9868bc548c60101362')
+
 # If you use the full dataset downloaded for the Kaggle competition, change
 # the variable below to False
 demo = True
-data_dir = '../data/kaggle_dog'
 if demo:
-    zipfiles = ['train_valid_test_tiny.zip']
+    data_dir = d2l.download_extract('dog_tiny')
 else:
-    zipfiles = ['train.zip', 'test.zip', 'labels.csv.zip']
-for f in zipfiles:
-    with zipfile.ZipFile(data_dir + '/' + f, 'r') as z:
-        z.extractall(data_dir)
+    data_dir = '../data/dog-breed-identification'
 ```
 
 ### Organizing the Dataset
 
-Next, we define the `reorg_train_valid` function to segment the validation set from the original Kaggle competition training set.  The parameter `valid_ratio` in this function is the ratio of the number of examples of each dog breed in the validation set to the number of examples of the breed with the least examples (66) in the original training set. After organizing the data, images of the same breed will be placed in the same folder so that we can read them later.
-
-```{.python .input}
-def reorg_train_valid(data_dir, train_dir, input_dir, valid_ratio, idx_label):
-    # The number of examples of the least represented breed in the training
-    # set
-    min_n_train_per_label = (
-        collections.Counter(idx_label.values()).most_common()[:-2:-1][0][1])
-    # The number of examples of each breed in the validation set
-    n_valid_per_label = math.floor(min_n_train_per_label * valid_ratio)
-    label_count = {}
-    for train_file in os.listdir(os.path.join(data_dir, train_dir)):
-        idx = train_file.split('.')[0]
-        label = idx_label[idx]
-        d2l.mkdir_if_not_exist([data_dir, input_dir, 'train_valid', label])
-        shutil.copy(os.path.join(data_dir, train_dir, train_file),
-                    os.path.join(data_dir, input_dir, 'train_valid', label))
-        if label not in label_count or label_count[label] < n_valid_per_label:
-            d2l.mkdir_if_not_exist([data_dir, input_dir, 'valid', label])
-            shutil.copy(os.path.join(data_dir, train_dir, train_file),
-                        os.path.join(data_dir, input_dir, 'valid', label))
-            label_count[label] = label_count.get(label, 0) + 1
-        else:
-            d2l.mkdir_if_not_exist([data_dir, input_dir, 'train', label])
-            shutil.copy(os.path.join(data_dir, train_dir, train_file),
-                        os.path.join(data_dir, input_dir, 'train', label))
-```
+We can organize the dataset similarly as we did in :numref:`sec_kaggle_cifar10`, namely separating a validation set from the training set, and moving images into subfolders grouped by labels. 
 
 The `reorg_dog_data` function below is used to read the training data labels, segment the validation set, and organize the training set.
 
 ```{.python .input  n=2}
-def reorg_dog_data(data_dir, label_file, train_dir, test_dir, input_dir,
-                   valid_ratio):
-    # Read the training data labels
-    with open(os.path.join(data_dir, label_file), 'r') as f:
-        # Skip the file header line (column name)
-        lines = f.readlines()[1:]
-        tokens = [l.rstrip().split(',') for l in lines]
-        idx_label = dict(((idx, label) for idx, label in tokens))
-    reorg_train_valid(data_dir, train_dir, input_dir, valid_ratio, idx_label)
-    # Organize the training set
-    d2l.mkdir_if_not_exist([data_dir, input_dir, 'test', 'unknown'])
-    for test_file in os.listdir(os.path.join(data_dir, test_dir)):
-        shutil.copy(os.path.join(data_dir, test_dir, test_file),
-                    os.path.join(data_dir, input_dir, 'test', 'unknown'))
-```
-
-Because we are using a small dataset, we set the batch size to 1. During actual training and testing, we would use the entire Kaggle Competition dataset and call the `reorg_dog_data` function to organize the dataset. Likewise, we would need to set the `batch_size` to a larger integer, such as 128.
-
-```{.python .input  n=3}
-if demo:
-    # Note: Here, we use a small dataset and the batch size should be set
-    # smaller. When using the complete dataset for the Kaggle competition, we
-    # can set the batch size to a larger integer
-    input_dir, batch_size = 'train_valid_test_tiny', 1
-else:
-    label_file, train_dir, test_dir = 'labels.csv', 'train', 'test'
-    input_dir, batch_size, valid_ratio = 'train_valid_test', 128, 0.1
-    reorg_dog_data(data_dir, label_file, train_dir, test_dir, input_dir,
-                   valid_ratio)
+def reorg_dog_data(data_dir, valid_ratio):
+    labels = d2l.read_csv_labels(data_dir+'labels.csv')
+    d2l.reorg_train_valid(data_dir, labels, valid_ratio)
+    d2l.reorg_test(data_dir)
+    
+batch_size = 1 if demo else 128
+valid_ratio = 0.1
+reorg_dog_data(data_dir, valid_ratio)
 ```
 
 ## Image Augmentation
@@ -164,30 +117,21 @@ transform_test = gluon.data.vision.transforms.Compose([
 As in the previous section, we can create an `ImageFolderDataset` instance to read the dataset containing the original image files.
 
 ```{.python .input  n=5}
-train_ds = gluon.data.vision.ImageFolderDataset(
-    os.path.join(data_dir, input_dir, 'train'), flag=1)
-valid_ds = gluon.data.vision.ImageFolderDataset(
-    os.path.join(data_dir, input_dir, 'valid'), flag=1)
-train_valid_ds = gluon.data.vision.ImageFolderDataset(
-    os.path.join(data_dir, input_dir, 'train_valid'), flag=1)
-test_ds = gluon.data.vision.ImageFolderDataset(
-    os.path.join(data_dir, input_dir, 'test'), flag=1)
+train_ds, valid_ds, train_valid_ds, test_ds = [
+    gluon.data.vision.ImageFolderDataset(data_dir+'train_valid_test/'+folder)
+    for folder in ['train', 'valid', 'train_valid', 'test']]
 ```
 
 Here, we create a `DataLoader` instance, just like in the previous section.
 
 ```{.python .input}
-train_iter = gluon.data.DataLoader(train_ds.transform_first(transform_train),
-                                   batch_size, shuffle=True,
-                                   last_batch='keep')
-valid_iter = gluon.data.DataLoader(valid_ds.transform_first(transform_test),
-                                   batch_size, shuffle=True,
-                                   last_batch='keep')
-train_valid_iter = gluon.data.DataLoader(train_valid_ds.transform_first(
-    transform_train), batch_size, shuffle=True, last_batch='keep')
-test_iter = gluon.data.DataLoader(test_ds.transform_first(transform_test),
-                                  batch_size, shuffle=False,
-                                  last_batch='keep')
+train_iter, train_valid_iter = [gluon.data.DataLoader(
+    dataset.transform_first(transform_train), batch_size, shuffle=True, 
+    last_batch='keep') for dataset in (train_ds, train_valid_ds)]
+
+valid_iter, test_iter = [gluon.data.DataLoader(
+    dataset.transform_first(transform_test), batch_size, shuffle=False, 
+    last_batch='keep') for dataset in (valid_ds, test_ds)]
 ```
 
 ## Defining the Model
@@ -303,7 +247,7 @@ for data, label in test_iter:
     output_features = net.features(data.as_in_context(ctx))
     output = npx.softmax(net.output_new(output_features))
     preds.extend(output.asnumpy())
-ids = sorted(os.listdir(os.path.join(data_dir, input_dir, 'test/unknown')))
+ids = sorted(os.listdir(data_dir+'train_valid_test/test/unknown'))
 with open('submission.csv', 'w') as f:
     f.write('id,' + ','.join(train_valid_ds.synsets) + '\n')
     for i, output in zip(ids, preds):

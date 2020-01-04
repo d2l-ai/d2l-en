@@ -9,6 +9,11 @@ $$ \text{CTR} = \frac{\#\text{Clicks}} {\#\text{Impressions}} \times 100 \% .$$
 
 Click-through rate is an important signal that indicates the effectiveness of prediction algorithms. Click-through rate prediction is a task of predicting the likelihood that something on a website will be clicked. Models on CTR prediction can not only be employed in targeted advertising systems but also in general item (e.g., movies, news, products) recommender systems, email campaigns, and even search engines. It is also closely related to user satisfaction, conversion rate, and can be helpful in setting campaign goals as it can help advertisers to set realistic expectations. 
 
+```{.python .input}
+from collections import defaultdict
+import d2l
+from mxnet import gluon, np
+```
 
 ## An Online Advertising Dataset
 
@@ -17,23 +22,11 @@ With the considerable advancements of Internet and mobile technology, online adv
 The following code downloads the dataset from our server and saves it into the local data folder.
 
 ```{.python .input  n=15}
-from collections import defaultdict
-from mxnet import gluon, np
-import os
-
 # Saved in the d2l package for later use
-def read_data_ctr(path="../data/", train="ctr/train.csv",
-                  test="ctr/test.csv"):
-    data_path = ("https://apache-mxnet.s3-accelerate.amazonaws.com/"
-                 "gluon/dataset/")
-    train_sha1 = "6dec3052e49ce0d1cec5ebc6f5ded1172be0befb"
-    test_sha1 = "c265e3c1fad0ed4caf8c1a373c580465a8096eb0"
-    ctr_path = path+"ctr"
-    os.makedirs(ctr_path, exist_ok=True)
-    gluon.utils.download(data_path + train, ctr_path, train_sha1)
-    gluon.utils.download(data_path + test, ctr_path, test_sha1)
+d2l.DATA_HUB['ctr'] = (d2l.DATA_URL+'ctr.zip',
+                      'e18327c48c8e8e5c23da714dd614e390d369843f')
 
-read_data_ctr()
+data_dir = d2l.download_extract('ctr')
 ```
 
 There are a training set and a test set, consisting of 15000 and 3000 samples/lines, respectively.
@@ -88,7 +81,7 @@ class CTRDataset(gluon.data.Dataset):
 The following example loads the training data and print out the first record.
 
 ```{.python .input  n=16}
-train_data = CTRDataset(data_path="../data/ctr/train.csv")
+train_data = CTRDataset(data_path=data_dir+"train.csv")
 train_data[0]
 ```
 

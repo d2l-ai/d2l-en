@@ -31,8 +31,6 @@ First, import the packages and modules required for the experiment.  Gluon's `mo
 import d2l
 from mxnet import gluon, init, np, npx
 from mxnet.gluon import nn
-import os
-import zipfile
 
 npx.set_np()
 ```
@@ -41,25 +39,21 @@ npx.set_np()
 
 The hot dog dataset we use was taken from online images and contains $1,400$ positive images containing hot dogs and same number of negative images containing other foods. $1,000$ images of various classes are used for training and the rest are used for testing.
 
-We first download the compressed dataset to the path `../data`. Then, we unzip the downloaded dataset in this path and get two folders, `hotdog/train` and `hotdog/test`. Both folders have `hotdog` and `not-hotdog` category subfolders, each of which has corresponding image files.
+We first download the compressed dataset to get two folders, `hotdog/train` and `hotdog/test`. Both folders have `hotdog` and `not-hotdog` category subfolders, each of which has corresponding image files.
 
 ```{.python .input  n=2}
-data_dir = '../data'
-base_url = 'https://apache-mxnet.s3-accelerate.amazonaws.com/'
-fname = gluon.utils.download(
-    base_url + 'gluon/dataset/hotdog.zip',
-    path=data_dir, sha1_hash='fba480ffa8aa7e0febbb511d181409f899b9baa5')
-with zipfile.ZipFile(fname, 'r') as z:
-    z.extractall(data_dir)
+# Saved in the d2l package for later use
+d2l.DATA_HUB['hotdog'] = (d2l.DATA_URL+'hotdog.zip', 
+                         'fba480ffa8aa7e0febbb511d181409f899b9baa5')
+
+data_dir = d2l.download_extract('hotdog')
 ```
 
 We create two `ImageFolderDataset` instances to read all the image files in the training dataset and testing dataset, respectively.
 
 ```{.python .input  n=3}
-train_imgs = gluon.data.vision.ImageFolderDataset(
-    os.path.join(data_dir, 'hotdog/train'))
-test_imgs = gluon.data.vision.ImageFolderDataset(
-    os.path.join(data_dir, 'hotdog/test'))
+train_imgs = gluon.data.vision.ImageFolderDataset(data_dir+'train')
+test_imgs = gluon.data.vision.ImageFolderDataset(data_dir+'test')
 ```
 
 The first 8 positive examples and the last 8 negative images are shown below. As you can see, the images vary in size and aspect ratio.
