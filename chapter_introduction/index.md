@@ -541,7 +541,7 @@ Homes probably never sell for fractions of a cent,
 let alone prices expressed as irrational numbers.
 In cases like this, when the target is actually discrete,
 but where the rounding takes place on a sufficiently fine scale,
-we will abuse language just a bit cn continue to describe
+we will abuse language just a bit and continue to describe
 our outputs and targets as real-valued numbers.
 
 
