@@ -22,6 +22,8 @@ import os
 
 # Saved in the d2l package for later use
 def mkdir_if_not_exist(path):
+    if not isinstance(path, str):
+        path = os.path.join(*path)
     if not os.path.exists(path):
         os.makedirs(path)
 ```
@@ -102,7 +104,7 @@ X, y
 
 Create a raw dataset with more rows and columns.
 
-1. Delete the column with the most missing values. 
+1. Delete the column with the most missing values.
 2. Convert the preprocessed dataset to the `ndarray` format.
 
 

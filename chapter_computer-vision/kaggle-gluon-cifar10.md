@@ -20,8 +20,10 @@ is
 
 First, import the packages or modules required for the competition.
 
-```{.python .input  n=1}
+```{.python .input  n=14}
+import collections
 import d2l
+import math
 from mxnet import autograd, gluon, init, npx
 from mxnet.gluon import nn
 import os
@@ -34,117 +36,122 @@ npx.set_np()
 
 ## Obtaining and Organizing the Dataset
 
-The competition data is divided into a training set and testing set. The training set contains $50,000$ images. The testing set contains $300,000$ images, of which $10,000$ images are used for scoring, while the other $290,000$ non-scoring images are included to prevent the manual labeling of the testing set and the submission of labeling results. The image formats in both datasets are PNG, with heights and widths of 32 pixels and three color channels (RGB). The images cover 10$ categories: planes, cars, birds, cats, deer, dogs, frogs, horses, boats, and trucks. The upper-left corner of Figure 9.16 shows some images of planes, cars, and birds in the dataset.
+The competition data is divided into a training set and testing set. The training set contains $50,000$ images. The testing set contains $300,000$ images, of which $10,000$ images are used for scoring, while the other $290,000$ non-scoring images are included to prevent the manual labeling of the testing set and the submission of labeling results. The image formats in both datasets are PNG, with heights and widths of 32 pixels and three color channels (RGB). The images cover $10$ categories: planes, cars, birds, cats, deer, dogs, frogs, horses, boats, and trucks. The upper-left corner of Figure 9.16 shows some images of planes, cars, and birds in the dataset.
 
 ### Downloading the Dataset
 
-After logging in to Kaggle, we can click on the "Data" tab on the CIFAR-10 image classification competition webpage shown in Figure 9.16 and download the training dataset "train.7z", the testing dataset "test.7z", and the training dataset labels "trainlabels.csv".
+After logging in to Kaggle, we can click on the "Data" tab on the CIFAR-10 image classification competition webpage shown in :numref:`fig_kaggle_cifar10` and download the dataset by clicking the "Download All" button. If you unzip the downloaded file in `../data`, with the `train.7z` and `test.7z` in it as well, you will find the dataset has the following structure:
 
 
-### Unzipping the Dataset
+* ../data/cifar10/train/[1-50000].png
+* ../data/cifar10/test/[1-300000].png
+* ../data/cifar10/trainLabels.csv
+* ../data/cifar10/sampleSubmission.csv
 
-The training dataset "train.7z" and the test dataset "test.7z" need to be unzipped after downloading. After unzipping the datasets, store the training dataset, test dataset, and training dataset labels in the following respective paths:
+Here folders `train` and `test` contains the images, `trainLabels.csv` has labels for the images in the `train` folder, and `sample_submission.csv` is a sample of the result submission. 
 
-* ../data/kaggle_cifar10/train/[1-50000].png
-* ../data/kaggle_cifar10/test/[1-300000].png
-* ../data/kaggle_cifar10/trainLabels.csv
+To make it easier to get started, we provide a small-scale sample of the dataset mentioned above. It has the same structure, but `train` only contains the first 1000 images and `test` has 5 random images. If you are going to use the full dataset of the Kaggle competition, you will also need to change the following `demo` variable to `False`.
 
-To make it easier to get started, we provide a small-scale sample of the dataset mentioned above. "train_tiny.zip" contains $100$ training examples, while "test_tiny.zip" contains only one test example. Their unzipped folder names are "train_tiny" and "test_tiny", respectively. In addition, unzip the zip file of the training dataset labels to obtain the file "trainlabels.csv". If you are going to use the full dataset of the Kaggle competition, you will also need to change the following `demo` variable to `False`.
+```{.python .input  n=15}
+# Saved in the d2l package for later use
+d2l.DATA_HUB['cifar10_tiny'] = (d2l.DATA_URL+'kaggle_cifar10_tiny.zip',
+                                '2068874e4b9a9f0fb07ebe0ad2b29754449ccacd')
 
-```{.python .input  n=2}
 # If you use the full dataset downloaded for the Kaggle competition, change
 # the demo variable to False
 demo = True
+
 if demo:
-    import zipfile
-    train_fn, test_fn, label_fn = d2l.get_files([
-        'kaggle_cifar10_train_tiny.zip', 'kaggle_cifar10_test_tiny.zip',
-        'kaggle_cifar10_trainLabels.csv.zip'])
-    for f in [train_fn, test_fn, label_fn]:
-        with zipfile.ZipFile(f, 'r') as z:
-            z.extractall('../data/kaggle_cifar10/')
+    data_dir = d2l.download_extract('cifar10_tiny')
+else:
+    data_dir = '../data/cifar10/'
 ```
 
 ### Organizing the Dataset
 
-We need to organize datasets to facilitate model training and testing. The following `read_label_file` function will be used to read the label file for the training dataset. The parameter `valid_ratio` in this function is the ratio of the number of examples in the validation set to the number of examples in the original training set.
+We need to organize datasets to facilitate model training and testing. Let's first read the labels from the csv file. The following function returns dictionary that maps the filename without extension to its label.
 
-```{.python .input  n=3}
-def read_label_file(data_dir, label_file, train_dir, valid_ratio):
-    with open(os.path.join(data_dir, label_file), 'r') as f:
+```{.python .input  n=16}
+# Saved in the d2l package for later use
+def read_csv_labels(fname):
+    """Read fname to return a name to label dictionary"""
+    with open(fname, 'r') as f:
         # Skip the file header line (column name)
         lines = f.readlines()[1:]
-        tokens = [l.rstrip().split(',') for l in lines]
-        idx_label = dict(((int(idx), label) for idx, label in tokens))
-    labels = set(idx_label.values())
-    n_train_valid = len(os.listdir(os.path.join(data_dir, train_dir)))
-    n_train = int(n_train_valid * (1 - valid_ratio))
-    assert 0 < n_train < n_train_valid
-    return n_train // len(labels), idx_label
+    tokens = [l.rstrip().split(',') for l in lines]
+    return dict(((name, label) for name, label in tokens))
+
+labels = read_csv_labels(data_dir+'trainLabels.csv')
+print('# training examples:', len(labels))
+print('# classes:', len(set(labels.values())))
 ```
 
-Next, we define the `reorg_train_valid` function to segment the validation set from the original training set.  Here, we use `valid_ratio=0.1` as an example. Since the original training set has $50,000$ images, there will be $45,000$ images used for training and stored in the path “`input_dir/train`” when tuning hyper-parameters, while the other $5,000$ images will be stored as validation set in the path “`input_dir/valid`”. After organizing the data, images of the same type will be placed under the same folder so that we can read them later.
+The following function will determine the number of examples per class for the validation set.
 
-```{.python .input  n=5}
-def reorg_train_valid(data_dir, train_dir, input_dir, n_train_per_label,
-                      idx_label):
+```{.python .input  n=18}
+# Saved in the d2l package for later use
+def n_valid_per_label(labels, valid_ratio):
+    """Determine # examples per class for the validation set"""
+    n = collections.Counter(labels.values()).most_common()[-1][1]
+    return max(1, math.floor(n * valid_ratio))
+
+n_valid_per_label(labels, 0.1)
+```
+
+Next, we define the `reorg_train_valid` function to segment the validation set from the original training set. The parameter `valid_ratio` in this function is the ratio of the number of examples in the validation set to the number of examples in the original training set. In particular, if $n$ is number of images in the smallest category, and $r$ is the ratio, then we will use $\max(\lfloor nr\rfloor,1)$ images for each category as the validation set.  Let's use `valid_ratio=0.1` as an example. Since the original training set has $50,000$ images, there will be $45,000$ images used for training and stored in the path "`train_valid_test/train`" when tuning hyper-parameters, while the other $5,000$ images will be stored as validation set in the path "`train_valid_test/valid`". After organizing the data, images of the same type will be placed under the same folder so that we can read them later.
+
+```{.python .input  n=2}
+# Saved in the d2l package for later use
+def copyfile(filename, target_dir):
+    """Copy a file into a target directory"""
+    d2l.mkdir_if_not_exist(target_dir)
+    shutil.copy(filename, target_dir)
+
+# Saved in the d2l package for later use    
+def reorg_train_valid(data_dir, labels, valid_ratio):
+    n = collections.Counter(labels.values()).most_common()[-1][1]
+    n_valid_per_label = max(1, math.floor(n * valid_ratio))
     label_count = {}
-    for train_file in os.listdir(os.path.join(data_dir, train_dir)):
-        idx = int(train_file.split('.')[0])
-        label = idx_label[idx]
-        d2l.mkdir_if_not_exist(
-            data_dir + '/' + input_dir + '/train_valid/' + label)
-        shutil.copy(os.path.join(data_dir, train_dir, train_file),
-                    os.path.join(data_dir, input_dir, 'train_valid', label))
-        if label not in label_count or label_count[label] < n_train_per_label:
-            d2l.mkdir_if_not_exist(
-                data_dir + '/' + input_dir + '/train/' + label)
-            shutil.copy(os.path.join(data_dir, train_dir, train_file),
-                        os.path.join(data_dir, input_dir, 'train', label))
+    for train_file in os.listdir(data_dir+'train'):
+        label = labels[train_file.split('.')[0]]
+        fname = data_dir+'train/'+train_file
+        # Copy to train_valid_test/train_valid with a subfolder per class
+        copyfile(fname, data_dir+'train_valid_test/train_valid/'+label)
+        if label not in label_count or label_count[label] < n_valid_per_label:
+            # Copy to train_valid_test/valid
+            copyfile(fname, data_dir+'train_valid_test/valid/'+label)
             label_count[label] = label_count.get(label, 0) + 1
         else:
-            d2l.mkdir_if_not_exist(
-                data_dir + '/' + input_dir + '/valid/' + label)
-            shutil.copy(os.path.join(data_dir, train_dir, train_file),
-                        os.path.join(data_dir, input_dir, 'valid', label))
+            # Copy to train_valid_test/train
+            copyfile(fname, data_dir+'train_valid_test/train/'+label)
+    return n_valid_per_label
 ```
 
 The `reorg_test` function below is used to organize the testing set to facilitate the reading during prediction.
 
-```{.python .input  n=6}
-def reorg_test(data_dir, test_dir, input_dir):
-    d2l.mkdir_if_not_exist(data_dir + '/' + input_dir + '/test/unknown')
-    for test_file in os.listdir(os.path.join(data_dir, test_dir)):
-        shutil.copy(os.path.join(data_dir, test_dir, test_file),
-                    os.path.join(data_dir, input_dir, 'test', 'unknown'))
+```{.python .input  n=3}
+# Saved in the d2l package for later use    
+def reorg_test(data_dir):
+    for test_file in os.listdir(data_dir+'test'):
+        copyfile(data_dir+'test/'+test_file, 
+                 data_dir+'train_valid_test/test/unknown/')
 ```
 
-Finally, we use a function to call the previously defined `reorg_test`, `reorg_train_valid`, and `reorg_test` functions.
+Finally, we use a function to call the previously defined `read_csv_labels`, `reorg_train_valid`, and `reorg_test` functions.
 
 ```{.python .input  n=7}
-def reorg_cifar10_data(data_dir, label_file, train_dir, test_dir, input_dir,
-                       valid_ratio):
-    n_train_per_label, idx_label = read_label_file(data_dir, label_file,
-                                                   train_dir, valid_ratio)
-    reorg_train_valid(data_dir, train_dir, input_dir, n_train_per_label,
-                      idx_label)
-    reorg_test(data_dir, test_dir, input_dir)
+def reorg_cifar10_data(data_dir, valid_ratio):
+    labels = read_csv_labels(data_dir+'trainLabels.csv')
+    reorg_train_valid(data_dir, labels, valid_ratio)
+    reorg_test(data_dir)
 ```
 
-We use only 100 training example and one test example here. The folder names for the training and testing datasets are "train_tiny" and "test_tiny", respectively. Accordingly, we only set the batch size to 1. During actual training and testing, the complete dataset of the Kaggle competition should be used and `batch_size` should be set to a larger integer, such as 128. We use 10% of the training examples as the validation set for tuning hyper-parameters.
+We only set the batch size to 1 for the demo dataset. During actual training and testing, the complete dataset of the Kaggle competition should be used and `batch_size` should be set to a larger integer, such as 128. We use 10% of the training examples as the validation set for tuning hyper-parameters.
 
-```{.python .input  n=8}
-if demo:
-    # Note: Here, we use small training sets and small testing sets and the
-    # batch size should be set smaller. When using the complete dataset for
-    # the Kaggle competition, the batch size can be set to a large integer
-    train_dir, test_dir, batch_size = 'train_tiny', 'test_tiny', 1
-else:
-    train_dir, test_dir, batch_size = 'train', 'test', 128
-data_dir, label_file = '../data/kaggle_cifar10', 'trainLabels.csv'
-input_dir, valid_ratio = 'train_valid_test', 0.1
-reorg_cifar10_data(data_dir, label_file, train_dir, test_dir, input_dir,
-                   valid_ratio)
+```{.python .input  n=4}
+batch_size = 1 if demo else 128
+valid_ratio = 0.1
+reorg_cifar10_data(data_dir, valid_ratio)
 ```
 
 ## Image Augmentation
@@ -182,32 +189,21 @@ transform_test = gluon.data.vision.transforms.Compose([
 Next, we can create the `ImageFolderDataset` instance to read the organized dataset containing the original image files, where each data instance includes the image and label.
 
 ```{.python .input  n=10}
-# Read the original image file. Flag=1 indicates that the input image has
-# three channels (color)
-train_ds = gluon.data.vision.ImageFolderDataset(
-    os.path.join(data_dir, input_dir, 'train'), flag=1)
-valid_ds = gluon.data.vision.ImageFolderDataset(
-    os.path.join(data_dir, input_dir, 'valid'), flag=1)
-train_valid_ds = gluon.data.vision.ImageFolderDataset(
-    os.path.join(data_dir, input_dir, 'train_valid'), flag=1)
-test_ds = gluon.data.vision.ImageFolderDataset(
-    os.path.join(data_dir, input_dir, 'test'), flag=1)
+train_ds, valid_ds, train_valid_ds, test_ds = [
+    gluon.data.vision.ImageFolderDataset(data_dir+'train_valid_test/'+folder)
+    for folder in ['train', 'valid', 'train_valid', 'test']]
 ```
 
 We specify the defined image augmentation operation in `DataLoader`. During training, we only use the validation set to evaluate the model, so we need to ensure the certainty of the output. During prediction, we will train the model on the combined training set and validation set to make full use of all labelled data.
 
 ```{.python .input}
-train_iter = gluon.data.DataLoader(train_ds.transform_first(transform_train),
-                                   batch_size, shuffle=True,
-                                   last_batch='keep')
-valid_iter = gluon.data.DataLoader(valid_ds.transform_first(transform_test),
-                                   batch_size, shuffle=True,
-                                   last_batch='keep')
-train_valid_iter = gluon.data.DataLoader(train_valid_ds.transform_first(
-    transform_train), batch_size, shuffle=True, last_batch='keep')
-test_iter = gluon.data.DataLoader(test_ds.transform_first(transform_test),
-                                  batch_size, shuffle=False,
-                                  last_batch='keep')
+train_iter, train_valid_iter = [gluon.data.DataLoader(
+    dataset.transform_first(transform_train), batch_size, shuffle=True, 
+    last_batch='keep') for dataset in (train_ds, train_valid_ds)]
+
+valid_iter, test_iter = [gluon.data.DataLoader(
+    dataset.transform_first(transform_test), batch_size, shuffle=False, 
+    last_batch='keep') for dataset in (valid_ds, test_ds)]
 ```
 
 ## Defining the Model

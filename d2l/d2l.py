@@ -17,6 +17,7 @@ import os
 import pandas as pd
 import random
 import re
+import shutil
 import sys
 import tarfile
 import time
@@ -25,6 +26,8 @@ import zipfile
 
 # Defined in file: ./chapter_preliminaries/pandas.md
 def mkdir_if_not_exist(path):
+    if not isinstance(path, str):
+        path = os.path.join(*path)
     if not os.path.exists(path):
         os.makedirs(path)
 
@@ -314,16 +317,53 @@ def evaluate_loss(net, data_iter, loss):
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
-def get_files(filenames, path='../data', url='https://raw.'\
-              'githubusercontent.com/d2l-ai/d2l-en/master/data/'):
-    """If filenames do not exist in path, then download them from url. 
-    Return the downloaded filenames.
-    """
-    d2l.mkdir_if_not_exist(path)
-    if isinstance(filenames, str): 
-        return gluon.utils.download(url + filenames, path)
+DATA_HUB = dict()
+DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
+
+
+# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
+def download(name, cache_dir='../data'):
+    """Download a file inserted into DATA_HUB, return the local filename"""
+    assert name in DATA_HUB, "%s doesn't exist" % name
+    url, sha1 = DATA_HUB[name]
+    if not os.path.exists(cache_dir):
+        os.makedirs(cache_dir)
+    return gluon.utils.download(url, cache_dir, sha1_hash=sha1)
+
+
+# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
+def download_extract(name, folder=None):
+    """Download and extract a .zip or a .tar file"""
+    fname = download(name)
+    base_dir = os.path.dirname(fname) 
+    data_dir, ext = os.path.splitext(fname)
+    if ext == '.zip':
+        fp = zipfile.ZipFile(fname, 'r')
+    elif ext == '.tar' or ext == '.gz':
+        fp = tarfile.open(fname, 'r')
     else:
-        return [get_files(fn, path, url) for fn in filenames]    
+        assert False, 'Only zip and tar files can be extracted'
+    fp.extractall(base_dir)
+    if folder:
+        return base_dir + '/' + folder + '/'
+    else:
+        return data_dir + '/'
+
+
+# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
+def download_all():
+    """Download all files in the DATA_HUB"""
+    for name in DATA_HUB:
+        download(name)
+
+
+# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
+DATA_HUB['kaggle_house_train'] = (
+    DATA_URL+'kaggle_house_pred_train.csv',
+    '585e9cc93e70b39160e7921475f9bcd7d31219ce')
+DATA_HUB['kaggle_house_test'] = (
+    DATA_URL+'kaggle_house_pred_test.csv',
+    'fa19780a7b011d9b009e8bff8e99922a8ee2eb90')
 
 
 # Defined in file: ./chapter_deep-learning-computation/use-gpu.md
@@ -418,10 +458,11 @@ class Residual(nn.Block):
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
+d2l.DATA_HUB['time_machine'] = (d2l.DATA_URL+'timemachine.txt',
+                               '090b5e7e70c295757f55df93cb0a180b9691891a')
 def read_time_machine():
     """Load the time machine book into a list of sentences."""
-    fname = d2l.get_files('../data/timemachine.txt')
-    with open(fname, 'r') as f:
+    with open(d2l.download('time_machine'), 'r') as f:
         lines = f.readlines()
     return [re.sub('[^A-Za-z]+', ' ', line.strip().lower())
             for line in lines]
@@ -677,10 +718,12 @@ class RNNModel(nn.Block):
 
 
 # Defined in file: ./chapter_recurrent-modern/machine-translation.md
+d2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL+'fra-eng.zip',
+                          '94646ad1522d915e7b0f9296181140edcf86a4f5')
 def read_data_nmt():
-    fname = gluon.utils.download('http://data.mxnet.io/data/fra-eng.zip')
-    with zipfile.ZipFile(fname, 'r') as f:
-        return f.read('fra.txt').decode("utf-8")
+    data_dir = d2l.download_extract('fra-eng')
+    with open(data_dir+'fra.txt', 'r') as f:
+        return f.read()
 
 
 # Defined in file: ./chapter_recurrent-modern/machine-translation.md
@@ -973,9 +1016,11 @@ def show_trace_2d(f, results):
 
 
 # Defined in file: ./chapter_optimization/minibatch-sgd.md
+d2l.DATA_HUB['airfoil'] = (d2l.DATA_URL+'airfoil_self_noise.dat',
+                          '76e5be1548fd8222e5074cf0faae75edff8cf93f')
 def get_data_ch11(batch_size=10, n=1500):
-    fname = d2l.get_files('../data/airfoil_self_noise.dat')
-    data = np.genfromtxt(fname, dtype=np.float32, delimiter='\t')
+    data = np.genfromtxt(d2l.download('airfoil'),
+                         dtype=np.float32, delimiter='\t')
     data = (data - data.mean(axis=0)) / data.std(axis=0)
     data_iter = d2l.load_array(
         (data[:n, :-1], data[:n, -1]), batch_size, is_train=True)
@@ -1138,6 +1183,11 @@ def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
         metric[2]*num_epochs/timer.sum(), ctx_list))
 
 
+# Defined in file: ./chapter_computer-vision/fine-tuning.md
+d2l.DATA_HUB['hotdog'] = (d2l.DATA_URL+'hotdog.zip', 
+                         'fba480ffa8aa7e0febbb511d181409f899b9baa5')
+
+
 # Defined in file: ./chapter_computer-vision/bounding-box.md
 def bbox_to_rect(bbox, color):
     """Convert bounding box to matplotlib format."""
@@ -1172,61 +1222,45 @@ def show_bboxes(axes, bboxes, labels=None, colors=None):
 
 
 # Defined in file: ./chapter_computer-vision/object-detection-dataset.md
-def download_pikachu(data_dir):
-    root_url = ('https://apache-mxnet.s3-accelerate.amazonaws.com/'
-                'gluon/dataset/pikachu/')
-    dataset = {'train.rec': 'e6bcb6ffba1ac04ff8a9b1115e650af56ee969c8',
-               'train.idx': 'dcf7318b2602c06428b9988470c731621716c393',
-               'val.rec': 'd6c33f799b4d058e82f2cb5bd9a976f69d72d520'}
-    for k, v in dataset.items():
-        gluon.utils.download(
-            root_url + k, os.path.join(data_dir, k), sha1_hash=v)
+d2l.DATA_HUB['pikachu'] = (d2l.DATA_URL+'pikachu.zip', 
+                         '68ab1bd42143c5966785eb0d7b2839df8d570190')
 
 
 # Defined in file: ./chapter_computer-vision/object-detection-dataset.md
 def load_data_pikachu(batch_size, edge_size=256):
     """Load the pikachu dataset"""
-    data_dir = '../data/pikachu'
-    download_pikachu(data_dir)
+    data_dir = d2l.download_extract('pikachu')
     train_iter = image.ImageDetIter(
-        path_imgrec=os.path.join(data_dir, 'train.rec'),
-        path_imgidx=os.path.join(data_dir, 'train.idx'),
+        path_imgrec=data_dir+'train.rec',
+        path_imgidx=data_dir+'train.idx',
         batch_size=batch_size,
         data_shape=(3, edge_size, edge_size),  # The shape of the output image
         shuffle=True,  # Read the dataset in random order
         rand_crop=1,  # The probability of random cropping is 1
         min_object_covered=0.95, max_attempts=200)
     val_iter = image.ImageDetIter(
-        path_imgrec=os.path.join(data_dir, 'val.rec'), batch_size=batch_size,
+        path_imgrec=data_dir+'val.rec', batch_size=batch_size,
         data_shape=(3, edge_size, edge_size), shuffle=False)
     return train_iter, val_iter
 
 
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
-def download_voc_pascal(data_dir='../data'):
-    """Download the VOC2012 segmentation dataset."""
-    voc_dir = os.path.join(data_dir, 'VOCdevkit/VOC2012')
-    url = 'http://data.mxnet.io/data/VOCtrainval_11-May-2012.tar'
-    sha1 = '4e443f8a2eca6b1dac8a6c57641b67dd40621a49'
-    fname = gluon.utils.download(url, data_dir+'/VOCtrainval_11-May-2012.tar',
-                                 sha1_hash=sha1)
-    with tarfile.open(fname, 'r') as f:
-        f.extractall(data_dir)
-    return voc_dir
+d2l.DATA_HUB['voc2012'] = (d2l.DATA_URL+'VOCtrainval_11-May-2012.tar',
+                          '4e443f8a2eca6b1dac8a6c57641b67dd40621a49')
 
 
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
-def read_voc_images(root='../data/VOCdevkit/VOC2012', is_train=True):
+def read_voc_images(voc_dir, is_train=True):
     """Read all VOC feature and label images."""
     txt_fname = '%s/ImageSets/Segmentation/%s' % (
-        root, 'train.txt' if is_train else 'val.txt')
+        voc_dir, 'train.txt' if is_train else 'val.txt')
     with open(txt_fname, 'r') as f:
         images = f.read().split()
     features, labels = [None] * len(images), [None] * len(images)
     for i, fname in enumerate(images):
-        features[i] = image.imread('%s/JPEGImages/%s.jpg' % (root, fname))
+        features[i] = image.imread('%s/JPEGImages/%s.jpg' % (voc_dir, fname))
         labels[i] = image.imread(
-            '%s/SegmentationClass/%s.png' % (root, fname))
+            '%s/SegmentationClass/%s.png' % (voc_dir, fname))
     return features, labels
 
 
@@ -1237,9 +1271,6 @@ VOC_COLORMAP = [[0, 0, 0], [128, 0, 0], [0, 128, 0], [128, 128, 0],
                 [64, 0, 128], [192, 0, 128], [64, 128, 128], [192, 128, 128],
                 [0, 64, 0], [128, 64, 0], [0, 192, 0], [128, 192, 0],
                 [0, 64, 128]]
-
-
-# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
 VOC_CLASSES = ['background', 'aeroplane', 'bicycle', 'bird', 'boat',
                'bottle', 'bus', 'car', 'cat', 'chair', 'cow',
                'diningtable', 'dog', 'horse', 'motorbike', 'person',
@@ -1280,7 +1311,7 @@ class VOCSegDataset(gluon.data.Dataset):
         self.rgb_mean = np.array([0.485, 0.456, 0.406])
         self.rgb_std = np.array([0.229, 0.224, 0.225])
         self.crop_size = crop_size
-        features, labels = read_voc_images(root=voc_dir, is_train=is_train)
+        features, labels = read_voc_images(voc_dir, is_train=is_train)
         self.features = [self.normalize_image(feature)
                          for feature in self.filter(features)]
         self.labels = self.filter(labels)
@@ -1308,7 +1339,7 @@ class VOCSegDataset(gluon.data.Dataset):
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
 def load_data_voc(batch_size, crop_size):
     """Download and load the VOC2012 semantic dataset."""
-    voc_dir = d2l.download_voc_pascal()
+    voc_dir = d2l.download_extract('voc2012', 'VOCdevkit/VOC2012')
     num_workers = d2l.get_dataloader_workers()
     train_iter = gluon.data.DataLoader(
         VOCSegDataset(True, crop_size, voc_dir), batch_size,
@@ -1319,11 +1350,74 @@ def load_data_voc(batch_size, crop_size):
     return train_iter, test_iter
 
 
+# Defined in file: ./chapter_computer-vision/kaggle-gluon-cifar10.md
+d2l.DATA_HUB['cifar10_tiny'] = (d2l.DATA_URL+'kaggle_cifar10_tiny.zip',
+                                '2068874e4b9a9f0fb07ebe0ad2b29754449ccacd')
+
+
+# Defined in file: ./chapter_computer-vision/kaggle-gluon-cifar10.md
+def read_csv_labels(fname):
+    """Read fname to return a name to label dictionary"""
+    with open(fname, 'r') as f:
+        # Skip the file header line (column name)
+        lines = f.readlines()[1:]
+    tokens = [l.rstrip().split(',') for l in lines]
+    return dict(((name, label) for name, label in tokens))
+
+
+# Defined in file: ./chapter_computer-vision/kaggle-gluon-cifar10.md
+def n_valid_per_label(labels, valid_ratio):
+    """Determine # examples per class for the validation set"""
+    n = collections.Counter(labels.values()).most_common()[-1][1]
+    return max(1, math.floor(n * valid_ratio))
+
+
+# Defined in file: ./chapter_computer-vision/kaggle-gluon-cifar10.md
+def copyfile(filename, target_dir):
+    """Copy a file into a target directory"""
+    d2l.mkdir_if_not_exist(target_dir)
+    shutil.copy(filename, target_dir)
+
+
+# Defined in file: ./chapter_computer-vision/kaggle-gluon-cifar10.md
+def reorg_train_valid(data_dir, labels, valid_ratio):
+    n = collections.Counter(labels.values()).most_common()[-1][1]
+    n_valid_per_label = max(1, math.floor(n * valid_ratio))
+    label_count = {}
+    for train_file in os.listdir(data_dir+'train'):
+        label = labels[train_file.split('.')[0]]
+        fname = data_dir+'train/'+train_file
+        # Copy to train_valid_test/train_valid with a subfolder per class
+        copyfile(fname, data_dir+'train_valid_test/train_valid/'+label)
+        if label not in label_count or label_count[label] < n_valid_per_label:
+            # Copy to train_valid_test/valid
+            copyfile(fname, data_dir+'train_valid_test/valid/'+label)
+            label_count[label] = label_count.get(label, 0) + 1
+        else:
+            # Copy to train_valid_test/train
+            copyfile(fname, data_dir+'train_valid_test/train/'+label)
+    return n_valid_per_label
+
+
+# Defined in file: ./chapter_computer-vision/kaggle-gluon-cifar10.md
+def reorg_test(data_dir):
+    for test_file in os.listdir(data_dir+'test'):
+        copyfile(data_dir+'test/'+test_file, 
+                 data_dir+'train_valid_test/test/unknown/')
+
+
+# Defined in file: ./chapter_computer-vision/kaggle-gluon-dog.md
+d2l.DATA_HUB['dog_tiny'] = (d2l.DATA_URL+'kaggle_dog_tiny.zip',
+                            '7c9b54e78c1cedaa04998f9868bc548c60101362')
+
+
 # Defined in file: ./chapter_natural-language-processing/word2vec-dataset.md
+d2l.DATA_HUB['ptb'] = (d2l.DATA_URL+'ptb.zip', 
+                      '319d85e578af0cdc590547f26231e4e31cdf1e42')
 def read_ptb():
-    fname = d2l.get_files('../data/ptb.zip')
-    with zipfile.ZipFile(fname, 'r') as f:
-        raw_text = f.read('ptb/ptb.train.txt').decode("utf-8")
+    data_dir = d2l.download_extract('ptb')
+    with open(data_dir+'ptb.train.txt') as f:
+        raw_text = f.read()
     return [line.split() for line in raw_text.split('\n')]
 
 
@@ -1429,20 +1523,18 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
 
 
 # Defined in file: ./chapter_natural-language-processing/sentiment-analysis.md
-def download_imdb(data_dir='../data'):
-    url = 'http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz'
-    fname = gluon.utils.download(url, data_dir+'/aclImdb_v1.tar.gz')
-    with tarfile.open(fname, 'r') as f:
-        f.extractall(data_dir)
+d2l.DATA_HUB['aclImdb'] = (
+    'http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz',
+    '01ada507287d82875905620988597833ad4e0903')
 
 
 # Defined in file: ./chapter_natural-language-processing/sentiment-analysis.md
-def read_imdb(folder='train', data_dir='../data'):
+def read_imdb(data_dir, is_train):
     data, labels = [], []
-    for label in ['pos', 'neg']:
-        folder_name = os.path.join(data_dir, 'aclImdb', folder, label)
+    for label in ['pos/', 'neg/']:
+        folder_name = data_dir + ('train/' if is_train else 'test/') + label
         for file in os.listdir(folder_name):
-            with open(os.path.join(folder_name, file), 'rb') as f:
+            with open(folder_name+file, 'rb') as f:
                 review = f.read().decode('utf-8').replace('\n', '')
                 data.append(review)
                 labels.append(1 if label == 'pos' else 0)
@@ -1451,8 +1543,9 @@ def read_imdb(folder='train', data_dir='../data'):
 
 # Defined in file: ./chapter_natural-language-processing/sentiment-analysis.md
 def load_data_imdb(batch_size, num_steps=500):
-    download_imdb()
-    train_data, test_data = read_imdb('train'), read_imdb('test')
+    data_dir = d2l.download_extract('aclImdb', 'aclImdb')
+    train_data = read_imdb(data_dir, True)
+    test_data = read_imdb(data_dir, False)
     train_tokens = d2l.tokenize(train_data[0], token='word')
     test_tokens = d2l.tokenize(test_data[0], token='word')
     vocab = d2l.Vocab(train_tokens, min_freq=5)
@@ -1474,18 +1567,16 @@ def predict_sentiment(net, vocab, sentence):
 
 
 # Defined in file: ./chapter_recommender-systems/movielens.md
-def read_data_ml100k(path="../data/", member="ml-100k/u.data",
-                     names=['user_id', 'item_id', 'rating', 'timestamp'],
-                     sep="\t"):
-    fname = gluon.utils.download(
-        'http://files.grouplens.org/datasets/movielens/ml-100k.zip',
-        path+'/ml-100k.zip')
-    with zipfile.ZipFile(fname, 'r') as inzipfile:
-        inzipfile.extract(member, path)
-        data = pd.read_csv(path + member, sep, names=names, engine='python')
-        num_users = data.user_id.unique().shape[0]
-        num_items = data.item_id.unique().shape[0]
-        return data, num_users, num_items
+d2l.DATA_HUB['ml-100k'] = (
+    'http://files.grouplens.org/datasets/movielens/ml-100k.zip',
+    'cd4dcac4241c8a4ad7badc7ca635da8a69dddb83')
+def read_data_ml100k():
+    data_dir = d2l.download_extract('ml-100k')
+    names = ['user_id', 'item_id', 'rating', 'timestamp']
+    data = pd.read_csv(data_dir+'u.data', '\t', names=names, engine='python')
+    num_users = data.user_id.unique().shape[0]
+    num_items = data.item_id.unique().shape[0]
+    return data, num_users, num_items
 
 
 # Defined in file: ./chapter_recommender-systems/movielens.md
@@ -1692,14 +1783,8 @@ def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
 
 
 # Defined in file: ./chapter_recommender-systems/ctr.md
-def read_data_ctr(path="../data/", train="ctr/train.csv",
-                  test="ctr/test.csv"):
-    data_path = ("https://apache-mxnet.s3-accelerate.amazonaws.com/"
-                 "gluon/dataset/")
-    train_sha1 = "6dec3052e49ce0d1cec5ebc6f5ded1172be0befb"
-    test_sha1 = "c265e3c1fad0ed4caf8c1a373c580465a8096eb0"
-    gluon.utils.download(data_path+train, path+train, train_sha1)
-    gluon.utils.download(data_path+test, path+test, test_sha1)
+d2l.DATA_HUB['ctr'] = (d2l.DATA_URL+'ctr.zip',
+                      'e18327c48c8e8e5c23da714dd614e390d369843f')
 
 
 # Defined in file: ./chapter_recommender-systems/ctr.md
@@ -1776,5 +1861,10 @@ def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
     loss_G.backward()
     trainer_G.step(batch_size)
     return float(loss_G.sum())
+
+
+# Defined in file: ./chapter_generative-adversarial-networks/dcgan.md
+d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL+'pokemon.zip',
+                          'c065c0e2593b8b161a2d7873e42418bf6a21106c')
 
 

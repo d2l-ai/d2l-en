@@ -14,25 +14,22 @@ To begin with, let's import the packages required to run this section’s experi
 import d2l
 from mxnet import gluon, np
 import pandas as pd
-import zipfile
 ```
 
 Then, we download the MovieLens 100k dataset and load the interactions as `DataFrame`.
 
 ```{.python .input  n=2}
 # Saved in the d2l package for later use
-def read_data_ml100k(path="../data/", member="ml-100k/u.data",
-                     names=['user_id', 'item_id', 'rating', 'timestamp'],
-                     sep="\t"):
-    fname = gluon.utils.download(
-        'http://files.grouplens.org/datasets/movielens/ml-100k.zip',
-        path+'/ml-100k.zip')
-    with zipfile.ZipFile(fname, 'r') as inzipfile:
-        inzipfile.extract(member, path)
-        data = pd.read_csv(path + member, sep, names=names, engine='python')
-        num_users = data.user_id.unique().shape[0]
-        num_items = data.item_id.unique().shape[0]
-        return data, num_users, num_items
+d2l.DATA_HUB['ml-100k'] = (
+    'http://files.grouplens.org/datasets/movielens/ml-100k.zip',
+    'cd4dcac4241c8a4ad7badc7ca635da8a69dddb83')
+def read_data_ml100k():
+    data_dir = d2l.download_extract('ml-100k')
+    names = ['user_id', 'item_id', 'rating', 'timestamp']
+    data = pd.read_csv(data_dir+'u.data', '\t', names=names, engine='python')
+    num_users = data.user_id.unique().shape[0]
+    num_items = data.item_id.unique().shape[0]
+    return data, num_users, num_items
 ```
 
 ## Statistics of the Dataset

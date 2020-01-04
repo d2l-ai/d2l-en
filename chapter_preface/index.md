@@ -293,6 +293,7 @@ import os
 import pandas as pd
 import random
 import re
+import shutil
 import sys
 import tarfile
 import time
