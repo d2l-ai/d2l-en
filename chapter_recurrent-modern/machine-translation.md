@@ -7,8 +7,6 @@ Machine translation (MT) refers to the automatic translation of a segment of tex
 
 ```{.python .input  n=1}
 import d2l
-import zipfile
-
 from mxnet import np, npx, gluon
 npx.set_np()
 ```
@@ -19,10 +17,12 @@ We first download a dataset that contains a set of English sentences with the co
 
 ```{.python .input  n=8}
 # Saved in the d2l package for later use
+d2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL+'fra-eng.zip',
+                          '94646ad1522d915e7b0f9296181140edcf86a4f5')
 def read_data_nmt():
-    fname = gluon.utils.download('http://data.mxnet.io/data/fra-eng.zip')
-    with zipfile.ZipFile(fname, 'r') as f:
-        return f.read('fra.txt').decode("utf-8")
+    data_dir = d2l.download_extract('fra-eng')
+    with open(data_dir+'fra.txt', 'r') as f:
+        return f.read()
 
 raw_text = read_data_nmt()
 print(raw_text[0:106])
