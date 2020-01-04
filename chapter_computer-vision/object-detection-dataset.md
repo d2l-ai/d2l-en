@@ -34,7 +34,7 @@ We are going to read the object detection dataset by creating the instance `Imag
 ```{.python .input  n=2}
 # Saved in the d2l package for later use
 def load_data_pikachu(batch_size, edge_size=256):
-    """Load the pikachu dataset"""
+    """Load the pikachu dataset."""
     data_dir = '../data/pikachu'
     download_pikachu(data_dir)
     train_iter = image.ImageDetIter(

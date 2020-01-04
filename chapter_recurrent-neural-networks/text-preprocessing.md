@@ -38,7 +38,7 @@ For each sentence, we split it into a list of tokens. A token is a data point th
 ```{.python .input}
 # Saved in the d2l package for later use
 def tokenize(lines, token='word'):
-    """Split sentences into word or char tokens"""
+    """Split sentences into word or char tokens."""
     if token == 'word':
         return [line.split(' ') for line in lines]
     elif token == 'char':

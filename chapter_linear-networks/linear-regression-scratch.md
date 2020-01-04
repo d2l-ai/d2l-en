@@ -55,7 +55,7 @@ The following code generates our synthetic dataset:
 ```{.python .input  n=2}
 # Saved in the d2l package for later use
 def synthetic_data(w, b, num_examples):
-    """generate y = X w + b + noise"""
+    """Generate y = X w + b + noise."""
     X = np.random.normal(0, 1, (num_examples, len(w)))
     y = np.dot(X, w) + b
     y += np.random.normal(0, 0.01, y.shape)
