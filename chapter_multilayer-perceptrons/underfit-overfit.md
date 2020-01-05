@@ -469,7 +469,7 @@ Let's first implement a function to evaluate the loss on a given data.
 ```{.python .input}
 # Saved in the d2l package for later use
 def evaluate_loss(net, data_iter, loss):
-    """Evaluate the loss of a model on the given dataset"""
+    """Evaluate the loss of a model on the given dataset."""
     metric = d2l.Accumulator(2)  # sum_loss, num_examples
     for X, y in data_iter:
         metric.add(loss(net(X), y).sum(), y.size)

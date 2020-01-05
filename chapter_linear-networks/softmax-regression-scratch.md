@@ -240,7 +240,7 @@ Here `Accumulator` is a utility class to accumulated sum over multiple numbers.
 ```{.python .input}
 # Saved in the d2l package for later use
 class Accumulator(object):
-    """Sum a list of numbers over time"""
+    """Sum a list of numbers over time."""
 
     def __init__(self, n):
         self.data = [0.0] * n

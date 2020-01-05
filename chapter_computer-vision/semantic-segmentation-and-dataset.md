@@ -90,7 +90,7 @@ After defining the two constants above, we can easily find the category index fo
 ```{.python .input  n=6}
 # Saved in the d2l package for later use
 def build_colormap2label():
-    """Build a RGB color to label mapping for segmentation."""
+    """Build an RGB color to label mapping for segmentation."""
     colormap2label = np.zeros(256 ** 3)
     for i, colormap in enumerate(VOC_COLORMAP):
         colormap2label[(colormap[0]*256 + colormap[1])*256 + colormap[2]] = i
@@ -98,7 +98,7 @@ def build_colormap2label():
 
 # Saved in the d2l package for later use
 def voc_label_indices(colormap, colormap2label):
-    """Map a RGB color to a label."""
+    """Map an RGB color to a label."""
     colormap = colormap.astype(np.int32)
     idx = ((colormap[:, :, 0] * 256 + colormap[:, :, 1]) * 256
            + colormap[:, :, 2])

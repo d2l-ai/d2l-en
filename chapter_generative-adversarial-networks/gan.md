@@ -101,7 +101,7 @@ First we define a function to update the discriminator.
 ```{.python .input  n=7}
 # Saved in the d2l package for later use
 def update_D(X, Z, net_D, net_G, loss, trainer_D):
-    """Update discriminator"""
+    """Update discriminator."""
     batch_size = X.shape[0]
     ones = np.ones((batch_size,), ctx=X.context)
     zeros = np.zeros((batch_size,), ctx=X.context)
@@ -122,7 +122,7 @@ The generator is updated similarly. Here we reuse the cross-entropy loss but cha
 ```{.python .input  n=8}
 # Saved in the d2l package for later use
 def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
-    """Update generator"""
+    """Update generator."""
     batch_size = Z.shape[0]
     ones = np.ones((batch_size,), ctx=Z.context)
     with autograd.record():

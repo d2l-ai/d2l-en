@@ -40,13 +40,13 @@ the model will train and predict. The following function supports splitting a se
 ```{.python .input}
 # Saved in the d2l package for later use
 def tokenize(lines, token='word'):
-    """Split sentences into word or char tokens"""
+    """Split sentences into word or char tokens."""
     if token == 'word':
         return [line.split(' ') for line in lines]
     elif token == 'char':
         return [list(line) for line in lines]
     else:
-        print('ERROR: unkown token type '+token)
+        print('ERROR: unknown token type '+token)
 
 tokens = tokenize(lines)
 tokens[0:2]

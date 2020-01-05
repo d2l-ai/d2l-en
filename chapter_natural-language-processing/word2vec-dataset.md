@@ -156,7 +156,7 @@ We first define a class to draw a candidate according to the sampling weights. I
 ```{.python .input  n=12}
 # Saved in the d2l package for later use
 class RandomGenerator(object):
-    """Draw a random int in [0, n] according to n sampling weights"""
+    """Draw a random int in [0, n] according to n sampling weights."""
     def __init__(self, sampling_weights):
         self.population = list(range(len(sampling_weights)))
         self.sampling_weights = sampling_weights
