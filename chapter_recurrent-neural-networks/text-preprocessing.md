@@ -34,7 +34,8 @@ lines = read_time_machine()
 
 ## Tokenization
 
-For each sentence, we split it into a list of tokens. A token is a data point the model will train and predict. The following function supports split a sentence into words or characters, and returns a list of split strings.
+For each sentence, we split it into a list of tokens. A token is a data point
+the model will train and predict. The following function supports splitting a sentence into words or characters, and returns a list of split strings.
 
 ```{.python .input}
 # Saved in the d2l package for later use
