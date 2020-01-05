@@ -1,4 +1,5 @@
 # Concise Implementation of Softmax Regression
+:label:`sec_softmax_gluon`
 
 Just as Gluon made it much easier
 to implement linear regression in :numref:`sec_linear_gluon`,
