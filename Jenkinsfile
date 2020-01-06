@@ -12,6 +12,7 @@ stage("Build and Publish") {
       conda create -n ${ENV_NAME} pip python=3.7 -y
       conda activate ${ENV_NAME}
       pip install mxnet-cu101==1.6.0b20191122
+      pip install git+https://github.com/mli/notedown
       pip install git+https://github.com/d2l-ai/d2l-book
       python setup.py develop
       pip list
