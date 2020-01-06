@@ -13,6 +13,7 @@ stage("Build and Publish") {
       conda activate ${ENV_NAME}
       pip install mxnet-cu101==1.6.0b20191122
       pip install git+https://github.com/d2l-ai/d2l-book
+      pip install nbformat==4.4.0
       python setup.py develop
       pip list
       nvidia-smi
