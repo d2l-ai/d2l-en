@@ -318,6 +318,7 @@ def evaluate_loss(net, data_iter, loss):
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
 DATA_HUB = dict()
+DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
@@ -1130,7 +1131,7 @@ def train_batch_ch13(net, features, labels, loss, trainer, ctx_list,
         ls = [loss(py, y) for py, y in zip(pys, ys)]
     for l in ls:
         l.backward()
-    trainer.step(features.shape[0])
+    trainer.step(labels.shape[0])
     train_loss_sum = sum([float(l.sum()) for l in ls])
     train_acc_sum = sum(d2l.accuracy(py, y) for py, y in zip(pys, ys))
     return train_loss_sum, train_acc_sum
@@ -1155,6 +1156,7 @@ def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
                 animator.add(epoch+i/num_batches,
                              (metric[0]/metric[2], metric[1]/metric[3], None))
         test_acc = d2l.evaluate_accuracy_gpus(net, test_iter, split_f)
+        print(test_acc)
         animator.add(epoch+1, (None, None, test_acc))
     print('loss %.3f, train acc %.3f, test acc %.3f' % (
         metric[0]/metric[2], metric[1]/metric[3], test_acc))
@@ -1831,3 +1833,54 @@ d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL+'pokemon.zip',
                           'c065c0e2593b8b161a2d7873e42418bf6a21106c')
 
 
+def download_snli(data_dir='../data/'):
+    url = ('https://nlp.stanford.edu/projects/snli/snli_1.0.zip')
+    sha1 = '9fcde07509c7e87ec61c640c1b2753d9041758e4'
+    fname = gluon.utils.download(url, data_dir, sha1_hash=sha1)
+    with zipfile.ZipFile(fname, 'r') as f:
+        f.extractall(data_dir)
+
+        
+def read_file_snli(filename):
+    label_set = set(["entailment", "contradiction", "neutral"])
+    def tokenized(text): 
+        # The brackets represent the level of the parse tree. 
+        # We need to remove the brackets to keep only the original text.
+        return text.replace("(", "").replace(")", "").strip().lower().split()
+    with open(os.path.join('../data/snli_1.0/', filename), 'r') as f:
+        examples = [row.split('\t') for row in f.readlines()[1:]]
+    return [(tokenized(row[1]), tokenized(row[2]), row[0]) 
+             for row in examples if row[0] in label_set]
+
+class SNLIDataset(gluon.data.Dataset):
+    def __init__(self, dataset, vocab=None):
+        self.dataset = dataset
+        self.max_len = 50  # We fix the length of each sentence to 50.
+        self.data = read_file_snli('snli_1.0_'+ dataset + '.txt')
+        if vocab is None:
+            self.vocab = d2l.Vocab([row[0] for row in self.data] + \
+                                   [row[1] for row in self.data], \
+                                   min_freq = 5) # Filter words less than 5 times
+        else:
+            self.vocab = vocab
+        self.premise, self.hypothesis, self.labels =  \
+                                self.preprocess(self.data, self.vocab)
+        print('read ' + str(len(self.premise)) + ' examples')
+
+    def preprocess(self, data, vocab):
+        LABEL_TO_IDX = {'entailment': 0, 'contradiction': 1, 'neutral': 2}
+
+        def pad(x):
+            return x[:self.max_len] if len(x) > self.max_len \
+                                    else x + [0] * (self.max_len - len(x))
+
+        premise = np.array([pad(vocab[x[0]]) for x in data])
+        hypothesis = np.array([pad(vocab[x[1]]) for x in data])
+        labels = np.array([LABEL_TO_IDX[x[2]] for x in data])
+        return premise, hypothesis, labels
+
+    def __getitem__(self, idx):
+        return (self.premise[idx], self.hypothesis[idx]), self.labels[idx]
+
+    def __len__(self):
+        return len(self.premise)
