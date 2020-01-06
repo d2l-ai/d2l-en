@@ -469,6 +469,15 @@ d2l.DATA_HUB['time_machine'] = (d2l.DATA_URL+'timemachine.txt',
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
+def read_time_machine():
+    """Load the time machine book into a list of sentences."""
+    with open(d2l.download('time_machine'), 'r') as f:
+        lines = f.readlines()
+    return [re.sub('[^A-Za-z]+', ' ', line.strip().lower())
+            for line in lines]
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
 def tokenize(lines, token='word'):
     """Split sentences into word or char tokens."""
     if token == 'word':

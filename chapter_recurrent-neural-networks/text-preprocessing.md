@@ -21,6 +21,8 @@ import re
 # Saved in the d2l package for later use
 d2l.DATA_HUB['time_machine'] = (d2l.DATA_URL+'timemachine.txt',
                                '090b5e7e70c295757f55df93cb0a180b9691891a')
+
+# Saved in the d2l package for later use
 def read_time_machine():
     """Load the time machine book into a list of sentences."""
     with open(d2l.download('time_machine'), 'r') as f:
