@@ -35,6 +35,8 @@ import tarfile
 
 # Saved in the d2l package for later use
 DATA_HUB = dict()
+
+# Saved in the d2l package for later use
 DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
 ```
 
@@ -157,6 +159,8 @@ For convenience, we downloaded and saved the Kaggle dataset in the `DATA_URL` we
 DATA_HUB['kaggle_house_train'] = (
     DATA_URL+'kaggle_house_pred_train.csv',
     '585e9cc93e70b39160e7921475f9bcd7d31219ce')
+
+# Saved in the d2l package for later use  
 DATA_HUB['kaggle_house_test'] = (
     DATA_URL+'kaggle_house_pred_test.csv',
     'fa19780a7b011d9b009e8bff8e99922a8ee2eb90')

@@ -321,6 +321,10 @@ DATA_HUB = dict()
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
+DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
+
+
+# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
 def download(name, cache_dir='../data'):
     """Download a file inserted into DATA_HUB, return the local filename"""
     assert name in DATA_HUB, "%s doesn't exist" % name
@@ -360,6 +364,12 @@ def download_all():
 DATA_HUB['kaggle_house_train'] = (
     DATA_URL+'kaggle_house_pred_train.csv',
     '585e9cc93e70b39160e7921475f9bcd7d31219ce')
+
+
+# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
+DATA_HUB['kaggle_house_test'] = (
+    DATA_URL+'kaggle_house_pred_test.csv',
+    'fa19780a7b011d9b009e8bff8e99922a8ee2eb90')
 
 
 # Defined in file: ./chapter_deep-learning-computation/use-gpu.md
@@ -713,6 +723,13 @@ d2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL+'fra-eng.zip',
 
 
 # Defined in file: ./chapter_recurrent-modern/machine-translation.md
+def read_data_nmt():
+    data_dir = d2l.download_extract('fra-eng')
+    with open(data_dir+'fra.txt', 'r') as f:
+        return f.read()
+
+
+# Defined in file: ./chapter_recurrent-modern/machine-translation.md
 def preprocess_nmt(text):
     text = text.replace('\u202f', ' ').replace('\xa0', ' ')
 
@@ -1007,6 +1024,16 @@ d2l.DATA_HUB['airfoil'] = (d2l.DATA_URL+'airfoil_self_noise.dat',
 
 
 # Defined in file: ./chapter_optimization/minibatch-sgd.md
+def get_data_ch11(batch_size=10, n=1500):
+    data = np.genfromtxt(d2l.download('airfoil'),
+                         dtype=np.float32, delimiter='\t')
+    data = (data - data.mean(axis=0)) / data.std(axis=0)
+    data_iter = d2l.load_array(
+        (data[:n, :-1], data[:n, -1]), batch_size, is_train=True)
+    return data_iter, data.shape[1]-1
+
+
+# Defined in file: ./chapter_optimization/minibatch-sgd.md
 def train_ch11(trainer_fn, states, hyperparams, data_iter,
                feature_dim, num_epochs=2):
     # Initialization
@@ -1253,6 +1280,13 @@ VOC_COLORMAP = [[0, 0, 0], [128, 0, 0], [0, 128, 0], [128, 128, 0],
 
 
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
+VOC_CLASSES = ['background', 'aeroplane', 'bicycle', 'bird', 'boat',
+               'bottle', 'bus', 'car', 'cat', 'chair', 'cow',
+               'diningtable', 'dog', 'horse', 'motorbike', 'person',
+               'potted plant', 'sheep', 'sofa', 'train', 'tv/monitor']
+
+
+# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
 def build_colormap2label():
     """Build an RGB color to label mapping for segmentation."""
     colormap2label = np.zeros(256 ** 3)
@@ -1389,6 +1423,14 @@ d2l.DATA_HUB['dog_tiny'] = (d2l.DATA_URL+'kaggle_dog_tiny.zip',
 # Defined in file: ./chapter_natural-language-processing/word2vec-dataset.md
 d2l.DATA_HUB['ptb'] = (d2l.DATA_URL+'ptb.zip', 
                       '319d85e578af0cdc590547f26231e4e31cdf1e42')
+
+
+# Defined in file: ./chapter_natural-language-processing/word2vec-dataset.md
+def read_ptb():
+    data_dir = d2l.download_extract('ptb')
+    with open(data_dir+'ptb.train.txt') as f:
+        raw_text = f.read()
+    return [line.split() for line in raw_text.split('\n')]
 
 
 # Defined in file: ./chapter_natural-language-processing/word2vec-dataset.md
@@ -1540,6 +1582,16 @@ def predict_sentiment(net, vocab, sentence):
 d2l.DATA_HUB['ml-100k'] = (
     'http://files.grouplens.org/datasets/movielens/ml-100k.zip',
     'cd4dcac4241c8a4ad7badc7ca635da8a69dddb83')
+
+
+# Defined in file: ./chapter_recommender-systems/movielens.md
+def read_data_ml100k():
+    data_dir = d2l.download_extract('ml-100k')
+    names = ['user_id', 'item_id', 'rating', 'timestamp']
+    data = pd.read_csv(data_dir+'u.data', '\t', names=names, engine='python')
+    num_users = data.user_id.unique().shape[0]
+    num_items = data.item_id.unique().shape[0]
+    return data, num_users, num_items
 
 
 # Defined in file: ./chapter_recommender-systems/movielens.md
