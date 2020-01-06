@@ -176,7 +176,8 @@ The size and shape of the images in the test dataset vary. Because the model use
 For the sake of simplicity, we only read a few large test images and crop an area with a shape of $320\times480$ from the top-left corner of the image. Only this area is used for prediction. For the input image, we print the cropped area first, then print the predicted result, and finally print the labeled category.
 
 ```{.python .input  n=15}
-test_images, test_labels = d2l.read_voc_images(is_train=False)
+voc_dir = d2l.download_extract('voc2012', 'VOCdevkit/VOC2012')
+test_images, test_labels = d2l.read_voc_images(voc_dir, False)
 n, imgs = 4, []
 for i in range(n):
     crop_rect = (0, 0, 480, 320)
