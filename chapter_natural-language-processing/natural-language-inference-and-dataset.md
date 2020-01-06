@@ -80,26 +80,13 @@ train_data, test_data = [read_file_snli('snli_1.0_'+ split + '.txt')
 
 We output the first five sentence pairs of premise and hypothesis, as well as corresponding tags of inference relationship.
 
-```{.python .input  n=4}
+```{.python .input  n=1}
 train_data[:5] 
-```
-
-```{.json .output n=4}
-[
- {
-  "data": {
-   "text/plain": "[(['a',\n   'person',\n   'on',\n   'a',\n   'horse',\n   'jumps',\n   'over',\n   'a',\n   'broken',\n   'down',\n   'airplane',\n   '.'],\n  ['a',\n   'person',\n   'is',\n   'training',\n   'his',\n   'horse',\n   'for',\n   'a',\n   'competition',\n   '.'],\n  'neutral'),\n (['a',\n   'person',\n   'on',\n   'a',\n   'horse',\n   'jumps',\n   'over',\n   'a',\n   'broken',\n   'down',\n   'airplane',\n   '.'],\n  ['a',\n   'person',\n   'is',\n   'at',\n   'a',\n   'diner',\n   ',',\n   'ordering',\n   'an',\n   'omelette',\n   '.'],\n  'contradiction'),\n (['a',\n   'person',\n   'on',\n   'a',\n   'horse',\n   'jumps',\n   'over',\n   'a',\n   'broken',\n   'down',\n   'airplane',\n   '.'],\n  ['a', 'person', 'is', 'outdoors', ',', 'on', 'a', 'horse', '.'],\n  'entailment'),\n (['children', 'smiling', 'and', 'waving', 'at', 'camera'],\n  ['they', 'are', 'smiling', 'at', 'their', 'parents'],\n  'neutral'),\n (['children', 'smiling', 'and', 'waving', 'at', 'camera'],\n  ['there', 'are', 'children', 'present'],\n  'entailment')]"
-  },
-  "execution_count": 4,
-  "metadata": {},
-  "output_type": "execute_result"
- }
-]
 ```
 
 According to rough statistics, we find approximately 550,000 training set samples. Three relationship tags account for around 180,000 respectively. We also find about 10,000 testing dataset samples. Three relationship tags account for around 3000 respectively. Each type of tag shows the basically equivalent amount.
 
-```{.python .input  n=5}
+```{.python .input  n=3}
 print("Training pairs: %d" % len(train_data))
 print("Test pairs: %d" % len(test_data))
 
@@ -113,20 +100,10 @@ print("Test labels: {'entailment': %d, 'contradiction': %d, 'neutral': %d}" %
        [row[2] for row in test_data].count('neutral')))
 ```
 
-```{.json .output n=5}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "Training pairs: 549367\nTest pairs: 9824\nTrain labels: {'entailment': 183416, 'contradiction': 183187, 'neutral': 182764}\nTest labels: {'entailment': 3368, 'contradiction': 3237, 'neutral': 3219}\n"
- }
-]
-```
-
 ### Self-defining dataset
 By inheriting `Dataset` by Gluon, we self-defined a natural language inference dataset `SNLIDataset`. By realizing `__getitem__` function, we can get access to the sentence pairs with idx index and relevant categories.
 
-```{.python .input  n=11}
+```{.python .input  n=3}
 # Saved in the d2l package for later use
 class SNLIDataset(gluon.data.Dataset):
     def __init__(self, dataset, vocab=None):
@@ -166,24 +143,14 @@ class SNLIDataset(gluon.data.Dataset):
 
 Training set and testing set examples are respectively established on the basis of self-defining `SNLIDataset`. We define 50 as the maximum text length. Then, we can check the number of samples retained in training set and testing set.
 
-```{.python .input  n=7}
+```{.python .input  n=3}
 train_set = SNLIDataset("train")
 test_set = SNLIDataset("test", train_set.vocab)
 ```
 
-```{.json .output n=7}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "read 549367 examples\nread 9824 examples\n"
- }
-]
-```
-
 Assume batch size is 128, respectively define the iterators of training set and testing set.
 
-```{.python .input  n=8}
+```{.python .input  n=3}
 batch_size = 128
 train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True)
 test_iter = gluon.data.DataLoader(test_set, batch_size)
@@ -191,38 +158,18 @@ test_iter = gluon.data.DataLoader(test_set, batch_size)
 
 Output the size of the word list, showing 18677 valid words.
 
-```{.python .input  n=9}
+```{.python .input  n=3}
 print('Vocab size:', len(train_set.vocab))
-```
-
-```{.json .output n=9}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "Vocab size: 16673\n"
- }
-]
 ```
 
 Print the form of the first small batch. What is different from text classification task is the data here consist of triples (Sentence 1, Sentence 2, Label)
 
-```{.python .input  n=10}
+```{.python .input  n=3}
 for X, Y in train_iter:
     print(X[0].shape)
     print(X[1].shape)
     print(Y.shape)
     break
-```
-
-```{.json .output n=10}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "(128, 50)\n(128, 50)\n(128,)\n"
- }
-]
 ```
 
 ## Summary
