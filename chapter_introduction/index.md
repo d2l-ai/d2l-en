@@ -1500,7 +1500,7 @@ will become sentient and decide independently from their programmers
 (and masters) about things that directly affect the livelihood of humans.
 To some extent, AI already affects the livelihood of humans
 in an immediate way---creditworthiness is assessed automatically,
-autopilots mostly navigate cars, decisions about
+autopilots mostly navigate vehicles, decisions about
 whether to grant bail use statistical data as input.
 More frivolously, we can ask Alexa to switch on the coffee machine.
 
