@@ -31,7 +31,7 @@ Likewise any individual constituent layer in a multilayer perceptron
 ingests inputs (supplied by the previous layer)
 generates outputs (which form the inputs to the subsequent layer),
 and possesses a set of tunable parameters
-tht are updated with respect to the ultimate objective
+that are updated with respect to the ultimate objective
 (using the signal that flows backwards through the subsequent layer).
 
 While you might think that neurons, layers, and models
