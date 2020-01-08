@@ -70,7 +70,7 @@ class Attend(nn.Block):
     def forward(self, a, b):
         # Feed two sentences into a feedforward neural network. The shape of 
         # outputs is (batch size, number of words, number of hidden units)
-        with dimensions (batch size, sentence length, number of hidden units)
+        # with dimensions (batch size, sentence length, number of hidden units)
         f_a = self.f(a)
         f_b = self.f(b)
         # Calculate Attention Score e. The shape of outputs is
@@ -270,7 +270,3 @@ Assume $d$ is the dimension of the hidden layer and $O(d^2)$ is the time complex
 ## References
 
 [1] Parikh, A.P., Täckström, O., Das, D., & Uszkoreit, J. (2016). A Decomposable Attention Model for Natural Language Inference. *EMNLP*.
-
-```{.python .input}
-
-```
