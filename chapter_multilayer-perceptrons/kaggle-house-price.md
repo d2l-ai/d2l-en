@@ -23,9 +23,9 @@ feature extraction, etc. in practice.
 This experience is vital to gaining intuition as a data scientist.
 
 
-## Obtaining Data and Caching
+## Downloading and Caching Datasets
 
-Throughout the book we will train models on various downloaded datasets. Here we developed several utility functions to facilitate data downloading. First, we will maintain a dictionary `DATA_HUB` that maps a string name to a URL with the [SHA-1](https://en.wikipedia.org/wiki/SHA-1) of the content in the URL. If the original datasets are not convenient to download, we may host them on the `DATA_URL` site.
+Throughout the book we will train and test models on various downloaded datasets. Here we implement several utility functions to facilitate data downloading. First, we maintain a dictionary `DATA_HUB` that maps a string name to a URL with the SHA-1 of the file at the URL, where SHA-1 verifies the integrity of the file. Such datasets are hosted on the `DATA_URL` site.
 
 ```{.python .input  n=2}
 import os
@@ -40,25 +40,28 @@ DATA_HUB = dict()
 DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
 ```
 
-The `download` method downloads the URL associated with the string name stored in `DATA_HUB` into a cache directory, which is `../data` in default. If the file already exists in the directory and its `SHA-1` matches the one specified in `DATA_HUB`, then the cached file is used without downloading. This function then returns the filename of the downloaded file.
+The following `download` function downloads the dataset from 
+the URL mapping the specified dataset `name` to a local cache directory (`../data` by default).
+If the file already exists in the cache directory and its SHA-1 matches the one stored in `DATA_HUB`, the cached file will be used and no downloading is needed.
+That is to say, you only need to download datasets once with a network connection.
+This `download` function returns the name of the downloaded file.
 
 ```{.python .input  n=6}
 # Saved in the d2l package for later use
 def download(name, cache_dir='../data'):
-    """Download a file inserted into DATA_HUB, return the local filename"""
+    """Download a file inserted into DATA_HUB, return the local filename."""
     assert name in DATA_HUB, "%s doesn't exist" % name
     url, sha1 = DATA_HUB[name]
-    if not os.path.exists(cache_dir):
-        os.makedirs(cache_dir)
+    d2l.mkdir_if_not_exist(cache_dir)
     return gluon.utils.download(url, cache_dir, sha1_hash=sha1)
 ```
 
-We also implement two additional methods, one to download and extract a `tar` or a `zip` file. The other one downloads all files in the `DATA_HUB`, namely almost all datasets needed in this book, into the cache directory. It's useful when your network is slow.
+We also implement two additional functions: one is to download and extract a zip/tar file, and the other to download all the files from `DATA_HUB` (most of the datasets used in this book) into the cache directory. You may invoke the latter to download all these datasets once and for all if your network connection is slow.
 
 ```{.python .input  n=11}
 # Saved in the d2l package for later use
 def download_extract(name, folder=None):
-    """Download and extract a .zip or a .tar file"""
+    """Download and extract a zip/tar file."""
     fname = download(name)
     base_dir = os.path.dirname(fname) 
     data_dir, ext = os.path.splitext(fname)
@@ -67,7 +70,7 @@ def download_extract(name, folder=None):
     elif ext == '.tar' or ext == '.gz':
         fp = tarfile.open(fname, 'r')
     else:
-        assert False, 'Only zip and tar files can be extracted'
+        assert False, 'Only zip/tar files can be extracted'
     fp.extractall(base_dir)
     if folder:
         return base_dir + '/' + folder + '/'
@@ -152,21 +155,21 @@ import pandas as pd
 npx.set_np()
 ```
 
-For convenience, we downloaded and saved the Kaggle dataset in the `DATA_URL` website. For other Kaggle competitions, you may need to download them manually.
+For convenience, we download and cache the Kaggle housing dataset from the `DATA_URL` website. For the other Kaggle competitions, you may need to download them manually.
 
 ```{.python .input}
 # Saved in the d2l package for later use        
 DATA_HUB['kaggle_house_train'] = (
-    DATA_URL+'kaggle_house_pred_train.csv',
+    DATA_URL + 'kaggle_house_pred_train.csv',
     '585e9cc93e70b39160e7921475f9bcd7d31219ce')
 
 # Saved in the d2l package for later use  
 DATA_HUB['kaggle_house_test'] = (
-    DATA_URL+'kaggle_house_pred_test.csv',
+    DATA_URL + 'kaggle_house_pred_test.csv',
     'fa19780a7b011d9b009e8bff8e99922a8ee2eb90')
 ```
 
-To load the two CSV (Comma Separated Values) files
+To load the two csv files
 containing training and test data respectively we use Pandas.
 
 ```{.python .input  n=14}
