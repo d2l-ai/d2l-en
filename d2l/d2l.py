@@ -1369,13 +1369,13 @@ def load_data_voc(batch_size, crop_size):
 
 
 # Defined in file: ./chapter_computer-vision/kaggle-gluon-cifar10.md
-d2l.DATA_HUB['cifar10_tiny'] = (d2l.DATA_URL+'kaggle_cifar10_tiny.zip',
+d2l.DATA_HUB['cifar10_tiny'] = (d2l.DATA_URL + 'kaggle_cifar10_tiny.zip',
                                 '2068874e4b9a9f0fb07ebe0ad2b29754449ccacd')
 
 
 # Defined in file: ./chapter_computer-vision/kaggle-gluon-cifar10.md
 def read_csv_labels(fname):
-    """Read fname to return a name to label dictionary"""
+    """Read fname to return a name to label dictionary."""
     with open(fname, 'r') as f:
         # Skip the file header line (column name)
         lines = f.readlines()[1:]
@@ -1384,48 +1384,44 @@ def read_csv_labels(fname):
 
 
 # Defined in file: ./chapter_computer-vision/kaggle-gluon-cifar10.md
-def n_valid_per_label(labels, valid_ratio):
-    """Determine # examples per class for the validation set"""
-    n = collections.Counter(labels.values()).most_common()[-1][1]
-    return max(1, math.floor(n * valid_ratio))
-
-
-# Defined in file: ./chapter_computer-vision/kaggle-gluon-cifar10.md
 def copyfile(filename, target_dir):
-    """Copy a file into a target directory"""
+    """Copy a file into a target directory."""
     d2l.mkdir_if_not_exist(target_dir)
     shutil.copy(filename, target_dir)
 
 
 # Defined in file: ./chapter_computer-vision/kaggle-gluon-cifar10.md
 def reorg_train_valid(data_dir, labels, valid_ratio):
+    # The number of examples of the class with the least examples in the
+    # training dataset
     n = collections.Counter(labels.values()).most_common()[-1][1]
+    # The number of examples per class for the validation set
     n_valid_per_label = max(1, math.floor(n * valid_ratio))
     label_count = {}
-    for train_file in os.listdir(data_dir+'train'):
+    for train_file in os.listdir(data_dir + 'train'):
         label = labels[train_file.split('.')[0]]
-        fname = data_dir+'train/'+train_file
+        fname = data_dir + 'train/' + train_file
         # Copy to train_valid_test/train_valid with a subfolder per class
-        copyfile(fname, data_dir+'train_valid_test/train_valid/'+label)
+        copyfile(fname, data_dir + 'train_valid_test/train_valid/' + label)
         if label not in label_count or label_count[label] < n_valid_per_label:
             # Copy to train_valid_test/valid
-            copyfile(fname, data_dir+'train_valid_test/valid/'+label)
+            copyfile(fname, data_dir + 'train_valid_test/valid/' + label)
             label_count[label] = label_count.get(label, 0) + 1
         else:
             # Copy to train_valid_test/train
-            copyfile(fname, data_dir+'train_valid_test/train/'+label)
+            copyfile(fname, data_dir+'train_valid_test/train/' + label)
     return n_valid_per_label
 
 
 # Defined in file: ./chapter_computer-vision/kaggle-gluon-cifar10.md
 def reorg_test(data_dir):
-    for test_file in os.listdir(data_dir+'test'):
-        copyfile(data_dir+'test/'+test_file, 
-                 data_dir+'train_valid_test/test/unknown/')
+    for test_file in os.listdir(data_dir + 'test'):
+        copyfile(data_dir + 'test/' + test_file, 
+                 data_dir + 'train_valid_test/test/unknown/')
 
 
 # Defined in file: ./chapter_computer-vision/kaggle-gluon-dog.md
-d2l.DATA_HUB['dog_tiny'] = (d2l.DATA_URL+'kaggle_dog_tiny.zip',
+d2l.DATA_HUB['dog_tiny'] = (d2l.DATA_URL + 'kaggle_dog_tiny.zip',
                             '7c9b54e78c1cedaa04998f9868bc548c60101362')
 
 
