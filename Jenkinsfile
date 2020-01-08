@@ -21,7 +21,6 @@ stage("Build and Publish") {
 
       sh label: "Check Execution Output", script: """set -ex
       conda activate ${ENV_NAME}
-      d2lbook clear
       d2lbook build outputcheck
       """
 
@@ -47,9 +46,7 @@ stage("Build and Publish") {
       # don't pack downloaded data into the pkg
       rm -rf _build/data_tmp
       mv _build/eval/data _build/data_tmp
-      cp -r data _build/eval
       d2lbook build pkg
-      rm -rf _build/eval/data
       mv _build/data_tmp _build/eval/data
       """
 
