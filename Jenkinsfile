@@ -20,7 +20,6 @@ stage("Build and Publish") {
 
       sh label: "Check Execution Output", script: """set -ex
       conda activate ${ENV_NAME}
-      d2lbook clear
       d2lbook build outputcheck
       """
 
