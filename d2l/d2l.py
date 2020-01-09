@@ -321,6 +321,10 @@ DATA_HUB = dict()
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
+DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
+
+
+# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
 def download(name, cache_dir='../data'):
     """Download a file inserted into DATA_HUB, return the local filename"""
     assert name in DATA_HUB, "%s doesn't exist" % name
@@ -360,6 +364,12 @@ def download_all():
 DATA_HUB['kaggle_house_train'] = (
     DATA_URL+'kaggle_house_pred_train.csv',
     '585e9cc93e70b39160e7921475f9bcd7d31219ce')
+
+
+# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
+DATA_HUB['kaggle_house_test'] = (
+    DATA_URL+'kaggle_house_pred_test.csv',
+    'fa19780a7b011d9b009e8bff8e99922a8ee2eb90')
 
 
 # Defined in file: ./chapter_deep-learning-computation/use-gpu.md
@@ -456,6 +466,15 @@ class Residual(nn.Block):
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
 d2l.DATA_HUB['time_machine'] = (d2l.DATA_URL+'timemachine.txt',
                                '090b5e7e70c295757f55df93cb0a180b9691891a')
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
+def read_time_machine():
+    """Load the time machine book into a list of sentences."""
+    with open(d2l.download('time_machine'), 'r') as f:
+        lines = f.readlines()
+    return [re.sub('[^A-Za-z]+', ' ', line.strip().lower())
+            for line in lines]
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
@@ -710,6 +729,13 @@ class RNNModel(nn.Block):
 # Defined in file: ./chapter_recurrent-modern/machine-translation.md
 d2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL+'fra-eng.zip',
                           '94646ad1522d915e7b0f9296181140edcf86a4f5')
+
+
+# Defined in file: ./chapter_recurrent-modern/machine-translation.md
+def read_data_nmt():
+    data_dir = d2l.download_extract('fra-eng')
+    with open(data_dir+'fra.txt', 'r') as f:
+        return f.read()
 
 
 # Defined in file: ./chapter_recurrent-modern/machine-translation.md
@@ -1007,6 +1033,16 @@ d2l.DATA_HUB['airfoil'] = (d2l.DATA_URL+'airfoil_self_noise.dat',
 
 
 # Defined in file: ./chapter_optimization/minibatch-sgd.md
+def get_data_ch11(batch_size=10, n=1500):
+    data = np.genfromtxt(d2l.download('airfoil'),
+                         dtype=np.float32, delimiter='\t')
+    data = (data - data.mean(axis=0)) / data.std(axis=0)
+    data_iter = d2l.load_array(
+        (data[:n, :-1], data[:n, -1]), batch_size, is_train=True)
+    return data_iter, data.shape[1]-1
+
+
+# Defined in file: ./chapter_optimization/minibatch-sgd.md
 def train_ch11(trainer_fn, states, hyperparams, data_iter,
                feature_dim, num_epochs=2):
     # Initialization
@@ -1253,6 +1289,13 @@ VOC_COLORMAP = [[0, 0, 0], [128, 0, 0], [0, 128, 0], [128, 128, 0],
 
 
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
+VOC_CLASSES = ['background', 'aeroplane', 'bicycle', 'bird', 'boat',
+               'bottle', 'bus', 'car', 'cat', 'chair', 'cow',
+               'diningtable', 'dog', 'horse', 'motorbike', 'person',
+               'potted plant', 'sheep', 'sofa', 'train', 'tv/monitor']
+
+
+# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
 def build_colormap2label():
     """Build an RGB color to label mapping for segmentation."""
     colormap2label = np.zeros(256 ** 3)
@@ -1326,13 +1369,13 @@ def load_data_voc(batch_size, crop_size):
 
 
 # Defined in file: ./chapter_computer-vision/kaggle-gluon-cifar10.md
-d2l.DATA_HUB['cifar10_tiny'] = (d2l.DATA_URL+'kaggle_cifar10_tiny.zip',
+d2l.DATA_HUB['cifar10_tiny'] = (d2l.DATA_URL + 'kaggle_cifar10_tiny.zip',
                                 '2068874e4b9a9f0fb07ebe0ad2b29754449ccacd')
 
 
 # Defined in file: ./chapter_computer-vision/kaggle-gluon-cifar10.md
 def read_csv_labels(fname):
-    """Read fname to return a name to label dictionary"""
+    """Read fname to return a name to label dictionary."""
     with open(fname, 'r') as f:
         # Skip the file header line (column name)
         lines = f.readlines()[1:]
@@ -1341,54 +1384,58 @@ def read_csv_labels(fname):
 
 
 # Defined in file: ./chapter_computer-vision/kaggle-gluon-cifar10.md
-def n_valid_per_label(labels, valid_ratio):
-    """Determine # examples per class for the validation set"""
-    n = collections.Counter(labels.values()).most_common()[-1][1]
-    return max(1, math.floor(n * valid_ratio))
-
-
-# Defined in file: ./chapter_computer-vision/kaggle-gluon-cifar10.md
 def copyfile(filename, target_dir):
-    """Copy a file into a target directory"""
+    """Copy a file into a target directory."""
     d2l.mkdir_if_not_exist(target_dir)
     shutil.copy(filename, target_dir)
 
 
 # Defined in file: ./chapter_computer-vision/kaggle-gluon-cifar10.md
 def reorg_train_valid(data_dir, labels, valid_ratio):
+    # The number of examples of the class with the least examples in the
+    # training dataset
     n = collections.Counter(labels.values()).most_common()[-1][1]
+    # The number of examples per class for the validation set
     n_valid_per_label = max(1, math.floor(n * valid_ratio))
     label_count = {}
-    for train_file in os.listdir(data_dir+'train'):
+    for train_file in os.listdir(data_dir + 'train'):
         label = labels[train_file.split('.')[0]]
-        fname = data_dir+'train/'+train_file
+        fname = data_dir + 'train/' + train_file
         # Copy to train_valid_test/train_valid with a subfolder per class
-        copyfile(fname, data_dir+'train_valid_test/train_valid/'+label)
+        copyfile(fname, data_dir + 'train_valid_test/train_valid/' + label)
         if label not in label_count or label_count[label] < n_valid_per_label:
             # Copy to train_valid_test/valid
-            copyfile(fname, data_dir+'train_valid_test/valid/'+label)
+            copyfile(fname, data_dir + 'train_valid_test/valid/' + label)
             label_count[label] = label_count.get(label, 0) + 1
         else:
             # Copy to train_valid_test/train
-            copyfile(fname, data_dir+'train_valid_test/train/'+label)
+            copyfile(fname, data_dir+'train_valid_test/train/' + label)
     return n_valid_per_label
 
 
 # Defined in file: ./chapter_computer-vision/kaggle-gluon-cifar10.md
 def reorg_test(data_dir):
-    for test_file in os.listdir(data_dir+'test'):
-        copyfile(data_dir+'test/'+test_file, 
-                 data_dir+'train_valid_test/test/unknown/')
+    for test_file in os.listdir(data_dir + 'test'):
+        copyfile(data_dir + 'test/' + test_file, 
+                 data_dir + 'train_valid_test/test/unknown/')
 
 
 # Defined in file: ./chapter_computer-vision/kaggle-gluon-dog.md
-d2l.DATA_HUB['dog_tiny'] = (d2l.DATA_URL+'kaggle_dog_tiny.zip',
+d2l.DATA_HUB['dog_tiny'] = (d2l.DATA_URL + 'kaggle_dog_tiny.zip',
                             '7c9b54e78c1cedaa04998f9868bc548c60101362')
 
 
 # Defined in file: ./chapter_natural-language-processing/word2vec-dataset.md
 d2l.DATA_HUB['ptb'] = (d2l.DATA_URL+'ptb.zip', 
                       '319d85e578af0cdc590547f26231e4e31cdf1e42')
+
+
+# Defined in file: ./chapter_natural-language-processing/word2vec-dataset.md
+def read_ptb():
+    data_dir = d2l.download_extract('ptb')
+    with open(data_dir+'ptb.train.txt') as f:
+        raw_text = f.read()
+    return [line.split() for line in raw_text.split('\n')]
 
 
 # Defined in file: ./chapter_natural-language-processing/word2vec-dataset.md
@@ -1540,6 +1587,16 @@ def predict_sentiment(net, vocab, sentence):
 d2l.DATA_HUB['ml-100k'] = (
     'http://files.grouplens.org/datasets/movielens/ml-100k.zip',
     'cd4dcac4241c8a4ad7badc7ca635da8a69dddb83')
+
+
+# Defined in file: ./chapter_recommender-systems/movielens.md
+def read_data_ml100k():
+    data_dir = d2l.download_extract('ml-100k')
+    names = ['user_id', 'item_id', 'rating', 'timestamp']
+    data = pd.read_csv(data_dir+'u.data', '\t', names=names, engine='python')
+    num_users = data.user_id.unique().shape[0]
+    num_items = data.item_id.unique().shape[0]
+    return data, num_users, num_items
 
 
 # Defined in file: ./chapter_recommender-systems/movielens.md

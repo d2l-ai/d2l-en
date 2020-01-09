@@ -39,7 +39,7 @@ npx.set_np()
 
 The hot dog dataset we use was taken from online images and contains $1,400$ positive images containing hot dogs and same number of negative images containing other foods. $1,000$ images of various classes are used for training and the rest are used for testing.
 
-We first download the compressed dataset to get two folders, `hotdog/train` and `hotdog/test`. Both folders have `hotdog` and `not-hotdog` category subfolders, each of which has corresponding image files.
+We first download the compressed dataset and get two folders `hotdog/train` and `hotdog/test`. Both folders have `hotdog` and `not-hotdog` category subfolders, each of which has corresponding image files.
 
 ```{.python .input  n=2}
 # Saved in the d2l package for later use
@@ -52,8 +52,8 @@ data_dir = d2l.download_extract('hotdog')
 We create two `ImageFolderDataset` instances to read all the image files in the training dataset and testing dataset, respectively.
 
 ```{.python .input  n=3}
-train_imgs = gluon.data.vision.ImageFolderDataset(data_dir+'train')
-test_imgs = gluon.data.vision.ImageFolderDataset(data_dir+'test')
+train_imgs = gluon.data.vision.ImageFolderDataset(data_dir + 'train')
+test_imgs = gluon.data.vision.ImageFolderDataset(data_dir + 'test')
 ```
 
 The first 8 positive examples and the last 8 negative images are shown below. As you can see, the images vary in size and aspect ratio.
