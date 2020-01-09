@@ -68,7 +68,7 @@ After that, the output with length $p_v$ from each of the $h$ attention heads ar
 $$\mathbf o = \mathbf W_o \begin{bmatrix}\mathbf o^{(1)}\\\vdots\\\mathbf o^{(h)}\end{bmatrix}.$$
 
 
-Now we can implement the multi-head attention. Assume that the multi-head attention contain the number heads `num_heads` $=h$, the hidden size `hidden_size` $=p_q=p_k=p_v$ are the same for the query,  key, and value dense layers. In addition, since the multi-head attention keeps the same dimensionality between its input and its output, we have the output feature size $d_o = $ `hidden_size` as well. 
+Now we can implement the multi-head attention. Assume that the multi-head attention contain the number heads `num_heads` $=h$, the hidden size `hidden_size` $=p_q=p_k=p_v$ are the same for the query,  key, and value dense layers. In addition, since the multi-head attention keeps the same dimensionality between its input and its output, we have the output feature size $d_o =$ `hidden_size` as well. 
 
 ```{.python .input  n=2}
 class MultiHeadAttention(nn.Block):
