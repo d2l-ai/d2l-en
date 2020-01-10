@@ -159,6 +159,21 @@ e.g., `cu100` for CUDA 10.0 and `cu90` for CUDA 9.0.
 You can find all available MXNet versions via `pip search mxnet`.
 
 
+## Jupyter Lab Support
+
+[JupyterLab](https://jupyterlab.readthedocs.io/en/stable/) is the next-generation web-based user interface for Project Jupyter. JupyterLab enables you to work with documents and activities such as Jupyter notebooks, text editors, terminals, and custom components in a flexible, integrated, and extensible manner.
+
+```bash
+# Using Conda
+conda install -c conda-forge jupyterlab
+
+# Using Pip
+pip install jupyterlab
+
+# Registering d2l as a selectable kernel
+ipython kernel install --user --name=d2l
+```
+
 ## Exercises
 
 1. Download the code for the book and install the runtime environment.
