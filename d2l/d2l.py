@@ -318,7 +318,6 @@ def evaluate_loss(net, data_iter, loss):
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
 DATA_HUB = dict()
-DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
