@@ -283,13 +283,11 @@ and the optimizer must to touch each parameter once anyway.
 
 In the following code, we specify
 the weight decay hyperparameter directly
-through the `wd` parameter when instantiating our `Trainer`.
+through `wd` when instantiating our `Trainer`.
 By default, Gluon decays both weights and biases simultaneously.
-Note that we can have *different* optimizers
-for different sets of parameters.
-For instance, we can have one `Trainer`
-with weight decay for the weights $\mathbf{w}$
-and another without weight decay to take care of the bias $b$.
+Note that the hyperparameter `wd` will be multiplied by `wd_mult`
+when updating model parameters. Thus, by setting `wd_mult` to $0$
+the bias parameter $b$ will not decay.
 
 ```{.python .input}
 def train_gluon(wd):
@@ -298,13 +296,11 @@ def train_gluon(wd):
     net.initialize(init.Normal(sigma=1))
     loss = gluon.loss.L2Loss()
     num_epochs, lr = 100, 0.003
-    # The weight parameter has been decayed. Weight names generally end with
-    # "weight"
-    trainer_w = gluon.Trainer(net.collect_params('.*weight'), 'sgd',
-                              {'learning_rate': lr, 'wd': wd})
+    trainer = gluon.Trainer(net.collect_params(), 'sgd',
+                            {'learning_rate': lr, 'wd': wd})
     # The bias parameter has not decayed. Bias names generally end with "bias"
-    trainer_b = gluon.Trainer(net.collect_params('.*bias'), 'sgd',
-                              {'learning_rate': lr})
+    net.collect_params('.*bias').setattr('ml_mult', 0)
+    
     animator = d2l.Animator(xlabel='epochs', ylabel='loss', yscale='log',
                             xlim=[1, num_epochs], legend=['train', 'test'])
     for epoch in range(1, num_epochs+1):
@@ -312,10 +308,7 @@ def train_gluon(wd):
             with autograd.record():
                 l = loss(net(X), y)
             l.backward()
-            # Call the step function on each of the two Trainer instances to
-            # update the weight and bias separately
-            trainer_w.step(batch_size)
-            trainer_b.step(batch_size)
+            trainer.step(batch_size)
         if epoch % 5 == 0:
             animator.add(epoch+1, (d2l.evaluate_loss(net, train_iter, loss),
                                    d2l.evaluate_loss(net, test_iter, loss)))
