@@ -44,10 +44,10 @@ e_{ij} = F(a_i)^\top F(b_j)
 $$
 Next, we need to operate the sentence $ A $. In this case, $ \beta_i $ is the alignment word corresponding from B to $ a_i $. Generally speaking, it is obtained by the weighted array $(b_1,\ldots,b_{l_B})$ of $ a_i $. This step is known as soft alignment. Similarly, soft alignment is also necessary for sentence $B$.
 $$
-\beta_i = \sum_{j=1}^{l_B}\frac{\exp(e_{i j})}{ \sum_{k=1}^{l_B} \exp(e_{i k})} b_j,
+\beta_i = \sum_{j=1}^{l_B}\frac{\exp(e_{ij})}{ \sum_{k=1}^{l_B} \exp(e_{ik})} b_j,
 $$
 $$
-\alpha_j = \sum_{i=1}^{l_A}\frac{\exp(e_{i j})}{ \sum_{k=1}^{l_A} \exp(e_{k j})} a_i,
+\alpha_j = \sum_{i=1}^{l_A}\frac{\exp(e_{ij})}{ \sum_{k=1}^{l_A} \exp(e_{kj})} a_i,
 $$
 
 ```{.python .input  n=2}
