@@ -299,7 +299,7 @@ def train_gluon(wd):
     trainer = gluon.Trainer(net.collect_params(), 'sgd',
                             {'learning_rate': lr, 'wd': wd})
     # The bias parameter has not decayed. Bias names generally end with "bias"
-    net.collect_params('.*bias').setattr('ml_mult', 0)
+    net.collect_params('.*bias').setattr('wd_mult', 0)
     
     animator = d2l.Animator(xlabel='epochs', ylabel='loss', yscale='log',
                             xlim=[1, num_epochs], legend=['train', 'test'])
