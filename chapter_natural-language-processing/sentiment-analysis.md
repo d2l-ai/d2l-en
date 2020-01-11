@@ -38,7 +38,7 @@ def read_imdb(data_dir, is_train):
     for label in ['pos/', 'neg/']:
         folder_name = data_dir + ('train/' if is_train else 'test/') + label
         for file in os.listdir(folder_name):
-            with open(folder_name+file, 'rb') as f:
+            with open(folder_name + file, 'rb') as f:
                 review = f.read().decode('utf-8').replace('\n', '')
                 data.append(review)
                 labels.append(1 if label == 'pos' else 0)

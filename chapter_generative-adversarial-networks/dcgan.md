@@ -19,8 +19,8 @@ The dataset we will use is a collection of Pokemon sprites obtained from [pokemo
 
 ```{.python .input  n=2}
 # Saved in the d2l package for later use
-d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL+'pokemon.zip',
-                          'c065c0e2593b8b161a2d7873e42418bf6a21106c')
+d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
+                           'c065c0e2593b8b161a2d7873e42418bf6a21106c')
 
 data_dir = d2l.download_extract('pokemon')
 pokemon = gluon.data.vision.datasets.ImageFolderDataset(data_dir)

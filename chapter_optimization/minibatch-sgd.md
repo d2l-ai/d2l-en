@@ -106,8 +106,8 @@ Let's have a look at how minibatches are efficiently generated from data. In the
 
 ```{.python .input  n=1}
 # Saved in the d2l package for later use
-d2l.DATA_HUB['airfoil'] = (d2l.DATA_URL+'airfoil_self_noise.dat',
-                          '76e5be1548fd8222e5074cf0faae75edff8cf93f')
+d2l.DATA_HUB['airfoil'] = (d2l.DATA_URL + 'airfoil_self_noise.dat',
+                           '76e5be1548fd8222e5074cf0faae75edff8cf93f')
 
 # Saved in the d2l package for later use
 def get_data_ch11(batch_size=10, n=1500):

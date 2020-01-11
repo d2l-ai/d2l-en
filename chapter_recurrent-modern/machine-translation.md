@@ -17,13 +17,13 @@ We first download a dataset that contains a set of English sentences with the co
 
 ```{.python .input  n=8}
 # Saved in the d2l package for later use
-d2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL+'fra-eng.zip',
-                          '94646ad1522d915e7b0f9296181140edcf86a4f5')
+d2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL + 'fra-eng.zip',
+                           '94646ad1522d915e7b0f9296181140edcf86a4f5')
 
 # Saved in the d2l package for later use
 def read_data_nmt():
     data_dir = d2l.download_extract('fra-eng')
-    with open(data_dir+'fra.txt', 'r') as f:
+    with open(data_dir + 'fra.txt', 'r') as f:
         return f.read()
 
 raw_text = read_data_nmt()
