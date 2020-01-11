@@ -326,17 +326,16 @@ DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
 def download(name, cache_dir='../data'):
-    """Download a file inserted into DATA_HUB, return the local filename"""
+    """Download a file inserted into DATA_HUB, return the local filename."""
     assert name in DATA_HUB, "%s doesn't exist" % name
     url, sha1 = DATA_HUB[name]
-    if not os.path.exists(cache_dir):
-        os.makedirs(cache_dir)
+    d2l.mkdir_if_not_exist(cache_dir)
     return gluon.utils.download(url, cache_dir, sha1_hash=sha1)
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
 def download_extract(name, folder=None):
-    """Download and extract a .zip or a .tar file"""
+    """Download and extract a zip/tar file."""
     fname = download(name)
     base_dir = os.path.dirname(fname) 
     data_dir, ext = os.path.splitext(fname)
@@ -345,7 +344,7 @@ def download_extract(name, folder=None):
     elif ext == '.tar' or ext == '.gz':
         fp = tarfile.open(fname, 'r')
     else:
-        assert False, 'Only zip and tar files can be extracted'
+        assert False, 'Only zip/tar files can be extracted'
     fp.extractall(base_dir)
     if folder:
         return base_dir + '/' + folder + '/'
@@ -362,13 +361,13 @@ def download_all():
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
 DATA_HUB['kaggle_house_train'] = (
-    DATA_URL+'kaggle_house_pred_train.csv',
+    DATA_URL + 'kaggle_house_pred_train.csv',
     '585e9cc93e70b39160e7921475f9bcd7d31219ce')
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
 DATA_HUB['kaggle_house_test'] = (
-    DATA_URL+'kaggle_house_pred_test.csv',
+    DATA_URL + 'kaggle_house_pred_test.csv',
     'fa19780a7b011d9b009e8bff8e99922a8ee2eb90')
 
 
@@ -464,8 +463,8 @@ class Residual(nn.Block):
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
-d2l.DATA_HUB['time_machine'] = (d2l.DATA_URL+'timemachine.txt',
-                               '090b5e7e70c295757f55df93cb0a180b9691891a')
+d2l.DATA_HUB['time_machine'] = (d2l.DATA_URL + 'timemachine.txt',
+                                '090b5e7e70c295757f55df93cb0a180b9691891a')
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
@@ -727,14 +726,14 @@ class RNNModel(nn.Block):
 
 
 # Defined in file: ./chapter_recurrent-modern/machine-translation.md
-d2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL+'fra-eng.zip',
-                          '94646ad1522d915e7b0f9296181140edcf86a4f5')
+d2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL + 'fra-eng.zip',
+                           '94646ad1522d915e7b0f9296181140edcf86a4f5')
 
 
 # Defined in file: ./chapter_recurrent-modern/machine-translation.md
 def read_data_nmt():
     data_dir = d2l.download_extract('fra-eng')
-    with open(data_dir+'fra.txt', 'r') as f:
+    with open(data_dir + 'fra.txt', 'r') as f:
         return f.read()
 
 
@@ -1028,8 +1027,8 @@ def show_trace_2d(f, results):
 
 
 # Defined in file: ./chapter_optimization/minibatch-sgd.md
-d2l.DATA_HUB['airfoil'] = (d2l.DATA_URL+'airfoil_self_noise.dat',
-                          '76e5be1548fd8222e5074cf0faae75edff8cf93f')
+d2l.DATA_HUB['airfoil'] = (d2l.DATA_URL + 'airfoil_self_noise.dat',
+                           '76e5be1548fd8222e5074cf0faae75edff8cf93f')
 
 
 # Defined in file: ./chapter_optimization/minibatch-sgd.md
@@ -1237,8 +1236,8 @@ def show_bboxes(axes, bboxes, labels=None, colors=None):
 
 
 # Defined in file: ./chapter_computer-vision/object-detection-dataset.md
-d2l.DATA_HUB['pikachu'] = (d2l.DATA_URL+'pikachu.zip', 
-                         '68ab1bd42143c5966785eb0d7b2839df8d570190')
+d2l.DATA_HUB['pikachu'] = (d2l.DATA_URL + 'pikachu.zip',
+                           '68ab1bd42143c5966785eb0d7b2839df8d570190')
 
 
 # Defined in file: ./chapter_computer-vision/object-detection-dataset.md
@@ -1246,22 +1245,22 @@ def load_data_pikachu(batch_size, edge_size=256):
     """Load the pikachu dataset."""
     data_dir = d2l.download_extract('pikachu')
     train_iter = image.ImageDetIter(
-        path_imgrec=data_dir+'train.rec',
-        path_imgidx=data_dir+'train.idx',
+        path_imgrec=data_dir + 'train.rec',
+        path_imgidx=data_dir + 'train.idx',
         batch_size=batch_size,
         data_shape=(3, edge_size, edge_size),  # The shape of the output image
         shuffle=True,  # Read the dataset in random order
         rand_crop=1,  # The probability of random cropping is 1
         min_object_covered=0.95, max_attempts=200)
     val_iter = image.ImageDetIter(
-        path_imgrec=data_dir+'val.rec', batch_size=batch_size,
+        path_imgrec=data_dir + 'val.rec', batch_size=batch_size,
         data_shape=(3, edge_size, edge_size), shuffle=False)
     return train_iter, val_iter
 
 
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
-d2l.DATA_HUB['voc2012'] = (d2l.DATA_URL+'VOCtrainval_11-May-2012.tar',
-                          '4e443f8a2eca6b1dac8a6c57641b67dd40621a49')
+d2l.DATA_HUB['voc2012'] = (d2l.DATA_URL + 'VOCtrainval_11-May-2012.tar',
+                           '4e443f8a2eca6b1dac8a6c57641b67dd40621a49')
 
 
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
@@ -1426,14 +1425,14 @@ d2l.DATA_HUB['dog_tiny'] = (d2l.DATA_URL + 'kaggle_dog_tiny.zip',
 
 
 # Defined in file: ./chapter_natural-language-processing/word2vec-dataset.md
-d2l.DATA_HUB['ptb'] = (d2l.DATA_URL+'ptb.zip', 
-                      '319d85e578af0cdc590547f26231e4e31cdf1e42')
+d2l.DATA_HUB['ptb'] = (d2l.DATA_URL + 'ptb.zip', 
+                       '319d85e578af0cdc590547f26231e4e31cdf1e42')
 
 
 # Defined in file: ./chapter_natural-language-processing/word2vec-dataset.md
 def read_ptb():
     data_dir = d2l.download_extract('ptb')
-    with open(data_dir+'ptb.train.txt') as f:
+    with open(data_dir + 'ptb.train.txt') as f:
         raw_text = f.read()
     return [line.split() for line in raw_text.split('\n')]
 
@@ -1551,7 +1550,7 @@ def read_imdb(data_dir, is_train):
     for label in ['pos/', 'neg/']:
         folder_name = data_dir + ('train/' if is_train else 'test/') + label
         for file in os.listdir(folder_name):
-            with open(folder_name+file, 'rb') as f:
+            with open(folder_name + file, 'rb') as f:
                 review = f.read().decode('utf-8').replace('\n', '')
                 data.append(review)
                 labels.append(1 if label == 'pos' else 0)
@@ -1593,7 +1592,8 @@ d2l.DATA_HUB['ml-100k'] = (
 def read_data_ml100k():
     data_dir = d2l.download_extract('ml-100k')
     names = ['user_id', 'item_id', 'rating', 'timestamp']
-    data = pd.read_csv(data_dir+'u.data', '\t', names=names, engine='python')
+    data = pd.read_csv(data_dir + 'u.data', '\t', names=names,
+                       engine='python')
     num_users = data.user_id.unique().shape[0]
     num_items = data.item_id.unique().shape[0]
     return data, num_users, num_items
@@ -1803,8 +1803,8 @@ def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
 
 
 # Defined in file: ./chapter_recommender-systems/ctr.md
-d2l.DATA_HUB['ctr'] = (d2l.DATA_URL+'ctr.zip',
-                      'e18327c48c8e8e5c23da714dd614e390d369843f')
+d2l.DATA_HUB['ctr'] = (d2l.DATA_URL + 'ctr.zip',
+                       'e18327c48c8e8e5c23da714dd614e390d369843f')
 
 
 # Defined in file: ./chapter_recommender-systems/ctr.md
@@ -1884,7 +1884,7 @@ def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
 
 
 # Defined in file: ./chapter_generative-adversarial-networks/dcgan.md
-d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL+'pokemon.zip',
-                          'c065c0e2593b8b161a2d7873e42418bf6a21106c')
+d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
+                           'c065c0e2593b8b161a2d7873e42418bf6a21106c')
 
 

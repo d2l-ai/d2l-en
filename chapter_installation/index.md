@@ -52,7 +52,7 @@ Alternatively, if you have `unzip` (otherwise run `sudo apt install unzip`) avai
 
 ```bash
 mkdir d2l-en && cd d2l-en
-curl https://d2l.ai/d2l-en-0.7.1.zip -o d2l-en.zip
+curl https://d2l.ai/d2l-en.zip -o d2l-en.zip
 unzip d2l-en.zip && rm d2l-en.zip
 ```
 
@@ -94,7 +94,7 @@ We also install the `d2l` package that encapsulates frequently used
 functions and classes in this book.
 
 ```bash
-pip install d2l==0.11.1
+pip install d2l
 ```
 
 
