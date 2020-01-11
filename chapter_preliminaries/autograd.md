@@ -138,17 +138,17 @@ x.grad
 ## Backward for Non-Scalar Variables
 
 Technically, when `y` is not a scalar, 
-the most natural interpretation of the gradient of `y` (a vector of length $m$)
-with respect to `x` (a vector of length $n$) is the *Jacobian* (an $m\times n$ matrix).
+the most natural interpretation of the differentiation of a vector `y`
+with respect to a vector `x` is a matrix.
 For higher-order and higher-dimensional `y` and `x`, 
-the Jacobian could be a gnarly high-order tensor. 
+the differentiation result could be a gnarly high-order tensor. 
 
 However, while these more exotic objects do show up 
 in advanced machine learning (including in deep learning),
 more often when we are calling backward on a vector,
 we are trying to calculate the derivatives of the loss functions
 for each constituent of a *batch* of training examples.
-Here, our intent is not to calculate the Jacobian
+Here, our intent is not to calculate the differentiation matrix
 but rather the sum of the partial derivatives 
 computed individually for each example in the batch.
 
