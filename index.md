@@ -38,6 +38,7 @@ chapter_recommender-systems/index
 chapter_generative-adversarial-networks/index
 chapter_appendix-mathematics-for-deep-learning/index
 chapter_appendix-tools-for-deep-learning/index
+contrib/index
 
 ```
 
