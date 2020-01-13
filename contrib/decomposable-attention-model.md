@@ -46,6 +46,7 @@ Next, we need to operate the sentence $ A $. In this case, $ \beta_i $ is the al
 $$
 \beta_i = \sum_{j=1}^{l_B}\frac{\exp(e_{ij})}{ \sum_{k=1}^{l_B} \exp(e_{ik})} b_j,
 $$
+
 $$
 \alpha_j = \sum_{i=1}^{l_A}\frac{\exp(e_{ij})}{ \sum_{k=1}^{l_A} \exp(e_{kj})} a_i,
 $$
@@ -96,6 +97,7 @@ In the attention process, soft alignment is achieved between every word of premi
 $$
 v_{1,i} = G([a_i, \beta_i])
 $$
+
 $$
 v_{2,j} = G([b_i, \alpha_i])
 $$
@@ -129,7 +131,7 @@ $$
 Then, we connect the representation vectors of two sentences and classify them through feed-forward network.
 
 $$
-\hat y = H([v_1,v_2])
+\hat{y} = H([v_1, v_2])
 $$
 
 ```{.python .input  n=4}
@@ -181,20 +183,15 @@ class DecomposableAttention(nn.Block):
 We use the Stanford natural language inference dataset to formulate examples of training set and testing set, as well as define iterators of training set and testing set.
 
 ```{.python .input  n=6}
-d2l.download_snli(data_dir='../data')
-train_set = d2l.SNLIDataset("train")
-test_set = d2l.SNLIDataset("test", train_set.vocab)
-
 batch_size = 256
-train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True)
-test_iter = gluon.data.DataLoader(test_set, batch_size)
+train_iter, test_iter, vocab = d2l.load_data_snli(batch_size)
 ```
 
 Create a `DecomposableAttention` instance.
 
 ```{.python .input  n=7}
-embed_size, hidden_size, ctx = 100, 100, d2l.try_all_gpus()
-net = DecomposableAttention(train_set.vocab, embed_size, hidden_size)
+embed_size, hidden_size, ctx = 100, 200, d2l.try_all_gpus()
+net = DecomposableAttention(vocab, embed_size, hidden_size)
 net.initialize(init.Xavier(), ctx=ctx)
 ```
 
@@ -205,7 +202,7 @@ We use the pre-trained word vector as the feature vector of every word. In this 
 ```{.python .input}
 glove_embedding = text.embedding.create(
     'glove', pretrained_file_name='glove.6B.100d.txt')
-embeds = glove_embedding.get_vecs_by_tokens(train_set.vocab.idx_to_token)
+embeds = glove_embedding.get_vecs_by_tokens(vocab.idx_to_token)
 net.embedding.weight.set_data(embeds)
 ```
 
@@ -237,9 +234,9 @@ Finally, define the prediction function.
 ```{.python .input  n=30}
 # Saved in the d2l package for later use
 def predict_snli(net, premise, hypothesis):
-    premise = np.array(train_set.vocab[premise],
+    premise = np.array(vocab[premise],
                        ctx=d2l.try_gpu())
-    hypothesis = np.array(train_set.vocab[hypothesis],
+    hypothesis = np.array(vocab[hypothesis],
                           ctx=d2l.try_gpu())
     label = np.argmax(net([premise.reshape((1, -1)),
                            hypothesis.reshape((1, -1))]), axis=1)
