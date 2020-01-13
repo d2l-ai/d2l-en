@@ -2,7 +2,6 @@
 
 ...
 
-
 ```{.python .input  n=1}
 import d2l
 from mxnet import autograd, gluon, init, np, npx
@@ -10,7 +9,7 @@ from mxnet.gluon import nn
 import time
 
 npx.set_np()
-
+d2l.download_extract('wikitext-2', 'wikitext-2')
 bert_train_set = d2l.WikiDataset('wikitext-2', 128)
 batch_size, ctx = 512, d2l.try_all_gpus()
 bert_train_iter = gluon.data.DataLoader(bert_train_set, batch_size, shuffle=True)
@@ -23,6 +22,7 @@ mlm_loss = gluon.loss.SoftmaxCELoss()
 
 d2l.train_bert(bert_train_iter, bert, nsp_loss, mlm_loss, len(bert_train_set.vocab), ctx, 20, 3000)
 ```
+
 ...
 
 ```{.python .input  n=65}
@@ -60,6 +60,7 @@ class SNLIBERTDataset(gluon.data.Dataset):
 ```
 
 ...
+
 ```{.python .input  n=66}
 data_dir = d2l.download_extract('SNLI')
 train_data = d2l.read_snli(data_dir, True)
@@ -69,12 +70,15 @@ test_set = SNLIBERTDataset(test_data, bert_train_set.vocab)
 ```
 
 ...
+
 ```{.python .input  n=67}
 batch_size = 256
 train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True)
 test_iter = gluon.data.DataLoader(test_set, batch_size)
 ```
+
 ...
+
 ```{.python .input  n=82}
 class BERTClassifier(nn.Block):
     def __init__(self, bert, num_classes):
@@ -91,16 +95,19 @@ class BERTClassifier(nn.Block):
 ```
 
 ...
+
 ```{.python .input  n=83}
 net = BERTClassifier(bert, 3)
 net.classifier.initialize(ctx=ctx)
 ```
 
 ...
+
 ```{.python .input  n=87}
 lr, num_epochs = 0.00005, 5
 trainer = gluon.Trainer(net.collect_params(), 'adam', {'learning_rate': lr})
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
 d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, ctx, d2l.split_batch_multi_inputs)
 ```
+
 ...
