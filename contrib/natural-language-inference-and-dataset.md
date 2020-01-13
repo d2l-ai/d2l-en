@@ -90,16 +90,6 @@ for x0, x1, y in zip(train_data[0][:3], train_data[1][:3], train_data[2][:3]):
     print('label:', y, 'premise:', x0[0:60], 'hypothesis:', x1[0:60])
 ```
 
-```{.json .output n=70}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "# trainings: 549367\nlabel: 2 premise: A person on a horse jumps over a broken down airplane . hypothesis: A person is training his horse for a competition .\nlabel: 1 premise: A person on a horse jumps over a broken down airplane . hypothesis: A person is at a diner , ordering an omelette .\nlabel: 0 premise: A person on a horse jumps over a broken down airplane . hypothesis: A person is outdoors , on a horse .\n"
- }
-]
-```
-
 According to rough statistics, we find approximately 550,000 training set samples. Three relationship tags account for around 180,000 respectively. We also find about 10,000 testing dataset samples. Three relationship tags account for around 3000 respectively. Each type of tag shows the basically equivalent amount.
 
 ```{.python .input  n=72}
@@ -113,16 +103,6 @@ print("Test labels: {'entailment': %d, 'contradiction': %d, 'neutral': %d}" %
       ([row for row in test_data[2]].count(0), 
        [row for row in test_data[2]].count(1), 
        [row for row in test_data[2]].count(2)))
-```
-
-```{.json .output n=72}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "Training pairs: 549367\nTest pairs: 9824\nTrain labels: {'entailment': 183416, 'contradiction': 183187, 'neutral': 0}\nTest labels: {'entailment': 3368, 'contradiction': 3237, 'neutral': 3219}\n"
- }
-]
 ```
 
 ### Self-defining dataset
@@ -180,30 +160,10 @@ batch_size = 128
 train_iter, test_iter, vocab = load_data_snli(batch_size)
 ```
 
-```{.json .output n=111}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "read 549367 examples\nread 9824 examples\n"
- }
-]
-```
-
 Output the size of the word list, showing 18677 valid words.
 
 ```{.python .input  n=112}
 print('Vocab size:', len(vocab))
-```
-
-```{.json .output n=112}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "Vocab size: 18677\n"
- }
-]
 ```
 
 Print the form of the first small batch. What is different from text classification task is the data here consist of triples (Sentence 1, Sentence 2, Label)
@@ -214,16 +174,6 @@ for X, Y in train_iter:
     print(X[1].shape)
     print(Y.shape)
     break
-```
-
-```{.json .output n=113}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "(128, 50)\n(128, 50)\n(128,)\n"
- }
-]
 ```
 
 ## Summary
