@@ -61,7 +61,8 @@ The string type of the token is inconvenient to be used by models, which take nu
 ```{.python .input  n=9}
 # Saved in the d2l package for later use
 class Vocab(object):
-    def __init__(self, tokens, min_freq=0, use_special_tokens=False):
+    def __init__(self, tokens, min_freq=0, use_special_tokens=False, 
+                 reserved_tokens = []):
         # Sort according to frequencies
         counter = count_corpus(tokens)
         self.token_freqs = sorted(counter.items(), key=lambda x: x[0])
@@ -69,7 +70,7 @@ class Vocab(object):
         if use_special_tokens:
             # For padding, begin of sentence, end of sentence, and unknown
             self.pad, self.bos, self.eos, self.unk = (0, 1, 2, 3)
-            uniq_tokens = ['<pad>', '<bos>', '<eos>', '<unk>']
+            uniq_tokens = ['<pad>', '<bos>', '<eos>', '<unk>'] + reserved_tokens
         else:
             self.unk, uniq_tokens = 0, ['<unk>']
         uniq_tokens += [token for token, freq in self.token_freqs
