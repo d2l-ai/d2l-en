@@ -33,16 +33,16 @@ Therefore, it naturally occurs to us that we can divide the task of identifying 
 
 ### Attend
 
-The text sequence of premise consists of $ l_A $ words. The text sequence of hypothesis consists of $ l_B $ words. The dimension of word embedding is $ d $. In the attention process,  the premise $\boldsymbol{A}= (a_1,\ldots,a_{l_A}) \in \mathbb{R}^{l_A \times d}$ and hypothesis $\boldsymbol{B} = (b_1,\ldots,b_{l_B}) \in \mathbb{R}^{l_B \times d}$ are input respectively. $a_i$ and $b_i$ represent the word embedding of Premise A and Hypothesis B.
+The text sequence of premise consists of $l_A$ words. The text sequence of hypothesis consists of $l_B$ words. The dimension of word embedding is $d$. In the attention process,  the premise $\boldsymbol{A}= (a_1,\ldots,a_{l_A}) \in \mathbb{R}^{l_A \times d}$ and hypothesis $\boldsymbol{B} = (b_1,\ldots,b_{l_B}) \in \mathbb{R}^{l_B \times d}$ are input respectively. $a_i$ and $b_i$ represent the word embedding of Premise A and Hypothesis B.
 
 In the previous section of `attention mechanism`, for the seq2seq model, attention mechanism can learn about the intimate connection between the tabs of target sequence and source sequence, which is also a type of word alignment relationship in essence. For this reason, we can use the attention mechanism to learn about the word alignment relationship.
 
-Firstly, we need to calculate the unnormalized attention weight matrix $ e $ between  $ {a_1,\ldots,a_{l_A}} $  and ${b_1,\ldots,b_{l_B}}$ . In other words, after the feedforward network calculation of $ a_i $ and $ b_j $, and then calculate the attention of inner product.
+Firstly, we need to calculate the unnormalized attention weight matrix $e$ between  ${a_1,\ldots,a_{l_A}}$  and ${b_1,\ldots,b_{l_B}}$ . In other words, after the feedforward network calculation of $a_i$ and $b_j$, and then calculate the attention of inner product.
 
 $$
 e_{ij} = F(a_i)^\top F(b_j)
 $$
-Next, we need to operate the sentence $ A $. In this case, $ \beta_i $ is the alignment word corresponding from B to $ a_i $. Generally speaking, it is obtained by the weighted array $(b_1,\ldots,b_{l_B})$ of $ a_i $. This step is known as soft alignment. Similarly, soft alignment is also necessary for sentence $B$.
+Next, we need to operate the sentence $A$. In this case, $\beta_i$ is the alignment word corresponding from B to $a_i$. Generally speaking, it is obtained by the weighted array $(b_1,\ldots,b_{l_B})$ of $a_i$. This step is known as soft alignment. Similarly, soft alignment is also necessary for sentence $B$.
 $$
 \beta_i = \sum_{j=1}^{l_B}\frac{\exp(e_{ij})}{ \sum_{k=1}^{l_B} \exp(e_{ik})} b_j,
 $$
@@ -210,7 +210,7 @@ We define the `split_batch_multi_input` function. This function divides and copi
 
 ```{.python .input}
 # Saved in the d2l package for later use
-def split_batch_multi_input(X, y, ctx_list):
+def split_batch_multi_inputs(X, y, ctx_list):
     """Split X and y into multiple devices specified by ctx"""
     X = list(zip(*[gluon.utils.split_and_load(feature, ctx_list, even_split=False)
                    for feature in X]))
@@ -224,7 +224,7 @@ lr, num_epochs = 0.001, 5
 trainer = gluon.Trainer(net.collect_params(), 'adam', {'learning_rate': lr})
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
 d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
-               ctx, split_batch_multi_input)
+               ctx, split_batch_multi_inputs)
 ```
 
 ### Evaluating the Model
@@ -267,3 +267,7 @@ Assume $d$ is the dimension of the hidden layer and $O(d^2)$ is the time complex
 ## References
 
 [1] Parikh, A.P., Täckström, O., Das, D., & Uszkoreit, J. (2016). A Decomposable Attention Model for Natural Language Inference. *EMNLP*.
+
+```{.python .input}
+
+```
