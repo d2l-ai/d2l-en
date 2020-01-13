@@ -490,7 +490,8 @@ def tokenize(lines, token='word'):
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
 class Vocab(object):
-    def __init__(self, tokens, min_freq=0, use_special_tokens=False):
+    def __init__(self, tokens, min_freq=0, use_special_tokens=False, 
+                 reserved_tokens = []):
         # Sort according to frequencies
         counter = count_corpus(tokens)
         self.token_freqs = sorted(counter.items(), key=lambda x: x[0])
@@ -498,7 +499,7 @@ class Vocab(object):
         if use_special_tokens:
             # For padding, begin of sentence, end of sentence, and unknown
             self.pad, self.bos, self.eos, self.unk = (0, 1, 2, 3)
-            uniq_tokens = ['<pad>', '<bos>', '<eos>', '<unk>']
+            uniq_tokens = ['<pad>', '<bos>', '<eos>', '<unk>'] + reserved_tokens
         else:
             self.unk, uniq_tokens = 0, ['<unk>']
         uniq_tokens += [token for token, freq in self.token_freqs
@@ -1166,7 +1167,7 @@ def train_batch_ch13(net, features, labels, loss, trainer, ctx_list,
         ls = [loss(py, y) for py, y in zip(pys, ys)]
     for l in ls:
         l.backward()
-    trainer.step(features.shape[0])
+    trainer.step(labels.shape[0])
     train_loss_sum = sum([float(l.sum()) for l in ls])
     train_acc_sum = sum(d2l.accuracy(py, y) for py, y in zip(pys, ys))
     return train_loss_sum, train_acc_sum
@@ -1888,6 +1889,80 @@ def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
 d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
                            'c065c0e2593b8b161a2d7873e42418bf6a21106c')
 
+d2l.DATA_HUB['SNLI'] = (
+    'https://nlp.stanford.edu/projects/snli/snli_1.0.zip',
+    '9fcde07509c7e87ec61c640c1b2753d9041758e4')
+
+
+def split_batch_multi_inputs(X, y, ctx_list):
+    """Split X and y into multiple devices specified by ctx"""
+    X = list(zip(*[gluon.utils.split_and_load(feature, ctx_list, even_split=False)
+                   for feature in X]))
+    return (X, gluon.utils.split_and_load(y, ctx_list, even_split=False))
+
+
+def predict_snli(net, premise, hypothesis):
+    premise = np.array(vocab[premise],
+                       ctx=d2l.try_gpu())
+    hypothesis = np.array(vocab[hypothesis],
+                          ctx=d2l.try_gpu())
+    label = np.argmax(net([premise.reshape((1, -1)),
+                           hypothesis.reshape((1, -1))]), axis=1)
+    return 'neutral' if label == 0 else 'contradiction' if label == 1 \
+            else 'entailment'
+
+
+def read_snli(data_dir, is_train):
+    def extract_text(s):
+        s = re.sub('\(', '', s) 
+        s = re.sub('\)', '', s) 
+        s = re.sub("\s{2,}", " ", s)
+        return s.strip()#.lower()
+    label_set = {'entailment': 0, 'contradiction': 1, 'neutral': 2}
+    file_name = data_dir + 'snli_1.0_'+ ('train' if is_train else 'test') + '.txt'
+    with open(file_name, 'r') as f:
+        examples = [row.split('\t') for row in f.readlines()[1:]]
+    premise = [extract_text(row[1]) for row in examples if row[0] in label_set]
+    hypothesis = [extract_text(row[2]) for row in examples if row[0] in label_set]
+    labels = [label_set[row[0]] for row in examples if row[0] in label_set]
+    return premise, hypothesis, labels
+
+
+class SNLIDataset(gluon.data.Dataset):
+    def __init__(self, dataset, vocab = None):
+        self.num_steps = 50  # We fix the length of each sentence to 50.
+        p_tokens = d2l.tokenize(dataset[0], token='word')
+        h_tokens = d2l.tokenize(dataset[1], token='word')
+        if vocab is None:
+            self.vocab = d2l.Vocab(p_tokens + h_tokens, min_freq=5)
+        else:
+            self.vocab = vocab
+        self.premise = self.pad(p_tokens)
+        self.hypothesis = self.pad(h_tokens)
+        self.labels = np.array(dataset[2])
+        print('read ' + str(len(self.premise)) + ' examples')
+
+    def pad(self, data):
+        return np.array([d2l.trim_pad(self.vocab[line], self.num_steps, 
+                                      self.vocab.unk) for line in data])
+
+    def __getitem__(self, idx):
+        return (self.premise[idx], self.hypothesis[idx]), self.labels[idx]
+
+    def __len__(self):
+        return len(self.premise)
+    
+    
+def load_data_snli(batch_size, num_steps=50):
+    data_dir = d2l.download_extract('SNLI')
+    train_data = read_snli(data_dir, True)
+    test_data = read_snli(data_dir, False)
+    train_set = SNLIDataset(train_data)
+    test_set = SNLIDataset(test_data, train_set.vocab)
+    train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True)
+    test_iter = gluon.data.DataLoader(test_set, batch_size, shuffle=False)
+    return train_iter, test_iter, train_set.vocab
+
 
 class MultiHeadAttention(nn.Block):
     def __init__(self, hidden_size, num_heads, dropout, **kwargs):
@@ -1925,6 +2000,7 @@ class MultiHeadAttention(nn.Block):
         # to (batch_size, seq_len, hidden_size * num_heads)
         output_concat = transpose_output(output, self.num_heads)
         return self.W_o(output_concat)
+
     
 def transpose_qkv(X, num_heads):
     # Original X shape: (batch_size, seq_len, hidden_size * num_heads),
@@ -2084,10 +2160,13 @@ class BERTModel(nn.Block):
         self.ns_classifier = NextSentenceClassifier()
         self.mlm_decoder = MaskLMDecoder(vocab_size=vocab_size, units=embed_size)
 
-    def forward(self, inputs, token_types, valid_length=None, masked_positions=None):
+    def forward(self, inputs, token_types, valid_length = None, masked_positions = None):
         seq_out = self.encoder(inputs, token_types, valid_length)
         next_sentence_classifier_out = self.ns_classifier(seq_out)
-        mlm_decoder_out = self.mlm_decoder(seq_out, masked_positions)
+        if not masked_positions is None:
+            mlm_decoder_out = self.mlm_decoder(seq_out, masked_positions)
+        else:
+            mlm_decoder_out = None
         return seq_out, next_sentence_classifier_out, mlm_decoder_out
     
     

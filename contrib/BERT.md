@@ -17,7 +17,7 @@
 
 首先导入实验所需的包和模块。
 
-```{.python .input  n=1}
+```{.python .input  n=3}
 import d2l
 from mxnet import gluon, np, npx
 from mxnet.gluon import nn
@@ -46,7 +46,7 @@ BERT的输入支持单个句子或一对句子。分别适用于单句任务（�
 
 在代码实现中，我们修改“Transformer”中的`TransformerEncoder`类，加入BERT所需要的词片嵌入，片段嵌入和位置嵌入。
 
-```{.python .input  n=2}
+```{.python .input  n=4}
 # Saved in the d2l package for later use
 class BERTEncoder(nn.Block):
     def __init__(self, vocab_size, units, hidden_size,
@@ -69,7 +69,7 @@ class BERTEncoder(nn.Block):
 
 为了测试这个BERTEncoder，现在我们模拟一个句对数据输入。每个句子对包含8个单词，不同的单词由不同的整数表示。
 
-```{.python .input  n=3}
+```{.python .input  n=5}
 encoder = BERTEncoder(vocab_size=10000, units=768, hidden_size=1024,
                       num_heads=4, num_layers=2, dropout=0.1)
 encoder.initialize()
@@ -81,16 +81,6 @@ segments = np.array([[0, 0, 0, 0, 1, 1, 1, 1],
                      [0, 0, 0, 1, 1, 1, 1, 1]])
 encodings = encoder(words, segments, None)
 print(encodings.shape)  # (批量大小, 单词数, 嵌入大小)
-```
-
-```{.json .output n=3}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "(2, 8, 768)\n"
- }
-]
 ```
 
 ## 预训练任务
@@ -107,7 +97,7 @@ BERT包含两个预训练任务：掩码语言模型和下一句预测。
 
 下面我们创建掩码语言模型。
 
-```{.python .input  n=4}
+```{.python .input  n=6}
 # Saved in the d2l package for later use
 class MaskLMDecoder(nn.Block):
     def __init__(self, vocab_size, units, **kwargs):
@@ -138,7 +128,7 @@ class MaskLMDecoder(nn.Block):
 
 下面我们生成一些随机单词作为演示。我们使用交叉熵作为损失函数。然后将预测结果和真实标签传递给损失函数。
 
-```{.python .input  n=5}
+```{.python .input  n=30}
 mlm_decoder = MaskLMDecoder(vocab_size=10000, units=768)
 mlm_decoder.initialize()
 
@@ -148,16 +138,6 @@ mlm_pred = mlm_decoder(encodings, mlm_positions)  # (批量大小, 掩码数目,
 mlm_loss_fn = gluon.loss.SoftmaxCrossEntropyLoss()
 mlm_loss = mlm_loss_fn(mlm_pred, mlm_label)
 print(mlm_pred.shape, mlm_loss.shape)
-```
-
-```{.json .output n=5}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "(2, 2, 10000) (2,)\n"
- }
-]
 ```
 
 ### 下一句预测
@@ -182,7 +162,7 @@ print(mlm_pred.shape, mlm_loss.shape)
 
 ![下一句预测](../img/bert_nsp.svg)
 
-```{.python .input  n=6}
+```{.python .input  n=18}
 # Saved in the d2l package for later use
 class NextSentenceClassifier(nn.Block):
     def __init__(self, units=768, **kwargs):
@@ -199,7 +179,7 @@ class NextSentenceClassifier(nn.Block):
 
 下一句预测是二分类问题，我们依然使用交叉熵作为损失函数。 我们将编码结果传递给`NextSentenceClassifier`这个类以获得下一句预测结果。 如果是真实的下一句则标签为1，否则使用0。然后，我们将预测结果和真实标签传递给损失函数。
 
-```{.python .input  n=7}
+```{.python .input  n=19}
 ns_classifier = NextSentenceClassifier()
 ns_classifier.initialize()
 
@@ -210,21 +190,11 @@ ns_loss = ns_loss_fn(ns_pred, ns_label)
 print(ns_pred.shape, ns_loss.shape)
 ```
 
-```{.json .output n=7}
-[
- {
-  "name": "stdout",
-  "output_type": "stream",
-  "text": "(2, 2) (2,)\n"
- }
-]
-```
-
 ## 构建模型
 
 我们将刚才修改得到的`TransformerEncoder`，下一句任务预测模型和遮蔽语言模型串联到一起，得到BERT模型。
 
-```{.python .input  n=8}
+```{.python .input  n=20}
 # Saved in the d2l package for later use
 class BERTModel(nn.Block):
     def __init__(self, vocab_size=None, embed_size=128, hidden_size=512,
@@ -241,7 +211,10 @@ class BERTModel(nn.Block):
         # 进行下一句预测任务
         next_sentence_classifier_out = self.ns_classifier(seq_out)
         # 进行掩码语言模型任务
-        mlm_decoder_out = self.mlm_decoder(seq_out, masked_positions)
+        if not masked_positions is None:
+            mlm_decoder_out = self.mlm_decoder(seq_out, masked_positions)
+        else:
+            mlm_decoder_out = None
         return seq_out, next_sentence_classifier_out, mlm_decoder_out
 ```
 
