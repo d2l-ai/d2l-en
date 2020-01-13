@@ -300,7 +300,7 @@ class BatchNorm(nn.Block):
         # Save the updated moving_mean and moving_var
         Y, self.moving_mean, self.moving_var = batch_norm(
             X, self.gamma.data(), self.beta.data(), self.moving_mean,
-            self.moving_var, eps=1e-5, momentum=0.9)
+            self.moving_var, eps=1e-12, momentum=0.9)
         return Y
 ```
 
