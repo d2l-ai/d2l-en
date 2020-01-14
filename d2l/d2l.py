@@ -489,17 +489,12 @@ def tokenize(lines, token='word'):
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
 class Vocab(object):
-    def __init__(self, tokens, min_freq=0, use_special_tokens=False):
+    def __init__(self, tokens, min_freq=0, reserved_tokens=[]):
         # Sort according to frequencies
         counter = count_corpus(tokens)
         self.token_freqs = sorted(counter.items(), key=lambda x: x[0])
         self.token_freqs.sort(key=lambda x: x[1], reverse=True)
-        if use_special_tokens:
-            # For padding, begin of sentence, end of sentence, and unknown
-            self.pad, self.bos, self.eos, self.unk = (0, 1, 2, 3)
-            uniq_tokens = ['<pad>', '<bos>', '<eos>', '<unk>']
-        else:
-            self.unk, uniq_tokens = 0, ['<unk>']
+        self.unk, uniq_tokens = 0, ['<unk>'] + reserved_tokens
         uniq_tokens += [token for token, freq in self.token_freqs
                         if freq >= min_freq and token not in uniq_tokens]
         self.idx_to_token, self.token_to_idx = [], dict()
@@ -775,9 +770,9 @@ def trim_pad(line, num_steps, padding_token):
 def build_array(lines, vocab, num_steps, is_source):
     lines = [vocab[l] for l in lines]
     if not is_source:
-        lines = [[vocab.bos] + l + [vocab.eos] for l in lines]
-    array = np.array([trim_pad(l, num_steps, vocab.pad) for l in lines])
-    valid_len = (array != vocab.pad).sum(axis=1)
+        lines = [[vocab['<bos>']] + l + [vocab['<eos>']] for l in lines]
+    array = np.array([trim_pad(l, num_steps, vocab['<pad>']) for l in lines])
+    valid_len = (array != vocab['<pad>']).sum(axis=1)
     return array, valid_len
 
 
@@ -785,8 +780,10 @@ def build_array(lines, vocab, num_steps, is_source):
 def load_data_nmt(batch_size, num_steps, num_examples=1000):
     text = preprocess_nmt(read_data_nmt())
     source, target = tokenize_nmt(text, num_examples)
-    src_vocab = d2l.Vocab(source, min_freq=3, use_special_tokens=True)
-    tgt_vocab = d2l.Vocab(target, min_freq=3, use_special_tokens=True)
+    src_vocab = d2l.Vocab(source, min_freq=3, 
+                          reserved_tokens=['<pad>', '<bos>', '<eos>'])
+    tgt_vocab = d2l.Vocab(target, min_freq=3, 
+                          reserved_tokens=['<pad>', '<bos>', '<eos>'])
     src_array, src_valid_len = build_array(
         source, src_vocab, num_steps, True)
     tgt_array, tgt_valid_len = build_array(

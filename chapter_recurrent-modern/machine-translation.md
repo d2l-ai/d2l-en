@@ -84,7 +84,8 @@ d2l.plt.legend(loc='upper right');
 Since the tokens in the source language could be different to the ones in the target language, we need to build a vocabulary for each of them. Since we are using words instead of characters  as tokens, it makes the vocabulary size significantly large. Here we map every token that appears less than 3 times into the &lt;unk&gt; token :numref:`sec_text_preprocessing`. In addition, we need other special tokens such as padding and sentence beginnings.
 
 ```{.python .input  n=16}
-src_vocab = d2l.Vocab(source, min_freq=3, use_special_tokens=True)
+src_vocab = d2l.Vocab(source, min_freq=3, 
+                      reserved_tokens=['<pad>', '<bos>', '<eos>'])
 len(src_vocab)
 ```
 
@@ -102,7 +103,7 @@ def trim_pad(line, num_steps, padding_token):
     return line + [padding_token] * (num_steps - len(line))  # Pad
 
 
-trim_pad(src_vocab[source[0]], 10, src_vocab.pad)
+trim_pad(src_vocab[source[0]], 10, src_vocab['<pad>'])
 ```
 
 Now we can convert a list of sentences into an `(num_example, num_steps)` index array. We also record the length of each sentence without the padding tokens, called *valid length*, which might be used by some models. In addition, we add the special “&lt;bos&gt;” and “&lt;eos&gt;” tokens to the target sentences so that our model will know the signals for starting and ending predicting.
@@ -112,9 +113,9 @@ Now we can convert a list of sentences into an `(num_example, num_steps)` index 
 def build_array(lines, vocab, num_steps, is_source):
     lines = [vocab[l] for l in lines]
     if not is_source:
-        lines = [[vocab.bos] + l + [vocab.eos] for l in lines]
-    array = np.array([trim_pad(l, num_steps, vocab.pad) for l in lines])
-    valid_len = (array != vocab.pad).sum(axis=1)
+        lines = [[vocab['<bos>']] + l + [vocab['<eos>']] for l in lines]
+    array = np.array([trim_pad(l, num_steps, vocab['<pad>']) for l in lines])
+    valid_len = (array != vocab['<pad>']).sum(axis=1)
     return array, valid_len
 ```
 
@@ -129,8 +130,10 @@ Finally, we define the function `load_data_nmt` to return the data iterator with
 def load_data_nmt(batch_size, num_steps, num_examples=1000):
     text = preprocess_nmt(read_data_nmt())
     source, target = tokenize_nmt(text, num_examples)
-    src_vocab = d2l.Vocab(source, min_freq=3, use_special_tokens=True)
-    tgt_vocab = d2l.Vocab(target, min_freq=3, use_special_tokens=True)
+    src_vocab = d2l.Vocab(source, min_freq=3, 
+                          reserved_tokens=['<pad>', '<bos>', '<eos>'])
+    tgt_vocab = d2l.Vocab(target, min_freq=3, 
+                          reserved_tokens=['<pad>', '<bos>', '<eos>'])
     src_array, src_valid_len = build_array(
         source, src_vocab, num_steps, True)
     tgt_array, tgt_valid_len = build_array(
