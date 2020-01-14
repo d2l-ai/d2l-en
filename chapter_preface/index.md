@@ -122,7 +122,7 @@ as a downloadable PDF, and on the internet as a website.
 At present there exist no tools and no workflow
 perfectly suited to these demands, so we had to assemble our own.
 We describe our approach in detail in :numref:`sec_how_to_contribute`.
-We settled on Github to share the source and to allow for edits,
+We settled on GitHub to share the source and to allow for edits,
 Jupyter notebooks for mixing code, equations and text,
 Sphinx as a rendering engine to generate multiple outputs,
 and Discourse for the forum.
@@ -274,7 +274,7 @@ to update your code and runtime environment.
 At times, to avoid unnecessary repetition, we encapsulate
 the frequently-imported and referred-to functions, classes, etc.
 in this book in the `d2l` package.
-For any block block such as a function, a class, or multiple imports
+For any block such as a function, a class, or multiple imports
 to be saved in the package, we will mark it with
 `# Saved in the d2l package for later use`.
 The `d2l` package is light-weight and only requires

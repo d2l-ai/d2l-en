@@ -161,7 +161,7 @@ def train_batch_ch13(net, features, labels, loss, trainer, ctx_list,
         ls = [loss(py, y) for py, y in zip(pys, ys)]
     for l in ls:
         l.backward()
-    trainer.step(features.shape[0])
+    trainer.step(labels.shape[0])
     train_loss_sum = sum([float(l.sum()) for l in ls])
     train_acc_sum = sum(d2l.accuracy(py, y) for py, y in zip(pys, ys))
     return train_loss_sum, train_acc_sum

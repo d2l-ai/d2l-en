@@ -489,17 +489,12 @@ def tokenize(lines, token='word'):
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
 class Vocab(object):
-    def __init__(self, tokens, min_freq=0, use_special_tokens=False):
+    def __init__(self, tokens, min_freq=0, reserved_tokens=[]):
         # Sort according to frequencies
         counter = count_corpus(tokens)
         self.token_freqs = sorted(counter.items(), key=lambda x: x[0])
         self.token_freqs.sort(key=lambda x: x[1], reverse=True)
-        if use_special_tokens:
-            # For padding, begin of sentence, end of sentence, and unknown
-            self.pad, self.bos, self.eos, self.unk = (0, 1, 2, 3)
-            uniq_tokens = ['<pad>', '<bos>', '<eos>', '<unk>']
-        else:
-            self.unk, uniq_tokens = 0, ['<unk>']
+        self.unk, uniq_tokens = 0, ['<unk>'] + reserved_tokens
         uniq_tokens += [token for token, freq in self.token_freqs
                         if freq >= min_freq and token not in uniq_tokens]
         self.idx_to_token, self.token_to_idx = [], dict()
@@ -775,9 +770,9 @@ def trim_pad(line, num_steps, padding_token):
 def build_array(lines, vocab, num_steps, is_source):
     lines = [vocab[l] for l in lines]
     if not is_source:
-        lines = [[vocab.bos] + l + [vocab.eos] for l in lines]
-    array = np.array([trim_pad(l, num_steps, vocab.pad) for l in lines])
-    valid_len = (array != vocab.pad).sum(axis=1)
+        lines = [[vocab['<bos>']] + l + [vocab['<eos>']] for l in lines]
+    array = np.array([trim_pad(l, num_steps, vocab['<pad>']) for l in lines])
+    valid_len = (array != vocab['<pad>']).sum(axis=1)
     return array, valid_len
 
 
@@ -785,8 +780,10 @@ def build_array(lines, vocab, num_steps, is_source):
 def load_data_nmt(batch_size, num_steps, num_examples=1000):
     text = preprocess_nmt(read_data_nmt())
     source, target = tokenize_nmt(text, num_examples)
-    src_vocab = d2l.Vocab(source, min_freq=3, use_special_tokens=True)
-    tgt_vocab = d2l.Vocab(target, min_freq=3, use_special_tokens=True)
+    src_vocab = d2l.Vocab(source, min_freq=3, 
+                          reserved_tokens=['<pad>', '<bos>', '<eos>'])
+    tgt_vocab = d2l.Vocab(target, min_freq=3, 
+                          reserved_tokens=['<pad>', '<bos>', '<eos>'])
     src_array, src_valid_len = build_array(
         source, src_vocab, num_steps, True)
     tgt_array, tgt_valid_len = build_array(
@@ -1888,3 +1885,56 @@ d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
                            'c065c0e2593b8b161a2d7873e42418bf6a21106c')
 
 
+d2l.DATA_HUB['SNLI'] = (
+    'https://nlp.stanford.edu/projects/snli/snli_1.0.zip',
+    '9fcde07509c7e87ec61c640c1b2753d9041758e4')
+
+def read_snli(data_dir, is_train):
+    def extract_text(s):
+        s = re.sub('\(', '', s) 
+        s = re.sub('\)', '', s) 
+        s = re.sub("\s{2,}", " ", s)
+        return s.strip()#.lower()
+    label_set = {'entailment': 0, 'contradiction': 1, 'neutral': 2}
+    file_name = data_dir + 'snli_1.0_'+ ('train' if is_train else 'test') + '.txt'
+    with open(file_name, 'r') as f:
+        examples = [row.split('\t') for row in f.readlines()[1:]]
+    premise = [extract_text(row[1]) for row in examples if row[0] in label_set]
+    hypothesis = [extract_text(row[2]) for row in examples if row[0] in label_set]
+    labels = [label_set[row[0]] for row in examples if row[0] in label_set]
+    return premise, hypothesis, labels
+
+class SNLIDataset(gluon.data.Dataset):
+    def __init__(self, dataset, vocab = None):
+        self.num_steps = 50  # We fix the length of each sentence to 50.
+        p_tokens = d2l.tokenize(dataset[0], token='word')
+        h_tokens = d2l.tokenize(dataset[1], token='word')
+        if vocab is None:
+            self.vocab = d2l.Vocab(p_tokens + h_tokens, min_freq=5)
+        else:
+            self.vocab = vocab
+        self.premise = self.pad(p_tokens)
+        self.hypothesis = self.pad(h_tokens)
+        self.labels = np.array(dataset[2])
+        print('read ' + str(len(self.premise)) + ' examples')
+
+    def pad(self, data):
+        return np.array([d2l.trim_pad(self.vocab[line], self.num_steps, 
+                                      self.vocab.unk) for line in data])
+
+    def __getitem__(self, idx):
+        return (self.premise[idx], self.hypothesis[idx]), self.labels[idx]
+
+    def __len__(self):
+        return len(self.premise)
+    
+    
+def load_data_snli(batch_size, num_steps=50):
+    data_dir = d2l.download_extract('SNLI')
+    train_data = read_snli(data_dir, True)
+    test_data = read_snli(data_dir, False)
+    train_set = SNLIDataset(train_data)
+    test_set = SNLIDataset(test_data, train_set.vocab)
+    train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True)
+    test_iter = gluon.data.DataLoader(test_set, batch_size, shuffle=False)
+    return train_iter, test_iter, train_set.vocab

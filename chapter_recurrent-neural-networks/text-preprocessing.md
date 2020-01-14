@@ -56,22 +56,17 @@ tokens[0:2]
 
 ## Vocabulary
 
-The string type of the token is inconvenient to be used by models, which take numerical inputs. Now let's build a dictionary, often called *vocabulary* as well, to map string tokens into numerical indices starting from 0. To do so, we first count the unique tokens in all documents, called *corpus*, and then assign a numerical index to each unique token according to its frequency. Rarely appeared tokens are often removed to reduce the complexity. A token does not exist in corpus or has been removed is mapped into a special unknown (“&lt;unk&gt;”) token. We optionally add another three special tokens: “&lt;pad&gt;” a token for padding, “&lt;bos&gt;” to present the beginning for a sentence, and “&lt;eos&gt;” for the ending of a sentence.
+The string type of the token is inconvenient to be used by models, which take numerical inputs. Now let's build a dictionary, often called *vocabulary* as well, to map string tokens into numerical indices starting from 0. To do so, we first count the unique tokens in all documents, called *corpus*, and then assign a numerical index to each unique token according to its frequency. Rarely appeared tokens are often removed to reduce the complexity. A token does not exist in corpus or has been removed is mapped into a special unknown (“&lt;unk&gt;”) token. We optionally add a list of reserved tokens, such as “&lt;pad&gt;” a token for padding, “&lt;bos&gt;” to present the beginning for a sentence, and “&lt;eos&gt;” for the ending of a sentence.
 
 ```{.python .input  n=9}
 # Saved in the d2l package for later use
 class Vocab(object):
-    def __init__(self, tokens, min_freq=0, use_special_tokens=False):
+    def __init__(self, tokens, min_freq=0, reserved_tokens=[]):
         # Sort according to frequencies
         counter = count_corpus(tokens)
         self.token_freqs = sorted(counter.items(), key=lambda x: x[0])
         self.token_freqs.sort(key=lambda x: x[1], reverse=True)
-        if use_special_tokens:
-            # For padding, begin of sentence, end of sentence, and unknown
-            self.pad, self.bos, self.eos, self.unk = (0, 1, 2, 3)
-            uniq_tokens = ['<pad>', '<bos>', '<eos>', '<unk>']
-        else:
-            self.unk, uniq_tokens = 0, ['<unk>']
+        self.unk, uniq_tokens = 0, ['<unk>'] + reserved_tokens
         uniq_tokens += [token for token, freq in self.token_freqs
                         if freq >= min_freq and token not in uniq_tokens]
         self.idx_to_token, self.token_to_idx = [], dict()
