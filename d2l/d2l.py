@@ -1165,7 +1165,7 @@ def train_batch_ch13(net, features, labels, loss, trainer, ctx_list,
         ls = [loss(py, y) for py, y in zip(pys, ys)]
     for l in ls:
         l.backward()
-    trainer.step(features.shape[0])
+    trainer.step(labels.shape[0])
     train_loss_sum = sum([float(l.sum()) for l in ls])
     train_acc_sum = sum(d2l.accuracy(py, y) for py, y in zip(pys, ys))
     return train_loss_sum, train_acc_sum
@@ -1888,3 +1888,56 @@ d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
                            'c065c0e2593b8b161a2d7873e42418bf6a21106c')
 
 
+d2l.DATA_HUB['SNLI'] = (
+    'https://nlp.stanford.edu/projects/snli/snli_1.0.zip',
+    '9fcde07509c7e87ec61c640c1b2753d9041758e4')
+
+def read_snli(data_dir, is_train):
+    def extract_text(s):
+        s = re.sub('\(', '', s) 
+        s = re.sub('\)', '', s) 
+        s = re.sub("\s{2,}", " ", s)
+        return s.strip()#.lower()
+    label_set = {'entailment': 0, 'contradiction': 1, 'neutral': 2}
+    file_name = data_dir + 'snli_1.0_'+ ('train' if is_train else 'test') + '.txt'
+    with open(file_name, 'r') as f:
+        examples = [row.split('\t') for row in f.readlines()[1:]]
+    premise = [extract_text(row[1]) for row in examples if row[0] in label_set]
+    hypothesis = [extract_text(row[2]) for row in examples if row[0] in label_set]
+    labels = [label_set[row[0]] for row in examples if row[0] in label_set]
+    return premise, hypothesis, labels
+
+class SNLIDataset(gluon.data.Dataset):
+    def __init__(self, dataset, vocab = None):
+        self.num_steps = 50  # We fix the length of each sentence to 50.
+        p_tokens = d2l.tokenize(dataset[0], token='word')
+        h_tokens = d2l.tokenize(dataset[1], token='word')
+        if vocab is None:
+            self.vocab = d2l.Vocab(p_tokens + h_tokens, min_freq=5)
+        else:
+            self.vocab = vocab
+        self.premise = self.pad(p_tokens)
+        self.hypothesis = self.pad(h_tokens)
+        self.labels = np.array(dataset[2])
+        print('read ' + str(len(self.premise)) + ' examples')
+
+    def pad(self, data):
+        return np.array([d2l.trim_pad(self.vocab[line], self.num_steps, 
+                                      self.vocab.unk) for line in data])
+
+    def __getitem__(self, idx):
+        return (self.premise[idx], self.hypothesis[idx]), self.labels[idx]
+
+    def __len__(self):
+        return len(self.premise)
+    
+    
+def load_data_snli(batch_size, num_steps=50):
+    data_dir = d2l.download_extract('SNLI')
+    train_data = read_snli(data_dir, True)
+    test_data = read_snli(data_dir, False)
+    train_set = SNLIDataset(train_data)
+    test_set = SNLIDataset(test_data, train_set.vocab)
+    train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True)
+    test_iter = gluon.data.DataLoader(test_set, batch_size, shuffle=False)
+    return train_iter, test_iter, train_set.vocab
