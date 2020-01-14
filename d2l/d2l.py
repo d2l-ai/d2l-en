@@ -1421,86 +1421,162 @@ d2l.DATA_HUB['dog_tiny'] = (d2l.DATA_URL + 'kaggle_dog_tiny.zip',
                             '7c9b54e78c1cedaa04998f9868bc548c60101362')
 
 
-# Defined in file: ./chapter_natural-language-processing/natural-language-inference-and-dataset.md
-d2l.DATA_HUB['SNLI'] = (
-    'https://nlp.stanford.edu/projects/snli/snli_1.0.zip',
-    '9fcde07509c7e87ec61c640c1b2753d9041758e4')
+# Defined in file: ./chapter_natural-language-processing/word2vec-dataset.md
+d2l.DATA_HUB['ptb'] = (d2l.DATA_URL + 'ptb.zip', 
+                       '319d85e578af0cdc590547f26231e4e31cdf1e42')
 
 
-# Defined in file: ./chapter_natural-language-processing/natural-language-inference-and-dataset.md
-def read_snli(data_dir, is_train):
-    def extract_text(s):
-        s = re.sub('\(', '', s) 
-        s = re.sub('\)', '', s) 
-        s = re.sub("\s{2,}", " ", s)
-        return s.strip()
-    label_set = {'entailment': 0, 'contradiction': 1, 'neutral': 2}
-    file_name = data_dir + 'snli_1.0_'+ ('train' if is_train else 'test') + '.txt'
-    with open(file_name, 'r') as f:
-        examples = [row.split('\t') for row in f.readlines()[1:]]
-    premise = [extract_text(row[1]) for row in examples if row[0] in label_set]
-    hypothesis = [extract_text(row[2]) for row in examples if row[0] in label_set]
-    labels = [label_set[row[0]] for row in examples if row[0] in label_set]
-    return premise, hypothesis, labels
+# Defined in file: ./chapter_natural-language-processing/word2vec-dataset.md
+def read_ptb():
+    data_dir = d2l.download_extract('ptb')
+    with open(data_dir + 'ptb.train.txt') as f:
+        raw_text = f.read()
+    return [line.split() for line in raw_text.split('\n')]
 
 
-# Defined in file: ./chapter_natural-language-processing/natural-language-inference-and-dataset.md
-class SNLIDataset(gluon.data.Dataset):
-    def __init__(self, dataset, vocab = None):
-        self.num_steps = 50  # We fix the length of each sentence to 50.
-        p_tokens = d2l.tokenize(dataset[0], token='word')
-        h_tokens = d2l.tokenize(dataset[1], token='word')
-        if vocab is None:
-            self.vocab = d2l.Vocab(p_tokens + h_tokens, min_freq=5)
-        else:
-            self.vocab = vocab
-        self.premise = self.pad(p_tokens)
-        self.hypothesis = self.pad(h_tokens)
-        self.labels = np.array(dataset[2])
-        print('read ' + str(len(self.premise)) + ' examples')
+# Defined in file: ./chapter_natural-language-processing/word2vec-dataset.md
+def subsampling(sentences, vocab):
+    # Map low frequency words into <unk>
+    sentences = [[vocab.idx_to_token[vocab[tk]] for tk in line]
+                 for line in sentences]
+    # Count the frequency for each word
+    counter = d2l.count_corpus(sentences)
+    num_tokens = sum(counter.values())
 
-    def pad(self, data):
-        return np.array([d2l.trim_pad(self.vocab[line], self.num_steps, 
-                                      self.vocab.unk) for line in data])
+    # Return True if to keep this token during subsampling
+    def keep(token):
+        return(random.uniform(0, 1) <
+               math.sqrt(1e-4 / counter[token] * num_tokens))
 
-    def __getitem__(self, idx):
-        return (self.premise[idx], self.hypothesis[idx]), self.labels[idx]
-
-    def __len__(self):
-        return len(self.premise)
+    # Now do the subsampling
+    return [[tk for tk in line if keep(tk)] for line in sentences]
 
 
-# Defined in file: ./chapter_natural-language-processing/natural-language-inference-and-dataset.md
-def load_data_snli(batch_size, num_steps=50):
-    data_dir = d2l.download_extract('SNLI')
-    train_data = read_snli(data_dir, True)
-    test_data = read_snli(data_dir, False)
-    train_set = SNLIDataset(train_data)
-    test_set = SNLIDataset(test_data, train_set.vocab)
-    train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True)
-    test_iter = gluon.data.DataLoader(test_set, batch_size, shuffle=False)
-
-    return train_iter, test_iter, train_set.vocab
-
-
-# Defined in file: ./chapter_natural-language-processing/decomposable-attention-model.md
-def split_batch_multi_inputs(X, y, ctx_list):
-    """Split X and y into multiple devices specified by ctx"""
-    X = list(zip(*[gluon.utils.split_and_load(feature, ctx_list, even_split=False)
-                   for feature in X]))
-    return (X, gluon.utils.split_and_load(y, ctx_list, even_split=False))
+# Defined in file: ./chapter_natural-language-processing/word2vec-dataset.md
+def get_centers_and_contexts(corpus, max_window_size):
+    centers, contexts = [], []
+    for line in corpus:
+        # Each sentence needs at least 2 words to form a
+        # "central target word - context word" pair
+        if len(line) < 2:
+            continue
+        centers += line
+        for i in range(len(line)):  # Context window centered at i
+            window_size = random.randint(1, max_window_size)
+            indices = list(range(max(0, i - window_size),
+                                 min(len(line), i + 1 + window_size)))
+            # Exclude the central target word from the context words
+            indices.remove(i)
+            contexts.append([line[idx] for idx in indices])
+    return centers, contexts
 
 
-# Defined in file: ./chapter_natural-language-processing/decomposable-attention-model.md
-def predict_snli(net, premise, hypothesis):
-    premise = np.array(vocab[premise],
-                       ctx=d2l.try_gpu())
-    hypothesis = np.array(vocab[hypothesis],
-                          ctx=d2l.try_gpu())
-    label = np.argmax(net([premise.reshape((1, -1)),
-                           hypothesis.reshape((1, -1))]), axis=1)
-    return 'neutral' if label == 0 else 'contradiction' if label == 1 \
-            else 'entailment'
+# Defined in file: ./chapter_natural-language-processing/word2vec-dataset.md
+class RandomGenerator(object):
+    """Draw a random int in [0, n] according to n sampling weights."""
+    def __init__(self, sampling_weights):
+        self.population = list(range(len(sampling_weights)))
+        self.sampling_weights = sampling_weights
+        self.candidates = []
+        self.i = 0
+
+    def draw(self):
+        if self.i == len(self.candidates):
+            self.candidates = random.choices(
+                self.population, self.sampling_weights, k=10000)
+            self.i = 0
+        self.i += 1
+        return self.candidates[self.i-1]
+
+
+# Defined in file: ./chapter_natural-language-processing/word2vec-dataset.md
+def get_negatives(all_contexts, corpus, K):
+    counter = d2l.count_corpus(corpus)
+    sampling_weights = [counter[i]**0.75 for i in range(len(counter))]
+    all_negatives, generator = [], RandomGenerator(sampling_weights)
+    for contexts in all_contexts:
+        negatives = []
+        while len(negatives) < len(contexts) * K:
+            neg = generator.draw()
+            # Noise words cannot be context words
+            if neg not in contexts:
+                negatives.append(neg)
+        all_negatives.append(negatives)
+    return all_negatives
+
+
+# Defined in file: ./chapter_natural-language-processing/word2vec-dataset.md
+def batchify(data):
+    max_len = max(len(c) + len(n) for _, c, n in data)
+    centers, contexts_negatives, masks, labels = [], [], [], []
+    for center, context, negative in data:
+        cur_len = len(context) + len(negative)
+        centers += [center]
+        contexts_negatives += [context + negative + [0] * (max_len - cur_len)]
+        masks += [[1] * cur_len + [0] * (max_len - cur_len)]
+        labels += [[1] * len(context) + [0] * (max_len - len(context))]
+    return (np.array(centers).reshape(-1, 1), np.array(contexts_negatives),
+            np.array(masks), np.array(labels))
+
+
+# Defined in file: ./chapter_natural-language-processing/word2vec-dataset.md
+def load_data_ptb(batch_size, max_window_size, num_noise_words):
+    sentences = read_ptb()
+    vocab = d2l.Vocab(sentences, min_freq=10)
+    subsampled = subsampling(sentences, vocab)
+    corpus = [vocab[line] for line in subsampled]
+    all_centers, all_contexts = get_centers_and_contexts(
+        corpus, max_window_size)
+    all_negatives = get_negatives(all_contexts, corpus, num_noise_words)
+    dataset = gluon.data.ArrayDataset(
+        all_centers, all_contexts, all_negatives)
+    data_iter = gluon.data.DataLoader(dataset, batch_size, shuffle=True,
+                                      batchify_fn=batchify)
+    return data_iter, vocab
+
+
+# Defined in file: ./chapter_natural-language-processing/sentiment-analysis.md
+d2l.DATA_HUB['aclImdb'] = (
+    'http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz',
+    '01ada507287d82875905620988597833ad4e0903')
+
+
+# Defined in file: ./chapter_natural-language-processing/sentiment-analysis.md
+def read_imdb(data_dir, is_train):
+    data, labels = [], []
+    for label in ['pos/', 'neg/']:
+        folder_name = data_dir + ('train/' if is_train else 'test/') + label
+        for file in os.listdir(folder_name):
+            with open(folder_name + file, 'rb') as f:
+                review = f.read().decode('utf-8').replace('\n', '')
+                data.append(review)
+                labels.append(1 if label == 'pos' else 0)
+    return data, labels
+
+
+# Defined in file: ./chapter_natural-language-processing/sentiment-analysis.md
+def load_data_imdb(batch_size, num_steps=500):
+    data_dir = d2l.download_extract('aclImdb', 'aclImdb')
+    train_data = read_imdb(data_dir, True)
+    test_data = read_imdb(data_dir, False)
+    train_tokens = d2l.tokenize(train_data[0], token='word')
+    test_tokens = d2l.tokenize(test_data[0], token='word')
+    vocab = d2l.Vocab(train_tokens, min_freq=5)
+    train_features = np.array([d2l.trim_pad(vocab[line], num_steps, vocab.unk)
+                               for line in train_tokens])
+    test_features = np.array([d2l.trim_pad(vocab[line], num_steps, vocab.unk)
+                              for line in test_tokens])
+    train_iter = d2l.load_array((train_features, train_data[1]), batch_size)
+    test_iter = d2l.load_array((test_features, test_data[1]), batch_size,
+                               is_train=False)
+    return train_iter, test_iter, vocab
+
+
+# Defined in file: ./chapter_natural-language-processing/sentiment-analysis-rnn.md
+def predict_sentiment(net, vocab, sentence):
+    sentence = np.array(vocab[sentence.split()], ctx=d2l.try_gpu())
+    label = np.argmax(net(sentence.reshape(1, -1)), axis=1)
+    return 'positive' if label == 1 else 'negative'
 
 
 # Defined in file: ./chapter_recommender-systems/movielens.md
