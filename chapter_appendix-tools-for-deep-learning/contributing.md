@@ -38,7 +38,7 @@ To clone the repository (i.e., to make a local copy) we need to get its reposito
 :width:`700px`
 :label:`fig_git_clone`
 
-```bash
+```
 # Replace your_github_username with your GitHub username
 git clone https://github.com/your_github_username/d2l-en.git
 ```
@@ -65,7 +65,7 @@ Changes not staged for commit:
 
 After confirming that this is what you want, execute the following command:
 
-```bash
+```
 git add chapter_appendix_tools/how-to-contribute.md
 git commit -m 'fix typo in git documentation'
 git push
