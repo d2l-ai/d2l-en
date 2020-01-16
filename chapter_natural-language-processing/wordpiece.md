@@ -2,7 +2,7 @@
 
 ...
 
-```{.python .input  n=9}
+```{.python .input  n=1}
 import collections
 
 vocabs = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
@@ -11,7 +11,7 @@ vocabs = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
 
 ...
 
-```{.python .input  n=10}
+```{.python .input  n=2}
 original_words = {'low_' : 5, 'lower_' : 2, 'newest_' : 6, 'widest_' : 3}
 words = {}
 for word, freq in original_words.items():
@@ -21,7 +21,7 @@ for word, freq in original_words.items():
 
 ...
 
-```{.python .input  n=11}
+```{.python .input  n=3}
 def get_max_freq_pair(words):
     pairs = collections.defaultdict(int)
     for word, freq in words.items():
@@ -35,7 +35,7 @@ def get_max_freq_pair(words):
 
 ...
 
-```{.python .input  n=12}
+```{.python .input  n=4}
 def merge_vocab(max_freq_pair, words, vocabs):
     bigram = ' '.join(max_freq_pair)
     vocabs.append(''.join(max_freq_pair))
@@ -48,7 +48,7 @@ def merge_vocab(max_freq_pair, words, vocabs):
 
 ...
 
-```{.python .input  n=13}
+```{.python .input  n=5}
 num_merges = 10
 for i in range(num_merges):
     max_freq_pair = get_max_freq_pair(words)
@@ -58,20 +58,20 @@ for i in range(num_merges):
 
 ...
 
-```{.python .input  n=14}
+```{.python .input  n=6}
 print("Words:", list(original_words.keys()))
 print("Wordpieces:", list(words.keys()))
 ```
 
 ...
 
-```{.python .input  n=15}
+```{.python .input  n=7}
 print("Vocabs:", vocabs)
 ```
 
 ...
 
-```{.python .input  n=16}
+```{.python .input  n=8}
 inputs = ['slow_', 'slowest_']
 outputs = []
 for word in inputs:
@@ -99,7 +99,3 @@ print('Wordpieces:', outputs)
 [1] Wu, Y., Schuster, M., Chen, Z., Le, Q. V., Norouzi, M., Macherey, W., ... & Klingner, J. (2016). Google's neural machine translation system: Bridging the gap between human and machine translation. arXiv preprint arXiv:1609.08144.
 
 [2] Sennrich, R., Haddow, B., & Birch, A. (2015). Neural machine translation of rare words with subword units. arXiv preprint arXiv:1508.07909.
-
-```{.python .input}
-
-```
