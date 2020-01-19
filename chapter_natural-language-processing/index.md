@@ -12,7 +12,7 @@ word2vec
 approx-training
 word2vec-dataset
 word2vec-gluon
-fasttext
+subword-embedding
 glove
 similarity-analogy
 sentiment-analysis

@@ -1,5 +1,5 @@
 # Subword Embedding
-:label:`sec_subword-embedding`
+:label:`sec_fasttext`
 
 English words usually have internal structures and formation methods. For example, we can deduce the relationship between "dog", "dogs", and "dogcatcher" by their spelling. All these words have the same root, "dog", but they use different suffixes to change the meaning of the word. Moreover, this association can be extended to other words. For example, the relationship between "dog" and "dogs" is just like the relationship between "cat" and "cats". The relationship between "boy" and "boyfriend" is just like the relationship between "girl" and "girlfriend". This characteristic is not unique to English. In French and Spanish, a lot of verbs can have more than 40 different forms depending on the context. In Finnish, a noun may have more than 15 forms. In fact, morphology, which is an important branch of linguistics, studies the internal structure and formation of words.
 
@@ -28,6 +28,9 @@ The rest of the fastText process is consistent with the skip-gram model, so it i
 
 
 ## Wordpiece
+
+
+
 
 
 ```{.python .input}
@@ -117,6 +120,7 @@ print('Wordpieces:', outputs)
 1. How can you design a subword embedding model based on the continuous bag-of-words model?
 
 
+
 ## [Discussions](https://discuss.mxnet.io/t/2388)
 
-![](../img/qr_subword-embedding.svg)
+![](../img/qr_fasttext.svg)
