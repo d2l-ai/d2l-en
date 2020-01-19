@@ -1,4 +1,4 @@
-# WordPiece
+# Byte-Pair Embedding (WordPiece)
 
 ...
 
