@@ -8,9 +8,6 @@ data/
 *.csv
 build/README.md
 build/environment.yml
-/chapter_gluon-basics/x
-/chapter_gluon-basics/xy
-/chapter_gluon-basics/mydict
 *egg-info*
 dist*
 build/chapter*
@@ -18,7 +15,7 @@ build/_build
 build/img
 build/data
 build/d2l
-/chapter_attention-mechanism/fra-eng.zip
+/chapter_attention-mechanisms/fra-eng.zip
 /chapter_recurrent-neural-networks/fra-eng.zip
 img/*.pdf
 aclImdb*
