@@ -123,4 +123,4 @@ print('Wordpieces:', outputs)
 
 ## [Discussions](https://discuss.mxnet.io/t/2388)
 
-![](../img/qr_fasttext.svg)
+![](../img/qr_subword-embedding.svg)
