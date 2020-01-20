@@ -2164,9 +2164,16 @@ class BERTModel(nn.Block):
             mlm_decoder_out = None
         return seq_out, next_sentence_classifier_out, mlm_decoder_out
     
-    
-def read_wiki(data_set='wikitext-2'):
-    file_name = os.path.join('../data/', data_set, 'wiki.train.tokens')
+d2l.DATA_HUB['wikitext-2'] = (
+    'https://s3.amazonaws.com/research.metamind.io/wikitext/wikitext-2-v1.zip',
+    '3c914d17d80b1459be871a5039ac23e752a53cbe')
+
+d2l.DATA_HUB['wikitext-103'] = (
+    'https://s3.amazonaws.com/research.metamind.io/wikitext/wikitext-103-v1.zip',
+    '0aec09a7537b58d4bb65362fee27650eeaba625a')
+
+def read_wiki(data_dir):
+    file_name = os.path.join(data_dir, 'wiki.train.tokens')
     with open(file_name, 'r') as f:
         raw = f.readlines()
     data = [line.strip().lower().split(' . ')
@@ -2176,32 +2183,28 @@ def read_wiki(data_set='wikitext-2'):
 
 
 def get_next_sentence(sentence, next_sentence, all_documents):
-    # 对于每一个句子，有50%的概率使用真实的下一句
     if random.random() < 0.5:
-        tokens_a = sentence.split() 
-        tokens_b = next_sentence.split()
+        tokens_a = sentence
+        tokens_b = next_sentence
         is_next = True
-    # 对于每一个句子，有50%的概率使用随机选取的句子作为下一句
     else:
         random_sentence = random.choice(random.choice(all_documents))
-        tokens_a = sentence.split() 
-        tokens_b = random_sentence.split()
+        tokens_a = sentence
+        tokens_b = random_sentence
         is_next = False
     return tokens_a, tokens_b, is_next
 
 
 def get_tokens_and_segment(tokens_a, tokens_b):
-    tokens = []  # 词片标记
-    segment_ids = []  # 片段索引，使用0和1区分两个句子
+    tokens = [] 
+    segment_ids = [] 
 
-    # 在序列开始插入“[CLS]”标记
     tokens.append('[CLS]')
     segment_ids.append(0)
 
     for token in tokens_a:
         tokens.append(token)
         segment_ids.append(0)
-    # 在句子结束位置插入“[SEP]”标记
     tokens.append('[SEP]')
     segment_ids.append(0)
 
@@ -2218,7 +2221,6 @@ def create_next_sentence(document, all_documents, vocab, max_length):
     for i in range(len(document)-1):
         tokens_a, tokens_b, is_next = get_next_sentence(document[i], document[i+1], all_documents)
         
-        # 舍弃超过最大长度的句子，注意这里计算长度时要考虑“[CLS]”标记和两个“[SEP]”标记
         if len(tokens_a) + len(tokens_b) + 3 > max_length:
              continue
         tokens, segment_ids = get_tokens_and_segment(tokens_a, tokens_b)
@@ -2236,14 +2238,11 @@ def choice_mask_tokens(tokens, cand_indexes, num_to_predict, vocab):
             continue
         for index in index_set:
             masked_token = None
-            # 80%的概率替换成“[MASK]”标记
             if random.random() < 0.8:
                 masked_token = '[MASK]'
             else:
-                # 10%的概率保持不变
                 if random.random() < 0.5:
                     masked_token = tokens[index]
-                # 10%的概率使用随机单词进行替换
                 else:
                     masked_token = random.randint(0, len(vocab) - 1)
 
@@ -2259,37 +2258,29 @@ def create_masked_lm(tokens, vocab):
             continue
         cand_indexes.append([i])
         
-    # 计算需要遮挡的标记数目
     num_to_predict = max(1, int(round(len(tokens) * 0.15)))
     
-    # 遮挡标记，返回的是遮挡后句子的标记序列，以及掩码位置和掩码位置的真实标记。
     output_tokens, masked_lms = choice_mask_tokens(tokens, cand_indexes,
                                                    num_to_predict, vocab)
             
     masked_lms = sorted(masked_lms, key=lambda x: x[0])
-    masked_lm_positions = []  # 掩码位置
-    masked_lm_labels = []  # 掩码位置的真实标记
+    masked_lm_positions = []
+    masked_lm_labels = []
     for p in masked_lms:
         masked_lm_positions.append(p[0])
         masked_lm_labels.append(p[1])
         
-    return vocab.to_indices(output_tokens), masked_lm_positions, vocab.to_indices(masked_lm_labels)
+    return vocab[output_tokens], masked_lm_positions, vocab[masked_lm_labels]
 
 
 def convert_numpy(instances, max_length):
     input_ids, segment_ids, masked_lm_positions, masked_lm_ids = [], [], [], []
     masked_lm_weights, next_sentence_labels, valid_lengths = [], [], []
     for instance in instances:
-        # instance[0] 输入的索引表示
-        # instance[1] 掩码位置
-        # instance[2] 掩码位置的真实标记
-        # instance[3] 片段标记
-        # instance[4] 下一句预测标签
         input_id = instance[0] + [0] * (max_length - len(instance[0]))
         segment_id = instance[3] + [0] * (max_length - len(instance[3]))
-        masked_lm_position = instance[1] + [0] * (20 - len(instance[1]))  # 对于每个样本最大掩码数量为20
+        masked_lm_position = instance[1] + [0] * (20 - len(instance[1]))
         masked_lm_id = instance[2] + [0] * (20 - len(instance[2]))
-        # 通过将非掩码位置的权重置为0，来避免预测非掩码位置的标记
         masked_lm_weight = [1.0] * len(instance[2]) + [0.0] * (20 - len(instance[1]))
         next_sentence_label = instance[4]
         valid_length = len(instance[0])
@@ -2306,14 +2297,11 @@ def convert_numpy(instances, max_length):
 
 
 def create_training_instances(train_data, vocab, max_length):
-    # 创建下一句任务的样本
     instances = []
     for i, document in enumerate(train_data):
         instances.extend(create_next_sentence(document, train_data, vocab, max_length))
-    # 进行掩码语言模型的预处理
     instances = [(create_masked_lm(tokens, vocab) + (segment_ids, is_random_next))
                  for (tokens, segment_ids, is_random_next) in instances]
-    # 转换成numpy形式
     input_ids, masked_lm_ids, masked_lm_positions, masked_lm_weights,\
            next_sentence_labels, segment_ids, valid_lengths = convert_numpy(instances, max_length)
     return input_ids, masked_lm_ids, masked_lm_positions, masked_lm_weights,\
@@ -2321,19 +2309,17 @@ def create_training_instances(train_data, vocab, max_length):
 
 
 class WikiDataset(gluon.data.Dataset):
-    def __init__(self, data_set = 'wikitext-2', max_length = 128):
-        train_data = read_wiki(data_set)
-        self.vocab = self.get_vocab(train_data)
+    def __init__(self, dataset, max_length = 128):
+        train_tokens = [d2l.tokenize(row, token='word') for row in dataset]
+        
+        text_list=[]
+        [text_list.extend(row) for row in train_tokens]
+        self.vocab = d2l.Vocab(text_list, min_freq=5, 
+                               reserved_tokens=['[MASK]', '[CLS]', '[SEP]'])
         self.input_ids, self.masked_lm_ids, self.masked_lm_positions,\
         self.masked_lm_weights, self.next_sentence_labels, self.segment_ids,\
-        self.valid_lengths = create_training_instances(train_data, self.vocab, max_length)
+        self.valid_lengths = create_training_instances(train_tokens, self.vocab, max_length)
 
-    def get_vocab(self, data):
-        # 过滤出现频度小于5的词
-        counter = collections.Counter([w for st in data
-                                       for tk in st
-                                       for w in tk.split()])
-        return text.vocab.Vocabulary(counter, min_freq=5, reserved_tokens=['[MASK]', '[CLS]', '[SEP]'])
     def __getitem__(self, idx):
         return self.input_ids[idx], self.masked_lm_ids[idx], self.masked_lm_positions[idx], self.masked_lm_weights[idx],\
            self.next_sentence_labels[idx], self.segment_ids[idx], self.valid_lengths[idx]
@@ -2341,6 +2327,12 @@ class WikiDataset(gluon.data.Dataset):
     def __len__(self):
         return len(self.input_ids)
     
+def load_data_wiki(batch_size, data_set = 'wikitext-2', num_steps=128):
+    data_dir = d2l.download_extract(data_set, data_set)
+    train_data = read_wiki(data_dir)
+    train_set = WikiDataset(train_data, num_steps)
+    train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True)
+    return train_iter, train_set.vocab
     
 def _get_batch_bert(batch, ctx):
     (input_id, masked_id, masked_position, masked_weight, \

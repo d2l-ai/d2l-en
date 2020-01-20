@@ -9,18 +9,17 @@ from mxnet.gluon import nn
 import time
 
 npx.set_np()
-d2l.download_extract('wikitext-2', 'wikitext-2')
-bert_train_set = d2l.WikiDataset('wikitext-2', 128)
-batch_size, ctx = 512, d2l.try_all_gpus()
-bert_train_iter = gluon.data.DataLoader(bert_train_set, batch_size, shuffle=True)
 
-bert = d2l.BERTModel(len(bert_train_set.vocab), embed_size=128, hidden_size=256, num_heads=2,
+batch_size, ctx = 512, d2l.try_all_gpus()
+bert_train_iter, vocab = d2l.load_data_wiki(batch_size, 'wikitext-2')
+
+bert = d2l.BERTModel(len(vocab), embed_size=128, hidden_size=256, num_heads=2,
                      num_layers=2, dropout=0.2)
 bert.initialize(init.Xavier(), ctx=ctx)
 nsp_loss = gluon.loss.SoftmaxCELoss()
 mlm_loss = gluon.loss.SoftmaxCELoss()
 
-d2l.train_bert(bert_train_iter, bert, nsp_loss, mlm_loss, len(bert_train_set.vocab), ctx, 20, 3000)
+d2l.train_bert(bert_train_iter, bert, nsp_loss, mlm_loss, len(vocab), ctx, 20, 3000)
 ```
 
 ...
@@ -45,7 +44,7 @@ class SNLIBERTDataset(gluon.data.Dataset):
         for i in range(len(p_tokens)):
             token, segment_id = d2l.get_tokens_and_segment(p_tokens[i][:self.num_steps], 
                                                            h_tokens[i][:self.num_steps])
-            tokens.append(self.vocab.to_indices(pad(token)))
+            tokens.append(self.vocab[pad(token)])
             segment_ids.append(np.array(pad(segment_id)))
             valid_lengths.append(np.array(len(token)))
             
@@ -65,8 +64,8 @@ class SNLIBERTDataset(gluon.data.Dataset):
 data_dir = d2l.download_extract('SNLI')
 train_data = d2l.read_snli(data_dir, True)
 test_data = d2l.read_snli(data_dir, False)
-train_set = SNLIBERTDataset(train_data, bert_train_set.vocab)
-test_set = SNLIBERTDataset(test_data, bert_train_set.vocab)
+train_set = SNLIBERTDataset(train_data, vocab)
+test_set = SNLIBERTDataset(test_data, vocab)
 ```
 
 ...
@@ -104,7 +103,7 @@ net.classifier.initialize(ctx=ctx)
 ...
 
 ```{.python .input  n=87}
-lr, num_epochs = 0.00005, 5
+lr, num_epochs = 1e-5, 5
 trainer = gluon.Trainer(net.collect_params(), 'adam', {'learning_rate': lr})
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
 d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, ctx, d2l.split_batch_multi_inputs)

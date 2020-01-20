@@ -23,15 +23,13 @@ d2l.DATA_HUB['wikitext-2'] = (
 d2l.DATA_HUB['wikitext-103'] = (
     'https://s3.amazonaws.com/research.metamind.io/wikitext/wikitext-103-v1.zip',
     '0aec09a7537b58d4bb65362fee27650eeaba625a')
-
-data_dir = d2l.download_extract('wikitext-2', 'wikitext-2')
 ```
 
 ...
 
 ```{.python .input  n=3}
 # Saved in the d2l package for later use
-def read_wiki(data_set='wikitext-2'):
+def read_wiki(data_dir):
     file_name = os.path.join(data_dir, 'wiki.train.tokens')
     with open(file_name, 'r') as f:
         raw = f.readlines()
@@ -39,8 +37,6 @@ def read_wiki(data_set='wikitext-2'):
             for line in raw if len(line.split(' . '))>=2]
     random.shuffle(data)
     return data
-
-train_data = read_wiki()
 ```
 
 ...
@@ -49,13 +45,13 @@ train_data = read_wiki()
 # Saved in the d2l package for later use
 def get_next_sentence(sentence, next_sentence, all_documents):
     if random.random() < 0.5:
-        tokens_a = sentence.split() 
-        tokens_b = next_sentence.split()
+        tokens_a = sentence
+        tokens_b = next_sentence
         is_next = True
     else:
         random_sentence = random.choice(random.choice(all_documents))
-        tokens_a = sentence.split() 
-        tokens_b = random_sentence.split()
+        tokens_a = sentence
+        tokens_b = random_sentence
         is_next = False
     return tokens_a, tokens_b, is_next
 ```
@@ -153,7 +149,7 @@ def create_masked_lm(tokens, vocab):
         masked_lm_positions.append(p[0])
         masked_lm_labels.append(p[1])
         
-    return vocab.to_indices(output_tokens), masked_lm_positions, vocab.to_indices(masked_lm_labels)
+    return vocab[output_tokens], masked_lm_positions, vocab[masked_lm_labels]
 ```
 
 ...
@@ -204,18 +200,17 @@ def create_training_instances(train_data, vocab, max_length):
 ```{.python .input  n=11}
 # Saved in the d2l package for later use
 class WikiDataset(gluon.data.Dataset):
-    def __init__(self, data_set = 'wikitext-2', max_length = 128):
-        train_data = read_wiki(data_set)
-        self.vocab = self.get_vocab(train_data)
+    def __init__(self, dataset, max_length = 128):
+        train_tokens = [d2l.tokenize(row, token='word') for row in dataset]
+        
+        text_list=[]
+        [text_list.extend(row) for row in train_tokens]
+        self.vocab = d2l.Vocab(text_list, min_freq=5, 
+                               reserved_tokens=['[MASK]', '[CLS]', '[SEP]'])
         self.input_ids, self.masked_lm_ids, self.masked_lm_positions,\
         self.masked_lm_weights, self.next_sentence_labels, self.segment_ids,\
-        self.valid_lengths = create_training_instances(train_data, self.vocab, max_length)
+        self.valid_lengths = create_training_instances(train_tokens, self.vocab, max_length)
 
-    def get_vocab(self, data):
-        counter = collections.Counter([w for st in data
-                                       for tk in st
-                                       for w in tk.split()])
-        return text.vocab.Vocabulary(counter, min_freq=5, reserved_tokens=['[MASK]', '[CLS]', '[SEP]'])
     def __getitem__(self, idx):
         return self.input_ids[idx], self.masked_lm_ids[idx], self.masked_lm_positions[idx], self.masked_lm_weights[idx],\
            self.next_sentence_labels[idx], self.segment_ids[idx], self.valid_lengths[idx]
@@ -224,18 +219,23 @@ class WikiDataset(gluon.data.Dataset):
         return len(self.input_ids)
 ```
 
-...
-
-```{.python .input  n=12}
-train_set = WikiDataset('wikitext-2', 128)
+```{.python .input}
+def load_data_wiki(batch_size, data_set = 'wikitext-2', num_steps=128):
+    data_dir = d2l.download_extract(data_set, data_set)
+    train_data = read_wiki(data_dir)
+    train_set = WikiDataset(train_data, num_steps)
+    train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True)
+    return train_iter, train_set.vocab
 ```
 
-...
-
-```{.python .input  n=13}
+```{.python .input}
 batch_size = 512
-train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True)
+train_iter, vocab = load_data_wiki(batch_size, 'wikitext-2')
 ```
+
+...
+
+...
 
 ...
 
@@ -251,7 +251,7 @@ for _, data_batch in enumerate(train_iter):
 ...
 
 ```{.python .input  n=15}
-net = d2l.BERTModel(len(train_set.vocab), embed_size=128, hidden_size=256, 
+net = d2l.BERTModel(len(vocab), embed_size=128, hidden_size=256, 
                     num_heads=2, num_layers=2, dropout=0.2)
 ctx = d2l.try_all_gpus()
 net.initialize(init.Xavier(), ctx=ctx)
@@ -352,4 +352,8 @@ def train_bert(data_eval, net, nsp_loss, mlm_loss, vocab_size, ctx, log_interval
 
 ```{.python .input  n=19}
 train_bert(train_iter, net, nsp_loss, mlm_loss, len(train_set.vocab), ctx, 20, 1)
+```
+
+```{.python .input}
+
 ```
