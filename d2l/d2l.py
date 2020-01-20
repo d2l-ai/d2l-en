@@ -916,20 +916,20 @@ def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
                     ctx):
     src_tokens = src_vocab[src_sentence.lower().split(' ')]
     enc_valid_length = np.array([len(src_tokens)], ctx=ctx)
-    src_tokens = d2l.trim_pad(src_tokens, num_steps, src_vocab.pad)
+    src_tokens = d2l.trim_pad(src_tokens, num_steps, src_vocab['<pad>'])
     enc_X = np.array(src_tokens, ctx=ctx)
     # Add the batch_size dimension
     enc_outputs = model.encoder(np.expand_dims(enc_X, axis=0),
                                 enc_valid_length)
     dec_state = model.decoder.init_state(enc_outputs, enc_valid_length)
-    dec_X = np.expand_dims(np.array([tgt_vocab.bos], ctx=ctx), axis=0)
+    dec_X = np.expand_dims(np.array([tgt_vocab['<bos>']], ctx=ctx), axis=0)
     predict_tokens = []
     for _ in range(num_steps):
         Y, dec_state = model.decoder(dec_X, dec_state)
         # The token with highest score is used as the next timestep input
         dec_X = Y.argmax(axis=2)
         py = dec_X.squeeze(axis=0).astype('int32').item()
-        if py == tgt_vocab.eos:
+        if py == tgt_vocab['<eos>']:
             break
         predict_tokens.append(py)
     return ' '.join(tgt_vocab.to_tokens(predict_tokens))
