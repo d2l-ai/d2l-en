@@ -33,79 +33,140 @@ In fastText, all the extracted subwords have to be of the specified lengths, suc
 To allow for variable-length subwords in a fixed-size vocabulary,
 we can apply a compression algorithm
 called *byte pair encoding* (BPE) to extract subwords :cite:`Sennrich.Haddow.Birch.2015`.
-Starting from symbols of length $1$,
-BPE iteratively merges the frequent pair of symbols, such as consecutive characters of
-arbitrary length within a word, to produce new symbols.
-Note that for efficiency, pairs crossing word boundaries are not considered.
-In the end, we can use such symbols as subwords to segment words.
-In the following, we will illustrate how BPE works.
 
-First, we initialize the vocabulary of symbols as all the English characters, a special end-of-word symbol `'_'`, and a special unknown symbol `'[UNK]'`.
+```{.python .input  n=1}
+import re, collections
 
-```{.python .input}
-import collections
-
-symbols = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
-           'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-           '_', '[UNK]']
-```
-
-Since we do not consider symbol pairs that cross boundaries of words,
-we only need a dictionary `raw_token_freqs` that maps words to frequencies as the representation of a dataset.
-Note that the special symbol `'_'` is appended to each word so that
-we can easily convert a sequence of symbols ( e.g., "a_ tall er_ man")
-to its corresponding word sequence (e.g., "a taller man").
-Since we start the merging process from a vocabulary of only single characters and special symbols, space is inserted between every pair of consecutive characters within each word.
-
-```{.python .input}
-raw_token_freqs = {'fast_': 4, 'faster_': 3, 'tall_': 5, 'taller_': 4}
-token_freqs = {}
-for token, freq in raw_token_freqs.items():
-    token_freqs[' '.join(list(token))] = raw_token_freqs[token]
-token_freqs
-```
-
-```{.python .input}
-def get_max_freq_pair(token_freqs):
+def get_stats(vocab):
     pairs = collections.defaultdict(int)
-    for token, freq in token_freqs.items():
-        symbols = token.split()
+    for word, freq in vocab.items():
+        symbols = word.split()
+        for i in range(len(symbols)-1):
+            pairs[symbols[i],symbols[i+1]] += freq
+    return pairs
+
+def merge_vocab(pair, v_in):
+    v_out = {}
+    bigram = re.escape(' '.join(pair))
+    p = re.compile(r'(?<!\S)' + bigram + r'(?!\S)')
+    for word in v_in:
+        w_out = p.sub(''.join(pair), word)
+        v_out[w_out] = v_in[word]
+    return v_out
+
+vocab = {'l o w </w>' : 5, 'l o w e r </w>' : 2,
+         'n e w e s t </w>':6, 'w i d e s t </w>':3}
+num_merges = 10
+for i in range(num_merges):
+    pairs = get_stats(vocab)
+    best = max(pairs, key=pairs.get)
+    vocab = merge_vocab(best, vocab)
+    print(best)
+```
+
+```{.json .output n=1}
+[
+ {
+  "name": "stdout",
+  "output_type": "stream",
+  "text": "('e', 's')\n('es', 't')\n('est', '</w>')\n('l', 'o')\n('lo', 'w')\n('n', 'e')\n('ne', 'w')\n('new', 'est</w>')\n('low', '</w>')\n('w', 'i')\n"
+ }
+]
+```
+
+```{.python .input  n=2}
+original_words = {'low_': 5, 'lower_': 2, 'newest_': 6, 'widest_': 3}
+words = {}
+for word, freq in original_words.items():
+    new_word = ' '.join(list(word))
+    words[new_word] = original_words[word]
+words
+```
+
+```{.json .output n=2}
+[
+ {
+  "data": {
+   "text/plain": "{'l o w _': 5, 'l o w e r _': 2, 'n e w e s t _': 6, 'w i d e s t _': 3}"
+  },
+  "execution_count": 2,
+  "metadata": {},
+  "output_type": "execute_result"
+ }
+]
+```
+
+```{.python .input  n=3}
+def get_max_freq_pair(words):
+    pairs = collections.defaultdict(int)
+    for word, freq in words.items():
+        symbols = word.split()
         for i in range(len(symbols) - 1):
             # Key of pairs is a tuple composed of two adjacent units
             pairs[symbols[i], symbols[i + 1]] += freq
     return max(pairs, key=pairs.get)  # Key of pairs with the max value
 ```
 
-```{.python .input}
-def merge_vocab(max_freq_pair, token_freqs, symbols):
+```{.python .input  n=4}
+def merge_vocab(max_freq_pair, words, symbols):
+    bigram = ' '.join(max_freq_pair)
     symbols.append(''.join(max_freq_pair))
-    new_token_freqs = {}
-    for token, freq in token_freqs.items():
-        new_token = token.replace(' '.join(max_freq_pair),
-                                  ''.join(max_freq_pair))
-        new_token_freqs[new_token] = token_freqs[token]
-    return new_token_freqs
+    words_out = {}
+    for word, freq in words.items():
+        new_word = word.replace(bigram, ''.join(max_freq_pair))
+        words_out[new_word] = words[word]
+    return words_out
 ```
 
-```{.python .input}
+```{.python .input  n=5}
 num_merges = 10
 for i in range(num_merges):
-    max_freq_pair = get_max_freq_pair(token_freqs)
-    token_freqs = merge_vocab(max_freq_pair, token_freqs, symbols)
+    max_freq_pair = get_max_freq_pair(words)
+    words = merge_vocab(max_freq_pair, words, symbols)
     print("Merge #%d:" % (i + 1), max_freq_pair)
 ```
 
-```{.python .input}
-print(symbols)
+```{.json .output n=5}
+[
+ {
+  "name": "stdout",
+  "output_type": "stream",
+  "text": "Merge #1: ('e', 's')\nMerge #2: ('es', 't')\nMerge #3: ('est', '_')\nMerge #4: ('l', 'o')\nMerge #5: ('lo', 'w')\nMerge #6: ('n', 'e')\nMerge #7: ('ne', 'w')\nMerge #8: ('new', 'est_')\nMerge #9: ('low', '_')\nMerge #10: ('w', 'i')\n"
+ }
+]
 ```
 
-```{.python .input}
-print("Original tokens:", list(raw_token_freqs.keys()))
-print("Tokens with BPE segmentation:", list(token_freqs.keys()))
+```{.python .input  n=6}
+print("Words:", list(original_words.keys()))
+print("Wordpieces:", list(words.keys()))
 ```
 
-```{.python .input}
-inputs = ['tallest_', 'fatter_']
+```{.json .output n=6}
+[
+ {
+  "name": "stdout",
+  "output_type": "stream",
+  "text": "Words: ['low_', 'lower_', 'newest_', 'widest_']\nWordpieces: ['low_', 'low e r _', 'newest_', 'wi d est_']\n"
+ }
+]
+```
+
+```{.python .input  n=7}
+print("Symbols:", symbols)
+```
+
+```{.json .output n=7}
+[
+ {
+  "name": "stdout",
+  "output_type": "stream",
+  "text": "Symbols: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '_', '[UNK]', 'es', 'est', 'est_', 'lo', 'low', 'ne', 'new', 'newest_', 'low_', 'wi']\n"
+ }
+]
+```
+
+```{.python .input  n=8}
+inputs = ['slow_', 'slowest_']
 outputs = []
 for word in inputs:
     start, end = 0, len(word)
@@ -124,6 +185,16 @@ print('Words:', inputs)
 print('Wordpieces:', outputs)
 ```
 
+```{.json .output n=8}
+[
+ {
+  "name": "stdout",
+  "output_type": "stream",
+  "text": "Words: ['slow_', 'slowest_']\nWordpieces: ['s low_', 's low est_']\n"
+ }
+]
+```
+
 ## Summary
 
 * FastText proposes a subword embedding method. Based on the skip-gram model in word2vec, it represents the central word vector as the sum of the subword vectors of the word.
@@ -134,7 +205,6 @@ print('Wordpieces:', outputs)
 
 1. When there are too many subwords (for example, 6 words in English result in about $3\times 10^8$ combinations), what problems arise? Can you think of any methods to solve them? Hint: Refer to the end of section 3.2 of the fastText paper[1].
 1. How can you design a subword embedding model based on the continuous bag-of-words model?
-1. To get a vocabulary of size $m$, how many merging operations are needed when the initial symbol vocabulary size is $n$?
 
 
 
