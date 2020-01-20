@@ -351,7 +351,7 @@ def train_bert(data_eval, net, nsp_loss, mlm_loss, vocab_size, ctx, log_interval
 ...
 
 ```{.python .input  n=19}
-train_bert(train_iter, net, nsp_loss, mlm_loss, len(train_set.vocab), ctx, 20, 1)
+train_bert(train_iter, net, nsp_loss, mlm_loss, len(vocab), ctx, 20, 1)
 ```
 
 ```{.python .input}
