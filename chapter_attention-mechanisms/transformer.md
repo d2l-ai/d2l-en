@@ -68,7 +68,7 @@ After that, the output with length $p_v$ from each of the $h$ attention heads ar
 $$\mathbf o = \mathbf W_o \begin{bmatrix}\mathbf o^{(1)}\\\vdots\\\mathbf o^{(h)}\end{bmatrix}.$$
 
 
-Now we can implement the multi-head attention. Assume that the multi-head attention contain the number heads `num_heads` $=h$, the hidden size `hidden_size` $=p_q=p_k=p_v$ are the same for the query,  key, and value dense layers. In addition, since the multi-head attention keeps the same dimensionality between its input and its output, we have the output feature size $d_o =$ `hidden_size` as well. 
+Now we can implement the multi-head attention. Assume that the multi-head attention contain the number heads `num_heads` $=h$, the hidden size `hidden_size` $=p_q=p_k=p_v$ are the same for the query,  key, and value dense layers. In addition, since the multi-head attention keeps the same dimensionality between its input and its output, we have the output feature size $d_o =$ `hidden_size` as well.
 
 ```{.python .input  n=2}
 class MultiHeadAttention(nn.Block):
@@ -108,7 +108,9 @@ class MultiHeadAttention(nn.Block):
         output_concat = transpose_output(output, self.num_heads)
         return self.W_o(output_concat)
 ```
+
 Here are the definitions of the transpose functions `transpose_qkv` and `transpose_output`, who are the inverse of each other.
+
 ```{.python .input  n=3}
 def transpose_qkv(X, num_heads):
     # Original X shape: (batch_size, seq_len, hidden_size * num_heads),
@@ -161,7 +163,7 @@ class PositionWiseFFN(nn.Block):
         return self.ffn_2(self.ffn_1(X))
 ```
 
-Similar to the multi-head attention, the position-wise feed-forward network will only change the last dimension size of the input---the feature dimension. In addition, if two items in the input sequence are identical, the according outputs will be identical as well. 
+Similar to the multi-head attention, the position-wise feed-forward network will only change the last dimension size of the input---the feature dimension. In addition, if two items in the input sequence are identical, the according outputs will be identical as well.
 
 ```{.python .input  n=6}
 ffn = PositionWiseFFN(4, 8)
