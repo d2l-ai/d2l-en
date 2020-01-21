@@ -43,7 +43,7 @@ In the end, we can use such symbols as subwords to segment words.
 BPE and its variants has been used for input representations in popular NLP pretraining models such as GPT-2 :cite:`Radford.Wu.Child.ea.2019` and RoBERTa :cite:`Liu.Ott.Goyal.ea.2019`.
 In the following, we will illustrate how BPE works.
 
-First, we initialize the vocabulary of symbols as all the English characters, a special end-of-word symbol `'_'`, and a special unknown symbol `'[UNK]'`.
+First, we initialize the vocabulary of symbols as all the English lowercase characters, a special end-of-word symbol `'_'`, and a special unknown symbol `'[UNK]'`.
 
 ```{.python .input}
 import collections
@@ -99,7 +99,7 @@ def merge_symbols(max_freq_pair, token_freqs, symbols):
     return new_token_freqs
 ```
 
-Now we iteratively perform the BPE algorithm over the keys of the dictionary `token_freqs`. In the first iteration, the most frequent pair of consecutive symbols are `'t'` and `'a'`, thus BPE merges them to produce a new symbol `'ta'`. In the second iteration, BPE continues to merge `'ta'` and `'l'` to result in another new symbol `'tal'`. 
+Now we iteratively perform the BPE algorithm over the keys of the dictionary `token_freqs`. In the first iteration, the most frequent pair of consecutive symbols are `'t'` and `'a'`, thus BPE merges them to produce a new symbol `'ta'`. In the second iteration, BPE continues to merge `'ta'` and `'l'` to result in another new symbol `'tal'`.
 
 ```{.python .input}
 num_merges = 10
