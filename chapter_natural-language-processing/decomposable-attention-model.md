@@ -267,7 +267,3 @@ Assume $d$ is the dimension of the hidden layer and $O(d^2)$ is the time complex
 ## References
 
 [1] Parikh, A.P., Täckström, O., Das, D., & Uszkoreit, J. (2016). A Decomposable Attention Model for Natural Language Inference. *EMNLP*.
-
-```{.python .input}
-
-```
