@@ -33,11 +33,14 @@ In fastText, all the extracted subwords have to be of the specified lengths, suc
 To allow for variable-length subwords in a fixed-size vocabulary,
 we can apply a compression algorithm
 called *byte pair encoding* (BPE) to extract subwords :cite:`Sennrich.Haddow.Birch.2015`.
+
+BPE performs a statistical analysis of the training dataset to discover common symbols within a word,
+such as consecutive characters of arbitrary length.
 Starting from symbols of length $1$,
-BPE iteratively merges the frequent pair of symbols, such as consecutive characters of
-arbitrary length within a word, to produce new symbols.
+BPE iteratively merges the most frequent pair of consecutive symbols to produce new longer symbols.
 Note that for efficiency, pairs crossing word boundaries are not considered.
 In the end, we can use such symbols as subwords to segment words.
+BPE and its variants has been used for input representations in popular NLP pretraining models such as GPT-2 :cite:`Radford.Wu.Child.ea.2019` and RoBERTa :cite:`Liu.Ott.Goyal.ea.2019`.
 In the following, we will illustrate how BPE works.
 
 First, we initialize the vocabulary of symbols as all the English characters, a special end-of-word symbol `'_'`, and a special unknown symbol `'[UNK]'`.
@@ -51,11 +54,13 @@ symbols = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
 ```
 
 Since we do not consider symbol pairs that cross boundaries of words,
-we only need a dictionary `raw_token_freqs` that maps words to frequencies as the representation of a dataset.
+we only need a dictionary `raw_token_freqs` that maps words to their frequencies (number of occurrences)
+in a dataset.
 Note that the special symbol `'_'` is appended to each word so that
-we can easily convert a sequence of symbols ( e.g., "a_ tall er_ man")
-to its corresponding word sequence (e.g., "a taller man").
-Since we start the merging process from a vocabulary of only single characters and special symbols, space is inserted between every pair of consecutive characters within each word.
+we can easily recover a word sequence (e.g., "a taller man")
+from a sequence of output symbols ( e.g., "a_ tall er_ man").
+Since we start the merging process from a vocabulary of only single characters and special symbols, space is inserted between every pair of consecutive characters within each word (keys of the dictionary `token_freqs`).
+In other words, space is the delimiter between symbols within a word.
 
 ```{.python .input}
 raw_token_freqs = {'fast_': 4, 'faster_': 3, 'tall_': 5, 'taller_': 4}
@@ -65,19 +70,26 @@ for token, freq in raw_token_freqs.items():
 token_freqs
 ```
 
+We define the following `get_max_freq_pair` function that 
+returns the most frequent pair of consecutive symbols within a word,
+where words come from keys of the input dictionary `token_freqs`.
+
 ```{.python .input}
 def get_max_freq_pair(token_freqs):
     pairs = collections.defaultdict(int)
     for token, freq in token_freqs.items():
         symbols = token.split()
         for i in range(len(symbols) - 1):
-            # Key of pairs is a tuple composed of two adjacent units
+            # Key of pairs is a tuple of two consecutive symbols
             pairs[symbols[i], symbols[i + 1]] += freq
     return max(pairs, key=pairs.get)  # Key of pairs with the max value
 ```
 
+As a greedy approach based on frequency of consecutive symbols,
+BPE will use the following `merge_symbols` function to merge the most frequent pair of consecutive symbols to produce new symbols.
+
 ```{.python .input}
-def merge_vocab(max_freq_pair, token_freqs, symbols):
+def merge_symbols(max_freq_pair, token_freqs, symbols):
     symbols.append(''.join(max_freq_pair))
     new_token_freqs = {}
     for token, freq in token_freqs.items():
@@ -87,47 +99,69 @@ def merge_vocab(max_freq_pair, token_freqs, symbols):
     return new_token_freqs
 ```
 
+Now we iteratively perform the BPE algorithm over the keys of the dictionary `token_freqs`. In the first iteration, the most frequent pair of consecutive symbols are `'t'` and `'a'`, thus BPE merges them to produce a new symbol `'ta'`. In the second iteration, BPE continues to merge `'ta'` and `'l'` to result in another new symbol `'tal'`. 
+
 ```{.python .input}
 num_merges = 10
 for i in range(num_merges):
     max_freq_pair = get_max_freq_pair(token_freqs)
-    token_freqs = merge_vocab(max_freq_pair, token_freqs, symbols)
+    token_freqs = merge_symbols(max_freq_pair, token_freqs, symbols)
     print("Merge #%d:" % (i + 1), max_freq_pair)
 ```
+
+After 10 iterations of BPE, we can see that list `symbols` now contains 10 more symbols that are iteratively merged from other symbols.
 
 ```{.python .input}
 print(symbols)
 ```
 
-```{.python .input}
-print("Original tokens:", list(raw_token_freqs.keys()))
-print("Tokens with BPE segmentation:", list(token_freqs.keys()))
-```
+For the same dataset specified in the keys of the dictionary `raw_token_freqs`,
+each word in the dataset is now segmented by subwords "fast_", "fast", "er_", "tall_", and "tall"
+as a result of the BPE algorithm.
+For instance, words "faster_" and "taller_" are segmented as "fast er_" and "tall er_", respectively.
 
 ```{.python .input}
-inputs = ['tallest_', 'fatter_']
-outputs = []
-for word in inputs:
-    start, end = 0, len(word)
-    cur_output = []
-    while start < len(word) and start < end:
-        if word[start : end] in symbols:
-            cur_output.append(word[start : end])
-            start = end
-            end = len(word)
-        else:
-            end -= 1
-    if start < len(word):
-        cur_output.append('[UNK]')
-    outputs.append(' '.join(cur_output))
-print('Words:', inputs)
-print('Wordpieces:', outputs)
+print(list(token_freqs.keys()))
+```
+
+Note that the result of BPE depends on the dataset being used.
+We can also use the subwords learned from one dataset
+to segment words of another dataset.
+As a greedy approach, the following `segment_BPE` function tries to break words into the longest possible subwords from the input argument `symbols`.
+
+```{.python .input}
+def segment_BPE(tokens, symbols):
+    outputs = []
+    for token in tokens:
+        start, end = 0, len(token)
+        cur_output = []
+        # Segment token with the longest possible subwords from symbols
+        while start < len(token) and start < end:
+            if token[start: end] in symbols:
+                cur_output.append(token[start: end])
+                start = end
+                end = len(token)
+            else:
+                end -= 1
+        if start < len(token):
+            cur_output.append('[UNK]')
+        outputs.append(' '.join(cur_output))
+    return outputs
+```
+
+In the following, we use the subwords in list `symbols`, which is learned from the aforementioned dataset,
+to segment `tokens` that represent another dataset.
+
+```{.python .input}
+tokens = ['tallest_', 'fatter_']
+print(segment_BPE(tokens, symbols))
 ```
 
 ## Summary
 
 * FastText proposes a subword embedding method. Based on the skip-gram model in word2vec, it represents the central word vector as the sum of the subword vectors of the word.
 * Subword embedding utilizes the principles of morphology, which usually improves the quality of representations of uncommon words.
+* BPE performs a statistical analysis of the training dataset to discover common symbols within a word. As a greedy approach, BPE iteratively merges the most frequent pair of consecutive symbols.
 
 
 ## Exercises
@@ -135,6 +169,7 @@ print('Wordpieces:', outputs)
 1. When there are too many subwords (for example, 6 words in English result in about $3\times 10^8$ combinations), what problems arise? Can you think of any methods to solve them? Hint: Refer to the end of section 3.2 of the fastText paper[1].
 1. How can you design a subword embedding model based on the continuous bag-of-words model?
 1. To get a vocabulary of size $m$, how many merging operations are needed when the initial symbol vocabulary size is $n$?
+1. How can we extend the idea of BPE to extract phrases?
 
 
 
