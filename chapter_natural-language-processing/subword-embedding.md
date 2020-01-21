@@ -91,7 +91,7 @@ BPE will use the following `merge_symbols` function to merge the most frequent p
 ```{.python .input}
 def merge_symbols(max_freq_pair, token_freqs, symbols):
     symbols.append(''.join(max_freq_pair))
-    new_token_freqs = {}
+    new_token_freqs = dict()
     for token, freq in token_freqs.items():
         new_token = token.replace(' '.join(max_freq_pair),
                                   ''.join(max_freq_pair))
@@ -106,7 +106,7 @@ num_merges = 10
 for i in range(num_merges):
     max_freq_pair = get_max_freq_pair(token_freqs)
     token_freqs = merge_symbols(max_freq_pair, token_freqs, symbols)
-    print("Merge #%d:" % (i + 1), max_freq_pair)
+    print("merge #%d:" % (i + 1), max_freq_pair)
 ```
 
 After 10 iterations of BPE, we can see that list `symbols` now contains 10 more symbols that are iteratively merged from other symbols.

@@ -1587,49 +1587,56 @@ d2l.DATA_HUB['SNLI'] = (
 
 # Defined in file: ./chapter_natural-language-processing/natural-language-inference-and-dataset.md
 def read_snli(data_dir, is_train):
+    """Read the SNLI dataset into premises, hypotheses, and labels."""
     def extract_text(s):
+        # Remove information that will not be used by us
         s = re.sub('\(', '', s) 
-        s = re.sub('\)', '', s) 
-        s = re.sub("\s{2,}", " ", s)
+        s = re.sub('\)', '', s)
+        # Substitute two or more consecutive whitespace with space
+        s = re.sub('\s{2,}', ' ', s)
         return s.strip()
     label_set = {'entailment': 0, 'contradiction': 1, 'neutral': 2}
-    file_name = data_dir + 'snli_1.0_'+ ('train' if is_train else 'test') + '.txt'
+    file_name = (data_dir + 'snli_1.0_'+ ('train' if is_train else 'test')
+                 + '.txt')
     with open(file_name, 'r') as f:
-        examples = [row.split('\t') for row in f.readlines()[1:]]
-    premise = [extract_text(row[1]) for row in examples if row[0] in label_set]
-    hypothesis = [extract_text(row[2]) for row in examples if row[0] in label_set]
-    labels = [label_set[row[0]] for row in examples if row[0] in label_set]
-    return premise, hypothesis, labels
+        rows = [row.split('\t') for row in f.readlines()[1:]]
+    premises = [extract_text(row[1]) for row in rows if row[0] in label_set]
+    hypotheses = [extract_text(row[2]) for row in rows if row[0] in label_set]
+    labels = [label_set[row[0]] for row in rows if row[0] in label_set]
+    return premises, hypotheses, labels
 
 
 # Defined in file: ./chapter_natural-language-processing/natural-language-inference-and-dataset.md
 class SNLIDataset(gluon.data.Dataset):
-    def __init__(self, dataset, vocab = None):
+    """A customized dataset to load the SNLI dataset."""
+    def __init__(self, dataset, vocab=None):
         self.num_steps = 50  # We fix the length of each sentence to 50.
-        p_tokens = d2l.tokenize(dataset[0], token='word')
-        h_tokens = d2l.tokenize(dataset[1], token='word')
+        p_tokens = d2l.tokenize(dataset[0])
+        h_tokens = d2l.tokenize(dataset[1])
         if vocab is None:
-            self.vocab = d2l.Vocab(p_tokens + h_tokens, min_freq=5)
+            self.vocab = d2l.Vocab(p_tokens + h_tokens, min_freq=5,
+                                   reserved_tokens=['<pad>'])
         else:
             self.vocab = vocab
-        self.premise = self.pad(p_tokens)
-        self.hypothesis = self.pad(h_tokens)
+        self.premises = self.pad(p_tokens)
+        self.hypotheses = self.pad(h_tokens)
         self.labels = np.array(dataset[2])
-        print('read ' + str(len(self.premise)) + ' examples')
+        print('read ' + str(len(self.premises)) + ' examples')
 
-    def pad(self, data):
+    def pad(self, lines):
         return np.array([d2l.trim_pad(self.vocab[line], self.num_steps, 
-                                      self.vocab.unk) for line in data])
+                                      self.vocab['<pad>']) for line in lines])
 
     def __getitem__(self, idx):
-        return (self.premise[idx], self.hypothesis[idx]), self.labels[idx]
+        return (self.premises[idx], self.hypotheses[idx]), self.labels[idx]
 
     def __len__(self):
-        return len(self.premise)
+        return len(self.premises)
 
 
 # Defined in file: ./chapter_natural-language-processing/natural-language-inference-and-dataset.md
 def load_data_snli(batch_size, num_steps=50):
+    """Download the SNLI dataset and return its Dataloader instances."""
     data_dir = d2l.download_extract('SNLI')
     train_data = read_snli(data_dir, True)
     test_data = read_snli(data_dir, False)
@@ -1637,11 +1644,10 @@ def load_data_snli(batch_size, num_steps=50):
     test_set = SNLIDataset(test_data, train_set.vocab)
     train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True)
     test_iter = gluon.data.DataLoader(test_set, batch_size, shuffle=False)
-
     return train_iter, test_iter, train_set.vocab
 
 
-# Defined in file: ./chapter_natural-language-processing/decomposable-attention-model.md
+# Defined in file: ./chapter_natural-language-processing/natural-language-inference-attention.md
 def split_batch_multi_inputs(X, y, ctx_list):
     """Split X and y into multiple devices specified by ctx"""
     X = list(zip(*[gluon.utils.split_and_load(feature, ctx_list, even_split=False)
@@ -1649,7 +1655,7 @@ def split_batch_multi_inputs(X, y, ctx_list):
     return (X, gluon.utils.split_and_load(y, ctx_list, even_split=False))
 
 
-# Defined in file: ./chapter_natural-language-processing/decomposable-attention-model.md
+# Defined in file: ./chapter_natural-language-processing/natural-language-inference-attention.md
 def predict_snli(net, premise, hypothesis):
     premise = np.array(vocab[premise],
                        ctx=d2l.try_gpu())

@@ -1,4 +1,4 @@
-# Natural language inference and the Dataset
+# Natural Language Inference and the Dataset
 
 In the section “Text Sentiment Classification: Using Recurrent Neural Networks”, we discussed the model of using recurrent neural networks for text classification. Text classification task aims to identify the category of any given text sequence. But in actual scenarios, sometimes we need two given sentences in order to classify the relationship between them, i.e. sentence pair classification. For example, on a shopping website, the online customer service system needs to decide whether users’ questions have the same meanings as the existing ones in the knowledge base, which is the task of identifying the relationship between two sentences. In this case, we can not solve the issue by using the model of categorizing the single text sequence.
 
@@ -28,6 +28,9 @@ The third example is neutrality. There is no relationship between premise and hy
 
 
 ## Stanford natural language inference(SNLI) dataset
+
+
+SNLI :cite:`Bowman.Angeli.Potts.ea.2015`
 
 Commonly used datasets in natural language inference include Stanford natural language inference(SNLI) and multiple natural language inference (MultiNLI) dataset. SNLI has more than 500,000 manually written English sentence pairs, which are divided into three types of relationships: entailment, contradiction and neutrality. MultiNLI is the upgraded version of SNLI. However, the difference between them is that MultiNLI dataset also involves relevant spoken and written texts. For this reason, it has more variations in comparison with Stanford natural language inference dataset.
 
@@ -62,47 +65,41 @@ Next, we read the training dataset and testing dataset, and retain samples with 
 ```{.python .input  n=66}
 # Saved in the d2l package for later use
 def read_snli(data_dir, is_train):
+    """Read the SNLI dataset into premises, hypotheses, and labels."""
     def extract_text(s):
+        # Remove information that will not be used by us
         s = re.sub('\(', '', s) 
-        s = re.sub('\)', '', s) 
-        s = re.sub("\s{2,}", " ", s)
+        s = re.sub('\)', '', s)
+        # Substitute two or more consecutive whitespace with space
+        s = re.sub('\s{2,}', ' ', s)
         return s.strip()
     label_set = {'entailment': 0, 'contradiction': 1, 'neutral': 2}
-    file_name = data_dir + 'snli_1.0_'+ ('train' if is_train else 'test') + '.txt'
+    file_name = (data_dir + 'snli_1.0_'+ ('train' if is_train else 'test')
+                 + '.txt')
     with open(file_name, 'r') as f:
-        examples = [row.split('\t') for row in f.readlines()[1:]]
-    premise = [extract_text(row[1]) for row in examples if row[0] in label_set]
-    hypothesis = [extract_text(row[2]) for row in examples if row[0] in label_set]
-    labels = [label_set[row[0]] for row in examples if row[0] in label_set]
-    return premise, hypothesis, labels
-```
-
-```{.python .input  n=67}
-train_data = read_snli(data_dir, is_train=True)
-test_data = read_snli(data_dir, is_train=False)
+        rows = [row.split('\t') for row in f.readlines()[1:]]
+    premises = [extract_text(row[1]) for row in rows if row[0] in label_set]
+    hypotheses = [extract_text(row[2]) for row in rows if row[0] in label_set]
+    labels = [label_set[row[0]] for row in rows if row[0] in label_set]
+    return premises, hypotheses, labels
 ```
 
 We output the first five sentence pairs of premise and hypothesis, as well as corresponding tags of inference relationship.
 
 ```{.python .input  n=70}
-print('# trainings:', len(train_data[0]))
+train_data = read_snli(data_dir, is_train=True)
 for x0, x1, y in zip(train_data[0][:3], train_data[1][:3], train_data[2][:3]):
-    print('label:', y, 'premise:', x0[0:60], 'hypothesis:', x1[0:60])
+    print('premise:', x0)
+    print('hypothesis:', x1)
+    print('label:', y)
 ```
 
 According to rough statistics, we find approximately 550,000 training set samples. Three relationship tags account for around 180,000 respectively. We also find about 10,000 testing dataset samples. Three relationship tags account for around 3000 respectively. Each type of tag shows the basically equivalent amount.
 
-```{.python .input  n=72}
-print("Training pairs: %d" % len(train_data[0]))
-print("Test pairs: %d" % len(test_data[0]))
-print("Train labels: {'entailment': %d, 'contradiction': %d, 'neutral': %d}" %
-      ([row for row in train_data[2]].count(0), 
-       [row for row in train_data[2]].count(1), 
-       [row for row in train_data[2]].count('neutral')))
-print("Test labels: {'entailment': %d, 'contradiction': %d, 'neutral': %d}" %
-      ([row for row in test_data[2]].count(0), 
-       [row for row in test_data[2]].count(1), 
-       [row for row in test_data[2]].count(2)))
+```{.python .input}
+test_data = read_snli(data_dir, is_train=False)
+for data in [train_data, test_data]:
+    print([[row for row in data[2]].count(i) for i in range(3)])
 ```
 
 ### Self-defining dataset
@@ -111,28 +108,30 @@ By inheriting `Dataset` by Gluon, we self-defined a natural language inference d
 ```{.python .input  n=115}
 # Saved in the d2l package for later use
 class SNLIDataset(gluon.data.Dataset):
-    def __init__(self, dataset, vocab = None):
+    """A customized dataset to load the SNLI dataset."""
+    def __init__(self, dataset, vocab=None):
         self.num_steps = 50  # We fix the length of each sentence to 50.
-        p_tokens = d2l.tokenize(dataset[0], token='word')
-        h_tokens = d2l.tokenize(dataset[1], token='word')
+        p_tokens = d2l.tokenize(dataset[0])
+        h_tokens = d2l.tokenize(dataset[1])
         if vocab is None:
-            self.vocab = d2l.Vocab(p_tokens + h_tokens, min_freq=5)
+            self.vocab = d2l.Vocab(p_tokens + h_tokens, min_freq=5,
+                                   reserved_tokens=['<pad>'])
         else:
             self.vocab = vocab
-        self.premise = self.pad(p_tokens)
-        self.hypothesis = self.pad(h_tokens)
+        self.premises = self.pad(p_tokens)
+        self.hypotheses = self.pad(h_tokens)
         self.labels = np.array(dataset[2])
-        print('read ' + str(len(self.premise)) + ' examples')
+        print('read ' + str(len(self.premises)) + ' examples')
 
-    def pad(self, data):
+    def pad(self, lines):
         return np.array([d2l.trim_pad(self.vocab[line], self.num_steps, 
-                                      self.vocab.unk) for line in data])
+                                      self.vocab['<pad>']) for line in lines])
 
     def __getitem__(self, idx):
-        return (self.premise[idx], self.hypothesis[idx]), self.labels[idx]
+        return (self.premises[idx], self.hypotheses[idx]), self.labels[idx]
 
     def __len__(self):
-        return len(self.premise)
+        return len(self.premises)
 ```
 
 ### Read dataset
@@ -142,6 +141,7 @@ Training set and testing set examples are respectively established on the basis 
 ```{.python .input  n=114}
 # Saved in the d2l package for later use
 def load_data_snli(batch_size, num_steps=50):
+    """Download the SNLI dataset and return its Dataloader instances."""
     data_dir = d2l.download_extract('SNLI')
     train_data = read_snli(data_dir, True)
     test_data = read_snli(data_dir, False)
@@ -149,7 +149,6 @@ def load_data_snli(batch_size, num_steps=50):
     test_set = SNLIDataset(test_data, train_set.vocab)
     train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True)
     test_iter = gluon.data.DataLoader(test_set, batch_size, shuffle=False)
-
     return train_iter, test_iter, train_set.vocab
 ```
 
@@ -180,3 +179,7 @@ for X, Y in train_iter:
 - Natural language inference task aims to identify the inference relationship between premise and hypothesis.
 - In natural language inference task, the sentences have three types of inference relationships: entailment, contradiction and neutral.
 - An important dataset of natural language inference task is known as Stanford natural language inference (SNLI) dataset.
+
+## [Discussions](https://discuss.mxnet.io/t/5517)
+
+![](../img/qr_natural-language-inference-and-dataset.svg)
