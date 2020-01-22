@@ -23,21 +23,21 @@ Such relationships usually fall into three types:
 NLI is also known as the recognizing textual entailment task.
 For example, the following pair will be labeled as *entailment* because "showing affection" in the hypothesis can be inferred from "hugging one another" in the premise.
 
-> Premise：Two women are hugging each other.
+> Premise: Two women are hugging each other.
 
-> Hypothesis：Two women are showing affection.
+> Hypothesis: Two women are showing affection.
 
 The following is an example of *contradiction* as "running the coding example" indicates "not sleeping" rather than "sleeping".
 
-> Premise：A man is running the coding example from Dive into Deep Learning.
+> Premise: A man is running the coding example from Dive into Deep Learning.
 
-> Hypothesis：The man is sleeping.
+> Hypothesis: The man is sleeping.
 
 The third example shows a *neutrality* relationship because neither "famous" nor "not famous" can be inferred from the fact that "are performing for us". 
 
-> Premise：The musicians are performing for us.
+> Premise: The musicians are performing for us.
 
-> Hypothesis：The musicians are famous.
+> Hypothesis: The musicians are famous.
 
 NLI has been a central topic for understanding natural language.
 It enjoys wide applications ranging from
