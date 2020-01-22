@@ -1,40 +1,55 @@
 # Natural Language Inference and the Dataset
 
-In the section “Text Sentiment Classification: Using Recurrent Neural Networks”, we discussed the model of using recurrent neural networks for text classification. Text classification task aims to identify the category of any given text sequence. But in actual scenarios, sometimes we need two given sentences in order to classify the relationship between them, i.e. sentence pair classification. For example, on a shopping website, the online customer service system needs to decide whether users’ questions have the same meanings as the existing ones in the knowledge base, which is the task of identifying the relationship between two sentences. In this case, we can not solve the issue by using the model of categorizing the single text sequence.
+In :numref:`sec_sentiment`, we discussed the problem of sentiment analysis.
+This task aims to classify a single text sequence into predefined categories,
+such as a set of sentiment polarities.
+However, when there is a need to decide whether one sentence can be inferred form another, 
+or eliminate redundancy by identifying sentences that are semantically equivalent,
+the capability of analyzing one text sequence seems rather insufficient.
+Instead, we need to be able to reason over pairs of text sequences.
 
-Now, we are about to analyze the relationship between the two sentence classification. The most typical example of these tasks is natural language inference.
 
-## Natural language inference
+## Natural Language Inference
 
-Natural language inference is also known as text entailment. Natural language inference is an important issue of natural language processing. On one hand, semantic relations exit among the seemingly isolated texts. On the other hand, semantic relations of texts enable machine to truly understand and utilize the semantic information.
+*Natural language inference* (NLI) studies whether a *hypothesis*
+can be inferred from a *premise*, where both are a text sequence.
+In other words, NLI determines the logical relationship between a pair of text sequences.
+Such relationships usually fall into three types:
 
-To be more specific, the task of natural language inference refers to identifying the inference relationship between hypothesis and premise. There are three different types of inference relationships. 1. Entailment, i.e. People think the semanteme of hypothesis can be inferred from that of premise. 2. Contradiction, i.e. People believe that hypothesis is false according to the semanteme of premise. 3. Neutral, i.e. People can not decide the semanteme of hypothesis according to that of the premise.
+* *Entailment*: the hypothesis can be inferred from the premise.
+* *Contradiction*: the negation of the hypothesis can be inferred from the premise.
+* *Neutral*: all the other cases.
 
-Because this task inputs a sentence pair of premise and hypothesis, natural language inference is to classify the sentence pair.
+NLI is also known as the recognizing textual entailment task.
+For example, the following pair will be labeled as *entailment* because "showing affection" in the hypothesis can be inferred from "hugging one another" in the premise.
 
-Here are three examples:
+> Premise：Two women are hugging each other.
 
-The first example is entailment. “Showing affection” in the hypothesis can be inferred from “hugging one another” in the premise.
-> Premise：Two blond women are hugging one another.
-> Hypothesis：There are women showing affection.
+> Hypothesis：Two women are showing affection.
 
-The second example is contradiction. The premise mentions what a person inspects. It can be inferred that “sleeping” can not happen simultaneously in the hypothesis.
-> Premise：A man inspects the uniform of a figure in some East Asian country.
+The following is an example of *contradiction* as "running the coding example" indicates "not sleeping" rather than "sleeping".
+
+> Premise：A man is running the coding example from Dive into Deep Learning.
+
 > Hypothesis：The man is sleeping.
 
-The third example is neutrality. There is no relationship between premise and hypothesis.
-> Premise：A boy is jumping on skateboard in the middle of a red bridge.
-> Hypothesis：The boy skates down the sidewalk.
+The third example shows a *neutrality* relationship because neither "famous" nor "not famous" can be inferred from the fact that "are performing for us". 
+
+> Premise：The musicians are performing for us.
+
+> Hypothesis：The musicians are famous.
+
+NLI has been a central topic for understanding natural language.
+It enjoys wide applications ranging from
+information retrieval to open-domain question answering.
+To study this problem, we will begin by investigating a popular NLI benchmark dataset.
 
 
-## Stanford natural language inference(SNLI) dataset
+## The Stanford Natural Language Inference (SNLI) Dataset
 
 
-SNLI :cite:`Bowman.Angeli.Potts.ea.2015`
-
-Commonly used datasets in natural language inference include Stanford natural language inference(SNLI) and multiple natural language inference (MultiNLI) dataset. SNLI has more than 500,000 manually written English sentence pairs, which are divided into three types of relationships: entailment, contradiction and neutrality. MultiNLI is the upgraded version of SNLI. However, the difference between them is that MultiNLI dataset also involves relevant spoken and written texts. For this reason, it has more variations in comparison with Stanford natural language inference dataset.
-
-In this section, we will use Stanford natural language inference dataset. To make better use of this dataset, we need to input the packages or modules needed for the experiment.
+Stanford Natural Language Inference (SNLI) Corpus is a collection of over $500,000$ labeled English sentence pairs :cite:`Bowman.Angeli.Potts.ea.2015`.
+The three labels "entailment", "contradiction", and "neutral" are balanced in the dataset.
 
 ```{.python .input  n=28}
 import collections
@@ -179,6 +194,15 @@ for X, Y in train_iter:
 - Natural language inference task aims to identify the inference relationship between premise and hypothesis.
 - In natural language inference task, the sentences have three types of inference relationships: entailment, contradiction and neutral.
 - An important dataset of natural language inference task is known as Stanford natural language inference (SNLI) dataset.
+
+
+## Exercises
+
+1. Machine translation has long been evaluated based on superficial $n$-gram matching between an output translation and a ground-truth translation. Can you design a measure for evaluating machine translation results by using NLI?
+
+
+
+
 
 ## [Discussions](https://discuss.mxnet.io/t/5517)
 

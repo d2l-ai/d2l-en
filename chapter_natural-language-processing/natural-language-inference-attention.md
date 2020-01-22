@@ -220,7 +220,7 @@ def split_batch_multi_inputs(X, y, ctx_list):
 Now, we can start training.
 
 ```{.python .input}
-lr, num_epochs = 0.001, 5
+lr, num_epochs = 0.001, 3
 trainer = gluon.Trainer(net.collect_params(), 'adam', {'learning_rate': lr})
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
 d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
@@ -246,12 +246,8 @@ def predict_snli(net, premise, hypothesis):
 
 Next, trained models are used to infer the relationship between two simple sentences.
 
-```{.python .input  n=30}
-predict_snli(net,
-        ['a', 'person', 'on', 'a', 'horse', 'jumps', 'over', 'a', 'broken',
-         'down', 'airplane', '.'],
-        ['a', 'person', 'is', 'training', 'his', 'horse', 'for', 'a',
-         'competition', '.'])
+```{.python .input}
+predict_snli(net, ['he', 'is', 'good', '.'], ['he', 'is', 'bad', '.'])
 ```
 
 ## Calculate time complexity

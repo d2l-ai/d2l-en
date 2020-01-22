@@ -1,4 +1,4 @@
-# Text Sentiment Classification: Using Convolutional Neural Networks (textCNN)
+# Sentiment Analysis: Using Convolutional Neural Networks 
 :label:`sec_sentiment_cnn`
 
 In :numref:`chap_cnn`, we explored how to process
