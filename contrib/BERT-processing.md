@@ -20,6 +20,7 @@ d2l.DATA_HUB['wikitext-2'] = (
     'https://s3.amazonaws.com/research.metamind.io/wikitext/wikitext-2-v1.zip',
     '3c914d17d80b1459be871a5039ac23e752a53cbe')
 
+# Saved in the d2l package for later use
 d2l.DATA_HUB['wikitext-103'] = (
     'https://s3.amazonaws.com/research.metamind.io/wikitext/wikitext-103-v1.zip',
     '0aec09a7537b58d4bb65362fee27650eeaba625a')
@@ -352,8 +353,4 @@ def train_bert(data_eval, net, nsp_loss, mlm_loss, vocab_size, ctx, log_interval
 
 ```{.python .input  n=19}
 train_bert(train_iter, net, nsp_loss, mlm_loss, len(vocab), ctx, 20, 1)
-```
-
-```{.python .input}
-
 ```

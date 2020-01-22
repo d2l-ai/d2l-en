@@ -1972,6 +1972,9 @@ def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
 d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
                            'c065c0e2593b8b161a2d7873e42418bf6a21106c')
 
+d2l.DATA_HUB['wikitext-2'] = (
+    'https://s3.amazonaws.com/research.metamind.io/wikitext/wikitext-2-v1.zip',
+    '3c914d17d80b1459be871a5039ac23e752a53cbe')
 
 d2l.DATA_HUB['wikitext-103'] = (
     'https://s3.amazonaws.com/research.metamind.io/wikitext/wikitext-103-v1.zip',
