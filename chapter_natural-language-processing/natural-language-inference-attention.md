@@ -220,7 +220,7 @@ def split_batch_multi_inputs(X, y, ctx_list):
 Now, we can start training.
 
 ```{.python .input}
-lr, num_epochs = 0.001, 2
+lr, num_epochs = 0.001, 4
 trainer = gluon.Trainer(net.collect_params(), 'adam', {'learning_rate': lr})
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
 d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,

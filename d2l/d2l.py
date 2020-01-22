@@ -1609,8 +1609,8 @@ def read_snli(data_dir, is_train):
 # Defined in file: ./chapter_natural-language-processing/natural-language-inference-and-dataset.md
 class SNLIDataset(gluon.data.Dataset):
     """A customized dataset to load the SNLI dataset."""
-    def __init__(self, dataset, vocab=None):
-        self.num_steps = 50  # We fix the length of each sentence to 50.
+    def __init__(self, dataset, num_steps, vocab=None):
+        self.num_steps = num_steps
         p_tokens = d2l.tokenize(dataset[0])
         h_tokens = d2l.tokenize(dataset[1])
         if vocab is None:
@@ -1640,8 +1640,8 @@ def load_data_snli(batch_size, num_steps=50):
     data_dir = d2l.download_extract('SNLI')
     train_data = read_snli(data_dir, True)
     test_data = read_snli(data_dir, False)
-    train_set = SNLIDataset(train_data)
-    test_set = SNLIDataset(test_data, train_set.vocab)
+    train_set = SNLIDataset(train_data, num_steps)
+    test_set = SNLIDataset(test_data, num_steps, train_set.vocab)
     train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True)
     test_iter = gluon.data.DataLoader(test_set, batch_size, shuffle=False)
     return train_iter, test_iter, train_set.vocab

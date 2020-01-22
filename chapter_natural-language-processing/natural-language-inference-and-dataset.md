@@ -118,14 +118,16 @@ for data in [train_data, test_data]:
 
 ### Defining a Class for Loading the Dataset
 
-By inheriting `Dataset` by Gluon, we self-defined a natural language inference dataset `SNLIDataset`. By realizing `__getitem__` function, we can get access to the sentence pairs with idx index and relevant categories.
+Below we define a class for loading the SNLI dataset by inheriting from the `Dataset` class in Gluon. The argument `num_steps` in the constructor specifies the length of any text sequence so that each minibatch of sequences will have the same shape. 
+In other words,
+tokens after the first `num_steps` ones in longer sequence are trimmed, while special tokens “&lt;pad&gt;” will be appended to shorter sequences until their length becomes `num_steps`.
 
 ```{.python .input  n=115}
 # Saved in the d2l package for later use
 class SNLIDataset(gluon.data.Dataset):
     """A customized dataset to load the SNLI dataset."""
-    def __init__(self, dataset, vocab=None):
-        self.num_steps = 50  # We fix the length of each sentence to 50.
+    def __init__(self, dataset, num_steps, vocab=None):
+        self.num_steps = num_steps
         p_tokens = d2l.tokenize(dataset[0])
         h_tokens = d2l.tokenize(dataset[1])
         if vocab is None:
@@ -160,8 +162,8 @@ def load_data_snli(batch_size, num_steps=50):
     data_dir = d2l.download_extract('SNLI')
     train_data = read_snli(data_dir, True)
     test_data = read_snli(data_dir, False)
-    train_set = SNLIDataset(train_data)
-    test_set = SNLIDataset(test_data, train_set.vocab)
+    train_set = SNLIDataset(train_data, num_steps)
+    test_set = SNLIDataset(test_data, num_steps, train_set.vocab)
     train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True)
     test_iter = gluon.data.DataLoader(test_set, batch_size, shuffle=False)
     return train_iter, test_iter, train_set.vocab
