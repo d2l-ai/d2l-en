@@ -221,6 +221,7 @@ class WikiDataset(gluon.data.Dataset):
 ```
 
 ```{.python .input}
+# Saved in the d2l package for later use
 def load_data_wiki(batch_size, data_set = 'wikitext-2', num_steps=128):
     data_dir = d2l.download_extract(data_set, data_set)
     train_data = read_wiki(data_dir)

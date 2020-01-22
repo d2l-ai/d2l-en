@@ -2067,6 +2067,15 @@ class WikiDataset(gluon.data.Dataset):
 
 
 # Defined in file: ./chapter_natural-language-processing/BERT-processing.md
+def load_data_wiki(batch_size, data_set = 'wikitext-2', num_steps=128):
+    data_dir = d2l.download_extract(data_set, data_set)
+    train_data = read_wiki(data_dir)
+    train_set = WikiDataset(train_data, num_steps)
+    train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True)
+    return train_iter, train_set.vocab
+
+
+# Defined in file: ./chapter_natural-language-processing/BERT-processing.md
 def _get_batch_bert(batch, ctx):
     (input_id, masked_id, masked_position, masked_weight, \
      next_sentence_label, segment_id, valid_length) = batch
