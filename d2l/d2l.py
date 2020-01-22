@@ -1972,7 +1972,133 @@ def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
 d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
                            'c065c0e2593b8b161a2d7873e42418bf6a21106c')
 
+class MultiHeadAttention(nn.Block):
+    def __init__(self, hidden_size, num_heads, dropout, **kwargs):
+        super(MultiHeadAttention, self).__init__(**kwargs)
+        self.num_heads = num_heads
+        self.attention = d2l.DotProductAttention(dropout)
+        self.W_q = nn.Dense(hidden_size, use_bias=False, flatten=False)
+        self.W_k = nn.Dense(hidden_size, use_bias=False, flatten=False)
+        self.W_v = nn.Dense(hidden_size, use_bias=False, flatten=False)
+        self.W_o = nn.Dense(hidden_size, use_bias=False, flatten=False)
 
+    def forward(self, query, key, value, valid_length):
+        # query, key, and value shape: (batch_size, seq_len, dim),
+        # where seq_len is the length of input sequence
+        # valid_length shape is either (batch_size, )
+        # or (batch_size, seq_len).
+
+        # Project and transpose query, key, and value from
+        # (batch_size, seq_len, hidden_size * num_heads) to
+        # (batch_size * num_heads, seq_len, hidden_size).
+        query = transpose_qkv(self.W_q(query), self.num_heads)
+        key = transpose_qkv(self.W_k(key), self.num_heads)
+        value = transpose_qkv(self.W_v(value), self.num_heads)
+
+        if valid_length is not None:
+            # Copy valid_length by num_heads times
+            if valid_length.ndim == 1:
+                valid_length = np.tile(valid_length, self.num_heads)
+            else:
+                valid_length = np.tile(valid_length, (self.num_heads, 1))
+
+        output = self.attention(query, key, value, valid_length)
+
+        # Transpose from (batch_size * num_heads, seq_len, hidden_size) back
+        # to (batch_size, seq_len, hidden_size * num_heads)
+        output_concat = transpose_output(output, self.num_heads)
+        return self.W_o(output_concat)
+    
+def transpose_qkv(X, num_heads):
+    # Original X shape: (batch_size, seq_len, hidden_size * num_heads),
+    # -1 means inferring its value, after first reshape, X shape:
+    # (batch_size, seq_len, num_heads, hidden_size)
+    X = X.reshape(X.shape[0], X.shape[1], num_heads, -1)
+
+    # After transpose, X shape: (batch_size, num_heads, seq_len, hidden_size)
+    X = X.transpose(0, 2, 1, 3)
+
+    # Merge the first two dimensions. Use reverse=True to infer shape from
+    # right to left. 
+    # output shape: (batch_size * num_heads, seq_len, hidden_size)
+    output = X.reshape(-1, X.shape[2], X.shape[3])
+    return output
+
+
+# Saved in the d2l package for later use
+def transpose_output(X, num_heads):
+    # A reversed version of transpose_qkv
+    X = X.reshape(-1, num_heads, X.shape[1], X.shape[2])
+    X = X.transpose(0, 2, 1, 3)
+    return X.reshape(X.shape[0], X.shape[1], -1)
+
+class PositionWiseFFN(nn.Block):
+    def __init__(self, ffn_hidden_size, hidden_size_out, **kwargs):
+        super(PositionWiseFFN, self).__init__(**kwargs)
+        self.ffn_1 = nn.Dense(ffn_hidden_size, flatten=False,
+                              activation='relu')
+        self.ffn_2 = nn.Dense(hidden_size_out, flatten=False)
+
+    def forward(self, X):
+        return self.ffn_2(self.ffn_1(X))
+
+class AddNorm(nn.Block):
+    def __init__(self, dropout, **kwargs):
+        super(AddNorm, self).__init__(**kwargs)
+        self.dropout = nn.Dropout(dropout)
+        self.norm = nn.LayerNorm()
+
+    def forward(self, X, Y):
+        return self.norm(self.dropout(Y) + X)
+    
+class PositionalEncoding(nn.Block):
+    def __init__(self, embedding_size, dropout, max_len=1000):
+        super(PositionalEncoding, self).__init__()
+        self.dropout = nn.Dropout(dropout)
+        # Create a long enough P
+        self.P = np.zeros((1, max_len, embedding_size))
+        X = np.arange(0, max_len).reshape(-1, 1) / np.power(
+            10000, np.arange(0, embedding_size, 2)/embedding_size)
+        self.P[:, :, 0::2] = np.sin(X)
+        self.P[:, :, 1::2] = np.cos(X)
+
+    def forward(self, X):
+        X = X + self.P[:, :X.shape[1], :].as_in_context(X.context)
+        return self.dropout(X)
+    
+class EncoderBlock(nn.Block):
+    def __init__(self, embedding_size, ffn_hidden_size, num_heads,
+                 dropout, **kwargs):
+        super(EncoderBlock, self).__init__(**kwargs)
+        self.attention = MultiHeadAttention(embedding_size, num_heads,
+                                            dropout)
+        self.addnorm_1 = AddNorm(dropout)
+        self.ffn = PositionWiseFFN(ffn_hidden_size, embedding_size)
+        self.addnorm_2 = AddNorm(dropout)
+
+    def forward(self, X, valid_length):
+        Y = self.addnorm_1(X, self.attention(X, X, X, valid_length))
+        return self.addnorm_2(Y, self.ffn(Y))
+    
+class TransformerEncoder(d2l.Encoder):
+    def __init__(self, vocab_size, embedding_size, ffn_hidden_size,
+                 num_heads, num_layers, dropout, **kwargs):
+        super(TransformerEncoder, self).__init__(**kwargs)
+        self.embedding_size = embedding_size
+        self.embed = nn.Embedding(vocab_size, embedding_size)
+        self.pos_encoding = PositionalEncoding(embedding_size, dropout)
+        self.blks = nn.Sequential()
+        for i in range(num_layers):
+            self.blks.add(
+                EncoderBlock(embedding_size, ffn_hidden_size,
+                             num_heads, dropout))
+
+    def forward(self, X, valid_length, *args):
+        X = self.pos_encoding(self.embed(X) * math.sqrt(self.embedding_size))
+        for blk in self.blks:
+            X = blk(X, valid_length)
+        return X
+    
 class BERTEncoder(nn.Block):
     def __init__(self, vocab_size, units, hidden_size,
                  num_heads, num_layers, dropout, **kwargs):
