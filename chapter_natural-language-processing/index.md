@@ -18,5 +18,6 @@ similarity-analogy
 sentiment-analysis
 sentiment-analysis-rnn
 sentiment-analysis-cnn
+natural-language-inference-and-dataset
 ```
 
