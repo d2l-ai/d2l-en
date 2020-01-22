@@ -118,9 +118,10 @@ for data in [train_data, test_data]:
 
 ### Defining a Class for Loading the Dataset
 
-Below we define a class for loading the SNLI dataset by inheriting from the `Dataset` class in Gluon. The argument `num_steps` in the constructor specifies the length of any text sequence so that each minibatch of sequences will have the same shape. 
+Below we define a class for loading the SNLI dataset by inheriting from the `Dataset` class in Gluon. The argument `num_steps` in the class constructor specifies the length of a text sequence so that each minibatch of sequences will have the same shape. 
 In other words,
 tokens after the first `num_steps` ones in longer sequence are trimmed, while special tokens “&lt;pad&gt;” will be appended to shorter sequences until their length becomes `num_steps`.
+By implementing the `__getitem__` function, we can arbitrarily access the premise, hypothesis, and label with the index `idx`.
 
 ```{.python .input  n=115}
 # Saved in the d2l package for later use
@@ -153,12 +154,15 @@ class SNLIDataset(gluon.data.Dataset):
 
 ### Putting All Things Together
 
-Training set and testing set examples are respectively established on the basis of self-defining `SNLIDataset`. We define 50 as the maximum text length. Then, we can check the number of samples retained in training set and testing set.
+Now we can invoke the `read_snli` function and the `SNLIDataset` class to download the SNLI dataset and return `DataLoader` instances for both training and testing sets, together with the vocabulary of the training set.
+It is noteworthy that we must use the vocabulary constructed from the training set
+as that of the testing set. 
+As a result, any new token from the testing set will be unknown to the model trained on the training set.
 
 ```{.python .input  n=114}
 # Saved in the d2l package for later use
 def load_data_snli(batch_size, num_steps=50):
-    """Download the SNLI dataset and return its Dataloader instances."""
+    """Download the SNLI dataset and return data iterators and vocabulary."""
     data_dir = d2l.download_extract('SNLI')
     train_data = read_snli(data_dir, True)
     test_data = read_snli(data_dir, False)
@@ -169,20 +173,18 @@ def load_data_snli(batch_size, num_steps=50):
     return train_iter, test_iter, train_set.vocab
 ```
 
-Assume batch size is 128, respectively define the iterators of training set and testing set.
+Here we set the batch size to $128$ and sequence length to $50$,
+and invoke the `load_data_snli` function to get the data iterators and vocabulary.
+Then we print the vocabulary size.
 
 ```{.python .input  n=111}
-batch_size = 128
-train_iter, test_iter, vocab = load_data_snli(batch_size)
+train_iter, test_iter, vocab = load_data_snli(128, 50)
+len(vocab)
 ```
 
-Output the size of the word list, showing 18677 valid words.
-
-```{.python .input  n=112}
-print('Vocab size:', len(vocab))
-```
-
-Print the form of the first small batch. What is different from text classification task is the data here consist of triples (Sentence 1, Sentence 2, Label)
+Now we print the shape of the first minibatch.
+Contrary to sentiment analysis,
+we have $2$ inputs `X[0]` and `X[1]` representing pairs of premises and hypotheses.
 
 ```{.python .input  n=113}
 for X, Y in train_iter:
@@ -193,16 +195,15 @@ for X, Y in train_iter:
 ```
 
 ## Summary
-- Natural language inference task aims to identify the inference relationship between premise and hypothesis.
-- In natural language inference task, the sentences have three types of inference relationships: entailment, contradiction and neutral.
-- An important dataset of natural language inference task is known as Stanford natural language inference (SNLI) dataset.
+
+* Natural language inference (NLI) studies whether a hypothesis can be inferred from a premise, where both are a text sequence.
+* In NLI, relationships between premises and hypotheses include entailment, contradiction, and neutral.
+* Stanford Natural Language Inference (SNLI) Corpus is a popular benchmark dataset of NLI.
 
 
 ## Exercises
 
 1. Machine translation has long been evaluated based on superficial $n$-gram matching between an output translation and a ground-truth translation. Can you design a measure for evaluating machine translation results by using NLI?
-
-
 
 
 
