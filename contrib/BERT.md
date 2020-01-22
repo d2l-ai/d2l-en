@@ -7,10 +7,12 @@ from mxnet.gluon import nn
 
 npx.set_np()
 ```
+
 ...
 ![输入表示](../img/bert_inputs.svg)
 
 ...
+
 ```{.python .input  n=4}
 # Saved in the d2l package for later use
 class BERTEncoder(nn.Block):
@@ -31,7 +33,9 @@ class BERTEncoder(nn.Block):
             X = blk(X, mask)
         return X
 ```
+
 ...
+
 ```{.python .input  n=5}
 encoder = BERTEncoder(vocab_size=10000, units=768, hidden_size=1024,
                       num_heads=4, num_layers=2, dropout=0.1)
@@ -43,6 +47,7 @@ segments = np.array([[0, 0, 0, 0, 1, 1, 1, 1],
 encodings = encoder(words, segments, None)
 print(encodings.shape)
 ```
+
 ...
 
 ![双向语言模型](../img/biLM_Leakage.svg)
@@ -78,6 +83,7 @@ class MaskLMDecoder(nn.Block):
 ```
 
 ...
+
 ```{.python .input  n=30}
 mlm_decoder = MaskLMDecoder(vocab_size=10000, units=768)
 mlm_decoder.initialize()
@@ -107,6 +113,7 @@ class NextSentenceClassifier(nn.Block):
         X = X[:, 0, :]
         return self.classifier(X)
 ```
+
 ...
 
 ```{.python .input  n=19}
@@ -121,6 +128,7 @@ print(ns_pred.shape, ns_loss.shape)
 ```
 
 ...
+
 ```{.python .input  n=20}
 # Saved in the d2l package for later use
 class BERTModel(nn.Block):
@@ -141,4 +149,5 @@ class BERTModel(nn.Block):
             mlm_decoder_out = None
         return seq_out, next_sentence_classifier_out, mlm_decoder_out
 ```
+
 ...
