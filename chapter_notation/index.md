@@ -4,7 +4,7 @@
 The notation used throughout this book is summarized below.
 
 
-## Numbers
+## Linear Algebra
 
 * $x$: A scalar
 * $\mathbf{x}$: A vector
