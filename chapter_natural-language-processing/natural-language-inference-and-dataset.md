@@ -53,8 +53,8 @@ We download and store the extracted SNLI dataset in the path `../data/snli_1.0`.
 ```{.python .input  n=28}
 import collections
 import d2l
-import os
 from mxnet import gluon, np, npx
+import os
 import re
 import zipfile
 
