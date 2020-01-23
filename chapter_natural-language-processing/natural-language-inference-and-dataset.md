@@ -204,6 +204,7 @@ for X, Y in train_iter:
 ## Exercises
 
 1. Machine translation has long been evaluated based on superficial $n$-gram matching between an output translation and a ground-truth translation. Can you design a measure for evaluating machine translation results by using NLI?
+1. How can we change hyperparameters to reduce the vocabulary size? 
 
 
 
