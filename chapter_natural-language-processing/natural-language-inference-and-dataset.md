@@ -5,7 +5,7 @@ This task aims to classify a single text sequence into predefined categories,
 such as a set of sentiment polarities.
 However, when there is a need to decide whether one sentence can be inferred form another, 
 or eliminate redundancy by identifying sentences that are semantically equivalent,
-the capability of analyzing one text sequence seems rather insufficient.
+knowing how to classify one text sequence is insufficient.
 Instead, we need to be able to reason over pairs of text sequences.
 
 
