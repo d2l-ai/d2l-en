@@ -1,69 +1,50 @@
 # Model Selection, Underfitting and Overfitting
 :label:`sec_model_selection`
 
-As machine learning scientists, our goal is to discover general patterns.
-Say, for example, that we wish to learn the pattern
-that associates genetic markers with the development of dementia in adulthood.
-It is easy enough to memorize our training set.
-Each person's genes uniquely identify them,
-not just among people represented in our dataset,
-but among all people on earth!
+As machine learning scientists, 
+our goal is to discover *patterns*.
+But how can we be sure that we have 
+truly discovered a *general* pattern
+and not simply memorized our data. 
+For example, imagine that we wanted to hunt 
+for patterns among genetic markers 
+linking patients to their dementia status,
+(let's the labels are drawn from the set
+{*dementia*, *mild cognitive impairment*, *healthy*}).
+Because each person's genes identify them uniquely
+(ignoring identical siblings),
+it's possible to memorize the entire dataset.
 
-Given the genetic markers representing some person,
-we do not want our model to simply recognize "oh, that is Bob",
-and then output the classification,
-say among {*dementia*, *mild cognitive impairment*, *healthy*},
-that corresponds to Bob.
-Rather, our goal is to discover patterns
+We don't want our model to say 
+*"That's Bob! I remember him! He has dementia!*
+The reason why is simple. 
+When we deploy the model in the future,
+we will encounter patients  
+that the model has never seen before.
+Our predictions will only be useful
+if our model has truly discovered a *general* pattern.
+
+To recapitulate more formally, 
+our goal is to discover patterns
 that capture regularities in the underlying population
 from which our training set was drawn.
-If we are successfully in this endeavor,
+If we are successfull in this endeavor,
 then we could successfully assess risk
 even for individuals that we have never encountered before.
 This problem---how to discover patterns that *generalize*---is
 the fundamental problem of machine learning.
 
-
 The danger is that when we train models,
 we access just a small sample of data.
-The largest public image datasets contain roughly one million images.
-And more often we have to learn from thousands or tens of thousands.
-In a large hospital system we might access
+The largest public image datasets contain 
+roughly one million images.
+More often, we must learn from only thousands 
+or tens of thousands of data points.
+In a large hospital system, we might access
 hundreds of thousands of medical records.
-With finite samples, we always run the risk
+When working with finite samples, we run the risk
 that we might discover *apparent* associations
 that turn out not to hold up when we collect more data.
-
-Let’s consider an extreme pathological case.
-Imagine that you want to learn to predict
-which people will repay their loans.
-A lender hires you as a data scientist to investigate,
-handing over the complete files on 100 applicants,
-5 of which defaulted on their loans within 3 years.
-Realistically, the files might include hundreds of potential features, including income, occupation, credit score, length of employment etc.
-Moreover, say that they additionally hand over video footage
-of each applicant's interview with their lending agent.
-
-Now suppose that after featurizing the data into an enormous design matrix,
-you discover that of the 5 applicants who default,
-all of them were wearing blue shirts during their interviews,
-while only 40% of general population wore blue shirts.
-There is a good chance that if you train a predictive model
-to predict default, it might rely upon blue-shirt-wearing
-as an important feature.
-
-Even if in fact defaulters were no more likely to wear blue shirts
-than people in the general population,
-there’s a $.4^5 = .01$ probability that
-we would observe all five defaulters wearing blue shirts.
-With just $5$ positive examples of defaults
-and hundreds or thousands of features,
-we would probably find a large number of features
-that appear to be perfectly predictive of our labor
-just due to random chance.
-With an unlimited amount of data, we would expect
-these *spurious* associations to eventually disappear.
-But we seldom have that luxury.
 
 The phenomena of fitting our training data
 more closely than we fit the underlying distribution is called overfitting, and the techniques used to combat overfitting are called regularization.
