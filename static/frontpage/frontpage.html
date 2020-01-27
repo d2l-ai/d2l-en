@@ -109,6 +109,9 @@ padding: 10px 0;
     height: 400px;
     width: 100%;
 }
+#mapimg {
+    width: 100%;
+}
 a {
   font-size: normal;
 }
@@ -180,10 +183,9 @@ a {
     <h3>Announcements</h3>
     <div align="left">
     <ul>
-      <li> [Dec, 2019] A <a href="https://github.com/d2l-ai/d2l-en/releases/tag/v0.7.0">pre-print
-      version (v0.7)</a> is released. We switched codes to use
-      the NumPy API, and polished almost every section. Also please check new
-      instructions to run this book on <a href="#jupyter">Amazon SageMaker and Google Colab</a>.
+      <li> [Dec, 2019] A <a href="https://github.com/d2l-ai/d2l-en/releases/tag/v0.7.0">preview
+      version (v0.7)</a> is released. All the code has been rewritten with the NumPy API.
+      Check out new instructions to run this book on <a href="#jupyter">Amazon SageMaker and Google Colab</a>.
       </li>
     <li>
       [Oct, 2019] We have improved <a href="chapter_preliminaries/index.html">Chapter: Preliminaries</a>,
@@ -312,35 +314,53 @@ a {
     <div id = "logos" class="logos">
       <div class="mdl-grid">
         <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/cmu.png" /> </div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/Duke_University_logo.svg" /> </div>
         <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/emory.png" /> </div>
         <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/fudan.svg" /></div>
         <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/georgia_tech.svg" /></div>
-        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/Habib_University.jpg" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/Habib_University.png" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/HIT.png" /></div>
         <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/hasso-plattner-institute.png" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/hangzhou-dianzi.png" /></div>
         <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/HKUST.png" /></div>
         <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/Hust.png" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/Imperial_college_london.svg" /></div>
         <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/IIT-bombay.png" /></div>
         <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/IIT_Kanpur.svg" /></div>
         <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/IIT_Ropar.png" /></div>
         <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/Istanbul_Technical_University.svg" /></div>
         <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/kyungpook-national.png" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/lancaster-university.png" /></div>
         <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/mit.svg" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/mcgill.png" /></div>
         <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/national_chung_hsing.png" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/national_taiwan.png" /></div>
         <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/National_United_University.svg" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/nus.png" /></div>
         <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/Nazarbayev_University.png" /></div>
         <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/northeastern.svg" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/Ohio_University_seal.svg" /></div>
         <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/peking.svg" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/Pontificia_Universidad_Católica_de_Chile.svg" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/Rutgers_University_seal.svg" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/sapienza.png" /></div>
         <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/sjtu.png" /></div>
         <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/Shanghai_University_of_Finance_and_Economics.png" /></div>
         <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/Stevens_Institute_of_Technology.svg" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/tudelft.png" /></div>
         <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/tamu.png" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/tsinghua.png" /></div>
         <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/UFMG.png" /></div>
         <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/University_of_Brescia.svg" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/catania.png" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/West_University_of_Timisoara.png" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/University_of_Arkansas_seal.svg" /></div>
         <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/UC-Berkeley.png" /></div>
         <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/ucla.png" /></div>
         <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/ucsb.png" /></div>
         <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/uiuc.png" /></div>
         <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/u_maryland.svg" /></div>
+        <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/Minnesota_twin_city.svg" /></div>
         <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/UNewHampshire.png" /></div>
         <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/unc_chapel_hill.svg" /></div>
         <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/USTC.svg" /></div>
@@ -352,6 +372,10 @@ a {
         <div class = "mdl-cell mdl-cell--2-col"> <img src="./_images/logos/Zhejiang_University.svg" /></div>
       </div>
     </div>
+    <div id="mapimg"><img src="./_images/map.png" /></div>
+
+    <!--beginning of the map-->
+    <!--
     <div id="map"></div>
     <script>
       function initMap() {
@@ -362,36 +386,54 @@ a {
         });
 
       var locations = [
-        ['Carnegie Mellon University', 40.443279, -79.943889],
+        ['Carnegie Mellon University', 41.443279, -79.943889],
+        ['Duke University', 36.001443, -78.938250],
         ['Emory University', 33.797164, -84.322272],
         ['Fudan University', 31.297640, 121.503629],
         ['Georgia Institute of Technology', 33.775444, -84.396371],
         ['Habib University', 24.905933, 67.138266],
+        ['Harbin Institute of Technology', 45.747036, 126.633527],
         ['Hasso-Plattner-Institut', 52.397485, 13.132519],
+        ['Hangzhou Dianzi University', 30.288456, 120.140527],
         ['Hong Kong University of Science and Technology', 22.336678, 114.265412],
         ['Huazhong University of Science and Technology', 30.513226, 114.420726],
+        ['Imperial College London', 51.498741, -0.174802],
         ['Indian Institute of Technology Bombay', 19.134282, 72.912646],
         ['Indian Institute of Kanpur', 26.512224, 80.233533],
         ['Indian Institute of Technology Ropar',  30.976563, 76.538215],
         ['İstanbul Teknik Üniversitesi', 41.105424, 29.025383],
         ['Kyungpook National University', 35.888949, 128.610718],
+        ['Lancaster University', 54.009934, -2.785905],
         ['Massachusetts Institute of Technology', 42.360281, -71.093098],
+        ['McGill University', 45.504939, -73.577136],
         ['National Chung Hsing University', 24.123679, 120.675380],
+        ['National Taiwan University', 25.017350, 121.539655],
         ['National United University', 24.545702, 120.811728],
+        ['National University of Singapore', 1.296520, 103.776442],
         ['Nazarbayev University', 51.090618, 71.398175],
         ['Northeastern University', 42.339386, -71.089279],
+        ['Ohio University', 39.324372, -82.101379 ],
         ['Peking University', 39.987012, 116.305112],
+        ['Pontificia Universidad Católica de Chile', -33.441277, -70.640809],
+        ['Rutgers, The State University of New Jersey', 40.500694, -74.447496],
+        ['Sapienza Università di Roma', 41.903379, 12.514557],
         ['Shanghai Jiao Tong University', 31.024733, 121.433617],
         ['Shanghai University of Finance and Economics',31.306851, 121.493008],
         ['Stevens Institute of Technology', 40.745038, -74.024795],
+        ['Technische Universiteit Delft', 51.996068, 4.375953],
         ['Texas A&M University', 30.617810, -96.333042],
+        ['Tsinghua University', 39.999700, 116.326473],
         ['Universidade Federal de Minas Gerais', -19.871207, -43.967403],
         ['Università degli Studi di Brescia', 45.538091, 10.218809],
+        ['Università degli Studi di Catania', 37.503557, 15.086512],
+        ['Universitatea de Vest din Timișoara', 45.746810, 21.231822],
+        ['University of Arkansas', 36.068646, -94.175019],
         ['University of California, Berkeley', 37.872119, -122.259398],
         ['University of California, Los Angeles', 34.068512, -118.444870],
         ['University of California, Santa Barbara', 34.413981, -119.849795],
         ['University of Illinois at Urbana-Champaign', 40.102379, -88.227408],
         ['University of Maryland',38.987052, -76.943692],
+        ['University of Minnesota, Twin Cities', 44.973929, -93.227836],
         ['University of New Hampshire',43.138784, -70.937798],
         ['University of North Carolina at Chapel Hill',35.905182, -79.046044],
         ['University of Science and Technology of China', 31.822004, 117.281182],
@@ -425,41 +467,62 @@ a {
     <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDHVyB-dRW3fhSdUmy3lqoiaNjV9JVUR4M&callback=initMap">
     </script>
+    -->
+    <!--end of the map-->
+
     <button class="collapsible">
         <center>[+] <i>Click here to show the full list. </i></center>
     </button>
     <div class="expansion">
     <div class="institute mdl-grid">
         Carnegie Mellon University<br>
+        Duke University<br>
         Emory University<br>
         Fudan University<br>
         Georgia Institute of Technology<br>
         Habib University<br>
+        Harbin Institute of Technology<br>
         Hasso-Plattner-Institut<br>
+        Hangzhou Dianzi University<br>
         Hong Kong University of Science and Technology<br>
         Huazhong University of Science and Technology<br>
+        Imperial College London<br>
         Indian Institute of Technology Bombay<br>
         Indian Institute of Technology Kanpur<br>
         Indian Institute of Technology Ropar<br>
         İstanbul Teknik Üniversitesi<br>
         Kyungpook National University<br>
+        Lancaster University<br>
         Massachusetts Institute of Technology<br>
+        McGill University<br>
         National Chung Hsing University<br>
+        National Taiwan University<br>
         National United University<br>
+        National University of Singapore<br>
         Nazarbayev University<br>
         Northeastern University<br>
+        Ohio University<br>
         Peking University<br>
+        Pontificia Universidad Católica de Chile<br>
+        Rutgers, The State University of New Jersey<br>
+        Sapienza Università di Roma<br>
         Shanghai Jiao Tong University<br>
         Shanghai University of Finance and Economics<br>
         Stevens Institute of Technology<br>
+        Technische Universiteit Delft<br>
         Texas A&amp;M University<br>
+        Tsinghua University<br>
         Universidade Federal de Minas Gerais<br>
         Università degli Studi di Brescia<br>
+        Università degli Studi di Catania<br>
+        Universitatea de Vest din Timișoara<br>
+        University of Arkansas<br>
         University of California, Berkeley<br>
         University of California, Los Angeles<br>
         University of California, Santa Barbara<br>
         University of Illinois at Urbana-Champaign<br>
         University of Maryland<br>
+        University of Minnesota, Twin Cities<br>
         University of New Hampshire<br>
         University of North Carolina at Chapel Hill<br>
         University of Science and Technology of China<br>
@@ -472,8 +535,7 @@ a {
     </div> <!-- mdl-grid -->
     </div>
 
-
-    <h4>Please contact us at <a href="mailto:d2lbook.en@gmail.com">d2lbook.en@gmail.com</a> if any is missed.</h4>
+    <h4>If you use D2L to teach (or plan to) and would like to receive a hardcopy, please contact us at <a href="mailto:d2lbook.en@gmail.com">d2lbook.en@gmail.com</a>.</h4>
 
     <!-- reverse the changes by google map... -->
     <style>

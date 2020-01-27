@@ -322,7 +322,7 @@ for epoch in range(num_epochs):
     cls_err, bbox_mae = 1-metric[0]/metric[1], metric[2]/metric[3]
     animator.add(epoch+1, (cls_err, bbox_mae))
 print('class err %.2e, bbox mae %.2e' % (cls_err, bbox_mae))
-print('%.1f exampes/sec on %s' % (train_iter.num_image/timer.stop(), ctx))
+print('%.1f examples/sec on %s' % (train_iter.num_image/timer.stop(), ctx))
 ```
 
 ## Prediction

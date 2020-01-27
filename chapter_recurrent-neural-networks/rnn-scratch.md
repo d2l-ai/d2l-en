@@ -16,7 +16,10 @@ train_iter, vocab = d2l.load_data_time_machine(batch_size, num_steps)
 
 ## One-hot Encoding
 
-Remember that each token is presented as a numerical index in `train_iter`. Feeding these indices directly to the neural network might make it hard to learn. We often present each token as a more expressive feature vector. The easiest presentation is called *one-hot encoding*.
+Remember that each token is presented as a numerical index in `train_iter`.
+Feeding these indices directly to the neural network might make it hard to
+learn. We often present each token as a more expressive feature vector. The
+easiest representation is called *one-hot encoding*.
 
 In a nutshell, we map each index to a different unit vector: assume that the number of different tokens in the vocabulary is $N$ (the `len(vocab)`) and the token indices range from 0 to $N-1$. If the index of a token is the integer $i$, then we create a vector $\mathbf{e}_i$ of all 0s with a length of $N$ and set the element at position $i$ to 1. This vector is the one-hot vector of the original token. The one-hot vectors with indices 0 and 2 are shown below.
 
@@ -88,7 +91,7 @@ Now we have all functions defined, next we create a class to wrap these function
 ```{.python .input}
 # Saved in the d2l package for later use
 class RNNModelScratch(object):
-    """A RNN Model based on scratch implementations"""
+    """A RNN Model based on scratch implementations."""
 
     def __init__(self, vocab_size, num_hiddens, ctx,
                  get_params, init_state, forward):
@@ -158,7 +161,12 @@ Sometimes the gradients can be quite large and the optimization algorithm may fa
 
 $$\mathbf{g} \leftarrow \min\left(1, \frac{\theta}{\|\mathbf{g}\|}\right) \mathbf{g}.$$
 
-By doing so we know that the gradient norm never exceeds $\theta$ and that the updated gradient is entirely aligned with the original direction $\mathbf{g}$. It also has the desirable side-effect of limiting the influence any given minibatch (and within it any given sample) can exert on the weight vectors. This bestows a certain degree of robustness to the model. Gradient clipping provides a quick fix to the gradient exploding. While it does not entire solve the problem, it is one of the many techniques to alleviate it.
+By doing so we know that the gradient norm never exceeds $\theta$ and that the
+updated gradient is entirely aligned with the original direction $\mathbf{g}$.
+It also has the desirable side-effect of limiting the influence any given
+minibatch (and within it any given sample) can exert on the weight vectors. This
+bestows a certain degree of robustness to the model. Gradient clipping provides
+a quick fix to the gradient exploding. While it does not entirely solve the problem, it is one of the many techniques to alleviate it.
 
 Below we define a function to clip the gradients of a model that is either a `RNNModelScratch` instance or a Gluon model. Also note that we compute the gradient norm over all parameters.
 

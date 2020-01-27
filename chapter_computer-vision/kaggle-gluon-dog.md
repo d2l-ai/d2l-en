@@ -33,20 +33,20 @@ The competition data is divided into a training set and testing set. The trainin
 
 ### Downloading the Dataset
 
-After logging in to Kaggle, we can click on the "Data" tab on the dog breed identification competition webpage shown in :numref:`fig_kaggle_dog` and download the dataset by clicking the "Download All" button. If you unzip the downloaded zip file in `../data`, then you will found the following structure:
+After logging in to Kaggle, we can click on the "Data" tab on the dog breed identification competition webpage shown in :numref:`fig_kaggle_dog` and download the dataset by clicking the "Download All" button. After unzipping the downloaded file in `../data`, you will find the entire dataset in the following paths:
 
 * ../data/dog-breed-identification/labels.csv
 * ../data/dog-breed-identification/sample_submission.csv
 * ../data/dog-breed-identification/train
 * ../data/dog-breed-identification/test
 
-You can see its structure is quite similar to the CIFAR-10 competition :numref:`sec_kaggle_cifar10`, where folders `train/` and `test/` have dog images, `labels.csv` contains the labels for the images in `train/`.
+You may have noticed that the above structure is quite similar to that of the CIFAR-10 competition in :numref:`sec_kaggle_cifar10`, where folders `train/` and `test/` contain training and testing dog images respectively, and `labels.csv` has the labels for the training images.
 
 Similarly, to make it easier to get started, we provide a small-scale sample of the dataset mentioned above, "train_valid_test_tiny.zip". If you are going to use the full dataset for the Kaggle competition, you will also need to change the `demo` variable below to `False`.
 
 ```{.python .input  n=1}
 # Saved in the d2l package for later use 
-d2l.DATA_HUB['dog_tiny'] = (d2l.DATA_URL+'kaggle_dog_tiny.zip',
+d2l.DATA_HUB['dog_tiny'] = (d2l.DATA_URL + 'kaggle_dog_tiny.zip',
                             '7c9b54e78c1cedaa04998f9868bc548c60101362')
 
 # If you use the full dataset downloaded for the Kaggle competition, change
@@ -60,13 +60,13 @@ else:
 
 ### Organizing the Dataset
 
-We can organize the dataset similarly as we did in :numref:`sec_kaggle_cifar10`, namely separating a validation set from the training set, and moving images into subfolders grouped by labels. 
+We can organize the dataset similarly to what we did in :numref:`sec_kaggle_cifar10`, namely separating a validation set from the training set, and moving images into subfolders grouped by labels.
 
 The `reorg_dog_data` function below is used to read the training data labels, segment the validation set, and organize the training set.
 
 ```{.python .input  n=2}
 def reorg_dog_data(data_dir, valid_ratio):
-    labels = d2l.read_csv_labels(data_dir+'labels.csv')
+    labels = d2l.read_csv_labels(data_dir + 'labels.csv')
     d2l.reorg_train_valid(data_dir, labels, valid_ratio)
     d2l.reorg_test(data_dir)
     
@@ -118,11 +118,12 @@ As in the previous section, we can create an `ImageFolderDataset` instance to re
 
 ```{.python .input  n=5}
 train_ds, valid_ds, train_valid_ds, test_ds = [
-    gluon.data.vision.ImageFolderDataset(data_dir+'train_valid_test/'+folder)
+    gluon.data.vision.ImageFolderDataset(
+        data_dir + 'train_valid_test/' + folder)
     for folder in ['train', 'valid', 'train_valid', 'test']]
 ```
 
-Here, we create a `DataLoader` instance, just like in the previous section.
+Here, we create `DataLoader` instances, just like in :numref:`sec_kaggle_cifar10`.
 
 ```{.python .input}
 train_iter, train_valid_iter = [gluon.data.DataLoader(
@@ -232,7 +233,7 @@ train(net, train_iter, valid_iter, num_epochs, lr, wd, ctx, lr_period,
       lr_decay)
 ```
 
-## Classifying the Testing Set and Submit Results on Kaggle
+## Classifying the Testing Set and Submitting Results on Kaggle
 
 After obtaining a satisfactory model design and hyper-parameters, we use all training datasets (including validation sets) to retrain the model and then classify the testing set. Note that predictions are made by the output network we just trained.
 
@@ -247,7 +248,7 @@ for data, label in test_iter:
     output_features = net.features(data.as_in_context(ctx))
     output = npx.softmax(net.output_new(output_features))
     preds.extend(output.asnumpy())
-ids = sorted(os.listdir(data_dir+'train_valid_test/test/unknown'))
+ids = sorted(os.listdir(data_dir + 'train_valid_test/test/unknown'))
 with open('submission.csv', 'w') as f:
     f.write('id,' + ','.join(train_valid_ds.synsets) + '\n')
     for i, output in zip(ids, preds):

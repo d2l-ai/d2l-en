@@ -28,14 +28,14 @@ import os
 npx.set_np()
 ```
 
-The original site might be unstable, we download the data from a mirror site. 
-The archive is about 2GB, so it will take some time to download. 
+The original site might be unstable, so we download the data from a mirror site. 
+The archive is about 2 GB, so it will take some time to download. 
 After you decompress the archive, the dataset is located in the `../data/VOCdevkit/VOC2012` path.
 
 ```{.python .input  n=2}
 # Saved in the d2l package for later use
-d2l.DATA_HUB['voc2012'] = (d2l.DATA_URL+'VOCtrainval_11-May-2012.tar',
-                          '4e443f8a2eca6b1dac8a6c57641b67dd40621a49')
+d2l.DATA_HUB['voc2012'] = (d2l.DATA_URL + 'VOCtrainval_11-May-2012.tar',
+                           '4e443f8a2eca6b1dac8a6c57641b67dd40621a49')
 
 voc_dir = d2l.download_extract('voc2012', 'VOCdevkit/VOC2012')
 ```
@@ -79,6 +79,8 @@ VOC_COLORMAP = [[0, 0, 0], [128, 0, 0], [0, 128, 0], [128, 128, 0],
                 [64, 0, 128], [192, 0, 128], [64, 128, 128], [192, 128, 128],
                 [0, 64, 0], [128, 64, 0], [0, 192, 0], [128, 192, 0],
                 [0, 64, 128]]
+
+# Saved in the d2l package for later use
 VOC_CLASSES = ['background', 'aeroplane', 'bicycle', 'bird', 'boat',
                'bottle', 'bus', 'car', 'cat', 'chair', 'cow',
                'diningtable', 'dog', 'horse', 'motorbike', 'person',
@@ -90,7 +92,7 @@ After defining the two constants above, we can easily find the category index fo
 ```{.python .input  n=6}
 # Saved in the d2l package for later use
 def build_colormap2label():
-    """Build a RGB color to label mapping for segmentation."""
+    """Build an RGB color to label mapping for segmentation."""
     colormap2label = np.zeros(256 ** 3)
     for i, colormap in enumerate(VOC_COLORMAP):
         colormap2label[(colormap[0]*256 + colormap[1])*256 + colormap[2]] = i
@@ -98,7 +100,7 @@ def build_colormap2label():
 
 # Saved in the d2l package for later use
 def voc_label_indices(colormap, colormap2label):
-    """Map a RGB color to a label."""
+    """Map an RGB color to a label."""
     colormap = colormap.astype(np.int32)
     idx = ((colormap[:, :, 0] * 256 + colormap[:, :, 1]) * 256
            + colormap[:, :, 2])

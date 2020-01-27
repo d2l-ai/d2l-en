@@ -20,11 +20,13 @@ This dataset has already been preprocessed. Each line of the dataset acts as a s
 
 ```{.python .input  n=2}
 # Saved in the d2l package for later use
-d2l.DATA_HUB['ptb'] = (d2l.DATA_URL+'ptb.zip', 
-                      '319d85e578af0cdc590547f26231e4e31cdf1e42')
+d2l.DATA_HUB['ptb'] = (d2l.DATA_URL + 'ptb.zip', 
+                       '319d85e578af0cdc590547f26231e4e31cdf1e42')
+
+# Saved in the d2l package for later use
 def read_ptb():
     data_dir = d2l.download_extract('ptb')
-    with open(data_dir+'ptb.train.txt') as f:
+    with open(data_dir + 'ptb.train.txt') as f:
         raw_text = f.read()
     return [line.split() for line in raw_text.split('\n')]
 
@@ -156,7 +158,7 @@ We first define a class to draw a candidate according to the sampling weights. I
 ```{.python .input  n=12}
 # Saved in the d2l package for later use
 class RandomGenerator(object):
-    """Draw a random int in [0, n] according to n sampling weights"""
+    """Draw a random int in [0, n] according to n sampling weights."""
     def __init__(self, sampling_weights):
         self.population = list(range(len(sampling_weights)))
         self.sampling_weights = sampling_weights

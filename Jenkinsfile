@@ -44,11 +44,9 @@ stage("Build and Publish") {
       conda activate ${ENV_NAME}
       # don't pack downloaded data into the pkg
       rm -rf _build/data_tmp
-      mv _build/eval/data _build/data_tmp
-      cp -r data _build/eval
+      [ -e _build/eval/data ] && mv _build/eval/data _build/data_tmp
       d2lbook build pkg
-      rm -rf _build/eval/data
-      mv _build/data_tmp _build/eval/data
+      [ -e _build/data_tmp ] && mv _build/data_tmp _build/eval/data
       """
 
       if (env.BRANCH_NAME == 'master') {

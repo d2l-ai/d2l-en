@@ -1,4 +1,4 @@
-# Text Classification and the Dataset
+# Sentiment Analysis and the Dataset
 :label:`sec_sentiment`
 
 Text classification is a common task in natural language processing, which transforms a sequence of text of indefinite length into a category of text. It is similar to the image classification, the most frequently used application in this book, e.g., :numref:`sec_naive_bayes`. The only difference is that, rather than an image, text classification's example is a text sentence. 
@@ -12,9 +12,9 @@ import os
 npx.set_np()
 ```
 
-## The Text Sentiment Classification Dataset
+## The Sentiment Analysis Dataset
 
-We use Stanford's [Large Movie Review Dataset](https://ai.stanford.edu/~amaas/data/sentiment/) as the dataset for text sentiment classification. This dataset is divided into two datasets for training and testing purposes, each containing 25,000 movie reviews downloaded from IMDb. In each dataset, the number of comments labeled as "positive" and "negative" is equal.
+We use Stanford's [Large Movie Review Dataset](https://ai.stanford.edu/~amaas/data/sentiment/) as the dataset for sentiment analysis. This dataset is divided into two datasets for training and testing purposes, each containing 25,000 movie reviews downloaded from IMDb. In each dataset, the number of comments labeled as "positive" and "negative" is equal.
 
 ###  Reading the Dataset
 
@@ -38,7 +38,7 @@ def read_imdb(data_dir, is_train):
     for label in ['pos/', 'neg/']:
         folder_name = data_dir + ('train/' if is_train else 'test/') + label
         for file in os.listdir(folder_name):
-            with open(folder_name+file, 'rb') as f:
+            with open(folder_name + file, 'rb') as f:
                 review = f.read().decode('utf-8').replace('\n', '')
                 data.append(review)
                 labels.append(1 if label == 'pos' else 0)

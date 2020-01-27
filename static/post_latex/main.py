@@ -108,7 +108,7 @@ def main():
         f.write('\n'.join(lines))
 
     pdf_dir = os.path.dirname(tex_file)
-    _edit_titlepage(pdf_dir)
+    #_edit_titlepage(pdf_dir)
 
 if __name__ == "__main__":
     main()

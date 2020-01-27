@@ -19,8 +19,8 @@ The dataset we will use is a collection of Pokemon sprites obtained from [pokemo
 
 ```{.python .input  n=2}
 # Saved in the d2l package for later use
-d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL+'pokemon.zip',
-                          'c065c0e2593b8b161a2d7873e42418bf6a21106c')
+d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
+                           'c065c0e2593b8b161a2d7873e42418bf6a21106c')
 
 data_dir = d2l.download_extract('pokemon')
 pokemon = gluon.data.vision.datasets.ImageFolderDataset(data_dir)
@@ -148,7 +148,7 @@ class D_block(nn.Block):
         return self.activation(self.batch_norm(self.conv2d(X)))
 ```
 
-A basic block with default settings will halve the width and height of the inputs, as we demonstrated in :numref:`sec_padding`. For example, given a input shape $n_h = n_w = 16 $, with a kernel shape $k_h = k_w = 4$, a stride shape $s_h = s_w = 2$, and a padding shape $p_h = p_w = 1$, the output shape will be:
+A basic block with default settings will halve the width and height of the inputs, as we demonstrated in :numref:`sec_padding`. For example, given a input shape $n_h = n_w = 16$, with a kernel shape $k_h = k_w = 4$, a stride shape $s_h = s_w = 2$, and a padding shape $p_h = p_w = 1$, the output shape will be:
 
 $$
 \begin{aligned}

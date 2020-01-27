@@ -1,4 +1,4 @@
-# Text Sentiment Classification: Using Recurrent Neural Networks
+# Sentiment Analysis: Using Recurrent Neural Networks
 :label:`sec_sentiment_rnn`
 
 

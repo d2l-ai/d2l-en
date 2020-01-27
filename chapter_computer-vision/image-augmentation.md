@@ -161,7 +161,7 @@ def train_batch_ch13(net, features, labels, loss, trainer, ctx_list,
         ls = [loss(py, y) for py, y in zip(pys, ys)]
     for l in ls:
         l.backward()
-    trainer.step(features.shape[0])
+    trainer.step(labels.shape[0])
     train_loss_sum = sum([float(l.sum()) for l in ls])
     train_acc_sum = sum(d2l.accuracy(py, y) for py, y in zip(pys, ys))
     return train_loss_sum, train_acc_sum
@@ -190,7 +190,7 @@ def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
         animator.add(epoch+1, (None, None, test_acc))
     print('loss %.3f, train acc %.3f, test acc %.3f' % (
         metric[0]/metric[2], metric[1]/metric[3], test_acc))
-    print('%.1f exampes/sec on %s' % (
+    print('%.1f examples/sec on %s' % (
         metric[2]*num_epochs/timer.sum(), ctx_list))
 ```
 

@@ -7,7 +7,7 @@ Digital marketers use online advertising to display advertisements to customers.
 
 $$ \text{CTR} = \frac{\#\text{Clicks}} {\#\text{Impressions}} \times 100 \% .$$
 
-Click-through rate is an important signal that indicates the effectiveness of prediction algorithms. Click-through rate prediction is a task of predicting the likelihood that something on a website will be clicked. Models on CTR prediction can not only be employed in targeted advertising systems but also in general item (e.g., movies, news, products) recommender systems, email campaigns, and even search engines. It is also closely related to user satisfaction, conversion rate, and can be helpful in setting campaign goals as it can help advertisers to set realistic expectations. 
+Click-through rate is an important signal that indicates the effectiveness of prediction algorithms. Click-through rate prediction is a task of predicting the likelihood that something on a website will be clicked. Models on CTR prediction can not only be employed in targeted advertising systems but also in general item (e.g., movies, news, products) recommender systems, email campaigns, and even search engines. It is also closely related to user satisfaction, conversion rate, and can be helpful in setting campaign goals as it can help advertisers to set realistic expectations.
 
 ```{.python .input}
 from collections import defaultdict
@@ -23,8 +23,8 @@ The following code downloads the dataset from our server and saves it into the l
 
 ```{.python .input  n=15}
 # Saved in the d2l package for later use
-d2l.DATA_HUB['ctr'] = (d2l.DATA_URL+'ctr.zip',
-                      'e18327c48c8e8e5c23da714dd614e390d369843f')
+d2l.DATA_HUB['ctr'] = (d2l.DATA_URL + 'ctr.zip',
+                       'e18327c48c8e8e5c23da714dd614e390d369843f')
 
 data_dir = d2l.download_extract('ctr')
 ```
@@ -81,7 +81,7 @@ class CTRDataset(gluon.data.Dataset):
 The following example loads the training data and print out the first record.
 
 ```{.python .input  n=16}
-train_data = CTRDataset(data_path=data_dir+"train.csv")
+train_data = CTRDataset(data_path=data_dir + "train.csv")
 train_data[0]
 ```
 

@@ -2,7 +2,7 @@
 :label:`chap_introduction`
 
 Until recently, nearly every computer program that we interact with daily
-were coded by software developers from first principles.
+was coded by software developers from first principles.
 Say that we wanted to write an application to manage an e-commerce platform.  After huddling around a whiteboard for a few hours to ponder the problem,
 we would come up with the broad strokes of a working solution that might probably look something like this:
 (i) users interact with the application through an interface
@@ -294,9 +294,9 @@ When we have more data, we can train more powerful models,
 and rely less heavily on pre-conceived assumptions.
 The regime change from (comparatively small) to big data
 is a major contributor to the success of modern deep learning.
-To drive the point home, many of the most exciting models in deep learning either do not work without large datasets.
+To drive the point home, many of the most exciting models in deep learning do not work without large datasets.
 Some others work in the low-data regime,
-but no better than traditional approaches.
+but are no better than traditional approaches.
 
 Finally it is not enough to have lots of data and to process it cleverly.
 We need the *right* data. If the data is full of mistakes,
@@ -541,7 +541,7 @@ Homes probably never sell for fractions of a cent,
 let alone prices expressed as irrational numbers.
 In cases like this, when the target is actually discrete,
 but where the rounding takes place on a sufficiently fine scale,
-we will abuse language just a bit cn continue to describe
+we will abuse language just a bit and continue to describe
 our outputs and targets as real-valued numbers.
 
 
@@ -1500,7 +1500,7 @@ will become sentient and decide independently from their programmers
 (and masters) about things that directly affect the livelihood of humans.
 To some extent, AI already affects the livelihood of humans
 in an immediate way---creditworthiness is assessed automatically,
-autopilots mostly navigate cars, decisions about
+autopilots mostly navigate vehicles, decisions about
 whether to grant bail use statistical data as input.
 More frivolously, we can ask Alexa to switch on the coffee machine.
 

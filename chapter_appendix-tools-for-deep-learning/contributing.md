@@ -24,18 +24,17 @@ Enter the [address](https://github.com/d2l-ai/d2l-en/) of the book's code reposi
 :label:`fig_git_fork`
 
 
-Now, the code repository of this book will be copied to your username, such as `astonzhang/d2l-en` shown at the top-left of the screenshot :numref:`fig_git_forked`.
+Now, the code repository of this book will be forked (i.e., copied) to your username, such as `astonzhang/d2l-en` shown at the top-left of the screenshot :numref:`fig_git_forked`.
 
-![Copy the code repository.](../img/git-forked.png)
+![Fork the code repository.](../img/git-forked.png)
 :width:`700px`
 :label:`fig_git_forked`
 
-
 ### Cloning the Repository
 
-To clone the repository (i.e., to make a local copy) we need to get its repository address. The green button in :numref:`fig_git_clone` displays this. Make sure that your local copy is up to date with the main repository if you decide to keep this fork around for longer. For now simply follow the instructions in :numref:`chap_installation` to get started. The main difference is that you are now downloading *your own fork* of the repository.
+To clone the repository (i.e., to make a local copy) we need to get its repository address. The green button in :numref:`fig_git_clone` displays this. Make sure that your local copy is up to date with the main repository if you decide to keep this fork around for longer. For now simply follow the instructions in :ref:`chap_installation` to get started. The main difference is that you are now downloading *your own fork* of the repository.
 
-![ Git clone. ](../img/git-clone.png)
+![Git clone.](../img/git-clone.png)
 :width:`700px`
 :label:`fig_git_clone`
 
@@ -43,7 +42,6 @@ To clone the repository (i.e., to make a local copy) we need to get its reposito
 # Replace your_github_username with your GitHub username
 git clone https://github.com/your_github_username/d2l-en.git
 ```
-
 
 ### Editing the Book and Push
 
@@ -96,11 +94,13 @@ Finally, submit a pull request by clicking the button as shown in :numref:`fig_g
 
 Your pull request will appear among the list of requests in the main repository. We will make every effort to process it quickly.
 
+
 ## Summary
 
 * You can use GitHub to contribute to this book.
 * Forking a repository is the first step to contributing, since it allows you to edit things locally and only contribute back once you are ready.
 * Pull requests are how contributions are being bundled up. Try not to submit huge pull requests since this makes them hard to understand and incorporate. Better send several smaller ones.
+
 
 ## Exercises
 

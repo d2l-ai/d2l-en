@@ -120,7 +120,7 @@ class Timer(object):
 
 # Defined in file: ./chapter_linear-networks/linear-regression-scratch.md
 def synthetic_data(w, b, num_examples):
-    """generate y = X w + b + noise"""
+    """Generate y = X w + b + noise."""
     X = np.random.normal(0, 1, (num_examples, len(w)))
     y = np.dot(X, w) + b
     y += np.random.normal(0, 0.01, y.shape)
@@ -214,7 +214,7 @@ def evaluate_accuracy(net, data_iter):
 
 # Defined in file: ./chapter_linear-networks/softmax-regression-scratch.md
 class Accumulator(object):
-    """Sum a list of numbers over time"""
+    """Sum a list of numbers over time."""
 
     def __init__(self, n):
         self.data = [0.0] * n
@@ -309,7 +309,7 @@ def predict_ch3(net, test_iter, n=6):
 
 # Defined in file: ./chapter_multilayer-perceptrons/underfit-overfit.md
 def evaluate_loss(net, data_iter, loss):
-    """Evaluate the loss of a model on the given dataset"""
+    """Evaluate the loss of a model on the given dataset."""
     metric = d2l.Accumulator(2)  # sum_loss, num_examples
     for X, y in data_iter:
         metric.add(loss(net(X), y).sum(), y.size)
@@ -318,22 +318,24 @@ def evaluate_loss(net, data_iter, loss):
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
 DATA_HUB = dict()
+
+
+# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
 DATA_URL = 'http://d2l-data.s3-accelerate.amazonaws.com/'
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
 def download(name, cache_dir='../data'):
-    """Download a file inserted into DATA_HUB, return the local filename"""
+    """Download a file inserted into DATA_HUB, return the local filename."""
     assert name in DATA_HUB, "%s doesn't exist" % name
     url, sha1 = DATA_HUB[name]
-    if not os.path.exists(cache_dir):
-        os.makedirs(cache_dir)
+    d2l.mkdir_if_not_exist(cache_dir)
     return gluon.utils.download(url, cache_dir, sha1_hash=sha1)
 
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
 def download_extract(name, folder=None):
-    """Download and extract a .zip or a .tar file"""
+    """Download and extract a zip/tar file."""
     fname = download(name)
     base_dir = os.path.dirname(fname) 
     data_dir, ext = os.path.splitext(fname)
@@ -342,7 +344,7 @@ def download_extract(name, folder=None):
     elif ext == '.tar' or ext == '.gz':
         fp = tarfile.open(fname, 'r')
     else:
-        assert False, 'Only zip and tar files can be extracted'
+        assert False, 'Only zip/tar files can be extracted'
     fp.extractall(base_dir)
     if folder:
         return base_dir + '/' + folder + '/'
@@ -359,10 +361,13 @@ def download_all():
 
 # Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
 DATA_HUB['kaggle_house_train'] = (
-    DATA_URL+'kaggle_house_pred_train.csv',
+    DATA_URL + 'kaggle_house_pred_train.csv',
     '585e9cc93e70b39160e7921475f9bcd7d31219ce')
+
+
+# Defined in file: ./chapter_multilayer-perceptrons/kaggle-house-price.md
 DATA_HUB['kaggle_house_test'] = (
-    DATA_URL+'kaggle_house_pred_test.csv',
+    DATA_URL + 'kaggle_house_pred_test.csv',
     'fa19780a7b011d9b009e8bff8e99922a8ee2eb90')
 
 
@@ -431,7 +436,7 @@ def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
         animator.add(epoch+1, (None, None, test_acc))
     print('loss %.3f, train acc %.3f, test acc %.3f' % (
         train_loss, train_acc, test_acc))
-    print('%.1f exampes/sec on %s' % (metric[2]*num_epochs/timer.sum(), ctx))
+    print('%.1f examples/sec on %s' % (metric[2]*num_epochs/timer.sum(), ctx))
 
 
 # Defined in file: ./chapter_convolutional-modern/resnet.md
@@ -458,8 +463,11 @@ class Residual(nn.Block):
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
-d2l.DATA_HUB['time_machine'] = (d2l.DATA_URL+'timemachine.txt',
-                               '090b5e7e70c295757f55df93cb0a180b9691891a')
+d2l.DATA_HUB['time_machine'] = (d2l.DATA_URL + 'timemachine.txt',
+                                '090b5e7e70c295757f55df93cb0a180b9691891a')
+
+
+# Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
 def read_time_machine():
     """Load the time machine book into a list of sentences."""
     with open(d2l.download('time_machine'), 'r') as f:
@@ -470,28 +478,23 @@ def read_time_machine():
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
 def tokenize(lines, token='word'):
-    """Split sentences into word or char tokens"""
+    """Split sentences into word or char tokens."""
     if token == 'word':
         return [line.split(' ') for line in lines]
     elif token == 'char':
         return [list(line) for line in lines]
     else:
-        print('ERROR: unkown token type '+token)
+        print('ERROR: unknown token type '+token)
 
 
 # Defined in file: ./chapter_recurrent-neural-networks/text-preprocessing.md
 class Vocab(object):
-    def __init__(self, tokens, min_freq=0, use_special_tokens=False):
+    def __init__(self, tokens, min_freq=0, reserved_tokens=[]):
         # Sort according to frequencies
         counter = count_corpus(tokens)
         self.token_freqs = sorted(counter.items(), key=lambda x: x[0])
         self.token_freqs.sort(key=lambda x: x[1], reverse=True)
-        if use_special_tokens:
-            # For padding, begin of sentence, end of sentence, and unknown
-            self.pad, self.bos, self.eos, self.unk = (0, 1, 2, 3)
-            uniq_tokens = ['<pad>', '<bos>', '<eos>', '<unk>']
-        else:
-            self.unk, uniq_tokens = 0, ['<unk>']
+        self.unk, uniq_tokens = 0, ['<unk>'] + reserved_tokens
         uniq_tokens += [token for token, freq in self.token_freqs
                         if freq >= min_freq and token not in uniq_tokens]
         self.idx_to_token, self.token_to_idx = [], dict()
@@ -572,7 +575,7 @@ def seq_data_iter_consecutive(corpus, batch_size, num_steps):
 
 # Defined in file: ./chapter_recurrent-neural-networks/lang-model.md
 class SeqDataLoader(object):
-    """A iterator to load sequence data"""
+    """A iterator to load sequence data."""
     def __init__(self, batch_size, num_steps, use_random_iter, max_tokens):
         if use_random_iter:
             self.data_iter_fn = d2l.seq_data_iter_random
@@ -595,7 +598,7 @@ def load_data_time_machine(batch_size, num_steps, use_random_iter=False,
 
 # Defined in file: ./chapter_recurrent-neural-networks/rnn-scratch.md
 class RNNModelScratch(object):
-    """A RNN Model based on scratch implementations"""
+    """A RNN Model based on scratch implementations."""
 
     def __init__(self, vocab_size, num_hiddens, ctx,
                  get_params, init_state, forward):
@@ -718,11 +721,14 @@ class RNNModel(nn.Block):
 
 
 # Defined in file: ./chapter_recurrent-modern/machine-translation.md
-d2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL+'fra-eng.zip',
-                          '94646ad1522d915e7b0f9296181140edcf86a4f5')
+d2l.DATA_HUB['fra-eng'] = (d2l.DATA_URL + 'fra-eng.zip',
+                           '94646ad1522d915e7b0f9296181140edcf86a4f5')
+
+
+# Defined in file: ./chapter_recurrent-modern/machine-translation.md
 def read_data_nmt():
     data_dir = d2l.download_extract('fra-eng')
-    with open(data_dir+'fra.txt', 'r') as f:
+    with open(data_dir + 'fra.txt', 'r') as f:
         return f.read()
 
 
@@ -764,9 +770,9 @@ def trim_pad(line, num_steps, padding_token):
 def build_array(lines, vocab, num_steps, is_source):
     lines = [vocab[l] for l in lines]
     if not is_source:
-        lines = [[vocab.bos] + l + [vocab.eos] for l in lines]
-    array = np.array([trim_pad(l, num_steps, vocab.pad) for l in lines])
-    valid_len = (array != vocab.pad).sum(axis=1)
+        lines = [[vocab['<bos>']] + l + [vocab['<eos>']] for l in lines]
+    array = np.array([trim_pad(l, num_steps, vocab['<pad>']) for l in lines])
+    valid_len = (array != vocab['<pad>']).sum(axis=1)
     return array, valid_len
 
 
@@ -774,8 +780,10 @@ def build_array(lines, vocab, num_steps, is_source):
 def load_data_nmt(batch_size, num_steps, num_examples=1000):
     text = preprocess_nmt(read_data_nmt())
     source, target = tokenize_nmt(text, num_examples)
-    src_vocab = d2l.Vocab(source, min_freq=3, use_special_tokens=True)
-    tgt_vocab = d2l.Vocab(target, min_freq=3, use_special_tokens=True)
+    src_vocab = d2l.Vocab(source, min_freq=3, 
+                          reserved_tokens=['<pad>', '<bos>', '<eos>'])
+    tgt_vocab = d2l.Vocab(target, min_freq=3, 
+                          reserved_tokens=['<pad>', '<bos>', '<eos>'])
     src_array, src_valid_len = build_array(
         source, src_vocab, num_steps, True)
     tgt_array, tgt_valid_len = build_array(
@@ -908,20 +916,20 @@ def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
                     ctx):
     src_tokens = src_vocab[src_sentence.lower().split(' ')]
     enc_valid_length = np.array([len(src_tokens)], ctx=ctx)
-    src_tokens = d2l.trim_pad(src_tokens, num_steps, src_vocab.pad)
+    src_tokens = d2l.trim_pad(src_tokens, num_steps, src_vocab['<pad>'])
     enc_X = np.array(src_tokens, ctx=ctx)
     # Add the batch_size dimension
     enc_outputs = model.encoder(np.expand_dims(enc_X, axis=0),
                                 enc_valid_length)
     dec_state = model.decoder.init_state(enc_outputs, enc_valid_length)
-    dec_X = np.expand_dims(np.array([tgt_vocab.bos], ctx=ctx), axis=0)
+    dec_X = np.expand_dims(np.array([tgt_vocab['<bos>']], ctx=ctx), axis=0)
     predict_tokens = []
     for _ in range(num_steps):
         Y, dec_state = model.decoder(dec_X, dec_state)
         # The token with highest score is used as the next timestep input
         dec_X = Y.argmax(axis=2)
         py = dec_X.squeeze(axis=0).astype('int32').item()
-        if py == tgt_vocab.eos:
+        if py == tgt_vocab['<eos>']:
             break
         predict_tokens.append(py)
     return ' '.join(tgt_vocab.to_tokens(predict_tokens))
@@ -984,6 +992,148 @@ class MLPAttention(nn.Block):
         return npx.batch_dot(attention_weights, value)
 
 
+# Defined in file: ./chapter_attention-mechanisms/transformer.md
+class MultiHeadAttention(nn.Block):
+    def __init__(self, hidden_size, num_heads, dropout, **kwargs):
+        super(MultiHeadAttention, self).__init__(**kwargs)
+        self.num_heads = num_heads
+        self.attention = d2l.DotProductAttention(dropout)
+        self.W_q = nn.Dense(hidden_size, use_bias=False, flatten=False)
+        self.W_k = nn.Dense(hidden_size, use_bias=False, flatten=False)
+        self.W_v = nn.Dense(hidden_size, use_bias=False, flatten=False)
+        self.W_o = nn.Dense(hidden_size, use_bias=False, flatten=False)
+
+    def forward(self, query, key, value, valid_length):
+        # query, key, and value shape: (batch_size, seq_len, dim),
+        # where seq_len is the length of input sequence
+        # valid_length shape is either (batch_size, )
+        # or (batch_size, seq_len).
+
+        # Project and transpose query, key, and value from
+        # (batch_size, seq_len, hidden_size * num_heads) to
+        # (batch_size * num_heads, seq_len, hidden_size).
+        query = transpose_qkv(self.W_q(query), self.num_heads)
+        key = transpose_qkv(self.W_k(key), self.num_heads)
+        value = transpose_qkv(self.W_v(value), self.num_heads)
+
+        if valid_length is not None:
+            # Copy valid_length by num_heads times
+            if valid_length.ndim == 1:
+                valid_length = np.tile(valid_length, self.num_heads)
+            else:
+                valid_length = np.tile(valid_length, (self.num_heads, 1))
+
+        output = self.attention(query, key, value, valid_length)
+
+        # Transpose from (batch_size * num_heads, seq_len, hidden_size) back
+        # to (batch_size, seq_len, hidden_size * num_heads)
+        output_concat = transpose_output(output, self.num_heads)
+        return self.W_o(output_concat)
+
+
+# Defined in file: ./chapter_attention-mechanisms/transformer.md
+def transpose_qkv(X, num_heads):
+    # Original X shape: (batch_size, seq_len, hidden_size * num_heads),
+    # -1 means inferring its value, after first reshape, X shape:
+    # (batch_size, seq_len, num_heads, hidden_size)
+    X = X.reshape(X.shape[0], X.shape[1], num_heads, -1)
+
+    # After transpose, X shape: (batch_size, num_heads, seq_len, hidden_size)
+    X = X.transpose(0, 2, 1, 3)
+
+    # Merge the first two dimensions. Use reverse=True to infer shape from
+    # right to left. 
+    # output shape: (batch_size * num_heads, seq_len, hidden_size)
+    output = X.reshape(-1, X.shape[2], X.shape[3])
+    return output
+
+
+
+# Defined in file: ./chapter_attention-mechanisms/transformer.md
+def transpose_output(X, num_heads):
+    # A reversed version of transpose_qkv
+    X = X.reshape(-1, num_heads, X.shape[1], X.shape[2])
+    X = X.transpose(0, 2, 1, 3)
+    return X.reshape(X.shape[0], X.shape[1], -1)
+
+
+# Defined in file: ./chapter_attention-mechanisms/transformer.md
+class PositionWiseFFN(nn.Block):
+    def __init__(self, ffn_hidden_size, hidden_size_out, **kwargs):
+        super(PositionWiseFFN, self).__init__(**kwargs)
+        self.ffn_1 = nn.Dense(ffn_hidden_size, flatten=False,
+                              activation='relu')
+        self.ffn_2 = nn.Dense(hidden_size_out, flatten=False)
+
+    def forward(self, X):
+        return self.ffn_2(self.ffn_1(X))
+
+
+# Defined in file: ./chapter_attention-mechanisms/transformer.md
+class AddNorm(nn.Block):
+    def __init__(self, dropout, **kwargs):
+        super(AddNorm, self).__init__(**kwargs)
+        self.dropout = nn.Dropout(dropout)
+        self.norm = nn.LayerNorm()
+
+    def forward(self, X, Y):
+        return self.norm(self.dropout(Y) + X)
+
+
+# Defined in file: ./chapter_attention-mechanisms/transformer.md
+class PositionalEncoding(nn.Block):
+    def __init__(self, embedding_size, dropout, max_len=1000):
+        super(PositionalEncoding, self).__init__()
+        self.dropout = nn.Dropout(dropout)
+        # Create a long enough P
+        self.P = np.zeros((1, max_len, embedding_size))
+        X = np.arange(0, max_len).reshape(-1, 1) / np.power(
+            10000, np.arange(0, embedding_size, 2)/embedding_size)
+        self.P[:, :, 0::2] = np.sin(X)
+        self.P[:, :, 1::2] = np.cos(X)
+
+    def forward(self, X):
+        X = X + self.P[:, :X.shape[1], :].as_in_context(X.context)
+        return self.dropout(X)
+
+
+# Defined in file: ./chapter_attention-mechanisms/transformer.md
+class EncoderBlock(nn.Block):
+    def __init__(self, embedding_size, ffn_hidden_size, num_heads,
+                 dropout, **kwargs):
+        super(EncoderBlock, self).__init__(**kwargs)
+        self.attention = MultiHeadAttention(embedding_size, num_heads,
+                                            dropout)
+        self.addnorm_1 = AddNorm(dropout)
+        self.ffn = PositionWiseFFN(ffn_hidden_size, embedding_size)
+        self.addnorm_2 = AddNorm(dropout)
+
+    def forward(self, X, valid_length):
+        Y = self.addnorm_1(X, self.attention(X, X, X, valid_length))
+        return self.addnorm_2(Y, self.ffn(Y))
+
+
+# Defined in file: ./chapter_attention-mechanisms/transformer.md
+class TransformerEncoder(d2l.Encoder):
+    def __init__(self, vocab_size, embedding_size, ffn_hidden_size,
+                 num_heads, num_layers, dropout, **kwargs):
+        super(TransformerEncoder, self).__init__(**kwargs)
+        self.embedding_size = embedding_size
+        self.embed = nn.Embedding(vocab_size, embedding_size)
+        self.pos_encoding = PositionalEncoding(embedding_size, dropout)
+        self.blks = nn.Sequential()
+        for i in range(num_layers):
+            self.blks.add(
+                EncoderBlock(embedding_size, ffn_hidden_size,
+                             num_heads, dropout))
+
+    def forward(self, X, valid_length, *args):
+        X = self.pos_encoding(self.embed(X) * math.sqrt(self.embedding_size))
+        for blk in self.blks:
+            X = blk(X, valid_length)
+        return X
+
+
 # Defined in file: ./chapter_optimization/optimization-intro.md
 def annotate(text, xy, xytext):
     d2l.plt.gca().annotate(text, xy=xy, xytext=xytext,
@@ -1016,8 +1166,11 @@ def show_trace_2d(f, results):
 
 
 # Defined in file: ./chapter_optimization/minibatch-sgd.md
-d2l.DATA_HUB['airfoil'] = (d2l.DATA_URL+'airfoil_self_noise.dat',
-                          '76e5be1548fd8222e5074cf0faae75edff8cf93f')
+d2l.DATA_HUB['airfoil'] = (d2l.DATA_URL + 'airfoil_self_noise.dat',
+                           '76e5be1548fd8222e5074cf0faae75edff8cf93f')
+
+
+# Defined in file: ./chapter_optimization/minibatch-sgd.md
 def get_data_ch11(batch_size=10, n=1500):
     data = np.genfromtxt(d2l.download('airfoil'),
                          dtype=np.float32, delimiter='\t')
@@ -1151,7 +1304,7 @@ def train_batch_ch13(net, features, labels, loss, trainer, ctx_list,
         ls = [loss(py, y) for py, y in zip(pys, ys)]
     for l in ls:
         l.backward()
-    trainer.step(features.shape[0])
+    trainer.step(labels.shape[0])
     train_loss_sum = sum([float(l.sum()) for l in ls])
     train_acc_sum = sum(d2l.accuracy(py, y) for py, y in zip(pys, ys))
     return train_loss_sum, train_acc_sum
@@ -1179,7 +1332,7 @@ def train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs,
         animator.add(epoch+1, (None, None, test_acc))
     print('loss %.3f, train acc %.3f, test acc %.3f' % (
         metric[0]/metric[2], metric[1]/metric[3], test_acc))
-    print('%.1f exampes/sec on %s' % (
+    print('%.1f examples/sec on %s' % (
         metric[2]*num_epochs/timer.sum(), ctx_list))
 
 
@@ -1222,31 +1375,31 @@ def show_bboxes(axes, bboxes, labels=None, colors=None):
 
 
 # Defined in file: ./chapter_computer-vision/object-detection-dataset.md
-d2l.DATA_HUB['pikachu'] = (d2l.DATA_URL+'pikachu.zip', 
-                         '68ab1bd42143c5966785eb0d7b2839df8d570190')
+d2l.DATA_HUB['pikachu'] = (d2l.DATA_URL + 'pikachu.zip',
+                           '68ab1bd42143c5966785eb0d7b2839df8d570190')
 
 
 # Defined in file: ./chapter_computer-vision/object-detection-dataset.md
 def load_data_pikachu(batch_size, edge_size=256):
-    """Load the pikachu dataset"""
+    """Load the pikachu dataset."""
     data_dir = d2l.download_extract('pikachu')
     train_iter = image.ImageDetIter(
-        path_imgrec=data_dir+'train.rec',
-        path_imgidx=data_dir+'train.idx',
+        path_imgrec=data_dir + 'train.rec',
+        path_imgidx=data_dir + 'train.idx',
         batch_size=batch_size,
         data_shape=(3, edge_size, edge_size),  # The shape of the output image
         shuffle=True,  # Read the dataset in random order
         rand_crop=1,  # The probability of random cropping is 1
         min_object_covered=0.95, max_attempts=200)
     val_iter = image.ImageDetIter(
-        path_imgrec=data_dir+'val.rec', batch_size=batch_size,
+        path_imgrec=data_dir + 'val.rec', batch_size=batch_size,
         data_shape=(3, edge_size, edge_size), shuffle=False)
     return train_iter, val_iter
 
 
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
-d2l.DATA_HUB['voc2012'] = (d2l.DATA_URL+'VOCtrainval_11-May-2012.tar',
-                          '4e443f8a2eca6b1dac8a6c57641b67dd40621a49')
+d2l.DATA_HUB['voc2012'] = (d2l.DATA_URL + 'VOCtrainval_11-May-2012.tar',
+                           '4e443f8a2eca6b1dac8a6c57641b67dd40621a49')
 
 
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
@@ -1271,6 +1424,9 @@ VOC_COLORMAP = [[0, 0, 0], [128, 0, 0], [0, 128, 0], [128, 128, 0],
                 [64, 0, 128], [192, 0, 128], [64, 128, 128], [192, 128, 128],
                 [0, 64, 0], [128, 64, 0], [0, 192, 0], [128, 192, 0],
                 [0, 64, 128]]
+
+
+# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
 VOC_CLASSES = ['background', 'aeroplane', 'bicycle', 'bird', 'boat',
                'bottle', 'bus', 'car', 'cat', 'chair', 'cow',
                'diningtable', 'dog', 'horse', 'motorbike', 'person',
@@ -1279,7 +1435,7 @@ VOC_CLASSES = ['background', 'aeroplane', 'bicycle', 'bird', 'boat',
 
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
 def build_colormap2label():
-    """Build a RGB color to label mapping for segmentation."""
+    """Build an RGB color to label mapping for segmentation."""
     colormap2label = np.zeros(256 ** 3)
     for i, colormap in enumerate(VOC_COLORMAP):
         colormap2label[(colormap[0]*256 + colormap[1])*256 + colormap[2]] = i
@@ -1288,7 +1444,7 @@ def build_colormap2label():
 
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
 def voc_label_indices(colormap, colormap2label):
-    """Map a RGB color to a label."""
+    """Map an RGB color to a label."""
     colormap = colormap.astype(np.int32)
     idx = ((colormap[:, :, 0] * 256 + colormap[:, :, 1]) * 256
            + colormap[:, :, 2])
@@ -1351,13 +1507,13 @@ def load_data_voc(batch_size, crop_size):
 
 
 # Defined in file: ./chapter_computer-vision/kaggle-gluon-cifar10.md
-d2l.DATA_HUB['cifar10_tiny'] = (d2l.DATA_URL+'kaggle_cifar10_tiny.zip',
+d2l.DATA_HUB['cifar10_tiny'] = (d2l.DATA_URL + 'kaggle_cifar10_tiny.zip',
                                 '2068874e4b9a9f0fb07ebe0ad2b29754449ccacd')
 
 
 # Defined in file: ./chapter_computer-vision/kaggle-gluon-cifar10.md
 def read_csv_labels(fname):
-    """Read fname to return a name to label dictionary"""
+    """Read fname to return a name to label dictionary."""
     with open(fname, 'r') as f:
         # Skip the file header line (column name)
         lines = f.readlines()[1:]
@@ -1366,57 +1522,56 @@ def read_csv_labels(fname):
 
 
 # Defined in file: ./chapter_computer-vision/kaggle-gluon-cifar10.md
-def n_valid_per_label(labels, valid_ratio):
-    """Determine # examples per class for the validation set"""
-    n = collections.Counter(labels.values()).most_common()[-1][1]
-    return max(1, math.floor(n * valid_ratio))
-
-
-# Defined in file: ./chapter_computer-vision/kaggle-gluon-cifar10.md
 def copyfile(filename, target_dir):
-    """Copy a file into a target directory"""
+    """Copy a file into a target directory."""
     d2l.mkdir_if_not_exist(target_dir)
     shutil.copy(filename, target_dir)
 
 
 # Defined in file: ./chapter_computer-vision/kaggle-gluon-cifar10.md
 def reorg_train_valid(data_dir, labels, valid_ratio):
+    # The number of examples of the class with the least examples in the
+    # training dataset
     n = collections.Counter(labels.values()).most_common()[-1][1]
+    # The number of examples per class for the validation set
     n_valid_per_label = max(1, math.floor(n * valid_ratio))
     label_count = {}
-    for train_file in os.listdir(data_dir+'train'):
+    for train_file in os.listdir(data_dir + 'train'):
         label = labels[train_file.split('.')[0]]
-        fname = data_dir+'train/'+train_file
+        fname = data_dir + 'train/' + train_file
         # Copy to train_valid_test/train_valid with a subfolder per class
-        copyfile(fname, data_dir+'train_valid_test/train_valid/'+label)
+        copyfile(fname, data_dir + 'train_valid_test/train_valid/' + label)
         if label not in label_count or label_count[label] < n_valid_per_label:
             # Copy to train_valid_test/valid
-            copyfile(fname, data_dir+'train_valid_test/valid/'+label)
+            copyfile(fname, data_dir + 'train_valid_test/valid/' + label)
             label_count[label] = label_count.get(label, 0) + 1
         else:
             # Copy to train_valid_test/train
-            copyfile(fname, data_dir+'train_valid_test/train/'+label)
+            copyfile(fname, data_dir+'train_valid_test/train/' + label)
     return n_valid_per_label
 
 
 # Defined in file: ./chapter_computer-vision/kaggle-gluon-cifar10.md
 def reorg_test(data_dir):
-    for test_file in os.listdir(data_dir+'test'):
-        copyfile(data_dir+'test/'+test_file, 
-                 data_dir+'train_valid_test/test/unknown/')
+    for test_file in os.listdir(data_dir + 'test'):
+        copyfile(data_dir + 'test/' + test_file, 
+                 data_dir + 'train_valid_test/test/unknown/')
 
 
 # Defined in file: ./chapter_computer-vision/kaggle-gluon-dog.md
-d2l.DATA_HUB['dog_tiny'] = (d2l.DATA_URL+'kaggle_dog_tiny.zip',
+d2l.DATA_HUB['dog_tiny'] = (d2l.DATA_URL + 'kaggle_dog_tiny.zip',
                             '7c9b54e78c1cedaa04998f9868bc548c60101362')
 
 
 # Defined in file: ./chapter_natural-language-processing/word2vec-dataset.md
-d2l.DATA_HUB['ptb'] = (d2l.DATA_URL+'ptb.zip', 
-                      '319d85e578af0cdc590547f26231e4e31cdf1e42')
+d2l.DATA_HUB['ptb'] = (d2l.DATA_URL + 'ptb.zip', 
+                       '319d85e578af0cdc590547f26231e4e31cdf1e42')
+
+
+# Defined in file: ./chapter_natural-language-processing/word2vec-dataset.md
 def read_ptb():
     data_dir = d2l.download_extract('ptb')
-    with open(data_dir+'ptb.train.txt') as f:
+    with open(data_dir + 'ptb.train.txt') as f:
         raw_text = f.read()
     return [line.split() for line in raw_text.split('\n')]
 
@@ -1460,7 +1615,7 @@ def get_centers_and_contexts(corpus, max_window_size):
 
 # Defined in file: ./chapter_natural-language-processing/word2vec-dataset.md
 class RandomGenerator(object):
-    """Draw a random int in [0, n] according to n sampling weights"""
+    """Draw a random int in [0, n] according to n sampling weights."""
     def __init__(self, sampling_weights):
         self.population = list(range(len(sampling_weights)))
         self.sampling_weights = sampling_weights
@@ -1534,7 +1689,7 @@ def read_imdb(data_dir, is_train):
     for label in ['pos/', 'neg/']:
         folder_name = data_dir + ('train/' if is_train else 'test/') + label
         for file in os.listdir(folder_name):
-            with open(folder_name+file, 'rb') as f:
+            with open(folder_name + file, 'rb') as f:
                 review = f.read().decode('utf-8').replace('\n', '')
                 data.append(review)
                 labels.append(1 if label == 'pos' else 0)
@@ -1566,14 +1721,452 @@ def predict_sentiment(net, vocab, sentence):
     return 'positive' if label == 1 else 'negative'
 
 
+# Defined in file: ./chapter_natural-language-processing/natural-language-inference-and-dataset.md
+d2l.DATA_HUB['SNLI'] = (
+    'https://nlp.stanford.edu/projects/snli/snli_1.0.zip',
+    '9fcde07509c7e87ec61c640c1b2753d9041758e4')
+
+
+# Defined in file: ./chapter_natural-language-processing/natural-language-inference-and-dataset.md
+def read_snli(data_dir, is_train):
+    """Read the SNLI dataset into premises, hypotheses, and labels."""
+    def extract_text(s):
+        # Remove information that will not be used by us
+        s = re.sub('\(', '', s) 
+        s = re.sub('\)', '', s)
+        # Substitute two or more consecutive whitespace with space
+        s = re.sub('\s{2,}', ' ', s)
+        return s.strip()
+    label_set = {'entailment': 0, 'contradiction': 1, 'neutral': 2}
+    file_name = (data_dir + 'snli_1.0_'+ ('train' if is_train else 'test')
+                 + '.txt')
+    with open(file_name, 'r') as f:
+        rows = [row.split('\t') for row in f.readlines()[1:]]
+    premises = [extract_text(row[1]) for row in rows if row[0] in label_set]
+    hypotheses = [extract_text(row[2]) for row in rows if row[0] in label_set]
+    labels = [label_set[row[0]] for row in rows if row[0] in label_set]
+    return premises, hypotheses, labels
+
+
+# Defined in file: ./chapter_natural-language-processing/natural-language-inference-and-dataset.md
+class SNLIDataset(gluon.data.Dataset):
+    """A customized dataset to load the SNLI dataset."""
+    def __init__(self, dataset, num_steps, vocab=None):
+        self.num_steps = num_steps
+        p_tokens = d2l.tokenize(dataset[0])
+        h_tokens = d2l.tokenize(dataset[1])
+        if vocab is None:
+            self.vocab = d2l.Vocab(p_tokens + h_tokens, min_freq=5,
+                                   reserved_tokens=['<pad>'])
+        else:
+            self.vocab = vocab
+        self.premises = self.pad(p_tokens)
+        self.hypotheses = self.pad(h_tokens)
+        self.labels = np.array(dataset[2])
+        print('read ' + str(len(self.premises)) + ' examples')
+
+    def pad(self, lines):
+        return np.array([d2l.trim_pad(self.vocab[line], self.num_steps, 
+                                      self.vocab['<pad>']) for line in lines])
+
+    def __getitem__(self, idx):
+        return (self.premises[idx], self.hypotheses[idx]), self.labels[idx]
+
+    def __len__(self):
+        return len(self.premises)
+
+
+# Defined in file: ./chapter_natural-language-processing/natural-language-inference-and-dataset.md
+def load_data_snli(batch_size, num_steps=50):
+    """Download the SNLI dataset and return data iterators and vocabulary."""
+    data_dir = d2l.download_extract('SNLI')
+    train_data = read_snli(data_dir, True)
+    test_data = read_snli(data_dir, False)
+    train_set = SNLIDataset(train_data, num_steps)
+    test_set = SNLIDataset(test_data, num_steps, train_set.vocab)
+    train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True)
+    test_iter = gluon.data.DataLoader(test_set, batch_size, shuffle=False)
+    return train_iter, test_iter, train_set.vocab
+
+
+# Defined in file: ./chapter_natural-language-processing/natural-language-inference-attention.md
+def split_batch_multi_inputs(X, y, ctx_list):
+    """Split X and y into multiple devices specified by ctx"""
+    X = list(zip(*[gluon.utils.split_and_load(feature, ctx_list, even_split=False)
+                   for feature in X]))
+    return (X, gluon.utils.split_and_load(y, ctx_list, even_split=False))
+
+
+# Defined in file: ./chapter_natural-language-processing/natural-language-inference-attention.md
+def predict_snli(net, premise, hypothesis):
+    premise = np.array(vocab[premise],
+                       ctx=d2l.try_gpu())
+    hypothesis = np.array(vocab[hypothesis],
+                          ctx=d2l.try_gpu())
+    label = np.argmax(net([premise.reshape((1, -1)),
+                           hypothesis.reshape((1, -1))]), axis=1)
+    return 'neutral' if label == 0 else 'contradiction' if label == 1 \
+            else 'entailment'
+
+
+# Defined in file: ./chapter_natural-language-processing/BERT.md
+class BERTEncoder(nn.Block):
+    def __init__(self, vocab_size, units, hidden_size,
+                 num_heads, num_layers, dropout, **kwargs):
+        super(BERTEncoder, self).__init__(**kwargs)
+        self.word_embedding = gluon.nn.Embedding(vocab_size, units)
+        self.segment_embedding = gluon.nn.Embedding(2, units)
+        self.pos_encoding = d2l.PositionalEncoding(units, dropout)
+        self.blks = gluon.nn.Sequential()
+        for i in range(num_layers):
+            self.blks.add(d2l.EncoderBlock(units, hidden_size, num_heads, dropout))
+
+    def forward(self, words, segments, mask):
+        X = self.word_embedding(words) + self.segment_embedding(segments)
+        X = self.pos_encoding(X)
+        for blk in self.blks:
+            X = blk(X, mask)
+        return X
+
+
+# Defined in file: ./chapter_natural-language-processing/BERT.md
+class MaskLMDecoder(nn.Block):
+    def __init__(self, vocab_size, units, **kwargs):
+        super(MaskLMDecoder, self).__init__(**kwargs)
+        self.decoder = gluon.nn.Sequential()
+        self.decoder.add(gluon.nn.Dense(units, flatten=False, activation='relu'))
+        self.decoder.add(gluon.nn.LayerNorm())
+        self.decoder.add(gluon.nn.Dense(vocab_size, flatten=False))
+
+    def forward(self, X, masked_positions):
+        ctx = masked_positions.context
+        dtype = masked_positions.dtype
+        num_masked_positions = masked_positions.shape[1]
+        masked_positions = masked_positions.reshape((1, -1))
+        batch_size = X.shape[0]
+        batch_idx = np.arange(0, batch_size)
+        batch_idx = np.repeat(batch_idx, num_masked_positions)
+        batch_idx = batch_idx.reshape((1, -1))
+        encoded = X[batch_idx, masked_positions]
+        encoded = encoded.reshape((batch_size, num_masked_positions, X.shape[-1]))
+        pred = self.decoder(encoded)
+        return pred
+
+
+# Defined in file: ./chapter_natural-language-processing/BERT.md
+class NextSentenceClassifier(nn.Block):
+    def __init__(self, units=768, **kwargs):
+        super(NextSentenceClassifier, self).__init__(**kwargs)
+        self.classifier = gluon.nn.Sequential()
+        self.classifier.add(gluon.nn.Dense(units=units, flatten=False,
+                                           activation='tanh'))
+        self.classifier.add(gluon.nn.Dense(units=2, flatten=False))
+
+    def forward(self, X):
+        X = X[:, 0, :]
+        return self.classifier(X)
+
+
+# Defined in file: ./chapter_natural-language-processing/BERT.md
+class BERTModel(nn.Block):
+    def __init__(self, vocab_size=None, embed_size=128, hidden_size=512,
+                 num_heads=2, num_layers=4, dropout=0.1):
+        super(BERTModel, self).__init__()
+        self.encoder = BERTEncoder(vocab_size=vocab_size, units=embed_size, hidden_size=hidden_size,
+                                   num_heads=num_heads, num_layers=num_layers, dropout=dropout)
+        self.ns_classifier = NextSentenceClassifier()
+        self.mlm_decoder = MaskLMDecoder(vocab_size=vocab_size, units=embed_size)
+
+    def forward(self, inputs, token_types, valid_length=None, masked_positions=None):
+        seq_out = self.encoder(inputs, token_types, valid_length)
+        next_sentence_classifier_out = self.ns_classifier(seq_out)
+        if not masked_positions is None:
+            mlm_decoder_out = self.mlm_decoder(seq_out, masked_positions)
+        else:
+            mlm_decoder_out = None
+        return seq_out, next_sentence_classifier_out, mlm_decoder_out
+
+
+# Defined in file: ./chapter_natural-language-processing/BERT-processing.md
+d2l.DATA_HUB['wikitext-2'] = (
+    'https://s3.amazonaws.com/research.metamind.io/wikitext/wikitext-2-v1.zip',
+    '3c914d17d80b1459be871a5039ac23e752a53cbe')
+
+
+# Defined in file: ./chapter_natural-language-processing/BERT-processing.md
+d2l.DATA_HUB['wikitext-103'] = (
+    'https://s3.amazonaws.com/research.metamind.io/wikitext/wikitext-103-v1.zip',
+    '0aec09a7537b58d4bb65362fee27650eeaba625a')
+
+
+# Defined in file: ./chapter_natural-language-processing/BERT-processing.md
+def read_wiki(data_dir):
+    file_name = os.path.join(data_dir, 'wiki.train.tokens')
+    with open(file_name, 'r') as f:
+        raw = f.readlines()
+    data = [line.strip().lower().split(' . ')
+            for line in raw if len(line.split(' . '))>=2]
+    random.shuffle(data)
+    return data
+
+
+# Defined in file: ./chapter_natural-language-processing/BERT-processing.md
+def get_next_sentence(sentence, next_sentence, all_documents):
+    if random.random() < 0.5:
+        tokens_a = sentence
+        tokens_b = next_sentence
+        is_next = True
+    else:
+        random_sentence = random.choice(random.choice(all_documents))
+        tokens_a = sentence
+        tokens_b = random_sentence
+        is_next = False
+    return tokens_a, tokens_b, is_next
+
+
+# Defined in file: ./chapter_natural-language-processing/BERT-processing.md
+def get_tokens_and_segment(tokens_a, tokens_b):
+    tokens = [] 
+    segment_ids = [] 
+
+    tokens.append('[CLS]')
+    segment_ids.append(0)
+
+    for token in tokens_a:
+        tokens.append(token)
+        segment_ids.append(0)
+    tokens.append('[SEP]')
+    segment_ids.append(0)
+
+    for token in tokens_b:
+        tokens.append(token)
+        segment_ids.append(1)
+    tokens.append('[SEP]')
+    segment_ids.append(1)
+    
+    return tokens, segment_ids
+
+
+# Defined in file: ./chapter_natural-language-processing/BERT-processing.md
+def create_next_sentence(document, all_documents, vocab, max_length):
+    instances = []
+    for i in range(len(document)-1):
+        tokens_a, tokens_b, is_next = get_next_sentence(document[i], document[i+1], all_documents)
+        
+        if len(tokens_a) + len(tokens_b) + 3 > max_length:
+             continue
+        tokens, segment_ids = get_tokens_and_segment(tokens_a, tokens_b)
+        instances.append((tokens, segment_ids, is_next))
+    return instances
+
+
+# Defined in file: ./chapter_natural-language-processing/BERT-processing.md
+def choice_mask_tokens(tokens, cand_indexes, num_to_predict, vocab):
+    output_tokens = list(tokens)
+    masked_lms = []
+    random.shuffle(cand_indexes)
+    for index_set in cand_indexes:
+        if len(masked_lms) >= num_to_predict:
+            break
+        if len(masked_lms) + len(index_set) > num_to_predict:
+            continue
+        for index in index_set:
+            masked_token = None
+            if random.random() < 0.8:
+                masked_token = '[MASK]'
+            else:
+                if random.random() < 0.5:
+                    masked_token = tokens[index]
+                else:
+                    masked_token = random.randint(0, len(vocab) - 1)
+
+            output_tokens[index] = masked_token
+            masked_lms.append((index, tokens[index]))
+    return output_tokens, masked_lms
+
+
+# Defined in file: ./chapter_natural-language-processing/BERT-processing.md
+def create_masked_lm(tokens, vocab):
+    cand_indexes = []
+    for (i, token) in enumerate(tokens):
+        if token in ['[CLS]', '[SEP]']:
+            continue
+        cand_indexes.append([i])
+        
+    num_to_predict = max(1, int(round(len(tokens) * 0.15)))
+    
+    output_tokens, masked_lms = choice_mask_tokens(tokens, cand_indexes,
+                                                   num_to_predict, vocab)
+            
+    masked_lms = sorted(masked_lms, key=lambda x: x[0])
+    masked_lm_positions = []
+    masked_lm_labels = []
+    for p in masked_lms:
+        masked_lm_positions.append(p[0])
+        masked_lm_labels.append(p[1])
+        
+    return vocab[output_tokens], masked_lm_positions, vocab[masked_lm_labels]
+
+
+# Defined in file: ./chapter_natural-language-processing/BERT-processing.md
+def convert_numpy(instances, max_length):
+    input_ids, segment_ids, masked_lm_positions, masked_lm_ids = [], [], [], []
+    masked_lm_weights, next_sentence_labels, valid_lengths = [], [], []
+    for instance in instances:
+        input_id = instance[0] + [0] * (max_length - len(instance[0]))
+        segment_id = instance[3] + [0] * (max_length - len(instance[3]))
+        masked_lm_position = instance[1] + [0] * (20 - len(instance[1]))
+        masked_lm_id = instance[2] + [0] * (20 - len(instance[2]))
+        masked_lm_weight = [1.0] * len(instance[2]) + [0.0] * (20 - len(instance[1]))
+        next_sentence_label = instance[4]
+        valid_length = len(instance[0])
+
+        input_ids.append(np.array(input_id, dtype='int32'))
+        segment_ids.append(np.array(segment_id, dtype='int32'))
+        masked_lm_positions.append(np.array(masked_lm_position, dtype='int32'))
+        masked_lm_ids.append(np.array(masked_lm_id, dtype='int32'))
+        masked_lm_weights.append(np.array(masked_lm_weight, dtype='float32'))
+        next_sentence_labels.append(np.array(next_sentence_label))
+        valid_lengths.append(np.array(valid_length))
+    return input_ids, masked_lm_ids, masked_lm_positions, masked_lm_weights,\
+           next_sentence_labels, segment_ids, valid_lengths
+
+
+# Defined in file: ./chapter_natural-language-processing/BERT-processing.md
+def create_training_instances(train_data, vocab, max_length):
+    instances = []
+    for i, document in enumerate(train_data):
+        instances.extend(create_next_sentence(document, train_data, vocab, max_length))
+    instances = [(create_masked_lm(tokens, vocab) + (segment_ids, is_random_next))
+                 for (tokens, segment_ids, is_random_next) in instances]
+    input_ids, masked_lm_ids, masked_lm_positions, masked_lm_weights,\
+           next_sentence_labels, segment_ids, valid_lengths = convert_numpy(instances, max_length)
+    return input_ids, masked_lm_ids, masked_lm_positions, masked_lm_weights,\
+           next_sentence_labels, segment_ids, valid_lengths
+
+
+# Defined in file: ./chapter_natural-language-processing/BERT-processing.md
+class WikiDataset(gluon.data.Dataset):
+    def __init__(self, dataset, max_length = 128):
+        train_tokens = [d2l.tokenize(row, token='word') for row in dataset]
+        
+        text_list=[]
+        [text_list.extend(row) for row in train_tokens]
+        self.vocab = d2l.Vocab(text_list, min_freq=5, 
+                               reserved_tokens=['[MASK]', '[CLS]', '[SEP]'])
+        self.input_ids, self.masked_lm_ids, self.masked_lm_positions,\
+        self.masked_lm_weights, self.next_sentence_labels, self.segment_ids,\
+        self.valid_lengths = create_training_instances(train_tokens, self.vocab, max_length)
+
+    def __getitem__(self, idx):
+        return self.input_ids[idx], self.masked_lm_ids[idx], self.masked_lm_positions[idx], self.masked_lm_weights[idx],\
+           self.next_sentence_labels[idx], self.segment_ids[idx], self.valid_lengths[idx]
+
+    def __len__(self):
+        return len(self.input_ids)
+
+
+# Defined in file: ./chapter_natural-language-processing/BERT-processing.md
+def load_data_wiki(batch_size, data_set = 'wikitext-2', num_steps=128):
+    data_dir = d2l.download_extract(data_set, data_set)
+    train_data = read_wiki(data_dir)
+    train_set = WikiDataset(train_data, num_steps)
+    train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True)
+    return train_iter, train_set.vocab
+
+
+# Defined in file: ./chapter_natural-language-processing/BERT-processing.md
+def _get_batch_bert(batch, ctx):
+    (input_id, masked_id, masked_position, masked_weight, \
+     next_sentence_label, segment_id, valid_length) = batch
+    
+    return (gluon.utils.split_and_load(input_id, ctx, even_split=False),
+            gluon.utils.split_and_load(masked_id, ctx, even_split=False),
+            gluon.utils.split_and_load(masked_position, ctx, even_split=False),
+            gluon.utils.split_and_load(masked_weight, ctx, even_split=False),
+            gluon.utils.split_and_load(next_sentence_label, ctx, even_split=False),
+            gluon.utils.split_and_load(segment_id, ctx, even_split=False),
+            gluon.utils.split_and_load(valid_length.astype('float32'), ctx, even_split=False))
+
+
+# Defined in file: ./chapter_natural-language-processing/BERT-processing.md
+def batch_loss_bert(net, nsp_loss, mlm_loss, input_id, masked_id, masked_position,
+                    masked_weight, next_sentence_label, segment_id, valid_length, vocab_size):
+    ls = []
+    ls_mlm = []
+    ls_nsp = []
+    for i_id, m_id, m_pos, m_w, nsl, s_i, v_l in zip(input_id, masked_id, masked_position, masked_weight,\
+                                                      next_sentence_label, segment_id, valid_length):
+        num_masks = m_w.sum() + 1e-8
+        _, classified, decoded = net(i_id, s_i, v_l.reshape(-1),m_pos)
+        l_mlm = mlm_loss(decoded.reshape((-1, vocab_size)),m_id.reshape(-1), m_w.reshape((-1, 1)))
+        l_mlm = l_mlm.sum() / num_masks
+        l_nsp = nsp_loss(classified, nsl)
+        l_nsp = l_nsp.mean()
+        l = l_mlm + l_nsp
+        ls.append(l)
+        ls_mlm.append(l_mlm)
+        ls_nsp.append(l_nsp)
+        npx.waitall()
+    return ls, ls_mlm, ls_nsp
+
+
+# Defined in file: ./chapter_natural-language-processing/BERT-processing.md
+def train_bert(data_eval, net, nsp_loss, mlm_loss, vocab_size, ctx, log_interval, max_step):
+    trainer = gluon.Trainer(net.collect_params(), 'adam')
+    step_num = 0
+    while step_num < max_step:
+        eval_begin_time = time.time()
+        begin_time = time.time()
+        
+        running_mlm_loss = running_nsp_loss = 0
+        total_mlm_loss = total_nsp_loss = 0
+        running_num_tks = 0
+        for _, data_batch in enumerate(data_eval):
+            (input_id, masked_id, masked_position, masked_weight, \
+             next_sentence_label, segment_id, valid_length) = _get_batch_bert(data_batch, ctx)
+            
+            step_num += 1
+            with autograd.record():
+                ls, ls_mlm, ls_nsp = batch_loss_bert(net, nsp_loss, mlm_loss, input_id, masked_id, masked_position, masked_weight, next_sentence_label, segment_id, valid_length, vocab_size)
+            for l in ls:
+                l.backward()
+            
+            trainer.step(1)
+            
+            running_mlm_loss += sum([l for l in ls_mlm])
+            running_nsp_loss += sum([l for l in ls_nsp])
+
+            if (step_num + 1) % (log_interval) == 0:
+                total_mlm_loss += running_mlm_loss
+                total_nsp_loss += running_nsp_loss
+                begin_time = time.time()
+                running_mlm_loss = running_nsp_loss = 0
+
+        eval_end_time = time.time()
+        if running_mlm_loss != 0:
+            total_mlm_loss += running_mlm_loss
+            total_nsp_loss += running_nsp_loss
+        total_mlm_loss /= step_num
+        total_nsp_loss /= step_num
+        print('Eval mlm_loss={:.3f}\tnsp_loss={:.3f}\t'
+                     .format(float(total_mlm_loss),
+                             float(total_nsp_loss)))
+        print('Eval cost={:.1f}s'.format(eval_end_time - eval_begin_time))
+
+
 # Defined in file: ./chapter_recommender-systems/movielens.md
 d2l.DATA_HUB['ml-100k'] = (
     'http://files.grouplens.org/datasets/movielens/ml-100k.zip',
     'cd4dcac4241c8a4ad7badc7ca635da8a69dddb83')
+
+
+# Defined in file: ./chapter_recommender-systems/movielens.md
 def read_data_ml100k():
     data_dir = d2l.download_extract('ml-100k')
     names = ['user_id', 'item_id', 'rating', 'timestamp']
-    data = pd.read_csv(data_dir+'u.data', '\t', names=names, engine='python')
+    data = pd.read_csv(data_dir + 'u.data', '\t', names=names,
+                       engine='python')
     num_users = data.user_id.unique().shape[0]
     num_items = data.item_id.unique().shape[0]
     return data, num_users, num_items
@@ -1783,8 +2376,8 @@ def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
 
 
 # Defined in file: ./chapter_recommender-systems/ctr.md
-d2l.DATA_HUB['ctr'] = (d2l.DATA_URL+'ctr.zip',
-                      'e18327c48c8e8e5c23da714dd614e390d369843f')
+d2l.DATA_HUB['ctr'] = (d2l.DATA_URL + 'ctr.zip',
+                       'e18327c48c8e8e5c23da714dd614e390d369843f')
 
 
 # Defined in file: ./chapter_recommender-systems/ctr.md
@@ -1831,7 +2424,7 @@ class CTRDataset(gluon.data.Dataset):
 
 # Defined in file: ./chapter_generative-adversarial-networks/gan.md
 def update_D(X, Z, net_D, net_G, loss, trainer_D):
-    """Update discriminator"""
+    """Update discriminator."""
     batch_size = X.shape[0]
     ones = np.ones((batch_size,), ctx=X.context)
     zeros = np.zeros((batch_size,), ctx=X.context)
@@ -1849,7 +2442,7 @@ def update_D(X, Z, net_D, net_G, loss, trainer_D):
 
 # Defined in file: ./chapter_generative-adversarial-networks/gan.md
 def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
-    """Update generator"""
+    """Update generator."""
     batch_size = Z.shape[0]
     ones = np.ones((batch_size,), ctx=Z.context)
     with autograd.record():
@@ -1864,7 +2457,7 @@ def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
 
 
 # Defined in file: ./chapter_generative-adversarial-networks/dcgan.md
-d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL+'pokemon.zip',
-                          'c065c0e2593b8b161a2d7873e42418bf6a21106c')
+d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
+                           'c065c0e2593b8b161a2d7873e42418bf6a21106c')
 
 

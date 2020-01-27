@@ -23,10 +23,13 @@ Then, we download the MovieLens 100k dataset and load the interactions as `DataF
 d2l.DATA_HUB['ml-100k'] = (
     'http://files.grouplens.org/datasets/movielens/ml-100k.zip',
     'cd4dcac4241c8a4ad7badc7ca635da8a69dddb83')
+
+# Saved in the d2l package for later use
 def read_data_ml100k():
     data_dir = d2l.download_extract('ml-100k')
     names = ['user_id', 'item_id', 'rating', 'timestamp']
-    data = pd.read_csv(data_dir+'u.data', '\t', names=names, engine='python')
+    data = pd.read_csv(data_dir + 'u.data', '\t', names=names,
+                       engine='python')
     num_users = data.user_id.unique().shape[0]
     num_items = data.item_id.unique().shape[0]
     return data, num_users, num_items
