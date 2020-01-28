@@ -224,7 +224,8 @@ Finally, install MXNet and the `d2l` package. The postfix `cu101` means that thi
 
 ```bash
 pip install mxnet-cu101==1.6.0b20191122
-pip install d2l
+pip install git+https://github.com/d2l-ai/d2l-en
+
 ```
 
 
