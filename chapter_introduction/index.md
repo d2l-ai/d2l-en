@@ -1403,7 +1403,7 @@ over the past decade.
   simulations (e.g., using MuJoCo). See e.g.,
   :cite:`Silver.Huang.Maddison.ea.2016` for a description
   of how to achieve this in AlphaGo. In a nutshell,
-  reinforcement learning works best if plenty of (state, action, reward)triples are available, i.e., whenever it is possible to try out lots of things to learn how they relate to each
+  reinforcement learning works best if plenty of (state, action, reward) triples are available, i.e., whenever it is possible to try out lots of things to learn how they relate to each
   other. Simulation provides such an avenue.
 * Deep Learning frameworks have played a crucial role
   in disseminating ideas. The first generation of frameworks
@@ -1469,7 +1469,7 @@ solutions to problems that were considered intractable previously.
   algorithmic and computational progress has led to algorithms
   for a wide range of applications. Unlike Backgammon,
   chess has a much more complex state space and set of actions.
-  DeepBlue beat Gary Kasparov, Campbell et al.
+  DeepBlue beat Garry Kasparov, Campbell et al.
   :cite:`Campbell.Hoane-Jr.Hsu.2002`, using massive parallelism,
   special purpose hardware and efficient search through the game tree.
   Go is more difficult still, due to its huge state space.
