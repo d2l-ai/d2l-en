@@ -75,7 +75,7 @@ fig = d2l.plt.imshow(img)
 show_boxes(fig.axes, [dog_box, cat_box], ['dog', 'cat'])
 ```
 
-Another commonly used bounding box presentation is the $x$ and $y$ axis coordinates of the bounding box center, and its width and height. Here we define functions to convert between these two representations, `box_corner_to_center` converts from the two-corner representation to the center-width-width presentation, and `box_center_to_corner` vice verse. The input argument `boxes` can be either a length $4$ array, or a $(4, n)$ 2-D array. 
+Another commonly used bounding box presentation is the $x$ and $y$ axis coordinates of the bounding box center, and its width and height. Here we define functions to convert between these two representations, `box_corner_to_center` converts from the two-corner representation to the center-width-height presentation, and `box_center_to_corner` vice verse. The input argument `boxes` can be either a length $4$ array, or a $(4, n)$ 2-D array.
 
 ```{.python .input  n=7}
 # Saved in the d2l package for later use
@@ -98,7 +98,7 @@ def box_center_to_corner(boxes):
 
 ```
 
-We can verify the correctness by converting twice. 
+We can verify the correctness by converting twice.
 
 ```{.python .input  n=8}
 boxes = np.array((dog_box, cat_box)).T
@@ -138,7 +138,7 @@ def iou(a, b):
     return inter_area / (a_area + b_area - inter_area)
 ```
 
-Here we draw multiple boxes and visualize their IoU scores compared to the dog bounding box. You can see that a $0.7$ score means these two boxes are quite similar,  a $0.3$ score then implies there is a large gap, and $0$ means there is no overlap. 
+Here we draw multiple boxes and visualize their IoU scores compared to the dog bounding box. You can see that a $0.7$ score means these two boxes are quite similar,  a $0.3$ score then implies there is a large gap, and $0$ means there is no overlap.
 
 ```{.python .input  n=11}
 boxes = [[80, 245, 328, 420], [120, 105, 390, 540], cat_box]
@@ -151,11 +151,13 @@ show_boxes(fig.axes, boxes, ['%.1f'%s for s in scores])
 ## Summary
 
 * In object detection, we not only need to identify all the objects of interest in the image, but also their positions. The positions are generally represented by a rectangular bounding box.
-* We often use Intersection over Union (IoU) to compute the similarity between two bounding boxes.
+* IoU, also called Jaccard index, measures the similarity of two bounding boxes. It is the ratio of the intersecting area to the union area of two bounding boxes.
+
 
 ## Exercises
 
 1. Find some images and try to label a bounding box that contains the target. Compare the difference between the time it takes to label the bounding box and label the category.
+1. Construct two bounding boxes with and IoU of 0.5, and observe their coincidence.
 
 
 ## [Discussions](https://discuss.mxnet.io/t/2444)
