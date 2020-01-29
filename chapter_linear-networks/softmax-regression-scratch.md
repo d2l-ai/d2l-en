@@ -246,7 +246,7 @@ class Accumulator(object):
         self.data = [0.0] * n
 
     def add(self, *args):
-        self.data = [a+b for a, float(b) in zip(self.data, args)]
+        self.data = [a+float(b) for a, b in zip(self.data, args)]
 
     def reset(self):
         self.data = [0] * len(self.data)
