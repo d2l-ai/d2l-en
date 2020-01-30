@@ -64,13 +64,17 @@ not_hotdogs = [train_imgs[-i - 1][0] for i in range(8)]
 d2l.show_images(hotdogs + not_hotdogs, 2, 8, scale=1.4);
 ```
 
-During training, we first crop a random area with random size and random aspect ratio from the image and then scale the area to an input with a height and width of 224 pixels. During testing, we scale the height and width of images to 256 pixels, and then crop the center area with height and width of 224 pixels to use as the input. In addition, we normalize the values of the three RGB (red, green, and blue) color channels. The average of all values of the channel is subtracted from each value and then the result is divided by the standard deviation of all values of the channel to produce the output.
+During training, we first crop a random area with random size and random aspect ratio from the image and then scale the area to an input with a height and width of 224 pixels. During testing, we scale the height and width of images to 256 pixels, and then crop the center area with height and width of 224 pixels to use as the input. In addition, we normalize the values of the three RGB (red, green, and blue) color channels. The mean and variance of the RGB channels are computed based on the ImageNet dataset. The average of all values of the channel is subtracted from each value and then the result is divided by the standard deviation of all values of the channel to produce the output.
 
 ```{.python .input  n=5}
+# Saved in the d2l package for later use
+RGB_MEAN = np.array([0.485, 0.456, 0.406])
+RGB_STD = np.array([0.229, 0.224, 0.225])
+
 # We specify the mean and variance of the three RGB channels to normalize the
 # image channel
 normalize = gluon.data.vision.transforms.Normalize(
-    [0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+    RGB_MEAN.tolist(), RGB_STD.tolist())
 
 train_augs = gluon.data.vision.transforms.Compose([
     gluon.data.vision.transforms.RandomResizedCrop(224),

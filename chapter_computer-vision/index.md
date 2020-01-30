@@ -12,8 +12,8 @@ image-augmentation
 fine-tuning
 bounding-box
 anchor
-multiscale-object-detection
-object-detection-dataset
+voc
+fcn
 ssd
 rcnn
 semantic-segmentation-and-dataset
@@ -23,4 +23,3 @@ neural-style
 kaggle-gluon-cifar10
 kaggle-gluon-dog
 ```
-
