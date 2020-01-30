@@ -1,4 +1,5 @@
 # Natural Language Inference and the Dataset
+:label:`sec_natural-language-inference-and-dataset`
 
 In :numref:`sec_sentiment`, we discussed the problem of sentiment analysis.
 This task aims to classify a single text sequence into predefined categories,

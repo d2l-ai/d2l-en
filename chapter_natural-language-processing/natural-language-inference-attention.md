@@ -1,13 +1,28 @@
 # Natural Language Inference: Using Attention
+:label:`sec_natural-language-inference-attention`
 
-:cite:`Parikh.Tackstrom.Das.ea.2016`
+We introduced the natural language inference (NLI) task and the SNLI dataset in :numref:`sec_natural-language-inference-and-dataset`. In view of many models that are based on complex and deep architectures, Parikh et al. proposed to address NLI with attention mechanisms :cite:`Parikh.Tackstrom.Das.ea.2016`.
+This results in a model without recurrent or convolutional layers, achieving the best result at the time on the SNLI dataset with much fewer parameters.
+We will describe and implement this method in this section.
 
 
-In the previous section, we introduce the natural language inference task. Given the premise and hypothesis, this task identifies the inference relationship between them, including three types: entailment, contradiction and neutral.
 
-This section will discuss one of the classic tasks of natural language inference: decomposable attention model [1]. In the section `Machine translation`, we applied the attention mechanism in machine translation tasks. For these tasks, we can identify the relationship between words through attention mechanism. Decomposable attention model is enlightened by the function of attention mechanism. According to the decomposable attention model, the inference relationship between two sentences can be inferred from the corresponding relationship among the words, which can be found by the attention mechanism. Back then, this model achieved the highest rate of accuracy in Stanford natural language inference dataset, whose number of parameters are also significantly lower than other complicated models.
 
-Firstly, input packages and modules needed by the experiment.
+## Method Overview
+
+Simpler than preserving the order of words in premises and hypotheses,
+we can just align words in one text sequence to every word in the other, and vice versa,
+then compare and aggregate such information to predict the logical relationships
+between premises and hypotheses.
+The alignment of words can be neatly provided by attention mechanisms.
+
+
+![NLI using attention mechanisms. ](../img/nli_attention.svg)
+:label:`fig_nli_attention`
+
+
+:numref:`fig_nli_attention` depicts the NLI method using attention mechanisms.
+At a high level, it consists of three steps: attend, compare, and aggregate.
 
 ```{.python .input  n=1}
 import d2l
@@ -70,19 +85,19 @@ class Attend(nn.Block):
         self.f = mlp(num_hiddens=num_hiddens, flatten=False)
 
     def forward(self, A, B):
-        # Shape of A/B: (batch_size, #words in sentence A/B, embed_size)
-        # Shape of f_A/f_B: (batch_size, #words in sentence A/B, num_hiddens)
+        # Shape of A/B: (batch_size, #words in sequence A/B, embed_size)
+        # Shape of f_A/f_B: (batch_size, #words in sequence A/B, num_hiddens)
         f_A = self.f(A)
         f_B = self.f(B)
-        # Shape of e: (batch_size, #words in sentence A, #words in sentence B)
+        # Shape of e: (batch_size, #words in sequence A, #words in sequence B)
         e = npx.batch_dot(f_A, f_B, transpose_b=True)
-        # Shape of beta: (batch_size, #words in sentence A, embed_size), where
-        # sentence B is softly aligned to each word (axis 1 of beta) in
-        # sentence A
+        # Shape of beta: (batch_size, #words in sequence A, embed_size), where
+        # sequence B is softly aligned to each word (axis 1 of beta) in
+        # sequence A
         beta = npx.batch_dot(npx.softmax(e), B)
-        # Shape of alpha: (batch_size, #words in sentence B, embed_size),
-        # where sentence A is softly aligned to each word (axis 1 of alpha) in
-        # sentence B
+        # Shape of alpha: (batch_size, #words in sequence B, embed_size),
+        # where sequence A is softly aligned to each word (axis 1 of alpha) in
+        # sequence B
         alpha = npx.batch_dot(npx.softmax(e.transpose(0, 2, 1)), A)
         return beta, alpha
 ```
@@ -139,11 +154,11 @@ class Aggregate(nn.Block):
         self.h.add(nn.Dense(num_outputs))
 
     def forward(self, V_A, V_B):
-        # Sum over representations of all the words in sentence A and B to
-        # obtain sentence representations
+        # Sum over representations of all the words in sequence A and B to
+        # obtain sequence representations
         V_A = V_A.sum(axis=1)
         V_B = V_B.sum(axis=1)
-        # Concatenate representations of sentence A and B
+        # Concatenate representations of sequence A and B
         Y_hat = self.h(np.concatenate([V_A, V_B], axis=1))
         return Y_hat
 ```
@@ -247,9 +262,10 @@ predict_snli(net, ['he', 'is', 'good', '.'], ['he', 'is', 'bad', '.'])
 * Decomposable attention model converts natural language inference to comparison of words after alignment.
 
 
-## References
+## Exercises
 
-[1] Parikh, A.P., Täckström, O., Das, D., & Uszkoreit, J. (2016). A Decomposable Attention Model for Natural Language Inference. *EMNLP*.
+1. What are major drawbacks of the decomposable attention model for NLI?
+
 
 ## [Discussions](https://discuss.mxnet.io/t/5518)
 
