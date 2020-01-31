@@ -40,32 +40,26 @@ npx.set_np()
 
 
 
-demo = True
-
-d2l.DATA_HUB['cifar10_tiny'] = (d2l.DATA_URL + 'kaggle_cifar10_tiny.zip',
-                                '2068874e4b9a9f0fb07ebe0ad2b29754449ccacd')
-
-if demo:
-    data_dir = d2l.download_extract('cifar10_tiny')
-    train_data_size = 800
-    batch_size = 1
-else:
-    data_dir = 'data/'
-    train_data_size = 50000
-    batch_size_per_gpu = 128  # 64 images in a batch
-    gpus_per_machine = 2
-    batch_size = batch_size_per_gpu * gpus_per_machine
-
-
-# Create a distributed key-value store
-store = kv.create('dist')
-print(store.num_workers, store.rank)
-
-
-
 #########################################################################################
 ## Only do it once, rather than on multiple workers
 #########################################################################################
+
+# demo = True
+
+# d2l.DATA_HUB['cifar10_tiny'] = (d2l.DATA_URL + 'kaggle_cifar10_tiny.zip',
+#                                 '2068874e4b9a9f0fb07ebe0ad2b29754449ccacd')
+
+# if demo:
+#     data_dir = d2l.download_extract('cifar10_tiny')
+#     train_data_size = 800
+#     batch_size = 1
+# else:
+#     data_dir = 'data/'
+#     train_data_size = 50000
+#     batch_size_per_gpu = 128  # 64 images in a batch
+#     gpus_per_machine = 2
+#     batch_size = batch_size_per_gpu * gpus_per_machine
+
 
 # def reorg_cifar10_data(data_dir, valid_ratio):
 #     labels = d2l.read_csv_labels(data_dir + 'trainLabels.csv')
@@ -74,9 +68,13 @@ print(store.num_workers, store.rank)
 
 # reorg_cifar10_data(data_dir, valid_ratio = 0)
 
-
 #########################################################################################
 
+
+
+# Create a distributed key-value store
+store = kv.create('dist')
+print(store.num_workers, store.rank)
 
 class SplitSampler(gluon.data.sampler.Sampler):
     """ Split the dataset into `num_parts` parts and sample from the 
