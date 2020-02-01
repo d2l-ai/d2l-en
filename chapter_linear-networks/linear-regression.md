@@ -338,7 +338,7 @@ rather than writing costly for-loops in Python.
 
 To illustrate why this matters so much,
 we can consider two methods for adding vectors.
-To start we instantiate two $100000$-dimensional vectors
+To start we instantiate two $10000$-dimensional vectors
 containing all ones.
 In one method we will loop over the vectors with a Python `for` loop.
 In the other method we will rely on a single call to `np`.
