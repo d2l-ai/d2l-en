@@ -274,8 +274,13 @@ npx.set_np()
 
 ## Activation Functions
 
-Because they are so fundamental to deep learning, 
-let briefly survey some common activation functions.
+Activation functions decide whether a neuron should be activated or not by 
+calculating the weighted sum and further adding bias with it. It is a 
+differentiable operator to transform input signals to outputs, some activation 
+functions add non-linearity to its outputs.
+
+Because activation functions are so fundamental to deep learning, 
+let's briefly survey some common activation functions.
 
 ### ReLU Function
 
