@@ -625,8 +625,8 @@ that we started with, and indeed in the specific case shown here of
 
 $$
 \mathbf{A} = \begin{bmatrix}
-1 & -1 \\
-2 & 3
+1 & 2 \\
+-1 & 3
 \end{bmatrix},
 $$
 
