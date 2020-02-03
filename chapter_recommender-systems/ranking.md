@@ -19,7 +19,7 @@ Where $\Theta$ represents the parameters of an arbitrary recommendation model, $
 $$
 \begin{aligned}
 \text{BPR-OPT} : &= \ln p(\Theta \mid >_u) \\
-         &= \ln p(>_u \mid \Theta) p(\Theta) \\
+         & \propto \ln p(>_u \mid \Theta) p(\Theta) \\
          &= \ln \prod_{(u, i, j \in D)} \sigma(\hat{y}_{ui} - \hat{y}_{uj}) p(\Theta) \\
          &= \sum_{(u, i, j \in D)} \ln \sigma(\hat{y}_{ui} - \hat{y}_{uj}) + \ln p(\Theta) \\
          &= \sum_{(u, i, j \in D)} \ln \sigma(\hat{y}_{ui} - \hat{y}_{uj}) - \lambda_\Theta \|\Theta \|^2
