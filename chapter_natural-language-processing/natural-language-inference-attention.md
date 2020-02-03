@@ -7,7 +7,6 @@ We will describe and implement this method in this section.
 
 
 
-
 ## Method Overview
 
 Simpler than preserving the order of words in premises and hypotheses,
