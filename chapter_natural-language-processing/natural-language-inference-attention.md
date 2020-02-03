@@ -3,25 +3,26 @@
 
 We introduced the natural language inference (NLI) task and the SNLI dataset in :numref:`sec_natural-language-inference-and-dataset`. In view of many models that are based on complex and deep architectures, Parikh et al. proposed to address NLI with attention mechanisms :cite:`Parikh.Tackstrom.Das.ea.2016`.
 This results in a model without recurrent or convolutional layers, achieving the best result at the time on the SNLI dataset with much fewer parameters.
-We will describe and implement this method in this section.
+In this section, we will describe and implement this attention-based method for NLI.
 
 
 
-## Method Overview
+## Method
 
 Simpler than preserving the order of words in premises and hypotheses,
 we can just align words in one text sequence to every word in the other, and vice versa,
 then compare and aggregate such information to predict the logical relationships
 between premises and hypotheses.
-The alignment of words can be neatly provided by attention mechanisms.
-
+Similar to alignment of words between source and target sentences in machine translation,
+the alignment of words between premises and hypotheses
+can be neatly accomplished by attention mechanisms.
 
 ![NLI using attention mechanisms. ](../img/nli_attention.svg)
 :label:`fig_nli_attention`
 
-
 :numref:`fig_nli_attention` depicts the NLI method using attention mechanisms.
-At a high level, it consists of three steps: attend, compare, and aggregate.
+At a high level, it consists of three jointly trained steps: attending, comparing, and aggregating.
+We will illustrate them step by step in the following.
 
 ```{.python .input  n=1}
 import d2l
@@ -33,21 +34,26 @@ from mxnet.gluon import nn
 npx.set_np()
 ```
 
-## Model
+### Attending
 
-Before introducing the model, let’s look at the following three sentences:
+The first step is to align words in one text sequence to each word in the other sequence.
+Suppose that the premise is "i do need sleep" and the hypothesis is "i am tired".
+For instance, due to semantical similarity,
+we may wish to align "i" in the premise with "i" in the hypothesis,
+and align "need" and "sleep" in the premise with "tired" in the hypothesis.
+Note that such alignment is *soft* using weighted average,
+where ideally large weights are associated with the words to be aligned.
+Likewise, we may wish to align "i" in the premi
 
-- Bob is in his room, but because of the thunder and lightning outside, he cannot sleep.
-- Bob is awake.
-- It is sunny outside.
 
-“Cannot sleep” in the first sentence and “awake” in the second sentence have the same meaning. Despite the complicated structures of the first sentence, we can also easily reach the conclusion: the second sentence is entailed in the first sentence. Similarly, as “thunder and lighting” in the first sentence and “sunny” in the third sentence are mutually exclusive, we can conclude the first sentence is contradictory to the third sentence.
 
-Based on the above examples, we can find a synonymous or mutually exclusive relationship between the words of premise and hypothesis, which can also conclude the inference relationship between premise and hypothesis. 
+In :numref:`fig_nli_attention`, we may wish to align "i" in the hypothesis with "i" in the premise,
+and align "need" and "sleep" in the hypothesis with "tired" in the hypothesis.
+Note that such alignment is *soft* using weighted average where 
 
-Therefore, it naturally occurs to us that we can divide the task of identifying the inference relationship between premise and hypothesis into subproblems. Firstly, establish the relationship between each word of premise and hypothesis. This step is also known as world alignment. Then, compare the alignment relationship of every word pair to identify the inference relationship between premise and hypothesis. It also involves the three basic steps of the decomposable attention model: attention, comparison and aggregation.
 
-### Attend
+
+
 
 The text sequence of premise consists of $l_A$ words. The text sequence of hypothesis consists of $l_B$ words. The dimension of word embedding is $d$. In the attention process,  the premise $\boldsymbol{A}= (a_1,\ldots,a_{l_A}) \in \mathbb{R}^{l_A \times d}$ and hypothesis $\boldsymbol{B} = (b_1,\ldots,b_{l_B}) \in \mathbb{R}^{l_B \times d}$ are input respectively. $a_i$ and $b_i$ represent the word embedding of Premise A and Hypothesis B.
 
@@ -103,7 +109,8 @@ class Attend(nn.Block):
 
 After this step, we convert this issue into comparing word pairs after alignment.
 
-### Compare
+### Comparing
+
 In the attention process, soft alignment is achieved between every word of premise and hypothesis. In the comparison process, we need to compare all the soft alignment relationships. We also need to represent every word with $a_i$ and represent aligned word with $\beta_i$. Then, the feed-forward network conversion is conducted. The converted vectors are known as comparison vectors. Likewise, we also implement the same step for every word $b_i$ and the aligned word $\alpha_i$.
 
 
@@ -127,7 +134,7 @@ class Compare(nn.Block):
         return V_A, V_B
 ```
 
-### Aggregate
+### Aggregating
 
 Now we have two sets of comparison vectors. In this step, we need to convert the set of comparison vectors to representation vectors of sentences. A relatively simple way is to regard the average value of vectors as the representation vectors of sentences.
 
