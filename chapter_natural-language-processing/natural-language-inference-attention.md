@@ -38,40 +38,27 @@ npx.set_np()
 
 The first step is to align words in one text sequence to each word in the other sequence.
 Suppose that the premise is "i do need sleep" and the hypothesis is "i am tired".
-For instance, due to semantical similarity,
-we may wish to align "i" in the premise with "i" in the hypothesis,
+Due to semantical similarity,
+we may wish to align "i" in the hypothesis with "i" in the premise,
+and align "tired" in the hypothesis with "sleep" in the premise.
+Likewise, we may wish to align "i" in the premise with "i" in the hypothesis,
 and align "need" and "sleep" in the premise with "tired" in the hypothesis.
 Note that such alignment is *soft* using weighted average,
 where ideally large weights are associated with the words to be aligned.
-Likewise, we may wish to align "i" in the premi
+For ease of demonstration, :numref:`fig_nli_attention` shows such alignment in a *hard* way.
 
+Now we describe the soft-alignment using attention mechanisms in more detail.
+Denote by $\mathbf{A} = (\mathbf{a}_1, \ldots, \mathbf{a}_m)$
+and $\mathbf{B} = (\mathbf{b}_1, \ldots, \mathbf{b}_n)$ the premise and hypothesis, 
+whose number of words are $m$ and $n$, respectively,
+where $\mathbf{a}_i, \mathbf{b}_j \in \mathbb{R}^{d}$ ($i = 1, \ldots, m, j = 1, \ldots, n$) is a $d$-dimensional word embedding vector.
+For soft-alignment, we compute the attention weights $e_{ij} \in \mathbb{R}$ as
 
+$$e_{ij} = f(\mathbf{a}_i)^\top f(\mathbf{b}_j),$$
+:eqlabel:`eq_nli_e`
 
-In :numref:`fig_nli_attention`, we may wish to align "i" in the hypothesis with "i" in the premise,
-and align "need" and "sleep" in the hypothesis with "tired" in the hypothesis.
-Note that such alignment is *soft* using weighted average where 
-
-
-
-
-
-The text sequence of premise consists of $l_A$ words. The text sequence of hypothesis consists of $l_B$ words. The dimension of word embedding is $d$. In the attention process,  the premise $\boldsymbol{A}= (a_1,\ldots,a_{l_A}) \in \mathbb{R}^{l_A \times d}$ and hypothesis $\boldsymbol{B} = (b_1,\ldots,b_{l_B}) \in \mathbb{R}^{l_B \times d}$ are input respectively. $a_i$ and $b_i$ represent the word embedding of Premise A and Hypothesis B.
-
-In the previous section of `attention mechanism`, for the seq2seq model, attention mechanism can learn about the intimate connection between the tabs of target sequence and source sequence, which is also a type of word alignment relationship in essence. For this reason, we can use the attention mechanism to learn about the word alignment relationship.
-
-Firstly, we need to calculate the unnormalized attention weight matrix $e$ between  ${a_1,\ldots,a_{l_A}}$  and ${b_1,\ldots,b_{l_B}}$ . In other words, after the feedforward network calculation of $a_i$ and $b_j$, and then calculate the attention of inner product.
-
-$$
-e_{ij} = F(a_i)^\top F(b_j)
-$$
-Next, we need to operate the sentence $A$. In this case, $\beta_i$ is the alignment word corresponding from B to $a_i$. Generally speaking, it is obtained by the weighted array $(b_1,\ldots,b_{l_B})$ of $a_i$. This step is known as soft alignment. Similarly, soft alignment is also necessary for sentence $B$.
-$$
-\beta_i = \sum_{j=1}^{l_B}\frac{\exp(e_{ij})}{ \sum_{k=1}^{l_B} \exp(e_{ik})} b_j,
-$$
-
-$$
-\alpha_j = \sum_{i=1}^{l_A}\frac{\exp(e_{ij})}{ \sum_{k=1}^{l_A} \exp(e_{kj})} a_i,
-$$
+where the function $f$ is a multilayer perceptron defined in the following `mlp` function.
+The output dimension of $f$ is specified by the `num_hiddens` argument of `mlp`.
 
 ```{.python .input  n=2}
 def mlp(num_hiddens, flatten):
@@ -82,6 +69,22 @@ def mlp(num_hiddens, flatten):
     net.add(nn.Dense(num_hiddens, activation='relu', flatten=flatten))
     return net
 ```
+
+Normalizing the attention weights in :eqref:`eq_nli_e`,
+we compute the weighted average of all the word embeddings in the hypothesis
+to obtain representation of the hypothesis that is softly aligned with the word indexed by $i$ in the premise:
+
+$$
+\boldsymbol{\beta}_i = \sum_{j=1}^{n}\frac{\exp(e_{ij})}{ \sum_{k=1}^{n} \exp(e_{ik})} \mathbf{b}_j.
+$$
+
+Likewise, we compute soft-alignment of premise words for each word indexed by $j$ in the hypothesis:
+
+$$
+\boldsymbol{\alpha}_j = \sum_{i=1}^{m}\frac{\exp(e_{ij})}{ \sum_{k=1}^{m} \exp(e_{kj})} \mathbf{a}_i.
+$$
+
+Below we define the `Attend` class to compute the soft-alignment of hypotheses (`beta`) with input premises `A` and soft-alignment of premises (`alpha`) with input hypotheses `B`. 
 
 ```{.python .input  n=3}
 class Attend(nn.Block):
@@ -97,17 +100,15 @@ class Attend(nn.Block):
         # Shape of e: (batch_size, #words in sequence A, #words in sequence B)
         e = npx.batch_dot(f_A, f_B, transpose_b=True)
         # Shape of beta: (batch_size, #words in sequence A, embed_size), where
-        # sequence B is softly aligned to each word (axis 1 of beta) in
+        # sequence B is softly aligned with each word (axis 1 of beta) in
         # sequence A
         beta = npx.batch_dot(npx.softmax(e), B)
         # Shape of alpha: (batch_size, #words in sequence B, embed_size),
-        # where sequence A is softly aligned to each word (axis 1 of alpha) in
-        # sequence B
+        # where sequence A is softly aligned with each word (axis 1 of alpha)
+        # in sequence B
         alpha = npx.batch_dot(npx.softmax(e.transpose(0, 2, 1)), A)
         return beta, alpha
 ```
-
-After this step, we convert this issue into comparing word pairs after alignment.
 
 ### Comparing
 
