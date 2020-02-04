@@ -1,7 +1,7 @@
 # Natural Language Inference: Using Attention
 :label:`sec_natural-language-inference-attention`
 
-We introduced the natural language inference (NLI) task and the SNLI dataset in :numref:`sec_natural-language-inference-and-dataset`. In view of many models that are based on complex and deep architectures, Parikh et al. proposed to address NLI with attention mechanisms :cite:`Parikh.Tackstrom.Das.ea.2016`.
+We introduced the natural language inference (NLI) task and the SNLI dataset in :numref:`sec_natural-language-inference-and-dataset`. In view of many models that are based on complex and deep architectures, Parikh et al. proposed to address NLI with attention mechanisms ("decomposable attention model") :cite:`Parikh.Tackstrom.Das.ea.2016`.
 This results in a model without recurrent or convolutional layers, achieving the best result at the time on the SNLI dataset with much fewer parameters.
 In this section, we will describe and implement this attention-based method for NLI.
 
@@ -47,12 +47,12 @@ Note that such alignment is *soft* using weighted average,
 where ideally large weights are associated with the words to be aligned.
 For ease of demonstration, :numref:`fig_nli_attention` shows such alignment in a *hard* way.
 
-Now we describe the soft-alignment using attention mechanisms in more detail.
+Now we describe the soft alignment using attention mechanisms in more detail.
 Denote by $\mathbf{A} = (\mathbf{a}_1, \ldots, \mathbf{a}_m)$
 and $\mathbf{B} = (\mathbf{b}_1, \ldots, \mathbf{b}_n)$ the premise and hypothesis, 
 whose number of words are $m$ and $n$, respectively,
 where $\mathbf{a}_i, \mathbf{b}_j \in \mathbb{R}^{d}$ ($i = 1, \ldots, m, j = 1, \ldots, n$) is a $d$-dimensional word embedding vector.
-For soft-alignment, we compute the attention weights $e_{ij} \in \mathbb{R}$ as
+For soft alignment, we compute the attention weights $e_{ij} \in \mathbb{R}$ as
 
 $$e_{ij} = f(\mathbf{a}_i)^\top f(\mathbf{b}_j),$$
 :eqlabel:`eq_nli_e`
@@ -78,13 +78,13 @@ $$
 \boldsymbol{\beta}_i = \sum_{j=1}^{n}\frac{\exp(e_{ij})}{ \sum_{k=1}^{n} \exp(e_{ik})} \mathbf{b}_j.
 $$
 
-Likewise, we compute soft-alignment of premise words for each word indexed by $j$ in the hypothesis:
+Likewise, we compute soft alignment of premise words for each word indexed by $j$ in the hypothesis:
 
 $$
 \boldsymbol{\alpha}_j = \sum_{i=1}^{m}\frac{\exp(e_{ij})}{ \sum_{k=1}^{m} \exp(e_{kj})} \mathbf{a}_i.
 $$
 
-Below we define the `Attend` class to compute the soft-alignment of hypotheses (`beta`) with input premises `A` and soft-alignment of premises (`alpha`) with input hypotheses `B`. 
+Below we define the `Attend` class to compute the soft alignment of hypotheses (`beta`) with input premises `A` and soft alignment of premises (`alpha`) with input hypotheses `B`.
 
 ```{.python .input  n=3}
 class Attend(nn.Block):
@@ -112,16 +112,23 @@ class Attend(nn.Block):
 
 ### Comparing
 
-In the attention process, soft alignment is achieved between every word of premise and hypothesis. In the comparison process, we need to compare all the soft alignment relationships. We also need to represent every word with $a_i$ and represent aligned word with $\beta_i$. Then, the feed-forward network conversion is conducted. The converted vectors are known as comparison vectors. Likewise, we also implement the same step for every word $b_i$ and the aligned word $\alpha_i$.
+In the next step, we compare a word in one sequence with the other sequence that is softly aligned with that word. 
+Note that in soft alignment, all the words from one sequence, though with probably different attention weights, will be compared with a word in the other sequence.
+For easy of demonstration, :numref:`fig_nli_attention` pairs words with aligned words in a *hard* way.
+For example, suppose that the attending step determines that "need" and "sleep" in the premise are both aligned with "tired" in the hypothesis, the pair "tired--need sleep" will be compared.
+
+In the comparing step, we feed the concatenation (operator $[\cdot, \cdot]$) of words from one sequence and aligned words from the other sequence into a function $g$ (a multilayer perceptron):
+
+$$
+\mathbf{v}_{A,i} = g([\mathbf{a}_i, \boldsymbol{\beta}_i]), i = 1, \ldots, m\\
+\mathbf{v}_{B,j} = g([\mathbf{b}_j, \boldsymbol{\alpha}_j]), j = 1, \ldots, n.
+$$
+:eqlabel:`eq_nli_v_ab`
 
 
-$$
-v_{1,i} = G([a_i, \beta_i])
-$$
-
-$$
-v_{2,j} = G([b_i, \alpha_i])
-$$
+In :eqref:`eq_nli_v_ab`, $\mathbf{v}_{A,i}$ is the comparison between word $i$ in the premise and all the hypothesis words that are softly aligned with word $i$; 
+while $\mathbf{v}_{B,j}$ is the comparison between word $j$ in the hypothesis and all the premise words that are softly aligned with word $j$.
+The following `Compare` class defines such as comparing step.
 
 ```{.python .input  n=4}
 class Compare(nn.Block):
@@ -137,21 +144,21 @@ class Compare(nn.Block):
 
 ### Aggregating
 
-Now we have two sets of comparison vectors. In this step, we need to convert the set of comparison vectors to representation vectors of sentences. A relatively simple way is to regard the average value of vectors as the representation vectors of sentences.
+With two sets of comparison vectors $\mathbf{v}_{A,i}$ ($i = 1, \ldots, m$) and $\mathbf{v}_{B,j}$ ($j = 1, \ldots, n$) on hand,
+in the last step we will aggregate such information to infer the logical relationship.
+We begin by summing up both sets:
 
 $$
-v_1 = \sum_{i=1}^{l_A}v_{1,i}
+\mathbf{v}_A = \sum_{i=1}^{m} \mathbf{v}_{A,i}, \quad \mathbf{v}_B = \sum_{j=1}^{n}\mathbf{v}_{B,j}.
 $$
 
-$$
-v_2 = \sum_{j=1}^{l_B}v_{2,j}
-$$
-
-Then, we connect the representation vectors of two sentences and classify them through feed-forward network.
+Next we feed the concatenation of both summarization results into function $h$ (a multilayer perceptron) to obtain the classification result of the logical relationship:
 
 $$
-\hat{y} = H([v_1, v_2])
+\hat{\mathbf{y}} = h([\mathbf{v}_A, \mathbf{v}_B]).
 $$
+
+The aggregation step is defined in the following `Aggregate` class.
 
 ```{.python .input  n=5}
 class Aggregate(nn.Block):
@@ -161,11 +168,10 @@ class Aggregate(nn.Block):
         self.h.add(nn.Dense(num_outputs))
 
     def forward(self, V_A, V_B):
-        # Sum over representations of all the words in sequence A and B to
-        # obtain sequence representations
+        # Sum up both sets of comparison vectors
         V_A = V_A.sum(axis=1)
         V_B = V_B.sum(axis=1)
-        # Concatenate representations of sequence A and B
+        # Feed the concatenation of both summarization results into an MLP
         Y_hat = self.h(np.concatenate([V_A, V_B], axis=1))
         return Y_hat
 ```

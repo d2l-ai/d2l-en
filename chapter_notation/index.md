@@ -4,7 +4,7 @@
 The notation used throughout this book is summarized below.
 
 
-## Linear Algebra
+## Numbers
 
 * $x$: A scalar
 * $\mathbf{x}$: A vector
@@ -13,6 +13,7 @@ The notation used throughout this book is summarized below.
 * $\mathbf{I}$: An identity matrix
 * $x_i$, $[\mathbf{x}]_i$: The $i^\mathrm{th}$ element of vector $\mathbf{x}$ 
 * $x_{ij}$, $[\mathbf{X}]_{ij}$: The element of matrix $\mathbf{X}$ at row $i$ and column $j$
+
 
 
 
@@ -38,7 +39,8 @@ The notation used throughout this book is summarized below.
 * $\mathbf{1}_\mathcal{X}$: The indicator function
 * $\mathbf{(\cdot)}^\top$: Transpose of a vector or a matrix             
 * $\mathbf{X}^{-1}$: Inverse of matrix $\mathbf{X}$
-* $\odot$: Hadamard (elementwise) product                
+* $\odot$: Hadamard (elementwise) product 
+* $[\cdot, \cdot]$: Concatenation
 * $\lvert \mathcal{X} \rvert$: Cardinality of set $\mathcal{X}$
 * $\|\cdot\|_p$: $\ell_p$ norm                                 
 * $\|\cdot\|$: $\ell_2$ norm        
