@@ -1,7 +1,7 @@
 # Natural Language Inference: Using Attention
 :label:`sec_natural-language-inference-attention`
 
-We introduced the natural language inference (NLI) task and the SNLI dataset in :numref:`sec_natural-language-inference-and-dataset`. In view of many models that are based on complex and deep architectures, Parikh et al. proposed to address NLI with attention mechanisms ("decomposable attention model") :cite:`Parikh.Tackstrom.Das.ea.2016`.
+We introduced the natural language inference (NLI) task and the SNLI dataset in :numref:`sec_natural-language-inference-and-dataset`. In view of many models that are based on complex and deep architectures, Parikh et al. proposed to address NLI with attention mechanisms and called it a "decomposable attention model" :cite:`Parikh.Tackstrom.Das.ea.2016`.
 This results in a model without recurrent or convolutional layers, achieving the best result at the time on the SNLI dataset with much fewer parameters.
 In this section, we will describe and implement this attention-based method for NLI.
 
@@ -176,9 +176,10 @@ class Aggregate(nn.Block):
         return Y_hat
 ```
 
-## The use of decomposable attention model
+### Putting All Things Together
 
-We combine the above three steps of "attention", "comparison" and "aggregation".
+By putting the attending, comparing, and aggregating steps together,
+we define the decomposable attention model to jointly train these three steps.
 
 ```{.python .input  n=6}
 class DecomposableAttention(nn.Block):
@@ -187,6 +188,7 @@ class DecomposableAttention(nn.Block):
         self.embedding = nn.Embedding(len(vocab), embed_size)
         self.attend = Attend(num_hiddens)
         self.compare = Compare(num_hiddens)
+        # There are 3 possible outputs: entailment, contradiction, and neutral
         self.aggregate = Aggregate(num_hiddens, 3)
 
     def forward(self, X):
@@ -198,6 +200,10 @@ class DecomposableAttention(nn.Block):
         Y_hat = self.aggregate(V_A, V_B)
         return Y_hat
 ```
+
+## Training and Evaluating the Model
+
+Now we train and evaluate the model.
 
 ### Read dataset
 
