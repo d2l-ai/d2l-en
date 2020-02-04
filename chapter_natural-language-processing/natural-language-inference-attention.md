@@ -1,28 +1,28 @@
 # Natural Language Inference: Using Attention
 :label:`sec_natural-language-inference-attention`
 
-We introduced the natural language inference (NLI) task and the SNLI dataset in :numref:`sec_natural-language-inference-and-dataset`. In view of many models that are based on complex and deep architectures, Parikh et al. proposed to address NLI with attention mechanisms :cite:`Parikh.Tackstrom.Das.ea.2016`.
+We introduced the natural language inference (NLI) task and the SNLI dataset in :numref:`sec_natural-language-inference-and-dataset`. In view of many models that are based on complex and deep architectures, Parikh et al. proposed to address NLI with attention mechanisms and called it a "decomposable attention model" :cite:`Parikh.Tackstrom.Das.ea.2016`.
 This results in a model without recurrent or convolutional layers, achieving the best result at the time on the SNLI dataset with much fewer parameters.
-We will describe and implement this method in this section.
+In this section, we will describe and implement this attention-based method for NLI.
 
 
 
-
-## Method Overview
+## Method
 
 Simpler than preserving the order of words in premises and hypotheses,
 we can just align words in one text sequence to every word in the other, and vice versa,
 then compare and aggregate such information to predict the logical relationships
 between premises and hypotheses.
-The alignment of words can be neatly provided by attention mechanisms.
-
+Similar to alignment of words between source and target sentences in machine translation,
+the alignment of words between premises and hypotheses
+can be neatly accomplished by attention mechanisms.
 
 ![NLI using attention mechanisms. ](../img/nli_attention.svg)
 :label:`fig_nli_attention`
 
-
 :numref:`fig_nli_attention` depicts the NLI method using attention mechanisms.
-At a high level, it consists of three steps: attend, compare, and aggregate.
+At a high level, it consists of three jointly trained steps: attending, comparing, and aggregating.
+We will illustrate them step by step in the following.
 
 ```{.python .input  n=1}
 import d2l
@@ -34,39 +34,31 @@ from mxnet.gluon import nn
 npx.set_np()
 ```
 
-## Model
+### Attending
 
-Before introducing the model, let’s look at the following three sentences:
+The first step is to align words in one text sequence to each word in the other sequence.
+Suppose that the premise is "i do need sleep" and the hypothesis is "i am tired".
+Due to semantical similarity,
+we may wish to align "i" in the hypothesis with "i" in the premise,
+and align "tired" in the hypothesis with "sleep" in the premise.
+Likewise, we may wish to align "i" in the premise with "i" in the hypothesis,
+and align "need" and "sleep" in the premise with "tired" in the hypothesis.
+Note that such alignment is *soft* using weighted average,
+where ideally large weights are associated with the words to be aligned.
+For ease of demonstration, :numref:`fig_nli_attention` shows such alignment in a *hard* way.
 
-- Bob is in his room, but because of the thunder and lightning outside, he cannot sleep.
-- Bob is awake.
-- It is sunny outside.
+Now we describe the soft alignment using attention mechanisms in more detail.
+Denote by $\mathbf{A} = (\mathbf{a}_1, \ldots, \mathbf{a}_m)$
+and $\mathbf{B} = (\mathbf{b}_1, \ldots, \mathbf{b}_n)$ the premise and hypothesis, 
+whose number of words are $m$ and $n$, respectively,
+where $\mathbf{a}_i, \mathbf{b}_j \in \mathbb{R}^{d}$ ($i = 1, \ldots, m, j = 1, \ldots, n$) is a $d$-dimensional word embedding vector.
+For soft alignment, we compute the attention weights $e_{ij} \in \mathbb{R}$ as
 
-“Cannot sleep” in the first sentence and “awake” in the second sentence have the same meaning. Despite the complicated structures of the first sentence, we can also easily reach the conclusion: the second sentence is entailed in the first sentence. Similarly, as “thunder and lighting” in the first sentence and “sunny” in the third sentence are mutually exclusive, we can conclude the first sentence is contradictory to the third sentence.
+$$e_{ij} = f(\mathbf{a}_i)^\top f(\mathbf{b}_j),$$
+:eqlabel:`eq_nli_e`
 
-Based on the above examples, we can find a synonymous or mutually exclusive relationship between the words of premise and hypothesis, which can also conclude the inference relationship between premise and hypothesis. 
-
-Therefore, it naturally occurs to us that we can divide the task of identifying the inference relationship between premise and hypothesis into subproblems. Firstly, establish the relationship between each word of premise and hypothesis. This step is also known as world alignment. Then, compare the alignment relationship of every word pair to identify the inference relationship between premise and hypothesis. It also involves the three basic steps of the decomposable attention model: attention, comparison and aggregation.
-
-### Attend
-
-The text sequence of premise consists of $l_A$ words. The text sequence of hypothesis consists of $l_B$ words. The dimension of word embedding is $d$. In the attention process,  the premise $\boldsymbol{A}= (a_1,\ldots,a_{l_A}) \in \mathbb{R}^{l_A \times d}$ and hypothesis $\boldsymbol{B} = (b_1,\ldots,b_{l_B}) \in \mathbb{R}^{l_B \times d}$ are input respectively. $a_i$ and $b_i$ represent the word embedding of Premise A and Hypothesis B.
-
-In the previous section of `attention mechanism`, for the seq2seq model, attention mechanism can learn about the intimate connection between the tabs of target sequence and source sequence, which is also a type of word alignment relationship in essence. For this reason, we can use the attention mechanism to learn about the word alignment relationship.
-
-Firstly, we need to calculate the unnormalized attention weight matrix $e$ between  ${a_1,\ldots,a_{l_A}}$  and ${b_1,\ldots,b_{l_B}}$ . In other words, after the feedforward network calculation of $a_i$ and $b_j$, and then calculate the attention of inner product.
-
-$$
-e_{ij} = F(a_i)^\top F(b_j)
-$$
-Next, we need to operate the sentence $A$. In this case, $\beta_i$ is the alignment word corresponding from B to $a_i$. Generally speaking, it is obtained by the weighted array $(b_1,\ldots,b_{l_B})$ of $a_i$. This step is known as soft alignment. Similarly, soft alignment is also necessary for sentence $B$.
-$$
-\beta_i = \sum_{j=1}^{l_B}\frac{\exp(e_{ij})}{ \sum_{k=1}^{l_B} \exp(e_{ik})} b_j,
-$$
-
-$$
-\alpha_j = \sum_{i=1}^{l_A}\frac{\exp(e_{ij})}{ \sum_{k=1}^{l_A} \exp(e_{kj})} a_i,
-$$
+where the function $f$ is a multilayer perceptron defined in the following `mlp` function.
+The output dimension of $f$ is specified by the `num_hiddens` argument of `mlp`.
 
 ```{.python .input  n=2}
 def mlp(num_hiddens, flatten):
@@ -77,6 +69,22 @@ def mlp(num_hiddens, flatten):
     net.add(nn.Dense(num_hiddens, activation='relu', flatten=flatten))
     return net
 ```
+
+Normalizing the attention weights in :eqref:`eq_nli_e`,
+we compute the weighted average of all the word embeddings in the hypothesis
+to obtain representation of the hypothesis that is softly aligned with the word indexed by $i$ in the premise:
+
+$$
+\boldsymbol{\beta}_i = \sum_{j=1}^{n}\frac{\exp(e_{ij})}{ \sum_{k=1}^{n} \exp(e_{ik})} \mathbf{b}_j.
+$$
+
+Likewise, we compute soft alignment of premise words for each word indexed by $j$ in the hypothesis:
+
+$$
+\boldsymbol{\alpha}_j = \sum_{i=1}^{m}\frac{\exp(e_{ij})}{ \sum_{k=1}^{m} \exp(e_{kj})} \mathbf{a}_i.
+$$
+
+Below we define the `Attend` class to compute the soft alignment of hypotheses (`beta`) with input premises `A` and soft alignment of premises (`alpha`) with input hypotheses `B`.
 
 ```{.python .input  n=3}
 class Attend(nn.Block):
@@ -92,29 +100,35 @@ class Attend(nn.Block):
         # Shape of e: (batch_size, #words in sequence A, #words in sequence B)
         e = npx.batch_dot(f_A, f_B, transpose_b=True)
         # Shape of beta: (batch_size, #words in sequence A, embed_size), where
-        # sequence B is softly aligned to each word (axis 1 of beta) in
+        # sequence B is softly aligned with each word (axis 1 of beta) in
         # sequence A
         beta = npx.batch_dot(npx.softmax(e), B)
         # Shape of alpha: (batch_size, #words in sequence B, embed_size),
-        # where sequence A is softly aligned to each word (axis 1 of alpha) in
-        # sequence B
+        # where sequence A is softly aligned with each word (axis 1 of alpha)
+        # in sequence B
         alpha = npx.batch_dot(npx.softmax(e.transpose(0, 2, 1)), A)
         return beta, alpha
 ```
 
-After this step, we convert this issue into comparing word pairs after alignment.
+### Comparing
 
-### Compare
-In the attention process, soft alignment is achieved between every word of premise and hypothesis. In the comparison process, we need to compare all the soft alignment relationships. We also need to represent every word with $a_i$ and represent aligned word with $\beta_i$. Then, the feed-forward network conversion is conducted. The converted vectors are known as comparison vectors. Likewise, we also implement the same step for every word $b_i$ and the aligned word $\alpha_i$.
+In the next step, we compare a word in one sequence with the other sequence that is softly aligned with that word. 
+Note that in soft alignment, all the words from one sequence, though with probably different attention weights, will be compared with a word in the other sequence.
+For easy of demonstration, :numref:`fig_nli_attention` pairs words with aligned words in a *hard* way.
+For example, suppose that the attending step determines that "need" and "sleep" in the premise are both aligned with "tired" in the hypothesis, the pair "tired--need sleep" will be compared.
 
+In the comparing step, we feed the concatenation (operator $[\cdot, \cdot]$) of words from one sequence and aligned words from the other sequence into a function $g$ (a multilayer perceptron):
 
 $$
-v_{1,i} = G([a_i, \beta_i])
+\mathbf{v}_{A,i} = g([\mathbf{a}_i, \boldsymbol{\beta}_i]), i = 1, \ldots, m\\
+\mathbf{v}_{B,j} = g([\mathbf{b}_j, \boldsymbol{\alpha}_j]), j = 1, \ldots, n.
 $$
+:eqlabel:`eq_nli_v_ab`
 
-$$
-v_{2,j} = G([b_i, \alpha_i])
-$$
+
+In :eqref:`eq_nli_v_ab`, $\mathbf{v}_{A,i}$ is the comparison between word $i$ in the premise and all the hypothesis words that are softly aligned with word $i$; 
+while $\mathbf{v}_{B,j}$ is the comparison between word $j$ in the hypothesis and all the premise words that are softly aligned with word $j$.
+The following `Compare` class defines such as comparing step.
 
 ```{.python .input  n=4}
 class Compare(nn.Block):
@@ -128,23 +142,23 @@ class Compare(nn.Block):
         return V_A, V_B
 ```
 
-### Aggregate
+### Aggregating
 
-Now we have two sets of comparison vectors. In this step, we need to convert the set of comparison vectors to representation vectors of sentences. A relatively simple way is to regard the average value of vectors as the representation vectors of sentences.
-
-$$
-v_1 = \sum_{i=1}^{l_A}v_{1,i}
-$$
+With two sets of comparison vectors $\mathbf{v}_{A,i}$ ($i = 1, \ldots, m$) and $\mathbf{v}_{B,j}$ ($j = 1, \ldots, n$) on hand,
+in the last step we will aggregate such information to infer the logical relationship.
+We begin by summing up both sets:
 
 $$
-v_2 = \sum_{j=1}^{l_B}v_{2,j}
+\mathbf{v}_A = \sum_{i=1}^{m} \mathbf{v}_{A,i}, \quad \mathbf{v}_B = \sum_{j=1}^{n}\mathbf{v}_{B,j}.
 $$
 
-Then, we connect the representation vectors of two sentences and classify them through feed-forward network.
+Next we feed the concatenation of both summarization results into function $h$ (a multilayer perceptron) to obtain the classification result of the logical relationship:
 
 $$
-\hat{y} = H([v_1, v_2])
+\hat{\mathbf{y}} = h([\mathbf{v}_A, \mathbf{v}_B]).
 $$
+
+The aggregation step is defined in the following `Aggregate` class.
 
 ```{.python .input  n=5}
 class Aggregate(nn.Block):
@@ -154,18 +168,18 @@ class Aggregate(nn.Block):
         self.h.add(nn.Dense(num_outputs))
 
     def forward(self, V_A, V_B):
-        # Sum over representations of all the words in sequence A and B to
-        # obtain sequence representations
+        # Sum up both sets of comparison vectors
         V_A = V_A.sum(axis=1)
         V_B = V_B.sum(axis=1)
-        # Concatenate representations of sequence A and B
+        # Feed the concatenation of both summarization results into an MLP
         Y_hat = self.h(np.concatenate([V_A, V_B], axis=1))
         return Y_hat
 ```
 
-## The use of decomposable attention model
+### Putting All Things Together
 
-We combine the above three steps of "attention", "comparison" and "aggregation".
+By putting the attending, comparing, and aggregating steps together,
+we define the decomposable attention model to jointly train these three steps.
 
 ```{.python .input  n=6}
 class DecomposableAttention(nn.Block):
@@ -174,6 +188,7 @@ class DecomposableAttention(nn.Block):
         self.embedding = nn.Embedding(len(vocab), embed_size)
         self.attend = Attend(num_hiddens)
         self.compare = Compare(num_hiddens)
+        # There are 3 possible outputs: entailment, contradiction, and neutral
         self.aggregate = Aggregate(num_hiddens, 3)
 
     def forward(self, X):
@@ -185,6 +200,10 @@ class DecomposableAttention(nn.Block):
         Y_hat = self.aggregate(V_A, V_B)
         return Y_hat
 ```
+
+## Training and Evaluating the Model
+
+Now we train and evaluate the model.
 
 ### Read dataset
 
