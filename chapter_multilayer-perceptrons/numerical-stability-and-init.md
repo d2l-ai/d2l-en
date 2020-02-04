@@ -247,7 +247,8 @@ $U\left[-\sqrt{6/(n_\mathrm{in} + n_\mathrm{out})}, \sqrt{6/(n_\mathrm{in} + n_\
 
 The reasoning above barely scratches the surface
 of modern approaches to parameter initialization.
-In fact, MXNet has an entire `mxnet.initializer` module
+In fact, MXNet has an entire 
+[`mxnet.initializer`](https://mxnet.apache.org/api/python/docs/api/initializer/index.html) module
 implementing over a dozen different heuristics.
 Moreover, initialization continues to be a hot area of inquiry
 within research into the fundamental theory of neural network optimization.
