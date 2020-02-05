@@ -266,7 +266,7 @@ In the above section, we saw how to perform elementwise operations
 on two `ndarray`s of the same shape. Under certain conditions, 
 even when shapes differ, we can still perform elementwise operations
 by invoking the *broadcasting mechanism*.
-This mechanism work in the following way:
+This mechanism works in the following way:
 First, expand one or both arrays
 by copying elements appropriately 
 so that after this transformation, 
