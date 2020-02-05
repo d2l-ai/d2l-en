@@ -201,9 +201,11 @@ class DecomposableAttention(nn.Block):
 
 ## Training and Evaluating the Model
 
-Now we train and evaluate the model.
+Now we will train and evaluate the defined decomposable attention model on the SNLI dataset.
+We begin by reading the dataset. 
 
-### Read dataset
+
+### Reading the dataset
 
 We use the Stanford natural language inference dataset to formulate examples of training set and testing set, as well as define iterators of training set and testing set.
 
