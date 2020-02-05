@@ -1692,7 +1692,7 @@ def read_imdb(data_dir, is_train):
             with open(folder_name + file, 'rb') as f:
                 review = f.read().decode('utf-8').replace('\n', '')
                 data.append(review)
-                labels.append(1 if label == 'pos' else 0)
+                labels.append(1 if label == 'pos/' else 0)
     return data, labels
 
 
@@ -1787,6 +1787,24 @@ def load_data_snli(batch_size, num_steps=50):
     train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True)
     test_iter = gluon.data.DataLoader(test_set, batch_size, shuffle=False)
     return train_iter, test_iter, train_set.vocab
+
+
+# Defined in file: ./chapter_natural-language-processing/natural-language-inference-attention.md
+def split_batch_multi_inputs(X, y, ctx_list):
+    """Split multi-input X and y into multiple devices specified by ctx"""
+    X = list(zip(*[gluon.utils.split_and_load(
+        feature, ctx_list, even_split=False) for feature in X]))
+    return (X, gluon.utils.split_and_load(y, ctx_list, even_split=False))
+
+
+# Defined in file: ./chapter_natural-language-processing/natural-language-inference-attention.md
+def predict_snli(net, premise, hypothesis):
+    premise = np.array(vocab[premise], ctx=d2l.try_gpu())
+    hypothesis = np.array(vocab[hypothesis], ctx=d2l.try_gpu())
+    label = np.argmax(net([premise.reshape((1, -1)),
+                           hypothesis.reshape((1, -1))]), axis=1)
+    return 'entailment' if label == 0 else 'contradiction' if label == 1 \
+            else 'neutral'
 
 
 # Defined in file: ./chapter_recommender-systems/movielens.md
