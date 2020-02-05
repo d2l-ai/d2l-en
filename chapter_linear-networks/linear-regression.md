@@ -582,7 +582,7 @@ We invoke Stuart Russell and Peter Norvig who,
 in their classic AI text book
 *Artificial Intelligence: A Modern Approach* :cite:`Russell.Norvig.2016`,
 pointed out that although airplanes might have been *inspired* by birds,
-orninthology has not been the primary driver
+ornithology has not been the primary driver
 of aeronautics innovation for some centuries.
 Likewise, inspiration in deep learning these days
 comes in equal or greater measure from mathematics,
