@@ -41,7 +41,7 @@ def read_imdb(data_dir, is_train):
             with open(folder_name + file, 'rb') as f:
                 review = f.read().decode('utf-8').replace('\n', '')
                 data.append(review)
-                labels.append(1 if label == 'pos' else 0)
+                labels.append(1 if label == 'pos/' else 0)
     return data, labels
 
 train_data = read_imdb(data_dir, is_train=True)
