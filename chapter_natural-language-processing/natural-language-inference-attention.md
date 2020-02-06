@@ -7,7 +7,7 @@ In this section, we will describe and implement this attention-based method for 
 
 
 
-## Method
+## The Model
 
 Simpler than preserving the order of words in premises and hypotheses,
 we can just align words in one text sequence to every word in the other, and vice versa,
@@ -69,6 +69,12 @@ def mlp(num_hiddens, flatten):
     net.add(nn.Dense(num_hiddens, activation='relu', flatten=flatten))
     return net
 ```
+
+It should be highlighted that, in :eqref:`eq_nli_e`
+$f$ takes inputs $\mathbf{a}_i$ and $\mathbf{b}_j$ separately rather than takes a pair of them together as the input.
+This *decomposition* trick leads to only $m + n$ applications (linear complexity) of $f$ rather than $mn$ applications
+(quadratic complexity).
+
 
 Normalizing the attention weights in :eqref:`eq_nli_e`,
 we compute the weighted average of all the word embeddings in the hypothesis
@@ -207,33 +213,35 @@ We begin by reading the dataset.
 
 ### Reading the dataset
 
-We use the Stanford natural language inference dataset to formulate examples of training set and testing set, as well as define iterators of training set and testing set.
+We download and read the SNLI dataset using the function defined in :numref:`sec_natural-language-inference-and-dataset`. The batch size and sequence length are set to $256$ and $50$, respectively.
 
 ```{.python .input  n=7}
 batch_size, num_steps = 256, 50
 train_iter, test_iter, vocab = d2l.load_data_snli(batch_size, num_steps)
 ```
 
-Create a `DecomposableAttention` instance.
+### Creating the Model
+
+We use the pretrained $100$-dimensional GloVe embedding to represent the input tokens.
+Thus, we predefine the dimension of vectors $\mathbf{a}_i$ and $\mathbf{b}_j$ in :eqlabel:`eq_nli_e` as $100$.
+The output dimension of functions $f$ in :eqref:`eq_nli_e` and $g$ in :eqref:`eq_nli_v_ab` is set to $200$.
+Then we create a model instance, initialize its parameters,
+and load the GloVe embedding to initialize vectors of input tokens.
 
 ```{.python .input  n=8}
 embed_size, num_hiddens, ctx = 100, 200, d2l.try_all_gpus()
 net = DecomposableAttention(vocab, embed_size, num_hiddens)
 net.initialize(init.Xavier(), ctx=ctx)
-```
-
-### Training the model
-
-We use the pre-trained word vector as the feature vector of every word. In this case, we load the 100-dimension GloVe vector for every word in vocab. It should be noted that the dimension of the pre-trained word vector needs to agree with embed_size of the embedded layer of established models.
-
-```{.python .input  n=9}
 glove_embedding = text.embedding.create(
     'glove', pretrained_file_name='glove.6B.100d.txt')
 embeds = glove_embedding.get_vecs_by_tokens(vocab.idx_to_token)
 net.embedding.weight.set_data(embeds)
 ```
 
-We define the `split_batch_multi_input` function. This function divides and copies multiple small batches of data samples to video memories in ctx variables.
+### Training and Evaluating the Model
+
+In contrast to the `split_batch` function in :numref:`sec_multi_gpu` that takes single inputs such as text sequences (or images),
+we define a `split_batch_multi_inputs` function to take multiple inputs such as premises and hypotheses in minibatches.
 
 ```{.python .input  n=10}
 # Saved in the d2l package for later use
@@ -244,7 +252,7 @@ def split_batch_multi_inputs(X, y, ctx_list):
     return (X, gluon.utils.split_and_load(y, ctx_list, even_split=False))
 ```
 
-Now, we can start training.
+Now we can train and evaluate the model on the SNLI dataset.
 
 ```{.python .input  n=11}
 lr, num_epochs = 0.001, 4
@@ -254,9 +262,9 @@ d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, ctx,
                split_batch_multi_inputs)
 ```
 
-### Evaluating the Model
+### Using the Model
 
-Finally, define the prediction function.
+Finally, define the prediction function to output the logical relationship between a pair of premise and hypothesis.
 
 ```{.python .input  n=14}
 # Saved in the d2l package for later use
@@ -269,7 +277,7 @@ def predict_snli(net, premise, hypothesis):
             else 'neutral'
 ```
 
-Next, trained models are used to infer the relationship between two simple sentences.
+We can use the trained model to obtain the NLI result for a sample pair of sentences.
 
 ```{.python .input  n=15}
 predict_snli(net, ['he', 'is', 'good', '.'], ['he', 'is', 'bad', '.'])
@@ -277,13 +285,17 @@ predict_snli(net, ['he', 'is', 'good', '.'], ['he', 'is', 'bad', '.'])
 
 ## Summary
 
-* Attention mechanism can be used to conduct the soft alignment of words.
-* Decomposable attention model converts natural language inference to comparison of words after alignment.
+* The decomposable attention model consists of three steps for predicting the logical relationships between premises and hypotheses: attending, comparing, and aggregating.
+* With attention mechanisms, we can align words in one text sequence to every word in the other, and vice versa. Such alignment is soft using weighted average, where ideally large weights are associated with the words to be aligned.
+* The decomposition trick leads to a more desirable linear complexity than quadratic complexity when computing attention weights.
+* We can use pretrained word embedding as the input representation for downstream NLP task such as NLI.
 
 
 ## Exercises
 
+1. Train the model with other combinations of hyperparameters. Can you get better accuracy on the test set?
 1. What are major drawbacks of the decomposable attention model for NLI?
+1. Suppose that we want to get the level of semantical similarity (e.g., a continuous value between $0$ and $1$) for any pair of sentences. How shall we collect and label the dataset? Can you design a model with attention mechanisms?
 
 
 ## [Discussions](https://discuss.mxnet.io/t/5518)
