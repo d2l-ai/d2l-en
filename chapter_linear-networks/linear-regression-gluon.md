@@ -69,7 +69,7 @@ for X, y in data_iter:
 ## Defining the Model
 
 When we implemented linear regression from scratch
-(in :numref`sec_linear_scratch`),
+(in :numref:`sec_linear_scratch`),
 we defined our model parameters explicitly
 and coded up the calculations to produce output
 using basic linear algebra operations.
