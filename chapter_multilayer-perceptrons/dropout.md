@@ -331,7 +331,7 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 
 1. Try out what happens if you change the dropout probabilities for layers 1 and 2. In particular, what happens if you switch the ones for both layers?
 1. Increase the number of epochs and compare the results obtained when using dropout with those when not using it.
-1. Compute the variance of the the activation random variables after applying dropout.
+1. Compute the variance of the activation random variables after applying dropout.
 1. Why should you typically not using dropout?
 1. If changes are made to the model to make it more complex, such as adding hidden layer units, will the effect of using dropout to cope with overfitting be more obvious?
 1. Using the model in this section as an example, compare the effects of using dropout and weight decay. What if dropout and weight decay are used at the same time?
