@@ -215,7 +215,7 @@ def train(net_D, net_G, data_iter, num_epochs, lr, latent_dim,
                        batch_size)
         # Show generated examples
         Z = np.random.normal(0, 1, size=(21, latent_dim, 1, 1), ctx=ctx)
-        # Noramlize the synthetic data to N(0, 1)
+        # Normalize the synthetic data to N(0, 1)
         fake_x = net_G(Z).transpose(0, 2, 3, 1)/2+0.5
         imgs = np.concatenate(
             [np.concatenate([fake_x[i * 7 + j] for j in range(7)], axis=1)

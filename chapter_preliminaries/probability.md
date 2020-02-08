@@ -94,7 +94,7 @@ Specifically, we calculate the relative frequency as the estimate of the true pr
 ```{.python .input  n=5}
 # Store the results as 32-bit floats for division
 counts = np.random.multinomial(1000, fair_probs).astype(np.float32)
-counts / 1000  # Reletive frequency as the estimate
+counts / 1000  # Relative frequency as the estimate
 ```
 
 Because we generated the data from a fair die, we know that each outcome has true probability $\frac{1}{6}$, roughly $0.167$, so the above output estimates look good. 

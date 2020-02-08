@@ -352,7 +352,7 @@ class DecoderBlock(nn.Block):
         self.addnorm_3 = AddNorm(dropout)
 
     def forward(self, X, state):
-        enc_outputs, enc_valid_lengh = state[0], state[1]
+        enc_outputs, enc_valid_length = state[0], state[1]
         # state[2][i] contains the past queries for this block
         if state[2][self.i] is None:
             key_values = X
@@ -370,7 +370,7 @@ class DecoderBlock(nn.Block):
 
         X2 = self.attention_1(X, key_values, key_values, valid_length)
         Y = self.addnorm_1(X, X2)
-        Y2 = self.attention_2(Y, enc_outputs, enc_outputs, enc_valid_lengh)
+        Y2 = self.attention_2(Y, enc_outputs, enc_outputs, enc_valid_length)
         Z = self.addnorm_2(Y, Y2)
         return self.addnorm_3(Z, self.ffn(Z)), state
 ```
@@ -387,7 +387,7 @@ decoder_blk(X, state)[0].shape
 
 The construction of the entire  Transformer decoder is identical to the  Transformer encoder, except for the additional dense layer to obtain the output confidence scores. 
 
-Let's implement the  Transformer decoder `TransformerDecoder`. Besides the regular hyperparameters such as the `vocab_size` and `embedding_size`, the  Transformer decoder also needs the encoder Transformer's outputs `enc_outputs` and `env_valid_lengh`.
+Let's implement the  Transformer decoder `TransformerDecoder`. Besides the regular hyperparameters such as the `vocab_size` and `embedding_size`, the  Transformer decoder also needs the encoder Transformer's outputs `enc_outputs` and `env_valid_length`.
 
 ```{.python .input  n=18}
 class TransformerDecoder(d2l.Decoder):
@@ -405,8 +405,8 @@ class TransformerDecoder(d2l.Decoder):
                              dropout, i))
         self.dense = nn.Dense(vocab_size, flatten=False)
 
-    def init_state(self, enc_outputs, env_valid_lengh, *args):
-        return [enc_outputs, env_valid_lengh, [None]*self.num_layers]
+    def init_state(self, enc_outputs, env_valid_length, *args):
+        return [enc_outputs, env_valid_length, [None]*self.num_layers]
 
     def forward(self, X, state):
         X = self.pos_encoding(self.embed(X) * math.sqrt(self.embedding_size))
