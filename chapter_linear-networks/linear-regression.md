@@ -190,7 +190,7 @@ To start, we can subsume the bias $b$ into the parameter $\mathbf{w}$
 by appending a column to the design matrix consisting of all $1s$.
 Then our prediction problem is to minimize $||\mathbf{y} - X\mathbf{w}||$.
 Because this expression has a quadratic form, it is convex,
-and as long as the problem is not degenerate
+and so long as the problem is not degenerate
 (our features are linearly independent), it is strictly convex.
 
 Thus there is just one critical point on the loss surface
