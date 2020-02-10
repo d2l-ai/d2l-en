@@ -140,8 +140,8 @@ Note that the height and width of the representation
 at each layer throughout the convolutional block is reduced
 (compared to the previous layer).
 The first convolutional layer uses a kernel
-with a height and width of 5, and a $2$ pixels of padding 
-compensates the reduction in its original shape.
+with a height and width of 5, and then a $2$ pixels of padding 
+which compensates the reduction in its original shape.
 While the second convolutional layer applies a same shape of 
 $5 x 5$ kernel with no padding, which results in reductions 
 in both height and width by 4 pixels.
