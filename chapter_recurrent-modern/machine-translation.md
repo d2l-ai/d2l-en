@@ -76,7 +76,7 @@ We visualize the histogram of the number of tokens per sentence in the following
 d2l.set_figsize((3.5, 2.5))
 d2l.plt.hist([[len(l) for l in source], [len(l) for l in target]],
              label=['source', 'target'])
-d2l.plt.legend(loc='upper right')
+d2l.plt.legend(loc='upper right');
 ```
 
 ## Vocabulary
@@ -148,7 +148,7 @@ Let's read the first batch.
 
 ```{.python .input  n=10}
 src_vocab, tgt_vocab, train_iter = load_data_nmt(batch_size=2, num_steps=8)
-for X, X_vlen, Y, Y_vlen, in train_iter:
+for X, X_vlen, Y, Y_vlen in train_iter:
     print('X:\n', X.astype('int32'))
     print('Valid lengths for X:', X_vlen)
     print('Y:\n', Y.astype('int32'))
