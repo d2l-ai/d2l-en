@@ -139,11 +139,12 @@ for layer in net:
 Note that the height and width of the representation
 at each layer throughout the convolutional block is reduced
 (compared to the previous layer).
-The convolutional layer uses a kernel
-with a height and width of 5,
-which with only $2$ pixels of padding in the first convolutional layer
-and none in the second convolutional layer
-leads to reductions in both height and width by 2 and 4 pixels, respectively.
+The first convolutional layer uses a kernel
+with a height and width of 5, and a $2$ pixels of padding 
+compensates the reduction in its original shape.
+While the second convolutional layer applies a same shape of 
+$5 x 5$ kernel with no padding, which results in reductions 
+in both height and width by 4 pixels.
 Moreover each pooling layer halves the height and width.
 However, as we go up the stack of layers,
 the number of channels increases layer-over-layer
