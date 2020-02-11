@@ -147,7 +147,6 @@
 
 ## Citations
 
-
 1. Run `pip install git+https://github.com/d2l-ai/d2l-book`
 1. Use bibtool to generate consistent keys for bibtex entries. Install it by `brew install bib-tool`
 1. Add an bibtex entry to `d2l.bib` on the root directory. Say the original entry is

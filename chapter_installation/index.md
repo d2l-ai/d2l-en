@@ -94,7 +94,8 @@ We also install the `d2l` package that encapsulates frequently used
 functions and classes in this book.
 
 ```bash
-pip install d2l
+pip install git+https://github.com/d2l-ai/d2l-en
+
 ```
 
 
@@ -113,7 +114,7 @@ To exit the environment, run `conda deactivate`.
 
 ## Upgrading to a New Version
 
-Both this book and MXNet are keeping improving. Please check a new version from time to time.
+Both this book and MXNet keep being improved. Please check a new version from time to time.
 
 1. The URL https://d2l.ai/d2l-en.zip always points to the latest contents.
 2. Please upgrade the `d2l` package by `pip install d2l --upgrade`.

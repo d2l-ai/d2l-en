@@ -41,7 +41,7 @@ def read_imdb(data_dir, is_train):
             with open(folder_name + file, 'rb') as f:
                 review = f.read().decode('utf-8').replace('\n', '')
                 data.append(review)
-                labels.append(1 if label == 'pos' else 0)
+                labels.append(1 if label == 'pos/' else 0)
     return data, labels
 
 train_data = read_imdb(data_dir, is_train=True)
@@ -117,6 +117,7 @@ def load_data_imdb(batch_size, num_steps=500):
 ## Exercises
 
 1. Discover a different natural language dataset (such as [Amazon reviews](https://snap.stanford.edu/data/web-Amazon.html)) and build a similar data_loader function as `load_data_imdb`.
+
 
 ## [Discussions](https://discuss.mxnet.io/t/4355)
 
