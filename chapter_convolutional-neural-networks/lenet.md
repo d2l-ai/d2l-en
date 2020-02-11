@@ -39,7 +39,7 @@ In a rough sense, we can think LeNet as consisting of two parts:
 (ii) a block of fully-connected layers.
 Before getting into the weeds, let's briefly review the model in :numref:`img_lenet`.
 
-![Data flow in LeNet 5. The input is a handwritten digit, the output a probabilitiy over 10 possible outcomes.](../img/lenet.svg)
+![Data flow in LeNet 5. The input is a handwritten digit, the output a probability over 10 possible outcomes.](../img/lenet.svg)
 :label:`img_lenet`
 
 The basic units in the convolutional block are a convolutional layer
