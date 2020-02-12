@@ -33,7 +33,6 @@ The archive is about 2 GB, so it will take some time to download.
 After you decompress the archive, the dataset is located in the `../data/VOCdevkit/VOC2012` path.
 
 ```{.python .input  n=2}
-# Saved in the d2l package for later use
 d2l.DATA_HUB['voc2012'] = (d2l.DATA_URL + 'VOCtrainval_11-May-2012.tar',
                            '4e443f8a2eca6b1dac8a6c57641b67dd40621a49')
 
@@ -44,7 +43,6 @@ Go to `../data/VOCdevkit/VOC2012` to see the different parts of the dataset.
 The `ImageSets/Segmentation` path contains text files that specify the training and testing examples. The `JPEGImages` and `SegmentationClass` paths contain the example input images and labels, respectively. These labels are also in image format, with the same dimensions as the input images to which they correspond. In the labels, pixels with the same color belong to the same semantic category. The `read_voc_images` function defined below reads all input images and labels to the memory.
 
 ```{.python .input  n=3}
-# Saved in the d2l package for later use
 def read_voc_images(voc_dir, is_train=True):
     """Read all VOC feature and label images."""
     txt_fname = '%s/ImageSets/Segmentation/%s' % (

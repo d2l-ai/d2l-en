@@ -11,9 +11,10 @@ We have introduced deep learning models commonly used in the area of computer vi
 image-augmentation
 fine-tuning
 bounding-box
-anchor
 voc
-fcn
+anchor
+rpn
+faster-rcnn
 ssd
 rcnn
 semantic-segmentation-and-dataset

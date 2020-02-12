@@ -91,7 +91,7 @@ test_augs = gluon.data.vision.transforms.Compose([
 
 ### Defining and Initializing the Model
 
-We use ResNet-18, which was pre-trained on the ImageNet dataset, as the source model. Here, we specify `pretrained=True` to automatically download and load the pre-trained model parameters. The first time they are used, the model parameters need to be downloaded from the Internet.
+Instead of the original ResNet-18 described in :numref:`sec_resnet`, we used the improved version :cite:`He.Zhang.Ren.ea.2016*1` provided in model zoo (refer to exercises in :numref:`sec_resnet`). Specifying `pretrained=True` will automatically download and load the pre-trained model parameters on the ImageNet dataset.
 
 ```{.python .input  n=6}
 pretrained_net = gluon.model_zoo.vision.resnet18_v2(pretrained=True)

@@ -1341,31 +1341,25 @@ d2l.DATA_HUB['hotdog'] = (d2l.DATA_URL+'hotdog.zip',
                          'fba480ffa8aa7e0febbb511d181409f899b9baa5')
 
 
+# Defined in file: ./chapter_computer-vision/fine-tuning.md
+RGB_MEAN = np.array([0.485, 0.456, 0.406])
+RGB_STD = np.array([0.229, 0.224, 0.225])
+
+
 # Defined in file: ./chapter_computer-vision/bounding-box.md
-def bbox_to_rect(bbox, color):
-    """Convert bounding box to matplotlib format."""
-    # Convert the bounding box (top-left x, top-left y, bottom-right x,
-    # bottom-right y) format to matplotlib format: ((upper-left x,
-    # upper-left y), width, height)
-    return d2l.plt.Rectangle(
-        xy=(bbox[0], bbox[1]), width=bbox[2]-bbox[0], height=bbox[3]-bbox[1],
-        fill=False, edgecolor=color, linewidth=2)
+d2l.DATA_HUB['catdog'] = (d2l.DATA_URL+'catdog.jpg',
+                         '60b7d540db03eef6b9834329bccc4417ef349bf6')
 
 
-# Defined in file: ./chapter_computer-vision/anchor.md
-def show_bboxes(axes, bboxes, labels=None, colors=None):
-    """Show bounding boxes."""
-    def _make_list(obj, default_values=None):
-        if obj is None:
-            obj = default_values
-        elif not isinstance(obj, (list, tuple)):
-            obj = [obj]
-        return obj
-    labels = _make_list(labels)
-    colors = _make_list(colors, ['b', 'g', 'r', 'm', 'c'])
-    for i, bbox in enumerate(bboxes):
+# Defined in file: ./chapter_computer-vision/bounding-box.md
+def show_boxes(axes, boxes, labels=None, colors=['b','g','r','m','c']):
+    """Show a list of bounding boxes with labels."""
+    for i, box in enumerate(boxes):
         color = colors[i % len(colors)]
-        rect = d2l.bbox_to_rect(bbox.asnumpy(), color)
+        # convert to matplotlib Rectangle
+        rect = d2l.plt.Rectangle(
+            xy=(box[0], box[1]), width=box[2]-box[0], 
+            height=box[3]-box[1], fill=False, edgecolor=color, linewidth=2)
         axes.add_patch(rect)
         if labels and len(labels) > i:
             text_color = 'k' if color == 'w' else 'w'
@@ -1374,47 +1368,424 @@ def show_bboxes(axes, bboxes, labels=None, colors=None):
                       bbox=dict(facecolor=color, lw=0))
 
 
-# Defined in file: ./chapter_computer-vision/object-detection-dataset.md
-d2l.DATA_HUB['pikachu'] = (d2l.DATA_URL + 'pikachu.zip',
-                           '68ab1bd42143c5966785eb0d7b2839df8d570190')
+# Defined in file: ./chapter_computer-vision/bounding-box.md
+def box_corner_to_center(boxes):
+    """Convert from (upper_left, bottom_right) to (center, width, height)"""
+    assert boxes.shape[0] == 4, 'The shape should be either (4,) or (4,n)'
+    return np.stack(((boxes[0] + boxes[2])/2,  # center-x
+                     (boxes[1] + boxes[3])/2,  # center-y
+                     boxes[2] - boxes[0],      # width
+                     boxes[3] - boxes[1]))     # height
 
 
-# Defined in file: ./chapter_computer-vision/object-detection-dataset.md
-def load_data_pikachu(batch_size, edge_size=256):
-    """Load the pikachu dataset."""
-    data_dir = d2l.download_extract('pikachu')
-    train_iter = image.ImageDetIter(
-        path_imgrec=data_dir + 'train.rec',
-        path_imgidx=data_dir + 'train.idx',
-        batch_size=batch_size,
-        data_shape=(3, edge_size, edge_size),  # The shape of the output image
-        shuffle=True,  # Read the dataset in random order
-        rand_crop=1,  # The probability of random cropping is 1
-        min_object_covered=0.95, max_attempts=200)
-    val_iter = image.ImageDetIter(
-        path_imgrec=data_dir + 'val.rec', batch_size=batch_size,
-        data_shape=(3, edge_size, edge_size), shuffle=False)
-    return train_iter, val_iter
+# Defined in file: ./chapter_computer-vision/bounding-box.md
+def box_center_to_corner(boxes):
+    """Convert from (center, width, height) to (upper_left, bottom_right)"""
+    assert boxes.shape[0] == 4, 'The shape should be either (4,) or (4,n)'
+    return np.stack((boxes[0] - boxes[2]/2,  # upper_left_x
+                     boxes[1] - boxes[3]/2,  # upper_left_y
+                     boxes[0] + boxes[2]/2,  # bottom_right_x
+                     boxes[1] + boxes[3]/2))  # bottom_right_y
 
 
-# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
+# Defined in file: ./chapter_computer-vision/bounding-box.md
+def iou(a, b, use_numpy=False):
+    """Compute the IOU between two box sets a and b
+    
+    a : its shape can be (4,), (4, 1) or (4, n)
+    b : its shape can be (4,), (4, 1) or (4, n)
+    use_numpy : fallback to numpy (Will remove later)
+    """
+    if use_numpy: 
+        import numpy as np
+    else:
+        from mxnet import np    
+    # Compute box areas
+    box_area = lambda boxes: (np.maximum(boxes[2]-boxes[0], 0) 
+                              * np.maximum(boxes[3]-boxes[1], 0))
+    inter = np.stack((np.maximum(a[0], b[0]),  # Intersections 
+                      np.maximum(a[1], b[1]),
+                      np.minimum(a[2], b[2]),
+                      np.minimum(a[3], b[3]))) 
+    a_area, b_area, inter_area = box_area(a), box_area(b), box_area(inter)
+    return inter_area / (a_area + b_area - inter_area)
+
+
+# Defined in file: ./chapter_computer-vision/voc.md
 d2l.DATA_HUB['voc2012'] = (d2l.DATA_URL + 'VOCtrainval_11-May-2012.tar',
                            '4e443f8a2eca6b1dac8a6c57641b67dd40621a49')
 
 
-# Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
-def read_voc_images(voc_dir, is_train=True):
-    """Read all VOC feature and label images."""
-    txt_fname = '%s/ImageSets/Segmentation/%s' % (
-        voc_dir, 'train.txt' if is_train else 'val.txt')
-    with open(txt_fname, 'r') as f:
-        images = f.read().split()
-    features, labels = [None] * len(images), [None] * len(images)
-    for i, fname in enumerate(images):
-        features[i] = image.imread('%s/JPEGImages/%s.jpg' % (voc_dir, fname))
-        labels[i] = image.imread(
-            '%s/SegmentationClass/%s.png' % (voc_dir, fname))
-    return features, labels
+# Defined in file: ./chapter_computer-vision/voc.md
+VOC_CLASSES = ['background', 'aeroplane', 'bicycle', 'bird', 'boat',
+               'bottle', 'bus', 'car', 'cat', 'chair', 'cow',
+               'diningtable', 'dog', 'horse', 'motorbike', 'person',
+               'pottedplant', 'sheep', 'sofa', 'train', 'tvmonitor']
+
+
+# Defined in file: ./chapter_computer-vision/voc.md
+def read_voc_images(voc_dir, image_sets):
+    """Read images specified in the list of files."""
+    lines = []
+    for fn in image_sets:
+        image_set_fname = '%s/ImageSets/%s' % (voc_dir, fn)
+        with open(image_set_fname, 'r') as f:
+            lines.extend(f.read().split('\n'))
+    # only keep positive instances
+    image_fns, images = [], []
+    for l in lines:
+        items = l.split(' ')
+        if l and (len(items) == 1 or items[-1] == '1'):
+            image_fns.append(items[0])
+    for fn in image_fns:
+        images.append(image.imread('%s/JPEGImages/%s.jpg' % (voc_dir, fn)))
+    return images, image_fns
+
+
+# Defined in file: ./chapter_computer-vision/voc.md
+def read_voc_labels(voc_dir, image_fns, classes):
+    import xml.etree.cElementTree as et
+    labels = []
+    class_to_idx = dict([(cls, i) for i, cls in enumerate(classes)])
+    for fn in image_fns:
+        xml_fn = '%s/Annotations/%s.xml' % (voc_dir, fn)
+        root = et.parse(xml_fn).getroot()
+        label = []
+        for obj in root.iter('object'):
+            cls = obj.find('name').text.strip().lower()
+            if cls not in class_to_idx: continue
+            box = [float(obj.find('bndbox').find(name).text) - 1 
+                   for name in ('xmin', 'ymin', 'xmax', 'ymax')]
+            label.append([class_to_idx[cls]]+box)
+        labels.append(np.array(label))
+    return labels
+
+
+# Defined in file: ./chapter_computer-vision/voc.md
+class VOCDetDataset(gluon.data.Dataset):
+    """A customized dataset to load VOC dataset."""
+    def __init__(self, images, labels, height, width):
+        n = max([l.shape[0] for l in labels])  # max #objects per image
+        self.labels = []
+        for label, img in zip(labels, images):
+            # Project bounding boxes to [0, 1]
+            h, w, _ = img.shape
+            label[:,1:5] /= np.array([w, h, w, h])
+            k = label.shape[0]
+            if k < n:  # Pad invalid (-1) labels
+                label = np.concatenate([label, np.zeros((n-k, 5))], axis=0)
+                label[k:,0] = -1
+            self.labels.append(label)
+        # Resize and then normalize RGB channels
+        self.features = [(image.imresize(img, width, height).astype(
+            'float32')/255-d2l.RGB_MEAN)/d2l.RGB_STD for img in images]
+        
+    def __getitem__(self, idx):
+        feature, label = self.features[idx], self.labels[idx]
+        # Flip both image and bounding box horizontally in random.
+        if float(np.random.uniform()) > 0.5:
+            feature = feature[:, ::-1, :]
+            label = np.stack([label[:,0], 1-label[:,3], label[:,2],
+                              1-label[:,1], label[:,4]], axis=1)
+        return feature.transpose(2, 0, 1), label
+    
+    def __len__(self):
+        return len(self.features)
+
+
+# Defined in file: ./chapter_computer-vision/voc.md
+def load_data_voc_detection(batch_size, height, width, classes=['cat','dog']):
+    """Load the pikachu dataset."""
+    def load_data(dataset):
+        txt_fns = ['Main/%s_%s.txt'%(cls, dataset) for cls in classes]
+        images, image_fns = read_voc_images(voc_dir, txt_fns)
+        labels = read_voc_labels(voc_dir, image_fns, classes)
+        return images, labels
+    #voc_dir = d2l.download_extract('voc2012', 'VOCdevkit/VOC2012')
+    voc_dir = '../data/VOCdevkit/VOC2012/'
+    train_ds = VOCDetDataset(*load_data('train'), height, width)
+    test_ds = VOCDetDataset(*load_data('val'), height, width)
+    train_iter, test_iter = [gluon.data.DataLoader(
+        ds, batch_size, shuffle=shuffle, last_batch='discard',
+        num_workers=d2l.get_dataloader_workers()) for ds, shuffle in
+                             [[train_ds, True], [test_ds, False]]]
+    return train_iter, test_iter
+
+
+# Defined in file: ./chapter_computer-vision/anchor.md
+def generate_anchors(height, width, sizes, ratios):
+    # n + m - 1 ratios and widths
+    s = np.array([sizes[0]]*len(ratios) + sizes[1:])
+    r = np.array(ratios + [ratios[0]]*(len(sizes)-1))
+    w = min(width, height) / width * s * r ** 0.5
+    h = min(width, height) / height * s * r ** -0.5
+    # all center points
+    x, y = np.meshgrid(np.arange(0.5/width, 1.0, 1.0/width), 
+                       np.arange(0.5/height, 1.0, 1.0/height))
+    # generate n + m - 1 anchors boxes for each center point
+    w, x = np.meshgrid(w.reshape(-1), x.reshape(-1))
+    h, y = np.meshgrid(h.reshape(-1), y.reshape(-1))
+    anchors = np.stack([a.reshape(-1) for a in (x, y, w, h)])
+    return d2l.box_center_to_corner(anchors)
+
+
+# Defined in file: ./chapter_computer-vision/anchor.md
+def anchor_to_gt_offset(anchors, ground_truths):
+    """Return the offset from anchor boxes to ground_truth boxes"""
+    a = d2l.box_corner_to_center(anchors)
+    g = d2l.box_corner_to_center(ground_truths)
+    return np.stack((10*(g[0]-a[0])/a[2], 10*(g[1]-a[1])/a[3],
+                     5*np.log(g[2]/a[2]), 5*np.log(g[3]/a[3])))
+
+
+# Defined in file: ./chapter_computer-vision/anchor.md
+def anchor_plus_offset(anchors, offsets):
+    """Apply offset to anchors to predict ground truth boxes"""
+    a = d2l.box_corner_to_center(anchors)
+    x_g, y_g = a[0] + offsets[0] * a[2] / 10, a[1] + offsets[1] * a[3] / 10
+    w_g, h_g = a[2] * np.exp(offsets[2] / 5), a[3] * np.exp(offsets[3] / 5)
+    return d2l.box_center_to_corner(np.stack((x_g, y_g, w_g, h_g)))
+
+
+# Defined in file: ./chapter_computer-vision/anchor.md
+def project_box(boxes):
+    """Project boxes into [0,1]"""
+    return np.stack((np.maximum(boxes[0], 0),
+                     np.maximum(boxes[1], 0),
+                     np.minimum(boxes[2], 1),
+                     np.minimum(boxes[3], 1)))
+
+
+# Defined in file: ./chapter_computer-vision/anchor.md
+def nms(scores, boxes, iou_threshold, use_numpy=False):
+    """Non-maximum suppression
+    
+    scores : shape (n,) 
+    boxes : shape (4, n)
+    use_numpy : fallback to numpy, will remove later
+    """
+    if use_numpy:
+        scores, boxes = scores.asnumpy(), boxes.asnumpy()
+    # sorting scores by the descending order and return their indices 
+    B = scores.argsort()[::-1]
+    keep = []  # boxes indices that will be kept
+    while B.size > 0:
+        i = B[0]
+        keep.append(i)
+        if B.size == 1: break  #FIXME, unnecessary
+        iou = d2l.iou(boxes[:,i], boxes[:,B[1:]], use_numpy)
+        inds = (iou <= iou_threshold).nonzero()[0]
+        B = B[inds + 1]
+    return np.array(keep)
+
+
+# Defined in file: ./chapter_computer-vision/anchor.md
+def label_anchors(ground_truth, anchors, pos_iou, neg_iou, neg_pos_ratio):
+    """Assign labels to anchors
+
+    ground_truth : (batch_size, #objects_per_image, 5)
+    anchors : (4, #anchors)
+    pos_iou : iou threshold (>) for a positve anchor
+    neg_iou : iou threshold (<=) for a negative anchor
+    neg_pos_ratio : #neg / #pos, subsampling negatives when necessary
+    """
+    num_anchors, batch_size = anchors.shape[1], ground_truth.shape[0]
+    cls_labels = - np.ones((batch_size, num_anchors))
+    box_offsets = np.zeros((batch_size, num_anchors, 4))
+    for i, label in enumerate(ground_truth):
+        label = label[label[:,0]>=0, :]  # Ignore invalid labels
+        neg = np.zeros((len(label), num_anchors), dtype='bool')  # Fix me...
+        #print(neg)
+        for j, y in enumerate(label):
+            iou = d2l.iou(y[1:], anchors)
+            pos = iou > pos_iou
+            k = int(iou.argmax()) # In case pos is all False
+            pos[k] = True  
+            cls_labels[i, pos] = y[0]+1  # Positive anchors
+            # fixme: i][pos -> i, pos
+            box_offsets[i][pos, :] = d2l.anchor_to_gt_offset(
+                anchors[:,pos].reshape((4,-1)), # fixme, no reshape is needed
+                y[1:].reshape((-1,1))).T
+            neg[j][iou < neg_iou] = True
+            #print((iou < neg_iou).nonzero()[0])
+            neg[j][k] = True
+        # Randomly sample negative
+        n_pos = int((cls_labels[i]>0).sum())
+        neg = neg.all(axis=0).nonzero()[0]        
+        np.random.shuffle(neg)
+        n_neg = min(len(neg), int(n_pos*neg_pos_ratio))
+        if n_neg > 0:  # fixme, no needed
+            cls_labels[i, neg[:n_neg]] = 0
+    return cls_labels, box_offsets
+
+
+# Defined in file: ./chapter_computer-vision/rpn.md
+def detection_backbone():
+    net = gluon.model_zoo.vision.resnet18_v2(pretrained=True)
+    return net.features[:-2]
+
+
+# Defined in file: ./chapter_computer-vision/rpn.md
+class RPNOutput(nn.Block):
+    def __init__(self, num_anchors=5, **kwargs):
+        super(RPNOutput, self).__init__(**kwargs)
+        self.conv = nn.Conv2D(128, kernel_size=3, padding=1, activation='relu')
+        self.cls_predictor = nn.Conv2D(num_anchors*2, kernel_size=1)
+        self.box_predictor = nn.Conv2D(num_anchors*4, kernel_size=1)
+
+    def forward(self, X):
+        Y = self.conv(X)
+        cls_preds = self.cls_predictor(Y)
+        box_preds = self.box_predictor(Y)
+        return (cls_preds.transpose(0, 2, 3, 1).reshape(-1, 2),
+                box_preds.transpose(0, 2, 3, 1).reshape(-1, 4))
+
+
+# Defined in file: ./chapter_computer-vision/rpn.md
+def rpn_anchors(X):
+    """Generate anchors for RPN
+
+    X: (batch_size, #channels, height, width)
+    """
+    sizes, ratios = [0.85, 0.43, 0.21], [1, 2, 0.5]
+    _, _, height, width = X.shape
+    return d2l.generate_anchors(height, width, sizes, ratios)
+
+
+# Defined in file: ./chapter_computer-vision/rpn.md
+def rpn_targets(ground_truth, anchors):
+    """Assign labels to anchors for RPN
+    """
+    cls_labels, box_offsets = d2l.label_anchors(
+        ground_truth, anchors, 0.7, 0.3, 5)
+    cls_labels[cls_labels>0] = 1
+    return cls_labels.reshape(-1), box_offsets.reshape(-1, 4)
+
+
+# Defined in file: ./chapter_computer-vision/rpn.md
+class DetectionLoss(nn.Block):
+    """Object class loss + lambda * bounding box loss"""
+    def __init__(self, lambd, **kwargs):
+        super(DetectionLoss, self).__init__(**kwargs)
+        self.cls_loss = gluon.loss.SoftmaxCrossEntropyLoss()
+        self.box_loss = gluon.loss.L1Loss()
+        self.lambd = lambd
+
+    def forward(self, cls_preds, box_preds, cls_labels, box_labels):
+        """Compute loss
+
+        cls_preds: (#anchors, #classes)
+        box_preds: (#anchors, 4)
+        cls_labels: (#anchors, )
+        box_labels: (#anchors, 4)
+        """
+        # Ignore invalid examples
+        cls_mask, box_mask = cls_labels >= 0, cls_labels > 0
+        cls = self.cls_loss(cls_preds, cls_labels,
+                            np.expand_dims(cls_mask, axis=-1))
+        box = self.box_loss(box_preds, box_labels,
+                            np.expand_dims(box_mask, axis=-1))
+        # Average per each image
+        cls = cls / float(cls_mask.sum())
+        box = box / float(box_mask.sum())
+        return cls + self.lambd * box
+
+
+# Defined in file: ./chapter_computer-vision/rpn.md
+class DetectionEvaluation(object):
+    def __call__(self, cls_preds, box_preds, cls_labels, box_labels):
+        cls_mask, box_mask = cls_labels >= 0, cls_labels > 0
+        cls = (cls_preds.argmax(axis=-1) == cls_labels)[cls_mask].sum()
+        box = np.abs(box_labels - box_preds)[box_mask, :].sum() / 4
+        return cls, box, cls_mask.sum(), box_mask.sum()
+
+
+# Defined in file: ./chapter_computer-vision/rpn.md
+def rpn_batch(Y, backbone_features, output_model, anchors):
+    if anchors is None:
+        anchors = rpn_anchors(backbone_features)
+    labels = rpn_targets(Y, anchors)
+    preds = output_model(backbone_features)
+    return preds, labels, anchors
+
+
+# Defined in file: ./chapter_computer-vision/rpn.md
+def train_detection(backbone, output_model, batch_fn, 
+                    train_iter, test_iter, loss, num_epochs, 
+                    backbone_lr, output_lr, ctx=d2l.try_gpu()):
+    """Train a detection model
+    
+    backbone, output_model - the 
+    anchor_fn, batch_fn - 
+    train_iter, test_iter - data iterators for training and test
+    num_epochs - number of data epochs to train
+    backbone_lr, output_lr - the learning rate for 
+    """
+    backbone_trainer = gluon.Trainer(backbone.collect_params(), 'sgd', {
+        'learning_rate': backbone_lr, 'wd': 1e-4})
+    output_trainer = gluon.Trainer(output_model.collect_params(), 'sgd', {
+        'learning_rate': output_lr, 'wd': 1e-4})
+    evaluator, anchors = DetectionEvaluation(), None
+    animator = d2l.Animator(xlabel='epoch', xlim=[0,num_epochs], 
+                            legend=['train class err', 'train box mae',
+                                    'test class err', 'test box mae'])
+    for epoch in range(num_epochs):
+        # accuracy_sum, mae_sum, num_valid_anchors, num_pos_anchors
+        metric = d2l.Accumulator(5)
+        for i, (X, Y) in enumerate(train_iter):
+            with autograd.record():
+                X = backbone(X.as_in_context(ctx))
+                preds, labels, anchors = batch_fn(Y, X, output_model, anchors)
+                labels = [y.as_in_context(ctx) for y in labels]
+                l = loss(*preds, *labels)
+            l.backward()
+            metric.add(*evaluator(*preds, *labels))
+            output_trainer.step(1)
+            backbone_trainer.step(1)
+            if (i+1)%4 == 0:
+                animator.add(epoch+i/len(train_iter), (
+                    1-metric[0]/metric[2], metric[1]/metric[3], None, None))
+        metric.reset()
+        continue
+        for X, Y in test_iter:
+            X = backbone(X.as_in_context(ctx))
+            preds, labels = batch_fn(Y, X, output_model, anchors)
+            labels = [y.as_in_context(ctx) for y in labels]
+            metric.add(*evaluator(*preds, *labels))
+        animator.add(epoch+1, (
+            None, None, 1-metric[0]/metric[2], metric[1]/metric[3]))
+
+
+# Defined in file: ./chapter_computer-vision/rpn.md
+def predict_rpn(backbone_features, output_model, anchor_fn, nms_threshold):
+    anchors = anchor_fn(backbone_features)
+    cls_preds, box_preds = output_model(backbone_features)
+    # reshape to 3D to iterate on each image in the batch
+    num_anchors, ctx = anchors.shape[1], anchors.context
+    batch_size = cls_preds.shape[0] // num_anchors
+    cls_preds, box_preds = [
+        a.reshape(batch_size, num_anchors, -1).as_in_context(ctx) 
+        for a in [cls_preds, box_preds]]
+    Y = []
+    for i, (cls_pred, box_pred) in enumerate(zip(cls_preds, box_preds)):
+        keep = d2l.nms(cls_pred[:,1], box_pred.T, nms_threshold, 
+                       use_numpy=True)
+        box = d2l.anchor_plus_offset(anchors[:,keep], box_pred[keep].T)
+        Y.append([cls_pred[keep,1], d2l.project_box(box)])
+    return Y
+
+
+# Defined in file: ./chapter_computer-vision/ssd.md
+def ssd_anchors(feature_maps):
+    sizes = [[.3,.4],[.5,.6],[.7,.8],[.9,.1]]
+    #[[0.37, 0.447], [0.54, 0.619], [0.71, 0.79],
+             #[0.88, 0.961]]    
+    ratios = [[1, 2, 0.5]] * 4
+    anchors = []
+    for X, s, r in zip(feature_maps, sizes, ratios):
+        _, _, height, width = X.shape
+        anchors.append(d2l.generate_anchors(height, width, s, r))
+    return np.concatenate(anchors, axis=1)
 
 
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
@@ -1787,372 +2158,6 @@ def load_data_snli(batch_size, num_steps=50):
     train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True)
     test_iter = gluon.data.DataLoader(test_set, batch_size, shuffle=False)
     return train_iter, test_iter, train_set.vocab
-
-
-# Defined in file: ./chapter_natural-language-processing/natural-language-inference-attention.md
-def split_batch_multi_inputs(X, y, ctx_list):
-    """Split X and y into multiple devices specified by ctx"""
-    X = list(zip(*[gluon.utils.split_and_load(feature, ctx_list, even_split=False)
-                   for feature in X]))
-    return (X, gluon.utils.split_and_load(y, ctx_list, even_split=False))
-
-
-# Defined in file: ./chapter_natural-language-processing/natural-language-inference-attention.md
-def predict_snli(net, premise, hypothesis):
-    premise = np.array(vocab[premise],
-                       ctx=d2l.try_gpu())
-    hypothesis = np.array(vocab[hypothesis],
-                          ctx=d2l.try_gpu())
-    label = np.argmax(net([premise.reshape((1, -1)),
-                           hypothesis.reshape((1, -1))]), axis=1)
-    return 'neutral' if label == 0 else 'contradiction' if label == 1 \
-            else 'entailment'
-
-
-# Defined in file: ./chapter_natural-language-processing/BERT.md
-class BERTEncoder(nn.Block):
-    def __init__(self, vocab_size, units, hidden_size,
-                 num_heads, num_layers, dropout, **kwargs):
-        super(BERTEncoder, self).__init__(**kwargs)
-        self.word_embedding = gluon.nn.Embedding(vocab_size, units)
-        self.segment_embedding = gluon.nn.Embedding(2, units)
-        self.pos_encoding = d2l.PositionalEncoding(units, dropout)
-        self.blks = gluon.nn.Sequential()
-        for i in range(num_layers):
-            self.blks.add(d2l.EncoderBlock(units, hidden_size, num_heads, dropout))
-
-    def forward(self, words, segments, mask):
-        X = self.word_embedding(words) + self.segment_embedding(segments)
-        X = self.pos_encoding(X)
-        for blk in self.blks:
-            X = blk(X, mask)
-        return X
-
-
-# Defined in file: ./chapter_natural-language-processing/BERT.md
-class MaskLMDecoder(nn.Block):
-    def __init__(self, vocab_size, units, **kwargs):
-        super(MaskLMDecoder, self).__init__(**kwargs)
-        self.decoder = gluon.nn.Sequential()
-        self.decoder.add(gluon.nn.Dense(units, flatten=False, activation='relu'))
-        self.decoder.add(gluon.nn.LayerNorm())
-        self.decoder.add(gluon.nn.Dense(vocab_size, flatten=False))
-
-    def forward(self, X, masked_positions):
-        ctx = masked_positions.context
-        dtype = masked_positions.dtype
-        num_masked_positions = masked_positions.shape[1]
-        masked_positions = masked_positions.reshape((1, -1))
-        batch_size = X.shape[0]
-        batch_idx = np.arange(0, batch_size)
-        batch_idx = np.repeat(batch_idx, num_masked_positions)
-        batch_idx = batch_idx.reshape((1, -1))
-        encoded = X[batch_idx, masked_positions]
-        encoded = encoded.reshape((batch_size, num_masked_positions, X.shape[-1]))
-        pred = self.decoder(encoded)
-        return pred
-
-
-# Defined in file: ./chapter_natural-language-processing/BERT.md
-class NextSentenceClassifier(nn.Block):
-    def __init__(self, units=768, **kwargs):
-        super(NextSentenceClassifier, self).__init__(**kwargs)
-        self.classifier = gluon.nn.Sequential()
-        self.classifier.add(gluon.nn.Dense(units=units, flatten=False,
-                                           activation='tanh'))
-        self.classifier.add(gluon.nn.Dense(units=2, flatten=False))
-
-    def forward(self, X):
-        X = X[:, 0, :]
-        return self.classifier(X)
-
-
-# Defined in file: ./chapter_natural-language-processing/BERT.md
-class BERTModel(nn.Block):
-    def __init__(self, vocab_size=None, embed_size=128, hidden_size=512,
-                 num_heads=2, num_layers=4, dropout=0.1):
-        super(BERTModel, self).__init__()
-        self.encoder = BERTEncoder(vocab_size=vocab_size, units=embed_size, hidden_size=hidden_size,
-                                   num_heads=num_heads, num_layers=num_layers, dropout=dropout)
-        self.ns_classifier = NextSentenceClassifier()
-        self.mlm_decoder = MaskLMDecoder(vocab_size=vocab_size, units=embed_size)
-
-    def forward(self, inputs, token_types, valid_length=None, masked_positions=None):
-        seq_out = self.encoder(inputs, token_types, valid_length)
-        next_sentence_classifier_out = self.ns_classifier(seq_out)
-        if not masked_positions is None:
-            mlm_decoder_out = self.mlm_decoder(seq_out, masked_positions)
-        else:
-            mlm_decoder_out = None
-        return seq_out, next_sentence_classifier_out, mlm_decoder_out
-
-
-# Defined in file: ./chapter_natural-language-processing/BERT-processing.md
-d2l.DATA_HUB['wikitext-2'] = (
-    'https://s3.amazonaws.com/research.metamind.io/wikitext/wikitext-2-v1.zip',
-    '3c914d17d80b1459be871a5039ac23e752a53cbe')
-
-
-# Defined in file: ./chapter_natural-language-processing/BERT-processing.md
-d2l.DATA_HUB['wikitext-103'] = (
-    'https://s3.amazonaws.com/research.metamind.io/wikitext/wikitext-103-v1.zip',
-    '0aec09a7537b58d4bb65362fee27650eeaba625a')
-
-
-# Defined in file: ./chapter_natural-language-processing/BERT-processing.md
-def read_wiki(data_dir):
-    file_name = os.path.join(data_dir, 'wiki.train.tokens')
-    with open(file_name, 'r') as f:
-        raw = f.readlines()
-    data = [line.strip().lower().split(' . ')
-            for line in raw if len(line.split(' . '))>=2]
-    random.shuffle(data)
-    return data
-
-
-# Defined in file: ./chapter_natural-language-processing/BERT-processing.md
-def get_next_sentence(sentence, next_sentence, all_documents):
-    if random.random() < 0.5:
-        tokens_a = sentence
-        tokens_b = next_sentence
-        is_next = True
-    else:
-        random_sentence = random.choice(random.choice(all_documents))
-        tokens_a = sentence
-        tokens_b = random_sentence
-        is_next = False
-    return tokens_a, tokens_b, is_next
-
-
-# Defined in file: ./chapter_natural-language-processing/BERT-processing.md
-def get_tokens_and_segment(tokens_a, tokens_b):
-    tokens = [] 
-    segment_ids = [] 
-
-    tokens.append('[CLS]')
-    segment_ids.append(0)
-
-    for token in tokens_a:
-        tokens.append(token)
-        segment_ids.append(0)
-    tokens.append('[SEP]')
-    segment_ids.append(0)
-
-    for token in tokens_b:
-        tokens.append(token)
-        segment_ids.append(1)
-    tokens.append('[SEP]')
-    segment_ids.append(1)
-    
-    return tokens, segment_ids
-
-
-# Defined in file: ./chapter_natural-language-processing/BERT-processing.md
-def create_next_sentence(document, all_documents, vocab, max_length):
-    instances = []
-    for i in range(len(document)-1):
-        tokens_a, tokens_b, is_next = get_next_sentence(document[i], document[i+1], all_documents)
-        
-        if len(tokens_a) + len(tokens_b) + 3 > max_length:
-             continue
-        tokens, segment_ids = get_tokens_and_segment(tokens_a, tokens_b)
-        instances.append((tokens, segment_ids, is_next))
-    return instances
-
-
-# Defined in file: ./chapter_natural-language-processing/BERT-processing.md
-def choice_mask_tokens(tokens, cand_indexes, num_to_predict, vocab):
-    output_tokens = list(tokens)
-    masked_lms = []
-    random.shuffle(cand_indexes)
-    for index_set in cand_indexes:
-        if len(masked_lms) >= num_to_predict:
-            break
-        if len(masked_lms) + len(index_set) > num_to_predict:
-            continue
-        for index in index_set:
-            masked_token = None
-            if random.random() < 0.8:
-                masked_token = '[MASK]'
-            else:
-                if random.random() < 0.5:
-                    masked_token = tokens[index]
-                else:
-                    masked_token = random.randint(0, len(vocab) - 1)
-
-            output_tokens[index] = masked_token
-            masked_lms.append((index, tokens[index]))
-    return output_tokens, masked_lms
-
-
-# Defined in file: ./chapter_natural-language-processing/BERT-processing.md
-def create_masked_lm(tokens, vocab):
-    cand_indexes = []
-    for (i, token) in enumerate(tokens):
-        if token in ['[CLS]', '[SEP]']:
-            continue
-        cand_indexes.append([i])
-        
-    num_to_predict = max(1, int(round(len(tokens) * 0.15)))
-    
-    output_tokens, masked_lms = choice_mask_tokens(tokens, cand_indexes,
-                                                   num_to_predict, vocab)
-            
-    masked_lms = sorted(masked_lms, key=lambda x: x[0])
-    masked_lm_positions = []
-    masked_lm_labels = []
-    for p in masked_lms:
-        masked_lm_positions.append(p[0])
-        masked_lm_labels.append(p[1])
-        
-    return vocab[output_tokens], masked_lm_positions, vocab[masked_lm_labels]
-
-
-# Defined in file: ./chapter_natural-language-processing/BERT-processing.md
-def convert_numpy(instances, max_length):
-    input_ids, segment_ids, masked_lm_positions, masked_lm_ids = [], [], [], []
-    masked_lm_weights, next_sentence_labels, valid_lengths = [], [], []
-    for instance in instances:
-        input_id = instance[0] + [0] * (max_length - len(instance[0]))
-        segment_id = instance[3] + [0] * (max_length - len(instance[3]))
-        masked_lm_position = instance[1] + [0] * (20 - len(instance[1]))
-        masked_lm_id = instance[2] + [0] * (20 - len(instance[2]))
-        masked_lm_weight = [1.0] * len(instance[2]) + [0.0] * (20 - len(instance[1]))
-        next_sentence_label = instance[4]
-        valid_length = len(instance[0])
-
-        input_ids.append(np.array(input_id, dtype='int32'))
-        segment_ids.append(np.array(segment_id, dtype='int32'))
-        masked_lm_positions.append(np.array(masked_lm_position, dtype='int32'))
-        masked_lm_ids.append(np.array(masked_lm_id, dtype='int32'))
-        masked_lm_weights.append(np.array(masked_lm_weight, dtype='float32'))
-        next_sentence_labels.append(np.array(next_sentence_label))
-        valid_lengths.append(np.array(valid_length))
-    return input_ids, masked_lm_ids, masked_lm_positions, masked_lm_weights,\
-           next_sentence_labels, segment_ids, valid_lengths
-
-
-# Defined in file: ./chapter_natural-language-processing/BERT-processing.md
-def create_training_instances(train_data, vocab, max_length):
-    instances = []
-    for i, document in enumerate(train_data):
-        instances.extend(create_next_sentence(document, train_data, vocab, max_length))
-    instances = [(create_masked_lm(tokens, vocab) + (segment_ids, is_random_next))
-                 for (tokens, segment_ids, is_random_next) in instances]
-    input_ids, masked_lm_ids, masked_lm_positions, masked_lm_weights,\
-           next_sentence_labels, segment_ids, valid_lengths = convert_numpy(instances, max_length)
-    return input_ids, masked_lm_ids, masked_lm_positions, masked_lm_weights,\
-           next_sentence_labels, segment_ids, valid_lengths
-
-
-# Defined in file: ./chapter_natural-language-processing/BERT-processing.md
-class WikiDataset(gluon.data.Dataset):
-    def __init__(self, dataset, max_length = 128):
-        train_tokens = [d2l.tokenize(row, token='word') for row in dataset]
-        
-        text_list=[]
-        [text_list.extend(row) for row in train_tokens]
-        self.vocab = d2l.Vocab(text_list, min_freq=5, 
-                               reserved_tokens=['[MASK]', '[CLS]', '[SEP]'])
-        self.input_ids, self.masked_lm_ids, self.masked_lm_positions,\
-        self.masked_lm_weights, self.next_sentence_labels, self.segment_ids,\
-        self.valid_lengths = create_training_instances(train_tokens, self.vocab, max_length)
-
-    def __getitem__(self, idx):
-        return self.input_ids[idx], self.masked_lm_ids[idx], self.masked_lm_positions[idx], self.masked_lm_weights[idx],\
-           self.next_sentence_labels[idx], self.segment_ids[idx], self.valid_lengths[idx]
-
-    def __len__(self):
-        return len(self.input_ids)
-
-
-# Defined in file: ./chapter_natural-language-processing/BERT-processing.md
-def load_data_wiki(batch_size, data_set = 'wikitext-2', num_steps=128):
-    data_dir = d2l.download_extract(data_set, data_set)
-    train_data = read_wiki(data_dir)
-    train_set = WikiDataset(train_data, num_steps)
-    train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True)
-    return train_iter, train_set.vocab
-
-
-# Defined in file: ./chapter_natural-language-processing/BERT-processing.md
-def _get_batch_bert(batch, ctx):
-    (input_id, masked_id, masked_position, masked_weight, \
-     next_sentence_label, segment_id, valid_length) = batch
-    
-    return (gluon.utils.split_and_load(input_id, ctx, even_split=False),
-            gluon.utils.split_and_load(masked_id, ctx, even_split=False),
-            gluon.utils.split_and_load(masked_position, ctx, even_split=False),
-            gluon.utils.split_and_load(masked_weight, ctx, even_split=False),
-            gluon.utils.split_and_load(next_sentence_label, ctx, even_split=False),
-            gluon.utils.split_and_load(segment_id, ctx, even_split=False),
-            gluon.utils.split_and_load(valid_length.astype('float32'), ctx, even_split=False))
-
-
-# Defined in file: ./chapter_natural-language-processing/BERT-processing.md
-def batch_loss_bert(net, nsp_loss, mlm_loss, input_id, masked_id, masked_position,
-                    masked_weight, next_sentence_label, segment_id, valid_length, vocab_size):
-    ls = []
-    ls_mlm = []
-    ls_nsp = []
-    for i_id, m_id, m_pos, m_w, nsl, s_i, v_l in zip(input_id, masked_id, masked_position, masked_weight,\
-                                                      next_sentence_label, segment_id, valid_length):
-        num_masks = m_w.sum() + 1e-8
-        _, classified, decoded = net(i_id, s_i, v_l.reshape(-1),m_pos)
-        l_mlm = mlm_loss(decoded.reshape((-1, vocab_size)),m_id.reshape(-1), m_w.reshape((-1, 1)))
-        l_mlm = l_mlm.sum() / num_masks
-        l_nsp = nsp_loss(classified, nsl)
-        l_nsp = l_nsp.mean()
-        l = l_mlm + l_nsp
-        ls.append(l)
-        ls_mlm.append(l_mlm)
-        ls_nsp.append(l_nsp)
-        npx.waitall()
-    return ls, ls_mlm, ls_nsp
-
-
-# Defined in file: ./chapter_natural-language-processing/BERT-processing.md
-def train_bert(data_eval, net, nsp_loss, mlm_loss, vocab_size, ctx, log_interval, max_step):
-    trainer = gluon.Trainer(net.collect_params(), 'adam')
-    step_num = 0
-    while step_num < max_step:
-        eval_begin_time = time.time()
-        begin_time = time.time()
-        
-        running_mlm_loss = running_nsp_loss = 0
-        total_mlm_loss = total_nsp_loss = 0
-        running_num_tks = 0
-        for _, data_batch in enumerate(data_eval):
-            (input_id, masked_id, masked_position, masked_weight, \
-             next_sentence_label, segment_id, valid_length) = _get_batch_bert(data_batch, ctx)
-            
-            step_num += 1
-            with autograd.record():
-                ls, ls_mlm, ls_nsp = batch_loss_bert(net, nsp_loss, mlm_loss, input_id, masked_id, masked_position, masked_weight, next_sentence_label, segment_id, valid_length, vocab_size)
-            for l in ls:
-                l.backward()
-            
-            trainer.step(1)
-            
-            running_mlm_loss += sum([l for l in ls_mlm])
-            running_nsp_loss += sum([l for l in ls_nsp])
-
-            if (step_num + 1) % (log_interval) == 0:
-                total_mlm_loss += running_mlm_loss
-                total_nsp_loss += running_nsp_loss
-                begin_time = time.time()
-                running_mlm_loss = running_nsp_loss = 0
-
-        eval_end_time = time.time()
-        if running_mlm_loss != 0:
-            total_mlm_loss += running_mlm_loss
-            total_nsp_loss += running_nsp_loss
-        total_mlm_loss /= step_num
-        total_nsp_loss /= step_num
-        print('Eval mlm_loss={:.3f}\tnsp_loss={:.3f}\t'
-                     .format(float(total_mlm_loss),
-                             float(total_nsp_loss)))
-        print('Eval cost={:.1f}s'.format(eval_end_time - eval_begin_time))
 
 
 # Defined in file: ./chapter_recommender-systems/movielens.md

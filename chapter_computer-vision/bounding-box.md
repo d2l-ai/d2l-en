@@ -119,17 +119,20 @@ In fact, we can consider the pixel area of a bounding box as a collection of pix
 
 ```{.python .input  n=9}
 # Saved in the d2l package for later use
-def box_area(boxes):
-    """Compute the box areas"""
-    return np.maximum(boxes[2]-boxes[0], 0) * np.maximum(boxes[3]-boxes[1], 0)
-
-# Saved in the d2l package for later use
-def iou(a, b):
+def iou(a, b, use_numpy=False):
     """Compute the IOU between two box sets a and b
     
     a : its shape can be (4,), (4, 1) or (4, n)
     b : its shape can be (4,), (4, 1) or (4, n)
+    use_numpy : fallback to numpy (Will remove later)
     """
+    if use_numpy: 
+        import numpy as np
+    else:
+        from mxnet import np    
+    # Compute box areas
+    box_area = lambda boxes: (np.maximum(boxes[2]-boxes[0], 0) 
+                              * np.maximum(boxes[3]-boxes[1], 0))
     inter = np.stack((np.maximum(a[0], b[0]),  # Intersections 
                       np.maximum(a[1], b[1]),
                       np.minimum(a[2], b[2]),
