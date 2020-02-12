@@ -64,7 +64,18 @@ git reset --hard
 git pull
 ```
 
+
 ## Summary
 
 * Cloud computing services offer a wide variety of GPU servers.
-* You can launch and stop a Jupyter server through Amazon SageMaker easily. 
+* You can launch and stop a Jupyter server through Amazon SageMaker easily.
+
+
+## Exercises
+
+1. Try to edit and run the code in this book using Amazon SageMaker.
+
+
+## [Discussions](https://discuss.mxnet.io/t/5640)
+
+![](../img/qr_sagemaker.svg)
