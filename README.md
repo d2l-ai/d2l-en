@@ -11,7 +11,7 @@ This open-source book represents our attempt to make deep learning approachable,
 
 This is a resource that could (1) be freely available for everyone; (2) offer sufficient technical depth to provide a starting point on the path to actually becoming an applied machine learning scientist; (3) include runnable code, showing readers how to solve problems in practice; (4) allow for rapid updates, both by us and also by the community at large; and (5) be complemented by a forum for interactive discussion of technical details and to answer questions.
 
-If you find this book useful, please star this repository or cite this book using the following bibtex entry:
+If you find this book useful, please star (★) this repository or cite this book using the following bibtex entry:
 
 ```
 @book{zhang2020dive,
