@@ -19,7 +19,7 @@ This open-source book represents our attempt to make deep learning approachable,
 
 Our goal is to offer a resource that could (1) be freely available for everyone; (2) offer sufficient technical depth to provide a starting point on the path to actually becoming an applied machine learning scientist; (3) include runnable code, showing readers how to solve problems in practice; (4) allow for rapid updates, both by us and also by the community at large; and (5) be complemented by a forum for interactive discussion of technical details and to answer questions.
 
-<h5 align="center"><i>Universities that use D2L as a textbook or a reference book</i></h5>
+<h5 align="center">Universities that use D2L as a textbook or a reference book</h5>
 <p align="center">
   <img width="400"  src="static/frontpage/_images/map.png">
 </p>
