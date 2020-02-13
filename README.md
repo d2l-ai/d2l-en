@@ -9,10 +9,10 @@
 
 <p align="center">
   <img width="200"  src="static/frontpage/_images/notebook.gif">
-  <img width="200"  src="http://www.d2l.ai/_images/book-org.svg">
+  <img width="200"  src="http://www.d2l.ai/_images/eq.jpg">
+  <img width="200"  src="http://www.d2l.ai/_images/figure.jpg">
+  <img width="200"  src="http://www.d2l.ai/_images/code.jpg">
 </p>
-
-
 
 
 This open-source book represents our attempt to make deep learning approachable, teaching you both the concepts, the context, and the code. 
