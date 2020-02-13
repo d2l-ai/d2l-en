@@ -7,6 +7,9 @@
 
 <h5 align="center"><i>The best way to understand deep learning is learning by doing.</i></h5>
 
+![](d2l-en/static/frontpage/_images/notebook.gif)
+
+
 This open-source book represents our attempt to make deep learning approachable, teaching you both the concepts, the context, and the code. 
 
 This is a resource that could (1) be freely available for everyone; (2) offer sufficient technical depth to provide a starting point on the path to actually becoming an applied machine learning scientist; (3) include runnable code, showing readers how to solve problems in practice; (4) allow for rapid updates, both by us and also by the community at large; and (5) be complemented by a forum for interactive discussion of technical details and to answer questions.
