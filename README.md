@@ -7,7 +7,9 @@
 
 <h5 align="center"><i>The best way to understand deep learning is learning by doing.</i></h5>
 
-![](static/frontpage/_images/notebook.gif)
+<p align="center">
+  <img width="200"  src="static/frontpage/_images/notebook.gif">
+</p>
 
 
 This open-source book represents our attempt to make deep learning approachable, teaching you both the concepts, the context, and the code. 
