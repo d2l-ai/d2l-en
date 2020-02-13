@@ -62,10 +62,10 @@ def train(net, train_iter, test_iter, num_epochs, loss, trainer, ctx):
         train_loss, train_acc, test_acc))
 ```
 
-Let's have a look at what happens if we invoke this algorithm with default settings, such as a learning rate of $0.5$ and train for $40$ iterations. Note how the training accuracy keeps on increasing while progress in terms of test accuracy stalls beyond a point. The gap between both curves indicates overfitting.
+Let's have a look at what happens if we invoke this algorithm with default settings, such as a learning rate of $0.3$ and train for $30$ iterations. Note how the training accuracy keeps on increasing while progress in terms of test accuracy stalls beyond a point. The gap between both curves indicates overfitting.
 
 ```{.python .input}
-lr, num_epochs = 0.5, 40
+lr, num_epochs = 0.3, 30
 net.initialize(force_reinit=True, ctx=ctx, init=init.Xavier())
 trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': lr})
 train(net, train_iter, test_iter, num_epochs, loss, trainer, ctx)
@@ -157,10 +157,10 @@ A rather perplexing heuristic was proposed by :cite:`Loshchilov.Hutter.2016`. It
 
 $$\eta_t = \eta_T + \frac{\eta_0 - \eta_T}{2} \left(1 + \cos(\pi t/T)\right)$$
 
-Here $\eta_0$ is the initial learning rate, $\eta_T$ is the target rate at time $T$. Furthermore, for $t > T$ we simply pin the value to $\eta_T$ without increasing it again. In the following example, we set the max update step $T = 40$.
+Here $\eta_0$ is the initial learning rate, $\eta_T$ is the target rate at time $T$. Furthermore, for $t > T$ we simply pin the value to $\eta_T$ without increasing it again. In the following example, we set the max update step $T = 20$.
 
 ```{.python .input}
-scheduler = lr_scheduler.CosineScheduler(max_update=40, base_lr=0.5,
+scheduler = lr_scheduler.CosineScheduler(max_update=20, base_lr=0.5,
                                          final_lr=0.01)
 d2l.plot(np.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
 ```
@@ -180,7 +180,7 @@ In some cases initializing the parameters is not sufficient to guarantee a good 
 A rather simple fix for this dilemma is to use a warmup period during which the learning rate *increases* to its initial maximum and to cool down the rate until the end of the optimization process. For simplicity one typically uses a linear increase for this purpose. This leads to a schedule of the form indicated below.
 
 ```{.python .input}
-scheduler = lr_scheduler.CosineScheduler(40, warmup_steps=5, base_lr=0.5,
+scheduler = lr_scheduler.CosineScheduler(20, warmup_steps=5, base_lr=0.5,
                                          final_lr=0.01)
 d2l.plot(np.arange(num_epochs), [scheduler(t) for t in range(num_epochs)])
 ```
