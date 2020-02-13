@@ -7,7 +7,7 @@
 
 <h5 align="center"><i>The best way to understand deep learning is learning by doing.</i></h5>
 
-![](d2l-en/static/frontpage/_images/forum.jpg)
+![](static/frontpage/_images/notebook.gif)
 
 
 This open-source book represents our attempt to make deep learning approachable, teaching you both the concepts, the context, and the code. 
