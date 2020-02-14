@@ -8,8 +8,15 @@ treated text data as a time series with only one dimension, and naturally, we
 used recurrent neural networks to process such data. In fact, we can also treat
 text as a one-dimensional image, so that we can use one-dimensional
 convolutional neural networks to capture associations between adjacent
-words. This section describes a groundbreaking approach to applying
-convolutional neural networks to text analysis: textCNN :cite:`Kim.2014`. First, import the packages and modules required for the experiment.
+words. 
+As described in :label:`fig_nlp-map-sa-cnn`
+This section describes a groundbreaking approach to applying
+convolutional neural networks to sentiment analysis: textCNN :cite:`Kim.2014`.
+
+![This section feeds pretrained GloVe to a CNN-based architecture for sentiment analysis.](../img/nlp-map-sa-rnn.svg)
+:label:`fig_nlp-map-sa-cnn`
+
+First, import the packages and modules required for the experiment.
 
 ```{.python .input  n=1}
 import d2l

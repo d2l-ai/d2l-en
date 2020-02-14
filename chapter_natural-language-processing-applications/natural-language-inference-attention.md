@@ -3,8 +3,10 @@
 
 We introduced the natural language inference (NLI) task and the SNLI dataset in :numref:`sec_natural-language-inference-and-dataset`. In view of many models that are based on complex and deep architectures, Parikh et al. proposed to address NLI with attention mechanisms and called it a "decomposable attention model" :cite:`Parikh.Tackstrom.Das.ea.2016`.
 This results in a model without recurrent or convolutional layers, achieving the best result at the time on the SNLI dataset with much fewer parameters.
-In this section, we will describe and implement this attention-based method for NLI.
+In this section, we will describe and implement this attention-based method (with MLPs) for NLI, as depicted in :numref:`fig_nlp-map-nli-attention`.
 
+![This section feeds pretrained GloVe to an architecture based on attention and MLPs for natural language inference.](../img/nlp-map-nli-attention.svg)
+:label:`fig_nlp-map-nli-attention`
 
 
 ## The Model
