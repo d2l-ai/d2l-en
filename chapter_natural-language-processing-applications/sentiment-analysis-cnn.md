@@ -13,7 +13,7 @@ As described in :label:`fig_nlp-map-sa-cnn`
 This section describes a groundbreaking approach to applying
 convolutional neural networks to sentiment analysis: textCNN :cite:`Kim.2014`.
 
-![This section feeds pretrained GloVe to a CNN-based architecture for sentiment analysis.](../img/nlp-map-sa-rnn.svg)
+![This section feeds pretrained GloVe to a CNN-based architecture for sentiment analysis.](../img/nlp-map-sa-cnn.svg)
 :label:`fig_nlp-map-sa-cnn`
 
 First, import the packages and modules required for the experiment.
