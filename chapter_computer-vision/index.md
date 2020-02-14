@@ -14,7 +14,7 @@ bounding-box
 object-detection-dataset
 anchor
 rpn
-faster-rcnn
+rcnn
 ssd
 rcnn
 semantic-segmentation-and-dataset
