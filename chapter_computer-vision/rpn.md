@@ -224,8 +224,6 @@ def train_detection(backbone, output_model, batch_fn,
                 animator.add(epoch+i/len(train_iter), (
                     train_err, train_mae, None, None))
         metric.reset()
-        test_err, test_mae = 0, 0  # fixme, remove it later
-        continue                   # fixme, remove it later
         for X, Y in test_iter:
             X = backbone(X.as_in_context(ctx))
             preds, labels, anchors = batch_fn(Y, X, output_model, anchors)
@@ -322,4 +320,4 @@ visualize_rpn_preds(X, Y, preds)
 ## Exercises
 
 1. Try fine-tune the backbone instead of training from scratch, check if it improves the results.
-1. Improve the model accuracy. You may consider the following options: change model hyper-parameters, using more epochs, tuning the learning rate. 
+1. Improve the model accuracy. You may consider the following options: change model hyper-parameters, using a larger feature map to generate anchors, training with more data epochs, and tuning the learning rate.

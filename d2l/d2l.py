@@ -1550,10 +1550,8 @@ def anchor_plus_offset(anchors, offsets):
 # Defined in file: ./chapter_computer-vision/anchor.md
 def project_box(boxes):
     """Project boxes into [0,1]"""
-    return np.stack((np.maximum(boxes[0], 0),
-                     np.maximum(boxes[1], 0),
-                     np.minimum(boxes[2], 1),
-                     np.minimum(boxes[3], 1)))
+    return np.stack((np.maximum(boxes[0], 0), np.maximum(boxes[1], 0),
+                     np.minimum(boxes[2], 1), np.minimum(boxes[3], 1)))
 
 
 # Defined in file: ./chapter_computer-vision/anchor.md
@@ -1562,7 +1560,7 @@ def nms(scores, boxes, iou_threshold, use_numpy=False):
     
     scores : shape (n,) 
     boxes : shape (4, n)
-    use_numpy : fallback to numpy, will remove later
+    use_numpy : fallback to numpy for better performance, will remove later
     """
     if use_numpy:
         scores, boxes = scores.asnumpy(), boxes.asnumpy()
@@ -1594,27 +1592,25 @@ def label_anchors(ground_truth, anchors, pos_iou, neg_iou, neg_pos_ratio):
     box_offsets = np.zeros((batch_size, num_anchors, 4))
     for i, label in enumerate(ground_truth):
         label = label[label[:,0]>=0, :]  # Ignore invalid labels
-        neg = np.zeros((len(label), num_anchors), dtype='bool')  # Fix me...
-        #print(neg)
+        neg = np.zeros((len(label), num_anchors), dtype='bool')
         for j, y in enumerate(label):
             iou = d2l.iou(y[1:], anchors)
             pos = iou > pos_iou
-            k = int(iou.argmax()) # In case pos is all False
+            k = int(iou.argmax()) # In case pos is all False, fixme, no need int
             pos[k] = True  
             cls_labels[i, pos] = y[0]+1  # Positive anchors
-            # fixme: i][pos -> i, pos
+            # fixme: [i][pos, :] -> [i, pos, :]
             box_offsets[i][pos, :] = d2l.anchor_to_gt_offset(
                 anchors[:,pos].reshape((4,-1)), # fixme, no reshape is needed
                 y[1:].reshape((-1,1))).T
             neg[j][iou < neg_iou] = True
-            #print((iou < neg_iou).nonzero()[0])
             neg[j][k] = True
         # Randomly sample negative
         n_pos = int((cls_labels[i]>0).sum())
         neg = neg.all(axis=0).nonzero()[0]        
         np.random.shuffle(neg)
         n_neg = min(len(neg), int(n_pos*neg_pos_ratio))
-        if n_neg > 0:  # fixme, no needed
+        if n_neg > 0:  # fixme, a[i,[]] = 0 should work.
             cls_labels[i, neg[:n_neg]] = 0
     return cls_labels, box_offsets
 
@@ -1643,10 +1639,7 @@ class RPNOutput(nn.Block):
 
 # Defined in file: ./chapter_computer-vision/rpn.md
 def rpn_anchors(X):
-    """Generate anchors for RPN
-
-    X: (batch_size, #channels, height, width)
-    """
+    """Generate anchors for RPN"""
     sizes, ratios = [0.85, 0.43, 0.21], [1, 2, 0.5]
     _, _, height, width = X.shape
     return d2l.generate_anchors(height, width, sizes, ratios)
@@ -1701,25 +1694,16 @@ class DetectionEvaluation(object):
 
 
 # Defined in file: ./chapter_computer-vision/rpn.md
-def rpn_batch(Y, backbone_features, output_model, anchors):
-    if anchors is None:
-        anchors = rpn_anchors(backbone_features)
-    labels = rpn_targets(Y, anchors)
-    preds = output_model(backbone_features)
-    return preds, labels, anchors
-
-
-# Defined in file: ./chapter_computer-vision/rpn.md
 def train_detection(backbone, output_model, batch_fn, 
                     train_iter, test_iter, loss, num_epochs, 
                     backbone_lr, output_lr, ctx=d2l.try_gpu()):
     """Train a detection model
     
-    backbone, output_model - the 
-    anchor_fn, batch_fn - 
+    backbone, output_model : neural network models 
+    batch_fn : a function to compute predictions, labels and anchors
     train_iter, test_iter - data iterators for training and test
     num_epochs - number of data epochs to train
-    backbone_lr, output_lr - the learning rate for 
+    backbone_lr, output_lr - the learning rates
     """
     backbone_trainer = gluon.Trainer(backbone.collect_params(), 'sgd', {
         'learning_rate': backbone_lr, 'wd': 1e-4})
@@ -1739,21 +1723,32 @@ def train_detection(backbone, output_model, batch_fn,
                 labels = [y.as_in_context(ctx) for y in labels]
                 l = loss(*preds, *labels)
             l.backward()
-            metric.add(*evaluator(*preds, *labels))
             output_trainer.step(1)
             backbone_trainer.step(1)
+            metric.add(*evaluator(*preds, *labels))
+            train_err, train_mae = 1-metric[0]/metric[2], metric[1]/metric[3]
             if (i+1)%4 == 0:
                 animator.add(epoch+i/len(train_iter), (
-                    1-metric[0]/metric[2], metric[1]/metric[3], None, None))
+                    train_err, train_mae, None, None))
         metric.reset()
-        continue
         for X, Y in test_iter:
             X = backbone(X.as_in_context(ctx))
-            preds, labels = batch_fn(Y, X, output_model, anchors)
+            preds, labels, anchors = batch_fn(Y, X, output_model, anchors)
             labels = [y.as_in_context(ctx) for y in labels]
             metric.add(*evaluator(*preds, *labels))
-        animator.add(epoch+1, (
-            None, None, 1-metric[0]/metric[2], metric[1]/metric[3]))
+        test_err, test_mae = 1-metric[0]/metric[2], metric[1]/metric[3]
+        animator.add(epoch+1, (None, None, test_err, test_mae))
+    print('train class err %.2f, box mae %.2f; test class err %.2f, '
+          'box mae %.2f' % (train_err, train_mae, test_err, test_mae))
+
+
+# Defined in file: ./chapter_computer-vision/rpn.md
+def rpn_batch(Y, backbone_features, output_model, anchors):
+    if anchors is None:
+        anchors = rpn_anchors(backbone_features)
+    labels = rpn_targets(Y, anchors)
+    preds = output_model(backbone_features)
+    return preds, labels, anchors
 
 
 # Defined in file: ./chapter_computer-vision/rpn.md
@@ -1768,21 +1763,23 @@ def predict_rpn(backbone_features, output_model, anchor_fn, nms_threshold):
         for a in [cls_preds, box_preds]]
     Y = []
     for i, (cls_pred, box_pred) in enumerate(zip(cls_preds, box_preds)):
-        keep = d2l.nms(cls_pred[:,1], box_pred.T, nms_threshold, 
-                       use_numpy=True)
-        box = d2l.anchor_plus_offset(anchors[:,keep], box_pred[keep].T)
-        Y.append([cls_pred[keep,1], d2l.project_box(box)])
+        box = d2l.anchor_plus_offset(anchors, box_pred.T)
+        keep = d2l.nms(cls_pred[:,1], box, nms_threshold, use_numpy=True)
+        Y.append([cls_pred[keep,1], d2l.project_box(box[:,keep])])
     return Y
 
 
 # Defined in file: ./chapter_computer-vision/rpn.md
-def visualize_rpn_preds(X, rpn_preds):
+def visualize_rpn_preds(X, Y, rpn_preds):
     imgs = [img.transpose(1, 2, 0)*d2l.RGB_STD+d2l.RGB_MEAN for img in X[:10]]
     axes = d2l.show_images(imgs, 2, 5, scale=2)
-    for ax, label in zip(axes, rpn_preds[:10]):
+    for ax, label, gt in zip(axes, rpn_preds[:10], Y[:10]):
         h, w, _ = imgs[0].shape
+        scale = np.array([w,h,w,h])
+        boxes = gt[gt[:,0]>=0][:,1:5]*scale
+        d2l.show_boxes(ax, boxes, colors=['r'], labels=['gt'])
         scores = ['%.1f'%i for i in label[0][:2]]
-        boxes = label[1][:,:1].T*np.array([w,h,w,h])
+        boxes = label[1][:,:1].T*scale
         d2l.show_boxes(ax, boxes, colors=['w'], labels=scores)
         
 

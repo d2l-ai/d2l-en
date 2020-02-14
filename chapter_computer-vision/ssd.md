@@ -3,7 +3,7 @@
 In both RPN (:numref:`sec_rpn`) and faster R-CNN (:numref:`sec_rcnn`), the backbone model outputs $8\times 8$ feature maps for the images. If an object in the image with height and width less than 1/8 of the image height and width, then it is presented as a single pixel in the feature maps, which makes detection difficult. We can increase the input image resolution and reduce the backbone model stride to improve the detection accuracy for small objects. In this chapter, we will introduce single shot multibox detection
 (SSD) :cite:`Liu.Anguelov.Erhan.ea.2016`, which uses the internal feature maps in the backbone model for multiple scale detection. Unlike faster R-CNN, it only has a single stage, that's why it is called "single shot".  
 
-Let's first import modules and load the dataset. 
+Let's first import modules and load the dataset.
 
 ```{.python .input  n=1}
 from mxnet import autograd, np, npx, gluon, init
@@ -23,7 +23,7 @@ train_iter, test_iter = d2l.load_data_voc_detection(batch_size, 256, 256)
 ![The SSD is composed of a base network block and several multiscale feature blocks connected in a series. ](../img/ssd.svg)
 :label:`fig_ssd`
 
-Remember the ResNet-18 model contains multiple convolution blocks (:numref:`sec_resnet`), let's check the output size of each block. 
+Remember the ResNet-18 model contains multiple convolution blocks (:numref:`sec_resnet`), let's check the output size of each block.
 
 ```{.python .input  n=3}
 for X, Y in train_iter:
@@ -35,7 +35,7 @@ for i in range(len(net)):
 ```
 
 As can be seen, each block either keep the input size or halve the width and height while double the channel size. 
-In our SSD implementation in `SSDBackbone`, we will use 4 feature maps for object detection. The first layer is the output of the 6-th block (layer 6), which outputs a $32\times 32$ feature map. The second layer is the output of the 7-th block, with a $16\times 16$ feature map. The third layer is the output of the backbone model, with a $8\times 8$ feature map. The last layer is a $1\times 1$ feature map by applying a global max pooling. The output is a list of the feature map of each layer. 
+In our SSD implementation in `SSDBackbone`, we will use 4 feature maps for object detection. The first layer is the output of the 6-th block (layer 6), which outputs a $32\times 32$ feature map. The second layer is the output of the 7-th block, with a $16\times 16$ feature map. The third layer is the output of the backbone model, with a $8\times 8$ feature map. The last layer is a $1\times 1$ feature map by applying a global max pooling. The output is a list of the feature map of each layer.
 
 ```{.python .input  n=4}
 class SSDBackbone(nn.Block):
@@ -107,7 +107,7 @@ cls_preds.shape, box_preds.shape
 
 ## Anchor Boxes
 
-For each layer, we generate anchor boxes by calling `generate_anchors` defined in :numref:`sec_anchors`. Note that the anchor sizes for each layer are different. The smallest size is $0.3$, then we increase it by $0.1$ each time. So that low layers uses small sizes for small objects, while high layers for large objects. The anchors for each layers are then concatenated. 
+For each layer, we generate anchor boxes by calling `generate_anchors` defined in :numref:`sec_anchors`. Note that the anchor sizes for each layer are different. The smallest size is $0.3$, then we increase it by $0.1$ each time. So that low layers uses small sizes for small objects, while high layers for large objects. The anchors for each layers are then concatenated.
 
 ```{.python .input  n=6}
 # Saved in the d2l package for later use
@@ -151,7 +151,7 @@ def ssd_batch(Y, backbone_features, output_model, anchors):
     return preds, labels, anchors
 ```
 
-The training is almost identical to RPN. 
+The training is almost identical to RPN.
 
 ```{.python .input  n=18}
 ctx, loss = d2l.try_gpu(), d2l.DetectionLoss(1)
@@ -160,35 +160,27 @@ backbone.initialize(init=init.Xavier(), ctx=ctx, force_reinit=True)
 ssd_output = SSDOutput(2)
 ssd_output.initialize(init=init.Xavier(), ctx=ctx)
 
-lr = 0.05
-num_epochs = 4
-d2l.train_detection(backbone, ssd_output, ssd_batch, train_iter, 
-                    test_iter, loss, num_epochs, lr, lr, ctx)
+d2l.train_detection(backbone, ssd_output, ssd_batch, train_iter, test_iter, 
+                    loss, num_epochs=4, backbone_lr=.05, output_lr=.05, 
+                    ctx=ctx)
 ```
 
 ## Inference
 
-We can call `predict_rpn` directly for predictions, despite it always use the confident scores for the first object category. 
+We can call `predict_rpn` directly for predictions, despite it always use the confident scores for the first object category. Compared to RPN, the predicted bounding boxes are smaller for SSD, as the anchors proposed for low layer outputs are significantly smaller. 
 
 ```{.python .input  n=20}
 for X, Y in test_iter:
     break 
 
 preds = d2l.predict_rpn(backbone(X.copyto(ctx)), ssd_output, ssd_anchors, 0.7)
-```
-
-```{.python .input}
-def visualize_rpn_preds(X, rpn_preds):
-    imgs = [img.transpose(1, 2, 0)*d2l.RGB_STD+d2l.RGB_MEAN for img in X[:10]]
-    axes = d2l.show_images(imgs, 2, 5, scale=2)
-    for ax, label in zip(axes, rpn_preds[:10]):
-        h, w, _ = imgs[0].shape
-        scores = ['%.1f'%i for i in label[0][:2]]
-        boxes = label[1][:,:1].T*np.array([w,h,w,h])
-        d2l.show_boxes(ax, boxes, colors=['w'], labels=scores)
-        
-visualize_rpn_preds(X, preds)
+d2l.visualize_rpn_preds(X, Y, preds)
 ```
 
 ## Summary
 
+1. SSD is similar to RPN but detects objects on multiple layer outputs.
+
+## Exercises
+
+1. Tune hyper-parameters for better performance

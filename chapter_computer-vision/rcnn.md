@@ -1,6 +1,6 @@
 # Faster R-CNN
 
-Faster R-CNN :cite:`Ren.He.Girshick.ea.2015` is an object detection in the Region-based CNN (R-CNN) family, which improves the speedup over the original R-CNN model :cite:`Girshick.Donahue.Darrell.ea.2014` and the following improved version Fast R-CNN :cite:`Girshick.2015`. Like other models in the R-CNN family, Faster R-CNN is a two-stage detection model. High quality regions (anchor boxes) are proposed using the RPN model described in :numref:`sec_rpn`, then an another model is trained for predicting the bounding boxes and object class categories. 
+Faster R-CNN :cite:`Ren.He.Girshick.ea.2015` is an object detection in the Region-based CNN (R-CNN) family, which improves the speed over the original R-CNN model :cite:`Girshick.Donahue.Darrell.ea.2014` and the following improved version called fast R-CNN :cite:`Girshick.2015`. Like other models in the R-CNN family, Faster R-CNN is a two-stage detection model. In the first stage, high quality regions (anchor boxes) are proposed using the RPN model described in :numref:`sec_rpn`. Another model is trained on the second stage to predict the bounding boxes and object class categories. 
 
 Let's first import the modules and load the data.
 
@@ -122,7 +122,7 @@ d2l.train_detection(backbone, rpn_output, d2l.rpn_batch,
 backbone.save_parameters('backbone')
 ```
 
-Next we define the batch function for faster R-CNN. It first runs `predict_rpn` to predict the anchor boxes, then obtain the targets with `faster_rcnn_targets`. Note that we don't need to compute the gradients for the RPN output module, while it has been attached gradients on step 1. We put these two steps in the `pause` scope of `autograd` to explicit ask MXNet to stop computing gradients. Besides, as the anchors change for every batch, we ignore `anchors` input and output. 
+Next we define the batch function for faster R-CNN. It first runs `predict_rpn` to predict the anchor boxes, then obtain the targets with `faster_rcnn_targets`. Note that we don't need to compute the gradients for the RPN output module, while it has been attached gradients on step 1. We put these two steps in the `pause` scope of `autograd` to explicit ask MXNet to stop computing gradients. Besides, as the anchors change for every batch, we ignore `anchors` input and output.
 
 ```{.python .input  n=38}
 def faster_rcnn_batch(ground_truths, backbone_outputs, faster_rcnn_output, anchors):
@@ -136,25 +136,28 @@ def faster_rcnn_batch(ground_truths, backbone_outputs, faster_rcnn_output, ancho
     return preds, (cls_labels, box_labels), None
 ```
 
-Now we can do step 2. We randomly initialize the faster R-CNN output module, but load the parameters of the backbone trained in step 1 from disk. This extra loading step makes we can run step 2 repeated to tune the learning rate that changes the parameters in `backbone`. 
+Now we can do step 2. We randomly initialize the faster R-CNN output module, but load the parameters of the backbone trained in step 1 from disk. This extra loading step makes we can run step 2 repeated to tune the learning rate that changes the parameters in `backbone`. We found the bounding box MAE is too large with $\lambda=1$ in the loss function, we increase it to $10$. 
 
 ```{.python .input  n=15}
 faster_rcnn_output = FasterRCNNOutput(2)
 faster_rcnn_output.initialize(init=init.Xavier(), ctx=ctx)
 backbone.load_parameters('backbone', ctx=ctx)
 
+loss = d2l.DetectionLoss(10)
+ 
 d2l.train_detection(backbone, faster_rcnn_output, faster_rcnn_batch, 
-                    train_iter, test_iter, loss, num_epochs=3, 
+                    train_iter, test_iter, loss, num_epochs=2, 
                     backbone_lr=0.01, output_lr=0.1, ctx=ctx)
 ```
 
 ## Summary
 
-1. 
+1. Faster R-CNN uses the predictions of a trained RPN for high-quality anchor boxes. 
+1. RoI pooling is used to extract features from each anchor box with a fixed shape.
+
 
 ## Exercises
 
-1. Tune both number of epochs and the learning rates for better results. 
+1. Tune hyper-parameters for better results. 
 1. Implement the full 4-step training procedure
-1. Implement the inference function and visualize the results. 
-
+1. Implement the inference function and visualize the results.
