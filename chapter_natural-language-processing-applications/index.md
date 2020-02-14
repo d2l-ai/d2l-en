@@ -2,7 +2,7 @@
 :label:`chap_nlp_app`
 
 
-![Focus of this chapter are models for applications. ](../img/nlp-map-app.svg)
+![Pretrained text representation can be fed to various deep learning architectures for different downstream NLP tasks. This chapter focuses on how to design models for different downstream NLP tasks.](../img/nlp-map-app.svg)
 :label:`fig_nlp-map-app`
 
 TODO@astonzhang
@@ -10,7 +10,6 @@ TODO@astonzhang
 ```toc
 :maxdepth: 2
 
-similarity-analogy
 sentiment-analysis
 sentiment-analysis-rnn
 sentiment-analysis-cnn
