@@ -1,4 +1,5 @@
 # The Object Detection Dataset (VOC)
+:numref:`sec_detection_dataset`
 
 [Pascal VOC2012](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/) is one the widely used dataset in object detection. In this chapter, we will describe how to download and read this dataset.
 
@@ -20,13 +21,13 @@ The whole dataset is contained in the `VOCtrainval_11-May-2012.tar` that can be 
 d2l.DATA_HUB['voc2012'] = (d2l.DATA_URL + 'VOCtrainval_11-May-2012.tar',
                            '4e443f8a2eca6b1dac8a6c57641b67dd40621a49')
 
-voc_dir = '../data/VOCdevkit/VOC2012'
+voc_dir = '../data/VOCdevkit/VOC2012'  # fixme, remove this one
 #voc_dir = d2l.download_extract('voc2012', 'VOCdevkit/VOC2012')
 ```
 
 ## Reading the Dataset
 
-This dataset contains 20 objects in four categories: person, animal, vehicle and indoor.
+This dataset contains 20 objects in four categories: person, animal, vehicle and indoor, with an additional background class.
 
 ```{.python .input  n=6}
 # Saved in the d2l package for later use
@@ -69,7 +70,7 @@ The labels for each image are stored as a xml file in the `Annotations` folder. 
 
 ```{.python .input  n=11}
 # Saved in the d2l package for later use
-def read_voc_labels(voc_dir, image_fns, classes):
+def read_voc_detection_labels(voc_dir, image_fns, classes):
     import xml.etree.cElementTree as et
     labels = []
     class_to_idx = dict([(cls, i) for i, cls in enumerate(classes)])
@@ -90,7 +91,7 @@ def read_voc_labels(voc_dir, image_fns, classes):
 Let's read all ground-truth bonding boxes for the cat class.
 
 ```{.python .input  n=12}
-labels = read_voc_labels(voc_dir, image_fns, ['cat'])
+labels = read_voc_detection_labels(voc_dir, image_fns, ['cat'])
 len(labels), labels[0]
 ```
 
@@ -111,7 +112,7 @@ As mentioned before, an image may contain more than one bounding boxes and there
 
 ```{.python .input  n=14}
 # Saved in the d2l package for later use
-class VOCDetDataset(gluon.data.Dataset):
+class DetectionDataset(gluon.data.Dataset):
     """A customized dataset to load VOC dataset."""
     def __init__(self, images, labels, height, width):
         n = max([l.shape[0] for l in labels])  # max #objects per image
@@ -145,7 +146,7 @@ class VOCDetDataset(gluon.data.Dataset):
 Let's construct a data loader to read the first batch. Comparing reading image classification data, the label shape changes from `(batch_size, )` to `(batch_size, n, 5)`.
 
 ```{.python .input  n=15}
-train_ds = VOCDetDataset(images, labels, 400, 470)
+train_ds = DetectionDataset(images, labels, 400, 470)
 train_iter = gluon.data.DataLoader(train_ds, 10)
 for x, y in train_iter:
     break
@@ -173,12 +174,12 @@ def load_data_voc_detection(batch_size, height, width, classes=['cat','dog']):
     def load_data(dataset):
         txt_fns = ['Main/%s_%s.txt'%(cls, dataset) for cls in classes]
         images, image_fns = read_voc_images(voc_dir, txt_fns)
-        labels = read_voc_labels(voc_dir, image_fns, classes)
+        labels = read_voc_detection_labels(voc_dir, image_fns, classes)
         return images, labels
-    #voc_dir = d2l.download_extract('voc2012', 'VOCdevkit/VOC2012')
-    voc_dir = '../data/VOCdevkit/VOC2012/'
-    train_ds = VOCDetDataset(*load_data('train'), height, width)
-    test_ds = VOCDetDataset(*load_data('val'), height, width)
+    #voc_dir = d2l.download_extract('voc2012', 'VOCdevkit/VOC2012') 
+    voc_dir = '../data/VOCdevkit/VOC2012/' #FIXME
+    train_ds = DetectionDataset(*load_data('train'), height, width)
+    test_ds = DetectionDataset(*load_data('val'), height, width)
     train_iter, test_iter = [gluon.data.DataLoader(
         ds, batch_size, shuffle=shuffle, last_batch='discard',
         num_workers=d2l.get_dataloader_workers()) for ds, shuffle in
@@ -195,5 +196,5 @@ def load_data_voc_detection(batch_size, height, width, classes=['cat','dog']):
 
 ## Exercises
 
-1. Add random cropping into `VOCDetDataset`. You may need to try more than one time if a bounding box is cropped too much.
-1. Loading the whole dataset with 20 classes is time consuming. Change `VOCDetDataset` so that it reads the example when needed by `__getitem__`.
+1. Add random cropping into `DetectionDataset`. You may need to try more than one time if a bounding box is cropped too much. You can refer to how we do random crop for semantic detection in :numref:`sec_semantic_segmentation`. 
+1. Loading the whole dataset with 20 classes is time consuming. Change `DetectionDataset` so that it reads the example when needed by `__getitem__`.
