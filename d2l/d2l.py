@@ -1563,12 +1563,12 @@ d2l.DATA_HUB['dog_tiny'] = (d2l.DATA_URL + 'kaggle_dog_tiny.zip',
                             '7c9b54e78c1cedaa04998f9868bc548c60101362')
 
 
-# Defined in file: ./chapter_natural-language-processing/word2vec-dataset.md
+# Defined in file: ./chapter_natural-language-processing-pretraining/word2vec-dataset.md
 d2l.DATA_HUB['ptb'] = (d2l.DATA_URL + 'ptb.zip', 
                        '319d85e578af0cdc590547f26231e4e31cdf1e42')
 
 
-# Defined in file: ./chapter_natural-language-processing/word2vec-dataset.md
+# Defined in file: ./chapter_natural-language-processing-pretraining/word2vec-dataset.md
 def read_ptb():
     data_dir = d2l.download_extract('ptb')
     with open(data_dir + 'ptb.train.txt') as f:
@@ -1576,7 +1576,7 @@ def read_ptb():
     return [line.split() for line in raw_text.split('\n')]
 
 
-# Defined in file: ./chapter_natural-language-processing/word2vec-dataset.md
+# Defined in file: ./chapter_natural-language-processing-pretraining/word2vec-dataset.md
 def subsampling(sentences, vocab):
     # Map low frequency words into <unk>
     sentences = [[vocab.idx_to_token[vocab[tk]] for tk in line]
@@ -1594,7 +1594,7 @@ def subsampling(sentences, vocab):
     return [[tk for tk in line if keep(tk)] for line in sentences]
 
 
-# Defined in file: ./chapter_natural-language-processing/word2vec-dataset.md
+# Defined in file: ./chapter_natural-language-processing-pretraining/word2vec-dataset.md
 def get_centers_and_contexts(corpus, max_window_size):
     centers, contexts = [], []
     for line in corpus:
@@ -1613,7 +1613,7 @@ def get_centers_and_contexts(corpus, max_window_size):
     return centers, contexts
 
 
-# Defined in file: ./chapter_natural-language-processing/word2vec-dataset.md
+# Defined in file: ./chapter_natural-language-processing-pretraining/word2vec-dataset.md
 class RandomGenerator(object):
     """Draw a random int in [0, n] according to n sampling weights."""
     def __init__(self, sampling_weights):
@@ -1631,7 +1631,7 @@ class RandomGenerator(object):
         return self.candidates[self.i-1]
 
 
-# Defined in file: ./chapter_natural-language-processing/word2vec-dataset.md
+# Defined in file: ./chapter_natural-language-processing-pretraining/word2vec-dataset.md
 def get_negatives(all_contexts, corpus, K):
     counter = d2l.count_corpus(corpus)
     sampling_weights = [counter[i]**0.75 for i in range(len(counter))]
@@ -1647,7 +1647,7 @@ def get_negatives(all_contexts, corpus, K):
     return all_negatives
 
 
-# Defined in file: ./chapter_natural-language-processing/word2vec-dataset.md
+# Defined in file: ./chapter_natural-language-processing-pretraining/word2vec-dataset.md
 def batchify(data):
     max_len = max(len(c) + len(n) for _, c, n in data)
     centers, contexts_negatives, masks, labels = [], [], [], []
@@ -1661,7 +1661,7 @@ def batchify(data):
             np.array(masks), np.array(labels))
 
 
-# Defined in file: ./chapter_natural-language-processing/word2vec-dataset.md
+# Defined in file: ./chapter_natural-language-processing-pretraining/word2vec-dataset.md
 def load_data_ptb(batch_size, max_window_size, num_noise_words):
     sentences = read_ptb()
     vocab = d2l.Vocab(sentences, min_freq=10)
@@ -1677,13 +1677,13 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
     return data_iter, vocab
 
 
-# Defined in file: ./chapter_natural-language-processing/sentiment-analysis.md
+# Defined in file: ./chapter_natural-language-processing-applications/sentiment-analysis.md
 d2l.DATA_HUB['aclImdb'] = (
     'http://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz',
     '01ada507287d82875905620988597833ad4e0903')
 
 
-# Defined in file: ./chapter_natural-language-processing/sentiment-analysis.md
+# Defined in file: ./chapter_natural-language-processing-applications/sentiment-analysis.md
 def read_imdb(data_dir, is_train):
     data, labels = [], []
     for label in ['pos/', 'neg/']:
@@ -1696,7 +1696,7 @@ def read_imdb(data_dir, is_train):
     return data, labels
 
 
-# Defined in file: ./chapter_natural-language-processing/sentiment-analysis.md
+# Defined in file: ./chapter_natural-language-processing-applications/sentiment-analysis.md
 def load_data_imdb(batch_size, num_steps=500):
     data_dir = d2l.download_extract('aclImdb', 'aclImdb')
     train_data = read_imdb(data_dir, True)
@@ -1714,20 +1714,20 @@ def load_data_imdb(batch_size, num_steps=500):
     return train_iter, test_iter, vocab
 
 
-# Defined in file: ./chapter_natural-language-processing/sentiment-analysis-rnn.md
+# Defined in file: ./chapter_natural-language-processing-applications/sentiment-analysis-rnn.md
 def predict_sentiment(net, vocab, sentence):
     sentence = np.array(vocab[sentence.split()], ctx=d2l.try_gpu())
     label = np.argmax(net(sentence.reshape(1, -1)), axis=1)
     return 'positive' if label == 1 else 'negative'
 
 
-# Defined in file: ./chapter_natural-language-processing/natural-language-inference-and-dataset.md
+# Defined in file: ./chapter_natural-language-processing-applications/natural-language-inference-and-dataset.md
 d2l.DATA_HUB['SNLI'] = (
     'https://nlp.stanford.edu/projects/snli/snli_1.0.zip',
     '9fcde07509c7e87ec61c640c1b2753d9041758e4')
 
 
-# Defined in file: ./chapter_natural-language-processing/natural-language-inference-and-dataset.md
+# Defined in file: ./chapter_natural-language-processing-applications/natural-language-inference-and-dataset.md
 def read_snli(data_dir, is_train):
     """Read the SNLI dataset into premises, hypotheses, and labels."""
     def extract_text(s):
@@ -1748,7 +1748,7 @@ def read_snli(data_dir, is_train):
     return premises, hypotheses, labels
 
 
-# Defined in file: ./chapter_natural-language-processing/natural-language-inference-and-dataset.md
+# Defined in file: ./chapter_natural-language-processing-applications/natural-language-inference-and-dataset.md
 class SNLIDataset(gluon.data.Dataset):
     """A customized dataset to load the SNLI dataset."""
     def __init__(self, dataset, num_steps, vocab=None):
@@ -1776,7 +1776,7 @@ class SNLIDataset(gluon.data.Dataset):
         return len(self.premises)
 
 
-# Defined in file: ./chapter_natural-language-processing/natural-language-inference-and-dataset.md
+# Defined in file: ./chapter_natural-language-processing-applications/natural-language-inference-and-dataset.md
 def load_data_snli(batch_size, num_steps=50):
     """Download the SNLI dataset and return data iterators and vocabulary."""
     data_dir = d2l.download_extract('SNLI')
@@ -1789,7 +1789,7 @@ def load_data_snli(batch_size, num_steps=50):
     return train_iter, test_iter, train_set.vocab
 
 
-# Defined in file: ./chapter_natural-language-processing/natural-language-inference-attention.md
+# Defined in file: ./chapter_natural-language-processing-applications/natural-language-inference-attention.md
 def split_batch_multi_inputs(X, y, ctx_list):
     """Split multi-input X and y into multiple devices specified by ctx"""
     X = list(zip(*[gluon.utils.split_and_load(
@@ -1797,7 +1797,7 @@ def split_batch_multi_inputs(X, y, ctx_list):
     return (X, gluon.utils.split_and_load(y, ctx_list, even_split=False))
 
 
-# Defined in file: ./chapter_natural-language-processing/natural-language-inference-attention.md
+# Defined in file: ./chapter_natural-language-processing-applications/natural-language-inference-attention.md
 def predict_snli(net, premise, hypothesis):
     premise = np.array(vocab[premise], ctx=d2l.try_gpu())
     hypothesis = np.array(vocab[hypothesis], ctx=d2l.try_gpu())
