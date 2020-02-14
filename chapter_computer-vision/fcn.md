@@ -31,7 +31,7 @@ Here, we demonstrate the most basic design of a fully convolutional network mode
 ![Fully convolutional network. ](../img/fcn.svg)
 :label:`fig_fcn`
 
-Similar to FPN :numref:`sec_fpn`, we use a ResNet-18 model pre-trained on the ImageNet dataset to extract image features. The feature maps before the global average pooling layers are kept. 
+Similar to FPN :numref:`sec_fpn`, we use a ResNet-18 model pre-trained on the ImageNet dataset to extract image features. The feature maps before the global average pooling layers are kept.
 
 ```{.python .input  n=2}
 net = d2l.detection_backbone()
@@ -161,8 +161,7 @@ for X, Y in test_iter:
 preds = net(X.as_in_context(ctx[0])).argmax(axis=1)
 ```
 
-Now we can visualize the first 4 predictions (in middle row) with the original images (in top row) and ground truth labels (in bottle row). 
-
+Now we can visualize the first 4 predictions (in middle row) with the original images (in top row) and ground truth labels (in bottle row).
 
 ```{.python .input  n=44}
 n = 4

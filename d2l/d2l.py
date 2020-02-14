@@ -1411,19 +1411,19 @@ def iou(a, b, use_numpy=False):
     return inter_area / (a_area + b_area - inter_area)
 
 
-# Defined in file: ./chapter_computer-vision/voc.md
+# Defined in file: ./chapter_computer-vision/object-detection-dataset.md
 d2l.DATA_HUB['voc2012'] = (d2l.DATA_URL + 'VOCtrainval_11-May-2012.tar',
                            '4e443f8a2eca6b1dac8a6c57641b67dd40621a49')
 
 
-# Defined in file: ./chapter_computer-vision/voc.md
+# Defined in file: ./chapter_computer-vision/object-detection-dataset.md
 VOC_CLASSES = ['background', 'aeroplane', 'bicycle', 'bird', 'boat',
                'bottle', 'bus', 'car', 'cat', 'chair', 'cow',
                'diningtable', 'dog', 'horse', 'motorbike', 'person',
                'pottedplant', 'sheep', 'sofa', 'train', 'tvmonitor']
 
 
-# Defined in file: ./chapter_computer-vision/voc.md
+# Defined in file: ./chapter_computer-vision/object-detection-dataset.md
 def read_voc_images(voc_dir, image_sets):
     """Read images specified in the list of files."""
     lines = []
@@ -1442,8 +1442,8 @@ def read_voc_images(voc_dir, image_sets):
     return images, image_fns
 
 
-# Defined in file: ./chapter_computer-vision/voc.md
-def read_voc_labels(voc_dir, image_fns, classes):
+# Defined in file: ./chapter_computer-vision/object-detection-dataset.md
+def read_voc_detection_labels(voc_dir, image_fns, classes):
     import xml.etree.cElementTree as et
     labels = []
     class_to_idx = dict([(cls, i) for i, cls in enumerate(classes)])
@@ -1454,15 +1454,15 @@ def read_voc_labels(voc_dir, image_fns, classes):
         for obj in root.iter('object'):
             cls = obj.find('name').text.strip().lower()
             if cls not in class_to_idx: continue
-            box = [float(obj.find('bndbox').find(name).text) - 1 
+            box = [float(obj.find('bndbox').find(name).text) - 1
                    for name in ('xmin', 'ymin', 'xmax', 'ymax')]
             label.append([class_to_idx[cls]]+box)
         labels.append(np.array(label))
     return labels
 
 
-# Defined in file: ./chapter_computer-vision/voc.md
-class VOCDetDataset(gluon.data.Dataset):
+# Defined in file: ./chapter_computer-vision/object-detection-dataset.md
+class DetectionDataset(gluon.data.Dataset):
     """A customized dataset to load VOC dataset."""
     def __init__(self, images, labels, height, width):
         n = max([l.shape[0] for l in labels])  # max #objects per image
@@ -1479,7 +1479,7 @@ class VOCDetDataset(gluon.data.Dataset):
         # Resize and then normalize RGB channels
         self.features = [(image.imresize(img, width, height).astype(
             'float32')/255-d2l.RGB_MEAN)/d2l.RGB_STD for img in images]
-        
+
     def __getitem__(self, idx):
         feature, label = self.features[idx], self.labels[idx]
         # Flip both image and bounding box horizontally in random.
@@ -1488,23 +1488,23 @@ class VOCDetDataset(gluon.data.Dataset):
             label = np.stack([label[:,0], 1-label[:,3], label[:,2],
                               1-label[:,1], label[:,4]], axis=1)
         return feature.transpose(2, 0, 1), label
-    
+
     def __len__(self):
         return len(self.features)
 
 
-# Defined in file: ./chapter_computer-vision/voc.md
+# Defined in file: ./chapter_computer-vision/object-detection-dataset.md
 def load_data_voc_detection(batch_size, height, width, classes=['cat','dog']):
     """Load the pikachu dataset."""
     def load_data(dataset):
         txt_fns = ['Main/%s_%s.txt'%(cls, dataset) for cls in classes]
         images, image_fns = read_voc_images(voc_dir, txt_fns)
-        labels = read_voc_labels(voc_dir, image_fns, classes)
+        labels = read_voc_detection_labels(voc_dir, image_fns, classes)
         return images, labels
-    #voc_dir = d2l.download_extract('voc2012', 'VOCdevkit/VOC2012')
-    voc_dir = '../data/VOCdevkit/VOC2012/'
-    train_ds = VOCDetDataset(*load_data('train'), height, width)
-    test_ds = VOCDetDataset(*load_data('val'), height, width)
+    #voc_dir = d2l.download_extract('voc2012', 'VOCdevkit/VOC2012') 
+    voc_dir = '../data/VOCdevkit/VOC2012/' #FIXME
+    train_ds = DetectionDataset(*load_data('train'), height, width)
+    test_ds = DetectionDataset(*load_data('val'), height, width)
     train_iter, test_iter = [gluon.data.DataLoader(
         ds, batch_size, shuffle=shuffle, last_batch='discard',
         num_workers=d2l.get_dataloader_workers()) for ds, shuffle in
@@ -1775,6 +1775,18 @@ def predict_rpn(backbone_features, output_model, anchor_fn, nms_threshold):
     return Y
 
 
+# Defined in file: ./chapter_computer-vision/rpn.md
+def visualize_rpn_preds(X, rpn_preds):
+    imgs = [img.transpose(1, 2, 0)*d2l.RGB_STD+d2l.RGB_MEAN for img in X[:10]]
+    axes = d2l.show_images(imgs, 2, 5, scale=2)
+    for ax, label in zip(axes, rpn_preds[:10]):
+        h, w, _ = imgs[0].shape
+        scores = ['%.1f'%i for i in label[0][:2]]
+        boxes = label[1][:,:1].T*np.array([w,h,w,h])
+        d2l.show_boxes(ax, boxes, colors=['w'], labels=scores)
+        
+
+
 # Defined in file: ./chapter_computer-vision/ssd.md
 def ssd_anchors(feature_maps):
     sizes = [[.3,.4],[.5,.6],[.7,.8],[.9,.1]]
@@ -1789,41 +1801,45 @@ def ssd_anchors(feature_maps):
 
 
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
-VOC_COLORMAP = [[0, 0, 0], [128, 0, 0], [0, 128, 0], [128, 128, 0],
-                [0, 0, 128], [128, 0, 128], [0, 128, 128], [128, 128, 128],
-                [64, 0, 0], [192, 0, 0], [64, 128, 0], [192, 128, 0],
-                [64, 0, 128], [192, 0, 128], [64, 128, 128], [192, 128, 128],
-                [0, 64, 0], [128, 64, 0], [0, 192, 0], [128, 192, 0],
-                [0, 64, 128]]
+def read_voc_seg_labels(voc_dir, image_set):
+    """Read images specified in the list of files."""
+    with open('%s/ImageSets/%s' % (voc_dir, image_set), 'r') as f:
+        lines = f.read().split('\n')
+    labels = []
+    for fn in lines:
+        if fn:
+            labels.append(image.imread(
+                '%s/SegmentationClass/%s.png' % (voc_dir, fn)))
+    return labels
 
 
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
-VOC_CLASSES = ['background', 'aeroplane', 'bicycle', 'bird', 'boat',
-               'bottle', 'bus', 'car', 'cat', 'chair', 'cow',
-               'diningtable', 'dog', 'horse', 'motorbike', 'person',
-               'potted plant', 'sheep', 'sofa', 'train', 'tv/monitor']
+VOC_SEG_COLORS = [[0, 0, 0], [128, 0, 0], [0, 128, 0], [128, 128, 0],
+                 [0, 0, 128], [128, 0, 128], [0, 128, 128], [128, 128, 128],
+                 [64, 0, 0], [192, 0, 0], [64, 128, 0], [192, 128, 0],
+                 [64, 0, 128], [192, 0, 128], [64, 128, 128], [192, 128, 128],
+                 [0, 64, 0], [128, 64, 0], [0, 192, 0], [128, 192, 0],
+                 [0, 64, 128]]
 
 
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
-def build_colormap2label():
-    """Build an RGB color to label mapping for segmentation."""
-    colormap2label = np.zeros(256 ** 3)
-    for i, colormap in enumerate(VOC_COLORMAP):
-        colormap2label[(colormap[0]*256 + colormap[1])*256 + colormap[2]] = i
-    return colormap2label
+def build_colormap(colors=VOC_SEG_COLORS):
+    """Build an colormap that maps RGB colors to indices."""
+    colormap = np.zeros(256 ** 3, dtype='int32') 
+    for i, color in enumerate(colors):
+        colormap[(color[0]*256 + color[1])*256 + color[2]] = i
+    return colormap
 
 
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
-def voc_label_indices(colormap, colormap2label):
-    """Map an RGB color to a label."""
-    colormap = colormap.astype(np.int32)
-    idx = ((colormap[:, :, 0] * 256 + colormap[:, :, 1]) * 256
-           + colormap[:, :, 2])
-    return colormap2label[idx]
+def colors_to_indices(colors, colormap):
+    """Map an RGB color to an index."""
+    colors = colors.astype('int32')  # convert from uint8 to int32
+    return colormap[(colors[:,:,0]*256+colors[:,:,1])*256 + colors[:,:,2]]
 
 
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
-def voc_rand_crop(feature, label, height, width):
+def segmentation_rand_crop(feature, label, height, width):
     """Randomly crop for both feature and label images."""
     feature, rect = image.random_crop(feature, (width, height))
     label = image.fixed_crop(label, *rect)
@@ -1831,49 +1847,43 @@ def voc_rand_crop(feature, label, height, width):
 
 
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
-class VOCSegDataset(gluon.data.Dataset):
+class SegmentationDataset(gluon.data.Dataset):
     """A customized dataset to load VOC dataset."""
-
-    def __init__(self, is_train, crop_size, voc_dir):
-        self.rgb_mean = np.array([0.485, 0.456, 0.406])
-        self.rgb_std = np.array([0.229, 0.224, 0.225])
-        self.crop_size = crop_size
-        features, labels = read_voc_images(voc_dir, is_train=is_train)
-        self.features = [self.normalize_image(feature)
-                         for feature in self.filter(features)]
-        self.labels = self.filter(labels)
-        self.colormap2label = build_colormap2label()
-        print('read ' + str(len(self.features)) + ' examples')
-
-    def normalize_image(self, img):
-        return (img.astype('float32') / 255 - self.rgb_mean) / self.rgb_std
-
-    def filter(self, imgs):
-        return [img for img in imgs if (
-            img.shape[0] >= self.crop_size[0] and
-            img.shape[1] >= self.crop_size[1])]
-
+    def __init__(self, images, labels, height, width):
+        self.height, self.width = height, width
+        self.colormap = build_colormap()
+        remove_small_images = lambda imgs: [img for img in imgs if (
+            img.shape[1] >= width and img.shape[0] >= height)]        
+        self.features = [(img.astype('float32')/255-d2l.RGB_MEAN)/d2l.RGB_STD 
+                         for img in remove_small_images(images)]
+        self.labels = remove_small_images(labels)
+    
     def __getitem__(self, idx):
-        feature, label = voc_rand_crop(self.features[idx], self.labels[idx],
-                                       *self.crop_size)
+        feature, label = segmentation_rand_crop(
+            self.features[idx], self.labels[idx], self.height, self.width)
         return (feature.transpose(2, 0, 1),
-                voc_label_indices(label, self.colormap2label))
+                colors_to_indices(label, self.colormap))
 
     def __len__(self):
         return len(self.features)
 
 
 # Defined in file: ./chapter_computer-vision/semantic-segmentation-and-dataset.md
-def load_data_voc(batch_size, crop_size):
-    """Download and load the VOC2012 semantic dataset."""
-    voc_dir = d2l.download_extract('voc2012', 'VOCdevkit/VOC2012')
-    num_workers = d2l.get_dataloader_workers()
-    train_iter = gluon.data.DataLoader(
-        VOCSegDataset(True, crop_size, voc_dir), batch_size,
-        shuffle=True, last_batch='discard', num_workers=num_workers)
-    test_iter = gluon.data.DataLoader(
-        VOCSegDataset(False, crop_size, voc_dir), batch_size,
-        last_batch='discard', num_workers=num_workers)
+def load_data_voc_segmentation(batch_size, height, width):
+    """Download and load the VOC2012 semantic segmentation dataset."""
+    def load_data(dataset):
+        image_set = 'Segmentation/'+dataset+'.txt'
+        images, _ = d2l.read_voc_images(voc_dir, [image_set])
+        labels = read_voc_seg_labels(voc_dir, image_set)
+        return images, labels
+    voc_dir = '../data/VOCdevkit/VOC2012'  # fixme, remove this one
+    #voc_dir = d2l.download_extract('voc2012', 'VOCdevkit/VOC2012')
+    train_ds = SegmentationDataset(*load_data('train'), height, width)
+    test_ds = SegmentationDataset(*load_data('val'), height, width)
+    train_iter, test_iter = [gluon.data.DataLoader(
+        ds, batch_size, shuffle=shuffle, last_batch='discard',
+        num_workers=d2l.get_dataloader_workers()) for ds, shuffle in
+                             [[train_ds, True], [test_ds, False]]]
     return train_iter, test_iter
 
 

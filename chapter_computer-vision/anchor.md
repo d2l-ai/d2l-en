@@ -175,7 +175,7 @@ Now let's look at training. During training, each anchor box is treated as a tra
 
 Assume there are $n$ object categories, then the label of an anchor box has $n+2$ categories. Typically, we assign it a $0$ label if this anchor box contains no object, $i=1,\ldots,n$ if it contains an object in the $i$-th category, or $-1$ for invalid anchors. 
 
-Given an image, assume it has ground-truth bounding boxes $g_1, \ldots, g_n$, and we generated anchor boxes $a_1, \ldots, a_m$. For each ground-truth $g_i$, we mark $a_j$ as containing an object if the IoU between $g_i$ and $a_j$ is larger than the positive IoU threshold, such as $0.7$. If for every ground truth $g_i$, its IoU to $a_j$ is smaller than the negative IoU threshold, such as $0.5$, then $g_i$ is an negative anchor box with label $0$. The rest anchor boxes are marked as invalid. Sometimes we generate too many negative anchors, we can sample the negative anchors by fixing a ratio between the number of negative anchors to the the number of positive anchors. 
+Given an image, assume it has ground-truth bounding boxes $g_1, \ldots, g_n$, and we generated anchor boxes $a_1, \ldots, a_m$. For each ground-truth $g_i$, we mark $a_j$ as containing an object if the IoU between $g_i$ and $a_j$ is larger than the positive IoU threshold, such as $0.7$. If for every ground truth $g_i$, its IoU to $a_j$ is smaller than the negative IoU threshold, such as $0.5$, then $g_i$ is an negative anchor box with label $0$. The rest anchor boxes are marked as invalid. Sometimes we generate too many negative anchors, we can sample the negative anchors by fixing a ratio between the number of negative anchors to the the number of positive anchors.
 
 ```{.python .input  n=11}
 # Saved in the d2l package for later use
@@ -226,7 +226,7 @@ cls_labels, box_labels = label_anchors(gt, anchors, 0.7, 0.3, 5)
 [int((cls_labels[0]==i).sum()) for i in [-1, 0,1,2]] 
 ```
 
-Finally, we visualize the negative and positive anchors. 
+Finally, we visualize the negative and positive anchors.
 
 ```{.python .input  n=13}
 axes = d2l.show_images([np.array(img)]*3, 1, 3, scale=2.5)
