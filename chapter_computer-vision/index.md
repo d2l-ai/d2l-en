@@ -11,7 +11,7 @@ We have introduced deep learning models commonly used in the area of computer vi
 image-augmentation
 fine-tuning
 bounding-box
-voc
+object-detection-dataset
 anchor
 rpn
 faster-rcnn

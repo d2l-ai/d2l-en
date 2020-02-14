@@ -1,7 +1,7 @@
 # Semantic Segmentation and the Dataset
 :label:`sec_semantic_segmentation`
 
-In our discussion of object detection issues in the previous sections, we only used rectangular bounding boxes to label and predict objects in images. In this section, we will look at semantic segmentation, which attempts to segment images into regions with different semantic categories. These semantic regions label and predict objects at the pixel level. :numref:`fig_segmentation` shows a semantically-segmented image, with areas labeled "dog", "cat", and "background". As you can see, compared to object detection, semantic segmentation labels areas with pixel-level borders, for significantly greater precision.
+In our discussion of object detection issues in previous sections, we only used rectangular bounding boxes to label and predict objects in images. In this section, we will look at semantic segmentation, which attempts to segment images into regions with different semantic categories. These semantic regions label and predict objects at the pixel level. :numref:`fig_segmentation` shows a semantically-segmented image, with areas labeled "dog", "cat", and "background". As you can see, compared to object detection, semantic segmentation labels areas with pixel-level borders, for significantly greater precision.
 
 ![Semantically-segmented image, with areas labeled "dog", "cat", and "background". ](../img/segmentation.svg)
 :label:`fig_segmentation`
@@ -15,11 +15,11 @@ In the computer vision field, there are two important methods related to semanti
 * Instance segmentation is also called simultaneous detection and segmentation. This method attempts to identify the pixel-level regions of each object instance in an image. In contrast to semantic segmentation, instance segmentation not only distinguishes semantics, but also different object instances. If an image contains two dogs, instance segmentation will distinguish which pixels belong to which dog.
 
 
-## The Pascal VOC2012 Semantic Segmentation Dataset
+## Reading Pascal VOC2012 Semantic Segmentation Dataset
 
-In the semantic segmentation field, one important dataset is [Pascal VOC2012](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/). To better understand this dataset, we must first import the package or module needed for the experiment.
+We already described the VOC dataset for object detection in :numref:`sec_detection_dataset`. This same dataset has a semantic segmentation task, which is one of widely used datasets in semantic segmentation. To better explore this task, we must first import the package or module needed for the experiment.
 
-```{.python .input  n=1}
+```{.python .input  n=3}
 %matplotlib inline
 import d2l
 from mxnet import gluon, image, np, npx
@@ -28,97 +28,89 @@ import os
 npx.set_np()
 ```
 
-The original site might be unstable, so we download the data from a mirror site. 
-The archive is about 2 GB, so it will take some time to download. 
-After you decompress the archive, the dataset is located in the `../data/VOCdevkit/VOC2012` path.
+We can reuse the functions we developed in :numref:`sec_detection_dataset`. But the segmentation task needs a different way to load the pixel level labels. Let's first download and extract this datasets.
 
-```{.python .input  n=2}
-d2l.DATA_HUB['voc2012'] = (d2l.DATA_URL + 'VOCtrainval_11-May-2012.tar',
-                           '4e443f8a2eca6b1dac8a6c57641b67dd40621a49')
-
-voc_dir = d2l.download_extract('voc2012', 'VOCdevkit/VOC2012')
+```{.python .input  n=4}
+voc_dir = '../data/VOCdevkit/VOC2012'  # fixme, remove this one
+#voc_dir = d2l.download_extract('voc2012', 'VOCdevkit/VOC2012')
 ```
 
-Go to `../data/VOCdevkit/VOC2012` to see the different parts of the dataset. 
-The `ImageSets/Segmentation` path contains text files that specify the training and testing examples. The `JPEGImages` and `SegmentationClass` paths contain the example input images and labels, respectively. These labels are also in image format, with the same dimensions as the input images to which they correspond. In the labels, pixels with the same color belong to the same semantic category. The `read_voc_images` function defined below reads all input images and labels to the memory.
+The training images are still in the `JPEGImages` folder as for the detection task, which can be read by the `read_voc_images` function. While the labels are saved as png files in the `SegmentationClass`, we need a new function to load them.
 
-```{.python .input  n=3}
-def read_voc_images(voc_dir, is_train=True):
-    """Read all VOC feature and label images."""
-    txt_fname = '%s/ImageSets/Segmentation/%s' % (
-        voc_dir, 'train.txt' if is_train else 'val.txt')
-    with open(txt_fname, 'r') as f:
-        images = f.read().split()
-    features, labels = [None] * len(images), [None] * len(images)
-    for i, fname in enumerate(images):
-        features[i] = image.imread('%s/JPEGImages/%s.jpg' % (voc_dir, fname))
-        labels[i] = image.imread(
-            '%s/SegmentationClass/%s.png' % (voc_dir, fname))
-    return features, labels
+```{.python .input  n=13}
+# Saved in the d2l package for later use
+def read_voc_seg_labels(voc_dir, image_set):
+    """Read images specified in the list of files."""
+    with open('%s/ImageSets/%s' % (voc_dir, image_set), 'r') as f:
+        lines = f.read().split('\n')
+    labels = []
+    for fn in lines:
+        if fn:
+            labels.append(image.imread(
+                '%s/SegmentationClass/%s.png' % (voc_dir, fn)))
+    return labels
+```
 
-train_features, train_labels = read_voc_images(voc_dir, True)
+The set of images for training and test are stored in the `ImageSets/Segmentation` folder. Now we load the images and labels for training.
+
+```{.python .input  n=15}
+image_set = 'Segmentation/train.txt'
+images, _ = d2l.read_voc_images(voc_dir, [image_set])
+labels = read_voc_seg_labels(voc_dir, image_set)
 ```
 
 We draw the first five input images and their labels. In the label images, white represents borders and black represents the background. Other colors correspond to different categories.
 
-```{.python .input  n=4}
+```{.python .input  n=17}
 n = 5
-imgs = train_features[0:n] + train_labels[0:n]
+imgs = images[0:n] + labels[0:n]
+d2l.set_figsize()
 d2l.show_images(imgs, 2, n);
 ```
 
-Next, we list each RGB color value in the labels and the categories they label.
+Remember this dataset has 20 object classes, with a background class. We list each RGB color value for each category, and then defined
 
-```{.python .input  n=5}
+in the labels, then we can easily find the category index for each pixel in the labels.
+
+```{.python .input  n=25}
 # Saved in the d2l package for later use
-VOC_COLORMAP = [[0, 0, 0], [128, 0, 0], [0, 128, 0], [128, 128, 0],
-                [0, 0, 128], [128, 0, 128], [0, 128, 128], [128, 128, 128],
-                [64, 0, 0], [192, 0, 0], [64, 128, 0], [192, 128, 0],
-                [64, 0, 128], [192, 0, 128], [64, 128, 128], [192, 128, 128],
-                [0, 64, 0], [128, 64, 0], [0, 192, 0], [128, 192, 0],
-                [0, 64, 128]]
-
-# Saved in the d2l package for later use
-VOC_CLASSES = ['background', 'aeroplane', 'bicycle', 'bird', 'boat',
-               'bottle', 'bus', 'car', 'cat', 'chair', 'cow',
-               'diningtable', 'dog', 'horse', 'motorbike', 'person',
-               'potted plant', 'sheep', 'sofa', 'train', 'tv/monitor']
-```
-
-After defining the two constants above, we can easily find the category index for each pixel in the labels.
-
-```{.python .input  n=6}
-# Saved in the d2l package for later use
-def build_colormap2label():
-    """Build an RGB color to label mapping for segmentation."""
-    colormap2label = np.zeros(256 ** 3)
-    for i, colormap in enumerate(VOC_COLORMAP):
-        colormap2label[(colormap[0]*256 + colormap[1])*256 + colormap[2]] = i
-    return colormap2label
+VOC_SEG_COLORS = [[0, 0, 0], [128, 0, 0], [0, 128, 0], [128, 128, 0],
+                 [0, 0, 128], [128, 0, 128], [0, 128, 128], [128, 128, 128],
+                 [64, 0, 0], [192, 0, 0], [64, 128, 0], [192, 128, 0],
+                 [64, 0, 128], [192, 0, 128], [64, 128, 128], [192, 128, 128],
+                 [0, 64, 0], [128, 64, 0], [0, 192, 0], [128, 192, 0],
+                 [0, 64, 128]]
 
 # Saved in the d2l package for later use
-def voc_label_indices(colormap, colormap2label):
-    """Map an RGB color to a label."""
-    colormap = colormap.astype(np.int32)
-    idx = ((colormap[:, :, 0] * 256 + colormap[:, :, 1]) * 256
-           + colormap[:, :, 2])
-    return colormap2label[idx]
+def build_colormap(colors=VOC_SEG_COLORS):
+    """Build an colormap that maps RGB colors to indices."""
+    colormap = np.zeros(256 ** 3, dtype='int32') 
+    for i, color in enumerate(colors):
+        colormap[(color[0]*256 + color[1])*256 + color[2]] = i
+    return colormap
+
+# Saved in the d2l package for later use
+def colors_to_indices(colors, colormap):
+    """Map an RGB color to an index."""
+    colors = colors.astype('int32')  # convert from uint8 to int32
+    return colormap[(colors[:,:,0]*256+colors[:,:,1])*256 + colors[:,:,2]]
 ```
 
 For example, in the first example image, the category index for the front part of the airplane is 1 and the index for the background is 0.
 
-```{.python .input  n=7}
-y = voc_label_indices(train_labels[0], build_colormap2label())
-y[105:115, 130:140], VOC_CLASSES[1]
+```{.python .input  n=26}
+y = colors_to_indices(labels[0], build_colormap())
+y[105:115, 130:140], d2l.VOC_CLASSES[1]
 ```
 
-### Data Preprocessing
+## Semantic Segmentation Dataset Class
 
-In the preceding chapters, we scaled images to make them fit the input shape of the model. In semantic segmentation, this method would require us to re-map the predicted pixel categories back to the original-size input image. It would be very difficult to do this precisely, especially in segmented regions with different semantics. To avoid this problem, we crop the images to set dimensions and do not scale them. Specifically, we use the random cropping method used in image augmentation to crop the same region from input images and their labels.
+In  image classification and object detection, we resized images to make them fit the input shape of the model. In semantic segmentation, this method would require us to re-map the predicted pixel categories back to the original-size input image. It would be very difficult to do this precisely, especially in segmented regions with different semantics. To avoid this problem, we crop the images to set dimensions and do not scale them. Specifically, we use the random cropping method used in image augmentation to crop the same region from input images and their labels.
 
-```{.python .input  n=8}
+
+```{.python .input}
 # Saved in the d2l package for later use
-def voc_rand_crop(feature, label, height, width):
+def segmentation_rand_crop(feature, label, height, width):
     """Randomly crop for both feature and label images."""
     feature, rect = image.random_crop(feature, (width, height))
     label = image.fixed_crop(label, *rect)
@@ -126,87 +118,66 @@ def voc_rand_crop(feature, label, height, width):
 
 imgs = []
 for _ in range(n):
-    imgs += voc_rand_crop(train_features[0], train_labels[0], 200, 300)
+    imgs += segmentation_rand_crop(images[0], labels[0], 200, 300)
 d2l.show_images(imgs[::2] + imgs[1::2], 2, n);
 ```
 
-### Dataset Classes for Custom Semantic Segmentation
-
-We use the inherited `Dataset` class provided by Gluon to customize the semantic segmentation dataset class `VOCSegDataset`. By implementing the `__getitem__` function, we can arbitrarily access the input image with the index `idx` and the category indexes for each of its pixels from the dataset. As some images in the dataset may be smaller than the output dimensions specified for random cropping, we must remove these example by using a custom `filter` function. In addition, we define the `normalize_image` function to normalize each of the three RGB channels of the input images.
+Next, as we did in :numref:`sec_detection_dataset`, we inherit the `gluon.data.Dataset` class to create a customized semantic segmentation dataset class. Note that we removed images that are smaller than the desired size as we cannot upscale images. 
 
 ```{.python .input  n=9}
 # Saved in the d2l package for later use
-class VOCSegDataset(gluon.data.Dataset):
+class SegmentationDataset(gluon.data.Dataset):
     """A customized dataset to load VOC dataset."""
-
-    def __init__(self, is_train, crop_size, voc_dir):
-        self.rgb_mean = np.array([0.485, 0.456, 0.406])
-        self.rgb_std = np.array([0.229, 0.224, 0.225])
-        self.crop_size = crop_size
-        features, labels = read_voc_images(voc_dir, is_train=is_train)
-        self.features = [self.normalize_image(feature)
-                         for feature in self.filter(features)]
-        self.labels = self.filter(labels)
-        self.colormap2label = build_colormap2label()
-        print('read ' + str(len(self.features)) + ' examples')
-
-    def normalize_image(self, img):
-        return (img.astype('float32') / 255 - self.rgb_mean) / self.rgb_std
-
-    def filter(self, imgs):
-        return [img for img in imgs if (
-            img.shape[0] >= self.crop_size[0] and
-            img.shape[1] >= self.crop_size[1])]
-
+    def __init__(self, images, labels, height, width):
+        self.height, self.width = height, width
+        self.colormap = build_colormap()
+        remove_small_images = lambda imgs: [img for img in imgs if (
+            img.shape[1] >= width and img.shape[0] >= height)]        
+        self.features = [(img.astype('float32')/255-d2l.RGB_MEAN)/d2l.RGB_STD 
+                         for img in remove_small_images(images)]
+        self.labels = remove_small_images(labels)
+    
     def __getitem__(self, idx):
-        feature, label = voc_rand_crop(self.features[idx], self.labels[idx],
-                                       *self.crop_size)
+        feature, label = segmentation_rand_crop(
+            self.features[idx], self.labels[idx], self.height, self.width)
         return (feature.transpose(2, 0, 1),
-                voc_label_indices(label, self.colormap2label))
+                colors_to_indices(label, self.colormap))
 
     def __len__(self):
         return len(self.features)
 ```
 
-### Reading the Dataset
+Let's construct a data loader to read the first batch. 
 
-Using the custom `VOCSegDataset` class, we create the training set and testing set instances. We assume the random cropping operation output images in the shape $320\times 480$. Below, we can see the number of examples retained in the training and testing sets.
-
-```{.python .input  n=10}
-crop_size = (320, 480)
-voc_train = VOCSegDataset(True, crop_size, voc_dir)
-voc_test = VOCSegDataset(False, crop_size, voc_dir)
-```
-
-We set the batch size to 64 and define the iterators for the training and testing sets. Print the shape of the first minibatch. In contrast to image classification and object recognition, labels here are three-dimensional arrays.
-
-```{.python .input  n=11}
-batch_size = 64
-train_iter = gluon.data.DataLoader(voc_train, batch_size, shuffle=True,
-                                   last_batch='discard',
-                                   num_workers=d2l.get_dataloader_workers())
-for X, Y in train_iter:
-    print(X.shape)
-    print(Y.shape)
+```{.python .input}
+train_ds = SegmentationDataset(images, labels, 320, 480)
+train_iter = gluon.data.DataLoader(train_ds, 10)
+for x, y in train_iter:
     break
+x.shape, y.shape
 ```
 
 ### Putting All Things Together
 
-Finally, we define a function `load_data_voc` that  downloads and loads this dataset, and then returns the data loaders.
+Finally, we define a function `load_data_voc_segmentation` that  downloads and loads this dataset, and then returns the data loaders.
 
 ```{.python .input  n=12}
 # Saved in the d2l package for later use
-def load_data_voc(batch_size, crop_size):
-    """Download and load the VOC2012 semantic dataset."""
-    voc_dir = d2l.download_extract('voc2012', 'VOCdevkit/VOC2012')
-    num_workers = d2l.get_dataloader_workers()
-    train_iter = gluon.data.DataLoader(
-        VOCSegDataset(True, crop_size, voc_dir), batch_size,
-        shuffle=True, last_batch='discard', num_workers=num_workers)
-    test_iter = gluon.data.DataLoader(
-        VOCSegDataset(False, crop_size, voc_dir), batch_size,
-        last_batch='discard', num_workers=num_workers)
+def load_data_voc_segmentation(batch_size, height, width):
+    """Download and load the VOC2012 semantic segmentation dataset."""
+    def load_data(dataset):
+        image_set = 'Segmentation/'+dataset+'.txt'
+        images, _ = d2l.read_voc_images(voc_dir, [image_set])
+        labels = read_voc_seg_labels(voc_dir, image_set)
+        return images, labels
+    voc_dir = '../data/VOCdevkit/VOC2012'  # fixme, remove this one
+    #voc_dir = d2l.download_extract('voc2012', 'VOCdevkit/VOC2012')
+    train_ds = SegmentationDataset(*load_data('train'), height, width)
+    test_ds = SegmentationDataset(*load_data('val'), height, width)
+    train_iter, test_iter = [gluon.data.DataLoader(
+        ds, batch_size, shuffle=shuffle, last_batch='discard',
+        num_workers=d2l.get_dataloader_workers()) for ds, shuffle in
+                             [[train_ds, True], [test_ds, False]]]
     return train_iter, test_iter
 ```
 
