@@ -235,10 +235,12 @@ we discuss several common optimization algorithms
 used to train deep learning models.
 The next chapter, :numref:`chap_performance` examines several key factors
 that influence the computational performance of your deep learning code.
-In :numref:`chap_cv` and :numref:`chap_nlp`, we illustrate
-major applications of deep learning in computer vision
-and natural language processing, respectively.
-
+In :numref:`chap_cv`,
+we illustrate
+major applications of deep learning in computer vision.
+In :numref:`chap_nlp_pretrain` and :numref:`chap_nlp_app`,
+we show how to pretrain language representation models and apply
+them to natural language processing tasks.
 
 
 ### Code
