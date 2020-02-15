@@ -15,13 +15,14 @@ As we will see in this chapter,
 the representation of each token can be pretrained on a large corpus,
 using word2vec, GloVe, or subword embedding models.
 After pretraining, representation of each token can be a vector,
-and it remains the same no matter what the context is.
+however, it remains the same no matter what the context is.
 For instance, the vector representation of "bank" is the same
 in both 
 "go to the bank to deposit some money"
 and 
 "go to the bank to sit down".
-Many more recent pretraining models can incorporate context information.
+Thus, many more recent pretraining models adapt representation of the same token
+to different contexts.
 Among them is BERT, a much deeper model based on the Transformer encoder.
 In this chapter, we will focus on how to pretrain such representations for text,
 as highlighted in :numref:`fig_nlp-map-pretrain`.
