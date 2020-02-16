@@ -673,7 +673,7 @@ So while we reserve the right to introduce more mathematics much later on,
 we will wrap up this section here.
 
 If you are eager to learn more about linear algebra,
-you may refer to either :numref:`sec_geometry-linear-algebric-ops`
+you may refer to either :numref:`sec_geometry-linear-algebraic-ops`
 or other excellent resources :cite:`Strang.1993,Kolter.2008,Petersen.Pedersen.ea.2008`.
 
 

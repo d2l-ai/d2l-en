@@ -31,9 +31,9 @@ from mxnet.gluon import nn
 npx.set_np()
 
 timer = d2l.Timer()
-A = np.zeros((1024, 1024))
-B = np.random.normal(0, 1, (1024, 1024))
-C = np.random.normal(0, 1, (1024, 1024))
+A = np.zeros((256, 256))
+B = np.random.normal(0, 1, (256, 256))
+C = np.random.normal(0, 1, (256, 256))
 ```
 
 Element-wise assignment simply iterates over all rows and columns of $\mathbf{B}$ and $\mathbf{C}$ respectively to assign the value to $\mathbf{A}$.
@@ -41,8 +41,8 @@ Element-wise assignment simply iterates over all rows and columns of $\mathbf{B}
 ```{.python .input  n=2}
 # Compute A = B C one element at a time
 timer.start()
-for i in range(1024):
-    for j in range(1024):
+for i in range(256):
+    for j in range(256):
         A[i, j] = np.dot(B[i, :], C[:, j])
 A.wait_to_read()
 timer.stop()
@@ -53,7 +53,7 @@ A faster strategy is to perform column-wise assignment.
 ```{.python .input  n=3}
 # Compute A = B C one column at a time
 timer.start()
-for j in range(1024):
+for j in range(256):
     A[:, j] = np.dot(B, C[:, j])
 A.wait_to_read()
 timer.stop()
@@ -92,7 +92,7 @@ Naively this would indicate that choosing a large minibatch $\mathcal{B}_t$ woul
 
 ```{.python .input}
 timer.start()
-for j in range(0, 1024, 64):
+for j in range(0, 256, 64):
     A[:, j:j+64] = np.dot(B, C[:, j:j+64])
 timer.stop()
 print("Performance in Gigaflops: block {:.3f}".format(2/timer.times[3]))

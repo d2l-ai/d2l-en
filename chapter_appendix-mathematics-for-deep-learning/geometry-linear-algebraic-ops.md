@@ -1,5 +1,5 @@
 # Geometry and Linear Algebraic Operations
-:label:`sec_geometry-linear-algebric-ops`
+:label:`sec_geometry-linear-algebraic-ops`
 
 In :numref:`sec_linear-algebra`, we encountered the basics of linear algebra
 and saw how it could be used to express common operations for transforming our data.
@@ -847,4 +847,4 @@ $$
 
 ## [Discussions](https://discuss.mxnet.io/t/5147)
 
-![](../img/qr_geometry-linear-algebric-ops.svg)
+![](../img/qr_geometry-linear-algebraic-ops.svg)

@@ -33,7 +33,8 @@ chapter_attention-mechanisms/index
 chapter_optimization/index
 chapter_computational-performance/index
 chapter_computer-vision/index
-chapter_natural-language-processing/index
+chapter_natural-language-processing-pretraining/index
+chapter_natural-language-processing-applications/index
 chapter_recommender-systems/index
 chapter_generative-adversarial-networks/index
 chapter_appendix-mathematics-for-deep-learning/index

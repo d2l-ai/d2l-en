@@ -144,7 +144,7 @@ for each element in an `ndarray`
 from some probability distribution. 
 For example, when we construct arrays to serve 
 as parameters in a neural network, we will
-typically inititialize their values randomly. 
+typically initialize their values randomly. 
 The following snippet creates an `ndarray` with shape ($3$, $4$). 
 Each of its elements is randomly sampled 
 from a standard Gaussian (normal) distribution 

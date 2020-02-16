@@ -1,13 +1,14 @@
 # Numerical Stability and Initialization
 :label:`sec_numerical_stability`
 
-So far, every model that we have implemented
-required that we choose some scheme
-for initializing its parameters.
-So far we glossed over these details,
-initializing according to a default distribution.
-You might have even gotten the impression
-that these choices are not especially important.
+
+So far, for every model that we have implemented,
+we needed to initialize our parameters 
+according to some specified distribution.
+And until now, we glossed over the details,
+taking the initialization hyperparameters for granted.
+You might have even gotten the impression that these choices
+are not especially important.
 However, the choice of initialization scheme
 plays a significant role in neural network learning,
 and can be crucial for maintaining numerical stability.

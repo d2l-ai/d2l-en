@@ -39,7 +39,7 @@ In a rough sense, we can think LeNet as consisting of two parts:
 (ii) a block of fully-connected layers.
 Before getting into the weeds, let's briefly review the model in :numref:`img_lenet`.
 
-![Data flow in LeNet 5. The input is a handwritten digit, the output a probabilitiy over 10 possible outcomes.](../img/lenet.svg)
+![Data flow in LeNet 5. The input is a handwritten digit, the output a probability over 10 possible outcomes.](../img/lenet.svg)
 :label:`img_lenet`
 
 The basic units in the convolutional block are a convolutional layer
@@ -139,11 +139,12 @@ for layer in net:
 Note that the height and width of the representation
 at each layer throughout the convolutional block is reduced
 (compared to the previous layer).
-The convolutional layer uses a kernel
-with a height and width of 5,
-which with only $2$ pixels of padding in the first convolutional layer
-and none in the second convolutional layer
-leads to reductions in both height and width by 2 and 4 pixels, respectively.
+The first convolutional layer uses a kernel
+with a height and width of $5$, and then a $2$ pixels of padding 
+which compensates the reduction in its original shape.
+While the second convolutional layer applies the same shape of 
+$5 x 5$ kernel without padding, resulting in reductions 
+in both height and width by $4$ pixels.
 Moreover each pooling layer halves the height and width.
 However, as we go up the stack of layers,
 the number of channels increases layer-over-layer

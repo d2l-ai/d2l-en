@@ -1,6 +1,7 @@
 # BERT-NLI
 
-...
+![This section feeds pretrained BERT to an MLP-based architecture for natural language inference.](../img/nlp-map-nli-bert.svg)
+:label:`fig_nlp-map-nli-bert`
 
 ```{.python .input  n=1}
 import d2l
