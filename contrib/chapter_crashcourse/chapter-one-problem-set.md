@@ -17,7 +17,7 @@ Problem 1: Initialize an ndarray of dimension 1x256 on the GPU without overwriti
 
 ## Problems from Linear Algebra
 
-Problem 2: Create a 4x4 matrix of random values (where values are uniformly random on the iterval [0, 1]. Then create an 4x4 identity matrix (an identity of size n is the n × n square matrix with ones on the main diagonal and zeros elsewhere). Multiply the two together and verify that you get the original matrix back.
+Problem 2: Create a 4x4 matrix of random values (where values are uniformly random on the interval [0, 1]. Then create an 4x4 identity matrix (an identity of size n is the n × n square matrix with ones on the main diagonal and zeros elsewhere). Multiply the two together and verify that you get the original matrix back.
 
 
 ```python

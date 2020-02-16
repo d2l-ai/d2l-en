@@ -4,11 +4,13 @@
 
 Similar to search synonyms and analogies, text classification is also a
 downstream application of word embedding. In this section, we will apply
-pre-trained word vectors and bidirectional recurrent neural networks with
-multiple hidden layers :cite:`Maas.Daly.Pham.ea.2011`. We will use them to
+pre-trained word vectors (GloVe) and bidirectional recurrent neural networks with
+multiple hidden layers :cite:`Maas.Daly.Pham.ea.2011`, as shown in :numref:`fig_nlp-map-sa-rnn`. We will use the model to
 determine whether a text sequence of indefinite length contains positive or
-negative emotion. Import the required package or module before starting the
-experiment.
+negative emotion. 
+
+![This section feeds pretrained GloVe to an RNN-based architecture for sentiment analysis.](../img/nlp-map-sa-rnn.svg)
+:label:`fig_nlp-map-sa-rnn`
 
 ```{.python .input  n=1}
 import d2l

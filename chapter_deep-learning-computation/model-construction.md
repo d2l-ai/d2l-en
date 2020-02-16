@@ -37,7 +37,7 @@ that are updated with respect to the ultimate objective
 While you might think that neurons, layers, and models
 give us enough abstractions to go about our business,
 it turns out that we will often want to express our model
-in terms of a components that are large than an indivudal layer.
+in terms of components that are larger than an individual layer.
 For example, when designing models, like ResNet-152,
 which possess hundreds (152, thus the name) of layers,
 implementing the network one layer at a time can grow tedious.
@@ -218,7 +218,7 @@ We can subclass `Block` to create layers
 entire models (such as the `MLP` class implemented above),
 or various components of intermediate complexity,
 a pattern that we will lean on heavily throughout
-the next chapters on convolutinoal neural networks.
+the next chapters on convolutional neural networks.
 
 
 ## The Sequential Block

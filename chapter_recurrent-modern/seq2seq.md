@@ -33,7 +33,7 @@ $$\mathbf{c} = q (\mathbf{h}_1, \ldots, \mathbf{h}_T).$$
 
 For example, if we choose $q$ as $q (\mathbf{h}_1, \ldots, \mathbf{h}_T) = \mathbf{h}_T$, then the context vector will be the final hidden state $\mathbf{h}_T$.
 
-So far what we describe above is a unidirectional RNN, where each timestep's hidden state only depends on the previous timesteps'. We can also use other forms of RNNs such as GRUs, LSTMs and, bidirectional RNNs to encode the sequential input.
+So far what we describe above is a unidirectional RNN, where each timestep's hidden state depends only on the previous timesteps'. We can also use other forms of RNNs such as GRUs, LSTMs, and bidirectional RNNs to encode the sequential input.
 
 Now let's implement the seq2seq's encoder. 
 Here we use the word embedding layer to obtain the feature vector
@@ -41,7 +41,7 @@ according to the word index of the input language.
 Those feature vectors will be fed to a multi-layer LSTM.
 The input for the encoder is a batch of sequences, which is 2-D tensor with shape (batch size, sequence length). The encoder returns both the LSTM outputs, i.e., hidden states of all the timesteps, as well as the hidden state and the memory cell of the final timestep.
 
-```{.python .input  n=3}
+```{.python .input  n=2}
 # Saved in the d2l package for later use
 class Seq2SeqEncoder(d2l.Encoder):
     def __init__(self, vocab_size, embed_size, num_hiddens, num_layers,
@@ -64,7 +64,7 @@ class Seq2SeqEncoder(d2l.Encoder):
 
 Next, we will create a minibatch sequence input with a batch size of 4 and 7 timesteps. We assume the number of hidden layers of the LSTM unit is 2 and the number of hidden units is 16. The output shape returned by the encoder after performing forward calculation on the input is (number of timesteps, batch size, number of hidden units). The shape of the multi-layer hidden state of the gated recurrent unit in the final timestep is (number of hidden layers, batch size, number of hidden units). For the gated recurrent unit, the `state` list contains only one element, which is the hidden state. If long short-term memory is used, the `state` list will also contain another element, which is the memory cell.
 
-```{.python .input  n=4}
+```{.python .input  n=3}
 encoder = Seq2SeqEncoder(vocab_size=10, embed_size=8, num_hiddens=16,
                          num_layers=2)
 encoder.initialize()
@@ -75,7 +75,7 @@ output.shape
 
 Since an LSTM is used, the `state` list will contain both the hidden state and the memory cell with same shape (number of hidden layers, batch size, number of hidden units). However, if a GRU is used, the `state` list will contain only one element---the hidden state in the final timestep with shape (number of hidden layers, batch size, number of hidden units).
 
-```{.python .input}
+```{.python .input  n=4}
 len(state), state[0].shape, state[1].shape
 ```
 
@@ -116,7 +116,7 @@ class Seq2SeqDecoder(d2l.Decoder):
         return out, state
 ```
 
-We create an decoder with the same hyper-parameters as the encoder. As we can see, the output shape is changed to (batch size, the sequence length, vocabulary size).
+We create a decoder with the same hyper-parameters as the encoder. As we can see, the output shape is changed to (batch size, the sequence length, vocabulary size).
 
 ```{.python .input  n=6}
 decoder = Seq2SeqDecoder(vocab_size=10, embed_size=8,
@@ -172,7 +172,7 @@ loss(np.ones((3, 4, 10)), np.ones((3, 4)), np.array([4, 2, 0]))
 
 During training, if the target sequence has length $n$, we feed the first $n-1$ tokens into the decoder as inputs, and the last $n-1$ tokens are used as ground truth label.
 
-```{.python .input  n=13}
+```{.python .input  n=11}
 # Saved in the d2l package for later use
 def train_s2s_ch9(model, data_iter, lr, num_epochs, ctx):
     model.initialize(init.Xavier(), force_reinit=True, ctx=ctx)
@@ -203,7 +203,7 @@ def train_s2s_ch9(model, data_iter, lr, num_epochs, ctx):
 
 Next, we create a model instance and set hyper-parameters. Then, we can train the model.
 
-```{.python .input  n=14}
+```{.python .input  n=15}
 embed_size, num_hiddens, num_layers, dropout = 32, 32, 2, 0.0
 batch_size, num_steps = 64, 10
 lr, num_epochs, ctx = 0.005, 300, d2l.try_gpu()
@@ -225,7 +225,7 @@ sequence. As illustrated in :numref:`fig_seq2seq_predict`, during predicting, we
 ![Sequence to sequence model predicting with greedy search](../img/seq2seq_predict.svg)
 :label:`fig_seq2seq_predict`
 
-```{.python .input  n=15}
+```{.python .input  n=16}
 # Saved in the d2l package for later use
 def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
                     ctx):
@@ -252,7 +252,7 @@ def predict_s2s_ch9(model, src_sentence, src_vocab, tgt_vocab, num_steps,
 
 Try several examples:
 
-```{.python .input  n=16}
+```{.python .input  n=17}
 for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
     print(sentence + ' => ' + predict_s2s_ch9(
         model, sentence, src_vocab, tgt_vocab, num_steps, ctx))
@@ -261,7 +261,7 @@ for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
 ## Summary
 
 * The sequence to sequence (seq2seq) model is based on the encoder-decoder architecture to generate a sequence output from a sequence input.
-* We use multiple LSTM layers for both the encoder and decoder.
+* We use multiple LSTM layers for both the encoder and the decoder.
 
 
 ## Exercises

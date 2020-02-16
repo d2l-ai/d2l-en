@@ -100,17 +100,17 @@ $$\hat{y} = \mathbf{w}^T \mathbf{x} + b.$$
 
 Here, the vector $\mathbf{x}$ corresponds to a single data point.
 We will often find it convenient
-to refer to our entire dataset via the *design matrix* $X$.
-Here, $X$ contains one row for every example
+to refer to our entire dataset via the *design matrix* $\mathbf{X}$.
+Here, $\mathbf{X}$ contains one row for every example
 and one column for every feature.
 
 For a collection of data points $\mathbf{X}$,
 the predictions $\hat{\mathbf{y}}$
 can be expressed via the matrix-vector product:
 
-$${\hat{\mathbf{y}}} = \mathbf X \mathbf{w} + b.$$
+$${\hat{\mathbf{y}}} = \mathbf{X} \mathbf{w} + b.$$
 
-Given a training dataset $X$
+Given a training dataset $\mathbf{X}$
 and corresponding (known) targets $\mathbf{y}$,
 the goal of linear regression is to find
 the *weight* vector $w$ and bias term $b$
@@ -119,18 +119,18 @@ sampled from the same distribution as the training data
 will (in expectation) predict the target $y_i$ with the lowest error.
 
 Even if we believe that the best model for
-predicting $y$ given  $\mathbf{x}$ is linear,
+predicting $y$ given $\mathbf{x}$ is linear,
 we would not expect to find real-world data where
 $y_i$ exactly equals $\mathbf{w}^T \mathbf{x}+b$
 for all points ($\mathbf{x}, y)$.
 For example, whatever instruments we use to observe
-the features $X$ and labels $\mathbf{y}$
+the features $\mathbf{X}$ and labels $\mathbf{y}$
 might suffer small amount of measurement error.
 Thus, even when we are confident
 that the underlying relationship is linear,
 we will incorporate a noise term to account for such errors.
 
-Before we can go about searching for the best parameters $w$ and $b$,
+Before we can go about searching for the best parameters $\mathbf{w}$ and $b$,
 we will need two more things:
 (i) a quality measure for some given model;
 and (ii) a procedure for updating the model to improve its quality.

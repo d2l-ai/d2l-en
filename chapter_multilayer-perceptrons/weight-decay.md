@@ -1,41 +1,44 @@
 # Weight Decay
 :label:`sec_weight_decay`
 
-Now that we have characterized the problem of overfitting
-and motivated the need for capacity control,
-we can begin discussing some of the popular techniques
-used to these ends in practice.
+Now that we have characterized the problem of overfitting,
+we can introduce some standard techniques for regularizing models.
 Recall that we can always mitigate overfitting
 by going out and collecting more training data,
-that can be costly and time consuming,
-typically making it impossible in the short run.
-For now, let's assume that we have already obtained
+that can be costly, time consuming,
+or entirely out of our control,
+making it impossible in the short run.
+For now, we can assume that we already have
 as much high-quality data as our resources permit
-and focus on techniques aimed at limiting the capacity
-of the function classes under consideration.
+and focus on regularization techniques.
 
-In our toy example,
-we saw that we could control the complexity of a polynomial
-by adjusting its degree.
-However, most of machine learning
-does not consist of polynomial curve fitting.
-And moreover, even when we focus on polynomial regression,
-when we deal with high-dimensional data,
-manipulating model capacity by tweaking the degree $d$ is problematic.
-To see why, note that for multivariate data
-we must generalize the concept of polynomials
-to include *monomials*, which are simply
-products of powers of variables.
-For example, $x_1^2 x_2$, and $x_3 x_5^2$ are both monomials of degree $3$.
-The number of such terms with a given degree $d$
-blows up as a function of the degree $d$.
+Recall that in our example
+polynomial curve-fitting example
+(:numref:`sec_model_selection`)
+we could limit our model's capacity
+simply by tweaking the degree 
+of the fitted polynomial.
+Indeed, limiting the number of features 
+is a popular technique to avoid overfitting.
+However, simply tossing aside features
+can be too blunt a hammer for the job.
+Sticking with the polynomial curve-fitting
+example, consider what might happen
+with high-dimensional inputs.
+The natural extensions of polynomials
+to multivariate data are called *monomials*, 
+which are simply products of powers of variables.
+The degree of a monomial is the sum of the powers.
+For example, $x_1^2 x_2$, and $x_3 x_5^2$ 
+are both monomials of degree $3$.
 
-Concretely, for vectors of dimensionality $D$,
-the number of monomials of a given degree $d$ is ${D -1 + d} \choose {D-1}$.
-Hence, a small change in degree, even from say $1$ to $2$ or $2$ to $3$
-would entail a massive blowup in the complexity of our model.
-Thus, tweaking the degree is too blunt a hammer.
-Instead, we need a more fine-grained tool
+Note that the number of terms with degree $d$
+blows up rapidly as $d$ grows larger.
+Given $k$ variables, the number of monomials 
+of degree $d$ is ${k - 1 + d} \choose {k - 1}$.
+Even small changes in degree, say, from $2$ to $3$
+dramatically increase the complexity of our model.
+Thus we often need a more fine-grained tool
 for adjusting function complexity.
 
 ## Squared Norm Regularization
@@ -43,35 +46,39 @@ for adjusting function complexity.
 *Weight decay* (commonly called *L2* regularization),
 might be the most widely-used technique
 for regularizing parametric machine learning models.
-The basic intuition behind weight decay is
-the notion that among all functions $f$,
-the function $f = 0$ is the simplest.
-Intuitively, we can then measure functions by their proximity to zero.
+The technique is motivated by the basic intuition
+that among all functions $f$,
+the function $f = 0$ 
+(assigning the value $0$ to all inputs) 
+is in some sense the *simplest*
+and that we can measure the complexity 
+of a function by its distance from zero.
 But how precisely should we measure
 the distance between a function and zero?
 There is no single right answer.
 In fact, entire branches of mathematics,
-e.g., in functional analysis and the theory of Banach spaces
+including parts of functional analysis 
+and the theory of Banach spaces
 are devoted to answering this issue.
 
-For our present purposes, a very simple interpretation will suffice:
-We will consider a linear function
+One simple interpretation might be 
+to measure the complexity of a linear function
 $f(\mathbf{x}) = \mathbf{w}^\top \mathbf{x}$
-to be simple if its weight vector is small.
-We can measure this via $||mathbf{w}||^2$.
-One way of keeping the weight vector small
+by some norm of its weight vector, e.g., $|| \mathbf{w} ||^2$.
+The most common method for ensuring a small weight vector
 is to add its norm as a penalty term
 to the problem of minimizing the loss.
 Thus we replace our original objective,
-*minimize the prediction error on the training labels*,
+*minimize the prediction loss on the training labels*,
 with new objective,
-*minimize the sum of the prediction error and the penalty term*.
-Now, if the weight vector becomes too large,
-our learning algorithm will find more profit in
-minimizing the norm $|| \mathbf{w} ||^2$
+*minimize the sum of the prediction loss and the penalty term*.
+Now, if our weight vector grows too large,
+our learning algorithm might *focus* 
+on minimizing the weight norm $|| \mathbf{w} ||^2$
 versus minimizing the training error.
 That is exactly what we want.
-To illustrate things in code, let's revive our previous example
+To illustrate things in code, 
+let's revive our previous example
 from :numref:`sec_linear_regression` for linear regression.
 There, our loss was given by
 
@@ -80,43 +87,62 @@ $$l(\mathbf{w}, b) = \frac{1}{n}\sum_{i=1}^n \frac{1}{2}\left(\mathbf{w}^\top \m
 Recall that $\mathbf{x}^{(i)}$ are the observations,
 $y^{(i)}$ are labels, and $(\mathbf{w}, b)$
 are the weight and bias parameters respectively.
-To arrive at a new loss function
-that penalizes the size of the weight vector,
-we need to add $||mathbf{w}||^2$, but how much should we add?
-To address this, we need to add a new hyperparameter,
-that we will call the *regularization constant* and denote by $\lambda$:
+To penalizes the size of the weight vector,
+we must somehow add $||mathbf{w}||^2$ to the loss function,
+but how should the model trade off the 
+standard loss for this new additive penalty?
+In practice, we characterize this tradeoff
+via the *regularization constant* $\lambda > 0$, 
+a non-negative hyperparameter 
+that we fit using validation data:
 
 $$l(\mathbf{w}, b) + \frac{\lambda}{2} \|\mathbf{w}\|^2.$$
 
-This non-negative parameter $\lambda \geq 0$
-governs the amount of regularization.
-For $\lambda = 0$, we recover our original loss function,
-whereas for $\lambda > 0$ we ensure that $\mathbf{w}$ cannot grow too large. The astute reader might wonder why we are squaring
-the norm of the weight vector.
-We do this for two reasons.
-First, we do it for computational convenience.
-By squaring the L2 norm, we remove the square root,
-leaving the sum of squares of each component of the weight vector.
-This is convenient because it is easy to compute derivatives of a sum of terms (the sum of derivatives equals the derivative of the sum).
+For $\lambda = 0$, we recover our original loss function.
+For $\lambda > 0$, we restrict the size of $|| \mathbf{w} ||$.
+The astute reader might wonder why we work with the squared
+norm and not the standard norm (i.e., the Euclidean distance).
+We do this for computational convenience.
+By squaring the L2 norm, we remove the square root, 
+leaving the sum of squares of 
+each component of the weight vector.
+This makes the derivative of the penalty easy to compute
+(the sum of derivatives equals the derivative of the sum).
 
-Moreover, you might ask, why the L2 norm in the first place and not the L1 norm, or some other distance function.
-In fact, several other choices are valid
-and are popular throughout statistics.
+Moreover, you might ask why we work with the L2 norm 
+in the first place and not, say, the L1 norm.
+
+In fact, other choices are valid and 
+popular throughout statistics.
 While L2-regularized linear models constitute
 the classic *ridge regression* algorithm
 L1-regularized linear regression
 is a similarly fundamental model in statistics
-popularly known as *lasso regression*.
+(popularly known as *lasso regression*).
 
-One mathematical reason for working with the L2 norm and not some other norm,
-is that it penalizes large components of the weight vector
-much more than it penalizes small ones.
-This encourages our learning algorithm to discover models
-which distribute their weight across a larger number of features,
-which might make them more robust in practice
-since they do not depend precariously on a single feature.
-The stochastic gradient descent updates for L2-regularized regression
-are as follows:
+More generally, the $\ell_2$ is just one 
+among an infinite class of norms call p-norms,
+many of which you might encounter in the future.
+In general, for some number $p$, 
+the $\ell_p$ norm is defined as
+
+$$\|\mathbf{w}\|_p^p := \sum_{i=1}^d |w_i|^p.$$
+
+
+One reason to work with the L2 norm
+is that it places and outsize penalty
+on large components of the weight vector.
+This biases our learning algorithm 
+towards models that distribute weight evenly 
+across a larger number of features.
+In practice, this might make them more robust
+to measurement error in a single variable.
+By contrast, L1 penalties lead to models
+that concentrate weight on a small set of features,
+which may be desirable for other reasons. 
+
+The stochastic gradient descent updates 
+for L2-regularized regression follow:
 
 $$
 \begin{aligned}
@@ -124,39 +150,42 @@ w & \leftarrow \left(1- \frac{\eta\lambda}{|\mathcal{B}|} \right) \mathbf{w} - \
 \end{aligned}
 $$
 
-As before, we update $\mathbf{w}$ based on the amount
+As before, we update $\mathbf{w}$ based on the amount 
 by which our estimate differs from the observation.
 However, we also shrink the size of $\mathbf{w}$ towards $0$.
 That is why the method is sometimes called "weight decay":
-because the penalty term literally causes our optimization algorithm
-to *decay* the magnitude of the weight at each step of training.
-This is more convenient than having to pick
-the number of parameters as we did for polynomials.
-In particular, we now have a continuous mechanism
+given the penalty term alone,
+our optimization algorithm *decays*
+the weight at each step of training.
+In contrast to feature selection,
+weight decay offers us a continuous mechanism
 for adjusting the complexity of $f$.
-Small values of $\lambda$ correspond to unconstrained $\mathbf{w}$,
-whereas large values of $\lambda$ constrain $\mathbf{w}$ considerably.
-Since we do not want to have large bias terms either,
-we often add $b^2$ as a penalty, too.
+Small values of $\lambda$ correspond 
+to unconstrained $\mathbf{w}$,
+whereas large values of $\lambda$ 
+constrain $\mathbf{w}$ considerably.
+Whether we include a corresponding bias penalty $b^2$ 
+can vary across implementations, 
+and may vary across layers of a neural network.
+Often, we do not regularize the bias term
+of a network's output layer.
+ 
 
 ## High-Dimensional Linear Regression
 
-For high-dimensional regression it is difficult
-to pick the 'right' dimensions to omit.
-Weight-decay regularization is a much more convenient alternative.
-We will illustrate this below.
-First, we will generate some synthetic data as before
+We can illustrate the benefits of 
+weight decay over feature selection
+through a simple synthetic example.
+First, we generate some data as before
 
 $$y = 0.05 + \sum_{i = 1}^d 0.01 x_i + \epsilon \text{ where }
 \epsilon \sim \mathcal{N}(0, 0.01).$$
 
-representing our label as a linear function of our inputs,
+choosing our label to be a linear function of our inputs,
 corrupted by Gaussian noise with zero mean and variance 0.01.
-To observe the effects of overfitting more easily,
-we can make our problem high-dimensional,
-setting the data dimension to $d = 200$
-and working with a relatively small number of training 
-examples---here we will set the sample size to 20:
+To make the effects of overfitting pronounced,
+we can increase the dimensinoality of our problem to $d = 200$
+and work with a small training set containing only 20 example.
 
 ```{.python .input  n=2}
 %matplotlib inline
@@ -175,20 +204,16 @@ test_iter = d2l.load_array(test_data, batch_size, is_train=False)
 
 ## Implementation from Scratch
 
-Next, we will show how to implement weight decay from scratch.
-All we have to do here is to add the squared $\ell_2$ penalty
-as an additional loss term added to the original target function.
-The squared norm penalty derives its name from the fact
-that we are adding the second power $\sum_i w_i^2$.
-The $\ell_2$ is just one among an infinite class of norms call p-norms,
-many of which you might encounter in the future.
-In general, for some number $p$, the $\ell_p$ norm is defined as
-
-$$\|\mathbf{w}\|_p^p := \sum_{i=1}^d |w_i|^p.$$
+Next, we will implement weight decay from scratch,
+simply by adding the squared $\ell_2$ penalty
+to the original target function.
 
 ### Initializing Model Parameters
 
-First, we will define a function to randomly initialize our model parameters and run `attach_grad` on each to allocate memory for the gradients we will calculate.
+First, we will define a function 
+to randomly initialize our model parameters 
+and run `attach_grad` on each to allocate 
+memory for the gradients we will calculate.
 
 ```{.python .input  n=5}
 def init_params():
@@ -203,7 +228,7 @@ def init_params():
 
 Perhaps the most convenient way to implement this penalty
 is to square all terms in place and sum them up.
-We divide by $2$ by convention
+We divide by $2$ by convention,
 (when we take the derivative of a quadratic function,
 the $2$ and $1/2$ cancel out, ensuring that the expression
 for the update looks nice and simple).
@@ -215,14 +240,12 @@ def l2_penalty(w):
 
 ### Defining the Train and Test Functions
 
-The following code defines how to train and test the model
-separately on the training dataset and the test dataset.
-Unlike the previous sections, here, the $\ell_2$ norm penalty term
-is added when calculating the final loss function.
+The following code fits a model on the test set
+and evaluates it on the test set.
 The linear network and the squared loss
 have not changed since the previous chapter,
-so we will just import them via `d2l.linreg` and `d2l.squared_loss`
-to reduce clutter.
+so we will just import them via `d2l.linreg` and `d2l.squared_loss`.
+The only change here is that our loss now includes the penalty term.
 
 ```{.python .input  n=7}
 def train(lambd):
@@ -246,10 +269,11 @@ def train(lambd):
 
 ### Training without Regularization
 
-Next, let's train and test the high-dimensional linear regression model.
-When `lambd = 0` we do not use weight decay.
-As a result, while the training error decreases, the test error does not.
-This is a perfect example of overfitting.
+We now run this code with `lambd = 0`, 
+disabling weight decay.
+Note that we overfit badly, 
+decreasing the training error but not the 
+test error---a textook case of overfitting.
 
 ```{.python .input  n=8}
 train(lambd=0)
@@ -257,12 +281,14 @@ train(lambd=0)
 
 ### Using Weight Decay
 
-The example below shows that even though the training error increased,
-the error on the test set decreased.
-This is precisely the improvement that we expect from using weight decay.
-While not perfect, overfitting has been mitigated to some extent.
-In addition, the $\ell_2$ norm of the weight $\mathbf{w}$
-is smaller than without using weight decay.
+Below, we run with substantial weight decay.
+Note that the training error increases
+but the test error decreases.
+This is precisely the effect 
+we expect from regularization.
+As an exercise, you might want to check
+that the $\ell_2$ norm of the weights $\mathbf{w}$
+has actually decreased.
 
 ```{.python .input  n=9}
 train(lambd=3)
@@ -270,7 +296,8 @@ train(lambd=3)
 
 ## Concise Implementation
 
-Because weight decay is ubiquitous in neural network optimization,
+Because weight decay is ubiquitous 
+in neural network optimization,
 Gluon makes it especially convenient,
 integrating weight decay into the optimization algorithm itself
 for easy use in combination with any loss function.
@@ -284,9 +311,12 @@ and the optimizer must to touch each parameter once anyway.
 In the following code, we specify
 the weight decay hyperparameter directly
 through `wd` when instantiating our `Trainer`.
-By default, Gluon decays both weights and biases simultaneously.
-Note that the hyperparameter `wd` will be multiplied by `wd_mult`
-when updating model parameters. Thus, by setting `wd_mult` to $0$
+By default, Gluon decays both 
+weights and biases simultaneously.
+Note that the hyperparameter `wd` 
+will be multiplied by `wd_mult`
+when updating model parameters. 
+Thus, if we set `wd_mult` to $0$,
 the bias parameter $b$ will not decay.
 
 ```{.python .input}
@@ -315,9 +345,12 @@ def train_gluon(wd):
     print('L1 norm of w:', np.abs(net[0].weight.data()).sum())
 ```
 
-The plots look just the same as when we implemented weight decay from scratch
-but they run a bit faster and are easier to implement,
-a benefit that will become more pronounced for large problems.
+The plots look identical to those when 
+we implemented weight decay from scratch.
+However, they run appreciably faster 
+and are easier to implement,
+a benefit that will become more
+pronounced for large problems.
 
 ```{.python .input}
 train_gluon(0)
@@ -329,18 +362,15 @@ train_gluon(3)
 
 So far, we only touched upon one notion of
 what constitutes a simple *linear* function.
-For nonlinear functions, what constitutes *simplicity*
-can be a far more complex question.
-For instance, there exist [Reproducing Kernel Hilbert Spaces (RKHS)](https://en.wikipedia.org/wiki/Reproducing_kernel_Hilbert_space)
-which allow one to use many of the tools
-introduced for linear functions in a nonlinear context.
+Moreover, what constitutes a simple *nonlinear* function,
+can be an even more complex question.
+For instance, [Reproducing Kernel Hilbert Spaces (RKHS)](https://en.wikipedia.org/wiki/Reproducing_kernel_Hilbert_space)
+allow one to apply tools introduced 
+for linear functions in a nonlinear context.
 Unfortunately, RKHS-based algorithms
-do not always scale well to massive amounts of data.
-For the purposes of this book, we limit ourselves
-to simply summing over the weights for different layers,
-e.g., via $\sum_l \|\mathbf{w}_l\|^2$,
-which is equivalent to weight decay applied to all layers.
-
+tend to scale purely to large, high-dimensional data.
+In this book we will default to the simple heuristic
+of applying weight decay on all layers of a deep network.
 
 ## Summary
 

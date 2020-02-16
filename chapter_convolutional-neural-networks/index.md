@@ -22,7 +22,7 @@ that nearby pixels are more related to each other.
 In this chapter, we introduce convolutional neural networks (CNNs),
 a powerful family of neural networks
 that were designed for precisely this purpose.
-CNN-based network *architecures*
+CNN-based network *architectures*
 now dominate the field of computer vision to such an extent
 that hardly anyone these days would develop
 a commercial application or enter a competition
