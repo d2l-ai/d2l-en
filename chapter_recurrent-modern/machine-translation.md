@@ -35,18 +35,16 @@ We perform several preprocessing steps on the raw text data, including ignoring 
 ```{.python .input  n=3}
 # Saved in the d2l package for later use
 def preprocess_nmt(text):
-
     def no_space(char, prev_char):
-        return char in frozenset('?!,.;"$%()+:') and prev_char != ' '
+        return char in set(',.!') and prev_char != ' '
 
     text = text.replace('\u202f', ' ').replace('\xa0', ' ').lower()
-    out = text[0]
-    out += ''.join(' ' + char if no_space(char, prev_char) else char
-                   for prev_char, char in zip(text[:-1], text[1:]))
-    return out
+    out = [' ' + char if i > 0 and no_space(char, text[i-1]) else char
+           for i, char in enumerate(text)]
+    return ''.join(out)
 
 text = preprocess_nmt(raw_text)
-print(text[0:96])
+print(text[0:95])
 ```
 
 ## Tokenization
@@ -55,10 +53,10 @@ Different to using character tokens in :numref:`sec_language_model`, here a toke
 
 ```{.python .input  n=4}
 # Saved in the d2l package for later use
-def tokenize_nmt(text, num_examples=-1):
+def tokenize_nmt(text, num_examples=None):
     source, target = [], []
     for i, line in enumerate(text.split('\n')):
-        if i == num_examples:
+        if num_examples and i > num_examples:
             break
         parts = line.split('\t')
         if len(parts) == 2:
@@ -110,13 +108,11 @@ Now we can convert a list of sentences into an `(num_example, num_steps)` index 
 ```{.python .input  n=8}
 # Saved in the d2l package for later use
 def build_array(lines, vocab, num_steps, is_source):
-    if is_source:
-        lines = [vocab[l] for l in lines]
-    else:
-        lines = [[vocab['<bos>']] + vocab[l] + [vocab['<eos>']]
-                 for l in lines]
-    array = np.array([trim_pad(l, num_steps, vocab['<pad>']) for l in lines])
-    valid_len = (array != vocab['<pad>']).sum(axis=1)
+    lines = [vocab[l] for l in lines]
+    if not is_source:
+        lines = [[vocab.bos] + l + [vocab.eos] for l in lines]
+    array = np.array([trim_pad(l, num_steps, vocab.pad) for l in lines])
+    valid_len = (array != vocab.pad).sum(axis=1)
     return array, valid_len
 ```
 
@@ -149,9 +145,9 @@ Let's read the first batch.
 ```{.python .input  n=10}
 src_vocab, tgt_vocab, train_iter = load_data_nmt(batch_size=2, num_steps=8)
 for X, X_vlen, Y, Y_vlen in train_iter:
-    print('X:\n', X.astype('int32'))
+    print('X:', X.astype('int32'))
     print('Valid lengths for X:', X_vlen)
-    print('Y:\n', Y.astype('int32'))
+    print('Y:', Y.astype('int32'))
     print('Valid lengths for Y:', Y_vlen)
     break
 ```
