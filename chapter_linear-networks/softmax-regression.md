@@ -239,7 +239,7 @@ is commonly called the *cross-entropy* loss.
 Here, we used that by construction $\hat{y}$ 
 is a discrete probability distribution
 and that the vector $\mathbf{y}$ is a one-hot vector.
-Hence the the sum over all coordinates $j$ vanishes for all but one term.
+Hence the sum over all coordinates $j$ vanishes for all but one term.
 Since all $\hat{y}_j$ are probabilities, 
 their logarithm is never larger than $0$.
 Consequently, the loss function cannot be minimized any further
