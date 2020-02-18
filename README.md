@@ -40,6 +40,20 @@ If you find this book useful, please star (★) this repository or cite this boo
 }
 ```
 
+
+## Endorsements
+
+> <p>"In less than a decade, the AI revolution has swept from research labs to broad industries to every corner of our daily life.  Dive Into Deep Learning is an excellent text on deep learning and deserves attention from anyone who wants to learn why deep learning has ignited the AI revolution – the most powerful technology force of our time."</p>
+> <b>&mdash; Jensen Huang, Founder and CEO of NVIDIA</b>
+
+
+> <p>"This is a timely, fascinating book, providing with not only a comprehensive overview of deep learning principles but also detailed algorithms with hands-on programming codes, and moreover, a state-of-the-art introduction to deep learning in computer vision and natural language processing. Dive into this book if you want to dive into deep learning!"</p>
+> <b>&mdash; Jiawei Han, Michael Aiken Chair Professor, University of Illinois at Urbana-Champaign</b>
+
+
+> <p>"This is a highly welcome addition to the machine learning literature, with a focus on hands-on experience implemented via the integration of Jupyter Notebooks. Students of deep learning should find this invaluable to become proficient in this field."</p>
+> <b>&mdash; Bernhard Schölkopf, Director at the Max Planck Institute for Intelligent Systems</b>
+
 ## Contribute ([learn how](https://d2l.ai/chapter_appendix-tools-for-deep-learning/contributing.html))
 
 This open source book has benefited from pedagogical suggestions, typo corrections, and other improvements from community contributors. Your help is valuable for making the book better for everyone. We will [acknowledge](https://d2l.ai/chapter_preface/index.html#Acknowledgments) each D2L contributor in the book and send a free book (hard copy) to the *first 100 contributors* when it is published.
