@@ -4,7 +4,7 @@
 The notation used throughout this book is summarized below.
 
 
-## Linear Algebra
+## Numbers
 
 * $x$: A scalar
 * $\mathbf{x}$: A vector
@@ -13,6 +13,7 @@ The notation used throughout this book is summarized below.
 * $\mathbf{I}$: An identity matrix
 * $x_i$, $[\mathbf{x}]_i$: The $i^\mathrm{th}$ element of vector $\mathbf{x}$ 
 * $x_{ij}$, $[\mathbf{X}]_{ij}$: The element of matrix $\mathbf{X}$ at row $i$ and column $j$
+
 
 
 
@@ -38,7 +39,8 @@ The notation used throughout this book is summarized below.
 * $\mathbf{1}_\mathcal{X}$: The indicator function
 * $\mathbf{(\cdot)}^\top$: Transpose of a vector or a matrix             
 * $\mathbf{X}^{-1}$: Inverse of matrix $\mathbf{X}$
-* $\odot$: Hadamard (elementwise) product                
+* $\odot$: Hadamard (elementwise) product 
+* $[\cdot, \cdot]$: Concatenation
 * $\lvert \mathcal{X} \rvert$: Cardinality of set $\mathcal{X}$
 * $\|\cdot\|_p$: $\ell_p$ norm                                 
 * $\|\cdot\|$: $\ell_2$ norm        
@@ -60,7 +62,7 @@ The notation used throughout this book is summarized below.
 * $P(\cdot)$: Probability distribution                                
 * $z \sim P$: Random variable $z$ has probability distribution $P$ 
 * $P(X \mid Y)$: Conditional probability of $X \mid Y$        
-* $p(x)$: probability density function
+* $p(x)$: Probability density function
 * ${E}_{x} [f(x)]$: Expectation of $f$ with respect to $x$  
 * $X \perp Y$: Random variables $X$ and $Y$ are independent
 * $X \perp Y \mid Z$: Random variables  $X$  and  $Y$  are conditionally independent given random variable $Z$

@@ -1,7 +1,7 @@
 # Sentiment Analysis and the Dataset
 :label:`sec_sentiment`
 
-Text classification is a common task in natural language processing, which transforms a sequence of text of indefinite length into a category of text. It is similar to the image classification, the most frequently used application in this book, e.g., :numref:`sec_naive_bayes`. The only difference is that, rather than an image, text classification's example is a text sentence. 
+Text classification is a common task in natural language processing, which transforms a sequence of text of indefinite length into a category of text. It is similar to the image classification, the most frequently used application in this book, e.g., :numref:`sec_naive_bayes`. The only difference is that, rather than an image, text classification's example is a text sentence.
 
 This section will focus on loading data for one of the sub-questions in this field: using text sentiment classification to analyze the emotions of the text's author. This problem is also called sentiment analysis and has a wide range of applications. For example, we can analyze user reviews of products to obtain user satisfaction statistics, or analyze user sentiments about market conditions and use it to predict future trends.
 
@@ -41,7 +41,7 @@ def read_imdb(data_dir, is_train):
             with open(folder_name + file, 'rb') as f:
                 review = f.read().decode('utf-8').replace('\n', '')
                 data.append(review)
-                labels.append(1 if label == 'pos' else 0)
+                labels.append(1 if label == 'pos/' else 0)
     return data, labels
 
 train_data = read_imdb(data_dir, is_train=True)
@@ -118,6 +118,7 @@ def load_data_imdb(batch_size, num_steps=500):
 
 1. Discover a different natural language dataset (such as [Amazon reviews](https://snap.stanford.edu/data/web-Amazon.html)) and build a similar data_loader function as `load_data_imdb`.
 
+
 ## [Discussions](https://discuss.mxnet.io/t/4355)
 
-![](../img/qr_sentiment-analysis.svg)
+![](../img/qr_sentiment-analysis-and-dataset.svg)

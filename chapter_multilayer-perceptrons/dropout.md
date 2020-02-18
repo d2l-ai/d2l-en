@@ -1,12 +1,14 @@
 # Dropout
 :label:`sec_dropout`
 
-Just now, we introduced the classical approach
-of regularizing statistical models by penalizing
-the $\ell_2$ norm of the weights.
+Just now, in :numref:`sec_weight_decay`,
+we introduced the classical approach
+to regularizing statistical models 
+by penalizing the $\ell_2$ norm of the weights.
 In probabilistic terms, we could justify this technique
 by arguing that we have assumed a prior belief
-that weights take values from a Gaussian distribution with mean $0$.
+that weights take values from 
+a Gaussian distribution with mean $0$.
 More intuitively, we might argue
 that we encouraged the model to spread out its weights
 among many features and rather than depending too much
@@ -14,113 +16,151 @@ on a small number of potentially spurious associations.
 
 ## Overfitting Revisited
 
-Given many more features than examples, linear models can overfit.
-But when there are many more examples than features,
+Faced with more features than examples, 
+linear models tend to overfit.
+But given more examples than features,
 we can generally count on linear models not to overfit.
-Unfortunately, the reliability with which linear models generalize
-comes at a cost:
-Linear models can’t take into account interactions among features.
+Unfortunately, the reliability with which
+linear models generalize comes at a cost:
+Naively applied, linear models do not take 
+into account interactions among features.
 For every feature, a linear model must assign
-either a positive or a negative weight.
-They lack the flexibility to account for context.
+either a positive or a negative weight, ignoring context.
 
-In more formal text, you’ll see this fundamental tension
+In traditional texts, this fundamental tension 
 between generalizability and flexibility
-discussed as the *bias-variance tradeoff*.
+is described as the *bias-variance tradeoff*.
 Linear models have high bias
 (they can only represent a small class of functions),
 but low variance (they give similar results
 across different random samples of the data).
 
-Deep neural networks take us to the opposite end
-of the bias-variance spectrum.
-Neural networks are so flexible because
-they aren’t confined to looking at each feature individually.
-Instead, they can learn interactions among groups of features.
-For example, they might infer that “Nigeria” and “Western Union”
-appearing together in an email indicates spam
-but that “Nigeria” without “Western Union” does not.
+Deep neural networks inhabit the opposite 
+end of the bias-variance spectrum.
+Unlike linear models, neural networks,
+are not confined to looking at each feature individually.
+They can learn interactions among groups of features.
+For example, they might infer that 
+“Nigeria” and “Western Union” appearing 
+together in an email indicates spam
+but that separately they do not.
 
-Even when we only have a small number of features,
+Even when we have far more examples than features,
 deep neural networks are capable of overfitting.
-In 2017, a group of researchers presented a now well-known
-demonstration of the incredible flexibility of neural networks.
-They presented a neural network with randomly-labeled images
-(there was no true pattern linking the inputs to the outputs)
-and found that the neural network, optimized by SGD,
+In 2017, a group of researchers demonstrated
+the extreme flexibility of neural networks
+by training deep nets on randomly-labeled images.
+Despite the absence of any true pattern
+linking the inputs to the outputs,
+they found that the neural network optimized by SGD,
 could label every image in the training set perfectly.
 
 Consider what this means.
-If the labels are assigned uniformly at random and there are 10 classes,
-then no classifier can get better than 10% accuracy on holdout data.
-Yet even in these situations, when there is no true pattern to be learned, neural networks can perfectly fit the training labels.
+If the labels are assigned uniformly
+at random and there are 10 classes,
+then no classifier can do better 
+than 10% accuracy on holdout data.
+The generalization gap here is a whopping 90%.
+If our models so expressive that they 
+can overfit this badly, then when should
+we expect them not to overfit?
+The mathemtatical foundations for 
+the puzzling generalization properties
+of deep networks remain open research questions,
+and we encourage the theoretically-oriented 
+reader to dig deeperinto the topic.
+For now, we turn to the more terrestrial investigation of 
+practical tools that tend (empirically)
+to improve the generalization of deep nets.
+
 
 ## Robustness through Perturbations
 
-Let's think briefly about what we expect from a good statistical model.
-We want it to do well on unseen test data.
-One way we can accomplish this is by asking
-what constitutes a "simple" model?
+Let's think briefly about what we 
+expect from a good predictive model.
+We want it to peform well on unseen data.
+Classical generalization theory
+suggests that to close the gap between
+train and test performance, 
+we should aim for a *simple* model.
 Simplicity can come in the form
 of a small number of dimensions,
-which is what we did when discussing fitting a model
-with monomial basis functions.
-Simplicity can also come in the form
-of a small norm for the basis functions.
-This led us to weight decay ($\ell_2$ regularization).
-Yet a third notion of simplicity that we can impose
-is that the function should be robust
-under small changes in the input.
+as we explored when discussing 
+linear models monomial basis functions
+:numref:`sec_model_selection`.
+As we saw when discussing weight decay 
+($\ell_2$ regularization) :numref:`sec_weight_decay`,
+the (inverse) norm of the parameters 
+represents another useful measure of simplicity.
+Another useful notion of simplicity is smoothness,
+i.e., that the function should not be sensitive
+to small changed to its inputs.
 For instance, when we classify images,
 we would expect that adding some random noise
 to the pixels should be mostly harmless.
 
-
 In 1995, Christopher Bishop formalized
-a form of this idea when he proved
-that training with input noise is equivalent to Tikhonov regularization :cite:`Bishop.1995`.
-In other words, he drew a clear mathematical connection
+this idea when he proved that training with input noise 
+is equivalent to Tikhonov regularization :cite:`Bishop.1995`.
+This work drew a clear mathematical connection
 between the requirement that a function be smooth (and thus simple),
-as we discussed in the section on weight decay,
-with and the requirement that it be resilient to perturbations in the input.
+and the requirement that it be resilient 
+to perturbations in the input.
 
-Then in 2014, Srivastava et al. :cite:`Srivastava.Hinton.Krizhevsky.ea.2014`
+Then, in 2014, Srivastava et al. :cite:`Srivastava.Hinton.Krizhevsky.ea.2014`
 developed a clever idea for how to apply Bishop's idea
 to the *internal* layers of the network, too.
-Namely they proposed to inject noise into each layer of the network
+Namely, they proposed to inject noise 
+into each layer of the network
 before calculating the subsequent layer during training.
-They realized that when training deep network with many layers,
-enforcing smoothness just on the input-output mapping
-misses out on what is happening internally in the network.
-Their proposed idea is called *dropout*,
-and it is now a standard technique
-that is widely used for training neural networks.
+They realized that when training 
+a deep network with many layers,
+enforcing smoothness just on the input-output mapping.
+
+Their idea, called *dropout*, involves 
+injecting noise while computing 
+each internal layer during forward propagation,
+and it has become a standard technique
+for training neural networks.
+The method is called *dropout* because we literally
+*drop out* some neurons during training.
 Throughout training, on each iteration,
-dropout regularization consists simply of zeroing out
+standard dropout consists of zeroing out 
 some fraction (typically 50%) of the nodes in each layer
 before calculating the subsequent layer.
 
-The key challenge then is how to inject this noise
-without introducing undue statistical *bias*.
-In other words, we want to perturb the inputs
-to each layer during training
-in such a way that the expected value of the layer
-is equal to the value it would have taken
-had we not introduced any noise at all.
+To be clear, we are imposing 
+our own narrative with the link to Bishop.
+The original paper on dropout
+offers intuition through a surprising 
+analogy to sexual reproduction.
+The authors argue that neural network overfitting
+is characterized by a state in which 
+each layer an relies on a specifc 
+pattern of activations in the previous layer,
+calling this condition *co-adaptation*.
+Dropout, they claim, breaks up co-adaptation
+just as sexual reproduction is argued to 
+break up co-adapted genes. 
 
-In Bishop's case, when we are adding
-Gaussian noise to a linear model,
-this is simple:
-At each training iteration, just add noise
+The key challenge then is *how* to inject this noise.
+One idea is too inject the noise in an *unbiased* manner
+so that the expected value of each layer---fixing 
+the others equal to the value it would have taken absent noise.
+
+In Bishop's work, he added Gaussian noise 
+to the inputs to a linear model:
+At each training iteration, he added noise
 sampled from a distribution with mean zero
-$\epsilon \sim \mathcal{N}(0,\sigma^2)$ to the input $\mathbf{x}$ ,
+$\epsilon \sim \mathcal{N}(0,\sigma^2)$ to the input $\mathbf{x}$,
 yielding a perturbed point $\mathbf{x}' = \mathbf{x} + \epsilon$.
 In expectation, $E[\mathbf{x}'] = \mathbf{x}$.
 
-In the case of dropout regularization,
-one can debias each layer
-by normalizing by the fraction of nodes that were not dropped out.
-In other words, dropout with drop probability $p$ is applied as follows:
+In standard dropout regularization,
+one debiases each layer by normalizing 
+by the fraction of nodes that were retained (not dropped out).
+In other words, dropout with *dropout probability* $p$ 
+is applied as follows:
 
 $$
 \begin{aligned}
@@ -132,18 +172,17 @@ h' =
 \end{aligned}
 $$
 
-By design, the expectation remains unchanged,
-i.e., $E[h'] = h$.
-Intermediate activations $h$ are replaced by a random variable $h'$
-with matching expectation.
-The name "dropout" arises from the notion
-that some neurons "drop out" of the computation
-for the purpose of computing the final result.
-During training, we replace intermediate activations with random variables.
+By design, the expectation remains unchanged, i.e., $E[h'] = h$.
+Intermediate activations $h$ are replaced by
+a random variable $h'$ with matching expectation.
+
+
 
 ## Dropout in Practice
 
-Recall the multilayer perceptron (:numref:`sec_mlp`) with a hidden layer and 5 hidden units. Its architecture is given by
+Recall the multilayer perceptron (:numref:`sec_mlp`) 
+with a hidden layer and 5 hidden units. 
+Its architecture is given by
 
 $$
 \begin{aligned}
@@ -153,41 +192,43 @@ $$
 \end{aligned}
 $$
 
-When we apply dropout to the hidden layer,
-we are essentially removing each hidden unit with probability $p$,
-(i.e., setting their output to $0$).
-We can view the result as a network containing
-only a subset of the original neurons.
+When we apply dropout to a hidden layer,
+zeroing out each hidden unit with probability $p$,
+the result can be viewed as a network 
+containing only a subset of the original neurons.
 In :numref:`fig_dropout2`, $h_2$ and $h_5$ are removed.
-Consequently, the calculation of $y$ no longer depends on $h_2$ and $h_5$
-and their respective gradient also vanishes when performing backprop.
+Consequently, the calculation of $y$ 
+no longer depends on $h_2$ and $h_5$
+and their respective gradient also vanishes 
+when performing backprop.
 In this way, the calculation of the output layer
-cannot be overly dependent on any one element of $h_1, \ldots, h_5$.
-Intuitively, deep learning researchers often explain the intuition thusly:
-we do not want the network's output to depend
-too precariously on the exact activation pathway through the network.
-The original authors of the dropout technique
-described their intuition as an effort
-to prevent the *co-adaptation* of feature detectors.
+cannot be overly dependent on any 
+one element of $h_1, \ldots, h_5$.
 
 ![MLP before and after dropout](../img/dropout2.svg)
 :label:`fig_dropout2`
 
-At test time, we typically do not use dropout.
-However, we note that there are some exceptions:
-some researchers use dropout at test time as a heuristic approach
-for estimating the *confidence* of neural network predictions:
+Typically, ***we disable dropout at test time***.
+Given a trained model and a new example,
+we do not drop out any nodes 
+(and thus do not need to normalize).
+However, there are some exceptions:
+some researchers use dropout at test time as a heuristic 
+for estimating the *uncertainty* of neural network predictions:
 if the predictions agree across many different dropout masks,
 then we might say that the network is more confident.
-For now we will put off the advanced topic of uncertainty estimation
+For now we will put off uncertainty estimation 
 for subsequent chapters and volumes.
 
 
 ## Implementation from Scratch
 
 To implement the dropout function for a single layer,
-we must draw as many samples from a Bernoulli (binary) random variable
-as our layer has dimensions, where the random variable takes value $1$ (keep) with probability $1-p$ and $0$ (drop) with probability $p$.
+we must draw as many samples 
+from a Bernoulli (binary) random variable
+as our layer has dimensions, 
+where the random variable takes value $1$ (keep) 
+with probability $1-p$ and $0$ (drop) with probability $p$.
 One easy way to implement this is to first draw samples
 from the uniform distribution $U[0, 1]$.
 then we can keep those nodes for which the corresponding
@@ -215,8 +256,9 @@ def dropout(X, drop_prob):
 ```
 
 We can test out the `dropout` function on a few examples.
-In the following lines of code, we pass our input `X`
-through the dropout operation, with probabilities 0, 0.5, and 1, respectively.
+In the following lines of code, 
+we pass our input `X` through the dropout operation,
+with probabilities 0, 0.5, and 1, respectively.
 
 ```{.python .input  n=2}
 X = np.arange(16).reshape(2, 8)
@@ -227,10 +269,10 @@ print(dropout(X, 1))
 
 ### Defining Model Parameters
 
-Again, we can use the Fashion-MNIST dataset,
+Again, we work with the Fashion-MNIST dataset
 introduced in :numref:`sec_softmax_scratch`.
-We will define a multilayer perceptron with two hidden layers.
-The two hidden layers both have 256 outputs.
+We define a multilayer perceptron with 
+two hidden layers containing 256 outputs each.
 
 ```{.python .input  n=3}
 num_inputs, num_outputs, num_hiddens1, num_hiddens2 = 784, 10, 256, 256
@@ -249,13 +291,13 @@ for param in params:
 
 ### Defining the Model
 
-The model defined below concatenates the fully-connected layer
- and the activation function ReLU,
- using dropout for the output of each activation function.
- We can set the dropout probability of each layer separately.
- It is generally recommended to set
- a lower dropout probability closer to the input layer.
- Below we set it to 0.2 and 0.5 for the first and second hidden layer respectively.
+The model below applies dropout to the output 
+of each hidden layer (following the activation function).
+We can set dropout probabilities for each layer separately.
+A common trend is to set
+a lower dropout probability closer to the input layer.
+Below we set it to 0.2 and 0.5 for the first 
+and second hidden layer respectively.
  By using the `is_training` function described in :numref:`sec_autograd`,
  we can ensure that dropout is only active during training.
 
@@ -292,7 +334,8 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs,
 
 Using Gluon, all we need to do is add a `Dropout` layer
 (also in the `nn` package)
-after each fully-connected layer, passing in the dropout probability
+after each fully-connected layer, 
+passing in the dropout probability
 as the only argument to its constructor.
 During training, the `Dropout` layer will randomly
 drop out outputs of the previous layer
@@ -329,14 +372,13 @@ d2l.train_ch3(net, train_iter, test_iter, loss, num_epochs, trainer)
 
 ## Exercises
 
-1. Try out what happens if you change the dropout probabilities for layers 1 and 2. In particular, what happens if you switch the ones for both layers?
+1. What happens if you change the dropout probabilities for layers 1 and 2? In particular, what happens if you switch the ones for both layers? Design an experiment to answer these questions, describe your results quantitatively, and summarize the qualitative takeaways.
 1. Increase the number of epochs and compare the results obtained when using dropout with those when not using it.
-1. Compute the variance of the the activation random variables after applying dropout.
-1. Why should you typically not using dropout?
-1. If changes are made to the model to make it more complex, such as adding hidden layer units, will the effect of using dropout to cope with overfitting be more obvious?
-1. Using the model in this section as an example, compare the effects of using dropout and weight decay. What if dropout and weight decay are used at the same time?
+1. What is the variance of the activations in each hidden layer when dropout is and is not applied? Draw a plot to show how this quantity evolves over time for both models. 
+1. Why is dropout not typically used at test time?
+1. Using the model in this section as an example, compare the effects of using dropout and weight decay. What happens when dropout and weight decay are used at the same time? Are the results additive, are their diminish returns or (worse), do they cancel each other out?
 1. What happens if we apply dropout to the individual weights of the weight matrix rather than the activations?
-1. Replace the dropout activation with a random variable that takes on values of $[0, \gamma/2, \gamma]$. Can you design something that works better than the binary dropout function? Why might you want to use it? Why not?
+1. Invent another technique for injecting random noise at each layer that is different from the standard dropout technique. Can you develop a method that outperforms dropout on the FashionMNIST dataset (for a fixed architecture)?
 
 
 ## [Discussions](https://discuss.mxnet.io/t/2343)

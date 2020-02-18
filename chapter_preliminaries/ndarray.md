@@ -28,12 +28,12 @@ we are referring to MXNet's `ndarray` unless otherwise stated.
 ## Getting Started
 
 In this section, we aim to get you up and running,
-equipping you with the the basic math and numerical computing tools
+equipping you with the basic math and numerical computing tools
 that you will build on as you progress through the book. 
 Do not worry if you struggle to grok some of 
 the mathematical concepts or library functions. 
 The following sections will revisit this material 
-in the context practical examples and it will sink. 
+in the context of practical examples and it will sink. 
 On the other hand, if you already have some background 
 and want to go deeper into the mathematical content, just skip this section.
 
@@ -144,7 +144,7 @@ for each element in an `ndarray`
 from some probability distribution. 
 For example, when we construct arrays to serve 
 as parameters in a neural network, we will
-typically inititialize their values randomly. 
+typically initialize their values randomly. 
 The following snippet creates an `ndarray` with shape ($3$, $4$). 
 Each of its elements is randomly sampled 
 from a standard Gaussian (normal) distribution 
@@ -181,7 +181,7 @@ that maps from a scalar to a scalar.
 In mathematical notation, we would denote such
 a *unary* scalar operator (taking one input)
 by the signature $f: \mathbb{R} \rightarrow \mathbb{R}$.
-This just mean that the function is mapping
+This just means that the function is mapping
 from any real number ($\mathbb{R}$) onto another.
 Likewise, we denote a *binary* scalar operator
 (taking two real inputs, and yielding one output)
@@ -258,7 +258,7 @@ Summing all the elements in the `ndarray` yields an `ndarray` with only one elem
 x.sum()
 ```
 
-For stylistic convenience, we can write `x.sum()`as `np.sum(x)`.
+For stylistic convenience, we can write `x.sum()` as `np.sum(x)`.
 
 ## Broadcasting Mechanism
 
@@ -266,7 +266,7 @@ In the above section, we saw how to perform elementwise operations
 on two `ndarray`s of the same shape. Under certain conditions, 
 even when shapes differ, we can still perform elementwise operations
 by invoking the *broadcasting mechanism*.
-These mechanisms work in the following way:
+This mechanism works in the following way:
 First, expand one or both arrays
 by copying elements appropriately 
 so that after this transformation, 

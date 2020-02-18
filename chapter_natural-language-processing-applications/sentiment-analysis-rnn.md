@@ -4,11 +4,13 @@
 
 Similar to search synonyms and analogies, text classification is also a
 downstream application of word embedding. In this section, we will apply
-pre-trained word vectors and bidirectional recurrent neural networks with
-multiple hidden layers :cite:`Maas.Daly.Pham.ea.2011`. We will use them to
+pre-trained word vectors (GloVe) and bidirectional recurrent neural networks with
+multiple hidden layers :cite:`Maas.Daly.Pham.ea.2011`, as shown in :numref:`fig_nlp-map-sa-rnn`. We will use the model to
 determine whether a text sequence of indefinite length contains positive or
-negative emotion. Import the required package or module before starting the
-experiment.
+negative emotion. 
+
+![This section feeds pretrained GloVe to an RNN-based architecture for sentiment analysis.](../img/nlp-map-sa-rnn.svg)
+:label:`fig_nlp-map-sa-rnn`
 
 ```{.python .input  n=1}
 import d2l
@@ -138,7 +140,6 @@ predict_sentiment(net, vocab, 'this movie is so bad')
 1. Increase the number of epochs. What accuracy rate can you achieve on the training and testing datasets? What about trying to re-tune other hyper-parameters?
 1. Will using larger pre-trained word vectors, such as 300-dimensional GloVe word vectors, improve classification accuracy?
 1. Can we improve the classification accuracy by using the spaCy word tokenization tool? You need to install spaCy: `pip install spacy` and install the English package: `python -m spacy download en`. In the code, first import spacy: `import spacy`. Then, load the spacy English package: `spacy_en = spacy.load('en')`. Finally, define the function `def tokenizer(text): return [tok.text for tok in spacy_en.tokenizer(text)]` and replace the original `tokenizer` function. It should be noted that GloVe's word vector uses "-" to connect each word when storing noun phrases. For example, the phrase "new york" is represented as "new-york" in GloVe. After using spaCy tokenization, "new york" may be stored as "new york".
-
 
 
 ## [Discussions](https://discuss.mxnet.io/t/2391)

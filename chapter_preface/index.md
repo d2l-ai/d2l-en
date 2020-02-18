@@ -235,10 +235,12 @@ we discuss several common optimization algorithms
 used to train deep learning models.
 The next chapter, :numref:`chap_performance` examines several key factors
 that influence the computational performance of your deep learning code.
-In :numref:`chap_cv` and :numref:`chap_nlp`, we illustrate
-major applications of deep learning in computer vision
-and natural language processing, respectively.
-
+In :numref:`chap_cv`,
+we illustrate
+major applications of deep learning in computer vision.
+In :numref:`chap_nlp_pretrain` and :numref:`chap_nlp_app`,
+we show how to pretrain language representation models and apply
+them to natural language processing tasks.
 
 
 ### Code
@@ -361,7 +363,8 @@ Maximilian Böther, Rakib Islam, Leonard Lausen, Abhinav Upadhyay, rongruosong,
 Steve Sedlmeyer, ruslo, Rafael Schlatter, liusy182, Giannis Pappas, ruslo,
 ati-ozgur, qbaza, dchoi77, Adam Gerson, Phuc Le, Mark Atwood, christabella, vn09,
 Haibin Lin, jjangga0214, RichyChen, noelo, hansent, Giel Dops, dvincent1337, WhiteD3vil,
-Peter Kulits, codypenta, joseppinilla, ahmaurya, karolszk.
+Peter Kulits, codypenta, joseppinilla, ahmaurya, karolszk, heytitle, Peter Goetz, rigtorp,
+tiepvupsu, sfilip, mlxd, KaleabTessera, sanjaradylov.
 
 We thank Amazon Web Services, especially Swami Sivasubramanian,
 Raju Gulabani, Charlie Bell, and Andrew Jassy for their generous support in writing this book. Without the available time, resources, discussions with colleagues, and continuous encouragement this book would not have happened.

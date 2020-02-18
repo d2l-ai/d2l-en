@@ -79,7 +79,7 @@ limit the expressivity of our linear model.
 
 Given a dataset, our goal is to choose
 the weights $w$ and bias $b$ such that on average,
-the predictions made according our  model
+the predictions made according to our model
 best fit the true prices observed in the data.
 
 In disciplines where it is common to focus
@@ -100,17 +100,17 @@ $$\hat{y} = \mathbf{w}^T \mathbf{x} + b.$$
 
 Here, the vector $\mathbf{x}$ corresponds to a single data point.
 We will often find it convenient
-to refer to our entire dataset via the *design matrix* $X$.
-Here, $X$ contains one row for every example
+to refer to our entire dataset via the *design matrix* $\mathbf{X}$.
+Here, $\mathbf{X}$ contains one row for every example
 and one column for every feature.
 
 For a collection of data points $\mathbf{X}$,
 the predictions $\hat{\mathbf{y}}$
 can be expressed via the matrix-vector product:
 
-$${\hat{\mathbf{y}}} = \mathbf X \mathbf{w} + b.$$
+$${\hat{\mathbf{y}}} = \mathbf{X} \mathbf{w} + b.$$
 
-Given a training dataset $X$
+Given a training dataset $\mathbf{X}$
 and corresponding (known) targets $\mathbf{y}$,
 the goal of linear regression is to find
 the *weight* vector $w$ and bias term $b$
@@ -119,18 +119,18 @@ sampled from the same distribution as the training data
 will (in expectation) predict the target $y_i$ with the lowest error.
 
 Even if we believe that the best model for
-predicting $y$ given  $\mathbf{x}$ is linear,
+predicting $y$ given $\mathbf{x}$ is linear,
 we would not expect to find real-world data where
 $y_i$ exactly equals $\mathbf{w}^T \mathbf{x}+b$
 for all points ($\mathbf{x}, y)$.
 For example, whatever instruments we use to observe
-the features $X$ and labels $\mathbf{y}$
+the features $\mathbf{X}$ and labels $\mathbf{y}$
 might suffer small amount of measurement error.
 Thus, even when we are confident
 that the underlying relationship is linear,
 we will incorporate a noise term to account for such errors.
 
-Before we can go about searching for the best parameters $w$ and $b$,
+Before we can go about searching for the best parameters $\mathbf{w}$ and $b$,
 we will need two more things:
 (i) a quality measure for some given model;
 and (ii) a procedure for updating the model to improve its quality.
@@ -233,7 +233,7 @@ on every single example in the dataset.
 In practice, this can be extremely slow.
 We must pass over the entire dataset before making a single update.
 Thus, we will often settle for sampling a random minibatch of examples
-every time we need to computer the update,
+every time we need to compute the update,
 a variant called *stochastic gradient descent*.
 
 In each iteration, we first randomly sample a minibatch $\mathcal{B}$
@@ -251,7 +251,7 @@ $$(\mathbf{w},b) \leftarrow (\mathbf{w},b) - \frac{\eta}{|\mathcal{B}|} \sum_{i 
 
 To summarize, steps of the algorithm are the following:
 (i) we initialize the values of the model parameters, typically at random;
-(ii) we iteratively sample random batches from the the data (many times),
+(ii) we iteratively sample random batches from the data (many times),
 updating the parameters in the direction of the negative gradient.
 
 For quadratic losses and linear functions,
@@ -264,7 +264,7 @@ say $w_1, w_2, \ldots, w_d$.
 $$
 \begin{aligned}
 \mathbf{w} &\leftarrow \mathbf{w} -   \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_{\mathbf{w}} l^{(i)}(\mathbf{w}, b) && =
-w - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \mathbf{x}^{(i)} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right),\\
+\mathbf{w} - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \mathbf{x}^{(i)} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right),\\
 b &\leftarrow b -  \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \partial_b l^{(i)}(\mathbf{w}, b)  && =
 b - \frac{\eta}{|\mathcal{B}|} \sum_{i \in \mathcal{B}} \left(\mathbf{w}^\top \mathbf{x}^{(i)} + b - y^{(i)}\right).
 \end{aligned}
@@ -338,7 +338,7 @@ rather than writing costly for-loops in Python.
 
 To illustrate why this matters so much,
 we can consider two methods for adding vectors.
-To start we instantiate two $100000$-dimensional vectors
+To start we instantiate two $10000$-dimensional vectors
 containing all ones.
 In one method we will loop over the vectors with a Python `for` loop.
 In the other method we will rely on a single call to `np`.
@@ -508,7 +508,7 @@ of a linear model under the assumption of additive Gaussian noise.
 So far we only talked about linear functions.
 While neural networks cover a much richer family of models,
 we can begin thinking of the linear model
-as a neural network by expressing it the language of neural networks.
+as a neural network by expressing it in the language of neural networks.
 To begin, let's start by rewriting things in a 'layer' notation.
 
 ### Neural Network Diagram
@@ -582,7 +582,7 @@ We invoke Stuart Russell and Peter Norvig who,
 in their classic AI text book
 *Artificial Intelligence: A Modern Approach* :cite:`Russell.Norvig.2016`,
 pointed out that although airplanes might have been *inspired* by birds,
-orninthology has not been the primary driver
+ornithology has not been the primary driver
 of aeronautics innovation for some centuries.
 Likewise, inspiration in deep learning these days
 comes in equal or greater measure from mathematics,

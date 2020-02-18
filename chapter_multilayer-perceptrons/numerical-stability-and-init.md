@@ -1,21 +1,20 @@
 # Numerical Stability and Initialization
 :label:`sec_numerical_stability`
 
-In the past few sections, each model that we implemented
-required initializing our parameters according to some specified distribution.
-However, until now, we glossed over the details,
+So far, for every model that we have implemented,
+we needed to initialize our parameters 
+according to some specified distribution.
+And until now, we glossed over the details,
 taking the initialization hyperparameters for granted.
 You might even have gotten the impression that these choices
 are not especially important.
 However, the choice of initialization scheme
 plays a significant role in neural network learning,
-and can prove essentially to maintaining numerical stability.
+and can be crucial for maintaining numerical stability.
 Moreover, these choices can be tied up in interesting ways
-with the choice of the activation function.
-Which nonlinear activation function we choose,
-and how we decide to initialize our parameters
-can play a crucial role in making
-the optimization algorithm converge rapidly.
+with the choice of the nonlinear activation function.
+Which function we choose and how we initialize parameters
+can determine how quickly our optimization algorithm converges.
 Failure to be mindful of these issues
 can lead to either exploding or vanishing gradients.
 In this section, we delve into these topics with greater detail
@@ -247,7 +246,8 @@ $U\left[-\sqrt{6/(n_\mathrm{in} + n_\mathrm{out})}, \sqrt{6/(n_\mathrm{in} + n_\
 
 The reasoning above barely scratches the surface
 of modern approaches to parameter initialization.
-In fact, MXNet has an entire `mxnet.initializer` module
+In fact, MXNet has an entire 
+[`mxnet.initializer`](https://mxnet.apache.org/api/python/docs/api/initializer/index.html) module
 implementing over a dozen different heuristics.
 Moreover, initialization continues to be a hot area of inquiry
 within research into the fundamental theory of neural network optimization.

@@ -39,9 +39,9 @@ Thus, rather than training *end-to-end* (pixel to classification) systems,
 classical pipelines looked more like this:
 
 1. Obtain an interesting dataset. In early days, these datasets required expensive sensors (at the time, 1 megapixel images were state of the art).
-1. Preprocess the dataset with hand-crafted features based on some knowledge of optics, geometry, other analytic tools, and occasionally on the serendipitous discoveries of lucky graduate students.
-1. Feed the data through a standard set of feature extractors such as [SIFT](https://en.wikipedia.org/wiki/Scale-invariant_feature_transform), the Scale-Invariant Feature Transform, or [SURF](https://en.wikipedia.org/wiki/Speeded_up_robust_features), the Speeded-Up Robust Features, or any number of other hand-tuned pipelines.
-1. Dummp the resulting representations into your favorite classifier, likely a linear model or kernel method, to learn a classifier.
+2. Preprocess the dataset with hand-crafted features based on some knowledge of optics, geometry, other analytic tools, and occasionally on the serendipitous discoveries of lucky graduate students.
+3. Feed the data through a standard set of feature extractors such as [SIFT](https://en.wikipedia.org/wiki/Scale-invariant_feature_transform), the Scale-Invariant Feature Transform, or [SURF](https://en.wikipedia.org/wiki/Speeded_up_robust_features), the Speeded-Up Robust Features, or any number of other hand-tuned pipelines.
+4. Dump the resulting representations into your favorite classifier, likely a linear model or kernel method, to learn a classifier.
 
 If you spoke to machine learning researchers,
 they believed that machine learning was both important and beautiful.
@@ -109,7 +109,7 @@ The ultimate breakthrough in 2012 can be attributed to two key factors.
 
 Deep models with many layers require large amounts of data
 in order to enter the regime
-where they signficantly outperform traditional methods
+where they significantly outperform traditional methods
 based on convex optimizations (e.g., linear and kernel methods).
 However, given the limited storage capacity of computers,
 the relative expense of sensors,
@@ -136,7 +136,7 @@ at a greater scale than academics had previously considered.
 
 ### Missing Ingredient - Hardware
 
-Deep learning models are varacious consumers of compute cycles.
+Deep learning models are voracious consumers of compute cycles.
 Training can take hundreds of epochs, and each iteration
 requires passing data through many layers of computationally-expensive
 linear algebra operations.
@@ -201,7 +201,7 @@ that could run on GPU hardware.
 They realized that the computational bottlenecks in CNNs
 (convolutions and matrix multiplications)
 are all operations that could be parallelized in hardware.
-Using two NIVIDA GTX 580s with 3GB of memory,
+Using two NVIDIA GTX 580s with 3GB of memory,
 they implemented fast convolutions.
 The code [cuda-convnet](https://code.google.com/archive/p/cuda-convnet/)
 was good enough that for several years

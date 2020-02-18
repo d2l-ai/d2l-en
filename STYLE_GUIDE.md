@@ -49,7 +49,7 @@
     * the N equations above/below
 * Place punctuations within equations if necessary
     * e.g., comma and period
-* Assignment sumbol
+* Assignment symbol
     * \leftarrow
 
 ## Figure
@@ -69,7 +69,7 @@
         * arrow head size: 50%
     * Font：
         * STIXGeneral, 9pt（subscripts/superscripts：6pt）
-        * Do not italize numbers or parentheses in subscripts or superscripts
+        * Do not italicize numbers or parentheses in subscripts or superscripts
     * Color：
         * Blue as background (text is black)
             * (Try to avoid) Extra Dark：3FA3FD
@@ -146,7 +146,6 @@
     * 75pixel, SVG
 
 ## Citations
-
 
 1. Run `pip install git+https://github.com/d2l-ai/d2l-book`
 1. Use bibtool to generate consistent keys for bibtex entries. Install it by `brew install bib-tool`

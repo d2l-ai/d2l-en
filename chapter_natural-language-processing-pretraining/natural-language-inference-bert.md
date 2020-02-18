@@ -1,15 +1,14 @@
 # BERT-NLI
 
-...
+![This section feeds pretrained BERT to an MLP-based architecture for natural language inference.](../img/nlp-map-nli-bert.svg)
+:label:`fig_nlp-map-nli-bert`
 
 ```{.python .input  n=1}
 import d2l
 from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
-import time
 
 npx.set_np()
-
 batch_size, ctx = 512, d2l.try_all_gpus()
 bert_train_iter, vocab = d2l.load_data_wiki(batch_size, 'wikitext-2')
 
@@ -19,7 +18,7 @@ bert.initialize(init.Xavier(), ctx=ctx)
 nsp_loss = gluon.loss.SoftmaxCELoss()
 mlm_loss = gluon.loss.SoftmaxCELoss()
 
-d2l.train_bert(bert_train_iter, bert, nsp_loss, mlm_loss, len(vocab), ctx, 20, 3000)
+d2l.train_bert(bert_train_iter, bert, nsp_loss, mlm_loss, len(vocab), ctx, 20, 2000)
 ```
 
 ...
@@ -71,7 +70,7 @@ test_set = SNLIBERTDataset(test_data, vocab)
 ...
 
 ```{.python .input  n=67}
-batch_size = 256
+batch_size = 512
 train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True)
 test_iter = gluon.data.DataLoader(test_set, batch_size)
 ```
@@ -103,7 +102,7 @@ net.classifier.initialize(ctx=ctx)
 ...
 
 ```{.python .input  n=87}
-lr, num_epochs = 1e-5, 5
+lr, num_epochs = 1e-4, 5
 trainer = gluon.Trainer(net.collect_params(), 'adam', {'learning_rate': lr})
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
 d2l.train_ch13(net, train_iter, test_iter, loss, trainer, num_epochs, ctx, d2l.split_batch_multi_inputs)

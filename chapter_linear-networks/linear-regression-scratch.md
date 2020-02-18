@@ -139,8 +139,8 @@ it is inefficient in ways that might get us in trouble on real problems.
 For example, it requires that we load all data in memory
 and that we perform lots of random memory access.
 The built-in iterators implemented in Apache MXNet
-are considerably efficient and they can deal
-both with data stored on file and data fed via a data stream.
+are considerably more efficient and they can deal
+both with data stored in file and data fed via a data stream.
 
 ## Initializing Model Parameters
 
