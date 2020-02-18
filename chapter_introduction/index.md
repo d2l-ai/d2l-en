@@ -847,7 +847,7 @@ or the probability of purchase, given a user $u_i$ and product $p_j$.
 
 Given such a model, then for any given user,
 we could retrieve the set of objects with the largest scores $y_{ij}$,
-which are could then be recommended to the customer.
+which could then be recommended to the customer.
 Production systems are considerably more advanced and take
 detailed user activity and item characteristics into account
 when computing such scores. :numref:`fig_deeplearning_amazon` is an example
