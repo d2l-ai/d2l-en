@@ -991,14 +991,14 @@ class MLPAttention(nn.Block):
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 class MultiHeadAttention(nn.Block):
-    def __init__(self, hidden_size, num_heads, dropout, **kwargs):
+    def __init__(self, num_hiddens, num_heads, dropout, **kwargs):
         super(MultiHeadAttention, self).__init__(**kwargs)
         self.num_heads = num_heads
         self.attention = d2l.DotProductAttention(dropout)
-        self.W_q = nn.Dense(hidden_size, use_bias=False, flatten=False)
-        self.W_k = nn.Dense(hidden_size, use_bias=False, flatten=False)
-        self.W_v = nn.Dense(hidden_size, use_bias=False, flatten=False)
-        self.W_o = nn.Dense(hidden_size, use_bias=False, flatten=False)
+        self.W_q = nn.Dense(num_hiddens, use_bias=False, flatten=False)
+        self.W_k = nn.Dense(num_hiddens, use_bias=False, flatten=False)
+        self.W_v = nn.Dense(num_hiddens, use_bias=False, flatten=False)
+        self.W_o = nn.Dense(num_hiddens, use_bias=False, flatten=False)
 
     def forward(self, query, key, value, valid_length):
         # query, key, and value shape: (batch_size, seq_len, dim),
@@ -1007,8 +1007,8 @@ class MultiHeadAttention(nn.Block):
         # or (batch_size, seq_len).
 
         # Project and transpose query, key, and value from
-        # (batch_size, seq_len, hidden_size * num_heads) to
-        # (batch_size * num_heads, seq_len, hidden_size).
+        # (batch_size, seq_len, num_hiddens * num_heads) to
+        # (batch_size * num_heads, seq_len, num_hiddens).
         query = transpose_qkv(self.W_q(query), self.num_heads)
         key = transpose_qkv(self.W_k(key), self.num_heads)
         value = transpose_qkv(self.W_v(value), self.num_heads)
@@ -1022,25 +1022,25 @@ class MultiHeadAttention(nn.Block):
 
         output = self.attention(query, key, value, valid_length)
 
-        # Transpose from (batch_size * num_heads, seq_len, hidden_size) back
-        # to (batch_size, seq_len, hidden_size * num_heads)
+        # Transpose from (batch_size * num_heads, seq_len, num_hiddens) back
+        # to (batch_size, seq_len, num_hiddens * num_heads)
         output_concat = transpose_output(output, self.num_heads)
         return self.W_o(output_concat)
 
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 def transpose_qkv(X, num_heads):
-    # Original X shape: (batch_size, seq_len, hidden_size * num_heads),
+    # Original X shape: (batch_size, seq_len, num_hiddens * num_heads),
     # -1 means inferring its value, after first reshape, X shape:
-    # (batch_size, seq_len, num_heads, hidden_size)
+    # (batch_size, seq_len, num_heads, num_hiddens)
     X = X.reshape(X.shape[0], X.shape[1], num_heads, -1)
 
-    # After transpose, X shape: (batch_size, num_heads, seq_len, hidden_size)
+    # After transpose, X shape: (batch_size, num_heads, seq_len, num_hiddens)
     X = X.transpose(0, 2, 1, 3)
 
     # Merge the first two dimensions. Use reverse=True to infer shape from
     # right to left.
-    # output shape: (batch_size * num_heads, seq_len, hidden_size)
+    # output shape: (batch_size * num_heads, seq_len, num_hiddens)
     output = X.reshape(-1, X.shape[2], X.shape[3])
     return output
 
@@ -1056,14 +1056,14 @@ def transpose_output(X, num_heads):
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 class PositionWiseFFN(nn.Block):
-    def __init__(self, ffn_hidden_size, hidden_size_out, **kwargs):
+    def __init__(self, pw_num_hiddens, pw_num_outputs, **kwargs):
         super(PositionWiseFFN, self).__init__(**kwargs)
-        self.ffn_1 = nn.Dense(ffn_hidden_size, flatten=False,
-                              activation='relu')
-        self.ffn_2 = nn.Dense(hidden_size_out, flatten=False)
+        self.dense1 = nn.Dense(pw_num_hiddens, flatten=False,
+                               activation='relu')
+        self.dense2 = nn.Dense(pw_num_outputs, flatten=False)
 
     def forward(self, X):
-        return self.ffn_2(self.ffn_1(X))
+        return self.dense2(self.dense1(X))
 
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
@@ -1096,23 +1096,22 @@ class PositionalEncoding(nn.Block):
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 class EncoderBlock(nn.Block):
-    def __init__(self, embed_size, ffn_hidden_size, num_heads,
-                 dropout, **kwargs):
+    def __init__(self, embed_size, pw_num_hiddens, num_heads, dropout,
+                 **kwargs):
         super(EncoderBlock, self).__init__(**kwargs)
-        self.attention = MultiHeadAttention(embed_size, num_heads,
-                                            dropout)
-        self.addnorm_1 = AddNorm(dropout)
-        self.ffn = PositionWiseFFN(ffn_hidden_size, embed_size)
-        self.addnorm_2 = AddNorm(dropout)
+        self.attention = MultiHeadAttention(embed_size, num_heads, dropout)
+        self.addnorm1 = AddNorm(dropout)
+        self.ffn = PositionWiseFFN(pw_num_hiddens, embed_size)
+        self.addnorm2 = AddNorm(dropout)
 
     def forward(self, X, valid_length):
-        Y = self.addnorm_1(X, self.attention(X, X, X, valid_length))
-        return self.addnorm_2(Y, self.ffn(Y))
+        Y = self.addnorm_(X, self.attention(X, X, X, valid_length))
+        return self.addnorm2(Y, self.ffn(Y))
 
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 class TransformerEncoder(d2l.Encoder):
-    def __init__(self, vocab_size, embed_size, ffn_hidden_size,
+    def __init__(self, vocab_size, embed_size, pw_num_hiddens,
                  num_heads, num_layers, dropout, **kwargs):
         super(TransformerEncoder, self).__init__(**kwargs)
         self.embed_size = embed_size
@@ -1121,8 +1120,7 @@ class TransformerEncoder(d2l.Encoder):
         self.blks = nn.Sequential()
         for i in range(num_layers):
             self.blks.add(
-                EncoderBlock(embed_size, ffn_hidden_size,
-                             num_heads, dropout))
+                EncoderBlock(embed_size, pw_num_hiddens, num_heads, dropout))
 
     def forward(self, X, valid_length, *args):
         X = self.pos_encoding(self.embed(X) * math.sqrt(self.embed_size))
