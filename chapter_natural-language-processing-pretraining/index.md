@@ -45,6 +45,5 @@ word2vec-gluon
 glove
 subword-embedding
 similarity-analogy
-
 ```
 

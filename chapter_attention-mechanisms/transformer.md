@@ -278,7 +278,7 @@ class EncoderBlock(nn.Block):
         self.addnorm2 = AddNorm(dropout)
 
     def forward(self, X, valid_length):
-        Y = self.addnorm_(X, self.attention(X, X, X, valid_length))
+        Y = self.addnorm1(X, self.attention(X, X, X, valid_length))
         return self.addnorm2(Y, self.ffn(Y))
 ```
 
