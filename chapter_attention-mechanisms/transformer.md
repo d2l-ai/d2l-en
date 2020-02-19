@@ -83,14 +83,14 @@ class MultiHeadAttention(nn.Block):
         self.W_o = nn.Dense(num_hiddens, use_bias=False, flatten=False)
 
     def forward(self, query, key, value, valid_length):
-        # query, key, and value shape: (batch_size, seq_len, dim),
-        # where seq_len is the length of input sequence
-        # valid_length shape is either (batch_size, )
-        # or (batch_size, seq_len).
+        # For self-attention, query, key, and value shape:
+        # (batch_size, seq_len, dim), where seq_len is the length of input
+        # sequence. valid_length shape is either (batch_size, ) or
+        # (batch_size, seq_len).
 
         # Project and transpose query, key, and value from
-        # (batch_size, seq_len, num_hiddens * num_heads) to
-        # (batch_size * num_heads, seq_len, num_hiddens).
+        # (batch_size, seq_len, num_hiddens) to
+        # (batch_size * num_heads, seq_len, num_hiddens / num_heads).
         query = transpose_qkv(self.W_q(query), self.num_heads)
         key = transpose_qkv(self.W_k(key), self.num_heads)
         value = transpose_qkv(self.W_v(value), self.num_heads)
@@ -102,11 +102,13 @@ class MultiHeadAttention(nn.Block):
             else:
                 valid_length = np.tile(valid_length, (self.num_heads, 1))
 
+        # For self-attention, output shape:
+        # (batch_size * num_heads, seq_len, num_hiddens / num_heads)
         output = self.attention(query, key, value, valid_length)
 
-        # Transpose from (batch_size * num_heads, seq_len, num_hiddens) back
-        # to (batch_size, seq_len, num_hiddens * num_heads)
+        # output_concat shape: (batch_size, seq_len, num_hiddens)
         output_concat = transpose_output(output, self.num_heads)
+        print('o', output_concat.shape)
         return self.W_o(output_concat)
 ```
 
@@ -115,17 +117,15 @@ Here are the definitions of the transpose functions `transpose_qkv` and `transpo
 ```{.python .input  n=3}
 # Saved in the d2l package for later use
 def transpose_qkv(X, num_heads):
-    # Original X shape: (batch_size, seq_len, num_hiddens * num_heads),
-    # -1 means inferring its value, after first reshape, X shape:
-    # (batch_size, seq_len, num_heads, num_hiddens)
+    # Input X shape: (batch_size, seq_len, num_hiddens).
+    # Output X shape:
+    # (batch_size, seq_len, num_heads, num_hiddens / num_heads)
     X = X.reshape(X.shape[0], X.shape[1], num_heads, -1)
 
-    # After transpose, X shape: (batch_size, num_heads, seq_len, num_hiddens)
+    # X shape: (batch_size, num_heads, seq_len, num_hiddens / num_heads)
     X = X.transpose(0, 2, 1, 3)
 
-    # Merge the first two dimensions. Use reverse=True to infer shape from
-    # right to left.
-    # output shape: (batch_size * num_heads, seq_len, num_hiddens)
+    # output shape: (batch_size * num_heads, seq_len, num_hiddens / num_heads)
     output = X.reshape(-1, X.shape[2], X.shape[3])
     return output
 
