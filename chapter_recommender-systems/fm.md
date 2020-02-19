@@ -47,9 +47,9 @@ The following code implement the factorization machines. It is clear to see that
 class FM(nn.Block):
     def __init__(self, field_dims, num_factors):
         super(FM, self).__init__()
-        input_size = int(sum(field_dims))
-        self.embedding = nn.Embedding(input_size, num_factors)
-        self.fc = nn.Embedding(input_size, 1)
+        num_inputs = int(sum(field_dims))
+        self.embedding = nn.Embedding(num_inputs, num_factors)
+        self.fc = nn.Embedding(num_inputs, 1)
         self.linear_layer = gluon.nn.Dense(1, use_bias=True)
         
     def forward(self, x):

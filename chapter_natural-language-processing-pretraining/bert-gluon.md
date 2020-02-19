@@ -253,7 +253,7 @@ for _, data_batch in enumerate(train_iter):
 ...
 
 ```{.python .input  n=15}
-net = d2l.BERTModel(len(vocab), embed_size=128, hidden_size=256, 
+net = d2l.BERTModel(len(vocab), embed_size=128, pw_num_hiddens=256, 
                     num_heads=2, num_layers=2, dropout=0.2)
 ctx = d2l.try_all_gpus()
 net.initialize(init.Xavier(), ctx=ctx)

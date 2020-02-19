@@ -1,6 +1,6 @@
-...
+# BERT
 
-```{.python .input  n=3}
+```{.python .input  n=1}
 import d2l
 from mxnet import gluon, np, npx
 from mxnet.gluon import nn
@@ -13,21 +13,22 @@ npx.set_np()
 
 ...
 
-```{.python .input  n=4}
+```{.python .input  n=2}
 # Saved in the d2l package for later use
 class BERTEncoder(nn.Block):
-    def __init__(self, vocab_size, units, hidden_size,
-                 num_heads, num_layers, dropout, **kwargs):
+    def __init__(self, vocab_size, embed_size, pw_num_hiddens, num_heads,
+                 num_layers, dropout, **kwargs):
         super(BERTEncoder, self).__init__(**kwargs)
-        self.word_embedding = gluon.nn.Embedding(vocab_size, units)
-        self.segment_embedding = gluon.nn.Embedding(2, units)
-        self.pos_encoding = d2l.PositionalEncoding(units, dropout)
+        self.token_embedding = gluon.nn.Embedding(vocab_size, embed_size)
+        self.segment_embedding = gluon.nn.Embedding(2, embed_size)
+        self.pos_encoding = d2l.PositionalEncoding(embed_size, dropout)
         self.blks = gluon.nn.Sequential()
         for i in range(num_layers):
-            self.blks.add(d2l.EncoderBlock(units, hidden_size, num_heads, dropout))
+            self.blks.add(d2l.EncoderBlock(
+                embed_size, pw_num_hiddens, num_heads, dropout))
 
-    def forward(self, words, segments, mask):
-        X = self.word_embedding(words) + self.segment_embedding(segments)
+    def forward(self, tokens, segments, mask):
+        X = self.token_embedding(tokens) + self.segment_embedding(segments)
         X = self.pos_encoding(X)
         for blk in self.blks:
             X = blk(X, mask)
@@ -36,15 +37,15 @@ class BERTEncoder(nn.Block):
 
 ...
 
-```{.python .input  n=5}
-encoder = BERTEncoder(vocab_size=10000, units=768, hidden_size=1024,
+```{.python .input  n=3}
+encoder = BERTEncoder(vocab_size=10000, embed_size=768, pw_num_hiddens=1024,
                       num_heads=4, num_layers=2, dropout=0.1)
 encoder.initialize()
-num_samples, num_words = 2, 8
-words = np.random.randint(0, 10000, (2, 8))
+num_samples, num_tokens = 2, 8
+tokens = np.random.randint(0, 10000, (2, 8))
 segments = np.array([[0, 0, 0, 0, 1, 1, 1, 1],
                      [0, 0, 0, 1, 1, 1, 1, 1]])
-encodings = encoder(words, segments, None)
+encodings = encoder(tokens, segments, None)
 print(encodings.shape)
 ```
 
@@ -57,7 +58,7 @@ print(encodings.shape)
 
 ...
 
-```{.python .input  n=6}
+```{.python .input  n=4}
 # Saved in the d2l package for later use
 class MaskLMDecoder(nn.Block):
     def __init__(self, vocab_size, units, **kwargs):
@@ -84,7 +85,7 @@ class MaskLMDecoder(nn.Block):
 
 ...
 
-```{.python .input  n=30}
+```{.python .input  n=5}
 mlm_decoder = MaskLMDecoder(vocab_size=10000, units=768)
 mlm_decoder.initialize()
 
@@ -99,7 +100,7 @@ print(mlm_pred.shape, mlm_loss.shape)
 ...
 ![下一句预测](../img/bert_nsp.svg)
 
-```{.python .input  n=18}
+```{.python .input  n=6}
 # Saved in the d2l package for later use
 class NextSentenceClassifier(nn.Block):
     def __init__(self, units=768, **kwargs):
@@ -116,7 +117,7 @@ class NextSentenceClassifier(nn.Block):
 
 ...
 
-```{.python .input  n=19}
+```{.python .input  n=7}
 ns_classifier = NextSentenceClassifier()
 ns_classifier.initialize()
 
@@ -129,13 +130,13 @@ print(ns_pred.shape, ns_loss.shape)
 
 ...
 
-```{.python .input  n=20}
+```{.python .input  n=8}
 # Saved in the d2l package for later use
 class BERTModel(nn.Block):
-    def __init__(self, vocab_size=None, embed_size=128, hidden_size=512,
+    def __init__(self, vocab_size=None, embed_size=128, pw_num_hiddens=512,
                  num_heads=2, num_layers=4, dropout=0.1):
         super(BERTModel, self).__init__()
-        self.encoder = BERTEncoder(vocab_size=vocab_size, units=embed_size, hidden_size=hidden_size,
+        self.encoder = BERTEncoder(vocab_size=vocab_size, embed_size=embed_size, pw_num_hiddens=pw_num_hiddens,
                                    num_heads=num_heads, num_layers=num_layers, dropout=dropout)
         self.ns_classifier = NextSentenceClassifier()
         self.mlm_decoder = MaskLMDecoder(vocab_size=vocab_size, units=embed_size)

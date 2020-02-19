@@ -54,7 +54,7 @@ class Seq2SeqAttentionDecoder(d2l.Decoder):
 
     def init_state(self, enc_outputs, enc_valid_len, *args):
         outputs, hidden_state = enc_outputs
-        # Transpose outputs to (batch_size, seq_len, hidden_size)
+        # Transpose outputs to (batch_size, seq_len, num_hiddens)
         return (outputs.swapaxes(0, 1), hidden_state, enc_valid_len)
 
     def forward(self, X, state):
@@ -62,14 +62,14 @@ class Seq2SeqAttentionDecoder(d2l.Decoder):
         X = self.embedding(X).swapaxes(0, 1)
         outputs = []
         for x in X:
-            # query shape: (batch_size, 1, hidden_size)
+            # query shape: (batch_size, 1, num_hiddens)
             query = np.expand_dims(hidden_state[0][-1], axis=1)
             # context has same shape as query
             context = self.attention_cell(
                 query, enc_outputs, enc_outputs, enc_valid_len)
             # Concatenate on the feature dimension
             x = np.concatenate((context, np.expand_dims(x, axis=1)), axis=-1)
-            # Reshape x to (1, batch_size, embed_size+hidden_size)
+            # Reshape x to (1, batch_size, embed_size + num_hiddens)
             out, hidden_state = self.rnn(x.swapaxes(0, 1), hidden_state)
             outputs.append(out)
         outputs = self.dense(np.concatenate(outputs, axis=0))
