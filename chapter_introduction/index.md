@@ -672,7 +672,7 @@ and we will discuss others in more advanced chapters.
 When we have more than two possible classes,
 we call the problem *multiclass classification*.
 Common examples include hand-written character recognition
-`[0, 1, 2, 3 ... 9, a, b, c, ... z]`.
+`[0, 1, 2, 3 ... 9, a, b, c, ...]`.
 While we attacked regression problems by trying
 to minimize the L1 or L2 loss functions,
 the common loss function for classification problems is called cross-entropy.
