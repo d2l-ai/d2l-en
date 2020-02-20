@@ -43,9 +43,10 @@ To start, let's import the necessary packages.
 
 ```{.python .input  n=1}
 %matplotlib inline
+import random
 import d2l
 from mxnet import np, npx
-import random
+
 npx.set_np()
 ```
 
