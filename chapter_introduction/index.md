@@ -1032,7 +1032,7 @@ how they are related simply based on empirical data?
 The fields concerned with *causality* and
 *probabilistic graphical models* address this problem.
 * Another important and exciting recent development in unsupervised learning
-is the advent of *generative adversarial networks*.
+is the advent of *generative adversarial networks* (GANs).
 These give us a procedural way to synthesize data,
 even complicated structured data like images and audio.
 The underlying statistical mechanisms are tests
@@ -1365,7 +1365,7 @@ over the past decade.
   to be modified repeatedly, thus carrying out subsequent steps
   in a chain of reasoning, similar to how a processor
   can modify memory for a computation.
-* Another key development was the invention of GANS
+* Another key development was the invention of GANs
   :cite:`Goodfellow.Pouget-Abadie.Mirza.ea.2014`.
   Traditionally, statistical methods for density estimation
   and generative models focused on finding proper probability distributions
@@ -1375,11 +1375,13 @@ over the past decade.
   The crucial innovation in GANs was to replace the sampler
   by an arbitrary algorithm with differentiable parameters.
   These are then adjusted in such a way that the discriminator
-  (effectively a two-sample test) cannot distinguish fake from real data. Through the ability to use arbitrary algorithms to generate data,
+  (effectively a two-sample test) cannot distinguish fake from real data.
+  Through the ability to use arbitrary algorithms to generate data,
   it opened up density estimation to a wide variety of techniques.
-  Examples of galloping Zebras :cite:`Zhu.Park.Isola.ea.2017`
-  and of fake celebrity faces :cite:`Karras.Aila.Laine.ea.2017`
-  are both testimony to this progress.
+  Examples of galloping Zebras :cite:`Zhu.Park.Isola.ea.2017`,
+  of fake celebrity faces :cite:`Karras.Aila.Laine.ea.2017`,
+  and of photorealistic images (based on just an input semantic layout) :cite:`Park.Liu.Wang.ea.2019`  
+  are all testimony to this progress.
 * In many cases, a single GPU is insufficient to process
   the large amounts of data available for training.
   Over the past decade the ability to build parallel
