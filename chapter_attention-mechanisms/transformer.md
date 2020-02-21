@@ -108,7 +108,6 @@ class MultiHeadAttention(nn.Block):
 
         # output_concat shape: (batch_size, seq_len, num_hiddens)
         output_concat = transpose_output(output, self.num_heads)
-        print('o', output_concat.shape)
         return self.W_o(output_concat)
 ```
 
@@ -119,7 +118,7 @@ Here are the definitions of the transpose functions `transpose_qkv` and `transpo
 def transpose_qkv(X, num_heads):
     # Input X shape: (batch_size, seq_len, num_hiddens).
     # Output X shape:
-    # (batch_size, seq_len, num_heads, num_hiddens / num_heads)
+    # (batch_size, seq_len, num_heads, num_hiddens / num_heads)    
     X = X.reshape(X.shape[0], X.shape[1], num_heads, -1)
 
     # X shape: (batch_size, num_heads, seq_len, num_hiddens / num_heads)
@@ -141,7 +140,7 @@ def transpose_output(X, num_heads):
 Let's test the `MultiHeadAttention` model in the a toy example. Create a multi-head attention with the hidden size $d_o = 100$, the output will share the same batch size and sequence length as the input, but the last dimension will be equal to the `num_hiddens` $= 100$.
 
 ```{.python .input  n=4}
-cell = MultiHeadAttention(100, 10, 0.5)
+cell = MultiHeadAttention(90, 9, 0.5)
 cell.initialize()
 X = np.ones((2, 4, 5))
 valid_length = np.array([2, 3])
@@ -200,10 +199,10 @@ class AddNorm(nn.Block):
     def __init__(self, dropout, **kwargs):
         super(AddNorm, self).__init__(**kwargs)
         self.dropout = nn.Dropout(dropout)
-        self.norm = nn.LayerNorm()
+        self.ln = nn.LayerNorm()
 
     def forward(self, X, Y):
-        return self.norm(self.dropout(Y) + X)
+        return self.ln(self.dropout(Y) + X)
 ```
 
 Due to the residual connection, $X$ and $Y$ should have the same shape.
@@ -416,7 +415,7 @@ class TransformerDecoder(d2l.Decoder):
 Finally, we can build a encoder-decoder model with Transformer architecture.
 Similar to the seq2seq with attention model in :numref:`sec_seq2seq_attention`, we use the following hyperparameters: two Transformer blocks with both the embedding size and the block output size to be $32$. In addition, we use $4$ heads, and set the hidden size to be twice larger than the output size.
 
-```{.python .input  n=31}
+```{.python .input  n=19}
 embed_size, embed_size, num_layers, dropout = 32, 32, 2, 0.0
 batch_size, num_steps = 64, 10
 lr, num_epochs, ctx = 0.005, 100, d2l.try_gpu()
@@ -438,7 +437,7 @@ As we can see from the training time and accuracy, compared with the seq2seq mod
 
 We can use the trained Transformer to translate some simple sentences.
 
-```{.python .input  n=28}
+```{.python .input  n=20}
 for sentence in ['Go .', 'Wow !', "I'm OK .", 'I won !']:
     print(sentence + ' => ' + d2l.predict_s2s_ch9(
         model, sentence, src_vocab, tgt_vocab, num_steps, ctx))
