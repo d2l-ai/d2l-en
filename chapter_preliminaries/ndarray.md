@@ -139,16 +139,7 @@ Similarly, we can create tensors with each element set to 1 as follows:
 np.ones((2, 3, 4))
 ```
 
-Often, we want to randomly sample the values 
-for each element in an `ndarray` 
-from some probability distribution. 
-For example, when we construct arrays to serve 
-as parameters in a neural network, we will
-typically initialize their values randomly. 
-The following snippet creates an `ndarray` with shape ($3$, $4$). 
-Each of its elements is randomly sampled 
-from a standard Gaussian (normal) distribution 
-with a mean of $0$ and a standard deviation of $1$.
+Often, we want to randomly sample the values for each element in an `ndarray` from some probability distribution. For example, when we construct arrays to serve as parameters in a neural network, we will typically initialize their values randomly. The following snippet creates an `ndarray` with shape ($3$, $4$). Each of its elements is randomly sampled from a standard Gaussian (normal) distribution with a mean of $0$ and a standard deviation of $1$.
 
 ```{.python .input  n=10}
 np.random.normal(0, 1, size=(3, 4))
