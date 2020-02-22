@@ -406,7 +406,7 @@ This is equal to the ratio between the number of correct predictions and the tot
 
 * We introduced the softmax operation which takes a vector maps it into probabilities.
 * Softmax regression applies to classification problems. It uses the probability distribution of the output category in the softmax operation.
-* cross-entropy is a good measure of the difference between two probability distributions. It measures the number of bits needed to encode the data given our model.
+* Cross-entropy is a good measure of the difference between two probability distributions. It measures the number of bits needed to encode the data given our model.
 
 ## Exercises
 
