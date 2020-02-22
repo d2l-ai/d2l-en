@@ -400,8 +400,7 @@ we can predict the probability of each output category.
 Normally, we use the category with the highest predicted probability as the output category. The prediction is correct if it is consistent with the actual category (label). 
 In the next part of the experiment,
 we will use accuracy to evaluate the model’s performance. 
-This is equal to the ratio between the number of correct predictions a
-nd the total number of predictions.
+This is equal to the ratio between the number of correct predictions and the total number of predictions.
 
 ## Summary
 
