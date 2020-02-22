@@ -50,7 +50,7 @@ class FM(nn.Block):
         num_inputs = int(sum(field_dims))
         self.embedding = nn.Embedding(num_inputs, num_factors)
         self.fc = nn.Embedding(num_inputs, 1)
-        self.linear_layer = gluon.nn.Dense(1, use_bias=True)
+        self.linear_layer = nn.Dense(1, use_bias=True)
         
     def forward(self, x):
         square_of_sum = np.sum(self.embedding(x), axis=1) ** 2

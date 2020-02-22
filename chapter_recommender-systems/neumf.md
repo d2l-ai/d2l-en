@@ -47,20 +47,21 @@ npx.set_np()
 ```
 
 ## Model Implementation
-The following code implements the NeuMF model. It consists of a generalized matrix factorization model and a multi-layered perceptron with different user and item embedding vectors. The structure of the MLP is controlled with the parameter `mlp_layers`. ReLU is used as the default activation function.
+The following code implements the NeuMF model. It consists of a generalized matrix factorization model and a multi-layered perceptron with different user and item embedding vectors. The structure of the MLP is controlled with the parameter `nums_hiddens`. ReLU is used as the default activation function.
 
 ```{.python .input  n=2}
 class NeuMF(nn.Block):
-    def __init__(self, num_factors, num_users, num_items, mlp_layers,
+    def __init__(self, num_factors, num_users, num_items, nums_hiddens,
                  **kwargs):
         super(NeuMF, self).__init__(**kwargs)
         self.P = nn.Embedding(num_users, num_factors)
         self.Q = nn.Embedding(num_items, num_factors)
         self.U = nn.Embedding(num_users, num_factors)
         self.V = nn.Embedding(num_items, num_factors)
-        self.mlp = nn.Sequential()  # The MLP layers
-        for i in mlp_layers:
-            self.mlp.add(gluon.nn.Dense(i, activation='relu', use_bias=True))
+        self.mlp = nn.Sequential()
+        for num_hiddens in nums_hiddens:
+            self.mlp.add(nn.Dense(num_hiddens, activation='relu',
+                                  use_bias=True))
             
     def forward(self, user_id, item_id):
         p_mf = self.P(user_id)
@@ -223,7 +224,7 @@ We then create and initialize the model. we use a three-layer MLP with constant 
 
 ```{.python .input  n=8}
 ctx = d2l.try_all_gpus()
-net = NeuMF(10, num_users, num_items, mlp_layers=[10, 10, 10])
+net = NeuMF(10, num_users, num_items, nums_hiddens=[10, 10, 10])
 net.initialize(ctx=ctx, force_reinit=True, init=mx.init.Normal(0.01))
 ```
 

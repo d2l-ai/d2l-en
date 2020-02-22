@@ -407,7 +407,7 @@ def evaluate_accuracy_gpu(net, data_iter, ctx=None):
 
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
-def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
+def train_ch6(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
     net.initialize(force_reinit=True, ctx=ctx, init=init.Xavier())
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
     trainer = gluon.Trainer(net.collect_params(),
@@ -796,7 +796,7 @@ class Encoder(nn.Block):
     def __init__(self, **kwargs):
         super(Encoder, self).__init__(**kwargs)
 
-    def forward(self, X):
+    def forward(self, X, *args):
         raise NotImplementedError
 
 
@@ -1001,14 +1001,14 @@ class MultiHeadAttention(nn.Block):
         self.W_o = nn.Dense(num_hiddens, use_bias=False, flatten=False)
 
     def forward(self, query, key, value, valid_length):
-        # query, key, and value shape: (batch_size, seq_len, dim),
-        # where seq_len is the length of input sequence
-        # valid_length shape is either (batch_size, )
-        # or (batch_size, seq_len).
+        # For self-attention, query, key, and value shape:
+        # (batch_size, seq_len, dim), where seq_len is the length of input
+        # sequence. valid_length shape is either (batch_size, ) or
+        # (batch_size, seq_len).
 
         # Project and transpose query, key, and value from
-        # (batch_size, seq_len, num_hiddens * num_heads) to
-        # (batch_size * num_heads, seq_len, num_hiddens).
+        # (batch_size, seq_len, num_hiddens) to
+        # (batch_size * num_heads, seq_len, num_hiddens / num_heads).
         query = transpose_qkv(self.W_q(query), self.num_heads)
         key = transpose_qkv(self.W_k(key), self.num_heads)
         value = transpose_qkv(self.W_v(value), self.num_heads)
@@ -1020,27 +1020,26 @@ class MultiHeadAttention(nn.Block):
             else:
                 valid_length = np.tile(valid_length, (self.num_heads, 1))
 
+        # For self-attention, output shape:
+        # (batch_size * num_heads, seq_len, num_hiddens / num_heads)
         output = self.attention(query, key, value, valid_length)
 
-        # Transpose from (batch_size * num_heads, seq_len, num_hiddens) back
-        # to (batch_size, seq_len, num_hiddens * num_heads)
+        # output_concat shape: (batch_size, seq_len, num_hiddens)
         output_concat = transpose_output(output, self.num_heads)
         return self.W_o(output_concat)
 
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 def transpose_qkv(X, num_heads):
-    # Original X shape: (batch_size, seq_len, num_hiddens * num_heads),
-    # -1 means inferring its value, after first reshape, X shape:
-    # (batch_size, seq_len, num_heads, num_hiddens)
+    # Input X shape: (batch_size, seq_len, num_hiddens).
+    # Output X shape:
+    # (batch_size, seq_len, num_heads, num_hiddens / num_heads)    
     X = X.reshape(X.shape[0], X.shape[1], num_heads, -1)
 
-    # After transpose, X shape: (batch_size, num_heads, seq_len, num_hiddens)
+    # X shape: (batch_size, num_heads, seq_len, num_hiddens / num_heads)
     X = X.transpose(0, 2, 1, 3)
 
-    # Merge the first two dimensions. Use reverse=True to infer shape from
-    # right to left.
-    # output shape: (batch_size * num_heads, seq_len, num_hiddens)
+    # output shape: (batch_size * num_heads, seq_len, num_hiddens / num_heads)
     output = X.reshape(-1, X.shape[2], X.shape[3])
     return output
 
@@ -1071,10 +1070,10 @@ class AddNorm(nn.Block):
     def __init__(self, dropout, **kwargs):
         super(AddNorm, self).__init__(**kwargs)
         self.dropout = nn.Dropout(dropout)
-        self.norm = nn.LayerNorm()
+        self.ln = nn.LayerNorm()
 
     def forward(self, X, Y):
-        return self.norm(self.dropout(Y) + X)
+        return self.ln(self.dropout(Y) + X)
 
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
@@ -1115,15 +1114,15 @@ class TransformerEncoder(d2l.Encoder):
                  num_heads, num_layers, dropout, **kwargs):
         super(TransformerEncoder, self).__init__(**kwargs)
         self.embed_size = embed_size
-        self.embed = nn.Embedding(vocab_size, embed_size)
+        self.embedding = nn.Embedding(vocab_size, embed_size)
         self.pos_encoding = PositionalEncoding(embed_size, dropout)
         self.blks = nn.Sequential()
-        for i in range(num_layers):
+        for _ in range(num_layers):
             self.blks.add(
                 EncoderBlock(embed_size, pw_num_hiddens, num_heads, dropout))
 
     def forward(self, X, valid_length, *args):
-        X = self.pos_encoding(self.embed(X) * math.sqrt(self.embed_size))
+        X = self.pos_encoding(self.embedding(X) * math.sqrt(self.embed_size))
         for blk in self.blks:
             X = blk(X, valid_length)
         return X
@@ -1677,40 +1676,41 @@ class BERTEncoder(nn.Block):
     def __init__(self, vocab_size, embed_size, pw_num_hiddens, num_heads,
                  num_layers, dropout, **kwargs):
         super(BERTEncoder, self).__init__(**kwargs)
-        self.token_embedding = gluon.nn.Embedding(vocab_size, embed_size)
-        self.segment_embedding = gluon.nn.Embedding(2, embed_size)
+        self.token_embedding = nn.Embedding(vocab_size, embed_size)
+        self.segment_embedding = nn.Embedding(2, embed_size)
         self.pos_encoding = d2l.PositionalEncoding(embed_size, dropout)
-        self.blks = gluon.nn.Sequential()
-        for i in range(num_layers):
+        self.blks = nn.Sequential()
+        for _ in range(num_layers):
             self.blks.add(d2l.EncoderBlock(
                 embed_size, pw_num_hiddens, num_heads, dropout))
 
-    def forward(self, tokens, segments, mask):
+    def forward(self, tokens, segments, valid_length):
+        # Shape of X remains unchanged in the following code snippet:
+        # (batch size, max sequence length, embed_size)
         X = self.token_embedding(tokens) + self.segment_embedding(segments)
         X = self.pos_encoding(X)
         for blk in self.blks:
-            X = blk(X, mask)
+            X = blk(X, valid_length)
         return X
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert.md
 class MaskLMDecoder(nn.Block):
-    def __init__(self, vocab_size, units, **kwargs):
+    def __init__(self, vocab_size, num_hiddens, **kwargs):
         super(MaskLMDecoder, self).__init__(**kwargs)
-        self.decoder = gluon.nn.Sequential()
-        self.decoder.add(gluon.nn.Dense(units, flatten=False, activation='relu'))
-        self.decoder.add(gluon.nn.LayerNorm())
-        self.decoder.add(gluon.nn.Dense(vocab_size, flatten=False))
+        self.decoder = nn.Sequential()
+        self.decoder.add(
+            nn.Dense(num_hiddens, flatten=False, activation='relu'))
+        self.decoder.add(nn.LayerNorm())
+        self.decoder.add(nn.Dense(vocab_size, flatten=False))
 
     def forward(self, X, masked_positions):
-        ctx = masked_positions.context
-        dtype = masked_positions.dtype
         num_masked_positions = masked_positions.shape[1]
         masked_positions = masked_positions.reshape((1, -1))
         batch_size = X.shape[0]
-        batch_idx = np.arange(0, batch_size)
+        batch_idx = np.arange(0, batch_size)   
         batch_idx = np.repeat(batch_idx, num_masked_positions)
-        batch_idx = batch_idx.reshape((1, -1))
+        batch_idx = np.expand_dims(batch_idx, axis=0)
         encoded = X[batch_idx, masked_positions]
         encoded = encoded.reshape((batch_size, num_masked_positions, X.shape[-1]))
         pred = self.decoder(encoded)
@@ -1719,12 +1719,12 @@ class MaskLMDecoder(nn.Block):
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert.md
 class NextSentenceClassifier(nn.Block):
-    def __init__(self, units=768, **kwargs):
+    def __init__(self, num_hiddens, **kwargs):
         super(NextSentenceClassifier, self).__init__(**kwargs)
-        self.classifier = gluon.nn.Sequential()
-        self.classifier.add(gluon.nn.Dense(units=units, flatten=False,
-                                           activation='tanh'))
-        self.classifier.add(gluon.nn.Dense(units=2, flatten=False))
+        self.classifier = nn.Sequential()
+        self.classifier.add(nn.Dense(num_hiddens, flatten=False,
+                                     activation='tanh'))
+        self.classifier.add(nn.Dense(2, flatten=False))
 
     def forward(self, X):
         X = X[:, 0, :]
@@ -1733,13 +1733,13 @@ class NextSentenceClassifier(nn.Block):
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert.md
 class BERTModel(nn.Block):
-    def __init__(self, vocab_size=None, embed_size=128, pw_num_hiddens=512,
-                 num_heads=2, num_layers=4, dropout=0.1):
+    def __init__(self, vocab_size, embed_size, pw_num_hiddens, num_heads,
+                 num_layers, dropout):
         super(BERTModel, self).__init__()
-        self.encoder = BERTEncoder(vocab_size=vocab_size, embed_size=embed_size, pw_num_hiddens=pw_num_hiddens,
-                                   num_heads=num_heads, num_layers=num_layers, dropout=dropout)
-        self.ns_classifier = NextSentenceClassifier()
-        self.mlm_decoder = MaskLMDecoder(vocab_size=vocab_size, units=embed_size)
+        self.encoder = BERTEncoder(vocab_size, embed_size, pw_num_hiddens,
+                                   num_heads, num_layers, dropout)
+        self.ns_classifier = NextSentenceClassifier(embed_size)
+        self.mlm_decoder = MaskLMDecoder(vocab_size, embed_size)
 
     def forward(self, inputs, token_types, valid_length=None, masked_positions=None):
         seq_out = self.encoder(inputs, token_types, valid_length)

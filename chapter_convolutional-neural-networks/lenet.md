@@ -205,7 +205,7 @@ We also need to update our training function to deal with GPUs.
 Unlike the `train_epoch_ch3` defined in :numref:`sec_softmax_scratch`, we now need to move each batch of data to our designated context (hopefully, the GPU)
 prior to making the forward and backward passes.
 
-The training function `train_ch5` is also very similar to `train_ch3` defined in :numref:`sec_softmax_scratch`. Since we will deal with networks with tens of layers now, the function will only support Gluon models. We initialize the model parameters on the device indicated by `ctx`,
+The training function `train_ch6` is also very similar to `train_ch3` defined in :numref:`sec_softmax_scratch`. Since we will deal with networks with tens of layers now, the function will only support Gluon models. We initialize the model parameters on the device indicated by `ctx`,
 this time using the Xavier initializer.
 The loss function and the training algorithm
 still use the cross-entropy loss function
@@ -214,7 +214,7 @@ seconds to run, we visualize the training loss in a finer granularity.
 
 ```{.python .input}
 # Saved in the d2l package for later use
-def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
+def train_ch6(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
     net.initialize(force_reinit=True, ctx=ctx, init=init.Xavier())
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
     trainer = gluon.Trainer(net.collect_params(),
@@ -250,7 +250,7 @@ Now let's train the model.
 
 ```{.python .input}
 lr, num_epochs = 0.9, 10
-train_ch5(net, train_iter, test_iter, num_epochs, lr)
+train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
 
 ## Summary
