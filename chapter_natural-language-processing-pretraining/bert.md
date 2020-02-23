@@ -99,9 +99,6 @@ mlm_pred = mlm_decoder(encodings, mlm_positions)
 mlm_pred.shape
 ```
 
-```{.python .input}
-a = bx
-```
 
 ```{.python .input}
 mlm_loss_fn = gluon.loss.SoftmaxCrossEntropyLoss()
