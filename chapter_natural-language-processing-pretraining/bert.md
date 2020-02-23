@@ -1,6 +1,6 @@
 # BERT
 
-```{.python .input  n=1}
+```{.python .input  n=3}
 import d2l
 from mxnet import gluon, np, npx
 from mxnet.gluon import nn
@@ -13,7 +13,7 @@ npx.set_np()
 
 ...
 
-```{.python .input  n=2}
+```{.python .input  n=3}
 # Saved in the d2l package for later use
 class BERTEncoder(nn.Block):
     def __init__(self, vocab_size, embed_size, pw_num_hiddens, num_heads,
@@ -39,7 +39,7 @@ class BERTEncoder(nn.Block):
 
 ...
 
-```{.python .input  n=3}
+```{.python .input  n=4}
 vocab_size, embed_size, pw_num_hiddens = 10000, 768, 1024
 num_heads, num_layers, dropout = 4, 2, 0.1
 encoder = BERTEncoder(vocab_size, embed_size, pw_num_hiddens, num_heads,
@@ -61,7 +61,7 @@ encodings.shape
 
 ...
 
-```{.python .input  n=4}
+```{.python .input  n=29}
 # Saved in the d2l package for later use
 class MaskLMDecoder(nn.Block):
     def __init__(self, vocab_size, num_hiddens, **kwargs):
@@ -87,9 +87,7 @@ class MaskLMDecoder(nn.Block):
 
 ...
 
-```{.python .input  n=5}
-print(encodings)
-
+```{.python .input  n=30}
 mlm_decoder = MaskLMDecoder(vocab_size, embed_size)
 mlm_decoder.initialize()
 
@@ -98,6 +96,7 @@ mlm_label = np.array([[100, 200], [100, 200]])
 mlm_pred = mlm_decoder(encodings, mlm_positions)
 mlm_pred.shape
 ```
+
 
 
 ```{.python .input}
@@ -109,7 +108,7 @@ mlm_loss.shape
 ...
 ![下一句预测](../img/bert_nsp.svg)
 
-```{.python .input  n=6}
+```{.python .input  n=13}
 # Saved in the d2l package for later use
 class NextSentenceClassifier(nn.Block):
     def __init__(self, num_hiddens, **kwargs):
@@ -126,7 +125,7 @@ class NextSentenceClassifier(nn.Block):
 
 ...
 
-```{.python .input  n=7}
+```{.python .input  n=14}
 ns_classifier = NextSentenceClassifier(embed_size)
 ns_classifier.initialize()
 
@@ -139,7 +138,7 @@ print(ns_pred.shape, ns_loss.shape)
 
 ...
 
-```{.python .input  n=8}
+```{.python .input  n=10}
 # Saved in the d2l package for later use
 class BERTModel(nn.Block):
     def __init__(self, vocab_size, embed_size, pw_num_hiddens, num_heads,

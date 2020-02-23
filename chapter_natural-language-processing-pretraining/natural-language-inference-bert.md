@@ -1,9 +1,10 @@
 # BERT-NLI
 
-![This section feeds pretrained BERT to an MLP-based architecture for natural language inference.](../img/nlp-map-nli-bert.svg)
+![This section feeds pretrained BERT to an MLP-based architecture for natural
+language inference.](../img/nlp-map-nli-bert.svg)
 :label:`fig_nlp-map-nli-bert`
 
-```{.python .input  n=1}
+```{.python .input  n=40}
 import d2l
 from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
@@ -12,8 +13,8 @@ npx.set_np()
 batch_size, ctx = 512, d2l.try_all_gpus()
 bert_train_iter, vocab = d2l.load_data_wiki(batch_size, 'wikitext-2')
 
-bert = d2l.BERTModel(len(vocab), embed_size=128, pw_num_hiddens=256,
-                     num_heads=2, num_layers=2, dropout=0.2)
+bert = d2l.BERTModel(len(vocab), embed_size=256, pw_num_hiddens=256,
+                     num_heads=4, num_layers=2, dropout=0.2)
 bert.initialize(init.Xavier(), ctx=ctx)
 nsp_loss = gluon.loss.SoftmaxCELoss()
 mlm_loss = gluon.loss.SoftmaxCELoss()
@@ -23,7 +24,7 @@ d2l.train_bert(bert_train_iter, bert, nsp_loss, mlm_loss, len(vocab), ctx, 20, 2
 
 ...
 
-```{.python .input  n=65}
+```{.python .input  n=41}
 class SNLIBERTDataset(gluon.data.Dataset):
     def __init__(self, dataset, vocab = None):
         self.num_steps = 50  # We fix the length of each sentence to 50.
@@ -59,7 +60,7 @@ class SNLIBERTDataset(gluon.data.Dataset):
 
 ...
 
-```{.python .input  n=66}
+```{.python .input  n=42}
 data_dir = d2l.download_extract('SNLI')
 train_data = d2l.read_snli(data_dir, True)
 test_data = d2l.read_snli(data_dir, False)
@@ -69,7 +70,7 @@ test_set = SNLIBERTDataset(test_data, vocab)
 
 ...
 
-```{.python .input  n=67}
+```{.python .input  n=43}
 batch_size = 512
 train_iter = gluon.data.DataLoader(train_set, batch_size, shuffle=True)
 test_iter = gluon.data.DataLoader(test_set, batch_size)
@@ -77,7 +78,7 @@ test_iter = gluon.data.DataLoader(test_set, batch_size)
 
 ...
 
-```{.python .input  n=82}
+```{.python .input  n=44}
 class BERTClassifier(nn.Block):
     def __init__(self, bert, num_classes):
         super(BERTClassifier, self).__init__()
@@ -94,14 +95,14 @@ class BERTClassifier(nn.Block):
 
 ...
 
-```{.python .input  n=83}
+```{.python .input  n=45}
 net = BERTClassifier(bert, 3)
 net.classifier.initialize(ctx=ctx)
 ```
 
 ...
 
-```{.python .input  n=87}
+```{.python .input  n=46}
 lr, num_epochs = 1e-4, 5
 trainer = gluon.Trainer(net.collect_params(), 'adam', {'learning_rate': lr})
 loss = gluon.loss.SoftmaxCrossEntropyLoss()
