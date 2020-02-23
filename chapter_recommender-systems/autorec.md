@@ -42,15 +42,15 @@ A typical autoencoder consists of an encoder and a decoder. The encoder projects
 
 ```{.python .input  n=2}
 class AutoRec(nn.Block):
-    def __init__(self, num_hidden, num_users, dropout_rate=0.05):
+    def __init__(self, num_hidden, num_users, dropout=0.05):
         super(AutoRec, self).__init__()
-        self.encoder = gluon.nn.Dense(num_hidden, activation='sigmoid',
-                                      use_bias=True)
-        self.decoder = gluon.nn.Dense(num_users, use_bias=True)
-        self.dropout_layer = gluon.nn.Dropout(dropout_rate)
+        self.encoder = nn.Dense(num_hidden, activation='sigmoid',
+                                use_bias=True)
+        self.decoder = nn.Dense(num_users, use_bias=True)
+        self.dropout = nn.Dropout(dropout)
 
     def forward(self, input):
-        hidden = self.dropout_layer(self.encoder(input))
+        hidden = self.dropout(self.encoder(input))
         pred = self.decoder(hidden)
         if autograd.is_training():  # mask the gradient during training.
             return pred * np.sign(input)

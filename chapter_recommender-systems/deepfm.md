@@ -47,10 +47,10 @@ The implementation of DeepFM is similar to that of FM. We keep the FM part uncha
 class DeepFM(nn.Block):
     def __init__(self, field_dims, num_factors, mlp_dims, drop_rate=0.1):
         super(DeepFM, self).__init__()
-        input_size = int(sum(field_dims))
-        self.embedding = nn.Embedding(input_size, num_factors)
-        self.fc = nn.Embedding(input_size, 1)
-        self.linear_layer = gluon.nn.Dense(1, use_bias=True)
+        num_inputs = int(sum(field_dims))
+        self.embedding = nn.Embedding(num_inputs, num_factors)
+        self.fc = nn.Embedding(num_inputs, 1)
+        self.linear_layer = nn.Dense(1, use_bias=True)
         input_dim = self.embed_output_dim = len(field_dims) * num_factors
         self.mlp = nn.Sequential()
         for dim in mlp_dims:

@@ -17,7 +17,12 @@
 
 This open-source book represents our attempt to make deep learning approachable, teaching you both the concepts, the context, and the code. 
 
-Our goal is to offer a resource that could (1) be freely available for everyone; (2) offer sufficient technical depth to provide a starting point on the path to actually becoming an applied machine learning scientist; (3) include runnable code, showing readers how to solve problems in practice; (4) allow for rapid updates, both by us and also by the community at large; and (5) be complemented by a forum for interactive discussion of technical details and to answer questions.
+Our goal is to offer a resource that could 
+1. be freely available for everyone; 
+1. offer sufficient technical depth to provide a starting point on the path to actually becoming an applied machine learning scientist; 
+1. include runnable code, showing readers how to solve problems in practice; 
+1. allow for rapid updates, both by us and also by the community at large; 
+1. be complemented by a forum for interactive discussion of technical details and to answer questions.
 
 <h5 align="center">Universities that use D2L as a textbook or a reference book</h5>
 <p align="center">
@@ -34,6 +39,20 @@ If you find this book useful, please star (★) this repository or cite this boo
     year={2020}
 }
 ```
+
+
+## Endorsements
+
+> <p>"In less than a decade, the AI revolution has swept from research labs to broad industries to every corner of our daily life.  Dive Into Deep Learning is an excellent text on deep learning and deserves attention from anyone who wants to learn why deep learning has ignited the AI revolution: the most powerful technology force of our time."</p>
+> <b>&mdash; Jensen Huang, Founder and CEO of NVIDIA</b>
+
+
+> <p>"This is a timely, fascinating book, providing with not only a comprehensive overview of deep learning principles but also detailed algorithms with hands-on programming codes, and moreover, a state-of-the-art introduction to deep learning in computer vision and natural language processing. Dive into this book if you want to dive into deep learning!"</p>
+> <b>&mdash; Jiawei Han, Michael Aiken Chair Professor, University of Illinois at Urbana-Champaign</b>
+
+
+> <p>"This is a highly welcome addition to the machine learning literature, with a focus on hands-on experience implemented via the integration of Jupyter Notebooks. Students of deep learning should find this invaluable to become proficient in this field."</p>
+> <b>&mdash; Bernhard Schölkopf, Director at the Max Planck Institute for Intelligent Systems</b>
 
 ## Contribute ([learn how](https://d2l.ai/chapter_appendix-tools-for-deep-learning/contributing.html))
 

@@ -407,7 +407,7 @@ def evaluate_accuracy_gpu(net, data_iter, ctx=None):
 
 
 # Defined in file: ./chapter_convolutional-neural-networks/lenet.md
-def train_ch5(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
+def train_ch6(net, train_iter, test_iter, num_epochs, lr, ctx=d2l.try_gpu()):
     net.initialize(force_reinit=True, ctx=ctx, init=init.Xavier())
     loss = gluon.loss.SoftmaxCrossEntropyLoss()
     trainer = gluon.Trainer(net.collect_params(),
@@ -734,14 +734,12 @@ def read_data_nmt():
 
 # Defined in file: ./chapter_recurrent-modern/machine-translation.md
 def preprocess_nmt(text):
-    text = text.replace('\u202f', ' ').replace('\xa0', ' ')
-
     def no_space(char, prev_char):
-        return (True if char in (',', '!', '.')
-                and prev_char != ' ' else False)
-    
-    out = [' '+char if i > 0 and no_space(char, text[i-1]) else char
-           for i, char in enumerate(text.lower())]
+        return char in set(',.!') and prev_char != ' '
+
+    text = text.replace('\u202f', ' ').replace('\xa0', ' ').lower()
+    out = [' ' + char if i > 0 and no_space(char, text[i-1]) else char
+           for i, char in enumerate(text)]
     return ''.join(out)
 
 
@@ -763,7 +761,6 @@ def trim_pad(line, num_steps, padding_token):
     if len(line) > num_steps:
         return line[:num_steps]  # Trim
     return line + [padding_token] * (num_steps - len(line))  # Pad
-
 
 
 # Defined in file: ./chapter_recurrent-modern/machine-translation.md
@@ -799,7 +796,7 @@ class Encoder(nn.Block):
     def __init__(self, **kwargs):
         super(Encoder, self).__init__(**kwargs)
 
-    def forward(self, X):
+    def forward(self, X, *args):
         raise NotImplementedError
 
 
@@ -994,24 +991,24 @@ class MLPAttention(nn.Block):
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 class MultiHeadAttention(nn.Block):
-    def __init__(self, hidden_size, num_heads, dropout, **kwargs):
+    def __init__(self, num_hiddens, num_heads, dropout, **kwargs):
         super(MultiHeadAttention, self).__init__(**kwargs)
         self.num_heads = num_heads
         self.attention = d2l.DotProductAttention(dropout)
-        self.W_q = nn.Dense(hidden_size, use_bias=False, flatten=False)
-        self.W_k = nn.Dense(hidden_size, use_bias=False, flatten=False)
-        self.W_v = nn.Dense(hidden_size, use_bias=False, flatten=False)
-        self.W_o = nn.Dense(hidden_size, use_bias=False, flatten=False)
+        self.W_q = nn.Dense(num_hiddens, use_bias=False, flatten=False)
+        self.W_k = nn.Dense(num_hiddens, use_bias=False, flatten=False)
+        self.W_v = nn.Dense(num_hiddens, use_bias=False, flatten=False)
+        self.W_o = nn.Dense(num_hiddens, use_bias=False, flatten=False)
 
     def forward(self, query, key, value, valid_length):
-        # query, key, and value shape: (batch_size, seq_len, dim),
-        # where seq_len is the length of input sequence
-        # valid_length shape is either (batch_size, )
-        # or (batch_size, seq_len).
+        # For self-attention, query, key, and value shape:
+        # (batch_size, seq_len, dim), where seq_len is the length of input
+        # sequence. valid_length shape is either (batch_size, ) or
+        # (batch_size, seq_len).
 
         # Project and transpose query, key, and value from
-        # (batch_size, seq_len, hidden_size * num_heads) to
-        # (batch_size * num_heads, seq_len, hidden_size).
+        # (batch_size, seq_len, num_hiddens) to
+        # (batch_size * num_heads, seq_len, num_hiddens / num_heads).
         query = transpose_qkv(self.W_q(query), self.num_heads)
         key = transpose_qkv(self.W_k(key), self.num_heads)
         value = transpose_qkv(self.W_v(value), self.num_heads)
@@ -1023,27 +1020,26 @@ class MultiHeadAttention(nn.Block):
             else:
                 valid_length = np.tile(valid_length, (self.num_heads, 1))
 
+        # For self-attention, output shape:
+        # (batch_size * num_heads, seq_len, num_hiddens / num_heads)
         output = self.attention(query, key, value, valid_length)
 
-        # Transpose from (batch_size * num_heads, seq_len, hidden_size) back
-        # to (batch_size, seq_len, hidden_size * num_heads)
+        # output_concat shape: (batch_size, seq_len, num_hiddens)
         output_concat = transpose_output(output, self.num_heads)
         return self.W_o(output_concat)
 
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 def transpose_qkv(X, num_heads):
-    # Original X shape: (batch_size, seq_len, hidden_size * num_heads),
-    # -1 means inferring its value, after first reshape, X shape:
-    # (batch_size, seq_len, num_heads, hidden_size)
+    # Input X shape: (batch_size, seq_len, num_hiddens).
+    # Output X shape:
+    # (batch_size, seq_len, num_heads, num_hiddens / num_heads)    
     X = X.reshape(X.shape[0], X.shape[1], num_heads, -1)
 
-    # After transpose, X shape: (batch_size, num_heads, seq_len, hidden_size)
+    # X shape: (batch_size, num_heads, seq_len, num_hiddens / num_heads)
     X = X.transpose(0, 2, 1, 3)
 
-    # Merge the first two dimensions. Use reverse=True to infer shape from
-    # right to left. 
-    # output shape: (batch_size * num_heads, seq_len, hidden_size)
+    # output shape: (batch_size * num_heads, seq_len, num_hiddens / num_heads)
     output = X.reshape(-1, X.shape[2], X.shape[3])
     return output
 
@@ -1059,14 +1055,14 @@ def transpose_output(X, num_heads):
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 class PositionWiseFFN(nn.Block):
-    def __init__(self, ffn_hidden_size, hidden_size_out, **kwargs):
+    def __init__(self, pw_num_hiddens, pw_num_outputs, **kwargs):
         super(PositionWiseFFN, self).__init__(**kwargs)
-        self.ffn_1 = nn.Dense(ffn_hidden_size, flatten=False,
-                              activation='relu')
-        self.ffn_2 = nn.Dense(hidden_size_out, flatten=False)
+        self.dense1 = nn.Dense(pw_num_hiddens, flatten=False,
+                               activation='relu')
+        self.dense2 = nn.Dense(pw_num_outputs, flatten=False)
 
     def forward(self, X):
-        return self.ffn_2(self.ffn_1(X))
+        return self.dense2(self.dense1(X))
 
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
@@ -1074,21 +1070,21 @@ class AddNorm(nn.Block):
     def __init__(self, dropout, **kwargs):
         super(AddNorm, self).__init__(**kwargs)
         self.dropout = nn.Dropout(dropout)
-        self.norm = nn.LayerNorm()
+        self.ln = nn.LayerNorm()
 
     def forward(self, X, Y):
-        return self.norm(self.dropout(Y) + X)
+        return self.ln(self.dropout(Y) + X)
 
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 class PositionalEncoding(nn.Block):
-    def __init__(self, embedding_size, dropout, max_len=1000):
+    def __init__(self, embed_size, dropout, max_len=1000):
         super(PositionalEncoding, self).__init__()
         self.dropout = nn.Dropout(dropout)
         # Create a long enough P
-        self.P = np.zeros((1, max_len, embedding_size))
+        self.P = np.zeros((1, max_len, embed_size))
         X = np.arange(0, max_len).reshape(-1, 1) / np.power(
-            10000, np.arange(0, embedding_size, 2)/embedding_size)
+            10000, np.arange(0, embed_size, 2) / embed_size)
         self.P[:, :, 0::2] = np.sin(X)
         self.P[:, :, 1::2] = np.cos(X)
 
@@ -1099,36 +1095,34 @@ class PositionalEncoding(nn.Block):
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 class EncoderBlock(nn.Block):
-    def __init__(self, embedding_size, ffn_hidden_size, num_heads,
-                 dropout, **kwargs):
+    def __init__(self, embed_size, pw_num_hiddens, num_heads, dropout,
+                 **kwargs):
         super(EncoderBlock, self).__init__(**kwargs)
-        self.attention = MultiHeadAttention(embedding_size, num_heads,
-                                            dropout)
-        self.addnorm_1 = AddNorm(dropout)
-        self.ffn = PositionWiseFFN(ffn_hidden_size, embedding_size)
-        self.addnorm_2 = AddNorm(dropout)
+        self.attention = MultiHeadAttention(embed_size, num_heads, dropout)
+        self.addnorm1 = AddNorm(dropout)
+        self.ffn = PositionWiseFFN(pw_num_hiddens, embed_size)
+        self.addnorm2 = AddNorm(dropout)
 
     def forward(self, X, valid_length):
-        Y = self.addnorm_1(X, self.attention(X, X, X, valid_length))
-        return self.addnorm_2(Y, self.ffn(Y))
+        Y = self.addnorm1(X, self.attention(X, X, X, valid_length))
+        return self.addnorm2(Y, self.ffn(Y))
 
 
 # Defined in file: ./chapter_attention-mechanisms/transformer.md
 class TransformerEncoder(d2l.Encoder):
-    def __init__(self, vocab_size, embedding_size, ffn_hidden_size,
+    def __init__(self, vocab_size, embed_size, pw_num_hiddens,
                  num_heads, num_layers, dropout, **kwargs):
         super(TransformerEncoder, self).__init__(**kwargs)
-        self.embedding_size = embedding_size
-        self.embed = nn.Embedding(vocab_size, embedding_size)
-        self.pos_encoding = PositionalEncoding(embedding_size, dropout)
+        self.embed_size = embed_size
+        self.embedding = nn.Embedding(vocab_size, embed_size)
+        self.pos_encoding = PositionalEncoding(embed_size, dropout)
         self.blks = nn.Sequential()
-        for i in range(num_layers):
+        for _ in range(num_layers):
             self.blks.add(
-                EncoderBlock(embedding_size, ffn_hidden_size,
-                             num_heads, dropout))
+                EncoderBlock(embed_size, pw_num_hiddens, num_heads, dropout))
 
     def forward(self, X, valid_length, *args):
-        X = self.pos_encoding(self.embed(X) * math.sqrt(self.embedding_size))
+        X = self.pos_encoding(self.embedding(X) * math.sqrt(self.embed_size))
         for blk in self.blks:
             X = blk(X, valid_length)
         return X
@@ -1679,80 +1673,85 @@ def load_data_ptb(batch_size, max_window_size, num_noise_words):
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert.md
 class BERTEncoder(nn.Block):
-    def __init__(self, vocab_size, units, hidden_size,
-                 num_heads, num_layers, dropout, **kwargs):
+    def __init__(self, vocab_size, embed_size, pw_num_hiddens, num_heads,
+                 num_layers, dropout, **kwargs):
         super(BERTEncoder, self).__init__(**kwargs)
-        self.word_embedding = gluon.nn.Embedding(vocab_size, units)
-        self.segment_embedding = gluon.nn.Embedding(2, units)
-        self.pos_encoding = d2l.PositionalEncoding(units, dropout)
-        self.blks = gluon.nn.Sequential()
-        for i in range(num_layers):
-            self.blks.add(d2l.EncoderBlock(units, hidden_size, num_heads, dropout))
+        self.token_embedding = nn.Embedding(vocab_size, embed_size)
+        self.segment_embedding = nn.Embedding(2, embed_size)
+        self.pos_encoding = d2l.PositionalEncoding(embed_size, dropout)
+        self.blks = nn.Sequential()
+        for _ in range(num_layers):
+            self.blks.add(d2l.EncoderBlock(
+                embed_size, pw_num_hiddens, num_heads, dropout))
 
-    def forward(self, words, segments, mask):
-        X = self.word_embedding(words) + self.segment_embedding(segments)
+    def forward(self, tokens, segments, valid_length):
+        # Shape of X remains unchanged in the following code snippet:
+        # (batch size, max sequence length, embed_size)
+        X = self.token_embedding(tokens) + self.segment_embedding(segments)
         X = self.pos_encoding(X)
         for blk in self.blks:
-            X = blk(X, mask)
+            X = blk(X, valid_length)
         return X
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert.md
-class MaskLMDecoder(nn.Block):
-    def __init__(self, vocab_size, units, **kwargs):
-        super(MaskLMDecoder, self).__init__(**kwargs)
-        self.decoder = gluon.nn.Sequential()
-        self.decoder.add(gluon.nn.Dense(units, flatten=False, activation='relu'))
-        self.decoder.add(gluon.nn.LayerNorm())
-        self.decoder.add(gluon.nn.Dense(vocab_size, flatten=False))
+class MaskLM(nn.Block):
+    def __init__(self, vocab_size, num_hiddens, **kwargs):
+        super(MaskLM, self).__init__(**kwargs)
+        self.mlp = nn.Sequential()
+        self.mlp.add(
+            nn.Dense(num_hiddens, flatten=False, activation='relu'))
+        self.mlp.add(nn.LayerNorm())
+        self.mlp.add(nn.Dense(vocab_size, flatten=False))
 
     def forward(self, X, masked_positions):
-        ctx = masked_positions.context
-        dtype = masked_positions.dtype
         num_masked_positions = masked_positions.shape[1]
-        masked_positions = masked_positions.reshape((1, -1))
+        masked_positions = masked_positions.reshape(-1)
         batch_size = X.shape[0]
         batch_idx = np.arange(0, batch_size)
+        # Suppose that batch_size = 2, num_masked_positions = 3,
+        # batch_idx = np.array([0, 0, 0, 1, 1, 1])
         batch_idx = np.repeat(batch_idx, num_masked_positions)
-        batch_idx = batch_idx.reshape((1, -1))
-        encoded = X[batch_idx, masked_positions]
-        encoded = encoded.reshape((batch_size, num_masked_positions, X.shape[-1]))
-        pred = self.decoder(encoded)
-        return pred
+        masked_X = X[batch_idx, masked_positions]
+        masked_X = masked_X.reshape((batch_size, num_masked_positions, -1))
+        masked_preds = self.mlp(masked_X)
+        return masked_preds
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert.md
-class NextSentenceClassifier(nn.Block):
-    def __init__(self, units=768, **kwargs):
-        super(NextSentenceClassifier, self).__init__(**kwargs)
-        self.classifier = gluon.nn.Sequential()
-        self.classifier.add(gluon.nn.Dense(units=units, flatten=False,
-                                           activation='tanh'))
-        self.classifier.add(gluon.nn.Dense(units=2, flatten=False))
+class NextSentencePred(nn.Block):
+    def __init__(self, num_hiddens, **kwargs):
+        super(NextSentencePred, self).__init__(**kwargs)
+        self.mlp = nn.Sequential()
+        self.mlp.add(nn.Dense(num_hiddens, activation='tanh'))
+        self.mlp.add(nn.Dense(2))
 
     def forward(self, X):
+        # 0 is the index of the CLS token
         X = X[:, 0, :]
-        return self.classifier(X)
+        # X shape: (batch size, embed_size)
+        return self.mlp(X)
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert.md
 class BERTModel(nn.Block):
-    def __init__(self, vocab_size=None, embed_size=128, hidden_size=512,
-                 num_heads=2, num_layers=4, dropout=0.1):
+    def __init__(self, vocab_size, embed_size, pw_num_hiddens, num_heads,
+                 num_layers, dropout):
         super(BERTModel, self).__init__()
-        self.encoder = BERTEncoder(vocab_size=vocab_size, units=embed_size, hidden_size=hidden_size,
-                                   num_heads=num_heads, num_layers=num_layers, dropout=dropout)
-        self.ns_classifier = NextSentenceClassifier()
-        self.mlm_decoder = MaskLMDecoder(vocab_size=vocab_size, units=embed_size)
+        self.encoder = BERTEncoder(vocab_size, embed_size, pw_num_hiddens,
+                                   num_heads, num_layers, dropout)
+        self.nsp = NextSentencePred(embed_size)
+        self.mlm = MaskLM(vocab_size, embed_size)
 
-    def forward(self, inputs, token_types, valid_length=None, masked_positions=None):
-        seq_out = self.encoder(inputs, token_types, valid_length)
-        next_sentence_classifier_out = self.ns_classifier(seq_out)
-        if not masked_positions is None:
-            mlm_decoder_out = self.mlm_decoder(seq_out, masked_positions)
+    def forward(self, tokens, segments, valid_length=None,
+                masked_positions=None):
+        X = self.encoder(tokens, segments, valid_length)
+        if masked_positions is not None:
+            mlm_Y = self.mlm(X, masked_positions)
         else:
-            mlm_decoder_out = None
-        return seq_out, next_sentence_classifier_out, mlm_decoder_out
+            mlm_Y = None
+        nsp_Y = self.nsp(X)
+        return X, mlm_Y, nsp_Y
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-gluon.md
@@ -1966,7 +1965,7 @@ def batch_loss_bert(net, nsp_loss, mlm_loss, input_id, masked_id, masked_positio
     for i_id, m_id, m_pos, m_w, nsl, s_i, v_l in zip(input_id, masked_id, masked_position, masked_weight,\
                                                       next_sentence_label, segment_id, valid_length):
         num_masks = m_w.sum() + 1e-8
-        _, classified, decoded = net(i_id, s_i, v_l.reshape(-1),m_pos)
+        _, decoded, classified = net(i_id, s_i, v_l.reshape(-1),m_pos)
         l_mlm = mlm_loss(decoded.reshape((-1, vocab_size)),m_id.reshape(-1), m_w.reshape((-1, 1)))
         l_mlm = l_mlm.sum() / num_masks
         l_nsp = nsp_loss(classified, nsl)
@@ -2151,311 +2150,5 @@ def predict_snli(net, premise, hypothesis):
                            hypothesis.reshape((1, -1))]), axis=1)
     return 'entailment' if label == 0 else 'contradiction' if label == 1 \
             else 'neutral'
-
-
-# Defined in file: ./chapter_recommender-systems/movielens.md
-d2l.DATA_HUB['ml-100k'] = (
-    'http://files.grouplens.org/datasets/movielens/ml-100k.zip',
-    'cd4dcac4241c8a4ad7badc7ca635da8a69dddb83')
-
-
-# Defined in file: ./chapter_recommender-systems/movielens.md
-def read_data_ml100k():
-    data_dir = d2l.download_extract('ml-100k')
-    names = ['user_id', 'item_id', 'rating', 'timestamp']
-    data = pd.read_csv(data_dir + 'u.data', '\t', names=names,
-                       engine='python')
-    num_users = data.user_id.unique().shape[0]
-    num_items = data.item_id.unique().shape[0]
-    return data, num_users, num_items
-
-
-# Defined in file: ./chapter_recommender-systems/movielens.md
-def split_data_ml100k(data, num_users, num_items,
-                      split_mode="random", test_ratio=0.1):
-    """Split the dataset in random mode or seq-aware mode."""
-    if split_mode == "seq-aware":
-        train_items, test_items, train_list = {}, {}, []
-        for line in data.itertuples():
-            u, i, rating, time = line[1], line[2], line[3], line[4]
-            train_items.setdefault(u, []).append((u, i, rating, time))
-            if u not in test_items or test_items[u][-1] < time:
-                test_items[u] = (i, rating, time)
-        for u in range(1, num_users + 1):
-            train_list.extend(sorted(train_items[u], key=lambda k: k[3]))
-        test_data = [(key, *value) for key, value in test_items.items()]
-        train_data = [item for item in train_list if item not in test_data]
-        train_data = pd.DataFrame(train_data)
-        test_data = pd.DataFrame(test_data)
-    else:
-        mask = [True if x == 1 else False for x in np.random.uniform(
-            0, 1, (len(data))) < 1 - test_ratio]
-        neg_mask = [not x for x in mask]
-        train_data, test_data = data[mask], data[neg_mask]
-    return train_data, test_data
-
-
-# Defined in file: ./chapter_recommender-systems/movielens.md
-def load_data_ml100k(data, num_users, num_items, feedback="explicit"):
-    users, items, scores = [], [], []
-    inter = np.zeros((num_items, num_users)) if feedback == "explicit" else {}
-    for line in data.itertuples():
-        user_index, item_index = int(line[1] - 1), int(line[2] - 1)
-        score = int(line[3]) if feedback == "explicit" else 1
-        users.append(user_index)
-        items.append(item_index)
-        scores.append(score)
-        if feedback == "implicit":
-            inter.setdefault(user_index, []).append(item_index)
-        else:
-            inter[item_index, user_index] = score
-    return users, items, scores, inter
-
-
-# Defined in file: ./chapter_recommender-systems/movielens.md
-def split_and_load_ml100k(split_mode="seq-aware", feedback="explicit",
-                          test_ratio=0.1, batch_size=256):
-    data, num_users, num_items = read_data_ml100k()
-    train_data, test_data = split_data_ml100k(
-        data, num_users, num_items, split_mode, test_ratio)
-    train_u, train_i, train_r, _ = load_data_ml100k(
-        train_data, num_users, num_items, feedback)
-    test_u, test_i, test_r, _ = load_data_ml100k(
-        test_data, num_users, num_items, feedback)
-    train_set = gluon.data.ArrayDataset(
-        np.array(train_u), np.array(train_i), np.array(train_r))
-    test_set = gluon.data.ArrayDataset(
-        np.array(test_u), np.array(test_i), np.array(test_r))
-    train_iter = gluon.data.DataLoader(
-        train_set, shuffle=True, last_batch="rollover",
-        batch_size=batch_size)
-    test_iter = gluon.data.DataLoader(
-        test_set, batch_size=batch_size)
-    return num_users, num_items, train_iter, test_iter
-
-
-# Defined in file: ./chapter_recommender-systems/mf.md
-def train_recsys_rating(net, train_iter, test_iter, loss, trainer, num_epochs,
-                        ctx_list=d2l.try_all_gpus(), evaluator=None,
-                        **kwargs):
-    timer = d2l.Timer()
-    animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 2],
-                            legend=['train loss', 'test RMSE'])
-    for epoch in range(num_epochs):
-        metric, l = d2l.Accumulator(3), 0.
-        for i, values in enumerate(train_iter):
-            timer.start()
-            input_data = []
-            values = values if isinstance(values, list) else [values]
-            for v in values:
-                input_data.append(gluon.utils.split_and_load(v, ctx_list))
-            train_feat = input_data[0:-1] if len(values) > 1 else input_data
-            train_label = input_data[-1]
-            with autograd.record():
-                preds = [net(*t) for t in zip(*train_feat)]
-                ls = [loss(p, s) for p, s in zip(preds, train_label)]
-            [l.backward() for l in ls]
-            l += sum([l.asnumpy() for l in ls]).mean() / len(ctx_list)
-            trainer.step(values[0].shape[0])
-            metric.add(l, values[0].shape[0], values[0].size)
-            timer.stop()
-        if len(kwargs) > 0:  # it will be used in section AutoRec.
-            test_rmse = evaluator(net, test_iter, kwargs['inter_mat'],
-                                  ctx_list)
-        else:
-            test_rmse = evaluator(net, test_iter, ctx_list)
-        train_l = l / (i + 1)
-        animator.add(epoch + 1, (train_l, test_rmse))
-    print('train loss %.3f, test RMSE %.3f'
-          % (metric[0] / metric[1], test_rmse))
-    print('%.1f examples/sec on %s'
-          % (metric[2] * num_epochs / timer.sum(), ctx_list))
-
-
-# Defined in file: ./chapter_recommender-systems/ranking.md
-class BPRLoss(gluon.loss.Loss):
-    def __init__(self, weight=None, batch_axis=0, **kwargs):
-        super(BPRLoss, self).__init__(weight=None, batch_axis=0, **kwargs)
-
-    def forward(self, positive, negative):
-        distances = positive - negative
-        loss = - np.sum(np.log(npx.sigmoid(distances)), 0, keepdims=True)
-        return loss
-
-
-# Defined in file: ./chapter_recommender-systems/ranking.md
-class HingeLossbRec(gluon.loss.Loss):
-    def __init__(self, weight=None, batch_axis=0, **kwargs):
-        super(HingeLossbRec, self).__init__(weight=None, batch_axis=0,
-                                            **kwargs)
-
-    def forward(self, positive, negative, margin=1):
-        distances = positive - negative
-        loss = np.sum(np.maximum(- distances + margin, 0))
-        return loss
-
-
-# Defined in file: ./chapter_recommender-systems/neumf.md
-def hit_and_auc(rankedlist, test_matrix, k):
-    hits_k = [(idx, val) for idx, val in enumerate(rankedlist[:k])
-              if val in set(test_matrix)]
-    hits_all = [(idx, val) for idx, val in enumerate(rankedlist)
-                if val in set(test_matrix)]
-    max = len(rankedlist) - 1
-    auc = 1.0 * (max - hits_all[0][0]) / max if len(hits_all) > 0 else 0
-    return len(hits_k), auc
-
-
-# Defined in file: ./chapter_recommender-systems/neumf.md
-def evaluate_ranking(net, test_input, seq, candidates, num_users, num_items,
-                     ctx):
-    ranked_list, ranked_items, hit_rate, auc = {}, {}, [], []
-    all_items = set([i for i in range(num_users)])
-    for u in range(num_users):
-        neg_items = list(all_items - set(candidates[int(u)]))
-        user_ids, item_ids, x, scores = [], [], [], []
-        [item_ids.append(i) for i in neg_items]
-        [user_ids.append(u) for _ in neg_items]
-        x.extend([np.array(user_ids)])
-        if seq is not None:
-            x.append(seq[user_ids, :])
-        x.extend([np.array(item_ids)])
-        test_data_iter = gluon.data.DataLoader(gluon.data.ArrayDataset(*x),
-                                               shuffle=False, 
-                                               last_batch="keep", 
-                                               batch_size=1024) 
-        for index, values in enumerate(test_data_iter):
-            x = [gluon.utils.split_and_load(v, ctx, even_split=False) 
-                 for v in values]
-            scores.extend([list(net(*t).asnumpy()) for t in zip(*x)])
-        scores = [item for sublist in scores for item in sublist]
-        item_scores = list(zip(item_ids, scores))
-        ranked_list[u] = sorted(item_scores, key=lambda t: t[1], reverse=True)
-        ranked_items[u] = [r[0] for r in ranked_list[u]]
-        temp = hit_and_auc(ranked_items[u], test_input[u], 50)
-        hit_rate.append(temp[0])
-        auc.append(temp[1])
-    return np.mean(np.array(hit_rate)), np.mean(np.array(auc))
-
-
-# Defined in file: ./chapter_recommender-systems/neumf.md
-def train_ranking(net, train_iter, test_iter, loss, trainer, test_seq_iter,
-                  num_users, num_items, num_epochs, ctx_list, evaluator, 
-                  candidates, eval_step=1):
-    timer, hit_rate, auc = d2l.Timer(), 0, 0
-    animator = d2l.Animator(xlabel='epoch', xlim=[1, num_epochs], ylim=[0, 1],
-                            legend=['test hit rate', 'test AUC'])
-    for epoch in range(num_epochs):
-        metric, l = d2l.Accumulator(3), 0.
-        for i, values in enumerate(train_iter):
-            input_data = []
-            for v in values:
-                input_data.append(gluon.utils.split_and_load(v, ctx_list))
-            with autograd.record():
-                p_pos = [net(*t) for t in zip(*input_data[0:-1])]
-                p_neg = [net(*t) for t in zip(*input_data[0:-2], 
-                                              input_data[-1])]
-                ls = [loss(p, n) for p, n in zip(p_pos, p_neg)]
-            [l.backward(retain_graph=False) for l in ls]
-            l += sum([l.asnumpy() for l in ls]).mean()/len(ctx_list)
-            trainer.step(values[0].shape[0])
-            metric.add(l, values[0].shape[0], values[0].size)
-            timer.stop()
-        with autograd.predict_mode():
-            if (epoch + 1) % eval_step == 0:
-                hit_rate, auc = evaluator(net, test_iter, test_seq_iter,
-                                          candidates, num_users, num_items,
-                                          ctx_list)
-                animator.add(epoch + 1, (hit_rate, auc))
-    print('train loss %.3f, test hit rate %.3f, test AUC %.3f'
-          % (metric[0] / metric[1], hit_rate, auc))
-    print('%.1f examples/sec on %s'
-          % (metric[2] * num_epochs / timer.sum(), ctx_list))
-
-
-# Defined in file: ./chapter_recommender-systems/ctr.md
-d2l.DATA_HUB['ctr'] = (d2l.DATA_URL + 'ctr.zip',
-                       'e18327c48c8e8e5c23da714dd614e390d369843f')
-
-
-# Defined in file: ./chapter_recommender-systems/ctr.md
-class CTRDataset(gluon.data.Dataset):
-    def __init__(self, data_path, feat_mapper=None, defaults=None,
-                 min_threshold=4, num_feat=34):
-        self.NUM_FEATS, self.count, self.data = num_feat, 0, {}
-        feat_cnts = defaultdict(lambda: defaultdict(int))
-        self.feat_mapper, self.defaults = feat_mapper, defaults
-        self.field_dims = np.zeros(self.NUM_FEATS, dtype=np.int64)
-        with open(data_path) as f:
-            for line in f:
-                instance = {}
-                values = line.rstrip('\n').split('\t')
-                if len(values) != self.NUM_FEATS + 1:
-                    continue
-                label = np.float32([0, 0])
-                label[int(values[0])] = 1
-                instance['y'] = [np.float32(values[0])]
-                for i in range(1, self.NUM_FEATS + 1):
-                    feat_cnts[i][values[i]] += 1
-                    instance.setdefault('x', []).append(values[i])
-                self.data[self.count] = instance
-                self.count = self.count + 1
-        if self.feat_mapper is None and self.defaults is None:
-            feat_mapper = {i: {feat for feat, c in cnt.items() if c >=
-                               min_threshold} for i, cnt in feat_cnts.items()}
-            self.feat_mapper = {i: {feat: idx for idx, feat in enumerate(cnt)}
-                                for i, cnt in feat_mapper.items()}
-            self.defaults = {i: len(cnt) for i, cnt in feat_mapper.items()}
-        for i, fm in self.feat_mapper.items():
-            self.field_dims[i - 1] = len(fm) + 1
-        self.offsets = np.array((0, *np.cumsum(self.field_dims).asnumpy()
-                                 [:-1]))
-        
-    def __len__(self):
-        return self.count
-    
-    def __getitem__(self, idx):
-        feat = np.array([self.feat_mapper[i + 1].get(v, self.defaults[i + 1])
-                         for i, v in enumerate(self.data[idx]['x'])])
-        return feat + self.offsets, self.data[idx]['y']
-
-
-# Defined in file: ./chapter_generative-adversarial-networks/gan.md
-def update_D(X, Z, net_D, net_G, loss, trainer_D):
-    """Update discriminator."""
-    batch_size = X.shape[0]
-    ones = np.ones((batch_size,), ctx=X.context)
-    zeros = np.zeros((batch_size,), ctx=X.context)
-    with autograd.record():
-        real_Y = net_D(X)
-        fake_X = net_G(Z)
-        # Do not need to compute gradient for net_G, detach it from
-        # computing gradients.
-        fake_Y = net_D(fake_X.detach())
-        loss_D = (loss(real_Y, ones) + loss(fake_Y, zeros)) / 2
-    loss_D.backward()
-    trainer_D.step(batch_size)
-    return float(loss_D.sum())
-
-
-# Defined in file: ./chapter_generative-adversarial-networks/gan.md
-def update_G(Z, net_D, net_G, loss, trainer_G):  # saved in d2l
-    """Update generator."""
-    batch_size = Z.shape[0]
-    ones = np.ones((batch_size,), ctx=Z.context)
-    with autograd.record():
-        # We could reuse fake_X from update_D to save computation.
-        fake_X = net_G(Z)
-        # Recomputing fake_Y is needed since net_D is changed.
-        fake_Y = net_D(fake_X)
-        loss_G = loss(fake_Y, ones)
-    loss_G.backward()
-    trainer_G.step(batch_size)
-    return float(loss_G.sum())
-
-
-# Defined in file: ./chapter_generative-adversarial-networks/dcgan.md
-d2l.DATA_HUB['pokemon'] = (d2l.DATA_URL + 'pokemon.zip',
-                           'c065c0e2593b8b161a2d7873e42418bf6a21106c')
 
 

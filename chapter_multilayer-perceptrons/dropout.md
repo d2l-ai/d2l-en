@@ -234,11 +234,11 @@ from the uniform distribution $U[0, 1]$.
 then we can keep those nodes for which the corresponding
 sample is greater than $p$, dropping the rest.
 
-In the following code, we implement a `dropout` function
+In the following code, we implement a `dropout_layer` function
 that drops out the elements in the `ndarray` input `X`
-with probability `drop_prob`,
+with probability `dropout`,
 rescaling the remainder as described above
-(dividing the survivors by `1.0-drop_prob`).
+(dividing the survivors by `1.0-dropout`).
 
 ```{.python .input  n=1}
 import d2l
@@ -246,25 +246,25 @@ from mxnet import autograd, gluon, init, np, npx
 from mxnet.gluon import nn
 npx.set_np()
 
-def dropout(X, drop_prob):
-    assert 0 <= drop_prob <= 1
+def dropout_layer(X, dropout):
+    assert 0 <= dropout <= 1
     # In this case, all elements are dropped out
-    if drop_prob == 1:
+    if dropout == 1:
         return np.zeros_like(X)
-    mask = np.random.uniform(0, 1, X.shape) > drop_prob
-    return mask.astype(np.float32) * X / (1.0-drop_prob)
+    mask = np.random.uniform(0, 1, X.shape) > dropout
+    return mask.astype(np.float32) * X / (1.0-dropout)
 ```
 
-We can test out the `dropout` function on a few examples.
+We can test out the `dropout_layer` function on a few examples.
 In the following lines of code, 
 we pass our input `X` through the dropout operation,
 with probabilities 0, 0.5, and 1, respectively.
 
 ```{.python .input  n=2}
 X = np.arange(16).reshape(2, 8)
-print(dropout(X, 0))
-print(dropout(X, 0.5))
-print(dropout(X, 1))
+print(dropout_layer(X, 0))
+print(dropout_layer(X, 0.5))
+print(dropout_layer(X, 1))
 ```
 
 ### Defining Model Parameters
@@ -302,7 +302,7 @@ and second hidden layer respectively.
  we can ensure that dropout is only active during training.
 
 ```{.python .input  n=4}
-drop_prob1, drop_prob2 = 0.2, 0.5
+dropout1, dropout2 = 0.2, 0.5
 
 def net(X):
     X = X.reshape(-1, num_inputs)
@@ -310,11 +310,11 @@ def net(X):
     # Use dropout only when training the model
     if autograd.is_training():
         # Add a dropout layer after the first fully connected layer
-        H1 = dropout(H1, drop_prob1)
+        H1 = dropout_layer(H1, dropout1)
     H2 = npx.relu(np.dot(H1, W2) + b2)
     if autograd.is_training():
         # Add a dropout layer after the second fully connected layer
-        H2 = dropout(H2, drop_prob2)
+        H2 = dropout_layer(H2, dropout2)
     return np.dot(H2, W3) + b3
 ```
 
@@ -348,10 +348,10 @@ the `Dropout` layer simply passes the data through during testing.
 net = nn.Sequential()
 net.add(nn.Dense(256, activation="relu"),
         # Add a dropout layer after the first fully connected layer
-        nn.Dropout(drop_prob1),
+        nn.Dropout(dropout1),
         nn.Dense(256, activation="relu"),
         # Add a dropout layer after the second fully connected layer
-        nn.Dropout(drop_prob2),
+        nn.Dropout(dropout2),
         nn.Dense(10))
 net.initialize(init.Normal(sigma=0.01))
 ```

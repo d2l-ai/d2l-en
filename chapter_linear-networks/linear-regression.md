@@ -79,7 +79,7 @@ limit the expressivity of our linear model.
 
 Given a dataset, our goal is to choose
 the weights $w$ and bias $b$ such that on average,
-the predictions made according our  model
+the predictions made according to our model
 best fit the true prices observed in the data.
 
 In disciplines where it is common to focus
@@ -233,7 +233,7 @@ on every single example in the dataset.
 In practice, this can be extremely slow.
 We must pass over the entire dataset before making a single update.
 Thus, we will often settle for sampling a random minibatch of examples
-every time we need to computer the update,
+every time we need to compute the update,
 a variant called *stochastic gradient descent*.
 
 In each iteration, we first randomly sample a minibatch $\mathcal{B}$
@@ -251,7 +251,7 @@ $$(\mathbf{w},b) \leftarrow (\mathbf{w},b) - \frac{\eta}{|\mathcal{B}|} \sum_{i 
 
 To summarize, steps of the algorithm are the following:
 (i) we initialize the values of the model parameters, typically at random;
-(ii) we iteratively sample random batches from the the data (many times),
+(ii) we iteratively sample random batches from the data (many times),
 updating the parameters in the direction of the negative gradient.
 
 For quadratic losses and linear functions,
@@ -508,7 +508,7 @@ of a linear model under the assumption of additive Gaussian noise.
 So far we only talked about linear functions.
 While neural networks cover a much richer family of models,
 we can begin thinking of the linear model
-as a neural network by expressing it the language of neural networks.
+as a neural network by expressing it in the language of neural networks.
 To begin, let's start by rewriting things in a 'layer' notation.
 
 ### Neural Network Diagram

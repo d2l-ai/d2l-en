@@ -349,7 +349,7 @@ the higher image resolution and the more costly convolutions.
 
 ```{.python .input  n=5}
 lr, num_epochs = 0.01, 10
-d2l.train_ch5(net, train_iter, test_iter, num_epochs, lr)
+d2l.train_ch6(net, train_iter, test_iter, num_epochs, lr)
 ```
 
 ## Summary

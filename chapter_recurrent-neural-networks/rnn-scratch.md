@@ -1,7 +1,7 @@
 # Implementation of Recurrent Neural Networks from Scratch
 :label:`sec_rnn_scratch`
 
-In this section we implement a language model introduce in :numref:`chap_rnn` from scratch. It is based on a character-level recurrent neural network trained on H. G. Wells' *The Time Machine*. As before, we start by reading the dataset first, which is introduced in :numref:`sec_language_model`.
+In this section we implement a language model introduced in :numref:`chap_rnn` from scratch. It is based on a character-level recurrent neural network trained on H. G. Wells' *The Time Machine*. As before, we start by reading the dataset first, which is introduced in :numref:`sec_language_model`.
 
 ```{.python .input  n=14}
 %matplotlib inline
@@ -110,7 +110,7 @@ class RNNModelScratch(object):
 Let's do a sanity check whether inputs and outputs have the correct dimensions, e.g., to ensure that the dimensionality of the hidden state has not changed.
 
 ```{.python .input}
-vocab_size, num_hiddens, ctx = len(vocab), 512, d2l.try_gpu()
+num_hiddens, ctx = 512, d2l.try_gpu()
 model = RNNModelScratch(len(vocab), num_hiddens, ctx, get_params,
                         init_rnn_state, rnn)
 state = model.begin_state(X.shape[0], ctx)
@@ -141,7 +141,7 @@ def predict_ch8(prefix, num_predicts, model, vocab, ctx):
     return ''.join([vocab.idx_to_token[i] for i in outputs])
 ```
 
-We test the `predict_rnn` function first. Given that we did not train the network it will generate nonsensical predictions. We initialize it with the sequence `traveller ` and have it generate 10 additional characters.
+We test the `predict_rnn` function first. Given that we did not train the network, it will generate nonsensical predictions. We initialize it with the sequence `traveller ` and have it generate 10 additional characters.
 
 ```{.python .input  n=9}
 predict_ch8('time traveller ', 10, model, vocab, ctx)
@@ -257,7 +257,7 @@ def train_ch8(model, train_iter, vocab, lr, num_epochs, ctx,
     print(predict('traveller'))
 ```
 
-Now we can train a model. Since we only use $10,000$ tokens in the dataset, so here the model needs more epochs to converge.
+Now we can train a model. Since we only use $10,000$ tokens in the dataset, the model needs more epochs to converge.
 
 ```{.python .input}
 num_epochs, lr = 500, 1

@@ -4,7 +4,9 @@
 We have seen how to represent text tokens and train their representation in :numref:`chap_nlp_pretrain`.
 Such pretrained text representation can be fed to various models for different downstream NLP tasks.
 
-In fact, we have discussed NLP applications without pretraining in earlier chapters,
+This book does not intend to cover NLP applications in a comprehensive manner.
+Our focus is on *how to apply (deep) representation learning of languages to addressing NLP problems*.
+Nonetheless, we have already discussed several NLP applications without pretraining in earlier chapters,
 just for explaining deep learning architectures.
 For instance, in :numref:`chap_rnn`,
 we have relied on RNNs to design language models to generate novella-like text.
