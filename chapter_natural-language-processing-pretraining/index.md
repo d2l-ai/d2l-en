@@ -46,9 +46,5 @@ glove
 subword-embedding
 similarity-analogy
 
-bert
-bert-gluon
-natural-language-inference-bert
-
 ```
 
