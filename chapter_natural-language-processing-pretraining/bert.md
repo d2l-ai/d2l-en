@@ -97,7 +97,9 @@ mlm_pred = mlm_decoder(encodings, mlm_positions)
 mlm_pred.shape
 ```
 
-```{.python .input  n=12}
+
+
+```{.python .input}
 mlm_loss_fn = gluon.loss.SoftmaxCrossEntropyLoss()
 mlm_loss = mlm_loss_fn(mlm_pred, mlm_label)
 mlm_loss.shape
