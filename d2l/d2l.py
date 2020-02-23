@@ -1695,40 +1695,42 @@ class BERTEncoder(nn.Block):
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert.md
-class MaskLMDecoder(nn.Block):
+class MaskLM(nn.Block):
     def __init__(self, vocab_size, num_hiddens, **kwargs):
-        super(MaskLMDecoder, self).__init__(**kwargs)
-        self.decoder = nn.Sequential()
-        self.decoder.add(
+        super(MaskLM, self).__init__(**kwargs)
+        self.mlp = nn.Sequential()
+        self.mlp.add(
             nn.Dense(num_hiddens, flatten=False, activation='relu'))
-        self.decoder.add(nn.LayerNorm())
-        self.decoder.add(nn.Dense(vocab_size, flatten=False))
+        self.mlp.add(nn.LayerNorm())
+        self.mlp.add(nn.Dense(vocab_size, flatten=False))
 
     def forward(self, X, masked_positions):
         num_masked_positions = masked_positions.shape[1]
-        masked_positions = masked_positions.reshape((1, -1))
+        masked_positions = masked_positions.reshape(-1)
         batch_size = X.shape[0]
-        batch_idx = np.arange(0, batch_size)   
+        batch_idx = np.arange(0, batch_size)
+        # Suppose that batch_size = 2, num_masked_positions = 3,
+        # batch_idx = np.array([0, 0, 0, 1, 1, 1])
         batch_idx = np.repeat(batch_idx, num_masked_positions)
-        batch_idx = np.expand_dims(batch_idx, axis=0)
-        encoded = X[batch_idx, masked_positions]
-        encoded = encoded.reshape((batch_size, num_masked_positions, X.shape[-1]))
-        pred = self.decoder(encoded)
-        return pred
+        masked_X = X[batch_idx, masked_positions]
+        masked_X = masked_X.reshape((batch_size, num_masked_positions, -1))
+        masked_preds = self.mlp(masked_X)
+        return masked_preds
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert.md
-class NextSentenceClassifier(nn.Block):
+class NextSentencePred(nn.Block):
     def __init__(self, num_hiddens, **kwargs):
-        super(NextSentenceClassifier, self).__init__(**kwargs)
-        self.classifier = nn.Sequential()
-        self.classifier.add(nn.Dense(num_hiddens, flatten=False,
-                                     activation='tanh'))
-        self.classifier.add(nn.Dense(2, flatten=False))
+        super(NextSentencePred, self).__init__(**kwargs)
+        self.mlp = nn.Sequential()
+        self.mlp.add(nn.Dense(num_hiddens, activation='tanh'))
+        self.mlp.add(nn.Dense(2))
 
     def forward(self, X):
+        # 0 is the index of the CLS token
         X = X[:, 0, :]
-        return self.classifier(X)
+        # X shape: (batch size, embed_size)
+        return self.mlp(X)
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert.md
@@ -1738,17 +1740,18 @@ class BERTModel(nn.Block):
         super(BERTModel, self).__init__()
         self.encoder = BERTEncoder(vocab_size, embed_size, pw_num_hiddens,
                                    num_heads, num_layers, dropout)
-        self.ns_classifier = NextSentenceClassifier(embed_size)
-        self.mlm_decoder = MaskLMDecoder(vocab_size, embed_size)
+        self.nsp = NextSentencePred(embed_size)
+        self.mlm = MaskLM(vocab_size, embed_size)
 
-    def forward(self, inputs, token_types, valid_length=None, masked_positions=None):
-        seq_out = self.encoder(inputs, token_types, valid_length)
-        next_sentence_classifier_out = self.ns_classifier(seq_out)
-        if not masked_positions is None:
-            mlm_decoder_out = self.mlm_decoder(seq_out, masked_positions)
+    def forward(self, tokens, segments, valid_length=None,
+                masked_positions=None):
+        X = self.encoder(tokens, segments, valid_length)
+        if masked_positions is not None:
+            mlm_Y = self.mlm(X, masked_positions)
         else:
-            mlm_decoder_out = None
-        return seq_out, next_sentence_classifier_out, mlm_decoder_out
+            mlm_Y = None
+        nsp_Y = self.nsp(X)
+        return X, mlm_Y, nsp_Y
 
 
 # Defined in file: ./chapter_natural-language-processing-pretraining/bert-gluon.md
@@ -1962,7 +1965,7 @@ def batch_loss_bert(net, nsp_loss, mlm_loss, input_id, masked_id, masked_positio
     for i_id, m_id, m_pos, m_w, nsl, s_i, v_l in zip(input_id, masked_id, masked_position, masked_weight,\
                                                       next_sentence_label, segment_id, valid_length):
         num_masks = m_w.sum() + 1e-8
-        _, classified, decoded = net(i_id, s_i, v_l.reshape(-1),m_pos)
+        _, decoded, classified = net(i_id, s_i, v_l.reshape(-1),m_pos)
         l_mlm = mlm_loss(decoded.reshape((-1, vocab_size)),m_id.reshape(-1), m_w.reshape((-1, 1)))
         l_mlm = l_mlm.sum() / num_masks
         l_nsp = nsp_loss(classified, nsl)

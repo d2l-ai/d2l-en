@@ -290,7 +290,7 @@ def batch_loss_bert(net, nsp_loss, mlm_loss, input_id, masked_id, masked_positio
     for i_id, m_id, m_pos, m_w, nsl, s_i, v_l in zip(input_id, masked_id, masked_position, masked_weight,\
                                                       next_sentence_label, segment_id, valid_length):
         num_masks = m_w.sum() + 1e-8
-        _, classified, decoded = net(i_id, s_i, v_l.reshape(-1),m_pos)
+        _, decoded, classified = net(i_id, s_i, v_l.reshape(-1),m_pos)
         l_mlm = mlm_loss(decoded.reshape((-1, vocab_size)),m_id.reshape(-1), m_w.reshape((-1, 1)))
         l_mlm = l_mlm.sum() / num_masks
         l_nsp = nsp_loss(classified, nsl)
