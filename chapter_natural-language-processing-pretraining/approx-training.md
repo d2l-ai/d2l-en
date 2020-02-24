@@ -1,4 +1,4 @@
-# Approximate Training for Word2vec
+# Approximate Training
 :label:`sec_approx_train`
 
 Recall content of the last section.  The core feature of the skip-gram model is the use of softmax operations to compute the conditional probability of generating context word $w_o$ based on the given central target word $w_c$.
