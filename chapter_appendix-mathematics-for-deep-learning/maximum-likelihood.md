@@ -91,7 +91,7 @@ Since the function $x \mapsto \log(x)$ is increasing, maximizing the likelihood 
 
 We often work with loss functions, where we wish to minimize the loss.  We may turn maximum likelihood into the minimization of a loss by taking $-\log(P(X \mid \boldsymbol{\theta}))$, which is the *negative log-likelihood*.
 
-To illustrate this, consider the coin flipping problem from before, and pretend that we do not know the closed form solution.  The we may compute that
+To illustrate this, consider the coin flipping problem from before, and pretend that we do not know the closed form solution.  We may compute that
 
 $$
 -\log(P(X \mid \boldsymbol{\theta})) = -\log(\theta^{n_H}(1-\theta)^{n_T}) = -(n_H\log(\theta) + n_T\log(1-\theta)).
