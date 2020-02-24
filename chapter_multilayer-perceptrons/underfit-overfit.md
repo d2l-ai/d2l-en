@@ -385,7 +385,7 @@ For many tasks, deep learning only outperforms linear models
 when many thousands of training examples are available.
 In part, the current success of deep learning
 owes to the current abundance of massive datasets
-due to internet companies, cheap storage, connected devices,
+due to Internet companies, cheap storage, connected devices,
 and the broad digitization of the economy.
 
 ## Polynomial Regression

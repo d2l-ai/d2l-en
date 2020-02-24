@@ -19,7 +19,7 @@ d2l.use_svg_display()
 MNIST :cite:`LeCun.Bottou.Bengio.ea.1998` is one of widely used datasets. It contains 60,000 images for training and 10,000 images for validation. Each image contains a handwritten digit from 0 to 9. The task is classifying each image into the corresponding digit.
 
 Gluon provides a `MNIST` class in the `data.vision` module to
-automatically retrieve the dataset from the internet.
+automatically retrieve the dataset from the Internet.
 Subsequently, Gluon will use the already-downloaded local copy.
 We specify whether we are requesting the training set or the test set
 by setting the value of the parameter `train` to `True` or `False`, respectively.

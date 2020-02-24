@@ -118,7 +118,7 @@ Code is best described in Python.
 And webpages are native in HTML and JavaScript.
 Furthermore, we want the content to be
 accessible both as executable code, as a physical book,
-as a downloadable PDF, and on the internet as a website.
+as a downloadable PDF, and on the Internet as a website.
 At present there exist no tools and no workflow
 perfectly suited to these demands, so we had to assemble our own.
 We describe our approach in detail in :numref:`sec_how_to_contribute`.
