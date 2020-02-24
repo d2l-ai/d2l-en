@@ -52,7 +52,7 @@ the extreme flexibility of neural networks
 by training deep nets on randomly-labeled images.
 Despite the absence of any true pattern
 linking the inputs to the outputs,
-they found that the neural network optimized by SGD,
+they found that the neural network optimized by SGD
 could label every image in the training set perfectly.
 
 Consider what this means.
@@ -61,14 +61,14 @@ at random and there are 10 classes,
 then no classifier can do better 
 than 10% accuracy on holdout data.
 The generalization gap here is a whopping 90%.
-If our models so expressive that they 
+If our models are so expressive that they 
 can overfit this badly, then when should
 we expect them not to overfit?
-The mathemtatical foundations for 
+The mathematical foundations for 
 the puzzling generalization properties
 of deep networks remain open research questions,
 and we encourage the theoretically-oriented 
-reader to dig deeperinto the topic.
+reader to dig deeper into the topic.
 For now, we turn to the more terrestrial investigation of 
 practical tools that tend (empirically)
 to improve the generalization of deep nets.
@@ -136,7 +136,7 @@ offers intuition through a surprising
 analogy to sexual reproduction.
 The authors argue that neural network overfitting
 is characterized by a state in which 
-each layer an relies on a specifc 
+each layer relies on a specifc 
 pattern of activations in the previous layer,
 calling this condition *co-adaptation*.
 Dropout, they claim, breaks up co-adaptation
@@ -144,7 +144,7 @@ just as sexual reproduction is argued to
 break up co-adapted genes. 
 
 The key challenge then is *how* to inject this noise.
-One idea is too inject the noise in an *unbiased* manner
+One idea is to inject the noise in an *unbiased* manner
 so that the expected value of each layer---fixing 
 the others equal to the value it would have taken absent noise.
 
@@ -251,6 +251,9 @@ def dropout_layer(X, dropout):
     # In this case, all elements are dropped out
     if dropout == 1:
         return np.zeros_like(X)
+    # In this case, all elements are kept
+    if dropout == 0:
+        return X
     mask = np.random.uniform(0, 1, X.shape) > dropout
     return mask.astype(np.float32) * X / (1.0-dropout)
 ```
