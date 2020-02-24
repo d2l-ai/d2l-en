@@ -66,7 +66,7 @@ This allows us to quantify the average squared deviation from the true value.  M
 
 ### Statistical Bias
 
-The MSE provides a natural metric, but we can easily imagine multiple different phenomena that might make it large.  Two that we will see are fundamentally important are the fluctuation in the estimator due to randomness in the dataset, and systematic error in the estimator due to the estimation procedure.  
+The MSE provides a natural metric, but we can easily imagine multiple different phenomena that might make it large.  Two fundamentally important are fluctuation in the estimator due to randomness in the dataset, and systematic error in the estimator due to the estimation procedure.  
 
 
 First, let's measure the systematic error. For an estimator $\hat{\theta}_n$, the mathematical illustration of *statistical bias* can be defined as
