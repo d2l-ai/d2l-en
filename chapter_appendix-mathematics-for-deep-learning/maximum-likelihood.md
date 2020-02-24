@@ -73,7 +73,7 @@ This has three solutions: $0$, $1$ and $9/13$.  The first two are clearly minima
 
 The previous example is nice, but what if we have billions of parameters and data points.
 
-First notice that, if we make the assumption that all the data points are independent, we can no longer practically consider the likelihood itself as it is a product of many probabilities.  Indeed, each probability is in $[0,1]$, say typically of size about $1/2$, and the product of $(1/2)^{1000000000}$ is far below machine precision.  We cannot work with that directly.  
+First notice that, if we make the assumption that all the data points are independent, we can no longer practically consider the likelihood itself as it is a product of many probabilities.  Indeed, each probability is in $[0,1]$, say typically of value about $1/2$, and the product of $(1/2)^{1000000000}$ is far below machine precision.  We cannot work with that directly.  
 
 However, recall that the logarithm turns products to sums, in which case 
 
