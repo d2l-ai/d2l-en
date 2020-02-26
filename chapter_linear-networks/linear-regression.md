@@ -114,7 +114,7 @@ Given a training dataset $\mathbf{X}$
 and corresponding (known) targets $\mathbf{y}$,
 the goal of linear regression is to find
 the *weight* vector $w$ and bias term $b$
-that given some a new data point $\mathbf{x}_i$,
+that given a new data point $\mathbf{x}_i$,
 sampled from the same distribution as the training data
 will (in expectation) predict the target $y_i$ with the lowest error.
 
